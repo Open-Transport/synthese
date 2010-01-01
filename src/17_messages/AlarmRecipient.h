@@ -28,18 +28,13 @@
 #include "FactoryBase.h"
 #include "12_security/Types.h"
 #include "17_messages/Types.h"
-#include "ActionFunctionRequest.h"
+#include "RequestManager.h"
 
 namespace synthese
 {
 	namespace html
 	{
 		class HTMLForm;
-	}
-
-	namespace admin
-	{
-		class AdminRequest;
 	}
 
 	namespace messages
@@ -64,9 +59,9 @@ namespace synthese
 				std::ostream& stream
 				, const messages::Alarm* alarm
 				, const server::ParametersMap& request
-				, server::FunctionRequest<admin::AdminRequest>& searchRequest
-				, server::ActionFunctionRequest<messages::AlarmAddLinkAction,admin::AdminRequest>& addRequest
-				, server::ActionFunctionRequest<messages::AlarmRemoveLinkAction, admin::AdminRequest>& removeRequest
+				, admin::AdminRequest& searchRequest
+				, server::RequestManager<server::StaticActionRequestPolicy<messages::AlarmAddLinkAction> >& addRequest
+				, server::RequestManager<server::StaticActionRequestPolicy<messages::AlarmRemoveLinkAction> >& removeRequest
 				) = 0;
 
 			virtual AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const server::ParametersMap& parameters) const = 0;

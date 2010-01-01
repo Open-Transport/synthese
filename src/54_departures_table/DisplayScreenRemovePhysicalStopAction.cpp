@@ -85,7 +85,7 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenRemovePhysicalStopAction::run()
+		void DisplayScreenRemovePhysicalStopAction::run(Request& request)
 		{
 			// Preparation
 			_screen->removePhysicalStop(_stop.get());
@@ -94,7 +94,7 @@ namespace synthese
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
 				"Retrait de l'arrêt de départ "+ _stop->getCodeBySource() +"/"+ _stop->getName(),
-				*_request->getUser()
+				*request.getUser()
 			);
 
 			DisplayScreenTableSync::Save(_screen.get());
@@ -102,16 +102,16 @@ namespace synthese
 
 
 
-		bool DisplayScreenRemovePhysicalStopAction::_isAuthorized(
+		bool DisplayScreenRemovePhysicalStopAction::isAuthorized(const Profile& profile
 		) const {
 			assert(_screen.get() != NULL);
 			if (_screen->getLocalization() != NULL)
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 		

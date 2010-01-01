@@ -42,6 +42,7 @@
 #include "AddressablePlace.h"
 #include "PTRoadsAdmin.h"
 #include "PTPlaceAdmin.h"
+#include "Profile.h"
 
 using namespace std;
 using namespace boost;
@@ -84,8 +85,7 @@ namespace synthese
 
 		
 		void PTRoadAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			try
 			{
@@ -116,9 +116,9 @@ namespace synthese
 
 		
 		bool PTRoadAdmin::isAuthorized(
-			const FunctionRequest<AdminRequest>& request
+			const security::Profile& profile
 		) const	{
-			return request.isAuthorized<TransportNetworkRight>(READ);
+			return profile.isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -126,7 +126,7 @@ namespace synthese
 		void PTRoadAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 		
 			////////////////////////////////////////////////////////////////////
@@ -245,7 +245,7 @@ namespace synthese
 
 
 
-		void PTRoadAdmin::_buildTabs( const server::FunctionRequest<admin::AdminRequest>& request ) const
+		void PTRoadAdmin::_buildTabs( const admin::AdminRequest& request ) const
 		{
 			_tabs.clear();
 			_tabs.push_back(Tab("Carte", TAB_MAP, true));

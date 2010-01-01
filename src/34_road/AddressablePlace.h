@@ -81,7 +81,7 @@ namespace synthese
 
 			AddressablePlace(
 				bool allowedConnection= false,
-				boost::posix_time::time_duration defaultTransferDelay = boost::posix_time::time_duration()
+				boost::posix_time::time_duration defaultTransferDelay = boost::posix_time::time_duration(boost::date_time::not_a_date_time)
 			);
 
 		public:

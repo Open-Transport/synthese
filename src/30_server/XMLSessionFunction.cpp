@@ -48,25 +48,25 @@ namespace synthese
 		{
 		}
 
-		void XMLSessionFunction::_run( std::ostream& stream ) const
+		void XMLSessionFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			stream <<
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 				"<login xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/xml_Session_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" <<
 				"<session>"
 			;
-			if (_request->getSession())
-				stream << _request->getSession()->getKey();
+			if (request.getSession())
+				stream << request.getSession()->getKey();
 
 			stream << "</session>";
 
-			if (_request->getSession())
+			if (request.getSession())
 			{
 				stream <<
-					"<name>" <<	_request->getUser()->getFullName() << "</name>" <<
-					"<phone>" << _request->getUser()->getPhone() << "</phone>" <<
-					"<email>" << _request->getUser()->getEMail() << "</email>" <<
-					"<user_id>" << _request->getUser()->getKey() << "</user_id>"
+					"<name>" <<	request.getUser()->getFullName() << "</name>" <<
+					"<phone>" << request.getUser()->getPhone() << "</phone>" <<
+					"<email>" << request.getUser()->getEMail() << "</email>" <<
+					"<user_id>" << request.getUser()->getKey() << "</user_id>"
 				;
 			}
 
@@ -75,7 +75,7 @@ namespace synthese
 		
 		
 		
-		bool XMLSessionFunction::_isAuthorized() const
+		bool XMLSessionFunction::isAuthorized(const Profile& profile) const
 		{
 			return true;
 		}

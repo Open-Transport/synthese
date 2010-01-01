@@ -78,6 +78,7 @@
 #include "City.h"
 #include "DisplayScreenTransferDestinationAddAction.h"
 #include "DisplayScreenTransferDestinationRemoveAction.h"
+#include "Profile.h"
 
 #include <utility>
 #include <sstream>
@@ -125,11 +126,8 @@ namespace synthese
 
 
 		void DisplayAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
-			if(objectWillBeCreatedLater) return;
-
 			try
 			{
 				_displayScreen = DisplayScreenTableSync::Get(
@@ -901,7 +899,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_RESULT))
 			{
 				// Requests
-				FunctionRequest<DisplayScreenContentFunction> viewRequest(&_request);
+				FunctionRequest<DisplayScreenContentFunction> viewRequest(_request);
 				viewRequest.getFunction()->setScreen(_displayScreen);
 				if(	_displayScreen->getType() &&
 					_displayScreen->getType()->getDisplayInterface() &&
@@ -1032,15 +1030,13 @@ namespace synthese
 
 
 		bool DisplayAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			if(_request.getActionWillCreateObject()) return true;
+			const security::Profile& profile
+		) const	{
 			if (_displayScreen.get() == NULL) return false;
-			if (_displayScreen->getLocalization() == NULL) return  _request.isAuthorized<ArrivalDepartureTableRight>(READ) || _request.isAuthorized<DisplayMaintenanceRight>(READ);
+			if (_displayScreen->getLocalization() == NULL) return profile.isAuthorized<ArrivalDepartureTableRight>(READ) || profile.isAuthorized<DisplayMaintenanceRight>(READ);
 			return
-				_request.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())) ||
-				_request.isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
+				profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())) ||
+				profile.isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
 		}
 
 		DisplayAdmin::DisplayAdmin(
@@ -1059,7 +1055,7 @@ namespace synthese
 
 
 		void DisplayAdmin::_buildTabs(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 			_tabs.clear();
 

@@ -41,9 +41,9 @@ namespace synthese
 
 		}
 
-		void LogoutAction::run()
+		void LogoutAction::run(Request& request)
 		{
-			_request->deleteSession();
+			request.deleteSession();
 		}
 
 		bool LogoutAction::_isSessionRequired() const
@@ -53,7 +53,7 @@ namespace synthese
 
 
 
-		bool LogoutAction::_isAuthorized(
+		bool LogoutAction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

@@ -133,7 +133,7 @@ namespace synthese
 		}
 
 
-		bool CityListRequest::_isAuthorized(
+		bool CityListRequest::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

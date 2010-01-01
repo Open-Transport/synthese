@@ -73,7 +73,7 @@ namespace synthese
 		
 		
 		
-		void TimetableRowDeleteAction::run()
+		void TimetableRowDeleteAction::run(Request& request)
 		{
 			TimetableRowTableSync::Shift(_element->getTimetableId(), _element->getRank(), -1);
 
@@ -82,9 +82,9 @@ namespace synthese
 		
 		
 		
-		bool TimetableRowDeleteAction::_isAuthorized(
+		bool TimetableRowDeleteAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<TimetableRight>(WRITE);
+			return profile.isAuthorized<TimetableRight>(WRITE);
 		}
 
 

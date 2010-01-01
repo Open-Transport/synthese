@@ -141,7 +141,8 @@ namespace synthese
 				bool isUseLess(
 					const TimeMap::key_type& vertex,
 					const TimeMap::mapped_type::key_type& transferNumber,
-					const TimeMap::mapped_type::mapped_type& duration
+					const TimeMap::mapped_type::mapped_type& duration,
+					bool propagateInConnectionPlace
 				);
 			//@}
 		};

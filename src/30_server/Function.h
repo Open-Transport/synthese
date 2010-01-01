@@ -38,6 +38,11 @@
 
 namespace synthese
 {
+	namespace security
+	{
+		class Profile;
+	}
+
 	namespace server
 	{
 		class Request;
@@ -72,7 +77,6 @@ namespace synthese
 		public:
 
 		protected:
-			Request* _request;
 			boost::shared_ptr<util::Env>	_env;
 
 			//////////////////////////////////////////////////////////////////////////
@@ -118,6 +122,14 @@ namespace synthese
 			boost::shared_ptr<util::Env> getEnv() const { return _env; }
 			void setEnv(boost::shared_ptr<util::Env> value) { _env = value; }
 
+
+			/** Copy of the function parameters.
+				@param function
+				@author Hugues Romain
+				@date 2007				
+			*/
+			virtual void _copy(boost::shared_ptr<const Function> function) {}
+
 		private:
 
 			/** Conversion from generic parameters map to attributes.
@@ -138,26 +150,25 @@ namespace synthese
 
 
 			/** Authorization control.
+				@param profile Profile to test
 				@return True if the action run is authorized
 				@author Hugues Romain
 				@date 2007
 			*/
-			virtual bool _isAuthorized() const = 0;
+			virtual bool isAuthorized(
+				const security::Profile& profile
+			) const = 0;
 
-			/** Copy of the function parameters.
-				@param function
-				@return void
-				@author Hugues Romain
-				@date 2007				
-			*/
-			virtual void _copy(boost::shared_ptr<const Function> function) {}
 
-			/** Function to display, defined by each subclass.
-			@param stream Stream to write the output on.
-			*/
-			virtual void _run(std::ostream& stream) const = 0;
 
-			friend class Request;
+			//////////////////////////////////////////////////////////////////////////
+			/// Function to display, defined by each subclass.
+			///	@param stream Stream to write the output on.
+			/// @param request The request which has launched the function
+			virtual void run(
+				std::ostream& stream,
+				const Request& request
+			) const = 0;
 		};
 	}
 }

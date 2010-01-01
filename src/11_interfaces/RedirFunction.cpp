@@ -54,7 +54,7 @@ namespace synthese
 			_url = map.getString(PARAMETER_URL, true, FACTORY_KEY);
 		}
 
-		void RedirFunction::_run( std::ostream& stream ) const
+		void RedirFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			throw Request::RedirectException(_url);
 		}
@@ -71,7 +71,7 @@ namespace synthese
 
 
 
-		bool RedirFunction::_isAuthorized(
+		bool RedirFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

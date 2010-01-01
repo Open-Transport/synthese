@@ -64,16 +64,16 @@ namespace synthese
 		
 		
 		
-		void CallEndAction::run()
+		void CallEndAction::run(Request& request)
 		{
-			ResaModule::CallClose(_request->getSession());
+			ResaModule::CallClose(request.getSession());
 		}
 
 
 
-		bool CallEndAction::_isAuthorized(
+		bool CallEndAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<ResaRight>(WRITE);
+			return profile.isAuthorized<ResaRight>(WRITE);
 		}
 	}
 }

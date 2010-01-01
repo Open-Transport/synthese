@@ -91,10 +91,38 @@ namespace synthese
 			_arrivalEdges.insert(make_pair(edge->getParentPath(), edge));    
 		}
 
+
+
 		void Vertex::setHub(
 			const Hub* hub
 		){
 			_hub = hub;
+		}
+
+
+
+		void Vertex::removeArrivalEdge( const Edge* edge )
+		{
+			assert(edge);
+			assert(edge->getParentPath());
+
+			Edges::iterator it(_arrivalEdges.find(edge->getParentPath()));
+			assert(it != _arrivalEdges.end());
+			if(it == _arrivalEdges.end()) return;
+			_arrivalEdges.erase(it);
+		}
+
+
+
+		void Vertex::removeDepartureEdge( const Edge* edge )
+		{
+			assert(edge);
+			assert(edge->getParentPath());
+
+			Edges::iterator it(_departureEdges.find(edge->getParentPath()));
+			assert(it != _departureEdges.end());
+			if(it == _departureEdges.end()) return;
+			_departureEdges.erase(it);
 		}
 	}
 }

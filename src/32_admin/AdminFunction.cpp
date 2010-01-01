@@ -23,7 +23,7 @@
 #include <sstream>
 #include <assert.h>
 
-#include "AdminRequest.h"
+
 
 #include "Conversion.h"
 #include "FactoryException.h"
@@ -49,16 +49,16 @@ namespace synthese
 	using namespace interfaces;
 	using namespace security;
 
-	template<> const string util::FactorableTemplate<RequestWithInterfaceAndRequiredSession,admin::AdminRequest>::FACTORY_KEY("admin");
+	template<> const string util::FactorableTemplate<RequestWithInterfaceAndRequiredSession,admin::AdminFunction>::FACTORY_KEY("admin");
 
 	namespace admin
 	{
-		const string AdminRequest::PARAMETER_PAGE("rub");
-		const string AdminRequest::PARAMETER_TAB("tab");
-		const string AdminRequest::PARAMETER_ACTION_FAILED_PAGE("afp");
-		const string AdminRequest::PARAMETER_ACTION_FAILED_TAB("aft");
+		const string AdminFunction::PARAMETER_PAGE("rub");
+		const string AdminFunction::PARAMETER_TAB("tab");
+		const string AdminFunction::PARAMETER_ACTION_FAILED_PAGE("afp");
+		const string AdminFunction::PARAMETER_ACTION_FAILED_TAB("aft");
 		
-		ParametersMap AdminRequest::_getParametersMap() const
+		ParametersMap AdminFunction::_getParametersMap() const
 		{
 			ParametersMap result(RequestWithInterfaceAndRequiredSession::_getParametersMap());
 
@@ -80,17 +80,17 @@ namespace synthese
 			return result;
 		}
 
-		void AdminRequest::_setFromParametersMap(const ParametersMap& map)
+		void AdminFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			RequestWithInterfaceAndRequiredSession::_setFromParametersMap(map);
 
 			try
 			{
-				if (_request->getUser().get() == NULL) return;
+				if (request.getUser().get() == NULL) return;
 
 				// Page
 				string pageKey;
-				if (_request->getActionException())
+				if (request.getActionException())
 				{	// Prepare the KO page
 					pageKey = map.getDefault<string>(PARAMETER_ACTION_FAILED_PAGE);
 					if (pageKey.empty())
@@ -116,11 +116,11 @@ namespace synthese
 					: Factory<AdminInterfaceElement>::create(pageKey)
 				);
 				page->setEnv(shared_ptr<Env>(new Env));
-				page->setFromParametersMap(map, _request->getActionWillCreateObject());
-				if(!_request->getActionWillCreateObject())
+				page->setFromParametersMap(map, request.getActionWillCreateObject());
+				if(!request.getActionWillCreateObject())
 				{
 					page->_buildTabs(
-						static_cast<const FunctionRequest<AdminRequest>* >(_request)
+						static_cast<const AdminRequest* >(&request)
 					);
 				}
 				page->setActiveTab(map.getDefault<string>(PARAMETER_TAB));
@@ -136,7 +136,7 @@ namespace synthese
 			}
 		}
 
-		void AdminRequest::_run( std::ostream& stream ) const
+		void AdminFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			try
 			{
@@ -148,7 +148,7 @@ namespace synthese
 					aip->display(
 						stream,
 						_page.get(),
-						static_cast<const FunctionRequest<AdminRequest>* >(_request)
+						static_cast<const AdminRequest* >(_request)
 					);
 				}
 				else
@@ -157,7 +157,7 @@ namespace synthese
 					_page->display(
 						stream,
 						variables,
-						static_cast<FunctionRequest<AdminRequest>& >(*_request)
+						static_cast<AdminRequest& >(*_request)
 					);
 				}
 			}
@@ -183,9 +183,9 @@ namespace synthese
 			_actionFailedPage = aie;
 		}
 
-		bool AdminRequest::_isAuthorized() const
+		bool AdminRequest::isAuthorized(const Profile& profile) const
 		{
-			return !_page.get() || _page->isAuthorized(static_cast<FunctionRequest<AdminRequest>& >(*_request));
+			return !_page.get() || _page->isAuthorized(static_cast<AdminRequest& >(*_request));
 		}
 
 

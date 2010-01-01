@@ -29,7 +29,7 @@
 #include "UserUpdateAction.h"
 #include "UserPasswordUpdateAction.h"
 #include "AdminActionFunctionRequest.hpp"
-#include "AdminRequest.h"
+
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "SecurityRight.h"
@@ -68,11 +68,8 @@ namespace synthese
 
 		
 		void UserAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
-			if(objectWillBeCreatedLater) return;
-			
 			try
 			{
 				_user = UserTableSync::Get(
@@ -99,7 +96,7 @@ namespace synthese
 
 
 		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
+					const admin::AdminRequest& _request) const
 		{
 			AdminActionFunctionRequest<UserUpdateAction, UserAdmin> updateRequest(_request);
 			updateRequest.getAction()->setUser(_user);
@@ -165,16 +162,15 @@ namespace synthese
 
 
 		bool UserAdmin::isAuthorized(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const security::Profile& profile
 		) const	{
-			if(_request.getActionWillCreateObject()) return true;
-			return 	_request.isAuthorized<SecurityRight>(
+			return 	profile.isAuthorized<SecurityRight>(
 						READ,
 						UNKNOWN_RIGHT_LEVEL,
 						_user->getProfile() ? lexical_cast<string>(_user->getProfile()->getKey()) : GLOBAL_PERIMETER
 					) ||
 					_user->getKey() == _request.getUser()->getKey() &&
-					_request.isAuthorized<SecurityRight>(
+					profile.isAuthorized<SecurityRight>(
 						UNKNOWN_RIGHT_LEVEL,
 						READ,
 						string()

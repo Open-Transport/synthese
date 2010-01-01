@@ -96,7 +96,7 @@ namespace synthese
 		
 		
 		
-		void DisplayScreenAppearanceUpdateAction::run()
+		void DisplayScreenAppearanceUpdateAction::run(Request& request)
 		{
 			// Log
 			stringstream log;
@@ -119,7 +119,7 @@ namespace synthese
 			DisplayScreenTableSync::Save(_screen.get());
 
 			// Log
-			ArrivalDepartureTableLog::addUpdateEntry(*_screen, log.str(), *_request->getUser());
+			ArrivalDepartureTableLog::addUpdateEntry(*_screen, log.str(), *request.getUser());
 		}
 
 
@@ -139,16 +139,16 @@ namespace synthese
 
 
 
-		bool DisplayScreenAppearanceUpdateAction::_isAuthorized(
+		bool DisplayScreenAppearanceUpdateAction::isAuthorized(const Profile& profile
 		) const {
 			assert(_screen.get() != NULL);
 			if (_screen->getLocalization() != NULL)
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 	}

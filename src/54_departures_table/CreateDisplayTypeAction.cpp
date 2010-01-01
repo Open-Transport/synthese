@@ -113,7 +113,7 @@ namespace synthese
 			}
 		}
 
-		void CreateDisplayTypeAction::run()
+		void CreateDisplayTypeAction::run(Request& request)
 		{
 			DisplayType dt;
 			dt.setName(_name);
@@ -123,17 +123,17 @@ namespace synthese
 			DisplayTypeTableSync::Save(&dt);
 
 			// Request update
-			_request->setActionCreatedId(dt.getKey());
+			request.setActionCreatedId(dt.getKey());
 
 			// Log
-			ArrivalDepartureTableLog::addCreateEntry(dt, *_request->getUser());
+			ArrivalDepartureTableLog::addCreateEntry(dt, *request.getUser());
 		}
 
 
 
-		bool CreateDisplayTypeAction::_isAuthorized(
+		bool CreateDisplayTypeAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+			return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 	}
 }

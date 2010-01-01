@@ -63,7 +63,7 @@ namespace synthese
 		
 		void AccountLockAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(_request->getObjectId());
+			uid id(request.getObjectId());
 			try
 			{
 				_account = AccountTableSync::GetEditable(id);
@@ -76,7 +76,7 @@ namespace synthese
 		
 		
 		
-		void AccountLockAction::run()
+		void AccountLockAction::run(Request& request)
 		{
 			_account->setLocked(true);
 			AccountTableSync::Save(_account.get());

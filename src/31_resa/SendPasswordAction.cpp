@@ -82,26 +82,26 @@ namespace synthese
 		
 		
 		
-		void SendPasswordAction::run()
+		void SendPasswordAction::run(Request& request)
 		{
 			_user->setRandomPassword();
 
 			UserTableSync::Save(_user.get());
 
-			ResaDBLog::AddPasswordInitEntry(*_request->getSession(), *_user);
+			ResaDBLog::AddPasswordInitEntry(*request.getSession(), *_user);
 
 			// Send confirmation email
 			if(ResaModule::GetReservationContact()->sendCustomerEMail(*_user))
 			{
-				ResaDBLog::AddEMailEntry(*_request->getSession(), *_user, "Message d'activation de réservation en ligne");
+				ResaDBLog::AddEMailEntry(*request.getSession(), *_user, "Message d'activation de réservation en ligne");
 			}
 		}
 		
 		
 		
-		bool SendPasswordAction::_isAuthorized(
+		bool SendPasswordAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<ResaRight>(WRITE);
+			return profile.isAuthorized<ResaRight>(WRITE);
 		}
 
 

@@ -69,13 +69,13 @@ namespace synthese
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void _run(std::ostream& stream) const;
+			void run(std::ostream& stream, const server::Request& request) const;
 
 			void setNetworkId(
 				util::RegistryKeyType id
 			) throw(server::RequestException);
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 
 			virtual std::string getOutputMimeType() const;

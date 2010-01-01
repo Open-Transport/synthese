@@ -33,6 +33,7 @@
 #include "AdminFunctionRequest.hpp"
 #include "PTPlacesAdmin.h"
 #include "FrenchSentence.h"
+#include "Profile.h"
 
 using namespace std;
 
@@ -74,8 +75,7 @@ namespace synthese
 
 		
 		void PTCitiesAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_searchName = map.getDefault<string>(PARAM_SEARCH_NAME);
 
@@ -97,9 +97,9 @@ namespace synthese
 
 		
 		bool PTCitiesAdmin::isAuthorized(
-			const FunctionRequest<AdminRequest>& request
+			const security::Profile& profile
 		) const	{
-			return request.isAuthorized<TransportNetworkRight>(READ);
+			return profile.isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -107,7 +107,7 @@ namespace synthese
 		void PTCitiesAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 		
 			////////////////////////////////////////////////////////////////////
@@ -175,13 +175,16 @@ namespace synthese
 		AdminInterfaceElement::PageLinks PTCitiesAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == PTModule::FACTORY_KEY && isAuthorized(request))
-			{
+			if(	moduleKey == PTModule::FACTORY_KEY &&
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile())
+			){
 				links.push_back(getNewPage());
 			}
 			
@@ -192,7 +195,7 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks PTCitiesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
@@ -207,7 +210,7 @@ namespace synthese
 
 
 
-		void PTCitiesAdmin::_buildTabs( const server::FunctionRequest<admin::AdminRequest>& request ) const
+		void PTCitiesAdmin::_buildTabs( const admin::AdminRequest& request ) const
 		{
 			_tabs.clear();
 

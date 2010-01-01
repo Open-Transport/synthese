@@ -24,7 +24,7 @@
 
 #include "TransportNetworkAdmin.h"
 #include "PTModule.h"
-
+#include "Profile.h"
 #include "AdminFunctionRequest.hpp"
 #include "TransportNetwork.h"
 #include "TransportNetworkTableSync.h"
@@ -71,11 +71,8 @@ namespace synthese
 
 		
 		void TransportNetworkAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
-			if(objectWillBeCreatedLater) return;
-			
 			_searchName = map.getDefault<string>(PARAMETER_SEARCH_NAME);
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 100);
 
@@ -106,7 +103,7 @@ namespace synthese
 
 		
 		void TransportNetworkAdmin::display(ostream& stream, VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
+					const admin::AdminRequest& _request) const
 		{
 			// Requests
 			
@@ -160,10 +157,9 @@ namespace synthese
 		}
 
 		bool TransportNetworkAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<TransportNetworkRight>(READ);
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -176,7 +172,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 

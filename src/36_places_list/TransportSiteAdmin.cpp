@@ -41,6 +41,7 @@
 #include "Interface.h"
 #include "InterfaceTableSync.h"
 #include "RoutePlannerInterfacePage.h"
+#include "Profile.h"
 
 #include <boost/foreach.hpp>
 
@@ -76,10 +77,8 @@ namespace synthese
 		{ }
 		
 		void TransportSiteAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
-			if(objectWillBeCreatedLater) return;
 			try
 			{
 				_site = SiteTableSync::GetEditable(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), _getEnv(), UP_LINKS_LOAD_LEVEL);
@@ -103,7 +102,7 @@ namespace synthese
 
 		
 		void TransportSiteAdmin::display(ostream& stream, VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
+					const admin::AdminRequest& _request) const
 		{
 			// Requests
 			AdminActionFunctionRequest<SiteUpdateAction,TransportSiteAdmin> updateRequest(
@@ -114,7 +113,7 @@ namespace synthese
 			AdminFunctionRequest<SiteRoutePlanningAdmin> routeplannerRequest(_request);
 			routeplannerRequest.getPage()->setSite(_site);
 
-			FunctionRequest<RoutePlannerFunction> rpHomeRequest(&_request);
+			FunctionRequest<RoutePlannerFunction> rpHomeRequest(_request);
 			rpHomeRequest.getFunction()->setSite(_site);
 
 			// Display
@@ -165,20 +164,21 @@ namespace synthese
 		}
 
 		bool TransportSiteAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<TransportWebsiteRight>(READ);
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<TransportWebsiteRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfModule(
 			const string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(moduleKey == PlacesListModule::FACTORY_KEY && isAuthorized(request))
+			if(moduleKey == PlacesListModule::FACTORY_KEY && request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()))
 			{
 				SiteTableSync::SearchResult sites(
 					SiteTableSync::Search(*_env)
@@ -198,7 +198,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			

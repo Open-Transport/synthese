@@ -25,7 +25,8 @@
 
 #include "FactoryBase.h"
 #include "11_interfaces/Types.h"
-#include "FunctionRequest.h"
+#include "RequestManager.h"
+#include "StaticRequestPolicy.h"
 
 #include <string>
 #include <vector>
@@ -36,6 +37,7 @@ namespace synthese
 	namespace security
 	{
 		class Right;
+		class Profile;
 	}
 	
 	namespace server
@@ -45,7 +47,8 @@ namespace synthese
 
 	namespace admin
 	{
-	    class AdminRequest;
+		class AdminFunction;
+		typedef server::RequestManager<server::StaticFunctionRequestPolicy<AdminFunction> > AdminRequest;
 
 		////////////////////////////////////////////////////////////////////
 		/// Composant d'administration.
@@ -231,7 +234,7 @@ namespace synthese
 			PageLinksTree	_buildTreeRecursion(
 				boost::shared_ptr<const AdminInterfaceElement> page,
 				const PageLinks position,
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const AdminRequest& request
 			) const;
 
 			util::Env& _getEnv() const;
@@ -264,7 +267,7 @@ namespace synthese
 			/// This method has to be called by the current displayed admin page.
 			////////////////////////////////////////////////////////////////////
 			void _buildTree(
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const AdminRequest& request
 			) const;
 			
 			
@@ -285,7 +288,7 @@ namespace synthese
 				///			relaunched
 				////////////////////////////////////////////////////////////////////
 				virtual void _buildTabs(
-					const server::FunctionRequest<admin::AdminRequest>& _request
+					const AdminRequest& _request
 				) const;
 
 
@@ -373,10 +376,10 @@ namespace synthese
 			//! \name Getters
 			//@{
 				const PageLinks&		getTreePosition(
-					const server::FunctionRequest<admin::AdminRequest>& request
+					const server::Request& request
 				)	const;
 				const PageLinksTree&	getTree(
-					const server::FunctionRequest<admin::AdminRequest>& request
+					const server::Request& request
 				)	const;
 				const Tabs&				getTabs()			const;
 				std::string				getCurrentTab()		const;
@@ -414,7 +417,7 @@ namespace synthese
 			void displayTabs(
 				std::ostream& stream,
 				interfaces::VariablesMap& variables,
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const AdminRequest& request
 			) const;
 
 
@@ -429,8 +432,7 @@ namespace synthese
 				///  - storage of the parameters (directly or not)
 				///  - running of several actions to prepare the display (such searching results of a SQL request)
 				virtual void setFromParametersMap(
-					const server::ParametersMap& map,
-					bool objectWillBeCreatedLater
+					const server::ParametersMap& map
 				) = 0;
 			//@}
 
@@ -450,7 +452,7 @@ namespace synthese
 					@date 2007					
 				*/
 				virtual bool isAuthorized(
-					const server::FunctionRequest<admin::AdminRequest>& _request
+					const security::Profile& profile
 				) const = 0;
 
 				/** Display of the content of the admin element.
@@ -461,7 +463,7 @@ namespace synthese
 				virtual void display(
 					std::ostream& stream,
 					interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+					const AdminRequest& _request
 				) const = 0;
 
 				virtual std::string getIcon() const = 0;
@@ -479,7 +481,7 @@ namespace synthese
 				*/
 				virtual PageLinks getSubPages(
 					const AdminInterfaceElement& currentPage,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+					const AdminRequest& _request
 				) const;
 
 
@@ -487,7 +489,7 @@ namespace synthese
 				virtual PageLinks getSubPagesOfModule(
 					const std::string& moduleKey,
 					const AdminInterfaceElement& currentPage,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+					const AdminRequest& _request
 				) const;
 
 
@@ -506,8 +508,7 @@ namespace synthese
 					){
 						p->setActiveTab(getCurrentTab());
 						p->setFromParametersMap(
-							getParametersMap(),
-							false
+							getParametersMap()
 						);
 					}
 					return p;
@@ -521,7 +522,7 @@ namespace synthese
 				*/
 				virtual bool isPageVisibleInTree(
 					const AdminInterfaceElement& currentPage,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+					const AdminRequest& _request
 				) const;
 			//@}
 		};

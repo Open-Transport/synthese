@@ -23,7 +23,7 @@
 */
 
 #include "ResaCustomersAdmin.h"
-
+#include "Profile.h
 #include "User.h"
 #include "UserTableSync.h"
 
@@ -75,8 +75,7 @@ namespace synthese
 
 		
 		void ResaCustomersAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			if(!map.getDefault<string>(PARAM_SEARCH_NAME).empty())
 			{
@@ -110,7 +109,7 @@ namespace synthese
 
 		
 		void ResaCustomersAdmin::display(ostream& stream, VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
+					const admin::AdminRequest& _request) const
 		{
 			// Requests
 			AdminFunctionRequest<ResaCustomersAdmin> searchRequest(_request);
@@ -185,9 +184,9 @@ namespace synthese
 
 
 		bool ResaCustomersAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+			const security::Profile& profile
 		) const	{
-			return _request.isAuthorized<ResaRight>(READ);
+			return profile.isAuthorized<ResaRight>(READ);
 		}
 
 
@@ -195,12 +194,14 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPagesOfModule(
 			const string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			if(	moduleKey == ResaModule::FACTORY_KEY &&
-				isAuthorized(request)
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile())
 			){
 				links.push_back(getNewPage());
 			}
@@ -210,7 +211,7 @@ namespace synthese
 	
 		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			

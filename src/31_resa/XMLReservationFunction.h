@@ -114,7 +114,7 @@ namespace synthese
 			/// @param stream Stream to display the content on.
 			/// @author Hugues
 			/// @date 2009
-			virtual void _run(std::ostream& stream) const;
+			virtual void run(std::ostream& stream, const server::Request& request) const;
 			
 			
 			
@@ -123,7 +123,7 @@ namespace synthese
 			/// @return true if the function can be run
 			/// @author Hugues
 			/// @date 2009
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 
 

@@ -33,6 +33,7 @@
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "GlobalRight.h"
+#include "Profile.h"
 
 using namespace std;
 
@@ -69,8 +70,7 @@ namespace synthese
 		{ }
 		
 		void TestMapAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_dataXml = map.getString(PARAMETER_DATA_XML, false, FACTORY_KEY);
 			_queryXml = map.getString(PARAMETER_QUERY_XML, false, FACTORY_KEY);
@@ -106,7 +106,7 @@ namespace synthese
 			{
 				try
 				{
-					FunctionRequest<MapRequest> r(&_request);
+					FunctionRequest<MapRequest> r(_request);
 					r.getFunction()->setUseEnvironment(_useEnvironment);
 					r.getFunction()->setData(_dataXml);
 					r.getFunction()->setQuery(_queryXml);
@@ -150,9 +150,9 @@ namespace synthese
 		}
 
 		bool TestMapAdmin::isAuthorized(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const security::Profile& profile
 		) const {
-			return _request.isAuthorized<GlobalRight>(READ);;
+			return profile.isAuthorized<GlobalRight>(READ);;
 		}
 		
 
@@ -160,10 +160,12 @@ namespace synthese
 		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(moduleKey == MapModule::FACTORY_KEY && isAuthorized(request))
+			if(moduleKey == MapModule::FACTORY_KEY && request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()))
 			{
 				links.push_back(getNewPage());
 			}

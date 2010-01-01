@@ -82,8 +82,11 @@ namespace synthese
 			}
 		}
 
-		void UpdateAlarmMessagesAction::run() throw(ActionException)
-		{
+
+
+		void UpdateAlarmMessagesAction::run(
+			Request& request
+		) throw(ActionException) {
 			stringstream s;
 			DBLogModule::appendToLogIfChange(s,
 				"type",
@@ -102,26 +105,26 @@ namespace synthese
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
 			{
 				shared_ptr<const AlarmTemplate> alarmTemplate = dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm);
-				MessagesLibraryLog::addUpdateEntry(alarmTemplate.get(), s.str(), _request->getUser().get());
+				MessagesLibraryLog::addUpdateEntry(alarmTemplate.get(), s.str(), request.getUser().get());
 			}
 			else
 			{
 				shared_ptr<const SentAlarm> scenarioSentAlarm = dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm);
-				MessagesLog::addUpdateEntry(scenarioSentAlarm.get(), s.str(), _request->getUser().get());
+				MessagesLog::addUpdateEntry(scenarioSentAlarm.get(), s.str(), request.getUser().get());
 			}
 		}
 
 
 
-		bool UpdateAlarmMessagesAction::_isAuthorized(
+		bool UpdateAlarmMessagesAction::isAuthorized(const Profile& profile
 		) const {
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
 			{
-				return _request->isAuthorized<MessagesLibraryRight>(WRITE);
+				return profile.isAuthorized<MessagesLibraryRight>(WRITE);
 			}
 			else
 			{
-				return _request->isAuthorized<MessagesRight>(WRITE);
+				return profile.isAuthorized<MessagesRight>(WRITE);
 			}
 		}
 

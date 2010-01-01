@@ -176,6 +176,18 @@ namespace synthese
 
 				void setAllDays(bool value);
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Merges two paths.
+				/// @param other the path to add at the end of the current object
+				/// Actions :
+				///  - verify if the two paths can be merged (the second one must begin
+				///    where the current one ends, and the two paths must belong to the
+				///    same PathGroup)
+				///  - shift the metric offset in the second path
+				///  - change the pointers
+				///  - delete the second path in the PathGroup
+				void merge(Path& other);
+
 		private:
 
 				void markScheduleIndexesUpdateNeeded ();

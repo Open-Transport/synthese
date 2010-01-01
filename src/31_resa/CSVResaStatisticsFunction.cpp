@@ -91,7 +91,7 @@ namespace synthese
 				_searchColStep = static_cast<ResaStatisticsTableSync::Step>(map.get<int>(PARAM_COL_STEP));
 		}
 
-		void CSVResaStatisticsFunction::_run( std::ostream& stream ) const
+		void CSVResaStatisticsFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			ResaStatisticsTableSync::ResaCountSearchResult r(
 				ResaStatisticsTableSync::CountCalls(
@@ -187,12 +187,12 @@ namespace synthese
 		
 		
 		
-		bool CSVResaStatisticsFunction::_isAuthorized() const
+		bool CSVResaStatisticsFunction::isAuthorized(const Profile& profile) const
 		{
 			if (!_line.get())
 				return false;
 
-			return _request->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
+			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
 		}
 
 

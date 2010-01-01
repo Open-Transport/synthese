@@ -66,23 +66,26 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenRemoveAction::run() throw(ActionException)
-		{
+		void DisplayScreenRemoveAction::run(
+			Request& request
+		) throw(ActionException) {
+
 			DisplayScreenTableSync::Remove(_displayScreen->getKey());
 
-			ArrivalDepartureTableLog::addRemoveEntry(_displayScreen.get(), _request->getUser().get());
+			ArrivalDepartureTableLog::addRemoveEntry(_displayScreen.get(), request.getUser().get());
+
 		}
 
-		bool DisplayScreenRemoveAction::_isAuthorized() const
+		bool DisplayScreenRemoveAction::isAuthorized(const Profile& profile) const
 		{
 			assert(_displayScreen.get() != NULL);
 			if (_displayScreen->getLocalization() != NULL)
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_displayScreen->getLocalization()->getKey()));
+				return profile.isAuthorized<ArrivalDepartureTableRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_displayScreen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 

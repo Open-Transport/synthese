@@ -31,7 +31,7 @@
 #include "Profile.h"
 #include "User.h"
 #include "Session.h"
-#include "AdminRequest.h"
+
 
 using namespace std;
 using namespace boost;
@@ -56,7 +56,7 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const	{
 			return PageLinks();
 		}
@@ -65,7 +65,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 			return PageLinks();
 		}
@@ -73,7 +73,7 @@ namespace synthese
 
 
 		void AdminInterfaceElement::_buildTree(
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			// Cleaning
 			_tree.subPages.clear();
@@ -109,7 +109,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinksTree AdminInterfaceElement::_buildTreeRecursion(
 			shared_ptr<const AdminInterfaceElement> adminPage,
 			PageLinks position,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 
 			// Local variables
@@ -156,7 +156,7 @@ namespace synthese
 		}
 
 		const AdminInterfaceElement::PageLinks& AdminInterfaceElement::getTreePosition(
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			if (_treePosition.empty())
 			{
@@ -166,7 +166,7 @@ namespace synthese
 		}
 
 		const AdminInterfaceElement::PageLinksTree& AdminInterfaceElement::getTree(
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const
 		{
 			if (_treePosition.empty())
@@ -180,7 +180,7 @@ namespace synthese
 
 		bool AdminInterfaceElement::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			return false;
 		}
@@ -190,7 +190,7 @@ namespace synthese
 		void AdminInterfaceElement::displayTabs(
 			std::ostream& stream,
 			interfaces::VariablesMap& variables,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			if (_tabs.empty()) return;
 
@@ -227,7 +227,7 @@ namespace synthese
 
 
 		void AdminInterfaceElement::_buildTabs(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 			_tabBuilded = true;
 		}

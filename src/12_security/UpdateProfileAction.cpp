@@ -82,7 +82,7 @@ namespace synthese
 				throw ActionException("Le nom choisi est déjà pris par un autre profil. Veuillez entrer un autre nom.");
 		}
 
-		void UpdateProfileAction::run()
+		void UpdateProfileAction::run(Request& request)
 		{
 			// Old value
 			stringstream log;
@@ -93,15 +93,15 @@ namespace synthese
 			ProfileTableSync::Save(_profile.get());
 
 			// Log
-			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), log.str());
+			SecurityLog::addProfileAdmin(request.getUser().get(), _profile.get(), log.str());
 		}
 
 
 
-		bool UpdateProfileAction::_isAuthorized(
+		bool UpdateProfileAction::isAuthorized(const Profile& profile
 		) const {
 			/// @todo add a control on the users profile
-			return _request->isAuthorized<SecurityRight>(WRITE);
+			return profile.isAuthorized<SecurityRight>(WRITE);
 		}
 		
 		

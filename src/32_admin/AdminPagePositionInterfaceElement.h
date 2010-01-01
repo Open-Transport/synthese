@@ -32,8 +32,6 @@ namespace synthese
 {
 	namespace admin
 	{
-		class AdminRequest;
-
 		/** Position of current admin page in the tree.
 			@ingroup m14Values refLibrary
 		*/

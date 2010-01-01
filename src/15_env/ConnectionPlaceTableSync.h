@@ -57,6 +57,8 @@ namespace synthese
 			static const std::string COL_NAME13;
 			static const std::string COL_NAME26;
 
+			static const std::string FORBIDDEN_DELAY_SYMBOL;
+
 
 
 			static SearchResult Search(

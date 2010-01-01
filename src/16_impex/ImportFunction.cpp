@@ -122,7 +122,7 @@ namespace synthese
 			}
 		}
 
-		void ImportFunction::_run( std::ostream& stream ) const
+		void ImportFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			stream << _output;
 			if(_doImport)
@@ -133,7 +133,7 @@ namespace synthese
 		
 		
 		
-		bool ImportFunction::_isAuthorized(
+		bool ImportFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

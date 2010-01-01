@@ -77,19 +77,20 @@ namespace synthese
 		}
 
 		void AlarmRemoveLinkAction::run(
-		) throw (ActionException)
-		{
+			Request& request
+		) throw (ActionException) {
+
 			AlarmObjectLinkTableSync::Remove(_alarm->getKey(), _objectId);
 
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
 			{
 				shared_ptr<const AlarmTemplate> talarm(dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm));
-				MessagesLibraryLog::addUpdateEntry(talarm.get(), "Suppression de la destination "+ Conversion::ToString(_objectId), _request->getUser().get());
+				MessagesLibraryLog::addUpdateEntry(talarm.get(), "Suppression de la destination "+ Conversion::ToString(_objectId), request.getUser().get());
 			}
 			else if(dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm).get() != NULL)
 			{
 				shared_ptr<const SentAlarm> salarm(dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm));
-				MessagesLog::addUpdateEntry(salarm.get(), "Suppression de la destination "+ Conversion::ToString(_objectId), _request->getUser().get());
+				MessagesLog::addUpdateEntry(salarm.get(), "Suppression de la destination "+ Conversion::ToString(_objectId), request.getUser().get());
 			}
 		}
 
@@ -112,15 +113,15 @@ namespace synthese
 
 
 
-		bool AlarmRemoveLinkAction::_isAuthorized(
+		bool AlarmRemoveLinkAction::isAuthorized(const Profile& profile
 		) const {
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
 			{
-				return _request->isAuthorized<MessagesLibraryRight>(WRITE);
+				return profile.isAuthorized<MessagesLibraryRight>(WRITE);
 			}
 			else
 			{
-				return _request->isAuthorized<MessagesRight>(WRITE);
+				return profile.isAuthorized<MessagesRight>(WRITE);
 			}
 		}
 	}

@@ -116,6 +116,23 @@ namespace synthese
 				RoadChunk* address,
 				boost::optional<double> autoShift = boost::optional<double>()
 			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Merges two roads.
+			/// @param other the road to add at the end of the current object
+			/// Actions :
+			///  - verify if the two roads can be merged (the second one must begin
+			///    where the current one ends, and the two roads must belong to the
+			///    same RoadPlace)
+			///  - shift the metric offset in the second road
+			///  - change the pointers
+			///  - delete the second road in the road place
+			/// The other road must be removed from the registry externally
+			void merge(
+				Road& other
+			);
 		//@}
 		};
 	}

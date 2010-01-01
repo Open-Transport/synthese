@@ -39,6 +39,7 @@
 #include "InterfaceTableSync.h"
 #include "UpdateDisplayPreselectionParametersAction.h"
 #include "CPUGetWiredScreensFunction.h"
+#include "Profile.h"
 
 #include <boost/foreach.hpp>
 
@@ -73,8 +74,7 @@ namespace synthese
 		const string DeparturesTableBenchmarkAdmin::PARAMETER_DOIT("di");
 
 		void DeparturesTableBenchmarkAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_doIt = map.getDefault<bool>(PARAMETER_DOIT, false);
 		}
@@ -93,7 +93,7 @@ namespace synthese
 		void DeparturesTableBenchmarkAdmin::display(
 			ostream& stream,
 			interfaces::VariablesMap& variables,
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const	{
 
 			if(_doIt)
@@ -107,8 +107,8 @@ namespace synthese
 					DisplayScreenCPUTableSync::Search(Env::GetOfficialEnv())
 				);
 				
-				FunctionRequest<DisplayScreenContentFunction> r(&_request);
-				FunctionRequest<CPUGetWiredScreensFunction> r2(&_request);
+				FunctionRequest<DisplayScreenContentFunction> r(_request);
+				FunctionRequest<CPUGetWiredScreensFunction> r2(_request);
 				ptime t0(microsec_clock::local_time());
 				time_duration duration;
 				BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, screens)
@@ -225,7 +225,7 @@ namespace synthese
 			}
 			else
 			{
-				FunctionRequest<AdminRequest> doRequest(_request);
+				AdminRequest doRequest(_request);
 
 				stream << "<p class=\"info\">Le lancement du benchmark peut affecter les performances du système durant le test. Etes-vous sûr de vouloir lancer le benchmark ?</p>";
 				HTMLForm f(doRequest.getHTMLForm());
@@ -238,10 +238,9 @@ namespace synthese
 		}
 
 		bool DeparturesTableBenchmarkAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<ArrivalDepartureTableRight>(
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<ArrivalDepartureTableRight>(
 				DELETE_RIGHT,
 				UNKNOWN_RIGHT_LEVEL,
 				GLOBAL_PERIMETER
@@ -258,10 +257,12 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DeparturesTableBenchmarkAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(	moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
+			if(	moduleKey == DeparturesTableModule::FACTORY_KEY && request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()))
 			{
 				links.push_back(getNewPage());
 			}
@@ -272,7 +273,7 @@ namespace synthese
 
 		bool DeparturesTableBenchmarkAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			return true;
 		}

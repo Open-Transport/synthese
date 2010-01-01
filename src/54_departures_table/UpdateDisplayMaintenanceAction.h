@@ -73,7 +73,7 @@ namespace synthese
 			///	Runs the action.
 			///	@author Hugues Romain
 			////////////////////////////////////////////////////////////////////
-			void run();
+			void run(server::Request& request);
 
 			
 			
@@ -86,7 +86,7 @@ namespace synthese
 			void setScreenId(util::RegistryKeyType id);
 
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 		};
 	}
 }

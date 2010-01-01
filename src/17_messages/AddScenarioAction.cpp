@@ -110,7 +110,7 @@ namespace synthese
 
 
 
-		void AddScenarioAction::run()
+		void AddScenarioAction::run(Request& request)
 		{
 			if (_template.get())
 			{
@@ -123,11 +123,11 @@ namespace synthese
 				);
 
 				// Remember of the id of created object to view it after the action
-				_request->setActionCreatedId(scenario.getKey());
+				request.setActionCreatedId(scenario.getKey());
 
 				// Log
 				MessagesLibraryLog::addCreateEntry(
-					scenario, *_template, _request->getUser().get()
+					scenario, *_template, request.getUser().get()
 				);
 
 			} else {
@@ -139,10 +139,10 @@ namespace synthese
 				ScenarioTableSync::Save(&scenario);
 
 				// Remember of the id of created object to view it after the action
-				_request->setActionCreatedId(scenario.getKey());
+				request.setActionCreatedId(scenario.getKey());
 
 				MessagesLibraryLog::addCreateEntry(
-					scenario, _request->getUser().get()
+					scenario, request.getUser().get()
 				);
 			}
 		}
@@ -160,9 +160,9 @@ namespace synthese
 
 
 
-		bool AddScenarioAction::_isAuthorized(
+		bool AddScenarioAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
+			return profile.isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

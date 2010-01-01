@@ -75,17 +75,17 @@ namespace synthese
 			}
 		}
 
-		void ReservationEditFunction::_run( std::ostream& stream ) const
+		void ReservationEditFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			const ReservationEditInterfacePage* page(getInterface()->getPage<ReservationEditInterfacePage>());
 
 			VariablesMap v;
-			page->display(stream, *_resa, v, _request);
+			page->display(stream, *_resa, v, &request);
 		}
 		
 		
 		
-		bool ReservationEditFunction::_isAuthorized() const
+		bool ReservationEditFunction::isAuthorized(const Profile& profile) const
 		{
 			return true;
 		}

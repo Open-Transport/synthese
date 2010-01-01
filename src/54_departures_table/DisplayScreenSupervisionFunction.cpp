@@ -95,7 +95,7 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenSupervisionFunction::_run( std::ostream& stream ) const
+		void DisplayScreenSupervisionFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			// Assertions
 			assert(_displayScreen.get() != NULL);
@@ -113,7 +113,7 @@ namespace synthese
 			stringstream s;
 			const ParseDisplayReturnInterfacePage* page(_displayScreen->getType()->getMonitoringInterface()->getPage<ParseDisplayReturnInterfacePage>());
 			VariablesMap v;
-			page->display(s, _text, v, _request);
+			page->display(s, _text, v, &request);
 
 			// Standard status object creation
 			DisplayMonitoringStatus status(s.str(), _displayScreen.get());
@@ -148,7 +148,7 @@ namespace synthese
 
 
 
-		bool DisplayScreenSupervisionFunction::_isAuthorized(
+		bool DisplayScreenSupervisionFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

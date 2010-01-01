@@ -115,7 +115,7 @@ namespace synthese
 			_rights.insert(make_pair(make_pair(right->getFactoryKey(), right->getParameter()), right));
 		}
 
-		bool Profile::_isAuthorized(const Right& right ) const
+		bool Profile::isAuthorized(const Profile& profileconst Right& right ) const
 		{
 			// 0 Default values : forbidden
 			bool privateAuthorization = false;

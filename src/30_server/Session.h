@@ -27,7 +27,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
 namespace synthese
 {

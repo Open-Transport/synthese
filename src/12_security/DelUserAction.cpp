@@ -64,12 +64,12 @@ namespace synthese
 
 		}
 
-		void DelUserAction::run()
+		void DelUserAction::run(Request& request)
 		{
 			UserTableSync::Remove(_user->getKey());
 			
 			SecurityLog::addUserAdmin(
-				_request->getUser().get(),
+				request.getUser().get(),
 				_user.get(),
 				"Suppression de l'utilisateur "+ _user->getLogin()
 			);
@@ -77,9 +77,9 @@ namespace synthese
 
 
 
-		bool DelUserAction::_isAuthorized(
+		bool DelUserAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<SecurityRight>(DELETE_RIGHT);
+			return profile.isAuthorized<SecurityRight>(DELETE_RIGHT);
 		}
 		
 		

@@ -95,7 +95,7 @@ namespace synthese
 		
 		
 		
-		void ScenarioFolderRemoveAction::run()
+		void ScenarioFolderRemoveAction::run(Request& request)
 		{
 			ScenarioFolderTableSync::Remove(_folder->getKey());
 		}
@@ -110,9 +110,9 @@ namespace synthese
 
 
 
-		bool ScenarioFolderRemoveAction::_isAuthorized(
+		bool ScenarioFolderRemoveAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
+			return profile.isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
 		}
 	}
 }

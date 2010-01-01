@@ -121,9 +121,10 @@ namespace synthese
 				); //13
 
 				if(	getInterface()->hasPage<RealTimeUpdateScreenServiceInterfacePage>() &&
-					dynamic_cast<const ScheduledService*>(ptd.first.getService())
+					dynamic_cast<const ScheduledService*>(ptd.first.getService()) &&
+					request
 				){
-					FunctionRequest<RealTimeUpdateFunction> realTimeRequest(request);
+					FunctionRequest<RealTimeUpdateFunction> realTimeRequest(*request);
 					realTimeRequest.getFunction()->setInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(getInterface()->getKey()));
 					realTimeRequest.getFunction()->setService(Env::GetOfficialEnv().getRegistry<ScheduledService>().get(ptd.first.getService()->getKey()));
 					realTimeRequest.getFunction()->setLineStopRank(ptd.first.getEdge()->getRankInPath());

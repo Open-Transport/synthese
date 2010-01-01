@@ -72,7 +72,7 @@ namespace synthese
 			_number = map.getDefault<size_t>(PARAMETER_NUMBER, 20);
 		}
 
-		void ResaCustomerHtmlOptionListFunction::_run( std::ostream& stream ) const
+		void ResaCustomerHtmlOptionListFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			if (!_name && !_surname)
 				return;
@@ -109,9 +109,9 @@ namespace synthese
 
 
 
-		bool ResaCustomerHtmlOptionListFunction::_isAuthorized(
+		bool ResaCustomerHtmlOptionListFunction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<ResaRight>(READ);
+			return profile.isAuthorized<ResaRight>(READ);
 		}
 
 		std::string ResaCustomerHtmlOptionListFunction::getOutputMimeType() const

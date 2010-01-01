@@ -73,7 +73,7 @@ namespace synthese
 			}
 		}
 
-		void UpdateAllStopsDisplayScreenAction::run()
+		void UpdateAllStopsDisplayScreenAction::run(Request& request)
 		{
 			// Comparison for log text generation
 			stringstream log;
@@ -90,22 +90,22 @@ namespace synthese
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
 				log.str(),
-				*_request->getUser()
+				*request.getUser()
 			);
 		}
 
 
 
-		bool UpdateAllStopsDisplayScreenAction::_isAuthorized(
+		bool UpdateAllStopsDisplayScreenAction::isAuthorized(const Profile& profile
 		) const {
 			assert(_screen.get() != NULL);
 			if (_screen->getLocalization() != NULL)
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 		

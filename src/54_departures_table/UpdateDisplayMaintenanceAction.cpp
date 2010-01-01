@@ -69,12 +69,12 @@ namespace synthese
 			_message = map.getString(PARAMETER_MESSAGE, true, FACTORY_KEY);
 		}
 
-		void UpdateDisplayMaintenanceAction::run()
+		void UpdateDisplayMaintenanceAction::run(Request& request)
 		{
 			// Online
 			DisplayMaintenanceLog::AddAdminEntry(
 				*_displayScreen,
-				*_request->getUser(),
+				*request.getUser(),
 				"Etat en ligne de l'afficheur",
 				Conversion::ToString(_displayScreen->getIsOnline()),
 				Conversion::ToString(_online),
@@ -85,7 +85,7 @@ namespace synthese
 			// Message
 			DisplayMaintenanceLog::AddAdminEntry(
 				*_displayScreen,
-				*_request->getUser(),
+				*request.getUser(),
 				"Message de maintenance",
 				string(),
 				_message
@@ -113,15 +113,15 @@ namespace synthese
 
 
 
-		bool UpdateDisplayMaintenanceAction::_isAuthorized(
+		bool UpdateDisplayMaintenanceAction::isAuthorized(const Profile& profile
 		) const {
 			if (_displayScreen->getLocalization() != NULL)
 			{
-				return _request->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
+				return profile.isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return _request->isAuthorized<DisplayMaintenanceRight>(WRITE);
+				return profile.isAuthorized<DisplayMaintenanceRight>(WRITE);
 			}
 		}
 	}

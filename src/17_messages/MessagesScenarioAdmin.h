@@ -91,8 +91,7 @@ namespace synthese
 				@param request The request to use for the initialization.
 			*/
 			virtual void setFromParametersMap(
-				const server::ParametersMap& map,
-				bool objectWillBeCreatedLater
+				const server::ParametersMap& map
 			);
 
 			
@@ -110,10 +109,10 @@ namespace synthese
 				@param stream Stream to write on.
 			*/
 			void display(std::ostream& stream, interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const;
+					const admin::AdminRequest& _request) const;
 
 			bool isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const security::Profile& profile
 			) const;
 
 
@@ -127,13 +126,13 @@ namespace synthese
 			*/
 			virtual PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const admin::AdminRequest& request
 			) const;
 
 			virtual std::string getTitle() const;
 
 			virtual void _buildTabs(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const admin::AdminRequest& _request
 			) const;
 
 			boost::shared_ptr<const Scenario> getScenario() const;

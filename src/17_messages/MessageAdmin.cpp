@@ -79,11 +79,8 @@ namespace synthese
 		const string MessageAdmin::TAB_PARAMS("tp");
 
 		void MessageAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
-			if(objectWillBeCreatedLater) return;
-
 			try
 			{
 				_alarm = AlarmTableSync::Get(
@@ -114,7 +111,7 @@ namespace synthese
 
 
 		void MessageAdmin::display(ostream& stream, interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
+					const admin::AdminRequest& _request) const
 		{
 			////////////////////////////////////////////////////////////////////
 			// TAB PARAMETERS
@@ -176,7 +173,7 @@ namespace synthese
 
 
 		void MessageAdmin::_buildTabs(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 			_tabs.clear();
 
@@ -193,13 +190,12 @@ namespace synthese
 		}
 
 		bool MessageAdmin::isAuthorized(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const security::Profile& profile
  		) const {
-			if(_request.getActionWillCreateObject()) return true;
 			if (_alarm.get() == NULL) return false;
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() == NULL)
-				return _request.isAuthorized<MessagesRight>(READ);
-			return _request.isAuthorized<MessagesLibraryRight>(READ);
+				return profile.isAuthorized<MessagesRight>(READ);
+			return profile.isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		MessageAdmin::MessageAdmin()
@@ -222,7 +218,7 @@ namespace synthese
 
 		bool MessageAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			const MessagesScenarioAdmin* ma(
 				dynamic_cast<const MessagesScenarioAdmin*>(&currentPage)

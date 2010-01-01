@@ -77,7 +77,7 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenCPUCreateAction::run()
+		void DisplayScreenCPUCreateAction::run(Request& request)
 		{
 			// Preparation
 			DisplayScreenCPU cpu;
@@ -90,10 +90,10 @@ namespace synthese
 			DisplayScreenCPUTableSync::Save(&cpu);
 
 			// Request update
-			_request->setActionCreatedId(cpu.getKey());
+			request.setActionCreatedId(cpu.getKey());
 
 			// Log
-			ArrivalDepartureTableLog::addCreateEntry(cpu, *_request->getUser());
+			ArrivalDepartureTableLog::addCreateEntry(cpu, *request.getUser());
 		}
 
 		void DisplayScreenCPUCreateAction::setPlace( boost::shared_ptr<const PublicTransportStopZoneConnectionPlace> place )
@@ -103,12 +103,12 @@ namespace synthese
 
 
 
-		bool DisplayScreenCPUCreateAction::_isAuthorized(
+		bool DisplayScreenCPUCreateAction::isAuthorized(const Profile& profile
 		) const {
 			return
 				_place.get() ?
-				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey())) :
-				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE)
+				profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey())) :
+				profile.isAuthorized<ArrivalDepartureTableRight>(WRITE)
 			;
 		}
 	}

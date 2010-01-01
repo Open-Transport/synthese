@@ -96,19 +96,19 @@ namespace synthese
 				throw ActionException("Au moins un utilisateur appartient au profil spécifié. La suppression est impossible.");
 		}
 
-		void DeleteProfileAction::run()
+		void DeleteProfileAction::run(Request& request)
 		{
 			ProfileTableSync::Remove(_profile->getKey());
 
 			// Log
-			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), "Suppression de " + _profile->getName());
+			SecurityLog::addProfileAdmin(request.getUser().get(), _profile.get(), "Suppression de " + _profile->getName());
 		}
 
 
 
-		bool DeleteProfileAction::_isAuthorized(
+		bool DeleteProfileAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<SecurityRight>(DELETE_RIGHT);
+			return profile.isAuthorized<SecurityRight>(DELETE_RIGHT);
 		}
 		
 		void DeleteProfileAction::setProfile(boost::shared_ptr<Profile> value)

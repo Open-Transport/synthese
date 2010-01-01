@@ -92,7 +92,7 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			/// Action to run, defined by each subclass.
 			///	@param stream Stream to write the output on
-			void _run(std::ostream& stream) const;
+			void run(std::ostream& stream, const server::Request& request) const;
 
 			
 			
@@ -101,7 +101,7 @@ namespace synthese
 			///	@author Hugues Romain
 			///	@date 2008
 			/// At the time, the function can be used without restrictions.
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 
 

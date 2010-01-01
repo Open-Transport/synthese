@@ -81,7 +81,7 @@ namespace synthese
 			}
 		}
 
-		void UpdateDisplayPreselectionParametersAction::run()
+		void UpdateDisplayPreselectionParametersAction::run(Request& request)
 		{
 			stringstream t;
 			
@@ -167,7 +167,7 @@ namespace synthese
 			
 			// Saving
 			DisplayScreenTableSync::Save(_screen.get());
-			ArrivalDepartureTableLog::addUpdateEntry(*_screen, t.str(), *_request->getUser());
+			ArrivalDepartureTableLog::addUpdateEntry(*_screen, t.str(), *request.getUser());
 		}
 
 
@@ -223,16 +223,16 @@ namespace synthese
 
 
 
-		bool UpdateDisplayPreselectionParametersAction::_isAuthorized(
+		bool UpdateDisplayPreselectionParametersAction::isAuthorized(const Profile& profile
 		) const {
 			assert(_screen.get() != NULL);
 			if (_screen->getLocalization() != NULL)
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 

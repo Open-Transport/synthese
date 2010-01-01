@@ -54,6 +54,7 @@
 #include "TimetableSetLineAction.h"
 #include "PhysicalStop.h"
 #include "LineStop.h"
+#include "Profile.h"
 
 #include <boost/foreach.hpp>
 
@@ -100,11 +101,8 @@ namespace synthese
 		{ }
 		
 		void TimetableAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
-			if(objectWillBeCreatedLater) return;
-			
 			if(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
 			{
 				try
@@ -136,7 +134,7 @@ namespace synthese
 		void TimetableAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -472,7 +470,7 @@ namespace synthese
 			{
 				if(_timetable->getInterface())
 				{
-					FunctionRequest<TimetableGenerateFunction> viewRequest(&_request);
+					RequestManager<StaticFunctionRequestPolicy<TimetableGenerateFunction> > viewRequest(_request);
 					viewRequest.getFunction()->setTimetable(_timetable);
 					if(	!_timetable->getInterface()->getDefaultClientURL().empty()
 					){
@@ -562,9 +560,9 @@ namespace synthese
 		}
 
 		bool TimetableAdmin::isAuthorized(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const security::Profile& profile
 		) const	{
-			return _request.isAuthorized<TimetableRight>(READ);
+			return profile.isAuthorized<TimetableRight>(READ);
 		}
 		
 
@@ -592,7 +590,7 @@ namespace synthese
 
 
 
-		void TimetableAdmin::_buildTabs( const server::FunctionRequest<admin::AdminRequest>& request ) const
+		void TimetableAdmin::_buildTabs( const admin::AdminRequest& request ) const
 		{
 			_tabs.clear();
 
@@ -605,12 +603,17 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks TimetableAdmin::getSubPagesOfModule( const std::string& moduleKey, const admin::AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>& request ) const
-		{
+		AdminInterfaceElement::PageLinks TimetableAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			const admin::AdminInterfaceElement& currentPage,
+			const admin::AdminRequest& request
+		) const	{
 			AdminInterfaceElement::PageLinks links;
 
 			if(	moduleKey == TimetableModule::FACTORY_KEY &&
-				isAuthorized(request)
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile())
 			){
 				links.push_back(getNewPage());
 			}
@@ -619,7 +622,7 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks TimetableAdmin::getSubPages( const admin::AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>& request ) const
+		AdminInterfaceElement::PageLinks TimetableAdmin::getSubPages( const admin::AdminInterfaceElement& currentPage, const admin::AdminRequest& request ) const
 		{
 			AdminInterfaceElement::PageLinks links;
 

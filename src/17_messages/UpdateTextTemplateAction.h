@@ -59,7 +59,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007
 			*/
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -76,7 +76,7 @@ namespace synthese
 
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(server::Request& request);
 
 			void setTemplate(boost::shared_ptr<TextTemplate> text);
 		};

@@ -111,7 +111,7 @@ namespace synthese
 			}
 		}
 
-		void AlarmTestOnDisplayScreenFunction::_run( std::ostream& stream ) const
+		void AlarmTestOnDisplayScreenFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			try
 			{
@@ -202,9 +202,9 @@ namespace synthese
 
 
 
-		bool AlarmTestOnDisplayScreenFunction::_isAuthorized(
+		bool AlarmTestOnDisplayScreenFunction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			return profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 		std::string AlarmTestOnDisplayScreenFunction::getOutputMimeType() const

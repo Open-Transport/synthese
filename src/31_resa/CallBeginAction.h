@@ -54,7 +54,7 @@ namespace synthese
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(server::Request& request);
 			
 			CallBeginAction();
 
@@ -66,7 +66,7 @@ namespace synthese
 			///	@author Hugues Romain
 			///	@date 2008
 			/// The user need WRITE permissions on ResaRight habilitation.
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 		};
 	}
 }

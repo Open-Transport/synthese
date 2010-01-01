@@ -88,13 +88,13 @@ namespace synthese
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(server::Request& request);
 
 			static DisplayFunctionNames GetFunctionList();
 			static std::map<int, std::string> GetClearDelaysList();
 			static DisplayFunction GetFunction(const DisplayScreen& screen);
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 			
 			

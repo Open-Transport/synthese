@@ -112,7 +112,7 @@ namespace synthese
 		
 		
 		
-		void TimetableRowAddAction::run()
+		void TimetableRowAddAction::run(Request& request)
 		{
 			TimetableRow r;
 			r.setTimetableId(_timetable->getKey());
@@ -136,9 +136,9 @@ namespace synthese
 		}
 		
 		
-		bool TimetableRowAddAction::_isAuthorized() const
+		bool TimetableRowAddAction::isAuthorized(const Profile& profile) const
 		{
-			return _request->isAuthorized<TimetableRight>(WRITE);
+			return profile.isAuthorized<TimetableRight>(WRITE);
 		}
 
 	}

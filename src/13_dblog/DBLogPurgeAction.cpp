@@ -70,20 +70,20 @@ namespace synthese
 			}
 		}
 
-		void DBLogPurgeAction::run()
+		void DBLogPurgeAction::run(Request& request)
 		{
 			// Action
 			DBLogEntryTableSync::Purge(_dbLog->getFactoryKey(), _endDate);
 
 			// Log
-			DBLog::AddSimpleEntry(_dbLog->getFactoryKey(), DBLogEntry::DB_LOG_INFO, "Log purge -> " + _endDate.toString(), _request->getUser().get());
+			DBLog::AddSimpleEntry(_dbLog->getFactoryKey(), DBLogEntry::DB_LOG_INFO, "Log purge -> " + _endDate.toString(), request.getUser().get());
 		}
 
 
-		bool DBLogPurgeAction::_isAuthorized(
+		bool DBLogPurgeAction::isAuthorized(const Profile& profile
 		) const {
 			return 
-				_request->isAuthorized<DBLogRight>(DELETE_RIGHT) && _dbLog->isAuthorized(*_request, DELETE_RIGHT);
+				profile.isAuthorized<DBLogRight>(DELETE_RIGHT) && _dbLog->isAuthorized(*_request, DELETE_RIGHT);
 		}
 
 		void DBLogPurgeAction::setDBLog( const std::string& value )

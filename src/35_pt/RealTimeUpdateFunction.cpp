@@ -98,7 +98,7 @@ namespace synthese
 			}
 		}
 
-		void RealTimeUpdateFunction::_run( std::ostream& stream ) const
+		void RealTimeUpdateFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			VariablesMap vm;
 			const RealTimeUpdateScreenServiceInterfacePage* page(
@@ -109,13 +109,13 @@ namespace synthese
 				*_service,
 				*_service->getRoute()->getLineStop(_lineStopRank),
 				vm,
-				_request
+				&request
 			);
 		}
 		
 		
 		
-		bool RealTimeUpdateFunction::_isAuthorized() const
+		bool RealTimeUpdateFunction::isAuthorized(const Profile& profile) const
 		{
 			return true;
 		}

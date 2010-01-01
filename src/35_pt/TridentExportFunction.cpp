@@ -75,7 +75,7 @@ namespace synthese
 			_withTisseoExtension = map.getBool(PARAMETER_WITH_TISSEO_EXTENSION, false, false, FACTORY_KEY);
 		}
 
-		void TridentExportFunction::_run( std::ostream& stream ) const
+		void TridentExportFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			TridentFileFormat t(_env.get(), _line->getKey(), _withTisseoExtension);
 			t.build(stream);
@@ -83,7 +83,7 @@ namespace synthese
 
 
 
-		bool TridentExportFunction::_isAuthorized(
+		bool TridentExportFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

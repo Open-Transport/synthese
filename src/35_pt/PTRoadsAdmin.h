@@ -70,15 +70,11 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.
 			///	@param map The parameters map to use for the initialization.
-			///	@param objectWillBeCreatedLater Indicates that the object that is
-			///	       supposed to be loaded by the page is not created yet. If true,
-			///	       some controls shoud be cancelled.
 			///	@throw AdminParametersException if a parameter has incorrect value.
 			///	@author Hugues
 			///	@date 2009
 			void setFromParametersMap(
-				const server::ParametersMap& map,
-				bool objectWillBeCreatedLater
+				const server::ParametersMap& map
 			);
 
 			
@@ -101,7 +97,7 @@ namespace synthese
 			void display(
 				std::ostream& stream,
 				interfaces::VariablesMap& variables,
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const admin::AdminRequest& request
 			) const;
 
 
@@ -115,7 +111,7 @@ namespace synthese
 			///	@author Hugues
 			///	@date 2009
 			bool isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const security::Profile& profile
 			) const;
 
 
@@ -130,7 +126,7 @@ namespace synthese
 			///	@date 2009
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const admin::AdminRequest& request
 			) const;
 
 

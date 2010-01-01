@@ -136,7 +136,7 @@ namespace synthese
 		
 		
 		
-		void TimetableUpdateAction::run()
+		void TimetableUpdateAction::run(Request& request)
 		{
 			_timetable->setBaseCalendar(_calendarTemplate.get());
 			_timetable->setTitle(_title);
@@ -148,9 +148,9 @@ namespace synthese
 		}
 		
 		
-		bool TimetableUpdateAction::_isAuthorized() const
+		bool TimetableUpdateAction::isAuthorized(const Profile& profile) const
 		{
-			return _request->isAuthorized<TimetableRight>(WRITE);
+			return profile.isAuthorized<TimetableRight>(WRITE);
 		}
 
 

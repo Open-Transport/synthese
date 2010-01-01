@@ -28,7 +28,6 @@
 #include "Interface.h"
 
 #include "RequestException.h"
-#include "Request.h"
 
 using namespace std;
 using namespace boost;

@@ -147,7 +147,7 @@ namespace synthese
 		void BookReservationAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Right control
-			if (_request->isAuthorized<ResaRight>(WRITE, WRITE))
+			if (profile.isAuthorized<ResaRight>(WRITE, WRITE))
 			{
 				_createCustomer = map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false);
 
@@ -196,7 +196,7 @@ namespace synthese
 			}
 			if(!_customer.get())
 			{
-				_customer = const_pointer_cast<User, const User>(_request->getUser());
+				_customer = const_pointer_cast<User, const User>(request.getUser());
 			}
 			if(!_customer.get())
 			{
@@ -286,21 +286,21 @@ namespace synthese
 
 		}
 
-		void BookReservationAction::run()
+		void BookReservationAction::run(Request& request)
 		{
 			// Save customer if necessary
 			if (_createCustomer)
 			{
 				UserTableSync::Save(_customer.get());
 
-				ResaDBLog::AddCustomerCreationEntry(*_request->getSession(), *_customer);
+				ResaDBLog::AddCustomerCreationEntry(*request.getSession(), *_customer);
 			}
 
 			// New ReservationTransaction
 			const DateTime now(TIME_CURRENT);
 			ReservationTransaction rt;
 			rt.setBookingTime(now);
-			rt.setBookingUserId(_request->getUser()->getKey());
+			rt.setBookingUserId(request.getUser()->getKey());
 			rt.setCustomerName(_customer->getName() + " " + _customer->getSurname());
 			rt.setCustomerPhone(_customer->getPhone());
 			rt.setCustomerEMail(_customer->getEMail());
@@ -389,19 +389,19 @@ namespace synthese
 			}
 
 			// Log
-			ResaDBLog::AddBookReservationEntry(_request->getSession(), rt);
+			ResaDBLog::AddBookReservationEntry(request.getSession(), rt);
 
 			// Mail
 			if(!_customer->getEMail().empty() && reservationContact)
  			{
 				reservationContact->sendCustomerEMail(rt);
 
-				ResaDBLog::AddEMailEntry(*_request->getSession(), *_customer, "Récapitulatif de réservation");
+				ResaDBLog::AddEMailEntry(*request.getSession(), *_customer, "Récapitulatif de réservation");
  			}
  
 
 			// Redirect
-			_request->setActionCreatedId(rt.getKey());
+			request.setActionCreatedId(rt.getKey());
 		}
 
 
@@ -412,11 +412,11 @@ namespace synthese
 
 
 
-		bool BookReservationAction::_isAuthorized(
+		bool BookReservationAction::isAuthorized(const Profile& profile
 		) const {
 			return
-				_request->isAuthorized<ResaRight>(WRITE) ||
-				_customer->getKey() == _request->getUser()->getKey() && _request->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
+				profile.isAuthorized<ResaRight>(WRITE) ||
+				_customer->getKey() == request.getUser()->getKey() && profile.isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
 		}
 
 

@@ -62,7 +62,7 @@ namespace synthese
 		{
 			if(!map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
 			{
-				_request->setActionWillCreateObject();
+				request.setActionWillCreateObject();
 			}
 			else
 			{
@@ -81,12 +81,12 @@ namespace synthese
 			}
 		}
 
-		void XMLReservationFunction::_run( std::ostream& stream ) const
+		void XMLReservationFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			shared_ptr<const ReservationTransaction> resa(_resa);
-			if(!resa.get() && _request->getActionCreatedId())
+			if(!resa.get() && request.getActionCreatedId())
 			{
-				resa = ReservationTransactionTableSync::Get(*_request->getActionCreatedId(), *getEnv());
+				resa = ReservationTransactionTableSync::Get(*request.getActionCreatedId(), *getEnv());
 				ReservationTableSync::Search(*getEnv(), resa->getKey());
 			}
 
@@ -139,11 +139,11 @@ namespace synthese
 		
 		
 		
-		bool XMLReservationFunction::_isAuthorized() const
+		bool XMLReservationFunction::isAuthorized(const Profile& profile) const
 		{
 			return
-				_request->isAuthorized<ResaRight>(WRITE) ||
-				_request->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
+				profile.isAuthorized<ResaRight>(WRITE) ||
+				profile.isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
 		}
 
 

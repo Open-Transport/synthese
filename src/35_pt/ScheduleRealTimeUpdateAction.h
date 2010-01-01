@@ -86,12 +86,12 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Action to run, defined by each subclass.
 			/// @todo Implement journalization
-			void run();
+			void run(server::Request& request);
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Authorization control.
 			/// @todo Implement a right control on this function
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 			virtual bool _isSessionRequired() const { return false; }
 

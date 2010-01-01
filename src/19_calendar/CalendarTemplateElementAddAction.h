@@ -79,14 +79,14 @@ namespace synthese
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(server::Request& request);
 			
 			CalendarTemplateElementAddAction();
 
 			void setCalendar(boost::shared_ptr<CalendarTemplate> value);
 			void setCalendar(boost::shared_ptr<const CalendarTemplate> value);
 			
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 		};
 	}
 }

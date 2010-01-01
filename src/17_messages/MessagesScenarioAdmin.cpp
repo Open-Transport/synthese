@@ -50,6 +50,7 @@
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"
 #include "ScenarioFolder.h"
+#include "Profile.h"
 
 #include <boost/foreach.hpp>
 
@@ -85,11 +86,8 @@ namespace synthese
 		const string MessagesScenarioAdmin::TAB_LOG("l");
 
 		void MessagesScenarioAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
-			if(objectWillBeCreatedLater) return;
-			
 			try
 			{
 				_scenario = ScenarioTableSync::Get(
@@ -128,7 +126,7 @@ namespace synthese
 		void MessagesScenarioAdmin::display(
 			ostream& stream,
 			interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+					const admin::AdminRequest& _request
 		) const	{
 
 			const SentScenario* _sentScenario = dynamic_cast<const SentScenario*>(_scenario.get());
@@ -288,21 +286,19 @@ namespace synthese
 			if (openTabContent(stream, TAB_LOG))
 			{
 				// Log search
-				_generalLogView.display(stream, FunctionRequest<AdminRequest>(_request));
+				_generalLogView.display(stream, AdminRequest(_request));
 			}
 
 			closeTabContent(stream);
 		}
 
 		bool MessagesScenarioAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			if(_request.getActionWillCreateObject()) return true;
+			const security::Profile& profile
+		) const	{
 			if (_scenario.get() == NULL) return false;
 			if (dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario).get() != NULL)
-				return _request.isAuthorized<MessagesRight>(READ);
-			return _request.isAuthorized<MessagesLibraryRight>(READ);
+				return profile.isAuthorized<MessagesRight>(READ);
+			return profile.isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		MessagesScenarioAdmin::MessagesScenarioAdmin(
@@ -314,11 +310,9 @@ namespace synthese
 
 
 
-
-
 		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			
@@ -369,7 +363,7 @@ namespace synthese
 
 
 		void MessagesScenarioAdmin::_buildTabs(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 			_tabs.clear();
 

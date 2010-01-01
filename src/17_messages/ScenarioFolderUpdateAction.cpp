@@ -118,7 +118,7 @@ namespace synthese
 		
 		
 		
-		void ScenarioFolderUpdateAction::run()
+		void ScenarioFolderUpdateAction::run(Request& request)
 		{
 			_folder->setName(_name);
 			_folder->setParent(_parentFolder.get());
@@ -144,9 +144,9 @@ namespace synthese
 
 
 
-		bool ScenarioFolderUpdateAction::_isAuthorized(
+		bool ScenarioFolderUpdateAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
+			return profile.isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

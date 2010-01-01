@@ -33,7 +33,7 @@
 #include "ResaRight.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "HTMLModule.h"
-#include "AdminRequest.h"
+
 #include "DBLogEntryTableSync.h"
 
 using namespace std;
@@ -75,29 +75,32 @@ namespace synthese
 
 			uid callId(ResaModule::GetCurrentCallId(request->getSession()));
 
-			if (callId == UNKNOWN_VALUE)
-			{ // Case call start
-
-				AdminActionFunctionRequest<CallBeginAction,ReservationRoutePlannerAdmin> callRequest(
-					static_cast<const FunctionRequest<AdminRequest>* >(request)
-				);
-				stream << HTMLModule::getLinkButton(callRequest.getURL(), _takeCallText->getValue(parameters,variables,object,request),string(), _takeCallIcon->getValue(parameters,variables,object,request));
-			}
-			else
+			if(request)
 			{
-				
-				AdminActionFunctionRequest<CallEndAction,ResaEditLogEntryAdmin> callRequest(
-					static_cast<const FunctionRequest<AdminRequest>* >(request)
-				);
-				
-				callRequest.getPage()->setEntry(
-					DBLogEntryTableSync::Get(
-						callId,
-						*static_cast<const FunctionRequest<AdminRequest>* >(
-							request
-						)->getFunction()->getEnv()
-				)	);
-				stream << HTMLModule::getLinkButton(callRequest.getURL(), _stopCallText->getValue(parameters,variables,object,request),string(), _stopCallIcon->getValue(parameters,variables,object,request));
+				if (callId == UNKNOWN_VALUE)
+				{ // Case call start
+
+					AdminActionFunctionRequest<CallBeginAction,ReservationRoutePlannerAdmin> callRequest(
+						*dynamic_cast<const AdminRequest* >(request)
+					);
+					stream << HTMLModule::getLinkButton(callRequest.getURL(), _takeCallText->getValue(parameters,variables,object,request),string(), _takeCallIcon->getValue(parameters,variables,object,request));
+				}
+				else
+				{
+
+					AdminActionFunctionRequest<CallEndAction,ResaEditLogEntryAdmin> callRequest(
+						*dynamic_cast<const AdminRequest* >(request)
+					);
+
+					callRequest.getPage()->setEntry(
+						DBLogEntryTableSync::Get(
+							callId,
+							*dynamic_cast<const AdminRequest* >(
+								request
+							)->getFunction()->getEnv()
+					)	);
+					stream << HTMLModule::getLinkButton(callRequest.getURL(), _stopCallText->getValue(parameters,variables,object,request),string(), _stopCallIcon->getValue(parameters,variables,object,request));
+				}
 			}
 
 			return string();

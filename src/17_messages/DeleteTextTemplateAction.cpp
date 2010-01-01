@@ -66,9 +66,9 @@ namespace synthese
 				throw ActionException(e.getMessage());
 			}
 		}
-		void DeleteTextTemplateAction::run()
+		void DeleteTextTemplateAction::run(Request& request)
 		{
-			MessagesLibraryLog::AddTemplateDeleteEntry(*_text, _request->getUser().get());
+			MessagesLibraryLog::AddTemplateDeleteEntry(*_text, request.getUser().get());
 
 			TextTemplateTableSync::Remove(_text->getKey());
 		}
@@ -82,9 +82,9 @@ namespace synthese
 
 
 
-		bool DeleteTextTemplateAction::_isAuthorized() const
+		bool DeleteTextTemplateAction::isAuthorized(const Profile& profile) const
 		{
-			return _request->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
+			return profile.isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
 		}
 	}
 }

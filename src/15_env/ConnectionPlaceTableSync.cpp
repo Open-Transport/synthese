@@ -58,6 +58,8 @@ namespace synthese
 		const string ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS = "transfer_delays";
 		const string ConnectionPlaceTableSync::COL_NAME13("short_display_name");
 		const string ConnectionPlaceTableSync::COL_NAME26("long_display_name");
+		
+		const string ConnectionPlaceTableSync::FORBIDDEN_DELAY_SYMBOL("F");
 	}
 
 	namespace db
@@ -125,7 +127,15 @@ namespace synthese
 				// departureRank:arrivalRank:transferDelay
 				RegistryKeyType startStop(Conversion::ToLongLong(*valueIter));
 				RegistryKeyType endStop(Conversion::ToLongLong(*(++valueIter)));
-				cp->addTransferDelay (startStop, endStop, posix_time::minutes(lexical_cast<long>(*(++valueIter))));
+				const string delay(*(++valueIter));
+				if(delay == ConnectionPlaceTableSync::FORBIDDEN_DELAY_SYMBOL)
+				{
+					cp->addForbiddenTransferDelay(startStop, endStop);
+				}
+				else
+				{
+					cp->addTransferDelay(startStop, endStop, posix_time::minutes(lexical_cast<long>(delay)));
+				}
 			}
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
@@ -178,7 +188,15 @@ namespace synthese
 			BOOST_FOREACH(const AddressablePlace::TransferDelaysMap::value_type& td, object->getTransferDelays())
 			{
 				if(!first) query << ",";
-				query << td.first.first << ":" << td.first.second << ":" << (td.second.total_seconds() / 60);
+				query << td.first.first << ":" << td.first.second << ":";
+				if(td.second.is_not_a_date_time())
+				{
+					query << ConnectionPlaceTableSync::FORBIDDEN_DELAY_SYMBOL;
+				}
+				else
+				{
+					query << (td.second.total_seconds() / 60);
+				}
 				first = false;
 			}
 			query << "\"," <<

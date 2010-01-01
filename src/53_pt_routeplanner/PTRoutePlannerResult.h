@@ -24,12 +24,18 @@
 #define SYNTHESE_routeplanner_PTRoutePlannerResult_h__
 
 #include <vector>
+#include <boost/optional.hpp>
 
 #include "Journey.h"
 #include "TimeSlotRoutePlanner.h"
 
 namespace synthese
 {
+	namespace html
+	{
+		class HTMLForm;
+	}
+
 	namespace geography
 	{
 		class NamedPlace;
@@ -391,6 +397,21 @@ namespace synthese
 			const PlaceList& getOrderedPlaces() const;
 			const geography::Place* getDeparturePlace() const;
 			const geography::Place* getArrivalPlace() const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Generates an HTML table to display on admin console.
+			/// @param stream stream to write the result on
+			/// @param resaForm reservation HTML Form. If not defined, the table does not
+			///		allow to book any seat.
+			/// @param resaRadioFieldName name of radio fields to display if a journey is
+			///		bookable.
+			void displayHTMLTable(
+				std::ostream& stream,
+				boost::optional<html::HTMLForm&> resaForm,
+				const std::string& resaRadioFieldName
+			) const;
 		};
 	}
 }

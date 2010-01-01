@@ -73,7 +73,7 @@ namespace synthese
 		}
 
 
-		void DeleteScenarioAction::run()
+		void DeleteScenarioAction::run(Request& request)
 		{
 			// The action on the alarms
 			AlarmTemplateInheritedTableSync::SearchResult alarms(
@@ -89,7 +89,7 @@ namespace synthese
 			ScenarioTableSync::Remove(_scenario->getKey());
 
 			// Log
-			MessagesLibraryLog::addDeleteEntry(_scenario.get(), _request->getUser().get());
+			MessagesLibraryLog::addDeleteEntry(_scenario.get(), request.getUser().get());
 		}
 
 		void DeleteScenarioAction::setScenario( boost::shared_ptr<const ScenarioTemplate> scenario )
@@ -99,9 +99,9 @@ namespace synthese
 
 
 
-		bool DeleteScenarioAction::_isAuthorized(
+		bool DeleteScenarioAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
+			return profile.isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
 		}
 	}
 }

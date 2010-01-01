@@ -70,8 +70,9 @@ namespace synthese
 			}
 		}
 
-		void DeleteAlarmAction::run() throw(ActionException)
-		{
+		void DeleteAlarmAction::run(
+			Request& request
+		) throw(ActionException) {
 			// Action
 			AlarmObjectLinkTableSync::Remove(_alarm->getKey());
 			AlarmTableSync::Remove(_alarm->getKey());
@@ -79,13 +80,15 @@ namespace synthese
 			// Log
 			if (dynamic_cast<const SentAlarm*>(_alarm.get()))
 			{
-				MessagesLog::AddDeleteEntry(static_cast<const SentAlarm*>(_alarm.get()), _request->getUser().get());
+				MessagesLog::AddDeleteEntry(static_cast<const SentAlarm*>(_alarm.get()), request.getUser().get());
 			}
 			else
 			{
-				MessagesLibraryLog::AddDeleteEntry(static_cast<const AlarmTemplate*>(_alarm.get()), _request->getUser().get());
+				MessagesLibraryLog::AddDeleteEntry(static_cast<const AlarmTemplate*>(_alarm.get()), request.getUser().get());
 			}
 		}
+
+
 
 		void DeleteAlarmAction::setAlarmId(RegistryKeyType id ) throw(ActionException)
 		{
@@ -101,15 +104,15 @@ namespace synthese
 
 
 
-		bool DeleteAlarmAction::_isAuthorized(
+		bool DeleteAlarmAction::isAuthorized(const Profile& profile
 		) const {
 			if (dynamic_cast<const SentAlarm*>(_alarm.get()))
 			{
-				return _request->isAuthorized<MessagesRight>(DELETE_RIGHT);
+				return profile.isAuthorized<MessagesRight>(DELETE_RIGHT);
 			}
 			else
 			{
-				return _request->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
+				return profile.isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
 			}
 		}
 	}

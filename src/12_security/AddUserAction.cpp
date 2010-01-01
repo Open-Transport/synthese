@@ -78,7 +78,7 @@ namespace synthese
 			}
 		}
 
-		void AddUserAction::run()
+		void AddUserAction::run(Request& request)
 		{
 			User user;
 			user.setLogin(_login);
@@ -86,11 +86,11 @@ namespace synthese
 			user.setProfile(_profile.get());
 			UserTableSync::Save(&user);
 			
-			_request->setActionCreatedId(user.getKey());
+			request.setActionCreatedId(user.getKey());
 				
 			// DBLog
 			SecurityLog::addUserAdmin(
-				_request->getUser().get(),
+				request.getUser().get(),
 				&user,
 				"Création de l'utilisateur " + user.getLogin()
 			);
@@ -98,9 +98,9 @@ namespace synthese
 
 
 
-		bool AddUserAction::_isAuthorized(
+		bool AddUserAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<SecurityRight>(WRITE);
+			return profile.isAuthorized<SecurityRight>(WRITE);
 			/// @todo Add a control on the profile on the user who creates the new user, depending on the new user profile
 		}
 	}

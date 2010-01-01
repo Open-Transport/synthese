@@ -162,6 +162,21 @@ namespace synthese
 				this_thread::interruption_point();
 				shared_ptr<Journey> journey(todo.front());
 
+				VertexAccessMap curVam;
+				if(journey->empty())
+				{
+					curVam = vam;
+				}
+				else
+				{
+					journey->getEndEdge()->getHub()->getVertexAccessMap(
+						curVam,
+						_accessDirection,
+						_graphToUse,
+						*journey->getEndEdge()->getFromVertex()
+					);
+				}
+
 #ifdef DEBUG
 				if(	!journey->empty()
 				&&	(Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
@@ -286,9 +301,9 @@ namespace synthese
 				Journey currentJourney(startJourney, *journey);
 
 				// Loop on each origin vertex
-				for(std::map<const Vertex*, VertexAccess>::const_iterator itVertex(vam.getMap ().begin())
-					; itVertex != vam.getMap ().end ()
-					; ++itVertex
+				for(map<const Vertex*, VertexAccess>::const_iterator itVertex(curVam.getMap ().begin());
+					itVertex != curVam.getMap().end();
+					++itVertex
 				){
 					this_thread::interruption_point();
 
@@ -577,8 +592,9 @@ namespace synthese
 
 				@todo Replace the third value (1 minute) by a more accurate value ("VMAX algorithm")
 			*/
-			if(	!_destinationVam.contains(reachedVertex)
-				&& reachedVertex->getHub()->isConnectionPossible()
+			if(	!_destinationVam.contains(reachedVertex) &&
+				reachedVertex->getHub()->isConnectionPossible() &&
+				_searchOnlyNodes
 			){
 
 /* Extract of the old VMAX code
@@ -613,8 +629,14 @@ namespace synthese
 			/** - Best vertex map control : the service use is useful only if no other already found
 				service use reaches the vertex at a strictly better time.
 			*/
-			if(	_bestVertexReachesMap.isUseLess(reachedVertex, journey.size(), posix_time::minutes(method == DEPARTURE_TO_ARRIVAL ? journey.getEndTime() - _originDateTime : _originDateTime - journey.getEndTime()))
-			)	return _JourneyUsefulness(false,true);
+			if(	_bestVertexReachesMap.isUseLess(
+					reachedVertex,
+					journey.size(),
+					posix_time::minutes(method == DEPARTURE_TO_ARRIVAL ? journey.getEndTime() - _originDateTime : _originDateTime - journey.getEndTime()),
+					_searchOnlyNodes
+			)	){
+					return _JourneyUsefulness(false,true);
+			}
 
 			return _JourneyUsefulness(true,true);
 		}

@@ -44,6 +44,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "ActionResultHTMLTable.h"
 #include "NonPermanentService.h"
+#include "Profile.h"
 
 using namespace std;
 using namespace boost;
@@ -84,8 +85,7 @@ namespace synthese
 
 		
 		void CommercialLineAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
 			if(map.getOptional<string>(PARAMETER_DATES_START))
@@ -119,7 +119,7 @@ namespace synthese
 		void CommercialLineAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 			////////////////////////////////////////////////////////////////////
 			// TAB STOPS
@@ -305,7 +305,7 @@ namespace synthese
 			// TAB EXPORT
 			if (openTabContent(stream, TAB_EXPORT))
 			{
-				FunctionRequest<TridentExportFunction> tridentExportFunction(&_request);
+				RequestManager<StaticFunctionRequestPolicy<TridentExportFunction> > tridentExportFunction(_request);
 				tridentExportFunction.getFunction()->setCommercialLine(_cline);
 				stream << "<h1>Formats Trident</h1>";
 				stream << "<p>";
@@ -322,11 +322,10 @@ namespace synthese
 		}
 
 		bool CommercialLineAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
+			const security::Profile& profile
+		) const	{
 			if (_cline.get() == NULL) return false;
-			return _request.isAuthorized<TransportNetworkRight>(READ);
+			return profile.isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		
@@ -337,7 +336,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks CommercialLineAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
@@ -360,7 +359,7 @@ namespace synthese
 		}
 
 		void CommercialLineAdmin::_buildTabs(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 			_tabs.clear();
 

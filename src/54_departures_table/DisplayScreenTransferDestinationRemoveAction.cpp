@@ -91,7 +91,7 @@ namespace synthese
 		
 		
 		
-		void DisplayScreenTransferDestinationRemoveAction::run()
+		void DisplayScreenTransferDestinationRemoveAction::run(Request& request)
 		{
 			// Action
 			_screen->removeTransferDestination(
@@ -106,22 +106,22 @@ namespace synthese
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
 				"Retrait de destination avec correspondance : "+ _destinationPlace->getFullName() + " à "+ _transferPlace->getFullName(),
-				*_request->getUser()
+				*request.getUser()
 			);
 		}
 		
 		
 		
-		bool DisplayScreenTransferDestinationRemoveAction::_isAuthorized(
+		bool DisplayScreenTransferDestinationRemoveAction::isAuthorized(const Profile& profile
 		) const {
 			assert(_screen.get() != NULL);
 			if (_screen->getLocalization() != NULL)
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 

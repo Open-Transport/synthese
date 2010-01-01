@@ -70,13 +70,21 @@ namespace synthese
 		bool BestVertexReachesMap::isUseLess(
 			const TimeMap::key_type& vertex,
 			const TimeMap::mapped_type::key_type& transferNumber,
-			const TimeMap::mapped_type::mapped_type& duration
+			const TimeMap::mapped_type::mapped_type& duration,
+			bool propagateInConnectionPlace
 		){
 			TimeMap::const_iterator itc(_bestTimeMap.find(vertex));
 
 			if (itc == _bestTimeMap.end ())
 			{
-				_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration);
+				if(propagateInConnectionPlace)
+				{
+					_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration);
+				}
+				else
+				{
+					_insert(vertex, transferNumber, duration);
+				}
 				return false;
 			}
 
@@ -95,21 +103,45 @@ namespace synthese
 					}
 					else
 					{
-						_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration);
+						if(propagateInConnectionPlace)
+						{
+							_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration);
+						}
+						else
+						{
+							_insert(vertex, transferNumber, duration);
+						}
 						return false;
 					}
 				}
 				else
 				{
-					_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration);
+					if(propagateInConnectionPlace)
+					{
+						_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration);
+					}
+					else
+					{
+						_insert(vertex, transferNumber, duration);
+					}
 					if(item.second >= duration)
 					{
-						_removeDurationsForMoreTransfers(vertex, item.first);
+						if(propagateInConnectionPlace)
+						{
+							_removeDurationsForMoreTransfers(vertex, item.first);
+						}
 						return true;
 					}
 				}
 			}
-			_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration);
+			if(propagateInConnectionPlace)
+			{
+				_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration);
+			}
+			else
+			{
+				_insert(vertex, transferNumber, duration);
+			}
 			return false;
 		}
 
@@ -147,7 +179,7 @@ namespace synthese
 		){
 			_insert(vertex, transfers, duration);
 			
-			if(vertex->getHub()->isConnectionPossible()) return;
+			if(!vertex->getHub()->isConnectionPossible()) return;
 
 			const Hub* p(vertex->getHub());
 			assert (p != 0);

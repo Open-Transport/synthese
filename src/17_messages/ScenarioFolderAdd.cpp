@@ -133,9 +133,9 @@ namespace synthese
 
 
 
-		bool ScenarioFolderAdd::_isAuthorized(
+		bool ScenarioFolderAdd::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
+			return profile.isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

@@ -79,13 +79,13 @@ namespace synthese
 			///	@return bool true if the user can use the action.
 			///	@author Hugues Romain
 			///	@date 2008
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(server::Request& request);
 			
 			DisplayScreenAppearanceUpdateAction();
 

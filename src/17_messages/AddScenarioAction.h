@@ -65,7 +65,7 @@ namespace synthese
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(server::Request& request);
 
 			void setFolder(
 				boost::shared_ptr<ScenarioFolder> value
@@ -74,7 +74,7 @@ namespace synthese
 				boost::shared_ptr<const ScenarioFolder> value
 			);
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 		};
 	}
 }

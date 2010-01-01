@@ -117,14 +117,14 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenContentFunction::_run( std::ostream& stream ) const
+		void DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			_screen->display(stream, _date ? *_date : DateTime(TIME_CURRENT), _request);
+			_screen->display(stream, _date ? *_date : DateTime(TIME_CURRENT), &request);
 		}
 
 
 
-		bool DisplayScreenContentFunction::_isAuthorized(
+		bool DisplayScreenContentFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

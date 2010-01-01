@@ -40,10 +40,10 @@ namespace synthese
 		/** Administration console Function Class.
 			@ingroup m14Functions refFunctions
 			
-			@warning Must be linked to the Request by FunctionRequest<AdminRequest> or its subclasses.
+			@warning Must be linked to the Request by AdminRequest or its subclasses.
 		*/
-		class AdminRequest:
-			public util::FactorableTemplate<interfaces::RequestWithInterfaceAndRequiredSession, AdminRequest>
+		class AdminFunction:
+			public util::FactorableTemplate<interfaces::RequestWithInterfaceAndRequiredSession, AdminFunction>
 		{
 		public:
 			static const std::string PARAMETER_PAGE;
@@ -69,9 +69,9 @@ namespace synthese
 
 			/** Action to run, defined by each subclass.
 			*/
-			void _run(std::ostream& stream) const;
+			void run(std::ostream& stream, const server::Request& request) const;
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 		public:
 		
@@ -95,7 +95,7 @@ namespace synthese
 		};
 
 		template<class T>
-		void AdminRequest::setActionFailedPage()
+		void AdminFunction::setActionFailedPage()
 		{
 		    _actionFailedPage = _page->getNewOtherPage<T>();
 		}

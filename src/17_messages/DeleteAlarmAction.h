@@ -65,13 +65,15 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run(
+				server::Request& request
 			) throw(server::ActionException);
 
 			void setAlarmId(
 				util::RegistryKeyType id
 			) throw(server::ActionException);
 
-			virtual bool _isAuthorized(
+			virtual bool isAuthorized(
+				const security::Profile& profile
 			) const;
 		};
 	}

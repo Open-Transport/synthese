@@ -34,6 +34,11 @@
 
 namespace synthese
 {
+	namespace security
+	{
+		class Profile;
+	}
+
 	namespace server
 	{
 		class Request;
@@ -143,7 +148,7 @@ namespace synthese
 				) const;
 				
 				bool isAuthorized(
-					const server::Request& request
+					const security::Profile& profile
 				) const;
 				
 				server::ParametersMap getParametersMap(

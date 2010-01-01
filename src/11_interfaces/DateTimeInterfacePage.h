@@ -27,14 +27,10 @@
 
 #include "InterfacePage.h"
 #include "FactorableTemplate.h"
+#include "Request.h"
 
 namespace synthese
 {
-	namespace server
-	{
-		class Request;
-	}
-
 	namespace time
 	{
 		class DateTime;

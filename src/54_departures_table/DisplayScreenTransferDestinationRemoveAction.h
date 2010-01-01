@@ -71,9 +71,9 @@ namespace synthese
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(server::Request& request);
 			
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 			void setScreen(boost::shared_ptr<const DisplayScreen> value);
 			void setTransferPlace(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> value);

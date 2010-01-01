@@ -140,7 +140,7 @@ namespace synthese
 
 
 
-		void ScenarioUpdateDatesAction::run()
+		void ScenarioUpdateDatesAction::run(Request& request)
 		{
 			// Log message
 			stringstream text;
@@ -205,19 +205,19 @@ namespace synthese
 			// Log
 			if(_sscenario.get())
 			{
-				MessagesLog::addUpdateEntry(_sscenario.get(), text.str(), _request->getUser().get());
+				MessagesLog::addUpdateEntry(_sscenario.get(), text.str(), request.getUser().get());
 			}
 			else
 			{
-				MessagesLibraryLog::addUpdateEntry(_tscenario.get(), text.str(), _request->getUser().get());
+				MessagesLibraryLog::addUpdateEntry(_tscenario.get(), text.str(), request.getUser().get());
 			}
 		}
 
 
 
-		bool ScenarioUpdateDatesAction::_isAuthorized(
+		bool ScenarioUpdateDatesAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<MessagesRight>(WRITE);
+			return profile.isAuthorized<MessagesRight>(WRITE);
 		}
 
 

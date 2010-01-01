@@ -31,6 +31,7 @@
 #include "ResultHTMLTable.h"
 #include "RequestException.h"
 #include "SearchFormHTMLTable.h"
+#include "Profile.h"
 
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/foreach.hpp>
@@ -89,8 +90,7 @@ namespace synthese
 
 		
 		void CallStatisticsAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			if(map.getOptional<string>(PARAM_SEARCH_START_DATE) && map.getOptional<string>(PARAM_SEARCH_END_DATE))
 			{
@@ -121,9 +121,9 @@ namespace synthese
 
 		
 		bool CallStatisticsAdmin::isAuthorized(
-			const FunctionRequest<AdminRequest>& request
+			const security::Profile& profile
 		) const	{
-			return request.isAuthorized<ResaRight>(READ);
+			return profile.isAuthorized<ResaRight>(READ);
 		}
 
 
@@ -131,7 +131,7 @@ namespace synthese
 		void CallStatisticsAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 		
 			AdminFunctionRequest<CallStatisticsAdmin> searchRequest(request);

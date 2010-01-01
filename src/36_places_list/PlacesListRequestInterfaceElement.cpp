@@ -60,13 +60,16 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/
 		) const {
-			FunctionRequest<PlacesListFunction> plrequest(request);
-			plrequest.getFunction()->setTextInput(_txtField->getValue(parameters, variables, object, request));
-			plrequest.getFunction()->setIsForOrigin(Conversion::ToBool(_isForOrigin->getValue(parameters, variables, object, request)));
-			plrequest.getFunction()->setNumber(Conversion::ToInt(_number->getValue(parameters, variables, object, request)));
-			plrequest.getFunction()->setCityTextInput(_cityTxtField->getValue(parameters, variables, object, request));
+			if(request)
+			{
+				FunctionRequest<PlacesListFunction> plrequest(*request);
+				plrequest.getFunction()->setTextInput(_txtField->getValue(parameters, variables, object, request));
+				plrequest.getFunction()->setIsForOrigin(Conversion::ToBool(_isForOrigin->getValue(parameters, variables, object, request)));
+				plrequest.getFunction()->setNumber(Conversion::ToInt(_number->getValue(parameters, variables, object, request)));
+				plrequest.getFunction()->setCityTextInput(_cityTxtField->getValue(parameters, variables, object, request));
 
-			stream << plrequest.getURL(false);
+				stream << plrequest.getURL(false);
+			}
 
 			return string();
 		}

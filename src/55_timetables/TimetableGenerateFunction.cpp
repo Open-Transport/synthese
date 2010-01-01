@@ -82,18 +82,18 @@ namespace synthese
 			}
 		}
 
-		void TimetableGenerateFunction::_run( std::ostream& stream ) const
+		void TimetableGenerateFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			auto_ptr<TimetableGenerator> generator(_timetable->getGenerator(Env::GetOfficialEnv()));
 			generator->build();
 			const TimetableInterfacePage* page(_timetable->getInterface()->getPage<TimetableInterfacePage>());
 			VariablesMap variables;
-			page->display(stream, *_timetable, *generator, variables, _request);
+			page->display(stream, *_timetable, *generator, variables, &request);
 		}
 		
 		
 		
-		bool TimetableGenerateFunction::_isAuthorized() const
+		bool TimetableGenerateFunction::isAuthorized(const Profile& profile) const
 		{
 			return true;
 		}

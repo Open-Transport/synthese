@@ -45,8 +45,6 @@ namespace synthese
 
 	namespace server
 	{
-		class Request;
-
 		/** ParametersMap class.
 			@ingroup m15
 		*/
@@ -267,6 +265,8 @@ namespace synthese
 				 * @param other map to read an integrate into the current one
 				 */
 				void merge(const ParametersMap& other);
+
+				void remove(const std::string& parameterName);
 			//@}
 		};
 

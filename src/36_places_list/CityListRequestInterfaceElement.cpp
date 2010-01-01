@@ -60,12 +60,15 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const {
 			
-			FunctionRequest<CityListRequest> clrequest(request);
-			clrequest.getFunction()->setTextInput(_txtField->getValue(parameters, variables, object, request));
-			clrequest.getFunction()->setIsForOrigin(Conversion::ToBool(_isForOrigin->getValue(parameters, variables, object, request)));
-			clrequest.getFunction()->setNumber(Conversion::ToInt(_number->getValue(parameters, variables, object, request)));
+			if(request)
+			{
+				FunctionRequest<CityListRequest> clrequest(*request);
+				clrequest.getFunction()->setTextInput(_txtField->getValue(parameters, variables, object, request));
+				clrequest.getFunction()->setIsForOrigin(Conversion::ToBool(_isForOrigin->getValue(parameters, variables, object, request)));
+				clrequest.getFunction()->setNumber(Conversion::ToInt(_number->getValue(parameters, variables, object, request)));
 
-			stream << clrequest.getURL(false);
+				stream << clrequest.getURL(false);
+			}
 
 			return string();
 		}

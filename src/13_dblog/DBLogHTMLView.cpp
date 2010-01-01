@@ -34,7 +34,7 @@
 #include "DBLogEntryTableSync.h"
 #include "DBLogRight.h"
 #include "Request.h"
-#include "Request.h"
+#include "Profile.h"
 #include "SecurityModule.h"
 
 using namespace std;
@@ -398,9 +398,9 @@ namespace synthese
 		
 		
 		bool DBLogHTMLView::isAuthorized(
-			const Request& request
+			const security::Profile& profile
 		) const {
-			return _dbLog.get() && _dbLog->isAuthorized(request, READ);
+			return _dbLog.get() && _dbLog->isAuthorized(profile, READ);
 		}
 		
 		

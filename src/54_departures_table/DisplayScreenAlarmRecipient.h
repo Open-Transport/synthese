@@ -51,10 +51,10 @@ namespace synthese
 				std::ostream& stream
 				, const messages::Alarm* alarm
 				, const server::ParametersMap& request
-				, server::FunctionRequest<admin::AdminRequest>& searchRequest
-				, server::ActionFunctionRequest<messages::AlarmAddLinkAction,admin::AdminRequest>& addRequest
-				, server::ActionFunctionRequest<messages::AlarmRemoveLinkAction, admin::AdminRequest>& removeRequest
-				);
+				, admin::AdminRequest& searchRequest
+				, server::RequestManager<server::StaticActionRequestPolicy<messages::AlarmAddLinkAction> >& addRequest
+				, server::RequestManager<server::StaticActionRequestPolicy<messages::AlarmRemoveLinkAction> >& removeRequest
+			);
 
 			virtual messages::AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const server::ParametersMap& parameters) const;
 

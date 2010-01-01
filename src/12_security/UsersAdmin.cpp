@@ -79,8 +79,7 @@ namespace synthese
 
 
 		void UsersAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			if(!map.getDefault<string>(PARAM_SEARCH_LOGIN).empty())
 			{
@@ -129,9 +128,9 @@ namespace synthese
 
 
 		bool UsersAdmin::isAuthorized(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const security::Profile& profile
 		) const	{
-			return _request.isAuthorized<SecurityRight>(READ);
+			return profile.isAuthorized<SecurityRight>(READ);
 		}
 
 
@@ -139,7 +138,7 @@ namespace synthese
 		void UsersAdmin::display(
 			std::ostream& stream,
 			interfaces::VariablesMap& variables,
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const	{
 			// Request for search form
 			AdminFunctionRequest<UsersAdmin> searchRequest(_request);
@@ -240,13 +239,16 @@ namespace synthese
 		AdminInterfaceElement::PageLinks UsersAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == SecurityModule::FACTORY_KEY && isAuthorized(request))
-			{
+			if(	moduleKey == SecurityModule::FACTORY_KEY &&
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile())
+			){
 				links.push_back(getNewPage());
 			}
 			return links;
@@ -255,7 +257,7 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks UsersAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;

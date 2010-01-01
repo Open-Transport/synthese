@@ -74,7 +74,7 @@ namespace synthese
 			_macAddress = map.getString(PARAMETER_MAC_ADDRESS, true, FACTORY_KEY);
 		}
 
-		void DisplayScreenCPUUpdateAction::run()
+		void DisplayScreenCPUUpdateAction::run(Request& request)
 		{
 			// Log
 			stringstream log;
@@ -88,17 +88,17 @@ namespace synthese
 			DisplayScreenCPUTableSync::Save(_cpu.get());
 
 			// Log
-			ArrivalDepartureTableLog::addUpdateEntry(*_cpu, log.str(), *_request->getUser());
+			ArrivalDepartureTableLog::addUpdateEntry(*_cpu, log.str(), *request.getUser());
 		}
 
 
 
-		bool DisplayScreenCPUUpdateAction::_isAuthorized(
+		bool DisplayScreenCPUUpdateAction::isAuthorized(const Profile& profile
 		) const {
 			return
 				_cpu->getPlace() ?
-				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
-				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER)
+				profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
+				profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER)
 			;				
 		}
 

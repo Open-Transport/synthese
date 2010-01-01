@@ -23,7 +23,7 @@
 #include "AdminPagesTreeInterfaceElement.h"
 
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+
 #include "HomeAdmin.h"
 
 #include "HTMLModule.h"
@@ -96,16 +96,19 @@ namespace synthese
 			_openedFolderLastSubpageIntroducer = _openedFolderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
 			_closedFolderLastSubpageIntroducer = _closedFolderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
 
-			stream << displaySubPages(
-				page->getTree(
-					static_cast<const FunctionRequest<AdminRequest>& >(*request)
-				),
-				page
-				, 0
-				, string()
-				, true,
-				*request
-			);
+			if(request)
+			{
+				stream << displaySubPages(
+					page->getTree(
+						*dynamic_cast<const AdminRequest*>(request)
+					),
+					page
+					, 0
+					, string()
+					, true,
+					*request
+					);
+			}
 	
 			return string();
 		}
@@ -153,7 +156,7 @@ namespace synthese
 			}
 
 			// Display current page
-			FunctionRequest<AdminRequest> r(&request);
+			AdminRequest r(request);
 			if (*pages.page == *currentPage)
 			{
 				str <<

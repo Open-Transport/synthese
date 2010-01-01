@@ -76,8 +76,7 @@ namespace synthese
 				@date 2008
 			*/
 			void setFromParametersMap(
-				const server::ParametersMap& map,
-				bool objectWillBeCreatedLater
+				const server::ParametersMap& map
 			);
 			
 			
@@ -97,7 +96,7 @@ namespace synthese
 				@date 2008
 			*/
 			void display(std::ostream& stream, interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const;
+					const admin::AdminRequest& _request) const;
 
 			/** Authorization control.
 				@return bool True if the displayed page can be displayed
@@ -105,7 +104,7 @@ namespace synthese
 				@date 2008
 			*/
 			bool isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const security::Profile& profile
 			) const;
 			
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;

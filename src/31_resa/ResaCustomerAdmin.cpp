@@ -23,7 +23,7 @@
 */
 
 #include "ResaCustomerAdmin.h"
-
+#include "Profile.h"
 #include "ResaCustomersAdmin.h"
 #include "ResaModule.h"
 #include "ReservationTransaction.h"
@@ -96,8 +96,7 @@ namespace synthese
 		}
 		
 		void ResaCustomerAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			try
 			{
@@ -131,7 +130,7 @@ namespace synthese
 		void ResaCustomerAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -218,7 +217,7 @@ namespace synthese
 				// Results
 				_log.display(
 					stream,
-					FunctionRequest<AdminRequest>(_request),
+					AdminRequest(_request),
 					true,
 					true
 				);
@@ -230,9 +229,9 @@ namespace synthese
 		}
 
 		bool ResaCustomerAdmin::isAuthorized(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const security::Profile& profile
 		) const	{
-			return _request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 
@@ -245,7 +244,7 @@ namespace synthese
 
 		
 		void ResaCustomerAdmin::_buildTabs(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 			_tabs.clear();
 			bool writeRight(_request.isAuthorized<ResaRight>(WRITE, UNKNOWN_RIGHT_LEVEL));
@@ -283,8 +282,11 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks ResaCustomerAdmin::getSubPagesOfModule( const std::string& moduleKey, const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>& request ) const
-		{
+		AdminInterfaceElement::PageLinks ResaCustomerAdmin::getSubPagesOfModule(
+			const std::string& moduleKey,
+			const AdminInterfaceElement& currentPage,
+			const admin::AdminRequest& request
+		) const	{
 			PageLinks result;
 			if(moduleKey == ResaModule::FACTORY_KEY)
 			{

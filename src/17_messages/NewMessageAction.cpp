@@ -75,19 +75,22 @@ namespace synthese
 			}
 		}
 
-		void NewMessageAction::run() throw(ActionException)
-		{
+		
+		
+		void NewMessageAction::run(
+			Request& request
+		) throw(ActionException) {
 			if (_scenarioTemplate.get())
 			{
 				AlarmTemplate alarm(UNKNOWN_VALUE, _scenarioTemplate.get());
 				AlarmTableSync::Save(&alarm);
 				
-				_request->setActionCreatedId(alarm.getKey());
+				request.setActionCreatedId(alarm.getKey());
 				
 				MessagesLog::AddNewScenarioMessageEntry(
 					alarm,
 					*_scenarioTemplate,
-					_request->getUser().get()
+					request.getUser().get()
 				);
 			}
 			else
@@ -96,12 +99,12 @@ namespace synthese
 					
 				AlarmTableSync::Save(&alarm);
 				
-				_request->setActionCreatedId(alarm.getKey());
+				request.setActionCreatedId(alarm.getKey());
 			
 				MessagesLog::AddNewScenarioMessageEntry(
 					alarm,
 					*_sentScenario,
-					_request->getUser().get()
+					request.getUser().get()
 				);
 			}
 		}
@@ -124,9 +127,9 @@ namespace synthese
 
 
 
-		bool NewMessageAction::_isAuthorized(
+		bool NewMessageAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<MessagesRight>(WRITE);
+			return profile.isAuthorized<MessagesRight>(WRITE);
 		}
 	}
 }

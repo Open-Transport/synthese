@@ -116,7 +116,7 @@ namespace synthese
 				{
 					Env env;
 					shared_ptr<const UserFavoriteJourney> favorite(UserFavoriteJourneyTableSync::Get(*_favoriteId, env));
-					if (favorite->getUser()->getKey() != _request->getUser()->getKey())
+					if (favorite->getUser()->getKey() != request.getUser()->getKey())
 					{
 						throw RequestException("Forbidden favorite");
 					}
@@ -251,8 +251,10 @@ namespace synthese
 
 
 
-		void RoutePlannerFunction::_run( ostream& stream ) const
-		{
+		void RoutePlannerFunction::run(
+			ostream& stream,
+			const Request& request
+		) const	{
 			VariablesMap vm;
 			if (_departure_place.placeResult.value && _arrival_place.placeResult.value)
 			{
@@ -285,7 +287,7 @@ namespace synthese
 						, _arrival_place.placeResult.value
 						, _period
 						, _accessParameters
-						, _request
+						, &request
 						, _site.get()
 						, result.getSamePlaces()
 					);
@@ -302,9 +304,9 @@ namespace synthese
 						stream << " maxSolutions=\"" << _maxSolutionsNumber << "\"";
 					}
 					stream << " userProfile=\"" << _accessParameters.getUserClass() << "\"";
-					if(_request->getSession())
+					if(request.getSession())
 					{
-						stream << " sessionId=\"" << _request->getSession()->getKey() << "\"";
+						stream << " sessionId=\"" << request.getSession()->getKey() << "\"";
 					}
 					stream <<
 						" siteId=\"" << _site->getKey() << "\">" <<
@@ -654,7 +656,7 @@ namespace synthese
 					, _destinationPlaceText
 					, _period
 					, _accessParameters
-					, _request
+					, &request
 					, _site.get()
 				);
 			}
@@ -689,7 +691,7 @@ namespace synthese
 
 
 
-		bool RoutePlannerFunction::_isAuthorized(
+		bool RoutePlannerFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

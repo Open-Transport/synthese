@@ -96,7 +96,7 @@ namespace synthese
 			_shortMessage = map.getString(PARAMETER_SHORT_MESSAGE, true, FACTORY_KEY);
 		}
 
-		void TextTemplateAddAction::run()
+		void TextTemplateAddAction::run(Request& request)
 		{
 			TextTemplate tt;
 			tt.setLongMessage(_longMessage);
@@ -107,14 +107,14 @@ namespace synthese
 			TextTemplateTableSync::Save(&tt);
 
 			// Log
-			MessagesLibraryLog::AddTemplateCreationEntry(tt, _request->getUser().get());
+			MessagesLibraryLog::AddTemplateCreationEntry(tt, request.getUser().get());
 		}
 
 
 
-		bool TextTemplateAddAction::_isAuthorized() const
+		bool TextTemplateAddAction::isAuthorized(const Profile& profile) const
 		{
-			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
+			return profile.isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 
 

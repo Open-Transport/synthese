@@ -102,7 +102,7 @@ namespace synthese
 		
 		
 		
-		void TextTemplateFolderUpdateAction::run()
+		void TextTemplateFolderUpdateAction::run(Request& request)
 		{
 			stringstream s;
 
@@ -113,7 +113,7 @@ namespace synthese
 
 			TextTemplateTableSync::Save(_folder.get());
 
-			MessagesLibraryLog::AddTemplateFolderUpdateEntry(*_folder, s.str(), _request->getUser().get());
+			MessagesLibraryLog::AddTemplateFolderUpdateEntry(*_folder, s.str(), request.getUser().get());
 		}
 
 
@@ -132,9 +132,9 @@ namespace synthese
 
 
 
-		bool TextTemplateFolderUpdateAction::_isAuthorized(
+		bool TextTemplateFolderUpdateAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
+			return profile.isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

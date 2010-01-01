@@ -80,11 +80,8 @@ namespace synthese
 		
 		
 		void ProfileAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
-			if(objectWillBeCreatedLater) return;
-			
 			try
 			{
 				RegistryKeyType id = map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID);
@@ -108,7 +105,7 @@ namespace synthese
 
 
 		void ProfileAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
+					const admin::AdminRequest& _request) const
 		{
 			AdminActionFunctionRequest<UpdateProfileAction, ProfileAdmin> updateRequest(_request);
 			updateRequest.getAction()->setProfile(_profile);
@@ -230,11 +227,9 @@ namespace synthese
 
 
 		bool ProfileAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			if(_request.getActionWillCreateObject()) return true;
-			return _request.isAuthorized<SecurityRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<SecurityRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 		std::string ProfileAdmin::getTitle() const
@@ -255,7 +250,7 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks ProfileAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			

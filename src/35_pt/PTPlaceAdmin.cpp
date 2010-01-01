@@ -36,6 +36,7 @@
 #include "PhysicalStop.h"
 #include "PTPlacesAdmin.h"
 #include "City.h"
+#include "Profile.h"
 
 using namespace std;
 using namespace boost;
@@ -80,8 +81,7 @@ namespace synthese
 
 		
 		void PTPlaceAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			try
 			{
@@ -133,9 +133,9 @@ namespace synthese
 
 		
 		bool PTPlaceAdmin::isAuthorized(
-			const FunctionRequest<AdminRequest>& request
+			const security::Profile& profile
 		) const	{
-			return request.isAuthorized<TransportNetworkRight>(READ);
+			return profile.isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -143,7 +143,7 @@ namespace synthese
 		void PTPlaceAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 		
 			////////////////////////////////////////////////////////////////////
@@ -196,7 +196,7 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks PTPlaceAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
@@ -224,7 +224,7 @@ namespace synthese
 
 
 
-		void PTPlaceAdmin::_buildTabs( const server::FunctionRequest<admin::AdminRequest>& request ) const
+		void PTPlaceAdmin::_buildTabs( const admin::AdminRequest& request ) const
 		{
 			_tabs.clear();
 			_tabs.push_back(Tab("Propriétés", TAB_GENERAL, true));

@@ -64,16 +64,16 @@ namespace synthese
 		
 		
 		
-		void CallBeginAction::run()
+		void CallBeginAction::run(Request& request)
 		{
-			ResaModule::CallOpen(_request->getSession());
+			ResaModule::CallOpen(request.getSession());
 		}
 
 
 
-		bool CallBeginAction::_isAuthorized(
+		bool CallBeginAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<ResaRight>(WRITE);
+			return profile.isAuthorized<ResaRight>(WRITE);
 		}
 	}
 }

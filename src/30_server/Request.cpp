@@ -30,17 +30,13 @@
 #include "SessionException.h"
 #include "Action.h"
 #include "Function.h"
-#include "RequestException.h"
 
 #include "Exception.h"
 #include "FactoryException.h"
 #include "Conversion.h"
 #include "Log.h"
 
-#include "HTMLForm.h"
-
 #include "DateTime.h"
-#include "HTTPRequest.hpp"
 
 using namespace std;
 using namespace boost;
@@ -54,52 +50,241 @@ namespace synthese
 
 	namespace server
 	{
-		const string Request::PARAMETER_SEPARATOR ("&");
-		const string Request::PARAMETER_ASSIGNMENT ("=");
-		const string Request::PARAMETER_STARTER ("?");
-		const string Request::PARAMETER_ACTION ("a");
-		const string Request::PARAMETER_FUNCTION = "fonction";
-		const string Request::PARAMETER_SESSION = "sid";
-		const string Request::PARAMETER_OBJECT_ID = "roid";
-		const string Request::PARAMETER_ACTION_FAILED = "raf";
-		const string Request::PARAMETER_ERROR_MESSAGE = "rem";
-		const string Request::PARAMETER_ERROR_LEVEL = "rel";
-		const string Request::PARAMETER_ACTION_WILL_CREATE_OBJECT = "co";
-		const string Request::PARAMETER_NO_REDIRECT_AFTER_ACTION = "nr";
+
+
+		const string Request::PARAMETER_SEPARATOR("&");
+		const string Request::PARAMETER_ASSIGNMENT("=");
+
+		const string Request::PARAMETER_STARTER("?");
+		const string Request::PARAMETER_FUNCTION("fonction");
+		const string Request::PARAMETER_SESSION("sid");
+		const string Request::PARAMETER_OBJECT_ID("roid");
+		const string Request::PARAMETER_ACTION("a");
+		const string Request::PARAMETER_ACTION_FAILED("raf");
+		const string Request::PARAMETER_ERROR_MESSAGE("rem");
+		const string Request::PARAMETER_ACTION_WILL_CREATE_OBJECT("co");
+		const string Request::PARAMETER_NO_REDIRECT_AFTER_ACTION("nr");
+
+
+
+
+// 		Request::Request(
+// 			const Request& request,
+// 			shared_ptr<Action> action,
+// 			shared_ptr<Function> function
+// 		):	_session(request._session),
+// 			_actionException(false),
+// 			_errorLevel(REQUEST_ERROR_NONE),
+// 			_actionWillCreateObject(false),
+// 			_redirectAfterAction(request._redirectAfterAction),
+// 			_clientURL(request._clientURL)
+// 		{
+// 			_setAction(action);
+// 			_setFunction(function);
+// 			if(!request._getFunction().get() || !_function.get())
+// 			{
+// 				return;
+// 			}
+// 			if (_function->getFactoryKey() == request._getFunction()->getFactoryKey())
+// 			{
+// 				_function->_copy(request._getFunction());
+// 			}
+// 			_function->setEnv(request._getFunction()->getEnv());
+// 		}
+
+
+
+		void Request::deleteSession()
+		{
+			delete _session;
+			_session = NULL;
+		}
+
+
+
+		ParametersMap Request::_getParametersMap() const
+		{
+			ParametersMap result;
+
+			// Function
+			if (_getFunction().get())
+			{
+				result.insert(Request::PARAMETER_FUNCTION, _getFunction()->getFactoryKey());
+				ParametersMap::Map functionMap(_getFunction()->_getParametersMap().getMap());
+				for (ParametersMap::Map::const_iterator it = functionMap.begin(); it != functionMap.end(); ++it)
+					result.insert(it->first, it->second);
+			}
+
+			// Action name and parameters
+			if (_getAction().get())
+			{
+				result.insert(Request::PARAMETER_ACTION, _getAction()->getFactoryKey());
+				ParametersMap::Map actionMap(_getAction()->getParametersMap().getMap());
+				for (ParametersMap::Map::const_iterator it = actionMap.begin(); it != actionMap.end(); ++it)
+					result.insert(it->first, it->second);
+				result.insert(Request::PARAMETER_ACTION_WILL_CREATE_OBJECT, _actionWillCreateObject);
+			}
+
+			// Session
+			if(_session)
+			{
+				result.insert(Request::PARAMETER_SESSION, _session->getKey());
+			}
+
+			// Object ID
+			if (_actionCreatedId)
+				result.insert(Request::PARAMETER_OBJECT_ID, *_actionCreatedId);
+
+			// No redirection
+			if(!_redirectAfterAction)
+			{
+				result.insert(Request::PARAMETER_NO_REDIRECT_AFTER_ACTION, 1);
+			}
+
+			return result;
+		}
+
+
+
+		void Request::run( std::ostream& stream )
+		{
+			bool actionException(false);
+
+			// Handle of the action
+			try
+			{
+				_loadAction();
+
+				if (_getAction().get())
+				{
+					if(	_getAction()->_isSessionRequired() &&
+						(!_session || !_session->getUser() || !_session->getUser()->getProfile())
+					){
+						actionException = true;
+						_errorMessage = "Active session required for this action! Action dropped.";
+					}
+					else if (!_getAction()->_isAuthorized())
+					{
+						actionException = true;
+						_errorMessage = "Forbidden Action";
+					}
+					else
+					{
+						ServerModule::SetCurrentThreadRunningAction();
+
+						// Run of the action
+						_getAction()->run(*this);
+					}
+				}
+				catch(ActionException& e)
+				{
+					actionException = true;
+					_errorMessage = "Action error : "+ e.getMessage();
+				}
+			}
+
+			_loadFunction(actionException, _errorMessage, _actionCreatedId);
+
+			// Run after the action
+			if (_getAction().get() && _redirectAfterAction)
+			{
+				_deleteAction();
+				throw RedirectException(getURL());
+			}
+
+			if (!_getFunction()->_isAuthorized())
+			{
+				throw ForbiddenRequestException();
+			}
+
+			// Run the display
+			ServerModule::SetCurrentThreadRunningFunction();
+			_getFunction()->run(stream, *this);
+		}
+
+
+
+		bool Request::isActionFunctionAuthorized() const
+		{
+			if (_session == NULL ||
+				_session->getUser() == NULL ||
+				_session->getUser()->getProfile() == NULL
+			){
+				return false;
+			}
+			return (!_getAction().get() || _getAction()->isAuthorized(*_session->getUser()->getProfile()))
+				&& (!_getFunction.get() || _getFunction()->isAuthorized(*_session->getUser()->getProfile()));
+		}
+
+
+
+		boost::shared_ptr<const security::User> Request::getUser() const
+		{
+			if (_session)
+				return _session->getUser();
+			return boost::shared_ptr<User>();
+		}
+
+
+
+		std::string Request::getOutputMimeType()
+		{
+			return _getFunction().get() ? _getFunction()->getOutputMimeType() : string();
+		}
+
+
+
+		std::string Request::getURL( bool normalize /*= true*/ ) const
+		{
+			std::stringstream str;
+			str << _clientURL << Request::PARAMETER_STARTER << getURI();
+			return str.str();
+		}
+
+
+
+		html::HTMLForm Request::getHTMLForm( std::string name/*=std::string()*/ ) const
+		{
+			html::HTMLForm form(name, _clientURL);
+			ParametersMap::Map map(_getParametersMap().getMap());
+			for (ParametersMap::Map::const_iterator it = map.begin(); it != map.end(); ++it)
+				form.addHiddenField(it->first, it->second);
+			return form;
+		}
+
+
+
+		std::string Request::getURI() const
+		{
+			return _getParametersMap().getURI();
+		}
+
 
 
 		Request::Request(
-			const Request* request/*=NULL*/,
-			shared_ptr<Function> function, shared_ptr<Action> action
-		):	_session(NULL)
-			, _actionException(false)
-			, _errorLevel(REQUEST_ERROR_NONE)
-			, _actionWillCreateObject(false),
-			_redirectAfterAction(request ? request->_redirectAfterAction : true)
+		):	_session(NULL),
+			_actionWillCreateObject(false),
+			_redirectAfterAction(true),
+			_actionException(false),
 		{
-			if (action.get())
-				_setAction(action);
-			if (function.get())
-				_setFunction(function);
-			if (request)
-			{
-				_clientURL = request->_clientURL;
-				_session = request->_session;
-				if (_function.get() && _function->getFactoryKey() == function->getFactoryKey())
-					_function->_copy(request->_function);
-			}
+		}
+
+
+
+		Request::Request( const Request& request):
+			_session(request._session),
+			_actionWillCreateObject(false),
+			_redirectAfterAction(request._redirectAfterAction),
+			_clientURL(request._clientURL),
+			_actionException(false)
+		{
 		}
 
 
 
 		Request::Request(
 			const HTTPRequest& httpRequest
-		):	_session(NULL),
-			_ip(httpRequest.ipaddr)
-			, _actionException(false)
-			, _errorLevel(REQUEST_ERROR_NONE)
-			, _actionWillCreateObject(false),
-			_redirectAfterAction(true)
+		):	_ip(httpRequest.ipaddr)
 		{
 			// IP
 			if (_ip.empty())
@@ -184,347 +369,6 @@ namespace synthese
 				}
 			}
 
-			// Function name
-			string functionName(map.getDefault<string>(Request::PARAMETER_FUNCTION));
-			if (functionName.empty())
-				throw RequestException("Function not specified");
-			if (!Factory<Function>::contains(functionName))
-				throw RequestException("Function not found");
-			_setFunction(shared_ptr<Function>(Factory<Function>::create(functionName)));
-
-			// Action name
-			string actionName(map.getDefault<string>(Request::PARAMETER_ACTION));
-			if (!actionName.empty())
-			{
-				if (!Factory<Action>::contains(actionName))
-					throw RequestException("Action not found");
-				_setAction(shared_ptr<Action>(Factory<Action>::create(actionName)));
-
-				// Action parameters
-				try
-				{
-					_action->_setFromParametersMap(map);
-				}
-				catch (ActionException& e)	// Action parameters error
-				{
-					_actionException = true;
-					_errorLevel = REQUEST_ERROR_WARNING;
-					_errorMessage = "Action error : "+ e.getMessage();
-				}
-
-				if(_action->_isSessionRequired() &&	_session == NULL)
-				{
-					_actionException = true;
-					_errorMessage = "Active session required for this action! Action dropped.";
-					_errorLevel = REQUEST_ERROR_WARNING;
-				}
-				else if (!_action->_isAuthorized())
-				{
-					_actionException = true;
-					_errorMessage = "Forbidden Action";
-					_errorLevel = REQUEST_ERROR_WARNING;
-				}
-			}
-
-			// Last action error
-			optional<int> num(map.getOptional<int>(Request::PARAMETER_ERROR_LEVEL));
-			if (!_actionException || (num && static_cast<ErrorLevel>(*num) > _errorLevel))
-			{
-				_actionException = map.getDefault<bool>(Request::PARAMETER_ACTION_FAILED, false);
-
-				// Error message
-				_errorMessage = map.getDefault<string>(Request::PARAMETER_ERROR_MESSAGE);
-				if (!_errorMessage.empty() && _errorLevel < REQUEST_ERROR_WARNING)
-					_errorLevel = REQUEST_ERROR_WARNING;	// Default error level if non empty message
-
-				// Error level
-				if (num)
-				{
-					_errorLevel = static_cast<ErrorLevel>(*num);
-				}
-			}
-
-			// Function parameters
-			_function->_setFromParametersMap(map);
-
-			if (!_function->_isAuthorized())
-			{
-				throw ForbiddenRequestException();
-			}
-		}
-
-
-
-		std::string Request::getURI() const
-		{
-			return _getParametersMap().getURI();
-		}
-
-
-		
-		void Request::run( std::ostream& stream )
-		{
-			// Handle of the action
-			if (_action.get() && !_actionException)
-			{
-				try
-				{
-					// Run of the action
-					ServerModule::SetCurrentThreadRunningAction();
-					_action->run();
-					
-					// Run after the action
-					if (_redirectAfterAction)
-					{
-						deleteAction();
-						throw RedirectException(getURL());
-					}
-				}
-				catch (ActionException e)	// Action run error
-				{
-					_actionException = true;
-					_errorMessage = e.getMessage();
-					_errorLevel = REQUEST_ERROR_WARNING;
-				}
-			}
-
-			// No session is active.
-			if (_session == NULL && _function->_runBeforeDisplayIfNoSession(stream))
-				return;
-			
-			// Run the display
-			ServerModule::SetCurrentThreadRunningFunction();
-			_function->_run(stream);
-		}
-
-
-
-		void Request::_setAction(shared_ptr<Action> action )
-		{
-			_action = action;
-			action->_request = this;
-		}
-
-		void Request::deleteSession()
-		{
-			delete _session;
-			_session = NULL;
-		}
-
-
-		std::string Request::getURL(bool normalize) const
-		{
-			stringstream str;
-			str << _clientURL << Request::PARAMETER_STARTER << getURI();
-			return str.str();
-		}
-
-
-
-		const std::string& Request::getClientURL() const
-		{
-			return _clientURL;
-		}
-
-		const std::string& Request::getIP() const
-		{
-			return _ip;
-		}
-
-		void Request::setSession( Session* session )
-		{
-			_session = session;
-		}
-
-
-
-		HTMLForm Request::getHTMLForm(std::string name) const
-		{
-			HTMLForm form(name, _clientURL);
-			ParametersMap::Map map(_getParametersMap().getMap());
-			for (ParametersMap::Map::const_iterator it = map.begin(); it != map.end(); ++it)
-				form.addHiddenField(it->first, it->second);
-			return form;
-		}
-
-		shared_ptr<const Action> Request::_getAction() const
-		{
-			return _action;
-		}
-
-		boost::shared_ptr<Action> Request::_getAction()
-		{
-			return _action;
-		}
-
-
-		const std::string& Request::getErrorMessage() const
-		{
-			return _errorMessage;
-		}
-
-		ParametersMap Request::_getParametersMap() const
-		{
-			ParametersMap result;
-			
-			// Function
-			if (_function.get())
-			{
-				result.insert(Request::PARAMETER_FUNCTION, _function->getFactoryKey());
-				ParametersMap::Map functionMap(_function->_getParametersMap().getMap());
-				for (ParametersMap::Map::const_iterator it = functionMap.begin(); it != functionMap.end(); ++it)
-					result.insert(it->first, it->second);
-			}
-			
-			// Action name and parameters
-			if (_action.get())
-			{
-				result.insert(Request::PARAMETER_ACTION, _action->getFactoryKey());
-				ParametersMap::Map actionMap(_action->getParametersMap().getMap());
-				for (ParametersMap::Map::const_iterator it = actionMap.begin(); it != actionMap.end(); ++it)
-					result.insert(it->first, it->second);
-				result.insert(Request::PARAMETER_ACTION_WILL_CREATE_OBJECT, _actionWillCreateObject);
-			}
-
-			// Session
-			if(_session)
-			{
-				result.insert(Request::PARAMETER_SESSION, _session->getKey());
-			}
-
-			// Object ID
-			if (_actionCreatedId)
-				result.insert(Request::PARAMETER_OBJECT_ID, *_actionCreatedId);
-
-			// No redirection
-			if(!_redirectAfterAction)
-			{
-				result.insert(Request::PARAMETER_NO_REDIRECT_AFTER_ACTION, 1);
-			}
-
-			return result;
-		}
-
-
-
-		bool Request::getActionException() const
-		{
-			return _actionException;
-		}
-
-		void Request::_setErrorMessage( const std::string& message )
-		{
-			_errorMessage = message;
-		}
-
-		void Request::_setActionException( bool value )
-		{
-			_actionException = value;
-		}
-
-		void Request::_setErrorLevel( const ErrorLevel& level )
-		{
-			_errorLevel = level;
-		}
-
-		void Request::_setFunction(shared_ptr<Function> function )
-		{
-			_function = function;
-			function->_request = this;
-		}
-
-		void Request::setClientURL( const std::string& url )
-		{
-			_clientURL = url;
-		}
-
-		shared_ptr<Function> Request::_getFunction()
-		{
-			return _function;
-		}
-
-		shared_ptr<const Function> Request::_getFunction() const
-		{
-			return _function;
-		}
-
-		void Request::deleteAction()
-		{
-			_action.reset();
-		}
-
-		shared_ptr<const User> Request::getUser() const
-		{
-			if (_session)
-				return _session->getUser();
-			return shared_ptr<User>();
-
-		}
-
-		bool Request::isActionFunctionAuthorized() const
-		{
-			return (!_action.get() || _action->_isAuthorized())
-				&& (!_function.get() || _function->_isAuthorized());
-		}
-
-		const Session* Request::getSession() const
-		{
-			return _session;
-		}
-
-
-
-		std::string Request::getOutputMimeType()
-		{
-			return _function.get() ? _function->getOutputMimeType() : string();
-		}
-
-		void Request::setHostName( const std::string& value )
-		{
-			_hostName = value;
-		}
-
-		const std::string& Request::getHostName() const
-		{
-			return _hostName;
-		}
-		
-		const optional<RegistryKeyType>& Request::getActionCreatedId() const
-		{
-			return _actionCreatedId;
-		}
-		
-		bool Request::getActionWillCreateObject() const
-		{
-			return _actionWillCreateObject;
-		}
-	
-		void Request::setActionCreatedId(util::RegistryKeyType id)
-		{
-			if(_actionWillCreateObject) _actionCreatedId = id;
-		}
-		
-		void Request::setActionWillCreateObject()
-		{
-			_actionWillCreateObject = true;
-		}
-
-
-
-		Request::RedirectException::RedirectException( const std::string& location )
-			: _location(location)
-		{
-
-		}
-
-
-		Request::RedirectException::~RedirectException() throw()
-		{
-		}
-
-		const std::string& Request::RedirectException::getLocation()
-		{
-			return _location;
 		}
 	}
 }

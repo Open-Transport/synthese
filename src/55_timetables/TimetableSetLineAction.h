@@ -69,9 +69,9 @@ namespace synthese
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(server::Request& request);
 			
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 			void setTimetable(boost::shared_ptr<Timetable> value);
 			void setLine(boost::shared_ptr<const env::CommercialLine> value);

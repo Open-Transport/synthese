@@ -52,6 +52,7 @@
 #include "DisplayScreenCPUCreateAction.h"
 #include "DisplayScreenCPUTableSync.h"
 #include "Interface.h"
+#include "Profile.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -105,8 +106,7 @@ namespace synthese
 		{}
 
 		void DisplaySearchAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			setPlace(map.getUid(PARAMETER_SEARCH_LOCALIZATION_ID, false, FACTORY_KEY));
 			if (!_place)
@@ -208,7 +208,7 @@ namespace synthese
 	
 				AdminFunctionRequest<DisplayAdmin> updateRequest(_request);
 
-				FunctionRequest<DisplayScreenContentFunction> viewRequest(&_request);
+				FunctionRequest<DisplayScreenContentFunction> viewRequest(_request);
 
 				if (!_place)
 				{
@@ -532,20 +532,22 @@ namespace synthese
 		}
 
 		bool DisplaySearchAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+			const security::Profile& profile
 		) const	{
-			return _request.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			return profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
 			// General search page
-			if (moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
+			if (moduleKey == DeparturesTableModule::FACTORY_KEY && request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()))
 			{
 				// General search
 				shared_ptr<DisplaySearchAdmin> p1(getNewOtherPage<DisplaySearchAdmin>());
@@ -565,7 +567,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 		
 			AdminInterfaceElement::PageLinks links;
@@ -628,7 +630,7 @@ namespace synthese
 
 
 		void DisplaySearchAdmin::_buildTabs(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 			bool writeRight(
 				_place ?

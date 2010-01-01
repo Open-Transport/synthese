@@ -82,7 +82,7 @@ namespace synthese
 		}
 
 
-		void CPUGetWiredScreensFunction::_run( std::ostream& stream ) const
+		void CPUGetWiredScreensFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			// Last monitoring status
 			DisplayMonitoringStatusTableSync::SearchResult entries(
@@ -132,7 +132,7 @@ namespace synthese
 
 
 
-		bool CPUGetWiredScreensFunction::_isAuthorized(
+		bool CPUGetWiredScreensFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

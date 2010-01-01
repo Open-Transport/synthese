@@ -115,7 +115,7 @@ namespace synthese
 		
 		
 		
-		void AccountAddAction::run()
+		void AccountAddAction::run(Request& request)
 		{
 			Account a;
 			a.setName(_name);

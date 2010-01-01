@@ -41,6 +41,7 @@
 #include "DeparturesTableInterfacePage.h"
 #include "ParseDisplayReturnInterfacePage.h"
 #include "InterfaceTableSync.h"
+#include "Profile.h"
 
 #include <boost/foreach.hpp>
 
@@ -76,8 +77,7 @@ namespace synthese
 
 
 		void DisplayTypesAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_requestParameters.setFromParametersMap(map.getMap(), DisplayTypeTableSync::COL_NAME, 20);
 			if(!map.getDefault<string>(PARAMETER_NAME).empty())
@@ -252,10 +252,9 @@ namespace synthese
 		}
 
 		bool DisplayTypesAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<ArrivalDepartureTableRight>(
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<ArrivalDepartureTableRight>(
 				READ,
 				UNKNOWN_RIGHT_LEVEL,
 				GLOBAL_PERIMETER
@@ -267,11 +266,13 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
+			if (moduleKey == DeparturesTableModule::FACTORY_KEY && request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()))
 			{
 				links.push_back(getNewPage());
 			}
@@ -282,7 +283,7 @@ namespace synthese
 
 		bool DisplayTypesAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			return true;
 		}
@@ -291,7 +292,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 		
 			DisplayTypeTableSync::SearchResult types(

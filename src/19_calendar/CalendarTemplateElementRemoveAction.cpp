@@ -73,7 +73,7 @@ namespace synthese
 		
 		
 		
-		void CalendarTemplateElementRemoveAction::run()
+		void CalendarTemplateElementRemoveAction::run(Request& request)
 		{
 			CalendarTemplateElementTableSync::Remove(_element->getKey());
 			if(_element->getCalendar())
@@ -82,9 +82,9 @@ namespace synthese
 		
 		
 		
-		bool CalendarTemplateElementRemoveAction::_isAuthorized(
+		bool CalendarTemplateElementRemoveAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<CalendarRight>(WRITE);
+			return profile.isAuthorized<CalendarRight>(WRITE);
 		}
 
 

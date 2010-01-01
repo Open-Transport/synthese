@@ -64,8 +64,7 @@ namespace synthese
 				@date 2008
 			*/
 			void setFromParametersMap(
-				const server::ParametersMap& map,
-				bool objectWillBeCreatedLater
+				const server::ParametersMap& map
 			);
 			
 			
@@ -85,7 +84,7 @@ namespace synthese
 				@date 2008
 			*/
 			void display(std::ostream& stream, interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+					const admin::AdminRequest& _request
 			) const;
 			
 			/** Authorization control.
@@ -94,8 +93,7 @@ namespace synthese
 				@date 2008
 			*/
 			bool isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			
+				const security::Profile& profile
 			) const;
 			
 			/** Gets sub page of the designed parent page, which are from the current class.
@@ -108,7 +106,7 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
 				const AdminInterfaceElement& currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const admin::AdminRequest& request
 			) const;
 			
 			/** Title generator.
@@ -120,7 +118,7 @@ namespace synthese
 			
 			
 			virtual void _buildTabs(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const admin::AdminRequest& _request
 			) const;
 			
 			void setUser(boost::shared_ptr<security::User> value);

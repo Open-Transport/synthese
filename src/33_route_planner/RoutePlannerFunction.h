@@ -180,14 +180,14 @@ namespace synthese
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void _run(std::ostream& stream) const;
+			void run(std::ostream& stream, const server::Request& request) const;
 
 			const boost::optional<std::size_t>& getMaxSolutions() const;
 			void setMaxSolutions(boost::optional<std::size_t> number);
 
 			RoutePlannerFunction();
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 			virtual std::string getOutputMimeType() const;
 		};

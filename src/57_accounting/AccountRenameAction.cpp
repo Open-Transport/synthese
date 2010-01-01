@@ -68,7 +68,7 @@ namespace synthese
 		{
 			_value = map.getString(PARAMETER_VALUE, true, FACTORY_KEY);
 
-			uid id(_request->getObjectId());
+			uid id(request.getObjectId());
 			try
 			{
 				_account = AccountTableSync::GetEditable(id);
@@ -81,7 +81,7 @@ namespace synthese
 		
 		
 		
-		void AccountRenameAction::run()
+		void AccountRenameAction::run(Request& request)
 		{
 			_account->setName(_value);
 			AccountTableSync::Save(_account.get());

@@ -70,7 +70,7 @@ namespace synthese
 			}
 		}
 
-		void LoginAction::run()
+		void LoginAction::run(Request& request)
 		{
 			// Fetch user
 			try
@@ -84,9 +84,9 @@ namespace synthese
 				if (!user->getConnectionAllowed())
 					throw ActionException("Connexion impossible");
 
-				Session* session = new Session(_request->getIP());
+				Session* session = new Session(request.getIP());
 				session->setUser(user);
-				_request->setSession(session);
+				request.setSession(session);
 
 				SecurityLog::addUserLogin(user.get());
 			}
@@ -117,7 +117,7 @@ namespace synthese
 
 
 
-		bool LoginAction::_isAuthorized(
+		bool LoginAction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

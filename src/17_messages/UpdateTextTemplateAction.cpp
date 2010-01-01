@@ -101,7 +101,7 @@ namespace synthese
 			}
 		}
 
-		void UpdateTextTemplateAction::run()
+		void UpdateTextTemplateAction::run(Request& request)
 		{
 			stringstream logChanges;
 
@@ -116,7 +116,7 @@ namespace synthese
 
 			TextTemplateTableSync::Save(_text.get());
 
-			MessagesLibraryLog::AddTemplateUpdateEntry(*_text, logChanges.str(), _request->getUser().get());
+			MessagesLibraryLog::AddTemplateUpdateEntry(*_text, logChanges.str(), request.getUser().get());
 		}
 
 
@@ -128,9 +128,9 @@ namespace synthese
 
 
 
-		bool UpdateTextTemplateAction::_isAuthorized() const
+		bool UpdateTextTemplateAction::isAuthorized(const Profile& profile) const
 		{
-			return _request->isAuthorized<MessagesLibraryRight>(WRITE);
+			return profile.isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

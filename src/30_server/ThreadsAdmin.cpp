@@ -29,6 +29,7 @@
 #include "ResultHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "ThreadKillAction.h"
+#include "Profile.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -57,11 +58,11 @@ namespace synthese
 
 	namespace server
 	{
-		void ThreadsAdmin::setFromParametersMap(const ParametersMap& map, bool)
+		void ThreadsAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 		}
 		
-		void ThreadsAdmin::display(ostream& stream, VariablesMap& variables, const FunctionRequest<AdminRequest>& request) const
+		void ThreadsAdmin::display(ostream& stream, VariablesMap& variables, const AdminRequest& request) const
 		{
 			bool killRight(request.isAuthorized<ServerAdminRight>(DELETE_RIGHT));
 			AdminActionFunctionRequest<ThreadKillAction,ThreadsAdmin> killRequest(request);
@@ -129,9 +130,10 @@ namespace synthese
 			stream << t.close();
 		}
 
-		bool ThreadsAdmin::isAuthorized(const FunctionRequest<AdminRequest>& request) const
-		{
-			return request.isAuthorized<ServerAdminRight>(READ);
+		bool ThreadsAdmin::isAuthorized(
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<ServerAdminRight>(READ);
 		}
 
 
@@ -139,12 +141,14 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ThreadsAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			PageLinks links;
 
 			if(	moduleKey == ServerModule::FACTORY_KEY &&
-				isAuthorized(request)
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()
 			){
 				links.push_back(getNewPage());
 			}

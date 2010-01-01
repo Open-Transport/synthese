@@ -77,11 +77,11 @@ namespace synthese
 			if (_icon != NULL)
 				icon = _icon->getValue(parameters, variables, NULL, request);
 
-			if (!requestKey.empty())
+			if (!requestKey.empty() && request)
 			{
 				try
 				{
-					ActionFunctionRequest<LogoutAction,SimplePageFunction> redirRequest(request);
+					ActionFunctionRequest<LogoutAction,SimplePageFunction> redirRequest(*request);
 					redirRequest.getFunction()->setPage(_page->getInterface()->getPage(NonPredefinedInterfacePage::FACTORY_KEY, requestKey));
 					stream << redirRequest.getHTMLForm().getLinkButton(content, "", icon);
 				}
@@ -90,9 +90,9 @@ namespace synthese
 					Log::GetInstance().debug("No such interface page "+ requestKey);
 				}
 			}
-			if (url.size())
+			if (url.size() && request)
 			{
-				ActionFunctionRequest<LogoutAction,RedirFunction> redirRequest(request);
+				ActionFunctionRequest<LogoutAction,RedirFunction> redirRequest(*request);
 				redirRequest.getFunction()->setRedirURL(url);
 				stream << redirRequest.getHTMLForm().getLinkButton(content, "", icon);
 			}

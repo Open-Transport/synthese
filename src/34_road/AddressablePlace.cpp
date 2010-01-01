@@ -31,6 +31,8 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::date_time;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -44,7 +46,7 @@ namespace synthese
 	{
 		AddressablePlace::AddressablePlace(
 			bool allowedConnection/*= CONNECTION_TYPE_FORBIDDEN */,
-			boost::posix_time::time_duration defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */
+			posix_time::time_duration defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */
 		):	Place(),
 			_allowedConnection(allowedConnection),
 			_defaultTransferDelay(defaultTransferDelay)
@@ -52,12 +54,12 @@ namespace synthese
 		}
 
 
-		boost::posix_time::time_duration AddressablePlace::getDefaultTransferDelay(
-			) const {
-				return _defaultTransferDelay;
+		posix_time::time_duration AddressablePlace::getDefaultTransferDelay(
+		) const {
+			return _defaultTransferDelay;
 		}
 
-		boost::posix_time::time_duration AddressablePlace::getMinTransferDelay() const
+		posix_time::time_duration AddressablePlace::getMinTransferDelay() const
 		{
 			if (_minTransferDelay.is_not_a_date_time())
 			{
@@ -72,18 +74,18 @@ namespace synthese
 
 
 		void AddressablePlace::setDefaultTransferDelay(
-			boost::posix_time::time_duration defaultTransferDelay
+			posix_time::time_duration defaultTransferDelay
 		){
-			assert(defaultTransferDelay >= posix_time::minutes(0) && !defaultTransferDelay.is_not_a_date_time());
+			assert(defaultTransferDelay >= minutes(0) && !defaultTransferDelay.is_not_a_date_time());
 
 			_defaultTransferDelay = defaultTransferDelay;
-			_minTransferDelay = boost::posix_time::time_duration();
+			_minTransferDelay = posix_time::time_duration(not_a_date_time);
 		}
 
 		void AddressablePlace::setAllowedConnection(
 			bool value
-			){
-				_allowedConnection = value;
+		){
+			_allowedConnection = value;
 		}
 
 
@@ -93,10 +95,10 @@ namespace synthese
 			AddressablePlace::TransferDelaysMap::key_type::second_type toVertex,
 			posix_time::time_duration transferDelay
 		){
-			assert(transferDelay >= posix_time::minutes(0) && !transferDelay.is_not_a_date_time());
+			assert(transferDelay >= minutes(0) && !transferDelay.is_not_a_date_time());
 
 			_transferDelays[std::make_pair (fromVertex, toVertex)] = transferDelay;
-			_minTransferDelay = posix_time::time_duration();
+			_minTransferDelay = posix_time::time_duration(not_a_date_time);
 		}
 
 
@@ -104,8 +106,8 @@ namespace synthese
 			AddressablePlace::TransferDelaysMap::key_type::first_type fromVertex,
 			AddressablePlace::TransferDelaysMap::key_type::second_type toVertex
 		){
-			_transferDelays[std::make_pair (fromVertex, toVertex)] = posix_time::time_duration();
-			_minTransferDelay = posix_time::time_duration();
+			_transferDelays[std::make_pair (fromVertex, toVertex)] = posix_time::time_duration(not_a_date_time);
+			_minTransferDelay = posix_time::time_duration(not_a_date_time);
 		}
 
 
@@ -113,8 +115,8 @@ namespace synthese
 		void AddressablePlace::clearTransferDelays()
 		{
 			_transferDelays.clear ();
-			_defaultTransferDelay = posix_time::time_duration();
-			_minTransferDelay = posix_time::time_duration();
+			_defaultTransferDelay = posix_time::time_duration(not_a_date_time);
+			_minTransferDelay = posix_time::time_duration(not_a_date_time);
 		}
 
 
@@ -123,12 +125,12 @@ namespace synthese
 			const Vertex& fromVertex,
 			const Vertex& toVertex
 		) const {
-			return getTransferDelay(fromVertex, toVertex) != posix_time::time_duration();
+			return !getTransferDelay(fromVertex, toVertex).is_not_a_date_time();
 		}
 
 
 
-		boost::posix_time::time_duration AddressablePlace::getTransferDelay(
+		posix_time::time_duration AddressablePlace::getTransferDelay(
 			const Vertex& fromVertex,
 			const Vertex& toVertex
 		) const {

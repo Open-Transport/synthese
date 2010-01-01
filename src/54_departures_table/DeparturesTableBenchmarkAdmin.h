@@ -76,8 +76,7 @@ namespace synthese
 				@param request The request to use for the initialization.
 			*/
 			virtual void setFromParametersMap(
-				const server::ParametersMap& map,
-				bool objectWillBeCreatedLater
+				const server::ParametersMap& map
 			);
 
 			/** Parameters map generator, used when building an url to the admin page.
@@ -92,10 +91,10 @@ namespace synthese
 				@param stream Stream to write on.
 			*/
 			void display(std::ostream& stream, interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const;
+					const admin::AdminRequest& _request) const;
 
 			bool isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const security::Profile& profile
 			) const;
 
 			/** Gets sub page of the designed parent page, which are from the current class.
@@ -107,7 +106,7 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
 				const AdminInterfaceElement& currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const admin::AdminRequest& request
 			) const;
 
 
@@ -118,7 +117,7 @@ namespace synthese
 			*/
 			virtual bool isPageVisibleInTree(
 				const AdminInterfaceElement& currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const admin::AdminRequest& request
 			) const;
 
 		};

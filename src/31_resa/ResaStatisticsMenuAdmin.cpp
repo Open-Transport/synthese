@@ -33,6 +33,7 @@
 #include "CommercialLineTableSync.h"
 #include "CommercialLine.h"
 #include "HTMLModule.h"
+#include "Profile.h"
 
 using namespace std;
 using namespace boost;
@@ -68,8 +69,7 @@ namespace synthese
 
 		
 		void ResaStatisticsMenuAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			// Search table initialization
 			_requestParameters.setFromParametersMap(map.getMap());
@@ -86,9 +86,9 @@ namespace synthese
 
 		
 		bool ResaStatisticsMenuAdmin::isAuthorized(
-			const FunctionRequest<AdminRequest>& request
+			const security::Profile& profile
 		) const	{
-			return request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 
@@ -96,12 +96,14 @@ namespace synthese
 		void ResaStatisticsMenuAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 
 			// Display
 			AdminFunctionRequest<CallStatisticsAdmin> openCallsRequest(request);
-			if(request.getFunction()->getPage()->isAuthorized(request))
+			if(request.getFunction()->getPage()->request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()))
 			{
 				stream << "<h1>Statistiques d'appels</h1>";
 				stream << "<p>" << HTMLModule::getLinkButton(openCallsRequest.getURL(), "Statistiques appels", string(), CallStatisticsAdmin::ICON) << "</p>";
@@ -154,13 +156,16 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ResaStatisticsMenuAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == ResaModule::FACTORY_KEY && isAuthorized(request))
-			{
+			if (moduleKey == ResaModule::FACTORY_KEY &&
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile())
+			){
 				links.push_back(getNewPage());
 			}
 			
@@ -171,14 +176,16 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks ResaStatisticsMenuAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
 			shared_ptr<CallStatisticsAdmin> p(
 				getNewOtherPage<CallStatisticsAdmin>()
 			);
-			if(p->isAuthorized(request))
+			if(p->request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()))
 			{
 				links.push_back(p);
 			}

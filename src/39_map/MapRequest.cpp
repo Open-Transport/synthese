@@ -107,7 +107,7 @@ namespace synthese
 
 
 
-		void MapRequest::_run( std::ostream& stream ) const
+		void MapRequest::run( std::ostream& stream, const Request& request ) const
 		{
 			if (!_map.get())
 				return;
@@ -243,7 +243,7 @@ namespace synthese
 
 
 
-		bool MapRequest::_isAuthorized(
+		bool MapRequest::isAuthorized(const Profile& profile
 
 			) const {
 			return true;

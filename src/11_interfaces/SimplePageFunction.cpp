@@ -44,8 +44,10 @@ namespace synthese
 		const string SimplePageFunction::PARAMETER_PAGE_CLASS("pcl");
 		const string SimplePageFunction::PARAMETER_PAGE = "page";
 
-		void SimplePageFunction::_run( ostream& stream ) const
-		{
+		void SimplePageFunction::run(
+			ostream& stream,
+			const Request& request
+		) const	{
 			if (_page == NULL)
 				return;
 
@@ -57,8 +59,10 @@ namespace synthese
 
 			VariablesMap vm;
 
-			_page->_display(stream, pv, vm, NULL, _request);
+			_page->_display(stream, pv, vm, NULL, &request);
 		}
+
+
 
 		void SimplePageFunction::_setFromParametersMap(const ParametersMap& map )
 		{
@@ -112,7 +116,7 @@ namespace synthese
 
 
 
-		bool SimplePageFunction::_isAuthorized(
+		bool SimplePageFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

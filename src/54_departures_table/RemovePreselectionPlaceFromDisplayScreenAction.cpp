@@ -78,7 +78,7 @@ namespace synthese
 			}
 		}
 
-		void RemovePreselectionPlaceFromDisplayScreenAction::run()
+		void RemovePreselectionPlaceFromDisplayScreenAction::run(Request& request)
 		{
 			_screen->removeForcedDestination(_place.get());
 			DisplayScreenTableSync::Save(_screen.get());
@@ -87,22 +87,22 @@ namespace synthese
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
 				"Retrait de l'arrêt de présélection "+  _place->getFullName(),
-				*_request->getUser()
+				*request.getUser()
 			);
 		}
 
 
 
-		bool RemovePreselectionPlaceFromDisplayScreenAction::_isAuthorized(
+		bool RemovePreselectionPlaceFromDisplayScreenAction::isAuthorized(const Profile& profile
 		) const {
 			assert(_screen.get() != NULL);
 			if (_screen->getLocalization() != NULL)
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 		

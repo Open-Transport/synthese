@@ -277,7 +277,8 @@ namespace synthese
 				<< "id=\"" << fieldId << "\" "
 				<< "value=\"" << (value.is_not_a_date_time() ? string() : to_iso_extended_string(value.date()) +" "+ to_simple_string(value.time_of_day())) << "\" "
 				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">"
-				<< to_simple_string(value.date()) +" "+ to_simple_string(value.time_of_day())
+				<< value.date().day() << "/" << static_cast<int>(value.date().month()) << "/" << value.date().year()
+				<< " " << to_simple_string(value.time_of_day())
 				<< "</span>"
 				<< "<img "
 				<< "src=\"calendar_edit.png\" "
@@ -298,7 +299,7 @@ namespace synthese
 				<< "electric : false,"
 				<< "singleClick:true,";
 			if (!value.is_not_a_date_time())
-				s << "date:new Date(" << value.date().year() <<","<< value.date().month() <<","<< value.date().day() <<","<< value.time_of_day().hours() <<"," << value.time_of_day().minutes() <<",0),";
+				s << "date:new Date(" << value.date().year() <<","<< static_cast<int>(value.date().month()) <<","<< value.date().day() <<","<< value.time_of_day().hours() <<"," << value.time_of_day().minutes() <<",0),";
 			s		<< "firstDay:1"
 				<< "});"
 				<< HTMLModule::GetHTMLJavascriptClose();
@@ -347,7 +348,7 @@ namespace synthese
 				<< "id=\"" << fieldId << "\" "
 				<< "value=\"" << (value.is_not_a_date() ? string() : to_iso_extended_string(value)) << "\" "
 				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">"
-				<< to_simple_string(value)
+				<< value.day() << "/" << static_cast<int>(value.month()) << "/" << value.year()
 				<< "</span>"
 				<< "<img "
 				<< "src=\"calendar_edit.png\" "
@@ -368,7 +369,7 @@ namespace synthese
 				<< "electric : false,"
 				<< "singleClick:true,";
 			if (!value.is_not_a_date())
-				s << "date:new Date(" << value.year() <<","<< value.month() <<","<< value.day() << "),";
+				s << "date:new Date(" << value.year() <<","<< static_cast<int>(value.month()) <<","<< value.day() << "),";
 			s		<< "firstDay:1"
 				<< "});"
 				<< HTMLModule::GetHTMLJavascriptClose();

@@ -99,7 +99,7 @@ namespace synthese
 			);
 		}
 
-		void UpdateRightAction::run()
+		void UpdateRightAction::run(Request& request)
 		{
 			stringstream log;
 			DBLogModule::appendToLogIfChange(log, "Droits publics", Right::getLevelLabel(_right->getPublicRightLevel()), Right::getLevelLabel(_publicLevel));
@@ -110,14 +110,14 @@ namespace synthese
 
 			ProfileTableSync::Save(_profile.get());
 
-			SecurityLog::addProfileAdmin(_request->getUser().get(), _profile.get(), _right->getFactoryKey() + "/" + _right->getParameter() + log.str());
+			SecurityLog::addProfileAdmin(request.getUser().get(), _profile.get(), _right->getFactoryKey() + "/" + _right->getParameter() + log.str());
 		}
 
 
 
-		bool UpdateRightAction::_isAuthorized(
+		bool UpdateRightAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<SecurityRight>(WRITE);
+			return profile.isAuthorized<SecurityRight>(WRITE);
 			/// @todo Add a control on the profile of the user
 		}
 		

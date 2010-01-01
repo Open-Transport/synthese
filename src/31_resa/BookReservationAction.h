@@ -112,13 +112,13 @@ namespace synthese
 
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(server::Request& request);
 
 			
 			void setJourney(const graph::Journey& journey);
 			void setAccessParameters(const graph::AccessParameters& value);
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 		};
 	}
 }

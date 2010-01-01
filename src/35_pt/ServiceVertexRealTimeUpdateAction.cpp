@@ -107,14 +107,14 @@ namespace synthese
 		
 		
 		
-		void ServiceVertexRealTimeUpdateAction::run()
+		void ServiceVertexRealTimeUpdateAction::run(Request& request)
 		{
 			_service->setRealTimeVertex(_lineStopRank, _physicalStop.get());
 		}
 		
 		
 		
-		bool ServiceVertexRealTimeUpdateAction::_isAuthorized(
+		bool ServiceVertexRealTimeUpdateAction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

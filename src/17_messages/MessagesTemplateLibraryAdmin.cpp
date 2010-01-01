@@ -24,7 +24,7 @@
 
 #include "MessagesTemplateLibraryAdmin.h"
 #include "MessagesModule.h"
-
+#include "Profile.h"
 #include "PropertiesHTMLTable.h"
 #include "HTMLList.h"
 
@@ -83,8 +83,7 @@ namespace synthese
 
 
 		void MessagesTemplateLibraryAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			uid id(map.getUid(PARAMETER_FOLDER_ID, false, FACTORY_KEY));
 			if (id > 0)
@@ -114,7 +113,7 @@ namespace synthese
 
 
 		void MessagesTemplateLibraryAdmin::display(ostream& stream, VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
+					const admin::AdminRequest& _request) const
 		{
 			// Requests
 			AdminActionFunctionRequest<UpdateTextTemplateAction,MessagesTemplateLibraryAdmin> updateRequest(_request);
@@ -224,10 +223,9 @@ namespace synthese
 
 
 		bool MessagesTemplateLibraryAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<MessagesLibraryRight>(READ);
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<MessagesLibraryRight>(READ);
 		}
 		
 
@@ -235,12 +233,15 @@ namespace synthese
 		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(moduleKey == MessagesModule::FACTORY_KEY && isAuthorized(request))
-			{
+			if(	moduleKey == MessagesModule::FACTORY_KEY &&
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()
+			){
 				links.push_back(getNewOtherPage<MessagesTemplateLibraryAdmin>());
 			}
 			return links;
@@ -249,7 +250,7 @@ namespace synthese
 
 		bool MessagesTemplateLibraryAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			return true;
 		}

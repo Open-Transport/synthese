@@ -25,7 +25,7 @@
 #include "LineAdmin.h"
 #include "CommercialLineAdmin.h"
 #include "EnvModule.h"
-
+#include "Profile.h"
 #include "Schedule.h"
 #include "CommercialLine.h"
 #include "HTMLTable.h"
@@ -43,7 +43,6 @@
 #include "TransportNetworkRight.h"
 #include "ServiceAdmin.h"
 #include "Request.h"
-#include "AdminRequest.h"
 
 #include "AdminParametersException.h"
 
@@ -89,8 +88,7 @@ namespace synthese
 		{ }
 		
 		void LineAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			try
 			{
@@ -116,9 +114,11 @@ namespace synthese
 
 
 		
-		void LineAdmin::display(ostream& stream, VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
-		{
+		void LineAdmin::display(
+			ostream& stream,
+			VariablesMap& variables,
+			const admin::AdminRequest& _request
+		) const	{
 			map<const Service*, string> services;
 
 			////////////////////////////////////////////////////////////////////
@@ -368,12 +368,13 @@ namespace synthese
 			closeTabContent(stream);
 		}
 
+
+
 		bool LineAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
+			const security::Profile& profile
+		) const	{
 			if (_line.get() == NULL) return false;
-			return _request.isAuthorized<TransportNetworkRight>(READ);
+			return profile.isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		
@@ -383,6 +384,8 @@ namespace synthese
 			return _line.get() ? "Route " + _line->getName() : DEFAULT_TITLE;
 		}
 
+
+
 		boost::shared_ptr<const Line> LineAdmin::getLine() const
 		{
 			return _line;
@@ -391,7 +394,7 @@ namespace synthese
 
 
 		void LineAdmin::_buildTabs(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 			_tabs.clear();
 
@@ -403,12 +406,15 @@ namespace synthese
 			_tabBuilded = true;
 		}
 		
+
+
 		void LineAdmin::setLine(boost::shared_ptr<const Line> value)
 		{
 			_line = value;
 		}
 		
 		
+
 		bool LineAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _line->getKey() == static_cast<const LineAdmin&>(other)._line->getKey();
@@ -418,7 +424,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks LineAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -466,6 +472,5 @@ namespace synthese
 			links.push_back(p);
 			return links;
 		}
-
 	}
 }

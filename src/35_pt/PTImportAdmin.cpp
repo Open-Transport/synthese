@@ -34,6 +34,7 @@
 #include "NavteqWithProjectionFileFormat.h"
 #include "TridentFileFormat.h"
 #include "TransportNetworkRight.h"
+#include "Profile.h"
 
 using namespace boost;
 using namespace std;
@@ -74,8 +75,7 @@ namespace synthese
 
 		
 		void PTImportAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			/// @todo Initialize internal attributes from the map
 			// 	string a = map.get<string>(PARAM_SEARCH_XXX);
@@ -102,9 +102,9 @@ namespace synthese
 
 		
 		bool PTImportAdmin::isAuthorized(
-			const FunctionRequest<AdminRequest>& request
+			const security::Profile& profile
 		) const	{
-			return request.isAuthorized<TransportNetworkRight>(READ);
+			return profile.isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -112,7 +112,7 @@ namespace synthese
 		void PTImportAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 
 			DataSourceTableSync::SearchResult sources(DataSourceTableSync::Search(_getEnv()));
@@ -122,7 +122,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_NAVTEQ))
 			{
 
-				FunctionRequest<ImportFunction> importRequest( &request);
+				RequestManager<StaticFunctionRequestPolicy<ImportFunction> > importRequest(request);
 				
 				PropertiesHTMLTable t(importRequest.getHTMLForm());
 				stream << t.open();
@@ -140,7 +140,7 @@ namespace synthese
 			// TAB TRIDENT
 			if(openTabContent(stream, TAB_TRIDENT))
 			{
-				FunctionRequest<ImportFunction> importRequest( &request);
+				RequestManager<StaticFunctionRequestPolicy<ImportFunction> > importRequest(request);
 
 				PropertiesHTMLTable t(importRequest.getHTMLForm());
 				stream << t.open();
@@ -163,12 +163,14 @@ namespace synthese
 		AdminInterfaceElement::PageLinks PTImportAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == PTModule::FACTORY_KEY && isAuthorized(request))
+			if (moduleKey == PTModule::FACTORY_KEY && request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()))
 			{
 				links.push_back(getNewPage());
 			}
@@ -178,7 +180,7 @@ namespace synthese
 
 
 
-		void PTImportAdmin::_buildTabs( const server::FunctionRequest<admin::AdminRequest>& request ) const
+		void PTImportAdmin::_buildTabs( const admin::AdminRequest& request ) const
 		{
 			_tabs.clear();
 			_tabs.push_back(Tab("Trident", TAB_TRIDENT, true));

@@ -23,8 +23,9 @@
 #ifndef SYNTHESE_admin_AdminActionFunctionRequest_hpp__
 #define SYNTHESE_admin_AdminActionFunctionRequest_hpp__
 
-#include "ActionFunctionRequest.h"
-#include "AdminRequest.h"
+#include "RequestManager.h"
+#include "StaticRequestPolicy.h"
+#include "AdminFunction.h"
 
 namespace synthese
 {
@@ -35,12 +36,12 @@ namespace synthese
 		*/
 		template<class A, class P>
 		class AdminActionFunctionRequest:
-			public server::ActionFunctionRequest<A, AdminRequest>
+			public server::RequestManager<server::StaticActionFunctionRequestPolicy<A, AdminFunction> >
 		{
 		public:
 			AdminActionFunctionRequest(
-				const server::FunctionRequest<AdminRequest>& request
-			):	server::ActionFunctionRequest<A, AdminRequest>(&request)
+				const server::RequestManager<server::StaticFunctionRequestPolicy<AdminFunction> >& request
+			):	server::RequestManager<server::StaticActionFunctionRequestPolicy<A, AdminFunction> >(request)
 			{
 				boost::shared_ptr<P> p(request.getFunction()->getPage()->getNewOtherPage<P>());
 				this->getFunction()->setPage(p);

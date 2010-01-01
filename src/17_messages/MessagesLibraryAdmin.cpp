@@ -24,7 +24,7 @@
 #include "HTMLForm.h"
 #include "HTMLList.h"
 #include "PropertiesHTMLTable.h"
-
+#include "Profile.h"
 #include "ScenarioTemplate.h"
 #include "ScenarioTableSync.h"
 #include "MessagesLibraryAdmin.h"
@@ -82,16 +82,13 @@ namespace synthese
 
 		
 		void MessagesLibraryAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_requestParameters.setFromParametersMap(
 				map.getMap(),
 				PARAMETER_NAME,
 				optional<size_t>()
 			);
-			
-			if(objectWillBeCreatedLater) return;
 			
 			optional<RegistryKeyType> id(
 				map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
@@ -124,7 +121,7 @@ namespace synthese
 		void MessagesLibraryAdmin::display(
 			ostream& stream,
 			interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+					const admin::AdminRequest& _request
 		) const {
 			if (_folder.get())
 			{
@@ -263,10 +260,9 @@ namespace synthese
 		}
 
 		bool MessagesLibraryAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<MessagesLibraryRight>(READ);
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		MessagesLibraryAdmin::MessagesLibraryAdmin()
@@ -278,12 +274,15 @@ namespace synthese
 		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == MessagesModule::FACTORY_KEY && isAuthorized(request))
-			{
+			if(	moduleKey == MessagesModule::FACTORY_KEY &&
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()
+			){
 				links.push_back(getNewPage());
 			}
 			return links;
@@ -293,7 +292,7 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			PageLinks links;
 
@@ -343,7 +342,7 @@ namespace synthese
 
 		bool MessagesLibraryAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			return !_folder.get();
 		}

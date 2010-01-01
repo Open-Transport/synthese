@@ -86,11 +86,11 @@ namespace synthese
 				throw ActionException("Ce type d'afficheur ne peut être supprimé car il est utilisé par au moins un afficheur.");
 		}
 
-		void DisplayTypeRemoveAction::run()
+		void DisplayTypeRemoveAction::run(Request& request)
 		{
 			DisplayTypeTableSync::Remove(_type->getKey());
 
-			ArrivalDepartureTableLog::addDeleteTypeEntry(_type.get(), _request->getUser().get());
+			ArrivalDepartureTableLog::addDeleteTypeEntry(_type.get(), request.getUser().get());
 		}
 
 		void DisplayTypeRemoveAction::setType( boost::shared_ptr<const DisplayType> type )
@@ -100,10 +100,10 @@ namespace synthese
 
 
 
-		bool DisplayTypeRemoveAction::_isAuthorized(
+		bool DisplayTypeRemoveAction::isAuthorized(const Profile& profile
 
 			) const {
-			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+			return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 	}
 }

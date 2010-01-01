@@ -82,7 +82,7 @@ namespace synthese
 
 
 
-		void AddDepartureStopToDisplayScreenAction::run()
+		void AddDepartureStopToDisplayScreenAction::run(Request& request)
 		{
 			// Preparation
 			_screen->addPhysicalStop(_stop.get());
@@ -91,7 +91,7 @@ namespace synthese
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
 				"Ajout de l'arrêt de départ "+ _stop->getCodeBySource() +"/"+ _stop->getName(),
-				*_request->getUser()
+				*request.getUser()
 			);
 			
 			// Action
@@ -100,16 +100,16 @@ namespace synthese
 
 
 
-		bool AddDepartureStopToDisplayScreenAction::_isAuthorized(
+		bool AddDepartureStopToDisplayScreenAction::isAuthorized(const Profile& profile
 		) const {
 			assert(_screen.get() != NULL);
 			if (_screen->getLocalization() != NULL)
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 		

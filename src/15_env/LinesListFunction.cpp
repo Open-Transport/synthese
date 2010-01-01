@@ -41,6 +41,8 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace pt;
+	using namespace security;
+	
 
 	template<> const string util::FactorableTemplate<Function,env::LinesListFunction>::FACTORY_KEY(
 		"LinesListFunction2"
@@ -66,7 +68,7 @@ namespace synthese
 		}
 
 
-		void LinesListFunction::_run( std::ostream& stream ) const
+		void LinesListFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			CommercialLineTableSync::SearchResult lines(
 				CommercialLineTableSync::Search(*_env, _network->getKey())
@@ -79,7 +81,7 @@ namespace synthese
 
 
 
-		bool LinesListFunction::_isAuthorized(
+		bool LinesListFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

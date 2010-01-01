@@ -23,7 +23,7 @@
 */
 
 #include "ResaEditLogEntryAdmin.h"
-
+#include "Profile.h"
 #include "DateTime.h"
 
 #include "User.h"
@@ -82,8 +82,7 @@ namespace synthese
 		{ }
 		
 		void ResaEditLogEntryAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			try
 			{
@@ -117,7 +116,7 @@ namespace synthese
 
 
 		void ResaEditLogEntryAdmin::display(ostream& stream, VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+					const admin::AdminRequest& _request
 		) const	{
 			// Requests
 			AdminActionFunctionRequest<ResaLogEntryUpdateAction,ResaEditLogEntryAdmin> updateRequest(_request);
@@ -205,10 +204,9 @@ namespace synthese
 		}
 
 		bool ResaEditLogEntryAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 

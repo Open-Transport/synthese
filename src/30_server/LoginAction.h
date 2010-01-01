@@ -66,12 +66,12 @@ namespace synthese
 
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(server::Request& request);
 
 			void setLogin(const std::string& login);
 			void setPassword(const std::string& password);
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 		};
 	}
 }

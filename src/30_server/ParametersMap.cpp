@@ -224,6 +224,14 @@ namespace synthese
 			return (it == _map.end()) ? optional<string>() : optional<string>(it->second);
 		}
 
+
+
+		void ParametersMap::remove( const std::string& parameterName )
+		{
+			Map::const_iterator it(_map.find(parameterName));
+			if(it != _map.end()) _map.erase(it);
+		}
+
 		
 		ParametersMap::MissingParameterException::MissingParameterException( const std::string& field ):
 			_field(field),

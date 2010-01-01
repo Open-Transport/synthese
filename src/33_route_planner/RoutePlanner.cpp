@@ -335,7 +335,7 @@ namespace synthese
 					it = next;
 				}
 
-				todo.cleanup(lastBestEndTime != bestEndTime, bestEndTime, bestVertexReachesMap);
+				todo.cleanup(lastBestEndTime != bestEndTime, bestEndTime, bestVertexReachesMap, true);
 
 				// Loop exit
 				if (todo.empty())

@@ -57,7 +57,7 @@ namespace synthese
 			_sessionIdToControl = map.get<string>(PARAMETER_SESSION_ID_TO_CONTROL);
 		}
 
-		void XMLSessionIsValidFunction::_run( std::ostream& stream ) const
+		void XMLSessionIsValidFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(_sessionIdToControl);
 			stream <<
@@ -68,7 +68,7 @@ namespace synthese
 			{
 				try
 				{
-					sit->second->controlAndRefresh(_request->getIP());
+					sit->second->controlAndRefresh(request.getIP());
 					stream << "true";
 				}
 				catch(SessionException)
@@ -85,7 +85,7 @@ namespace synthese
 		
 		
 		
-		bool XMLSessionIsValidFunction::_isAuthorized() const
+		bool XMLSessionIsValidFunction::isAuthorized(const Profile& profile) const
 		{
 			return true;
 		}

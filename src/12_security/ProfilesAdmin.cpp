@@ -75,8 +75,7 @@ namespace synthese
 		const std::string ProfilesAdmin::PARAMETER_SEARCH_RIGHT = "pasr";
 		
 		void ProfilesAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			// Profile name
 			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
@@ -99,7 +98,7 @@ namespace synthese
 
 
 		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
+					const admin::AdminRequest& _request) const
 		{
 			// Requests
 			AdminFunctionRequest<ProfilesAdmin> searchRequest(_request);
@@ -205,10 +204,9 @@ namespace synthese
 		}
 
 		bool ProfilesAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<SecurityRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<SecurityRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 		
@@ -216,12 +214,15 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfModule(
 			const string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const security::Profile& profile
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(moduleKey == SecurityModule::FACTORY_KEY && isAuthorized(request))
-			{
+			if(	moduleKey == SecurityModule::FACTORY_KEY &&
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile())
+			){
 				links.push_back(getNewPage());
 			}
 			return links;
@@ -230,7 +231,7 @@ namespace synthese
 	
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			

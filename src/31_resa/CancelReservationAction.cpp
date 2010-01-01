@@ -87,13 +87,13 @@ namespace synthese
 			}
 
 			// Minimal right is standard user
-			if (!_request->isAuthorized<ResaRight>(FORBIDDEN, WRITE))
+			if (!profile.isAuthorized<ResaRight>(FORBIDDEN, WRITE))
 				throw ActionException("Non autorisé");
 
 			// Standard user
-			if (!_request->isAuthorized<ResaRight>(WRITE, WRITE))
+			if (!profile.isAuthorized<ResaRight>(WRITE, WRITE))
 			{
-				if (_request->getUser()->getKey() != _transaction->getCustomerUserId())
+				if (request.getUser()->getKey() != _transaction->getCustomerUserId())
 					throw ActionException("Non autorisé");
 			}
 
@@ -121,7 +121,7 @@ namespace synthese
 		
 		
 		
-		void CancelReservationAction::run()
+		void CancelReservationAction::run(Request& request)
 		{
 			// Store old parameters
 			ReservationStatus oldStatus(_transaction->getStatus());
@@ -129,11 +129,11 @@ namespace synthese
 			// Write the cancellation
 			DateTime now(TIME_CURRENT);
 			_transaction->setCancellationTime(now);
-			_transaction->setCancelUserId(_request->getUser()->getKey());
+			_transaction->setCancelUserId(request.getUser()->getKey());
 			ReservationTransactionTableSync::Save(_transaction.get());
 
 			// Write the log
-			ResaDBLog::AddCancelReservationEntry(_request->getSession(), *_transaction, oldStatus);
+			ResaDBLog::AddCancelReservationEntry(request.getSession(), *_transaction, oldStatus);
 
 			// Mail
 			shared_ptr<const User> customer(UserTableSync::Get(_transaction->getCustomerUserId(), *_env));
@@ -161,7 +161,7 @@ namespace synthese
 			{
 				reservationContact->sendCustomerCancellationEMail(*_transaction);
 
-				ResaDBLog::AddEMailEntry(*_request->getSession(), *customer, "Annulation de réservation");
+				ResaDBLog::AddEMailEntry(*request.getSession(), *customer, "Annulation de réservation");
 			}
 		}
 
@@ -174,10 +174,10 @@ namespace synthese
 
 
 
-		bool CancelReservationAction::_isAuthorized(
+		bool CancelReservationAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<ResaRight>(WRITE) ||
-					_transaction->getCustomerUserId() == _request->getUser()->getKey() && _request->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
+			return profile.isAuthorized<ResaRight>(WRITE) ||
+					_transaction->getCustomerUserId() == request.getUser()->getKey() && profile.isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
 
 		}
 	}

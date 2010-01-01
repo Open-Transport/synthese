@@ -56,8 +56,7 @@ namespace synthese
 		}
 
 		void HomeAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 		}
 		
@@ -72,9 +71,8 @@ namespace synthese
 
 
 		bool HomeAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
+			const security::Profile& profile
+		) const	{
 			return true;
 		}
 
@@ -87,7 +85,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks HomeAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 			

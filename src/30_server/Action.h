@@ -37,11 +37,16 @@
 
 namespace synthese
 {
+	namespace security
+	{
+		class Profile;
+	}
+
 	namespace server
 	{
-		class Request;
 		class ParametersMap;
 		class ActionException;
+		class Request;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Action abstract class to run before the display of a function result.
@@ -55,7 +60,6 @@ namespace synthese
 		public:
 
 		protected:
-			Request* _request;
 			boost::shared_ptr<util::Env>	_env;
 
 			//////////////////////////////////////////////////////////////////////////
@@ -86,7 +90,9 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007
 			*/
-			virtual bool _isAuthorized() const = 0;
+			virtual bool isAuthorized(
+				const security::Profile& profile
+			) const = 0;
 
 			/** Conversion from generic parameters map to attributes.
 				@param map Map to analyse
@@ -97,11 +103,13 @@ namespace synthese
 			*/
 			virtual ParametersMap getParametersMap() const = 0;
 
-			/** Action to run, defined by each subclass.
-			*/
-			virtual void run() = 0;
 
-			friend class Request;
+			//////////////////////////////////////////////////////////////////////////
+			/// Action to run, defined by each subclass.
+			///	@return the id of the object created by the action, if any,
+			virtual void run(
+				Request& request
+			) = 0;
 
 		public:
 			boost::shared_ptr<util::Env> getEnv() const { return _env; }

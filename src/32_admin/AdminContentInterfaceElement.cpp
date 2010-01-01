@@ -52,12 +52,12 @@ namespace synthese
 			const AdminInterfaceElement* aie = static_cast<const AdminInterfaceElement*>(rootObject);
 			assert(aie != NULL);
 
-			if(aie != NULL)
+			if(aie != NULL && request)
 			{
 				aie->display(
 					stream,
 					variables,
-					static_cast<const FunctionRequest<AdminRequest>&>(*request)
+					*dynamic_cast<const AdminRequest*>(request)
 				);
 			}
 			return string();

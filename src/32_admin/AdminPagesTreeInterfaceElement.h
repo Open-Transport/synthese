@@ -24,7 +24,6 @@
 #define SYNTHESE_AdminPagesTreeInterfaceElement_H__
 
 #include "AdminInterfaceElement.h"
-#include "FunctionRequest.h"
 #include "LibraryInterfaceElement.h"
 #include "FactorableTemplate.h"
 
@@ -32,8 +31,6 @@ namespace synthese
 {
 	namespace admin
 	{
-		class AdminRequest;
-		
 		/** Tree of admin pages links.
 			@ingroup m14Values refLibrary
 

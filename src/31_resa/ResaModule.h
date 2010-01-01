@@ -45,11 +45,6 @@ namespace synthese
 		class Env;
 	}
 
-	namespace admin
-	{
-		class AdminRequest;
-	}
-
 	namespace dblog
 	{
 		class DBLogEntry;

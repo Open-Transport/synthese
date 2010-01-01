@@ -89,7 +89,7 @@ namespace synthese
 		
 		
 		
-		void TimetableAddAction::run()
+		void TimetableAddAction::run(Request& request)
 		{
 			// timetable creation
 			Timetable t;
@@ -105,7 +105,7 @@ namespace synthese
 			TimetableTableSync::Save(&t);
 
 			// ID update
-			_request->setActionCreatedId(t.getKey());
+			request.setActionCreatedId(t.getKey());
 		}
 
 
@@ -118,9 +118,9 @@ namespace synthese
 		}
 		
 		
-		bool TimetableAddAction::_isAuthorized() const
+		bool TimetableAddAction::isAuthorized(const security::Profile& profile) const
 		{
-			return _request->isAuthorized<TimetableRight>(WRITE);
+			return profile.isAuthorized<TimetableRight>(WRITE);
 		}
 	}
 }

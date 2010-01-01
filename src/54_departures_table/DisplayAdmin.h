@@ -183,8 +183,7 @@ namespace synthese
 				@param request The request to use for the initialization.
 			*/
 			void setFromParametersMap(
-				const server::ParametersMap& map,
-				bool objectWillBeCreatedLater
+				const server::ParametersMap& map
 			);
 			
 			
@@ -199,11 +198,11 @@ namespace synthese
 			void display(
 				std::ostream& stream,
 				interfaces::VariablesMap& variables,
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const admin::AdminRequest& _request
 			) const;
 			
 			bool isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const security::Profile& profile
 			) const;
 
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
@@ -211,7 +210,7 @@ namespace synthese
 			virtual std::string getTitle() const;
 
 			virtual void _buildTabs(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const admin::AdminRequest& _request
 			) const;
 		};
 	}

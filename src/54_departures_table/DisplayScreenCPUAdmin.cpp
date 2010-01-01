@@ -46,6 +46,7 @@
 #include "HTMLList.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
+#include "Profile.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -92,11 +93,8 @@ namespace synthese
 		
 		
 		void DisplayScreenCPUAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
-			if(objectWillBeCreatedLater) return;
-			
 			try
 			{
 				_cpu = DisplayScreenCPUTableSync::Get(
@@ -305,23 +303,20 @@ namespace synthese
 			// LOG TAB
 			if (openTabContent(stream, TAB_LOG))
 			{
-				_generalLogView.display(stream,	FunctionRequest<AdminRequest>(_request));
+				_generalLogView.display(stream,	AdminRequest(_request));
 			}
 			closeTabContent(stream);
 		}
 
 		bool DisplayScreenCPUAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			if(_request.getActionWillCreateObject()) return true;
-			
+			const security::Profile& profile
+		) const	{
 			if (_cpu.get() == NULL) return false;
 			if (_cpu->getPlace() == NULL)
 			{
-				return _request.isAuthorized<ArrivalDepartureTableRight>(READ);
+				return profile.isAuthorized<ArrivalDepartureTableRight>(READ);
 			}
-			return _request.isAuthorized<ArrivalDepartureTableRight>(
+			return profile.isAuthorized<ArrivalDepartureTableRight>(
 				READ,
 				UNKNOWN_RIGHT_LEVEL,
 				lexical_cast<string>(_cpu->getPlace()->getKey())
@@ -337,7 +332,7 @@ namespace synthese
 
 
 		void DisplayScreenCPUAdmin::_buildTabs(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 			_tabs.clear();
 
@@ -375,7 +370,7 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks DisplayScreenCPUAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>& request ) const
+		AdminInterfaceElement::PageLinks DisplayScreenCPUAdmin::getSubPages( const AdminInterfaceElement& currentPage, const admin::AdminRequest& request ) const
 		{
 			AdminInterfaceElement::PageLinks links;
 

@@ -122,9 +122,9 @@ namespace synthese
 			std::ostream& stream
 			, const messages::Alarm* alarm
 			, const server::ParametersMap& parameters
-			, server::FunctionRequest<admin::AdminRequest>& searchRequest
-			, server::ActionFunctionRequest<messages::AlarmAddLinkAction,admin::AdminRequest>& addRequest
-			, server::ActionFunctionRequest<messages::AlarmRemoveLinkAction, admin::AdminRequest>& removeRequest
+			, admin::AdminRequest& searchRequest
+			, RequestManager<StaticActionRequestPolicy<messages::AlarmAddLinkAction> >& addRequest
+			, RequestManager<StaticActionRequestPolicy<messages::AlarmRemoveLinkAction> >& removeRequest
 		){
 			Env env;
 			vector<shared_ptr<DisplayScreen> > dsv(
@@ -135,7 +135,7 @@ namespace synthese
 			)	);
 			set<uid> usedDisplayScreens;
 
-			FunctionRequest<AlarmTestOnDisplayScreenFunction> testRequest(&addRequest);
+			FunctionRequest<AlarmTestOnDisplayScreenFunction> testRequest(addRequest);
 			testRequest.getFunction()->setAlarmId(alarm->getKey());
 
 			stream << "<h1>Test du message</h1>";

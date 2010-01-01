@@ -188,7 +188,8 @@ namespace synthese
 				void cleanup(
 					bool updateMinSpeed,
 					const time::DateTime& newMaxTime,
-					BestVertexReachesMap& bvrm
+					BestVertexReachesMap& bvrm,
+					bool propagateInConnectionPlace
 				){
 					std::vector<boost::shared_ptr<graph::Journey> > journeysToAdd;
 					std::vector<boost::shared_ptr<graph::Journey> > journeysToRemove;
@@ -199,7 +200,7 @@ namespace synthese
 						++next;
 						if(	journey->getMethod() == graph::DEPARTURE_TO_ARRIVAL && journey->getEndTime() >= newMaxTime ||
 							journey->getMethod() == graph::ARRIVAL_TO_DEPARTURE && journey->getEndTime() <= newMaxTime ||
-							bvrm.isUseLess(it->first, journey->size(), it->second->second)
+							bvrm.isUseLess(it->first, journey->size(), it->second->second, propagateInConnectionPlace)
 						){
 							journeysToRemove.push_back(journey);
 						}

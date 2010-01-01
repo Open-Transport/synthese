@@ -91,15 +91,15 @@ namespace synthese
 			_screen.reset(screen);
 		}
 
-		void DisplayScreenPhysicalStopFunction::_run( std::ostream& stream ) const
+		void DisplayScreenPhysicalStopFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			DateTime date(TIME_CURRENT);
-			_screen->display(stream, date, _request);
+			_screen->display(stream, date, &request);
 		}
 
 
 
-		bool DisplayScreenPhysicalStopFunction::_isAuthorized(
+		bool DisplayScreenPhysicalStopFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

@@ -101,29 +101,37 @@ namespace synthese
 				lexical_cast<string>(service.getDepartureSchedule(true, lineStop.getRankInPath()) - service.getDepartureSchedule(false, lineStop.getRankInPath()))
 			); //10
 
-			ActionFunctionRequest<ScheduleRealTimeUpdateAction,RealTimeUpdateFunction> scheduleUpdateRequest(request);
-			scheduleUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
-			scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
-			scheduleUpdateRequest.getAction()->setAtArrival(false);
-			scheduleUpdateRequest.getAction()->setAtDeparture(true);
-			scheduleUpdateRequest.getAction()->setPropagateConstantly(true);
-			scheduleUpdateRequest.getAction()->setDelay(posix_time::not_a_date_time);
-			scheduleUpdateRequest.getFunction()->setService(Env::GetOfficialEnv().getSPtr(&service));
-			scheduleUpdateRequest.getFunction()->setLineStopRank(lineStop.getRankInPath());
-			scheduleUpdateRequest.getFunction()->setInterface(Env::GetOfficialEnv().getSPtr(getInterface()));
-			pv.push_back(
-				scheduleUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES + Request::PARAMETER_ASSIGNMENT
-			); //11
+			if(request)
+			{
+				ActionFunctionRequest<ScheduleRealTimeUpdateAction,RealTimeUpdateFunction> scheduleUpdateRequest(*request);
+				scheduleUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
+				scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
+				scheduleUpdateRequest.getAction()->setAtArrival(false);
+				scheduleUpdateRequest.getAction()->setAtDeparture(true);
+				scheduleUpdateRequest.getAction()->setPropagateConstantly(true);
+				scheduleUpdateRequest.getAction()->setDelay(posix_time::not_a_date_time);
+				scheduleUpdateRequest.getFunction()->setService(Env::GetOfficialEnv().getSPtr(&service));
+				scheduleUpdateRequest.getFunction()->setLineStopRank(lineStop.getRankInPath());
+				scheduleUpdateRequest.getFunction()->setInterface(Env::GetOfficialEnv().getSPtr(getInterface()));
+				pv.push_back(
+					scheduleUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES + Request::PARAMETER_ASSIGNMENT
+				); //11
 
-			ActionFunctionRequest<ServiceVertexRealTimeUpdateAction,RealTimeUpdateFunction> vertexUpdateRequest(request);
-			vertexUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
-			vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
-			vertexUpdateRequest.getFunction()->setService(Env::GetOfficialEnv().getSPtr(&service));
-			vertexUpdateRequest.getFunction()->setLineStopRank(lineStop.getRankInPath());
-			vertexUpdateRequest.getFunction()->setInterface(Env::GetOfficialEnv().getSPtr(getInterface()));
-			pv.push_back(
-				vertexUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID + Request::PARAMETER_ASSIGNMENT
-			); //12
+				ActionFunctionRequest<ServiceVertexRealTimeUpdateAction,RealTimeUpdateFunction> vertexUpdateRequest(*request);
+				vertexUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
+				vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
+				vertexUpdateRequest.getFunction()->setService(Env::GetOfficialEnv().getSPtr(&service));
+				vertexUpdateRequest.getFunction()->setLineStopRank(lineStop.getRankInPath());
+				vertexUpdateRequest.getFunction()->setInterface(Env::GetOfficialEnv().getSPtr(getInterface()));
+				pv.push_back(
+					vertexUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID + Request::PARAMETER_ASSIGNMENT
+				); //12
+			}
+			else
+			{
+				pv.push_back(string());
+				pv.push_back(string());
+			}
 
 
 			InterfacePage::_display(

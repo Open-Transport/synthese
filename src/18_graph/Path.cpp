@@ -31,6 +31,7 @@
 
 #include <assert.h>
 #include <boost/lexical_cast.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -343,6 +344,74 @@ namespace synthese
 		{
 			return _allDays;
 		}
+
+
+
+		void Path::merge(Path& other )
+		{
+			if(	other._pathGroup != _pathGroup ||
+				other._edges.empty() ||
+				_edges.empty() ||
+				other.getEdge(0)->getFromVertex() != getLastEdge()->getFromVertex() ||
+				!_services.empty() ||
+				!other._services.empty()
+			){
+				throw util::Exception("The two roads cannot be merged");
+			}
+
+			Edge* lastEdge(getLastEdge());
+			Vertex* vertex(const_cast<Vertex*>(lastEdge->getFromVertex()));
+			double metricOffset(lastEdge->getMetricOffset());
+			int rankInPath(lastEdge->getRankInPath());
+
+			_edges.pop_back();
+			vertex->removeArrivalEdge(lastEdge);
+			other._edges[0]->setPreviousConnectionDeparture(lastEdge->getPreviousConnectionDeparture());
+			other._edges[0]->setPreviousDepartureForFineSteppingOnly(lastEdge->getPreviousDepartureForFineSteppingOnly());
+
+			BOOST_FOREACH(Edge* edge, _edges)
+			{
+				if(edge->getFollowingConnectionArrival() == lastEdge)
+				{
+					edge->setFollowingConnectionArrival(other._edges[0]);
+				}
+				if(edge->getFollowingArrivalForFineSteppingOnly() == lastEdge)
+				{
+					edge->setFollowingArrivalForFineSteppingOnly(other._edges[0]);
+				}
+			}
+
+			BOOST_FOREACH(Edge* edge, other._edges)
+			{
+				Vertex* vertex(const_cast<Vertex*>(edge->getFromVertex()));
+				if(edge->isArrivalAllowed())
+				{
+					vertex->removeArrivalEdge(edge);
+				}
+				if(edge->isDepartureAllowed())
+				{
+					vertex->removeDepartureEdge(edge);
+				}
+				edge->setRankInPath(edge->getRankInPath()+rankInPath);
+				edge->setMetricOffset(edge->getMetricOffset()+metricOffset);
+				_edges.push_back(edge);
+				edge->setParentPath(this);
+				if(edge->isArrivalAllowed())
+				{
+					vertex->addArrivalEdge(edge);
+				}
+				if(edge->isDepartureAllowed())
+				{
+					vertex->addDepartureEdge(edge);
+				}
+			}
+
+			other._edges.clear();
+
+			_pathGroup->removePath(&other);
+		}
+
+
 
 		bool cmpService::operator ()(const Service *s1, const Service *s2) const
 		{

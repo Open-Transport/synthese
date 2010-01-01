@@ -118,7 +118,7 @@ namespace synthese
 					"INSERT INTO command(command_id,command_name,command_line,command_type) VALUES(" <<
 					CHECK_SYNTHESE_COMMAND_ID << "," << CHECK_SYNTHESE_COMMAND_NAME <<
 					",'$USER1$#S#check_synthese.sh  \"http://" <<
-					_request->getHostName() << _request->getClientURL() <<
+					request.getHostName() << request.getClientURL() <<
 					Request::PARAMETER_STARTER << Request::PARAMETER_FUNCTION <<
 					Request::PARAMETER_ASSIGNMENT << DisplayGetNagiosStatusFunction::FACTORY_KEY <<
 					Request::PARAMETER_SEPARATOR << DisplayGetNagiosStatusFunction::PARAMETER_DISPLAY_SCREEN_ID <<
@@ -304,7 +304,7 @@ namespace synthese
 
 
 				// Insertion of the hosts
-				FunctionRequest<DisplayScreenContentFunction> displayRequest(NULL);
+				FunctionRequest<DisplayScreenContentFunction> displayRequest;
 				
 				DisplayScreenTableSync::SearchResult screens(
 					DisplayScreenTableSync::Search(env)
@@ -387,7 +387,7 @@ namespace synthese
 						SYNTHESE_SERVER_ID << ",(SELECT command_id FROM command WHERE command_name='check_host_alive')," <<
 						"1,1," <<
 						SYNTHESE_SERVER_NAME << "," << SYNTHESE_SERVER_NAME << "," <<
-						Conversion::ToSQLiteString(_request->getHostName()) << ",1000," <<
+						Conversion::ToSQLiteString(request.getHostName()) << ",1000," <<
 						"'1','2'," <<
 						"'2','2'," <<
 						"'2','2'," <<
@@ -429,7 +429,7 @@ namespace synthese
 
 
 
-		bool CentreonConfigExportFunction::_isAuthorized(
+		bool CentreonConfigExportFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

@@ -50,6 +50,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
 #include "MessageAdmin.h"
+#include "Profile.h"
 
 #include <boost/foreach.hpp>
 
@@ -100,8 +101,7 @@ namespace synthese
 		{}
 
 		void MessagesAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			try
 			{
@@ -157,7 +157,7 @@ namespace synthese
 
 
 		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
+					const admin::AdminRequest& _request) const
 		{
 			// Requests
 			AdminFunctionRequest<MessagesAdmin> searchRequest(_request);
@@ -375,21 +375,23 @@ namespace synthese
 
 
 		bool MessagesAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			
+			const security::Profile& profile
 		) const	{
-			return _request.isAuthorized<MessagesRight>(READ);
+			return profile.isAuthorized<MessagesRight>(READ);
 		}
 
 		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPagesOfModule(
 			const string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == MessagesModule::FACTORY_KEY && isAuthorized(request))
-			{
+			if(	moduleKey == MessagesModule::FACTORY_KEY &&
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()
+			){
 				links.push_back(getNewPage());
 			}
 			return links;
@@ -397,7 +399,7 @@ namespace synthese
 
 		bool MessagesAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			return true;
 		}
@@ -406,7 +408,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 		
 			AdminInterfaceElement::PageLinks links;

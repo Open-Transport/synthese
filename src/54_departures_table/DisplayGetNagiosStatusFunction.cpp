@@ -77,7 +77,7 @@ namespace synthese
 		}
 
 
-		void DisplayGetNagiosStatusFunction::_run( std::ostream& stream ) const
+		void DisplayGetNagiosStatusFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			if(	!_screen->getIsOnline()
 			){
@@ -106,7 +106,7 @@ namespace synthese
 
 
 
-		bool DisplayGetNagiosStatusFunction::_isAuthorized(
+		bool DisplayGetNagiosStatusFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

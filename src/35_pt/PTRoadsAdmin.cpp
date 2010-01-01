@@ -35,6 +35,7 @@
 #include "PTCitiesAdmin.h"
 #include "PTPlacesAdmin.h"
 #include "City.h"
+#include "Profile.h"
 
 using namespace std;
 using namespace boost;
@@ -70,8 +71,7 @@ namespace synthese
 
 		
 		void PTRoadsAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			try
 			{
@@ -100,9 +100,9 @@ namespace synthese
 
 		
 		bool PTRoadsAdmin::isAuthorized(
-			const FunctionRequest<AdminRequest>& request
+			const security::Profile& profile
 		) const	{
-			return request.isAuthorized<TransportNetworkRight>(READ);
+			return profile.isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -110,7 +110,7 @@ namespace synthese
 		void PTRoadsAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 		
 			AdminFunctionRequest<PTRoadAdmin> openRoadRequest(request);
@@ -143,7 +143,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks PTRoadsAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;

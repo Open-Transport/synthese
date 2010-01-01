@@ -92,7 +92,7 @@ namespace synthese
 			}
 		}
 
-		void CreateDisplayScreenAction::run()
+		void CreateDisplayScreenAction::run(Request& request)
 		{
 			// Preparation
 			DisplayScreen screen;
@@ -109,10 +109,10 @@ namespace synthese
 			DisplayScreenTableSync::Save(&screen);
 
 			// Request update
-			_request->setActionCreatedId(screen.getKey());
+			request.setActionCreatedId(screen.getKey());
 
 			// Log
-			ArrivalDepartureTableLog::addCreateEntry(screen, *_request->getUser());
+			ArrivalDepartureTableLog::addCreateEntry(screen, *request.getUser());
 		}
 
 		void CreateDisplayScreenAction::setPlace(RegistryKeyType id)
@@ -130,12 +130,12 @@ namespace synthese
 
 
 
-		bool CreateDisplayScreenAction::_isAuthorized(
+		bool CreateDisplayScreenAction::isAuthorized(const Profile& profile
 		) const {
 			return
 				_place.get() ?
-				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey())) :
-				_request->isAuthorized<ArrivalDepartureTableRight>(WRITE)
+				profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey())) :
+				profile.isAuthorized<ArrivalDepartureTableRight>(WRITE)
 			;
 		}
 

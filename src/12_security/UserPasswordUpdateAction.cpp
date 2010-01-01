@@ -77,14 +77,14 @@ namespace synthese
 			}
 		}
 
-		void UserPasswordUpdateAction::run()
+		void UserPasswordUpdateAction::run(Request& request)
 		{
 			_user->setPassword(_password);
 			
 			UserTableSync::Save(_user.get());
 			
 			SecurityLog::addUserAdmin(
-				_request->getUser().get(),
+				request.getUser().get(),
 				_user.get(),
 				"Modification du mot de passe"
 			);
@@ -92,10 +92,10 @@ namespace synthese
 
 
 
-		bool UserPasswordUpdateAction::_isAuthorized(
+		bool UserPasswordUpdateAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<SecurityRight>(WRITE) ||
-				_request->getUser() != NULL && _request->getUser()->getKey() == _user->getKey();
+			return profile.isAuthorized<SecurityRight>(WRITE) ||
+				request.getUser() != NULL && request.getUser()->getKey() == _user->getKey();
 		}
 		
 		

@@ -45,7 +45,7 @@ namespace synthese
 				@author Hugues
 				@date 2009
 			*/
-			void setFromParametersMap(const server::ParametersMap& map, bool);
+			void setFromParametersMap(const server::ParametersMap& map);
 
 
 			server::ParametersMap getParametersMap() const;
@@ -56,7 +56,7 @@ namespace synthese
 				@author Hugues
 				@date 2009
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables, const server::FunctionRequest<admin::AdminRequest>& request) const;
+			void display(std::ostream& stream, interfaces::VariablesMap& variables, const admin::AdminRequest& request) const;
 			
 			/** Authorization control.
 				@param request The current request
@@ -64,7 +64,9 @@ namespace synthese
 				@author Hugues
 				@date 2009
 			*/
-			bool isAuthorized(const server::FunctionRequest<admin::AdminRequest>& request) const;
+			bool isAuthorized(
+				const security::Profile& profile
+			) const;
 			
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param factoryKey Key of the parent class
@@ -75,7 +77,7 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
 				const AdminInterfaceElement& currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const admin::AdminRequest& request
 			) const;
 		};
 	}

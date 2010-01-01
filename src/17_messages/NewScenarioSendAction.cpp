@@ -95,7 +95,7 @@ namespace synthese
 			}
 		}
 
-		void NewScenarioSendAction::run()
+		void NewScenarioSendAction::run(Request& request)
 		{
 			if(_scenarioToCopy.get()) // Copy of an existing scenario
 			{
@@ -104,7 +104,7 @@ namespace synthese
 				ScenarioTableSync::Save(&scenario);
 	
 				// Remember of the id of created object to view it after the action
-				_request->setActionCreatedId(scenario.getKey());
+				request.setActionCreatedId(scenario.getKey());
 					
 				SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
 	 				_scenarioToCopy->getTemplate()->getKey(),
@@ -113,10 +113,10 @@ namespace synthese
 	 			
 				// The log
 				MessagesLog::AddNewSentScenarioEntry(
-					*_scenarioToCopy, scenario, _request->getUser().get()
+					*_scenarioToCopy, scenario, request.getUser().get()
 				);
 				MessagesLibraryLog::AddTemplateInstanciationEntry(
-					scenario, _request->getUser().get()
+					scenario, request.getUser().get()
 				);
 			}
 			else if(_template.get()) // New scenario from template
@@ -126,7 +126,7 @@ namespace synthese
 				ScenarioTableSync::Save(&scenario);
 	
 				// Remember of the id of created object to view it after the action
-				_request->setActionCreatedId(scenario.getKey());
+				request.setActionCreatedId(scenario.getKey());
 				
 				// The action on the alarms
 				SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
@@ -136,10 +136,10 @@ namespace synthese
 			
 				// The log
 				MessagesLog::AddNewSentScenarioEntry(
-					*_template, scenario, _request->getUser().get()
+					*_template, scenario, request.getUser().get()
 				);
 				MessagesLibraryLog::AddTemplateInstanciationEntry(
-					scenario, _request->getUser().get()
+					scenario, request.getUser().get()
 				);
 			}
 			else
@@ -149,20 +149,20 @@ namespace synthese
 				ScenarioTableSync::Save(&scenario);
 
 				// Remember of the id of created object to view it after the action
-				_request->setActionCreatedId(scenario.getKey());
+				request.setActionCreatedId(scenario.getKey());
 
 				// The log
 				MessagesLog::AddNewSentScenarioEntry(
-					scenario, *_request->getUser().get()
+					scenario, *request.getUser().get()
 				);
 			}
 		}
 
 
 
-		bool NewScenarioSendAction::_isAuthorized(
+		bool NewScenarioSendAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<MessagesRight>(WRITE);
+			return profile.isAuthorized<MessagesRight>(WRITE);
 		}
 	}
 }

@@ -42,7 +42,7 @@
 #include "ResaEditLogEntryAdmin.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
-#include "AdminRequest.h"
+
 #include "OnlineReservationRule.h"
 #include "OnlineReservationRuleTableSync.h"
 

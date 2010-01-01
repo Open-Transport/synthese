@@ -81,10 +81,13 @@ namespace synthese
 			}
 		}
 
-		void UpdateAlarmMessagesFromTemplateAction::run() throw(ActionException)
-		{
+		void UpdateAlarmMessagesFromTemplateAction::run(
+			Request& request
+		) throw(ActionException) {
+			
 			_message->setShortMessage(_template->getShortMessage());
 			_message->setLongMessage(_template->getLongMessage());
+			
 			AlarmTableSync::Save(_message.get());
 		}
 
@@ -106,15 +109,15 @@ namespace synthese
 
 
 
-		bool UpdateAlarmMessagesFromTemplateAction::_isAuthorized(
+		bool UpdateAlarmMessagesFromTemplateAction::isAuthorized(const Profile& profile
 		) const {
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_message).get() != NULL)
 			{
-				return _request->isAuthorized<MessagesLibraryRight>(WRITE);
+				return profile.isAuthorized<MessagesLibraryRight>(WRITE);
 			}
 			else
 			{
-				return _request->isAuthorized<MessagesRight>(WRITE);
+				return profile.isAuthorized<MessagesRight>(WRITE);
 			}
 		}
 	}

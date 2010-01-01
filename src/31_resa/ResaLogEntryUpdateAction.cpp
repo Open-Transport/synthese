@@ -89,7 +89,7 @@ namespace synthese
 		
 		
 		
-		void ResaLogEntryUpdateAction::run()
+		void ResaLogEntryUpdateAction::run(Request& request)
 		{
 			// Update the call status if necessary
 			DBLogEntry::Content content(_entry->getContent());
@@ -104,7 +104,7 @@ namespace synthese
 					*_entry,
 					*_type,
 					_text,
-					*_request->getUser()
+					*request.getUser()
 				);
 			}
 		}
@@ -127,9 +127,9 @@ namespace synthese
 
 
 
-		bool ResaLogEntryUpdateAction::_isAuthorized(
+		bool ResaLogEntryUpdateAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<ResaRight>(WRITE);
+			return profile.isAuthorized<ResaRight>(WRITE);
 		}
 	}
 }

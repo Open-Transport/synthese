@@ -39,7 +39,6 @@
 #include "Session.h"
 #include "AdminInterfaceElement.h"
 #include "ResaEditLogEntryAdmin.h"
-#include "AdminRequest.h"
 #include "CancelReservationAction.h"
 #include "ResaCustomerAdmin.h"
 
@@ -81,15 +80,15 @@ namespace synthese
 			if (tableId == UserTableSync::TABLE.ID)
 			{
 				AdminFunctionRequest<ResaCustomerAdmin> openRequest(
-					static_cast<const FunctionRequest<AdminRequest>* >(&searchRequest)
+					dynamic_cast<const AdminRequest& >(searchRequest)
 				);
 
 				shared_ptr<const User> user(
 					UserTableSync::Get(
 						id,
-						*static_cast<const FunctionRequest<AdminRequest>* >(
-							&searchRequest
-						)->getFunction()->getEnv(),
+						*dynamic_cast<const AdminRequest& >(
+							searchRequest
+						).getFunction()->getEnv(),
 						FIELDS_ONLY_LOAD_LEVEL
 				)	);
 
@@ -322,9 +321,9 @@ namespace synthese
 					shared_ptr<CancelReservationAction> action(new CancelReservationAction);
 					action->setTransaction(tr);
 					Request cancelRequest(
-						&searchRequest,
-						shared_ptr<Function>(searchRequest._getFunction()->clone()),
-						static_pointer_cast<Action, CancelReservationAction>(action)
+						searchRequest,
+						static_pointer_cast<Action, CancelReservationAction>(action),
+						shared_ptr<Function>(searchRequest._getFunction()->clone())
 					);
 
 					switch(status)
@@ -366,14 +365,14 @@ namespace synthese
 					entry.getObjectId2() > 0
 				){
 					AdminFunctionRequest<ResaEditLogEntryAdmin> openCallRequest(
-						static_cast<const FunctionRequest<AdminRequest>* >(&searchRequest)
+						dynamic_cast<const AdminRequest& >(searchRequest)
 					);
 					openCallRequest.getPage()->setEntry(
 						DBLogEntryTableSync::Get(
 							entry.getObjectId2() > 0 ? entry.getObjectId2() : entry.getKey(),
-							*static_cast<const FunctionRequest<AdminRequest>* >(
-								&searchRequest
-							)->getFunction()->getEnv()
+							*dynamic_cast<const AdminRequest& >(
+								searchRequest
+							).getFunction()->getEnv()
 					)	);
 					stream << HTMLModule::getLinkButton(openCallRequest.getURL(), "Ouvrir", string(), GetIconURL(CALL_ENTRY));
 				}

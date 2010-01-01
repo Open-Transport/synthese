@@ -108,7 +108,7 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenAddDisplayedPlaceAction::run()
+		void DisplayScreenAddDisplayedPlaceAction::run(Request& request)
 		{
 			_screen->addDisplayedPlace(_place);
 
@@ -118,22 +118,22 @@ namespace synthese
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
 				"Ajout de destination : "+ _place->getFullName(),
-				*_request->getUser()
+				*request.getUser()
 			);
 		}
 
 
 
-		bool DisplayScreenAddDisplayedPlaceAction::_isAuthorized(
+		bool DisplayScreenAddDisplayedPlaceAction::isAuthorized(const Profile& profile
 		) const {
 			assert(_screen.get() != NULL);
 			if (_screen->getLocalization() != NULL)
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 		

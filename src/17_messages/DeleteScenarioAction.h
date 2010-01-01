@@ -60,11 +60,11 @@ namespace synthese
 
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(server::Request& request);
 
 			void setScenario(boost::shared_ptr<const ScenarioTemplate> scenario);
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 		};
 	}
 }

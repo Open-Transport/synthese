@@ -35,7 +35,7 @@
 #include "NamedPlace.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
-
+#include "Profile.h
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
@@ -115,8 +115,7 @@ namespace synthese
 
 
 		void ReservationRoutePlannerAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_startCity = map.getDefault<string>(PARAMETER_START_CITY);
 			_startPlace = map.getDefault<string>(PARAMETER_START_PLACE);
@@ -193,7 +192,7 @@ namespace synthese
 		void ReservationRoutePlannerAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 
 			vector<pair<string, string> > dates;
@@ -218,7 +217,7 @@ namespace synthese
 			);
 			resaRequest.setActionWillCreateObject();
 
-			FunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(&_request);
+			FunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request);
 			customerSearchRequest.getFunction()->setNumber(20);
 
 			stream << HTMLModule::GetHTMLJavascriptOpen("resa.js");
@@ -357,38 +356,6 @@ namespace synthese
 
 			stream << "<h1>Résultats</h1>";
 
-			if (jv.getJourneys().empty())
-			{
-				stream << "Aucun résultat trouvé de " << (
-						dynamic_cast<const NamedPlace*>(startPlace) ?
-						dynamic_cast<const NamedPlace*>(startPlace)->getFullName() :
-						dynamic_cast<const City*>(startPlace)->getName()
-					) << " à " << (
-						dynamic_cast<const NamedPlace*>(endPlace) ?
-						dynamic_cast<const NamedPlace*>(endPlace)->getFullName() :
-						dynamic_cast<const City*>(endPlace)->getName()
-					);
-				return;
-			}
-
-			HTMLTable::ColsVector v;
-			v.push_back("Départ<br />" + (
-					dynamic_cast<const NamedPlace*>(startPlace) ?
-					dynamic_cast<const NamedPlace*>(startPlace)->getFullName() :
-					dynamic_cast<const City*>(startPlace)->getName()
-			)	);
-			v.push_back("Ligne");
-			v.push_back("Arrivée");
-			v.push_back("Correspondance");
-			v.push_back("Départ");
-			v.push_back("Ligne");
-			v.push_back("Arrivée<br />" + (
-					dynamic_cast<const NamedPlace*>(endPlace) ?
-					dynamic_cast<const NamedPlace*>(endPlace)->getFullName() :
-					dynamic_cast<const City*>(endPlace)->getName()
-			)	);
-			HTMLTable t(v,"adminresults");
-
 			// Reservation
 			bool withReservation(false);
 			for (PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().begin()); it != jv.getJourneys().end(); ++it)
@@ -404,125 +371,12 @@ namespace synthese
 			if (withReservation)
 				stream << rf.open();
 
-			// Solutions display loop
-			int solution(1);
-			stream << t.open();
-			for (PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().begin()); it != jv.getJourneys().end(); ++it)
+			jv.displayHTMLTable(stream, rf, BookReservationAction::PARAMETER_DATE_TIME);
+
+			if(jv.getJourneys().empty())
 			{
-				stream << t.row();
-				stream << t.col(7, string(), true);
-				if (it->getReservationCompliance() && it->getReservationDeadLine() > now)
-				{
-					withReservation = true;
-					stream << rf.getRadioInput(BookReservationAction::PARAMETER_DATE_TIME, it->getDepartureTime(), (solution==1) ? it->getDepartureTime() : DateTime(UNKNOWN_VALUE), " Solution "+ lexical_cast<string>(solution));
-				}
-				else
-					stream << "Solution " << solution;
-				++solution;
-
-				// Departure time
-				Journey::ServiceUses::const_iterator its(it->getServiceUses().begin());
-
-				if (it->getContinuousServiceRange() > 1)
-				{
-					DateTime endRange(its->getDepartureDateTime());
-					endRange += it->getContinuousServiceRange();
-					stream << " - Service continu jusqu'à " << endRange.toString();
-				}
-				if (it->getReservationCompliance() == true)
-				{
-					stream << " - " << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire") << " Réservation obligatoire avant le " << it->getReservationDeadLine().toString();
-				}
-				if (it->getReservationCompliance() == boost::logic::indeterminate)
-				{
-					stream << " - " << HTMLModule::getHTMLImage("resa_optional.png", "Réservation facultative") << " Réservation facultative avant le " << it->getReservationDeadLine().toString();
-				}
-				if(dynamic_cast<const City*>(startPlace) || dynamic_cast<const City*>(endPlace))
-				{
-					stream << " (";
-					if(dynamic_cast<const City*>(startPlace))
-					{
-						stream << "départ de " << 
-							static_cast<const PublicTransportStopZoneConnectionPlace*>(
-								its->getDepartureEdge()->getHub()
-							)->getFullName()
-						;
-					}
-					if(dynamic_cast<const City*>(endPlace))
-					{
-						if(dynamic_cast<const City*>(startPlace)) stream << " - ";
-						Journey::ServiceUses::const_iterator ite(it->getServiceUses().end() - 1);
-						stream << "arrivée à " << 
-							static_cast<const PublicTransportStopZoneConnectionPlace*>(
-								ite->getArrivalEdge()->getHub()
-							)->getFullName()
-						;
-					}
-					stream << ")";
-				}
-
-
-				stream << t.row();
-				stream << t.col() << "<b>" << its->getDepartureDateTime().toString() << "</b>";
-
-				// Line
-				const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-				const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-				stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
-				stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
-
-				// Transfers
-				if (its == it->getServiceUses().end() -1)
-				{
-					stream << t.col(4) << "(trajet direct)";
-				}
-				else
-				{
-					while(true)
-					{
-						// Arrival
-						stream << t.col() << its->getArrivalDateTime().toString();
-
-						// Place
-						stream << t.col();
-						if(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(its->getArrivalEdge()->getHub()))
-						{
-							stream <<
-								static_cast<const PublicTransportStopZoneConnectionPlace*>(
-									its->getArrivalEdge()->getHub()
-								)->getFullName();
-						}
-
-						// Next service use
-						++its;
-
-						// Departure
-						stream << t.col() << its->getDepartureDateTime().toString();
-
-						// Line
-						const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-						const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-						stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
-						stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
-
-						// Exit if last service use
-						if (its == it->getServiceUses().end() -1)
-							break;
-
-						// Empty final arrival col
-						stream << t.col();
-
-						// New row and empty origin departure cols;
-						stream << t.row();
-						stream << t.col();
-						stream << t.col();
-					}
-				}
-
-				// Final arrival
-				stream << t.col() << "<b>" << its->getArrivalDateTime().toString() << "</b>";
+				return;
 			}
-			stream << t.close();
 
 			stream << "<h1>Réservation</h1>";
 
@@ -605,19 +459,20 @@ namespace synthese
 		}
 
 		bool ReservationRoutePlannerAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(moduleKey == ResaModule::FACTORY_KEY && isAuthorized(request))
+			if(moduleKey == ResaModule::FACTORY_KEY && request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()))
 			{
 				links.push_back(getNewPage());
 			}
@@ -628,7 +483,7 @@ namespace synthese
 		
 		bool ReservationRoutePlannerAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			return true;
 		}

@@ -40,6 +40,7 @@
 #include "DeparturesTableInterfacePage.h"
 #include "ParseDisplayReturnInterfacePage.h"
 #include "InterfaceTableSync.h"
+#include "Profile.h"
 
 using namespace std;
 using namespace boost;
@@ -72,11 +73,8 @@ namespace synthese
 		{ }
 		
 		void DisplayTypeAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
-			if(objectWillBeCreatedLater) return;
-
 			try
 			{
 				_type = DisplayTypeTableSync::GetEditable(
@@ -180,11 +178,10 @@ namespace synthese
 		}
 
 		bool DisplayTypeAdmin::isAuthorized(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const security::Profile& profile
 		) const	{
-			if(_request.getActionWillCreateObject()) return true;
 			if (_type.get() == NULL) return false;
-			return _request.isAuthorized<ArrivalDepartureTableRight>(READ);
+			return profile.isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 		
 

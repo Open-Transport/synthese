@@ -4,7 +4,7 @@
 
 #include "HomeAdmin.h"
 #include "ModuleAdmin.h"
-#include "AdminRequest.h"
+#include "AdminFunction.h"
 #include "AdminInterfaceElement.h"
 #include "AdminPagesTreeInterfaceElement.h"
 #include "AdminPagePositionInterfaceElement.h"

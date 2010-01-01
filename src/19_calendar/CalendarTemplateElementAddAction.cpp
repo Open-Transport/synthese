@@ -122,7 +122,7 @@ namespace synthese
 		
 		
 		
-		void CalendarTemplateElementAddAction::run()
+		void CalendarTemplateElementAddAction::run(Request& request)
 		{
 			CalendarTemplateElement e;
 			e.setInclude(_include.get());
@@ -152,9 +152,9 @@ namespace synthese
 		}
 
 		
-		bool CalendarTemplateElementAddAction::_isAuthorized() const
+		bool CalendarTemplateElementAddAction::isAuthorized(const Profile& profile) const
 		{
-			return _request->isAuthorized<CalendarRight>(WRITE);
+			return profile.isAuthorized<CalendarRight>(WRITE);
 		}
 	}
 }

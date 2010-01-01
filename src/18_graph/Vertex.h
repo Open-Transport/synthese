@@ -87,6 +87,8 @@ namespace synthese
 			//@{
 				void addDepartureEdge ( const Edge* edge );
 				void addArrivalEdge ( const Edge* edge );
+				void removeArrivalEdge(const Edge* edge);
+				void removeDepartureEdge(const Edge* edge);
 			//@}
 
 

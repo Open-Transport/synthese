@@ -73,24 +73,24 @@ namespace synthese
 		
 		
 		
-		void CalendarTemplateAddAction::run()
+		void CalendarTemplateAddAction::run(Request& request)
 		{
 			CalendarTemplate c;
 			c.setText(_text);
 
 			CalendarTemplateTableSync::Save(&c);
 
-			_request->setActionCreatedId(c.getKey());
+			request.setActionCreatedId(c.getKey());
 		}
 	
 		
 		
 		/*!
-			\fn synthese::timetables::CalendarTemplateAddAction::_isAuthorized()
+			\fn synthese::timetables::CalendarTemplateAddAction::isAuthorized(const Profile& profile)
 		*/
-		bool CalendarTemplateAddAction::_isAuthorized(
+		bool CalendarTemplateAddAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<CalendarRight>(WRITE);
+			return profile.isAuthorized<CalendarRight>(WRITE);
 		}
 	}
 }

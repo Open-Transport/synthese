@@ -145,7 +145,7 @@ namespace synthese
 		
 		
 		
-		void ReservationUserUpdateAction::run()
+		void ReservationUserUpdateAction::run(Request& request)
 		{
 			stringstream s;
 			DBLogModule::appendToLogIfChange(s, "Login", _user->getLogin(), _login);
@@ -176,8 +176,8 @@ namespace synthese
 
 			if(!s.str().empty())
 			{
-				SecurityLog::addUserAdmin(_request->getUser().get(), _user.get(), s.str());
-				ResaDBLog::AddUserAdminEntry(*_request->getSession(), *_user, s.str());
+				SecurityLog::addUserAdmin(request.getUser().get(), _user.get(), s.str());
+				ResaDBLog::AddUserAdminEntry(*request.getSession(), *_user, s.str());
 			}
 
 
@@ -199,7 +199,7 @@ namespace synthese
 				// Change detection
 				if(!s2.str().empty())
 				{
-					ResaDBLog::AddUserChangeAutoResaActivationEntry(*_request->getSession(), *_user);
+					ResaDBLog::AddUserChangeAutoResaActivationEntry(*request.getSession(), *_user);
 
 					// Send confirmation e-mail to the customer
 					if(_autoResaActivated)
@@ -244,7 +244,7 @@ namespace synthese
 						{
 							if(ResaModule::GetReservationContact()->sendCustomerEMail(*_user))
 							{
-								ResaDBLog::AddEMailEntry(*_request->getSession(), *_user, "Message d'activation de réservation en ligne");
+								ResaDBLog::AddEMailEntry(*request.getSession(), *_user, "Message d'activation de réservation en ligne");
 							}
 						}
 					}
@@ -256,9 +256,9 @@ namespace synthese
 		
 		
 		
-		bool ReservationUserUpdateAction::_isAuthorized(
+		bool ReservationUserUpdateAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<ResaRight>(WRITE);
+			return profile.isAuthorized<ResaRight>(WRITE);
 		}
 
 

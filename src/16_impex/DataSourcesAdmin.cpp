@@ -70,8 +70,7 @@ namespace synthese
 
 		
 		void DataSourcesAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_searchName = map.getDefault<string>(PARAM_SEARCH_NAME);
 
@@ -93,9 +92,9 @@ namespace synthese
 
 		
 		bool DataSourcesAdmin::isAuthorized(
-			const FunctionRequest<AdminRequest>& request
+			const security::Profile& profile
 		) const	{
-			return request.isAuthorized<GlobalRight>(READ);
+			return profile.isAuthorized<GlobalRight>(READ);
 		}
 
 
@@ -103,7 +102,7 @@ namespace synthese
 		void DataSourcesAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 
 			AdminFunctionRequest<DataSourcesAdmin> searchRequest(request);
@@ -145,13 +144,16 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DataSourcesAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == ImpExModule::FACTORY_KEY && isAuthorized(request))
-			{
+			if(	moduleKey == ImpExModule::FACTORY_KEY &&
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()
+			){
 				links.push_back(getNewPage());
 			}
 			
@@ -162,7 +164,7 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks DataSourcesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;

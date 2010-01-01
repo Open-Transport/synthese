@@ -106,7 +106,7 @@ namespace synthese
 		
 		
 		
-		void ScheduleRealTimeUpdateAction::run()
+		void ScheduleRealTimeUpdateAction::run(Request& request)
 		{
 			_service->applyRealTimeLateDuration(
 				_lineStopRank,
@@ -119,7 +119,7 @@ namespace synthese
 		
 		
 		
-		bool ScheduleRealTimeUpdateAction::_isAuthorized(
+		bool ScheduleRealTimeUpdateAction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

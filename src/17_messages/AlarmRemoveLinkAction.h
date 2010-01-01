@@ -85,9 +85,11 @@ namespace synthese
 			
 			////////////////////////////////////////////////////////////////////
 			/// Action to run, defined by each subclass.
-			void run() throw(server::ActionException);
+			void run(
+				server::Request& request
+			) throw(server::ActionException);
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 		};
 	}
 }

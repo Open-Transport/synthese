@@ -89,7 +89,7 @@ namespace synthese
 		
 		
 		
-		void NonConcurrencyRuleAddAction::run()
+		void NonConcurrencyRuleAddAction::run(Request& request)
 		{
 			NonConcurrencyRule r;
 			r.setPriorityLine(_priorityLine.get());
@@ -101,9 +101,9 @@ namespace synthese
 		
 		
 		
-		bool NonConcurrencyRuleAddAction::_isAuthorized(
+		bool NonConcurrencyRuleAddAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<TransportNetworkRight>(WRITE);
+			return profile.isAuthorized<TransportNetworkRight>(WRITE);
 		}
 
 

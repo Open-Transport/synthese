@@ -29,7 +29,7 @@
 #include "AdminInterfaceElement.h"
 #include "AdminPagePositionInterfaceElement.h"
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+
 
 using namespace boost;
 using namespace std;
@@ -78,35 +78,38 @@ namespace synthese
 
 			const AdminInterfaceElement::PageLinks& links(
 				page->getTreePosition(
-					static_cast<const FunctionRequest<AdminRequest>& >(*request)
+					*dynamic_cast<const AdminRequest*>(request)
 			)	);
 
 			bool first(true);
-			FunctionRequest<AdminRequest> r(request);
-			for (AdminInterfaceElement::PageLinks::const_iterator it(links.begin()); it != links.end(); ++it)
+			if(request)
 			{
-				if(!withFirst && it == links.begin() && it != links.end()-1) continue;
-
-				if (it == links.end()-1)
+				AdminRequest r(*request);
+				for (AdminInterfaceElement::PageLinks::const_iterator it(links.begin()); it != links.end(); ++it)
 				{
-					if(lastSeparatorIfFirst || it != links.begin())
-						stream << lastSeparator;
-				}
-				else if(first)
-					first = false;
-				else
-					stream << normalSeparator;
+					if(!withFirst && it == links.begin() && it != links.end()-1) continue;
 
-				if(withImages)
-				{
-					stream << HTMLModule::getHTMLImage((*it)->getIcon(), string("-"));
-				}
+					if (it == links.end()-1)
+					{
+						if(lastSeparatorIfFirst || it != links.begin())
+							stream << lastSeparator;
+					}
+					else if(first)
+						first = false;
+					else
+						stream << normalSeparator;
 
-				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(*it));
-				if (withLinks && it != (links.end() -1))
-					stream << HTMLModule::getHTMLLink(r.getURL(), (*it)->getTitle());
-				else
-					stream << (*it)->getTitle();
+					if(withImages)
+					{
+						stream << HTMLModule::getHTMLImage((*it)->getIcon(), string("-"));
+					}
+
+					r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(*it));
+					if (withLinks && it != (links.end() -1))
+						stream << HTMLModule::getHTMLLink(r.getURL(), (*it)->getTitle());
+					else
+						stream << (*it)->getTitle();
+				}
 			}
 			return string();
 		}

@@ -27,7 +27,7 @@
 #include "ResaModule.h"
 #include "BookableCommercialLineAdmin.h"
 #include "ResaRight.h"
-
+#include "Profile.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 
@@ -71,8 +71,7 @@ namespace synthese
 		{ }
 		
 		void BookableCommercialLinesAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_requestParameters.setFromParametersMap(map.getMap());
 		}
@@ -89,7 +88,7 @@ namespace synthese
 		void BookableCommercialLinesAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<AdminRequest>& _request
+			const AdminRequest& _request
 		) const {
 			// Search
 			CommercialLineTableSync::SearchResult lines(
@@ -132,20 +131,22 @@ namespace synthese
 		}
 
 		bool BookableCommercialLinesAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(moduleKey == ResaModule::FACTORY_KEY && isAuthorized(request))
-			{
+			if(	moduleKey == ResaModule::FACTORY_KEY &&
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile())
+			){
 				links.push_back(getNewPage());
 			}
 			return links;
@@ -153,7 +154,7 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 

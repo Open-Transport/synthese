@@ -55,16 +55,19 @@ namespace synthese
 			string formName(_formName->getValue(parameters, variables, object, request));
 			string html(_html->getValue(parameters, variables, object, request));
 			
-			FunctionRequest<RoutePlannerFunction> rprequest(request);
-			rprequest.getFunction()->setMaxSolutions(
-				static_cast<const FunctionRequest<RoutePlannerFunction>* >(
-					request
-				)->getFunction()->getMaxSolutions()
-			);
+			if(request)
+			{
+				FunctionRequest<RoutePlannerFunction> rprequest(*request);
+				rprequest.getFunction()->setMaxSolutions(
+					dynamic_cast<const FunctionRequest<RoutePlannerFunction>* >(
+						request
+					)->getFunction()->getMaxSolutions()
+				);
 
-			HTMLForm form(rprequest.getHTMLForm(formName));
-			stream << form.open(html);
-			stream << form.getHiddenFields();
+				HTMLForm form(rprequest.getHTMLForm(formName));
+				stream << form.open(html);
+				stream << form.getHiddenFields();
+			}
 
 			return string();
 		}

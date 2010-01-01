@@ -79,7 +79,7 @@ namespace synthese
 				throw ActionException("Specified right not found");
 		}
 
-		void DeleteRightAction::run()
+		void DeleteRightAction::run(Request& request)
 		{
 			if (_profile != NULL)
 			{
@@ -90,9 +90,9 @@ namespace synthese
 
 
 
-		bool DeleteRightAction::_isAuthorized(
+		bool DeleteRightAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<SecurityRight>(WRITE);
+			return profile.isAuthorized<SecurityRight>(WRITE);
 		}
 		
 		

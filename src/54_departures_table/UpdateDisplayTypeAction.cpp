@@ -142,7 +142,7 @@ namespace synthese
 			}
 		}
 
-		void UpdateDisplayTypeAction::run()
+		void UpdateDisplayTypeAction::run(Request& request)
 		{
 			// Log entry content
 			stringstream log;
@@ -165,7 +165,7 @@ namespace synthese
 			DisplayTypeTableSync::Save(_dt.get());
 
 			// Log
-			ArrivalDepartureTableLog::addUpdateTypeEntry(_dt.get(), _request->getUser().get(), log.str());
+			ArrivalDepartureTableLog::addUpdateTypeEntry(_dt.get(), request.getUser().get(), log.str());
 		}
 
 
@@ -186,10 +186,10 @@ namespace synthese
 
 
 
-		bool UpdateDisplayTypeAction::_isAuthorized(
+		bool UpdateDisplayTypeAction::isAuthorized(const Profile& profile
 
 			) const {
-			return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+			return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 	}
 }

@@ -174,5 +174,16 @@ namespace synthese
 			_pathGroup = value;
 			if(_reverseRoad) _reverseRoad->setRoadPlace(value);
 		}
+
+
+
+		void Road::merge( Road& other )
+		{
+			Path::merge(static_cast<Path&>(other));
+			if(_reverseRoad && other._reverseRoad)
+			{
+				other._reverseRoad->merge(*_reverseRoad);
+			}
+		}
 	}
 }

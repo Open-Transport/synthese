@@ -22,7 +22,7 @@
 
 #include "AdminModule.h"
 #include "AdminInterfaceElement.h"
-#include "AdminRequest.h"
+
 
 using namespace boost;
 using namespace std;

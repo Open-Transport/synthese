@@ -97,7 +97,7 @@ namespace synthese
 		
 		
 		
-		void AddUserFavoriteJourneyAction::run()
+		void AddUserFavoriteJourneyAction::run(Request& request)
 		{
 			UserFavoriteJourney f;
 			f.setUser(_user.get());
@@ -110,11 +110,11 @@ namespace synthese
 
 
 
-		bool AddUserFavoriteJourneyAction::_isAuthorized(
+		bool AddUserFavoriteJourneyAction::isAuthorized(const Profile& profile
 		) const {
 			return 
-				_request->isAuthorized<GlobalRight>(WRITE) ||
-				_request->getUser() != NULL && _request->getUser()->getKey() == _user->getKey();
+				profile.isAuthorized<GlobalRight>(WRITE) ||
+				request.getUser() != NULL && request.getUser()->getKey() == _user->getKey();
 
 		}
 	}

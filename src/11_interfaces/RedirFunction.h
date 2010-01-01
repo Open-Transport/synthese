@@ -58,13 +58,13 @@ namespace synthese
 
 			/** Action to run, defined by each subclass.
 			*/
-			void _run(std::ostream& stream) const;
+			void run(std::ostream& stream, const server::Request& request) const;
 
 		public:
 			void				setRedirURL(const std::string& url);
 			const std::string&	getRedirURL()	const;
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 
 			virtual std::string getOutputMimeType() const;

@@ -74,16 +74,16 @@ namespace synthese
 		
 		
 		
-		void NonConcurrencyRuleRemoveAction::run()
+		void NonConcurrencyRuleRemoveAction::run(Request& request)
 		{
 			NonConcurrencyRuleTableSync::Remove(_rule->getKey());
 		}
 		
 		
 		
-		bool NonConcurrencyRuleRemoveAction::_isAuthorized(
+		bool NonConcurrencyRuleRemoveAction::isAuthorized(const Profile& profile
 		) const {
-			return _rule.get() && _request->isAuthorized<TransportNetworkRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_rule->getKey()));
+			return _rule.get() && profile.isAuthorized<TransportNetworkRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_rule->getKey()));
 		}
 
 

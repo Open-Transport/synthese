@@ -36,6 +36,7 @@
 #include "AdminFunctionRequest.hpp"
 #include "SearchFormHTMLTable.h"
 #include "Date.h"
+#include "Profile.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -97,8 +98,7 @@ namespace synthese
 
 		
 		void ResaStatisticsAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			RegistryKeyType id(map.get<RegistryKeyType>(PARAM_LINE_ID));
 			try
@@ -143,12 +143,12 @@ namespace synthese
 
 		
 		bool ResaStatisticsAdmin::isAuthorized(
-			const FunctionRequest<AdminRequest>& request
+			const Profile& profile
 		) const	{
 			if (!_line.get())
 				return false;
 
-			return request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
+			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
 		}
 
 
@@ -156,7 +156,7 @@ namespace synthese
 		void ResaStatisticsAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 
 			stream << "<h1>Requête</h1>";
@@ -275,7 +275,7 @@ namespace synthese
 
 			stream << "<h1>Export CSV</h1>";
 
-			FunctionRequest<CSVResaStatisticsFunction> csvRequest(&request);
+			FunctionRequest<CSVResaStatisticsFunction> csvRequest(request);
 			csvRequest.getFunction()->setLine(_line);
 			csvRequest.getFunction()->setPeriod(_searchPeriod);
 			csvRequest.getFunction()->setRowStep(_searchRowStep);

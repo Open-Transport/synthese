@@ -95,7 +95,7 @@ namespace synthese
 			_cityText = map.get<string>(PARAMETER_CITY_TEXT);
 		}
 
-		void PlacesListFunction::_run( std::ostream& stream ) const
+		void PlacesListFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			Site::CitiesMatcher::MatchResult cities(
 				_site->getCitiesMatcher().bestMatches(_cityText, 1)
@@ -119,7 +119,7 @@ namespace synthese
 				}
 
 				VariablesMap vm;
-				_page->display(stream, vm, placesList, false, _isForOrigin, city, _request);
+				_page->display(stream, vm, placesList, false, _isForOrigin, city, &request);
 			}
 			else
 			{
@@ -175,7 +175,7 @@ namespace synthese
 
 
 
-		bool PlacesListFunction::_isAuthorized(
+		bool PlacesListFunction::isAuthorized(const Profile& profile
 		) const {
 			return true;
 		}

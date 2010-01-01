@@ -72,12 +72,12 @@ namespace synthese
 			_monitoringDelay = minutes(map.getInt(PARAMETER_MONITORING_DELAY, true, FACTORY_KEY));
 		}
 
-		void DisplayScreenCPUMaintenanceUpdateAction::run()
+		void DisplayScreenCPUMaintenanceUpdateAction::run(Request& request)
 		{
 			// Log
-			DisplayMaintenanceLog::AddAdminEntry(*_cpu, *_request->getUser(), "Statut en service", _cpu->getIsOnline() ? "OUI" : "NON", _isOnline ? "OUI" : "NON");
-			DisplayMaintenanceLog::AddAdminEntry(*_cpu, *_request->getUser(), "Message de maintenance", _cpu->getMaintenanceMessage(), _maintenanceMessage);
-			DisplayMaintenanceLog::AddAdminEntry(*_cpu, *_request->getUser(), "Délai de contact", to_simple_string(_cpu->getMonitoringDelay()), to_simple_string(_monitoringDelay));
+			DisplayMaintenanceLog::AddAdminEntry(*_cpu, *request.getUser(), "Statut en service", _cpu->getIsOnline() ? "OUI" : "NON", _isOnline ? "OUI" : "NON");
+			DisplayMaintenanceLog::AddAdminEntry(*_cpu, *request.getUser(), "Message de maintenance", _cpu->getMaintenanceMessage(), _maintenanceMessage);
+			DisplayMaintenanceLog::AddAdminEntry(*_cpu, *request.getUser(), "Délai de contact", to_simple_string(_cpu->getMonitoringDelay()), to_simple_string(_monitoringDelay));
 
 			// Action
 			_cpu->setIsOnline(_isOnline);
@@ -88,12 +88,12 @@ namespace synthese
 
 
 
-		bool DisplayScreenCPUMaintenanceUpdateAction::_isAuthorized(
+		bool DisplayScreenCPUMaintenanceUpdateAction::isAuthorized(const Profile& profile
 		) const {
 			return
 				_cpu->getPlace() ?
-				_request->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
-				_request->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER)
+				profile.isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
+				profile.isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER)
 			;
 		}
 

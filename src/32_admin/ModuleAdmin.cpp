@@ -27,7 +27,7 @@
 #include "ModuleClass.h"
 #include "HTMLModule.h"
 #include "AdminParametersException.h"
-#include "AdminRequest.h"
+
 
 #include <boost/foreach.hpp>
 
@@ -63,8 +63,7 @@ namespace synthese
 		{ }
 		
 		void ModuleAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			try
 			{
@@ -107,7 +106,7 @@ namespace synthese
 			
 			stream << "<ul>";
 
-			FunctionRequest<AdminRequest> r(&_request);
+			AdminRequest r(_request);
 			AdminInterfaceElement::PageLinks links(getSubPages(*this, _request));
 			BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> page, links)
 			{
@@ -120,15 +119,14 @@ namespace synthese
 		}
 
 		bool ModuleAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
+			const security::Profile& profile
+		) const	{
 			return true;
 		}
 		
 		AdminInterfaceElement::PageLinks ModuleAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
@@ -155,7 +153,7 @@ namespace synthese
 
 		bool ModuleAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			return true;
 		}

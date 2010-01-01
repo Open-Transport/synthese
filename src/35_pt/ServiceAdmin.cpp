@@ -42,6 +42,7 @@
 #include "ServiceVertexRealTimeUpdateAction.h"
 #include "CalendarHTMLViewer.h"
 #include "LineAdmin.h"
+#include "Profile.h"
 
 using namespace std;
 using namespace boost;
@@ -84,8 +85,7 @@ namespace synthese
 
 		
 		void ServiceAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			RegistryKeyType id(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 			try
@@ -127,9 +127,9 @@ namespace synthese
 
 		
 		bool ServiceAdmin::isAuthorized(
-			const FunctionRequest<AdminRequest>& request
+			const security::Profile& profile
 		) const	{
-			return request.isAuthorized<TransportNetworkRight>(READ);
+			return profile.isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -137,7 +137,7 @@ namespace synthese
 		void ServiceAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 		
 			////////////////////////////////////////////////////////////////////
@@ -274,7 +274,7 @@ namespace synthese
 
 
 		void ServiceAdmin::_buildTabs(
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			_tabs.clear();
 

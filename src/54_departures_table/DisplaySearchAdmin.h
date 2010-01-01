@@ -29,11 +29,6 @@
 
 namespace synthese
 {
-	namespace admin
-	{
-		class AdminRequest;
-	}
-
 	namespace env
 	{
 		class PublicTransportStopZoneConnectionPlace;
@@ -148,8 +143,7 @@ namespace synthese
 				@param request The request to use for the initialization.
 			*/
 			void setFromParametersMap(
-				const server::ParametersMap& map,
-				bool objectWillBeCreatedLater
+				const server::ParametersMap& map
 			);
 			
 			
@@ -167,7 +161,7 @@ namespace synthese
 				@param stream Stream to write on.
 			*/
 			void display(std::ostream& stream, interfaces::VariablesMap& variables,
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const admin::AdminRequest& _request
 			) const;
 
 
@@ -179,7 +173,7 @@ namespace synthese
 				, uid lineUid, uid typeUid, int state, int message );
 
 			bool isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const security::Profile& profile
 			) const;
 
 			/** Gets sub page of the designed parent page, which are from the current class.
@@ -192,20 +186,20 @@ namespace synthese
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const std::string& moduleKey,
 				const AdminInterfaceElement& currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const admin::AdminRequest& request
 			) const;
 			
 			
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const admin::AdminRequest& request
 			) const;
 
 			virtual std::string getTitle() const;
 
 
 			virtual void _buildTabs(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const admin::AdminRequest& _request
 			) const;
 
 			void setPlace(const util::RegistryKeyType id);

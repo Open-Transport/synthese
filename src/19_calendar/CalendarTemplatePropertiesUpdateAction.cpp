@@ -90,7 +90,7 @@ namespace synthese
 		
 		
 		
-		void CalendarTemplatePropertiesUpdateAction::run()
+		void CalendarTemplatePropertiesUpdateAction::run(Request& request)
 		{
 			_calendar->setText(_name);
 			_calendar->setCategory(_category);
@@ -100,9 +100,9 @@ namespace synthese
 		
 		
 		
-		bool CalendarTemplatePropertiesUpdateAction::_isAuthorized(
+		bool CalendarTemplatePropertiesUpdateAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<CalendarRight>(WRITE);
+			return profile.isAuthorized<CalendarRight>(WRITE);
 		}
 
 

@@ -56,12 +56,12 @@ namespace synthese
 			const AdminInterfaceElement* aie(static_cast<const AdminInterfaceElement*>(object));
 			assert(aie != NULL);
 
-			if(aie != NULL)
+			if(aie != NULL && request)
 			{
 				aie->displayTabs(
 					stream,
 					variables,
-					static_cast<const FunctionRequest<AdminRequest>& >(*request)
+					*dynamic_cast<const AdminRequest*>(request)
 				);
 			}
 			return string();

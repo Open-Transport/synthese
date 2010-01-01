@@ -266,11 +266,20 @@ namespace synthese
 						{
 							shared_ptr<PhysicalStop> stop(PhysicalStopTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL));
 							PublicTransportStopZoneConnectionPlace* place(const_cast<PublicTransportStopZoneConnectionPlace*>(stop->getConnectionPlace()));
+							PhysicalStopTableSync::Search(*_env, place->getKey());
+							AddressTableSync::Search(*_env, place->getKey());
 							place->addAddress(address.get());
 							BOOST_FOREACH(const Address* add2, place->getAddresses())
 							{
-								place->addForbiddenTransferDelay(add2->getKey(), address->getKey());
-								place->addForbiddenTransferDelay(address->getKey(), add2->getKey());
+								if(add2 == address.get())
+								{
+									place->addTransferDelay(add2->getKey(), address->getKey(), posix_time::minutes(0));
+								}
+								else
+								{
+									place->addForbiddenTransferDelay(add2->getKey(), address->getKey());
+									place->addForbiddenTransferDelay(address->getKey(), add2->getKey());
+								}
 							}
 							BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& ps2, place->getPhysicalStops())
 							{
@@ -429,6 +438,23 @@ namespace synthese
 							secondRoadChunk->setKey(RoadChunkTableSync::getId());
 							road->addRoadChunk(secondRoadChunk.get());
 							_env->getEditableRegistry<RoadChunk>().add(secondRoadChunk);
+
+							// Search for a second existing road which starts at the right node
+							Road* road2 = NULL;
+							BOOST_FOREACH(const Road* croad, roadPlace->getRoads())
+							{
+								if(croad->getEdge(0)->getFromVertex() == rightNode)
+								{
+									road2 = const_cast<Road*>(croad);
+									break;
+								}
+							}
+							// If found, merge the two roads
+							if(road2)
+							{
+								road->merge(*road2);
+							}
+
 						}
 						else
 						{

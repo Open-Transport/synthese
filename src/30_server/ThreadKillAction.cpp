@@ -66,16 +66,16 @@ namespace synthese
 		
 		
 		
-		void ThreadKillAction::run()
+		void ThreadKillAction::run(Request& request)
 		{
 			ServerModule::KillThread(_thread_id);
 		}
 
 
 
-		bool ThreadKillAction::_isAuthorized() const
+		bool ThreadKillAction::isAuthorized(const Profile& profile) const
 		{
-			return _request->isAuthorized<ServerAdminRight>(DELETE_RIGHT);
+			return profile.isAuthorized<ServerAdminRight>(DELETE_RIGHT);
 		}
 
 

@@ -23,30 +23,23 @@
 */
 
 #include "SiteRoutePlanningAdmin.h"
-
-#include "Journey.h"
-#include "ServiceUse.h"
+#include "Profile.h"
 #include "Line.h"
-#include "CommercialLine.h"
-#include "LineStop.h"
-#include "Road.h"
-#include "RoadChunk.h"
-#include "AddressablePlace.h"
 #include "PlacesListModule.h"
 #include "Site.h"
 #include "SiteTableSync.h"
 #include "TransportSiteAdmin.h"
 #include "TransportWebsiteRight.h"
-#include "RoadPlace.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "SearchFormHTMLTable.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "HTMLForm.h"
 #include "PTRoutePlannerResult.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -61,7 +54,6 @@ namespace synthese
 	using namespace env;
 	using namespace security;
 	using namespace graph;
-	using namespace road;
 	using namespace geography;
 
 	namespace util
@@ -97,8 +89,7 @@ namespace synthese
 
 		
 		void SiteRoutePlanningAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_startCity = map.getString(PARAMETER_START_CITY, false, FACTORY_KEY);
 			_startPlace = map.getString(PARAMETER_START_PLACE, false, FACTORY_KEY);
@@ -147,7 +138,7 @@ namespace synthese
 
 
 		void SiteRoutePlanningAdmin::display(ostream& stream, VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
+					const admin::AdminRequest& _request) const
 		{
 			AdminFunctionRequest<SiteRoutePlanningAdmin> searchRequest(_request);
 
@@ -196,148 +187,15 @@ namespace synthese
 
 			stream << "<h1>Résultats</h1>";
 
-			if (jv.getJourneys().empty())
-			{
-				stream << "Aucun résultat trouvé de " << (
-					dynamic_cast<const NamedPlace*>(startPlace) ?
-					dynamic_cast<const NamedPlace*>(startPlace)->getFullName() :
-				dynamic_cast<const City*>(startPlace)->getName()
-					) << " à " << (
-					dynamic_cast<const NamedPlace*>(endPlace) ?
-					dynamic_cast<const NamedPlace*>(endPlace)->getFullName() :
-				dynamic_cast<const City*>(endPlace)->getName()
-					);
-				return;
-			}
-			
-			HTMLTable::ColsVector v;
-			v.push_back("Départ<br />" + (
-				dynamic_cast<const NamedPlace*>(startPlace) ?
-				dynamic_cast<const NamedPlace*>(startPlace)->getFullName() :
-				dynamic_cast<const City*>(startPlace)->getName()
-			)	);
-			v.push_back("Ligne");
-			v.push_back("Arrivée");
-			v.push_back("Correspondance");
-			v.push_back("Départ");
-			v.push_back("Ligne");
-			v.push_back("Arrivée<br />" + (
-				dynamic_cast<const NamedPlace*>(endPlace) ?
-				dynamic_cast<const NamedPlace*>(endPlace)->getFullName() :
-				dynamic_cast<const City*>(endPlace)->getName()
-			)	);
-			HTMLTable t(v,"adminresults");
-
-			int solution(1);
-			stream << t.open();
-			for(PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().begin()); it != jv.getJourneys().end(); ++it)
-			{
-				stream << t.row();
-				stream << t.col(7, string(), true) << "Solution " << solution++;
-
-				// Departure time
-				Journey::ServiceUses::const_iterator its(it->getServiceUses().begin());
-
-				if (it->getContinuousServiceRange() > 1)
-				{
-					DateTime endRange(its->getDepartureDateTime());
-					endRange += it->getContinuousServiceRange();
-					stream << " - Service continu jusqu'à " << endRange.toString();
-				}
-				if (it->getReservationCompliance() == true)
-				{
-					stream << " - Réservation obligatoire avant le " << it->getReservationDeadLine().toString();
-				}
-				if (it->getReservationCompliance() == boost::logic::indeterminate)
-				{
-					stream << " - Réservation facultative avant le " << it->getReservationDeadLine().toString();
-				}
-				if(dynamic_cast<const City*>(startPlace) || dynamic_cast<const City*>(endPlace))
-				{
-					stream << " (";
-					if(dynamic_cast<const City*>(startPlace))
-					{
-						stream << "départ de " << 
-							static_cast<const PublicTransportStopZoneConnectionPlace*>(
-								its->getDepartureEdge()->getHub()
-							)->getFullName()
-						;
-					}
-					if(dynamic_cast<const City*>(endPlace))
-					{
-						if(dynamic_cast<const City*>(startPlace)) stream << " - ";
-						Journey::ServiceUses::const_iterator ite(it->getServiceUses().end() - 1);
-						stream << "arrivée à " << 
-							static_cast<const PublicTransportStopZoneConnectionPlace*>(
-								ite->getArrivalEdge()->getHub()
-							)->getFullName()
-						;
-					}
-					stream << ")";
-				}
-
-				stream << t.row();
-				stream << t.col() << its->getDepartureDateTime().toString();
-
-				// Line
-				const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-				const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-				stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
-				stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
-
-				// Transfers
-				if (its == it->getServiceUses().end() -1)
-				{
-					stream << t.col(4) << "(trajet direct)";
-				}
-				else
-				{
-					while(true)
-					{
-						// Arrival
-						stream << t.col() << its->getArrivalDateTime().toString();
-
-						// Place
-						stream << t.col() << 
-							dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub())->getFullName();
-
-						// Next service use
-						++its;
-
-						// Departure
-						stream << t.col() << its->getDepartureDateTime().toString();
-						
-						// Line
-						const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-						const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-						stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
-						stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
-
-						// Exit if last service use
-						if (its == it->getServiceUses().end() -1)
-							break;
-
-						// Empty final arrival col
-						stream << t.col();
-
-						// New row and empty origin departure cols;
-						stream << t.row();
-						stream << t.col();
-						stream << t.col();
-					}
-				}
-
-				// Final arrival
-				stream << t.col() << its->getArrivalDateTime().toString();
-			}
-			stream << t.close();
+			jv.displayHTMLTable(stream, optional<HTMLForm&>(), string());
 		}
 
+
+
 		bool SiteRoutePlanningAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<TransportWebsiteRight>(READ);
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<TransportWebsiteRight>(READ);
 		}
 		
 		

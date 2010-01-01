@@ -43,6 +43,7 @@
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "SearchFormHTMLTable.h"
+#include "Profile.h"
 
 #include <boost/foreach.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -86,11 +87,8 @@ namespace synthese
 		{ }
 		
 		void CalendarTemplateAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
-			if(objectWillBeCreatedLater) return;
-			
 			_requestParameters.setFromParametersMap(map.getMap(), CalendarTemplateElementTableSync::COL_RANK);
 			try
 			{
@@ -127,7 +125,7 @@ namespace synthese
 		void CalendarTemplateAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const {
 
 			////////////////////////////////////////////////////////////////////
@@ -260,9 +258,9 @@ namespace synthese
 		}
 
 		bool CalendarTemplateAdmin::isAuthorized(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const security::Profile& profile
 		) const {
-			return _request.isAuthorized<CalendarRight>(READ);
+			return profile.isAuthorized<CalendarRight>(READ);
 		}
 		
 
@@ -289,7 +287,7 @@ namespace synthese
 
 
 
-		void CalendarTemplateAdmin::_buildTabs( const server::FunctionRequest<admin::AdminRequest>& request ) const
+		void CalendarTemplateAdmin::_buildTabs( const admin::AdminRequest& request ) const
 		{
 			_tabs.clear();
 

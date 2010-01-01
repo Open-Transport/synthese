@@ -29,6 +29,7 @@
 #include "TransportNetworkRight.h"
 #include "TransportNetwork.h"
 #include "TransportNetworkAdmin.h"
+#include "Profile.h"
 
 using namespace std;
 using namespace boost;
@@ -66,8 +67,7 @@ namespace synthese
 
 		
 		void PTNetworksAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_searchName = map.getDefault<string>(PARAM_SEARCH_NAME);
 
@@ -87,9 +87,9 @@ namespace synthese
 
 		
 		bool PTNetworksAdmin::isAuthorized(
-			const FunctionRequest<AdminRequest>& request
+			const security::Profile& profile
 		) const	{
-			return request.isAuthorized<TransportNetworkRight>(READ);
+			return profile.isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -97,7 +97,7 @@ namespace synthese
 		void PTNetworksAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 		
 			/// @todo Implement the display by streaming the output to the stream variable
@@ -109,12 +109,14 @@ namespace synthese
 		AdminInterfaceElement::PageLinks PTNetworksAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == PTModule::FACTORY_KEY && isAuthorized(request))
+			if (moduleKey == PTModule::FACTORY_KEY && request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()))
 			{
 				links.push_back(getNewPage());
 			}
@@ -126,7 +128,7 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks PTNetworksAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const FunctionRequest<AdminRequest>& request
+			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;

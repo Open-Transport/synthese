@@ -76,7 +76,7 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenRemoveForbiddenPlaceAction::run()
+		void DisplayScreenRemoveForbiddenPlaceAction::run(Request& request)
 		{
 			_screen->removeForbiddenPlace(_place.get());
 			DisplayScreenTableSync::Save(_screen.get());
@@ -86,23 +86,23 @@ namespace synthese
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
 				"Retrait de l'arrêt à ne pas desservir "+ _place->getFullName(),
-				*_request->getUser()
+				*request.getUser()
 			);
 
 		}
 
 
 
-		bool DisplayScreenRemoveForbiddenPlaceAction::_isAuthorized(
+		bool DisplayScreenRemoveForbiddenPlaceAction::isAuthorized(const Profile& profile
 		) const {
 			assert(_screen.get() != NULL);
 			if (_screen->getLocalization() != NULL)
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return _request->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 		

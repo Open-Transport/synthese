@@ -47,7 +47,7 @@
 #include "AdminFunctionRequest.hpp"
 #include "RequestException.h"
 #include "ActionFunctionRequest.h"
-
+#include "Profile.h"
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"
@@ -100,8 +100,7 @@ namespace synthese
 		{ }
 		
 		void BookableCommercialLineAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 
 			// Date
@@ -172,7 +171,7 @@ namespace synthese
 
 
 		void BookableCommercialLineAdmin::display(ostream& stream, VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request) const
+					const admin::AdminRequest& _request) const
 		{
 			// Rights
 			bool globalReadRight(
@@ -502,13 +501,12 @@ namespace synthese
 		}
 
 		bool BookableCommercialLineAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
+			const security::Profile& profile
+		) const	{
 			if (!_line.get())
 				return false;
 
-			return _request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
+			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
 		}
 		
 
@@ -586,7 +584,7 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLineAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			const BookableCommercialLineAdmin* ba(
 				dynamic_cast<const BookableCommercialLineAdmin*>(&currentPage)
@@ -622,7 +620,7 @@ namespace synthese
 		}
 		
 
-		bool BookableCommercialLineAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage, const server::FunctionRequest<admin::AdminRequest>& request ) const
+		bool BookableCommercialLineAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage, const admin::AdminRequest& request ) const
 		{
 			return
 				!request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL) &&

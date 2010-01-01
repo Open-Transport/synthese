@@ -84,8 +84,7 @@ namespace synthese
 		{}
 
 		void BroadcastPointsAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_cityName = map.getDefault<string>(PARAMETER_CITY_NAME);
 			_placeName = map.getDefault<string>(PARAMETER_PLACE_NAME);
@@ -116,7 +115,7 @@ namespace synthese
 		void BroadcastPointsAdmin::display(
 			ostream& stream,
 			interfaces::VariablesMap& variables,
-			const server::FunctionRequest<admin::AdminRequest>& _request) const
+			const admin::AdminRequest& _request) const
 		{
 			vector<pair<int, string> > m;
 			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre désactivé)"));
@@ -229,9 +228,9 @@ namespace synthese
 
 
 		bool BroadcastPointsAdmin::isAuthorized(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const security::Profile& profile
 		) const {
-			return _request.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			return profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 
@@ -239,10 +238,12 @@ namespace synthese
 		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (moduleKey == DeparturesTableModule::FACTORY_KEY && isAuthorized(request))
+			if (moduleKey == DeparturesTableModule::FACTORY_KEY && request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()))
 			{
 				links.push_back(getNewPage());
 			}
@@ -252,7 +253,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
@@ -297,7 +298,7 @@ namespace synthese
 
 		bool BroadcastPointsAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			return true;
 		}

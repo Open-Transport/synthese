@@ -211,6 +211,7 @@ namespace synthese
 
 		AddressTableSync::SearchResult AddressTableSync::Search(
 			Env& env,
+			boost::optional<util::RegistryKeyType> placeId /*= boost::optional<util::RegistryKeyType>()*/,
 			int first /*= 0*/,
 			boost::optional<std::size_t> number /*= 0*/,
 			LinkLevel linkLevel
@@ -219,14 +220,19 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
-				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-				;
+				<< " WHERE 1 ";
+			if(placeId)
+			{
+				query << COL_PLACEID << "=" << *placeId;
+			}
 			if (number)
+			{
 				query << " LIMIT " << (*number + 1);
-			if (first > 0)
-				query << " OFFSET " << first;
+				if (first > 0)
+				{
+					query << " OFFSET " << first;
+				}
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

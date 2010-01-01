@@ -131,7 +131,7 @@ namespace synthese
 			}
 		}
 
-		void UserUpdateAction::run()
+		void UserUpdateAction::run(Request& request)
 		{
 			stringstream s;
 			DBLogModule::appendToLogIfChange(s, "Login", _user->getLogin(), _login);
@@ -170,15 +170,15 @@ namespace synthese
 
 			UserTableSync::Save(_user.get());
 
-			SecurityLog::addUserAdmin(_request->getUser().get(), _user.get(), s.str());
+			SecurityLog::addUserAdmin(request.getUser().get(), _user.get(), s.str());
 		}
 
 
 
-		bool UserUpdateAction::_isAuthorized(
+		bool UserUpdateAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<SecurityRight>(WRITE) ||
-				_request->getUser() != NULL && _request->getUser()->getKey() == _user->getKey();
+			return profile.isAuthorized<SecurityRight>(WRITE) ||
+				request.getUser() != NULL && request.getUser()->getKey() == _user->getKey();
 		}
 		
 		

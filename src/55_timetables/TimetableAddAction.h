@@ -68,13 +68,13 @@ namespace synthese
 		public:
 			/** Action to run, defined by each subclass.
 			*/
-			void run();
+			void run(server::Request& request);
 
 			void setBook(boost::shared_ptr<const Timetable> book);
 			
 			TimetableAddAction();
 			
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 		};
 	}
 }

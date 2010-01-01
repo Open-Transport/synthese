@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_RequestWithInterface_h__
 #define SYNTHESE_RequestWithInterface_h__
 
-#include "30_server/Function.h"
+#include "Function.h"
 
 namespace synthese
 {

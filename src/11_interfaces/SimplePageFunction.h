@@ -68,7 +68,7 @@ namespace synthese
 
 			/** Action to run, defined by each subclass.
 			*/
-			void _run(std::ostream& stream) const;
+			void run(std::ostream& stream, const server::Request& request) const;
 
 			/** This function can be used without any session.
 				@return false
@@ -78,7 +78,7 @@ namespace synthese
 		public:
 			void setPage(const interfaces::InterfacePage* page);
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 			virtual std::string getOutputMimeType() const;
 		};

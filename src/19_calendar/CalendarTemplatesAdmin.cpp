@@ -24,7 +24,7 @@
 
 #include "CalendarTemplatesAdmin.h"
 #include "CalendarModule.h"
-
+#include "Profile.h"
 #include "ResultHTMLTable.h"
 #include "HTMLModule.h"
 #include "HTMLForm.h"
@@ -75,10 +75,8 @@ namespace synthese
 		{ }
 		
 		void CalendarTemplatesAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
-
 		}
 		
 		
@@ -93,7 +91,7 @@ namespace synthese
 		void CalendarTemplatesAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+					const admin::AdminRequest& _request
 		) const {
 			// Requests
 
@@ -147,21 +145,22 @@ namespace synthese
 		}
 
 		bool CalendarTemplatesAdmin::isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
-			) const
-		{
-			return _request.isAuthorized<CalendarRight>(READ);
+			const security::Profile& profile
+		) const	{
+			return profile.isAuthorized<CalendarRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			if(	moduleKey == CalendarModule::FACTORY_KEY &&
-				isAuthorized(request)
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser()->getProfile()
 			){
 				links.push_back(getNewPage());
 			}
@@ -170,7 +169,7 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 

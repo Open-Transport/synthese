@@ -26,7 +26,7 @@
 #include "DBLogRight.h"
 #include "DBLog.h"
 #include "FactorableTemplate.h"
-#include "Request.h"
+#include "Profile.h"
 
 namespace synthese
 {
@@ -41,19 +41,19 @@ namespace synthese
 		{
 		public:
 			static bool IsAuthorized(
-				const server::Request& request,
+				const security::Profile& profile,
 				const security::RightLevel& level
 			){
-				return request.isAuthorized<DBLogRight>(level, security::UNKNOWN_RIGHT_LEVEL, T::FACTORY_KEY);
+				return profile.isAuthorized<DBLogRight>(level, security::UNKNOWN_RIGHT_LEVEL, T::FACTORY_KEY);
 			}
 
 
 
 			virtual bool isAuthorized(
-				const server::Request& request,
+				const security::Profile& profile,
 				const security::RightLevel& level
 			){
-				return IsAuthorized(request, level);
+				return IsAuthorized(profile, level);
 			};
 
 		};

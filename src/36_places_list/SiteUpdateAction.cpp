@@ -100,7 +100,7 @@ namespace synthese
 		
 		
 		
-		void SiteUpdateAction::run()
+		void SiteUpdateAction::run(Request& request)
 		{
 			_site->setName(_name);
 			_site->setInterface(_interface.get());
@@ -130,7 +130,7 @@ namespace synthese
 
 
 
-		bool SiteUpdateAction::_isAuthorized(
+		bool SiteUpdateAction::isAuthorized(const Profile& profile
 
 			) const {
 			return true;

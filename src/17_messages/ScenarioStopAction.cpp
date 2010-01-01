@@ -71,7 +71,7 @@ namespace synthese
 			}
 		}
 
-		void ScenarioStopAction::run()
+		void ScenarioStopAction::run(Request& request)
 		{
 			// Action
 			_scenario->setPeriodEnd(_stopDateTime);
@@ -80,7 +80,7 @@ namespace synthese
 			ScenarioTableSync::Save(_scenario.get());
 
 			// Log
-			MessagesLog::addUpdateEntry(_scenario.get(), "Diffusion arrêtée le " + _stopDateTime.toString(), _request->getUser().get());
+			MessagesLog::addUpdateEntry(_scenario.get(), "Diffusion arrêtée le " + _stopDateTime.toString(), request.getUser().get());
 		}
 
 		ScenarioStopAction::ScenarioStopAction()
@@ -91,9 +91,9 @@ namespace synthese
 
 
 
-		bool ScenarioStopAction::_isAuthorized(
+		bool ScenarioStopAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<MessagesRight>(WRITE);
+			return profile.isAuthorized<MessagesRight>(WRITE);
 		}
 		
 		void ScenarioStopAction::setScenario(boost::shared_ptr<SentScenario> value){

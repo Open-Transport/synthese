@@ -60,12 +60,14 @@ namespace synthese
 			///	@throws ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const server::ParametersMap& map) throw(server::ActionException);
 
-			virtual bool _isAuthorized() const;
+			virtual bool isAuthorized(const security::Profile& profile) const;
 
 		public:
 			////////////////////////////////////////////////////////////////////
 			/// Runs the action.
-			void run() throw(server::ActionException);
+			void run(
+				server::Request& request
+			) throw(server::ActionException);
 
 			////////////////////////////////////////////////////////////////////
 			/// Display screen setter

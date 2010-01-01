@@ -65,8 +65,7 @@ namespace synthese
 				@date 2008
 			*/
 			virtual void setFromParametersMap(
-				const server::ParametersMap& map,
-				bool objectWillBeCreatedLater
+				const server::ParametersMap& map
 			);
 			
 			
@@ -89,7 +88,7 @@ namespace synthese
 			void display(
 				std::ostream& stream,
 				interfaces::VariablesMap& variables,
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const admin::AdminRequest& _request
 			) const;
 			
 			/** Authorization control.
@@ -98,7 +97,7 @@ namespace synthese
 				@date 2008
 			*/
 			bool isAuthorized(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const security::Profile& profile
 			) const;
 			
 			
@@ -111,7 +110,7 @@ namespace synthese
 			
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
-				const server::FunctionRequest<admin::AdminRequest>& request
+				const admin::AdminRequest& request
 			) const;
 			
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
@@ -127,7 +126,7 @@ namespace synthese
 			///			relaunched
 			////////////////////////////////////////////////////////////////////
 			virtual void _buildTabs(
-				const server::FunctionRequest<admin::AdminRequest>& _request
+				const admin::AdminRequest& _request
 			) const;
 		};
 	}

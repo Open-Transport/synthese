@@ -84,8 +84,7 @@ namespace synthese
 		{}
 
 		void DBLogAdmin::setFromParametersMap(
-			const ParametersMap& map,
-			bool objectWillBeCreatedLater
+			const ParametersMap& map
 		){
 			_viewer.set(
 				map,
@@ -107,7 +106,7 @@ namespace synthese
 		void DBLogAdmin::display(
 			ostream& stream,
 			interfaces::VariablesMap& variables,
-					const server::FunctionRequest<admin::AdminRequest>& _request
+					const admin::AdminRequest& _request
 		) const {
 			stream << "<h1>Journal</h1>";
 
@@ -138,9 +137,9 @@ namespace synthese
 		}
 
 		bool DBLogAdmin::isAuthorized(
-			const server::FunctionRequest<admin::AdminRequest>& _request
+			const security::Profile& profile
 		) const	{
-			return _viewer.isAuthorized(_request);
+			return _viewer.isAuthorized(profile);
 		}
 
 
@@ -148,16 +147,18 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DBLogAdmin::getSubPagesOfModule(
 			const std::string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const server::FunctionRequest<admin::AdminRequest>& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == DBLogModule::FACTORY_KEY
+			if(	moduleKey == DBLogModule::FACTORY_KEY &&
+				request.getUser() &&
+				request.getUser()->getProfile()
 			){
 				vector<shared_ptr<DBLog> > logs(Factory<DBLog>::GetNewCollection());
 				BOOST_FOREACH(const shared_ptr<DBLog> loge, logs)
 				{
-					if(!loge->isAuthorized(request, READ) || loge->getName().empty()) continue;
+					if(!loge->isAuthorized(*request.getUser()->getProfile(), READ) || loge->getName().empty()) continue;
 
 					shared_ptr<DBLogAdmin> p(
 						getNewOtherPage<DBLogAdmin>(false)

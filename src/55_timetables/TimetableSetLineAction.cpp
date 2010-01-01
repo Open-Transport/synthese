@@ -86,7 +86,7 @@ namespace synthese
 		
 		
 		
-		void TimetableSetLineAction::run()
+		void TimetableSetLineAction::run(Request& request)
 		{
 			if(_timetable->getAuthorizedLines().find(_line.get()) == _timetable->getAuthorizedLines().end())
 			{
@@ -101,9 +101,9 @@ namespace synthese
 		
 		
 		
-		bool TimetableSetLineAction::_isAuthorized(
+		bool TimetableSetLineAction::isAuthorized(const Profile& profile
 		) const {
-			return _request->isAuthorized<TimetableRight>(WRITE);
+			return profile.isAuthorized<TimetableRight>(WRITE);
 		}
 
 
