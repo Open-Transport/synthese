@@ -27,83 +27,83 @@
 
 namespace synthese
 {
-	namespace geometry
-	{
-		class Point2D;
+namespace geometry
+{
+class Point2D;
 
 
-		/** Square of distance between two points, approximated to 2kms.
-		@ingroup m06
+/** Square of distance between two points, approximated to 2kms.
+@ingroup m06
 
-		This class is used to store squre distances between point coordinates in kilometers.
-		The approximation is aimed at fastening intensive calculation that is needed by recursive algorithm.
+This class is used to store squre distances between point coordinates in kilometers.
+The approximation is aimed at fastening intensive calculation that is needed by recursive algorithm.
 
-		Classical arithmetic operators take into account this inaccuracy :
-		  - equality is true even if the result may be true.
-		  - strict inequality operators return true if the result is gauranteed to be true.
-		 
-		This way, a partial order is defined :
-		  - an unknown distance is equal to UNKNOWN_VALUE
-		  - two line stops belonging to the same group have a zero distance between them
-		  - if two line stops have their isobarycenters distant of less than \f$ \sqrt{2} \f$ km, they have a neglictable square distance.
-		  - if two line stops have their isobarycenters distant of more than \f$ \sqrt{2} \f$ km, a square distance can be consistently compared with another square distance.
-		  
-		*/
-		class SquareDistance
-		{
-			long int _squareDistance; //!< Square of distance in km
+Classical arithmetic operators take into account this inaccuracy :
+  - equality is true even if the result may be true.
+  - strict inequality operators return true if the result is gauranteed to be true.
 
-			public:
-				SquareDistance( long int value = UNKNOWN_VALUE );
-				SquareDistance( const Point2D&, const Point2D& );
+This way, a partial order is defined :
+  - an unknown distance is equal to UNKNOWN_VALUE
+  - two line stops belonging to the same group have a zero distance between them
+  - if two line stops have their isobarycenters distant of less than \f$ \sqrt{2} \f$ km, they have a neglictable square distance.
+  - if two line stops have their isobarycenters distant of more than \f$ \sqrt{2} \f$ km, a square distance can be consistently compared with another square distance.
 
-			//! @name Getters/Setters
-			//@{
-				long int getSquareDistance () const;
-				void setSquareDistance ( long int squareDistance );
-			//@}
+*/
+class SquareDistance
+{
+    long int _squareDistance; //!< Square of distance in km
 
+public:
+    SquareDistance( long int value = UNKNOWN_VALUE );
+    SquareDistance( const Point2D&, const Point2D& );
 
-			//! @name Query methods.
-			//@{
-				long int getDistance () const;
-				bool isUnknown () const;
-			//@}
-
-			//! @name Update methods.
-			//@{
-				void setFromDistance (long int distance);
+    //! @name Getters/Setters
+    //@{
+    long int getSquareDistance () const;
+    void setSquareDistance ( long int squareDistance );
+    //@}
 
 
-				/** Updates this square distance with the square distance between two points.
-					@param point1 First point
-					@param point2 Second point
-			 
-					If one point has unknow coordinates, the resulting square distance is
-					unknown as well.
-				*/
-				void setFromPoints ( const Point2D& point1, const Point2D& point2 );
-			//@}
+    //! @name Query methods.
+    //@{
+    long int getDistance () const;
+    bool isUnknown () const;
+    //@}
+
+    //! @name Update methods.
+    //@{
+    void setFromDistance (long int distance);
 
 
-			/** Strictly inferior operator.
-			  @param op Square distance to compare.
-			  @return true if the square distance is guaranteed to be superior  
-			  to this square distance taking into account inaccuracy.
-			*/
-			int operator < ( const SquareDistance& op ) const;
+    /** Updates this square distance with the square distance between two points.
+    	@param point1 First point
+    	@param point2 Second point
+
+    	If one point has unknow coordinates, the resulting square distance is
+    	unknown as well.
+    */
+    void setFromPoints ( const Point2D& point1, const Point2D& point2 );
+    //@}
 
 
-			/** Equality operator.
-			  @param op Square distance to compare.
-			  @return true if both square distances are likely to be equal 
-			  taking into account inaccuracy.
-			*/
-			int operator == ( const SquareDistance& op ) const;
-		};
+    /** Strictly inferior operator.
+      @param op Square distance to compare.
+      @return true if the square distance is guaranteed to be superior
+      to this square distance taking into account inaccuracy.
+    */
+    int operator < ( const SquareDistance& op ) const;
 
 
-	}
+    /** Equality operator.
+      @param op Square distance to compare.
+      @return true if both square distances are likely to be equal
+      taking into account inaccuracy.
+    */
+    int operator == ( const SquareDistance& op ) const;
+};
+
+
+}
 }
 
 #endif

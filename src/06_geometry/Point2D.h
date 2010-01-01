@@ -31,49 +31,53 @@
 
 namespace synthese
 {
-	namespace geometry
-	{
+namespace geometry
+{
 
-		/** Two dimensions point.
-			@ingroup m06
-		*/
-		class Point2D
-		{
-		private:
+/** Two dimensions point.
+	@ingroup m06
+*/
+class Point2D
+{
+private:
 
-			double _x; 
-			double _y; 
+    double _x;
+    double _y;
 
-		public:
+public:
 
-			Point2D (double x = UNKNOWN_VALUE, double y = UNKNOWN_VALUE);
-			virtual ~Point2D () {}
-
-
-			//! @name Getters
-			//@{
-				double getX () const { return _x; }
-				double getY () const { return _y; }
-			//@}
-
-			//! @name Queries
-			//@{
-				bool isUnknown() const;
-				double getDistanceTo(const Point2D& op) const;
-			//@}
-
-			//! @name Setters
-			//@{
-				void setXY (double x = UNKNOWN_VALUE, double y = UNKNOWN_VALUE);
-			//@}
-		};
+    Point2D (double x = UNKNOWN_VALUE, double y = UNKNOWN_VALUE);
+    virtual ~Point2D () {}
 
 
-		bool operator== ( const Point2D& op1, const Point2D& op2 );
-		bool operator!= ( const Point2D& op1, const Point2D& op2 );
+    //! @name Getters
+    //@{
+    double getX () const {
+        return _x;
+    }
+    double getY () const {
+        return _y;
+    }
+    //@}
 
-		std::ostream& operator<< ( std::ostream& os, const Point2D& op );
-	}
+    //! @name Queries
+    //@{
+    bool isUnknown() const;
+    double getDistanceTo(const Point2D& op) const;
+    //@}
+
+    //! @name Setters
+    //@{
+    void setXY (double x = UNKNOWN_VALUE, double y = UNKNOWN_VALUE);
+    //@}
+};
+
+
+bool operator== ( const Point2D& op1, const Point2D& op2 );
+bool operator!= ( const Point2D& op1, const Point2D& op2 );
+
+std::ostream& operator<< ( std::ostream& os, const Point2D& op );
+}
 }
 
 #endif

@@ -12,14 +12,14 @@ namespace geometry
 
 
 
-double 
+double
 ToDegrees (double angle)
 {
     return 180.0 * angle / M_PI;
 }
 
 
-double 
+double
 ToRadians (double angle)
 {
     return M_PI * angle / 180.0;

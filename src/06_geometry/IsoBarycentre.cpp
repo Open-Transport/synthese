@@ -24,46 +24,46 @@
 
 namespace synthese
 {
-	namespace geometry
-	{
+namespace geometry
+{
 
 
-		IsoBarycentre::IsoBarycentre()
-			: Point2D()
-		{			
-			clear();
-		}
+IsoBarycentre::IsoBarycentre()
+        : Point2D()
+{
+    clear();
+}
 
-		void IsoBarycentre::clear()
-		{
-			_points = 0;
-			setXY();
-		}
+void IsoBarycentre::clear()
+{
+    _points = 0;
+    setXY();
+}
 
-		void IsoBarycentre::add( const Point2D& point )
-		{
-			if (point.isUnknown())
-				return;
+void IsoBarycentre::add( const Point2D& point )
+{
+    if (point.isUnknown())
+        return;
 
-			setXY(
-				(getX() * _points + point.getX()) / (_points + 1)
-				, (getY() * _points + point.getY()) / (_points + 1)
-			);
+    setXY(
+        (getX() * _points + point.getX()) / (_points + 1)
+        , (getY() * _points + point.getY()) / (_points + 1)
+    );
 
-			++_points;
-		}
+    ++_points;
+}
 
-		void IsoBarycentre::add( const IsoBarycentre& barycentre )
-		{
-			if (barycentre.isUnknown())
-				return;
+void IsoBarycentre::add( const IsoBarycentre& barycentre )
+{
+    if (barycentre.isUnknown())
+        return;
 
-			setXY(
-				(getX() * _points + barycentre.getX() * barycentre._points) / (_points + barycentre._points)
-				, (getY() * _points + barycentre.getY() * barycentre._points) / (_points + barycentre._points)
-				);
+    setXY(
+        (getX() * _points + barycentre.getX() * barycentre._points) / (_points + barycentre._points)
+        , (getY() * _points + barycentre.getY() * barycentre._points) / (_points + barycentre._points)
+    );
 
-			_points += barycentre._points;
-		}
-	}
+    _points += barycentre._points;
+}
+}
 }

@@ -166,24 +166,24 @@ namespace synthese
 		{
 		public:
 			StaticActionFunctionRequestPolicy():
-				StaticActionRequestPolicy(),
-				StaticFunctionRequestPolicy()
+				StaticActionRequestPolicy<ActionT>(),
+				StaticFunctionRequestPolicy<FunctionT>()
 			{
 			}
 
 
 
 			StaticActionFunctionRequestPolicy(const Request& request):
-				StaticActionRequestPolicy(request),
-				StaticFunctionRequestPolicy(request)
+				StaticActionRequestPolicy<ActionT>(request),
+				StaticFunctionRequestPolicy<FunctionT>(request)
 			{
 			}
 
-			boost::shared_ptr<Action> _getAction() { return StaticActionRequestPolicy::_getAction(); }
-			boost::shared_ptr<const Action> _getAction() const { return StaticActionRequestPolicy::_getAction(); }
-			boost::shared_ptr<Function> _getFunction() { return StaticFunctionRequestPolicy::_getFunction(); }
-			boost::shared_ptr<const Function> _getFunction() const { return StaticFunctionRequestPolicy::_getFunction(); }
-			void _deleteAction()	{ StaticActionRequestPolicy::_deleteAction(); }
+			boost::shared_ptr<Action> _getAction() { return StaticActionRequestPolicy<ActionT>::_getAction(); }
+			boost::shared_ptr<const Action> _getAction() const { return StaticActionRequestPolicy<ActionT>::_getAction(); }
+			boost::shared_ptr<Function> _getFunction() { return StaticFunctionRequestPolicy<FunctionT>::_getFunction(); }
+			boost::shared_ptr<const Function> _getFunction() const { return StaticFunctionRequestPolicy<FunctionT>::_getFunction(); }
+			void _deleteAction()	{ StaticActionRequestPolicy<ActionT>::_deleteAction(); }
 			void _loadFunction(
 				bool actionException,
 				const std::string& errorMessage,

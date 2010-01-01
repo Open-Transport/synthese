@@ -38,6 +38,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,impex::ImportFunction>::FACTORY_KEY("ImportFunction");
 	

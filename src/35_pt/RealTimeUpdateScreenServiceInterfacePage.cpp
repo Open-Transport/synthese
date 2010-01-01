@@ -31,11 +31,12 @@
 #include "CommercialLine.h"
 #include "RollingStock.h"
 #include "Schedule.h"
-#include "ActionFunctionRequest.h"
 #include "ScheduleRealTimeUpdateAction.h"
 #include "RealTimeUpdateFunction.h"
 #include "Interface.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
+#include "RequestManager.h"
+#include "StaticRequestPolicy.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -103,7 +104,7 @@ namespace synthese
 
 			if(request)
 			{
-				ActionFunctionRequest<ScheduleRealTimeUpdateAction,RealTimeUpdateFunction> scheduleUpdateRequest(*request);
+				RequestManager<StaticActionFunctionRequestPolicy<ScheduleRealTimeUpdateAction,RealTimeUpdateFunction> > scheduleUpdateRequest(*request);
 				scheduleUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
 				scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 				scheduleUpdateRequest.getAction()->setAtArrival(false);
@@ -117,7 +118,7 @@ namespace synthese
 					scheduleUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES + Request::PARAMETER_ASSIGNMENT
 				); //11
 
-				ActionFunctionRequest<ServiceVertexRealTimeUpdateAction,RealTimeUpdateFunction> vertexUpdateRequest(*request);
+				RequestManager<StaticActionFunctionRequestPolicy<ServiceVertexRealTimeUpdateAction,RealTimeUpdateFunction> > vertexUpdateRequest(*request);
 				vertexUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
 				vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 				vertexUpdateRequest.getFunction()->setService(Env::GetOfficialEnv().getSPtr(&service));

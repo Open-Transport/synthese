@@ -27,23 +27,23 @@
 
 namespace synthese
 {
-	namespace geometry
-	{
-		/** IsoBarycentre class.
-			@ingroup m06
-		*/
-		class IsoBarycentre : public Point2D
-		{
-			int _points;
+namespace geometry
+{
+/** IsoBarycentre class.
+	@ingroup m06
+*/
+class IsoBarycentre : public Point2D
+{
+    int _points;
 
-		public:
-			IsoBarycentre();
+public:
+    IsoBarycentre();
 
-			void clear();
-			void add(const Point2D& point);
-			void add(const IsoBarycentre& barycentre);
-		};
-	}
+    void clear();
+    void add(const Point2D& point);
+    void add(const IsoBarycentre& barycentre);
+};
+}
 }
 
 #endif // SYNTHESE_geometry_IsoBarycentre_h__

@@ -51,9 +51,9 @@ namespace synthese
 			virtual server::ParametersMap _getParametersMap() const;
 
 
-			virtual void _copy(boost::shared_ptr<const Function> function);
-
 		public:
+
+			virtual void _copy(boost::shared_ptr<const Function> function);
 
 			virtual server::ParametersMap getFixedParametersMap() const;
 

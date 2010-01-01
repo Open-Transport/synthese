@@ -25,70 +25,70 @@
 
 namespace synthese
 {
-	namespace geometry
-	{
+namespace geometry
+{
 
 
 
-		Point2D::Point2D (double x, double y)
-		{
-			setXY(x, y);
-		}
+Point2D::Point2D (double x, double y)
+{
+    setXY(x, y);
+}
 
-		void Point2D::setXY( double x /*= UNKNOWN_VALUE*/, double y /*= UNKNOWN_VALUE*/ )
-		{
-			if (x <= 0 || y <= 0)
-			{
-				_x = UNKNOWN_VALUE;
-				_y = UNKNOWN_VALUE;
-				return;
-			}
-			_x = x;
-			_y = y;
-		}
+void Point2D::setXY( double x /*= UNKNOWN_VALUE*/, double y /*= UNKNOWN_VALUE*/ )
+{
+    if (x <= 0 || y <= 0)
+    {
+        _x = UNKNOWN_VALUE;
+        _y = UNKNOWN_VALUE;
+        return;
+    }
+    _x = x;
+    _y = y;
+}
 
-		bool Point2D::isUnknown() const
-		{
-			return _x == UNKNOWN_VALUE;
-		}
+bool Point2D::isUnknown() const
+{
+    return _x == UNKNOWN_VALUE;
+}
 
-		double Point2D::getDistanceTo( const Point2D& p ) const
-		{
-			return sqrt ((p.getX() - getX()) * (p.getX() - getX()) + 
-				(p.getY() - getY()) * (p.getY() - getY()));
-		}
-
-
-
-		    
-
-		bool
-		operator== ( const Point2D& op1, const Point2D& op2 )
-		{
-			return (op1.getX () == op2.getX ()) && 
-			(op1.getY () == op2.getY ());
-		    
-		}
-
-
-		bool
-		operator!= ( const Point2D& op1, const Point2D& op2 )
-		{
-			return !(op1 == op2);
-		}
+double Point2D::getDistanceTo( const Point2D& p ) const
+{
+    return sqrt ((p.getX() - getX()) * (p.getX() - getX()) +
+                 (p.getY() - getY()) * (p.getY() - getY()));
+}
 
 
 
 
-		std::ostream&
-		operator<< ( std::ostream& os, const Point2D& op )
-		{
-			os << "(" << op.getX () << "," << op.getY () << ")";
-			return os;
-		}
+
+bool
+operator== ( const Point2D& op1, const Point2D& op2 )
+{
+    return (op1.getX () == op2.getX ()) &&
+           (op1.getY () == op2.getY ());
+
+}
+
+
+bool
+operator!= ( const Point2D& op1, const Point2D& op2 )
+{
+    return !(op1 == op2);
+}
 
 
 
-	}
+
+std::ostream&
+operator<< ( std::ostream& os, const Point2D& op )
+{
+    os << "(" << op.getX () << "," << op.getY () << ")";
+    return os;
+}
+
+
+
+}
 }
 

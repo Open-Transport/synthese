@@ -11,23 +11,23 @@ namespace geometry
 
 
 Point3D::Point3D (double x, double y, double z)
-    : Point2D (x, y)
-    , _z (z)
+        : Point2D (x, y)
+        , _z (z)
 {
 }
 
 
 
-    
+
 
 bool
 operator== ( const Point3D& op1, const Point3D& op2 )
 {
-    return 
-	(op1.getX () == op2.getX ()) && 
-	(op1.getY () == op2.getY ()) && 
-	(op1.getZ () == op2.getZ ());
-    
+    return
+        (op1.getX () == op2.getX ()) &&
+        (op1.getY () == op2.getY ()) &&
+        (op1.getZ () == op2.getZ ());
+
 }
 
 

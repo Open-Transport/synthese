@@ -20,21 +20,25 @@ namespace geometry
 */
 class Point3D : public Point2D
 {
-    private:
+private:
 
-        double _z; 
+    double _z;
 
-    public:
+public:
 
-        Point3D (double x, double y, double z);
-        ~Point3D () {}
+    Point3D (double x, double y, double z);
+    ~Point3D () {}
 
 
-        //! @name Getters/Setters
-        //@{
-        double getZ () const { return _z; }
-	void setZ (double z) { _z = z; }
-        //@}
+    //! @name Getters/Setters
+    //@{
+    double getZ () const {
+        return _z;
+    }
+    void setZ (double z) {
+        _z = z;
+    }
+    //@}
 
 };
 

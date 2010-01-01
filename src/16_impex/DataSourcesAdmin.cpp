@@ -152,7 +152,7 @@ namespace synthese
 			if(	moduleKey == ImpExModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()
+				isAuthorized(*request.getUser()->getProfile())
 			){
 				links.push_back(getNewPage());
 			}
