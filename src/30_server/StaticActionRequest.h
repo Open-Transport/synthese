@@ -25,6 +25,7 @@
 
 #include "Request.h"
 #include "Action.h"
+#include "Function.h"
 
 namespace synthese
 {

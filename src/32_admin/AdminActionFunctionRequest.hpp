@@ -43,7 +43,7 @@ namespace synthese
 			):	server::Request(request),
 				server::StaticActionFunctionRequest<A, AdminFunction>(request)
 			{
-				boost::shared_ptr<P> p(request.getFunction()->getPage()->getNewOtherPage<P>());
+				boost::shared_ptr<P> p(request.getFunction()->getPage()->template getNewOtherPage<P>());
 				this->getFunction()->setPage(p);
 			}
 			

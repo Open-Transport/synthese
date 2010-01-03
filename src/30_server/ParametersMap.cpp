@@ -228,7 +228,7 @@ namespace synthese
 
 		void ParametersMap::remove( const std::string& parameterName )
 		{
-			Map::const_iterator it(_map.find(parameterName));
+			Map::iterator it(_map.find(parameterName));
 			if(it != _map.end()) _map.erase(it);
 		}
 

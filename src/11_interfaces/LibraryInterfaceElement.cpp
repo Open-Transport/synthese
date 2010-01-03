@@ -50,7 +50,7 @@ namespace synthese
 			// Trim the left spaces
 			size_t start_pos;
 
-			for (start_pos = 0; start_pos < text.size() && text[start_pos] == ' '; ++start_pos);
+			for (start_pos = 0; start_pos < text.size() && text[start_pos] == ' '; ++start_pos) ;
 
 			// Empty line : return null
 			if (start_pos >= text.size())
@@ -58,7 +58,7 @@ namespace synthese
 
 			// Search for the end of the keyword
 			size_t word_end_pos = start_pos;
-			for (; word_end_pos < text.size() && text[word_end_pos] != ' '; ++word_end_pos);
+			for (; word_end_pos < text.size() && text[word_end_pos] != ' '; ++word_end_pos) ;
 
 			shared_ptr<LibraryInterfaceElement> lie;
 			try
