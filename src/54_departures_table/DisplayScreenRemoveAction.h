@@ -60,7 +60,7 @@ namespace synthese
 			///	@throws ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const server::ParametersMap& map) throw(server::ActionException);
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 		public:
 			////////////////////////////////////////////////////////////////////

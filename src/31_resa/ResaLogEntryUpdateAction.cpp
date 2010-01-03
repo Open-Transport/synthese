@@ -127,9 +127,9 @@ namespace synthese
 
 
 
-		bool ResaLogEntryUpdateAction::isAuthorized(const Profile& profile
+		bool ResaLogEntryUpdateAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<ResaRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE);
 		}
 	}
 }

@@ -39,7 +39,6 @@ namespace synthese
 	{
 		class Action;
 		class Function;
-		struct HTTPRequest;
 
 		/** Parsed request.
 			@ingroup m15
@@ -103,6 +102,28 @@ namespace synthese
 		class Request
 		{
 		public:
+			/** RedirectException class.
+			@ingroup m15
+			*/
+			class RedirectException:
+				public std::exception
+			{
+				std::string _location;
+
+			public:
+				RedirectException(const std::string& location): _location(location) {}
+				const std::string& getLocation() { return _location; }
+				virtual ~RedirectException() throw() {}
+			};
+
+			/** Forbidden request Exception class.
+			@ingroup m15
+			*/
+			class ForbiddenRequestException:
+				public std::exception
+			{
+			};
+
 			static const std::string PARAMETER_SEPARATOR;
 			static const std::string PARAMETER_ASSIGNMENT;
 
@@ -117,57 +138,52 @@ namespace synthese
 			static const std::string PARAMETER_NO_REDIRECT_AFTER_ACTION;
 
 		protected:
+			boost::shared_ptr<Action> _action;
+			boost::shared_ptr<Function> _function;
 			const Session*				_session;
-			bool						_sessionBroken;
 			std::string					_ip;
 			std::string					_clientURL;
 			std::string					_hostName;
 			bool						_actionWillCreateObject;
 			boost::optional<util::RegistryKeyType>	_actionCreatedId;
 			bool									_redirectAfterAction;
-			bool						_actionException;
-			std::string					_errorMessage;
 
+		public:
 			Request();
 			explicit Request(
-				const HTTPRequest& httpRequest
-			);
-			explicit Request(
-				const Request& rhs
+				const Request& rhs,
+				boost::shared_ptr<Action> action = boost::shared_ptr<Action>(),
+				boost::shared_ptr<Function> function = boost::shared_ptr<Function>()
 			);
 
-		protected:
-			virtual void _loadAction() = 0;
+
+		private:
+			virtual void _loadAction() {}
 			virtual void _loadFunction(
-				bool actionException,
-				const std::string& errorMessage,
+				const boost::optional<std::string>& errorMessage,
 				boost::optional<util::RegistryKeyType> actionCreatedId
-			) = 0;
-			virtual void _deleteAction() = 0;
+			) {}
+			void _deleteAction() { _action.reset(); }
 
 		public:
 			//! \name Getters
 			//@{
-				/** Action exception getter for subclasses only.
-				@return bool If an action exception has occurred
-				@author Hugues Romain
-				@date 2007
-
-				*/
-				bool getActionException() const { return _actionException; }
 				const Session*		getSession()		const { return _session; }
 				const std::string&	getClientURL()		const { return _clientURL; }
 				const std::string&	getIP()				const { return _ip; }
 				const boost::optional<util::RegistryKeyType>& 	getActionCreatedId()	const { return _actionCreatedId; }
 				bool				getActionWillCreateObject()	const { return _actionWillCreateObject; }
-				const std::string&	getErrorMessage()	const { return _errorMessage; }
 				const std::string&	getHostName()		const { return _hostName; }
+
+				boost::shared_ptr<Action> getAction() { return _action; }
+				boost::shared_ptr<const Action> getAction() const { return boost::const_pointer_cast<const Action>(_action); }
+				boost::shared_ptr<Function> getFunction() { return _function; }
+				boost::shared_ptr<const Function> getFunction() const { return boost::const_pointer_cast<const Function>(_function); }
+
 			//@}
 
 			//! \name Setters
 			//@{
-				void _setErrorMessage(const std::string& message) { _errorMessage = message; }
-				void _setActionException(bool value) { _actionException = value; }
 				void setActionCreatedId(util::RegistryKeyType id) { if(_actionWillCreateObject) _actionCreatedId = id; }
 				void setActionWillCreateObject() { _actionWillCreateObject = true; }
 				void setSession(Session* session);
@@ -189,18 +205,6 @@ namespace synthese
 			//! @name Queries
 			//@{
 				ParametersMap _getParametersMap() const;
-
-				virtual boost::shared_ptr<Function> _getFunction() = 0;
-				virtual boost::shared_ptr<const Function> _getFunction() const = 0;
-
-				/** Action getter.
-					@return const Action* The action of the request
-					@author Hugues Romain
-					@date 2007					
-				*/
-				virtual boost::shared_ptr<const Action> _getAction() const = 0;
-				virtual boost::shared_ptr<Action> _getAction() = 0;
-
 			//@}
 
 			//! \name Service

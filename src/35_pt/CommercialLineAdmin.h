@@ -105,7 +105,7 @@ namespace synthese
 				@date 2008
 			*/
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& user
 			) const;
 			
 
@@ -131,7 +131,7 @@ namespace synthese
 			virtual std::string getTitle() const;
 
 			virtual void _buildTabs(
-				const admin::AdminRequest& _request
+				const security::Profile& profile
 			) const;
 
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;

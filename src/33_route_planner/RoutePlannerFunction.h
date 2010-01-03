@@ -56,6 +56,7 @@ namespace synthese
 	namespace routeplanner
 	{
 		class RoutePlannerInterfacePage;
+		class UserFavoriteJourney;
 
 		////////////////////////////////////////////////////////////////////
 		/// Route planning Function class.
@@ -153,7 +154,7 @@ namespace synthese
 				std::size_t									_periodId;
 				const transportwebsite::HourPeriod*			_period;
 				bool										_home;
-				boost::optional<util::RegistryKeyType>		_favoriteId;
+				boost::shared_ptr<const UserFavoriteJourney>		_favorite;
 			//@}
 
 
@@ -187,7 +188,7 @@ namespace synthese
 
 			RoutePlannerFunction();
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 			virtual std::string getOutputMimeType() const;
 		};

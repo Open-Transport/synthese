@@ -323,7 +323,7 @@ namespace synthese
 					Request cancelRequest(
 						searchRequest,
 						static_pointer_cast<Action, CancelReservationAction>(action),
-						shared_ptr<Function>(searchRequest._getFunction()->clone())
+						shared_ptr<Function>(searchRequest.getFunction()->clone())
 					);
 
 					switch(status)

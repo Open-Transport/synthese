@@ -76,16 +76,16 @@ namespace synthese
 
 		}
 
-		bool DisplayScreenRemoveAction::isAuthorized(const Profile& profile) const
+		bool DisplayScreenRemoveAction::isAuthorized(const server::Session* session) const
 		{
 			assert(_displayScreen.get() != NULL);
 			if (_displayScreen->getLocalization() != NULL)
 			{
-				return profile.isAuthorized<ArrivalDepartureTableRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_displayScreen->getLocalization()->getKey()));
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_displayScreen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 

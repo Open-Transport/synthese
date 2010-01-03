@@ -134,7 +134,7 @@ namespace synthese
 		
 		
 		
-		bool ImportFunction::isAuthorized(const Profile& profile
+		bool ImportFunction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

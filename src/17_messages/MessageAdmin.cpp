@@ -173,7 +173,7 @@ namespace synthese
 
 
 		void MessageAdmin::_buildTabs(
-			const admin::AdminRequest& _request
+			const security::Profile& profile
 		) const {
 			_tabs.clear();
 
@@ -189,13 +189,15 @@ namespace synthese
 			_tabBuilded = true;
 		}
 
+
+
 		bool MessageAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
  		) const {
 			if (_alarm.get() == NULL) return false;
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() == NULL)
-				return profile.isAuthorized<MessagesRight>(READ);
-			return profile.isAuthorized<MessagesLibraryRight>(READ);
+				return user.getProfile()->isAuthorized<MessagesRight>(READ);
+			return user.getProfile()->isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		MessageAdmin::MessageAdmin()

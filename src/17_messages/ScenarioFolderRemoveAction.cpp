@@ -110,9 +110,9 @@ namespace synthese
 
 
 
-		bool ScenarioFolderRemoveAction::isAuthorized(const Profile& profile
+		bool ScenarioFolderRemoveAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
 		}
 	}
 }

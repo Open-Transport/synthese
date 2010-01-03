@@ -4,7 +4,6 @@
 #include "LoginHtmlField.h"
 #include "PasswordHtmlField.h"
 #include "HtmlFormInterfaceElement.h"
-#include "RequestErrorMessageInterfaceElement.h"
 #include "LogoutHTMLLinkInterfaceElement.h"
 #include "ValidSessionInterfaceElement.h"
 #include "HtmlFormCalendarFieldInterfaceElement.h"

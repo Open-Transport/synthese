@@ -23,7 +23,7 @@
 */
 
 #include "ResaCustomersAdmin.h"
-#include "Profile.h
+#include "Profile.h"
 #include "User.h"
 #include "UserTableSync.h"
 
@@ -184,9 +184,9 @@ namespace synthese
 
 
 		bool ResaCustomersAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<ResaRight>(READ);
+			return user.getProfile()->isAuthorized<ResaRight>(READ);
 		}
 
 
@@ -201,7 +201,7 @@ namespace synthese
 			if(	moduleKey == ResaModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile())
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewPage());
 			}

@@ -64,7 +64,7 @@ namespace synthese
 			void				setRedirURL(const std::string& url);
 			const std::string&	getRedirURL()	const;
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 
 			virtual std::string getOutputMimeType() const;

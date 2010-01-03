@@ -91,9 +91,9 @@ namespace synthese
 
 
 
-		bool ScenarioStopAction::isAuthorized(const Profile& profile
+		bool ScenarioStopAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<MessagesRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);
 		}
 		
 		void ScenarioStopAction::setScenario(boost::shared_ptr<SentScenario> value){

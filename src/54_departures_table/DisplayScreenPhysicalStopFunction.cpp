@@ -99,7 +99,7 @@ namespace synthese
 
 
 
-		bool DisplayScreenPhysicalStopFunction::isAuthorized(const Profile& profile
+		bool DisplayScreenPhysicalStopFunction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

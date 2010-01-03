@@ -22,7 +22,7 @@
 
 #include "AdminModule.h"
 #include "AdminInterfaceElement.h"
-
+#include "AdminFunction.h"
 
 using namespace boost;
 using namespace std;
@@ -67,7 +67,7 @@ namespace synthese
 			const std::string& oldPage,
 			const std::string& newPage
 		){
-			AdminRequest* ar(dynamic_cast<AdminRequest*>(request._getFunction().get()));
+			AdminFunction* ar(dynamic_cast<AdminFunction*>(request.getFunction().get()));
 			if(ar != NULL)
 			{
 				if(ar->getPage()->getFactoryKey() == oldPage)

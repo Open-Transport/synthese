@@ -93,8 +93,8 @@ namespace synthese
 		void TestMapAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<admin::AdminRequest>& _request) const
-		{
+			const AdminRequest& _request
+		) const	{
 			// Requests
 			AdminFunctionRequest<TestMapAdmin> testMapRequest(_request);
 			
@@ -106,7 +106,7 @@ namespace synthese
 			{
 				try
 				{
-					FunctionRequest<MapRequest> r(_request);
+					StaticFunctionRequest<MapRequest> r(_request);
 					r.getFunction()->setUseEnvironment(_useEnvironment);
 					r.getFunction()->setData(_dataXml);
 					r.getFunction()->setQuery(_queryXml);
@@ -150,9 +150,9 @@ namespace synthese
 		}
 
 		bool TestMapAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const {
-			return profile.isAuthorized<GlobalRight>(READ);;
+			return user.getProfile()->isAuthorized<GlobalRight>(READ);;
 		}
 		
 
@@ -165,7 +165,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if(moduleKey == MapModule::FACTORY_KEY && request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+				isAuthorized(*request.getUser()))
 			{
 				links.push_back(getNewPage());
 			}

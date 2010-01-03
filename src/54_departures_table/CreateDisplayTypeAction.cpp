@@ -131,9 +131,9 @@ namespace synthese
 
 
 
-		bool CreateDisplayTypeAction::isAuthorized(const Profile& profile
+		bool CreateDisplayTypeAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 		}
 	}
 }

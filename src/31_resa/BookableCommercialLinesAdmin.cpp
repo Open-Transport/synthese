@@ -131,9 +131,9 @@ namespace synthese
 		}
 
 		bool BookableCommercialLinesAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPagesOfModule(
@@ -145,7 +145,7 @@ namespace synthese
 			if(	moduleKey == ResaModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile())
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewPage());
 			}

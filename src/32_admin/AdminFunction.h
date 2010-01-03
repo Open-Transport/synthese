@@ -28,7 +28,7 @@
 #include "UId.h"
 #include "FactorableTemplate.h"
 
-#include "RequestWithInterfaceAndRequiredSession.h"
+#include "RequestWithInterface.h"
 #include "AdminInterfaceElement.h"
 
 namespace synthese
@@ -43,7 +43,7 @@ namespace synthese
 			@warning Must be linked to the Request by AdminRequest or its subclasses.
 		*/
 		class AdminFunction:
-			public util::FactorableTemplate<interfaces::RequestWithInterfaceAndRequiredSession, AdminFunction>
+			public util::FactorableTemplate<interfaces::RequestWithInterface, AdminFunction>
 		{
 		public:
 			static const std::string PARAMETER_PAGE;
@@ -56,6 +56,8 @@ namespace synthese
 			//@{
 				boost::shared_ptr<AdminInterfaceElement>	_page;
 				boost::shared_ptr<AdminInterfaceElement>	_actionFailedPage;
+				std::string		_activeTab;
+				boost::optional<std::string>	_errorMessage;
 			//@}
 
 
@@ -71,7 +73,7 @@ namespace synthese
 			*/
 			void run(std::ostream& stream, const server::Request& request) const;
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 		public:
 		

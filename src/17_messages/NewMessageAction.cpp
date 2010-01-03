@@ -127,9 +127,9 @@ namespace synthese
 
 
 
-		bool NewMessageAction::isAuthorized(const Profile& profile
+		bool NewMessageAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<MessagesRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);
 		}
 	}
 }

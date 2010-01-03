@@ -371,10 +371,10 @@ namespace synthese
 
 
 		bool LineAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
 			if (_line.get() == NULL) return false;
-			return profile.isAuthorized<TransportNetworkRight>(READ);
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		
@@ -394,7 +394,7 @@ namespace synthese
 
 
 		void LineAdmin::_buildTabs(
-			const admin::AdminRequest& _request
+			const security::Profile& profile
 		) const {
 			_tabs.clear();
 

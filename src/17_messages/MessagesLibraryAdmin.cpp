@@ -41,7 +41,7 @@
 #include "ScenarioFolderUpdateAction.h"
 #include "ScenarioTemplateInheritedTableSync.h"
 
-#include "ActionFunctionRequest.h"
+#include "StaticActionFunctionRequest.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
 
@@ -260,9 +260,9 @@ namespace synthese
 		}
 
 		bool MessagesLibraryAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<MessagesLibraryRight>(READ);
+			return user.getProfile()->isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		MessagesLibraryAdmin::MessagesLibraryAdmin()
@@ -281,7 +281,7 @@ namespace synthese
 			if(	moduleKey == MessagesModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewPage());
 			}

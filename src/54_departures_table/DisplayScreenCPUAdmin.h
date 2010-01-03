@@ -97,7 +97,7 @@ namespace synthese
 				@date 2008
 			*/
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& user
 			) const;
 			
 			
@@ -126,7 +126,7 @@ namespace synthese
 			///			relaunched
 			////////////////////////////////////////////////////////////////////
 			virtual void _buildTabs(
-				const admin::AdminRequest& _request
+				const security::Profile& profile
 			) const;
 		};
 	}

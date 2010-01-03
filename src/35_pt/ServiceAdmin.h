@@ -86,7 +86,7 @@ namespace synthese
 			/// @author Hugues
 			/// @date 2009
 			virtual void _buildTabs(
-				const admin::AdminRequest& request
+				const security::Profile& profile
 			) const;
 
 		public:
@@ -142,7 +142,7 @@ namespace synthese
 			///	@author Hugues
 			///	@date 2009
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& user
 			) const;
 
 

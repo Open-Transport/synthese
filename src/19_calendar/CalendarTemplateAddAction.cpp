@@ -86,11 +86,11 @@ namespace synthese
 		
 		
 		/*!
-			\fn synthese::timetables::CalendarTemplateAddAction::isAuthorized(const Profile& profile)
+			\fn synthese::timetables::CalendarTemplateAddAction::isAuthorized(const server::Session* session)
 		*/
-		bool CalendarTemplateAddAction::isAuthorized(const Profile& profile
+		bool CalendarTemplateAddAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<CalendarRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CalendarRight>(WRITE);
 		}
 	}
 }

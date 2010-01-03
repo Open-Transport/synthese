@@ -100,10 +100,7 @@ namespace synthese
 			}
 		}
 
-		bool LoginAction::_isSessionRequired() const
-		{
-			return false;
-		}
+
 
 		void LoginAction::setLogin( const std::string& login )
 		{
@@ -117,7 +114,8 @@ namespace synthese
 
 
 
-		bool LoginAction::isAuthorized(const Profile& profile
+		bool LoginAction::isAuthorized(
+			const Session*
 		) const {
 			return true;
 		}

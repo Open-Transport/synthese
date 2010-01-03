@@ -66,7 +66,7 @@ namespace synthese
 
 			void setType(boost::shared_ptr<const DisplayType> type);
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 		};
 	}
 }

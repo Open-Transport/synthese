@@ -61,7 +61,7 @@ namespace synthese
 
 			shared_ptr<const RoutePlannerFunction> function(
 				static_pointer_cast<const RoutePlannerFunction>(
-					request->_getFunction()
+					request->getFunction()
 			)	);
 
 			assert(function.get());

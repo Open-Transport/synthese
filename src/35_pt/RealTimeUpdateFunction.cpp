@@ -115,7 +115,7 @@ namespace synthese
 		
 		
 		
-		bool RealTimeUpdateFunction::isAuthorized(const Profile& profile) const
+		bool RealTimeUpdateFunction::isAuthorized(const server::Session* session) const
 		{
 			return true;
 		}

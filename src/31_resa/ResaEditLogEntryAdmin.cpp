@@ -204,9 +204,9 @@ namespace synthese
 		}
 
 		bool ResaEditLogEntryAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 

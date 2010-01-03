@@ -98,9 +98,9 @@ namespace synthese
 
 
 
-		bool AddUserAction::isAuthorized(const Profile& profile
+		bool AddUserAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<SecurityRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
 			/// @todo Add a control on the profile on the user who creates the new user, depending on the new user profile
 		}
 	}

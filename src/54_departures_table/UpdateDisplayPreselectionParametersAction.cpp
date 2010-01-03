@@ -223,16 +223,16 @@ namespace synthese
 
 
 
-		bool UpdateDisplayPreselectionParametersAction::isAuthorized(const Profile& profile
+		bool UpdateDisplayPreselectionParametersAction::isAuthorized(const Session* session
 		) const {
 			assert(_screen.get() != NULL);
 			if (_screen->getLocalization() != NULL)
 			{
-				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return profile.isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 

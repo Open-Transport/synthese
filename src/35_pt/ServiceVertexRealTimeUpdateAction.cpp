@@ -114,7 +114,7 @@ namespace synthese
 		
 		
 		
-		bool ServiceVertexRealTimeUpdateAction::isAuthorized(const Profile& profile
+		bool ServiceVertexRealTimeUpdateAction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

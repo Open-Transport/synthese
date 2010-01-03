@@ -106,7 +106,7 @@ namespace synthese
 
 
 
-		bool DisplayGetNagiosStatusFunction::isAuthorized(const Profile& profile
+		bool DisplayGetNagiosStatusFunction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

@@ -202,9 +202,9 @@ namespace synthese
 
 
 
-		bool AlarmTestOnDisplayScreenFunction::isAuthorized(const Profile& profile
+		bool AlarmTestOnDisplayScreenFunction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 		std::string AlarmTestOnDisplayScreenFunction::getOutputMimeType() const

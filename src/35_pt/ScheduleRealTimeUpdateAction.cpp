@@ -119,7 +119,7 @@ namespace synthese
 		
 		
 		
-		bool ScheduleRealTimeUpdateAction::isAuthorized(const Profile& profile
+		bool ScheduleRealTimeUpdateAction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

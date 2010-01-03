@@ -73,7 +73,7 @@ namespace synthese
 			*/
 			void run(server::Request& request);
 			
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 			void setScreen(boost::shared_ptr<const DisplayScreen> value);
 			void setTransferPlace(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> value);

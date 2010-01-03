@@ -66,7 +66,7 @@ namespace synthese
 			///	@author Hugues Romain
 			///	@date 2008
 			/// The user need WRITE permissions on ResaRight habilitation.
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 		};
 	}
 }

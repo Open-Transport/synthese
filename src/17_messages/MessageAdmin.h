@@ -131,7 +131,7 @@ namespace synthese
 			virtual server::ParametersMap getParametersMap() const;
 
 			virtual void _buildTabs(
-				const admin::AdminRequest& _request
+				const security::Profile& profile
 			) const;
 
 			/** Display of the content of the admin element.
@@ -141,7 +141,7 @@ namespace synthese
 					const admin::AdminRequest& _request) const;
 
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& user
 			) const;
 
 

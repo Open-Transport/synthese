@@ -101,7 +101,7 @@ namespace synthese
 		
 		
 		void DisplayTypeAdmin::display(ostream& stream, VariablesMap& variables,
-					const FunctionRequest<admin::AdminRequest>& _request) const
+					const admin::AdminRequest& _request) const
 		{
 			// Requests
 			AdminActionFunctionRequest<UpdateDisplayTypeAction,DisplayTypeAdmin> updateRequest(
@@ -178,10 +178,10 @@ namespace synthese
 		}
 
 		bool DisplayTypeAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
 			if (_type.get() == NULL) return false;
-			return profile.isAuthorized<ArrivalDepartureTableRight>(READ);
+			return user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
 		
 

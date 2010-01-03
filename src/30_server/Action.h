@@ -47,6 +47,7 @@ namespace synthese
 		class ParametersMap;
 		class ActionException;
 		class Request;
+		class Session;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Action abstract class to run before the display of a function result.
@@ -57,11 +58,10 @@ namespace synthese
 		class Action
 		:	public util::FactoryBase<Action>
 		{
-		public:
-
 		protected:
 			boost::shared_ptr<util::Env>	_env;
 
+		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			//////////////////////////////////////////////////////////////////////////
@@ -73,25 +73,13 @@ namespace synthese
 			}
 
 
-		private:
-
-			/** Indicates if the action must be launched before the session control.
-				@return True if the action must be launched before the session control	
-				@author Hugues Romain
-				@date 2007
-				
-			*/
-			virtual bool _isSessionRequired() const { return true; }
-
-
-
 			/** Authorization control.
 				@return True if the action run is authorized
 				@author Hugues Romain
 				@date 2007
 			*/
 			virtual bool isAuthorized(
-				const security::Profile& profile
+				const server::Session* session
 			) const = 0;
 
 			/** Conversion from generic parameters map to attributes.
@@ -111,7 +99,6 @@ namespace synthese
 				Request& request
 			) = 0;
 
-		public:
 			boost::shared_ptr<util::Env> getEnv() const { return _env; }
 			void setEnv(boost::shared_ptr<util::Env> value) { _env = value; }
 		};

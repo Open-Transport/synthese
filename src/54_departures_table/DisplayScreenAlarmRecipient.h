@@ -24,7 +24,6 @@
 #define SYNTHESE_DisplayScreenAlarmRecipient_h__
 
 #include "DisplayScreen.h"
-
 #include "AlarmRecipientTemplate.h"
 
 namespace synthese
@@ -51,9 +50,9 @@ namespace synthese
 				std::ostream& stream
 				, const messages::Alarm* alarm
 				, const server::ParametersMap& request
-				, admin::AdminRequest& searchRequest
-				, server::RequestManager<server::StaticActionRequestPolicy<messages::AlarmAddLinkAction> >& addRequest
-				, server::RequestManager<server::StaticActionRequestPolicy<messages::AlarmRemoveLinkAction> >& removeRequest
+				, server::Request& searchRequest
+				, server::StaticActionRequest<messages::AlarmAddLinkAction>& addRequest
+				, server::StaticActionRequest<messages::AlarmRemoveLinkAction>& removeRequest
 			);
 
 			virtual messages::AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const server::ParametersMap& parameters) const;

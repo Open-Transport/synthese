@@ -49,9 +49,11 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<HomeAdmin>::ICON = "house.png";
 		template<> const string AdminInterfaceElementTemplate<HomeAdmin>::DEFAULT_TITLE = "Accueil";
 
-		void HomeAdmin::display( std::ostream& stream, interfaces::VariablesMap& variables,
-					const FunctionRequest<admin::AdminRequest>& request) const
-		{
+		void HomeAdmin::display(
+			std::ostream& stream,
+			interfaces::VariablesMap& variables,
+			const AdminRequest& request
+		) const	{
 			stream << "Bienvenue sur le panneau de configuration de SYNTHESE";
 		}
 
@@ -71,7 +73,7 @@ namespace synthese
 
 
 		bool HomeAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
 			return true;
 		}

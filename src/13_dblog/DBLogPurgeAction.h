@@ -65,7 +65,7 @@ namespace synthese
 
 			void setDBLog(const std::string& value);
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 			DBLogPurgeAction();
 		};

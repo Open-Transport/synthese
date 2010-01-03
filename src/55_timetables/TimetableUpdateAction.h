@@ -87,7 +87,7 @@ namespace synthese
 			
 			TimetableUpdateAction();
 			
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 			void setTimetable(boost::shared_ptr<Timetable> value);
 		};

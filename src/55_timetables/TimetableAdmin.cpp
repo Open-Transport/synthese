@@ -470,7 +470,7 @@ namespace synthese
 			{
 				if(_timetable->getInterface())
 				{
-					RequestManager<StaticFunctionRequestPolicy<TimetableGenerateFunction> > viewRequest(_request);
+					StaticFunctionRequest<TimetableGenerateFunction> viewRequest(_request);
 					viewRequest.getFunction()->setTimetable(_timetable);
 					if(	!_timetable->getInterface()->getDefaultClientURL().empty()
 					){
@@ -560,9 +560,9 @@ namespace synthese
 		}
 
 		bool TimetableAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<TimetableRight>(READ);
+			return user.getProfile()->isAuthorized<TimetableRight>(READ);
 		}
 		
 
@@ -590,8 +590,9 @@ namespace synthese
 
 
 
-		void TimetableAdmin::_buildTabs( const admin::AdminRequest& request ) const
-		{
+		void TimetableAdmin::_buildTabs(
+			const security::Profile& profile
+		) const	{
 			_tabs.clear();
 
 			if(_timetable.get()) _tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
@@ -613,7 +614,7 @@ namespace synthese
 			if(	moduleKey == TimetableModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile())
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewPage());
 			}

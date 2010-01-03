@@ -114,7 +114,7 @@ namespace synthese
 			) const;
 			
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& user
 			) const;
 
 			virtual std::string getTitle() const;

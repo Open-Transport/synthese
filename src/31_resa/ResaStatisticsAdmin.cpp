@@ -143,12 +143,12 @@ namespace synthese
 
 		
 		bool ResaStatisticsAdmin::isAuthorized(
-			const Profile& profile
+			const security::User& user
 		) const	{
 			if (!_line.get())
 				return false;
 
-			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
+			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
 		}
 
 
@@ -275,7 +275,7 @@ namespace synthese
 
 			stream << "<h1>Export CSV</h1>";
 
-			FunctionRequest<CSVResaStatisticsFunction> csvRequest(request);
+			StaticFunctionRequest<CSVResaStatisticsFunction> csvRequest(request);
 			csvRequest.getFunction()->setLine(_line);
 			csvRequest.getFunction()->setPeriod(_searchPeriod);
 			csvRequest.getFunction()->setRowStep(_searchRowStep);

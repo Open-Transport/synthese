@@ -133,9 +133,9 @@ namespace synthese
 
 		
 		bool PTPlaceAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<TransportNetworkRight>(READ);
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -224,8 +224,9 @@ namespace synthese
 
 
 
-		void PTPlaceAdmin::_buildTabs( const admin::AdminRequest& request ) const
-		{
+		void PTPlaceAdmin::_buildTabs(
+			const security::Profile& profile
+		) const	{
 			_tabs.clear();
 			_tabs.push_back(Tab("Propriétés", TAB_GENERAL, true));
 			if(_connectionPlace.get())

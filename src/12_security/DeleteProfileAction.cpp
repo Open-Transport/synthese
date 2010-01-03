@@ -106,9 +106,9 @@ namespace synthese
 
 
 
-		bool DeleteProfileAction::isAuthorized(const Profile& profile
+		bool DeleteProfileAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<SecurityRight>(DELETE_RIGHT);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(DELETE_RIGHT);
 		}
 		
 		void DeleteProfileAction::setProfile(boost::shared_ptr<Profile> value)

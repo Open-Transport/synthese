@@ -38,6 +38,7 @@ namespace synthese
 	namespace security
 	{
 		class User;
+		class Profile;
 	}
 	
 	namespace server

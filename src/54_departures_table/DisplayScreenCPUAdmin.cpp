@@ -30,7 +30,7 @@
 #include "DisplaySearchAdmin.h"
 #include "DeparturesTableModule.h"
 #include "AdminInterfaceElement.h"
-#include "ActionFunctionRequest.h"
+#include "StaticActionFunctionRequest.h"
 #include "AdminParametersException.h"
 #include "ArrivalDepartureTableRight.h"
 #include "ArrivalDepartureTableLog.h"
@@ -125,7 +125,7 @@ namespace synthese
 		void DisplayScreenCPUAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-					const FunctionRequest<admin::AdminRequest>& _request
+					const admin::AdminRequest& _request
 		) const	{
 			
 			////////////////////////////////////////////////////////////////////
@@ -309,14 +309,14 @@ namespace synthese
 		}
 
 		bool DisplayScreenCPUAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
 			if (_cpu.get() == NULL) return false;
 			if (_cpu->getPlace() == NULL)
 			{
-				return profile.isAuthorized<ArrivalDepartureTableRight>(READ);
+				return user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ);
 			}
-			return profile.isAuthorized<ArrivalDepartureTableRight>(
+			return user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(
 				READ,
 				UNKNOWN_RIGHT_LEVEL,
 				lexical_cast<string>(_cpu->getPlace()->getKey())
@@ -332,14 +332,14 @@ namespace synthese
 
 
 		void DisplayScreenCPUAdmin::_buildTabs(
-			const admin::AdminRequest& _request
+			const security::Profile& profile
 		) const {
 			_tabs.clear();
 
 			bool writePermission(
 				_cpu->getPlace() ?
-				_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
-				_request.isAuthorized<ArrivalDepartureTableRight>(WRITE)
+				profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
+				profile.isAuthorized<ArrivalDepartureTableRight>(WRITE)
 			);
 			_tabs.push_back(Tab("Technique", TAB_TECHNICAL, writePermission, "cog.png"));
 

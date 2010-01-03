@@ -67,7 +67,7 @@ namespace synthese
 			*/
 			void run(server::Request& request);
 			
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 			void setRule(boost::shared_ptr<const env::NonConcurrencyRule> rule);
 		};

@@ -136,9 +136,9 @@ namespace synthese
 		}
 		
 		
-		bool TimetableRowAddAction::isAuthorized(const Profile& profile) const
+		bool TimetableRowAddAction::isAuthorized(const server::Session* session) const
 		{
-			return profile.isAuthorized<TimetableRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(WRITE);
 		}
 
 	}

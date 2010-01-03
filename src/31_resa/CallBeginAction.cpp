@@ -71,9 +71,9 @@ namespace synthese
 
 
 
-		bool CallBeginAction::isAuthorized(const Profile& profile
+		bool CallBeginAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<ResaRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE);
 		}
 	}
 }

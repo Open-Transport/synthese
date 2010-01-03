@@ -109,9 +109,9 @@ namespace synthese
 
 
 
-		bool ResaCustomerHtmlOptionListFunction::isAuthorized(const Profile& profile
+		bool ResaCustomerHtmlOptionListFunction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<ResaRight>(READ);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(READ);
 		}
 
 		std::string ResaCustomerHtmlOptionListFunction::getOutputMimeType() const

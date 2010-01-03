@@ -42,6 +42,7 @@
 #include "InterfaceTableSync.h"
 #include "RoutePlannerInterfacePage.h"
 #include "Profile.h"
+#include "StaticFunctionRequest.h"
 
 #include <boost/foreach.hpp>
 
@@ -113,7 +114,7 @@ namespace synthese
 			AdminFunctionRequest<SiteRoutePlanningAdmin> routeplannerRequest(_request);
 			routeplannerRequest.getPage()->setSite(_site);
 
-			FunctionRequest<RoutePlannerFunction> rpHomeRequest(_request);
+			StaticFunctionRequest<RoutePlannerFunction> rpHomeRequest(_request);
 			rpHomeRequest.getFunction()->setSite(_site);
 
 			// Display
@@ -164,9 +165,9 @@ namespace synthese
 		}
 
 		bool TransportSiteAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<TransportWebsiteRight>(READ);
+			return user.getProfile()->isAuthorized<TransportWebsiteRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfModule(
@@ -178,7 +179,7 @@ namespace synthese
 			
 			if(moduleKey == PlacesListModule::FACTORY_KEY && request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+				isAuthorized(*request.getUser()))
 			{
 				SiteTableSync::SearchResult sites(
 					SiteTableSync::Search(*_env)

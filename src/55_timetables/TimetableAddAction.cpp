@@ -118,9 +118,9 @@ namespace synthese
 		}
 		
 		
-		bool TimetableAddAction::isAuthorized(const security::Profile& profile) const
+		bool TimetableAddAction::isAuthorized(const server::Session* session) const
 		{
-			return profile.isAuthorized<TimetableRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(WRITE);
 		}
 	}
 }

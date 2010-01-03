@@ -25,7 +25,7 @@
 #include "CentreonConfigExportFunction.h"
 
 #include "RequestException.h"
-#include "FunctionRequest.h"
+#include "StaticFunctionRequest.h"
 #include "UniqueStringsSet.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
@@ -77,8 +77,9 @@ namespace synthese
 			_action = static_cast<Action>(map.get<int>(PARAMETER_ACTION));
 		}
 
-		void CentreonConfigExportFunction::_run(
-			std::ostream& stream
+		void CentreonConfigExportFunction::run(
+			std::ostream& stream,
+			const server::Request& request
 		) const	{
 
 			Env env;
@@ -304,7 +305,7 @@ namespace synthese
 
 
 				// Insertion of the hosts
-				FunctionRequest<DisplayScreenContentFunction> displayRequest;
+				StaticFunctionRequest<DisplayScreenContentFunction> displayRequest;
 				
 				DisplayScreenTableSync::SearchResult screens(
 					DisplayScreenTableSync::Search(env)
@@ -429,7 +430,7 @@ namespace synthese
 
 
 
-		bool CentreonConfigExportFunction::isAuthorized(const Profile& profile
+		bool CentreonConfigExportFunction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

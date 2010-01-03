@@ -85,7 +85,7 @@ namespace synthese
 		
 		
 		
-		bool ReservationEditFunction::isAuthorized(const Profile& profile) const
+		bool ReservationEditFunction::isAuthorized(const server::Session* session) const
 		{
 			return true;
 		}

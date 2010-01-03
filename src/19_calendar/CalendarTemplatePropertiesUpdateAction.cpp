@@ -100,9 +100,9 @@ namespace synthese
 		
 		
 		
-		bool CalendarTemplatePropertiesUpdateAction::isAuthorized(const Profile& profile
+		bool CalendarTemplatePropertiesUpdateAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<CalendarRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CalendarRight>(WRITE);
 		}
 
 

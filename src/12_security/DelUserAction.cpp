@@ -77,9 +77,9 @@ namespace synthese
 
 
 
-		bool DelUserAction::isAuthorized(const Profile& profile
+		bool DelUserAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<SecurityRight>(DELETE_RIGHT);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(DELETE_RIGHT);
 		}
 		
 		

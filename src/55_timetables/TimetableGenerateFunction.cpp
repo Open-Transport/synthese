@@ -93,7 +93,7 @@ namespace synthese
 		
 		
 		
-		bool TimetableGenerateFunction::isAuthorized(const Profile& profile) const
+		bool TimetableGenerateFunction::isAuthorized(const server::Session* session) const
 		{
 			return true;
 		}

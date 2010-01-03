@@ -62,7 +62,7 @@ namespace synthese
 			*/
 			void run(server::Request& request);
 			
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 			void setThreadId(const std::string& value);
 		};

@@ -146,61 +146,53 @@ namespace synthese
 
 		void BookReservationAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Right control
-			if (profile.isAuthorized<ResaRight>(WRITE, WRITE))
+			_createCustomer = map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false);
+
+			if (_createCustomer)
 			{
-				_createCustomer = map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false);
+				_customer.reset(new User);
+				_customer->setName(map.get<string>(PARAMETER_CUSTOMER_NAME));
+				if (_customer->getName().empty())
+					throw ActionException("Le nom du client doit être rempli");
 
-				if (_createCustomer)
-				{
-					_customer.reset(new User);
-					_customer->setName(map.get<string>(PARAMETER_CUSTOMER_NAME));
-					if (_customer->getName().empty())
-						throw ActionException("Le nom du client doit être rempli");
+				_customer->setSurname(map.get<string>(PARAMETER_CUSTOMER_SURNAME));
+				if (_customer->getSurname().empty())
+					throw ActionException("Le prénom du client doit être rempli");
 
-					_customer->setSurname(map.get<string>(PARAMETER_CUSTOMER_SURNAME));
-					if (_customer->getSurname().empty())
-						throw ActionException("Le prénom du client doit être rempli");
+				_customer->setPhone(map.get<string>(PARAMETER_CUSTOMER_PHONE));
+				if (_customer->getPhone().empty())
+					throw ActionException("Le numéro de téléphone doit être rempli");
 
-					_customer->setPhone(map.get<string>(PARAMETER_CUSTOMER_PHONE));
-					if (_customer->getPhone().empty())
-						throw ActionException("Le numéro de téléphone doit être rempli");
-
-					// Integrity test : the key is name + surname + phone
-					Env env;
-					UserTableSync::Search(
-						env,
-						optional<string>(),
-						_customer->getName(),
-						_customer->getSurname(),
-						_customer->getPhone(),
-						optional<RegistryKeyType>(),
-						logic::indeterminate,
-						logic::indeterminate,
-						optional<RegistryKeyType>(),
-						0, 1
-					);
-					if (!env.getRegistry<User>().empty())
-						throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
-					
-					_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
-					_customer->setProfile(ResaModule::GetBasicResaCustomerProfile().get());
-				}
-				else
-				{
-					// Customer ID
-					optional<RegistryKeyType> id(map.get<RegistryKeyType>(PARAMETER_CUSTOMER_ID));
-					if (id)
-						_customer = UserTableSync::GetEditable(*id, *_env);
-				}
+				// Integrity test : the key is name + surname + phone
+				Env env;
+				UserTableSync::Search(
+					env,
+					optional<string>(),
+					_customer->getName(),
+					_customer->getSurname(),
+					_customer->getPhone(),
+					optional<RegistryKeyType>(),
+					logic::indeterminate,
+					logic::indeterminate,
+					optional<RegistryKeyType>(),
+					0, 1
+				);
+				if (!env.getRegistry<User>().empty())
+					throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
+				
+				_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
+				_customer->setProfile(ResaModule::GetBasicResaCustomerProfile().get());
+			}
+			else
+			{
+				// Customer ID
+				optional<RegistryKeyType> id(map.get<RegistryKeyType>(PARAMETER_CUSTOMER_ID));
+				if (id)
+					_customer = UserTableSync::GetEditable(*id, *_env);
 			}
 			if(!_customer.get())
 			{
-				_customer = const_pointer_cast<User, const User>(request.getUser());
-			}
-			if(!_customer.get())
-			{
-				throw ActionException("Not authorized");
+				throw ActionException("Undefined customer.");
 			}
 
 			// Deduce naming fields from the customer if already recognized
@@ -412,11 +404,18 @@ namespace synthese
 
 
 
-		bool BookReservationAction::isAuthorized(const Profile& profile
+		bool BookReservationAction::isAuthorized(const Session* session
 		) const {
-			return
-				profile.isAuthorized<ResaRight>(WRITE) ||
-				_customer->getKey() == request.getUser()->getKey() && profile.isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
+			if( !session || !session->hasProfile())
+			{
+				return false;
+			}
+			return 
+				session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE) ||
+				!_createCustomer &&
+				_customer->getKey() == session->getUser()->getKey() &&
+				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE)
+			;
 		}
 
 

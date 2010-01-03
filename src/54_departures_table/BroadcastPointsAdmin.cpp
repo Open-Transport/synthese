@@ -32,7 +32,7 @@
 #include "City.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "EnvModule.h"
-#include "FunctionRequest.h"
+#include "StaticFunctionRequest.h"
 #include "Session.h"
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"
@@ -228,9 +228,9 @@ namespace synthese
 
 
 		bool BroadcastPointsAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const {
-			return profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			return user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 
@@ -243,7 +243,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if (moduleKey == DeparturesTableModule::FACTORY_KEY && request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+				isAuthorized(*request.getUser()))
 			{
 				links.push_back(getNewPage());
 			}

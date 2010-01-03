@@ -175,10 +175,14 @@ namespace synthese
 
 
 
-		bool UserUpdateAction::isAuthorized(const Profile& profile
+		bool UserUpdateAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<SecurityRight>(WRITE) ||
-				request.getUser() != NULL && request.getUser()->getKey() == _user->getKey();
+			return
+				session &&
+				(	session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE) ||
+					session->getUser() && session->getUser()->getKey() == _user->getKey()
+				)
+			;
 		}
 		
 		

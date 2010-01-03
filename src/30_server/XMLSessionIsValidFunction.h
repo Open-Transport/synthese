@@ -87,7 +87,7 @@ namespace synthese
 			/// @return true if the function can be run
 			/// @author Hugues
 			/// @date 2009
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 
 

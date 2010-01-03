@@ -227,9 +227,9 @@ namespace synthese
 
 
 		bool ProfileAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<SecurityRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			return user.getProfile()->isAuthorized<SecurityRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 		std::string ProfileAdmin::getTitle() const

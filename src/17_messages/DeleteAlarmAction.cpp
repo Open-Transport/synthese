@@ -104,15 +104,15 @@ namespace synthese
 
 
 
-		bool DeleteAlarmAction::isAuthorized(const Profile& profile
+		bool DeleteAlarmAction::isAuthorized(const Session* session
 		) const {
 			if (dynamic_cast<const SentAlarm*>(_alarm.get()))
 			{
-				return profile.isAuthorized<MessagesRight>(DELETE_RIGHT);
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(DELETE_RIGHT);
 			}
 			else
 			{
-				return profile.isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
 			}
 		}
 	}

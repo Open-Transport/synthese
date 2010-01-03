@@ -81,9 +81,9 @@ namespace synthese
 		
 		
 		
-		bool NonConcurrencyRuleRemoveAction::isAuthorized(const Profile& profile
+		bool NonConcurrencyRuleRemoveAction::isAuthorized(const Session* session
 		) const {
-			return _rule.get() && profile.isAuthorized<TransportNetworkRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_rule->getKey()));
+			return _rule.get() && session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_rule->getKey()));
 		}
 
 

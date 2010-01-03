@@ -45,6 +45,7 @@ namespace synthese
 
 	namespace server
 	{
+		class Session;
 		class Request;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -130,7 +131,6 @@ namespace synthese
 			*/
 			virtual void _copy(boost::shared_ptr<const Function> function) {}
 
-		private:
 
 			/** Conversion from generic parameters map to attributes.
 				@param map The map to interpret (comes from _parseString())
@@ -150,13 +150,13 @@ namespace synthese
 
 
 			/** Authorization control.
-				@param profile Profile to test
-				@return True if the action run is authorized
+				@param session Session to read
+				@return True if the function run is authorized
 				@author Hugues Romain
 				@date 2007
 			*/
 			virtual bool isAuthorized(
-				const security::Profile& profile
+				const Session* session
 			) const = 0;
 
 

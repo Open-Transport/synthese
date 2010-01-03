@@ -103,12 +103,12 @@ namespace synthese
 
 
 
-		bool DisplayScreenCPUCreateAction::isAuthorized(const Profile& profile
+		bool DisplayScreenCPUCreateAction::isAuthorized(const Session* session
 		) const {
 			return
 				_place.get() ?
-				profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey())) :
-				profile.isAuthorized<ArrivalDepartureTableRight>(WRITE)
+				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey())) :
+				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE)
 			;
 		}
 	}

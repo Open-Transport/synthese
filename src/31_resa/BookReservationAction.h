@@ -118,7 +118,7 @@ namespace synthese
 			void setJourney(const graph::Journey& journey);
 			void setAccessParameters(const graph::AccessParameters& value);
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 		};
 	}
 }

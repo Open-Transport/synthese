@@ -145,9 +145,9 @@ namespace synthese
 		}
 
 		bool CalendarTemplatesAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<CalendarRight>(READ);
+			return user.getProfile()->isAuthorized<CalendarRight>(READ);
 		}
 		
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPagesOfModule(
@@ -160,7 +160,7 @@ namespace synthese
 			if(	moduleKey == CalendarModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewPage());
 			}

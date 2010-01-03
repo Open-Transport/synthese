@@ -85,7 +85,7 @@ namespace synthese
 		
 		
 		
-		bool XMLSessionIsValidFunction::isAuthorized(const Profile& profile) const
+		bool XMLSessionIsValidFunction::isAuthorized(const Session*) const
 		{
 			return true;
 		}

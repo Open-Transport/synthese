@@ -109,15 +109,15 @@ namespace synthese
 
 
 
-		bool UpdateAlarmMessagesFromTemplateAction::isAuthorized(const Profile& profile
+		bool UpdateAlarmMessagesFromTemplateAction::isAuthorized(const Session* session
 		) const {
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_message).get() != NULL)
 			{
-				return profile.isAuthorized<MessagesLibraryRight>(WRITE);
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE);
 			}
 			else
 			{
-				return profile.isAuthorized<MessagesRight>(WRITE);
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);
 			}
 		}
 	}

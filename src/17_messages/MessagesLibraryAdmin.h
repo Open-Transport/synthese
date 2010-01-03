@@ -116,7 +116,7 @@ namespace synthese
 					const admin::AdminRequest& _request) const;
 
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& profile
 			) const;
 
 

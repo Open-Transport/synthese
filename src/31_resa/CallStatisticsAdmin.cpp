@@ -121,9 +121,9 @@ namespace synthese
 
 		
 		bool CallStatisticsAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<ResaRight>(READ);
+			return user.getProfile()->isAuthorized<ResaRight>(READ);
 		}
 
 

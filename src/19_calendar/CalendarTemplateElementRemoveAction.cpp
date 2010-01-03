@@ -82,9 +82,9 @@ namespace synthese
 		
 		
 		
-		bool CalendarTemplateElementRemoveAction::isAuthorized(const Profile& profile
+		bool CalendarTemplateElementRemoveAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<CalendarRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CalendarRight>(WRITE);
 		}
 
 

@@ -175,7 +175,7 @@ namespace synthese
 
 
 
-		bool PlacesListFunction::isAuthorized(const Profile& profile
+		bool PlacesListFunction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

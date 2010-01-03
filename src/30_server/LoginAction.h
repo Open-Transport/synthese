@@ -55,13 +55,6 @@ namespace synthese
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
 
-			/** Activates the action before the session control.
-				@return TRUE
-				@author Hugues Romain
-				@date 2007				
-			*/
-			bool _isSessionRequired() const;
-
 		public:
 
 			/** Action to run, defined by each subclass.
@@ -71,7 +64,7 @@ namespace synthese
 			void setLogin(const std::string& login);
 			void setPassword(const std::string& password);
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 		};
 	}
 }

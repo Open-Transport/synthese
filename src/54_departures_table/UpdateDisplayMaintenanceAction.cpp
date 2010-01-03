@@ -113,15 +113,15 @@ namespace synthese
 
 
 
-		bool UpdateDisplayMaintenanceAction::isAuthorized(const Profile& profile
+		bool UpdateDisplayMaintenanceAction::isAuthorized(const Session* session
 		) const {
 			if (_displayScreen->getLocalization() != NULL)
 			{
-				return profile.isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
 			}
 			else
 			{
-				return profile.isAuthorized<DisplayMaintenanceRight>(WRITE);
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<DisplayMaintenanceRight>(WRITE);
 			}
 		}
 	}

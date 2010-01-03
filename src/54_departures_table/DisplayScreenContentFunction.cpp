@@ -124,7 +124,7 @@ namespace synthese
 
 
 
-		bool DisplayScreenContentFunction::isAuthorized(const Profile& profile
+		bool DisplayScreenContentFunction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

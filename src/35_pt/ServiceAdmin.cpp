@@ -127,9 +127,9 @@ namespace synthese
 
 		
 		bool ServiceAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<TransportNetworkRight>(READ);
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -274,7 +274,7 @@ namespace synthese
 
 
 		void ServiceAdmin::_buildTabs(
-			const admin::AdminRequest& request
+			const security::Profile& profile
 		) const	{
 			_tabs.clear();
 

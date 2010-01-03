@@ -21,7 +21,7 @@ extern "C"
 #include "01_util/XmlToolkit.h"
 #include "30_server/BasicClient.h"
 #include "30_server/LoginAction.h"
-#include "30_server/ActionFunctionRequest.h"
+#include "30_server/StaticActionFunctionRequest.h"
 #include "11_interfaces/SimplePageRequest.h"
 #include "01_util/Conversion.h"
 #include "30_server/QueryString.h"
@@ -133,7 +133,7 @@ class SessionReturnType
 		string callerId;
 		string favorisSentence;
 		vector<FavorisVectorStruct> favoris;
-		ActionFunctionRequest<LoginAction,SimplePageRequest> loginRequest;
+		StaticActionFunctionRequest<LoginAction,SimplePageRequest> loginRequest;
 		vector<SolutionSt> solutionVector;
 		
 	

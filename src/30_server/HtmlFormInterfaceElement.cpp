@@ -22,7 +22,7 @@
 
 #include "HtmlFormInterfaceElement.h"
 
-#include "Request.h"
+#include "DynamicRequest.h"
 #include "HTTPRequest.hpp"
 #include "Action.h"
 
@@ -92,7 +92,7 @@ namespace synthese
 				if (_function_key.get())
 					functionKey = _function_key->getValue(parameters, variables, object, request);
 				if (functionKey.empty())
-					functionKey = request->_getFunction()->getFactoryKey();
+					functionKey = request->getFunction()->getFactoryKey();
 				string actionKey;
 				if (_action_key.get())
 					actionKey = _action_key->getValue(parameters, variables, object, request);
@@ -102,8 +102,8 @@ namespace synthese
 				string functionParameters;
 				if (_function_parameters.get())
 					functionParameters = _function_parameters->getValue(parameters, variables, object, request);
-				if (functionParameters.empty() && functionKey == request->_getFunction()->getFactoryKey())
-					functionParameters = request->_getFunction()->getFixedParametersMap().getURI();
+				if (functionParameters.empty() && functionKey == request->getFunction()->getFactoryKey())
+					functionParameters = request->getFunction()->getFixedParametersMap().getURI();
 				
 				stringstream s;
 				s	<<
@@ -127,7 +127,7 @@ namespace synthese
 				HTTPRequest q;
 				q.uri = s.str();
 				q.ipaddr = request->getIP();
-				Request r(q);
+				DynamicRequest r(q);
 				r.setClientURL(request->getClientURL());
 				
 				

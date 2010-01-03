@@ -47,7 +47,7 @@ class Search
 		
 		tm dateTime;
 		
-		//ActionFunctionRequest<SearchRequest> searchRequest;
+		//StaticActionFunctionRequest<SearchRequest> searchRequest;
 		
 		
 		

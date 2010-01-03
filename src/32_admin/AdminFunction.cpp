@@ -23,8 +23,7 @@
 #include <sstream>
 #include <assert.h>
 
-
-
+#include "AdminFunction.h"
 #include "Conversion.h"
 #include "FactoryException.h"
 #include "HTMLForm.h"
@@ -49,7 +48,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace security;
 
-	template<> const string util::FactorableTemplate<RequestWithInterfaceAndRequiredSession,admin::AdminFunction>::FACTORY_KEY("admin");
+	template<> const string util::FactorableTemplate<RequestWithInterface,admin::AdminFunction>::FACTORY_KEY("admin");
 
 	namespace admin
 	{
@@ -60,7 +59,7 @@ namespace synthese
 		
 		ParametersMap AdminFunction::_getParametersMap() const
 		{
-			ParametersMap result(RequestWithInterfaceAndRequiredSession::_getParametersMap());
+			ParametersMap result(RequestWithInterface::_getParametersMap());
 
 			if (_page.get())
 			{
@@ -82,15 +81,13 @@ namespace synthese
 
 		void AdminFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			RequestWithInterfaceAndRequiredSession::_setFromParametersMap(map);
+			RequestWithInterface::_setFromParametersMap(map);
 
 			try
 			{
-				if (request.getUser().get() == NULL) return;
-
 				// Page
 				string pageKey;
-				if (request.getActionException())
+				if (map.getDefault<bool>(Request::PARAMETER_ACTION_FAILED, false))
 				{	// Prepare the KO page
 					pageKey = map.getDefault<string>(PARAMETER_ACTION_FAILED_PAGE);
 					if (pageKey.empty())
@@ -111,20 +108,14 @@ namespace synthese
 
 					pageKey = map.getDefault<string>(PARAMETER_PAGE);
 				}
-				shared_ptr<AdminInterfaceElement> page(pageKey.empty()
+				_page.reset(pageKey.empty()
 					? new HomeAdmin
 					: Factory<AdminInterfaceElement>::create(pageKey)
 				);
-				page->setEnv(shared_ptr<Env>(new Env));
-				page->setFromParametersMap(map, request.getActionWillCreateObject());
-				if(!request.getActionWillCreateObject())
-				{
-					page->_buildTabs(
-						static_cast<const AdminRequest* >(&request)
-					);
-				}
-				page->setActiveTab(map.getDefault<string>(PARAMETER_TAB));
-				_page = page;
+				_page->setEnv(shared_ptr<Env>(new Env));
+				_errorMessage = map.getOptional<string>(Request::PARAMETER_ERROR_MESSAGE);
+				_activeTab = map.getDefault<string>(PARAMETER_TAB);
+				_page->setFromParametersMap(map);
 			}
 			catch (FactoryException<AdminInterfaceElement> e)
 			{
@@ -140,6 +131,8 @@ namespace synthese
 		{
 			try
 			{
+				_page->_buildTabs(*request.getSession()->getUser()->getProfile());
+				_page->setActiveTab(_activeTab);
 				if (_interface != NULL)
 				{
 					const AdminInterfacePage* const aip(
@@ -148,16 +141,17 @@ namespace synthese
 					aip->display(
 						stream,
 						_page.get(),
-						static_cast<const AdminRequest* >(_request)
+						_errorMessage,
+						&StaticFunctionRequest<AdminFunction>(request, false)
 					);
 				}
-				else
+				else if(request.getSession())
 				{
 					VariablesMap variables;
 					_page->display(
 						stream,
 						variables,
-						static_cast<AdminRequest& >(*_request)
+						StaticFunctionRequest<AdminFunction>(request, false)
 					);
 				}
 			}
@@ -167,38 +161,45 @@ namespace synthese
 			}
 		}
 
-		void AdminRequest::setPage(shared_ptr<AdminInterfaceElement> aie )
+		void AdminFunction::setPage(shared_ptr<AdminInterfaceElement> aie )
 		{
 			_page = aie;
 		}
 
 		
-		shared_ptr<AdminInterfaceElement> AdminRequest::getPage() const
+		shared_ptr<AdminInterfaceElement> AdminFunction::getPage() const
 		{
 			return _page;
 		}
 
-		void AdminRequest::setActionFailedPage(shared_ptr<AdminInterfaceElement> aie )
+		void AdminFunction::setActionFailedPage(shared_ptr<AdminInterfaceElement> aie )
 		{
 			_actionFailedPage = aie;
 		}
 
-		bool AdminRequest::isAuthorized(const Profile& profile) const
+		bool AdminFunction::isAuthorized(const server::Session* session) const
 		{
-			return !_page.get() || _page->isAuthorized(static_cast<AdminRequest& >(*_request));
+			return
+				_page.get() &&
+				session &&
+				session->hasProfile() &&
+				_page->isAuthorized(
+					*session->getUser()
+				)
+			;
 		}
 
 
 
-		std::string AdminRequest::getOutputMimeType() const
+		std::string AdminFunction::getOutputMimeType() const
 		{
 			return "text/html";
 		}
 
-		void AdminRequest::_copy( boost::shared_ptr<const Function> function )
+		void AdminFunction::_copy( boost::shared_ptr<const Function> function )
 		{
-			RequestWithInterfaceAndRequiredSession::_copy(function);
-			_page = static_pointer_cast<const AdminRequest>(function)->_page;
+			RequestWithInterface::_copy(function);
+			_page = static_pointer_cast<const AdminFunction>(function)->_page;
 		}
 	}
 }

@@ -258,9 +258,9 @@ namespace synthese
 		}
 
 		bool CalendarTemplateAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const {
-			return profile.isAuthorized<CalendarRight>(READ);
+			return user.getProfile()->isAuthorized<CalendarRight>(READ);
 		}
 		
 
@@ -287,8 +287,9 @@ namespace synthese
 
 
 
-		void CalendarTemplateAdmin::_buildTabs( const admin::AdminRequest& request ) const
-		{
+		void CalendarTemplateAdmin::_buildTabs(
+			const security::Profile& profile
+		) const {
 			_tabs.clear();
 
 			_tabs.push_back(Tab("Données", TAB_SOURCE, true));

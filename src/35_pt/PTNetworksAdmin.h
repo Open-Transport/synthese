@@ -109,7 +109,7 @@ namespace synthese
 			///	@author Hugues
 			///	@date 2009
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& profile
 			) const;
 
 

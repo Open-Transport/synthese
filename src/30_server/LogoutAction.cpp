@@ -46,14 +46,10 @@ namespace synthese
 			request.deleteSession();
 		}
 
-		bool LogoutAction::_isSessionRequired() const
-		{
-			return false;
-		}
 
 
-
-		bool LogoutAction::isAuthorized(const Profile& profile
+		bool LogoutAction::isAuthorized(
+			const Session*
 		) const {
 			return true;
 		}

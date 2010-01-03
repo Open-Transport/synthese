@@ -4,7 +4,7 @@
 #include "Functions.h"
 #include "30_server/LoginAction.h"
 
-#include "30_server/ActionFunctionRequest.h"
+#include "30_server/StaticActionFunctionRequest.h"
 #include "11_interfaces/SimplePageRequest.h"
 
 using namespace synthese::server;

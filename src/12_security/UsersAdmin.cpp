@@ -39,7 +39,7 @@
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "Session.h"
-#include "ActionFunctionRequest.h"
+#include "StaticActionFunctionRequest.h"
 
 #include "AdminModule.h"
 #include "ModuleAdmin.h"
@@ -128,9 +128,9 @@ namespace synthese
 
 
 		bool UsersAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<SecurityRight>(READ);
+			return user.getProfile()->isAuthorized<SecurityRight>(READ);
 		}
 
 
@@ -247,7 +247,7 @@ namespace synthese
 			if(	moduleKey == SecurityModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile())
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewPage());
 			}

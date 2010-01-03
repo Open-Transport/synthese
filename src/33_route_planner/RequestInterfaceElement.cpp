@@ -22,7 +22,7 @@
 
 #include "RequestInterfaceElement.h"
 #include "RoutePlannerFunction.h"
-#include "FunctionRequest.h"
+#include "StaticFunctionRequest.h"
 #include "ValueElementList.h"
 #include "HTMLForm.h"
 
@@ -54,19 +54,17 @@ namespace synthese
 
 			string formName(_formName->getValue(parameters, variables, object, request));
 			string html(_html->getValue(parameters, variables, object, request));
-			
-			if(request)
+			try
 			{
-				FunctionRequest<RoutePlannerFunction> rprequest(*request);
-				rprequest.getFunction()->setMaxSolutions(
-					dynamic_cast<const FunctionRequest<RoutePlannerFunction>* >(
-						request
-					)->getFunction()->getMaxSolutions()
-				);
-
+				StaticFunctionRequest<RoutePlannerFunction> rprequest(*request, false);
+				
 				HTMLForm form(rprequest.getHTMLForm(formName));
 				stream << form.open(html);
 				stream << form.getHiddenFields();
+			}
+			catch(...)
+			{
+
 			}
 
 			return string();

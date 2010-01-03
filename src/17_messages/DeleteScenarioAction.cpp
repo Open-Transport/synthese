@@ -99,9 +99,9 @@ namespace synthese
 
 
 
-		bool DeleteScenarioAction::isAuthorized(const Profile& profile
+		bool DeleteScenarioAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
 		}
 	}
 }

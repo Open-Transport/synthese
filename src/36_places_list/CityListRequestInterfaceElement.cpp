@@ -21,16 +21,11 @@
 */
 
 #include "CityListRequestInterfaceElement.h"
-
-#include "36_places_list/CityListRequest.h"
-
-#include "30_server/FunctionRequest.h"
-
-#include "11_interfaces/ValueElementList.h"
-
-#include "05_html/HTMLForm.h"
-
-#include "01_util/Conversion.h"
+#include "CityListRequest.h"
+#include "StaticFunctionRequest.h"
+#include "ValueElementList.h"
+#include "HTMLForm.h"
+#include "Conversion.h"
 
 using namespace std;
 
@@ -62,7 +57,7 @@ namespace synthese
 			
 			if(request)
 			{
-				FunctionRequest<CityListRequest> clrequest(*request);
+				StaticFunctionRequest<CityListRequest> clrequest(*request);
 				clrequest.getFunction()->setTextInput(_txtField->getValue(parameters, variables, object, request));
 				clrequest.getFunction()->setIsForOrigin(Conversion::ToBool(_isForOrigin->getValue(parameters, variables, object, request)));
 				clrequest.getFunction()->setNumber(Conversion::ToInt(_number->getValue(parameters, variables, object, request)));

@@ -92,9 +92,9 @@ namespace synthese
 
 		
 		bool DataSourcesAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<GlobalRight>(READ);
+			return user.getProfile()->isAuthorized<GlobalRight>(READ);
 		}
 
 
@@ -152,7 +152,7 @@ namespace synthese
 			if(	moduleKey == ImpExModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile())
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewPage());
 			}

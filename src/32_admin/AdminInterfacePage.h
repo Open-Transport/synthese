@@ -42,7 +42,8 @@ namespace synthese
 				- object_id : current object id
 			
 			Parameters :
-				- 0 : user_full_name : User full name
+				- 0 : user_full_name : User full name (empty = no user logged)
+				- 1 : error message
 		*/
 		class AdminInterfacePage :
 			public util::FactorableTemplate<interfaces::InterfacePage,AdminInterfacePage>
@@ -61,6 +62,7 @@ namespace synthese
 			void display(
 				std::ostream& stream,
 				const AdminInterfaceElement* page,
+				const boost::optional<std::string>& errorMessage,
 				const server::Request* request = NULL
 			) const;
 

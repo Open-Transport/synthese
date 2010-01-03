@@ -160,9 +160,9 @@ namespace synthese
 
 
 
-		bool AddScenarioAction::isAuthorized(const Profile& profile
+		bool AddScenarioAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<MessagesLibraryRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

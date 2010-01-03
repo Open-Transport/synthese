@@ -71,7 +71,7 @@ namespace synthese
 			*/
 			void run(server::Request& request);
 			
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 			void setTimetable(boost::shared_ptr<Timetable> value);
 			void setLine(boost::shared_ptr<const env::CommercialLine> value);

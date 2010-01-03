@@ -148,7 +148,7 @@ namespace synthese
 
 
 
-		bool DisplayScreenSupervisionFunction::isAuthorized(const Profile& profile
+		bool DisplayScreenSupervisionFunction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

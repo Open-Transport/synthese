@@ -35,7 +35,7 @@
 #include "NamedPlace.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
-#include "Profile.h
+#include "Profile.h"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
@@ -217,7 +217,7 @@ namespace synthese
 			);
 			resaRequest.setActionWillCreateObject();
 
-			FunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request);
+			StaticFunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request);
 			customerSearchRequest.getFunction()->setNumber(20);
 
 			stream << HTMLModule::GetHTMLJavascriptOpen("resa.js");
@@ -459,9 +459,9 @@ namespace synthese
 		}
 
 		bool ReservationRoutePlannerAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPagesOfModule(
@@ -472,7 +472,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if(moduleKey == ResaModule::FACTORY_KEY && request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+				isAuthorized(*request.getUser()))
 			{
 				links.push_back(getNewPage());
 			}

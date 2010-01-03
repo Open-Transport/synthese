@@ -42,14 +42,16 @@ namespace synthese
 		void AdminInterfacePage::display(
 			std::ostream& stream,
 			const AdminInterfaceElement* page,
+			const boost::optional<std::string>& errorMessage,
 			const server::Request* request /*= NULL */
 		) const	{
 			ParametersVector parameters;
 			parameters.push_back(
-				request->getUser().get() ?
+				request->getSession() && request->getUser().get() ?
 				request->getUser()->getFullName() :
 				string()
 			);
+			parameters.push_back(errorMessage ? *errorMessage : string());
 			
 			VariablesMap vars;
 

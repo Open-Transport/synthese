@@ -99,7 +99,7 @@ namespace synthese
 				@date 2008
 			*/
 			virtual bool isAuthorized(
-				const security::Profile& profile
+				const security::User& user
 			) const;
 			
 			/** Title generator.
@@ -145,7 +145,7 @@ namespace synthese
 			/// @author Hugues
 			/// @date 2009
 			virtual void _buildTabs(
-				const admin::AdminRequest& request
+				const security::Profile& profile
 			) const;
 
 		};

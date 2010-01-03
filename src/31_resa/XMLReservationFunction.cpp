@@ -60,24 +60,17 @@ namespace synthese
 
 		void XMLReservationFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			if(!map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
+			try
 			{
-				request.setActionWillCreateObject();
+				_resa = ReservationTransactionTableSync::Get(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
+					*getEnv()
+				);
+				ReservationTableSync::Search(*getEnv(), _resa->getKey());
 			}
-			else
+			catch(ObjectNotFoundException<ReservationTransactionTableSync>)
 			{
-				try
-				{
-					_resa = ReservationTransactionTableSync::Get(
-						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-						*getEnv()
-					);
-					ReservationTableSync::Search(*getEnv(), _resa->getKey());
-				}
-				catch(ObjectNotFoundException<ReservationTransactionTableSync>)
-				{
-					throw RequestException("No such reservation");
-				}
+				throw RequestException("No such reservation");
 			}
 		}
 
@@ -139,11 +132,11 @@ namespace synthese
 		
 		
 		
-		bool XMLReservationFunction::isAuthorized(const Profile& profile) const
+		bool XMLReservationFunction::isAuthorized(const server::Session* session) const
 		{
 			return
-				profile.isAuthorized<ResaRight>(WRITE) ||
-				profile.isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
+				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE) ||
+				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
 		}
 
 

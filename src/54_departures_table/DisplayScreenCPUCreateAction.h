@@ -69,7 +69,7 @@ namespace synthese
 
 			void setPlace(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> place);
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 		};
 	}
 }

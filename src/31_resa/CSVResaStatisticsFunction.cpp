@@ -187,12 +187,12 @@ namespace synthese
 		
 		
 		
-		bool CSVResaStatisticsFunction::isAuthorized(const Profile& profile) const
+		bool CSVResaStatisticsFunction::isAuthorized(const server::Session* session) const
 		{
 			if (!_line.get())
 				return false;
 
-			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
 		}
 
 

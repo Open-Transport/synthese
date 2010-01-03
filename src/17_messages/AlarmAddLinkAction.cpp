@@ -126,15 +126,15 @@ namespace synthese
 
 
 
-		bool AlarmAddLinkAction::isAuthorized(const Profile& profile
+		bool AlarmAddLinkAction::isAuthorized(const Session* session
 		) const {
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get() != NULL)
 			{
-				return profile.isAuthorized<MessagesLibraryRight>(WRITE);
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE);
 			}
 			else
 			{
-				return profile.isAuthorized<MessagesRight>(WRITE);
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);
 			}
 		}
 	}

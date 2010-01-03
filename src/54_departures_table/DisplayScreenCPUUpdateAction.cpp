@@ -93,12 +93,12 @@ namespace synthese
 
 
 
-		bool DisplayScreenCPUUpdateAction::isAuthorized(const Profile& profile
+		bool DisplayScreenCPUUpdateAction::isAuthorized(const Session* session
 		) const {
 			return
 				_cpu->getPlace() ?
-				profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
-				profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER)
+				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
+				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER)
 			;				
 		}
 

@@ -125,9 +125,9 @@ namespace synthese
 
 		
 		bool PTPlacesAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<TransportNetworkRight>(READ);
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -280,7 +280,7 @@ namespace synthese
 			
 			if (moduleKey == PTModule::FACTORY_KEY && request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+				isAuthorized(*request.getUser()))
 			{
 				links.push_back(getNewPage());
 			}
@@ -320,8 +320,9 @@ namespace synthese
 
 
 
-		void PTPlacesAdmin::_buildTabs( const admin::AdminRequest& request ) const
-		{
+		void PTPlacesAdmin::_buildTabs(
+			const security::Profile& profile
+		) const	{
 			_tabs.clear();
 			_tabs.push_back(Tab("Zones d'arrêt", TAB_CONNECTION_PLACES, true, "building.png"));
 			_tabs.push_back(Tab("Routes", TAB_ROAD_PLACES, true, "building.png"));

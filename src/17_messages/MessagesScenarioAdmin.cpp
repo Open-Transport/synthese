@@ -41,7 +41,7 @@
 #include "MessagesLibraryRight.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "AlarmTemplateInheritedTableSync.h"
-#include "ActionFunctionRequest.h"
+#include "StaticActionFunctionRequest.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminParametersException.h"
@@ -293,12 +293,12 @@ namespace synthese
 		}
 
 		bool MessagesScenarioAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
 			if (_scenario.get() == NULL) return false;
 			if (dynamic_pointer_cast<const SentScenario, const Scenario>(_scenario).get() != NULL)
-				return profile.isAuthorized<MessagesRight>(READ);
-			return profile.isAuthorized<MessagesLibraryRight>(READ);
+				return user.getProfile()->isAuthorized<MessagesRight>(READ);
+			return user.getProfile()->isAuthorized<MessagesLibraryRight>(READ);
 		}
 
 		MessagesScenarioAdmin::MessagesScenarioAdmin(
@@ -363,7 +363,7 @@ namespace synthese
 
 
 		void MessagesScenarioAdmin::_buildTabs(
-			const admin::AdminRequest& _request
+			const security::Profile& profile
 		) const {
 			_tabs.clear();
 

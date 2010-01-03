@@ -54,14 +54,15 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const {
 			const AdminInterfaceElement* aie(static_cast<const AdminInterfaceElement*>(object));
-			assert(aie != NULL);
+			const AdminRequest* adminRequest(dynamic_cast<const AdminRequest*>(request));
+			assert(aie && adminRequest);
 
-			if(aie != NULL && request)
+			if(aie && adminRequest)
 			{
 				aie->displayTabs(
 					stream,
 					variables,
-					*dynamic_cast<const AdminRequest*>(request)
+					*adminRequest
 				);
 			}
 			return string();

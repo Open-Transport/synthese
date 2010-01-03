@@ -73,7 +73,7 @@ namespace synthese
 			*/
 			void run(std::ostream& stream, const server::Request& request) const;
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 			virtual std::string getOutputMimeType() const;
 		};

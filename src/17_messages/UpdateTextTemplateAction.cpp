@@ -128,9 +128,9 @@ namespace synthese
 
 
 
-		bool UpdateTextTemplateAction::isAuthorized(const Profile& profile) const
+		bool UpdateTextTemplateAction::isAuthorized(const server::Session* session) const
 		{
-			return profile.isAuthorized<MessagesLibraryRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

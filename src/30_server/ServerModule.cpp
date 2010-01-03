@@ -39,7 +39,7 @@
 #include "HTTPReply.hpp"
 #include "HTTPRequest.hpp"
 #include "Log.h"
-#include "Request.h"
+#include "DynamicRequest.h"
 #include "Function.h"
 #include "RequestException.h"
 #include "ActionException.h"
@@ -191,7 +191,7 @@ namespace synthese
 					req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)" + (req.postData.empty() ? string() : " + "+ lexical_cast<string>(req.postData.size()) +" bytes of POST data : "+ req.postData.substr(0, 100) ) );
 
 				SetCurrentThreadAnalysing(req.uri + (req.postData.empty() ? string() : " + "+ req.postData.substr(0, 100)));
-				Request request(req);
+				DynamicRequest request(req);
 
 				stringstream output;
 				request.run(output);
@@ -199,9 +199,9 @@ namespace synthese
 				rep.content.append(output.str());
 				rep.headers.insert(make_pair("Content-Length", lexical_cast<string>(rep.content.size())));
 				rep.headers.insert(make_pair("Content-Type", request.getOutputMimeType()));
-				if(request._getFunction().get() && !request._getFunction()->getFileName().empty())
+				if(request.getFunction().get() && !request.getFunction()->getFileName().empty())
 				{
-					rep.headers.insert(make_pair("Content-Disposition", "attachement; filename="+ request._getFunction()->getFileName()));
+					rep.headers.insert(make_pair("Content-Disposition", "attachement; filename="+ request.getFunction()->getFileName()));
 				}
 			}
 			catch(Request::RedirectException& e)

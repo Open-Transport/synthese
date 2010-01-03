@@ -99,9 +99,9 @@ namespace synthese
 		
 		
 		
-		bool SendPasswordAction::isAuthorized(const Profile& profile
+		bool SendPasswordAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<ResaRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE);
 		}
 
 

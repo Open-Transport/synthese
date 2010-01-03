@@ -243,7 +243,7 @@ namespace synthese
 
 
 
-		bool MapRequest::isAuthorized(const Profile& profile
+		bool MapRequest::isAuthorized(const Session* session
 
 			) const {
 			return true;

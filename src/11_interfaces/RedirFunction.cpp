@@ -71,7 +71,7 @@ namespace synthese
 
 
 
-		bool RedirFunction::isAuthorized(const Profile& profile
+		bool RedirFunction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

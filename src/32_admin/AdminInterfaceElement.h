@@ -25,8 +25,7 @@
 
 #include "FactoryBase.h"
 #include "11_interfaces/Types.h"
-#include "RequestManager.h"
-#include "StaticRequestPolicy.h"
+#include "StaticFunctionRequest.h"
 
 #include <string>
 #include <vector>
@@ -38,6 +37,7 @@ namespace synthese
 	{
 		class Right;
 		class Profile;
+		class User;
 	}
 	
 	namespace server
@@ -48,7 +48,7 @@ namespace synthese
 	namespace admin
 	{
 		class AdminFunction;
-		typedef server::RequestManager<server::StaticFunctionRequestPolicy<AdminFunction> > AdminRequest;
+		typedef server::StaticFunctionRequest<AdminFunction> AdminRequest;
 
 		////////////////////////////////////////////////////////////////////
 		/// Composant d'administration.
@@ -288,7 +288,7 @@ namespace synthese
 				///			relaunched
 				////////////////////////////////////////////////////////////////////
 				virtual void _buildTabs(
-					const AdminRequest& _request
+					const security::Profile& profile
 				) const;
 
 
@@ -376,10 +376,10 @@ namespace synthese
 			//! \name Getters
 			//@{
 				const PageLinks&		getTreePosition(
-					const server::Request& request
+					const AdminRequest& request
 				)	const;
 				const PageLinksTree&	getTree(
-					const server::Request& request
+					const AdminRequest& request
 				)	const;
 				const Tabs&				getTabs()			const;
 				std::string				getCurrentTab()		const;
@@ -446,13 +446,13 @@ namespace synthese
 				virtual server::ParametersMap getParametersMap() const = 0;
 
 				/** Authorization control.
-					@param request The current request
+					@param user The user who launched the display of the page
 					@return bool True if the displayed page can be displayed
 					@author Hugues Romain
 					@date 2007					
 				*/
 				virtual bool isAuthorized(
-					const security::Profile& profile
+					const security::User& user
 				) const = 0;
 
 				/** Display of the content of the admin element.

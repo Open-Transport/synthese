@@ -22,7 +22,7 @@
 
 #include "HTMLForm.h"
 #include "Interface.h"
-#include "ActionFunctionRequest.h"
+#include "StaticActionFunctionRequest.h"
 #include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
 #include "DisplayType.h"
@@ -103,7 +103,7 @@ namespace synthese
 		void DisplayTypesAdmin::display(
 			ostream& stream,
 			interfaces::VariablesMap& variables,
-			const FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const	{
 			// Right
 			bool writeRight(_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
@@ -252,9 +252,9 @@ namespace synthese
 		}
 
 		bool DisplayTypesAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<ArrivalDepartureTableRight>(
+			return user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(
 				READ,
 				UNKNOWN_RIGHT_LEVEL,
 				GLOBAL_PERIMETER
@@ -272,7 +272,7 @@ namespace synthese
 			
 			if (moduleKey == DeparturesTableModule::FACTORY_KEY && request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+				isAuthorized(*request.getUser()))
 			{
 				links.push_back(getNewPage());
 			}

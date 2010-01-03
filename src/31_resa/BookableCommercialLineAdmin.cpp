@@ -46,7 +46,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
 #include "RequestException.h"
-#include "ActionFunctionRequest.h"
+#include "StaticActionFunctionRequest.h"
 #include "Profile.h"
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"
@@ -501,12 +501,12 @@ namespace synthese
 		}
 
 		bool BookableCommercialLineAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
 			if (!_line.get())
 				return false;
 
-			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
+			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
 		}
 		
 

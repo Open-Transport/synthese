@@ -305,7 +305,7 @@ namespace synthese
 			// TAB EXPORT
 			if (openTabContent(stream, TAB_EXPORT))
 			{
-				RequestManager<StaticFunctionRequestPolicy<TridentExportFunction> > tridentExportFunction(_request);
+				StaticFunctionRequest<TridentExportFunction> tridentExportFunction(_request);
 				tridentExportFunction.getFunction()->setCommercialLine(_cline);
 				stream << "<h1>Formats Trident</h1>";
 				stream << "<p>";
@@ -322,10 +322,10 @@ namespace synthese
 		}
 
 		bool CommercialLineAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
 			if (_cline.get() == NULL) return false;
-			return profile.isAuthorized<TransportNetworkRight>(READ);
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
 		}
 		
 		
@@ -359,7 +359,7 @@ namespace synthese
 		}
 
 		void CommercialLineAdmin::_buildTabs(
-			const admin::AdminRequest& _request
+			const security::Profile& profile
 		) const {
 			_tabs.clear();
 

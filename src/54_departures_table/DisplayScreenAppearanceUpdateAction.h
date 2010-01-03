@@ -79,7 +79,7 @@ namespace synthese
 			///	@return bool true if the user can use the action.
 			///	@author Hugues Romain
 			///	@date 2008
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 
 		public:

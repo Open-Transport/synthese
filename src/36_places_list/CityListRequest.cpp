@@ -54,7 +54,7 @@ namespace synthese
 		const string CityListRequest::PARAMETER_IS_FOR_ORIGIN("o");
 		const string CityListRequest::PARAMETER_PAGE("p");
 		
-		void CityListRequest::_run( ostream& stream ) const
+		void CityListRequest::run( std::ostream& stream, const Request& request ) const
 		{
 			Site::CitiesMatcher::MatchResult matches(
 				_site->getCitiesMatcher().bestMatches(_input, _n)
@@ -69,7 +69,7 @@ namespace synthese
 				}
 
 				VariablesMap vm;
-				_page->display(stream, vm, placesList, true, _isForOrigin, NULL, _request);
+				_page->display(stream, vm, placesList, true, _isForOrigin, NULL, &request);
 			}
 			else
 			{
@@ -133,7 +133,7 @@ namespace synthese
 		}
 
 
-		bool CityListRequest::isAuthorized(const Profile& profile
+		bool CityListRequest::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

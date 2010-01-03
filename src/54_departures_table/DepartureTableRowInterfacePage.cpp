@@ -34,7 +34,7 @@
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "RealTimeUpdateFunction.h"
 #include "Interface.h"
-#include "FunctionRequest.h"
+#include "StaticFunctionRequest.h"
 
 using namespace boost;
 using namespace std;
@@ -124,7 +124,7 @@ namespace synthese
 					dynamic_cast<const ScheduledService*>(ptd.first.getService()) &&
 					request
 				){
-					FunctionRequest<RealTimeUpdateFunction> realTimeRequest(*request);
+					StaticFunctionRequest<RealTimeUpdateFunction> realTimeRequest(*request);
 					realTimeRequest.getFunction()->setInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(getInterface()->getKey()));
 					realTimeRequest.getFunction()->setService(Env::GetOfficialEnv().getRegistry<ScheduledService>().get(ptd.first.getService()->getKey()));
 					realTimeRequest.getFunction()->setLineStopRank(ptd.first.getEdge()->getRankInPath());

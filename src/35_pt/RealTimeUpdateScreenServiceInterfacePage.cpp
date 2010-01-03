@@ -35,8 +35,7 @@
 #include "RealTimeUpdateFunction.h"
 #include "Interface.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
-#include "RequestManager.h"
-#include "StaticRequestPolicy.h"
+#include "StaticActionFunctionRequest.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -104,7 +103,7 @@ namespace synthese
 
 			if(request)
 			{
-				RequestManager<StaticActionFunctionRequestPolicy<ScheduleRealTimeUpdateAction,RealTimeUpdateFunction> > scheduleUpdateRequest(*request);
+				StaticActionFunctionRequest<ScheduleRealTimeUpdateAction,RealTimeUpdateFunction> scheduleUpdateRequest(*request);
 				scheduleUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
 				scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 				scheduleUpdateRequest.getAction()->setAtArrival(false);
@@ -118,7 +117,7 @@ namespace synthese
 					scheduleUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES + Request::PARAMETER_ASSIGNMENT
 				); //11
 
-				RequestManager<StaticActionFunctionRequestPolicy<ServiceVertexRealTimeUpdateAction,RealTimeUpdateFunction> > vertexUpdateRequest(*request);
+				StaticActionFunctionRequest<ServiceVertexRealTimeUpdateAction,RealTimeUpdateFunction> vertexUpdateRequest(*request);
 				vertexUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
 				vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 				vertexUpdateRequest.getFunction()->setService(Env::GetOfficialEnv().getSPtr(&service));

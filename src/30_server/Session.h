@@ -86,6 +86,11 @@ namespace synthese
 				const std::string getKey() const;
 				boost::shared_ptr<const security::User> getUser() const;
 			//@}
+
+			//! @name Queries
+			//@{
+				bool hasProfile() const;
+			//@}
 		};
 	}
 }

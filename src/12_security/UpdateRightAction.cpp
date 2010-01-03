@@ -115,9 +115,9 @@ namespace synthese
 
 
 
-		bool UpdateRightAction::isAuthorized(const Profile& profile
+		bool UpdateRightAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<SecurityRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
 			/// @todo Add a control on the profile of the user
 		}
 		

@@ -49,7 +49,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007
 			*/
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

@@ -28,7 +28,7 @@
 #include "FactoryBase.h"
 #include "12_security/Types.h"
 #include "17_messages/Types.h"
-#include "RequestManager.h"
+#include "StaticActionRequest.h"
 
 namespace synthese
 {
@@ -59,10 +59,10 @@ namespace synthese
 				std::ostream& stream
 				, const messages::Alarm* alarm
 				, const server::ParametersMap& request
-				, admin::AdminRequest& searchRequest
-				, server::RequestManager<server::StaticActionRequestPolicy<messages::AlarmAddLinkAction> >& addRequest
-				, server::RequestManager<server::StaticActionRequestPolicy<messages::AlarmRemoveLinkAction> >& removeRequest
-				) = 0;
+				, server::Request& searchRequest
+				, server::StaticActionRequest<AlarmAddLinkAction>& addRequest
+				, server::StaticActionRequest<AlarmRemoveLinkAction>& removeRequest
+			) = 0;
 
 			virtual AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const server::ParametersMap& parameters) const = 0;
 

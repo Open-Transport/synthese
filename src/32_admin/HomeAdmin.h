@@ -85,7 +85,7 @@ namespace synthese
 			) const;
 
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& profile
 			) const;
 		};
 	}

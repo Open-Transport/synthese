@@ -80,11 +80,18 @@ namespace synthese
 		}
 
 
-		bool DBLogPurgeAction::isAuthorized(const Profile& profile
+
+		bool DBLogPurgeAction::isAuthorized(const Session* session
 		) const {
 			return 
-				profile.isAuthorized<DBLogRight>(DELETE_RIGHT) && _dbLog->isAuthorized(*_request, DELETE_RIGHT);
+				session &&
+				session->hasProfile() &&
+				session->getUser()->getProfile()->isAuthorized<DBLogRight>(DELETE_RIGHT) &&
+				_dbLog->isAuthorized(*session->getUser()->getProfile(), DELETE_RIGHT)
+			;
 		}
+
+
 
 		void DBLogPurgeAction::setDBLog( const std::string& value )
 		{
@@ -96,8 +103,9 @@ namespace synthese
 			{
 				throw ActionException(e.getMessage());
 			}
-
 		}
+
+
 
 		DBLogPurgeAction::DBLogPurgeAction()
 			: _endDate(TIME_UNKNOWN)

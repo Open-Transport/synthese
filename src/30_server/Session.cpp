@@ -32,6 +32,7 @@
 #include "Session.h"
 #include "SessionException.h"
 #include "ServerModule.h"
+#include "User.h"
 
 using namespace boost;
 using namespace std;
@@ -98,6 +99,16 @@ namespace synthese
 		shared_ptr<const security::User> Session::getUser() const
 		{
 			return _user;
+		}
+
+
+
+		bool Session::hasProfile() const
+		{
+			return
+				_user != NULL &&
+				_user->getProfile() != NULL
+			;
 		}
 	}
 }

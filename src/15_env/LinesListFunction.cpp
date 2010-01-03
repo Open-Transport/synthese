@@ -81,7 +81,8 @@ namespace synthese
 
 
 
-		bool LinesListFunction::isAuthorized(const Profile& profile
+		bool LinesListFunction::isAuthorized(
+			const Session*
 		) const {
 			return true;
 		}

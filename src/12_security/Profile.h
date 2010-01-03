@@ -109,7 +109,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007
 				*/
-				bool _isAuthorized(const Right& right) const;
+				bool isAuthorized(const Right& right) const;
 
 
 				/** Control of authorization.
@@ -172,7 +172,7 @@ namespace synthese
 			neededRight.setPublicLevel(publicr);
 			neededRight.setPrivateLevel(privater);
 			neededRight.setParameter(parameter);
-			return _isAuthorized(neededRight);
+			return isAuthorized(neededRight);
 		}
 
 

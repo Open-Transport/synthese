@@ -34,7 +34,7 @@
 #include "SecurityRight.h"
 #include "SecurityModule.h"
 #include "12_security/Constants.h"
-#include "ActionFunctionRequest.h"
+#include "StaticActionFunctionRequest.h"
 #include "AdminModule.h"
 #include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
@@ -204,9 +204,9 @@ namespace synthese
 		}
 
 		bool ProfilesAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<SecurityRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			return user.getProfile()->isAuthorized<SecurityRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 		
@@ -214,14 +214,14 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfModule(
 			const string& moduleKey,
 			const AdminInterfaceElement& currentPage,
-			const security::Profile& profile
+			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
 			if(	moduleKey == SecurityModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile())
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewPage());
 			}

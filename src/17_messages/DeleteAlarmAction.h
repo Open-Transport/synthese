@@ -73,7 +73,7 @@ namespace synthese
 			) throw(server::ActionException);
 
 			virtual bool isAuthorized(
-				const security::Profile& profile
+				const server::Session* session
 			) const;
 		};
 	}

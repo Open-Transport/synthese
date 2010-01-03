@@ -86,7 +86,7 @@ namespace synthese
 			void setCalendar(boost::shared_ptr<CalendarTemplate> value);
 			void setCalendar(boost::shared_ptr<const CalendarTemplate> value);
 			
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 		};
 	}
 }

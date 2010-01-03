@@ -107,8 +107,8 @@ namespace synthese
 					DisplayScreenCPUTableSync::Search(Env::GetOfficialEnv())
 				);
 				
-				FunctionRequest<DisplayScreenContentFunction> r(_request);
-				FunctionRequest<CPUGetWiredScreensFunction> r2(_request);
+				StaticFunctionRequest<DisplayScreenContentFunction> r(_request);
+				StaticFunctionRequest<CPUGetWiredScreensFunction> r2(_request);
 				ptime t0(microsec_clock::local_time());
 				time_duration duration;
 				BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, screens)
@@ -238,9 +238,9 @@ namespace synthese
 		}
 
 		bool DeparturesTableBenchmarkAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<ArrivalDepartureTableRight>(
+			return user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(
 				DELETE_RIGHT,
 				UNKNOWN_RIGHT_LEVEL,
 				GLOBAL_PERIMETER
@@ -262,7 +262,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if(	moduleKey == DeparturesTableModule::FACTORY_KEY && request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+				isAuthorized(*request.getUser()))
 			{
 				links.push_back(getNewPage());
 			}

@@ -130,7 +130,7 @@ namespace synthese
 
 
 
-		bool SiteUpdateAction::isAuthorized(const Profile& profile
+		bool SiteUpdateAction::isAuthorized(const Session* session
 
 			) const {
 			return true;

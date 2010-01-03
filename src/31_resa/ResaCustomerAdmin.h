@@ -93,7 +93,7 @@ namespace synthese
 				@date 2008
 			*/
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& user
 			) const;
 			
 			/** Gets sub page of the designed parent page, which are from the current class.
@@ -118,7 +118,7 @@ namespace synthese
 			
 			
 			virtual void _buildTabs(
-				const admin::AdminRequest& _request
+				const security::Profile& profile
 			) const;
 			
 			void setUser(boost::shared_ptr<security::User> value);

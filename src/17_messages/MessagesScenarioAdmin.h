@@ -112,7 +112,7 @@ namespace synthese
 					const admin::AdminRequest& _request) const;
 
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& user
 			) const;
 
 
@@ -132,7 +132,7 @@ namespace synthese
 			virtual std::string getTitle() const;
 
 			virtual void _buildTabs(
-				const admin::AdminRequest& _request
+				const security::Profile& profile
 			) const;
 
 			boost::shared_ptr<const Scenario> getScenario() const;

@@ -89,7 +89,7 @@ namespace synthese
 
 			void setTimetable(boost::shared_ptr<const Timetable> timetable);
 			
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 		};
 	}
 }

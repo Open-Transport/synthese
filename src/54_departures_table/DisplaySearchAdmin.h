@@ -173,7 +173,7 @@ namespace synthese
 				, uid lineUid, uid typeUid, int state, int message );
 
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& user
 			) const;
 
 			/** Gets sub page of the designed parent page, which are from the current class.
@@ -199,7 +199,7 @@ namespace synthese
 
 
 			virtual void _buildTabs(
-				const admin::AdminRequest& _request
+				const security::Profile& profile
 			) const;
 
 			void setPlace(const util::RegistryKeyType id);

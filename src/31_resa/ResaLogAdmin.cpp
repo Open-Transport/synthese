@@ -103,11 +103,11 @@ namespace synthese
 		}
 
 		bool ResaLogAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
 			return
-				profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL) &&
-				ResaDBLog::IsAuthorized(profile, READ)
+				user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL) &&
+				ResaDBLog::IsAuthorized(*user.getProfile(), READ)
 			;
 		}
 		
@@ -119,7 +119,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			if(moduleKey == ResaModule::FACTORY_KEY && request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+				isAuthorized(*request.getUser()))
 			{
 				links.push_back(getNewPage());
 			}

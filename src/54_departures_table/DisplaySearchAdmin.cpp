@@ -147,7 +147,7 @@ namespace synthese
 		void DisplaySearchAdmin::display(
 			ostream& stream,
 			interfaces::VariablesMap& variables,
-			const FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const	{
 			
 			DisplayScreenTableSync::SearchResult screens(
@@ -208,7 +208,7 @@ namespace synthese
 	
 				AdminFunctionRequest<DisplayAdmin> updateRequest(_request);
 
-				FunctionRequest<DisplayScreenContentFunction> viewRequest(_request);
+				StaticFunctionRequest<DisplayScreenContentFunction> viewRequest(_request);
 
 				if (!_place)
 				{
@@ -532,9 +532,9 @@ namespace synthese
 		}
 
 		bool DisplaySearchAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			return user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfModule(
@@ -547,7 +547,7 @@ namespace synthese
 			// General search page
 			if (moduleKey == DeparturesTableModule::FACTORY_KEY && request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+				isAuthorized(*request.getUser()))
 			{
 				// General search
 				shared_ptr<DisplaySearchAdmin> p1(getNewOtherPage<DisplaySearchAdmin>());
@@ -630,11 +630,11 @@ namespace synthese
 
 
 		void DisplaySearchAdmin::_buildTabs(
-			const admin::AdminRequest& _request
+			const security::Profile& profile
 		) const {
 			bool writeRight(
 				_place ?
-				_request.isAuthorized<ArrivalDepartureTableRight>(
+				profile.isAuthorized<ArrivalDepartureTableRight>(
 					WRITE,
 					UNKNOWN_RIGHT_LEVEL,
 					(_place->get() ? lexical_cast<string>((*_place)->getKey()) : string("0"))) :

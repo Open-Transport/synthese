@@ -30,6 +30,7 @@
 #include "TransportNetwork.h"
 #include "TransportNetworkAdmin.h"
 #include "Profile.h"
+#include "AdminFunction.h"
 
 using namespace std;
 using namespace boost;
@@ -87,9 +88,9 @@ namespace synthese
 
 		
 		bool PTNetworksAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<TransportNetworkRight>(READ);
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -116,7 +117,7 @@ namespace synthese
 			
 			if (moduleKey == PTModule::FACTORY_KEY && request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+				isAuthorized(*request.getUser()))
 			{
 				links.push_back(getNewPage());
 			}

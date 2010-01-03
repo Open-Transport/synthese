@@ -27,7 +27,7 @@
 #include "ModuleClass.h"
 #include "HTMLModule.h"
 #include "AdminParametersException.h"
-
+#include "AdminFunction.h"
 
 #include <boost/foreach.hpp>
 
@@ -91,7 +91,7 @@ namespace synthese
 		void ModuleAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
-			const FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const	{
 			stream << "<h1>Informations sur le module</h1>";
 
@@ -119,7 +119,7 @@ namespace synthese
 		}
 
 		bool ModuleAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
 			return true;
 		}

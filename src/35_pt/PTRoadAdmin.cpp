@@ -116,9 +116,9 @@ namespace synthese
 
 		
 		bool PTRoadAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<TransportNetworkRight>(READ);
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -245,8 +245,9 @@ namespace synthese
 
 
 
-		void PTRoadAdmin::_buildTabs( const admin::AdminRequest& request ) const
-		{
+		void PTRoadAdmin::_buildTabs(
+			const security::Profile& profile
+		) const	{
 			_tabs.clear();
 			_tabs.push_back(Tab("Carte", TAB_MAP, true));
 			_tabs.push_back(Tab("Détail", TAB_DETAIL, true));

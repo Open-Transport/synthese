@@ -102,17 +102,18 @@ namespace synthese
 		
 		
 		
-		void ScenarioFolderAdd::run()
-		{
+		void ScenarioFolderAdd::run(
+			Request& request
+		){
 			ScenarioFolder f;
 			f.setParent(_parent.get());
 			f.setName(_name);
 
 			ScenarioFolderTableSync::Save(&f);
 
-			_request->setActionCreatedId(f.getKey());
+			request.setActionCreatedId(f.getKey());
 
-			MessagesLibraryLog::AddCreateEntry(f, _request->getUser().get());
+			MessagesLibraryLog::AddCreateEntry(f, request.getUser().get());
 		}
 
 
@@ -133,9 +134,10 @@ namespace synthese
 
 
 
-		bool ScenarioFolderAdd::isAuthorized(const Profile& profile
+		bool ScenarioFolderAdd::isAuthorized(
+			const Session* session
 		) const {
-			return profile.isAuthorized<MessagesLibraryRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE);
 		}
 	}
 }

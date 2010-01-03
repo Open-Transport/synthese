@@ -106,7 +106,7 @@ namespace synthese
 		void DBLogAdmin::display(
 			ostream& stream,
 			interfaces::VariablesMap& variables,
-					const admin::AdminRequest& _request
+			const admin::AdminRequest& _request
 		) const {
 			stream << "<h1>Journal</h1>";
 
@@ -122,7 +122,7 @@ namespace synthese
 				true, false
 			);
 
-			if(purgeRequest.getAction()->_isAuthorized())
+			if(purgeRequest.getAction()->isAuthorized(_request.getSession()))
 			{
 				stream << "<h1>Purge</h1>";
 
@@ -137,9 +137,9 @@ namespace synthese
 		}
 
 		bool DBLogAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return _viewer.isAuthorized(profile);
+			return _viewer.isAuthorized(*user.getProfile());
 		}
 
 

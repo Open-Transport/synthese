@@ -25,7 +25,7 @@
 
 #include "AdminInterfaceElement.h"
 #include "HTMLModule.h"
-#include "FunctionRequest.h"
+#include "StaticFunctionRequest.h"
 #include "HomeAdmin.h"
 #include "Interface.h"
 #include "Profile.h"
@@ -227,7 +227,7 @@ namespace synthese
 
 
 		void AdminInterfaceElement::_buildTabs(
-			const admin::AdminRequest& _request
+			const security::Profile&
 		) const {
 			_tabBuilded = true;
 		}
@@ -385,8 +385,7 @@ namespace synthese
 			page->setEnv(_env);
 			page->setActiveTab(getCurrentTab());
 			page->setFromParametersMap(
-				getParametersMap(),
-				false
+				getParametersMap()
 			);
 			return page;
 		}

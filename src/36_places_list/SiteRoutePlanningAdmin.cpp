@@ -193,9 +193,9 @@ namespace synthese
 
 
 		bool SiteRoutePlanningAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<TransportWebsiteRight>(READ);
+			return user.getProfile()->isAuthorized<TransportWebsiteRight>(READ);
 		}
 		
 		

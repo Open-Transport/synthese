@@ -23,8 +23,8 @@
 #ifndef SYNTHESE_LogoutAction_H__
 #define SYNTHESE_LogoutAction_H__
 
-#include "30_server/Action.h"
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -44,13 +44,6 @@ namespace synthese
 			Removes the used parameters from the map.
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
-
-			/** Activates the action before the session control.
-				@return false
-				@author Hugues Romain
-				@date 2007				
-			*/
-			bool _isSessionRequired() const;
 		
 		public:
 
@@ -58,7 +51,9 @@ namespace synthese
 			*/
 			void run(server::Request& request);
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(
+				const Session* session
+			) const;
 		};
 	}
 }

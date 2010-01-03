@@ -23,7 +23,7 @@
 #include "LogoutHTMLLinkInterfaceElement.h"
 
 #include "LogoutAction.h"
-#include "ActionFunctionRequest.h"
+#include "StaticActionFunctionRequest.h"
 
 #include "HTMLForm.h"
 
@@ -81,7 +81,7 @@ namespace synthese
 			{
 				try
 				{
-					ActionFunctionRequest<LogoutAction,SimplePageFunction> redirRequest(*request);
+					StaticActionFunctionRequest<LogoutAction,SimplePageFunction> redirRequest(*request);
 					redirRequest.getFunction()->setPage(_page->getInterface()->getPage(NonPredefinedInterfacePage::FACTORY_KEY, requestKey));
 					stream << redirRequest.getHTMLForm().getLinkButton(content, "", icon);
 				}
@@ -92,7 +92,7 @@ namespace synthese
 			}
 			if (url.size() && request)
 			{
-				ActionFunctionRequest<LogoutAction,RedirFunction> redirRequest(*request);
+				StaticActionFunctionRequest<LogoutAction,RedirFunction> redirRequest(*request);
 				redirRequest.getFunction()->setRedirURL(url);
 				stream << redirRequest.getHTMLForm().getLinkButton(content, "", icon);
 			}

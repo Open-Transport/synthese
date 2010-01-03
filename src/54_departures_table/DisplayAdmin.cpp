@@ -167,7 +167,7 @@ namespace synthese
 		void DisplayAdmin::display(
 			std::ostream& stream,
 			interfaces::VariablesMap& variables,
-			const FunctionRequest<admin::AdminRequest>& _request
+			const admin::AdminRequest& _request
 		) const	{
 			// Display screen read in the main environment
 			shared_ptr<const DisplayScreen> _prodScreen(
@@ -899,7 +899,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_RESULT))
 			{
 				// Requests
-				FunctionRequest<DisplayScreenContentFunction> viewRequest(_request);
+				StaticFunctionRequest<DisplayScreenContentFunction> viewRequest(_request);
 				viewRequest.getFunction()->setScreen(_displayScreen);
 				if(	_displayScreen->getType() &&
 					_displayScreen->getType()->getDisplayInterface() &&
@@ -1030,13 +1030,13 @@ namespace synthese
 
 
 		bool DisplayAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
 			if (_displayScreen.get() == NULL) return false;
-			if (_displayScreen->getLocalization() == NULL) return profile.isAuthorized<ArrivalDepartureTableRight>(READ) || profile.isAuthorized<DisplayMaintenanceRight>(READ);
+			if (_displayScreen->getLocalization() == NULL) return user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ) || user.getProfile()->isAuthorized<DisplayMaintenanceRight>(READ);
 			return
-				profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())) ||
-				profile.isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
+				user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())) ||
+				user.getProfile()->isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
 		}
 
 		DisplayAdmin::DisplayAdmin(
@@ -1055,29 +1055,29 @@ namespace synthese
 
 
 		void DisplayAdmin::_buildTabs(
-			const admin::AdminRequest& _request
+			const security::Profile& profile
 		) const {
 			_tabs.clear();
 
 			if(	_displayScreen->getLocalization() &&
-				_request.isAuthorized<ArrivalDepartureTableRight>(
+				profile.isAuthorized<ArrivalDepartureTableRight>(
 					READ,
 					UNKNOWN_RIGHT_LEVEL,
 					lexical_cast<string>(_displayScreen->getLocalization()->getKey())
 				) ||
 				!_displayScreen->getLocalization() &&
-				_request.isAuthorized<ArrivalDepartureTableRight>(
+				profile.isAuthorized<ArrivalDepartureTableRight>(
 					READ,
 					UNKNOWN_RIGHT_LEVEL
 			)	){
 				bool writeRight(
 					_displayScreen->getLocalization() ?
-					_request.isAuthorized<ArrivalDepartureTableRight>(
+					profile.isAuthorized<ArrivalDepartureTableRight>(
 						WRITE,
 						UNKNOWN_RIGHT_LEVEL,
 						Conversion::ToString(_displayScreen->getLocalization()->getKey())
 					) :
-					_request.isAuthorized<ArrivalDepartureTableRight>(
+					profile.isAuthorized<ArrivalDepartureTableRight>(
 						WRITE,
 						UNKNOWN_RIGHT_LEVEL
 				)	);
@@ -1085,22 +1085,22 @@ namespace synthese
 			}
 
 			if(	_displayScreen->getLocalization() &&
-				_request.isAuthorized<DisplayMaintenanceRight>(
+				profile.isAuthorized<DisplayMaintenanceRight>(
 					READ,
 					UNKNOWN_RIGHT_LEVEL,
 					lexical_cast<string>(_displayScreen->getLocalization()->getKey())
 				) ||
 				!_displayScreen->getLocalization() &&
-				_request.isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL)
+				profile.isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL)
 			){
 				bool writeRight(
 					_displayScreen->getLocalization() ?
-					_request.isAuthorized<DisplayMaintenanceRight>(
+					profile.isAuthorized<DisplayMaintenanceRight>(
 						WRITE,
 						UNKNOWN_RIGHT_LEVEL,
 						lexical_cast<string>(_displayScreen->getLocalization()->getKey())
 					) :
-					_request.isAuthorized<DisplayMaintenanceRight>(
+					profile.isAuthorized<DisplayMaintenanceRight>(
 						WRITE,
 						UNKNOWN_RIGHT_LEVEL
 				)	);
@@ -1108,24 +1108,24 @@ namespace synthese
 			}
 
 			if (_displayScreen->getLocalization() &&
-				_request.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())) ||
+				profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())) ||
 				!_displayScreen->getLocalization() &&
-				_request.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL)
+				profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL)
 			){
 				bool writeRight(
 					_displayScreen->getLocalization() ?
-					_request.isAuthorized<ArrivalDepartureTableRight>(
+					profile.isAuthorized<ArrivalDepartureTableRight>(
 						WRITE,
 						UNKNOWN_RIGHT_LEVEL,
 						lexical_cast<string>(_displayScreen->getLocalization()->getKey())
 					) :
-					_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL)
+					profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL)
 				);
 				_tabs.push_back(Tab("Sélection", TAB_CONTENT, writeRight, "times_display.png"));
 				_tabs.push_back(Tab("Apparence", TAB_APPEARANCE, writeRight, "font.png"));
 				_tabs.push_back(Tab("Résultat", TAB_RESULT, writeRight, "zoom.png"));
 
-				if (ArrivalDepartureTableLog::IsAuthorized(_request, READ))
+				if (ArrivalDepartureTableLog::IsAuthorized(profile, READ))
 				{
 					_tabs.push_back(Tab("Journal", TAB_LOG, writeRight, "book.png"));
 				}

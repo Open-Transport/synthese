@@ -86,9 +86,9 @@ namespace synthese
 
 		
 		bool ResaStatisticsMenuAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
+			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 
@@ -101,9 +101,7 @@ namespace synthese
 
 			// Display
 			AdminFunctionRequest<CallStatisticsAdmin> openCallsRequest(request);
-			if(request.getFunction()->getPage()->request.getUser() &&
-				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+			if(request.getFunction()->getPage()->isAuthorized(*request.getUser()))
 			{
 				stream << "<h1>Statistiques d'appels</h1>";
 				stream << "<p>" << HTMLModule::getLinkButton(openCallsRequest.getURL(), "Statistiques appels", string(), CallStatisticsAdmin::ICON) << "</p>";
@@ -164,7 +162,7 @@ namespace synthese
 			if (moduleKey == ResaModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile())
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewPage());
 			}
@@ -183,9 +181,7 @@ namespace synthese
 			shared_ptr<CallStatisticsAdmin> p(
 				getNewOtherPage<CallStatisticsAdmin>()
 			);
-			if(p->request.getUser() &&
-				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+			if(p->isAuthorized(*request.getUser()))
 			{
 				links.push_back(p);
 			}

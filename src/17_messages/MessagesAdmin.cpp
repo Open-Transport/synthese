@@ -28,7 +28,7 @@
 #include "ActionResultHTMLTable.h"
 #include "05_html/Constants.h"
 #include "InterfaceModule.h"
-#include "ActionFunctionRequest.h"
+#include "StaticActionFunctionRequest.h"
 #include "SentScenario.h"
 #include "AlarmRecipient.h"
 #include "AlarmTableSync.h"
@@ -374,10 +374,9 @@ namespace synthese
 
 
 
-		bool MessagesAdmin::isAuthorized(
-			const security::Profile& profile
+		bool MessagesAdmin::isAuthorized(const security::User& user
 		) const	{
-			return profile.isAuthorized<MessagesRight>(READ);
+			return user.getProfile()->isAuthorized<MessagesRight>(READ);
 		}
 
 		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPagesOfModule(
@@ -390,7 +389,7 @@ namespace synthese
 			if(	moduleKey == MessagesModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewPage());
 			}

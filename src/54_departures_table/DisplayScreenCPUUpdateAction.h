@@ -66,7 +66,7 @@ namespace synthese
 
 			void setCPU(util::RegistryKeyType id);
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 		};
 	}
 }

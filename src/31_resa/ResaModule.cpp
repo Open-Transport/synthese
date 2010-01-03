@@ -30,7 +30,7 @@
 #include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
 #include "Session.h"
-#include "ActionFunctionRequest.h"
+#include "StaticActionFunctionRequest.h"
 #include "Reservation.h"
 #include "ReservationTableSync.h"
 #include "ResaRight.h"

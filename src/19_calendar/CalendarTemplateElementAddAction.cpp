@@ -152,9 +152,9 @@ namespace synthese
 		}
 
 		
-		bool CalendarTemplateElementAddAction::isAuthorized(const Profile& profile) const
+		bool CalendarTemplateElementAddAction::isAuthorized(const server::Session* session) const
 		{
-			return profile.isAuthorized<CalendarRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CalendarRight>(WRITE);
 		}
 	}
 }

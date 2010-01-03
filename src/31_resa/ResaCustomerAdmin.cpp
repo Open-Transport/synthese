@@ -229,9 +229,9 @@ namespace synthese
 		}
 
 		bool ResaCustomerAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
+			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
 		
 
@@ -244,10 +244,10 @@ namespace synthese
 
 		
 		void ResaCustomerAdmin::_buildTabs(
-			const admin::AdminRequest& _request
+			const security::Profile& profile
 		) const {
 			_tabs.clear();
-			bool writeRight(_request.isAuthorized<ResaRight>(WRITE, UNKNOWN_RIGHT_LEVEL));
+			bool writeRight(profile.isAuthorized<ResaRight>(WRITE, UNKNOWN_RIGHT_LEVEL));
 
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, writeRight, "user.png"));
 			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, writeRight, "cog.png"));

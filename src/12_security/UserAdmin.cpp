@@ -162,19 +162,21 @@ namespace synthese
 
 
 		bool UserAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return 	profile.isAuthorized<SecurityRight>(
-						READ,
-						UNKNOWN_RIGHT_LEVEL,
-						_user->getProfile() ? lexical_cast<string>(_user->getProfile()->getKey()) : GLOBAL_PERIMETER
-					) ||
-					_user->getKey() == _request.getUser()->getKey() &&
-					profile.isAuthorized<SecurityRight>(
-						UNKNOWN_RIGHT_LEVEL,
-						READ,
-						string()
-				);
+			return
+				user.getProfile()->isAuthorized<SecurityRight>(
+					READ,
+					UNKNOWN_RIGHT_LEVEL,
+					_user->getProfile() ? lexical_cast<string>(_user->getProfile()->getKey()) : GLOBAL_PERIMETER
+				) ||
+				_user->getKey() == user.getKey() &&
+				user.getProfile()->isAuthorized<SecurityRight>(
+					UNKNOWN_RIGHT_LEVEL,
+					READ,
+					string()
+				)
+			;
 		}
 
 

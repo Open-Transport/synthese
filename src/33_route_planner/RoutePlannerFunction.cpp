@@ -109,21 +109,16 @@ namespace synthese
 			}
 
 			// Origin and destination places
-			_favoriteId = map.getOptional<RegistryKeyType>(PARAMETER_FAVORITE_ID);
-			if (_favoriteId) // 2b
+			optional<RegistryKeyType> favoriteId(map.getOptional<RegistryKeyType>(PARAMETER_FAVORITE_ID));
+			if (favoriteId) // 2b
 			{
 				try
 				{
-					Env env;
-					shared_ptr<const UserFavoriteJourney> favorite(UserFavoriteJourneyTableSync::Get(*_favoriteId, env));
-					if (favorite->getUser()->getKey() != request.getUser()->getKey())
-					{
-						throw RequestException("Forbidden favorite");
-					}
-					_originCityText = favorite->getOriginCityName();
-					_originPlaceText = favorite->getOriginPlaceName();
-					_destinationCityText = favorite->getDestinationCityName();
-					_destinationPlaceText = favorite->getDestinationPlaceName();
+					_favorite = UserFavoriteJourneyTableSync::Get(*favoriteId, Env::GetOfficialEnv());
+					_originCityText = _favorite->getOriginCityName();
+					_originPlaceText = _favorite->getOriginPlaceName();
+					_destinationCityText = _favorite->getDestinationCityName();
+					_destinationPlaceText = _favorite->getDestinationPlaceName();
 				}
 				catch(ObjectNotFoundException<UserFavoriteJourney> e)
 				{
@@ -342,10 +337,10 @@ namespace synthese
 						;
 					}
 					stream << " />";
-					if(_favoriteId)
+					if(_favorite.get())
 					{
 						stream <<
-							"<favorite id=\"" << *_favoriteId << "\" />"
+							"<favorite id=\"" << _favorite->getKey() << "\" />"
 						;
 					}
 /*
@@ -691,8 +686,17 @@ namespace synthese
 
 
 
-		bool RoutePlannerFunction::isAuthorized(const Profile& profile
+		bool RoutePlannerFunction::isAuthorized(
+			const Session* session
 		) const {
+			if(	_favorite.get() &&
+				(	!session ||
+					!session->getUser() ||
+					_favorite->getUser()->getKey() != session->getUser()->getKey()
+			)	){
+				return false;
+			}
+
 			return true;
 		}
 

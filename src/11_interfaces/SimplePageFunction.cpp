@@ -116,7 +116,7 @@ namespace synthese
 
 
 
-		bool SimplePageFunction::isAuthorized(const Profile& profile
+		bool SimplePageFunction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

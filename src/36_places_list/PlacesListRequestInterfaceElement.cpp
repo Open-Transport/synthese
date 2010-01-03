@@ -21,14 +21,10 @@
 */
 
 #include "PlacesListRequestInterfaceElement.h"
-
-#include "36_places_list/PlacesListFunction.h"
-
-#include "30_server/FunctionRequest.h"
-
-#include "11_interfaces/ValueElementList.h"
-
-#include "01_util/Conversion.h"
+#include "PlacesListFunction.h"
+#include "StaticFunctionRequest.h"
+#include "ValueElementList.h"
+#include "Conversion.h"
 
 using namespace std;
 
@@ -62,7 +58,7 @@ namespace synthese
 		) const {
 			if(request)
 			{
-				FunctionRequest<PlacesListFunction> plrequest(*request);
+				StaticFunctionRequest<PlacesListFunction> plrequest(*request);
 				plrequest.getFunction()->setTextInput(_txtField->getValue(parameters, variables, object, request));
 				plrequest.getFunction()->setIsForOrigin(Conversion::ToBool(_isForOrigin->getValue(parameters, variables, object, request)));
 				plrequest.getFunction()->setNumber(Conversion::ToInt(_number->getValue(parameters, variables, object, request)));

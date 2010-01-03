@@ -121,7 +121,7 @@ namespace synthese
 				@date 2007
 			*/
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& user
 			) const;
 
 			/** Gets sub page of the designed parent page, which are from the current class.

@@ -92,10 +92,15 @@ namespace synthese
 
 
 
-		bool UserPasswordUpdateAction::isAuthorized(const Profile& profile
+		bool UserPasswordUpdateAction::isAuthorized(
+			const Session* session
 		) const {
-			return profile.isAuthorized<SecurityRight>(WRITE) ||
-				request.getUser() != NULL && request.getUser()->getKey() == _user->getKey();
+			return
+				session &&
+				(	session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE) ||
+					session->getUser() != NULL && session->getUser()->getKey() == _user->getKey()
+				)
+			;
 		}
 		
 		

@@ -75,7 +75,7 @@ namespace synthese
 				util::RegistryKeyType id
 			) throw(server::RequestException);
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 
 			virtual std::string getOutputMimeType() const;

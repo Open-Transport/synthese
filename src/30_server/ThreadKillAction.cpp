@@ -73,9 +73,9 @@ namespace synthese
 
 
 
-		bool ThreadKillAction::isAuthorized(const Profile& profile) const
+		bool ThreadKillAction::isAuthorized(const server::Session* session) const
 		{
-			return profile.isAuthorized<ServerAdminRight>(DELETE_RIGHT);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ServerAdminRight>(DELETE_RIGHT);
 		}
 
 

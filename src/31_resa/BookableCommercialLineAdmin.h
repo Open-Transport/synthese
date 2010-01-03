@@ -112,7 +112,7 @@ namespace synthese
 				@date 2008
 			*/
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& profile
 			) const;
 			
 			/** Sub pages getter.

@@ -104,7 +104,7 @@ namespace synthese
 				@date 2008
 			*/
 			bool isAuthorized(
-				const security::Profile& profile
+				const security::User& user
 			) const;
 			
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;

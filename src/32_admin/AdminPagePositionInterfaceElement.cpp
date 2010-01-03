@@ -24,12 +24,12 @@
 
 #include "HTMLModule.h"
 #include "ValueElementList.h"
-#include "FunctionRequest.h"
+#include "StaticFunctionRequest.h"
 #include "Conversion.h"
 #include "AdminInterfaceElement.h"
 #include "AdminPagePositionInterfaceElement.h"
 #include "AdminParametersException.h"
-
+#include "AdminFunction.h"
 
 using namespace boost;
 using namespace std;

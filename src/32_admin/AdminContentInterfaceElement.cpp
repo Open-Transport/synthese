@@ -21,7 +21,7 @@
 */
 
 #include "ValueElementList.h"
-#include "FunctionRequest.h"
+#include "StaticFunctionRequest.h"
 #include "AdminInterfaceElement.h"
 #include "AdminInterfaceElement.h"
 #include "AdminContentInterfaceElement.h"
@@ -50,14 +50,17 @@ namespace synthese
 			const server::Request* request /*= NULL*/ ) const
 		{
 			const AdminInterfaceElement* aie = static_cast<const AdminInterfaceElement*>(rootObject);
-			assert(aie != NULL);
-
-			if(aie != NULL && request)
+			const AdminRequest* adminRequest(
+				dynamic_cast<const AdminRequest*>(request)
+			);
+			assert(aie && adminRequest);
+			
+			if(aie && adminRequest)
 			{
 				aie->display(
 					stream,
 					variables,
-					*dynamic_cast<const AdminRequest*>(request)
+					*adminRequest
 				);
 			}
 			return string();

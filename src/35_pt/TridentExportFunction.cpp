@@ -84,7 +84,7 @@ namespace synthese
 
 
 
-		bool TridentExportFunction::isAuthorized(const Profile& profile
+		bool TridentExportFunction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

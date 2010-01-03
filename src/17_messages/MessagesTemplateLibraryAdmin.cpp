@@ -223,9 +223,9 @@ namespace synthese
 
 
 		bool MessagesTemplateLibraryAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<MessagesLibraryRight>(READ);
+			return user.getProfile()->isAuthorized<MessagesLibraryRight>(READ);
 		}
 		
 
@@ -240,7 +240,7 @@ namespace synthese
 			if(	moduleKey == MessagesModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewOtherPage<MessagesTemplateLibraryAdmin>());
 			}

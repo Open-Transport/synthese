@@ -97,9 +97,9 @@ namespace synthese
 
 		
 		bool PTCitiesAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<TransportNetworkRight>(READ);
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -183,7 +183,7 @@ namespace synthese
 			if(	moduleKey == PTModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile())
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewPage());
 			}
@@ -210,8 +210,9 @@ namespace synthese
 
 
 
-		void PTCitiesAdmin::_buildTabs( const admin::AdminRequest& request ) const
-		{
+		void PTCitiesAdmin::_buildTabs(
+			const security::Profile& profile
+		) const	{
 			_tabs.clear();
 
 			_tabs.push_back(Tab("Recherche", TAB_LIST, true, "find.png"));

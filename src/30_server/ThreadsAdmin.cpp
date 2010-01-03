@@ -131,9 +131,9 @@ namespace synthese
 		}
 
 		bool ThreadsAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<ServerAdminRight>(READ);
+			return user.getProfile()->isAuthorized<ServerAdminRight>(READ);
 		}
 
 
@@ -148,7 +148,7 @@ namespace synthese
 			if(	moduleKey == ServerModule::FACTORY_KEY &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()
+				isAuthorized(*request.getUser())
 			){
 				links.push_back(getNewPage());
 			}

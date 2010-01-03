@@ -73,7 +73,7 @@ namespace synthese
 			);
 
 			virtual bool isAuthorized(
-				const security::Profile& profile
+				const server::Session* session
 			) const;
 			
 			void setProfile(boost::shared_ptr<Profile> value);

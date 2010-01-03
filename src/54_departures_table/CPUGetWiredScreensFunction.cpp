@@ -132,7 +132,7 @@ namespace synthese
 
 
 
-		bool CPUGetWiredScreensFunction::isAuthorized(const Profile& profile
+		bool CPUGetWiredScreensFunction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}

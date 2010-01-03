@@ -110,12 +110,14 @@ namespace synthese
 
 
 
-		bool AddUserFavoriteJourneyAction::isAuthorized(const Profile& profile
+		bool AddUserFavoriteJourneyAction::isAuthorized(const Session* session
 		) const {
 			return 
-				profile.isAuthorized<GlobalRight>(WRITE) ||
-				request.getUser() != NULL && request.getUser()->getKey() == _user->getKey();
-
+				session &&
+				(	session->hasProfile() && session->getUser()->getProfile()->isAuthorized<GlobalRight>(WRITE) ||
+					session->getUser() != NULL && session->getUser()->getKey() == _user->getKey()
+				)
+			;
 		}
 	}
 }

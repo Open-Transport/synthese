@@ -21,7 +21,7 @@
 */
 
 #include "AdminPagesTreeInterfaceElement.h"
-
+#include "AdminFunction.h"
 #include "AdminParametersException.h"
 
 #include "HomeAdmin.h"
@@ -30,7 +30,7 @@
 
 #include "ValueElementList.h"
 
-#include "FunctionRequest.h"
+#include "StaticFunctionRequest.h"
 
 #include <sstream>
 
@@ -82,32 +82,36 @@ namespace synthese
 			const AdminInterfaceElement* page(
 				static_cast<const AdminInterfaceElement*>(object)
 			);
+			const AdminRequest* adminRequest(
+				dynamic_cast<const AdminRequest*>(request)
+			);
+			assert(page && adminRequest);
 			
-			_lastLevelIndenter = _lastLevelIndenterVIE->getValue(parameters, variables, object, request);
-			_levelIndenter = _levelIndenterVIE->getValue(parameters, variables, object, request);
-			_lastSubpageIntroducer = _lastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
-			_subpageIntroducer = _subpageIntroducerVIE->getValue(parameters, variables, object, request);
-			_subpagesIntroducerIfClosed = _subpagesIntroducerIfClosedVIE->getValue(parameters, variables, object, request);
-			_subpagesIntroducerIfOpened = _subpagesIntroducerIfOpenedVIE->getValue(parameters, variables, object, request);
-			_opening = _openingVIE->getValue(parameters, variables, object, request);
-			_ending = _endingVIE->getValue(parameters, variables, object, request);
-			_openedFolderSubpageIntroducer = _openedFolderSubpageIntroducerVIE->getValue(parameters, variables, object, request);
-			_closedFolderSubpageIntroducer = _closedFolderSubpageIntroducerVIE->getValue(parameters, variables, object, request);
-			_openedFolderLastSubpageIntroducer = _openedFolderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
-			_closedFolderLastSubpageIntroducer = _closedFolderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
-
-			if(request)
+			if(page && adminRequest)
 			{
+				_lastLevelIndenter = _lastLevelIndenterVIE->getValue(parameters, variables, object, request);
+				_levelIndenter = _levelIndenterVIE->getValue(parameters, variables, object, request);
+				_lastSubpageIntroducer = _lastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
+				_subpageIntroducer = _subpageIntroducerVIE->getValue(parameters, variables, object, request);
+				_subpagesIntroducerIfClosed = _subpagesIntroducerIfClosedVIE->getValue(parameters, variables, object, request);
+				_subpagesIntroducerIfOpened = _subpagesIntroducerIfOpenedVIE->getValue(parameters, variables, object, request);
+				_opening = _openingVIE->getValue(parameters, variables, object, request);
+				_ending = _endingVIE->getValue(parameters, variables, object, request);
+				_openedFolderSubpageIntroducer = _openedFolderSubpageIntroducerVIE->getValue(parameters, variables, object, request);
+				_closedFolderSubpageIntroducer = _closedFolderSubpageIntroducerVIE->getValue(parameters, variables, object, request);
+				_openedFolderLastSubpageIntroducer = _openedFolderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
+				_closedFolderLastSubpageIntroducer = _closedFolderLastSubpageIntroducerVIE->getValue(parameters, variables, object, request);
+
 				stream << displaySubPages(
 					page->getTree(
-						*dynamic_cast<const AdminRequest*>(request)
+						*adminRequest
 					),
 					page
 					, 0
 					, string()
 					, true,
 					*request
-					);
+				);
 			}
 	
 			return string();

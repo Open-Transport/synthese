@@ -94,7 +94,7 @@ namespace synthese
 			static std::map<int, std::string> GetClearDelaysList();
 			static DisplayFunction GetFunction(const DisplayScreen& screen);
 
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 			
 			

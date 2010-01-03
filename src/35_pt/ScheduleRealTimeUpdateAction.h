@@ -91,7 +91,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Authorization control.
 			/// @todo Implement a right control on this function
-			virtual bool isAuthorized(const security::Profile& profile) const;
+			virtual bool isAuthorized(const server::Session* session) const;
 
 			virtual bool _isSessionRequired() const { return false; }
 

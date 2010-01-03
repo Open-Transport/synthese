@@ -88,12 +88,12 @@ namespace synthese
 
 
 
-		bool DisplayScreenCPUMaintenanceUpdateAction::isAuthorized(const Profile& profile
+		bool DisplayScreenCPUMaintenanceUpdateAction::isAuthorized(const Session* session
 		) const {
 			return
 				_cpu->getPlace() ?
-				profile.isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
-				profile.isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER)
+				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
+				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER)
 			;
 		}
 

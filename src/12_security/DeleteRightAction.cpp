@@ -90,9 +90,9 @@ namespace synthese
 
 
 
-		bool DeleteRightAction::isAuthorized(const Profile& profile
+		bool DeleteRightAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<SecurityRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
 		}
 		
 		

@@ -35,6 +35,7 @@
 #include "TridentFileFormat.h"
 #include "TransportNetworkRight.h"
 #include "Profile.h"
+#include "AdminFunction.h"
 
 using namespace boost;
 using namespace std;
@@ -102,9 +103,9 @@ namespace synthese
 
 		
 		bool PTImportAdmin::isAuthorized(
-			const security::Profile& profile
+			const security::User& user
 		) const	{
-			return profile.isAuthorized<TransportNetworkRight>(READ);
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
 		}
 
 
@@ -122,7 +123,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_NAVTEQ))
 			{
 
-				RequestManager<StaticFunctionRequestPolicy<ImportFunction> > importRequest(request);
+				StaticFunctionRequest<ImportFunction> importRequest(request);
 				
 				PropertiesHTMLTable t(importRequest.getHTMLForm());
 				stream << t.open();
@@ -140,7 +141,7 @@ namespace synthese
 			// TAB TRIDENT
 			if(openTabContent(stream, TAB_TRIDENT))
 			{
-				RequestManager<StaticFunctionRequestPolicy<ImportFunction> > importRequest(request);
+				StaticFunctionRequest<ImportFunction> importRequest(request);
 
 				PropertiesHTMLTable t(importRequest.getHTMLForm());
 				stream << t.open();
@@ -170,7 +171,7 @@ namespace synthese
 			
 			if (moduleKey == PTModule::FACTORY_KEY && request.getUser() &&
 				request.getUser()->getProfile() &&
-				isAuthorized(*request.getUser()->getProfile()))
+				isAuthorized(*request.getUser()))
 			{
 				links.push_back(getNewPage());
 			}
@@ -180,8 +181,9 @@ namespace synthese
 
 
 
-		void PTImportAdmin::_buildTabs( const admin::AdminRequest& request ) const
-		{
+		void PTImportAdmin::_buildTabs(
+			const security::Profile& profile
+		) const	{
 			_tabs.clear();
 			_tabs.push_back(Tab("Trident", TAB_TRIDENT, true));
 			_tabs.push_back(Tab("Navteq", TAB_NAVTEQ, true));

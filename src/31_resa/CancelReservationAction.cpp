@@ -86,17 +86,6 @@ namespace synthese
 				throw ActionException("No such reservation");
 			}
 
-			// Minimal right is standard user
-			if (!profile.isAuthorized<ResaRight>(FORBIDDEN, WRITE))
-				throw ActionException("Non autorisé");
-
-			// Standard user
-			if (!profile.isAuthorized<ResaRight>(WRITE, WRITE))
-			{
-				if (request.getUser()->getKey() != _transaction->getCustomerUserId())
-					throw ActionException("Non autorisé");
-			}
-
 			// Control of the date : a cancellation has no sense if after the arrival time
 			DateTime now(TIME_CURRENT);
 			ReservationTableSync::SearchResult reservations(
@@ -174,11 +163,19 @@ namespace synthese
 
 
 
-		bool CancelReservationAction::isAuthorized(const Profile& profile
+		bool CancelReservationAction::isAuthorized(const Session* session
 		) const {
-			return profile.isAuthorized<ResaRight>(WRITE) ||
-					_transaction->getCustomerUserId() == request.getUser()->getKey() && profile.isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE);
+			
+			if(!session || !session->hasProfile())
+			{
+				return false;
+			}
 
+			return
+				session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE) ||
+				_transaction->getCustomerUserId() == session->getUser()->getKey() &&
+				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE)
+			;
 		}
 	}
 }
