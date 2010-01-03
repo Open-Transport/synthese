@@ -24,6 +24,7 @@
 #define SYNTHESE_server_StaticFunctionRequest_h__
 
 #include "Request.h"
+#include "Function.h"
 
 namespace synthese
 {

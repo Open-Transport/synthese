@@ -40,8 +40,8 @@ namespace synthese
 		public:
 			AdminActionFunctionRequest(
 				const server::StaticActionFunctionRequest<A, AdminFunction>& request
-			):	server::StaticActionFunctionRequest<A, AdminFunction>(request),
-				Request(request)
+			):	server::Request(request),
+				server::StaticActionFunctionRequest<A, AdminFunction>(request)
 			{
 				boost::shared_ptr<P> p(request.getFunction()->getPage()->getNewOtherPage<P>());
 				this->getFunction()->setPage(p);

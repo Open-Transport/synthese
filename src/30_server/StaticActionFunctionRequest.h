@@ -69,9 +69,9 @@ namespace synthese
 		template<class A, class F>
 		StaticActionFunctionRequest<A,F>::StaticActionFunctionRequest(
 			const Request& request
-		):	StaticActionRequest<A>(request),
-			StaticFunctionRequest<F>(request),
-			Request(request)
+		):	Request(request),
+			StaticActionRequest<A>(request),
+			StaticFunctionRequest<F>(request)
 		{
 		}
 
@@ -79,9 +79,9 @@ namespace synthese
 
 		template<class A, class F>
 		StaticActionFunctionRequest<A,F>::StaticActionFunctionRequest():
+			Request(),
 			StaticActionRequest<A>(),
-			StaticFunctionRequest<F>(),
-			Request()
+			StaticFunctionRequest<F>()
 		{
 		}
 	}

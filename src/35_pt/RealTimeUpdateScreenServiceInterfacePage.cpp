@@ -56,9 +56,9 @@ namespace synthese
 
 	namespace pt
 	{
-		RealTimeUpdateScreenServiceInterfacePage::RealTimeUpdateScreenServiceInterfacePage()
-			: FactorableTemplate<interfaces::InterfacePage, RealTimeUpdateScreenServiceInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+		RealTimeUpdateScreenServiceInterfacePage::RealTimeUpdateScreenServiceInterfacePage(
+		):	Registrable(UNKNOWN_VALUE),
+			FactorableTemplate<interfaces::InterfacePage, RealTimeUpdateScreenServiceInterfacePage>()
 		{
 		}
 		
