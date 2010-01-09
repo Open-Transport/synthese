@@ -39,7 +39,7 @@ namespace synthese
 		{
 		public:
 			AdminActionFunctionRequest(
-				const server::StaticActionFunctionRequest<A, AdminFunction>& request
+				const server::StaticFunctionRequest<AdminFunction>& request
 			):	server::Request(request),
 				server::StaticActionFunctionRequest<A, AdminFunction>(request)
 			{

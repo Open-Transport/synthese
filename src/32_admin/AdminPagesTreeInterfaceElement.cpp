@@ -85,7 +85,6 @@ namespace synthese
 			const AdminRequest* adminRequest(
 				dynamic_cast<const AdminRequest*>(request)
 			);
-			assert(page && adminRequest);
 			
 			if(page && adminRequest)
 			{

@@ -45,7 +45,7 @@ namespace synthese
 				_action = boost::shared_ptr<Action>(new ActionT);
 			}
 
-			StaticActionRequest(const Request& request):
+			explicit StaticActionRequest(const Request& request):
 				Request(request)
 			{
 				_action = boost::shared_ptr<Action>(new ActionT);

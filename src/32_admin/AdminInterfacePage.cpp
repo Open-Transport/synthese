@@ -22,6 +22,11 @@
 
 #include "AdminInterfaceElement.h"
 #include "AdminInterfacePage.h"
+#include "LoginAction.h"
+#include "LogoutAction.h"
+#include "HomeAdmin.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "HTMLForm.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -32,6 +37,9 @@ namespace synthese
 {
 	using namespace util;
 	using namespace interfaces;
+	using namespace html;
+	using namespace server;
+		
 
 	template<> const std::string util::FactorableTemplate<interfaces::InterfacePage,admin::AdminInterfacePage>::FACTORY_KEY("admin");
 
@@ -43,24 +51,89 @@ namespace synthese
 			std::ostream& stream,
 			const AdminInterfaceElement* page,
 			const boost::optional<std::string>& errorMessage,
-			const server::Request* request /*= NULL */
+			const AdminRequest& request
 		) const	{
+
+			VariablesMap vars;
+
 			ParametersVector parameters;
 			parameters.push_back(
-				request->getSession() && request->getUser().get() ?
-				request->getUser()->getFullName() :
+				request.getSession() && request.getUser().get() ?
+				request.getUser()->getFullName() :
 				string()
-			);
-			parameters.push_back(errorMessage ? *errorMessage : string());
-			
-			VariablesMap vars;
+			); //0
+			parameters.push_back(errorMessage ? *errorMessage : string()); //1
+
+			if(page)
+			{
+				// 2 : admin tree (not yet implemented)
+				parameters.push_back(string());
+
+				// 3 : admin position (not yet implemented)
+				parameters.push_back(string());
+
+				// 4 : admin tabs code
+				stringstream tabsStream;
+				page->displayTabs(
+					tabsStream,
+					vars,
+					request
+				);
+				parameters.push_back(tabsStream.str());
+
+				// 5 : admin content
+				stringstream contentStream;
+				page->display(
+					contentStream,
+					vars,
+					request
+				);
+				parameters.push_back(contentStream.str()); //6
+
+				parameters.push_back(string()); //6
+				parameters.push_back(string()); //7
+				parameters.push_back(string()); //8
+				parameters.push_back(string()); //9
+
+				// 10 : logout url
+				StaticActionFunctionRequest<LogoutAction,AdminFunction> logoutRequest(request);
+				parameters.push_back(logoutRequest.getURL());
+			}
+			else
+			{
+				parameters.push_back(string()); //2
+				parameters.push_back(string()); //3
+				parameters.push_back(string()); //4
+				parameters.push_back(string()); //5
+
+				// 6 : login form opening html code
+				AdminActionFunctionRequest<LoginAction,HomeAdmin> homeRequest(request);
+				HTMLForm f(homeRequest.getHTMLForm("login"));
+				parameters.push_back(f.open());
+
+				// 7 : login form login text field html code
+				parameters.push_back(
+					f.getTextInput(LoginAction::PARAMETER_LOGIN, string()) +
+					f.setFocus(LoginAction::PARAMETER_LOGIN)
+				);
+
+				// 8 : login form login password field html code
+				parameters.push_back(
+					f.getPasswordInput(LoginAction::PARAMETER_PASSWORD, string())
+				);
+
+				// 9 : login form closing html code
+				parameters.push_back(f.close());
+
+				parameters.push_back(string()); //10
+			}
 
 			InterfacePage::_display(
 				stream,
 				parameters,
 				vars,
 				static_cast<const void*>(page),
-				request
+				&request
 			);
 		}
 

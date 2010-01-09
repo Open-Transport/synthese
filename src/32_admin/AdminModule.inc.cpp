@@ -8,5 +8,3 @@
 #include "AdminInterfaceElement.h"
 #include "AdminPagesTreeInterfaceElement.h"
 #include "AdminPagePositionInterfaceElement.h"
-#include "AdminContentInterfaceElement.h"
-#include "AdminTabsInterfaceElement.h"

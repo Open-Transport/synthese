@@ -37,6 +37,8 @@
 #include "PTPlacesAdmin.h"
 #include "City.h"
 #include "Profile.h"
+#include "PropertiesHTMLTable.h"
+#include "AdminFunctionRequest.hpp"
 
 using namespace std;
 using namespace boost;
@@ -150,6 +152,23 @@ namespace synthese
 			// TAB PROPERTIES
 			if (openTabContent(stream, TAB_GENERAL))
 			{
+				AdminFunctionRequest<PTPlaceAdmin> updateRequest(request);
+
+				stream << "<h1>Propriétés</h1>";
+
+				shared_ptr<const NamedPlace> namedPlace(dynamic_pointer_cast<const NamedPlace, const AddressablePlace>(_addressablePlace));
+				PropertiesHTMLTable t(updateRequest.getHTMLForm());
+				stream << t.open();
+				stream << t.cell("Localité", namedPlace->getCity()->getName());
+				stream << t.cell("Nom", namedPlace->getName());
+				if(_connectionPlace.get())
+				{
+					stream << t.title("Destination sur afficheur");
+					stream << t.cell("Nom court", _connectionPlace->getName13());
+					stream << t.cell("Nom moyen", _connectionPlace->getName26());
+				}
+				stream << t.close();
+
 			}
 
 			////////////////////////////////////////////////////////////////////

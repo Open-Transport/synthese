@@ -1,8 +1,6 @@
 
 #include "LoginAction.h"
 #include "LogoutAction.h"
-#include "LoginHtmlField.h"
-#include "PasswordHtmlField.h"
 #include "HtmlFormInterfaceElement.h"
 #include "LogoutHTMLLinkInterfaceElement.h"
 #include "ValidSessionInterfaceElement.h"

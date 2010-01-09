@@ -44,6 +44,15 @@ namespace synthese
 			Parameters :
 				- 0 : user_full_name : User full name (empty = no user logged)
 				- 1 : error message
+				- 2 : admin tree (not yet implemented)
+				- 3 : admin position (not yet implemented)
+				- 4 : admin tabs code
+				- 5 : admin content
+				- 6 : login form opening html code
+				- 7 : login form login text field html code
+				- 8 : login form login password field html code
+				- 9 : login form closing html code
+				- 10 : logout url
 		*/
 		class AdminInterfacePage :
 			public util::FactorableTemplate<interfaces::InterfacePage,AdminInterfacePage>
@@ -63,7 +72,7 @@ namespace synthese
 				std::ostream& stream,
 				const AdminInterfaceElement* page,
 				const boost::optional<std::string>& errorMessage,
-				const server::Request* request = NULL
+				const AdminRequest& request
 			) const;
 
 		};

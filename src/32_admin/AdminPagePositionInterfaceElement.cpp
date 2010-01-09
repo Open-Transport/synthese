@@ -69,21 +69,22 @@ namespace synthese
 			const server::Request* request /* = NULL */
 		) const {
 			const AdminInterfaceElement* page = static_cast<const AdminInterfaceElement*>(object);
-			string normalSeparator(_normalSeparator->getValue(parameters, variables, object, request));
-			string lastSeparator(_lastSeparator->getValue(parameters, variables, object, request));
-			bool withImages(Conversion::ToBool(_withImages->getValue(parameters, variables, object, request)));
-			bool withLinks(Conversion::ToBool(_withLinks->getValue(parameters, variables, object, request)));
-			bool withFirst(Conversion::ToBool(_withFirst->getValue(parameters, variables, object, request)));
-			bool lastSeparatorIfFirst(Conversion::ToBool(_withFirst->getValue(parameters, variables, object, request)));
 
-			const AdminInterfaceElement::PageLinks& links(
-				page->getTreePosition(
-					*dynamic_cast<const AdminRequest*>(request)
-			)	);
-
-			bool first(true);
-			if(request)
+			if(page && request)
 			{
+				string normalSeparator(_normalSeparator->getValue(parameters, variables, object, request));
+				string lastSeparator(_lastSeparator->getValue(parameters, variables, object, request));
+				bool withImages(Conversion::ToBool(_withImages->getValue(parameters, variables, object, request)));
+				bool withLinks(Conversion::ToBool(_withLinks->getValue(parameters, variables, object, request)));
+				bool withFirst(Conversion::ToBool(_withFirst->getValue(parameters, variables, object, request)));
+				bool lastSeparatorIfFirst(Conversion::ToBool(_withFirst->getValue(parameters, variables, object, request)));
+
+				const AdminInterfaceElement::PageLinks& links(
+					page->getTreePosition(
+						*dynamic_cast<const AdminRequest*>(request)
+				)	);
+
+				bool first(true);
 				AdminRequest r(*request);
 				for (AdminInterfaceElement::PageLinks::const_iterator it(links.begin()); it != links.end(); ++it)
 				{

@@ -9,8 +9,6 @@ synthese::server::ThreadKillAction::integrate();
 
 synthese::server::HtmlFormInterfaceElement::integrate();
 synthese::server::LogoutHTMLLinkInterfaceElement::integrate();
-synthese::server::LoginHtmlField::integrate();
-synthese::server::PasswordHtmlField::integrate();
 synthese::server::ValidSessionInterfaceElement::integrate();
 synthese::server::HtmlFormCalendarFieldInterfaceElement::integrate();
 synthese::server::HtmlFormFieldInterfaceElement::integrate();

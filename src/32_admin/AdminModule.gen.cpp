@@ -8,6 +8,4 @@ synthese::admin::AdminFunction::integrate();
 
 synthese::admin::AdminPagesTreeInterfaceElement::integrate();
 synthese::admin::AdminPagePositionInterfaceElement::integrate();
-synthese::admin::AdminContentInterfaceElement::integrate();
-synthese::admin::AdminTabsInterfaceElement::integrate();
 

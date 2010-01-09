@@ -131,30 +131,38 @@ namespace synthese
 		{
 			try
 			{
-				_page->_buildTabs(*request.getSession()->getUser()->getProfile());
-				_page->setActiveTab(_activeTab);
-				if (_interface != NULL)
+				if(request.getSession())
 				{
-					const AdminInterfacePage* const aip(
-						_interface->getPage<AdminInterfacePage>()
-					);
-					aip->display(
+					_page->_buildTabs(*request.getSession()->getUser()->getProfile());
+					_page->setActiveTab(_activeTab);
+					if (_interface && _interface->getPage<AdminInterfacePage>())
+					{
+						_interface->getPage<AdminInterfacePage>()->display(
+							stream,
+							_page.get(),
+							_errorMessage,
+							StaticFunctionRequest<AdminFunction>(request, false)
+						);
+					}
+					else
+					{
+						VariablesMap variables;
+						_page->display(
+							stream,
+							variables,
+							StaticFunctionRequest<AdminFunction>(request, false)
+						);
+				}	} else if(
+					_interface &&
+					_interface->getPage<AdminInterfacePage>()
+				){
+					_interface->getPage<AdminInterfacePage>()->display(
 						stream,
-						_page.get(),
+						NULL,
 						_errorMessage,
-						&StaticFunctionRequest<AdminFunction>(request, false)
-					);
-				}
-				else if(request.getSession())
-				{
-					VariablesMap variables;
-					_page->display(
-						stream,
-						variables,
 						StaticFunctionRequest<AdminFunction>(request, false)
 					);
-				}
-			}
+			}	}
 			catch (Exception e)
 			{
 				throw RequestException("Admin interface page not implemented in database"+ e.getMessage());
@@ -181,11 +189,11 @@ namespace synthese
 		{
 			return
 				_page.get() &&
-				session &&
-				session->hasProfile() &&
-				_page->isAuthorized(
-					*session->getUser()
-				)
+				(	!session ||
+					session->hasProfile() &&
+					_page->isAuthorized(
+						*session->getUser()
+				)	)
 			;
 		}
 

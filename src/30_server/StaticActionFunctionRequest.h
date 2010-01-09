@@ -59,7 +59,7 @@ namespace synthese
 					@date 2009
 					Use the public setters to fill the request.					
 				*/
-				StaticActionFunctionRequest(const Request& request);
+				explicit StaticActionFunctionRequest(const Request& request);
 			//@}
 		};
 
