@@ -26,6 +26,8 @@ synthese::pt::PTNetworksAdmin::integrate();
 synthese::pt::PTPlaceAdmin::integrate();
 
 synthese::pt::RealTimeUpdateFunction::integrate();
+synthese::pt::PhysicalStopsCSVExportFunction::integrate();
+
 synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
 synthese::pt::ScheduleRealTimeUpdateAction::integrate();
 synthese::pt::ServiceVertexRealTimeUpdateAction::integrate();

@@ -26,6 +26,8 @@
 #include "PTPlaceAdmin.h"
 
 #include "RealTimeUpdateFunction.h"
+#include "PhysicalStopsCSVExportFunction.h"
+
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
