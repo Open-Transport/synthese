@@ -303,7 +303,7 @@ namespace synthese
 			// LOG TAB
 			if (openTabContent(stream, TAB_LOG))
 			{
-				_generalLogView.display(stream,	AdminRequest(_request));
+				_generalLogView.display(stream,	AdminRequest(_request, true));
 			}
 			closeTabContent(stream);
 		}

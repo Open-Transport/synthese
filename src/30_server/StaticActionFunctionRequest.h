@@ -59,7 +59,7 @@ namespace synthese
 					@date 2009
 					Use the public setters to fill the request.					
 				*/
-				explicit StaticActionFunctionRequest(const Request& request);
+				explicit StaticActionFunctionRequest(const Request& request, bool copyFunction);
 			//@}
 		};
 
@@ -68,10 +68,10 @@ namespace synthese
 
 		template<class A, class F>
 		StaticActionFunctionRequest<A,F>::StaticActionFunctionRequest(
-			const Request& request
+			const Request& request, bool copyFunction
 		):	Request(request),
 			StaticActionRequest<A>(request),
-			StaticFunctionRequest<F>(request)
+			StaticFunctionRequest<F>(request, copyFunction)
 		{
 		}
 

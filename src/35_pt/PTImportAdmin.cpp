@@ -123,7 +123,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_NAVTEQ))
 			{
 
-				StaticFunctionRequest<ImportFunction> importRequest(request);
+				StaticFunctionRequest<ImportFunction> importRequest(request, true);
 				
 				PropertiesHTMLTable t(importRequest.getHTMLForm());
 				stream << t.open();
@@ -141,7 +141,7 @@ namespace synthese
 			// TAB TRIDENT
 			if(openTabContent(stream, TAB_TRIDENT))
 			{
-				StaticFunctionRequest<ImportFunction> importRequest(request);
+				StaticFunctionRequest<ImportFunction> importRequest(request, true);
 
 				PropertiesHTMLTable t(importRequest.getHTMLForm());
 				stream << t.open();

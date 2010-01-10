@@ -107,8 +107,8 @@ namespace synthese
 					DisplayScreenCPUTableSync::Search(Env::GetOfficialEnv())
 				);
 				
-				StaticFunctionRequest<DisplayScreenContentFunction> r(_request);
-				StaticFunctionRequest<CPUGetWiredScreensFunction> r2(_request);
+				StaticFunctionRequest<DisplayScreenContentFunction> r(_request, true);
+				StaticFunctionRequest<CPUGetWiredScreensFunction> r2(_request, true);
 				ptime t0(microsec_clock::local_time());
 				time_duration duration;
 				BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, screens)

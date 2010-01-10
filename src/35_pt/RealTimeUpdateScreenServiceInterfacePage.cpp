@@ -103,7 +103,7 @@ namespace synthese
 
 			if(request)
 			{
-				StaticActionFunctionRequest<ScheduleRealTimeUpdateAction,RealTimeUpdateFunction> scheduleUpdateRequest(*request);
+				StaticActionFunctionRequest<ScheduleRealTimeUpdateAction,RealTimeUpdateFunction> scheduleUpdateRequest(*request, true);
 				scheduleUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
 				scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 				scheduleUpdateRequest.getAction()->setAtArrival(false);
@@ -117,7 +117,7 @@ namespace synthese
 					scheduleUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES + Request::PARAMETER_ASSIGNMENT
 				); //11
 
-				StaticActionFunctionRequest<ServiceVertexRealTimeUpdateAction,RealTimeUpdateFunction> vertexUpdateRequest(*request);
+				StaticActionFunctionRequest<ServiceVertexRealTimeUpdateAction,RealTimeUpdateFunction> vertexUpdateRequest(*request, true);
 				vertexUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
 				vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 				vertexUpdateRequest.getFunction()->setService(Env::GetOfficialEnv().getSPtr(&service));

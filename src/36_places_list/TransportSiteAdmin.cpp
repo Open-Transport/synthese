@@ -114,7 +114,7 @@ namespace synthese
 			AdminFunctionRequest<SiteRoutePlanningAdmin> routeplannerRequest(_request);
 			routeplannerRequest.getPage()->setSite(_site);
 
-			StaticFunctionRequest<RoutePlannerFunction> rpHomeRequest(_request);
+			StaticFunctionRequest<RoutePlannerFunction> rpHomeRequest(_request, true);
 			rpHomeRequest.getFunction()->setSite(_site);
 
 			// Display

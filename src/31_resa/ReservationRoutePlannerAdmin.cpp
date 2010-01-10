@@ -217,7 +217,7 @@ namespace synthese
 			);
 			resaRequest.setActionWillCreateObject();
 
-			StaticFunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request);
+			StaticFunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request, true);
 			customerSearchRequest.getFunction()->setNumber(20);
 
 			stream << HTMLModule::GetHTMLJavascriptOpen("resa.js");

@@ -305,7 +305,7 @@ namespace synthese
 			// TAB EXPORT
 			if (openTabContent(stream, TAB_EXPORT))
 			{
-				StaticFunctionRequest<TridentExportFunction> tridentExportFunction(_request);
+				StaticFunctionRequest<TridentExportFunction> tridentExportFunction(_request, true);
 				tridentExportFunction.getFunction()->setCommercialLine(_cline);
 				stream << "<h1>Formats Trident</h1>";
 				stream << "<p>";

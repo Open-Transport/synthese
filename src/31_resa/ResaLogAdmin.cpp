@@ -36,6 +36,7 @@
 #include "SearchFormHTMLTable.h"
 #include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
+#include "AdminFunction.h"
 
 using namespace std;
 using namespace boost;
@@ -96,7 +97,7 @@ namespace synthese
 			// Results
 			_log.display(
 				stream,
-				AdminRequest(_request),
+				AdminRequest(_request, true),
 				true,
 				true
 			);

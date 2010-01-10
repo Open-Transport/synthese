@@ -208,7 +208,7 @@ namespace synthese
 	
 				AdminFunctionRequest<DisplayAdmin> updateRequest(_request);
 
-				StaticFunctionRequest<DisplayScreenContentFunction> viewRequest(_request);
+				StaticFunctionRequest<DisplayScreenContentFunction> viewRequest(_request, true);
 
 				if (!_place)
 				{

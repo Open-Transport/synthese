@@ -135,7 +135,7 @@ namespace synthese
 			)	);
 			set<uid> usedDisplayScreens;
 
-			StaticFunctionRequest<AlarmTestOnDisplayScreenFunction> testRequest(addRequest);
+			StaticFunctionRequest<AlarmTestOnDisplayScreenFunction> testRequest(addRequest, true);
 			testRequest.getFunction()->setAlarmId(alarm->getKey());
 
 			stream << "<h1>Test du message</h1>";

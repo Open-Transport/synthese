@@ -96,7 +96,7 @@ namespace synthese
 				parameters.push_back(string()); //9
 
 				// 10 : logout url
-				StaticActionFunctionRequest<LogoutAction,AdminFunction> logoutRequest(request);
+				StaticActionFunctionRequest<LogoutAction,AdminFunction> logoutRequest(request, true);
 				parameters.push_back(logoutRequest.getURL());
 			}
 			else

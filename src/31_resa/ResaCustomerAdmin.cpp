@@ -217,7 +217,7 @@ namespace synthese
 				// Results
 				_log.display(
 					stream,
-					AdminRequest(_request),
+					AdminRequest(_request, true),
 					true,
 					true
 				);

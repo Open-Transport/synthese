@@ -81,7 +81,7 @@ namespace synthese
 			{
 				try
 				{
-					StaticActionFunctionRequest<LogoutAction,SimplePageFunction> redirRequest(*request);
+					StaticActionFunctionRequest<LogoutAction,SimplePageFunction> redirRequest(*request, true);
 					redirRequest.getFunction()->setPage(_page->getInterface()->getPage(NonPredefinedInterfacePage::FACTORY_KEY, requestKey));
 					stream << redirRequest.getHTMLForm().getLinkButton(content, "", icon);
 				}
@@ -92,7 +92,7 @@ namespace synthese
 			}
 			if (url.size() && request)
 			{
-				StaticActionFunctionRequest<LogoutAction,RedirFunction> redirRequest(*request);
+				StaticActionFunctionRequest<LogoutAction,RedirFunction> redirRequest(*request, true);
 				redirRequest.getFunction()->setRedirURL(url);
 				stream << redirRequest.getHTMLForm().getLinkButton(content, "", icon);
 			}

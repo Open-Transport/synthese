@@ -899,7 +899,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_RESULT))
 			{
 				// Requests
-				StaticFunctionRequest<DisplayScreenContentFunction> viewRequest(_request);
+				StaticFunctionRequest<DisplayScreenContentFunction> viewRequest(_request, true);
 				viewRequest.getFunction()->setScreen(_displayScreen);
 				if(	_displayScreen->getType() &&
 					_displayScreen->getType()->getDisplayInterface() &&

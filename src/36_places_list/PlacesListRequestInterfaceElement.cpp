@@ -58,7 +58,7 @@ namespace synthese
 		) const {
 			if(request)
 			{
-				StaticFunctionRequest<PlacesListFunction> plrequest(*request);
+				StaticFunctionRequest<PlacesListFunction> plrequest(*request, true);
 				plrequest.getFunction()->setTextInput(_txtField->getValue(parameters, variables, object, request));
 				plrequest.getFunction()->setIsForOrigin(Conversion::ToBool(_isForOrigin->getValue(parameters, variables, object, request)));
 				plrequest.getFunction()->setNumber(Conversion::ToInt(_number->getValue(parameters, variables, object, request)));

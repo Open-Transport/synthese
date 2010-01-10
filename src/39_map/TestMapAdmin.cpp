@@ -106,7 +106,7 @@ namespace synthese
 			{
 				try
 				{
-					StaticFunctionRequest<MapRequest> r(_request);
+					StaticFunctionRequest<MapRequest> r(_request, true);
 					r.getFunction()->setUseEnvironment(_useEnvironment);
 					r.getFunction()->setData(_dataXml);
 					r.getFunction()->setQuery(_queryXml);

@@ -245,7 +245,13 @@ namespace synthese
 			const ptime& value
 		){
 			if (!_updateRight)
+			{
+				if(value.is_not_a_date_time())
+				{
+					return "(indéfini)";
+				}
 				return to_simple_string(value.date()) +" "+ to_simple_string(value.time_of_day());
+			}
 
 			removeHiddenFieldIfExists(name, to_simple_string(value.date()) +" "+ to_simple_string(value.time_of_day()));
 			string fieldId = _getFieldId(name);
@@ -276,10 +282,18 @@ namespace synthese
 				<< "name=\"" << name << "\" "
 				<< "id=\"" << fieldId << "\" "
 				<< "value=\"" << (value.is_not_a_date_time() ? string() : to_iso_extended_string(value.date()) +" "+ to_simple_string(value.time_of_day())) << "\" "
-				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">"
-				<< value.date().day() << "/" << static_cast<int>(value.date().month()) << "/" << value.date().year()
-				<< " " << to_simple_string(value.time_of_day())
-				<< "</span>"
+				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">";
+			if(value.is_not_a_date_time())
+			{
+				s << "(indéfini)";
+			}
+			else
+			{
+				s <<
+					value.date().day() << "/" << static_cast<int>(value.date().month()) << "/" << value.date().year() <<
+					" " << to_simple_string(value.time_of_day());
+			}
+			s	<< "</span>"
 				<< "<img "
 				<< "src=\"calendar_edit.png\" "
 				<< "style=\"cursor:pointer\" "

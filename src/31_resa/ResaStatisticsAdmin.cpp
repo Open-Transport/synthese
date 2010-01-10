@@ -275,7 +275,7 @@ namespace synthese
 
 			stream << "<h1>Export CSV</h1>";
 
-			StaticFunctionRequest<CSVResaStatisticsFunction> csvRequest(request);
+			StaticFunctionRequest<CSVResaStatisticsFunction> csvRequest(request, true);
 			csvRequest.getFunction()->setLine(_line);
 			csvRequest.getFunction()->setPeriod(_searchPeriod);
 			csvRequest.getFunction()->setRowStep(_searchRowStep);

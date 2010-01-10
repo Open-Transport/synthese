@@ -124,7 +124,7 @@ namespace synthese
 					dynamic_cast<const ScheduledService*>(ptd.first.getService()) &&
 					request
 				){
-					StaticFunctionRequest<RealTimeUpdateFunction> realTimeRequest(*request);
+					StaticFunctionRequest<RealTimeUpdateFunction> realTimeRequest(*request, true);
 					realTimeRequest.getFunction()->setInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(getInterface()->getKey()));
 					realTimeRequest.getFunction()->setService(Env::GetOfficialEnv().getRegistry<ScheduledService>().get(ptd.first.getService()->getKey()));
 					realTimeRequest.getFunction()->setLineStopRank(ptd.first.getEdge()->getRankInPath());

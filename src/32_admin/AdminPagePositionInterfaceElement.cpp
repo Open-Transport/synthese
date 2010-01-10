@@ -85,7 +85,7 @@ namespace synthese
 				)	);
 
 				bool first(true);
-				AdminRequest r(*request);
+				AdminRequest r(*request, true);
 				for (AdminInterfaceElement::PageLinks::const_iterator it(links.begin()); it != links.end(); ++it)
 				{
 					if(!withFirst && it == links.begin() && it != links.end()-1) continue;

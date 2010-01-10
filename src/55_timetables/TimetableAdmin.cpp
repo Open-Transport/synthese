@@ -470,7 +470,7 @@ namespace synthese
 			{
 				if(_timetable->getInterface())
 				{
-					StaticFunctionRequest<TimetableGenerateFunction> viewRequest(_request);
+					StaticFunctionRequest<TimetableGenerateFunction> viewRequest(_request, true);
 					viewRequest.getFunction()->setTimetable(_timetable);
 					if(	!_timetable->getInterface()->getDefaultClientURL().empty()
 					){

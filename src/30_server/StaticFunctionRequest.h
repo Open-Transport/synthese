@@ -45,8 +45,10 @@ namespace synthese
 			}
 
 
-			explicit StaticFunctionRequest(const Request& request, bool copyFunction = true):
-			Request(request)
+			explicit StaticFunctionRequest(
+				const Request& request,
+				bool copyFunction
+			):	Request(request)
 			{
 				if(!request.getFunction().get())
 				{

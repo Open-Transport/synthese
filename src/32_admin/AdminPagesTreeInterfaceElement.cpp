@@ -159,7 +159,7 @@ namespace synthese
 			}
 
 			// Display current page
-			AdminRequest r(request);
+			AdminRequest r(request, true);
 			if (*pages.page == *currentPage)
 			{
 				str <<
