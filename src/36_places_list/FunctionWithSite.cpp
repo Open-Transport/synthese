@@ -41,7 +41,10 @@ namespace synthese
 		ParametersMap FunctionWithSite::_getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_SITE, _site->getKey());
+			if(_site.get())
+			{
+				map.insert(PARAMETER_SITE, _site->getKey());
+			}
 			return map;
 		}
 
