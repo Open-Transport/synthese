@@ -31,6 +31,7 @@
 #include "01_util/Constants.h"
 #include "GraphTypes.h"
 #include "City.h"
+#include "AccessParameters.h"
 
 #include <string>
 #include <set>
@@ -177,7 +178,10 @@ namespace synthese
 					@date 2007
 					@todo Modify the generated object to avoid memory leaks due to the use of new operator
 				*/
-				graph::AccessParameters	getAccessParameters(graph::UserClassCode parameter)	const;
+				graph::AccessParameters	getAccessParameters(
+					graph::UserClassCode parameter,
+					const graph::AccessParameters::AllowedPathClasses& allowedPathClasses
+				) const;
 	
 				bool dateControl() const;
 

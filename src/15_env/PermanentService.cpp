@@ -27,8 +27,10 @@
 #include "04_time/module.h"
 
 #include <math.h>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -68,13 +70,13 @@ namespace synthese
 
 			assert(distance >= 0);
 
-			int duration(distance > 0 ? ceil(distance * 0.015) : 1);
-			DateTime dt(servicePointer.getActualDateTime());
+			posix_time::time_duration duration(posix_time::seconds(distance > 0 ? ceil(distance * 0.9) : 1));
+			posix_time::ptime dt(servicePointer.getActualDateTime().toPosixTime());
 			if (servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 				dt += duration;
 			else
 				dt -= duration;
-			return dt;
+			return DateTime::FromPosixTime(dt);
 		}
 
 		time::Schedule PermanentService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const

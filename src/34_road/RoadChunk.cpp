@@ -42,12 +42,14 @@ namespace synthese
 			util::RegistryKeyType id,
 			Address* fromAddress,
 			int rankInRoad,
-			Road* street
+			Road* street,
+			double metricOffset
 		):	util::Registrable(id),
 			Edge(
 				street,
 				rankInRoad,
-				fromAddress
+				fromAddress,
+				metricOffset
 			)
 		{
 			if(fromAddress) setFromAddress(fromAddress);

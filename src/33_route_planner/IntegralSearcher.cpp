@@ -321,9 +321,9 @@ namespace synthese
 
 					DateTime correctedDesiredTime(journey->empty() ? desiredTime : journey->getEndTime());
 					if (_accessDirection == DEPARTURE_TO_ARRIVAL)
-						correctedDesiredTime += static_cast<int>(itVertex->second.approachTime.minutes());
+						correctedDesiredTime += static_cast<int>(ceil(itVertex->second.approachTime.total_seconds() / double(60)));
 					else
-						correctedDesiredTime -= static_cast<int>(itVertex->second.approachTime.minutes());
+						correctedDesiredTime -= static_cast<int>(ceil(itVertex->second.approachTime.total_seconds() / double(60)));
 
 					// Goal edges loop
 					const Vertex::Edges& edges((_accessDirection == DEPARTURE_TO_ARRIVAL) ? origin->getDepartureEdges() : origin->getArrivalEdges());
@@ -566,7 +566,7 @@ namespace synthese
 				/** - If the edge is an address, the currentJourney necessarily contains
 					only road legs, filter approach (= walk distance and duration).
 				*/
-				if(!_accessParameters.isCompatibleWithApproach(journey.getDistance(), journey.getEffectiveDuration()))
+				if(!_accessParameters.isCompatibleWithApproach(journey.getDistance(), journey.getDuration()))
 					return _JourneyUsefulness(false,false);
 			}
 
@@ -632,7 +632,7 @@ namespace synthese
 			if(	_bestVertexReachesMap.isUseLess(
 					reachedVertex,
 					journey.size(),
-					posix_time::minutes(method == DEPARTURE_TO_ARRIVAL ? journey.getEndTime() - _originDateTime : _originDateTime - journey.getEndTime()),
+					posix_time::seconds(method == DEPARTURE_TO_ARRIVAL ? journey.getEndTime().getSecondsDifference(_originDateTime) : _originDateTime.getSecondsDifference(journey.getEndTime())),
 					_searchOnlyNodes
 			)	){
 					return _JourneyUsefulness(false,true);
@@ -649,13 +649,35 @@ namespace synthese
 			assert(j2 != NULL);
 			assert(j1->getMethod() == j2->getMethod());
 
+			// Total duration
 			posix_time::time_duration duration1(j1->getDuration());
 			posix_time::time_duration duration2(j2->getDuration());
 
 			if (duration1 != duration2)
+			{
 				return duration1 < duration2;
+			}
 
-			return j1 < j2;
+			// Approach and pedestrian duration
+			posix_time::time_duration pedestrianDuration1(j1->getStartApproachDuration() + j1->getEndApproachDuration());
+			posix_time::time_duration pedestrianDuration2(j2->getStartApproachDuration() + j2->getEndApproachDuration());
+
+			if (pedestrianDuration1 != pedestrianDuration2)
+			{
+				return pedestrianDuration1 < pedestrianDuration2;
+			}
+
+			// Total distance
+			
+			double distance1(j1->getDistance());
+			double distance2(j2->getDistance());
+
+			if(distance1 != distance2)
+			{
+				return distance1 < distance2;
+			}
+
+			return j1.get() < j2.get();
 		}
 
 

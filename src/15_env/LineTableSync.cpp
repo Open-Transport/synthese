@@ -171,7 +171,7 @@ namespace synthese
 				}
 
 
-				line->setRollingStock(RollingStockTableSync::Get(rollingStockId, env, linkLevel, AUTO_CREATE).get());
+				line->setRollingStock(RollingStockTableSync::GetEditable(rollingStockId, env, linkLevel, AUTO_CREATE).get());
 				if(bikeComplianceId > 0)
 				{
 					line->addRule(

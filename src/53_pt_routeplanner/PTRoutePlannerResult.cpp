@@ -430,7 +430,7 @@ namespace synthese
 
 
 				stream << t.row();
-				stream << t.col() << "<b>" << its->getDepartureDateTime().toString() << "</b>";
+				stream << t.col() << "<b>" << its->getDepartureDateTime().toString(true) << "</b>";
 
 				// Line
 				const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
@@ -448,7 +448,7 @@ namespace synthese
 					while(true)
 					{
 						// Arrival
-						stream << t.col() << its->getArrivalDateTime().toString();
+						stream << t.col() << its->getArrivalDateTime().toString(true);
 
 						// Place
 						stream << t.col();
@@ -464,7 +464,7 @@ namespace synthese
 						++its;
 
 						// Departure
-						stream << t.col() << its->getDepartureDateTime().toString();
+						stream << t.col() << its->getDepartureDateTime().toString(true);
 
 						// Line
 						const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
@@ -487,7 +487,7 @@ namespace synthese
 				}
 
 				// Final arrival
-				stream << t.col() << "<b>" << its->getArrivalDateTime().toString() << "</b>";
+				stream << t.col() << "<b>" << its->getArrivalDateTime().toString(true) << "</b>";
 			}
 			stream << t.close();
 

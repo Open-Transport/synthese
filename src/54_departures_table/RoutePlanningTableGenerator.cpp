@@ -26,6 +26,7 @@
 #include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -57,7 +58,7 @@ namespace synthese
 						false,
 						false,
 						0,
-						0,
+						posix_time::minutes(0),
 						67,
 						_withTransfer ? 2 : 1
 					),

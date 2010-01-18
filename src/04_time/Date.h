@@ -205,6 +205,8 @@ namespace synthese
 				bool operator != (const Date& op2 ) const;
 
 				boost::gregorian::date toGregorianDate() const;
+
+				static Date FromGregorianDate(boost::gregorian::date value);
 		};
 
 		std::ostream& operator<< ( std::ostream& os, const Date& op );

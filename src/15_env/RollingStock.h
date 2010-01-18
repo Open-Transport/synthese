@@ -25,6 +25,7 @@
 
 #include "Registrable.h"
 #include "Registry.h"
+#include "PathClass.h"
 
 #include <string>
 
@@ -37,8 +38,9 @@ namespace synthese
 		/// TRIDENT = VehicleType
 		/// @ingroup m35
 		//////////////////////////////////////////////////////////////////////////
-		class RollingStock
-		:	public virtual util::Registrable
+		class RollingStock:
+			public virtual util::Registrable,
+			public graph::PathClass
 		{
 		public:
 
@@ -70,6 +72,11 @@ namespace synthese
 				void setName(const std::string& value);
 				void setArticle(const std::string& value);
 				void setIndicator(const std::string& value);
+			//@}
+
+			//! @name Queries
+			//@{
+				virtual PathClass::Identifier getIdentifier() const;
 			//@}
 		};
 	}

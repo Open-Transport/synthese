@@ -27,6 +27,7 @@
 #include "PTRoutePlannerResult.h"
 #include "RoutePlannerTypes.h"
 #include "AccessParameters.h"
+#include "GraphTypes.h"
 
 #include <boost/optional.hpp>
 
@@ -54,6 +55,11 @@ namespace synthese
 			const geography::Place* const _departurePlace;
 			const geography::Place* const _arrivalPlace;
 
+			graph::VertexAccessMap _extendToPhysicalStops(
+				const graph::VertexAccessMap& vam,
+				graph::AccessDirection direction
+			) const;
+
 		public:
 			PTTimeSlotRoutePlanner(
 				const geography::Place* origin,
@@ -67,7 +73,7 @@ namespace synthese
 				const algorithm::PlanningOrder		planningOrder
 			);
 
-			PTRoutePlannerResult run();
+			PTRoutePlannerResult run() const;
 		};
 	}
 }

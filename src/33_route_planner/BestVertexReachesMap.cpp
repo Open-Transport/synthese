@@ -130,7 +130,7 @@ namespace synthese
 						{
 							_removeDurationsForMoreTransfers(vertex, item.first);
 						}
-						return true;
+						return false;
 					}
 				}
 			}

@@ -389,6 +389,14 @@ namespace synthese
 			;
 		}
 
+
+
+		Hour Hour::FromTimeDuration( boost::posix_time::time_duration value )
+		{
+			if(value.is_not_a_date_time()) return Hour(TIME_UNKNOWN);
+
+			return Hour(value.hours(), value.minutes(), value.seconds());
+		}
 	}
 }
 

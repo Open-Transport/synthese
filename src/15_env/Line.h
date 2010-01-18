@@ -85,8 +85,6 @@ namespace synthese
 			typedef std::vector<SubLine*> SubLines;
 
 		private:
-			const RollingStock* _rollingStock;
-
 			std::string _name;			//!< Name (code)
 			std::string _timetableName; //!< Name for timetable
 			std::string _direction;		//!< Direction (shown on vehicles)
@@ -114,17 +112,17 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const std::string&			getName ()					const;
-				bool						getUseInDepartureBoards ()	const;
-				bool						getUseInTimetables ()		const;
-				bool						getUseInRoutePlanning ()	const;
-				const std::string&			getDirection ()				const;
-				const std::string&			getTimetableName ()			const;
-				const RollingStock*			getRollingStock()			const;
-				bool						getWalkingLine ()			const;
-				const CommercialLine*		getCommercialLine()			const;
-				const SubLines				getSubLines()				const;
-				boost::logic::tribool		getWayBack()				const;
+				const std::string&		getName ()					const;
+				bool					getUseInDepartureBoards ()	const;
+				bool					getUseInTimetables ()		const;
+				bool					getUseInRoutePlanning ()	const;
+				const std::string&		getDirection ()				const;
+				const std::string&		getTimetableName ()			const;
+				RollingStock*			getRollingStock()			const;
+				bool					getWalkingLine ()			const;
+				CommercialLine*			getCommercialLine()			const;
+				const SubLines			getSubLines()				const;
+				boost::logic::tribool	getWayBack()				const;
 			//@}
 
 
@@ -133,7 +131,7 @@ namespace synthese
 				void setUseInDepartureBoards (bool useInDepartureBoards);
 				void setName (const std::string& name);
 				void setWalkingLine (bool isWalkingLine);
-				void setRollingStock(const RollingStock*);
+				void setRollingStock(RollingStock*);
 				void setTimetableName (const std::string& timetableName);
 				void setDirection (const std::string& direction);
 				void setUseInRoutePlanning (bool useInRoutePlanning);

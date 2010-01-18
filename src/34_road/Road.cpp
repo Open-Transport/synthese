@@ -60,6 +60,7 @@ namespace synthese
 			_type(reverseRoad.getType()),
 			_reverseRoad(NULL)
 		{
+			addService(new PermanentService(UNKNOWN_VALUE, this), false);
 		}
 
 
@@ -150,7 +151,8 @@ namespace synthese
 						UNKNOWN_VALUE,
 						chunk->getFromAddress(),
 						-chunk->getRankInPath(),
-						_reverseRoad
+						_reverseRoad,
+						-chunk->getMetricOffset()
 				)	);
 				_reverseRoad->addEdge(reverseChunk, autoShift);
 			}

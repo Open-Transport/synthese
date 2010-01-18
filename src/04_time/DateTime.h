@@ -134,6 +134,7 @@ namespace synthese
 				seconds are ignored.				
 			*/
 			static DateTime FromString (const std::string& str);
+			static DateTime FromPosixTime(const boost::posix_time::ptime value);
 
 			bool operator == (const DateTime& op2 ) const;
 			bool operator != (const DateTime& op2 ) const;

@@ -192,17 +192,9 @@ namespace synthese
 
 		void VertexAccessMap::mergeWithFilter(
 			const VertexAccessMap& vam,
-			GraphIdType graphFilter
+			GraphIdType graphFilter,
+			AccessDirection direction
 		){
-			BOOST_FOREACH(const VamMap::value_type& itps, vam.getMap())
-			{
-				const Vertex* vertex(itps.first);
-
-				if(vertex->getGraphType() == graphFilter)
-				{
-					insert(vertex, itps.second);
-				}
-			}
 		}
 
 

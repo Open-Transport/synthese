@@ -49,8 +49,8 @@ namespace synthese
 	{
 
 		Journey::Journey(
-		):	_continuousServiceRange (UNKNOWN_VALUE)
-			, _effectiveDuration (0)
+		):	_continuousServiceRange (UNKNOWN_VALUE),
+			_effectiveDuration(posix_time::seconds(0))
 			, _transportConnectionCount (0)
 			, _distance (0)
 			, _startApproachDuration(posix_time::minutes(0))
@@ -68,9 +68,10 @@ namespace synthese
 			const Journey& journey,
 			const ServiceUse& serviceUse
 		):	_continuousServiceRange(
-				journey._continuousServiceRange == UNKNOWN_VALUE ||	journey._continuousServiceRange > serviceUse.getServiceRange() ?
+				journey.getContinuousServiceRange() == UNKNOWN_VALUE ||	
+				journey.getContinuousServiceRange() > serviceUse.getServiceRange() ?
 				serviceUse.getServiceRange() :
-				journey._continuousServiceRange
+				journey.getContinuousServiceRange()
 			),
 			_effectiveDuration(journey._effectiveDuration + serviceUse.getDuration()),
 			_transportConnectionCount(
@@ -105,10 +106,10 @@ namespace synthese
 			const Journey& journey1,
 			const Journey& journey2
 		):	_continuousServiceRange(
-				journey1._continuousServiceRange == UNKNOWN_VALUE ||
-				journey1._continuousServiceRange > journey2._continuousServiceRange ?
-				journey2._continuousServiceRange :
-				journey1._continuousServiceRange
+				journey1.getContinuousServiceRange() == UNKNOWN_VALUE ||
+				journey1.getContinuousServiceRange() > journey2.getContinuousServiceRange() ?
+				journey2.getContinuousServiceRange() :
+				journey1.getContinuousServiceRange()
 			),
 			_effectiveDuration(journey1._effectiveDuration + journey2._effectiveDuration),
 			_transportConnectionCount(
@@ -265,7 +266,7 @@ namespace synthese
 				getArrivalTime ().getHour ().isUnknown ()
 			) return posix_time::time_duration();
 		    
-			return posix_time::minutes(getArrivalTime () - getDepartureTime ());
+			return posix_time::seconds(getArrivalTime().getSecondsDifference(getDepartureTime()));
 		}
 
 
@@ -274,15 +275,14 @@ namespace synthese
 		) const	{
 			if (_continuousServiceRange == UNKNOWN_VALUE)
 			{
-				int continuousServiceRange = UNKNOWN_VALUE;
 				BOOST_FOREACH(const ServiceUse& leg, _journeyLegs)
 				{
-					if ( (continuousServiceRange == UNKNOWN_VALUE) ||
-						(leg.getServiceRange() < continuousServiceRange) )
-					{
-						continuousServiceRange = leg.getServiceRange();
+					if(	_continuousServiceRange == UNKNOWN_VALUE ||
+						leg.getServiceRange() < _continuousServiceRange
+					){
+						_continuousServiceRange = leg.getServiceRange();
 					}
-					if (continuousServiceRange == 0) break;
+					if (_continuousServiceRange == 0) break;
 				}
 			}
 			return _continuousServiceRange;
@@ -301,11 +301,11 @@ namespace synthese
 		void Journey::clear(
 		){
 			_continuousServiceRange = UNKNOWN_VALUE;
-			_effectiveDuration = 0;
+			_effectiveDuration = posix_time::seconds(0);
 			_transportConnectionCount = 0;
 			_distance = 0;
-			_endApproachDuration = posix_time::minutes(0);
-			_startApproachDuration = posix_time::minutes(0);
+			_endApproachDuration = posix_time::seconds(0);
+			_startApproachDuration = posix_time::seconds(0);
 			_endReached = false;
 			_journeyLegs.clear();
 			_method = UNDEFINED_DIRECTION;
@@ -324,7 +324,7 @@ namespace synthese
 			return _journeyLegs;
 		}
 
-		int Journey::getEffectiveDuration() const
+		posix_time::time_duration Journey::getEffectiveDuration() const
 		{
 			return _effectiveDuration;
 		}
@@ -346,22 +346,31 @@ namespace synthese
 
 			//! <li>Time comparison</li>
 			DateTime currentsTime = getEndTime();
-
 			DateTime othersTime = other.getEndTime();
-
-			if ((currentsTime.*_bestTimeStrictOperator)(othersTime))
-				return true;
 			if (currentsTime != othersTime)
-				return false;
+			{
+				return (currentsTime.*_bestTimeStrictOperator)(othersTime);
+			}
 
 			/** </ul><p>Comparison between journey of same duration.</p><ul>
-				<li>A shorter journey is best</li>
 			*/
+			/** <li>A journey with less approach duration is best</li> */
+			posix_time::time_duration pedestrianDuration1(getStartApproachDuration() + getEndApproachDuration());
+			posix_time::time_duration pedestrianDuration2(other.getStartApproachDuration() + other.getEndApproachDuration());
+
+			if (pedestrianDuration1 != pedestrianDuration2)
+			{
+				return pedestrianDuration1 < pedestrianDuration2;
+			}
+
+
+			/** <li>A journey without compulsor reservation is best</li> */
 			if (getReservationCompliance() == true && other.getReservationCompliance() != true)
 				return false;
 			if (other.getReservationCompliance() == true && getReservationCompliance() != true)
 				return true;
 
+			/** <li>A shorter journey is best</li> */
 			if (getDuration () != other.getDuration ())
 				return getDuration() < other.getDuration();
 
@@ -568,7 +577,7 @@ namespace synthese
 
 
 
-		posix_time::time_duration Journey::getEndApproroachDuration() const
+		posix_time::time_duration Journey::getEndApproachDuration() const
 		{
 			return _endApproachDuration;
 		}

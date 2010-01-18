@@ -255,7 +255,7 @@ namespace synthese
 			// Accessibility
 			if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
 			{
-				_accessParameters = AccessParameters(map.get<string>(PARAMETER_ACCESS_PARAMETERS));
+				_accessParameters = map.get<string>(PARAMETER_ACCESS_PARAMETERS);
 			}
 
 			PTTimeSlotRoutePlanner rp(

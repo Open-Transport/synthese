@@ -121,6 +121,7 @@ namespace synthese
 			int getSecondsDifference(const Hour& op2) const;
 
 			boost::posix_time::time_duration toPosixTimeDuration() const;
+			static Hour FromTimeDuration(boost::posix_time::time_duration value);
 		};
 
 		std::ostream& operator<< ( std::ostream& os, const Hour& op );

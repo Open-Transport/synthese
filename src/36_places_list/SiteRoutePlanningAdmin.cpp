@@ -178,7 +178,7 @@ namespace synthese
 				_dateTime,
 				endDate,
 				_resultsNumber,
-				_site->getAccessParameters(_accessibility),
+				_site->getAccessParameters(_accessibility, AccessParameters::AllowedPathClasses()),
 				DEPARTURE_FIRST
 //				, &stream
 //				, _log ? Log::LEVEL_TRACE : Log::LEVEL_NONE

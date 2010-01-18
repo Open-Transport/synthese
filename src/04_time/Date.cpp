@@ -576,5 +576,14 @@ namespace synthese
 		{
 			return isUnknown() ? gregorian::date() : gregorian::date(_year, _month, _day);
 		}
+
+
+
+		synthese::time::Date Date::FromGregorianDate( boost::gregorian::date value )
+		{
+			if(value.is_not_a_date()) return Date(TIME_UNKNOWN);
+
+			return Date(value.day(), value.month(), value.year());
+		}
 	}
 }

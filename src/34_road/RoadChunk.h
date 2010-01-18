@@ -56,7 +56,8 @@ namespace synthese
 				util::RegistryKeyType id = UNKNOWN_VALUE,
 				Address* fromAddress = NULL,
 				int rankInRoad = UNKNOWN_VALUE,
-				Road* street = NULL
+				Road* street = NULL,
+				double metricOffset = UNKNOWN_VALUE
 			);
 
 		  

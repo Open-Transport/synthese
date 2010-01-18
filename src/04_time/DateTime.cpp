@@ -398,6 +398,13 @@ namespace synthese
 		{
 			return isUnknown() ? posix_time::ptime() : posix_time::ptime(_date.toGregorianDate(), _hour.toPosixTimeDuration());
 		}
+
+
+
+		DateTime DateTime::FromPosixTime( const boost::posix_time::ptime value )
+		{
+			return DateTime(Date::FromGregorianDate(value.date()), Hour::FromTimeDuration(value.time_of_day()));
+		}
 	}
 }
 

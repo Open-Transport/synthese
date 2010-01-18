@@ -97,9 +97,9 @@ namespace synthese
 			return _secondActualDateTime;
 		}
 
-		int ServiceUse::getDuration() const
+		posix_time::time_duration ServiceUse::getDuration() const
 		{
-			return getArrivalDateTime() - getDepartureDateTime();
+			return posix_time::seconds(getArrivalDateTime().getSecondsDifference(getDepartureDateTime()));
 		}
 
 		double ServiceUse::getDistance() const

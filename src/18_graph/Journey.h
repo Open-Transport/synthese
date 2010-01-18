@@ -74,7 +74,7 @@ namespace synthese
 			//! @name Query cache
 			//@{
 				mutable int		_continuousServiceRange;
-				int				_effectiveDuration;
+				boost::posix_time::time_duration	_effectiveDuration;
 				int				_transportConnectionCount;
 				double			_distance;
 			//@}
@@ -119,7 +119,7 @@ namespace synthese
 				/** Returns the effective amount of time spent
 					travelling, excluding tranfer delays.
 				*/
-				int getEffectiveDuration () const;
+				boost::posix_time::time_duration getEffectiveDuration () const;
 	
 				/** Continuous service range of this journey.
 					@return Range duration in minutes, or 0 if unique service.
@@ -130,7 +130,7 @@ namespace synthese
 				const time::DateTime::ComparisonOperator& getBestTimeStrictOperator() const;
 				int			getScore()	const;
 				boost::posix_time::time_duration getStartApproachDuration()	const;
-				boost::posix_time::time_duration getEndApproroachDuration()	const;
+				boost::posix_time::time_duration getEndApproachDuration()	const;
 			//@}
 
 			//! @name Setters

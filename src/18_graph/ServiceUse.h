@@ -68,7 +68,7 @@ namespace synthese
 				const Vertex*			getArrivalRTVertex()			const;
 				const time::DateTime&	getDepartureDateTime()		const;
 				const time::DateTime&	getArrivalDateTime()		const;
-				int						getDuration()				const;
+				boost::posix_time::time_duration	getDuration()				const;
 				double					getDistance()				const;
 				UseRule::RunPossibilityType		isUseRuleCompliant(
 				)	const;

@@ -27,6 +27,8 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace graph;
+
 	namespace util
 	{
 		template<> const string Registry<env::RollingStock>::KEY("RollingStock");
@@ -36,8 +38,10 @@ namespace synthese
 	{
 
 
-		RollingStock::RollingStock(util::RegistryKeyType key)
-			: util::Registrable(key)
+		RollingStock::RollingStock(
+			util::RegistryKeyType key
+		):	graph::PathClass(),
+			util::Registrable(key)
 		{
 		}
 
@@ -83,6 +87,13 @@ namespace synthese
 		void RollingStock::setIndicator( const std::string& value )
 		{
 			_indicator = value;
+		}
+
+
+
+		PathClass::Identifier RollingStock::getIdentifier() const
+		{
+			return getKey();
 		}
 	}
 }

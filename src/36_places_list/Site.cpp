@@ -163,26 +163,28 @@ namespace synthese
 
 
 
-		graph::AccessParameters Site::getAccessParameters(UserClassCode parameter) const
-		{
+		graph::AccessParameters Site::getAccessParameters(
+			UserClassCode parameter,
+			const graph::AccessParameters::AllowedPathClasses& allowedPathClasses
+		) const	{
 			AccessParameters ap;
 
 			switch(parameter)
 			{
 			case USER_HANDICAPPED:
 				return AccessParameters(
-					parameter, false, false, 300, 23, 34, _maxTransportConnectionsCount
+					parameter, false, false, 300, posix_time::minutes(23), 34, _maxTransportConnectionsCount, allowedPathClasses
 				);
 
 			case USER_BIKE:
 				return AccessParameters(
-					parameter, false, false, 3000, 23, 201, _maxTransportConnectionsCount
+					parameter, false, false, 3000, posix_time::minutes(23), 201, _maxTransportConnectionsCount, allowedPathClasses
 				);
 
 			case USER_PEDESTRIAN:
 			default:
 				return AccessParameters(
-					USER_PEDESTRIAN, false, false, 1000, 23, 67, _maxTransportConnectionsCount
+					USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 67, _maxTransportConnectionsCount, allowedPathClasses
 				);
 			}
 		}

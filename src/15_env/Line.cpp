@@ -22,7 +22,7 @@
 
 #include "Line.h"
 #include "Registry.h"
-
+#include "RollingStock.h"
 #include "Service.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
@@ -51,7 +51,6 @@ namespace synthese
 			, Path(),
 			Importable(),
 			_name (name)
-			, _rollingStock (NULL)
 			, _isWalkingLine (false)
 			, _useInDepartureBoards (true)
 			, _useInTimetables (true)
@@ -165,18 +164,16 @@ namespace synthese
 
 
 
-		const RollingStock*
-		Line::getRollingStock () const
+		RollingStock*	Line::getRollingStock () const
 		{
-			return _rollingStock;
+			return static_cast<RollingStock*>(_pathClass);
 		}
 
 
 
-		void 
-		Line::setRollingStock (const RollingStock* rollingStock)
+		void Line::setRollingStock(RollingStock* rollingStock)
 		{
-			_rollingStock = rollingStock;
+			_pathClass = static_cast<PathClass*>(rollingStock);
 		}
 
 
@@ -235,9 +232,9 @@ namespace synthese
 			_pathGroup = commercialLine;
 		}
 
-		const CommercialLine* Line::getCommercialLine() const
+		CommercialLine* Line::getCommercialLine() const
 		{
-			return static_cast<const CommercialLine*>(_pathGroup);
+			return static_cast<CommercialLine*>(_pathGroup);
 		}
 
 		bool Line::isPedestrianMode() const

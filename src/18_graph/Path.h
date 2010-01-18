@@ -48,6 +48,7 @@ namespace synthese
 		class Service;
 		class Edge;
 		class PathGroup;
+		class PathClass;
 
 		struct cmpService
 		{
@@ -84,6 +85,7 @@ namespace synthese
 
 		protected:
 			PathGroup*		_pathGroup;	//!< Up link : path group
+			PathClass*		_pathClass;	//!< Up link : path class
 			Edges			_edges; 	//!< Down link 1 : edges
 			ServiceSet		_services;	//!< Down link 2 : services
 			

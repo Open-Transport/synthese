@@ -46,11 +46,12 @@ namespace synthese
 	namespace graph
 	{
 
-		Path::Path()
-			: RuleUser()
-			, Calendar()
-			, _allDays(false)
-			, _pathGroup(NULL)
+		Path::Path():
+			RuleUser(),
+			Calendar(),
+			_allDays(false),
+			_pathGroup(NULL),
+			_pathClass(NULL)
 		{
 		}
 		    

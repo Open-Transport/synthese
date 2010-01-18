@@ -48,6 +48,7 @@
 #include "PhysicalStop.h"
 #include "OnlineReservationRule.h"
 #include "ReservationContact.h"
+#include "RollingStockFilter.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -88,7 +89,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_LOWEST_ARRIVAL_TIME("ii");
 		const string RoutePlannerFunction::PARAMETER_HIGHEST_DEPARTURE_TIME("ha");
 		const string RoutePlannerFunction::PARAMETER_HIGHEST_ARRIVAL_TIME("ia");
-
+		const string RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID("tm");
 
 
 
@@ -213,6 +214,12 @@ namespace synthese
 						_endArrivalDate += 2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000);
 					}
 				}
+
+				// Rolling stock filter
+				if(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID))
+				{
+					_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
+				}
 			}
 			catch(Site::ForbiddenDateException)
 			{
@@ -226,6 +233,10 @@ namespace synthese
 			{
 				throw RequestException(e.what());
 			}
+			catch(ObjectNotFoundException<RollingStockFilter>& e)
+			{
+				throw RequestException(e.getMessage());
+			}
 
 			// Max solutions number
 			_maxSolutionsNumber = map.getOptional<size_t>(PARAMETER_MAX_SOLUTIONS_NUMBER);
@@ -233,7 +244,8 @@ namespace synthese
 			// Accessibility
 			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
 			_accessParameters = _site->getAccessParameters(
-				acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN
+				acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
+				_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
 			);
 
 			if(	(!_departure_place.placeResult.value || !_arrival_place.placeResult.value) &&

@@ -31,6 +31,7 @@
 #include "PTRoutePlannerResult.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -187,7 +188,7 @@ namespace synthese
 							false,
 							false,
 							0,
-							0,
+							posix_time::minutes(0),
 							67,
 							2
 						),

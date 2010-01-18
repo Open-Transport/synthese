@@ -25,3 +25,4 @@ synthese::transportwebsite::TransportWebsiteRight::integrate();
 synthese::util::Env::Integrate<synthese::transportwebsite::ObjectSiteLink>();
 synthese::util::Env::Integrate<synthese::transportwebsite::Site>();
 synthese::util::Env::Integrate<synthese::transportwebsite::SiteCommercialLineLink>();
+synthese::util::Env::Integrate<synthese::transportwebsite::RollingStockFilter>();

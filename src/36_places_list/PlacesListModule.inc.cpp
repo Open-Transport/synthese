@@ -29,3 +29,4 @@
 #include "ObjectSiteLink.h"
 #include "Site.h"
 #include "SiteCommercialLineLink.h"
+#include "RollingStockFilter.h"

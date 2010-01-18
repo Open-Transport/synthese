@@ -39,6 +39,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		class HourPeriod;
+		class RollingStockFilter;
 	}
 
 	namespace geography
@@ -133,6 +134,7 @@ namespace synthese
 			static const std::string PARAMETER_LOWEST_ARRIVAL_TIME;
 			static const std::string PARAMETER_HIGHEST_DEPARTURE_TIME;
 			static const std::string PARAMETER_HIGHEST_ARRIVAL_TIME;
+			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			
 		private:
 			//! \name Parameters
@@ -155,6 +157,7 @@ namespace synthese
 				const transportwebsite::HourPeriod*			_period;
 				bool										_home;
 				boost::shared_ptr<const UserFavoriteJourney>		_favorite;
+				boost::shared_ptr<const transportwebsite::RollingStockFilter>	_rollingStockFilter;
 			//@}
 
 
