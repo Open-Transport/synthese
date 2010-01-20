@@ -214,12 +214,6 @@ namespace synthese
 						_endArrivalDate += 2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000);
 					}
 				}
-
-				// Rolling stock filter
-				if(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID))
-				{
-					_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
-				}
 			}
 			catch(Site::ForbiddenDateException)
 			{
@@ -233,9 +227,17 @@ namespace synthese
 			{
 				throw RequestException(e.what());
 			}
+
+			try
+			{
+				// Rolling stock filter
+				if(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID))
+				{
+					_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
+				}
+			}
 			catch(ObjectNotFoundException<RollingStockFilter>& e)
 			{
-				throw RequestException(e.getMessage());
 			}
 
 			// Max solutions number

@@ -370,7 +370,7 @@ namespace synthese
 
 			// 1: Minutes
 			int retain2 = ( 3599 + op2._minutes -_minutes) / 3600;
-			result += 60 * (_minutes + retain2 * 3600 - op2._minutes - retain);
+			result += 60 * (_minutes + retain2 * 60 - op2._minutes - retain);
 
 			// 2: Hours
 			result += 3600 * (_hours - op2._hours - retain2 );

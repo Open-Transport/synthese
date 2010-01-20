@@ -50,6 +50,7 @@ namespace synthese
 	using namespace pt;
 	using namespace road;
 	using namespace html;
+	using namespace graph;
 
 	namespace util
 	{
@@ -122,10 +123,10 @@ namespace synthese
 			c.push_back("Actions");
 			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 			stream << t.open();
-			BOOST_FOREACH(const Road* road, _roadPlace->getRoads())
+			BOOST_FOREACH(Path* road, _roadPlace->getPaths())
 			{
 				openRoadRequest.getPage()->setRoad(
-					Env::GetOfficialEnv().getSPtr(road)
+					Env::GetOfficialEnv().getSPtr(static_cast<Road*>(road))
 				);
 
 				stream << t.row();
@@ -151,10 +152,10 @@ namespace synthese
 			if(	currentPage == *this ||
 				currentPage.getCurrentTreeBranch().find(*this)
 			){
-				BOOST_FOREACH(const Road* road, _roadPlace->getRoads())
+				BOOST_FOREACH(Path* road, _roadPlace->getPaths())
 				{
 					shared_ptr<PTRoadAdmin> p(getNewOtherPage<PTRoadAdmin>());
-					p->setRoad(Env::GetOfficialEnv().getSPtr(road));
+					p->setRoad(Env::GetOfficialEnv().getSPtr(static_cast<Road*>(road)));
 					links.push_back(p);
 				}
 			}

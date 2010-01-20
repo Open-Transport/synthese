@@ -61,27 +61,19 @@ namespace synthese
 		
 		
 		
-		const RoadPlace::Roads& RoadPlace::getRoads(
-		) const {
-			return _roads;
-		}
-		
-		
-		
 		void RoadPlace::addRoad(
-			const Road& road
+			Road& road
 		){
-			_roads.insert(&road);
+			addPath(static_cast<Path*>(&road));
 			_isoBarycentreToUpdate = true;
 		}
 		
 		
 		
 		void RoadPlace::removeRoad(
-			const Road& road
+			Road& road
 		){
-			Roads::iterator it(_roads.find(&road));
-			if(it != _roads.end()) _roads.erase(it);
+			removePath(static_cast<Path*>(&road));
 			_isoBarycentreToUpdate = true;
 		}
 
@@ -95,7 +87,7 @@ namespace synthese
 		) const	{
 			if(whatToSearch.find(RoadModule::GRAPH_ID) == whatToSearch.end()) return;
 
-			BOOST_FOREACH(const Road* road, _roads)
+			BOOST_FOREACH(const Path* road, _paths)
 			{
 				BOOST_FOREACH(const Edge* edge, road->getEdges())
 				{
@@ -115,7 +107,7 @@ namespace synthese
 			{
 				_isoBarycentre.clear();
 
-				BOOST_FOREACH(const Road* road, _roads)
+				BOOST_FOREACH(const Path* road, _paths)
 				{
 					BOOST_FOREACH(const Edge* edge, road->getEdges())
 					{

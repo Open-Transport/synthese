@@ -223,7 +223,7 @@ namespace synthese
 				<< " WHERE 1 ";
 			if(placeId)
 			{
-				query << COL_PLACEID << "=" << *placeId;
+				query << " AND " << COL_PLACEID << "=" << *placeId;
 			}
 			if (number)
 			{

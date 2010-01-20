@@ -320,9 +320,8 @@ namespace synthese
 
 		Edge* Path::getLastEdge() const
 		{
-			vector<Edge*>::const_iterator it = _edges.end();
-			--it;
-			return (it != _edges.end()) ? *it : NULL;
+			if(_edges.empty()) return NULL;
+			return *(_edges.end() - 1);
 		}
 
 
@@ -353,9 +352,7 @@ namespace synthese
 			if(	other._pathGroup != _pathGroup ||
 				other._edges.empty() ||
 				_edges.empty() ||
-				other.getEdge(0)->getFromVertex() != getLastEdge()->getFromVertex() ||
-				!_services.empty() ||
-				!other._services.empty()
+				other.getEdge(0)->getFromVertex() != getLastEdge()->getFromVertex()
 			){
 				throw util::Exception("The two roads cannot be merged");
 			}

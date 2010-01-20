@@ -60,7 +60,7 @@ namespace synthese
 	using namespace geography;
 	using namespace db;
 	using namespace geometry;
-	
+	using namespace graph;
 	
 
 	namespace util
@@ -364,9 +364,9 @@ namespace synthese
 						SHPObject* shpObject(SHPReadObject(shapeFile, int(i-1)));
 						double length(0);
 						optional<Point2D> lastPt;
-						for(int i(0); i< shpObject->nVertices; ++i)
+						for(int p(0); p< shpObject->nVertices; ++p)
 						{
-							Point2D point(shpObject->padfX[i], shpObject->padfY[i]);
+							Point2D point(shpObject->padfX[p], shpObject->padfY[p]);
 							if(lastPt)
 							{
 								length += point.getDistanceTo(*lastPt);
@@ -408,21 +408,21 @@ namespace synthese
 							_env->getEditableRegistry<RoadPlace>().add(roadPlace);
 							recentlyCreatedRoadPlaces.insert(
 								make_pair(
-								make_pair(
-								city->getKey(),
-								roadName
-								), roadPlace
-								)	);
+									make_pair(
+										city->getKey(),
+										roadName
+									), roadPlace
+							)	);
 						}
 
 						// Search for an existing road which ends at the left node
 						Road* road(NULL);
 						double startMetricOffset(0);
-						BOOST_FOREACH(const Road* croad, roadPlace->getRoads())
+						BOOST_FOREACH(Path* croad, roadPlace->getPaths())
 						{
 							if(croad->getLastEdge()->getFromVertex() == leftNode)
 							{
-								road = const_cast<Road*>(croad);
+								road = static_cast<Road*>(croad);
 								startMetricOffset = croad->getLastEdge()->getMetricOffset();
 								break;
 							}
@@ -441,29 +441,32 @@ namespace synthese
 
 							// Search for a second existing road which starts at the right node
 							Road* road2 = NULL;
-							BOOST_FOREACH(const Road* croad, roadPlace->getRoads())
+							BOOST_FOREACH(Path* croad, roadPlace->getPaths())
 							{
 								if(croad->getEdge(0)->getFromVertex() == rightNode)
 								{
-									road2 = const_cast<Road*>(croad);
+									road2 = static_cast<Road*>(croad);
 									break;
 								}
 							}
 							// If found, merge the two roads
 							if(road2)
 							{
+								RegistryKeyType lastEdgeId(road->getLastEdge()->getKey());
 								road->merge(*road2);
+								_env->getEditableRegistry<RoadChunk>().remove(lastEdgeId);
+								_env->getEditableRegistry<Road>().remove(road2->getKey());
 							}
 
 						}
 						else
 						{
 							// If not found search for an existing road which begins at the right node
-							BOOST_FOREACH(const Road* croad, roadPlace->getRoads())
+							BOOST_FOREACH(Path* croad, roadPlace->getPaths())
 							{
 								if(croad->getEdge(0)->getFromVertex() == rightNode)
 								{
-									road = const_cast<Road*>(croad);
+									road = static_cast<Road*>(croad);
 									break;
 								}
 							}
@@ -482,7 +485,7 @@ namespace synthese
 							}
 							else
 							{
-								shared_ptr<Road> road(new Road);
+								shared_ptr<Road> road(new Road(UNKNOWN_VALUE, Road::ROAD_TYPE_UNKNOWN, false));
 								road->setRoadPlace(roadPlace.get());
 								roadPlace->addRoad(*road);
 								road->setKey(RoadTableSync::getId());

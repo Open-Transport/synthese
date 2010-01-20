@@ -46,13 +46,14 @@ namespace synthese
 
 		Road::Road (
 			RegistryKeyType id,
-			RoadType type
+			RoadType type,
+			bool autoCreateReverseRoad
 		):	Registrable(id),
 			_type (type)
 		{
 			// Creation of the permanent service
 			addService(new PermanentService(id, this), false);
-			_reverseRoad = new Road(*this);
+			_reverseRoad = (autoCreateReverseRoad ? new Road(*this) : NULL);
 		}
 
 		Road::Road(const Road& reverseRoad
@@ -67,6 +68,11 @@ namespace synthese
 
 		Road::~Road()
 		{
+			BOOST_FOREACH(ServiceSet::value_type& service, _services)
+			{
+				delete service;
+			}
+			delete _reverseRoad;
 		}
 
 		

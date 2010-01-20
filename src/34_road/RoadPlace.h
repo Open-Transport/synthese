@@ -52,11 +52,8 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<RoadPlace> Registry;
 
-			typedef std::set<const Road*> Roads;
-			
+		
 		private:
-			// Attributes
-			Roads _roads;
 			
 		public:
 			/////////////////////////////////////////////////////////////////////
@@ -72,7 +69,6 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const Roads& getRoads() const;
 			//@}
 		
 			//! @name Setters
@@ -81,8 +77,8 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
-				void addRoad(const Road& road);
-				void removeRoad(const Road& road);
+				void addRoad(Road& road);
+				void removeRoad(Road& road);
 			//@}
 
 			//! @name Queries
