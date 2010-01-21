@@ -92,12 +92,12 @@ namespace synthese
 			{
 				if(item.first < transferNumber)
 				{
-					if(item.second < duration)
+					if(item.second <= duration)
 						return true;
 				}
 				else if(item.first == transferNumber)
 				{
-					if(item.second < duration)
+					if(item.second <= duration) // Can erase much comfortable solutions (only the first found solution is kept : there could be an election at this time)
 					{
 						return true;
 					}

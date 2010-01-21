@@ -58,6 +58,7 @@ namespace synthese
 
 			std::string _name;
 			const Site* _site;
+			std::size_t _rank;
 			List _list;
 			bool _authorized_only;
 
@@ -73,6 +74,7 @@ namespace synthese
 				bool getAuthorizedOnly() const { return _authorized_only; }
 				const List& getList() const { return _list; }
 				const Site* getSite() const { return _site; }
+				std::size_t getRank() const { return _rank; }
 			//@}
 
 			//! @name Setters
@@ -80,11 +82,13 @@ namespace synthese
 				void setName(const std::string& value) { _name=value; }
 				void setAuthorizedOnly(bool value) { _authorized_only = value; }
 				void setSite(const Site* value) { _site = value; }
+				void setRank(std::size_t value) { _rank = value; }
 			//@}
 
 			//! @name Modifiers
 			//@{
 				void addRollingStock(const env::RollingStock* value) { _list.insert(value); }
+				void cleanRollingStocks() { _list.clear(); }
 			//@}
 
 			//! @name Queries

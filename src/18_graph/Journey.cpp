@@ -205,7 +205,7 @@ namespace synthese
 			DateTime d(getFirstJourneyLeg ().getDepartureDateTime());
 			if (d.isUnknown())
 				return d;
-			d -= ((_method == DEPARTURE_TO_ARRIVAL) ? _startApproachDuration : _endApproachDuration).total_seconds() / 60;
+			d -= ceil(((_method == DEPARTURE_TO_ARRIVAL) ? _startApproachDuration : _endApproachDuration).total_seconds() / double(60));
 			return d;
 		}
 
@@ -216,7 +216,7 @@ namespace synthese
 			DateTime d(getLastJourneyLeg ().getArrivalDateTime());
 			if (d.isUnknown())
 				return d;
-			d += ((_method == DEPARTURE_TO_ARRIVAL) ? _endApproachDuration : _startApproachDuration).total_seconds() / 60;
+			d += ceil(((_method == DEPARTURE_TO_ARRIVAL) ? _endApproachDuration : _startApproachDuration).total_seconds() / double(60));
 			return d;
 		}
 

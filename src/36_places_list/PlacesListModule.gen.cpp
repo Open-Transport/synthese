@@ -4,6 +4,7 @@ synthese::transportwebsite::SiteRoutePlanningAdmin::integrate();
 
 synthese::transportwebsite::SiteTableSync::integrate();
 synthese::transportwebsite::ObjectSiteLinkTableSync::integrate();
+synthese::transportwebsite::RollingStockFilterTableSync::integrate();
 
 synthese::transportwebsite::PlacesListModule::integrate();
 

@@ -20,6 +20,7 @@
 
 #include "SiteTableSync.h"
 #include "ObjectSiteLinkTableSync.h"
+#include "RollingStockFilterTableSync.h"
 
 #include "SiteUpdateAction.h"
 

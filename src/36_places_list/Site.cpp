@@ -352,6 +352,31 @@ namespace synthese
 
 
 
+		void Site::addRollingStockFilter( RollingStockFilter& value )
+		{
+			_rollingStockFilters[value.getRank()] = &value;
+		}
+
+
+
+		void Site::removeRollingStockFilter( RollingStockFilter& value )
+		{
+			RollingStockFilters::iterator it(_rollingStockFilters.find(value.getRank()));
+			if(it != _rollingStockFilters.end())
+			{
+				_rollingStockFilters.erase(it);
+			}
+		}
+
+
+
+		void Site::clearRollingStockFilters()
+		{
+			_rollingStockFilters.clear();
+		}
+
+
+
 		Site::ExtendedFetchPlaceResult::ExtendedFetchPlaceResult()
 		{
 			cityResult.value = NULL;

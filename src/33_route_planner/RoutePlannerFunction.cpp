@@ -608,11 +608,17 @@ namespace synthese
 								stream <<
 									">" <<
 									"<startAddress>";
-								_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getDepartureEdge()->getHub()));
+								if(dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub()))
+								{
+									_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getDepartureEdge()->getHub()));
+								}
 								stream <<
 									"</startAddress>" <<
 									"<endAddress>";
-								_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getArrivalEdge()->getHub()));
+								if(dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub()))
+								{
+									_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getArrivalEdge()->getHub()));
+								}
 								stream <<
 									"</endAddress>" <<
 									"</street>"

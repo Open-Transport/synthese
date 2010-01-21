@@ -319,19 +319,31 @@ namespace synthese
 					if(fullApproachJourney.empty())
 						fullApproachJourney.setStartApproachDuration(itVertex->second.approachTime);
 
+					int roundedApproachDuration(static_cast<int>(ceil(itVertex->second.approachTime.total_seconds() / double(60))));
 					DateTime correctedDesiredTime(journey->empty() ? desiredTime : journey->getEndTime());
+					DateTime correctedMinMaxDateTimeAtOrigin(minMaxDateTimeAtOrigin);
 					if (_accessDirection == DEPARTURE_TO_ARRIVAL)
-						correctedDesiredTime += static_cast<int>(ceil(itVertex->second.approachTime.total_seconds() / double(60)));
+					{
+						correctedDesiredTime += roundedApproachDuration;
+						correctedMinMaxDateTimeAtOrigin += roundedApproachDuration;
+					}
 					else
-						correctedDesiredTime -= static_cast<int>(ceil(itVertex->second.approachTime.total_seconds() / double(60)));
+					{
+						correctedDesiredTime -= roundedApproachDuration;
+						correctedMinMaxDateTimeAtOrigin -= roundedApproachDuration;
+					}
 
 					// Goal edges loop
 					const Vertex::Edges& edges((_accessDirection == DEPARTURE_TO_ARRIVAL) ? origin->getDepartureEdges() : origin->getArrivalEdges());
 
 					BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, edges)
 					{
-						if (!itEdge.first->isCompatibleWith(_accessParameters))
+						const Path& path(*itEdge.first);
+						if(	!path.isCompatibleWith(_accessParameters) ||
+							!_accessParameters.isAllowedPathClass(path.getPathClass() ? path.getPathClass()->getIdentifier() : 0)
+						){
 							continue;
+						}
 
 						assert(itEdge.second);
 						const Edge& edge(*itEdge.second);
@@ -350,7 +362,7 @@ namespace synthese
 								?	edge.getNextService(
 										_accessParameters.getUserClass(),
 										departureMoment,
-										minMaxDateTimeAtOrigin
+										correctedMinMaxDateTimeAtOrigin
 										, true
 										, departureServiceNumber
 										, _inverted
@@ -358,7 +370,7 @@ namespace synthese
 								:	edge.getPreviousService(
 										_accessParameters.getUserClass(),
 										departureMoment,
-										minMaxDateTimeAtOrigin
+										correctedMinMaxDateTimeAtOrigin
 										, true
 										, arrivalServiceNumber
 										, _inverted

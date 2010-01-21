@@ -32,6 +32,7 @@
 #include "GraphTypes.h"
 #include "City.h"
 #include "AccessParameters.h"
+#include "RollingStockFilter.h"
 
 #include <string>
 #include <set>
@@ -96,6 +97,8 @@ namespace synthese
 			typedef std::vector<HourPeriod> Periods;
 			
 			typedef lexmatcher::LexicalMatcher<const geography::City*> CitiesMatcher;
+
+			typedef std::map<std::size_t,RollingStockFilter*> RollingStockFilters;
 			
 		private:
 			//! \name Properties
@@ -110,6 +113,7 @@ namespace synthese
 			//@{
 				std::set<env::CommercialLine*>	_lines;
 				CitiesMatcher _citiesMatcher;
+				RollingStockFilters _rollingStockFilters;
 			//@}
 
 			//! \name Parameters
@@ -167,6 +171,9 @@ namespace synthese
 			//@{
 				void addHourPeriod(const HourPeriod& hourPeriod);
 				void addCity(const geography::City* value);
+				void addRollingStockFilter(RollingStockFilter& value);
+				void removeRollingStockFilter(RollingStockFilter& value);
+				void clearRollingStockFilters();
 			//@}
 
 			//! \name Queries

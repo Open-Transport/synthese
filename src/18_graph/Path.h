@@ -107,6 +107,7 @@ namespace synthese
 				const ServiceSet&	getServices()	const;
 				const Edges&		getEdges()		const;
 				bool				getAllDays()	const;
+				PathClass*			getPathClass()	const { return _pathClass; }
 			//@}
 
 			//! @name Query methods.

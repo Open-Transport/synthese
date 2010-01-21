@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -42,15 +42,15 @@ namespace synthese
 			@ingroup m36LS refLS
 		*/
 		class RollingStockFilterTableSync :
-			public db::SQLiteNoSyncTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>
+			public db::SQLiteRegistryTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>
 		{
 		public:
+			static const std::string COL_SITE_ID;
+			static const std::string COL_RANK;
 			static const std::string COL_NAME;
 			static const std::string COL_AUTHORIZED_ONLY;
 			static const std::string COL_ROLLING_STOCK_IDS;
 			
-			RollingStockFilterTableSync();
-
 
 			/** RollingStockFilter search.
 				(other search parameters)
@@ -60,9 +60,11 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static std::vector<boost::shared_ptr<RollingStockFilter> > search(
-				// other search parameters ,
-				int first = 0, int number = 0
+			static std::vector<boost::shared_ptr<RollingStockFilter> > Search(
+				util::Env& env,
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
 	}

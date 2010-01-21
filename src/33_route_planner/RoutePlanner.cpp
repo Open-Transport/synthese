@@ -126,7 +126,7 @@ namespace synthese
 			DateTime beginBound(result.getBeginTime());
 			DateTime endBound(result.getEndTime());
 			if(	_maxDuration &&
-				result.getArrivalTime() - result.getDepartureTime() > _maxDuration->total_seconds() / 60
+				result.getDuration() > _maxDuration
 			){
 				endBound = 
 					_planningOrder == DEPARTURE_FIRST ?

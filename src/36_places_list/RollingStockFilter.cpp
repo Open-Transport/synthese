@@ -42,6 +42,7 @@ namespace synthese
 		graph::AccessParameters::AllowedPathClasses RollingStockFilter::getAllowedPathClasses() const
 		{
 			graph::AccessParameters::AllowedPathClasses result;
+			result.insert(0);
 			if(_authorized_only)
 			{
 				BOOST_FOREACH(const List::value_type& element, _list)
