@@ -143,15 +143,10 @@ namespace synthese
 			bool operator >= (const DateTime& op2 ) const;
 			bool operator > (const DateTime& op2 ) const;
 
-			/** Minutes duration calculation.
-				@return The number of minutes between two DateTime objects.
-			*/
-			int operator - (const DateTime& op2 ) const;
-
 			DateTime operator + (int minutesDuration ) const;
 			DateTime operator - (int minutesDuration ) const;
 
-			int getSecondsDifference(const DateTime& op2) const;
+			boost::posix_time::time_duration getSecondsDifference(const DateTime& op2) const;
 		};
 
 		std::ostream& operator<< ( std::ostream& os, const DateTime& op );

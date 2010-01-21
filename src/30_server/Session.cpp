@@ -62,7 +62,7 @@ namespace synthese
 				throw SessionException("IP has changed during the session.");
 
 			DateTime now(TIME_CURRENT);
-			if (now - _lastUse > MAX_MINUTES_DURATION)
+			if (now.getSecondsDifference(_lastUse).total_seconds() / 60 > MAX_MINUTES_DURATION)
 				throw SessionException("Session is too old");
 
 			_lastUse = now;

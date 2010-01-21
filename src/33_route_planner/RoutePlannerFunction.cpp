@@ -49,6 +49,7 @@
 #include "OnlineReservationRule.h"
 #include "ReservationContact.h"
 #include "RollingStockFilter.h"
+#include "Address.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -387,7 +388,7 @@ namespace synthese
 						stream <<
 							"<journey hasALineAlert=\"" << (hasALineAlert ? "true" : "false") << "\" hasAStopAlert=\"" << (hasAStopAlert ? "true" : "false") << "\""
 						;
-						if(journey.getContinuousServiceRange() > 0)
+						if(journey.getContinuousServiceRange().total_seconds() > 0)
 						{
 							stream << " continuousServiceDuration=\"" << journey.getContinuousServiceRange() << "\"";
 						}
@@ -469,10 +470,10 @@ namespace synthese
 								**itSheetRow <<
 									" departureDateTime=\"" <<
 									posix_time::to_iso_extended_string(curET.getDepartureDateTime().toPosixTime()) << "\"";
-								if(journey.getContinuousServiceRange() > 0)
+								if(journey.getContinuousServiceRange().total_seconds() > 0)
 								{
 									posix_time::ptime edTime(curET.getDepartureDateTime().toPosixTime());
-									edTime += posix_time::minutes(journey.getContinuousServiceRange());
+									edTime += journey.getContinuousServiceRange();
 									**itSheetRow << " endDepartureDateTime=\"" << 
 										posix_time::to_iso_extended_string(edTime) << "\"";
 								}
@@ -498,10 +499,10 @@ namespace synthese
 								}
 								**itSheetRow << "<cell arrivalDateTime=\"" <<
 									posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
-								if(journey.getContinuousServiceRange() > 0)
+								if(journey.getContinuousServiceRange().total_seconds() > 0)
 								{
 									posix_time::ptime eaTime(curET.getArrivalDateTime().toPosixTime());
-									eaTime += posix_time::minutes(journey.getContinuousServiceRange());
+									eaTime += journey.getContinuousServiceRange();
 									**itSheetRow << " endArrivalDateTime=\"" <<
 										posix_time::to_iso_extended_string(eaTime) << "\"";
 								}
@@ -520,12 +521,12 @@ namespace synthese
 										" length=\"" << curET.getDistance() << "\"" <<
 										" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime().toPosixTime()) << "\"" <<
 										" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
-								if(journey.getContinuousServiceRange() > 0)
+								if(journey.getContinuousServiceRange().total_seconds() > 0)
 								{
 									posix_time::ptime edTime(curET.getDepartureDateTime().toPosixTime());
-									edTime += posix_time::minutes(journey.getContinuousServiceRange());
+									edTime += journey.getContinuousServiceRange();
 									posix_time::ptime eaTime(curET.getArrivalDateTime().toPosixTime());
-									eaTime += posix_time::minutes(journey.getContinuousServiceRange());
+									eaTime += journey.getContinuousServiceRange();
 									stream <<
 										" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
 										" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
@@ -595,12 +596,12 @@ namespace synthese
 										" name=\"" << road->getRoadPlace()->getName() << "\"" <<
 										" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime().toPosixTime()) << "\"" <<
 										" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
-								if(journey.getContinuousServiceRange() > 0)
+								if(journey.getContinuousServiceRange().total_seconds() > 0)
 								{
 									posix_time::ptime edTime(curET.getDepartureDateTime().toPosixTime());
-									edTime += posix_time::minutes(journey.getContinuousServiceRange());
+									edTime += journey.getContinuousServiceRange();
 									posix_time::ptime eaTime(curET.getArrivalDateTime().toPosixTime());
-									eaTime += posix_time::minutes(journey.getContinuousServiceRange());
+									eaTime += journey.getContinuousServiceRange();
 									stream <<
 										" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
 										" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
@@ -612,12 +613,28 @@ namespace synthese
 								{
 									_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getDepartureEdge()->getHub()));
 								}
+								else if(dynamic_cast<const Address*>(curET.getDepartureEdge()->getFromVertex()))
+								{
+									_XMLDisplayAddress(
+										stream,
+										*dynamic_cast<const Address*>(curET.getDepartureEdge()->getFromVertex()),
+										*road->getRoadPlace()
+									);
+								}
 								stream <<
 									"</startAddress>" <<
 									"<endAddress>";
 								if(dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub()))
 								{
 									_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getArrivalEdge()->getHub()));
+								}
+								else if(dynamic_cast<const Address*>(curET.getArrivalEdge()->getFromVertex()))
+								{
+									_XMLDisplayAddress(
+										stream,
+										*dynamic_cast<const Address*>(curET.getArrivalEdge()->getFromVertex()),
+										*road->getRoadPlace()
+									);
 								}
 								stream <<
 									"</endAddress>" <<
@@ -775,6 +792,27 @@ namespace synthese
 				">";
 			_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*stop.getHub()));
 			stream << "</" << tag << ">";
+		}
+
+
+
+		void RoutePlannerFunction::_XMLDisplayAddress(
+			std::ostream& stream,
+			const road::Address& address,
+			const road::RoadPlace& roadPlace
+		){
+			GeoPoint gp(WGS84FromLambert(address));
+
+			stream <<
+				"<address" <<
+				" latitude=\"" << gp.getLatitude() << "\"" <<
+				" longitude=\"" << gp.getLongitude() << "\"" <<
+				" id=\"" << address.getKey() << "\"" <<
+				" x=\"" << static_cast<int>(address.getX()) << "\"" <<
+				" y=\"" << static_cast<int>(address.getY()) << "\"" <<
+				" city=\"" << roadPlace.getCity()->getName() << "\"" <<
+				" streetName=\"" << roadPlace.getName() << "\"" <<
+				" />";
 		}
 	}
 }

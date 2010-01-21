@@ -390,10 +390,10 @@ namespace synthese
 				// Departure time
 				Journey::ServiceUses::const_iterator its(it->getServiceUses().begin());
 
-				if (it->getContinuousServiceRange() > 1)
+				if (it->getContinuousServiceRange().total_seconds() > 60)
 				{
 					DateTime endRange(its->getDepartureDateTime());
-					endRange += it->getContinuousServiceRange();
+					endRange += it->getContinuousServiceRange().total_seconds() / 60;
 					stream << " - Service continu jusqu'à " << endRange.toString();
 				}
 				if (it->getReservationCompliance() == true)

@@ -118,7 +118,7 @@ namespace synthese
 							, *static_cast<const PhysicalStop*>(leg.getDepartureEdge()->getFromVertex())
 							, __Couleur
 							, leg.getDepartureDateTime()
-							, journey->getContinuousServiceRange()
+							, journey->getContinuousServiceRange().total_seconds() / 60
 							, request
 							);
 
@@ -139,7 +139,7 @@ namespace synthese
 					serviceCellInterfacePage->display(
 						stream 
 						, leg
-						, journey->getContinuousServiceRange()
+						, journey->getContinuousServiceRange().total_seconds() % 60
 						, __FiltreHandicape
 						, __FiltreVelo
 						, NULL // leg->getService ()->getPath ()->hasApplicableAlarm ( debutLigne, finLigne ) ? __ET->getService()->getPath ()->getAlarm() : NULL
@@ -165,7 +165,7 @@ namespace synthese
 						, *static_cast<const PhysicalStop*>(leg.getArrivalEdge()->getFromVertex())
 						, __Couleur
 						, leg.getArrivalDateTime()
-						, journey->getContinuousServiceRange()
+						, journey->getContinuousServiceRange().total_seconds() / 60
 						, request
 					);
 

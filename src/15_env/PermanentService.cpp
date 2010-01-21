@@ -55,7 +55,7 @@ namespace synthese
 			sp.setTheoreticalTime(presenceDateTime);
 			sp.setOriginDateTime(DateTime(presenceDateTime.getDate(), Hour(TIME_MIN)));
 			sp.setService(this);
-			sp.setServiceRange(MINUTES_PER_DAY);
+			sp.setServiceRange(posix_time::hours(24));
 			return sp;
 		}
 

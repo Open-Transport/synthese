@@ -29,6 +29,7 @@
 #include "DateTime.h"
 
 using namespace std;
+using namespace boost;
 using namespace boost::gregorian;
 
 namespace synthese
@@ -117,7 +118,7 @@ namespace synthese
 			ptr.setService(this);
 			Schedule schedule;
 			DateTime actualDateTime(presenceDateTime);
-			int range;
+			posix_time::time_duration range;
 			int edgeIndex(edge->getRankInPath());
 			
 			if (method == DEPARTURE_TO_ARRIVAL)
@@ -139,12 +140,12 @@ namespace synthese
 				if (inverted)
 				{
 					DateTime validityEndTime(presenceDateTime.getDate(), _departureSchedules.at(edgeIndex).first);
-					range = actualDateTime - validityEndTime;
+					range = actualDateTime.getSecondsDifference(validityEndTime);
 				}
 				else
 				{
 					DateTime validityEndTime(presenceDateTime.getDate(), _departureSchedules.at(edgeIndex).second);
-					range = validityEndTime - actualDateTime;
+					range = validityEndTime.getSecondsDifference(actualDateTime);
 				}
 			}
 			else
@@ -166,12 +167,12 @@ namespace synthese
 				if (inverted)
 				{
 					DateTime validityEndTime(presenceDateTime.getDate(), _arrivalSchedules.at(edgeIndex).second);
-					range = validityEndTime - actualDateTime;
+					range = validityEndTime.getSecondsDifference(actualDateTime);
 				}
 				else
 				{
 					DateTime validityEndTime(presenceDateTime.getDate(), _arrivalSchedules.at(edgeIndex).first);
-					range = actualDateTime - validityEndTime;
+					range = actualDateTime.getSecondsDifference(validityEndTime);
 				}
 			}
 			ptr.setActualTime(actualDateTime);
@@ -200,6 +201,8 @@ namespace synthese
 
 			return ptr;
 		}
+
+
 
 		time::DateTime ContinuousService::getLeaveTime(
 			const ServicePointer& servicePointer,

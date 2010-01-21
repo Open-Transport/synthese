@@ -118,8 +118,6 @@ namespace synthese
 			*/
 			int operator- (const Hour& op2 ) const;
 
-			int getSecondsDifference(const Hour& op2) const;
-
 			boost::posix_time::time_duration toPosixTimeDuration() const;
 			static Hour FromTimeDuration(boost::posix_time::time_duration value);
 		};

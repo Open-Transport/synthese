@@ -114,7 +114,7 @@ namespace synthese
 			{
 				const ServiceUse& s(row.second.getStartServiceUse());
 
-				v.push_back(lexical_cast<string>((s.getDepartureDateTime() - DateTime(TIME_CURRENT)) <= blinkingDelay));
+				v.push_back(lexical_cast<string>(s.getDepartureDateTime().getSecondsDifference(DateTime(TIME_CURRENT)) <= posix_time::minutes(blinkingDelay)));
 				v.push_back(static_cast<const PhysicalStop*>(s.getDepartureRTVertex())->getName());
 				v.push_back(s.getService()->getServiceNumber());
 				v.push_back(s.getDepartureDateTime().getHour().toString());

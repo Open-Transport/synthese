@@ -55,7 +55,7 @@ namespace synthese
 		std::string PublicPlace::getNameForAllPlacesMatcher(
 			std::string text
 		) const	{
-			return (text.empty() ? getName() : text) + " [lieu public]";
+			return (text.empty() ? getName() : text);
 		}
 	}
 }

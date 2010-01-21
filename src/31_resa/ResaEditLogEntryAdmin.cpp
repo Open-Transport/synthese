@@ -152,7 +152,7 @@ namespace synthese
 			// Duration
 			if(!d.isUnknown())
 			{
-				stream << t.cell("Durée", lexical_cast<string>(d.getSecondsDifference(_entry->getDate())) + " s");
+				stream << t.cell("Durée", lexical_cast<string>(d.getSecondsDifference(_entry->getDate()).total_seconds()) + " s");
 			}
 
 			// Customer

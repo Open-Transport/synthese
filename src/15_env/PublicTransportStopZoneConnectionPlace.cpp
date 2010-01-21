@@ -250,7 +250,7 @@ namespace synthese
 		std::string PublicTransportStopZoneConnectionPlace::getNameForAllPlacesMatcher(
 			std::string text
 		) const	{
-			return (text.empty() ? getName() : text) + " [arrêt]";
+			return (text.empty() ? getName() : text);
 		}
 	}
 }

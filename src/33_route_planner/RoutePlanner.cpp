@@ -166,7 +166,7 @@ namespace synthese
 				if (!goalApproachJourney.empty())
 				{
 					goalApproachJourney.shift(
-						posix_time::minutes(result.getArrivalTime() - goalApproachJourney.getDepartureTime()) +
+						result.getArrivalTime().getSecondsDifference(goalApproachJourney.getDepartureTime()) +
 						result.getDestination()->getHub()->getTransferDelay(
 							*result.getDestination()->getFromVertex(),
 							*goalApproachJourney.getOrigin()->getFromVertex()
@@ -189,7 +189,7 @@ namespace synthese
 				if (!originApproachJourney.empty())
 				{
 					originApproachJourney.shift(
-						posix_time::minutes(result.getDepartureTime() - originApproachJourney.getDepartureTime()) -
+						result.getDepartureTime().getSecondsDifference(originApproachJourney.getDepartureTime()) -
 						originApproachJourney.getDuration() -
 						result.getOrigin()->getHub()->getTransferDelay(
 							*originApproachJourney.getDestination()->getFromVertex(),

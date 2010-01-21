@@ -126,7 +126,7 @@ namespace synthese
 							assert(placeToSearch != NULL);
 
 							DateTime lastDateTime(curET.getDepartureDateTime());
-							lastDateTime += it->getContinuousServiceRange();
+							lastDateTime += it->getContinuousServiceRange().total_seconds() / 60;
 
 							for (; itPlaces != placesList.end() && itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
 								columnInterfacePage->display(
@@ -155,7 +155,7 @@ namespace synthese
 								, pedestrianMode
 								, curET.getDepartureDateTime().getHour()
 								, lastDateTime.getHour()
-								, it->getContinuousServiceRange() > 0
+								, it->getContinuousServiceRange().total_seconds() > 0
 								, itl == jl.begin()
 								, true
 								, pedestrianMode && !lastPedestrianMode
@@ -195,7 +195,7 @@ namespace synthese
 							}
 							
 							DateTime lastDateTime(curET.getArrivalDateTime());
-							lastDateTime += it->getContinuousServiceRange();
+							lastDateTime += it->getContinuousServiceRange().total_seconds() / 60;
 
 							columnInterfacePage->display(
 								**itSheetRow
@@ -205,7 +205,7 @@ namespace synthese
 								, pedestrianMode
 								, curET.getArrivalDateTime().getHour ()
 								, lastDateTime.getHour()
-								, it->getContinuousServiceRange() > 0
+								, it->getContinuousServiceRange().total_seconds() > 0
 								, true
 								, (itl + 1) == jl.end()
 								, false

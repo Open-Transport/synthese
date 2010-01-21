@@ -284,24 +284,6 @@ namespace synthese
 		}
 
 
-		int DateTime::operator - (const DateTime& op2 ) const
-		{
-			int result;
-			int retain = 0;
-			  
-			// 1: Hour
-			result = _hour - op2._hour;
-			if (result < 0)
-			{
-				retain = 1;
-				result += MINUTES_PER_DAY;
-			}
-			  
-			// 2: Days since departure
-			result += ((_date - op2._date) - retain) * MINUTES_PER_DAY;
-			return result;
-		}
-
 
 		DateTime DateTime::operator + (int minutesDuration ) const
 		{
@@ -374,22 +356,9 @@ namespace synthese
 
 
 
-		int DateTime::getSecondsDifference( const DateTime& op2 ) const
+		boost::posix_time::time_duration DateTime::getSecondsDifference( const DateTime& op2 ) const
 		{
-			int result;
-			int retain = 0;
-
-			// 1: Hour
-			result = _hour.getSecondsDifference(op2._hour);
-			if (result < 0)
-			{
-				retain = 1;
-				result += 3600;
-			}
-
-			// 2: Days since departure
-			result += ((_date - op2._date) - retain) * 86400;
-			return result;
+			return toPosixTime() - op2.toPosixTime();
 		}
 
 

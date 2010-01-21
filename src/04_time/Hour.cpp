@@ -360,26 +360,6 @@ namespace synthese
 
 
 
-		int Hour::getSecondsDifference( const Hour& op2 ) const
-		{
-			int result = 0;
-
-			// 0 : Seconds
-			int retain = ( 59 + op2._seconds -_seconds) / 60;
-			result = _seconds + retain * 60 - op2._seconds;
-
-			// 1: Minutes
-			int retain2 = ( 3599 + op2._minutes -_minutes) / 3600;
-			result += 60 * (_minutes + retain2 * 60 - op2._minutes - retain);
-
-			// 2: Hours
-			result += 3600 * (_hours - op2._hours - retain2 );
-
-			return result;
-		}
-
-
-
 		boost::posix_time::time_duration Hour::toPosixTimeDuration() const
 		{
 			return

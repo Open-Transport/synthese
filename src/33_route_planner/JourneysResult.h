@@ -125,11 +125,10 @@ namespace synthese
 
 					const graph::Vertex* vertex(journey->getEndEdge()->getFromVertex());
 					boost::posix_time::time_duration duration(
-						boost::posix_time::minutes(
-							_accessDirection == graph::DEPARTURE_TO_ARRIVAL ?
-							journey->getEndTime() - _originDateTime :
-							_originDateTime - journey->getEndTime()
-					)	);
+						_accessDirection == graph::DEPARTURE_TO_ARRIVAL ?
+						journey->getEndTime().getSecondsDifference(_originDateTime) :
+						_originDateTime.getSecondsDifference(journey->getEndTime())
+					);
 					remove(vertex);
 					_index.insert(
 						std::make_pair(
@@ -200,7 +199,7 @@ namespace synthese
 						++next;
 						if(	journey->getMethod() == graph::DEPARTURE_TO_ARRIVAL && journey->getEndTime() >= newMaxTime ||
 							journey->getMethod() == graph::ARRIVAL_TO_DEPARTURE && journey->getEndTime() <= newMaxTime ||
-							bvrm.isUseLess(it->first, journey->size(), it->second->second, propagateInConnectionPlace)
+							bvrm.isUseLess(it->first, journey->size(), it->second->second, propagateInConnectionPlace, false)
 						){
 							journeysToRemove.push_back(journey);
 						}

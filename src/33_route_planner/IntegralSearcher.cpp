@@ -644,7 +644,7 @@ namespace synthese
 			if(	_bestVertexReachesMap.isUseLess(
 					reachedVertex,
 					journey.size(),
-					posix_time::seconds(method == DEPARTURE_TO_ARRIVAL ? journey.getEndTime().getSecondsDifference(_originDateTime) : _originDateTime.getSecondsDifference(journey.getEndTime())),
+					method == DEPARTURE_TO_ARRIVAL ? journey.getEndTime().getSecondsDifference(_originDateTime) : _originDateTime.getSecondsDifference(journey.getEndTime()),
 					_searchOnlyNodes
 			)	){
 					return _JourneyUsefulness(false,true);

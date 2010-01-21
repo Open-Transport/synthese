@@ -71,7 +71,8 @@ namespace synthese
 			const TimeMap::key_type& vertex,
 			const TimeMap::mapped_type::key_type& transferNumber,
 			const TimeMap::mapped_type::mapped_type& duration,
-			bool propagateInConnectionPlace
+			bool propagateInConnectionPlace,
+			bool strict
 		){
 			TimeMap::const_iterator itc(_bestTimeMap.find(vertex));
 
@@ -97,8 +98,9 @@ namespace synthese
 				}
 				else if(item.first == transferNumber)
 				{
-					if(item.second <= duration) // Can erase much comfortable solutions (only the first found solution is kept : there could be an election at this time)
-					{
+					if(	item.second < duration ||
+						strict && item.second == duration
+					){ // Can erase much comfortable solutions (only the first found solution is kept : there could be an election at this time)
 						return true;
 					}
 					else

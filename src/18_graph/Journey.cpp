@@ -49,7 +49,7 @@ namespace synthese
 	{
 
 		Journey::Journey(
-		):	_continuousServiceRange (UNKNOWN_VALUE),
+		):	_continuousServiceRange (posix_time::not_a_date_time),
 			_effectiveDuration(posix_time::seconds(0))
 			, _transportConnectionCount (0)
 			, _distance (0)
@@ -68,7 +68,7 @@ namespace synthese
 			const Journey& journey,
 			const ServiceUse& serviceUse
 		):	_continuousServiceRange(
-				journey.getContinuousServiceRange() == UNKNOWN_VALUE ||	
+				journey.getContinuousServiceRange().is_not_a_date_time() ||	
 				journey.getContinuousServiceRange() > serviceUse.getServiceRange() ?
 				serviceUse.getServiceRange() :
 				journey.getContinuousServiceRange()
@@ -106,7 +106,7 @@ namespace synthese
 			const Journey& journey1,
 			const Journey& journey2
 		):	_continuousServiceRange(
-				journey1.getContinuousServiceRange() == UNKNOWN_VALUE ||
+				journey1.getContinuousServiceRange().is_not_a_date_time() ||
 				journey1.getContinuousServiceRange() > journey2.getContinuousServiceRange() ?
 				journey2.getContinuousServiceRange() :
 				journey1.getContinuousServiceRange()
@@ -266,23 +266,23 @@ namespace synthese
 				getArrivalTime ().getHour ().isUnknown ()
 			) return posix_time::time_duration();
 		    
-			return posix_time::seconds(getArrivalTime().getSecondsDifference(getDepartureTime()));
+			return getArrivalTime().getSecondsDifference(getDepartureTime());
 		}
 
 
 
-		int Journey::getContinuousServiceRange(
+		posix_time::time_duration Journey::getContinuousServiceRange(
 		) const	{
-			if (_continuousServiceRange == UNKNOWN_VALUE)
+			if (_continuousServiceRange.is_not_a_date_time())
 			{
 				BOOST_FOREACH(const ServiceUse& leg, _journeyLegs)
 				{
-					if(	_continuousServiceRange == UNKNOWN_VALUE ||
+					if(	_continuousServiceRange.is_not_a_date_time() ||
 						leg.getServiceRange() < _continuousServiceRange
 					){
 						_continuousServiceRange = leg.getServiceRange();
 					}
-					if (_continuousServiceRange == 0) break;
+					if (_continuousServiceRange.total_seconds() == 0) break;
 				}
 			}
 			return _continuousServiceRange;
@@ -291,7 +291,7 @@ namespace synthese
 
 
 		void Journey::setContinuousServiceRange(
-			int continuousServiceRange
+			posix_time::time_duration continuousServiceRange
 		){
 			_continuousServiceRange = continuousServiceRange;
 		}
@@ -300,7 +300,7 @@ namespace synthese
 
 		void Journey::clear(
 		){
-			_continuousServiceRange = UNKNOWN_VALUE;
+			_continuousServiceRange = posix_time::not_a_date_time;
 			_effectiveDuration = posix_time::seconds(0);
 			_transportConnectionCount = 0;
 			_distance = 0;
@@ -396,13 +396,13 @@ namespace synthese
 
 		void Journey::shift(
 			posix_time::time_duration duration,
-			int continuousServiceRange /*= UNKNOWN_VALUE*/
+			posix_time::time_duration continuousServiceRange /*= UNKNOWN_VALUE*/
 		){
 			for(ServiceUses::iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
 			{
 				it->shift(duration);
 			}
-			_continuousServiceRange = (continuousServiceRange == UNKNOWN_VALUE) ? _continuousServiceRange - duration.total_seconds() / 60 : continuousServiceRange;
+			_continuousServiceRange = continuousServiceRange.is_not_a_date_time() ? _continuousServiceRange - duration : continuousServiceRange;
 		}
 
 
@@ -622,7 +622,12 @@ namespace synthese
 			{
 				const Hub* endHub(getEndEdge()->getHub());
 
-				_minSpeedToEnd = (1000 * _squareDistanceToEnd.getSquareDistance()) / ((_method == DEPARTURE_TO_ARRIVAL) ? bestTimeAtGoal - getArrivalTime() : getDepartureTime() - bestTimeAtGoal);
+				_minSpeedToEnd =
+					(10 * _squareDistanceToEnd.getSquareDistance()) /
+					(	_method == DEPARTURE_TO_ARRIVAL ?
+						bestTimeAtGoal.getSecondsDifference(getArrivalTime()) :
+						getDepartureTime().getSecondsDifference(bestTimeAtGoal)
+					).total_seconds();
 
 				_score = _minSpeedToEnd;
 				if (_score < 100)

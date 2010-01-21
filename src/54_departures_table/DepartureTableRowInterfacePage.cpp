@@ -98,7 +98,7 @@ namespace synthese
 			else
 			{
 				parameters.push_back(
-					(blinkingDelay > 0 && (ptd.first.getActualDateTime() - DateTime(TIME_CURRENT)) <= blinkingDelay) ?
+					(blinkingDelay > 0 && ptd.first.getActualDateTime().getSecondsDifference(DateTime(TIME_CURRENT)) <= posix_time::minutes(blinkingDelay)) ?
 					string("1") : string("0")
 					);
 				parameters.push_back(ptd.first.getActualDateTime().getHour().toString());
@@ -117,7 +117,7 @@ namespace synthese
 				);
 
 				parameters.push_back(
-					lexical_cast<string>(ptd.first.getActualDateTime() - ptd.first.getTheoreticalDateTime())
+					lexical_cast<string>(ptd.first.getActualDateTime().getSecondsDifference(ptd.first.getTheoreticalDateTime()).total_seconds() / 60)
 				); //13
 
 				if(	getInterface()->hasPage<RealTimeUpdateScreenServiceInterfacePage>() &&

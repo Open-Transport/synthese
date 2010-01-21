@@ -36,6 +36,12 @@
 
 namespace synthese
 {
+	namespace road
+	{
+		class Address;
+		class RoadPlace;
+	}
+
 	namespace transportwebsite
 	{
 		class HourPeriod;
@@ -179,6 +185,11 @@ namespace synthese
 				std::ostream& stream,
 				const std::string& tag,
 				const env::PhysicalStop& place
+			);
+			static void _XMLDisplayAddress(
+				std::ostream& stream,
+				const road::Address& place,
+				const road::RoadPlace& roadPlace
 			);
 
 		public:

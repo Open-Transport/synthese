@@ -73,7 +73,7 @@ namespace synthese
 
 			//! @name Query cache
 			//@{
-				mutable int		_continuousServiceRange;
+				mutable boost::posix_time::time_duration	_continuousServiceRange;
 				boost::posix_time::time_duration	_effectiveDuration;
 				int				_transportConnectionCount;
 				double			_distance;
@@ -124,7 +124,7 @@ namespace synthese
 				/** Continuous service range of this journey.
 					@return Range duration in minutes, or 0 if unique service.
 				*/
-				int			getContinuousServiceRange () const;
+				boost::posix_time::time_duration			getContinuousServiceRange () const;
 				MinSpeed	getMinSpeedToEnd() const;
 				bool		getEndReached() const;
 				const time::DateTime::ComparisonOperator& getBestTimeStrictOperator() const;
@@ -135,7 +135,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setContinuousServiceRange (int continuousServiceRange);
+				void setContinuousServiceRange (boost::posix_time::time_duration continuousServiceRange);
 				geometry::SquareDistance getSquareDistanceToEnd() const;
 			//@}
 
@@ -201,7 +201,7 @@ namespace synthese
 
 				void shift(
 					boost::posix_time::time_duration duration,
-					int continuousServiceRange = UNKNOWN_VALUE
+					boost::posix_time::time_duration continuousServiceRange = boost::posix_time::not_a_date_time
 				);
 				void reverse();
 

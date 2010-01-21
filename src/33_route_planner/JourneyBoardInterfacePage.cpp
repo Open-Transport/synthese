@@ -155,9 +155,9 @@ namespace synthese
 			);
 
 			DateTime lastDeparture(journey->getDepartureTime());
-			lastDeparture += journey->getContinuousServiceRange();
+			lastDeparture += journey->getContinuousServiceRange().total_seconds() / 60;
 			DateTime lastArrival(journey->getArrivalTime());
-			lastArrival += journey->getContinuousServiceRange();
+			lastArrival += journey->getContinuousServiceRange().total_seconds() / 60;
 
 			GeoPoint departurePoint(WGS84FromLambert(departurePlace->getPoint()));
 			GeoPoint arrivalPoint(WGS84FromLambert(arrivalPlace->getPoint()));
@@ -174,14 +174,14 @@ namespace synthese
 			pv.push_back(sDate.str());
 			pv.push_back(Conversion::ToString(resaCompliance && resaDeadLine > now));
 			pv.push_back(Conversion::ToString(resaCompliance == true));
-			pv.push_back(Conversion::ToString(resaDeadLine.isUnknown() ? 0 : resaDeadLine - now));
+			pv.push_back(Conversion::ToString(resaDeadLine.isUnknown() ? 0 : resaDeadLine.getSecondsDifference(now).total_seconds() / 60));
 			pv.push_back(sResa.str());
 			pv.push_back(sPhones.str());
 			pv.push_back(Conversion::ToString(onlineBooking));
 			pv.push_back(journey->getDepartureTime().toSQLString(false));
 			pv.push_back(Conversion::ToString(isTheLast));
-			pv.push_back(journey->getContinuousServiceRange() ? lastDeparture.getHour().toString() : string()); //17
-			pv.push_back(journey->getContinuousServiceRange() ? lastArrival.getHour().toString() : string()); //18
+			pv.push_back(journey->getContinuousServiceRange().total_seconds() ? lastDeparture.getHour().toString() : string()); //17
+			pv.push_back(journey->getContinuousServiceRange().total_seconds() ? lastArrival.getHour().toString() : string()); //18
 			pv.push_back(lexical_cast<string>(departurePoint.getLongitude()));
 			pv.push_back(lexical_cast<string>(departurePoint.getLatitude()));
 			pv.push_back(lexical_cast<string>(arrivalPoint.getLongitude()));

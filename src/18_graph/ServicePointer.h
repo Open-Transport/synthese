@@ -27,6 +27,8 @@
 #include "GraphTypes.h"
 #include "UseRule.h"
 
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
+
 namespace synthese
 {
 	namespace graph
@@ -65,7 +67,7 @@ namespace synthese
 				const UseRule*		_useRule;
 			//@}
 
-				int					_range;
+				boost::posix_time::time_duration	_range;
 
 		public:
 			ServicePointer(
@@ -82,7 +84,7 @@ namespace synthese
 				void	setTheoreticalTime(const time::DateTime& dateTime);
 				void	setService(const Service* service);
 				void	setOriginDateTime(const time::DateTime& dateTime);
-				void	setServiceRange(int duration);
+				void	setServiceRange(boost::posix_time::time_duration duration);
 				void	setRealTimeVertex(const Vertex* value);
 			//@}
 
@@ -95,7 +97,7 @@ namespace synthese
 				const time::DateTime&	getTheoreticalDateTime()	const;
 				const time::DateTime&	getOriginDateTime()			const;
 				AccessDirection			getMethod()					const;
-				int						getServiceRange()			const;
+				boost::posix_time::time_duration	getServiceRange()			const;
 				const UseRule*			getUseRule()				const;
 				UserClassCode			getUserClass()				const;
 				bool					getRTData()					const;

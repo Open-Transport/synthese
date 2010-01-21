@@ -142,7 +142,8 @@ namespace synthese
 					const TimeMap::key_type& vertex,
 					const TimeMap::mapped_type::key_type& transferNumber,
 					const TimeMap::mapped_type::mapped_type& duration,
-					bool propagateInConnectionPlace
+					bool propagateInConnectionPlace,
+					bool strict = true
 				);
 			//@}
 		};

@@ -282,7 +282,7 @@ namespace synthese
 					{
 						DateTime d(DateTime::FromSQLTimestamp(content[ResaDBLog::COL_DATE2]));
 						if (!d.isUnknown())
-							stream << "Jusqu'à " << d.toString() << " (" << (d.getSecondsDifference(entry.getDate())) << " s)";
+							stream << "Jusqu'à " << d.toString() << " (" << (d.getSecondsDifference(entry.getDate()).total_seconds()) << " s)";
 					}
 					break;
 

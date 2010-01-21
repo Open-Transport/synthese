@@ -99,7 +99,7 @@ namespace synthese
 
 		posix_time::time_duration ServiceUse::getDuration() const
 		{
-			return posix_time::seconds(getArrivalDateTime().getSecondsDifference(getDepartureDateTime()));
+			return getArrivalDateTime().getSecondsDifference(getDepartureDateTime());
 		}
 
 		double ServiceUse::getDistance() const
@@ -115,7 +115,7 @@ namespace synthese
 			_actualTime += duration.total_seconds() / 60;
 			_originDateTime += duration.total_seconds() / 60;
 			_secondActualDateTime += duration.total_seconds() / 60;
-			setServiceRange(getServiceRange() - duration.total_seconds() / 60);
+			setServiceRange(getServiceRange() - duration);
 		}
 
 

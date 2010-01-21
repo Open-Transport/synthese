@@ -29,6 +29,8 @@
 
 #include "01_util/Constants.h"
 
+using namespace boost;
+
 namespace synthese
 {
 	using namespace time;
@@ -47,7 +49,7 @@ namespace synthese
 			, _determinationMethod(method)
 			, _actualTime(TIME_UNKNOWN),
 			_theoreticalTime(TIME_UNKNOWN)
-			, _range(0)
+			, _range(posix_time::seconds(0))
 			, _edge(edge),
 			_userClass(userClassCode),
 			_useRule(NULL),
@@ -65,7 +67,8 @@ namespace synthese
 			_actualTime(TIME_UNKNOWN),
 			_theoreticalTime(TIME_UNKNOWN),
 			_useRule(NULL),
-			_originDateTime(TIME_UNKNOWN)
+			_originDateTime(TIME_UNKNOWN),
+			_range(posix_time::seconds(0))
 		{}
 
 
@@ -129,12 +132,14 @@ namespace synthese
 
 		
 
-		void ServicePointer::setServiceRange(int duration)
+		void ServicePointer::setServiceRange(posix_time::time_duration duration)
 		{
 			_range = duration;
 		}
 
-		int ServicePointer::getServiceRange() const
+
+
+		posix_time::time_duration ServicePointer::getServiceRange() const
 		{
 			return _range;
 		}

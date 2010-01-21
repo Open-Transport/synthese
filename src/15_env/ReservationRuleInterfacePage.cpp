@@ -30,6 +30,7 @@
 #include "DateTime.h"
 
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -60,9 +61,9 @@ namespace synthese
 			DateTime deadLine(journey.getReservationDeadLine());
 			logic::tribool compliance(journey.getReservationCompliance());
 
-			pv.push_back(Conversion::ToString(logic::indeterminate(compliance) && deadLine > now));
-			pv.push_back(Conversion::ToString(compliance == true));
-			pv.push_back(Conversion::ToString(deadLine.isUnknown() ? 0 : deadLine - now));
+			pv.push_back(lexical_cast<string>(logic::indeterminate(compliance) && deadLine > now));
+			pv.push_back(lexical_cast<string>(compliance == true));
+			pv.push_back(lexical_cast<string>(deadLine.isUnknown() ? 0 : deadLine.getSecondsDifference(now).total_seconds() / 60 ));
 			
 			stringstream s;
 			const DateTimeInterfacePage* datePage(getInterface()->getPage<DateTimeInterfacePage>());

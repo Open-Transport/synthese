@@ -125,7 +125,7 @@ namespace synthese
 		std::string RoadPlace::getNameForAllPlacesMatcher(
 			std::string text
 		) const	{
-			return (text.empty() ? getName() : text) + " [voie]";
+			return (text.empty() ? getName() : text);
 		}
 	}
 }
