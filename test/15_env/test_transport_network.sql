@@ -21,11 +21,33 @@ DELETE FROM t014_road_chunks;
 DELETE FROM t059_data_sources;
 DELETE FROM t060_road_places;
 DELETE FROM t061_pt_use_rules;
+DELETE FROM t049_rolling_stock;
 COMMIT;
 
 VACUUM;
 
 BEGIN TRANSACTION;
+
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822587,"train régional","le"," train");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822584,"autocar","l'","  car");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822585,"bus","le","  bus");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822160,"train de Grandes Lignes","le"," train");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822158,"train intercity","le"," train");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822586,"métro","le","metro");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822159,"train de banlieue","le"," train");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822638,"train de nuit","le"," train");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822589,"transport à la demande","le"," tad");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822590,"train à grande vitesse","le"," TGV");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822583,"bus scolaire","le"," bus");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822562,"","","");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822588,"tramway","le"," tram");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822591,"télécabine","la"," cable");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822594,"ligne de bus spéciale","la","bus");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273858822157,"train Eurostar","le"," E*");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273859967672,"train de nuit Corail Lunéa","le"," NUIT");
+REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273859967678,"train grandes lignes Corail Téoz","le"," TEOZ");
+
+
 INSERT INTO t006_cities(id,name) VALUES(1688849860511154,'City54');
 INSERT INTO t006_cities(id,name) VALUES(1688849860511295,'City95');
 INSERT INTO t006_cities(id,name) VALUES(1688849860530938,'City38');
@@ -88,8 +110,8 @@ INSERT INTO t002_addresses(id,place_id,x,y) VALUES(562949953421393,0,523000.0,18
 
 /* Lines */
 
-INSERT INTO t042_commercial_lines VALUES(11821949021891553,6192449487677434,'92','92','','vertfonce','vertfonce','','','',0,0,0,0);
-INSERT INTO t009_lines VALUES(2533274790397692,11821949021891553,'92',' 92.1','',0,1,1,1,2251799814850473,0,0,0,0,0);
+INSERT INTO t042_commercial_lines VALUES(11821949021891553,6192449487677434,'92','92','','vertfonce','vertfonce','','','',0,2305843009213693954,0,0);
+INSERT INTO t009_lines VALUES(2533274790397692,11821949021891553,'92',' 92.1','',0,1,1,1,13792273858822586,0,0,0,0,0);
 INSERT INTO t010_line_stops VALUES(2814749767106586,3377699720880586,2533274790397692,0,1,0,0.0,'');
 INSERT INTO t010_line_stops VALUES(2814749767106563,3377699720880573,2533274790397692,1,1,1,100.0,'');
 INSERT INTO t010_line_stops VALUES(2814749767106561,3377699720880575,2533274790397692,2,1,1,5500.0,'');
@@ -110,8 +132,8 @@ INSERT INTO t005_service_dates VALUES(1407374883553288,4503599627370502,date('no
 INSERT INTO t005_service_dates VALUES(1407374883553289,4503599627370502,date('now','+1 day'));
 
 
-INSERT INTO t042_commercial_lines VALUES(11821949021891554,6192449487677434,'Network1-CommLine2','93','le train (ligne C)','bleuclair','bleuclair','','','',0,0,0,0);
-INSERT INTO t009_lines VALUES(2533274790397693,11821949021891554,'93-2',' 93.2','',0,1,1,1,2251799814850473,0,0,0,0,0);
+INSERT INTO t042_commercial_lines VALUES(11821949021891554,6192449487677434,'Network1-CommLine2','93','le bus','bleuclair','bleuclair','','','',0,0,0,0);
+INSERT INTO t009_lines VALUES(2533274790397693,11821949021891554,'93-2',' 93.2','',0,1,1,1,13792273858822585,0,0,0,0,0);
 INSERT INTO t010_line_stops VALUES(2814749767106564,3377699720880573,2533274790397693,0,1,0,6500.0,'');
 INSERT INTO t010_line_stops VALUES(2814749767106565,3377699720880581,2533274790397693,1,1,1,12141.0,'523000:1843000,525000:1843000');
 INSERT INTO t010_line_stops VALUES(2814749767106566,3377699720880575,2533274790397693,2,0,1,12141.0,'');
@@ -128,7 +150,7 @@ INSERT INTO t005_service_dates VALUES(1407374883553284,4503599627370507,date('no
 
 
 INSERT INTO t042_commercial_lines  VALUES(11821949021891555,6192449487677434,'94','94','','orange','orange','','1970324837184599','',0,0,2305843009213693953,5910974511914805);
-INSERT INTO t009_lines VALUES(2533274790397694,11821949021891555,'94-3',' 94.3','',0,1,1,1,2251799814850473,0,0,0,0,0);
+INSERT INTO t009_lines VALUES(2533274790397694,11821949021891555,'94-3',' 94.3','',0,1,1,1,13792273858822589,0,0,0,0,0);
 INSERT INTO t010_line_stops VALUES(2814749767106567,3377699720880583,2533274790397694,0,1,0,14141.0,'');
 INSERT INTO t010_line_stops VALUES(2814749767106569,3377699720880585,2533274790397694,1,1,1,15141.0,'');
 INSERT INTO t010_line_stops VALUES(2814749767106571,3377699720880580,2533274790397694,2,1,1,16141.0,'');
@@ -145,7 +167,7 @@ INSERT INTO t005_service_dates VALUES(1407374883553301,4503599627370506,date('no
 
 
 INSERT INTO t042_commercial_lines VALUES(11821949021891562,6192449487677437,'Network2-CommLine1','95','','rouge','rouge','','','',0,0,0,0);
-INSERT INTO t009_lines VALUES(2533274790397695,11821949021891562,'95',' 95.1','',0,1,1,1,2251799814850473,0,0,0,0,0);
+INSERT INTO t009_lines VALUES(2533274790397695,11821949021891562,'95',' 95.1','',0,1,1,1,13792273858822585,0,0,0,0,0);
 INSERT INTO t010_line_stops VALUES(2814749767106572,3377699720880575,2533274790397695,0,1,0,17641.0,'');
 INSERT INTO t010_line_stops VALUES(2814749767106573,3377699720880584,2533274790397695,1,0,1,17641.0,'');
 
@@ -159,7 +181,7 @@ INSERT INTO t005_service_dates VALUES(1407374883553299,4503599627370510,date('no
 
 
 INSERT INTO t042_commercial_lines VALUES(11821949021891563,6192449487677437,'Network2-CommLine2','96','','jaune','jaune','','','',0,0,0,0);
-INSERT INTO t009_lines VALUES(2533274790397696,11821949021891563,'96',' 96','',0,1,1,1,2251799814850473,0,0,0,0,0);
+INSERT INTO t009_lines VALUES(2533274790397696,11821949021891563,'96',' 96','',0,1,1,1,13792273858822585,0,0,0,0,0);
 INSERT INTO t010_line_stops VALUES(2814749767106574,3377699720880579,2533274790397696,0,1,0,17641.0,'');
 INSERT INTO t010_line_stops VALUES(2814749767106575,3377699720880585,2533274790397696,1,0,1,17641.0,'');
 
@@ -231,7 +253,10 @@ REPLACE INTO t047_online_reservation_rules(id,reservation_rule_id,email,copy_ema
 REPLACE INTO t999_config(param_name,param_value) VALUES('reservation_contact',13229323905400833);
 
 REPLACE INTO t061_pt_use_rules(id,name,capacity,reservation_type,origin_is_reference,min_delay_minutes,min_delay_days,max_delay_days,hour_deadline,default_fare_id) 
-	VALUES(2305843009213693953,'DRT Test','',3,0,10,0,60,'23:59:00',NULL);
+	VALUES(2305843009213693953,'Compulsory reservation','',3,0,10,0,60,'23:59:00',NULL);
+
+REPLACE INTO t061_pt_use_rules(id,name,capacity,reservation_type,origin_is_reference,min_delay_minutes,min_delay_days,max_delay_days,hour_deadline,default_fare_id) 
+	VALUES(2305843009213693954,'1 seat only',1,0,0,0,0,0,'23:59:00',NULL);
 
 REPLACE INTO t059_data_sources VALUES(16607023625928705,'test source','Trident');
 
