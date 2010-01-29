@@ -228,7 +228,6 @@ namespace synthese
 			
 			if(	!ma) return false;
 
-			assert(_alarm->getScenario());
 			if(!_alarm->getScenario())
 				return false;
 

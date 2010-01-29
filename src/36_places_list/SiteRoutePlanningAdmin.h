@@ -35,6 +35,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		class Site;
+		class RollingStockFilter;
 
 		/** Site route planning admin component.
 			@ingroup m36Admin refAdmin
@@ -53,6 +54,7 @@ namespace synthese
 			int								_resultsNumber;
 			graph::UserClassCode			_accessibility;
 			bool							_log;
+			RollingStockFilter*				_rollingStockFilter;
 
 		public:
 			static const std::string PARAMETER_START_CITY;
@@ -63,6 +65,7 @@ namespace synthese
 			static const std::string PARAMETER_RESULTS_NUMBER;
 			static const std::string PARAMETER_ACCESSIBILITY;
 			static const std::string PARAMETER_LOG;
+			static const std::string PARAMETER_ROLLING_STOCK_FILTER;
 
 			SiteRoutePlanningAdmin();
 			

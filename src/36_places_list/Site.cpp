@@ -377,6 +377,23 @@ namespace synthese
 
 
 
+		const Site::RollingStockFilters& Site::getRollingStockFilters() const
+		{
+			return _rollingStockFilters;
+		}
+
+
+
+		map<size_t, string> Site::getRollingStockFiltersList(
+		) const {
+			map<size_t, string> result;
+			BOOST_FOREACH(const RollingStockFilters::value_type& it, _rollingStockFilters)
+			{
+				result.insert(make_pair(it.first, it.second->getName()));
+			}
+			return result;
+		}
+
 		Site::ExtendedFetchPlaceResult::ExtendedFetchPlaceResult()
 		{
 			cityResult.value = NULL;

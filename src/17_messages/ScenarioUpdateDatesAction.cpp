@@ -62,7 +62,6 @@ namespace synthese
 		const string ScenarioUpdateDatesAction::PARAMETER_ENABLED(Action_PARAMETER_PREFIX + "ena");
 		const string ScenarioUpdateDatesAction::PARAMETER_START_DATE(Action_PARAMETER_PREFIX + "sda");
 		const string ScenarioUpdateDatesAction::PARAMETER_END_DATE(Action_PARAMETER_PREFIX + "eda");
-		const string ScenarioUpdateDatesAction::PARAMETER_VARIABLE(Action_PARAMETER_PREFIX + "var");
 		const string ScenarioUpdateDatesAction::PARAMETER_SCENARIO_ID(Action_PARAMETER_PREFIX + "sid");
 		const string ScenarioUpdateDatesAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
 		const string ScenarioUpdateDatesAction::PARAMETER_FOLDER_ID = Action_PARAMETER_PREFIX + "fi";
@@ -106,18 +105,6 @@ namespace synthese
 					_startDate = map.getDateTime(PARAMETER_START_DATE, true, FACTORY_KEY);
 
 					_endDate = map.getDateTime(PARAMETER_END_DATE, true, FACTORY_KEY);
-
-					if(_sscenario->getTemplate())
-					{
-						const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
-						BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
-						{
-							_variables.insert(make_pair(
-									variable.second.code,
-									variable.second.compulsory ? map.get<string>(PARAMETER_VARIABLE + variable.second.code) : map.getDefault<string>(PARAMETER_VARIABLE + variable.second.code)
-							)	);
-						}
-					}
 				}
 			}
 			catch(ParametersMap::MissingParameterException& e)
@@ -159,19 +146,6 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(text, "Affichage ", _sscenario->getIsEnabled() ? "activé" : "désactivé", _enabled ? "activé" : "désactivé");
 				DBLogModule::appendToLogIfChange(text, "Date de début", _sscenario->getPeriodStart().toString(), _startDate.toString());
 				DBLogModule::appendToLogIfChange(text, "Date de fin", _sscenario->getPeriodEnd().toString(), _endDate.toString());
-			
-				if(_sscenario->getTemplate())
-				{
-					const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
-					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
-					{
-						string value;
-						SentScenario::VariablesMap::const_iterator it(_sscenario->getVariables().find(variable.second.code));
-						if (it != _sscenario->getVariables().end()) value = it->second;
-
-						DBLogModule::appendToLogIfChange(text, variable.second.code, value, _variables[variable.second.code]);
-					}
-				}
 			}
 
 
@@ -184,7 +158,7 @@ namespace synthese
 			if(_sscenario.get())
 			{
 				if(	_sscenario->getTemplate() &&
-					!ScenarioTemplate::ControlCompulsoryVariables(_sscenario->getTemplate()->getVariables(), _variables)
+					!ScenarioTemplate::ControlCompulsoryVariables(_sscenario->getTemplate()->getVariables(), _sscenario->getVariables())
 				){
 					_sscenario->setIsEnabled(false);
 				}
@@ -194,12 +168,10 @@ namespace synthese
 				}
 				_sscenario->setPeriodStart(_startDate);
 				_sscenario->setPeriodEnd(_endDate);
-				_sscenario->setVariables(_variables);
 			}
 			ScenarioTableSync::Save(_scenario.get());
 			if(_sscenario.get() &&	_sscenario->getTemplate())
 			{
-				SentScenarioInheritedTableSync::WriteVariablesIntoMessages(*_sscenario);
 			}
 
 			// Log

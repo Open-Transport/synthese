@@ -638,5 +638,12 @@ namespace synthese
 				}
 			}
 		}
+
+
+
+		void Journey::setEndApproachDuration( boost::posix_time::time_duration duration )
+		{
+			_endApproachDuration = duration;
+		}
 	}
 }

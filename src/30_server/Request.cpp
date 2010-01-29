@@ -74,8 +74,8 @@ namespace synthese
 
 
 
-		ParametersMap Request::_getParametersMap() const
-		{
+		ParametersMap Request::_getParametersMap(
+		) const	{
 			ParametersMap result;
 
 			// Function
@@ -113,6 +113,12 @@ namespace synthese
 				result.insert(Request::PARAMETER_NO_REDIRECT_AFTER_ACTION, 1);
 			}
 
+			if(!_actionErrorMessage.empty())
+			{
+				result.insert(Request::PARAMETER_ACTION_FAILED, true);
+				result.insert(Request::PARAMETER_ERROR_MESSAGE, _actionErrorMessage);
+			}
+
 			return result;
 		}
 
@@ -120,8 +126,6 @@ namespace synthese
 
 		void Request::run( std::ostream& stream )
 		{
-			optional<string> errorMessage;
-
 			// Handle of the action
 			if (_action.get())
 			{
@@ -131,7 +135,7 @@ namespace synthese
 
 					if(	!_action->isAuthorized(_session)
 					){
-						errorMessage = "Forbidden Action";
+						_actionErrorMessage = "Forbidden Action";
 					}
 					else
 					{
@@ -143,13 +147,13 @@ namespace synthese
 				}
 				catch(ActionException& e)
 				{
-					errorMessage = "Action error : "+ e.getMessage();
+					_actionErrorMessage = "Action error : "+ e.getMessage();
 				}
 			}
 
 			if(_function.get())
 			{
-				_loadFunction(errorMessage, _actionCreatedId);
+				_loadFunction(_actionErrorMessage, _actionCreatedId);
 
 				// Run after the action
 				if (_action.get() && _redirectAfterAction)

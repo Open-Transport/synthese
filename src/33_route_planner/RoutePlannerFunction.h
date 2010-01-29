@@ -191,6 +191,10 @@ namespace synthese
 				const road::Address& place,
 				const road::RoadPlace& roadPlace
 			);
+			static void _XMLDisplayRoadPlace(
+				std::ostream& stream,
+				const road::RoadPlace& roadPlace
+			);
 
 		public:
 			/** Action to run, defined by each subclass.

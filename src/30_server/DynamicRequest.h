@@ -64,7 +64,7 @@ namespace synthese
 
 		protected:
 			virtual void _loadFunction(
-				const boost::optional<std::string>& errorMessage,
+				const std::string& errorMessage,
 				boost::optional<util::RegistryKeyType> actionCreatedId
 			);
 			

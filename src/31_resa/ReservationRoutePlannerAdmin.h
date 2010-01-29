@@ -26,6 +26,7 @@
 #define SYNTHESE_ReservationRoutePlannerAdmin_H__
 
 #include "AdminInterfaceElementTemplate.h"
+#include "RoutePlannerTypes.h"
 
 namespace synthese
 {
@@ -38,10 +39,15 @@ namespace synthese
 	{
 		class ReservationTransaction;
 
-		/** ReservationRoutePlannerAdmin Class.
+		/** Route planning with reservation ability admin page class.
 			@ingroup m31Admin refAdmin
 			@author Hugues Romain
 			@date 2008
+
+			Parameters :
+				- PARAMTER_PLANNING_ORDER / po : 0 : departure first, 1 : arrival first
+				- PARAMETER_DATE / da : if route planning order is departure first : min date of departure, else max date arrival
+				- PARAMETER_DATE / ti : if route planning order is departure first : min hour of departure, else max date arrival
 		*/
 		class ReservationRoutePlannerAdmin : public admin::AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>
 		{
@@ -55,6 +61,7 @@ namespace synthese
 			boost::shared_ptr<ReservationTransaction>	_confirmedTransaction;
 			boost::shared_ptr<const security::User>		_customer;
 			int											_seatsNumber;
+			algorithm::PlanningOrder					_planningOrder;
 
 		public:
 			static const std::string PARAMETER_START_CITY;
@@ -67,6 +74,7 @@ namespace synthese
 			static const std::string PARAMETER_WITHOUT_TRANSFER;
 			static const std::string PARAMETER_CUSTOMER_ID;
 			static const std::string PARAMETER_SEATS_NUMBER;
+			static const std::string PARAMETER_PLANNING_ORDER;
 
 			ReservationRoutePlannerAdmin();
 			

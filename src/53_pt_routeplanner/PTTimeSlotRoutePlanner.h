@@ -57,6 +57,7 @@ namespace synthese
 
 			graph::VertexAccessMap _extendToPhysicalStops(
 				const graph::VertexAccessMap& vam,
+				const graph::VertexAccessMap& destinationVam,
 				graph::AccessDirection direction
 			) const;
 

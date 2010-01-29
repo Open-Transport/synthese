@@ -147,6 +147,7 @@ namespace synthese
 			bool						_actionWillCreateObject;
 			boost::optional<util::RegistryKeyType>	_actionCreatedId;
 			bool									_redirectAfterAction;
+			std::string								_actionErrorMessage;
 
 		public:
 			Request();
@@ -160,7 +161,7 @@ namespace synthese
 		private:
 			virtual void _loadAction() {}
 			virtual void _loadFunction(
-				const boost::optional<std::string>& errorMessage,
+				const std::string& errorMessage,
 				boost::optional<util::RegistryKeyType> actionCreatedId
 			) {}
 			void _deleteAction() { _action.reset(); }

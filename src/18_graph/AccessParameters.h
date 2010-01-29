@@ -101,7 +101,8 @@ namespace synthese
 				, _maxTransportConnectionCount(maxTransportConnectionCount)
 				, _drtOnly(drtOnly)
 				, _withoutDrt(withoutDrt),
-				_userClass(userClass)
+				_userClass(userClass),
+				_allowedPathClasses(allowedPathClasses)
 			{
 
 			}
@@ -136,6 +137,10 @@ namespace synthese
 				boost::algorithm::split(elements2, *it, boost::algorithm::is_any_of(ACCESSPARAMETERS_LIST_SEPARATOR));
 				BOOST_FOREACH(const std::string& element, elements2)
 				{
+					if(element.empty())
+					{
+						continue;
+					}
 					_allowedPathClasses.insert(boost::lexical_cast<PathClass::Identifier>(element));
 				}
 

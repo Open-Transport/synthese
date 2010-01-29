@@ -109,8 +109,8 @@ namespace synthese
 			// Look for best time
 			_findBestJourney(
 				result,
-				_originVam,
-				_destinationVam,
+				_planningOrder == DEPARTURE_FIRST ? _originVam : _destinationVam,
+				_planningOrder == DEPARTURE_FIRST ? _destinationVam : _originVam,
 				_planningOrder == DEPARTURE_FIRST ? DEPARTURE_TO_ARRIVAL : ARRIVAL_TO_DEPARTURE,
 				_minBeginTime,
 				_maxBeginTime,
@@ -144,8 +144,8 @@ namespace synthese
 			// Look for best duration
 			_findBestJourney(
 				result,
-				_destinationVam,
-				_originVam,
+				_planningOrder == DEPARTURE_FIRST ? _destinationVam : _originVam,
+				_planningOrder == DEPARTURE_FIRST ? _originVam : _destinationVam,
 				_planningOrder == DEPARTURE_FIRST ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL,
 				beginBound,
 				beginBound,
@@ -156,49 +156,100 @@ namespace synthese
 
 			if(result.empty()) return result;
 
-			// Inclusion of approach journeys in the result
-			if (result.getStartApproachDuration().total_seconds())
+			if(_planningOrder == DEPARTURE_FIRST)
 			{
-				result.setStartApproachDuration(posix_time::minutes(0));
-				Journey goalApproachJourney(
-					_destinationVam.getVertexAccess(result.getDestination()->getFromVertex()).approachJourney
-				);
-				if (!goalApproachJourney.empty())
+				// Inclusion of approach journeys in the result
+				if (result.getStartApproachDuration().total_seconds())
 				{
-					goalApproachJourney.shift(
-						result.getArrivalTime().getSecondsDifference(goalApproachJourney.getDepartureTime()) +
-						result.getDestination()->getHub()->getTransferDelay(
+					result.setStartApproachDuration(posix_time::minutes(0));
+					Journey goalApproachJourney(
+						_destinationVam.getVertexAccess(result.getDestination()->getFromVertex()).approachJourney
+						);
+					if (!goalApproachJourney.empty())
+					{
+						goalApproachJourney.shift(
+							result.getArrivalTime().getSecondsDifference(goalApproachJourney.getDepartureTime()) +
+							result.getDestination()->getHub()->getTransferDelay(
 							*result.getDestination()->getFromVertex(),
 							*goalApproachJourney.getOrigin()->getFromVertex()
-						),
-						result.getContinuousServiceRange()
-					);
-					goalApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
-					result = Journey(goalApproachJourney, result);
+							),
+							result.getContinuousServiceRange()
+							);
+						goalApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
+						result = Journey(goalApproachJourney, result);
+					}
 				}
-			}
 
-			result.reverse();
+				result.reverse();
 
-			if (result.getStartApproachDuration().total_seconds())
-			{
-				result.setStartApproachDuration(posix_time::minutes(0));
-				Journey originApproachJourney(
-					_originVam.getVertexAccess(result.getOrigin()->getFromVertex()).approachJourney
-				);
-				if (!originApproachJourney.empty())
+				if (result.getStartApproachDuration().total_seconds())
 				{
-					originApproachJourney.shift(
-						result.getDepartureTime().getSecondsDifference(originApproachJourney.getDepartureTime()) -
-						originApproachJourney.getDuration() -
-						result.getOrigin()->getHub()->getTransferDelay(
+					result.setStartApproachDuration(posix_time::minutes(0));
+					Journey originApproachJourney(
+						_originVam.getVertexAccess(result.getOrigin()->getFromVertex()).approachJourney
+						);
+					if (!originApproachJourney.empty())
+					{
+						originApproachJourney.shift(
+							result.getDepartureTime().getSecondsDifference(originApproachJourney.getDepartureTime()) -
+							originApproachJourney.getDuration() -
+							result.getOrigin()->getHub()->getTransferDelay(
 							*originApproachJourney.getDestination()->getFromVertex(),
 							*result.getOrigin()->getFromVertex()
-						),
-						result.getContinuousServiceRange()
+							),
+							result.getContinuousServiceRange()
+							);
+						originApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
+						result = Journey(originApproachJourney, result);
+					}
+				}
+			}
+			else
+			{
+				if (result.getStartApproachDuration().total_seconds())
+				{
+					result.setStartApproachDuration(posix_time::minutes(0));
+					Journey originApproachJourney(
+						_originVam.getVertexAccess(result.getOrigin()->getFromVertex()).approachJourney
 					);
-					originApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
-					result = Journey(originApproachJourney, result);
+					if (!originApproachJourney.empty())
+					{
+						originApproachJourney.shift(
+							result.getDepartureTime().getSecondsDifference(originApproachJourney.getDepartureTime()) -
+							originApproachJourney.getDuration() -
+							result.getOrigin()->getHub()->getTransferDelay(
+								*originApproachJourney.getDestination()->getFromVertex(),
+								*result.getOrigin()->getFromVertex()
+							),
+							result.getContinuousServiceRange()
+						);
+						originApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
+						result = Journey(originApproachJourney, result);
+					}
+				}
+
+				result.reverse();
+
+				// Inclusion of approach journeys in the result
+				if (result.getStartApproachDuration().total_seconds())
+				{
+					result.setStartApproachDuration(posix_time::minutes(0));
+					Journey goalApproachJourney(
+						_destinationVam.getVertexAccess(result.getDestination()->getFromVertex()).approachJourney
+					);
+					if (!goalApproachJourney.empty())
+					{
+						goalApproachJourney.shift(
+							result.getArrivalTime().getSecondsDifference(goalApproachJourney.getDepartureTime()) +
+							result.getDestination()->getHub()->getTransferDelay(
+							*result.getDestination()->getFromVertex(),
+							*goalApproachJourney.getOrigin()->getFromVertex()
+							),
+							result.getContinuousServiceRange()
+							);
+						goalApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
+						result = Journey(goalApproachJourney, result);
+					}
 				}
 			}
 

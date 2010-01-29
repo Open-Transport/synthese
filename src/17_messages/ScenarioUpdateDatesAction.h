@@ -67,7 +67,6 @@ namespace synthese
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
 			static const std::string PARAMETER_ENABLED;
-			static const std::string PARAMETER_VARIABLE;
 			static const std::string PARAMETER_SCENARIO_ID;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_FOLDER_ID;
@@ -81,7 +80,6 @@ namespace synthese
 			boost::shared_ptr<Scenario>				_scenario;
 			boost::shared_ptr<SentScenario>			_sscenario;
 			boost::shared_ptr<ScenarioTemplate>		_tscenario;
-			SentScenario::VariablesMap				_variables;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

@@ -130,6 +130,10 @@ namespace synthese
 				object->cleanRollingStocks();
 				BOOST_FOREACH(const string& id, parsed_ids)
 				{
+					if(id.empty())
+					{
+						continue;
+					}
 					try
 					{
 						object->addRollingStock(

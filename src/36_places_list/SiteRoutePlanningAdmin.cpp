@@ -77,13 +77,17 @@ namespace synthese
 		const string SiteRoutePlanningAdmin::PARAMETER_RESULTS_NUMBER("rn");
 		const string SiteRoutePlanningAdmin::PARAMETER_ACCESSIBILITY("ac");
 		const string SiteRoutePlanningAdmin::PARAMETER_LOG("lo");
+		const string SiteRoutePlanningAdmin::PARAMETER_ROLLING_STOCK_FILTER("rf");
+
+
 
 		SiteRoutePlanningAdmin::SiteRoutePlanningAdmin()
 			: AdminInterfaceElementTemplate<SiteRoutePlanningAdmin>()
 			, _resultsNumber(UNKNOWN_VALUE)
 			, _dateTime(TIME_UNKNOWN)
 			, _log(false),
-			_accessibility(USER_PEDESTRIAN)
+			_accessibility(USER_PEDESTRIAN),
+			_rollingStockFilter(NULL)
 		{ }
 
 
@@ -115,6 +119,23 @@ namespace synthese
 			{
 				throw AdminParametersException("No such site");
 			}
+
+			if(!_site->getRollingStockFilters().empty())
+			{
+				if(map.getOptional<size_t>(PARAMETER_ROLLING_STOCK_FILTER))
+				{
+					Site::RollingStockFilters::const_iterator it(_site->getRollingStockFilters().find(map.get<size_t>(PARAMETER_ROLLING_STOCK_FILTER)));
+					if(it == _site->getRollingStockFilters().end())
+					{
+						throw AdminParametersException("No such rolling stock filter");
+					}
+					_rollingStockFilter = it->second;
+				}
+				else
+				{
+					_rollingStockFilter = _site->getRollingStockFilters().begin()->second;
+				}
+			}
 		}
 		
 		
@@ -131,15 +152,23 @@ namespace synthese
 			m.insert(PARAMETER_RESULTS_NUMBER, _resultsNumber);
 			m.insert(PARAMETER_ACCESSIBILITY, static_cast<int>(_accessibility));
 			if(_site.get())
+			{
 				m.insert(Request::PARAMETER_OBJECT_ID, _site->getKey());
+				if(_rollingStockFilter)
+				{
+					m.insert(PARAMETER_ROLLING_STOCK_FILTER, static_cast<int>(_rollingStockFilter->getRank()));
+				}
+			}
 			return m;
 		}
 
 
 
-		void SiteRoutePlanningAdmin::display(ostream& stream, VariablesMap& variables,
-					const admin::AdminRequest& _request) const
-		{
+		void SiteRoutePlanningAdmin::display(
+			ostream& stream,
+			VariablesMap& variables,
+			const admin::AdminRequest& _request
+		) const	{
 			AdminFunctionRequest<SiteRoutePlanningAdmin> searchRequest(_request);
 
 			// Search form
@@ -155,6 +184,10 @@ namespace synthese
 			stream << st.cell("Nombre réponses", st.getForm().getSelectNumberInput(PARAMETER_RESULTS_NUMBER, 1, 99, _resultsNumber, 1, "(illimité)"));
 			stream << st.cell("Accessibilité", st.getForm().getSelectInput(PARAMETER_ACCESSIBILITY, PlacesListModule::GetAccessibilityNames(), _accessibility));
 			stream << st.cell("Trace", st.getForm().getOuiNonRadioInput(PARAMETER_LOG, _log));
+			if(!_site->getRollingStockFilters().empty())
+			{
+				stream << st.cell("Modes de transport", st.getForm().getSelectInput(PARAMETER_ROLLING_STOCK_FILTER, _site->getRollingStockFiltersList(), _rollingStockFilter->getRank()));
+			}
 			stream << st.close();
 
 			// No calculation without cities
@@ -178,7 +211,7 @@ namespace synthese
 				_dateTime,
 				endDate,
 				_resultsNumber,
-				_site->getAccessParameters(_accessibility, AccessParameters::AllowedPathClasses()),
+				_site->getAccessParameters(_accessibility, _rollingStockFilter ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()),
 				DEPARTURE_FIRST
 //				, &stream
 //				, _log ? Log::LEVEL_TRACE : Log::LEVEL_NONE

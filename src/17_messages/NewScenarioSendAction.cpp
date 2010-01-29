@@ -72,11 +72,15 @@ namespace synthese
 			{
 				try
 				{
-					_scenarioToCopy = SentScenarioInheritedTableSync::Get(*id, *_env);
+					_scenarioToCopy = SentScenarioInheritedTableSync::Get(*id, *_env, UP_LINKS_LOAD_LEVEL);
 				}
 				catch(ObjectNotFoundException<SentScenario>& e)
 				{
 					throw ActionException("scenario to copy", e, *this);
+				}
+				if(!_scenarioToCopy->getTemplate())
+				{
+					throw ActionException("Malformed scenario : template not defined");
 				}
 			} else {
 				// Template to source
@@ -85,7 +89,7 @@ namespace synthese
 				{
 					try
 					{
-						_template = ScenarioTemplateInheritedTableSync::Get(*id, *_env);
+						_template = ScenarioTemplateInheritedTableSync::Get(*id, *_env, UP_LINKS_LOAD_LEVEL);
 					}
 					catch(ObjectNotFoundException<ScenarioTemplate>& e)
 					{

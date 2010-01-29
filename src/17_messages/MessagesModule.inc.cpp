@@ -42,6 +42,7 @@
 #include "17_messages/ScenarioFolderAdd.h"
 #include "17_messages/ScenarioFolderRemoveAction.h"
 #include "17_messages/ScenarioFolderUpdateAction.h"
+#include "17_messages/ScenarioVariablesUpdateAction.h"
 
 // Registries
 #include "AlarmObjectLink.h"

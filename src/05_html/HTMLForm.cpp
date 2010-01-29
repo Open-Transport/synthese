@@ -361,9 +361,16 @@ namespace synthese
 				<< "name=\"" << name << "\" "
 				<< "id=\"" << fieldId << "\" "
 				<< "value=\"" << (value.is_not_a_date() ? string() : to_iso_extended_string(value)) << "\" "
-				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">"
-				<< value.day() << "/" << static_cast<int>(value.month()) << "/" << value.year()
-				<< "</span>"
+				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">";
+			if(value.is_not_a_date())
+			{
+				s << "(indéfini)";
+			}
+			else
+			{
+				s << value.day() << "/" << static_cast<int>(value.month()) << "/" << value.year();
+			}
+			s	<< "</span>"
 				<< "<img "
 				<< "src=\"calendar_edit.png\" "
 				<< "style=\"cursor:pointer\" "
@@ -383,8 +390,10 @@ namespace synthese
 				<< "electric : false,"
 				<< "singleClick:true,";
 			if (!value.is_not_a_date())
+			{
 				s << "date:new Date(" << value.year() <<","<< static_cast<int>(value.month()) <<","<< value.day() << "),";
-			s		<< "firstDay:1"
+			}
+			s	<< "firstDay:1"
 				<< "});"
 				<< HTMLModule::GetHTMLJavascriptClose();
 

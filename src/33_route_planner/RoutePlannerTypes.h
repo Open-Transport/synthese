@@ -31,7 +31,7 @@ namespace synthese
 			@{
 		*/
 
-		typedef enum {DEPARTURE_FIRST, ARRIVAL_FIRST} PlanningOrder;
+		typedef enum {DEPARTURE_FIRST = 0, ARRIVAL_FIRST = 1} PlanningOrder;
 
 		/** @} */
 	}

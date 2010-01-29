@@ -165,6 +165,7 @@ namespace synthese
 				const time::Date&				getStartDate()						const;
 				const time::Date&				getEndDate()						const;
 				const CitiesMatcher&			getCitiesMatcher () const;
+				const RollingStockFilters&		getRollingStockFilters() const;
 			//@}
 
 			// \name Modifiers
@@ -263,6 +264,8 @@ namespace synthese
 					const std::string& cityName
 					, const std::string& placeName
 				) const;
+
+				std::map<std::size_t, std::string> getRollingStockFiltersList() const;
 			//@}
 
 		};

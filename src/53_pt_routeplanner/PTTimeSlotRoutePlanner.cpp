@@ -60,8 +60,14 @@ namespace synthese
 			const graph::AccessParameters accessParameters,
 			const PlanningOrder planningOrder
 		):	TimeSlotRoutePlanner(
-				origin->getVertexAccessMap(DEPARTURE_TO_ARRIVAL, accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0),
-				destination->getVertexAccessMap(ARRIVAL_TO_DEPARTURE, accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0),
+				origin->getVertexAccessMap(
+					planningOrder == DEPARTURE_FIRST ? DEPARTURE_TO_ARRIVAL : ARRIVAL_TO_DEPARTURE,
+					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
+				),
+				destination->getVertexAccessMap(
+					planningOrder == ARRIVAL_FIRST ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL,
+					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
+				),
 				lowerDepartureTime, higherDepartureTime,
 				lowerArrivalTime, higherArrivalTime,
 				PTModule::GRAPH_ID,
@@ -79,6 +85,7 @@ namespace synthese
 
 		VertexAccessMap PTTimeSlotRoutePlanner::_extendToPhysicalStops(
 			const VertexAccessMap& vam,
+			const VertexAccessMap& destinationVam,
 			AccessDirection direction
 		) const {
 
@@ -104,7 +111,7 @@ namespace synthese
 				RoadModule::GRAPH_ID,
 				resultJourneys,
 				bvrmd,
-				direction == DEPARTURE_TO_ARRIVAL ? _destinationVam : _originVam,
+				destinationVam,
 				direction == DEPARTURE_TO_ARRIVAL ? getLowestDepartureTime() : getHighestArrivalTime(),
 				direction == DEPARTURE_TO_ARRIVAL ? getHighestDepartureTime() : getLowestArrivalTime(),
 				highestArrivalTime,
@@ -117,7 +124,7 @@ namespace synthese
 
 			// Include physical stops from originVam into result of integral search
 			// (cos not taken into account in returned journey vector).
-			BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, (direction ? _originVam : _destinationVam).getMap())
+			BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, vam.getMap())
 			{
 				const Vertex* vertex(itps.first);
 
@@ -160,15 +167,17 @@ namespace synthese
 				//	- duration of the approach journey
 				//	- transfer delay between approach journey end address and physical stop
 				posix_time::time_duration commonApproachTime(
-					(	direction == DEPARTURE_TO_ARRIVAL ?
-						_originVam.getVertexAccess(oj->getOrigin()->getFromVertex()) :
-						_destinationVam.getVertexAccess(oj->getDestination()->getFromVertex())
+					vam.getVertexAccess(
+						direction == DEPARTURE_TO_ARRIVAL ?
+						oj->getOrigin()->getFromVertex() :
+						oj->getDestination()->getFromVertex()
 					).approachTime + oj->getDuration()
 				);
 				double commonApproachDistance(
-					(	direction == DEPARTURE_TO_ARRIVAL ?
-						_originVam.getVertexAccess(oj->getOrigin()->getFromVertex()) :
-						_destinationVam.getVertexAccess(oj->getDestination()->getFromVertex())
+					vam.getVertexAccess(
+						direction == DEPARTURE_TO_ARRIVAL ?
+						oj->getOrigin()->getFromVertex() :
+						oj->getDestination()->getFromVertex()
 					).approachDistance + oj->getDistance ()
 				);
 				VertexAccessMap vam2;
@@ -236,8 +245,8 @@ namespace synthese
 				return PTRoutePlannerResult(_departurePlace, _arrivalPlace, true, result);
 			}
 
-			VertexAccessMap ovam(_extendToPhysicalStops(_originVam, DEPARTURE_TO_ARRIVAL));
-			VertexAccessMap dvam(_extendToPhysicalStops(_destinationVam, ARRIVAL_TO_DEPARTURE));
+			VertexAccessMap ovam(_extendToPhysicalStops(_originVam, _destinationVam, DEPARTURE_TO_ARRIVAL));
+			VertexAccessMap dvam(_extendToPhysicalStops(_destinationVam, _originVam, ARRIVAL_TO_DEPARTURE));
 
 #ifdef DEBUG			// Log
 			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE

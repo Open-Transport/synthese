@@ -52,14 +52,14 @@ namespace synthese
 
 
 		void DynamicRequest::_loadFunction(
- 			const optional<string>& errorMessage,
+ 			const string& errorMessage,
 			optional<RegistryKeyType> actionCreatedId
 		){
 			// Last action error
-			if(errorMessage)
+			if(!errorMessage.empty())
 			{
 				_parametersMap.insert(Request::PARAMETER_ACTION_FAILED, true);
-				_parametersMap.insert(Request::PARAMETER_ERROR_MESSAGE, *errorMessage);
+				_parametersMap.insert(Request::PARAMETER_ERROR_MESSAGE, errorMessage);
 			}
 			if(actionCreatedId)
 			{

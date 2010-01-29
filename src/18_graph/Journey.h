@@ -137,13 +137,14 @@ namespace synthese
 			//@{
 				void setContinuousServiceRange (boost::posix_time::time_duration continuousServiceRange);
 				geometry::SquareDistance getSquareDistanceToEnd() const;
+				void setStartApproachDuration(boost::posix_time::time_duration duration);
+				void setEndApproachDuration(boost::posix_time::time_duration duration);
 			//@}
 
 			//! @name Orientation relative methods
 			//@{
 				const ServiceUse& getEndServiceUse() const;
 				const ServiceUse& getStartServiceUse() const;
-				void setStartApproachDuration(boost::posix_time::time_duration duration);
 			//@}
 
 			//! @name Query methods

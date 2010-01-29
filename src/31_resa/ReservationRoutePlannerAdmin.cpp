@@ -101,15 +101,17 @@ namespace synthese
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_WITHOUT_TRANSFER("wt");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_CUSTOMER_ID("cu");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_SEATS_NUMBER("sn");
+		const std::string ReservationRoutePlannerAdmin::PARAMETER_PLANNING_ORDER("po");
 
 
 
-		ReservationRoutePlannerAdmin::ReservationRoutePlannerAdmin()
-			: AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>()
-			, _disabledPassenger(false)
-			, _withoutTransfer(false)
-			, _dateTime(TIME_CURRENT),
-			_seatsNumber(1)
+		ReservationRoutePlannerAdmin::ReservationRoutePlannerAdmin(
+		):	AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>(),
+			_disabledPassenger(false),
+			_withoutTransfer(false),
+			_dateTime(TIME_CURRENT),
+			_seatsNumber(1),
+			_planningOrder(DEPARTURE_FIRST)
 		{ }
 		
 
@@ -117,6 +119,7 @@ namespace synthese
 		void ReservationRoutePlannerAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
+			_planningOrder = static_cast<PlanningOrder>(map.getDefault<int>(PARAMETER_PLANNING_ORDER));
 			_startCity = map.getDefault<string>(PARAMETER_START_CITY);
 			_startPlace = map.getDefault<string>(PARAMETER_START_PLACE);
 			_endCity = map.getDefault<string>(PARAMETER_END_CITY);
@@ -180,6 +183,7 @@ namespace synthese
 			m.insert(PARAMETER_DISABLED_PASSENGER, _disabledPassenger);
 			m.insert(PARAMETER_WITHOUT_TRANSFER, _withoutTransfer);
 			m.insert(PARAMETER_SEATS_NUMBER, _seatsNumber);
+			m.insert(PARAMETER_PLANNING_ORDER, static_cast<int>(_planningOrder));
 			if(_customer.get())
 			{
 				m.insert(PARAMETER_CUSTOMER_ID, _customer->getKey());
@@ -209,8 +213,6 @@ namespace synthese
 					hours.push_back(make_pair(lexical_cast<string>(i) +":00", lexical_cast<string>(i) +":00"));
 				}
 			}
-
-			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request);
 
 			AdminActionFunctionRequest<BookReservationAction,ReservationRoutePlannerAdmin> resaRequest(
 				_request
@@ -242,6 +244,7 @@ namespace synthese
 				endPlace = GeographyModule::FetchPlace(_endCity, _endPlace);
 			}
 
+			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request);
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
 			stream << st.cell("Commune départ", st.getForm().getTextInput(
@@ -286,7 +289,14 @@ namespace synthese
 			if(!_confirmedTransaction.get())
 			{
 				DateTime endDate(_dateTime);
-				endDate++;
+				if(_planningOrder == DEPARTURE_FIRST)
+				{
+					endDate++;
+				}
+				else
+				{
+					endDate--;
+				}
 
 				// Route planning
 				AccessParameters ap(
@@ -299,13 +309,13 @@ namespace synthese
 				PTTimeSlotRoutePlanner r(
 					startPlace,
 					endPlace,
-					_dateTime,
-					endDate,
-					_dateTime,
-					endDate,
+					_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
+					_planningOrder == DEPARTURE_FIRST ? endDate : _dateTime,
+					_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
+					_planningOrder == DEPARTURE_FIRST ? endDate : _dateTime,
 					5,
 					ap,
-					DEPARTURE_FIRST
+					_planningOrder
 				);
 				jv = r.run();
 			}
@@ -318,12 +328,16 @@ namespace synthese
 			
 			if(!jv.getJourneys().empty())
 			{
-				date = _dateTime;
-				date -= 120;
+				PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().begin());
+				date = it->getArrivalTime();
+				date -= 1;
 				searchRequest.getPage()->_dateTime = date;
+				searchRequest.getPage()->_planningOrder = ARRIVAL_FIRST;
+
 				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions précédentes", string(), "resultset_previous.png") << " ";
 			}
 
+			searchRequest.getPage()->_planningOrder = DEPARTURE_FIRST;
 			searchRequest.getPage()->_dateTime = _dateTime;
 			searchRequest.getPage()->_startCity = _endCity;
 			searchRequest.getPage()->_startPlace = _endPlace;

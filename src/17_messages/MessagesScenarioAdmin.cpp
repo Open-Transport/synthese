@@ -39,6 +39,7 @@
 #include "MessagesModule.h"
 #include "MessagesRight.h"
 #include "MessagesLibraryRight.h"
+#include "ScenarioVariablesUpdateAction.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "StaticActionFunctionRequest.h"
@@ -129,7 +130,7 @@ namespace synthese
 					const admin::AdminRequest& _request
 		) const	{
 
-			const SentScenario* _sentScenario = dynamic_cast<const SentScenario*>(_scenario.get());
+			shared_ptr<const SentScenario> _sentScenario = dynamic_pointer_cast<const SentScenario>(_scenario);
 			const ScenarioTemplate* _templateScenario = dynamic_cast<const ScenarioTemplate*>(_scenario.get());
 
 
@@ -150,33 +151,45 @@ namespace synthese
 				{
 					stream << udt.cell("Répertoire", udt.getForm().getSelectInput(ScenarioUpdateDatesAction::PARAMETER_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(), _templateScenario->getFolder() ? _templateScenario->getFolder()->getKey() : 0));
 				}
-				if(_sentScenario)
+				if(_sentScenario.get())
 				{
 					stream << udt.title("Diffusion");
 					stream << udt.cell("Début diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_START_DATE, _sentScenario->getPeriodStart().toPosixTime()));
 					stream << udt.cell("Fin diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_END_DATE, _sentScenario->getPeriodEnd().toPosixTime()));
 
 					stream << udt.cell("Actif", udt.getForm().getOuiNonRadioInput(ScenarioUpdateDatesAction::PARAMETER_ENABLED, _sentScenario->getIsEnabled()));
-				
-
-					if (_sentScenario->getTemplate() && !_sentScenario->getTemplate()->getVariables().empty())
-					{
-						stream << udt.title("Variables (* = champ obligatoire)");
-						const ScenarioTemplate::VariablesMap& variables(_sentScenario->getTemplate()->getVariables());
-						BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type variable, variables)
-						{
-							string value;
-							SentScenario::VariablesMap::const_iterator it(_sentScenario->getVariables().find(variable.second.code));
-							if (it != _sentScenario->getVariables().end()) value = it->second;
-
-							stream << udt.cell(
-								variable.second.code + (variable.second.compulsory ? "*" : "") + (variable.second.helpMessage.empty() ? string() : (" ("+ HTMLModule::getHTMLImage("information.png", "Info : ") + variable.second.helpMessage + ")"))
-								, udt.getForm().getTextInput(ScenarioUpdateDatesAction::PARAMETER_VARIABLE + variable.second.code, value)
-							);
-						}
-					}
 				}
 				stream << udt.close();
+
+
+
+				if(	_sentScenario &&
+					_sentScenario->getTemplate() &&
+					!_sentScenario->getTemplate()->getVariables().empty()
+				){
+					stream << "<h1>Variables</h1>";
+
+					AdminActionFunctionRequest<ScenarioVariablesUpdateAction, MessagesScenarioAdmin> updateVariablesRequest(_request);
+					updateVariablesRequest.getAction()->setScenario(const_pointer_cast<SentScenario>(_sentScenario));
+					PropertiesHTMLTable uvt(updateVariablesRequest.getHTMLForm("update_var"));
+
+					stream << uvt.open();
+					stream << uvt.title("* = champ obligatoire");
+					const ScenarioTemplate::VariablesMap& variables(_sentScenario->getTemplate()->getVariables());
+					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type variable, variables)
+					{
+						string value;
+						SentScenario::VariablesMap::const_iterator it(_sentScenario->getVariables().find(variable.second.code));
+						if (it != _sentScenario->getVariables().end()) value = it->second;
+
+						stream << uvt.cell(
+							variable.second.code + (variable.second.compulsory ? "*" : "") + (variable.second.helpMessage.empty() ? string() : (" ("+ HTMLModule::getHTMLImage("information.png", "Info : ") + variable.second.helpMessage + ")")),
+							uvt.getForm().getTextInput(ScenarioVariablesUpdateAction::PARAMETER_VARIABLE + variable.second.code, value)
+						);
+					}
+					stream << uvt.close();
+				}
+
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -193,7 +206,7 @@ namespace synthese
 
 				vector<shared_ptr<Alarm> > v;
 				
-				if (_sentScenario)
+				if (_sentScenario.get())
 				{
 					ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
 						ScenarioSentAlarmInheritedTableSync::Search(*_env, _sentScenario->getKey())
