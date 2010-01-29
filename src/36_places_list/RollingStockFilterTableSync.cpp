@@ -122,11 +122,8 @@ namespace synthese
 				}
 
 				vector< string > parsed_ids;
-				split(
-					parsed_ids,
-					rows->getText(RollingStockFilterTableSync::COL_ROLLING_STOCK_IDS),
-					is_any_of(",")
-				);
+				const string rollingStocksString(rows->getText(RollingStockFilterTableSync::COL_ROLLING_STOCK_IDS));
+				split(parsed_ids, rollingStocksString, is_any_of(","));
 				object->cleanRollingStocks();
 				BOOST_FOREACH(const string& id, parsed_ids)
 				{
