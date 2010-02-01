@@ -36,7 +36,7 @@ namespace synthese
 		class User;
 	}
 
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		/** UserFavoriteJourney class.
 			@ingroup m53

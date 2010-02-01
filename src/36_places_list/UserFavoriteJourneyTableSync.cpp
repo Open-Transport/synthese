@@ -44,7 +44,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace routeplanner;
+	using namespace transportwebsite;
 	using namespace security;
 
 	namespace util
@@ -52,7 +52,7 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,UserFavoriteJourneyTableSync>::FACTORY_KEY("53.1 User favorite journey");
 	}
 
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		const std::string UserFavoriteJourneyTableSync::COL_USER_ID("user_id");
 		const std::string UserFavoriteJourneyTableSync::COL_RANK("rank");

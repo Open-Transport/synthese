@@ -25,13 +25,12 @@
 #ifndef SYNTHESE_UserFavoriteListInterfaceElement_H__
 #define SYNTHESE_UserFavoriteListInterfaceElement_H__
 
-#include "11_interfaces/LibraryInterfaceElement.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "LibraryInterfaceElement.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		/** UserFavoriteListInterfaceElement Library Interface Element Class.
 			@author Hugues Romain

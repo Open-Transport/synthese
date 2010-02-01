@@ -34,10 +34,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<InterfacePage, routeplanner::UserFavoriteInterfacePage>::FACTORY_KEY("user_favorite_journey");
+		template<> const string FactorableTemplate<InterfacePage, transportwebsite::UserFavoriteInterfacePage>::FACTORY_KEY("user_favorite_journey");
 	}
 
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		const string UserFavoriteInterfacePage::DATA_ID("id");
 		const string UserFavoriteInterfacePage::DATA_RANK("rank");

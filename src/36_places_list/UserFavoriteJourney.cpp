@@ -33,10 +33,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<routeplanner::UserFavoriteJourney>::KEY("UserFavoriteJourney");
+		template<> const string Registry<transportwebsite::UserFavoriteJourney>::KEY("UserFavoriteJourney");
 	}
 
-	namespace routeplanner
+	namespace transportwebsite
 	{
 
 

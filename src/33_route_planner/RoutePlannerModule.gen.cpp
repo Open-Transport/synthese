@@ -7,7 +7,6 @@ synthese::routeplanner::JourneyBoardServiceCellInterfacePage::integrate();
 synthese::routeplanner::JourneyBoardJunctionCellInterfacePage::integrate();
 synthese::routeplanner::RoutePlannerInterfacePage::integrate();
 synthese::routeplanner::JourneyBoardInterfacePage::integrate();
-synthese::routeplanner::UserFavoriteInterfacePage::integrate();
 synthese::routeplanner::ResultLinesListInterfaceElement::integrate();
 synthese::routeplanner::JourneyLineListInterfaceElement::integrate();
 synthese::routeplanner::JourneyBoardInterfaceElement::integrate();
@@ -20,11 +19,5 @@ synthese::routeplanner::TextInputInterfaceElemet::integrate();
 synthese::routeplanner::RequestInterfaceElement::integrate();
 synthese::routeplanner::PeriodsListInterfaceElement::integrate();
 synthese::routeplanner::JourneyBoardsInterfaceElement::integrate();
-synthese::routeplanner::UserFavoriteListInterfaceElement::integrate();
 
 synthese::routeplanner::RoutePlannerFunction::integrate();
-
-synthese::routeplanner::UserFavoriteJourneyTableSync::integrate();
-
-// Registries
-synthese::util::Env::Integrate<synthese::routeplanner::UserFavoriteJourney>();

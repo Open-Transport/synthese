@@ -39,7 +39,7 @@ namespace synthese
 		class User;
 	}
 
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		class UserFavoriteJourney;
 

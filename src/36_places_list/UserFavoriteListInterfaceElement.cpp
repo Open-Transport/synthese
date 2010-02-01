@@ -48,10 +48,10 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<LibraryInterfaceElement, routeplanner::UserFavoriteListInterfaceElement>::FACTORY_KEY("user_favorite_journeys");
+		template<> const string FactorableTemplate<LibraryInterfaceElement, transportwebsite::UserFavoriteListInterfaceElement>::FACTORY_KEY("user_favorite_journeys");
 	}
 
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		void UserFavoriteListInterfaceElement::storeParameters(ValueElementList& vel)
 		{

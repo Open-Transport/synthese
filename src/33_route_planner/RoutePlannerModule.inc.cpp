@@ -20,9 +20,3 @@
 #include "PeriodsListInterfaceElement.h"
 #include "JourneyBoardsInterfaceElement.h"
 #include "JourneyBoardInterfacePage.h"
-#include "UserFavoriteJourneyTableSync.h"
-#include "UserFavoriteListInterfaceElement.h"
-#include "UserFavoriteInterfacePage.h"
-
-// Registries
-#include "UserFavoriteJourney.h"
