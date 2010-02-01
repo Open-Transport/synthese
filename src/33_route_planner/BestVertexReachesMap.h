@@ -30,9 +30,14 @@
 
 namespace synthese
 {
+	namespace time
+	{
+		class DateTime;
+	}
 
 	namespace graph
 	{
+		class Journey;
 		class Vertex;
 		class VertexAccessMap;
 	}
@@ -100,8 +105,10 @@ namespace synthese
 				const graph::Vertex*,
 				std::map<
 					std::size_t,
-					boost::posix_time::time_duration
-			>	> TimeMap;
+					std::pair<
+						boost::posix_time::time_duration,
+						boost::shared_ptr<graph::Journey>
+			>	>	> TimeMap;
 		    
 			TimeMap _bestTimeMap;
 			const graph::AccessDirection _accessDirection;
@@ -109,13 +116,15 @@ namespace synthese
 			void _insert(
 				const TimeMap::key_type& vertex,
 				const TimeMap::mapped_type::key_type& transfers,
-				const TimeMap::mapped_type::mapped_type& duration
+				boost::posix_time::time_duration duration,
+				boost::shared_ptr<graph::Journey> journey
 			);
 
 			void _insertAndPropagateInConnectionPlace(
 				const TimeMap::key_type& vertex,
 				const TimeMap::mapped_type::key_type& transfers,
-				const TimeMap::mapped_type::mapped_type& duration
+				boost::posix_time::time_duration duration,
+				boost::shared_ptr<graph::Journey> journey
 			);
 
 			void _removeDurationsForMoreTransfers(
@@ -139,9 +148,8 @@ namespace synthese
 					@return true if the described journey is useful
 				*/
 				bool isUseLess(
-					const TimeMap::key_type& vertex,
-					const TimeMap::mapped_type::key_type& transferNumber,
-					const TimeMap::mapped_type::mapped_type& duration,
+					boost::shared_ptr<graph::Journey> journey,
+					const time::DateTime& originDateTime,
 					bool propagateInConnectionPlace,
 					bool strict = true
 				);

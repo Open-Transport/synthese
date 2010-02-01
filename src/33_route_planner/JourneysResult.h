@@ -35,7 +35,6 @@
 #include "Edge.h"
 #include "Vertex.h"
 #include "Hub.h"
-#include "NamedPlace.h"
 #include "GraphTypes.h"
 
 #include "DateTime.h"
@@ -60,7 +59,7 @@ namespace synthese
 		private:
 			typedef std::map<const graph::Vertex*, typename ResultSet::iterator> IndexMap;
 			
-			const time::DateTime& _originDateTime;
+			time::DateTime _originDateTime;
 			boost::optional<graph::AccessDirection> _accessDirection;
 			ResultSet	_result;
 			IndexMap	_index;
@@ -70,6 +69,22 @@ namespace synthese
 				const time::DateTime& originDateTime
 			):	_originDateTime(originDateTime)
 			{}
+
+
+			void operator=(const JourneysResult<JourneyComparator>& other)
+			{
+				_originDateTime = other._originDateTime;
+				_accessDirection = other._accessDirection;
+				_result = other._result;
+				for(typename ResultSet::iterator it(_result.begin()); it != _result.end(); ++it)
+				{
+					_index.insert(
+						std::make_pair(
+							it->first->getEndEdge()->getFromVertex(),
+							it
+					)	);
+				}
+			}
 
 
 
@@ -188,7 +203,10 @@ namespace synthese
 					bool updateMinSpeed,
 					const time::DateTime& newMaxTime,
 					BestVertexReachesMap& bvrm,
-					bool propagateInConnectionPlace
+					bool propagateInConnectionPlace,
+					const time::DateTime& originDateTime,
+					bool strict,
+					int totalDistance
 				){
 					std::vector<boost::shared_ptr<graph::Journey> > journeysToAdd;
 					std::vector<boost::shared_ptr<graph::Journey> > journeysToRemove;
@@ -198,8 +216,8 @@ namespace synthese
 						typename IndexMap::iterator next(it);
 						++next;
 						if(	journey->getMethod() == graph::DEPARTURE_TO_ARRIVAL && journey->getEndTime() >= newMaxTime ||
-							journey->getMethod() == graph::ARRIVAL_TO_DEPARTURE && journey->getEndTime() <= newMaxTime ||
-							bvrm.isUseLess(it->first, journey->size(), it->second->second, propagateInConnectionPlace, false)
+							journey->getMethod() == graph::ARRIVAL_TO_DEPARTURE && journey->getEndTime() <= newMaxTime
+							// Add reach ability test
 						){
 							journeysToRemove.push_back(journey);
 						}
@@ -207,7 +225,9 @@ namespace synthese
 						{
 							_result.erase(it->second);
 							_index.erase(it);
-							journey->setMinSpeedToEnd(newMaxTime);
+							journey->setMinSpeedToEnd(
+								originDateTime,
+								journey->getMethod() == graph::DEPARTURE_TO_ARRIVAL ? newMaxTime.getSecondsDifference(originDateTime) : originDateTime.getSecondsDifference(newMaxTime), totalDistance);
 							journeysToAdd.push_back(journey);
 						}
 						it = next;
@@ -241,7 +261,7 @@ namespace synthese
 						return its->first;
 					}
 					else
-						return NULL;
+						return boost::shared_ptr<graph::Journey>();
 				}
 
 				
@@ -253,44 +273,6 @@ namespace synthese
 				bool empty() const
 				{
 					return _result.empty();
-				}
-
-
-
-				/** Log generator.
-					@return std::string description of the journey for logging purposes
-					@author Hugues Romain
-				*/
-				std::string	getLog() const
-				{
-					std::stringstream s;
-					s	<< "<tr><th colspan=\"7\">Exploration queue (size=" << _result.size() << ")</th></tr>"
-						<< "<tr><th>Place</th><th>Time</th><th>Score</th><th>Dist</th><th>Min spd</th><th>Dist.MinSpd</th><th>Place score</th></tr>"
-						;
-					BOOST_FOREACH(const typename ResultSet::value_type& it, _result)
-					{
-						boost::shared_ptr<graph::Journey> journey(it.first);
-						if (journey->empty())
-						{
-							s << "<tr><td colspan=\"7\">Empty fake journey</td></tr>";
-							continue;
-						}
-
-						s	<<
-							"<tr><td>" <<
-							dynamic_cast<const geography::NamedPlace*>(
-								journey->getEndEdge()->getHub()
-							)->getFullName() <<
-							"</td><td>" <<
-							journey->getEndTime().toString() << "</td>"
-							<< "<td>" << journey->getScore() << "</td>"
-							<< "<td>" << journey->getSquareDistanceToEnd().getDistance() << "</td>"
-							<< "<td>" << (journey->getSquareDistanceToEnd().getDistance() ? (0.06 * journey->getMinSpeedToEnd() / journey->getSquareDistanceToEnd().getDistance()) : -1) << "</td>"
-							<< "<td>" << journey->getMinSpeedToEnd() << "</td>"
-							<< "<td>" << journey->getEndEdge()->getHub()->getScore() << "</td>"
-							<< "</tr>";
-					}
-					return s.str();
 				}
 			//@}
 		};

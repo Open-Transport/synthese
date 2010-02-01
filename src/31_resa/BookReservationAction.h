@@ -40,6 +40,13 @@ namespace synthese
 		class User;
 	}
 
+	namespace transportwebsite
+	{
+		class Site;
+		class RollingStockFilter;
+	}
+
+
 	namespace resa
 	{
 		/** BookReservationAction action class.
@@ -61,8 +68,7 @@ namespace synthese
 			: public util::FactorableTemplate<server::Action, BookReservationAction>
 		{
 		public:
-			static const std::string PARAMETER_SITE;
-			
+		
 			// Accessibility
 			static const std::string PARAMETER_ACCESS_PARAMETERS;
 
@@ -87,12 +93,19 @@ namespace synthese
 			// Reservation information
 			static const std::string PARAMETER_SEATS_NUMBER;
 
+			// Access parameters by site
+			static const std::string PARAMETER_SITE;
+			static const std::string PARAMETER_USER_CLASS_ID;
+			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
+
 		private:
 			graph::Journey						_journey;
 			boost::shared_ptr<security::User>	_customer;
 			bool								_createCustomer;
 			graph::AccessParameters				_accessParameters;
 			int									_seatsNumber;
+			boost::shared_ptr<const transportwebsite::Site>	_site;
+			boost::shared_ptr<const transportwebsite::RollingStockFilter>	_rollingStockFilter;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

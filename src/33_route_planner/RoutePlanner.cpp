@@ -24,27 +24,14 @@
 
 #include "IntegralSearcher.h"
 #include "BestVertexReachesMap.h"
-#include "RoadModule.h"
-#include "PTModule.h"
 #include "Hub.h"
 #include "Edge.h"
-#include "Line.h"
 #include "Service.h"
 #include "Vertex.h"
-#include "PhysicalStop.h"
 #include "Journey.h"
 #include "VertexAccessMap.h"
 #include "JourneyComparator.h"
-#include "RoadPlace.h"
-
-#include "LineStop.h"
-#include "Road.h"
-#include "Line.h"
-#include "CommercialLine.h"
-
-#include "SquareDistance.h"
-
-#include "Log.h"
+#include "RoutePlannerLogger.h"
 
 #include <algorithm>
 #include <set>
@@ -59,13 +46,10 @@ using namespace std;
 namespace synthese
 {
 	using namespace time;
-	using namespace env;	
 	using namespace geography;
 	using namespace geometry;
 	using namespace util;
 	using namespace graph;
-	using namespace road;
-	using namespace pt;
 	
 
 	namespace algorithm
@@ -81,8 +65,7 @@ namespace synthese
 			const time::DateTime& maxEndTime,
 			graph::GraphIdType whatToSearch,
 			graph::GraphIdType graphToUse,
-			std::ostream* logStream /*= NULL*/,
-			util::Log::Level logLevel /*= util::Log::LEVEL_NONE */
+			std::ostream* logStream /*= NULL*/
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_planningOrder(planningOrder),
@@ -94,7 +77,7 @@ namespace synthese
 			_whatToSearch(whatToSearch),
 			_graphToUse(graphToUse),
 			_logStream(logStream),
-			_logLevel(logLevel)
+			_totalDistance(destinationVam.getIsobarycenter().getDistanceTo(originVam.getIsobarycenter()))
 		{
 		}
 
@@ -266,7 +249,7 @@ namespace synthese
 			const time::DateTime& originDateTime,
 			const time::DateTime& minMaxDateTimeAtOrigin,
 			const time::DateTime& minMaxDateTimeAtDestination,
-			bool inverted,
+			bool secondTime,
 			boost::optional<boost::posix_time::time_duration> maxDuration
 		){
 			assert(accessDirection != UNDEFINED_DIRECTION);
@@ -287,27 +270,23 @@ namespace synthese
 			DateTime __minMaxDateTimeAtDestination(minMaxDateTimeAtDestination);
 
 			JourneysResult<JourneyComparator> todo(originDateTime);
-			int integralSerachsNumber(1);
 			
 			DateTime bestEndTime(minMaxDateTimeAtDestination);
 			DateTime lastBestEndTime(minMaxDateTimeAtDestination);
 			
 			// Initialization of the best vertex reaches map
 			BestVertexReachesMap bestVertexReachesMap(accessDirection, startVam);
-			
-#ifdef DEBUG
-			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-				|| _logLevel <= Log::LEVEL_TRACE
-				){
-					stringstream s;
-					s << "<h3>Integral search " << integralSerachsNumber << "</h3>";
 
-					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-						Log::GetInstance().trace(s.str());
-					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-						*_logStream << s.str();
+			optional<RoutePlannerLogger> logger(
+				_logStream ?
+				optional<RoutePlannerLogger>(RoutePlannerLogger(*_logStream, todo, result)) :
+				optional<RoutePlannerLogger>()
+			);
+			if(logger)
+			{
+				logger->open();
 			}
-#endif
+
 			// Initialization of the integral searcher
 			IntegralSearcher is(
 				accessDirection,
@@ -321,17 +300,34 @@ namespace synthese
 				originDateTime,
 				minMaxDateTimeAtOrigin,
 				__minMaxDateTimeAtDestination,
-				inverted,
-				_maxDuration
-				, _logStream
-				, _logLevel
+				secondTime,
+				secondTime,
+				_maxDuration,
+				NULL,
+				_totalDistance
 			);
 
-			is.integralSearch(startVam, optional<size_t>(0));
-			++integralSerachsNumber;
-			
+			is.integralSearch(
+				startVam,
+				optional<size_t>(0),
+				result.empty() ?
+					optional<posix_time::time_duration>() :
+					optional<posix_time::time_duration>(
+						accessDirection == DEPARTURE_TO_ARRIVAL ?
+						result.getEndTime().getSecondsDifference(originDateTime) :
+						originDateTime.getSecondsDifference(result.getEndTime())
+					)
+			);
+
+			// Main loop
 			while(true)
 			{
+				if(logger)
+				{
+					logger->recordIntegralSearch(todo);
+				}
+
+				bool resultFound(false);
 
 				// Take into account of the end reached journeys
 				for(JourneysResult<JourneyComparator>::ResultSet::const_iterator it(todo.getJourneys().begin());
@@ -349,34 +345,17 @@ namespace synthese
 					const VertexAccess& va = endVam.getVertexAccess(reachedVertex);
 					
 					// Attempt to elect the solution as the result
-#ifdef DEBUG
-					bool saved(journey.isBestThan(result));
-#endif
 					if (journey.isBestThan(result))
 					{
 						result = journey;
+						if(logger)
+						{
+							logger->recordNewResult(result);
+						}
+						resultFound = true;
+						bestEndTime = result.getEndTime();
 					}
 
-#ifdef DEBUG
-					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-					{
-						Log::GetInstance().trace(
-							dynamic_cast<const NamedPlace*>(reachedVertex->getHub())->getFullName() +
-							" was found at " +
-							journey.getEndTime().toString() +
-							(saved ? " (accepted)" : " (rejected)")
-						);
-						if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-						{
-							*_logStream <<
-								"<p>" <<
-								dynamic_cast<const NamedPlace*>(reachedVertex->getHub())->getFullName() <<
-								" was found at " << journey.getEndTime().toString() <<
-								(saved ? " (accepted)" : " (rejected)") << "</p>"
-							;
-						}
-					}
-#endif
 
 					if (va.approachTime.total_seconds() == 0)
 					{
@@ -386,151 +365,43 @@ namespace synthese
 					it = next;
 				}
 
-				todo.cleanup(lastBestEndTime != bestEndTime, bestEndTime, bestVertexReachesMap, true);
-
-				// Loop exit
-				if (todo.empty())
-					break;
-
-#ifdef DEBUG
-				if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-					|| _logLevel <= Log::LEVEL_TRACE
-				){
-					string s("<table class=\"adminresults\">"+todo.getLog());
-					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-						Log::GetInstance().trace(s);
-					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-						*_logStream << s << "</table>";
+				if(resultFound)
+				{
+					todo.cleanup(lastBestEndTime != bestEndTime, bestEndTime, bestVertexReachesMap, true, originDateTime, !secondTime, _totalDistance);
 				}
-#endif
+
+				if(todo.empty())
+				{
+					break;
+				}
+
+				if(logger)
+				{
+					logger->recordCleanup(todo);
+				}
+
 				lastBestEndTime = bestEndTime;
 
 				shared_ptr<const Journey> journey(todo.front());
-#ifdef DEBUG
-				if(	!journey->empty() &&
-					(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE ||
-						_logLevel <= Log::LEVEL_TRACE
-				)	){
-					stringstream stream;
-					stream
-						<< "<h3>Integral search " << integralSerachsNumber++ << "</h3>"
-						<< "<table class=\"adminresults\"><tr>"
-						<< "<th colspan=\"7\">Journey</th>"
-						<< "</tr>"
-						;
 
-					// Departure time
-					Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
+				is.integralSearch(
+					*journey,
+					optional<size_t>(0),
+					result.empty() ?
+						optional<posix_time::time_duration>() :
+						optional<posix_time::time_duration>(
+							accessDirection == DEPARTURE_TO_ARRIVAL ?
+							result.getEndTime().getSecondsDifference(originDateTime) :
+							originDateTime.getSecondsDifference(result.getEndTime())
+						)
+				);
 
-					/*					if (journey->getContinuousServiceRange() > 1)
-					{
-					DateTime endRange(its->getDepartureDateTime());
-					endRange += journey->getContinuousServiceRange();
-					stream << " - Service continu jusqu'à " << endRange.toString();
-					}
-					if (journey->getReservationCompliance() == true)
-					{
-					stream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine().toString();
-					}
-					if (journey->getReservationCompliance() == boost::logic::indeterminate)
-					{
-					stream << " - Réservation facultative avant le " << journey->getReservationDeadLine().toString();
-					}
-					*/
-					stream << "<tr>";
-					stream << "<td>" << its->getDepartureDateTime().toString() << "</td>";
-
-					// Line
-					const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-					const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-					stream << "<td";
-					if (ls)
-						stream << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
-					stream << ">";
-					stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
-
-					// Transfers
-					if (its == journey->getServiceUses().end() -1)
-					{
-						stream << "<td colspan=\"4\">(trajet direct)</td>";
-					}
-					else
-					{
-						while(true)
-						{
-							// Arrival
-							stream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
-
-							// Place
-							stream <<
-								"<td>" <<
-								dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub())->getFullName() <<
-								"</td>"
-							;
-
-							// Next service use
-							++its;
-
-							// Departure
-							stream << "<td>" << its->getDepartureDateTime().toString() << "</td>";
-
-							// Line
-							const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-							const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-							stream << "<td";
-							if (ls)
-								stream << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
-							stream << ">";
-							stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
-
-							// Exit if last service use
-							if (its == journey->getServiceUses().end() -1)
-								break;
-
-							// Empty final arrival col
-							stream << "<td></td>";
-
-							// New row and empty origin departure cols;
-							stream << "</tr><tr>";
-							stream << "<td></td>";
-							stream << "<td></td>";
-						}
-					}
-
-					// Final arrival
-					stream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
-
-
-					string s(todo.getLog());
-					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-					{
-						Log::GetInstance().trace(stream.str());
-						Log::GetInstance().trace(s);
-						Log::GetInstance().trace("</table>");
-					}
-					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-					{
-						*_logStream << stream.str();
-						*_logStream << s << "</table>";
-					}
-				}
-#endif
-
-				is.integralSearch(*journey, optional<size_t>(0));
 			}
-#ifdef DEBUG
-			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-				|| _logLevel <= Log::LEVEL_TRACE
-			){
-				stringstream s;
-				s << "<p>End of findJourney computing. Was made with " << --integralSerachsNumber << " integral searches.</p>";
 
-				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-					Log::GetInstance().trace(s.str());
-				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-					*_logStream << s.str();
+			if(logger)
+			{
+				logger->close();
 			}
-#endif
 		}
 
 

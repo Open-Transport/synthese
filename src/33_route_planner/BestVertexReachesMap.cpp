@@ -32,6 +32,7 @@
 #include "RoadModule.h"
 #include "PTModule.h"
 #include "VertexAccessMap.h"
+#include "JourneyComparator.h"
 
 #include <assert.h>
 
@@ -44,7 +45,8 @@ namespace synthese
 	using namespace graph;
 	using namespace road;
 	using namespace pt;
-	
+	using namespace time;
+		
 
 	namespace algorithm
 	{
@@ -68,23 +70,32 @@ namespace synthese
 
 
 		bool BestVertexReachesMap::isUseLess(
-			const TimeMap::key_type& vertex,
-			const TimeMap::mapped_type::key_type& transferNumber,
-			const TimeMap::mapped_type::mapped_type& duration,
+			boost::shared_ptr<graph::Journey> journeysptr,
+			const DateTime& originDateTime,
 			bool propagateInConnectionPlace,
 			bool strict
 		){
+			const Journey& journey(*journeysptr);
+			const Vertex* const vertex(journey.getEndEdge()->getFromVertex());
+			const size_t transferNumber(journey.size());
+			const posix_time::time_duration duration(
+				journey.getMethod() == DEPARTURE_TO_ARRIVAL ?
+				journey.getEndTime().getSecondsDifference(originDateTime) :
+				originDateTime.getSecondsDifference(journey.getEndTime())
+			);
+			assert(duration.total_seconds() >= 0);
+
 			TimeMap::const_iterator itc(_bestTimeMap.find(vertex));
 
 			if (itc == _bestTimeMap.end ())
 			{
 				if(propagateInConnectionPlace)
 				{
-					_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration);
+					_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration, journeysptr);
 				}
 				else
 				{
-					_insert(vertex, transferNumber, duration);
+					_insert(vertex, transferNumber, duration, journeysptr);
 				}
 				return false;
 			}
@@ -93,25 +104,25 @@ namespace synthese
 			{
 				if(item.first < transferNumber)
 				{
-					if(item.second <= duration)
+					if(item.second.first <= duration)
 						return true;
 				}
 				else if(item.first == transferNumber)
 				{
-					if(	item.second < duration ||
-						strict && item.second == duration
-					){ // Can erase much comfortable solutions (only the first found solution is kept : there could be an election at this time)
+					if(	item.second.first < duration ||
+						item.second.first == duration && (strict || JourneyComparator().operator()(item.second.second, journeysptr))
+					){
 						return true;
 					}
 					else
 					{
 						if(propagateInConnectionPlace)
 						{
-							_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration);
+							_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration, journeysptr);
 						}
 						else
 						{
-							_insert(vertex, transferNumber, duration);
+							_insert(vertex, transferNumber, duration, journeysptr);
 						}
 						return false;
 					}
@@ -120,13 +131,13 @@ namespace synthese
 				{
 					if(propagateInConnectionPlace)
 					{
-						_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration);
+						_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration, journeysptr);
 					}
 					else
 					{
-						_insert(vertex, transferNumber, duration);
+						_insert(vertex, transferNumber, duration, journeysptr);
 					}
-					if(item.second >= duration)
+					if(item.second.first >= duration)
 					{
 						if(propagateInConnectionPlace)
 						{
@@ -138,11 +149,11 @@ namespace synthese
 			}
 			if(propagateInConnectionPlace)
 			{
-				_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration);
+				_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration, journeysptr);
 			}
 			else
 			{
-				_insert(vertex, transferNumber, duration);
+				_insert(vertex, transferNumber, duration, journeysptr);
 			}
 			return false;
 		}
@@ -152,7 +163,8 @@ namespace synthese
 		void BestVertexReachesMap::_insert(
 			const TimeMap::key_type& vertex,
 			const TimeMap::mapped_type::key_type& transfers,
-			const TimeMap::mapped_type::mapped_type& duration
+			boost::posix_time::time_duration duration,
+			boost::shared_ptr<graph::Journey> journey
 		){
 			TimeMap::iterator itc = _bestTimeMap.find (vertex);
 
@@ -164,11 +176,11 @@ namespace synthese
 			TimeMap::mapped_type::iterator it(itc->second.find(transfers));
 			if (it == itc->second.end())
 			{
-				itc->second.insert(make_pair(transfers, duration));
+				itc->second.insert(make_pair(transfers, make_pair(duration, journey)));
 			}
 			else
 			{
-				it->second = duration;
+				it->second = make_pair(duration, journey);
 			}
 		}
 
@@ -177,9 +189,10 @@ namespace synthese
 		void BestVertexReachesMap::_insertAndPropagateInConnectionPlace(
 			const TimeMap::key_type& vertex,
 			const TimeMap::mapped_type::key_type& transfers,
-			const TimeMap::mapped_type::mapped_type& duration
+			boost::posix_time::time_duration duration,
+			boost::shared_ptr<graph::Journey> journey
 		){
-			_insert(vertex, transfers, duration);
+			_insert(vertex, transfers, duration, journey);
 			
 			if(!vertex->getHub()->isConnectionPossible()) return;
 
@@ -204,7 +217,7 @@ namespace synthese
 							if (!p->isConnectionAllowed(**ita, *vertex)) continue;
 							bestTimeAtAddress += p->getTransferDelay(**ita, *vertex);
 						}
-						_insert (*ita, transfers+1, bestTimeAtAddress);
+						_insert (*ita, transfers+1, bestTimeAtAddress, journey);
 					}
 				}
 			}
@@ -225,7 +238,7 @@ namespace synthese
 						if (!p->isConnectionAllowed(*itp->second,*vertex)) continue;
 						bestTimeAtStop += p->getTransferDelay(*itp->second, *vertex);
 					}
-					_insert(itp->second, transfers+1, bestTimeAtStop);
+					_insert(itp->second, transfers+1, bestTimeAtStop, journey);
 				}
 			}
 		}
@@ -260,7 +273,8 @@ namespace synthese
 				_insert(
 					it->first,
 					0,
-					it->second.approachTime
+					it->second.approachTime,
+					shared_ptr<Journey>(new Journey)
 				);
 			}
 		}

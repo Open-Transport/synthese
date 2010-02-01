@@ -212,9 +212,8 @@ namespace synthese
 				endDate,
 				_resultsNumber,
 				_site->getAccessParameters(_accessibility, _rollingStockFilter ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()),
-				DEPARTURE_FIRST
-//				, &stream
-//				, _log ? Log::LEVEL_TRACE : Log::LEVEL_NONE
+				DEPARTURE_FIRST,
+				_log ? &stream : NULL
 			);
 			const PTRoutePlannerResult jv(r.run());
 

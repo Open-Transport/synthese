@@ -50,6 +50,7 @@
 #include "ReservationContact.h"
 #include "RollingStockFilter.h"
 #include "Address.h"
+#include "ContinuousService.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -533,6 +534,11 @@ namespace synthese
 									stream <<
 										" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
 										" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
+								}
+								const ContinuousService* cserv(dynamic_cast<const ContinuousService*>(curET.getService()));
+								if(cserv && cserv->getMaxWaitingTime() > 0)
+								{
+									stream << " possibleWaitingTime=\"" << cserv->getMaxWaitingTime() << "\"";
 								}
 								stream <<
 										" startStopIsTerminus=\"" << (curET.getDepartureEdge()->getRankInPath() == 0 ? "true" : "false") << "\"" <<

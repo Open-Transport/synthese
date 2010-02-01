@@ -71,7 +71,8 @@ namespace synthese
 				const time::DateTime& higherArrivalTime,
 				const boost::optional<std::size_t>	maxSolutionsNumber,
 				const graph::AccessParameters		accessParameters,
-				const algorithm::PlanningOrder		planningOrder
+				const algorithm::PlanningOrder		planningOrder,
+				std::ostream* logStream = NULL
 			);
 
 			PTRoutePlannerResult run() const;

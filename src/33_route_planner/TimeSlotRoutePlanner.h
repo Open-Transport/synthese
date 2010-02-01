@@ -26,7 +26,6 @@
 #include "RoutePlannerTypes.h"
 #include "Journey.h"
 #include "AccessParameters.h"
-#include "Log.h"
 #include "VertexAccessMap.h"
 
 #include <deque>
@@ -68,7 +67,6 @@ namespace synthese
 			//! @name Logging
 			//@{
 				std::ostream* const					_logStream;
-				const util::Log::Level				_logLevel;
 			//@}
 
 			Result _MergeSubResultAndParentContinuousService(
@@ -91,8 +89,7 @@ namespace synthese
 				boost::optional<std::size_t>	maxSolutionsNumber,
 				graph::AccessParameters		accessParameters,
 				PlanningOrder					planningOrder,
-				std::ostream* logStream = NULL,
-				util::Log::Level logLevel = util::Log::LEVEL_NONE
+				std::ostream* logStream = NULL
 			);
 
 			
@@ -117,8 +114,7 @@ namespace synthese
 				boost::optional<std::size_t>	maxSolutionsNumber,
 				graph::AccessParameters		accessParameters,
 				PlanningOrder					planningOrder,
-				std::ostream* logStream = NULL,
-				util::Log::Level logLevel = util::Log::LEVEL_NONE
+				std::ostream* logStream = NULL
 			);
 
 			//! @name Getters

@@ -22,10 +22,12 @@
 
 #include "JourneyComparator.h"
 #include "Journey.h"
+#include "Edge.h"
 
 #include <assert.h>
 
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -45,22 +47,52 @@ namespace synthese
 			if (j1->getEndReached() != j2->getEndReached())
 				return j1->getEndReached();
 			
-			// Prirority 1b : if both have end reached, the the best time is selected
-			if (j1->getEndReached())
-			{
+			// Prirority 1b : if both have end or same vertex reached, the the best time is selected
+			if (j1->getEndEdge()->getFromVertex() == j2->getEndEdge()->getFromVertex() ||
+				j1->getEndReached()
+			){
 				if (j1->getEndTime() != j2->getEndTime())
 					return (j1->getEndTime().*(j1->getBestTimeStrictOperator())) (j2->getEndTime());
+
+				posix_time::time_duration pedestrianDuration1(j1->getStartApproachDuration() + j1->getEndApproachDuration());
+				posix_time::time_duration pedestrianDuration2(j2->getStartApproachDuration() + j2->getEndApproachDuration());
+
+				if (pedestrianDuration1 != pedestrianDuration2)
+				{
+					return pedestrianDuration1 < pedestrianDuration2;
+				}
+
+				if(j1->size() != j2->size())
+				{
+					return j1->size() < j2->size();
+				}
+
+				// Total distance
+				double distance1(j1->getDistance());
+				double distance2(j2->getDistance());
+				if(distance1 != distance2)
+				{
+					return distance1 < distance2;
+				}
+
+				// Effective duration
+				time_duration td1(j1->getEffectiveDuration());
+				time_duration td2(j2->getEffectiveDuration());
+				if(td1 != td2)
+				{
+					return td1 < td2;
+				}
 
 				// Priority 1c : order between addresses
 				return j1 < j2;
 			}
 			if (j1->getScore() != j2->getScore())
-				return j1->getScore() < j2->getScore();
-
+				return j1->getScore() < j2->getScore(); // inverser
+			
 			// Priority 2 : min speed to end
 			if (j1->getMinSpeedToEnd() != j2->getMinSpeedToEnd())
 				return j1->getMinSpeedToEnd() < j2->getMinSpeedToEnd();
-
+			// comparer square distance
 			// Priority 3 : end time
 			if (j1->getEndTime() != j2->getEndTime())
 				return (j1->getEndTime().*j1->getBestTimeStrictOperator())(j2->getEndTime());

@@ -22,7 +22,6 @@
 
 #include "TimeSlotRoutePlanner.h"
 #include "RoutePlanner.h"
-#include "Log.h"
 
 #include <boost/foreach.hpp>
 #include <sstream>
@@ -51,8 +50,7 @@ namespace synthese
 			optional<size_t> maxSolutionsNumber,
 			AccessParameters accessParameters,
 			PlanningOrder planningOrder,
-			std::ostream* logStream,
-			util::Log::Level logLevel
+			std::ostream* logStream
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(lowerDepartureTime),
@@ -65,8 +63,7 @@ namespace synthese
 			_maxSolutionsNumber(maxSolutionsNumber),
 			_accessParameters(accessParameters),
 			_planningOrder(planningOrder),
-			_logStream(logStream),
-			_logLevel(logLevel)
+			_logStream(logStream)
 		{
 		}
 
@@ -82,8 +79,7 @@ namespace synthese
 			optional<std::size_t>	maxSolutionsNumber,
 			AccessParameters accessParameters,
 			const PlanningOrder planningOrder,
-			std::ostream* logStream,
-			util::Log::Level logLevel
+			std::ostream* logStream
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(continuousService.getDepartureTime()),
@@ -101,7 +97,6 @@ namespace synthese
 			_accessParameters(),
 			_planningOrder(planningOrder),
 			_logStream(logStream),
-			_logLevel(logLevel),
 			_parentContinuousService(continuousService)
 		{
 			assert(continuousService.getContinuousServiceRange().total_seconds() > 60);
@@ -144,19 +139,10 @@ namespace synthese
 				_planningOrder == DEPARTURE_FIRST ? originDateTime <= _highestDepartureTime : originDateTime >= _lowestArrivalTime;
 				_planningOrder == DEPARTURE_FIRST ? originDateTime += 1 : originDateTime -= 1
 			){
-#ifdef DEBUG
-				if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE ||
-					_logLevel <= Log::LEVEL_TRACE
+				if(	_logStream
 				){
-					stringstream s;
-					s << "<h2>Route planning " << (result.size()+1) << " at " << _lowestDepartureTime.toString() << "</h2>";
-
-					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-						Log::GetInstance().trace(s.str());
-					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-						*_logStream << s.str();
+					*_logStream << "<h2>Route planning " << (result.size()+1) << " at " << _lowestDepartureTime.toString() << "</h2>";
 				}
-#endif
 
 				RoutePlanner r(
 					_originVam,
@@ -169,8 +155,7 @@ namespace synthese
 					_planningOrder == DEPARTURE_FIRST ? _highestArrivalTime : _lowestDepartureTime,
 					_whatToSearch,
 					_graphToUse,
-					_logStream,
-					_logLevel
+					_logStream
 				);
 				RoutePlanner::Result journey(r.run());
 
@@ -189,8 +174,7 @@ namespace synthese
 						_maxSolutionsNumber ? *_maxSolutionsNumber - result.size() : _maxSolutionsNumber,
 						_accessParameters,
 						_planningOrder,
-						_logStream,
-						_logLevel
+						_logStream
 					);
 					Result subResult(_MergeSubResultAndParentContinuousService(journey, tsr.run()));
 			

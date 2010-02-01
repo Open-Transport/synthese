@@ -85,7 +85,9 @@ namespace synthese
 	namespace resa
 	{
 		const string BookReservationAction::PARAMETER_SITE = Action_PARAMETER_PREFIX + "sit";
-		
+		const string BookReservationAction::PARAMETER_USER_CLASS_ID = Action_PARAMETER_PREFIX + "acc";
+		const string BookReservationAction::PARAMETER_ROLLING_STOCK_FILTER_ID = Action_PARAMETER_PREFIX + "tm";
+
 		const string BookReservationAction::PARAMETER_ACCESS_PARAMETERS(Action_PARAMETER_PREFIX + "ac");
 
 		const string BookReservationAction::PARAMETER_ORIGIN_CITY = Action_PARAMETER_PREFIX + "dct";
@@ -105,8 +107,6 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "pass";
 
 		const string BookReservationAction::PARAMETER_SEATS_NUMBER = Action_PARAMETER_PREFIX + "senu";
-
-
 
 
 
@@ -139,7 +139,19 @@ namespace synthese
 				{
 					map.insert(PARAMETER_DATE_TIME, _journey.getDepartureTime());
 				}
-				map.insert(PARAMETER_ACCESS_PARAMETERS, _accessParameters.serialize());
+				if(_site.get())
+				{
+					map.insert(PARAMETER_SITE, _site->getKey());
+					map.insert(PARAMETER_USER_CLASS_ID, static_cast<int>(_accessParameters.getUserClass()));
+					if(_rollingStockFilter)
+					{
+						map.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, static_cast<int>(_rollingStockFilter->getRank()));
+					}
+				}
+				else
+				{
+					map.insert(PARAMETER_ACCESS_PARAMETERS, _accessParameters.serialize());
+				}
 			}
 			return map;
 		}
@@ -204,9 +216,10 @@ namespace synthese
 
 			// Site
 			uid id(map.getUid(PARAMETER_SITE, false, FACTORY_KEY));
-			shared_ptr<const Site> site;
 			if (id > 0 && Env::GetOfficialEnv().getRegistry<Site>().contains(id))
-				site = Env::GetOfficialEnv().getRegistry<Site>().get(id);
+			{
+				_site = Env::GetOfficialEnv().getRegistry<Site>().get(id);
+			}
 
 			// Seats number
 			_seatsNumber = map.get<int>(PARAMETER_SEATS_NUMBER);
@@ -214,8 +227,8 @@ namespace synthese
 				throw ActionException("Invalid seats number");
 
 			// Journey
-			const Place* originPlace(site.get() 
-				? site->fetchPlace(
+			const Place* originPlace(_site.get() 
+				? _site->fetchPlace(
 					map.getString(PARAMETER_ORIGIN_CITY, true, FACTORY_KEY)
 					, map.getString(PARAMETER_ORIGIN_PLACE, true, FACTORY_KEY)
 				) : GeographyModule::FetchPlace(
@@ -228,8 +241,8 @@ namespace synthese
 				throw ActionException("Invalid origin place");
 			}
 
-			const Place* destinationPlace(site.get()
-				? site->fetchPlace(
+			const Place* destinationPlace(_site.get()
+				? _site->fetchPlace(
 					map.getString(PARAMETER_DESTINATION_CITY, true, FACTORY_KEY)
 					, map.getString(PARAMETER_DESTINATION_PLACE, true, FACTORY_KEY)
 				) : GeographyModule::FetchPlace(
@@ -253,7 +266,31 @@ namespace synthese
 			}
 
 			// Accessibility
-			if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
+			if(_site.get())
+			{
+				try
+				{
+					// Rolling stock filter
+					if(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID))
+					{
+						_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
+					}
+				}
+				catch(ObjectNotFoundException<RollingStockFilter>& e)
+				{
+				}
+
+				if(_rollingStockFilter.get() && _rollingStockFilter->getSite() != _site.get())
+				{
+					throw ActionException("Bad rolling stock filter");
+				}
+
+				_accessParameters = _site->getAccessParameters(
+					map.getDefault<UserClassCode>(PARAMETER_USER_CLASS_ID, USER_PEDESTRIAN),
+					_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
+				);
+			}
+			else if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
 			{
 				_accessParameters = map.get<string>(PARAMETER_ACCESS_PARAMETERS);
 			}

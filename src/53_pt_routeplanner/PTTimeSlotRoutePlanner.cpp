@@ -30,6 +30,7 @@
 #include "JourneyComparator.h"
 #include "IntegralSearcher.h"
 #include "PhysicalStop.h"
+#include "NamedPlace.h"
 
 #include <sstream>
 
@@ -58,7 +59,8 @@ namespace synthese
 			const time::DateTime& higherArrivalTime,
 			const boost::optional<std::size_t> maxSolutionsNumber,
 			const graph::AccessParameters accessParameters,
-			const PlanningOrder planningOrder
+			const PlanningOrder planningOrder,
+			std::ostream* logStream
 		):	TimeSlotRoutePlanner(
 				origin->getVertexAccessMap(
 					planningOrder == DEPARTURE_FIRST ? DEPARTURE_TO_ARRIVAL : ARRIVAL_TO_DEPARTURE,
@@ -75,7 +77,8 @@ namespace synthese
 				optional<posix_time::time_duration>(),
 				maxSolutionsNumber,
 				accessParameters,
-				planningOrder
+				planningOrder,
+				logStream
 			),
 			_departurePlace(origin),
 			_arrivalPlace(destination)
@@ -116,11 +119,11 @@ namespace synthese
 				direction == DEPARTURE_TO_ARRIVAL ? getHighestDepartureTime() : getLowestArrivalTime(),
 				highestArrivalTime,
 				false,
+				false,
 				_accessParameters.getMaxApproachTime(),
-				_logStream,
-				_logLevel
+				_logStream
 			);
-			iso.integralSearch(vam, optional<size_t>());
+			iso.integralSearch(vam, optional<size_t>(), optional<posix_time::time_duration>());
 
 			// Include physical stops from originVam into result of integral search
 			// (cos not taken into account in returned journey vector).
@@ -221,19 +224,11 @@ namespace synthese
 
 		PTRoutePlannerResult PTTimeSlotRoutePlanner::run() const
 		{
-#ifdef DEBUG			// Log
-			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-				|| _logLevel <= Log::LEVEL_TRACE
-				){
-					stringstream s;
-					s << "<h2>Origin access map calculation</h2>";
-
-					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-						Log::GetInstance().trace(s.str());
-					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-						*_logStream << s.str();
+			if(	_logStream
+			){
+				*_logStream << "<h2>Origin access map calculation</h2>";
 			}
-#endif
+
 			TimeSlotRoutePlanner::Result result;
 
 			// Control if departure and arrival VAMs has contains at least one vertex
@@ -248,16 +243,13 @@ namespace synthese
 			VertexAccessMap ovam(_extendToPhysicalStops(_originVam, _destinationVam, DEPARTURE_TO_ARRIVAL));
 			VertexAccessMap dvam(_extendToPhysicalStops(_destinationVam, _originVam, ARRIVAL_TO_DEPARTURE));
 
-#ifdef DEBUG			// Log
-			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-				|| _logLevel <= Log::LEVEL_TRACE
+			if(	_logStream
 			){
-				stringstream s;
-				s << "<h3>Origins</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
+				*_logStream << "<h3>Origins</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
 
 				BOOST_FOREACH(VertexAccessMap::VamMap::value_type it, ovam.getMap())
 				{
-					s	<<
+					*_logStream	<<
 						"<tr><td>" <<
 						dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
 						"</td><td>" << static_cast<const PhysicalStop*>(it.first)->getName() <<
@@ -266,57 +258,28 @@ namespace synthese
 						"</td></tr>"
 						;
 				}
-				s << "</table>";
+				*_logStream << "</table>";
 
-				if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-					Log::GetInstance().trace(s.str());
-				if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-					*_logStream << s.str();
+				*_logStream << "<h2>Destination access map calculation</h2>";
+
+				*_logStream << "<h3>Destinations</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
+
+				BOOST_FOREACH(VertexAccessMap::VamMap::value_type it, dvam.getMap())
+				{
+					*_logStream	<<
+						"<tr><td>" <<
+						dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
+						"</td><td>" <<
+						static_cast<const PhysicalStop* const>(it.first)->getName() <<
+						"</td><td>" <<
+						it.second.approachDistance <<
+						"</td><td>" <<
+						it.second.approachTime.total_seconds() / 60 <<
+						"</td></tr>"
+						;
+				}
+				*_logStream << "</table>";
 			}
-
-			// Log
-			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-				|| _logLevel <= Log::LEVEL_TRACE
-				){
-					stringstream s;
-					s << "<h2>Destination access map calculation</h2>";
-
-					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-						Log::GetInstance().trace(s.str());
-					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-						*_logStream << s.str();
-			}
-#endif
-
-#ifdef DEBUG			// Log
-			if(	Log::GetInstance().getLevel() <= Log::LEVEL_TRACE
-				|| _logLevel <= Log::LEVEL_TRACE
-				){
-					stringstream s;
-					s << "<h3>Destinations</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
-
-					BOOST_FOREACH(VertexAccessMap::VamMap::value_type it, dvam.getMap())
-					{
-						s	<<
-							"<tr><td>" <<
-							dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
-							"</td><td>" <<
-							static_cast<const PhysicalStop* const>(it.first)->getName() <<
-							"</td><td>" <<
-							it.second.approachDistance <<
-							"</td><td>" <<
-							it.second.approachTime.total_seconds() / 60 <<
-							"</td></tr>"
-							;
-					}
-					s << "</table>";
-
-					if (Log::GetInstance().getLevel() <= Log::LEVEL_TRACE)
-						Log::GetInstance().trace(s.str());
-					if (_logLevel <= Log::LEVEL_TRACE && _logStream)
-						*_logStream << s.str();
-			}
-#endif
 // 			if (result.empty())
 // 			{
 // 				_previousContinuousServiceDuration = posix_time::minutes(0);
@@ -343,8 +306,7 @@ namespace synthese
 				_maxSolutionsNumber,
 				_accessParameters,
 				_planningOrder,
-				_logStream,
-				_logLevel
+				_logStream
 			);
 			return PTRoutePlannerResult(
 				_departurePlace,

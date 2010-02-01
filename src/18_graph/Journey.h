@@ -68,7 +68,7 @@ namespace synthese
 				bool						_endReached;
 				geometry::SquareDistance	_squareDistanceToEnd;
 				MinSpeed					_minSpeedToEnd;
-				int							_score;
+				unsigned int				_score;
 			//@}
 
 			//! @name Query cache
@@ -220,11 +220,15 @@ namespace synthese
 				void setRoutePlanningInformations(
 					bool endIsReached,
 					const VertexAccessMap& goal,
-					const time::DateTime& bestTimeAtGoal
+					const time::DateTime& originDateTime,
+					boost::optional<boost::posix_time::time_duration> totalDuration,
+					int totalDistance
 				);
 
 				void setMinSpeedToEnd(
-					const time::DateTime& bestTimeAtGoal
+					const time::DateTime& originDateTime,
+					boost::optional<boost::posix_time::time_duration> totalDuration,
+					int totalDistance
 				);
 			//@}
 

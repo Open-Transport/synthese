@@ -27,7 +27,6 @@
 #include <vector>
 #include <map>
 
-#include "Log.h"
 #include "DateTime.h"
 #include "VertexAccessMap.h"
 #include "ServiceUse.h"
@@ -115,10 +114,10 @@ namespace synthese
 			//! @name Logging
 			//@{
 				std::ostream* const					_logStream;
-				const util::Log::Level				_logLevel;
 			//@}
 				
 
+				const int _totalDistance;
 
 			/** Best journey finder.
 				@param accessDirection Type of computing : search of better arrival or of a better departure
@@ -138,7 +137,7 @@ namespace synthese
 				const time::DateTime& originDateTime,
 				const time::DateTime& maxMinDateTimeAtOrigin,
 				const time::DateTime& maxMinDateTimeAtDestination,
-				bool inverted,
+				bool secondTime,
 				boost::optional<boost::posix_time::time_duration> maxDuration
 			);
 
@@ -166,8 +165,7 @@ namespace synthese
 				const time::DateTime&				maxEndTime,
 				graph::GraphIdType			whatToSearch,
 				graph::GraphIdType			graphToUse,
-				std::ostream* logStream = NULL,
-				util::Log::Level logLevel = util::Log::LEVEL_NONE
+				std::ostream* logStream = NULL
 			);
 
 			

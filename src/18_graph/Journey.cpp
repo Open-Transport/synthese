@@ -587,7 +587,9 @@ namespace synthese
 		void Journey::setRoutePlanningInformations(
 			bool endIsReached,
 			const VertexAccessMap& goal,
-			const time::DateTime& bestTimeAtGoal 
+			const time::DateTime& originDateTime,
+			optional<posix_time::time_duration> totalDuration,
+			int totalDistance
 		){
 			_endReached = endIsReached;
 
@@ -604,38 +606,44 @@ namespace synthese
 					getEndEdge()->getHub()->getPoint()
 				);
 
-				setMinSpeedToEnd(bestTimeAtGoal);
+				setMinSpeedToEnd(originDateTime, totalDuration, totalDistance);
 			}
 
 		}
 
 
 
-		void Journey::setMinSpeedToEnd( const time::DateTime& bestTimeAtGoal )
-		{
-			if(_method == DEPARTURE_TO_ARRIVAL ? bestTimeAtGoal <= getArrivalTime() : getDepartureTime() <= bestTimeAtGoal)
+		void Journey::setMinSpeedToEnd(
+			const time::DateTime& originDateTime,
+			optional<posix_time::time_duration> totalDuration,
+			int totalDistance
+		){
+			long long unsigned int estimatedTotalDuration;
+			if(totalDuration)
 			{
-				_minSpeedToEnd = numeric_limits<MinSpeed>::max();
-				_score = 0;
+				estimatedTotalDuration = totalDuration->total_seconds();
 			}
 			else
 			{
-				const Hub* endHub(getEndEdge()->getHub());
+				estimatedTotalDuration = ceil(totalDistance * 0.36);
+			}
+			long long unsigned int distanceToEnd(1000 * _squareDistanceToEnd.getDistance());
+			long long unsigned int journeyDuration(getDuration().total_seconds());
 
-				_minSpeedToEnd =
-					(10 * _squareDistanceToEnd.getSquareDistance()) /
-					(	_method == DEPARTURE_TO_ARRIVAL ?
-						bestTimeAtGoal.getSecondsDifference(getArrivalTime()) :
-						getDepartureTime().getSecondsDifference(bestTimeAtGoal)
-					).total_seconds();
+			_score = static_cast<unsigned int>(
+				long long unsigned int(1000 * distanceToEnd * journeyDuration) /
+				long long unsigned int(totalDistance * estimatedTotalDuration)
+			);
 
-				_score = _minSpeedToEnd;
-				if (_score < 100)
-					_score = 100;
-				if (endHub->getScore())
-				{
-					_score /= endHub->getScore();
-				}
+			HubScore hubScore(getEndEdge()->getHub()->getScore());
+			if(hubScore > 1)
+			{
+				_score /= hubScore;
+			}
+
+			if(_score > 1000)
+			{
+				_score = 1000;
 			}
 		}
 

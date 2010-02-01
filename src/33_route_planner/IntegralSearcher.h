@@ -23,8 +23,6 @@
 #ifndef SYNTHESE_routeplanner_IntegralSearcher_h__
 #define SYNTHESE_routeplanner_IntegralSearcher_h__
 
-#include "Log.h"
-
 #include "GraphTypes.h"
 #include "AccessParameters.h"
 
@@ -94,9 +92,10 @@ namespace synthese
 				const time::DateTime&						_minMaxDateTimeAtOrigin;
 				time::DateTime&								_minMaxDateTimeAtDestination;
 				const bool									_inverted;	//!< Indicates that the AccessDirection is the contraty to the planning order (2nd passe)
+				const bool									_optim;
 				std::ostream* const							_logStream;
-				const util::Log::Level						_logLevel;
 				boost::optional<boost::posix_time::time_duration>	_maxDuration;
+				const int		_totalDistance;
 			//@}
 
 
@@ -105,7 +104,8 @@ namespace synthese
 				const graph::Journey& startJourney,
 				const time::DateTime& originDateTime,
 				const time::DateTime& minMaxOriginDateTime,
-				boost::optional<std::size_t> maxDepth
+				boost::optional<std::size_t> maxDepth,
+				boost::optional<boost::posix_time::time_duration> totalDuration
 			);
 
 		public:
@@ -122,9 +122,10 @@ namespace synthese
 				const time::DateTime&								minMaxDateTimeAtOrigin,
 				time::DateTime&										minMaxDateTimeAtDestination,
 				bool												inverted,
+				bool												optim,
 				boost::optional<boost::posix_time::time_duration>	maxDuration,
 				std::ostream* const									logStream = NULL,
-				util::Log::Level									logLevel = util::Log::LEVEL_NONE
+				int													totalDistance = 0
 			);
 
 
@@ -135,7 +136,8 @@ namespace synthese
 			///	@param maxDepth Maximum recursion depth.
 			void integralSearch(
 				const graph::VertexAccessMap& vertices,
-				boost::optional<std::size_t> maxDepth
+				boost::optional<std::size_t> maxDepth,
+				boost::optional<boost::posix_time::time_duration> totalDuration
 			);
 
 
@@ -146,7 +148,8 @@ namespace synthese
 			/// @param maxDepth limit of transfers
 			void integralSearch(
 				const graph::Journey& startJourney,
-				boost::optional<std::size_t> maxDepth
+				boost::optional<std::size_t> maxDepth,
+				boost::optional<boost::posix_time::time_duration> totalDuration
 			);
 
 
@@ -160,7 +163,7 @@ namespace synthese
 				@date 2007				
 			*/
 			_JourneyUsefulness evaluateJourney(
-				const graph::Journey& journey
+				boost::shared_ptr<graph::Journey> journey
 			) const;
 
 		};
