@@ -22,6 +22,7 @@ synthese::transportwebsite::CityListRequest::integrate();
 synthese::transportwebsite::PlacesListFunction::integrate();
 
 synthese::transportwebsite::SiteUpdateAction::integrate();
+synthese::transportwebsite::AddUserFavoriteJourneyAction::integrate();
 
 synthese::transportwebsite::TransportWebsiteRight::integrate();
 

@@ -1,0 +1,110 @@
+
+/** JourneyTemplates class implementation.
+	@file JourneyTemplates.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "JourneyTemplates.h"
+#include "Journey.h"
+#include "Edge.h"
+#include "Vertex.h"
+#include "ServiceUse.h"
+
+#include <boost/foreach.hpp>
+
+using namespace std;
+
+namespace synthese
+{
+	using namespace graph;
+
+	namespace algorithm
+	{
+		void JourneyTemplates::addResult( const Journey& value )
+		{
+			Hubs::value_type result;
+			BOOST_FOREACH(const Journey::ServiceUses::value_type& service, value.getServiceUses())
+			{
+				if(service.getEdge()->getFromVertex()->getGraphType() == _graphToUse)
+				{
+					result.push_back(service.getEdge()->getFromVertex()->getHub());
+				}
+				if(service.getSecondEdge()->getFromVertex()->getGraphType() == _graphToUse)
+				{
+					result.push_back(service.getSecondEdge()->getFromVertex()->getHub());
+				}
+			}
+			if(_hubs.find(result) == _hubs.end())
+			{
+				_hubs.insert(result);
+			}
+		}
+
+
+
+		JourneyTemplates::JourneyTemplates( const graph::GraphIdType graphToUse ):
+			_graphToUse(graphToUse)
+		{
+
+		}
+
+
+
+		bool JourneyTemplates::testJourneySimilarity( const graph::Journey& value ) const
+		{
+			BOOST_FOREACH(const Hubs::value_type& journeyTemplate, _hubs)
+			{
+				if(2 * value.size() > journeyTemplate.size())
+				{
+					continue;
+				}
+
+				Hubs::value_type::const_iterator it(journeyTemplate.begin());
+				bool ok(true);
+				BOOST_FOREACH(const Journey::ServiceUses::value_type& service, value.getServiceUses())
+				{
+					if(service.getEdge()->getFromVertex()->getGraphType() == _graphToUse)
+					{
+						if(*it != service.getEdge()->getFromVertex()->getHub())
+						{
+							ok = false;
+							break;
+						}
+						++it;
+					}
+					if(service.getSecondEdge()->getFromVertex()->getGraphType() == _graphToUse)
+					{
+						if(*it != service.getSecondEdge()->getFromVertex()->getHub())
+						{
+							ok = false;
+							break;
+						}
+						++it;
+					}
+				}
+				if(ok)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+
+	}
+}

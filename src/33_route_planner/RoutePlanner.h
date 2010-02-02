@@ -50,7 +50,6 @@ namespace synthese
 		class Path;
 		class Vertex;
 		class Service;
-		class SquareDistance;
 		class ServicePointer;
 		class Journey;
 	}
@@ -62,6 +61,8 @@ namespace synthese
 
 	namespace algorithm
 	{
+		class JourneyTemplates;
+
 		/** Route planner class.
 
 			Potential optimization by maximal speeds
@@ -85,7 +86,7 @@ namespace synthese
 		{
 		public:
 			typedef graph::Journey Result;
-
+			
 			/** Exception to throw when the route planning has no sense because of the presence of a common vertex in
 				both the the departure and the arrival vertex access maps.
 			*/
@@ -109,6 +110,7 @@ namespace synthese
 				const time::DateTime&				_maxEndTime;
 				const graph::GraphIdType			_whatToSearch;
 				const graph::GraphIdType			_graphToUse;
+				boost::optional<const JourneyTemplates&> _journeyTemplates;
 			//@}
 
 			//! @name Logging
@@ -117,7 +119,10 @@ namespace synthese
 			//@}
 				
 
+			//! @name Intermediate values
+			//@{
 				const int _totalDistance;
+			//@}
 
 			/** Best journey finder.
 				@param accessDirection Type of computing : search of better arrival or of a better departure
@@ -165,7 +170,8 @@ namespace synthese
 				const time::DateTime&				maxEndTime,
 				graph::GraphIdType			whatToSearch,
 				graph::GraphIdType			graphToUse,
-				std::ostream* logStream = NULL
+				std::ostream* logStream = NULL,
+				boost::optional<const JourneyTemplates&> journeyTemplates = boost::optional<const JourneyTemplates&>()
 			);
 
 			

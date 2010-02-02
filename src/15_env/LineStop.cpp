@@ -29,8 +29,6 @@
 #include "PhysicalStop.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 
-#include "SquareDistance.h"
-
 using namespace std;
 
 namespace synthese
@@ -81,9 +79,7 @@ namespace synthese
 			else
 				deltaMO = ( other.getMetricOffset () - getMetricOffset () ) / 1000;
 
-			const int deltaGPS = SquareDistance ( 
-			*getFromVertex (), 
-			*other.getFromVertex () ).getDistance(); // kilometers
+			const int deltaGPS = getFromVertex()->getDistanceTo(*other.getFromVertex()); // kilometers
 
 			if ( deltaMO > 10 * deltaGPS && deltaMO - deltaGPS > 1 )
 			{

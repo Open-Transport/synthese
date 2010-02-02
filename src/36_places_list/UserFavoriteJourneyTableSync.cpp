@@ -149,7 +149,7 @@ namespace synthese
 	
 	
 	
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		UserFavoriteJourneyTableSync::SearchResult UserFavoriteJourneyTableSync::Search(
 			Env& env,

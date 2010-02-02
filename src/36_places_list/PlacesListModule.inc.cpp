@@ -26,6 +26,7 @@
 #include "UserFavoriteJourneyTableSync.h"
 
 #include "SiteUpdateAction.h"
+#include "AddUserFavoriteJourneyAction.h"
 
 #include "TransportWebsiteRight.h"
 

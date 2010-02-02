@@ -42,7 +42,6 @@ namespace synthese
 	{
 		VertexAccessMap::VertexAccessMap ()
 			: _isobarycentreToUpdate (false)
-			, _isobarycenterMaxSquareDistanceUpToDate (false)
 		{
 		}
 
@@ -98,8 +97,7 @@ namespace synthese
 				// Insertion of a new vertex
 				_map.insert (std::make_pair (vertex, vertexAccess));
 				_isobarycentreToUpdate = true;
-				_isobarycenterMaxSquareDistanceUpToDate = false;
-
+				
 				// Updating the paths which needs fine stepping set
 				if (!vertex->getHub()->isConnectionPossible())
 				{
@@ -146,32 +144,6 @@ namespace synthese
 			}
 			return _isobarycentre;
 		    
-		}
-
-
-
-		const SquareDistance& VertexAccessMap::getIsobarycenterMaxSquareDistance(
-		) const	{
-			if (_isobarycenterMaxSquareDistanceUpToDate == false)
-			{
-				_isobarycenterMaxSquareDistance.setSquareDistance (0);
-				if (!_isobarycentre.isUnknown())
-				{
-					BOOST_FOREACH(const VamMap::value_type& it, _map)
-					{
-						if (it.first->getX() > 0 && it.first->getY() > 0)
-						{
-							SquareDistance sqd (*it.first, _isobarycentre);
-							if (_isobarycenterMaxSquareDistance < sqd)
-							{
-								_isobarycenterMaxSquareDistance.setSquareDistance (sqd.getSquareDistance ());
-							}
-						}
-					}
-				}
-				_isobarycenterMaxSquareDistanceUpToDate = true;
-			}
-			return _isobarycenterMaxSquareDistance;		    
 		}
 
 

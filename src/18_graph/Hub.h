@@ -92,7 +92,7 @@ namespace synthese
 
 				virtual bool containsAnyVertex(GraphIdType graphType) const = 0;
 
-				bool isConnectionPossible() const {	return getScore() > 0; }
+				virtual bool isConnectionPossible() const {	return getScore() > 0; }
 			//@}
 		};
 	}

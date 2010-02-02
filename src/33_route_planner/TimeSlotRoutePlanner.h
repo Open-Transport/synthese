@@ -27,7 +27,10 @@
 #include "Journey.h"
 #include "AccessParameters.h"
 #include "VertexAccessMap.h"
+#include "JourneyTemplates.h"
 
+#include <set>
+#include <vector>
 #include <deque>
 #include <boost/optional.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
@@ -67,6 +70,11 @@ namespace synthese
 			//! @name Logging
 			//@{
 				std::ostream* const					_logStream;
+			//@}
+
+			//! @name Intermediate values
+			//@{
+				JourneyTemplates _journeyTemplates;
 			//@}
 
 			Result _MergeSubResultAndParentContinuousService(

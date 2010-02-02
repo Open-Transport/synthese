@@ -32,6 +32,7 @@
 #include "Hub.h"
 #include "Journey.h"
 #include "JourneyComparator.h"
+#include "JourneyTemplates.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 // To be removed by a log class
 #include "LineStop.h"
@@ -58,6 +59,7 @@ namespace synthese
 	using namespace graph;
 	using namespace road;
 	using namespace geography;
+	using namespace geometry;
 
 	namespace algorithm
 	{
@@ -80,7 +82,8 @@ namespace synthese
 			bool optim,
 			optional<posix_time::time_duration> maxDuration,
 			ostream* const logStream,
-			int totalDistance
+			int totalDistance,
+			boost::optional<const JourneyTemplates&> journeyTemplates
 		):	_accessDirection(accessDirection),
 			_accessParameters(accessParameters),
 			_whatToSearch(whatToSearch),
@@ -96,7 +99,8 @@ namespace synthese
 			_optim(optim),
 			_maxDuration(maxDuration),
 			_logStream(logStream),
-			_totalDistance(totalDistance)
+			_totalDistance(totalDistance),
+			_journeyTemplates(journeyTemplates)
 		{}
 
 
@@ -455,12 +459,10 @@ namespace synthese
 								shared_ptr<Journey> resultJourney(
 									new Journey(fullApproachJourney, serviceUse)
 								);
-								resultJourney->setRoutePlanningInformations(
+								_setJourneyRoutePlanningInformations(
+									*resultJourney,
 									isGoalReached,
-									_destinationVam,
-									_originDateTime,
-									totalDuration,
-									_totalDistance
+									totalDuration
 								);
 
 
@@ -640,43 +642,84 @@ namespace synthese
 
 
 
-		bool IntegralSearcher::_JourneyComparator::operator() (shared_ptr<Journey> j1, shared_ptr<Journey> j2) const
-		{
-			assert(j1 != NULL);
-			assert(j2 != NULL);
-			assert(j1->getMethod() == j2->getMethod());
+		void IntegralSearcher::_setJourneyRoutePlanningInformations(
+			Journey& journey,
+			bool endIsReached,
+			boost::optional<boost::posix_time::time_duration> totalDuration
+		) const {
+			journey.setEndIsReached(endIsReached);
 
-			// Total duration
-			posix_time::time_duration duration1(j1->getDuration());
-			posix_time::time_duration duration2(j2->getDuration());
-
-			if (duration1 != duration2)
+			if(endIsReached)
 			{
-				return duration1 < duration2;
+				journey.setEndApproachDuration(_destinationVam.getVertexAccess(journey.getEndEdge()->getFromVertex()).approachTime);
+				journey.setDistanceToEnd(0);
 			}
-
-			// Approach and pedestrian duration
-			posix_time::time_duration pedestrianDuration1(j1->getStartApproachDuration() + j1->getEndApproachDuration());
-			posix_time::time_duration pedestrianDuration2(j2->getStartApproachDuration() + j2->getEndApproachDuration());
-
-			if (pedestrianDuration1 != pedestrianDuration2)
+			else
 			{
-				return pedestrianDuration1 < pedestrianDuration2;
+				journey.setDistanceToEnd(
+					_destinationVam.getIsobarycenter().getDistanceTo(journey.getEndEdge()->getHub()->getPoint())
+				);
+				setJourneyScore(journey, totalDuration);
 			}
-
-			// Total distance
-			
-			double distance1(j1->getDistance());
-			double distance2(j2->getDistance());
-
-			if(distance1 != distance2)
-			{
-				return distance1 < distance2;
-			}
-
-			return j1.get() < j2.get();
 		}
 
+
+
+		void IntegralSearcher::setJourneyScore(
+			Journey& journey,
+			boost::optional<boost::posix_time::time_duration> totalDuration
+		) const {
+			if(!totalDuration && logic::indeterminate(journey.getSimilarity()) && _journeyTemplates)
+			{
+				journey.setSimilarity(_journeyTemplates->testJourneySimilarity(journey));
+			}
+			if(journey.getSimilarity() == true)
+			{
+				journey.setScore(0);
+				return;
+			}
+
+			long long unsigned int estimatedTotalDuration;
+			if(totalDuration)
+			{
+				estimatedTotalDuration = totalDuration->total_seconds();
+			}
+			else
+			{
+				estimatedTotalDuration = ceil(_totalDistance * 0.36);
+			}
+			long long unsigned int distanceToEnd(journey.getDistanceToEnd());
+			long long unsigned int journeyDuration(
+				(	journey.getMethod() == DEPARTURE_TO_ARRIVAL ?
+					journey.getEndTime().getSecondsDifference(_originDateTime) :
+					_originDateTime.getSecondsDifference(journey.getEndTime())
+				).total_seconds()
+			);
+
+			Journey::Score score(
+				long long unsigned int(1000 * distanceToEnd * distanceToEnd * journeyDuration) /
+				long long unsigned int(_totalDistance * _totalDistance * estimatedTotalDuration)
+			);
+
+			HubScore hubScore(journey.getEndEdge()->getHub()->getScore());
+			if(hubScore > 1)
+			{
+				score /= hubScore;
+			}
+
+			if(score > 1000)
+			{
+				score = 1000;
+			}
+			journey.setScore(score);
+		}
+
+
+
+		const time::DateTime& IntegralSearcher::getOriginDateTime() const
+		{
+			return _originDateTime;
+		}
 
 
 		IntegralSearcher::_JourneyUsefulness::_JourneyUsefulness(

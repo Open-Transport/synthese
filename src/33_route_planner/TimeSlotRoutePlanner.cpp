@@ -63,7 +63,8 @@ namespace synthese
 			_maxSolutionsNumber(maxSolutionsNumber),
 			_accessParameters(accessParameters),
 			_planningOrder(planningOrder),
-			_logStream(logStream)
+			_logStream(logStream),
+			_journeyTemplates(graphToUse)
 		{
 		}
 
@@ -97,7 +98,8 @@ namespace synthese
 			_accessParameters(),
 			_planningOrder(planningOrder),
 			_logStream(logStream),
-			_parentContinuousService(continuousService)
+			_parentContinuousService(continuousService),
+			_journeyTemplates(graphToUse)
 		{
 			assert(continuousService.getContinuousServiceRange().total_seconds() > 60);
 		}
@@ -155,7 +157,8 @@ namespace synthese
 					_planningOrder == DEPARTURE_FIRST ? _highestArrivalTime : _lowestDepartureTime,
 					_whatToSearch,
 					_graphToUse,
-					_logStream
+					_logStream,
+					_journeyTemplates
 				);
 				RoutePlanner::Result journey(r.run());
 
@@ -183,6 +186,7 @@ namespace synthese
 						BOOST_FOREACH(const Result::value_type& sj, subResult)
 						{
 							result.push_back(sj);
+							_journeyTemplates.addResult(journey);
 						}
 					}
 					else
@@ -190,6 +194,7 @@ namespace synthese
 						for(Result::const_reverse_iterator it(subResult.rbegin()); it != subResult.rend(); ++it)
 						{
 							result.push_front(*it);
+							_journeyTemplates.addResult(journey);
 						}
 					}
 				}
@@ -200,12 +205,14 @@ namespace synthese
 						// Verifiy that the journey is not the same continuous service than the last one.
 						// If yes, enlarge the time slot of the existing continuous service
 						result.push_back(journey);
+						_journeyTemplates.addResult(journey);
 					}
 					else
 					{
 						// Verifiy that the journey is not the same continuous service than the first one.
 						// If yes, enlarge the time slot of the existing continuous service and shift it
 						result.push_front(journey);
+						_journeyTemplates.addResult(journey);
 					}
 
 				}

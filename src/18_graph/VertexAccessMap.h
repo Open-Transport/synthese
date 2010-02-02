@@ -30,7 +30,6 @@
 #include "Journey.h"
 
 #include "IsoBarycentre.h"
-#include "SquareDistance.h"
 
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
@@ -84,11 +83,9 @@ TRIDENT : VertexAccess => AccesPoint
 			std::set<const Path*> _pathOnWhichFineSteppingForArrival;
 		    
 			mutable bool _isobarycentreToUpdate;
-			mutable bool _isobarycenterMaxSquareDistanceUpToDate;
-
+		
 			mutable geometry::IsoBarycentre _isobarycentre;   //!< Isobarycenter of all points contained in this map.
-			mutable geometry::SquareDistance _isobarycenterMaxSquareDistance;   //!< Maximum square distance of one map point with the isobarycenter.
-
+		
 			boost::posix_time::time_duration _minApproachTime;
 
 
@@ -140,7 +137,6 @@ TRIDENT : VertexAccess => AccesPoint
 			);
 
 			const geometry::IsoBarycentre& getIsobarycenter () const;
-			const geometry::SquareDistance& getIsobarycenterMaxSquareDistance () const;
 		    
 			boost::posix_time::time_duration getMinApproachTime () const;
 

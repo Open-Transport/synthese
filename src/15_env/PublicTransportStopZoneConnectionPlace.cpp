@@ -252,5 +252,12 @@ namespace synthese
 		) const	{
 			return (text.empty() ? getName() : text);
 		}
+
+
+
+		bool PublicTransportStopZoneConnectionPlace::isConnectionPossible() const
+		{
+			return _allowedConnection;
+		}
 	}
 }

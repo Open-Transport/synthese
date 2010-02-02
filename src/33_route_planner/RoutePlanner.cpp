@@ -65,7 +65,8 @@ namespace synthese
 			const time::DateTime& maxEndTime,
 			graph::GraphIdType whatToSearch,
 			graph::GraphIdType graphToUse,
-			std::ostream* logStream /*= NULL*/
+			std::ostream* logStream /*= NULL*/,
+			boost::optional<const JourneyTemplates&> journeyTemplates
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_planningOrder(planningOrder),
@@ -77,7 +78,8 @@ namespace synthese
 			_whatToSearch(whatToSearch),
 			_graphToUse(graphToUse),
 			_logStream(logStream),
-			_totalDistance(destinationVam.getIsobarycenter().getDistanceTo(originVam.getIsobarycenter()))
+			_totalDistance(destinationVam.getIsobarycenter().getDistanceTo(originVam.getIsobarycenter())),
+			_journeyTemplates(journeyTemplates)
 		{
 		}
 
@@ -304,7 +306,8 @@ namespace synthese
 				secondTime,
 				_maxDuration,
 				NULL,
-				_totalDistance
+				_totalDistance,
+				_journeyTemplates
 			);
 
 			is.integralSearch(
@@ -367,7 +370,14 @@ namespace synthese
 
 				if(resultFound)
 				{
-					todo.cleanup(lastBestEndTime != bestEndTime, bestEndTime, bestVertexReachesMap, true, originDateTime, !secondTime, _totalDistance);
+					todo.cleanup(
+						lastBestEndTime != bestEndTime,
+						bestEndTime,
+						bestVertexReachesMap,
+						true,
+						!secondTime,
+						is
+					);
 				}
 
 				if(todo.empty())

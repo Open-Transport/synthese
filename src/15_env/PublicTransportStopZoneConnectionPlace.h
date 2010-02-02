@@ -37,11 +37,6 @@ namespace synthese
 	{
 		class DateTime;
 	}
-
-	namespace geometry
-	{
-		class SquareDistance; 
-	}
 	
 	namespace road
 	{
@@ -123,6 +118,8 @@ namespace synthese
 				virtual graph::HubScore getScore() const;
 
 				virtual const geometry::Point2D& getPoint() const;
+
+				virtual bool isConnectionPossible() const;
 
 				virtual std::string getNameForAllPlacesMatcher(
 					std::string text = std::string()

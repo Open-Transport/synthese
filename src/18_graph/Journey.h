@@ -28,7 +28,6 @@
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 #include "ServiceUse.h"
-#include "SquareDistance.h"
 #include "DateTime.h"
 #include "GraphTypes.h"
 
@@ -45,8 +44,9 @@ namespace synthese
 		class Journey
 		{
 		public:
-			typedef unsigned int MinSpeed;
 			typedef std::deque<ServiceUse>	ServiceUses;
+			typedef unsigned int Score;
+			typedef unsigned int Distance;
 
 		private:
 			typedef const ServiceUse& (Journey::*ServiceUseGetter) () const;
@@ -66,9 +66,9 @@ namespace synthese
 			//! @name Route planning data
 			//@{
 				bool						_endReached;
-				geometry::SquareDistance	_squareDistanceToEnd;
-				MinSpeed					_minSpeedToEnd;
-				unsigned int				_score;
+				Distance					_distanceToEnd;
+				Score						_score;
+				boost::logic::tribool		_similarity;		
 			//@}
 
 			//! @name Query cache
@@ -125,20 +125,24 @@ namespace synthese
 					@return Range duration in minutes, or 0 if unique service.
 				*/
 				boost::posix_time::time_duration			getContinuousServiceRange () const;
-				MinSpeed	getMinSpeedToEnd() const;
 				bool		getEndReached() const;
 				const time::DateTime::ComparisonOperator& getBestTimeStrictOperator() const;
-				int			getScore()	const;
+				Score			getScore()	const;
 				boost::posix_time::time_duration getStartApproachDuration()	const;
 				boost::posix_time::time_duration getEndApproachDuration()	const;
+				Distance getDistanceToEnd() const;
+				boost::logic::tribool getSimilarity() const;
 			//@}
 
 			//! @name Setters
 			//@{
 				void setContinuousServiceRange (boost::posix_time::time_duration continuousServiceRange);
-				geometry::SquareDistance getSquareDistanceToEnd() const;
 				void setStartApproachDuration(boost::posix_time::time_duration duration);
 				void setEndApproachDuration(boost::posix_time::time_duration duration);
+				void setEndIsReached(bool value);
+				void setDistanceToEnd(Distance value);
+				void setScore(Score value);
+				void setSimilarity(boost::logic::tribool value);
 			//@}
 
 			//! @name Orientation relative methods
@@ -205,31 +209,6 @@ namespace synthese
 					boost::posix_time::time_duration continuousServiceRange = boost::posix_time::not_a_date_time
 				);
 				void reverse();
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Sets the informations about the position of the journey as a route
-				/// planning result.
-				/// @param endIsReached indicates that the journey has reached the goal of
-				///		a route planning.
-				/// @param goal the goal vertex access map
-				/// @param bestTimeAtGoal the best time found for an other journey to reach
-				///		the goal
-				/// Sets :
-				///		- route planning informations
-				///		- end arrival time
-				void setRoutePlanningInformations(
-					bool endIsReached,
-					const VertexAccessMap& goal,
-					const time::DateTime& originDateTime,
-					boost::optional<boost::posix_time::time_duration> totalDuration,
-					int totalDistance
-				);
-
-				void setMinSpeedToEnd(
-					const time::DateTime& originDateTime,
-					boost::optional<boost::posix_time::time_duration> totalDuration,
-					int totalDistance
-				);
 			//@}
 
 //			Journey& operator = (const Journey& ref);

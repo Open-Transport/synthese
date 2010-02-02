@@ -44,10 +44,10 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, routeplanner::AddUserFavoriteJourneyAction>::FACTORY_KEY("add_favorite_journey");
+		template<> const string FactorableTemplate<Action, transportwebsite::AddUserFavoriteJourneyAction>::FACTORY_KEY("add_favorite_journey");
 	}
 
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		const string AddUserFavoriteJourneyAction::PARAMETER_USER_ID = Action_PARAMETER_PREFIX + "uid";
 		const string AddUserFavoriteJourneyAction::PARAMETER_ORIGIN_CITY_NAME = Action_PARAMETER_PREFIX + "ocn";

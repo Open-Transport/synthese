@@ -113,22 +113,22 @@ namespace synthese
 
 			// Origin and destination places
 			optional<RegistryKeyType> favoriteId(map.getOptional<RegistryKeyType>(PARAMETER_FAVORITE_ID));
-			if (favoriteId) // 2b
-			{
-				try
-				{
-					_favorite = UserFavoriteJourneyTableSync::Get(*favoriteId, Env::GetOfficialEnv());
-					_originCityText = _favorite->getOriginCityName();
-					_originPlaceText = _favorite->getOriginPlaceName();
-					_destinationCityText = _favorite->getDestinationCityName();
-					_destinationPlaceText = _favorite->getDestinationPlaceName();
-				}
-				catch(ObjectNotFoundException<UserFavoriteJourney> e)
-				{
-					throw RequestException(e.getMessage());
-				}
-			}
-			else // 2a
+//			if (favoriteId) // 2b
+//			{
+//				try
+//				{
+//					_favorite = UserFavoriteJourneyTableSync::Get(*favoriteId, Env::GetOfficialEnv());
+//					_originCityText = _favorite->getOriginCityName();
+//					_originPlaceText = _favorite->getOriginPlaceName();
+//					_destinationCityText = _favorite->getDestinationCityName();
+//					_destinationPlaceText = _favorite->getDestinationPlaceName();
+//				}
+//				catch(ObjectNotFoundException<UserFavoriteJourney> e)
+//				{
+//					throw RequestException(e.getMessage());
+//				}
+//			}
+//			else // 2a
 			{
 				_originCityText = map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT);
 				_destinationCityText = map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT);
@@ -353,12 +353,12 @@ namespace synthese
 						;
 					}
 					stream << " />";
-					if(_favorite.get())
-					{
-						stream <<
-							"<favorite id=\"" << _favorite->getKey() << "\" />"
-						;
-					}
+//					if(_favorite.get())
+//					{
+//						stream <<
+//							"<favorite id=\"" << _favorite->getKey() << "\" />"
+//						;
+//					}
 
 					if(_rollingStockFilter.get())
 					{
@@ -765,8 +765,8 @@ namespace synthese
 		) const {
 			if(	_favorite.get() &&
 				(	!session ||
-					!session->getUser() ||
-					_favorite->getUser()->getKey() != session->getUser()->getKey()
+					!session->getUser()
+//					|| _favorite->getUser()->getKey() != session->getUser()->getKey()
 			)	){
 				return false;
 			}

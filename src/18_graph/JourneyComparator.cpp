@@ -38,10 +38,6 @@ namespace synthese
 			assert(j1 != NULL);
 			assert(j2 != NULL);
 			assert(j1->getMethod() == j2->getMethod());
-			//assert(j1->getSquareDistanceToEnd().getSquareDistance() != UNKNOWN_VALUE);
-			//assert(j2->getSquareDistanceToEnd().getSquareDistance() != UNKNOWN_VALUE);
-
-			/// @todo Add imitation function (which search to imitate _results.rbegin and _results.rbegin+1
 
 			// Priority 1 : end is reached
 			if (j1->getEndReached() != j2->getEndReached())
@@ -87,12 +83,12 @@ namespace synthese
 				return j1 < j2;
 			}
 			if (j1->getScore() != j2->getScore())
-				return j1->getScore() < j2->getScore(); // inverser
+				return j1->getScore() < j2->getScore();
 			
-			// Priority 2 : min speed to end
-			if (j1->getMinSpeedToEnd() != j2->getMinSpeedToEnd())
-				return j1->getMinSpeedToEnd() < j2->getMinSpeedToEnd();
-			// comparer square distance
+			// Priority 2 : max distance
+			if (j1->getDistanceToEnd() != j2->getDistanceToEnd())
+				return j1->getDistanceToEnd() < j2->getDistanceToEnd();
+
 			// Priority 3 : end time
 			if (j1->getEndTime() != j2->getEndTime())
 				return (j1->getEndTime().*j1->getBestTimeStrictOperator())(j2->getEndTime());

@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_AddUserFavoriteJourneyAction_H__
 #define SYNTHESE_AddUserFavoriteJourneyAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -38,10 +37,10 @@ namespace synthese
 		class User;
 	}
 
-	namespace routeplanner
+	namespace transportwebsite
 	{
 		/** AddUserFavoriteJourneyAction action class.
-			@ingroup m53Actions refActions
+			@ingroup m51Actions refActions
 		*/
 		class AddUserFavoriteJourneyAction
 			: public util::FactorableTemplate<server::Action, AddUserFavoriteJourneyAction>

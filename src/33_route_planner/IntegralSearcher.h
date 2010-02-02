@@ -50,6 +50,8 @@ namespace synthese
 	namespace algorithm
 	{
 		class BestVertexReachesMap;
+		class JourneyTemplates;
+
 
 		/** IntegralSearcher class.
 			@ingroup m33
@@ -72,11 +74,6 @@ namespace synthese
 				_JourneyUsefulness(bool _canBeAResultPart, bool _continueToTraverseThePath);
 			};
 
-			class _JourneyComparator
-			{
-			public:
-				bool operator()(boost::shared_ptr<graph::Journey> j1, boost::shared_ptr<graph::Journey> j2) const;
-			};
 
 			//! @name Parameters
 			//@{
@@ -87,15 +84,20 @@ namespace synthese
 				const graph::GraphIdType					_graphToUse;
 				JourneysResult<graph::JourneyComparator>&	_result;
 				BestVertexReachesMap&						_bestVertexReachesMap;
-				const graph::VertexAccessMap&				_destinationVam;	//!< Can be a departure or an arrival, according to _accesDirection
 				const time::DateTime&						_originDateTime;
 				const time::DateTime&						_minMaxDateTimeAtOrigin;
 				time::DateTime&								_minMaxDateTimeAtDestination;
-				const bool									_inverted;	//!< Indicates that the AccessDirection is the contraty to the planning order (2nd passe)
+				const bool									_inverted;	//!< Indicates that the AccessDirection is the contrary to the planning order (2nd phase)
 				const bool									_optim;
 				std::ostream* const							_logStream;
 				boost::optional<boost::posix_time::time_duration>	_maxDuration;
-				const int		_totalDistance;
+			//@}
+
+			//! @name Route planning data
+			//@{
+				const graph::VertexAccessMap&				_destinationVam;	//!< Can be a departure or an arrival, according to _accesDirection
+				const int									_totalDistance;
+				boost::optional<const JourneyTemplates&>	_journeyTemplates;	//!< For similarity test
 			//@}
 
 
@@ -107,6 +109,24 @@ namespace synthese
 				boost::optional<std::size_t> maxDepth,
 				boost::optional<boost::posix_time::time_duration> totalDuration
 			);
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Sets the informations about the position of the journey as a route
+			/// planning result.
+			/// @param endIsReached indicates that the journey has reached the goal of
+			///		a route planning.
+			/// @param goal the goal vertex access map
+			/// @param bestTimeAtGoal the best time found for an other journey to reach
+			///		the goal
+			/// Sets :
+			///		- route planning informations
+			///		- end arrival time
+			void _setJourneyRoutePlanningInformations(
+				graph::Journey& journey,
+				bool endIsReached,
+				boost::optional<boost::posix_time::time_duration> totalDuration
+			) const;
 
 		public:
 			IntegralSearcher(
@@ -125,7 +145,8 @@ namespace synthese
 				bool												optim,
 				boost::optional<boost::posix_time::time_duration>	maxDuration,
 				std::ostream* const									logStream = NULL,
-				int													totalDistance = 0
+				int													totalDistance = 0,
+				boost::optional<const JourneyTemplates&>			journeyTemplates = boost::optional<const JourneyTemplates&>()
 			);
 
 
@@ -166,6 +187,18 @@ namespace synthese
 				boost::shared_ptr<graph::Journey> journey
 			) const;
 
+
+
+
+			void setJourneyScore(
+				graph::Journey& journey,
+				boost::optional<boost::posix_time::time_duration> totalDuration
+			) const;
+
+			//! @name Getters
+			//@{
+				const time::DateTime& getOriginDateTime() const;
+			//@}
 		};
 	}
 }

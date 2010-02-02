@@ -43,6 +43,8 @@ namespace synthese
 {
 	namespace algorithm
 	{
+		class IntegralSearcher;
+
 		/** List of journeys that should be part of the result of a routing process.
 			@ingroup m53
 		*/
@@ -204,9 +206,8 @@ namespace synthese
 					const time::DateTime& newMaxTime,
 					BestVertexReachesMap& bvrm,
 					bool propagateInConnectionPlace,
-					const time::DateTime& originDateTime,
 					bool strict,
-					int totalDistance
+					const IntegralSearcher& is
 				){
 					std::vector<boost::shared_ptr<graph::Journey> > journeysToAdd;
 					std::vector<boost::shared_ptr<graph::Journey> > journeysToRemove;
@@ -225,9 +226,12 @@ namespace synthese
 						{
 							_result.erase(it->second);
 							_index.erase(it);
-							journey->setMinSpeedToEnd(
-								originDateTime,
-								journey->getMethod() == graph::DEPARTURE_TO_ARRIVAL ? newMaxTime.getSecondsDifference(originDateTime) : originDateTime.getSecondsDifference(newMaxTime), totalDistance);
+							is.setJourneyScore(
+								*journey,
+								journey->getMethod() == graph::DEPARTURE_TO_ARRIVAL ?
+									newMaxTime.getSecondsDifference(is.getOriginDateTime()) : 
+									is.getOriginDateTime().getSecondsDifference(newMaxTime)
+							);
 							journeysToAdd.push_back(journey);
 						}
 						it = next;

@@ -56,9 +56,9 @@ namespace synthese
 			, _startApproachDuration(posix_time::minutes(0))
 			, _endApproachDuration(posix_time::minutes(0))
 			, _endReached(false)
-			, _squareDistanceToEnd(UNKNOWN_VALUE)
-			, _minSpeedToEnd(UNKNOWN_VALUE),
-			_method(UNDEFINED_DIRECTION)
+			, _distanceToEnd(UNKNOWN_VALUE),
+			_method(UNDEFINED_DIRECTION),
+			_similarity(logic::indeterminate)
 		{
 		}
 
@@ -83,8 +83,8 @@ namespace synthese
 			_startApproachDuration(journey._startApproachDuration),
 			_endApproachDuration(posix_time::minutes(0)),
 			_endReached(false),
-			_squareDistanceToEnd(UNKNOWN_VALUE),
-			_minSpeedToEnd(UNKNOWN_VALUE)
+			_distanceToEnd(UNKNOWN_VALUE),
+			_similarity(journey._similarity == false ? false : indeterminate)
 		{
 			assert(journey._method == UNDEFINED_DIRECTION || journey._method == serviceUse.getMethod());
 
@@ -120,8 +120,8 @@ namespace synthese
 			_startApproachDuration(journey1._startApproachDuration),
 			_endApproachDuration(journey2._endApproachDuration),
 			_endReached(journey2._endReached),
-			_squareDistanceToEnd(journey2._squareDistanceToEnd),
-			_minSpeedToEnd(journey2._minSpeedToEnd)
+			_distanceToEnd(journey2._distanceToEnd),
+			_similarity(journey1._similarity == false ? false : logic::indeterminate)
 		{
 			assert(journey1._method == UNDEFINED_DIRECTION || journey2._method == UNDEFINED_DIRECTION || journey1._method == journey2._method);
 
@@ -475,14 +475,9 @@ namespace synthese
 
 
 
-		Journey::MinSpeed Journey::getMinSpeedToEnd() const
+		Journey::Distance Journey::getDistanceToEnd() const
 		{
-			return _minSpeedToEnd;
-		}
-
-		SquareDistance Journey::getSquareDistanceToEnd() const
-		{
-			return _squareDistanceToEnd;
+			return _distanceToEnd;
 		}
 
 		bool Journey::getEndReached() const
@@ -523,7 +518,7 @@ namespace synthese
 			}
 		}
 
-		int Journey::getScore() const
+		Journey::Score Journey::getScore() const
 		{
 			return _score;
 		}
@@ -584,74 +579,44 @@ namespace synthese
 
 
 
-		void Journey::setRoutePlanningInformations(
-			bool endIsReached,
-			const VertexAccessMap& goal,
-			const time::DateTime& originDateTime,
-			optional<posix_time::time_duration> totalDuration,
-			int totalDistance
-		){
-			_endReached = endIsReached;
-
-			if(_endReached)
-			{
-				_endApproachDuration = goal.getVertexAccess(getEndEdge()->getFromVertex()).approachTime;
-				_squareDistanceToEnd = 0;
-				_minSpeedToEnd = 0;
-			}
-			else
-			{
-				_squareDistanceToEnd.setFromPoints(
-					goal.getIsobarycenter(),
-					getEndEdge()->getHub()->getPoint()
-				);
-
-				setMinSpeedToEnd(originDateTime, totalDuration, totalDistance);
-			}
-
-		}
-
-
-
-		void Journey::setMinSpeedToEnd(
-			const time::DateTime& originDateTime,
-			optional<posix_time::time_duration> totalDuration,
-			int totalDistance
-		){
-			long long unsigned int estimatedTotalDuration;
-			if(totalDuration)
-			{
-				estimatedTotalDuration = totalDuration->total_seconds();
-			}
-			else
-			{
-				estimatedTotalDuration = ceil(totalDistance * 0.36);
-			}
-			long long unsigned int distanceToEnd(1000 * _squareDistanceToEnd.getDistance());
-			long long unsigned int journeyDuration(getDuration().total_seconds());
-
-			_score = static_cast<unsigned int>(
-				long long unsigned int(1000 * distanceToEnd * journeyDuration) /
-				long long unsigned int(totalDistance * estimatedTotalDuration)
-			);
-
-			HubScore hubScore(getEndEdge()->getHub()->getScore());
-			if(hubScore > 1)
-			{
-				_score /= hubScore;
-			}
-
-			if(_score > 1000)
-			{
-				_score = 1000;
-			}
-		}
-
-
-
 		void Journey::setEndApproachDuration( boost::posix_time::time_duration duration )
 		{
 			_endApproachDuration = duration;
+		}
+
+
+
+		void Journey::setEndIsReached( bool value )
+		{
+			_endReached = value;
+		}
+
+
+
+		void Journey::setDistanceToEnd(Distance value )
+		{
+			_distanceToEnd = value;
+		}
+
+
+
+		void Journey::setScore( Score value )
+		{
+			_score = value;
+		}
+
+
+
+		boost::logic::tribool Journey::getSimilarity() const
+		{
+			return _similarity;
+		}
+
+
+
+		void Journey::setSimilarity( boost::logic::tribool value )
+		{
+			_similarity = value;
 		}
 	}
 }
