@@ -30,7 +30,7 @@
 #include <boost/foreach.hpp>
 
 #include "BestVertexReachesMap.h"
-
+#include "IntegralSearcher.h"
 #include "Journey.h"
 #include "Edge.h"
 #include "Vertex.h"
