@@ -39,7 +39,7 @@ namespace synthese
 	{
 		RoutePlannerLogger::RoutePlannerLogger(
 			std::ostream& stream,
-			const JourneysResult<graph::JourneyComparator> emptyTodo,
+			const JourneysResult& emptyTodo,
 			const graph::Journey& result
 		):	_stream(stream),
 			_t(9, ResultHTMLTable::CSS_CLASS),
@@ -50,7 +50,7 @@ namespace synthese
 
 
 		void RoutePlannerLogger::recordIntegralSearch(
-			const JourneysResult<JourneyComparator>& todo
+			const JourneysResult& todo
 		){
 			++_searchNumber;
 
@@ -61,7 +61,7 @@ namespace synthese
 			_stream << _t.col(6, string(), true);
 
 			_todoBeforeClean.clear();
-			BOOST_FOREACH(const JourneysResult<JourneyComparator>::ResultSet::value_type& it, todo.getJourneys())
+			BOOST_FOREACH(const JourneysResult::ResultSet::value_type& it, todo.getJourneys())
 			{
 				_todoBeforeClean.push_back(
 					it.first
@@ -71,7 +71,7 @@ namespace synthese
 
 
 		void RoutePlannerLogger::recordCleanup(
-			const JourneysResult<JourneyComparator>& todo
+			const JourneysResult& todo
 		){
 
 /*							// Departure time
@@ -220,7 +220,7 @@ namespace synthese
 			}
 
 			_lastTodo.clear();
-			BOOST_FOREACH(const JourneysResult<JourneyComparator>::ResultSet::value_type& it, todo.getJourneys())
+			BOOST_FOREACH(const JourneysResult::ResultSet::value_type& it, todo.getJourneys())
 			{
 				_lastTodo.insert(make_pair(it.first->getEndEdge()->getFromVertex(), it.first));
 			}

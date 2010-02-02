@@ -27,7 +27,6 @@
 #include "Log.h"
 #include "JourneysResult.h"
 #include "VertexAccessMap.h"
-#include "JourneyComparator.h"
 #include "IntegralSearcher.h"
 #include "PhysicalStop.h"
 #include "NamedPlace.h"
@@ -95,7 +94,7 @@ namespace synthese
 			VertexAccessMap result;
 
 			// Create origin vam from integral search on roads
-			JourneysResult<JourneyComparator> resultJourneys(
+			JourneysResult resultJourneys(
 				direction == DEPARTURE_TO_ARRIVAL ?
 				getLowestDepartureTime() :
 				getHighestArrivalTime()
@@ -161,9 +160,9 @@ namespace synthese
 
 
 			Journey candidate;
-			BOOST_FOREACH(const JourneysResult<JourneyComparator>::ResultSet::value_type& it, resultJourneys.getJourneys())
+			BOOST_FOREACH(const JourneysResult::ResultSet::value_type& it, resultJourneys.getJourneys())
 			{
-				JourneysResult<JourneyComparator>::ResultSet::key_type oj(it.first);
+				JourneysResult::ResultSet::key_type oj(it.first);
 
 				// Store each reached physical stop with full approach time addition :
 				//	- approach time in departure place

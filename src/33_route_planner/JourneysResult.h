@@ -29,8 +29,8 @@
 #include <sstream>
 #include <boost/foreach.hpp>
 
+#include "JourneyComparator.h"
 #include "BestVertexReachesMap.h"
-#include "IntegralSearcher.h"
 #include "Journey.h"
 #include "Edge.h"
 #include "Vertex.h"
@@ -48,14 +48,13 @@ namespace synthese
 		/** List of journeys that should be part of the result of a routing process.
 			@ingroup m53
 		*/
-		template<class JourneyComparator>
 		class JourneysResult
 		{			
 		public:
 			typedef std::map<
 				boost::shared_ptr<graph::Journey>,
 				boost::posix_time::time_duration,
-				JourneyComparator
+				graph::JourneyComparator
 			> ResultSet;
 
 		private:
@@ -73,20 +72,7 @@ namespace synthese
 			{}
 
 
-			void operator=(const JourneysResult<JourneyComparator>& other)
-			{
-				_originDateTime = other._originDateTime;
-				_accessDirection = other._accessDirection;
-				_result = other._result;
-				for(typename ResultSet::iterator it(_result.begin()); it != _result.end(); ++it)
-				{
-					_index.insert(
-						std::make_pair(
-							it->first->getEndEdge()->getFromVertex(),
-							it
-					)	);
-				}
-			}
+			void operator=(const JourneysResult& other);
 
 
 
@@ -96,10 +82,7 @@ namespace synthese
 					@return const ResultSet& the result
 					@author Hugues Romain
 				*/
-				const ResultSet& getJourneys() const
-				{
-					return _result;
-				}
+				const ResultSet& getJourneys() const;
 			//@}
 
 
@@ -110,52 +93,17 @@ namespace synthese
 					@param journey the journey to remove
 					@author Hugues Romain
 				*/
-				void remove(boost::shared_ptr<graph::Journey> journey)
-				{
-					const graph::Vertex* vertex(journey->getEndEdge()->getFromVertex());
-					remove(vertex);
-				}
+				void remove(boost::shared_ptr<graph::Journey> journey);
 
 
-
-				void remove(const graph::Vertex* vertex)
-				{
-					typename IndexMap::iterator it(_index.find(vertex));
-					if (it != _index.end())
-					{
-						typename ResultSet::iterator its(it->second);
-						_result.erase(its);
-						_index.erase(it);
-					}
-				}
-
+				void remove(const graph::Vertex* vertex);
 
 
 				/** Adds a journey to the result object.
 					@param journey the journey to add
 					@author Hugues Romain
 				*/
-				void add(boost::shared_ptr<graph::Journey> journey)
-				{
-					if(!_accessDirection) _accessDirection = journey->getMethod();
-					assert(*_accessDirection == journey->getMethod());
-
-					const graph::Vertex* vertex(journey->getEndEdge()->getFromVertex());
-					boost::posix_time::time_duration duration(
-						_accessDirection == graph::DEPARTURE_TO_ARRIVAL ?
-						journey->getEndTime().getSecondsDifference(_originDateTime) :
-						_originDateTime.getSecondsDifference(journey->getEndTime())
-					);
-					remove(vertex);
-					_index.insert(
-						std::make_pair(
-							vertex,
-							_result.insert(
-								std::make_pair(journey, duration)
-							).first
-					)	);
-				}
-
+				void add(boost::shared_ptr<graph::Journey> journey);
 			
 				
 				/** Adds an empty journey for a specified vertex.
@@ -163,19 +111,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008					
 				*/
-				void addEmptyJourney()
-				{
-					graph::Vertex* nullVertex(NULL);
-					_index.insert(
-						std::make_pair(
-							nullVertex,
-							_result.insert(
-								std::make_pair(
-									boost::shared_ptr<graph::Journey>(new graph::Journey),
-									boost::posix_time::minutes(0)
-							)	).first
-					)	);
-				}
+				void addEmptyJourney();
 
 
 
@@ -183,15 +119,7 @@ namespace synthese
 					@return Pointer to the first journey
 					@warning The returned pointer must be deleted after use
 				*/
-				boost::shared_ptr<graph::Journey> front()
-				{
-					assert(!empty());
-
-					boost::shared_ptr<graph::Journey> ptr(_result.begin()->first);
-					_index.erase(ptr->empty() ? NULL : ptr->getEndEdge()->getFromVertex());
-					_result.erase(_result.begin());
-					return ptr;
-				}
+				boost::shared_ptr<graph::Journey> front();
 
 				
 				
@@ -208,43 +136,7 @@ namespace synthese
 					bool propagateInConnectionPlace,
 					bool strict,
 					const IntegralSearcher& is
-				){
-					std::vector<boost::shared_ptr<graph::Journey> > journeysToAdd;
-					std::vector<boost::shared_ptr<graph::Journey> > journeysToRemove;
-					for (typename IndexMap::iterator it(_index.begin()); it != _index.end();)
-					{
-						boost::shared_ptr<graph::Journey> journey(it->second->first);
-						typename IndexMap::iterator next(it);
-						++next;
-						if(	journey->getMethod() == graph::DEPARTURE_TO_ARRIVAL && journey->getEndTime() >= newMaxTime ||
-							journey->getMethod() == graph::ARRIVAL_TO_DEPARTURE && journey->getEndTime() <= newMaxTime
-							// Add reach ability test
-						){
-							journeysToRemove.push_back(journey);
-						}
-						else if (updateMinSpeed)
-						{
-							_result.erase(it->second);
-							_index.erase(it);
-							is.setJourneyScore(
-								*journey,
-								journey->getMethod() == graph::DEPARTURE_TO_ARRIVAL ?
-									newMaxTime.getSecondsDifference(is.getOriginDateTime()) : 
-									is.getOriginDateTime().getSecondsDifference(newMaxTime)
-							);
-							journeysToAdd.push_back(journey);
-						}
-						it = next;
-					}
-					BOOST_FOREACH(boost::shared_ptr<graph::Journey> journey, journeysToRemove)
-					{
-						remove(journey);
-					}
-					BOOST_FOREACH(boost::shared_ptr<graph::Journey> journey, journeysToAdd)
-					{
-						add(journey);
-					}
-				}
+				);
 			//@}
 
 
@@ -256,28 +148,15 @@ namespace synthese
 					@return const env::Journey* const The result journey that reaches the specified vertex
 					@author Hugues Romain
 				*/
-				boost::shared_ptr<graph::Journey> get(const graph::Vertex* vertex) const
-				{
-					typename IndexMap::const_iterator it(_index.find(vertex));
-					if (it != _index.end())
-					{
-						typename ResultSet::const_iterator its(it->second);
-						return its->first;
-					}
-					else
-						return boost::shared_ptr<graph::Journey>();
-				}
-
+				boost::shared_ptr<graph::Journey> get(const graph::Vertex* vertex) const;
+				
 				
 				
 				/** Is the result empty ?.
 					@return bool true if the result is empty
 					@author Hugues Romain
 				*/
-				bool empty() const
-				{
-					return _result.empty();
-				}
+				bool empty() const;
 			//@}
 		};
 	}

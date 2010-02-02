@@ -25,7 +25,6 @@
 
 #include "HTMLTable.h"
 #include "JourneysResult.h"
-#include "JourneyComparator.h"
 #include "Journey.h"
 
 namespace synthese
@@ -51,13 +50,13 @@ namespace synthese
 		public:
 			RoutePlannerLogger(
 				std::ostream& stream,
-				const JourneysResult<graph::JourneyComparator> emptyTodo,
+				const JourneysResult& emptyTodo,
 				const graph::Journey& result
 			);
 
 			void open();
-			void recordIntegralSearch(const JourneysResult<graph::JourneyComparator>& todo);
-			void recordCleanup(const JourneysResult<graph::JourneyComparator>& todo);
+			void recordIntegralSearch(const JourneysResult& todo);
+			void recordCleanup(const JourneysResult& todo);
 			void recordNewResult(const graph::Journey& result);
 			void close();
 		};

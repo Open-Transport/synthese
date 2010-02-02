@@ -72,7 +72,7 @@ namespace synthese
 			GraphIdType whatToSearch,
 			bool searchOnlyNodes,
 			GraphIdType graphToUse,
-			JourneysResult<graph::JourneyComparator>&	result,
+			JourneysResult&	result,
 			BestVertexReachesMap& bestVertexReachesMap,
 			const VertexAccessMap& destinationVam,
 			const DateTime&			originDateTime,
@@ -156,7 +156,7 @@ namespace synthese
 			boost::optional<boost::posix_time::time_duration> totalDuration
 		){
 			// Recursions to do
-			JourneysResult<JourneyComparator> todo(_originDateTime);
+			JourneysResult todo(_originDateTime);
 			todo.addEmptyJourney();
 
 			if (_logStream)

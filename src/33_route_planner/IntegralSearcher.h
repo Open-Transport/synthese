@@ -82,7 +82,7 @@ namespace synthese
 				const graph::GraphIdType					_whatToSearch;
 				const bool									_searchOnlyNodes;
 				const graph::GraphIdType					_graphToUse;
-				JourneysResult<graph::JourneyComparator>&	_result;
+				JourneysResult&								_result;
 				BestVertexReachesMap&						_bestVertexReachesMap;
 				const time::DateTime&						_originDateTime;
 				const time::DateTime&						_minMaxDateTimeAtOrigin;
@@ -135,7 +135,7 @@ namespace synthese
 				graph::GraphIdType									whatToSearch,
 				bool												searchOnlyNodes,
 				graph::GraphIdType									graphToUse,
-				JourneysResult<graph::JourneyComparator>&			result,
+				JourneysResult&										result,
 				BestVertexReachesMap&								bestVertexReachesMap,
 				const graph::VertexAccessMap&						destinationVam,
 				const time::DateTime&								originDateTime,

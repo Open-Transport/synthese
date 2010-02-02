@@ -30,7 +30,6 @@
 #include "Vertex.h"
 #include "Journey.h"
 #include "VertexAccessMap.h"
-#include "JourneyComparator.h"
 #include "RoutePlannerLogger.h"
 
 #include <algorithm>
@@ -271,7 +270,7 @@ namespace synthese
 
 			DateTime __minMaxDateTimeAtDestination(minMaxDateTimeAtDestination);
 
-			JourneysResult<JourneyComparator> todo(originDateTime);
+			JourneysResult todo(originDateTime);
 			
 			DateTime bestEndTime(minMaxDateTimeAtDestination);
 			DateTime lastBestEndTime(minMaxDateTimeAtDestination);
@@ -333,10 +332,10 @@ namespace synthese
 				bool resultFound(false);
 
 				// Take into account of the end reached journeys
-				for(JourneysResult<JourneyComparator>::ResultSet::const_iterator it(todo.getJourneys().begin());
+				for(JourneysResult::ResultSet::const_iterator it(todo.getJourneys().begin());
 					it != todo.getJourneys().end();
 				){
-					JourneysResult<JourneyComparator>::ResultSet::const_iterator next(it);
+					JourneysResult::ResultSet::const_iterator next(it);
 					++next;
 					const Journey& journey(*it->first);
 					
