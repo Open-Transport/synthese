@@ -106,7 +106,7 @@ namespace synthese
 			
 			stream << "<ul>";
 
-			AdminRequest r(_request);
+			AdminRequest r(_request, true);
 			AdminInterfaceElement::PageLinks links(getSubPages(*this, _request));
 			BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> page, links)
 			{

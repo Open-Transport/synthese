@@ -105,7 +105,7 @@ namespace synthese
 				" customerName=\"" << (resa.get() ? resa->getCustomerName() : string()) << "\"" <<
 				" customerPhone=\"" << (resa.get() ? resa->getCustomerPhone() : string()) << "\"" <<
 				" status=\"" << (resa.get() ? ResaModule::GetStatusText(resa->getStatus()) : "N.A.") << "\"" <<
-				" canBeCancelled=\"" << (resa.get() ? lexical_cast<string>(resa->getReservationDeadLine() > DateTime(TIME_CURRENT) && !resa->getCancellationTime().isUnknown()) : "0") << "\"" <<
+				" canBeCancelled=\"" << (resa.get() ? lexical_cast<string>(resa->getReservationDeadLine() < DateTime(TIME_CURRENT) && resa->getCancellationTime().isUnknown()) : "0") << "\"" <<
 				" seats=\"" << (resa.get() ? lexical_cast<string>(resa->getSeats()) : "0") << "\"";
 			if(resa.get() && !resa->getCancellationTime().isUnknown())
 			{

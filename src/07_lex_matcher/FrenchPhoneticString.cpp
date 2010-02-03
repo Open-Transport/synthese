@@ -111,6 +111,8 @@ namespace synthese
 					}
 
 					if(	(	_IsFollowedBy(source, pos, "i") ||
+							_IsFollowedBy(source, pos, "ï") ||
+							_IsFollowedBy(source, pos, "ì") ||
 							_IsFollowedBy(source, pos, "y") ||
 							_IsFollowedBy(source, pos, "e")
 						) && !_IsFollowedBy(source, pos, "il")
@@ -281,6 +283,8 @@ namespace synthese
 						_IsFollowedBy(source, pos, "è") ||
 						_IsFollowedBy(source, pos, "ë") ||
 						_IsFollowedBy(source, pos, "i") ||
+						_IsFollowedBy(source, pos, "ï") ||
+						_IsFollowedBy(source, pos, "î") ||
 						_IsFollowedBy(source, pos, "y")
 					){
 						result.push_back(J);
@@ -342,6 +346,7 @@ namespace synthese
 							!_IsFollowedBy(source, pos, "ni") &&
 							!_IsFollowedBy(source, pos, "nì") &&
 							!_IsFollowedBy(source, pos, "nï") &&
+							!_IsFollowedBy(source, pos, "nî") &&
 							!_IsFollowedBy(source, pos, "no") &&
 							!_IsFollowedBy(source, pos, "nu") &&
 							!_IsFollowedBy(source, pos, "ny") &&
