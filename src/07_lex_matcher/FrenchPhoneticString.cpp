@@ -408,7 +408,24 @@ namespace synthese
 				case 'o':
 				case 'ò':
 				case 'ô':
-					if(	_IsFollowedBy(source, pos, "n") ||
+					if(		_IsFollowedBy(source, pos, "n") &&
+							!_IsFollowedBy(source, pos, "na") &&
+							!_IsFollowedBy(source, pos, "nà") &&
+							!_IsFollowedBy(source, pos, "nä") &&
+							!_IsFollowedBy(source, pos, "ne") &&
+							!_IsFollowedBy(source, pos, "né") &&
+							!_IsFollowedBy(source, pos, "në") &&
+							!_IsFollowedBy(source, pos, "ni") &&
+							!_IsFollowedBy(source, pos, "nï") &&
+							!_IsFollowedBy(source, pos, "nì") &&
+							!_IsFollowedBy(source, pos, "no") &&
+							!_IsFollowedBy(source, pos, "nò") &&
+							!_IsFollowedBy(source, pos, "nô") &&
+							!_IsFollowedBy(source, pos, "nu") &&
+							!_IsFollowedBy(source, pos, "nù") &&
+							!_IsFollowedBy(source, pos, "nû") &&
+							!_IsFollowedBy(source, pos, "ny")
+						||
 						_IsFollowedBy(source, pos, "mp") ||
 						_IsFollowedBy(source, pos, "mb")
 					){
