@@ -418,6 +418,7 @@ namespace synthese
 							!_IsFollowedBy(source, pos, "ni") &&
 							!_IsFollowedBy(source, pos, "nï") &&
 							!_IsFollowedBy(source, pos, "nì") &&
+							!_IsFollowedBy(source, pos, "nn") &&
 							!_IsFollowedBy(source, pos, "no") &&
 							!_IsFollowedBy(source, pos, "nò") &&
 							!_IsFollowedBy(source, pos, "nô") &&
