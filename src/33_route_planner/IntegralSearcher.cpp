@@ -696,10 +696,14 @@ namespace synthese
 				).total_seconds()
 			);
 
+
 			Journey::Score score(
+				(_totalDistance == 0 || estimatedTotalDuration == 0) ?
+				1000 :
 				long long unsigned int(1000 * distanceToEnd * distanceToEnd * journeyDuration) /
 				long long unsigned int(_totalDistance * _totalDistance * estimatedTotalDuration)
 			);
+
 
 			HubScore hubScore(journey.getEndEdge()->getHub()->getScore());
 			if(hubScore > 1)

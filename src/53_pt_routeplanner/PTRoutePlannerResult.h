@@ -397,6 +397,8 @@ namespace synthese
 			const PlaceList& getOrderedPlaces() const;
 			const geography::Place* getDeparturePlace() const;
 			const geography::Place* getArrivalPlace() const;
+			
+			void removeFirstJourneys(size_t value);
 
 
 

@@ -269,22 +269,37 @@ namespace synthese
 			VariablesMap vm;
 			if (_departure_place.placeResult.value && _arrival_place.placeResult.value)
 			{
+				DateTime startDate(_planningOrder == DEPARTURE_FIRST ? _startDate : _endArrivalDate);
+				if(_planningOrder == ARRIVAL_FIRST)
+				{
+					startDate = Hour(3,0);
+				}
+				DateTime endDate(_planningOrder == DEPARTURE_FIRST ? _endDate : _endArrivalDate);
+
+
 				// Initialisation
 				PTTimeSlotRoutePlanner r(
 					_departure_place.placeResult.value,
 					_arrival_place.placeResult.value,
-					_startDate,
-					_endDate,
-					_startArrivalDate,
+					startDate,
+					endDate,
+					_planningOrder == DEPARTURE_FIRST ? _startArrivalDate : startDate,
 					_endArrivalDate,
-					_maxSolutionsNumber,
+					_planningOrder == DEPARTURE_FIRST ? _maxSolutionsNumber : optional<size_t>(),
 					_accessParameters,
-					_planningOrder
+					DEPARTURE_FIRST
 				);
-				
+
 				// Computing
-				const PTRoutePlannerResult result(r.run());
-				
+				PTRoutePlannerResult result = r.run();
+
+				if(	_planningOrder == ARRIVAL_FIRST &&
+					_maxSolutionsNumber &&
+					result.getJourneys().size() > *_maxSolutionsNumber
+				){
+					result.removeFirstJourneys(result.getJourneys().size() - *_maxSolutionsNumber);
+				}
+
 				// Display
 				if(_page)
 				{
@@ -312,7 +327,7 @@ namespace synthese
 					;
 					if(_maxSolutionsNumber)
 					{
-						stream << " maxSolutions=\"" << _maxSolutionsNumber << "\"";
+						stream << " maxSolutions=\"" << *_maxSolutionsNumber << "\"";
 					}
 					stream << " userProfile=\"" << _accessParameters.getUserClass() << "\"";
 					if(request.getSession())

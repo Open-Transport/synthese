@@ -492,5 +492,15 @@ namespace synthese
 			stream << t.close();
 
 		}
+
+
+
+		void PTRoutePlannerResult::removeFirstJourneys( size_t value )
+		{
+			for(size_t i(0); i<value; ++i)
+			{
+				_journeys.pop_front();
+			}
+		}
 	}
 }
