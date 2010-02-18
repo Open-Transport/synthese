@@ -178,6 +178,10 @@ namespace synthese
 		const OnlineReservationRule* OnlineReservationRule::GetOnlineReservationRule(
 			const env::ReservationContact* rule
 		){
+			if(rule == NULL)
+			{
+				return NULL;
+			}
 			OnlineReservationRuleMap::const_iterator it(_onlineReservationRuleMap.find(rule->getKey()));
 			return (it == _onlineReservationRuleMap.end()) ? NULL : it->second;
 		}
