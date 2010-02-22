@@ -27,7 +27,6 @@
 
 #include "FunctionWithSite.h"
 #include "AccessParameters.h"
-#include "DateTime.h"
 #include "FactorableTemplate.h"
 #include "Site.h"
 #include "RoutePlannerTypes.h"
@@ -152,10 +151,10 @@ namespace synthese
 				std::string									_destinationCityText;
 				std::string									_originPlaceText;
 				std::string									_destinationPlaceText;
-				time::DateTime								_startDate;
-				time::DateTime								_endDate;
-				time::DateTime								_startArrivalDate;
-				time::DateTime								_endArrivalDate;
+				boost::posix_time::ptime					_startDate;
+				boost::posix_time::ptime					_endDate;
+				boost::posix_time::ptime					_startArrivalDate;
+				boost::posix_time::ptime					_endArrivalDate;
 				algorithm::PlanningOrder					_planningOrder;
 				graph::AccessParameters						_accessParameters;
 				boost::optional<std::size_t>				_maxSolutionsNumber;

@@ -34,6 +34,7 @@
 #include "Conversion.h"
 
 #include <sstream>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
@@ -45,7 +46,6 @@ namespace synthese
 	using namespace security;
 	using namespace departurestable;
 	using namespace util;
-	using namespace time;
 	using namespace server;
 
 	namespace util

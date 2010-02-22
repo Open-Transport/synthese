@@ -28,6 +28,8 @@
 #include "InterfacePage.h"
 #include "FactorableTemplate.h"
 
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
+
 namespace synthese
 {
 	namespace server
@@ -35,11 +37,6 @@ namespace synthese
 		class Request;
 	}
 	
-	namespace time
-	{
-		class Schedule;
-	}
-
 	namespace timetables
 	{
 		class TimetableColumn;
@@ -82,7 +79,7 @@ namespace synthese
 			void display(
 				std::ostream& stream,
 				const timetables::TimetableColumn& object,
-				const time::Schedule& lastSchedule,
+				const boost::posix_time::time_duration& lastSchedule,
 				std::size_t rank,
 				std::size_t followingServicesWithSameHour,
 				interfaces::VariablesMap& variables,

@@ -44,7 +44,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace server;
-	using namespace time;
 	using namespace util;
 	using namespace db;
 	using namespace security;

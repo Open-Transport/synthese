@@ -32,7 +32,6 @@
 #include "DisplayScreenTableSync.h"
 #include "DisplayMonitoringStatus.h"
 #include "DisplayMonitoringStatusTableSync.h"
-#include "DateTime.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -43,7 +42,6 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
-	using namespace time;
 
 	template<> const string util::FactorableTemplate<Function,departurestable::DisplayGetNagiosStatusFunction>::FACTORY_KEY("DisplayGetNagiosStatusFunction");
 	

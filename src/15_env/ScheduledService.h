@@ -53,7 +53,7 @@ namespace synthese
 		:	public NonPermanentService
 		{
 		public:
-			typedef std::vector<time::Schedule> Schedules;
+			typedef std::vector<boost::posix_time::time_duration> Schedules;
 			typedef std::vector<const graph::Vertex*> ServedVertices;
 			
 			/// Chosen registry class.
@@ -168,7 +168,7 @@ namespace synthese
 				virtual bool isContinuous () const;
 
 				virtual bool nonConcurrencyRuleOK(
-					const time::Date& date,
+					const boost::gregorian::date& date,
 					const graph::Edge& departureEdge,
 					const graph::Edge& arrivalEdge,
 					graph::UserClassCode userClass
@@ -177,10 +177,11 @@ namespace synthese
 				virtual void clearNonConcurrencyCache() const;
 
 				graph::UseRule::ReservationAvailabilityType getReservationAbility(
-					const time::Date& date
+					const boost::gregorian::date& date
 				) const;
-				time::DateTime getReservationDeadLine(
-					const time::Date& date
+
+				boost::posix_time::ptime getReservationDeadLine(
+					const boost::gregorian::date& date
 				) const;
 
 				/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
@@ -202,12 +203,12 @@ namespace synthese
 					graph::AccessDirection method,
 					graph::UserClassCode userClass
 					, const graph::Edge* edge
-					, const time::DateTime& presenceDateTime
+					, const boost::posix_time::ptime& presenceDateTime
 					, bool controlIfTheServiceIsReachable
 					, bool inverted
 				) const;
 				
-				virtual time::DateTime getLeaveTime(
+				virtual boost::posix_time::ptime getLeaveTime(
 					const graph::ServicePointer& servicePointer
 					, const graph::Edge* edge
 				) const;
@@ -215,18 +216,18 @@ namespace synthese
 				
 				/** Gets a departure schedule for this service.
 					@param rank Rank of the stop where to get the departure schedule
-					@return time::Schedule The schedule at the specified stop rank
+					@return The schedule at the specified stop rank
 				*/
-				virtual time::Schedule getDepartureSchedule (bool RTData, std::size_t rank) const;
+				virtual boost::posix_time::time_duration getDepartureSchedule (bool RTData, std::size_t rank) const;
 
-				const time::Schedule& getLastDepartureSchedule(bool RTData) const;
+				const boost::posix_time::time_duration& getLastDepartureSchedule(bool RTData) const;
 
-				virtual const time::Schedule& getLastArrivalSchedule(bool RTData) const;
+				virtual const boost::posix_time::time_duration& getLastArrivalSchedule(bool RTData) const;
 
-				virtual time::Schedule getDepartureBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
-				virtual time::Schedule getDepartureEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
-				virtual time::Schedule getArrivalBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
-				virtual time::Schedule getArrivalEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+				virtual boost::posix_time::time_duration getDepartureBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+				virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+				virtual boost::posix_time::time_duration getArrivalBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+				virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
 
 				const graph::Vertex* getRealTimeVertex(
 					std::size_t rank

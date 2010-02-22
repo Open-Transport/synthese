@@ -33,11 +33,6 @@
 
 namespace synthese
 {
-	namespace time
-	{
-		class DateTime;
-	}
-	
 	namespace road
 	{
 		class Address;

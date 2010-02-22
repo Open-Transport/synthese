@@ -25,7 +25,10 @@
 #include "ReservationConfirmationEMailItemInterfacePage.h"
 #include "Reservation.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -55,9 +58,9 @@ namespace synthese
 		) const	{
 			ParametersVector pv;
 		
-			pv.push_back(resa.getDepartureTime().getHour().toString());
+			pv.push_back(to_simple_string(resa.getDepartureTime().time_of_day()));
 			pv.push_back(resa.getDeparturePlaceName());
-			pv.push_back(resa.getArrivalTime().getHour().toString());
+			pv.push_back(to_simple_string(resa.getArrivalTime().time_of_day()));
 			pv.push_back(resa.getArrivalPlaceName());
 			pv.push_back(resa.getLineCode());
 

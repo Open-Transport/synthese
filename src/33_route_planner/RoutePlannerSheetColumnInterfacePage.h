@@ -20,10 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "11_interfaces/InterfacePage.h"
-#include "04_time/Hour.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
-#include "01_util/FactorableTemplate.h"
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 namespace synthese
 {
@@ -81,8 +81,8 @@ namespace synthese
 				, bool isItLastLine
 				, size_t columnNumber
 				, bool isItFootLine
-				, const time::Hour& firstTime
-				, const time::Hour& lastTime
+				, const boost::posix_time::time_duration& firstTime
+				, const boost::posix_time::time_duration& lastTime
 				, bool isItContinuousService
 				, bool isFirstWriting
 				, bool isLastWriting

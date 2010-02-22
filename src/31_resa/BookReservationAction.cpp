@@ -57,9 +57,12 @@
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -68,7 +71,6 @@ namespace synthese
 	using namespace security;
 	using namespace env;
 	using namespace transportwebsite;
-	using namespace time;
 	using namespace util;
 	using namespace graph;
 	using namespace road;
@@ -135,9 +137,9 @@ namespace synthese
 					map.insert(PARAMETER_DESTINATION_CITY, place->getCity()->getName());
 					map.insert(PARAMETER_DESTINATION_PLACE, place->getName());
 				}
-				if (!_journey.getDepartureTime().isUnknown())
+				if (!_journey.getDepartureTime().is_not_a_date_time())
 				{
-					map.insert(PARAMETER_DATE_TIME, _journey.getDepartureTime());
+					map.insert(PARAMETER_DATE_TIME, to_iso_string(_journey.getDepartureTime()));
 				}
 				if(_site.get())
 				{
@@ -256,13 +258,13 @@ namespace synthese
 			}
 			
 			// Departure date time
-			DateTime departureDateTime(map.getDateTime(PARAMETER_DATE_TIME, true, FACTORY_KEY));
-			DateTime arrivalDateTime(departureDateTime);
-			arrivalDateTime.addDaysDuration(1);
+			ptime departureDateTime(from_iso_string(map.get<string>(PARAMETER_DATE_TIME)));
+			ptime arrivalDateTime(departureDateTime);
+			arrivalDateTime += days(1);
 			if(	!originPlace->getPoint().isUnknown() &&
 				!destinationPlace->getPoint().isUnknown()
 			){
-				arrivalDateTime += 2 * static_cast<int>(originPlace->getPoint().getDistanceTo(destinationPlace->getPoint()) / 1000);
+				arrivalDateTime += minutes(2 * static_cast<int>(originPlace->getPoint().getDistanceTo(destinationPlace->getPoint()) / 1000));
 			}
 
 			// Accessibility
@@ -326,9 +328,8 @@ namespace synthese
 			}
 
 			// New ReservationTransaction
-			const DateTime now(TIME_CURRENT);
 			ReservationTransaction rt;
-			rt.setBookingTime(now);
+			rt.setBookingTime(second_clock::local_time());
 			rt.setBookingUserId(request.getUser()->getKey());
 			rt.setCustomerName(_customer->getName() + " " + _customer->getSurname());
 			rt.setCustomerPhone(_customer->getPhone());

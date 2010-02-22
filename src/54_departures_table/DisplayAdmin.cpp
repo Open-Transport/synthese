@@ -84,9 +84,12 @@
 #include <sstream>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
@@ -98,7 +101,6 @@ namespace synthese
 	using namespace db;
 	using namespace departurestable;
 	using namespace security;
-	using namespace time;
 	using namespace dblog;
 	using namespace messages;
 	using namespace graph;
@@ -943,7 +945,7 @@ namespace synthese
 					stream << t.col() << HTMLModule::getHTMLImage((alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
 					stream << t.col() << "Message : " + alarm->getShortMessage();
 					stream << t.col() <<
-						(alarm->getScenario()->getPeriodEnd().isUnknown() ? "(illimité)" : alarm->getScenario()->getPeriodEnd().toString())
+						(alarm->getScenario()->getPeriodEnd().is_not_a_date_time() ? "(illimité)" : to_simple_string(alarm->getScenario()->getPeriodEnd()))
 					;
 					stream << t.col();
 
@@ -992,8 +994,8 @@ namespace synthese
 						stream << t2.row();
 						stream << t2.col() << HTMLModule::getHTMLImage((alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
 						stream << t2.col() << "Message : " + alarm->getShortMessage();
-						stream << t2.col() << alarm->getScenario()->getPeriodStart().toString();
-						stream << t2.col() << (alarm->getScenario()->getPeriodEnd().isUnknown() ? "(illimité)" : alarm->getScenario()->getPeriodEnd().toString());
+						stream << t2.col() << alarm->getScenario()->getPeriodStart();
+						stream << t2.col() << (alarm->getScenario()->getPeriodEnd().is_not_a_date_time() ? "(illimité)" : to_simple_string(alarm->getScenario()->getPeriodEnd()));
 						stream << t2.col();
 
 						viewMessageRequest.getPage()->setMessage(alarm);

@@ -25,7 +25,6 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "DateTime.h"
 
 namespace synthese
 {
@@ -44,7 +43,7 @@ namespace synthese
 			
 		private:
 			boost::shared_ptr<SentScenario>	_scenario;
-			const time::DateTime			_stopDateTime;
+			const boost::posix_time::ptime	_stopDateTime;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

@@ -29,6 +29,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -36,7 +37,6 @@ namespace synthese
 	using namespace security;
 	using namespace server;
 	using namespace util;
-	using namespace time;
 	
 	template<> const string FactorableTemplate<Action, DBLogPurgeAction>::FACTORY_KEY("DBLogPurgeAction");
 
@@ -52,7 +52,7 @@ namespace synthese
 			{
 				map.insert(PARAMETER_LOG_KEY, _dbLog->getFactoryKey());
 			}
-			map.insert(PARAMETER_END_DATE, _endDate.toSQLString());
+			map.insert(PARAMETER_END_DATE, _endDate);
 			return map;
 		}
 
@@ -62,7 +62,7 @@ namespace synthese
 
 			try
 			{
-				_endDate = map.getDateTime(PARAMETER_END_DATE, true, FACTORY_KEY);
+				_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
 			}
 			catch (...)
 			{
@@ -76,7 +76,7 @@ namespace synthese
 			DBLogEntryTableSync::Purge(_dbLog->getFactoryKey(), _endDate);
 
 			// Log
-			DBLog::AddSimpleEntry(_dbLog->getFactoryKey(), DBLogEntry::DB_LOG_INFO, "Log purge -> " + _endDate.toString(), request.getUser().get());
+			DBLog::AddSimpleEntry(_dbLog->getFactoryKey(), DBLogEntry::DB_LOG_INFO, "Log purge -> " + to_simple_string(_endDate), request.getUser().get());
 		}
 
 
@@ -108,7 +108,7 @@ namespace synthese
 
 
 		DBLogPurgeAction::DBLogPurgeAction()
-			: _endDate(TIME_UNKNOWN)
+			: _endDate(not_a_date_time)
 		{
 
 		}

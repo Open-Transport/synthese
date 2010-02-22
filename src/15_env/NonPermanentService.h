@@ -61,7 +61,7 @@ namespace synthese
 			/** Latest schedule of the service : the last arrival at the last vertex.
 				@return The latest schedule of the service
 			*/
-			virtual const time::Schedule& getLastArrivalSchedule(
+			virtual const boost::posix_time::time_duration& getLastArrivalSchedule(
 				bool RTData
 			) const = 0;
 

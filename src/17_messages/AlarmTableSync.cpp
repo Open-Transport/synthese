@@ -38,8 +38,6 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 
-#include "DateTime.h"
-
 using namespace std;
 using namespace boost;
 
@@ -47,7 +45,6 @@ namespace synthese
 {
 	using namespace db;
 	using namespace messages;
-	using namespace time;
 	using namespace util;
 
 	namespace util

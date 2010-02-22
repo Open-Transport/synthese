@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_PTUseRule_h__
 #define SYNTHESE_PTUseRule_h__
 
-#include "DateTime.h"
 #include "UseRule.h"
 #include "Registrable.h"
 #include "Registry.h"
@@ -35,7 +34,7 @@ namespace synthese
 {
 	namespace time
 	{
-		class Hour;
+		class ptime;
 	}
 
 	namespace env
@@ -103,12 +102,11 @@ namespace synthese
 
 				////
 				/// Minimum delay in minutes between reservation and reference moment
-				int _minDelayMinutes;
-				
-				int _minDelayDays;   //!< Minimum delay in days between reservation and reference moment
-				boost::optional<std::size_t> _maxDelayDays;  //!< Maxium number of days between reservation and departure.
+				boost::posix_time::time_duration _minDelayMinutes;
+				boost::gregorian::date_duration _minDelayDays;   //!< Minimum delay in days between reservation and reference moment
+				boost::optional<boost::gregorian::date_duration> _maxDelayDays;  //!< Maxium number of days between reservation and departure.
 
-				time::Hour _hourDeadLine; //!< Latest reservation hour the last day open for reservation
+				boost::posix_time::time_duration _hourDeadLine; //!< Latest reservation hour the last day open for reservation
 
 			//@}
 			
@@ -128,10 +126,10 @@ namespace synthese
 			//@{
 				virtual AccessCapacity				getAccessCapacity()		const;
 				bool								getOriginIsReference()	const;
-				const time::Hour&	getHourDeadLine()				const;
-				int					getMinDelayDays()				const;
-				int					getMinDelayMinutes()			const;
-				const boost::optional<std::size_t>&	getMaxDelayDays()		const;
+				const boost::posix_time::time_duration&	getHourDeadLine()				const;
+				boost::gregorian::date_duration		getMinDelayDays()				const;
+				boost::posix_time::time_duration					getMinDelayMinutes()			const;
+				const boost::optional<boost::gregorian::date_duration>&	getMaxDelayDays()		const;
 				ReservationRuleType	getReservationType()			const;
 				const std::string&	getName()						const;
 				const env::Fare*	getDefaultFare()				const;
@@ -139,10 +137,10 @@ namespace synthese
 			
 			//! @name Setters
 			//@{
-				void setHourDeadLine (const time::Hour& hourDeadLine);
-				void setMinDelayMinutes (int minDelayMinutes);
-				void setMinDelayDays (int minDelayDays);
-				void setMaxDelayDays (const boost::optional<std::size_t> maxDelayDays);
+				void setHourDeadLine (const boost::posix_time::time_duration& hourDeadLine);
+				void setMinDelayMinutes (boost::posix_time::time_duration minDelayMinutes);
+				void setMinDelayDays (boost::gregorian::date_duration minDelayDays);
+				void setMaxDelayDays (const boost::optional<boost::gregorian::date_duration> maxDelayDays);
 				void setOriginIsReference (bool originIsReference);
 				void setReservationType(ReservationRuleType value);
 				void setName(const std::string& value);
@@ -169,9 +167,9 @@ namespace synthese
 				If no explicit rule defines the reservation dead line, 
 				the actual reservation time is returned.
 			*/
-			virtual time::DateTime getReservationDeadLine (
-				const time::DateTime& originTime,
-				const time::DateTime& departureTime
+			virtual boost::posix_time::ptime getReservationDeadLine (
+				const boost::posix_time::ptime& originTime,
+				const boost::posix_time::ptime& departureTime
 			) const;
 
 
@@ -182,7 +180,7 @@ namespace synthese
 			
 				If no explicit rule defines this minimum time, the actual reservation time is returned.
 			*/
-			virtual time::DateTime getReservationOpeningTime ( 
+			virtual boost::posix_time::ptime getReservationOpeningTime ( 
 				const graph::ServicePointer& servicePointer
 			) const;
 			

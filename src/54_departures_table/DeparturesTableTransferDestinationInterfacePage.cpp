@@ -33,9 +33,11 @@
 #include "CommercialLine.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -83,8 +85,16 @@ namespace synthese
 			pv.push_back(place->getName()); //7
 			pv.push_back(place->getName26());
 			pv.push_back(place->getName13()); //9
-			pv.push_back(object.getDepartureDateTime().toString());
-			pv.push_back(object.getArrivalDateTime().toString()); //11
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << object.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << object.getDepartureDateTime().time_of_day().minutes();
+				pv.push_back(s.str()); // 10
+			}
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << object.getArrivalDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << object.getArrivalDateTime().time_of_day().minutes();
+				pv.push_back(s.str()); // 11
+			}
 			pv.push_back(lexical_cast<string>(localTransferRank)); //12
 			pv.push_back(lexical_cast<string>(totalTransferRank)); //13
 

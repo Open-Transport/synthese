@@ -24,7 +24,6 @@
 #define SYNTHESE_JourneyBoardServiceCellInterfacePage_H__
 
 #include "InterfacePage.h"
-#include "DateTime.h"
 #include "FactorableTemplate.h"
 
 #include <boost/logic/tribool.hpp>
@@ -116,7 +115,7 @@ namespace synthese
 			void display(
 				std::ostream& stream
 				, const graph::ServiceUse& serviceUse
-				, int continuousServiceRange
+				, boost::posix_time::time_duration continuousServiceRange
 				, boost::logic::tribool handicappedFilterStatus
 				, boost::logic::tribool bikeFilterStatus
 				, const messages::SentAlarm* alarm

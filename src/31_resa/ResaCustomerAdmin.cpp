@@ -53,8 +53,6 @@
 #include "SendPasswordAction.h"
 #include "SecurityModule.h"
 
-#include "DateTime.h"
-
 #include <boost/foreach.hpp>
 
 using namespace std;
@@ -69,7 +67,6 @@ namespace synthese
 	using namespace resa;
 	using namespace html;
 	using namespace security;
-	using namespace time;
 	using namespace dblog;
 
 	namespace util

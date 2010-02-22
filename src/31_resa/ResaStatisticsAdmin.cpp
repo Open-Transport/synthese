@@ -35,7 +35,6 @@
 #include "ResultHTMLTable.h"
 #include "AdminFunctionRequest.hpp"
 #include "SearchFormHTMLTable.h"
-#include "Date.h"
 #include "Profile.h"
 
 #include <boost/lexical_cast.hpp>
@@ -53,7 +52,6 @@ namespace synthese
 	using namespace resa;
 	using namespace env;
 	using namespace html;
-	using namespace time;
 
 	namespace util
 	{
@@ -110,8 +108,9 @@ namespace synthese
 				throw RequestException("Bad value for line ID");
 			}
 
-			if(map.getOptional<string>(PARAM_SEARCH_START_DATE) && map.getOptional<string>(PARAM_SEARCH_END_DATE))
-			{
+			if(	!map.getDefault<string>(PARAM_SEARCH_START_DATE).empty() &&
+				!map.getDefault<string>(PARAM_SEARCH_END_DATE).empty()
+			){
 				_searchPeriod = gregorian::date_period(
 					gregorian::from_string(map.get<string>(PARAM_SEARCH_START_DATE)),
 					gregorian::from_string(map.get<string>(PARAM_SEARCH_END_DATE)) + gregorian::days(1)

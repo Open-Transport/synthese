@@ -40,23 +40,22 @@
 #include "SQLite.h"
 #include "SQLiteException.h"
 
-#include "Schedule.h"
-#include "Date.h"
-
 #include <boost/tokenizer.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 #include <assert.h>
 #include <set>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
 	using namespace env;
-	using namespace time;
 	using namespace graph;
 	using namespace pt;
 
@@ -146,8 +145,8 @@ namespace synthese
 					arrivalScheduleStr = departureScheduleStr;
 				}
 				
-				Schedule departureSchedule (Schedule::FromString (departureScheduleStr));
-				Schedule arrivalSchedule (Schedule::FromString (arrivalScheduleStr));
+				time_duration departureSchedule (Service::DecodeSchedule(departureScheduleStr));
+				time_duration arrivalSchedule (Service::DecodeSchedule(arrivalScheduleStr));
 				
 				departureSchedules.push_back (departureSchedule);
 				arrivalSchedules.push_back (arrivalSchedule);
@@ -243,7 +242,7 @@ namespace synthese
 			for(int i(0); i<object->getDepartureSchedules(false).size(); ++i)
 			{
 				if(i) query << ",";
-				query << object->getArrivalSchedules(false)[i].toSQLString(false) << "#" << object->getDepartureSchedules(false)[i].toSQLString(false);
+				query << Service::EncodeSchedule(object->getArrivalSchedules(false)[i]) << "#" << Service::EncodeSchedule(object->getDepartureSchedules(false)[i]);
 			}
 			query <<
 				"'," << object->getPathId()
@@ -276,7 +275,7 @@ namespace synthese
 			optional<RegistryKeyType> commercialLineId,
 			optional<RegistryKeyType> dataSourceId,
 			optional<string> serviceNumber,
-			optional<Date> date,
+			optional<date> date,
 			bool hideOldServices,
 			int first, /*= 0*/
 			boost::optional<std::size_t> number, /*= 0*/
@@ -302,15 +301,19 @@ namespace synthese
 			if(serviceNumber)
 				query << " AND " << COL_SERVICENUMBER << "=" << *serviceNumber;
 			if (date)
-				query << " AND d." << ServiceDateTableSync::COL_DATE << "=" << date->toSQLString();
+				query << " AND d." << ServiceDateTableSync::COL_DATE << "=\"" << to_iso_extended_string(*date) << "\"";
 			if(hideOldServices)
 			{
-				Hour now(TIME_CURRENT);
-				now -= 60;
-				Schedule snow(now, now <= Hour(3,0));
+				ptime now(second_clock::local_time());
+				now -= hours(1);
+				time_duration snow(now.time_of_day());
+				if(snow <= time_duration(3,0,0))
+				{
+					snow += hours(24);
+				}
 				query <<
 					" AND " << ScheduledServiceTableSync::COL_SCHEDULES <<
-					">='00:00:00#" << snow.toSQLString(false) << "'" 
+					">='00:00:00#" << Service::EncodeSchedule(snow) << "'" 
 				;
 			}
 			if (date)
@@ -320,9 +323,11 @@ namespace synthese
 				query << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");
 
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
 			ScheduledServiceTableSync::SearchResult result(
 				LoadFromQuery(query.str(), env, linkLevel)
@@ -332,7 +337,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(shared_ptr<ScheduledService> service, result)
 				{
-					service->setActive(gregorian::date(date->getYear(), date->getMonth(), date->getDay()));
+					service->setActive(*date);
 			}	}
 				
 			return result;

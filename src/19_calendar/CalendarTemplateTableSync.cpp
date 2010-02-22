@@ -95,17 +95,17 @@ namespace synthese
 			
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				CalendarTemplateElementTableSync::SearchResult elements(
-					CalendarTemplateElementTableSync::Search(
-						env,
-						object->getKey(),
-						0, optional<size_t>(),
-						DOWN_LINKS_LOAD_LEVEL
-				)	);
-				BOOST_FOREACH(shared_ptr<CalendarTemplateElement> e, elements)
-				{
-					object->addElement(*e);
-				}
+// 				CalendarTemplateElementTableSync::SearchResult elements(
+// 					CalendarTemplateElementTableSync::Search(
+// 						env,
+// 						object->getKey(),
+// 						0, optional<size_t>(),
+// 						DOWN_LINKS_LOAD_LEVEL
+// 				)	);
+// 				BOOST_FOREACH(shared_ptr<CalendarTemplateElement> e, elements)
+// 				{
+// 					object->addElement(*e);
+// 				}
 			}
 		}
 

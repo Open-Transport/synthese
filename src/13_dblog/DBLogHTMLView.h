@@ -26,7 +26,6 @@
 #ifndef SYNTHESE_DBLogHTMLView_h__
 #define SYNTHESE_DBLogHTMLView_h__
 
-#include "DateTime.h"
 #include "DBLogEntry.h"
 #include "ResultHTMLTable.h"
 #include "Env.h"
@@ -72,9 +71,9 @@ namespace synthese
 			const std::string				_code;
 			mutable util::Env				_env;
 			boost::shared_ptr<DBLog>		_dbLog;
-			time::DateTime					_searchStartDate;
+			boost::posix_time::ptime		_searchStartDate;
 			bool							_fixedStartDate;
-			time::DateTime					_searchEndDate;
+			boost::posix_time::ptime		_searchEndDate;
 			bool							_fixedEndDate;
 			DBLogEntry::Level				_searchLevel;
 			bool							_fixedLevel;
@@ -129,8 +128,8 @@ namespace synthese
 					util::RegistryKeyType searchObjectId2 = UNKNOWN_VALUE,
 					util::RegistryKeyType searchUserId = UNKNOWN_VALUE,
 					DBLogEntry::Level searchLevel = DBLogEntry::DB_LOG_UNKNOWN,
-					time::DateTime searchStartDate = time::TIME_UNKNOWN,
-					time::DateTime searchEndDate = time::TIME_UNKNOWN,
+					boost::posix_time::ptime searchStartDate = boost::posix_time::ptime(boost::posix_time::not_a_date_time),
+					boost::posix_time::ptime searchEndDate = boost::posix_time::ptime(boost::posix_time::not_a_date_time),
 					std::string searchText = std::string()
 				);
 			//@}

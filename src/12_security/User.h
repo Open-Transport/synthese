@@ -24,10 +24,10 @@
 #define SYNTHESE_SECURITY_USER_H
 
 #include <string>
+#include <boost/date_time/gregorian/gregorian.hpp>
 
 #include "Registrable.h"
 #include "Registry.h"
-#include "Date.h"
 
 namespace synthese
 {
@@ -69,7 +69,7 @@ namespace synthese
 			std::string		_email;
 			std::string		_phone;
 			bool			_isConnectionAllowed;
-			time::Date		_birthDate;
+			boost::gregorian::date	_birthDate;
 			
 		public:
 			User(util::RegistryKeyType id = UNKNOWN_VALUE);
@@ -93,7 +93,7 @@ namespace synthese
 				void setEMail(const std::string& email);
 				void setPhone(const std::string& phone);
 				void setConnectionAllowed(bool value);
-				void setBirthDate(const time::Date& date);
+				void setBirthDate(const boost::gregorian::date& date);
 				void setRandomPassword();
 			//@}
 
@@ -116,7 +116,7 @@ namespace synthese
 				const std::string&	getEMail()				const;
 				const std::string&	getPhone()				const;
 				bool				getConnectionAllowed()	const;
-				const time::Date&	getBirthDate()			const;
+				const boost::gregorian::date&	getBirthDate()			const;
 			//@}
 
 			//! \name Services

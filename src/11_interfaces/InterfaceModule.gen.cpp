@@ -1,5 +1,12 @@
 
+synthese::interfaces::InterfaceRight::integrate();
+
 synthese::interfaces::InterfaceModule::integrate();
+
+synthese::interfaces::InterfaceAdmin::integrate();
+synthese::interfaces::InterfacePageAdmin::integrate();
+
+synthese::interfaces::InterfacePageUpdateAction::integrate();
 
 synthese::interfaces::ParameterValueInterfaceElement::integrate();
 synthese::interfaces::IfThenElseInterfaceElement::integrate();

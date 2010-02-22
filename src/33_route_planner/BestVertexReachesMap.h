@@ -27,14 +27,10 @@
 
 #include <map>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace synthese
 {
-	namespace time
-	{
-		class DateTime;
-	}
-
 	namespace graph
 	{
 		class Journey;
@@ -149,7 +145,7 @@ namespace synthese
 				*/
 				bool isUseLess(
 					boost::shared_ptr<graph::Journey> journey,
-					const time::DateTime& originDateTime,
+					const boost::posix_time::ptime& originDateTime,
 					bool propagateInConnectionPlace,
 					bool strict = true
 				);

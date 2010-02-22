@@ -47,6 +47,8 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
@@ -54,7 +56,6 @@ namespace synthese
 	using namespace routeplanner;
 	using namespace util;
 	using namespace env;
-	using namespace time;
 	using namespace resa;
 	using namespace graph;
 	using namespace road;
@@ -107,12 +108,15 @@ namespace synthese
 			durationInterfacePage->display(sDuration, journey->getDuration(), variables, NULL, request);
 			const DateTimeInterfacePage* dateInterfacePage = getInterface()->getPage<DateTimeInterfacePage>();
 			stringstream sDate;
-			dateInterfacePage->display(sDate, variables, journey->getDepartureTime().getDate(), request);
-			DateTime now(TIME_CURRENT);
-			DateTime resaDeadLine(journey->getReservationDeadLine());
+			dateInterfacePage->display(sDate, variables, journey->getDepartureTime(), request);
+			ptime now(second_clock::local_time());
+			ptime resaDeadLine(journey->getReservationDeadLine());
 			logic::tribool resaCompliance(journey->getReservationCompliance());
 			stringstream sResa;
-			dateInterfacePage->display(sResa, variables, journey->getReservationDeadLine(), request);
+			if(!journey->getReservationDeadLine().is_not_a_date_time())
+			{
+				dateInterfacePage->display(sResa, variables, journey->getReservationDeadLine(), request);
+			}
 
 			set<const ReservationContact*> resaRules;
 			BOOST_FOREACH(const ServiceUse& su, journey->getServiceUses())
@@ -154,10 +158,10 @@ namespace synthese
 				)->getFullName()
 			);
 
-			DateTime lastDeparture(journey->getDepartureTime());
-			lastDeparture += journey->getContinuousServiceRange().total_seconds() / 60;
-			DateTime lastArrival(journey->getArrivalTime());
-			lastArrival += journey->getContinuousServiceRange().total_seconds() / 60;
+			ptime lastDeparture(journey->getDepartureTime());
+			lastDeparture += journey->getContinuousServiceRange();
+			ptime lastArrival(journey->getArrivalTime());
+			lastArrival += journey->getContinuousServiceRange();
 
 			GeoPoint departurePoint(WGS84FromLambert(departurePlace->getPoint()));
 			GeoPoint arrivalPoint(WGS84FromLambert(arrivalPlace->getPoint()));
@@ -166,22 +170,22 @@ namespace synthese
 			pv.push_back(Conversion::ToString(n));
 			pv.push_back(Conversion::ToString(handicappedFilter));
 			pv.push_back(Conversion::ToString(bikeFilter));
-			pv.push_back(journey->getDepartureTime().getHour().toString());
+			pv.push_back(to_simple_string(journey->getDepartureTime().time_of_day()));
 			pv.push_back(displayedDeparturePlace);
-			pv.push_back(journey->getArrivalTime().getHour().toString());
+			pv.push_back(to_simple_string(journey->getArrivalTime().time_of_day()));
 			pv.push_back(displayedArrivalPlace);
 			pv.push_back(sDuration.str());
 			pv.push_back(sDate.str());
 			pv.push_back(Conversion::ToString(resaCompliance && resaDeadLine > now));
 			pv.push_back(Conversion::ToString(resaCompliance == true));
-			pv.push_back(Conversion::ToString(resaDeadLine.isUnknown() ? 0 : resaDeadLine.getSecondsDifference(now).total_seconds() / 60));
+			pv.push_back(Conversion::ToString(resaDeadLine.is_not_a_date_time() ? 0 : (resaDeadLine - now).total_seconds() / 60));
 			pv.push_back(sResa.str());
 			pv.push_back(sPhones.str());
 			pv.push_back(Conversion::ToString(onlineBooking));
-			pv.push_back(journey->getDepartureTime().toSQLString(false));
+			pv.push_back(to_iso_extended_string(journey->getDepartureTime()));
 			pv.push_back(Conversion::ToString(isTheLast));
-			pv.push_back(journey->getContinuousServiceRange().total_seconds() ? lastDeparture.getHour().toString() : string()); //17
-			pv.push_back(journey->getContinuousServiceRange().total_seconds() ? lastArrival.getHour().toString() : string()); //18
+			pv.push_back(journey->getContinuousServiceRange().total_seconds() ? to_simple_string(lastDeparture.time_of_day()) : string()); //17
+			pv.push_back(journey->getContinuousServiceRange().total_seconds() ? to_simple_string(lastArrival.time_of_day()) : string()); //18
 			pv.push_back(lexical_cast<string>(departurePoint.getLongitude()));
 			pv.push_back(lexical_cast<string>(departurePoint.getLatitude()));
 			pv.push_back(lexical_cast<string>(arrivalPoint.getLongitude()));

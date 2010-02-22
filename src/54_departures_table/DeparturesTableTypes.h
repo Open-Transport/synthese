@@ -27,9 +27,9 @@
 #include <utility>
 #include <vector>
 #include <map>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 #include "ServiceUse.h"
-#include "DateTime.h"
 #include "Registry.h"
 #include "Journey.h"
 #include "PublicTransportStopZoneConnectionPlace.h"

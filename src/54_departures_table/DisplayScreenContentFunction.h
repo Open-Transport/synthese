@@ -23,9 +23,11 @@
 #ifndef SYNTHESE_DisplayScreenContentRequest_H__
 #define SYNTHESE_DisplayScreenContentRequest_H__
 
-#include "DateTime.h"
 #include "Function.h"
 #include "FactorableTemplate.h"
+
+#include <boost/optional.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace synthese
 {
@@ -48,7 +50,7 @@ namespace synthese
 			//@{
 				boost::shared_ptr<const DisplayScreen>	_screen;
 				boost::shared_ptr<DisplayType>			_type;
-				boost::optional<time::DateTime>			_date;
+				boost::optional<boost::posix_time::ptime>			_date;
 			//@}
 
 

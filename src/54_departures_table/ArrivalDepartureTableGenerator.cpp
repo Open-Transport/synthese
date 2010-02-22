@@ -30,13 +30,16 @@
 #include "PTTimeSlotRoutePlanner.h"
 #include "PTRoutePlannerResult.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace env;
-	using namespace time;
 	using namespace graph;
 	using namespace algorithm;
 	using namespace ptrouteplanner;
@@ -53,8 +56,8 @@ namespace synthese
 				, const DisplayedPlacesList&	displayedPlacesList
 				, const ForbiddenPlacesList&	forbiddenPlaces,
 				const TransferDestinationsList& transferDestinations
-				, const DateTime& startDateTime
-				, const DateTime& endDateTime
+				, const ptime& startDateTime
+				, const ptime& endDateTime
 				, size_t maxSize
 		) : _physicalStops(physicalStops), _direction(direction), _endFilter(endfilter)
 			, _lineFilter(lineFilter), _displayedPlaces(displayedPlacesList), _forbiddenPlaces(forbiddenPlaces),
@@ -120,7 +123,7 @@ namespace synthese
 				curLinestop = static_cast<const LineStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly())
 			){
 				if(!servicePointer.getService()->nonConcurrencyRuleOK(
-						servicePointer.getOriginDateTime().getDate(),
+						servicePointer.getOriginDateTime().date(),
 						*servicePointer.getEdge(),
 						*curLinestop,
 						USER_PEDESTRIAN
@@ -171,8 +174,8 @@ namespace synthese
 			)	);
 			if(it != _transferDestinations.end())
 			{
-				DateTime routePlanningEndTime(_startDateTime);
-				routePlanningEndTime++;
+				ptime routePlanningEndTime(_startDateTime);
+				routePlanningEndTime += days(1);
 				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
 				{
 					PTTimeSlotRoutePlanner rp(

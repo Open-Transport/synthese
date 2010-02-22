@@ -26,9 +26,7 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-
-#include "DateTime.h"
-
+#include "ReplaceQuery.h"
 #include "ReservationTransaction.h"
 #include "ReservationTableSync.h"
 #include "ReservationTransactionTableSync.h"
@@ -36,16 +34,18 @@
 #include "LineTableSync.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
 	using namespace resa;
-	using namespace time;
 	using namespace env;
 
 	namespace util
@@ -122,13 +122,13 @@ namespace synthese
 			object->setServiceCode(rows->getText ( ReservationTableSync::COL_SERVICE_CODE));
 			object->setDeparturePlaceId(rows->getLongLong ( ReservationTableSync::COL_DEPARTURE_PLACE_ID));
 			object->setDeparturePlaceName(rows->getText ( ReservationTableSync::COL_DEPARTURE_PLACE_NAME));
-			object->setDepartureTime(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_DEPARTURE_TIME)));
+			object->setDepartureTime(rows->getDateTime( ReservationTableSync::COL_DEPARTURE_TIME));
 			object->setArrivalPlaceId(rows->getLongLong ( ReservationTableSync::COL_ARRIVAL_PLACE_ID));
 			object->setArrivalPlaceName(rows->getText ( ReservationTableSync::COL_ARRIVAL_PLACE_NAME));
-			object->setArrivalTime(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_ARRIVAL_TIME)));
+			object->setArrivalTime(rows->getDateTime( ReservationTableSync::COL_ARRIVAL_TIME));
 			object->setReservationRuleId(rows->getLongLong ( ReservationTableSync::COL_RESERVATION_RULE_ID));
-			object->setOriginDateTime(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_ORIGIN_DATE_TIME)));
-			object->setReservationDeadLine(DateTime::FromSQLTimestamp(rows->getText ( ReservationTableSync::COL_RESERVATION_DEAD_LINE)));
+			object->setOriginDateTime(rows->getDateTime( ReservationTableSync::COL_ORIGIN_DATE_TIME));
+			object->setReservationDeadLine(rows->getDateTime( ReservationTableSync::COL_RESERVATION_DEAD_LINE));
 
 			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
 			{
@@ -149,30 +149,22 @@ namespace synthese
 			Reservation* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() == UNKNOWN_VALUE)
-				object->setKey(getId());
-               
-			query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< lexical_cast<string>(object->getKey())
-				<< "," << (object->getTransaction() ? lexical_cast<string>(object->getTransaction()->getKey()) : "0")
-				<< "," << lexical_cast<string>(object->getLineId())
-				<< "," << Conversion::ToSQLiteString(object->getLineCode())
-				<< "," << lexical_cast<string>(object->getServiceId())
-				<< "," << Conversion::ToSQLiteString(object->getServiceCode())
-				<< "," << lexical_cast<string>(object->getDeparturePlaceId())
-				<< "," << Conversion::ToSQLiteString(object->getDeparturePlaceName())
-				<< "," << object->getDepartureTime().toSQLString()
-				<< "," << lexical_cast<string>(object->getArrivalPlaceId())
-				<< "," << Conversion::ToSQLiteString(object->getArrivalPlaceName())
-				<< "," << object->getArrivalTime().toSQLString()
-				<< "," << lexical_cast<string>(object->getReservationRuleId())
-				<< "," << object->getOriginDateTime().toSQLString()
-				<< "," << object->getReservationDeadLine().toSQLString()
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<ReservationTableSync> query(*object);
+			query.addField(object->getTransaction() ? object->getTransaction()->getKey() : RegistryKeyType(0));
+			query.addField(object->getLineId());
+			query.addField(object->getLineCode());
+			query.addField(object->getServiceId());
+			query.addField(object->getServiceCode());
+			query.addField(object->getDeparturePlaceId());
+			query.addField(object->getDeparturePlaceName());
+			query.addField(object->getDepartureTime());
+			query.addField(object->getArrivalPlaceId());
+			query.addField(object->getArrivalPlaceName());
+			query.addField(object->getArrivalTime());
+			query.addField(object->getReservationRuleId());
+			query.addField(object->getOriginDateTime());
+			query.addField(object->getReservationDeadLine());
+			query.execute(transaction);
 		}
 
 	}
@@ -207,7 +199,7 @@ namespace synthese
 		ReservationTableSync::SearchResult ReservationTableSync::Search(
 			util::Env& env,
 			util::RegistryKeyType commercialLineId,
-			const Date& day,
+			const date& day,
 			optional<string> serviceNumber,
 			bool hideOldServices,
 			logic::tribool cancellations,
@@ -233,11 +225,11 @@ namespace synthese
 			query <<
 				" WHERE " <<
 				"l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId << " AND " <<
-				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << ">='" << day.toSQLString(false) << " 03:00' ";
-			Date dayp(day);
-			dayp += 1;
+				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << ">='" << to_iso_extended_string(day) << " 03:00' ";
+			date dayp(day);
+			dayp += days(1);
 			query <<
-				" AND " << TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << "<'" << dayp.toSQLString(false) << " 03:00'"
+				" AND " << TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << "<'" << to_iso_extended_string(dayp) << " 03:00'"
 			;
 			if(serviceNumber)
 			{
@@ -250,12 +242,16 @@ namespace synthese
 
 			if(hideOldServices)
 			{
-				Hour now(TIME_CURRENT);
-				now -= 60;
-				Schedule snow(now, now <= Hour(3,0));
+				ptime now(second_clock::local_time());
+				now -= hours(1);
+				time_duration snow(now.time_of_day());
+				if(snow <= time_duration(3,0,0))
+				{
+					snow += hours(24);
+				}
 				query <<
 					" AND s." << ScheduledServiceTableSync::COL_SCHEDULES << ">='00:00:00#" <<
-					snow.toSQLString(false) << "'" ;
+					to_simple_string(snow) << "'" ;
 			}
 			
 			if(orderByService)

@@ -34,7 +34,6 @@
 #include "User.h"
 #include "UserException.h"
 #include "UserTableSync.h"
-#include "UserTableSyncException.h"
 #include "SecurityLog.h"
 
 using namespace std;
@@ -90,13 +89,13 @@ namespace synthese
 
 				SecurityLog::addUserLogin(user.get());
 			}
-			catch (UserTableSyncException e)
-			{
-				throw ActionException("Utilisateur introuvable");
-			}
 			catch (UserException e)
 			{
 				throw ActionException("Mot de passe erroné");
+			}
+			catch (...)
+			{
+				throw ActionException("Utilisateur introuvable");
 			}
 		}
 

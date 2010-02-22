@@ -42,8 +42,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
-	using namespace time;
-
+	
 	template<> const string util::FactorableTemplate<Function,departurestable::CPUGetWiredScreensFunction>::FACTORY_KEY("CPUGetWiredScreensFunction");
 
 	namespace departurestable

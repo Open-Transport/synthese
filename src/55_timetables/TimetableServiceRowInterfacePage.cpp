@@ -24,7 +24,6 @@
 
 #include "TimetableServiceRowInterfacePage.h"
 #include "TimetableColumn.h"
-#include "Schedule.h"
 #include "PhysicalStop.h"
 #include "Line.h"
 #include "CommercialLine.h"
@@ -33,19 +32,21 @@
 #include "Interface.h"
 #include "InterfacePageException.h"
 #include "TimetableWarning.h"
+#include "Service.h"
 
 #include <boost/lexical_cast.hpp>
 #include <sstream>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
 	using namespace timetables;
-	using namespace time;
+	using namespace graph;
 
 	namespace util
 	{
@@ -65,7 +66,7 @@ namespace synthese
 		void TimetableServiceRowInterfacePage::display(
 			std::ostream& stream,
 			const TimetableColumn& object,
-			const Schedule& lastSchedule,
+			const time_duration& lastSchedule,
 			size_t rank,
 			std::size_t followingServicesWithSameHour,
 			VariablesMap& variables,
@@ -73,9 +74,9 @@ namespace synthese
 		) const	{
 			ParametersVector pv;
 		
-			pv.push_back(lexical_cast<string>(object.getContent().begin()->second.getHour().getHours())); //0
-			pv.push_back(lexical_cast<string>(object.getContent().begin()->second.getHour().getMinutes())); //1
-			pv.push_back(lexical_cast<string>(lastSchedule.getHour().getHours())); //2
+			pv.push_back(lexical_cast<string>(Service::GetTimeOfDay(object.getContent().begin()->second).hours())); //0
+			pv.push_back(lexical_cast<string>(Service::GetTimeOfDay(object.getContent().begin()->second).minutes())); //1
+			pv.push_back(lexical_cast<string>(Service::GetTimeOfDay(lastSchedule).hours())); //2
 			pv.push_back(object.getWarning() ? lexical_cast<string>(object.getWarning()->getNumber()) : string()); //3
 			pv.push_back(object.getWarning() ? object.getWarning()->getText() : string()); //4
 

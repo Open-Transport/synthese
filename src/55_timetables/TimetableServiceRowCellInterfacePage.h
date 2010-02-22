@@ -52,7 +52,7 @@ namespace synthese
 			@code timetable_service_row_cell @endcode
 
 			Parameters :
-				- 0 : Hour
+				- 0 : ptime
 				- 1 : Minutes
 				- 2 : Stop name
 				- 3 : City name

@@ -25,7 +25,8 @@
 #include "ReservationConfirmationEMailSubjectInterfacePage.h"
 #include "ReservationTransaction.h"
 #include "Reservation.h"
-#include "Date.h"
+
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 
@@ -56,7 +57,7 @@ namespace synthese
 			const server::Request* request /*= NULL*/
 		) const	{
 			ParametersVector pv;
-			pv.push_back((*resa.getReservations().begin())->getDepartureTime().getDate().toString()); // 0
+			pv.push_back(to_simple_string((*resa.getReservations().begin())->getDepartureTime().date())); // 0
 			pv.push_back((*resa.getReservations().begin())->getDeparturePlaceName()); // 1
 			pv.push_back((*(resa.getReservations().end()-1))->getArrivalPlaceName()); // 2
 

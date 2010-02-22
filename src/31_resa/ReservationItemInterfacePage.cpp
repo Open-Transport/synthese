@@ -26,13 +26,15 @@
 #include "Reservation.h"
 #include "ReservationTransaction.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using namespace time;
 
 	namespace util
 	{
@@ -57,14 +59,14 @@ namespace synthese
 		) const	{
 			ParametersVector pv;
 			
-			DateTime now(TIME_CURRENT);
+			ptime now(second_clock::local_time());
 
 			pv.push_back((*transaction.getReservations().begin())->getDeparturePlaceName());
-			pv.push_back((*transaction.getReservations().begin())->getDepartureTime().toString());
+			pv.push_back(to_simple_string((*transaction.getReservations().begin())->getDepartureTime()));
 			pv.push_back((*(transaction.getReservations().end() - 1))->getArrivalPlaceName());
-			pv.push_back((*(transaction.getReservations().end() - 1))->getArrivalTime().toString());
+			pv.push_back(to_simple_string((*(transaction.getReservations().end() - 1))->getArrivalTime()));
 			pv.push_back(Conversion::ToString(transaction.getSeats()));
-			if (transaction.getCancellationTime().isUnknown() && now <= transaction.getReservationDeadLine())
+			if (transaction.getCancellationTime().is_not_a_date_time() && now <= transaction.getReservationDeadLine())
 				pv.push_back(Conversion::ToString(transaction.getKey()));
 			else
 				pv.push_back(string());

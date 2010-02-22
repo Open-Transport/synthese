@@ -44,13 +44,14 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
 	using namespace server;
 	using namespace util;
 	using namespace security;
-	using namespace time;
 	using namespace env;
 	
 	
@@ -87,7 +88,7 @@ namespace synthese
 			}
 
 			// Control of the date : a cancellation has no sense if after the arrival time
-			DateTime now(TIME_CURRENT);
+			ptime now(second_clock::local_time());
 			ReservationTableSync::SearchResult reservations(
 				ReservationTableSync::Search(*_env, _transaction->getKey())
 			);
@@ -102,7 +103,7 @@ namespace synthese
 			}
 
 			// Tests if the reservation is already cancelled
-			if(!_transaction->getCancellationTime().isUnknown())
+			if(!_transaction->getCancellationTime().is_not_a_date_time())
 			{
 				throw ActionException("Cette réservation est déjà annulée.");
 			}
@@ -116,7 +117,7 @@ namespace synthese
 			ReservationStatus oldStatus(_transaction->getStatus());
 
 			// Write the cancellation
-			DateTime now(TIME_CURRENT);
+			ptime now(second_clock::local_time());
 			_transaction->setCancellationTime(now);
 			_transaction->setCancelUserId(request.getUser()->getKey());
 			ReservationTransactionTableSync::Save(_transaction.get());

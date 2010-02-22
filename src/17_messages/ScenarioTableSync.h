@@ -30,8 +30,6 @@
 #include "AlarmTemplate.h"
 #include "SentAlarm.h"
 
-#include "DateTime.h"
-
 #include "SQLiteInheritanceTableSyncTemplate.h"
 
 #include <vector>

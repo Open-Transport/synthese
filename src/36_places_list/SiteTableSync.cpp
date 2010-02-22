@@ -22,17 +22,19 @@
 
 #include "SiteTableSync.h"
 #include "Site.h"
-#include "Conversion.h"
+#include "ReplaceQuery.h"
 #include "SQLiteResult.h"
-#include "Date.h"
 #include "Interface.h"
 #include "InterfaceTableSync.h"
 
 #include <sstream>
 #include <boost/tokenizer.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace boost;
 using namespace std;
+using namespace boost::gregorian;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -40,7 +42,6 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 	using namespace db;
-	using namespace time;
 	using namespace transportwebsite;
 
 	namespace util
@@ -95,12 +96,12 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 		    site->setName(rows->getText (SiteTableSync::TABLE_COL_NAME));
-		    site->setStartDate(Date::FromSQLDate(rows->getText (SiteTableSync::TABLE_COL_START_DATE)));
-		    site->setEndDate(Date::FromSQLDate(rows->getText(SiteTableSync::TABLE_COL_END_DATE)));
+		    site->setStartDate(rows->getDate(SiteTableSync::TABLE_COL_START_DATE));
+		    site->setEndDate(rows->getDate(SiteTableSync::TABLE_COL_END_DATE));
 		    site->setOnlineBookingAllowed(rows->getBool(SiteTableSync::TABLE_COL_ONLINE_BOOKING));
 		    site->setPastSolutionsDisplayed(rows->getBool(SiteTableSync::TABLE_COL_USE_OLD_DATA));
 		    site->setMaxTransportConnectionsCount(rows->getInt(SiteTableSync::COL_MAX_CONNECTIONS));
-		    site->setUseDateRange(rows->getInt(SiteTableSync::COL_USE_DATES_RANGE));
+		    site->setUseDateRange(days(rows->getInt(SiteTableSync::COL_USE_DATES_RANGE)));
 		    
 		    string periodsStr(rows->getText(SiteTableSync::COL_PERIODS));
 
@@ -109,6 +110,7 @@ namespace synthese
 			boost::char_separator<char> sep1 (",");
 			boost::char_separator<char> sep2 ("|");
 			tokenizer tripletTokens (periodsStr, sep1);
+			site->clearHourPeriods();
 			for (tokenizer::iterator tripletIter = tripletTokens.begin();
 				tripletIter != tripletTokens.end (); ++tripletIter)
 			{
@@ -116,8 +118,8 @@ namespace synthese
 				tokenizer::iterator valueIter = valueTokens.begin();
 
 				// (beginHour|endHour|Caption)
-				Hour beginHour(Hour::FromSQLTime(*valueIter));
-				Hour endHour(Hour::FromSQLTime(*(++valueIter)));
+				time_duration beginHour(duration_from_string(*valueIter));
+				time_duration endHour(duration_from_string(*(++valueIter)));
 				HourPeriod period(*(++valueIter), beginHour, endHour);
 
 				site->addHourPeriod(period);
@@ -135,8 +137,8 @@ namespace synthese
 					catch(ObjectNotFoundException<Interface>& e)
 					{
 						Log::GetInstance().warn(
-							"Data corrupted in "+ TABLE.NAME + " on site " + Conversion::ToString(site->getKey()) +" : interface " +
-							Conversion::ToString(id) + " not found"
+							"Data corrupted in "+ TABLE.NAME + " on site " + lexical_cast<string>(site->getKey()) +" : interface " +
+							lexical_cast<string>(id) + " not found"
 						);
 					}
 				}
@@ -156,31 +158,30 @@ namespace synthese
 			Site* site,
 			optional<SQLiteTransaction&> transaction
 		){
-			stringstream query;
-			query << " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< site->getKey()
-				<< "," << Conversion::ToSQLiteString(site->getName())
-				<< "," << (site->getInterface() ? site->getInterface()->getKey() : static_cast<uid>(UNKNOWN_VALUE))
-				<< "," << site->getStartDate().toSQLString()
-				<< "," << site->getEndDate().toSQLString()
-				<< "," << Conversion::ToString(site->getOnlineBookingAllowed())
-				<< "," << Conversion::ToString(site->getPastSolutionsDisplayed())
-				<< "," << site->getMaxTransportConnectionsCount()
-				<< "," << site->getUseDatesRange();
-			
+			// Preparation
+			stringstream periodstr;
 			const Site::Periods& periods(site->getPeriods());
-			query << ",'";
 			for(Site::Periods::const_iterator it(periods.begin()); it != periods.end(); ++it)
 			{
 				if (it != periods.begin())
-					query << ",";
-				query << it->getBeginHour().toSQLString(false)
-					<< "|" << it->getEndHour().toSQLString(false)
-					<< "|" << Conversion::ToSQLiteString(it->getCaption(), false);
+					periodstr << ",";
+				periodstr << to_simple_string(it->getBeginHour())
+					<< "|" << to_simple_string(it->getEndHour())
+					<< "|" << it->getCaption();
 			}
-			query << "'"
-				<< ")";
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+
+			// Query
+			ReplaceQuery<SiteTableSync> query(*site);
+			query.addField(site->getName());
+			query.addField(site->getInterface() ? site->getInterface()->getKey() : RegistryKeyType(0));
+			query.addField(site->getStartDate());
+			query.addField(site->getEndDate());
+			query.addField(site->getOnlineBookingAllowed());
+			query.addField(site->getPastSolutionsDisplayed());
+			query.addField(site->getMaxTransportConnectionsCount());
+			query.addField(site->getUseDatesRange().days());
+			query.addField(periodstr.str());
+			query.execute(transaction);
 		}
 	}
 
@@ -206,9 +207,11 @@ namespace synthese
 			if (orderByName)
 				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number)
+			{
 				query << " LIMIT " << (*number + 1);
-			if (first > 0)
-				query << " OFFSET " << first;
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

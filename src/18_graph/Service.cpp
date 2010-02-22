@@ -24,11 +24,16 @@
 #include "Path.h"
 #include "Edge.h"
 
+#include <iomanip>
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
+using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
-	using namespace time;
 	using namespace util;
 
 	namespace graph
@@ -97,15 +102,17 @@ namespace synthese
 			setPathId(path->getKey());
 		}
 
-		DateTime Service::getOriginDateTime(
+
+
+		ptime Service::getOriginDateTime(
 			bool RTData,
-			const Date& departureDate,
-			const Schedule& departureTime
+			const date& departureDate,
+			const time_duration& departureTime
 		) const	{
-			DateTime originDateTime(departureDate);
-			originDateTime -= (departureTime.getDaysSinceDeparture() - getDepartureSchedule(RTData,0).getDaysSinceDeparture());
-			originDateTime.setHour(getDepartureSchedule(RTData,0).getHour());
-			return originDateTime;
+			return ptime(
+				departureDate,
+				departureTime - getDepartureSchedule(RTData,0)
+			);
 		}
 
 		std::string Service::getTeam() const
@@ -181,8 +188,12 @@ namespace synthese
 
 
 
-		bool Service::nonConcurrencyRuleOK( const time::Date& date, const graph::Edge& departureEdge, const graph::Edge& arrivalEdge, graph::UserClassCode userClass ) const
-		{
+		bool Service::nonConcurrencyRuleOK(
+			const date& date,
+			const graph::Edge& departureEdge,
+			const graph::Edge& arrivalEdge,
+			graph::UserClassCode userClass
+		) const	{
 			return true;
 		}
 
@@ -191,6 +202,48 @@ namespace synthese
 		void Service::clearNonConcurrencyCache() const
 		{
 
+		}
+
+
+
+
+
+		boost::posix_time::time_duration Service::GetTimeOfDay( const boost::posix_time::time_duration& value )
+		{
+			return time_duration(value.hours() % 24, value.minutes(), value.seconds());
+		}
+
+
+
+		std::string Service::EncodeSchedule( const boost::posix_time::time_duration& value )
+		{
+			if(value.is_not_a_date_time())
+			{
+				return string();
+			}
+
+			std::stringstream os;
+
+			os << std::setw( 2 ) << std::setfill ( '0' )
+				<< (value.hours() / 24) << ":"
+				<< std::setw( 2 ) << std::setfill ( '0' )
+				<< (value.hours() % 24) << ":"
+				<< std::setw( 2 ) << std::setfill ( '0' )
+				<< value.minutes()
+			;
+
+			return os.str ();
+		}
+
+
+
+		boost::posix_time::time_duration Service::DecodeSchedule( const std::string value )
+		{
+			return time_duration(
+				24 * lexical_cast<int>(value.substr(0, 2)) + lexical_cast<int>(value.substr(3, 2)),
+				lexical_cast<int>(value.substr(6, 2)),
+				0
+			);
 		}
 	}
 }

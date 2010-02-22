@@ -24,25 +24,26 @@
 
 #include "SentScenarioInheritedTableSync.h"
 #include "SentScenario.h"
-#include "DateTime.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "ScenarioTemplateInheritedTableSync.h"
 #include "AlarmObjectLinkTableSync.h"
 #include "SentAlarm.h"
+#include "ReplaceQuery.h"
 
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
 	using namespace db;
 	using namespace messages;
 	using namespace util;
-	using namespace time;
 	
 
 	template<>
@@ -61,8 +62,8 @@ namespace synthese
 			_CommonLoad(obj, rows, env, linkLevel);
 
 			obj->setIsEnabled(rows->getBool ( ScenarioTableSync::COL_ENABLED));
-			obj->setPeriodStart(DateTime::FromSQLTimestamp (rows->getText ( ScenarioTableSync::COL_PERIODSTART)));
-			obj->setPeriodEnd(DateTime::FromSQLTimestamp (rows->getText ( ScenarioTableSync::COL_PERIODEND)));
+			obj->setPeriodStart(rows->getDateTime( ScenarioTableSync::COL_PERIODSTART));
+			obj->setPeriodEnd(rows->getDateTime( ScenarioTableSync::COL_PERIODEND));
 
 			const string txtVariables(rows->getText(ScenarioTableSync::COL_VARIABLES));
 			SentScenario::VariablesMap variables;
@@ -111,51 +112,46 @@ namespace synthese
 			SentScenario* obj,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			if (obj->getKey() == UNKNOWN_VALUE)
-				obj->setKey(getId());
-
-			stringstream query;
-			query
-				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(obj->getKey())
-				<< ",0"
-				<< "," << Conversion::ToString(obj->getIsEnabled())
-				<< "," << Conversion::ToSQLiteString(obj->getName())
-				<< "," << obj->getPeriodStart().toSQLString()
-				<< "," << obj->getPeriodEnd().toSQLString()
-				<< "," << UNKNOWN_VALUE
-				<< ",\"";
+			// Preparation
+			stringstream vars;
 			const SentScenario::VariablesMap& variables(obj->getVariables());
 			bool firstVar(true);
 			BOOST_FOREACH(const SentScenario::VariablesMap::value_type& variable, variables)
 			{
 				if(!firstVar)
 				{
-					query << "|";
+					vars << "|";
 				}
 				else
 				{
 					firstVar = false;
 				}
-				query << variable.first << "$" << variable.second;
+				vars << variable.first << "$" << variable.second;
 			}
-			query << "\""
-				<< "," << (obj->getTemplate() ? Conversion::ToString(obj->getTemplate()->getKey()) : "0")
-				<< ")"
-			;
-			sqlite->execUpdate(query.str());
 
+			// Main replace query
+			ReplaceQuery<ScenarioTableSync> query(*obj);
+			query.addField(0);
+			query.addField(obj->getIsEnabled());
+			query.addField(obj->getName());
+			query.addField(obj->getPeriodStart());
+			query.addField(obj->getPeriodEnd());
+			query.addField(UNKNOWN_VALUE);
+			query.addField(vars.str());
+			query.addField(obj->getTemplate() ? obj->getTemplate()->getKey() : RegistryKeyType(0));
+			query.execute(transaction);
+
+			// Alarms query
 			stringstream alarmquery;
 			alarmquery
 				<< "UPDATE "
 				<< AlarmTableSync::TABLE.NAME
 				<< " SET "
-				<< AlarmTableSync::COL_PERIODSTART << "=" << obj->getPeriodStart().toSQLString()
-				<< "," << AlarmTableSync::COL_PERIODEND << "=" << obj->getPeriodEnd().toSQLString()
+				<< AlarmTableSync::COL_PERIODSTART << "='" << to_iso_extended_string(obj->getPeriodStart().date()) << " " << to_simple_string(obj->getPeriodStart().time_of_day()) << "'"
+				<< "," << AlarmTableSync::COL_PERIODEND << "='" << to_iso_extended_string(obj->getPeriodEnd().date()) << " " << to_simple_string(obj->getPeriodEnd().time_of_day()) << "'"
 				<< " WHERE " 
 				<< AlarmTableSync::COL_SCENARIO_ID << "=" << obj->getKey();
-			sqlite->execUpdate(alarmquery.str(), transaction);
+			DBModule::GetSQLite()->execUpdate(alarmquery.str(), transaction);
 		}
 	}
 
@@ -167,7 +163,7 @@ namespace synthese
 			/*AlarmConflict conflict, */
 			/*AlarmLevel level, */
 			boost::optional<StatusSearch> status /*= boost::optional<StatusSearch>()*/,
-			boost::optional<time::DateTime> date /*= boost::optional<time::DateTime>()*/,
+			boost::optional<ptime> date,
 			boost::optional<util::RegistryKeyType> scenarioId /*= boost::optional<util::RegistryKeyType>()*/,
 			boost::optional<int> first /*= boost::optional<int>()*/,
 			boost::optional<std::size_t> number /*= boost::optional<int>()*/,
@@ -196,29 +192,29 @@ namespace synthese
 				{
 				case BROADCAST_OVER:
 					query << " AND " << ScenarioTableSync::COL_PERIODEND << " IS NOT NULL "
-						<< " AND " << ScenarioTableSync::COL_PERIODEND << "<" << date->toSQLString()
+						<< " AND " << ScenarioTableSync::COL_PERIODEND << "<'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						;
 					break;
 
 				case BROADCAST_RUNNING:
 					query << " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL "
-						<< " OR " << ScenarioTableSync::COL_PERIODEND << ">" << date->toSQLString()
+						<< " OR " << ScenarioTableSync::COL_PERIODEND << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						<< ") AND " << ScenarioTableSync::COL_ENABLED
 						;
 					break;
 
 				case BROADCAST_RUNNING_WITH_END:
 					query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL "
-						<< " OR " << ScenarioTableSync::COL_PERIODSTART << "<=" << date->toSQLString()
+						<< " OR " << ScenarioTableSync::COL_PERIODSTART << "<='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						<< ") AND " << ScenarioTableSync::COL_ENABLED
 						<<  " AND " << ScenarioTableSync::COL_PERIODEND << " IS NOT NULL "
-						<< " AND " << ScenarioTableSync::COL_PERIODEND << ">" << date->toSQLString()
+						<< " AND " << ScenarioTableSync::COL_PERIODEND << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						;
 					break;
 
 				case BROADCAST_RUNNING_WITHOUT_END:
 					query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL "
-						<< " OR " << ScenarioTableSync::COL_PERIODSTART << "<=" << date->toSQLString()
+						<< " OR " << ScenarioTableSync::COL_PERIODSTART << "<='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						<< ") AND " << ScenarioTableSync::COL_ENABLED
 						<<  " AND " << ScenarioTableSync::COL_PERIODEND << " IS NULL "
 						;
@@ -226,14 +222,14 @@ namespace synthese
 
 				case FUTURE_BROADCAST:
 					query << " AND " << ScenarioTableSync::COL_PERIODSTART << " IS NOT NULL "
-						<< " AND " << ScenarioTableSync::COL_PERIODSTART << ">" << date->toSQLString()
+						<< " AND " << ScenarioTableSync::COL_PERIODSTART << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						<< " AND " << ScenarioTableSync::COL_ENABLED
 						;
 					break;
 
 				case BROADCAST_DRAFT:
 					query << " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL "
-						<< " OR " << ScenarioTableSync::COL_PERIODEND << ">" << date->toSQLString()
+						<< " OR " << ScenarioTableSync::COL_PERIODEND << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						<< ") AND NOT " << ScenarioTableSync::COL_ENABLED
 						;
 					break;
@@ -243,9 +239,9 @@ namespace synthese
 			if(!status && date)
 			{
 				query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR " <<
-					ScenarioTableSync::COL_PERIODSTART << " <= " << date->toSQLString() <<
+					ScenarioTableSync::COL_PERIODSTART << " <='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'" <<
 					") AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL OR " <<
-					ScenarioTableSync::COL_PERIODEND << " >= " << date->toSQLString() <<
+					ScenarioTableSync::COL_PERIODEND << " >='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'" <<
 					")"
 				;
 			}
@@ -291,9 +287,11 @@ namespace synthese
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 
 			if (number)
+			{
 				query << " LIMIT " << (*number + 1);
-			if (first)
-				query << " OFFSET " << *first;
+				if (first)
+					query << " OFFSET " << *first;
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

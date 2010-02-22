@@ -24,7 +24,6 @@
 
 #include "Conversion.h"
 #include "DepartureTableRowInterfacePage.h"
-#include "DateTime.h"
 #include "ScheduledService.h"
 #include "ServicePointer.h"
 #include "PhysicalStop.h"
@@ -36,14 +35,16 @@
 #include "Interface.h"
 #include "StaticFunctionRequest.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace interfaces;
-	using namespace time;
 	using namespace env;
 	using namespace pt;
 	using namespace server;
@@ -98,10 +99,16 @@ namespace synthese
 			else
 			{
 				parameters.push_back(
-					(blinkingDelay > 0 && ptd.first.getActualDateTime().getSecondsDifference(DateTime(TIME_CURRENT)) <= posix_time::minutes(blinkingDelay)) ?
+					(blinkingDelay > 0 && (ptd.first.getActualDateTime() - second_clock::local_time()) <= posix_time::minutes(blinkingDelay)) ?
 					string("1") : string("0")
-					);
-				parameters.push_back(ptd.first.getActualDateTime().getHour().toString());
+				);
+
+				{
+					stringstream str;
+					str << setw(2) << setfill('0') << ptd.first.getActualDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << ptd.first.getActualDateTime().time_of_day().minutes();
+					parameters.push_back(str.str());
+				}
+
 				parameters.push_back(ptd.first.getService()->getServiceNumber());
 				parameters.push_back(
 					static_cast<const PhysicalStop*>(ptd.first.getRealTimeVertex())->getName()
@@ -112,12 +119,14 @@ namespace synthese
 				const Line* line(static_cast<const Line*>(ptd.first.getEdge()->getParentPath()));
 				parameters.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string());
 
-				parameters.push_back(
-					ptd.first.getTheoreticalDateTime().getHour().toString()
-				);
+				{
+					stringstream str;
+					str << setw(2) << setfill('0') << ptd.first.getTheoreticalDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << ptd.first.getTheoreticalDateTime().time_of_day().minutes();
+					parameters.push_back(str.str());
+				}
 
 				parameters.push_back(
-					lexical_cast<string>(ptd.first.getActualDateTime().getSecondsDifference(ptd.first.getTheoreticalDateTime()).total_seconds() / 60)
+					lexical_cast<string>((ptd.first.getActualDateTime() - ptd.first.getTheoreticalDateTime()).total_seconds() / 60)
 				); //13
 
 				if(	getInterface()->hasPage<RealTimeUpdateScreenServiceInterfacePage>() &&

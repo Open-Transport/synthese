@@ -39,7 +39,6 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace server;
-	using namespace time;
 	using namespace db;
 	using namespace security;
 	using namespace util;
@@ -135,8 +134,6 @@ namespace synthese
 
 			CalendarTemplateElementTableSync::Shift(_calendar->getKey(), _rank, 1);
 			CalendarTemplateElementTableSync::Save(&e);
-
-			_calendar->addElement(e);
 		}
 
 

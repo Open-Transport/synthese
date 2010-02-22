@@ -24,8 +24,6 @@
 
 #include "SQLiteInheritanceTableSyncTemplate.h"
 
-#include "DateTime.h"
-
 #include "Alarm.h"
 #include "17_messages/Types.h"
 

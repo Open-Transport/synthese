@@ -28,11 +28,11 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
 	using namespace server;
 	using namespace security;
 
@@ -75,8 +75,8 @@ namespace synthese
 				DBLogEntryTableSync::Search(
 					env,
 					logKey,
-					DateTime(TIME_UNKNOWN),
-					DateTime(TIME_UNKNOWN),
+					ptime(not_a_date_time),
+					ptime(not_a_date_time),
 					UNKNOWN_VALUE,
 					DBLogEntry::DB_LOG_UNKNOWN,
 					objectId ? *objectId : UNKNOWN_VALUE,

@@ -45,6 +45,10 @@ namespace synthese
 			{
 				boost::shared_ptr<P> p(request.getFunction()->getPage()->template getNewOtherPage<P>());
 				this->getFunction()->setPage(p);
+				if(P::FACTORY_KEY == request.getFunction()->getPage()->getFactoryKey())
+				{
+					this->getFunction()->getPage()->setActiveTab(request.getFunction()->getPage()->getCurrentTab());
+				}
 			}
 			
 			boost::shared_ptr<P> getPage() const

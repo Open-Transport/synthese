@@ -40,7 +40,6 @@
 #include "SQLiteException.h"
 #include "ServiceDate.h"
 #include "ServiceDateTableSync.h"
-#include "Schedule.h"
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"
 #include "Point2D.h"
@@ -52,13 +51,13 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
 	using namespace env;
-	using namespace time;
 	using namespace graph;
 	using namespace pt;
 
@@ -110,8 +109,8 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 		    string serviceNumber (rows->getText(ContinuousServiceTableSync::COL_SERVICENUMBER));
-		    int range (rows->getInt (ContinuousServiceTableSync::COL_RANGE));
-		    int maxWaitingTime (rows->getInt (ContinuousServiceTableSync::COL_MAXWAITINGTIME));
+		    boost::posix_time::time_duration range (minutes(rows->getInt (ContinuousServiceTableSync::COL_RANGE)));
+		    boost::posix_time::time_duration maxWaitingTime (minutes(rows->getInt (ContinuousServiceTableSync::COL_MAXWAITINGTIME)));
 			uid pathId(rows->getLongLong(ContinuousServiceTableSync::COL_PATHID));
 
 		    string schedules (
@@ -150,14 +149,13 @@ namespace synthese
 					arrivalScheduleStr = departureScheduleStr;
 				}
 
-				Schedule departureSchedule (Schedule::FromString (departureScheduleStr));
-
-				Schedule arrivalSchedule (Schedule::FromString (arrivalScheduleStr));
+				time_duration departureSchedule(Service::DecodeSchedule(departureScheduleStr));
+				time_duration arrivalSchedule (Service::DecodeSchedule(arrivalScheduleStr));
 				arrivalSchedule += maxWaitingTime;
 
-				Schedule endDepartureSchedule(departureSchedule);
+				time_duration endDepartureSchedule(departureSchedule);
 				endDepartureSchedule += range;
-				Schedule endArrivalSchedule(arrivalSchedule);
+				time_duration endArrivalSchedule(arrivalSchedule);
 				endArrivalSchedule += range;
 
 				departureSchedules.push_back (make_pair(departureSchedule, endDepartureSchedule));
@@ -242,7 +240,7 @@ namespace synthese
                
 			 query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
+				<< object->getKey()
 				/// @todo fill other fields separated by ,
 				<< ")";
 			sqlite->execUpdate(query.str(), transaction);

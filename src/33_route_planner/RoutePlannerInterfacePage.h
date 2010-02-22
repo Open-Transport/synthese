@@ -27,17 +27,14 @@
 #include "InterfacePage.h"
 #include "FactorableTemplate.h"
 
+#include <boost/date_time/gregorian/greg_date.hpp>
+
 namespace synthese
 {
 	namespace transportwebsite
 	{
 		class HourPeriod;
 		class Site;
-	}
-
-	namespace time
-	{
-		class Date;
 	}
 
 	namespace server
@@ -121,7 +118,7 @@ namespace synthese
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
 				, const ptrouteplanner::PTRoutePlannerResult& object
-				, const time::Date& date
+				, const boost::gregorian::date& date
 				, size_t periodId
 				, const geography::Place* originPlace
 				, const geography::Place* destinationPlace
@@ -135,7 +132,7 @@ namespace synthese
 			void display(
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
-				, const time::Date& date
+				, const boost::gregorian::date& date
 				, size_t periodId
 				, bool home
 				, const std::string& originCity

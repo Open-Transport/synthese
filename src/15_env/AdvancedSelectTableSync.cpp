@@ -22,8 +22,6 @@
 
 #include "AdvancedSelectTableSync.h"
 
-#include "Schedule.h"
-
 #include "LineStopTableSync.h"
 #include "LineTableSync.h"
 #include "PhysicalStopTableSync.h"
@@ -50,6 +48,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace pt;
+	using namespace graph;
 
 	namespace env
 	{
@@ -129,8 +128,8 @@ namespace synthese
 					if(startDate && d < *startDate) continue;
 					if(endDate && d > *endDate) continue;
 
-					const int startHour(serv->getDepartureBeginScheduleToIndex(false, 0).getHour().getHours());
-					const int endHour(serv->getDepartureEndScheduleToIndex(false, 0).getHour().getHours());
+					const int startHour(Service::GetTimeOfDay(serv->getDepartureBeginScheduleToIndex(false, 0)).hours());
+					const int endHour(Service::GetTimeOfDay(serv->getDepartureEndScheduleToIndex(false, 0)).hours());
 					if (startHour <= endHour)
 					{
 						for(int h(startHour); h <= endHour; ++h)
@@ -190,8 +189,8 @@ namespace synthese
 					if(startDate && d < *startDate) continue;
 					if(endDate && d > *endDate) continue;
 
-					const int startHour(serv->getDepartureBeginScheduleToIndex(false, 0).getHour().getHours());
-					const int endHour(serv->getDepartureEndScheduleToIndex(false, 0).getHour().getHours());
+					const int startHour(Service::GetTimeOfDay(serv->getDepartureBeginScheduleToIndex(false, 0)).hours());
+					const int endHour(Service::GetTimeOfDay(serv->getDepartureEndScheduleToIndex(false, 0)).hours());
 					if (startHour <= endHour)
 					{
 						for(int h(startHour); h <= endHour; ++h)

@@ -58,10 +58,6 @@
 #include "Projection.h"
 #include "Point2D.h"
 
-// 04 Time
-#include "Date.h"
-#include "Hour.h"
-
 // 01 Util
 #include "Conversion.h"
 #include "XmlToolkit.h"
@@ -83,12 +79,13 @@ using namespace std;
 using namespace boost;
 using namespace boost::gregorian;
 using namespace boost::filesystem;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
 	using namespace geography;
 	using namespace geometry;
-	using namespace time;
 	using namespace env;
 	using namespace util::XmlToolkit;
 	using namespace util;
@@ -124,10 +121,10 @@ namespace synthese
 		}
 
 
-		string ToXsdDaysDuration (int daysDelay)
+		string ToXsdDaysDuration (date_duration daysDelay)
 		{
 			stringstream s;
-			s << "P" << daysDelay << "D";
+			s << "P" << daysDelay.days() << "D";
 			return s.str();
 		}
 
@@ -142,27 +139,15 @@ namespace synthese
 			return s.str();
 		}
 
-		string ToXsdDate (const date& d)
-		{
-			stringstream ss;
-			ss << setw( 4 ) << setfill ( '0' )
-			   << d.year() << "-"
-			   << setw( 2 ) << setfill ( '0' )
-			   << d.month().as_number() << "-"
-			   << setw( 2 ) << setfill ( '0' )
-			   << d.day();
-			return ss.str ();
-		}
+		
 
-
-
-		string ToXsdTime (const Hour& time)
+		string ToXsdTime (const time_duration& time)
 		{
 			stringstream ss;
 			ss << setw( 2 ) << setfill ( '0' )
-			   << time.getHours () << ":"
+			   << time.hours() << ":"
 			   << setw( 2 ) << setfill ( '0' )
-			   << time.getMinutes () << ":00";
+			   << time.minutes () << ":00";
 			return ss.str ();
 		}
 
@@ -214,7 +199,7 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					optional<RegistryKeyType>(),
 					optional<string>(),
-					optional<Date>(),
+					optional<date>(),
 					false,
 					0,
 					optional<size_t>(),
@@ -252,7 +237,7 @@ namespace synthese
 			const TransportNetwork* tn(_commercialLine->getNetwork());
 			os << "<PTNetwork>" << "\n";
 			os << "<objectId>" << TridentId (peerid, "PTNetwork", *tn) << "</objectId>" << "\n";
-			os << "<versionDate>" << ToXsdDate(day_clock::local_day()) << "</versionDate>" << "\n";
+			os << "<versionDate>" << to_iso_extended_string(day_clock::local_day()) << "</versionDate>" << "\n";
 			os << "<name>" << tn->getName () << "</name>" << "\n";
 			os << "<registration>" << "\n";
 			os << "<registrationNumber>" << Conversion::ToString (tn->getKey ()) << "</registrationNumber>" << "\n";
@@ -423,7 +408,7 @@ namespace synthese
 
 				BOOST_FOREACH(const date& d, srv->getActiveDates())
 				{
-					os << "<calendarDay>" << ToXsdDate (d) << "</calendarDay>" << "\n";
+					os << "<calendarDay>" << to_iso_extended_string(d) << "</calendarDay>" << "\n";
 				}
 				os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
@@ -437,7 +422,7 @@ namespace synthese
 
 				BOOST_FOREACH(const date& d, srv->getActiveDates())
 				{
-					os << "<calendarDay>" << ToXsdDate (d) << "</calendarDay>" << "\n";
+					os << "<calendarDay>" << to_iso_extended_string(d) << "</calendarDay>" << "\n";
 				}
 				os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
@@ -454,10 +439,10 @@ namespace synthese
 
 				os << "<TimeSlot>" << "\n";
 				os << "<objectId>" << timeSlotId << "</objectId>" << "\n";
-				os << "<beginningSlotTime>" << ToXsdTime(csrv->getDepartureBeginScheduleToIndex(false, 0).getHour()) << "</beginningSlotTime>" << "\n";
-				os << "<endSlotTime>" << ToXsdTime(csrv->getDepartureEndScheduleToIndex(false, 0).getHour()) << "</endSlotTime>" << "\n";
-				os << "<firstDepartureTimeInSlot>" << ToXsdTime(csrv->getDepartureBeginScheduleToIndex(false, 0).getHour()) << "</firstDepartureTimeInSlot>" << "\n";
-				os << "<lastDepartureTimeInSlot>" << ToXsdTime(csrv->getDepartureEndScheduleToIndex(false, 0).getHour()) << "</lastDepartureTimeInSlot>" << "\n";
+				os << "<beginningSlotTime>" << ToXsdTime(Service::GetTimeOfDay(csrv->getDepartureBeginScheduleToIndex(false, 0))) << "</beginningSlotTime>" << "\n";
+				os << "<endSlotTime>" << ToXsdTime(Service::GetTimeOfDay(csrv->getDepartureEndScheduleToIndex(false, 0))) << "</endSlotTime>" << "\n";
+				os << "<firstDepartureTimeInSlot>" << ToXsdTime(Service::GetTimeOfDay(csrv->getDepartureBeginScheduleToIndex(false, 0))) << "</firstDepartureTimeInSlot>" << "\n";
+				os << "<lastDepartureTimeInSlot>" << ToXsdTime(Service::GetTimeOfDay(csrv->getDepartureEndScheduleToIndex(false, 0))) << "</lastDepartureTimeInSlot>" << "\n";
 				os << "</TimeSlot>" << "\n";
 			}
 
@@ -693,17 +678,17 @@ namespace synthese
 					os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
 					if (ls->getRankInPath() > 0 && ls->isArrival())
-						os << "<arrivalTime>" << ToXsdTime (srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()).getHour ()) 
+						os << "<arrivalTime>" << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()))) 
 						<< "</arrivalTime>" << "\n";
 
 					os	<< "<departureTime>";
 					if (ls->getRankInPath() != linestops.size () - 1 && ls->isDeparture())
 					{
-						os << ToXsdTime (srv->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()).getHour());
+						os << ToXsdTime (Service::GetTimeOfDay(srv->getDepartureBeginScheduleToIndex(false, ls->getRankInPath())));
 					}
 					else
 					{
-						os << ToXsdTime (srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()).getHour());
+						os << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath())));
 					}
 					os	<< "</departureTime>" << "\n";
 
@@ -799,9 +784,9 @@ namespace synthese
 						os << "<stopPointId>" << TridentId (peerid, "StopPoint", *ls) << "</stopPointId>" << "\n";
 						os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
-						const Schedule& schedule((ls->getRankInPath() > 0 && ls->isArrival()) ? srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()) : srv->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()));
-						os << "<elapseDuration>" << ToXsdDuration(posix_time::minutes(schedule - srv->getDepartureBeginScheduleToIndex(false, 0))) << "</elapseDuration>" << "\n";
-						os << "<headwayFrequency>" << ToXsdDuration(posix_time::minutes(srv->getMaxWaitingTime())) << "</headwayFrequency>" << "\n";
+						const time_duration& schedule((ls->getRankInPath() > 0 && ls->isArrival()) ? srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()) : srv->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()));
+						os << "<elapseDuration>" << ToXsdDuration(schedule - srv->getDepartureBeginScheduleToIndex(false, 0)) << "</elapseDuration>" << "\n";
+						os << "<headwayFrequency>" << ToXsdDuration(srv->getMaxWaitingTime()) << "</headwayFrequency>" << "\n";
 
 						os << "</vehicleJourneyAtStop>" << "\n";
 					}
@@ -874,21 +859,21 @@ namespace synthese
  				{
  					const PTUseRule& rule(*r.second);
  
-					if (rule.getReservationType() == PTUseRule::RESERVATION_RULE_FORBIDDEN || (rule.getMinDelayDays() == 0 && rule.getMinDelayMinutes() == 0))	continue;
+					if (rule.getReservationType() == PTUseRule::RESERVATION_RULE_FORBIDDEN || (rule.getMinDelayDays().days() == 0 && rule.getMinDelayMinutes().total_seconds() == 0))	continue;
  
  					os << "<ReservationRule>" << "\n";
  					os << "<objectId>" << TridentId (peerid, "ReservationRule", rule.getKey ()) << "</objectId>" << "\n";
 					os << "<ReservationCompulsory>" << ((rule.getReservationType() == PTUseRule::RESERVATION_RULE_COMPULSORY) ? "compulsory" : "optional") << "</ReservationCompulsory>" << "\n";
  					os << "<deadLineIsTheCustomerDeparture>" << !rule.getOriginIsReference() << "</deadLineIsTheCustomerDeparture>" << "\n";
- 					if (rule.getMinDelayMinutes() > 0)
+ 					if (rule.getMinDelayMinutes().total_seconds() > 0)
  					{
-						os << "<minMinutesDurationBeforeDeadline>" << ToXsdDuration(posix_time::minutes(rule.getMinDelayMinutes())) << "</minMinutesDurationBeforeDeadline>" << "\n";
+						os << "<minMinutesDurationBeforeDeadline>" << ToXsdDuration(rule.getMinDelayMinutes()) << "</minMinutesDurationBeforeDeadline>" << "\n";
 					}
- 					if (rule.getMinDelayDays() > 0)
+ 					if (rule.getMinDelayDays().days() > 0)
  					{
 						os << "<minDaysDurationBeforeDeadline>" << ToXsdDaysDuration(rule.getMinDelayDays()) << "</minDaysDurationBeforeDeadline>" << "\n";
  					}
- 					if (!rule.getHourDeadLine().isUnknown())
+ 					if (!rule.getHourDeadLine().is_not_a_date_time())
  					{
  						os << "<yesterdayBookingMaxTime>" << ToXsdTime(rule.getHourDeadLine()) << "</yesterdayBookingMaxTime>" << "\n";
  					}
@@ -1192,7 +1177,7 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					optional<RegistryKeyType>(),
 					optional<string>(),
-					optional<Date>(),
+					optional<date>(),
 					false,
 					0, optional<size_t>(), true, true,
 					UP_LINKS_LOAD_LEVEL
@@ -1304,17 +1289,17 @@ namespace synthese
 				ScheduledService::Schedules deps;
 				ScheduledService::Schedules arrs;
 				int stopsNumber(serviceNode.nChildNode("VehicleJourneyAtStop"));
-				Schedule lastDep(Hour(0,0,0),0);
-				Schedule lastArr(Hour(0,0,0),0);
+				time_duration lastDep(0,0,0);
+				time_duration lastArr(0,0,0);
 				for(int stopRank(0); stopRank < stopsNumber; ++stopRank)
 				{
 					XMLNode vjsNode(serviceNode.getChildNode("VehicleJourneyAtStop", stopRank));
 					XMLNode depNode(vjsNode.getChildNode("departureTime"));
 					XMLNode arrNode(vjsNode.getChildNode("arrivalTime"));
-					Hour depHour(Hour::FromSQLTime(depNode.getText()));
-					Hour arrHour(Hour::FromSQLTime(arrNode.getText()));
-					Schedule depSchedule(depHour, lastDep.getDaysSinceDeparture() + (depHour < lastDep.getHour() ? 1 : 0));
-					Schedule arrSchedule(arrHour, lastArr.getDaysSinceDeparture() + (arrHour < lastArr.getHour() ? 1 : 0));
+					time_duration depHour(duration_from_string(depNode.getText()));
+					time_duration arrHour(duration_from_string(arrNode.getText()));
+					time_duration depSchedule(depHour + hours(24 * (lastDep.hours() / 24 + (depHour < Service::GetTimeOfDay(lastDep) ? 1 : 0))));
+					time_duration arrSchedule(arrHour + hours(24 * (lastArr.hours() / 24 + (arrHour < Service::GetTimeOfDay(lastArr) ? 1 : 0))));
 					lastDep = depSchedule;
 					lastArr = arrSchedule;
 					deps.push_back(depSchedule);
@@ -1346,13 +1331,13 @@ namespace synthese
 					_env->getEditableRegistry<ScheduledService>().add(service);
 					services[keyNode.getText()] = service.get();
 					
-					os << "CREA : Creation of service " << service->getServiceNumber() << " for " << keyNode.getText() << " (" << deps[0].toString() << ") on route " << line->getKey() << " (" << line->getName() << ")<br />";
+					os << "CREA : Creation of service " << service->getServiceNumber() << " for " << keyNode.getText() << " (" << deps[0] << ") on route " << line->getKey() << " (" << line->getName() << ")<br />";
 				}
 				else
 				{
 					services[keyNode.getText()] = existingService;
 					
-					os << "LOAD : Use of service " << existingService->getKey() << " (" << existingService->getServiceNumber() << ") for " << keyNode.getText() << " (" << deps[0].toString() << ") on route " << line->getKey() << " (" << line->getName() << ")<br />";
+					os << "LOAD : Use of service " << existingService->getKey() << " (" << existingService->getServiceNumber() << ") for " << keyNode.getText() << " (" << deps[0] << ") on route " << line->getKey() << " (" << line->getName() << ")<br />";
 
 				}
 			}

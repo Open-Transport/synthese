@@ -29,14 +29,10 @@
 #include "FactorableTemplate.h"
 #include "Request.h"
 
+#include <boost/date_time/posix_time/ptime.hpp>
+
 namespace synthese
 {
-	namespace time
-	{
-		class DateTime;
-		class Date;
-	}
-
 	namespace interfaces
 	{
 		/** DateTimeInterfacePage Interface Page Class.
@@ -51,7 +47,7 @@ namespace synthese
 			 - day of week  : 0 = sunday, 1 = monday, ..., 6 = saturday 
 
 			Object :
-			 - DateTime
+			 - boost::gregorian::date or boost::posix_time::ptime
 		*/
 		class DateTimeInterfacePage : public util::FactorableTemplate<InterfacePage,DateTimeInterfacePage>
 		{
@@ -71,7 +67,7 @@ namespace synthese
 			void display(
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
-				, const time::DateTime& dateTime
+				, const boost::posix_time::ptime& dateTime
 				, const server::Request* request = NULL
 			) const;
 
@@ -81,7 +77,7 @@ namespace synthese
 			void display(
 				std::ostream& stream
 				, interfaces::VariablesMap& variables
-				, const time::Date& date
+				, const boost::gregorian::date& date
 				, const server::Request* request = NULL
 			) const;
 

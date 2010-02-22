@@ -61,7 +61,6 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace html;
-	using namespace time;
 	using namespace messages;
 	using namespace security;
 

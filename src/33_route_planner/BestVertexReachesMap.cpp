@@ -38,6 +38,8 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
@@ -45,7 +47,6 @@ namespace synthese
 	using namespace graph;
 	using namespace road;
 	using namespace pt;
-	using namespace time;
 		
 
 	namespace algorithm
@@ -55,14 +56,14 @@ namespace synthese
 // 
 // 		bool BestVertexReachesMap::mustBeCleared(
 // 			const Journey& testJourney,
-// 			const time::DateTime& dateTime,
-// 			const DateTime& bestEndTime
+// 			const time::ptime& ptime,
+// 			const ptime& bestEndTime
 // 		) const {
-// 			if ((dateTime.*_strictWeakCTimeComparison)(bestEndTime))
+// 			if ((ptime.*_strictWeakCTimeComparison)(bestEndTime))
 // 				return true;
 // 			TimeMap::const_iterator itc(_bestTimeMap.find(testJourney.getEndEdge()->getFromVertex());
 // 			if (itc != _bestTimeMap.end ())
-// 				return (dateTime.*_cleanUpUselessComparison)(itc->second);
+// 				return (ptime.*_cleanUpUselessComparison)(itc->second);
 // 			return false;
 // 
 // 		}
@@ -71,7 +72,7 @@ namespace synthese
 
 		bool BestVertexReachesMap::isUseLess(
 			boost::shared_ptr<graph::Journey> journeysptr,
-			const DateTime& originDateTime,
+			const ptime& originDateTime,
 			bool propagateInConnectionPlace,
 			bool strict
 		){
@@ -80,8 +81,8 @@ namespace synthese
 			const size_t transferNumber(journey.size());
 			const posix_time::time_duration duration(
 				journey.getMethod() == DEPARTURE_TO_ARRIVAL ?
-				journey.getEndTime().getSecondsDifference(originDateTime) :
-				originDateTime.getSecondsDifference(journey.getEndTime())
+				journey.getEndTime() - originDateTime :
+				originDateTime - journey.getEndTime()
 			);
 			assert(duration.total_seconds() >= 0);
 

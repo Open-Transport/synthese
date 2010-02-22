@@ -26,13 +26,13 @@
 #include <vector>
 
 #include "01_util/Constants.h"
-#include "DateTime.h"
-#include "Schedule.h"
 #include "Registrable.h"
 #include "GraphTypes.h"
 #include "Path.h"
 
 #include <boost/optional.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 namespace synthese
 {
@@ -242,8 +242,8 @@ namespace synthese
 				*/
 				ServicePointer getNextService (
 					UserClassCode userClass,
-					time::DateTime departureMoment,
-					const time::DateTime& maxDepartureMoment,
+					boost::posix_time::ptime departureMoment,
+					const boost::posix_time::ptime& maxDepartureMoment,
 					bool controlIfTheServiceIsReachable,
 					boost::optional<DepartureServiceIndex::Value>& minNextServiceIndex,
 					bool inverted = false
@@ -265,8 +265,8 @@ namespace synthese
 				*/
 				ServicePointer getPreviousService(
 					UserClassCode userClass,
-					time::DateTime arrivalMoment,
-					const time::DateTime& minArrivalMoment,
+					boost::posix_time::ptime arrivalMoment,
+					const boost::posix_time::ptime& minArrivalMoment,
 					bool controlIfTheServiceIsReachable,
 					boost::optional<ArrivalServiceIndex::Value>& maxPreviousServiceIndex,
 					bool inverted = false
@@ -281,7 +281,6 @@ namespace synthese
 			    
 				void markServiceIndexUpdateNeeded(bool RTDataOnly) const;
 			//@}
-	    
 		};
 	}
 }

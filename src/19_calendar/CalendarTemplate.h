@@ -30,6 +30,8 @@
 #include "Exception.h"
 #include "Calendar.h"
 
+#include <map>
+
 namespace synthese
 {
 	namespace calendar
@@ -105,9 +107,11 @@ namespace synthese
 			typedef std::vector<std::pair<Category, std::string> > CategoryList;
 			
 			static CategoryList GetCategoriesList();
+
+			typedef std::map<std::size_t, CalendarTemplateElement> Elements;
 			
 		private:
-			std::vector<CalendarTemplateElement>	_elements;
+			Elements	_elements;
 			std::string								_text;
 			Category								_category;
 

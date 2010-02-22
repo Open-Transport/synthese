@@ -28,13 +28,14 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace pt;
 	using namespace util;
 	using namespace db;
-	using namespace time;
 	using namespace env;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,PTUseRuleTableSync>::FACTORY_KEY("35.10.06 Public transportation use rules");
@@ -86,13 +87,12 @@ namespace synthese
 		){
 			bool originIsReference (rows->getBool (PTUseRuleTableSync::COL_ORIGINISREFERENCE));
 
-			int minDelayMinutes = rows->getInt (PTUseRuleTableSync::COL_MINDELAYMINUTES);
-			int minDelayDays = rows->getInt (PTUseRuleTableSync::COL_MINDELAYDAYS);
-			int maxDelayDays = rows->getInt (PTUseRuleTableSync::COL_MAXDELAYDAYS);
+			time_duration minDelayMinutes = minutes(rows->getInt (PTUseRuleTableSync::COL_MINDELAYMINUTES));
+			date_duration minDelayDays = days(rows->getInt (PTUseRuleTableSync::COL_MINDELAYDAYS));
+			date_duration maxDelayDays = days(rows->getInt (PTUseRuleTableSync::COL_MAXDELAYDAYS));
 
 
-			Hour hourDeadline = 
-			Hour::FromSQLTime (rows->getText (PTUseRuleTableSync::COL_HOURDEADLINE));
+			time_duration hourDeadline(rows->getHour(PTUseRuleTableSync::COL_HOURDEADLINE));
 
 			PTUseRule::ReservationRuleType ruleType(static_cast<PTUseRule::ReservationRuleType>(rows->getInt(PTUseRuleTableSync::COL_RESERVATION_TYPE)));
 
@@ -100,7 +100,7 @@ namespace synthese
  		    rr->setOriginIsReference (originIsReference);
  		    rr->setMinDelayMinutes (minDelayMinutes);
  		    rr->setMinDelayDays (minDelayDays);
-			rr->setMaxDelayDays(maxDelayDays > 0 ? maxDelayDays : optional<size_t>());
+			rr->setMaxDelayDays(maxDelayDays.days() > 0 ? maxDelayDays : optional<date_duration>());
  		    rr->setHourDeadLine (hourDeadline);
 			rr->setName(rows->getText(PTUseRuleTableSync::COL_NAME));
 			rr->setAccessCapacity(rows->getOptionalUnsignedInt(PTUseRuleTableSync::COL_CAPACITY));
@@ -136,10 +136,10 @@ namespace synthese
 				object->getKey() << "," <<
 				(object->getAccessCapacity() ? lexical_cast<string>(*object->getAccessCapacity()) : "''") << "," <<
 				static_cast<int>(object->getReservationType()) << "," <<
-				object->getMinDelayMinutes() << "," <<
-				object->getMinDelayDays() << "," <<
-				object->getMaxDelayDays() << "," <<
-				object->getHourDeadLine().toSQLString() << "," <<
+				object->getMinDelayMinutes().minutes() << "," <<
+				object->getMinDelayDays().days() << "," <<
+				(object->getMaxDelayDays() ? "0" : lexical_cast<string>(object->getMaxDelayDays()->days())) << "," <<
+				"\"" << to_simple_string(object->getHourDeadLine()) << "\"," <<
 				(object->getDefaultFare() ? object->getDefaultFare()->getKey() : RegistryKeyType(0)) <<
 			")";
 			sqlite->execUpdate(query.str(), transaction);

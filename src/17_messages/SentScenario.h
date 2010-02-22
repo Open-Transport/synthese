@@ -27,11 +27,11 @@
 
 #include "17_messages/Types.h"
 #include "Registry.h"
-#include "DateTime.h"
 #include "Scenario.h"
 
 #include <map>
 #include <string>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace synthese
 {
@@ -57,8 +57,8 @@ namespace synthese
 
 		private:
 			bool					_isEnabled;
-			time::DateTime			_periodStart; //!< Alarm applicability period start
-			time::DateTime			_periodEnd;   //!< Alarm applicability period end
+			boost::posix_time::ptime	_periodStart; //!< Alarm applicability period start
+			boost::posix_time::ptime	_periodEnd;   //!< Alarm applicability period end
 			const ScenarioTemplate*	_template;
 			VariablesMap			_variables;
 
@@ -88,8 +88,8 @@ namespace synthese
 			
 			~SentScenario();
 
-			const time::DateTime&	getPeriodStart()	const;
-			const time::DateTime&	getPeriodEnd()		const;
+			const boost::posix_time::ptime&	getPeriodStart()	const;
+			const boost::posix_time::ptime&	getPeriodEnd()		const;
 			bool					getIsEnabled()		const;
 			const ScenarioTemplate*	getTemplate()		const;
 			const VariablesMap&		getVariables()		const;
@@ -98,14 +98,14 @@ namespace synthese
 			/// Start broadcast date setter.
 			///	Updates the alarms too.
 			///	@param periodStart Start broadcast date
-			void setPeriodStart ( const synthese::time::DateTime& periodStart);
+			void setPeriodStart ( const boost::posix_time::ptime& periodStart);
 			
 
 			////////////////////////////////////////////////////////////////////
 			/// End broadcast date setter.
 			///	Updates the alarms too.
 			///	@param periodEnd End broadcast date
-			void setPeriodEnd ( const synthese::time::DateTime& periodEnd);
+			void setPeriodEnd ( const boost::posix_time::ptime& periodEnd);
 			void setIsEnabled(bool value);
 			void setTemplate(const ScenarioTemplate* value);
 			void setVariables(const VariablesMap& value);
@@ -122,9 +122,9 @@ namespace synthese
 				@param end End of applicability period
 				@return true if the message is not empty and is valid for the whole period given as argument.
 			*/
-			bool isApplicable ( const time::DateTime& start, const time::DateTime& end ) const;
+			bool isApplicable ( const boost::posix_time::ptime& start, const boost::posix_time::ptime& end ) const;
 
-			bool isApplicable(const time::DateTime& date) const;
+			bool isApplicable(const boost::posix_time::ptime& date) const;
 
 		};
 	}

@@ -23,23 +23,24 @@
 */
 
 #include "TimetableServiceRowCellInterfacePage.h"
-#include "Schedule.h"
 #include "PhysicalStop.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "City.h"
 #include "RollingStock.h"
+#include "Service.h"
 
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using namespace time;
 	using namespace env;
+	using namespace graph;
 
 	namespace util
 	{
@@ -67,8 +68,8 @@ namespace synthese
 			ParametersVector pv;
 			if(object.first)
 			{
-				pv.push_back(lexical_cast<string>(object.second.getHour().getHours())); //0
-				pv.push_back(lexical_cast<string>(object.second.getHour().getMinutes())); //1
+				pv.push_back(lexical_cast<string>(Service::GetTimeOfDay(object.second).hours())); //0
+				pv.push_back(lexical_cast<string>(Service::GetTimeOfDay(object.second).minutes())); //1
 				pv.push_back(object.first->getConnectionPlace()->getName()); //2
 				pv.push_back(object.first->getConnectionPlace()->getCity()->getName()); //3
 				pv.push_back(object.first->getConnectionPlace()->getName26()); //4

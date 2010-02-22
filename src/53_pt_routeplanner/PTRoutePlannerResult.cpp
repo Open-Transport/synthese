@@ -35,6 +35,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -43,7 +44,6 @@ namespace synthese
 	using namespace geography;
 	using namespace algorithm;
 	using namespace html;
-	using namespace time;
 	using namespace env;
 
 	namespace ptrouteplanner
@@ -364,7 +364,7 @@ namespace synthese
 
 			// Solutions display loop
 			int solution(1);
-			DateTime now(TIME_CURRENT);
+			ptime now(second_clock::local_time());
 			stream << t.open();
 			for (PTRoutePlannerResult::Journeys::const_iterator it(_journeys.begin()); it != _journeys.end(); ++it)
 			{
@@ -378,7 +378,7 @@ namespace synthese
 						resaForm->getRadioInput(
 							resaRadioFieldName,
 							it->getDepartureTime(),
-							(solution==1) ? it->getDepartureTime() : DateTime(UNKNOWN_VALUE),
+							(solution==1) ? it->getDepartureTime() : ptime(not_a_date_time),
 							" Solution "+ lexical_cast<string>(solution)
 						)
 					;
@@ -392,17 +392,17 @@ namespace synthese
 
 				if (it->getContinuousServiceRange().total_seconds() > 60)
 				{
-					DateTime endRange(its->getDepartureDateTime());
-					endRange += it->getContinuousServiceRange().total_seconds() / 60;
-					stream << " - Service continu jusqu'à " << endRange.toString();
+					ptime endRange(its->getDepartureDateTime());
+					endRange += it->getContinuousServiceRange();
+					stream << " - Service continu jusqu'à " << endRange;
 				}
 				if (it->getReservationCompliance() == true)
 				{
-					stream << " - " << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire") << " Réservation obligatoire avant le " << it->getReservationDeadLine().toString();
+					stream << " - " << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire") << " Réservation obligatoire avant le " << it->getReservationDeadLine();
 				}
 				if (it->getReservationCompliance() == boost::logic::indeterminate)
 				{
-					stream << " - " << HTMLModule::getHTMLImage("resa_optional.png", "Réservation facultative") << " Réservation facultative avant le " << it->getReservationDeadLine().toString();
+					stream << " - " << HTMLModule::getHTMLImage("resa_optional.png", "Réservation facultative") << " Réservation facultative avant le " << it->getReservationDeadLine();
 				}
 				if(dynamic_cast<const City*>(_departurePlace) || dynamic_cast<const City*>(_arrivalPlace))
 				{
@@ -430,7 +430,7 @@ namespace synthese
 
 
 				stream << t.row();
-				stream << t.col() << "<b>" << its->getDepartureDateTime().toString(true) << "</b>";
+				stream << t.col() << "<b>" << its->getDepartureDateTime() << "</b>";
 
 				// Line
 				const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
@@ -448,7 +448,7 @@ namespace synthese
 					while(true)
 					{
 						// Arrival
-						stream << t.col() << its->getArrivalDateTime().toString(true);
+						stream << t.col() << its->getArrivalDateTime();
 
 						// Place
 						stream << t.col();
@@ -464,7 +464,7 @@ namespace synthese
 						++its;
 
 						// Departure
-						stream << t.col() << its->getDepartureDateTime().toString(true);
+						stream << t.col() << its->getDepartureDateTime();
 
 						// Line
 						const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
@@ -487,7 +487,7 @@ namespace synthese
 				}
 
 				// Final arrival
-				stream << t.col() << "<b>" << its->getArrivalDateTime().toString(true) << "</b>";
+				stream << t.col() << "<b>" << its->getArrivalDateTime() << "</b>";
 			}
 			stream << t.close();
 

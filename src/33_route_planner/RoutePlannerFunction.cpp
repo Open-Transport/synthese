@@ -30,7 +30,6 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "Interface.h"
-#include "TimeParseException.h"
 #include "ObjectNotFoundException.h"
 #include "GeoPoint.h"
 #include "Projection.h"
@@ -57,13 +56,14 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace server;
 	using namespace env;
-	using namespace time;
 	using namespace interfaces;
 	using namespace transportwebsite;
 	using namespace db;
@@ -149,60 +149,17 @@ namespace synthese
 			try
 			{
 				// Date
-				Date day(map.getDate(PARAMETER_DAY, false, string()));
-				if (day.isUnknown()) // 1b
-				{
-					if(	map.getDateTime(PARAMETER_HIGHEST_ARRIVAL_TIME, false, string()).isUnknown()
-					){ // All default values
-						_planningOrder = DEPARTURE_FIRST;
-						_startDate = map.getDateTime(PARAMETER_LOWEST_DEPARTURE_TIME, false, string());
-						if(_startDate.isUnknown())
-						{
-							_startDate = DateTime(TIME_CURRENT);
-						}
-						_startArrivalDate = _startDate;
-						_endDate = map.getDateTime(PARAMETER_HIGHEST_DEPARTURE_TIME, false, string());
-						if(_endDate.isUnknown())
-						{
-							_endDate = _startDate;
-							_endDate.addDaysDuration(1);
-						}
-						_endArrivalDate = _endDate;
-						if(	_departure_place.placeResult.value &&
-							_arrival_place.placeResult.value &&
-							!_departure_place.placeResult.value->getPoint().isUnknown() &&
-							!_arrival_place.placeResult.value->getPoint().isUnknown()
-						){
-							_endArrivalDate += 2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000);
-						}
-					}
-					else if(map.getDateTime(PARAMETER_LOWEST_DEPARTURE_TIME, false, string()).isUnknown())
-					{ // Arrival to departure from the specified arrival time
-						_planningOrder = ARRIVAL_FIRST;
-						_endArrivalDate = map.getDateTime(PARAMETER_HIGHEST_ARRIVAL_TIME, false, string());
-						_startArrivalDate = map.getDateTime(PARAMETER_LOWEST_ARRIVAL_TIME, false, string());
-						if(_startArrivalDate.isUnknown())
-						{
-							_startArrivalDate = _endArrivalDate;
-							_startArrivalDate.subDaysDuration(1);
-						}
-						_startDate = _startArrivalDate;
-						if(	_departure_place.placeResult.value &&
-							_arrival_place.placeResult.value &&
-							!_departure_place.placeResult.value->getPoint().isUnknown() &&
-							!_arrival_place.placeResult.value->getPoint().isUnknown()
-						){
-							_startDate -= 2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000);
-						}
-					}
-				}
-				else // 1a
-				{
+				if(!map.getDefault<string>(PARAMETER_DAY).empty())
+				{ // 1a
+					date day(from_string(map.get<string>(PARAMETER_DAY)));
+
 					_planningOrder = DEPARTURE_FIRST;
 					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
 					if (_periodId >= _site->getPeriods().size())
+					{
 						throw RequestException("Bad value for period id");
-					_startDate = DateTime(day, Hour(0, 0));
+					}
+					_startDate = ptime(day, time_duration(0, 0, 0));
 					_endDate = _startDate;
 					_period = &_site->getPeriods().at(_periodId);
 					_site->applyPeriod(*_period, _startDate, _endDate);
@@ -213,17 +170,68 @@ namespace synthese
 						!_departure_place.placeResult.value->getPoint().isUnknown() &&
 						!_arrival_place.placeResult.value->getPoint().isUnknown()
 					){
-						_endArrivalDate += 2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000);
+						_endArrivalDate += minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000));
+					}
+				}
+				else
+				{ // 1b
+					if(	!map.getOptional<string>(PARAMETER_HIGHEST_ARRIVAL_TIME)
+					){ // All default values
+						_planningOrder = DEPARTURE_FIRST;
+						if(!map.getDefault<string>(PARAMETER_LOWEST_DEPARTURE_TIME).empty())
+						{
+							_startDate = time_from_string(map.get<string>(PARAMETER_LOWEST_DEPARTURE_TIME));
+						}
+						else
+						{
+							_startDate = ptime(second_clock::local_time());
+						}
+						_startArrivalDate = _startDate;
+						if(!map.getDefault<string>(PARAMETER_HIGHEST_DEPARTURE_TIME).empty())
+						{
+							_endDate = time_from_string(map.get<string>(PARAMETER_HIGHEST_DEPARTURE_TIME));
+						}
+						else
+						{
+							_endDate = _startDate;
+							_endDate += days(1);
+						}
+						_endArrivalDate = _endDate;
+						if(	_departure_place.placeResult.value &&
+							_arrival_place.placeResult.value &&
+							!_departure_place.placeResult.value->getPoint().isUnknown() &&
+							!_arrival_place.placeResult.value->getPoint().isUnknown()
+						){
+							_endArrivalDate += minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000));
+						}
+					}
+					else if(!map.getOptional<string>(PARAMETER_LOWEST_DEPARTURE_TIME))
+					{ // Arrival to departure from the specified arrival time
+						_planningOrder = ARRIVAL_FIRST;
+						_endArrivalDate = time_from_string(map.get<string>(PARAMETER_HIGHEST_ARRIVAL_TIME));
+						if(!map.getDefault<string>(PARAMETER_LOWEST_ARRIVAL_TIME).empty())
+						{
+							_startArrivalDate = time_from_string(map.get<string>(PARAMETER_LOWEST_ARRIVAL_TIME));
+						}
+						else
+						{
+							_startArrivalDate = _endArrivalDate;
+							_startArrivalDate -= days(1);
+						}
+						_startDate = _startArrivalDate;
+						if(	_departure_place.placeResult.value &&
+							_arrival_place.placeResult.value &&
+							!_departure_place.placeResult.value->getPoint().isUnknown() &&
+							!_arrival_place.placeResult.value->getPoint().isUnknown()
+						){
+							_startDate -= minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000));
+						}
 					}
 				}
 			}
 			catch(Site::ForbiddenDateException)
 			{
 				throw RequestException("Date in the past is forbidden");
-			}
-			catch (time::TimeParseException)
-			{
-				throw RequestException("Bad date");
 			}
 			catch(ParametersMap::MissingParameterException& e)
 			{
@@ -269,12 +277,12 @@ namespace synthese
 			VariablesMap vm;
 			if (_departure_place.placeResult.value && _arrival_place.placeResult.value)
 			{
-				DateTime startDate(_planningOrder == DEPARTURE_FIRST ? _startDate : _endArrivalDate);
+				ptime startDate(_planningOrder == DEPARTURE_FIRST ? _startDate : _endArrivalDate);
 				if(_planningOrder == ARRIVAL_FIRST)
 				{
-					startDate = Hour(3,0);
+					startDate = ptime(startDate.date(), hours(3));
 				}
-				DateTime endDate(_planningOrder == DEPARTURE_FIRST ? _endDate : _endArrivalDate);
+				ptime endDate(_planningOrder == DEPARTURE_FIRST ? _endDate : _endArrivalDate);
 
 
 				// Initialisation
@@ -307,7 +315,7 @@ namespace synthese
 						stream
 						, vm
 						, result
-						, _startDate.getDate()
+						, _startDate.date()
 						, _periodId
 						, _departure_place.placeResult.value
 						, _arrival_place.placeResult.value
@@ -337,17 +345,17 @@ namespace synthese
 					stream <<
 						" siteId=\"" << _site->getKey() << "\">" <<
 						"<timeBounds" <<
-							" minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getLowestDepartureTime().toPosixTime()) << "\"" <<
-							" minArrivalHour=\"" << posix_time::to_iso_extended_string(r.getLowestArrivalTime().toPosixTime()) << "\"" <<
-							" maxArrivalHour=\"" << posix_time::to_iso_extended_string(r.getHighestArrivalTime().toPosixTime()) << "\"" <<
-							" maxDepartureHour=\"" << posix_time::to_iso_extended_string(r.getHighestDepartureTime().toPosixTime()) << "\"" <<
+							" minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getLowestDepartureTime()) << "\"" <<
+							" minArrivalHour=\"" << posix_time::to_iso_extended_string(r.getLowestArrivalTime()) << "\"" <<
+							" maxArrivalHour=\"" << posix_time::to_iso_extended_string(r.getHighestArrivalTime()) << "\"" <<
+							" maxDepartureHour=\"" << posix_time::to_iso_extended_string(r.getHighestDepartureTime()) << "\"" <<
 						" />"
 					;
 					if(_period)
 					{
 						stream <<
 							"<timePeriod id=\"" << _periodId << "\" date=\"" <<
-							to_iso_extended_string(_startDate.getDate().toGregorianDate()) << "\" name=\"" <<
+							to_iso_extended_string(_startDate.date()) << "\" name=\"" <<
 							_period->getCaption() << "\" />"
 						;
 					}
@@ -452,7 +460,7 @@ namespace synthese
 							{
 								stream << " phoneNumber=\"" << sPhones.str() << "\"";
 							}
-							stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey.getReservationDeadLine().toPosixTime()) << "\" />";
+							stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey.getReservationDeadLine()) << "\" />";
 						}
 						stream << "<chunks>";
 
@@ -488,10 +496,10 @@ namespace synthese
 								}
 								**itSheetRow <<
 									" departureDateTime=\"" <<
-									posix_time::to_iso_extended_string(curET.getDepartureDateTime().toPosixTime()) << "\"";
+									posix_time::to_iso_extended_string(curET.getDepartureDateTime()) << "\"";
 								if(journey.getContinuousServiceRange().total_seconds() > 0)
 								{
-									posix_time::ptime edTime(curET.getDepartureDateTime().toPosixTime());
+									posix_time::ptime edTime(curET.getDepartureDateTime());
 									edTime += journey.getContinuousServiceRange();
 									**itSheetRow << " endDepartureDateTime=\"" << 
 										posix_time::to_iso_extended_string(edTime) << "\"";
@@ -517,10 +525,10 @@ namespace synthese
 									**itSheetRow << "<cell />";
 								}
 								**itSheetRow << "<cell arrivalDateTime=\"" <<
-									posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
+									posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
 								if(journey.getContinuousServiceRange().total_seconds() > 0)
 								{
-									posix_time::ptime eaTime(curET.getArrivalDateTime().toPosixTime());
+									posix_time::ptime eaTime(curET.getArrivalDateTime());
 									eaTime += journey.getContinuousServiceRange();
 									**itSheetRow << " endArrivalDateTime=\"" <<
 										posix_time::to_iso_extended_string(eaTime) << "\"";
@@ -538,22 +546,22 @@ namespace synthese
 								stream <<
 									"<" << (line->isPedestrianMode() ? "connection" : "transport") <<
 										" length=\"" << ceil(curET.getDistance()) << "\"" <<
-										" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime().toPosixTime()) << "\"" <<
-										" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
+										" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime()) << "\"" <<
+										" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
 								if(journey.getContinuousServiceRange().total_seconds() > 0)
 								{
-									posix_time::ptime edTime(curET.getDepartureDateTime().toPosixTime());
+									posix_time::ptime edTime(curET.getDepartureDateTime());
 									edTime += journey.getContinuousServiceRange();
-									posix_time::ptime eaTime(curET.getArrivalDateTime().toPosixTime());
+									posix_time::ptime eaTime(curET.getArrivalDateTime());
 									eaTime += journey.getContinuousServiceRange();
 									stream <<
 										" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
 										" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
 								}
 								const ContinuousService* cserv(dynamic_cast<const ContinuousService*>(curET.getService()));
-								if(cserv && cserv->getMaxWaitingTime() > 0)
+								if(cserv && cserv->getMaxWaitingTime().total_seconds() > 0)
 								{
-									stream << " possibleWaitingTime=\"" << cserv->getMaxWaitingTime() << "\"";
+									stream << " possibleWaitingTime=\"" << (cserv->getMaxWaitingTime().total_seconds() / 60) << "\"";
 								}
 								stream <<
 										" startStopIsTerminus=\"" << (curET.getDepartureEdge()->getRankInPath() == 0 ? "true" : "false") << "\"" <<
@@ -618,13 +626,13 @@ namespace synthese
 										" length=\"" << ceil(curET.getDistance()) << "\"" <<
 										" city=\"" << road->getRoadPlace()->getCity()->getName() << "\"" <<
 										" name=\"" << road->getRoadPlace()->getName() << "\"" <<
-										" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime().toPosixTime()) << "\"" <<
-										" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime().toPosixTime()) << "\"";
+										" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime()) << "\"" <<
+										" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
 								if(journey.getContinuousServiceRange().total_seconds() > 0)
 								{
-									posix_time::ptime edTime(curET.getDepartureDateTime().toPosixTime());
+									posix_time::ptime edTime(curET.getDepartureDateTime());
 									edTime += journey.getContinuousServiceRange();
-									posix_time::ptime eaTime(curET.getArrivalDateTime().toPosixTime());
+									posix_time::ptime eaTime(curET.getArrivalDateTime());
 									eaTime += journey.getContinuousServiceRange();
 									stream <<
 										" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
@@ -731,7 +739,7 @@ namespace synthese
 				_page->display(
 					stream
 					, vm
-					, _startDate.getDate()
+					, _startDate.date()
 					, _periodId
 					, _home
 					, _originCityText
@@ -749,13 +757,13 @@ namespace synthese
 
 
 		RoutePlannerFunction::RoutePlannerFunction()
-			: _startDate(TIME_UNKNOWN)
-			, _endDate(TIME_UNKNOWN)
+			: _startDate(not_a_date_time)
+			, _endDate(not_a_date_time)
 			, _period(NULL)
 			, _home(false),
 			_page(NULL),
-			_startArrivalDate(TIME_UNKNOWN),
-			_endArrivalDate(TIME_UNKNOWN)
+			_startArrivalDate(not_a_date_time),
+			_endArrivalDate(not_a_date_time)
 		{			
 		}
 

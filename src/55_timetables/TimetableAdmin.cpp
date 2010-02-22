@@ -55,12 +55,15 @@
 #include "PhysicalStop.h"
 #include "LineStop.h"
 #include "Profile.h"
+#include "TimetableSetPhysicalStopAction.h"
+#include "PhysicalStopTableSync.h"
 
 #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::gregorian;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -74,7 +77,6 @@ namespace synthese
 	using namespace calendar;
 	using namespace security;
 	using namespace env;
-	using namespace time;
 	using namespace graph;
 
 	namespace util
@@ -322,7 +324,7 @@ namespace synthese
 							, _requestParameters.raisingOrder
 							, _requestParameters.first
 							, _requestParameters.maxSize,
-							UP_LINKS_LOAD_LEVEL
+							UP_DOWN_LINKS_LOAD_LEVEL
 					)	);
 					
 					ActionResultHTMLTable::HeaderVector h;
@@ -461,6 +463,45 @@ namespace synthese
 					}
 
 					stream << t3.close();
+
+
+					if(!rows.empty())
+					{
+						stream << "<h1>Quais de départ</h1>";
+
+
+						HTMLTable::ColsVector c4;
+						c4.push_back("Quai");
+						c4.push_back("Action");
+						HTMLTable t4(c4, ResultHTMLTable::CSS_CLASS);
+						stream << t4.open();
+
+						AdminActionFunctionRequest<TimetableSetPhysicalStopAction,TimetableAdmin> setStopRequest(_request);
+						setStopRequest.getAction()->setTimetable(const_pointer_cast<Timetable>(_timetable));
+
+						PhysicalStopTableSync::SearchResult stops(
+							PhysicalStopTableSync::Search(Env::GetOfficialEnv(), rows[0]->getPlace()->getKey())
+						);
+						BOOST_FOREACH(const PhysicalStopTableSync::SearchResult::value_type& stop, stops)
+						{
+							setStopRequest.getAction()->setPhysicalStop(stop);
+
+							stream << t4.row();
+							stream << t4.col() <<
+								stop->getName()
+							;
+							stream << t4.col() <<
+								HTMLModule::getHTMLLink(
+									setStopRequest.getURL(),
+									_timetable->getAuthorizedPhysicalStops().find(stop.get()) == _timetable->getAuthorizedPhysicalStops().end() ? HTMLModule::getHTMLImage("cross.png", "Non sélectionné") :  HTMLModule::getHTMLImage("tick.png", "Sélectionné")
+								)
+							;
+
+						}
+
+						stream << t4.close();
+
+					}
 				}
 			}
 
@@ -509,12 +550,14 @@ namespace synthese
 					{
 						stream << tf.row();
 						stream << tf.col(1, string(), true) << it->getPlace()->getFullName();
-						vector<Schedule> cols(g->getSchedulesByRow(it));
-						for (vector<Schedule>::const_iterator its(cols.begin()); its != cols.end(); ++its)
+						vector<time_duration> cols(g->getSchedulesByRow(it));
+						for (vector<time_duration>::const_iterator its(cols.begin()); its != cols.end(); ++its)
 						{
 							stream << tf.col();
-							if (!its->getHour().isUnknown())
-								stream << its->toString();
+							if (!its->is_not_a_date_time())
+							{
+								stream << its->hours() << ":" << its->minutes();
+							}
 						}
 					}
 

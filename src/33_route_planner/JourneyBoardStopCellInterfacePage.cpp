@@ -28,9 +28,12 @@
 #include "Projection.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
@@ -38,10 +41,11 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace geography;
-	using namespace time;
 	using namespace env;
 	using namespace road;
 	using namespace routeplanner;
+	using namespace graph;
+	
 
 	template<> const string util::FactorableTemplate<InterfacePage, JourneyBoardStopCellInterfacePage>::FACTORY_KEY(
 		"journey_board_stop_cell"
@@ -67,13 +71,14 @@ namespace synthese
 			, bool isItTerminus
 			, const PhysicalStop& physicalStop
 			, bool color
-			, const DateTime& time
-			, int continuousServiceRange
+			, const ptime& time
+			, time_duration continuousServiceRange,
+			bool isLastLeg
 			, const server::Request* request /*= NULL */
 		) const	{
 
-			DateTime endRangeTime(time);
-			if (continuousServiceRange > 0)
+			ptime endRangeTime(time);
+			if (continuousServiceRange.total_seconds() > 0)
 				endRangeTime += continuousServiceRange;
 
 			GeoPoint point(WGS84FromLambert(physicalStop));
@@ -85,10 +90,25 @@ namespace synthese
 			pv.push_back( Conversion::ToString( isItTerminus ));
 			pv.push_back( dynamic_cast<const NamedPlace*>(physicalStop.getHub())->getFullName() );
 			pv.push_back( Conversion::ToString( color ));
-			pv.push_back( time.isUnknown() ? string() : time.getHour().toString() );
-			pv.push_back( (continuousServiceRange > 0) ? endRangeTime.getHour().toString() : string() );
+			{
+				stringstream s;
+				if(!time.is_not_a_date_time())
+				{
+					s << setw(2) << setfill('0') << time.time_of_day().hours() << ":" << setw(2) << setfill('0') << time.time_of_day().minutes();
+				}
+				pv.push_back(s.str()); // 6
+			}
+			{
+				stringstream s;
+				if(continuousServiceRange.total_seconds() > 0)
+				{
+					s << setw(2) << setfill('0') << endRangeTime.time_of_day().hours() << ":" << setw(2) << setfill('0') << endRangeTime.time_of_day().minutes();
+				}
+				pv.push_back(s.str()); // 7
+			}
 			pv.push_back( lexical_cast<string>(point.getLongitude()) );
 			pv.push_back( lexical_cast<string>(point.getLatitude()) );
+			pv.push_back( lexical_cast<string>(isLastLeg) );
 
 			VariablesMap vm;
 			InterfacePage::_display( stream, pv, vm, NULL, request );

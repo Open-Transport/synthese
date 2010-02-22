@@ -24,7 +24,6 @@
 #define SYNTHESE_CSITE_H
 
 #include "HourPeriod.h"
-#include "DateTime.h"
 #include "LexicalMatcher.h"
 #include "Registrable.h"
 #include "Registry.h"
@@ -36,14 +35,11 @@
 
 #include <string>
 #include <set>
+#include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/date_time/gregorian/greg_duration.hpp>
 
 namespace synthese
 {
-	namespace time
-	{
-		class DateTime;
-	}
-
 	namespace geography
 	{
 		class Place;
@@ -105,8 +101,8 @@ namespace synthese
 			//@{
 				const interfaces::Interface*	_interface;
 				std::string						_name;  //!< Name of the site
-				time::Date						_startValidityDate;
-				time::Date						_endValidityDate;
+				boost::gregorian::date			_startValidityDate;
+				boost::gregorian::date			_endValidityDate;
 			//@}
 
 			//! \name Environment
@@ -126,7 +122,7 @@ namespace synthese
 			//! \name Cached used days
 			//@{
 				bool	_useOldData;
-				int		_useDateRange;
+				boost::gregorian::date_duration		_useDateRange;
 				Periods	_periods;
 			//@}
 
@@ -144,13 +140,13 @@ namespace synthese
 			//! \name Setters
 			//@{
 				void setInterface (const interfaces::Interface* interf);
-				void setStartDate ( const time::Date& dateDebut );
-				void setEndDate ( const time::Date& dateFin );
+				void setStartDate ( const boost::gregorian::date& dateDebut );
+				void setEndDate ( const boost::gregorian::date& dateFin );
 				void setOnlineBookingAllowed ( const bool valeur );
 				void setPastSolutionsDisplayed ( bool );
 				void setName(const std::string& name);
 				void setMaxTransportConnectionsCount(int number);
-				void setUseDateRange(int range);
+				void setUseDateRange(boost::gregorian::date_duration range);
 			//@}
 
 			//! \name Getters
@@ -161,9 +157,9 @@ namespace synthese
 				int								getMaxTransportConnectionsCount()	const;
 				const Periods&					getPeriods()	const;
 				const std::string&				getName()							const;
-				int								getUseDatesRange()					const;
-				const time::Date&				getStartDate()						const;
-				const time::Date&				getEndDate()						const;
+				boost::gregorian::date_duration				getUseDatesRange()					const;
+				const boost::gregorian::date&				getStartDate()						const;
+				const boost::gregorian::date&				getEndDate()						const;
 				const CitiesMatcher&			getCitiesMatcher () const;
 				const RollingStockFilters&		getRollingStockFilters() const;
 			//@}
@@ -171,6 +167,7 @@ namespace synthese
 			// \name Modifiers
 			//@{
 				void addHourPeriod(const HourPeriod& hourPeriod);
+				void clearHourPeriods();
 				void addCity(const geography::City* value);
 				void addRollingStockFilter(RollingStockFilter& value);
 				void removeRollingStockFilter(RollingStockFilter& value);
@@ -193,8 +190,8 @@ namespace synthese
 	
 				bool dateControl() const;
 
-				const time::Date				getMinUseDate() const;
-				const time::Date				getMaxUseDate() const;
+				const boost::gregorian::date				getMinUseDate() const;
+				const boost::gregorian::date				getMaxUseDate() const;
 
 				/** Interprets date from text and environment data.
 					@param text Text to interpret
@@ -212,12 +209,12 @@ namespace synthese
 
 					The following assertion is always assumed : \f$ TEMPS_{INCONNU}<=TEMPS_{MIN}<=TEMPS_{MIN ENVIRONNEMENT}<=TEMPS_{MIN CIRCULATIONS}<=TEMPS_{ACTUEL}<=TEMPS_{MAX CIRCULATIONS}<=TEMPS_{MAX ENVIRONNEMENT}<=TEMPS_{MAX} \f$.
 				*/
-				time::Date interpretDate( const std::string& text ) const;
+				boost::gregorian::date interpretDate( const std::string& text ) const;
 
 					
 				/** Apply this period to given dates.
-					@param startTime The DateTime object to be modified.
-					@param endTime The DateTime object to be modified.
+					@param startTime The start time object to update.
+					@param endTime The end time object to update.
 					@param calculationTime Time of calculation.
 					@param pastSolutions Past solutions filter (true = past solutions kept)
 					@return true if the applied period of time is valid (ie if the required period is not anterior 
@@ -233,8 +230,8 @@ namespace synthese
 				*/
 				void applyPeriod(
 					const HourPeriod& period
-					, time::DateTime& startTime
-					, time::DateTime& endTime
+					, boost::posix_time::ptime& startTime
+					, boost::posix_time::ptime& endTime
 				) const;				
 
 				/** Find the best place corresponding to a city name and a place name.

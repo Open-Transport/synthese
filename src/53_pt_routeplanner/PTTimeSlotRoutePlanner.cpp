@@ -35,6 +35,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -44,7 +45,6 @@ namespace synthese
 	using namespace geography;
 	using namespace algorithm;
 	using namespace util;
-	using namespace time;
 	using namespace env;
 
 	namespace ptrouteplanner
@@ -52,10 +52,10 @@ namespace synthese
 		PTTimeSlotRoutePlanner::PTTimeSlotRoutePlanner(
 			const geography::Place* origin,
 			const geography::Place* destination,
-			const time::DateTime& lowerDepartureTime,
-			const time::DateTime& higherDepartureTime,
-			const time::DateTime& lowerArrivalTime,
-			const time::DateTime& higherArrivalTime,
+			const ptime& lowerDepartureTime,
+			const ptime& higherDepartureTime,
+			const ptime& lowerArrivalTime,
+			const ptime& higherArrivalTime,
 			const boost::optional<std::size_t> maxSolutionsNumber,
 			const graph::AccessParameters accessParameters,
 			const PlanningOrder planningOrder,
@@ -104,7 +104,7 @@ namespace synthese
 				vam
 			); // was optim=true
 
-			DateTime highestArrivalTime(direction == DEPARTURE_TO_ARRIVAL ? getHighestArrivalTime() : getLowestDepartureTime());
+			ptime highestArrivalTime(direction == DEPARTURE_TO_ARRIVAL ? getHighestArrivalTime() : getLowestDepartureTime());
 			IntegralSearcher iso(
 				direction,
 				_accessParameters,
@@ -173,7 +173,7 @@ namespace synthese
 						direction == DEPARTURE_TO_ARRIVAL ?
 						oj->getOrigin()->getFromVertex() :
 						oj->getDestination()->getFromVertex()
-					).approachTime + oj->getDuration()
+					).approachTime + minutes(ceil(oj->getDuration().total_seconds() / double(60)))
 				);
 				double commonApproachDistance(
 					vam.getVertexAccess(

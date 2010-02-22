@@ -28,7 +28,6 @@
 #include "Edge.h"
 #include "VertexAccessMap.h"
 #include "Hub.h"
-#include "DateTime.h"
 
 #include "01_util/Constants.h"
 
@@ -39,10 +38,10 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace time;
 	using namespace geometry;
 
 	namespace graph
@@ -200,23 +199,23 @@ namespace synthese
 
 
 
-		DateTime Journey::getDepartureTime () const
+		boost::posix_time::ptime Journey::getDepartureTime () const
 		{
-			DateTime d(getFirstJourneyLeg ().getDepartureDateTime());
-			if (d.isUnknown())
+			boost::posix_time::ptime d(getFirstJourneyLeg ().getDepartureDateTime());
+			if (d.is_not_a_date_time())
 				return d;
-			d -= ceil(((_method == DEPARTURE_TO_ARRIVAL) ? _startApproachDuration : _endApproachDuration).total_seconds() / double(60));
+			d -= (_method == DEPARTURE_TO_ARRIVAL) ? _startApproachDuration : _endApproachDuration;
 			return d;
 		}
 
 
 
-		DateTime Journey::getArrivalTime () const
+		ptime Journey::getArrivalTime () const
 		{
-			DateTime d(getLastJourneyLeg ().getArrivalDateTime());
-			if (d.isUnknown())
+			ptime d(getLastJourneyLeg ().getArrivalDateTime());
+			if (d.is_not_a_date_time())
 				return d;
-			d += ceil(((_method == DEPARTURE_TO_ARRIVAL) ? _endApproachDuration : _startApproachDuration).total_seconds() / double(60));
+			d += (_method == DEPARTURE_TO_ARRIVAL) ? _endApproachDuration : _startApproachDuration;
 			return d;
 		}
 
@@ -262,11 +261,11 @@ namespace synthese
 
 		posix_time::time_duration Journey::getDuration () const
 		{
-			if (getDepartureTime ().getHour ().isUnknown () ||
-				getArrivalTime ().getHour ().isUnknown ()
-			) return posix_time::time_duration();
+			if (getDepartureTime().is_not_a_date_time() ||
+				getArrivalTime ().is_not_a_date_time()
+			) return posix_time::time_duration(not_a_date_time);
 		    
-			return getArrivalTime().getSecondsDifference(getDepartureTime());
+			return getArrivalTime() - getDepartureTime();
 		}
 
 
@@ -345,11 +344,11 @@ namespace synthese
 				return true;
 
 			//! <li>Time comparison</li>
-			DateTime currentsTime = getEndTime();
-			DateTime othersTime = other.getEndTime();
+			ptime currentsTime = getEndTime();
+			ptime othersTime = other.getEndTime();
 			if (currentsTime != othersTime)
 			{
-				return (currentsTime.*_bestTimeStrictOperator)(othersTime);
+				return _method == DEPARTURE_TO_ARRIVAL ? currentsTime < othersTime : othersTime < currentsTime;
 			}
 
 			/** </ul><p>Comparison between journey of same duration.</p><ul>
@@ -457,7 +456,7 @@ namespace synthese
 			return (this->*_endEdgeGetter)();
 		}
 
-		DateTime Journey::getEndTime() const
+		ptime Journey::getEndTime() const
 		{
 			assert(_method != UNDEFINED_DIRECTION);
 
@@ -466,7 +465,7 @@ namespace synthese
 
 
 
-		DateTime Journey::getBeginTime() const
+		ptime Journey::getBeginTime() const
 		{
 			assert(_method != UNDEFINED_DIRECTION);
 
@@ -485,10 +484,6 @@ namespace synthese
 			return _endReached;
 		}
 
-		const time::DateTime::ComparisonOperator& Journey::getBestTimeStrictOperator() const
-		{
-			return _bestTimeStrictOperator;
-		}
 
 		void Journey::_setMethod( AccessDirection method )
 		{
@@ -498,7 +493,6 @@ namespace synthese
 
 			if (_method == DEPARTURE_TO_ARRIVAL)
 			{
-				_bestTimeStrictOperator = &DateTime::operator<;
 				_endServiceUseGetter = &Journey::getLastJourneyLeg;
 				_beginServiceUseGetter = &Journey::getFirstJourneyLeg;
 				_endEdgeGetter = &Journey::getDestination;
@@ -508,7 +502,6 @@ namespace synthese
 			}
 			else
 			{
-				_bestTimeStrictOperator = &DateTime::operator>;
 				_endServiceUseGetter = &Journey::getFirstJourneyLeg;
 				_beginServiceUseGetter = &Journey::getLastJourneyLeg;
 				_endEdgeGetter = &Journey::getOrigin;
@@ -541,9 +534,9 @@ namespace synthese
 			return result;
 		}
 
-		time::DateTime Journey::getReservationDeadLine() const
+		ptime Journey::getReservationDeadLine() const
 		{
-			DateTime result(TIME_UNKNOWN);
+			ptime result(not_a_date_time);
 			boost::logic::tribool compliance(getReservationCompliance());
 			BOOST_FOREACH(const ServiceUse& su, _journeyLegs)
 			{
@@ -555,8 +548,8 @@ namespace synthese
 					)||(compliance == true &&
 						resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE
 				)	){
-					DateTime deadLine(su.getReservationDeadLine());
-					if (result.isUnknown() || deadLine < result)
+					ptime deadLine(su.getReservationDeadLine());
+					if (result.is_not_a_date_time() || deadLine < result)
 						result = deadLine;
 				}
 			}

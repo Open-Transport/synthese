@@ -42,11 +42,6 @@ namespace synthese
 		class JourneyComparator;
 	}
 
-	namespace time
-	{
-		class DateTime;
-	}
-
 	namespace algorithm
 	{
 		class BestVertexReachesMap;
@@ -84,9 +79,9 @@ namespace synthese
 				const graph::GraphIdType					_graphToUse;
 				JourneysResult&								_result;
 				BestVertexReachesMap&						_bestVertexReachesMap;
-				const time::DateTime&						_originDateTime;
-				const time::DateTime&						_minMaxDateTimeAtOrigin;
-				time::DateTime&								_minMaxDateTimeAtDestination;
+				const boost::posix_time::ptime&				_originDateTime;
+				const boost::posix_time::ptime&				_minMaxDateTimeAtOrigin;
+				boost::posix_time::ptime&					_minMaxDateTimeAtDestination;
 				const bool									_inverted;	//!< Indicates that the AccessDirection is the contrary to the planning order (2nd phase)
 				const bool									_optim;
 				std::ostream* const							_logStream;
@@ -104,8 +99,8 @@ namespace synthese
 			void _integralSearch(
 				const graph::VertexAccessMap& vertices,
 				const graph::Journey& startJourney,
-				const time::DateTime& originDateTime,
-				const time::DateTime& minMaxOriginDateTime,
+				const boost::posix_time::ptime& originDateTime,
+				const boost::posix_time::ptime& minMaxOriginDateTime,
 				boost::optional<std::size_t> maxDepth,
 				boost::optional<boost::posix_time::time_duration> totalDuration
 			);
@@ -138,9 +133,9 @@ namespace synthese
 				JourneysResult&										result,
 				BestVertexReachesMap&								bestVertexReachesMap,
 				const graph::VertexAccessMap&						destinationVam,
-				const time::DateTime&								originDateTime,
-				const time::DateTime&								minMaxDateTimeAtOrigin,
-				time::DateTime&										minMaxDateTimeAtDestination,
+				const boost::posix_time::ptime&						originDateTime,
+				const boost::posix_time::ptime&						minMaxDateTimeAtOrigin,
+				boost::posix_time::ptime&							minMaxDateTimeAtDestination,
 				bool												inverted,
 				bool												optim,
 				boost::optional<boost::posix_time::time_duration>	maxDuration,
@@ -197,7 +192,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const time::DateTime& getOriginDateTime() const;
+				const boost::posix_time::ptime& getOriginDateTime() const;
 			//@}
 		};
 	}

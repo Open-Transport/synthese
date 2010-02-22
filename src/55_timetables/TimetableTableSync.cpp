@@ -35,6 +35,8 @@
 #include "SQLiteException.h"
 #include "Interface.h"
 #include "CommercialLine.h"
+#include "PhysicalStop.h"
+#include "ReplaceQuery.h"
 
 #include "01_util/Conversion.h"
 
@@ -65,6 +67,7 @@ namespace synthese
 		const std::string TimetableTableSync::COL_FORMAT("format");
 		const std::string TimetableTableSync::COL_INTERFACE_ID("interface_id");
 		const std::string TimetableTableSync::COL_AUTHORIZED_LINES("authorized_lines");
+		const std::string TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS("authorized_physical_stops");
 	}
 	
 	namespace db
@@ -86,6 +89,7 @@ namespace synthese
 			SQLiteTableSync::Field(TimetableTableSync::COL_FORMAT, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_INTERFACE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_AUTHORIZED_LINES, SQL_TEXT),
+			SQLiteTableSync::Field(TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -136,6 +140,22 @@ namespace synthese
 				}
 
 
+				vector<string> pstops = Conversion::ToStringVector(rows->getText (TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS));
+				object->clearAuthorizedPhysicalStops();
+				BOOST_FOREACH(const string& pstop, pstops)
+				{
+					try
+					{
+						RegistryKeyType id(lexical_cast<RegistryKeyType>(pstop));
+						object->addAuthorizedPhysicalStop(Env::GetOfficialEnv().get<PhysicalStop>(id).get());
+					}
+					catch (ObjectNotFoundException<PhysicalStop>& e)
+					{
+						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS);
+					}
+				}
+
+
 				{
 					TimetableRowTableSync::SearchResult rows(
 						TimetableRowTableSync::Search(env, object->getKey())
@@ -182,33 +202,39 @@ namespace synthese
 			Timetable* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< object->getKey()
-				<< "," << object->getBookId()
-				<< "," << object->getRank()
-				<< "," << Conversion::ToSQLiteString(object->getTitle())
-				<< "," << (object->getBaseCalendar() ? object->getBaseCalendar()->getKey() : RegistryKeyType(0))
-				<< "," << static_cast<int>(object->getContentType())
-				<< "," << (object->getInterface() ? object->getInterface()->getKey() : RegistryKeyType(0)) << "," <<
-				"\"";
-	
-			 bool first(true);
-			 BOOST_FOREACH(const CommercialLine* line, object->getAuthorizedLines())
-			 {
-				 if(!first) query << ",";
-				 query << line->getKey();
-				 first = false;
-			 }
+			// Preparation
+			stringstream authorizedLines;
+			{
+				bool first(true);
+				BOOST_FOREACH(const CommercialLine* line, object->getAuthorizedLines())
+				{
+					if(!first) authorizedLines << ",";
+					authorizedLines << line->getKey();
+					first = false;
+				}
+			}
+			stringstream authorizedPhysicalStops;
+			{
+				bool first(true);
+				BOOST_FOREACH(const PhysicalStop* pstop, object->getAuthorizedPhysicalStops())
+				{
+					if(!first) authorizedPhysicalStops << ",";
+					authorizedPhysicalStops << pstop->getKey();
+					first = false;
+				}
+			}
 
-			 query << "\""
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			// Writing
+			ReplaceQuery<TimetableTableSync> query(*object);
+			query.addField(object->getBookId());
+			query.addField(object->getRank());
+			query.addField(object->getTitle());
+			query.addField(object->getBaseCalendar() ? object->getBaseCalendar()->getKey() : RegistryKeyType(0));
+			query.addField(static_cast<int>(object->getContentType()));
+			query.addField(object->getInterface() ? object->getInterface()->getKey() : RegistryKeyType(0));
+			query.addField(authorizedLines.str());
+			query.addField(authorizedPhysicalStops.str());
+			query.execute(transaction);
 		}
 
 

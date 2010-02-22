@@ -72,8 +72,8 @@ namespace synthese
 			static SearchResult Search(
 				util::Env& env,
 				const std::string& logKey
-				, const time::DateTime& startDate
-				, const time::DateTime& endDate
+				, const boost::posix_time::ptime& startDate
+				, const boost::posix_time::ptime& endDate
 				, uid userId
 				, DBLogEntry::Level level,
 				util::RegistryKeyType id,
@@ -91,7 +91,7 @@ namespace synthese
 
 			static void Purge(
 				const std::string& logKey,
-				const time::DateTime& endDate
+				const boost::posix_time::ptime& endDate
 			);
 		};
 	}

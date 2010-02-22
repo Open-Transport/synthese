@@ -118,11 +118,13 @@ namespace synthese
 					rows->getInt(CalendarTemplateElementTableSync::COL_POSITIVE)
 			)	);
 
-			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
+			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
 			{
 				try
 				{
-					object->setCalendar(CalendarTemplateTableSync::Get(rows->getLongLong(CalendarTemplateElementTableSync::COL_CALENDAR_ID), env, FIELDS_ONLY_LOAD_LEVEL).get());
+					boost::shared_ptr<CalendarTemplate> cal(CalendarTemplateTableSync::GetEditable(rows->getLongLong(CalendarTemplateElementTableSync::COL_CALENDAR_ID), env, FIELDS_ONLY_LOAD_LEVEL));
+					object->setCalendar(cal.get());
+					cal->addElement(*object);
 				}
 				catch (ObjectNotFoundException<CalendarTemplate> e)
 				{
@@ -130,7 +132,7 @@ namespace synthese
 				}
 			}
 
-			if(linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
+			if(linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
 			{
 				try
 				{

@@ -24,17 +24,15 @@
 #include "Edge.h"
 #include "Path.h"
 
-#include "04_time/module.h"
-
 #include <math.h>
 #include <boost/date_time/posix_time/ptime.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace time;
 	using namespace util;
 	using namespace graph;
 
@@ -46,20 +44,20 @@ namespace synthese
 			AccessDirection method,
 			UserClassCode userClass
 			, const Edge* edge
-			, const DateTime& presenceDateTime
+			, const ptime& presenceDateTime
 			, bool controlIfTheServiceIsReachable
 			, bool inverted
 		) const	{
 			ServicePointer sp(RTData, method,userClass,edge);
 			sp.setActualTime(presenceDateTime);
 			sp.setTheoreticalTime(presenceDateTime);
-			sp.setOriginDateTime(DateTime(presenceDateTime.getDate(), Hour(TIME_MIN)));
+			sp.setOriginDateTime(presenceDateTime);
 			sp.setService(this);
 			sp.setServiceRange(posix_time::hours(24));
 			return sp;
 		}
 
-		time::DateTime PermanentService::getLeaveTime(
+		ptime PermanentService::getLeaveTime(
 			const ServicePointer& servicePointer,
 			const Edge* edge
 		) const	{
@@ -71,32 +69,32 @@ namespace synthese
 			assert(distance >= 0);
 
 			posix_time::time_duration duration(posix_time::seconds(distance > 0 ? ceil(distance * 0.9) : 1));
-			posix_time::ptime dt(servicePointer.getActualDateTime().toPosixTime());
+			posix_time::ptime dt(servicePointer.getActualDateTime());
 			if (servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 				dt += duration;
 			else
 				dt -= duration;
-			return DateTime::FromPosixTime(dt);
+			return dt;
 		}
 
-		time::Schedule PermanentService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
+		time_duration PermanentService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return Schedule(Hour(TIME_MIN),0);
+			return time_duration(0,0,0);
 		}
 
-		time::Schedule PermanentService::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
+		time_duration PermanentService::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return Schedule(Hour(TIME_MAX),0);
+			return time_duration(23,59,59);
 		}
 
-		time::Schedule PermanentService::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
+		time_duration PermanentService::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return Schedule(Hour(TIME_MIN),0);
+			return time_duration(0,0,0);
 		}
 
-		time::Schedule PermanentService::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
+		time_duration PermanentService::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return Schedule(Hour(TIME_MAX),0);
+			return time_duration(23,59,59);
 		}
 
 	
@@ -106,10 +104,10 @@ namespace synthese
 			return false;
 		}
 
-		Schedule PermanentService::getDepartureSchedule(bool RTData, size_t rank) const
+		time_duration PermanentService::getDepartureSchedule(bool RTData, size_t rank) const
 		{
 			assert(rank != 0);
-			return Schedule(Hour(TIME_MIN),0);
+			return time_duration(0,0,0);
 		}
 
 		PermanentService::PermanentService(

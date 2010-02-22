@@ -29,14 +29,16 @@
 #include "GraphConstants.h"
 
 #include <boost/foreach.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
 	using namespace env;
-	using namespace time;
 	using namespace graph;
 
 	namespace departurestable
@@ -50,11 +52,11 @@ namespace synthese
 			, const DisplayedPlacesList& displayedPlacesList
 			, const ForbiddenPlacesList& forbiddenPlaces,
 			const TransferDestinationsList& transferDestinations
-			, const DateTime& startTime
-			, const DateTime& endDateTime
+			, const ptime& startTime
+			, const ptime& endDateTime
 			, size_t maxSize
 			, const ForcedDestinationsSet& forcedDestinations
-			, int persistanceDuration
+			, time_duration persistanceDuration
 		):	ArrivalDepartureTableGenerator(
 				physicalStops,
 				direction,
@@ -112,9 +114,9 @@ namespace synthese
 						continue;
 
 					// Max time for forced destination
-					DateTime maxTimeForForcedDestination(_startDateTime);
+					ptime maxTimeForForcedDestination(_startDateTime);
 					maxTimeForForcedDestination += _persistanceDuration;
-					DateTime minTimeForForcedDestination(_startDateTime);
+					ptime minTimeForForcedDestination(_startDateTime);
 					ServicePointer serviceInstance;
 
 					optional<Edge::DepartureServiceIndex::Value> minIndex;

@@ -33,11 +33,6 @@
 
 namespace synthese
 {
-	namespace time
-	{
-		class Date;
-	}
-
 	namespace resa
 	{
 		/** Reservation table synchronizer.
@@ -97,7 +92,7 @@ namespace synthese
 			static SearchResult Search(
 				util::Env& env,
 				util::RegistryKeyType commercialLineId,
-				const time::Date& day,
+				const boost::gregorian::date& day,
 				boost::optional<std::string> serviceNumber = boost::optional<std::string>(),
 				bool hideOldServices = false,
 				boost::logic::tribool cancelled = false,

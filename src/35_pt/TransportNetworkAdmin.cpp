@@ -37,6 +37,8 @@
 #include "AdminParametersException.h"
 #include "ScheduledService.h"
 #include "SearchFormHTMLTable.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "CommercialLineAddAction.h"
 
 #include <boost/foreach.hpp>
 
@@ -153,6 +155,15 @@ namespace synthese
 				stream << t.col();
 				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
 			}
+
+			AdminActionFunctionRequest<CommercialLineAddAction,CommercialLineAdmin> creationRequest(_request);
+			creationRequest.getFunction()->setActionFailedPage(getNewPage());
+			creationRequest.setActionWillCreateObject();
+			creationRequest.getAction()->setNetwork(_network);
+
+			stream << t.row();
+			stream << t.col(2) << "Création de ligne";
+			stream << t.col() << HTMLModule::getLinkButton(creationRequest.getURL(), "Créer");
 			stream << t.close();
 		}
 

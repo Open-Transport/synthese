@@ -54,10 +54,10 @@ namespace synthese
 			//@{
 				const graph::VertexAccessMap				_originVam;
 				const graph::VertexAccessMap				_destinationVam;
-				const time::DateTime	_lowestDepartureTime;  //!< Start time of schedule sheet.
-				const time::DateTime	_highestDepartureTime;    //!< End time of schedule sheet.
-				const time::DateTime	_lowestArrivalTime;  //!< Start time of schedule sheet.
-				const time::DateTime	_highestArrivalTime;    //!< End time of schedule sheet.
+				const boost::posix_time::ptime	_lowestDepartureTime;  //!< Start time of schedule sheet.
+				const boost::posix_time::ptime	_highestDepartureTime;    //!< End time of schedule sheet.
+				const boost::posix_time::ptime	_lowestArrivalTime;  //!< Start time of schedule sheet.
+				const boost::posix_time::ptime	_highestArrivalTime;    //!< End time of schedule sheet.
 				const boost::optional<boost::posix_time::time_duration> _maxDuration;
 				const boost::optional<std::size_t>	_maxSolutionsNumber;
 				const graph::AccessParameters		_accessParameters;
@@ -87,10 +87,10 @@ namespace synthese
 			TimeSlotRoutePlanner(
 				const graph::VertexAccessMap& originVam,
 				const graph::VertexAccessMap& destinationVam,
-				const time::DateTime& lowestDepartureTime,
-				const time::DateTime& highestDepartureTime,
-				const time::DateTime& lowestArrivalTime,
-				const time::DateTime& highestArrivalTime,
+				const boost::posix_time::ptime& lowestDepartureTime,
+				const boost::posix_time::ptime& highestDepartureTime,
+				const boost::posix_time::ptime& lowestArrivalTime,
+				const boost::posix_time::ptime& highestArrivalTime,
 				const graph::GraphIdType			whatToSearch,
 				const graph::GraphIdType			graphToUse,
 				boost::optional<boost::posix_time::time_duration> maxDuration,
@@ -127,10 +127,10 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const time::DateTime&		getLowestDepartureTime() const;
-				const time::DateTime&		getHighestDepartureTime() const;
-				const time::DateTime&		getLowestArrivalTime() const;
-				const time::DateTime&		getHighestArrivalTime() const;
+				const boost::posix_time::ptime&		getLowestDepartureTime() const;
+				const boost::posix_time::ptime&		getHighestDepartureTime() const;
+				const boost::posix_time::ptime&		getLowestArrivalTime() const;
+				const boost::posix_time::ptime&		getHighestArrivalTime() const;
 			//@}
 
 			/** Launch of the route planning

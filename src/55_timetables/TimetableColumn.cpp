@@ -22,8 +22,6 @@
 
 #include "TimetableColumn.h"
 
-#include "Schedule.h"
-
 #include "TimetableRow.h"
 #include "TimetableGenerator.h"
 
@@ -36,13 +34,13 @@
 #include "PublicTransportStopZoneConnectionPlace.h"
 
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace env;
 	using namespace calendar;
 	using namespace graph;
-	using namespace time;
 
 	namespace timetables
 	{
@@ -57,7 +55,7 @@ namespace synthese
 			const TimetableGenerator::Rows& rows(timetablegenerator.getRows());
 			const Path::Edges& edges(service.getPath()->getEdges());
 			Path::Edges::const_iterator itEdge(edges.begin());
-
+			bool first(true);
 			
 			for(TimetableGenerator::Rows::const_iterator itRow(rows.begin()); itRow != rows.end(); ++itRow)
 			{
@@ -67,8 +65,13 @@ namespace synthese
 					if(	dynamic_cast<const PublicTransportStopZoneConnectionPlace*>((*itEdge2)->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
 						&&(	(*itEdge2)->isDeparture() == itRow->getIsDeparture()
 							|| (*itEdge2)->isArrival() == itRow->getIsArrival()
+						) &&
+						(	!first ||
+							timetablegenerator.getAuthorizedPhysicalStops().empty() ||
+							timetablegenerator.getAuthorizedPhysicalStops().find(dynamic_cast<const PhysicalStop*>((*itEdge2)->getFromVertex())) != timetablegenerator.getAuthorizedPhysicalStops().end()
 						)
 					){
+						first = false;
 						_content.push_back(
 							make_pair(
 								dynamic_cast<const PhysicalStop*>((*itEdge2)->getFromVertex()),
@@ -86,7 +89,7 @@ namespace synthese
 				}
 				if (itEdge2 == edges.end())
 				{
-					_content.push_back(make_pair<const PhysicalStop*, Schedule>(NULL, Schedule()));
+					_content.push_back(make_pair<const PhysicalStop*, time_duration>(NULL, time_duration(not_a_date_time)));
 				}
 			}
 		}
@@ -104,7 +107,7 @@ namespace synthese
 			// Tentative par ligne commune
 			for (i=0; i<rowsNumber; ++i)
 			{
-				if (!_content[i].second.getHour().isUnknown() && !other._content[i].second.getHour().isUnknown())
+				if (!_content[i].second.is_not_a_date_time() && !other._content[i].second.is_not_a_date_time())
 				{
 					if (_content[i].second < other._content[i].second)
 						return true;
@@ -116,11 +119,11 @@ namespace synthese
 			// Tentative par succession 1
 			for (i=0; i< rowsNumber; ++i)
 			{
-				if (!_content[i].second.getHour().isUnknown())
+				if (!_content[i].second.is_not_a_date_time())
 				{
 					for(j = i+1; j< rowsNumber; ++j)
 					{
-						if(	!other._content[j].second.getHour().isUnknown() &&
+						if(	!other._content[j].second.is_not_a_date_time() &&
 							other._content[j].second < _content[i].second
 						){
 							return false;
@@ -130,7 +133,7 @@ namespace synthese
 						{
 							for(size_t k = i-1; k>0; --k)
 							{
-								if(	!other._content[k].second.getHour().isUnknown() &&
+								if(	!other._content[k].second.is_not_a_date_time() &&
 									_content[i].second < other._content[k].second
 								)	return true;
 							}
@@ -141,10 +144,10 @@ namespace synthese
 
 			// Premiere heure
 			for (i=0; i< rowsNumber; ++i)
-				if (!_content[i].second.getHour().isUnknown())
+				if (!_content[i].second.is_not_a_date_time())
 					break;
 			for (j=0; j< rowsNumber; ++j)
-				if (!other._content[j].second.getHour().isUnknown())
+				if (!other._content[j].second.is_not_a_date_time())
 					break;
 			return _content[i].second < other._content[j].second;
 		}

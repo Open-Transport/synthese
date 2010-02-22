@@ -34,7 +34,6 @@
 #include "Interface.h"
 #include "InterfacePage.h"
 #include "InterfacePageException.h"
-#include "DateTime.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "ServicePointer.h"
 #include "Line.h"
@@ -49,6 +48,8 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -57,7 +58,6 @@ namespace synthese
 	using namespace messages;
 	using namespace env;
 	using namespace interfaces;
-	using namespace time;
 	using namespace security;
 	using namespace graph;
 	using namespace geography;
@@ -130,7 +130,7 @@ namespace synthese
 				LineStop lineStop;
 				lineStop.setLine(&line);
 				lineStop.setPhysicalStop(&ps);
-				DateTime d(TIME_CURRENT);
+				ptime d(second_clock::local_time());
 
 				for (int i(0); i<_type->getRowNumber(); ++i)
 				{
@@ -146,7 +146,7 @@ namespace synthese
 							sp,
 							destinations		
 					)	);
-					d += 1;
+					d += days(1);
 				}
 
 				SentScenario scenario;

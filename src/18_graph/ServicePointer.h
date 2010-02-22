@@ -23,11 +23,11 @@
 #ifndef SYNTHESE_env_ServicePointer_h__
 #define SYNTHESE_env_ServicePointer_h__
 
-#include "DateTime.h"
 #include "GraphTypes.h"
 #include "UseRule.h"
 
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace synthese
 {
@@ -61,9 +61,9 @@ namespace synthese
 			//! @name Result elements
 			//@{
 				const Service*		_service;
-				time::DateTime		_originDateTime;
-				time::DateTime		_actualTime;
-				time::DateTime		_theoreticalTime;
+				boost::posix_time::ptime		_originDateTime;
+				boost::posix_time::ptime		_actualTime;
+				boost::posix_time::ptime		_theoreticalTime;
 				const UseRule*		_useRule;
 			//@}
 
@@ -80,10 +80,10 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void	setActualTime(const time::DateTime& dateTime);
-				void	setTheoreticalTime(const time::DateTime& dateTime);
+				void	setActualTime(const boost::posix_time::ptime& dateTime);
+				void	setTheoreticalTime(const boost::posix_time::ptime& dateTime);
 				void	setService(const Service* service);
-				void	setOriginDateTime(const time::DateTime& dateTime);
+				void	setOriginDateTime(const boost::posix_time::ptime& dateTime);
 				void	setServiceRange(boost::posix_time::time_duration duration);
 				void	setRealTimeVertex(const Vertex* value);
 			//@}
@@ -93,9 +93,9 @@ namespace synthese
 				const Edge*				getEdge()					const;
 				const Vertex*			getRealTimeVertex()			const;
 				const Service*			getService()				const;
-				const time::DateTime&	getActualDateTime()			const;
-				const time::DateTime&	getTheoreticalDateTime()	const;
-				const time::DateTime&	getOriginDateTime()			const;
+				const boost::posix_time::ptime&	getActualDateTime()			const;
+				const boost::posix_time::ptime&	getTheoreticalDateTime()	const;
+				const boost::posix_time::ptime&	getOriginDateTime()			const;
 				AccessDirection			getMethod()					const;
 				boost::posix_time::time_duration	getServiceRange()			const;
 				const UseRule*			getUseRule()				const;

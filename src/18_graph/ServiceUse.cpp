@@ -26,11 +26,10 @@
 #include "UseRule.h"
 
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace time;
-
 	namespace graph
 	{
 		ServiceUse::ServiceUse(
@@ -48,10 +47,8 @@ namespace synthese
 		ServiceUse::ServiceUse():
 			ServicePointer(),
 			_secondEdge(NULL),
-			_secondRTVertex(NULL),
-			_secondActualDateTime(TIME_UNKNOWN)
+			_secondRTVertex(NULL)
 		{
-
 		}
 
 
@@ -71,7 +68,7 @@ namespace synthese
 				;
 		}
 
-		const DateTime& ServiceUse::getDepartureDateTime() const
+		const ptime& ServiceUse::getDepartureDateTime() const
 		{
 			return  (_determinationMethod == DEPARTURE_TO_ARRIVAL)
 				? _actualTime
@@ -79,7 +76,7 @@ namespace synthese
 				;
 		}
 
-		const DateTime& ServiceUse::getArrivalDateTime() const
+		const ptime& ServiceUse::getArrivalDateTime() const
 		{
 			return  (_determinationMethod == ARRIVAL_TO_DEPARTURE)
 				? _actualTime
@@ -92,14 +89,14 @@ namespace synthese
 			return _secondEdge;
 		}
 
-		const DateTime& ServiceUse::getSecondActualDateTime() const
+		const ptime& ServiceUse::getSecondActualDateTime() const
 		{
 			return _secondActualDateTime;
 		}
 
 		posix_time::time_duration ServiceUse::getDuration() const
 		{
-			return getArrivalDateTime().getSecondsDifference(getDepartureDateTime());
+			return getArrivalDateTime() - getDepartureDateTime();
 		}
 
 		double ServiceUse::getDistance() const
@@ -112,9 +109,9 @@ namespace synthese
 			if (duration.total_seconds() == 0)
 				return;
 
-			_actualTime += duration.total_seconds() / 60;
-			_originDateTime += duration.total_seconds() / 60;
-			_secondActualDateTime += duration.total_seconds() / 60;
+			_actualTime += duration;
+			_originDateTime += duration;
+			_secondActualDateTime += duration;
 			setServiceRange(getServiceRange() - duration);
 		}
 
@@ -125,7 +122,7 @@ namespace synthese
 			return
 				_useRule->isRunPossible(*this) == UseRule::RUN_POSSIBLE &&
 				_service->nonConcurrencyRuleOK(
-					_originDateTime.getDate(),
+					_originDateTime.date(),
 					*getDepartureEdge(),
 					*getArrivalEdge(),
 					_userClass
@@ -137,7 +134,7 @@ namespace synthese
 
 
 
-		DateTime ServiceUse::getReservationDeadLine() const
+		ptime ServiceUse::getReservationDeadLine() const
 		{
 			UseRule::ReservationAvailabilityType resa(_useRule->getReservationAvailability(*this));
 			if(	resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
@@ -148,7 +145,7 @@ namespace synthese
 					getDepartureDateTime()
 				);
 			}
-			return DateTime(TIME_UNKNOWN);
+			return ptime(not_a_date_time);
 		}
 
 
@@ -164,7 +161,7 @@ namespace synthese
 			_RTVertex = vertex;
 
 			// Reverse time
-			DateTime dateTime(_secondActualDateTime);
+			ptime dateTime(_secondActualDateTime);
 			_secondActualDateTime = _actualTime;
 			_actualTime = dateTime;
 

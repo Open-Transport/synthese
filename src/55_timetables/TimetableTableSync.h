@@ -51,6 +51,7 @@ namespace synthese
 			static const std::string COL_FORMAT;
 			static const std::string COL_INTERFACE_ID;
 			static const std::string COL_AUTHORIZED_LINES;
+			static const std::string COL_AUTHORIZED_PHYSICAL_STOPS;
 			
 			TimetableTableSync();
 

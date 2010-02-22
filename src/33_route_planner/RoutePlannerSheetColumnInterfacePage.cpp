@@ -20,18 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "33_route_planner/RoutePlannerSheetColumnInterfacePage.h"
-
-#include "30_server/Request.h"
-
-#include "01_util/Conversion.h"
+#include "RoutePlannerSheetColumnInterfacePage.h"
+#include "Request.h"
 
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace time;
 	using namespace util;
 
 	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::RoutePlannerSheetColumnInterfacePage>::FACTORY_KEY("schedule_sheet_column");
@@ -55,8 +52,8 @@ namespace synthese
 			, bool isItLastLine
 			, size_t columnNumber
 			, bool isItFootLine 
-			, const Hour& firstArrivalTime
-			, const Hour& lastArrivalTime 
+			, const time_duration& firstArrivalTime
+			, const time_duration& lastArrivalTime 
 			, bool isItContinuousService
 			, bool isFirstWriting
 			, bool isLastWriting
@@ -68,8 +65,22 @@ namespace synthese
 			pv.push_back( Conversion::ToString( isItLastLine ) );
 			pv.push_back( Conversion::ToString( columnNumber ) );
 			pv.push_back( Conversion::ToString( isItFootLine ) );
-			pv.push_back( firstArrivalTime.isUnknown() ? string() : firstArrivalTime.toString());
-			pv.push_back( firstArrivalTime.isUnknown() ? string() : lastArrivalTime.toString() );
+			{
+				stringstream s;
+				if(!firstArrivalTime.is_not_a_date_time())
+				{
+					s << setfill('0') << setw(2) << firstArrivalTime.hours() << ":" << setfill('0') << setw(2) << firstArrivalTime.minutes();
+				}
+				pv.push_back(s.str());
+			}
+			{
+				stringstream s;
+				if(!lastArrivalTime.is_not_a_date_time())
+				{
+					s << setfill('0') << setw(2) << lastArrivalTime.hours() << ":" << setfill('0') << setw(2) << lastArrivalTime.minutes();
+				}
+				pv.push_back(s.str());
+			}
 			pv.push_back( Conversion::ToString( isItContinuousService ) );
 			pv.push_back( Conversion::ToString( isFirstWriting ) );
 			pv.push_back( Conversion::ToString( isLastWriting ) );

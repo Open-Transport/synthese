@@ -49,7 +49,6 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace html;
-	using namespace time;
 	using namespace dblog;
 	using namespace security;
 

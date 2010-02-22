@@ -37,8 +37,6 @@
 #include "Hub.h"
 #include "GraphTypes.h"
 
-#include "DateTime.h"
-
 namespace synthese
 {
 	namespace algorithm
@@ -60,14 +58,14 @@ namespace synthese
 		private:
 			typedef std::map<const graph::Vertex*, typename ResultSet::iterator> IndexMap;
 			
-			time::DateTime _originDateTime;
+			boost::posix_time::ptime _originDateTime;
 			boost::optional<graph::AccessDirection> _accessDirection;
 			ResultSet	_result;
 			IndexMap	_index;
 
 		public:
 			JourneysResult(
-				const time::DateTime& originDateTime
+				const boost::posix_time::ptime& originDateTime
 			):	_originDateTime(originDateTime)
 			{}
 
@@ -131,7 +129,7 @@ namespace synthese
 				*/
 				void cleanup(
 					bool updateMinSpeed,
-					const time::DateTime& newMaxTime,
+					const boost::posix_time::ptime& newMaxTime,
 					BestVertexReachesMap& bvrm,
 					bool propagateInConnectionPlace,
 					bool strict,

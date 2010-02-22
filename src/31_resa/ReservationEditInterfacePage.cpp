@@ -36,9 +36,11 @@
 #include <sstream>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -46,7 +48,6 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace security;
-	using namespace time;
 
 	namespace util
 	{
@@ -89,13 +90,13 @@ namespace synthese
 
 				pv.push_back(lexical_cast<string>(resa.getCustomerUserId())); // 2
 
-				pv.push_back(resa.getReservationDeadLine().getDate().toString()); // 3
-				pv.push_back(resa.getReservationDeadLine().getHour().toString()); // 4
+				pv.push_back(to_simple_string(resa.getReservationDeadLine().date())); // 3
+				pv.push_back(to_simple_string(resa.getReservationDeadLine().time_of_day())); // 4
 
 				pv.push_back((*resa.getReservations().begin())->getDeparturePlaceName()); // 5
 				pv.push_back((*(resa.getReservations().end()-1))->getArrivalPlaceName()); // 6
 
-				pv.push_back((*resa.getReservations().begin())->getDepartureTime().getDate().toString()); // 7
+				pv.push_back(to_simple_string((*resa.getReservations().begin())->getDepartureTime().date())); // 7
 
 				pv.push_back(resa.getCustomerName()); // 8
 
@@ -103,12 +104,12 @@ namespace synthese
 
 				pv.push_back(ResaModule::GetStatusText(resa.getStatus())); // 10
 
-				pv.push_back(lexical_cast<string>(resa.getReservationDeadLine() > DateTime(TIME_CURRENT))); // 11
+				pv.push_back(lexical_cast<string>(resa.getReservationDeadLine() > second_clock::local_time())); // 11
 
 				pv.push_back(request->getSession()->getKey()); // 12
 
-				pv.push_back(resa.getCancellationTime().isUnknown() ? string() : resa.getCancellationTime().getDate().toString());
-				pv.push_back(resa.getCancellationTime().isUnknown() ? string() : resa.getCancellationTime().getHour().toString()); //14
+				pv.push_back(resa.getCancellationTime().is_not_a_date_time() ? string() : to_simple_string(resa.getCancellationTime().date()));
+				pv.push_back(resa.getCancellationTime().is_not_a_date_time() ? string() : to_simple_string(resa.getCancellationTime().time_of_day())); //14
 			} else {
 				pv.push_back(string());
 				pv.push_back(string());

@@ -23,11 +23,12 @@
 #ifndef SYNTHESE_MessagesAdmin_H__
 #define SYNTHESE_MessagesAdmin_H__
 
-#include "DateTime.h"
 #include "ActionResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
 #include "17_messages/Types.h"
 #include "SentScenarioInheritedTableSync.h"
+
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace synthese
 {
@@ -121,7 +122,7 @@ namespace synthese
 			static const std::string CSS_ALARM_DISPLAYED_WITH_END_DATE;
 
 		private:
-			time::DateTime										_date;
+			boost::posix_time::ptime							_date;
 			SentScenarioInheritedTableSync::StatusSearch		_searchStatus;
 //			AlarmLevel											_searchLevel;
 //			AlarmConflict										_searchConflict;

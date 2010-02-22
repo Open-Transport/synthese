@@ -47,10 +47,6 @@
 // included auto generated code
 #include "includes.cpp.inc"
 
-#ifdef DEBUG
-#include "date_time_visualizer.hpp"
-#endif
-
 using namespace boost;
 using namespace std;
 using namespace synthese::util;
@@ -283,7 +279,6 @@ int main( int argc, char **argv )
 
 		// included auto generated code
 		#include "generated.cpp.inc"
-
 
 		const boost::filesystem::path& workingDir = boost::filesystem::current_path();
 		Log::GetInstance ().info ("Working dir  = " + workingDir.string ());

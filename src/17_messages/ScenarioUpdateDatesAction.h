@@ -25,7 +25,6 @@
 #ifndef SYNTHESE_ScenarioUpdateDatesAction_H__
 #define SYNTHESE_ScenarioUpdateDatesAction_H__
 
-#include "DateTime.h"
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include "SentScenario.h"
@@ -75,8 +74,8 @@ namespace synthese
 			std::string								_name;
 			boost::shared_ptr<ScenarioFolder>		_folder;
 			bool									_enabled;
-			time::DateTime							_startDate;
-			time::DateTime							_endDate;
+			boost::posix_time::ptime				_startDate;
+			boost::posix_time::ptime				_endDate;
 			boost::shared_ptr<Scenario>				_scenario;
 			boost::shared_ptr<SentScenario>			_sscenario;
 			boost::shared_ptr<ScenarioTemplate>		_tscenario;

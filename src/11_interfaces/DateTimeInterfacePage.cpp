@@ -22,15 +22,14 @@
 
 #include "DateTimeInterfacePage.h"
 
-#include "DateTime.h"
-
 using namespace std;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using namespace time;
 
 	template<> const string util::FactorableTemplate<InterfacePage,DateTimeInterfacePage>::FACTORY_KEY("datetime");
 
@@ -43,31 +42,38 @@ namespace synthese
 		const string DateTimeInterfacePage::DATA_MONTH("month");
 		const string DateTimeInterfacePage::DATA_YEAR("year");
 
-		void DateTimeInterfacePage::display(std::ostream& stream, VariablesMap& variables	, const time::DateTime& dateTime
-			, const server::Request* request /*= NULL*/) const
-		{
+		void DateTimeInterfacePage::display(
+			std::ostream& stream,
+			VariablesMap& variables	,
+			const ptime& dateTime
+			, const server::Request* request /*= NULL*/
+		) const	{
 			ParametersVector pv;
 
-			pv.push_back(Conversion::ToString(dateTime.getYear()));
-			pv.push_back(Conversion::ToString(dateTime.getMonth()));
-			pv.push_back(Conversion::ToString(dateTime.getDay()));
-			pv.push_back(Conversion::ToString(dateTime.getHours()));
-			pv.push_back(Conversion::ToString(dateTime.getMinutes()));
-			pv.push_back(Conversion::ToString(dateTime.getDate().getWeekDay()));
+			pv.push_back(Conversion::ToString(dateTime.date().year()));
+			pv.push_back(Conversion::ToString(dateTime.date().month()));
+			pv.push_back(Conversion::ToString(dateTime.date().day()));
+			pv.push_back(Conversion::ToString(dateTime.time_of_day().hours()));
+			pv.push_back(Conversion::ToString(dateTime.time_of_day().minutes()));
+			pv.push_back(Conversion::ToString(dateTime.date().day_of_week()));
 
 			InterfacePage::_display(stream, pv, variables, NULL, request);
 		}
 
-		void DateTimeInterfacePage::display( std::ostream& stream , interfaces::VariablesMap& variables , const time::Date& date , const server::Request* request /*= NULL  */ ) const
-		{
+		void DateTimeInterfacePage::display(
+			std::ostream& stream ,
+			interfaces::VariablesMap& variables ,
+			const date& date ,
+			const server::Request* request /*= NULL  */
+		) const	{
 			ParametersVector pv;
 
-			pv.push_back(Conversion::ToString(date.getYear()));
-			pv.push_back(Conversion::ToString(date.getMonth()));
-			pv.push_back(Conversion::ToString(date.getDay()));
+			pv.push_back(Conversion::ToString(date.year()));
+			pv.push_back(Conversion::ToString(date.month()));
+			pv.push_back(Conversion::ToString(date.day()));
 			pv.push_back(Conversion::ToString(UNKNOWN_VALUE));
 			pv.push_back(Conversion::ToString(UNKNOWN_VALUE));
-			pv.push_back(Conversion::ToString(date.getWeekDay()));
+			pv.push_back(Conversion::ToString(date.day_of_week()));
 
 			InterfacePage::_display(stream, pv, variables, NULL, request);
 		}

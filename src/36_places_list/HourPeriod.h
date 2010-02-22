@@ -23,15 +23,14 @@
 #ifndef SYNTHESE_TIME_HOURPERIOD_H
 #define SYNTHESE_TIME_HOURPERIOD_H
 
-#include "04_time/Hour.h"
-
 #include <string>
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 namespace synthese
 {
 	namespace transportwebsite
 	{
-		/** Hour period in a day.
+		/** ptime period in a day.
 			@ingroup m36
 
 			These objects describe a period of time in a day.
@@ -39,15 +38,15 @@ namespace synthese
 		class HourPeriod
 		{
 		private:
-			time::Hour	_startHour;	//!< Period start hour
-			time::Hour	_endHour;	//!< Period end hour
+			boost::posix_time::time_duration	_startHour;	//!< Period start hour
+			boost::posix_time::time_duration	_endHour;	//!< Period end hour
 			std::string	_caption;	//!< Period caption
 
 		public:
 			HourPeriod(
 				const std::string& caption
-				, const time::Hour& startHour
-				, const time::Hour& endHour
+				, const boost::posix_time::time_duration& startHour
+				, const boost::posix_time::time_duration& endHour
 			);
 //			HourPeriod();
 //			HourPeriod(const HourPeriod& period);
@@ -56,8 +55,8 @@ namespace synthese
 			//! @name Getters/Setters
 			//@{
 				const std::string& getCaption () const;
-				const time::Hour& getBeginHour() const;
-				const time::Hour& getEndHour() const;
+				const boost::posix_time::time_duration& getBeginHour() const;
+				const boost::posix_time::time_duration& getEndHour() const;
 			//@}
 		};
 	}

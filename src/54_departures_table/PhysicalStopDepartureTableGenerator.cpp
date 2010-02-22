@@ -32,11 +32,11 @@
 #include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace env;
-	using namespace time;
 	using namespace graph;
 
 	namespace departurestable
@@ -50,8 +50,8 @@ namespace synthese
 			, const DisplayedPlacesList& displayedPlacesList
 			, const ForbiddenPlacesList& forbiddenPlaces,
 			const TransferDestinationsList& transferDestinations
-			, const DateTime& startTime
-			, const DateTime& endDateTime
+			, const ptime& startTime
+			, const ptime& endDateTime
 			, size_t maxSize
 		):	ArrivalDepartureTableGenerator(
 			physicalStops,

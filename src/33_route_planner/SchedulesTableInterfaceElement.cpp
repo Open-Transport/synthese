@@ -38,18 +38,16 @@
 #include "Interface.h"
 #include "NamedPlace.h"
 
-#include "DateTime.h"
-
 #include <vector>
 #include <boost/foreach.hpp>
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace routeplanner;
-	using namespace time;
 	using namespace geography;
 	using namespace interfaces;
 	using namespace graph;
@@ -77,7 +75,6 @@ namespace synthese
 				const PTRoutePlannerResult::PlaceList& placesList(
 					jv->getOrderedPlaces()
 				);
-				Hour unknownTime( TIME_UNKNOWN );
 				const RoutePlannerSheetColumnInterfacePage* columnInterfacePage(
 					_page->getInterface()->getPage<RoutePlannerSheetColumnInterfacePage>()
 				);
@@ -125,8 +122,8 @@ namespace synthese
 							);
 							assert(placeToSearch != NULL);
 
-							DateTime lastDateTime(curET.getDepartureDateTime());
-							lastDateTime += it->getContinuousServiceRange().total_seconds() / 60;
+							ptime lastDateTime(curET.getDepartureDateTime());
+							lastDateTime += it->getContinuousServiceRange();
 
 							for (; itPlaces != placesList.end() && itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
 								columnInterfacePage->display(
@@ -135,8 +132,8 @@ namespace synthese
 									, (itl + 1) == jl.end()
 									, i
 									, pedestrianMode
-									, unknownTime
-									, unknownTime
+									, time_duration(not_a_date_time)
+									, time_duration(not_a_date_time)
 									, false
 									, true
 									, true
@@ -153,8 +150,8 @@ namespace synthese
 								, true
 								, i
 								, pedestrianMode
-								, curET.getDepartureDateTime().getHour()
-								, lastDateTime.getHour()
+								, curET.getDepartureDateTime().time_of_day()
+								, lastDateTime.time_of_day()
 								, it->getContinuousServiceRange().total_seconds() > 0
 								, itl == jl.begin()
 								, true
@@ -184,8 +181,8 @@ namespace synthese
 									, true
 									, i
 									, pedestrianMode
-									, unknownTime
-									, unknownTime
+									, time_duration(not_a_date_time)
+									, time_duration(not_a_date_time)
 									, false
 									, true
 									, true
@@ -194,8 +191,8 @@ namespace synthese
 								);
 							}
 							
-							DateTime lastDateTime(curET.getArrivalDateTime());
-							lastDateTime += it->getContinuousServiceRange().total_seconds() / 60;
+							ptime lastDateTime(curET.getArrivalDateTime());
+							lastDateTime += it->getContinuousServiceRange();
 
 							columnInterfacePage->display(
 								**itSheetRow
@@ -203,8 +200,8 @@ namespace synthese
 								, (itl + 1) == jl.end()
 								, i
 								, pedestrianMode
-								, curET.getArrivalDateTime().getHour ()
-								, lastDateTime.getHour()
+								, curET.getArrivalDateTime().time_of_day()
+								, lastDateTime.time_of_day()
 								, it->getContinuousServiceRange().total_seconds() > 0
 								, true
 								, (itl + 1) == jl.end()
@@ -222,8 +219,8 @@ namespace synthese
 							, true
 							, i
 							, false
-							, unknownTime
-							, unknownTime
+							, time_duration(not_a_date_time)
+							, time_duration(not_a_date_time)
 							, false
 							, true
 							, true
@@ -262,13 +259,13 @@ namespace synthese
 				// Circulation ï¿ rï¿servation
 				// Alerte sur circulation
 				// Alerte sur arrï¿t d'arrivï¿e
-				synthese::time::DateTime __debutAlerte, __finAlerte;
+				ptime __debutAlerte, __finAlerte;
 
 				// Alerte sur arrï¿t de dï¿part
 				// Dï¿but alerte = premier dï¿part
 				// Fin alerte = dernier dï¿part
-				synthese::time::DateTime debutPrem = curET->getDepartureTime();
-				synthese::time::DateTime finPrem = debutPrem;
+				ptime debutPrem = curET->getDepartureTime();
+				ptime finPrem = debutPrem;
 				if (__Trajet->getContinuousServiceRange ().Valeur())
 				finPrem += __Trajet->getContinuousServiceRange ();
 				if (curET->getGareDepart()->getAlarm().showMessage(__debutAlerte, __finAlerte)
@@ -276,7 +273,7 @@ namespace synthese
 				__NiveauRenvoiColonne = curET->getGareDepart()->getAlarm().Niveau();
 
 				// Circulation ï¿ rï¿servation obligatoire
-				synthese::time::DateTime maintenant;
+				ptime maintenant;
 				maintenant.setMoment();
 				if (curET->getLigne()->GetResa()->TypeResa() == Obligatoire
 				&& curET->getLigne()->GetResa()->reservationPossible(curET->getLigne()->GetTrain(curET->getService()), maintenant, curET->getDepartureTime())

@@ -45,34 +45,34 @@ namespace synthese
 		public:
 			static boost::shared_ptr<const AllowedUseRule> INSTANCE;
 
-			virtual time::DateTime getReservationDeadLine (
-				const time::DateTime& originTime,
-				const time::DateTime& departureTime
-				) const;
+			virtual boost::posix_time::ptime getReservationDeadLine (
+				const boost::posix_time::ptime& originTime,
+				const boost::posix_time::ptime& departureTime
+			) const;
 
 
 			virtual AccessCapacity getAccessCapacity(
-				) const;
+			) const;
 
 
-			virtual time::DateTime getReservationOpeningTime ( 
+			virtual boost::posix_time::ptime getReservationOpeningTime ( 
 				const ServicePointer& servicePointer
-				) const;
+			) const;
 
 
 			virtual RunPossibilityType isRunPossible (
 				const ServiceUse& serviceUse
-				) const;
+			) const;
 
 
 			virtual RunPossibilityType isRunPossible (
 				const ServicePointer& servicePointer
-				) const;
+			) const;
 
 
 			virtual ReservationAvailabilityType getReservationAvailability(
 				const ServiceUse& serviceUse
-				) const;
+			) const;
 
 
 			virtual ReservationAvailabilityType getReservationAvailability(

@@ -24,7 +24,6 @@
 #define SYNTHESE_JourneyBoardStopCellInterfacePage_H__
 
 #include "InterfacePage.h"
-#include "DateTime.h"
 #include "FactorableTemplate.h"
 
 namespace synthese
@@ -56,6 +55,7 @@ namespace synthese
 				- 7 Last time (empty if continuous service)
 				- 8 WGS84 longitude
 				- 9 WGS84 latitude
+				- 10 is last leg
 		*/
 		class JourneyBoardStopCellInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,JourneyBoardStopCellInterfacePage>
 		{
@@ -90,9 +90,10 @@ namespace synthese
 				, const messages::SentAlarm* alarm,
 				bool isItTerminus,
 				const env::PhysicalStop& physicalStop,
-				bool color
-				, const time::DateTime& time
-				, int continuousServiceRange
+				bool color,
+				const boost::posix_time::ptime& time
+				, boost::posix_time::time_duration continuousServiceRange,
+				bool isLastLeg
 				, const server::Request* request = NULL
 			) const;
 		};

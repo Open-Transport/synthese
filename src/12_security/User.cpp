@@ -35,11 +35,11 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
 
 	namespace util
 	{
@@ -53,7 +53,7 @@ namespace synthese
 			: Registrable(id)
 			, _cityId(0)
 			, _isConnectionAllowed(true)
-			, _birthDate(TIME_UNKNOWN),
+			, _birthDate(not_a_date_time),
 			_profile(NULL)
 		{
 		}
@@ -185,12 +185,12 @@ namespace synthese
 			return _isConnectionAllowed;
 		}
 
-		const time::Date& User::getBirthDate() const
+		const date& User::getBirthDate() const
 		{
 			return _birthDate;
 		}
 
-		void User::setBirthDate( const time::Date& date )
+		void User::setBirthDate( const date& date )
 		{
 			_birthDate = date;
 		}

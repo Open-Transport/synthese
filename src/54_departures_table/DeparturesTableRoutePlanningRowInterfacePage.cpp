@@ -31,12 +31,15 @@
 #include "Line.h"
 #include "CommercialLine.h"
 #include "Edge.h"
-#include "DateTime.h"
 #include "City.h"
 #include "RollingStock.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
@@ -44,9 +47,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace graph;
 	using namespace env;
-	using namespace time;
-	
-	
+
 
 	namespace util
 	{
@@ -114,10 +115,12 @@ namespace synthese
 			{
 				const ServiceUse& s(row.second.getStartServiceUse());
 
-				v.push_back(lexical_cast<string>(s.getDepartureDateTime().getSecondsDifference(DateTime(TIME_CURRENT)) <= posix_time::minutes(blinkingDelay)));
+				v.push_back(lexical_cast<string>(s.getDepartureDateTime() - second_clock::local_time() <= posix_time::minutes(blinkingDelay)));
 				v.push_back(static_cast<const PhysicalStop*>(s.getDepartureRTVertex())->getName());
 				v.push_back(s.getService()->getServiceNumber());
-				v.push_back(s.getDepartureDateTime().getHour().toString());
+				stringstream str;
+				str << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().minutes();
+				v.push_back(str.str());
 				const CommercialLine* line(static_cast<const Line*>(s.getEdge()->getParentPath())->getCommercialLine());
 				v.push_back(line->getShortName());
 				v.push_back(line->getImage());
@@ -128,7 +131,11 @@ namespace synthese
 					const ServiceUse& s(row.second.getEndServiceUse());
 					v.push_back(static_cast<const PhysicalStop*>(s.getDepartureRTVertex())->getName());
 					v.push_back(s.getService()->getServiceNumber());
-					v.push_back(s.getDepartureDateTime().getHour().toString());
+
+					stringstream str;
+					str << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().minutes();
+					v.push_back(str.str());
+
 					const CommercialLine* line(static_cast<const Line*>(s.getEdge()->getParentPath())->getCommercialLine());
 					v.push_back(line->getShortName());
 					v.push_back(line->getImage());

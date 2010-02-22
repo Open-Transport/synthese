@@ -129,20 +129,24 @@ namespace synthese
 						break;
 					}
 
-					if(	(	_IsFollowedBy(source, pos, "n") &&
+					if(	(	_IsFollowedBy(source, pos, "n")  &&
 							!_IsFollowedBy(source, pos, "na") &&
+							!_IsFollowedBy(source, pos, "nà") &&
+							!_IsFollowedBy(source, pos, "nä") &&
 							!_IsFollowedBy(source, pos, "ne") &&
 							!_IsFollowedBy(source, pos, "né") &&
-							!_IsFollowedBy(source, pos, "nè") &&
 							!_IsFollowedBy(source, pos, "në") &&
-							!_IsFollowedBy(source, pos, "nê") &&
 							!_IsFollowedBy(source, pos, "ni") &&
-							!_IsFollowedBy(source, pos, "nì") &&
 							!_IsFollowedBy(source, pos, "nï") &&
+							!_IsFollowedBy(source, pos, "nì") &&
+							!_IsFollowedBy(source, pos, "nn") &&
 							!_IsFollowedBy(source, pos, "no") &&
+							!_IsFollowedBy(source, pos, "nò") &&
+							!_IsFollowedBy(source, pos, "nô") &&
 							!_IsFollowedBy(source, pos, "nu") &&
-							!_IsFollowedBy(source, pos, "ny") &&
-							!_IsFollowedBy(source, pos, "nn")
+							!_IsFollowedBy(source, pos, "nù") &&
+							!_IsFollowedBy(source, pos, "nû") &&
+							!_IsFollowedBy(source, pos, "ny")
 						) ||
 						_IsFollowedBy(source, pos, "mb") ||
 						_IsFollowedBy(source, pos, "mp")
@@ -206,6 +210,12 @@ namespace synthese
 					break;
 					
 				case 'e':
+					if(	_IsFollowedBy(source, pos, "au")
+					){
+						result.push_back(O);
+						pos += 2;
+						break;
+					}
 					if(	_IsFollowedBy(source, pos, "s") &&
 						_IsLast(source, pos, 2)
 					){
@@ -241,7 +251,24 @@ namespace synthese
 						break;
 					}
 					
-					if(	_IsFollowedBy(source, pos, "n") ||
+					if(	_IsFollowedBy(source, pos, "n") &&
+							!_IsFollowedBy(source, pos, "na") &&
+							!_IsFollowedBy(source, pos, "nà") &&
+							!_IsFollowedBy(source, pos, "nä") &&
+							!_IsFollowedBy(source, pos, "ne") &&
+							!_IsFollowedBy(source, pos, "né") &&
+							!_IsFollowedBy(source, pos, "në") &&
+							!_IsFollowedBy(source, pos, "ni") &&
+							!_IsFollowedBy(source, pos, "nï") &&
+							!_IsFollowedBy(source, pos, "nì") &&
+							!_IsFollowedBy(source, pos, "nn") &&
+							!_IsFollowedBy(source, pos, "no") &&
+							!_IsFollowedBy(source, pos, "nò") &&
+							!_IsFollowedBy(source, pos, "nô") &&
+							!_IsFollowedBy(source, pos, "nu") &&
+							!_IsFollowedBy(source, pos, "nù") &&
+							!_IsFollowedBy(source, pos, "nû") &&
+							!_IsFollowedBy(source, pos, "ny")||
 						_IsFollowedBy(source, pos, "mp") ||
 						_IsFollowedBy(source, pos, "mb")
 					){
@@ -592,8 +619,24 @@ namespace synthese
 						break;
 					}
 				
-					if(	_IsLast(source, pos))
-					{
+					if(	_IsLast(source, pos) ||
+						_IsFollowedBy(source, pos, "b") ||
+						_IsFollowedBy(source, pos, "c") ||
+						_IsFollowedBy(source, pos, "d") ||
+						_IsFollowedBy(source, pos, "f") ||
+						_IsFollowedBy(source, pos, "g") ||
+						_IsFollowedBy(source, pos, "h") ||
+						_IsFollowedBy(source, pos, "j") ||
+						_IsFollowedBy(source, pos, "k") ||
+						_IsFollowedBy(source, pos, "l") ||
+						_IsFollowedBy(source, pos, "m") ||
+						_IsFollowedBy(source, pos, "n") ||
+						_IsFollowedBy(source, pos, "p") ||
+						_IsFollowedBy(source, pos, "q") ||
+						_IsFollowedBy(source, pos, "r") ||
+						_IsFollowedBy(source, pos, "s") ||
+						_IsFollowedBy(source, pos, "v") 
+					){
 						break;
 					}
 					
@@ -604,6 +647,13 @@ namespace synthese
 				case 'ù':
 				case 'ü':
 				case 'û':
+					if(	_IsFollowedBy(source, pos, "n") &&
+						_IsLast(source, pos+1)
+					){
+						++pos;
+						result.push_back(AN);
+						break;
+					}
 					result.push_back(U);
 					break;
 

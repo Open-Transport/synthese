@@ -25,6 +25,7 @@
 
 #include <set>
 #include <map>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 #include "UtilTypes.h"
 #include "DeparturesTableTypes.h"
@@ -70,8 +71,8 @@ namespace synthese
 				const LineFilter				_lineFilter;
 				const ForbiddenPlacesList		_forbiddenPlaces;
 				const TransferDestinationsList	_transferDestinations;
-				const time::DateTime			_startDateTime;
-				const time::DateTime			_endDateTime;
+				const boost::posix_time::ptime	_startDateTime;
+				const boost::posix_time::ptime	_endDateTime;
 				const size_t					_maxSize;	//!< Maximal size of the departure table according to the demand rules.
 			//@}
 
@@ -105,8 +106,8 @@ namespace synthese
 				, const DisplayedPlacesList&
 				, const ForbiddenPlacesList&,
 				const TransferDestinationsList&
-				, const time::DateTime& startDateTime
-				, const time::DateTime& endDateTime
+				, const boost::posix_time::ptime& startDateTime
+				, const boost::posix_time::ptime& endDateTime
 				, size_t maxSize = UNLIMITED_SIZE
 			);
 

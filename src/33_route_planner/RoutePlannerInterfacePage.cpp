@@ -32,7 +32,6 @@
 #include "DateTimeInterfacePage.h"
 #include "Interface.h"
 #include "PTRoutePlannerResult.h"
-#include "Date.h"
 #include "NamedPlace.h"
 
 #include <sstream>
@@ -40,6 +39,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -78,7 +78,7 @@ namespace synthese
 			ostream& stream
 			, VariablesMap& variables
 			, const PTRoutePlannerResult& object
-			, const time::Date& date
+			, const date& date
 			, size_t periodId
 			, const Place* originPlace
 			, const Place* destinationPlace
@@ -110,7 +110,7 @@ namespace synthese
 			datePage->display(sDate, variables, date, request);
 
 			ParametersVector pv;
-			pv.push_back(date.toSQLString(false));
+			pv.push_back(to_iso_extended_string(date));
 			pv.push_back("0");
 			pv.push_back(originCity->getName());
 			pv.push_back(lexical_cast<string>(accessParameters.getUserClass() == USER_HANDICAPPED));
@@ -148,7 +148,7 @@ namespace synthese
 		void RoutePlannerInterfacePage::display(
 			ostream& stream
 			, interfaces::VariablesMap& variables
-			, const time::Date& date
+			, const date& date
 			, size_t periodId
 			, bool home
 			, const string& originCity
@@ -166,7 +166,7 @@ namespace synthese
 			datePage->display(sDate, variables, date, request);
 
 			ParametersVector pv;
-			pv.push_back(date.toSQLString(false));
+			pv.push_back(to_iso_extended_string(date));
 			pv.push_back(lexical_cast<string>(home));
 			pv.push_back(originCity);
 			pv.push_back(lexical_cast<string>(accessParameters.getUserClass() == USER_HANDICAPPED));

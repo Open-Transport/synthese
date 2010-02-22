@@ -26,25 +26,61 @@
 #define SYNTHESE_TransportSiteAdmin_H__
 
 #include "AdminInterfaceElementTemplate.h"
+#include "GraphTypes.h"
+#include "ResultHTMLTable.h"
 
 namespace synthese
 {
 	namespace transportwebsite
 	{
 		class Site;
+		class RollingStockFilter;
 
 		/** TransportSiteAdmin Class.
 			@ingroup m36Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/
-		class TransportSiteAdmin : public admin::AdminInterfaceElementTemplate<TransportSiteAdmin>
+		class TransportSiteAdmin:
+			public admin::AdminInterfaceElementTemplate<TransportSiteAdmin>
 		{
-			boost::shared_ptr<Site>	_site;
+		public:
+			static const std::string PARAMETER_START_CITY;
+			static const std::string PARAMETER_START_PLACE;
+			static const std::string PARAMETER_END_CITY;
+			static const std::string PARAMETER_END_PLACE;
+			static const std::string PARAMETER_DATE_TIME;
+			static const std::string PARAMETER_RESULTS_NUMBER;
+			static const std::string PARAMETER_ACCESSIBILITY;
+			static const std::string PARAMETER_LOG;
+			static const std::string PARAMETER_ROLLING_STOCK_FILTER;
+			static const std::string PARAMETER_SEARCH_PAGE;
+
+			static const std::string TAB_PROPERTIES;
+			static const std::string TAB_PERIMETER;
+			static const std::string TAB_WEB_PAGES;
+			static const std::string TAB_ROUTE_PLANNING;
+
+		private:
+			boost::shared_ptr<const Site>	_site;
+			std::string						_startCity;
+			std::string						_startPlace;
+			std::string						_endCity;
+			std::string						_endPlace;
+			boost::posix_time::ptime		_dateTime;
+			int								_resultsNumber;
+			graph::UserClassCode			_accessibility;
+			bool							_log;
+			RollingStockFilter*				_rollingStockFilter;
+			std::string						_searchPage;
+			html::ResultHTMLTable::RequestParameters	_pageSearchParameter;
 
 		public:
 			TransportSiteAdmin();
-			
+
+			boost::shared_ptr<const Site> getSite() const;
+			void setSite(boost::shared_ptr<const Site> value);
+
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -71,8 +107,10 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables,
-					const admin::AdminRequest& _request
+			void display(
+				std::ostream& stream,
+				interfaces::VariablesMap& variables,
+				const admin::AdminRequest& _request
 			) const;
 			
 			/** Authorization control.
@@ -113,6 +151,19 @@ namespace synthese
 			virtual std::string getTitle() const;
 			
 			
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds the tabs of the page.
+			/// @param request The current request (can be used to determinate the
+			///        current user rights.)
+			/// @author Hugues
+			/// @date 2010
+			virtual void _buildTabs(
+				const security::Profile& profile
+			) const;
+
+
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 			
 		};

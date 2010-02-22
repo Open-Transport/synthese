@@ -25,7 +25,6 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "DateTime.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -46,7 +45,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<DBLog>		_dbLog;
-			time::DateTime					_endDate;
+			boost::posix_time::ptime	_endDate;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

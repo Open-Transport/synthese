@@ -14,10 +14,6 @@ synthese::routeplanner::SchedulesTableInterfaceElement::integrate();
 synthese::routeplanner::ScheduleSheetLinesListLineInterfaceElement::integrate();
 synthese::routeplanner::ScheduleSheetDurationRowInterfaceElement::integrate();
 synthese::routeplanner::ScheduleSheetReservationRowInterfaceElement::integrate();
-synthese::routeplanner::DatesListInterfaceElement::integrate();
-synthese::routeplanner::TextInputInterfaceElemet::integrate();
-synthese::routeplanner::RequestInterfaceElement::integrate();
-synthese::routeplanner::PeriodsListInterfaceElement::integrate();
 synthese::routeplanner::JourneyBoardsInterfaceElement::integrate();
 
 synthese::routeplanner::RoutePlannerFunction::integrate();

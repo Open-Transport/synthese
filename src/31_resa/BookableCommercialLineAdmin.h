@@ -27,8 +27,6 @@
 
 #include "AdminInterfaceElementTemplate.h"
 
-#include "DateTime.h"
-
 namespace synthese
 {
 	namespace env
@@ -58,7 +56,7 @@ namespace synthese
 		{
 			bool											_displayCancelled;
 			boost::shared_ptr<const env::CommercialLine>	_line;
-			time::Date										_date;
+			boost::gregorian::date							_date;
 			bool											_hideOldServices;
 			boost::optional<std::string>					_serviceNumber;
 

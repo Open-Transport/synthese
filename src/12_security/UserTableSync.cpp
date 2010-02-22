@@ -22,8 +22,7 @@
 
 #include <sstream>
 
-#include "Conversion.h"
-
+#include "ReplaceQuery.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
@@ -33,18 +32,17 @@
 #include "UserTableSync.h"
 #include "ProfileTableSync.h"
 #include "User.h"
-#include "UserTableSyncException.h"
 
 using namespace std;
 using namespace boost;
 using namespace boost::logic;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
 	using namespace security;
-	using namespace time;
 
 	namespace util
 	{
@@ -121,22 +119,15 @@ namespace synthese
 			user->setEMail(rows->getText ( UserTableSync::TABLE_COL_EMAIL));
 			user->setPhone(rows->getText ( UserTableSync::TABLE_COL_PHONE));
 			user->setConnectionAllowed(rows->getBool ( UserTableSync::COL_LOGIN_AUTHORIZED));
-			user->setBirthDate(Date::FromSQLDate(rows->getText ( UserTableSync::COL_BIRTH_DATE)));
+			user->setBirthDate(rows->getDate(UserTableSync::COL_BIRTH_DATE));
 	
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				try
-				{
-					user->setProfile(ProfileTableSync::Get(
-						rows->getLongLong(UserTableSync::TABLE_COL_PROFILE_ID),
-						env,
-						linkLevel
-					).get());
-				}
-				catch (ObjectNotFoundException<Profile>& e)
-				{
-					throw UserTableSyncException("Bad profile "+ rows->getText ( UserTableSync::TABLE_COL_PROFILE_ID)+ e.getMessage());
-				}
+				user->setProfile(ProfileTableSync::Get(
+					rows->getLongLong(UserTableSync::TABLE_COL_PROFILE_ID),
+					env,
+					linkLevel
+				).get());
 			}
 		}
 
@@ -153,41 +144,22 @@ namespace synthese
 			User* user,
 			optional<SQLiteTransaction&> transaction
 		){
-			try
-			{
-				SQLite* sqlite = DBModule::GetSQLite();
-				stringstream query;
-				if (user->getKey() <= 0)
-					user->setKey(getId());
-				query
-					<< "REPLACE INTO " << TABLE.NAME
-					<< " VALUES(" 
-					<< Conversion::ToString(user->getKey())
-					<< "," << Conversion::ToSQLiteString(user->getName())
-					<< "," << Conversion::ToSQLiteString(user->getSurname())
-					<< "," << Conversion::ToSQLiteString(user->getLogin())
-					<< "," << Conversion::ToSQLiteString(user->getPassword())
-					<< "," << Conversion::ToString(user->getProfile()->getKey())
-					<< "," << Conversion::ToSQLiteString(user->getAddress())
-					<< "," << Conversion::ToSQLiteString(user->getPostCode())
-					<< "," << Conversion::ToSQLiteString(user->getCityText())
-					<< "," << Conversion::ToString(user->getCityId())
-					<< "," << Conversion::ToSQLiteString(user->getCountry())
-					<< "," << Conversion::ToSQLiteString(user->getEMail())
-					<< "," << Conversion::ToSQLiteString(user->getPhone())
-					<< "," << Conversion::ToString(user->getConnectionAllowed())
-					<< "," << user->getBirthDate().toSQLString()
-					<< ")";
-				sqlite->execUpdate(query.str(), transaction);
-			}
-			catch (SQLiteException e)
-			{
-				throw UserTableSyncException("Insert/Update error " + e.getMessage());
-			}
-			catch (...)
-			{
-				throw UserTableSyncException("Unknown Insert/Update error");
-			}
+			ReplaceQuery<UserTableSync> query(*user);
+			query.addField(user->getName());
+			query.addField(user->getSurname());
+			query.addField(user->getLogin());
+			query.addField(user->getPassword());
+			query.addField(user->getProfile()->getKey());
+			query.addField(user->getAddress());
+			query.addField(user->getPostCode());
+			query.addField(user->getCityText());
+			query.addField(user->getCityId());
+			query.addField(user->getCountry());
+			query.addField(user->getEMail());
+			query.addField(user->getPhone());
+			query.addField(user->getConnectionAllowed());
+			query.addField(user->getBirthDate());
+			query.execute(transaction);
 		}
 	}
 	namespace security
@@ -205,7 +177,7 @@ namespace synthese
 			{
 				db::SQLiteResultSPtr rows = sqlite->execQuery(query.str());
 				if (rows->next () == false)
-					throw UserTableSyncException("User "+ login + " not found in database.");
+					throw Exception("User "+ login + " not found in database.");
 
 				shared_ptr<User> user (new User(rows->getKey()));
 				Load(user.get(), rows, env, UP_LINKS_LOAD_LEVEL);
@@ -213,7 +185,7 @@ namespace synthese
 			}
 			catch (SQLiteException e)
 			{
-				throw UserTableSyncException(e.getMessage());
+				throw Exception(e.getMessage());
 			}
 		}
 
@@ -301,7 +273,7 @@ namespace synthese
 			}
 			catch (SQLiteException e)
 			{
-				throw UserTableSyncException(e.getMessage());
+				throw Exception(e.getMessage());
 			}
 		}
 	}

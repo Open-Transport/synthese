@@ -25,8 +25,6 @@
 
 #include "ServicePointer.h"
 
-#include <boost/date_time/posix_time/posix_time_duration.hpp>
-
 namespace synthese
 {
 	namespace graph
@@ -43,7 +41,7 @@ namespace synthese
 			//! @name Second step data
 			//@{
 				const Edge*				_secondEdge;
-				time::DateTime			_secondActualDateTime;
+				boost::posix_time::ptime			_secondActualDateTime;
 				const Vertex*			_secondRTVertex;
 			//@}
 
@@ -56,7 +54,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const Edge*				getSecondEdge()				const;
-				const time::DateTime&	getSecondActualDateTime()	const;
+				const boost::posix_time::ptime&	getSecondActualDateTime()	const;
 				const Vertex*			getSecondVertex()			const;
 			//@}
 
@@ -66,13 +64,13 @@ namespace synthese
 				const Edge*				getArrivalEdge()			const;
 				const Vertex*			getDepartureRTVertex()			const;
 				const Vertex*			getArrivalRTVertex()			const;
-				const time::DateTime&	getDepartureDateTime()		const;
-				const time::DateTime&	getArrivalDateTime()		const;
+				const boost::posix_time::ptime&	getDepartureDateTime()		const;
+				const boost::posix_time::ptime&	getArrivalDateTime()		const;
 				boost::posix_time::time_duration	getDuration()				const;
 				double					getDistance()				const;
 				UseRule::RunPossibilityType		isUseRuleCompliant(
 				)	const;
-				time::DateTime			getReservationDeadLine()	const;
+				boost::posix_time::ptime			getReservationDeadLine()	const;
 			//@}
 
 			//! @name Update

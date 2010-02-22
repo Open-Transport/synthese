@@ -38,7 +38,6 @@
 #include "PhysicalStop.h"
 #include "PhysicalStopTableSync.h"
 #include "Line.h"
-#include "DateTime.h"
 #include "DBLogEntryTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
@@ -52,9 +51,12 @@
 
 #include <sstream>
 #include <boost/foreach.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
@@ -63,7 +65,6 @@ namespace synthese
 	using namespace departurestable;
 	using namespace env;
 	using namespace dblog;
-	using namespace time;
 	using namespace security;
 	using namespace messages;
 	using namespace geography;
@@ -606,7 +607,7 @@ namespace synthese
 			util::RegistryKeyType screenId,
 			int limit
 		){
-			DateTime now(TIME_CURRENT);
+			ptime now(second_clock::local_time());
 			stringstream q;
 			q	<< "SELECT " << AlarmObjectLinkTableSync::COL_ALARM_ID
 				<< " FROM " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol "
@@ -615,8 +616,8 @@ namespace synthese
 				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << screenId
 				<< " AND s." << ScenarioTableSync::COL_ENABLED
 				<< " AND NOT s." << ScenarioTableSync::COL_IS_TEMPLATE
-				<< " AND (s." << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR s." << ScenarioTableSync::COL_PERIODSTART << "<" << now.toSQLString() << ")"
-				<< " AND (s." << ScenarioTableSync::COL_PERIODEND << " IS NULL OR s." << ScenarioTableSync::COL_PERIODEND << ">" << now.toSQLString() << ")"
+				<< " AND (s." << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR s." << ScenarioTableSync::COL_PERIODSTART << "<\"" << to_iso_extended_string(now.date()) << " " << to_simple_string(now.time_of_day()) << "\")"
+				<< " AND (s." << ScenarioTableSync::COL_PERIODEND << " IS NULL OR s." << ScenarioTableSync::COL_PERIODEND << ">\"" << to_iso_extended_string(now.date()) << " " << to_simple_string(now.time_of_day()) << "\")"
 				<< " ORDER BY a." << AlarmTableSync::COL_LEVEL << " DESC, s." << ScenarioTableSync::COL_PERIODSTART << " DESC";
 			if (limit > 0)
 			{
@@ -663,7 +664,7 @@ namespace synthese
 			RegistryKeyType screenId,
 			optional<int> number /*= UNKNOWN_VALUE */
 		){
-			DateTime now(TIME_CURRENT);
+			ptime now(second_clock::local_time());
 			stringstream q;
 			q	<< "SELECT " << AlarmObjectLinkTableSync::COL_ALARM_ID
 				<< " FROM " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol "
@@ -672,7 +673,7 @@ namespace synthese
 				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << screenId
 				<< " AND s." << ScenarioTableSync::COL_ENABLED
 				<< " AND NOT s." << ScenarioTableSync::COL_IS_TEMPLATE
-				<< " AND s." << ScenarioTableSync::COL_PERIODSTART << ">" << now.toSQLString()
+				<< " AND s." << ScenarioTableSync::COL_PERIODSTART << ">'" << to_iso_extended_string(now.date()) << " " << to_simple_string(now.time_of_day()) << "'"
 				<< " ORDER BY s." << ScenarioTableSync::COL_PERIODSTART;
 			if (number)
 			{

@@ -135,6 +135,7 @@ namespace synthese
 				g->setRows(_rows);
 				g->setBaseCalendar(_baseCalendar->getResult());
 				g->setAuthorizedLines(_authorizedLines);
+				g->setAuthorizedPhysicalStops(_authorizedPhysicalStops);
 			}
 			return g;
 		}
@@ -263,6 +264,33 @@ namespace synthese
 			_authorizedLines.erase(line);
 		}
 
+
+
+		void Timetable::addAuthorizedPhysicalStop( const env::PhysicalStop* stop )
+		{
+			_authorizedPhysicalStops.insert(stop);
+		}
+
+
+
+		void Timetable::removeAuthorizedPhysicalStop( const env::PhysicalStop* stop )
+		{
+			_authorizedPhysicalStops.erase(stop);
+		}
+
+
+
+		void Timetable::clearAuthorizedPhysicalStops()
+		{
+			_authorizedPhysicalStops.clear();
+		}
+
+
+
+		const TimetableGenerator::AuthorizedPhysicalStops& Timetable::getAuthorizedPhysicalStops() const
+		{
+			return _authorizedPhysicalStops;
+		}
 
 		Timetable::ImpossibleGenerationException::ImpossibleGenerationException():
 			Exception("Timetable generation is impossible.")

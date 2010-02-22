@@ -225,7 +225,7 @@ namespace synthese
 			}
 			else
 			{
-				AdminRequest doRequest(_request);
+				AdminRequest doRequest(_request,true);
 
 				stream << "<p class=\"info\">Le lancement du benchmark peut affecter les performances du système durant le test. Etes-vous sûr de vouloir lancer le benchmark ?</p>";
 				HTMLForm f(doRequest.getHTMLForm());

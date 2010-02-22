@@ -11,6 +11,7 @@
 #include "TimetableUpdateAction.h"
 #include "TimetableRowDeleteAction.h"
 #include "TimetableSetLineAction.h"
+#include "TimetableSetPhysicalStopAction.h"
 
 #include "TimetableInterfacePage.h"
 #include "TimetableNoteInterfacePage.h"

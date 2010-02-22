@@ -25,13 +25,12 @@
 
 #include "31_resa/Types.h"
 
-#include "DateTime.h"
-
 #include "Registrable.h"
 #include "Registry.h"
 
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace synthese
 {
@@ -59,8 +58,8 @@ namespace synthese
 				Reservations		_reservations;
 				uid					_lastReservation;		//!< Code de la réservation annulée en cas de modification
 				int					_seats;			//!< Nombre de places
-				time::DateTime		_bookingTime;		//!< Date de la réservation
-				time::DateTime		_cancellationTime;		//!< Date de l'annulation (unknown = not cancelled)
+				boost::posix_time::ptime		_bookingTime;		//!< Date de la réservation
+				boost::posix_time::ptime	_cancellationTime;		//!< Date de l'annulation (unknown = not cancelled)
 			//@}
 
 			//!	\name Personnes
@@ -79,8 +78,8 @@ namespace synthese
 				std::string			_originPlaceText;
 				uid					_destinationPlaceId;
 				std::string			_destinationPlaceText;
-				time::DateTime		_originDateTime;
-				time::DateTime		_destinationDateTime;
+				boost::posix_time::ptime		_originDateTime;
+				boost::posix_time::ptime		_destinationDateTime;
 				std::string			_htmlJourneyBoard;
 			//@}
 
@@ -89,8 +88,8 @@ namespace synthese
 
 			void setLastReservation	(uid id);
 			void setSeats			(int seats);
-			void setBookingTime		(const time::DateTime& time);
-			void setCancellationTime(const time::DateTime& time);
+			void setBookingTime		(const boost::posix_time::ptime& time);
+			void setCancellationTime(const boost::posix_time::ptime& time);
 			void setCustomerUserId	(uid id);
 			void setCustomerName	(const std::string& name);
 			void setCustomerPhone	(const std::string& phone);
@@ -100,8 +99,8 @@ namespace synthese
 
 			uid						getLastReservation()	const;
 			int						getSeats()				const;
-			const time::DateTime&	getBookingTime()		const;
-			const time::DateTime&	getCancellationTime()	const;
+			const boost::posix_time::ptime&	getBookingTime()		const;
+			const boost::posix_time::ptime&	getCancellationTime()	const;
 			uid						getCustomerUserId()		const;
 			const std::string&		getCustomerName()		const;
 			const std::string&		getCustomerPhone()		const;
@@ -138,14 +137,14 @@ namespace synthese
 				
 				
 				/** Dead line of the reservation transaction.
-					@return time::DateTime the dead line
+					@return the deadline
 					@author Hugues Romain
 					@date 2008
 					
 					The dead line of the reservation transaction is the time when the cancellation is not allowed anymore.
 					This is the first reservation dead line in chronological order.
 				*/
-				time::DateTime getReservationDeadLine() const;
+				boost::posix_time::ptime getReservationDeadLine() const;
 			//@}
 		};
 	}

@@ -22,8 +22,6 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "TimeParseException.h"
-#include "DateTime.h"
 #include "SearchFormHTMLTable.h"
 #include "ActionResultHTMLTable.h"
 #include "05_html/Constants.h"
@@ -56,6 +54,8 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
@@ -63,7 +63,6 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
-	using namespace time;
 	using namespace html;
 	using namespace messages;
 	using namespace security;
@@ -94,7 +93,7 @@ namespace synthese
 
 		MessagesAdmin::MessagesAdmin()
 			: AdminInterfaceElementTemplate<MessagesAdmin>()
-			, _date(TIME_CURRENT)
+			, _date(second_clock::local_time())
 			, _searchStatus(SentScenarioInheritedTableSync::BROADCAST_RUNNING)
 //			_searchLevel(ALARM_LEVEL_UNKNOWN)
 //			, _searchConflict(ALARM_CONFLICT_UNKNOWN)
@@ -103,11 +102,12 @@ namespace synthese
 		void MessagesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			try
-			{
 				_parametersMap = map;
 
-				_date = map.getDateTime(PARAMETER_SEARCH_DATE, false, FACTORY_KEY);
+				if(!map.getDefault<string>(PARAMETER_SEARCH_DATE).empty())
+				{
+					_date = time_from_string(map.get<string>(PARAMETER_SEARCH_DATE));
+				}
 
 //				int num = map.getInt(PARAMETER_SEARCH_CONFLICT, false, FACTORY_KEY);
 //				if (num != UNKNOWN_VALUE)
@@ -132,14 +132,9 @@ namespace synthese
 //					);
 //				}
 
-				_searchName = map.getOptionalString(PARAMETER_SEARCH_NAME);
+				_searchName = map.getOptional<string>(PARAMETER_SEARCH_NAME);
 
 				_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_LEVEL, 15, false);
-			}
-			catch (TimeParseException e)
-			{
-				throw AdminParametersException("Date invalide");
-			}
 		}
 
 
@@ -147,7 +142,7 @@ namespace synthese
 		server::ParametersMap MessagesAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
-			m.insert(PARAMETER_SEARCH_DATE, _date);
+//			m.insert(PARAMETER_SEARCH_DATE, _date);
 //			m.insert(PARAMETER_SEARCH_CONFLICT, static_cast<int>(_searchConflict));
 			m.insert(PARAMETER_SEARCH_STATUS, static_cast<int>(_searchStatus));
 //			m.insert(PARAMETER_SEARCH_LEVEL, static_cast<int>(_searchLevel));
@@ -178,13 +173,13 @@ namespace synthese
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_OVER, "Archivés"));
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_DRAFT, "Brouillons"));
 			
-			DateTime now(TIME_CURRENT);
+			ptime now(second_clock::local_time());
 
 			stream << "<h1>Recherche</h1>";
 
 			SearchFormHTMLTable s(searchRequest.getHTMLForm());
 			stream << s.open();
-			stream << s.cell("Date", s.getForm().getCalendarInput(PARAMETER_SEARCH_DATE, _date.toPosixTime()));
+			stream << s.cell("Date", s.getForm().getCalendarInput(PARAMETER_SEARCH_DATE, _date));
 
 			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
 			BOOST_FOREACH(const shared_ptr<AlarmRecipient> recipient, recipients)
@@ -257,18 +252,18 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<SentScenario> message, scenarios)
 			{
 				bool isDisplayedWithEndDate(
-					(message->getPeriodStart().isUnknown() || message->getPeriodStart() <= now)
-					&& !message->getPeriodEnd().isUnknown()
+					(message->getPeriodStart().is_not_a_date_time() || message->getPeriodStart() <= now)
+					&& !message->getPeriodEnd().is_not_a_date_time()
 					&& message->getPeriodEnd() >= now
 					&& message->getIsEnabled()
 				);
 				bool isDisplayedWithoutEndDate(
-					(message->getPeriodStart().isUnknown() || message->getPeriodStart() <= now)
-					&& message->getPeriodEnd().isUnknown()
+					(message->getPeriodStart().is_not_a_date_time() || message->getPeriodStart() <= now)
+					&& message->getPeriodEnd().is_not_a_date_time()
 					&& message->getIsEnabled()
 				);
 				bool willBeDisplayed(
-					!message->getPeriodStart().isUnknown()
+					!message->getPeriodStart().is_not_a_date_time()
 					&& message->getPeriodStart() > now
 					&& message->getIsEnabled()
 				);
@@ -295,7 +290,7 @@ namespace synthese
 				stream << t1.col();
 				if (!message->getIsEnabled())
 				{
-					if (!message->getPeriodEnd().isUnknown() && message->getPeriodEnd() < now)
+					if (!message->getPeriodEnd().is_not_a_date_time() && message->getPeriodEnd() < now)
 					{
 						stream << "Archivé";
 					}
@@ -306,11 +301,11 @@ namespace synthese
 				}
 				else
 				{
-					if (!message->getPeriodEnd().isUnknown() && message->getPeriodEnd() < now)
+					if (!message->getPeriodEnd().is_not_a_date_time() && message->getPeriodEnd() < now)
 					{
 						stream << "Archivé";
 					}
-					else if(message->getPeriodStart().isUnknown() || message->getPeriodStart() <= now)
+					else if(message->getPeriodStart().is_not_a_date_time() || message->getPeriodStart() <= now)
 					{
 						stream << "En cours";
 					}
@@ -322,21 +317,21 @@ namespace synthese
 				
 				
 				stream << t1.col();
-				if (message->getPeriodStart().isUnknown() && message->getPeriodEnd().isUnknown())
+				if (message->getPeriodStart().is_not_a_date_time() && message->getPeriodEnd().is_not_a_date_time())
 				{
 					stream << "Diffusion permanente";
 				}
-				if (message->getPeriodStart().isUnknown() && !message->getPeriodEnd().isUnknown())
+				if (message->getPeriodStart().is_not_a_date_time() && !message->getPeriodEnd().is_not_a_date_time())
 				{
-					stream << "Jusqu'au " << message->getPeriodEnd().toString();
+					stream << "Jusqu'au " << message->getPeriodEnd();
 				}
-				if (!message->getPeriodStart().isUnknown() && message->getPeriodEnd().isUnknown())
+				if (!message->getPeriodStart().is_not_a_date_time() && message->getPeriodEnd().is_not_a_date_time())
 				{
-					stream << "A compter du " << message->getPeriodStart().toString();
+					stream << "A compter du " << message->getPeriodStart();
 				}
-				if (!message->getPeriodStart().isUnknown() && !message->getPeriodEnd().isUnknown())
+				if (!message->getPeriodStart().is_not_a_date_time() && !message->getPeriodEnd().is_not_a_date_time())
 				{
-					stream << "Du " << message->getPeriodStart().toString() << " au " << message->getPeriodEnd().toString();
+					stream << "Du " << message->getPeriodStart() << " au " << message->getPeriodEnd();
 				}
 
 				// Type
@@ -350,7 +345,7 @@ namespace synthese
 				scenarioRequest.getPage()->setScenario(message);
 
 				stream << HTMLModule::getLinkButton(scenarioRequest.getURL(), "Ouvrir");
-				if (message->isApplicable(DateTime(TIME_CURRENT)))
+				if (message->isApplicable(now))
 				{
 					scenarioStopRequest.getAction()->setScenario(message);
 					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?", "stop.png");

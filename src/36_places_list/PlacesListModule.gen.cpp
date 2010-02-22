@@ -1,11 +1,12 @@
 
 synthese::transportwebsite::TransportSiteAdmin::integrate();
-synthese::transportwebsite::SiteRoutePlanningAdmin::integrate();
+synthese::transportwebsite::WebPageAdmin::integrate();
 
 synthese::transportwebsite::SiteTableSync::integrate();
 synthese::transportwebsite::ObjectSiteLinkTableSync::integrate();
 synthese::transportwebsite::RollingStockFilterTableSync::integrate();
 synthese::transportwebsite::UserFavoriteJourneyTableSync::integrate();
+synthese::transportwebsite::WebPageTableSync::integrate();
 
 synthese::transportwebsite::PlacesListModule::integrate();
 
@@ -13,16 +14,23 @@ synthese::transportwebsite::CityListInterfaceElement::integrate();
 synthese::transportwebsite::CityListRequestInterfaceElement::integrate();
 synthese::transportwebsite::PlacesListRequestInterfaceElement::integrate();
 synthese::transportwebsite::UserFavoriteListInterfaceElement::integrate();
+synthese::transportwebsite::WebPageFormInterfaceElement::integrate();
+synthese::transportwebsite::WebPageLinkInterfaceElement::integrate();
 
 synthese::transportwebsite::PlacesListInterfacePage::integrate();
 synthese::transportwebsite::PlacesListItemInterfacePage::integrate();
 synthese::transportwebsite::UserFavoriteInterfacePage::integrate();
+synthese::transportwebsite::WebPageInterfacePage::integrate();
 
 synthese::transportwebsite::CityListRequest::integrate();
 synthese::transportwebsite::PlacesListFunction::integrate();
+synthese::transportwebsite::WebPageDisplayFunction::integrate();
 
 synthese::transportwebsite::SiteUpdateAction::integrate();
 synthese::transportwebsite::AddUserFavoriteJourneyAction::integrate();
+synthese::transportwebsite::WebPageAddAction::integrate();
+synthese::transportwebsite::WebPageUpdateAction::integrate();
+synthese::transportwebsite::WebPageRemoveAction::integrate();
 
 synthese::transportwebsite::TransportWebsiteRight::integrate();
 
@@ -32,3 +40,4 @@ synthese::util::Env::Integrate<synthese::transportwebsite::Site>();
 synthese::util::Env::Integrate<synthese::transportwebsite::SiteCommercialLineLink>();
 synthese::util::Env::Integrate<synthese::transportwebsite::RollingStockFilter>();
 synthese::util::Env::Integrate<synthese::transportwebsite::UserFavoriteJourney>();
+synthese::util::Env::Integrate<synthese::transportwebsite::WebPage>();

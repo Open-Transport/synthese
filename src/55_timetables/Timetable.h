@@ -107,6 +107,7 @@ namespace synthese
 			//@{
 				ContentType					_contentType;
 				TimetableGenerator::AuthorizedLines			_authorizedLines;
+				TimetableGenerator::AuthorizedPhysicalStops	_authorizedPhysicalStops;
 				Rows					_rows;
 				const calendar::CalendarTemplate*			_baseCalendar;
 				std::string				_title;
@@ -128,6 +129,9 @@ namespace synthese
 				void addAuthorizedLine(const env::CommercialLine* line);
 				void removeAuthorizedLine(const env::CommercialLine* line);
 				void clearAuthorizedLines();
+				void addAuthorizedPhysicalStop(const env::PhysicalStop* stop);
+				void removeAuthorizedPhysicalStop(const env::PhysicalStop* stop);
+				void clearAuthorizedPhysicalStops();
 				void setBookId(util::RegistryKeyType value);
 				void setTitle(const std::string& title);
 				void setBaseCalendar(const calendar::CalendarTemplate* calendar);
@@ -144,6 +148,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const TimetableGenerator::AuthorizedLines&	getAuthorizedLines() const;
+				const TimetableGenerator::AuthorizedPhysicalStops& getAuthorizedPhysicalStops() const;
 				const calendar::CalendarTemplate*	getBaseCalendar()		const;
 				const std::string&		getTitle()				const;
 				const Rows&				getRows()				const;

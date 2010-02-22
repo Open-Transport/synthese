@@ -32,6 +32,7 @@
 #include "02_db/Constants.h"
 #include "SQLiteResult.h"
 #include "InterfacePageException.h"
+#include "ReplaceQuery.h"
 
 using namespace boost;
 using namespace std;
@@ -111,7 +112,8 @@ namespace synthese
 					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + InterfacePageTableSync::TABLE_COL_INTERFACE, e);
 				}
 			}
-			page->parse(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
+			page->setSource(rows->getText (InterfacePageTableSync::TABLE_COL_CONTENT));
+			page->parse();
 		}
 
 
@@ -119,7 +121,14 @@ namespace synthese
 			InterfacePage* page,
 			optional<SQLiteTransaction&> transaction
 		){
-			/// @todo Implementation
+			ReplaceQuery<InterfacePageTableSync> query(*page);
+			query.addField(page->getInterface() ? page->getInterface()->getKey() : RegistryKeyType(0));
+			query.addField(page->getFactoryKey());
+			query.addField(page->getPageCode());
+			query.addField(page->getDirectDisplayAllowed());
+			query.addField(page->getMimeType());
+			query.addField(page->getSource());
+			query.execute(transaction);
 		}
 
 
@@ -160,7 +169,7 @@ namespace synthese
 
 
 
-		void InterfacePageTableSync::Search(
+		InterfacePageTableSync::SearchResult InterfacePageTableSync::Search(
 			util::Env& env,
 			boost::optional<util::RegistryKeyType> interfaceId /*= boost::optional<util::RegistryKeyType>()*/,
 			boost::optional<int> first /*= 0*/,
@@ -176,11 +185,13 @@ namespace synthese
 				query << " AND " << TABLE_COL_INTERFACE << "=" << *interfaceId;
 
 			if (number)
+			{
 				query << " LIMIT " << Conversion::ToString(*number + 1);
-			if (first)
-				query << " OFFSET " << Conversion::ToString(*first);
+				if (first)
+					query << " OFFSET " << Conversion::ToString(*first);
+			}
 
-			LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}
 }

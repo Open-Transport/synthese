@@ -25,14 +25,16 @@
 
 #include <boost/foreach.hpp>
 #include <sstream>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace graph;
-	using namespace time;
 	using namespace util;
 
 	namespace algorithm
@@ -40,10 +42,10 @@ namespace synthese
 		TimeSlotRoutePlanner::TimeSlotRoutePlanner(
 			const graph::VertexAccessMap& originVam,
 			const graph::VertexAccessMap& destinationVam,
-			const time::DateTime& lowerDepartureTime,
-			const time::DateTime& higherDepartureTime,
-			const time::DateTime& lowerArrivalTime,
-			const time::DateTime& higherArrivalTime,
+			const ptime& lowerDepartureTime,
+			const ptime& higherDepartureTime,
+			const ptime& lowerArrivalTime,
+			const ptime& higherArrivalTime,
 			const graph::GraphIdType			whatToSearch,
 			const graph::GraphIdType			graphToUse,
 			optional<posix_time::time_duration> maxDuration,
@@ -84,9 +86,9 @@ namespace synthese
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(continuousService.getDepartureTime()),
-			_highestDepartureTime(continuousService.getDepartureTime() + continuousService.getContinuousServiceRange().total_seconds() / 60),
+			_highestDepartureTime(continuousService.getDepartureTime() + continuousService.getContinuousServiceRange()),
 			_lowestArrivalTime(continuousService.getArrivalTime()),
-			_highestArrivalTime(continuousService.getArrivalTime() + continuousService.getContinuousServiceRange().total_seconds() / 60),
+			_highestArrivalTime(continuousService.getArrivalTime() + continuousService.getContinuousServiceRange()),
 			_whatToSearch(whatToSearch),
 			_graphToUse(graphToUse),
 			_maxDuration(
@@ -106,28 +108,28 @@ namespace synthese
 
 
 
-		const time::DateTime& TimeSlotRoutePlanner::getLowestDepartureTime() const
+		const ptime& TimeSlotRoutePlanner::getLowestDepartureTime() const
 		{
 			return _lowestDepartureTime;
 		}
 
 
 
-		const time::DateTime& TimeSlotRoutePlanner::getHighestDepartureTime() const
+		const ptime& TimeSlotRoutePlanner::getHighestDepartureTime() const
 		{
 			return _highestDepartureTime;
 		}
 
 
 
-		const time::DateTime& TimeSlotRoutePlanner::getLowestArrivalTime() const
+		const ptime& TimeSlotRoutePlanner::getLowestArrivalTime() const
 		{
 			return _lowestArrivalTime;
 		}
 
 
 
-		const time::DateTime& TimeSlotRoutePlanner::getHighestArrivalTime() const
+		const ptime& TimeSlotRoutePlanner::getHighestArrivalTime() const
 		{
 			return _highestArrivalTime;
 		}
@@ -137,13 +139,13 @@ namespace synthese
 			Result result;
 
 			// Time loop
-			for(DateTime originDateTime(_planningOrder == DEPARTURE_FIRST ? _lowestDepartureTime : _highestArrivalTime);
+			for(ptime originDateTime(_planningOrder == DEPARTURE_FIRST ? _lowestDepartureTime : _highestArrivalTime);
 				_planningOrder == DEPARTURE_FIRST ? originDateTime <= _highestDepartureTime : originDateTime >= _lowestArrivalTime;
-				_planningOrder == DEPARTURE_FIRST ? originDateTime += 1 : originDateTime -= 1
+				_planningOrder == DEPARTURE_FIRST ? originDateTime += minutes(1) : originDateTime -= minutes(1)
 			){
 				if(	_logStream
 				){
-					*_logStream << "<h2>Route planning " << (result.size()+1) << " at " << _lowestDepartureTime.toString() << "</h2>";
+					*_logStream << "<h2>Route planning " << (result.size()+1) << " at " << _lowestDepartureTime << "</h2>";
 				}
 
 				RoutePlanner r(
@@ -245,13 +247,13 @@ namespace synthese
 					{
 						const Journey& last(result.back());
 						originDateTime = last.getDepartureTime();
-						originDateTime += last.getContinuousServiceRange().total_seconds() / 60;
+						originDateTime += last.getContinuousServiceRange();
 					}
 					else
 					{
 						const Journey& first(result.front());
 						originDateTime = first.getArrivalTime();
-						originDateTime -= first.getContinuousServiceRange().total_seconds() / 60;
+						originDateTime -= first.getContinuousServiceRange();
 					}
 				}
 			}
@@ -273,46 +275,46 @@ namespace synthese
 				return result;
 			}
 
-			DateTime departureTime(parentContinuousService.getDepartureTime());
+			ptime departureTime(parentContinuousService.getDepartureTime());
 			BOOST_FOREACH(const Journey& subJourney, subResult)
 			{
 				// Insertion of a journey of the parent continuous service before
-				DateTime precedingLastDepartureTime(subJourney.getArrivalTime());
-				precedingLastDepartureTime -= 1;
-				precedingLastDepartureTime -= parentContinuousService.getDuration().total_seconds() / 60;
+				ptime precedingLastDepartureTime(subJourney.getArrivalTime());
+				precedingLastDepartureTime -= days(1);
+				precedingLastDepartureTime -= parentContinuousService.getDuration();
 				if(precedingLastDepartureTime > departureTime)
 				{
 					posix_time::time_duration toShift(
-						departureTime.getSecondsDifference(parentContinuousService.getDepartureTime())
+						departureTime - parentContinuousService.getDepartureTime()
 					);
 					TimeSlotRoutePlanner::Result::value_type j(parentContinuousService);
 					BOOST_FOREACH(Journey::ServiceUses::value_type& leg, j.getServiceUses())
 					{
 						leg.shift(toShift);
 					}
-					j.setContinuousServiceRange(precedingLastDepartureTime.getSecondsDifference(departureTime));
+					j.setContinuousServiceRange(precedingLastDepartureTime - departureTime);
 					result.push_back(j);
 				}
 
 				result.push_back(subJourney);
 
 				departureTime = subJourney.getDepartureTime();
-				departureTime += 1;
+				departureTime += days(1);
 			}
 
-			DateTime lastDepartureTime(parentContinuousService.getDepartureTime());
-			lastDepartureTime += parentContinuousService.getContinuousServiceRange().total_seconds() / 60;
+			ptime lastDepartureTime(parentContinuousService.getDepartureTime());
+			lastDepartureTime += parentContinuousService.getContinuousServiceRange();
 			if(departureTime <= lastDepartureTime)
 			{
 				posix_time::time_duration toShift(
-					departureTime.getSecondsDifference(parentContinuousService.getDepartureTime())
+					departureTime - parentContinuousService.getDepartureTime()
 				);
 				TimeSlotRoutePlanner::Result::value_type j(parentContinuousService);
 				BOOST_FOREACH(Journey::ServiceUses::value_type& leg, j.getServiceUses())
 				{
 					leg.shift(toShift);
 				}
-				j.setContinuousServiceRange(lastDepartureTime.getSecondsDifference(departureTime));
+				j.setContinuousServiceRange(lastDepartureTime - departureTime);
 				result.push_back(j);
 			}
 

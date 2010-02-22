@@ -30,11 +30,11 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace env;
-	using namespace time;
 	using namespace graph;
 
 	namespace departurestable
@@ -48,8 +48,8 @@ namespace synthese
 			, const DisplayedPlacesList& displayedPlacesList
 			, const ForbiddenPlacesList& forbiddenPlaces,
 			const TransferDestinationsList& transfers
-			, const DateTime& startTime
-			, const DateTime& endDateTime
+			, const ptime& startTime
+			, const ptime& endDateTime
 			, size_t maxSize
 		):	ArrivalDepartureTableGenerator(
 			physicalStops, direction, endfilter, lineFilter,
@@ -75,7 +75,7 @@ namespace synthese
 						continue;
 
 					// Loop on services
-					DateTime departureDateTime = _startDateTime;
+					ptime departureDateTime = _startDateTime;
 					optional<Edge::DepartureServiceIndex::Value> index;
 					size_t insertedServices(0);
 					while(true)

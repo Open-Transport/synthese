@@ -26,6 +26,8 @@
 #include "ArrivalDepartureTableGenerator.h"
 #include "UId.h"
 
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
+
 namespace synthese
 {
 	namespace env
@@ -45,7 +47,7 @@ namespace synthese
 		private:
 
 			ForcedDestinationsSet	_forcedDestinations;	//!< Destinations à afficher absolument
-			const int				_persistanceDuration;	//!< Durée pendant laquelle une destination est forcée
+			const boost::posix_time::time_duration				_persistanceDuration;	//!< Durée pendant laquelle une destination est forcée
 
 
 		public:
@@ -57,11 +59,11 @@ namespace synthese
 				, const DisplayedPlacesList&
 				, const ForbiddenPlacesList&,
 				const TransferDestinationsList&
-				, const time::DateTime& startDateTime
-				, const time::DateTime& endDateTime
+				, const boost::posix_time::ptime& startDateTime
+				, const boost::posix_time::ptime& endDateTime
 				, size_t maxSize
 				, const ForcedDestinationsSet&
-				, int persistanceDuration
+				, boost::posix_time::time_duration persistanceDuration
 				);
 
 

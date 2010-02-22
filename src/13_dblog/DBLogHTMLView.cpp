@@ -39,12 +39,13 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
 	using namespace util;
 	using namespace security;
-	using namespace time;
 	using namespace server;
 	using namespace html;
 	
@@ -63,8 +64,8 @@ namespace synthese
 			const std::string& code
 		):	_code(code),
 			_searchLevel(DBLogEntry::DB_LOG_UNKNOWN),
-			_searchStartDate(TIME_UNKNOWN),
-			_searchEndDate(TIME_UNKNOWN),
+			_searchStartDate(not_a_date_time),
+			_searchEndDate(not_a_date_time),
 			_searchObjectId(UNKNOWN_VALUE),
 			_searchObjectId2(UNKNOWN_VALUE),
 			_searchUserId(UNKNOWN_VALUE),
@@ -85,8 +86,8 @@ namespace synthese
 			util::RegistryKeyType searchObjectId2,
 			util::RegistryKeyType searchUserId,
 			DBLogEntry::Level searchLevel,
-			time::DateTime searchStartDate,
-			time::DateTime searchEndDate,
+			ptime searchStartDate,
+			ptime searchEndDate,
 			std::string searchText
 		){
 			const string FACTORY_KEY("LogViewer");
@@ -95,21 +96,19 @@ namespace synthese
 			setLogKey(logKey);
 
 			// Start Date
-			if(searchStartDate.isUnknown())
-			{
-				searchStartDate = map.getDateTime(
-					_getParameterName(PARAMETER_START_DATE), false, FACTORY_KEY
-				);
+			if(	searchStartDate.is_not_a_date_time() &&
+				!map.getDefault<string>(_getParameterName(PARAMETER_START_DATE)).empty()
+			){
+				searchStartDate = time_from_string(map.get<string>(_getParameterName(PARAMETER_START_DATE)));
 				_fixedStartDate = false;
 			}
 			_searchStartDate = searchStartDate;
 
 			// End Date
-			if(searchEndDate.isUnknown())
-			{
-				searchEndDate = map.getDateTime(
-					_getParameterName(PARAMETER_END_DATE), false, FACTORY_KEY
-				);
+			if(	searchEndDate.is_not_a_date_time() &&
+				!map.getDefault<string>(_getParameterName(PARAMETER_END_DATE)).empty()
+			){
+				searchEndDate = time_from_string(map.get<string>(_getParameterName(PARAMETER_END_DATE)));
 				_fixedEndDate = false;
 			}
 			_searchEndDate = searchEndDate;
@@ -205,7 +204,7 @@ namespace synthese
 							"Date début",
 							st.getForm().getCalendarInput(
 								_getParameterName(PARAMETER_START_DATE),
-								_searchStartDate.toPosixTime()
+								_searchStartDate
 						)	)
 					;
 				}
@@ -215,7 +214,7 @@ namespace synthese
 						"Date fin",
 						st.getForm().getCalendarInput(
 							_getParameterName(PARAMETER_END_DATE),
-							_searchEndDate.toPosixTime()
+							_searchEndDate
 						)	)
 					;
 				}
@@ -322,7 +321,7 @@ namespace synthese
 						DBLogModule::getEntryLevelLabel(dbe->getLevel())
 					)
 				;
-				stream << t.col() << dbe->getDate().toString(true);
+				stream << t.col() << to_simple_string(dbe->getDate());
 				if(!_fixedUserId)
 				{
 					stream <<

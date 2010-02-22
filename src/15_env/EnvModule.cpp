@@ -60,6 +60,8 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
@@ -67,7 +69,6 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace graph;
-	using namespace time;
 	using namespace road;
 	using namespace pt;
 	using namespace geography;
@@ -160,9 +161,9 @@ namespace synthese
 		int EnvModule::GetMaxAlarmLevel(
 			const Journey& journey
 		){
-			DateTime alarmStart(TIME_UNKNOWN);
-			DateTime alarmStop(TIME_UNKNOWN);
-			DateTime now(TIME_CURRENT);
+			ptime alarmStart(not_a_date_time);
+			ptime alarmStop(not_a_date_time);
+			ptime now(second_clock::local_time());
 			int maxAlarmLevel(0);
 		 
 			BOOST_FOREACH(const ServiceUse& leg, journey.getServiceUses())
@@ -173,8 +174,8 @@ namespace synthese
 					// -- Alarm on origin --
 					// Alarm start = first departure
 					// Alarm stop = last departure
-					alarmStart = leg.getDepartureDateTime();
-					alarmStop = alarmStart;
+				alarmStart = leg.getDepartureDateTime();
+				alarmStop = alarmStart;
 				if (service->isContinuous ()) 
 					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
 				

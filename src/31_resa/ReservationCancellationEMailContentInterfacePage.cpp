@@ -29,9 +29,12 @@
 #include "Interface.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -75,13 +78,13 @@ namespace synthese
 
 			pv.push_back(lexical_cast<string>(resa.getCustomerUserId())); // 2
 
-			pv.push_back(resa.getReservationDeadLine().getDate().toString()); // 3
-			pv.push_back(resa.getReservationDeadLine().getHour().toString()); // 4
+			pv.push_back(to_simple_string(resa.getReservationDeadLine().date())); // 3
+			pv.push_back(to_simple_string(resa.getReservationDeadLine().time_of_day())); // 4
 
 			pv.push_back((*resa.getReservations().begin())->getDeparturePlaceName()); // 5
 			pv.push_back((*(resa.getReservations().end()-1))->getArrivalPlaceName()); // 6
 
-			pv.push_back((*resa.getReservations().begin())->getDepartureTime().getDate().toString()); // 7
+			pv.push_back(to_simple_string((*resa.getReservations().begin())->getDepartureTime().date())); // 7
 
 			pv.push_back(resa.getCustomerName()); // 8
 

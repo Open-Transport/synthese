@@ -49,7 +49,6 @@ namespace synthese
 	using namespace db;
 	using namespace accounts;
 	using namespace security;
-	using namespace time;
 	using namespace util;
 
 	namespace util

@@ -40,21 +40,22 @@
 #include "Line.h"
 #include "CommercialLine.h"
 #include "RoadModule.h"
-#include "DateTime.h"
 #include "Service.h"
 #include "Log.h"
 
 #include <sstream>
 
 #include <boost/thread/thread.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/date_time/posix_time/posix_time_io.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace env;
-	using namespace time;
 	using namespace util;
 	using namespace graph;
 	using namespace road;
@@ -75,9 +76,9 @@ namespace synthese
 			JourneysResult&	result,
 			BestVertexReachesMap& bestVertexReachesMap,
 			const VertexAccessMap& destinationVam,
-			const DateTime&			originDateTime,
-			const DateTime&	minMaxDateTimeAtOrigin,
-			DateTime&	minMaxDateTimeAtDestination,
+			const boost::posix_time::ptime&			originDateTime,
+			const boost::posix_time::ptime&	minMaxDateTimeAtOrigin,
+			boost::posix_time::ptime&	minMaxDateTimeAtDestination,
 			bool inverted,
 			bool optim,
 			optional<posix_time::time_duration> maxDuration,
@@ -150,8 +151,8 @@ namespace synthese
 		void IntegralSearcher::_integralSearch(
 			const graph::VertexAccessMap& vam,
 			const graph::Journey& startJourney,
-			const time::DateTime& desiredTime,
-			const time::DateTime& minMaxDateTimeAtOrigin,
+			const boost::posix_time::ptime& desiredTime,
+			const boost::posix_time::ptime& minMaxDateTimeAtOrigin,
 			optional<size_t> maxDepth,
 			boost::optional<boost::posix_time::time_duration> totalDuration
 		){
@@ -199,21 +200,23 @@ namespace synthese
 
 /*					if (journey->getContinuousServiceRange() > 1)
 					{
-						DateTime endRange(its->getDepartureDateTime());
+						ptime endRange(its->getDepartureDateTime());
 						endRange += journey->getContinuousServiceRange();
-						*_logStream << " - Service continu jusqu'à " << endRange.toString();
+						*_logStream << " - Service continu jusqu'à " << endRange;
 					}
 					if (journey->getReservationCompliance() == true)
 					{
-						*_logStream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine().toString();
+						*_logStream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine();
 					}
 					if (journey->getReservationCompliance() == boost::logic::indeterminate)
 					{
-						*_logStream << " - Réservation facultative avant le " << journey->getReservationDeadLine().toString();
+						*_logStream << " - Réservation facultative avant le " << journey->getReservationDeadLine();
 					}
 */
 					*_logStream << "<tr>";
-					*_logStream << "<td>" << its->getDepartureDateTime().toString() << "</td>";
+					*_logStream << "<td>";
+					*_logStream << its->getDepartureDateTime();
+					*_logStream << "</td>";
 
 					// Line
 					const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
@@ -240,7 +243,9 @@ namespace synthese
 						while(true)
 						{
 							// Arrival
-							*_logStream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
+							*_logStream << "<td>";
+							*_logStream << its->getArrivalDateTime();
+							*_logStream << "</td>";
 
 							// Place
 							*_logStream << "<td>";
@@ -254,7 +259,7 @@ namespace synthese
 							++its;
 
 							// Departure
-							*_logStream << "<td>" << its->getDepartureDateTime().toString() << "</td>";
+							*_logStream << "<td>" << its->getDepartureDateTime() << "</td>";
 
 							// Line
 							const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
@@ -286,7 +291,7 @@ namespace synthese
 					}
 
 					// Final arrival
-					*_logStream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
+					*_logStream << "<td>" << its->getArrivalDateTime() << "</td>";
 
 
 //					*_logStream << todo.getLog();
@@ -313,18 +318,17 @@ namespace synthese
 					if(fullApproachJourney.empty())
 						fullApproachJourney.setStartApproachDuration(itVertex->second.approachTime);
 
-					int roundedApproachDuration(static_cast<int>(ceil(itVertex->second.approachTime.total_seconds() / double(60))));
-					DateTime correctedDesiredTime(journey->empty() ? desiredTime : journey->getEndTime());
-					DateTime correctedMinMaxDateTimeAtOrigin(minMaxDateTimeAtOrigin);
+					ptime correctedDesiredTime(journey->empty() ? desiredTime : journey->getEndTime());
+					ptime correctedMinMaxDateTimeAtOrigin(minMaxDateTimeAtOrigin);
 					if (_accessDirection == DEPARTURE_TO_ARRIVAL)
 					{
-						correctedDesiredTime += roundedApproachDuration;
-						correctedMinMaxDateTimeAtOrigin += roundedApproachDuration;
+						correctedDesiredTime += itVertex->second.approachTime;
+						correctedMinMaxDateTimeAtOrigin += itVertex->second.approachTime;
 					}
 					else
 					{
-						correctedDesiredTime -= roundedApproachDuration;
-						correctedMinMaxDateTimeAtOrigin -= roundedApproachDuration;
+						correctedDesiredTime -= itVertex->second.approachTime;
+						correctedMinMaxDateTimeAtOrigin -= itVertex->second.approachTime;
 					}
 
 					// Goal edges loop
@@ -345,7 +349,7 @@ namespace synthese
 						optional<Edge::DepartureServiceIndex::Value> departureServiceNumber;
 						optional<Edge::ArrivalServiceIndex::Value> arrivalServiceNumber;
 						set<const Edge*> nonServedEdges;
-						DateTime departureMoment(correctedDesiredTime);
+						ptime departureMoment(correctedDesiredTime);
 						while(true)
 						{
 							this_thread::interruption_point();
@@ -500,9 +504,9 @@ namespace synthese
 								{
 									_minMaxDateTimeAtDestination = serviceUse.getSecondActualDateTime();
 									if (_accessDirection == DEPARTURE_TO_ARRIVAL)
-										_minMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime.total_seconds() / 60;
+										_minMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime;
 									else
-										_minMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime.total_seconds() / 60;
+										_minMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime;
 								}
 							} // next arrival edge
 
@@ -534,7 +538,7 @@ namespace synthese
 				else
 					*_logStream << "ARRIVAL_TO_DEPARTURE   ";
 				*_logStream	<< " IntegralSearch. Start "
-					<< " at " << desiredTime.toString()
+					<< " at " << desiredTime
 					<< "</th></tr>"
 					<< "</table>"
 					;
@@ -572,7 +576,7 @@ namespace synthese
 			/// <h2>Determination of the usefulness to store the service use</h2>
 
 			/** - To be worse than the absolute best time is forbidden. */
-			const DateTime& reachDateTime(serviceUse.getSecondActualDateTime());
+			const ptime& reachDateTime(serviceUse.getSecondActualDateTime());
 			const AccessDirection& method(journey.getMethod());
 			if(	(	(method == ARRIVAL_TO_DEPARTURE)
 				&&	(reachDateTime < _minMaxDateTimeAtDestination)
@@ -605,16 +609,16 @@ namespace synthese
 				_destinationVam.getIsobarycenterMaxSquareDistance ().getSquareDistance ());
 				}
 */
-				DateTime bestHopedGoalAccessDateTime (reachDateTime);
+				ptime bestHopedGoalAccessDateTime (reachDateTime);
 				posix_time::time_duration minimalGoalReachDuration(
 					reachedVertex->getHub()->getMinTransferDelay()	// Minimal time to transfer
 					+ posix_time::minutes(1)						// Minimal time to reach the goal
 				);
 
 				if (method == DEPARTURE_TO_ARRIVAL)
-					bestHopedGoalAccessDateTime += minimalGoalReachDuration.total_seconds() / 60;
+					bestHopedGoalAccessDateTime += minimalGoalReachDuration;
 				else
-					bestHopedGoalAccessDateTime -= minimalGoalReachDuration.total_seconds() / 60;
+					bestHopedGoalAccessDateTime -= minimalGoalReachDuration;
 
 				if(	(	(method == ARRIVAL_TO_DEPARTURE)
 					&&	(bestHopedGoalAccessDateTime < _minMaxDateTimeAtDestination)
@@ -691,8 +695,8 @@ namespace synthese
 			long long unsigned int distanceToEnd(journey.getDistanceToEnd());
 			long long unsigned int journeyDuration(
 				(	journey.getMethod() == DEPARTURE_TO_ARRIVAL ?
-					journey.getEndTime().getSecondsDifference(_originDateTime) :
-					_originDateTime.getSecondsDifference(journey.getEndTime())
+					journey.getEndTime() - _originDateTime :
+					_originDateTime - journey.getEndTime()
 				).total_seconds()
 			);
 
@@ -720,7 +724,7 @@ namespace synthese
 
 
 
-		const time::DateTime& IntegralSearcher::getOriginDateTime() const
+		const ptime& IntegralSearcher::getOriginDateTime() const
 		{
 			return _originDateTime;
 		}

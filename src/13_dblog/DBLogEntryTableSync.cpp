@@ -25,14 +25,12 @@
 #include <boost/tokenizer.hpp>
 
 #include "Conversion.h"
-
+#include "ReplaceQuery.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
 #include "DBModule.h"
-
-#include "DateTime.h"
 
 #include "User.h"
 #include "UserTableSync.h"
@@ -42,13 +40,13 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
 	using namespace dblog;
-	using namespace time;
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,DBLogEntryTableSync>::FACTORY_KEY("13.01 DB Log entries");
@@ -114,7 +112,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			object->setLogKey(rows->getText ( DBLogEntryTableSync::COL_LOG_KEY));
-			object->setDate(DateTime::FromSQLTimestamp(rows->getText ( DBLogEntryTableSync::COL_DATE)));
+			object->setDate(rows->getDateTime( DBLogEntryTableSync::COL_DATE));
 			object->setLevel((DBLogEntry::Level) rows->getInt ( DBLogEntryTableSync::COL_LEVEL));
 			object->setObjectId(rows->getLongLong(DBLogEntryTableSync::COL_OBJECT_ID));
 			object->setObjectId2(rows->getLongLong(DBLogEntryTableSync::COL_OBJECT2_ID));
@@ -143,36 +141,26 @@ namespace synthese
 			DBLogEntry* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-
-			query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToSQLiteString(object->getLogKey())
-				<< "," << object->getDate().toSQLString()
-				<< "," << Conversion::ToString(object->getUserId())
-				<< "," << Conversion::ToString(static_cast<int>(object->getLevel()))
-				<< ",'";
-
+			// Preparation
+			stringstream content;
 			DBLogEntry::Content c = object->getContent();
 			for (DBLogEntry::Content::const_iterator it = c.begin(); it != c.end(); ++it)
 			{
 				if (it != c.begin())
-					query << DBLogEntryTableSync::CONTENT_SEPARATOR;
-				query << Conversion::ToSQLiteString(*it, false);
+					content << DBLogEntryTableSync::CONTENT_SEPARATOR;
+				content << *it;
 			}
 
-			query
-				<< "'"
-				<< "," << object->getObjectId()
-				<< "," << object->getObjectId2()
-				<< ")";
-
-			sqlite->execUpdate(query.str(), transaction);
+			// Query
+			ReplaceQuery<DBLogEntryTableSync> query(*object);
+			query.addField(object->getLogKey());
+			query.addField(object->getDate());
+			query.addField(object->getUserId());
+			query.addField(static_cast<int>(object->getLevel()));
+			query.addField(content.str());
+			query.addField(object->getObjectId());
+			query.addField(object->getObjectId2());
+			query.execute(transaction);
 		}
 
 	}
@@ -182,8 +170,8 @@ namespace synthese
 		DBLogEntryTableSync::SearchResult DBLogEntryTableSync::Search(
 			Env& env,
 			const std::string& logKey
-			, const time::DateTime& startDate
-			, const time::DateTime& endDate
+			, const ptime& startDate
+			, const ptime& endDate
 			, uid userId
 			, DBLogEntry::Level level
 			, uid objectId
@@ -203,10 +191,10 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE "
 					<< COL_LOG_KEY << "=" << Conversion::ToSQLiteString(logKey);
-			if (!startDate.isUnknown())
-				query << " AND " << COL_DATE << ">=" << startDate.toSQLString();
-			if (!endDate.isUnknown())
-				query << " AND " << COL_DATE << "<=" << endDate.toSQLString();
+			if (!startDate.is_not_a_date_time())
+				query << " AND " << COL_DATE << ">='" << to_iso_extended_string(startDate.date()) << " " << to_simple_string(startDate.time_of_day()) << "'";
+			if (!endDate.is_not_a_date_time())
+				query << " AND " << COL_DATE << "<='" << to_iso_extended_string(endDate.date()) << " " << to_simple_string(endDate.time_of_day()) << "'";
 			if (userId != UNKNOWN_VALUE)
 				query << " AND " << COL_USER_ID << "=" << userId;
 			if (level != DBLogEntry::DB_LOG_UNKNOWN)
@@ -224,21 +212,23 @@ namespace synthese
 			if (orderByLevel)
 				query << " ORDER BY " << COL_LEVEL << (raisingOrder ? " ASC" : " DESC") << "," << COL_DATE << (raisingOrder ? " ASC" : " DESC");
 			if (number)
+			{
 				query << " LIMIT " << (*number + 1);
-			if (first > 0)
-				query << " OFFSET " << first;
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
 
 
-		void DBLogEntryTableSync::Purge( const std::string& logKey, const time::DateTime& endDate )
+		void DBLogEntryTableSync::Purge( const std::string& logKey, const ptime& endDate )
 		{
 			stringstream query;
 			query <<
 				"DELETE FROM " << TABLE.NAME <<
-				" WHERE " << COL_DATE << "<=" << endDate.toSQLString() <<
+				" WHERE " << COL_DATE << "<='" << to_iso_extended_string(endDate.date()) << " " << to_simple_string(endDate.time_of_day()) << "'" <<
 				" AND " << COL_LOG_KEY << "=" << Conversion::ToSQLiteString(logKey)
 			;
 			DBModule::GetSQLite()->execQuery(query.str());

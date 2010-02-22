@@ -8,13 +8,13 @@
 #include "02_db/Constants.h"
 
 #include <iomanip>
-#include <boost/date_time/posix_time/time_formatters.hpp>
-#include <boost/date_time/posix_time/time_parsers.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -279,6 +279,52 @@ namespace synthese
 			if(text.empty()) return optional<unsigned int>();
 			return lexical_cast<unsigned int>(text);
 		}
+
+
+
+		boost::posix_time::ptime SQLiteResult::getDateTime( const std::string& name ) const
+		{
+			try
+			{
+				string text(getText(name));
+				return time_from_string(text);
+			}
+			catch(...)
+			{
+				return ptime(not_a_date_time);
+			}
+		}
+
+
+
+		boost::gregorian::date SQLiteResult::getDate( const std::string& name ) const
+		{
+			try
+			{
+				string text(getText(name));
+				return from_string(text);
+			}
+			catch(...)
+			{
+				return date(not_a_date_time);
+			}
+		}
+
+
+
+		boost::posix_time::time_duration SQLiteResult::getHour( const std::string& name ) const
+		{
+			try
+			{
+				string text(getText(name));
+				return duration_from_string(text);
+			}
+			catch(...)
+			{
+				return time_duration(not_a_date_time);
+			}
+		}
+
 
 
 		std::ostream& 

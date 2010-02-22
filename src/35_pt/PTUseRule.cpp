@@ -27,18 +27,18 @@
 #include "ServicePointer.h"
 #include "ServiceUse.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
-#include "DateTime.h"
 #include "AccessParameters.h"
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace graph;
 	using namespace env;
-	using namespace time;
 
 	namespace util
 	{
@@ -53,9 +53,9 @@ namespace synthese
 		):	Registrable(key),
 			_accessCapacity(0),
 			_reservationType(RESERVATION_RULE_FORBIDDEN),
-			_minDelayMinutes(0),
+			_minDelayMinutes(0,0,0),
 			_minDelayDays(0),
-			_hourDeadLine(TIME_UNKNOWN),
+			_hourDeadLine(not_a_date_time),
 			_defaultFare(NULL)
 		{
 		}
@@ -68,14 +68,14 @@ namespace synthese
 		}
 
 	
-		void PTUseRule::setMinDelayMinutes (int minDelayMinutes)
+		void PTUseRule::setMinDelayMinutes (time_duration minDelayMinutes)
 		{
 			_minDelayMinutes = minDelayMinutes;
 		}
 
 
 
-		void PTUseRule::setMinDelayDays (int minDelayDays)
+		void PTUseRule::setMinDelayDays (date_duration minDelayDays)
 		{
 			_minDelayDays = minDelayDays;
 		}
@@ -83,7 +83,7 @@ namespace synthese
 
 
 		void PTUseRule::setMaxDelayDays(
-			const optional<size_t> maxDelayDays
+			const optional<date_duration> maxDelayDays
 		){
 			_maxDelayDays = maxDelayDays;
 		}
@@ -100,17 +100,17 @@ namespace synthese
 			return _originIsReference;
 		}
 
-		int PTUseRule::getMinDelayDays() const
+		date_duration PTUseRule::getMinDelayDays() const
 		{
 			return _minDelayDays;
 		}
 
-		int PTUseRule::getMinDelayMinutes() const
+		time_duration PTUseRule::getMinDelayMinutes() const
 		{
 			return _minDelayMinutes;
 		}
 
-		const optional<size_t>& PTUseRule::getMaxDelayDays() const
+		const optional<date_duration>& PTUseRule::getMaxDelayDays() const
 		{
 			return _maxDelayDays;
 		}
@@ -134,7 +134,7 @@ namespace synthese
 
 
 
-		const Hour& PTUseRule::getHourDeadLine () const
+		const time_duration& PTUseRule::getHourDeadLine () const
 		{
 			return _hourDeadLine;
 		}
@@ -142,10 +142,10 @@ namespace synthese
 
 
 		void PTUseRule::setHourDeadLine(
-			const Hour& hourDeadLine
+			const time_duration& hourDeadLine
 		){
-			if (hourDeadLine == Hour(0,0))
-				_hourDeadLine = Hour(23,59);
+			if (hourDeadLine == time_duration(0,0,0))
+				_hourDeadLine = time_duration(23,59,59);
 			else
 				_hourDeadLine = hourDeadLine;
 		}
@@ -153,30 +153,29 @@ namespace synthese
 
 
 
-		DateTime PTUseRule::getReservationDeadLine (
-			const DateTime& originDateTime
-			, const DateTime& departureTime
+		ptime PTUseRule::getReservationDeadLine (
+			const ptime& originDateTime
+			, const ptime& departureTime
 		) const {
 
-			const DateTime& referenceTime(
+			const ptime& referenceTime(
 				_originIsReference ?
 				originDateTime :
 				departureTime
 			);
 
-			DateTime minutesMoment = referenceTime;
-			DateTime daysMoment = referenceTime;
+			ptime minutesMoment = referenceTime;
+			ptime daysMoment = referenceTime;
 
-			if ( _minDelayMinutes ) minutesMoment -= _minDelayMinutes;
+			if ( _minDelayMinutes.total_seconds() ) minutesMoment -= _minDelayMinutes;
 
-			if ( _minDelayDays )
+			if ( _minDelayDays.days() )
 			{
-				daysMoment.subDaysDuration( _minDelayDays );
-				daysMoment.setHour(Hour(TIME_MAX));
+				daysMoment = daysMoment - _minDelayDays + time_duration(23,59,59);
 			}
 
-			if ( _hourDeadLine < daysMoment.getHour () )
-				daysMoment.setHour( _hourDeadLine );
+			if ( _hourDeadLine < daysMoment.time_of_day() )
+				daysMoment = ptime(daysMoment.date(), _hourDeadLine);
 
 			if ( minutesMoment < daysMoment )
 				return minutesMoment;
@@ -292,14 +291,14 @@ namespace synthese
 
 			case RESERVATION_RULE_OPTIONAL:
 				{
-					DateTime reservationTime(TIME_CURRENT);
+					ptime reservationTime(second_clock::local_time());
 					if(	reservationTime < getReservationOpeningTime(servicePointer)
-						){
-							return RESERVATION_OPTIONAL_TOO_EARLY;
+					){
+						return RESERVATION_OPTIONAL_TOO_EARLY;
 					}
 					if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getActualDateTime())
-						){
-							return RESERVATION_OPTIONAL_TOO_LATE;
+					){
+						return RESERVATION_OPTIONAL_TOO_LATE;
 					}
 					if(servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 					{
@@ -316,7 +315,7 @@ namespace synthese
 				if(servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 				{
 					const Edge* departureEdge(servicePointer.getEdge());
-					DateTime reservationTime(TIME_CURRENT);
+					ptime reservationTime(second_clock::local_time());
 					if(static_cast<const Line*>(departureEdge->getParentPath())->getCommercialLine()->isOptionalReservationPlace(
 						static_cast<const PublicTransportStopZoneConnectionPlace*>(departureEdge->getHub())
 					)){
@@ -345,7 +344,7 @@ namespace synthese
 
 			case RESERVATION_RULE_COMPULSORY:
 				{
-					DateTime reservationTime(TIME_CURRENT);
+					ptime reservationTime(second_clock::local_time());
 					if(	reservationTime < getReservationOpeningTime(servicePointer)
 					){
 						return RESERVATION_COMPULSORY_TOO_EARLY;
@@ -382,7 +381,7 @@ namespace synthese
 
 			case RESERVATION_RULE_OPTIONAL:
 				{
-					DateTime reservationTime(TIME_CURRENT);
+					ptime reservationTime(second_clock::local_time());
 					if(	reservationTime < getReservationOpeningTime(serviceUse)
 						){
 							return RESERVATION_OPTIONAL_TOO_EARLY;
@@ -396,7 +395,7 @@ namespace synthese
 
 			case RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE:
 			{
-				DateTime reservationTime(TIME_CURRENT);
+				ptime reservationTime(second_clock::local_time());
 				const Edge* departureEdge(serviceUse.getDepartureEdge());
 				if(static_cast<const Line*>(departureEdge->getParentPath())->getCommercialLine()->isOptionalReservationPlace(
 					static_cast<const PublicTransportStopZoneConnectionPlace*>(departureEdge->getHub())
@@ -425,7 +424,7 @@ namespace synthese
 			
 			case RESERVATION_RULE_COMPULSORY:
 				{
-					DateTime reservationTime(TIME_CURRENT);
+					ptime reservationTime(second_clock::local_time());
 					if(	reservationTime < getReservationOpeningTime(serviceUse)
 						){
 							return RESERVATION_COMPULSORY_TOO_EARLY;
@@ -441,17 +440,16 @@ namespace synthese
 			return RESERVATION_FORBIDDEN;
 		}
 
-		time::DateTime PTUseRule::getReservationOpeningTime(
+
+
+		ptime PTUseRule::getReservationOpeningTime(
 			const graph::ServicePointer& servicePointer
 		) const {
 			if(_maxDelayDays)
 			{
-				DateTime reservationStartTime(servicePointer.getOriginDateTime());
-				reservationStartTime.subDaysDuration(static_cast<int>(*_maxDelayDays));
-				reservationStartTime.setHour(Hour(TIME_MIN));
-				return reservationStartTime;
+				return ptime(servicePointer.getOriginDateTime().date(), -hours(24 * _maxDelayDays->days()));
 			}
-			return DateTime(TIME_MIN);
+			return neg_infin;
 		}
 
 		bool PTUseRule::isCompatibleWith( const AccessParameters& accessParameters ) const

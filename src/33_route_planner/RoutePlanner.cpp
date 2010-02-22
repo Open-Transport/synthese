@@ -41,10 +41,11 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
-	using namespace time;
 	using namespace geography;
 	using namespace geometry;
 	using namespace util;
@@ -59,9 +60,9 @@ namespace synthese
 			PlanningOrder planningOrder, /*!< Define planning sequence. */
 			graph::AccessParameters accessParameters,
 			optional<posix_time::time_duration> maxDuration,
-			const time::DateTime& minBeginTime,
-			const time::DateTime& maxBeginTime,
-			const time::DateTime& maxEndTime,
+			const ptime& minBeginTime,
+			const ptime& maxBeginTime,
+			const ptime& maxEndTime,
 			graph::GraphIdType whatToSearch,
 			graph::GraphIdType graphToUse,
 			std::ostream* logStream /*= NULL*/,
@@ -107,15 +108,15 @@ namespace synthese
 		    
 			result.reverse();
 
-			DateTime beginBound(result.getBeginTime());
-			DateTime endBound(result.getEndTime());
+			ptime beginBound(result.getBeginTime());
+			ptime endBound(result.getEndTime());
 			if(	_maxDuration &&
 				result.getDuration() > _maxDuration
 			){
 				endBound = 
 					_planningOrder == DEPARTURE_FIRST ?
-					result.getArrivalTime() - _maxDuration->total_seconds() / 60 :
-					result.getDepartureTime() + _maxDuration->total_seconds() / 60 
+					result.getArrivalTime() - *_maxDuration :
+					result.getDepartureTime() + *_maxDuration
 				;
 
 				if(	_planningOrder == DEPARTURE_FIRST && result.getEndTime() < endBound ||
@@ -152,7 +153,7 @@ namespace synthese
 					if (!goalApproachJourney.empty())
 					{
 						goalApproachJourney.shift(
-							result.getArrivalTime().getSecondsDifference(goalApproachJourney.getDepartureTime()) +
+							(result.getArrivalTime() - goalApproachJourney.getDepartureTime()) +
 							result.getDestination()->getHub()->getTransferDelay(
 							*result.getDestination()->getFromVertex(),
 							*goalApproachJourney.getOrigin()->getFromVertex()
@@ -175,7 +176,7 @@ namespace synthese
 					if (!originApproachJourney.empty())
 					{
 						originApproachJourney.shift(
-							result.getDepartureTime().getSecondsDifference(originApproachJourney.getDepartureTime()) -
+							(result.getDepartureTime() - originApproachJourney.getDepartureTime()) -
 							originApproachJourney.getDuration() -
 							result.getOrigin()->getHub()->getTransferDelay(
 							*originApproachJourney.getDestination()->getFromVertex(),
@@ -199,7 +200,7 @@ namespace synthese
 					if (!originApproachJourney.empty())
 					{
 						originApproachJourney.shift(
-							result.getDepartureTime().getSecondsDifference(originApproachJourney.getDepartureTime()) -
+							(result.getDepartureTime() - originApproachJourney.getDepartureTime()) -
 							originApproachJourney.getDuration() -
 							result.getOrigin()->getHub()->getTransferDelay(
 								*originApproachJourney.getDestination()->getFromVertex(),
@@ -224,7 +225,7 @@ namespace synthese
 					if (!goalApproachJourney.empty())
 					{
 						goalApproachJourney.shift(
-							result.getArrivalTime().getSecondsDifference(goalApproachJourney.getDepartureTime()) +
+							(result.getArrivalTime() - goalApproachJourney.getDepartureTime()) +
 							result.getDestination()->getHub()->getTransferDelay(
 							*result.getDestination()->getFromVertex(),
 							*goalApproachJourney.getOrigin()->getFromVertex()
@@ -247,9 +248,9 @@ namespace synthese
 			const graph::VertexAccessMap& startVam,
 			const graph::VertexAccessMap& endVam,
 			AccessDirection accessDirection,
-			const time::DateTime& originDateTime,
-			const time::DateTime& minMaxDateTimeAtOrigin,
-			const time::DateTime& minMaxDateTimeAtDestination,
+			const ptime& originDateTime,
+			const ptime& minMaxDateTimeAtOrigin,
+			const ptime& minMaxDateTimeAtDestination,
 			bool secondTime,
 			boost::optional<boost::posix_time::time_duration> maxDuration
 		){
@@ -268,12 +269,12 @@ namespace synthese
 				return;
 			}
 
-			DateTime __minMaxDateTimeAtDestination(minMaxDateTimeAtDestination);
+			ptime __minMaxDateTimeAtDestination(minMaxDateTimeAtDestination);
 
 			JourneysResult todo(originDateTime);
 			
-			DateTime bestEndTime(minMaxDateTimeAtDestination);
-			DateTime lastBestEndTime(minMaxDateTimeAtDestination);
+			ptime bestEndTime(minMaxDateTimeAtDestination);
+			ptime lastBestEndTime(minMaxDateTimeAtDestination);
 			
 			// Initialization of the best vertex reaches map
 			BestVertexReachesMap bestVertexReachesMap(accessDirection, startVam);
@@ -316,8 +317,8 @@ namespace synthese
 					optional<posix_time::time_duration>() :
 					optional<posix_time::time_duration>(
 						accessDirection == DEPARTURE_TO_ARRIVAL ?
-						result.getEndTime().getSecondsDifference(originDateTime) :
-						originDateTime.getSecondsDifference(result.getEndTime())
+						result.getEndTime() - originDateTime :
+						originDateTime - result.getEndTime()
 					)
 			);
 
@@ -400,8 +401,8 @@ namespace synthese
 						optional<posix_time::time_duration>() :
 						optional<posix_time::time_duration>(
 							accessDirection == DEPARTURE_TO_ARRIVAL ?
-							result.getEndTime().getSecondsDifference(originDateTime) :
-							originDateTime.getSecondsDifference(result.getEndTime())
+							result.getEndTime() - originDateTime :
+							originDateTime - result.getEndTime()
 						)
 				);
 

@@ -22,18 +22,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-
+#include "ActionException.h"
+#include "ParametersMap.h"
 #include "SiteUpdateAction.h"
-
-#include "36_places_list/Site.h"
-#include "36_places_list/SiteTableSync.h"
-
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/InterfaceTableSync.h"
+#include "Site.h"
+#include "SiteTableSync.h"
+#include "Interface.h"
+#include "InterfaceTableSync.h"
 
 using namespace std;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -61,8 +59,8 @@ namespace synthese
 		
 		SiteUpdateAction::SiteUpdateAction()
 			: util::FactorableTemplate<Action, SiteUpdateAction>()
-			, _startDate(UNKNOWN_VALUE)
-			, _endDate(UNKNOWN_VALUE)
+			, _startDate(not_a_date_time)
+			, _endDate(not_a_date_time)
 		{
 		}
 		
@@ -90,12 +88,18 @@ namespace synthese
 			{
 				throw ActionException("No such interface");
 			}
-			_startDate = map.getDate(PARAMETER_START_DATE, true, FACTORY_KEY);
-			_endDate = map.getDate(PARAMETER_END_DATE, true, FACTORY_KEY);
-			_onlineBooking = map.getBool(PARAMETER_ONLINE_BOOKING, true, true, FACTORY_KEY);
-			_useOldData = map.getBool(PARAMETER_USE_OLD_DATA, true, true, FACTORY_KEY);
-			_useDatesRange = map.getInt(PARAMETER_USE_DATES_RANGE, true, FACTORY_KEY);
-			_maxConnections = map.getInt(PARAMETER_MAX_CONNECTIONS, true, FACTORY_KEY);
+			if(!map.getDefault<string>(PARAMETER_START_DATE).empty())
+			{
+				_startDate = from_string(map.get<string>(PARAMETER_START_DATE));
+			}
+			if(!map.getDefault<string>(PARAMETER_END_DATE).empty())
+			{
+				_endDate = from_string(map.get<string>(PARAMETER_END_DATE));
+			}
+			_onlineBooking = map.get<bool>(PARAMETER_ONLINE_BOOKING);
+			_useOldData = map.get<bool>(PARAMETER_USE_OLD_DATA);
+			_useDatesRange = days(map.get<int>(PARAMETER_USE_DATES_RANGE));
+			_maxConnections = map.get<int>(PARAMETER_MAX_CONNECTIONS);
 		}
 		
 		

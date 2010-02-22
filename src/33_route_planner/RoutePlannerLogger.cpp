@@ -24,8 +24,11 @@
 #include "ResultHTMLTable.h"
 #include "NamedPlace.h"
 
+#include <boost/date_time/posix_time/posix_time_io.hpp>
+
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -79,21 +82,21 @@ namespace synthese
 
 												if (journey->getContinuousServiceRange() > 1)
 							{
-							DateTime endRange(its->getDepartureDateTime());
+							ptime endRange(its->getDepartureDateTime());
 							endRange += journey->getContinuousServiceRange();
-							stream << " - Service continu jusqu'à " << endRange.toString();
+							stream << " - Service continu jusqu'à " << endRange.;
 							}
 							if (journey->getReservationCompliance() == true)
 							{
-							stream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine().toString();
+							stream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine();
 							}
 							if (journey->getReservationCompliance() == boost::logic::indeterminate)
 							{
-							stream << " - Réservation facultative avant le " << journey->getReservationDeadLine().toString();
+							stream << " - Réservation facultative avant le " << journey->getReservationDeadLine();
 							}
 							
 							stream << "<tr>";
-							stream << "<td>" << its->getDepartureDateTime().toString() << "</td>";
+							stream << "<td>" << its->getDepartureDateTime() << "</td>";
 
 							// Line
 							const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
@@ -114,7 +117,7 @@ namespace synthese
 								while(true)
 								{
 									// Arrival
-									stream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
+									stream << "<td>" << its->getArrivalDateTime() << "</td>";
 
 									// Place
 									stream <<
@@ -127,7 +130,7 @@ namespace synthese
 									++its;
 
 									// Departure
-									stream << "<td>" << its->getDepartureDateTime().toString() << "</td>";
+									stream << "<td>" << its->getDepartureDateTime() << "</td>";
 
 									// Line
 									const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
@@ -153,7 +156,7 @@ namespace synthese
 							}
 
 							// Final arrival
-							stream << "<td>" << its->getArrivalDateTime().toString() << "</td>";
+							stream << "<td>" << its->getArrivalDateTime() << "</td>";
 */
 							
 					
@@ -211,7 +214,7 @@ namespace synthese
 				{
 					_stream << dynamic_cast<const geography::NamedPlace*>(journey->getEndEdge()->getHub())->getFullName();
 				}
-				_stream << _t.col() << journey->getEndTime().toString();
+				_stream << _t.col() << journey->getEndTime();
 				_stream << _t.col() << journey->getScore();
 				_stream << _t.col() << journey->getDistanceToEnd();
 //				_stream << _t.col() << (60 * (journey->getMinSpeedToEnd() ? (journey->getDistanceToEnd() / journey->getMinSpeedToEnd()) : -1));
@@ -240,7 +243,7 @@ namespace synthese
 				{
 					_stream << dynamic_cast<const NamedPlace*>(result.getEndEdge()->getFromVertex()->getHub())->getFullName();
 				}
-				_stream << " at " << result.getEndTime().toString();
+				_stream << " at " << result.getEndTime();
 			}
 		}
 

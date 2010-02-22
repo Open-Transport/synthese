@@ -101,7 +101,8 @@ namespace synthese
 		
 		
 		
-		bool NonConcurrencyRuleAddAction::isAuthorized(const Session* session
+		bool NonConcurrencyRuleAddAction::isAuthorized(
+			const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
 		}

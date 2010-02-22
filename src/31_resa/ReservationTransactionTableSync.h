@@ -30,6 +30,9 @@
 #include <string>
 #include <iostream>
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+
 #include "SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
@@ -37,12 +40,6 @@ namespace synthese
 	namespace graph
 	{
 		class Service;
-	}
-
-	namespace time
-	{
-		class Date;
-		class DateTime;
 	}
 
 	namespace resa
@@ -83,7 +80,7 @@ namespace synthese
 			static SearchResult Search(
 				util::Env& env,
 				const util::RegistryKeyType serviceId
-				, const time::Date& originDate
+				, const boost::gregorian::date& originDate
 				, bool withCancelled
 				, int first = 0
 				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),
@@ -94,8 +91,8 @@ namespace synthese
 			static SearchResult Search(
 				util::Env& env,
 				uid userId
-				, const time::DateTime& minDate
-				, const time::DateTime& maxDate
+				, const boost::posix_time::ptime& minDate
+				, const boost::posix_time::ptime& maxDate
 				, bool withCancelled = false
 				, int first = 0
 				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),

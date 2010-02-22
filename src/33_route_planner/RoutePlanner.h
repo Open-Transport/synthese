@@ -27,7 +27,6 @@
 #include <vector>
 #include <map>
 
-#include "DateTime.h"
 #include "VertexAccessMap.h"
 #include "ServiceUse.h"
 #include "AccessParameters.h"
@@ -38,12 +37,6 @@
 
 namespace synthese
 {
-
-	namespace time
-	{
-		class DateTime;
-	}
-
 	namespace graph
 	{
 		class Edge;
@@ -105,9 +98,9 @@ namespace synthese
 				const PlanningOrder					_planningOrder;  //!< Define planning sequence.
 				const graph::AccessParameters		_accessParameters;
 				const boost::optional<boost::posix_time::time_duration>	_maxDuration;
-				const time::DateTime&				_minBeginTime;
-				const time::DateTime&				_maxBeginTime;
-				const time::DateTime&				_maxEndTime;
+				const boost::posix_time::ptime&				_minBeginTime;
+				const boost::posix_time::ptime&				_maxBeginTime;
+				const boost::posix_time::ptime&				_maxEndTime;
 				const graph::GraphIdType			_whatToSearch;
 				const graph::GraphIdType			_graphToUse;
 				boost::optional<const JourneyTemplates&> _journeyTemplates;
@@ -139,9 +132,9 @@ namespace synthese
 				const graph::VertexAccessMap& originVam,
 				const graph::VertexAccessMap& destinationVam,
 				graph::AccessDirection direction,
-				const time::DateTime& originDateTime,
-				const time::DateTime& maxMinDateTimeAtOrigin,
-				const time::DateTime& maxMinDateTimeAtDestination,
+				const boost::posix_time::ptime& originDateTime,
+				const boost::posix_time::ptime& maxMinDateTimeAtOrigin,
+				const boost::posix_time::ptime& maxMinDateTimeAtDestination,
 				bool secondTime,
 				boost::optional<boost::posix_time::time_duration> maxDuration
 			);
@@ -165,9 +158,9 @@ namespace synthese
 				PlanningOrder					planningOrder,  //!< Define planning sequence.
 				graph::AccessParameters		accessParameters,
 				boost::optional<boost::posix_time::time_duration>	maxDuration,
-				const time::DateTime&				minBeginTime,
-				const time::DateTime&				maxBeginTime,
-				const time::DateTime&				maxEndTime,
+				const boost::posix_time::ptime&				minBeginTime,
+				const boost::posix_time::ptime&				maxBeginTime,
+				const boost::posix_time::ptime&				maxEndTime,
 				graph::GraphIdType			whatToSearch,
 				graph::GraphIdType			graphToUse,
 				std::ostream* logStream = NULL,

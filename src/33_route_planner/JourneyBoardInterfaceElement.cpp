@@ -42,18 +42,17 @@
 
 #include "InterfacePageException.h"
 
-#include "04_time/module.h"
-
 #include "Conversion.h"
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using namespace time;
 	using namespace env;
 	using namespace graph;
 	using namespace road;
@@ -82,9 +81,7 @@ namespace synthese
 			const JourneyBoardStopCellInterfacePage* stopCellInterfacePage = _page->getInterface()->getPage<JourneyBoardStopCellInterfacePage>(pageCode);
 			const JourneyBoardServiceCellInterfacePage* serviceCellInterfacePage = _page->getInterface()->getPage<JourneyBoardServiceCellInterfacePage>(pageCode);
 			const JourneyBoardJunctionCellInterfacePage* junctionCellInterfacePage = _page->getInterface()->getPage<JourneyBoardJunctionCellInterfacePage>(pageCode);
-			const Hour unknownHour(TIME_UNKNOWN );
-			const DateTime unknownDateTime(TIME_UNKNOWN );
-
+			
 			// Loop on lines of the board
 			bool __Couleur = false;
 
@@ -104,8 +101,8 @@ namespace synthese
 					// LIGNE ARRET MONTEE Si premier point d'arrêt et si alerte
 					if (leg.getDepartureEdge()->getHub() != lastPlace)
 					{
-						/*					DateTime debutPrem(leg.getDepartureDateTime());
-						DateTime finPrem(debutPrem);
+						/*					ptime debutPrem(leg.getDepartureDateTime());
+						ptime finPrem(debutPrem);
 						if (journey->getContinuousServiceRange () )
 						finPrem += journey->getContinuousServiceRange ();
 						*/
@@ -118,17 +115,18 @@ namespace synthese
 							, *static_cast<const PhysicalStop*>(leg.getDepartureEdge()->getFromVertex())
 							, __Couleur
 							, leg.getDepartureDateTime()
-							, journey->getContinuousServiceRange().total_seconds() / 60
+							, journey->getContinuousServiceRange(),
+							false
 							, request
-							);
+						);
 
 						lastPlace = leg.getDepartureEdge()->getHub();
 						__Couleur = !__Couleur;
 					}
 
 					// LIGNE CIRCULATIONS
-/*					DateTime debutLigne(leg.getDepartureDateTime());
-					DateTime finLigne(leg.getArrivalDateTime());
+/*					ptime debutLigne(leg.getDepartureDateTime());
+					ptime finLigne(leg.getArrivalDateTime());
 
 					if ( journey->getContinuousServiceRange () )
 					{
@@ -139,7 +137,7 @@ namespace synthese
 					serviceCellInterfacePage->display(
 						stream 
 						, leg
-						, journey->getContinuousServiceRange().total_seconds() % 60
+						, journey->getContinuousServiceRange()
 						, __FiltreHandicape
 						, __FiltreVelo
 						, NULL // leg->getService ()->getPath ()->hasApplicableAlarm ( debutLigne, finLigne ) ? __ET->getService()->getPath ()->getAlarm() : NULL
@@ -151,8 +149,8 @@ namespace synthese
 
 					// LIGNE ARRET DE DESCENTE
 
-/*					DateTime debutArret(leg.getArrivalDateTime ());
-					DateTime finArret(debutArret);
+/*					ptime debutArret(leg.getArrivalDateTime ());
+					ptime finArret(debutArret);
 					if ( (it + 1) < journey->getServiceUses().end())
 						finArret = (it + 1)->getDepartureDateTime();
 					if ( journey->getContinuousServiceRange () )
@@ -165,8 +163,9 @@ namespace synthese
 						, *static_cast<const PhysicalStop*>(leg.getArrivalEdge()->getFromVertex())
 						, __Couleur
 						, leg.getArrivalDateTime()
-						, journey->getContinuousServiceRange().total_seconds() / 60
-						, request
+						, journey->getContinuousServiceRange(),
+						it+1 == services.end(),
+						request
 					);
 
 					lastPlace = leg.getArrivalEdge()->getHub();
@@ -176,8 +175,8 @@ namespace synthese
 				else
 				{
 					// 1/2 Alerte
-/*					DateTime debutArret(leg.getArrivalDateTime ());
-					DateTime finArret(debutArret);
+/*					ptime debutArret(leg.getArrivalDateTime ());
+					ptime finArret(debutArret);
 					if ((it+1) < journey->getServiceUses().end())
 						finArret = (it + 1)->getDepartureDateTime();
 					if ( journey->getContinuousServiceRange () )
@@ -200,7 +199,7 @@ namespace synthese
 					)	);
 */					junctionCellInterfacePage->display(
 						stream
-						, NULL //aPlace
+						, *leg.getArrivalEdge()->getFromVertex()
 						, NULL // leg->getDestination()->getConnectionPlace()->hasApplicableAlarm(debutArret, finArret) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 						, __Couleur
 						, road

@@ -38,11 +38,6 @@ namespace synthese
 		class Place;
 	}
 
-	namespace time
-	{
-		class DateTime;
-	}
-
 	namespace ptrouteplanner
 	{
 		/** PTTimeSlotRoutePlanner class.
@@ -65,10 +60,10 @@ namespace synthese
 			PTTimeSlotRoutePlanner(
 				const geography::Place* origin,
 				const geography::Place* destination,
-				const time::DateTime& lowerDepartureTime,
-				const time::DateTime& higherDepartureTime,
-				const time::DateTime& lowerArrivalTime,
-				const time::DateTime& higherArrivalTime,
+				const boost::posix_time::ptime& lowerDepartureTime,
+				const boost::posix_time::ptime& higherDepartureTime,
+				const boost::posix_time::ptime& lowerArrivalTime,
+				const boost::posix_time::ptime& higherArrivalTime,
 				const boost::optional<std::size_t>	maxSolutionsNumber,
 				const graph::AccessParameters		accessParameters,
 				const algorithm::PlanningOrder		planningOrder,

@@ -23,11 +23,10 @@
 #ifndef SYNTHESE_Reservation_h__
 #define SYNTHESE_Reservation_h__
 
+#include <boost/date_time/posix_time/ptime.hpp>
 #include <string>
 
 #include "31_resa/Types.h"
-
-#include "DateTime.h"
 
 #include "Registrable.h"
 #include "Registry.h"
@@ -72,10 +71,10 @@ namespace synthese
 				uid								_reservationRuleId;		//!< ID of the used OnlineReservationRule
 				std::string						_departureAddress;		//!< Adresse du départ
 				std::string						_arrivalAddress;		//!< Adresse d'arrivée
-				time::DateTime					_departureTime;			//!< Moment de montée prévu
-				time::DateTime					_arrivalTime;			//!< Moment d'arrivée prévue
-				time::DateTime					_originDateTime;
-				time::DateTime					_reservationDeadLine;
+				boost::posix_time::ptime		_departureTime;			//!< Moment de montée prévu
+				boost::posix_time::ptime		_arrivalTime;			//!< Moment d'arrivée prévue
+				boost::posix_time::ptime		_originDateTime;
+				boost::posix_time::ptime		_reservationDeadLine;
 			//@}
 
 		public:
@@ -92,8 +91,8 @@ namespace synthese
 				void setReservationRuleId	(uid id);
 				void setDepartureAddress	(const std::string& address);
 				void setArrivalAddress		(const std::string& address);
-				void setDepartureTime		(const time::DateTime& time);
-				void setArrivalTime			(const time::DateTime& time);
+				void setDepartureTime		(const boost::posix_time::ptime& time);
+				void setArrivalTime			(const boost::posix_time::ptime& time);
 		
 
 
@@ -104,8 +103,8 @@ namespace synthese
 					The reservation is also added to the transaction.
 				*/
 				void setTransaction			(ReservationTransaction* transaction);
-				void setOriginDateTime		(const time::DateTime& time);
-				void setReservationDeadLine	(const time::DateTime& time);
+				void setOriginDateTime		(const boost::posix_time::ptime& time);
+				void setReservationDeadLine	(const boost::posix_time::ptime& time);
 			//@}
 
 			//!	\name Getters
@@ -121,11 +120,11 @@ namespace synthese
 				uid								getReservationRuleId()		const;
 				const std::string&				getDepartureAddress()		const;
 				const std::string&				getArrivalAddress()			const;
-				const time::DateTime&			getDepartureTime()			const;
-				const time::DateTime&			getArrivalTime()			const;
+				const boost::posix_time::ptime&	getDepartureTime()			const;
+				const boost::posix_time::ptime&	getArrivalTime()			const;
 				const ReservationTransaction*	getTransaction()			const;
-				const time::DateTime&			getOriginDateTime()			const;
-				const time::DateTime&			getReservationDeadLine()	const;
+				const boost::posix_time::ptime&	getOriginDateTime()			const;
+				const boost::posix_time::ptime&	getReservationDeadLine()	const;
 			//@}
 
 

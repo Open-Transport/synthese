@@ -77,7 +77,7 @@ namespace synthese
 				//AlarmConflict conflict,
 				//AlarmLevel level,
 				boost::optional<StatusSearch> status = boost::optional<StatusSearch>(),
-				boost::optional<time::DateTime> date = boost::optional<time::DateTime>(),
+				boost::optional<boost::posix_time::ptime> date = boost::optional<boost::posix_time::ptime>(),
 				boost::optional<util::RegistryKeyType> scenarioId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<int> first = boost::optional<int>(),
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),

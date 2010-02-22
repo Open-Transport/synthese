@@ -29,8 +29,7 @@
 #include <string>
 #include <iostream>
 #include <boost/optional.hpp>
-
-#include "Date.h"
+#include <boost/date_time/gregorian/gregorian.hpp>
 
 #include "SQLiteRegistryTableSyncTemplate.h"
 #include "FetcherTemplate.h"
@@ -76,7 +75,7 @@ namespace synthese
 				boost::optional<util::RegistryKeyType> commercialLineId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<util::RegistryKeyType> dataSource = boost::optional<util::RegistryKeyType>(),
 				boost::optional<std::string> serviceNumber = boost::optional<std::string>(),
-				boost::optional<time::Date> date = boost::optional<time::Date>(),
+				boost::optional<boost::gregorian::date> date = boost::optional<boost::gregorian::date>(),
 				bool hideOldServices = false,
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),

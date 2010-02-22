@@ -63,7 +63,6 @@ namespace synthese
 			static const SQLiteTableSync::Format TABLE;
 
 
-		private:
 			////////////////////////////////////////////////////////////////////
 			/// Fields of the table.
 			/// To allow to loop on the table without knowing its size,
@@ -82,7 +81,7 @@ namespace synthese
 			static const SQLiteTableSync::Index _INDEXES[];
 
 			
-			
+		private:
 			////////////////////////////////////////////////////////////////////
 			///	Gets the SQL schema of the table.
 			///	@return the SQL schema of the table

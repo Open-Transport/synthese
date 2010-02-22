@@ -32,6 +32,8 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -64,12 +66,22 @@ namespace synthese
 			string name(_name->getValue(parameters,variables,object,request));
 			if (lexical_cast<bool>(_withHour->getValue(parameters,variables,object,request)))
 			{
-				posix_time::ptime dt(posix_time::time_from_string(_value->getValue(parameters,variables,object,request)));
+				posix_time::ptime dt(not_a_date_time);
+				string dtparameter(_value->getValue(parameters,variables,object,request));
+				if(!dtparameter.empty())
+				{
+					dt = time_from_string(dtparameter);
+				}
 				stream << HTMLForm::GetCalendarInput(name, dt);
 			}
 			else
 			{
-				gregorian::date dt(gregorian::from_string(_value->getValue(parameters,variables,object,request)));
+				gregorian::date dt(not_a_date_time);
+				string dtparameter(_value->getValue(parameters,variables,object,request));
+				if(!dtparameter.empty())
+				{
+					dt = from_string(dtparameter);
+				}
 				stream << HTMLForm::GetCalendarInput(name, dt);
 			}
 			

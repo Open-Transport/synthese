@@ -32,7 +32,7 @@
 #include "SQLite.h"
 #include "SQLiteException.h"
 #include "CityTableSync.h"
-#include "Conversion.h"
+#include "ReplaceQuery.h"
 
 using namespace std;
 using namespace boost;
@@ -58,8 +58,10 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::TABLE(
-				"t001_object_site_links"
-				);
+			"t001_object_site_links"
+		);
+
+
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::_FIELDS[]=
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
@@ -68,9 +70,12 @@ namespace synthese
 			SQLiteTableSync::Field()
 		};
 
+
+
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::_INDEXES[]=
 		{
 			SQLiteTableSync::Index(ObjectSiteLinkTableSync::COL_SITE_ID.c_str(), ""),
+			SQLiteTableSync::Index(ObjectSiteLinkTableSync::COL_OBJECT_ID.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
@@ -109,17 +114,10 @@ namespace synthese
 			ObjectSiteLink* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				/// @todo fill other fields separated by ,
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<ObjectSiteLinkTableSync> query(*object);
+			query.addField(object->getObjectId());
+			query.addField(object->getSite() ? object->getSite()->getKey() : RegistryKeyType(0));
+			query.execute(transaction);
 		}
 
 
@@ -136,9 +134,11 @@ namespace synthese
 	{
 		ObjectSiteLinkTableSync::SearchResult ObjectSiteLinkTableSync::Search(
 			Env& env,
-			uid siteId
-			, int first /*= 0*/
-			, boost::optional<std::size_t> number, /*= 0*/
+			boost::optional<util::RegistryKeyType> siteId, // = boost::optional<util::RegistryKeyType>(),
+			boost::optional<util::RegistryKeyType> objectId, // = boost::optional<util::RegistryKeyType>(),
+			boost::optional<int> objectTableId, // = boost::optional<int>(),
+			int first, /*= 0*/
+			boost::optional<std::size_t> number, /*= 0*/
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -146,14 +146,24 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
-			if (siteId != UNKNOWN_VALUE)
+			if (siteId)
 			{
-				query << " AND " << COL_SITE_ID << "=" << siteId;
+				query << " AND " << COL_SITE_ID << "=" << *siteId;
+			}
+			if(objectId)
+			{
+				query << " AND " << COL_OBJECT_ID << "=" << *objectId;
+			}
+			if(objectTableId)
+			{
+				query << " AND " << COL_OBJECT_ID << " & " << 0xFFFF000000000000LL << " = " << util::encodeUId(*objectTableId, 0, 0, 0);
 			}
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << (first);
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

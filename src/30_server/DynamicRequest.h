@@ -62,6 +62,8 @@ namespace synthese
 				const HTTPRequest& httpRequest
 			);
 
+			const ParametersMap& getParametersMap() const;
+
 		protected:
 			virtual void _loadFunction(
 				const std::string& errorMessage,

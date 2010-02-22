@@ -22,6 +22,8 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 #include "PTNetworksAdmin.h"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
@@ -31,6 +33,11 @@
 #include "TransportNetworkAdmin.h"
 #include "Profile.h"
 #include "AdminFunction.h"
+#include "TransportNetworkTableSync.h"
+#include "HTMLModule.h"
+#include "SearchFormHTMLTable.h"
+#include "TransportNetworkAddAction.h"
+#include "ActionResultHTMLTable.h"
 
 using namespace std;
 using namespace boost;
@@ -43,6 +50,7 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace pt;
+	using namespace html;
 
 	namespace util
 	{
@@ -73,7 +81,7 @@ namespace synthese
 			_searchName = map.getDefault<string>(PARAM_SEARCH_NAME);
 
 			// Search table initialization
-			// _requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_XXX, 30);
+			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 30);
 		}
 
 
@@ -100,9 +108,57 @@ namespace synthese
 			VariablesMap& variables,
 			const AdminRequest& request
 		) const	{
+
+			// Search form
+			stream << "<h1>Recherche</h1>";
+
+			AdminFunctionRequest<TransportNetworkAdmin> searchRequest(request);
+			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
+			stream << s.open();
+			stream << s.cell("Nom", s.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
+			HTMLForm sortedForm(s.getForm());
+			stream << s.close();
+
+			// Results display
+			stream << "<h1>Réseaux</h1>";
+
+			TransportNetworkTableSync::SearchResult networks(
+				TransportNetworkTableSync::Search(
+					_getEnv(),
+					_searchName,
+					string(),
+					_requestParameters.first,
+					_requestParameters.maxSize,
+					_requestParameters.orderField == PARAM_SEARCH_NAME,
+					_requestParameters.raisingOrder
+			)	);
+
+			AdminActionFunctionRequest<TransportNetworkAddAction,TransportNetworkAdmin> newRequest(request);
+			newRequest.getFunction()->setActionFailedPage<PTNetworksAdmin>();
+			newRequest.setActionWillCreateObject();
+
+			ResultHTMLTable::HeaderVector h;
+			h.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
+			h.push_back(make_pair(string(), "Actions"));
+			ActionResultHTMLTable t(h,sortedForm,_requestParameters, networks, newRequest.getHTMLForm());
 		
-			/// @todo Implement the display by streaming the output to the stream variable
-		
+			stream << t.open();
+			AdminFunctionRequest<TransportNetworkAdmin> openRequest(request);
+			BOOST_FOREACH(shared_ptr<TransportNetwork> network, networks)
+			{
+				openRequest.getPage()->setNetwork(const_pointer_cast<const TransportNetwork>(network));
+				stream << t.row();
+				stream << t.col();
+				stream << network->getName();
+				stream << t.col();
+				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), TransportNetworkAdmin::ICON);
+			}
+			stream << t.row();
+			stream << t.col();
+			stream << t.getActionForm().getTextInput(TransportNetworkAddAction::PARAMETER_NAME, string());
+			stream << t.col();
+			stream << t.getActionForm().getSubmitButton("Créer");
+			stream << t.close();
 		}
 
 

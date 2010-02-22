@@ -25,13 +25,13 @@
 #include "Path.h"
 #include "Service.h"
 #include "Vertex.h"
-#include "Schedule.h"
 
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
-	using namespace time;
 	using namespace geometry;
 
 	namespace graph
@@ -256,8 +256,8 @@ namespace synthese
 
 		ServicePointer Edge::getNextService(
 			UserClassCode userClass,
-			DateTime departureMoment,
-			const DateTime& maxDepartureMoment,
+			ptime departureMoment,
+			const ptime& maxDepartureMoment,
 			bool controlIfTheServiceIsReachable,
 			optional<DepartureServiceIndex::Value>& minNextServiceIndex,
 			bool inverted
@@ -270,10 +270,10 @@ namespace synthese
 				return ServicePointer(false, DEPARTURE_TO_ARRIVAL, userClass);
 			}
 
-			bool RTData(departureMoment.toPosixTime() < posix_time::second_clock().local_time() + posix_time::hours(23));
+			bool RTData(departureMoment < posix_time::second_clock().local_time() + posix_time::hours(23));
 
 			// Search schedule
-			DepartureServiceIndex::Value next(getDepartureFromIndex(RTData, departureMoment.getHours()));
+			DepartureServiceIndex::Value next(getDepartureFromIndex(RTData, departureMoment.time_of_day().hours()));
 
 			if(	minNextServiceIndex &&
 				(*minNextServiceIndex == services.end() || services.value_comp()(*next, **minNextServiceIndex))
@@ -284,7 +284,7 @@ namespace synthese
 			while ( departureMoment <= maxDepartureMoment )  // boucle sur les dates
 			{
 				// Look in schedule for when the line is in service
-				if(	getParentPath()->isActive(gregorian::date(departureMoment.getDate().getYear(), departureMoment.getDate().getMonth(), departureMoment.getDate().getDay())))
+				if(	getParentPath()->isActive(departureMoment.date()))
 				{
 					for (; next != services.end(); ++next)  // boucle sur les services
 					{
@@ -315,8 +315,7 @@ namespace synthese
 						return servicePointer;
 				}	}
 				
-				departureMoment++;
-				departureMoment.setHour(Hour(TIME_MIN));
+				departureMoment = ptime(departureMoment.date(), hours(24));
 
 				next = _departureIndex[0].get(RTData);
 			}
@@ -328,8 +327,8 @@ namespace synthese
 
 		ServicePointer Edge::getPreviousService(
 			UserClassCode userClass,
-			DateTime arrivalMoment,
-			const DateTime& minArrivalMoment,
+			ptime arrivalMoment,
+			const ptime& minArrivalMoment,
 			bool controlIfTheServiceIsReachable,
 			optional<ArrivalServiceIndex::Value>& maxPreviousServiceIndex,
 			bool inverted
@@ -342,9 +341,9 @@ namespace synthese
 				return ServicePointer(false, ARRIVAL_TO_DEPARTURE, userClass);
 			}
 
-			bool RTData(arrivalMoment.toPosixTime() < posix_time::second_clock().local_time() + posix_time::hours(23));
+			bool RTData(arrivalMoment < posix_time::second_clock().local_time() + posix_time::hours(23));
 
-			ArrivalServiceIndex::Value previous(getArrivalFromIndex(RTData, arrivalMoment.getHours()));
+			ArrivalServiceIndex::Value previous(getArrivalFromIndex(RTData, arrivalMoment.time_of_day().hours()));
 
 			if(	maxPreviousServiceIndex &&
 				(*maxPreviousServiceIndex == services.rend() || services.value_comp()(**maxPreviousServiceIndex, *previous))
@@ -354,7 +353,7 @@ namespace synthese
 
 			while ( arrivalMoment >= minArrivalMoment )  // Loop over dates
 			{
-				if(	getParentPath()->isActive(gregorian::date(arrivalMoment.getDate().getYear(), arrivalMoment.getDate().getMonth(), arrivalMoment.getDay())))
+				if(	getParentPath()->isActive(arrivalMoment.date()))
 				{
 					for (; previous != services.rend(); ++previous)  // Loop over services
 					{
@@ -385,8 +384,7 @@ namespace synthese
 						return servicePointer;
 				}	}
 
-				arrivalMoment--;
-				arrivalMoment.setHour(Hour(TIME_MAX));
+				arrivalMoment = ptime(arrivalMoment.date(), -hours(24) - seconds(1));
 				previous = _arrivalIndex[INDICES_NUMBER - 1].get(RTData);
 			}
 
@@ -423,21 +421,21 @@ namespace synthese
 			for(ServiceSet::const_iterator it(services.begin()); it!=services.end(); ++it)
 			{
 				const Service* service = *it;
-				const Hour& endHour(service->getDepartureEndScheduleToIndex(RTData, getRankInPath()).getHour());
-				int endHours(endHour.getHours());
-				const Hour& beginHour(service->getDepartureBeginScheduleToIndex(RTData, getRankInPath()).getHour());
+				time_duration endHour(Service::GetTimeOfDay(service->getDepartureEndScheduleToIndex(RTData, getRankInPath())));
+				int endHours(endHour.hours());
+				time_duration beginHour(Service::GetTimeOfDay(service->getDepartureBeginScheduleToIndex(RTData, getRankInPath())));
 
 				for (numHour = 0; numHour <= endHours; ++numHour)
 				{
 					if(	_departureIndex[numHour].get(RTData) == services.end() ||
-						(*_departureIndex[numHour].get(RTData))->getDepartureBeginScheduleToIndex(RTData, getRankInPath()).getHour() > endHour
+						Service::GetTimeOfDay((*_departureIndex[numHour].get(RTData))->getDepartureBeginScheduleToIndex(RTData, getRankInPath())) > endHour
 					){
 						_departureIndex[numHour].set(RTData, it);
 					}
 				}
 				if (endHour < beginHour)
 				{
-					for (numHour = endHours; numHour < HOURS_PER_DAY; ++numHour)
+					for (numHour = endHours; numHour < 24; ++numHour)
 					{
 						if(	_departureIndex[numHour].get(RTData) == services.end())
 						{
@@ -451,14 +449,14 @@ namespace synthese
 			for(ServiceSet::const_reverse_iterator it(services.rbegin()); it != services.rend(); ++it)
 			{
 				const Service* service = *it;
-				const Hour& endHour(service->getArrivalEndScheduleToIndex(RTData, getRankInPath()).getHour());
-				const Hour& beginHour(service->getArrivalBeginScheduleToIndex(RTData, getRankInPath()).getHour());
-				int beginHours(beginHour.getHours());
+				time_duration endHour(Service::GetTimeOfDay(service->getArrivalEndScheduleToIndex(RTData, getRankInPath())));
+				time_duration beginHour(Service::GetTimeOfDay(service->getArrivalBeginScheduleToIndex(RTData, getRankInPath())));
+				int beginHours(beginHour.hours());
 
-				for (numHour = HOURS_PER_DAY-1; numHour >= beginHours; --numHour)
+				for (numHour = 23; numHour >= beginHours; --numHour)
 				{
 					if(	_arrivalIndex[numHour].get(RTData) == services.rend()	||
-						(*_arrivalIndex[numHour].get(RTData))->getArrivalBeginScheduleToIndex(RTData, getRankInPath()).getHour() < beginHour
+						Service::GetTimeOfDay((*_arrivalIndex[numHour].get(RTData))->getArrivalBeginScheduleToIndex(RTData, getRankInPath())) < beginHour
 					){
 						_arrivalIndex[numHour].set(RTData, it);
 					}
@@ -466,7 +464,7 @@ namespace synthese
 				}
 				if (endHour < beginHour)
 				{
-					for (numHour = endHour.getHours(); numHour >= 0; --numHour)
+					for (numHour = endHour.hours(); numHour >= 0; --numHour)
 					{
 						if(	_arrivalIndex[numHour].get(RTData) == services.rend())
 						{

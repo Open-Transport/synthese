@@ -30,8 +30,7 @@ using boost::shared_ptr;
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
-
+	
 	namespace accounts
 	{
 		Transaction::Transaction( uid id /*= 0*/ )
@@ -39,8 +38,8 @@ namespace synthese
 			, _documentId(0)
 			, _leftUserId(0)
 			, _placeId(0)
-			, _startDateTime(TIME_UNKNOWN)
-			, _endDateTime(TIME_UNKNOWN)
+			, _startDateTime(not_a_date_time)
+			, _endDateTime(not_a_date_time)
 		{
 
 		}

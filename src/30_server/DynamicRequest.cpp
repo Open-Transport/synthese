@@ -182,5 +182,12 @@ namespace synthese
 				_function = boost::shared_ptr<Function>(util::Factory<Function>::create(functionName));
 			}
 		}
+
+
+
+		const ParametersMap& DynamicRequest::getParametersMap() const
+		{
+			return _parametersMap;
+		}
 	}
 }

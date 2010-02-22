@@ -25,10 +25,10 @@
 
 #include <vector>
 #include <string>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 #include "Registrable.h"
 #include "Registry.h"
-#include "DateTime.h"
 
 namespace synthese
 {
@@ -57,7 +57,7 @@ namespace synthese
 
 		private:
 			std::string				_logKey;
-			time::DateTime			_date;
+			boost::posix_time::ptime	_date;
 			util::RegistryKeyType	_userId;
 			Content					_content;
 			Level					_level;
@@ -68,7 +68,7 @@ namespace synthese
 			DBLogEntry(util::RegistryKeyType key = UNKNOWN_VALUE);
 
 			void					setLogKey(const std::string& key);
-			void					setDate(const time::DateTime& date);
+			void					setDate(const boost::posix_time::ptime& date);
 			void					setUserId(util::RegistryKeyType value);
 			void					setContent(const Content& content);
 			void					setLevel(Level level);
@@ -76,7 +76,7 @@ namespace synthese
 			void					setObjectId2(util::RegistryKeyType id);
 
 			const std::string&		getLogKey()			const;
-			time::DateTime			getDate()			const;
+			boost::posix_time::ptime	getDate()			const;
 			util::RegistryKeyType	getUserId()			const;
 			const Content&			getContent()		const;
 			std::string				getStringContent()	const;

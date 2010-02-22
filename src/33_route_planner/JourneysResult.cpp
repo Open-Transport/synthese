@@ -23,6 +23,8 @@
 #include "JourneysResult.h"
 #include "IntegralSearcher.h"
 
+using namespace boost::posix_time;
+
 namespace synthese
 {
 	namespace algorithm
@@ -97,8 +99,8 @@ namespace synthese
 				const graph::Vertex* vertex(journey->getEndEdge()->getFromVertex());
 				boost::posix_time::time_duration duration(
 					_accessDirection == graph::DEPARTURE_TO_ARRIVAL ?
-					journey->getEndTime().getSecondsDifference(_originDateTime) :
-					_originDateTime.getSecondsDifference(journey->getEndTime())
+					journey->getEndTime() - _originDateTime :
+					_originDateTime - journey->getEndTime()
 				);
 				remove(vertex);
 				_index.insert(
@@ -157,7 +159,7 @@ namespace synthese
 			*/
 			void JourneysResult::cleanup(
 				bool updateMinSpeed,
-				const time::DateTime& newMaxTime,
+				const ptime& newMaxTime,
 				BestVertexReachesMap& bvrm,
 				bool propagateInConnectionPlace,
 				bool strict,
@@ -183,8 +185,8 @@ namespace synthese
 						is.setJourneyScore(
 							*journey,
 							journey->getMethod() == graph::DEPARTURE_TO_ARRIVAL ?
-								newMaxTime.getSecondsDifference(is.getOriginDateTime()) : 
-								is.getOriginDateTime().getSecondsDifference(newMaxTime)
+								newMaxTime - is.getOriginDateTime() :
+								is.getOriginDateTime() - newMaxTime
 						);
 						journeysToAdd.push_back(journey);
 					}

@@ -23,17 +23,16 @@
 #include "HourPeriod.h"
 
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace time;
-
 	namespace transportwebsite
 	{
 		HourPeriod::HourPeriod (
 			const string& caption
-			, const Hour& startHour
-			, const Hour& endHour
+			, const time_duration& startHour
+			, const time_duration& endHour
 		)	: _startHour(startHour)
 			, _endHour(endHour)
 			, _caption(caption)
@@ -64,14 +63,14 @@ namespace synthese
 
 
 
-		const time::Hour& HourPeriod::getBeginHour() const
+		const time_duration& HourPeriod::getBeginHour() const
 		{
 			return _startHour;
 		}
 
 
 
-		const time::Hour& HourPeriod::getEndHour() const
+		const time_duration& HourPeriod::getEndHour() const
 		{
 			return _endHour;
 		}

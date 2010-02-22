@@ -51,20 +51,20 @@ namespace synthese
 			const Calendar& mask
 		) const {
 			Calendar result;
-			BOOST_FOREACH(const CalendarTemplateElement& element, _elements)
+			BOOST_FOREACH(const Elements::value_type& element, _elements)
 			{
-				switch(element.getOperation())
+				switch(element.second.getOperation())
 				{
 				case CalendarTemplateElement::ADD:
-					result |= element.getResult(mask);
+					result |= element.second.getResult(mask);
 					break;
 
 				case CalendarTemplateElement::SUB:
-					result.subDates(element.getResult(mask));
+					result.subDates(element.second.getResult(mask));
 					break;
 
 				case CalendarTemplateElement::AND:
-					result &= element.getResult(mask);
+					result &= element.second.getResult(mask);
 					break;
 				}
 			}
@@ -98,7 +98,7 @@ namespace synthese
 
 		void CalendarTemplate::addElement( const CalendarTemplateElement& element )
 		{
-			_elements.insert(_elements.begin() + element.getRank(), element);
+			_elements.insert(make_pair(element.getRank(), element));
 		}
 
 
@@ -106,14 +106,14 @@ namespace synthese
 		boost::gregorian::date CalendarTemplate::getMinDate() const
 		{
 			date result(pos_infin);
-			BOOST_FOREACH(const CalendarTemplateElement& element, _elements)
+			BOOST_FOREACH(const Elements::value_type& element, _elements)
 			{
-				if(	element.getMinDate() < result &&
-					element.getOperation() != CalendarTemplateElement::AND ||
-					element.getOperation() == CalendarTemplateElement::AND &&
-					element.getMinDate() > result
+				if(	element.second.getMinDate() < result &&
+					element.second.getOperation() != CalendarTemplateElement::AND ||
+					element.second.getOperation() == CalendarTemplateElement::AND &&
+					element.second.getMinDate() > result
 				){
-					result = element.getMinDate();
+					result = element.second.getMinDate();
 				}
 			}
 			return result;
@@ -124,14 +124,14 @@ namespace synthese
 		boost::gregorian::date CalendarTemplate::getMaxDate() const
 		{
 			date result(neg_infin);
-			BOOST_FOREACH(const CalendarTemplateElement& element, _elements)
+			BOOST_FOREACH(const Elements::value_type& element, _elements)
 			{
-				if(	element.getMaxDate() > result &&
-					element.getOperation() != CalendarTemplateElement::AND ||
-					element.getOperation() == CalendarTemplateElement::AND &&
-					element.getMaxDate() < result
+				if(	element.second.getMaxDate() > result &&
+					element.second.getOperation() != CalendarTemplateElement::AND ||
+					element.second.getOperation() == CalendarTemplateElement::AND &&
+					element.second.getMaxDate() < result
 				){
-					result = element.getMaxDate();
+					result = element.second.getMaxDate();
 				}
 			}
 			return result;

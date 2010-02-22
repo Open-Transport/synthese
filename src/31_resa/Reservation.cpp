@@ -25,12 +25,14 @@
 #include "ResaModule.h"
 #include "Registry.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
 
 	namespace util
 	{
@@ -42,10 +44,10 @@ namespace synthese
 		Reservation::Reservation(
 			RegistryKeyType key
 		):	Registrable(key)
-			, _departureTime(TIME_UNKNOWN)
-			, _arrivalTime(TIME_UNKNOWN)
-			, _originDateTime(TIME_UNKNOWN)
-			, _reservationDeadLine(TIME_UNKNOWN)
+			, _departureTime(not_a_date_time)
+			, _arrivalTime(not_a_date_time)
+			, _originDateTime(not_a_date_time)
+			, _reservationDeadLine(not_a_date_time)
 			, _reservationRuleId(UNKNOWN_VALUE)
 		{
 
@@ -108,12 +110,12 @@ namespace synthese
 			_departureAddress = address;
 		}
 
-		void Reservation::setDepartureTime( const time::DateTime& time )
+		void Reservation::setDepartureTime( const ptime& time )
 		{
 			_departureTime = time;
 		}
 
-		void Reservation::setArrivalTime( const time::DateTime& time )
+		void Reservation::setArrivalTime( const ptime& time )
 		{
 			_arrivalTime = time;
 		}
@@ -164,12 +166,12 @@ namespace synthese
 			return _arrivalAddress;
 		}
 
-		const time::DateTime& Reservation::getDepartureTime() const
+		const ptime& Reservation::getDepartureTime() const
 		{
 			return _departureTime;
 		}
 
-		const time::DateTime& Reservation::getArrivalTime() const
+		const ptime& Reservation::getArrivalTime() const
 		{
 			return _arrivalTime;
 		}
@@ -185,12 +187,12 @@ namespace synthese
 			transaction->addReservation(this);
 		}
 
-		const time::DateTime& Reservation::getOriginDateTime() const
+		const ptime& Reservation::getOriginDateTime() const
 		{
 			return _originDateTime;
 		}
 
-		void Reservation::setOriginDateTime( const time::DateTime& time )
+		void Reservation::setOriginDateTime( const ptime& time )
 		{
 			_originDateTime = time;
 		}
@@ -212,10 +214,10 @@ namespace synthese
 			if (_reservationRuleId == UNKNOWN_VALUE)
 				return NO_RESERVATION;
 
-			const DateTime& cancellationTime(getTransaction()->getCancellationTime());
-			const DateTime now(TIME_CURRENT);
+			const ptime& cancellationTime(getTransaction()->getCancellationTime());
+			const ptime now(second_clock::local_time());
 
-			if (cancellationTime.isUnknown())
+			if (cancellationTime.is_not_a_date_time())
 			{
 				if (now < _reservationDeadLine)
 					return OPTION;
@@ -237,14 +239,14 @@ namespace synthese
 
 
 
-		void Reservation::setReservationDeadLine( const time::DateTime& time )
+		void Reservation::setReservationDeadLine( const ptime& time )
 		{
 			_reservationDeadLine = time;
 		}
 
 
 
-		const time::DateTime& Reservation::getReservationDeadLine() const
+		const ptime& Reservation::getReservationDeadLine() const
 		{
 			return _reservationDeadLine;
 		}
@@ -258,10 +260,10 @@ namespace synthese
 			
 			switch(status)
 			{
-			case OPTION: return statusText + " pouvant être annulée avant le " + _reservationDeadLine.toString();
-			case CANCELLED: return statusText + " le " + getTransaction()->getCancellationTime().toString();
-			case CANCELLED_AFTER_DELAY: return statusText + " le " + getTransaction()->getCancellationTime().toString();
-			case NO_SHOW: return statusText + " constatée le " + getTransaction()->getCancellationTime().toString();
+			case OPTION: return statusText + " pouvant être annulée avant le " + to_simple_string(_reservationDeadLine);
+			case CANCELLED: return statusText + " le " + to_simple_string(getTransaction()->getCancellationTime());
+			case CANCELLED_AFTER_DELAY: return statusText + " le " + to_simple_string(getTransaction()->getCancellationTime());
+			case NO_SHOW: return statusText + " constatée le " + to_simple_string(getTransaction()->getCancellationTime());
 			}
 
 			return statusText;

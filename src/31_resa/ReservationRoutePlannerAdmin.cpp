@@ -58,8 +58,13 @@
 #include "User.h"
 #include "UserTableSync.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
+
 
 namespace synthese
 {
@@ -69,7 +74,6 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace env;
-	using namespace time;
 	using namespace html;
 	using namespace ptrouteplanner;
 	using namespace algorithm;	
@@ -109,7 +113,7 @@ namespace synthese
 		):	AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>(),
 			_disabledPassenger(false),
 			_withoutTransfer(false),
-			_dateTime(TIME_CURRENT),
+			_dateTime(second_clock::local_time()),
 			_seatsNumber(1),
 			_planningOrder(DEPARTURE_FIRST)
 		{ }
@@ -124,13 +128,13 @@ namespace synthese
 			_startPlace = map.getDefault<string>(PARAMETER_START_PLACE);
 			_endCity = map.getDefault<string>(PARAMETER_END_CITY);
 			_endPlace = map.getDefault<string>(PARAMETER_END_PLACE);
-			if(map.getOptional<string>(PARAMETER_DATE))
+			if(!map.getDefault<string>(PARAMETER_DATE).empty())
 			{
-				_dateTime = map.getDate(PARAMETER_DATE, false, FACTORY_KEY);
+				_dateTime = time_from_string(map.get<string>(PARAMETER_DATE));
 			}
-			if(map.getOptional<string>(PARAMETER_TIME))
+			if(!map.getDefault<string>(PARAMETER_TIME).empty())
 			{
-				_dateTime.setHour(map.getHour(PARAMETER_TIME, false, FACTORY_KEY));
+				_dateTime = ptime(_dateTime.date(), duration_from_string(map.get<string>(PARAMETER_TIME)));
 			}
 			_disabledPassenger = map.getDefault<bool>(PARAMETER_DISABLED_PASSENGER, false);
 			_withoutTransfer = map.getDefault<bool>(PARAMETER_WITHOUT_TRANSFER, false);
@@ -178,8 +182,8 @@ namespace synthese
 			m.insert(PARAMETER_START_PLACE, _startPlace);
 			m.insert(PARAMETER_END_CITY, _endCity);
 			m.insert(PARAMETER_END_PLACE, _endPlace);
-			m.insert(PARAMETER_DATE, _dateTime.getDate());
-			m.insert(PARAMETER_TIME, _dateTime.getHour());
+			m.insert(PARAMETER_DATE, _dateTime.date());
+			m.insert(PARAMETER_TIME, _dateTime.time_of_day());
 			m.insert(PARAMETER_DISABLED_PASSENGER, _disabledPassenger);
 			m.insert(PARAMETER_WITHOUT_TRANSFER, _withoutTransfer);
 			m.insert(PARAMETER_SEATS_NUMBER, _seatsNumber);
@@ -202,11 +206,11 @@ namespace synthese
 			vector<pair<string, string> > dates;
 			vector<pair<string, string> > hours;
 			{
-				Date date(TIME_CURRENT);
+				date date(day_clock::local_day());
 				for(size_t i=0; i<14; ++i)
 				{
-					dates.push_back(make_pair(date.toSQLString(false), date.getTextWeekDay() +" "+ date.toString()));
-					date++;
+					dates.push_back(make_pair(to_iso_extended_string(date), lexical_cast<string>(date.day_of_week()) +" "+ to_simple_string(date)));
+					date += days(1);
 				}
 				for(size_t i=0; i<24; ++i)
 				{
@@ -271,8 +275,8 @@ namespace synthese
 						(dynamic_cast<const City*>(endPlace) ? string() : dynamic_cast<const NamedPlace*>(endPlace)->getName()) :
 						_endPlace
 				)	);
-			stream << st.cell("Date", st.getForm().getSelectInput(PARAMETER_DATE, dates, _dateTime.getDate().toSQLString(false)));
-			stream << st.cell("Heure", st.getForm().getSelectInput(PARAMETER_TIME, hours, lexical_cast<string>(_dateTime.getHour().getHours())+":00"));
+			stream << st.cell("Date", st.getForm().getSelectInput(PARAMETER_DATE, dates, to_iso_extended_string(_dateTime.date())));
+			stream << st.cell("Heure", st.getForm().getSelectInput(PARAMETER_TIME, hours, lexical_cast<string>(_dateTime.time_of_day().hours())+":00"));
 			stream << st.cell("PMR", st.getForm().getOuiNonRadioInput(PARAMETER_DISABLED_PASSENGER, _disabledPassenger));
 			stream << st.cell("Sans correspondance", st.getForm().getOuiNonRadioInput(PARAMETER_WITHOUT_TRANSFER, _withoutTransfer));
 			stream << st.close();
@@ -284,18 +288,18 @@ namespace synthese
 
 			TimeSlotRoutePlanner::Result dummy;
 			PTRoutePlannerResult jv(startPlace, endPlace, false, dummy);
-			DateTime now(TIME_CURRENT);
+			ptime now(second_clock::local_time());
 
 			if(!_confirmedTransaction.get())
 			{
-				DateTime endDate(_dateTime);
+				ptime endDate(_dateTime);
 				if(_planningOrder == DEPARTURE_FIRST)
 				{
-					endDate++;
+					endDate += days(1);
 				}
 				else
 				{
-					endDate--;
+					endDate -= days(1);
 				}
 
 				// Route planning
@@ -321,8 +325,8 @@ namespace synthese
 			}
 
 			stream << "<h1>Liens</h1><p>";
-			DateTime date(_dateTime);
-			date.subDaysDuration(1);
+			ptime date(_dateTime);
+			date -= days(1);
 			searchRequest.getPage()->_dateTime = date;
 			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour précédent", string(), "rewind_blue.png") << " ";
 			
@@ -330,7 +334,7 @@ namespace synthese
 			{
 				PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().begin());
 				date = it->getArrivalTime();
-				date -= 1;
+				date -= days(1);
 				searchRequest.getPage()->_dateTime = date;
 				searchRequest.getPage()->_planningOrder = ARRIVAL_FIRST;
 
@@ -353,14 +357,14 @@ namespace synthese
 			{
 				PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().end() - 1);
 				date = it->getDepartureTime();
-				date += 1;
+				date += days(1);
 				searchRequest.getPage()->_dateTime = date;
 				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions suivantes", string(), "resultset_next.png") << " ";
 
 			}
 
 			date = _dateTime;
-			date.addDaysDuration(1);
+			date += days(1);
 			searchRequest.getPage()->_dateTime = date;
 			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour suivant", string(), "forward_blue.png");
 

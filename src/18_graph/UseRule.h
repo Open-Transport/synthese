@@ -27,14 +27,10 @@
 #define SYNTHESE_UseRule_h__
 
 #include <boost/optional.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace synthese
 {
-	namespace time
-	{
-		class DateTime;
-	}
-
 	namespace graph
 	{
 		class ServiceUse;
@@ -118,9 +114,9 @@ namespace synthese
 				If no explicit rule defines the reservation dead line, 
 				the actual reservation time is returned.
 			*/
-			virtual time::DateTime getReservationDeadLine (
-				const time::DateTime& originTime,
-				const time::DateTime& departureTime
+			virtual boost::posix_time::ptime getReservationDeadLine (
+				const boost::posix_time::ptime& originTime,
+				const boost::posix_time::ptime& departureTime
 			) const = 0;
 
 
@@ -134,7 +130,7 @@ namespace synthese
 			
 				If no explicit rule defines this minimum time, the actual reservation time is returned.
 			*/
-			virtual time::DateTime getReservationOpeningTime ( 
+			virtual boost::posix_time::ptime getReservationOpeningTime ( 
 				const ServicePointer& servicePointer
 			) const = 0;
 			

@@ -37,7 +37,6 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace time;
 	using namespace util;
 
 	namespace util

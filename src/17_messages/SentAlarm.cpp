@@ -90,12 +90,12 @@ namespace synthese
 				return ALARM_NO_CONFLICT;
 
 			// Inverting the parameters if necessary
-			if ((other.getPeriodStart().isUnknown() && !getPeriodStart().isUnknown())
-				|| (!other.getPeriodStart().isUnknown() && !getPeriodStart().isUnknown() && other.getPeriodStart() < getPeriodStart()))
+			if ((other.getPeriodStart().is_not_a_date_time() && !getPeriodStart().is_not_a_date_time())
+				|| (!other.getPeriodStart().is_not_a_date_time() && !getPeriodStart().is_not_a_date_time() && other.getPeriodStart() < getPeriodStart()))
 				return other.wereInConflictWith(*this);
 
 			// No common period : no conflict
-			if (!other.getPeriodStart().isUnknown() && !getPeriodEnd().isUnknown() && other.getPeriodStart() > getPeriodEnd())
+			if (!other.getPeriodStart().is_not_a_date_time() && !getPeriodEnd().is_not_a_date_time() && other.getPeriodStart() > getPeriodEnd())
 				return ALARM_NO_CONFLICT;
 
 			// Common period : different level gives priority to an alarm

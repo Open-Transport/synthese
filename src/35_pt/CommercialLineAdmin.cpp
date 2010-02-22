@@ -45,6 +45,7 @@
 #include "ActionResultHTMLTable.h"
 #include "NonPermanentService.h"
 #include "Profile.h"
+#include "LineAddAction.h"
 
 using namespace std;
 using namespace boost;
@@ -59,7 +60,6 @@ namespace synthese
 	using namespace env;
 	using namespace security;
 	using namespace html;
-	using namespace time;
 	using namespace pt;
 
 	namespace util
@@ -88,10 +88,14 @@ namespace synthese
 			const ParametersMap& map
 		){
 			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
-			if(map.getOptional<string>(PARAMETER_DATES_START))
+			if(!map.getDefault<string>(PARAMETER_DATES_START).empty()
+			){
 				_startDate = from_string(map.get<string>(PARAMETER_DATES_START));
-			if(map.getOptional<string>(PARAMETER_DATES_END))
+			}
+			if(	!map.getDefault<string>(PARAMETER_DATES_END).empty()
+			){
 				_endDate = from_string(map.get<string>(PARAMETER_DATES_END));
+			}
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 100);
 
@@ -169,6 +173,16 @@ namespace synthese
 					stream << t.col();
 					stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
 				}
+
+				AdminActionFunctionRequest<LineAddAction,LineAdmin> creationRequest(_request);
+				creationRequest.getFunction()->setActionFailedPage(getNewPage());
+				creationRequest.setActionWillCreateObject();
+				creationRequest.getAction()->setCommercialLine(const_pointer_cast<CommercialLine>(_cline));
+
+				stream << t.row();
+				stream << t.col() << "Création d'itinéraire";
+				stream << t.col() << HTMLModule::getLinkButton(creationRequest.getURL(), "Créer");
+
 				stream << t.close();
 			}
 			////////////////////////////////////////////////////////////////////

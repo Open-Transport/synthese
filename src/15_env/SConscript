@@ -12,7 +12,6 @@ CppSynthese3LibProject(
 		's3-graph.cpplib',
 		's3-geometry.cpplib',
 		's3-db.cpplib',
-		's3-time.cpplib',
 		's3-calendar.cpplib',
 		's3-messages.cpplib',
 		's3-pt.cpplib',

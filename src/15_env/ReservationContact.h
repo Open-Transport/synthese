@@ -25,8 +25,6 @@
 
 #include "Registrable.h"
 #include "Registry.h"
-#include "Hour.h"
-#include "DateTime.h"
 
 namespace synthese
 {

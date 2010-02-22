@@ -87,7 +87,7 @@ namespace synthese
 			int result(0);
 			BOOST_FOREACH(shared_ptr<const Reservation> resa, _reservations)
 			{
-				if (resa->getTransaction()->getCancellationTime().isUnknown())
+				if (resa->getTransaction()->getCancellationTime().is_not_a_date_time())
 				{
 					result += resa->getTransaction()->getSeats();
 				}

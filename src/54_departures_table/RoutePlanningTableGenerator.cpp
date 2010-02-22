@@ -27,6 +27,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -79,8 +80,8 @@ namespace synthese
 		RoutePlanningTableGenerator::RoutePlanningTableGenerator(
 			const PublicTransportStopZoneConnectionPlace& origin,
 			const DisplayedPlacesList& destinations,
-			const time::DateTime& startDateTime,
-			const time::DateTime& endDateTime,
+			const ptime& startDateTime,
+			const ptime& endDateTime,
 			bool withTransfer
 		):	_origin(origin),
 			_destinations(destinations),

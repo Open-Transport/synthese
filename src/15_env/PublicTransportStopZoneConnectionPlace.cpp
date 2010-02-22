@@ -40,7 +40,6 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace pt;
-	using namespace time;
 	using namespace road;
 	using namespace geography;
 
@@ -75,6 +74,7 @@ namespace synthese
 			_isoBarycentreToUpdate = true;
 			_physicalStops.insert(make_pair(physicalStop.getKey(), &physicalStop));
 		}
+
 		PublicTransportStopZoneConnectionPlace::PhysicalStopsLabels PublicTransportStopZoneConnectionPlace::getPhysicalStopLabels( bool withAll /*= false*/ ) const
 		{
 			PhysicalStopsLabels m;

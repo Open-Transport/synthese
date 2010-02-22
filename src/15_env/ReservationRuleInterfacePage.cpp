@@ -27,19 +27,17 @@
 #include "DateTimeInterfacePage.h"
 #include "Interface.h"
 
-#include "DateTime.h"
-
 #include <sstream>
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using namespace time;
 	using namespace graph;
 
 	namespace util
@@ -56,19 +54,26 @@ namespace synthese
 
 		void ReservationRuleInterfacePage::display( std::ostream& stream , interfaces::VariablesMap& variables , const Journey& journey, const server::Request* request /*= NULL  */ ) const
 		{
-			DateTime now(TIME_CURRENT);
+			ptime now(second_clock::local_time());
 			ParametersVector pv;
-			DateTime deadLine(journey.getReservationDeadLine());
+			ptime deadLine(journey.getReservationDeadLine());
 			logic::tribool compliance(journey.getReservationCompliance());
 
-			pv.push_back(lexical_cast<string>(logic::indeterminate(compliance) && deadLine > now));
+			pv.push_back(lexical_cast<string>(logic::indeterminate(compliance) && (deadLine.is_not_a_date_time() || deadLine > now)));
 			pv.push_back(lexical_cast<string>(compliance == true));
-			pv.push_back(lexical_cast<string>(deadLine.isUnknown() ? 0 : deadLine.getSecondsDifference(now).total_seconds() / 60 ));
-			
-			stringstream s;
-			const DateTimeInterfacePage* datePage(getInterface()->getPage<DateTimeInterfacePage>());
-			datePage->display(s, variables, deadLine, request);
-			pv.push_back(s.str());
+			pv.push_back(lexical_cast<string>(deadLine.is_not_a_date_time() ? 0 : (deadLine - now).total_seconds() / 60 ));
+
+			if(deadLine.is_not_a_date_time())
+			{
+				pv.push_back(string());
+			}
+			else
+			{
+				stringstream s;
+				const DateTimeInterfacePage* datePage(getInterface()->getPage<DateTimeInterfacePage>());
+				datePage->display(s, variables, deadLine, request);
+				pv.push_back(s.str());
+			}
 
 			InterfacePage::_display(stream, pv, variables, static_cast<const void*>(&journey), request);
 		}

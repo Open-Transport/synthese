@@ -35,11 +35,11 @@
 using namespace std;
 using namespace boost;
 using namespace boost::gregorian;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
 	using namespace graph;
 
 	namespace util
@@ -98,7 +98,7 @@ namespace synthese
 			AccessDirection method,
 			UserClassCode userClass
 			, const Edge* edge
-			, const time::DateTime& presenceDateTime
+			, const ptime& presenceDateTime
 			, bool controlIfTheServiceIsReachable
 			, bool inverted
 		) const {
@@ -107,29 +107,37 @@ namespace synthese
 			ServicePointer ptr(RTData,method, userClass, edge);
 			ptr.setService(this);
 			int edgeIndex(edge->getRankInPath());
-			const Schedule& thSchedule(method == DEPARTURE_TO_ARRIVAL ? _departureSchedules.at(edgeIndex) : _arrivalSchedules.at(edgeIndex));
-			const Schedule& rtSchedule(method == DEPARTURE_TO_ARRIVAL ? _RTDepartureSchedules.at(edgeIndex) : _RTArrivalSchedules.at(edgeIndex));
-			const Schedule& schedule(RTData ? rtSchedule : thSchedule);
+			const time_duration& thSchedule(method == DEPARTURE_TO_ARRIVAL ? _departureSchedules.at(edgeIndex) : _arrivalSchedules.at(edgeIndex));
+			const time_duration& rtSchedule(method == DEPARTURE_TO_ARRIVAL ? _RTDepartureSchedules.at(edgeIndex) : _RTArrivalSchedules.at(edgeIndex));
+			const time_duration& schedule(RTData ? rtSchedule : thSchedule);
 
 			// Actual time
-			if(	method == DEPARTURE_TO_ARRIVAL && presenceDateTime.getHour() > schedule.getHour() ||
-				method == ARRIVAL_TO_DEPARTURE && presenceDateTime.getHour() < schedule.getHour()
+			if(	method == DEPARTURE_TO_ARRIVAL && presenceDateTime.time_of_day() > GetTimeOfDay(schedule) ||
+				method == ARRIVAL_TO_DEPARTURE && presenceDateTime.time_of_day() < GetTimeOfDay(schedule)
 			){
 				return ServicePointer(RTData, method, userClass);
 			}
-			DateTime actualTime(presenceDateTime);
-			actualTime.setHour(schedule.getHour());
-			ptr.setActualTime(actualTime);
+			ptime actualTime(presenceDateTime.date(), GetTimeOfDay(schedule));
+			const time_duration& departureSchedule(RTData ? _RTDepartureSchedules.at(0) : _departureSchedules.at(0));
 
-			// Origin departure time
-			DateTime originDateTime(actualTime);
-			int duration = schedule - (RTData ? _RTDepartureSchedules.at(0) : _departureSchedules.at(0));
-			originDateTime -= duration;
-			ptr.setOriginDateTime(originDateTime);
+			ptime originDateTime(actualTime);
+			originDateTime += (departureSchedule - schedule);
+
+			ptime calendarDateTime(originDateTime);
+			if(departureSchedule >= hours(24))
+			{
+				calendarDateTime -= days(floor(float(departureSchedule.total_seconds()) / float(86400)));
+			}
 
 			// Date control
-			if (!isActive(date(originDateTime.getDate().getYear(),originDateTime.getDate().getMonth(),originDateTime.getDate().getDay())))
+			if (!isActive(calendarDateTime.date()))
+			{
 				return ServicePointer(RTData, method, userClass);
+			}
+
+			// Saving dates
+			ptr.setActualTime(actualTime);
+			ptr.setOriginDateTime(originDateTime);
 
 			// Reservation control
 			if(	controlIfTheServiceIsReachable &&
@@ -139,9 +147,7 @@ namespace synthese
 			}		
 
 			// Theoretical time
-			DateTime theoreticalTime(presenceDateTime);
-			theoreticalTime.setHour(thSchedule.getHour());
-			ptr.setTheoreticalTime(theoreticalTime);
+			ptr.setTheoreticalTime(ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)));
 
 			// Real time edge
 			if(RTData)
@@ -151,19 +157,17 @@ namespace synthese
 			return ptr;
 		}
 
-		time::DateTime ScheduledService::getLeaveTime(
-			const ServicePointer& servicePointer
-			, const Edge* edge
+		ptime ScheduledService::getLeaveTime(
+			const ServicePointer& servicePointer,
+			const Edge* edge
 		) const	{
 			int edgeIndex(edge->getRankInPath());
-			Schedule schedule(
+			time_duration schedule(
 				(servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 				? getArrivalSchedules(servicePointer.getRTData()).at(edgeIndex)
 				: getDepartureSchedules(servicePointer.getRTData()).at(edgeIndex)
-				);
-			DateTime actualDateTime(servicePointer.getOriginDateTime());
-			actualDateTime += (schedule - _departureSchedules.at(0));
-			return actualDateTime;
+			);
+			return servicePointer.getOriginDateTime() + (schedule - _departureSchedules.at(0));
 		}
 
 		void ScheduledService::setDepartureSchedules( const Schedules& schedules )
@@ -178,13 +182,13 @@ namespace synthese
 		{
 			if(!_arrivalSchedules.empty())
 			{
-				const Schedule& lastThSchedule(*(_arrivalSchedules.end() - 1));
-				const Schedule& lastRTSchedule(*(_RTArrivalSchedules.end() - 1));
-				const Schedule& lastSchedule = (lastThSchedule < lastRTSchedule) ? lastRTSchedule : lastThSchedule;
+				const time_duration& lastThSchedule(*(_arrivalSchedules.end() - 1));
+				const time_duration& lastRTSchedule(*(_RTArrivalSchedules.end() - 1));
+				const time_duration& lastSchedule = (lastThSchedule < lastRTSchedule) ? lastRTSchedule : lastThSchedule;
 
 				posix_time::ptime now(posix_time::second_clock::local_time());
-				_nextRTUpdate = posix_time::ptime(now.date(), lastSchedule.getHour().toPosixTimeDuration());
-				if(now.time_of_day() > lastSchedule.getHour().toPosixTimeDuration())
+				_nextRTUpdate = ptime(now.date(), GetTimeOfDay(lastSchedule));
+				if(now.time_of_day() > GetTimeOfDay(lastSchedule))
 				{
 					_nextRTUpdate += gregorian::days(1);
 				}
@@ -200,38 +204,38 @@ namespace synthese
 			_computeNextRTUpdate();
 		}
 
-		Schedule ScheduledService::getDepartureSchedule(bool RTData, size_t rank) const
+		time_duration ScheduledService::getDepartureSchedule(bool RTData, size_t rank) const
 		{
 			return getDepartureSchedules(RTData).at(rank);
 		}
 
-		Schedule ScheduledService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
+		time_duration ScheduledService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
 			return getDepartureSchedules(RTData).at(rankInPath);
 		}
 
-		Schedule ScheduledService::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
+		time_duration ScheduledService::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
 			return getDepartureSchedules(RTData).at(rankInPath);
 		}
 
-		Schedule ScheduledService::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
+		time_duration ScheduledService::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
 			return getArrivalSchedules(RTData).at(rankInPath);
 		}
 
-		Schedule ScheduledService::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
+		time_duration ScheduledService::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
 			return getArrivalSchedules(RTData).at(rankInPath);
 		}
 
-		const time::Schedule& ScheduledService::getLastArrivalSchedule(bool RTData) const
+		const time_duration& ScheduledService::getLastArrivalSchedule(bool RTData) const
 		{
 			Schedules::const_iterator it(getArrivalSchedules(RTData).end() - 1);
 			return *it;
 		}
 
-		const time::Schedule& ScheduledService::getLastDepartureSchedule(bool RTData) const
+		const time_duration& ScheduledService::getLastDepartureSchedule(bool RTData) const
 		{
 			for (Path::Edges::const_reverse_iterator it(getPath()->getEdges().rbegin()); it != getPath()->getEdges().rend(); ++it)
 				if ((*it)->isDeparture())
@@ -263,7 +267,7 @@ namespace synthese
 		}
 
 		graph::UseRule::ReservationAvailabilityType ScheduledService::getReservationAbility(
-			const Date& date
+			const date& date
 		) const {
 			// Pedestrian
 			const Path::Edges& edges(getPath()->getEdges());
@@ -276,10 +280,7 @@ namespace synthese
 						DEPARTURE_TO_ARRIVAL,
 						USER_PEDESTRIAN,
 						*it,
-						DateTime(
-							date,
-							getDepartureSchedule(false, (*it)->getRankInPath())
-						),
+						ptime(date, GetTimeOfDay(getDepartureSchedule(false, (*it)->getRankInPath()))),
 						false,
 						false
 					)	);
@@ -292,8 +293,8 @@ namespace synthese
 		}
 		
 		
-		time::DateTime ScheduledService::getReservationDeadLine(
-			const Date& date
+		ptime ScheduledService::getReservationDeadLine(
+			const date& date
 		) const {
 			// Pedestrian
 			const Path::Edges& edges(getPath()->getEdges());
@@ -306,10 +307,7 @@ namespace synthese
 						DEPARTURE_TO_ARRIVAL,
 						USER_PEDESTRIAN,
 						*it,
-						DateTime(
-							date,
-							getDepartureSchedule(false, (*it)->getRankInPath())
-						),
+						ptime(date, getDepartureSchedule(false, (*it)->getRankInPath())),
 						false,
 						false
 					)	);
@@ -320,13 +318,13 @@ namespace synthese
 				}
 			}
 			assert(false);
-			return DateTime(TIME_UNKNOWN);
+			return not_a_date_time;
 		}
 
 
 
 		bool ScheduledService::nonConcurrencyRuleOK(
-			const time::Date& date,
+			const date& date,
 			const Edge& departureEdge,
 			const Edge& arrivalEdge,
 			UserClassCode userClass
@@ -342,7 +340,7 @@ namespace synthese
 						departureEdge.getRankInPath(),
 						arrivalEdge.getRankInPath(),
 						userClass,
-						gregorian::date(date.getYear(), date.getMonth(), date.getDay())
+						date
 			)	)	);
 			if(it != _nonConcurrencyCache.end()) return it->second;
 
@@ -368,10 +366,10 @@ namespace synthese
 			{
 				CommercialLine* priorityLine(rule->getPriorityLine());
 				const CommercialLine::Paths& paths(priorityLine->getPaths());
-				DateTime minStartTime(date, getDepartureSchedule(false, departureEdge.getRankInPath()));
-				minStartTime -= rule->getDelay().minutes();
-				DateTime maxStartTime(date, getDepartureSchedule(false, departureEdge.getRankInPath()));
-				maxStartTime += rule->getDelay().minutes();
+				ptime minStartTime(date, getDepartureSchedule(false, departureEdge.getRankInPath()));
+				minStartTime -= rule->getDelay();
+				ptime maxStartTime(date, getDepartureSchedule(false, departureEdge.getRankInPath()));
+				maxStartTime += rule->getDelay();
 
 				// Loop on all vertices of the starting place
 				BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& itStartStop, startStops)
@@ -413,7 +411,7 @@ namespace synthese
 											departureEdge.getRankInPath(),
 											arrivalEdge.getRankInPath(),
 											userClass,
-											gregorian::date(date.getYear(), date.getMonth(), date.getDay())
+											date
 										), false
 								)	);
 								return false;
@@ -429,7 +427,7 @@ namespace synthese
 						departureEdge.getRankInPath(),
 						arrivalEdge.getRankInPath(),
 						userClass,
-						gregorian::date(date.getYear(), date.getMonth(), date.getDay())
+						date
 					), true
 			)	);
 			return true;
@@ -461,14 +459,14 @@ namespace synthese
 		){
 			if(atArrival)
 			{
-				Schedule schedule(_arrivalSchedules[rank]);
-				schedule += value.total_seconds() / 60;
+				time_duration schedule(_arrivalSchedules[rank]);
+				schedule += value;
 				_RTArrivalSchedules[rank] = schedule;
 			}
 			if(atDeparture)
 			{
-				Schedule schedule(_departureSchedules[rank]);
-				schedule += value.total_seconds() / 60;
+				time_duration schedule(_departureSchedules[rank]);
+				schedule += value;
 				_RTDepartureSchedules[rank] = schedule;
 			}
 			if(updateFollowingSchedules && rank + 1 < _arrivalSchedules.size())

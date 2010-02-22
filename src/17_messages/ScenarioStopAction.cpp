@@ -22,23 +22,23 @@
 
 #include "ScenarioStopAction.h"
 
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/SentScenario.h"
-#include "17_messages/SentScenarioInheritedTableSync.h"
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/MessagesLog.h"
+#include "ScenarioTableSync.h"
+#include "SentScenario.h"
+#include "SentScenarioInheritedTableSync.h"
+#include "AlarmTableSync.h"
+#include "MessagesLog.h"
 #include "MessagesRight.h"
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace server;
-	using namespace time;
 	using namespace util;
 	using namespace security;
 
@@ -80,11 +80,11 @@ namespace synthese
 			ScenarioTableSync::Save(_scenario.get());
 
 			// Log
-			MessagesLog::addUpdateEntry(_scenario.get(), "Diffusion arrêtée le " + _stopDateTime.toString(), request.getUser().get());
+			MessagesLog::addUpdateEntry(_scenario.get(), "Diffusion arrêtée le " + to_simple_string(_stopDateTime), request.getUser().get());
 		}
 
 		ScenarioStopAction::ScenarioStopAction()
-			: FactorableTemplate<Action, ScenarioStopAction>(), _stopDateTime(TIME_CURRENT)
+			: FactorableTemplate<Action, ScenarioStopAction>(), _stopDateTime(second_clock::local_time())
 		{
 	
 		}

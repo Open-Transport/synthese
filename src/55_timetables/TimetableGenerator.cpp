@@ -23,7 +23,7 @@
 #include "TimetableGenerator.h"
 #include "Line.h"
 #include "LineStop.h"
-#include "Vertex.h"
+#include "PhysicalStop.h"
 #include "NonPermanentService.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "Env.h"
@@ -34,6 +34,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -41,7 +42,6 @@ namespace synthese
 	using namespace calendar;
 	using namespace util;
 	using namespace graph;
-	using namespace time;
 
 	namespace timetables
 	{
@@ -53,7 +53,6 @@ namespace synthese
 		{
 
 		}
-
 
 
 
@@ -194,7 +193,9 @@ namespace synthese
 
 			// Line is authorized
 			if(!_authorizedLines.empty() && _authorizedLines.find(line.getCommercialLine()) == _authorizedLines.end())
+			{
 				return false;
+			}
 
 			// A0: Line selection upon calendar
 			if (!line.getAllDays() && !_baseCalendar.hasAtLeastOneCommonDateWith(line))
@@ -210,8 +211,12 @@ namespace synthese
 
 				for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
 				{
-					if((*itEdge)->isDeparture() && dynamic_cast<const PublicTransportStopZoneConnectionPlace*>((*itEdge)->getHub())->getKey() == itRow->getPlace()->getKey())
-					{
+					if(	(*itEdge)->isDeparture() &&
+						dynamic_cast<const PublicTransportStopZoneConnectionPlace*>((*itEdge)->getHub())->getKey() == itRow->getPlace()->getKey() &&
+						(	_authorizedPhysicalStops.empty() ||
+							_authorizedPhysicalStops.find(dynamic_cast<const PhysicalStop*>((*itEdge)->getFromVertex())) != _authorizedPhysicalStops.end()
+						)	
+					){
 						lineIsSelected = true;
 						if (itRow->getIsArrival() || itRow->getCompulsory() == PassageSuffisant)
 							passageOk = true;
@@ -266,10 +271,10 @@ namespace synthese
 
 
 
-		std::vector<time::Schedule> TimetableGenerator::getSchedulesByRow( Rows::const_iterator row ) const
+		std::vector<time_duration> TimetableGenerator::getSchedulesByRow( Rows::const_iterator row ) const
 		{
 			int delta(row - _rows.begin());
-			vector<Schedule> result;
+			vector<time_duration> result;
 			for (Columns::const_iterator it(_columns.begin()); it != _columns.end(); ++it)
 			{
 				const TimetableColumn::Content& content(it->getContent());
@@ -345,6 +350,20 @@ namespace synthese
 		void TimetableGenerator::setAuthorizedLines( const AuthorizedLines& value )
 		{
 			_authorizedLines = value;
+		}
+
+
+
+		void TimetableGenerator::setAuthorizedPhysicalStops( const AuthorizedPhysicalStops& value )
+		{
+			_authorizedPhysicalStops = value;
+		}
+
+
+
+		const TimetableGenerator::AuthorizedPhysicalStops& TimetableGenerator::getAuthorizedPhysicalStops() const
+		{
+			return _authorizedPhysicalStops;
 		}
 	}
 }

@@ -81,7 +81,7 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			const date d(from_string(rows->getText (ServiceDateTableSync::COL_DATE)));
+			const date d(rows->getDate(ServiceDateTableSync::COL_DATE));
 			ss->setDate(d);
 			
 			shared_ptr<NonPermanentService> service(
@@ -160,7 +160,7 @@ namespace synthese
 				service.clear();
 				while(rows->next())
 				{
-					service.setActive(from_string(rows->getText(COL_DATE)));
+					service.setActive(rows->getDate(COL_DATE));
 				}
 			}
 			catch(SQLiteException& e)

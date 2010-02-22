@@ -56,8 +56,8 @@ namespace synthese
 				, const DisplayedPlacesList&
 				, const ForbiddenPlacesList&,
 				const TransferDestinationsList&
-				, const time::DateTime& startDateTime
-				, const time::DateTime& endDateTime
+				, const boost::posix_time::ptime& startDateTime
+				, const boost::posix_time::ptime& endDateTime
 				, size_t maxSize
 			);
 

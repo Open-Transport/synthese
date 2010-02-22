@@ -33,7 +33,6 @@
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
-#include "TimeParseException.h"
 #include "Conversion.h"
 #include "DBLogModule.h"
 #include "ScenarioFolder.h"
@@ -45,12 +44,12 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace server;
 	using namespace db;
-	using namespace time;
 	using namespace util;
 	using namespace security;
 	using namespace dblog;
@@ -102,18 +101,20 @@ namespace synthese
 				{
 					_enabled = map.get<bool>(PARAMETER_ENABLED);
 
-					_startDate = map.getDateTime(PARAMETER_START_DATE, true, FACTORY_KEY);
+					if(!map.get<string>(PARAMETER_START_DATE).empty())
+					{
+						_startDate = time_from_string(map.get<string>(PARAMETER_START_DATE));
+					}
 
-					_endDate = map.getDateTime(PARAMETER_END_DATE, true, FACTORY_KEY);
+					if(!map.get<string>(PARAMETER_END_DATE).empty())
+					{
+						_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
+					}
 				}
 			}
 			catch(ParametersMap::MissingParameterException& e)
 			{
 				throw ActionException(e, *this);
-			}
-			catch(TimeParseException& e)
-			{
-				throw ActionException("Une date ou une heure est mal formée");
 			}
 		}
 
@@ -121,8 +122,8 @@ namespace synthese
 
 		ScenarioUpdateDatesAction::ScenarioUpdateDatesAction()
 			: FactorableTemplate<Action, ScenarioUpdateDatesAction>()
-			, _startDate(TIME_UNKNOWN)
-			, _endDate(TIME_UNKNOWN)
+			, _startDate(not_a_date_time)
+			, _endDate(not_a_date_time)
 		{}
 
 
@@ -144,8 +145,8 @@ namespace synthese
 			if(_sscenario.get())
 			{
 				DBLogModule::appendToLogIfChange(text, "Affichage ", _sscenario->getIsEnabled() ? "activé" : "désactivé", _enabled ? "activé" : "désactivé");
-				DBLogModule::appendToLogIfChange(text, "Date de début", _sscenario->getPeriodStart().toString(), _startDate.toString());
-				DBLogModule::appendToLogIfChange(text, "Date de fin", _sscenario->getPeriodEnd().toString(), _endDate.toString());
+				DBLogModule::appendToLogIfChange(text, "Date de début", to_simple_string(_sscenario->getPeriodStart()), to_simple_string(_startDate));
+				DBLogModule::appendToLogIfChange(text, "Date de fin", to_simple_string(_sscenario->getPeriodEnd()), to_simple_string(_endDate));
 			}
 
 

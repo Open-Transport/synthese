@@ -35,8 +35,6 @@
 #include "Conversion.h"
 #include "Log.h"
 
-#include "DateTime.h"
-
 using namespace std;
 using namespace boost;
 
@@ -45,7 +43,6 @@ namespace synthese
 	using namespace util;
 	using namespace html;
 	using namespace security;
-	using namespace time;
 
 	namespace server
 	{

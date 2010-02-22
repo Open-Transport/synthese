@@ -26,7 +26,6 @@
 #include "CommercialLineAdmin.h"
 #include "EnvModule.h"
 #include "Profile.h"
-#include "Schedule.h"
 #include "CommercialLine.h"
 #include "HTMLTable.h"
 #include "HTMLModule.h"
@@ -43,6 +42,7 @@
 #include "TransportNetworkRight.h"
 #include "ServiceAdmin.h"
 #include "Request.h"
+#include "AdminFunctionRequest.hpp"
 
 #include "AdminParametersException.h"
 
@@ -50,6 +50,9 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
+
 
 namespace synthese
 {
@@ -59,7 +62,6 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace html;
-	using namespace time;
 	using namespace security;
 	using namespace graph;
 	using namespace pt;
@@ -177,7 +179,7 @@ namespace synthese
 						optional<RegistryKeyType>(),
 						optional<RegistryKeyType>(),
 						optional<string>(),
-						optional<Date>(),
+						optional<date>(),
 						false,
 						0,
 						optional<size_t>(),
@@ -188,6 +190,8 @@ namespace synthese
 					stream << "<p>Aucun service à horaire</p>";
 				else
 				{
+					AdminFunctionRequest<ServiceAdmin> serviceRequest(_request);
+
 					HTMLTable::ColsVector vs;
 					vs.push_back("Num");
 					vs.push_back("Numéro");
@@ -202,11 +206,13 @@ namespace synthese
 					size_t i(0);
 					BOOST_FOREACH(shared_ptr<ScheduledService> service, sservices)
 					{
+						serviceRequest.getPage()->setService(service);
+
 						string number("S"+ lexical_cast<string>(i++));
 						services[service.get()] = number;
 
-						Schedule ds(service->getDepartureSchedule(false, 0));
-						Schedule as(service->getLastArrivalSchedule(false));
+						time_duration ds(service->getDepartureSchedule(false, 0));
+						time_duration as(service->getLastArrivalSchedule(false));
 
 						stream << ts.row();
 
@@ -214,12 +220,14 @@ namespace synthese
 
 						stream << ts.col() << service->getServiceNumber();
 
-						stream << ts.col() << ds.toString();
-						stream << ts.col() << as.toString();
+						stream << ts.col() << ds;
+						stream << ts.col() << as;
 
 						stream << ts.col() << (as - ds);
 
 						stream << ts.col() << to_iso_extended_string(service->getLastActiveDate());
+
+						stream << ts.col() << HTMLModule::getLinkButton(serviceRequest.getURL(), "Ouvrir", string(), ServiceAdmin::ICON);
 					}
 
 					stream << ts.close();
@@ -245,6 +253,8 @@ namespace synthese
 					stream << "<p>Aucun service continu</p>";
 				else
 				{
+					AdminFunctionRequest<ServiceAdmin> serviceRequest(_request);
+
 					HTMLTable::ColsVector vc;
 					vc.push_back("Num");
 					vc.push_back("Départ premier");
@@ -262,6 +272,8 @@ namespace synthese
 					size_t i(0);
 					BOOST_FOREACH(shared_ptr<ContinuousService> service, cservices)
 					{
+						serviceRequest.getPage()->setService(service);
+
 						string number("C"+ lexical_cast<string>(i++));
 						services[service.get()] = number;
 
@@ -269,16 +281,16 @@ namespace synthese
 
 						stream << tc.col() << number;
 
-						Schedule ds(service->getDepartureSchedule(false, 0));
-						Schedule as(service->getLastArrivalSchedule(false));
+						time_duration ds(service->getDepartureSchedule(false, 0));
+						time_duration as(service->getLastArrivalSchedule(false));
 
-						stream << tc.col() << ds.toString();
+						stream << tc.col() << ds;
 						ds += service->getRange();
-						stream << tc.col() << ds.toString();
+						stream << tc.col() << ds;
 
-						stream << tc.col() << as.toString();
+						stream << tc.col() << as;
 						as += service->getRange();
-						stream << tc.col() << as.toString();
+						stream << tc.col() << as;
 
 						stream << tc.col() << (as - ds);
 
@@ -286,6 +298,8 @@ namespace synthese
 						stream << tc.col() << service->getMaxWaitingTime();
 
 						stream << tc.col() << to_iso_extended_string(service->getLastActiveDate());
+
+						stream << tc.col() << HTMLModule::getLinkButton(serviceRequest.getURL(), "Ouvrir", string(), ServiceAdmin::ICON);
 					}
 
 					stream << tc.close();
@@ -331,7 +345,7 @@ namespace synthese
 							{
 								const Service* service(*index.get(false));
 								stream << services[service];
-								stream << "<br /><span class=\"mini\">" << service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath()).toString() << "</span>";
+								stream << "<br /><span class=\"mini\">" << service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath()) << "</span>";
 							}
 						}
 					}
@@ -354,7 +368,7 @@ namespace synthese
 							{
 								const Service* service(*index.get(false));
 								stream << services[service];
-								stream << "<br /><span class=\"mini\">" << service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath()).toString() << "</span>";
+								stream << "<br /><span class=\"mini\">" << service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath()) << "</span>";
 							}
 						}
 					}

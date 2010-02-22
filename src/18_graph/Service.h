@@ -24,21 +24,17 @@
 #define SYNTHESE_ENV_SERVICE_H
 
 #include "ServicePointer.h"
-#include "Schedule.h"
 #include "Registrable.h"
 #include "Registry.h"
 #include "RuleUser.h"
 
 #include <string>
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
+#include <boost/date_time/gregorian/greg_date.hpp>
 
 namespace synthese
 {
-	namespace time
-	{
-		class Date;
-		class DateTime;
-	}
-
 	namespace graph
 	{
 		class Path;
@@ -95,16 +91,6 @@ namespace synthese
 				Path*				getPath ();
 				uid					getPathId()			const;
 				const std::string&	getServiceNumber()	const;
-
-
-				/** Gets a departure schedule for this service.
-					@param rank Rank of the stop where to get the departure schedule
-					@return see the implementations of the method.
-				*/
-				virtual time::Schedule getDepartureSchedule(
-					bool RTData,
-					size_t rank
-				) const = 0;
 			//@}
 
 			//! @name Setters
@@ -124,25 +110,28 @@ namespace synthese
 
 				virtual std::string getTeam() const;
 
-				virtual time::Schedule getDepartureBeginScheduleToIndex(
+				virtual boost::posix_time::time_duration getDepartureBeginScheduleToIndex(
 					bool RTData,
 					std::size_t rankInPath
 				) const = 0;
-				virtual time::Schedule getDepartureEndScheduleToIndex(
+				
+				virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(
 					bool RTData,
 					std::size_t rankInPath
 				) const = 0;
-				virtual time::Schedule getArrivalBeginScheduleToIndex(
+				
+				virtual boost::posix_time::time_duration getArrivalBeginScheduleToIndex(
 					bool RTData,
 					std::size_t rankInPath
 				) const = 0;
-				virtual time::Schedule getArrivalEndScheduleToIndex(
+
+				virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(
 					bool RTData,
 					std::size_t rankInPath
 				) const = 0;
 
 				virtual bool nonConcurrencyRuleOK(
-					const time::Date& date,
+					const boost::gregorian::date& date,
 					const graph::Edge& departureEdge,
 					const graph::Edge& arrivalEdge,
 					graph::UserClassCode userClass
@@ -183,14 +172,14 @@ namespace synthese
 				virtual ServicePointer getFromPresenceTime(
 					bool RTData,
 					AccessDirection method,
-					UserClassCode userClass
-					, const Edge* edge
-					, const time::DateTime& presenceDateTime
+					UserClassCode userClass,
+					const Edge* edge,
+					const boost::posix_time::ptime& presenceDateTime
 					, bool controlIfTheServiceIsReachable
 					, bool inverted
 				) const = 0;
 
-				virtual time::DateTime getLeaveTime(
+				virtual boost::posix_time::ptime getLeaveTime(
 					const ServicePointer& servicePointer
 					, const Edge* edge
 				) const = 0;
@@ -198,17 +187,39 @@ namespace synthese
 				/** Date of the departure from the origin of the service.
 				@param departureDate Date of use of the service at the scheduled point
 				@param departureTime Known schedule of departure in the service journey
-				@return time::DateTime Date of the departure from the origin of the service.
+				@return Date of the departure from the origin of the service.
 				@author Hugues Romain
 				@date 2007
 
 				*/
-				time::DateTime getOriginDateTime(
+				boost::posix_time::ptime getOriginDateTime(
 					bool RTData,
-					const time::Date& departureDate,
-					const time::Schedule& departureTime
+					const boost::gregorian::date& departureDate,
+					const boost::posix_time::time_duration& departureTime
 				) const;
+
+				/** Gets a departure schedule for this service.
+					@param rank Rank of the stop where to get the departure schedule
+					@return see the implementations of the method.
+				*/
+				virtual boost::posix_time::time_duration getDepartureSchedule(
+					bool RTData,
+					size_t rank
+				) const = 0;
 			//@}
+
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the time of day of a duration which can be greater than 24 hours
+			/// Example : 25:00:00 => 1:00:00
+			/// @param value the duration to transform
+			/// @result the time of day duration
+			static boost::posix_time::time_duration GetTimeOfDay(const boost::posix_time::time_duration& value);
+
+			static std::string EncodeSchedule(const boost::posix_time::time_duration& value);
+			static boost::posix_time::time_duration DecodeSchedule(const std::string value);
 		};
 	}
 }

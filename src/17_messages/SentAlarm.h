@@ -25,7 +25,6 @@
 
 #include "Alarm.h"
 #include "17_messages/Types.h"
-#include "DateTime.h"
 #include "Registry.h"
 
 namespace synthese

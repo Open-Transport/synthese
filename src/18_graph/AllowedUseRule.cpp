@@ -1,33 +1,42 @@
-//
-// C++ Implementation: UseRule
-//
-// Description: 
-//
-//
-// Author: Hugues Romain (RCS) <hugues.romain@reseaux-conseil.com>, (C) 2009
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
+
+/** AllowedUseRule class implementation.
+	@file AllowedUseRule.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 
 #include "AllowedUseRule.h"
-#include "DateTime.h"
 #include "AccessParameters.h"
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace time;
-
 	namespace graph
 	{
 		shared_ptr<const AllowedUseRule> AllowedUseRule::INSTANCE(new AllowedUseRule);
 
-		time::DateTime AllowedUseRule::getReservationDeadLine(
-			const time::DateTime& originTime,
-			const time::DateTime& departureTime
+		boost::posix_time::ptime AllowedUseRule::getReservationDeadLine(
+			const boost::posix_time::ptime& originTime,
+			const boost::posix_time::ptime& departureTime
 		) const	{
 			return departureTime;
 		}
@@ -37,9 +46,9 @@ namespace synthese
 			return AccessCapacity();
 		}
 
-		time::DateTime AllowedUseRule::getReservationOpeningTime( const ServicePointer& servicePointer ) const
+		boost::posix_time::ptime AllowedUseRule::getReservationOpeningTime( const ServicePointer& servicePointer ) const
 		{
-			return DateTime(TIME_MIN);
+			return ptime(neg_infin);
 		}
 
 		UseRule::RunPossibilityType AllowedUseRule::isRunPossible(

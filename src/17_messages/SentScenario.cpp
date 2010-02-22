@@ -25,10 +25,10 @@
 #include "Registry.h"
 
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace time;
 	using namespace util;
 
 	namespace util
@@ -44,8 +44,8 @@ namespace synthese
 		):	Registrable(key),
 			Scenario()
 			, _isEnabled(false)
-			, _periodStart(TIME_CURRENT)
-			, _periodEnd(TIME_UNKNOWN)
+			, _periodStart(second_clock::local_time())
+			, _periodEnd(not_a_date_time)
 			, _template(NULL)
 		{
 		}
@@ -55,8 +55,8 @@ namespace synthese
 		):	Scenario(source.getName()),
 			Registrable(UNKNOWN_VALUE),
 			_isEnabled(false),
-			_periodStart(TIME_CURRENT),
-			_periodEnd(TIME_UNKNOWN),
+			_periodStart(second_clock::local_time()),
+			_periodEnd(not_a_date_time),
 			_template(&source)
 		{
 		}
@@ -67,31 +67,31 @@ namespace synthese
 		):	Scenario(source._template ? source._template->getName() : source.getName()),
 			Registrable(UNKNOWN_VALUE),
 			_isEnabled(false),
-			_periodStart(TIME_CURRENT),
-			_periodEnd(TIME_UNKNOWN),
+			_periodStart(second_clock::local_time()),
+			_periodEnd(not_a_date_time),
 			_template(source._template),
 			_variables(source._variables)
 		{
 		}
 
 
-		void SentScenario::setPeriodStart( const synthese::time::DateTime& periodStart )
+		void SentScenario::setPeriodStart( const ptime& periodStart )
 		{
 			_periodStart = periodStart;
 		}
 
-		void SentScenario::setPeriodEnd( const synthese::time::DateTime& periodEnd )
+		void SentScenario::setPeriodEnd( const ptime& periodEnd )
 		{
 			_periodEnd = periodEnd;
 		}
 
 
-		const time::DateTime& SentScenario::getPeriodStart() const
+		const ptime& SentScenario::getPeriodStart() const
 		{
 			return _periodStart;
 		}
 
-		const time::DateTime& SentScenario::getPeriodEnd() const
+		const ptime& SentScenario::getPeriodEnd() const
 		{
 			return _periodEnd;
 		}
@@ -127,24 +127,24 @@ namespace synthese
 			return conflictStatus;
 		}
 
-		bool SentScenario::isApplicable( const time::DateTime& start, const time::DateTime& end ) const
+		bool SentScenario::isApplicable( const ptime& start, const ptime& end ) const
 		{
 			// Disabled alarm is never applicable
 			if (!getIsEnabled())
 				return false;
 
 			// Start date control
-			if (!getPeriodStart().isUnknown() && end < getPeriodStart())
+			if (!getPeriodStart().is_not_a_date_time() && end < getPeriodStart())
 				return false;
 
 			// End date control
-			if (!getPeriodEnd().isUnknown() && start >= getPeriodEnd())
+			if (!getPeriodEnd().is_not_a_date_time() && start >= getPeriodEnd())
 				return false;
 
 			return true;
 		}
 
-		bool SentScenario::isApplicable( const time::DateTime& date ) const
+		bool SentScenario::isApplicable( const ptime& date ) const
 		{
 			return isApplicable(date, date);
 		}

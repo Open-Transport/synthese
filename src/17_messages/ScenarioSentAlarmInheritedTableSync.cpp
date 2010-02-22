@@ -141,7 +141,7 @@ namespace synthese
 }
 
 /* voir si c interessant
-void SingleSentAlarmInheritedTableSync::Search( util::Env& env, time::DateTime startDate , time::DateTime endDate , AlarmConflict conflict , AlarmLevel level , int first, int number, bool orderByDate, bool orderByLevel,
+void SingleSentAlarmInheritedTableSync::Search( util::Env& env, ptime startDate , ptime endDate , AlarmConflict conflict , AlarmLevel level , int first, int number, bool orderByDate, bool orderByLevel,
 bool orderByStatus, bool orderByConflict, bool raisingOrder, util::LinkLevel linkLevel )
 {
 	SQLite* sqlite = DBModule::GetSQLite();
@@ -160,10 +160,10 @@ bool orderByStatus, bool orderByConflict, bool raisingOrder, util::LinkLevel lin
 		<< " WHERE "
 		<< "a." << COL_IS_TEMPLATE << "=0"
 		<< " AND " << COL_SCENARIO_ID << "=0";
-	if (!startDate.isUnknown())
-		query << " AND a." << COL_PERIODSTART << "<=" << startDate.toSQLString();
-	if (!endDate.isUnknown())
-		query << " AND a." << COL_PERIODEND << ">=" << endDate.toSQLString();
+	if (!startDate.is_not_a_date_time())
+		query << " AND a." << COL_PERIODSTART << "<=" << startDate.();
+	if (!endDate.is_not_a_date_time())
+		query << " AND a." << COL_PERIODEND << ">=" << endDate.();
 	if (conflict == ALARM_NO_CONFLICT)
 		query << " AND " << _COL_CONFLICT_LEVEL << " IS NULL";
 	if (conflict == ALARM_WARNING_ON_INFO)

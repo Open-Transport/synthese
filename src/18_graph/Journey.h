@@ -28,7 +28,6 @@
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 #include "ServiceUse.h"
-#include "DateTime.h"
 #include "GraphTypes.h"
 
 namespace synthese
@@ -51,7 +50,7 @@ namespace synthese
 		private:
 			typedef const ServiceUse& (Journey::*ServiceUseGetter) () const;
 			typedef const Edge* (Journey::*EdgeGetter) () const;
-			typedef time::DateTime (Journey::*DateTimeGetter) () const;
+			typedef boost::posix_time::ptime (Journey::*DateTimeGetter) () const;
 			typedef void (Journey::*JourneyPusher) (const Journey& journey);
 			typedef void (Journey::*ServiceUsePusher) (const ServiceUse& serviceUse);
 
@@ -81,7 +80,6 @@ namespace synthese
 			
 			//! @name Oriented operators
 			//@{
-				time::DateTime::ComparisonOperator	_bestTimeStrictOperator;
 				ServiceUseGetter					_endServiceUseGetter;
 				ServiceUseGetter					_beginServiceUseGetter;
 				EdgeGetter							_endEdgeGetter;
@@ -126,7 +124,6 @@ namespace synthese
 				*/
 				boost::posix_time::time_duration			getContinuousServiceRange () const;
 				bool		getEndReached() const;
-				const time::DateTime::ComparisonOperator& getBestTimeStrictOperator() const;
 				Score			getScore()	const;
 				boost::posix_time::time_duration getStartApproachDuration()	const;
 				boost::posix_time::time_duration getEndApproachDuration()	const;
@@ -164,11 +161,11 @@ namespace synthese
 				const Edge* getDestination() const;
 
 				const Edge* getEndEdge() const;
-				time::DateTime getEndTime() const;
-				time::DateTime getBeginTime() const;
+				boost::posix_time::ptime getEndTime() const;
+				boost::posix_time::ptime getBeginTime() const;
 
-				time::DateTime getDepartureTime () const;
-				time::DateTime getArrivalTime () const;
+				boost::posix_time::ptime getDepartureTime () const;
+				boost::posix_time::ptime getArrivalTime () const;
 
 				boost::posix_time::time_duration getDuration () const;
 				double getDistance () const;
@@ -195,7 +192,7 @@ namespace synthese
 
 
 				boost::logic::tribool	getReservationCompliance() const;
-				time::DateTime			getReservationDeadLine() const;
+				boost::posix_time::ptime			getReservationDeadLine() const;
 			//@}
 
 

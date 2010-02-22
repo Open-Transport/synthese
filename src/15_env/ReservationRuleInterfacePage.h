@@ -35,11 +35,6 @@ namespace synthese
 	{
 		class Request;
 	}
-
-	namespace time
-	{
-		class DateTime;
-	}
 	
 	namespace graph
 	{

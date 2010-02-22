@@ -21,7 +21,6 @@
 */
 
 #include "ResaModule.h"
-#include "DateTime.h"
 #include "HTMLModule.h"
 #include "Profile.h"
 #include "ProfileTableSync.h"
@@ -58,7 +57,6 @@ namespace synthese
 	using namespace env;
 	using namespace server;
 	using namespace admin;
-	using namespace time;
 	using namespace dblog;
 	using namespace util;
 	using namespace resa;
@@ -167,9 +165,9 @@ namespace synthese
 					stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Place réservée sur ce tronçon");
 				}
 				stream << " de " << (*itrs)->getDeparturePlaceName();
-				stream << " le " << (*itrs)->getDepartureTime().getDate().getTextWeekDay() << " " << (*itrs)->getDepartureTime().toString();
+				stream << " le " << (*itrs)->getDepartureTime().date().day_of_week() << " " << (*itrs)->getDepartureTime();
 				stream << " jusqu'à " << (*itrs)->getArrivalPlaceName();
-				stream << " le " << (*itrs)->getArrivalTime().getDate().getTextWeekDay() << " " <<(*itrs)->getArrivalTime().toString();
+				stream << " le " << (*itrs)->getArrivalTime().date().day_of_week() << " " << (*itrs)->getArrivalTime();
 				stream << "</li>";
 			}
 			stream << "</ul>";

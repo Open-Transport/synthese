@@ -51,7 +51,7 @@ namespace synthese
 			/// @name Search parameters
 			//@{
 				std::string				_searchName;
-			// html::ResultHTMLTable::RequestParameters	_requestParameters;
+				html::ResultHTMLTable::RequestParameters	_requestParameters;
 			//@}
 
 		protected:

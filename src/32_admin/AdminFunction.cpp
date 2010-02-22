@@ -114,8 +114,8 @@ namespace synthese
 				);
 				_page->setEnv(shared_ptr<Env>(new Env));
 				_errorMessage = map.getOptional<string>(Request::PARAMETER_ERROR_MESSAGE);
-				_activeTab = map.getDefault<string>(PARAMETER_TAB);
 				_page->setFromParametersMap(map);
+				_page->setActiveTab(map.getDefault<string>(PARAMETER_TAB));
 			}
 			catch (FactoryException<AdminInterfaceElement> e)
 			{
@@ -134,7 +134,6 @@ namespace synthese
 				if(request.getSession())
 				{
 					_page->_buildTabs(*request.getSession()->getUser()->getProfile());
-					_page->setActiveTab(_activeTab);
 					if (_interface && _interface->getPage<AdminInterfacePage>())
 					{
 						_interface->getPage<AdminInterfacePage>()->display(

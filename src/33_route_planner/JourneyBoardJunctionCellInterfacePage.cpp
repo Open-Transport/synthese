@@ -25,6 +25,11 @@
 #include "Place.h"
 #include "Road.h"
 #include "RoadPlace.h"
+#include "GeoPoint.h"
+#include "Vertex.h"
+#include "Projection.h"
+#include "Hub.h"
+#include "NamedPlace.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -38,6 +43,7 @@ namespace synthese
 	using namespace util;
 	using namespace geography;
 	using namespace road;
+	using namespace graph;
 	
 
 	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::JourneyBoardJunctionCellInterfacePage>::FACTORY_KEY("journey_board_junction_cell");
@@ -51,17 +57,20 @@ namespace synthese
 
 		void JourneyBoardJunctionCellInterfacePage::display( 
 		    ostream& stream
-		    , const Place* place
+		    , const Vertex& vertex
 		    , const SentAlarm* alarm
 		    , bool color
 			, const Road* road
 			, double distance
 		    , const server::Request* request /*= NULL */
 		) const	{
+
+			GeoPoint point(WGS84FromLambert(vertex));
+
 			ParametersVector pv;
-			pv.push_back("" /*Conversion::ToString(place->getKey())*/);
-			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
-			pv.push_back(alarm == NULL ? "" : alarm->getLongMessage());
+			pv.push_back(lexical_cast<string>(point.getLongitude()));
+			pv.push_back(lexical_cast<string>(point.getLatitude()));
+			pv.push_back(lexical_cast<string>(dynamic_cast<const NamedPlace*>(vertex.getHub()) != NULL));
 			pv.push_back(lexical_cast<string>(color));
 			pv.push_back((road && road->getRoadPlace()) ? road->getRoadPlace()->getName() : string());
 			pv.push_back(lexical_cast<string>(distance));

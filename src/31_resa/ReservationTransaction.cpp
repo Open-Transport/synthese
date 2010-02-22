@@ -25,13 +25,15 @@
 #include "Reservation.h"
 #include "ResaModule.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
 
 	namespace util
 	{
@@ -45,10 +47,10 @@ namespace synthese
 		ReservationTransaction::ReservationTransaction(
 			RegistryKeyType key
 		):	Registrable(key)
-			, _bookingTime(TIME_CURRENT)
-			, _cancellationTime(TIME_UNKNOWN)
-			, _originDateTime(TIME_UNKNOWN)
-			, _destinationDateTime(TIME_UNKNOWN)
+			, _bookingTime(second_clock::local_time())
+			, _cancellationTime(not_a_date_time)
+			, _originDateTime(not_a_date_time)
+			, _destinationDateTime(not_a_date_time)
 			, _cancelUserId(UNKNOWN_VALUE)
 			, _bookingUserId(UNKNOWN_VALUE)
 			, _customerUserId(UNKNOWN_VALUE)
@@ -67,12 +69,12 @@ namespace synthese
 			_seats = seats;
 		}
 
-		void ReservationTransaction::setBookingTime( const time::DateTime& time )
+		void ReservationTransaction::setBookingTime( const ptime& time )
 		{
 			_bookingTime = time;
 		}
 
-		void ReservationTransaction::setCancellationTime( const time::DateTime& time )
+		void ReservationTransaction::setCancellationTime( const ptime& time )
 		{
 			_cancellationTime = time;
 		}
@@ -112,12 +114,12 @@ namespace synthese
 			return _seats;
 		}
 
-		const time::DateTime& ReservationTransaction::getBookingTime() const
+		const ptime& ReservationTransaction::getBookingTime() const
 		{
 			return _bookingTime;
 		}
 
-		const time::DateTime& ReservationTransaction::getCancellationTime() const
+		const ptime& ReservationTransaction::getCancellationTime() const
 		{
 			return _cancellationTime;
 		}
@@ -199,10 +201,10 @@ namespace synthese
 
 			switch(status)
 			{
-			case OPTION: return statusText + " pouvant être annulée avant le " + getReservationDeadLine().toString();
-			case CANCELLED: return statusText + " le " + _cancellationTime.toString();
-			case CANCELLED_AFTER_DELAY: return statusText + " le " + _cancellationTime.toString();
-			case NO_SHOW: return statusText + " constatée le " + _cancellationTime.toString();
+			case OPTION: return statusText + " pouvant être annulée avant le " + to_simple_string(getReservationDeadLine());
+			case CANCELLED: return statusText + " le " + to_simple_string(_cancellationTime);
+			case CANCELLED_AFTER_DELAY: return statusText + " le " + to_simple_string(_cancellationTime);
+			case NO_SHOW: return statusText + " constatée le " + to_simple_string(_cancellationTime);
 			}
 
 			return statusText;
@@ -210,12 +212,12 @@ namespace synthese
 
 
 
-		time::DateTime ReservationTransaction::getReservationDeadLine() const
+		ptime ReservationTransaction::getReservationDeadLine() const
 		{
-			DateTime result(TIME_UNKNOWN);
+			ptime result(not_a_date_time);
 			for (Reservations::const_iterator it(_reservations.begin()); it != _reservations.end(); ++it)
 			{
-				if (!(*it)->getReservationDeadLine().isUnknown() && (result.isUnknown() || (*it)->getReservationDeadLine() < result))
+				if (!(*it)->getReservationDeadLine().is_not_a_date_time() && (result.is_not_a_date_time() || (*it)->getReservationDeadLine() < result))
 					result = (*it)->getReservationDeadLine();
 			}
 			return result;

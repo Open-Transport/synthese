@@ -11,7 +11,6 @@
 //
 
 #include "UseRule.h"
-#include "DateTime.h"
 
 #include <limits>
 
@@ -19,8 +18,6 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace time;
-	
 	namespace graph
 	{
 		UseRule::UseRule(

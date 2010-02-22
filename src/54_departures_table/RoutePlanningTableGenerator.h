@@ -27,11 +27,6 @@
 
 namespace synthese
 {
-	namespace time
-	{
-		class DateTime;
-	}
-
 	namespace env
 	{
 		class PublicTransportStopZoneConnectionPlace;
@@ -47,8 +42,8 @@ namespace synthese
 			//@{
 				const env::PublicTransportStopZoneConnectionPlace& _origin;
 				const DisplayedPlacesList _destinations;
-				const time::DateTime _startDateTime;
-				const time::DateTime _endDateTime;
+				const boost::posix_time::ptime _startDateTime;
+				const boost::posix_time::ptime _endDateTime;
 				bool _withTransfer;
 			//@}
 
@@ -56,8 +51,8 @@ namespace synthese
 			RoutePlanningTableGenerator(
 				const env::PublicTransportStopZoneConnectionPlace& origin,
 				const DisplayedPlacesList& destinations,
-				const time::DateTime& startDateTime,
-				const time::DateTime& endDateTime,
+				const boost::posix_time::ptime& startDateTime,
+				const boost::posix_time::ptime& endDateTime,
 				bool withTransfer
 			);
 

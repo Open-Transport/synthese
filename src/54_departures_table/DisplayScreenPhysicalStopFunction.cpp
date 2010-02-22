@@ -39,12 +39,11 @@
 #include "DisplayScreen.h"
 #include "DisplayType.h"
 
-#include "DateTime.h"
-
 #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -52,8 +51,7 @@ namespace synthese
 	using namespace server;
 	using namespace env;
 	using namespace interfaces;
-	using namespace time;
-
+	
 	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenPhysicalStopFunction>::FACTORY_KEY("td");
 	
 	namespace departurestable
@@ -93,7 +91,7 @@ namespace synthese
 
 		void DisplayScreenPhysicalStopFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			DateTime date(TIME_CURRENT);
+			ptime date(second_clock::local_time());
 			_screen->display(stream, date, &request);
 		}
 

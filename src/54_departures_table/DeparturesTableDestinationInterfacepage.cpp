@@ -29,9 +29,11 @@
 #include "Edge.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -73,7 +75,7 @@ namespace synthese
 			pv.push_back(place->getName26()); //3
 			pv.push_back(place->getName13()); //4
 			pv.push_back(lexical_cast<string>(lastDisplayedStopWasInTheSameCity)); //5
-			pv.push_back(object.getSecondActualDateTime().toString()); //6
+			pv.push_back(to_simple_string(object.getSecondActualDateTime())); //6
 			pv.push_back(lexical_cast<string>(isTheEndStation)); //7
 			pv.push_back(transfersString); //8
 

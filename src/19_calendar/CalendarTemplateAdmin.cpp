@@ -101,11 +101,11 @@ namespace synthese
 			{
 				throw AdminParametersException("No such calendar");
 			}
-			if(map.getOptional<string>(PARAMETER_RESULT_START))
+			if(!map.getDefault<string>(PARAMETER_RESULT_START).empty())
 			{
 				_resultStartDate = from_string(get<string>(PARAMETER_RESULT_START));
 			}
-			if(map.getOptional<string>(PARAMETER_RESULT_END))
+			if(!map.getDefault<string>(PARAMETER_RESULT_END).empty())
 			{
 				_resultEndDate = from_string(get<string>(PARAMETER_RESULT_END));
 			}

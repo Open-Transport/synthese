@@ -30,7 +30,6 @@
 #include "Line.h"
 #include "CommercialLine.h"
 #include "RollingStock.h"
-#include "Schedule.h"
 #include "ScheduleRealTimeUpdateAction.h"
 #include "RealTimeUpdateFunction.h"
 #include "Interface.h"
@@ -41,6 +40,7 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -48,6 +48,7 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace server;
+	using namespace graph;
 
 	namespace util
 	{
@@ -95,10 +96,10 @@ namespace synthese
 				string()
 			); //7
 
-			pv.push_back(service.getDepartureSchedule(false, lineStop.getRankInPath()).getHour().toString()); //8
-			pv.push_back(service.getDepartureSchedule(true, lineStop.getRankInPath()).getHour().toString()); //9
+			pv.push_back(to_simple_string(Service::GetTimeOfDay(service.getDepartureSchedule(false, lineStop.getRankInPath())))); //8
+			pv.push_back(to_simple_string(Service::GetTimeOfDay(service.getDepartureSchedule(true, lineStop.getRankInPath())))); //9
 			pv.push_back(
-				lexical_cast<string>(service.getDepartureSchedule(true, lineStop.getRankInPath()) - service.getDepartureSchedule(false, lineStop.getRankInPath()))
+				to_simple_string(service.getDepartureSchedule(true, lineStop.getRankInPath()) - service.getDepartureSchedule(false, lineStop.getRankInPath()))
 			); //10
 
 			if(request)

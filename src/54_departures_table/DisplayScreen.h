@@ -150,7 +150,7 @@ namespace synthese
 
 			//!	\name Protected
 			//@{
-				time::DateTime	_MomentFin(const time::DateTime& __MomentDebut)			const;
+				boost::posix_time::ptime	_MomentFin(const boost::posix_time::ptime& __MomentDebut)			const;
 			//@}
 
 		public:
@@ -264,13 +264,13 @@ namespace synthese
 
 			//! \name Queries
 			//@{
-				boost::shared_ptr<ArrivalDepartureTableGenerator>	getGenerator(const time::DateTime& startTime)		const;
+				boost::shared_ptr<ArrivalDepartureTableGenerator>	getGenerator(const boost::posix_time::ptime& startTime)		const;
 				
 				//////////////////////////////////////////////////////////////////////////
 				/// Display the content generated for the screen
 				void display(
 					std::ostream& stream,
-					const time::DateTime& date,
+					const boost::posix_time::ptime& date,
 					const server::Request* request
 				) const;
 

@@ -68,17 +68,18 @@ namespace synthese
 
 
 
-		void InterfacePage::parse( const std::string& text )
+		void InterfacePage::parse()
 		{
+			_components.clear();
 			int counter = 0;
 			size_t start_pos;
 			size_t end_pos;
 			std::string last_label = "";
-			for (start_pos = 0; start_pos < text.size(); start_pos = end_pos + 1)
+			for (start_pos = 0; start_pos < _source.size(); start_pos = end_pos + 1)
 			{
-				for (end_pos = start_pos; end_pos < text.size() && text[end_pos] != '\n'; ++end_pos);
+				for (end_pos = start_pos; end_pos < _source.size() && _source[end_pos] != '\n' && _source[end_pos] != '\r'; ++end_pos);
 
-				std::string line = text.substr(start_pos, end_pos - start_pos);
+				std::string line = _source.substr(start_pos, end_pos - start_pos);
 				shared_ptr<LibraryInterfaceElement> lie;
 				try
 				{
@@ -172,6 +173,20 @@ namespace synthese
 		void InterfacePage::setMimeType( const std::string& value )
 		{
 			_mimeType = value;
+		}
+
+
+
+		void InterfacePage::setSource( const std::string& value )
+		{
+			_source = value;
+		}
+
+
+
+		const std::string& InterfacePage::getSource() const
+		{
+			return _source;
 		}
 	}
 }

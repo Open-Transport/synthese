@@ -27,10 +27,10 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace time;
 	using namespace util;
 
 	namespace util
@@ -40,7 +40,7 @@ namespace synthese
 
 	namespace dblog
 	{
-		void DBLogEntry::setDate( const time::DateTime& date )
+		void DBLogEntry::setDate( const boost::posix_time::ptime& date )
 		{
 			_date = date;
 		}
@@ -59,7 +59,7 @@ namespace synthese
 			_content = content;
 		}
 
-		time::DateTime DBLogEntry::getDate() const
+		boost::posix_time::ptime DBLogEntry::getDate() const
 		{
 			return _date;
 		}
@@ -111,7 +111,7 @@ namespace synthese
 
 		DBLogEntry::DBLogEntry(RegistryKeyType key)
 		:	Registrable(key),
-			_date(TIME_CURRENT)
+			_date(second_clock::local_time())
 			, _userId(UNKNOWN_VALUE)
 		{
 

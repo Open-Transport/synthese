@@ -51,7 +51,6 @@ namespace synthese
 {
 	using namespace util;
 	using namespace env;
-	using namespace time;
 	using namespace dblog;
 	using namespace interfaces;
 	using namespace graph;
@@ -221,7 +220,7 @@ namespace synthese
 
 		void DisplayScreen::display(
 			std::ostream& stream,
-			const DateTime& date,
+			const ptime& date,
 			const server::Request* request
 		) const {
 			if (!_displayType || !_displayType->getDisplayInterface() || !_maintenanceIsOnline || !_localization)
@@ -232,10 +231,10 @@ namespace synthese
 				shared_ptr<ArrivalDepartureTableGenerator> generator;
 
 				// End time
-				DateTime realStartDateTime(date);
-				realStartDateTime -= _clearingDelay;
-				DateTime endDateTime(realStartDateTime);
-				endDateTime += _maxDelay;
+				ptime realStartDateTime(date);
+				realStartDateTime -= minutes(_clearingDelay);
+				ptime endDateTime(realStartDateTime);
+				endDateTime += minutes(_maxDelay);
 
 				VariablesMap variables;
 
@@ -314,7 +313,7 @@ namespace synthese
 								, endDateTime
 								, _displayType->getRowNumber()
 								, _forcedDestinations
-								, _destinationForceDelay
+								, minutes(_destinationForceDelay)
 						)	)	);
 					}
 

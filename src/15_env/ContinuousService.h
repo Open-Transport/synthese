@@ -41,15 +41,15 @@ namespace synthese
 		:	public NonPermanentService
 		{
 		public:
-			typedef std::vector<std::pair<time::Schedule, time::Schedule> > Schedules;
+			typedef std::vector<std::pair<boost::posix_time::time_duration, boost::posix_time::time_duration> > Schedules;
 
 			/// Chosen registry class.
 			typedef util::Registry<ContinuousService>	Registry;
 
 		private:
 
-			int			_range;				//!< Continuous service range (minutes).
-			int			_maxWaitingTime;	//!< Max waiting waiting time before next service.
+			boost::posix_time::time_duration			_range;				//!< Continuous service range (minutes).
+			boost::posix_time::time_duration			_maxWaitingTime;	//!< Max waiting waiting time before next service.
 			Schedules	_departureSchedules;	//!< Departure schedules at each Edge
 			Schedules	_arrivalSchedules;		//!< Arrival schedules at each edge
 		    
@@ -60,22 +60,23 @@ namespace synthese
 				util::RegistryKeyType id = UNKNOWN_VALUE,
 				std::string serviceNumber = std::string(),
 				graph::Path* path = NULL,
-				int range = 0,
-				int maxWaitingTime = 0);
+				boost::posix_time::time_duration range = boost::posix_time::time_duration(0,0,0),
+				boost::posix_time::time_duration maxWaitingTime = boost::posix_time::time_duration(0,0,0)
+			);
 
 			~ContinuousService ();
 
 		    
 			//! @name Getters
 			//@{
-				int getMaxWaitingTime () const;
-				int getRange () const;
+				boost::posix_time::time_duration getMaxWaitingTime () const;
+				boost::posix_time::time_duration getRange () const;
 			//@}
 
 			//! @name Setters
 			//@{
-				void setMaxWaitingTime (int maxWaitingTime);
-				void setRange (int range);
+				void setMaxWaitingTime (boost::posix_time::time_duration maxWaitingTime);
+				void setRange (boost::posix_time::time_duration range);
 				void setDepartureSchedules(const Schedules& schedules);
 				void setArrivalSchedules(const Schedules& schedules);
 			//@}
@@ -103,42 +104,45 @@ namespace synthese
 					graph::AccessDirection method,
 					graph::UserClassCode userClass
 					, const graph::Edge* edge
-					, const time::DateTime& presenceDateTime
+					, const boost::posix_time::ptime& presenceDateTime
 					, bool controlIfTheServiceIsReachable
 					, bool inverted
 				) const;
 
-				virtual time::DateTime getLeaveTime(
+				virtual boost::posix_time::ptime getLeaveTime(
 					const graph::ServicePointer& servicePointer
 					, const graph::Edge* edge
 				) const;
 
 				/** Gets a departure schedule for this service.
 					@param rank Rank of the stop where to get the departure schedule
-					@return time::Schedule The first schedule of the continuous range, at the specified stop rank
+					@return The first schedule of the continuous range, at the specified stop rank
 				*/
-				virtual time::Schedule getDepartureSchedule(
+				virtual boost::posix_time::time_duration getDepartureSchedule(
 					bool RTData,
 					std::size_t rank
 				) const;
 
-				virtual const time::Schedule& getLastArrivalSchedule(
+				virtual const boost::posix_time::time_duration& getLastArrivalSchedule(
 					bool RTData
 				) const;
 
-				virtual time::Schedule getDepartureBeginScheduleToIndex(
+				virtual boost::posix_time::time_duration getDepartureBeginScheduleToIndex(
 					bool RTData,
 					std::size_t rankInPath
 				) const;
-				virtual time::Schedule getDepartureEndScheduleToIndex(
+
+				virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(
 					bool RTData,
 					std::size_t rankInPath
 				) const;
-				virtual time::Schedule getArrivalBeginScheduleToIndex(
+
+				virtual boost::posix_time::time_duration getArrivalBeginScheduleToIndex(
 					bool RTData,
 					std::size_t rankInPath
 				) const;
-				virtual time::Schedule getArrivalEndScheduleToIndex(
+
+				virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(
 					bool RTData,
 					std::size_t rankInPath
 				) const;

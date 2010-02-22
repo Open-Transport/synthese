@@ -35,9 +35,12 @@
 #include "PublicTransportStopZoneConnectionPlace.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
@@ -45,7 +48,6 @@ namespace synthese
 	using namespace interfaces;
 	using namespace env;
 	using namespace util;
-	using namespace time;
 	using namespace graph;
 
 	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::JourneyBoardServiceCellInterfacePage>::FACTORY_KEY("journey_board_service_cell");
@@ -75,7 +77,7 @@ namespace synthese
 		void JourneyBoardServiceCellInterfacePage::display(
 			std::ostream& stream
 			, const ServiceUse& serviceUse
-			, int continuousServiceRange
+			, time_duration continuousServiceRange
 			, logic::tribool handicappedFilterStatus
 			, logic::tribool bikeFilterStatus
 			, const SentAlarm* alarm
@@ -83,9 +85,9 @@ namespace synthese
 			, const server::Request* request /*= NULL */
 		) const	{
 			// Continuous service
-			DateTime lastDepartureDateTime(serviceUse.getDepartureDateTime());
-			DateTime lastArrivalDateTime(serviceUse.getArrivalDateTime());
-			if (continuousServiceRange)
+			ptime lastDepartureDateTime(serviceUse.getDepartureDateTime());
+			ptime lastArrivalDateTime(serviceUse.getArrivalDateTime());
+			if (continuousServiceRange.total_seconds())
 			{
 				lastArrivalDateTime += continuousServiceRange;
 				lastDepartureDateTime += continuousServiceRange;
@@ -98,10 +100,32 @@ namespace synthese
 
 			// Build of the parameters vector
 			ParametersVector pv;
-			pv.push_back( serviceUse.getDepartureDateTime().getHour().toString() ); // 0
-			pv.push_back( continuousServiceRange ? lastDepartureDateTime.getHour().toString() : string() );
-			pv.push_back( serviceUse.getArrivalDateTime().getHour().toString() );
-			pv.push_back( continuousServiceRange ? lastArrivalDateTime.getHour().toString() : string() );
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << serviceUse.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << serviceUse.getDepartureDateTime().time_of_day().minutes();
+				pv.push_back(s.str()); // 0
+			}
+			{
+				stringstream s;
+				if(continuousServiceRange.total_seconds() > 0)
+				{
+					s << setw(2) << setfill('0') << lastDepartureDateTime.time_of_day().hours() << ":" << setw(2) << setfill('0') << lastDepartureDateTime.time_of_day().minutes();
+				}
+				pv.push_back(s.str()); // 1
+			}
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << serviceUse.getArrivalDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << serviceUse.getArrivalDateTime().time_of_day().minutes();
+				pv.push_back(s.str()); // 2
+			}
+			{
+				stringstream s;
+				if(continuousServiceRange.total_seconds() > 0)
+				{
+					s << setw(2) << setfill('0') << lastArrivalDateTime.time_of_day().hours() << ":" << setw(2) << setfill('0') << lastArrivalDateTime.time_of_day().minutes();
+				}
+				pv.push_back(s.str()); // 3
+			}
 			pv.push_back( line->getRollingStock() ? Conversion::ToString(line->getRollingStock()->getKey()) : string()  ); // 4
 			pv.push_back( line->getRollingStock() ? line->getRollingStock()->getName() : string() ); // 5
 			pv.push_back( line->getRollingStock() ? line->getRollingStock()->getArticle() : string()  ); // 6
@@ -120,7 +144,7 @@ namespace synthese
 			)	); // 11
 			pv.push_back( commercialLine->getShortName() ); // 12
 			pv.push_back( commercialLine->getLongName() ); // 13
-			pv.push_back( continuousService ? Conversion::ToString(continuousService->getMaxWaitingTime()) : string() ); // 14
+			pv.push_back( continuousService ? Conversion::ToString(continuousService->getMaxWaitingTime().total_seconds() / 60) : string() ); // 14
 			pv.push_back( commercialLine->getStyle() ); //15
 			pv.push_back( commercialLine->getImage() );
 			pv.push_back( lexical_cast<string>(commercialLine->getKey()) ); // 17

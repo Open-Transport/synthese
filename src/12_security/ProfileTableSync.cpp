@@ -20,7 +20,6 @@
 */
 
 #include "ProfileTableSync.h"
-#include "UserTableSyncException.h"
 #include "Right.h"
 #include "Profile.h"
 
@@ -28,8 +27,7 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-
-#include "Conversion.h"
+#include "ReplaceQuery.h"
 #include "01_util/Log.h"
 #include "Factory.h"
 
@@ -114,31 +112,11 @@ namespace synthese
 			Profile* profile,
 			optional<SQLiteTransaction&> transaction
 		){
-			try
-			{
-				SQLite* sqlite = DBModule::GetSQLite();
-				if (profile->getKey() <= 0)
-					profile->setKey(getId());
-				
-				stringstream query;
-				query
-					<< "REPLACE INTO " << TABLE.NAME
-					<< " VALUES(" 
-					<< profile->getKey()
-					<< "," << Conversion::ToSQLiteString(profile->getName())
-					<< "," << (profile->getParent() == NULL ? 0 : profile->getParent()->getKey())
-					<< "," << Conversion::ToSQLiteString(ProfileTableSync::getRightsString(profile))
-					<< ")";
-				sqlite->execUpdate(query.str(), transaction);
-			}
-			catch (SQLiteException& e)
-			{
-				throw UserTableSyncException("Insert/Update error " + e.getMessage());
-			}
-			catch (...)
-			{
-				throw UserTableSyncException("Unknown Insert/Update error");
-			}
+			ReplaceQuery<ProfileTableSync> query(*profile);
+			query.addField(profile->getName());
+			query.addField(profile->getParent() == NULL ? RegistryKeyType(0) : profile->getParent()->getKey());
+			query.addField(ProfileTableSync::getRightsString(profile));
+			query.execute(transaction);
 		}
 
 

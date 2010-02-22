@@ -27,7 +27,6 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "DateTime.h"
 #include "ResultHTMLTable.h"
 #include "DBLogEntry.h"
 #include "AdminInterfaceElementTemplate.h"

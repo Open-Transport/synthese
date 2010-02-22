@@ -80,6 +80,9 @@ namespace synthese
 			virtual boost::posix_time::ptime getTimestamp (const std::string& name) const;
 
 			boost::posix_time::time_duration getDuration(const std::string& name) const;
+			boost::posix_time::ptime getDateTime(const std::string& name) const;
+			boost::gregorian::date getDate(const std::string& name) const;
+			boost::posix_time::time_duration getHour(const std::string& name) const;
 
 			virtual SQLiteResultRow getRow () const;
 

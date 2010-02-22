@@ -1,4 +1,13 @@
 
+#include "InterfaceRight.h"
+
+#include "InterfaceAdmin.h"
+#include "InterfacePageAdmin.h"
+
+#include "InterfaceUpdateAction.h"
+#include "InterfacePageAddAction.h"
+#include "InterfacePageUpdateAction.h"
+
 #include "11_interfaces/InterfaceTableSync.h"
 #include "11_interfaces/InterfacePageTableSync.h"
 #include "11_interfaces/InterfaceModule.h"

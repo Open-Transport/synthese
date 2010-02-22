@@ -31,9 +31,10 @@
 
 #include "AlarmRecipient.h"
 #include "SentAlarm.h"
-#include "DateTime.h"
 #include "FactorableTemplate.h"
 #include "SentScenario.h"
+
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace synthese
 {
@@ -68,7 +69,7 @@ namespace synthese
 	    static LinkedObjectsSet	getLinkedObjects(const SentAlarm* alarm);
 
 	    static const SentAlarm* getAlarm(const T* object);
-	    static const SentAlarm* getAlarm(const T* object, const time::DateTime& date);
+		static const SentAlarm* getAlarm(const T* object, const boost::posix_time::ptime& date);
 
 		static void getStaticParametersLabels(security::ParameterLabelsVector& m);
 
@@ -156,7 +157,7 @@ namespace synthese
 	}
 
 	template<class T, class C>
-	    const SentAlarm* AlarmRecipientTemplate<T, C>::getAlarm( const T* object, const time::DateTime& date )
+	const SentAlarm* AlarmRecipientTemplate<T, C>::getAlarm( const T* object, const boost::posix_time::ptime& date )
 	{
 	    typename ObjectLinks::const_iterator it = _linksObject.find(object);
 	    if (it == _linksObject.end())
@@ -172,7 +173,7 @@ namespace synthese
 					alarm == NULL ||
 					candidateAlarm->getLevel() > alarm->getLevel() ||
 					candidateAlarm->getLevel() == alarm->getLevel() &&
-					!candidateAlarm->getScenario()->getPeriodStart().isUnknown() &&
+					!candidateAlarm->getScenario()->getPeriodStart().is_not_a_date_time() &&
 					candidateAlarm->getScenario()->getPeriodStart() > alarm->getScenario()->getPeriodStart()
 			)	) alarm = candidateAlarm;
 
@@ -183,7 +184,8 @@ namespace synthese
 	template<class T, class C>
 	    const SentAlarm* AlarmRecipientTemplate<T, C>::getAlarm( const T* object )
 	{
-	    return AlarmRecipientTemplate<T, C>::getAlarm(object, time::DateTime(time::TIME_CURRENT));
+		boost::posix_time::ptime now(boost::posix_time::second_clock::local_time());
+	    return AlarmRecipientTemplate<T, C>::getAlarm(object, now);
 	}
 
 	template<class T, class C>

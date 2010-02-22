@@ -31,6 +31,9 @@ synthese::pt::PhysicalStopsCSVExportFunction::integrate();
 synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
 synthese::pt::ScheduleRealTimeUpdateAction::integrate();
 synthese::pt::ServiceVertexRealTimeUpdateAction::integrate();
+synthese::pt::TransportNetworkAddAction::integrate();
+synthese::pt::CommercialLineAddAction::integrate();
+synthese::pt::LineAddAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 

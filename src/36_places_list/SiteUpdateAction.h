@@ -25,11 +25,11 @@
 #ifndef SYNTHESE_SiteUpdateAction_H__
 #define SYNTHESE_SiteUpdateAction_H__
 
-#include "30_server/Action.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
-#include "01_util/FactorableTemplate.h"
-
-#include "04_time/Date.h"
+#include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/date_time/gregorian/greg_duration_types.hpp>
 
 namespace synthese
 {
@@ -63,12 +63,12 @@ namespace synthese
 			boost::shared_ptr<Site>							_site;
 			std::string										_name;
 			boost::shared_ptr<const interfaces::Interface>	_interface;
-			time::Date										_startDate;
-			time::Date										_endDate;
+			boost::gregorian::date										_startDate;
+			boost::gregorian::date										_endDate;
 			bool											_onlineBooking;
 			bool											_useOldData;
 			int												_maxConnections;
-			int												_useDatesRange;
+			boost::gregorian::date_duration							_useDatesRange;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

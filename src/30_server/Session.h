@@ -26,8 +26,7 @@
 #include <string>
 
 #include <boost/shared_ptr.hpp>
-
-#include "DateTime.h"
+#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace synthese
 {
@@ -47,7 +46,7 @@ namespace synthese
 			const std::string			_key;
 			const std::string			_ip;
 			boost::shared_ptr<const security::User>	_user;
-			synthese::time::DateTime	_lastUse;
+			boost::posix_time::ptime	_lastUse;
 
 			static const size_t KEY_LENGTH;
 			static const int MAX_MINUTES_DURATION;

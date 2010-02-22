@@ -27,7 +27,6 @@
 
 #include "ParametersMap.h"
 #include "Request.h"
-#include "DateTime.h"
 #include "Conversion.h"
 
 #include <boost/tokenizer.hpp>
@@ -37,11 +36,12 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
 
 	namespace server
 	{
@@ -119,23 +119,7 @@ namespace synthese
 			return result.empty() ? defaultValue : Conversion::ToBool(result);
 		}
 
-		time::DateTime ParametersMap::getDateTime( const std::string& parameterName , bool neededParameter , const std::string& source ) const
-		{
-			const string result(getString(parameterName, neededParameter, source));
-			return result.empty() ? DateTime(TIME_UNKNOWN) : DateTime::FromSQLTimestamp(result);
-		}
 
-		time::Date ParametersMap::getDate( const std::string& parameterName , bool neededParameter , const std::string& source ) const
-		{
-			const string result(getString(parameterName, neededParameter, source));
-			return result.empty() ? Date(TIME_UNKNOWN) : Date::FromSQLDate(result);
-		}
-
-		time::Hour ParametersMap::getHour( const std::string& parameterName , bool neededParameter , const std::string& source ) const
-		{
-			const string result(getString(parameterName, neededParameter, source));
-			return result.empty() ? Hour(TIME_UNKNOWN) : Hour::FromSQLTime(result);
-		}
 
 		void ParametersMap::insert( const std::string& parameterName, const std::string& value )
 		{
@@ -162,19 +146,25 @@ namespace synthese
 			insert(parameterName, Conversion::ToString(value));
 		}
 
-		void ParametersMap::insert( const std::string& parameterName, const time::DateTime& value )
-		{
-			insert(parameterName, value.toSQLString(false));
+		void ParametersMap::insert(
+			const std::string& parameterName,
+			const ptime& value
+		){
+			insert(parameterName, value.is_not_a_date_time() ? string() : to_iso_extended_string(value.date()) + " " + to_simple_string(value.time_of_day()));
 		}
 
-		void ParametersMap::insert( const std::string& parameterName, const time::Hour& value )
-		{
-			insert(parameterName, value.toSQLString(false));
+		void ParametersMap::insert(
+			const std::string& parameterName,
+			const time_duration& value
+		){
+			insert(parameterName, value.is_not_a_date_time() ? string() : to_simple_string(value));
 		}
 
-		void ParametersMap::insert( const std::string& parameterName, const time::Date& value )
-		{
-			insert(parameterName, value.toSQLString(false));
+		void ParametersMap::insert(
+			const std::string& parameterName,
+			const date& value
+		){
+			insert(parameterName, value.is_not_a_date() ? string() : to_iso_extended_string(value));
 		}
 
 		const ParametersMap::Map& ParametersMap::getMap() const
@@ -209,20 +199,6 @@ namespace synthese
 		}
 
 
-
-		boost::optional<time::Date> ParametersMap::getOptionalDate( const std::string& parameterName ) const
-		{
-			optional<string> result(getOptionalString(parameterName));
-			return result ? Date::FromSQLOptionalDate(*result) : optional<Date>();
-		}
-
-
-
-		boost::optional<std::string> ParametersMap::getOptionalString( const std::string& parameterName ) const
-		{
-			Map::const_iterator it(_map.find(parameterName));
-			return (it == _map.end()) ? optional<string>() : optional<string>(it->second);
-		}
 
 
 

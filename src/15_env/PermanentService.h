@@ -46,14 +46,14 @@ namespace synthese
 				@warning Only a 0 value is allowed for the rank.
 				@return time::Schedule The schedule at the specified stop rank
 			*/
-			virtual time::Schedule getDepartureSchedule(bool RTData, std::size_t rank = 0) const;
+			virtual boost::posix_time::time_duration getDepartureSchedule(bool RTData, std::size_t rank = 0) const;
 
 			virtual bool isContinuous () const;
 
-			virtual time::Schedule getDepartureBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
-			virtual time::Schedule getDepartureEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
-			virtual time::Schedule getArrivalBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
-			virtual time::Schedule getArrivalEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+			virtual boost::posix_time::time_duration getDepartureBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+			virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+			virtual boost::posix_time::time_duration getArrivalBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+			virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
 
 			/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
 				@param method Search departure or arrival :
@@ -74,12 +74,12 @@ namespace synthese
 				graph::AccessDirection method,
 				graph::UserClassCode userClass
 				, const graph::Edge* edge
-				, const time::DateTime& presenceDateTime
+				, const boost::posix_time::ptime& presenceDateTime
 				, bool controlIfTheServiceIsReachable
 				, bool inverted
 			) const;
 
-			virtual time::DateTime getLeaveTime(
+			virtual boost::posix_time::ptime getLeaveTime(
 				const graph::ServicePointer& servicePointer
 				, const graph::Edge* edge
 			) const;

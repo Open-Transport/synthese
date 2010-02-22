@@ -56,7 +56,6 @@ namespace synthese
 			//@{
 				boost::shared_ptr<AdminInterfaceElement>	_page;
 				boost::shared_ptr<AdminInterfaceElement>	_actionFailedPage;
-				std::string		_activeTab;
 				boost::optional<std::string>	_errorMessage;
 			//@}
 

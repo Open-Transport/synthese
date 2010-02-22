@@ -48,7 +48,9 @@ namespace synthese
 				j1->getEndReached()
 			){
 				if (j1->getEndTime() != j2->getEndTime())
-					return (j1->getEndTime().*(j1->getBestTimeStrictOperator())) (j2->getEndTime());
+				{
+					return j1->getMethod() == DEPARTURE_TO_ARRIVAL ? j1->getEndTime() < j2->getEndTime() : j2->getEndTime() < j1->getEndTime();
+				}
 
 				posix_time::time_duration pedestrianDuration1(j1->getStartApproachDuration() + j1->getEndApproachDuration());
 				posix_time::time_duration pedestrianDuration2(j2->getStartApproachDuration() + j2->getEndApproachDuration());
@@ -91,7 +93,9 @@ namespace synthese
 
 			// Priority 3 : end time
 			if (j1->getEndTime() != j2->getEndTime())
-				return (j1->getEndTime().*j1->getBestTimeStrictOperator())(j2->getEndTime());
+			{
+				return j1->getMethod() == DEPARTURE_TO_ARRIVAL ? j1->getEndTime() < j2->getEndTime() : j2->getEndTime() < j1->getEndTime();
+			}
 
 			// Priority 4 : addresses order (to differentiate journeys in all cases)
 			return j1 < j2;

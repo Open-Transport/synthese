@@ -31,7 +31,6 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-#include "DateTime.h"
 
 #include <sstream>
 
@@ -43,7 +42,6 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace messages;
-	using namespace time;
 
 	namespace util
 	{

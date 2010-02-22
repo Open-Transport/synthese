@@ -58,6 +58,9 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
+
 
 namespace synthese
 {
@@ -66,7 +69,6 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace resa;
-	using namespace time;
 	using namespace env;
 	using namespace html;
 	using namespace security;
@@ -94,7 +96,7 @@ namespace synthese
 
 		BookableCommercialLineAdmin::BookableCommercialLineAdmin()
 			: AdminInterfaceElementTemplate<BookableCommercialLineAdmin>(),
-			_date(TIME_UNKNOWN),
+			_date(not_a_date_time),
 			_hideOldServices(false),
 			_displayCancelled(false)
 		{ }
@@ -106,13 +108,16 @@ namespace synthese
 			// Date
 			try
 			{
-				_date = map.getDate(PARAMETER_DATE, false, FACTORY_KEY);
-				if(_date.isUnknown())
+				if(!map.getDefault<string>(PARAMETER_DATE).empty())
 				{
-					_date = Date(TIME_CURRENT);
-					if(Hour(TIME_CURRENT) < Hour(3,0))
+					_date = from_string(map.get<string>(PARAMETER_DATE));
+				}
+				else
+				{
+					_date = day_clock::local_day();
+					if(second_clock::local_time().time_of_day() < time_duration(3,0,0))
 					{
-						_date--;
+						_date -= days(1);
 					}
 					_hideOldServices = true;
 				}
@@ -158,9 +163,9 @@ namespace synthese
 		server::ParametersMap BookableCommercialLineAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			if(!_hideOldServices)
+			if(!_hideOldServices && !_date.is_not_a_date())
 			{
-				m.insert(PARAMETER_DATE, _date);
+				m.insert(PARAMETER_DATE, to_iso_extended_string(_date));
 			}
 			m.insert(PARAMETER_DISPLAY_CANCELLED, _displayCancelled);
 			if(_line.get()) m.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
@@ -170,9 +175,11 @@ namespace synthese
 
 
 
-		void BookableCommercialLineAdmin::display(ostream& stream, VariablesMap& variables,
-					const admin::AdminRequest& _request) const
-		{
+		void BookableCommercialLineAdmin::display(
+			ostream& stream,
+			VariablesMap& variables,
+			const admin::AdminRequest& _request
+		) const	{
 			// Rights
 			bool globalReadRight(
 				_request.isAuthorized<ResaRight>(security::READ,UNKNOWN_RIGHT_LEVEL)
@@ -193,7 +200,7 @@ namespace synthese
 			
 
 			// Local variables
-			DateTime now(TIME_CURRENT);
+			ptime now(second_clock::local_time());
 
 			// Temporary variables
 			int seatsNumber(0);
@@ -260,14 +267,14 @@ namespace synthese
 
 				SearchFormHTMLTable st(searchRequest.getHTMLForm());
 				stream << st.open();
-				stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _date.toGregorianDate()));
+				stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _date));
 				stream << st.cell("Afficher annulations", st.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_CANCELLED, _displayCancelled));
 				stream << st.close();
 				
 				stream << "<h1>Liens</h1>";
 				
-				Date date(_date);
-				date -= 1;
+				date date(_date);
+				date -= days(1);
 				searchRequest.getPage()->_hideOldServices = false;
 				searchRequest.getPage()->_date = date;
 				
@@ -290,7 +297,7 @@ namespace synthese
 					) << " ";
 				
 				date = _date;
-				date += 1;
+				date += days(1);
 				searchRequest.getPage()->_hideOldServices = false;
 				searchRequest.getPage()->_date = date;
 
@@ -328,12 +335,12 @@ namespace synthese
 						"ATTENTION Cette liste de réservations est provisoire tant que le service est ouvert à la réservation." <<
 						"</p>"
 					;
-					DateTime deadLine(sortedServices[0]->getReservationDeadLine(_date));
+					ptime deadLine(sortedServices[0]->getReservationDeadLine(_date));
 					stream <<
 						"<p class=\"info\">" <<
 						"Le service sera fermé à la réservation à partir du " <<
-						deadLine.getDate().toString() <<
-						" à " << deadLine.getHour().toString() <<
+						deadLine.date() <<
+						" à " << deadLine.time_of_day() <<
 						"</p>"
 					;
 				}
@@ -387,7 +394,7 @@ namespace synthese
 					
 					stream << t.col(6, string(), true) << "Service " << service->getServiceNumber() << " - départ de " <<
 						dynamic_cast<const NamedPlace*>(static_cast<const Line*>(service->getPath())->getEdge(0)->getHub())->getFullName() <<
-						" à " << service->getDepartureSchedule(false, 0).getHour().toString();
+						" à " << Service::GetTimeOfDay(service->getDepartureSchedule(false, 0));
 					if (serviceSeatsNumber > 0)
 						stream << " - " << serviceSeatsNumber << " place" << plural << " réservée" << plural;
 
@@ -423,18 +430,18 @@ namespace synthese
 						stream << t.col() << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), reservation->getFullStatusText());
 						stream <<
 							t.col() <<
-							(	reservation->getDepartureTime().getDate() != _date ?
-								reservation->getDepartureTime().toString() :
-								reservation->getDepartureTime().getHour().toString()
+							(	reservation->getDepartureTime().date() != _date ?
+								to_simple_string(reservation->getDepartureTime()) :
+								to_simple_string(reservation->getDepartureTime().time_of_day())
 							)
 						;
 						stream << t.col() << reservation->getDeparturePlaceName();
 						stream << t.col() << reservation->getArrivalPlaceName();
 						stream <<
 							t.col() <<
-							(	reservation->getArrivalTime().getDate() != _date ?
-								reservation->getArrivalTime().toString() :
-								reservation->getArrivalTime().getHour().toString()
+							(	reservation->getArrivalTime().date() != _date ?
+								to_simple_string(reservation->getArrivalTime())	:
+								to_simple_string(reservation->getArrivalTime().time_of_day())
 							)
 						;
 						stream << t.col() << reservation->getTransaction()->getSeats();
@@ -532,15 +539,15 @@ namespace synthese
 					)	);
 					if(services.empty()) return string();
 
-					DateTime date(_date, services[0]->getDepartureSchedule(false, 0));
+					ptime date(_date, services[0]->getDepartureSchedule(false, 0));
 					s <<
 						"Ligne " << _line->getShortName() <<
 						" - service " << services[0]->getServiceNumber() <<
 						" - départ de " << dynamic_cast<const NamedPlace*>(
 								static_cast<const Line*>(services[0]->getPath())->getEdge(0)->getHub()
 							)->getFullName() <<
-						" le " << date.getDate().toString() <<
-						" à " << date.getHour().toString()
+						" le " << date.date() <<
+						" à " << date.time_of_day()
 					;
 				}
 				else

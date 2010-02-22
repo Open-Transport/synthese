@@ -11,22 +11,20 @@
 //
 
 #include "ForbiddenUseRule.h"
-#include "DateTime.h"
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace time;
-
 	namespace graph
 	{
 		shared_ptr<const ForbiddenUseRule> ForbiddenUseRule::INSTANCE(new ForbiddenUseRule);
 
-		time::DateTime ForbiddenUseRule::getReservationDeadLine( const time::DateTime& originTime, const time::DateTime& departureTime ) const
+		ptime ForbiddenUseRule::getReservationDeadLine( const ptime& originTime, const ptime& departureTime ) const
 		{
-			return DateTime(TIME_MIN);
+			return ptime(neg_infin);
 		}
 
 		UseRule::AccessCapacity ForbiddenUseRule::getAccessCapacity() const
@@ -34,10 +32,10 @@ namespace synthese
 			return AccessCapacity(0);
 		}
 
-		time::DateTime ForbiddenUseRule::getReservationOpeningTime(
+		ptime ForbiddenUseRule::getReservationOpeningTime(
 			const ServicePointer& servicePointer
 		) const	{
-			return DateTime(TIME_MAX);
+			return ptime(pos_infin);
 		}
 
 		UseRule::RunPossibilityType ForbiddenUseRule::isRunPossible(

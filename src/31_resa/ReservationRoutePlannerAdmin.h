@@ -55,7 +55,7 @@ namespace synthese
 			std::string						_startPlace;
 			std::string						_endCity;
 			std::string						_endPlace;
-			time::DateTime					_dateTime;
+			boost::posix_time::ptime		_dateTime;
 			bool							_disabledPassenger;
 			bool										_withoutTransfer;
 			boost::shared_ptr<ReservationTransaction>	_confirmedTransaction;

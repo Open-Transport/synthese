@@ -29,21 +29,22 @@
 #include "TimetableServiceRowInterfacePage.h"
 #include "Interface.h"
 #include "InterfacePageException.h"
-#include "Schedule.h"
 #include "Env.h"
 #include "TimetableTableSync.h"
+#include "Service.h"
 
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
 	using namespace timetables;
-	using namespace time;
+	using namespace graph;
 
 	namespace util
 	{
@@ -116,7 +117,7 @@ namespace synthese
 				case Timetable::TABLE_SERVICES_IN_ROWS:
 					{
 						const TimetableServiceRowInterfacePage* page(getInterface()->getPage<TimetableServiceRowInterfacePage>());
-						Schedule lastSchedule;
+						time_duration lastSchedule;
 						size_t rank(0);
 						size_t followingWithSameHour;
 						for(TimetableGenerator::Columns::const_iterator it(generator.getColumns().begin()); it != generator.getColumns().end(); ++it)
@@ -125,7 +126,7 @@ namespace synthese
 
 							followingWithSameHour = 1;
 							for(TimetableGenerator::Columns::const_iterator it2(it+1); 
-								it2 != generator.getColumns().end() && it2->getContent().begin()->second.getHour().getHours() == it->getContent().begin()->second.getHour().getHours();
+								it2 != generator.getColumns().end() && Service::GetTimeOfDay(it2->getContent().begin()->second).hours() == Service::GetTimeOfDay(it->getContent().begin()->second).hours();
 								++it2
 							){
 								++followingWithSameHour;

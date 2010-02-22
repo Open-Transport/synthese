@@ -31,6 +31,9 @@
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
+#include "TransportNetworkAddAction.h"
+#include "CommercialLineAddAction.h"
+#include "LineAddAction.h"
 
 #include "TransportNetworkRight.h"
 

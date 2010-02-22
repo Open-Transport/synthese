@@ -31,13 +31,10 @@
 #include "TimetableWarning.h"
 #include "TimetableRow.h"
 
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
+
 namespace synthese
 {
-	namespace time
-	{
-		class Schedule;
-	}
-	
 	namespace util
 	{
 		class Env;
@@ -62,16 +59,18 @@ namespace synthese
 			typedef std::vector<TimetableColumn>			Columns;
 			typedef std::vector<TimetableRow>				Rows;
 			typedef std::set<const env::CommercialLine*>	AuthorizedLines;
+			typedef std::set<const env::PhysicalStop*>		AuthorizedPhysicalStops;
 
 		private:
 
 			//! @name Content definition
 			//@{
-				Rows				_rows;
-				calendar::Calendar		_baseCalendar;
+				Rows						_rows;
+				calendar::Calendar			_baseCalendar;
 				AuthorizedLines				_authorizedLines;
-				bool				_withContinuousServices;
-				const util::Env&	_env;
+				AuthorizedPhysicalStops		_authorizedPhysicalStops;
+				bool						_withContinuousServices;
+				const util::Env&			_env;
 			//@}
 
 			//! @name Rendering parameters
@@ -105,6 +104,7 @@ namespace synthese
 				const Warnings&	getWarnings()	const;
 				const Rows&		getRows()		const;
 				const Columns&	getColumns()	const;
+				const AuthorizedPhysicalStops& getAuthorizedPhysicalStops() const;
 			//@}
 
 			//! @name Actions
@@ -114,7 +114,7 @@ namespace synthese
 
 			//! @name Output by row
 			//@{
-				std::vector<time::Schedule>		getSchedulesByRow(Rows::const_iterator row)	const;
+				std::vector<boost::posix_time::time_duration>		getSchedulesByRow(Rows::const_iterator row)	const;
 				std::vector<const env::Line*>	getLines()									const;
 				std::vector<tTypeOD>			getOriginTypes()							const;
 				std::vector<tTypeOD>			getDestinationTypes()						const;
@@ -126,6 +126,7 @@ namespace synthese
 				void setRows(const Rows& rows);
 				void setBaseCalendar(const calendar::Calendar& value);
 				void setAuthorizedLines(const AuthorizedLines& value);
+				void setAuthorizedPhysicalStops(const AuthorizedPhysicalStops& value);
 			//@}
 		};
 	}

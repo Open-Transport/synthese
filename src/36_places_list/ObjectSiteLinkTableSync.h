@@ -58,9 +58,11 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				uid siteId = UNKNOWN_VALUE
-				, int first = 0
-				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				boost::optional<util::RegistryKeyType> siteId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> objectId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<int> objectTableId = boost::optional<int>(),
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 

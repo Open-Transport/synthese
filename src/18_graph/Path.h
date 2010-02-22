@@ -33,11 +33,6 @@
 
 namespace synthese
 {
-	namespace time
-	{
-		class DateTime;
-	}
-
 	namespace geometry
 	{
 		class Point2D;

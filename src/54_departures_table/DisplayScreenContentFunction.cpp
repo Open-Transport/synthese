@@ -41,12 +41,12 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace server;
-	using namespace time;
 	using namespace env;
 	using namespace interfaces;
 	using namespace db;
@@ -63,7 +63,7 @@ namespace synthese
 		ParametersMap DisplayScreenContentFunction::_getParametersMap() const
 		{
 			ParametersMap map;
-			if(_date) map.insert(PARAMETER_DATE, *_date);
+			if(_date && _date->is_not_a_date_time()) map.insert(PARAMETER_DATE, *_date);
 			if(_screen.get()) map.insert(Request::PARAMETER_OBJECT_ID, _screen->getKey());
 			return map;
 		}
@@ -106,9 +106,9 @@ namespace synthese
 				}
 
 				// Date
-				if(map.getOptional<string>(PARAMETER_DATE))
+				if(!map.getDefault<string>(PARAMETER_DATE).empty())
 				{
-					_date = map.getDateTime(PARAMETER_DATE, false, FACTORY_KEY);
+					_date = time_from_string(map.get<string>(PARAMETER_DATE));
 				}
 			}
 			catch (ObjectNotFoundException<DisplayScreen> e)
@@ -119,7 +119,7 @@ namespace synthese
 
 		void DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			_screen->display(stream, _date ? *_date : DateTime(TIME_CURRENT), &request);
+			_screen->display(stream, _date ? *_date : second_clock::local_time(), &request);
 		}
 
 

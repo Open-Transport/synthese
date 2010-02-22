@@ -23,11 +23,8 @@
 // At first to avoid the Windows bug "WinSock.h has already been included"
 #include "ServerModule.h"
 
-#include <time.h>
 #include <stdlib.h>
 #include <boost/lexical_cast.hpp>
-
-#include "DateTime.h"
 
 #include "Session.h"
 #include "SessionException.h"
@@ -36,11 +33,11 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace util;
-	using namespace time;
 	using namespace security;
 
 	namespace server
@@ -51,7 +48,7 @@ namespace synthese
 		Session::Session(const std::string& ip)
 			: _ip(ip)
 			, _key(generateKey())
-			, _lastUse(TIME_CURRENT)
+			, _lastUse(second_clock::local_time())
 		{
 			ServerModule::getSessions().insert(make_pair(_key, this));
 		}
@@ -61,9 +58,11 @@ namespace synthese
 			if (ip != _ip)
 				throw SessionException("IP has changed during the session.");
 
-			DateTime now(TIME_CURRENT);
-			if (now.getSecondsDifference(_lastUse).total_seconds() / 60 > MAX_MINUTES_DURATION)
+			ptime now(second_clock::local_time());
+			if( (now - _lastUse) > minutes(MAX_MINUTES_DURATION))
+			{
 				throw SessionException("Session is too old");
+			}
 
 			_lastUse = now;
 		}

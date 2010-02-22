@@ -46,6 +46,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -145,11 +146,25 @@ namespace synthese
 			if (openTabContent(stream, TAB_SCHEDULES))
 			{
 				AdminActionFunctionRequest<ScheduleRealTimeUpdateAction, ServiceAdmin> scheduleUpdateRequest(request);
-				scheduleUpdateRequest.getPage()->setService(_service);
+				if(_scheduledService.get())
+				{
+					scheduleUpdateRequest.getPage()->setService(_scheduledService);
+				}
+				else
+				{
+					scheduleUpdateRequest.getPage()->setService(_continuousService);
+				}
 				scheduleUpdateRequest.getAction()->setService(_scheduledService);
 
 				AdminActionFunctionRequest<ServiceVertexRealTimeUpdateAction, ServiceAdmin> vertexUpdateRequest(request);
-				vertexUpdateRequest.getPage()->setService(_service);
+				if(_scheduledService.get())
+				{
+					vertexUpdateRequest.getPage()->setService(_scheduledService);
+				}
+				else
+				{
+					vertexUpdateRequest.getPage()->setService(_continuousService);
+				}
 				vertexUpdateRequest.getAction()->setService(_scheduledService);
 
 				stream << "<h1>Horaires</h1>";
@@ -181,24 +196,24 @@ namespace synthese
 					stream << ts.col();
 					if(lineStop.isArrival())
 					{
-						stream << _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath()).toString();
+						stream << _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath());
 					}
 					stream << ts.col();
 					if(lineStop.isArrival() && !(_service->getArrivalBeginScheduleToIndex(true, lineStop.getRankInPath()) == _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath())))
 					{
-						int delta(_service->getArrivalBeginScheduleToIndex(true, lineStop.getRankInPath()) - _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath()));
-						stream << (delta > 0 ? "+" : string()) << delta << " min";
+						time_duration delta(_service->getArrivalBeginScheduleToIndex(true, lineStop.getRankInPath()) - _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath()));
+						stream << (delta.total_seconds() > 0 ? "+" : string()) << delta << " min";
 					}
 					stream << ts.col();
 					if(lineStop.isDeparture())
 					{
-						stream << _service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath()).toString();
+						stream << _service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath());
 					}
 					stream << ts.col();
 					if(lineStop.isDeparture() && !(_service->getDepartureBeginScheduleToIndex(true, lineStop.getRankInPath()) == _service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath())))
 					{
-						int delta(_service->getDepartureBeginScheduleToIndex(true, lineStop.getRankInPath()) - _service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath()));
-						stream << (delta > 0 ? "+" : string()) << delta << " min";
+						time_duration delta(_service->getDepartureBeginScheduleToIndex(true, lineStop.getRankInPath()) - _service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath()));
+						stream << (delta.total_seconds() > 0 ? "+" : string()) << delta << " min";
 					}
 					if(_scheduledService.get())
 					{
@@ -305,28 +320,6 @@ namespace synthese
 			_service = static_pointer_cast<const NonPermanentService, const ContinuousService>(value);
 		}
 
-
-
-		void ServiceAdmin::setService( boost::shared_ptr<const env::NonPermanentService> value )
-		{
-			_service = value;
-			if(dynamic_cast<const ScheduledService*>(_service.get()))
-			{
-				_scheduledService = dynamic_pointer_cast<const ScheduledService, const NonPermanentService>(_service);
-				_continuousService.reset();
-			}
-			else if(dynamic_cast<const ContinuousService*>(_service.get()))
-			{
-				_scheduledService.reset();
-				_continuousService = dynamic_pointer_cast<const ContinuousService, const NonPermanentService>(_service);
-			}
-			else
-			{
-				_scheduledService.reset();
-				_continuousService.reset();
-				_service.reset();
-			}
-		}
 
 
 		boost::shared_ptr<const NonPermanentService> ServiceAdmin::getService() const

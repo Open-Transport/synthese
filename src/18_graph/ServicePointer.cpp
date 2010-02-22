@@ -25,16 +25,13 @@
 #include "UseRule.h"
 #include "Edge.h"
 
-#include "04_time/module.h"
-
 #include "01_util/Constants.h"
 
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace time;
-
 	namespace graph
 	{
 
@@ -44,13 +41,10 @@ namespace synthese
 			UserClassCode userClassCode,
 			const Edge* edge
 		):	_RTData(RTData),
-			_service(NULL)
-			, _originDateTime(TIME_UNKNOWN)
-			, _determinationMethod(method)
-			, _actualTime(TIME_UNKNOWN),
-			_theoreticalTime(TIME_UNKNOWN)
-			, _range(posix_time::seconds(0))
-			, _edge(edge),
+			_service(NULL),
+			_determinationMethod(method),
+			_range(posix_time::seconds(0)),
+			_edge(edge),
 			_userClass(userClassCode),
 			_useRule(NULL),
 			_RTVertex(edge ? edge->getFromVertex() : NULL)
@@ -64,10 +58,7 @@ namespace synthese
 			_edge(NULL),
 			_RTVertex(NULL),
 			_determinationMethod(UNDEFINED_DIRECTION),
-			_actualTime(TIME_UNKNOWN),
-			_theoreticalTime(TIME_UNKNOWN),
 			_useRule(NULL),
-			_originDateTime(TIME_UNKNOWN),
 			_range(posix_time::seconds(0))
 		{}
 
@@ -80,7 +71,7 @@ namespace synthese
 		
 		
 
-		void ServicePointer::setActualTime( const time::DateTime& dateTime )
+		void ServicePointer::setActualTime( const ptime& dateTime )
 		{
 			_actualTime = dateTime;
 		}
@@ -91,7 +82,7 @@ namespace synthese
 			_useRule = &service->getUseRule(_userClass);
 		}
 
-		void ServicePointer::setOriginDateTime( const time::DateTime& dateTime )
+		void ServicePointer::setOriginDateTime( const ptime& dateTime )
 		{
 			_originDateTime = dateTime;
 		}
@@ -110,12 +101,12 @@ namespace synthese
 			return _service;
 		}
 
-		const time::DateTime& ServicePointer::getActualDateTime() const
+		const ptime& ServicePointer::getActualDateTime() const
 		{
 			return _actualTime;
 		}
 
-		const time::DateTime& ServicePointer::getOriginDateTime() const
+		const ptime& ServicePointer::getOriginDateTime() const
 		{
 			return _originDateTime;
 		}
@@ -158,14 +149,14 @@ namespace synthese
 
 
 
-		const time::DateTime& ServicePointer::getTheoreticalDateTime() const
+		const ptime& ServicePointer::getTheoreticalDateTime() const
 		{
 			return _theoreticalTime;
 		}
 
 
 
-		void ServicePointer::setTheoreticalTime( const time::DateTime& dateTime )
+		void ServicePointer::setTheoreticalTime( const ptime& dateTime )
 		{
 			_theoreticalTime = dateTime;
 		}

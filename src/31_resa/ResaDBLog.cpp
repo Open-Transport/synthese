@@ -30,7 +30,6 @@
 #include "ReservationTransactionTableSync.h"
 #include "ReservationTransaction.h"
 #include "ReservationTableSync.h"
-#include "DateTime.h"
 #include "HTMLModule.h"
 #include "User.h"
 #include "UserTableSync.h"
@@ -46,6 +45,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -53,7 +53,6 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace security;
-	using namespace time;
 	using namespace html;
 	using namespace server;
 	using namespace admin;
@@ -126,7 +125,7 @@ namespace synthese
 
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(RESERVATION_ENTRY));
-			content.push_back(r1->getDepartureTime().toSQLString(false));
+			content.push_back(to_iso_extended_string(r1->getDepartureTime().date()) +" "+to_simple_string(r1->getDepartureTime().time_of_day()));
 			content.push_back("Réservation");
 			content.push_back(lexical_cast<string>(transaction.getKey()));
 
@@ -151,8 +150,8 @@ namespace synthese
 			Env env;
 			shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId, env));
 			DBLogEntry::Content content(entry->getContent());
-			DateTime now(TIME_CURRENT);
-			content[COL_DATE2] = now.toSQLString(false);
+			ptime now(second_clock::local_time());
+			content[COL_DATE2] = to_iso_extended_string(now.date()) + " "+to_simple_string(now.time_of_day());
 			entry->setContent(content);
 
 			DBLogEntryTableSync::Save(entry.get());
@@ -213,7 +212,7 @@ namespace synthese
 			}
 
 			content.push_back(lexical_cast<string>(type));
-			content.push_back(r1->getDepartureTime().toSQLString(false));
+			content.push_back(to_iso_extended_string(r1->getDepartureTime().date())+" "+to_simple_string(r1->getDepartureTime().time_of_day()));
 			content.push_back(description);
 			content.push_back(lexical_cast<string>(transaction.getKey()));
 
@@ -231,7 +230,7 @@ namespace synthese
 			DBLog::ColumnsVector result;
 			const DBLogEntry::Content& content(entry.getContent());
 
-			if(content.size() <= COL_RESA || entry.getDate().isUnknown())
+			if(content.size() <= COL_RESA || entry.getDate().is_not_a_date_time())
 			{
 				ColumnsVector cv;
 				cv.push_back(GetIcon(OTHER));
@@ -280,9 +279,14 @@ namespace synthese
 				case OUTGOING_CALL:
 				case RADIO_CALL:
 					{
-						DateTime d(DateTime::FromSQLTimestamp(content[ResaDBLog::COL_DATE2]));
-						if (!d.isUnknown())
-							stream << "Jusqu'à " << d.toString() << " (" << (d.getSecondsDifference(entry.getDate()).total_seconds()) << " s)";
+						try
+						{
+							ptime d(time_from_string(content[ResaDBLog::COL_DATE2]));
+							stream << "Jusqu'à " << d << " (" << (d - entry.getDate()).total_seconds() << " s)";
+						}
+						catch(...)
+						{
+						}
 					}
 					break;
 

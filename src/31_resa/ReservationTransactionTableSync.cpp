@@ -26,7 +26,7 @@
 #include "ReservationTransaction.h"
 #include "ReservationTableSync.h"
 #include "ResaModule.h"
-
+#include "ReplaceQuery.h"
 #include "Service.h"
 
 #include "DBModule.h"
@@ -34,19 +34,18 @@
 #include "SQLite.h"
 #include "SQLiteException.h"
 
-#include "Conversion.h"
-
 #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
 	using namespace resa;
-	using namespace time;
 
 	namespace util
 	{
@@ -101,8 +100,8 @@ namespace synthese
 		){
 			object->setLastReservation(rows->getLongLong ( ReservationTransactionTableSync::COL_LAST_RESERVATION_ID));
 			object->setSeats(rows->getInt( ReservationTransactionTableSync::COL_SEATS));
-			object->setBookingTime(DateTime::FromSQLTimestamp(rows->getText ( ReservationTransactionTableSync::COL_BOOKING_TIME)));
-			object->setCancellationTime(DateTime::FromSQLTimestamp(rows->getText ( ReservationTransactionTableSync::COL_CANCELLATION_TIME)));
+			object->setBookingTime(rows->getDateTime( ReservationTransactionTableSync::COL_BOOKING_TIME));
+			object->setCancellationTime(rows->getDateTime( ReservationTransactionTableSync::COL_CANCELLATION_TIME));
 			object->setCustomerUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_CUSTOMER_ID));
 			object->setCustomerName(rows->getText ( ReservationTransactionTableSync::COL_CUSTOMER_NAME));
 			object->setCustomerPhone(rows->getText ( ReservationTransactionTableSync::COL_CUSTOMER_PHONE));
@@ -115,26 +114,18 @@ namespace synthese
 			ReservationTransaction* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToString(object->getLastReservation())
-				<< "," << Conversion::ToString(object->getSeats())
-				<< "," << object->getBookingTime().toSQLString()
-				<< "," << object->getCancellationTime().toSQLString()
-				<< "," << Conversion::ToString(object->getCustomerUserId())
-				<< "," << Conversion::ToSQLiteString(object->getCustomerName())
-				<< "," << Conversion::ToSQLiteString(object->getCustomerPhone())
-				<< "," << Conversion::ToSQLiteString(object->getCustomerEMail())
-				<< "," << Conversion::ToString(object->getBookingUserId())
-				<< "," << Conversion::ToString(object->getCancelUserId())
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<ReservationTransactionTableSync> query(*object);
+			query.addField(object->getLastReservation());
+			query.addField(object->getSeats());
+			query.addField(object->getBookingTime());
+			query.addField(object->getCancellationTime());
+			query.addField(object->getCustomerUserId());
+			query.addField(object->getCustomerName());
+			query.addField(object->getCustomerPhone());
+			query.addField(object->getCustomerEMail());
+			query.addField(object->getBookingUserId());
+			query.addField(object->getCancelUserId());
+			query.execute(transaction);
 		}
 
 		template<> void  SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Unlink(
@@ -149,7 +140,7 @@ namespace synthese
 		ReservationTransactionTableSync::SearchResult ReservationTransactionTableSync::Search(
 			Env& env,
 			util::RegistryKeyType serviceId
-			, const time::Date& originDate
+			, const date& originDate
 			, bool withCancelled
 			, int first /*= 0*/
 			, boost::optional<std::size_t> number, /*= 0*/
@@ -162,17 +153,19 @@ namespace synthese
 				<< " INNER JOIN " << ReservationTableSync::TABLE.NAME << " AS r ON "
 				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID
 				<< " WHERE " 
-				<< " r." << ReservationTableSync::COL_SERVICE_ID << "=" << Conversion::ToString(serviceId)
-				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << originDate.toSQLString(false) << " 00:00'"
-				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << "<='" << originDate.toSQLString(false) << " 23:59'";
+				<< " r." << ReservationTableSync::COL_SERVICE_ID << "=" << serviceId
+				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << to_iso_extended_string(originDate) << " 00:00'"
+				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << "<='" << to_iso_extended_string(originDate) << " 23:59'";
 			if (!withCancelled)
 				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
 			query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
 			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME;
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
@@ -180,8 +173,8 @@ namespace synthese
 		ReservationTransactionTableSync::SearchResult ReservationTransactionTableSync::Search(
 			Env& env,
 			uid userId
-			, const time::DateTime& minDate
-			, const time::DateTime& maxDate
+			, const ptime& minDate
+			, const ptime& maxDate
 			, bool withCancelled
 			, int first
 			, boost::optional<std::size_t> number,
@@ -194,18 +187,20 @@ namespace synthese
 				<< " INNER JOIN " << ReservationTableSync::TABLE.NAME << " AS r ON "
 				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID
 				<< " WHERE " << COL_CANCEL_USER_ID << "=" << userId;
-			if (!minDate.isUnknown())
-				query << " AND r." << ReservationTableSync::COL_DEPARTURE_TIME << ">=" << minDate.toSQLString();
-			if (!maxDate.isUnknown())
-				query << " AND r." << ReservationTableSync::COL_DEPARTURE_TIME << "<=" << maxDate.toSQLString();
+			if (!minDate.is_not_a_date_time())
+				query << " AND r." << ReservationTableSync::COL_DEPARTURE_TIME << ">='" << to_iso_extended_string(minDate.date()) << " " << to_simple_string(minDate.time_of_day()) << "'";
+			if (!maxDate.is_not_a_date_time())
+				query << " AND r." << ReservationTableSync::COL_DEPARTURE_TIME << "<='" << to_iso_extended_string(maxDate.date()) << " " << to_simple_string(maxDate.time_of_day()) << "'";
 			if (!withCancelled)
 				query << " AND " << COL_CANCELLATION_TIME << " IS NULL";
 			query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
 			query << " ORDER BY " << ReservationTableSync::COL_DEPARTURE_TIME << " DESC";
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

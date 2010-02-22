@@ -25,10 +25,10 @@
 
 #include <vector>
 
-#include "Schedule.h"
-
 #include "55_timetables/types.h"
 #include "Calendar.h"
+
+#include <boost/date_time/posix_time/posix_time_duration.hpp>
 
 namespace synthese
 {
@@ -58,7 +58,7 @@ namespace synthese
 		class TimetableColumn
 		{
 		public:
-			typedef std::vector<std::pair<const env::PhysicalStop*, time::Schedule> > Content;
+			typedef std::vector<std::pair<const env::PhysicalStop*, boost::posix_time::time_duration> > Content;
 
 		private:
 			// Variables

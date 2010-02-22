@@ -71,11 +71,19 @@ namespace synthese
 			typedef InterfacePage FactoryClass;
 
 		private:
-			std::string			_pageCode;
-			std::string			_mimeType;
-			const Interface*	_interface;
-			Components			_components;
-			bool				_directDisplayAllowed;
+			//! @name Database attributes
+			//@{
+				std::string			_pageCode;
+				std::string			_mimeType;
+				const Interface*	_interface;
+				bool				_directDisplayAllowed;
+				std::string			_source;
+			//@}
+
+			//! @name Run attributes
+			//@{
+				Components			_components;
+			//@}
 			
 		protected:
 			////////////////////////////////////////////////////////////////////
@@ -93,7 +101,7 @@ namespace synthese
 
 
 		public:
-			void parse( const std::string& text );
+			void parse();
 
 			InterfacePage(
 				util::RegistryKeyType key = UNKNOWN_VALUE
@@ -108,6 +116,7 @@ namespace synthese
 				void				setPageCode(const std::string& code);
 				void				setDirectDisplayAllowed(bool value);
 				void				setMimeType(const std::string& value);
+				void				setSource(const std::string& value);
 			//@}
 
 			/// @name Getters
@@ -116,6 +125,7 @@ namespace synthese
 				const std::string&	getPageCode()				const;
 				bool				getDirectDisplayAllowed()	const;
 				const std::string&	getMimeType()				const;
+				const std::string&	getSource()					const;
 			//@}
 
 			std::string getValue(

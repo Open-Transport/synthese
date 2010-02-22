@@ -30,16 +30,17 @@
 
 #include "LexicalMatcher.h"
 
-#include "DateTime.h"
-
 #include "01_util/Exception.h"
+
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace boost;
 using namespace std;
+using namespace boost::gregorian;
+using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace time;
 	using namespace std;
 	using namespace util;
 	using namespace geography;
@@ -61,8 +62,8 @@ namespace synthese
 		Site::Site(
 			RegistryKeyType id
 		):	Registrable(id),
-			_startValidityDate(TIME_UNKNOWN),
-			_endValidityDate(TIME_UNKNOWN),
+			_startValidityDate(not_a_date_time),
+			_endValidityDate(not_a_date_time),
 			_interface(NULL)
 		{		
 		}
@@ -79,7 +80,7 @@ namespace synthese
 
 		bool Site::dateControl() const
 		{
-			Date tempDate(TIME_CURRENT);
+			date tempDate(day_clock::local_day());
 			return tempDate >= _startValidityDate && tempDate <= _endValidityDate;
 		}
 
@@ -88,12 +89,12 @@ namespace synthese
 			_interface = interf;
 		}
 
-		void Site::setStartDate( const synthese::time::Date& dateDebut )
+		void Site::setStartDate( const date& dateDebut )
 		{
 			_startValidityDate = dateDebut;
 		}
 
-		void Site::setEndDate( const synthese::time::Date& dateFin )
+		void Site::setEndDate( const date& dateFin )
 		{
 			_endValidityDate = dateFin;
 		}
@@ -118,22 +119,22 @@ namespace synthese
 			return _pastSolutionsDisplayed;
 		}
 
-		const time::Date Site::getMinUseDate() const
+		const date Site::getMinUseDate() const
 		{
-			return Date(TIME_CURRENT);
+			return day_clock::local_day();
 		}
 
-		const time::Date Site::getMaxUseDate() const
+		const date Site::getMaxUseDate() const
 		{
-			Date date(TIME_CURRENT);
+			date date(day_clock::local_day());
 			date += _useDateRange;
 			return date;
 		}
 
-		Date Site::interpretDate( const std::string& text ) const
+		date Site::interpretDate( const std::string& text ) const
 		{
 			if ( text.empty() )
-				return Date(TIME_UNKNOWN);
+				return date(not_a_date_time);
 
 			if ( text == TEMPS_MIN_CIRCULATIONS)
 				return getMinUseDate();
@@ -142,9 +143,9 @@ namespace synthese
 				return getMaxUseDate();
 
 			if (text.size() == 1)
-				return Date(text[ 0 ]);
+				return day_clock::local_day();
 			
-			return Date::FromString(text);
+			return date(from_string(text));
 		}
 
 
@@ -193,23 +194,23 @@ namespace synthese
 
 		void Site::applyPeriod(
 			const HourPeriod& period
-			, DateTime& startTime
-			, DateTime& endTime
+			, ptime& startTime
+			, ptime& endTime
 		) const {
 			
 			// Updates
 			if (period.getEndHour() <= period.getBeginHour())
 			{
-				endTime.addDaysDuration ( 1 );
+				endTime += days( 1 );
 			}
 
-			endTime.setHour(period.getEndHour());
-			startTime.setHour(period.getBeginHour());
+			endTime = ptime(endTime.date(), period.getEndHour());
+			startTime = ptime(startTime.date(), period.getBeginHour());
 
 			// Checks
 			if (_pastSolutionsDisplayed == false )
 			{
-				DateTime now(TIME_CURRENT);
+				ptime now(second_clock::local_time());
 				if (endTime < now)
 				{
 					throw ForbiddenDateException();
@@ -232,7 +233,7 @@ namespace synthese
 			return _periods;
 		}
 
-		void Site::setUseDateRange( int range )
+		void Site::setUseDateRange(date_duration range )
 		{
 			_useDateRange = range;
 		}
@@ -245,21 +246,21 @@ namespace synthese
 
 
 
-		int Site::getUseDatesRange() const
+		date_duration Site::getUseDatesRange() const
 		{
 			return _useDateRange;
 		}
 
 
 
-		const time::Date& Site::getStartDate() const
+		const date& Site::getStartDate() const
 		{
 			return _startValidityDate;
 		}
 
 
 
-		const time::Date& Site::getEndDate() const
+		const date& Site::getEndDate() const
 		{
 			return _endValidityDate;
 		}
@@ -393,6 +394,15 @@ namespace synthese
 			}
 			return result;
 		}
+
+
+
+		void Site::clearHourPeriods()
+		{
+			_periods.clear();
+		}
+
+
 
 		Site::ExtendedFetchPlaceResult::ExtendedFetchPlaceResult()
 		{

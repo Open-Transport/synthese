@@ -28,6 +28,11 @@
 
 namespace synthese
 {
+	namespace graph
+	{
+		class Vertex;
+	}
+
 	namespace road
 	{
 		class Road;
@@ -50,9 +55,9 @@ namespace synthese
 			@ingroup m53Pages refPages
 
 			Parameters :
-				- 0 : Reached place name
-				- 1 : Alarm (unused)
-				- 2 : Alarm (unused)
+				- 0 : vertex WGS84 longitude
+				- 1 : vertex WGS84 latitude
+				- 2 : Vertex is in a named place
 				- 3 : Odd or even row in the journey board
 				- 4 : Road name
 				- 5 : Length of the junction
@@ -79,7 +84,7 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream
-				, const geography::Place* place
+				, const graph::Vertex& vertex
 				, const messages::SentAlarm* alarm
 				, bool color
 				, const road::Road* road,

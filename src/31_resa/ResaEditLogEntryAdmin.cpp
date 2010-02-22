@@ -24,7 +24,6 @@
 
 #include "ResaEditLogEntryAdmin.h"
 #include "Profile.h"
-#include "DateTime.h"
 
 #include "User.h"
 #include "UserTableSync.h"
@@ -50,6 +49,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -61,7 +61,6 @@ namespace synthese
 	using namespace dblog;
 	using namespace html;
 	using namespace security;
-	using namespace time;
 
 	namespace util
 	{
@@ -145,14 +144,21 @@ namespace synthese
 			stream << "<h1>Propriétés</h1>";
 			stream << t.open();
 			stream << t.title("Appel");
-			stream << t.cell("Date début", _entry->getDate().toString(true));
-			DateTime d(DateTime::FromSQLTimestamp(content[ResaDBLog::COL_DATE2]));
-			stream << t.cell("Date fin", d.isUnknown() ? "inconnu" : d.toString(true));
+			stream << t.cell("Date début", to_simple_string(_entry->getDate()));
+			ptime d(not_a_date_time);
+			try
+			{
+				d = time_from_string(content[ResaDBLog::COL_DATE2]);
+			}
+			catch (...)
+			{
+			}
+			stream << t.cell("Date fin", d.is_not_a_date_time() ? "inconnu" : to_simple_string(d));
 
 			// Duration
-			if(!d.isUnknown())
+			if(!d.is_not_a_date_time())
 			{
-				stream << t.cell("Durée", lexical_cast<string>(d.getSecondsDifference(_entry->getDate()).total_seconds()) + " s");
+				stream << t.cell("Durée", lexical_cast<string>((d - _entry->getDate()).total_seconds()) + " s");
 			}
 
 			// Customer
@@ -213,7 +219,7 @@ namespace synthese
 
 		std::string ResaEditLogEntryAdmin::getTitle() const
 		{
-			return _entry.get() ? _entry->getDate().toString() : DEFAULT_TITLE;
+			return _entry.get() ? to_simple_string(_entry->getDate()) : DEFAULT_TITLE;
 		}
 
 	
