@@ -120,22 +120,22 @@ namespace synthese
 								itl->second += route->getServices().size();
 							}
 						}
+					}
 	
-						BOOST_FOREACH(ScoresMap::value_type itc, scores)
+					BOOST_FOREACH(ScoresMap::value_type itc, scores)
+					{
+						if (itc.second <= 10)
+							_score += 1;
+						else if (itc.second <= 50)
+							_score += 2;
+						else if (itc.second <= 100)
+							_score += 3;
+						else
+							_score += 4;
+						if (_score > MAX_HUB_SCORE)
 						{
-							if (itc.second <= 10)
-								_score += 2;
-							else if (itc.second <= 50)
-								_score += 3;
-							else if (itc.second <= 100)
-								_score += 4;
-							else
-								_score += 5;
-							if (_score > MAX_HUB_SCORE)
-							{
-								_score = MAX_HUB_SCORE;
-								break;
-							}
+							_score = MAX_HUB_SCORE;
+							break;
 						}
 					}
 					if(_score < NO_TRANSFER_HUB_SCORE)

@@ -56,7 +56,7 @@ namespace synthese
 			> ResultSet;
 
 		private:
-			typedef std::map<const graph::Vertex*, typename ResultSet::iterator> IndexMap;
+			typedef std::map<const graph::Vertex*, ResultSet::iterator> IndexMap;
 			
 			boost::posix_time::ptime _originDateTime;
 			boost::optional<graph::AccessDirection> _accessDirection;

@@ -179,7 +179,7 @@ namespace synthese
 			query.addField(site->getOnlineBookingAllowed());
 			query.addField(site->getPastSolutionsDisplayed());
 			query.addField(site->getMaxTransportConnectionsCount());
-			query.addField(site->getUseDatesRange().days());
+			query.addField(static_cast<int>(site->getUseDatesRange().days()));
 			query.addField(periodstr.str());
 			query.execute(transaction);
 		}
