@@ -96,11 +96,21 @@ namespace synthese
 				string()
 			); //7
 
-			pv.push_back(to_simple_string(Service::GetTimeOfDay(service.getDepartureSchedule(false, lineStop.getRankInPath())))); //8
-			pv.push_back(to_simple_string(Service::GetTimeOfDay(service.getDepartureSchedule(true, lineStop.getRankInPath())))); //9
+
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(false, lineStop.getRankInPath())).hours() << ":" << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(false, lineStop.getRankInPath())).minutes();
+				pv.push_back(s.str()); // 8
+			}
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(true, lineStop.getRankInPath())).hours() << ":" << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(true, lineStop.getRankInPath())).minutes();
+				pv.push_back(s.str()); // 9
+			}
 			pv.push_back(
-				to_simple_string(service.getDepartureSchedule(true, lineStop.getRankInPath()) - service.getDepartureSchedule(false, lineStop.getRankInPath()))
-			); //10
+				lexical_cast<string>(
+					(service.getDepartureSchedule(true, lineStop.getRankInPath()) - service.getDepartureSchedule(false, lineStop.getRankInPath())).total_seconds() / 60
+			)	); //10
 
 			if(request)
 			{
