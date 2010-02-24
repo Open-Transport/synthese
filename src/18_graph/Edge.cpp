@@ -384,7 +384,7 @@ namespace synthese
 						return servicePointer;
 				}	}
 
-				arrivalMoment = ptime(arrivalMoment.date(), -hours(24) - seconds(1));
+				arrivalMoment = ptime(arrivalMoment.date(), -seconds(1));
 				previous = _arrivalIndex[INDICES_NUMBER - 1].get(RTData);
 			}
 
