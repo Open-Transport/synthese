@@ -49,7 +49,7 @@ REPLACE INTO t049_rolling_stock(id,name,article,indicator_label) VALUES(13792273
 
 
 INSERT INTO t006_cities(id,name) VALUES(1688849860511154,'City54');
-INSERT INTO t006_cities(id,name) VALUES(1688849860511295,'City95');
+INSERT INTO t006_cities(id,name) VALUES(1688849860511295,'City95 City54');
 INSERT INTO t006_cities(id,name) VALUES(1688849860530938,'City38');
 
 
