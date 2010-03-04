@@ -32,7 +32,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** TransportWebsiteRight Right Class.
-			@ingroup m36Rights refRights
+			@ingroup m56Rights refRights
 
 			Here are the different right levels :
 

@@ -31,7 +31,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** ptime period in a day.
-			@ingroup m36
+			@ingroup m56
 
 			These objects describe a period of time in a day.
 		*/

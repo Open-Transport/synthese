@@ -40,7 +40,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** AddUserFavoriteJourneyAction action class.
-			@ingroup m51Actions refActions
+			@ingroup m56Actions refActions
 		*/
 		class AddUserFavoriteJourneyAction
 			: public util::FactorableTemplate<server::Action, AddUserFavoriteJourneyAction>

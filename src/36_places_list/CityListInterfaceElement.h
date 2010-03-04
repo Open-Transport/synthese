@@ -37,7 +37,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** List of cities.
-			@ingroup m36Library refLibrary
+			@ingroup m56Library refLibrary
 			@code city_list @endcode
 
 			Parameters : none

@@ -39,7 +39,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** PlacesListItemInterfacePage Interface Page Class.
-			@ingroup m36Pages refPages
+			@ingroup m56Pages refPages
 
 			Parameters :
 			 - 0 : n rank of the item

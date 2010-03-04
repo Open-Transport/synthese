@@ -43,7 +43,7 @@ namespace synthese
 		class Site;
 
 		/** SiteUpdateAction action class.
-			@ingroup m36Actions refActions
+			@ingroup m56Actions refActions
 		*/
 		class SiteUpdateAction
 			: public util::FactorableTemplate<server::Action, SiteUpdateAction>

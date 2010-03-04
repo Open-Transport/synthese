@@ -40,7 +40,7 @@ namespace synthese
 		class UserFavoriteJourney;
 
 		/** UserFavoriteInterfacePage Interface Page Class.
-			@ingroup m53Pages refPages
+			@ingroup m56Pages refPages
 			@author Hugues Romain
 			@date 2007
 

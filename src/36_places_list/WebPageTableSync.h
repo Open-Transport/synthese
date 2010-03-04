@@ -35,7 +35,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** Web page SQLite table synchronizer.
-			@ingroup m36LS refLS
+			@ingroup m56LS refLS
 		*/
 		class WebPageTableSync : public db::SQLiteRegistryTableSyncTemplate<WebPageTableSync,WebPage>
 		{

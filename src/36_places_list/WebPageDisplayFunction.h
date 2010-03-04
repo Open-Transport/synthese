@@ -37,7 +37,7 @@ namespace synthese
 		/** WebPageDisplayFunction Function class.
 			@author Hugues
 			@date 2010
-			@ingroup m36Functions refFunctions
+			@ingroup m56Functions refFunctions
 		*/
 		class WebPageDisplayFunction:
 			public util::FactorableTemplate<FunctionWithSite, WebPageDisplayFunction>

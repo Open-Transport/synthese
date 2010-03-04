@@ -35,7 +35,7 @@ namespace synthese
 		/** WebPageFormInterfaceElement Library Interface Element Class.
 			@author Hugues
 			@date 2010
-			@ingroup m36Library refLibrary
+			@ingroup m56Library refLibrary
 
 			@code form @endcode
 

@@ -36,7 +36,7 @@ namespace synthese
 		/** PlacesListRequestInterfaceElement Library Interface Element Class.
 			@author Hugues Romain
 			@date 2007
-			@ingroup m36Library refLibrary
+			@ingroup m56Library refLibrary
 
 			Parameters :
 				- 0 : Text field (can be a string with script code)

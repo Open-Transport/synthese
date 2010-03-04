@@ -63,7 +63,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** Transport website.
-			@ingroup m36
+			@ingroup m56
 			@author Hugues Romain
 			@date 2005-2006
 

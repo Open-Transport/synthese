@@ -36,7 +36,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// WebPageUpdateAction action class.
-		/// @ingroup m36Actions refActions
+		/// @ingroup m56Actions refActions
 		class WebPageUpdateAction:
 			public util::FactorableTemplate<server::Action, WebPageUpdateAction>
 		{

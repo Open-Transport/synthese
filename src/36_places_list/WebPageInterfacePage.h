@@ -40,7 +40,7 @@ namespace synthese
 		class WebPage;
 
 		/** WebPageInterfacePage Interface Page Class.
-			@ingroup m36Pages refPages
+			@ingroup m56Pages refPages
 			@author Hugues
 			@date 2010
 

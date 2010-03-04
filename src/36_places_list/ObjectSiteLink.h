@@ -33,7 +33,7 @@ namespace synthese
 		class Site;
 
 		/** ObjectSiteLink class.
-			@ingroup m36
+			@ingroup m56
 		*/
 		class ObjectSiteLink
 		:	public virtual util::Registrable

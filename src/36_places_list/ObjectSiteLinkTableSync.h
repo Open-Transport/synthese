@@ -39,7 +39,7 @@ namespace synthese
 		class ObjectSiteLink;
 
 		/** ObjectSiteLink table synchronizer.
-			@ingroup m36LS refLS
+			@ingroup m56LS refLS
 		*/
 		class ObjectSiteLinkTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>

@@ -40,7 +40,7 @@ namespace synthese
 		class Site;
 
 		/** WebPage class.
-			@ingroup m36
+			@ingroup m56
 		*/
 		class WebPage:
 		public util::Registrable

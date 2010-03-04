@@ -37,7 +37,7 @@ namespace synthese
 		class RollingStockFilter;
 
 		/** TransportSiteAdmin Class.
-			@ingroup m36Admin refAdmin
+			@ingroup m56Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/

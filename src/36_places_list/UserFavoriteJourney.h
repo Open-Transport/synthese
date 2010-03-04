@@ -39,7 +39,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** UserFavoriteJourney class.
-			@ingroup m53
+			@ingroup m56
 		*/
 		class UserFavoriteJourney
 		:	public virtual util::Registrable

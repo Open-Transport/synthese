@@ -32,7 +32,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** SiteCommercialLineLink class.
-			@ingroup m36
+			@ingroup m56
 		*/
 		class SiteCommercialLineLink
 		:	public virtual util::Registrable

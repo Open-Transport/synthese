@@ -35,7 +35,7 @@ namespace synthese
 		/** UserFavoriteListInterfaceElement Library Interface Element Class.
 			@author Hugues Romain
 			@date 2007
-			@ingroup m53Library refLibrary
+			@ingroup m56Library refLibrary
 
 			@code user_favorite_journeys @endcode
 

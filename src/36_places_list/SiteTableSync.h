@@ -37,7 +37,7 @@ namespace synthese
 		class Site;
 
 		/** Transport website SQLite table synchronizer.
-			@ingroup m36LS refLS
+			@ingroup m56LS refLS
 		*/
 		class SiteTableSync : public db::SQLiteRegistryTableSyncTemplate<SiteTableSync,Site>
 		{

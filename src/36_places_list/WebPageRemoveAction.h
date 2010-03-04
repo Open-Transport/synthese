@@ -36,7 +36,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// WebPageRemoveAction action class.
-		/// @ingroup m36Actions refActions
+		/// @ingroup m56Actions refActions
 		class WebPageRemoveAction:
 			public util::FactorableTemplate<server::Action, WebPageRemoveAction>
 		{

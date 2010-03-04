@@ -36,7 +36,7 @@ namespace synthese
 		/** FunctionWithSite Function class.
 			@author Hugues Romain
 			@date 2007
-			@ingroup m36
+			@ingroup m56
 		*/
 		class FunctionWithSite : public server::Function
 		{

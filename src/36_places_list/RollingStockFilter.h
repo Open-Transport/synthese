@@ -43,7 +43,7 @@ namespace synthese
 		class Site;
 
 		/** RollingStockFilter class.
-			@ingroup m36
+			@ingroup m56
 		*/
 		class RollingStockFilter:
 			public util::Registrable

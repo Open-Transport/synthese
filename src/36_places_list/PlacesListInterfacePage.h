@@ -45,7 +45,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** PlacesListInterfacePage Interface Page Class.
-			@ingroup m36Pages refPages
+			@ingroup m56Pages refPages
 
 			Parameters :
 			 - 0 : 1|0 is city list

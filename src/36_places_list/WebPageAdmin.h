@@ -37,7 +37,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// WebPageAdmin Admin compound class.
-		///	@ingroup m36Admin refAdmin
+		///	@ingroup m56Admin refAdmin
 		///	@author Hugues
 		///	@date 2010
 		class WebPageAdmin:

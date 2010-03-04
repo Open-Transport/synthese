@@ -44,7 +44,7 @@ namespace synthese
 		class UserFavoriteJourney;
 
 		/** UserFavoriteJourney table synchronizer.
-			@ingroup m53LS refLS
+			@ingroup m56LS refLS
 		*/
 		class UserFavoriteJourneyTableSync:
 			public db::SQLiteNoSyncTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>

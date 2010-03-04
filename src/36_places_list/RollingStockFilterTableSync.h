@@ -39,7 +39,7 @@ namespace synthese
 		class RollingStockFilter;
 
 		/** RollingStockFilter table synchronizer.
-			@ingroup m36LS refLS
+			@ingroup m56LS refLS
 		*/
 		class RollingStockFilterTableSync :
 			public db::SQLiteRegistryTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>
