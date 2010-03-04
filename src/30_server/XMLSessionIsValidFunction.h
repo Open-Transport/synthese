@@ -32,10 +32,35 @@ namespace synthese
 {
 	namespace server
 	{
-		/** XMLSessionIsValidFunction Function class.
-			@author Hugues
+		/** Public function to test if a session id represents a valid session.
+			@author Hugues Romain
 			@date 2009
 			@ingroup m15Functions refFunctions
+
+			<h3>Requête</h3>
+
+			<pre>
+			fonction=XMLSessionIsValidFunction
+			si=<numéro de session>
+			</pre>
+			
+			<h3>Réponse</h3>
+
+			@image html xml_valid_session.png
+
+			La réponse indique si le numéro de session correspond à une session valide ou non, sans donner plus d’informations.
+			Le retour XML est réduit au minimum.
+			<ul>
+			<li>id : identificateur de la session demandée pour contrôle</li>
+			<li>valid : indique si la session peut être utilisée dans un délai d’une minute après la requête</li>
+			</ul>
+
+			<h3>Attachments</h3>
+
+			<ul>
+			<li><a href="include/15_server/xml_session_is_valid_function.xsd">Response XSD schema</a></li>
+			<li><a href="include/15_server/XMLSessionIsValidFunctionSample.xml">Example of XML response</a></li>
+			</ul>
 		*/
 		class XMLSessionIsValidFunction:
 			public util::FactorableTemplate<server::Function,XMLSessionIsValidFunction>
