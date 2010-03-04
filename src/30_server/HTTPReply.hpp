@@ -19,6 +19,8 @@ namespace synthese
 {
 	namespace server
 	{
+		/// addtogroup m15
+		/// @{
 
 		/// A reply to be sent to a client.
 		struct HTTPReply
@@ -61,6 +63,8 @@ namespace synthese
 		  /// Get a stock reply.
 		  static HTTPReply stock_reply(status_type status);
 		};
+
+		/// @}
 	} // namespace server3
 } // namespace http
 

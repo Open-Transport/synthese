@@ -32,7 +32,7 @@ namespace synthese
 	namespace server
 	{
 		/** HTML Form generator Value Interface Element Class.
-			@ingroup m18
+			@ingroup m15Library refLibrary
 
 			Parameters :
 				- 0 : form name

@@ -11,7 +11,9 @@ namespace synthese
 	namespace server
 	{
 
-
+		//////////////////////////////////////////////////////////////////////////
+		/// Simple HTTP client.
+		/// @param m15
 		class BasicClient
 		{
 		private:

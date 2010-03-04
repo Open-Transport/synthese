@@ -22,7 +22,9 @@ namespace synthese
 
 		struct HTTPRequest;
 
+		//////////////////////////////////////////////////////////////////////////
 		/// Parser for incoming requests.
+		/// @ingroup m15
 		class HTTPRequestParser
 		{
 		public:

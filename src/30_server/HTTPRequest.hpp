@@ -18,6 +18,8 @@ namespace synthese
 {
 	namespace server
 	{
+		/// addtogroup m15
+		/// @{
 
 		/// A request received from a client.
 		struct HTTPRequest
@@ -33,6 +35,8 @@ namespace synthese
 			Headers headers;
 			std::string postData;
 		};
+
+		/// @}
 
 	} // namespace server3
 } // namespace http

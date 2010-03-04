@@ -53,7 +53,7 @@ namespace synthese
 		/// Action abstract class to run before the display of a function result.
 		///	A factory of actions is handled by 30_server module.
 		///
-		///	@ingroup m18
+		///	@ingroup m15
 		//////////////////////////////////////////////////////////////////////////
 		class Action
 		:	public util::FactoryBase<Action>

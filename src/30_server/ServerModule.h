@@ -48,9 +48,27 @@ namespace synthese
 	/**	@defgroup m15Actions 15 Actions
 		@ingroup m15
 
-		@defgroup m18Functions 15 Functions
+		@defgroup m15Functions 15 Functions
 		@ingroup m15
-	
+
+		@defgroup m15Pages 15 Pages
+		@ingroup m15
+
+		@defgroup m15Library 15 Interface library
+		@ingroup m15
+
+		@defgroup m15LS 15 Table synchronizers
+		@ingroup m15
+
+		@defgroup m15Admin 15 Administration pages
+		@ingroup m15
+
+		@defgroup m15Rights 15 Rights
+		@ingroup m15
+
+		@defgroup m15Logs 15 DB Logs
+		@ingroup m15
+
 		@defgroup m15 15 Server
 		@ingroup m1
 		@{

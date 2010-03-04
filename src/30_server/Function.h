@@ -70,7 +70,7 @@ namespace synthese
 		///		- produce a request object from a feature : a method builds the whole request string from
 		///		the parameters stored previously in the object by the setters. (see _getParametersMap method)
 		///
-		/// @ingroup m18
+		/// @ingroup m15
 		//////////////////////////////////////////////////////////////////////////
 		class Function
 		:	public util::FactoryBase<Function>

@@ -40,7 +40,7 @@ namespace synthese
 		class Function;
 
 		/** LoginInterfacePage Interface Page Class.
-			@ingroup m30Pages refPages
+			@ingroup m15Pages refPages
 
 			Parameters :
 				- 0 : function key if login succeeds

@@ -31,7 +31,7 @@ namespace synthese
 	namespace server
 	{
 		/** Logout Action Class
-			@ingroup m18Action refActions
+			@ingroup m15Action refActions
 		*/
 		class LogoutAction : public util::FactorableTemplate<server::Action, LogoutAction>
 		{

@@ -40,7 +40,7 @@ namespace synthese
 	{
 		////////////////////////////////////////////////////////////////////////
 		/// Action related exception class.
-		/// @ingroup m18/exception
+		/// @ingroup m15/exception
 		class ActionException:
 			public util::Exception
 		{

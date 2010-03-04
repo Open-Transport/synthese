@@ -36,7 +36,7 @@ namespace synthese
 		/** ValidSessionInterfaceElement Library Interface Element Class.
 			@author Hugues Romain
 			@date 2007
-			@ingroup m18Library refLibrary
+			@ingroup m15Library refLibrary
 		*/
 		class ValidSessionInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, ValidSessionInterfaceElement>

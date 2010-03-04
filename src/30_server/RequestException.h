@@ -15,7 +15,7 @@ namespace server
 
 
 /** Request related exception class
-@ingroup m18
+@ingroup m15
 */
 
 class RequestException : public synthese::util::Exception

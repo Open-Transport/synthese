@@ -20,7 +20,7 @@ namespace server
 
 This thread is aimed at cleaning temporary folders on a regular basis.
 
-@ingroup m18
+@ingroup m15
 */
 class CleanerThreadExec : public synthese::util::ThreadExec
 {

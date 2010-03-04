@@ -12,7 +12,7 @@ namespace synthese
 
 
 		/** Session related exception class
-		@ingroup m18
+		@ingroup m15
 		*/
 
 		class SessionException : public synthese::util::Exception

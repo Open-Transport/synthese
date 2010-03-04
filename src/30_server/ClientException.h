@@ -12,7 +12,7 @@ namespace synthese
 
 
 		/** Client related exception class
-		@ingroup m18
+		@ingroup m15
 		*/
 
 		class ClientException : public synthese::util::Exception

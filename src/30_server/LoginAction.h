@@ -33,7 +33,7 @@ namespace synthese
 	namespace server
 	{
 		/** Login Action Class.
-			@ingroup m18Actions refActions
+			@ingroup m15Actions refActions
 		*/
 		class LoginAction : public util::FactorableTemplate<server::Action, LoginAction>
 		{
