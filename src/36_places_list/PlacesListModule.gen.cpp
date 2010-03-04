@@ -22,7 +22,7 @@ synthese::transportwebsite::PlacesListItemInterfacePage::integrate();
 synthese::transportwebsite::UserFavoriteInterfacePage::integrate();
 synthese::transportwebsite::WebPageInterfacePage::integrate();
 
-synthese::transportwebsite::CityListRequest::integrate();
+synthese::transportwebsite::CityListFunction::integrate();
 synthese::transportwebsite::PlacesListFunction::integrate();
 synthese::transportwebsite::WebPageDisplayFunction::integrate();
 

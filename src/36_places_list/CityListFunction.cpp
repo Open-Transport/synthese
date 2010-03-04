@@ -1,6 +1,6 @@
 
-/** CityListRequest class implementation.
-	@file CityListRequest.cpp
+/** CityListFunction class implementation.
+	@file CityListFunction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "CityListRequest.h"
+#include "CityListFunction.h"
 
 #include "PlacesListInterfacePage.h"
 #include "Types.h"
@@ -29,7 +29,6 @@
 #include "RequestException.h"
 #include "City.h"
 #include "Interface.h"
-#include "Conversion.h"
 
 #include <boost/foreach.hpp>
 
@@ -45,16 +44,16 @@ namespace synthese
 	using namespace lexmatcher;
 	using namespace transportwebsite;
 
-	template<> const string util::FactorableTemplate<FunctionWithSite,CityListRequest>::FACTORY_KEY("lc");
+	template<> const string util::FactorableTemplate<FunctionWithSite,CityListFunction>::FACTORY_KEY("lc");
 	
 	namespace transportwebsite
 	{
-		const string CityListRequest::PARAMETER_INPUT("t");
-		const string CityListRequest::PARAMETER_NUMBER("n");
-		const string CityListRequest::PARAMETER_IS_FOR_ORIGIN("o");
-		const string CityListRequest::PARAMETER_PAGE("p");
+		const string CityListFunction::PARAMETER_INPUT("t");
+		const string CityListFunction::PARAMETER_NUMBER("n");
+		const string CityListFunction::PARAMETER_IS_FOR_ORIGIN("o");
+		const string CityListFunction::PARAMETER_PAGE("p");
 		
-		void CityListRequest::run( std::ostream& stream, const Request& request ) const
+		void CityListFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			Site::CitiesMatcher::MatchResult matches(
 				_site->getCitiesMatcher().bestMatches(_input, _n)
@@ -85,7 +84,7 @@ namespace synthese
 			}
 		}
 
-		ParametersMap CityListRequest::_getParametersMap() const
+		ParametersMap CityListFunction::_getParametersMap() const
 		{
 			ParametersMap pm(FunctionWithSite::_getParametersMap());
 			pm.insert(PARAMETER_INPUT, _input);
@@ -95,7 +94,7 @@ namespace synthese
 			return pm;
 		}
 
-		void CityListRequest::_setFromParametersMap( const server::ParametersMap& map )
+		void CityListFunction::_setFromParametersMap( const server::ParametersMap& map )
 		{
 			FunctionWithSite::_setFromParametersMap(map);
 
@@ -111,34 +110,34 @@ namespace synthese
 				throw RequestException("Bad value for number");
 		}
 
-		void CityListRequest::setTextInput( const std::string& text )
+		void CityListFunction::setTextInput( const std::string& text )
 		{
 			_input = text;
 		}
 
-		void CityListRequest::setNumber( int number )
+		void CityListFunction::setNumber( int number )
 		{
 			_n = number;
 		}
 
-		void CityListRequest::setIsForOrigin( bool isForOrigin )
+		void CityListFunction::setIsForOrigin( bool isForOrigin )
 		{
 			_isForOrigin = isForOrigin;
 		}
 
 
-		CityListRequest::CityListRequest():
+		CityListFunction::CityListFunction():
 			_page(NULL)
 		{
 		}
 
 
-		bool CityListRequest::isAuthorized(const Session* session
+		bool CityListFunction::isAuthorized(const Session* session
 		) const {
 			return true;
 		}
 
-		std::string CityListRequest::getOutputMimeType() const
+		std::string CityListFunction::getOutputMimeType() const
 		{
 			return _page ? _page->getMimeType() : "text/xml";
 		}

@@ -15,7 +15,7 @@
 #include "WebPageFormInterfaceElement.h"
 #include "WebPageLinkInterfaceElement.h"
 
-#include "CityListRequest.h"
+#include "CityListFunction.h"
 #include "PlacesListFunction.h"
 #include "WebPageDisplayFunction.h"
 

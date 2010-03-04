@@ -21,13 +21,15 @@
 */
 
 #include "CityListRequestInterfaceElement.h"
-#include "CityListRequest.h"
+#include "CityListFunction.h"
 #include "StaticFunctionRequest.h"
 #include "ValueElementList.h"
 #include "HTMLForm.h"
-#include "Conversion.h"
+
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -57,14 +59,14 @@ namespace synthese
 			
 			if(request)
 			{
-				StaticFunctionRequest<CityListRequest> clrequest(*request, true);
+				StaticFunctionRequest<CityListFunction> clrequest(*request, true);
 				if(dynamic_cast<const FunctionWithSite*>(request->getFunction().get()))
 				{
 					clrequest.getFunction()->setSite(dynamic_cast<const FunctionWithSite*>(request->getFunction().get())->getSite());
 				}
 				clrequest.getFunction()->setTextInput(_txtField->getValue(parameters, variables, object, request));
-				clrequest.getFunction()->setIsForOrigin(Conversion::ToBool(_isForOrigin->getValue(parameters, variables, object, request)));
-				clrequest.getFunction()->setNumber(Conversion::ToInt(_number->getValue(parameters, variables, object, request)));
+				clrequest.getFunction()->setIsForOrigin(lexical_cast<bool>(_isForOrigin->getValue(parameters, variables, object, request)));
+				clrequest.getFunction()->setNumber(lexical_cast<int>(_number->getValue(parameters, variables, object, request)));
 
 				stream << clrequest.getURL(false);
 			}

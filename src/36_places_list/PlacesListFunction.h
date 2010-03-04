@@ -50,12 +50,16 @@ namespace synthese
 			t=<texte saisi> : texte entré par l’utilisateur
 			n=<nombre resultats> : nombre de résultats devant être fournis par le serveur
 			ct=<nom de commune> : texte de commune validé (issu du retour de la fonction de recherche de nom de commune CityListRequest) ou non
+			p=<page code> : code of page reffering to an instanciation of the PlacesListInterfacePage element in the specified website
 			</pre>
 
 			<h3>Réponse</h3>
 
 			La réponse propose, dans l’ordre décroissant de pertinence, les n communes dont le nom
-			est le plus proche possible du texte entré, dans un format XML défini comme suit :
+			est le plus proche possible du texte entré.
+			
+			Si p est spécifié, la réponse est définie par la page PlacesListInterfacePage désignée.
+			Si p n'est pas spécifié, la réponse respecte le schéma XML suivant :
 
 			@image html options.png
 
@@ -110,8 +114,6 @@ namespace synthese
 				@param map Parameters map to interpret
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
-			
-			/// @todo Getters/Setters for parsed parameters
 			
 		public:
 			PlacesListFunction();
