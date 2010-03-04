@@ -33,42 +33,41 @@
 
 namespace synthese
 {
-	/**	@defgroup m36Actions 36 Actions
-		@ingroup m36
+	/**	@defgroup m56Actions 56 Actions
+		@ingroup m56
 
-		@defgroup m36Pages 36 Pages
-		@ingroup m36
+		@defgroup m56Pages 56 Pages
+		@ingroup m56
 
-		@defgroup m36Functions 36 Functions
-		@ingroup m36
+		@defgroup m56Functions 56 Functions
+		@ingroup m56
 
-		@defgroup m36Exceptions 36 Exceptions
-		@ingroup m36
+		@defgroup m56Exceptions 56 Exceptions
+		@ingroup m56
 
-		@defgroup m36LS 36 Table synchronizers
-		@ingroup m36
+		@defgroup m56LS 56 Table synchronizers
+		@ingroup m56
 
-		@defgroup m36Admin 36 Administration pages
-		@ingroup m36
+		@defgroup m56Admin 56 Administration pages
+		@ingroup m56
 
-		@defgroup m36Rights 36 Rights
-		@ingroup m36
+		@defgroup m56Rights 56 Rights
+		@ingroup m56
 
-		@defgroup m36Logs 36 DB Logs
-		@ingroup m36
+		@defgroup m56Logs 56 DB Logs
+		@ingroup m56
 		
-		@defgroup m36 36 Transport website
-		@ingroup m3
+		@defgroup m56 56 Transport website
+		@ingroup m5
 		
-		(Module documentation)
 		
 		@{
 	*/
 
-	/** 16 Transport website namespace. */
+	/** 56 Transport website namespace. */
 	namespace transportwebsite
 	{
-		/** 16 Transport website module class. */
+		/** 56 Transport website module class. */
 		class PlacesListModule:
 			public server::ModuleClassTemplate<PlacesListModule>
 		{

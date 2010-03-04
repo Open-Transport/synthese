@@ -39,10 +39,46 @@ namespace synthese
 	{
 		class PlacesListInterfacePage;
 
-		/** PlacesListFunction Function class.
+		/** Places list query public function.
 			@author Hugues Romain
 			@date 2007
-			@ingroup m36Functions refFunctions
+			@ingroup m56Functions refFunctions
+
+			<pre>
+			fonction=lp
+			si=<id website> : site id
+			t=<texte saisi> : texte entré par l’utilisateur
+			n=<nombre resultats> : nombre de résultats devant être fournis par le serveur
+			ct=<nom de commune> : texte de commune validé (issu du retour de la fonction de recherche de nom de commune CityListRequest) ou non
+			</pre>
+
+			<h3>Réponse</h3>
+
+			La réponse propose, dans l’ordre décroissant de pertinence, les n communes dont le nom
+			est le plus proche possible du texte entré, dans un format XML défini comme suit :
+
+			@image html options.png
+
+			Les objets suivants sont définis :
+			<ul>
+			<li>options : balise racine</li>
+			<li>option : définit un élément retourné</li>
+			<li>score : taux de correspondance entre le texte proposé et le texte entré, entre 0
+			(limite basse théorique) et 1 (texte identique).</li>
+			<li>Type : type d’objet retourné :
+			<ul>
+			<li>stop : arrêt du réseau de transport</li>
+			<li>publicPlace : lieu public</li>
+			<li>street : rue entière (tous points de la rue considérés équivalents)</li>
+			<li>address : adresse sur une rue (point précis sur la rue)</li>
+			</ul></ul>
+
+			<h3>Attachments</h3>
+
+			<ul>
+			<li><a href="include/56_transport_website/places_list.xsd">Response XSD schema</a></li>
+			<li><a href="include/56_transport_website/places_listSample.xml">Example of XML response</a></li>
+			</ul>
 		*/
 		class PlacesListFunction : public util::FactorableTemplate<FunctionWithSite,PlacesListFunction>
 		{

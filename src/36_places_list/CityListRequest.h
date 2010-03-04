@@ -39,29 +39,47 @@ namespace synthese
 	{
 		class PlacesListInterfacePage;
 
-		/** City list request.
-			@ingroup m36Functions refFunctions
+		/** City list query public function.
+			@ingroup m56Functions refFunctions
 
+			<h3>Request</h3>
 
+			<pre>
 			fonction=lc
-			si=7036874417766401
+			si=<id website> : site id
 			t=<texte saisi> : texte entré par l’utilisateur
 			n=<nombre resultats> : nombre de résultats devant être fournis par le serveur
-			Réponse
+			</pre>
+
+			<h3>Réponse</h3>
+
 			La réponse propose, dans l’ordre décroissant de pertinence, les n communes dont le nom
-			est le plus proche possible du texte entré.
+			est le plus proche possible du texte entré, dans un format XML défini comme suit :
+			
+			@image html options.png
+			
 			Les objets suivants sont définis :
-			• options : balise racine
-			• option : définit un élément retourné
-			• score : taux de correspondance entre le texte proposé et le texte entré, entre 0
-			(limite basse théorique) et 1 (texte identique).
-			• Type : type d’objet retourné, choix parmi les valeurs suivantes (ne peut être que
+			<ul>
+			<li>options : balise racine</li>
+			<li>option : définit un élément retourné</li>
+			<li>score : taux de correspondance entre le texte proposé et le texte entré, entre 0
+			(limite basse théorique) et 1 (texte identique).</li>
+			<li>Type : type d’objet retourné, porte systématiquement la valeur <i>city</i>, choix parmi les valeurs suivantes (ne peut être que
 			city dans le cas d’une recherche de commune) :
-			o city : commune
-			o stop : arrêt du réseau de transport
-			o publicPlace : lieu public
-			o street : rue entière (tous points de la rue considérés équivalents)
-			o address : adresse sur une rue (point précis sur la rue)
+			<ul>
+			<li>city : commune</li>
+			<li>stop : arrêt du réseau de transport</li>
+			<li>publicPlace : lieu public</li>
+			<li>street : rue entière (tous points de la rue considérés équivalents)</li>
+			<li>address : adresse sur une rue (point précis sur la rue)</li>
+			</ul></ul>
+
+			<h3>Attachments</h3>
+
+			<ul>
+			<li><a href="include/56_transport_website/places_list.xsd">Response XSD schema</a></li>
+			<li><a href="include/56_transport_website/places_listSample.xml">Example of XML response</a></li>
+			</ul>
 		*/
 		class CityListRequest : public util::FactorableTemplate<FunctionWithSite,CityListRequest>
 		{
