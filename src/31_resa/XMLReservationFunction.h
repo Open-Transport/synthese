@@ -39,18 +39,30 @@ namespace synthese
 			@date 2009
 			@ingroup m31Functions refFunctions
 
-			Parameters :
-				- fonction=XMLReservationFunction
-				- sid=<session id> : ID of the current session
-				- roid=<id reservation> : Reservation ID (can be the BookReservationAction created id)
+			<h3>Prérequis</h3>
+
+			<ul>
+			<li>Disposer d’une session valide dont l’ID est connu.</li>
+			<li>Disposer de l’ID de l’utilisateur courant</li>
+			<li>Disposer des paramètres de lancement du calculateur d’itinéraires ayant conduit à la proposition de la solution à réserver</li>
+			<li>Disposer de l’heure de départ de la solution à réserver</li>
+			</ul>
+
+			<h3>Request</h3>
+
+			<pre>
+			fonction=XMLReservationFunction
+			sid=<session id> : ID of the current session
+			roid=<id reservation> : Reservation ID (can be the BookReservationAction created id)
+			</pre>
 			
-			Réponse
+			<h3>Réponse</h3>
 
 			Description
 
 			Une réservation est décrite comme suit :
 
-			(schéma)
+			@image html reservation.png
 
 				- id : identificateur de la réservation dans la base de données de SYNTHESE (vide si
 			réservation non effectuée ou non trouvée)
@@ -75,6 +87,12 @@ namespace synthese
 					- arrivalDateTime : date/heure d’arrivée du tronçon
 					- lineNumber : numéro de la ligne empruntée
 
+			<h3>Attachments</h3>
+
+			<ul>
+			<li><a href="include/31_resa/xml_reservation_function.xsd">Response XSD Schema</a></li>
+			<li><a href="include/31_resa/XMLReservationFunctionSample.xml">Example of XML response</a></li>
+			</ul>
 		*/
 		class XMLReservationFunction:
 			public util::FactorableTemplate<server::Function,XMLReservationFunction>

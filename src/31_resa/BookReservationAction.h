@@ -52,8 +52,6 @@ namespace synthese
 		/** BookReservationAction action class.
 			@ingroup m31Actions refActions
 
-			@todo Move this action into route planner and rename it BookJourneyFromRoutePlannerAction
-
 			The reservation is made upon a journey. Each journey leg allowing reservation
 			is booked simultaneously.
 
@@ -63,6 +61,25 @@ namespace synthese
 
 			The datetime must be precisely identical with the start time of the founded journey. If not, the reservation is cancelled and the route planning must be launched again.
 			This case can occur if a hot update has been done while the customer asked for his reservation.
+
+			Tip : XMLReservationFunction can be used to view the result of the action.
+
+			<h3>Request</h3>
+
+			<pre>
+			a=bra
+			sid=<id session> : ID de la session ouverte, issu du retour de la fonction de connexion d’utilisateur
+			actionParamcuid=<id utilisateur> : ID de l’utilisateur courant, issu du retour de la fonction de connexion d’utilisateur
+			actionParamsit=<site id> : ID of the site used by the route planner
+			actionParamacc=35001|35002|35003 : type d’utilisateur pour filtrer sur les règles d’accessibilité et appliquer les règles de réservation adéquates. 35001 = piéton, 35002 = PMR, 35003 = vélo. Si non fourni, le calcul s’effectue pour un utilisateur piéton.
+			actionParamdct=<commune de départ> : commune de départ sous forme de texte
+			[actionParamdpt=<arrêt de départ>] : arrêt de départ sous forme de texte. Si non fourni, les arrêts principaux de la commune sont choisis.
+			actionParamact=<commune d’arrivée> : commune d’arrivée sous forme de texte
+			[actionParamapt=<arrêt d’arrivée>] : arrêt d’arrivée sous forme de texte. Si non fourni, les arrêts principaux de la commune sont choisis.
+			actionParamda=YYYY-MM-DD HH:II : date et heure exacte du depart de la solution à réserver
+			[actionParamtm =<id filtre mode de transport>] : identificateur de filtre sur les modes de transport (doit correspondre à un des filtres paramétrés sur le site)
+			actionParamsenu=<nombre de places> : nombre de places à réserver
+			</pre>
 		*/
 		class BookReservationAction
 			: public util::FactorableTemplate<server::Action, BookReservationAction>
