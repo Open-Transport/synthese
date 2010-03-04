@@ -30,7 +30,7 @@ namespace synthese
 {
 	namespace server
 	{
-		/** Logout Action Class
+		/** Logs the current user out of the system.
 			@ingroup m15Action refActions
 		*/
 		class LogoutAction : public util::FactorableTemplate<server::Action, LogoutAction>

@@ -32,10 +32,42 @@ namespace synthese
 {
 	namespace server
 	{
-		/** XMLSessionFunction Function class.
-			@author Hugues
+		/** Returns informations about the current user session.
+			@author Hugues Romain
 			@date 2009
 			@ingroup m15Functions refFunctions
+
+			<h3>Request</h3>
+
+			<pre>
+			fonction=XMLSessionFunction
+			sid=<id session> : current session id (must be valid)
+			</pre>
+
+			<h3>Response</h3>
+
+			@image html session.png
+
+			Le retour de la connexion d’utilisateur (login) est décrit comme suit :
+			<ul>
+			<li>session : identificateur de la session (généré aléatoirement). Vide si pas de session valide en cours</li>
+			<li>si une session valide est en cours (sinon seul le champ session, vide, est présent) :</li>
+			<ul>
+			<li>name : nom de l’utilisateur connecté</li>
+			<li>phone : téléphone de l’utilisateur connecté</li>
+			<li>email : adresse e-mail de l’utilisateur connecté</li>
+			<li>user_id : identificateur de l’utilisateur connecté dans la base de données de SYNTHESE (pérenne)</li>
+			</ul></ul>
+
+			Tip : this function can be used in conjunction with the LoginAction and LogoutAction actions to handle user login.
+
+			<h3>Attachments</h3>
+
+			<ul>
+			<li><a href="include/15_server/xml_session_function.xsd">Response XSD Schema</a></li>
+			<li><a href="include/15_server/XMLSessionFunctionSample.xml">Example of XML response</a></li>
+			</ul>
+
 		*/
 		class XMLSessionFunction:
 			public util::FactorableTemplate<server::Function,XMLSessionFunction>

@@ -32,8 +32,10 @@ namespace synthese
 {
 	namespace server
 	{
-		/** Login Action Class.
+		/** Logs a user in the system.
 			@ingroup m15Actions refActions
+
+			Tip : XMLSessionFunction can be used after the action to get the result of the action.
 		*/
 		class LoginAction : public util::FactorableTemplate<server::Action, LoginAction>
 		{
