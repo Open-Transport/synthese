@@ -40,9 +40,6 @@ namespace synthese
 		@defgroup m12Pages 12 Pages
 		@ingroup m12
 
-		@defgroup m12Values 12 Values
-		@ingroup m12
-
 		@defgroup m12Functions 12 Functions
 		@ingroup m12
 
