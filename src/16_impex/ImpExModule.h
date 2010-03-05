@@ -56,7 +56,7 @@ namespace synthese
 		@defgroup m16Logs 16 DB Logs
 		@ingroup m16
 		
-		@defgroup m16 Import export framework
+		@defgroup m16 16 Import export framework
 		@ingroup m1
 		
 		(Module documentation)
