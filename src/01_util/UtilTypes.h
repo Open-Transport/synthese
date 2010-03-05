@@ -28,7 +28,7 @@
 
 namespace synthese
 {
-	/// @defgroup m01 Utilities
+	/// @defgroup m01 01 Utilities
 	/// @ingroup m0
 	/// @{
 	namespace util
