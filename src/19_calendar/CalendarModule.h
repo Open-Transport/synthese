@@ -56,7 +56,7 @@ namespace synthese
 		@defgroup m19Logs 19 DB Logs
 		@ingroup m19
 		
-		@defgroup m19 calendar
+		@defgroup m19 19 Calendar
 		@ingroup m1
 		
 		(Module documentation)
