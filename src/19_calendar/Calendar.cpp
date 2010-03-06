@@ -307,5 +307,12 @@ namespace synthese
 		{
 			return _markedDates != op._markedDates;
 		}
+
+
+
+		void Calendar::copyDates( const Calendar& op )
+		{
+			_markedDates = op._markedDates;
+		}
 	}
 }

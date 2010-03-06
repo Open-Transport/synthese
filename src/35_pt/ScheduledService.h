@@ -1,6 +1,6 @@
 
-/** ContinuousService class header.
-	@file ContinuousService.h
+/** ScheduledService class header.
+	@file ScheduledService.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,70 +20,108 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ENV_CONTINUOUSSERVICE_H
-#define SYNTHESE_ENV_CONTINUOUSSERVICE_H
+#ifndef SYNTHESE_ENV_SCHEDULEDSERVICE_H
+#define SYNTHESE_ENV_SCHEDULEDSERVICE_H
 
-#include "NonPermanentService.h"
 #include "Types.h"
 #include "Registry.h"
+#include "SchedulesBasedService.h"
 
 #include <string>
+#include <boost/tuple/tuple.hpp>
+#include <boost/tuple/tuple_comparison.hpp>
+#include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 
 namespace synthese
 {
+	namespace graph
+	{
+		class Vertex;
+	}
+
 	namespace env
 	{
+		class Line;
+		class LineStop;
+	}
 
-		/** Continuous service.
+	namespace pt
+	{
+		/** Scheduled service.
 			@ingroup m35
 		*/
-		class ContinuousService
-		:	public NonPermanentService
+		class ScheduledService
+		:	public SchedulesBasedService
 		{
 		public:
-			typedef std::vector<std::pair<boost::posix_time::time_duration, boost::posix_time::time_duration> > Schedules;
-
+			
 			/// Chosen registry class.
-			typedef util::Registry<ContinuousService>	Registry;
+			typedef util::Registry<ScheduledService>	Registry;
 
 		private:
+			typedef std::map<
+				boost::tuples::tuple<
+					std::size_t,
+					std::size_t,
+					graph::UserClassCode,
+					boost::gregorian::date
+				>, bool
+			> _NonConcurrencyCache;
 
-			boost::posix_time::time_duration			_range;				//!< Continuous service range (minutes).
-			boost::posix_time::time_duration			_maxWaitingTime;	//!< Max waiting waiting time before next service.
-			Schedules	_departureSchedules;	//!< Departure schedules at each Edge
-			Schedules	_arrivalSchedules;		//!< Arrival schedules at each edge
-		    
+			mutable _NonConcurrencyCache _nonConcurrencyCache;
+			mutable boost::recursive_mutex _nonConcurrencyCacheMutex;
+
+			std::string	_team;
+
 
 		public:
 
-			ContinuousService(
+			ScheduledService(
 				util::RegistryKeyType id = UNKNOWN_VALUE,
 				std::string serviceNumber = std::string(),
-				graph::Path* path = NULL,
-				boost::posix_time::time_duration range = boost::posix_time::time_duration(0,0,0),
-				boost::posix_time::time_duration maxWaitingTime = boost::posix_time::time_duration(0,0,0)
+				graph::Path* path = NULL
 			);
 
-			~ContinuousService ();
+			~ScheduledService ();
 
 		    
 			//! @name Getters
 			//@{
-				boost::posix_time::time_duration getMaxWaitingTime () const;
-				boost::posix_time::time_duration getRange () const;
+				virtual std::string getTeam() const;
+				const env::Line* getRoute() const;
 			//@}
 
 			//! @name Setters
 			//@{
-				void setMaxWaitingTime (boost::posix_time::time_duration maxWaitingTime);
-				void setRange (boost::posix_time::time_duration range);
-				void setDepartureSchedules(const Schedules& schedules);
-				void setArrivalSchedules(const Schedules& schedules);
+				void	setTeam(const std::string& team);
+			//@}
+
+			//! @name Update methods
+			//@{
 			//@}
 
 			//! @name Query methods
 			//@{
-				bool isContinuous () const;
+				virtual bool isContinuous () const;
+
+				virtual bool nonConcurrencyRuleOK(
+					const boost::gregorian::date& date,
+					const graph::Edge& departureEdge,
+					const graph::Edge& arrivalEdge,
+					graph::UserClassCode userClass
+				) const;
+
+				virtual void clearNonConcurrencyCache() const;
+
+				graph::UseRule::ReservationAvailabilityType getReservationAbility(
+					const boost::gregorian::date& date
+				) const;
+
+				boost::posix_time::ptime getReservationDeadLine(
+					const boost::gregorian::date& date
+				) const;
 
 				/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
 					@param method Search departure or arrival :
@@ -108,48 +146,23 @@ namespace synthese
 					, bool controlIfTheServiceIsReachable
 					, bool inverted
 				) const;
-
+				
 				virtual boost::posix_time::ptime getLeaveTime(
 					const graph::ServicePointer& servicePointer
 					, const graph::Edge* edge
 				) const;
 
-				/** Gets a departure schedule for this service.
-					@param rank Rank of the stop where to get the departure schedule
-					@return The first schedule of the continuous range, at the specified stop rank
-				*/
-				virtual boost::posix_time::time_duration getDepartureSchedule(
-					bool RTData,
-					std::size_t rank
-				) const;
+				
 
-				virtual const boost::posix_time::time_duration& getLastArrivalSchedule(
-					bool RTData
-				) const;
-
-				virtual boost::posix_time::time_duration getDepartureBeginScheduleToIndex(
-					bool RTData,
-					std::size_t rankInPath
-				) const;
-
-				virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(
-					bool RTData,
-					std::size_t rankInPath
-				) const;
-
-				virtual boost::posix_time::time_duration getArrivalBeginScheduleToIndex(
-					bool RTData,
-					std::size_t rankInPath
-				) const;
-
-				virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(
-					bool RTData,
-					std::size_t rankInPath
-				) const;
-
+				virtual boost::posix_time::time_duration getDepartureBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+				virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+				virtual boost::posix_time::time_duration getArrivalBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+				virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
 			//@}
 
 		};
+	
+		bool operator==(const ScheduledService& first, const ScheduledService& second);
 	}
 }
 

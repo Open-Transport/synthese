@@ -37,12 +37,13 @@ namespace synthese
 	
 	namespace env
 	{
-		class ScheduledService;
 		class LineStop;
 	}
 
 	namespace pt
 	{
+		class ScheduledService;
+
 		/** RealTimeUpdateScreenServiceInterfacePage Interface Page Class.
 			@ingroup m35Pages refPages
 			@author Hugues
@@ -80,7 +81,7 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				const env::ScheduledService& service,
+				const ScheduledService& service,
 				const env::LineStop& lineStop,
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL

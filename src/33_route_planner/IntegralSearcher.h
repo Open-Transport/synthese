@@ -185,6 +185,20 @@ namespace synthese
 
 
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Computes and stores the score of a journey.
+			/// @param journey the journey to evaluate
+			/// @param totalDuration the duration of the best journey found by the route planner (undefined if no journey has been found at the time)
+			/// @author Hugues Romain
+			/// @date 2009
+			///
+			/// The score is between 0 and 1000.
+			///
+			/// @image html scores_noresult.png
+			/// @image html scores_result.png
+			///
+			/// <h3>Attachments</h3>
+			/// <ul><li><a href="include/test-score.xslx">Score simulation table</a></li></ul>
 			void setJourneyScore(
 				graph::Journey& journey,
 				boost::optional<boost::posix_time::time_duration> totalDuration

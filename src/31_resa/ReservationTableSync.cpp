@@ -47,6 +47,7 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{

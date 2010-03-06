@@ -25,7 +25,7 @@
 #include "TimetableRow.h"
 #include "TimetableGenerator.h"
 
-#include "NonPermanentService.h"
+#include "SchedulesBasedService.h"
 #include "Path.h"
 #include "Line.h"
 #include "Edge.h"
@@ -38,15 +38,16 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace pt;
 	using namespace calendar;
 	using namespace graph;
+	using namespace env;
 
 	namespace timetables
 	{
 		TimetableColumn::TimetableColumn(
 			const TimetableGenerator& timetablegenerator,
-			const env::NonPermanentService& service
+			const SchedulesBasedService& service
 		):	_warning(NULL)
 			, _line(static_cast<const Line*>(service.getPath()))
 			, _calendar(service)

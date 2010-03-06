@@ -12,6 +12,8 @@
 #include "NavteqWithProjectionFileFormat.h"
 #include "NonConcurrencyRuleAddAction.h"
 #include "NonConcurrencyRuleRemoveAction.h"
+#include "ContinuousServiceTableSync.h"
+#include "ScheduledServiceTableSync.h"
 
 #include "TransportNetworkAdmin.h"
 #include "CommercialLineAdmin.h"
@@ -34,6 +36,7 @@
 #include "TransportNetworkAddAction.h"
 #include "CommercialLineAddAction.h"
 #include "LineAddAction.h"
+#include "ServiceAddAction.h"
 
 #include "TransportNetworkRight.h"
 

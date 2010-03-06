@@ -32,6 +32,10 @@ namespace synthese
 	namespace env
 	{
 		class CommercialLine;
+	}
+
+	namespace pt
+	{
 		class ScheduledService;
 	}
 

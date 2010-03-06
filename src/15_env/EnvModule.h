@@ -47,9 +47,6 @@ namespace synthese
 	*/
 	namespace env
 	{
-		class NonPermanentService;
-		
-
 		/** 35 Transport network module class.
 		*/
 		class EnvModule:
@@ -59,12 +56,7 @@ namespace synthese
 
 
 		public:
-			static boost::shared_ptr<NonPermanentService> FetchEditableService(
-				const util::RegistryKeyType& id,
-				util::Env& env = util::Env::GetOfficialEnv()
-			);
-
-			
+		
 			static std::vector<std::pair<uid, std::string> >	getCommercialLineLabels(
 				const security::RightsOfSameClassMap& rights 
 				, bool totalControl 

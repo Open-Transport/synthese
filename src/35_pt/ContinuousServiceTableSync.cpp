@@ -32,8 +32,6 @@
 
 #include <boost/tokenizer.hpp>
 
-#include "Conversion.h"
-
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
@@ -44,6 +42,8 @@
 #include "PTUseRule.h"
 #include "Point2D.h"
 #include "GraphConstants.h"
+#include "ReplaceQuery.h"
+#include "LoadException.h"
 
 #include <set>
 #include <boost/algorithm/string.hpp>
@@ -62,9 +62,10 @@ namespace synthese
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ContinuousServiceTableSync>::FACTORY_KEY("15.60.02 Continuous services");
+	template<> const string FactorableTemplate<Fetcher<SchedulesBasedService>, ContinuousServiceTableSync>::FACTORY_KEY("17");
 	template<> const string FactorableTemplate<Fetcher<NonPermanentService>, ContinuousServiceTableSync>::FACTORY_KEY("17");
 
-	namespace env
+	namespace pt
 	{
 		const std::string ContinuousServiceTableSync::COL_SERVICENUMBER ("service_number");
 		const std::string ContinuousServiceTableSync::COL_SCHEDULES ("schedules");
@@ -113,72 +114,25 @@ namespace synthese
 		    boost::posix_time::time_duration maxWaitingTime (minutes(rows->getInt (ContinuousServiceTableSync::COL_MAXWAITINGTIME)));
 			uid pathId(rows->getLongLong(ContinuousServiceTableSync::COL_PATHID));
 
-		    string schedules (
-			rows->getText (ContinuousServiceTableSync::COL_SCHEDULES));
-
-		    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-		    
-		    // Parse all schedules arrival#departure,arrival#departure...
-			boost::char_separator<char> sep1 (",");
-			tokenizer schedulesTokens (schedules, sep1);
-
-			ContinuousService::Schedules departureSchedules;
-			ContinuousService::Schedules arrivalSchedules;
-
-			for (tokenizer::iterator schedulesIter = schedulesTokens.begin();
-				schedulesIter != schedulesTokens.end (); ++schedulesIter)
+			try
 			{
-				std::string arrDep (*schedulesIter);
-				size_t sepPos = arrDep.find ("#");
-				assert (sepPos != std::string::npos);
-
-				std::string arrivalScheduleStr (arrDep.substr (0, sepPos));
-				std::string departureScheduleStr (arrDep.substr (sepPos+1));
-
-				boost::trim (departureScheduleStr);
-				boost::trim (arrivalScheduleStr);
-
-				if (departureScheduleStr.empty ())
-				{
-					assert (arrivalScheduleStr.empty () == false);
-					departureScheduleStr = arrivalScheduleStr;
-				}
-				if (arrivalScheduleStr.empty ())
-				{
-					assert (departureScheduleStr.empty () == false);
-					arrivalScheduleStr = departureScheduleStr;
-				}
-
-				time_duration departureSchedule(Service::DecodeSchedule(departureScheduleStr));
-				time_duration arrivalSchedule (Service::DecodeSchedule(arrivalScheduleStr));
-				arrivalSchedule += maxWaitingTime;
-
-				time_duration endDepartureSchedule(departureSchedule);
-				endDepartureSchedule += range;
-				time_duration endArrivalSchedule(arrivalSchedule);
-				endArrivalSchedule += range;
-
-				departureSchedules.push_back (make_pair(departureSchedule, endDepartureSchedule));
-				arrivalSchedules.push_back (make_pair(arrivalSchedule, endArrivalSchedule));
+				cs->decodeSchedules(
+					rows->getText(ContinuousServiceTableSync::COL_SCHEDULES)
+				);
 			}
-
-			assert (departureSchedules.size () > 0);
-			assert (arrivalSchedules.size () > 0);
-			assert (departureSchedules.size () == arrivalSchedules.size ());
+			catch(...)
+			{
+				throw LoadException<ContinuousServiceTableSync>(rows, ContinuousServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size");
+			}
 
 			cs->setServiceNumber(serviceNumber);
 			cs->setRange(range);
 			cs->setMaxWaitingTime(maxWaitingTime);
-			cs->setDepartureSchedules(departureSchedules);
-			cs->setArrivalSchedules(arrivalSchedules);
 			cs->setPathId(pathId);
 			cs->clearRules();
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-
-				uid pathId (rows->getLongLong (ContinuousServiceTableSync::COL_PATHID));
-
 				Path* path(LineTableSync::GetEditable(pathId, env, linkLevel).get());
 				assert (path);
 	//			assert (path->getEdges ().size () == arrivalSchedules.size ());
@@ -233,22 +187,33 @@ namespace synthese
 			ContinuousService* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());	/// @todo Use grid ID
-               
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< object->getKey()
-				/// @todo fill other fields separated by ,
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<ContinuousServiceTableSync> query(*object);
+			query.addField(object->getServiceNumber());
+			query.addField(object->encodeSchedules());
+			query.addField(object->getPathId());
+			query.addField(object->getRange().total_seconds() / 60);
+			query.addField(object->getMaxWaitingTime().total_seconds() / 60);
+			query.addField(
+				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
+				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :
+				RegistryKeyType(0)
+			);
+			query.addField(
+				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
+				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() :
+				RegistryKeyType(0)
+			);
+			query.addField(
+				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
+				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() :
+				RegistryKeyType(0)
+			);
+			query.execute(transaction);
 		}
 
 	}
 
-	namespace env
+	namespace pt
 	{
 		ContinuousServiceTableSync::SearchResult ContinuousServiceTableSync::Search(
 			Env& env,
@@ -278,11 +243,17 @@ namespace synthese
 				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << *commercialLineId;
 			}
 			if (orderByDepartureTime)
+			{
 				query << " ORDER BY " << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");
+			}
 			if (number)
+			{
 				query << " LIMIT " << (*number + 1);
-			if (first > 0)
-				query << " OFFSET " << first;
+				if (first > 0)
+				{
+					query << " OFFSET " << first;
+				}
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

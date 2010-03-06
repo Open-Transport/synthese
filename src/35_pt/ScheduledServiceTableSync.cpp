@@ -33,14 +33,12 @@
 #include "GraphConstants.h"
 #include <sstream>
 
-#include "Conversion.h"
-
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
+#include "ReplaceQuery.h"
 
-#include <boost/tokenizer.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 
 #include <assert.h>
@@ -60,9 +58,10 @@ namespace synthese
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ScheduledServiceTableSync>::FACTORY_KEY("15.60.03 Scheduled services");
+	template<> const string FactorableTemplate<Fetcher<SchedulesBasedService>, ScheduledServiceTableSync>::FACTORY_KEY("16");
 	template<> const string FactorableTemplate<Fetcher<NonPermanentService>, ScheduledServiceTableSync>::FACTORY_KEY("16");
 
-	namespace env
+	namespace pt
 	{
 		const string ScheduledServiceTableSync::COL_SERVICENUMBER ("service_number");
 		const string ScheduledServiceTableSync::COL_SCHEDULES ("schedules");
@@ -108,71 +107,28 @@ namespace synthese
 		    string serviceNumber (rows->getText(ScheduledServiceTableSync::COL_SERVICENUMBER));
 
 			uid pathId(rows->getLongLong(ScheduledServiceTableSync::COL_PATHID));
-		    
-		    string schedules (rows->getText (ScheduledServiceTableSync::COL_SCHEDULES));
 
-		    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-
-		    // Parse all schedules arrival#departure,arrival#departure...
-		    boost::char_separator<char> sep1 (",");
-		    tokenizer schedulesTokens (schedules, sep1);
-		    
-		    ScheduledService::Schedules departureSchedules;
-		    ScheduledService::Schedules arrivalSchedules;
-		    
-		    for(tokenizer::iterator schedulesIter = schedulesTokens.begin();
-				schedulesIter != schedulesTokens.end ();
-				++schedulesIter
-			){
-				string arrDep (*schedulesIter);
-				size_t sepPos = arrDep.find ("#");
-				assert (sepPos != string::npos);
-				
-				string arrivalScheduleStr (arrDep.substr (0, sepPos));
-				string departureScheduleStr (arrDep.substr (sepPos+1));
-				
-				// unnecessary : boost::trim (departureScheduleStr);
-				// unnecessary : boost::trim (arrivalScheduleStr);
-				
-				if (departureScheduleStr.empty ())
-				{
-					assert (arrivalScheduleStr.empty () == false);
-					departureScheduleStr = arrivalScheduleStr;
-				}
-				if (arrivalScheduleStr.empty ())
-				{
-					assert (departureScheduleStr.empty () == false);
-					arrivalScheduleStr = departureScheduleStr;
-				}
-				
-				time_duration departureSchedule (Service::DecodeSchedule(departureScheduleStr));
-				time_duration arrivalSchedule (Service::DecodeSchedule(arrivalScheduleStr));
-				
-				departureSchedules.push_back (departureSchedule);
-				arrivalSchedules.push_back (arrivalSchedule);
-		    }
-		    
-		    if(	departureSchedules.size () <= 0 ||
-				arrivalSchedules.size () <= 0 ||
-				departureSchedules.size() != arrivalSchedules.size ()
-			){
+			try
+			{
+				ss->decodeSchedules(
+					rows->getText(ScheduledServiceTableSync::COL_SCHEDULES)
+				);
+			}
+			catch(...)
+			{
 				throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size");
 			}
-		    
+
 		    ss->setServiceNumber(serviceNumber);
-		    ss->setDepartureSchedules(departureSchedules);
-		    ss->setArrivalSchedules(arrivalSchedules);
 			ss->setTeam(rows->getText(ScheduledServiceTableSync::COL_TEAM));
 			ss->setPathId(pathId);
 			ss->clearRules();
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				uid pathId (rows->getLongLong (ScheduledServiceTableSync::COL_PATHID));
-
 				Path* path = LineTableSync::GetEditable(pathId, env, linkLevel).get();
 				
-				if(	path->getEdges ().size () != arrivalSchedules.size ()
+				if(	path->getEdges ().size () != ss->getArrivalSchedules(false).size ()
 				){
 					throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");
 				}
@@ -229,45 +185,32 @@ namespace synthese
 			ScheduledService* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-			
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToSQLiteString(object->getServiceNumber())
-				<< ",'"
-			;
-			for(int i(0); i<object->getDepartureSchedules(false).size(); ++i)
-			{
-				if(i) query << ",";
-				query << Service::EncodeSchedule(object->getArrivalSchedules(false)[i]) << "#" << Service::EncodeSchedule(object->getDepartureSchedules(false)[i]);
-			}
-			query <<
-				"'," << object->getPathId()
-				<< "," << (
-					object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
-					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey()) :
-				"0")
-					<< "," << (
-					object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
-					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey()) :
-				"0")
-					<< "," << (
-					object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
-					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey()) :
-				"0") <<
-
-
-				"," << Conversion::ToSQLiteString(object->getTeam()) <<
-			")";
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+			ReplaceQuery<ScheduledServiceTableSync> query(*object);
+			query.addField(object->getServiceNumber());
+			query.addField(object->encodeSchedules());
+			query.addField(object->getPathId());
+			query.addField(
+				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
+				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :
+				RegistryKeyType(0)
+			);
+			query.addField(
+				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
+				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() :
+				RegistryKeyType(0)
+			);
+			query.addField(
+				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
+				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() :
+				RegistryKeyType(0)
+			);
+			query.addField(object->getTeam());
+			query.execute(transaction);
 		}
 
 	}
 
-	namespace env
+	namespace pt
 	{
 		ScheduledServiceTableSync::SearchResult ScheduledServiceTableSync::Search(
 			Env& env,
@@ -313,14 +256,17 @@ namespace synthese
 				}
 				query <<
 					" AND " << ScheduledServiceTableSync::COL_SCHEDULES <<
-					">='00:00:00#" << Service::EncodeSchedule(snow) << "'" 
+					">='00:00:00#" << SchedulesBasedService::EncodeSchedule(snow) << "'" 
 				;
 			}
 			if (date)
+			{
 				query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
-			query << " ORDER BY ";
+			}
 			if (orderByOriginTime)
-				query << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");
+			{
+				query << " ORDER BY " << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");
+			}
 
 			if (number)
 			{

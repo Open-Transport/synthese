@@ -27,7 +27,6 @@
 #include "EnvModule.h"
 #include "Profile.h"
 #include "CommercialLine.h"
-#include "HTMLTable.h"
 #include "HTMLModule.h"
 #include "PhysicalStop.h"
 #include "Line.h"
@@ -43,8 +42,10 @@
 #include "ServiceAdmin.h"
 #include "Request.h"
 #include "AdminFunctionRequest.hpp"
-
+#include "ActionResultHTMLTable.h"
 #include "AdminParametersException.h"
+#include "ServiceAddAction.h"
+#include "AdminActionFunctionRequest.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -80,9 +81,10 @@ namespace synthese
 
 	namespace pt
 	{
-		const string LineAdmin::TAB_STOPS("stops");
-		const string LineAdmin::TAB_SCHEDULED_SERVICES("sserv");
-		const string LineAdmin::TAB_CONTINUOUS_SERVICES("cserv");
+		const string LineAdmin::TAB_STOPS("st");
+		const string LineAdmin::TAB_SCHEDULED_SERVICES("ss");
+		const string LineAdmin::TAB_CONTINUOUS_SERVICES("cs");
+		const string LineAdmin::TAB_PROPERTIES("pr");
 		const string LineAdmin::TAB_INDICES("in");
 
 		LineAdmin::LineAdmin()
@@ -103,13 +105,16 @@ namespace synthese
 			{
 				throw AdminParametersException("No such line");
 			}
+
+			// Search table initialization
+			_requestParameters.setFromParametersMap(map.getMap(), ScheduledServiceTableSync::COL_SCHEDULES);
 		}
 		
 		
 		
 		server::ParametersMap LineAdmin::getParametersMap() const
 		{
-			ParametersMap m;
+			ParametersMap m(_requestParameters.getParametersMap());
 			if(_line.get()) m.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
 			return m;
 		}
@@ -172,6 +177,8 @@ namespace synthese
 			// TAB SCHEDULED SERVICES
 			if (openTabContent(stream, TAB_SCHEDULED_SERVICES))
 			{
+				stream << "<h1>Services à horaire</h1>";
+
 				ScheduledServiceTableSync::SearchResult sservices(
 					ScheduledServiceTableSync::Search(
 						Env::GetOfficialEnv(),
@@ -183,55 +190,73 @@ namespace synthese
 						false,
 						0,
 						optional<size_t>(),
-						true, true,
+						_requestParameters.orderField == ScheduledServiceTableSync::COL_SCHEDULES,
+						_requestParameters.raisingOrder,
 						UP_DOWN_LINKS_LOAD_LEVEL
 				)	);
-				if (sservices.empty())
-					stream << "<p>Aucun service à horaire</p>";
-				else
+
+				AdminFunctionRequest<LineAdmin> searchRequest(_request);
+				HTMLForm sortedForm(searchRequest.getHTMLForm());
+
+				AdminActionFunctionRequest<ServiceAddAction, LineAdmin> newRequest(_request);
+				newRequest.getAction()->setLine(const_pointer_cast<Line>(_line));
+				newRequest.getAction()->setIsContinuous(false);
+
+				ActionResultHTMLTable::HeaderVector vs;
+				vs.push_back(make_pair(string(), "Num"));
+				vs.push_back(make_pair(string(), "Numéro"));
+				vs.push_back(make_pair(ScheduledServiceTableSync::COL_SCHEDULES, "Départ"));
+				vs.push_back(make_pair(string(), "Arrivée"));
+				vs.push_back(make_pair(string(), "Durée"));
+				vs.push_back(make_pair(string(), "Dernier jour"));
+				vs.push_back(make_pair(string(), "Actions"));
+				vs.push_back(make_pair(string(), "Actions"));
+				ActionResultHTMLTable ts(vs, sortedForm, _requestParameters, sservices, newRequest.getHTMLForm(), ServiceAddAction::PARAMETER_TEMPLATE_ID);
+
+				AdminFunctionRequest<ServiceAdmin> serviceRequest(_request);
+
+				stream << ts.open();
+
+				size_t i(0);
+				BOOST_FOREACH(shared_ptr<ScheduledService> service, sservices)
 				{
-					AdminFunctionRequest<ServiceAdmin> serviceRequest(_request);
+					serviceRequest.getPage()->setService(service);
 
-					HTMLTable::ColsVector vs;
-					vs.push_back("Num");
-					vs.push_back("Numéro");
-					vs.push_back("Départ");
-					vs.push_back("Arrivée");
-					vs.push_back("Durée");
-					vs.push_back("Dernier jour");
-					HTMLTable ts(vs,"adminresults");
+					string number("S"+ lexical_cast<string>(i++));
+					services[service.get()] = number;
 
-					stream << ts.open();
+					time_duration ds(service->getDepartureSchedule(false, 0));
+					time_duration as(service->getLastArrivalSchedule(false));
 
-					size_t i(0);
-					BOOST_FOREACH(shared_ptr<ScheduledService> service, sservices)
-					{
-						serviceRequest.getPage()->setService(service);
+					stream << ts.row(lexical_cast<string>(service->getKey()));
 
-						string number("S"+ lexical_cast<string>(i++));
-						services[service.get()] = number;
+					stream << ts.col() << number;
 
-						time_duration ds(service->getDepartureSchedule(false, 0));
-						time_duration as(service->getLastArrivalSchedule(false));
+					stream << ts.col() << service->getServiceNumber();
 
-						stream << ts.row();
+					stream << ts.col() << ds;
+					stream << ts.col() << as;
 
-						stream << ts.col() << number;
+					stream << ts.col() << (as - ds);
 
-						stream << ts.col() << service->getServiceNumber();
+					serviceRequest.getPage()->setActiveTab(ServiceAdmin::TAB_CALENDAR);
+					stream << ts.col() << HTMLModule::getHTMLLink(serviceRequest.getURL(), to_iso_extended_string(service->getLastActiveDate()));
 
-						stream << ts.col() << ds;
-						stream << ts.col() << as;
+					serviceRequest.getPage()->setActiveTab(string());
+					stream << ts.col() << HTMLModule::getLinkButton(serviceRequest.getURL(), "Ouvrir", string(), ServiceAdmin::ICON);
 
-						stream << ts.col() << (as - ds);
-
-						stream << ts.col() << to_iso_extended_string(service->getLastActiveDate());
-
-						stream << ts.col() << HTMLModule::getLinkButton(serviceRequest.getURL(), "Ouvrir", string(), ServiceAdmin::ICON);
-					}
-
-					stream << ts.close();
+					stream << ts.col() << "Supprimer";
 				}
+
+				stream << ts.row();
+				stream << ts.col() << "S" << i;
+				stream << ts.col() << ts.getActionForm().getTextInput(ServiceAddAction::PARAMETER_NUMBER, string());
+				stream << ts.col() << ts.getActionForm().getTextInput(ServiceAddAction::PARAMETER_START_DEPARTURE_TIME, string());
+				stream << ts.col(3) << "cadence : " << ts.getActionForm().getSelectNumberInput(ServiceAddAction::PARAMETER_PERIOD, 0, 120, 0, 1, string(), "non") << " " <<
+					ts.getActionForm().getTextInput(ServiceAddAction::PARAMETER_END_DEPARTURE_TIME, string(), "(fin cadence)");
+				stream << ts.col(2) << ts.getActionForm().getSubmitButton("Créer");
+
+				stream << ts.close();
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -245,65 +270,94 @@ namespace synthese
 						optional<RegistryKeyType>(),
 						0,
 						optional<size_t>(),
-						true,
-						true,
+						_requestParameters.orderField == ScheduledServiceTableSync::COL_SCHEDULES,
+						_requestParameters.raisingOrder,
 						UP_DOWN_LINKS_LOAD_LEVEL
 				)	);
-				if (cservices.empty())
-					stream << "<p>Aucun service continu</p>";
-				else
+
+				AdminFunctionRequest<LineAdmin> searchRequest(_request);
+				HTMLForm sortedForm(searchRequest.getHTMLForm());
+
+				AdminActionFunctionRequest<ServiceAddAction, LineAdmin> newRequest(_request);
+				newRequest.getAction()->setLine(const_pointer_cast<Line>(_line));
+				newRequest.getAction()->setIsContinuous(true);
+
+				AdminFunctionRequest<ServiceAdmin> serviceRequest(_request);
+
+				ActionResultHTMLTable::HeaderVector vc;
+				vc.push_back(make_pair(string(), "Num"));
+				vc.push_back(make_pair(ScheduledServiceTableSync::COL_SCHEDULES, "Départ premier"));
+				vc.push_back(make_pair(string(), "Départ dernier"));
+				vc.push_back(make_pair(string(), "Arrivée premier"));
+				vc.push_back(make_pair(string(), "Arrivée dernier"));
+				vc.push_back(make_pair(string(), "Durée"));
+				vc.push_back(make_pair(string(), "Amplitude"));
+				vc.push_back(make_pair(string(), "Fréquence"));
+				vc.push_back(make_pair(string(), "Dernier jour"));
+				vc.push_back(make_pair(string(), "Actions"));
+				vc.push_back(make_pair(string(), "Actions"));
+				
+				ActionResultHTMLTable tc(vc, sortedForm, _requestParameters, cservices, newRequest.getHTMLForm(), ServiceAddAction::PARAMETER_TEMPLATE_ID);
+
+				stream << tc.open();
+
+				size_t i(0);
+				BOOST_FOREACH(shared_ptr<ContinuousService> service, cservices)
 				{
-					AdminFunctionRequest<ServiceAdmin> serviceRequest(_request);
+					serviceRequest.getPage()->setService(service);
 
-					HTMLTable::ColsVector vc;
-					vc.push_back("Num");
-					vc.push_back("Départ premier");
-					vc.push_back("Départ dernier");
-					vc.push_back("Arrivée premier");
-					vc.push_back("Arrivée dernier");
-					vc.push_back("Durée");
-					vc.push_back("Amplitude");
-					vc.push_back("Fréquence");
-					vc.push_back("Dernier jour");
-					HTMLTable tc(vc,"adminresults");
+					string number("C"+ lexical_cast<string>(i++));
+					services[service.get()] = number;
 
-					stream << tc.open();
+					stream << tc.row(lexical_cast<string>(service->getKey()));
 
-					size_t i(0);
-					BOOST_FOREACH(shared_ptr<ContinuousService> service, cservices)
-					{
-						serviceRequest.getPage()->setService(service);
+					stream << tc.col() << number;
 
-						string number("C"+ lexical_cast<string>(i++));
-						services[service.get()] = number;
+					time_duration ds(service->getDepartureSchedule(false, 0));
+					time_duration as(service->getLastArrivalSchedule(false));
 
-						stream << tc.row();
+					stream << tc.col() << ds;
+					ds += service->getRange();
+					stream << tc.col() << ds;
 
-						stream << tc.col() << number;
+					stream << tc.col() << as;
+					as += service->getRange();
+					stream << tc.col() << as;
 
-						time_duration ds(service->getDepartureSchedule(false, 0));
-						time_duration as(service->getLastArrivalSchedule(false));
+					stream << tc.col() << (as - ds);
 
-						stream << tc.col() << ds;
-						ds += service->getRange();
-						stream << tc.col() << ds;
+					stream << tc.col() << service->getRange();
+					stream << tc.col() << service->getMaxWaitingTime();
 
-						stream << tc.col() << as;
-						as += service->getRange();
-						stream << tc.col() << as;
+					stream << tc.col() << to_iso_extended_string(service->getLastActiveDate());
 
-						stream << tc.col() << (as - ds);
+					stream << tc.col() << HTMLModule::getLinkButton(serviceRequest.getURL(), "Ouvrir", string(), ServiceAdmin::ICON);
 
-						stream << tc.col() << service->getRange();
-						stream << tc.col() << service->getMaxWaitingTime();
-
-						stream << tc.col() << to_iso_extended_string(service->getLastActiveDate());
-
-						stream << tc.col() << HTMLModule::getLinkButton(serviceRequest.getURL(), "Ouvrir", string(), ServiceAdmin::ICON);
-					}
-
-					stream << tc.close();
+					stream << tc.col() << "Supprimer";
 				}
+
+				stream << tc.row();
+				stream << tc.col() << "C" << i;
+				stream << tc.col() << tc.getActionForm().getTextInput(ServiceAddAction::PARAMETER_START_DEPARTURE_TIME, string());
+				stream << tc.col() << tc.getActionForm().getTextInput(ServiceAddAction::PARAMETER_END_DEPARTURE_TIME, string());
+				stream << tc.col(4);
+				stream << tc.col() << tc.getActionForm().getSelectNumberInput(ServiceAddAction::PARAMETER_PERIOD, 1, 120, 5);
+				stream << tc.col(2) << tc.getActionForm().getSubmitButton("Créer");
+
+				stream << tc.close();
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB INDICES
+			if (openTabContent(stream, TAB_PROPERTIES))
+			{
+				stream << "<h1>Propriétés</h1>";
+
+				// LineUpdateAction
+
+				stream << "<h1>Règles d'accès</h1>";
+
+				// RuleUserUpdateAction
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -413,8 +467,9 @@ namespace synthese
 			_tabs.clear();
 
 			_tabs.push_back(Tab("Arrêts desservis", TAB_STOPS, true));
-			_tabs.push_back(Tab("Services à horaire", TAB_SCHEDULED_SERVICES, true));
-			_tabs.push_back(Tab("Services continus", TAB_CONTINUOUS_SERVICES, true));
+			_tabs.push_back(Tab("Services à horaire", TAB_SCHEDULED_SERVICES, true, ServiceAdmin::ICON));
+			_tabs.push_back(Tab("Services continus", TAB_CONTINUOUS_SERVICES, true, ServiceAdmin::ICON));
+			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true, "application_form.png"));
 			_tabs.push_back(Tab("Index", TAB_INDICES, true));
 
 			_tabBuilded = true;

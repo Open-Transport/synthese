@@ -21,6 +21,7 @@
 */
 
 #include "EnvModule.h"
+#include "ContinuousService.h"
 #include "Journey.h"
 #include "01_util/Constants.h"
 #include "Conversion.h"
@@ -34,10 +35,6 @@
 #include "CommercialLine.h"
 #include "Crossing.h"
 #include "Line.h"
-#include "ScheduledService.h"
-#include "ScheduledServiceTableSync.h"
-#include "ContinuousService.h"
-#include "ContinuousServiceTableSync.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "ConnectionPlaceTableSync.h"
 #include "RoadPlace.h"
@@ -118,21 +115,6 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 				m.push_back(make_pair(line->getKey(), line->getShortName()));
 			return m;
-		}
-
-
-
-		shared_ptr<NonPermanentService> EnvModule::FetchEditableService(
-			const RegistryKeyType& id,
-			Env& env
-		){
-			int tableId(decodeTableId(id));
-			if(tableId == ScheduledServiceTableSync::TABLE.ID)
-				return static_pointer_cast<NonPermanentService, ScheduledService>(env.getEditableRegistry<ScheduledService>().getEditable(id));
-			if (tableId == ContinuousServiceTableSync::TABLE.ID)
-				return static_pointer_cast<NonPermanentService, ContinuousService>(env.getEditableRegistry<ContinuousService>().getEditable(id));
-			
-			return shared_ptr<NonPermanentService>();
 		}
 
 

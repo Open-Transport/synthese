@@ -56,6 +56,9 @@ namespace synthese
 			but also self-provided by the traveller himself 
 			(walking, cycling...).
 
+			@warning Each constructor of Service implementations must run clearRTData().
+
+
 			@ingroup m18
 		*/
 		class Service
@@ -63,13 +66,17 @@ namespace synthese
 			public virtual util::Registrable		
 		{
 		public:
+			typedef std::vector<const Vertex*> ServedVertices;
 
-		private:
+		protected:
 			std::string				_serviceNumber;
 			util::RegistryKeyType	_pathId;
 			Path*					_path;
-			
-		protected:
+
+			boost::posix_time::ptime _nextRTUpdate;
+			ServedVertices	_RTVertices;	//!< Real time edges
+
+			virtual void _computeNextRTUpdate() = 0;
 			virtual const RuleUser* _getParentRuleUser() const;
 
 		public:
@@ -91,6 +98,7 @@ namespace synthese
 				Path*				getPath ();
 				uid					getPathId()			const;
 				const std::string&	getServiceNumber()	const;
+				const boost::posix_time::ptime& getNextRTUpdate() const;
 			//@}
 
 			//! @name Setters
@@ -206,9 +214,33 @@ namespace synthese
 					bool RTData,
 					size_t rank
 				) const = 0;
+
+
+				const graph::Vertex* getRealTimeVertex(
+					std::size_t rank
+				) const;
 			//@}
 
 
+
+
+			//! @name Update methods
+			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Update a served edge at real time.
+				/// @param rank Rank of the edge to update
+				/// @param value Served edge 
+				void setRealTimeVertex(
+					std::size_t rank,
+					const graph::Vertex* value
+				);
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Restores real time data to theoretical value.
+				/// Sets the next update into the next day.
+				virtual void clearRTData();
+			//@}
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -217,9 +249,6 @@ namespace synthese
 			/// @param value the duration to transform
 			/// @result the time of day duration
 			static boost::posix_time::time_duration GetTimeOfDay(const boost::posix_time::time_duration& value);
-
-			static std::string EncodeSchedule(const boost::posix_time::time_duration& value);
-			static boost::posix_time::time_duration DecodeSchedule(const std::string value);
 		};
 	}
 }

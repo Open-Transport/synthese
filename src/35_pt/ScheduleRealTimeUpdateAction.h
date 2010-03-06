@@ -32,13 +32,10 @@
 
 namespace synthese
 {
-	namespace env
-	{
-		class ScheduledService;
-	}
-
 	namespace pt
 	{
+		class ScheduledService;
+
 		/** Action class : real time update of service schedules.
 			@ingroup m35Actions refActions
 
@@ -62,7 +59,7 @@ namespace synthese
 			static const std::string PARAMETER_PROPAGATE_CONSTANTLY;
 
 		private:
-			boost::shared_ptr<env::ScheduledService> _service;
+			boost::shared_ptr<ScheduledService> _service;
 			std::size_t _lineStopRank;
 			boost::posix_time::time_duration _lateDuration;
 			bool _atArrival;
@@ -97,7 +94,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setService(boost::shared_ptr<const env::ScheduledService> service);
+				void setService(boost::shared_ptr<const ScheduledService> service);
 				void setLineStopRank(std::size_t value);
 				void setAtArrival(bool value);
 				void setAtDeparture(bool value);

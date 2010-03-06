@@ -36,14 +36,17 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
-		/** ContinuousService table synchronizer.
-			@ingroup m35LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// ContinuousService table synchronizer.
+		///	@ingroup m35LS refLS
+		///
+		///	@warning The continuous service table synchronizer DOES NOT handle calendar dates. See ServiceDateTableSync.
 		class ContinuousServiceTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>,
-			public db::FetcherTemplate<env::NonPermanentService, ContinuousServiceTableSync>
+			public db::FetcherTemplate<SchedulesBasedService, ContinuousServiceTableSync>,
+			public db::FetcherTemplate<NonPermanentService, ContinuousServiceTableSync>
 		{
 		public:
 			static const std::string COL_SERVICENUMBER;

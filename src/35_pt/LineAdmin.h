@@ -26,6 +26,7 @@
 #define SYNTHESE_LineAdmin_H__
 
 #include "AdminInterfaceElementTemplate.h"
+#include "ResultHTMLTable.h"
 
 namespace synthese
 {
@@ -47,10 +48,12 @@ namespace synthese
 			static const std::string TAB_STOPS;
 			static const std::string TAB_SCHEDULED_SERVICES;
 			static const std::string TAB_CONTINUOUS_SERVICES;
+			static const std::string TAB_PROPERTIES;
 			static const std::string TAB_INDICES;
 
 		private:
 			boost::shared_ptr<const env::Line>	_line;
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
 		public:
 			LineAdmin();

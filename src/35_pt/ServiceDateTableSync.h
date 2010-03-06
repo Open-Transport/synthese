@@ -31,13 +31,9 @@
 
 namespace synthese
 {
-	namespace env
-	{
-		class NonPermanentService;
-	}
-	
 	namespace pt
 	{
+		class NonPermanentService;
 		class ServiceDate;
 		
 		/** Service dates table synchronizer.
@@ -57,11 +53,16 @@ namespace synthese
 			 * @param service The service to update
 			 */
 			static void SetActiveDates(
-				env::NonPermanentService& service
+				NonPermanentService& service
 			);
 			
 			static void DeleteDatesFromNow(
 				util::RegistryKeyType serviceId
+			);
+
+			static void CreateDatesForRecentlyCreatedCalendar(
+				NonPermanentService& service,
+				boost::optional<db::SQLiteTransaction&> transaction
 			);
 		};
 	}

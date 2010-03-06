@@ -49,6 +49,7 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 	using namespace graph;
+	using namespace pt;	
 
 	template<> const string util::FactorableTemplate<InterfacePage,routeplanner::JourneyBoardServiceCellInterfacePage>::FACTORY_KEY("journey_board_service_cell");
 

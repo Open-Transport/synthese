@@ -38,10 +38,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<env::ContinuousService>::KEY("ContinuousService");
+		template<> const string Registry<pt::ContinuousService>::KEY("ContinuousService");
 	}
 
-	namespace env
+	namespace pt
 	{
 		ContinuousService::ContinuousService(
 			RegistryKeyType id,
@@ -49,8 +49,8 @@ namespace synthese
 			Path* path,
 			boost::posix_time::time_duration range,
 			boost::posix_time::time_duration maxWaitingTime
-		):	Registrable(id)
-			, NonPermanentService(serviceNumber, path)
+		):	Registrable(id),
+			SchedulesBasedService(serviceNumber, path)
 			, _range (range)
 			, _maxWaitingTime (maxWaitingTime)
 		{}
@@ -70,7 +70,6 @@ namespace synthese
 
 
 
-
 		void 
 		ContinuousService::setMaxWaitingTime (boost::posix_time::time_duration maxWaitingTime)
 		{
@@ -79,11 +78,12 @@ namespace synthese
 
 
 
-
 		boost::posix_time::time_duration ContinuousService::getRange () const
 		{
 			return _range;
 		}
+
+
 
 		void 
 		ContinuousService::setRange (boost::posix_time::time_duration range)
@@ -120,11 +120,15 @@ namespace synthese
 			
 			if (method == DEPARTURE_TO_ARRIVAL)
 			{
-				schedule = _departureSchedules.at(edgeIndex).first;
-				if (GetTimeOfDay(_departureSchedules.at(edgeIndex).first) <= GetTimeOfDay(_departureSchedules.at(edgeIndex).second))
-				{
-					if (presenceDateTime.time_of_day() > GetTimeOfDay(_departureSchedules.at(edgeIndex).second))
+				schedule = (RTData ? _RTDepartureSchedules : _departureSchedules).at(edgeIndex);
+				time_duration endSchedule(schedule + _range);
+
+				if(	GetTimeOfDay(schedule) <= GetTimeOfDay(endSchedule)
+				){
+					if (presenceDateTime.time_of_day() > GetTimeOfDay(endSchedule))
+					{
 						return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClass);
+					}
 					if (presenceDateTime.time_of_day() < GetTimeOfDay(schedule))
 					{
 						actualDateTime = ptime(presenceDateTime.date(), GetTimeOfDay(schedule));
@@ -132,57 +136,60 @@ namespace synthese
 				}
 				else
 				{
-					if (presenceDateTime.time_of_day() > GetTimeOfDay(_departureSchedules.at(edgeIndex).second)
-						&& presenceDateTime.time_of_day() < GetTimeOfDay(_departureSchedules.at(edgeIndex).first)
+					if (presenceDateTime.time_of_day() > GetTimeOfDay(endSchedule)
+						&& presenceDateTime.time_of_day() < GetTimeOfDay(schedule)
 					){
 						actualDateTime = ptime(presenceDateTime.date(), GetTimeOfDay(schedule));
 					}
 				}
 				if (inverted)
 				{
-					ptime validityEndTime(presenceDateTime.date(), _departureSchedules.at(edgeIndex).first);
+					ptime validityEndTime(presenceDateTime.date(), schedule);
 					range = actualDateTime - validityEndTime;
 				}
 				else
 				{
-					ptime validityEndTime(presenceDateTime.date(), _departureSchedules.at(edgeIndex).second);
+					ptime validityEndTime(presenceDateTime.date(), endSchedule);
 					range = validityEndTime - actualDateTime;
 				}
 			}
 			else
 			{
-				schedule = _arrivalSchedules.at(edgeIndex).first;
-				if (GetTimeOfDay(_arrivalSchedules.at(edgeIndex).first) <= GetTimeOfDay(_arrivalSchedules.at(edgeIndex).second))
+				schedule = (RTData ? _RTArrivalSchedules : _arrivalSchedules).at(edgeIndex);
+				time_duration endSchedule(schedule + _range);
+				if (GetTimeOfDay(schedule) <= GetTimeOfDay(endSchedule))
 				{
-					if (presenceDateTime.time_of_day() < GetTimeOfDay(_arrivalSchedules.at(edgeIndex).first))
-						return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClass);
-					if (presenceDateTime.time_of_day() > GetTimeOfDay(_arrivalSchedules.at(edgeIndex).second))
+					if (presenceDateTime.time_of_day() < GetTimeOfDay(schedule))
 					{
-						actualDateTime = ptime(presenceDateTime.date(), GetTimeOfDay(_arrivalSchedules.at(edgeIndex).second));
+						return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClass);
+					}
+					if (presenceDateTime.time_of_day() > GetTimeOfDay(endSchedule))
+					{
+						actualDateTime = ptime(presenceDateTime.date(), GetTimeOfDay(endSchedule));
 					}
 				}
 				else
 				{
-					if (presenceDateTime.time_of_day() < GetTimeOfDay(_arrivalSchedules.at(edgeIndex).second)
-						&& presenceDateTime.time_of_day() > GetTimeOfDay(_arrivalSchedules.at(edgeIndex).first)
+					if (presenceDateTime.time_of_day() < GetTimeOfDay(endSchedule)
+						&& presenceDateTime.time_of_day() > GetTimeOfDay(schedule)
 					){
-						actualDateTime = ptime(presenceDateTime.date(), GetTimeOfDay(_arrivalSchedules.at(edgeIndex).second));
+						actualDateTime = ptime(presenceDateTime.date(), GetTimeOfDay(endSchedule));
 					}
 				}
 				if (inverted)
 				{
-					ptime validityEndTime(presenceDateTime.date(), _arrivalSchedules.at(edgeIndex).second);
+					ptime validityEndTime(presenceDateTime.date(), endSchedule);
 					range = validityEndTime - actualDateTime;
 				}
 				else
 				{
-					ptime validityEndTime(presenceDateTime.date(), _arrivalSchedules.at(edgeIndex).first);
+					ptime validityEndTime(presenceDateTime.date(), schedule);
 					range = actualDateTime - validityEndTime;
 				}
 			}
 
 			// Origin departure time
-			const time_duration& departureSchedule(_departureSchedules.at(0).first);
+			const time_duration& departureSchedule(_departureSchedules.at(0));
 			ptime originDateTime(actualDateTime - (schedule - departureSchedule));
 
 			ptime calendarDateTime(originDateTime);
@@ -224,60 +231,47 @@ namespace synthese
 		) const	{
 			int edgeIndex(edge->getRankInPath());
 			time_duration schedule(
-				servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL ?
-				_arrivalSchedules.at(edgeIndex).first :
-				getDepartureSchedule(servicePointer.getRTData(), edgeIndex)
+				(	servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL ?
+					(servicePointer.getRTData() ? _RTArrivalSchedules : _arrivalSchedules) :
+					(servicePointer.getRTData() ? _RTDepartureSchedules : _departureSchedules)
+				).at(edgeIndex)
 			);
 			return servicePointer.getOriginDateTime() + (schedule - getDepartureSchedule(servicePointer.getRTData(), 0));
 		}
 
 
 
-		time_duration ContinuousService::getDepartureSchedule(bool RTData,
-			std::size_t rank) const
-		{
-			return _departureSchedules.at(rank).first;
+		time_duration ContinuousService::getDepartureBeginScheduleToIndex(
+			bool RTData, size_t rankInPath
+		) const	{
+			return _departureSchedules.at(rankInPath);
 		}
 
 
 
-		void ContinuousService::setDepartureSchedules( const Schedules& schedules )
-		{
-			_departureSchedules = schedules;
+		time_duration ContinuousService::getDepartureEndScheduleToIndex(
+			bool RTData,
+			std::size_t rankInPath
+		) const	{
+			return _departureSchedules.at(rankInPath) + _range;
 		}
 
-		void ContinuousService::setArrivalSchedules( const Schedules& schedules )
-		{
-			_arrivalSchedules = schedules;
+
+
+		time_duration ContinuousService::getArrivalBeginScheduleToIndex(
+			bool RTData,
+			std::size_t rankInPath
+		) const	{
+			return _arrivalSchedules.at(rankInPath);
 		}
 
-		time_duration ContinuousService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
-		{
-			return _departureSchedules.at(rankInPath).first;
-		}
 
-		time_duration ContinuousService::getDepartureEndScheduleToIndex(bool RTData,
-			std::size_t rankInPath) const
-		{
-			return _departureSchedules.at(rankInPath).second;
-		}
 
-		time_duration ContinuousService::getArrivalBeginScheduleToIndex(bool RTData,
-			std::size_t rankInPath) const
-		{
-			return _arrivalSchedules.at(rankInPath).first;
-		}
-
-		time_duration ContinuousService::getArrivalEndScheduleToIndex(bool RTData,
-			std::size_t rankInPath) const
-		{
-			return _arrivalSchedules.at(rankInPath).second;
-		}
-
-		const time_duration& ContinuousService::getLastArrivalSchedule(bool RTData) const
-		{
-			const Schedules::const_iterator it(_arrivalSchedules.end() - 1);
-			return it->second;
+		time_duration ContinuousService::getArrivalEndScheduleToIndex(
+			bool RTData,
+			std::size_t rankInPath
+		) const	{
+			return _arrivalSchedules.at(rankInPath) + _range;
 		}
 	}
 }

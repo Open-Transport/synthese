@@ -32,10 +32,14 @@
 
 namespace synthese
 {
+	namespace pt
+	{
+		class SchedulesBasedService;
+	}
+
 	namespace env
 	{
 		class Line;
-		class NonPermanentService;
 		class PhysicalStop;
 	}
 
@@ -73,7 +77,7 @@ namespace synthese
 			// Constructeur
 			TimetableColumn(
 				const TimetableGenerator& generator,
-				const env::NonPermanentService& service
+				const pt::SchedulesBasedService& service
 			);
 
 			//! @name Queries

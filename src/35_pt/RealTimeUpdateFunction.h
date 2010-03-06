@@ -33,11 +33,12 @@ namespace synthese
 	namespace env
 	{
 		class PublicTransportStopZoneConnectionPlace;
-		class ScheduledService;
 	}
 
 	namespace pt
 	{
+		class ScheduledService;
+
 		/** RealTimeUpdateFunction Function class.
 			@author Hugues
 			@date 2009
@@ -66,7 +67,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const env::ScheduledService>	_service;
+				boost::shared_ptr<const ScheduledService>	_service;
 				std::size_t _lineStopRank;
 			//@}
 			
@@ -121,7 +122,7 @@ namespace synthese
 			virtual std::string getOutputMimeType() const;
 
 
-			void setService(boost::shared_ptr<const env::ScheduledService> value);
+			void setService(boost::shared_ptr<const ScheduledService> value);
 			void setLineStopRank(std::size_t value);
 		};
 	}

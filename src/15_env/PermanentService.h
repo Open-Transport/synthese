@@ -35,6 +35,9 @@ namespace synthese
 		class PermanentService
 		:	public graph::Service
 		{
+		private:
+			virtual void _computeNextRTUpdate();
+
 		public:
 			PermanentService(
 				util::RegistryKeyType id = UNKNOWN_VALUE,

@@ -78,6 +78,7 @@ namespace synthese
 		const string CommercialLineAdmin::TAB_DATES("da");
 		const string CommercialLineAdmin::TAB_ROUTES("ro");
 		const string CommercialLineAdmin::TAB_NON_CONCURRENCY("nc");
+		const string CommercialLineAdmin::TAB_PROPERTIES("pr");
 		const string CommercialLineAdmin::TAB_EXPORT("ex");
 		const string CommercialLineAdmin::PARAMETER_SEARCH_NAME("na");
 		const string CommercialLineAdmin::PARAMETER_DATES_START("ds");
@@ -317,6 +318,13 @@ namespace synthese
 
 			////////////////////////////////////////////////////////////////////
 			// TAB EXPORT
+			if (openTabContent(stream, TAB_PROPERTIES))
+			{
+				// CommercialLineUpdateAction
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB EXPORT
 			if (openTabContent(stream, TAB_EXPORT))
 			{
 				StaticFunctionRequest<TridentExportFunction> tridentExportFunction(_request, true);
@@ -380,6 +388,7 @@ namespace synthese
 			_tabs.push_back(Tab("Parcours", TAB_ROUTES, true, LineAdmin::ICON));
 			_tabs.push_back(Tab("Dates de fonctionnement", TAB_DATES, true, "calendar.png"));
 			_tabs.push_back(Tab("Non concurrence", TAB_NON_CONCURRENCY, true, "lock.png"));
+			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
 			_tabs.push_back(Tab("Export", TAB_EXPORT, true, "page_white_go.png"));
 
 			_tabBuilded = true;

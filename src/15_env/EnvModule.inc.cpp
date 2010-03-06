@@ -9,14 +9,12 @@
 
 #include "CommercialLineTableSync.h"
 #include "ConnectionPlaceTableSync.h"
-#include "ContinuousServiceTableSync.h"
 #include "FareTableSync.h"
 #include "LineStopTableSync.h"
 #include "LineTableSync.h"
 #include "PhysicalStopTableSync.h"
 #include "ReservationContactTableSync.h"
 #include "RollingStockTableSync.h"
-#include "ScheduledServiceTableSync.h"
 #include "NonConcurrencyRuleTableSync.h"
 
 #include "EnvModule.h"

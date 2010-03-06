@@ -23,12 +23,6 @@ synthese::env::LineStopTableSync::integrate();
 
 synthese::env::NonConcurrencyRuleTableSync::integrate();
 
-synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::env::ContinuousServiceTableSync>::integrate();
-synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::env::NonPermanentService>, synthese::env::ContinuousServiceTableSync>::integrate();
-
-synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::env::ScheduledServiceTableSync>::integrate();
-synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::env::NonPermanentService>, synthese::env::ScheduledServiceTableSync>::integrate();
-
 synthese::env::EnvModule::integrate();
 
 synthese::env::LinesListFunction::integrate();
@@ -44,6 +38,4 @@ synthese::util::Env::Integrate<synthese::env::PublicTransportStopZoneConnectionP
 synthese::util::Env::Integrate<synthese::env::ReservationContact>();
 synthese::util::Env::Integrate<synthese::env::CommercialLine>();
 synthese::util::Env::Integrate<synthese::env::RollingStock>();
-synthese::util::Env::Integrate<synthese::env::ContinuousService>();
 synthese::util::Env::Integrate<synthese::env::Fare>();
-synthese::util::Env::Integrate<synthese::env::ScheduledService>();

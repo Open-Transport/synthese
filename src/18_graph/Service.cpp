@@ -23,9 +23,11 @@
 #include "Service.h"
 #include "Path.h"
 #include "Edge.h"
+#include "Vertex.h"
 
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -39,11 +41,12 @@ namespace synthese
 	namespace graph
 	{
 		Service::Service(
-			const string& serviceNumber
-			, Path* path
-		)	: RuleUser() 
-			, _serviceNumber (serviceNumber)
-			, _path (path)
+			const string& serviceNumber,
+			Path* path
+		):	RuleUser(),
+			_serviceNumber (serviceNumber),
+			_path (path),
+			_nextRTUpdate(posix_time::second_clock::local_time() + gregorian::days(1))
 		{
 		}
 
@@ -52,7 +55,8 @@ namespace synthese
 			RegistryKeyType id
 		):	RuleUser(),
 			_path(NULL),
-			Registrable(id)
+			Registrable(id),
+			_nextRTUpdate(posix_time::second_clock::local_time() + gregorian::days(1))
 		{
 		}
 
@@ -81,15 +85,13 @@ namespace synthese
 		}
 
 
-		Path* 
-		Service::getPath ()
+		Path* Service::getPath ()
 		{
 			return _path;
 		}
 
 
-		const Path* 
-			Service::getPath () const
+		const Path* Service::getPath () const
 		{
 			return _path;
 		}
@@ -99,7 +101,7 @@ namespace synthese
 		void Service::setPath( Path* path )
 		{
 			_path = path;
-			setPathId(path->getKey());
+			clearRTData();
 		}
 
 
@@ -206,8 +208,6 @@ namespace synthese
 
 
 
-
-
 		boost::posix_time::time_duration Service::GetTimeOfDay( const boost::posix_time::time_duration& value )
 		{
 			return time_duration(value.hours() % 24, value.minutes(), value.seconds());
@@ -215,35 +215,39 @@ namespace synthese
 
 
 
-		std::string Service::EncodeSchedule( const boost::posix_time::time_duration& value )
+		const boost::posix_time::ptime& Service::getNextRTUpdate() const
 		{
-			if(value.is_not_a_date_time())
-			{
-				return string();
-			}
-
-			std::stringstream os;
-
-			os << std::setw( 2 ) << std::setfill ( '0' )
-				<< (value.hours() / 24) << ":"
-				<< std::setw( 2 ) << std::setfill ( '0' )
-				<< (value.hours() % 24) << ":"
-				<< std::setw( 2 ) << std::setfill ( '0' )
-				<< value.minutes()
-			;
-
-			return os.str ();
+			return _nextRTUpdate;
 		}
 
 
 
-		boost::posix_time::time_duration Service::DecodeSchedule( const std::string value )
+		void Service::setRealTimeVertex( std::size_t rank, const graph::Vertex* value )
 		{
-			return time_duration(
-				24 * lexical_cast<int>(value.substr(0, 2)) + lexical_cast<int>(value.substr(3, 2)),
-				lexical_cast<int>(value.substr(6, 2)),
-				0
-			);
+			assert(value->getHub() == _RTVertices[rank]->getHub());
+			_RTVertices[rank] = value;
+		}
+
+
+
+		const graph::Vertex* Service::getRealTimeVertex( std::size_t rank ) const
+		{
+			return _RTVertices[rank];
+		}
+
+
+
+		void Service::clearRTData()
+		{
+			if(getPath())
+			{
+				_RTVertices.clear();
+				BOOST_FOREACH(const Edge* edge, getPath()->getEdges())
+				{
+					_RTVertices.push_back(edge->getFromVertex());
+				}
+			}
+			_computeNextRTUpdate();
 		}
 	}
 }

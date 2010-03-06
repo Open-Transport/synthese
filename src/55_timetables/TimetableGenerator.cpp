@@ -24,7 +24,7 @@
 #include "Line.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
-#include "NonPermanentService.h"
+#include "SchedulesBasedService.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "Env.h"
 #include "CalendarModule.h"
@@ -42,6 +42,7 @@ namespace synthese
 	using namespace calendar;
 	using namespace util;
 	using namespace graph;
+	using namespace pt;
 
 	namespace timetables
 	{
@@ -95,7 +96,7 @@ namespace synthese
 			BOOST_FOREACH(const Service* servicePtr, line.getServices())
 			{
 				// Permanent service filter
-				const NonPermanentService* service(dynamic_cast<const NonPermanentService*>(servicePtr));
+				const SchedulesBasedService* service(dynamic_cast<const SchedulesBasedService*>(servicePtr));
 				if (service == NULL)
 					continue;
 

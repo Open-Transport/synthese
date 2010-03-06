@@ -132,7 +132,7 @@ namespace synthese
 
 
 
-		void RealTimeUpdateFunction::setService( boost::shared_ptr<const env::ScheduledService> value )
+		void RealTimeUpdateFunction::setService( boost::shared_ptr<const ScheduledService> value )
 		{
 			_service = value;
 		}

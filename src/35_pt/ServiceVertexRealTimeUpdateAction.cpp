@@ -135,7 +135,7 @@ namespace synthese
 
 
 
-		void ServiceVertexRealTimeUpdateAction::setService( boost::shared_ptr<const env::ScheduledService> service )
+		void ServiceVertexRealTimeUpdateAction::setService( boost::shared_ptr<const ScheduledService> service )
 		{
 			_service = const_pointer_cast<ScheduledService>(service);
 		}

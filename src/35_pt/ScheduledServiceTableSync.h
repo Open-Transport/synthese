@@ -36,14 +36,17 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
-		/** ScheduledService table synchronizer.
-			@ingroup m35LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Scheduled Service table synchronizer.
+		///	@ingroup m35LS refLS
+		///
+		///	@warning The scheduled service table synchronizer DOES NOT handle calendar dates. See ServiceDateTableSync.
 		class ScheduledServiceTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>,
-			public db::FetcherTemplate<env::NonPermanentService, ScheduledServiceTableSync>
+			public db::FetcherTemplate<SchedulesBasedService, ScheduledServiceTableSync>,
+			public db::FetcherTemplate<NonPermanentService, ScheduledServiceTableSync>
 		{
 		public:
 			static const std::string COL_SERVICENUMBER;

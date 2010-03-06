@@ -31,15 +31,12 @@
 
 namespace synthese
 {
-	namespace env
-	{
-		class NonPermanentService;
-		class ScheduledService;
-		class ContinuousService;
-	}
-
 	namespace pt
 	{
+		class SchedulesBasedService;
+		class ScheduledService;
+		class ContinuousService;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// ServiceAdmin Admin compound class.
 		///	@ingroup m35Admin refAdmin
@@ -52,16 +49,16 @@ namespace synthese
 			/// @name Parameter identifiers
 			//@{
 				static const std::string TAB_SCHEDULES;
-				static const std::string TAB_CONTINUOUS;
+				static const std::string TAB_PROPERTIES;
 				static const std::string TAB_CALENDAR;
 			//@}
 
 		private:
 			/// @name Search parameters
 			//@{
-				boost::shared_ptr<const env::NonPermanentService>	_service;
-				boost::shared_ptr<const env::ScheduledService>	_scheduledService;
-				boost::shared_ptr<const env::ContinuousService>	_continuousService;
+				boost::shared_ptr<const SchedulesBasedService>	_service;
+				boost::shared_ptr<const ScheduledService>	_scheduledService;
+				boost::shared_ptr<const ContinuousService>	_continuousService;
 			//@}
 
 		protected:
@@ -154,9 +151,9 @@ namespace synthese
 			///	@date 2009
 			virtual std::string getTitle() const;
 
-			void setService(boost::shared_ptr<const env::ScheduledService> value);
-			void setService(boost::shared_ptr<const env::ContinuousService> value);
-			boost::shared_ptr<const env::NonPermanentService> getService() const;
+			void setService(boost::shared_ptr<const ScheduledService> value);
+			void setService(boost::shared_ptr<const ContinuousService> value);
+			boost::shared_ptr<const SchedulesBasedService> getService() const;
 
 			virtual PageLinks _getCurrentTreeBranch() const;
 		};

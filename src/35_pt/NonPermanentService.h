@@ -31,10 +31,7 @@ namespace synthese
 	namespace pt
 	{
 		class PTUseRule;
-	}
 
-	namespace env
-	{
 		/** NonPermanentService class.
 			@ingroup m35
 			

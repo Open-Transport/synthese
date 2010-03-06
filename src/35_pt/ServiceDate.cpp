@@ -42,7 +42,7 @@ namespace synthese
 			Registrable(key)
 		{ }
 		
-		env::NonPermanentService*	ServiceDate::getService() const
+		NonPermanentService*	ServiceDate::getService() const
 		{
 			return _service;
 		}
@@ -52,7 +52,7 @@ namespace synthese
 			return _date;
 		}
 		
-		void ServiceDate::setService(env::NonPermanentService* value)
+		void ServiceDate::setService(NonPermanentService* value)
 		{
 			_service = value;
 		}

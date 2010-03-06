@@ -73,6 +73,7 @@ namespace synthese
 	using namespace algorithm;
 	using namespace ptrouteplanner;
 	using namespace resa;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,routeplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
 

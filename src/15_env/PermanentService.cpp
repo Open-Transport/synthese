@@ -118,6 +118,14 @@ namespace synthese
 		{
 			if (path != NULL)
 				path->setAllDays(true);
+			clearRTData();
+		}
+
+
+
+		void PermanentService::_computeNextRTUpdate()
+		{
+			_nextRTUpdate = second_clock::local_time() + gregorian::days(1);
 		}
 	}
 }

@@ -1,0 +1,10 @@
+Import ('s3env')
+
+CppSynthese3LibProject(
+	s3env, 's3-hiking', s3env['S3VERSION'], 
+	source_files = s3env.Glob ('*.cpp'),
+	dependencies = [
+		's3-pt.cpplib',
+		's3-env.cpplib',
+	]
+)

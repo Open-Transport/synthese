@@ -88,7 +88,7 @@ namespace synthese
 
 		ParametersMap PTNetworksAdmin::getParametersMap() const
 		{
-			ParametersMap m;
+			ParametersMap m(_requestParameters.getParametersMap());
 			m.insert(PARAM_SEARCH_NAME, _searchName);
 			return m;
 		}

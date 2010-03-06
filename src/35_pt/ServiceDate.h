@@ -30,13 +30,10 @@
 
 namespace synthese
 {
-	namespace env
-	{
-		class NonPermanentService;
-	}
-	
 	namespace pt
 	{
+		class NonPermanentService;
+
 		/** ServiceDate class.
 			This class is available for the template instanciation of the ServiceDateTableSync.
 			It can be used as a simple structure.
@@ -51,7 +48,7 @@ namespace synthese
 			typedef util::Registry<ServiceDate>	Registry;
 		
 		private:
-			env::NonPermanentService*	_service;
+			NonPermanentService*	_service;
 			boost::gregorian::date	_date;
 			
 		public:
@@ -59,10 +56,10 @@ namespace synthese
 				util::RegistryKeyType key = UNKNOWN_VALUE
 			);
 			
-			env::NonPermanentService*	getService() const;
+			NonPermanentService*	getService() const;
 			const boost::gregorian::date&				getDate() const;
 			
-			void setService(env::NonPermanentService* value);
+			void setService(NonPermanentService* value);
 			void setDate(const boost::gregorian::date& value);
 		};
 	}

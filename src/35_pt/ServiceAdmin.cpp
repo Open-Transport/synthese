@@ -75,7 +75,7 @@ namespace synthese
 	namespace pt
 	{
 		const string ServiceAdmin::TAB_CALENDAR("ca");
-		const string ServiceAdmin::TAB_CONTINUOUS("co");
+		const string ServiceAdmin::TAB_PROPERTIES("pr");
 		const string ServiceAdmin::TAB_SCHEDULES("sc");
 
 
@@ -176,11 +176,9 @@ namespace synthese
 				vs.push_back("Arrivée");
 				vs.push_back("Départ");
 				vs.push_back("Départ");
-				if(_scheduledService.get())
-				{
-					vs.push_back("Retard");
-					vs.push_back("Changement de quai");
-				}
+				vs.push_back("Retard");
+				vs.push_back("Changement de quai");
+				
 				HTMLTable ts(vs, ResultHTMLTable::CSS_CLASS);
 
 				stream << ts.open();
@@ -215,48 +213,42 @@ namespace synthese
 						time_duration delta(_service->getDepartureBeginScheduleToIndex(true, lineStop.getRankInPath()) - _service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath()));
 						stream << (delta.total_seconds() > 0 ? "+" : string()) << delta << " min";
 					}
-					if(_scheduledService.get())
-					{
-						scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
-						vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
+					scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
+					vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 
-						stream << ts.col();
-						HTMLForm f(scheduleUpdateRequest.getHTMLForm("delay"+lexical_cast<string>(lineStop.getRankInPath())));
-						stream << f.open();
-						stream << "Durée : " << f.getSelectNumberInput(ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES, 0, 500);
-						stream << "Propager : " << f.getOuiNonRadioInput(ScheduleRealTimeUpdateAction::PARAMETER_PROPAGATE_CONSTANTLY, true);
-						stream << f.getSubmitButton("OK");
-						stream << f.close();
+					stream << ts.col();
+					HTMLForm f(scheduleUpdateRequest.getHTMLForm("delay"+lexical_cast<string>(lineStop.getRankInPath())));
+					stream << f.open();
+					stream << "Durée : " << f.getSelectNumberInput(ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES, 0, 500);
+					stream << "Propager : " << f.getOuiNonRadioInput(ScheduleRealTimeUpdateAction::PARAMETER_PROPAGATE_CONSTANTLY, true);
+					stream << f.getSubmitButton("OK");
+					stream << f.close();
 
-						stream << ts.col();
-						HTMLForm f2(vertexUpdateRequest.getHTMLForm("quay"+lexical_cast<string>(lineStop.getRankInPath())));
-						stream << f2.open();
-						stream << "Quai : " << f.getSelectInput(
-							ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID,
-							lineStop.getPhysicalStop()->getConnectionPlace()->getPhysicalStopLabels(),
-							_scheduledService->getRealTimeVertex(lineStop.getRankInPath())->getKey()
-						);
-						stream << f.getSubmitButton("OK");
-						stream << f2.close();
-					}
+					stream << ts.col();
+					HTMLForm f2(vertexUpdateRequest.getHTMLForm("quay"+lexical_cast<string>(lineStop.getRankInPath())));
+					stream << f2.open();
+					stream << "Quai : " << f.getSelectInput(
+						ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID,
+						lineStop.getPhysicalStop()->getConnectionPlace()->getPhysicalStopLabels(),
+						_service->getRealTimeVertex(lineStop.getRankInPath())->getKey()
+					);
+					stream << f.getSubmitButton("OK");
+					stream << f2.close();
 				}
+
+				// ServiceTimetableUpdateAction
 
 				stream << ts.close();
 
-				if(_scheduledService.get())
+				stream << "<h1>Informations temps réel</h1>";
+				stream << "<p>Information temps réel valables jusqu'à : " << posix_time::to_simple_string(_service->getNextRTUpdate()) << "</p>";
+
+				if(_continuousService.get())
 				{
-					stream << "<h1>Informations temps réel</h1>";
+					stream << "<h1>Service continu</h1>";
 
-					stream << "<p>Information temps réel valables jusqu'à : " << posix_time::to_simple_string(_scheduledService->getNextRTUpdate()) << "</p>";
+					// ContinuousServiceUpdateAction
 				}
-
-			}
-
-			////////////////////////////////////////////////////////////////////
-			// TAB CONTINUOUS
-			if (openTabContent(stream, TAB_CONTINUOUS))
-			{
-				
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -265,8 +257,18 @@ namespace synthese
 			{
 				CalendarHTMLViewer cv(*_service);
 				cv.display(stream);
+
+				// ServiceApplyCalendarAction
+				// ServiceDateChangeAction
 			}
 		
+			////////////////////////////////////////////////////////////////////
+			// TAB PROPERTIES
+			if (openTabContent(stream, TAB_PROPERTIES))
+			{
+				// ServiceUpdateAction
+			}
+
 			////////////////////////////////////////////////////////////////////
 			// END TABS
 			closeTabContent(stream);
@@ -293,36 +295,34 @@ namespace synthese
 		) const	{
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Horaires", TAB_SCHEDULES, true));
+			_tabs.push_back(Tab("Horaires", TAB_SCHEDULES, true, "time.png"));
 
-			if(_continuousService.get())
-			{
-				_tabs.push_back(Tab("Service continu", TAB_CONTINUOUS, true));
-			}
-			_tabs.push_back(Tab("Calendrier", TAB_CALENDAR, true));
+			_tabs.push_back(Tab("Calendrier", TAB_CALENDAR, true, "calendar.png"));
+
+			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true, "application_form.png"));
 			
 			_tabBuilded = true;
 		}
 
 
 
-		void ServiceAdmin::setService( boost::shared_ptr<const env::ScheduledService> value )
+		void ServiceAdmin::setService( boost::shared_ptr<const ScheduledService> value )
 		{
 			_scheduledService = value;
-			_service = static_pointer_cast<const NonPermanentService, const ScheduledService>(value);
+			_service = static_pointer_cast<const SchedulesBasedService, const ScheduledService>(value);
 		}
 
 
 
-		void ServiceAdmin::setService( boost::shared_ptr<const env::ContinuousService> value )
+		void ServiceAdmin::setService( boost::shared_ptr<const ContinuousService> value )
 		{
 			_continuousService = value;
-			_service = static_pointer_cast<const NonPermanentService, const ContinuousService>(value);
+			_service = static_pointer_cast<const SchedulesBasedService, const ContinuousService>(value);
 		}
 
 
 
-		boost::shared_ptr<const NonPermanentService> ServiceAdmin::getService() const
+		boost::shared_ptr<const SchedulesBasedService> ServiceAdmin::getService() const
 		{
 			return _service;
 		}
@@ -334,7 +334,7 @@ namespace synthese
 			shared_ptr<LineAdmin> p(
 				getNewOtherPage<LineAdmin>()
 			);
-			p->setLine(Env::GetOfficialEnv().getSPtr(static_cast<const Line*>(_service->getPath())));
+			p->setLine(Env::GetOfficialEnv().get<Line>(_service->getPathId()));
 
 			PageLinks links(p->_getCurrentTreeBranch());
 			links.push_back(p);

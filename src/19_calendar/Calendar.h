@@ -133,6 +133,7 @@ namespace synthese
 				virtual void setInactive(const boost::gregorian::date& date);
 				void subDates(const Calendar& calendar);
 				void clear();
+				void copyDates(const Calendar& calendar);
 			//@}
 		};
 

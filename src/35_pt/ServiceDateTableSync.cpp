@@ -28,7 +28,7 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-
+#include "ReplaceQuery.h"
 #include "ServiceDate.h"
 #include "ServiceDateTableSync.h"
 #include "NonPermanentService.h"
@@ -43,8 +43,8 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
 	using namespace pt;
+	using namespace calendar;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ServiceDateTableSync>::FACTORY_KEY("15.70.01 Service dates");
 
@@ -166,6 +166,22 @@ namespace synthese
 			catch(SQLiteException& e)
 			{
 				throw Exception(e.getMessage());
+			}
+		}
+
+
+
+		void ServiceDateTableSync::CreateDatesForRecentlyCreatedCalendar(
+			NonPermanentService& service,
+			boost::optional<db::SQLiteTransaction&> transaction
+		){
+			Calendar::DatesVector v(service.getActiveDates());
+			BOOST_FOREACH(const Calendar::DatesVector::value_type& d, v)
+			{
+				ServiceDate sd;
+				sd.setDate(d);
+				sd.setService(&service);
+				Save(&sd, transaction);
 			}
 		}
 	}

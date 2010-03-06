@@ -6,12 +6,19 @@
 synthese::pt::TransportNetworkTableSync::integrate();
 synthese::pt::TridentExportFunction::integrate ();
 synthese::pt::TridentFileFormat::integrate ();
+
 synthese::pt::ServiceDateTableSync::integrate();
 synthese::pt::PTUseRuleTableSync::integrate();
+synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::ContinuousServiceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::SchedulesBasedService>, synthese::pt::ContinuousServiceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::NonPermanentService>, synthese::pt::ContinuousServiceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::ScheduledServiceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::SchedulesBasedService>, synthese::pt::ScheduledServiceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::NonPermanentService>, synthese::pt::ScheduledServiceTableSync>::integrate();
+
 synthese::pt::PTModule::integrate();
+
 synthese::pt::NavteqWithProjectionFileFormat::integrate();
-synthese::pt::NonConcurrencyRuleAddAction::integrate();
-synthese::pt::NonConcurrencyRuleRemoveAction::integrate();
 
 synthese::pt::ServiceAdmin::integrate();
 synthese::pt::PTImportAdmin::integrate();
@@ -29,11 +36,15 @@ synthese::pt::RealTimeUpdateFunction::integrate();
 synthese::pt::PhysicalStopsCSVExportFunction::integrate();
 
 synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
+
+synthese::pt::NonConcurrencyRuleAddAction::integrate();
+synthese::pt::NonConcurrencyRuleRemoveAction::integrate();
 synthese::pt::ScheduleRealTimeUpdateAction::integrate();
 synthese::pt::ServiceVertexRealTimeUpdateAction::integrate();
 synthese::pt::TransportNetworkAddAction::integrate();
 synthese::pt::CommercialLineAddAction::integrate();
 synthese::pt::LineAddAction::integrate();
+synthese::pt::ServiceAddAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 
@@ -42,4 +53,6 @@ synthese::pt::TransportNetworkRight::integrate();
 synthese::util::Env::Integrate<synthese::pt::TransportNetwork>();
 synthese::util::Env::Integrate<synthese::pt::ServiceDate>();
 synthese::util::Env::Integrate<synthese::pt::PTUseRule>();
+synthese::util::Env::Integrate<synthese::pt::ContinuousService>();
+synthese::util::Env::Integrate<synthese::pt::ScheduledService>();
 

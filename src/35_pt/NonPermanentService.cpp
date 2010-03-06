@@ -34,7 +34,7 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 
-	namespace env
+	namespace pt
 	{
 		NonPermanentService::NonPermanentService(
 			RegistryKeyType key
