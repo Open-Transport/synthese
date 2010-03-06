@@ -4,7 +4,7 @@
 <h2>Index</h2>
  - @subpage overview
  - @subpage admin
- - @subpage dev
+ - @subpage <a href="modules.html">Developer documentation</a>
  - @subpage customer_specs
  - @subpage backoffice_user_manual
  - @subpage annexes
@@ -15,9 +15,6 @@ All SYNTHESE modules and each corresponding documentation are under the @subpage
 
 @page overview Overview
  - @subpage
-
-@page dev Developer documentation
-	- @subpage mod
 
 @page customer_specs Functional specifications
 	- @subpage customer_spec_sai_tisseo
