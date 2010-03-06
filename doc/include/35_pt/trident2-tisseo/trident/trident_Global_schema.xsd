@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XMLSpy v2007 sp2 (http://www.altova.com) by christophe duquesne (Dryade SARL) -->
+<!-- edited with XML Spy v4.3 U (http://www.xmlspy.com) by Christophe Duquesne (Dryade) -->
+<!--  File: trident_Global_schema.xsd  -->
+<xsd:schema xmlns:trd="http://www.trident.org/schema/trident" xmlns="http://www.trident.org/schema/trident" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.trident.org/schema/trident" elementFormDefault="qualified" version="2.0">
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+TRIDENT exchange schema.
+Global Definition
+Copyright (c) 2001 TRIDENT consortium, All Rights Reserved.
+		</xsd:documentation>
+	</xsd:annotation>
+	<!--  included files (if any) -->
+	<xsd:include schemaLocation="trident_Location_schema.xsd"/>
+	<!-- ==============================================================
+     global declarations
+     ============================================================== -->
+	<xsd:simpleType name="TridentIdType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Defines the way an TRIDENT ID has to be built:
+{PeerID}:{Class name}:{Progressive integer}
+For example: RATP:Event:12332  or  ATAC:Line:9987
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:pattern value="(\p{L}|_)+:\p{L}+:[0-9A-Za-z]+"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- REMARK : The following 2 types are not in the DM: they are technical
+		  types used to ease construction_ it's just a list of
+  Trident Object Id -->
+	<xsd:simpleType name="TridentIdGeneralListType">
+		<xsd:list itemType="TridentIdType"/>
+	</xsd:simpleType>
+	<xsd:simpleType name="TridentIdListType">
+		<xsd:restriction base="TridentIdGeneralListType">
+			<xsd:minLength value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- REMARK: The name of the following type is TridentObject and not
+ Object, as this last name is too general -->
+	<xsd:complexType name="TridentObjectType" abstract="true">
+		<xsd:sequence>
+			<xsd:element name="objectId" type="trd:TridentIdType"/>
+			<xsd:element name="objectVersion" type="xsd:positiveInteger" minOccurs="0"/>
+			<xsd:element name="creationTime" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="creatorId" type="xsd:string" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ObjectReferenceType">
+		<xsd:sequence>
+			<xsd:element name="Id" type="trd:TridentIdType"/>
+			<xsd:element name="Version" type="xsd:string" minOccurs="0"/>
+		</xsd:sequence>
+		<!-- REMARK: This object type is used for requests (to select
+ a specific Opbject from its Id), "minOccurs" has been set
+ to "0" for Version to be able to select the current Version
+ -->
+	</xsd:complexType>
+	<xsd:complexType name="ObjectValidityType">
+		<xsd:sequence>
+			<xsd:element name="start" type="xsd:dateTime"/>
+			<xsd:element name="end" type="xsd:dateTime" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- WGS84 Coordinates
+The range of longitude is -180° to +180°, and the range of latitude is -90° to +90°. 0° longitude corresponds to the Greenwich Meridian, and
+positive angles are to the East, while negative angles are to the West. 0° latitude corresponds to the equator, and positive angles are to the North, while negative angles are to the South.
+-->
+	<xsd:simpleType name="LongitudeType">
+		<xsd:restriction base="xsd:decimal">
+			<xsd:minInclusive value="-180"/>
+			<xsd:maxInclusive value="180"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="LatitudeType">
+		<xsd:restriction base="xsd:decimal">
+			<xsd:minInclusive value="-90"/>
+			<xsd:maxInclusive value="90"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PercentageType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Percentage: decimal between 0 and 100
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:decimal">
+			<xsd:minInclusive value="0"/>
+			<xsd:maxInclusive value="100"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ==============================================================
+     Main enumrations
+     ============================================================== -->
+	<xsd:simpleType name="DayOfWeekType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Defines the list of the days of the week (in english!)
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Monday"/>
+			<xsd:enumeration value="Tuesday"/>
+			<xsd:enumeration value="Wednsday"/>
+			<xsd:enumeration value="Thursday"/>
+			<xsd:enumeration value="Friday"/>
+			<xsd:enumeration value="Saturday"/>
+			<xsd:enumeration value="Sunday"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="UnitType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Enumeration containing all the possible units for measurement
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="DegreesCelsius"/>
+			<xsd:enumeration value="Centimeter"/>
+			<xsd:enumeration value="Degree"/>
+			<xsd:enumeration value="Hour"/>
+			<xsd:enumeration value="Hectopascals"/>
+			<xsd:enumeration value="KilometersPerHour"/>
+			<xsd:enumeration value="Kilometer"/>
+			<xsd:enumeration value="CubicMeter"/>
+			<xsd:enumeration value="MillimetersPerHour"/>
+			<xsd:enumeration value="Millimeter"/>
+			<xsd:enumeration value="Meter"/>
+			<xsd:enumeration value="MetersPerSecond"/>
+			<xsd:enumeration value="Percentage"/>
+			<xsd:enumeration value="Second"/>
+			<xsd:enumeration value="Tonne"/>
+			<xsd:enumeration value="HrMinSec"/>
+			<xsd:enumeration value="PeriodOfTime"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ============================================================== -->
+	<xsd:simpleType name="LocationTypeType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Enumeration containing all the possible location Type
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="BusStopPoint"/>
+			<xsd:enumeration value="AriportStopPoint"/>
+			<xsd:enumeration value="TramStopPoint"/>
+			<xsd:enumeration value="MetroStopPoint"/>
+			<xsd:enumeration value="RailwayStopPoint"/>
+			<xsd:enumeration value="RoadJunction"/>
+			<xsd:enumeration value="Mixed"/>
+			<xsd:enumeration value="Address"/>
+			<xsd:enumeration value="IntermediateRoadPoint"/>
+			<xsd:enumeration value="StopArea"/>
+			<xsd:enumeration value="PointOfInterest"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="LongLatTypeType">
+		<xsd:annotation>
+			<xsd:documentation>Type of geodesic reference</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="WGS84"/>
+			<xsd:enumeration value="WGS92"/>
+			<xsd:enumeration value="Standard"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="LocationReferencingMethodType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Enumeration containing all the possible location referencing
+		methods
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="1"/>
+			<xsd:enumeration value="2"/>
+			<xsd:enumeration value="3"/>
+			<xsd:enumeration value="4"/>
+			<xsd:enumeration value="5"/>
+			<xsd:enumeration value="6"/>
+			<xsd:enumeration value="7"/>
+			<xsd:enumeration value="8"/>
+			<xsd:enumeration value="9"/>
+			<xsd:enumeration value="10"/>
+			<xsd:enumeration value="11"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="WordOrderType">
+		<xsd:annotation>
+			<xsd:documentation>Order of words in a ILOC descriptor</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="FromTheFirstToTheLastWord"/>
+			<xsd:enumeration value="FromTheLastToTheFirstWord"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="POITypeType">
+		<xsd:annotation>
+			<xsd:documentation>Different types for a point</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="AccommodationEatingAndDrinking"/>
+			<xsd:enumeration value="CommercialServices"/>
+			<xsd:enumeration value="Attraction"/>
+			<xsd:enumeration value="SportAndEntertainment"/>
+			<xsd:enumeration value="EducationAndHealth"/>
+			<xsd:enumeration value="PublicInfrastructure"/>
+			<xsd:enumeration value="ManufacturingAndProduction"/>
+			<xsd:enumeration value="Wholesale"/>
+			<xsd:enumeration value="Retail"/>
+			<xsd:enumeration value="Transport"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PtAccessPointTypeType">
+		<xsd:annotation>
+			<xsd:documentation>Type of a PT acces</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="In"/>
+			<xsd:enumeration value="Out"/>
+			<xsd:enumeration value="InOut"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ConnectionLinkTypeType">
+		<xsd:annotation>
+			<xsd:documentation>Type of connection</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Underground"/>
+			<xsd:enumeration value="Mixed"/>
+			<xsd:enumeration value="Overground"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ============================================================== -->
+	<xsd:simpleType name="TransportModeNameType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Enumeration containing all the possible transport modes
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Air"/>
+			<xsd:enumeration value="Train"/>
+			<xsd:enumeration value="LongDistanceTrain"/>
+			<xsd:enumeration value="LongDistanceTrain"/>
+			<xsd:enumeration value="LocalTrain"/>
+			<xsd:enumeration value="RapidTransit"/>
+			<xsd:enumeration value="Metro"/>
+			<xsd:enumeration value="Tramway"/>
+			<xsd:enumeration value="Coach"/>
+			<xsd:enumeration value="Bus"/>
+			<xsd:enumeration value="Ferry"/>
+			<xsd:enumeration value="Waterborne"/>
+			<xsd:enumeration value="PrivateVehicle"/>
+			<xsd:enumeration value="Walk"/>
+			<xsd:enumeration value="Trolleybus"/>
+			<xsd:enumeration value="Bicycle"/>
+			<xsd:enumeration value="Shuttle"/>
+			<xsd:enumeration value="Taxi"/>
+			<xsd:enumeration value="VAL"/>
+			<xsd:enumeration value="Other"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="PTDirectionType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Enumeration containing all the possible directions on a PT Network
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="North"/>
+			<xsd:enumeration value="NorthEast"/>
+			<xsd:enumeration value="East"/>
+			<xsd:enumeration value="SouthEast"/>
+			<xsd:enumeration value="South"/>
+			<xsd:enumeration value="SouthWest"/>
+			<xsd:enumeration value="West"/>
+			<xsd:enumeration value="NorthWest"/>
+			<xsd:enumeration value="ClockWise"/>
+			<xsd:enumeration value="CounterClockWise"/>
+			<xsd:enumeration value="A"/>
+			<xsd:enumeration value="R"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="DayTypeType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Enumeration containing all defined Day Type
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="WeekDay"/>
+			<xsd:enumeration value="WeekEnd"/>
+			<xsd:enumeration value="Monday"/>
+			<xsd:enumeration value="Tuesday"/>
+			<xsd:enumeration value="Wednesday"/>
+			<xsd:enumeration value="Thursday"/>
+			<xsd:enumeration value="Friday"/>
+			<xsd:enumeration value="Saturday"/>
+			<xsd:enumeration value="Sunday"/>
+			<xsd:enumeration value="SchoolHolliday"/>
+			<xsd:enumeration value="PublicHolliday"/>
+			<xsd:enumeration value="MarketDay"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="BoardingAlightingPossibilityType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Enumeration containing all the ways to board or alight a bus
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="BoardAndAlight"/>
+			<xsd:enumeration value="AlightOnly"/>
+			<xsd:enumeration value="BoardOnly"/>
+			<xsd:enumeration value="NeitherBoardOrAlight"/>
+			<xsd:enumeration value="BoardAndAlightOnRequest"/>
+			<xsd:enumeration value="AlightOnRequest"/>
+			<xsd:enumeration value="BoardOnRequest"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="ServiceStatusValueType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Enumeration containing all the possible status of a PT service
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Normal"/>
+			<xsd:enumeration value="Delayed"/>
+			<xsd:enumeration value="Cancelled"/>
+			<xsd:enumeration value="Disrupted"/>
+			<xsd:enumeration value="ReducedService"/>
+			<xsd:enumeration value="IncreasedService"/>
+			<xsd:enumeration value="Rerouted"/>
+			<xsd:enumeration value="NotStopping"/>
+			<xsd:enumeration value="Early"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="VehicleJourneyStatusValueType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Enumeration containing all the possible status of a PT service 
+on a vehicle
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Normal"/>
+			<xsd:enumeration value="Delayed"/>
+			<xsd:enumeration value="Cancelled"/>
+			<xsd:enumeration value="Rerouted"/>
+			<xsd:enumeration value="NotStopping"/>
+			<xsd:enumeration value="Early"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="SourceTypeType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Enumeration containing all the possible type of information 
+source
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="AutomobileClubPatrol"/>
+			<xsd:enumeration value="SpotterAircraft"/>
+			<xsd:enumeration value="BreakdownService"/>
+			<xsd:enumeration value="CameraObservation"/>
+			<xsd:enumeration value="EmergencyServicePatrol"/>
+			<xsd:enumeration value="FreightVehicleOperator"/>
+			<xsd:enumeration value="InfraredMonitoringStation"/>
+			<xsd:enumeration value="InductionLoopMonitoringStation"/>
+			<xsd:enumeration value="MicrowaveMonitoringStation"/>
+			<xsd:enumeration value="MobileTelephoneCaller"/>
+			<xsd:enumeration value="OtherInformation"/>
+			<xsd:enumeration value="OtherOfficialVehicle"/>
+			<xsd:enumeration value="PolicePatrol"/>
+			<xsd:enumeration value="PublicAndPrivateUtilities"/>
+			<xsd:enumeration value="RoadAuthorities"/>
+			<xsd:enumeration value="RegisteredMotoristObserver"/>
+			<xsd:enumeration value="RoadsideTelephoneCaller"/>
+			<xsd:enumeration value="TrafficMonitoringStation"/>
+			<xsd:enumeration value="TransitOperator"/>
+			<xsd:enumeration value="VideoProcessingMonitoringStation"/>
+			<xsd:enumeration value="VehicleProbeMeasurement"/>
+			<xsd:enumeration value="PublicTransport"/>
+			<xsd:enumeration value="PassengerTransportCoordinatingAuthority"/>
+			<xsd:enumeration value="TravelInformationServiceProvider"/>
+			<xsd:enumeration value="TravelAgency"/>
+			<xsd:enumeration value="IndividualSubjectOfTravelItinerary"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ============================================================== -->
+	<xsd:simpleType name="QualityIndexType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Quality of a status/situation indications
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Certain"/>
+			<xsd:enumeration value="VeryReliable"/>
+			<xsd:enumeration value="Reliable"/>
+			<xsd:enumeration value="ProbablyReliable"/>
+			<xsd:enumeration value="Unconfirmed"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="SeverityType">
+		<xsd:annotation>
+			<xsd:documentation>
+		Severity of a status/situation
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="ExtremelySevere"/>
+			<xsd:enumeration value="VerySevere"/>
+			<xsd:enumeration value="Severe"/>
+			<xsd:enumeration value="LowSeverity"/>
+			<xsd:enumeration value="LowestSeverity"/>
+			<xsd:enumeration value="NotProvided"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- ============================================================== -->
+	<xsd:complexType name="TimePeriodType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				Time and duration information
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="DateTime" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="Duration" type="xsd:duration" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="MeasurementTimeType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				Informations on the time of a measurement
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="measurementTime" type="xsd:dateTime" minOccurs="0"/>
+			<xsd:element name="measurementPeriod" type="trd:TimePeriodType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="UnitisedQuantityType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+Value with its type 
+for road trafic_
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="value" type="xsd:decimal"/>
+			<xsd:element name="unit" type="trd:UnitType"/>
+			<xsd:element name="accuracy" type="trd:AccuracyType" minOccurs="0"/>
+			<xsd:element name="measurementTime" type="trd:MeasurementTimeType" minOccurs="0"/>
+			<xsd:element name="measurementLocation" type="trd:LocationType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AccuracyType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				Accuracy of a measure
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="standardDeviation" type="xsd:decimal" minOccurs="0"/>
+			<xsd:element name="accuracy" type="xsd:decimal" minOccurs="0"/>
+			<xsd:element name="dataClass" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="accuracyRange" type="xsd:string" minOccurs="0"/>
+			<!-- REMARK : I didn't find the enumeration for the 2
+			  following element in the DM_ I used
+			  string type instead !!! -->
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
