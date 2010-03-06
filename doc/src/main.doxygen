@@ -1,13 +1,16 @@
 /**
-@mainpage SYNTHESE Documentation
+@mainpage Project Home Page
 
 <h2>Index</h2>
- - @subpage overview
- - @subpage admin
- - @subpage <a href="modules.html">Developer documentation</a>
- - @subpage customer_specs
- - @subpage backoffice_user_manual
- - @subpage annexes
+
+<ul>
+<li>@subpage overview</li>
+<li>@subpage admin</li>
+<li><a href="modules.html">Developer documentation</a></li>
+<li>@subpage customer_specs</li>
+<li>@subpage backoffice_user_manual</li>
+<li>@subpage annexes</li>
+</ul>
 
 <h2>License</h2>
 
