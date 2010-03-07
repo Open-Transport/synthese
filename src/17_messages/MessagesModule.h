@@ -34,9 +34,30 @@
 
 namespace synthese
 {
-	/** @defgroup m17Actions Actions
+	/** @defgroup m17Exceptions 17.01 Exceptions
+		@ingroup m17
+		
+		@defgroup m17LS 17.10 Table synchronizers
 		@ingroup m17
 
+		@defgroup m17Pages 17.11 Pages
+		@ingroup m17
+
+		@defgroup m17Rights 17.12 Rights
+		@ingroup m17
+
+		@defgroup m17Logs 17.13 DB Logs
+		@ingroup m17
+
+		@defgroup m17Admin 17.14 Administration pages
+		@ingroup m17
+
+		@defgroup m17Functions 17.15 Functions
+		@ingroup m17
+
+		@defgroup m17Actions 17.15 Actions
+		@ingroup m17
+		
 		@defgroup m17 17 Messages
 		@ingroup m1
 	@{	*/

@@ -56,7 +56,7 @@ namespace synthese
 		@defgroup m18Logs 18 DB Logs
 		@ingroup m18
 		
-		@defgroup m18 Graph
+		@defgroup m18 18 Graph
 		@ingroup m1
 		
 		(Module documentation)

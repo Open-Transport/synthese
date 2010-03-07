@@ -56,7 +56,7 @@ namespace synthese
 		@defgroup m58Logs 58 DB Logs
 		@ingroup m58
 		
-		@defgroup m58 Hiking
+		@defgroup m58 58 Hiking
 		@ingroup m5
 		
 		(Module documentation)
