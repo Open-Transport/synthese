@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_HikingModule_H__
 #define SYNTHESE_HikingModule_H__
 
-#include "01_util/ModuleClass.h"
+#include "ModuleClassTemplate.hpp"
 
 namespace synthese
 {
@@ -75,7 +75,8 @@ namespace synthese
 			@author Hugues
 			@date 2010
 		*/
-		class HikingModule : public util::ModuleClass
+		class HikingModule:
+			public server::ModuleClassTemplate<HikingModule>
 		{
 		private:
 			
