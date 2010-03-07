@@ -37,7 +37,7 @@ namespace synthese
 
 		/** Place alias.
 
-			@ingroup m14
+			@ingroup m32
 		*/
 		class PlaceAlias:
 			public IncludingPlace,

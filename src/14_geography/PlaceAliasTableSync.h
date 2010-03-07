@@ -36,7 +36,7 @@ namespace synthese
 	namespace geography
 	{
 		/** PlaceAlias table synchronizer.
-			@ingroup m14LS refLS
+			@ingroup m32LS refLS
 		*/
 		class PlaceAliasTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>

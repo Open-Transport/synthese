@@ -34,15 +34,48 @@
 
 namespace synthese
 {
-	/**	@defgroup m09 09 Geography
-		@ingroup m0
+	/**	@defgroup m32Exceptions 32.01 Exceptions
+		@ingroup m32
+
+		@defgroup m32LS 32.10 Table synchronizers
+		@ingroup m32
+
+		@defgroup m32Pages 32.11 Interface Pages
+		@ingroup m32
+
+		@defgroup m32Library 32.11 Interface Library
+		@ingroup m32
+
+		@defgroup m32Rights 32.12 Rights
+		@ingroup m32
+
+		@defgroup m32Logs 32.13 DB Logs
+		@ingroup m32
+
+		@defgroup m32Admin 32.14 Administration pages
+		@ingroup m32
+
+		@defgroup m32Actions 32.15 Actions
+		@ingroup m32
+
+		@defgroup m32Functions 32.15 Functions
+		@ingroup m32
+
+		@defgroup m32File 32.16 File formats
+		@ingroup m32
+
+		@defgroup m32Alarm 32.17 Messages recipient
+		@ingroup m32
 		
-		(Module documentation)
+		@defgroup m32 32 Geography
+		@ingroup m3
+		
+		@todo Write Module documentation
 		
 		@{
 	*/
 
-	/** 09 Geography Module namespace.
+	/** 32 Geography Module namespace.
 		@author Hugues Romain
 		@date 2008
 	*/

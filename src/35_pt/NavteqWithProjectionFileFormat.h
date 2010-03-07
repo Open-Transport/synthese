@@ -50,7 +50,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Navteq with projection file format.
-		/// @ingroup m35
+		/// @ingroup m35File refFile
 		//////////////////////////////////////////////////////////////////////////
 		class NavteqWithProjectionFileFormat
 		:	public impex::FileFormatTemplate<NavteqWithProjectionFileFormat>

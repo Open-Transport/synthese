@@ -21,7 +21,7 @@ namespace synthese
 			http://en.wikipedia.org/wiki/WGS84
 			http://en.wikipedia.org/wiki/GRS_80
 		    
-			@ingroup m09
+			@ingroup m32
 		*/
 		class GeoPoint
 		{

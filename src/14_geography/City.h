@@ -46,7 +46,7 @@ namespace synthese
 			A city holds in its included places the main connection places
 			 (those taken by default when no stop is explicitly chosen).
 
-			@ingroup m14
+			@ingroup m32
 		*/
 		class City:
 			public IncludingPlace,

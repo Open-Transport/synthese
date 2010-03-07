@@ -53,6 +53,9 @@ namespace synthese
 		@defgroup m35Logs 35 DB Logs
 		@ingroup m35
 
+		@defgroup m35File 35.16 File formats
+		@ingroup m35
+
 		@defgroup m35 35 Transport
 		@ingroup m3
 	@{

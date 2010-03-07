@@ -38,7 +38,7 @@ namespace synthese
 	namespace geography
 	{
 		/** City Name.
-			@ingroup m14Values refLibrary
+			@ingroup m32Library refLibrary
 		*/
 		class CityNameValueInterfaceElement
 			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, CityNameValueInterfaceElement>

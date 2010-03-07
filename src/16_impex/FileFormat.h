@@ -29,6 +29,10 @@
 #include <set>
 #include <map>
 
+////////////////////////////////////////////////////////////////////
+/// @defgroup refFile 16 File formats
+///	@ingroup ref
+
 namespace synthese
 {
 	namespace impex

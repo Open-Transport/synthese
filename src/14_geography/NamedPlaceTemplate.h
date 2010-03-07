@@ -31,7 +31,7 @@ namespace synthese
 	namespace geography
 	{
 		/** NamedPlaceTemplate class.
-			@ingroup m14
+			@ingroup m32
 		*/
 		template<class T>
 		class NamedPlaceTemplate:

@@ -29,7 +29,7 @@ namespace synthese
 		/// WGS84 point generation from LambertII.
 		/// @param point Lambert II point to convert
 		/// @return WGS84 converted point
-		/// @ingroup m09
+		/// @ingroup m32
 		///
 		/// http://www.ign.fr/telechargement/MPro/geodesie/CIRCE/transfo.pdf
 		/// http://www.ign.fr/telechargement/MPro/geodesie/CIRCE/NTG_80.pdf

@@ -35,7 +35,7 @@ namespace synthese
 	namespace geography
 	{
 		/** City SQLite table synchronizer.
-			@ingroup m14LS refLS
+			@ingroup m32LS refLS
 
 			- on insert : insert entry in associator
 			- on update : update entry in associator

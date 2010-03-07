@@ -33,7 +33,7 @@ namespace synthese
 	{
 		/** Base class for a place including other places.
 
-			@ingroup m14
+			@ingroup m32
 		*/
 		class IncludingPlace:
 			public virtual Place

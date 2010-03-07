@@ -39,7 +39,7 @@ namespace synthese
 		///	of geographical location in terms of coordinates; it is rather
 		///	a human abstraction.
 		///
-		///	@ingroup m14
+		///	@ingroup m32
 		//////////////////////////////////////////////////////////////////////////
 		class NamedPlace:
 			public util::FactoryBase<NamedPlace>,
