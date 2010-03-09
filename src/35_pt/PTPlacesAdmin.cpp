@@ -196,6 +196,7 @@ namespace synthese
 					c.push_back("Clé");
 					c.push_back("Phonétique");
 					c.push_back("Score");
+					c.push_back("Levenshtein");
 					c.push_back("Actions");
 					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 					stream << t.open();
@@ -217,7 +218,8 @@ namespace synthese
 							stream << t.col() << roadPlace->getName();
 							stream << t.col() << it.key.getSource();
 							stream << t.col() << it.key.getPhoneticString();
-							stream << t.col() << it.score;
+							stream << t.col() << it.score.phoneticScore;
+							stream << t.col() << it.score.levenshtein;
 							stream << t.col() << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
 						else if(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(it.value))
@@ -230,7 +232,8 @@ namespace synthese
 							stream << t.col() << connectionPlace->getName();
 							stream << t.col() << it.key.getSource();
 							stream << t.col() << it.key.getPhoneticString();
-							stream << t.col() << it.score;
+							stream << t.col() << it.score.phoneticScore;
+							stream << t.col() << it.score.levenshtein;
 							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
 						else if(dynamic_cast<const PublicPlace*>(it.value))
@@ -243,7 +246,8 @@ namespace synthese
 							stream << t.col() << publicPlace->getName();
 							stream << t.col() << it.key.getSource();
 							stream << t.col() << it.key.getPhoneticString();
-							stream << t.col() << it.score;
+							stream << t.col() << it.score.phoneticScore;
+							stream << t.col() << it.score.levenshtein;
 							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
 						else
@@ -253,7 +257,8 @@ namespace synthese
 							stream << t.col() << string();
 							stream << t.col() << it.key.getSource();
 							stream << t.col() << it.key.getPhoneticString();
-							stream << t.col() << it.score;
+							stream << t.col() << it.score.phoneticScore;
+							stream << t.col() << it.score.levenshtein;
 							stream << t.col();
 						}
 					}

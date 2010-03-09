@@ -47,7 +47,7 @@ namespace synthese
 		):	_source(source)
 		{
 			typedef tokenizer<char_separator<char> > tokenizer;
-			char_separator<char> sep(" :,;.'");
+			char_separator<char> sep(" :,;.-_|/\¦'");
 			tokenizer words(source, sep);
 			BOOST_FOREACH(string word, words)
 			{
@@ -179,7 +179,7 @@ namespace synthese
 		FrenchSentence::ComparisonScore FrenchSentence::compare(
 			const FrenchSentence& s
 		) const {
-			typedef map<size_t, pair<size_t, ComparisonScore> > Relations;
+			typedef map<size_t, pair<size_t, double> > Relations;
 			
 			Relations othersToThis;
 			Relations thisToOthers;
@@ -189,7 +189,7 @@ namespace synthese
 			{
 				if(_words[i].getPhonetic().empty()) continue;
 
-				ComparisonScore bestScore(0);
+				double bestScore(0);
 				
 				for(size_t j(0); j<s._words.size(); ++j)
 				{
@@ -198,7 +198,7 @@ namespace synthese
 					FrenchPhoneticString::LevenshteinDistance distance(
 						_words[i].levenshtein(s._words[j])
 					);
-					ComparisonScore score(
+					double score(
 						1 - static_cast<double>(distance) / static_cast<double>(distance > s._words[j].getPhonetic().size() ? distance : s._words[j].getPhonetic().size())
 					);
 					assert(score >= 0 && score <= 1);
@@ -215,7 +215,7 @@ namespace synthese
 
 
 			// Average score
-			ComparisonScore totalScores(0);
+			double totalScores(0);
 			for(size_t j(0); j<s._words.size(); ++j)
 			{
 				if(	othersToThis.find(j) != othersToThis.end()
@@ -235,7 +235,10 @@ namespace synthese
 			}
 			if(penalties) totalScores /= penalties;
 
-			return totalScores;
+			ComparisonScore score;
+			score.levenshtein = FrenchPhoneticString::Levenshtein(_source, s._source);
+			score.phoneticScore = totalScores;
+			return score;
 		}
 
 		bool FrenchSentence::startsWith(const FrenchSentence& s) const

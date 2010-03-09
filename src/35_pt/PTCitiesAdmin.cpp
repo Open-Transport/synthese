@@ -143,6 +143,7 @@ namespace synthese
 					c.push_back("Localité");
 					c.push_back("Phonétique");
 					c.push_back("Score");
+					c.push_back("Levenshtein");
 					c.push_back("Actions");
 					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 					stream << t.open();
@@ -157,7 +158,8 @@ namespace synthese
 						stream << t.row();
 						stream << t.col() << it.key.getSource();
 						stream << t.col() << it.key.getPhoneticString();
-						stream << t.col() << it.score;
+						stream << t.col() << it.score.phoneticScore;
+						stream << t.col() << it.score.levenshtein;
 						stream << t.col() << HTMLModule::getLinkButton(openCityRequest.getURL(), "Ouvrir", string(), "building.png");
 					}
 

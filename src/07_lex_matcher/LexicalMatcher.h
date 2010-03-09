@@ -48,7 +48,9 @@ namespace synthese
 					const MatchHit& op1,
 					const MatchHit& op2
 				) const {
-					return op1.score > op2.score;
+					return
+						op1.score.phoneticScore > op2.score.phoneticScore ||
+						op1.score.phoneticScore == op2.score.phoneticScore && op1.score.levenshtein < op2.score.levenshtein;
 				}
 			};
 			
@@ -154,21 +156,21 @@ namespace synthese
 			BOOST_FOREACH(const typename Map::value_type& value, _map)
 			{
 				MatchHit hit;
-				hit.score = ppkey.compare(value.first);
-				if(hit.score == 1)
+				hit.score = value.first.compare(ppkey);
+				if(hit.score.phoneticScore == 1)
 				{
-					hit.score = 2;
+					hit.score.phoneticScore = 2;
 				}
 				else
 				{
 					if(value.first.startsWith(ppkey))
 					{
-						++hit.score;
+						++hit.score.phoneticScore;
 					}
 				}
-				if (hit.score >= minScore)
+				if (hit.score.phoneticScore >= minScore)
 				{
-					hit.score /= double(2);	// ensure that score value is between 0 and 1
+					hit.score.phoneticScore /= double(2);	// ensure that score value is between 0 and 1
 					hit.key = value.first;
 					hit.value = value.second;
 					result.push_back(hit);

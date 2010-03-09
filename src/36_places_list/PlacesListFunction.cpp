@@ -147,7 +147,7 @@ namespace synthese
 					{
 						stream << "address";
 					}
-					stream << "\" score=\"" << it.score << "\">" << it.key.getSource() << "</option>";
+					stream << "\" score=\"" << it.score.phoneticScore << "\">" << it.key.getSource() << "</option>";
 				}
 				stream << "</options>";
 			}

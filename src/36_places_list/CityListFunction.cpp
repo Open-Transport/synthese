@@ -78,7 +78,7 @@ namespace synthese
 				;
 				BOOST_FOREACH(LexicalMatcher<const City*>::MatchHit it, matches)
 				{
-					stream << "<option type=\"city\" score=\"" << it.score << "\">" << it.key.getSource() << "</option>";
+					stream << "<option type=\"city\" score=\"" << it.score.phoneticScore << "\">" << it.key.getSource() << "</option>";
 				}
 				stream << "</options>";
 			}

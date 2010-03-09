@@ -38,7 +38,11 @@ namespace synthese
 		class FrenchSentence
 		{
 		public:
-			typedef double ComparisonScore;
+			struct ComparisonScore
+			{
+				size_t levenshtein;
+				double phoneticScore;
+			};
 			
 		private:
 			typedef std::vector<FrenchPhoneticString> _Words;
