@@ -1,10 +1,31 @@
 /**
 @mainpage Project Home Page
 
-<h2>Index</h2>
+<h3>Qu'est-ce que SYNTHESE ?</h3>
+
+SYNTHESE est un serveur d'information voyageurs multimodale.
+
+Exploité par les opérateurs de transport public, il offre toutes les fonctions nécessaires à leurs utilisateurs :
+<ul>
+<li>multi-supports : de l'information statique sur papier aux écrans dynamiques temps réel</li>
+<li>multimodal : de la ligne de bus à la télécabine de montagne</li>
+<li>ouvert : 100% OpenSource et en lien avec les standards du métier</li>
+<li>innovant : bon nombre de fonctionnalités métier avancées sont proposées en exclusivité</li>
+</ul>
+
+SYNTHESE est le véritable couteau Suisse des transports publics.
+
+<h3>Présentation détaillée</h3>
 
 <ul>
-<li>@subpage overview</li>
+<li>@subpage philo</li>
+<li>@subpage features</li>
+<li>@subpage tech</li>
+</ul>
+
+<h2>Documentation technique</h2>
+
+<ul>
 <li>@subpage admin</li>
 <li><a href="modules.html">Developer documentation</a></li>
 <li>@subpage customer_specs</li>
