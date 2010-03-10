@@ -98,6 +98,7 @@ namespace synthese
 
 		void CalendarTemplate::addElement( const CalendarTemplateElement& element )
 		{
+			removeElement(element);
 			_elements.insert(make_pair(element.getRank(), element));
 		}
 
@@ -200,6 +201,25 @@ namespace synthese
 			result.push_back(make_pair(OTHER_CALENDAR, GetCategoryName(OTHER_CALENDAR)));
 			return result;
 		}
+
+
+
+		void CalendarTemplate::clearElements()
+		{
+			_elements.clear();
+		}
+
+
+
+		void CalendarTemplate::removeElement( const CalendarTemplateElement& element )
+		{
+			Elements::iterator it(_elements.find(element.getRank()));
+			if(it != _elements.end())
+			{
+				_elements.erase(it);
+			}
+		}
+
 
 		CalendarTemplate::InfiniteCalendarException::InfiniteCalendarException()
 			: Exception("The calendar template defines an infinite sized result.")

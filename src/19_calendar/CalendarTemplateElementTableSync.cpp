@@ -179,6 +179,10 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Unlink(
 			CalendarTemplateElement* obj
 		){
+			if(obj->getCalendar())
+			{
+				const_cast<CalendarTemplate*>(obj->getCalendar())->removeElement(*obj);
+			}
 		}
 	}
 	

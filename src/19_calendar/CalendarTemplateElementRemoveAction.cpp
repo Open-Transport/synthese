@@ -77,7 +77,9 @@ namespace synthese
 		{
 			CalendarTemplateElementTableSync::Remove(_element->getKey());
 			if(_element->getCalendar())
+			{
 				CalendarTemplateElementTableSync::Shift(_element->getCalendar()->getKey(), _element->getRank(), -1);
+			}
 		}
 		
 		

@@ -163,7 +163,9 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
+				void	clearElements();
 				void	addElement(const CalendarTemplateElement& element);
+				void	removeElement(const CalendarTemplateElement& element);
 			//@}
 		};
 	}
