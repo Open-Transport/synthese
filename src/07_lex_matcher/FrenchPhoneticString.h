@@ -88,7 +88,7 @@ namespace synthese
 			template<class T>
 			static LevenshteinDistance Levenshtein(const T& s1, const T& s2)
 			{
-				if (s2.size () > 256 || s1.size() > 256) return numeric_limits<LevenshteinDistance>::max ();
+				if (s2.size () > 256 || s1.size() > 256) return std::numeric_limits<LevenshteinDistance>::max ();
 
 				// Levenshtein Word Distance matrix.
 				// Note that the dims are bounded to 256. It means that it is 
@@ -112,7 +112,7 @@ namespace synthese
 					{
 						LevenshteinDistance v = matrix[i-1][j-1];
 						if ( s1[j-1] !=  sc ) v++;
-						matrix[i][j] = min(min(matrix[i-1][j] + 1, matrix[i][j-1] + 1 ), v );
+						matrix[i][j] = std::min(std::min(matrix[i-1][j] + 1, matrix[i][j-1] + 1 ), v );
 					}
 				}
 				return matrix[n][m];
