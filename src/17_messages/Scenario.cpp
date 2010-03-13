@@ -24,27 +24,17 @@
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace messages
 	{
-
-
-		const std::string& Scenario::getName() const
-		{
-			return _name;
-		}
-
-		void Scenario::setName( const std::string& name )
-		{
-			_name = name;
-		}
-
 		Scenario::~Scenario()
 		{
 
 		}
 
 		Scenario::Scenario( const std::string name /*= std::string()*/ )
-			: _name(name)
+			: Named(name)
 		{
 
 		}

@@ -26,9 +26,7 @@
 #define SYNTHESE_Scenario_h__
 
 #include "Registrable.h"
-
-#include <string>
-#include <set>
+#include "Named.h"
 
 namespace synthese
 {
@@ -42,13 +40,13 @@ namespace synthese
 		///	The type of the contained alarms defines two categories of scenario :
 		///		- the template scenario
 		///		- the sent scenario
-		class Scenario
-			:	public virtual util::Registrable
+		class Scenario:
+			public virtual util::Registrable,
+			public util::Named
 		{
 		public:
 
 		private:
-			std::string					_name;
 
 		protected:
 			Scenario(const std::string name = std::string());
@@ -56,20 +54,6 @@ namespace synthese
 		public:
 			virtual ~Scenario();
 
-			/** Name getter.
-				@return const std::string& The name of the scenario
-				@author Hugues Romain
-				@date 2007
-			*/
-			const std::string& getName() const;
-
-
-			/** Name setter.
-				@param name Name of the scenario
-				@author Hugues Romain
-				@date 2007
-			*/
-			void setName(const std::string& name);
 		};
 	}
 }
