@@ -117,6 +117,10 @@ namespace synthese
 		
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CommercialLineTableSync>::_INDEXES[]=
 		{
+			SQLiteTableSync::Index(
+				CommercialLineTableSync::COL_NETWORK_ID.c_str(),
+				""
+			),
 			SQLiteTableSync::Index()
 		};
 

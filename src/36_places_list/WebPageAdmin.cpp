@@ -29,7 +29,11 @@
 #include "WebPageTableSync.h"
 #include "PropertiesHTMLTable.h"
 #include "WebPageUpdateAction.h"
+#include "WebPageContentUpdateAction.hpp"
+#include "WebPageDisplayFunction.h"
 #include "AdminActionFunctionRequest.hpp"
+#include "Interface.h"
+#include "WebPageInterfacePage.h"
 
 using namespace std;
 using namespace boost;
@@ -108,23 +112,44 @@ namespace synthese
 			const admin::AdminRequest& _request
 		) const	{
 
+			stream << "<h1>Visualisation</h1>";
+
+			StaticFunctionRequest<WebPageDisplayFunction> viewRequest(_request, false);
+			if(	_page->getRoot()->getInterface() &&
+				!_page->getRoot()->getInterface()->getDefaultClientURL().empty()
+			){
+				viewRequest.setClientURL(_page->getRoot()->getInterface()->getDefaultClientURL());
+			}
+			viewRequest.getFunction()->setPage(_page);
+			stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "page_go.png") << "</p>";
+
+
 			stream << "<h1>Propriétés</h1>";
 
-			stream << "<p>id : " << _page->getKey() << "</p>";
+			{
+				AdminActionFunctionRequest<WebPageUpdateAction, WebPageAdmin> updateRequest(_request);
+				updateRequest.getAction()->setWebPage(const_pointer_cast<WebPage>(_page));
+				PropertiesHTMLTable t(updateRequest.getHTMLForm());
+				stream << t.open();
+				stream << t.cell("ID", lexical_cast<string>(_page->getKey()));
+				stream << t.cell("Titre", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TITLE, _page->getName()));
+				stream << t.cell("Page supérieure", t.getForm().getSelectInput(WebPageUpdateAction::PARAMETER_UP_ID, WebPageTableSync::GetPagesList(_page->getRoot()->getKey(), "(racine)"), _page->getParent() ? _page->getParent()->getKey() : RegistryKeyType(0)));
+			}
 
 			stream << "<h1>Contenu</h1>";
 
-			AdminActionFunctionRequest<WebPageUpdateAction, WebPageAdmin> updateRequest(_request);
-			updateRequest.getAction()->setWebPage(const_pointer_cast<WebPage>(_page));
-			PropertiesHTMLTable t(updateRequest.getHTMLForm());
-			stream << t.open();
-			stream << t.cell("Titre", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TITLE, _page->getTitle()));
-			stream << t.cell("Contenu 1", t.getForm().getTextAreaInput(WebPageUpdateAction::PARAMETER_CONTENT1, _page->getContent1(), 20, 60));
-			stream << t.cell("Inclusion 1", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_INCLUDE1, _page->getInclude1()));
-			stream << t.cell("Contenu 2", t.getForm().getTextAreaInput(WebPageUpdateAction::PARAMETER_CONTENT2, _page->getContent2(), 20, 60));
-			stream << t.cell("Inclusion 2", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_INCLUDE2, _page->getInclude2()));
-			stream << t.cell("Contenu 3", t.getForm().getTextAreaInput(WebPageUpdateAction::PARAMETER_CONTENT3, _page->getContent3(), 20, 60));
-			stream << t.close();
+			{
+				AdminActionFunctionRequest<WebPageContentUpdateAction, WebPageAdmin> contentUpdateRequest(_request);
+				contentUpdateRequest.getAction()->setWebPage(const_pointer_cast<WebPage>(_page));
+				PropertiesHTMLTable t(contentUpdateRequest.getHTMLForm());
+				stream << t.open();
+				stream << t.cell("Contenu 1", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_CONTENT1, _page->getContent1(), 20, 60));
+				stream << t.cell("Inclusion 1", t.getForm().getTextInput(WebPageContentUpdateAction::PARAMETER_INCLUDE1, _page->getInclude1()));
+				stream << t.cell("Contenu 2", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_CONTENT2, _page->getContent2(), 20, 60));
+				stream << t.cell("Inclusion 2", t.getForm().getTextInput(WebPageContentUpdateAction::PARAMETER_INCLUDE2, _page->getInclude2()));
+				stream << t.cell("Contenu 3", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_CONTENT3, _page->getContent3(), 20, 60));
+				stream << t.close();
+			}
 		}
 
 
@@ -132,7 +157,7 @@ namespace synthese
 
 		std::string WebPageAdmin::getTitle() const
 		{
-			return _page.get() ? _page->getTitle() : DEFAULT_TITLE;
+			return _page.get() ? _page->getName() : DEFAULT_TITLE;
 		}
 
 
@@ -147,6 +172,26 @@ namespace synthese
 		void WebPageAdmin::setPage( boost::shared_ptr<const WebPage> value )
 		{
 			_page = value;
+		}
+
+
+
+		AdminInterfaceElement::PageLinks WebPageAdmin::getSubPages( const AdminInterfaceElement& currentPage, const admin::AdminRequest& request ) const
+		{
+			AdminInterfaceElement::PageLinks links;
+
+			WebPageTableSync::SearchResult pages(WebPageTableSync::Search(Env::GetOfficialEnv(), _page->getRoot()->getKey(), _page->getKey()));
+			BOOST_FOREACH(shared_ptr<WebPage> page, pages)
+			{
+				shared_ptr<WebPageAdmin> p(
+					getNewOtherPage<WebPageAdmin>(false)
+				);
+				p->setPage(const_pointer_cast<const WebPage>(page));
+				links.push_back(p);
+			}
+
+			return links;
+
 		}
 	}
 }

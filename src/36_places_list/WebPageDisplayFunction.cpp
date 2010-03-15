@@ -30,8 +30,10 @@
 #include "WebPage.h"
 #include "Site.h"
 #include "WebPageInterfacePage.h"
+#include "TransportWebsiteRight.h"
 
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -41,13 +43,13 @@ namespace synthese
 	using namespace interfaces;
 	using namespace transportwebsite;
 
-	template<> const string util::FactorableTemplate<FunctionWithSite,WebPageDisplayFunction>::FACTORY_KEY("WebPageDisplayFunction");
+	template<> const string util::FactorableTemplate<Function,WebPageDisplayFunction>::FACTORY_KEY("WebPageDisplayFunction");
 	
 	namespace transportwebsite
 	{
 		ParametersMap WebPageDisplayFunction::_getParametersMap() const
 		{
-			ParametersMap map(FunctionWithSite::_getParametersMap());
+			ParametersMap map;
 			if(_page.get())
 			{
 				map.insert(Request::PARAMETER_OBJECT_ID, _page->getKey());
@@ -57,26 +59,24 @@ namespace synthese
 
 		void WebPageDisplayFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			FunctionWithSite::_setFromParametersMap(map);
 			try
 			{
 				_page = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 			}
-			catch (...)
+			catch (ObjectNotFoundException<WebPage>)
 			{
 				throw RequestException("No such page");
 			}
 
-			if(_page->getSite() != _site.get())
-			{
-				throw RequestException("Inconsistent page");
-			}
-
-			if(_site->getInterface() == NULL || !_site->getInterface()->hasPage<WebPageInterfacePage>())
+			if(_page->getRoot() == NULL || _page->getRoot()->getInterface() == NULL || !_page->getRoot()->getInterface()->hasPage<WebPageInterfacePage>())
 			{
 				throw RequestException("Inappropriate site");
 			}
 
+			if(	!_page->mustBeDisplayed()
+			){
+				throw RequestException("The page is not displayed right now");
+			}
 		}
 
 		void WebPageDisplayFunction::run(
@@ -85,7 +85,13 @@ namespace synthese
 		) const {
 
 			VariablesMap variables;
-			_site->getInterface()->getPage<WebPageInterfacePage>()->display(stream, *_page, variables, &request);
+			_page->getRoot()->getInterface()->getPage<WebPageInterfacePage>()->display(
+				stream,
+				*_page,
+				request.isAuthorized<TransportWebsiteRight>(WRITE),
+				variables,
+				&request
+			);
 
 		}
 		

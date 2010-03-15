@@ -45,11 +45,15 @@ namespace synthese
 	{
 		const string WebPageTableSync::COL_TITLE = "title";
 		const string WebPageTableSync::COL_SITE_ID = "site_id";
+		const string WebPageTableSync::COL_UP_ID = "up_id";
+		const string WebPageTableSync::COL_RANK = "rank";
 		const string WebPageTableSync::COL_CONTENT1 = "content1";
 		const string WebPageTableSync::COL_INCLUDE1 = "include1";
 		const string WebPageTableSync::COL_CONTENT2 = "content2";
 		const string WebPageTableSync::COL_INCLUDE2 = "include2";
 		const string WebPageTableSync::COL_CONTENT3 = "content3";
+		const string WebPageTableSync::COL_START_TIME = "start_time";
+		const string WebPageTableSync::COL_END_TIME = "end_time";
 	}
 
 	namespace db
@@ -62,18 +66,23 @@ namespace synthese
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(WebPageTableSync::COL_SITE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(WebPageTableSync::COL_UP_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(WebPageTableSync::COL_RANK, SQL_INTEGER),
 			SQLiteTableSync::Field(WebPageTableSync::COL_TITLE, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_CONTENT1, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_INCLUDE1, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_CONTENT2, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_INCLUDE2, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_CONTENT3, SQL_TEXT),
+			SQLiteTableSync::Field(WebPageTableSync::COL_START_TIME, SQL_TEXT),
+			SQLiteTableSync::Field(WebPageTableSync::COL_END_TIME, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<WebPageTableSync>::_INDEXES[] =
 		{
 			SQLiteTableSync::Index(WebPageTableSync::COL_SITE_ID.c_str(), ""),
+			SQLiteTableSync::Index(WebPageTableSync::COL_UP_ID.c_str(), WebPageTableSync::COL_RANK.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
@@ -84,12 +93,22 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			webpage->setTitle(rows->getText(WebPageTableSync::COL_TITLE));
+			webpage->setName(rows->getText(WebPageTableSync::COL_TITLE));
 			webpage->setContent1(rows->getText(WebPageTableSync::COL_CONTENT1));
 			webpage->setInclude1(rows->getText(WebPageTableSync::COL_INCLUDE1));
 			webpage->setContent2(rows->getText(WebPageTableSync::COL_CONTENT2));
 			webpage->setInclude2(rows->getText(WebPageTableSync::COL_INCLUDE2));
 			webpage->setContent3(rows->getText(WebPageTableSync::COL_CONTENT3));
+			webpage->setRank(rows->getInt(WebPageTableSync::COL_RANK));
+
+			if(!rows->getText(WebPageTableSync::COL_START_TIME).empty())
+			{
+				webpage->setStartDate(rows->getDateTime(WebPageTableSync::COL_START_TIME));
+			}
+			if(!rows->getText(WebPageTableSync::COL_END_TIME).empty())
+			{
+				webpage->setEndDate(rows->getDateTime(WebPageTableSync::COL_END_TIME));
+			}
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -98,13 +117,29 @@ namespace synthese
 				{
 					try
 					{
-						webpage->setSite(SiteTableSync::GetEditable(id, env, linkLevel).get());
+						webpage->setRoot(SiteTableSync::GetEditable(id, env, linkLevel).get());
 					}
 					catch(ObjectNotFoundException<Site>& e)
 					{
 						Log::GetInstance().warn(
 							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : site " +
 							lexical_cast<string>(id) + " not found"
+						);
+					}
+				}
+
+				uid up_id(rows->getLongLong(WebPageTableSync::COL_UP_ID));
+				if (up_id > 0)
+				{
+					try
+					{
+						webpage->setParent(WebPageTableSync::GetEditable(up_id, env, linkLevel).get());
+					}
+					catch(ObjectNotFoundException<WebPage>& e)
+					{
+						Log::GetInstance().warn(
+							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : up web page " +
+							lexical_cast<string>(up_id) + " not found"
 						);
 					}
 				}
@@ -116,7 +151,6 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,WebPage>::Unlink(
 			WebPage* obj
 		){
-			obj->setSite(NULL);
 		}
 
 
@@ -126,13 +160,17 @@ namespace synthese
 		){
 			// Query
 			ReplaceQuery<WebPageTableSync> query(*webPage);
-			query.addField(webPage->getSite() ? webPage->getSite()->getKey() : RegistryKeyType(0));
-			query.addField(webPage->getTitle());
+			query.addField(webPage->getRoot() ? webPage->getRoot()->getKey() : RegistryKeyType(0));
+			query.addField(webPage->getParent() ? webPage->getParent()->getKey() : RegistryKeyType(0));
+			query.addField(static_cast<int>(webPage->getRank()));
+			query.addField(webPage->getName());
 			query.addField(webPage->getContent1());
 			query.addField(webPage->getInclude1());
 			query.addField(webPage->getContent2());
 			query.addField(webPage->getInclude2());
 			query.addField(webPage->getContent3());
+			query.addField(webPage->getStartDate());
+			query.addField(webPage->getEndDate());
 			query.execute(transaction);
 		}
 	}
@@ -142,8 +180,10 @@ namespace synthese
 		WebPageTableSync::SearchResult WebPageTableSync::Search(
 			util::Env& env,
 			boost::optional<util::RegistryKeyType> siteId /*= boost::optional<util::RegistryKeyType>()*/, 
+			optional<RegistryKeyType> parentId,
 			int first /*= 0 */,
 			boost::optional<std::size_t> number /* = boost::optional<std::size_t>()*/,
+			bool orderByRank,
 			bool orderByTitle /*= true*/,
 			bool raisingOrder /*= true*/,
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
@@ -154,10 +194,21 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (siteId)
+			{
 				query << " AND " << COL_SITE_ID << "=" << *siteId;
-			;
-			if (orderByTitle)
+			}
+			if(parentId)
+			{
+				query << " AND " << COL_UP_ID << "=" << *parentId;
+			}
+			if(orderByRank)
+			{
+				query << " ORDER BY " << COL_RANK << (raisingOrder ? " ASC" : " DESC");
+			}
+			else if (orderByTitle)
+			{
 				query << " ORDER BY " << COL_TITLE << (raisingOrder ? " ASC" : " DESC");
+			}
 			if (number)
 			{
 				query << " LIMIT " << (*number + 1);
@@ -166,6 +217,50 @@ namespace synthese
 			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+
+
+		WebPageTableSync::SiteWebPagesList WebPageTableSync::GetPagesList(
+			util::RegistryKeyType siteId,
+			const std::string& rootLabel,
+			std::string prefix,
+			RegistryKeyType upId
+		){
+			SiteWebPagesList result;
+			if(!rootLabel.empty())
+			{
+				result.push_back(make_pair(0, rootLabel));
+			}
+			Env env;
+			SearchResult pages(Search(env, siteId, upId, 0, optional<size_t>(), true));
+			BOOST_FOREACH(const SearchResult::value_type& page, pages)
+			{
+				result.push_back(make_pair(page->getKey(), prefix + page->getName()));
+				SiteWebPagesList subResult(GetPagesList(siteId, string(), prefix + "&nbsp;&nbsp;&nbsp;", page->getKey()));
+				result.insert(result.end(), subResult.begin(), subResult.end());
+			}
+			return result;
+		}
+
+
+
+		void WebPageTableSync::ShiftRank(
+			RegistryKeyType siteId,
+			util::RegistryKeyType parentId,
+			std::size_t rank,
+			bool add
+		){
+			stringstream query;
+			query <<
+				"UPDATE " << TABLE.NAME <<
+				" SET " << COL_RANK << "=" << COL_RANK << (add ? "+" : "-") << "1" <<
+				" WHERE " <<
+					COL_SITE_ID << "=" << siteId << " AND " <<
+					COL_UP_ID << "=" << parentId << " AND " <<
+					COL_RANK << ">=" << rank
+			;
+			DBModule::GetSQLite()->execUpdate(query.str());
 		}
 	}
 }

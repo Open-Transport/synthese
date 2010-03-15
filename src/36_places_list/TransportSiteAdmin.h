@@ -28,15 +28,28 @@
 #include "AdminInterfaceElementTemplate.h"
 #include "GraphTypes.h"
 #include "ResultHTMLTable.h"
+#include "WebPageTableSync.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
 
 namespace synthese
 {
+	namespace html
+	{
+		class ActionResultHTMLTable;
+	}
+
 	namespace transportwebsite
 	{
 		class Site;
 		class RollingStockFilter;
+		class WebPageAdmin;
+		class WebPageDisplayFunction;
+		class WebPageRemoveAction;
+		class WebPageAddAction;
 
-		/** TransportSiteAdmin Class.
+
+		/** Transport web site administration page class.
 			@ingroup m56Admin refAdmin
 			@author Hugues Romain
 			@date 2008
@@ -55,6 +68,7 @@ namespace synthese
 			static const std::string PARAMETER_LOG;
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER;
 			static const std::string PARAMETER_SEARCH_PAGE;
+			static const std::string PARAMETER_SEARCH_RANK;
 
 			static const std::string TAB_PROPERTIES;
 			static const std::string TAB_PERIMETER;
@@ -74,6 +88,17 @@ namespace synthese
 			RollingStockFilter*				_rollingStockFilter;
 			std::string						_searchPage;
 			html::ResultHTMLTable::RequestParameters	_pageSearchParameter;
+
+			void _displaySubPages(
+				std::ostream& stream,
+				const WebPageTableSync::SearchResult& pages,
+				admin::AdminFunctionRequest<WebPageAdmin>& openRequest,
+				server::StaticFunctionRequest<WebPageDisplayFunction>& viewRequest,
+				admin::AdminActionFunctionRequest<WebPageAddAction, TransportSiteAdmin>& createRequest,
+				admin::AdminActionFunctionRequest<WebPageRemoveAction, TransportSiteAdmin>& deleteRequest,
+				html::ActionResultHTMLTable& t,
+				std::size_t depth = 0
+			) const;
 
 		public:
 			TransportSiteAdmin();

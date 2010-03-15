@@ -132,13 +132,10 @@ namespace synthese
 			///	@return PageLinks each page to put under the current page
 			///	@author Hugues
 			///	@date 2010
-			/// @todo A DEFAULT IMPLEMENTATION RETURNS NOTHING.
-			///       REMOVE THIS METHOD OVERLOAD IF IT IS NOT NECESSARY.
-// 			virtual AdminInterfaceElement::PageLinks getSubPages(
-// 				const AdminInterfaceElement& currentPage,
-// 				const admin::AdminRequest& request
-// 			) const;
-// later
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				const AdminInterfaceElement& currentPage,
+				const admin::AdminRequest& request
+			) const;
 
 			
 			//////////////////////////////////////////////////////////////////////////

@@ -26,8 +26,10 @@
 #include "WebPage.h"
 
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -52,12 +54,13 @@ namespace synthese
 		void WebPageInterfacePage::display(
 			std::ostream& stream,
 			const WebPage& webPage,
+			bool edit,
 			VariablesMap& variables,
 			const server::Request* request /*= NULL*/
 		) const	{
 			ParametersVector pv;
 		
-			pv.push_back(webPage.getTitle()); //0
+			pv.push_back(webPage.getName()); //0
 			pv.push_back(webPage.getContent1()); //1
 
 			stringstream include1;
@@ -77,6 +80,8 @@ namespace synthese
 			pv.push_back(include2.str()); //4
 
 			pv.push_back(webPage.getContent3()); //5
+
+			pv.push_back(lexical_cast<string>(webPage.getKey())); //6
 
 
 			InterfacePage::_display(

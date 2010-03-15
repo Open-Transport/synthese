@@ -72,7 +72,7 @@ namespace synthese
 				return string();
 			}
 
-			shared_ptr<const FunctionWithSite> fws(dynamic_pointer_cast<const FunctionWithSite>(request->getFunction()));
+			shared_ptr<const Function> fws(request->getFunction());
 			if(!fws.get())
 			{
 				return string();
@@ -81,11 +81,11 @@ namespace synthese
 			try
 			{
 				StaticFunctionRequest<WebPageDisplayFunction> openRequest(*request, false);
-				openRequest.getFunction()->setSite(fws->getSite());
-				openRequest.getFunction()->setPage(Env::GetOfficialEnv().get<WebPage>(pageId));
-				if(fws->getSite()->getInterface() && !fws->getSite()->getInterface()->getDefaultClientURL().empty())
+				shared_ptr<const WebPage> page(Env::GetOfficialEnv().get<WebPage>(pageId));
+				openRequest.getFunction()->setPage(page);
+				if(page->getRoot()->getInterface() && !page->getRoot()->getInterface()->getDefaultClientURL().empty())
 				{
-					openRequest.setClientURL(fws->getSite()->getInterface()->getDefaultClientURL());
+					openRequest.setClientURL(page->getRoot()->getInterface()->getDefaultClientURL());
 				}
 
 				HTMLForm form(openRequest.getHTMLForm(formName));

@@ -96,7 +96,7 @@ namespace synthese
 					return string();
 				}
 
-				shared_ptr<const FunctionWithSite> fws(dynamic_pointer_cast<const FunctionWithSite>(request->getFunction()));
+				shared_ptr<const Function> fws(request->getFunction());
 				if(!fws.get())
 				{
 					return string();
@@ -105,16 +105,15 @@ namespace synthese
 				try
 				{
 					StaticFunctionRequest<WebPageDisplayFunction> openRequest(*request, false);
-					openRequest.getFunction()->setSite(fws->getSite());
 					shared_ptr<const WebPage> page(Env::GetOfficialEnv().get<WebPage>(pageId));
 					openRequest.getFunction()->setPage(page);
-					if(fws->getSite()->getInterface() && !fws->getSite()->getInterface()->getDefaultClientURL().empty())
+					if(page->getRoot()->getInterface() && !page->getRoot()->getInterface()->getDefaultClientURL().empty())
 					{
-						openRequest.setClientURL(fws->getSite()->getInterface()->getDefaultClientURL());
+						openRequest.setClientURL(page->getRoot()->getInterface()->getDefaultClientURL());
 					}
 					stream << HTMLModule::getHTMLLink(
 						openRequest.getURL(),
-						text.empty() ? page->getTitle() : text
+						text.empty() ? page->getName() : text
 					);
 				}
 				catch(ObjectNotFoundException<WebPage>)

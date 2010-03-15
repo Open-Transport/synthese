@@ -14,6 +14,7 @@
 #include "UserFavoriteListInterfaceElement.h"
 #include "WebPageFormInterfaceElement.h"
 #include "WebPageLinkInterfaceElement.h"
+#include "WebPageMenuInterfaceElement.hpp"
 
 #include "CityListFunction.h"
 #include "PlacesListFunction.h"
@@ -35,6 +36,7 @@
 #include "WebPageAddAction.h"
 #include "WebPageUpdateAction.h"
 #include "WebPageRemoveAction.h"
+#include "WebPageContentUpdateAction.hpp"
 
 #include "TransportWebsiteRight.h"
 

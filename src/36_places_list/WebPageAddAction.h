@@ -38,8 +38,13 @@ namespace synthese
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// WebPageAddAction action class.
+		/// Web page creation action.
 		/// @ingroup m56Actions refActions
+		///
+		/// There is 3 ways to create a web page sorted by decreasing priority :
+		///		- by specifying TEMPLATE_ID : insertion of a page after an existing page with the same parent
+		///		- by specifying PARENT_ID : creation of a child of an other page after the last sibling if a child page already exists
+		///		- by specifying SITE_ID : creation of a page at the last position of a web site
 		class WebPageAddAction:
 			public util::FactorableTemplate<server::Action, WebPageAddAction>
 		{
@@ -47,11 +52,14 @@ namespace synthese
 			static const std::string PARAMETER_TITLE;
 			static const std::string PARAMETER_SITE_ID;
 			static const std::string PARAMETER_TEMPLATE_ID;
+			static const std::string PARAMETER_PARENT_ID;
 
 		private:
 			std::string _title;
+			std::size_t _rank;
 			boost::shared_ptr<Site> _site;
 			boost::shared_ptr<const WebPage> _template;
+			boost::shared_ptr<WebPage> _parent;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -82,9 +90,12 @@ namespace synthese
 			virtual bool isAuthorized(const server::Session* session) const;
 
 
-
-			void setSite(boost::shared_ptr<Site> value);
-			void setTitle(const std::string& value);
+			//! @name Setters
+			//@{
+				void setSite(boost::shared_ptr<Site> value);
+				void setTitle(const std::string& value);
+				void setParent(boost::shared_ptr<WebPage> value);
+			//@}
 			
 		};
 	}

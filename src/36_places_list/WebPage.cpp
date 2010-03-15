@@ -23,7 +23,6 @@
 #include "WebPage.h"
 #include "ParametersMap.h"
 #include "DynamicRequest.h"
-#include "Site.h"
 #include "Function.h"
 
 using namespace std;
@@ -43,7 +42,8 @@ namespace synthese
 	{
 		WebPage::WebPage( util::RegistryKeyType id /*= UNKNOWN_VALUE*/ ):
 			Registrable(id),
-			_site(NULL)
+			_startDate(posix_time::not_a_date_time),
+			_endDate(posix_time::not_a_date_time)
 		{
 			
 		}
@@ -158,30 +158,40 @@ namespace synthese
 
 
 
-		void WebPage::setSite( Site* value )
+		const boost::posix_time::ptime& WebPage::getStartDate() const
 		{
-			_site = value;
+			return _startDate;
 		}
 
 
 
-		Site* WebPage::getSite() const
+		const boost::posix_time::ptime& WebPage::getEndDate() const
 		{
-			return _site;
+			return _endDate;
 		}
 
 
 
-		const std::string& WebPage::getTitle() const
+		void WebPage::setStartDate( const boost::posix_time::ptime& value )
 		{
-			return _title;
+			_startDate = value;
 		}
 
 
 
-		void WebPage::setTitle( const std::string& value )
+		void WebPage::setEndDate( const boost::posix_time::ptime& value )
 		{
-			_title = value;
+			_endDate = value;
+		}
+
+
+
+		bool WebPage::mustBeDisplayed( boost::posix_time::ptime now /*= boost::posix_time::second_clock::local_time()*/ ) const
+		{
+			return
+				(_startDate.is_not_a_date_time() || _startDate <= now) &&
+				(_endDate.is_not_a_date_time() || _endDate >= now)
+			;
 		}
 	}
 }

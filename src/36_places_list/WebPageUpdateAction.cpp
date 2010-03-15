@@ -30,6 +30,7 @@
 #include "WebPageTableSync.h"
 
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -45,12 +46,10 @@ namespace synthese
 	namespace transportwebsite
 	{
 		const string WebPageUpdateAction::PARAMETER_WEB_PAGE_ID = Action_PARAMETER_PREFIX + "wp";
+		const string WebPageUpdateAction::PARAMETER_UP_ID = Action_PARAMETER_PREFIX + "ui";
 		const string WebPageUpdateAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "ti";
-		const string WebPageUpdateAction::PARAMETER_CONTENT1 = Action_PARAMETER_PREFIX + "c1";
-		const string WebPageUpdateAction::PARAMETER_INCLUDE1 = Action_PARAMETER_PREFIX + "i1";
-		const string WebPageUpdateAction::PARAMETER_CONTENT2 = Action_PARAMETER_PREFIX + "c2";
-		const string WebPageUpdateAction::PARAMETER_INCLUDE2 = Action_PARAMETER_PREFIX + "i2";
-		const string WebPageUpdateAction::PARAMETER_CONTENT3 = Action_PARAMETER_PREFIX + "c3";
+		const string WebPageUpdateAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sd";
+		const string WebPageUpdateAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "ed";
 
 		
 		
@@ -77,13 +76,27 @@ namespace synthese
 				throw ActionException("No such page");
 			}
 
+			RegistryKeyType uid(map.get<RegistryKeyType>(PARAMETER_UP_ID));
+			if(uid > 0)
+			try
+			{
+				_up = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_WEB_PAGE_ID), *_env);
+			}
+			catch(ObjectNotFoundException<WebPage>& e)
+			{
+				throw ActionException("No such up page");
+			}
+
+			if(!map.getDefault<string>(PARAMETER_START_DATE).empty())
+			{
+				_startDate = from_iso_string(map.get<string>(PARAMETER_START_DATE));
+			}
+			if(!map.getDefault<string>(PARAMETER_END_DATE).empty())
+			{
+				_endDate = from_iso_string(map.get<string>(PARAMETER_END_DATE));
+			}
+
 			_title = map.getDefault<string>(PARAMETER_TITLE);
-			_content1 = map.getDefault<string>(PARAMETER_CONTENT1);
-			_include1 = map.getDefault<string>(PARAMETER_INCLUDE1);
-			_content2 = map.getDefault<string>(PARAMETER_CONTENT2);
-			_include2 = map.getDefault<string>(PARAMETER_INCLUDE2);
-			_content3 = map.getDefault<string>(PARAMETER_CONTENT3);
-	
 		}
 		
 		
@@ -94,12 +107,10 @@ namespace synthese
 			stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			
-			_page->setTitle(_title);
-			_page->setContent1(_content1);
-			_page->setInclude1(_include1);
-			_page->setContent2(_content2);
-			_page->setInclude2(_include2);
-			_page->setContent3(_content3);
+			_page->setName(_title);
+			_page->setParent(_up.get());
+			_page->setStartDate(_startDate);
+			_page->setEndDate(_endDate);
 
 			WebPageTableSync::Save(_page.get());
 
@@ -119,6 +130,15 @@ namespace synthese
 		void WebPageUpdateAction::setWebPage( boost::shared_ptr<WebPage> value )
 		{
 			_page = value;
+		}
+
+
+
+		WebPageUpdateAction::WebPageUpdateAction():
+			_startDate(not_a_date_time),
+			_endDate(not_a_date_time)
+		{
+
 		}
 	}
 }

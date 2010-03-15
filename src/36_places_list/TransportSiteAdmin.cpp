@@ -28,8 +28,6 @@
 #include "Site.h"
 #include "SiteUpdateAction.h"
 #include "TransportWebsiteRight.h"
-#include "AdminFunctionRequest.hpp"
-#include "AdminActionFunctionRequest.hpp"
 #include "RoutePlannerFunction.h"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
@@ -54,7 +52,6 @@
 #include "HTMLForm.h"
 #include "PTRoutePlannerResult.h"
 #include "WebPageAdmin.h"
-#include "WebPageTableSync.h"
 #include "ActionResultHTMLTable.h"
 #include "WebPageAddAction.h"
 #include "WebPageRemoveAction.h"
@@ -108,6 +105,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		const string TransportSiteAdmin::PARAMETER_SEARCH_PAGE("pp");
+		const string TransportSiteAdmin::PARAMETER_SEARCH_RANK("pr");
 		const string TransportSiteAdmin::PARAMETER_DATE_TIME("dt");
 		const string TransportSiteAdmin::PARAMETER_START_CITY("sc");
 		const string TransportSiteAdmin::PARAMETER_START_PLACE("sp");
@@ -150,13 +148,14 @@ namespace synthese
 			}
 
 			_searchPage = map.getDefault<string>(PARAMETER_SEARCH_PAGE);
-			_pageSearchParameter.setFromParametersMap(map.getMap(), WebPageTableSync::COL_TITLE, optional<size_t>());
+			_pageSearchParameter.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_RANK, optional<size_t>());
 
 			_startCity = map.getDefault<string>(PARAMETER_START_CITY);
 			_endCity = map.getDefault<string>(PARAMETER_END_CITY);
 			_startPlace = map.getDefault<string>(PARAMETER_START_PLACE);
 			_endPlace = map.getDefault<string>(PARAMETER_END_PLACE);
 			_log = map.getDefault<bool>(PARAMETER_LOG, false);
+			_pageSearchParameter.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_RANK);
 
 			if(!map.getDefault<string>(PARAMETER_DATE_TIME).empty())
 			{
@@ -335,12 +334,14 @@ namespace synthese
 				AdminActionFunctionRequest<WebPageAddAction, TransportSiteAdmin> addRequest(_request);
 				addRequest.getAction()->setSite(const_pointer_cast<Site>(_site));
 
+				AdminActionFunctionRequest<WebPageAddAction, TransportSiteAdmin> parentAddRequest(_request);
+				addRequest.getAction()->setSite(const_pointer_cast<Site>(_site));
+
 				AdminActionFunctionRequest<WebPageRemoveAction, TransportSiteAdmin> deleteRequest(_request);
 
 				AdminFunctionRequest<WebPageAdmin> openRequest(_request);
 
 				StaticFunctionRequest<WebPageDisplayFunction> viewRequest(_request, false);
-				viewRequest.getFunction()->setSite(_site);
 				if(	_site->getInterface() &&
 					!_site->getInterface()->getDefaultClientURL().empty()
 				){
@@ -351,36 +352,30 @@ namespace synthese
 					WebPageTableSync::Search(
 						Env::GetOfficialEnv(),
 						_site->getKey(),
+						RegistryKeyType(0),
 						_pageSearchParameter.first,
 						_pageSearchParameter.maxSize,
+						_pageSearchParameter.orderField == PARAMETER_SEARCH_RANK,
 						_pageSearchParameter.orderField == PARAMETER_SEARCH_PAGE,
 						_pageSearchParameter.raisingOrder
 				)	);
 
 				ActionResultHTMLTable::HeaderVector h;
+				h.push_back(make_pair(PARAMETER_SEARCH_RANK, "#"));
 				h.push_back(make_pair(PARAMETER_SEARCH_PAGE, "Titre"));
+				h.push_back(make_pair(string(), "Actions"));
 				h.push_back(make_pair(string(), "Actions"));
 				h.push_back(make_pair(string(), "Actions"));
 				h.push_back(make_pair(string(), "Actions"));
 				ActionResultHTMLTable t(h, sft.getForm(), _pageSearchParameter, result, addRequest.getHTMLForm(), WebPageAddAction::PARAMETER_TEMPLATE_ID);
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<WebPage> page, result)
-				{
-					openRequest.getPage()->setPage(const_pointer_cast<const WebPage>(page));
-					viewRequest.getFunction()->setPage(const_pointer_cast<const WebPage>(page));
-					deleteRequest.getAction()->setPage(page);
-
-					stream << t.row(lexical_cast<string>(page->getKey()));
-					stream << t.col() << page->getTitle();
-					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), WebPageAdmin::ICON);
-					stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "page_go.png");
-					stream << t.col() << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la page "+ page->getTitle() +" ?", "page_delete.png");
-				}
+				_displaySubPages(stream, result, openRequest, viewRequest, parentAddRequest, deleteRequest, t);
 
 				stream << t.row();
+				stream << t.col();
 				stream << t.col() << t.getActionForm().getTextInput(WebPageAddAction::PARAMETER_TITLE, string(), "(Entrez le titre ici)");
-				stream << t.col(2) << t.getActionForm().getSubmitButton("Créer");
+				stream << t.col(4) << t.getActionForm().getSubmitButton("Créer");
 				stream << t.close();
 			}
 
@@ -450,6 +445,63 @@ namespace synthese
 
 
 
+		void TransportSiteAdmin::_displaySubPages(
+			std::ostream& stream,
+			const WebPageTableSync::SearchResult& pages,
+			AdminFunctionRequest<WebPageAdmin>& openRequest,
+			StaticFunctionRequest<WebPageDisplayFunction>& viewRequest,
+			AdminActionFunctionRequest<WebPageAddAction, TransportSiteAdmin>& createRequest,
+			AdminActionFunctionRequest<WebPageRemoveAction, TransportSiteAdmin>& deleteRequest,
+			ActionResultHTMLTable& t,
+			size_t depth
+		) const {
+
+			BOOST_FOREACH(shared_ptr<WebPage> page, pages)
+			{
+				openRequest.getPage()->setPage(const_pointer_cast<const WebPage>(page));
+				viewRequest.getFunction()->setPage(const_pointer_cast<const WebPage>(page));
+				deleteRequest.getAction()->setPage(page);
+
+				stream << t.row(lexical_cast<string>(page->getKey()));
+				stream << t.col();
+				for(size_t i(0); i<depth; ++i)
+					stream << "&nbsp;&nbsp;&nbsp;";
+				stream << page->getRank();
+				stream << t.col() << page->getName();
+				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), WebPageAdmin::ICON);
+				stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "page_go.png");
+				
+				WebPageTableSync::SearchResult result(
+					WebPageTableSync::Search(
+						Env::GetOfficialEnv(),
+						_site->getKey(),
+						page->getKey(),
+						_pageSearchParameter.first,
+						_pageSearchParameter.maxSize,
+						_pageSearchParameter.orderField == PARAMETER_SEARCH_RANK,
+						_pageSearchParameter.orderField == PARAMETER_SEARCH_PAGE,
+						_pageSearchParameter.raisingOrder
+				)	);
+
+				stream << t.col();
+				if(result.empty())
+				{
+					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la page "+ page->getName() +" ?", "page_delete.png");
+				}
+
+				stream << t.col();
+				if(result.empty())
+				{
+					createRequest.getAction()->setParent(page);
+					stream << HTMLModule::getLinkButton(createRequest.getURL(), "Créer sous-page", string(), "page_add.png");
+				}
+
+				_displaySubPages(stream, result, openRequest, viewRequest, createRequest, deleteRequest, t, depth+1);
+			}
+		}
+
+
+
 		bool TransportSiteAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -491,15 +543,18 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
-			WebPageTableSync::SearchResult pages(WebPageTableSync::Search(Env::GetOfficialEnv(), _site->getKey()));
-			BOOST_FOREACH(shared_ptr<WebPage> page, pages)
-			{
-				shared_ptr<WebPageAdmin> p(
-					getNewOtherPage<WebPageAdmin>(false)
-				);
-				p->setPage(const_pointer_cast<const WebPage>(page));
-				links.push_back(p);
-			}
+			if(	currentPage == *this ||
+				currentPage.getCurrentTreeBranch().find(*this)
+			){
+				WebPageTableSync::SearchResult pages(WebPageTableSync::Search(Env::GetOfficialEnv(), _site->getKey(), RegistryKeyType(0)));
+				BOOST_FOREACH(shared_ptr<WebPage> page, pages)
+				{
+					shared_ptr<WebPageAdmin> p(
+						getNewOtherPage<WebPageAdmin>(false)
+					);
+					p->setPage(const_pointer_cast<const WebPage>(page));
+					links.push_back(p);
+				}	}
 			
 			return links;
 		}
@@ -546,6 +601,5 @@ namespace synthese
 		{
 			_site = value;
 		}
-
 	}
 }

@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// WebPageUpdateAction class header.
-///	@file WebPageUpdateAction.h
+/// WebPageContentUpdateAction class header.
+///	@file WebPageContentUpdateAction.hpp
 ///	@author Hugues
 ///	@date 2010
 ///
@@ -22,8 +22,8 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_WebPageUpdateAction_H__
-#define SYNTHESE_WebPageUpdateAction_H__
+#ifndef SYNTHESE_WebPageContentUpdateAction_H__
+#define SYNTHESE_WebPageContentUpdateAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
@@ -35,24 +35,26 @@ namespace synthese
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// WebPageUpdateAction action class.
+		/// WebPageContentUpdateAction action class.
 		/// @ingroup m56Actions refActions
-		class WebPageUpdateAction:
-			public util::FactorableTemplate<server::Action, WebPageUpdateAction>
+		class WebPageContentUpdateAction:
+			public util::FactorableTemplate<server::Action, WebPageContentUpdateAction>
 		{
 		public:
 			static const std::string PARAMETER_WEB_PAGE_ID;
-			static const std::string PARAMETER_TITLE;
-			static const std::string PARAMETER_UP_ID;
-			static const std::string PARAMETER_START_DATE;
-			static const std::string PARAMETER_END_DATE;
+			static const std::string PARAMETER_CONTENT1;
+			static const std::string PARAMETER_INCLUDE1;
+			static const std::string PARAMETER_CONTENT2;
+			static const std::string PARAMETER_INCLUDE2;
+			static const std::string PARAMETER_CONTENT3;
 
 		private:
 			boost::shared_ptr<WebPage> _page;
-			boost::shared_ptr<WebPage> _up;
-			std::string _title;
-			boost::posix_time::ptime _startDate;
-			boost::posix_time::ptime _endDate;
+			std::string _content1;
+			std::string _include1;
+			std::string _content2;
+			std::string _include2;
+			std::string _content3;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -69,8 +71,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			WebPageUpdateAction();
-
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action
@@ -91,4 +91,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_WebPageUpdateAction_H__
+#endif // SYNTHESE_WebPageContentUpdateAction_H__

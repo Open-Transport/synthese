@@ -79,6 +79,14 @@ namespace synthese
 			Request& request
 		){
 			WebPageTableSync::Remove(_page->getKey());
+			
+			WebPageTableSync::ShiftRank(
+				_page->getRoot()->getKey(),
+				_page->getParent() ? _page->getParent()->getKey() : RegistryKeyType(0),
+				_page->getRank(),
+				false
+			);
+
 //			::AddDeleteEntry(*_object, request.getUser().get());
 
 		}

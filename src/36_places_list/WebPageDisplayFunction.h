@@ -26,7 +26,7 @@
 #define SYNTHESE_WebPageDisplayFunction_H__
 
 #include "FactorableTemplate.h"
-#include "FunctionWithSite.h"
+#include "Function.h"
 
 namespace synthese
 {
@@ -40,7 +40,7 @@ namespace synthese
 			@ingroup m56Functions refFunctions
 		*/
 		class WebPageDisplayFunction:
-			public util::FactorableTemplate<FunctionWithSite, WebPageDisplayFunction>
+			public util::FactorableTemplate<server::Function, WebPageDisplayFunction>
 		{
 		public:
 			
@@ -71,8 +71,16 @@ namespace synthese
 			
 			
 		public:
-			void setPage(boost::shared_ptr<const WebPage> value);
-			boost::shared_ptr<const WebPage> getPage() const;
+
+			//! @name Setters
+			//@{
+				void setPage(boost::shared_ptr<const WebPage> value);
+			//@}
+
+			//! @name Getters
+			//@{
+				boost::shared_ptr<const WebPage> getPage() const;
+			//@}
 
 
 

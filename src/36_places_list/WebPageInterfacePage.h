@@ -53,6 +53,7 @@ namespace synthese
 				- 3 : content 2
 				- 4 : include 2
 				- 5 : content 3
+				- 6 : page id
 
 			Object : WebPage
 		*/
@@ -63,13 +64,15 @@ namespace synthese
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
-				@param ...	
+				@param page The page to display
+				@param edit True if the display must include inline edition forms
 				@param variables Execution variables
 				@param request Source request
 			*/
 			void display(
 				std::ostream& stream,
 				const WebPage& page,
+				bool edit,
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL
 			) const;
