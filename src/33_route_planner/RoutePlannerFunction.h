@@ -69,15 +69,15 @@ namespace synthese
 		///	@ingroup m53Functions refFunctions
 		///
 		/// <h3>Requête</h3>
-		/// <h4>Parameters de base</h4>
+		/// <h4>Base parameters</h4>
 		///
-		/// <pre>
-		///	fonction=<b>rp</b>
-		///	si=<site id> : ID Site
-		///	[sid=<session id>] : ID de la session ouverte, issu du retour de la fonction de connexion
+		/// <ul>
+		///		<li>fonction=<b>rp</b></li>
+		///		<li>si=<site id> : ID Site</li>
+		///		<li>[sid=<session id>] : ID de la session ouverte, issu du retour de la fonction de connexion
 		///		  d'utilisateur. Nécessaire uniquement pour faire appel au trajet favori de l'utilisateur (voir
-		///		  plus loin)
-		/// </pre>
+		///		  plus loin)</li>
+		/// </ul>
 		///
 		///	<h4>Paramètres de temps</h4>
 		/// <ul>
@@ -179,20 +179,25 @@ namespace synthese
 		///
 		/// @image html xml_journeys.png
 		///
-		/// <ul><li>les attributs, qui donnent des informations de résumé sur le contenu des tronçons</li><ul>
-		///		<li>continuousServiceDuration (optionnel) : indique par sa présence que la solution est valable en continu pendant une plage horaire. L'attribut contient la durée de cette plage horaire. Les bornes effectives de la plage horaire sont définies par les heures de départ du premier tronçon de l'itinéraire (chunk). Si cet attribut n'est pas fourni, alors l'itinéraire définit une solution unique à heure fixe</li>
-		///		<li>hasAStopAlert (booléen) : si vrai, indique qu'au moins un itinéraire passe par au moins un arrêt ayant un message d'alerte valable à l'heure de passage de l'itinéraire.</li>
-		///		<li>hasALineAlert (booléen) : si vrai, indique qu'au moins un itinéraire utilise au moins une ligne ayant un message d'alerte valable à l'heure d'utilisation</li></ul>
-		///	<li>l'objet reservation (optionnel) : indique par sa présence que l'itinéraire est soumis à une modalité de réservation des places, définie par une série d'attributs. L'absence d'objet indique que la réservation est impossible :</li><ul>
-		///		<li>type : compulsory = réservation obligatoire des places, optional = réservation possible des places</li><ul>
-		///		<li>deadLine : indique la date et l'heure limite de réservation. Au-delà de cette limite, la réservation devient impossible. Si elle est obligatoire, alors l'itinéraire n'est plus utilisable. Si elle est facultative, alors l'itinéraire reste utilisable mais n'est plus ouvert à la réservation des places</li>
-		///		<li>online  (booléen) : indique si la réservation des places est possible directement sur le serveur SYNTHESE</li>
-		///		<li>phoneNumber (optionnel) : indique le numéro de téléphone de la centrale de réservation téléphonique</li>
-		///		<li>openingHours (optionnel) : indique les horaires d'ouverture de la centrale de réservation téléphonique</li></ul>
-		///	<li>l'objet chunks contient les tronçons qui décrivent l'itinéraire dans l'ordre chronologique d'utilisation. Chaque tronçon peut être de trois types différents :</li><ul>
-		///		<li>street : marche à pied le long d'une rue désignée</li>
-		///		<li>transport : utilisation d'une ligne de transport public</li>
-		///		<li>connection : transfert à pied d'un arrêt vers un autre différent, sans pour autant fournir le descriptif du trajet à emprunter</li>
+		/// <ul><li>les attributs, qui donnent des informations de résumé sur le contenu des tronçons</li>
+		///		<ul>
+		///			<li>continuousServiceDuration (optionnel) : indique par sa présence que la solution est valable en continu pendant une plage horaire. L'attribut contient la durée de cette plage horaire. Les bornes effectives de la plage horaire sont définies par les heures de départ du premier tronçon de l'itinéraire (chunk). Si cet attribut n'est pas fourni, alors l'itinéraire définit une solution unique à heure fixe</li>
+		///			<li>hasAStopAlert (booléen) : si vrai, indique qu'au moins un itinéraire passe par au moins un arrêt ayant un message d'alerte valable à l'heure de passage de l'itinéraire.</li>
+		///			<li>hasALineAlert (booléen) : si vrai, indique qu'au moins un itinéraire utilise au moins une ligne ayant un message d'alerte valable à l'heure d'utilisation</li>
+		///		</ul>
+		///		<li>l'objet reservation (optionnel) : indique par sa présence que l'itinéraire est soumis à une modalité de réservation des places, définie par une série d'attributs. L'absence d'objet indique que la réservation est impossible :</li>
+		///		<ul>
+		///			<li>type : compulsory = réservation obligatoire des places, optional = réservation possible des places</li>
+		///			<li>deadLine : indique la date et l'heure limite de réservation. Au-delà de cette limite, la réservation devient impossible. Si elle est obligatoire, alors l'itinéraire n'est plus utilisable. Si elle est facultative, alors l'itinéraire reste utilisable mais n'est plus ouvert à la réservation des places</li>
+		///			<li>online  (booléen) : indique si la réservation des places est possible directement sur le serveur SYNTHESE</li>
+		///			<li>phoneNumber (optionnel) : indique le numéro de téléphone de la centrale de réservation téléphonique</li>
+		///			<li>openingHours (optionnel) : indique les horaires d'ouverture de la centrale de réservation téléphonique</li>
+		///		</ul>
+		///		<li>l'objet chunks contient les tronçons qui décrivent l'itinéraire dans l'ordre chronologique d'utilisation. Chaque tronçon peut être de trois types différents :</li>
+		///		<ul>
+		///			<li>street : marche à pied le long d'une rue désignée</li>
+		///			<li>transport : utilisation d'une ligne de transport public</li>
+		///			<li>connection : transfert à pied d'un arrêt vers un autre différent, sans pour autant fournir le descriptif du trajet à emprunter</li>
 		///	</ul></ul>
 		///
 		///	<h4>Tronçon d'itinéraire à pied le long d'une rue</h4>
