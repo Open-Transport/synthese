@@ -111,6 +111,7 @@ namespace synthese
 				DataSourceTableSync::Search(
 					*_env,
 					_searchName,
+					optional<string>(),
 					_requestParameters.first,
 					_requestParameters.maxSize,
 					_requestParameters.orderField == PARAM_SEARCH_NAME,

@@ -118,7 +118,7 @@ namespace synthese
 			Env& env,
 			string name,
 			optional<string> format,
-			, int first /*= 0*/
+			int first /*= 0*/
 			, optional<size_t> number /*= 0*/
 			, bool orderByName
 			, bool raisingOrder,
