@@ -15,22 +15,32 @@ Exploité par les opérateurs de transport public, il offre toutes les fonctions n
 
 SYNTHESE est le véritable couteau Suisse des transports publics.
 
-<h3>Présentation détaillée</h3>
+<h3>Le projet</h3>
 
 <ul>
 <li>@subpage philo</li>
 <li>@subpage features</li>
-<li>@subpage tech</li>
+<li>@subpage technical</li>
+<li>@subpage roadmap</li>
+<li>@subpage participate</li>
 </ul>
 
-<h2>Documentation technique</h2>
+<h2>Documentation utilisateur</h2>
 
 <ul>
-<li>@subpage admin</li>
-<li><a href="modules.html">Developer documentation</a></li>
-<li>@subpage customer_specs</li>
-<li>@subpage backoffice_user_manual</li>
-<li>@subpage annexes</li>
+<li>@subpage userdoc</li>
+<li>@subpage admindoccompil</li>
+</ul>
+
+<h2>Documentation technique (en anglais)</h2>
+
+<ul>
+<li>@ref ref</li>
+<li>@ref mod</li>
+<li>@subpage thematics</li>
+<li>@subpage admindoc</li>
+<li>@subpage tools</li>
+<li>@subpage build</li>
 </ul>
 
 <h2>License</h2>
@@ -54,23 +64,31 @@ All SYNTHESE modules and each corresponding documentation are under the @subpage
 
 /**
 
-@defgroup ref Reference
+@defgroup ref Reference by factory
+
+@defgroup mod Reference by module
 	
 @defgroup m0 0 Utilities and technical elements
+@ingroup mod
 
 @defgroup m1 1 Factories and related technical services
+@ingroup mod
 
 @defgroup m3 3 Business data
+@ingroup mod
 The services contained in class 3 modules are only basic services to handle the business data (insertion, list, ...)
 No complex algorithm should be present in a class 3 module.
 
 @defgroup m5 5 Business services
+@ingroup mod
 The data tables of class 5 modules contains only stored service parameters.
 No business data should be present in a class 5 module.
 
 @defgroup m7 7 Third-party business services and data
+@ingroup mod
 The class 7 modules can contain business data and services : the division between class 7 modules corresponds to the third parties which have initiated the module (one module per company)
 
 @defgroup m9 9 Binaries
+@ingroup mod
 
 */

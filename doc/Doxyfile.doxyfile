@@ -593,7 +593,8 @@ WARN_LOGFILE           =
 INPUT                  = src \
                          ../src \
                          ../utils \
-                         ../../../doc/res
+                         ../../../doc/res \
+                         include
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
@@ -684,7 +685,8 @@ EXAMPLE_RECURSIVE      = YES
 
 IMAGE_PATH             = img \
                          include \
-                         ../../../doc/res
+                         ../../../doc/res \
+                         ../../../data/interface/common/s3-admin/deb/opt/rcs/common-datas3-interface-admin/files
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should 
 # invoke to filter for each input file. Doxygen will invoke the filter program 
