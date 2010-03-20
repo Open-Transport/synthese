@@ -52,7 +52,8 @@ namespace synthese
 
 			/** DataSource search.
 				@param env Environment to read and populate
-				@param name Part of the name of the server
+				@param name Filter on a part of the name of the data source
+				@param format Filter on the format of the data source
 				@param first First Line object to answer
 				@param number Number of Line objects to answer (0 = all) The size of the vector is less
 					or equal to number, then all users were returned despite of the number limit. If the 
@@ -67,6 +68,7 @@ namespace synthese
 			static SearchResult Search(
 				util::Env& env,
 				std::string name = std::string(),
+				boost::optional<std::string> format = boost::optional<std::string>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByName = true,

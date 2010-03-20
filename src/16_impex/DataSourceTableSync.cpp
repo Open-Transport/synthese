@@ -116,7 +116,8 @@ namespace synthese
 	    
 		DataSourceTableSync::SearchResult DataSourceTableSync::Search(
 			Env& env,
-			string name
+			string name,
+			optional<string> format,
 			, int first /*= 0*/
 			, optional<size_t> number /*= 0*/
 			, bool orderByName
@@ -130,6 +131,10 @@ namespace synthese
 				<< " WHERE 1 ";
 			if (!name.empty())
 				query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			if(format)
+			{
+				query << " AND " << COL_FORMAT << "=" << Conversion::ToSQLiteString(*format);
+			}
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number)

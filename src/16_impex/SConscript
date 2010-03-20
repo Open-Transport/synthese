@@ -5,5 +5,5 @@ CppSynthese3LibProject(
 	's3-impex',
 	s3env['S3VERSION'], 
 	source_files = s3env.Glob ('*.cpp'),
-	dependencies = ['s3-env.cpplib', 's3-geography.cpplib', 's3-db.cpplib', 's3-util-iostreams.cpplib', 'boost.cppinc', 'boost-regex.cpplib'],
+	dependencies = ['s3-server.cpplib', 's3-db.cpplib', 's3-util-iostreams.cpplib', 'boost.cppinc', 'boost-regex.cpplib'],
 )

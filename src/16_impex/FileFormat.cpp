@@ -33,6 +33,8 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
+	using namespace server;
+	
 
 	namespace impex
 	{
@@ -109,6 +111,20 @@ namespace synthese
 
 				_parse(path, os, key);
 			}
+		}
+
+
+
+		server::ParametersMap FileFormat::_getParametersMap() const
+		{
+			return ParametersMap();
+		}
+
+
+
+		void FileFormat::_setFromParametersMap( const server::ParametersMap& map )
+		{
+
 		}
 	}
 }

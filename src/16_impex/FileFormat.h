@@ -24,6 +24,7 @@
 
 #include "FactoryBase.h"
 #include "Env.h"
+#include "ParametersMap.h"
 
 #include <boost/filesystem/path.hpp>
 #include <set>
@@ -97,9 +98,28 @@ namespace synthese
 				std::ostream& os,
 				std::string key = std::string()
 			) = 0;
-			
-			
+
+
 		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from attributes to generic parameter maps.
+			/// @return Generated parameters map
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			virtual server::ParametersMap _getParametersMap() const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from generic parameters map to attributes.
+			/// @param map Parameters map to interpret
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			virtual void _setFromParametersMap(const server::ParametersMap& map);
+
+
 			virtual const Files::FilesVector& getFiles() const = 0;
 
 			/** Generic export method.

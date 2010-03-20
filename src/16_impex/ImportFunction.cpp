@@ -61,9 +61,7 @@ namespace synthese
 
 		ParametersMap ImportFunction::_getParametersMap() const
 		{
-			ParametersMap map;
-			/// @todo Map filling
-			// eg : map.insert(make_pair(PARAMETER_PAGE, _page->getFactoryKey()));
+			ParametersMap map(_fileFormat.get() ? _fileFormat->_getParametersMap() : ParametersMap());
 			return map;
 		}
 
@@ -115,6 +113,9 @@ namespace synthese
 					}
 					_fileFormat->parseFiles(paths, output);
 				}
+
+				_fileFormat->_setFromParametersMap(map);
+
 				_output = output.str();
 			}
 			catch(Exception e)

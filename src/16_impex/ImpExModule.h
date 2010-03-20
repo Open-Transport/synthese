@@ -29,37 +29,31 @@
 
 namespace synthese
 {
-	/**	@defgroup m16Actions 16 Actions
-		@ingroup m16
-
-		@defgroup m16Pages 16 Pages
-		@ingroup m16
-
-		@defgroup m16Functions 16 Functions
-		@ingroup m16
-
-		@defgroup m16Exceptions 16 Exceptions
-		@ingroup m16
-
-		@defgroup m16Alarm 16 Messages recipient
-		@ingroup m16
+	/**	@defgroup m16Exceptions 16 Exceptions
+		@ingroup m16.01
 
 		@defgroup m16LS 16 Table synchronizers
-		@ingroup m16
-
-		@defgroup m16Admin 16 Administration pages
-		@ingroup m16
+		@ingroup m16.10
 
 		@defgroup m16Rights 16 Rights
-		@ingroup m16
+		@ingroup m16.12
 
 		@defgroup m16Logs 16 DB Logs
-		@ingroup m16
-		
+		@ingroup m16.13
+
+		@defgroup m16Admin 16 Administration pages
+		@ingroup m16.14
+
+		@defgroup m16Actions 16 Actions
+		@ingroup m16.15
+
+		@defgroup m16Functions 16 Functions
+		@ingroup m16.15
+
 		@defgroup m16 16 Import export framework
 		@ingroup m1
 		
-		(Module documentation)
+		Management of data sources and standardized import / export interface.
 		
 		@{
 	*/
