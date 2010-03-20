@@ -25,6 +25,7 @@
 
 #include "Registrable.h"
 #include "Registry.h"
+#include "Named.h"
 
 #include <vector>
 
@@ -41,17 +42,17 @@ namespace synthese
 			@ingroup m56
 		*/
 		class HikingTrail:
-			public virtual util::Registrable
+			public virtual util::Registrable,
+			public util::Named
 		{
 		public:
 
 			/// Chosen registry class.
 			typedef util::Registry<HikingTrail>	Registry;
 
-			typedef std::vector<boost::shared_ptr<env::PublicTransportStopZoneConnectionPlace> > Stops;
+			typedef std::vector<env::PublicTransportStopZoneConnectionPlace*> Stops;
 
 		private:
-			std::string _name;
 			std::string _map;
 			std::string _duration;
 			std::string _profile;
@@ -61,17 +62,15 @@ namespace synthese
 			HikingTrail(util::RegistryKeyType id = UNKNOWN_VALUE);
 
 			const std::string& getMap() const;
-			const std::string& getName() const;
 			const std::string& getDuration() const;
 			const std::string& getProfile() const;
 			const Stops& getStops() const;
 
 			void setMap(const std::string& value);
-			void setName(const std::string& value);
 			void setDuration(const std::string& value);
 			void setProfile(const std::string& value);
 			void clearStops();
-			void addStop(boost::shared_ptr<env::PublicTransportStopZoneConnectionPlace> value, size_t rank);
+			void addStop(env::PublicTransportStopZoneConnectionPlace* value, size_t rank);
 			void removeStop(size_t rank);
 		};
 	}

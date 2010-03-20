@@ -132,7 +132,8 @@ namespace synthese
 	namespace pt
 	{
 		void ServiceDateTableSync::DeleteDatesFromNow(
-			util::RegistryKeyType serviceId
+			util::RegistryKeyType serviceId,
+			boost::optional<db::SQLiteTransaction&> transaction
 		){
 			date now(day_clock::local_day());
 			stringstream query;
@@ -141,7 +142,7 @@ namespace synthese
 				" WHERE " << COL_SERVICEID << "=" << serviceId <<
 				" AND " << COL_DATE << ">'" << to_iso_extended_string(now) << "'"
 			;
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 
 

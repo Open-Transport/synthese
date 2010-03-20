@@ -56,16 +56,30 @@ namespace synthese
 			static const std::string TABLE_COL_TRANSFERDELAYS;
 			static const std::string COL_NAME13;
 			static const std::string COL_NAME26;
+			static const std::string COL_CODE_BY_SOURCE;
 
 			static const std::string FORBIDDEN_DELAY_SYMBOL;
 
 
-
+			//////////////////////////////////////////////////////////////////////////
+			/// Commercial stop point search.
+			/// @param env Environment to populate
+			/// @param cityId id of the city the returned stops must belong.
+			/// @param mainConnection the returned stops must belong to the list of main stops of the city
+			/// @param creatorIdFilter search of a stop by creator ID
+			/// @param orderByCityNameAndName order the results by city name, then by stop name
+			/// @param raisingOrder order the results ascendantly
+			/// @param rank of the first result to return
+			/// @param maximal number of results to return
+			/// @param linkLevel level of link to follow when loading data of the returned objects
+			/// @return the commercial stop points whose respect the search criterias
+			/// @author Hugues Romain
 			static SearchResult Search(
 				util::Env& env,
-				util::RegistryKeyType cityId = UNKNOWN_VALUE
-				, boost::logic::tribool mainConnection = boost::logic::indeterminate
-				, bool orderByCityNameAndName = true
+				boost::optional<util::RegistryKeyType> cityId = boost::optional<util::RegistryKeyType>(),
+				boost::logic::tribool mainConnection = boost::logic::indeterminate,
+				boost::optional<std::string> creatorIdFilter = boost::optional<std::string>(),
+				bool orderByCityNameAndName = true
 				, bool raisingOrder = true
 				, int first = 0
 				, int number = 0

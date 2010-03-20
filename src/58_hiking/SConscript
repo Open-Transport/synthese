@@ -6,5 +6,6 @@ CppSynthese3LibProject(
 	dependencies = [
 		's3-pt.cpplib',
 		's3-env.cpplib',
+		's3-places-list.cpplib'
 	]
 )

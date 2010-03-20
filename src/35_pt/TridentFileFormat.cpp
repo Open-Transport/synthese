@@ -20,11 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-// 36 Impex
 #include "DataSource.h"
 #include "SQLite.h"
 #include "DBModule.h"
-// 35 PT
 #include "TridentFileFormat.h"
 #include "GraphConstants.h"
 #include "CommercialLine.h"
@@ -45,6 +43,7 @@
 #include "TransportNetwork.h"
 #include "TransportNetworkTableSync.h"
 #include "City.h"
+#include "CityTableSync.h"
 #include "Service.h"
 #include "RollingStock.h"
 #include "NonConcurrencyRule.h"
@@ -54,15 +53,12 @@
 #include "PTUseRule.h"
 #include "ServiceDate.h"
 #include "PTConstants.h"
-// 06 Geometry
 #include "Projection.h"
 #include "Point2D.h"
-
-// 01 Util
 #include "Conversion.h"
 #include "XmlToolkit.h"
+#include "SQLiteTransaction.h"
 
-// Std
 #include <iomanip>
 #include <sstream>
 #include <iomanip>
@@ -70,8 +66,6 @@
 #include <string>
 #include <utility>
 #include <fstream>
-
-// Boost
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -93,7 +87,8 @@ namespace synthese
 	using namespace impex;
 	using namespace db;
 	using namespace pt;
-	
+	using namespace server;
+		
 
 	namespace util
 	{
@@ -109,6 +104,8 @@ namespace synthese
 
 	namespace pt
 	{
+		const string TridentFileFormat::PARAMETER_IMPORT_STOPS("impstp");
+
 		TridentFileFormat::TridentFileFormat(
 			Env* env,
 			RegistryKeyType lineId,
@@ -995,6 +992,8 @@ namespace synthese
 				throw Exception("Could no open the file" + filePath.file_string());
 			}
 
+			bool failure(false);
+
 			// Read the whole file into a string
 			stringstream text;
 			text << ifs.rdbuf();
@@ -1079,7 +1078,10 @@ namespace synthese
 				cline->setNetwork(network.get());
 				cline->setName(clineNameNode.getText());
 				cline->setCreatorId(ckey);
-				cline->setShortName(clineShortNameNode.getText());
+				if(!clineShortNameNode.isEmpty())
+				{
+					cline->setShortName(clineShortNameNode.getText());
+				}
 				cline->setKey(CommercialLineTableSync::getId());
 				_env->getEditableRegistry<CommercialLine>().add(cline);
 			}
@@ -1096,18 +1098,123 @@ namespace synthese
 			else if(rollingStockNode.getText() == "Train") rollingStockId = 13792273858822587LL;
 			else if(rollingStockNode.getText() == "Tramway") rollingStockId = 13792273858822588LL;
 
+			// Places
+			map<string, XMLNode> areaCentroids;
+			if(_importStops)
+			{
+				XMLNode chouetteAreaNode(allNode.getChildNode("ChouetteArea"));
+				int stopsNumber(chouetteAreaNode.nChildNode("AreaCentroid"));
+				for(int stopRank(0); stopRank < stopsNumber; ++stopRank)
+				{
+					XMLNode stopAreaNode(chouetteAreaNode.getChildNode("AreaCentroid", stopRank));
+
+					areaCentroids.insert(
+						make_pair(
+							stopAreaNode.getChildNode("objectId", 0).getText(),
+							stopAreaNode
+					)	);
+				}
+			}
+
+
+			// Commercial stops
+			map<string, PublicTransportStopZoneConnectionPlace*> commercialStopsByPhysicalStop;
+			if(_importStops)
+			{
+				XMLNode chouetteAreaNode(allNode.getChildNode("ChouetteArea"));
+				int stopsNumber(chouetteAreaNode.nChildNode("StopArea"));
+				for(int stopRank(0); stopRank < stopsNumber; ++stopRank)
+				{
+					XMLNode stopAreaNode(chouetteAreaNode.getChildNode("StopArea", stopRank));
+					XMLNode extensionNode(stopAreaNode.getChildNode("StopAreaExtension", 0));
+					XMLNode areaTypeNode(extensionNode.getChildNode("areaType",0));
+					if(string(areaTypeNode.getText()) != string("CommercialStopPoint")) continue;
+
+					XMLNode keyNode(stopAreaNode.getChildNode("objectId", 0));
+					XMLNode nameNode(stopAreaNode.getChildNode("name", 0));
+					string stopKey(keyNode.getText());
+					XMLNode areaNode(stopAreaNode.getChildNode("centroidOfArea", 0));
+					
+					// Place
+					map<string,XMLNode>::iterator itPlace(areaCentroids.find(areaNode.getText()));
+					if(itPlace == areaCentroids.end())
+					{
+						os << "ERR  : area centroid " << areaNode.getText() << " not found in CommercialStopPoint " << stopKey << " (" << nameNode.getText() << ")<br />";
+						failure = true;
+						continue;
+					}
+					XMLNode& areaCentroid(itPlace->second);
+					XMLNode addressNode(areaCentroid.getChildNode("address", 0));
+					CityTableSync::SearchResult cityResult(
+						CityTableSync::Search(*_env, optional<string>(), optional<string>(), string(addressNode.getChildNode("countryCode", 0).getText()))
+					);
+					if(cityResult.empty())
+					{
+						os << "ERR  : commercial stop point " << stopKey << " with area centroid " << areaNode.getText() << " does not link to a valid city (" << addressNode.getChildNode("countryCode", 0).getText() << ")<br />";
+						failure = true;
+						continue;
+					}
+					shared_ptr<const City> city(cityResult.front());
+
+
+					ConnectionPlaceTableSync::SearchResult cstops(
+						ConnectionPlaceTableSync::Search(
+							*_env,
+							optional<RegistryKeyType>(),
+							logic::indeterminate,
+							stopKey
+					)	);
+					if(cstops.size() > 1)
+					{
+						os << "WARN : more than one stop with key" << stopKey << "<br />";
+					}
+
+					shared_ptr<PublicTransportStopZoneConnectionPlace> curStop;
+					if(cstops.empty())
+					{
+						// Commercial stop point creation with some default values
+						curStop.reset(new PublicTransportStopZoneConnectionPlace);
+						curStop->setCodeBySource(stopKey);
+						curStop->setAllowedConnection(true);
+						curStop->setDefaultTransferDelay(minutes(8));
+						curStop->setKey(ConnectionPlaceTableSync::getId());
+						_env->getEditableRegistry<PublicTransportStopZoneConnectionPlace>().add(curStop);
+
+						os << "CREA : Creation of the commercial stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
+					}
+					else
+					{
+						// Load existing commercial stop point
+						RegistryKeyType stopId(cstops.front()->getKey());
+						curStop = ConnectionPlaceTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL);
+				
+						os << "LOAD : link between stops " << stopKey << " (" << nameNode.getText() << ") and "
+							<< curStop->getKey() << " (" << curStop->getFullName() << ")<br />";
+					}
+					curStop->setName(nameNode.getText());
+					curStop->setCity(city.get());
+
+					// Link from physical stops
+					int pstopsNumber(stopAreaNode.nChildNode("contains"));
+					for(int pstopRank(0); pstopRank < pstopsNumber; ++pstopRank)
+					{
+						commercialStopsByPhysicalStop[stopAreaNode.getChildNode("contains", pstopRank).getText()] = curStop.get();
+					}
+				}
+			}
+
 			// Stops
 			map<string, PhysicalStop*> stops;
 			XMLNode chouetteAreaNode(allNode.getChildNode("ChouetteArea"));
 			int stopsNumber(chouetteAreaNode.nChildNode("StopArea"));
-			bool failure(false);
 			for(int stopRank(0); stopRank < stopsNumber; ++stopRank)
 			{
 				XMLNode stopAreaNode(chouetteAreaNode.getChildNode("StopArea", stopRank));
 				XMLNode extensionNode(stopAreaNode.getChildNode("StopAreaExtension", 0));
 				XMLNode areaTypeNode(extensionNode.getChildNode("areaType",0));
 				if(string(areaTypeNode.getText()) != string("BoardingPosition")) continue;
-				
+				XMLNode areaCentroidNode(stopAreaNode.getChildNode("centroidOfArea", 0));
+
 				XMLNode keyNode(stopAreaNode.getChildNode("objectId", 0));
 				XMLNode nameNode(stopAreaNode.getChildNode("name", 0));
 				string stopKey(keyNode.getText());
@@ -1118,7 +1225,7 @@ namespace synthese
 						optional<RegistryKeyType>(),
 						stopKey
 				)	);
-				if(pstops.empty())
+				if(pstops.empty() && !_importStops)
 				{
 					os << "ERR  : stop not found " << stopKey << " (" << nameNode.getText() << ")<br />";
 					failure = true;
@@ -1130,12 +1237,53 @@ namespace synthese
 					os << "WARN : more than one stop with key" << stopKey << "<br />";
 				}
 				
-				RegistryKeyType stopId(pstops.front()->getKey());
-				stops[stopKey] = PhysicalStopTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL).get();
-				
-				os << "LOAD : link between stops " << stopKey << " (" << nameNode.getText() << ") and "
-					<< stops[stopKey]->getKey() << " (" << stops[stopKey]->getConnectionPlace()->getName() << ")<br />";
-				
+				shared_ptr<PhysicalStop> curStop;
+				if(pstops.empty())
+				{
+					// Stop creation
+					map<string,PublicTransportStopZoneConnectionPlace*>::const_iterator itcstop(commercialStopsByPhysicalStop.find(stopKey));
+					if(itcstop == commercialStopsByPhysicalStop.end())
+					{
+						os << "ERR  : stop " << stopKey << " not found in any commercia stop (" << nameNode.getText() << ")<br />";
+						failure = true;
+						continue;
+					}
+					curStop.reset(new PhysicalStop);
+					curStop->setHub(itcstop->second);
+					curStop->setKey(PhysicalStopTableSync::getId());
+					_env->getEditableRegistry<PhysicalStop>().add(curStop);
+
+					os << "CREA : Creation of the physical stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
+				}
+				else
+				{
+					RegistryKeyType stopId(pstops.front()->getKey());
+					curStop = PhysicalStopTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL);
+
+					os << "LOAD : link between stops " << stopKey << " (" << nameNode.getText() << ") and "
+						<< stops[stopKey]->getKey() << " (" << stops[stopKey]->getConnectionPlace()->getName() << ")<br />";
+				}
+
+				if(_importStops)
+				{
+					curStop->setName(nameNode.getText());
+					map<string, XMLNode>::iterator itPlace(areaCentroids.find(areaCentroidNode.getText()));
+					if(itPlace == areaCentroids.end())
+					{
+						os << "WARN : Physical stop with key " << stopKey << " links to a not found area centroid " << areaCentroidNode.getText() << " (" << nameNode.getText() <<  ")<br />";
+					}
+					else
+					{
+						XMLNode& areaCentroid(itPlace->second);
+						XMLNode projectedPointNode(areaCentroid.getChildNode("projectedPoint", 0));
+						curStop->setXY(
+							lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
+							lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
+						);
+					}
+				}
+	
+				stops[stopKey] = curStop.get();
 			}
 			
 		
@@ -1374,39 +1522,38 @@ namespace synthese
 		
 		void TridentFileFormat::save(std::ostream& os) const
 		{
-			DBModule::GetSQLite()->execUpdate("BEGIN TRANSACTION;");
+			SQLiteTransaction transaction;
 
 			// Saving of each created or altered objects
 			BOOST_FOREACH(Registry<TransportNetwork>::value_type network, _env->getRegistry<TransportNetwork>())
 			{
-				TransportNetworkTableSync::Save(network.second.get());
+				TransportNetworkTableSync::Save(network.second.get(), transaction);
 			}
 			BOOST_FOREACH(Registry<CommercialLine>::value_type cline, _env->getRegistry<CommercialLine>())
 			{
-				CommercialLineTableSync::Save(cline.second.get());
+				CommercialLineTableSync::Save(cline.second.get(), transaction);
 			}
 			BOOST_FOREACH(Registry<Line>::value_type line, _env->getRegistry<Line>())
 			{
-				LineTableSync::Save(line.second.get());
+				LineTableSync::Save(line.second.get(), transaction);
 			}
 			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env->getRegistry<LineStop>())
 			{
-				LineStopTableSync::Save(lineStop.second.get());
+				LineStopTableSync::Save(lineStop.second.get(), transaction);
 			}
 			BOOST_FOREACH(Registry<ScheduledService>::value_type service, _env->getRegistry<ScheduledService>())
 			{
-				ServiceDateTableSync::DeleteDatesFromNow(service.second->getKey());
-				ScheduledServiceTableSync::Save(service.second.get());
+				ServiceDateTableSync::DeleteDatesFromNow(service.second->getKey(), transaction);
+				ScheduledServiceTableSync::Save(service.second.get(), transaction);
 			}
 			BOOST_FOREACH(shared_ptr<ServiceDate> date, _serviceDates)
 			{
-				ServiceDateTableSync::Save(date.get());
+				ServiceDateTableSync::Save(date.get(), transaction);
 			}
 			
 			//TODO cleaning : delete services without dates and routes without service
-						
-			DBModule::GetSQLite()->execUpdate("COMMIT;");
-
+			transaction.run();					
+	
 			os << "<b>SUCCESS : Data saved.</b><br />";
 		}
 
@@ -1423,6 +1570,36 @@ namespace synthese
 				(value > 0) ?
 				lexical_cast<string>(value) :
 				string();
+		}
+
+
+
+		server::ParametersMap TridentFileFormat::_getParametersMap() const
+		{
+			ParametersMap result;
+			result.insert(PARAMETER_IMPORT_STOPS, _importStops);
+			return result;
+		}
+
+
+
+		void TridentFileFormat::_setFromParametersMap( const server::ParametersMap& map )
+		{
+			_importStops = map.getDefault<bool>(PARAMETER_IMPORT_STOPS, false);
+		}
+
+
+
+		void TridentFileFormat::setImportStops( bool value )
+		{
+			_importStops = value;
+		}
+
+
+
+		bool TridentFileFormat::getImportStops() const
+		{
+			return _importStops;
 		}
 	}
 }

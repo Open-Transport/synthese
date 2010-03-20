@@ -45,7 +45,7 @@ namespace synthese
 		class ValueElementList
 		{
 		private:
-			typedef std::deque<boost::shared_ptr<interfaces::LibraryInterfaceElement> > ElementsList;
+			typedef std::deque<boost::shared_ptr<LibraryInterfaceElement> > ElementsList;
 
 			ElementsList _elements;	//!< The list
 
@@ -114,6 +114,15 @@ namespace synthese
 				, const void* object = NULL
 				, const server::Request* request=NULL
 			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Adds an element to the list.
+			/// @param element The element to add to the list.
+			/// @author Hugues Romain
+			/// @date 2010
+			void push_back(boost::shared_ptr<LibraryInterfaceElement> element);
 		};
 	}
 }

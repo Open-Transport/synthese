@@ -24,7 +24,7 @@
 
 #include "ConnectionPlaceTableSync.h"
 #include "Conversion.h"
-
+#include "ReplaceQuery.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "LinkException.h"
@@ -58,6 +58,7 @@ namespace synthese
 		const string ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS = "transfer_delays";
 		const string ConnectionPlaceTableSync::COL_NAME13("short_display_name");
 		const string ConnectionPlaceTableSync::COL_NAME26("long_display_name");
+		const string ConnectionPlaceTableSync::COL_CODE_BY_SOURCE("code_by_source");
 		
 		const string ConnectionPlaceTableSync::FORBIDDEN_DELAY_SYMBOL("F");
 	}
@@ -79,12 +80,14 @@ namespace synthese
 			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS, SQL_TEXT),
 			SQLiteTableSync::Field(ConnectionPlaceTableSync::COL_NAME13, SQL_TEXT),
 			SQLiteTableSync::Field(ConnectionPlaceTableSync::COL_NAME26, SQL_TEXT),
+			SQLiteTableSync::Field(ConnectionPlaceTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::_INDEXES[] =
 		{
 			SQLiteTableSync::Index(ConnectionPlaceTableSync::TABLE_COL_CITYID.c_str(), ConnectionPlaceTableSync::TABLE_COL_NAME.c_str(), ""),
+			SQLiteTableSync::Index(ConnectionPlaceTableSync::COL_CODE_BY_SOURCE.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
@@ -102,6 +105,7 @@ namespace synthese
 			bool connectionType(rows->getBool(ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE));
 			posix_time::time_duration defaultTransferDelay(posix_time::minutes(rows->getInt (ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY)));
 			string transferDelaysStr (rows->getText (ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS));
+			string codeBySource(rows->getText(ConnectionPlaceTableSync::COL_CODE_BY_SOURCE));
 
 			// Update of the object
 			cp->setName (name);
@@ -113,6 +117,7 @@ namespace synthese
 			
 			cp->clearTransferDelays ();    
 			cp->setDefaultTransferDelay (defaultTransferDelay);
+			cp->setCodeBySource(codeBySource);
 
 			typedef tokenizer<char_separator<char> > tokenizer;
 			char_separator<char> sep1 (",");
@@ -171,40 +176,36 @@ namespace synthese
 			PublicTransportStopZoneConnectionPlace* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-
-			query <<
-				" REPLACE INTO " << TABLE.NAME << " VALUES(" <<
-				object->getKey() << "," <<
-				Conversion::ToSQLiteString(object->getName()) << "," <<
-				(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0)) << "," <<
-				object->getAllowedConnection() << "," <<
-				(object->getCity() ? object->getCity()->includes(object) : false) << "," <<
-				(object->getDefaultTransferDelay().total_seconds() / 60) << "," <<
-				"\"";
+			// Transfer delay matrix
+			stringstream delays;
 			bool first(true);
 			BOOST_FOREACH(const AddressablePlace::TransferDelaysMap::value_type& td, object->getTransferDelays())
 			{
-				if(!first) query << ",";
-				query << td.first.first << ":" << td.first.second << ":";
+				if(!first) delays << ",";
+				delays << td.first.first << ":" << td.first.second << ":";
 				if(td.second.is_not_a_date_time())
 				{
-					query << ConnectionPlaceTableSync::FORBIDDEN_DELAY_SYMBOL;
+					delays << ConnectionPlaceTableSync::FORBIDDEN_DELAY_SYMBOL;
 				}
 				else
 				{
-					query << (td.second.total_seconds() / 60);
+					delays << (td.second.total_seconds() / 60);
 				}
 				first = false;
 			}
-			query << "\"," <<
-				Conversion::ToSQLiteString(object->getName13()) << "," <<
-				Conversion::ToSQLiteString(object->getName26()) <<
-			")";
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 
+			// The query
+			ReplaceQuery<ConnectionPlaceTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
+			query.addField(object->getAllowedConnection());
+			query.addField(object->getCity() ? object->getCity()->includes(object) : false);
+			query.addField(object->getDefaultTransferDelay().total_seconds() / 60);
+			query.addField(delays.str());
+			query.addField(object->getName13());
+			query.addField(object->getName26());
+			query.addField(object->getCodeBySource());
+			query.execute(transaction);
 		}
 
 		
@@ -223,32 +224,58 @@ namespace synthese
 	{
 		ConnectionPlaceTableSync::SearchResult ConnectionPlaceTableSync::Search(
 			Env& env,
-			RegistryKeyType cityId /*= UNKNOWN_VALUE */
-			, logic::tribool mainConnectionOnly
-			, bool orderByCityNameAndName /*= true */
+			optional<RegistryKeyType> cityId, /*= UNKNOWN_VALUE */
+			logic::tribool mainConnectionOnly,
+			optional<string> creatorIdFilter,
+			bool orderByCityNameAndName /*= true */
 			, bool raisingOrder /*= true */
 			, int first /*= 0 */
 			, int number /*= 0 */,
 			LinkLevel linkLevel
 		){
 			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 "
-			;
-			if (cityId != UNKNOWN_VALUE)
-				query << " AND " << TABLE_COL_CITYID << "=" << cityId;
+			query <<
+				" SELECT " <<
+				TABLE.NAME << ".*" <<
+				" FROM " << TABLE.NAME;
+			if(orderByCityNameAndName)
+			{
+				query << " INNER JOIN " << CityTableSync::TABLE.NAME << " c ON c." << TABLE_COL_ID << "=" << TABLE.NAME << "." << TABLE_COL_CITYID;
+			}
+
+			// Filters
+			query << " WHERE 1 ";
+			if (cityId)
+			{
+				query << " AND " << TABLE_COL_CITYID << "=" << *cityId;
+			}
 			if (!logic::indeterminate(mainConnectionOnly))
 			{
 				query << " AND " << TABLE_COL_ISCITYMAINCONNECTION << "=" <<
 					Conversion::ToString(mainConnectionOnly)
 				;
 			}
+			if(creatorIdFilter)
+			{
+				query << " AND " << COL_CODE_BY_SOURCE << "=" << Conversion::ToSQLiteString(*creatorIdFilter);
+			}
+
+			// Ordering
+			if(orderByCityNameAndName)
+			{
+				query <<
+					" ORDER BY " <<
+					CityTableSync::TABLE.NAME << "." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") <<
+					TABLE.NAME << "." << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			}
 			if (number > 0)
+			{
 				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				if (first > 0)
+				{
+					query << " OFFSET " << Conversion::ToString(first);
+				}
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

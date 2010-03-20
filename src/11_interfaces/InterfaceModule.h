@@ -25,7 +25,10 @@
 
 #include <vector>
 #include <utility>
+#include <boost/foreach.hpp>
 
+#include "ValueElementList.h"
+#include "StaticValueInterfaceElement.h"
 #include "ModuleClassTemplate.hpp"
 #include "UId.h"
 
@@ -113,6 +116,34 @@ namespace synthese
 		{
 		public:
 			static std::string getVariableFromMap(const VariablesMap& variables, const std::string& varName);
+
+
+			
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets directly a display from a subclass, without mounting the object into an interface.
+			/// @param stream stream to write the display on
+			/// @param parameters list of strings equivalent from the interface definition code. It can be only text, there will be no interpretation : it is not execution parameters.
+			///	@param request The source request (read only)
+			template<class InterfaceElement>
+			static void SimpleDisplay(
+				std::ostream& stream,
+				std::vector<std::string> parameters,
+				const server::Request* request
+			){
+				ValueElementList vel;
+				BOOST_FOREACH(const std::string& parameter, parameters)
+				{
+					vel.push_back(boost::shared_ptr<StaticValueInterfaceElement>(new StaticValueInterfaceElement(parameter)));
+				}
+				boost::shared_ptr<InterfaceElement> element(new InterfaceElement);
+				element->storeParameters(vel);
+				ParametersVector params;
+				VariablesMap vars;
+				element->display(stream, params, vars, request);
+			}
 		};
 	}
 	/** @} */

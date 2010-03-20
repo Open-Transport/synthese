@@ -26,6 +26,8 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace env;
+
 	namespace util
 	{
 		template<> const string Registry<hiking::HikingTrail>::KEY("HikingTrail");
@@ -60,13 +62,6 @@ namespace synthese
 
 
 
-		const std::string& HikingTrail::getName() const
-		{
-			return _name;
-		}
-
-
-
 		const std::string& HikingTrail::getProfile() const
 		{
 			return _profile;
@@ -84,13 +79,6 @@ namespace synthese
 		void HikingTrail::setMap( const std::string& value )
 		{
 			_map = value;
-		}
-
-
-
-		void HikingTrail::setName( const std::string& value )
-		{
-			_name = value;
 		}
 
 
@@ -116,7 +104,7 @@ namespace synthese
 
 
 
-		void HikingTrail::addStop( boost::shared_ptr<env::PublicTransportStopZoneConnectionPlace> value, size_t rank )
+		void HikingTrail::addStop(PublicTransportStopZoneConnectionPlace* value, size_t rank )
 		{
 			if(rank >= _stops.size())
 			{

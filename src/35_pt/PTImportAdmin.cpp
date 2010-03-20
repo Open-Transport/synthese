@@ -116,13 +116,11 @@ namespace synthese
 			const AdminRequest& request
 		) const	{
 
-			DataSourceTableSync::SearchResult sources(DataSourceTableSync::Search(_getEnv()));
-
 			////////////////////////////////////////////////////////////////////
 			// TAB NAVTEQ
 			if (openTabContent(stream, TAB_NAVTEQ))
 			{
-
+				DataSourceTableSync::SearchResult sources(DataSourceTableSync::Search(_getEnv(), string(), NavteqWithProjectionFileFormat::FACTORY_KEY));
 				StaticFunctionRequest<ImportFunction> importRequest(request, true);
 				
 				PropertiesHTMLTable t(importRequest.getHTMLForm());
@@ -141,6 +139,7 @@ namespace synthese
 			// TAB TRIDENT
 			if(openTabContent(stream, TAB_TRIDENT))
 			{
+				DataSourceTableSync::SearchResult sources(DataSourceTableSync::Search(_getEnv(), string(), TridentFileFormat::FACTORY_KEY));
 				StaticFunctionRequest<ImportFunction> importRequest(request, true);
 
 				PropertiesHTMLTable t(importRequest.getHTMLForm());
@@ -148,6 +147,7 @@ namespace synthese
 				stream << t.title("Propriétés");
 				stream << t.cell("Source de données", t.getForm().getSelectInput(ImportFunction::PARAMETER_DATA_SOURCE, sources, optional<shared_ptr<DataSource> >()));
 				stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(ImportFunction::PARAMETER_DO_IMPORT, false));
+				stream << t.cell("Import arrêts", t.getForm().getOuiNonRadioInput(TridentFileFormat::PARAMETER_IMPORT_STOPS, false));
 				stream << t.title("Données");
 				stream << t.cell("Ligne", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH, string()));
 				stream << t.close();

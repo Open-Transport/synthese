@@ -57,7 +57,8 @@ namespace synthese
 			);
 			
 			static void DeleteDatesFromNow(
-				util::RegistryKeyType serviceId
+				util::RegistryKeyType serviceId,
+				boost::optional<db::SQLiteTransaction&> transaction
 			);
 
 			static void CreateDatesForRecentlyCreatedCalendar(

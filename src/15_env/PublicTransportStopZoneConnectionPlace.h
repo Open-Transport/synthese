@@ -27,6 +27,7 @@
 #include "AddressablePlace.h"
 #include "Registry.h"
 #include "IsoBarycentre.h"
+#include "Importable.h"
 
 #include <map>
 #include <utility>
@@ -52,7 +53,8 @@ namespace synthese
 		*/
 		class PublicTransportStopZoneConnectionPlace:
 			public road::AddressablePlace,
-			public geography::NamedPlaceTemplate<PublicTransportStopZoneConnectionPlace>
+			public geography::NamedPlaceTemplate<PublicTransportStopZoneConnectionPlace>,
+			public impex::Importable
 		{
 		public:
 

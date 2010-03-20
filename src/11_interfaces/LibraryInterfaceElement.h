@@ -23,7 +23,8 @@
 #ifndef SYNTHESE_INTERFACES_LIBRARY_INTERFACE_ELEMENT_H
 #define SYNTHESE_INTERFACES_LIBRARY_INTERFACE_ELEMENT_H
 
-#include<boost/shared_ptr.hpp>
+#include <boost/shared_ptr.hpp>
+#include <vector>
 
 #include "FactoryBase.h"
 #include "11_interfaces/Types.h"
@@ -87,7 +88,7 @@ namespace synthese
 			}
 
 
-			/** Virtual display method.
+			/** Display virtual method.
 				This method must be implemented in each subclass. It defines the behavior of the interface library element in three ways :
 					- it can write outputs on the stream : parameter stream
 					- it can write (and read) local variables : parameter variables
@@ -108,6 +109,14 @@ namespace synthese
 				, const server::Request* request = NULL
 			) const = 0;
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the display content in a string instead of writing on a stream.
+			/// @param parameters Execution parameters
+			/// @param variables Execution variables
+			///	@param object Object pointer to read
+			///	@param request The source request (read only)
 			const std::string getValue(
 				const interfaces::ParametersVector& parameters
 				, interfaces::VariablesMap& variables
@@ -115,8 +124,17 @@ namespace synthese
 				, const server::Request* request = NULL
 			) const;
 
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Tests if the display content can be interpreted as false value (empty, or 0, or -1).
+			/// @param parameters Execution parameters
+			/// @param variables Execution variables
+			///	@param object Object pointer to read
+			///	@param request The source request (read only)
 			bool isFalse(
-				const ParametersVector&
+				const ParametersVector& parameters
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL

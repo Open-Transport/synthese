@@ -191,5 +191,12 @@ namespace synthese
 			}
 
 		}
+
+
+
+		void ValueElementList::push_back( boost::shared_ptr<LibraryInterfaceElement> element )
+		{
+			_elements.push_back(element);
+		}
 	}
 }
