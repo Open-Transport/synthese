@@ -36,6 +36,9 @@
 
 /** @defgroup m01XML XML Parser
 	@ingroup m01
+
+	See http://www.applied-mathematics.net/tools/xmlParser.html
+
 	@{
 */
 

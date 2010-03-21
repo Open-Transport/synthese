@@ -999,20 +999,8 @@ namespace synthese
 			ostream& os,
 			string fileKey
 		){
-			ifstream ifs(filePath.file_string().c_str());
-			if (!ifs)
-			{
-				throw Exception("Could no open the file" + filePath.file_string());
-			}
-
 			bool failure(false);
-
-			// Read the whole file into a string
-			stringstream text;
-			text << ifs.rdbuf();
-			ifs.close();
-
-			XMLNode allNode = XMLNode::parseString (text.str().c_str(), "ChouettePTNetwork");
+			XMLNode allNode = XMLNode::openFileHelper(filePath.file_string().c_str(), "ChouettePTNetwork");
 			if(allNode.isEmpty())
 			{
 				os << "ERR  : XML parsing of file " << filePath.file_string() << " has failed.<br />";
@@ -1300,10 +1288,13 @@ namespace synthese
 					{
 						XMLNode& areaCentroid(itPlace->second);
 						XMLNode projectedPointNode(areaCentroid.getChildNode("projectedPoint", 0));
-						curStop->setXY(
-							lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
-							lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
-						);
+						if(!projectedPointNode.isEmpty())
+						{
+							curStop->setXY(
+								lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
+								lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
+							);
+						}
 					}
 				}
 	
