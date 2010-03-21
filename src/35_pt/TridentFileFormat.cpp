@@ -1010,7 +1010,7 @@ namespace synthese
 					"ERR  : XML Parsing error " << XMLNode::getError(pResults.error) <<
 					" inside file " << filePath.file_string() <<
 					" at line " << pResults.nLine << ", column " << pResults.nColumn;
-				return;
+				throw Exception("XML Parsing error");
 			}
 			
 			// Title
@@ -1311,7 +1311,7 @@ namespace synthese
 			if(failure)
 			{
 				os << "<b>FAILURE : At least a stop is missing : load interrupted</b><br />";
-				return;
+				throw Exception("At least a stop is missing : load interrupted");
 			}
 
 			// Line stops
@@ -1335,7 +1335,7 @@ namespace synthese
 			if(failure)
 			{
 				os << "<b>FAILURE : At least a stop point is missing : load interrupted</b><br />";
-				return;
+				throw Exception("At least a stop point is missing");
 			}
 
 			// Load of existing routes
@@ -1534,6 +1534,15 @@ namespace synthese
 				
 				int daysNumber(calendarNode.nChildNode("calendarDay"));
 				int servicesNumber(calendarNode.nChildNode("vehicleJourneyId"));
+
+				vector<ScheduledService*> calendarServices;
+				for(int serviceRank(0); serviceRank < servicesNumber; ++serviceRank)
+				{
+					XMLNode serviceNode(calendarNode.getChildNode("vehicleJourneyId", serviceRank));
+					calendarServices.push_back(services[serviceNode.getText()]);
+				}
+
+
 				for(int dayRank(0); dayRank < daysNumber; ++dayRank)
 				{
 					XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
@@ -1542,12 +1551,11 @@ namespace synthese
 					{
 						continue;
 					}
-					
-					for(int serviceRank(0); serviceRank < servicesNumber; ++serviceRank)
+
+					BOOST_FOREACH(ScheduledService* service, calendarServices)
 					{
-						XMLNode serviceNode(calendarNode.getChildNode("vehicleJourneyId", serviceRank));
 						shared_ptr<ServiceDate> sd(new ServiceDate);
-						sd->setService(services[serviceNode.getText()]);
+						sd->setService(service);
 						sd->setDate(d);
 						sd->setKey(ServiceDateTableSync::getId());
 						_serviceDates.push_back(sd);
