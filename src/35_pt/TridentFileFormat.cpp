@@ -1627,7 +1627,7 @@ namespace synthese
 			if(_startDate < day_clock::local_day())
 			{
 				date_duration du(day_clock::local_day() - _startDate);
-				result.insert(PARAMETER_WITH_OLD_DATES, du.days());
+				result.insert(PARAMETER_WITH_OLD_DATES, static_cast<int>(du.days()));
 			}
 			return result;
 		}
