@@ -105,6 +105,9 @@ namespace synthese
 	namespace pt
 	{
 		const string TridentFileFormat::PARAMETER_IMPORT_STOPS("impstp");
+		const string TridentFileFormat::PARAMETER_WITH_OLD_DATES("wod");
+
+
 
 		TridentFileFormat::TridentFileFormat(
 			Env* env,
@@ -112,7 +115,9 @@ namespace synthese
 			bool withTisseoExtension
 		):	FileFormatTemplate<TridentFileFormat>(),
 			_commercialLineId(lineId),
-			_withTisseoExtension(withTisseoExtension)
+			_withTisseoExtension(withTisseoExtension),
+			_importStops(false),
+			_withOldDates(false)
 		{
 			_env = env;
 		}
@@ -226,9 +231,9 @@ namespace synthese
 			// Writing of the header
 			os << "<?xml version='1.0' encoding='ISO-8859-15'?>" << "\n" << "\n";
 		    if (_withTisseoExtension)
-				os << "<TisseoPTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident http://www.reseaux-conseil.com/trident/tisseo-chouette-extension.xsd'>" << "\n";
+				os << "<TisseoPTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.rcsmobility.com/synthese/include/35_pt/trident2-tisseo/tisseo-chouette-extension.xsd'>" << "\n";
 			else
-				os << "<ChouettePTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident Chouette.xsd'>" << "\n";
+				os << "<ChouettePTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.rcsmobility.com/synthese/include/35_pt/chouette/Chouette.xsd'>" << "\n";
 
 			// --------------------------------------------------- PTNetwork 
 			const TransportNetwork* tn(_commercialLine->getNetwork());
@@ -396,6 +401,7 @@ namespace synthese
 			
 			// --------------------------------------------------- Timetable
 			// One timetable per service
+			date today(day_clock::local_day());
 			BOOST_FOREACH(Registry<ScheduledService>::value_type itsrv, _env->getRegistry<ScheduledService>())
 			{
 				const ScheduledService* srv(itsrv.second.get());
@@ -405,6 +411,10 @@ namespace synthese
 
 				BOOST_FOREACH(const date& d, srv->getActiveDates())
 				{
+					if(!_withOldDates && d < today)
+					{
+						continue;
+					}
 					os << "<calendarDay>" << to_iso_extended_string(d) << "</calendarDay>" << "\n";
 				}
 				os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
@@ -419,6 +429,10 @@ namespace synthese
 
 				BOOST_FOREACH(const date& d, srv->getActiveDates())
 				{
+					if(!_withOldDates && d < today)
+					{
+						continue;
+					}
 					os << "<calendarDay>" << to_iso_extended_string(d) << "</calendarDay>" << "\n";
 				}
 				os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
@@ -1529,7 +1543,10 @@ namespace synthese
 				{
 					XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
 					date d(from_string(dayNode.getText()));
-					if(d < today) continue;
+					if(!_withOldDates && d < today)
+					{
+						continue;
+					}
 					
 					for(int serviceRank(0); serviceRank < servicesNumber; ++serviceRank)
 					{
@@ -1580,7 +1597,14 @@ namespace synthese
 			}
 			BOOST_FOREACH(Registry<ScheduledService>::value_type service, _env->getRegistry<ScheduledService>())
 			{
-				ServiceDateTableSync::DeleteDatesFromNow(service.second->getKey(), transaction);
+				if(_withOldDates)
+				{
+					ServiceDateTableSync::DeleteDates(service.second->getKey(), transaction);
+				}
+				else
+				{
+					ServiceDateTableSync::DeleteDatesFromNow(service.second->getKey(), transaction);
+				}
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
 			}
 			BOOST_FOREACH(shared_ptr<ServiceDate> date, _serviceDates)
@@ -1611,18 +1635,26 @@ namespace synthese
 
 
 
-		server::ParametersMap TridentFileFormat::_getParametersMap() const
+		server::ParametersMap TridentFileFormat::_getParametersMap(bool import) const
 		{
 			ParametersMap result;
-			result.insert(PARAMETER_IMPORT_STOPS, _importStops);
+			if(import)
+			{
+				result.insert(PARAMETER_IMPORT_STOPS, _importStops);
+			}
+			result.insert(PARAMETER_WITH_OLD_DATES, _withOldDates);
 			return result;
 		}
 
 
 
-		void TridentFileFormat::_setFromParametersMap( const server::ParametersMap& map )
+		void TridentFileFormat::_setFromParametersMap(const ParametersMap& map, bool import)
 		{
-			_importStops = map.getDefault<bool>(PARAMETER_IMPORT_STOPS, false);
+			if(import)
+			{
+				_importStops = map.getDefault<bool>(PARAMETER_IMPORT_STOPS, false);
+			}
+			_withOldDates = map.getDefault<bool>(PARAMETER_WITH_OLD_DATES, false);
 		}
 
 
@@ -1637,6 +1669,20 @@ namespace synthese
 		bool TridentFileFormat::getImportStops() const
 		{
 			return _importStops;
+		}
+
+
+
+		void TridentFileFormat::setWithOldDates( bool value )
+		{
+			_withOldDates = value;
+		}
+
+
+
+		bool TridentFileFormat::getWithOldDates() const
+		{
+			return _withOldDates;
 		}
 	}
 }

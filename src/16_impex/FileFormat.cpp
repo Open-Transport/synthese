@@ -115,14 +115,14 @@ namespace synthese
 
 
 
-		server::ParametersMap FileFormat::_getParametersMap() const
+		server::ParametersMap FileFormat::_getParametersMap(bool import) const
 		{
 			return ParametersMap();
 		}
 
 
 
-		void FileFormat::_setFromParametersMap( const server::ParametersMap& map )
+		void FileFormat::_setFromParametersMap(const ParametersMap& map, bool import)
 		{
 
 		}

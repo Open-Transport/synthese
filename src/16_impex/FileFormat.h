@@ -103,21 +103,23 @@ namespace synthese
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
+			///	@param import true if the parameters must be generated for an import, false for an export
 			/// @return Generated parameters map
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.1.16
-			virtual server::ParametersMap _getParametersMap() const;
+			virtual server::ParametersMap _getParametersMap(bool import) const;
 
 
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// @param map Parameters map to interpret
+			///	@param import true if the parameters must be read for an import, false for an export
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.1.16
-			virtual void _setFromParametersMap(const server::ParametersMap& map);
+			virtual void _setFromParametersMap(const server::ParametersMap& map, bool import);
 
 
 			virtual const Files::FilesVector& getFiles() const = 0;

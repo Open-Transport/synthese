@@ -61,6 +61,11 @@ namespace synthese
 				boost::optional<db::SQLiteTransaction&> transaction
 			);
 
+			static void DeleteDates(
+				util::RegistryKeyType serviceId,
+				boost::optional<db::SQLiteTransaction&> transaction
+			);
+
 			static void CreateDatesForRecentlyCreatedCalendar(
 				NonPermanentService& service,
 				boost::optional<db::SQLiteTransaction&> transaction

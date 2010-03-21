@@ -61,7 +61,7 @@ namespace synthese
 
 		ParametersMap ImportFunction::_getParametersMap() const
 		{
-			ParametersMap map(_fileFormat.get() ? _fileFormat->_getParametersMap() : ParametersMap());
+			ParametersMap map(_fileFormat.get() ? _fileFormat->_getParametersMap(true) : ParametersMap());
 			return map;
 		}
 
@@ -91,6 +91,7 @@ namespace synthese
 				FileFormat::Files::FilesVector files(_fileFormat->getFiles());
 				_fileFormat->setEnv(_env.get());
 				_fileFormat->setDataSource(_dataSource.get());
+				_fileFormat->_setFromParametersMap(map, true);
 
 				if(files.empty())
 				{
@@ -113,8 +114,6 @@ namespace synthese
 					}
 					_fileFormat->parseFiles(paths, output);
 				}
-
-				_fileFormat->_setFromParametersMap(map);
 
 				_output = output.str();
 			}

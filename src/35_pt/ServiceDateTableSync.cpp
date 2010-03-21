@@ -185,5 +185,18 @@ namespace synthese
 				Save(&sd, transaction);
 			}
 		}
+
+
+
+		void ServiceDateTableSync::DeleteDates( util::RegistryKeyType serviceId, boost::optional<db::SQLiteTransaction&> transaction )
+		{
+			date now(day_clock::local_day());
+			stringstream query;
+			query <<
+				"DELETE FROM " << TABLE.NAME <<
+				" WHERE " << COL_SERVICEID << "=" << serviceId
+			;
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+		}
 	}
 }
