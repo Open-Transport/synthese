@@ -117,7 +117,7 @@ namespace synthese
 			_commercialLineId(lineId),
 			_withTisseoExtension(withTisseoExtension),
 			_importStops(false),
-			_withOldDates(false)
+			_startDate(day_clock::local_day())
 		{
 			_env = env;
 		}
@@ -401,7 +401,6 @@ namespace synthese
 			
 			// --------------------------------------------------- Timetable
 			// One timetable per service
-			date today(day_clock::local_day());
 			BOOST_FOREACH(Registry<ScheduledService>::value_type itsrv, _env->getRegistry<ScheduledService>())
 			{
 				const ScheduledService* srv(itsrv.second.get());
@@ -411,7 +410,7 @@ namespace synthese
 
 				BOOST_FOREACH(const date& d, srv->getActiveDates())
 				{
-					if(!_withOldDates && d < today)
+					if(d < _startDate)
 					{
 						continue;
 					}
@@ -429,7 +428,7 @@ namespace synthese
 
 				BOOST_FOREACH(const date& d, srv->getActiveDates())
 				{
-					if(!_withOldDates && d < today)
+					if(d < _startDate)
 					{
 						continue;
 					}
@@ -1532,7 +1531,6 @@ namespace synthese
 			
 			// Calendars
 			int calendarNumber(allNode.nChildNode("Timetable"));
-			date today(day_clock::local_day());
 			for(int calendarRank(0); calendarRank < calendarNumber; ++calendarRank)
 			{
 				XMLNode calendarNode(allNode.getChildNode("Timetable", calendarRank));
@@ -1543,7 +1541,7 @@ namespace synthese
 				{
 					XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
 					date d(from_string(dayNode.getText()));
-					if(!_withOldDates && d < today)
+					if(d < _startDate)
 					{
 						continue;
 					}
@@ -1597,14 +1595,7 @@ namespace synthese
 			}
 			BOOST_FOREACH(Registry<ScheduledService>::value_type service, _env->getRegistry<ScheduledService>())
 			{
-				if(_withOldDates)
-				{
-					ServiceDateTableSync::DeleteDates(service.second->getKey(), transaction);
-				}
-				else
-				{
-					ServiceDateTableSync::DeleteDatesFromNow(service.second->getKey(), transaction);
-				}
+				ServiceDateTableSync::DeleteDates(service.second->getKey(), _startDate, transaction);
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
 			}
 			BOOST_FOREACH(shared_ptr<ServiceDate> date, _serviceDates)
@@ -1642,7 +1633,11 @@ namespace synthese
 			{
 				result.insert(PARAMETER_IMPORT_STOPS, _importStops);
 			}
-			result.insert(PARAMETER_WITH_OLD_DATES, _withOldDates);
+			if(_startDate < day_clock::local_day())
+			{
+				date_duration du(day_clock::local_day() - _startDate);
+				result.insert(PARAMETER_WITH_OLD_DATES, du.days());
+			}
 			return result;
 		}
 
@@ -1654,7 +1649,8 @@ namespace synthese
 			{
 				_importStops = map.getDefault<bool>(PARAMETER_IMPORT_STOPS, false);
 			}
-			_withOldDates = map.getDefault<bool>(PARAMETER_WITH_OLD_DATES, false);
+			_startDate = day_clock::local_day();
+			_startDate -= days(map.getDefault<int>(PARAMETER_WITH_OLD_DATES, 0));
 		}
 
 
@@ -1669,20 +1665,6 @@ namespace synthese
 		bool TridentFileFormat::getImportStops() const
 		{
 			return _importStops;
-		}
-
-
-
-		void TridentFileFormat::setWithOldDates( bool value )
-		{
-			_withOldDates = value;
-		}
-
-
-
-		bool TridentFileFormat::getWithOldDates() const
-		{
-			return _withOldDates;
 		}
 	}
 }

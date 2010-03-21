@@ -26,6 +26,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <boost/date_time.hpp>
 
 #include "SQLiteRegistryTableSyncTemplate.h"
 
@@ -56,13 +57,9 @@ namespace synthese
 				NonPermanentService& service
 			);
 			
-			static void DeleteDatesFromNow(
-				util::RegistryKeyType serviceId,
-				boost::optional<db::SQLiteTransaction&> transaction
-			);
-
 			static void DeleteDates(
 				util::RegistryKeyType serviceId,
+				boost::gregorian::date firstDate,
 				boost::optional<db::SQLiteTransaction&> transaction
 			);
 

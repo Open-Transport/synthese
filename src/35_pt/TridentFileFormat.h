@@ -27,8 +27,8 @@
 #include "FileFormatTemplate.h"
 
 #include <iostream>
-
 #include <vector>
+#include <boost/date_time/gregorian/greg_date.hpp>
 
 namespace synthese
 {
@@ -64,12 +64,12 @@ namespace synthese
 		///
 		/// Import parameters :
 		///		- impstp (PARAMETER_IMPORT_STOPS / _importStops) : If true, the stops are imported from the Trident file. If false, the import function assumes that all stops linked in the Trident file exist already in the database.
-		///		- wod (PARAMETER_WITH_OLD_DATES / _withOldDates) : If true, all service dates will be synchronized with the source file. If false, the source file is considered as an incremental data source : only the future dates are imported, and the old dates present in SYNTHESE are kept.
+		///		- wod (PARAMETER_WITH_OLD_DATES / _startDate) : Number of past days to import (default 0).
 		///
 		/// Export parameters :
 		///		- roid : id of the CommercialLine object to export
 		///		- wte : If true, the generated file will contain "Tisséo Trident Extension". If false, the generated file will respect the pure Trident format.
-		///		- wod (PARAMETER_WITH_OLD_DATES / _withOldDates) : If true, all service dates are exported. If false, only future service dates are exported.
+		///		- wod (PARAMETER_WITH_OLD_DATES / _startDate) : Number of past days to export (default 0).
 		///
 		/// For the details about what is imported or exported, see the documentation of @ref TridentFileFormat::_parse
 		///
@@ -223,7 +223,7 @@ namespace synthese
 
 			//! @name Import/Export parameters
 			//@{
-				bool					_withOldDates;
+				boost::gregorian::date	_startDate;
 			//@}
 
 			//! @name Export parameters
@@ -299,13 +299,11 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setImportStops(bool value);
-				void setWithOldDates(bool value);
 			//@}
 
 			//! @name Getters
 			//@{
 				bool getImportStops() const;
-				bool getWithOldDates() const;
 			//@}
 
 		private:

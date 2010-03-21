@@ -131,17 +131,19 @@ namespace synthese
 
 	namespace pt
 	{
-		void ServiceDateTableSync::DeleteDatesFromNow(
+		void ServiceDateTableSync::DeleteDates(
 			util::RegistryKeyType serviceId,
+			boost::gregorian::date firstDate,
 			boost::optional<db::SQLiteTransaction&> transaction
 		){
-			date now(day_clock::local_day());
 			stringstream query;
 			query <<
 				"DELETE FROM " << TABLE.NAME <<
-				" WHERE " << COL_SERVICEID << "=" << serviceId <<
-				" AND " << COL_DATE << ">'" << to_iso_extended_string(now) << "'"
-			;
+				" WHERE " << COL_SERVICEID << "=" << serviceId;
+			if(!firstDate.is_not_a_date())
+			{
+				query << " AND " << COL_DATE << ">='" << to_iso_extended_string(firstDate) << "'";
+			}
 			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 
@@ -184,19 +186,6 @@ namespace synthese
 				sd.setService(&service);
 				Save(&sd, transaction);
 			}
-		}
-
-
-
-		void ServiceDateTableSync::DeleteDates( util::RegistryKeyType serviceId, boost::optional<db::SQLiteTransaction&> transaction )
-		{
-			date now(day_clock::local_day());
-			stringstream query;
-			query <<
-				"DELETE FROM " << TABLE.NAME <<
-				" WHERE " << COL_SERVICEID << "=" << serviceId
-			;
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
 		}
 	}
 }
