@@ -1000,10 +1000,16 @@ namespace synthese
 			string fileKey
 		){
 			bool failure(false);
-			XMLNode allNode = XMLNode::openFileHelper(filePath.file_string().c_str(), "ChouettePTNetwork");
-			if(allNode.isEmpty())
+
+
+			XMLResults pResults;
+			XMLNode allNode = XMLNode::parseFile(filePath.file_string().c_str(), "ChouettePTNetwork", &pResults);
+			if (pResults.error != eXMLErrorNone)
 			{
-				os << "ERR  : XML parsing of file " << filePath.file_string() << " has failed.<br />";
+				os <<
+					"ERR  : XML Parsing error " << XMLNode::getError(pResults.error) <<
+					" inside file " << filePath.file_string() <<
+					" at line " << pResults.nLine << ", column " << pResults.nColumn;
 				return;
 			}
 			
@@ -1057,7 +1063,7 @@ namespace synthese
 			
 			shared_ptr<CommercialLine> cline;
 			CommercialLineTableSync::SearchResult lines(
-				CommercialLineTableSync::Search(*_env, network->getKey(), string("%"), ckey)
+				CommercialLineTableSync::Search(*_env, network->getKey(), optional<string>(), ckey)
 			);
 			if(!lines.empty())
 			{

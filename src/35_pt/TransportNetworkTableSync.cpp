@@ -66,6 +66,7 @@ namespace synthese
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TransportNetworkTableSync>::_INDEXES[]=
 		{
+			SQLiteTableSync::Index(TransportNetworkTableSync::COL_CREATOR_ID.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 

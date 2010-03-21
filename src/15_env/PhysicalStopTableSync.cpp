@@ -71,6 +71,7 @@ namespace synthese
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<PhysicalStopTableSync>::_INDEXES[]=
 		{
 			SQLiteTableSync::Index(PhysicalStopTableSync::COL_PLACEID.c_str(), ""),
+			SQLiteTableSync::Index(PhysicalStopTableSync::COL_OPERATOR_CODE.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 

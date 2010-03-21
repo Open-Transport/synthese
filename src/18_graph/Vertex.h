@@ -49,7 +49,7 @@ namespace synthese
 			public virtual util::Registrable
 		{
 		public:
-			typedef std::map<const Path*, const Edge*> Edges;
+			typedef std::multimap<const Path*, const Edge*> Edges;
 
 		protected:
 			const Hub*	_hub;

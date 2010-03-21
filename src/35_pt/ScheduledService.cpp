@@ -313,41 +313,47 @@ namespace synthese
 						if(path == getPath()) continue;
 
 						const Vertex::Edges& departureEdges(itStartStop.second->getDepartureEdges());
-						Vertex::Edges::const_iterator its(departureEdges.find(path));
-						if(its == departureEdges.end()) continue;
-
-						const Edge& startEdge(*its->second);
-						// Search a service at the time of the possible
-
-						optional<Edge::DepartureServiceIndex::Value> minServiceIndex;
-						ServicePointer serviceInstance(
-							startEdge.getNextService(
-								userClass,
-								minStartTime,
-								maxStartTime,
-								true,
-								minServiceIndex
-						)	);
-						// If no service, advance to the next path
-						if (!serviceInstance.getService()) continue;
-
-						// Path traversal
-						for (const Edge* endEdge = (startEdge.*step) ();
-							endEdge != NULL; endEdge = (endEdge->*step) ())
+						pair<Vertex::Edges::const_iterator, Vertex::Edges::const_iterator> range(departureEdges.equal_range(path));
+						if(range.first == departureEdges.end() || range.first->first != path)
 						{
-							// Found eligible arrival place
-							if(endEdge->getHub() == arrivalHub)
+							continue;
+						}
+
+						for(Vertex::Edges::const_iterator its(range.first); its != range.second; ++its)
+						{
+							const Edge& startEdge(*its->second);
+							// Search a service at the time of the possible
+
+							optional<Edge::DepartureServiceIndex::Value> minServiceIndex;
+							ServicePointer serviceInstance(
+								startEdge.getNextService(
+									userClass,
+									minStartTime,
+									maxStartTime,
+									true,
+									minServiceIndex
+							)	);
+							// If no service, advance to the next path
+							if (!serviceInstance.getService()) continue;
+
+							// Path traversal
+							for (const Edge* endEdge = (startEdge.*step) ();
+								endEdge != NULL; endEdge = (endEdge->*step) ())
 							{
-								_nonConcurrencyCache.insert(
-									make_pair(
+								// Found eligible arrival place
+								if(endEdge->getHub() == arrivalHub)
+								{
+									_nonConcurrencyCache.insert(
+										make_pair(
 										_NonConcurrencyCache::key_type(
-											departureEdge.getRankInPath(),
-											arrivalEdge.getRankInPath(),
-											userClass,
-											date
+										departureEdge.getRankInPath(),
+										arrivalEdge.getRankInPath(),
+										userClass,
+										date
 										), false
-								)	);
-								return false;
+										)	);
+									return false;
+								}
 							}
 						}
 					}

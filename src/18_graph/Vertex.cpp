@@ -106,10 +106,16 @@ namespace synthese
 			assert(edge);
 			assert(edge->getParentPath());
 
-			Edges::iterator it(_arrivalEdges.find(edge->getParentPath()));
-			assert(it != _arrivalEdges.end());
-			if(it == _arrivalEdges.end()) return;
-			_arrivalEdges.erase(it);
+			pair<Edges::iterator, Edges::iterator> range(_arrivalEdges.equal_range(edge->getParentPath()));
+			assert(range.first != _arrivalEdges.end() && range.first->first == edge->getParentPath());
+
+			for(Edges::iterator it(range.first); it!= range.second; ++it)
+			{
+				if(it->second == edge)
+				{
+					_arrivalEdges.erase(it);
+				}
+			}
 		}
 
 
@@ -119,10 +125,16 @@ namespace synthese
 			assert(edge);
 			assert(edge->getParentPath());
 
-			Edges::iterator it(_departureEdges.find(edge->getParentPath()));
-			assert(it != _departureEdges.end());
-			if(it == _departureEdges.end()) return;
-			_departureEdges.erase(it);
+			pair<Edges::iterator, Edges::iterator> range(_departureEdges.equal_range(edge->getParentPath()));
+			assert(range.first != _departureEdges.end() && range.first->first == edge->getParentPath());
+
+			for(Edges::iterator it(range.first); it!= range.second; ++it)
+			{
+				if(it->second == edge)
+				{
+					_departureEdges.erase(it);
+				}
+			}
 		}
 	}
 }

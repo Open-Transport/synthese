@@ -119,6 +119,7 @@ namespace synthese
 		{
 			SQLiteTableSync::Index(
 				CommercialLineTableSync::COL_NETWORK_ID.c_str(),
+				CommercialLineTableSync::COL_CREATOR_ID.c_str(),
 				""
 			),
 			SQLiteTableSync::Index()
