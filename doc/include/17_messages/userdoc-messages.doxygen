@@ -41,4 +41,4 @@ Les conflits entre messages correspondent à des situations où deux messages de n
 Pour résoudre un conflit, stopper la diffusion de l'un des messages portant ce statut. Dans tous les cas seul un message est diffusé sur le panneau : il s'agit du plus récent.
 
 
-*"
+*/

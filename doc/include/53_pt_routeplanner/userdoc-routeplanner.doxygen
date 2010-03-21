@@ -80,8 +80,6 @@ Dans certains cas, il est proposé de rejoindre un arrêt à pied pour effectuer un
 Dans certains cas, un pictogramme indique que la solution est soumise à une modalité de réservation :
 <table>
 <tr><td>
-</td><td>Réservation impossible</td></tr>
-<tr><td>
 @image html resa_compulsory.png
 @image latex resa_compulsory.png "" width=0.3cm
 </td><td>Réservation obligatoire : le client doit réserver pour emprunter ce service</td></tr>
@@ -95,8 +93,11 @@ Dans certains cas, un pictogramme indique que la solution est soumise à une moda
 </td><td>Réservation facultative, mais délai de réservation expiré : le client peut emprunter ce service sans réserver, mais ne peut plus y réserver de place</td></tr>
 </table>
 
+Si aucun pictogramme n'est affiché, alors la réservation est impossible.
 
-<b>Cliquez sur une colonne pour obtenir la feuille de route détaillée correspondante.</b>
+<b>Détail d'une solution</b>
+
+Cliquez sur une colonne pour obtenir la feuille de route détaillée correspondante.
 
 @section userdocRoutePlannerRoadmap La feuille de route
 
@@ -215,7 +216,7 @@ Enfin, ces données sont régulièrement mises à jour pour en garantir la validité 
 S'il est presque systématiquement techniquement possible de diffuser des horaires de passage théoriques précis, cela n'aurait dans certains cas que peu d'intérêt. Ce serait même fréquemment une source de manque de fiabilité des résultats de la recherche :
 <ul>
 	<li>Certaines lignes ont une fréquence de passage trop importante pour que les horaires de passage présentent un intérêt à être connus : cela produirait des grilles de résultats peu lisibles car trop remplies, pour transmettre des informations peu utiles (fréquences inférieures à 5 minutes)</li>
-	<li>Certaines lignes n'observent pas une régularité suffisante pour s'engager sur des horaires de passage à la minute près (exemple : lignes de bus en centre ville)<(li>
+	<li>Certaines lignes n'observent pas une régularité suffisante pour s'engager sur des horaires de passage à la minute près (exemple : lignes de bus en centre ville)</li>
 	<li>Certaines lignes sont fortement fréquentées et peuvent en cas de surcharge contraindre le voyageur à emprunter le départ suivant (exemple : ligne de métro)</li>
 </ul>
 L'ensemble de ces "risques" est intégré dans la méthode de calcul des durées de trajet, pour proposer un taux de fiabilité des résultats homogène sur tout le territoire.
