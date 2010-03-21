@@ -1000,6 +1000,11 @@ namespace synthese
 			ifs.close();
 
 			XMLNode allNode = XMLNode::parseString (text.str().c_str(), "ChouettePTNetwork");
+			if(allNode.isEmpty())
+			{
+				os << "ERR  : XML parsing of file " << filePath.file_string() << " has failed.<br />";
+				return;
+			}
 			
 			// Title
 			XMLNode chouetteLineDescriptionNode(allNode.getChildNode("ChouetteLineDescription"));
@@ -1162,7 +1167,8 @@ namespace synthese
 							*_env,
 							optional<RegistryKeyType>(),
 							logic::indeterminate,
-							stopKey
+							stopKey,
+							false
 					)	);
 					if(cstops.size() > 1)
 					{
@@ -1212,7 +1218,11 @@ namespace synthese
 				XMLNode stopAreaNode(chouetteAreaNode.getChildNode("StopArea", stopRank));
 				XMLNode extensionNode(stopAreaNode.getChildNode("StopAreaExtension", 0));
 				XMLNode areaTypeNode(extensionNode.getChildNode("areaType",0));
-				if(string(areaTypeNode.getText()) != string("BoardingPosition")) continue;
+				if(	string(areaTypeNode.getText()) != string("BoardingPosition") &&
+					string(areaTypeNode.getText()) != string("Quay") 
+				){
+					continue;
+				}
 				XMLNode areaCentroidNode(stopAreaNode.getChildNode("centroidOfArea", 0));
 
 				XMLNode keyNode(stopAreaNode.getChildNode("objectId", 0));
@@ -1250,6 +1260,7 @@ namespace synthese
 					}
 					curStop.reset(new PhysicalStop);
 					curStop->setHub(itcstop->second);
+					curStop->setCodeBySource(stopKey);
 					curStop->setKey(PhysicalStopTableSync::getId());
 					_env->getEditableRegistry<PhysicalStop>().add(curStop);
 
@@ -1261,7 +1272,7 @@ namespace synthese
 					curStop = PhysicalStopTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL);
 
 					os << "LOAD : link between stops " << stopKey << " (" << nameNode.getText() << ") and "
-						<< stops[stopKey]->getKey() << " (" << stops[stopKey]->getConnectionPlace()->getName() << ")<br />";
+						<< curStop->getKey() << " (" << curStop->getConnectionPlace()->getName() << ")<br />";
 				}
 
 				if(_importStops)
@@ -1301,9 +1312,22 @@ namespace synthese
 				XMLNode stopPointNode(chouetteLineDescriptionNode.getChildNode("StopPoint", stopPointRank));
 				XMLNode spKeyNode(stopPointNode.getChildNode("objectId"));
 				XMLNode containedNode(stopPointNode.getChildNode("containedIn"));
+				map<string, PhysicalStop*>::iterator it(stops.find(containedNode.getText()));
+				if(it == stops.end())
+				{
+					os << "ERR  : stop " << containedNode.getText() << " not found by stop point " << spKeyNode.getText() << ")<br />";
+					failure = true;
+					continue;
+				}
 				stopPoints[spKeyNode.getText()] = stops[containedNode.getText()];
 			}
-			
+
+			if(failure)
+			{
+				os << "<b>FAILURE : At least a stop point is missing : load interrupted</b><br />";
+				return;
+			}
+
 			// Load of existing routes
 			LineTableSync::SearchResult sroutes(
 				LineTableSync::Search(*_env, cline->getKey(), _dataSource->getKey())
@@ -1386,6 +1410,7 @@ namespace synthese
 					os << "CREA : Creation of route " << routeNames[routeIdNode.getText()] << " for " << routeIdNode.getText() << "<br />";
 					route.reset(new Line);
 					route->setCommercialLine(cline.get());
+					route->setName(routeNames[routeIdNode.getText()]);
 					route->setCodeBySource(routeNames[routeIdNode.getText()]);
 					route->setWayBack(routeWaybacks[routeIdNode.getText()]);
 					route->setDataSource(_dataSource);
@@ -1433,6 +1458,7 @@ namespace synthese
 				Line* line(routes[jpKeyNode.getText()]);
 				shared_ptr<ScheduledService> service(new ScheduledService);
 				service->setPath(line);
+				service->setPathId(line->getKey());
 				service->setServiceNumber(numberNode.getText());
 				ScheduledService::Schedules deps;
 				ScheduledService::Schedules arrs;
@@ -1525,6 +1551,17 @@ namespace synthese
 			SQLiteTransaction transaction;
 
 			// Saving of each created or altered objects
+			if(_importStops)
+			{
+				BOOST_FOREACH(Registry<PublicTransportStopZoneConnectionPlace>::value_type cstop, _env->getRegistry<PublicTransportStopZoneConnectionPlace>())
+				{
+					ConnectionPlaceTableSync::Save(cstop.second.get(), transaction);
+				}
+				BOOST_FOREACH(Registry<PhysicalStop>::value_type stop, _env->getRegistry<PhysicalStop>())
+				{
+					PhysicalStopTableSync::Save(stop.second.get(), transaction);
+				}
+			}
 			BOOST_FOREACH(Registry<TransportNetwork>::value_type network, _env->getRegistry<TransportNetwork>())
 			{
 				TransportNetworkTableSync::Save(network.second.get(), transaction);

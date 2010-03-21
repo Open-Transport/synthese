@@ -82,6 +82,10 @@ namespace synthese
 				_fields.push_back(boost::lexical_cast<std::string>(value));
 			}
 
+			void addField(double value){
+				_fields.push_back(boost::lexical_cast<std::string>(value));
+			}
+
 			void addField(util::RegistryKeyType value){
 				_fields.push_back(boost::lexical_cast<std::string>(value));
 			}

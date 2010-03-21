@@ -21,7 +21,7 @@
 */
 
 #include "PhysicalStopTableSync.h"
-
+#include "ReplaceQuery.h"
 #include "Conversion.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
@@ -107,11 +107,19 @@ namespace synthese
 			obj->setHub(NULL);
 		}
 
+
+
 		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Save(
 			PhysicalStop* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			/// @todo Implementation
+			ReplaceQuery<PhysicalStopTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(object->getHub()) ? dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(object->getHub())->getKey() : RegistryKeyType(0));
+			query.addField(object->getX());
+			query.addField(object->getY());
+			query.addField(object->getCodeBySource());
+			query.execute(transaction);
 		}
     }
 

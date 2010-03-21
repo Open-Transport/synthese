@@ -265,7 +265,7 @@ namespace synthese
 			{
 				query <<
 					" ORDER BY " <<
-					CityTableSync::TABLE.NAME << "." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") <<
+					CityTableSync::TABLE.NAME << "." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << "," <<
 					TABLE.NAME << "." << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			}
 			if (number > 0)
