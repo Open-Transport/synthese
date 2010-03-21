@@ -92,7 +92,7 @@ namespace synthese
 
 			//! @name Updaters
 			//@{
-				void addChild(ObjectType* object) { _children.insert(std::make_pair(getTreeOrderingKey(), object)); }
+				void addChild(ObjectType* object) { _children.insert(std::make_pair(this->getTreeOrderingKey(), object)); }
 				void removeChild(ObjectType* object) { _children.erase(object->getTreeOrderingKey()); }
 			//@}
 
