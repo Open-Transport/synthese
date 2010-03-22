@@ -273,11 +273,11 @@ namespace synthese
 			return lexical_cast<int>(text);
 		}
 
-		boost::optional<unsigned int> SQLiteResult::getOptionalUnsignedInt( const std::string& name ) const
+		boost::optional<size_t> SQLiteResult::getOptionalUnsignedInt( const std::string& name ) const
 		{
 			string text(getText(name));
-			if(text.empty()) return optional<unsigned int>();
-			return lexical_cast<unsigned int>(text);
+			if(text.empty()) return optional<size_t>();
+			return lexical_cast<size_t>(text);
 		}
 
 

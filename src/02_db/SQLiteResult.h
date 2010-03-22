@@ -65,7 +65,7 @@ namespace synthese
 			virtual boost::logic::tribool getTribool (const std::string& name) const;
 
 			boost::optional<int> getOptionalInt(const std::string& name) const;
-			boost::optional<unsigned int> getOptionalUnsignedInt(const std::string& name) const;
+			boost::optional<std::size_t> getOptionalUnsignedInt(const std::string& name) const;
 
 			virtual double getDouble (int column) const;
 			virtual double getDouble (const std::string& name) const;
