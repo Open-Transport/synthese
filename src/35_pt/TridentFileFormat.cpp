@@ -1605,18 +1605,7 @@ namespace synthese
 					calendarDates.push_back(d);
 				}
 
-				if(calendarDates.empty())
-				{
-					// Clean useless services
-					BOOST_FOREACH(ScheduledService* service, calendarServices)
-					{
-						if(createdObjects.find(service->getKey()) != createdObjects.end())
-						{
-							_env->getEditableRegistry<ScheduledService>().remove(service->getKey());
-						}
-					}
-				}
-				else
+				if(!calendarDates.empty())
 				{
 					BOOST_FOREACH(const date& d, calendarDates)
 					{
@@ -1629,6 +1618,29 @@ namespace synthese
 							_serviceDates.push_back(sd);
 						}
 					}
+				}
+			}
+
+			// Clean useless services
+			for(map<string, ScheduledService*>::const_iterator its(services.begin()); its != services.end(); ++its)
+			{
+				if(its->second->empty() && createdObjects.find(its->second->getKey()) != createdObjects.end())
+				{
+					its->second->getPath()->removeService(its->second);
+					_env->getEditableRegistry<ScheduledService>().remove(its->second->getKey());
+				}
+			}
+
+			// Clean useless routes
+			for(map<string, Line*>::const_iterator itr(routes.begin()); itr != routes.end(); ++itr)
+			{
+				if(itr->second->getServices().empty() && createdObjects.find(itr->second->getKey()) != createdObjects.end())
+				{
+					BOOST_FOREACH(const Edge* ls, itr->second->getEdges())
+					{
+						_env->getEditableRegistry<LineStop>().remove(static_cast<const LineStop*>(ls)->getKey());
+					}
+					_env->getEditableRegistry<Line>().remove(itr->second->getKey());
 				}
 			}
 
