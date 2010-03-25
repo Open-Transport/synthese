@@ -46,6 +46,7 @@
 #include "AdminParametersException.h"
 #include "ServiceAddAction.h"
 #include "AdminActionFunctionRequest.hpp"
+#include "PTPlaceAdmin.h"
 
 #include <boost/foreach.hpp>
 
@@ -132,6 +133,8 @@ namespace synthese
 			// TAB STOPS
 			if (openTabContent(stream, TAB_STOPS))
 			{
+				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(_request);
+				
 				// Reservation
 // 				bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
 				LineStopTableSync::SearchResult lineStops(
@@ -149,6 +152,7 @@ namespace synthese
 				HTMLTable::ColsVector v;
 				v.push_back("Rang");
 				v.push_back("Arrêt");
+				v.push_back("Quai");
 				v.push_back("A");
 				v.push_back("D");
 				v.push_back("Hor");
@@ -160,9 +164,16 @@ namespace synthese
 
 				BOOST_FOREACH(shared_ptr<LineStop> lineStop, lineStops)
 				{
+					openPlaceRequest.getPage()->setConnectionPlace(
+						Env::GetOfficialEnv().getSPtr(lineStop->getPhysicalStop()->getConnectionPlace())
+					);
 					stream << t.row();
 					stream << t.col() << lineStop->getRankInPath();
-					stream << t.col() << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+					stream << t.col() << HTMLModule::getHTMLLink(
+						openPlaceRequest.getURL(),
+						lineStop->getPhysicalStop()->getConnectionPlace()->getFullName()
+					);
+					stream << t.col() << lineStop->getPhysicalStop()->getName();
 					stream << t.col() << (lineStop->isArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"));
 					stream << t.col() << (lineStop->isDeparture() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"));
 					stream << t.col() << (lineStop->getScheduleInput() ? HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") : HTMLModule::getHTMLImage("tree_vert.png", "Houraire non fourni à cet arrêt"));

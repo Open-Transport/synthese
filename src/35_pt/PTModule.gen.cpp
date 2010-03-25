@@ -4,11 +4,13 @@
 // Factories
 
 synthese::pt::TransportNetworkTableSync::integrate();
-synthese::pt::TridentExportFunction::integrate ();
 synthese::pt::TridentFileFormat::integrate ();
 
 synthese::pt::ServiceDateTableSync::integrate();
 synthese::pt::PTUseRuleTableSync::integrate();
+synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::PhysicalStopTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex>, synthese::pt::PhysicalStopTableSync>::integrate();
+synthese::pt::JunctionTableSync::integrate();
 synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::ContinuousServiceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::SchedulesBasedService>, synthese::pt::ContinuousServiceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::NonPermanentService>, synthese::pt::ContinuousServiceTableSync>::integrate();
@@ -34,8 +36,15 @@ synthese::pt::PTPlaceAdmin::integrate();
 
 synthese::pt::RealTimeUpdateFunction::integrate();
 synthese::pt::PhysicalStopsCSVExportFunction::integrate();
+synthese::pt::LinesListFunction::integrate();
+synthese::pt::TridentExportFunction::integrate ();
+synthese::pt::PTNetworksListFunction::integrate();
+synthese::pt::PTRoutesListFunction::integrate();
 
 synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
+synthese::pt::PTNetworkListItemInterfacePage::integrate();
+synthese::pt::PTLinesListItemInterfacePage::integrate();
+synthese::pt::PTRoutesListItemInterfacePage::integrate();
 
 synthese::pt::NonConcurrencyRuleAddAction::integrate();
 synthese::pt::NonConcurrencyRuleRemoveAction::integrate();
@@ -50,6 +59,8 @@ synthese::pt::TransportNetworkRight::integrate();
 
 // Registries
 
+synthese::util::Env::Integrate<synthese::pt::PhysicalStop>();
+synthese::util::Env::Integrate<synthese::pt::Junction>();
 synthese::util::Env::Integrate<synthese::pt::TransportNetwork>();
 synthese::util::Env::Integrate<synthese::pt::ServiceDate>();
 synthese::util::Env::Integrate<synthese::pt::PTUseRule>();

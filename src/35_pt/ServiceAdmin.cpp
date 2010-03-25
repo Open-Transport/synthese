@@ -43,6 +43,8 @@
 #include "CalendarHTMLViewer.h"
 #include "LineAdmin.h"
 #include "Profile.h"
+#include "PTPlaceAdmin.h"
+#include "AdminFunctionRequest.hpp"
 
 using namespace std;
 using namespace boost;
@@ -167,6 +169,8 @@ namespace synthese
 				}
 				vertexUpdateRequest.getAction()->setService(_scheduledService);
 
+				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
+
 				stream << "<h1>Horaires</h1>";
 				
 				HTMLTable::ColsVector vs;
@@ -187,9 +191,16 @@ namespace synthese
 				BOOST_FOREACH(const Path::Edges::value_type& edge, line->getEdges())
 				{
 					const LineStop& lineStop(dynamic_cast<const LineStop&>(*edge));
+					openPlaceRequest.getPage()->setConnectionPlace(
+						Env::GetOfficialEnv().getSPtr(lineStop.getPhysicalStop()->getConnectionPlace())
+					);
 					
 					stream << ts.row();
-					stream << ts.col() << lineStop.getPhysicalStop()->getConnectionPlace()->getFullName();
+					stream << ts.col() << 
+						HTMLModule::getHTMLLink(
+							openPlaceRequest.getURL(),
+							lineStop.getPhysicalStop()->getConnectionPlace()->getFullName()
+						);
 					stream << ts.col() << lineStop.getPhysicalStop()->getName();
 					stream << ts.col();
 					if(lineStop.isArrival())

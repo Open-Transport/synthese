@@ -39,6 +39,8 @@
 #include "Profile.h"
 #include "PropertiesHTMLTable.h"
 #include "AdminFunctionRequest.hpp"
+#include "JunctionTableSync.hpp"
+#include "Address.h"
 
 using namespace std;
 using namespace boost;
@@ -198,12 +200,156 @@ namespace synthese
 			// TAB ADDRESSES
 			if (openTabContent(stream, TAB_ADDRESSES))
 			{
+				HTMLTable::ColsVector c;
+				c.push_back("X");
+				c.push_back("Y");
+				c.push_back("Rues");
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+				BOOST_FOREACH(const AddressablePlace::Addresses::value_type& address, _addressablePlace->getAddresses())
+				{
+					stream << t.row();
+					stream << t.col() << address->getX();
+					stream << t.col() << address->getY();
+					stream << t.col();
+				}
+				stream << t.close();
 			}
 
 			////////////////////////////////////////////////////////////////////
 			// TAB TRANSFER
 			if (openTabContent(stream, TAB_TRANSFER))
 			{
+				stream << "<h1>Transferts internes (correspondances)</h1>";
+				{
+					HTMLTable::ColsVector c;
+					c.push_back("Quai départ");
+					c.push_back("Quai arrivée");
+					c.push_back("Durée");
+					c.push_back("Action");
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+					stream << t.open();
+					stream << t.row();
+					stream << t.col(2) << "<b>Valeur par défaut</b>";
+					stream << t.col() << (_addressablePlace->getDefaultTransferDelay().total_seconds() / 60) << " min";
+					stream << t.col();
+
+					BOOST_FOREACH(const AddressablePlace::TransferDelaysMap::value_type& it, _addressablePlace->getTransferDelays())
+					{
+						stream << t.row();
+						stream << t.col() << it.first.first;
+						stream << t.col() << it.first.second;
+						stream << t.col() << (it.second.total_seconds() / 60) << " min";
+						stream << t.col() << "Supprimer";
+					}
+
+					stream << t.row();
+					stream << t.col();
+					stream << t.col();
+					stream << t.col();
+					stream << t.col() << "Ajouter";
+					
+					stream << t.close();
+
+				}
+
+				if(_connectionPlace.get())
+				{
+					AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
+
+					stream << "<h1>Transferts externes (jonctions)</h1>";
+
+					JunctionTableSync::SearchResult startings(
+						JunctionTableSync::Search(Env::GetOfficialEnv(), _connectionPlace->getKey())
+					);
+					JunctionTableSync::SearchResult endings(
+						JunctionTableSync::Search(Env::GetOfficialEnv(), optional<RegistryKeyType>(), _connectionPlace->getKey())
+					);
+
+					HTMLTable::ColsVector c;
+					c.push_back("Quai");
+					c.push_back("Arrêt");
+					c.push_back("Quai");
+					c.push_back("Longueur");
+					c.push_back("Durée");
+					c.push_back("Action");
+
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+					stream << t.open();
+					stream << t.row();
+					stream << t.col(6, string(), true) << "Jonctions bidirectionnelles";
+					BOOST_FOREACH(shared_ptr<Junction> junction, startings)
+					{
+						if(!junction->getBack())
+						{
+							continue;
+						}
+						openPlaceRequest.getPage()->setConnectionPlace(
+							Env::GetOfficialEnv().getSPtr(junction->getEnd()->getConnectionPlace())
+						);
+
+						stream << t.row();
+						stream << t.col() << junction->getStart()->getName();
+						stream << t.col() << 
+							HTMLModule::getHTMLLink(
+								openPlaceRequest.getURL(),
+								junction->getEnd()->getConnectionPlace()->getFullName()
+							);
+						stream << t.col() << junction->getEnd()->getName();
+						stream << t.col() << junction->getLength() << " m";
+						stream << t.col() << (junction->getDuration().total_seconds() / 60) << " min";
+						stream << t.col() << "Fusionner l'arrêt";
+					}
+
+					stream << t.row();
+					stream << t.col(6, string(), true) << "Jonctions au départ de " << _connectionPlace->getFullName();
+					BOOST_FOREACH(shared_ptr<Junction> junction, startings)
+					{
+						if(junction->getBack())
+						{
+							continue;
+						}
+						openPlaceRequest.getPage()->setConnectionPlace(
+							Env::GetOfficialEnv().getSPtr(junction->getEnd()->getConnectionPlace())
+						);
+						stream << t.row();
+						stream << t.col() << junction->getStart()->getName();
+						stream << t.col() << HTMLModule::getHTMLLink(
+								openPlaceRequest.getURL(),
+								junction->getEnd()->getConnectionPlace()->getFullName()
+							);
+						stream << t.col() << junction->getEnd()->getName();
+						stream << t.col() << junction->getLength() << " m";
+						stream << t.col() << (junction->getDuration().total_seconds() / 60) << " min";
+						stream << t.col() << "Fusionner l'arrêt";
+					}
+
+					stream << t.row();
+					stream << t.col(6, string(), true) << "Jonctions vers " << _connectionPlace->getFullName();
+					BOOST_FOREACH(shared_ptr<Junction> junction, startings)
+					{
+						if(junction->getBack())
+						{
+							continue;
+						}
+						openPlaceRequest.getPage()->setConnectionPlace(
+							Env::GetOfficialEnv().getSPtr(junction->getStart()->getConnectionPlace())
+						);
+						stream << t.row();
+						stream << t.col() << junction->getEnd()->getName();
+						stream << t.col() << 
+							HTMLModule::getHTMLLink(
+								openPlaceRequest.getURL(),
+								junction->getStart()->getConnectionPlace()->getFullName()
+							);
+						stream << t.col() << junction->getStart()->getName();
+						stream << t.col() << junction->getLength() << " m";
+						stream << t.col() << (junction->getDuration().total_seconds() / 60) << " min";
+						stream << t.col() << "Fusionner l'arrêt";
+					}
+
+					stream << t.close();
+				}
 			}
 
 			////////////////////////////////////////////////////////////////////
