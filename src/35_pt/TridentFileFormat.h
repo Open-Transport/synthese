@@ -60,11 +60,18 @@ namespace synthese
 		///
 		/// The Trident file format has been extended by <a href="http://www.tisseo.fr/">Tisséo</a>, the local public transportation authority of Toulouse, France. See details @ref trident2tisseo "below".
 		///
+		/// In most cases, the Trident objects correspond exactly to the SYNTHESE objects :
+		///	<ul>
+		///		<li>ConnectionLink = Junction</li>
+		///	</ul>
+		///
 		/// <h3>Usage</h3>
 		///
 		/// Import parameters :
 		///		- impstp (PARAMETER_IMPORT_STOPS / _importStops) : If true, the stops are imported from the Trident file. If false, the import function assumes that all stops linked in the Trident file exist already in the database.
+		///		- impjun (PARAMETER_IMPORT_JUNCTIONS / _importJunctions) : If true, the junctions are imported from the Trident file. If false, they are ignored.
 		///		- wod (PARAMETER_WITH_OLD_DATES / _startDate) : Number of past days to import (default 0).
+		///		- dtd (PARAMETER_DEFAULT_TRANSFER_DURATION / _defaultTransferDuration) : Number of minutes for default transfer delay in case of connection place creation (default = 8).
 		///
 		/// Export parameters :
 		///		- roid : id of the CommercialLine object to export
@@ -213,12 +220,16 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_IMPORT_STOPS;
+			static const std::string PARAMETER_IMPORT_JUNCTIONS;
 			static const std::string PARAMETER_WITH_OLD_DATES;
+			static const std::string PARAMETER_DEFAULT_TRANSFER_DURATION;
 		    
 		private:
 			//! @name Import parameters
 			//@{
 				bool		_importStops;
+				bool		_importJunctions;
+				boost::posix_time::time_duration	_defaultTransferDuration;
 			//@}
 
 			//! @name Import/Export parameters
@@ -252,6 +263,7 @@ namespace synthese
 			///	<ul>
 			///		<li>Commercial stop points (PublicTransportStopZoneConnectionPlace) : city, name, specific transfer delays (only if stop import mode)</li>
 			///		<li>Physical stop points (PhysicalStop) : commercial stop point (only at physical stop creation), x, y, name (only if stop import mode)</li>
+			///		<li>Scheduled services (ScheduledService) : all. Not imported if the service runs never.
 			/// </ul>
 			virtual void _parse(
 				const boost::filesystem::path& filePath,

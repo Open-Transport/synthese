@@ -58,7 +58,10 @@
 #include "Conversion.h"
 #include "XmlToolkit.h"
 #include "SQLiteTransaction.h"
+#include "CityAliasTableSync.hpp"
+#include "JunctionTableSync.hpp"
 
+#include <algorithm>
 #include <iomanip>
 #include <sstream>
 #include <iomanip>
@@ -105,9 +108,17 @@ namespace synthese
 	namespace pt
 	{
 		const string TridentFileFormat::PARAMETER_IMPORT_STOPS("impstp");
+		const string TridentFileFormat::PARAMETER_IMPORT_JUNCTIONS("impjun");
 		const string TridentFileFormat::PARAMETER_WITH_OLD_DATES("wod");
+		const string TridentFileFormat::PARAMETER_DEFAULT_TRANSFER_DURATION("dtd");
 
+		string ToXsdDaysDuration (date_duration daysDelay);
+		string ToXsdDuration(posix_time::time_duration duration);
+		string ToXsdTime (const time_duration& time);
+		time_duration FromXsdDuration(const std::string& text);
 
+		//////////////////////////////////////////////////////////////////////////
+		// CONSTRUCTOR
 
 		TridentFileFormat::TridentFileFormat(
 			Env* env,
@@ -117,42 +128,55 @@ namespace synthese
 			_commercialLineId(lineId),
 			_withTisseoExtension(withTisseoExtension),
 			_importStops(false),
-			_startDate(day_clock::local_day())
+			_importJunctions(false),
+			_startDate(day_clock::local_day()),
+			_defaultTransferDuration(minutes(8))
 		{
 			_env = env;
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		// REQUESTS HANDLING
 
-		string ToXsdDaysDuration (date_duration daysDelay)
+		server::ParametersMap TridentFileFormat::_getParametersMap(bool import) const
 		{
-			stringstream s;
-			s << "P" << daysDelay.days() << "D";
-			return s.str();
+			ParametersMap result;
+			if(import)
+			{
+				result.insert(PARAMETER_IMPORT_STOPS, _importStops);
+				result.insert(PARAMETER_IMPORT_JUNCTIONS, _importJunctions);
+				if(!_defaultTransferDuration.is_not_a_date_time())
+				{
+					result.insert(PARAMETER_DEFAULT_TRANSFER_DURATION, _defaultTransferDuration.total_seconds() / 60);
+				}
+			}
+			if(_startDate < day_clock::local_day())
+			{
+				date_duration du(day_clock::local_day() - _startDate);
+				result.insert(PARAMETER_WITH_OLD_DATES, static_cast<int>(du.days()));
+			}
+			return result;
 		}
 
 
-		string ToXsdDuration(posix_time::time_duration duration)
+
+		void TridentFileFormat::_setFromParametersMap(const ParametersMap& map, bool import)
 		{
-			stringstream s;
-			s << "PT";
-			if(duration.hours() > 0)
-				s << duration.hours() << "H";
-			s << duration.minutes() << "M";
-			return s.str();
+			if(import)
+			{
+				_importStops = map.getDefault<bool>(PARAMETER_IMPORT_STOPS, false);
+				_importJunctions = map.getDefault<bool>(PARAMETER_IMPORT_JUNCTIONS, false);
+				if(map.getDefault<int>(PARAMETER_DEFAULT_TRANSFER_DURATION, 0))
+				{
+					_defaultTransferDuration = minutes(map.get<int>(PARAMETER_DEFAULT_TRANSFER_DURATION));
+				}
+			}
+			_startDate = day_clock::local_day();
+			_startDate -= days(map.getDefault<int>(PARAMETER_WITH_OLD_DATES, 0));
 		}
 
-		
-
-		string ToXsdTime (const time_duration& time)
-		{
-			stringstream ss;
-			ss << setw( 2 ) << setfill ( '0' )
-			   << time.hours() << ":"
-			   << setw( 2 ) << setfill ( '0' )
-			   << time.minutes () << ":00";
-			return ss.str ();
-		}
-
+		//////////////////////////////////////////////////////////////////////////
+		// OUTPUT
 
 		void TridentFileFormat::build(
 			ostream& os
@@ -960,39 +984,8 @@ namespace synthese
 		}
 
 
-		string TridentFileFormat::TridentId(
-			const string& peer,
-			const string clazz,
-			const uid& id
-		){
-			stringstream ss;
-			ss << peer << ":" << clazz << ":" << id;
-			return ss.str ();
-		}
-
-
-		string TridentFileFormat::TridentId(
-			const string& peer,
-			const string clazz,
-			const string& s
-		){
-			stringstream ss;
-			ss << peer << ":" << clazz << ":" << s;
-			return ss.str ();
-		}
-
-
-		string TridentFileFormat::TridentId(
-			const string& peer,
-			const string clazz,
-			const Registrable& obj
-		){
-			stringstream ss;
-			ss << peer << ":" << clazz << ":" << obj.getKey();
-			return ss.str ();
-		}
-
-
+		//////////////////////////////////////////////////////////////////////////
+		// INPUT
 
 		void TridentFileFormat::_parse(
 			const path& filePath,
@@ -1020,6 +1013,9 @@ namespace synthese
 				
 			os << "<h2>Trident import of " << clineNameNode.getText() << "</h2>";
 			
+			// Memory of objects created by the import
+			set<RegistryKeyType> createdObjects;
+
 			// Network
 			XMLNode networkNode =  allNode.getChildNode("PTNetwork", 0);
 			XMLNode networkIdNode = networkNode.getChildNode("objectId", 0);
@@ -1054,6 +1050,8 @@ namespace synthese
 				network->setCreatorId(key);
 				network->setKey(TransportNetworkTableSync::getId());
 				_env->getEditableRegistry<TransportNetwork>().add(network);
+
+				createdObjects.insert(network->getKey());
 			}
 			
 			// Commercial lines
@@ -1096,6 +1094,8 @@ namespace synthese
 				}
 				cline->setKey(CommercialLineTableSync::getId());
 				_env->getEditableRegistry<CommercialLine>().add(cline);
+
+				createdObjects.insert(cline->getKey());
 			}
 			
 			// Transport mode
@@ -1157,53 +1157,93 @@ namespace synthese
 					}
 					XMLNode& areaCentroid(itPlace->second);
 					XMLNode addressNode(areaCentroid.getChildNode("address", 0));
-					CityTableSync::SearchResult cityResult(
-						CityTableSync::Search(*_env, optional<string>(), optional<string>(), string(addressNode.getChildNode("countryCode", 0).getText()))
+					string cityCode(
+						addressNode.getChildNode("countryCode", 0).getText()
 					);
-					if(cityResult.empty())
+
+					// Search of the city
+					shared_ptr<const City> city;
+					CityTableSync::SearchResult cityResult(
+						CityTableSync::Search(*_env, optional<string>(), optional<string>(), cityCode)
+					);
+					if(!cityResult.empty())
 					{
-						os << "ERR  : commercial stop point " << stopKey << " with area centroid " << areaNode.getText() << " does not link to a valid city (" << addressNode.getChildNode("countryCode", 0).getText() << ")<br />";
-						failure = true;
-						continue;
+						city = cityResult.front();
 					}
-					shared_ptr<const City> city(cityResult.front());
+					else
+					{
+						// If no city was found, attempting to find an alias with the right code
+						CityAliasTableSync::SearchResult cityAliasResult(
+							CityAliasTableSync::Search(*_env, optional<RegistryKeyType>(), cityCode)
+						);
 
+						if(cityAliasResult.empty())
+						{
+							os << "ERR  : commercial stop point " << stopKey << " with area centroid " << areaNode.getText() << " does not link to a valid city (" << addressNode.getChildNode("countryCode", 0).getText() << ")<br />";
+							failure = true;
+							continue;
+						}
 
+						city = _env->getSPtr(cityAliasResult.front()->getCity());
+					}
+
+					// Search of an existing connection place with the same code
+					shared_ptr<PublicTransportStopZoneConnectionPlace> curStop;
 					ConnectionPlaceTableSync::SearchResult cstops(
 						ConnectionPlaceTableSync::Search(
 							*_env,
 							optional<RegistryKeyType>(),
 							logic::indeterminate,
 							stopKey,
+							optional<string>(),
 							false
 					)	);
 					if(cstops.size() > 1)
 					{
 						os << "WARN : more than one stop with key" << stopKey << "<br />";
 					}
-
-					shared_ptr<PublicTransportStopZoneConnectionPlace> curStop;
-					if(cstops.empty())
+					if(!cstops.empty())
 					{
-						// Commercial stop point creation with some default values
-						curStop.reset(new PublicTransportStopZoneConnectionPlace);
-						curStop->setCodeBySource(stopKey);
-						curStop->setAllowedConnection(true);
-						curStop->setDefaultTransferDelay(minutes(8));
-						curStop->setKey(ConnectionPlaceTableSync::getId());
-						_env->getEditableRegistry<PublicTransportStopZoneConnectionPlace>().add(curStop);
+						// Load existing commercial stop point
+						curStop = cstops.front();
 
-						os << "CREA : Creation of the commercial stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
+						os << "LOAD : link between stops by code " << stopKey << " (" << nameNode.getText() << ") and "
+							<< curStop->getKey() << " (" << curStop->getFullName() << ")<br />";
 					}
 					else
 					{
-						// Load existing commercial stop point
-						RegistryKeyType stopId(cstops.front()->getKey());
-						curStop = ConnectionPlaceTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL);
-				
-						os << "LOAD : link between stops " << stopKey << " (" << nameNode.getText() << ") and "
-							<< curStop->getKey() << " (" << curStop->getFullName() << ")<br />";
+						ConnectionPlaceTableSync::SearchResult cstops(
+							ConnectionPlaceTableSync::Search(
+								*_env,
+								city->getKey(),
+								logic::indeterminate,
+								optional<string>(),
+								string(nameNode.getText()),
+								false
+						)	);
+						if(!cstops.empty())
+						{
+							curStop = cstops.front();
+
+							os << "LOAD : link between stops by city and name " << stopKey << " (" << nameNode.getText() << ") and "
+								<< curStop->getKey() << " (" << curStop->getFullName() << ")<br />";
+						}
+						else
+						{
+							// Commercial stop point creation with some default values
+							curStop.reset(new PublicTransportStopZoneConnectionPlace);
+							curStop->setCodeBySource(stopKey);
+							curStop->setAllowedConnection(true);
+							curStop->setDefaultTransferDelay(_defaultTransferDuration);
+							curStop->setKey(ConnectionPlaceTableSync::getId());
+							_env->getEditableRegistry<PublicTransportStopZoneConnectionPlace>().add(curStop);
+
+							os << "CREA : Creation of the commercial stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
+
+							createdObjects.insert(curStop->getKey());
+						}
 					}
+
 					curStop->setName(nameNode.getText());
 					curStop->setCity(city.get());
 
@@ -1272,6 +1312,8 @@ namespace synthese
 					_env->getEditableRegistry<PhysicalStop>().add(curStop);
 
 					os << "CREA : Creation of the physical stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
+
+					createdObjects.insert(curStop->getKey());
 				}
 				else
 				{
@@ -1426,6 +1468,7 @@ namespace synthese
 					route->setDataSource(_dataSource);
 					route->setKey(LineTableSync::getId());
 					_env->getEditableRegistry<Line>().add(route);
+					createdObjects.insert(route->getKey());
 					
 					int rank(0);
 					BOOST_FOREACH(PhysicalStop* stop, routeStops)
@@ -1516,6 +1559,8 @@ namespace synthese
 					services[keyNode.getText()] = service.get();
 					
 					os << "CREA : Creation of service " << service->getServiceNumber() << " for " << keyNode.getText() << " (" << deps[0] << ") on route " << line->getKey() << " (" << line->getName() << ")<br />";
+
+					createdObjects.insert(service->getKey());
 				}
 				else
 				{
@@ -1539,10 +1584,16 @@ namespace synthese
 				for(int serviceRank(0); serviceRank < servicesNumber; ++serviceRank)
 				{
 					XMLNode serviceNode(calendarNode.getChildNode("vehicleJourneyId", serviceRank));
-					calendarServices.push_back(services[serviceNode.getText()]);
+					map<string, ScheduledService*>::const_iterator its(services.find(serviceNode.getText()));
+					if(its == services.end() || its->second == NULL)
+					{
+						continue;
+					}
+					calendarServices.push_back(its->second);
 				}
 
 
+				vector<date> calendarDates;
 				for(int dayRank(0); dayRank < daysNumber; ++dayRank)
 				{
 					XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
@@ -1551,18 +1602,117 @@ namespace synthese
 					{
 						continue;
 					}
+					calendarDates.push_back(d);
+				}
 
+				if(calendarDates.empty())
+				{
+					// Clean useless services
 					BOOST_FOREACH(ScheduledService* service, calendarServices)
 					{
-						shared_ptr<ServiceDate> sd(new ServiceDate);
-						sd->setService(service);
-						sd->setDate(d);
-						sd->setKey(ServiceDateTableSync::getId());
-						_serviceDates.push_back(sd);
+						if(createdObjects.find(service->getKey()) != createdObjects.end())
+						{
+							_env->getEditableRegistry<ScheduledService>().remove(service->getKey());
+						}
+					}
+				}
+				else
+				{
+					BOOST_FOREACH(const date& d, calendarDates)
+					{
+						BOOST_FOREACH(ScheduledService* service, calendarServices)
+						{
+							shared_ptr<ServiceDate> sd(new ServiceDate);
+							sd->setService(service);
+							sd->setDate(d);
+							sd->setKey(ServiceDateTableSync::getId());
+							_serviceDates.push_back(sd);
+						}
 					}
 				}
 			}
-			
+
+			// ConnectionLink / Junction
+			if(_importJunctions)
+			{
+				int connectionsNumber(allNode.nChildNode("ConnectionLink"));
+				for(int connectionRank(0); connectionRank < connectionsNumber; ++connectionRank)
+				{
+					// Connection node
+					XMLNode connectionNode(allNode.getChildNode("ConnectionLink", connectionRank));
+					
+					// Connection properties
+					XMLNode key(connectionNode.getChildNode("objectId", 0));
+					XMLNode startNode(connectionNode.getChildNode("startOfLink", 0));
+					XMLNode endNode(connectionNode.getChildNode("endOfLink", 0));
+					XMLNode distanceNode(connectionNode.getChildNode("linkDistance", 0));
+					XMLNode durationNode(connectionNode.getChildNode("defaultDuration", 0));
+
+					// Fetching the stops
+					PhysicalStopTableSync::SearchResult startStops(
+						PhysicalStopTableSync::Search(
+							*_env, optional<RegistryKeyType>(), string(startNode.getText()), 0, 1
+					)	);
+					PhysicalStopTableSync::SearchResult endStops(
+						PhysicalStopTableSync::Search(
+							*_env, optional<RegistryKeyType>(), string(endNode.getText()), 0, 1
+					)	);
+					if(startStops.empty() || endStops.empty())
+					{
+						os << "WARN : Connection link " << key.getText() << " rejected because of inexistent stop (" << startNode.getText() << "/" << endNode.getText() << ")<br />";
+						continue;
+					}
+					shared_ptr<PhysicalStop> startStop = startStops.front();
+					shared_ptr<PhysicalStop> endStop = endStops.front();
+
+					// Internal or external connection
+					if(startStop->getConnectionPlace() == endStop->getConnectionPlace())
+					{
+						// Internal transfer delay, updated only if the import handles the stops
+						if(!_importStops)
+						{
+							continue;
+						}
+
+						const_cast<PublicTransportStopZoneConnectionPlace*>(startStop->getConnectionPlace())->addTransferDelay(
+							startStop->getKey(),
+							endStop->getKey(),
+							FromXsdDuration(durationNode.getText())
+						);
+					}
+					else
+					{
+						// Junction
+						JunctionTableSync::SearchResult junctions(
+							JunctionTableSync::Search(
+								*_env, startStop->getKey(), endStop->getKey()
+						)	);
+
+						shared_ptr<Junction> junction;
+						if(!junctions.empty())
+						{
+							junction = junctions.front();
+							os << "LOAD : Load of junction " << key.getText() << "<br />";
+						}
+						else
+						{
+							junction.reset(new Junction);
+							junction->setKey(JunctionTableSync::getId());
+							os << "CREA : Creation of junction " << key.getText() << "<br />";
+						}
+						
+
+						junction->setStops(
+							startStop.get(),
+							endStop.get(),
+							lexical_cast<double>(distanceNode.getText()),
+							FromXsdDuration(durationNode.getText()),
+							false
+						);
+					}
+				}
+			}
+
 			os << "<b>SUCCESS : Data loaded</b><br />";
 		}
 		
@@ -1598,7 +1748,7 @@ namespace synthese
 			{
 				LineStopTableSync::Save(lineStop.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<ScheduledService>::value_type service, _env->getRegistry<ScheduledService>())
+			BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env->getRegistry<ScheduledService>())
 			{
 				ServiceDateTableSync::DeleteDates(service.second->getKey(), _startDate, transaction);
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
@@ -1607,13 +1757,102 @@ namespace synthese
 			{
 				ServiceDateTableSync::Save(date.get(), transaction);
 			}
-			
-			//TODO cleaning : delete services without dates and routes without service
+			BOOST_FOREACH(const Registry<Junction>::value_type& junction, _env->getRegistry<Junction>())
+			{
+				JunctionTableSync::Save(junction.second.get(), transaction);
+			}
+
 			transaction.run();					
 	
 			os << "<b>SUCCESS : Data saved.</b><br />";
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		// HELPERS
+
+		string TridentFileFormat::TridentId(
+			const string& peer,
+			const string clazz,
+			const uid& id
+		){
+			stringstream ss;
+			ss << peer << ":" << clazz << ":" << id;
+			return ss.str ();
+		}
+
+
+		string TridentFileFormat::TridentId(
+			const string& peer,
+			const string clazz,
+			const string& s
+		){
+			stringstream ss;
+			ss << peer << ":" << clazz << ":" << s;
+			return ss.str ();
+		}
+
+
+		string TridentFileFormat::TridentId(
+			const string& peer,
+			const string clazz,
+			const Registrable& obj
+		){
+			stringstream ss;
+			ss << peer << ":" << clazz << ":" << obj.getKey();
+			return ss.str ();
+		}
+
+		string ToXsdDaysDuration (date_duration daysDelay)
+		{
+			stringstream s;
+			s << "P" << daysDelay.days() << "D";
+			return s.str();
+		}
+
+
+		string ToXsdDuration(posix_time::time_duration duration)
+		{
+			stringstream s;
+			s << "PT";
+			if(duration.hours() > 0)
+				s << duration.hours() << "H";
+			s << duration.minutes() << "M";
+			return s.str();
+		}
+
+
+		time_duration FromXsdDuration(const std::string& text)
+		{
+			string::const_iterator t(find(text.begin(), text.end(), 'T'));
+			if(t == text.end())
+			{
+				return time_duration(not_a_date_time);
+			}
+			time_duration result(minutes(0));
+			string::const_iterator h(find(t, text.end(), 'H'));
+			if(h != text.end())
+			{
+				result += hours(lexical_cast<int>(text.substr((t-text.begin())+1, (h-t)-1)));
+				t = h;
+			}
+			string::const_iterator m(find(t, text.end(), 'M'));
+			if(m != text.end())
+			{
+				result += minutes(lexical_cast<int>(text.substr((t-text.begin())+1, (m-t)-1)));
+			}
+			return result;
+		}
+
+
+		string ToXsdTime (const time_duration& time)
+		{
+			stringstream ss;
+			ss << setw( 2 ) << setfill ( '0' )
+				<< time.hours() << ":"
+				<< setw( 2 ) << setfill ( '0' )
+				<< time.minutes () << ":00";
+			return ss.str ();
+		}
 
 
 		TridentFileFormat::~TridentFileFormat()
@@ -1627,35 +1866,6 @@ namespace synthese
 				(value > 0) ?
 				lexical_cast<string>(value) :
 				string();
-		}
-
-
-
-		server::ParametersMap TridentFileFormat::_getParametersMap(bool import) const
-		{
-			ParametersMap result;
-			if(import)
-			{
-				result.insert(PARAMETER_IMPORT_STOPS, _importStops);
-			}
-			if(_startDate < day_clock::local_day())
-			{
-				date_duration du(day_clock::local_day() - _startDate);
-				result.insert(PARAMETER_WITH_OLD_DATES, static_cast<int>(du.days()));
-			}
-			return result;
-		}
-
-
-
-		void TridentFileFormat::_setFromParametersMap(const ParametersMap& map, bool import)
-		{
-			if(import)
-			{
-				_importStops = map.getDefault<bool>(PARAMETER_IMPORT_STOPS, false);
-			}
-			_startDate = day_clock::local_day();
-			_startDate -= days(map.getDefault<int>(PARAMETER_WITH_OLD_DATES, 0));
 		}
 
 

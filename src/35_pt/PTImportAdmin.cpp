@@ -148,7 +148,9 @@ namespace synthese
 				stream << t.cell("Source de données", t.getForm().getSelectInput(ImportFunction::PARAMETER_DATA_SOURCE, sources, optional<shared_ptr<DataSource> >()));
 				stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(ImportFunction::PARAMETER_DO_IMPORT, false));
 				stream << t.cell("Import arrêts", t.getForm().getOuiNonRadioInput(TridentFileFormat::PARAMETER_IMPORT_STOPS, false));
+				stream << t.cell("Import transferts", t.getForm().getOuiNonRadioInput(TridentFileFormat::PARAMETER_IMPORT_JUNCTIONS, false));
 				stream << t.cell("Importer dates passées (nombre de jours)", t.getForm().getTextInput(TridentFileFormat::PARAMETER_WITH_OLD_DATES, "0"));
+				stream << t.cell("Temps de correspondance par défaut (minutes)", t.getForm().getTextInput(TridentFileFormat::PARAMETER_DEFAULT_TRANSFER_DURATION, "8"));
 				stream << t.title("Données");
 				stream << t.cell("Ligne", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH, string()));
 				stream << t.close();
