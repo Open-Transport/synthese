@@ -105,11 +105,12 @@ namespace synthese
 				PathClass*			getPathClass()	const { return _pathClass; }
 			//@}
 
-			//! @name Query methods.
+			//! @name Services.
 			//@{
-//				const Service*				getService (int serviceIndex) const;
 
 				const Edge*					getEdge (int index) const;
+
+				Edge*	getLastEdge()	const;
 
 				virtual bool isRoad() const;
 				virtual bool isPedestrianMode() const = 0;
@@ -129,14 +130,41 @@ namespace synthese
 					int toEdgeIndex = -1
 				) const;
 
-				Edge*	getLastEdge()	const;
 				
 				virtual bool isActive(const boost::gregorian::date& date) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Compares two paths on the served vertices or hubs.
+				/// @param other other path to compare with
+				/// @param considerVertices if true the served vertices must be identical, if false the served hubs must be identical
+				/// @param considerDepartureArrival if true the departure and arrival authorizations must be the same for each compared edge
+				/// @return true if the two paths are identical
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				bool sameContent(
+					const Path& other,
+					bool considerVertices,
+					bool considerDepartureArrival
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the current path includes an other path by comparison on the served vertices or hubs.
+				/// @param other other path to compare with
+				/// @param considerVertices if true the served vertices must be identical, if false the served hubs must be identical
+				/// @return true if the current path offers all relations offered by the second one
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				bool includes(const Path& other, bool considerVertices) const;
 			//@}
 			
-			//! @name Update methods.
+			//! @name Modifiers.
 			//@{
-
 				/** Inserts an edge in the path.
 					@param edge The edge to add
 					@param autoShift Shift the following edges if an edge with the same rank already exists, else throw an Exception. The value of autoShift is the distance between the edge and the next existing one.

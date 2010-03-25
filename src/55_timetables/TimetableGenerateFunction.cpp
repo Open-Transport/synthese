@@ -26,10 +26,18 @@
 #include "Request.h"
 #include "TimetableGenerateFunction.h"
 #include "TimetableTableSync.h"
+#include "LineTableSync.h"
 #include "Timetable.h"
+#include "TimetableRow.h"
 #include "Interface.h"
 #include "TimetableInterfacePage.h"
 #include "Env.h"
+#include "City.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "Line.h"
+#include "CalendarTemplate.h"
+#include "LineStop.h"
+#include "PhysicalStop.h"
 
 using namespace std;
 using namespace boost;
@@ -40,13 +48,22 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace interfaces;
+	using namespace env;
+	using namespace geography;
+	using namespace calendar;
+	using namespace graph;
+	using namespace transportwebsite;
 
-	template<> const string util::FactorableTemplate<Function,timetables::TimetableGenerateFunction>::FACTORY_KEY("TimetableGenerateFunction");
+	template<> const string util::FactorableTemplate<timetables::TimetableGenerateFunction::_FunctionWithSite,timetables::TimetableGenerateFunction>::FACTORY_KEY("TimetableGenerateFunction");
 	
 	namespace timetables
 	{
+		const string TimetableGenerateFunction::PARAMETER_CALENDAR_ID("cid");
+		const string TimetableGenerateFunction::PARAMETER_STOP_PREFIX("stop");
+		const string TimetableGenerateFunction::PARAMETER_CITY_PREFIX("city");
+
 		TimetableGenerateFunction::TimetableGenerateFunction():
-			FactorableTemplate<server::Function,TimetableGenerateFunction>()
+			FactorableTemplate<TimetableGenerateFunction::_FunctionWithSite,TimetableGenerateFunction>()
 		{
 			setEnv(shared_ptr<Env>(new Env));
 		}
@@ -55,30 +72,146 @@ namespace synthese
 
 		ParametersMap TimetableGenerateFunction::_getParametersMap() const
 		{
-			ParametersMap map;
-			if(_timetable.get()) map.insert(Request::PARAMETER_OBJECT_ID, _timetable->getKey());
+			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
+			if(_timetable.get())
+			{
+				if(_line.get())
+				{
+					map.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
+					if(_timetable->getBaseCalendar())
+					{
+						map.insert(PARAMETER_CALENDAR_ID, _timetable->getBaseCalendar()->getKey());
+					}
+				}
+				else
+				{
+					if(_timetable->getKey() > 0)
+					{
+						map.insert(Request::PARAMETER_OBJECT_ID, _timetable->getKey());
+					}
+					else
+					{
+						if(_timetable->getBaseCalendar())
+						{
+							map.insert(PARAMETER_CALENDAR_ID, _timetable->getBaseCalendar()->getKey());
+						}
+						size_t rank(0);
+						BOOST_FOREACH(const TimetableRow& row, _timetable->getRows())
+						{
+							map.insert(
+								PARAMETER_CITY_PREFIX + lexical_cast<string>(rank++),
+								static_cast<const PublicTransportStopZoneConnectionPlace*>(row.getPlace())->getCity()->getName()
+							);
+							map.insert(
+								PARAMETER_STOP_PREFIX + lexical_cast<string>(rank++),
+								static_cast<const PublicTransportStopZoneConnectionPlace*>(row.getPlace())->getName()
+							);
+						}
+					}
+				}
+			}
 			return map;
 		}
 
+
+
 		void TimetableGenerateFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				_timetable = TimetableTableSync::Get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID), *_env);
-			}
-			catch(ObjectNotFoundException<Timetable>)
-			{
-				throw RequestException("No such timetable");
-			}
+			_FunctionWithSite::_setFromParametersMap(map);
 
-			if(!_timetable->getInterface())
+			// Way 1 : pre-configured timetable
+			if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == TimetableTableSync::TABLE.ID)
 			{
-				throw RequestException("This timetable has not interface");
-			}
+				try
+				{
+					_timetable = TimetableTableSync::Get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID), *_env);
+				}
+				catch(ObjectNotFoundException<Timetable>)
+				{
+					throw RequestException("No such timetable");
+				}
 
-			if(!_timetable->getInterface()->hasPage<TimetableInterfacePage>())
+				if(!_timetable->getInterface())
+				{
+					throw RequestException("This timetable has not interface");
+				}
+				// Control
+				if(!_timetable->getInterface()->hasPage<TimetableInterfacePage>())
+				{
+					throw RequestException("This timetable uses an incompatible interface");
+				}
+			}
+			else
 			{
-				throw RequestException("This timetable uses an incompatible interface");
+				if(	!_site.get() ||
+					!_site->getInterface() ||
+					!_timetable->getInterface()->hasPage<TimetableInterfacePage>()
+				){
+					throw RequestException("A site with valid interface must be defined");
+				}
+				shared_ptr<Timetable> timetable(new Timetable);
+				timetable->setInterface(_site->getInterface());
+
+				try
+				{
+					timetable->setBaseCalendar(
+						Env::GetOfficialEnv().get<CalendarTemplate>(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID)).get()
+					);
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>&)
+				{
+					throw RequestException("No such calendar");
+				}
+				
+
+				// Way 2 : line time table
+				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == LineTableSync::TABLE.ID)
+				{
+					try
+					{
+						_line = Env::GetOfficialEnv().get<Line>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+					}
+					catch(ObjectNotFoundException<Line>&)
+					{
+						throw RequestException("No such line route");
+					}
+					timetable->addAuthorizedLine(_line->getCommercialLine());
+					
+					size_t rank(0);
+					BOOST_FOREACH(const Edge* edge, _line->getEdges())
+					{
+						TimetableRow row;
+						row.setIsArrival(edge->isArrival());
+						row.setIsDeparture(edge->isDeparture());
+						row.setPlace(static_cast<const LineStop*>(edge)->getPhysicalStop()->getConnectionPlace());
+						row.setRank(rank++);
+						timetable->addRow(row);
+					}
+				}
+				else // Way 3 : customized timetable
+				{
+					for(size_t rank(0);
+						!map.getDefault<string>(PARAMETER_CITY_PREFIX + lexical_cast<string>(rank)).empty() &&
+						!map.getDefault<string>(PARAMETER_STOP_PREFIX + lexical_cast<string>(rank)).empty();
+						++rank
+					){
+						Site::ExtendedFetchPlaceResult placeResult(
+							_site->extendedFetchPlace(
+								map.get<string>(PARAMETER_CITY_PREFIX + lexical_cast<string>(rank)),
+								map.get<string>(PARAMETER_STOP_PREFIX + lexical_cast<string>(rank))
+						)	);
+						TimetableRow row;
+						if(!dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(placeResult.placeResult.value))
+						{
+							throw RequestException("No such place at rank "+ lexical_cast<string>(rank));
+						}
+						row.setPlace(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(placeResult.placeResult.value));
+						row.setRank(rank);
+						timetable->addRow(row);
+					}
+				}
+
+				_timetable = const_pointer_cast<const Timetable>(timetable);
 			}
 		}
 
@@ -103,13 +236,6 @@ namespace synthese
 		std::string TimetableGenerateFunction::getOutputMimeType() const
 		{
 			return "text/html";
-		}
-
-
-
-		void TimetableGenerateFunction::setTimetable( boost::shared_ptr<const Timetable> value )
-		{
-			_timetable = value;
 		}
 	}
 }

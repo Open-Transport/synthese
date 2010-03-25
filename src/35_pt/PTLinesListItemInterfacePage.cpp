@@ -24,6 +24,7 @@
 
 #include "PTLinesListItemInterfacePage.hpp"
 #include "CommercialLine.h"
+#include "TransportNetwork.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -66,6 +67,8 @@ namespace synthese
 			pv.push_back(object.getColor() ? object.getColor()->toString() : string()); //4
 			pv.push_back(lexical_cast<string>(rank)); //5
 			pv.push_back(lexical_cast<string>(rank % 2)); //6
+			pv.push_back(lexical_cast<string>(object.getNetwork()->getKey()));//7
+			pv.push_back(object.getNetwork()->getName());//8
 
 			InterfacePage::_display(
 				stream

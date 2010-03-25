@@ -75,7 +75,6 @@
 #include "DisplayScreenSupervisionFunction.h"
 #include "DisplayScreenContentFunction.h"
 #include "AlarmTestOnDisplayScreenFunction.h"
-#include "DisplayScreenPhysicalStopFunction.h"
 #include "DisplayGetNagiosStatusFunction.h"
 #include "CentreonConfigExportFunction.h"
 #include "CPUGetWiredScreensFunction.h"

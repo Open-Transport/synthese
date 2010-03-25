@@ -26,7 +26,7 @@
 
 #include "RequestException.h"
 #include "Request.h"
-
+#include "PhysicalStopTableSync.h"
 #include "DisplayScreenContentFunction.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
@@ -50,16 +50,23 @@ namespace synthese
 	using namespace env;
 	using namespace interfaces;
 	using namespace db;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenContentFunction>::FACTORY_KEY("tdg");
 
 	namespace departurestable
 	{
-		const std::string DisplayScreenContentFunction::PARAMETER_DATE = "date";
-		const std::string DisplayScreenContentFunction::PARAMETER_TB = "tb";
-		const std::string DisplayScreenContentFunction::PARAMETER_INTERFACE_ID("i");
+		const string DisplayScreenContentFunction::PARAMETER_DATE = "date";
+		const string DisplayScreenContentFunction::PARAMETER_TB = "tb";
+		const string DisplayScreenContentFunction::PARAMETER_INTERFACE_ID("i");
 		const string DisplayScreenContentFunction::PARAMETER_MAC_ADDRESS("m");
-
+		const string DisplayScreenContentFunction::PARAMETER_OPERATOR_CODE("oc");
+		const string DisplayScreenContentFunction::PARAMETER_ROWS_NUMBER("rn");
+		const string DisplayScreenContentFunction::PARAMETER_CITY_NAME("cn");
+		const string DisplayScreenContentFunction::PARAMETER_STOP_NAME("sn");
+		
+		
+		
 		ParametersMap DisplayScreenContentFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -68,43 +75,103 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void DisplayScreenContentFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				optional<RegistryKeyType> id;
-				// Screen
-				id = map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID);
+				RegistryKeyType id(
+					map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0)
+				);
 				if (!id)
 				{
-					id = map.getOptional<RegistryKeyType>(PARAMETER_TB);
+					id = map.getDefault<RegistryKeyType>(PARAMETER_TB, 0);
 				}
-				if(id)
+				
+				// Way 1 : pre-configured display screen
+				
+				// 1.1 by id
+				if (decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
 				{
-					if (decodeTableId(*id) == ConnectionPlaceTableSync::TABLE.ID)
-					{
-						DisplayScreen* screen(new DisplayScreen);
-						_type.reset(new DisplayType);
-						_type->setRowNumber(10);
-						_type->setDisplayInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID)).get());
-						screen->setLocalization(Env::GetOfficialEnv().getRegistry<PublicTransportStopZoneConnectionPlace>().get(*id).get());
-						screen->setAllPhysicalStopsDisplayed(true);					
-						screen->setType(_type.get());
-						_screen.reset(screen);
-					}
-					else if (decodeTableId(*id) == DisplayScreenTableSync::TABLE.ID)
-					{
-						_screen = DisplayScreenTableSync::Get(*id, *_env);
-					}
-					else
-						throw RequestException("Not a display screen nor a connection place");
+					_screen = DisplayScreenTableSync::Get(id, *_env);
+				}
+				
+				// 1.2 by mac address
+				else if(!map.getDefault<string>(PARAMETER_MAC_ADDRESS).empty())
+				{
+					_screen = DisplayScreenTableSync::GetByMACAddress(
+						*_env,
+						map.get<string>(PARAMETER_MAC_ADDRESS),
+						UP_LINKS_LOAD_LEVEL
+					);
 				}
 				else
 				{
-					string macAddress(map.get<string>(PARAMETER_MAC_ADDRESS));
-					_screen = DisplayScreenTableSync::GetByMACAddress(*_env, macAddress, UP_LINKS_LOAD_LEVEL);
-				}
+					DisplayScreen* screen(new DisplayScreen);
+					_type.reset(new DisplayType);
+					_type->setRowNumber(map.getDefault<size_t>(PARAMETER_ROWS_NUMBER, 10));
+					_type->setDisplayInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID)).get());
+					screen->setType(_type.get());
 
+					// Way 3 : physical stop
+					
+					// 3.1 by id
+					if(decodeTableId(id) == PhysicalStopTableSync::TABLE.ID)
+					{
+						shared_ptr<const PhysicalStop> stop(
+							Env::GetOfficialEnv().get<PhysicalStop>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
+						);
+
+						screen->setLocalization(stop->getConnectionPlace());
+						screen->setAllPhysicalStopsDisplayed(false);
+						screen->addPhysicalStop(stop.get());
+					}
+					
+					// 3.2 by operator code
+					else if(!map.getDefault<string>(PARAMETER_OPERATOR_CODE).empty())
+					{
+						
+						string oc(map.get<string>(PARAMETER_OPERATOR_CODE));
+						shared_ptr<const PublicTransportStopZoneConnectionPlace> place(
+							Env::GetOfficialEnv().get<PublicTransportStopZoneConnectionPlace>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
+						);
+						screen->setLocalization(place.get());
+						screen->setAllPhysicalStopsDisplayed(false);
+						const ArrivalDepartureTableGenerator::PhysicalStops& stops(place->getPhysicalStops());
+						BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, stops)
+						{
+							if(it.second->getCodeBySource() == oc)
+								screen->addPhysicalStop(it.second);
+						}
+					}
+
+					// Way 2 : connection place
+				
+					// 2.1 by id
+					else if(decodeTableId(id) == ConnectionPlaceTableSync::TABLE.ID)
+					{
+						screen->setLocalization(Env::GetOfficialEnv().getRegistry<PublicTransportStopZoneConnectionPlace>().get(id).get());
+						screen->setAllPhysicalStopsDisplayed(true);
+					}
+					
+					// 2.2 by name
+					else if (!map.getDefault<string>(PARAMETER_CITY_NAME).empty() && !map.getDefault<string>(PARAMETER_STOP_NAME).empty())
+					{
+						screen->setAllPhysicalStopsDisplayed(true);
+						
+					}
+
+
+					else // Failure
+					{
+						throw RequestException("Not a display screen nor a connection place");
+					}
+
+
+					_screen.reset(screen);
+				}
+				
 				// Date
 				if(!map.getDefault<string>(PARAMETER_DATE).empty())
 				{
@@ -114,6 +181,14 @@ namespace synthese
 			catch (ObjectNotFoundException<DisplayScreen> e)
 			{
 				throw RequestException("Display screen not found "+ e.getMessage());
+			}
+			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+			{
+				throw RequestException("Connection place not found "+ e.getMessage());
+			}
+			catch (ObjectNotFoundException<PhysicalStop>& e)
+			{
+				throw RequestException("Physical stop not found "+ e.getMessage());
 			}
 		}
 

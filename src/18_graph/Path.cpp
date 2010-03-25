@@ -414,6 +414,58 @@ namespace synthese
 		}
 
 
+
+		bool Path::sameContent( const Path& other, bool considerVertices, bool considerDepartureArrival) const
+		{
+			if(_edges.size() != other._edges.size())
+			{
+				return false;
+			}
+
+			Edges::const_iterator otherEdgeIt(other._edges.begin());
+			BOOST_FOREACH(const Edge* edge, _edges)
+			{
+				const Edge& otherEdge(**otherEdgeIt);
+
+				if(	(considerVertices && edge->getFromVertex() != otherEdge.getFromVertex()) ||
+					edge->getFromVertex()->getHub() != otherEdge.getFromVertex()->getHub() ||
+					(considerDepartureArrival && edge->isArrival() != otherEdge.isArrival()) ||
+					(considerDepartureArrival && edge->isDeparture() != otherEdge.isDeparture())
+				){
+					return false;
+				}
+
+				++otherEdgeIt;
+			}
+
+			return true;
+		}
+
+
+
+		bool Path::includes( const Path& other, bool considerVertices ) const
+		{
+			Edges::const_iterator edgeIt(_edges.begin());
+			BOOST_FOREACH(const Edge* edge, other._edges)
+			{
+				for(;
+					edgeIt != _edges.end() &&
+					(
+						(considerVertices && edge->getFromVertex() != (*edgeIt)->getFromVertex()) ||
+						edge->getFromVertex()->getHub() != (*edgeIt)->getFromVertex()->getHub() ||
+						edge->isArrival() != (*edgeIt)->isArrival() ||
+						edge->isDeparture() != (*edgeIt)->isDeparture()
+					);
+					++edgeIt) ;
+				if(edgeIt == _edges.end())
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+
 		bool cmpService::operator ()(const Service *s1, const Service *s2) const
 		{
 			return (s1->getDepartureSchedule (false,0) < s2->getDepartureSchedule (false,0))

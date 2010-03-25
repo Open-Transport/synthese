@@ -58,6 +58,8 @@ namespace synthese
 				- 4 : Line color
 				- 5 : Item rank
 				- 6 : Item rank is odd
+				- 7 : Network id
+				- 8 : Network name
 
 			Object : CommercialLine
 		*/

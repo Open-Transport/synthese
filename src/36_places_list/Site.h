@@ -92,7 +92,7 @@ namespace synthese
 
 			typedef std::vector<HourPeriod> Periods;
 			
-			typedef lexmatcher::LexicalMatcher<const geography::City*> CitiesMatcher;
+			typedef lexmatcher::LexicalMatcher<geography::City*> CitiesMatcher;
 
 			typedef std::map<std::size_t,RollingStockFilter*> RollingStockFilters;
 			
@@ -157,9 +157,9 @@ namespace synthese
 				int								getMaxTransportConnectionsCount()	const;
 				const Periods&					getPeriods()	const;
 				const std::string&				getName()							const;
-				boost::gregorian::date_duration				getUseDatesRange()					const;
-				const boost::gregorian::date&				getStartDate()						const;
-				const boost::gregorian::date&				getEndDate()						const;
+				boost::gregorian::date_duration	getUseDatesRange()					const;
+				const boost::gregorian::date&	getStartDate()						const;
+				const boost::gregorian::date&	getEndDate()						const;
 				const CitiesMatcher&			getCitiesMatcher () const;
 				const RollingStockFilters&		getRollingStockFilters() const;
 			//@}
@@ -168,7 +168,7 @@ namespace synthese
 			//@{
 				void addHourPeriod(const HourPeriod& hourPeriod);
 				void clearHourPeriods();
-				void addCity(const geography::City* value);
+				void addCity(geography::City* value);
 				void addRollingStockFilter(RollingStockFilter& value);
 				void removeRollingStockFilter(RollingStockFilter& value);
 				void clearRollingStockFilters();

@@ -1616,6 +1616,7 @@ namespace synthese
 							sd->setDate(d);
 							sd->setKey(ServiceDateTableSync::getId());
 							_serviceDates.push_back(sd);
+							service->setActive(d);
 						}
 					}
 				}

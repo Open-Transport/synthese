@@ -57,7 +57,9 @@ synthese::departurestable::DisplayScreenTransferDestinationRemoveAction::integra
 synthese::departurestable::DisplayScreenContentFunction::integrate();
 synthese::departurestable::DisplayScreenSupervisionFunction::integrate();
 synthese::departurestable::AlarmTestOnDisplayScreenFunction::integrate();
-synthese::departurestable::DisplayScreenPhysicalStopFunction::integrate();
+synthese::departurestable::DisplayGetNagiosStatusFunction::integrate();
+synthese::departurestable::CentreonConfigExportFunction::integrate();
+synthese::departurestable::CPUGetWiredScreensFunction::integrate();
 
 synthese::departurestable::ArrivalDepartureTableRight::integrate();
 synthese::departurestable::DisplayMaintenanceRight::integrate();
@@ -67,10 +69,6 @@ synthese::departurestable::DisplayMaintenanceLog::integrate();
 
 synthese::departurestable::DisplayScreenAlarmRecipient::integrate();
 
-synthese::departurestable::DisplayGetNagiosStatusFunction::integrate();
-
-synthese::departurestable::CentreonConfigExportFunction::integrate();
-synthese::departurestable::CPUGetWiredScreensFunction::integrate();
 
 // Registries
 synthese::util::Env::Integrate<synthese::departurestable::DisplayScreen>();

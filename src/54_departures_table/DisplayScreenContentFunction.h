@@ -36,8 +36,85 @@ namespace synthese
 		class DisplayScreen;
 		class DisplayType;
 
-		/** DisplayScreenContentFunction class.
+		/** Arrival/departures table generator function.
 			@ingroup m54Functions refFunctions
+			@author Hugues Romain
+			@date 2002
+			
+			General parameters :
+			<ul>
+				<li>date (optional) : date of search (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
+			</ul>
+			
+			The content can be specified in 3 different ways :
+			
+			<h3>Usage 1 : Loading pre-configured display screen</h3>
+	
+			Remark : this is the only way to configure several parameters like the generation algorithm.
+			
+			The display screen can be specified by two ways :
+
+			<h4>Usage 1.1 by id
+			Parameters :
+			<ul>
+				<li>roid / tb : id of the pre-configured display screen</li>
+			</ul>
+
+			<h4>Usage 1.2 by mac address
+			Parameters :
+			<ul>
+				<li>m : MAC address of the display screen</li>
+			</ul>
+			
+			<h3>Usage 2 : Generating from a connection place</h3>
+			
+			General parameters :
+			<ul>
+				<li>i : id of display interface</li>
+				<li>rn : table rows number</li>
+			</ul>
+			
+			The connection place can be specified by two ways :
+			
+			<h4>Usage 2.1 by id</h4>
+			
+			Parameters :
+			<ul>
+				<li>roid : id of the connection place</li>
+			</ul>
+			
+			<h4>Usage 2.2 : by name</h4>
+			
+			Parameters :
+			<ul>
+				<li>cn : name of the city</li>
+				<li>sn : name of the stop</li>
+			</ul>
+			
+			<h3>Usage 3 : Generating from a physical stop</h3>
+						
+			General parameters :
+			<ul>
+				<li>i : id of display interface</li>
+				<li>rn : table rows number</li>
+			</ul>
+			
+			The physical stop can be specified by two ways :
+			
+			<h4>Usage 3.1 by id</h4>
+			
+			Parameters :
+			<ul>
+				<li>roid : id of the physical stop</li>
+			</ul>
+			
+			<h4>Usage 3.2 : by operator code</h4>
+			
+			Parameters :
+			<ul>
+				<li>roid : id of the connection place which belongs the stop</li>
+				<li>oc : operator code of the physical stop</li>
+			</ul>
 		*/
 		class DisplayScreenContentFunction : public util::FactorableTemplate<server::Function,DisplayScreenContentFunction>
 		{
@@ -45,7 +122,11 @@ namespace synthese
 			static const std::string PARAMETER_TB;
 			static const std::string PARAMETER_INTERFACE_ID;
 			static const std::string PARAMETER_MAC_ADDRESS;
-			
+			static const std::string PARAMETER_OPERATOR_CODE;
+			static const std::string PARAMETER_ROWS_NUMBER;
+			static const std::string PARAMETER_CITY_NAME;
+			static const std::string PARAMETER_STOP_NAME;
+
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const DisplayScreen>	_screen;
@@ -63,7 +144,9 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Action to run, defined by each subclass.
+			/** Launches the display.
+				@param stream stream to write the output on
+				@param request request which has launched the function
 			*/
 			void run(std::ostream& stream, const server::Request& request) const;
 
@@ -71,7 +154,10 @@ namespace synthese
 
 			virtual std::string getOutputMimeType() const;
 
-			void setScreen(boost::shared_ptr<const DisplayScreen> value);
+			//! @name Setters
+			//@{
+				void setScreen(boost::shared_ptr<const DisplayScreen> value);
+			//@}
 		};
 	}
 }

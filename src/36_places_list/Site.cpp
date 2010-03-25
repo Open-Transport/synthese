@@ -27,7 +27,7 @@
 #include "City.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "AccessParameters.h"
-
+#include "GeographyModule.h"
 #include "LexicalMatcher.h"
 
 #include "01_util/Exception.h"
@@ -269,12 +269,12 @@ namespace synthese
 		
 		const Site::CitiesMatcher& Site::getCitiesMatcher () const
 		{
-			return _citiesMatcher;
+			return _citiesMatcher.size() ? _citiesMatcher : GeographyModule::GetCitiesMatcher();
 		}
 		
 		
 		
-		void Site::addCity(const City* city)
+		void Site::addCity(City* city)
 		{
 			if(!city) return;
 			
@@ -284,7 +284,7 @@ namespace synthese
 			if(it != _citiesMatcher.entries().end())
 			{
 				string oldName(it->first.getSource());
-				const City* oldCity(it->second);
+				City* oldCity(it->second);
 				_citiesMatcher.remove(oldName);
 				_citiesMatcher.add(oldName + " (" + oldCity->getCode().substr(0,2) + ")", oldCity);
 				name += " (" + city->getCode().substr(0,2) + ")";
@@ -317,15 +317,17 @@ namespace synthese
 
 
 
-		Site::ExtendedFetchPlaceResult Site::extendedFetchPlace( const std::string& cityName , const std::string& placeName ) const
-		{
+		Site::ExtendedFetchPlaceResult Site::extendedFetchPlace(
+			const std::string& cityName,
+			const std::string& placeName
+		) const	{
 			ExtendedFetchPlaceResult result;
 
 			if (cityName.empty())
 				throw Exception("Empty city name");
 
 			CitiesMatcher::MatchResult cities(
-				_citiesMatcher.bestMatches(cityName,1)
+				getCitiesMatcher().bestMatches(cityName,1)
 			);
 			if(cities.empty()) throw Exception("An error has occured in city name search");
 			result.cityResult = cities.front();

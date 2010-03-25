@@ -92,6 +92,56 @@ namespace synthese
 			const Request& request
 		) const {
 			
+			set<const Line*> routes;
+			// Selection of routes by same comparison
+			BOOST_FOREACH(const Path* path, _line->getPaths())
+			{
+				bool toInsert(true);
+
+				if(_mergeSameRoutes)
+				{
+					BOOST_FOREACH(const Line* existingRoute, routes)
+					{
+						if(existingRoute->sameContent(*path, false, false))
+						{
+							toInsert = false;
+							break;
+						}
+					}
+				}
+
+				if(toInsert)
+				{
+					routes.insert(dynamic_cast<const Line*>(path));
+				}
+			}
+
+			// Selection of routes by inclusion
+			if(_mergeIncludingRoutes)
+			{
+				vector<const Line*> routesToRemove;
+				BOOST_FOREACH(const Line* route, routes)
+				{
+					BOOST_FOREACH(const Line* otherRoute, routes)
+					{
+						if(otherRoute == route)
+						{
+							continue;
+						}
+						if(otherRoute->includes(*route, false))
+						{
+							routesToRemove.push_back(route);
+							break;
+						}
+					}
+				}
+				BOOST_FOREACH(const Line* route, routesToRemove)
+				{
+					routes.erase(route);
+				}
+			}
+
+
 			if(!_page)
 			{
 				// XML header
@@ -99,13 +149,11 @@ namespace synthese
 
 			size_t rank(0);
 			VariablesMap variables;
-			BOOST_FOREACH(const Path* path, _line->getPaths())
+			BOOST_FOREACH(const Line* route, routes)
 			{
-				const Line& line(dynamic_cast<const Line&>(*path));
-
 				if(_page)
 				{
-					_page->display(stream, line, rank++, variables, &request);
+					_page->display(stream, *route, rank++, variables, &request);
 				}
 				else
 				{

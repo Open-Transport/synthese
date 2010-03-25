@@ -102,7 +102,7 @@ namespace synthese
 				if(decodeTableId(object->getObjectId()) == CityTableSync::TABLE.ID)
 				{
 					shared_ptr<Site> site(SiteTableSync::GetEditable(id, env, linkLevel));
-					shared_ptr<const City> city(CityTableSync::Get(object->getObjectId(), env, linkLevel));
+					shared_ptr<City> city(CityTableSync::GetEditable(object->getObjectId(), env, linkLevel));
 					site->addCity(city.get());
 				}
 			}
