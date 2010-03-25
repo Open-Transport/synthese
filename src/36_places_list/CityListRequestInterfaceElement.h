@@ -33,7 +33,7 @@ namespace synthese
 {
 	namespace transportwebsite
 	{
-		/** CityListRequestInterfaceElement Library Interface Element Class.
+		/** Generates a query string to CityListFunction.
 			@author Hugues Romain
 			@date 2007
 			@ingroup m56Library refLibrary
@@ -43,7 +43,8 @@ namespace synthese
 			 - 1 : 1|0 : 1 = departures city list, 0 = arrival city list
 			 - 2 : Number of answers in the popup
 		*/
-		class CityListRequestInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement,CityListRequestInterfaceElement>
+		class CityListRequestInterfaceElement:
+			public util::FactorableTemplate<interfaces::LibraryInterfaceElement,CityListRequestInterfaceElement>
 		{
 			// List of parameters to store
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _txtField;
@@ -62,6 +63,7 @@ namespace synthese
 				@param variables Runtime variables
 				@param object Object to read at the display
 				@param request Source request
+				@return nothing
 			*/
 			std::string display(
 				std::ostream& stream
@@ -69,7 +71,7 @@ namespace synthese
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL
-				) const;
+			) const;
 				
 			~CityListRequestInterfaceElement();
 		};

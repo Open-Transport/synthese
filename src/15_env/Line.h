@@ -42,11 +42,11 @@ namespace synthese
 	namespace pt
 	{
 		class TransportNetwork;
+		class PhysicalStop;
 	}
 	
 	namespace env
 	{
-		class PhysicalStop;
 		class LineStop;
 		class RollingStock;
 		class LineAlarmBroadcast;
@@ -172,14 +172,12 @@ namespace synthese
 		    
 			//! @name Query methods
 			//@{
-				bool isRoad () const;
-				bool isLine () const;
 				bool isPedestrianMode() const;
 
 				bool isReservable () const;
 
-				const PhysicalStop* getDestination () const;
-				const PhysicalStop* getOrigin () const;
+				const pt::PhysicalStop* getDestination () const;
+				const pt::PhysicalStop* getOrigin () const;
 				const LineStop* getLineStop(std::size_t rank) const;
 
 				/** Tests if the line theory would be respected if the service were inserted into the line.
@@ -198,7 +196,7 @@ namespace synthese
 					@return true if the line serves exactly the stops in the same order.
 					@warning There is no test on the departure/arrival attributes
 				*/
-				bool operator==(const std::vector<PhysicalStop*> stops) const;
+				bool operator==(const std::vector<pt::PhysicalStop*> stops) const;
 			//@}
 		    
 		};

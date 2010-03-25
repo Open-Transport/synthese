@@ -227,6 +227,7 @@ namespace synthese
 			optional<RegistryKeyType> cityId, /*= UNKNOWN_VALUE */
 			logic::tribool mainConnectionOnly,
 			optional<string> creatorIdFilter,
+			optional<string> nameFilter,
 			bool orderByCityNameAndName /*= true */
 			, bool raisingOrder /*= true */
 			, int first /*= 0 */
@@ -258,6 +259,10 @@ namespace synthese
 			if(creatorIdFilter)
 			{
 				query << " AND " << COL_CODE_BY_SOURCE << "=" << Conversion::ToSQLiteString(*creatorIdFilter);
+			}
+			if(nameFilter)
+			{
+				query << " AND " << TABLE_COL_NAME << " LIKE " << Conversion::ToSQLiteString(*nameFilter);
 			}
 
 			// Ordering

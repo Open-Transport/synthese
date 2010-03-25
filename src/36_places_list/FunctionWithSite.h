@@ -25,50 +25,97 @@
 #ifndef SYNTHESE_FunctionWithSite_H__
 #define SYNTHESE_FunctionWithSite_H__
 
-#include "30_server/Function.h"
+#include "Function.h"
+#include "Site.h"
+#include "RequestException.h"
+#include "Env.h"
 
 namespace synthese
 {
 	namespace transportwebsite
 	{
-		class Site;
-
-		/** FunctionWithSite Function class.
-			@author Hugues Romain
-			@date 2007
-			@ingroup m56
-		*/
-		class FunctionWithSite : public server::Function
+		class FunctionWithSiteBase:
+			public server::Function
 		{
 		public:
 			static const std::string PARAMETER_SITE;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const Site>	_site;
 			//@}
-			
-			
+
+
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map
 			*/
 			server::ParametersMap _getParametersMap() const;
 			
-			/** Conversion from generic parameters map to attributes.
-				@param map Parameters map to interpret
-			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
-			
+			//////////////////////////////////////////////////////////////////////////
+			/// Public function with site copy.
+			/// @param function function to copy
+			/// @author Hugues Romain
 			virtual void _copy(boost::shared_ptr<const Function> function);
 
 		public:
+			//! @name Getters
+			//@{
+				boost::shared_ptr<const Site> getSite() const {	return _site; }
+			//@}
 
-			virtual server::ParametersMap getFixedParametersMap() const;
+			//! @name Setters
+			//@{
+				void setSite(boost::shared_ptr<const Site> value) {	_site = value; }
+			//@}
 
-			boost::shared_ptr<const Site> getSite() const;
-			void setSite(boost::shared_ptr<const Site>);
+		};
 
+		/** Function With Site Function class.
+			@author Hugues Romain
+			@date 2007
+			@ingroup m56
+		*/
+		template<bool compulsory>
+		class FunctionWithSite:
+			public FunctionWithSiteBase
+		{
+		public:
+		
+			typedef FunctionWithSite<compulsory> _FunctionWithSite;
+			
+		protected:
+			/** Conversion from generic parameters map to attributes.
+				@param map Parameters map to interpret
+			*/
+			void _setFromParametersMap(const server::ParametersMap& map)
+			{
+				util::RegistryKeyType id(
+					compulsory ?
+					map.get<util::RegistryKeyType>(PARAMETER_SITE) :
+					map.getDefault<util::RegistryKeyType>(PARAMETER_SITE, 0)
+				);
+				if(id <= 0 && compulsory)
+				{
+					throw server::RequestException("Site id must be specified");
+				}
+				if(id > 0)
+				{
+					try
+					{
+						_site = util::Env::GetOfficialEnv().getRegistry<Site>().get(id);
+					}
+					catch (util::ObjectNotFoundException<Site>&)
+					{
+						throw RequestException("Specified site not found");
+					}
+				}
+			}
+
+			
+		public:
+
+			virtual server::ParametersMap getFixedParametersMap() const { return _getParametersMap(); }
 		};
 	}
 }

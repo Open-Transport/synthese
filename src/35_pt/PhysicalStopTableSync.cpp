@@ -36,13 +36,14 @@ using namespace boost;
 namespace synthese
 {
     using namespace db;
-    using namespace env;
+    using namespace pt;
     using namespace util;
+	using namespace env;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,PhysicalStopTableSync>::FACTORY_KEY("15.55.01 Physical stops");
 	template<> const string FactorableTemplate<Fetcher<graph::Vertex>, PhysicalStopTableSync>::FACTORY_KEY("12");
 
-	namespace env
+	namespace pt
 	{
 		const string PhysicalStopTableSync::COL_NAME = "name";
 		const string PhysicalStopTableSync::COL_PLACEID = "place_id";
@@ -124,7 +125,7 @@ namespace synthese
 		}
     }
 
-    namespace env
+    namespace pt
     {
 		PhysicalStopTableSync::SearchResult PhysicalStopTableSync::Search(
 			Env& env, 

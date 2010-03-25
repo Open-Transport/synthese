@@ -102,7 +102,7 @@ namespace synthese
 
 
 
-		const Vertex* Edge::getFromVertex() const
+		Vertex* Edge::getFromVertex() const
 		{
 			return _fromVertex;
 		}

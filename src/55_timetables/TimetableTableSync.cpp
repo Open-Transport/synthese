@@ -51,6 +51,7 @@ namespace synthese
 	using namespace calendar;
 	using namespace interfaces;
 	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{

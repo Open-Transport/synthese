@@ -40,6 +40,8 @@ namespace synthese
 {
 	using namespace env;
 	using namespace graph;
+	using namespace pt;
+	
 
 	namespace departurestable
 	{

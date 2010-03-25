@@ -49,6 +49,8 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace geography;
+	using namespace pt;
+	
 	
 
 	namespace departurestable

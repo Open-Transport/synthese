@@ -35,6 +35,7 @@ namespace synthese
 	using namespace ptrouteplanner;
 	using namespace graph;
 	using namespace algorithm;
+	using namespace pt;
 
 	namespace departurestable
 	{

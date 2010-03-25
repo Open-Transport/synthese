@@ -36,6 +36,7 @@ namespace synthese
 	using namespace graph;
 	using namespace util;
 	using namespace impex;
+	using namespace pt;
 	
 	namespace util
 	{
@@ -190,21 +191,6 @@ namespace synthese
 		Line::getWalkingLine () const
 		{
 			return _isWalkingLine;
-		}
-
-
-		bool 
-		Line::isRoad () const
-		{
-			return false;
-		}
-
-
-
-		bool 
-		Line::isLine () const
-		{
-			return true;
 		}
 
 

@@ -36,8 +36,12 @@ namespace synthese
 	{
 		class LineStop;
 		class PublicTransportStopZoneConnectionPlace;
-		class PhysicalStop;
 		class Line;
+	}
+
+	namespace pt
+	{
+		class PhysicalStop;
 	}
 
 	/**	@defgroup m54Actions 54 Actions

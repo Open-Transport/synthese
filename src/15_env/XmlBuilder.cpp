@@ -42,6 +42,8 @@ namespace synthese
 	using namespace geography;	
 	using namespace geometry;
 	using namespace util;
+	using namespace pt;
+	
 	
 
 	namespace env
@@ -202,7 +204,7 @@ namespace synthese
 			double y (GetDoubleAttr (node, "y"));
 
 			return shared_ptr<PhysicalStop>(
-			new synthese::env::PhysicalStop (
+			new synthese::pt::PhysicalStop (
 				id,
 				name, 
 				connectionPlaces.get (placeId).get(), 

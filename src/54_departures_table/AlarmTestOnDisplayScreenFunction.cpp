@@ -61,6 +61,7 @@ namespace synthese
 	using namespace security;
 	using namespace graph;
 	using namespace geography;
+	using namespace pt;
 
 	namespace util
 	{

@@ -30,9 +30,13 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PhysicalStop;
+	}
+
+	namespace env
+	{
 		class Line;
 		class PublicTransportStopZoneConnectionPlace;
 
@@ -64,7 +68,7 @@ namespace synthese
 				bool isDeparture = true,
 				bool isArrival = true,
 				double metricOffset = UNKNOWN_VALUE,
-				PhysicalStop* physicalStop = NULL
+				pt::PhysicalStop* physicalStop = NULL
 			);
 			
 			~LineStop();
@@ -72,7 +76,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const PhysicalStop*	getPhysicalStop()	const;
+				const pt::PhysicalStop*	getPhysicalStop()	const;
 				Line*				getLine()			const;
 				bool				getScheduleInput()	const;
 				bool				getIsDeparture()	const;
@@ -88,7 +92,7 @@ namespace synthese
 
 					@warning the isArrival and the isDeparture attributes must be up to date to avoid false links in the physical stop.
 				*/
-				void				setPhysicalStop(PhysicalStop* stop);
+				void				setPhysicalStop(pt::PhysicalStop* stop);
 
 				void				setScheduleInput(bool value);
 				void				setLine(const Line* line);

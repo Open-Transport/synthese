@@ -28,13 +28,13 @@
 
 #include "Map.h"
 
-#include "01_util/Log.h"
-#include "01_util/Conversion.h"
-#include "15_env/PhysicalStop.h"
+#include "Log.h"
+#include "Conversion.h"
+#include "PhysicalStop.h"
 
 #include <boost/algorithm/string/replace.hpp>
 
-#include "06_geometry/Point2D.h"
+#include "Point2D.h"
 
 #include <fstream>
 #include <cmath>
@@ -48,7 +48,9 @@ namespace synthese
 	using namespace util;
 	using namespace geometry;
 	using namespace map;
-	using namespace env;	
+	using namespace env;
+	using namespace pt;
+	
 
 	namespace util
 	{

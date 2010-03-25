@@ -111,8 +111,7 @@ namespace synthese
 
 				const Edge*					getEdge (int index) const;
 
-				virtual bool isRoad () const = 0;
-				virtual bool isLine () const = 0;
+				virtual bool isRoad() const;
 				virtual bool isPedestrianMode() const = 0;
 
 				/** Gets all the geographical points linked by the path

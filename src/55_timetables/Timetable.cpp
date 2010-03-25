@@ -266,14 +266,14 @@ namespace synthese
 
 
 
-		void Timetable::addAuthorizedPhysicalStop( const env::PhysicalStop* stop )
+		void Timetable::addAuthorizedPhysicalStop( const pt::PhysicalStop* stop )
 		{
 			_authorizedPhysicalStops.insert(stop);
 		}
 
 
 
-		void Timetable::removeAuthorizedPhysicalStop( const env::PhysicalStop* stop )
+		void Timetable::removeAuthorizedPhysicalStop( const pt::PhysicalStop* stop )
 		{
 			_authorizedPhysicalStops.erase(stop);
 		}

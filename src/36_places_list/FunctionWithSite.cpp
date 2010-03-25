@@ -21,26 +21,20 @@
 */
 
 #include "FunctionWithSite.h"
-#include "Site.h"
-#include "RequestException.h"
-#include "Conversion.h"
-#include "Env.h"
 
 using namespace std;
-using namespace boost;
 
 namespace synthese
 {
-	using namespace util;
-	using namespace server;
-
 	namespace transportwebsite
 	{
-		const string FunctionWithSite::PARAMETER_SITE("si");
-		
-		ParametersMap FunctionWithSite::_getParametersMap() const
+		const string FunctionWithSiteBase::PARAMETER_SITE("si");
+
+
+
+		server::ParametersMap FunctionWithSiteBase::_getParametersMap() const
 		{
-			ParametersMap map;
+			server::ParametersMap map;
 			if(_site.get())
 			{
 				map.insert(PARAMETER_SITE, _site->getKey());
@@ -48,37 +42,11 @@ namespace synthese
 			return map;
 		}
 
-		void FunctionWithSite::_setFromParametersMap(const ParametersMap& map)
-		{
-			try
-			{
-				_site = Env::GetOfficialEnv().getRegistry<Site>().get(map.getUid(PARAMETER_SITE, true, "fws"));
-			}
-			catch (ObjectNotFoundException<Site>& e)
-			{
-				throw RequestException("Specified site not found");
-			}
-		}
 
-		void FunctionWithSite::_copy( boost::shared_ptr<const Function> function )
-		{
-			shared_ptr<const FunctionWithSite> rwi = static_pointer_cast<const FunctionWithSite, const Function>(function);
-			_site = rwi->_site;
-		}
 
-		boost::shared_ptr<const Site> FunctionWithSite::getSite() const
+		void FunctionWithSiteBase::_copy( boost::shared_ptr<const Function> function )
 		{
-			return _site;
-		}
-
-		void FunctionWithSite::setSite( boost::shared_ptr<const Site> site)
-		{
-			_site = site;
-		}
-
-		synthese::server::ParametersMap FunctionWithSite::getFixedParametersMap() const
-		{
-			return _getParametersMap();
+			_site = boost::static_pointer_cast<const FunctionWithSiteBase, const Function>(function)->_site;
 		}
 	}
 }

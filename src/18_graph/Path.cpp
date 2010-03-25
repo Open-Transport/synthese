@@ -107,14 +107,11 @@ namespace synthese
 
 
 
-		void 
-		Path::removeService (Service* service)
+		void Path::removeService (Service* service)
 		{
-			// TODO 
-
+			_services.erase(service);
 
 			markScheduleIndexesUpdateNeeded ();
-
 		}
 
 
@@ -409,6 +406,12 @@ namespace synthese
 			_pathGroup->removePath(&other);
 		}
 
+
+
+		bool Path::isRoad() const
+		{
+			return false;
+		}
 
 
 		bool cmpService::operator ()(const Service *s1, const Service *s2) const

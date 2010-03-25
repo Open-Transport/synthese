@@ -44,7 +44,7 @@ namespace synthese
 	using namespace lexmatcher;
 	using namespace transportwebsite;
 
-	template<> const string util::FactorableTemplate<FunctionWithSite,CityListFunction>::FACTORY_KEY("lc");
+	template<> const string util::FactorableTemplate<CityListFunction::_FunctionWithSite,CityListFunction>::FACTORY_KEY("lc");
 	
 	namespace transportwebsite
 	{
@@ -86,7 +86,7 @@ namespace synthese
 
 		ParametersMap CityListFunction::_getParametersMap() const
 		{
-			ParametersMap pm(FunctionWithSite::_getParametersMap());
+			ParametersMap pm(FunctionWithSiteBase::_getParametersMap());
 			pm.insert(PARAMETER_INPUT, _input);
 			pm.insert(PARAMETER_NUMBER, _n);
 			pm.insert(PARAMETER_IS_FOR_ORIGIN, _isForOrigin);
@@ -96,7 +96,7 @@ namespace synthese
 
 		void CityListFunction::_setFromParametersMap( const server::ParametersMap& map )
 		{
-			FunctionWithSite::_setFromParametersMap(map);
+			_FunctionWithSite::_setFromParametersMap(map);
 
 			if(map.getOptional<string>(PARAMETER_PAGE))
 			{

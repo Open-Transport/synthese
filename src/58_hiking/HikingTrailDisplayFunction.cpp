@@ -37,7 +37,7 @@ namespace synthese
 	using namespace security;
 	using namespace transportwebsite;
 
-	template<> const string util::FactorableTemplate<FunctionWithSite,hiking::HikingTrailDisplayFunction>::FACTORY_KEY("HikingTrailDisplayFunction");
+	template<> const string util::FactorableTemplate<hiking::HikingTrailDisplayFunction::_FunctionWithSite,hiking::HikingTrailDisplayFunction>::FACTORY_KEY("HikingTrailDisplayFunction");
 	
 	namespace hiking
 	{
@@ -46,7 +46,7 @@ namespace synthese
 		
 		ParametersMap HikingTrailDisplayFunction::_getParametersMap() const
 		{
-			ParametersMap map(FunctionWithSite::_getParametersMap());
+			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
 			if(_hikingTrail.get())
 			{
 				map.insert(Request::PARAMETER_OBJECT_ID, _hikingTrail->getKey());
@@ -56,7 +56,7 @@ namespace synthese
 
 		void HikingTrailDisplayFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			FunctionWithSite::_setFromParametersMap(map);
+			_FunctionWithSite::_setFromParametersMap(map);
 			try
 			{
 				_hikingTrail = Env::GetOfficialEnv().get<HikingTrail>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));

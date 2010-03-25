@@ -121,7 +121,7 @@ namespace synthese
 
 
 
-		void ServiceVertexRealTimeUpdateAction::setPhysicalStop( boost::shared_ptr<const env::PhysicalStop> value )
+		void ServiceVertexRealTimeUpdateAction::setPhysicalStop( boost::shared_ptr<const pt::PhysicalStop> value )
 		{
 			_physicalStop = value;
 		}

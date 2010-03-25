@@ -28,7 +28,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PhysicalStop;
 	}
@@ -89,7 +89,7 @@ namespace synthese
 				, bool isItArrival
 				, const messages::SentAlarm* alarm,
 				bool isItTerminus,
-				const env::PhysicalStop& physicalStop,
+				const pt::PhysicalStop& physicalStop,
 				bool color,
 				const boost::posix_time::ptime& time
 				, boost::posix_time::time_duration continuousServiceRange,

@@ -30,7 +30,7 @@
 #include "Map.h"
 #include "PostscriptCanvas.h"
 
-using synthese::env::PhysicalStop;
+using synthese::pt::PhysicalStop;
 
 namespace synthese
 {

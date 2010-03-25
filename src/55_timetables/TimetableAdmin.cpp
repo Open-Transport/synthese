@@ -78,6 +78,7 @@ namespace synthese
 	using namespace security;
 	using namespace env;
 	using namespace graph;
+	using namespace pt;
 
 	namespace util
 	{
@@ -112,7 +113,7 @@ namespace synthese
 					_timetable = TimetableTableSync::Get(
 						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
 						_getEnv()
-						);
+					);
 				}
 				catch(...)
 				{

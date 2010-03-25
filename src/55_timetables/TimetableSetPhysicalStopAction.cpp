@@ -42,6 +42,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace env;
+	using namespace pt;
 	
 	namespace util
 	{
@@ -125,7 +126,7 @@ namespace synthese
 
 
 
-		void TimetableSetPhysicalStopAction::setPhysicalStop( boost::shared_ptr<const env::PhysicalStop> value )
+		void TimetableSetPhysicalStopAction::setPhysicalStop( boost::shared_ptr<const pt::PhysicalStop> value )
 		{
 			_physicalStop = value;
 		}

@@ -36,6 +36,7 @@ namespace synthese
 	using namespace util;
 	using namespace geometry;
 	using namespace graph;
+	using namespace pt;
 
 	namespace util
 	{

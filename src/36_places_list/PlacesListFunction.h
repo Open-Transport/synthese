@@ -84,7 +84,7 @@ namespace synthese
 			<li><a href="include/56_transport_website/places_listSample.xml">Example of XML response</a></li>
 			</ul>
 		*/
-		class PlacesListFunction : public util::FactorableTemplate<FunctionWithSite,PlacesListFunction>
+		class PlacesListFunction : public util::FactorableTemplate<FunctionWithSite<true>,PlacesListFunction>
 		{
 		public:
 			static const std::string PARAMETER_INPUT;

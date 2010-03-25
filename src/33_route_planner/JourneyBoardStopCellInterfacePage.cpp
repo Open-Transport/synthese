@@ -45,6 +45,8 @@ namespace synthese
 	using namespace road;
 	using namespace routeplanner;
 	using namespace graph;
+	using namespace pt;
+	
 	
 
 	template<> const string util::FactorableTemplate<InterfacePage, JourneyBoardStopCellInterfacePage>::FACTORY_KEY(

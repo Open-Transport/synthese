@@ -68,7 +68,11 @@ namespace synthese
 
 			assert(distance >= 0);
 
-			posix_time::time_duration duration(posix_time::seconds(distance > 0 ? ceil(distance * 0.9) : 1));
+			posix_time::time_duration duration(
+				_duration ?
+				*_duration :
+				posix_time::seconds(distance > 0 ? ceil(distance * 0.9) : 1)
+			);
 			posix_time::ptime dt(servicePointer.getActualDateTime());
 			if (servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
 				dt += duration;
@@ -112,9 +116,11 @@ namespace synthese
 
 		PermanentService::PermanentService(
 			RegistryKeyType id,
-			Path* path
+			Path* path,
+			boost::optional<boost::posix_time::time_duration> duration
 		):	Registrable(id),
-			Service(string(), path)
+			Service(string(), path),
+			_duration(duration)
 		{
 			if (path != NULL)
 				path->setAllDays(true);
@@ -126,6 +132,13 @@ namespace synthese
 		void PermanentService::_computeNextRTUpdate()
 		{
 			_nextRTUpdate = second_clock::local_time() + gregorian::days(1);
+		}
+
+
+
+		boost::optional<boost::posix_time::time_duration> PermanentService::getDuration() const
+		{
+			return _duration;
 		}
 	}
 }

@@ -38,12 +38,20 @@ namespace synthese
 		private:
 			virtual void _computeNextRTUpdate();
 
+			boost::optional<boost::posix_time::time_duration> _duration;
+
 		public:
 			PermanentService(
 				util::RegistryKeyType id = UNKNOWN_VALUE,
-				graph::Path* path = NULL
+				graph::Path* path = NULL,
+				boost::optional<boost::posix_time::time_duration> duration = boost::optional<boost::posix_time::time_duration>()
 			);
 			
+			//! @name Getters
+			//@{
+				boost::optional<boost::posix_time::time_duration> getDuration() const;
+			//@}
+
 			/** Gets a departure schedule for this service.
 				@param rank Rank of the stop where to get the departure schedule.
 				@warning Only a 0 value is allowed for the rank.

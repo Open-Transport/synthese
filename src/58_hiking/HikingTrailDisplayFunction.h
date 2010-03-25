@@ -40,7 +40,7 @@ namespace synthese
 			@ingroup m58Functions refFunctions
 		*/
 		class HikingTrailDisplayFunction:
-			public util::FactorableTemplate<transportwebsite::FunctionWithSite, HikingTrailDisplayFunction>
+			public util::FactorableTemplate<transportwebsite::FunctionWithSite<true>, HikingTrailDisplayFunction>
 		{
 		public:
 			

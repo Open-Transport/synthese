@@ -130,9 +130,9 @@ class XmlBuilder
 
 	 static boost::shared_ptr<LineStop> CreateLineStop (XMLNode& node, 
 		 util::Registry<Line>& lines,
-		 const util::Registry<PhysicalStop>& physicalStops);
+		 const util::Registry<pt::PhysicalStop>& physicalStops);
 
-	 static boost::shared_ptr<PhysicalStop> CreatePhysicalStop (XMLNode& node, 
+	 static boost::shared_ptr<pt::PhysicalStop> CreatePhysicalStop (XMLNode& node, 
 		 const util::Registry<PublicTransportStopZoneConnectionPlace>& connectionPlaces
 	);
     

@@ -33,10 +33,8 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
-		class PhysicalStop;
-
 		/** PhysicalStop SQLite table synchronizer.
 			@ingroup m35LS refLS
 			

@@ -60,9 +60,11 @@ namespace synthese
 			if(request)
 			{
 				StaticFunctionRequest<CityListFunction> clrequest(*request, true);
-				if(dynamic_cast<const FunctionWithSite*>(request->getFunction().get()))
+				if(dynamic_cast<const FunctionWithSiteBase*>(request->getFunction().get()))
 				{
-					clrequest.getFunction()->setSite(dynamic_cast<const FunctionWithSite*>(request->getFunction().get())->getSite());
+					clrequest.getFunction()->setSite(
+						dynamic_cast<const FunctionWithSiteBase*>(request->getFunction().get())->getSite()
+					);
 				}
 				clrequest.getFunction()->setTextInput(_txtField->getValue(parameters, variables, object, request));
 				clrequest.getFunction()->setIsForOrigin(lexical_cast<bool>(_isForOrigin->getValue(parameters, variables, object, request)));

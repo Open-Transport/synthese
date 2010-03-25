@@ -44,10 +44,13 @@ namespace synthese
 		class Vertex;
 	}
 
-	namespace env
+	namespace pt
 	{
 		class PhysicalStop;
+	}
 
+	namespace env
+	{		
 		/** PublicTransportStopZoneConnectionPlace class.
 			@ingroup m35
 		*/
@@ -61,7 +64,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<PublicTransportStopZoneConnectionPlace>	Registry;
 
-			typedef std::map<util::RegistryKeyType,const PhysicalStop*> PhysicalStops;
+			typedef std::map<util::RegistryKeyType,const pt::PhysicalStop*> PhysicalStops;
 			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > PhysicalStopsLabels;
 
 		private:
@@ -93,7 +96,7 @@ namespace synthese
 
 			//! @name Update methods.
 			//@{
-				void addPhysicalStop(const PhysicalStop& physicalStop);
+				void addPhysicalStop(const pt::PhysicalStop& physicalStop);
 			//@}
 
 

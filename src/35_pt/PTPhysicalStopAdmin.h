@@ -31,13 +31,10 @@
 
 namespace synthese
 {
-	namespace env
-	{
-		class PhysicalStop;
-	}
-
 	namespace pt
 	{
+		class PhysicalStop;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// PTPhysicalStopAdmin Admin compound class.
 		///	@ingroup m35Admin refAdmin
@@ -57,7 +54,7 @@ namespace synthese
 		private:
 			/// @name Search parameters
 			//@{
-				boost::shared_ptr<const env::PhysicalStop>	_stop;
+				boost::shared_ptr<const pt::PhysicalStop>	_stop;
 			// html::ResultHTMLTable::RequestParameters	_requestParameters;
 			//@}
 

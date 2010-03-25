@@ -35,6 +35,10 @@ namespace synthese
 	namespace env
 	{
 		class Line;
+	}
+
+	namespace pt
+	{
 		class PhysicalStop;
 	}
 
@@ -52,7 +56,7 @@ namespace synthese
 			typedef enum { FORCE_UNLIMITED_SIZE, SIZE_AS_DEFINED } UnlimitedSize;
 			static const size_t UNLIMITED_SIZE = 0;
 
-			typedef std::map<util::RegistryKeyType, const env::PhysicalStop*> PhysicalStops;
+			typedef std::map<util::RegistryKeyType, const pt::PhysicalStop*> PhysicalStops;
 		private:
 
 			void _push_back(

@@ -104,6 +104,8 @@ namespace synthese
 	using namespace dblog;
 	using namespace messages;
 	using namespace graph;
+	using namespace pt;
+	
 
 	namespace util
 	{

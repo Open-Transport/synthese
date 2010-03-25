@@ -40,10 +40,14 @@ namespace synthese
 		class Env;
 	}
 
+	namespace pt
+	{
+		class PhysicalStop;
+	}
+
 	namespace env
 	{
 		class PublicTransportStopZoneConnectionPlace;
-		class PhysicalStop;
 		class CommercialLine;
 	}
 
@@ -86,7 +90,7 @@ namespace synthese
 			, bool raisingOrder = true
 		);
 
-		typedef struct { boost::shared_ptr<const env::PhysicalStop> stop; boost::shared_ptr<BroadcastPoint> bp; } PhysicalStopAndBroadcastPoint;
+		typedef struct { boost::shared_ptr<const pt::PhysicalStop> stop; boost::shared_ptr<BroadcastPoint> bp; } PhysicalStopAndBroadcastPoint;
 
 
 		/** Line searcher.

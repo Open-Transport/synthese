@@ -68,7 +68,8 @@ namespace synthese
 	using namespace security;
 	using namespace messages;
 	using namespace geography;
-	
+	using namespace pt;
+		
 
 	namespace util
 	{

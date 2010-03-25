@@ -56,6 +56,7 @@ namespace synthese
 	using namespace env;
 	using namespace graph;
 	using namespace road;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::JourneyBoardInterfaceElement>::FACTORY_KEY(
 		"journey_board"

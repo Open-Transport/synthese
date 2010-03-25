@@ -168,7 +168,7 @@ namespace synthese
 
 				/** Returns this edge origin vertex.
 				*/
-				const Vertex* getFromVertex () const;
+				Vertex* getFromVertex () const;
 
 				/** Returns metric offset of this edge from
 				parent path origin vertex.

@@ -91,9 +91,8 @@ namespace synthese
 
 		//! @name Query methods.
 		//@{
-			bool isRoad () const;
-			bool isLine () const;
 			virtual bool isPedestrianMode() const;
+			virtual bool isRoad() const;
 
 
 		  /** Find closest address of this road, before a given metric offset.

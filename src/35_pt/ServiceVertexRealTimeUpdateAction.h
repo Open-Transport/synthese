@@ -30,14 +30,10 @@
 
 namespace synthese
 {
-	namespace env
-	{
-		class PhysicalStop;
-	}
-
 	namespace pt
 	{
 		class ScheduledService;
+		class PhysicalStop;
 
 		/** ServiceVertexRealTimeUpdateAction action class.
 			@ingroup m35Actions refActions
@@ -52,7 +48,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<ScheduledService> _service;
-			boost::shared_ptr<const env::PhysicalStop> _physicalStop;
+			boost::shared_ptr<const pt::PhysicalStop> _physicalStop;
 			std::size_t _lineStopRank;
 
 		protected:
@@ -81,7 +77,7 @@ namespace synthese
 			//@{
 				void setService(boost::shared_ptr<const ScheduledService> service);
 				void setLineStopRank(std::size_t value);
-				void setPhysicalStop(boost::shared_ptr<const env::PhysicalStop> value);
+				void setPhysicalStop(boost::shared_ptr<const pt::PhysicalStop> value);
 			//@}
 		};
 	}

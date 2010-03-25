@@ -51,8 +51,9 @@ namespace synthese
 	using namespace lexmatcher;
 	using namespace geography;
 	using namespace interfaces;
+	using namespace transportwebsite;
 
-	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,transportwebsite::PlacesListFunction>::FACTORY_KEY("lp");
+	template<> const string util::FactorableTemplate<PlacesListFunction::_FunctionWithSite,PlacesListFunction>::FACTORY_KEY("lp");
 
 	namespace transportwebsite
 	{
@@ -70,7 +71,7 @@ namespace synthese
 
 		ParametersMap PlacesListFunction::_getParametersMap() const
 		{
-			ParametersMap map(FunctionWithSite::_getParametersMap());
+			ParametersMap map(_FunctionWithSite::_getParametersMap());
 			map.insert(PARAMETER_INPUT, _input);
 			map.insert(PARAMETER_CITY_TEXT, _cityText);
 			map.insert(PARAMETER_NUMBER, _n);
@@ -81,7 +82,7 @@ namespace synthese
 
 		void PlacesListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			FunctionWithSite::_setFromParametersMap(map);
+			_FunctionWithSite::_setFromParametersMap(map);
 			if(map.getOptional<string>(PARAMETER_PAGE))
 			{
 				_page = _site->getInterface()->getPage<PlacesListInterfacePage>(map.get<string>(PARAMETER_PAGE));

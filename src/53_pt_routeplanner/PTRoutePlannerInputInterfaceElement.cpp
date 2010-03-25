@@ -83,8 +83,8 @@ namespace synthese
 
 			if(field == FIELD_PERIOD)
 			{
-				shared_ptr<const FunctionWithSite> function(
-					dynamic_pointer_cast<const FunctionWithSite>(
+				shared_ptr<const FunctionWithSiteBase> function(
+					dynamic_pointer_cast<const FunctionWithSiteBase>(
 						request->getFunction()
 				)	);
 				assert(function.get());
@@ -125,8 +125,8 @@ namespace synthese
 
 				string style(_parameter1.get() ? _parameter1->getValue(parameters, variables, object, request) : string());
 
-				shared_ptr<const FunctionWithSite> function(
-						dynamic_pointer_cast<const FunctionWithSite>(
+				shared_ptr<const FunctionWithSiteBase> function(
+					dynamic_pointer_cast<const FunctionWithSiteBase>(
 						request->getFunction()
 				)	);
 				assert(function.get());

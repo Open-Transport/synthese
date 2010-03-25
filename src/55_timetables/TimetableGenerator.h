@@ -59,7 +59,7 @@ namespace synthese
 			typedef std::vector<TimetableColumn>			Columns;
 			typedef std::vector<TimetableRow>				Rows;
 			typedef std::set<const env::CommercialLine*>	AuthorizedLines;
-			typedef std::set<const env::PhysicalStop*>		AuthorizedPhysicalStops;
+			typedef std::set<const pt::PhysicalStop*>		AuthorizedPhysicalStops;
 
 		private:
 

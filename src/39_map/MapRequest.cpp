@@ -54,6 +54,8 @@ namespace synthese
 	using namespace util::XmlToolkit;
 	using namespace env;
 	using namespace geography;
+	using namespace pt;
+	
 
 	namespace util
 	{

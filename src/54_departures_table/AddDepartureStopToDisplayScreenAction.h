@@ -28,7 +28,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PhysicalStop;
 	}
@@ -50,7 +50,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<DisplayScreen>			_screen;
-			boost::shared_ptr<const env::PhysicalStop>	_stop;
+			boost::shared_ptr<const pt::PhysicalStop>	_stop;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

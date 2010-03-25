@@ -31,13 +31,14 @@ namespace synthese
 {
 	using namespace util;
 	using namespace pt;
+	using namespace env;
 
 	namespace util
 	{
-		template<> const string Registry<env::PhysicalStop>::KEY("PhysicalStop");
+		template<> const string Registry<PhysicalStop>::KEY("PhysicalStop");
 	}
 
-	namespace env 
+	namespace pt
 	{
 
 		PhysicalStop::PhysicalStop(

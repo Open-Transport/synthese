@@ -47,7 +47,8 @@ namespace synthese
 	using namespace interfaces;
 	using namespace graph;
 	using namespace env;
-
+	using namespace pt;
+	
 
 	namespace util
 	{

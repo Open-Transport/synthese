@@ -29,10 +29,10 @@
 #include <algorithm>
 #include <iostream>
 
-#include "01_util/Conversion.h"
-#include "15_env/Line.h"
-#include "15_env/CommercialLine.h"
-#include "15_env/PhysicalStop.h"
+#include "Conversion.h"
+#include "Line.h"
+#include "CommercialLine.h"
+#include "PhysicalStop.h"
 
 
 namespace synthese
@@ -40,6 +40,8 @@ namespace synthese
 	using namespace geometry;
 	using namespace env;
 	using namespace util;
+	using namespace pt;
+	
 
 namespace map
 {

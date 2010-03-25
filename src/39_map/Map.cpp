@@ -40,13 +40,13 @@
 #include <cmath>
 #include <limits>
 
-#include "06_geometry/Point2D.h"
+#include "Point2D.h"
 
-#include "15_env/PhysicalStop.h"
+#include "PhysicalStop.h"
 
-#include "01_util/Log.h"
-#include "01_util/Conversion.h"
-#include "01_util/RGBColor.h"
+#include "Log.h"
+#include "Conversion.h"
+#include "RGBColor.h"
 
 #undef min
 #undef max
@@ -59,6 +59,7 @@ namespace synthese
 	using namespace geometry;
 	using namespace env;
 	using namespace util;
+	using namespace pt;
 	
 	
 namespace map

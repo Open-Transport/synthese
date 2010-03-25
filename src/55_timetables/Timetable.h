@@ -129,8 +129,8 @@ namespace synthese
 				void addAuthorizedLine(const env::CommercialLine* line);
 				void removeAuthorizedLine(const env::CommercialLine* line);
 				void clearAuthorizedLines();
-				void addAuthorizedPhysicalStop(const env::PhysicalStop* stop);
-				void removeAuthorizedPhysicalStop(const env::PhysicalStop* stop);
+				void addAuthorizedPhysicalStop(const pt::PhysicalStop* stop);
+				void removeAuthorizedPhysicalStop(const pt::PhysicalStop* stop);
 				void clearAuthorizedPhysicalStops();
 				void setBookId(util::RegistryKeyType value);
 				void setTitle(const std::string& title);

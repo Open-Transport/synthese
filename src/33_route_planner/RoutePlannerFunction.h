@@ -53,10 +53,14 @@ namespace synthese
 		class NamedPlace;
 	}
 
+	namespace pt
+	{
+		class PhysicalStop;
+	}
+
 	namespace env
 	{
 		class PublicTransportStopZoneConnectionPlace;
-		class PhysicalStop;
 	}
 
 	namespace routeplanner
@@ -341,7 +345,8 @@ namespace synthese
 		///	<li><a href="include/53_pt_routeplanner/routeplanner_result.xsd">Response XSD Schema</a></li>
 		///	<li><a href="include/53_pt_routeplanner/routeplanner_resultSample.xml">Example of XML response</a></li>
 		///	</ul>
-		class RoutePlannerFunction : public util::FactorableTemplate<transportwebsite::FunctionWithSite,RoutePlannerFunction>
+		class RoutePlannerFunction:
+			public util::FactorableTemplate<transportwebsite::FunctionWithSite<true>,RoutePlannerFunction>
 		{
 		public:
 			static const std::string PARAMETER_SITE;
@@ -402,7 +407,7 @@ namespace synthese
 			static void _XMLDisplayPhysicalStop(
 				std::ostream& stream,
 				const std::string& tag,
-				const env::PhysicalStop& place
+				const pt::PhysicalStop& place
 			);
 			static void _XMLDisplayAddress(
 				std::ostream& stream,

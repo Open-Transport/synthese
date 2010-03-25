@@ -49,6 +49,7 @@ namespace synthese
 	using namespace util;
 	using namespace env;
 	using namespace geometry;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,LineStopTableSync>::FACTORY_KEY("15.57.01 Line stops");
 

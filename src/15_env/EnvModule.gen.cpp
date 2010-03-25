@@ -16,21 +16,15 @@ synthese::env::LineTableSync::integrate();
 synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::env::ConnectionPlaceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::env::ConnectionPlaceTableSync>::integrate();
 
-synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::env::PhysicalStopTableSync>::integrate();
-synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex>, synthese::env::PhysicalStopTableSync>::integrate();
-
 synthese::env::LineStopTableSync::integrate();
 
 synthese::env::NonConcurrencyRuleTableSync::integrate();
 
 synthese::env::EnvModule::integrate();
 
-synthese::env::LinesListFunction::integrate();
-
 synthese::env::PublicTransportStopZoneConnectionPlace::integrate();
 
 // Registries
-synthese::util::Env::Integrate<synthese::env::PhysicalStop>();
 synthese::util::Env::Integrate<synthese::env::Line>();
 synthese::util::Env::Integrate<synthese::env::LineStop>();
 synthese::util::Env::Integrate<synthese::env::NonConcurrencyRule>();

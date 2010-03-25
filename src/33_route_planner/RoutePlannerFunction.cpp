@@ -75,7 +75,7 @@ namespace synthese
 	using namespace resa;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<transportwebsite::FunctionWithSite,routeplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
+	template<> const string util::FactorableTemplate<routeplanner::RoutePlannerFunction::_FunctionWithSite,routeplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
 
 	namespace routeplanner
 	{
@@ -98,7 +98,7 @@ namespace synthese
 
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
-			ParametersMap map(FunctionWithSite::_getParametersMap());
+			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
 			return map;
 		}
 
@@ -106,7 +106,7 @@ namespace synthese
 
 		void RoutePlannerFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			FunctionWithSite::_setFromParametersMap(map);
+			_FunctionWithSite::_setFromParametersMap(map);
 			if(_site->getInterface())
 			{
 				_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
@@ -838,7 +838,7 @@ namespace synthese
 		void RoutePlannerFunction::_XMLDisplayPhysicalStop(
 			std::ostream& stream,
 			const std::string& tag,
-			const env::PhysicalStop& stop
+			const pt::PhysicalStop& stop
 		){
 			GeoPoint gp(WGS84FromLambert(stop));
 

@@ -128,22 +128,6 @@ namespace synthese
 
 
 
-		bool 
-		Road::isRoad () const
-		{
-			return true;
-		}
-
-
-
-		bool 
-		Road::isLine () const
-		{
-			return false;
-		}
-
-
-
 		void Road::addRoadChunk(
 			RoadChunk* chunk,
 			optional<double> autoShift
@@ -192,6 +176,13 @@ namespace synthese
 			{
 				other._reverseRoad->merge(*_reverseRoad);
 			}
+		}
+
+
+
+		bool Road::isRoad() const
+		{
+			return true;
 		}
 	}
 }

@@ -35,12 +35,12 @@ namespace synthese
 	namespace pt
 	{
 		class SchedulesBasedService;
+		class PhysicalStop;
 	}
 
 	namespace env
 	{
 		class Line;
-		class PhysicalStop;
 	}
 
 	namespace timetables
@@ -62,7 +62,7 @@ namespace synthese
 		class TimetableColumn
 		{
 		public:
-			typedef std::vector<std::pair<const env::PhysicalStop*, boost::posix_time::time_duration> > Content;
+			typedef std::vector<std::pair<const pt::PhysicalStop*, boost::posix_time::time_duration> > Content;
 
 		private:
 			// Variables

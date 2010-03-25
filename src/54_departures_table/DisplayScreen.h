@@ -193,7 +193,7 @@ namespace synthese
 				void	addDisplayedPlace(const env::PublicTransportStopZoneConnectionPlace*);
 				void	addForbiddenPlace(const env::PublicTransportStopZoneConnectionPlace*);
 				void	addForcedDestination(const env::PublicTransportStopZoneConnectionPlace*);
-				void	addPhysicalStop(const env::PhysicalStop*);
+				void	addPhysicalStop(const pt::PhysicalStop*);
 				void	clearDisplayedPlaces();
 				void	clearForbiddenPlaces();
 				void	clearForcedDestinations();
@@ -202,7 +202,7 @@ namespace synthese
 				void	removeDisplayedPlace(const env::PublicTransportStopZoneConnectionPlace*);
 				void	removeForbiddenPlace(const env::PublicTransportStopZoneConnectionPlace*);
 				void	removeForcedDestination(const env::PublicTransportStopZoneConnectionPlace*);
-				void	removePhysicalStop(const env::PhysicalStop*);
+				void	removePhysicalStop(const pt::PhysicalStop*);
 				
 				//////////////////////////////////////////////////////////////////////////
 				/// Adds a destination by transfer to display if necessary.

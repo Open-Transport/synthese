@@ -33,7 +33,7 @@
 namespace synthese
 {
 
-namespace env
+namespace pt
 {
     class PhysicalStop;
 }
@@ -64,7 +64,7 @@ protected:
 
 public:
 
-    DrawablePhysicalStop (const synthese::env::PhysicalStop* physicalStop);
+    DrawablePhysicalStop (const synthese::pt::PhysicalStop* physicalStop);
     ~DrawablePhysicalStop ();
 	
     //! @name Getters/Setters

@@ -44,6 +44,7 @@ namespace synthese
 	using namespace env;
 	using namespace util;
 	using namespace security;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemovePhysicalStopAction>::FACTORY_KEY("dsrps");
 	

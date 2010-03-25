@@ -59,9 +59,9 @@ namespace synthese
 			if(request)
 			{
 				StaticFunctionRequest<PlacesListFunction> plrequest(*request, true);
-				if(dynamic_cast<const FunctionWithSite*>(request->getFunction().get()))
+				if(dynamic_cast<const FunctionWithSiteBase*>(request->getFunction().get()))
 				{
-					plrequest.getFunction()->setSite(dynamic_cast<const FunctionWithSite*>(request->getFunction().get())->getSite());
+					plrequest.getFunction()->setSite(dynamic_cast<const FunctionWithSiteBase*>(request->getFunction().get())->getSite());
 				}
 				plrequest.getFunction()->setTextInput(_txtField->getValue(parameters, variables, object, request));
 				plrequest.getFunction()->setIsForOrigin(Conversion::ToBool(_isForOrigin->getValue(parameters, variables, object, request)));

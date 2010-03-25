@@ -37,7 +37,10 @@ namespace synthese
 	{
 		class LineStop;
 		class PublicTransportStopZoneConnectionPlace;
-		 
+	}
+
+	namespace pt
+	{	 
 		//////////////////////////////////////////////////////////////////////////
 		/// Physical stop (bus stop, etc.).
 		///	A physical stop is an entry point to the transport network.
@@ -62,7 +65,7 @@ namespace synthese
 			PhysicalStop(
 				util::RegistryKeyType id = UNKNOWN_VALUE,
 				std::string name = std::string(), 
-				const PublicTransportStopZoneConnectionPlace* place = NULL,
+				const env::PublicTransportStopZoneConnectionPlace* place = NULL,
 				double x = UNKNOWN_VALUE,
 				double y = UNKNOWN_VALUE);
 
@@ -71,7 +74,7 @@ namespace synthese
 
 			//! @name Getters/Setters
 			//@{
-				const PublicTransportStopZoneConnectionPlace* getConnectionPlace() const;
+			const env::PublicTransportStopZoneConnectionPlace* getConnectionPlace() const;
 
 				const std::string& getName () const;
 				void setName (const std::string& name);
