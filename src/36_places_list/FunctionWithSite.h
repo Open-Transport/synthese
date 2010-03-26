@@ -107,7 +107,7 @@ namespace synthese
 					}
 					catch (util::ObjectNotFoundException<Site>&)
 					{
-						throw RequestException("Specified site not found");
+						throw server::RequestException("Specified site not found");
 					}
 				}
 			}
