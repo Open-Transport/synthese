@@ -7,6 +7,7 @@ synthese::interfaces::InterfaceAdmin::integrate();
 synthese::interfaces::InterfacePageAdmin::integrate();
 
 synthese::interfaces::InterfacePageUpdateAction::integrate();
+synthese::interfaces::InterfacePageAddAction::integrate();
 
 synthese::interfaces::ParameterValueInterfaceElement::integrate();
 synthese::interfaces::IfThenElseInterfaceElement::integrate();

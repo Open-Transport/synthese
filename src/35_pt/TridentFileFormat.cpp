@@ -1459,7 +1459,7 @@ namespace synthese
 				// Create a new route if necessary
 				if(!route.get())
 				{
-					os << "CREA : Creation of route " << routeNames[routeIdNode.getText()] << " for " << routeIdNode.getText() << "<br />";
+					os << "CREA : Creation of route " << routeNames[routeIdNode.getText()] << " for " << jpKeyNode.getText() << "<br />";
 					route.reset(new Line);
 					route->setCommercialLine(cline.get());
 					route->setName(routeNames[routeIdNode.getText()]);
@@ -1489,7 +1489,7 @@ namespace synthese
 				}
 				else
 				{
-					os << "LOAD : Use of route " << route->getKey() << " (" << route->getName() << ") for " << routeIdNode.getText() << " (" << routeNames[routeIdNode.getText()] << ")<br />";
+					os << "LOAD : Use of route " << route->getKey() << " (" << route->getName() << ") for " << jpKeyNode.getText() << " (" << routeNames[routeIdNode.getText()] << ")<br />";
 
 				}
 				
@@ -1509,13 +1509,18 @@ namespace synthese
 				
 				// Creation of the service
 				Line* line(routes[jpKeyNode.getText()]);
+				int stopsNumber(serviceNode.nChildNode("VehicleJourneyAtStop"));
+				if(stopsNumber != line->getEdges().size())
+				{
+					os << "WARN : Service " << numberNode.getText() << " / " << keyNode.getText() << " ignored due to bad stops number<br />";
+					continue;
+				}
 				shared_ptr<ScheduledService> service(new ScheduledService);
 				service->setPath(line);
 				service->setPathId(line->getKey());
 				service->setServiceNumber(numberNode.getText());
 				ScheduledService::Schedules deps;
 				ScheduledService::Schedules arrs;
-				int stopsNumber(serviceNode.nChildNode("VehicleJourneyAtStop"));
 				time_duration lastDep(0,0,0);
 				time_duration lastArr(0,0,0);
 				for(int stopRank(0); stopRank < stopsNumber; ++stopRank)

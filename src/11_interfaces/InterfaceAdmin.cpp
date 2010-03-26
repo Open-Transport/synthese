@@ -35,6 +35,8 @@
 #include "ResultHTMLTable.h"
 #include "HTMLModule.h"
 #include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
+#include "InterfacePageAddAction.h"
 
 using namespace std;
 using namespace boost;
@@ -62,10 +64,6 @@ namespace synthese
 
 	namespace interfaces
 	{
-		// const string InterfaceAdmin::PARAM_SEARCH_XXX("xx");
-
-
-
 		InterfaceAdmin::InterfaceAdmin()
 			: AdminInterfaceElementTemplate<InterfaceAdmin>()
 		{ }
@@ -120,9 +118,16 @@ namespace synthese
 			c.push_back("Actions");
 			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 
-			stream << t.open();
 
 			AdminFunctionRequest<InterfacePageAdmin> openRequest(_request);
+
+			AdminActionFunctionRequest<InterfacePageAddAction,InterfacePageAdmin> addRequest(_request);
+			addRequest.getAction()->setInterface(const_pointer_cast<Interface>(_interface));
+
+			HTMLForm f(addRequest.getHTMLForm("addpage"));
+
+			stream << f.open();
+			stream << t.open();
 
 			InterfacePageTableSync::SearchResult pages(InterfacePageTableSync::Search(Env::GetOfficialEnv(), _interface->getKey()));
 			BOOST_FOREACH(shared_ptr<InterfacePage> page, pages)
@@ -134,8 +139,13 @@ namespace synthese
 				stream << t.col() << page->getPageCode();
 				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), InterfacePageAdmin::ICON);
 			}
+			stream << t.row();
+			stream << t.col() << f.getTextInput(InterfacePageAddAction::PARAMETER_CLASS, string());
+			stream << t.col() << f.getTextInput(InterfacePageAddAction::PARAMETER_VARIANT, string());
+			stream << t.col() << f.getSubmitButton("Ajouter");
 
 			stream << t.close();
+			stream << f.close();
 		}
 
 

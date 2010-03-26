@@ -8,9 +8,9 @@
 #include "InterfacePageAddAction.h"
 #include "InterfacePageUpdateAction.h"
 
-#include "11_interfaces/InterfaceTableSync.h"
-#include "11_interfaces/InterfacePageTableSync.h"
-#include "11_interfaces/InterfaceModule.h"
+#include "InterfaceTableSync.h"
+#include "InterfacePageTableSync.h"
+#include "InterfaceModule.h"
 
 #include "11_interfaces/StaticValueInterfaceElement.h"
 #include "11_interfaces/ParameterValueInterfaceElement.h"
