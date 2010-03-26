@@ -57,7 +57,7 @@ namespace synthese
 			ParametersMap map;
 			if(_interface.get())
 			{
-				map.insert(PARAMETER_INTERFACE_ID, _interface.get());
+				map.insert(PARAMETER_INTERFACE_ID, _interface->getKey());
 			}
 			map.insert(PARAMETER_CLASS, _class);
 			map.insert(PARAMETER_VARIANT, _variant);
