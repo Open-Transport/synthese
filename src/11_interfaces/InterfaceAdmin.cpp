@@ -123,6 +123,7 @@ namespace synthese
 
 			AdminActionFunctionRequest<InterfacePageAddAction,InterfacePageAdmin> addRequest(_request);
 			addRequest.getAction()->setInterface(const_pointer_cast<Interface>(_interface));
+			addRequest.setActionWillCreateObject();
 
 			HTMLForm f(addRequest.getHTMLForm("addpage"));
 
