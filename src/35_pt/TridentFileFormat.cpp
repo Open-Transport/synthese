@@ -1638,7 +1638,7 @@ namespace synthese
 			}
 
 			// Clean useless routes
-			for(map<string, Line*>::const_iterator itr(routes.begin()); itr != routes.end(); ++itr)
+/*			for(map<string, Line*>::const_iterator itr(routes.begin()); itr != routes.end(); ++itr)
 			{
 				if(itr->second->getServices().empty() && createdObjects.find(itr->second->getKey()) != createdObjects.end())
 				{
@@ -1649,7 +1649,7 @@ namespace synthese
 					_env->getEditableRegistry<Line>().remove(itr->second->getKey());
 				}
 			}
-
+*/
 			// ConnectionLink / Junction
 			if(_importJunctions)
 			{
