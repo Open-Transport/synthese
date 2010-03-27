@@ -28,15 +28,13 @@
 #include <iostream>
 
 #include "SQLiteRegistryTableSyncTemplate.h"
+#include "PTUseRule.h"
 
 namespace synthese
 {
 	namespace pt
 	{
-		class PTUseRule;
-		
-		/** Public transportation use rules 
-		table synchronizer.
+		/** Public transportation use rules table synchronizer.
 			@ingroup m35LS refLS
 		*/
 		class PTUseRuleTableSync
