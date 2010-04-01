@@ -17,6 +17,8 @@
 #include "TimetableNoteInterfacePage.h"
 #include "TimetableServiceRowInterfacePage.h"
 #include "TimetableServiceRowCellInterfacePage.h"
+#include "TimetableServiceColRowInterfacePage.hpp"
+#include "TimetableServiceColCellInterfacePage.hpp"
 
 #include "TimetableGenerateFunction.h"
 

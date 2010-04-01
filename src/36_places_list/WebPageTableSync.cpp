@@ -48,10 +48,6 @@ namespace synthese
 		const string WebPageTableSync::COL_UP_ID = "up_id";
 		const string WebPageTableSync::COL_RANK = "rank";
 		const string WebPageTableSync::COL_CONTENT1 = "content1";
-		const string WebPageTableSync::COL_INCLUDE1 = "include1";
-		const string WebPageTableSync::COL_CONTENT2 = "content2";
-		const string WebPageTableSync::COL_INCLUDE2 = "include2";
-		const string WebPageTableSync::COL_CONTENT3 = "content3";
 		const string WebPageTableSync::COL_START_TIME = "start_time";
 		const string WebPageTableSync::COL_END_TIME = "end_time";
 	}
@@ -70,10 +66,6 @@ namespace synthese
 			SQLiteTableSync::Field(WebPageTableSync::COL_RANK, SQL_INTEGER),
 			SQLiteTableSync::Field(WebPageTableSync::COL_TITLE, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_CONTENT1, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_INCLUDE1, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_CONTENT2, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_INCLUDE2, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_CONTENT3, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_START_TIME, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_END_TIME, SQL_TEXT),
 			SQLiteTableSync::Field()
@@ -94,11 +86,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			webpage->setName(rows->getText(WebPageTableSync::COL_TITLE));
-			webpage->setContent1(rows->getText(WebPageTableSync::COL_CONTENT1));
-			webpage->setInclude1(rows->getText(WebPageTableSync::COL_INCLUDE1));
-			webpage->setContent2(rows->getText(WebPageTableSync::COL_CONTENT2));
-			webpage->setInclude2(rows->getText(WebPageTableSync::COL_INCLUDE2));
-			webpage->setContent3(rows->getText(WebPageTableSync::COL_CONTENT3));
+			webpage->setContent(rows->getText(WebPageTableSync::COL_CONTENT1));
 			webpage->setRank(rows->getInt(WebPageTableSync::COL_RANK));
 
 			if(!rows->getText(WebPageTableSync::COL_START_TIME).empty())
@@ -164,11 +152,7 @@ namespace synthese
 			query.addField(webPage->getParent() ? webPage->getParent()->getKey() : RegistryKeyType(0));
 			query.addField(static_cast<int>(webPage->getRank()));
 			query.addField(webPage->getName());
-			query.addField(webPage->getContent1());
-			query.addField(webPage->getInclude1());
-			query.addField(webPage->getContent2());
-			query.addField(webPage->getInclude2());
-			query.addField(webPage->getContent3());
+			query.addField(webPage->getContent());
 			query.addField(webPage->getStartDate());
 			query.addField(webPage->getEndDate());
 			query.execute(transaction);

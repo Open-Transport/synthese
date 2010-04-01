@@ -47,6 +47,7 @@
 #include "ServiceAddAction.h"
 #include "NonConcurrencyRuleAddAction.h"
 #include "NonConcurrencyRuleRemoveAction.h"
+#include "StopAreaUpdateAction.h"
 
 #include "TransportNetworkRight.h"
 

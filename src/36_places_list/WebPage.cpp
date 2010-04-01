@@ -23,7 +23,7 @@
 #include "WebPage.h"
 #include "ParametersMap.h"
 #include "DynamicRequest.h"
-#include "Function.h"
+#include "FunctionWithSite.h"
 
 using namespace std;
 using namespace boost;
@@ -45,143 +45,6 @@ namespace synthese
 			_startDate(posix_time::not_a_date_time),
 			_endDate(posix_time::not_a_date_time)
 		{
-			
-		}
-
-
-		const std::string& WebPage::getContent1() const
-		{
-			return _content1;
-		}
-
-
-
-		const std::string& WebPage::getInclude1() const
-		{
-			return _include1;
-		}
-
-
-
-		const std::string& WebPage::getContent2() const
-		{
-			return _content2;
-		}
-
-
-
-		const std::string& WebPage::getInclude2() const
-		{
-			return _include2;
-		}
-
-
-
-		const std::string& WebPage::getContent3() const
-		{
-			return _content3;
-		}
-
-
-
-		void WebPage::setContent1( const std::string& value )
-		{
-			_content1 = value;
-		}
-
-
-
-		void WebPage::setInclude1( const std::string& value )
-		{
-			_include1 = value;
-		}
-
-
-
-		void WebPage::setContent2( const std::string& value )
-		{
-			_content2 = value;
-		}
-
-
-
-		void WebPage::setInclude2( const std::string& value )
-		{
-			_include2 = value;
-		}
-
-
-
-		void WebPage::setContent3( const std::string& value )
-		{
-			_content3 = value;
-		}
-
-
-
-		void WebPage::DisplayInclude(
-			std::ostream& stream,
-			const std::string& includeString,
-			const Request& request
-		){
-			ParametersMap parametersMap(includeString);
-			ParametersMap requestParametersMap(
-				dynamic_cast<const DynamicRequest*>(&request) ?
-				dynamic_cast<const DynamicRequest&>(request).getParametersMap() :
-				ParametersMap()
-			);
-			requestParametersMap.remove(Request::PARAMETER_FUNCTION);
-			parametersMap.merge(requestParametersMap);
-			string functionName(parametersMap.getDefault<string>(Request::PARAMETER_FUNCTION));
-			if(!functionName.empty() && Factory<Function>::contains(functionName))
-			{
-				shared_ptr<Function> _function(Factory<Function>::create(functionName));
-				if(_function.get())
-				{
-					try
-					{
-						_function->_setFromParametersMap(parametersMap);
-						if (_function->isAuthorized(request.getSession()))
-						{
-							_function->run(stream, request);
-						}
-					}
-					catch(...)
-					{
-
-					}
-				}
-
-			}
-
-		}
-
-
-
-		const boost::posix_time::ptime& WebPage::getStartDate() const
-		{
-			return _startDate;
-		}
-
-
-
-		const boost::posix_time::ptime& WebPage::getEndDate() const
-		{
-			return _endDate;
-		}
-
-
-
-		void WebPage::setStartDate( const boost::posix_time::ptime& value )
-		{
-			_startDate = value;
-		}
-
-
-
-		void WebPage::setEndDate( const boost::posix_time::ptime& value )
-		{
-			_endDate = value;
 		}
 
 
@@ -192,6 +55,100 @@ namespace synthese
 				(_startDate.is_not_a_date_time() || _startDate <= now) &&
 				(_endDate.is_not_a_date_time() || _endDate >= now)
 			;
+		}
+
+
+
+		std::string::const_iterator WebPage::_parse(
+			std::ostream& stream,
+			std::string::const_iterator it,
+			std::string::const_iterator end,
+			const server::Request& request
+		) const {
+			while(it != end)
+			{
+				// Special characters
+				if(*it == '\\' && it+1 != end)
+				{
+					++it;
+					if(*it == 'n')
+					{
+						stream << endl;
+					}
+					else if(*it == '\\')
+					{
+						stream << '\\';
+					}
+					else if(*it == '<' && it+1 != end && *(it+1)=='?')
+					{
+						++it;
+						stream << "<?";
+					}
+					else if(*it == '?' && it+1 != end && *(it+1)=='>')
+					{
+						++it;
+						stream << "?>";
+					}
+					++it;
+				} // Call to a public function
+				else if(*it == '<' && it+1 != end && *(it+1)=='?' && it+2 != end)
+				{
+					stringstream query;
+					query << Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT;
+					it = _parse(query, it+2, end, request);
+
+					ParametersMap parametersMap(query.str());
+					ParametersMap requestParametersMap(
+						dynamic_cast<const DynamicRequest*>(&request) ?
+						dynamic_cast<const DynamicRequest&>(request).getParametersMap() :
+						ParametersMap()
+					);
+					requestParametersMap.remove(Request::PARAMETER_FUNCTION);
+					parametersMap.merge(requestParametersMap);
+					if(getRoot())
+					{
+						parametersMap.insert(FunctionWithSiteBase::PARAMETER_SITE, getRoot()->getKey());
+					}
+					string functionName(parametersMap.getDefault<string>(Request::PARAMETER_FUNCTION));
+					if(!functionName.empty() && Factory<Function>::contains(functionName))
+					{
+						shared_ptr<Function> _function(Factory<Function>::create(functionName));
+						if(_function.get())
+						{
+							try
+							{
+								_function->_setFromParametersMap(parametersMap);
+								if (_function->isAuthorized(request.getSession()))
+								{
+									_function->run(stream, request);
+								}
+							}
+							catch(...)
+							{
+
+							}
+						}
+
+					}
+				} // Reached the end of a recursion level
+				else if(*it == '?' && it+1 != end && *(it+1)=='>')
+				{
+					return it+2;
+				}
+				else
+				{
+					stream << *it;
+					++it;
+				}
+			}
+			return it;
+		}
+
+
+
+		void WebPage::display( std::ostream& stream, const server::Request& request ) const
+		{
+			_parse(stream, _content.begin(), _content.end(), request);
 		}
 	}
 }

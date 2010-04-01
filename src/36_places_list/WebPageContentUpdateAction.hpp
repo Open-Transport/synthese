@@ -43,18 +43,10 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_WEB_PAGE_ID;
 			static const std::string PARAMETER_CONTENT1;
-			static const std::string PARAMETER_INCLUDE1;
-			static const std::string PARAMETER_CONTENT2;
-			static const std::string PARAMETER_INCLUDE2;
-			static const std::string PARAMETER_CONTENT3;
 
 		private:
 			boost::shared_ptr<WebPage> _page;
 			std::string _content1;
-			std::string _include1;
-			std::string _content2;
-			std::string _include2;
-			std::string _content3;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

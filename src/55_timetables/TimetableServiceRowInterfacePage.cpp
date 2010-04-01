@@ -33,6 +33,8 @@
 #include "InterfacePageException.h"
 #include "TimetableWarning.h"
 #include "Service.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "City.h"
 
 #include <boost/lexical_cast.hpp>
 #include <sstream>
@@ -47,6 +49,7 @@ namespace synthese
 	using namespace util;
 	using namespace timetables;
 	using namespace graph;
+	using namespace env;
 
 	namespace util
 	{
@@ -102,7 +105,15 @@ namespace synthese
 			pv.push_back(object.getLine()->getCommercialLine()->getImage()); //9
 			pv.push_back(object.getLine()->getRollingStock() ? lexical_cast<string>(object.getLine()->getRollingStock()->getKey()) : string()); //10
 			pv.push_back(lexical_cast<string>(rank));
-			pv.push_back(lexical_cast<string>(followingServicesWithSameHour));
+			pv.push_back(lexical_cast<string>(followingServicesWithSameHour)); //12
+
+			const PublicTransportStopZoneConnectionPlace* lastPlace(object.getLine()->getDestination()->getConnectionPlace());
+			pv.push_back(lexical_cast<string>(lastPlace->getCity()->getKey())); //13
+			pv.push_back(lastPlace->getCity()->getName()); //14
+			pv.push_back(lexical_cast<string>(lastPlace->getKey())); //15
+			pv.push_back(lastPlace->getName()); //16
+
+			pv.push_back(object.getLine()->getDirection()); //17
 
 			InterfacePage::_display(
 				stream

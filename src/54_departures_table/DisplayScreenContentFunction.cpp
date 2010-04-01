@@ -51,8 +51,9 @@ namespace synthese
 	using namespace interfaces;
 	using namespace db;
 	using namespace pt;
+	using namespace departurestable;
 
-	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenContentFunction>::FACTORY_KEY("tdg");
+	template<> const string util::FactorableTemplate<DisplayScreenContentFunction::_FunctionWithSite,DisplayScreenContentFunction>::FACTORY_KEY("tdg");
 
 	namespace departurestable
 	{
@@ -69,7 +70,7 @@ namespace synthese
 		
 		ParametersMap DisplayScreenContentFunction::_getParametersMap() const
 		{
-			ParametersMap map;
+			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
 			if(_date && _date->is_not_a_date_time()) map.insert(PARAMETER_DATE, *_date);
 			if(_screen.get()) map.insert(Request::PARAMETER_OBJECT_ID, _screen->getKey());
 			return map;
@@ -108,10 +109,24 @@ namespace synthese
 				}
 				else
 				{
+					_FunctionWithSite::_setFromParametersMap(map);
+
 					DisplayScreen* screen(new DisplayScreen);
 					_type.reset(new DisplayType);
 					_type->setRowNumber(map.getDefault<size_t>(PARAMETER_ROWS_NUMBER, 10));
-					_type->setDisplayInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID)).get());
+
+					if(map.getDefault<RegistryKeyType>(PARAMETER_INTERFACE_ID) > 0)
+					{
+						_type->setDisplayInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID)).get());
+					}
+					else
+					{
+						if(!_site.get() || !_site->getInterface())
+						{
+							throw RequestException("Invalid site");
+						}
+						_type->setDisplayInterface(_site->getInterface());
+					}
 					screen->setType(_type.get());
 
 					// Way 3 : physical stop

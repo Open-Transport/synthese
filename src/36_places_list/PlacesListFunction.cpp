@@ -116,7 +116,11 @@ namespace synthese
 				PlacesList placesList;
 				BOOST_FOREACH(const City::PlacesMatcher::MatchHit it, places)
 				{
-					placesList.push_back(make_pair(UNKNOWN_VALUE /*it.value->getKey()*/, it.key.getSource()));
+					placesList.push_back(make_pair(
+						dynamic_cast<const Registrable*>(it.value) ? 
+						dynamic_cast<const Registrable*>(it.value)->getKey() : UNKNOWN_VALUE,
+						it.key.getSource()
+					)	);
 				}
 
 				VariablesMap vm;

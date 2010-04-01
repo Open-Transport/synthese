@@ -61,27 +61,12 @@ namespace synthese
 			ParametersVector pv;
 		
 			pv.push_back(webPage.getName()); //0
-			pv.push_back(webPage.getContent1()); //1
 
-			stringstream include1;
-			if(request)
-			{
-				WebPage::DisplayInclude(include1, webPage.getInclude1(), *request);
-			}
-			pv.push_back(include1.str()); //2
+			stringstream content;
+			webPage.display(content, *request);
+			pv.push_back(content.str()); //1
 
-			pv.push_back(webPage.getContent2()); //3
-
-			stringstream include2;
-			if(request)
-			{
-				WebPage::DisplayInclude(include2, webPage.getInclude2(), *request);
-			}
-			pv.push_back(include2.str()); //4
-
-			pv.push_back(webPage.getContent3()); //5
-
-			pv.push_back(lexical_cast<string>(webPage.getKey())); //6
+			pv.push_back(lexical_cast<string>(webPage.getKey())); //2
 
 
 			InterfacePage::_display(

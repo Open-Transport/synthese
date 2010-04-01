@@ -185,7 +185,7 @@ namespace synthese
 
 
 
-		const ParametersMap& DynamicRequest::getParametersMap() const
+		ParametersMap DynamicRequest::getParametersMap() const
 		{
 			return _parametersMap;
 		}

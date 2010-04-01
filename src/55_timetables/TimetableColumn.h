@@ -25,7 +25,6 @@
 
 #include <vector>
 
-#include "55_timetables/types.h"
 #include "Calendar.h"
 
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
@@ -63,6 +62,12 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<std::pair<const pt::PhysicalStop*, boost::posix_time::time_duration> > Content;
+			enum tTypeOD
+			{
+				Texte,
+				Terminus,
+				Indetermine
+			};
 
 		private:
 			// Variables
@@ -93,17 +98,17 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void	setWarning(const TimetableWarning* it);
+				void	setWarning(const TimetableWarning* value) { _warning = value; }
 			//@}
 
 			//! @name Getters
 			//@{
-				const calendar::Calendar&				getCalendar()			const;
-				const Content&							getContent()			const;
-				const env::Line*						getLine()				const;
-				tTypeOD									getOriginType()			const;
-				tTypeOD									getDestinationType()	const;
-				const TimetableWarning*					getWarning()			const;
+				const calendar::Calendar&				getCalendar()			const { return _calendar; }
+				const Content&							getContent()			const { return _content; }
+				const env::Line*						getLine()				const { return _line; }
+				tTypeOD									getOriginType()			const { return _originType; }
+				tTypeOD									getDestinationType()	const { return _destinationType; }
+				const TimetableWarning*					getWarning()			const { return _warning; }
 			//@}
 		};
 	}

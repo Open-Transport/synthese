@@ -38,9 +38,13 @@
 #include "CalendarTemplate.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
+#include "TimetableResult.hpp"
+#include "PhysicalStopTableSync.h"
+#include "ConnectionPlaceTableSync.h"
 
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -53,6 +57,7 @@ namespace synthese
 	using namespace calendar;
 	using namespace graph;
 	using namespace transportwebsite;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<timetables::TimetableGenerateFunction::_FunctionWithSite,timetables::TimetableGenerateFunction>::FACTORY_KEY("TimetableGenerateFunction");
 	
@@ -143,24 +148,36 @@ namespace synthese
 			}
 			else
 			{
-				if(	!_site.get() ||
-					!_site->getInterface() ||
-					!_timetable->getInterface()->hasPage<TimetableInterfacePage>()
-				){
-					throw RequestException("A site with valid interface must be defined");
-				}
 				shared_ptr<Timetable> timetable(new Timetable);
 				timetable->setInterface(_site->getInterface());
 
-				try
+				if(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_ID))
 				{
-					timetable->setBaseCalendar(
-						Env::GetOfficialEnv().get<CalendarTemplate>(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID)).get()
-					);
+					try
+					{
+						timetable->setBaseCalendar(
+							Env::GetOfficialEnv().get<CalendarTemplate>(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID)).get()
+						);
+					}
+					catch(ObjectNotFoundException<CalendarTemplate>&)
+					{
+						throw RequestException("No such calendar");
+					}
 				}
-				catch(ObjectNotFoundException<CalendarTemplate>&)
+				else
 				{
-					throw RequestException("No such calendar");
+					CalendarTemplate* calendarTemplate(new CalendarTemplate);
+					CalendarTemplateElement element;
+					element.setCalendar(calendarTemplate);
+					element.setInterval(days(1));
+					element.setMinDate(day_clock::local_day());
+					element.setMaxDate(day_clock::local_day());
+					element.setOperation(CalendarTemplateElement::ADD);
+					element.setRank(0);
+					calendarTemplate->addElement(element);
+					calendarTemplate->setText("Aujourd'hui");
+					timetable->setBaseCalendar(calendarTemplate);
+					_calendarTemplate.reset(calendarTemplate);
 				}
 				
 
@@ -176,6 +193,7 @@ namespace synthese
 						throw RequestException("No such line route");
 					}
 					timetable->addAuthorizedLine(_line->getCommercialLine());
+					timetable->setContentType(Timetable::TABLE_SERVICES_IN_COLS);
 					
 					size_t rank(0);
 					BOOST_FOREACH(const Edge* edge, _line->getEdges())
@@ -187,9 +205,49 @@ namespace synthese
 						row.setRank(rank++);
 						timetable->addRow(row);
 					}
+				} // Way 4.1 : stop area timetable
+				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == ConnectionPlaceTableSync::TABLE.ID)
+				{
+					shared_ptr<const PublicTransportStopZoneConnectionPlace> place;
+					try
+					{
+						place = Env::GetOfficialEnv().get<PublicTransportStopZoneConnectionPlace>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+					}
+					catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
+					{
+						throw RequestException("No such place");
+					}
+					timetable->setContentType(Timetable::TABLE_SERVICES_IN_ROWS);
+					TimetableRow row;
+					row.setIsArrival(false);
+					row.setIsDeparture(true);
+					row.setPlace(place.get());
+					row.setRank(0);
+					timetable->addRow(row);
+				} // Way 4.2 : physical stop timetable
+				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == PhysicalStopTableSync::TABLE.ID)
+				{
+					shared_ptr<const PhysicalStop> stop;
+					try
+					{
+						stop = Env::GetOfficialEnv().get<PhysicalStop>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+					}
+					catch(ObjectNotFoundException<PhysicalStop>&)
+					{
+						throw RequestException("No such stop");
+					}
+					timetable->setContentType(Timetable::TABLE_SERVICES_IN_ROWS);
+					TimetableRow row;
+					row.setIsArrival(false);
+					row.setIsDeparture(true);
+					row.setPlace(stop->getConnectionPlace());
+					row.setRank(0);
+					timetable->addRow(row);
+					timetable->addAuthorizedPhysicalStop(stop.get());
 				}
 				else // Way 3 : customized timetable
 				{
+					timetable->setContentType(Timetable::TABLE_SERVICES_IN_COLS);
 					for(size_t rank(0);
 						!map.getDefault<string>(PARAMETER_CITY_PREFIX + lexical_cast<string>(rank)).empty() &&
 						!map.getDefault<string>(PARAMETER_STOP_PREFIX + lexical_cast<string>(rank)).empty();
@@ -213,15 +271,22 @@ namespace synthese
 
 				_timetable = const_pointer_cast<const Timetable>(timetable);
 			}
+
+			if(	!_site.get() ||
+				!_site->getInterface() ||
+				!_timetable->getInterface()->hasPage<TimetableInterfacePage>()
+			){
+				throw RequestException("A site with valid interface must be defined");
+			}
 		}
 
 		void TimetableGenerateFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			auto_ptr<TimetableGenerator> generator(_timetable->getGenerator(Env::GetOfficialEnv()));
-			generator->build();
+			TimetableResult result(generator->build());
 			const TimetableInterfacePage* page(_timetable->getInterface()->getPage<TimetableInterfacePage>());
 			VariablesMap variables;
-			page->display(stream, *_timetable, *generator, variables, &request);
+			page->display(stream, *_timetable, *generator, result, variables, &request);
 		}
 		
 		

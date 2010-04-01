@@ -22,3 +22,4 @@ synthese::server::ThreadsAdmin::integrate();
 
 synthese::server::XMLSessionFunction::integrate();
 synthese::server::XMLSessionIsValidFunction::integrate();
+synthese::server::GetValueFunction::integrate();

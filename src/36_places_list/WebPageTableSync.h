@@ -45,10 +45,6 @@ namespace synthese
 			static const std::string COL_UP_ID;
 			static const std::string COL_RANK;
 			static const std::string COL_CONTENT1;
-			static const std::string COL_INCLUDE1;
-			static const std::string COL_CONTENT2;
-			static const std::string COL_INCLUDE2;
-			static const std::string COL_CONTENT3;
 			static const std::string COL_START_TIME;
 			static const std::string COL_END_TIME;
 		

@@ -52,45 +52,41 @@ namespace synthese
 			_env(env)
 			, _maxColumnsNumber(UNKNOWN_VALUE)
 		{
-
 		}
 
 
 
-		const TimetableGenerator::Warnings& TimetableGenerator::getWarnings() const
+		TimetableResult TimetableGenerator::build()
 		{
-			return _warnings;
-		}
+			TimetableResult result;
 
-
-		void TimetableGenerator::build()
-		{
-			assert(_columns.empty());
-
-			if(_rows.empty()) return;
-
-			// Loop on each line of the database
-			BOOST_FOREACH(Registry<Line>::value_type it, _env.getRegistry<Line>())
+			if(!_rows.empty())
 			{
-				// Line selection
-				const Line& line(*it.second);
-				if (!_isLineSelected(line))
-					continue;
-
-				_scanServices(line);
-
-				BOOST_FOREACH(const Line::SubLines::value_type& subline, line.getSubLines())
+				// Loop on each line of the database
+				BOOST_FOREACH(Registry<Line>::value_type it, _env.getRegistry<Line>())
 				{
-					_scanServices(*subline);
-				}
-			}
+					// Line selection
+					const Line& line(*it.second);
+					if (!_isLineSelected(line))
+						continue;
 
-			_buildWarnings();
+					_scanServices(result, line);
+
+					BOOST_FOREACH(const Line::SubLines::value_type& subline, line.getSubLines())
+					{
+						_scanServices(result, *subline);
+					}
+				}
+
+				_buildWarnings(result);
+
+			}
+			return result;
 		}
 
 
 
-		void TimetableGenerator::_scanServices( const env::Line& line )
+		void TimetableGenerator::_scanServices(TimetableResult& result, const env::Line& line )
 		{
 			// Loop on each service
 			BOOST_FOREACH(const Service* servicePtr, line.getServices())
@@ -109,23 +105,16 @@ namespace synthese
 				TimetableColumn col(*this, *service);
 
 				// Column storage or merge
-				_insert(col);
+				_insert(result, col);
 			}
 		}
 
 
 
-		const TimetableGenerator::Rows& TimetableGenerator::getRows() const
+		void TimetableGenerator::_insert(TimetableResult& result, const TimetableColumn& col )
 		{
-			return _rows;
-		}
-
-
-
-		void TimetableGenerator::_insert( const TimetableColumn& col )
-		{
-			Columns::iterator itCol;
-			for (itCol = _columns.begin(); itCol != _columns.end(); ++itCol)
+			TimetableResult::Columns::iterator itCol;
+			for (itCol = result.getColumns().begin(); itCol != result.getColumns().end(); ++itCol)
 			{
 				if (*itCol == col)
 				{
@@ -135,26 +124,24 @@ namespace synthese
 
 				if (col <= *itCol)
 				{
-					_columns.insert(itCol, col);
+					result.getColumns().insert(itCol, col);
 					return;
 				}
 			}
-			_columns.push_back(col);
+			result.getColumns().push_back(col);
 		}
 
 
 
-		void TimetableGenerator::_buildWarnings()
+		void TimetableGenerator::_buildWarnings(TimetableResult& result)
 		{
-			assert(_warnings.empty());
-
 			int nextNumber(1);
-			for(Columns::iterator itCol(_columns.begin()); itCol != _columns.end(); ++itCol)
+			for(TimetableResult::Columns::iterator itCol(result.getColumns().begin()); itCol != result.getColumns().end(); ++itCol)
 			{
 				if(itCol->getCalendar() == _baseCalendar) continue;
 
 				const TimetableWarning* warn(NULL);
-				BOOST_FOREACH(const Warnings::value_type& itWarn, _warnings)
+				BOOST_FOREACH(const TimetableResult::Warnings::value_type& itWarn, result.getWarnings())
 				{
 					if(itWarn.second.getCalendar() == itCol->getCalendar())
 					{
@@ -165,7 +152,7 @@ namespace synthese
 				
 				if (warn == NULL)
 				{
-					warn = &_warnings.insert(
+					warn = &result.getWarnings().insert(
 						make_pair(
 							nextNumber,
 							TimetableWarning(
@@ -219,7 +206,7 @@ namespace synthese
 						)	
 					){
 						lineIsSelected = true;
-						if (itRow->getIsArrival() || itRow->getCompulsory() == PassageSuffisant)
+						if (itRow->getIsArrival() || itRow->getCompulsory() == TimetableRow::PassageSuffisant)
 							passageOk = true;
 						break;
 					}
@@ -232,139 +219,39 @@ namespace synthese
 
 
 			// A2: Line selection : there must be at least an arrival stop of the line in the arrival rows, after the departure
-			lineIsSelected = false;
-			const LineStop* departureLinestop(static_cast<const LineStop*>(*itEdge));
-
-			for (++itRow; itRow != _rows.end(); ++itRow)
+			// this test is ignored if the timetable is defined only by a departure stop
+			if(_rows.size() > 1)
 			{
-				if(	(	itRow->getIsArrival()
-					&&(	passageOk
-						|| itRow->getCompulsory() == PassageSuffisant
-					)
-				)||(itRow->getIsDeparture()
-					&& itRow->getIsArrival()
-					)
-				){
-					for(const Edge* arrivalLinestop(departureLinestop->getFollowingArrivalForFineSteppingOnly());
-						arrivalLinestop != NULL;
-						arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
+				lineIsSelected = false;
+				const LineStop* departureLinestop(static_cast<const LineStop*>(*itEdge));
+
+				for (++itRow; itRow != _rows.end(); ++itRow)
+				{
+					if(	(	itRow->getIsArrival() &&
+							(	passageOk ||
+								itRow->getCompulsory() == TimetableRow::PassageSuffisant
+						)	) ||
+						(	itRow->getIsDeparture() &&
+							itRow->getIsArrival()
+						)
 					){
-						if(	dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(arrivalLinestop->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
+						for(const Edge* arrivalLinestop(departureLinestop->getFollowingArrivalForFineSteppingOnly());
+							arrivalLinestop != NULL;
+							arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
 						){
-							lineIsSelected = true;
-							break;
+							if(	dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(arrivalLinestop->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
+							){
+								lineIsSelected = true;
+								break;
+							}
 						}
+						if (lineIsSelected)
+							break;
 					}
-					if (lineIsSelected)
-						break;
 				}
 			}
 
 			return lineIsSelected;
-		}
-
-
-
-		void TimetableGenerator::setRows( const Rows& rows)
-		{
-			_rows = rows;
-		}
-
-
-
-		std::vector<time_duration> TimetableGenerator::getSchedulesByRow( Rows::const_iterator row ) const
-		{
-			int delta(row - _rows.begin());
-			vector<time_duration> result;
-			for (Columns::const_iterator it(_columns.begin()); it != _columns.end(); ++it)
-			{
-				const TimetableColumn::Content& content(it->getContent());
-				result.push_back((content.begin() + delta)->second);
-			}
-			return result;
-		}
-
-
-
-		void TimetableGenerator::setBaseCalendar(
-			const Calendar& value
-		){
-			_baseCalendar = value;
-		}
-
-
-
-		std::vector<const env::Line*> TimetableGenerator::getLines() const
-		{
-			vector<const Line*> result;
-			for (Columns::const_iterator it(_columns.begin()); it != _columns.end(); ++it)
-				result.push_back(it->getLine());
-			return result;
-		}
-
-
-
-		std::vector<tTypeOD> TimetableGenerator::getOriginTypes() const
-		{
-			vector<tTypeOD> result;
-			for (Columns::const_iterator it(_columns.begin()); it != _columns.end(); ++it)
-				result.push_back(it->getOriginType());
-			return result;
-		}
-
-
-
-		std::vector<tTypeOD> TimetableGenerator::getDestinationTypes() const
-		{
-			vector<tTypeOD> result;
-			for (Columns::const_iterator it(_columns.begin()); it != _columns.end(); ++it)
-				result.push_back(it->getDestinationType());
-			return result;
-		}
-
-
-
-		TimetableGenerator::ColumnWarnings TimetableGenerator::getColumnsWarnings() const
-		{
-			TimetableGenerator::ColumnWarnings result;
-			for (Columns::const_iterator it(_columns.begin()); it != _columns.end(); ++it)
-				result.push_back(it->getWarning() ? it->getWarning()->getNumber() : 0);
-			return result;
-		}
-
-
-
-		const calendar::Calendar& TimetableGenerator::getBaseCalendar() const
-		{
-			return _baseCalendar;
-		}
-
-
-
-		const TimetableGenerator::Columns& TimetableGenerator::getColumns() const
-		{
-			return _columns;
-		}
-
-
-
-		void TimetableGenerator::setAuthorizedLines( const AuthorizedLines& value )
-		{
-			_authorizedLines = value;
-		}
-
-
-
-		void TimetableGenerator::setAuthorizedPhysicalStops( const AuthorizedPhysicalStops& value )
-		{
-			_authorizedPhysicalStops = value;
-		}
-
-
-
-		const TimetableGenerator::AuthorizedPhysicalStops& TimetableGenerator::getAuthorizedPhysicalStops() const
-		{
-			return _authorizedPhysicalStops;
 		}
 	}
 }

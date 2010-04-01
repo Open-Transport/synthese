@@ -62,6 +62,11 @@ namespace synthese
 				- 10 : Rolling stock id
 				- 11 : Rank
 				- 12 : Following services with same departure hour
+				- 13 : Line destination city id
+				- 14 : Line destination city name
+				- 15 : Line destination place id
+				- 16 : Line destination place name
+				- 17 : Text line destination
 				
 			Object : TimetableColumn
 		*/
@@ -72,7 +77,10 @@ namespace synthese
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
-				@param ...	
+				@param object Column to display as a row
+				@param lastSchedule Schedule of the previous row
+				@param rank Rank of the row in the table
+				@param followingServicesWithSameHour 1 if the next service leaves the stop at the same hour (minutes ca n be different)
 				@param variables Execution variables
 				@param request Source request
 			*/

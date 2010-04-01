@@ -137,6 +137,14 @@ namespace synthese
 				const admin::AdminRequest& request
 			) const;
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the current tree branch.
+			/// @return the parent page
+			virtual AdminInterfaceElement::PageLinks _getCurrentTreeBranch() const;
+
+
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Title getter.
@@ -146,7 +154,10 @@ namespace synthese
 			virtual std::string getTitle() const;
 
 
-			void setPage(boost::shared_ptr<const WebPage> value);
+			//! @name Setters
+			//@{
+				void setPage(boost::shared_ptr<const WebPage> value) { _page = value; }
+			//@}
 		};
 	}
 }

@@ -15,3 +15,4 @@
 
 #include "XMLSessionFunction.h"
 #include "XMLSessionIsValidFunction.h"
+#include "GetValueFunction.hpp"

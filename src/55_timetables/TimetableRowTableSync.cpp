@@ -102,7 +102,7 @@ namespace synthese
 
 			// Properties
 			object->setKey(id);
-			object->setCompulsory(static_cast<tTypeGareIndicateur>(rows->getInt(TimetableRowTableSync::COL_IS_COMPULSORY)));
+			object->setCompulsory(static_cast<TimetableRow::tTypeGareIndicateur>(rows->getInt(TimetableRowTableSync::COL_IS_COMPULSORY)));
 			object->setIsArrival(rows->getBool(TimetableRowTableSync::COL_IS_ARRIVAL));
 			object->setIsDeparture(rows->getBool(TimetableRowTableSync::COL_IS_DEPARTURE));
 			

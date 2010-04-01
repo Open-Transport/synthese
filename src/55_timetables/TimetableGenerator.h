@@ -27,9 +27,8 @@
 #include <set>
 
 #include "Calendar.h"
-#include "TimetableColumn.h"
-#include "TimetableWarning.h"
 #include "TimetableRow.h"
+#include "TimetableResult.hpp"
 
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
@@ -44,19 +43,21 @@ namespace synthese
 	{
 		class Line;
 		class CommercialLine;
+		class RollingStock;
 	}
 
 	namespace timetables
 	{
-		/** TimetableGenerator class.
-			@ingroup m55
-		*/
+		class TimetableResult;
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Timetable generator.
+		///	@ingroup m55
+		///	@author Hugues Romain
+		/// @date 2002
 		class TimetableGenerator
 		{
 		public:
-			typedef std::map<std::size_t, TimetableWarning>		Warnings;
-			typedef std::vector<std::size_t>	ColumnWarnings;
-			typedef std::vector<TimetableColumn>			Columns;
 			typedef std::vector<TimetableRow>				Rows;
 			typedef std::set<const env::CommercialLine*>	AuthorizedLines;
 			typedef std::set<const pt::PhysicalStop*>		AuthorizedPhysicalStops;
@@ -78,19 +79,12 @@ namespace synthese
 				int				_maxColumnsNumber;
 			//@}
 
-			//! @name Results
-			//@{
-				Columns			_columns;
-				Warnings		_warnings;
-			//@}
-			
-
 			//! @name Algorithms
 			//@{
 				bool	_isLineSelected(const env::Line& line)	const;
-				void	_insert(const TimetableColumn& col);
-				void	_buildWarnings();
-				void	_scanServices(const env::Line& line);
+				void	_insert(TimetableResult& result, const TimetableColumn& col);
+				void	_buildWarnings(TimetableResult& result);
+				void	_scanServices(TimetableResult& result, const env::Line& line);
 			//@}
 
 		public:
@@ -100,33 +94,22 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const calendar::Calendar& getBaseCalendar() const;
-				const Warnings&	getWarnings()	const;
-				const Rows&		getRows()		const;
-				const Columns&	getColumns()	const;
-				const AuthorizedPhysicalStops& getAuthorizedPhysicalStops() const;
+				const calendar::Calendar& getBaseCalendar() const { return _baseCalendar; }
+				const Rows&		getRows()		const { return _rows; }
+				const AuthorizedPhysicalStops& getAuthorizedPhysicalStops() const { return _authorizedPhysicalStops; }
 			//@}
 
 			//! @name Actions
 			//@{
-				void build();
-			//@}
-
-			//! @name Output by row
-			//@{
-				std::vector<boost::posix_time::time_duration>		getSchedulesByRow(Rows::const_iterator row)	const;
-				std::vector<const env::Line*>	getLines()									const;
-				std::vector<tTypeOD>			getOriginTypes()							const;
-				std::vector<tTypeOD>			getDestinationTypes()						const;
-				ColumnWarnings					getColumnsWarnings()	const;
+				TimetableResult build();
 			//@}
 
 			//! @name Setters
 			//@{
-				void setRows(const Rows& rows);
-				void setBaseCalendar(const calendar::Calendar& value);
-				void setAuthorizedLines(const AuthorizedLines& value);
-				void setAuthorizedPhysicalStops(const AuthorizedPhysicalStops& value);
+				void setRows(const Rows& rows) { _rows = rows; }
+				void setBaseCalendar(const calendar::Calendar& value) { _baseCalendar = value; }
+				void setAuthorizedLines(const AuthorizedLines& value) { _authorizedLines = value; }
+				void setAuthorizedPhysicalStops(const AuthorizedPhysicalStops& value) { _authorizedPhysicalStops = value; }
 			//@}
 		};
 	}

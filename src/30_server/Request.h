@@ -206,6 +206,7 @@ namespace synthese
 			//! @name Queries
 			//@{
 				ParametersMap _getParametersMap() const;
+				virtual ParametersMap getParametersMap() const { return _getParametersMap(); }
 			//@}
 
 			//! \name Service

@@ -27,6 +27,7 @@
 
 #include "InterfacePage.h"
 #include "FactorableTemplate.h"
+#include "Timetable.h"
 
 namespace synthese
 {
@@ -37,21 +38,71 @@ namespace synthese
 	
 	namespace timetables
 	{
-		class Timetable;
 		class TimetableGenerator;
+		class TimetableResult;
 
-		/** TimetableInterfacePage Interface Page Class.
+		/** 55.11 Interface page : Timetable.
 			@ingroup m55Pages refPages
-			@author Hugues
+			@author Hugues Romain
 			@date 2009
 
 			@code timetable @endcode
 
-			Parameters :
-				- 0 : Content
-				- 1 : (no content)
-				- 2 : Title
-				- 3 : Notes content
+			The parameters structure depends on the type of the timetable generator.
+
+			Common parameters :
+			<ul>
+				<li>0 : Timetable generator :</li>
+				<ul>
+					<li>container : the object is a fake timetable which "includes" other timetables</li>
+					<li>calendar : a calendar showing each day of validity of each included timetable</li>
+					<li>line_schema : the "thermometer" schema of the line(s) displayed in the timetable</li>
+					<li>services_in_cols : real timetable with services in cols, places in rows</li>
+					<li>services_in_rows : real timetable with services in rows, places in cols</li>
+					<li>times_in_cols : real timetable with times in cols (can only display times from a specific place)</li>
+					<li>times_in_rows : real timetable with times in rows (can only display times from a specific place)</li>
+				</ul>
+				<li>1 : Timetable title</li>
+				<li>2 : Timetable notes</li>
+				<li>3 : Calendar name</li>
+			</ul>
+
+			Specific parameters :
+
+			For container :
+			<ul>
+			</ul>
+
+			For calendar :
+			<ul>
+			</ul>
+
+			For line schema :
+			<ul>
+			</ul>
+
+			For services in cols :
+			<ul>
+				<li>4 : lines row content</li>
+				<li>5 : time rows content</li>
+				<li>6 : rolling stock row content</li>
+				<li>7 : booking row content</li>
+				<li>8 : note row content</li>
+				<li>9 : at list a note</li>
+			</ul>
+
+			For services in rows :
+			<ul>
+				<li>3 : time row content</li>
+			</ul>
+
+			For times in cols :
+			<ul>
+			</li>
+
+			For rows in cols :
+			<ul>
+			</li>
 
 			Object : TimetableGenerator
 		*/
@@ -59,22 +110,42 @@ namespace synthese
 			: public util::FactorableTemplate<interfaces::InterfacePage, TimetableInterfacePage>
 		{
 		public:
-			/** Overloaded display method for specific parameter conversion.
-				This function converts the parameters into a single ParametersVector object.
-				@param stream Stream to write on
-				@param ...	
-				@param variables Execution variables
-				@param request Source request
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Timetable display.
+			///	This function converts the parameters into a single ParametersVector object.
+			///	@param stream Stream to write on
+			///	@param object Timetable parameters
+			///	@param generator Used timetable generator
+			/// @param result Timetable result
+			///	@param variables Execution variables
+			///	@param request Source request
+			///	@author Hugues Romain
+			///	@date 2009
 			void display(
 				std::ostream& stream,
 				const timetables::Timetable& object,
 				const timetables::TimetableGenerator& generator,
+				const timetables::TimetableResult& result,
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL
 			) const;
 			
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor.
 			TimetableInterfacePage();
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Converts timetable type into text code.
+			/// @param value timetable type
+			/// @return text code (empty if the content type is not valid)
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			static std::string GetTimetableTypeCode(Timetable::ContentType value);
 		};
 	}
 }

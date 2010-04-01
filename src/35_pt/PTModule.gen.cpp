@@ -54,6 +54,7 @@ synthese::pt::TransportNetworkAddAction::integrate();
 synthese::pt::CommercialLineAddAction::integrate();
 synthese::pt::LineAddAction::integrate();
 synthese::pt::ServiceAddAction::integrate();
+synthese::pt::StopAreaUpdateAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 

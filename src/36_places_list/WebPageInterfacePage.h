@@ -48,12 +48,8 @@ namespace synthese
 
 			Parameters :
 				- 0 : title
-				- 1 : content 1
-				- 2 : include 1
-				- 3 : content 2
-				- 4 : include 2
-				- 5 : content 3
-				- 6 : page id
+				- 1 : content
+				- 2 : page id
 
 			Object : WebPage
 		*/

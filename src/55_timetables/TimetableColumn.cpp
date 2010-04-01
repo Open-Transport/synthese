@@ -180,54 +180,5 @@ namespace synthese
 			return _line->getCommercialLine() == op._line->getCommercialLine()
 				&& _content == op._content;
 		}
-
-
-
-		void TimetableColumn::setWarning(const TimetableWarning* it )
-		{
-			_warning = it;
-		}
-
-
-
-		const Calendar& TimetableColumn::getCalendar() const
-		{
-			return _calendar;
-		}
-
-
-
-		const TimetableColumn::Content& TimetableColumn::getContent() const
-		{
-			return _content;
-		}
-
-
-
-		const env::Line* TimetableColumn::getLine() const
-		{
-			return _line;
-		}
-
-
-
-		synthese::timetables::tTypeOD TimetableColumn::getOriginType() const
-		{
-			return _originType;
-		}
-
-
-
-		synthese::timetables::tTypeOD TimetableColumn::getDestinationType() const
-		{
-			return _destinationType;
-		}
-
-
-
-		const TimetableWarning* TimetableColumn::getWarning() const
-		{
-			return _warning;
-		}
 	}
 }

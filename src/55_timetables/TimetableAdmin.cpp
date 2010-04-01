@@ -57,6 +57,7 @@
 #include "Profile.h"
 #include "TimetableSetPhysicalStopAction.h"
 #include "PhysicalStopTableSync.h"
+#include "TimetableResult.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -396,14 +397,14 @@ namespace synthese
 						;
 						stream <<
 							t.col() <<
-							(	(row->getCompulsory() == PassageObligatoire) ?
+							(	(row->getCompulsory() == TimetableRow::PassageObligatoire) ?
 								HTMLModule::getHTMLImage("bullet_green.png", "Obligatoire") :
 								HTMLModule::getHTMLImage("bullet_white.png", "Non obligatoire")
 							)
 						;
 						stream <<
 							t.col() <<
-							(	(row->getCompulsory() == PassageSuffisant) ?
+							(	(row->getCompulsory() == TimetableRow::PassageSuffisant) ?
 								HTMLModule::getHTMLImage("bullet_green.png", "Suffisant") :
 								HTMLModule::getHTMLImage("bullet_white.png", "Non suffisant")
 							)
@@ -531,33 +532,32 @@ namespace synthese
 					stream << "<h1>Tableau</h1>";
 
 					auto_ptr<TimetableGenerator> g(_timetable->getGenerator(Env::GetOfficialEnv()));
-					g->build();
+					const TimetableResult result(g->build());
 
 					HTMLTable tf(0, ResultHTMLTable::CSS_CLASS);
 					stream << tf.open();
 					stream << tf.row();
 					stream << tf.col(1, string(), true) << "Lignes";
 
-					BOOST_FOREACH(const Line* line, g->getLines())
+					BOOST_FOREACH(const CommercialLine* line, result.getRowLines())
 					{
 						stream <<
-							tf.col(1, line->getCommercialLine()->getStyle()) <<
-							line->getCommercialLine()->getShortName()
-							;
+							tf.col(1, line->getStyle()) <<
+							line->getShortName()
+						;
 					}
 
-					const TimetableGenerator::Rows& grows(g->getRows());
-					for (TimetableGenerator::Rows::const_iterator it(grows.begin()); it !=grows.end(); ++it)
+					BOOST_FOREACH(const Timetable::Rows::value_type& row, _timetable->getRows())
 					{
 						stream << tf.row();
-						stream << tf.col(1, string(), true) << it->getPlace()->getFullName();
-						vector<time_duration> cols(g->getSchedulesByRow(it));
-						for (vector<time_duration>::const_iterator its(cols.begin()); its != cols.end(); ++its)
+						stream << tf.col(1, string(), true) << row.getPlace()->getFullName();
+						const TimetableResult::RowTimesVector cols(result.getRowSchedules(row.getRank()));
+						BOOST_FOREACH(const TimetableResult::RowTimesVector::value_type& col, cols)
 						{
 							stream << tf.col();
-							if (!its->is_not_a_date_time())
+							if (!col.is_not_a_date_time())
 							{
-								stream << its->hours() << ":" << its->minutes();
+								stream << col.hours() << ":" << col.minutes();
 							}
 						}
 					}
@@ -565,7 +565,7 @@ namespace synthese
 					// Notes
 					stream << tf.row();
 					stream << tf.col(1, string(), true) << "Renvois";
-					BOOST_FOREACH(const TimetableGenerator::ColumnWarnings::value_type& warn, g->getColumnsWarnings())
+					BOOST_FOREACH(const TimetableResult::RowNotesVector::value_type& warn, result.getRowNotes())
 					{
 						stream << tf.col();
 						if(warn != 0)
@@ -576,7 +576,7 @@ namespace synthese
 
 					stream << tf.close();
 
-					if(	!g->getWarnings().empty()
+					if(	!result.getWarnings().empty()
 					){
 						stream << "<h1>Renvois</h1>";
 
@@ -586,7 +586,7 @@ namespace synthese
 						HTMLTable tw(v, ResultHTMLTable::CSS_CLASS);
 						stream << tw.open();
 
-						BOOST_FOREACH(const TimetableGenerator::Warnings::value_type& warn, g->getWarnings())
+						BOOST_FOREACH(const TimetableResult::Warnings::value_type& warn, result.getWarnings())
 						{
 							stream << tw.row();
 							stream << tw.col() << warn.first;

@@ -120,7 +120,7 @@ namespace synthese
 			r.setPlace(_place);
 			r.setIsDeparture(_isDeparture);
 			r.setIsArrival(_isArrival);
-			r.setCompulsory(_isSufficient ? PassageSuffisant : PassageFacultatif);
+			r.setCompulsory(_isSufficient ? TimetableRow::PassageSuffisant : TimetableRow::PassageFacultatif);
 
 			// rank shifting
 			TimetableRowTableSync::Shift(_timetable->getKey(), _rank, 1);

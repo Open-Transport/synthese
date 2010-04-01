@@ -17,6 +17,8 @@ synthese::calendar::CalendarTemplatePropertiesUpdateAction::integrate();
 synthese::calendar::CalendarModule::integrate();
 synthese::calendar::CalendarRight::integrate();
 
+synthese::calendar::CalendarTemplatesListFunction::integrate();
+
 // Registries
 synthese::util::Env::Integrate<synthese::calendar::CalendarTemplateElement>();
 synthese::util::Env::Integrate<synthese::calendar::CalendarTemplate>();

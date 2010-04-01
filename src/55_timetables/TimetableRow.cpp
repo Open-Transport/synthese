@@ -20,8 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <stdlib.h>
-
 #include "TimetableRow.h"
 
 using namespace std;
@@ -47,90 +45,6 @@ namespace synthese
 			_rank(UNKNOWN_VALUE),
 			_timetableId(UNKNOWN_VALUE)
 		{
-		}
-
-
-
-		void TimetableRow::setRank( int rank )
-		{
-			_rank = rank;
-		}
-
-
-
-		void TimetableRow::setPlace( const env::PublicTransportStopZoneConnectionPlace* place )
-		{
-			_place = place;
-		}
-
-
-
-		void TimetableRow::setCompulsory(tTypeGareIndicateur compulsory )
-		{
-			_compulsory = compulsory;
-		}
-
-
-
-		void TimetableRow::setTimetableId( uid id )
-		{
-			_timetableId = id;
-		}
-
-
-
-		const env::PublicTransportStopZoneConnectionPlace* TimetableRow::getPlace() const
-		{
-			return _place;
-		}
-
-
-
-		synthese::timetables::tTypeGareIndicateur TimetableRow::getCompulsory() const
-		{
-			return _compulsory;
-		}
-
-
-
-		int TimetableRow::getRank() const
-		{
-			return _rank;
-		}
-
-
-
-		uid TimetableRow::getTimetableId() const
-		{
-			return _timetableId;
-		}
-
-
-
-		bool TimetableRow::getIsArrival() const
-		{
-			return _isArrival;
-		}
-
-
-
-		bool TimetableRow::getIsDeparture() const
-		{
-			return _isDeparture;
-		}
-
-
-
-		void TimetableRow::setIsArrival( bool value )
-		{
-			_isArrival = value;
-		}
-
-
-
-		void TimetableRow::setIsDeparture( bool value )
-		{
-			_isDeparture = value;
 		}
 	}
 }

@@ -30,6 +30,11 @@
 
 namespace synthese
 {
+	namespace calendar
+	{
+		class CalendarTemplate;
+	}
+
 	namespace env
 	{
 		class Line;
@@ -62,6 +67,8 @@ namespace synthese
 				<li>sid : id of the site to use</li>
 			</ul>
 
+			The generated timetable is rendered as services_by_cols type.
+
 			<h3>Usage 3 : building a timetable from a list of stops</h3>
 
 			Parameters :
@@ -76,6 +83,19 @@ namespace synthese
 				<li>cid : id of the CalendarTemplate object</li>
 				<li>sid : id of the interface to use</li>
 			</ul>
+
+			The generated timetable is rendered as services_by_cols type.
+
+			<h3>Usage 4 : building the full timetable of a stop (stop area or stop point)</h3>
+
+			Parameters :
+			<ul>
+				<li>roid : id of a stop area (PublicStopZoneConnectionPlace) or stop zone (PhysicalStop) object</li>
+				<li>cid : id of the CalendarTemplate object</li>
+				<li>sid : id of the site to use</li>
+			</ul>
+
+			The generated timetable is rendered as services_by_rows type.
 		*/
 		class TimetableGenerateFunction:
 			public util::FactorableTemplate<transportwebsite::FunctionWithSite<false>,TimetableGenerateFunction>
@@ -89,6 +109,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const Timetable>	_timetable;
+				boost::shared_ptr<const calendar::CalendarTemplate>	_calendarTemplate;
 				boost::shared_ptr<const env::Line> _line;
 			//@}
 			

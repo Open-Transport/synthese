@@ -142,7 +142,7 @@ namespace synthese
 				{
 					object->setColor(RGBColor(color));
 				}
-				catch(RGBColor::Exception& e)
+				catch(RGBColor::Exception&)
 				{
 					Log::GetInstance().warn("No such color "+ color +" in commercial line "+ lexical_cast<string>(object->getKey()));
 				}

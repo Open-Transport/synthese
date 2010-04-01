@@ -15,3 +15,5 @@
 
 #include "CalendarModule.h"
 #include "CalendarRight.h"
+
+#include "CalendarTemplatesListFunction.hpp"

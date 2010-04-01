@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_DisplayScreenContentRequest_H__
 #define SYNTHESE_DisplayScreenContentRequest_H__
 
-#include "Function.h"
+#include "FunctionWithSite.h"
 #include "FactorableTemplate.h"
 
 #include <boost/optional.hpp>
@@ -70,7 +70,8 @@ namespace synthese
 			
 			General parameters :
 			<ul>
-				<li>i : id of display interface</li>
+				<li>i : id of display interface (optional if si is defined)</li>
+				<li>si : id of display website (ignored if i is defined)</li>
 				<li>rn : table rows number</li>
 			</ul>
 			
@@ -95,7 +96,8 @@ namespace synthese
 						
 			General parameters :
 			<ul>
-				<li>i : id of display interface</li>
+				<li>i : id of display interface (optional if si is defined)</li>
+				<li>si : id of display website (ignored if i is defined)</li>
 				<li>rn : table rows number</li>
 			</ul>
 			
@@ -116,7 +118,8 @@ namespace synthese
 				<li>oc : operator code of the physical stop</li>
 			</ul>
 		*/
-		class DisplayScreenContentFunction : public util::FactorableTemplate<server::Function,DisplayScreenContentFunction>
+		class DisplayScreenContentFunction:
+			public util::FactorableTemplate<transportwebsite::FunctionWithSite<false>,DisplayScreenContentFunction>
 		{
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_TB;

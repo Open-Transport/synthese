@@ -41,6 +41,8 @@
 #include "AdminFunctionRequest.hpp"
 #include "JunctionTableSync.hpp"
 #include "Address.h"
+#include "StopAreaUpdateAction.h"
+#include "AdminActionFunctionRequest.hpp"
 
 using namespace std;
 using namespace boost;
@@ -220,6 +222,20 @@ namespace synthese
 			// TAB TRANSFER
 			if (openTabContent(stream, TAB_TRANSFER))
 			{
+				if(_connectionPlace.get())
+				{
+					stream << "<h1>Propriétés</h1>";
+
+					AdminActionFunctionRequest<StopAreaUpdateAction,PTPlaceAdmin> updateRequest(request);
+					updateRequest.getAction()->setPlace(const_pointer_cast<PublicTransportStopZoneConnectionPlace>(_connectionPlace));
+
+					PropertiesHTMLTable t(updateRequest.getHTMLForm());
+					stream << t.open();
+					stream << t.cell("Correspondance autorisée", t.getForm().getOuiNonRadioInput(StopAreaUpdateAction::PARAMETER_ALLOWED_CONNECTIONS, _connectionPlace->getAllowedConnection()));
+					stream << t.cell("Délai de correspondance par défaut (minutes)", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_connectionPlace->getDefaultTransferDelay().total_seconds() / 60)));
+					stream << t.close();
+				}
+
 				stream << "<h1>Transferts internes (correspondances)</h1>";
 				{
 					HTMLTable::ColsVector c;

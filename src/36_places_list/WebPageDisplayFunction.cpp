@@ -47,12 +47,14 @@ namespace synthese
 	
 	namespace transportwebsite
 	{
+		const string WebPageDisplayFunction::PARAMETER_PAGE_ID("p");
+
 		ParametersMap WebPageDisplayFunction::_getParametersMap() const
 		{
 			ParametersMap map;
 			if(_page.get())
 			{
-				map.insert(Request::PARAMETER_OBJECT_ID, _page->getKey());
+				map.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
 			return map;
 		}
@@ -61,7 +63,7 @@ namespace synthese
 		{
 			try
 			{
-				_page = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+				_page = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
 			}
 			catch (ObjectNotFoundException<WebPage>)
 			{

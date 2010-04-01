@@ -26,7 +26,6 @@
 #include "Registrable.h"
 #include "UId.h"
 #include "Registry.h"
-#include "55_timetables/types.h"
 
 namespace synthese
 {
@@ -55,13 +54,21 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<TimetableRow>	Registry;
 		
+			enum tTypeGareIndicateur
+			{
+				PassageFacultatif = -1
+				, PassageObligatoire = 0
+				, PassageSuffisant = 1
+				, CompulsoryHidden = 2
+			};
+
 		private:
 			// Variables
 			const env::PublicTransportStopZoneConnectionPlace*	_place;
 			bool												_isDeparture;
 			bool												_isArrival;
 			tTypeGareIndicateur									_compulsory;
-			int													_rank;
+			std::size_t											_rank;
 			uid													_timetableId;
 
 		public:
@@ -72,22 +79,22 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const env::PublicTransportStopZoneConnectionPlace*	getPlace()			const;
-				tTypeGareIndicateur 								getCompulsory()		const;
-				int													getRank()			const;
-				uid													getTimetableId()	const;
-				bool												getIsArrival()		const;
-				bool												getIsDeparture()	const;
+				const env::PublicTransportStopZoneConnectionPlace*	getPlace()			const { return _place; }
+				tTypeGareIndicateur 								getCompulsory()		const { return _compulsory; }
+				std::size_t											getRank()			const { return _rank; }
+				uid													getTimetableId()	const { return _timetableId; }
+				bool												getIsArrival()		const { return _isArrival; }
+				bool												getIsDeparture()	const { return _isDeparture; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setRank(int rank);
-				void setPlace(const env::PublicTransportStopZoneConnectionPlace* place);
-				void setCompulsory(tTypeGareIndicateur compulsory);
-				void setTimetableId(uid id);
-				void setIsArrival(bool value);
-				void setIsDeparture(bool value);
+				void setRank(std::size_t value) { _rank = value; }
+				void setPlace(const env::PublicTransportStopZoneConnectionPlace* place) { _place = place; }
+				void setCompulsory(tTypeGareIndicateur compulsory) { _compulsory = compulsory; }
+				void setTimetableId(uid id) { _timetableId = id; }
+				void setIsArrival(bool value) { _isArrival = value; }
+				void setIsDeparture(bool value) { _isDeparture = value; }
 			//@}
 		};
 	}

@@ -165,11 +165,7 @@ namespace synthese
 
 			if(_template.get())
 			{
-				object.setContent1(_template->getContent1());
-				object.setInclude1(_template->getInclude1());
-				object.setContent2(_template->getContent2());
-				object.setInclude2(_template->getInclude2());
-				object.setContent3(_template->getContent3());
+				object.setContent(_template->getContent());
 				object.setParent(_template->getParent());
 
 				WebPageTableSync::ShiftRank(

@@ -34,6 +34,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "Interface.h"
 #include "WebPageInterfacePage.h"
+#include "TransportSiteAdmin.h"
 
 using namespace std;
 using namespace boost;
@@ -134,6 +135,7 @@ namespace synthese
 				stream << t.cell("ID", lexical_cast<string>(_page->getKey()));
 				stream << t.cell("Titre", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TITLE, _page->getName()));
 				stream << t.cell("Page supérieure", t.getForm().getSelectInput(WebPageUpdateAction::PARAMETER_UP_ID, WebPageTableSync::GetPagesList(_page->getRoot()->getKey(), "(racine)"), _page->getParent() ? _page->getParent()->getKey() : RegistryKeyType(0)));
+				stream << t.close();
 			}
 
 			stream << "<h1>Contenu</h1>";
@@ -143,11 +145,7 @@ namespace synthese
 				contentUpdateRequest.getAction()->setWebPage(const_pointer_cast<WebPage>(_page));
 				PropertiesHTMLTable t(contentUpdateRequest.getHTMLForm());
 				stream << t.open();
-				stream << t.cell("Contenu 1", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_CONTENT1, _page->getContent1(), 20, 60));
-				stream << t.cell("Inclusion 1", t.getForm().getTextInput(WebPageContentUpdateAction::PARAMETER_INCLUDE1, _page->getInclude1()));
-				stream << t.cell("Contenu 2", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_CONTENT2, _page->getContent2(), 20, 60));
-				stream << t.cell("Inclusion 2", t.getForm().getTextInput(WebPageContentUpdateAction::PARAMETER_INCLUDE2, _page->getInclude2()));
-				stream << t.cell("Contenu 3", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_CONTENT3, _page->getContent3(), 20, 60));
+				stream << t.cell("Contenu 1", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_CONTENT1, _page->getContent(), 20, 60));
 				stream << t.close();
 			}
 		}
@@ -169,13 +167,6 @@ namespace synthese
 
 
 
-		void WebPageAdmin::setPage( boost::shared_ptr<const WebPage> value )
-		{
-			_page = value;
-		}
-
-
-
 		AdminInterfaceElement::PageLinks WebPageAdmin::getSubPages( const AdminInterfaceElement& currentPage, const admin::AdminRequest& request ) const
 		{
 			AdminInterfaceElement::PageLinks links;
@@ -191,7 +182,32 @@ namespace synthese
 			}
 
 			return links;
+		}
 
+
+
+		AdminInterfaceElement::PageLinks WebPageAdmin::_getCurrentTreeBranch() const
+		{
+			if(_page->getParent())
+			{
+				shared_ptr<WebPageAdmin> p(
+					getNewOtherPage<WebPageAdmin>()
+				);
+				p->setPage(Env::GetOfficialEnv().getSPtr(_page->getParent()));
+				PageLinks links(p->getCurrentTreeBranch());
+				links.push_back(p);
+				return links;
+			}
+			else
+			{
+				shared_ptr<TransportSiteAdmin> p(
+					getNewOtherPage<TransportSiteAdmin>()
+				);
+				p->setSite(Env::GetOfficialEnv().getSPtr(_page->getRoot()));
+				PageLinks links(p->getCurrentTreeBranch());
+				links.push_back(p);
+				return links;
+			}
 		}
 	}
 }
