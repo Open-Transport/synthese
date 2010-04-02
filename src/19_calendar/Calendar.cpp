@@ -25,6 +25,7 @@
 
 #include <boost/foreach.hpp>
 #include <set>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -61,6 +62,14 @@ namespace synthese
 
 		}
 
+
+
+		Calendar::Calendar( const std::string& serialized )
+		{
+			setFromSerializedString(serialized);
+		}
+
+
 		date Calendar::getFirstActiveDate(
 		) const {
 			if(_markedDates.empty())
@@ -68,11 +77,14 @@ namespace synthese
 
 			_BitSets::const_iterator it(_markedDates.begin());
 
-			date result(it->first, Jan, 1);
-			size_t pos(it->second.find_first());
-			if(pos == dynamic_bitset<>::npos) return gregorian::date();
-			date_duration day(pos);
-			return result + day;
+			for(size_t p(0); p != 366; ++p)
+			{
+				if(it->second.test(p))
+				{
+					return date(it->first, Jan, 1) + days(p);
+				}
+			}
+			return gregorian::date();
 		}
 
 
@@ -84,18 +96,19 @@ namespace synthese
 
 			_BitSets::const_reverse_iterator it(_markedDates.rbegin());
 
-			date result(it->first, Jan, 1);
-
-			size_t lp(dynamic_bitset<>::npos);
-			for(size_t p(it->second.find_first()); p != dynamic_bitset<>::npos; p = it->second.find_next(p))
+			for(size_t p(366); p != 0; --p)
 			{
-				lp = p;
+				if(it->second.test(p))
+				{
+					return date(it->first, Jan, 1) + days(p);
+				}
 			}
-			if(lp == dynamic_bitset<>::npos) return gregorian::date();
+			if(it->second.test(0))
+			{
+				return date(it->first, Jan, 1);
+			}
 
-			date_duration day(lp);
-
-			return result + day;
+			return gregorian::date();
 		}
 
 
@@ -106,9 +119,12 @@ namespace synthese
 			BOOST_FOREACH(const _BitSets::value_type& it, _markedDates)
 			{
 				date d(it.first, Jan, 1);
-				for(size_t p(it.second.find_first()); p != dynamic_bitset<>::npos; p = it.second.find_next(p))
+				for(size_t p(0); p != 366; ++p)
 				{
-					result.push_back(d + date_duration(p));
+					if(it.second.test(p))
+					{
+						result.push_back(d + date_duration(p));
+					}
 				}
 			}
 			return result;
@@ -263,9 +279,12 @@ namespace synthese
 				_BitSets::iterator it2(_markedDates.find(it.first));
 				if(it2 == _markedDates.end()) continue;
 
-				for(size_t p(it.second.find_first()); p != dynamic_bitset<>::npos; p = it.second.find_next(p))
+				for(size_t p(0); p != 366; ++p)
 				{
-					it2->second.set(p, false);
+					if(it.second.test(p))
+					{
+						it2->second.set(p, false);
+					}
 				}
 			}
 		}
@@ -313,6 +332,32 @@ namespace synthese
 		void Calendar::copyDates( const Calendar& op )
 		{
 			_markedDates = op._markedDates;
+		}
+
+
+
+		void Calendar::serialize( std::ostream& stream ) const
+		{
+			BOOST_FOREACH(const _BitSets::value_type& yearDates, _markedDates)
+			{
+				stream << yearDates.first;
+				stream << yearDates.second;
+			}
+		}
+
+
+
+		void Calendar::setFromSerializedString( const std::string& value )
+		{
+			_markedDates.clear();
+			for(size_t p(0); p+369<value.size(); p += 370)
+			{
+				_markedDates.insert(
+					make_pair(
+						greg_year(lexical_cast<unsigned short>(value.substr(p, 4))),
+						bitset<366>(value.substr(p+4, 366))
+				)	);
+			}
 		}
 	}
 }

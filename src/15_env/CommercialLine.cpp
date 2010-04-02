@@ -24,18 +24,23 @@
 #include "Registry.h"
 #include "GraphConstants.h"
 #include "AllowedUseRule.h"
-#include "Path.h"
-#include "Service.h"
+#include "Line.h"
+#include "NonPermanentService.h"
+#include "SubLine.h"
+#include "CalendarTemplate.h"
 
 #include <boost/foreach.hpp>
 
 using namespace boost;
+using namespace std;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace graph;
 	using namespace pt;
+	using namespace calendar;
 
 	namespace util
 	{
@@ -44,136 +49,22 @@ namespace synthese
 
 	namespace env
 	{
-
-
-		const TransportNetwork* CommercialLine::getNetwork() const
-		{
-			return _network;
-		}
-
-		void CommercialLine::setNetwork(const TransportNetwork* network )
-		{
-			_network = network;
-		}
-
 		CommercialLine::CommercialLine(RegistryKeyType key)
 		:	util::Registrable(key),
 			graph::PathGroup(key),
 			_network(NULL),
-			_reservationContact(NULL)
+			_reservationContact(NULL),
+			_calendarTemplate(NULL)
 		{
 			// Default use rules
 			addRule(USER_PEDESTRIAN, AllowedUseRule::INSTANCE.get());
 		}
 
-		const std::string& CommercialLine::getName() const
-		{
-			return _name;
-		}
-
-		void CommercialLine::setName( const std::string& name )
-		{
-			_name = name;
-		}
 
 
-
-		const std::string& CommercialLine::getCreatorId() const
-		{
-			return _creatorId;
-		}
-
-		void CommercialLine::setCreatorId( const std::string& name )
-		{
-			_creatorId = name;
-		}
-
-
-		const CommercialLine::PlacesSet& CommercialLine::getOptionalReservationPlaces() const
-		{
-			return _optionalReservationPlaces;
-		}
-
-
-		const std::string& CommercialLine::getStyle() const
-		{
-			return _style;
-		}
-
-		void CommercialLine::setStyle( const std::string& style )
-		{
-			_style = style;
-		}
-
-		const std::string& CommercialLine::getShortName() const
-		{
-			return _shortName;
-		}
-
-		void CommercialLine::setShortName( const std::string& shortName )
-		{
-			_shortName = shortName;
-		}
-
-		const std::string& CommercialLine::getLongName() const
-		{
-			return _longName;
-		}
-
-		void CommercialLine::setLongName( const std::string& longName )
-		{
-			_longName = longName;
-		}
-
-		const std::string& CommercialLine::getImage() const
-		{
-			return _image;
-		}
-
-		void CommercialLine::setImage( const std::string& image )
-		{
-			_image = image;
-		}
-
-		const optional<util::RGBColor>& CommercialLine::getColor() const
-		{
-			return _color;
-		}
-
-		void CommercialLine::setColor(
-			const optional<util::RGBColor>& color
-		){
-			_color = color;
-		}
-
-		void CommercialLine::addOptionalReservationPlace(const PublicTransportStopZoneConnectionPlace* place )
-		{
-			recursive_mutex::scoped_lock lock(_optionalReservationPlacesMutex);
-
-			_optionalReservationPlaces.insert(place);
-		}
-
-
-
-		const ReservationContact* CommercialLine::getReservationContact() const
-		{
-			return _reservationContact;
-		}
-
-
-
-		void CommercialLine::setReservationContact(
-			const ReservationContact* value
-		){
-			_reservationContact = value;
-		}
-
-
-
-		bool CommercialLine::isOptionalReservationPlace( const env::PublicTransportStopZoneConnectionPlace* place ) const
-		{
-			recursive_mutex::scoped_lock lock(_optionalReservationPlacesMutex);
-
+		bool CommercialLine::isOptionalReservationPlace(
+			const PublicTransportStopZoneConnectionPlace* place
+		) const	{
 			return _optionalReservationPlaces.find(place) != _optionalReservationPlaces.end();
 		}
 
@@ -219,32 +110,58 @@ namespace synthese
 
 
 
-		void CommercialLine::cleanOptionalReservationPlaces()
-		{
-			recursive_mutex::scoped_lock lock(_optionalReservationPlacesMutex);
+		bool CommercialLine::respectsCalendarTemplate(
+			date_duration duration
+		) const	{
+			if(!_calendarTemplate)
+			{
+				return true;
+			}
 
-			_optionalReservationPlaces.clear();
+			date now(day_clock::local_day());
+			date endDate(now + duration);
+			Calendar period(now, endDate);
+
+			Calendar targetCalendar(_calendarTemplate->getResult(period));
+
+			return (getRunDays(period) & targetCalendar) == targetCalendar;
 		}
 
 
 
-		boost::recursive_mutex& CommercialLine::getOptionalReservationPlacesMutex() const
+		calendar::Calendar CommercialLine::getRunDays( const calendar::Calendar& mask ) const
 		{
-			return _optionalReservationPlacesMutex;
-		}
+			Calendar result;
+			BOOST_FOREACH(const Path* path, _paths)
+			{
+				BOOST_FOREACH(const Service* service, path->getServices())
+				{
+					if(dynamic_cast<const NonPermanentService*>(service))
+					{
+						result |= (*dynamic_cast<const NonPermanentService*>(service) & mask);
+					}
+					else
+					{
+						return mask;
+					}
+				}
 
-
-
-		const CommercialLine::NonConcurrencyRules& CommercialLine::getNonConcurrencyRules() const
-		{
-			return _nonConcurrencyRules;
-		}
-
-
-
-		boost::recursive_mutex& CommercialLine::getNonConcurrencyRulesMutex() const
-		{
-			return _nonConcurrencyRulesMutex;
+				BOOST_FOREACH(const SubLine* subline, static_cast<const Line*>(path)->getSubLines())
+				{
+					BOOST_FOREACH(const Service* service, subline->getServices())
+					{
+						if(dynamic_cast<const NonPermanentService*>(service))
+						{
+							result |= (*dynamic_cast<const NonPermanentService*>(service) & mask);
+						}
+						else
+						{
+							return mask;
+						}
+					}
+				}
+			}
+			return result;
 		}
 	}
 }

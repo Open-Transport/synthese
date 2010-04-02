@@ -45,7 +45,7 @@ namespace synthese
 	namespace util
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync, RoadTableSync>::FACTORY_KEY(
-			"15.30.02 Roads"
+			"34.10.01 Roads"
 		);
 	}
 

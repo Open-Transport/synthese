@@ -45,6 +45,8 @@
 #include "Profile.h"
 #include "PTPlaceAdmin.h"
 #include "AdminFunctionRequest.hpp"
+#include "ContinuousServiceUpdateAction.h"
+#include "PropertiesHTMLTable.h"
 
 using namespace std;
 using namespace boost;
@@ -258,7 +260,14 @@ namespace synthese
 				{
 					stream << "<h1>Service continu</h1>";
 
-					// ContinuousServiceUpdateAction
+					AdminActionFunctionRequest<ContinuousServiceUpdateAction,ServiceAdmin> updateRequest(request);
+					updateRequest.getAction()->setService(const_pointer_cast<ContinuousService>(_continuousService));
+					
+					PropertiesHTMLTable t(updateRequest.getHTMLForm());
+					stream << t.open();
+					stream << t.cell("Attente maximale (minutes)", t.getForm().getTextInput(ContinuousServiceUpdateAction::PARAMETER_WAITING_DURATION, lexical_cast<string>(_continuousService->getMaxWaitingTime().total_seconds() / 60)));
+					stream << t.cell("Fin de période", t.getForm().getTextInput(ContinuousServiceUpdateAction::PARAMETER_END_TIME, lexical_cast<string>(_continuousService->getDepartureEndScheduleToIndex(false, 0))));
+					stream << t.close();
 				}
 			}
 

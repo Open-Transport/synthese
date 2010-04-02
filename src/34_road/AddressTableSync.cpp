@@ -53,7 +53,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,AddressTableSync>::FACTORY_KEY("15.50.02 Addresses");
+		template<> const string FactorableTemplate<SQLiteTableSync,AddressTableSync>::FACTORY_KEY("34.20.01 Addresses");
 		template<> const string FactorableTemplate<Fetcher<Vertex>, AddressTableSync>::FACTORY_KEY("2");
 	}
 

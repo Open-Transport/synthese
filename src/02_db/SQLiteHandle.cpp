@@ -169,8 +169,8 @@ namespace synthese
 		SQLiteResultSPtr 
 		SQLiteHandle::execQuery (const SQLiteStatementSPtr& statement, bool lazy)
 		{
-			assert (lazy == false);
-			lazy = false;
+//			assert (lazy == false);
+//			lazy = false;
 			SQLiteResultSPtr result (new SQLiteLazyResult (statement));
 			if (lazy)
 			{

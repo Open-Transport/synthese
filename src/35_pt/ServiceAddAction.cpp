@@ -33,9 +33,7 @@
 #include "ScheduledServiceTableSync.h"
 #include "Line.h"
 #include "LineTableSync.h"
-#include "ServiceDateTableSync.h"
 #include "Fetcher.h"
-#include "ServiceDate.h"
 #include "SQLiteTransaction.h"
 
 using namespace std;
@@ -167,7 +165,7 @@ namespace synthese
 			shared_ptr<const SchedulesBasedService> timetemplate(_template);
 			if(!timetemplate.get()) // Attempt to load an other service to read the schedules
 			{
-				ScheduledServiceTableSync::SearchResult services(ScheduledServiceTableSync::Search(*_env, _line->getKey(), optional<RegistryKeyType>(), optional<RegistryKeyType>(), optional<string>(), optional<gregorian::date>(), false, 0, 1));
+				ScheduledServiceTableSync::SearchResult services(ScheduledServiceTableSync::Search(*_env, _line->getKey(), optional<RegistryKeyType>(), optional<RegistryKeyType>(), optional<string>(), false, 0, 1));
 				if(!services.empty())
 				{
 					timetemplate = static_pointer_cast<const SchedulesBasedService>(services.front());
@@ -207,8 +205,7 @@ namespace synthese
 				}
 				
 				ContinuousServiceTableSync::Save(&object, transaction);
-				ServiceDateTableSync::CreateDatesForRecentlyCreatedCalendar(object, transaction);
-
+				
 				//::AddCreationEntry(object, request.getUser().get());
 
 				request.setActionCreatedId(object.getKey());
@@ -234,8 +231,7 @@ namespace synthese
 				}
 
 				ScheduledServiceTableSync::Save(&object, transaction);
-				ServiceDateTableSync::CreateDatesForRecentlyCreatedCalendar(object, transaction);
-
+				
 				request.setActionCreatedId(object.getKey());
 
 				if(_period.total_seconds() > 0 && !_endDepartureTime.is_not_a_date_time())
@@ -259,7 +255,6 @@ namespace synthese
 						object2.copyDates(object);
 
 						ScheduledServiceTableSync::Save(&object2, transaction);
-						ServiceDateTableSync::CreateDatesForRecentlyCreatedCalendar(object2, transaction);
 					}
 				}
 			}

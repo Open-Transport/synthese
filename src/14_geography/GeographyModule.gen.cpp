@@ -10,6 +10,8 @@ synthese::geography::PlaceAliasTableSync::integrate();
 synthese::geography::PlaceAlias::integrate();
 synthese::geography::CityAliasTableSync::integrate();
 
+synthese::geography::CityUpdateAction::integrate();
+
 // Registries
 synthese::util::Env::Integrate<synthese::geography::City>();
 synthese::util::Env::Integrate<synthese::geography::CityAlias>();

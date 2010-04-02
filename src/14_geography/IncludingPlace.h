@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ENV_INCLUDINGPLACE_H
 #define SYNTHESE_ENV_INCLUDINGPLACE_H
 
-#include <vector>
+#include <set>
 
 #include "Place.h"
 
@@ -39,7 +39,7 @@ namespace synthese
 			public virtual Place
 		{
 		public:
-			typedef std::vector<const Place*> IncludedPlaces;
+			typedef std::set<const Place*> IncludedPlaces;
 
 		protected:
 			IncludedPlaces _includedPlaces; 
@@ -88,6 +88,17 @@ namespace synthese
 				 */
 				void addIncludedPlace (const Place* place);
 
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Removes an included place to the current one.
+				/// @param place place to remove
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				/// This methods cancels the caching of the isobarycentre.
+				/// If the place was not included, the method do nothing.
+				void removeIncludedPlace(const Place* place);
 			//@}
 		};
 	}

@@ -161,6 +161,10 @@ namespace synthese
 						{
 							city->addIncludedPlace (cp);
 						}
+						else
+						{
+							city->removeIncludedPlace(cp);
+						}
 						city->addPlaceToMatcher<PublicTransportStopZoneConnectionPlace>(cp);
 					}
 				}
@@ -216,6 +220,7 @@ namespace synthese
 			if (city != NULL)
 			{
 				city->removePlaceFromMatcher<PublicTransportStopZoneConnectionPlace>(cp);
+				city->removeIncludedPlace(cp);
 			}
 		}
 	}

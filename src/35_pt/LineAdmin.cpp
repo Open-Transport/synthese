@@ -197,7 +197,6 @@ namespace synthese
 						optional<RegistryKeyType>(),
 						optional<RegistryKeyType>(),
 						optional<string>(),
-						optional<date>(),
 						false,
 						0,
 						optional<size_t>(),

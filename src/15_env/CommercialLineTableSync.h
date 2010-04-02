@@ -43,7 +43,7 @@ namespace synthese
 {
 	namespace env
 	{
-		/** CommercialLine table synchronizer.
+		/** Commercial Line table synchronizer.
 			@ingroup m35LS refLS
 		*/
 		class CommercialLineTableSync:
@@ -63,6 +63,7 @@ namespace synthese
 			static const std::string COL_HANDICAPPED_USE_RULE;
 			static const std::string COL_BIKE_USE_RULE;
 			static const std::string COL_RESERVATION_CONTACT_ID;
+			static const std::string COL_CALENDAR_TEMPLATE_ID;
 
 			/** CommercialLine search.
 				@param networkId Id of the network which the lines must belong (default = UNKNOWN_VALUE = all networks)

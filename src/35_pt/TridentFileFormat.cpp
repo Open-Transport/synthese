@@ -33,7 +33,6 @@
 #include "PhysicalStopTableSync.h"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
-#include "ServiceDateTableSync.h"
 #include "ContinuousService.h"
 #include "ContinuousServiceTableSync.h"
 #include "Line.h"
@@ -51,7 +50,6 @@
 #include "ReservationContact.h"
 #include "ReservationContactTableSync.h"
 #include "PTUseRule.h"
-#include "ServiceDate.h"
 #include "PTConstants.h"
 #include "Projection.h"
 #include "Point2D.h"
@@ -225,17 +223,12 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					optional<RegistryKeyType>(),
 					optional<string>(),
-					optional<date>(),
 					false,
 					0,
 					optional<size_t>(),
 					true, true,
 					UP_DOWN_LINKS_LOAD_LEVEL
 				);
-				BOOST_FOREACH(Registry<ScheduledService>::value_type itServ, _env->getRegistry<ScheduledService>())
-				{
-					ServiceDateTableSync::SetActiveDates(*itServ.second);
-				}
 				ContinuousServiceTableSync::Search(
 					*_env,
 					line.getKey(),
@@ -245,10 +238,6 @@ namespace synthese
 					true, true,
 					UP_DOWN_LINKS_LOAD_LEVEL
 				);
-				BOOST_FOREACH(Registry<ContinuousService>::value_type itServC, _env->getRegistry<ContinuousService>())
-				{
-					ServiceDateTableSync::SetActiveDates(*itServC.second);
-				}
 			}
 
 
@@ -1401,7 +1390,6 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					optional<RegistryKeyType>(),
 					optional<string>(),
-					optional<date>(),
 					false,
 					0, optional<size_t>(), true, true,
 					UP_LINKS_LOAD_LEVEL
@@ -1616,11 +1604,6 @@ namespace synthese
 					{
 						BOOST_FOREACH(ScheduledService* service, calendarServices)
 						{
-							shared_ptr<ServiceDate> sd(new ServiceDate);
-							sd->setService(service);
-							sd->setDate(d);
-							sd->setKey(ServiceDateTableSync::getId());
-							_serviceDates.push_back(sd);
 							service->setActive(d);
 						}
 					}
@@ -1768,12 +1751,7 @@ namespace synthese
 			}
 			BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env->getRegistry<ScheduledService>())
 			{
-				ServiceDateTableSync::DeleteDates(service.second->getKey(), _startDate, transaction);
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
-			}
-			BOOST_FOREACH(shared_ptr<ServiceDate> date, _serviceDates)
-			{
-				ServiceDateTableSync::Save(date.get(), transaction);
 			}
 			BOOST_FOREACH(const Registry<Junction>::value_type& junction, _env->getRegistry<Junction>())
 			{

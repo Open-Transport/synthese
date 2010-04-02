@@ -46,6 +46,11 @@
 #include "NonPermanentService.h"
 #include "Profile.h"
 #include "LineAddAction.h"
+#include "CalendarTemplateTableSync.h"
+#include "CommercialLineCalendarTemplateUpdateAction.hpp"
+#include "CommercialLineUpdateAction.h"
+#include "PropertiesHTMLTable.h"
+#include "ReservationContact.h"
 
 using namespace std;
 using namespace boost;
@@ -61,6 +66,8 @@ namespace synthese
 	using namespace security;
 	using namespace html;
 	using namespace pt;
+	using namespace calendar;
+	
 
 	namespace util
 	{
@@ -83,6 +90,7 @@ namespace synthese
 		const string CommercialLineAdmin::PARAMETER_SEARCH_NAME("na");
 		const string CommercialLineAdmin::PARAMETER_DATES_START("ds");
 		const string CommercialLineAdmin::PARAMETER_DATES_END("de");
+		const string CommercialLineAdmin::PARAMETER_CALENDAR_CONTROL("cc");
 
 		
 		void CommercialLineAdmin::setFromParametersMap(
@@ -108,6 +116,8 @@ namespace synthese
 			{
 				throw AdminParametersException("No such line");
 			}
+
+			_controlCalendar = map.getDefault<bool>(PARAMETER_CALENDAR_CONTROL, false);
 		}
 		
 		
@@ -116,6 +126,7 @@ namespace synthese
 		{
 			ParametersMap m;
 			if(_cline.get()) m.insert(Request::PARAMETER_OBJECT_ID, _cline->getKey());
+			m.insert(PARAMETER_CALENDAR_CONTROL, _controlCalendar);
 			return m;
 		}
 
@@ -190,61 +201,93 @@ namespace synthese
 			// TAB HOURS
 			if (openTabContent(stream, TAB_DATES))
 			{
-				RunHours _runHours(
-					getCommercialLineRunHours(_getEnv(), _cline->getKey(), _startDate, _endDate)
-				);
+				stream << "<h1>Propriétés</h1>";
 
-				stream << "<style>td.red {background-color:red;width:8px; height:8px; color:white; text-align:center; } td.green {background-color:#008000;width:10px; height:10px; color:white; text-align:center; }</style>"; 
-				HTMLTable::ColsVector cols;
-				cols.push_back("Date");
-				for(int i(0); i<=23; ++i)
-				{
-					cols.push_back(Conversion::ToString(i));
-				}
-				optional<date> d;
-				int lastHour;
-				HTMLTable t(cols, ResultHTMLTable::CSS_CLASS);
+				AdminActionFunctionRequest<CommercialLineCalendarTemplateUpdateAction,CommercialLineAdmin> updateCalendarRequest(_request);
+				updateCalendarRequest.getAction()->setLine(const_pointer_cast<CommercialLine>(_cline));
+				PropertiesHTMLTable t(updateCalendarRequest.getHTMLForm());
+
 				stream << t.open();
-				BOOST_FOREACH(const RunHours::value_type& it, _runHours)
+				stream << t.cell(
+					"Calendrier à respecter",
+					t.getForm().getSelectInput(
+						CommercialLineCalendarTemplateUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID,
+						CalendarTemplateTableSync::GetCalendarTemplatesList("Pas de vérification"),
+						_cline->getCalendarTemplate() ? _cline->getCalendarTemplate()->getKey() : RegistryKeyType(0)
+				)	);
+				stream << t.close();
+
+				stream << "<h1>Contrôles du calendrier</h1>";
+
+				if(_controlCalendar)
 				{
-					if(!d || d != it.first.first)
+					RunHours _runHours(
+						getCommercialLineRunHours(_getEnv(), _cline->getKey(), _startDate, _endDate)
+					);
+
+					stream << "<style>td.red {background-color:red;width:8px; height:8px; color:white; text-align:center; } td.green {background-color:#008000;width:10px; height:10px; color:white; text-align:center; }</style>"; 
+					HTMLTable::ColsVector cols;
+					cols.push_back("Date");
+					for(int i(0); i<=23; ++i)
 					{
-						if (d)
+						cols.push_back(Conversion::ToString(i));
+					}
+					optional<date> d;
+					int lastHour;
+					HTMLTable t(cols, ResultHTMLTable::CSS_CLASS);
+					stream << t.open();
+					BOOST_FOREACH(const RunHours::value_type& it, _runHours)
+					{
+						if(!d || d != it.first.first)
 						{
-							for(int i(lastHour+1); i<=23; ++i)
+							if (d)
 							{
-								stream << t.col(1, "red") << "0";
-							}
-							for(d = *d + days(1); *d < it.first.first; d = *d + days(1))
-							{
-								stream << t.row();
-								stream << t.col(1, string(), true) << to_iso_extended_string(*d);
-								for(int i(0); i<=23; ++i)
+								for(int i(lastHour+1); i<=23; ++i)
 								{
 									stream << t.col(1, "red") << "0";
 								}
+								for(d = *d + days(1); *d < it.first.first; d = *d + days(1))
+								{
+									stream << t.row();
+									stream << t.col(1, string(), true) << to_iso_extended_string(*d);
+									for(int i(0); i<=23; ++i)
+									{
+										stream << t.col(1, "red") << "0";
+									}
+								}
 							}
+							d = it.first.first;
+							stream << t.row();
+							stream << t.col(1, string(), true) << to_iso_extended_string(*d);
+							lastHour = -1;
 						}
-						d = it.first.first;
-						stream << t.row();
-						stream << t.col(1, string(), true) << to_iso_extended_string(*d);
-						lastHour = -1;
+						for(int i(lastHour+1); i<it.first.second; ++i)
+						{
+							stream << t.col(1, "red") << "0";
+						}
+						stream << t.col(1, "green") << it.second;
+						lastHour = it.first.second;
 					}
-					for(int i(lastHour+1); i<it.first.second; ++i)
+					if(d)
 					{
-						stream << t.col(1, "red") << "0";
+						for(int i(lastHour+1); i<=23; ++i)
+						{
+							stream << t.col(1, "red") << "0";
+						}
 					}
-					stream << t.col(1, "green") << it.second;
-					lastHour = it.first.second;
+					stream << t.close();
 				}
-				if(d)
+				else
 				{
-					for(int i(lastHour+1); i<=23; ++i)
-					{
-						stream << t.col(1, "red") << "0";
-					}
+					AdminFunctionRequest<CommercialLineAdmin> openRequest(_request);
+					openRequest.getPage()->setControlCalendar(true);
+
+					stream <<
+						"<p class=\"info\">Les contrôle de dates sont désactivées par défaut.<br /><br />" <<
+						HTMLModule::getLinkButton(openRequest.getURL(), "Activer les contrôles de date", string(), ICON) <<
+						"</p>"
+					;
 				}
-				stream << t.close();
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -317,10 +360,30 @@ namespace synthese
 			}
 
 			////////////////////////////////////////////////////////////////////
-			// TAB EXPORT
+			// TAB PROPERTIES
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
-				// CommercialLineUpdateAction
+				stream << "<h1>Propriétés</h1>";
+
+				AdminActionFunctionRequest<CommercialLineUpdateAction,CommercialLineAdmin> updateRequest(_request);
+				updateRequest.getAction()->setLine(const_pointer_cast<CommercialLine>(_cline));
+
+				PropertiesHTMLTable t(updateRequest.getHTMLForm());
+				stream << t.open();
+				stream << t.title("Réseau");
+				stream << t.cell("Réseau", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NETWORK_ID, _cline->getNetwork() ? lexical_cast<string>(_cline->getNetwork()->getKey()) : string()));
+				stream << t.cell("ID vu par le réseau", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_CREATOR_ID, _cline->getCreatorId()));
+				stream << t.title("Nom");
+				stream << t.cell("Nom (menu)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NAME, _cline->getName()));
+				stream << t.cell("Nom long (feuille de route)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_LONG_NAME, _cline->getLongName()));
+				stream << t.cell("Nom court (cartouche)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_SHORT_NAME, _cline->getShortName()));
+				stream << t.title("Apparence");
+				stream << t.cell("Image", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_IMAGE, _cline->getImage()));
+				stream << t.cell("Style CSS", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_STYLE, _cline->getStyle()));
+				stream << t.cell("Couleur", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_COLOR, _cline->getColor() ? _cline->getColor()->toString() : string()));
+				stream << t.title("Réservation");
+				stream << t.cell("Centre de contact", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_RESERVATION_CONTACT_ID, _cline->getReservationContact() ? lexical_cast<string>(_cline->getReservationContact()->getKey()) : string()));
+				stream << t.close();
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -394,16 +457,6 @@ namespace synthese
 			_tabBuilded = true;
 		}
 
-		boost::shared_ptr<const CommercialLine> CommercialLineAdmin::getCommercialLine() const
-		{
-			return _cline;
-		}
-		
-		void CommercialLineAdmin::setCommercialLine(
-			boost::shared_ptr<const CommercialLine> value
-		){
-			_cline = value;
-		}
 		
 		
 		bool CommercialLineAdmin::_hasSameContent(const AdminInterfaceElement& other) const

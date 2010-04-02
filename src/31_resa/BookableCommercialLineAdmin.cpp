@@ -230,7 +230,6 @@ namespace synthese
 						_line->getKey(),
 						optional<RegistryKeyType>(),
 						_serviceNumber,
-						_date,
 						_hideOldServices,
 						0,
 						optional<size_t>(),
@@ -238,7 +237,11 @@ namespace synthese
 				)	);
 				BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
 				{
-					if(servicesByNumber.find(service->getServiceNumber()) != servicesByNumber.end()) continue;
+					if(	!service->isActive(_date) ||
+						servicesByNumber.find(service->getServiceNumber()) != servicesByNumber.end()
+					){
+						continue;
+					}
 
 					servicesByNumber.insert(make_pair(service->getServiceNumber(), service));
 					sortedServices.push_back(service);
@@ -532,7 +535,6 @@ namespace synthese
 							_line->getKey(),
 							optional<RegistryKeyType>(),
 							_serviceNumber,
-							_date,
 							_hideOldServices,
 							0, 1,
 							true, true, UP_LINKS_LOAD_LEVEL

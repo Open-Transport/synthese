@@ -40,6 +40,8 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
+#include "CalendarTemplateTableSync.h"
+#include "ReplaceQuery.h"
 
 // Util
 #include "Conversion.h"
@@ -52,7 +54,7 @@
 #include <sstream>
 
 // Boost
-#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 
 using namespace std;
@@ -67,6 +69,7 @@ namespace synthese
 	using namespace pt;
 	using namespace geography;
 	using namespace graph;
+	using namespace calendar;
 
 	namespace util
 	{
@@ -87,6 +90,7 @@ namespace synthese
 		const string CommercialLineTableSync::COL_HANDICAPPED_USE_RULE ("handicapped_compliance_id");
 		const string CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE("pedestrian_compliance_id");
 		const string CommercialLineTableSync::COL_RESERVATION_CONTACT_ID("reservation_contact_id");
+		const string CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID("calendar_template_id");
 	}
 
 	namespace db
@@ -111,8 +115,8 @@ namespace synthese
 			SQLiteTableSync::Field(CommercialLineTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
 			SQLiteTableSync::Field(CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
 			SQLiteTableSync::Field(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
-
 		};
 		
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CommercialLineTableSync>::_INDEXES[]=
@@ -135,6 +139,7 @@ namespace synthese
 		    object->setShortName(rows->getText ( CommercialLineTableSync::COL_SHORT_NAME));
 		    object->setLongName(rows->getText ( CommercialLineTableSync::COL_LONG_NAME));
 			
+			// Color
 			string color(rows->getText(CommercialLineTableSync::COL_COLOR));
 			if(!color.empty())
 			{
@@ -150,48 +155,71 @@ namespace synthese
 			object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
 		    object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
 		    object->setCreatorId(rows->getText ( CommercialLineTableSync::COL_CREATOR_ID));
-			object->setNetwork(NULL);
-			object->cleanOptionalReservationPlaces();
 			object->clearRules();
 			object->addRule(USER_PEDESTRIAN, AllowedUseRule::INSTANCE.get());
-			object->setReservationContact(NULL);
-
+			
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				const TransportNetwork* tn = 
-					TransportNetworkTableSync::Get (rows->getLongLong ( CommercialLineTableSync::COL_NETWORK_ID), env, linkLevel).get();
-
-				object->setNetwork (tn);
-
-				typedef tokenizer<char_separator<char> > tokenizer;
-				string stops(rows->getText(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES));
-
-				// Parse all optional reservation places separated by ,
-				char_separator<char> sep1 (",");
-				tokenizer stopsTokens (stops, sep1);
-
-				for(tokenizer::iterator it(stopsTokens.begin());
-					it != stopsTokens.end ();
-					++it
-				){
-					uid id(Conversion::ToLongLong(*it));
-					const PublicTransportStopZoneConnectionPlace* place(ConnectionPlaceTableSync::Get(id,env,linkLevel).get());
-					object->addOptionalReservationPlace(place);
+				// Transport network
+				try
+				{
+					object->setNetwork (
+						TransportNetworkTableSync::Get(rows->getLongLong(CommercialLineTableSync::COL_NETWORK_ID), env, linkLevel).get()
+					);
+				}
+				catch(ObjectNotFoundException<TransportNetwork>&)
+				{
+					Log::GetInstance().warn("No such network in commercial line "+ lexical_cast<string>(object->getKey()));
 				}
 
+				// Calendar template
+				if(rows->getLongLong(CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID) > 0)
+				{
+					try
+					{
+						object->setCalendarTemplate(
+							CalendarTemplateTableSync::GetEditable(rows->getLongLong(CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID), env, linkLevel).get()
+						);
+					}
+					catch(ObjectNotFoundException<CalendarTemplate>&)
+					{
+						Log::GetInstance().warn("No such calendar template in commercial line "+ lexical_cast<string>(object->getKey()));
+					}
+				}
+				else
+				{
+					object->setCalendarTemplate(NULL);
+				}
+
+				// Places with optional reservation
+				// Parse all optional reservation places separated by ,
+				std::vector<std::string> stops;
+				CommercialLine::PlacesSet placesWithOptionalReservation;
+				boost::split(
+					stops,
+					rows->getText(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES),
+					boost::is_any_of(",")
+				);
+				BOOST_FOREACH(const string& stop, stops)
+				{
+					if(stop.empty()) continue;
+					try
+					{
+						placesWithOptionalReservation.insert(
+							ConnectionPlaceTableSync::Get(lexical_cast<RegistryKeyType>(stop),env,linkLevel).get()
+						);
+					}
+					catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
+					{
+						Log::GetInstance().warn("No such place "+ stop +" in optional reservation places of commercial line "+ lexical_cast<string>(object->getKey()));
+					}
+				}
+				object->setOpionalReservationPlaces(placesWithOptionalReservation);
+
+				// Bike compliance
 				uid bikeComplianceId(
 					rows->getLongLong (CommercialLineTableSync::COL_BIKE_USE_RULE)
 					);
-				uid handicappedComplianceId(
-					rows->getLongLong (CommercialLineTableSync::COL_HANDICAPPED_USE_RULE)
-					);
-				uid pedestrianComplianceId(
-					rows->getLongLong (CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE)
-					);
-				uid reservationContactId(
-					rows->getLongLong(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID)
-				);
-
 				if(bikeComplianceId > 0)
 				{
 					object->addRule(
@@ -199,6 +227,11 @@ namespace synthese
 						PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get()
 					);
 				}
+				
+				// Handicapped compliance
+				uid handicappedComplianceId(
+					rows->getLongLong (CommercialLineTableSync::COL_HANDICAPPED_USE_RULE)
+				);
 				if(handicappedComplianceId > 0)
 				{
 					object->addRule(
@@ -206,6 +239,11 @@ namespace synthese
 						PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get()
 					);
 				}
+				
+				// Pedestrian compliance
+				uid pedestrianComplianceId(
+					rows->getLongLong (CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE)
+					);
 				if(pedestrianComplianceId > 0)
 				{
 					object->addRule(
@@ -213,13 +251,17 @@ namespace synthese
 						PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get()
 					);
 				}
+
+				// Reservation contact
+				uid reservationContactId(
+					rows->getLongLong(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID)
+				);
 				if(reservationContactId > 0)
 				{
 					object->setReservationContact(
 						ReservationContactTableSync::Get(reservationContactId, env, linkLevel).get()
 					);
 				}
-
 			}
 		}
 
@@ -237,22 +279,8 @@ namespace synthese
 			CommercialLine* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-			query
-				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << (object->getNetwork() ? Conversion::ToString(object->getNetwork()->getKey()) : "0")
-				<< "," << Conversion::ToSQLiteString(object->getName())
-				<< "," << Conversion::ToSQLiteString(object->getShortName())
-				<< "," << Conversion::ToSQLiteString(object->getLongName())
-				<< "," << (object->getColor() ? Conversion::ToSQLiteString(object->getColor()->toString()) : string("''"))
-				<< "," << Conversion::ToSQLiteString(object->getStyle())
-				<< "," << Conversion::ToSQLiteString(object->getImage())
-				<< ",'"
-			;
+			// Preparation of places with optional reservation
+			stringstream optionalReservationPlaces;
 			bool first(true);
 			BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace* place, object->getOptionalReservationPlaces())
 			{
@@ -262,32 +290,45 @@ namespace synthese
 				}
 				else
 				{
-					query << ",";
+					optionalReservationPlaces << ",";
 				}
-				query << place->getKey();
+				optionalReservationPlaces << place->getKey();
 			}
-			query << "'"
-				<< "," << Conversion::ToSQLiteString(object->getCreatorId())
-				<< "," << (
-					object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
-					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey()) :
-					"0")
-				<< "," << (
-					object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
-					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey()) :
-					"0")
-				<< "," << (
-					object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
-					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey()) :
-					"0")
-				<< "," << (
-					object->getReservationContact() ? lexical_cast<string>(object->getReservationContact()->getKey()) : "0"
-				)
 
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			// The query
+			ReplaceQuery<CommercialLineTableSync> query(*object);
+			query.addField(object->getNetwork() ? object->getNetwork()->getKey() : RegistryKeyType(0));
+			query.addField(object->getName());
+			query.addField(object->getShortName());
+			query.addField(object->getLongName());
+			query.addField(object->getColor() ? object->getColor()->toString() : string());
+			query.addField(object->getStyle());
+			query.addField(object->getImage());
+			query.addField(optionalReservationPlaces.str());
+			query.addField(object->getCreatorId());
+			query.addField(
+				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
+				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :
+				RegistryKeyType(0)
+			);
+			query.addField(
+				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
+				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() :
+				RegistryKeyType(0)
+			);
+			query.addField(
+				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
+				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() :
+				RegistryKeyType(0)
+			);
+			query.addField(
+				object->getReservationContact() ? object->getReservationContact()->getKey() : RegistryKeyType(0)
+			);
+			query.addField(
+				object->getCalendarTemplate() ? object->getCalendarTemplate()->getKey() : RegistryKeyType(0)
+			);
+			query.execute(transaction);
 		}
-
 	}
 
 	namespace env
@@ -367,9 +408,9 @@ namespace synthese
 			if (orderByName)
 				query << " ORDER BY " << TABLE.NAME << "." << COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

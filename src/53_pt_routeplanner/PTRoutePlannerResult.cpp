@@ -111,7 +111,7 @@ namespace synthese
 						if(_ordrePARechercheGare(i, placeToSearch))
 						{
 							if (dernieri && i < *dernieri )
-								i = _ordrePAEchangeSiPossible(*dernieri, i );
+								i = _ordrePAEchangeSiPossible(i, *dernieri);
 						}
 						else
 						{

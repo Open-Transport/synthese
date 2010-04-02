@@ -102,7 +102,7 @@ namespace synthese
 		void CityAlias::setCity( const City* value )
 		{
 			_includedPlaces.clear();
-			_includedPlaces.push_back(static_cast<const Place*>(value));
+			_includedPlaces.insert(static_cast<const Place*>(value));
 		}
 	}
 }

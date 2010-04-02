@@ -42,12 +42,18 @@ namespace synthese
 
 	namespace pt
 	{
-		/** CommercialLineAdmin Class.
-			@ingroup m35Admin refAdmin
-			@author Hugues Romain
-			@date 2008
-		*/
-		class CommercialLineAdmin : public admin::AdminInterfaceElementTemplate<CommercialLineAdmin>
+		//////////////////////////////////////////////////////////////////////////
+		/// 35.14 : Commercial line edition.
+		///	@ingroup m35Admin refAdmin
+		///	@author Hugues Romain
+		///	@date 2008
+		///
+		/// Parameters :
+		///	<ul>
+		///		<li>cc : if true launches the control of the respect of the calendar template and displays the run days</li>
+		/// </ul>
+		class CommercialLineAdmin:
+			public admin::AdminInterfaceElementTemplate<CommercialLineAdmin>
 		{
 		public:
 			static const std::string TAB_ROUTES;
@@ -58,10 +64,11 @@ namespace synthese
 			static const std::string PARAMETER_SEARCH_NAME;
 			static const std::string PARAMETER_DATES_START;
 			static const std::string PARAMETER_DATES_END;
+			static const std::string PARAMETER_CALENDAR_CONTROL;
 
 		protected:
 			boost::shared_ptr<const env::CommercialLine>	_cline;
-
+			bool								_controlCalendar;
 			std::string _searchName;
 			boost::optional<boost::gregorian::date>	_startDate;
 			boost::optional<boost::gregorian::date>	_endDate;
@@ -137,8 +144,16 @@ namespace synthese
 
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 			
-			boost::shared_ptr<const env::CommercialLine> getCommercialLine() const;
-			void setCommercialLine(boost::shared_ptr<const env::CommercialLine> value);
+			//! @name Getters
+			//@{
+				boost::shared_ptr<const env::CommercialLine> getCommercialLine() const { return _cline; }
+			//@}
+
+			//! @name Setters
+			//@{
+				void setCommercialLine(boost::shared_ptr<const env::CommercialLine> value) { _cline = value; }
+				void setControlCalendar(bool value) { _controlCalendar = value; }
+			//@}
 		};
 	}
 }

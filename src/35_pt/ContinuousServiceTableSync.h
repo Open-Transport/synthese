@@ -39,10 +39,9 @@ namespace synthese
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// ContinuousService table synchronizer.
+		/// 35.10 Table : Continuous Service.
 		///	@ingroup m35LS refLS
 		///
-		///	@warning The continuous service table synchronizer DOES NOT handle calendar dates. See ServiceDateTableSync.
 		class ContinuousServiceTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>,
 			public db::FetcherTemplate<SchedulesBasedService, ContinuousServiceTableSync>,
@@ -57,6 +56,7 @@ namespace synthese
 			static const std::string COL_PEDESTRIAN_USE_RULE;
 			static const std::string COL_HANDICAPPED_USE_RULE;
 			static const std::string COL_BIKE_USE_RULE;
+			static const std::string COL_DATES;
 			
 
 

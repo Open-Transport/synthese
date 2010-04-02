@@ -181,11 +181,10 @@ namespace synthese
 						std::stringstream query;
 						query
 							<< "SELECT " << 0x00000000FFFFFFFFLL
-							<< " & MAX(" << TABLE_COL_ID << ") AS maxid FROM " << K::TABLE.NAME
+							<< " & " << TABLE_COL_ID << " AS maxid FROM " << K::TABLE.NAME
 							<< " WHERE " << TABLE_COL_ID << ">=" << encodeUId(0) << " AND "
-							<< TABLE_COL_ID << "<=" << encodeUId(
-									std::numeric_limits<long>::max()
-								)
+							<< TABLE_COL_ID << "<=" << encodeUId(std::numeric_limits<long>::max()) <<
+							" ORDER BY " << TABLE_COL_ID << " DESC LIMIT 1"
 						;
 
 						SQLiteResultSPtr result (sqlite->execQuery(query.str()));
@@ -273,7 +272,7 @@ namespace synthese
 				{
 					std::stringstream ss;
 					ss << "SELECT *  FROM " << K::TABLE.NAME;
-					SQLiteResultSPtr result = sqlite->execQuery (ss.str ());
+					SQLiteResultSPtr result = sqlite->execQuery (ss.str (), true);
 					K().rowsAdded (sqlite, sync, result);
 				}
 			}

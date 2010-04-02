@@ -6,7 +6,6 @@
 synthese::pt::TransportNetworkTableSync::integrate();
 synthese::pt::TridentFileFormat::integrate ();
 
-synthese::pt::ServiceDateTableSync::integrate();
 synthese::pt::PTUseRuleTableSync::integrate();
 synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::PhysicalStopTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex>, synthese::pt::PhysicalStopTableSync>::integrate();
@@ -40,6 +39,7 @@ synthese::pt::LinesListFunction::integrate();
 synthese::pt::TridentExportFunction::integrate ();
 synthese::pt::PTNetworksListFunction::integrate();
 synthese::pt::PTRoutesListFunction::integrate();
+synthese::pt::CheckLineCalendarFunction::integrate();
 
 synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
 synthese::pt::PTNetworkListItemInterfacePage::integrate();
@@ -55,6 +55,10 @@ synthese::pt::CommercialLineAddAction::integrate();
 synthese::pt::LineAddAction::integrate();
 synthese::pt::ServiceAddAction::integrate();
 synthese::pt::StopAreaUpdateAction::integrate();
+synthese::pt::CommercialLineCalendarTemplateUpdateAction::integrate();
+synthese::pt::CommercialLineUpdateAction::integrate();
+synthese::pt::ContinuousServiceUpdateAction::integrate();
+synthese::pt::StopAreaNameUpdateAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 
@@ -63,7 +67,6 @@ synthese::pt::TransportNetworkRight::integrate();
 synthese::util::Env::Integrate<synthese::pt::PhysicalStop>();
 synthese::util::Env::Integrate<synthese::pt::Junction>();
 synthese::util::Env::Integrate<synthese::pt::TransportNetwork>();
-synthese::util::Env::Integrate<synthese::pt::ServiceDate>();
 synthese::util::Env::Integrate<synthese::pt::PTUseRule>();
 synthese::util::Env::Integrate<synthese::pt::ContinuousService>();
 synthese::util::Env::Integrate<synthese::pt::ScheduledService>();

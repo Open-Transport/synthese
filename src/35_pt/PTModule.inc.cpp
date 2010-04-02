@@ -9,13 +9,13 @@
 #include "PhysicalStopsCSVExportFunction.h"
 #include "PTNetworksListFunction.hpp"
 #include "PTRoutesListFunction.hpp"
+#include "CheckLineCalendarFunction.hpp"
 
 #include "TridentFileFormat.h"
 #include "PTModule.h"
 #include "NavteqWithProjectionFileFormat.h"
 
 #include "PTUseRuleTableSync.h"
-#include "ServiceDateTableSync.h"
 #include "ContinuousServiceTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "JunctionTableSync.hpp"
@@ -48,13 +48,16 @@
 #include "NonConcurrencyRuleAddAction.h"
 #include "NonConcurrencyRuleRemoveAction.h"
 #include "StopAreaUpdateAction.h"
+#include "CommercialLineCalendarTemplateUpdateAction.hpp"
+#include "CommercialLineUpdateAction.h"
+#include "ContinuousServiceUpdateAction.h"
+#include "StopAreaNameUpdateAction.hpp"
 
 #include "TransportNetworkRight.h"
 
 // Registries
 
 #include "TransportNetwork.h"
-#include "ServiceDate.h"
 #include "PTUseRule.h"
 #include "Junction.hpp"
 #include "PhysicalStop.h"

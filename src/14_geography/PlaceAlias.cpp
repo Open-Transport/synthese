@@ -61,7 +61,7 @@ namespace synthese
 		{
 			assert(!_includedPlaces.empty());
 
-			return dynamic_cast<const NamedPlace*>(_includedPlaces[0]);
+			return dynamic_cast<const NamedPlace*>(*_includedPlaces.begin());
 		}
 
 

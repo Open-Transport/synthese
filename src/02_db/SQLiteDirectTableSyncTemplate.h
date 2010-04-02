@@ -213,7 +213,7 @@ namespace synthese
 			){
 				SearchResult result;
 				util::Registry<T>& registry(env.template getEditableRegistry<T>());
-				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query, true);
 				while (rows->next ())
 				{
 					try

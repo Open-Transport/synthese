@@ -43,6 +43,7 @@
 #include "Address.h"
 #include "StopAreaUpdateAction.h"
 #include "AdminActionFunctionRequest.hpp"
+#include "StopAreaNameUpdateAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -156,23 +157,25 @@ namespace synthese
 			// TAB PROPERTIES
 			if (openTabContent(stream, TAB_GENERAL))
 			{
-				AdminFunctionRequest<PTPlaceAdmin> updateRequest(request);
-
-				stream << "<h1>Propriétés</h1>";
-
-				shared_ptr<const NamedPlace> namedPlace(dynamic_pointer_cast<const NamedPlace, const AddressablePlace>(_addressablePlace));
-				PropertiesHTMLTable t(updateRequest.getHTMLForm());
-				stream << t.open();
-				stream << t.cell("Localité", namedPlace->getCity()->getName());
-				stream << t.cell("Nom", namedPlace->getName());
 				if(_connectionPlace.get())
 				{
-					stream << t.title("Destination sur afficheur");
-					stream << t.cell("Nom court", _connectionPlace->getName13());
-					stream << t.cell("Nom moyen", _connectionPlace->getName26());
-				}
-				stream << t.close();
+					AdminActionFunctionRequest<StopAreaNameUpdateAction,PTPlaceAdmin> updateRequest(request);
+					updateRequest.getAction()->setPlace(const_pointer_cast<PublicTransportStopZoneConnectionPlace>(_connectionPlace));
 
+					stream << "<h1>Propriétés</h1>";
+
+					PropertiesHTMLTable t(updateRequest.getHTMLForm());
+					stream << t.open();
+					stream << t.title("Localisation");
+					stream << t.cell("Localité", _connectionPlace->getCity()->getName());
+					stream << t.cell("Localité", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_CITY_ID, lexical_cast<string>(_connectionPlace->getCity()->getKey())));
+					stream << t.cell("Nom", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_NAME, _connectionPlace->getName()));
+					stream << t.cell("Code import", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_CODE, _connectionPlace->getCodeBySource()));
+					stream << t.title("Destination sur afficheur");
+					stream << t.cell("Nom court", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_SHORT_NAME, _connectionPlace->getName13()));
+					stream << t.cell("Nom moyen", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_LONG_NAME, _connectionPlace->getName26()));
+					stream << t.close();
+				}
 			}
 
 			////////////////////////////////////////////////////////////////////

@@ -36,8 +36,6 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-#include "ServiceDate.h"
-#include "ServiceDateTableSync.h"
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"
 #include "Point2D.h"
@@ -75,6 +73,7 @@ namespace synthese
 		const std::string ContinuousServiceTableSync::COL_BIKE_USE_RULE("bike_compliance_id");
 		const std::string ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE ("handicapped_compliance_id");
 		const std::string ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE("pedestrian_compliance_id");
+		const std::string ContinuousServiceTableSync::COL_DATES("dates");
 	}
 
 	namespace db
@@ -94,6 +93,7 @@ namespace synthese
 			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
 			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
 			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
+			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_DATES, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 		
@@ -130,6 +130,8 @@ namespace synthese
 			cs->setMaxWaitingTime(maxWaitingTime);
 			cs->setPathId(pathId);
 			cs->clearRules();
+
+			cs->setFromSerializedString(rows->getText(ContinuousServiceTableSync::COL_DATES));
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -171,11 +173,7 @@ namespace synthese
 
 				path->addService (cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
-/*			if (linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
-			{
-				ServiceDateTableSync::SetActiveDates(*cs);
-			}
-*/		}
+		}
 
 		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Unlink(
 			ContinuousService* obj
@@ -183,10 +181,16 @@ namespace synthese
 			obj->getPath()->removeService(obj);
 		}
 
+
+
 		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Save(
 			ContinuousService* object,
 			optional<SQLiteTransaction&> transaction
 		){
+			// Dates preparation
+			stringstream datesStr;
+			object->serialize(datesStr);
+
 			ReplaceQuery<ContinuousServiceTableSync> query(*object);
 			query.addField(object->getServiceNumber());
 			query.addField(object->encodeSchedules());
@@ -207,6 +211,9 @@ namespace synthese
 				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
 				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() :
 				RegistryKeyType(0)
+			);
+			query.addField(
+				datesStr.str()
 			);
 			query.execute(transaction);
 		}

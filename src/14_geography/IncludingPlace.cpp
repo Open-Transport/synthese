@@ -58,7 +58,7 @@ namespace synthese
 		IncludingPlace::addIncludedPlace (const Place* place)
 		{
 			_isoBarycentreToUpdate = true;
-			_includedPlaces.push_back (place);
+			_includedPlaces.insert(place);
 		}
 
 
@@ -102,6 +102,14 @@ namespace synthese
 				if (*it == place)
 					return true;
 			return false;
+		}
+
+
+
+		void IncludingPlace::removeIncludedPlace( const Place* place )
+		{
+			_isoBarycentreToUpdate = true;
+			_includedPlaces.erase(place);
 		}
 	}
 }

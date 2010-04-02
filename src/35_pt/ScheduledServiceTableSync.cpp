@@ -26,8 +26,6 @@
 #include "EnvModule.h"
 #include "LineTableSync.h"
 #include "CommercialLineTableSync.h"
-#include "ServiceDate.h"
-#include "ServiceDateTableSync.h"
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"
 #include "GraphConstants.h"
@@ -71,6 +69,7 @@ namespace synthese
 		const string ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
 		const string ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
 		const string ScheduledServiceTableSync::COL_TEAM("team");
+		const string ScheduledServiceTableSync::COL_DATES("dates");
 	}
 
 	namespace db
@@ -89,6 +88,7 @@ namespace synthese
 			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_TEAM, SQL_TEXT),
+			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_DATES, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 		
@@ -123,6 +123,7 @@ namespace synthese
 			ss->setTeam(rows->getText(ScheduledServiceTableSync::COL_TEAM));
 			ss->setPathId(pathId);
 			ss->clearRules();
+			ss->setFromSerializedString(rows->getText(ScheduledServiceTableSync::COL_DATES));
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -167,11 +168,7 @@ namespace synthese
 					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
 				);
 			}
-/*			if (linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
-			{
-				ServiceDateTableSync::SetActiveDates(*ss);
-			}
-*/		}
+		}
 
 
 
@@ -181,10 +178,16 @@ namespace synthese
 			ss->getPath()->removeService(ss);
 		}
 
+
+
 		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Save(
 			ScheduledService* object,
 			optional<SQLiteTransaction&> transaction
 		){
+			// Dates preparation
+			stringstream datesStr;
+			object->serialize(datesStr);
+
 			ReplaceQuery<ScheduledServiceTableSync> query(*object);
 			query.addField(object->getServiceNumber());
 			query.addField(object->encodeSchedules());
@@ -205,6 +208,7 @@ namespace synthese
 				RegistryKeyType(0)
 			);
 			query.addField(object->getTeam());
+			query.addField(datesStr.str());
 			query.execute(transaction);
 		}
 
@@ -218,7 +222,6 @@ namespace synthese
 			optional<RegistryKeyType> commercialLineId,
 			optional<RegistryKeyType> dataSourceId,
 			optional<string> serviceNumber,
-			optional<date> date,
 			bool hideOldServices,
 			int first, /*= 0*/
 			boost::optional<std::size_t> number, /*= 0*/
@@ -232,8 +235,6 @@ namespace synthese
 				<< " FROM " << TABLE.NAME;
 			if (commercialLineId || dataSourceId)
 				query << " INNER JOIN " << LineTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
-			if (date)
-				query << " INNER JOIN " << ServiceDateTableSync::TABLE.NAME << " AS d ON d." << ServiceDateTableSync::COL_SERVICEID << "=" << TABLE.NAME << "." << TABLE_COL_ID;
 			query << " WHERE 1 ";
 			if (lineId)
 				query << " AND " << ScheduledServiceTableSync::COL_PATHID << "=" << *lineId;
@@ -243,8 +244,6 @@ namespace synthese
 				query << " AND l." << LineTableSync::COL_DATASOURCE_ID << "=" << *dataSourceId;
 			if(serviceNumber)
 				query << " AND " << COL_SERVICENUMBER << "=" << *serviceNumber;
-			if (date)
-				query << " AND d." << ServiceDateTableSync::COL_DATE << "=\"" << to_iso_extended_string(*date) << "\"";
 			if(hideOldServices)
 			{
 				ptime now(second_clock::local_time());
@@ -258,10 +257,6 @@ namespace synthese
 					" AND " << ScheduledServiceTableSync::COL_SCHEDULES <<
 					">='00:00:00#" << SchedulesBasedService::EncodeSchedule(snow) << "'" 
 				;
-			}
-			if (date)
-			{
-				query << " GROUP BY " << TABLE.NAME << "." << TABLE_COL_ID;
 			}
 			if (orderByOriginTime)
 			{
@@ -279,12 +274,5 @@ namespace synthese
 				LoadFromQuery(query.str(), env, linkLevel)
 			);
 			
-			if(date)
-			{
-				BOOST_FOREACH(shared_ptr<ScheduledService> service, result)
-				{
-					service->setActive(*date);
-			}	}
-				
 			return result;
 }	}	}

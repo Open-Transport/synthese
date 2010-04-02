@@ -56,6 +56,7 @@ namespace synthese
 				static const std::string TAB_ROAD_PLACES;
 				static const std::string TAB_ALIASES;
 				static const std::string TAB_PHONETIC;
+				static const std::string TAB_PROPERTIES;
 			//@}
 
 		private:

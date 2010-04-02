@@ -40,6 +40,9 @@
 #include "RoadPlace.h"
 #include "PTCitiesAdmin.h"
 #include "Profile.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "CityUpdateAction.h"
+#include "PropertiesHTMLTable.h"
 
 using namespace std;
 using namespace boost;
@@ -78,7 +81,7 @@ namespace synthese
 		const string PTPlacesAdmin::TAB_PHONETIC("ph");
 		const string PTPlacesAdmin::TAB_PUBLIC_PLACES("pp");
 		const string PTPlacesAdmin::TAB_ROAD_PLACES("rp");
-
+		const string PTPlacesAdmin::TAB_PROPERTIES("pr");
 
 		PTPlacesAdmin::PTPlacesAdmin()
 			: AdminInterfaceElementTemplate<PTPlacesAdmin>()
@@ -139,37 +142,16 @@ namespace synthese
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
-			// TAB CONNECTION PLACES
-			if (openTabContent(stream, TAB_CONNECTION_PLACES))
-			{
-			}
-
-			////////////////////////////////////////////////////////////////////
-			// TAB ROAD PLACES
-			if (openTabContent(stream, TAB_ROAD_PLACES))
-			{
-			}
-
-			////////////////////////////////////////////////////////////////////
-			// TAB PUBLIC PLACES
-			if (openTabContent(stream, TAB_PUBLIC_PLACES))
-			{
-			}
-
-			////////////////////////////////////////////////////////////////////
-			// TAB ALIASED PLACES
-			if (openTabContent(stream, TAB_ALIASES))
-			{
-			}
-
-			////////////////////////////////////////////////////////////////////
 			// TAB PHONETIC
 			if (openTabContent(stream, TAB_PHONETIC))
 			{
 				AdminFunctionRequest<PTPlacesAdmin> searchRequest(request);
 				searchRequest.getPage()->setCity(_city);
 
-				stream << "<h1>Recherche</h1>";
+				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
+				AdminFunctionRequest<PTRoadsAdmin> openRoadRequest(request);
+
+				stream << "<h1>Recherche phonétique</h1>";
 
 				SearchFormHTMLTable t(searchRequest.getHTMLForm());
 				stream << t.open();
@@ -182,10 +164,7 @@ namespace synthese
 
 				if(!_searchName.empty())
 				{
-					AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
-					AdminFunctionRequest<PTRoadsAdmin> openRoadRequest(request);
-
-					stream << "<h1>Résultat</h1>";
+					stream << "<h1>Résultats</h1>";
 
 					stream << "<p>Phonétique du texte recherché : " << FrenchSentence(_searchName).getPhoneticString() << "</p>";
 
@@ -265,6 +244,100 @@ namespace synthese
 
 					stream << t.close();
 				}
+
+				if(_city.get())
+				{
+					stream << "<h1>Lieux principaux</h1>";
+				
+					HTMLTable::ColsVector c;
+					c.push_back("Type");
+					c.push_back("Type");
+					c.push_back("Lieu");
+					c.push_back("Actions");
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+					stream << t.open();
+
+					BOOST_FOREACH(const IncludingPlace::IncludedPlaces::value_type it, _city->getIncludedPlaces())
+					{
+						stream << t.row();
+
+						if(dynamic_cast<const RoadPlace*>(it))
+						{
+							const RoadPlace* roadPlace(dynamic_cast<const RoadPlace*>(it));
+							openRoadRequest.getPage()->setRoadPlace(Env::GetOfficialEnv().getSPtr(roadPlace));
+
+							stream << t.col();
+							stream << t.col() << "Route";
+							stream << t.col() << roadPlace->getName();
+							stream << t.col() << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "building.png");
+						}
+						else if(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(it))
+						{
+							const PublicTransportStopZoneConnectionPlace* connectionPlace(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(it));
+							openPlaceRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr(connectionPlace));
+
+							stream << t.col();
+							stream << t.col() << "Zone d'arrêt";
+							stream << t.col() << connectionPlace->getName();
+							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
+						}
+						else if(dynamic_cast<const PublicPlace*>(it))
+						{
+							const PublicPlace* publicPlace(dynamic_cast<const PublicPlace*>(it));
+							openPlaceRequest.getPage()->setPublicPlace(Env::GetOfficialEnv().getSPtr(publicPlace));
+
+							stream << t.col();
+							stream << t.col() << "Lieu public";
+							stream << t.col() << publicPlace->getName();
+							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
+						}
+						else
+						{
+							stream << t.col();
+							stream << t.col() << "???";
+							stream << t.col() << string();
+							stream << t.col();
+						}
+					}
+				}
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB CONNECTION PLACES
+			if (openTabContent(stream, TAB_CONNECTION_PLACES))
+			{
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB ROAD PLACES
+			if (openTabContent(stream, TAB_ROAD_PLACES))
+			{
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB PUBLIC PLACES
+			if (openTabContent(stream, TAB_PUBLIC_PLACES))
+			{
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB ALIASED PLACES
+			if (openTabContent(stream, TAB_ALIASES))
+			{
+			}
+
+
+			////////////////////////////////////////////////////////////////////
+			// TAB PROPERTIES
+			if (openTabContent(stream, TAB_PROPERTIES))
+			{
+				AdminActionFunctionRequest<CityUpdateAction,PTPlacesAdmin> updateRequest(request);
+				updateRequest.getAction()->setCity(const_pointer_cast<City>(_city));
+				PropertiesHTMLTable t(updateRequest.getHTMLForm());
+				stream << t.open();
+				stream << t.cell("Nom", t.getForm().getTextInput(CityUpdateAction::PARAMETER_NAME, _city->getName()));
+				stream << t.cell("Code", t.getForm().getTextInput(CityUpdateAction::PARAMETER_CODE, _city->getCode()));
+				stream << t.close();
 			}
 
 
@@ -329,13 +402,17 @@ namespace synthese
 			const security::Profile& profile
 		) const	{
 			_tabs.clear();
+			if(_city.get())
+			{
+				_tabs.push_back(Tab("Lieux", TAB_PHONETIC, true, "text_allcaps.png"));
+			}
 			_tabs.push_back(Tab("Zones d'arrêt", TAB_CONNECTION_PLACES, true, "building.png"));
 			_tabs.push_back(Tab("Routes", TAB_ROAD_PLACES, true, "building.png"));
 			_tabs.push_back(Tab("Lieux publics", TAB_PUBLIC_PLACES, true, "building.png"));
 			_tabs.push_back(Tab("Alias", TAB_ALIASES, true, "building.png"));
 			if(_city.get())
 			{
-				_tabs.push_back(Tab("Phonétique", TAB_PHONETIC, true, "text_allcaps.png"));
+				_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true, "building.png"));
 			}
 			_tabBuilded = true;
 		}

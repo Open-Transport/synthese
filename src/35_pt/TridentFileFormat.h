@@ -39,11 +39,11 @@ namespace synthese
 	
 	namespace pt
 	{
-		class ServiceDate;
-
 		//////////////////////////////////////////////////////////////////////////
 		/// Trident/Chouette file format.
 		/// @ingroup m35File refFile
+		///
+		/// @todo Remove all running days of services of the datasource before Trident import.
 		///
 		///	<h3>The Trident file format</h3>
 		///
@@ -241,11 +241,6 @@ namespace synthese
 			//@{
 				util::RegistryKeyType	_commercialLineId;
 				const bool				_withTisseoExtension;
-			//@}
-
-			//! @name Temporary data
-			//@{
-				std::vector<boost::shared_ptr<pt::ServiceDate> > _serviceDates;
 			//@}
 		
 		protected:

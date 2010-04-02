@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_ENV_CALENDAR_H
 #define SYNTHESE_ENV_CALENDAR_H
 
-#include <boost/dynamic_bitset.hpp>
 #include <boost/date_time/gregorian/gregorian_types.hpp>
-
+#include <bitset>
 #include <map>
 #include <vector>
 
@@ -55,7 +54,7 @@ namespace synthese
 
 			typedef std::map<
 				boost::gregorian::greg_year,
-				boost::dynamic_bitset<>
+				std::bitset<366>
 			> _BitSets;
 			
 			_BitSets _markedDates;
@@ -73,17 +72,25 @@ namespace synthese
 				Calendar( 
 					const Calendar& other
 				);
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Constructs a calendar upon a serialized string.
+				/// @param serialized the serialized string
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				/// 
+				/// The serialized string comes from Calendar::serialize.
+				Calendar(
+					const std::string& serialized
+				);
 			//@}
 
-			//! @name Getters/Setters
+			//! @name Services
 			//@{
 				boost::gregorian::date getFirstActiveDate () const;
 				boost::gregorian::date getLastActiveDate () const;
-			//@}
-
-
-			//! @name Query methods
-			//@{
+			
 				/** Tests if a date is active according to the calendar.
 				 * This method can be overloaded by subclasses to do additional controls.
 				 * @param date date to test
@@ -123,17 +130,41 @@ namespace synthese
 
 				bool operator==(const Calendar& op) const;
 				bool operator!=(const Calendar& op) const;
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Serialization for storage in SQL compatible string.
+				/// @param stream stream to write the result on.
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				///
+				/// A serialized calendar contains a 370 bytes block per year.
+				/// Each block begins with the year in decimal (4 bytes), and is followed
+				/// by 366 bytes corresponding to the streamed view of the bitset.
+				///
+				void serialize(std::ostream& stream) const;
 			//@}
 
 
 
-			//! @name Update methods
+			//! @name Modifiers
 			//@{
 				virtual void setActive(const boost::gregorian::date& date);
 				virtual void setInactive(const boost::gregorian::date& date);
 				void subDates(const Calendar& calendar);
 				void clear();
 				void copyDates(const Calendar& calendar);
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Fullfill the calendar upon a serialized string.
+				/// @param serialized the serialized string
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				/// 
+				/// The serialized string comes from Calendar::serialize.
+				void setFromSerializedString(const std::string& value);
 			//@}
 		};
 

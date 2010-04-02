@@ -8,6 +8,7 @@
 #include "PlaceAliasTableSync.h"
 #include "CityAliasTableSync.hpp"
 
+#include "CityUpdateAction.h"
 
 // Registries
 #include "City.h"

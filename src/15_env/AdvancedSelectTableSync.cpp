@@ -28,8 +28,6 @@
 #include "CommercialLineTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousServiceTableSync.h"
-#include "ServiceDate.h"
-#include "ServiceDateTableSync.h"
 
 #include "DBModule.h"
 
@@ -120,7 +118,6 @@ namespace synthese
 			)	);
 			BOOST_FOREACH(shared_ptr<ScheduledService> serv, services)
 			{
-				ServiceDateTableSync::SetActiveDates(*serv);
 				BOOST_FOREACH(const date& d, serv->getActiveDates())
 				{
 					if(startDate && d < *startDate) continue;
@@ -181,7 +178,6 @@ namespace synthese
 			);
 			BOOST_FOREACH(shared_ptr<ContinuousService> serv, cservices)
 			{
-				ServiceDateTableSync::SetActiveDates(*serv);
 				BOOST_FOREACH(const date& d, serv->getActiveDates())
 				{
 					if(startDate && d < *startDate) continue;
