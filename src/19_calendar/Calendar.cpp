@@ -98,16 +98,11 @@ namespace synthese
 
 			for(size_t p(366); p != 0; --p)
 			{
-				if(it->second.test(p))
+				if(it->second.test(p-1))
 				{
-					return date(it->first, Jan, 1) + days(p);
+					return date(it->first, Jan, 1) + days(p-1);
 				}
 			}
-			if(it->second.test(0))
-			{
-				return date(it->first, Jan, 1);
-			}
-
 			return gregorian::date();
 		}
 
