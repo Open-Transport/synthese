@@ -144,7 +144,7 @@ namespace synthese
 			if(it == _markedDates.end())
 			{
 				it = _markedDates.insert(
-					make_pair(d.year(), _BitSets::mapped_type(366))
+					make_pair(d.year(), _BitSets::mapped_type())
 				).first;
 			}
 
