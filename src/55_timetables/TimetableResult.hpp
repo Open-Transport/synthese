@@ -35,6 +35,10 @@ namespace synthese
 	namespace env
 	{
 		class CommercialLine;
+	}
+
+	namespace pt
+	{
 		class RollingStock;
 	}
 
@@ -55,7 +59,7 @@ namespace synthese
 			typedef std::map<std::size_t, TimetableWarning>		Warnings;
 			typedef std::vector<env::CommercialLine*> RowLinesVector;
 			typedef std::vector<const TimetableWarning*> RowNotesVector;
-			typedef std::vector<const env::RollingStock*> RowRollingStockVector;
+			typedef std::vector<const pt::RollingStock*> RowRollingStockVector;
 			typedef std::vector<boost::posix_time::time_duration> RowTimesVector;
 			typedef std::vector<TimetableColumn::tTypeOD>	RowTypeODVector;
 

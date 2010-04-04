@@ -33,6 +33,7 @@
 #include "DBEmptyResultException.h"
 #include "SQLiteException.h"
 #include "01_util/Exception.h"
+#include "SelectQuery.hpp"
 
 #include <sstream>
 #include <string>
@@ -195,6 +196,14 @@ namespace synthese
 				return boost::shared_ptr<T>(new T(row->getKey()));
 			}
 
+
+			static SearchResult LoadFromQuery(
+				const SelectQuery<K>& query,
+				util::Env& env,
+				util::LinkLevel linkLevel
+			){
+				return LoadFromQuery(query.toString(), env, linkLevel);
+			}
 
 			
 			////////////////////////////////////////////////////////////////////

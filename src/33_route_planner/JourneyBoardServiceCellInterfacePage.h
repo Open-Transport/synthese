@@ -35,7 +35,7 @@ namespace synthese
 		class SentAlarm;
 	}
 
-	namespace env
+	namespace pt
 	{
 		class ReservationContact;
 	}

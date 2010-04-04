@@ -40,6 +40,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{
@@ -148,7 +149,7 @@ namespace synthese
 
 		void TimetableServiceColCellInterfacePage::display(
 			std::ostream& stream,
-			const env::RollingStock* object,
+			const RollingStock* object,
 			std::size_t rowRank,
 			std::size_t colRank,
 			interfaces::VariablesMap& variables,

@@ -23,6 +23,8 @@
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"
 #include "FareTableSync.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -36,7 +38,6 @@ namespace synthese
 	using namespace pt;
 	using namespace util;
 	using namespace db;
-	using namespace env;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,PTUseRuleTableSync>::FACTORY_KEY("35.10.06 Public transportation use rules");
 
@@ -126,23 +127,16 @@ namespace synthese
 			PTUseRule* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() == UNKNOWN_VALUE)
-				object->setKey(getId());
-			query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES(" <<
-				Conversion::ToSQLiteString(object->getName()) << "," <<
-				object->getKey() << "," <<
-				(object->getAccessCapacity() ? lexical_cast<string>(*object->getAccessCapacity()) : "''") << "," <<
-				static_cast<int>(object->getReservationType()) << "," <<
-				object->getMinDelayMinutes().minutes() << "," <<
-				object->getMinDelayDays().days() << "," <<
-				(object->getMaxDelayDays() ? "0" : lexical_cast<string>(object->getMaxDelayDays()->days())) << "," <<
-				"\"" << to_simple_string(object->getHourDeadLine()) << "\"," <<
-				(object->getDefaultFare() ? object->getDefaultFare()->getKey() : RegistryKeyType(0)) <<
-			")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<PTUseRuleTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getAccessCapacity() ? lexical_cast<string>(*object->getAccessCapacity()) : string());
+			query.addField(static_cast<int>(object->getReservationType()));
+			query.addField(object->getMinDelayMinutes().total_seconds() / 60);
+			query.addField(object->getMinDelayDays().days());
+			query.addField(object->getMaxDelayDays() ? lexical_cast<string>(object->getMaxDelayDays()->days()) : string());
+			query.addField(object->getHourDeadLine().is_not_a_date_time() ? string() : to_simple_string(object->getHourDeadLine()));
+			query.addField(object->getDefaultFare() ? object->getDefaultFare()->getKey() : RegistryKeyType(0));
+			query.execute(transaction);
 		}
 
 
@@ -156,5 +150,35 @@ namespace synthese
 
 	namespace pt
 	{
+		PTUseRuleTableSync::SearchResult PTUseRuleTableSync::Search(
+			util::Env& env,
+			boost::optional<std::string> name /*= boost::optional<std::string>()*/,
+			int first /*= 0*/,
+			boost::optional<std::size_t> number /*= boost::optional<std::size_t>()*/,
+			bool orderByName /*= true*/,
+			bool raisingOrder /*= true*/,
+			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+		){
+			SelectQuery<PTUseRuleTableSync> query;
+			if(name)
+			{
+				query.addWhereField(COL_NAME, *name, ComposedExpression::OP_LIKE);
+			}
+			if(orderByName)
+			{
+				query.addOrderField(COL_NAME, raisingOrder);
+			}
+			if(number)
+			{
+				query.setNumber(*number + 1);
+				if(first > 0)
+				{
+					query.setFirst(first);
+				}
+			}
+			return LoadFromQuery(query, env, linkLevel);
+
+		}
+
 	}
 }

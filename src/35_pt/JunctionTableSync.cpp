@@ -165,35 +165,30 @@ namespace synthese
 			bool raisingOrder,
 			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 "
-				;
+			SelectQuery<JunctionTableSync> query;
 			if(startStopFilter)
 			{
-			 	query << " AND " << COL_START_PHYSICAL_STOP_ID << "=" << *startStopFilter;
+			 	query.addWhereField(COL_START_PHYSICAL_STOP_ID, *startStopFilter);
 			}
 			if(endStopFilter)
 			{
-				query << " AND " << COL_END_PHYSICAL_STOP_ID << "=" << *endStopFilter;
+				query.addWhereField(COL_END_PHYSICAL_STOP_ID, *endStopFilter);
 			}
 			if(orderByStop)
 			{
-			 	query << " ORDER BY " << COL_START_PHYSICAL_STOP_ID << " " << (raisingOrder ? "ASC" : "DESC") << "," <<
-					COL_END_PHYSICAL_STOP_ID << " " << (raisingOrder ? "ASC" : "DESC")
+			 	query.addOrderField(COL_START_PHYSICAL_STOP_ID, raisingOrder);
+				query.addOrderField(COL_END_PHYSICAL_STOP_ID, raisingOrder);
 				;
 			}
 			if (number)
 			{
-				query << " LIMIT " << (*number + 1);
+				query.setNumber(*number + 1);
 				if (first > 0)
 				{
-					query << " OFFSET " << first;
+					query.setFirst(first);
 			}	}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }

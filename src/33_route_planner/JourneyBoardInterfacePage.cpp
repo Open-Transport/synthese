@@ -60,6 +60,8 @@ namespace synthese
 	using namespace graph;
 	using namespace road;
 	using namespace geography;
+	using namespace pt;
+	
 
 	namespace util
 	{

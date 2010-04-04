@@ -41,7 +41,7 @@ namespace synthese
 		class Journey;
 	}
 
-	namespace env
+	namespace pt
 	{
 		/** ReservationRuleInterfacePage Interface Page Class.
 			@ingroup m35Pages refPages
@@ -52,7 +52,8 @@ namespace synthese
 			 - delay : Reservation delay (0 if reservation impossible)
 			 - deadline : Reservation deadline (-1/-1/-1 if reservation impossible)
 		*/
-		class ReservationRuleInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage,env::ReservationRuleInterfacePage>
+		class ReservationRuleInterfacePage:
+			public util::FactorableTemplate<interfaces::InterfacePage,ReservationRuleInterfacePage>
 		{
 		public:
 			static const std::string DATA_IS_OPTIONAL;

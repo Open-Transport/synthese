@@ -30,13 +30,10 @@
 
 namespace synthese
 {
-	namespace env
-	{
-		class NonConcurrencyRule;
-	}
-
 	namespace pt
 	{
+		class NonConcurrencyRule;
+
 		/** NonConcurrencyRuleRemoveAction action class.
 			@ingroup m35Actions refActions
 		*/
@@ -47,7 +44,7 @@ namespace synthese
 			static const std::string PARAMETER_RULE_ID;
 
 		private:
-			boost::shared_ptr<const env::NonConcurrencyRule> _rule;
+			boost::shared_ptr<const NonConcurrencyRule> _rule;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -69,7 +66,10 @@ namespace synthese
 			
 			virtual bool isAuthorized(const server::Session* session) const;
 
-			void setRule(boost::shared_ptr<const env::NonConcurrencyRule> rule);
+			//! @name Setters
+			//@{
+				void setRule(boost::shared_ptr<const NonConcurrencyRule> rule) { _rule = rule; }
+			//@}
 		};
 	}
 }

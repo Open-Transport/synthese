@@ -227,9 +227,9 @@ namespace synthese
 				query << " AND t." << TABLE_COL_PHONE << " LIKE " << Conversion::ToSQLiteString(*phone);
 			if(profileId)
 				query << " AND " << TABLE_COL_PROFILE_ID << "=" << *profileId;
-			if (emptyLogin != tribool::indeterminate_value)
+			if (!indeterminate(emptyLogin))
 				query << " AND " << TABLE_COL_LOGIN << (emptyLogin ? "=''" : "!=''");
-			if (emptyPhone != tribool::indeterminate_value)
+			if (!indeterminate(emptyPhone))
 				query << " AND " << TABLE_COL_PHONE << (emptyPhone ? "=''" : "!=''");
 			if(differentUserId)
 				query << " AND " << TABLE_COL_ID << "!=" << *differentUserId;

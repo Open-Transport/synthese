@@ -32,22 +32,23 @@
 
 namespace synthese
 {
-	namespace time
-	{
-		class ptime;
-	}
-
-	namespace env
-	{
-		class Fare;
-	}
-
 	namespace pt
 	{
+		class Fare;
 	
-		/** Public transportation use rule class.
-			@ingroup m35
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Public transportation use rule.
+		///	@ingroup m35
+		/// @author Hugues Romain
+		/// @date 2009
+		//////////////////////////////////////////////////////////////////////////
+		/// A use rules defines for a user profile :
+		///	<ul>
+		///		<li>The maximum number of customer who can use the service</li>
+		///		<li>A default fare class</li>
+		///		<li>Some reservation rules</li>
+		///	</ul>
+		///
 		class PTUseRule
 		:	public util::Registrable,
 			public graph::UseRule
@@ -72,8 +73,8 @@ namespace synthese
 				RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE = 3
 			} ReservationRuleType;
 
-			static const PTUseRule FORBIDDEN_USE_RULE;
 
+			typedef std::vector<std::pair<ReservationRuleType, std::string> > ReservationRuleTypesList;
 
 		private:
 
@@ -81,10 +82,14 @@ namespace synthese
 
 			//! @name Access
 			//@{
-				////
+				//////////////////////////////////////////////////////////////////////////
 				/// Maximal person number which can be served
-				/// The maximum value of the attribute seems unlimited capacity
+				/// The undefined value of the attribute seems unlimited capacity
+				/// A 0 value seems that the service use is forbidden
 				AccessCapacity _accessCapacity;
+
+				/// Default fare
+				const Fare*	_defaultFare;
 			//@}
 				
 			//! @name Reservation
@@ -93,8 +98,7 @@ namespace synthese
 				/// Type of the reservation rule.
 				ReservationRuleType		_reservationType;
 
-				const env::Fare*	_defaultFare;
-				
+			
 				////
 				/// Whether reference departure time is the line run departure time at its origin (true)
 				/// or client departure time (false).
@@ -112,133 +116,183 @@ namespace synthese
 			
 			
 		public:
-			////
+			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
-			/// The constructor builds a most permissive rule :
-			///  - allowed access
+			/// @param key id of the object
+			/// @author Hugues Romain
+			//////////////////////////////////////////////////////////////////////////
+			///  - forbidden access
 			///  - no reservation
-			///  - unlimited capacity
 			PTUseRule(
 				util::RegistryKeyType key = UNKNOWN_VALUE
 			);
 			
 			//! @name Getters
 			//@{
-				virtual AccessCapacity				getAccessCapacity()		const;
-				bool								getOriginIsReference()	const;
-				const boost::posix_time::time_duration&	getHourDeadLine()				const;
-				boost::gregorian::date_duration		getMinDelayDays()				const;
-				boost::posix_time::time_duration					getMinDelayMinutes()			const;
-				const boost::optional<boost::gregorian::date_duration>&	getMaxDelayDays()		const;
-				ReservationRuleType	getReservationType()			const;
-				const std::string&	getName()						const;
-				const env::Fare*	getDefaultFare()				const;
+				virtual AccessCapacity	getAccessCapacity()	const { return _accessCapacity; }
+				bool								getOriginIsReference()	const { return _originIsReference; }
+				const boost::posix_time::time_duration&	getHourDeadLine()				const { return _hourDeadLine; }
+				boost::gregorian::date_duration		getMinDelayDays()				const { return _minDelayDays; }
+				boost::posix_time::time_duration					getMinDelayMinutes()			const { return _minDelayMinutes; }
+				const boost::optional<boost::gregorian::date_duration>&	getMaxDelayDays()		const { return _maxDelayDays; }
+				ReservationRuleType	getReservationType()			const { return _reservationType; }
+				const std::string&	getName()						const { return _name; }
+				const Fare*	getDefaultFare()				const { return _defaultFare; }
 			//@}
 			
 			//! @name Setters
 			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Hour dead line setter.
+				/// @param hourDeadLine value for the hour dead line. If not_a_date_time, there is no hour dead line. If 00:00 then the dead line is shifted 1 second before.
+				/// @author Hugues Romain
 				void setHourDeadLine (const boost::posix_time::time_duration& hourDeadLine);
-				void setMinDelayMinutes (boost::posix_time::time_duration minDelayMinutes);
-				void setMinDelayDays (boost::gregorian::date_duration minDelayDays);
-				void setMaxDelayDays (const boost::optional<boost::gregorian::date_duration> maxDelayDays);
-				void setOriginIsReference (bool originIsReference);
-				void setReservationType(ReservationRuleType value);
-				void setName(const std::string& value);
-				void setAccessCapacity(AccessCapacity value);
-				void setDefaultFare(const env::Fare* value);
+
+				void setMinDelayMinutes (boost::posix_time::time_duration minDelayMinutes) { _minDelayMinutes = minDelayMinutes; }
+				void setMinDelayDays (boost::gregorian::date_duration minDelayDays) { _maxDelayDays = minDelayDays; }
+				void setMaxDelayDays (const boost::optional<boost::gregorian::date_duration> maxDelayDays){ _maxDelayDays = maxDelayDays; }
+				void setOriginIsReference (bool originIsReference){ _originIsReference = originIsReference; }
+				void setReservationType(ReservationRuleType value){ _reservationType = value; }
+				void setName(const std::string& value) { _name = value; }
+				void setAccessCapacity(AccessCapacity value){ _accessCapacity = value; }
+				void setDefaultFare(const Fare* value){ _defaultFare = value; }
 			//@}
 
+			//! @name Service
+			//@{
 
-			/** Reference function for reservation dead line calculation.
-				@param originTime Time of start of the corresponding service
-				@param departureTime Desired departure time.
+				/** Reference function for reservation dead line calculation.
+					@param originTime Time of start of the corresponding service
+					@param departureTime Desired departure time.
 
-				It is done according to the following steps:
-					- Choice of reference time (client departure or line run departure at origin)
-					- Calculation 1 : x minutes before reference time :
-					- Decrease of _minDelayMinutes before reference
+					It is done according to the following steps:
+						- Choice of reference time (client departure or line run departure at origin)
+						- Calculation 1 : x minutes before reference time :
+						- Decrease of _minDelayMinutes before reference
 
-					- Calculation 2 : x days before reference time :
-					- Decrease of _minDelayDays before reference
-					- Sets hour to _hourDeadLine
+						- Calculation 2 : x days before reference time :
+						- Decrease of _minDelayDays before reference
+						- Sets hour to _hourDeadLine
 
-					- The smallest date time is chosen.
+						- The smallest date time is chosen.
 
-				If no explicit rule defines the reservation dead line, 
-				the actual reservation time is returned.
-			*/
-			virtual boost::posix_time::ptime getReservationDeadLine (
-				const boost::posix_time::ptime& originTime,
-				const boost::posix_time::ptime& departureTime
-			) const;
-
-
-
-			/** Reference function for calculation of the date time of the opening of reservations.
-				@param reservationTime Time when booking is done.
-				@return The minimum date time to make a reservation.
-			
-				If no explicit rule defines this minimum time, the actual reservation time is returned.
-			*/
-			virtual boost::posix_time::ptime getReservationOpeningTime ( 
-				const graph::ServicePointer& servicePointer
-			) const;
-			
-			
-			
-			/** Indicates whether or not a path can be taken at a given date, 
-				taking into account reservation delay rules.
-				@return true if the line run can be taken, false otherwise.
-
-				This methods checks the following conditions :
-					- if reservation is not compulsory, the run can be taken.
-					- if reservation is compulsory, reservation time must precede reservation 
-				dead line and be after reservation opening time.
-			*/
-			virtual RunPossibilityType isRunPossible (
-				const graph::ServiceUse& serviceUse
-			) const;
+					If no explicit rule defines the reservation dead line, 
+					the actual reservation time is returned.
+				*/
+				virtual boost::posix_time::ptime getReservationDeadLine (
+					const boost::posix_time::ptime& originTime,
+					const boost::posix_time::ptime& departureTime
+				) const;
 
 
-			virtual RunPossibilityType isRunPossible (
-				const graph::ServicePointer& servicePointer
-			) const;
+
+				/** Reference function for calculation of the date time of the opening of reservations.
+					@param reservationTime Time when booking is done.
+					@return The minimum date time to make a reservation.
+				
+					If no explicit rule defines this minimum time, the actual reservation time is returned.
+				*/
+				virtual boost::posix_time::ptime getReservationOpeningTime ( 
+					const graph::ServicePointer& servicePointer
+				) const;
+				
+				
+				
+				/** Indicates whether or not a path can be taken at a given date, 
+					taking into account reservation delay rules.
+					@return true if the line run can be taken, false otherwise.
+
+					This methods checks the following conditions :
+						- if reservation is not compulsory, the run can be taken.
+						- if reservation is compulsory, reservation time must precede reservation 
+					dead line and be after reservation opening time.
+				*/
+				virtual RunPossibilityType isRunPossible (
+					const graph::ServiceUse& serviceUse
+				) const;
 
 
-			/** Indicates whether or not a reservation is possible for a given run,
-				at a certain date, taking into account delay rules.
-				@return true if the reservation is possible, false otherwise.
-			 
-				This methods checks the following conditions :
-					- reservation time must precede reservation dead line
-					- reservation time must be later than reservation start time.
-			*/
-			virtual ReservationAvailabilityType getReservationAvailability(
-				const graph::ServiceUse& serviceUse
-			) const;
+				/** Indicates whether or not a path can be taken at a given date, 
+					taking into account reservation delay rules.
+					@return true if the line run can be taken, false otherwise.
+
+					This methods checks the following conditions :
+						- if reservation is not compulsory, the run can be taken.
+						- if reservation is compulsory, reservation time must precede reservation 
+					dead line and be after reservation opening time.
+				*/
+				virtual RunPossibilityType isRunPossible (
+					const graph::ServicePointer& servicePointer
+				) const;
 
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Temporary reservation availability getter.
-			/// 
-			/// @warning The reservation availability result produced by this method
-			/// is temporary : the departure time
-			/// must be known to determinate the reservation availability definitely.
-			/// In ARRIVAL_TO_DEPARTURE method, the arrival time is the only one
-			/// known. The temporary result is based on the arrival time : if no
-			/// reservation can be done for the arrival time, it is not possible to do
-			/// one for any departure time, that is necessarily earlier. So the
-			/// result of this method MUST be confirmed by
-			/// getReservationAvailability(const ServiceUse&, ...)
-			virtual ReservationAvailabilityType getReservationAvailability(
-				const graph::ServicePointer& servicePointer
-			) const;
+				/** Indicates whether or not a reservation is possible for a given run,
+					at a certain date, taking into account delay rules.
+					@return true if the reservation is possible, false otherwise.
+				 
+					This methods checks the following conditions :
+						- reservation time must precede reservation dead line
+						- reservation time must be later than reservation start time.
+				*/
+				virtual ReservationAvailabilityType getReservationAvailability(
+					const graph::ServiceUse& serviceUse
+				) const;
 
 
-			virtual bool isCompatibleWith(
-				const graph::AccessParameters& accessParameters
-			) const;
+				//////////////////////////////////////////////////////////////////////////
+				/// Temporary reservation availability getter.
+				/// 
+				/// @warning The reservation availability result produced by this method
+				/// is temporary : the departure time
+				/// must be known to determinate the reservation availability definitely.
+				/// In ARRIVAL_TO_DEPARTURE method, the arrival time is the only one
+				/// known. The temporary result is based on the arrival time : if no
+				/// reservation can be done for the arrival time, it is not possible to do
+				/// one for any departure time, that is necessarily earlier. So the
+				/// result of this method MUST be confirmed by
+				/// getReservationAvailability(const ServiceUse&, ...)
+				virtual ReservationAvailabilityType getReservationAvailability(
+					const graph::ServicePointer& servicePointer
+				) const;
 
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the use rule is compatible with the filters of an access parameter.
+				/// @param accessParameters access parameters object to compare with
+				/// @return true if the use rule is compatible with the filters of the specified access parameters object
+				/// @author Hugues Romain
+				virtual bool isCompatibleWith(
+					const graph::AccessParameters& accessParameters
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Builds the list of reservation rule types.
+				/// @return the list of reservation rule types
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				//////////////////////////////////////////////////////////////////////////
+				/// Designed to be used by HTMLForm::getSelectInput.
+				static ReservationRuleTypesList GetTypesList();
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the name of a reservation rule type.
+				/// @param type the type to be named
+				/// @return the name of the specified reservation rule type
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				//////////////////////////////////////////////////////////////////////////
+				static std::string GetTypeName(
+					ReservationRuleType type
+				);
+
+			//@}
 		};
 	}
 }

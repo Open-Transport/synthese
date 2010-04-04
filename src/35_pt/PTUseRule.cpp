@@ -53,90 +53,12 @@ namespace synthese
 		):	Registrable(key),
 			_accessCapacity(0),
 			_reservationType(RESERVATION_RULE_FORBIDDEN),
-			_minDelayMinutes(0,0,0),
-			_minDelayDays(0),
+			_minDelayMinutes(minutes(0)),
+			_minDelayDays(days(0)),
+			_maxDelayDays(not_a_date_time),
 			_hourDeadLine(not_a_date_time),
 			_defaultFare(NULL)
 		{
-		}
-
-
-		
-		UseRule::AccessCapacity PTUseRule::getAccessCapacity() const
-		{
-			return _accessCapacity;
-		}
-
-	
-		void PTUseRule::setMinDelayMinutes (time_duration minDelayMinutes)
-		{
-			_minDelayMinutes = minDelayMinutes;
-		}
-
-
-
-		void PTUseRule::setMinDelayDays (date_duration minDelayDays)
-		{
-			_minDelayDays = minDelayDays;
-		}
-
-
-
-		void PTUseRule::setMaxDelayDays(
-			const optional<date_duration> maxDelayDays
-		){
-			_maxDelayDays = maxDelayDays;
-		}
-
-
-
-		void PTUseRule::setOriginIsReference (bool originIsReference)
-		{
-			_originIsReference = originIsReference;
-		}
-
-		bool PTUseRule::getOriginIsReference() const
-		{
-			return _originIsReference;
-		}
-
-		date_duration PTUseRule::getMinDelayDays() const
-		{
-			return _minDelayDays;
-		}
-
-		time_duration PTUseRule::getMinDelayMinutes() const
-		{
-			return _minDelayMinutes;
-		}
-
-		const optional<date_duration>& PTUseRule::getMaxDelayDays() const
-		{
-			return _maxDelayDays;
-		}
-
-
-
-
-
-		PTUseRule::ReservationRuleType PTUseRule::getReservationType() const
-		{
-			return _reservationType;
-		}
-
-
-
-		void PTUseRule::setReservationType(
-			PTUseRule::ReservationRuleType value
-		){
-			_reservationType = value;
-		}
-
-
-
-		const time_duration& PTUseRule::getHourDeadLine () const
-		{
-			return _hourDeadLine;
 		}
 
 
@@ -470,29 +392,31 @@ namespace synthese
 			return true;
 		}
 
-		const std::string& PTUseRule::getName() const
+
+
+		PTUseRule::ReservationRuleTypesList PTUseRule::GetTypesList()
 		{
-			return _name;
+			ReservationRuleTypesList result;
+			result.push_back(make_pair(RESERVATION_RULE_FORBIDDEN, GetTypeName(RESERVATION_RULE_FORBIDDEN)));
+			result.push_back(make_pair(RESERVATION_RULE_OPTIONAL, GetTypeName(RESERVATION_RULE_OPTIONAL)));
+			result.push_back(make_pair(RESERVATION_RULE_COMPULSORY, GetTypeName(RESERVATION_RULE_COMPULSORY)));
+			result.push_back(make_pair(RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE, GetTypeName(RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE)));
+			return result;
 		}
 
-		void PTUseRule::setName( const std::string& value )
-		{
-			_name = value;
-		}
 
-		void PTUseRule::setAccessCapacity( UseRule::AccessCapacity value )
-		{
-			_accessCapacity = value;
-		}
 
-		void PTUseRule::setDefaultFare( const env::Fare* value )
+		std::string PTUseRule::GetTypeName( ReservationRuleType type )
 		{
-			_defaultFare = value;
-		}
-
-		const env::Fare* PTUseRule::getDefaultFare() const
-		{
-			return _defaultFare;
+			switch(type)
+			{
+			case RESERVATION_RULE_FORBIDDEN: return "Réservation impossible";
+			case RESERVATION_RULE_COMPULSORY: return "Réservation obligatoire";
+			case RESERVATION_RULE_OPTIONAL: return "Réservation possible";
+			case RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE: return "Réservation possible, obligatoire au départ de certains arrêts";
+			}
+			assert(false);
+			return string();
 		}
 	}
 }

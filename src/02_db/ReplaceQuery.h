@@ -90,6 +90,24 @@ namespace synthese
 				_fields.push_back(boost::lexical_cast<std::string>(value));
 			}
 
+			void addField(boost::logic::tribool value){
+				_fields.push_back(boost::lexical_cast<std::string>(value == true ? 1 : value == false ? 0 : -1));
+			}
+
+			template<class T>
+			void addField(std::set<T> value)
+			{
+				std::stringstream s;
+				bool first(true);
+				BOOST_FOREACH(const std::set<T>::value_type& o, value)
+				{
+					if(!first) s << ",";
+					s << o;
+					first = false;
+				}
+				_fields.push_back(s.str());
+			}
+
 			void execute(
 				boost::optional<SQLiteTransaction&> transaction
 			){

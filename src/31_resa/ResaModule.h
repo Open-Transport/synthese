@@ -35,7 +35,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class ReservationContact;
 	}

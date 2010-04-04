@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		/** Fare handling class
 
@@ -69,13 +69,16 @@ namespace synthese
 			~Fare ();
 		    
 		    
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
-			const std::string& getName () const;
-			void setName (const std::string& name);
+				const std::string& getName () const { return _name; }
+				const FareType& getType () const { return _type; }
+			//@}
 
-			const FareType& getType () const;
-			void setType (const FareType& fareType);
+			//! @name Setters
+			//@{
+				void setName (const std::string& name) { _name = name; }
+				void setType (const FareType& fareType) { _type = fareType; }
 			//@}
 		};
 	}

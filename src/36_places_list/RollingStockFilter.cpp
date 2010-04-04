@@ -30,7 +30,7 @@ namespace synthese
 {
 	using namespace graph;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{

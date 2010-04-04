@@ -30,13 +30,11 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string Registry<env::NonConcurrencyRule>::KEY("NonConcurrencyRule");
+		template<> const std::string Registry<pt::NonConcurrencyRule>::KEY("NonConcurrencyRule");
 	}
 
-	namespace env
+	namespace pt
 	{
-
-
 		NonConcurrencyRule::NonConcurrencyRule(
 			RegistryKeyType key
 		):	Registrable(key),
@@ -44,35 +42,5 @@ namespace synthese
 			_hiddenLine(NULL),
 			_delay(minutes(0))
 		{}
-
-		CommercialLine* NonConcurrencyRule::getPriorityLine() const
-		{
-			return _prorityLine;
-		}
-
-		CommercialLine* NonConcurrencyRule::getHiddenLine() const
-		{
-			return _hiddenLine;
-		}
-
-		const time_duration& NonConcurrencyRule::getDelay() const
-		{
-			return _delay;
-		}
-
-		void NonConcurrencyRule::setPriorityLine(CommercialLine* value )
-		{
-			_prorityLine = value;
-		}
-
-		void NonConcurrencyRule::setHiddenLine(CommercialLine* value )
-		{
-			_hiddenLine = value;
-		}
-
-		void NonConcurrencyRule::setDelay(const time_duration& value )
-		{
-			_delay = value;
-		}
 	}
 }

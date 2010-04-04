@@ -39,13 +39,14 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace graph;
+	using namespace pt;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<InterfacePage, env::ReservationRuleInterfacePage>::FACTORY_KEY("reservation_rule");
+		template<> const string FactorableTemplate<InterfacePage, ReservationRuleInterfacePage>::FACTORY_KEY("reservation_rule");
 	}
 
-	namespace env
+	namespace pt
 	{
 		const string ReservationRuleInterfacePage::DATA_DEADLINE("deadline");
 		const string ReservationRuleInterfacePage::DATA_DELAY("delay");

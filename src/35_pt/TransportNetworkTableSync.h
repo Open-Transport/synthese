@@ -34,9 +34,12 @@ namespace synthese
 {
 	namespace pt
 	{
-		/** TransportNetwork SQLite table synchronizer.
-			@ingroup m35LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 35.10 Table : Transport network.
+		///	@ingroup m35LS refLS
+		/// @author Hugues Romain
+		/// @date 2006
+		//////////////////////////////////////////////////////////////////////////
 		class TransportNetworkTableSync
 		:	public db::SQLiteRegistryTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>
 		{

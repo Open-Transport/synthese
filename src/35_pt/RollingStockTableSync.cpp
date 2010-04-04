@@ -25,13 +25,11 @@
 #include <sstream>
 
 #include "RollingStockTableSync.h"
-
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-
-#include "Conversion.h"
+#include "ReplaceQuery.h"
 
 using namespace std;
 using namespace boost;
@@ -40,14 +38,14 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,RollingStockTableSync>::FACTORY_KEY("15.10.07 Rolling Stock");
 	}
 
-	namespace env
+	namespace pt
 	{
 		const string RollingStockTableSync::COL_NAME("name");
 		const string RollingStockTableSync::COL_ARTICLE("article");
@@ -58,7 +56,7 @@ namespace synthese
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RollingStockTableSync>::TABLE(
 			"t049_rolling_stock"
-			);
+		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<RollingStockTableSync>::_FIELDS[]=
 		{
@@ -93,17 +91,11 @@ namespace synthese
 			RollingStock* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				/// @todo fill other fields separated by ,
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<RollingStockTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getArticle());
+			query.addField(object->getIndicator());
+			query.execute(transaction);
 		}
 
 
@@ -116,7 +108,7 @@ namespace synthese
 	
 	
 	
-	namespace env
+	namespace pt
 	{
 		RollingStockTableSync::RollingStockTableSync()
 			: SQLiteRegistryTableSyncTemplate<RollingStockTableSync,RollingStock>()

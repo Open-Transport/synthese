@@ -50,6 +50,29 @@ namespace synthese
 			static const std::string COL_MAXDELAYDAYS;
 			static const std::string COL_HOURDEADLINE;
 			static const std::string COL_DEFAULT_FARE;
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Search of use rules.
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			/// @param env Environment to populate while the search
+			/// @param name Filter on the name of the use rule
+			/// @param first Rank of the first returned rule
+			/// @param number Number of returned rules
+			/// @param orderByName Order the results by the name field
+			/// @param raisingOrder Order ascendantly
+			/// @param linkLevel Level of link when loading objects
+			static SearchResult Search(
+				util::Env& env,
+				boost::optional<std::string> name = boost::optional<std::string>(),
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				bool orderByName = true,
+				bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 		};
 	}
 }

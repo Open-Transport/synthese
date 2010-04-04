@@ -39,12 +39,13 @@ namespace synthese
 	namespace pt
 	{
 		class TransportNetwork;
+		class NonConcurrencyRule;
+		class ReservationContact;
 	}
 	
 	namespace env
 	{
 		class PublicTransportStopZoneConnectionPlace;
-		class NonConcurrencyRule;
 	}
 
 	namespace calendar
@@ -54,8 +55,6 @@ namespace synthese
 
 	namespace env
 	{
-		class ReservationContact;
-
 		/** Commercial line.
 			@ingroup m35
 
@@ -75,7 +74,7 @@ namespace synthese
 
 			typedef std::set<const env::PublicTransportStopZoneConnectionPlace*> PlacesSet;
 
-			typedef std::set<const NonConcurrencyRule*> NonConcurrencyRules;
+			typedef std::set<const pt::NonConcurrencyRule*> NonConcurrencyRules;
 
 		private:
 			std::string			_name;		//!< Name (code)
@@ -88,7 +87,7 @@ namespace synthese
 
 			const pt::TransportNetwork*	_network;	//!< Network
 
-			const ReservationContact*	_reservationContact;	//!< Reservation contact
+			const pt::ReservationContact*	_reservationContact;	//!< Reservation contact
 			PlacesSet	_optionalReservationPlaces;
 			
 			std::string _creatorId;
@@ -115,7 +114,7 @@ namespace synthese
 				const std::string& getImage () const { return _image; }
 				const boost::optional<util::RGBColor>& getColor () const { return _color; }
 				const std::string& getName () const { return _name; }
-				const ReservationContact* getReservationContact() const { return _reservationContact; }
+				const pt::ReservationContact* getReservationContact() const { return _reservationContact; }
 				const std::string& getCreatorId() const { return _creatorId; }
 				const PlacesSet& getOptionalReservationPlaces() const { return _optionalReservationPlaces; }
 				const NonConcurrencyRules& getNonConcurrencyRules() const { return _nonConcurrencyRules; }
@@ -132,7 +131,7 @@ namespace synthese
 				void setImage (const std::string& image) { _image = image; }
 				void setColor (const boost::optional<util::RGBColor>& color) { _color = color; }
 				void setName (const std::string& name) { _name = name; }
-				void setReservationContact(const ReservationContact* value) { _reservationContact = value; }
+				void setReservationContact(const pt::ReservationContact* value) { _reservationContact = value; }
 				void setCreatorId(const std::string& value) { _creatorId = value; }
 				void setCalendarTemplate(calendar::CalendarTemplate* value) { _calendarTemplate = value;}
 				void setNonConcurrencyRules(const NonConcurrencyRules& value) { _nonConcurrencyRules = value; }
@@ -177,14 +176,14 @@ namespace synthese
 				/// Adds a non concurrency rule.
 				/// @param rule the rule to add
 				/// This method cleans non concurrency cache of all the services of the line.
-				void addConcurrencyRule( const NonConcurrencyRule* rule );
+				void addConcurrencyRule( const pt::NonConcurrencyRule* rule );
 
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Removes a non concurrency rule.
 				/// @param rule the rule to remove
 				/// This method cleans non concurrency cache of all the services of the line.
-				void removeConcurrencyRule( const NonConcurrencyRule* rule );
+				void removeConcurrencyRule( const pt::NonConcurrencyRule* rule );
 			//@}
 		};
 	}

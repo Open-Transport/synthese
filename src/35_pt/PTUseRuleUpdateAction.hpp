@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// CommercialLineUpdateAction class header.
-///	@file CommercialLineUpdateAction.h
+/// PTUseRuleUpdateAction class header.
+///	@file PTUseRuleUpdateAction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///
@@ -22,71 +22,66 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_CommercialLineUpdateAction_H__
-#define SYNTHESE_CommercialLineUpdateAction_H__
+#ifndef SYNTHESE_PTUseRuleUpdateAction_H__
+#define SYNTHESE_PTUseRuleUpdateAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "RGBColor.h"
+#include "PTUseRule.h"
 
 namespace synthese
 {
-	namespace env
-	{
-		class CommercialLine;
-	}
-
 	namespace pt
 	{
-		class ReservationContact;
-		class TransportNetwork;
-
 		//////////////////////////////////////////////////////////////////////////
-		/// 35.15 Update of properties of a CommercialLine object.
+		/// 35.15 Action : Transport condition update.
 		/// @ingroup m35Actions refActions
 		/// @author Hugues Romain
 		/// @date 2010
 		/// @since 3.1.16
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : PTUseRuleUpdateAction
 		///
 		/// Parameters :
 		///	<ul>
-		///		<li>actionParamid : id of the commercial line to update</li>
-		///		<li>actionParamna : name (for the menu)</li>
-		///		<li>actionParamsn : short name (for the cartouche)</li>
-		///		<li>actionParamln : long name (for the road map)</li>
-		///		<li>actionParamco : color code (@ref RGBColor)</li>
-		///		<li>actionParamst : CSS style class (for the cartouche)</li>
-		///		<li>actionParamim : image url (for the cartouche)</li>
-		///		<li>actionParamni : network id</li>
-		///		<li>actionParamri : reservation contact id</li>
-		///		<li>actionParamci : creator id</li>
-		///	</ul>
-		class CommercialLineUpdateAction:
-			public util::FactorableTemplate<server::Action, CommercialLineUpdateAction>
+		///		<li>actionParamid : id of the object to update</li>
+		///		<li>actionParamna : new name</li>
+		///		<li>actionParamca : new capacity</li>
+		///		<li>actionParamor : new value for origin is reference</li>
+		///		<li>actionParamfi : new value for default fare</li>
+		///		<li>actionParamty : new value for type of reservation rule</li>
+		///		<li>actionParammx : new value for max delay days</li>
+		///		<li>actionParammd : new value for min delay days</li>
+		///		<li>actionParammm : new value for min delay minutes</li>
+		///		<li>actionParamdl : new value for hour dead line</li>
+		/// </ul>
+		class PTUseRuleUpdateAction:
+			public util::FactorableTemplate<server::Action, PTUseRuleUpdateAction>
 		{
 		public:
-			static const std::string PARAMETER_LINE_ID;
+			static const std::string PARAMETER_RULE_ID;
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_SHORT_NAME;
-			static const std::string PARAMETER_LONG_NAME;
-			static const std::string PARAMETER_COLOR;
-			static const std::string PARAMETER_STYLE;
-			static const std::string PARAMETER_IMAGE;
-			static const std::string PARAMETER_NETWORK_ID;
-			static const std::string PARAMETER_RESERVATION_CONTACT_ID;
-			static const std::string PARAMETER_CREATOR_ID;
+			static const std::string PARAMETER_CAPACITY;
+			static const std::string PARAMETER_ORIGIN_IS_REFERENCE;
+			static const std::string PARAMETER_FARE_ID;
+			static const std::string PARAMETER_TYPE;
+			static const std::string PARAMETER_MAX_DELAY_DAYS;
+			static const std::string PARAMETER_MIN_DELAY_DAYS;
+			static const std::string PARAMETER_MIN_DELAY_MINUTES;
+			static const std::string PARAMETER_HOUR_DEADLINE;
 
 		private:
-			boost::shared_ptr<env::CommercialLine> _line;
-			std::string			_name;		//!< Name (code)
-			std::string			_shortName;	//!< Name (cartouche)
-			std::string			_longName;	//!< Name for schedule card
-			boost::optional<util::RGBColor>		_color;		//!< Line color
-			std::string			_style;		//!< CSS style (cartouche)
-			std::string			_image;		//!< Display image (cartouche)
-			boost::shared_ptr<const TransportNetwork>	_network;	//!< Network
-			boost::shared_ptr<const pt::ReservationContact>	_reservationContact;	//!< Reservation contact
-			std::string _creatorId;
+			boost::shared_ptr<PTUseRule> _rule;
+			std::string _name;
+			graph::UseRule::AccessCapacity _capacity;
+			bool _originIsReference;
+			boost::shared_ptr<const Fare> _fare;
+			PTUseRule::ReservationRuleType _type;
+			boost::posix_time::time_duration _minDelayMinutes;
+			boost::gregorian::date_duration _minDelayDays; 
+			boost::optional<boost::gregorian::date_duration> _maxDelayDays;
+			boost::posix_time::time_duration _hourDeadLine;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -117,12 +112,13 @@ namespace synthese
 			virtual bool isAuthorized(const server::Session* session) const;
 
 
+
 			//! @name Setters
 			//@{
-				void setLine(boost::shared_ptr<env::CommercialLine> value) { _line = value; }
+				void setRule(boost::shared_ptr<PTUseRule> value) { _rule = value; }
 			//@}
 		};
 	}
 }
 
-#endif // SYNTHESE_CommercialLineUpdateAction_H__
+#endif // SYNTHESE_PTUseRuleUpdateAction_H__

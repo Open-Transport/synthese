@@ -34,7 +34,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace env;
+	using namespace pt;
 	using namespace ptrouteplanner;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement,routeplanner::ScheduleSheetReservationRowInterfaceElement>::FACTORY_KEY("schedules_reservation");

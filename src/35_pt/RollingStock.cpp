@@ -1,6 +1,6 @@
 
-/** Fare class implementation.
-	@file Fare.cpp
+/** RollingStock class implementation.
+	@file RollingStock.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,63 +20,80 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Fare.h"
+#include "RollingStock.h"
 #include "Registry.h"
 
 using namespace std;
-using namespace boost;
 
 namespace synthese
 {
-	using namespace util;
+	using namespace graph;
 
 	namespace util
 	{
-		template<> const string Registry<env::Fare>::KEY("Fare");
+		template<> const string Registry<pt::RollingStock>::KEY("RollingStock");
 	}
-	
-	namespace env
+
+	namespace pt
 	{
-		Fare::Fare(RegistryKeyType key)
-		: Registrable(key)
+
+
+		RollingStock::RollingStock(
+			util::RegistryKeyType key
+		):	graph::PathClass(),
+			util::Registrable(key)
 		{
 		}
 
 
 
-		Fare::~Fare ()
+		RollingStock::~RollingStock()
 		{
+
 		}
 
-		    
-		    
-		const std::string& Fare::getName () const
+
+		const std::string& 
+		RollingStock::getName() const
 		{
 			return _name;
 		}
 
 
-
-
-		const Fare::FareType& 
-		Fare::getType () const
+		const std::string& 
+		RollingStock::getArticle() const
 		{
-			return _type;
-		}
-
-
-		void 
-		Fare::setName (const std::string& name)
-		{
-			_name = name;
+			return _article;
 		}
 
 
 
-		void 
-		Fare::setType (const FareType& type)
+		const std::string& 
+		RollingStock::getIndicator() const
 		{
-			_type = type;
+			return _indicator;
+		}
+
+		void RollingStock::setName( const std::string& value )
+		{
+			_name = value;
+		}
+
+		void RollingStock::setArticle( const std::string& value )
+		{
+			_article = value;
+		}
+
+		void RollingStock::setIndicator( const std::string& value )
+		{
+			_indicator = value;
+		}
+
+
+
+		PathClass::Identifier RollingStock::getIdentifier() const
+		{
+			return getKey();
 		}
 	}
 }

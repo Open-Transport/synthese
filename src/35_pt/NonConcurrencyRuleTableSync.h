@@ -31,13 +31,12 @@
 #include <iostream>
 
 #include "SQLiteRegistryTableSyncTemplate.h"
+#include "NonConcurrencyRule.h"
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
-		class NonConcurrencyRule;
-
 		/** NonConcurrencyRule table synchronizer.
 			@ingroup m35LS refLS
 		*/

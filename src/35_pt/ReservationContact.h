@@ -28,7 +28,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		/** Reservation contact.
 			@ingroup m35

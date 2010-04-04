@@ -1,6 +1,6 @@
 
-/** RollingStock class implementation.
-	@file RollingStock.cpp
+/** Fare class implementation.
+	@file Fare.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,80 +20,32 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RollingStock.h"
+#include "Fare.h"
 #include "Registry.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
-	using namespace graph;
+	using namespace util;
 
 	namespace util
 	{
-		template<> const string Registry<env::RollingStock>::KEY("RollingStock");
+		template<> const string Registry<pt::Fare>::KEY("Fare");
 	}
-
-	namespace env
+	
+	namespace pt
 	{
-
-
-		RollingStock::RollingStock(
-			util::RegistryKeyType key
-		):	graph::PathClass(),
-			util::Registrable(key)
+		Fare::Fare(RegistryKeyType key)
+		: Registrable(key)
 		{
 		}
 
 
 
-		RollingStock::~RollingStock()
+		Fare::~Fare ()
 		{
-
-		}
-
-
-		const std::string& 
-		RollingStock::getName() const
-		{
-			return _name;
-		}
-
-
-		const std::string& 
-		RollingStock::getArticle() const
-		{
-			return _article;
-		}
-
-
-
-		const std::string& 
-		RollingStock::getIndicator() const
-		{
-			return _indicator;
-		}
-
-		void RollingStock::setName( const std::string& value )
-		{
-			_name = value;
-		}
-
-		void RollingStock::setArticle( const std::string& value )
-		{
-			_article = value;
-		}
-
-		void RollingStock::setIndicator( const std::string& value )
-		{
-			_indicator = value;
-		}
-
-
-
-		PathClass::Identifier RollingStock::getIdentifier() const
-		{
-			return getKey();
 		}
 	}
 }

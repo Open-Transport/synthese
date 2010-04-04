@@ -31,6 +31,7 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
+#include "ReplaceQuery.h"
 
 using namespace std;
 using namespace boost;
@@ -39,7 +40,6 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
 	using namespace road;
 
 	namespace util
@@ -62,8 +62,10 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RoadTableSync>::TABLE(
-				"t015_roads"
-				);
+			"t015_roads"
+		);
+
+
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<RoadTableSync>::_FIELDS[]=
 		{
@@ -77,10 +79,14 @@ namespace synthese
 			SQLiteTableSync::Field()
 		};
 
+
+
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<RoadTableSync>::_INDEXES[]=
 		{
 			SQLiteTableSync::Index()
 		};
+
+
 
 		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Load(
 			Road* object,
@@ -110,30 +116,28 @@ namespace synthese
 			}
 		}
 
+
+
 		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Unlink(
 			Road* obj
 		){
 		}
 
+
+
 		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Save(
 			Road* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			 query <<
-				" REPLACE INTO " << TABLE.NAME << " VALUES(" <<
-				object->getKey() << "," <<
-				static_cast<int>(object->getType()) << "," <<
-				"0,0,0,''," <<
-				(object->getRoadPlace() ? object->getRoadPlace()->getKey() : RegistryKeyType(0)) <<
-			")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<RoadTableSync> query(*object);
+			query.addField(static_cast<int>(object->getType()));
+			query.addField(0);
+			query.addField(0);
+			query.addField(0);
+			query.addField(string());
+			query.addField(object->getRoadPlace() ? object->getRoadPlace()->getKey() : RegistryKeyType(0));
+			query.execute(transaction);
 		}
-
 	}
 
 	namespace road

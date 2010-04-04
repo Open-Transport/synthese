@@ -85,12 +85,5 @@ namespace synthese
 		) const {
 			return _rule.get() && session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_rule->getKey()));
 		}
-
-
-
-		void NonConcurrencyRuleRemoveAction::setRule( boost::shared_ptr<const env::NonConcurrencyRule> rule )
-		{
-			_rule = rule;
-		}
 	}
 }

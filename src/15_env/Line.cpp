@@ -179,16 +179,14 @@ namespace synthese
 
 
 
-		void
-		Line::setWalkingLine (bool isWalkingLine)
+		void Line::setWalkingLine (bool isWalkingLine)
 		{
 			_isWalkingLine = isWalkingLine;
 		}
 
 
 
-		bool 
-		Line::getWalkingLine () const
+		bool Line::getWalkingLine () const
 		{
 			return _isWalkingLine;
 		}

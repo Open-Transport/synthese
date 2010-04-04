@@ -33,12 +33,10 @@ namespace synthese
 {
 	using namespace util;
 	using namespace graph;
-	using namespace pt;
-
-	namespace env
+	using namespace env;
+	
+	namespace pt
 	{
-
-
 		SubLine::SubLine( Line* line )
 			: Line()
 			, _mainLine(line),

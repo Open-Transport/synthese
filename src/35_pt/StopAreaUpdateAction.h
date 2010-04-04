@@ -44,6 +44,7 @@ namespace synthese
 		/// @author Hugues Romain
 		/// @date 2010
 		/// @since 3.1.16
+		///
 		/// Note :The name attributes can be updated by NamedPlaceUpdateAction.
 		///
 		/// Parameters :

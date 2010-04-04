@@ -43,15 +43,15 @@ namespace synthese
 	{
 		class TransportNetwork;
 		class PhysicalStop;
+		class RollingStock;
+		class SubLine;
 	}
 	
 	namespace env
 	{
 		class LineStop;
-		class RollingStock;
 		class LineAlarmBroadcast;
 		class CommercialLine;
-		class SubLine;
 
 
 		/** Technical line.
@@ -82,7 +82,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<Line>	Registry;
 
-			typedef std::vector<SubLine*> SubLines;
+			typedef std::vector<pt::SubLine*> SubLines;
 
 		private:
 			std::string _name;			//!< Name (code)
@@ -118,7 +118,7 @@ namespace synthese
 				bool					getUseInRoutePlanning ()	const;
 				const std::string&		getDirection ()				const;
 				const std::string&		getTimetableName ()			const;
-				RollingStock*			getRollingStock()			const;
+				pt::RollingStock*			getRollingStock()			const;
 				bool					getWalkingLine ()			const;
 				CommercialLine*			getCommercialLine()			const;
 				const SubLines			getSubLines()				const;
@@ -131,7 +131,7 @@ namespace synthese
 				void setUseInDepartureBoards (bool useInDepartureBoards);
 				void setName (const std::string& name);
 				void setWalkingLine (bool isWalkingLine);
-				void setRollingStock(RollingStock*);
+				void setRollingStock(pt::RollingStock*);
 				void setTimetableName (const std::string& timetableName);
 				void setDirection (const std::string& direction);
 				void setUseInRoutePlanning (bool useInRoutePlanning);
@@ -151,7 +151,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008
 				*/
-				int addSubLine(SubLine* line);
+				int addSubLine(pt::SubLine* line);
 
 
 				/** Adds a service to a line.

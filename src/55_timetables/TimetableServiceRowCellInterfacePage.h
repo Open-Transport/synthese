@@ -39,6 +39,10 @@ namespace synthese
 	namespace env
 	{
 		class PublicTransportStopZoneConnectionPlace;
+	}
+
+	namespace pt
+	{
 		class RollingStock;
 	}
 
@@ -76,7 +80,7 @@ namespace synthese
 			void display(
 				std::ostream& stream,
 				const TimetableColumn::Content::value_type& object,
-				const env::RollingStock* rollingStock,
+				const pt::RollingStock* rollingStock,
 				std::size_t rank,
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL

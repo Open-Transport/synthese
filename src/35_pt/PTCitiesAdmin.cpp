@@ -34,6 +34,8 @@
 #include "PTPlacesAdmin.h"
 #include "FrenchSentence.h"
 #include "Profile.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "CityAddAction.h"
 
 using namespace std;
 
@@ -112,15 +114,7 @@ namespace synthese
 		
 			////////////////////////////////////////////////////////////////////
 			// TAB LIST
-			if (openTabContent(stream, TAB_LIST))
-			{
-				AdminFunctionRequest<PTCitiesAdmin> searchRequest(request);
-			}
-
-
-			////////////////////////////////////////////////////////////////////
-			// TAB LIST
-			if (openTabContent(stream, TAB_PHONETIC))
+//			if (openTabContent(stream, TAB_PHONETIC))
 			{				
 				AdminFunctionRequest<PTCitiesAdmin> searchRequest(request);
 
@@ -165,11 +159,23 @@ namespace synthese
 
 					stream << t.close();
 				}
+
+				stream << "<h1>Création</h1>";
+
+				AdminActionFunctionRequest<CityAddAction,PTPlacesAdmin> creationRequest(request);
+				creationRequest.setActionWillCreateObject();
+				creationRequest.getFunction()->setActionFailedPage(getNewPage());
+
+				PropertiesHTMLTable tc(creationRequest.getHTMLForm());
+				stream << tc.open();
+				stream << tc.cell("Nom", t.getForm().GetTextInput(CityAddAction::PARAMETER_NAME, string()));
+				stream << tc.cell("Code", t.getForm().GetTextInput(CityAddAction::PARAMETER_CODE, string()));
+				stream << tc.close();
 			}
 
 			////////////////////////////////////////////////////////////////////
 			// END TABS
-			closeTabContent(stream);
+//			closeTabContent(stream);
 		}
 
 
@@ -217,8 +223,7 @@ namespace synthese
 		) const	{
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Recherche", TAB_LIST, true, "find.png"));
-			_tabs.push_back(Tab("Recherche phonétique", TAB_PHONETIC, true, "text_allcaps.png"));
+//			_tabs.push_back(Tab("Recherche phonétique", TAB_PHONETIC, true, "text_allcaps.png"));
 
 			_tabBuilded = true;
 		}

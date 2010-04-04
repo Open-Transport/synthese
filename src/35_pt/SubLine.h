@@ -27,7 +27,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		/** Sub-Line class.
 			@ingroup m35
@@ -41,9 +41,10 @@ namespace synthese
 			In theory, a stop could be added in the main line without doing the update in the subline.
 			This is avoided by the rule saying that no stop can be added once a service is inserted in the line (a subline is created only if at least a service is registered)
 		*/
-		class SubLine : public Line
+		class SubLine:
+			public env::Line
 		{
-			Line*	_mainLine;
+			env::Line*	_mainLine;
 
 		public:
 			/** Constructor.
@@ -55,7 +56,7 @@ namespace synthese
 					- copy all data (including LineStop) of the original line
 					- insert the subline in the sublines registry of the line.
 			*/
-			SubLine(Line* line);
+			SubLine(env::Line* line);
 
 
 			/** Destructor.
@@ -81,7 +82,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008				
 			*/
-			Line*	getMainLine()	const;
+			env::Line*	getMainLine()	const;
 		};
 	}
 }

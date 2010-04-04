@@ -16,3 +16,5 @@
 #include "Crossing.h"
 #include "RoadPlace.h"
 #include "PublicPlace.h"
+#include "RoadChunk.h"
+#include "Address.h"

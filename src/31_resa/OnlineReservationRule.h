@@ -38,7 +38,7 @@ namespace synthese
 		class Interface;
 	}
 
-	namespace env
+	namespace pt
 	{
 		class ReservationContact;
 	}
@@ -71,7 +71,7 @@ namespace synthese
 		private:
 			//! \name Link with env reservation rules
 			//@{
-				const env::ReservationContact* _reservationRule;
+				const pt::ReservationContact* _reservationRule;
 				static OnlineReservationRuleMap _onlineReservationRuleMap;
 			//@}
 
@@ -105,11 +105,11 @@ namespace synthese
 
 		public:
 
-			static const OnlineReservationRule* GetOnlineReservationRule(const env::ReservationContact* rule);
+			static const OnlineReservationRule* GetOnlineReservationRule(const pt::ReservationContact* rule);
 
 			//! \name Getters
 			//@{
-				const env::ReservationContact*	getReservationContact()		const;
+				const pt::ReservationContact*	getReservationContact()		const { return _reservationRule; }
 				const std::string&				getEMail()					const;
 				const std::string&				getCopyEMail()				const;
 				boost::logic::tribool			getNeedsSurname()			const;
@@ -126,7 +126,7 @@ namespace synthese
 
 			//! \name Setters
 			//@{
-				void	setReservationContact(const env::ReservationContact* value);
+				void	setReservationContact(const pt::ReservationContact* value);
 				void	setEMail(const std::string& email);
 				void	setCopyEMail(const std::string& email);
 				void	setNeedsSurname(boost::logic::tribool value);

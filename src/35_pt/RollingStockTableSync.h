@@ -36,7 +36,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		/** RollingStock table synchronizer.
 			@ingroup m35LS refLS

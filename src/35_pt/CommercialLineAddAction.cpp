@@ -69,7 +69,7 @@ namespace synthese
 			{
 				_network = Env::GetOfficialEnv().get<TransportNetwork>(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID));
 			}
-			catch(ObjectNotFoundException<TransportNetwork>& e)
+			catch(ObjectNotFoundException<TransportNetwork>&)
 			{
 				throw ActionException("No such network");
 			}

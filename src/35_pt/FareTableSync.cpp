@@ -28,8 +28,9 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-
 #include "FareTableSync.h"
+
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -38,11 +39,11 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync, env::FareTableSync>::FACTORY_KEY("15.10.02 Fares");
+	template<> const string util::FactorableTemplate<SQLiteTableSync, FareTableSync>::FACTORY_KEY("15.10.02 Fares");
 
-	namespace env
+	namespace pt
 	{
 		const std::string FareTableSync::COL_NAME ("name");
 		const std::string FareTableSync::COL_FARETYPE ("fare_type");
@@ -102,10 +103,13 @@ namespace synthese
 
 	}
 
-	namespace env
+	namespace pt
 	{
 		FareTableSync::SearchResult FareTableSync::Search(
 			Env& env,
+			optional<string> name,
+			bool orderByName,
+			bool raisingOrder,
 			int first /*= 0*/,
 			boost::optional<std::size_t> number  /*= 0*/,
 			LinkLevel linkLevel
@@ -114,16 +118,40 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
-				<< " WHERE " 
-				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-				;
+				<< " WHERE 1 ";
+			if(name)
+			{
+				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
+			}
+			if(orderByName)
+			{
+				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			}
 			if (number)
+			{
 				query << " LIMIT " << (*number + 1);
-			if (first > 0)
-				query << " OFFSET " << first;
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+
+
+		FareTableSync::NamedList FareTableSync::GetList(
+			util::Env& env
+		){
+			NamedList result;
+			SearchResult fares(Search(env));
+			result.push_back(make_pair(RegistryKeyType(0), "(inconnu)"));
+
+			BOOST_FOREACH(shared_ptr<Fare> fare, fares)
+			{
+				result.push_back(make_pair(fare->getKey(), fare->getName()));
+			}
+
+			return result;
 		}
 	}
 }

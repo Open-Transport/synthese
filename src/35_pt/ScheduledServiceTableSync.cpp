@@ -229,21 +229,27 @@ namespace synthese
 			bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME;
+			SelectQuery<ScheduledServiceTableSync> query;
 			if (commercialLineId || dataSourceId)
-				query << " INNER JOIN " << LineTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
-			query << " WHERE 1 ";
+			{
+				query.addTableAndEqualJoin<LineTableSync>(COL_PATHID, TABLE_COL_ID, "l");
+			}
 			if (lineId)
-				query << " AND " << ScheduledServiceTableSync::COL_PATHID << "=" << *lineId;
+			{
+				query.addWhereField(ScheduledServiceTableSync::COL_PATHID, *lineId);
+			}
 			if (commercialLineId)
-				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << *commercialLineId;
+			{
+				query.addWhereFieldOther("l", LineTableSync::COL_COMMERCIAL_LINE_ID, *commercialLineId);
+			}
 			if (dataSourceId)
-				query << " AND l." << LineTableSync::COL_DATASOURCE_ID << "=" << *dataSourceId;
+			{
+				query.addWhereFieldOther("l", LineTableSync::COL_DATASOURCE_ID, *dataSourceId);
+			}
 			if(serviceNumber)
-				query << " AND " << COL_SERVICENUMBER << "=" << *serviceNumber;
+			{
+				query.addWhereField(COL_SERVICENUMBER, *serviceNumber);
+			}
 			if(hideOldServices)
 			{
 				ptime now(second_clock::local_time());
@@ -253,26 +259,20 @@ namespace synthese
 				{
 					snow += hours(24);
 				}
-				query <<
-					" AND " << ScheduledServiceTableSync::COL_SCHEDULES <<
-					">='00:00:00#" << SchedulesBasedService::EncodeSchedule(snow) << "'" 
-				;
+				query.addWhereField(ScheduledServiceTableSync::COL_SCHEDULES,"00:00:00#"+ SchedulesBasedService::EncodeSchedule(snow), ComposedExpression::OP_SUPEQ); 
 			}
 			if (orderByOriginTime)
 			{
-				query << " ORDER BY " << COL_SCHEDULES << (raisingOrder ? " ASC" : " DESC");
+				query.addOrderField(COL_SCHEDULES, raisingOrder);
 			}
 
 			if (number)
 			{
-				query << " LIMIT " << (*number + 1);
+				query.setNumber(*number + 1);
 				if (first > 0)
-					query << " OFFSET " << first;
+					query.setFirst(first);
 			}
 
-			ScheduledServiceTableSync::SearchResult result(
-				LoadFromQuery(query.str(), env, linkLevel)
-			);
-			
-			return result;
-}	}	}
+			return LoadFromQuery(query, env, linkLevel);
+		}
+}	}

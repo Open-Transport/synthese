@@ -29,6 +29,7 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
+#include "ReplaceQuery.h"
 
 using namespace std;
 using namespace boost;
@@ -37,11 +38,11 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,ReservationContactTableSync>::FACTORY_KEY("15.10.06 Reservation contacts");
 
-	namespace env
+	namespace pt
 	{
 		const string ReservationContactTableSync::COL_PHONEEXCHANGENUMBER ("phone_exchange_number");
 		const string ReservationContactTableSync::COL_PHONEEXCHANGEOPENINGHOURS ("phone_exchange_opening_hours");
@@ -53,7 +54,7 @@ namespace synthese
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ReservationContactTableSync>::TABLE(
 			"t021_reservation_contacts"
-			);
+		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ReservationContactTableSync>::_FIELDS[]=
 		{
@@ -100,19 +101,12 @@ namespace synthese
 			ReservationContact* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() == UNKNOWN_VALUE)
-				object->setKey(getId());
-            query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey()) << ","
-				<< Conversion::ToSQLiteString(object->getPhoneExchangeNumber()) << ","
-				<< Conversion::ToSQLiteString(object->getPhoneExchangeOpeningHours()) << ","
-				<< Conversion::ToSQLiteString(object->getDescription()) << ","
-				<< Conversion::ToSQLiteString(object->getWebSiteUrl())
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<ReservationContactTableSync> query(*object);
+			query.addField(object->getPhoneExchangeNumber());
+			query.addField(object->getPhoneExchangeOpeningHours());
+			query.addField(object->getDescription());
+			query.addField(object->getWebSiteUrl());
+			query.execute(transaction);
 		}
 
 
@@ -125,7 +119,7 @@ namespace synthese
 
 	}
 
-	namespace env
+	namespace pt
 	{
 		ReservationContactTableSync::ReservationContactTableSync()
 			: SQLiteRegistryTableSyncTemplate<ReservationContactTableSync,ReservationContact>()

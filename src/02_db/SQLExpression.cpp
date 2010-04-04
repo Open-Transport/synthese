@@ -1,6 +1,6 @@
 
-/** Constants class header.
-	@file Constants.h
+/** ComposedExpression class implementation.
+	@file ComposedExpression.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,20 +20,31 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_env_Constants_h__
-#define SYNTHESE_env_Constants_h__
+#include "SQLExpression.hpp"
+
+using namespace std;
 
 namespace synthese
 {
-	namespace env
+	namespace db
 	{
-		/** @addtogroup m35
-			@{
-		*/
+		const string ComposedExpression::OP_AND("AND");
+		const string ComposedExpression::OP_BITAND("&");
+		const string ComposedExpression::OP_BITOR("|");
+		const string ComposedExpression::OP_EQ("=");
+		const string ComposedExpression::OP_INF("<");
+		const string ComposedExpression::OP_INFEQ("<=");
+		const string ComposedExpression::OP_LIKE("LIKE");
+		const string ComposedExpression::OP_OR("OR");
+		const string ComposedExpression::OP_SUP(">");
+		const string ComposedExpression::OP_SUPEQ(">=");
 
 
-		/** @} */
+		string FieldExpression::toString() const
+		{
+			stringstream s;
+			s << _table << "." << (_field.empty() ? std::string("*") : _field);
+			return s.str();
+		}
 	}
 }
-
-#endif // SYNTHESE_env_Constants_h__

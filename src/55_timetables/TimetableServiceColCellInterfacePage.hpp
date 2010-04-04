@@ -40,6 +40,10 @@ namespace synthese
 	namespace env
 	{
 		class CommercialLine;
+	}
+
+	namespace pt
+	{
 		class RollingStock;
 	}
 
@@ -164,7 +168,7 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				const env::RollingStock* object,
+				const pt::RollingStock* object,
 				std::size_t rowRank,
 				std::size_t colRank,
 				interfaces::VariablesMap& variables,

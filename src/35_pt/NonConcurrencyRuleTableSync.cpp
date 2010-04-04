@@ -34,7 +34,7 @@
 #include "SQLite.h"
 #include "SQLiteException.h"
 #include "LinkException.h"
-#include "Conversion.h"
+#include "ReplaceQuery.h"
 
 using namespace std;
 using namespace boost;
@@ -46,13 +46,13 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace env;
-
+	
 	namespace util
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,NonConcurrencyRuleTableSync>::FACTORY_KEY("15.25.02 Non concurrency rules");
 	}
 	
-	namespace env
+	namespace pt
 	{
 		const std::string NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID("priority_line_id");
 		const std::string NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID("hidden_line_id");
@@ -128,19 +128,11 @@ namespace synthese
 			NonConcurrencyRule* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			query <<
-				" REPLACE INTO " << TABLE.NAME << " VALUES(" <<
-				object->getKey() << "," <<
-				object->getPriorityLine()->getKey() << "," <<
-				object->getHiddenLine()->getKey() << "," <<
-				object->getDelay().minutes() <<
-			")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<NonConcurrencyRuleTableSync> query(*object);
+			query.addField(object->getPriorityLine()->getKey());
+			query.addField(object->getHiddenLine()->getKey());
+			query.addField(object->getDelay().total_seconds() / 60);
+			query.execute(transaction);
 		}
 
 
@@ -154,7 +146,7 @@ namespace synthese
 	
 	
 	
-	namespace env
+	namespace pt
 	{
 		NonConcurrencyRuleTableSync::SearchResult NonConcurrencyRuleTableSync::Search(
 			Env& env,
@@ -211,9 +203,11 @@ namespace synthese
 				query << " ORDER BY " << COL_DELAY << (raisingOrder ? " ASC" : " DESC");
 
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			{
+				query << " LIMIT " << (*number + 1);
+				if (first > 0)
+					query << " OFFSET " << first;
+			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

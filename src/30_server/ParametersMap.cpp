@@ -167,10 +167,7 @@ namespace synthese
 			insert(parameterName, value.is_not_a_date() ? string() : to_iso_extended_string(value));
 		}
 
-		const ParametersMap::Map& ParametersMap::getMap() const
-		{
-			return _map;
-		}
+
 
 		string ParametersMap::getURI()
 		{

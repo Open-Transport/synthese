@@ -28,13 +28,14 @@ using namespace boost;
 namespace synthese
 {
 	using namespace util;
+	using namespace pt;
 
 	namespace util
 	{
-		template<> const string Registry<env::ReservationContact>::KEY("ReservationRule");
+		template<> const string Registry<ReservationContact>::KEY("ReservationRule");
 	}
 
-	namespace env
+	namespace pt
 	{
 		ReservationContact::ReservationContact(
 			RegistryKeyType key

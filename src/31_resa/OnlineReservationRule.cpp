@@ -49,6 +49,7 @@ namespace synthese
 	using namespace server;
 	using namespace interfaces;
 	using namespace security;
+	using namespace pt;
 
 	namespace util
 	{
@@ -66,11 +67,6 @@ namespace synthese
 			_reservationRule(NULL),
 			_eMailInterface(NULL)
 		{		
-		}
-
-		const env::ReservationContact* OnlineReservationRule::getReservationContact() const
-		{
-			return _reservationRule;
 		}
 
 		const std::string& OnlineReservationRule::getEMail() const
@@ -176,7 +172,7 @@ namespace synthese
 		}
 
 		const OnlineReservationRule* OnlineReservationRule::GetOnlineReservationRule(
-			const env::ReservationContact* rule
+			const ReservationContact* rule
 		){
 			if(rule == NULL)
 			{

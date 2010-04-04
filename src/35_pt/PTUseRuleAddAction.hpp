@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// CommercialLineUpdateAction class header.
-///	@file CommercialLineUpdateAction.h
+/// PTUseRuleAddAction class header.
+///	@file PTUseRuleAddAction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///
@@ -22,71 +22,42 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_CommercialLineUpdateAction_H__
-#define SYNTHESE_CommercialLineUpdateAction_H__
+#ifndef SYNTHESE_PTUseRuleAddAction_H__
+#define SYNTHESE_PTUseRuleAddAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "RGBColor.h"
 
 namespace synthese
 {
-	namespace env
-	{
-		class CommercialLine;
-	}
-
 	namespace pt
 	{
-		class ReservationContact;
-		class TransportNetwork;
+		class PTUseRule;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 35.15 Update of properties of a CommercialLine object.
+		/// 35.15 Action : Transport conditions creation.
 		/// @ingroup m35Actions refActions
 		/// @author Hugues Romain
 		/// @date 2010
 		/// @since 3.1.16
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : PTUseRuleAddAction
 		///
 		/// Parameters :
 		///	<ul>
-		///		<li>actionParamid : id of the commercial line to update</li>
-		///		<li>actionParamna : name (for the menu)</li>
-		///		<li>actionParamsn : short name (for the cartouche)</li>
-		///		<li>actionParamln : long name (for the road map)</li>
-		///		<li>actionParamco : color code (@ref RGBColor)</li>
-		///		<li>actionParamst : CSS style class (for the cartouche)</li>
-		///		<li>actionParamim : image url (for the cartouche)</li>
-		///		<li>actionParamni : network id</li>
-		///		<li>actionParamri : reservation contact id</li>
-		///		<li>actionParamci : creator id</li>
+		///		<li>actionParamti (optional) : template id</li>
+		///		<li>actionParamna (optional) : name</li>
 		///	</ul>
-		class CommercialLineUpdateAction:
-			public util::FactorableTemplate<server::Action, CommercialLineUpdateAction>
+		class PTUseRuleAddAction:
+			public util::FactorableTemplate<server::Action, PTUseRuleAddAction>
 		{
 		public:
-			static const std::string PARAMETER_LINE_ID;
+			static const std::string PARAMETER_TEMPLATE_ID;
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_SHORT_NAME;
-			static const std::string PARAMETER_LONG_NAME;
-			static const std::string PARAMETER_COLOR;
-			static const std::string PARAMETER_STYLE;
-			static const std::string PARAMETER_IMAGE;
-			static const std::string PARAMETER_NETWORK_ID;
-			static const std::string PARAMETER_RESERVATION_CONTACT_ID;
-			static const std::string PARAMETER_CREATOR_ID;
 
 		private:
-			boost::shared_ptr<env::CommercialLine> _line;
-			std::string			_name;		//!< Name (code)
-			std::string			_shortName;	//!< Name (cartouche)
-			std::string			_longName;	//!< Name for schedule card
-			boost::optional<util::RGBColor>		_color;		//!< Line color
-			std::string			_style;		//!< CSS style (cartouche)
-			std::string			_image;		//!< Display image (cartouche)
-			boost::shared_ptr<const TransportNetwork>	_network;	//!< Network
-			boost::shared_ptr<const pt::ReservationContact>	_reservationContact;	//!< Reservation contact
-			std::string _creatorId;
+			boost::shared_ptr<const PTUseRule> _template;
+			std::string _name;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -115,14 +86,8 @@ namespace synthese
 			/// @param session the current session
 			/// @return true if the action can be launched in the current session
 			virtual bool isAuthorized(const server::Session* session) const;
-
-
-			//! @name Setters
-			//@{
-				void setLine(boost::shared_ptr<env::CommercialLine> value) { _line = value; }
-			//@}
 		};
 	}
 }
 
-#endif // SYNTHESE_CommercialLineUpdateAction_H__
+#endif // SYNTHESE_PTUseRuleAddAction_H__

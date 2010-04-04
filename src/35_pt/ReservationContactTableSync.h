@@ -35,7 +35,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		/** Reservation contact table synchronizer.
 			@ingroup m35LS refLS

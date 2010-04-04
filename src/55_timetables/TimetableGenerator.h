@@ -43,7 +43,6 @@ namespace synthese
 	{
 		class Line;
 		class CommercialLine;
-		class RollingStock;
 	}
 
 	namespace timetables
