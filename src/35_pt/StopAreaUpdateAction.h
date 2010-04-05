@@ -31,7 +31,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -62,7 +62,7 @@ namespace synthese
 			static const std::string PARAMETER_DEFAULT_TRANSFER_DURATION;
 
 		private:
-			boost::shared_ptr<env::PublicTransportStopZoneConnectionPlace> _place;
+			boost::shared_ptr<pt::PublicTransportStopZoneConnectionPlace> _place;
 			bool _allowedConnections;
 			boost::posix_time::time_duration _defaultTransferDuration;
 
@@ -98,7 +98,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setPlace(boost::shared_ptr<env::PublicTransportStopZoneConnectionPlace> value) { _place = value; }
+				void setPlace(boost::shared_ptr<pt::PublicTransportStopZoneConnectionPlace> value) { _place = value; }
 			//@}
 		};
 	}

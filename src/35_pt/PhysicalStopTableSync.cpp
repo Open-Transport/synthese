@@ -38,7 +38,7 @@ namespace synthese
     using namespace db;
     using namespace pt;
     using namespace util;
-	using namespace env;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,PhysicalStopTableSync>::FACTORY_KEY("15.55.01 Physical stops");
 	template<> const string FactorableTemplate<Fetcher<graph::Vertex>, PhysicalStopTableSync>::FACTORY_KEY("12");

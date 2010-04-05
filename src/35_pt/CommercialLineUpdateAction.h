@@ -31,7 +31,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -77,7 +77,7 @@ namespace synthese
 			static const std::string PARAMETER_CREATOR_ID;
 
 		private:
-			boost::shared_ptr<env::CommercialLine> _line;
+			boost::shared_ptr<pt::CommercialLine> _line;
 			std::string			_name;		//!< Name (code)
 			std::string			_shortName;	//!< Name (cartouche)
 			std::string			_longName;	//!< Name for schedule card
@@ -119,7 +119,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setLine(boost::shared_ptr<env::CommercialLine> value) { _line = value; }
+				void setLine(boost::shared_ptr<pt::CommercialLine> value) { _line = value; }
 			//@}
 		};
 	}

@@ -46,7 +46,7 @@ namespace synthese
 	using namespace util;
 	using namespace interfaces;
 	using namespace graph;
-	using namespace env;
+	using namespace pt;
 	using namespace pt;
 	
 
@@ -98,7 +98,7 @@ namespace synthese
 			bool displayServiceNumber ,
 			int blinkingDelay,
 			bool withTransfer,
-			const env::PublicTransportStopZoneConnectionPlace& origin,
+			const pt::PublicTransportStopZoneConnectionPlace& origin,
 			const RoutePlanningRow& row ,
 			const server::Request* request /*= NULL */
 		) const	{

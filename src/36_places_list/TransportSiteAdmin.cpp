@@ -86,7 +86,7 @@ namespace synthese
 	using namespace ptrouteplanner;
 	using namespace algorithm;
 	using namespace html;
-	using namespace env;
+	using namespace pt;
 	using namespace graph;
 	using namespace geography;
 	using namespace pt;

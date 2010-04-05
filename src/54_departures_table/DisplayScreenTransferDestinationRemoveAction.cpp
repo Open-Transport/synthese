@@ -40,7 +40,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace security;
-	using namespace env;
+	using namespace pt;
 	using namespace util;
 	
 	namespace util
@@ -134,14 +134,14 @@ namespace synthese
 
 
 
-		void DisplayScreenTransferDestinationRemoveAction::setTransferPlace( boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> value )
+		void DisplayScreenTransferDestinationRemoveAction::setTransferPlace( boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> value )
 		{
 			_transferPlace = value;
 		}
 
 
 
-		void DisplayScreenTransferDestinationRemoveAction::setDestinationPlace( boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> value )
+		void DisplayScreenTransferDestinationRemoveAction::setDestinationPlace( boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> value )
 		{
 			_destinationPlace = value;
 		}

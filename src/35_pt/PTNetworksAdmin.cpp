@@ -81,7 +81,7 @@ namespace synthese
 			_searchName = map.getDefault<string>(PARAM_SEARCH_NAME);
 
 			// Search table initialization
-			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 30);
+			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 100);
 		}
 
 
@@ -112,7 +112,7 @@ namespace synthese
 			// Search form
 			stream << "<h1>Recherche</h1>";
 
-			AdminFunctionRequest<TransportNetworkAdmin> searchRequest(request);
+			AdminFunctionRequest<PTNetworksAdmin> searchRequest(request);
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 			stream << s.open();
 			stream << s.cell("Nom", s.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
@@ -189,13 +189,15 @@ namespace synthese
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
-			
-			BOOST_FOREACH(const Registry<TransportNetwork>::value_type& network, Env::GetOfficialEnv().getRegistry<TransportNetwork>())
+			TransportNetworkTableSync::SearchResult networks(
+				TransportNetworkTableSync::Search(Env::GetOfficialEnv())
+			);
+			BOOST_FOREACH(const TransportNetworkTableSync::SearchResult::value_type& network, networks)
 			{
 				shared_ptr<TransportNetworkAdmin> link(
 					getNewOtherPage<TransportNetworkAdmin>(false)
 				);
-				link->setNetwork(network.second);
+				link->setNetwork(const_pointer_cast<const TransportNetwork>(network));
 				links.push_back(link);
 			}
 			

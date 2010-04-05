@@ -44,7 +44,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace impex;
 	using namespace graph;
 	using namespace pt;
@@ -53,7 +53,7 @@ namespace synthese
 		"15.30.01 Lines"
 	);
 
-	namespace env
+	namespace pt
 	{
 		const string LineTableSync::COL_COMMERCIAL_LINE_ID = "commercial_line_id";
 		const string LineTableSync::COL_NAME ("name");
@@ -247,7 +247,7 @@ namespace synthese
 
 	}
 
-	namespace env
+	namespace pt
 	{
 		LineTableSync::SearchResult LineTableSync::Search(
 			Env& env,

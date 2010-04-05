@@ -40,7 +40,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace env;
+	using namespace pt;
 	using namespace util;
 
 	template<> const string util::FactorableTemplate<LibraryInterfaceElement, departurestable::DeparturesTableLineContentInterfaceElement>::FACTORY_KEY("departurestablelinecell");

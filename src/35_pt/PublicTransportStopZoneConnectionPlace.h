@@ -49,7 +49,7 @@ namespace synthese
 		class PhysicalStop;
 	}
 
-	namespace env
+	namespace pt
 	{		
 		/** PublicTransportStopZoneConnectionPlace class.
 			@ingroup m35

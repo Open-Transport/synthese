@@ -37,7 +37,7 @@
 
 namespace synthese
 {
-namespace env
+namespace pt
 {
     class Line;
 }
@@ -74,7 +74,7 @@ public:
 
     typedef enum { NONE, SINGLE, SQL_DOUBLE } PointShiftingMode;
     
-    DrawableLine (const synthese::env::Line* line,
+    DrawableLine (const synthese::pt::Line* line,
 		  int fromLineStopIndex,
 		  int toLineStopIndex,
 		  bool withPhysicalStops = true);

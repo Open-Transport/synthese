@@ -40,10 +40,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<env::LineStop>::KEY("LineStop");
+		template<> const string Registry<pt::LineStop>::KEY("LineStop");
 	}
 
-	namespace env
+	namespace pt
 	{
 		LineStop::LineStop(
 			RegistryKeyType id,

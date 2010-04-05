@@ -46,7 +46,7 @@
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "Line.h"
 #include "LineTableSync.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 
 // messages
 #include "Alarm.h"
@@ -71,7 +71,7 @@ namespace synthese
 	using namespace util;
 	using namespace departurestable;
 	using namespace server;
-	using namespace env;
+	using namespace pt;
 	using namespace admin;
 	using namespace interfaces;
 	using namespace html;
@@ -102,7 +102,7 @@ namespace synthese
 		template<> void AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::getStaticParametersLabels(ParameterLabelsVector& m)
 		{
 			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les afficheurs)"));
-			EnvModule::getNetworkLinePlaceRightParameterList(m);
+			PTModule::getNetworkLinePlaceRightParameterList(m);
 		}
 
 	}

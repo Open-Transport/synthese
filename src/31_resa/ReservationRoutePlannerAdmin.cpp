@@ -52,7 +52,7 @@
 #include "LineStop.h"
 #include "Road.h"
 #include "RoadChunk.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 #include "AccessParameters.h"
 #include "RoadPlace.h"
 #include "User.h"
@@ -73,7 +73,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace resa;
-	using namespace env;
+	using namespace pt;
 	using namespace html;
 	using namespace ptrouteplanner;
 	using namespace algorithm;	

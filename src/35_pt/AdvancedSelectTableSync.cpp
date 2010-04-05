@@ -46,7 +46,7 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 
-	namespace env
+	namespace pt
 	{
 
 
@@ -102,7 +102,7 @@ namespace synthese
 
 
 
-		env::RunHours getCommercialLineRunHours(
+		pt::RunHours getCommercialLineRunHours(
 			util::Env& env,
 			util::RegistryKeyType id,
 			const boost::optional<date>& startDate,

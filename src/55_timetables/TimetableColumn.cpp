@@ -41,7 +41,7 @@ namespace synthese
 	using namespace pt;
 	using namespace calendar;
 	using namespace graph;
-	using namespace env;
+	using namespace pt;
 
 	namespace timetables
 	{

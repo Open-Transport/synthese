@@ -31,7 +31,7 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace pt;
 	using namespace util;
 	using namespace db;
 	using namespace transportwebsite;

@@ -56,7 +56,7 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace pt;
-	using namespace env;
+	using namespace pt;
 	using namespace geography;
 	using namespace road;
 	using namespace html;
@@ -441,7 +441,7 @@ namespace synthese
 
 
 
-		void PTPlaceAdmin::setConnectionPlace( boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> value )
+		void PTPlaceAdmin::setConnectionPlace( boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> value )
 		{
 			_connectionPlace = value;
 			_addressablePlace = static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(_connectionPlace);

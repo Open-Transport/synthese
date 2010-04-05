@@ -50,7 +50,7 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace dblog;
 	using namespace interfaces;
 	using namespace graph;
@@ -101,7 +101,7 @@ namespace synthese
 			_maxDelay = maxDelay;
 		}
 
-		void DisplayScreen::addForbiddenPlace(const env::PublicTransportStopZoneConnectionPlace* place)
+		void DisplayScreen::addForbiddenPlace(const pt::PublicTransportStopZoneConnectionPlace* place)
 		{
 			_forbiddenArrivalPlaces.insert(make_pair(place->getKey(),place));
 		}
@@ -115,14 +115,14 @@ namespace synthese
 		}
 
 
-		void DisplayScreen::addDisplayedPlace(const env::PublicTransportStopZoneConnectionPlace* __PointArret)
+		void DisplayScreen::addDisplayedPlace(const pt::PublicTransportStopZoneConnectionPlace* __PointArret)
 		{
 			_displayedPlaces.insert(make_pair(__PointArret->getKey(),__PointArret));
 		}
 
 		
 
-		void DisplayScreen::addForcedDestination(const env::PublicTransportStopZoneConnectionPlace* place)
+		void DisplayScreen::addForcedDestination(const pt::PublicTransportStopZoneConnectionPlace* place)
 		{
 			_forcedDestinations.insert(make_pair(place->getKey(), place));
 		}
@@ -492,7 +492,7 @@ namespace synthese
 							make_pair(
 								dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName(),
 								make_pair(
-									dynamic_cast<const env::PublicTransportStopZoneConnectionPlace*>(edge->getHub())->getKey(),
+									dynamic_cast<const pt::PublicTransportStopZoneConnectionPlace*>(edge->getHub())->getKey(),
 									dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName()
 						)	)	);
 					}

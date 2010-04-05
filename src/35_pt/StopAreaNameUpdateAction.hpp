@@ -35,7 +35,7 @@ namespace synthese
 		class City;
 	}
 
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -70,7 +70,7 @@ namespace synthese
 			static const std::string PARAMETER_CODE;
 
 		private:
-			boost::shared_ptr<env::PublicTransportStopZoneConnectionPlace> _place;
+			boost::shared_ptr<pt::PublicTransportStopZoneConnectionPlace> _place;
 			std::string _name;
 			std::string _shortName;
 			std::string _longName;
@@ -109,7 +109,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setPlace(boost::shared_ptr<env::PublicTransportStopZoneConnectionPlace> value) { _place = value; }
+				void setPlace(boost::shared_ptr<pt::PublicTransportStopZoneConnectionPlace> value) { _place = value; }
 			//@}
 		};
 	}

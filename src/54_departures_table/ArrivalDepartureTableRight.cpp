@@ -21,7 +21,7 @@
 */
 
 #include "ArrivalDepartureTableRight.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 
 using namespace std;
 using namespace boost;
@@ -30,7 +30,7 @@ namespace synthese
 {
 	using namespace security;
 	using namespace departurestable;
-	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{
@@ -48,7 +48,7 @@ namespace synthese
 			ParameterLabelsVector m;
 			m.push_back(make_pair("*","(tous les afficheurs)"));
 
-			EnvModule::getNetworkLinePlaceRightParameterList(m);
+			PTModule::getNetworkLinePlaceRightParameterList(m);
 
 			return m;
 		}

@@ -38,7 +38,7 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{

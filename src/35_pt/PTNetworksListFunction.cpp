@@ -28,7 +28,7 @@
 #include "Site.h"
 #include "Interface.h"
 #include "PTNetworkListItemInterfacePage.hpp"
-#include "TransportNetwork.h"
+#include "TransportNetworkTableSync.h"
 #include "Env.h"
 
 #include <boost/foreach.hpp>
@@ -72,11 +72,14 @@ namespace synthese
 			{
 				/// @todo generate XML header
 			}
-			BOOST_FOREACH(const TransportNetwork::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<TransportNetwork>())
+			TransportNetworkTableSync::SearchResult networks(
+				TransportNetworkTableSync::Search(Env::GetOfficialEnv())
+			);
+			BOOST_FOREACH(const TransportNetworkTableSync::SearchResult::value_type& it, networks)
 			{
 				if(_page)
 				{
-					_page->display(stream, *it.second, rank++, variables, &request);
+					_page->display(stream, *it, rank++, variables, &request);
 				}
 				else
 				{

@@ -42,9 +42,9 @@ namespace synthese
 			This is avoided by the rule saying that no stop can be added once a service is inserted in the line (a subline is created only if at least a service is registered)
 		*/
 		class SubLine:
-			public env::Line
+			public pt::Line
 		{
-			env::Line*	_mainLine;
+			pt::Line*	_mainLine;
 
 		public:
 			/** Constructor.
@@ -56,7 +56,7 @@ namespace synthese
 					- copy all data (including LineStop) of the original line
 					- insert the subline in the sublines registry of the line.
 			*/
-			SubLine(env::Line* line);
+			SubLine(pt::Line* line);
 
 
 			/** Destructor.
@@ -82,7 +82,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008				
 			*/
-			env::Line*	getMainLine()	const;
+			pt::Line*	getMainLine()	const;
 		};
 	}
 }

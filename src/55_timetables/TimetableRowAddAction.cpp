@@ -41,7 +41,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace server;
-	using namespace env;
+	using namespace pt;
 	using namespace security;
 	using namespace util;
 	using namespace geography;

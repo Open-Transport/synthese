@@ -39,7 +39,7 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace pt;
 	using namespace util;
 	using namespace util::XmlToolkit;
 	using namespace graph;

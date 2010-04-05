@@ -5,6 +5,8 @@ CppSynthese3LibProject(
 	source_files = s3env.Glob ('*.cpp'),
 	dependencies = [
 		's3-graph.cpplib',
-		's3-env.cpplib'
+		's3-impex.cpplib',
+		's3-geography.cpplib',
+		's3-pt.cpplib'
 	]
 )

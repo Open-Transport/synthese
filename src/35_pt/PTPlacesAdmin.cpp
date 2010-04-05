@@ -59,7 +59,7 @@ namespace synthese
 	using namespace html;
 	using namespace lexmatcher;
 	using namespace road;
-	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{

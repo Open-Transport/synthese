@@ -32,37 +32,37 @@
 
 namespace synthese
 {
-	/**	@defgroup m55Actions 55 Actions
+	/**	@defgroup m55Exceptions 55.01 Exceptions
 		@ingroup m55
 
-		@defgroup m55Pages 55 Pages
+		@defgroup m55LS 55.10 Table synchronizers
 		@ingroup m55
 
-		@defgroup m55Functions 55 Functions
+		@defgroup m55Pages 55.11 Interface pages
 		@ingroup m55
 
-		@defgroup m55Exceptions 55 Exceptions
+		@defgroup m55Rights 55.12 Rights
 		@ingroup m55
 
-		@defgroup m55Alarm 55 Messages recipient
+		@defgroup m55Logs 55.13 DB Logs
 		@ingroup m55
 
-		@defgroup m55LS 55 Table synchronizers
+		@defgroup m55Admin 55.14 Administration pages
 		@ingroup m55
 
-		@defgroup m55Admin 55 Administration pages
+		@defgroup m55Actions 55.15 Actions
 		@ingroup m55
 
-		@defgroup m55Rights 55 Rights
+		@defgroup m55Functions 55.15 Functions
 		@ingroup m55
 
-		@defgroup m55Logs 55 DB Logs
+		@defgroup m55Alarm 55.17 Messages recipient
 		@ingroup m55
 		
 		@defgroup m55 55 Timetables generator
 		@ingroup m5
 		
-		(Module documentation)
+		
 		
 		@{
 	*/

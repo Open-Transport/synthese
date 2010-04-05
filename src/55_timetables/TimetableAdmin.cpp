@@ -77,7 +77,7 @@ namespace synthese
 	using namespace db;
 	using namespace calendar;
 	using namespace security;
-	using namespace env;
+	using namespace pt;
 	using namespace graph;
 	using namespace pt;
 
@@ -520,8 +520,10 @@ namespace synthese
 						viewRequest.setClientURL(_timetable->getInterface()->getDefaultClientURL());
 					}
 
-					stream << "<h1>Résultat final</h1>";
-					stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), ICON) << "</p>";				}
+					stream << "<h1>Résultat final</h1>";
+
+					stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), ICON) << "</p>";
+				}
 
 				if(
 					_timetable->getContentType() == Timetable::TABLE_SERVICES_IN_COLS ||

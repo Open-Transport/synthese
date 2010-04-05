@@ -45,7 +45,7 @@ namespace synthese
 	using namespace geography;
 	using namespace algorithm;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 
 	namespace ptrouteplanner
 	{

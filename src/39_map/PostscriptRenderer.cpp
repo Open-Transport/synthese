@@ -49,7 +49,7 @@ namespace synthese
 	using namespace geometry;
 	using namespace util;
 	using namespace map;
-	using namespace env;
+	using namespace pt;
 	
 
 	namespace util

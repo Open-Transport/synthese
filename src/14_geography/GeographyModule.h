@@ -118,7 +118,7 @@ namespace synthese
 				@param fuzzyName The text entry to compare
 				@param nbMatches The number of matches to return
 				@param t9 true indicates that the text entry follows the t9 format (optional : default = false)
-				@return synthese::env::CityList The list of results
+				@return synthese::pt::CityList The list of results
 				@author Hugues Romain
 				@date 2008
 			*/

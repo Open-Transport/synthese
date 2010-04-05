@@ -39,7 +39,7 @@ namespace synthese
 		class Env;
 	}
 	
-	namespace env
+	namespace pt
 	{
 		typedef std::map<std::pair<boost::gregorian::date, int>, int> RunHours;
 

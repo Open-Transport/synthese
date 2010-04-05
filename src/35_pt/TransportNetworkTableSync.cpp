@@ -21,11 +21,8 @@
 */
 
 #include "TransportNetworkTableSync.h"
-
-#include "SQLiteResult.h"
-#include "SQLite.h"
-
-#include "Conversion.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
 
 #include <boost/logic/tribool.hpp>
 #include <assert.h>
@@ -67,6 +64,7 @@ namespace synthese
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TransportNetworkTableSync>::_INDEXES[]=
 		{
 			SQLiteTableSync::Index(TransportNetworkTableSync::COL_CREATOR_ID.c_str(), ""),
+			SQLiteTableSync::Index(TransportNetworkTableSync::COL_NAME.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
@@ -87,19 +85,13 @@ namespace synthese
 			TransportNetwork* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-
-			query
-				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToSQLiteString(object->getName())
-				<< "," << Conversion::ToSQLiteString(object->getCreatorId())
-				<< ")";
-			
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+			ReplaceQuery<TransportNetworkTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getCreatorId());
+			query.execute(transaction);
 		}
+
+
 
 		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Unlink(
 			TransportNetwork* object
@@ -119,23 +111,28 @@ namespace synthese
 			bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
+			SelectQuery<TransportNetworkTableSync> query;
 			if (!name.empty())
-				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(name);
+			{
+				query.addWhereField(COL_NAME, name, ComposedExpression::OP_LIKE);
+			}
 			if (!creatorId.empty())
-				query << " AND " << COL_CREATOR_ID << " LIKE " << Conversion::ToSQLiteString(creatorId);
+			{
+				query.addWhereField(COL_CREATOR_ID, creatorId, ComposedExpression::OP_LIKE);
+			}
 			if (orderByName)
-				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			{
+				query.addOrderField(COL_NAME, raisingOrder);
+			}
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
+			{
+				query.setNumber(*number + 1);
+			}
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
-
-			return LoadFromQuery(query.str(), env, linkLevel);
+			{
+				query.setFirst(first);
+			}
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }

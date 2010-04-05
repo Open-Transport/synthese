@@ -31,7 +31,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -50,7 +50,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<HikingTrail>	Registry;
 
-			typedef std::vector<env::PublicTransportStopZoneConnectionPlace*> Stops;
+			typedef std::vector<pt::PublicTransportStopZoneConnectionPlace*> Stops;
 
 		private:
 			std::string _map;
@@ -70,7 +70,7 @@ namespace synthese
 			void setDuration(const std::string& value);
 			void setProfile(const std::string& value);
 			void clearStops();
-			void addStop(env::PublicTransportStopZoneConnectionPlace* value, size_t rank);
+			void addStop(pt::PublicTransportStopZoneConnectionPlace* value, size_t rank);
 			void removeStop(size_t rank);
 		};
 	}

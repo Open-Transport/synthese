@@ -6,9 +6,16 @@ CppSynthese3LibProject(
 	dependencies = [
 		'shapelib.cpplib',
 		's3-graph.cpplib',
-		's3-env.cpplib',
 		's3-db.cpplib',
 		's3-impex.cpplib',
-		's3-places-list.cpplib'
+		's3-places-list.cpplib',
+		's3-security.cpplib',
+		's3-util.cpplib',
+		's3-interfaces.cpplib',
+		's3-geometry.cpplib',
+		's3-geography.cpplib',
+		's3-calendar.cpplib',
+		's3-messages.cpplib',
+		's3-road.cpplib'
 	]
 )

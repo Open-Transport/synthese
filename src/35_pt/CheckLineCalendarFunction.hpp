@@ -31,7 +31,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -61,7 +61,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const env::CommercialLine> _line;
+				boost::shared_ptr<const pt::CommercialLine> _line;
 				boost::gregorian::date_duration _duration;
 			//@}
 			
@@ -88,7 +88,7 @@ namespace synthese
 		public:
 			//! @name Setters
 			//@{
-				void setLine(boost::shared_ptr<const env::CommercialLine> value) {_line = value; }
+				void setLine(boost::shared_ptr<const pt::CommercialLine> value) {_line = value; }
 			//@}
 
 

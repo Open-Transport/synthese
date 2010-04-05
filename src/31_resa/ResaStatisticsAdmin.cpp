@@ -50,7 +50,7 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace resa;
-	using namespace env;
+	using namespace pt;
 	using namespace html;
 
 	namespace util
@@ -324,21 +324,21 @@ namespace synthese
 
 
 
-		void ResaStatisticsAdmin::setCommercialLine( boost::shared_ptr<env::CommercialLine> value )
+		void ResaStatisticsAdmin::setCommercialLine( boost::shared_ptr<pt::CommercialLine> value )
 		{
 			_line = const_pointer_cast<const CommercialLine>(value);
 		}
 
 
 
-		void ResaStatisticsAdmin::setCommercialLineC( boost::shared_ptr<const env::CommercialLine> value )
+		void ResaStatisticsAdmin::setCommercialLineC( boost::shared_ptr<const pt::CommercialLine> value )
 		{
 			_line = value;
 		}
 
 
 
-		boost::shared_ptr<const env::CommercialLine> ResaStatisticsAdmin::getCommercialLine() const
+		boost::shared_ptr<const pt::CommercialLine> ResaStatisticsAdmin::getCommercialLine() const
 		{
 			return _line;
 		}

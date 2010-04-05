@@ -10,7 +10,7 @@ CppSynthese3LibProject(
 	dependencies = [
 		's3-util.cpplib',
 		's3-db.cpplib',
-		's3-env.cpplib',
+		's3-pt.cpplib',
 		'boost.cppinc'
 	]
 )

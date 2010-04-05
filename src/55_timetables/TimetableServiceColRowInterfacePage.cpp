@@ -43,7 +43,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace timetables;
-	using namespace env;
+	using namespace pt;
 	using namespace pt;
 
 	namespace util

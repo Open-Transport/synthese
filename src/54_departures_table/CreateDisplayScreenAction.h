@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -52,7 +52,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<const DisplayScreen>			_template;
-			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_place;
+			boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace>	_place;
 			boost::shared_ptr<const DisplayScreenCPU>		_cpu;
 
 		protected:

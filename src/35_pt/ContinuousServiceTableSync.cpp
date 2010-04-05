@@ -26,7 +26,7 @@
 
 #include "Line.h"
 #include "LineTableSync.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 
 #include <sstream>
 
@@ -55,7 +55,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace graph;
 	using namespace pt;
 

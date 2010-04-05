@@ -31,7 +31,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace calendar;
-	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{
@@ -259,7 +259,7 @@ namespace synthese
 
 
 
-		void Timetable::removeAuthorizedLine( const env::CommercialLine* line )
+		void Timetable::removeAuthorizedLine( const pt::CommercialLine* line )
 		{
 			_authorizedLines.erase(line);
 		}

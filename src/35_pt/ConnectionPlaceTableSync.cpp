@@ -40,15 +40,15 @@ using namespace boost;
 namespace synthese
 {
 	using namespace db;
-	using namespace env;
+	using namespace pt;
 	using namespace util;
 	using namespace geography;
 	using namespace road;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,env::ConnectionPlaceTableSync>::FACTORY_KEY("15.40.01 Connection places");
+	template<> const string util::FactorableTemplate<SQLiteTableSync,pt::ConnectionPlaceTableSync>::FACTORY_KEY("15.40.01 Connection places");
 	template<> const string FactorableTemplate<Fetcher<NamedPlace>, ConnectionPlaceTableSync>::FACTORY_KEY("7");
 
-	namespace env
+	namespace pt
 	{
 		const string ConnectionPlaceTableSync::TABLE_COL_NAME = "name";
 		const string ConnectionPlaceTableSync::TABLE_COL_CITYID = "city_id";
@@ -225,7 +225,7 @@ namespace synthese
 		}
 	}
 
-	namespace env
+	namespace pt
 	{
 		ConnectionPlaceTableSync::SearchResult ConnectionPlaceTableSync::Search(
 			Env& env,

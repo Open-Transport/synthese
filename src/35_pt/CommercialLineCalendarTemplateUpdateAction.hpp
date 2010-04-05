@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -59,7 +59,7 @@ namespace synthese
 			static const std::string PARAMETER_CALENDAR_TEMPLATE_ID;
 
 		private:
-			boost::shared_ptr<env::CommercialLine> _line;
+			boost::shared_ptr<pt::CommercialLine> _line;
 			boost::shared_ptr<calendar::CalendarTemplate> _calendarTemplate;
 
 		protected:
@@ -94,7 +94,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setLine(boost::shared_ptr<env::CommercialLine> value) { _line = value; }
+				void setLine(boost::shared_ptr<pt::CommercialLine> value) { _line = value; }
 			//@}
 		};
 	}

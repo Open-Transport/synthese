@@ -26,7 +26,7 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{

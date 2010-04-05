@@ -27,7 +27,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -40,7 +40,7 @@ namespace synthese
 		private:
 			//! \name Parameters
 			//@{
-				const env::PublicTransportStopZoneConnectionPlace& _origin;
+				const pt::PublicTransportStopZoneConnectionPlace& _origin;
 				const DisplayedPlacesList _destinations;
 				const boost::posix_time::ptime _startDateTime;
 				const boost::posix_time::ptime _endDateTime;
@@ -49,7 +49,7 @@ namespace synthese
 
 		public:
 			RoutePlanningTableGenerator(
-				const env::PublicTransportStopZoneConnectionPlace& origin,
+				const pt::PublicTransportStopZoneConnectionPlace& origin,
 				const DisplayedPlacesList& destinations,
 				const boost::posix_time::ptime& startDateTime,
 				const boost::posix_time::ptime& endDateTime,

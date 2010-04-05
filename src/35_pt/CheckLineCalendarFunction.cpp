@@ -40,7 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace env;
+	using namespace pt;
 	using namespace calendar;
 
 	template<> const string util::FactorableTemplate<Function,pt::CheckLineCalendarFunction>::FACTORY_KEY("CheckLineCalendar");

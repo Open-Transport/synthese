@@ -35,7 +35,7 @@ namespace synthese
 		class Request;
 	}
 	
-	namespace env
+	namespace pt
 	{
 		class Line;
 	}
@@ -78,7 +78,7 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				const env::Line& object,
+				const pt::Line& object,
 				std::size_t rank,
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL

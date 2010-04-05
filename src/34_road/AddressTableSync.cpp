@@ -46,7 +46,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace road;
 	using namespace impex;
 	using namespace graph;

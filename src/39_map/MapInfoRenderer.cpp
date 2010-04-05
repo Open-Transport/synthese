@@ -48,7 +48,7 @@ namespace synthese
 	using namespace util;
 	using namespace geometry;
 	using namespace map;
-	using namespace env;
+	using namespace pt;
 	using namespace pt;
 	
 
@@ -221,7 +221,7 @@ MapInfoRenderer::renderLines (Map& map)
 		const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
 
 		// Shift them again on right and left of half-width to get the enveloppe.
-		const std::vector<synthese::env::Point2D> points1 =
+		const std::vector<synthese::pt::Point2D> points1 =
 		  dbl->calculateAbsoluteShiftedPoints (shiftedPoints, (_config.getBorderWidth () / 2));
 		
 		std::string href (_urlPattern);
@@ -233,7 +233,7 @@ MapInfoRenderer::renderLines (Map& map)
 			_output << (int) points1[i].getX () << "," << (int) (map.getHeight () - points1[i].getY ()) << ",";
 		}
 
-		std::vector<synthese::env::Point2D> points2 = 
+		std::vector<synthese::pt::Point2D> points2 = 
 			dbl->calculateAbsoluteShiftedPoints (shiftedPoints, - (_config.getBorderWidth () / 2));
 
 		std::reverse (points2.begin (), points2.end ());

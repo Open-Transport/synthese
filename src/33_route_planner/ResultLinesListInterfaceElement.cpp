@@ -42,7 +42,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace env;
+	using namespace pt;
 	using namespace graph;
 	using namespace ptrouteplanner;
 

@@ -50,7 +50,7 @@ namespace synthese
 		class AccessParameters;
 	}
 
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -107,7 +107,7 @@ namespace synthese
 
 			//! \name Environment
 			//@{
-				std::set<env::CommercialLine*>	_lines;
+				std::set<pt::CommercialLine*>	_lines;
 				CitiesMatcher _citiesMatcher;
 				RollingStockFilters _rollingStockFilters;
 			//@}
@@ -237,7 +237,7 @@ namespace synthese
 				/** Find the best place corresponding to a city name and a place name.
 					@param cityName City name
 					@param placeName Place name
-					@return const env::Place* best place found
+					@return const pt::Place* best place found
 					@author Hugues Romain
 					@date 2007
 					@throw Exception if no place can be found

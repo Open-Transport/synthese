@@ -37,9 +37,9 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 
-	template<> const string util::FactorableTemplate<InterfacePage,env::LineMarkerInterfacePage>::FACTORY_KEY("line_marker");
+	template<> const string util::FactorableTemplate<InterfacePage,pt::LineMarkerInterfacePage>::FACTORY_KEY("line_marker");
 
-	namespace env
+	namespace pt
 	{
 		const string LineMarkerInterfacePage::PARAMETER_OPENING_HTML_CODE("opening_html_code");
 		const string LineMarkerInterfacePage::PARAMETER_CLOSING_HTML_CODE("closing_html_code");

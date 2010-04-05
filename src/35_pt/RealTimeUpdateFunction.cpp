@@ -40,7 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace env;
+	using namespace pt;
 	using namespace interfaces;
 
 	template<> const string util::FactorableTemplate<RequestWithInterface,pt::RealTimeUpdateFunction>::FACTORY_KEY("rtu");

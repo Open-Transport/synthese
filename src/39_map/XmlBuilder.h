@@ -51,12 +51,12 @@ namespace synthese
 		public:
 			static DrawableLine* CreateDrawableLine(
 				 XMLNode& node,
-				 const util::Registry<env::Line>& lines
+				 const util::Registry<pt::Line>& lines
 			);
 
 			static Map* CreateMap(
 				XMLNode& node,
-				const util::Registry<env::Line>& lines
+				const util::Registry<pt::Line>& lines
 			);
 		};
 	}

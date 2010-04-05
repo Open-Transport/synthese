@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -51,7 +51,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<Timetable> _timetable;
-			boost::shared_ptr<const env::CommercialLine> _line;
+			boost::shared_ptr<const pt::CommercialLine> _line;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -74,7 +74,7 @@ namespace synthese
 			virtual bool isAuthorized(const server::Session* session) const;
 
 			void setTimetable(boost::shared_ptr<Timetable> value);
-			void setLine(boost::shared_ptr<const env::CommercialLine> value);
+			void setLine(boost::shared_ptr<const pt::CommercialLine> value);
 		};
 	}
 }

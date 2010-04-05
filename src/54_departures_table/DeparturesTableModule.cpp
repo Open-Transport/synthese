@@ -38,7 +38,7 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace pt;
 	using namespace security;
 	using namespace util;
 	using namespace departurestable;

@@ -54,7 +54,7 @@ namespace synthese
 {
 	using namespace html;
 	using namespace security;
-	using namespace env;
+	using namespace pt;
 	using namespace server;
 	using namespace admin;
 	using namespace dblog;

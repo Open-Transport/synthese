@@ -209,7 +209,7 @@ namespace synthese
 		//@{
 			/** Gets the result journey that reaches the specified vertex.
 				@param vertex Vertex to be reached by the returned result journey
-				@return const env::Journey* const The result journey that reaches the specified vertex
+				@return const pt::Journey* const The result journey that reaches the specified vertex
 				@author Hugues Romain
 			*/
 			boost::shared_ptr<graph::Journey> JourneysResult::get(const graph::Vertex* vertex) const

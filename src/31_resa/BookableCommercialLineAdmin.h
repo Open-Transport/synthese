@@ -29,7 +29,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -59,7 +59,7 @@ namespace synthese
 			public admin::AdminInterfaceElementTemplate<BookableCommercialLineAdmin>
 		{
 			bool											_displayCancelled;
-			boost::shared_ptr<const env::CommercialLine>	_line;
+			boost::shared_ptr<const pt::CommercialLine>	_line;
 			boost::gregorian::date							_date;
 			bool											_hideOldServices;
 			boost::optional<std::string>					_serviceNumber;
@@ -72,9 +72,9 @@ namespace synthese
 			BookableCommercialLineAdmin();
 			
 			void setServiceNumber(const boost::optional<std::string>& value);
-			void setCommercialLine(boost::shared_ptr<env::CommercialLine> value);
-			void setCommercialLineC(boost::shared_ptr<const env::CommercialLine> value);
-			boost::shared_ptr<const env::CommercialLine> getCommercialLine() const;
+			void setCommercialLine(boost::shared_ptr<pt::CommercialLine> value);
+			void setCommercialLineC(boost::shared_ptr<const pt::CommercialLine> value);
+			boost::shared_ptr<const pt::CommercialLine> getCommercialLine() const;
 			const boost::optional<std::string>& getServiceNumber() const;
 
 			

@@ -60,7 +60,7 @@ namespace synthese
 			, int intermediatesStopsToDisplay,
 			int blinkingDelay,
 			bool displayClock
-			, const env::PublicTransportStopZoneConnectionPlace* place
+			, const pt::PublicTransportStopZoneConnectionPlace* place
 			, const ArrivalDepartureListWithAlarm& rows
 			, const server::Request* request /*= NULL*/ ) const
 		{
@@ -94,7 +94,7 @@ namespace synthese
 			bool displayTrackNumber ,
 			int blinkingDelay,
 			bool displayClock,
-			const env::PublicTransportStopZoneConnectionPlace* place ,
+			const pt::PublicTransportStopZoneConnectionPlace* place ,
 			const RoutePlanningListWithAlarm& rows ,
 			const server::Request* request /*= NULL */ 
 		) const	{

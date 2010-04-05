@@ -49,7 +49,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace resa;
-	using namespace env;
+	using namespace pt;
 	using namespace security;
 	using namespace html;
 

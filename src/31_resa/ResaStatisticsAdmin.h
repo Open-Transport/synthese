@@ -35,7 +35,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -63,7 +63,7 @@ namespace synthese
 		private:
 			/// @name Search parameters
 			//@{
-				boost::shared_ptr<const env::CommercialLine>	_line;
+				boost::shared_ptr<const pt::CommercialLine>	_line;
 				boost::gregorian::date_period _searchPeriod;
 				ResaStatisticsTableSync::Step _searchRowStep;
 				ResaStatisticsTableSync::Step _searchColStep;
@@ -84,9 +84,9 @@ namespace synthese
 			ResaStatisticsAdmin();
 			
 			
-			void setCommercialLine(boost::shared_ptr<env::CommercialLine> value);
-			void setCommercialLineC(boost::shared_ptr<const env::CommercialLine> value);
-			boost::shared_ptr<const env::CommercialLine> getCommercialLine() const;
+			void setCommercialLine(boost::shared_ptr<pt::CommercialLine> value);
+			void setCommercialLineC(boost::shared_ptr<const pt::CommercialLine> value);
+			boost::shared_ptr<const pt::CommercialLine> getCommercialLine() const;
 
 			
 			//////////////////////////////////////////////////////////////////////////

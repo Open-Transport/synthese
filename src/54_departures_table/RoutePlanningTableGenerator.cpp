@@ -31,7 +31,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace pt;
 	using namespace ptrouteplanner;
 	using namespace graph;
 	using namespace algorithm;

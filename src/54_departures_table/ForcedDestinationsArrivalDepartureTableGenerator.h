@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -42,7 +42,7 @@ namespace synthese
 		:	public ArrivalDepartureTableGenerator
 		{
 		public:
-			typedef std::map<uid, const env::PublicTransportStopZoneConnectionPlace*> ForcedDestinationsSet;
+			typedef std::map<uid, const pt::PublicTransportStopZoneConnectionPlace*> ForcedDestinationsSet;
 
 		private:
 

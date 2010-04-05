@@ -41,7 +41,7 @@ namespace synthese
 		class Vertex;
 	}
 
-	namespace env
+	namespace pt
 	{
 		class Line;
 		class LineStop;
@@ -90,7 +90,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				virtual std::string getTeam() const;
-				const env::Line* getRoute() const;
+				const pt::Line* getRoute() const;
 			//@}
 
 			//! @name Setters

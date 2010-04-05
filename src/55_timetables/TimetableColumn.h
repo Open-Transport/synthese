@@ -37,7 +37,7 @@ namespace synthese
 		class PhysicalStop;
 	}
 
-	namespace env
+	namespace pt
 	{
 		class Line;
 	}
@@ -74,7 +74,7 @@ namespace synthese
 			Content		_content;
 			calendar::Calendar				_calendar;
 			const TimetableWarning*			_warning;
-			const env::Line*				_line;
+			const pt::Line*				_line;
 			tTypeOD							_originType;
 			tTypeOD							_destinationType;
 
@@ -105,7 +105,7 @@ namespace synthese
 			//@{
 				const calendar::Calendar&				getCalendar()			const { return _calendar; }
 				const Content&							getContent()			const { return _content; }
-				const env::Line*						getLine()				const { return _line; }
+				const pt::Line*						getLine()				const { return _line; }
 				tTypeOD									getOriginType()			const { return _originType; }
 				tTypeOD									getDestinationType()	const { return _destinationType; }
 				const TimetableWarning*					getWarning()			const { return _warning; }

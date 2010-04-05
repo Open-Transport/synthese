@@ -50,7 +50,7 @@ namespace synthese
 	using namespace timetables;
 	using namespace calendar;
 	using namespace interfaces;
-	using namespace env;
+	using namespace pt;
 	using namespace pt;
 
 	namespace util

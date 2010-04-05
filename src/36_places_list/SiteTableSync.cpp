@@ -39,7 +39,7 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace env;
+	using namespace pt;
 	using namespace util;
 	using namespace db;
 	using namespace transportwebsite;

@@ -55,7 +55,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace routeplanner;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace resa;
 	using namespace graph;
 	using namespace road;

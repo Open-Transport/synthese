@@ -32,7 +32,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class Line;
 	}
@@ -60,7 +60,7 @@ namespace synthese
 
 		private:
 			bool _isContinuous;
-			boost::shared_ptr<env::Line> _line;
+			boost::shared_ptr<pt::Line> _line;
 			boost::shared_ptr<const SchedulesBasedService> _template;
 			boost::posix_time::time_duration _period;
 			std::string _number;
@@ -104,7 +104,7 @@ namespace synthese
 
 
 			void setIsContinuous(bool value);
-			void setLine(boost::shared_ptr<env::Line> value);
+			void setLine(boost::shared_ptr<pt::Line> value);
 		};
 	}
 }

@@ -47,13 +47,13 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace geometry;
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,LineStopTableSync>::FACTORY_KEY("15.57.01 Line stops");
 
-	namespace env
+	namespace pt
 	{
 		const std::string LineStopTableSync::COL_PHYSICALSTOPID ("physical_stop_id");
 		const std::string LineStopTableSync::COL_LINEID ("line_id");
@@ -193,7 +193,7 @@ namespace synthese
 
 	}
 
-	namespace env
+	namespace pt
 	{
 		LineStopTableSync::SearchResult LineStopTableSync::Search(
 			Env& env,

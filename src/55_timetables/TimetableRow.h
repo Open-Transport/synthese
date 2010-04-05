@@ -29,7 +29,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -64,7 +64,7 @@ namespace synthese
 
 		private:
 			// Variables
-			const env::PublicTransportStopZoneConnectionPlace*	_place;
+			const pt::PublicTransportStopZoneConnectionPlace*	_place;
 			bool												_isDeparture;
 			bool												_isArrival;
 			tTypeGareIndicateur									_compulsory;
@@ -79,7 +79,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const env::PublicTransportStopZoneConnectionPlace*	getPlace()			const { return _place; }
+				const pt::PublicTransportStopZoneConnectionPlace*	getPlace()			const { return _place; }
 				tTypeGareIndicateur 								getCompulsory()		const { return _compulsory; }
 				std::size_t											getRank()			const { return _rank; }
 				uid													getTimetableId()	const { return _timetableId; }
@@ -90,7 +90,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setRank(std::size_t value) { _rank = value; }
-				void setPlace(const env::PublicTransportStopZoneConnectionPlace* place) { _place = place; }
+				void setPlace(const pt::PublicTransportStopZoneConnectionPlace* place) { _place = place; }
 				void setCompulsory(tTypeGareIndicateur compulsory) { _compulsory = compulsory; }
 				void setTimetableId(uid id) { _timetableId = id; }
 				void setIsArrival(bool value) { _isArrival = value; }

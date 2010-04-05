@@ -29,13 +29,13 @@
 
 #include "AdminInterfaceElementTemplate.h"
 
-#include "15_env/AdvancedSelectTableSync.h"
+#include "35_pt/AdvancedSelectTableSync.h"
 
 #include <boost/optional.hpp>
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -67,7 +67,7 @@ namespace synthese
 			static const std::string PARAMETER_CALENDAR_CONTROL;
 
 		protected:
-			boost::shared_ptr<const env::CommercialLine>	_cline;
+			boost::shared_ptr<const pt::CommercialLine>	_cline;
 			bool								_controlCalendar;
 			std::string _searchName;
 			boost::optional<boost::gregorian::date>	_startDate;
@@ -146,12 +146,12 @@ namespace synthese
 			
 			//! @name Getters
 			//@{
-				boost::shared_ptr<const env::CommercialLine> getCommercialLine() const { return _cline; }
+				boost::shared_ptr<const pt::CommercialLine> getCommercialLine() const { return _cline; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setCommercialLine(boost::shared_ptr<const env::CommercialLine> value) { _cline = value; }
+				void setCommercialLine(boost::shared_ptr<const pt::CommercialLine> value) { _cline = value; }
 				void setControlCalendar(bool value) { _controlCalendar = value; }
 			//@}
 		};

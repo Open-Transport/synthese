@@ -36,7 +36,7 @@ namespace synthese
 		class Request;
 	}
 	
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}

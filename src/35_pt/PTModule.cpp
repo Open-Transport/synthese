@@ -24,16 +24,48 @@
 #include "PTModule.h"
 #include "ScheduledService.h"
 #include "Env.h"
+#include "ContinuousService.h"
+#include "Journey.h"
+#include "01_util/Constants.h"
+#include "Conversion.h"
+#include "UId.h"
+#include "T9Filter.h"
+#include "SentAlarm.h"
+#include "17_messages/Types.h"
+#include "TransportNetworkTableSync.h"
+#include "TransportNetwork.h"
+#include "CommercialLineTableSync.h"
+#include "CommercialLine.h"
+#include "Crossing.h"
+#include "Line.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "ConnectionPlaceTableSync.h"
+#include "RoadPlace.h"
+#include "RoadPlaceTableSync.h"
+#include "PublicPlace.h"
+#include "PublicPlaceTableSync.h"
+#include "City.h"
+#include "CityTableSync.h"
+#include "PlaceAlias.h"
+#include "PlaceAliasTableSync.h"
+#include "Address.h"
+#include "AddressTableSync.h"
+#include "PhysicalStop.h"
+#include "PhysicalStopTableSync.h"
+#include "12_security/Constants.h"
+#include "Right.h"
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace pt;
 	using namespace server;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
+	using namespace security;
+	using namespace graph;
 	
 
 	namespace graph
@@ -97,5 +129,115 @@ namespace synthese
 				this_thread::sleep(posix_time::minutes(1));
 			}
 		}
+
+
+
+		std::vector<pair<RegistryKeyType, std::string> > PTModule::getCommercialLineLabels(
+			const security::RightsOfSameClassMap& rights 
+			, bool totalControl 
+			, RightLevel neededLevel
+			, bool withAll
+		){
+			vector<pair<uid,string> > m;
+			if (withAll)
+			m.push_back(make_pair(UNKNOWN_VALUE, "(toutes)"));
+
+			Env env;
+			CommercialLineTableSync::SearchResult lines(
+				CommercialLineTableSync::Search(env, rights, totalControl, neededLevel)
+			);
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
+				m.push_back(make_pair(line->getKey(), line->getShortName()));
+			return m;
+		}
+
+
+
+		void PTModule::getNetworkLinePlaceRightParameterList(ParameterLabelsVector& m)
+		{
+			Env env;
+			TransportNetworkTableSync::SearchResult networks(
+				TransportNetworkTableSync::Search(env)
+			);
+			CommercialLineTableSync::SearchResult lines(
+				CommercialLineTableSync::Search(env)
+			);
+
+			m.push_back(make_pair(string(), "--- Réseaux ---"));
+			BOOST_FOREACH(shared_ptr<TransportNetwork> network, networks)
+				m.push_back(make_pair(Conversion::ToString(network->getKey()), network->getName() ));
+
+			m.push_back(make_pair(string(), "--- Lignes ---"));
+			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
+				m.push_back(make_pair(Conversion::ToString(line->getKey()), line->getName() ));
+		}
+		
+		
+		
+		int PTModule::GetMaxAlarmLevel(
+			const Journey& journey
+		){
+			ptime alarmStart(not_a_date_time);
+			ptime alarmStop(not_a_date_time);
+			ptime now(second_clock::local_time());
+			int maxAlarmLevel(0);
+		 
+			BOOST_FOREACH(const ServiceUse& leg, journey.getServiceUses())
+			{
+				const Service* service(leg.getService());
+//				bool legIsConnection = (it < _journeyLegs.end() - 2);
+
+					// -- Alarm on origin --
+					// Alarm start = first departure
+					// Alarm stop = last departure
+				alarmStart = leg.getDepartureDateTime();
+				alarmStop = alarmStart;
+				if (service->isContinuous ()) 
+					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
+				
+	/*				if ( leg->getOrigin ()->getFromVertex ()->getConnectionPlace ()
+					 ->hasApplicableAlarm (alarmStart, alarmStop)
+					 && maxAlarmLevel < leg->getOrigin()->getFromVertex ()->
+					 getConnectionPlace ()->getAlarm ()->getLevel () )
+						maxAlarmLevel = leg->getOrigin()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
+	*/			
+				
+
+					// -- Service alarm --
+					// Alarm start = first departure
+					// Alarm stop = last arrival
+					alarmStart = leg.getDepartureDateTime();
+					alarmStop = leg.getArrivalDateTime();
+				if (service->isContinuous ()) 
+					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
+
+	/*				if ( (leg->getService ()->getPath ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
+					 (maxAlarmLevel < leg->getService ()->getPath ()->getAlarm ()->getLevel ()) )
+				{
+						maxAlarmLevel = leg->getService ()->getPath ()->getAlarm ()->getLevel ();
+				}
+	*/			
+					// -- Alarm on arrival --
+					// Alarm start = first arrival
+					// Alarm stop = last arrival if connection, last arrival otherwise
+					alarmStart = leg.getArrivalDateTime();
+					alarmStop = alarmStart;
+//					if (legIsConnection)
+//				{
+//						alarmStop = (it+1)->getDepartureDateTime ();
+//				}
+
+				if (service->isContinuous ()) 
+					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
+
+	/*				if ( (leg->getDestination ()->getFromVertex ()->getConnectionPlace ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
+						 (maxAlarmLevel < leg->getDestination()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ()) )
+				{
+					maxAlarmLevel = leg->getDestination()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
+				}
+*/			}
+			return maxAlarmLevel;
+		}
+
 	}
 }

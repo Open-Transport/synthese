@@ -24,7 +24,7 @@
 
 #include "CommercialLineAdmin.h"
 #include "TransportNetworkAdmin.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 #include "NonConcurrencyRuleTableSync.h"
 #include "NonConcurrencyRule.h"
 #include "TransportNetwork.h"
@@ -62,7 +62,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace security;
 	using namespace html;
 	using namespace pt;
@@ -340,7 +340,7 @@ namespace synthese
 				stream << t.col(2);
 				stream << t.getActionForm().getSelectInput(
 					NonConcurrencyRuleAddAction::PARAMETER_PRIORITY_LINE_ID,
-					EnvModule::getCommercialLineLabels(
+					PTModule::getCommercialLineLabels(
 						_request.getUser()->getProfile()->getRightsForModuleClass<TransportNetworkRight>(),
 						_request.getUser()->getProfile()->getGlobalPublicRight<TransportNetworkRight>() >= READ,
 						READ

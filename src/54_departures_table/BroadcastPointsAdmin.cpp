@@ -31,7 +31,7 @@
 #include "ConnectionPlaceTableSync.h"
 #include "City.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 #include "StaticFunctionRequest.h"
 #include "Session.h"
 #include "ModuleAdmin.h"
@@ -54,7 +54,7 @@ namespace synthese
 	using namespace admin;
 	using namespace server;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace html;
 	using namespace departurestable;
 	using namespace security;
@@ -135,7 +135,7 @@ namespace synthese
 			);
 			stream << st.cell("Ligne", st.getForm().getSelectInput(
 					PARAMETER_LINE_ID,
-					EnvModule::getCommercialLineLabels(
+					PTModule::getCommercialLineLabels(
 						_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>(),
 						_request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 						, READ

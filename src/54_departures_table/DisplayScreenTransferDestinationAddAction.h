@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -53,8 +53,8 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<DisplayScreen> _screen;
-			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> _transferPlace;
-			const env::PublicTransportStopZoneConnectionPlace* _destinationPlace;
+			boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> _transferPlace;
+			const pt::PublicTransportStopZoneConnectionPlace* _destinationPlace;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

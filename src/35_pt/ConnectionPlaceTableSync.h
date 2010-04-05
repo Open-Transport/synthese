@@ -33,7 +33,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		/** ConnectionPlace SQLite table synchronizer.
 			@ingroup m35LS refLS

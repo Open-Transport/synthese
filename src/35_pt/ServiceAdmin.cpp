@@ -60,7 +60,7 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace pt;
-	using namespace env;
+	using namespace pt;
 	using namespace graph;
 	using namespace html;
 	using namespace calendar;

@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -47,7 +47,7 @@ namespace synthese
 			static const std::string PARAMETER_COMMERCIAL_LINE_ID;
 
 		private:
-			boost::shared_ptr<env::CommercialLine> _commercialLine;
+			boost::shared_ptr<pt::CommercialLine> _commercialLine;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -79,7 +79,7 @@ namespace synthese
 
 
 
-			void setCommercialLine(boost::shared_ptr<env::CommercialLine> value);
+			void setCommercialLine(boost::shared_ptr<pt::CommercialLine> value);
 		};
 	}
 }

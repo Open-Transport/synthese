@@ -32,7 +32,7 @@
 #include "PublicPlace.h"
 #include "Address.h"
 #include "City.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 
 #include "Interface.h"
@@ -44,7 +44,7 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace pt;
 	using namespace road;
 	using namespace util;
 	using namespace server;

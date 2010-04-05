@@ -37,7 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace geography;
 	
 	namespace util

@@ -81,7 +81,7 @@ namespace synthese
 {
 	using namespace geography;
 	using namespace geometry;
-	using namespace env;
+	using namespace pt;
 	using namespace util::XmlToolkit;
 	using namespace util;
 	using namespace graph;

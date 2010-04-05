@@ -39,7 +39,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	
 	namespace util
 	{
@@ -115,7 +115,7 @@ namespace synthese
 
 
 
-		void TimetableSetLineAction::setLine( boost::shared_ptr<const env::CommercialLine> value )
+		void TimetableSetLineAction::setLine( boost::shared_ptr<const pt::CommercialLine> value )
 		{
 			_line = value;
 		}

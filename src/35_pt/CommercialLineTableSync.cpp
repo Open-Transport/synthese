@@ -27,7 +27,7 @@
 #include "TransportNetwork.h"
 #include "LineTableSync.h"
 #include "Place.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "ConnectionPlaceTableSync.h"
 #include "PTUseRule.h"
@@ -64,7 +64,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace security;
 	using namespace pt;
 	using namespace geography;
@@ -75,7 +75,7 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,CommercialLineTableSync>::FACTORY_KEY("15.25.01 Commercial lines");
 	}
-	namespace env
+	namespace pt
 	{
 		const string CommercialLineTableSync::COL_NETWORK_ID ("network_id");
 		const string CommercialLineTableSync::COL_NAME ("name");
@@ -331,7 +331,7 @@ namespace synthese
 		}
 	}
 
-	namespace env
+	namespace pt
 	{
 
 		CommercialLineTableSync::SearchResult CommercialLineTableSync::Search(

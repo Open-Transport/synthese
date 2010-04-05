@@ -45,7 +45,7 @@ namespace synthese
 		class PhysicalStop;
 	}
 
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 		class CommercialLine;
@@ -57,7 +57,7 @@ namespace synthese
 
 		struct ConnectionPlaceWithBroadcastPoint
 		{
-			boost::shared_ptr<env::PublicTransportStopZoneConnectionPlace> place;
+			boost::shared_ptr<pt::PublicTransportStopZoneConnectionPlace> place;
 			std::string	cityName;
 			int broadCastPointsNumber;
 			int cpuNumber;
@@ -96,7 +96,7 @@ namespace synthese
 		/** Line searcher.
 			@result found physical stops from the live data objects with the corresponding broadcast point if exists (NULL else) The broadcast points are temporary object and must be deleted after use. 
 		*/
-		std::vector<boost::shared_ptr<const env::CommercialLine> > getCommercialLineWithBroadcastPoints(
+		std::vector<boost::shared_ptr<const pt::CommercialLine> > getCommercialLineWithBroadcastPoints(
 			util::Env& env,
 			boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 			int first = 0

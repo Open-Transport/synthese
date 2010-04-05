@@ -39,7 +39,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace server;
-	using namespace env;
+	using namespace pt;
 	using namespace util;
 	using namespace db;
 	using namespace security;

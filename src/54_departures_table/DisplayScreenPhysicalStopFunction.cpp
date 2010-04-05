@@ -49,7 +49,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
-	using namespace env;
+	using namespace pt;
 	using namespace interfaces;
 	
 	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenPhysicalStopFunction>::FACTORY_KEY("td");

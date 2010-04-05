@@ -41,7 +41,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		/** Commercial Line table synchronizer.
 			@ingroup m35LS refLS

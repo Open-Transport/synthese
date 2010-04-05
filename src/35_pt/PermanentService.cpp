@@ -36,7 +36,7 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 
-	namespace env
+	namespace pt
 	{
 
 		ServicePointer PermanentService::getFromPresenceTime(

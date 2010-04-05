@@ -39,7 +39,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace env;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<Function,resa::CSVResaStatisticsFunction>::FACTORY_KEY("CSVResaStatisticsFunction");
 	
@@ -227,7 +227,7 @@ namespace synthese
 
 
 
-		void CSVResaStatisticsFunction::setLine( boost::shared_ptr<const env::CommercialLine> value )
+		void CSVResaStatisticsFunction::setLine( boost::shared_ptr<const pt::CommercialLine> value )
 		{
 			_line = value;
 		}

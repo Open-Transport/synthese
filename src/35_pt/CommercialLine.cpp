@@ -44,10 +44,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string Registry<env::CommercialLine>::KEY("CommercialLine");
+		template<> const std::string Registry<pt::CommercialLine>::KEY("CommercialLine");
 	}
 
-	namespace env
+	namespace pt
 	{
 		CommercialLine::CommercialLine(RegistryKeyType key)
 		:	util::Registrable(key),

@@ -48,7 +48,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const env::CommercialLine> _line; //!< Commercial line to export
+				boost::shared_ptr<const pt::CommercialLine> _line; //!< Commercial line to export
 				bool										_withTisseoExtension;
 			//@}
 			
@@ -74,7 +74,7 @@ namespace synthese
 
 			virtual std::string getOutputMimeType() const;
 
-			void setCommercialLine(boost::shared_ptr<const env::CommercialLine> line);
+			void setCommercialLine(boost::shared_ptr<const pt::CommercialLine> line);
 			void setWithTisseoExtension(bool value);
 		};
 	}

@@ -26,7 +26,7 @@
 #include "OnlineReservationRule.h"
 #include "Registry.h"
 #include "ResaModule.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 #include "ReservationConfirmationEMailInterfacePage.h"
 #include "ReservationConfirmationEMailSubjectInterfacePage.h"
 #include "Interface.h"
@@ -44,7 +44,7 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace pt;
 	using namespace util;
 	using namespace server;
 	using namespace interfaces;

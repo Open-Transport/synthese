@@ -66,7 +66,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace html;
 	using namespace departurestable;
 	using namespace security;
@@ -669,7 +669,7 @@ namespace synthese
 			}
 		}
 		
-		boost::optional<boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> > DisplaySearchAdmin::getPlace() const
+		boost::optional<boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> > DisplaySearchAdmin::getPlace() const
 		{
 			return _place;
 		}

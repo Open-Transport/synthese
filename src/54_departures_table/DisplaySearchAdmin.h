@@ -29,7 +29,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -118,7 +118,7 @@ namespace synthese
 			std::string										_searchName;
 			uid												_searchLineId;
 			uid												_searchTypeId;
-			boost::optional<boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> >
+			boost::optional<boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> >
 															_place;
 			int												_searchState;
 			int												_searchMessage;
@@ -203,7 +203,7 @@ namespace synthese
 			) const;
 
 			void setPlace(const util::RegistryKeyType id);
-			boost::optional<boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> > getPlace() const;
+			boost::optional<boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> > getPlace() const;
 			
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 		};

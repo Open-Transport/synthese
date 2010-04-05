@@ -24,6 +24,11 @@
 #include "NonConcurrencyRuleTableSync.h"
 #include "RollingStockTableSync.h"
 #include "ReservationContactTableSync.h"
+#include "CommercialLineTableSync.h"
+#include "ConnectionPlaceTableSync.h"
+#include "FareTableSync.h"
+#include "LineStopTableSync.h"
+#include "LineTableSync.h"
 
 #include "TransportNetworkAdmin.h"
 #include "CommercialLineAdmin.h"
@@ -44,6 +49,7 @@
 #include "PTRoutesListItemInterfacePage.hpp"
 #include "PTLinesListItemInterfacePage.hpp"
 #include "ReservationRuleInterfacePage.h"
+#include "LineMarkerInterfacePage.h"
 
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
@@ -63,8 +69,15 @@
 
 #include "TransportNetworkRight.h"
 
+
+
 // Registries
 
+#include "Line.h"
+#include "LineStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "ReservationContact.h"
+#include "CommercialLine.h"
 #include "TransportNetwork.h"
 #include "PTUseRule.h"
 #include "Junction.hpp"

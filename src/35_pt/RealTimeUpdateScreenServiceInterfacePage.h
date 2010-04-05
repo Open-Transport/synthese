@@ -35,7 +35,7 @@ namespace synthese
 		class Request;
 	}
 	
-	namespace env
+	namespace pt
 	{
 		class LineStop;
 	}
@@ -82,7 +82,7 @@ namespace synthese
 			void display(
 				std::ostream& stream,
 				const ScheduledService& service,
-				const env::LineStop& lineStop,
+				const pt::LineStop& lineStop,
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL
 			) const;

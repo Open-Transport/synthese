@@ -72,7 +72,7 @@ namespace synthese
 
 
 
-		const env::PublicTransportStopZoneConnectionPlace* DisplayScreenCPU::getPlace(
+		const pt::PublicTransportStopZoneConnectionPlace* DisplayScreenCPU::getPlace(
 		) const {
 			return _place;
 		}
@@ -116,7 +116,7 @@ namespace synthese
 
 
 		void DisplayScreenCPU::setPlace(
-			const env::PublicTransportStopZoneConnectionPlace* const value
+			const pt::PublicTransportStopZoneConnectionPlace* const value
 		){
 			_place = value;
 		}

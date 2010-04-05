@@ -31,7 +31,7 @@
 #include "ConnectionPlaceTableSync.h"
 #include "CommercialLine.h"
 #include "AdvancedSelectTableSync.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 
 #include "12_security/Constants.h"
 #include "RightTemplate.h"
@@ -45,7 +45,7 @@ namespace synthese
 		class Profile;
 	}
 
-	namespace env
+	namespace pt
 	{
 		/** Network and commercial line based perimeter right, for derivating purposes.
 			@ingroup m35
@@ -62,7 +62,7 @@ namespace synthese
 			{
 				security::ParameterLabelsVector m;
 				m.push_back(make_pair(security::GLOBAL_PERIMETER, "(all)"));
-				env::EnvModule::getNetworkLinePlaceRightParameterList(m);
+				pt::PTModule::getNetworkLinePlaceRightParameterList(m);
 				return m;
 			}
 

@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -59,7 +59,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<const Timetable>					_timetable;
 			int													_rank;
-			const env::PublicTransportStopZoneConnectionPlace*	_place;
+			const pt::PublicTransportStopZoneConnectionPlace*	_place;
 			bool												_isDeparture;
 			bool												_isArrival;
 			bool												_isCompulsory;

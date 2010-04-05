@@ -35,7 +35,7 @@ namespace synthese
 	{
 		class Request;
 	}
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 
@@ -89,7 +89,7 @@ namespace synthese
 				, const std::string& tableClosingHTML
 				, int pixelWidth
 				, int pixelHeight
-				, const env::CommercialLine& commercialLine
+				, const pt::CommercialLine& commercialLine
 				, const server::Request* request = NULL
 			) const;
 

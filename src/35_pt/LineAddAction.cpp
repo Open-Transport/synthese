@@ -38,7 +38,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	
 	namespace util
 	{
@@ -98,7 +98,7 @@ namespace synthese
 
 
 
-		void LineAddAction::setCommercialLine( boost::shared_ptr<env::CommercialLine> value )
+		void LineAddAction::setCommercialLine( boost::shared_ptr<pt::CommercialLine> value )
 		{
 			_commercialLine = value;
 		}

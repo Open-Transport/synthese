@@ -69,7 +69,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace resa;
-	using namespace env;
+	using namespace pt;
 	using namespace html;
 	using namespace security;
 	using namespace graph;
@@ -581,12 +581,12 @@ namespace synthese
 			return _serviceNumber;
 		}
 		
-		void BookableCommercialLineAdmin::setCommercialLine(boost::shared_ptr<env::CommercialLine> value)
+		void BookableCommercialLineAdmin::setCommercialLine(boost::shared_ptr<pt::CommercialLine> value)
 		{
 			_line = const_pointer_cast<const CommercialLine>(value);
 		}
 
-		boost::shared_ptr<const env::CommercialLine> BookableCommercialLineAdmin::getCommercialLine() const
+		boost::shared_ptr<const pt::CommercialLine> BookableCommercialLineAdmin::getCommercialLine() const
 		{
 			return _line;
 		}
@@ -639,7 +639,7 @@ namespace synthese
 
 
 
-		void BookableCommercialLineAdmin::setCommercialLineC( boost::shared_ptr<const env::CommercialLine> value )
+		void BookableCommercialLineAdmin::setCommercialLineC( boost::shared_ptr<const pt::CommercialLine> value )
 		{
 			_line = value;
 		}

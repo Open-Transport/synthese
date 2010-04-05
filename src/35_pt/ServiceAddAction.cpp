@@ -45,7 +45,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace db;
 	
 	namespace util
@@ -279,7 +279,7 @@ namespace synthese
 
 
 
-		void ServiceAddAction::setLine( boost::shared_ptr<env::Line> value )
+		void ServiceAddAction::setLine( boost::shared_ptr<pt::Line> value )
 		{
 			_line = value;
 		}

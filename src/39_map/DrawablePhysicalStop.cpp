@@ -35,7 +35,7 @@ using synthese::pt::PhysicalStop;
 namespace synthese
 {
 	using namespace geometry;
-	using namespace env;
+	using namespace pt;
 	
 	namespace map
 	{

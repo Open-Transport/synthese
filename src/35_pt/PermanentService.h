@@ -27,7 +27,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		/** PermanentService class.
 			@ingroup m35

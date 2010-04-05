@@ -39,7 +39,7 @@ using namespace boost::gregorian;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace pt;
 	using namespace graph;
 	using namespace algorithm;
 	using namespace ptrouteplanner;

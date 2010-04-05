@@ -32,7 +32,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class Line;
 	}
@@ -89,7 +89,7 @@ namespace synthese
 			/** Autorisation d'afficher une ligne sur le tableau de départs.
 				@param linestop linestop to test
 			*/
-				bool _allowedLineStop(const env::LineStop*) const;
+				bool _allowedLineStop(const pt::LineStop*) const;
 			
 			/** Insertion.
 				@return iterator on the element.

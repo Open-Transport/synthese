@@ -50,7 +50,7 @@ namespace synthese
 	using namespace geometry;
 	using namespace util;
 	using namespace map;
-	using namespace env;
+	using namespace pt;
 	using namespace graph;
 		
 	namespace util

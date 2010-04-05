@@ -39,7 +39,7 @@ namespace synthese
 		class Env;
 	}
 
-	namespace env
+	namespace pt
 	{
 		class Line;
 		class CommercialLine;
@@ -58,7 +58,7 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<TimetableRow>				Rows;
-			typedef std::set<const env::CommercialLine*>	AuthorizedLines;
+			typedef std::set<const pt::CommercialLine*>	AuthorizedLines;
 			typedef std::set<const pt::PhysicalStop*>		AuthorizedPhysicalStops;
 
 		private:
@@ -80,10 +80,10 @@ namespace synthese
 
 			//! @name Algorithms
 			//@{
-				bool	_isLineSelected(const env::Line& line)	const;
+				bool	_isLineSelected(const pt::Line& line)	const;
 				void	_insert(TimetableResult& result, const TimetableColumn& col);
 				void	_buildWarnings(TimetableResult& result);
-				void	_scanServices(TimetableResult& result, const env::Line& line);
+				void	_scanServices(TimetableResult& result, const pt::Line& line);
 			//@}
 
 		public:

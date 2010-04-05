@@ -52,7 +52,7 @@ namespace synthese
 				- CommercialLine object : the rules apply only on reservation for the specified line
 				- TransportNetwork : the rules apply only on reservations for lines of the specified network
 		*/
-		class ResaRight : public env::NetworkLineBasedRight<ResaRight>
+		class ResaRight : public pt::NetworkLineBasedRight<ResaRight>
 		{
 		public:
 			ResaRight();

@@ -32,7 +32,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -51,8 +51,8 @@ namespace synthese
 			static const std::string PARAMETER_DURATION;
 
 		private:
-			boost::shared_ptr<env::CommercialLine> _hiddenLine;
-			boost::shared_ptr<env::CommercialLine> _priorityLine;
+			boost::shared_ptr<pt::CommercialLine> _hiddenLine;
+			boost::shared_ptr<pt::CommercialLine> _priorityLine;
 			boost::posix_time::time_duration	_duration;
 
 
@@ -76,8 +76,8 @@ namespace synthese
 			
 			virtual bool isAuthorized(const server::Session* session) const;
 
-			void setPriorityLine(boost::shared_ptr<const env::CommercialLine> value);
-			void setHiddenLine(boost::shared_ptr<const env::CommercialLine> value);
+			void setPriorityLine(boost::shared_ptr<const pt::CommercialLine> value);
+			void setHiddenLine(boost::shared_ptr<const pt::CommercialLine> value);
 		};
 	}
 }

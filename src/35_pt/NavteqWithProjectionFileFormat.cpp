@@ -56,7 +56,7 @@ namespace synthese
 	using namespace impex;
 	using namespace pt;
 	using namespace road;
-	using namespace env;
+	using namespace pt;
 	using namespace geography;
 	using namespace db;
 	using namespace geometry;

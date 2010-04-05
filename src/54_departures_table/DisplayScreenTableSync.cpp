@@ -63,7 +63,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace departurestable;
-	using namespace env;
+	using namespace pt;
 	using namespace dblog;
 	using namespace security;
 	using namespace messages;

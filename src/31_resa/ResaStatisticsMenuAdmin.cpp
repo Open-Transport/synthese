@@ -46,7 +46,7 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace resa;
-	using namespace env;
+	using namespace pt;
 	using namespace html;
 
 	namespace util

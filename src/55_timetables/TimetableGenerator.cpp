@@ -38,7 +38,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace pt;
 	using namespace calendar;
 	using namespace util;
 	using namespace graph;
@@ -86,7 +86,7 @@ namespace synthese
 
 
 
-		void TimetableGenerator::_scanServices(TimetableResult& result, const env::Line& line )
+		void TimetableGenerator::_scanServices(TimetableResult& result, const pt::Line& line )
 		{
 			// Loop on each service
 			BOOST_FOREACH(const Service* servicePtr, line.getServices())
@@ -169,7 +169,7 @@ namespace synthese
 
 
 
-		bool TimetableGenerator::_isLineSelected( const env::Line& line ) const
+		bool TimetableGenerator::_isLineSelected( const pt::Line& line ) const
 		{
 			if (!line.getUseInTimetables())
 				return false;

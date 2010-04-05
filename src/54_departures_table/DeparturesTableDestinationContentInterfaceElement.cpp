@@ -44,7 +44,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace env;
+	using namespace pt;
 	using namespace util;
 	using namespace geography;
 

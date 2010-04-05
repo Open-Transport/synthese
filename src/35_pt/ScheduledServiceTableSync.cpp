@@ -23,7 +23,7 @@
 #include "ScheduledServiceTableSync.h"
 #include "LoadException.h"
 #include "Path.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 #include "LineTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "PTUseRuleTableSync.h"
@@ -51,7 +51,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace graph;
 	using namespace pt;
 

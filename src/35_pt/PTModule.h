@@ -25,10 +25,19 @@
 
 
 #include "GraphModuleTemplate.h"
+#include "12_security/Types.h"
+#include "Registry.h"
 
+#include <vector>
+#include <utility>
 
 namespace synthese
 {
+	namespace graph
+	{
+		class Journey;
+	}
+
 	/**	@defgroup m35Actions 35 Actions
 		@ingroup m35
 
@@ -73,6 +82,19 @@ namespace synthese
 		{
 		public:
 			static void RTDataCleaner();
+
+			static std::vector<std::pair<util::RegistryKeyType, std::string> >	getCommercialLineLabels(
+				const security::RightsOfSameClassMap& rights 
+				, bool totalControl 
+				, security::RightLevel neededLevel 
+				, bool withAll=false
+			);
+
+			static void getNetworkLinePlaceRightParameterList(security::ParameterLabelsVector& m);
+
+			static int GetMaxAlarmLevel(
+				const graph::Journey&
+			);
 		};
 	}
 	/** @} */

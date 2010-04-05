@@ -45,11 +45,11 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<env::PublicTransportStopZoneConnectionPlace>::KEY("PublicTransportStopZoneConnectionPlace");
-		template<> const string FactorableTemplate<geography::NamedPlace,env::PublicTransportStopZoneConnectionPlace>::FACTORY_KEY("PublicTransportStopZoneConnectionPlace");
+		template<> const string Registry<pt::PublicTransportStopZoneConnectionPlace>::KEY("PublicTransportStopZoneConnectionPlace");
+		template<> const string FactorableTemplate<geography::NamedPlace,pt::PublicTransportStopZoneConnectionPlace>::FACTORY_KEY("PublicTransportStopZoneConnectionPlace");
 	}
 
-	namespace env
+	namespace pt
 	{
 		PublicTransportStopZoneConnectionPlace::PublicTransportStopZoneConnectionPlace(
 			util::RegistryKeyType id /*= UNKNOWN_VALUE */

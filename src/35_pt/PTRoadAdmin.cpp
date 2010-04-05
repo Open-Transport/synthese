@@ -59,7 +59,7 @@ namespace synthese
 	using namespace html;
 	using namespace graph;
 	using namespace geography;
-	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{

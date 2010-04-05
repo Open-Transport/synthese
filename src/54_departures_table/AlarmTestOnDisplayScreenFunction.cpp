@@ -56,7 +56,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace messages;
-	using namespace env;
+	using namespace pt;
 	using namespace interfaces;
 	using namespace security;
 	using namespace graph;

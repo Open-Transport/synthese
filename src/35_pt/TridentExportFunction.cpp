@@ -38,7 +38,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
-	using namespace env;
+	using namespace pt;
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,pt::TridentExportFunction>::FACTORY_KEY(
@@ -103,7 +103,7 @@ namespace synthese
 
 
 
-		void TridentExportFunction::setCommercialLine( boost::shared_ptr<const env::CommercialLine> line )
+		void TridentExportFunction::setCommercialLine( boost::shared_ptr<const pt::CommercialLine> line )
 		{
 			_line = line;
 		}

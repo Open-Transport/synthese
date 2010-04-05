@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -50,7 +50,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<const DisplayScreenCPU>			_template;
-			boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace>	_place;
+			boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace>	_place;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -67,7 +67,7 @@ namespace synthese
 			*/
 			void run(server::Request& request);
 
-			void setPlace(boost::shared_ptr<const env::PublicTransportStopZoneConnectionPlace> place);
+			void setPlace(boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> place);
 
 			virtual bool isAuthorized(const server::Session* session) const;
 		};

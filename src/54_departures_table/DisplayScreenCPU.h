@@ -35,7 +35,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -62,7 +62,7 @@ namespace synthese
 		protected:
 			// Attributes
 			std::string											_name;
-			const env::PublicTransportStopZoneConnectionPlace*	_place;
+			const pt::PublicTransportStopZoneConnectionPlace*	_place;
 			std::string											_mac_address;
 			boost::posix_time::time_duration					_monitoring_delay;
 			bool												_is_online;
@@ -89,7 +89,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const std::string&									getName()				const;
-				const env::PublicTransportStopZoneConnectionPlace*	getPlace()				const;
+				const pt::PublicTransportStopZoneConnectionPlace*	getPlace()				const;
 				const std::string&									getMacAddress()			const;
 				boost::posix_time::time_duration					getMonitoringDelay()	const;
 				bool												getIsOnline()			const;
@@ -100,7 +100,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setName(const std::string& value);
-				void setPlace(const env::PublicTransportStopZoneConnectionPlace* const value);
+				void setPlace(const pt::PublicTransportStopZoneConnectionPlace* const value);
 				void setMacAddress(const std::string& value);
 				void setMonitoringDelay(const boost::posix_time::time_duration value);
 				void setIsOnline(const bool value);

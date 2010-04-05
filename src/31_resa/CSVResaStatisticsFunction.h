@@ -33,7 +33,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -59,7 +59,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const env::CommercialLine>	_line;
+				boost::shared_ptr<const pt::CommercialLine>	_line;
 				boost::gregorian::date_period _searchPeriod;
 				ResaStatisticsTableSync::Step _searchRowStep;
 				ResaStatisticsTableSync::Step _searchColStep;
@@ -86,7 +86,7 @@ namespace synthese
 			
 			
 		public:
-			void setLine(boost::shared_ptr<const env::CommercialLine> value);
+			void setLine(boost::shared_ptr<const pt::CommercialLine> value);
 			void setPeriod(boost::gregorian::date_period value);
 			void setRowStep(ResaStatisticsTableSync::Step value);
 			void setColStep(ResaStatisticsTableSync::Step value);

@@ -49,7 +49,7 @@ namespace synthese
 	using namespace util;
 	using namespace timetables;
 	using namespace graph;
-	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{

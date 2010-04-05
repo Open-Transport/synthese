@@ -33,7 +33,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class LineStop;
 		class PublicTransportStopZoneConnectionPlace;
@@ -65,7 +65,7 @@ namespace synthese
 			PhysicalStop(
 				util::RegistryKeyType id = UNKNOWN_VALUE,
 				std::string name = std::string(), 
-				const env::PublicTransportStopZoneConnectionPlace* place = NULL,
+				const pt::PublicTransportStopZoneConnectionPlace* place = NULL,
 				double x = UNKNOWN_VALUE,
 				double y = UNKNOWN_VALUE);
 
@@ -74,7 +74,7 @@ namespace synthese
 
 			//! @name Getters/Setters
 			//@{
-			const env::PublicTransportStopZoneConnectionPlace* getConnectionPlace() const;
+			const pt::PublicTransportStopZoneConnectionPlace* getConnectionPlace() const;
 
 				const std::string& getName () const;
 				void setName (const std::string& name);

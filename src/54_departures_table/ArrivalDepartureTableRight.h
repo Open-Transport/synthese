@@ -47,7 +47,7 @@ namespace synthese
 					- si le point de diffusion est un arrêt physique, alors il doit être desservi par la ligne
 					- si le point de diffusion n'est pas un arrêt physique, alors au moins un arrêt physique du lieu auquel appartient le point de diffusion doit être desservi par la ligne
 		*/
-		class ArrivalDepartureTableRight : public env::NetworkLineBasedRight<ArrivalDepartureTableRight>
+		class ArrivalDepartureTableRight : public pt::NetworkLineBasedRight<ArrivalDepartureTableRight>
 		{
 		public:
 		};

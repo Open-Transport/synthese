@@ -20,6 +20,11 @@ synthese::pt::FareTableSync::integrate();
 synthese::pt::RollingStockTableSync::integrate();
 synthese::pt::NonConcurrencyRuleTableSync::integrate();
 synthese::pt::ReservationContactTableSync::integrate();
+synthese::pt::CommercialLineTableSync::integrate();
+synthese::pt::LineTableSync::integrate();
+synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::ConnectionPlaceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::pt::ConnectionPlaceTableSync>::integrate();
+synthese::pt::LineStopTableSync::integrate();
 
 synthese::pt::PTModule::integrate();
 
@@ -47,6 +52,7 @@ synthese::pt::PTNetworksListFunction::integrate();
 synthese::pt::PTRoutesListFunction::integrate();
 synthese::pt::CheckLineCalendarFunction::integrate();
 
+synthese::pt::LineMarkerInterfacePage::integrate();
 synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
 synthese::pt::PTNetworkListItemInterfacePage::integrate();
 synthese::pt::PTLinesListItemInterfacePage::integrate();
@@ -71,8 +77,16 @@ synthese::pt::PTUseRuleUpdateAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 
-// Registries
+synthese::pt::PTModule::integrate();
 
+synthese::pt::PublicTransportStopZoneConnectionPlace::integrate();
+
+
+// Registries
+synthese::util::Env::Integrate<synthese::pt::Line>();
+synthese::util::Env::Integrate<synthese::pt::LineStop>();
+synthese::util::Env::Integrate<synthese::pt::PublicTransportStopZoneConnectionPlace>();
+synthese::util::Env::Integrate<synthese::pt::CommercialLine>();
 synthese::util::Env::Integrate<synthese::pt::PhysicalStop>();
 synthese::util::Env::Integrate<synthese::pt::Junction>();
 synthese::util::Env::Integrate<synthese::pt::TransportNetwork>();

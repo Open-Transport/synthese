@@ -47,7 +47,7 @@ namespace synthese
 		class SubLine;
 	}
 	
-	namespace env
+	namespace pt
 	{
 		class LineStop;
 		class LineAlarmBroadcast;

@@ -37,7 +37,7 @@ namespace synthese
 		class Request;
 	}
 	
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -109,7 +109,7 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				const env::CommercialLine& object,
+				const pt::CommercialLine& object,
 				std::size_t rowRank,
 				std::size_t colRank,
 				interfaces::VariablesMap& variables,

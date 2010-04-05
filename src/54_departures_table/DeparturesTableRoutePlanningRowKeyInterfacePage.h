@@ -35,7 +35,7 @@ namespace synthese
 	{
 		class Request;
 	}
-	namespace env
+	namespace pt
 	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
@@ -69,7 +69,7 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				const env::PublicTransportStopZoneConnectionPlace& origin,
+				const pt::PublicTransportStopZoneConnectionPlace& origin,
 				const RoutePlanningRow& row ,
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL

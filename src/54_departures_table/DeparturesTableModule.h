@@ -32,7 +32,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class LineStop;
 		class PublicTransportStopZoneConnectionPlace;

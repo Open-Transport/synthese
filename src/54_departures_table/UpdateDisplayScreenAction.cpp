@@ -47,7 +47,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace db;
 	using namespace dblog;
 	using namespace security;

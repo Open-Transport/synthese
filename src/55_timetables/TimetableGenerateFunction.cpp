@@ -52,7 +52,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace interfaces;
-	using namespace env;
+	using namespace pt;
 	using namespace geography;
 	using namespace calendar;
 	using namespace graph;

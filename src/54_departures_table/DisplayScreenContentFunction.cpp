@@ -47,7 +47,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
-	using namespace env;
+	using namespace pt;
 	using namespace interfaces;
 	using namespace db;
 	using namespace pt;

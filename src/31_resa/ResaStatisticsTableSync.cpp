@@ -36,7 +36,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace dblog;
-	using namespace env;
+	using namespace pt;
 	using namespace geography;
 
 	namespace resa

@@ -55,7 +55,7 @@ namespace synthese
 
 		void DeparturesTableRoutePlanningRowKeyInterfacePage::display(
 			std::ostream& stream,
-			const env::PublicTransportStopZoneConnectionPlace& origin,
+			const pt::PublicTransportStopZoneConnectionPlace& origin,
 			const RoutePlanningRow& row ,
 			VariablesMap& variables,
 			const server::Request* request /*= NULL*/

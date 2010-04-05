@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace env
+	namespace pt
 	{
 		class CommercialLine;
 	}
@@ -49,8 +49,8 @@ namespace synthese
 			typedef util::Registry<NonConcurrencyRule>	Registry;
 
 		protected:
-			env::CommercialLine* _prorityLine;
-			env::CommercialLine* _hiddenLine;
+			pt::CommercialLine* _prorityLine;
+			pt::CommercialLine* _hiddenLine;
 			boost::posix_time::time_duration	_delay;
 
 		public:
@@ -60,15 +60,15 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				env::CommercialLine* getPriorityLine()	const { return _prorityLine; }
-				env::CommercialLine*	getHiddenLine()		const { return _hiddenLine; }
+				pt::CommercialLine* getPriorityLine()	const { return _prorityLine; }
+				pt::CommercialLine*	getHiddenLine()		const { return _hiddenLine; }
 				const boost::posix_time::time_duration&	getDelay()			const { return _delay; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setPriorityLine(env::CommercialLine* value) { _prorityLine = value; }
-				void setHiddenLine(env::CommercialLine* value) { _hiddenLine = value; }
+				void setPriorityLine(pt::CommercialLine* value) { _prorityLine = value; }
+				void setHiddenLine(pt::CommercialLine* value) { _hiddenLine = value; }
 				void setDelay(const boost::posix_time::time_duration& value) { _delay = value; }
 			//@}
 		};

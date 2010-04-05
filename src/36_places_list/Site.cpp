@@ -23,7 +23,7 @@
 #include "Site.h"
 #include "Registry.h"
 #include "PTConstants.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 #include "City.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "AccessParameters.h"
@@ -46,7 +46,7 @@ namespace synthese
 	using namespace geography;
 	using namespace interfaces;
 	using namespace lexmatcher;
-	using namespace env;
+	using namespace pt;
 	using namespace graph;
 
 	namespace util

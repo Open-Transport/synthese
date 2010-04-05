@@ -34,7 +34,7 @@ namespace synthese
 {
 	using namespace resa;
 	using namespace security;
-	using namespace env;
+	using namespace pt;
 
 	namespace util
 	{
@@ -57,7 +57,7 @@ namespace synthese
 	{
 
 		ResaRight::ResaRight()
-			: env::NetworkLineBasedRight<ResaRight>()
+			: pt::NetworkLineBasedRight<ResaRight>()
 		{
 			setParameter(GLOBAL_PERIMETER);
 		}

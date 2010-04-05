@@ -40,10 +40,10 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const std::string Registry<env::Line>::KEY("Line");
+		template<> const std::string Registry<pt::Line>::KEY("Line");
 	}
 
-	namespace env
+	namespace pt
 	{
 		Line::Line(
 			util::RegistryKeyType id,

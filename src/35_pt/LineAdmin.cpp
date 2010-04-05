@@ -24,7 +24,7 @@
 
 #include "LineAdmin.h"
 #include "CommercialLineAdmin.h"
-#include "EnvModule.h"
+#include "PTModule.h"
 #include "Profile.h"
 #include "CommercialLine.h"
 #include "HTMLModule.h"
@@ -62,7 +62,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
-	using namespace env;
+	using namespace pt;
 	using namespace html;
 	using namespace security;
 	using namespace graph;

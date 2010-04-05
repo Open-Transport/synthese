@@ -43,7 +43,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace env;
+	using namespace pt;
 	using namespace graph;
 	using namespace road;
 	using namespace pt;

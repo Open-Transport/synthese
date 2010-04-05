@@ -57,7 +57,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace geometry;
-	using namespace env;
+	using namespace pt;
 	using namespace util;
 	using namespace pt;
 	
