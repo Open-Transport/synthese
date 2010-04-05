@@ -77,8 +77,6 @@ synthese::pt::PTUseRuleUpdateAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 
-synthese::pt::PTModule::integrate();
-
 synthese::pt::PublicTransportStopZoneConnectionPlace::integrate();
 
 

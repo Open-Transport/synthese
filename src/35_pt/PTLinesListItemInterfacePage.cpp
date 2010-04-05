@@ -61,8 +61,8 @@ namespace synthese
 		) const	{
 			ParametersVector pv;
 			pv.push_back(lexical_cast<string>(object.getKey()));//0
-			pv.push_back(object.getLongName()); //1
-			pv.push_back(object.getName()); //2
+			pv.push_back(object.getName()); //1
+			pv.push_back(object.getShortName()); //2
 			pv.push_back(object.getStyle()); //3
 			pv.push_back(object.getColor() ? object.getColor()->toString() : string()); //4
 			pv.push_back(lexical_cast<string>(rank)); //5
