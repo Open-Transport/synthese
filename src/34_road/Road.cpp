@@ -77,13 +77,6 @@ namespace synthese
 
 		
 		
-		const Road::RoadType& 
-		Road::getType () const
-		{
-			return _type;
-		}
-
-
 		void 
 		Road::setType (const RoadType& type)
 		{
@@ -183,6 +176,13 @@ namespace synthese
 		bool Road::isRoad() const
 		{
 			return true;
+		}
+
+
+
+		std::string Road::getRuleUserName() const
+		{
+			return "Route " + getRoadPlace()->getFullName() + " sens "+ (_reverseRoad ? "direct" : "opposé");
 		}
 	}
 }

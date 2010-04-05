@@ -205,6 +205,21 @@ namespace synthese
 			if(it != _map.end()) _map.erase(it);
 		}
 
+
+
+		ParametersMap ParametersMap::getExtract( const std::string& keyBegin ) const
+		{
+			ParametersMap result;
+			BOOST_FOREACH(const Map::value_type& element, _map)
+			{
+				if(element.first.substr(0, keyBegin.size()) == keyBegin)
+				{
+					result.insert(element.first, element.second);
+				}
+			}
+			return result;
+		}
+
 		
 		ParametersMap::MissingParameterException::MissingParameterException( const std::string& field ):
 			_field(field),

@@ -123,7 +123,6 @@ namespace synthese
 			ss->setTeam(rows->getText(ScheduledServiceTableSync::COL_TEAM));
 			ss->setPathId(pathId);
 			ss->clearRules();
-			ss->setFromSerializedString(rows->getText(ScheduledServiceTableSync::COL_DATES));
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -168,6 +167,10 @@ namespace synthese
 					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
 				);
 			}
+
+			// After path linking to update path calendar
+			ss->setFromSerializedString(rows->getText(ScheduledServiceTableSync::COL_DATES));
+			ss->updatePathCalendar();
 		}
 
 

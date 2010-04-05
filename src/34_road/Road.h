@@ -39,8 +39,8 @@ namespace synthese
 		/** Road class.
 			@ingroup m34
 		*/
-		class Road
-		:	public graph::Path
+		class Road:
+			public graph::Path
 		{
 		public:
 			
@@ -80,19 +80,23 @@ namespace synthese
 		virtual ~Road();
 
 
-		//! @name Getters/Setters
+		//! @name Getters
 		//@{
-			  const RoadType& getType () const;
+			const RoadType& getType () const { return _type; }
+			RoadPlace* getRoadPlace() const;
+		//@}
+
+		//! @name Setters
+		//@{
 			  void setType (const RoadType& type);
-			  RoadPlace* getRoadPlace() const;
 			  void setRoadPlace(RoadPlace* value);
 		//@}
 		
-
-		//! @name Query methods.
+		//! @name Services
 		//@{
 			virtual bool isPedestrianMode() const;
 			virtual bool isRoad() const;
+			virtual std::string getRuleUserName() const;
 
 
 		  /** Find closest address of this road, before a given metric offset.

@@ -112,6 +112,8 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
+				virtual std::string getRuleUserName() const { return "Service " + getServiceNumber(); }
+
 				virtual bool isContinuous () const = 0;
 
 

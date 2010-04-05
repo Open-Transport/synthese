@@ -84,6 +84,7 @@ namespace synthese
 				const AccessParameters& accessParameters
 			) const;
 
+			virtual std::string getUseRuleName() const;
 		};
 	}
 }

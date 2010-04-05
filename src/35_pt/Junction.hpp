@@ -65,6 +65,7 @@ namespace synthese
 
 			//! @name Services
 			//@{
+				virtual std::string getRuleUserName() const;
 				PhysicalStop* getStart() const;
 				PhysicalStop* getEnd() const;
 				double getLength() const;

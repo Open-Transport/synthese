@@ -48,6 +48,7 @@ namespace synthese
 		filesystem::path DBModule::_DatabasePath;
 
 		map<string,string>	DBModule::_tableSyncMap;
+		map<int,string>	DBModule::_idTableSyncMap;
 
 		SQLiteHandle* DBModule::_sqlite = 0;
 		DBModule::SubClassMap DBModule::_subClassMap;
@@ -81,6 +82,7 @@ namespace synthese
 			BOOST_FOREACH(const shared_ptr<SQLiteTableSync>& sync, tableSyncs)
 			{
 				DBModule::_tableSyncMap[sync->getFormat().NAME] = sync->getFactoryKey();
+				DBModule::_idTableSyncMap[sync->getFormat().ID] = sync->getFactoryKey();
 			}
 	    }
 	
@@ -112,6 +114,18 @@ namespace synthese
 		{
 			map<string,string>::const_iterator it(_tableSyncMap.find(tableName));
 			if (it == _tableSyncMap.end())
+			{
+				throw SQLiteException("Table not found in database");
+			}
+			return shared_ptr<SQLiteTableSync>(Factory<SQLiteTableSync>::create(it->second));
+		}
+
+
+
+		boost::shared_ptr<SQLiteTableSync> DBModule::GetTableSync( int tableId )
+		{
+			map<int,string>::const_iterator it(_idTableSyncMap.find(tableId));
+			if (it == _idTableSyncMap.end())
 			{
 				throw SQLiteException("Table not found in database");
 			}

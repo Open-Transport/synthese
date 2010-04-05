@@ -26,6 +26,7 @@
 #include "UseRule.h"
 #include "Registrable.h"
 #include "Registry.h"
+#include "Named.h"
 
 #include <string>
 #include <boost/optional.hpp>
@@ -51,7 +52,8 @@ namespace synthese
 		///
 		class PTUseRule
 		:	public util::Registrable,
-			public graph::UseRule
+			public graph::UseRule,
+			public util::Named
 		{
 		public:
 			/// Chosen registry class.
@@ -77,8 +79,6 @@ namespace synthese
 			typedef std::vector<std::pair<ReservationRuleType, std::string> > ReservationRuleTypesList;
 
 		private:
-
-			std::string _name;
 
 			//! @name Access
 			//@{
@@ -136,7 +136,6 @@ namespace synthese
 				boost::posix_time::time_duration					getMinDelayMinutes()			const { return _minDelayMinutes; }
 				const boost::optional<boost::gregorian::date_duration>&	getMaxDelayDays()		const { return _maxDelayDays; }
 				ReservationRuleType	getReservationType()			const { return _reservationType; }
-				const std::string&	getName()						const { return _name; }
 				const Fare*	getDefaultFare()				const { return _defaultFare; }
 			//@}
 			
@@ -153,13 +152,13 @@ namespace synthese
 				void setMaxDelayDays (const boost::optional<boost::gregorian::date_duration> maxDelayDays){ _maxDelayDays = maxDelayDays; }
 				void setOriginIsReference (bool originIsReference){ _originIsReference = originIsReference; }
 				void setReservationType(ReservationRuleType value){ _reservationType = value; }
-				void setName(const std::string& value) { _name = value; }
 				void setAccessCapacity(AccessCapacity value){ _accessCapacity = value; }
 				void setDefaultFare(const Fare* value){ _defaultFare = value; }
 			//@}
 
 			//! @name Service
 			//@{
+				virtual std::string getUseRuleName() const { return getName(); }
 
 				/** Reference function for reservation dead line calculation.
 					@param originTime Time of start of the corresponding service

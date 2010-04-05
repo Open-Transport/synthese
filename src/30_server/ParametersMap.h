@@ -99,6 +99,18 @@ namespace synthese
 
 			//! \name Queries
 			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Extracts a part of the map.
+				/// @param keyBegin beginning of the key of the elements to return
+				/// @return a map containing the elements with specified key pattern
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				ParametersMap getExtract(
+					const std::string& keyBegin
+				) const;
+
+
 
 				/** Search for the value of a parameter in a ParameterMap object.
 					@param parameterName Name of the searched parameter

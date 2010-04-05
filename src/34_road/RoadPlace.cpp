@@ -127,5 +127,12 @@ namespace synthese
 		) const	{
 			return (text.empty() ? getName() : text);
 		}
+
+
+
+		std::string RoadPlace::getRuleUserName() const
+		{
+			return "Route "+ getFullName();
+		}
 	}
 }

@@ -80,5 +80,12 @@ namespace synthese
 			if(accessParameters.getDRTOnly()) return false;
 			return true;
 		}
+
+
+
+		std::string AllowedUseRule::getUseRuleName() const
+		{
+			return "Autorisé sans condition";
+		}
 	}
 }

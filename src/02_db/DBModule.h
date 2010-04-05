@@ -70,6 +70,7 @@ namespace synthese
 		    static SQLiteHandle*	_sqlite;
 			static SubClassMap		_subClassMap;
 			static std::map<std::string,std::string>	_tableSyncMap;
+			static std::map<int,std::string>	_idTableSyncMap;
 		    static boost::filesystem::path _DatabasePath;
 
 		public:
@@ -79,7 +80,25 @@ namespace synthese
 
 		    static SQLite* GetSQLite ();
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the table sync by table name.
+			/// @param tableName name of the table
+			/// @return the specified table sync
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
 			static boost::shared_ptr<SQLiteTableSync> GetTableSync(const std::string& tableName);
+			
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the table sync by its id key.
+			/// @param tableId id of the table sync to return
+			/// @return the specified table sync
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			static boost::shared_ptr<SQLiteTableSync> GetTableSync(int tableId);
 
 		    /** Called whenever a parameter registered by this module is changed
 		     */

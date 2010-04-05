@@ -81,8 +81,10 @@ namespace synthese
 				void removeRoad(Road& road);
 			//@}
 
-			//! @name Queries
+			//! @name Services
 			//@{
+				virtual std::string getRuleUserName() const;
+
 				virtual void getVertexAccessMap(
 					graph::VertexAccessMap& result, 
 					const graph::AccessDirection& accessDirection,

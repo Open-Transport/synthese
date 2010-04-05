@@ -51,13 +51,14 @@ namespace synthese
 			mutable boost::recursive_mutex _rulesMutex;
 		
 		protected:
-			virtual const RuleUser* _getParentRuleUser() const = 0;
 			
 			/////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			RuleUser();
 			
 		public:
+			virtual const RuleUser* _getParentRuleUser() const = 0;
+
 			//! @name Getters
 			//@{
 				/////////////////////////////////////////////////////////////////
@@ -113,6 +114,14 @@ namespace synthese
 					const AccessParameters& accessParameters
 				) const;
 
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Pure virtual name getter.
+				/// @return the name of the object
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				virtual std::string getRuleUserName() const = 0;
 			//@}
 		};
 	}

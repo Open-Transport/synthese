@@ -96,97 +96,108 @@ namespace synthese
 			typedef boost::optional<size_t> AccessCapacity;
 			
 
-			/** Reference function for reservation dead line calculation.
-				@param originTime Time of start of the corresponding service
-				@param departureTime Desired departure time.
+			//! @name Services
+			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Pure virtual name getter.
+				/// @return name of the use rule
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				virtual std::string getUseRuleName() const = 0;
 
-				It is done according to the following steps:
-					- Choice of reference time (client departure or line run departure at origin)
-					- Calculation 1 : x minutes before reference time :
-					- Decrease of _minDelayMinutes before reference
+				/** Reference function for reservation dead line calculation.
+					@param originTime Time of start of the corresponding service
+					@param departureTime Desired departure time.
 
-					- Calculation 2 : x days before reference time :
-					- Decrease of _minDelayDays before reference
-					- Sets hour to _hourDeadLine
+					It is done according to the following steps:
+						- Choice of reference time (client departure or line run departure at origin)
+						- Calculation 1 : x minutes before reference time :
+						- Decrease of _minDelayMinutes before reference
 
-					- The smallest date time is chosen.
+						- Calculation 2 : x days before reference time :
+						- Decrease of _minDelayDays before reference
+						- Sets hour to _hourDeadLine
 
-				If no explicit rule defines the reservation dead line, 
-				the actual reservation time is returned.
-			*/
-			virtual boost::posix_time::ptime getReservationDeadLine (
-				const boost::posix_time::ptime& originTime,
-				const boost::posix_time::ptime& departureTime
-			) const = 0;
+						- The smallest date time is chosen.
 
-
-			virtual AccessCapacity getAccessCapacity(
-			) const = 0;
-
-
-			/** Reference function for calculation of the date time of the opening of reservations.
-				@param reservationTime Time when booking is done.
-				@return The minimum date time to make a reservation.
-			
-				If no explicit rule defines this minimum time, the actual reservation time is returned.
-			*/
-			virtual boost::posix_time::ptime getReservationOpeningTime ( 
-				const ServicePointer& servicePointer
-			) const = 0;
-			
-			
-			
-			/** Indicates whether or not a path can be taken at a given date, 
-				taking into account reservation delay rules.
-				@param originTime Time of start of the corresponding service
-				@param reservationTime Time of booking, if required.
-				@param departureTime Desired departure time.
-				@return true if the line run can be taken, false otherwise.
-
-				This methods checks the following conditions :
-					- if reservation is not compulsory, the run can be taken.
-					- if reservation is compulsory, reservation time must precede reservation 
-				dead line and be after reservation opening time.
-			*/
-			virtual RunPossibilityType isRunPossible (
-				const ServiceUse& serviceUse
-			) const = 0;
+					If no explicit rule defines the reservation dead line, 
+					the actual reservation time is returned.
+				*/
+				virtual boost::posix_time::ptime getReservationDeadLine (
+					const boost::posix_time::ptime& originTime,
+					const boost::posix_time::ptime& departureTime
+				) const = 0;
 
 
-
-			virtual RunPossibilityType isRunPossible (
-				const ServicePointer& servicePointer
-			) const = 0;
+				virtual AccessCapacity getAccessCapacity(
+				) const = 0;
 
 
-			/** Indicates whether or not a reservation is possible for a given run,
-				at a certain date, taking into account delay rules.
-				@param originTime Time of start of the corresponding service
-				@param reservationTime Time of booking.
-				@param departureTime Desired departure time.
-				@return true if the reservation is possible, false otherwise.
-			 
-				This methods checks the following conditions :
-					- reservation time must precede reservation dead line
-					- reservation time must be later than reservation start time.
-			*/
-			virtual ReservationAvailabilityType getReservationAvailability(
-				const ServiceUse& serviceUse
-			) const = 0;
+				/** Reference function for calculation of the date time of the opening of reservations.
+					@param reservationTime Time when booking is done.
+					@return The minimum date time to make a reservation.
+				
+					If no explicit rule defines this minimum time, the actual reservation time is returned.
+				*/
+				virtual boost::posix_time::ptime getReservationOpeningTime ( 
+					const ServicePointer& servicePointer
+				) const = 0;
+				
+				
+				
+				/** Indicates whether or not a path can be taken at a given date, 
+					taking into account reservation delay rules.
+					@param originTime Time of start of the corresponding service
+					@param reservationTime Time of booking, if required.
+					@param departureTime Desired departure time.
+					@return true if the line run can be taken, false otherwise.
+
+					This methods checks the following conditions :
+						- if reservation is not compulsory, the run can be taken.
+						- if reservation is compulsory, reservation time must precede reservation 
+					dead line and be after reservation opening time.
+				*/
+				virtual RunPossibilityType isRunPossible (
+					const ServiceUse& serviceUse
+				) const = 0;
 
 
-			virtual ReservationAvailabilityType getReservationAvailability(
-				const ServicePointer& servicePointer
-			) const = 0;
+
+				virtual RunPossibilityType isRunPossible (
+					const ServicePointer& servicePointer
+				) const = 0;
 
 
-			virtual bool isCompatibleWith(
-				const AccessParameters& accessParameters
-			) const = 0;
+				/** Indicates whether or not a reservation is possible for a given run,
+					at a certain date, taking into account delay rules.
+					@param originTime Time of start of the corresponding service
+					@param reservationTime Time of booking.
+					@param departureTime Desired departure time.
+					@return true if the reservation is possible, false otherwise.
+				 
+					This methods checks the following conditions :
+						- reservation time must precede reservation dead line
+						- reservation time must be later than reservation start time.
+				*/
+				virtual ReservationAvailabilityType getReservationAvailability(
+					const ServiceUse& serviceUse
+				) const = 0;
 
-			static bool IsReservationPossible(
-				const ReservationAvailabilityType& value
-			);
+
+				virtual ReservationAvailabilityType getReservationAvailability(
+					const ServicePointer& servicePointer
+				) const = 0;
+
+
+				virtual bool isCompatibleWith(
+					const AccessParameters& accessParameters
+				) const = 0;
+
+				static bool IsReservationPossible(
+					const ReservationAvailabilityType& value
+				);
+			//@}
 
 			UseRule();
 			~UseRule();

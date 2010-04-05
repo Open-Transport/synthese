@@ -85,8 +85,24 @@ namespace synthese
 					getPath()->setActive(newDate);
 				}
 			}
-		
 			//environment.updateMinMaxDatesInUse (newDate, marked);
+		}
+
+
+
+		void NonPermanentService::updatePathCalendar()
+		{
+			if(getPath())
+			{
+				Calendar& pathC(*getPath());
+				Calendar copyCalendar(*this);
+				for(int i(getDepartureSchedule(false,0).hours() / 24);
+					i<= getLastArrivalSchedule(false).hours() / 24;
+					++i, copyCalendar <<= 1
+				){
+					pathC |= copyCalendar;
+				}
+			}
 		}
 	}
 }

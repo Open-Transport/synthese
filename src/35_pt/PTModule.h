@@ -81,9 +81,29 @@ namespace synthese
 			public graph::GraphModuleTemplate<PTModule>
 		{
 		public:
+			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > Labels;
+
 			static void RTDataCleaner();
 
-			static std::vector<std::pair<util::RegistryKeyType, std::string> >	getCommercialLineLabels(
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the labels of each PT use rule, including undefined value.
+			/// @return The use rule labels
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			//////////////////////////////////////////////////////////////////////////
+			/// Alphabetical order.
+			static Labels GetPTUseRuleLabels();
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the labels of each PT use rule, including undefined value.
+			/// @return The use rule labels
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			//////////////////////////////////////////////////////////////////////////
+			/// Alphabetical order.
+			static Labels getCommercialLineLabels(
 				const security::RightsOfSameClassMap& rights 
 				, bool totalControl 
 				, security::RightLevel neededLevel 

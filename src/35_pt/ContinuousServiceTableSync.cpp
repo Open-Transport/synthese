@@ -131,8 +131,6 @@ namespace synthese
 			cs->setPathId(pathId);
 			cs->clearRules();
 
-			cs->setFromSerializedString(rows->getText(ContinuousServiceTableSync::COL_DATES));
-
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				Path* path(LineTableSync::GetEditable(pathId, env, linkLevel).get());
@@ -173,6 +171,10 @@ namespace synthese
 
 				path->addService (cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
+
+			// After path linking to update path calendar
+			cs->setFromSerializedString(rows->getText(ContinuousServiceTableSync::COL_DATES));
+			cs->updatePathCalendar();
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Unlink(

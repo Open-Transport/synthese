@@ -24,6 +24,8 @@
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace util
 	{
 		template<> const std::string Registry<pt::TransportNetwork>::KEY("TransportNetwork");
@@ -35,7 +37,7 @@ namespace synthese
 			util::RegistryKeyType id,
 			std::string name
 		):	util::Registrable(id),
-			_name (name)
+			Named(name)
 		{
 		}
 
@@ -43,40 +45,5 @@ namespace synthese
 		TransportNetwork::~TransportNetwork()
 		{
 		}
-
-
-
-		const std::string& 
-		TransportNetwork::getName () const
-		{
-			return _name;
-		}
-
-
-
-		void 
-		TransportNetwork::setName( const std::string& name)
-		{
-			_name = name;
-		}
-
-
-
-		const std::string& 
-		TransportNetwork::getCreatorId() const
-		{
-			return _creatorId;
-		}
-
-
-
-		void 
-		TransportNetwork::setCreatorId( const std::string& name)
-		{
-			_creatorId = name;
-		}
-
-
-
 	}
 }

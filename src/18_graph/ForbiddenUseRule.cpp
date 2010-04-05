@@ -66,5 +66,12 @@ namespace synthese
 		{
 			return false;
 		}
+
+
+
+		std::string ForbiddenUseRule::getUseRuleName() const
+		{
+			return "Accès interdit";
+		}
 	}
 }

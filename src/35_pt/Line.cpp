@@ -51,7 +51,7 @@ namespace synthese
 		):	util::Registrable(id)
 			, Path(),
 			Importable(),
-			_name (name)
+			Named(name)
 			, _isWalkingLine (false)
 			, _useInDepartureBoards (true)
 			, _useInTimetables (true)
@@ -67,18 +67,6 @@ namespace synthese
 				delete *it;
 		}
 
-
-
-		const std::string& Line::getName() const
-		{
-			return _name;
-		}
-
-
-		void Line::setName (const std::string& name)
-		{
-			_name = name;
-		}
 
 
 

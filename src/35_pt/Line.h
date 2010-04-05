@@ -31,6 +31,7 @@
 #include "Path.h"
 #include "Importable.h"
 #include "Registry.h"
+#include "Named.h"
 
 namespace synthese
 {
@@ -73,9 +74,10 @@ namespace synthese
 
 			If a service is responsible of a break of the preceding rules, then the line is copied as a SubLine, and the service is linked to the new line. The _sublines container keeps a pointer on each SubLine.
 		*/
-		class Line
-		:	public graph::Path,
-			public impex::Importable
+		class Line:
+			public graph::Path,
+			public impex::Importable,
+			public util::Named
 		{
 		public:
 
@@ -85,7 +87,6 @@ namespace synthese
 			typedef std::vector<pt::SubLine*> SubLines;
 
 		private:
-			std::string _name;			//!< Name (code)
 			std::string _timetableName; //!< Name for timetable
 			std::string _direction;		//!< Direction (shown on vehicles)
 
@@ -112,7 +113,6 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const std::string&		getName ()					const;
 				bool					getUseInDepartureBoards ()	const;
 				bool					getUseInTimetables ()		const;
 				bool					getUseInRoutePlanning ()	const;
@@ -129,7 +129,6 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setUseInDepartureBoards (bool useInDepartureBoards);
-				void setName (const std::string& name);
 				void setWalkingLine (bool isWalkingLine);
 				void setRollingStock(pt::RollingStock*);
 				void setTimetableName (const std::string& timetableName);
@@ -170,8 +169,10 @@ namespace synthese
 				);
 			//@}
 		    
-			//! @name Query methods
+			//! @name Services
 			//@{
+				virtual std::string getRuleUserName() const { return "Mission " + getName(); }
+
 				bool isPedestrianMode() const;
 
 				bool isReservable () const;

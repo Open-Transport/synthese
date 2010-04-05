@@ -30,6 +30,7 @@
 #include "RGBColor.h"
 #include "GraphTypes.h"
 #include "Calendar.h"
+#include "Named.h"
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/optional.hpp>
@@ -64,8 +65,9 @@ namespace synthese
 
 			The commercial line handles the denomination of the group of routes.
 		*/
-		class CommercialLine
-		:	public graph::PathGroup
+		class CommercialLine:
+			public graph::PathGroup,
+			public util::Named
 		{
 		public:
 
@@ -77,7 +79,6 @@ namespace synthese
 			typedef std::set<const pt::NonConcurrencyRule*> NonConcurrencyRules;
 
 		private:
-			std::string			_name;		//!< Name (code)
 			std::string			_shortName;	//!< Name (cartouche)
 			std::string			_longName;	//!< Name for schedule card
 
@@ -113,7 +114,6 @@ namespace synthese
 				const std::string& getLongName () const { return _longName; }
 				const std::string& getImage () const { return _image; }
 				const boost::optional<util::RGBColor>& getColor () const { return _color; }
-				const std::string& getName () const { return _name; }
 				const pt::ReservationContact* getReservationContact() const { return _reservationContact; }
 				const std::string& getCreatorId() const { return _creatorId; }
 				const PlacesSet& getOptionalReservationPlaces() const { return _optionalReservationPlaces; }
@@ -130,7 +130,6 @@ namespace synthese
 				void setLongName (const std::string& longName) { _longName = longName; }
 				void setImage (const std::string& image) { _image = image; }
 				void setColor (const boost::optional<util::RGBColor>& color) { _color = color; }
-				void setName (const std::string& name) { _name = name; }
 				void setReservationContact(const pt::ReservationContact* value) { _reservationContact = value; }
 				void setCreatorId(const std::string& value) { _creatorId = value; }
 				void setCalendarTemplate(calendar::CalendarTemplate* value) { _calendarTemplate = value;}
@@ -140,6 +139,8 @@ namespace synthese
 
 			//! @name Services
 			//@{
+				virtual std::string getRuleUserName() const { return "Ligne " + getName(); }
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Tests if a place belongs to the list of optional reservation places of the line.
 				/// @param place place to search

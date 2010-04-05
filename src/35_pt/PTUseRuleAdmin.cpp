@@ -156,35 +156,5 @@ namespace synthese
 			links.push_back(getNewOtherPage<PTUseRulesAdmin>());
 			return links;
 		}
-
-
-/*		void PTUseRuleAdmin::DisplayPTRuleUserAdmin(
-			std::ostream& stream,
-			const graph::RuleUser& object
-		){
-			stream << "<h1>Résultat</h1>";
-
-			HTMLTable::ColsVector c;
-			c.push_back("Piétons");
-			c.push_back("Handicapés");
-			c.push_back("Vélos");
-
-			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
-			stream << t.open();
-			stream << t.row();
-			stream << t.col(string(), true) << "Hérité de";
-			stream << t.col();
-			stream << t.col();
-			stream << t.col();
-
-			stream << t.row();
-			stream << t.col(string(), true) << "Valeur";
-
-			stream << t.row();
-			stream << t.col(string(), true) << "Spécifique";
-			stream << t.close();
-
-//			AdminActionFunctionRequest<RuleUserUpdateAction,T>
-		}
-*/	}
+	}
 }

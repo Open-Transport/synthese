@@ -24,6 +24,7 @@
 #include "JunctionStop.hpp"
 #include "PermanentService.h"
 #include "PhysicalStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
 
 using namespace boost;
 using namespace boost::posix_time;
@@ -172,6 +173,13 @@ namespace synthese
 		bool Junction::isRoad() const
 		{
 			return true;
+		}
+
+
+
+		std::string Junction::getRuleUserName() const
+		{
+			return "Jonction " + getStart()->getConnectionPlace()->getFullName() + " -> " + getEnd()->getConnectionPlace()->getFullName();
 		}
 	}
 }

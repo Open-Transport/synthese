@@ -25,8 +25,7 @@
 
 #include "Registrable.h"
 #include "Registry.h"
-
-#include <string>
+#include "Named.h"
 
 namespace synthese
 {
@@ -37,15 +36,15 @@ namespace synthese
 		/// TRIDENT OK
 		///	@ingroup m35
 		//////////////////////////////////////////////////////////////////////////
-		class TransportNetwork
-		:	public util::Registrable
+		class TransportNetwork:
+			public util::Registrable,
+			public util::Named
 		{
 		public:
 			/// Chosen registry class.
 			typedef util::Registry<TransportNetwork>	Registry;
 
 		protected:
-			std::string _name;
 			std::string _creatorId;
 
 		 public:
@@ -56,13 +55,19 @@ namespace synthese
 			);
 			~TransportNetwork ();
 
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
-				const std::string& getName () const;
-				const std::string& getCreatorId() const;
+				const std::string& getCreatorId() const { return _creatorId; }
+			//@}
 				
-				void setName( const std::string& name);
-				void setCreatorId( const std::string& value);
+			//! @name Setters
+			//@{
+				void setCreatorId( const std::string& value) { _creatorId = value; }
+			//@}
+
+			//! @name Services
+			//@{
+				virtual std::string getRuleUserName() const { return "Réseau " + getName(); }
 			//@}
 		};
 	}

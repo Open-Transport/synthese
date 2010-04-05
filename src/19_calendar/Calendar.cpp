@@ -354,5 +354,16 @@ namespace synthese
 				)	);
 			}
 		}
+
+
+
+		Calendar& Calendar::operator<<=( size_t i )
+		{
+			BOOST_FOREACH(_BitSets::value_type& yearDates, _markedDates)
+			{
+				yearDates.second <<= i;
+			}
+			return *this;
+		}
 	}
 }

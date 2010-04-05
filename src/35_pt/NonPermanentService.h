@@ -73,6 +73,8 @@ namespace synthese
 			 * @param date the date to unmark 
 			 */
 			virtual void setInactive(const boost::gregorian::date& d);
+
+			void updatePathCalendar();
 		};
 	}
 }

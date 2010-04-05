@@ -54,6 +54,7 @@
 #include "PhysicalStopTableSync.h"
 #include "12_security/Constants.h"
 #include "Right.h"
+#include "PTUseRuleTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -132,7 +133,7 @@ namespace synthese
 
 
 
-		std::vector<pair<RegistryKeyType, std::string> > PTModule::getCommercialLineLabels(
+		PTModule::Labels PTModule::getCommercialLineLabels(
 			const security::RightsOfSameClassMap& rights 
 			, bool totalControl 
 			, RightLevel neededLevel
@@ -142,9 +143,8 @@ namespace synthese
 			if (withAll)
 			m.push_back(make_pair(UNKNOWN_VALUE, "(toutes)"));
 
-			Env env;
 			CommercialLineTableSync::SearchResult lines(
-				CommercialLineTableSync::Search(env, rights, totalControl, neededLevel)
+				CommercialLineTableSync::Search(Env::GetOfficialEnv(), rights, totalControl, neededLevel)
 			);
 			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 				m.push_back(make_pair(line->getKey(), line->getShortName()));
@@ -237,6 +237,22 @@ namespace synthese
 				}
 */			}
 			return maxAlarmLevel;
+		}
+
+
+
+		PTModule::Labels PTModule::GetPTUseRuleLabels()
+		{
+			Labels result;
+			result.push_back(make_pair(RegistryKeyType(0), "(non défini)"));
+
+			PTUseRuleTableSync::SearchResult rules(PTUseRuleTableSync::Search(Env::GetOfficialEnv()));
+			BOOST_FOREACH(const PTUseRuleTableSync::SearchResult::value_type& element, rules)
+			{
+				result.push_back(make_pair(element->getKey(), element->getName()));
+			}
+
+			return result;
 		}
 
 	}

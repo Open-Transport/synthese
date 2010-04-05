@@ -123,6 +123,7 @@ namespace synthese
 
 				size_t size() const;
 
+				Calendar& operator<<= (std::size_t i);
 				Calendar& operator&= (const Calendar& op);
 				Calendar& operator|= (const Calendar& op);
 				Calendar operator& (const Calendar& op2) const;
