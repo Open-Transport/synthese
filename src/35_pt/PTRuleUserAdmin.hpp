@@ -64,7 +64,7 @@ namespace synthese
 			stream << "<h1>Conditions d'utilisation par profil</h1>";
 
 			html::HTMLTable::ColsVector c;
-			c.push_back(string());
+			c.push_back(std::string());
 			c.push_back("Piétons");
 			c.push_back("Handicapés");
 			c.push_back("Vélos");
@@ -95,9 +95,9 @@ namespace synthese
 
 			stream << t.row();
 			stream << t.col(1, std::string(), true) << object->getRuleUserName();
-			stream << t.col() << f.getSelectInput(RuleUserUpdateAction::PARAMETER_VALUE_PREFIX + CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE, PTModule::GetPTUseRuleLabels(), dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_PEDESTRIAN)) ? dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_PEDESTRIAN))->getKey() : RegistryKeyType(0));
-			stream << t.col() << f.getSelectInput(RuleUserUpdateAction::PARAMETER_VALUE_PREFIX + CommercialLineTableSync::COL_HANDICAPPED_USE_RULE, PTModule::GetPTUseRuleLabels(), dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_HANDICAPPED)) ? dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_HANDICAPPED))->getKey() : RegistryKeyType(0));
-			stream << t.col() << f.getSelectInput(RuleUserUpdateAction::PARAMETER_VALUE_PREFIX + CommercialLineTableSync::COL_BIKE_USE_RULE, PTModule::GetPTUseRuleLabels(), dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_BIKE)) ? dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_BIKE))->getKey() : RegistryKeyType(0));
+			stream << t.col() << f.getSelectInput(graph::RuleUserUpdateAction::PARAMETER_VALUE_PREFIX + CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE, PTModule::GetPTUseRuleLabels(), dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_PEDESTRIAN)) ? dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_PEDESTRIAN))->getKey() : util::RegistryKeyType(0));
+			stream << t.col() << f.getSelectInput(graph::RuleUserUpdateAction::PARAMETER_VALUE_PREFIX + CommercialLineTableSync::COL_HANDICAPPED_USE_RULE, PTModule::GetPTUseRuleLabels(), dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_HANDICAPPED)) ? dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_HANDICAPPED))->getKey() : util::RegistryKeyType(0));
+			stream << t.col() << f.getSelectInput(graph::RuleUserUpdateAction::PARAMETER_VALUE_PREFIX + CommercialLineTableSync::COL_BIKE_USE_RULE, PTModule::GetPTUseRuleLabels(), dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_BIKE)) ? dynamic_cast<const PTUseRule*>(object->getRule(graph::USER_BIKE))->getKey() : util::RegistryKeyType(0));
 
 			stream << t.row();
 			stream << t.col(4, std::string(), true) << f.getSubmitButton("Enregistrer les modifications");

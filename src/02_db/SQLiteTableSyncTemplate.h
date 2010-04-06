@@ -191,7 +191,7 @@ namespace synthese
 							if (maxid > 0)
 							{
 								_autoIncrementValue = util::decodeObjectId(maxid) + 1;
-								util::Log::GetInstance().debug("Auto-increment of table "+ K::TABLE.NAME +" initialized at "+ boost::lexical_cast<string>(_autoIncrementValue));
+								util::Log::GetInstance().debug("Auto-increment of table "+ K::TABLE.NAME +" initialized at "+ boost::lexical_cast<std::string>(_autoIncrementValue));
 							}
 						}
 
