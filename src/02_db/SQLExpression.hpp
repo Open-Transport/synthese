@@ -89,7 +89,7 @@ namespace synthese
 		{
 			const std::string _value;
 		public:
-			ValueExpression(const T& value) : _value(boost::lexical_cast<string>(value)) {}
+			ValueExpression(const T& value) : _value(boost::lexical_cast<std::string>(value)) {}
 			virtual std::string toString() const { return _value; }
 		};
 
@@ -101,10 +101,10 @@ namespace synthese
 		{
 			std::string _value;
 		public:
-			ValueExpression(const T& value) {
+			ValueExpression(const std::set<T>& value) {
 				std::stringstream s;
 				bool first(true);
-				BOOST_FOREACH(const std::set<T>::value_type& o, value)
+				BOOST_FOREACH(const typename std::set<T>::value_type& o, value)
 				{
 					if(!first) s << ",";
 					s << o;
@@ -122,10 +122,10 @@ namespace synthese
 		{
 			std::string _value;
 		public:
-			ValueExpression(const T& value) {
+			ValueExpression(const std::vector<T>& value) {
 				std::stringstream s;
 				bool first(true);
-				BOOST_FOREACH(const std::vector<T>::value_type& o, value)
+				BOOST_FOREACH(const typename std::vector<T>::value_type& o, value)
 				{
 					if(!first) s << ",";
 					s << o;

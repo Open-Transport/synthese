@@ -1,4 +1,3 @@
-
 /** CheckLineCalendarFunction class implementation.
 	@file CheckLineCalendarFunction.cpp
 	@author Hugues Romain
@@ -55,7 +54,7 @@ namespace synthese
 			if(_line.get())
 			{
 				map.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
-				map.insert(PARAMETER_DURATION, _duration.days());
+				map.insert(PARAMETER_DURATION, static_cast<int>(_duration.days()));
 			}
 			return map;
 		}

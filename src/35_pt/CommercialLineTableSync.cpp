@@ -195,9 +195,10 @@ namespace synthese
 				// Parse all optional reservation places separated by ,
 				std::vector<std::string> stops;
 				CommercialLine::PlacesSet placesWithOptionalReservation;
+				string colORP(rows->getText(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES));
 				boost::split(
 					stops,
-					rows->getText(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES),
+					colORP,
 					boost::is_any_of(",")
 				);
 				BOOST_FOREACH(const string& stop, stops)

@@ -99,7 +99,7 @@ namespace synthese
 			{
 				std::stringstream s;
 				bool first(true);
-				BOOST_FOREACH(const std::set<T>::value_type& o, value)
+				BOOST_FOREACH(const typename std::set<T>::value_type& o, value)
 				{
 					if(!first) s << ",";
 					s << o;

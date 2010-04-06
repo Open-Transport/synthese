@@ -8,7 +8,7 @@ if s3env.GetPlatform () == 'posix':
 #s3env.Append ( CPPDEFINES = ['BOOST_ALL_NO_LIB'] )
 s3env.Append (CPPPATH = [Dir ('src').abspath])
 
-s3env.Append (S3VERSION = '3.1.16j')
+s3env.Append (S3VERSION = '3.1.16q')
 s3env.Append(BOOSTVERSION = '1.39')
 
 Export ('s3env')

@@ -29,9 +29,11 @@
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/shared_ptr.hpp>
 #include <vector>
 #include <utility>
 #include <sstream>
+#include <string>
 
 namespace synthese
 {
@@ -105,7 +107,7 @@ namespace synthese
 		{
 			_fields.push_back(
 				std::make_pair(
-					boost::shared_ptr<SQLExpression>(new FieldExpression(Table.NAME, field)),
+					boost::shared_ptr<SQLExpression>(new FieldExpression(Table::NAME, field)),
 					alias
 			)	);
 		}
@@ -130,11 +132,11 @@ namespace synthese
 		{
 			JoinedTable t;
 			t.alias = alias;
-			t.table = Table2.TABLE.NAME;
+			t.table = Table2::TABLE.NAME;
 			t.on.reset(new ComposedExpression(
-					boost::shared_ptr<SQLExpression>(new FieldExpression(Table1.TABLE.NAME, field1)),
+					boost::shared_ptr<SQLExpression>(new FieldExpression(Table1::TABLE.NAME, field1)),
 					ComposedExpression::OP_EQ,
-					boost::shared_ptr<SQLExpression>(new FieldExpression(alias.empty() ? Table2.TABLE.NAME : alias, field2))
+					boost::shared_ptr<SQLExpression>(new FieldExpression(alias.empty() ? Table2::TABLE.NAME : alias, field2))
 			)	);
 			_tables.push_back(t);
 		}
@@ -145,11 +147,11 @@ namespace synthese
 		{
 			JoinedTable t;
 			t.alias = alias2;
-			t.table = Table2.TABLE.NAME;
+			t.table = Table2::TABLE.NAME;
 			t.on.reset(new ComposedExpression(
 					boost::shared_ptr<SQLExpression>(new FieldExpression(table1, field1)),
 					ComposedExpression::OP_EQ,
-					boost::shared_ptr<SQLExpression>(new FieldExpression(alias2.empty() ? Table2.TABLE.NAME : alias2, field2))
+					boost::shared_ptr<SQLExpression>(new FieldExpression(alias2.empty() ? Table2::TABLE.NAME : alias2, field2))
 			) );
 			_tables.push_back(t);
 		}
@@ -159,7 +161,7 @@ namespace synthese
 		template<class Table>
 		void SelectQuery<Table>::addOrderField( const std::string field, bool raisingOrder )
 		{
-			_orders.push_back(std::make_pair(boost::shared_ptr<SQLExpression>(new FieldExpression(Table.TABLE.NAME, field)), raisingOrder));
+			_orders.push_back(std::make_pair(boost::shared_ptr<SQLExpression>(new FieldExpression(Table::TABLE.NAME, field)), raisingOrder));
 		}
 
 
@@ -170,7 +172,7 @@ namespace synthese
 			_wheres.push_back(
 				boost::shared_ptr<SQLExpression>(
 					new ComposedExpression(
-						boost::shared_ptr<SQLExpression>(new FieldExpression(Table.TABLE.NAME, field)),
+						boost::shared_ptr<SQLExpression>(new FieldExpression(Table::TABLE.NAME, field)),
 						op,
 						boost::shared_ptr<SQLExpression>(new ValueExpression<T>(value))
 			)	)	);
@@ -183,11 +185,11 @@ namespace synthese
 		{
 			_wheres.push_back(
 				boost::shared_ptr<SQLExpression>(
-				new ComposedExpression(
-				boost::shared_ptr<SQLExpression>(new FieldExpression(table, field)),
-				op,
-				boost::shared_ptr<SQLExpression>(new ValueExpression<T>(value))
-				)	)	);
+					new ComposedExpression(
+						boost::shared_ptr<SQLExpression>(new FieldExpression(table, field)),
+						op,
+						boost::shared_ptr<SQLExpression>(new ValueExpression<T>(value))
+			)	)	);
 		}
 
 
@@ -221,8 +223,8 @@ namespace synthese
 			}
 
 			// Tables
-			s << " FROM " << Table.TABLE.NAME;
-			BOOST_FOREACH(const TablesType::value_type& table, _tables)
+			s << " FROM " << Table::TABLE.NAME;
+			BOOST_FOREACH(const typename TablesType::value_type& table, _tables)
 			{
 				s << " INNER JOIN " << table.table;
 				if(!table.alias.empty())

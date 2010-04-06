@@ -78,9 +78,9 @@ namespace synthese
 				map.insert(PARAMETER_TYPE, static_cast<int>(_type));
 				if(_maxDelayDays)
 				{
-					map.insert(PARAMETER_MAX_DELAY_DAYS, _maxDelayDays->days());
+					map.insert(PARAMETER_MAX_DELAY_DAYS, static_cast<int>(_maxDelayDays->days()));
 				}
-				map.insert(PARAMETER_MIN_DELAY_DAYS, _minDelayDays.days());
+				map.insert(PARAMETER_MIN_DELAY_DAYS, static_cast<int>(_minDelayDays.days()));
 				map.insert(PARAMETER_MIN_DELAY_MINUTES, _minDelayMinutes.total_seconds() / 60);
 				if(!_hourDeadLine.is_not_a_date_time())
 				{

@@ -132,7 +132,7 @@ namespace synthese
 			query.addField(object->getAccessCapacity() ? lexical_cast<string>(*object->getAccessCapacity()) : string());
 			query.addField(static_cast<int>(object->getReservationType()));
 			query.addField(object->getMinDelayMinutes().total_seconds() / 60);
-			query.addField(object->getMinDelayDays().days());
+			query.addField(static_cast<int>(object->getMinDelayDays().days()));
 			query.addField(object->getMaxDelayDays() ? lexical_cast<string>(object->getMaxDelayDays()->days()) : string());
 			query.addField(object->getHourDeadLine().is_not_a_date_time() ? string() : to_simple_string(object->getHourDeadLine()));
 			query.addField(object->getDefaultFare() ? object->getDefaultFare()->getKey() : RegistryKeyType(0));
