@@ -77,7 +77,6 @@ namespace synthese
 			ServedVertices	_RTVertices;	//!< Real time edges
 
 			virtual void _computeNextRTUpdate() = 0;
-			virtual const RuleUser* _getParentRuleUser() const;
 
 		public:
 
@@ -110,8 +109,10 @@ namespace synthese
 
 
 
-			//! @name Query methods
+			//! @name Services
 			//@{
+				virtual const RuleUser* _getParentRuleUser() const;
+
 				virtual std::string getRuleUserName() const { return "Service " + getServiceNumber(); }
 
 				virtual bool isContinuous () const = 0;

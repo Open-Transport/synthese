@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// ServiceUpdateAction class header.
-///	@file ServiceUpdateAction.h
+/// RuleUserUpdateAction class header.
+///	@file RuleUserUpdateAction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///
@@ -22,42 +22,53 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_ServiceUpdateAction_H__
-#define SYNTHESE_ServiceUpdateAction_H__
+#ifndef SYNTHESE_RuleUserUpdateAction_H__
+#define SYNTHESE_RuleUserUpdateAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "RuleUser.h"
 
 namespace synthese
 {
-	namespace graph
+	namespace db
 	{
-		class Service;
+		class SQLiteTableSync;
 	}
 
-	namespace pt
+	namespace graph
 	{
+		class RuleUser;
+
 		//////////////////////////////////////////////////////////////////////////
-		/// 35.15 Action : Service properties update.
-		/// @ingroup m35Actions refActions
+		/// 18.15 Action : Generic rule user update.
+		/// @ingroup m18Actions refActions
 		///	@author Hugues Romain
-		///	@date 2010
+		/// @date 2010
 		/// @since 3.1.16
+		/// @todo activate right control
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : ServiceUpdateAction
+		/// Key : RuleUserUpdateAction
 		///
-		/// Parameters :
+		///	Parameters
 		///	<ul>
-		///		<li>actionParamid : id of the service to update</li>
-		///	</ul>
-		class ServiceUpdateAction:
-			public util::FactorableTemplate<server::Action, ServiceUpdateAction>
+		///		<li>actionParamid : id of the object to update</li>
+		///		<li>actionParamvaxx : value for xx field (if 0, undefined)</li> 
+		///</ul>
+		class RuleUserUpdateAction:
+			public util::FactorableTemplate<server::Action, RuleUserUpdateAction>
 		{
 		public:
 			static const std::string PARAMETER_OBJECT_ID;
+			static const std::string PARAMETER_VALUE_PREFIX;
+
+			typedef std::map<std::string, util::RegistryKeyType> Values;
 
 		private:
-			boost::shared_ptr<graph::Service> _service;
+			boost::shared_ptr<db::SQLiteTableSync> _tableSync;
+			util::RegistryKeyType _id;
+			Values _values;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -91,10 +102,10 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setService(boost::shared_ptr<graph::Service> value) { _service = value; }
+				void setId(util::RegistryKeyType value) { _id = value; }
 			//@}
 		};
 	}
 }
 
-#endif // SYNTHESE_ServiceUpdateAction_H__
+#endif // SYNTHESE_RuleUserUpdateAction_H__

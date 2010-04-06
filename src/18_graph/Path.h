@@ -90,8 +90,6 @@ namespace synthese
 			*/
 			Path();
 			
-			virtual const RuleUser* _getParentRuleUser() const;
-			
 		public:
 
 			virtual ~Path ();
@@ -99,14 +97,20 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const ServiceSet&	getServices()	const;
-				const Edges&		getEdges()		const;
-				bool				getAllDays()	const;
+				const ServiceSet&	getServices()	const { return _services; }
+				const Edges&		getEdges()		const { return _edges; }
+				bool				getAllDays()	const { return _allDays; }
 				PathClass*			getPathClass()	const { return _pathClass; }
+			//@}
+
+			//! @name Setters
+			//@{
+				void setAllDays(bool value) { _allDays = value; }
 			//@}
 
 			//! @name Services.
 			//@{
+				virtual const RuleUser* _getParentRuleUser() const;
 
 				const Edge*					getEdge (int index) const;
 
@@ -199,7 +203,7 @@ namespace synthese
 
 				void removeService (Service* service);
 
-				void setAllDays(bool value);
+
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Merges two paths.

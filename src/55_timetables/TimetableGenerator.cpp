@@ -227,13 +227,14 @@ namespace synthese
 
 				for (++itRow; itRow != _rows.end(); ++itRow)
 				{
-					if(	(	itRow->getIsArrival() &&
-							(	passageOk ||
-								itRow->getCompulsory() == TimetableRow::PassageSuffisant
-						)	) ||
-						(	itRow->getIsDeparture() &&
-							itRow->getIsArrival()
-						)
+					if(	itRow->getIsArrival()
+// 					if(	(	itRow->getIsArrival() &&
+// 							(	passageOk ||
+// 								itRow->getCompulsory() == TimetableRow::PassageSuffisant
+// 						)	) ||
+// 						(	itRow->getIsDeparture() &&
+// 							itRow->getIsArrival()
+// 						)
 					){
 						for(const Edge* arrivalLinestop(departureLinestop->getFollowingArrivalForFineSteppingOnly());
 							arrivalLinestop != NULL;

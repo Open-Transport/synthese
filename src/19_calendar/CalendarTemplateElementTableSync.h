@@ -38,9 +38,14 @@ namespace synthese
 	{
 		class CalendarTemplateElement;
 
-		/** CalendarTemplateElement table synchronizer.
-			@ingroup m19LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 19.10 Table : Calendar template element.
+		/// @ingroup m19LS refLS
+		/// @author Hugues Romain
+		/// @date 2008
+		//////////////////////////////////////////////////////////////////////////
+		/// Object : CalendarTemplateElement
+		/// See also : CalendarTemplateTableSync
 		class CalendarTemplateElementTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>
 		{

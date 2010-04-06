@@ -39,9 +39,29 @@ namespace synthese
 	{
 		class CalendarTemplate;
 
-		/** CalendarTemplateElementAddAction action class.
-			@ingroup m19Actions refActions
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 19.15 Action : Adds an element to an existing calendar template.
+		/// @ingroup m19Actions refActions
+		/// @author Hugues Romain
+		/// @date 2010
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : CalendarTemplateElementAddAction
+		///
+		/// Parameters :
+		///	<ul>
+		///		<li>actionParamci : id of the calendar which will belong the element</li>
+		///		<li>actionParamrk : rank where insert the element in the calendar elements list</li>
+		///		<li>actionParamnd : first day to iterate on</li>
+		///		<li>actionParamxd : last day to iterate on</li>
+		///		<li>actionParamin : step between days when iterating to the first to the last day</li>
+		///		<li>actionParampo : operation to do on each iterated day : </li>
+		///		<ul>
+		///			<li>+ : adds the day</li>
+		///			<li>- : removes the day</li>
+		///			<li>* : and operator</li>
+		///		</ul>
+		///		<li>actionParamii : id of a calendar to read when iterating : if the day is not checked in the included calendar then the iteration is skipped (0 = no inclusion)</li>
+		///	</ul>
 		class CalendarTemplateElementAddAction
 			: public util::FactorableTemplate<server::Action, CalendarTemplateElementAddAction>
 		{

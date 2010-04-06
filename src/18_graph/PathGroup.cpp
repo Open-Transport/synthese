@@ -62,12 +62,5 @@ namespace synthese
 
 			_paths.erase(it);
 		}
-
-
-
-		const PathGroup::Paths& PathGroup::getPaths() const
-		{
-			return _paths;
-		}
 	}
 }

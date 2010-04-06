@@ -103,11 +103,11 @@ namespace synthese
 			}
 			if(!map.getDefault<string>(PARAMETER_RESULT_START).empty())
 			{
-				_resultStartDate = from_string(get<string>(PARAMETER_RESULT_START));
+				_resultStartDate = from_string(map.get<string>(PARAMETER_RESULT_START));
 			}
 			if(!map.getDefault<string>(PARAMETER_RESULT_END).empty())
 			{
-				_resultEndDate = from_string(get<string>(PARAMETER_RESULT_END));
+				_resultEndDate = from_string(map.get<string>(PARAMETER_RESULT_END));
 			}
 		}
 		
@@ -157,7 +157,7 @@ namespace synthese
 				
 				// Display
 				CalendarTemplateElementTableSync::SearchResult elements(
-					CalendarTemplateElementTableSync::Search(_getEnv(), _calendar->getKey())
+					CalendarTemplateElementTableSync::Search(Env::GetOfficialEnv(), _calendar->getKey());
 				);
 				
 				HTMLForm f(addRequest.getHTMLForm("add"));

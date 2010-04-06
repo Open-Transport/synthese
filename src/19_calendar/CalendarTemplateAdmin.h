@@ -36,11 +36,20 @@ namespace synthese
 	{
 		class CalendarTemplate;
 
-		/** CalendarTemplateAdmin Class.
-			@ingroup m19Admin refAdmin
-			@author Hugues Romain
-			@date 2008
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 19.14 Admin : Calendar template editor.
+		/// @ingroup m19Admin refAdmin
+		///	@author Hugues Romain
+		///	@date 2008
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : CalendarTemplateAdmin
+		///
+		/// Parameters :
+		///	<ul>
+		///		<li>roid : calendar template to edit</li>
+		///		<li>prs : start of calendar result check</li>
+		///		<li>pre : end of calendar result check</li>
+		///	</ul>
 		class CalendarTemplateAdmin:
 			public admin::AdminInterfaceElementTemplate<CalendarTemplateAdmin>
 		{

@@ -35,14 +35,11 @@
 #include "UtilTypes.h"
 #include "Log.h"
 
-#include <limits>
 #include <sstream>
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
-
-#undef max
 
 namespace synthese
 {
@@ -183,7 +180,7 @@ namespace synthese
 							<< "SELECT " << 0x00000000FFFFFFFFLL
 							<< " & " << TABLE_COL_ID << " AS maxid FROM " << K::TABLE.NAME
 							<< " WHERE " << TABLE_COL_ID << ">=" << encodeUId(0) << " AND "
-							<< TABLE_COL_ID << "<=" << encodeUId(std::numeric_limits<long>::max()) <<
+							<< TABLE_COL_ID << "<=" << encodeUId(0xFFFFFFFF) <<
 							" ORDER BY " << TABLE_COL_ID << " DESC LIMIT 1"
 						;
 
@@ -191,7 +188,11 @@ namespace synthese
 						if (result->next ())
 						{
 							util::RegistryKeyType maxid = result->getLongLong("maxid");
-							if (maxid > 0) _autoIncrementValue = util::decodeObjectId(maxid) + 1;
+							if (maxid > 0)
+							{
+								_autoIncrementValue = util::decodeObjectId(maxid) + 1;
+								util::Log::GetInstance().debug("Auto-increment of table "+ K::TABLE.NAME +" initialized at "+ boost::lexical_cast<string>(_autoIncrementValue));
+							}
 						}
 
 					}

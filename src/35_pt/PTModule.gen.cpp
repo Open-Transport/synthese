@@ -12,10 +12,10 @@ synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex
 synthese::pt::JunctionTableSync::integrate();
 synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::ContinuousServiceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::SchedulesBasedService>, synthese::pt::ContinuousServiceTableSync>::integrate();
-synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::NonPermanentService>, synthese::pt::ContinuousServiceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Service>, synthese::pt::ContinuousServiceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::ScheduledServiceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::SchedulesBasedService>, synthese::pt::ScheduledServiceTableSync>::integrate();
-synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::NonPermanentService>, synthese::pt::ScheduledServiceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Service>, synthese::pt::ScheduledServiceTableSync>::integrate();
 synthese::pt::FareTableSync::integrate();
 synthese::pt::RollingStockTableSync::integrate();
 synthese::pt::NonConcurrencyRuleTableSync::integrate();

@@ -62,13 +62,6 @@ namespace synthese
 
 
 
-		const ServiceSet& Path::getServices(
-		) const {
-			return _services;
-		}
-
-
-
 		const RuleUser* Path::_getParentRuleUser() const
 		{
 			return _pathGroup;
@@ -128,16 +121,6 @@ namespace synthese
 		{
 			return _edges[index];
 		}
-
-
-
-
-		const std::vector<Edge*>& 
-		Path::getEdges() const
-		{
-			return _edges;
-		}
-
 
 
 
@@ -330,18 +313,6 @@ namespace synthese
 		    (*it)->markServiceIndexUpdateNeeded (false);
 	    }
 
-		void Path::setAllDays( bool value )
-		{
-			_allDays = value;
-		}
-
-
-
-		bool Path::getAllDays() const
-		{
-			return _allDays;
-		}
-
 
 
 		void Path::merge(Path& other )
@@ -453,8 +424,8 @@ namespace synthese
 					(
 						(considerVertices && edge->getFromVertex() != (*edgeIt)->getFromVertex()) ||
 						edge->getFromVertex()->getHub() != (*edgeIt)->getFromVertex()->getHub() ||
-						edge->isArrival() != (*edgeIt)->isArrival() ||
-						edge->isDeparture() != (*edgeIt)->isDeparture()
+						edge->isArrival() && !(*edgeIt)->isArrival() ||
+						edge->isDeparture() && !(*edgeIt)->isDeparture()
 					);
 					++edgeIt) ;
 				if(edgeIt == _edges.end())

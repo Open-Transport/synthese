@@ -51,17 +51,28 @@ namespace synthese
 		protected:
 			Paths _paths;
 
-			virtual const RuleUser* _getParentRuleUser() const;
 
 			PathGroup(
 				util::RegistryKeyType id = UNKNOWN_VALUE
 			);
 
 		public:
-			void addPath(Path* path);
-			void removePath(Path* path);
+			//! @name Getters
+			//@{
+				const Paths& getPaths() const { return _paths; }
+			//@}
 
-			const Paths& getPaths() const;
+
+			//! @name Modifiers
+			//@{
+				void addPath(Path* path);
+				void removePath(Path* path);
+			//@}
+
+			//! @name Services
+			//@{
+				virtual const RuleUser* _getParentRuleUser() const;
+			//@}
 		};
 	}
 }

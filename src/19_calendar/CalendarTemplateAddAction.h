@@ -32,9 +32,18 @@ namespace synthese
 {
 	namespace calendar
 	{
-		/** CalendarTemplateAddAction action class.
-			@ingroup m19Actions refActions
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 19.15 Action : Creation of a calendar template.
+		/// @ingroup m19Actions refActions
+		/// @author Hugues Romain
+		/// @date 2008
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : CalendarTemplateAddAction
+		///
+		/// Parameters :
+		///	<ul>
+		///		<li>actionParamtx : Text of the calendar</li>
+		///	</ul>
 		class CalendarTemplateAddAction
 			: public util::FactorableTemplate<server::Action, CalendarTemplateAddAction>
 		{

@@ -47,6 +47,7 @@
 #include "AdminFunctionRequest.hpp"
 #include "ContinuousServiceUpdateAction.h"
 #include "PropertiesHTMLTable.h"
+#include "PTRuleUserAdmin.hpp"
 
 using namespace std;
 using namespace boost;
@@ -286,7 +287,11 @@ namespace synthese
 			// TAB PROPERTIES
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
+				stream << "<h1>Propriétés</h1>";
+
 				// ServiceUpdateAction
+
+				PTRuleUserAdmin<SchedulesBasedService,ServiceAdmin>::Display(stream, _service, request);
 			}
 
 			////////////////////////////////////////////////////////////////////

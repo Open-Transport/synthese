@@ -225,7 +225,7 @@ namespace synthese
 					row.setRank(0);
 					timetable->addRow(row);
 				} // Way 4.2 : physical stop timetable
-				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == PhysicalStopTableSync::TABLE.ID)
+				else if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == PhysicalStopTableSync::TABLE.ID)
 				{
 					shared_ptr<const PhysicalStop> stop;
 					try
