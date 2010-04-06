@@ -157,7 +157,7 @@ namespace synthese
 				
 				// Display
 				CalendarTemplateElementTableSync::SearchResult elements(
-					CalendarTemplateElementTableSync::Search(Env::GetOfficialEnv(), _calendar->getKey());
+					CalendarTemplateElementTableSync::Search(Env::GetOfficialEnv(), _calendar->getKey())
 				);
 				
 				HTMLForm f(addRequest.getHTMLForm("add"));
