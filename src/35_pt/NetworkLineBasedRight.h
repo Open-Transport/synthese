@@ -95,7 +95,7 @@ namespace synthese
 			util::RegistryKeyType id(util::Conversion::ToLongLong(this->_parameter));
 			try
 			{
-				int tableId(util::decodeTableId(id));
+				util::RegistryObjectType tableId(util::decodeTableId(id));
 				
 				if (tableId == pt::TransportNetworkTableSync::TABLE.ID)
 				{
@@ -130,10 +130,10 @@ namespace synthese
 			util::RegistryKeyType id2(util::Conversion::ToLongLong(perimeter));
 			try
 			{
-				int tableId1(util::decodeTableId(id1));
+				util::RegistryTableType tableId1(util::decodeTableId(id1));
 				if (tableId1 == pt::TransportNetworkTableSync::TABLE.ID)
 				{
-					int tableId2(util::decodeTableId(id2));
+					util::RegistryTableType tableId2(util::decodeTableId(id2));
 					if (tableId2 == pt::TransportNetworkTableSync::TABLE.ID)
 						return id1 == id2;
 					if (tableId2 == CommercialLineTableSync::TABLE.ID)

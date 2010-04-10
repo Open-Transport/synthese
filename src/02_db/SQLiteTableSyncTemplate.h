@@ -152,7 +152,7 @@ namespace synthese
 				static util::RegistryKeyType encodeUId(
 					util::RegistryObjectType objectId
 				){
-					static int nodeId = boost::lexical_cast<RegistryNodeType>(
+					static int nodeId = boost::lexical_cast<util::RegistryNodeType>(
 						server::ModuleClass::GetParameter("dbring_node_id", "1")
 					);
 					return util::encodeUId(
@@ -282,7 +282,7 @@ namespace synthese
 			{			
 				boost::mutex::scoped_lock mutex(*_idMutex);
 
-				RegistryObjectType retval = _autoIncrementValue++;
+				util::RegistryObjectType retval = _autoIncrementValue++;
 
 				return encodeUId(retval);
 			}
