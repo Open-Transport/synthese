@@ -52,7 +52,7 @@ namespace synthese
 	{
 		TimetableServiceRowCellInterfacePage::TimetableServiceRowCellInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, TimetableServiceRowCellInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

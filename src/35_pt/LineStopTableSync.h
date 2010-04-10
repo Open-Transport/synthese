@@ -24,20 +24,19 @@
 #define SYNTHESE_LineStopTableSync_H__
 
 #include "LineStop.h"
-
 #include "SQLiteRegistryTableSyncTemplate.h"
-
-#include <vector>
-#include <string>
-#include <iostream>
 
 namespace synthese
 {
 	namespace pt
 	{
-		/** LineStop table synchronizer.
-			@ingroup m35LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 35.10 Table : Route stop.
+		///	@ingroup m35LS refLS
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Table name : t010_line_stops
+		/// Corresponding class : LineStop
 		class LineStopTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<LineStopTableSync,LineStop>
 		{
@@ -63,9 +62,9 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				uid lineId = UNKNOWN_VALUE
-				, uid physicalStopId = UNKNOWN_VALUE
-				, int first = 0
+				boost::optional<util::RegistryKeyType> lineId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> physicalStopId = boost::optional<util::RegistryKeyType>(),
+				int first = 0
 				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByRank = true
 				, bool raisingOrder = true,

@@ -53,7 +53,7 @@ namespace synthese
 
 
 			PathGroup(
-				util::RegistryKeyType id = UNKNOWN_VALUE
+				util::RegistryKeyType id = 0
 			);
 
 		public:

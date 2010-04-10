@@ -74,7 +74,7 @@ namespace synthese
 
 
 
-			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > NamedList;
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > NamedList;
 
 
 

@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_PlacesListItemInterfacePage_H__
 #define SYNTHESE_PlacesListItemInterfacePage_H__
 
-#include "11_interfaces/InterfacePage.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "InterfacePage.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -63,9 +62,9 @@ namespace synthese
 				, interfaces::VariablesMap& variables
 				, int n
 				, const std::string& name
-				, uid id
+				, util::RegistryKeyType id
 				, const server::Request* request = NULL
-				) const;
+			) const;
 		};
 	}
 }

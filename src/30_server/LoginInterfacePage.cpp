@@ -67,7 +67,7 @@ namespace synthese
 		}
 
 		LoginInterfacePage::LoginInterfacePage()
-		:	Registrable(UNKNOWN_VALUE)
+		:	Registrable(0)
 		{
 
 		}

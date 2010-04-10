@@ -49,12 +49,12 @@ namespace synthese
 			std::string	_name;
 			std::string _short_message;
 			std::string	_long_message;
-			uid			_parentId;
+			util::RegistryKeyType			_parentId;
 			bool		_isFolder;
 			AlarmLevel	_level;
 
 		public:
-			TextTemplate(util::RegistryKeyType key = UNKNOWN_VALUE);
+			TextTemplate(util::RegistryKeyType key = 0);
 
 			//! @name Getters
 			//@{
@@ -63,7 +63,7 @@ namespace synthese
 				const std::string&	getLongMessage()	const;
 				AlarmLevel			getAlarmLevel()		const;
 				bool				getIsFolder()		const;
-				uid					getParentId()		const;
+				util::RegistryKeyType	getParentId()		const { return _parentId; }
 			//@}
 
 			//! @name Setters
@@ -73,7 +73,7 @@ namespace synthese
 				void setLongMessage(const std::string& message);
 				void setAlarmLevel(AlarmLevel level);
 				void setIsFolder(bool value);
-				void setParentId(uid value);
+				void setParentId(util::RegistryKeyType value) { _parentId = value; }
 			//@}
 		};
 	}

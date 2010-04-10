@@ -129,7 +129,7 @@ namespace synthese
 					else
 					{
 						RegistryKeyType crossingId(
-							util::encodeUId(43,0,0,decodeObjectId(object->getKey()))
+							util::encodeUId(43,0,decodeObjectId(object->getKey()))
 						);
 						shared_ptr<Crossing> crossing(new Crossing(crossingId));
 						crossing->setAddress(object);

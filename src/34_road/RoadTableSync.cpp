@@ -105,14 +105,11 @@ namespace synthese
 				object->setRoadPlace(roadPlace);
 				roadPlace->addRoad(*object);
 				
-// 				uid bikeComplianceId (rows->getLongLong (RoadTableSync::COL_BIKECOMPLIANCEID));
-// 				object->setBikeCompliance (BikeComplianceTableSync::Get (bikeComplianceId, env, linkLevel));
+// 				object->setBikeCompliance (BikeComplianceTableSync::Get (rows->getLongLong (RoadTableSync::COL_BIKECOMPLIANCEID), env, linkLevel));
 
-// 				uid handicappedComplianceId (rows->getLongLong (RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID));
-// 				object->setHandicappedCompliance(HandicappedComplianceTableSync::Get(handicappedComplianceId, env, linkLevel));
+// 				object->setHandicappedCompliance(HandicappedComplianceTableSync::Get(rows->getLongLong (RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID), env, linkLevel));
 
-// 				uid pedestrianComplianceId (rows->getLongLong (RoadTableSync::COL_PEDESTRIANCOMPLIANCEID));
-// 				object->setPedestrianCompliance(PedestrianComplianceTableSync::Get(pedestrianComplianceId, env, linkLevel));
+// 				object->setPedestrianCompliance(PedestrianComplianceTableSync::Get(rows->getLongLong (RoadTableSync::COL_PEDESTRIANCOMPLIANCEID), env, linkLevel));
 			}
 		}
 

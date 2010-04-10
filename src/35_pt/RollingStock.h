@@ -26,6 +26,7 @@
 #include "Registrable.h"
 #include "Registry.h"
 #include "PathClass.h"
+#include "Named.h"
 
 #include <string>
 
@@ -40,7 +41,8 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		class RollingStock:
 			public virtual util::Registrable,
-			public graph::PathClass
+			public graph::PathClass,
+			public util::Named
 		{
 		public:
 
@@ -48,33 +50,36 @@ namespace synthese
 			typedef util::Registry<RollingStock>	Registry;
 
 		protected:
-			std::string _name;
 			std::string _article;
 			std::string _indicator;
+			std::string _tridentKey;
+			bool _isTridentKeyReference;
 
 		public:
 
-			RollingStock(util::RegistryKeyType key = UNKNOWN_VALUE);
+			RollingStock(util::RegistryKeyType key = 0);
 
 			~RollingStock();
 
 
 			//! @name Getters
 			//@{
-				const std::string& getName() const;
-				const std::string& getArticle() const;
-				const std::string& getIndicator() const;
+				const std::string& getArticle() const { return _article; }
+				const std::string& getIndicator() const { return _indicator; }
+				const std::string& getTridentKey() const { return _tridentKey; }
+				bool getIsTridentKeyReference() const { return _isTridentKeyReference; }
 			//@}
 
 
 			//! @name Setters
 			//@{
-				void setName(const std::string& value);
-				void setArticle(const std::string& value);
-				void setIndicator(const std::string& value);
+				void setArticle(const std::string& value) { _article = value; }
+				void setIndicator(const std::string& value) { _indicator = value; }
+				void setTridentKey(const std::string& value) { _tridentKey = value; }
+				void setIsTridentKeyReference(bool value) { _isTridentKeyReference = value; }
 			//@}
 
-			//! @name Queries
+			//! @name Services
 			//@{
 				virtual PathClass::Identifier getIdentifier() const;
 			//@}

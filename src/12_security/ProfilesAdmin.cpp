@@ -78,10 +78,10 @@ namespace synthese
 			const ParametersMap& map
 		){
 			// Profile name
-			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
+			_searchName = map.getDefault<string>(PARAMETER_SEARCH_NAME);
 
 			// Profile right
-			_searchRightName = map.getString(PARAMETER_SEARCH_RIGHT, false, FACTORY_KEY);
+			_searchRightName = map.getDefault<string>(PARAMETER_SEARCH_RIGHT);
 
 			// Parameters
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
@@ -115,7 +115,9 @@ namespace synthese
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 			stream << s.open();
 			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, _searchName));
-			stream << s.cell("Habilitation", s.getForm().getSelectInput(PARAMETER_SEARCH_RIGHT, SecurityModule::getRightLabels(true), _searchRightName));
+			stream << s.cell(
+				"Habilitation",
+				s.getForm().getSelectInput(PARAMETER_SEARCH_RIGHT, SecurityModule::getRightLabels(true), optional<string>(_searchRightName)));
 			stream << s.close();
 			stream << s.getForm().setFocus(PARAMETER_SEARCH_NAME);
 				

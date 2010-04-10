@@ -60,12 +60,13 @@ namespace synthese
 		const string SiteTableSync::COL_MAX_CONNECTIONS = "max_connections";
 		const string SiteTableSync::COL_USE_DATES_RANGE("use_dates_range");
 		const string SiteTableSync::COL_PERIODS("periods");
+		const string SiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS("display_road_approach_detail");
 	}
 
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<SiteTableSync>::TABLE(
-				"t025_sites"
+			"t025_sites"
 		);
 		
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<SiteTableSync>::_FIELDS[] =
@@ -80,6 +81,7 @@ namespace synthese
 			SQLiteTableSync::Field(SiteTableSync::COL_MAX_CONNECTIONS, SQL_INTEGER),
 			SQLiteTableSync::Field(SiteTableSync::COL_USE_DATES_RANGE, SQL_INTEGER),
 			SQLiteTableSync::Field(SiteTableSync::COL_PERIODS, SQL_TEXT),
+			SQLiteTableSync::Field(SiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
@@ -102,6 +104,7 @@ namespace synthese
 		    site->setPastSolutionsDisplayed(rows->getBool(SiteTableSync::TABLE_COL_USE_OLD_DATA));
 		    site->setMaxTransportConnectionsCount(rows->getInt(SiteTableSync::COL_MAX_CONNECTIONS));
 		    site->setUseDateRange(days(rows->getInt(SiteTableSync::COL_USE_DATES_RANGE)));
+			site->setDisplayRoadApproachDetail(rows->getBool(SiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS));
 		    
 		    string periodsStr(rows->getText(SiteTableSync::COL_PERIODS));
 
@@ -127,7 +130,7 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				uid id(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
+				RegistryKeyType id(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
 				if (id > 0)
 				{
 					try
@@ -181,6 +184,7 @@ namespace synthese
 			query.addField(site->getMaxTransportConnectionsCount());
 			query.addField(static_cast<int>(site->getUseDatesRange().days()));
 			query.addField(periodstr.str());
+			query.addField(site->getDisplayRoadApproachDetail());
 			query.execute(transaction);
 		}
 	}

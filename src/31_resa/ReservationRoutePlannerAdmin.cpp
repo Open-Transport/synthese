@@ -203,8 +203,8 @@ namespace synthese
 			const admin::AdminRequest& _request
 		) const {
 
-			vector<pair<string, string> > dates;
-			vector<pair<string, string> > hours;
+			vector<pair<optional<string>, string> > dates;
+			vector<pair<optional<string>, string> > hours;
 			{
 				date date(day_clock::local_day());
 				for(size_t i=0; i<14; ++i)
@@ -275,8 +275,20 @@ namespace synthese
 						(dynamic_cast<const City*>(endPlace) ? string() : dynamic_cast<const NamedPlace*>(endPlace)->getName()) :
 						_endPlace
 				)	);
-			stream << st.cell("Date", st.getForm().getSelectInput(PARAMETER_DATE, dates, to_iso_extended_string(_dateTime.date())));
-			stream << st.cell("Heure", st.getForm().getSelectInput(PARAMETER_TIME, hours, lexical_cast<string>(_dateTime.time_of_day().hours())+":00"));
+			stream << st.cell(
+				"Date",
+				st.getForm().getSelectInput(
+					PARAMETER_DATE,
+					dates,
+					optional<string>(to_iso_extended_string(_dateTime.date()))
+			)	);
+			stream << st.cell(
+				"Heure",
+				st.getForm().getSelectInput(
+					PARAMETER_TIME,
+					hours,
+					optional<string>(lexical_cast<string>(_dateTime.time_of_day().hours())+":00")
+			)	);
 			stream << st.cell("PMR", st.getForm().getOuiNonRadioInput(PARAMETER_DISABLED_PASSENGER, _disabledPassenger));
 			stream << st.cell("Sans correspondance", st.getForm().getOuiNonRadioInput(PARAMETER_WITHOUT_TRANSFER, _withoutTransfer));
 			stream << st.close();
@@ -457,10 +469,21 @@ namespace synthese
 
 					stream << rt.row();
 					stream << rt.col() << "Client";
-					stream << rt.col() << rf.getRadioInput(BookReservationAction::PARAMETER_CREATE_CUSTOMER, true, true, "Nouveau client");
+					stream << rt.col() << rf.getRadioInput(
+						BookReservationAction::PARAMETER_CREATE_CUSTOMER, 
+						optional<bool>(true),
+						optional<bool>(true),
+						"Nouveau client"
+					);
 					stream << " : Téléphone : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_PHONE, string());
 					stream << "	E-mail : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_EMAIL, string());
-					stream << "<br />" << rf.getRadioInput(BookReservationAction::PARAMETER_CREATE_CUSTOMER, false, true, "Client existant", true);
+					stream << "<br />" << rf.getRadioInput(
+						BookReservationAction::PARAMETER_CREATE_CUSTOMER,
+						optional<bool>(false),
+						optional<bool>(true),
+						"Client existant",
+						true
+					);
 					stream << "<span id=\"ie_bug_curstomer_div\"></span>";
 				}
 				

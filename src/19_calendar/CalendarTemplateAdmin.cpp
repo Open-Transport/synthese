@@ -94,7 +94,7 @@ namespace synthese
 			{
 				_calendar = CalendarTemplateTableSync::Get(
 					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					_getEnv()
+					Env::GetOfficialEnv()
 				);
 			}
 			catch(...)
@@ -140,7 +140,13 @@ namespace synthese
 				PropertiesHTMLTable pt(updateRequest.getHTMLForm());
 				stream << pt.open();
 				stream << pt.cell("Nom", pt.getForm().getTextInput(CalendarTemplatePropertiesUpdateAction::PARAMETER_NAME, _calendar->getText()));
-				stream << pt.cell("Catégorie", pt.getForm().getSelectInput(CalendarTemplatePropertiesUpdateAction::PARAMETER_CATEGORY, CalendarTemplate::GetCategoriesList(), _calendar->getCategory()));
+				stream << pt.cell(
+					"Catégorie",
+					pt.getForm().getSelectInput(
+						CalendarTemplatePropertiesUpdateAction::PARAMETER_CATEGORY,
+						CalendarTemplate::GetCategoriesList(),
+						optional<CalendarTemplate::Category>(_calendar->getCategory())
+				)	);
 				stream << pt.close();
 
 				stream << "<h1>Commandes</h1>";
@@ -198,7 +204,7 @@ namespace synthese
 					stream << t.col();
 					if (ct->getInclude())
 					{
-						goRequest.getPage()->setCalendar(const_pointer_cast<CalendarTemplate>(_getEnv().getSPtr(ct->getInclude())));
+						goRequest.getPage()->setCalendar(const_pointer_cast<CalendarTemplate>(Env::GetOfficialEnv().getSPtr(ct->getInclude())));
 						stream << HTMLModule::getHTMLLink(goRequest.getURL(), ct->getInclude()->getText());
 					}
 
@@ -209,19 +215,23 @@ namespace synthese
 
 				stream << t.col();
 
-				vector<pair<CalendarTemplateElement::Operation, string> > addSub;
+				vector<pair<optional<CalendarTemplateElement::Operation>, string> > addSub;
 				addSub.push_back(make_pair(CalendarTemplateElement::ADD, "+"));
 				addSub.push_back(make_pair(CalendarTemplateElement::SUB, "-"));
 				addSub.push_back(make_pair(CalendarTemplateElement::AND, "&"));
 
-				stream << t.col() << f.getSelectInput(CalendarTemplateElementAddAction::PARAMETER_POSITIVE, addSub, CalendarTemplateElement::ADD);
+				stream << t.col() << f.getSelectInput(
+					CalendarTemplateElementAddAction::PARAMETER_POSITIVE,
+					addSub,
+					optional<CalendarTemplateElement::Operation>(CalendarTemplateElement::ADD)
+				);
 				stream << t.col() << f.getTextInput(CalendarTemplateElementAddAction::PARAMETER_MIN_DATE, string());
 				stream << t.col() << f.getTextInput(CalendarTemplateElementAddAction::PARAMETER_MAX_DATE, string());
 				stream << t.col() << f.getSelectNumberInput(CalendarTemplateElementAddAction::PARAMETER_INTERVAL, 1, 21);
 				stream << t.col() << f.getSelectInput(
 					CalendarTemplateElementAddAction::PARAMETER_INCLUDE_ID,
-					CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)", _calendar->getKey()),
-					RegistryKeyType(0)
+					CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)", optional<RegistryKeyType>(_calendar->getKey())),
+					optional<RegistryKeyType>(0)
 				);
 				stream << t.col() << f.getSubmitButton("Ajouter");
 

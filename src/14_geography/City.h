@@ -71,7 +71,7 @@ namespace synthese
 		public:
 
 			City(
-				util::RegistryKeyType key = UNKNOWN_VALUE,
+				util::RegistryKeyType key = 0,
 				std::string name = std::string(),
 				std::string code = std::string()
 			);

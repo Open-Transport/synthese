@@ -51,7 +51,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<Reservation>	Registry;
 
-			Reservation(util::RegistryKeyType key = UNKNOWN_VALUE);
+			Reservation(util::RegistryKeyType key = 0);
 
 
 		private:
@@ -60,15 +60,15 @@ namespace synthese
 
 			//!	\name Service réservé
 			//@{
-				uid								_lineId;				//!< ID of the booked CommercialLine
+				util::RegistryKeyType _lineId;				//!< ID of the booked CommercialLine
 				std::string						_lineCode;				//!< Comprehensive line code
-				uid								_serviceId;				//!< Code du service au sein l'axe
+				util::RegistryKeyType			_serviceId;				//!< Code du service au sein l'axe
 				std::string						_serviceCode;			//!< Code du service au sein l'axe
-				uid								_departurePlaceId;		//!< ID of the departure Place
+				util::RegistryKeyType			_departurePlaceId;		//!< ID of the departure Place
 				std::string						_departurePlaceName;
-				uid								_arrivalPlaceId;		//!< ID of the arrival Place
+				util::RegistryKeyType			_arrivalPlaceId;		//!< ID of the arrival Place
 				std::string						_arrivalPlaceName;
-				uid								_reservationRuleId;		//!< ID of the used OnlineReservationRule
+				util::RegistryKeyType			_reservationRuleId;		//!< ID of the used OnlineReservationRule
 				std::string						_departureAddress;		//!< Adresse du départ
 				std::string						_arrivalAddress;		//!< Adresse d'arrivée
 				boost::posix_time::ptime		_departureTime;			//!< Moment de montée prévu
@@ -80,15 +80,15 @@ namespace synthese
 		public:
 			//!	\name Setters
 			//@{
-				void setLineId				(uid id);
+				void setLineId				(util::RegistryKeyType id) { _lineId = id; }
 				void setLineCode			(const std::string& code);
-				void setServiceId			(uid id);
+				void setServiceId			(util::RegistryKeyType id) { _serviceId = id; }
 				void setServiceCode			(const std::string& code);
-				void setDeparturePlaceId	(uid id);
+				void setDeparturePlaceId	(util::RegistryKeyType id) { _departurePlaceId = id; }
 				void setDeparturePlaceName	(const std::string& name);
-				void setArrivalPlaceId		(uid id);
+				void setArrivalPlaceId		(util::RegistryKeyType id) { _arrivalPlaceId = id; }
 				void setArrivalPlaceName	(const std::string& name);
-				void setReservationRuleId	(uid id);
+				void setReservationRuleId	(util::RegistryKeyType id) { _reservationRuleId = id; }
 				void setDepartureAddress	(const std::string& address);
 				void setArrivalAddress		(const std::string& address);
 				void setDepartureTime		(const boost::posix_time::ptime& time);
@@ -109,15 +109,15 @@ namespace synthese
 
 			//!	\name Getters
 			//@{
-				uid								getLineId()					const;
+				util::RegistryKeyType			getLineId()					const { return _lineId; }
 				const std::string&				getLineCode()				const;
-				uid								getServiceId()				const;
+				util::RegistryKeyType			getServiceId()				const { return _serviceId; }
 				const std::string&				getServiceCode()			const;
-				uid								getDeparturePlaceId()		const;
+				util::RegistryKeyType			getDeparturePlaceId()		const { return _departurePlaceId; }
 				const std::string&				getDeparturePlaceName()		const;
-				uid								getArrivalPlaceId()			const;
+				util::RegistryKeyType			getArrivalPlaceId()			const { return _arrivalPlaceId; }
 				const std::string&				getArrivalPlaceName()		const;
-				uid								getReservationRuleId()		const;
+				util::RegistryKeyType			getReservationRuleId()		const { return _reservationRuleId; }
 				const std::string&				getDepartureAddress()		const;
 				const std::string&				getArrivalAddress()			const;
 				const boost::posix_time::ptime&	getDepartureTime()			const;

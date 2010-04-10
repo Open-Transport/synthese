@@ -156,7 +156,7 @@ namespace synthese
 		public:
 			//!	\name Constructor/Destructor
 			//@{
-				DisplayScreen(util::RegistryKeyType key = UNKNOWN_VALUE);
+				DisplayScreen(util::RegistryKeyType key = 0);
 				~DisplayScreen();
 			//@}
 
@@ -277,8 +277,9 @@ namespace synthese
 				std::string											getFullName()															const;
 				const ArrivalDepartureTableGenerator::PhysicalStops&	getPhysicalStops(bool result=true)										const;
 
-				std::vector<std::pair<uid, std::string> > 
-					getSortedAvaliableDestinationsLabels(const DisplayedPlacesList& placesToAvoid)	const;
+				typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
+
+				Labels getSortedAvaliableDestinationsLabels(const DisplayedPlacesList& placesToAvoid) const;
 
 				/** Analyzes a monitoring status to determinate if the display is down or up.
 					@param status Status to read

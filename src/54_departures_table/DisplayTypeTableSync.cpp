@@ -29,6 +29,7 @@
 #include "SQLiteException.h"
 #include "InterfaceTableSync.h"
 #include "Conversion.h"
+#include "ReplaceQuery.h"
 
 #include <sstream>
 
@@ -63,7 +64,7 @@ namespace synthese
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DisplayTypeTableSync>::TABLE(
 			"t036_display_types"
-			);
+		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DisplayTypeTableSync>::_FIELDS[] =
 		{
@@ -99,7 +100,7 @@ namespace synthese
 				try
 				{
 					object->setDisplayInterface(NULL);
-					uid id(rows->getLongLong(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID));
+					util::RegistryKeyType id(rows->getLongLong(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID));
 					if (id > 0)
 					{
 						object->setDisplayInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
@@ -112,7 +113,7 @@ namespace synthese
 				try
 				{
 					object->setAudioInterface(NULL);
-					uid id(rows->getLongLong(DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID));
+					util::RegistryKeyType id(rows->getLongLong(DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID));
 					if (id > 0)
 					{
 						object->setAudioInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
@@ -125,7 +126,7 @@ namespace synthese
 				try
 				{
 					object->setMonitoringInterface(NULL);
-					uid id(rows->getLongLong(DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID));
+					util::RegistryKeyType id(rows->getLongLong(DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID));
 					if (id > 0)
 					{
 						object->setMonitoringInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
@@ -149,22 +150,15 @@ namespace synthese
 			DisplayType* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-			stringstream query;
-			query
-				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< object->getKey()
-				<< "," << Conversion::ToSQLiteString(object->getName())
-				<< "," << ((object->getDisplayInterface() != NULL) ? Conversion::ToString(object->getDisplayInterface()->getKey()) : "0")
-				<< "," << ((object->getAudioInterface() != NULL) ? Conversion::ToString(object->getAudioInterface()->getKey()) : "0")
-				<< "," << ((object->getMonitoringInterface() != NULL) ? Conversion::ToString(object->getMonitoringInterface()->getKey()) : "0")
-				<< "," << object->getRowNumber()
-				<< "," << object->getMaxStopsNumber()
-				<< "," << (object->getTimeBetweenChecks().total_seconds() / 60)
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<DisplayTypeTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getDisplayInterface() ? object->getDisplayInterface()->getKey() : RegistryKeyType(0));
+			query.addField(object->getAudioInterface() ? object->getAudioInterface()->getKey() : RegistryKeyType(0));
+			query.addField(object->getMonitoringInterface() ? object->getMonitoringInterface()->getKey() : RegistryKeyType(0));
+			query.addField(object->getRowNumber());
+			query.addField(object->getMaxStopsNumber());
+			query.addField(object->getTimeBetweenChecks().total_seconds() / 60);
+			query.execute(transaction);
 		}
 
 	}
@@ -219,9 +213,9 @@ namespace synthese
 			}
 
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
+				query << " LIMIT " << (*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

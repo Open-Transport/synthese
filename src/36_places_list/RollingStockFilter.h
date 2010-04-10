@@ -63,7 +63,7 @@ namespace synthese
 			bool _authorized_only;
 
 		public:
-			RollingStockFilter(util::RegistryKeyType key = UNKNOWN_VALUE)
+			RollingStockFilter(util::RegistryKeyType key = 0)
 				: util::Registrable(key) {}
 
 			~RollingStockFilter() {}

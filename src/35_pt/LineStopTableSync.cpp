@@ -69,7 +69,9 @@ namespace synthese
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<LineStopTableSync>::TABLE(
 			"t010_line_stops"
-			);
+		);
+
+
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<LineStopTableSync>::_FIELDS[]=
 		{
@@ -137,10 +139,10 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				uid fromPhysicalStopId (
+				util::RegistryKeyType fromPhysicalStopId (
 					rows->getLongLong (LineStopTableSync::COL_PHYSICALSTOPID));
 
-				uid lineId (rows->getLongLong (LineStopTableSync::COL_LINEID));
+				util::RegistryKeyType lineId (rows->getLongLong (LineStopTableSync::COL_LINEID));
 				Line* line(LineTableSync::GetEditable (lineId, env, linkLevel).get());
 
 				ls->setLine(line);
@@ -197,8 +199,8 @@ namespace synthese
 	{
 		LineStopTableSync::SearchResult LineStopTableSync::Search(
 			Env& env,
-			uid lineId
-			, uid physicalStopId
+			optional<RegistryKeyType> lineId,
+			optional<RegistryKeyType> physicalStopId
 			, int first /*= 0*/
 			, boost::optional<std::size_t> number
 			, bool orderByRank
@@ -210,10 +212,10 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
-			if (lineId != UNKNOWN_VALUE)
-				query << " AND " << COL_LINEID << "=" << lineId;
-			if (physicalStopId != UNKNOWN_VALUE)
-				query << " AND " << COL_PHYSICALSTOPID << "=" << physicalStopId;
+			if (lineId)
+				query << " AND " << COL_LINEID << "=" << *lineId;
+			if (physicalStopId)
+				query << " AND " << COL_PHYSICALSTOPID << "=" << *physicalStopId;
 			if (orderByRank)
 				query << " ORDER BY " << COL_RANKINPATH << (raisingOrder ? " ASC" : " DESC");
 			if (number)

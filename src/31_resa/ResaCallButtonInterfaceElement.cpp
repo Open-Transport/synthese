@@ -46,6 +46,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace dblog;
+	using namespace util;
 	
 	namespace util
 	{
@@ -73,11 +74,11 @@ namespace synthese
 			if (!request->isAuthorized<ResaRight>(WRITE,UNKNOWN_RIGHT_LEVEL))
 				return string();
 
-			uid callId(ResaModule::GetCurrentCallId(request->getSession()));
+			RegistryKeyType callId(ResaModule::GetCurrentCallId(request->getSession()));
 
 			if(request)
 			{
-				if (callId == UNKNOWN_VALUE)
+				if (callId == 0)
 				{ // Case call start
 
 					AdminActionFunctionRequest<CallBeginAction,ReservationRoutePlannerAdmin> callRequest(

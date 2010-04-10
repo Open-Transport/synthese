@@ -72,9 +72,9 @@ namespace synthese
 		void TestMapAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			_dataXml = map.getString(PARAMETER_DATA_XML, false, FACTORY_KEY);
-			_queryXml = map.getString(PARAMETER_QUERY_XML, false, FACTORY_KEY);
-			_useEnvironment = map.getBool(PARAMETER_USE_ENVIRONMENT, false, true, FACTORY_KEY);
+			_dataXml = map.getDefault<string>(PARAMETER_DATA_XML);
+			_queryXml = map.getDefault<string>(PARAMETER_QUERY_XML);
+			_useEnvironment = map.getDefault<bool>(PARAMETER_USE_ENVIRONMENT, true);
 		}
 		
 		

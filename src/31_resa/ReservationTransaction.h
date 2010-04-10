@@ -56,7 +56,7 @@ namespace synthese
 			//!	\name Caractéristiques de la réservation
 			//@{
 				Reservations		_reservations;
-				uid					_lastReservation;		//!< Code de la réservation annulée en cas de modification
+				util::RegistryKeyType		_lastReservation;		//!< Code de la réservation annulée en cas de modification
 				int					_seats;			//!< Nombre de places
 				boost::posix_time::ptime		_bookingTime;		//!< Date de la réservation
 				boost::posix_time::ptime	_cancellationTime;		//!< Date de l'annulation (unknown = not cancelled)
@@ -64,19 +64,19 @@ namespace synthese
 
 			//!	\name Personnes
 			//@{
-				uid					_customerUserId;
+				util::RegistryKeyType		_customerUserId;
 				std::string			_customerName;
 				std::string			_customerPhone;
 				std::string			_customerEMail;
-				uid					_bookingUserId;
-				uid					_cancelUserId;
+				util::RegistryKeyType		_bookingUserId;
+				util::RegistryKeyType	_cancelUserId;
 			//@}
 
 			//! \name Journey
 			//@{
-				uid					_originPlaceId;
+				util::RegistryKeyType	_originPlaceId;
 				std::string			_originPlaceText;
-				uid					_destinationPlaceId;
+				util::RegistryKeyType	_destinationPlaceId;
 				std::string			_destinationPlaceText;
 				boost::posix_time::ptime		_originDateTime;
 				boost::posix_time::ptime		_destinationDateTime;
@@ -84,28 +84,28 @@ namespace synthese
 			//@}
 
 		public:
-			ReservationTransaction(util::RegistryKeyType key = UNKNOWN_VALUE);
+			ReservationTransaction(util::RegistryKeyType key = 0);
 
-			void setLastReservation	(uid id);
+			void setLastReservation	(util::RegistryKeyType id) { _lastReservation = id; }
 			void setSeats			(int seats);
 			void setBookingTime		(const boost::posix_time::ptime& time);
 			void setCancellationTime(const boost::posix_time::ptime& time);
-			void setCustomerUserId	(uid id);
+			void setCustomerUserId	(util::RegistryKeyType id) { _customerUserId = id; }
 			void setCustomerName	(const std::string& name);
 			void setCustomerPhone	(const std::string& phone);
-			void setBookingUserId	(uid id);
-			void setCancelUserId	(uid id);
+			void setBookingUserId	(util::RegistryKeyType id) { _bookingUserId = id; }
+			void setCancelUserId	(util::RegistryKeyType id) { _cancelUserId = id; }
 			void setCustomerEMail	(const std::string& email);
 
-			uid						getLastReservation()	const;
+			util::RegistryKeyType					getLastReservation()	const { return _lastReservation; }
 			int						getSeats()				const;
 			const boost::posix_time::ptime&	getBookingTime()		const;
 			const boost::posix_time::ptime&	getCancellationTime()	const;
-			uid						getCustomerUserId()		const;
+			util::RegistryKeyType	getCustomerUserId()		const { return _customerUserId; }
 			const std::string&		getCustomerName()		const;
 			const std::string&		getCustomerPhone()		const;
-			uid						getBookingUserId()		const;
-			uid						getCancelUserId()		const;
+			util::RegistryKeyType	getBookingUserId()		const { return _bookingUserId; }
+			util::RegistryKeyType	getCancelUserId()		const { return _cancelUserId; }
 			const std::string&		getCustomerEMail()		const;
 			const Reservations&		getReservations()		const;
 

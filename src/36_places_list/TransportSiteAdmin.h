@@ -82,12 +82,12 @@ namespace synthese
 			std::string						_endCity;
 			std::string						_endPlace;
 			boost::posix_time::ptime		_dateTime;
-			int								_resultsNumber;
 			graph::UserClassCode			_accessibility;
 			bool							_log;
 			RollingStockFilter*				_rollingStockFilter;
 			std::string						_searchPage;
 			html::ResultHTMLTable::RequestParameters	_pageSearchParameter;
+			boost::optional<size_t>			_resultsNumber;
 
 			void _displaySubPages(
 				std::ostream& stream,

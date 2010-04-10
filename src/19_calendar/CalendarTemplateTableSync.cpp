@@ -22,20 +22,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "CalendarTemplateTableSync.h"
-#include "CalendarTemplate.h"
-
-#include "CalendarTemplateElement.h"
 #include "CalendarTemplateElementTableSync.h"
 
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
-
-#include "Conversion.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
 
 using namespace std;
 using namespace boost;
@@ -86,7 +77,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			// Columns reading
-			uid id(rows->getLongLong(TABLE_COL_ID));
+			RegistryKeyType id(rows->getLongLong(TABLE_COL_ID));
 
 			// Properties
 			object->setKey(id);
@@ -115,18 +106,10 @@ namespace synthese
 			CalendarTemplate* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-			
-			query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToSQLiteString(object->getText())
-				<< "," << static_cast<int>(object->getCategory())
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<CalendarTemplateTableSync> query(*object);
+			query.addField(object->getText());
+			query.addField(static_cast<int>(object->getCategory()));
+			query.execute(transaction);
 		}
 
 
@@ -151,23 +134,29 @@ namespace synthese
 			boost::optional<std::size_t> number /*= 0*/,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
+			SelectQuery<CalendarTemplateTableSync> query;
 			if(name)
-			 	query << " AND " << COL_TEXT << "='" << Conversion::ToSQLiteString(*name, false) << "'";
+			{
+				query.addWhereField(COL_TEXT, *name);
+			}
 			if(forbiddenId)
-				query << " AND " << TABLE_COL_ID << "!=" << *forbiddenId;
+			{
+				query.addWhereField(TABLE_COL_ID, *forbiddenId, ComposedExpression::OP_DIFF);
+			}
 			if (orderByName)
-				query << " ORDER BY " << COL_TEXT << (raisingOrder ? " ASC" : " DESC");
+			{
+				query.addOrderField(COL_TEXT, raisingOrder);
+			}
 			if (number)
-				query << " LIMIT " << (*number + 1);
+			{
+				query.setNumber(*number + 1);
+			}
 			if (first > 0)
-				query << " OFFSET " << first;
+			{
+				query.setFirst(first);
+			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 
 
@@ -185,7 +174,7 @@ namespace synthese
 			}
 			BOOST_FOREACH(const CalendarTemplateTableSync::SearchResult::value_type& c, s)
 			{
-				if(c->getKey() == idToAvoid) continue;
+				if(idToAvoid && c->getKey() == *idToAvoid) continue;
 				r.push_back(make_pair(c->getKey(), c->getText()));
 			}
 			return r;

@@ -116,12 +116,12 @@ namespace synthese
 			std::string										_searchCity;
 			std::string										_searchStop;
 			std::string										_searchName;
-			uid												_searchLineId;
-			uid												_searchTypeId;
+			boost::optional<util::RegistryKeyType>				_searchLineId;
+			boost::optional<util::RegistryKeyType>				_searchTypeId;
 			boost::optional<boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> >
 															_place;
-			int												_searchState;
-			int												_searchMessage;
+			boost::optional<int>							_searchState;
+			boost::optional<int>							_searchMessage;
 			html::ResultHTMLTable::RequestParameters		_requestParameters;
 			
 		public:
@@ -170,7 +170,11 @@ namespace synthese
 				, const std::string& cityName
 				, const std::string& stopName
 				, const std::string& displayName
-				, uid lineUid, uid typeUid, int state, int message );
+				, boost::optional<util::RegistryKeyType> lineUid,
+				boost::optional<util::RegistryKeyType> typeUid,
+				boost::optional<int> state,
+				boost::optional<int> message
+			);
 
 			bool isAuthorized(
 				const security::User& user
@@ -202,10 +206,14 @@ namespace synthese
 				const security::Profile& profile
 			) const;
 
-			void setPlace(const util::RegistryKeyType id);
-			boost::optional<boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> > getPlace() const;
+			void setPlace(boost::optional<util::RegistryKeyType> id);
 			
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+
+			//! @name Getters
+			//@{
+				boost::optional<boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> > getPlace() const { return _place; }
+			//@}
 		};
 	}
 }

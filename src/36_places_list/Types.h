@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_TRANSPORT_WEBSITE_Types_H__
 #define SYNTHESE_TRANSPORT_WEBSITE_Types_H__
 
-#include "01_util/UId.h"
+#include "Registry.h"
 
 #include <vector>
 #include <utility>
@@ -37,7 +37,7 @@ namespace synthese
 			@{
 		*/
 
-		typedef std::vector<std::pair<uid, std::string> > PlacesList;
+		typedef std::vector<std::pair<util::RegistryKeyType, std::string> > PlacesList;
 
 		/** @} */
 	}

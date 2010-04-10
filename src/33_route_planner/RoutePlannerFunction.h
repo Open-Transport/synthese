@@ -69,8 +69,9 @@ namespace synthese
 		class UserFavoriteJourney;
 
 		////////////////////////////////////////////////////////////////////
-		/// Route planning Function class.
+		/// 53.15 Function : public transportation route planner.
 		///	@ingroup m53Functions refFunctions
+		/// @author Hugues Romain
 		///
 		/// <h3>Requête</h3>
 		/// <h4>Base parameters</h4>
@@ -387,6 +388,7 @@ namespace synthese
 				bool										_home;
 				boost::shared_ptr<const UserFavoriteJourney>		_favorite;
 				boost::shared_ptr<const transportwebsite::RollingStockFilter>	_rollingStockFilter;
+				bool										_outputRoadApproachDetail;
 			//@}
 
 

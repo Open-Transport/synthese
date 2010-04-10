@@ -32,6 +32,7 @@
 
 #include <vector>
 #include <utility>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -61,7 +62,7 @@ namespace synthese
 				CallStatisticsTableSync::Step _searchStep;
 			//@}
 
-				typedef std::vector<std::pair<CallStatisticsTableSync::Step, std::string> > _StepsVector;
+				typedef std::vector<std::pair<boost::optional<CallStatisticsTableSync::Step>, std::string> > _StepsVector;
 				static _StepsVector _GetStepsVector();
 
 		protected:

@@ -57,7 +57,7 @@ namespace synthese
 
 			} DisplayFunction;
 
-			typedef std::map<DisplayFunction, std::string> DisplayFunctionNames;
+			typedef std::map<boost::optional<DisplayFunction>, std::string> DisplayFunctionNames;
 
 			static const std::string PARAMETER_DISPLAY_SCREEN;
 			static const std::string PARAMETER_PRESELECTION_DELAY;
@@ -91,7 +91,9 @@ namespace synthese
 			void run(server::Request& request);
 
 			static DisplayFunctionNames GetFunctionList();
-			static std::map<int, std::string> GetClearDelaysList();
+
+			typedef std::map<boost::optional<int>, std::string> DelaysList;
+			static DelaysList GetClearDelaysList();
 			static DisplayFunction GetFunction(const DisplayScreen& screen);
 
 			virtual bool isAuthorized(const server::Session* session) const;

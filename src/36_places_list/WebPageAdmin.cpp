@@ -134,7 +134,13 @@ namespace synthese
 				stream << t.open();
 				stream << t.cell("ID", lexical_cast<string>(_page->getKey()));
 				stream << t.cell("Titre", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TITLE, _page->getName()));
-				stream << t.cell("Page supérieure", t.getForm().getSelectInput(WebPageUpdateAction::PARAMETER_UP_ID, WebPageTableSync::GetPagesList(_page->getRoot()->getKey(), "(racine)"), _page->getParent() ? _page->getParent()->getKey() : RegistryKeyType(0)));
+				stream << t.cell(
+					"Page supérieure",
+					t.getForm().getSelectInput(
+						WebPageUpdateAction::PARAMETER_UP_ID,
+						WebPageTableSync::GetPagesList(_page->getRoot()->getKey(), "(racine)"),
+						optional<RegistryKeyType>(_page->getParent() ? _page->getParent()->getKey() : 0)
+				)	);
 				stream << t.close();
 			}
 

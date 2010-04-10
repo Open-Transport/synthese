@@ -48,18 +48,18 @@ namespace synthese
 			typedef util::Registry<AlarmObjectLink>	Registry;
 
 		private:
-			uid				_objectId;
+			util::RegistryKeyType	_objectId;
 			Alarm*			_alarm;
 			std::string		_recipientKey;
 
 		public:
-			AlarmObjectLink(util::RegistryKeyType key = UNKNOWN_VALUE);
+			AlarmObjectLink(util::RegistryKeyType key = 0);
 
-			uid getObjectId() const;
+			util::RegistryKeyType getObjectId() const { return _objectId; }
 			Alarm* getAlarm() const;
 			std::string getRecipientKey() const;
 
-			void setObjectId(uid key);
+			void setObjectId(util::RegistryKeyType key) { _objectId = key; }
 			void setAlarm(Alarm* value);
 			void setRecipientKey(const std::string& key);
 		};

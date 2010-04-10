@@ -50,7 +50,7 @@ namespace synthese
 	{
 
 
-		bool isPlaceServedByCommercialLine(uid lineId, uid placeId)
+		bool isPlaceServedByCommercialLine(util::RegistryKeyType lineId, util::RegistryKeyType placeId)
 		{
 			stringstream query;
 			query
@@ -66,7 +66,7 @@ namespace synthese
 			return rows->next();
 		}
 
-		bool isPlaceServedByNetwork( uid networkId, uid placeId )
+		bool isPlaceServedByNetwork( util::RegistryKeyType networkId, util::RegistryKeyType placeId )
 		{
 			stringstream query;
 			query
@@ -83,7 +83,7 @@ namespace synthese
 			return rows->next();
 		}
 
-		int getRankOfLastDepartureLineStop( uid line )
+		int getRankOfLastDepartureLineStop( util::RegistryKeyType line )
 		{
 			stringstream query;
 			query

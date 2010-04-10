@@ -54,7 +54,7 @@ namespace synthese
 
 		public:
 			Junction(
-				util::RegistryKeyType id = UNKNOWN_VALUE
+				util::RegistryKeyType id = 0
 			);
 			~Junction();
 

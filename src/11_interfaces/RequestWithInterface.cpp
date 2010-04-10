@@ -55,10 +55,10 @@ namespace synthese
 			try
 			{
 				// Interface
-				uid id(map.getUid(PARAMETER_INTERFACE, false, "RWI"));
-				if (id != UNKNOWN_VALUE)
+				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_INTERFACE, 0));
+				if (id > 0)
 				{
-					_interface = Env::GetOfficialEnv().getRegistry<Interface>().get(id);
+					_interface = Env::GetOfficialEnv().get<Interface>(id);
 				}
 			}
 			catch (ObjectNotFoundException<Interface>& e)

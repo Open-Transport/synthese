@@ -30,6 +30,8 @@
 #include "ModuleClassTemplate.hpp"
 #include "DBLogEntry.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	/**	@defgroup m13Actions 13 Actions
@@ -79,7 +81,8 @@ namespace synthese
 			public server::ModuleClassTemplate<DBLogModule>
 		{
 		public:
-			static std::vector<std::pair<int, std::string> >	getEntryLevelLabels(bool withAll=false);
+			typedef std::vector<std::pair<boost::optional<int>, std::string> > Labels;
+			static Labels	getEntryLevelLabels(bool withAll=false);
 			static std::string					getEntryLevelLabel(const DBLogEntry::Level& level);
 			static std::string					getEntryIcon(const DBLogEntry::Level& level);
 

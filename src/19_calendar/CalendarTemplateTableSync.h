@@ -26,23 +26,22 @@
 #define SYNTHESE_CalendarTemplateTableSync_H__
 
 
-#include <vector>
-#include <string>
-#include <iostream>
-
 #include <boost/optional.hpp>
 
 #include "SQLiteRegistryTableSyncTemplate.h"
-
 #include "CalendarTemplate.h"
 
 namespace synthese
 {
 	namespace calendar
 	{
-		/** CalendarTemplate table synchronizer.
-			@ingroup m19LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 19.10 Table : Calendar templates.
+		///	@ingroup m19LS refLS
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Table name : t054_calendar_templates
+		/// Corresponding class : CalendarTemplate
 		class CalendarTemplateTableSync
 		:	public db::SQLiteRegistryTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>
 		{
@@ -71,7 +70,7 @@ namespace synthese
 			);
 
 
-			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > CalendarTemplatesList;
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > CalendarTemplatesList;
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a list of the calendar templates.

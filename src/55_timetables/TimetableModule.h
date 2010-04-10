@@ -80,13 +80,13 @@ namespace synthese
 		{
 		public:
 
-			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > TimetableContainersLabels;
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > TimetableContainersLabels;
 
 			/** Labels list containing each container timetable, indicating the full path in the folder tree.
 				@param folderId id of the main parent folder (optional)
 				@param prefix text to add at the beginning of each item (optional)
 				@param forbiddenFolderId id of a folder which must not be present in the result
-				@return std::vector<std::pair<uid, std::string> > The list
+				@return The list
 				@author Hugues Romain
 				@date 2008
 			*/

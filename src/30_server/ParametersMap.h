@@ -29,7 +29,7 @@
 #include <string>
 #include <map>
 
-#include "UId.h"
+#include "Registry.h"
 
 #include <boost/optional.hpp>
 #include <boost/lexical_cast.hpp>
@@ -128,71 +128,6 @@ namespace synthese
 				) const;
 
 
-				/** Search for the value of a parameter in a ParameterMap object and converts into an uid.
-					@param parameterName Name of the searched parameter
-					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
-					@param source Name of the action or function that requested the parameter (for the error message only)
-					@return uid Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
-					@throw ParametersMap::MissingParameterException if the parameter is not found and if it is needed
-					@author Hugues Romain
-					@date 2007
-				*/
-				uid getUid(
-					const std::string& parameterName
-					, bool neededParameter
-					, const std::string& source
-				) const;
-
-				/** Search for the value of a parameter in a ParameterMap object and converts into an integer.
-					@param parameterName Name of the searched parameter
-					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
-					@param source Name of the action or function that requested the parameter (for the error message only)
-					@return int Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
-					@throw ParametersMap::MissingParameterException if the parameter is not found and if it is needed
-					@author Hugues Romain
-					@date 2007
-				*/
-				int getInt(
-					const std::string& parameterName
-					, bool neededParameter
-					, const std::string& source
-				) const;
-
-
-				/** Search for the value of a parameter in a ParameterMap object and converts into an integer.
-					@param parameterName Name of the searched parameter
-					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
-					@param source Name of the action or function that requested the parameter (for the error message only)
-					@return int Value of the parameter (UNKNOWN_VALUE/-1 if parameter nor found)
-					@throw ParametersMap::MissingParameterException if the parameter is not found and if it is needed
-					@author Hugues Romain
-					@date 2007
-				*/
-				double getDouble(
-					const std::string& parameterName
-					, bool neededParameter
-					, const std::string& source
-				) const;
-
-
-				/** Search for the value of a parameter in a ParameterMap object and converts into an integer.
-					@param parameterName Name of the searched parameter
-					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
-					@param defaultValue Value to return if the parameter is not found
-					@param source Name of the action or function that requested the parameter (for the error message only)
-					@return int Value of the parameter (defaultValue if parameter nor found)
-					@throw ParametersMap::MissingParameterException if the parameter is not found and if it is needed
-					@author Hugues Romain
-					@date 2007
-				*/
-				bool getBool(
-					const std::string& parameterName
-					, bool neededParameter
-					, bool defaultValue
-					, const std::string& source
-				) const;
-
-
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Builds a query string from a parameters map.
@@ -277,7 +212,8 @@ namespace synthese
 				void insert(const std::string& parameterName, const std::string& value);
 				void insert(const std::string& parameterName, int value);
 				void insert(const std::string& parameterName, double value);
-				void insert(const std::string& parameterName, uid value);
+				void insert(const std::string& parameterName, std::size_t value);
+				void insert(const std::string& parameterName, util::RegistryKeyType value);
 				void insert(const std::string& parameterName, bool value);
 				void insert(const std::string& parameterName, const boost::posix_time::ptime& value);
 				void insert(const std::string& parameterName, const boost::gregorian::date& value);

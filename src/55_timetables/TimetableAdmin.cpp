@@ -60,6 +60,7 @@
 #include "TimetableResult.hpp"
 
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -159,14 +160,14 @@ namespace synthese
 					pt.getForm().getSelectInput(
 						TimetableUpdateAction::PARAMETER_CONTAINER_ID,
 						TimetableModule::GetTimetableContainersLabels(0, string(), _timetable->getKey()),
-						_timetable->getBookId()
+						optional<RegistryKeyType>(_timetable->getBookId())
 				)	);
 				stream << pt.cell(
 					"Calendrier",
 					pt.getForm().getSelectInput(
 						TimetableUpdateAction::PARAMETER_BASE_CALENDAR_ID,
 						CalendarTemplateTableSync::GetCalendarTemplatesList(),
-						_timetable->getBaseCalendar() ? _timetable->getBaseCalendar()->getKey() : RegistryKeyType(0)
+						optional<RegistryKeyType>(_timetable->getBaseCalendar() ? _timetable->getBaseCalendar()->getKey() : 0)
 				)	);
 				stream << pt.cell(
 					"Titre",
@@ -179,14 +180,14 @@ namespace synthese
 					pt.getForm().getSelectInput(
 						TimetableUpdateAction::PARAMETER_INTERFACE_ID,
 						InterfaceTableSync::GetInterfaceLabels<TimetableInterfacePage>(optional<string>()),
-						_timetable->getInterface() ? _timetable->getInterface()->getKey() : RegistryKeyType(0)
+						optional<RegistryKeyType>(_timetable->getInterface() ? _timetable->getInterface()->getKey() : 0)
 				)	);
 				stream << pt.cell(
 					"Format",
 					pt.getForm().getRadioInputCollection(
 						TimetableUpdateAction::PARAMETER_FORMAT,
 						Timetable::GetFormatsList(),
-						_timetable->getContentType(),
+						optional<Timetable::ContentType>(_timetable->getContentType()),
 						true
 				)	);
 
@@ -283,12 +284,12 @@ namespace synthese
 								"Etes-vous sûr de vouloir supprimer la fiche horaire "+ tt->getTitle() +" ?", "table_delete.png"
 							);
 					}
-					stream << t3.row(Conversion::ToString(++lastRank));
-					vector<pair<bool, string> > booknotbook;
+					stream << t3.row(lexical_cast<string>(++lastRank));
+					vector<pair<optional<bool>, string> > booknotbook;
 					booknotbook.push_back(make_pair(true, HTMLModule::getHTMLImage("table_multiple.png","Document")));
 					booknotbook.push_back(make_pair(false, HTMLModule::getHTMLImage("table.png","Fiche horaire")));
 					stream << t3.col() << lastRank;
-					stream << t3.col(3) << t3.getActionForm().getRadioInputCollection(TimetableAddAction::PARAMETER_IS_BOOK, booknotbook, false);
+					stream << t3.col(3) << t3.getActionForm().getRadioInputCollection(TimetableAddAction::PARAMETER_IS_BOOK, booknotbook, optional<bool>(false));
 					stream << t3.col() << t3.getActionForm().getTextInput(TimetableAddAction::PARAMETER_TITLE, string(), "(titre de la nouvelle fiche horaire)");
 					stream << t3.col() << t3.getActionForm().getSubmitButton("Créer");
 
@@ -371,7 +372,7 @@ namespace synthese
 							}
 						}
 
-						stream << t.row(Conversion::ToString(lastRank));
+						stream << t.row(lexical_cast<string>(lastRank));
 						stream << t.col();
 						if (lastRank > 0)
 							stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_up.png", "^"));
@@ -418,7 +419,7 @@ namespace synthese
 						;
 						stream << t.col() << HTMLModule::getLinkButton(deleteRowRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
 					}
-					stream << t.row(Conversion::ToString(UNKNOWN_VALUE));
+					stream << t.row(string("0"));
 					stream << t.col();
 					stream << t.col();
 					stream << t.col() << ++lastRank;

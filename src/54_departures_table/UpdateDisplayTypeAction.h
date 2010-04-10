@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_UpdateDisplayTypeAction_H__
 #define SYNTHESE_UpdateDisplayTypeAction_H__
 
-#include "UId.h"
 #include "FactorableTemplate.h"
 #include "Action.h"
 #include <boost/date_time/posix_time/posix_time_types.hpp>

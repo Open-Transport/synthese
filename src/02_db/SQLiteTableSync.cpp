@@ -32,8 +32,10 @@
 
 #include <sstream>
 #include <boost/thread/mutex.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -178,7 +180,6 @@ namespace synthese
 			const bool hasAutoIncrement // true
 		):
 			NAME(name),
-			ID(UNKNOWN_VALUE),
 			HAS_AUTO_INCREMENT(hasAutoIncrement),
 			TRIGGER_OVERRIDE_CLAUSE(triggerOverrideClause),
 			IGNORE_CALLBACKS_ON_FIRST_SYNC(ignoreCallbacksOnFirstSync),
@@ -189,9 +190,9 @@ namespace synthese
 				throw SQLiteException("Inconsistent table name in parse table id");
 			}
 
-			ID = Conversion::ToInt(name.substr(1, 4));
+			ID = lexical_cast<TableId>(name.substr(1, 3));
 
-			if (ID <= 0)
+			if (ID == 0)
 			{
 				throw SQLiteException("Inconsistent table name in parse table id");
 			}

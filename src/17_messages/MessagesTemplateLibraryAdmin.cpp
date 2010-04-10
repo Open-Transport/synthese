@@ -85,7 +85,7 @@ namespace synthese
 		void MessagesTemplateLibraryAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			uid id(map.getUid(PARAMETER_FOLDER_ID, false, FACTORY_KEY));
+			RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_FOLDER_ID, 0));
 			if (id > 0)
 			{
 				try
@@ -121,7 +121,7 @@ namespace synthese
 			AdminActionFunctionRequest<DeleteTextTemplateAction,MessagesTemplateLibraryAdmin> deleteRequest(_request);
 			
 			AdminActionFunctionRequest<TextTemplateAddAction,MessagesTemplateLibraryAdmin> addRequest(_request);
-			addRequest.getAction()->setParentId(_folder.get() ? _folder->getKey() : uid(0));
+			addRequest.getAction()->setParentId(_folder.get() ? _folder->getKey() : RegistryKeyType(0));
 			
 			AdminActionFunctionRequest<TextTemplateFolderUpdateAction,MessagesTemplateLibraryAdmin> updateFolderRequest(_request);
 			

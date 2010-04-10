@@ -32,6 +32,7 @@
 
 #include <vector>
 #include <utility>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -43,9 +44,9 @@ namespace synthese
 	namespace resa
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// ResaStatisticsAdmin Admin compound class.
+		/// 31.14 Admin : Reservation and calls statistics viewer.
 		///	@ingroup m31Admin refAdmin
-		///	@author Hugues
+		///	@author Hugues Romain
 		///	@date 2009
 		class ResaStatisticsAdmin:
 			public admin::AdminInterfaceElementTemplate<ResaStatisticsAdmin>
@@ -74,7 +75,7 @@ namespace synthese
 
 		public:
 			static std::string GetColumnName(ResaStatisticsTableSync::Step step);
-			typedef std::vector<std::pair<ResaStatisticsTableSync::Step, std::string> > _StepsVector;
+			typedef std::vector<std::pair<boost::optional<ResaStatisticsTableSync::Step>, std::string> > _StepsVector;
 			static _StepsVector _GetStepsVector();
 
 			//////////////////////////////////////////////////////////////////////////

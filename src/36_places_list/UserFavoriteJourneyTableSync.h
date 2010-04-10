@@ -25,11 +25,7 @@
 #ifndef SYNTHESE_UserFavoriteJourneyTableSync_H__
 #define SYNTHESE_UserFavoriteJourneyTableSync_H__
 
-
-#include <vector>
-#include <string>
-#include <iostream>
-
+#include "UserFavoriteJourney.h"
 #include "SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese

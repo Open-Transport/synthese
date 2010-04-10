@@ -26,7 +26,6 @@
 #include "Interface.h"
 
 #include <string>
-#include <iostream>
 
 #include "SQLiteRegistryTableSyncTemplate.h"
 
@@ -48,7 +47,7 @@ namespace synthese
 
 
 
-			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > OrderedInterfaceLabels;
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > OrderedInterfaceLabels;
 
 
 			/** Gets the label of the interfaces ordered alphabetically.

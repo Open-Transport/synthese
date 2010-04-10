@@ -89,15 +89,15 @@ namespace synthese
 
 		void AlarmTestOnDisplayScreenFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY));
-			setAlarmId(id);
+			setAlarmId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 
-			id = map.getUid(PARAMETER_DISPLAY_TYPE_ID, true, FACTORY_KEY);
 			try
 			{
-				_type = DisplayTypeTableSync::Get(id, *_env);
+				_type = DisplayTypeTableSync::Get(map.get<RegistryKeyType>(PARAMETER_DISPLAY_TYPE_ID), *_env);
 				if (!_type->getDisplayInterface())
+				{
 					throw RequestException("The specified type has no display interface");
+				}
 				InterfacePageTableSync::Search(
 					*_env,
 					_type->getDisplayInterface()->getKey(),
@@ -123,7 +123,7 @@ namespace synthese
 				PublicTransportStopZoneConnectionPlace place;
 				place.setName("TEST");
 				place.setCity(&city);
-				PhysicalStop ps(UNKNOWN_VALUE, string(), &place);
+				PhysicalStop ps(0, string(), &place);
 				CommercialLine cline;
 				cline.setShortName("00");
 				Line line;

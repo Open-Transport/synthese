@@ -142,7 +142,13 @@ namespace synthese
 				)	){
 					stream << t.title("Droits");
 					stream << t.cell("Connexion autorisée",t.getForm().getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
-					stream << t.cell("Profil",t.getForm().getSelectInput(UserUpdateAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), _user->getProfile()->getKey()));
+					stream << t.cell(
+						"Profil",
+						t.getForm().getSelectInput(
+							UserUpdateAction::PARAMETER_PROFILE_ID,
+							SecurityModule::getProfileLabels(),
+							optional<RegistryKeyType>(_user->getProfile()->getKey())
+					)	);
 				}
 				stream << t.close();
 			}

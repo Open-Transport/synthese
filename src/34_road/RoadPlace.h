@@ -64,7 +64,7 @@ namespace synthese
 			///  - USER_CAR : allowed
 			///  - USER_BUS : allowed
 			RoadPlace(
-				util::RegistryKeyType id = UNKNOWN_VALUE
+				util::RegistryKeyType id = 0
 			);
 
 			//! @name Getters

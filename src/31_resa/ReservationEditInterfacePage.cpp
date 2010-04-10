@@ -58,7 +58,7 @@ namespace synthese
 	{
 		ReservationEditInterfacePage::ReservationEditInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, ReservationEditInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

@@ -166,8 +166,14 @@ namespace synthese
 			stream << rt.open();
 			stream << rt.cell("Date début", rt.getForm().getCalendarInput(PARAM_SEARCH_START_DATE, _searchPeriod.begin()));
 			stream << rt.cell("Date fin", rt.getForm().getCalendarInput(PARAM_SEARCH_END_DATE, _searchPeriod.last()));
-			stream << rt.cell("Lignes", rt.getForm().getSelectInput(PARAM_ROW_STEP, _GetStepsVector(), _searchRowStep));
-			stream << rt.cell("Colonnes", rt.getForm().getSelectInput(PARAM_COL_STEP, _GetStepsVector(), _searchColStep));
+			stream << rt.cell(
+				"Lignes",
+				rt.getForm().getSelectInput(PARAM_ROW_STEP, _GetStepsVector(), optional<ResaStatisticsTableSync::Step>(_searchRowStep))
+			);
+			stream << rt.cell(
+				"Colonnes",
+				rt.getForm().getSelectInput(PARAM_COL_STEP, _GetStepsVector(), optional<ResaStatisticsTableSync::Step>(_searchColStep))
+			);
 			stream << rt.close();
 
 			stream << "<h1>Résultats</h1>";

@@ -30,6 +30,8 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/logic/tribool.hpp>
 
 namespace synthese
 {
@@ -55,6 +57,19 @@ namespace synthese
 			FieldExpression(const std::string& table, const std::string& field) : _table(table), _field(field) {}
 
 			virtual std::string toString() const;
+			static boost::shared_ptr<SQLExpression> Get(const std::string& table, const std::string& field);
+		};
+
+		class SubQueryExpression:
+			public SQLExpression
+		{
+			const std::string _subquery;
+
+		public:
+			SubQueryExpression(const std::string& subQuery) : _subquery(subQuery) {}
+
+			virtual std::string toString() const;
+			static boost::shared_ptr<SQLExpression> Get(const std::string& subQuery);
 		};
 
 
@@ -72,6 +87,10 @@ namespace synthese
 			static const std::string OP_INFEQ;
 			static const std::string OP_BITAND;
 			static const std::string OP_BITOR;
+			static const std::string OP_IN;
+			static const std::string OP_NOTIN;
+			static const std::string OP_EXISTS;
+			static const std::string OP_DIFF;
 
 		private:
 			boost::shared_ptr<SQLExpression> _expr1;
@@ -80,7 +99,8 @@ namespace synthese
 
 		public:
 			ComposedExpression(boost::shared_ptr<SQLExpression> expr1, std::string op, boost::shared_ptr<SQLExpression> expr2) : _expr1(expr1), _op(op), _expr2(expr2) {}
-			virtual std::string toString() const { return _expr1->toString() + " " + _op + " " + _expr2->toString(); }
+			virtual std::string toString() const;
+			static boost::shared_ptr<SQLExpression> Get(boost::shared_ptr<SQLExpression> expr1, std::string op, boost::shared_ptr<SQLExpression> expr2);
 		};
 
 		template<class T>
@@ -91,6 +111,34 @@ namespace synthese
 		public:
 			ValueExpression(const T& value) : _value(boost::lexical_cast<std::string>(value)) {}
 			virtual std::string toString() const { return _value; }
+			static boost::shared_ptr<SQLExpression> Get(const T& value);
+		};
+
+
+		class NotExpression:
+			public SQLExpression
+		{
+			boost::shared_ptr<SQLExpression> _expression;
+
+		public:
+			NotExpression(boost::shared_ptr<SQLExpression> expression) : _expression(expression) {}
+
+			virtual std::string toString() const;
+
+			static boost::shared_ptr<SQLExpression> Get(boost::shared_ptr<SQLExpression> expression);
+		};
+
+		class IsNullExpression:
+			public SQLExpression
+		{
+			boost::shared_ptr<SQLExpression> _expression;
+
+		public:
+			IsNullExpression(boost::shared_ptr<SQLExpression> expression) : _expression(expression) {}
+
+			virtual std::string toString() const;
+
+			static boost::shared_ptr<SQLExpression> Get(boost::shared_ptr<SQLExpression> expression);
 		};
 
 
@@ -113,6 +161,7 @@ namespace synthese
 				_value = s.str();
 			}
 			virtual std::string toString() const { return _value; }
+			static boost::shared_ptr<SQLExpression> Get(const std::set<T>& value);
 		};
 
 
@@ -134,6 +183,7 @@ namespace synthese
 				_value = s.str();
 			}
 			virtual std::string toString() const { return _value; }
+			static boost::shared_ptr<SQLExpression> Get(const std::vector<T>& value);
 		};
 
 
@@ -155,7 +205,99 @@ namespace synthese
 				_value.push_back('\'');
 			}
 			virtual std::string toString() const { return _value; }
+			static boost::shared_ptr<SQLExpression> Get(const std::string& value);
 		};
+
+
+		template<>
+		class ValueExpression<boost::posix_time::ptime>:
+			public SQLExpression
+		{
+			std::string _value;
+		public:
+			ValueExpression(const boost::posix_time::ptime& value) {
+				std::stringstream s;
+				s << "'";
+				if(!value.is_not_a_date_time())
+				{
+					s << boost::gregorian::to_iso_extended_string(value.date()) << " " << boost::posix_time::to_simple_string(value.time_of_day());
+				}
+				s << "'";
+				_value = s.str();
+			}
+			virtual std::string toString() const { return _value; }
+			static boost::shared_ptr<SQLExpression> Get(const boost::posix_time::ptime& value);
+		};
+
+
+
+		template<>
+		class ValueExpression<boost::gregorian::date>:
+			public SQLExpression
+		{
+			std::string _value;
+		public:
+			ValueExpression(const boost::gregorian::date& value) {
+				std::stringstream s;
+				s << "'";
+				if(!value.is_not_a_date())
+				{
+					s << boost::gregorian::to_iso_extended_string(value);
+				}
+				s << "'";
+				_value = s.str();
+			}
+			virtual std::string toString() const { return _value; }
+			static boost::shared_ptr<SQLExpression> Get(const boost::gregorian::date& value);
+		};
+
+
+
+		template<>
+		class ValueExpression<boost::logic::tribool>:
+			public SQLExpression
+		{
+			std::string _value;
+		public:
+			ValueExpression(const boost::logic::tribool& value) {
+				_value = boost::lexical_cast<std::string>(value == true ? 1 : value == false ? 0 : -1);
+			}
+			virtual std::string toString() const { return _value; }
+			static boost::shared_ptr<SQLExpression> Get(const boost::logic::tribool& value);
+		};
+
+
+
+
+
+
+		template<class T>
+		boost::shared_ptr<SQLExpression> ValueExpression<T>::Get( const T& value )
+		{
+			return boost::shared_ptr<SQLExpression>(
+				static_cast<SQLExpression*>(new ValueExpression<T>(value))
+			);
+		}
+
+
+
+		template<class T>
+		boost::shared_ptr<SQLExpression> ValueExpression<std::set<T> >::Get( const std::set<T>& value )
+		{
+			return boost::shared_ptr<SQLExpression>(
+				static_cast<SQLExpression*>(new ValueExpression<std::set<T> >(value))
+			);
+		}
+
+
+
+		template<class T>
+		boost::shared_ptr<SQLExpression> ValueExpression<std::vector<T> >::Get( const std::vector<T>& value )
+		{
+			return boost::shared_ptr<SQLExpression>(
+				static_cast<SQLExpression*>(new ValueExpression<std::vector<T> >(value))
+			);
+		}
 	}
 }
 

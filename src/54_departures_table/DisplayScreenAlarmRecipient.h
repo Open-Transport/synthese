@@ -30,10 +30,10 @@ namespace synthese
 {
 	namespace departurestable
 	{
-
-		/** DisplayScreenAlarmRecipient class.
-			@ingroup m54Messages refAlarmrecipients
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 54.17 Alarm recipient : display screen.
+		///	@ingroup m54Messages refAlarmrecipients
+		/// @author Hugues Romain
 		class DisplayScreenAlarmRecipient:
 			public messages::AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>
 		{
@@ -57,8 +57,8 @@ namespace synthese
 
 			virtual messages::AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const server::ParametersMap& parameters) const;
 
-			void addObject(const messages::SentAlarm* alarm, uid objectId);
-			void removeObject(const messages::SentAlarm* alarm, uid objectId);
+			virtual void addObject(const messages::SentAlarm* alarm, util::RegistryKeyType objectId);
+			virtual void removeObject(const messages::SentAlarm* alarm, util::RegistryKeyType objectId);
 		};
 	}
 }

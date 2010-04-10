@@ -23,9 +23,11 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "SelectQuery.hpp"
+#include "ReplaceQuery.h"
+#include "SQLExpression.hpp"
 #include "DisplayScreenTableSync.h"
 #include "DisplayTypeTableSync.h"
-#include "DisplayScreen.h"
 #include "DisplayType.h"
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
@@ -39,11 +41,6 @@
 #include "PhysicalStopTableSync.h"
 #include "Line.h"
 #include "DBLogEntryTableSync.h"
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
-#include "Conversion.h"
 #include "SentAlarm.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
@@ -340,114 +337,128 @@ namespace synthese
 			DisplayScreen* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-
-            query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< object->getKey()
-				<< "," << (object->getLocalization() ? object->getLocalization()->getKey() : RegistryKeyType(0))
-				<< "," << Conversion::ToSQLiteString(object->getLocalizationComment())
-				<< "," << (object->getType() ? object->getType()->getKey() : RegistryKeyType(0))
-				<< "," << object->getWiringCode()
-				<< "," << Conversion::ToSQLiteString(object->getTitle())
-				<< "," << object->getBlinkingDelay()
-				<< "," << object->getTrackNumberDisplay()
-				<< "," << object->getServiceNumberDisplay()
-				<< "," << object->getDisplayTeam()
-				<< ",'";
-
-			int count=0;
+			// Physical stops
+			stringstream psstream;
+			bool first(true);
 			const ArrivalDepartureTableGenerator::PhysicalStops& pss = object->getPhysicalStops(false);
 			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& itp, pss)
 			{
 				assert(itp.second->getKey() > 0);
-
-				if (count++)
-					query << ",";
-				query << itp.first;
+				if(!first)
+				{
+					psstream << ",";
+				}
+				psstream << itp.first;
+				first = false;
 			}
 
-			query
-				<< "'," << object->getAllPhysicalStopsDisplayed()
-				<< ",'";
-
-			count = 0;
+			// Forbidden places
+			stringstream fpstream;
+			first = true;
 			for (ForbiddenPlacesList::const_iterator itf = object->getForbiddenPlaces().begin(); itf != object->getForbiddenPlaces().end(); ++itf)
 			{
 				assert(itf->second->getKey() > 0);
-				if (count++)
-					query << ",";
-				query << itf->first;
+				if(!first)
+				{
+					fpstream << ",";
+				}
+				fpstream << itf->first;
+				first = false;
 			}
 
-			query << "','";
-
-			count = 0;
+			// Lines filter
+			stringstream lfstream;
+			first = true;
 			for (LineFilter::const_iterator itl = object->getForbiddenLines().begin(); itl != object->getForbiddenLines().end(); ++itl)
 			{
 				assert(itl->second->getKey() > 0);
-				if (count++)
-					query << ",";
-				query << itl->first;
+				if(!first)
+				{
+					lfstream << ",";
+				}
+				lfstream << itl->first;
+				first = false;
 			}
 
-			query
-				<< "'," << static_cast<int>(object->getDirection())
-				<< "," << static_cast<int>(object->getEndFilter())
-				<< ",'";
-
-			count = 0;
+			// Displayed places
+			stringstream dpstream;
+			first = true;
 			BOOST_FOREACH(const DisplayedPlacesList::value_type& itd, object->getDisplayedPlaces())
 			{
 				assert(itd.second->getKey() > 0);
-				if (count++)
-					query << ",";
-				query << itd.second->getKey();
+				if (!first)
+				{
+					dpstream << ",";
+				}
+				dpstream << itd.second->getKey();
+				first = false;
 			}
 
-			query
-				<< "'," << object->getMaxDelay()
-				<< "," << object->getClearingDelay()
-				<< "," << object->getFirstRow()
-				<< "," << static_cast<int>(object->getGenerationMethod())
-				<< ",'";
-
-			count = 0;
+			// Forced destinations
+			stringstream fdstream;
+			first = true;
 			BOOST_FOREACH(const DisplayedPlacesList::value_type& itd2, object->getForcedDestinations())
 			{
 				assert(itd2.second->getKey() > 0);
-				if (count++)
-					query << ",";
-				query << itd2.second->getKey();
+				if (!first)
+				{
+					fdstream << ",";
+				}
+				fdstream << itd2.second->getKey();
+				first = false;
 			}
 
-			query <<
-				"'," << object->getForceDestinationDelay() <<
-				",''" <<
-				"," << object->getIsOnline() <<
-				"," << Conversion::ToSQLiteString(object->getMaintenanceMessage()) << "," <<
-				object->getDisplayClock() << "," <<
-				object->getComPort() << "," <<
-				(object->getCPU() != NULL ? object->getCPU()->getKey() : RegistryKeyType(0)) << "," <<
-				Conversion::ToSQLiteString(object->getMacAddress()) << "," <<
-				object->getRoutePlanningWithTransfer() << ",'";
-			count = 0;
+			// Transfer destinations
+			stringstream tdstream;
+			first = true;
 			BOOST_FOREACH(const TransferDestinationsList::value_type& it, object->getTransferdestinations())
 			{
 				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it.second)
 				{
-					if (count++) query << ",";
-					query << it.first->getKey() << ":" << it2->getKey();
+					if(!first)
+					{
+						tdstream << ",";
+					}
+					tdstream << it.first->getKey() << ":" << it2->getKey();
+					first = false;
 				}
 			}
-			query << "'";
 
-			query << ")";
-			
-			sqlite->execUpdate(query.str(), transaction);
+
+			// Query
+			ReplaceQuery<DisplayScreenTableSync> query(*object);
+			query.addField(object->getLocalization() ? object->getLocalization()->getKey() : RegistryKeyType(0));
+			query.addField(object->getLocalizationComment());
+			query.addField(object->getType() ? object->getType()->getKey() : RegistryKeyType(0));
+			query.addField(object->getWiringCode());
+			query.addField(object->getTitle());
+			query.addField(object->getBlinkingDelay());
+			query.addField(object->getTrackNumberDisplay());
+			query.addField(object->getServiceNumberDisplay());
+			query.addField(object->getDisplayTeam());
+			query.addField(psstream.str());
+			query.addField(object->getAllPhysicalStopsDisplayed());
+			query.addField(fpstream.str());
+			query.addField(lfstream.str());
+			query.addField(static_cast<int>(object->getDirection()));
+			query.addField(static_cast<int>(object->getEndFilter()));
+			query.addField(dpstream.str());
+			query.addField(object->getMaxDelay());
+			query.addField(object->getClearingDelay());
+			query.addField(object->getFirstRow());
+			query.addField(static_cast<int>(object->getGenerationMethod()));
+			query.addField(fdstream.str());
+			query.addField(object->getForceDestinationDelay());
+			query.addField(string());
+			query.addField(object->getIsOnline());
+			query.addField(object->getMaintenanceMessage());
+			query.addField(object->getDisplayClock());
+			query.addField(object->getComPort());
+			query.addField(object->getCPU() != NULL ? object->getCPU()->getKey() : RegistryKeyType(0));
+			query.addField(object->getMacAddress());
+			query.addField(object->getRoutePlanningWithTransfer());
+			query.addField(tdstream.str());
+			query.execute(transaction);
 	}	}
 
 	namespace departurestable
@@ -456,18 +467,18 @@ namespace synthese
 			Env& env,
 			optional<const security::RightsOfSameClassMap&> rights 
 			, bool totalControl 
-			, RightLevel neededLevel
-			, uid duid
-			, uid localizationid
-			, uid lineid
-			, uid typeuid
-			, string cityName
+			, RightLevel neededLevel,
+			optional<RegistryKeyType> duid,
+			optional<RegistryKeyType> localizationid,
+			optional<RegistryKeyType> lineid,
+			optional<RegistryKeyType> typeuid,
+			string cityName
 			, string stopName
-			, string name
-			, int state 
-			, int message 
-			, int first /*= 0*/
-			, boost::optional<std::size_t> number
+			, string name,
+			optional<int> state,
+			optional<int> message,
+			size_t first /*= 0*/,
+			boost::optional<std::size_t> number
 			, bool orderByUid /*= false*/
 			, bool orderByCity /*= true*/
 			, bool orderByStopName /*= false*/
@@ -478,105 +489,126 @@ namespace synthese
 			, bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-			    << " SELECT"
-			    << " d.*"
-			    << " FROM "
-			    << TABLE.NAME << " AS d";
-			if(localizationid != 0)
+			SelectQuery<DisplayScreenTableSync> query;
+
+			// Tables
+			if(!localizationid || *localizationid != 0)
 			{
-				query
-					<< " INNER JOIN " << ConnectionPlaceTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=d." << COL_PLACE_ID
-					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
-					<< " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
-				;
+				query.addTableAndEqualJoin<ConnectionPlaceTableSync>(TABLE_COL_ID, COL_PLACE_ID);
+				query.addTableAndEqualOtherJoin<CityTableSync,ConnectionPlaceTableSync>(TABLE_COL_ID, ConnectionPlaceTableSync::TABLE_COL_CITYID);
+				query.addTableAndEqualOtherJoin<PhysicalStopTableSync,ConnectionPlaceTableSync>(PhysicalStopTableSync::COL_PLACEID, TABLE_COL_ID);
 			
-				if (lineid != UNKNOWN_VALUE || neededLevel > FORBIDDEN)
-					query
-					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls " << " ON s." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
-					<< " INNER JOIN " << LineTableSync::TABLE.NAME << " AS ll ON ll." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_LINEID
-				;
+				if (lineid || neededLevel > FORBIDDEN)
+				{
+					query.addTableAndEqualOtherJoin<LineStopTableSync,PhysicalStopTableSync>(LineStopTableSync::COL_PHYSICALSTOPID, TABLE_COL_ID);
+					query.addTableAndEqualOtherJoin<LineTableSync,LineStopTableSync>(TABLE_COL_ID, LineStopTableSync::COL_LINEID);
+				}
+
+				if(orderByType)
+				{
+					query.addTableAndEqualJoin<DisplayTypeTableSync>(TABLE_COL_ID, COL_TYPE_ID);
+				}
 			}
 			
 			// Filtering
-			query << " WHERE 1 ";
-			if(localizationid != 0)
+			if(!localizationid || *localizationid != 0)
 			{
 				if (neededLevel > FORBIDDEN && rights)
-					query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(*rights, totalControl, neededLevel, false) << ")";
+				{
+					query.addWhere(
+						ComposedExpression::Get(
+							FieldExpression::Get(
+								LineTableSync::TABLE.NAME, LineTableSync::COL_COMMERCIAL_LINE_ID
+							),
+							ComposedExpression::OP_IN,
+							SubQueryExpression::Get(
+								CommercialLineTableSync::getSQLLinesList(*rights, totalControl, neededLevel, false)
+					)	)	);
+				}
 				if (!cityName.empty())
-					query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
+				{
+					query.addWhereFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, "%"+cityName+"%", ComposedExpression::OP_LIKE);
+				}
 				if (!stopName.empty())
-					query << " AND p." << ConnectionPlaceTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(stopName, false) << "%'";
-				if (lineid != UNKNOWN_VALUE)
-					query << " AND ll." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineid;
+				{
+					query.addWhereFieldOther<ConnectionPlaceTableSync>(ConnectionPlaceTableSync::TABLE_COL_NAME, "%"+stopName+"%", ComposedExpression::OP_LIKE);
+				}
+				if (lineid)
+				{
+					query.addWhereFieldOther<LineTableSync>(LineTableSync::COL_COMMERCIAL_LINE_ID, *lineid);
+				}
+			}
+			if(state)
+			{
+				/// @todo write status filter
+			}
+			if(message)
+			{
+				/// @todo write message filter
 			}
 			if (!name.empty())
-			    query << " AND d." << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-			if (duid != UNKNOWN_VALUE)
-			    query << " AND d." << TABLE_COL_ID << "=" << duid;
-			if (localizationid != UNKNOWN_VALUE)
-			    query << " AND d." << COL_PLACE_ID << "=" << localizationid;
-			if (typeuid != UNKNOWN_VALUE)
-			    query << " AND d." << COL_TYPE_ID << "=" << typeuid;
+			{
+				query.addWhereField(COL_NAME, "%"+name+"%", ComposedExpression::OP_LIKE);
+			}
+			if (duid)
+			{
+				query.addWhereField(TABLE_COL_ID, *duid);
+			}
+			if (localizationid)
+			{
+				query.addWhereField(COL_PLACE_ID, *localizationid);
+			}
+			if (typeuid)
+			{
+				query.addWhereField(COL_TYPE_ID, *typeuid);
+			}
 			
 			// Grouping
-			query << " GROUP BY d." << TABLE_COL_ID;
+			query.addGroupByField();
 			
 			// Ordering
 			if (orderByUid)
 			{
-				query << " ORDER BY d." << TABLE_COL_ID << (raisingOrder ? " ASC" : " DESC");
+				query.addOrderField(TABLE_COL_ID, raisingOrder);
 			}
-			else if (localizationid != 0 && orderByCity)
+			else if ((!localizationid || *localizationid != 0) && orderByCity)
 			{
-				query
-					<< " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",s." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				;
+				query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
+				query.addOrderFieldOther<ConnectionPlaceTableSync>(ConnectionPlaceTableSync::TABLE_COL_NAME, raisingOrder);
+				query.addOrderField(COL_NAME, raisingOrder);
 			}
-			else if (localizationid != 0 && orderByStopName)
+			else if ((!localizationid || *localizationid != 0) && orderByStopName)
 			{
-				query
-					<< " ORDER BY s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC")
-				;
+				query.addOrderFieldOther<ConnectionPlaceTableSync>(ConnectionPlaceTableSync::TABLE_COL_NAME, raisingOrder);
+				query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
+				query.addOrderField(COL_NAME, raisingOrder);
 			}
 			else if (orderByName)
 			{
-				query << " ORDER BY d." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
-				if(localizationid != 0)
+				query.addOrderField(COL_NAME, raisingOrder);
+				if(!localizationid || *localizationid != 0)
 				{
-					query <<
-						",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-						<< ",s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					;
+					query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
+					query.addOrderFieldOther<ConnectionPlaceTableSync>(ConnectionPlaceTableSync::TABLE_COL_NAME, raisingOrder);
 			}	}
 			else if (orderByType)
 			{
-			    query <<
-			    	" ORDER BY (SELECT " << DisplayTypeTableSync::COL_NAME << " FROM " <<
-			    	DisplayTypeTableSync::TABLE.NAME << " WHERE " << 
-			    	DisplayTypeTableSync::TABLE.NAME << "." << TABLE_COL_ID << " = d." << 
-			    	COL_TYPE_ID << (raisingOrder ? ") ASC" : ") DESC");
-				if(localizationid != 0)
+			    query.addOrderFieldOther<DisplayTypeTableSync>(DisplayTypeTableSync::COL_NAME, raisingOrder);
+				if(!localizationid || *localizationid != 0)
 				{
-					query << ",c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC")
-					<< ",s." << PhysicalStopTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC");
+					query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
+					query.addOrderFieldOther<ConnectionPlaceTableSync>(ConnectionPlaceTableSync::TABLE_COL_NAME, raisingOrder);
 				}
-				query << ",d." << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query.addOrderField(COL_NAME, raisingOrder);
 			}
 			if (number)
 			{
-				query << " LIMIT " << (*number + 1);
+				query.setNumber(*number + 1);
 				if (first > 0)
-					query << " OFFSET " << first;
+					query.setFirst(first);
 			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 
 
@@ -586,19 +618,11 @@ namespace synthese
 			util::RegistryKeyType cpuId,
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
 		){
-			stringstream query;
-			query <<
-				" SELECT"
-				<< " *"
-				<< " FROM "
-				<< TABLE.NAME <<
-				" WHERE " <<
-				COL_CPU_HOST_ID << "=" << cpuId <<
-				" ORDER BY " <<
-				COL_COM_PORT << "," << COL_WIRING_CODE
-			;
-
-			return LoadFromQuery(query.str(), env, linkLevel);
+			SelectQuery<DisplayScreenTableSync> query;
+			query.addWhereField(COL_CPU_HOST_ID, cpuId);
+			query.addOrderField(COL_COM_PORT, true);
+			query.addOrderField(COL_WIRING_CODE, true);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 
 
@@ -606,29 +630,67 @@ namespace synthese
 		vector<boost::shared_ptr<SentAlarm> > DisplayScreenTableSync::GetCurrentDisplayedMessage(
 			util::Env& env,
 			util::RegistryKeyType screenId,
-			int limit
+			optional<int> limit
 		){
 			ptime now(second_clock::local_time());
-			stringstream q;
-			q	<< "SELECT " << AlarmObjectLinkTableSync::COL_ALARM_ID
-				<< " FROM " << AlarmObjectLinkTableSync::TABLE.NAME << " AS aol "
-				<< " INNER JOIN " << AlarmTableSync::TABLE.NAME << " AS a ON a." << TABLE_COL_ID << "=aol." << AlarmObjectLinkTableSync::COL_ALARM_ID
-				<< " INNER JOIN " << ScenarioTableSync::TABLE.NAME << " AS s ON s." << TABLE_COL_ID << "=a." << AlarmTableSync::COL_SCENARIO_ID
-				<< " WHERE aol." << AlarmObjectLinkTableSync::COL_OBJECT_ID << "=" << screenId
-				<< " AND s." << ScenarioTableSync::COL_ENABLED
-				<< " AND NOT s." << ScenarioTableSync::COL_IS_TEMPLATE
-				<< " AND (s." << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR s." << ScenarioTableSync::COL_PERIODSTART << "<\"" << to_iso_extended_string(now.date()) << " " << to_simple_string(now.time_of_day()) << "\")"
-				<< " AND (s." << ScenarioTableSync::COL_PERIODEND << " IS NULL OR s." << ScenarioTableSync::COL_PERIODEND << ">\"" << to_iso_extended_string(now.date()) << " " << to_simple_string(now.time_of_day()) << "\")"
-				<< " ORDER BY a." << AlarmTableSync::COL_LEVEL << " DESC, s." << ScenarioTableSync::COL_PERIODSTART << " DESC";
-			if (limit > 0)
+
+			SelectQuery<AlarmObjectLinkTableSync> query;
+			query.addTableField(AlarmObjectLinkTableSync::COL_ALARM_ID);
+			query.addTableAndEqualJoin<AlarmTableSync>(TABLE_COL_ID, AlarmObjectLinkTableSync::COL_ALARM_ID);
+			query.addTableAndEqualOtherJoin<ScenarioTableSync, AlarmTableSync>(TABLE_COL_ID, AlarmTableSync::COL_SCENARIO_ID);
+			query.addWhereField(AlarmObjectLinkTableSync::COL_OBJECT_ID, screenId);
+			query.addWhereFieldOther<ScenarioTableSync>(ScenarioTableSync::COL_ENABLED, 1);
+			query.addWhere(
+				NotExpression::Get(
+					FieldExpression::Get(
+						ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_IS_TEMPLATE
+			)	)	);
+			query.addWhere(
+				ComposedExpression::Get(
+					IsNullExpression::Get(
+						FieldExpression::Get(
+							ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODSTART
+					)	),
+					ComposedExpression::OP_OR,
+					ComposedExpression::Get(
+						FieldExpression::Get(
+							ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODSTART
+						),
+						ComposedExpression::OP_INF,
+						ValueExpression<ptime>::Get(now)
+					)
+			)	);
+			query.addWhere(
+				ComposedExpression::Get(
+					IsNullExpression::Get(
+						FieldExpression::Get(
+							ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODEND
+					)	),
+					ComposedExpression::OP_OR,
+					ComposedExpression::Get(
+						FieldExpression::Get(
+							ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODEND
+						),
+						ComposedExpression::OP_SUP,
+						ValueExpression<ptime>::Get(now)
+					)
+			)	);
+			query.addOrderFieldOther<AlarmTableSync>(AlarmTableSync::COL_LEVEL, false);
+			query.addOrderFieldOther<ScenarioTableSync>(ScenarioTableSync::COL_PERIODSTART, false);
+			if (limit)
 			{
-				q << " LIMIT 1";
+				query.setNumber(*limit);
 			}
-			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(q.str());
+			SQLiteResultSPtr rows = query.execute();
 			vector<shared_ptr<SentAlarm> > result;
 			while(rows->next())
 			{
-				result.push_back(static_pointer_cast<SentAlarm,Alarm>(AlarmTableSync::GetEditable(rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID), env)));
+				result.push_back(
+					static_pointer_cast<SentAlarm,Alarm>(
+						AlarmTableSync::GetEditable(
+							rows->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID),
+							env
+				)	)	);
 			}
 			return result;
 		}
@@ -663,7 +725,7 @@ namespace synthese
 		vector<shared_ptr<SentAlarm> > DisplayScreenTableSync::GetFutureDisplayedMessages(
 			Env& env,
 			RegistryKeyType screenId,
-			optional<int> number /*= UNKNOWN_VALUE */
+			optional<int> number
 		){
 			ptime now(second_clock::local_time());
 			stringstream q;
@@ -696,18 +758,10 @@ namespace synthese
 			const std::string& macAddress,
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */ )
 		{
-			stringstream query;
-			query <<
-				" SELECT"
-				<< " *"
-				<< " FROM "
-				<< TABLE.NAME <<
-				" WHERE " <<
-				COL_MAC_ADDRESS << "=" << Conversion::ToSQLiteString(macAddress) <<
-				" LIMIT 1 "
-			;
-
-			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
+			SelectQuery<DisplayScreenTableSync> query;
+			query.addWhereField(COL_MAC_ADDRESS, macAddress);
+			query.setNumber(1);
+			SQLiteResultSPtr rows = query.execute();
 			if(rows->next ())
 			{
 				util::Registry<DisplayScreen>& registry(env.getEditableRegistry<DisplayScreen>());

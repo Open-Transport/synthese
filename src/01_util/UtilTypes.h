@@ -33,18 +33,50 @@ namespace synthese
 	/// @{
 	namespace util
 	{
-		typedef signed long long int RegistryKeyType;
+		typedef unsigned long long int RegistryKeyType;
+		typedef unsigned long int RegistryObjectType;
+		typedef unsigned int RegistryTableType;
+		typedef unsigned int RegistryNodeType;
 
 		typedef enum
 		{
-			UNKNOWN_LOAD_LEVEL = -1,
-			FIELDS_ONLY_LOAD_LEVEL = 0,
+			UNKNOWN_LOAD_LEVEL = 0,
+			FIELDS_ONLY_LOAD_LEVEL = 1,
 			UP_LINKS_LOAD_LEVEL = 5,
 			DOWN_LINKS_LOAD_LEVEL = 6,
 			UP_DOWN_LINKS_LOAD_LEVEL = 10,
 			RECURSIVE_LINKS_LOAD_LEVEL = 20,
 			ALGORITHMS_OPTIMIZATION_LOAD_LEVEL = 30
 		} LinkLevel;
+
+
+		////////////////////////////////////////////////////////////////////
+		///	Encodes a universal id.
+		///	@param tableId (2 bytes)
+		///	@param gridNodeId (12 bits)
+		///	@param objectId (4 bytes)
+		///	@author Marc Jambert
+		////////////////////////////////////////////////////////////////////
+		RegistryKeyType encodeUId(
+			RegistryTableType tableId,
+			RegistryNodeType gridNodeId,
+			RegistryObjectType objectId
+		);
+
+
+
+		////////////////////////////////////////////////////////////////////
+		/// Reads the table ID in an object id.
+		///	@param id the object id
+		///	@return the table id
+		///	@author Marc Jambert
+		///	@date 2006
+		////////////////////////////////////////////////////////////////////
+		RegistryTableType decodeTableId (RegistryKeyType id);
+
+		RegistryNodeType decodeGridNodeId (RegistryKeyType id);
+
+		RegistryObjectType decodeObjectId (RegistryKeyType id);
 	}
 	/// @}
 }

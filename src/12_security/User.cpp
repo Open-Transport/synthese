@@ -204,16 +204,6 @@ namespace synthese
 			return s.str();
 		}
 
-		void User::setCityId( uid cityId )
-		{
-			_cityId = cityId;
-		}
-
-		uid User::getCityId() const
-		{
-			return _cityId;
-		}
-
 
 
 		void User::setRandomPassword()

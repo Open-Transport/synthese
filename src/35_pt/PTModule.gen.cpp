@@ -51,6 +51,7 @@ synthese::pt::TridentExportFunction::integrate ();
 synthese::pt::PTNetworksListFunction::integrate();
 synthese::pt::PTRoutesListFunction::integrate();
 synthese::pt::CheckLineCalendarFunction::integrate();
+synthese::pt::PTObjectInformationFunction::integrate();
 
 synthese::pt::LineMarkerInterfacePage::integrate();
 synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
@@ -74,6 +75,8 @@ synthese::pt::ContinuousServiceUpdateAction::integrate();
 synthese::pt::StopAreaNameUpdateAction::integrate();
 synthese::pt::PTUseRuleAddAction::integrate();
 synthese::pt::PTUseRuleUpdateAction::integrate();
+synthese::pt::ServiceTimetableUpdateAction::integrate();
+synthese::pt::ServiceUpdateAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 

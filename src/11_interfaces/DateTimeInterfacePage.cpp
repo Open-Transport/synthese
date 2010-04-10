@@ -22,7 +22,10 @@
 
 #include "DateTimeInterfacePage.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
+using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 
@@ -50,12 +53,12 @@ namespace synthese
 		) const	{
 			ParametersVector pv;
 
-			pv.push_back(Conversion::ToString(dateTime.date().year()));
-			pv.push_back(Conversion::ToString(dateTime.date().month()));
-			pv.push_back(Conversion::ToString(dateTime.date().day()));
-			pv.push_back(Conversion::ToString(dateTime.time_of_day().hours()));
-			pv.push_back(Conversion::ToString(dateTime.time_of_day().minutes()));
-			pv.push_back(Conversion::ToString(dateTime.date().day_of_week()));
+			pv.push_back(lexical_cast<string>(dateTime.date().year()));
+			pv.push_back(lexical_cast<string>(dateTime.date().month()));
+			pv.push_back(lexical_cast<string>(dateTime.date().day()));
+			pv.push_back(lexical_cast<string>(dateTime.time_of_day().hours()));
+			pv.push_back(lexical_cast<string>(dateTime.time_of_day().minutes()));
+			pv.push_back(lexical_cast<string>(dateTime.date().day_of_week()));
 
 			InterfacePage::_display(stream, pv, variables, NULL, request);
 		}
@@ -68,12 +71,12 @@ namespace synthese
 		) const	{
 			ParametersVector pv;
 
-			pv.push_back(Conversion::ToString(date.year()));
-			pv.push_back(Conversion::ToString(date.month()));
-			pv.push_back(Conversion::ToString(date.day()));
-			pv.push_back(Conversion::ToString(UNKNOWN_VALUE));
-			pv.push_back(Conversion::ToString(UNKNOWN_VALUE));
-			pv.push_back(Conversion::ToString(date.day_of_week()));
+			pv.push_back(lexical_cast<string>(date.year()));
+			pv.push_back(lexical_cast<string>(date.month()));
+			pv.push_back(lexical_cast<string>(date.day()));
+			pv.push_back(lexical_cast<string>(UNKNOWN_VALUE));
+			pv.push_back(lexical_cast<string>(UNKNOWN_VALUE));
+			pv.push_back(lexical_cast<string>(date.day_of_week()));
 
 			InterfacePage::_display(stream, pv, variables, NULL, request);
 		}
@@ -81,7 +84,7 @@ namespace synthese
 
 
 		DateTimeInterfacePage::DateTimeInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

@@ -34,32 +34,8 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-
-
-		void SiteCommercialLineLink::setSiteId( uid id )
-		{
-			_siteId = id;
-		}
-
-		void SiteCommercialLineLink::setCommercialLineId( uid id )
-		{
-			_commercialLineId = id;
-		}
-
-		uid SiteCommercialLineLink::getSiteId() const
-		{
-			return _siteId;
-		}
-
-		uid SiteCommercialLineLink::getCommercialLineId() const
-		{
-			return _commercialLineId;
-		}
-
-
-
 		SiteCommercialLineLink::SiteCommercialLineLink(
-			util::RegistryKeyType id /*= UNKNOWN_VALUE*/
+			util::RegistryKeyType id 
 		):	Registrable(id)
 		{
 

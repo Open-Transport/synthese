@@ -195,7 +195,7 @@ namespace synthese
 				<< static_cast<int>(object->getSoundStatus()) << ","
 				<< Conversion::ToSQLiteString(object->getSoundDetail()) << ","
 				<< static_cast<int>(object->getTemperatureStatus()) << ","
-				<< Conversion::ToString(object->getTemperatureValue()) << ","
+				<< (object->getTemperatureValue() ? lexical_cast<string>(*object->getTemperatureValue()) : string()) << ","
 				<< static_cast<int>(object->getCommunicationStatus()) << ","
 				<< static_cast<int>(object->getLocalizationStatus())
 				<< ")";
@@ -216,7 +216,7 @@ namespace synthese
 	{
 		DisplayMonitoringStatusTableSync::SearchResult DisplayMonitoringStatusTableSync::Search(
 			Env& env,
-			RegistryKeyType screenId,
+			optional<RegistryKeyType> screenId,
 			int first /*= 0*/,
 			boost::optional<std::size_t> number /*= 0*/,
 			bool orderByScreenId,
@@ -228,9 +228,9 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
-			if (screenId != UNKNOWN_VALUE)
+			if (screenId)
 			{
-				query << " AND " << COL_SCREEN_ID << "=" << Conversion::ToString(screenId);
+				query << " AND " << COL_SCREEN_ID << "=" << *screenId;
 			}
 			if (orderByScreenId)
 				query << " ORDER BY " << COL_SCREEN_ID << (raisingOrder ? " ASC" : " DESC");

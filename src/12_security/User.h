@@ -64,7 +64,7 @@ namespace synthese
 			std::string		_address;
 			std::string		_postCode;
 			std::string		_cityText;
-			uid				_cityId;
+			util::RegistryKeyType		_cityId;
 			std::string		_country;
 			std::string		_email;
 			std::string		_phone;
@@ -72,7 +72,7 @@ namespace synthese
 			boost::gregorian::date	_birthDate;
 			
 		public:
-			User(util::RegistryKeyType id = UNKNOWN_VALUE);
+			User(util::RegistryKeyType id = 0);
 
 			//! \name Setters
 			//@{
@@ -88,7 +88,7 @@ namespace synthese
 				void setAddress(const std::string& address);
 				void setPostCode(const std::string& code);
 				void setCityText(const std::string& city);
-				void setCityId(uid cityId);
+				void setCityId(util::RegistryKeyType cityId) { _cityId = cityId; }
 				void setCountry(const std::string& country);
 				void setEMail(const std::string& email);
 				void setPhone(const std::string& phone);
@@ -111,7 +111,7 @@ namespace synthese
 				const std::string&	getAddress()			const;
 				const std::string&	getPostCode()			const;
 				const std::string&	getCityText()			const;
-				uid					getCityId()				const;
+				util::RegistryKeyType	getCityId()				const { return _cityId; }
 				const std::string&	getCountry()			const;
 				const std::string&	getEMail()				const;
 				const std::string&	getPhone()				const;

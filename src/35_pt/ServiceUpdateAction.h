@@ -49,15 +49,21 @@ namespace synthese
 		/// Parameters :
 		///	<ul>
 		///		<li>actionParamid : id of the service to update</li>
+		///		<li>actionParamsn : service number</li>
+		///		<li>actionParamte : team number</li>
 		///	</ul>
 		class ServiceUpdateAction:
 			public util::FactorableTemplate<server::Action, ServiceUpdateAction>
 		{
 		public:
 			static const std::string PARAMETER_OBJECT_ID;
+			static const std::string PARAMETER_SERVICE_NUMBER;
+			static const std::string PARAMETER_TEAM_NUMBER;
 
 		private:
 			boost::shared_ptr<graph::Service> _service;
+			std::string _serviceNumber;
+			std::string _teamNumber;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

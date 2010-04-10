@@ -67,10 +67,10 @@ namespace synthese
 
 		void DisplayScreenCPUMaintenanceUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setCPU(map.getUid(PARAMETER_CPU, true, FACTORY_KEY));
-			_isOnline = map.getBool(PARAMETER_IS_ONLINE, true, false, FACTORY_KEY);
-			_maintenanceMessage = map.getString(PARAMETER_MAINTENANCE_MESSAGE, true, FACTORY_KEY);
-			_monitoringDelay = minutes(map.getInt(PARAMETER_MONITORING_DELAY, true, FACTORY_KEY));
+			setCPU(map.get<RegistryKeyType>(PARAMETER_CPU));
+			_isOnline = map.get<bool>(PARAMETER_IS_ONLINE);
+			_maintenanceMessage = map.get<string>(PARAMETER_MAINTENANCE_MESSAGE);
+			_monitoringDelay = minutes(map.get<int>(PARAMETER_MONITORING_DELAY));
 		}
 
 		void DisplayScreenCPUMaintenanceUpdateAction::run(Request& request)

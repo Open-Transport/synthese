@@ -97,7 +97,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			// Columns reading
-			uid id(rows->getLongLong(TABLE_COL_ID));
+			RegistryKeyType id(rows->getLongLong(TABLE_COL_ID));
 
 			// Properties
 			object->setKey(id);
@@ -192,7 +192,7 @@ namespace synthese
 	{
 		CalendarTemplateElementTableSync::SearchResult CalendarTemplateElementTableSync::Search(
 			Env& env,
-			uid calendarId
+			optional<RegistryKeyType> calendarId
 			, int first /*= 0*/
 			, boost::optional<std::size_t> number  /*= 0*/,
 			LinkLevel linkLevel
@@ -202,8 +202,8 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
-			if (calendarId != UNKNOWN_VALUE)
-				query << " AND " << COL_CALENDAR_ID << "=" << calendarId
+			if (calendarId)
+				query << " AND " << COL_CALENDAR_ID << "=" << *calendarId
 			;
 			query << " ORDER BY " << COL_RANK << " ASC";
 			if (number)
@@ -218,7 +218,7 @@ namespace synthese
 
 
 
-		void CalendarTemplateElementTableSync::Shift( uid calendarId , int rank , int delta )
+		void CalendarTemplateElementTableSync::Shift( RegistryKeyType calendarId , int rank , int delta )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 
@@ -237,7 +237,7 @@ namespace synthese
 
 
 
-		int CalendarTemplateElementTableSync::GetMaxRank( uid calendarId )
+		int CalendarTemplateElementTableSync::GetMaxRank( RegistryKeyType calendarId )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 

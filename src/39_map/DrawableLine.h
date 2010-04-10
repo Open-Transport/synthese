@@ -26,144 +26,140 @@
 #include <string>
 #include <vector>
 
-
+#include "UtilTypes.h"
 #include "Drawable.h"
-
-#include "01_util/RGBColor.h"
-#include "01_util/UId.h"
-
-#include "06_geometry/Point2D.h"
-
+#include "RGBColor.h"
+#include "Point2D.h"
 
 namespace synthese
 {
-namespace pt
-{
-    class Line;
-}
+	namespace pt
+	{
+		class Line;
+	}
 
 
-namespace map
-{
+	namespace map
+	{
 
-class DrawableLineIndex;
+		class DrawableLineIndex;
 
-/** @ingroup m59 */
-class DrawableLine 
-{
-private:
-
-
-    const uid _lineId;
-
-    std::vector<const geometry::Point2D*> _points;  //!< Reference line points
-    const std::string _shortName;
-    const synthese::util::RGBColor _color;
-    const bool _withPhysicalStops;
-
-    std::vector<int> _shifts;
-    std::vector<bool> _shifted;
-	
-	std::vector<geometry::Point2D> _fuzzyfiedPoints;
-    mutable std::vector<geometry::Point2D> _shiftedPoints;
-
-	
+		/** @ingroup m59 */
+		class DrawableLine 
+		{
+		private:
 
 
-public:
+			const util::RegistryKeyType _lineId;
 
-    typedef enum { NONE, SINGLE, SQL_DOUBLE } PointShiftingMode;
-    
-    DrawableLine (const synthese::pt::Line* line,
-		  int fromLineStopIndex,
-		  int toLineStopIndex,
-		  bool withPhysicalStops = true);
+			std::vector<const geometry::Point2D*> _points;  //!< Reference line points
+			const std::string _shortName;
+			const synthese::util::RGBColor _color;
+			const bool _withPhysicalStops;
 
+			std::vector<int> _shifts;
+			std::vector<bool> _shifted;
+			
+			std::vector<geometry::Point2D> _fuzzyfiedPoints;
+			mutable std::vector<geometry::Point2D> _shiftedPoints;
 
-    DrawableLine (const uid& lineId,
-		  const std::vector<const geometry::Point2D*>& points,
-		  const std::string& shortName,
-		  const synthese::util::RGBColor& color,
-		  bool withPhysicalStops = true);
-
-    ~DrawableLine();
-
-    //! @name Getters/Setters
-    //@{
-    const uid& getLineId () const;
-
-    const std::string& getShortName () const;
-	const synthese::util::RGBColor& getColor () const;
-    bool getWithPhysicalStops () const;
-
-    const std::vector<const geometry::Point2D*>& 
-	getPoints () const;
-
-	const std::vector<geometry::Point2D>& 
-	getFuzzyfiedPoints () const;
+			
 
 
-    bool hasPoint (const geometry::Point2D&) const;
+		public:
 
-    bool isStopPoint (int pointIndex) const;
-    bool isViaPoint (int pointIndex) const;
-
-    int isShifted (int pointIndex) const;
-    int getShift (int pointIndex) const;
-    void setShift (int pointIndex, int shift);
-
-    const std::vector<geometry::Point2D>& getShiftedPoints () const;
-
-    //@}
-
-	void fuzzyfyPoints (const DrawableLineIndex& lineIndex);
-
-    bool isFullyReverseWay (const DrawableLine* dbl) const;
-    bool isFullySameWay (const DrawableLine* dbl) const;
-    bool isReverseWayAt (const geometry::Point2D& p, const DrawableLine* dbl) const;
-    int numberOfCommonPointsWith (const DrawableLine* dbl) const;
-
-    virtual void prepare (Map& map, double spacing, PointShiftingMode shiftMode = SQL_DOUBLE) const;
-    
-    /** Find first point in this line points
-	which is equal (by value) to a given point.
-    */
-    int firstIndexOf (const geometry::Point2D& p) const;
-
-    const std::vector<geometry::Point2D> 
-	calculateShiftedPoints (const std::vector<geometry::Point2D>& points, 
-				double spacing, 
-				PointShiftingMode shiftMode) const;
-
-	const std::vector<geometry::Point2D>
-	calculateAbsoluteShiftedPoints (const std::vector<geometry::Point2D>& points, 
-										 double spacing) const;
-
-private:
+			typedef enum { NONE, SINGLE, SQL_DOUBLE } PointShiftingMode;
+		    
+			DrawableLine (const synthese::pt::Line* line,
+				  int fromLineStopIndex,
+				  int toLineStopIndex,
+				  bool withPhysicalStops = true);
 
 
-    geometry::Point2D  
-	calculateSingleShiftedPoint (geometry::Point2D a, 
-				     geometry::Point2D b, 
-				     double distance) const;
+			DrawableLine (const util::RegistryKeyType& lineId,
+				  const std::vector<const geometry::Point2D*>& points,
+				  const std::string& shortName,
+				  const synthese::util::RGBColor& color,
+				  bool withPhysicalStops = true);
 
-    geometry::Point2D  
-	calculateSingleShiftedPoint (geometry::Point2D a, 
-				     geometry::Point2D b, 
-				     geometry::Point2D c, 
-				     double distance) const;
-    geometry::Point2D  
-	calculateDoubleShiftedPoint (geometry::Point2D a, 
-				     geometry::Point2D b, 
-				     geometry::Point2D c, 
-				     double incomingDistance, 
-				     double outgoingDistance) const;
-    
-    
-    
-};
- 
-}
+			~DrawableLine();
+
+			//! @name Getters/Setters
+			//@{
+			const util::RegistryKeyType& getLineId () const;
+
+			const std::string& getShortName () const;
+			const synthese::util::RGBColor& getColor () const;
+			bool getWithPhysicalStops () const;
+
+			const std::vector<const geometry::Point2D*>& 
+			getPoints () const;
+
+			const std::vector<geometry::Point2D>& 
+			getFuzzyfiedPoints () const;
+
+
+			bool hasPoint (const geometry::Point2D&) const;
+
+			bool isStopPoint (int pointIndex) const;
+			bool isViaPoint (int pointIndex) const;
+
+			int isShifted (int pointIndex) const;
+			int getShift (int pointIndex) const;
+			void setShift (int pointIndex, int shift);
+
+			const std::vector<geometry::Point2D>& getShiftedPoints () const;
+
+			//@}
+
+			void fuzzyfyPoints (const DrawableLineIndex& lineIndex);
+
+			bool isFullyReverseWay (const DrawableLine* dbl) const;
+			bool isFullySameWay (const DrawableLine* dbl) const;
+			bool isReverseWayAt (const geometry::Point2D& p, const DrawableLine* dbl) const;
+			int numberOfCommonPointsWith (const DrawableLine* dbl) const;
+
+			virtual void prepare (Map& map, double spacing, PointShiftingMode shiftMode = SQL_DOUBLE) const;
+		    
+			/** Find first point in this line points
+			which is equal (by value) to a given point.
+			*/
+			int firstIndexOf (const geometry::Point2D& p) const;
+
+			const std::vector<geometry::Point2D> 
+			calculateShiftedPoints (const std::vector<geometry::Point2D>& points, 
+						double spacing, 
+						PointShiftingMode shiftMode) const;
+
+			const std::vector<geometry::Point2D>
+			calculateAbsoluteShiftedPoints (const std::vector<geometry::Point2D>& points, 
+												 double spacing) const;
+
+		private:
+
+
+			geometry::Point2D  
+			calculateSingleShiftedPoint (geometry::Point2D a, 
+							 geometry::Point2D b, 
+							 double distance) const;
+
+			geometry::Point2D  
+			calculateSingleShiftedPoint (geometry::Point2D a, 
+							 geometry::Point2D b, 
+							 geometry::Point2D c, 
+							 double distance) const;
+			geometry::Point2D  
+			calculateDoubleShiftedPoint (geometry::Point2D a, 
+							 geometry::Point2D b, 
+							 geometry::Point2D c, 
+							 double incomingDistance, 
+							 double outgoingDistance) const;
+		    
+		    
+		    
+		};
+	 
+	}
 }
 
 #endif

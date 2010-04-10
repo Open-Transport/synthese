@@ -75,7 +75,7 @@ namespace synthese
 			}
 
 			// Name
-			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+			_name = map.get<string>(PARAMETER_NAME);
 			Env env;
 			ProfileTableSync::Search(env, _name, string(), 0,1);
 			if (!env.getRegistry<Profile>().empty())

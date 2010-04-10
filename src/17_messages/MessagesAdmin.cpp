@@ -109,26 +109,26 @@ namespace synthese
 					_date = time_from_string(map.get<string>(PARAMETER_SEARCH_DATE));
 				}
 
-//				int num = map.getInt(PARAMETER_SEARCH_CONFLICT, false, FACTORY_KEY);
-//				if (num != UNKNOWN_VALUE)
-//					_searchConflict = static_cast<AlarmConflict>(num);
+//				optional<int> num = map.getOptional<int>(PARAMETER_SEARCH_CONFLICT);
+//				if (num)
+//					_searchConflict = static_cast<AlarmConflict>(*num);
 
-				int num = map.getInt(PARAMETER_SEARCH_STATUS, false, FACTORY_KEY);
+				int num = map.getDefault<int>(PARAMETER_SEARCH_STATUS, UNKNOWN_VALUE);
 
 				if (num != UNKNOWN_VALUE)
 					_searchStatus = static_cast<SentScenarioInheritedTableSync::StatusSearch>(num);
 
-				RegistryKeyType id(map.getUid(PARAMETER_SEARCH_LEVEL, false, FACTORY_KEY));
-//				if(id > encodeUId(ScenarioTableSync::TABLE.ID, 0, 0, 0))
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SEARCH_LEVEL));
+//				if(id > encodeUId(ScenarioTableSync::TABLE.ID, 0, 0))
 				{
 //					_searchLevel = ALARM_LEVEL_SCENARIO;
-					if(id != UNKNOWN_VALUE)
-					_searchScenario = ScenarioTemplateInheritedTableSync::Get(id, _getEnv()).get();
+					if(id)
+					_searchScenario = ScenarioTemplateInheritedTableSync::Get(*id, _getEnv()).get();
 				}
-//				else if (id != UNKNOWN_VALUE)
+//				else if (id != 0)
 //				{
 //					_searchLevel = static_cast<AlarmLevel>(
-//						map.getInt(PARAMETER_SEARCH_LEVEL, false, FACTORY_KEY)
+//						map.getDefault<int>(PARAMETER_SEARCH_LEVEL, UNKNOWN_VALUE)
 //					);
 //				}
 
@@ -165,7 +165,7 @@ namespace synthese
 
 			AdminActionFunctionRequest<ScenarioStopAction,MessagesAdmin> scenarioStopRequest(_request);
 			
-			vector<pair<SentScenarioInheritedTableSync::StatusSearch, string> > statusMap;
+			vector<pair<optional<SentScenarioInheritedTableSync::StatusSearch>, string> > statusMap;
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING, "En diffusion / prévu"));
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING_WITH_END, "&nbsp;&gt;&nbsp;En cours avec date de fin"));
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING_WITHOUT_END, "&nbsp;&gt;&nbsp;En cours sans date de fin"));
@@ -191,7 +191,7 @@ namespace synthese
 				}
 			}
 
-			stream << s.cell("Statut", s.getForm().getSelectInput(PARAMETER_SEARCH_STATUS, statusMap, _searchStatus));
+			stream << s.cell("Statut", s.getForm().getSelectInput(PARAMETER_SEARCH_STATUS, statusMap, optional<SentScenarioInheritedTableSync::StatusSearch>(_searchStatus)));
 //			stream << s.cell(
 //				"Superposition",
 //				s.getForm().getSelectInput(PARAMETER_SEARCH_CONFLICT, MessagesModule::getConflictLabels(true), _searchConflict)
@@ -205,7 +205,7 @@ namespace synthese
 					),
 					_searchScenario ?
 						(*_searchScenario ? (*_searchScenario)->getKey() : 0):
-						UNKNOWN_VALUE
+						optional<RegistryKeyType>()
 				)
 			);
 
@@ -359,7 +359,7 @@ namespace synthese
 				t1.getActionForm().getSelectInput(
 					NewScenarioSendAction::PARAMETER_TEMPLATE,
 					MessagesModule::GetScenarioTemplatesLabels(string(),"(pas de modéle)"),
-					uid(UNKNOWN_VALUE)
+					optional<RegistryKeyType>()
 				)
 			;
 			stream << t1.col(2) << t1.getActionForm().getSubmitButton("Nouvelle diffusion");

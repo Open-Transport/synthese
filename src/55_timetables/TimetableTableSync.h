@@ -65,7 +65,7 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				uid bookId = UNKNOWN_VALUE
+				boost::optional<util::RegistryKeyType> bookId = boost::optional<util::RegistryKeyType>()
 				, bool orderByParent = true
 				, bool orderByTitle = false
 				, bool raisingOrder = true
@@ -76,12 +76,12 @@ namespace synthese
 
 
 			static void Shift(
-				uid bookId
+				util::RegistryKeyType bookId
 				, int rank
 				, int delta
 			);
 
-			static int GetMaxRank(uid bookId);
+			static int GetMaxRank(util::RegistryKeyType bookId);
 		};
 	}
 }

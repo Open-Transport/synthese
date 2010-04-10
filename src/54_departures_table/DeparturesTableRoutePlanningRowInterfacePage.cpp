@@ -85,7 +85,7 @@ namespace synthese
 		const string DeparturesTableRoutePlanningRowInterfacePage::DATA_TRANSFER_PLACE_NAME26("transfer_place_name26");
 
 		DeparturesTableRoutePlanningRowInterfacePage::DeparturesTableRoutePlanningRowInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

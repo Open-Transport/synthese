@@ -60,7 +60,7 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				uid parentId = static_cast<uid>(UNKNOWN_VALUE)
+				boost::optional<util::RegistryKeyType> parentId = boost::optional<util::RegistryKeyType>()
 				, bool isFolder = false
 				, std::string name = std::string()
 				, const TextTemplate* templateToBeDifferentWith = NULL

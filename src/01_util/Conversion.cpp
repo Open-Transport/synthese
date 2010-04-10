@@ -243,7 +243,7 @@ namespace synthese
 
 		std::string Conversion::ToFixedSizeString( int number, int size )
 		{
-			if (size == UNKNOWN_VALUE)
+			if (size < 1)
 				return ToString(number);
 			stringstream s;
 			for (; size; size--)

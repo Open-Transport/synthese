@@ -26,7 +26,8 @@
 #define SYNTHESE_util_ObjectNotFoundException_h__
 
 #include "Exception.h"
-#include "Conversion.h"
+
+#include <boost/lexical_cast.hpp>
 
 namespace synthese
 {
@@ -42,7 +43,7 @@ namespace synthese
 
 		public:
 			ObjectNotFoundException(const RegistryKeyType key, const std::string& message)
-				: Exception(message + " (key=" + Conversion::ToString(key) + ")")
+				: Exception(message + " (key=" + boost::lexical_cast<std::string>(key) + ")")
 				, _key(key)
 			{}
 

@@ -67,7 +67,7 @@ namespace synthese
 			 * 
 			 * @param key id of the sent scenario 
 			 */
-			SentScenario(util::RegistryKeyType key = UNKNOWN_VALUE);
+			SentScenario(util::RegistryKeyType key = 0);
 			
 			/** Template instanciation constructor.
 			 * 

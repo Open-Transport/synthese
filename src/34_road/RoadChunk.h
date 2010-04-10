@@ -53,7 +53,7 @@ namespace synthese
 
 
 			RoadChunk(
-				util::RegistryKeyType id = UNKNOWN_VALUE,
+				util::RegistryKeyType id = 0,
 				Address* fromAddress = NULL,
 				int rankInRoad = UNKNOWN_VALUE,
 				Road* street = NULL,

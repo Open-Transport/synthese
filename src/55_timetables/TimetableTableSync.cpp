@@ -113,11 +113,8 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Columns reading
-			uid id(rows->getLongLong(TABLE_COL_ID));
-
 			// Properties
-			object->setKey(id);
+			object->setKey(rows->getLongLong(TABLE_COL_ID));
 			object->setBookId(rows->getLongLong(TimetableTableSync::COL_BOOK_ID));
 			object->setRank(rows->getInt(TimetableTableSync::COL_RANK));
 			object->setTitle(rows->getText(TimetableTableSync::COL_TITLE));
@@ -259,7 +256,7 @@ namespace synthese
 
 		TimetableTableSync::SearchResult TimetableTableSync::Search(
 			Env& env,
-			uid bookId
+			boost::optional<util::RegistryKeyType> bookId
 			, bool orderByParent
 			, bool orderByTitle
 			, bool raisingOrder
@@ -276,8 +273,10 @@ namespace synthese
 				<< " WHERE 1 ";
 			
 			// Selection
-			if (bookId != UNKNOWN_VALUE)
-			 	query << " AND " << COL_BOOK_ID << "=" << bookId;
+			if (bookId)
+			{
+				query << " AND " << COL_BOOK_ID << "=" << *bookId;
+			}
 
 			// Ordering
 			if (orderByParent)
@@ -297,7 +296,7 @@ namespace synthese
 
 
 
-		void TimetableTableSync::Shift( uid bookId , int rank , int delta )
+		void TimetableTableSync::Shift( util::RegistryKeyType bookId , int rank , int delta )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 
@@ -316,7 +315,7 @@ namespace synthese
 
 
 
-		int TimetableTableSync::GetMaxRank( uid bookId )
+		int TimetableTableSync::GetMaxRank( util::RegistryKeyType bookId )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 

@@ -103,7 +103,7 @@ namespace synthese
 			//@}
 
 			Crossing(
-				util::RegistryKeyType key = UNKNOWN_VALUE
+				util::RegistryKeyType key = 0
 			);
 			
 			~Crossing ();

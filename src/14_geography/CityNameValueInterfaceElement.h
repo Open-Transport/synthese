@@ -54,9 +54,6 @@ namespace synthese
 				, const void* object = NULL, const server::Request* request = NULL) const;
 
 			/** Parser.
-				@param text Optional parameter :
-					- if defined : the uid of the city to name
-					- if empty : the name of the city provided at runtime as current object
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
 		};

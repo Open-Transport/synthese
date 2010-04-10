@@ -119,7 +119,7 @@ namespace synthese
 
 
 		JourneyBoardStopCellInterfacePage::JourneyBoardStopCellInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

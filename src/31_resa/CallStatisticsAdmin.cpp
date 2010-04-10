@@ -141,7 +141,13 @@ namespace synthese
 				stream << t.open();
 				stream << t.cell("Date début", t.getForm().getCalendarInput(PARAM_SEARCH_START_DATE, _searchPeriod.begin()));
 				stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAM_SEARCH_END_DATE, _searchPeriod.last()));
-				stream << t.cell("Pas", t.getForm().getSelectInput(PARAM_SEARCH_STEP, _GetStepsVector(), _searchStep));
+				stream << t.cell(
+					"Pas",
+					t.getForm().getSelectInput(
+						PARAM_SEARCH_STEP,
+						_GetStepsVector(),
+						optional<CallStatisticsTableSync::Step>(_searchStep)
+				)	);
 				stream << t.close();
 			}
 

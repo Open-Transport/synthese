@@ -25,7 +25,6 @@
 
 #include "LibraryInterfaceElement.h"
 #include "FactorableTemplate.h"
-#include "UId.h"
 
 namespace synthese
 {

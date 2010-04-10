@@ -112,7 +112,7 @@ namespace synthese
 		    string serviceNumber (rows->getText(ContinuousServiceTableSync::COL_SERVICENUMBER));
 		    boost::posix_time::time_duration range (minutes(rows->getInt (ContinuousServiceTableSync::COL_RANGE)));
 		    boost::posix_time::time_duration maxWaitingTime (minutes(rows->getInt (ContinuousServiceTableSync::COL_MAXWAITINGTIME)));
-			uid pathId(rows->getLongLong(ContinuousServiceTableSync::COL_PATHID));
+			util::RegistryKeyType pathId(rows->getLongLong(ContinuousServiceTableSync::COL_PATHID));
 
 			try
 			{
@@ -137,13 +137,13 @@ namespace synthese
 				assert (path);
 	//			assert (path->getEdges ().size () == arrivalSchedules.size ());
 
-				uid bikeComplianceId(
+				util::RegistryKeyType bikeComplianceId(
 					rows->getLongLong (ContinuousServiceTableSync::COL_BIKE_USE_RULE)
 				);
-				uid handicappedComplianceId(
+				util::RegistryKeyType handicappedComplianceId(
 					rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE)
 				);
-				uid pedestrianComplianceId(
+				util::RegistryKeyType pedestrianComplianceId(
 					rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE)
 				);
 

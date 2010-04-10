@@ -32,6 +32,8 @@
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
 
+#include "ReplaceQuery.h"
+
 using namespace std;
 using namespace boost;
 
@@ -58,8 +60,8 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TextTemplateTableSync>::TABLE(
-				"t038_text_templates"
-				);
+			"t038_text_templates"
+		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<TextTemplateTableSync>::_FIELDS[]=
 		{
@@ -100,20 +102,13 @@ namespace synthese
 			TextTemplate* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() == UNKNOWN_VALUE)
-				object->setKey(getId());
-            query
-				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToSQLiteString(object->getName())
-				<< "," << Conversion::ToSQLiteString(object->getShortMessage())
-				<< "," << Conversion::ToSQLiteString(object->getLongMessage())
-				<< "," << Conversion::ToString(object->getIsFolder())
-				<< "," << Conversion::ToString(object->getParentId())
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<TextTemplateTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getShortMessage());
+			query.addField(object->getLongMessage());
+			query.addField(object->getIsFolder());
+			query.addField(object->getParentId());
+			query.execute(transaction);
 		}
 
 	}
@@ -122,7 +117,7 @@ namespace synthese
 	{
 		TextTemplateTableSync::SearchResult TextTemplateTableSync::Search(
 			Env& env,
-			uid parentId
+			boost::optional<util::RegistryKeyType> parentId
 			, bool isFolder
 			, string name
 			, const TextTemplate* templateToBeDifferentWith
@@ -143,8 +138,8 @@ namespace synthese
 			// Filtering
 				<< "is_folder=" << isFolder
 			;
-			if (parentId != static_cast<uid>(UNKNOWN_VALUE))
-				query << " AND " << COL_PARENT_ID << "=" << parentId;
+			if (parentId)
+				query << " AND " << COL_PARENT_ID << "=" << *parentId;
 			if (!name.empty())
 				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
 			if (templateToBeDifferentWith)

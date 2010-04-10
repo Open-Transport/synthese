@@ -62,7 +62,7 @@ namespace synthese
 		public:
 
 			LineStop(
-				util::RegistryKeyType id = UNKNOWN_VALUE,
+				util::RegistryKeyType id = 0,
 				const Line* line = NULL,
 				int rankInPath = UNKNOWN_VALUE,
 				bool isDeparture = true,

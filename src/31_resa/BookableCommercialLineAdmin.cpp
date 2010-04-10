@@ -147,7 +147,7 @@ namespace synthese
 				LineStopTableSync::Search(
 					_getEnv(),
 					line->getKey(),
-					UNKNOWN_VALUE,
+					optional<RegistryKeyType>(),
 					0,
 					optional<size_t>(),
 					true, true,

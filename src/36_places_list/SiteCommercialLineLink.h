@@ -43,17 +43,17 @@ namespace synthese
 			typedef util::Registry<SiteCommercialLineLink>	Registry;
 
 		protected:
-			uid _siteId;
-			uid _commercialLineId;
+			util::RegistryKeyType _siteId;
+			util::RegistryKeyType _commercialLineId;
 
 		public:
-			SiteCommercialLineLink(util::RegistryKeyType id = UNKNOWN_VALUE);
+			SiteCommercialLineLink(util::RegistryKeyType id = 0);
 
-			void setSiteId(uid id);
-			void setCommercialLineId(uid id);
+			void setSiteId(util::RegistryKeyType id) { _siteId = id; }
+			void setCommercialLineId(util::RegistryKeyType id){ _commercialLineId = id;}
 
-			uid getSiteId() const;
-			uid getCommercialLineId() const;
+			util::RegistryKeyType getSiteId() const { return _siteId; }
+			util::RegistryKeyType getCommercialLineId() const { return _commercialLineId; }
 		};
 	}
 }

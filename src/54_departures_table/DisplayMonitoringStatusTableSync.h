@@ -85,7 +85,7 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				util::RegistryKeyType screenId = UNKNOWN_VALUE,
+				boost::optional<util::RegistryKeyType> screenId = boost::optional<util::RegistryKeyType>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByScreenId = true,

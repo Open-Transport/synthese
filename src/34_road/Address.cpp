@@ -32,6 +32,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace graph;
+	using namespace util;
 	
 	namespace util
 	{
@@ -43,7 +44,7 @@ namespace synthese
 
 
 		Address::Address (
-			const uid id,
+			RegistryKeyType id,
 			const AddressablePlace* place,
 			double x,
 			double y

@@ -55,10 +55,9 @@ namespace synthese
 
 		void DisplayTypeRemoveAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_TYPE_ID, true, FACTORY_KEY));
 			try
 			{
-				_type = DisplayTypeTableSync::Get(id, *_env);
+				_type = DisplayTypeTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TYPE_ID), *_env);
 			}
 			catch(...)
 			{
@@ -69,16 +68,16 @@ namespace synthese
 				*_env,
 				RightsOfSameClassMap()
 				, true
-				, UNKNOWN_RIGHT_LEVEL
-				, UNKNOWN_VALUE
-				, UNKNOWN_VALUE
-				, UNKNOWN_VALUE
-				, _type->getKey()
+				, UNKNOWN_RIGHT_LEVEL,
+				optional<RegistryKeyType>(),
+				optional<RegistryKeyType>(),
+				optional<RegistryKeyType>(),
+				_type->getKey()
 				, std::string()
 				, std::string()
 				, std::string()
-				, UNKNOWN_VALUE
-				, UNKNOWN_VALUE
+				, optional<int>()
+				, optional<int>()
 				, 0
 				, 1
 			);

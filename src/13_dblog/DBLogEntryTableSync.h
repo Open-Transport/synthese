@@ -23,12 +23,7 @@
 #ifndef SYNTHESE_DBLogEntryTableSync_H__
 #define SYNTHESE_DBLogEntryTableSync_H__
 
-#include <vector>
-#include <string>
-#include <iostream>
-
-#include <boost/shared_ptr.hpp>
-
+#include "DBLogEntry.h"
 #include "SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
@@ -37,10 +32,14 @@ namespace synthese
 	{
 		class DBLog;
 
-		/** 45 DBLog table synchronizer.
-			@ingroup m13LS refLS
-		*/
-		class DBLogEntryTableSync : public db::SQLiteNoSyncTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>
+		//////////////////////////////////////////////////////////////////////////
+		/// 13.10 Table : Database stored log entries.
+		///	@ingroup m13LS refLS
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Table name : t045_log_entries
+		class DBLogEntryTableSync:
+			public db::SQLiteNoSyncTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>
 		{
 		public:
 			static const std::string CONTENT_SEPARATOR;
@@ -71,21 +70,21 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				const std::string& logKey
-				, const boost::posix_time::ptime& startDate
-				, const boost::posix_time::ptime& endDate
-				, uid userId
-				, DBLogEntry::Level level,
-				util::RegistryKeyType id,
-				util::RegistryKeyType id2,
-				const std::string& text
-				, int first = 0
-				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
-				, bool orderByDate = true
-				, bool orderByUser = false
-				, bool orderByLevel = false
-				, bool raisingOrder = true
-				, util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				const std::string& logKey,
+				const boost::posix_time::ptime& startDate,
+				const boost::posix_time::ptime& endDate,
+				boost::optional<util::RegistryKeyType> userId,
+				DBLogEntry::Level level,
+				boost::optional<util::RegistryKeyType> id,
+				boost::optional<util::RegistryKeyType> id2,
+				const std::string& text,
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				bool orderByDate = true,
+				bool orderByUser = false,
+				bool orderByLevel = false,
+				bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 
 

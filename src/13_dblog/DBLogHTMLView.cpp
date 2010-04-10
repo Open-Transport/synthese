@@ -66,9 +66,6 @@ namespace synthese
 			_searchLevel(DBLogEntry::DB_LOG_UNKNOWN),
 			_searchStartDate(not_a_date_time),
 			_searchEndDate(not_a_date_time),
-			_searchObjectId(UNKNOWN_VALUE),
-			_searchObjectId2(UNKNOWN_VALUE),
-			_searchUserId(UNKNOWN_VALUE),
 			_fixedLevel(true),
 			_fixedStartDate(true),
 			_fixedEndDate(true),
@@ -82,9 +79,9 @@ namespace synthese
 		void DBLogHTMLView::set(
 			const server::ParametersMap& map,
 			std::string logKey,
-			util::RegistryKeyType searchObjectId,
-			util::RegistryKeyType searchObjectId2,
-			util::RegistryKeyType searchUserId,
+			optional<util::RegistryKeyType> searchObjectId,
+			optional<util::RegistryKeyType> searchObjectId2,
+			optional<util::RegistryKeyType> searchUserId,
 			DBLogEntry::Level searchLevel,
 			ptime searchStartDate,
 			ptime searchEndDate,
@@ -114,10 +111,10 @@ namespace synthese
 			_searchEndDate = searchEndDate;
 
 			// User
-			if(searchUserId == UNKNOWN_VALUE)
+			if(!searchUserId)
 			{
-				searchUserId = map.getUid(
-					_getParameterName(PARAMETER_SEARCH_USER), false, FACTORY_KEY
+				searchUserId = map.getOptional<RegistryKeyType>(
+					_getParameterName(PARAMETER_SEARCH_USER)
 				);
 				_fixedUserId = false;
 			}
@@ -126,12 +123,12 @@ namespace synthese
 			// Level
 			if(searchLevel == DBLogEntry::DB_LOG_UNKNOWN)
 			{
-				int id(
-					map.getInt(_getParameterName(PARAMETER_SEARCH_TYPE), false, FACTORY_KEY)
+				optional<int> id(
+					map.getOptional<int>(_getParameterName(PARAMETER_SEARCH_TYPE))
 				);
-				if (id > 0)
+				if (id)
 				{
-					searchLevel = static_cast<DBLogEntry::Level>(id);
+					searchLevel = static_cast<DBLogEntry::Level>(*id);
 				}
 				_fixedLevel = false;
 			}
@@ -140,28 +137,28 @@ namespace synthese
 			// Text
 			if(searchText.empty())
 			{
-				searchText = map.getString(
-					_getParameterName(PARAMETER_SEARCH_TEXT), false, FACTORY_KEY
+				searchText = map.getDefault<string>(
+					_getParameterName(PARAMETER_SEARCH_TEXT)
 				);
 				_fixedText = false;
 			}
 			_searchText = searchText;
 
 			// Object
-			if(searchObjectId == UNKNOWN_VALUE)
+			if(!searchObjectId)
 			{
-				searchObjectId = map.getUid(
-					_getParameterName(PARAMETER_OBJECT_ID), false, FACTORY_KEY
+				searchObjectId = map.getOptional<RegistryKeyType>(
+					_getParameterName(PARAMETER_OBJECT_ID)
 				);
 				_fixedObjectId = false;
 			}
 			_searchObjectId = searchObjectId;
 
 			// Object 2
-			if(searchObjectId2 == UNKNOWN_VALUE)
+			if(!searchObjectId2)
 			{
-				searchObjectId2 = map.getUid(
-					_getParameterName(PARAMETER_OBJECT_ID2), false, FACTORY_KEY
+				searchObjectId2 = map.getOptional<RegistryKeyType>(
+					_getParameterName(PARAMETER_OBJECT_ID2)
 				);
 				_fixedObjectId2 = false;
 			}
@@ -236,7 +233,7 @@ namespace synthese
 							st.getForm().getSelectInput(
 								_getParameterName(PARAMETER_SEARCH_TYPE),
 								DBLogModule::getEntryLevelLabels(true),
-								static_cast<int>(_searchLevel)
+								optional<int>(static_cast<int>(_searchLevel))
 						)	)
 					;
 				}

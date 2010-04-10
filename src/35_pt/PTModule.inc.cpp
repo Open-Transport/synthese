@@ -10,6 +10,7 @@
 #include "PTNetworksListFunction.hpp"
 #include "PTRoutesListFunction.hpp"
 #include "CheckLineCalendarFunction.hpp"
+#include "PTObjectInformationFunction.hpp"
 
 #include "TridentFileFormat.h"
 #include "PTModule.h"
@@ -66,6 +67,8 @@
 #include "StopAreaNameUpdateAction.hpp"
 #include "PTUseRuleAddAction.hpp"
 #include "PTUseRuleUpdateAction.hpp"
+#include "ServiceTimetableUpdateAction.h"
+#include "ServiceUpdateAction.h"
 
 #include "TransportNetworkRight.h"
 

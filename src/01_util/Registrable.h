@@ -56,7 +56,7 @@ namespace synthese
 
 			////////////////////////////////////////////////////////////////////
 			///	Registrable constructor.
-			///	@param key ID of the object (use UNKNOWN_VALUE if not determined)
+			///	@param key ID of the object (use 0 if not determined)
 			///	@author Hugues Romain
 			///	@date 2008
 			////////////////////////////////////////////////////////////////////

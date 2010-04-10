@@ -37,6 +37,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace interfaces;
+	using namespace util;
 	
 	namespace util
 	{
@@ -54,13 +55,15 @@ namespace synthese
 		const string SiteUpdateAction::PARAMETER_USE_OLD_DATA = Action_PARAMETER_PREFIX + "uo";
 		const string SiteUpdateAction::PARAMETER_MAX_CONNECTIONS = Action_PARAMETER_PREFIX + "mc";
 		const string SiteUpdateAction::PARAMETER_USE_DATES_RANGE = Action_PARAMETER_PREFIX + "dr";
-		
+		const string SiteUpdateAction::PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL = Action_PARAMETER_PREFIX + "da";
+
 		
 		
 		SiteUpdateAction::SiteUpdateAction()
 			: util::FactorableTemplate<Action, SiteUpdateAction>()
 			, _startDate(not_a_date_time)
-			, _endDate(not_a_date_time)
+			, _endDate(not_a_date_time),
+			_displayRoadApproachDetail(true)
 		{
 		}
 		
@@ -70,7 +73,10 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_site.get())
+			{
 				map.insert(PARAMETER_SITE_ID, _site->getKey());
+				map.insert(PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL, _displayRoadApproachDetail);
+			}
 			return map;
 		}
 		
@@ -78,11 +84,11 @@ namespace synthese
 		
 		void SiteUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setSiteId(map.getUid(PARAMETER_SITE_ID, true, FACTORY_KEY));
-			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+			setSiteId(map.get<RegistryKeyType>(PARAMETER_SITE_ID));
+			_name = map.get<string>(PARAMETER_NAME);
 			try
 			{
-				_interface = InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY), *_env);
+				_interface = InterfaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID), *_env);
 			}
 			catch (...)
 			{
@@ -100,6 +106,7 @@ namespace synthese
 			_useOldData = map.get<bool>(PARAMETER_USE_OLD_DATA);
 			_useDatesRange = days(map.get<int>(PARAMETER_USE_DATES_RANGE));
 			_maxConnections = map.get<int>(PARAMETER_MAX_CONNECTIONS);
+			_displayRoadApproachDetail = map.get<bool>(PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL);
 		}
 		
 		
@@ -114,13 +121,14 @@ namespace synthese
 			_site->setPastSolutionsDisplayed(_useOldData);
 			_site->setUseDateRange(_useDatesRange);
 			_site->setMaxTransportConnectionsCount(_maxConnections);
+			_site->setDisplayRoadApproachDetail(_displayRoadApproachDetail);
 
 			SiteTableSync::Save(_site.get());
 		}
 
 
 
-		void SiteUpdateAction::setSiteId( uid id )
+		void SiteUpdateAction::setSiteId( RegistryKeyType id )
 		{
 			try
 			{

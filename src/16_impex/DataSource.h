@@ -55,7 +55,7 @@ namespace synthese
 			/////////////////////////////////////////////////////////////////////
 			/// DataSource Constructor.
 			DataSource(
-				util::RegistryKeyType id = UNKNOWN_VALUE
+				util::RegistryKeyType id = 0
 			);
 			
 			//! @name Getters

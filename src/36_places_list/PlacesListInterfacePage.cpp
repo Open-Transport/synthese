@@ -70,7 +70,7 @@ namespace synthese
 
 
 		PlacesListInterfacePage::PlacesListInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

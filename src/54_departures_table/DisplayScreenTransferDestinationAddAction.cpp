@@ -92,7 +92,7 @@ namespace synthese
 				throw ActionException("Transfer place not found");
 			}
 
-			const string city(map.getString(PARAMETER_DESTINATION_PLACE_CITY_NAME, true, FACTORY_KEY));
+			const string city(map.get<string>(PARAMETER_DESTINATION_PLACE_CITY_NAME));
 
 			GeographyModule::CityList cities(GeographyModule::GuessCity(city, 1));
 			if(cities.empty())
@@ -100,7 +100,7 @@ namespace synthese
 				throw ActionException("City not found");
 			}
 
-			const string place(map.getString(PARAMETER_DESTINATION_PLACE_NAME, true, FACTORY_KEY));
+			const string place(map.get<string>(PARAMETER_DESTINATION_PLACE_NAME));
 			vector<const PublicTransportStopZoneConnectionPlace*> stops(
 				cities.front()->search<PublicTransportStopZoneConnectionPlace>(place, 1)
 			);

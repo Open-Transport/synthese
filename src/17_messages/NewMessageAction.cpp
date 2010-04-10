@@ -82,7 +82,7 @@ namespace synthese
 		) throw(ActionException) {
 			if (_scenarioTemplate.get())
 			{
-				AlarmTemplate alarm(UNKNOWN_VALUE, _scenarioTemplate.get());
+				AlarmTemplate alarm(0, _scenarioTemplate.get());
 				AlarmTableSync::Save(&alarm);
 				
 				request.setActionCreatedId(alarm.getKey());
@@ -95,7 +95,7 @@ namespace synthese
 			}
 			else
 			{
-				SentAlarm alarm(UNKNOWN_VALUE, _sentScenario.get());
+				SentAlarm alarm(0, _sentScenario.get());
 					
 				AlarmTableSync::Save(&alarm);
 				
@@ -111,7 +111,7 @@ namespace synthese
 
 
 
-		void NewMessageAction::setScenarioId(uid key)
+		void NewMessageAction::setScenarioId(RegistryKeyType key)
 		{
 			try
 			{

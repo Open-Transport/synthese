@@ -24,7 +24,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define SYNTHESE_ForcedDestinationsArrivalDepartureTableGenerator_H
 
 #include "ArrivalDepartureTableGenerator.h"
-#include "UId.h"
 
 namespace synthese
 {
@@ -35,12 +34,13 @@ namespace synthese
 
 	namespace departurestable
 	{
-
+		//////////////////////////////////////////////////////////////////////////
+		/// @ingroup m54
 		class PhysicalStopDepartureTableGenerator
 			:	public ArrivalDepartureTableGenerator
 		{
 		public:
-			typedef std::map<uid, const pt::PhysicalStop*> PhysicalStops;
+			typedef std::map<util::RegistryKeyType, const pt::PhysicalStop*> PhysicalStops;
 
 		private:
 

@@ -48,7 +48,7 @@ namespace synthese
 			, VariablesMap& variables
 			, int n
 			, const std::string& name
-			, uid id
+			, util::RegistryKeyType id
 			, const server::Request* request /*= NULL*/
 		) const	{
 			ParametersVector pv;
@@ -62,7 +62,7 @@ namespace synthese
 
 
 		PlacesListItemInterfacePage::PlacesListItemInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

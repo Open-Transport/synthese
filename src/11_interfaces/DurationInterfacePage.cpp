@@ -57,7 +57,7 @@ namespace synthese
 
 
 		DurationInterfacePage::DurationInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

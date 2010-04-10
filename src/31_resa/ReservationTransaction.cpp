@@ -51,17 +51,12 @@ namespace synthese
 			, _cancellationTime(not_a_date_time)
 			, _originDateTime(not_a_date_time)
 			, _destinationDateTime(not_a_date_time)
-			, _cancelUserId(UNKNOWN_VALUE)
-			, _bookingUserId(UNKNOWN_VALUE)
-			, _customerUserId(UNKNOWN_VALUE)
-			, _lastReservation(UNKNOWN_VALUE)
+			, _cancelUserId(0)
+			, _bookingUserId(0)
+			, _customerUserId(0)
+			, _lastReservation(0)
 		{
 
-		}
-
-		void ReservationTransaction::setLastReservation( uid id )
-		{
-			_lastReservation = id;
 		}
 
 		void ReservationTransaction::setSeats( int seats )
@@ -79,10 +74,6 @@ namespace synthese
 			_cancellationTime = time;
 		}
 
-		void ReservationTransaction::setCustomerUserId( uid id )
-		{
-			_customerUserId = id;
-		}
 
 		void ReservationTransaction::setCustomerName( const std::string& name )
 		{
@@ -92,21 +83,6 @@ namespace synthese
 		void ReservationTransaction::setCustomerPhone( const std::string& phone )
 		{
 			_customerPhone = phone;
-		}
-
-		void ReservationTransaction::setBookingUserId( uid id )
-		{
-			_bookingUserId = id;
-		}
-
-		void ReservationTransaction::setCancelUserId( uid id )
-		{
-			_cancelUserId = id;
-		}
-
-		uid ReservationTransaction::getLastReservation() const
-		{
-			return _lastReservation;
 		}
 
 		int ReservationTransaction::getSeats() const
@@ -124,10 +100,6 @@ namespace synthese
 			return _cancellationTime;
 		}
 
-		uid ReservationTransaction::getCustomerUserId() const
-		{
-			return _customerUserId;
-		}
 
 		const std::string& ReservationTransaction::getCustomerName() const
 		{
@@ -139,15 +111,6 @@ namespace synthese
 			return _customerPhone;
 		}
 
-		uid ReservationTransaction::getBookingUserId() const
-		{
-			return _bookingUserId;
-		}
-
-		uid ReservationTransaction::getCancelUserId() const
-		{
-			return _cancelUserId;
-		}
 
 		void ReservationTransaction::setCustomerEMail( const std::string& email )
 		{

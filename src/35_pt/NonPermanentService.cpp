@@ -50,7 +50,7 @@ namespace synthese
 			string serviceNumber,
 			Path* path
 		):	Service(serviceNumber, path),
-			Registrable(UNKNOWN_VALUE),
+			Registrable(0),
 			Calendar()
 		{
 		}

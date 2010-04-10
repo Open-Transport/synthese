@@ -57,7 +57,7 @@ namespace synthese
 		ParametersMap CreateDisplayScreenAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_TEMPLATE_ID, _template ? _template->getKey() : uid(0));
+			map.insert(PARAMETER_TEMPLATE_ID, _template ? _template->getKey() : RegistryKeyType(0));
 			if(_cpu.get())
 			{
 				map.insert(PARAMETER_CPU_ID, _cpu->getKey());
@@ -71,20 +71,20 @@ namespace synthese
 
 		void CreateDisplayScreenAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_TEMPLATE_ID, false, FACTORY_KEY));
+			RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE_ID));
 			if (id > 0)
 			{
 				_template = DisplayScreenTableSync::Get(id, *_env);
 			}
 
-			id = map.getUid(PARAMETER_CPU_ID, false, FACTORY_KEY);
+			id = map.getDefault<RegistryKeyType>(PARAMETER_CPU_ID);
 			if (id > 0)
 			{
 				setCPU(id);
 			}
 			else
 			{
-				id = map.getUid(PARAMETER_LOCALIZATION_ID, false, FACTORY_KEY);
+				id = map.getDefault<RegistryKeyType>(PARAMETER_LOCALIZATION_ID);
 				if (id > 0)
 				{
 					setPlace(id);

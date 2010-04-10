@@ -82,7 +82,7 @@ namespace synthese
 
 
 		ReservationRuleInterfacePage::ReservationRuleInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

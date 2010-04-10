@@ -45,7 +45,7 @@ namespace synthese
 	{
 		WebPageInterfacePage::WebPageInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, WebPageInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

@@ -172,7 +172,7 @@ namespace synthese
 
 		ReservationTransactionTableSync::SearchResult ReservationTransactionTableSync::Search(
 			Env& env,
-			uid userId
+			boost::optional<RegistryKeyType> userId
 			, const ptime& minDate
 			, const ptime& maxDate
 			, bool withCancelled
@@ -186,7 +186,7 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " INNER JOIN " << ReservationTableSync::TABLE.NAME << " AS r ON "
 				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID
-				<< " WHERE " << COL_CANCEL_USER_ID << "=" << userId;
+				<< " WHERE " << COL_CANCEL_USER_ID << "=" << *userId;
 			if (!minDate.is_not_a_date_time())
 				query << " AND r." << ReservationTableSync::COL_DEPARTURE_TIME << ">='" << to_iso_extended_string(minDate.date()) << " " << to_simple_string(minDate.time_of_day()) << "'";
 			if (!maxDate.is_not_a_date_time())

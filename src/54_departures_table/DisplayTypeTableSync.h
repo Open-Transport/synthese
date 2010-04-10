@@ -38,9 +38,10 @@ namespace synthese
 	{
 		class DisplayType;
 
-		/** DisplayType table synchronizer.
-			@ingroup m54LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 54.10 Table : Display types.
+		///	@ingroup m54LS refLS
+		/// @author Hugues Romain
 		class DisplayTypeTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<DisplayTypeTableSync,DisplayType>
 		{
@@ -61,9 +62,9 @@ namespace synthese
 			/// @param nameLike SQL LIKE mask to filter on display type name (do
 			///		not forget the % command) (default/% = deactivate the filter)
 			/// @param interfaceId id of display interface to use as filter
-			///		(default/UNKNOWN_VALUE = deactivate the filter)
+			///		(default = deactivate the filter)
 			/// @param first First user to answer
-			///	@param number Number of users to answer (default/UNKNOWN_VALUE = all)
+			///	@param number Number of users to answer (default = all)
 			///		The size of the result registry is less or equal to number, then all 
 			///		users were returned despite of the number limit. If the size 
 			///		is greater than number (actually equal to number + 1) then 

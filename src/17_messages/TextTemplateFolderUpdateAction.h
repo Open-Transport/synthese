@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_TextTemplateFolderUpdateAction_H__
 #define SYNTHESE_TextTemplateFolderUpdateAction_H__
 
-#include "30_server/Action.h"
-
-#include "01_util/FactorableTemplate.h"
+#include "Action.h"
+#include "FactorableTemplate.h"
 
 namespace synthese
 {
@@ -35,9 +34,9 @@ namespace synthese
 	{
 		class TextTemplate;
 
-		/** TextTemplateFolderUpdateAction action class.
-			@ingroup m17Actions refActions
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 17.15 Action : text template folder update.
+		///	@ingroup m17Actions refActions
 		class TextTemplateFolderUpdateAction
 			: public util::FactorableTemplate<server::Action, TextTemplateFolderUpdateAction>
 		{
@@ -72,7 +71,7 @@ namespace synthese
 			
 			TextTemplateFolderUpdateAction();
 
-			void setFolderId(uid id);
+			void setFolderId(util::RegistryKeyType id);
 
 			virtual bool isAuthorized(const server::Session* session) const;
 		};

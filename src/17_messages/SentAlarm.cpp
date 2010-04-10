@@ -46,7 +46,7 @@ namespace synthese
 	{
 
 		SentAlarm::SentAlarm(
-			util::RegistryKeyType key /*= UNKNOWN_VALUE*/,
+			util::RegistryKeyType key ,
 			const SentScenario* scenario /*= NULL */
 		):	Alarm(key, scenario),
 			Registrable(key),
@@ -60,7 +60,7 @@ namespace synthese
 			const SentScenario& scenario,
 			const AlarmTemplate& source
 		):	Alarm(source, &scenario),
-			Registrable(UNKNOWN_VALUE),
+			Registrable(0),
 			_template(&source)
 		{
 		}
@@ -71,7 +71,7 @@ namespace synthese
 			const SentScenario& scenario,
 			const SentAlarm& source
 		):	Alarm(source, &scenario),
-			Registrable(UNKNOWN_VALUE),
+			Registrable(0),
 			_template(source._template)			
 		{
 		}

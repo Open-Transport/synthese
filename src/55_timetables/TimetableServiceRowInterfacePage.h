@@ -67,6 +67,9 @@ namespace synthese
 				- 15 : Line destination place id
 				- 16 : Line destination place name
 				- 17 : Text line destination
+				- 18 : Line id
+				- 19 : Route id
+				
 				
 			Object : TimetableColumn
 		*/

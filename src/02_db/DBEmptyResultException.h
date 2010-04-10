@@ -23,9 +23,7 @@
 #ifndef SYNTHESE_DBEmptyResultException_H__
 #define SYNTHESE_DBEmptyResultException_H__
 
-#include "01_util/UId.h"
 #include "ObjectNotFoundException.h"
-
 #include "SQLiteTableSyncTemplate.h"
 
 #include <string>
@@ -43,7 +41,7 @@ namespace synthese
 		class DBEmptyResultException : public util::ObjectNotFoundException<typename T::ObjectType>
 		{
 		public:
-			DBEmptyResultException (uid& id)
+			DBEmptyResultException(util::RegistryKeyType id)
 				: util::ObjectNotFoundException<typename T::ObjectType>(id, "Unable to fetch object in database table " + T::TABLE.NAME)
 			{}
 		};

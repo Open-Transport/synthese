@@ -25,7 +25,10 @@
 #include "UserFavoriteInterfacePage.h"
 #include "UserFavoriteJourney.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -54,8 +57,8 @@ namespace synthese
 		) const	{
 			ParametersVector pv;
 
-			pv.push_back(Conversion::ToString(fav->getKey()));
-			pv.push_back(Conversion::ToString(fav->getRank()));
+			pv.push_back(lexical_cast<string>(fav->getKey()));
+			pv.push_back(lexical_cast<string>(fav->getRank()));
 			pv.push_back(fav->getOriginCityName());
 			pv.push_back(fav->getOriginPlaceName());
 			pv.push_back(fav->getDestinationCityName());
@@ -71,7 +74,7 @@ namespace synthese
 		}
 
 		UserFavoriteInterfacePage::UserFavoriteInterfacePage()
-			: Registrable(UNKNOWN_VALUE),
+			: Registrable(0),
 			util::FactorableTemplate<interfaces::InterfacePage, UserFavoriteInterfacePage>()
 		{
 	

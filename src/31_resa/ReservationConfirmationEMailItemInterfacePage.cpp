@@ -44,7 +44,7 @@ namespace synthese
 	{
 		ReservationConfirmationEMailItemInterfacePage::ReservationConfirmationEMailItemInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, ReservationConfirmationEMailItemInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

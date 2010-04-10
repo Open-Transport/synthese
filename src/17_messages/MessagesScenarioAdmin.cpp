@@ -149,7 +149,13 @@ namespace synthese
 				stream << udt.cell("Nom", udt.getForm().getTextInput(ScenarioUpdateDatesAction::PARAMETER_NAME, _scenario->getName()));
 				if (_templateScenario)
 				{
-					stream << udt.cell("Répertoire", udt.getForm().getSelectInput(ScenarioUpdateDatesAction::PARAMETER_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(), _templateScenario->getFolder() ? _templateScenario->getFolder()->getKey() : 0));
+					stream << udt.cell(
+						"Répertoire",
+						udt.getForm().getSelectInput(
+							ScenarioUpdateDatesAction::PARAMETER_FOLDER_ID,
+							MessagesModule::GetScenarioFoldersLabels(),
+							optional<RegistryKeyType>(_templateScenario->getFolder() ? _templateScenario->getFolder()->getKey() : 0)
+					)	);
 				}
 				if(_sentScenario.get())
 				{

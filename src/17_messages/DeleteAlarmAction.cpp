@@ -62,7 +62,7 @@ namespace synthese
 		{
 			try
 			{
-				setAlarmId(map.getUid(PARAMETER_ALARM, true, FACTORY_KEY));
+				setAlarmId(map.get<RegistryKeyType>(PARAMETER_ALARM));
 			}
 			catch(ParametersMap::MissingParameterException& e)
 			{

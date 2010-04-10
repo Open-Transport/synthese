@@ -28,6 +28,7 @@
 
 #include <string>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/optional.hpp>
 
 #include "Registrable.h"
 #include "Registry.h"
@@ -78,7 +79,7 @@ namespace synthese
 			Status					_soundStatus;
 			std::string				_soundDetail;
 			Status					_temperatureStatus;
-			double					_temperatureValue;
+			boost::optional<double>	_temperatureValue;
 			Status					_communicationStatus;
 			Status					_localizationStatus;
 			
@@ -89,7 +90,7 @@ namespace synthese
 			///	@date 2008
 			////////////////////////////////////////////////////////////////////
 			DisplayMonitoringStatus(
-				util::RegistryKeyType id = UNKNOWN_VALUE
+				util::RegistryKeyType id = 0
 			);
 
 
@@ -160,7 +161,7 @@ namespace synthese
 				Status				getSoundStatus()			const;
 				const std::string&	getSoundDetail()			const;
 				Status				getTemperatureStatus()		const;
-				double				getTemperatureValue()		const;
+				boost::optional<double>	getTemperatureValue()		const { return _temperatureValue; }
 				Status				getCommunicationStatus()	const;
 				Status				getLocalizationStatus()		const;
 				const boost::posix_time::ptime&	 getTime()		const;
@@ -182,7 +183,7 @@ namespace synthese
 				void	setSoundStatus(Status value);
 				void	setSoundDetail(const std::string& value);
 				void	setTemperatureStatus(Status value);
-				void	setTemperatureValue(double value);
+				void	setTemperatureValue(boost::optional<double> value) { _temperatureValue = value; }
 				void	setCommunicationStatus(Status value);
 				void	setTime(const boost::posix_time::ptime& value);
 				void	setLocalizationStatus(Status value);

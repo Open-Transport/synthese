@@ -43,7 +43,7 @@ namespace synthese
 		public:
 			static SearchResult Search(
 				util::Env& env,
-				util::RegistryKeyType scenarioTemplateId = UNKNOWN_VALUE
+				boost::optional<util::RegistryKeyType> scenarioTemplateId = boost::optional<util::RegistryKeyType>()
 				, int first = 0
 				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByLevel = false

@@ -76,7 +76,7 @@ namespace synthese
 			} ReservationRuleType;
 
 
-			typedef std::vector<std::pair<ReservationRuleType, std::string> > ReservationRuleTypesList;
+			typedef std::vector<std::pair<boost::optional<ReservationRuleType>, std::string> > ReservationRuleTypesList;
 
 		private:
 
@@ -124,7 +124,7 @@ namespace synthese
 			///  - forbidden access
 			///  - no reservation
 			PTUseRule(
-				util::RegistryKeyType key = UNKNOWN_VALUE
+				util::RegistryKeyType key = 0
 			);
 			
 			//! @name Getters

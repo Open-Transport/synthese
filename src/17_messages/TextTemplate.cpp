@@ -36,13 +36,10 @@ namespace synthese
 
 	namespace messages
 	{
-
-
 		TextTemplate::TextTemplate(
 			RegistryKeyType key
 		):	Registrable(key)
 		{
-
 		}
 
 		void TextTemplate::setAlarmLevel( AlarmLevel level )
@@ -94,23 +91,9 @@ namespace synthese
 
 
 
-		uid TextTemplate::getParentId() const
-		{
-			return _parentId;
-		}
-
-
-
 		void TextTemplate::setIsFolder( bool value )
 		{
 			_isFolder = value;
-		}
-
-
-
-		void TextTemplate::setParentId( uid value )
-		{
-			_parentId = value;
 		}
 	}
 }

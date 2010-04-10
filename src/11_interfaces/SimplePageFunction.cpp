@@ -70,8 +70,8 @@ namespace synthese
 
 			_parameters = map;
 
-			string classKey(_parameters.getString(PARAMETER_PAGE_CLASS,false,FACTORY_KEY));
-			string key(_parameters.getString(PARAMETER_PAGE,false,FACTORY_KEY));
+			string classKey(_parameters.getDefault<string>(PARAMETER_PAGE_CLASS));
+			string key(_parameters.getDefault<string>(PARAMETER_PAGE));
 
 			if (classKey.empty())
 				classKey = NonPredefinedInterfacePage::FACTORY_KEY;

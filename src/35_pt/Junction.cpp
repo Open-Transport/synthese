@@ -43,7 +43,7 @@ namespace synthese
 
 	namespace pt
 	{
-		Junction::Junction( util::RegistryKeyType id /*= UNKNOWN_VALUE */ ):
+		Junction::Junction( util::RegistryKeyType id):
 			Registrable(id)
 		{
 
@@ -100,7 +100,7 @@ namespace synthese
 
 			// Generation of service
 			Service* service(new PermanentService(
-				UNKNOWN_VALUE,
+				0,
 				this,
 				duration
 			)	);

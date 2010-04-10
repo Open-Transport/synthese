@@ -24,7 +24,6 @@
 #define SYNTHESE_timetables_CalendarTemplate_h__
 
 #include "Registrable.h"
-#include "UId.h"
 #include "Registry.h"
 #include "CalendarTemplateElement.h"
 #include "Exception.h"
@@ -104,7 +103,7 @@ namespace synthese
 
 			static std::string GetCategoryName(Category value);
 
-			typedef std::vector<std::pair<Category, std::string> > CategoryList;
+			typedef std::vector<std::pair<boost::optional<Category>, std::string> > CategoryList;
 			
 			static CategoryList GetCategoriesList();
 
@@ -117,7 +116,7 @@ namespace synthese
 
 		public:
 			CalendarTemplate(
-				util::RegistryKeyType id = UNKNOWN_VALUE
+				util::RegistryKeyType id = 0
 			);
 
 			//! @name Queries

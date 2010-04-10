@@ -112,7 +112,7 @@ namespace synthese
 		DBLogEntry::DBLogEntry(RegistryKeyType key)
 		:	Registrable(key),
 			_date(second_clock::local_time())
-			, _userId(UNKNOWN_VALUE)
+			, _userId(0)
 		{
 
 		}

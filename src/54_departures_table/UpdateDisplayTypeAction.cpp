@@ -94,7 +94,7 @@ namespace synthese
 						throw ActionException("Le nom ne peut être vide.");
 
 					Env env;
-					DisplayTypeTableSync::Search(env, _name, UNKNOWN_VALUE, 0, 1);
+					DisplayTypeTableSync::Search(env, _name, optional<RegistryKeyType>(), 0, 1);
 					if (!env.getRegistry<DisplayType>().empty())
 						throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
 				}
@@ -125,7 +125,7 @@ namespace synthese
 
 				// Max stops number
 				_max_stops_number = map.get<int>(PARAMETER_MAX_STOPS_NUMBER);
-				if (_max_stops_number < UNKNOWN_VALUE)
+				if (_max_stops_number < 0)
 				{
 					throw ActionException("Un nombre positif d'arrêts intermédiaires doit être choisi");
 				}

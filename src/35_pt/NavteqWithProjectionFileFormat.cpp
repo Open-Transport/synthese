@@ -307,7 +307,7 @@ namespace synthese
 						catch(...)
 						{
 							shared_ptr<Crossing> crossing(new Crossing);
-							crossing->setKey(util::encodeUId(43,0,0,decodeObjectId(address->getKey())));
+							crossing->setKey(util::encodeUId(43,0,decodeObjectId(address->getKey())));
 							crossing->setAddress(address.get());
 							address->setHub(crossing.get());
 							_env->getEditableRegistry<Crossing>().add(crossing);
@@ -316,7 +316,7 @@ namespace synthese
 					else
 					{ // Crossing
 						shared_ptr<Crossing> crossing(new Crossing);
-						crossing->setKey(util::encodeUId(43,0,0,decodeObjectId(address->getKey())));
+						crossing->setKey(util::encodeUId(43,0,decodeObjectId(address->getKey())));
 						crossing->setAddress(address.get());
 						address->setHub(crossing.get());
 						_env->getEditableRegistry<Crossing>().add(crossing);
@@ -485,7 +485,7 @@ namespace synthese
 							}
 							else
 							{
-								shared_ptr<Road> road(new Road(UNKNOWN_VALUE, Road::ROAD_TYPE_UNKNOWN, false));
+								shared_ptr<Road> road(new Road(0, Road::ROAD_TYPE_UNKNOWN, false));
 								road->setRoadPlace(roadPlace.get());
 								roadPlace->addRoad(*road);
 								road->setKey(RoadTableSync::getId());

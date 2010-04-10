@@ -54,7 +54,7 @@ namespace synthese
 		public:
 
 			ContinuousService(
-				util::RegistryKeyType id = UNKNOWN_VALUE,
+				util::RegistryKeyType id = 0,
 				std::string serviceNumber = std::string(),
 				graph::Path* path = NULL,
 				boost::posix_time::time_duration range = boost::posix_time::time_duration(0,0,0),

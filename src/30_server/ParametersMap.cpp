@@ -27,7 +27,6 @@
 
 #include "ParametersMap.h"
 #include "Request.h"
-#include "Conversion.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
@@ -79,46 +78,6 @@ namespace synthese
 
 		}
 
-		std::string ParametersMap::getString(
-			const std::string& parameterName,
-			bool neededParameter,
-			const std::string& source 
-		) const
-		{
-			Map::const_iterator it(_map.find(parameterName));
-			if (it == _map.end())
-			{
-				if (neededParameter)
-					throw ParametersMap::MissingParameterException(parameterName);
-				return string();
-			}
-			return it->second;
-		}
-
-		uid ParametersMap::getUid( const std::string& parameterName , bool neededParameter , const std::string& source ) const
-		{
-			const string result(getString(parameterName, neededParameter, source));
-			return result.empty() ? UNKNOWN_VALUE : Conversion::ToLongLong(result);
-		}
-
-		int ParametersMap::getInt( const std::string& parameterName , bool neededParameter , const std::string& source ) const
-		{
-			const string result(getString(parameterName, neededParameter, source));
-			return result.empty() ? UNKNOWN_VALUE : Conversion::ToInt(result);
-		}
-
-		double ParametersMap::getDouble( const std::string& parameterName , bool neededParameter , const std::string& source ) const
-		{
-			const string result(getString(parameterName, neededParameter, source));
-			return result.empty() ? UNKNOWN_VALUE : Conversion::ToDouble(result);
-		}
-
-		bool ParametersMap::getBool( const std::string& parameterName , bool neededParameter , bool defaultValue , const std::string& source ) const
-		{
-			const string result(getString(parameterName, neededParameter, source));
-			return result.empty() ? defaultValue : Conversion::ToBool(result);
-		}
-
 
 
 		void ParametersMap::insert( const std::string& parameterName, const std::string& value )
@@ -128,22 +87,22 @@ namespace synthese
 
 		void ParametersMap::insert( const std::string& parameterName, int value )
 		{
-			insert(parameterName, Conversion::ToString(value));
+			insert(parameterName, lexical_cast<string>(value));
 		}
 
 		void ParametersMap::insert( const std::string& parameterName, double value )
 		{
-			insert(parameterName, Conversion::ToString(value));
+			insert(parameterName, lexical_cast<string>(value));
 		}
 
-		void ParametersMap::insert( const std::string& parameterName, uid value )
+		void ParametersMap::insert( const std::string& parameterName, RegistryKeyType value )
 		{
-			insert(parameterName, Conversion::ToString(value));
+			insert(parameterName, lexical_cast<string>(value));
 		}
 
 		void ParametersMap::insert( const std::string& parameterName, bool value )
 		{
-			insert(parameterName, Conversion::ToString(value));
+			insert(parameterName, lexical_cast<string>(value));
 		}
 
 		void ParametersMap::insert(
@@ -165,6 +124,13 @@ namespace synthese
 			const date& value
 		){
 			insert(parameterName, value.is_not_a_date() ? string() : to_iso_extended_string(value));
+		}
+
+
+
+		void ParametersMap::insert( const std::string& parameterName, std::size_t value )
+		{
+			insert(parameterName, lexical_cast<string>(value));
 		}
 
 

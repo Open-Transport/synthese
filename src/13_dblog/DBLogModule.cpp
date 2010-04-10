@@ -60,11 +60,11 @@ namespace synthese
 	namespace dblog
 	{
 
-		vector<pair<int, std::string> > DBLogModule::getEntryLevelLabels( bool withAll/*=false*/ )
+		DBLogModule::Labels DBLogModule::getEntryLevelLabels( bool withAll/*=false*/ )
 		{
-			vector<pair<int, std::string> > m;
+			Labels m;
 			if (withAll)
-				m.push_back(make_pair((int) DBLogEntry::DB_LOG_UNKNOWN, "(tous)"));
+				m.push_back(make_pair(boost::optional<int>(), "(tous)"));
 			m.push_back(make_pair((int) DBLogEntry::DB_LOG_INFO, getEntryLevelLabel(DBLogEntry::DB_LOG_INFO)));
 			m.push_back(make_pair((int) DBLogEntry::DB_LOG_WARNING, getEntryLevelLabel(DBLogEntry::DB_LOG_WARNING)));
 			m.push_back(make_pair((int) DBLogEntry::DB_LOG_ERROR, getEntryLevelLabel(DBLogEntry::DB_LOG_ERROR)));

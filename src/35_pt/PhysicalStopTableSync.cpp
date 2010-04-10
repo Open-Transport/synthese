@@ -22,13 +22,8 @@
 
 #include "PhysicalStopTableSync.h"
 #include "ReplaceQuery.h"
-#include "Conversion.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-
+#include "SelectQuery.hpp"
 #include "ConnectionPlaceTableSync.h"
-
-#include <assert.h>
 
 using namespace std;
 using namespace boost;
@@ -129,29 +124,29 @@ namespace synthese
     {
 		PhysicalStopTableSync::SearchResult PhysicalStopTableSync::Search(
 			Env& env, 
-			optional<RegistryKeyType> placeId /*= UNKNOWN_VALUE */,
+			optional<RegistryKeyType> placeId,
 			optional<string> operatorCode,
 			int first /*= 0 */,
 			boost::optional<std::size_t> number  /*= 0 */,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query <<
-				" SELECT *" <<
-				" FROM " << TABLE.NAME <<
-				" WHERE 1 ";
+			SelectQuery<PhysicalStopTableSync> query;
 			if(operatorCode)
-				query << " AND " << COL_OPERATOR_CODE << " LIKE " << Conversion::ToSQLiteString(*operatorCode);
+			{
+				query.addWhereField(COL_OPERATOR_CODE, *operatorCode, ComposedExpression::OP_LIKE);
+			}
 			if(placeId)
-				query << " AND " << COL_PLACEID << "=" << *placeId;
+			{
+				query.addWhereField(COL_PLACEID, *placeId);
+			}
 			if (number)
 			{
-				query << " LIMIT " << (*number + 1);
+				query.setNumber(*number + 1);
 				if (first > 0)
-					query << " OFFSET " << first;
+					query.setFirst(first);
 			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }

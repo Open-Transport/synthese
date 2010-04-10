@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace geography
 	{
-		CityAlias::CityAlias( util::RegistryKeyType id /*= UNKNOWN_VALUE*/ )
+		CityAlias::CityAlias( util::RegistryKeyType id)
 			: Registrable(id)
 		{
 

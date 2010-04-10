@@ -48,7 +48,7 @@ namespace synthese
 			const ScenarioTemplate& source,
 			const std::string& name
 		):	Scenario(name),
-			Registrable(UNKNOWN_VALUE),
+			Registrable(0),
 			_folder(source._folder),
 			_variables(source._variables)
 		{
@@ -60,7 +60,7 @@ namespace synthese
 			const std::string name,
 			ScenarioFolder* folder
 		):	Scenario(name)
-			, util::Registrable(UNKNOWN_VALUE)
+			, util::Registrable(0)
 			, _folder(folder)
 		{
 		}

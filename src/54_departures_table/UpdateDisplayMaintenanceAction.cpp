@@ -64,9 +64,9 @@ namespace synthese
 
 		void UpdateDisplayMaintenanceAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setScreenId(map.getUid(PARAMETER_SCREEN_ID, true, FACTORY_KEY));
-			_online = map.getBool(PARAMETER_ONLINE, true, false, FACTORY_KEY);
-			_message = map.getString(PARAMETER_MESSAGE, true, FACTORY_KEY);
+			setScreenId(map.get<RegistryKeyType>(PARAMETER_SCREEN_ID));
+			_online = map.get<bool>(PARAMETER_ONLINE);
+			_message = map.get<string>(PARAMETER_MESSAGE);
 		}
 
 		void UpdateDisplayMaintenanceAction::run(Request& request)

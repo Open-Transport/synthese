@@ -83,7 +83,7 @@ namespace synthese
 
 				if(_tscenario.get())
 				{
-					uid folderId(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID));
+					RegistryKeyType folderId(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID));
 
 					if (folderId != 0)
 					{

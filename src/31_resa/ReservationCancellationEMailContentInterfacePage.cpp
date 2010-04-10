@@ -51,7 +51,7 @@ namespace synthese
 	{
 		ReservationCancellationEMailContentInterfacePage::ReservationCancellationEMailContentInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, ReservationCancellationEMailContentInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

@@ -55,7 +55,7 @@ namespace synthese
 	{
 		TimetableServiceColRowInterfacePage::TimetableServiceColRowInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, TimetableServiceColRowInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

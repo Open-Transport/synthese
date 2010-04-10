@@ -26,16 +26,8 @@
 
 #include "UserFavoriteJourneyTableSync.h"
 #include "UserFavoriteJourney.h"
-
-#include "User.h"
 #include "UserTableSync.h"
-
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
-
-#include "Conversion.h"
+#include "ReplaceQuery.h"
 
 using namespace std;
 using namespace boost;
@@ -113,29 +105,26 @@ namespace synthese
 			UserFavoriteJourney* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() == UNKNOWN_VALUE)
-				object->setKey(getId());
-
-			assert(object->getUser());
-            
-			query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToString(object->getUser()->getKey())
-				<< ",";
-			if (object->getRank() == UNKNOWN_VALUE)
-				query << "(SELECT MAX(" << UserFavoriteJourneyTableSync::COL_RANK << ") +1 FROM " << UserFavoriteJourneyTableSync::TABLE.NAME << " WHERE " << UserFavoriteJourneyTableSync::COL_USER_ID << "=" << object->getUser()->getKey() << ")";
+			ReplaceQuery<UserFavoriteJourneyTableSync> query(*object);
+			query.addField(object->getUser() ? object->getUser()->getKey() : RegistryKeyType(0));
+			if (!object->getRank())
+			{
+				query.addFieldExpression(
+					SubQueryExpression::Get(
+						"SELECT MAX(" + UserFavoriteJourneyTableSync::COL_RANK + string(") +1 FROM ") + 
+						UserFavoriteJourneyTableSync::TABLE.NAME + " WHERE " +
+						UserFavoriteJourneyTableSync::COL_USER_ID + "=" + lexical_cast<string>(object->getUser()->getKey())
+				)	);
+			}
 			else
-				query << Conversion::ToString(object->getRank());
-			query
-				<< "," << Conversion::ToSQLiteString(object->getOriginCityName())
-				<< "," << Conversion::ToSQLiteString(object->getOriginPlaceName())
-				<< "," << Conversion::ToSQLiteString(object->getDestinationCityName())
-				<< "," << Conversion::ToSQLiteString(object->getDestinationPlaceName())
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			{
+				query.addField(object->getRank());
+			}
+			query.addField(object->getOriginCityName());
+			query.addField(object->getOriginPlaceName());
+			query.addField(object->getDestinationCityName());
+			query.addField(object->getDestinationPlaceName());
+			query.execute(transaction);
 		}
 
 

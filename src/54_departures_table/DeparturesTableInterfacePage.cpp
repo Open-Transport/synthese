@@ -120,7 +120,7 @@ namespace synthese
 
 
 		DeparturesTableInterfacePage::DeparturesTableInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

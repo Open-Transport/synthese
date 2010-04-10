@@ -26,8 +26,11 @@
 #include "Factory.h"
 #include "UtilTypes.h"
 #include "02_db/Types.h"
+#include "SQLiteTransaction.h"
+#include "Env.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -60,6 +63,11 @@ namespace synthese
 				AutoCreation autoCreate = NEVER_CREATE
 			) const = 0;
 
+			virtual void _save(
+				BaseClass& object,
+				boost::optional<SQLiteTransaction&> transaction
+			) const = 0;
+
 		public:
 			Fetcher() {}
 
@@ -85,6 +93,14 @@ namespace synthese
 				return pf->_get(key, env, linkLevel, autoCreate);
 			}
 
+			static void FetchSave(
+				BaseClass& object,
+				boost::optional<SQLiteTransaction&> transaction = boost::optional<SQLiteTransaction&>()
+			){
+				std::string ts(boost::lexical_cast<std::string>(util::decodeTableId(object.getKey())));
+				std::auto_ptr<Fetcher<BaseClass> > pf(util::Factory<Fetcher<BaseClass> >::create(ts));
+				pf->_save(object, transaction);
+			}
 		};
 	}
 }

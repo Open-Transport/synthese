@@ -58,7 +58,7 @@ namespace synthese
 		public:
 
 			Address(
-				util::RegistryKeyType id = UNKNOWN_VALUE,
+				util::RegistryKeyType id = 0,
 				const AddressablePlace* place = NULL,
 				double x = UNKNOWN_VALUE,
 				double y = UNKNOWN_VALUE

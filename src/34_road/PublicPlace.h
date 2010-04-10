@@ -46,7 +46,7 @@ namespace synthese
 			typedef util::Registry<PublicPlace>	Registry;
 
 			PublicPlace (
-				util::RegistryKeyType id = UNKNOWN_VALUE
+				util::RegistryKeyType id = 0
 			);
 
 			virtual ~PublicPlace ();

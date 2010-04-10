@@ -77,12 +77,12 @@ namespace synthese
 			bool							_fixedEndDate;
 			DBLogEntry::Level				_searchLevel;
 			bool							_fixedLevel;
-			util::RegistryKeyType			_searchUserId;
+			boost::optional<util::RegistryKeyType>			_searchUserId;
 			bool							_fixedUserId;
 			std::string						_searchText;
 			bool							_fixedText;
-			util::RegistryKeyType			_searchObjectId;
-			util::RegistryKeyType			_searchObjectId2;
+			boost::optional<util::RegistryKeyType>			_searchObjectId;
+			boost::optional<util::RegistryKeyType>			_searchObjectId2;
 			bool							_fixedObjectId;
 			bool							_fixedObjectId2;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
@@ -124,9 +124,9 @@ namespace synthese
 				void set(
 					const server::ParametersMap& map,
 					std::string logKey,
-					util::RegistryKeyType searchObjectId = UNKNOWN_VALUE,
-					util::RegistryKeyType searchObjectId2 = UNKNOWN_VALUE,
-					util::RegistryKeyType searchUserId = UNKNOWN_VALUE,
+					boost::optional<util::RegistryKeyType> searchObjectId = boost::optional<util::RegistryKeyType>(),
+					boost::optional<util::RegistryKeyType> searchObjectId2 = boost::optional<util::RegistryKeyType>(),
+					boost::optional<util::RegistryKeyType> searchUserId = boost::optional<util::RegistryKeyType>(),
 					DBLogEntry::Level searchLevel = DBLogEntry::DB_LOG_UNKNOWN,
 					boost::posix_time::ptime searchStartDate = boost::posix_time::ptime(boost::posix_time::not_a_date_time),
 					boost::posix_time::ptime searchEndDate = boost::posix_time::ptime(boost::posix_time::not_a_date_time),

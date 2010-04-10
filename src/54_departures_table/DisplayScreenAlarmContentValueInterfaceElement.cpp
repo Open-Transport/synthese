@@ -22,8 +22,6 @@
 
 #include <string>
 
-#include "UId.h"
-#include "Conversion.h"
 #include "Interface.h"
 #include "ValueElementList.h"
 #include "InterfacePageException.h"

@@ -47,7 +47,7 @@ namespace synthese
 	{
 		DeparturesTableRoutePlanningRowKeyInterfacePage::DeparturesTableRoutePlanningRowKeyInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, DeparturesTableRoutePlanningRowKeyInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

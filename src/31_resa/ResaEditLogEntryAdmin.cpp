@@ -98,7 +98,7 @@ namespace synthese
 			_log.set(
 				map,
 				ResaDBLog::FACTORY_KEY,
-				UNKNOWN_VALUE,
+				optional<RegistryKeyType>(),
 				_entry->getKey()
 			);
 		}
@@ -126,13 +126,13 @@ namespace synthese
 			// Display
 			DBLogEntry::Content content(_entry->getContent());
 
-			vector<pair<ResaDBLog::_EntryType,string> > choices;
+			vector<pair<optional<ResaDBLog::_EntryType>,string> > choices;
 			choices.push_back(make_pair(ResaDBLog::CALL_ENTRY, ResaDBLog::GetIcon(ResaDBLog::CALL_ENTRY) +" "+ ResaDBLog::GetText(ResaDBLog::CALL_ENTRY)));
 			choices.push_back(make_pair(ResaDBLog::OUTGOING_CALL, ResaDBLog::GetIcon(ResaDBLog::OUTGOING_CALL) +" "+ ResaDBLog::GetText(ResaDBLog::OUTGOING_CALL)));
 			choices.push_back(make_pair(ResaDBLog::FAKE_CALL,ResaDBLog::GetIcon(ResaDBLog::FAKE_CALL) +" "+ ResaDBLog::GetText(ResaDBLog::FAKE_CALL)));
 			choices.push_back(make_pair(ResaDBLog::RADIO_CALL,ResaDBLog::GetIcon(ResaDBLog::RADIO_CALL) +" "+ResaDBLog::GetText(ResaDBLog::RADIO_CALL)));
 
-			vector<pair<ResaDBLog::_EntryType,string> > addChoices;
+			vector<pair<optional<ResaDBLog::_EntryType>,string> > addChoices;
 			addChoices.push_back(make_pair(ResaDBLog::CUSTOMER_COMMENT_ENTRY,ResaDBLog::GetIcon(ResaDBLog::CUSTOMER_COMMENT_ENTRY) +" "+ResaDBLog::GetText(ResaDBLog::CUSTOMER_COMMENT_ENTRY)));
 			addChoices.push_back(make_pair(ResaDBLog::INFORMATION_ENTRY,ResaDBLog::GetIcon(ResaDBLog::INFORMATION_ENTRY) +" "+ResaDBLog::GetText(ResaDBLog::INFORMATION_ENTRY)));
 			addChoices.push_back(make_pair(ResaDBLog::REDIRECTION_ENTRY,ResaDBLog::GetIcon(ResaDBLog::REDIRECTION_ENTRY) +" "+ResaDBLog::GetText(ResaDBLog::REDIRECTION_ENTRY)));
@@ -197,9 +197,21 @@ namespace synthese
 				}
 			}
 			stream << t.cell("Opérateur", op.get() ? op->getFullName() : "inconnu");
-			stream << t.cell("Type d'appel", t.getForm().getRadioInputCollection(ResaLogEntryUpdateAction::PARAMETER_CALL_TYPE, choices, static_cast<ResaDBLog::_EntryType>(lexical_cast<int>(content[ResaDBLog::COL_TYPE]))));
+			stream << t.cell(
+				"Type d'appel",
+				t.getForm().getRadioInputCollection(
+					ResaLogEntryUpdateAction::PARAMETER_CALL_TYPE,
+					choices,
+					optional<ResaDBLog::_EntryType>(static_cast<ResaDBLog::_EntryType>(lexical_cast<int>(content[ResaDBLog::COL_TYPE])))
+			)	);
 			stream << t.title("Ajout d'information sur l'appel");
-			stream << t.cell("Type d'ajout", t.getForm().getRadioInputCollection(ResaLogEntryUpdateAction::PARAMETER_TYPE, addChoices, ResaDBLog::CALL_ENTRY));
+			stream << t.cell(
+				"Type d'ajout",
+				t.getForm().getRadioInputCollection(
+					ResaLogEntryUpdateAction::PARAMETER_TYPE,
+					addChoices,
+					optional<ResaDBLog::_EntryType>(ResaDBLog::CALL_ENTRY)
+			)	);
 			stream << t.cell("Texte", t.getForm().getTextAreaInput(ResaLogEntryUpdateAction::PARAMETER_TEXT, string(), 4, 50));
 			stream << t.getForm().setFocus(ResaLogEntryUpdateAction::PARAMETER_TYPE);
 			stream << t.close();

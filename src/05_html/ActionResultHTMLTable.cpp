@@ -25,6 +25,7 @@
 #include "ActionResultHTMLTable.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -58,7 +59,7 @@ namespace synthese
 			{
 				s << col();
 				if (!value.empty())
-					s << _actionForm.getRadioInput(_selectName, value, string(), string());
+					s << _actionForm.getRadioInput(_selectName, optional<string>(value), optional<string>(), string());
 			}
 			return s.str();
 		}

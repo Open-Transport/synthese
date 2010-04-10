@@ -161,7 +161,7 @@ namespace synthese
 
 
 		JourneyBoardServiceCellInterfacePage::JourneyBoardServiceCellInterfacePage()
-		:	Registrable(UNKNOWN_VALUE)
+		:	Registrable(0)
 		{
 
 		}

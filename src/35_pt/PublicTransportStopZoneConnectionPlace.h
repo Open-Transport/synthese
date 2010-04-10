@@ -31,6 +31,7 @@
 
 #include <map>
 #include <utility>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -65,7 +66,7 @@ namespace synthese
 			typedef util::Registry<PublicTransportStopZoneConnectionPlace>	Registry;
 
 			typedef std::map<util::RegistryKeyType,const pt::PhysicalStop*> PhysicalStops;
-			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > PhysicalStopsLabels;
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > PhysicalStopsLabels;
 
 		private:
 
@@ -84,7 +85,7 @@ namespace synthese
 		public:
 
 			PublicTransportStopZoneConnectionPlace(
-				util::RegistryKeyType id = UNKNOWN_VALUE
+				util::RegistryKeyType id = 0
 				, bool allowedConnection = false
 				, boost::posix_time::time_duration defaultTransferDelay = boost::posix_time::time_duration()
 			);
@@ -147,7 +148,7 @@ namespace synthese
 			//@{
 				/** getPhysicalStopLabels.
 					@param withAll
-					@return std::vector<std::pair<uid, std::string> >
+					@return Physical stops labels
 					@author Hugues Romain
 					@date 2007					
 				*/

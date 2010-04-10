@@ -30,6 +30,7 @@
 
 #include <utility>
 #include <vector>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -72,7 +73,7 @@ namespace synthese
 			public server::ModuleClassTemplate<PlacesListModule>
 		{
 		public:
-			typedef std::vector<std::pair<graph::UserClassCode, std::string> > UserClassNames;
+			typedef std::vector<std::pair<boost::optional<graph::UserClassCode>, std::string> > UserClassNames;
 			static UserClassNames GetAccessibilityNames();
 		};
 	}

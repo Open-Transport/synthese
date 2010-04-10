@@ -64,8 +64,7 @@ namespace synthese
 					*_env
 				);
 
-				uid id(map.getUid(PARAMETER_PLACE, true, FACTORY_KEY));
-				_place = ConnectionPlaceTableSync::Get(id, *_env);
+				_place = ConnectionPlaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PLACE), *_env);
 
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)

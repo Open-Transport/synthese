@@ -64,19 +64,12 @@ namespace synthese
 		):	Registrable(id),
 			_startValidityDate(not_a_date_time),
 			_endValidityDate(not_a_date_time),
-			_interface(NULL)
+			_interface(NULL),
+			_displayRoadApproachDetail(true)
 		{		
 		}
 
-		const Interface* Site::getInterface() const
-		{
-			return _interface;
-		}
 
-		bool Site::getOnlineBookingAllowed() const
-		{
-			return _onlineBookingAllowed;
-		}
 
 		bool Site::dateControl() const
 		{
@@ -84,10 +77,7 @@ namespace synthese
 			return tempDate >= _startValidityDate && tempDate <= _endValidityDate;
 		}
 
-		void Site::setInterface(const Interface* interf )
-		{
-			_interface = interf;
-		}
+		
 
 		void Site::setStartDate( const date& dateDebut )
 		{
@@ -109,10 +99,7 @@ namespace synthese
 			_pastSolutionsDisplayed = pastSolutions;
 		}
 
-		void Site::setName( const std::string& name )
-		{
-			_name = name;
-		}
+
 
 		bool Site::getPastSolutionsDisplayed() const
 		{
@@ -236,12 +223,6 @@ namespace synthese
 		void Site::setUseDateRange(date_duration range )
 		{
 			_useDateRange = range;
-		}
-
-
-		const std::string& Site::getName() const
-		{
-			return _name;
 		}
 
 
@@ -387,9 +368,9 @@ namespace synthese
 
 
 
-		map<size_t, string> Site::getRollingStockFiltersList(
+		Site::Labels Site::getRollingStockFiltersList(
 		) const {
-			map<size_t, string> result;
+			Labels result;
 			BOOST_FOREACH(const RollingStockFilters::value_type& it, _rollingStockFilters)
 			{
 				result.insert(make_pair(it.first, it.second->getName()));

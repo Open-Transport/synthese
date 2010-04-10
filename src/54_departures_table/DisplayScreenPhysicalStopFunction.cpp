@@ -22,18 +22,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Conversion.h"
-
 #include "PhysicalStop.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
-#include "ConnectionPlaceTableSync.h"
-
 #include "Interface.h"
-#include "InterfaceTableSync.h"
-
 #include "RequestException.h"
 #include "Request.h"
-
 #include "DisplayScreenPhysicalStopFunction.h"
 #include "DeparturesTableInterfacePage.h"
 #include "DisplayScreen.h"
@@ -69,15 +62,20 @@ namespace synthese
 
 		void DisplayScreenPhysicalStopFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			string oc(map.getString(PARAMETER_OPERATOR_CODE, true, FACTORY_KEY));
-			const PublicTransportStopZoneConnectionPlace* place(ConnectionPlaceTableSync::Get(map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY), *_env).get());
+			string oc(map.get<string>(PARAMETER_OPERATOR_CODE));
+			shared_ptr<const PublicTransportStopZoneConnectionPlace> place(
+				Env::GetOfficialEnv().get<PublicTransportStopZoneConnectionPlace>(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
+			)	);
 
 			DisplayScreen* screen(new DisplayScreen);
 			_type.reset(new DisplayType);
 			_type->setRowNumber(10);
-			_type->setDisplayInterface(InterfaceTableSync::Get(map.getUid(PARAMETER_INTERFACE_ID, true, FACTORY_KEY), *_env).get());
+			_type->setDisplayInterface(
+				Env::GetOfficialEnv().get<Interface>(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID)).get()
+			);
 
-			screen->setLocalization(place);
+			screen->setLocalization(place.get());
 			screen->setAllPhysicalStopsDisplayed(false);
 			const ArrivalDepartureTableGenerator::PhysicalStops& stops(place->getPhysicalStops());
 			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, stops)

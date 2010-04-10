@@ -94,7 +94,7 @@ namespace synthese
 
 
 		RoutePlannerSheetColumnInterfacePage::RoutePlannerSheetColumnInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

@@ -134,15 +134,13 @@ namespace synthese
 		){
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::Get(
-					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					_getEnv()
+				_displayScreen = Env::GetOfficialEnv().get<DisplayScreen>(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
 				);
 				
 				_status = DisplayMonitoringStatusTableSync::GetStatus(
-						_displayScreen->getKey()
-					)
-				;
+					_displayScreen->getKey()
+				);
 				_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _displayScreen->getKey());
 				_generalLogView.set(map, ArrivalDepartureTableLog::FACTORY_KEY, _displayScreen->getKey());
 			}
@@ -173,38 +171,6 @@ namespace synthese
 			interfaces::VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
-			// Display screen read in the main environment
-			shared_ptr<const DisplayScreen> _prodScreen(
-				Env::GetOfficialEnv().getRegistry<DisplayScreen>().get(_displayScreen->getKey())
-			);
-			
-			if(_displayScreen->getLocalization() != NULL)
-			{
-				PhysicalStopTableSync::Search(
-					_getEnv(),
-					_displayScreen->getLocalization()->getKey(),
-					optional<string>(),
-					0,
-					optional<size_t>(),
-					UP_LINKS_LOAD_LEVEL
-				);
-				
-				BOOST_FOREACH(
-					const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it,
-					_displayScreen->getLocalization()->getPhysicalStops()
-				){
-					LineStopTableSync::Search(
-						_getEnv(),
-						UNKNOWN_VALUE,
-						it.first,
-						0,
-						optional<size_t>(),
-						true, true,
-						UP_LINKS_LOAD_LEVEL
-					);
-				}
-			}
-			
 			////////////////////////////////////////////////////////////////////
 			// TECHNICAL TAB
 			if (openTabContent(stream, TAB_TECHNICAL))
@@ -242,7 +208,7 @@ namespace synthese
 						t.getForm().getSelectInput(
 							UpdateDisplayScreenAction::PARAMETER_TYPE,
 							DeparturesTableModule::getDisplayTypeLabels(false, _displayScreen->getType() == NULL),
-							_displayScreen->getType() ? _displayScreen->getType()->getKey() : UNKNOWN_VALUE
+							_displayScreen->getType() ? _displayScreen->getType()->getKey() : optional<RegistryKeyType>()
 					)	)
 				;
 				stream << t.cell("Adresse MAC", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_MAC_ADDRESS, _displayScreen->getMacAddress()));
@@ -490,7 +456,7 @@ namespace synthese
 				AdminActionFunctionRequest<DisplayScreenRemoveForbiddenPlaceAction,DisplayAdmin> rmForbiddenRequest(_request);
 				rmForbiddenRequest.getAction()->setScreen(_displayScreen);
 
-				vector<pair<EndFilter, string> > endFilterMap;
+				vector<pair<optional<EndFilter>, string> > endFilterMap;
 				endFilterMap.push_back(make_pair(WITH_PASSING, "Origines/Terminus et passages"));
 				endFilterMap.push_back(make_pair(ENDS_ONLY, "Origines/Terminus seulement"));
 
@@ -505,20 +471,20 @@ namespace synthese
 				stream << t.cell("Type de contenu", t.getForm().getRadioInputCollection(
 						UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_FUNCTION,
 						UpdateDisplayPreselectionParametersAction::GetFunctionList(),
-						UpdateDisplayPreselectionParametersAction::GetFunction(*_displayScreen),
+						optional<UpdateDisplayPreselectionParametersAction::DisplayFunction>(UpdateDisplayPreselectionParametersAction::GetFunction(*_displayScreen)),
 						true
 				)	);
 				stream << t.cell("Terminus", t.getForm().getRadioInputCollection(
 						UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_END_FILTER,
 						endFilterMap,
-						_displayScreen->getEndFilter(),
+						optional<EndFilter>(_displayScreen->getEndFilter()),
 						true
 				)	);
 				stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) + " minutes");
 				stream << t.cell("Délai d'effacement", t.getForm().getSelectInput(
 					UpdateDisplayPreselectionParametersAction::PARAMETER_CLEANING_DELAY,
 					UpdateDisplayPreselectionParametersAction::GetClearDelaysList(),
-					_displayScreen->getClearingDelay()
+					optional<int>(_displayScreen->getClearingDelay())
 				));
 
 				if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
@@ -694,10 +660,10 @@ namespace synthese
 					stream << ant.getImageSubmitButton("add.png", "Ajouter");
 					stream << ant.getSelectInput(
 						AddForbiddenPlaceToDisplayScreenAction::PARAMETER_PLACE,
-						_prodScreen->getSortedAvaliableDestinationsLabels(
+						_displayScreen->getSortedAvaliableDestinationsLabels(
 							_displayScreen->getForbiddenPlaces()
 						),
-						uid(0)
+						optional<RegistryKeyType>(0)
 					);
 					stream << l.close() << ant.close();
 				}
@@ -737,10 +703,10 @@ namespace synthese
 					stream <<
 						psaf.getSelectInput(
 							AddPreselectionPlaceToDisplayScreenAction::PARAMETER_PLACE,
-							_prodScreen->getSortedAvaliableDestinationsLabels(
+							_displayScreen->getSortedAvaliableDestinationsLabels(
 								_displayScreen->getForcedDestinations()
 							),
-							uid(0)
+							optional<RegistryKeyType>(0)
 						)
 					;
 					stream << l.close() << psaf.close();
@@ -758,12 +724,12 @@ namespace synthese
 				updateRequest.getAction()->setScreenId(_displayScreen->getKey());
 
 				// Maps for particular select fields
-				vector<pair<int, string> > blinkingDelaysMap;
+				vector<pair<optional<int>, string> > blinkingDelaysMap;
 				blinkingDelaysMap.push_back(make_pair(0, "Pas de clignotement"));
 				blinkingDelaysMap.push_back(make_pair(1, "1 minute avant disparition"));
 				for (int i=2; i<6; ++i)
 				{
-					blinkingDelaysMap.push_back(make_pair(i, Conversion::ToString(i) + " minutes avant disparition"));
+					blinkingDelaysMap.push_back(make_pair(i, lexical_cast<string>(i) + " minutes avant disparition"));
 				}
 
 				stream << "<h1>Propriétés</h1>";
@@ -773,7 +739,13 @@ namespace synthese
 
 				stream << t.open();
 				stream << t.cell("Titre", t.getForm().getTextInput(DisplayScreenAppearanceUpdateAction::PARAMETER_TITLE, _displayScreen->getTitle()));
-				stream << t.cell("Clignotement", t.getForm().getSelectInput(DisplayScreenAppearanceUpdateAction::PARAMETER_BLINKING_DELAY, blinkingDelaysMap, _displayScreen->getBlinkingDelay()));
+				stream << t.cell(
+					"Clignotement",
+					t.getForm().getSelectInput(
+						DisplayScreenAppearanceUpdateAction::PARAMETER_BLINKING_DELAY,
+						blinkingDelaysMap,
+						optional<int>(_displayScreen->getBlinkingDelay())
+				)	);
 				stream << t.cell("Affichage numéro de quai", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_PLATFORM, _displayScreen->getTrackNumberDisplay()));
 				stream << t.cell("Affichage numéro de service", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->getServiceNumberDisplay()));
 				stream << t.cell("Affichage numéro d'équipe", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_TEAM, _displayScreen->getDisplayTeam()));
@@ -826,8 +798,8 @@ namespace synthese
 					stream << t.row();
 					stream << t.col(2) << f.getSelectInput(
 						DisplayScreenAddDisplayedPlaceAction::PARAMETER_PLACE,
-						_prodScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()),
-						uid(0)
+						_displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()),
+						optional<RegistryKeyType>(0)
 					);
 						
 					stream << t.col() << f.getSubmitButton("Ajouter");
@@ -878,8 +850,8 @@ namespace synthese
 					stream << tt.row();
 					stream << tt.col(2) << ft.getSelectInput(
 						DisplayScreenTransferDestinationAddAction::PARAMETER_TRANSFER_PLACE_ID,
-						_prodScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()),
-						uid(0)
+						_displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()),
+						optional<RegistryKeyType>(0)
 					);
 					stream << tt.col() << ft.getTextInput(
 						DisplayScreenTransferDestinationAddAction::PARAMETER_DESTINATION_PLACE_CITY_NAME,

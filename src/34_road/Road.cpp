@@ -57,11 +57,11 @@ namespace synthese
 		}
 
 		Road::Road(const Road& reverseRoad
-		):	Registrable(UNKNOWN_VALUE),
+		):	Registrable(0),
 			_type(reverseRoad.getType()),
 			_reverseRoad(NULL)
 		{
-			addService(new PermanentService(UNKNOWN_VALUE, this), false);
+			addService(new PermanentService(0, this), false);
 		}
 
 
@@ -131,7 +131,7 @@ namespace synthese
 			{
 				RoadChunk* reverseChunk(
 					new RoadChunk(
-						UNKNOWN_VALUE,
+						0,
 						chunk->getFromAddress(),
 						-chunk->getRankInPath(),
 						_reverseRoad,

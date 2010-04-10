@@ -64,7 +64,7 @@ namespace synthese
 
 		public:
 			Fare(
-				util::RegistryKeyType key = UNKNOWN_VALUE
+				util::RegistryKeyType key = 0
 			);
 			~Fare ();
 		    

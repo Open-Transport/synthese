@@ -94,7 +94,7 @@ namespace synthese
 			);
 			BOOST_FOREACH(shared_ptr<Reservation> resa, reservations)
 			{
-				if (resa->getReservationRuleId() != UNKNOWN_VALUE)
+				if (resa->getReservationRuleId() != 0)
 				{
 					if (now > resa->getArrivalTime())
 						throw ActionException("Le statut de la réservation ne permet pas de l'annuler");

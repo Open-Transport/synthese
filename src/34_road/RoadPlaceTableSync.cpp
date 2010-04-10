@@ -85,11 +85,8 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Columns reading
-			uid id(rows->getLongLong(TABLE_COL_ID));
-
 			// Properties
-			object->setKey(id);
+			object->setKey(rows->getLongLong(TABLE_COL_ID));
 			object->setName(rows->getText(RoadPlaceTableSync::COL_NAME));
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)

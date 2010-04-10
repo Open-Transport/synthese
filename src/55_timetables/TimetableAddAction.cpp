@@ -63,7 +63,7 @@ namespace synthese
 		ParametersMap TimetableAddAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_BOOK_ID, _book.get() ? _book->getKey() : uid(0));
+			map.insert(PARAMETER_BOOK_ID, _book.get() ? _book->getKey() : RegistryKeyType(0));
 			return map;
 		}
 		

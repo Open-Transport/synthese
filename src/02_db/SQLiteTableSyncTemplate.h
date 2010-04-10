@@ -142,7 +142,7 @@ namespace synthese
 
 			//! @name Table run variables
 			//@{
-				static int _autoIncrementValue;						//!< Value of the last created object
+				static util::RegistryObjectType _autoIncrementValue;						//!< Value of the last created object
 				static boost::shared_ptr<boost::mutex> _idMutex;	//!< Mutex
 			//@}
 
@@ -150,16 +150,13 @@ namespace synthese
 			//! @name Table run variables handlers
 			//@{
 				static util::RegistryKeyType encodeUId(
-					long objectId
+					util::RegistryObjectType objectId
 				){
-					// TODO : plenty of functions should be at SQLiteTableSync level directly.
-					// default value is 1 for compatibility
-					static int nodeId = boost::lexical_cast<int>(
+					static int nodeId = boost::lexical_cast<RegistryNodeType>(
 						server::ModuleClass::GetParameter("dbring_node_id", "1")
 					);
 					return util::encodeUId(
 						K::TABLE.ID,
-						1, // TODO : remove grid id, deprecated with ring nodes
 						nodeId,
 						objectId
 					);
@@ -285,11 +282,7 @@ namespace synthese
 			{			
 				boost::mutex::scoped_lock mutex(*_idMutex);
 
-				//	if (it == _autoIncrementValues.end())
-				//		throw Exception("Autoincrement not initialized for table "+ getTableName());
-
-				//	int retval = it->second++;
-				int retval = _autoIncrementValue++;
+				RegistryObjectType retval = _autoIncrementValue++;
 
 				return encodeUId(retval);
 			}
@@ -329,7 +322,7 @@ namespace synthese
 
 
 		template <class K>
-		std::string synthese::db::SQLiteTableSyncTemplate<K>::_GetIndexName(
+		std::string SQLiteTableSyncTemplate<K>::_GetIndexName(
 			const SQLiteTableSync::Index& index
 		){
 			std::stringstream s;
@@ -366,7 +359,7 @@ namespace synthese
 
 
 		template <class K>
-		bool synthese::db::SQLiteTableSyncTemplate<K>::_HasField(
+		bool SQLiteTableSyncTemplate<K>::_HasField(
 			const std::string& name
 		){
 			for(size_t i(0); !_FIELDS[i].empty(); ++i)
@@ -379,7 +372,7 @@ namespace synthese
 
 
 		template <class K>
-		std::string synthese::db::SQLiteTableSyncTemplate<K>::_GetSQLTriggerNoUpdate(
+		std::string SQLiteTableSyncTemplate<K>::_GetSQLTriggerNoUpdate(
 		) {
 			std::vector<std::string> nonUpdatableColumns;
 			for(size_t i(0); !_FIELDS[i].empty(); ++i)
@@ -530,10 +523,10 @@ namespace synthese
 
 
 		template <class K>
-			boost::shared_ptr<boost::mutex> SQLiteTableSyncTemplate<K>::_idMutex(new boost::mutex); 
+		boost::shared_ptr<boost::mutex> SQLiteTableSyncTemplate<K>::_idMutex(new boost::mutex); 
 
 		template <class K>
-			int SQLiteTableSyncTemplate<K>::_autoIncrementValue(1); 
+		util::RegistryObjectType SQLiteTableSyncTemplate<K>::_autoIncrementValue(1); 
 	}
 }
 

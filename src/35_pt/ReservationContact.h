@@ -50,7 +50,7 @@ namespace synthese
 
 		 public:
 			ReservationContact(
-				util::RegistryKeyType key = UNKNOWN_VALUE
+				util::RegistryKeyType key = 0
 			);
 			virtual ~ReservationContact();
 

@@ -133,7 +133,7 @@ namespace synthese
 					alarm->getKey(),
 					this->getFactoryKey()
 			)	);
-			set<uid> usedDisplayScreens;
+			set<util::RegistryKeyType> usedDisplayScreens;
 
 			StaticFunctionRequest<AlarmTestOnDisplayScreenFunction> testRequest(addRequest, true);
 			testRequest.getFunction()->setAlarmId(alarm->getKey());
@@ -142,7 +142,12 @@ namespace synthese
 			
 			HTMLForm testForm(testRequest.getHTMLForm("testForm"));
 			stream << testForm.open() << "<p>";
-			stream << "Type d'afficheur à tester : " << testForm.getSelectInput(AlarmTestOnDisplayScreenFunction::PARAMETER_DISPLAY_TYPE_ID, DeparturesTableModule::getDisplayTypeLabels(), static_cast<uid>(UNKNOWN_VALUE));
+			stream << "Type d'afficheur à tester : " <<
+				testForm.getSelectInput(
+					AlarmTestOnDisplayScreenFunction::PARAMETER_DISPLAY_TYPE_ID,
+					DeparturesTableModule::getDisplayTypeLabels(),
+					optional<RegistryKeyType>()
+				);
 			stream << testForm.getSubmitOnPopupLink(HTMLModule::getHTMLImage("accept.png", "OK"), 800, 600);
 			stream << "</p>" << testForm.close();
 
@@ -179,13 +184,13 @@ namespace synthese
 
 			stream << "<h1>Ajout d'afficheur</h1>";
 
-			string searchCity(parameters.getString(PARAMETER_SEARCH_CITY_NAME, false, FACTORY_KEY));
-			string searchStop(parameters.getString(PARAMETER_SEARCH_STOP_NAME, false, FACTORY_KEY));
-			string searchName(parameters.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY));
-			uid searchLine = UNKNOWN_VALUE;
-			uid searchType = UNKNOWN_VALUE;
-			int searchState = UNKNOWN_VALUE;
-			int searchMessage = UNKNOWN_VALUE;
+			string searchCity(parameters.getDefault<string>(PARAMETER_SEARCH_CITY_NAME));
+			string searchStop(parameters.getDefault<string>(PARAMETER_SEARCH_STOP_NAME));
+			string searchName(parameters.getDefault<string>(PARAMETER_SEARCH_NAME));
+			optional<RegistryKeyType> searchLine;
+			optional<RegistryKeyType> searchType;
+			optional<int> searchState;
+			optional<int> searchMessage;
 
 			stream << DisplaySearchAdmin::getHtmlSearchForm(
 				searchRequest.getHTMLForm()
@@ -204,8 +209,8 @@ namespace synthese
 					searchRequest.getUser()->getProfile()->getRightsForModuleClass<MessagesRight>()
 					, searchRequest.getUser()->getProfile()->getGlobalPublicRight<MessagesRight>() >= READ
 					, WRITE
-					, UNKNOWN_VALUE
-					, UNKNOWN_VALUE
+					, optional<RegistryKeyType>()
+					, optional<RegistryKeyType>()
 					, searchLine
 					, searchType
 					, searchCity
@@ -254,24 +259,28 @@ namespace synthese
 		{
 			shared_ptr<const Line> line;
 			Env env;
-			uid id(parameters.getUid(PARAMETER_SEARCH_LINE, false, FACTORY_KEY));
-			if (id != UNKNOWN_VALUE)
+			optional<RegistryKeyType> id(parameters.getOptional<RegistryKeyType>(PARAMETER_SEARCH_LINE));
+			if (id)
 			{
-				line  = LineTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL);
+				line  = LineTableSync::Get(*id, env, FIELDS_ONLY_LOAD_LEVEL);
 			}
 
 			AlarmRecipientSearchFieldsMap map;
 			AlarmRecipientFilter arf;
 
 			arf.label = "Ligne";
-			arf.htmlField = form.getSelectInput(PARAMETER_SEARCH_LINE, DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), line ? line->getKey() : UNKNOWN_VALUE);
+			arf.htmlField = form.getSelectInput(
+				PARAMETER_SEARCH_LINE, 
+				DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), 
+				line ? line->getKey() : optional<RegistryKeyType>()
+			);
 			arf.query = "";
 			map.insert(make_pair(PARAMETER_SEARCH_LINE, arf));
 
 			return map;
 		}
 
-		void DisplayScreenAlarmRecipient::addObject(const SentAlarm* alarm, uid objectId )
+		void DisplayScreenAlarmRecipient::addObject(const SentAlarm* alarm, util::RegistryKeyType objectId )
 		{
 			try
 			{
@@ -283,7 +292,7 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenAlarmRecipient::removeObject(const SentAlarm* alarm, uid objectId )
+		void DisplayScreenAlarmRecipient::removeObject(const SentAlarm* alarm, util::RegistryKeyType objectId )
 		{
 			remove(DisplayScreenTableSync::Get(objectId, Env::GetOfficialEnv()).get(), alarm);
 		}

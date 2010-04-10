@@ -100,7 +100,7 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				uid id(rows->getLongLong(WebPageTableSync::COL_SITE_ID));
+				RegistryKeyType id(rows->getLongLong(WebPageTableSync::COL_SITE_ID));
 				if (id > 0)
 				{
 					try
@@ -116,7 +116,7 @@ namespace synthese
 					}
 				}
 
-				uid up_id(rows->getLongLong(WebPageTableSync::COL_UP_ID));
+				RegistryKeyType up_id(rows->getLongLong(WebPageTableSync::COL_UP_ID));
 				if (up_id > 0)
 				{
 					try

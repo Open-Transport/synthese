@@ -59,15 +59,17 @@ namespace synthese
 						linkLevel
 					).get()
 				);
-				uid id(rows->getLongLong(AlarmTableSync::COL_TEMPLATE_ID));
+				RegistryKeyType id(rows->getLongLong(AlarmTableSync::COL_TEMPLATE_ID));
 				if(id > 0)
-				obj->setTemplate(
-					AlarmTemplateInheritedTableSync::Get(
-						id,
-						env,
-						linkLevel
-					).get()
-				);
+				{
+					obj->setTemplate(
+						AlarmTemplateInheritedTableSync::Get(
+							id,
+							env,
+							linkLevel
+						).get()
+					);
+				}
 			}
 		}
 
@@ -90,7 +92,7 @@ namespace synthese
 			SentAlarm* obj,
 			optional<SQLiteTransaction&> transaction
 		){
-			if (obj->getKey() == UNKNOWN_VALUE)
+			if (obj->getKey() == 0)
 				obj->setKey(getId());
 			stringstream query;		
 			query

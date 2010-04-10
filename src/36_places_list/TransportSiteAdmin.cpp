@@ -123,7 +123,6 @@ namespace synthese
 		
 		TransportSiteAdmin::TransportSiteAdmin()
 			: AdminInterfaceElementTemplate<TransportSiteAdmin>(),
-			_resultsNumber(UNKNOWN_VALUE),
 			_dateTime(not_a_date_time),
 			_log(false),
 			_accessibility(USER_PEDESTRIAN),
@@ -165,9 +164,9 @@ namespace synthese
 			{
 				_dateTime = ptime(second_clock::local_time());
 			}
-			_resultsNumber = map.getInt(PARAMETER_RESULTS_NUMBER, false, FACTORY_KEY);
+			_resultsNumber = map.getOptional<size_t>(PARAMETER_RESULTS_NUMBER);
 			_accessibility = static_cast<UserClassCode>(
-				map.getInt(PARAMETER_ACCESSIBILITY, false, string())
+				map.getDefault<int>(PARAMETER_ACCESSIBILITY, UNKNOWN_VALUE)
 			);
 		
 			if(!_site->getRollingStockFilters().empty())
@@ -255,13 +254,14 @@ namespace synthese
 				stream << pt.cell("Interface", pt.getForm().getSelectInput(
 							SiteUpdateAction::PARAMETER_INTERFACE_ID,
 							InterfaceTableSync::GetInterfaceLabels<RoutePlannerInterfacePage>(optional<string>()),
-							_site->getInterface() ? _site->getInterface()->getKey() : 0
+							optional<RegistryKeyType>(_site->getInterface() ? _site->getInterface()->getKey() : 0)
 					)	);
 				stream << pt.title("Recherche d'itinéraires");
 				stream << pt.cell("Max correspondances", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_MAX_CONNECTIONS, 0, 99, _site->getMaxTransportConnectionsCount(), 1, "illimité"));
 				stream << pt.cell("Réservation en ligne", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_ONLINE_BOOKING, _site->getOnlineBookingAllowed()));
 				stream << pt.cell("Affichage données passées", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_USE_OLD_DATA, _site->getPastSolutionsDisplayed()));
 				stream << pt.cell("Nombre de jours chargés", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_USE_DATES_RANGE, 0, 365, _site->getUseDatesRange().days(), 1, "illimité"));
+				stream << pt.cell("Affichage détail approche routière", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL, _site->getDisplayRoadApproachDetail()));
 				stream << pt.close();
 
 				stream << "<h1>Périodes de recherche d'itinéraire</h1>";
@@ -396,12 +396,28 @@ namespace synthese
 				stream << st.cell("Commune arrivée", st.getForm().getTextInput(PARAMETER_END_CITY, _endCity));
 				stream << st.cell("Arrêt arrivée", st.getForm().getTextInput(PARAMETER_END_PLACE, _endPlace));
 				stream << st.cell("Date/Heure", st.getForm().getCalendarInput(PARAMETER_DATE_TIME, _dateTime));
-				stream << st.cell("Nombre réponses", st.getForm().getSelectNumberInput(PARAMETER_RESULTS_NUMBER, 1, 99, _resultsNumber, 1, "(illimité)"));
-				stream << st.cell("Accessibilité", st.getForm().getSelectInput(PARAMETER_ACCESSIBILITY, PlacesListModule::GetAccessibilityNames(), _accessibility));
+				stream << st.cell(
+					"Nombre réponses",
+					st.getForm().getSelectNumberInput(
+						PARAMETER_RESULTS_NUMBER,
+						1, 99,
+						_resultsNumber ? *_resultsNumber : UNKNOWN_VALUE,
+						1,
+						"(illimité)"
+				)	);
+				stream << st.cell(
+					"Accessibilité",
+					st.getForm().getSelectInput(PARAMETER_ACCESSIBILITY, PlacesListModule::GetAccessibilityNames(), optional<UserClassCode>(_accessibility)));
 				stream << st.cell("Trace", st.getForm().getOuiNonRadioInput(PARAMETER_LOG, _log));
 				if(!_site->getRollingStockFilters().empty())
 				{
-					stream << st.cell("Modes de transport", st.getForm().getSelectInput(PARAMETER_ROLLING_STOCK_FILTER, _site->getRollingStockFiltersList(), _rollingStockFilter->getRank()));
+					stream << st.cell(
+						"Modes de transport",
+						st.getForm().getSelectInput(
+							PARAMETER_ROLLING_STOCK_FILTER,
+							_site->getRollingStockFiltersList(),
+							optional<size_t>(_rollingStockFilter->getRank())
+					)	);
 				}
 				stream << st.close();
 

@@ -78,28 +78,27 @@ namespace synthese
 		
 		void AccountAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_name = map.getString(PARAMETER_NAME, false, FACTORY_KEY);
+			_name = map.getDefault<string>(PARAMETER_NAME);
 			if (_name.empty())
 				throw ActionException("Name must be non empty.");
 			// Search for existing account
 
-			_class = map.getString(PARAMETER_CLASS, false, FACTORY_KEY);
+			_class = map.getDefault<string>(PARAMETER_CLASS);
 			if (_class.empty())
 				throw ActionException("Class must be non empty");
 			
-			_autoIncrementClass = map.getBool(PARAMETER_AUTO_INCREMENT_CLASS, false, false, FACTORY_KEY);
+			_autoIncrementClass = map.getDefautl<bool>(PARAMETER_AUTO_INCREMENT_CLASS, false);
 
-			uid id(map.getUid(PARAMETER_CURRENCY, true, FACTORY_KEY));
 			try
 			{
-				_currency = CurrencyTableSync::Get(id);
+				_currency = CurrencyTableSync::Get(map.get<RegistryKeyType>(PARAMETER_CURRENCY));
 			}
 			catch(...)
 			{
 				throw ActionException("Currency not found");
 			}
 
-			id = map.getUid(PARAMETER_RIGHT_USER_ID, false, FACTORY_KEY);
+			RegistryKeyType id = map.getDefault<RegistryKeyType(PARAMETER_RIGHT_USER_ID);
 			if (id > 0)
 			{
 				try

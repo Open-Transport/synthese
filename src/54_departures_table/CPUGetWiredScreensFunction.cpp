@@ -68,15 +68,14 @@ namespace synthese
 
 		void CPUGetWiredScreensFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_CPU_ID, false, FACTORY_KEY));
+			RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_CPU_ID, 0));
 			if(id > 0)
 			{
 				setCPU(id);
 			}
 			else
 			{
-				string macAddress(map.getString(PARAMETER_CPU_MAC_ADDRESS, true, FACTORY_KEY));
-				setCPU(macAddress);
+				setCPU(map.get<string>(PARAMETER_CPU_MAC_ADDRESS));
 			}
 		}
 

@@ -55,7 +55,7 @@ namespace synthese
 
 		public:
 			NonConcurrencyRule(
-				util::RegistryKeyType key = UNKNOWN_VALUE
+				util::RegistryKeyType key = 0
 			);
 
 			//! @name Getters

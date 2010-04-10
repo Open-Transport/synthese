@@ -72,7 +72,7 @@ namespace synthese
 		public:
 
 			Road(
-				util::RegistryKeyType key = UNKNOWN_VALUE,
+				util::RegistryKeyType key = 0,
 				RoadType type = ROAD_TYPE_UNKNOWN,
 				bool autoCreateReverseRoad = true
 			);

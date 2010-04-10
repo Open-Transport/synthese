@@ -71,8 +71,8 @@ namespace synthese
 				throw ActionException("Profile not found");
 			}
 
-			string rightCode(map.getString(PARAMETER_RIGHT, true, FACTORY_KEY));
-			string parameter(map.getString(PARAMETER_PARAMETER, true, FACTORY_KEY));
+			string rightCode(map.get<string>(PARAMETER_RIGHT));
+			string parameter(map.get<string>(PARAMETER_PARAMETER));
 			
 			_right = _profile->getRight(rightCode, parameter);
 			if (!_right.get())

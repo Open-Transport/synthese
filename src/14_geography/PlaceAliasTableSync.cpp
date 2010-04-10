@@ -91,9 +91,9 @@ namespace synthese
 				// Because the fetch place has no equivalent in database read mode
 //				assert(temporary == GET_REGISTRY);
 
-				uid aliasedPlaceId (
+				RegistryKeyType aliasedPlaceId (
 					rows->getLongLong (PlaceAliasTableSync::COL_ALIASEDPLACEID));
-				uid cityId (
+				RegistryKeyType cityId (
 					rows->getLongLong (PlaceAliasTableSync::COL_CITYID));
 				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
 

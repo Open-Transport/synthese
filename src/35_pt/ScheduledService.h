@@ -79,7 +79,7 @@ namespace synthese
 		public:
 
 			ScheduledService(
-				util::RegistryKeyType id = UNKNOWN_VALUE,
+				util::RegistryKeyType id = 0,
 				std::string serviceNumber = std::string(),
 				graph::Path* path = NULL
 			);

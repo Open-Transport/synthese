@@ -20,8 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "UId.h"
-
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "CommercialLine.h"
 
@@ -68,22 +66,21 @@ namespace synthese
 
 	namespace departurestable
 	{
-		std::vector<pair<uid, std::string> > DeparturesTableModule::getDisplayTypeLabels(
+		DeparturesTableModule::Labels DeparturesTableModule::getDisplayTypeLabels(
 			bool withAll, /*= false*/
 			bool withNone
 		){
-			vector<pair<uid, string> > m;
+			Labels m;
 			if (withAll)
 			{
-				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
+				m.push_back(make_pair(optional<RegistryKeyType>(), "(tous)"));
 			}
 			if (withNone)
 			{
 				m.push_back(make_pair(0, "(non défini)"));
 			}
-			Env env;
 			DisplayTypeTableSync::SearchResult types(
-				DisplayTypeTableSync::Search(env)
+				DisplayTypeTableSync::Search(Env::GetOfficialEnv())
 			);
 			BOOST_FOREACH(shared_ptr<DisplayType> displayType, types)
 			{
@@ -92,18 +89,17 @@ namespace synthese
 			return m;
 		}
 
-		std::vector<pair<uid, std::string> > DeparturesTableModule::getPlacesWithBroadcastPointsLabels(
+		DeparturesTableModule::Labels DeparturesTableModule::getPlacesWithBroadcastPointsLabels(
 			const security::RightsOfSameClassMap& rights 
 			, bool totalControl 
 			, RightLevel neededLevel
 			, bool withAll /*= false*/
 		){
-			Env env;
-			vector<pair<uid, string> > localizations;
+			Labels localizations;
 			if (withAll)
-				localizations.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
+				localizations.push_back(make_pair(optional<RegistryKeyType>(), "(tous)"));
 			std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > bpv = searchConnectionPlacesWithBroadcastPoints(
-				env,
+				Env::GetOfficialEnv(),
 				rights,
 				totalControl,
 				neededLevel,
@@ -118,12 +114,16 @@ namespace synthese
 			return localizations;
 		}
 
-		std::vector<pair<uid, std::string> > DeparturesTableModule::getCommercialLineWithBroadcastLabels( bool withAll /*= false*/ )
+
+
+		DeparturesTableModule::Labels DeparturesTableModule::getCommercialLineWithBroadcastLabels( bool withAll /*= false*/ )
 		{
 			Env env;
-			vector<pair<uid, string> > m;
+			Labels m;
 			if (withAll)
-				m.push_back(make_pair(UNKNOWN_VALUE, "(toutes)"));
+			{
+				m.push_back(make_pair(optional<RegistryKeyType>(), "(toutes)"));
+			}
 			vector<shared_ptr<const CommercialLine> > c = getCommercialLineWithBroadcastPoints(env);
 			BOOST_FOREACH(shared_ptr<const CommercialLine> line, c)
 			{

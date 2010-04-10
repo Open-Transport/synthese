@@ -87,7 +87,7 @@ namespace synthese
 
 
 		DeparturesTableRoutePlanningInterfacePage::DeparturesTableRoutePlanningInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

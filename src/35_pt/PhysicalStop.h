@@ -63,7 +63,7 @@ namespace synthese
 		public:
 
 			PhysicalStop(
-				util::RegistryKeyType id = UNKNOWN_VALUE,
+				util::RegistryKeyType id = 0,
 				std::string name = std::string(), 
 				const pt::PublicTransportStopZoneConnectionPlace* place = NULL,
 				double x = UNKNOWN_VALUE,

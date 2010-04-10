@@ -25,12 +25,9 @@
 #ifndef SYNTHESE_ResaLogEntryUpdateAction_H__
 #define SYNTHESE_ResaLogEntryUpdateAction_H__
 
-#include "30_server/Action.h"
-
-#include "31_resa/ResaDBLog.h"
-
+#include "Action.h"
+#include "ResaDBLog.h"
 #include "FactorableTemplate.h"
-#include "01_util/UId.h"
 
 #include <boost/optional.hpp>
 
@@ -82,7 +79,7 @@ namespace synthese
 			
 			ResaLogEntryUpdateAction();
 
-			void setEntryId(uid id);
+			void setEntryId(util::RegistryKeyType id);
 
 			virtual bool isAuthorized(const server::Session* session) const;
 		};

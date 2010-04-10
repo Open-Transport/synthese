@@ -467,6 +467,11 @@ namespace synthese
 
 						// Loop on each leg
 						const Journey::ServiceUses& jl(journey.getServiceUses());
+						double partialDistance(0);
+						bool firstApproach(true);
+						bool lastApproach(false);
+						Journey::ServiceUses::const_iterator lastApproachBeginning(jl.end());
+
 						for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 						{
 							const ServiceUse& curET(*itl);
@@ -544,6 +549,102 @@ namespace synthese
 							const Line* line(dynamic_cast<const Line*> (curET.getService()->getPath()));
 							if(line != NULL)
 							{
+								// Insertion of fake leg if site does not output road approach detail
+								if(!_outputRoadApproachDetail)
+								{
+									if(firstApproach)
+									{
+										if(line->isPedestrianMode())
+										{
+											partialDistance += curET.getDistance();
+										}
+										else
+										{
+											firstApproach = false;
+											if(itl != jl.begin())
+											{
+												const Road* road(dynamic_cast<const Road*> (jl.begin()->getService()->getPath ()));
+												const ptime& departureTime(jl.begin()->getDepartureDateTime());
+												const ptime& arrivalTime((itl-1)->getArrivalDateTime());
+												stream <<
+													"<street" <<
+													" length=\"" << ceil(partialDistance) << "\"" <<
+													" city=\"Departure approach\"" <<
+													" name=\"Departure approach\"" <<
+													" departureTime=\"" << posix_time::to_iso_extended_string(departureTime) << "\"" <<
+													" arrivalTime=\"" << posix_time::to_iso_extended_string(arrivalTime) << "\"";
+												if(journey.getContinuousServiceRange().total_seconds() > 0)
+												{
+													posix_time::ptime edTime(departureTime);
+													edTime += journey.getContinuousServiceRange();
+													posix_time::ptime eaTime(arrivalTime);
+													eaTime += journey.getContinuousServiceRange();
+													stream <<
+														" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
+														" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
+												}
+												stream << ">" <<
+													"<startAddress>";
+												if(dynamic_cast<const NamedPlace*>(jl.begin()->getDepartureEdge()->getHub()))
+												{
+													_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*jl.begin()->getDepartureEdge()->getHub()));
+												}
+												else if(dynamic_cast<const Address*>(jl.begin()->getDepartureEdge()->getFromVertex()))
+												{
+													if(dynamic_cast<const RoadPlace*>(_departure_place.placeResult.value))
+													{
+														_XMLDisplayRoadPlace(
+															stream,
+															dynamic_cast<const RoadPlace&>(*_departure_place.placeResult.value)
+														);
+													}
+													else
+													{
+														_XMLDisplayAddress(
+															stream,
+															*dynamic_cast<const Address*>(jl.begin()->getDepartureEdge()->getFromVertex()),
+															*road->getRoadPlace()
+														);
+													}
+												}
+												stream <<
+													"</startAddress>" <<
+													"<endAddress>";
+												if(dynamic_cast<const NamedPlace*>((itl-1)->getArrivalEdge()->getHub()))
+												{
+													_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*(itl-1)->getArrivalEdge()->getHub()));
+												}
+												else if(dynamic_cast<const Address*>((itl-1)->getArrivalEdge()->getFromVertex()))
+												{
+													_XMLDisplayAddress(
+														stream,
+														*dynamic_cast<const Address*>((itl-1)->getArrivalEdge()->getFromVertex()),
+														*road->getRoadPlace()
+													);
+												}
+												stream <<
+													"</endAddress>" <<
+													"</street>"
+												;
+											}
+										}
+
+									}
+									if(!firstApproach && !lastApproach)
+									{
+										if(line->isPedestrianMode())
+										{
+											lastApproach = true;
+											lastApproachBeginning = itl;
+											partialDistance = 0;
+										}
+									}
+									if(lastApproach)
+									{
+										partialDistance += curET.getDistance();
+									}
+								}
+
 								stream <<
 									"<" << (line->isPedestrianMode() ? "connection" : "transport") <<
 										" length=\"" << ceil(curET.getDistance()) << "\"" <<
@@ -620,7 +721,7 @@ namespace synthese
 							}
 
 							const Road* road(dynamic_cast<const Road*> (curET.getService()->getPath ()));
-							if(road != NULL)
+							if(road != NULL && _outputRoadApproachDetail)
 							{
 								stream << 
 									"<street" <<
@@ -694,6 +795,74 @@ namespace synthese
 									"</street>"
 								;
 							}
+						}
+
+						if(!_outputRoadApproachDetail && lastApproachBeginning != jl.end())
+						{
+							const Road* road(dynamic_cast<const Road*> ((jl.end()-1)->getService()->getPath ()));
+							const ptime& departureTime(lastApproachBeginning->getDepartureDateTime());
+							const ptime& arrivalTime((jl.end()-1)->getArrivalDateTime());
+							stream <<
+								"<street" <<
+								" length=\"" << ceil(partialDistance) << "\"" <<
+								" city=\"Arrival approach\"" <<
+								" name=\"Arrival approach\"" <<
+								" departureTime=\"" << posix_time::to_iso_extended_string(departureTime) << "\"" <<
+								" arrivalTime=\"" << posix_time::to_iso_extended_string(arrivalTime) << "\"";
+							if(journey.getContinuousServiceRange().total_seconds() > 0)
+							{
+								posix_time::ptime edTime(departureTime);
+								edTime += journey.getContinuousServiceRange();
+								posix_time::ptime eaTime(arrivalTime);
+								eaTime += journey.getContinuousServiceRange();
+								stream <<
+									" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
+									" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
+							}
+							stream << ">" <<
+								"<startAddress>";
+							if(dynamic_cast<const NamedPlace*>(lastApproachBeginning->getDepartureEdge()->getHub()))
+							{
+								_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*lastApproachBeginning->getDepartureEdge()->getHub()));
+							}
+							else if(dynamic_cast<const Address*>(lastApproachBeginning->getDepartureEdge()->getFromVertex()))
+							{
+								_XMLDisplayAddress(
+									stream,
+									*dynamic_cast<const Address*>(lastApproachBeginning->getDepartureEdge()->getFromVertex()),
+									*road->getRoadPlace()
+								);
+							}
+							stream <<
+								"</startAddress>" <<
+								"<endAddress>";
+							if(dynamic_cast<const NamedPlace*>((jl.end()-1)->getArrivalEdge()->getHub()))
+							{
+								_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*(jl.end()-1)->getArrivalEdge()->getHub()));
+							}
+							else if(dynamic_cast<const Address*>((jl.end()-1)->getArrivalEdge()->getFromVertex()))
+							{
+								if(dynamic_cast<const RoadPlace*>(_arrival_place.placeResult.value))
+								{
+									_XMLDisplayRoadPlace(
+										stream,
+										dynamic_cast<const RoadPlace&>(*_arrival_place.placeResult.value)
+									);
+								}
+								else
+								{
+									_XMLDisplayAddress(
+										stream,
+										*dynamic_cast<const Address*>((jl.end()-1)->getArrivalEdge()->getFromVertex()),
+										*road->getRoadPlace()
+									);
+								}
+							}
+							stream <<
+								"</endAddress>" <<
+								"</street>"
+								;
+
 						}
 
 						stream << "</chunks></journey>";

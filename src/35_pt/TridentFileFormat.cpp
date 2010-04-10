@@ -58,6 +58,7 @@
 #include "SQLiteTransaction.h"
 #include "CityAliasTableSync.hpp"
 #include "JunctionTableSync.hpp"
+#include "RollingStockTableSync.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -120,10 +121,10 @@ namespace synthese
 
 		TridentFileFormat::TridentFileFormat(
 			Env* env,
-			RegistryKeyType lineId,
+			optional<RegistryKeyType> lineId,
 			bool withTisseoExtension
 		):	FileFormatTemplate<TridentFileFormat>(),
-			_commercialLineId(lineId),
+			_commercialLineId(*lineId),
 			_withTisseoExtension(withTisseoExtension),
 			_importStops(false),
 			_importJunctions(false),
@@ -192,7 +193,7 @@ namespace synthese
 			LineTableSync::Search(
 				*_env,
 				_commercialLine->getKey(),
-				UNKNOWN_VALUE,
+				optional<RegistryKeyType>(),
 				0,
 				optional<size_t>(),
 				true, true, UP_LINKS_LOAD_LEVEL
@@ -211,7 +212,7 @@ namespace synthese
 				LineStopTableSync::Search(
 					*_env,
 					line.getKey(),
-					UNKNOWN_VALUE,
+					optional<RegistryKeyType>(),
 					0,
 					optional<size_t>(),
 					true, true,
@@ -482,32 +483,11 @@ namespace synthese
 				os << "<number>" << _commercialLine->getShortName () << "</number>" << "\n";
 				os << "<publishedName>" << _commercialLine->getLongName () << "</publishedName>" << "\n";
 				
-				string tm ("");
-				if (rollingStock != NULL)
-				{
-				    switch (rollingStock->getKey ())
-				    {
-				    case 13792273858822157LL : tm = "RapidTransit"; break;  // train Eurostar
-				    case 13792273858822158LL : tm = "RapidTransit"; break;  // train intercity
-				    case 13792273858822159LL : tm = "LocalTrain"; break;  // train de banlieue
-				    case 13792273858822160LL : tm = "LongDistanceTrain"; break;  // train de Grandes Lignes
-				    case 13792273858822583LL : tm = "LocalTrain"; break;  // bus scolaire
-				    case 13792273858822584LL : tm = "Coach"; break;  // autocar
-				    case 13792273858822585LL : tm = "Bus"; break;  // bus
-				    case 13792273858822586LL : tm = "Metro"; break;  // metro
-				    case 13792273858822587LL : tm = "Train"; break;  // train regional
-				    case 13792273858822588LL : tm = "Tramway"; break;  // tramway
-				    case 13792273858822589LL : tm = "Other"; break;  // transport a la demande
-				    case 13792273858822590LL : tm = "RapidTransit"; break;  // train a grande vitesse
-				    case 13792273858822591LL : tm = "Other"; break;  // telecabine
-				    case 13792273858822594LL : tm = "Bus"; break;  // ligne de bus speciale
-				    case 13792273858822638LL : tm = "LongDistanceTrain"; break;  // train de nuit
-				    case 13792273859967672LL : tm = "LongDistanceTrain"; break;  // train de nuit Corail Lunea
-				    case 13792273859967678LL : tm = "LongDistanceTrain"; break;  // train grandes lignes Corail Teoz
-				    default: tm = "Other"; 
-				    }
-				}
-				os << "<transportModeName>" << tm << "</transportModeName>" << "\n";
+				os <<
+					"<transportModeName>" <<
+					((rollingStock == NULL || rollingStock->getTridentKey().empty()) ? "Other" : rollingStock->getTridentKey()) <<
+					"</transportModeName>" <<
+				"\n";
 			    
 				BOOST_FOREACH(Registry<Line>::value_type line, _env->getRegistry<Line>())
 				{
@@ -1088,16 +1068,17 @@ namespace synthese
 			}
 			
 			// Transport mode
-			RegistryKeyType rollingStockId(UNKNOWN_VALUE);
-			XMLNode rollingStockNode = lineNode.getChildNode("transportModeName");
-			if(rollingStockNode.getText() == "RapidTransit") rollingStockId = 13792273858822590LL;
-			else if(rollingStockNode.getText() == "LocalTrain") rollingStockId = 13792273858822159LL;
-			else if(rollingStockNode.getText() == "LongDistanceTrain") rollingStockId = 13792273858822160LL;
-			else if(rollingStockNode.getText() == "Coach") rollingStockId = 13792273858822584LL;
-			else if(rollingStockNode.getText() == "Bus") rollingStockId = 13792273858822585LL;
-			else if(rollingStockNode.getText() == "Metro") rollingStockId = 13792273858822586LL;
-			else if(rollingStockNode.getText() == "Train") rollingStockId = 13792273858822587LL;
-			else if(rollingStockNode.getText() == "Tramway") rollingStockId = 13792273858822588LL;
+			shared_ptr<RollingStock> rollingStock;
+			RollingStockTableSync::SearchResult rollingStocks(
+				RollingStockTableSync::Search(
+					*_env,
+					string(lineNode.getChildNode("transportModeName").getText()),
+					true
+			)	);
+			if(rollingStocks.empty())
+			{
+				rollingStock = rollingStocks.front();
+			}
 
 			// Places
 			map<string, XMLNode> areaCentroids;
@@ -1378,7 +1359,7 @@ namespace synthese
 				LineStopTableSync::Search(
 					*_env,
 					line->getKey(),
-					UNKNOWN_VALUE,
+					optional<RegistryKeyType>(),
 					0,
 					optional<size_t>(),
 					true, true,
@@ -1435,11 +1416,11 @@ namespace synthese
 				
 				// Attempting to find an existing route
 				shared_ptr<Line> route;
-				BOOST_FOREACH(Registry<Line>::value_type line, _env->getRegistry<Line>())
+				BOOST_FOREACH(shared_ptr<Line> line, sroutes)
 				{
-					if(*line.second == routeStops)
+					if(*line == routeStops)
 					{
-						route = line.second;
+						route = line;
 						continue;
 					}
 				}
@@ -1478,8 +1459,8 @@ namespace synthese
 				else
 				{
 					os << "LOAD : Use of route " << route->getKey() << " (" << route->getName() << ") for " << jpKeyNode.getText() << " (" << routeNames[routeIdNode.getText()] << ")<br />";
-
 				}
+				route->setRollingStock(rollingStock.get());
 				
 				// Link with the route
 				routes[jpKeyNode.getText()] = route.get();
@@ -1769,7 +1750,7 @@ namespace synthese
 		string TridentFileFormat::TridentId(
 			const string& peer,
 			const string clazz,
-			const uid& id
+			const util::RegistryKeyType& id
 		){
 			stringstream ss;
 			ss << peer << ":" << clazz << ":" << id;

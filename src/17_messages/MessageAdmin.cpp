@@ -122,13 +122,13 @@ namespace synthese
 				AdminActionFunctionRequest<UpdateAlarmMessagesFromTemplateAction,MessageAdmin> templateRequest(_request);
 				templateRequest.getAction()->setAlarmId(_alarm->getKey());
 
-				vector<pair<uid, string> > tl(MessagesModule::getTextTemplateLabels(_alarm->getLevel()));
+				MessagesModule::Labels tl(MessagesModule::getTextTemplateLabels(_alarm->getLevel()));
 				if(!tl.empty())
 				{
 					HTMLForm fc(templateRequest.getHTMLForm("template"));
 					stream << fc.open() << "<p>";
 					stream << "Modèle : ";
-					stream << fc.getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, tl, uid());
+					stream << fc.getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, tl, optional<RegistryKeyType>());
 					stream << fc.getSubmitButton("Copier contenu");
 					stream << "</p>" << fc.close();
 				}
@@ -138,7 +138,13 @@ namespace synthese
 
 				PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
 				stream << tu.open();
-				stream << tu.cell("Type", tu.getForm().getRadioInputCollection(UpdateAlarmMessagesAction::PARAMETER_TYPE, MessagesModule::getLevelLabels(), _alarm->getLevel()));
+				stream << tu.cell(
+					"Type",
+					tu.getForm().getRadioInputCollection(
+						UpdateAlarmMessagesAction::PARAMETER_TYPE,
+						MessagesModule::getLevelLabels(),
+						optional<AlarmLevel>(_alarm->getLevel())
+				)	);
 				stream << tu.cell("Message court", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage(), 2, 60));
 				stream << tu.cell("Message long", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 6, 60));
 				stream << tu.close();

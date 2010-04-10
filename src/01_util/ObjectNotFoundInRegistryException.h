@@ -24,9 +24,9 @@
 #define SYNTHESE_util_ObjectNotFoundInRegistryException_h__
 
 #include "ObjectNotFoundException.h"
+#include "UtilTypes.h"
 
-#include "UId.h"
-#include "Conversion.h"
+#include <boost/lexical_cast.hpp>
 
 namespace synthese
 {
@@ -38,7 +38,7 @@ namespace synthese
 		public:
 
 			ObjectNotFoundInRegistryException(const RegistryKeyType& key)
-				: ObjectNotFoundException<T>(key, "Object not found in registry " + Conversion::ToString(decodeTableId(key)))
+				: ObjectNotFoundException<T>(key, "Object not found in registry " + boost::lexical_cast<std::string>(decodeTableId(key)))
 			{}
 
 			~ObjectNotFoundInRegistryException() throw () {}

@@ -67,11 +67,11 @@ namespace synthese
 
 		void TextTemplateAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+			_name = map.get<string>(PARAMETER_NAME);
 
-			_isFolder = map.getBool(PARAMETER_IS_FOLDER, false, false, FACTORY_KEY);
+			_isFolder = map.getDefault<bool>(PARAMETER_IS_FOLDER, false);
 
-			_parentId = map.getUid(PARAMETER_PARENT_ID, true, FACTORY_KEY);
+			_parentId = map.get<RegistryKeyType>(PARAMETER_PARENT_ID);
 			if (_parentId > 0)
 			{
 				shared_ptr<const TextTemplate> parent;
@@ -92,8 +92,8 @@ namespace synthese
 			if (!env.getRegistry<TextTemplate>().empty())
 				throw ActionException("Un texte portant ce nom existe déjà.");
 
-			_longMessage = map.getString(PARAMETER_LONG_MESSAGE, true, FACTORY_KEY);
-			_shortMessage = map.getString(PARAMETER_SHORT_MESSAGE, true, FACTORY_KEY);
+			_longMessage = map.get<string>(PARAMETER_LONG_MESSAGE);
+			_shortMessage = map.get<string>(PARAMETER_SHORT_MESSAGE);
 		}
 
 		void TextTemplateAddAction::run(Request& request)
@@ -115,20 +115,6 @@ namespace synthese
 		bool TextTemplateAddAction::isAuthorized(const server::Session* session) const
 		{
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE);
-		}
-
-
-
-		void TextTemplateAddAction::setParentId(uid value)
-		{
-			_parentId = value;
-		}
-
-
-
-		void TextTemplateAddAction::setIsFolder( bool value )
-		{
-			_isFolder = value;
 		}
 	}
 }

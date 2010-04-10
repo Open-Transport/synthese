@@ -35,7 +35,7 @@ Point2D::Point2D (double x, double y)
     setXY(x, y);
 }
 
-void Point2D::setXY( double x /*= UNKNOWN_VALUE*/, double y /*= UNKNOWN_VALUE*/ )
+void Point2D::setXY( double x , double y  )
 {
     if (x <= 0 || y <= 0)
     {

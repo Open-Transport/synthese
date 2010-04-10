@@ -85,7 +85,7 @@ namespace synthese
 
 		ReservationItemInterfacePage::ReservationItemInterfacePage()
 			: util::FactorableTemplate<interfaces::InterfacePage, ReservationItemInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 
 		}

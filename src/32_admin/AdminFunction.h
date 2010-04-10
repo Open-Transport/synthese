@@ -25,9 +25,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "UId.h"
 #include "FactorableTemplate.h"
-
 #include "RequestWithInterface.h"
 #include "AdminInterfaceElement.h"
 

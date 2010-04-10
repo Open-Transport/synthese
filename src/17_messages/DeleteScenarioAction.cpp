@@ -61,7 +61,7 @@ namespace synthese
 
 		void DeleteScenarioAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_SCENARIO_ID, true, FACTORY_KEY));
+			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID));
 			try
 			{
 				_scenario = ScenarioTemplateInheritedTableSync::Get(id, *_env);

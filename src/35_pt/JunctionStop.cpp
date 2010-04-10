@@ -42,7 +42,7 @@ namespace synthese
 			const Junction* parentPath /*= NULL*/,
 			PhysicalStop* fromVertex /*= NULL*/			
 		):	Edge(parentPath, 0, static_cast<PhysicalStop*>(fromVertex), 0),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 
 		}
@@ -54,7 +54,7 @@ namespace synthese
 			const Junction* parentPath,
 			PhysicalStop* fromVertex
 		):	Edge(parentPath, 1, static_cast<PhysicalStop*>(fromVertex), length),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 

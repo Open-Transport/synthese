@@ -49,7 +49,7 @@ namespace synthese
 	{
 		PTRoutesListItemInterfacePage::PTRoutesListItemInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, PTRoutesListItemInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

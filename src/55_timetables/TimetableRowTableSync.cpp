@@ -22,19 +22,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "TimetableRowTableSync.h"
-#include "TimetableRow.h"
-
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
-
-#include "Conversion.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
 #include "ConnectionPlaceTableSync.h"
+#include "DBModule.h"
+#include "SQLite.h"
+#include "SQLiteResult.h"
 
 using namespace std;
 using namespace boost;
@@ -97,11 +91,8 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Columns reading
-			uid id(rows->getLongLong(TABLE_COL_ID));
-
 			// Properties
-			object->setKey(id);
+			object->setKey(rows->getLongLong(TABLE_COL_ID));
 			object->setCompulsory(static_cast<TimetableRow::tTypeGareIndicateur>(rows->getInt(TimetableRowTableSync::COL_IS_COMPULSORY)));
 			object->setIsArrival(rows->getBool(TimetableRowTableSync::COL_IS_ARRIVAL));
 			object->setIsDeparture(rows->getBool(TimetableRowTableSync::COL_IS_DEPARTURE));
@@ -131,22 +122,14 @@ namespace synthese
 			TimetableRow* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << object->getTimetableId()
-				<< "," << object->getRank()
-				<< "," << (object->getPlace() ? object->getPlace()->getKey() : uid(0))
-				<< "," << Conversion::ToString(object->getIsDeparture())
-				<< "," << Conversion::ToString(object->getIsArrival())
-				<< "," << static_cast<int>(object->getCompulsory())
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<TimetableRowTableSync> query(*object);
+			query.addField(object->getTimetableId());
+			query.addField(object->getRank());
+			query.addField(object->getPlace() ? object->getPlace()->getKey() : RegistryKeyType(0));
+			query.addField(object->getIsDeparture());
+			query.addField(object->getIsArrival());
+			query.addField(static_cast<int>(object->getCompulsory()));
+			query.execute(transaction);
 		}
 
 
@@ -163,42 +146,40 @@ namespace synthese
 	{
 		TimetableRowTableSync::SearchResult TimetableRowTableSync::Search(
 			Env& env,
-			uid timetableId
+			optional<RegistryKeyType> timetableId
 			, bool orderByTimetable
 			, bool raisingOrder
 			, int first
 			, boost::optional<std::size_t> number,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			
-			// Content
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
-			
+			SelectQuery<TimetableRowTableSync> query;
+
 			// Selection
-			if (timetableId != UNKNOWN_VALUE)
-			 	query << " AND " << COL_TIMETABLE_ID << "=" << timetableId;
+			if (timetableId)
+			{
+				query.addWhereField(COL_TIMETABLE_ID, *timetableId);
+			}
 			
 			// Ordering
 			if (orderByTimetable)
-				query << " ORDER BY " << COL_TIMETABLE_ID << (raisingOrder ? " ASC" : " DESC")
-					<< "," << COL_RANK << (raisingOrder ? " ASC" : " DESC");
+			{
+				query.addOrderField(COL_TIMETABLE_ID, raisingOrder);
+				query.addOrderField(COL_RANK, raisingOrder);
+			}
 
 			// Size
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
+				query.setNumber(*number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query.setFirst(first);
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 
 
 
-		void TimetableRowTableSync::Shift( uid timetableId , int rank , int delta )
+		void TimetableRowTableSync::Shift( util::RegistryKeyType timetableId , int rank , int delta )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 
@@ -218,7 +199,7 @@ namespace synthese
 
 
 
-		int TimetableRowTableSync::GetMaxRank( uid timetableId )
+		int TimetableRowTableSync::GetMaxRank( util::RegistryKeyType timetableId )
 		{
 			SQLite* sqlite = DBModule::GetSQLite();
 

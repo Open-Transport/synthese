@@ -377,8 +377,8 @@ namespace synthese
 					stream <<
 						resaForm->getRadioInput(
 							resaRadioFieldName,
-							it->getDepartureTime(),
-							(solution==1) ? it->getDepartureTime() : ptime(not_a_date_time),
+							optional<ptime>(it->getDepartureTime()),
+							optional<ptime>((solution==1) ? it->getDepartureTime() : ptime(not_a_date_time)),
 							" Solution "+ lexical_cast<string>(solution)
 						)
 					;

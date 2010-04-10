@@ -118,7 +118,7 @@ namespace synthese
 				{
 					placesList.push_back(make_pair(
 						dynamic_cast<const Registrable*>(it.value) ? 
-						dynamic_cast<const Registrable*>(it.value)->getKey() : UNKNOWN_VALUE,
+						dynamic_cast<const Registrable*>(it.value)->getKey() : 0,
 						it.key.getSource()
 					)	);
 				}

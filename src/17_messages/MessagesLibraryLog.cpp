@@ -105,7 +105,7 @@ namespace synthese
 			content.push_back(string());
 			content.push_back(text);
 			
-			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, UNKNOWN_VALUE);
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, 0);
 		}
 
 		void MessagesLibraryLog::addUpdateEntry(

@@ -174,7 +174,7 @@ namespace synthese
 
 		UpdateDisplayPreselectionParametersAction::DisplayFunctionNames UpdateDisplayPreselectionParametersAction::GetFunctionList(
 		){
-			map<DisplayFunction, string> directionMap;
+			DisplayFunctionNames directionMap;
 			directionMap.insert(make_pair(DEPARTURES_CHRONOLOGICAL, "Départs chronologiques"));
 			directionMap.insert(make_pair(DEPARTURES_PRESELECTION, "Départs avec présélection"));
 			directionMap.insert(make_pair(ARRIVAL_CHRONOLOGICAL, "Arrivées chronologiques"));
@@ -188,9 +188,9 @@ namespace synthese
 
 
 
-		map<int, std::string> UpdateDisplayPreselectionParametersAction::GetClearDelaysList(
+		UpdateDisplayPreselectionParametersAction::DelaysList UpdateDisplayPreselectionParametersAction::GetClearDelaysList(
 		){
-			map<int, string> clearDelayMap;
+			DelaysList clearDelayMap;
 			for (int i=-5; i<-1; ++i)
 			{
 				clearDelayMap.insert(make_pair(i, Conversion::ToString(-i) + " minutes avant le départ"));

@@ -31,41 +31,56 @@
 #include <iostream>
 
 #include "RollingStock.h"
-
 #include "SQLiteRegistryTableSyncTemplate.h"
+
+#include <boost/optional.hpp>
 
 namespace synthese
 {
 	namespace pt
 	{
-		/** RollingStock table synchronizer.
-			@ingroup m35LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 35.10 Table : Vehicle types.
+		///	@ingroup m35LS refLS
+		/// @author Hugues Romain
+		/// @date 2007
+		//////////////////////////////////////////////////////////////////////////
+		/// See : RollingStock
 		class RollingStockTableSync : public db::SQLiteRegistryTableSyncTemplate<RollingStockTableSync,RollingStock>
 		{
 		public:
 			static const std::string COL_NAME;
 			static const std::string COL_ARTICLE;
 			static const std::string COL_INDICATOR;
-			
+			static const std::string COL_TRIDENT;
+			static const std::string COL_IS_TRIDENT_REFERENCE;
+
 			RollingStockTableSync();
 
 
-			/** RollingStock search.
-				(other search parameters)
-				@param first First RollingStock object to answer
-				@param number Number of RollingStock objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<RollingStock> Founded RollingStock objects.
-				@author Hugues Romain
-				@date 2006
-			*/
-			static void Search(
+			//////////////////////////////////////////////////////////////////////////
+			/// Vehicle types search.
+			/// @param env environment to populate when loading objects
+			/// @param tridentKey filter on trident key (exact search)
+			/// @param tridentReference filter on trident reference attribute
+			/// @param orderByName order results by vehicle type name
+			/// @param raisingOrder order results ascendantly
+			/// @param first First RollingStock object to answer
+			///	@param number Number of objects to return (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+			/// @param linkLevel level of link to use when loading objects
+			///	@return the found vehicle types.
+			///	@author Hugues Romain
+			///	@date 2007
+			static SearchResult Search(
 				util::Env& env,
+				boost::optional<std::string> tridentKey = boost::optional<std::string>(),
+				bool tridentReference = false,
+				bool orderByName = true,
+				bool raisingOrder = true,
 				int first = 0,
 				int number = 0,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
-
 		};
 	}
 }

@@ -474,10 +474,12 @@ namespace synthese
 			}
 		}
 
-		std::vector<std::pair<uid, std::string> > DisplayScreen::getSortedAvaliableDestinationsLabels(
+
+
+		DisplayScreen::Labels DisplayScreen::getSortedAvaliableDestinationsLabels(
 			const DisplayedPlacesList& placesToAvoid
 		) const {
-			map<std::string, std::pair<uid, string> > m;
+			map<std::string, std::pair<RegistryKeyType, string> > m;
 			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, getPhysicalStops())
 			{
 				const PhysicalStop* p(it.second);
@@ -498,8 +500,8 @@ namespace synthese
 					}
 				}
 			}
-			vector<pair<uid, string> > v;
-			for (map<string, pair<uid, string> >::const_iterator it2 = m.begin(); it2 != m.end(); ++it2)
+			Labels v;
+			for (map<string, pair<RegistryKeyType, string> >::const_iterator it2 = m.begin(); it2 != m.end(); ++it2)
 			{
 				v.push_back(it2->second);
 			}

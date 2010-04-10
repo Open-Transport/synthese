@@ -43,7 +43,7 @@ namespace synthese
 			_place(NULL),
 			_compulsory(PassageFacultatif),
 			_rank(UNKNOWN_VALUE),
-			_timetableId(UNKNOWN_VALUE)
+			_timetableId(0)
 		{
 		}
 	}

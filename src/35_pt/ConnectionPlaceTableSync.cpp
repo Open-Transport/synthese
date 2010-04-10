@@ -146,7 +146,7 @@ namespace synthese
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				cp->setCity(NULL);
-				uid cityId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_CITYID));
+				util::RegistryKeyType cityId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_CITYID));
 
 				try
 				{
@@ -229,7 +229,7 @@ namespace synthese
 	{
 		ConnectionPlaceTableSync::SearchResult ConnectionPlaceTableSync::Search(
 			Env& env,
-			optional<RegistryKeyType> cityId, /*= UNKNOWN_VALUE */
+			optional<RegistryKeyType> cityId,
 			logic::tribool mainConnectionOnly,
 			optional<string> creatorIdFilter,
 			optional<string> nameFilter,

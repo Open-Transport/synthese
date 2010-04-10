@@ -72,7 +72,7 @@ DrawableLine::DrawableLine (const Line* line,
 
 
     
-DrawableLine::DrawableLine (const uid& lineId, 
+DrawableLine::DrawableLine (const util::RegistryKeyType& lineId, 
 			    const std::vector<const Point2D*>& points,
 			    const std::string& shortName,
 			    const synthese::util::RGBColor& color,
@@ -102,7 +102,7 @@ DrawableLine::~DrawableLine()
 
 
 
-const uid& 
+const util::RegistryKeyType& 
 DrawableLine::getLineId () const
 {
     return _lineId;

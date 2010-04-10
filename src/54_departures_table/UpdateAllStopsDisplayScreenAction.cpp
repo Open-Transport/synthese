@@ -64,7 +64,7 @@ namespace synthese
 					*_env
 				);
 
-				_value = map.getBool(PARAMETER_VALUE, true, false, FACTORY_KEY);
+				_value = map.getDefault<bool>(PARAMETER_VALUE, true);
 
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)

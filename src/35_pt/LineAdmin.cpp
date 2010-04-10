@@ -30,7 +30,6 @@
 #include "HTMLModule.h"
 #include "PhysicalStop.h"
 #include "Line.h"
-#include "LineTableSync.h"
 #include "LineStop.h"
 #include "LineStopTableSync.h"
 #include "ScheduledService.h"
@@ -97,12 +96,11 @@ namespace synthese
 		){
 			try
 			{
-				_line = LineTableSync::Get(
-					map.getUid(Request::PARAMETER_OBJECT_ID, true, FACTORY_KEY),
-					Env::GetOfficialEnv()
+				_line = Env::GetOfficialEnv().get<Line>(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
 				);
 			}
-			catch (Exception& e)
+			catch (ObjectNotFoundException<Line>&)
 			{
 				throw AdminParametersException("No such line");
 			}
@@ -141,7 +139,7 @@ namespace synthese
 					LineStopTableSync::Search(
 						Env::GetOfficialEnv(),
 						_line->getKey(),
-						UNKNOWN_VALUE,
+						optional<RegistryKeyType>(),
 						0,
 						optional<size_t>(),
 						true,

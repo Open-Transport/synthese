@@ -49,7 +49,7 @@ namespace synthese
 
 
 		DisplayMonitoringStatus::DisplayMonitoringStatus(
-			util::RegistryKeyType id /*= UNKNOWN_VALUE */
+			util::RegistryKeyType id
 		):	Registrable(id),
 			_generalStatus(DISPLAY_MONITORING_UNKNOWN),
 			_memoryStatus(DISPLAY_MONITORING_UNKNOWN),
@@ -60,7 +60,6 @@ namespace synthese
 			_displayStatus(DISPLAY_MONITORING_UNKNOWN),
 			_soundStatus(DISPLAY_MONITORING_UNKNOWN),
 			_temperatureStatus(DISPLAY_MONITORING_UNKNOWN),
-			_temperatureValue(static_cast<double>(UNKNOWN_VALUE)),
 			_communicationStatus(DISPLAY_MONITORING_UNKNOWN),
 			_localizationStatus(DISPLAY_MONITORING_UNKNOWN),
 			_displayScreen(NULL),
@@ -75,7 +74,7 @@ namespace synthese
 		DisplayMonitoringStatus::DisplayMonitoringStatus(
 			const std::string& monitoringInterfaceReturn,
 			const DisplayScreen* screen
-		):	Registrable(UNKNOWN_VALUE),
+		):	Registrable(0),
 			_generalStatus(DISPLAY_MONITORING_UNKNOWN),
 			_memoryStatus(DISPLAY_MONITORING_UNKNOWN),
 			_clockStatus(DISPLAY_MONITORING_UNKNOWN),
@@ -85,7 +84,6 @@ namespace synthese
 			_displayStatus(DISPLAY_MONITORING_UNKNOWN),
 			_soundStatus(DISPLAY_MONITORING_UNKNOWN),
 			_temperatureStatus(DISPLAY_MONITORING_UNKNOWN),
-			_temperatureValue(static_cast<double>(UNKNOWN_VALUE)),
 			_communicationStatus(DISPLAY_MONITORING_UNKNOWN),
 			_localizationStatus(DISPLAY_MONITORING_UNKNOWN),
 			_displayScreen(screen),
@@ -188,7 +186,7 @@ namespace synthese
 				}
 			}
 			if (++it == tokens.end()) return;
-			setTemperatureValue(Conversion::ToDouble(*it));
+			setTemperatureValue((it->empty() || *it == "-1") ? optional<double>() : Conversion::ToDouble(*it));
 
 			// Communication
 			if (++it == tokens.end()) return;
@@ -208,7 +206,7 @@ namespace synthese
 
 		DisplayMonitoringStatus::DisplayMonitoringStatus(
 			const DisplayScreenCPU* cpu
-		):	Registrable(UNKNOWN_VALUE),
+		):	Registrable(0),
 			_generalStatus(DISPLAY_MONITORING_UNKNOWN),
 			_memoryStatus(DISPLAY_MONITORING_UNKNOWN),
 			_clockStatus(DISPLAY_MONITORING_UNKNOWN),
@@ -307,14 +305,6 @@ namespace synthese
 
 
 
-		double DisplayMonitoringStatus::getTemperatureValue(
-
-			) const {
-			return _temperatureValue;
-		}
-
-
-
 		DisplayMonitoringStatus::Status DisplayMonitoringStatus::getCommunicationStatus(
 
 			) const {
@@ -399,14 +389,6 @@ namespace synthese
 			DisplayMonitoringStatus::Status value
 			) {
 			_temperatureStatus = value;
-		}
-
-
-
-		void DisplayMonitoringStatus::setTemperatureValue(
-			double value
-			) {
-			_temperatureValue = value;
 		}
 
 
@@ -508,7 +490,15 @@ namespace synthese
 			s << "Status: " << GetStatusString(getGlobalStatus());
 			if (getTempSensorStatus() != DISPLAY_MONITORING_ERROR)
 			{
-				s << " / Temp: " << getTemperatureValue() << "°";
+				s << " / Temp: ";
+				if(getTemperatureValue())
+				{
+					s << *getTemperatureValue() << "°";
+				}
+				else
+				{
+					s << "unknown";
+				}
 			}
 			if (getGeneralStatus() != DISPLAY_MONITORING_OK && getGeneralStatus() != DISPLAY_MONITORING_UNKNOWN)
 			{

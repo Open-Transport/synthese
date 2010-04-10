@@ -91,7 +91,7 @@ namespace synthese
 				{
 					try
 					{
-						uid id = rows->getKey();
+						util::RegistryKeyType id = rows->getKey();
 						if (registry.contains(id))
 						{
 							boost::shared_ptr<T> address(registry.getEditable(id));
@@ -122,7 +122,7 @@ namespace synthese
 				{
 					try
 					{
-						uid id = rows->getKey();
+						util::RegistryKeyType id = rows->getKey();
 						if (registry.contains(id))
 						{
 							SQLiteDirectTableSyncTemplate<K,T>::Unlink(registry.getEditable(id).get());

@@ -218,7 +218,7 @@ namespace synthese
 				object->setOpionalReservationPlaces(placesWithOptionalReservation);
 
 				// Bike compliance
-				uid bikeComplianceId(
+				util::RegistryKeyType bikeComplianceId(
 					rows->getLongLong (CommercialLineTableSync::COL_BIKE_USE_RULE)
 					);
 				if(bikeComplianceId > 0)
@@ -230,7 +230,7 @@ namespace synthese
 				}
 				
 				// Handicapped compliance
-				uid handicappedComplianceId(
+				util::RegistryKeyType handicappedComplianceId(
 					rows->getLongLong (CommercialLineTableSync::COL_HANDICAPPED_USE_RULE)
 				);
 				if(handicappedComplianceId > 0)
@@ -242,7 +242,7 @@ namespace synthese
 				}
 				
 				// Pedestrian compliance
-				uid pedestrianComplianceId(
+				util::RegistryKeyType pedestrianComplianceId(
 					rows->getLongLong (CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE)
 					);
 				if(pedestrianComplianceId > 0)
@@ -254,7 +254,7 @@ namespace synthese
 				}
 
 				// Reservation contact
-				uid reservationContactId(
+				util::RegistryKeyType reservationContactId(
 					rows->getLongLong(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID)
 				);
 				if(reservationContactId > 0)
@@ -366,7 +366,7 @@ namespace synthese
 				else
 					query << " AND l." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
 			}
-			if (networkId && *networkId != UNKNOWN_VALUE)
+			if (networkId)
 				query << " AND l." << COL_NETWORK_ID << "=" << *networkId;
 			if (orderByNetwork)
 				query << " ORDER BY "
@@ -427,10 +427,10 @@ namespace synthese
 		){
 			RightsOfSameClassMap::const_iterator it;
 			bool all(totalControl);
-			set<uid> allowedNetworks;
-			set<uid> forbiddenNetworks;
-			set<uid> allowedLines;
-			set<uid> forbiddenLines;
+			set<util::RegistryKeyType> allowedNetworks;
+			set<util::RegistryKeyType> forbiddenNetworks;
+			set<util::RegistryKeyType> allowedLines;
+			set<util::RegistryKeyType> forbiddenLines;
 
 			// All ?
 			it = rights.find(GLOBAL_PERIMETER);
@@ -463,7 +463,7 @@ namespace synthese
 			if (all && !forbiddenNetworks.empty())
 			{
 				query << " AND ((";
-				for (set<uid>::const_iterator it(forbiddenNetworks.begin()); it != forbiddenNetworks.end(); ++it)
+				for (set<util::RegistryKeyType>::const_iterator it(forbiddenNetworks.begin()); it != forbiddenNetworks.end(); ++it)
 				{
 					if (it != forbiddenNetworks.begin())
 						query << " AND ";
@@ -474,7 +474,7 @@ namespace synthese
 				if (!allowedLines.empty())
 				{
 					query << " OR (";
-					for (set<uid>::const_iterator it(allowedLines.begin()); it != allowedLines.end(); ++it)
+					for (set<util::RegistryKeyType>::const_iterator it(allowedLines.begin()); it != allowedLines.end(); ++it)
 					{
 						if (it != allowedLines.begin())
 							query << " OR ";
@@ -489,19 +489,19 @@ namespace synthese
 				query << " AND (0";
 				if (!allowedNetworks.empty())
 				{
-					for (set<uid>::const_iterator it(allowedNetworks.begin()); it != allowedNetworks.end(); ++it)
+					for (set<util::RegistryKeyType>::const_iterator it(allowedNetworks.begin()); it != allowedNetworks.end(); ++it)
 						query << " OR " << COL_NETWORK_ID << "=" << *it;
 				}
 				if (!allowedLines.empty())
 				{
-					for (set<uid>::const_iterator it(allowedLines.begin()); it != allowedLines.end(); ++it)
+					for (set<util::RegistryKeyType>::const_iterator it(allowedLines.begin()); it != allowedLines.end(); ++it)
 						query << " OR " << TABLE_COL_ID << "=" << *it;
 				}
 				query << ")";
 			}
 			if (!forbiddenLines.empty())
 			{
-				for (set<uid>::const_iterator it(forbiddenLines.begin()); it != forbiddenLines.end(); ++it)
+				for (set<util::RegistryKeyType>::const_iterator it(forbiddenLines.begin()); it != forbiddenLines.end(); ++it)
 					query << " AND " << TABLE_COL_ID << "!=" << *it;
 			}
 			if (mustBeBookable)

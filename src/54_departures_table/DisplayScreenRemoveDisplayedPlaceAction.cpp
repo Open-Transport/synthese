@@ -67,8 +67,8 @@ namespace synthese
 
 		void DisplayScreenRemoveDisplayedPlaceAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setScreen(map.getUid(PARAMETER_SCREEN, true, FACTORY_KEY));
-			setPlace(map.getUid(PARAMETER_PLACE, true, FACTORY_KEY));
+			setScreen(map.get<RegistryKeyType>(PARAMETER_SCREEN));
+			setPlace(map.get<RegistryKeyType>(PARAMETER_PLACE));
 		}
 
 

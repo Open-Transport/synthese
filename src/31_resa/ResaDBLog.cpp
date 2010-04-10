@@ -121,7 +121,7 @@ namespace synthese
 		void ResaDBLog::AddBookReservationEntry(const server::Session* session, const ReservationTransaction& transaction)
 		{
 			const Reservation* r1(*transaction.getReservations().begin());
-			uid callId(ResaModule::GetCurrentCallId(session));
+			RegistryKeyType callId(ResaModule::GetCurrentCallId(session));
 
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(RESERVATION_ENTRY));
@@ -134,18 +134,20 @@ namespace synthese
 			UpdateCallEntryCustomer(callId, transaction.getCustomerUserId());
 		}
 
-		uid ResaDBLog::AddCallEntry(const security::User* user)
+
+
+		RegistryKeyType ResaDBLog::AddCallEntry(const security::User* user)
 		{
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(CALL_ENTRY));
 			content.push_back(string());
 			content.push_back("Réception d'appel");
-			content.push_back(lexical_cast<string>(UNKNOWN_VALUE));
+			content.push_back(string());
 
-			return _addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, UNKNOWN_VALUE);
+			return _addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, 0);
 		}
 
-		void ResaDBLog::UpdateCallEntryDate( uid callId )
+		void ResaDBLog::UpdateCallEntryDate( RegistryKeyType callId )
 		{
 			Env env;
 			shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId, env));
@@ -157,7 +159,7 @@ namespace synthese
 			DBLogEntryTableSync::Save(entry.get());
 		}
 
-		void ResaDBLog::UpdateCallEntryCustomer( uid callId, uid customerId )
+		void ResaDBLog::UpdateCallEntryCustomer(RegistryKeyType callId, RegistryKeyType customerId )
 		{
 			try
 			{
@@ -181,7 +183,7 @@ namespace synthese
 			ReservationStatus oldStatus )
 		{
 			const Reservation* r1(*transaction.getReservations().begin());
-			uid callId(ResaModule::GetCurrentCallId(session));
+			RegistryKeyType callId(ResaModule::GetCurrentCallId(session));
 			string description;
 			DBLogEntry::Level level;
 			DBLog::ColumnsVector content;
@@ -558,7 +560,7 @@ namespace synthese
 			const User& subject,
 			const std::string& text
 		){
-			uid callId(ResaModule::GetCurrentCallId(&session));
+			RegistryKeyType callId(ResaModule::GetCurrentCallId(&session));
 
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(PERSONAL_DATA_UPDATE));
@@ -575,7 +577,7 @@ namespace synthese
 
 		void ResaDBLog::AddUserChangeAutoResaActivationEntry( const server::Session& session, const User& subject )
 		{
-			uid callId(ResaModule::GetCurrentCallId(&session));
+			RegistryKeyType callId(ResaModule::GetCurrentCallId(&session));
 
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(
@@ -596,7 +598,7 @@ namespace synthese
 
 		void ResaDBLog::AddCustomerCreationEntry( const server::Session& session, const User& subject )
 		{
-			uid callId(ResaModule::GetCurrentCallId(&session));
+			RegistryKeyType callId(ResaModule::GetCurrentCallId(&session));
 
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(CUSTOMER_CREATION_ENTRY));
@@ -613,7 +615,7 @@ namespace synthese
 
 		void ResaDBLog::AddEMailEntry( const server::Session& session, const User& subject, const std::string& text )
 		{
-			uid callId(ResaModule::GetCurrentCallId(&session));
+			RegistryKeyType callId(ResaModule::GetCurrentCallId(&session));
 
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(EMAIL));
@@ -630,7 +632,7 @@ namespace synthese
 
 		void ResaDBLog::AddPasswordInitEntry( const server::Session& session, const security::User& subject )
 		{
-			uid callId(ResaModule::GetCurrentCallId(&session));
+			RegistryKeyType callId(ResaModule::GetCurrentCallId(&session));
 
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(PASSWORD_UPDATE));

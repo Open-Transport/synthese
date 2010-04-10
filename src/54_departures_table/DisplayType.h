@@ -78,7 +78,7 @@ namespace synthese
 			///
 			/// Initializes all interface pointers to NULL
 			////////////////////////////////////////////////////////////////////
-			DisplayType(util::RegistryKeyType key = UNKNOWN_VALUE);
+			DisplayType(util::RegistryKeyType key = 0);
 
 			//! @name Getters
 			//@{

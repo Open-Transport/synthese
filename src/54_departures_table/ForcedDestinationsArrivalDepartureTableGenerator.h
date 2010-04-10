@@ -24,7 +24,6 @@
 #define SYNTHESE_ForcedDestinationsArrivalDepartureTableGenerator_H
 
 #include "ArrivalDepartureTableGenerator.h"
-#include "UId.h"
 
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
@@ -37,12 +36,16 @@ namespace synthese
 
 	namespace departurestable
 	{
-
+		//////////////////////////////////////////////////////////////////////////
+		/// Departure table generator : chronological order with priority to 
+		///	display at least one departure per available destination.
+		/// @ingroup m54
+		/// @author Hugues Romain
 		class ForcedDestinationsArrivalDepartureTableGenerator
 		:	public ArrivalDepartureTableGenerator
 		{
 		public:
-			typedef std::map<uid, const pt::PublicTransportStopZoneConnectionPlace*> ForcedDestinationsSet;
+			typedef std::map<boost::optional<util::RegistryKeyType>, const pt::PublicTransportStopZoneConnectionPlace*> ForcedDestinationsSet;
 
 		private:
 

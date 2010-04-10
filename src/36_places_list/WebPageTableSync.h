@@ -73,7 +73,7 @@ namespace synthese
 			);
 
 
-			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > SiteWebPagesList;
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > SiteWebPagesList;
 
 
 			//////////////////////////////////////////////////////////////////////////

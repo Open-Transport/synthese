@@ -23,6 +23,8 @@
 #include "Fetcher.h"
 #include "FactorableTemplate.h"
 
+#include <boost/optional.hpp>
+
 #ifndef SYNTHESE_db_FetcherTemplate_h__
 #define SYNTHESE_db_FetcherTemplate_h__
 
@@ -55,6 +57,14 @@ namespace synthese
 			) const {
 				return boost::static_pointer_cast<const BaseClass, const typename TableSync::ObjectType>(TableSync::Get(key, env, linkLevel, autoCreate));
 			}
+
+			virtual void _save(
+				BaseClass& object,
+				boost::optional<SQLiteTransaction&> transaction
+			) const {
+				TableSync::Save(&static_cast<typename TableSync::ObjectType&>(object), transaction);
+			}
+
 		};
 	}
 }

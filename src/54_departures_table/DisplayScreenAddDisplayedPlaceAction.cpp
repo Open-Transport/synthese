@@ -70,12 +70,11 @@ namespace synthese
 			try
 			{
 				_screen = DisplayScreenTableSync::GetEditable(
-						map.get<RegistryKeyType>(PARAMETER_SCREEN_ID),
-						*_env
-					);
+					map.get<RegistryKeyType>(PARAMETER_SCREEN_ID),
+					*_env
+				);
 
-				uid id(map.getUid(PARAMETER_PLACE, false, FACTORY_KEY));
-
+				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_PLACE, 0));
 				if(id > 0)
 				{
 					_placeSptr = ConnectionPlaceTableSync::Get(id, *_env);
@@ -83,7 +82,7 @@ namespace synthese
 				}
 				else
 				{
-					const string city(map.getString(PARAMETER_CITY_NAME, true, FACTORY_KEY));
+					const string city(map.get<string>(PARAMETER_CITY_NAME));
 					
 					GeographyModule::CityList cities(GeographyModule::GuessCity(city, 1));
 					if(cities.empty())
@@ -91,7 +90,7 @@ namespace synthese
 						throw ActionException("City not found");
 					}
 
-					const string place(map.getString(PARAMETER_PLACE_NAME, true, FACTORY_KEY));
+					const string place(map.get<string>(PARAMETER_PLACE_NAME));
 					vector<const PublicTransportStopZoneConnectionPlace*> stops(
 						cities.front()->search<PublicTransportStopZoneConnectionPlace>(place, 1)
 					);

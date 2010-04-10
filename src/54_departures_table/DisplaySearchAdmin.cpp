@@ -99,27 +99,23 @@ namespace synthese
 		
 		DisplaySearchAdmin::DisplaySearchAdmin()
 			: AdminInterfaceElementTemplate<DisplaySearchAdmin>()
-			, _searchLineId(UNKNOWN_VALUE)
-			, _searchTypeId(UNKNOWN_VALUE)
-			, _searchState(UNKNOWN_VALUE)
-			, _searchMessage(UNKNOWN_VALUE)
 		{}
 
 		void DisplaySearchAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			setPlace(map.getUid(PARAMETER_SEARCH_LOCALIZATION_ID, false, FACTORY_KEY));
+			setPlace(map.getOptional<RegistryKeyType>(PARAMETER_SEARCH_LOCALIZATION_ID));
 			if (!_place)
 			{
-				_searchCity = map.getString(PARAMETER_SEARCH_CITY, false, FACTORY_KEY);
-				_searchStop = map.getString(PARAMETER_SEARCH_STOP, false, FACTORY_KEY);
-				_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
-				_searchLineId = map.getUid(PARAMETER_SEARCH_LINE_ID, false, FACTORY_KEY);
-				_searchTypeId = map.getUid(PARAMETER_SEARCH_TYPE_ID, false, FACTORY_KEY);
-				_searchState = map.getInt(PARAMETER_SEARCH_STATE, false, FACTORY_KEY);
-				_searchMessage = map.getInt(PARAMETER_SEARCH_MESSAGE, false, FACTORY_KEY);
+				_searchCity = map.getDefault<string>(PARAMETER_SEARCH_CITY);
+				_searchStop = map.getDefault<string>(PARAMETER_SEARCH_STOP);
+				_searchName = map.getDefault<string>(PARAMETER_SEARCH_NAME);
+				_searchLineId = map.getOptional<RegistryKeyType>(PARAMETER_SEARCH_LINE_ID);
+				_searchTypeId = map.getOptional<RegistryKeyType>(PARAMETER_SEARCH_TYPE_ID);
+				_searchState = map.getOptional<int>(PARAMETER_SEARCH_STATE);
+				_searchMessage = map.getOptional<int>(PARAMETER_SEARCH_MESSAGE);
 			}
-
+  
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_CITY, 30);
 		}
 		
@@ -137,9 +133,18 @@ namespace synthese
 				m.insert(PARAMETER_SEARCH_NAME, _searchName);
 				m.insert(PARAMETER_SEARCH_LINE_ID, _searchLineId);
 			}
-			m.insert(PARAMETER_SEARCH_TYPE_ID, _searchTypeId);
-			m.insert(PARAMETER_SEARCH_STATE, _searchState);
-			m.insert(PARAMETER_SEARCH_MESSAGE, _searchMessage);
+			if(_searchTypeId)
+			{
+				m.insert(PARAMETER_SEARCH_TYPE_ID, _searchTypeId);
+			}
+			if(_searchState)
+			{
+				m.insert(PARAMETER_SEARCH_STATE, _searchState);
+			}
+			if(_searchMessage)
+			{
+				m.insert(PARAMETER_SEARCH_MESSAGE, _searchMessage);
+			}
 			return m;
 		}
 
@@ -152,12 +157,12 @@ namespace synthese
 			
 			DisplayScreenTableSync::SearchResult screens(
 				DisplayScreenTableSync::Search(
-					_getEnv(),
+					Env::GetOfficialEnv(),
 					_request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
 					, _request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
 					, READ
-					, UNKNOWN_VALUE
-					, _place ? (_place->get() ? (*_place)->getKey() : 0) : UNKNOWN_VALUE
+					, optional<RegistryKeyType>()
+					, _place ? (_place->get() ? (*_place)->getKey() : 0) : optional<RegistryKeyType>()
 					, _searchLineId
 					, _searchTypeId
 					, _searchCity
@@ -501,17 +506,20 @@ namespace synthese
 			, const std::string& cityName
 			, const std::string& stopName
 			, const std::string& displayName
-			, uid lineUid, uid typeUid, int state, int message
+			, optional<RegistryKeyType> lineUid,
+			optional<RegistryKeyType> typeUid,
+			optional<int> state,
+			optional<int> message
 		){
-			vector<pair<int, string> > states;
-			states.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
+			vector<pair<optional<int>, string> > states;
+			states.push_back(make_pair(optional<int>(), "(tous)"));
 			states.push_back(make_pair(1, "OK"));
 			states.push_back(make_pair(2, "Warning"));
 			states.push_back(make_pair(3, "Warning+Error"));
 			states.push_back(make_pair(4, "Error"));
 
-			vector<pair<int, string> > messages;
-			messages.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
+			vector<pair<optional<int>, string> > messages;
+			messages.push_back(make_pair(optional<int>(), "(tous)"));
 			messages.push_back(make_pair(1, "Un message"));
 			messages.push_back(make_pair(2, "Conflit"));
 			messages.push_back(make_pair(3, "Messages"));
@@ -523,8 +531,17 @@ namespace synthese
 			stream << s.cell("Arrêt", s.getForm().getTextInput(PARAMETER_SEARCH_STOP, stopName));
 			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, displayName));
 			stream << s.cell("Ligne", s.getForm().getSelectInput(PARAMETER_SEARCH_LINE_ID, DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), lineUid));
-			stream << s.cell("Type", s.getForm().getSelectInput(PARAMETER_SEARCH_TYPE_ID, DeparturesTableModule::getDisplayTypeLabels(true, true), typeUid));
-			stream << s.cell("Etat", s.getForm().getSelectInput(PARAMETER_SEARCH_TYPE_ID, states, state));
+			stream << s.cell(
+				"Type",
+				s.getForm().getSelectInput(
+					PARAMETER_SEARCH_TYPE_ID,
+					DeparturesTableModule::getDisplayTypeLabels(true, true),
+					typeUid
+			)	);
+			stream << s.cell(
+				"Etat",
+				s.getForm().getSelectInput(PARAMETER_SEARCH_TYPE_ID, states, state)
+			);
 			stream << s.cell("Message", s.getForm().getSelectInput(PARAMETER_SEARCH_MESSAGE, messages, message));
 			stream << s.close();
 
@@ -646,13 +663,14 @@ namespace synthese
 			_tabBuilded = true;
 		}
 
-		void DisplaySearchAdmin::setPlace( const util::RegistryKeyType id )
-		{
-			if(id == UNKNOWN_VALUE)
+		void DisplaySearchAdmin::setPlace(
+			optional<util::RegistryKeyType> id
+		){
+			if(!id)
 			{
 				return;
 			}
-			if(id == 0)
+			if(*id == 0)
 			{
 				_place = shared_ptr<const PublicTransportStopZoneConnectionPlace>();
 			}
@@ -660,20 +678,16 @@ namespace synthese
 			{
 				try
 				{
-					_place = ConnectionPlaceTableSync::Get(id, _getEnv());
+					_place = Env::GetOfficialEnv().get<PublicTransportStopZoneConnectionPlace>(*id);
 				}
-				catch (...)
+				catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
 				{
 					throw AdminParametersException("Specified place not found");
 				}
 			}
 		}
-		
-		boost::optional<boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> > DisplaySearchAdmin::getPlace() const
-		{
-			return _place;
-		}
-		
+
+
 		
 		bool DisplaySearchAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{

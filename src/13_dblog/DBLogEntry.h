@@ -65,7 +65,7 @@ namespace synthese
 			util::RegistryKeyType	_objectId2;
 
 		public:
-			DBLogEntry(util::RegistryKeyType key = UNKNOWN_VALUE);
+			DBLogEntry(util::RegistryKeyType key = 0);
 
 			void					setLogKey(const std::string& key);
 			void					setDate(const boost::posix_time::ptime& date);

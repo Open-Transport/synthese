@@ -68,7 +68,7 @@ namespace synthese
 		void ImportFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Datasource
-			RegistryKeyType dataSourceId(map.getUid(PARAMETER_DATA_SOURCE, true, FACTORY_KEY));
+			RegistryKeyType dataSourceId(map.get<RegistryKeyType>(PARAMETER_DATA_SOURCE));
 			try
 			{
 				_dataSource = DataSourceTableSync::Get(dataSourceId, *_env);
@@ -79,7 +79,7 @@ namespace synthese
 			}
 			
 			// Do import ?
-			_doImport = map.getBool(PARAMETER_DO_IMPORT, false, false, FACTORY_KEY);
+			_doImport = map.getDefault<bool>(PARAMETER_DO_IMPORT, false);
 			
 			// Input parsing
 			try
@@ -96,7 +96,7 @@ namespace synthese
 				if(files.empty())
 				{
 					FileFormat::FilePathsSet paths;
-					string text(map.getString(PARAMETER_PATH, true, FACTORY_KEY));
+					string text(map.get<string>(PARAMETER_PATH));
 					tokenizer<char_separator<char> > pathsTokens(text, char_separator<char>(","));
 					BOOST_FOREACH(const string& token, pathsTokens)
 					{
@@ -110,7 +110,7 @@ namespace synthese
 					FileFormat::FilePathsMap paths;
 					BOOST_FOREACH(const string& key, files)
 					{
-						paths.insert(make_pair(key, map.getString(PARAMETER_PATH + key, false, FACTORY_KEY)));
+						paths.insert(make_pair(key, map.getDefault<string>(PARAMETER_PATH + key)));
 					}
 					_fileFormat->parseFiles(paths, output);
 				}

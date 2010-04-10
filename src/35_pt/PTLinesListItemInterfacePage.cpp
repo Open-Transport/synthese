@@ -46,7 +46,7 @@ namespace synthese
 	{
 		PTLinesListItemInterfacePage::PTLinesListItemInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, PTLinesListItemInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

@@ -50,7 +50,7 @@ namespace synthese
 
 		public:
 			ScenarioFolder(
-				util::RegistryKeyType key = UNKNOWN_VALUE
+				util::RegistryKeyType key = 0
 			);
 
 			//! @name Getters

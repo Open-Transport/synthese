@@ -160,7 +160,7 @@ namespace synthese
 				{
 					stream << "Ligne " << (*itrs)->getLineCode();
 				}
-				if ((*itrs)->getReservationRuleId() != UNKNOWN_VALUE)
+				if ((*itrs)->getReservationRuleId() != 0)
 				{
 					stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Place réservée sur ce tronçon");
 				}
@@ -179,7 +179,7 @@ namespace synthese
 
 			CallClose(session);
 				
-			uid entryId(ResaDBLog::AddCallEntry(session->getUser().get()));
+			RegistryKeyType entryId(ResaDBLog::AddCallEntry(session->getUser().get()));
 
 			_sessionsCallIds[session] = entryId;
 		}
@@ -203,7 +203,7 @@ namespace synthese
 
 			_SessionsCallIdMap::iterator it(_sessionsCallIds.find(session));
 
-			return (it == _sessionsCallIds.end()) ? UNKNOWN_VALUE : it->second;
+			return (it == _sessionsCallIds.end()) ? 0 : it->second;
 		}
 
 

@@ -40,7 +40,7 @@ namespace synthese
 		SubLine::SubLine( Line* line )
 			: Line()
 			, _mainLine(line),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 			// Registration
 			int rank(line->addSubLine(this));
@@ -61,7 +61,7 @@ namespace synthese
 			for (Path::Edges::const_iterator it(edges.begin()); it != edges.end(); ++it)
 			{
 				Edge* newEdge(new LineStop(
-						UNKNOWN_VALUE
+						0
 						, this
 						, (*it)->getRankInPath()
 						, (*it)->isDeparture()

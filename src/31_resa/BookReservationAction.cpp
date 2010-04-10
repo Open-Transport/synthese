@@ -217,7 +217,7 @@ namespace synthese
 				throw ActionException("Client sans numéro de téléphone. Veuillez renseigner ce champ dans la fiche client et recommencer la réservation.");
 
 			// Site
-			uid id(map.getUid(PARAMETER_SITE, false, FACTORY_KEY));
+			RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_SITE, 0));
 			if (id > 0 && Env::GetOfficialEnv().getRegistry<Site>().contains(id))
 			{
 				_site = Env::GetOfficialEnv().getRegistry<Site>().get(id);
@@ -231,11 +231,11 @@ namespace synthese
 			// Journey
 			const Place* originPlace(_site.get() 
 				? _site->fetchPlace(
-					map.getString(PARAMETER_ORIGIN_CITY, true, FACTORY_KEY)
-					, map.getString(PARAMETER_ORIGIN_PLACE, true, FACTORY_KEY)
+					map.get<string>(PARAMETER_ORIGIN_CITY)
+					, map.get<string>(PARAMETER_ORIGIN_PLACE)
 				) : GeographyModule::FetchPlace(
-					map.getString(PARAMETER_ORIGIN_CITY, true, FACTORY_KEY)
-					, map.getString(PARAMETER_ORIGIN_PLACE, true, FACTORY_KEY)
+					map.get<string>(PARAMETER_ORIGIN_CITY)
+					, map.get<string>(PARAMETER_ORIGIN_PLACE)
 				)
 			);
 			if(!originPlace)
@@ -245,11 +245,11 @@ namespace synthese
 
 			const Place* destinationPlace(_site.get()
 				? _site->fetchPlace(
-					map.getString(PARAMETER_DESTINATION_CITY, true, FACTORY_KEY)
-					, map.getString(PARAMETER_DESTINATION_PLACE, true, FACTORY_KEY)
+					map.get<string>(PARAMETER_DESTINATION_CITY)
+					, map.get<string>(PARAMETER_DESTINATION_PLACE)
 				) : GeographyModule::FetchPlace(
-					map.getString(PARAMETER_DESTINATION_CITY, true, FACTORY_KEY)
-					, map.getString(PARAMETER_DESTINATION_PLACE, true, FACTORY_KEY)
+					map.get<string>(PARAMETER_DESTINATION_CITY)
+					, map.get<string>(PARAMETER_DESTINATION_PLACE)
 				)
 			);
 			if(!destinationPlace)

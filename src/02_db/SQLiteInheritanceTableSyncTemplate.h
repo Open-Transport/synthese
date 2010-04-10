@@ -160,7 +160,7 @@ namespace synthese
 			{
 				while (rows->next ())
 				{
-					uid id(rows->getLongLong(TABLE_COL_ID));
+					util::RegistryKeyType id(rows->getLongLong(TABLE_COL_ID));
 					std::string subClass(DBModule::GetSubClass(id));
 					if (!subClass.empty())
 					{

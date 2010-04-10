@@ -24,7 +24,6 @@
 #define SYNTHESE_timetables_TimetableRow_h__
 
 #include "Registrable.h"
-#include "UId.h"
 #include "Registry.h"
 
 namespace synthese
@@ -69,12 +68,12 @@ namespace synthese
 			bool												_isArrival;
 			tTypeGareIndicateur									_compulsory;
 			std::size_t											_rank;
-			uid													_timetableId;
+			util::RegistryKeyType								_timetableId;
 
 		public:
 			// Constructor
 			TimetableRow(
-				util::RegistryKeyType id = UNKNOWN_VALUE
+				util::RegistryKeyType id = 0
 			);
 
 			//! @name Getters
@@ -82,7 +81,7 @@ namespace synthese
 				const pt::PublicTransportStopZoneConnectionPlace*	getPlace()			const { return _place; }
 				tTypeGareIndicateur 								getCompulsory()		const { return _compulsory; }
 				std::size_t											getRank()			const { return _rank; }
-				uid													getTimetableId()	const { return _timetableId; }
+				util::RegistryKeyType								getTimetableId()	const { return _timetableId; }
 				bool												getIsArrival()		const { return _isArrival; }
 				bool												getIsDeparture()	const { return _isDeparture; }
 			//@}
@@ -92,7 +91,7 @@ namespace synthese
 				void setRank(std::size_t value) { _rank = value; }
 				void setPlace(const pt::PublicTransportStopZoneConnectionPlace* place) { _place = place; }
 				void setCompulsory(tTypeGareIndicateur compulsory) { _compulsory = compulsory; }
-				void setTimetableId(uid id) { _timetableId = id; }
+				void setTimetableId(util::RegistryKeyType id) { _timetableId = id; }
 				void setIsArrival(bool value) { _isArrival = value; }
 				void setIsDeparture(bool value) { _isDeparture = value; }
 			//@}

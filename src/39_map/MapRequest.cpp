@@ -91,19 +91,19 @@ namespace synthese
 
 		void MapRequest::_setFromParametersMap(const ParametersMap& map)
 		{
-			setUseEnvironment(map.getBool(PARAMETER_USE_ENVIRONMENT, false, true, FACTORY_KEY));
+			setUseEnvironment(map.getDefault<bool>(PARAMETER_USE_ENVIRONMENT, true));
 
 			// Output
-			setOutput(map.getString(OUTPUT_PARAMETER, true, FACTORY_KEY));
+			setOutput(map.get<string>(OUTPUT_PARAMETER));
 			
 			if (!_useEnvironment)
 			{
 				// XML data
-				setData(map.getString(DATA_PARAMETER, false, FACTORY_KEY));
+				setData(map.getDefault<string>(DATA_PARAMETER));
 			}
 			
 			// Map XML
-			setQuery(map.getString(MAP_PARAMETER, true, FACTORY_KEY));
+			setQuery(map.get<string>(MAP_PARAMETER));
 		}
 
 

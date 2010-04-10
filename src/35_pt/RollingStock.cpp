@@ -28,6 +28,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace graph;
+	using namespace util;
 
 	namespace util
 	{
@@ -50,43 +51,6 @@ namespace synthese
 		RollingStock::~RollingStock()
 		{
 
-		}
-
-
-		const std::string& 
-		RollingStock::getName() const
-		{
-			return _name;
-		}
-
-
-		const std::string& 
-		RollingStock::getArticle() const
-		{
-			return _article;
-		}
-
-
-
-		const std::string& 
-		RollingStock::getIndicator() const
-		{
-			return _indicator;
-		}
-
-		void RollingStock::setName( const std::string& value )
-		{
-			_name = value;
-		}
-
-		void RollingStock::setArticle( const std::string& value )
-		{
-			_article = value;
-		}
-
-		void RollingStock::setIndicator( const std::string& value )
-		{
-			_indicator = value;
 		}
 
 

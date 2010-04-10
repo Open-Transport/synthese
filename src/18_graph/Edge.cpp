@@ -43,7 +43,7 @@ namespace synthese
 			int rankInPath,
 			Vertex* fromVertex,
 			double metricOffset
-		):	Registrable(UNKNOWN_VALUE),
+		):	Registrable(0),
 			_parentPath (parentPath),
 			_rankInPath (rankInPath),
 			_previousConnectionDeparture(NULL),

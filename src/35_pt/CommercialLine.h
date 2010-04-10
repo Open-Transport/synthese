@@ -104,7 +104,7 @@ namespace synthese
 			///	@param key id of the object (optional)
 			/// Initializes the following default use rules :
 			///  - USER_PEDESTRIAN : allowed
-			CommercialLine(util::RegistryKeyType key = UNKNOWN_VALUE);
+			CommercialLine(util::RegistryKeyType key = 0);
 
 			//! @name Getters
 			//@{

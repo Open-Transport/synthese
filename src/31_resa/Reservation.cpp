@@ -48,17 +48,12 @@ namespace synthese
 			, _arrivalTime(not_a_date_time)
 			, _originDateTime(not_a_date_time)
 			, _reservationDeadLine(not_a_date_time)
-			, _reservationRuleId(UNKNOWN_VALUE)
+			, _reservationRuleId(0)
 		{
 
 		}
 
 
-
-		void Reservation::setLineId( uid id )
-		{
-			_lineId = id;
-		}
 
 		void Reservation::setLineCode( const std::string& code )
 		{
@@ -75,31 +70,19 @@ namespace synthese
 			_serviceCode = code;
 		}
 
-		void Reservation::setDeparturePlaceId( uid id )
-		{
-			_departurePlaceId = id;
-		}
 
 		void Reservation::setDeparturePlaceName( const std::string& name )
 		{
 			_departurePlaceName = name;
 		}
 
-		void Reservation::setArrivalPlaceId( uid id )
-		{
-			_arrivalPlaceId = id;
-		}
-
+		
 		void Reservation::setArrivalPlaceName( const std::string& name )
 		{
 			_arrivalPlaceName = name;
 		}
 
-		void Reservation::setReservationRuleId( uid id )
-		{
-			_reservationRuleId = id;
-		}
-
+		
 		void Reservation::setArrivalAddress( const std::string& address )
 		{
 			_arrivalAddress = address;
@@ -121,19 +104,9 @@ namespace synthese
 		}
 
 
-		uid Reservation::getLineId() const
-		{
-			return _lineId;
-		}
-
 		const std::string& Reservation::getServiceCode() const
 		{
 			return _serviceCode;
-		}
-
-		uid Reservation::getDeparturePlaceId() const
-		{
-			return _departurePlaceId;
 		}
 
 		const std::string& Reservation::getDeparturePlaceName() const
@@ -141,19 +114,9 @@ namespace synthese
 			return _departurePlaceName;
 		}
 
-		uid Reservation::getArrivalPlaceId() const
-		{
-			return _arrivalPlaceId;
-		}
-
 		const std::string& Reservation::getArrivalPlaceName() const
 		{
 			return _arrivalPlaceName;
-		}
-
-		uid Reservation::getReservationRuleId() const
-		{
-			return _reservationRuleId;
 		}
 
 		const std::string& Reservation::getDepartureAddress() const
@@ -197,21 +160,11 @@ namespace synthese
 			_originDateTime = time;
 		}
 
-		void Reservation::setServiceId( uid id )
-		{
-			_serviceId = id;
-		}
-
-		uid Reservation::getServiceId() const
-		{
-			return _serviceId;
-		}
-
-
+		
 
 		ReservationStatus Reservation::getStatus() const
 		{
-			if (_reservationRuleId == UNKNOWN_VALUE)
+			if (_reservationRuleId == 0)
 				return NO_RESERVATION;
 
 			const ptime& cancellationTime(getTransaction()->getCancellationTime());

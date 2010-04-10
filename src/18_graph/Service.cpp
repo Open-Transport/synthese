@@ -122,15 +122,7 @@ namespace synthese
 			return std::string();
 		}
 
-		void Service::setPathId( uid id )
-		{
-			_pathId = id;
-		}
 
-		uid Service::getPathId() const
-		{
-			return _pathId;
-		}
 
 		bool Service::respectsLineTheoryWith(
 			bool RTData,

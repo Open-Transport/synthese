@@ -114,9 +114,9 @@ namespace synthese
 
 
 
-		std::vector<pair<string, string> > SecurityModule::getRightsTemplates()
+		SecurityModule::FactoryKeysLabels SecurityModule::getRightsTemplates()
 		{
-			vector<pair<string, string> > m;
+			FactoryKeysLabels m;
 			vector<shared_ptr<Right> > rights(Factory<Right>::GetNewCollection());
 			BOOST_FOREACH(const shared_ptr<Right> right, rights)
 			{
@@ -125,11 +125,15 @@ namespace synthese
 			return m;
 		}
 
-		std::vector<pair<uid, std::string> > SecurityModule::getProfileLabels(bool withAll, int first/*=0*/, int last/*=-1*/ )
+
+
+		SecurityModule::Labels SecurityModule::getProfileLabels(bool withAll, int first/*=0*/, int last/*=-1*/ )
 		{
-			vector<pair<uid, string> > m;
+			Labels m;
 			if (withAll)
-				m.push_back(make_pair(UNKNOWN_VALUE, "(tous)"));
+			{
+				m.push_back(make_pair(optional<RegistryKeyType>(), "(tous)"));
+			}
 			
 			Env env;
 			ProfileTableSync::SearchResult profiles(
@@ -142,11 +146,15 @@ namespace synthese
 			return m;
 		}
 
-		std::vector<pair<uid, std::string> > SecurityModule::getUserLabels(bool withAll, int first/*=0*/, int last/*=-1*/ )
+
+
+		SecurityModule::Labels SecurityModule::getUserLabels(bool withAll, int first/*=0*/, int last/*=-1*/ )
 		{
-			vector<pair<uid, string> > m;
+			Labels m;
 			if (withAll)
-				m.push_back(make_pair(uid(UNKNOWN_VALUE), "(tous)"));
+			{
+				m.push_back(make_pair(optional<RegistryKeyType>(), "(tous)"));
+			}
 
 			Env env;
 			UserTableSync::SearchResult users(
@@ -166,11 +174,13 @@ namespace synthese
 			return m;
 		}
 
-		std::vector<std::pair<std::string, std::string> > SecurityModule::getRightLabels( bool withAll/*=false*/ )
+
+
+		SecurityModule::FactoryKeysLabels SecurityModule::getRightLabels( bool withAll/*=false*/ )
 		{
-			vector<pair<string, string> > m;
+			FactoryKeysLabels m;
 			if (withAll)
-				m.push_back(make_pair("", "(toutes)"));
+				m.push_back(make_pair(optional<string>(), "(toutes)"));
 			vector<shared_ptr<Right> > rights(Factory<Right>::GetNewCollection());
 			BOOST_FOREACH(const shared_ptr<Right> right, rights)
 			{
@@ -185,9 +195,10 @@ namespace synthese
 			Env env;
 			ProfileTableSync::SearchResult profiles(
 				ProfileTableSync::Search(
-					env, profile.get() ? profile->getKey() : RegistryKeyType(0),
+					env,
+					profile.get() ? profile->getKey() : RegistryKeyType(0),
 					0,
-					UNKNOWN_VALUE,
+					optional<size_t>(),
 					FIELDS_ONLY_LOAD_LEVEL
 			)	);
 			BOOST_FOREACH(shared_ptr<Profile> cprofile, profiles)

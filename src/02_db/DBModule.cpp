@@ -149,14 +149,14 @@ namespace synthese
 
 
 
-		void DBModule::AddSubClass( uid id, const string& subclass)
+		void DBModule::AddSubClass( util::RegistryKeyType id, const string& subclass)
 		{
 			_subClassMap[id] = subclass;
 		}
 
 
 
-		string DBModule::GetSubClass(uid id )
+		string DBModule::GetSubClass(util::RegistryKeyType id )
 		{
 			SubClassMap::const_iterator it(_subClassMap.find(id));
 			return (it == _subClassMap.end()) ? string() : it->second;

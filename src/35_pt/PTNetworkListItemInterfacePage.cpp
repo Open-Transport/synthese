@@ -45,7 +45,7 @@ namespace synthese
 	{
 		PTNetworkListItemInterfacePage::PTNetworkListItemInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, PTNetworkListItemInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

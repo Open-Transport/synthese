@@ -64,7 +64,7 @@ namespace synthese
 			const std::string& name
 			, int mini
 			, int maxi
-			, int value/*=UNKNOWN_VALUE*/
+			, int value
 			, int step
 			, std::string unknownValueText,
 			string nulValueText
@@ -83,7 +83,7 @@ namespace synthese
 			}
 
 			// Init
-			std::vector<pair<int, string> > m;
+			std::vector<pair<optional<int>, string> > m;
 			
 			// Generation of the suite
 			for(int i((step > 0) ? mini : maxi);
@@ -102,7 +102,7 @@ namespace synthese
 			}
 
 			// HTML Code
-			return getSelectInput(name, m, value);
+			return getSelectInput(name, m, optional<int>(value));
 		}
 
 
@@ -199,10 +199,10 @@ namespace synthese
 
 		std::string HTMLForm::getOuiNonRadioInput( const std::string& name, bool value )
 		{
-			vector<pair<int, string> > m;
+			vector<pair<optional<int>, string> > m;
 			m.push_back(make_pair(0, "NON"));
 			m.push_back(make_pair(1, "OUI"));
-			return getRadioInputCollection(name, m, value ? 1 : 0);
+			return getRadioInputCollection(name, m, optional<int>(value ? 1 : 0));
 		}
 
 		std::string HTMLForm::getCheckBox( const std::string& name, const std::string& value, bool checked )

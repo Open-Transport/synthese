@@ -78,9 +78,9 @@ namespace synthese
 		
 		void TextTemplateFolderUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setFolderId(map.getUid(PARAMETER_FOLDER_ID, true, FACTORY_KEY));
-			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
-			uid id(map.getUid(PARAMETER_PARENT_ID, true, FACTORY_KEY));
+			setFolderId(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID));
+			_name = map.get<string>(PARAMETER_NAME);
+			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_PARENT_ID));
 			if (id > 0)
 			{
 				_parent = TextTemplateTableSync::Get(id, *_env);
@@ -118,7 +118,7 @@ namespace synthese
 
 
 
-		void TextTemplateFolderUpdateAction::setFolderId( uid id )
+		void TextTemplateFolderUpdateAction::setFolderId(RegistryKeyType id )
 		{
 			try
 			{

@@ -106,7 +106,7 @@ namespace synthese
 			) const;
 
 		public:
-			WebPage(util::RegistryKeyType id = UNKNOWN_VALUE);
+			WebPage(util::RegistryKeyType id = 0);
 
 			//! @name Getters
 			//@{

@@ -54,13 +54,14 @@ namespace synthese
 
 		void DisplayScreenRemoveAction::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
 		{
-			uid id(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, FACTORY_KEY));
-			
 			try
 			{
-				_displayScreen = DisplayScreenTableSync::Get(id, *_env);
+				_displayScreen = DisplayScreenTableSync::Get(
+					map.get<RegistryKeyType>(PARAMETER_DISPLAY_SCREEN_ID),
+					*_env
+				);
 			}
-			catch (...)
+			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
 				throw ActionException("Specified display screen not found");
 			}

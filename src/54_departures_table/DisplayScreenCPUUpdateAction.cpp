@@ -69,9 +69,9 @@ namespace synthese
 
 		void DisplayScreenCPUUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setCPU(map.getUid(PARAMETER_CPU, true, FACTORY_KEY));
-			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
-			_macAddress = map.getString(PARAMETER_MAC_ADDRESS, true, FACTORY_KEY);
+			setCPU(map.get<RegistryKeyType>(PARAMETER_CPU));
+			_name = map.get<string>(PARAMETER_NAME);
+			_macAddress = map.get<string>(PARAMETER_MAC_ADDRESS);
 		}
 
 		void DisplayScreenCPUUpdateAction::run(Request& request)

@@ -28,7 +28,7 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "Fetcher.h"
-#include "Service.h"
+#include "ScheduledService.h"
 
 using namespace std;
 using namespace boost;
@@ -49,6 +49,8 @@ namespace synthese
 	namespace pt
 	{
 		const string ServiceUpdateAction::PARAMETER_OBJECT_ID = Action_PARAMETER_PREFIX + "id";
+		const string ServiceUpdateAction::PARAMETER_SERVICE_NUMBER = Action_PARAMETER_PREFIX + "sn";
+		const string ServiceUpdateAction::PARAMETER_TEAM_NUMBER = Action_PARAMETER_PREFIX + "te";
 		
 		
 		
@@ -58,6 +60,8 @@ namespace synthese
 			if(_service.get())
 			{
 				map.insert(PARAMETER_OBJECT_ID, _service->getKey());
+				map.insert(PARAMETER_SERVICE_NUMBER, _serviceNumber);
+				map.insert(PARAMETER_TEAM_NUMBER, _teamNumber);
 			}
 			return map;
 		}
@@ -75,6 +79,12 @@ namespace synthese
 				throw ActionException("No such service");
 			}
 
+			_serviceNumber = map.get<string>(PARAMETER_SERVICE_NUMBER);
+
+			if(dynamic_cast<ScheduledService*>(_service.get()))
+			{
+				_teamNumber = map.get<string>(PARAMETER_TEAM_NUMBER);
+			}
 		}
 		
 		
@@ -82,26 +92,18 @@ namespace synthese
 		void ServiceUpdateAction::run(
 			Request& request
 		){
-/*			UPDATE EXAMPLE
-			stringstream text;
-			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			_object->setAttribute(_value);
-			ObjectTableSync::Save(_object.get());
-			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
-*/
+//			stringstream text;
+//			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-/*			CREATION EXAMPLE
-			Object object;
-			object.setAttribute(_value);
-			ObjectTableSync::Save(&object);
-			::AddCreationEntry(object, request.getUser().get());
-			request.setActionCreatedId(object.getKey());
-*/
+			_service->setServiceNumber(_serviceNumber);
+			if(dynamic_cast<ScheduledService*>(_service.get()))
+			{
+				static_cast<ScheduledService*>(_service.get())->setTeam(_teamNumber);
+			}
+			
+			Fetcher<Service>::FetchSave(*_service);
 
-/*			DELETION EXAMPLE
-			ObjectTableSync::Remove(_object->getKey());
-			::AddDeleteEntry(*_object, request.getUser().get());
-*/
+//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
 		
 		

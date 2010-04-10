@@ -46,7 +46,7 @@ namespace synthese
 			std::string		_name;
 			std::string		_shortMessage;
 			std::string		_longMessage;
-			uid				_parentId;
+			util::RegistryKeyType		_parentId;
 			bool			_isFolder;
 
 			/** Authorization control.
@@ -72,8 +72,11 @@ namespace synthese
 			*/
 			void run(server::Request& request);
 
-			void setParentId(uid value);
-			void setIsFolder(bool value);
+			//! @name Setters
+			//@{
+				void setParentId(util::RegistryKeyType value) { _parentId = value; }
+				void setIsFolder(bool value) { _isFolder = value; }
+			//@}
 		};
 	}
 }

@@ -60,7 +60,7 @@ namespace synthese
 	{
 		TimetableServiceRowInterfacePage::TimetableServiceRowInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, TimetableServiceRowInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		
@@ -114,6 +114,10 @@ namespace synthese
 			pv.push_back(lastPlace->getName()); //16
 
 			pv.push_back(object.getLine()->getDirection()); //17
+
+			pv.push_back(lexical_cast<string>(object.getLine()->getCommercialLine()->getKey())); //18
+			pv.push_back(lexical_cast<string>(object.getLine()->getKey())); //19
+
 
 			InterfacePage::_display(
 				stream

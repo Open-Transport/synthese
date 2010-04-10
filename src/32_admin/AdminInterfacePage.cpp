@@ -140,7 +140,7 @@ namespace synthese
 
 
 		AdminInterfacePage::AdminInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

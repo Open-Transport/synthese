@@ -63,9 +63,9 @@ namespace synthese
 			, RightLevel neededLevel
 			, std::string cityName /*= ""*/
 			, std::string placeName /*= ""*/
-			, BroadcastPointsPresence bpPresence /*= UNKNOWN_VALUE*/
-			, optional<RegistryKeyType> lineId /*= UNKNOWN_VALUE*/
-			, boost::optional<std::size_t> number /*=UNKNOWN_VALUE*/
+			, BroadcastPointsPresence bpPresence 
+			, optional<RegistryKeyType> lineId 
+			, boost::optional<std::size_t> number
 			, int first/*=0*/ 
 			, bool orderByCity
 			, bool orderByName
@@ -154,7 +154,7 @@ namespace synthese
 		
 		std::vector<shared_ptr<const CommercialLine> > getCommercialLineWithBroadcastPoints(
 			Env& env,
-			boost::optional<std::size_t> number /*=UNKNOWN_VALUE*/,
+			boost::optional<std::size_t> number,
 			int first/*=0*/
 		){
 			stringstream query;

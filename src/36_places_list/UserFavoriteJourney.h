@@ -51,7 +51,7 @@ namespace synthese
 
 		private:
 			const security::User*	_user;
-			int						_rank;
+			boost::optional<std::size_t>	_rank;
 			std::string				_originCityName;
 			std::string				_originPlaceName;
 			std::string				_destinationCityName;
@@ -60,25 +60,30 @@ namespace synthese
 
 		public:
 			UserFavoriteJourney(
-				util::RegistryKeyType id = UNKNOWN_VALUE
+				util::RegistryKeyType id = 0
 			);
 
-			void setRank(int value);
-			void setUser(const security::User* value);
-			void setOriginCityName(const std::string& value);
-			void setOriginPlaceName(const std::string& value);
-			void setDestinationCityName(const std::string& value);
-			void setDestinationPlaceName(const std::string& value);
-			void setAccessParameters(const graph::AccessParameters& value);
+			//! @name Setters
+			//@{
+			void setRank(boost::optional<std::size_t> value) { _rank = value; }
+				void setUser(const security::User* value) { _user = value; }
+				void setOriginCityName(const std::string& value);
+				void setOriginPlaceName(const std::string& value);
+				void setDestinationCityName(const std::string& value);
+				void setDestinationPlaceName(const std::string& value);
+				void setAccessParameters(const graph::AccessParameters& value);
+			//@}
 
-			int								getRank()					const;
-			const security::User*			getUser()					const;
-			const std::string&				getOriginCityName()			const;
-			const std::string&				getOriginPlaceName()		const;
-			const std::string&				getDestinationCityName()	const;
-			const std::string&				getDestinationPlaceName()	const;
-			const graph::AccessParameters&	getAccessParameters()		const;
-
+			//! @name Getters
+			//@{
+				boost::optional<std::size_t>	getRank()					const { return _rank; }
+				const security::User*			getUser()					const { return _user; }
+				const std::string&				getOriginCityName()			const;
+				const std::string&				getOriginPlaceName()		const;
+				const std::string&				getDestinationCityName()	const;
+				const std::string&				getDestinationPlaceName()	const;
+				const graph::AccessParameters&	getAccessParameters()		const;
+			//@}
 		};
 	}
 }

@@ -86,7 +86,7 @@ namespace synthese
 			);
 
 			Service(
-				util::RegistryKeyType id = UNKNOWN_VALUE
+				util::RegistryKeyType id = 0
 			);
 			~Service ();
 
@@ -95,7 +95,7 @@ namespace synthese
 			//@{
 				const Path*			getPath () const;
 				Path*				getPath ();
-				uid					getPathId()			const;
+				util::RegistryKeyType		getPathId()			const { return _pathId; }
 				const std::string&	getServiceNumber()	const;
 				const boost::posix_time::ptime& getNextRTUpdate() const;
 			//@}
@@ -103,7 +103,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				virtual void setPath(Path* path);
-				void setPathId(uid id);
+				void setPathId(util::RegistryKeyType id) { _pathId = id; }
 				void setServiceNumber(std::string serviceNumber);
 			//@}
 

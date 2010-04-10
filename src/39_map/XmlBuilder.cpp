@@ -28,7 +28,7 @@
 
 #include "Conversion.h"
 #include "XmlToolkit.h"
-#include "UId.h"
+#include "UtilTypes.h"
 #include "Log.h"
 #include "DrawableLine.h"
 #include "Map.h"
@@ -52,7 +52,7 @@ namespace synthese
 		){
 			// assert ("drawableLine" == node.getName ());
 			
-			uid lineId (GetLongLongAttr (node, "lineId"));
+			util::RegistryKeyType lineId (GetLongLongAttr (node, "lineId"));
 			
 			shared_ptr<const Line> line = lines.get (lineId);
 			

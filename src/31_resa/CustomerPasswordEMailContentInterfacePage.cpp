@@ -45,7 +45,7 @@ namespace synthese
 	{
 		CustomerPasswordEMailContentInterfacePage::CustomerPasswordEMailContentInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, CustomerPasswordEMailContentInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

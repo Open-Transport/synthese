@@ -205,7 +205,7 @@ namespace synthese
 
 
 		RoutePlannerInterfacePage::RoutePlannerInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

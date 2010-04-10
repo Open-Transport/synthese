@@ -29,7 +29,6 @@
 #include "DisplayGetNagiosStatusFunction.h"
 #include "DisplayScreen.h"
 #include "DisplayType.h"
-#include "DisplayScreenTableSync.h"
 #include "DisplayMonitoringStatus.h"
 #include "DisplayMonitoringStatusTableSync.h"
 
@@ -63,14 +62,14 @@ namespace synthese
 
 		void DisplayGetNagiosStatusFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			uid id(map.getUid(PARAMETER_DISPLAY_SCREEN_ID, true, FACTORY_KEY));
+			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_DISPLAY_SCREEN_ID));
 			try
 			{
-				_screen = DisplayScreenTableSync::Get(id, *_env, UP_LINKS_LOAD_LEVEL);
+				_screen = Env::GetOfficialEnv().get<DisplayScreen>(id);
 			}
-			catch (...)
+			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
-				throw RequestException("Display screen " + Conversion::ToString(id) + " not found");
+				throw RequestException("Display screen " + lexical_cast<string>(id) + " not found");
 			}
 		}
 

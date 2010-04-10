@@ -20,20 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "RoadChunkTableSync.h"
-
 #include "AddressTableSync.h"
 #include "RoadTableSync.h"
-
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
 #include "LinkException.h"
-
-#include "Conversion.h"
 
 #include <boost/tokenizer.hpp>
 
@@ -65,7 +57,7 @@ namespace synthese
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RoadChunkTableSync>::TABLE(
 			"t014_road_chunks"
-			);
+		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<RoadChunkTableSync>::_FIELDS[]=
 		{
@@ -121,18 +113,12 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				// Road
-				uid roadId(rows->getLongLong(RoadChunkTableSync::COL_ROADID));
-
-				// From address
-				uid fromAddressId (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID));
-
 				try
 				{
-					object->setRoad(RoadTableSync::Get (roadId, env, linkLevel).get());
-					Address* fromAddress(AddressTableSync::GetEditable (fromAddressId, env, linkLevel).get());
+					shared_ptr<Road> road(RoadTableSync::GetEditable(rows->getLongLong(RoadChunkTableSync::COL_ROADID), env, linkLevel));
+					object->setRoad(road.get());
+					Address* fromAddress(AddressTableSync::GetEditable (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID), env, linkLevel).get());
 					object->setFromAddress(fromAddress);
-					shared_ptr<Road> road(RoadTableSync::GetEditable(roadId, env, linkLevel));
 					road->addRoadChunk(object);
 				}
 				catch (ObjectNotFoundException<Road>& e)
@@ -156,22 +142,14 @@ namespace synthese
 			RoadChunk* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());	
-			query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES(" <<
-				object->getKey() << "," <<
-				(object->getFromAddress() ? Conversion::ToString(object->getFromAddress()->getKey()) : "0") << "," <<
-				object->getRankInPath() << "," <<
-				"''" << "," <<
-				(object->getRoad() ? Conversion::ToString(object->getRoad()->getKey()) : "0") << "," <<
-				object->getMetricOffset() <<
-			")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<RoadChunkTableSync> query(*object);
+			query.addField(object->getFromAddress() ? object->getFromAddress()->getKey() : RegistryKeyType(0));
+			query.addField(object->getRankInPath());
+			query.addField(string());
+			query.addField(object->getRoad() ? object->getRoad()->getKey() : RegistryKeyType(0));
+			query.addField(object->getMetricOffset());
+			query.execute(transaction);
 	    }
-
 	}
 
 	namespace road
@@ -182,23 +160,13 @@ namespace synthese
 			boost::optional<std::size_t> number  /*= 0*/,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
-			/// @todo Fill Where criteria
-			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-			;
-			//if (orderByName)
-			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			SelectQuery<RoadChunkTableSync> query;
 			if (number)
-				query << " LIMIT " << (*number + 1);
+				query.setNumber(*number + 1);
 			if (first > 0)
-				query << " OFFSET " << first;
+				query.setFirst(first);
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 	    }
 	}
 }

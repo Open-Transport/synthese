@@ -92,7 +92,7 @@ namespace synthese
 			if (this->_parameter == security::GLOBAL_PERIMETER)
 				return "all";
 
-			uid id(util::Conversion::ToLongLong(this->_parameter));
+			util::RegistryKeyType id(util::Conversion::ToLongLong(this->_parameter));
 			try
 			{
 				int tableId(util::decodeTableId(id));
@@ -126,8 +126,8 @@ namespace synthese
 			if (this->_parameter == security::GLOBAL_PERIMETER)
 				return true;
 
-			uid id1(util::Conversion::ToLongLong(this->_parameter));
-			uid id2(util::Conversion::ToLongLong(perimeter));
+			util::RegistryKeyType id1(util::Conversion::ToLongLong(this->_parameter));
+			util::RegistryKeyType id2(util::Conversion::ToLongLong(perimeter));
 			try
 			{
 				int tableId1(util::decodeTableId(id1));

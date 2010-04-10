@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_MessagesModule_H__
 #define SYNTHESE_MessagesModule_H__
 
-#include "UId.h"
 #include "01_util/Constants.h"
 #include "ModuleClassTemplate.hpp"
 #include "Registry.h"
@@ -31,6 +30,7 @@
 
 #include <vector>
 #include <string>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -72,21 +72,23 @@ namespace synthese
 			public server::ModuleClassTemplate<MessagesModule>
 		{
 		public:
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
+
 			/** Labels list containing each scenario template ordered by folder, indicating the full path in the folder tree.
 				@param withAllLabel if non empty, add an option "all scenarios" (value -1) with the specified label
 				@param folderId id of the main parent folder (optional) :
 					- 0/default value is the root folder
 					- UNKWNOWN_VALUE = do not use this criteria : return all templates without their full path
 				@param prefix text to add at the beginning of each item (optional)
-				@return std::vector<std::pair<uid, std::string> > The list
+				@return The list
 				@author Hugues Romain
 				@date 2008
 			*/
-			static std::vector<std::pair<uid, std::string> > GetScenarioTemplatesLabels(
+			static Labels GetScenarioTemplatesLabels(
 				std::string withAllLabel = std::string(),
-				std::string withNoLabel = std::string()
-				, uid folderId = 0
-				, std::string prefix = std::string()
+				std::string withNoLabel = std::string(),
+				boost::optional<util::RegistryKeyType> folderId = boost::optional<util::RegistryKeyType>(),
+				std::string prefix = std::string()
 			);
 
 
@@ -95,23 +97,25 @@ namespace synthese
 				@param folderId id of the main parent folder (optional)
 				@param prefix text to add at the beginning of each item (optional)
 				@param forbiddenFolderId id of a folder which must not be present in the result
-				@return std::vector<std::pair<uid, std::string> > The list
+				@return The list
 				@author Hugues Romain
 				@date 2008
 			*/
-			static std::vector<std::pair<uid, std::string> > GetScenarioFoldersLabels(
-				uid folderId = 0
+			static Labels GetScenarioFoldersLabels(
+				util::RegistryKeyType folderId = 0
 				, std::string prefix = std::string()
-				, uid forbiddenFolderId = UNKNOWN_VALUE
+				, boost::optional<util::RegistryKeyType> forbiddenFolderId = boost::optional<util::RegistryKeyType>()
 			);
 
-			static std::vector<std::pair<AlarmLevel, std::string> >		getLevelLabels(bool withAll = false);
+			typedef std::vector<std::pair<boost::optional<AlarmLevel>, std::string> > LevelLabels;
+
+			static LevelLabels getLevelLabels(bool withAll = false);
 			
-			static std::vector<std::pair<util::RegistryKeyType, std::string> > GetLevelLabelsWithScenarios(
+			static Labels GetLevelLabelsWithScenarios(
 				bool withAll
 			);
 			static std::vector<std::pair<AlarmConflict, std::string> >	getConflictLabels(bool withAll = false);
-			static std::vector<std::pair<uid, std::string> >			getTextTemplateLabels(const AlarmLevel& level);
+			static Labels			getTextTemplateLabels(const AlarmLevel& level);
 
 			static std::string							getLevelLabel(const AlarmLevel& level);
 			static std::string							getConflictLabel(const AlarmConflict& conflict);

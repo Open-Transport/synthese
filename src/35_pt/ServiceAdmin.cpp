@@ -48,6 +48,8 @@
 #include "ContinuousServiceUpdateAction.h"
 #include "PropertiesHTMLTable.h"
 #include "PTRuleUserAdmin.hpp"
+#include "ServiceTimetableUpdateAction.h"
+#include "ServiceUpdateAction.h"
 
 using namespace std;
 using namespace boost;
@@ -174,6 +176,9 @@ namespace synthese
 
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
 
+				AdminActionFunctionRequest<ServiceTimetableUpdateAction,ServiceAdmin> timetableUpdateRequest(request);
+				timetableUpdateRequest.getAction()->setService(const_pointer_cast<SchedulesBasedService>(_service));
+				
 				stream << "<h1>Horaires</h1>";
 				
 				HTMLTable::ColsVector vs;
@@ -194,6 +199,8 @@ namespace synthese
 				BOOST_FOREACH(const Path::Edges::value_type& edge, line->getEdges())
 				{
 					const LineStop& lineStop(dynamic_cast<const LineStop&>(*edge));
+					timetableUpdateRequest.getAction()->setRank(lineStop.getRankInPath());
+
 					openPlaceRequest.getPage()->setConnectionPlace(
 						Env::GetOfficialEnv().getSPtr(lineStop.getPhysicalStop()->getConnectionPlace())
 					);
@@ -208,7 +215,25 @@ namespace synthese
 					stream << ts.col();
 					if(lineStop.isArrival())
 					{
-						stream << _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath());
+						timetableUpdateRequest.getAction()->setUpdateArrival(true);
+						HTMLForm tuForm(timetableUpdateRequest.getHTMLForm());
+						stream << tuForm.open();
+						stream << tuForm.getTextInput(
+							ServiceTimetableUpdateAction::PARAMETER_TIME,
+							to_simple_string(
+								_service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath())
+						)	);
+						stream << tuForm.getSubmitButton("Change");
+						stream << tuForm.close();
+						
+						HTMLForm suForm(timetableUpdateRequest.getHTMLForm());
+						stream << suForm.open();
+						stream << suForm.getTextInput(
+							ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY,
+							string()
+						);
+						stream << suForm.getSubmitButton("Shift");
+						stream << suForm.close();
 					}
 					stream << ts.col();
 					if(lineStop.isArrival() && !(_service->getArrivalBeginScheduleToIndex(true, lineStop.getRankInPath()) == _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath())))
@@ -219,7 +244,25 @@ namespace synthese
 					stream << ts.col();
 					if(lineStop.isDeparture())
 					{
-						stream << _service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath());
+						timetableUpdateRequest.getAction()->setUpdateArrival(false);
+						HTMLForm tuForm(timetableUpdateRequest.getHTMLForm());
+						stream << tuForm.open();
+						stream << tuForm.getTextInput(
+							ServiceTimetableUpdateAction::PARAMETER_TIME,
+							to_simple_string(
+								_service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath())
+						)	);
+						stream << tuForm.getSubmitButton("Change");
+						stream << tuForm.close();
+
+						HTMLForm suForm(timetableUpdateRequest.getHTMLForm());
+						stream << suForm.open();
+						stream << suForm.getTextInput(
+							ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY,
+							string()
+						);
+						stream << suForm.getSubmitButton("Shift");
+						stream << suForm.close();
 					}
 					stream << ts.col();
 					if(lineStop.isDeparture() && !(_service->getDepartureBeginScheduleToIndex(true, lineStop.getRankInPath()) == _service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath())))
@@ -244,13 +287,11 @@ namespace synthese
 					stream << "Quai : " << f.getSelectInput(
 						ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID,
 						lineStop.getPhysicalStop()->getConnectionPlace()->getPhysicalStopLabels(),
-						_service->getRealTimeVertex(lineStop.getRankInPath())->getKey()
+						optional<RegistryKeyType>(_service->getRealTimeVertex(lineStop.getRankInPath())->getKey())
 					);
 					stream << f.getSubmitButton("OK");
 					stream << f2.close();
 				}
-
-				// ServiceTimetableUpdateAction
 
 				stream << ts.close();
 
@@ -289,7 +330,16 @@ namespace synthese
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				// ServiceUpdateAction
+				AdminActionFunctionRequest<ServiceUpdateAction,ServiceAdmin> updateRequest(request);
+				updateRequest.getAction()->setService(const_pointer_cast<Service>(static_pointer_cast<const Service>(_service)));
+				PropertiesHTMLTable t(updateRequest.getHTMLForm());
+				stream << t.open();
+				stream << t.cell("Numéro", t.getForm().getTextInput(ServiceUpdateAction::PARAMETER_SERVICE_NUMBER, _service->getServiceNumber()));
+				if(_scheduledService.get())
+				{
+					stream << t.cell("Equipe", t.getForm().getTextInput(ServiceUpdateAction::PARAMETER_TEAM_NUMBER, _scheduledService->getTeam()));
+				}
+				stream << t.close();
 
 				PTRuleUserAdmin<SchedulesBasedService,ServiceAdmin>::Display(stream, _service, request);
 			}

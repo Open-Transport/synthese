@@ -87,7 +87,7 @@ namespace synthese
 			SQLite* sqlite = DBModule::GetSQLite();
 			stringstream query;
 
-			if (obj->getKey() == UNKNOWN_VALUE)
+			if (obj->getKey() == 0)
 				obj->setKey(getId());
 
 			query

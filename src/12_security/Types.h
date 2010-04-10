@@ -31,6 +31,7 @@
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -88,7 +89,7 @@ namespace synthese
 		} RightLevel;
 
 		typedef std::vector<
-			std::pair<std::string, std::string>
+			std::pair<boost::optional<std::string>, std::string>
 		> ParameterLabelsVector;
 
 		/** @} */

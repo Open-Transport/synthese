@@ -44,17 +44,17 @@ namespace synthese
 			typedef util::Registry<ObjectSiteLink>	Registry;
 
 		protected:
-			uid			_objectId;
+			util::RegistryKeyType			_objectId;
 			const Site*	_site;
 
 		public:
-			ObjectSiteLink(util::RegistryKeyType id = UNKNOWN_VALUE);
+			ObjectSiteLink(util::RegistryKeyType id = 0);
 
-			uid			getObjectId()	const;
-			const Site*	getSite()		const;
+			util::RegistryKeyType			getObjectId()	const { return _objectId; }
+			const Site*	getSite()		const { return _site; }
 
-			void setObjectId(uid value);
-			void setSite(const Site* site);
+			void setObjectId(util::RegistryKeyType value) { _objectId = value; }
+			void setSite(const Site* site) { _site = site; }
 		};
 	}
 }

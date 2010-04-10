@@ -104,7 +104,7 @@ namespace synthese
 			void parse();
 
 			InterfacePage(
-				util::RegistryKeyType key = UNKNOWN_VALUE
+				util::RegistryKeyType key = 0
 			);
 			virtual ~InterfacePage();
 

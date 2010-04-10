@@ -34,6 +34,8 @@
 #include "PTUseRuleUpdateAction.hpp"
 #include "FareTableSync.h"
 
+#include <boost/optional.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -46,7 +48,7 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace html;
-
+	
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, PTUseRuleAdmin>::FACTORY_KEY("PTUseRuleAdmin");
@@ -118,7 +120,13 @@ namespace synthese
 			stream << t.cell("ID", lexical_cast<string>(_rule->getKey()));
 			stream << t.cell("Nom", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_NAME, _rule->getName()));
 			stream << t.title("Réservation");
-			stream << t.cell("Type de réservation", t.getForm().getSelectInput(PTUseRuleUpdateAction::PARAMETER_TYPE, PTUseRule::GetTypesList(), _rule->getReservationType()));
+			stream << t.cell(
+				"Type de réservation",
+				t.getForm().getSelectInput(
+					PTUseRuleUpdateAction::PARAMETER_TYPE,
+					PTUseRule::GetTypesList(), 
+					optional<PTUseRule::ReservationRuleType>(_rule->getReservationType())
+			)	);
 			if(_rule->getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN)
 			{
 				stream << t.cell("Heure limite de réservation", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_HOUR_DEADLINE, _rule->getHourDeadLine().is_not_a_date_time() ? string() : to_simple_string(_rule->getHourDeadLine())));
@@ -129,7 +137,7 @@ namespace synthese
 			}
 			stream << t.title("Autres propriétés");
 			stream << t.cell("Capacité maximale (vide=illimité)", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_CAPACITY, _rule->getAccessCapacity() ? lexical_cast<string>(*_rule->getAccessCapacity()) : string()));
-			stream << t.cell("Tarification principale", t.getForm().getSelectInput(PTUseRuleUpdateAction::PARAMETER_FARE_ID, FareTableSync::GetList(_getEnv()), _rule->getDefaultFare() ? _rule->getDefaultFare()->getKey() : RegistryKeyType(0)));
+			stream << t.cell("Tarification principale", t.getForm().getSelectInput(PTUseRuleUpdateAction::PARAMETER_FARE_ID, FareTableSync::GetList(_getEnv()), optional<RegistryKeyType>(_rule->getDefaultFare() ? _rule->getDefaultFare()->getKey() : 0)));
 			stream << t.close();
 		}
 

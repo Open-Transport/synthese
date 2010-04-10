@@ -22,17 +22,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
-#include "ObjectSiteLink.h"
+#include "SelectQuery.hpp"
 #include "ObjectSiteLinkTableSync.h"
 #include "SiteTableSync.h"
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
 #include "CityTableSync.h"
 #include "ReplaceQuery.h"
+#include "UtilTypes.h"
 
 using namespace std;
 using namespace boost;
@@ -88,7 +83,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			object->setObjectId(rows->getLongLong(ObjectSiteLinkTableSync::COL_OBJECT_ID));
-			uid id(rows->getLongLong(ObjectSiteLinkTableSync::COL_SITE_ID));
+			RegistryKeyType id(rows->getLongLong(ObjectSiteLinkTableSync::COL_SITE_ID));
 			try
 			{
 				object->setSite(SiteTableSync::Get(id, env, linkLevel).get());
@@ -141,31 +136,27 @@ namespace synthese
 			boost::optional<std::size_t> number, /*= 0*/
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
+			SelectQuery<ObjectSiteLinkTableSync> query;
 			if (siteId)
 			{
-				query << " AND " << COL_SITE_ID << "=" << *siteId;
+				query.addWhereField(COL_SITE_ID, *siteId);
 			}
 			if(objectId)
 			{
-				query << " AND " << COL_OBJECT_ID << "=" << *objectId;
+				query.addWhereField(COL_OBJECT_ID, *objectId);
 			}
 			if(objectTableId)
 			{
-				query << " AND " << COL_OBJECT_ID << " & " << 0xFFFF000000000000LL << " = " << util::encodeUId(*objectTableId, 0, 0, 0);
+				query.addWhereField(COL_OBJECT_ID + " & " + lexical_cast<string>(0xFFFF000000000000LL), util::encodeUId(*objectTableId, 0, 0));
 			}
 			if (number)
 			{
-				query << " LIMIT " << (*number + 1);
+				query.setNumber(*number + 1);
 				if (first > 0)
-					query << " OFFSET " << (first);
+					query.setFirst(first);
 			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }

@@ -73,7 +73,7 @@ namespace synthese
 			optional<SQLiteTransaction&> transaction
 		){
 			stringstream query;
-			if (obj->getKey() == UNKNOWN_VALUE)
+			if (obj->getKey() == 0)
 				obj->setKey(getId());
 			query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
@@ -96,7 +96,7 @@ namespace synthese
 	{
 		AlarmTemplateInheritedTableSync::SearchResult AlarmTemplateInheritedTableSync::Search(
 			Env& env,
-			RegistryKeyType scenarioId,
+			optional<RegistryKeyType> scenarioId,
 			int first /*= 0 */,
 			boost::optional<std::size_t> number /*= 0 */,
 			bool orderByLevel /*= false */,
@@ -109,7 +109,7 @@ namespace synthese
 				<< " FROM " << TABLE.NAME << " AS a "
 				<< " WHERE "
 				<< COL_IS_TEMPLATE << "=1"
-				<< " AND " << COL_SCENARIO_ID << "=" << scenarioId;
+				<< " AND " << COL_SCENARIO_ID << "=" << *scenarioId;
 			if (number)
 				query << " LIMIT " << (*number + 1);
 			if (first > 0)

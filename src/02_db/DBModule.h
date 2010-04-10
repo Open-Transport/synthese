@@ -29,8 +29,7 @@
 
 #include "ModuleClassTemplate.hpp"
 #include "02_db/Constants.h"
-
-#include "UId.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -63,7 +62,7 @@ namespace synthese
 			friend class server::ModuleClassTemplate<DBModule>;
 			
 		public:
-			typedef std::map<uid, std::string>	SubClassMap;
+			typedef std::map<util::RegistryKeyType, std::string>	SubClassMap;
 
 		private:
 
@@ -105,8 +104,8 @@ namespace synthese
 		    static void ParameterCallback (const std::string& name, 
 						   const std::string& value);
 
-			static void AddSubClass(uid, const std::string&);
-			static std::string GetSubClass(uid id);
+			static void AddSubClass(util::RegistryKeyType, const std::string&);
+			static std::string GetSubClass(util::RegistryKeyType id);
 		};
 	}
 

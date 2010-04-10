@@ -45,7 +45,7 @@ namespace synthese
 	{
 		HikingTrailInterfacePage::HikingTrailInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, HikingTrailInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

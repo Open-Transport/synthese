@@ -80,13 +80,13 @@ namespace synthese
 				@param content serialized content of the entry
 				@param user user of the entry
 				@param objectId id of the referring object 
-				@return uid id of the created entry
+				@return id of the created entry
 				@author Hugues Romain
 				@date 2008
 				
 				This method is intended to be used by subclasses to do managed entry creations.
 			*/
-			static uid _addEntry(
+			static util::RegistryKeyType _addEntry(
 				const std::string& logKey
 				, DBLogEntry::Level level
 				, const DBLogEntry::Content& content
@@ -166,7 +166,7 @@ namespace synthese
 
 
 
-			static uid AddSimpleEntry(
+			static util::RegistryKeyType AddSimpleEntry(
 				const std::string& logKey,
 				DBLogEntry::Level level,
 				const std::string& content,

@@ -42,9 +42,19 @@ namespace synthese
 	{
 		class Site;
 
-		/** SiteUpdateAction action class.
-			@ingroup m56Actions refActions
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 56.15 Action : Transport web site update.
+		/// @ingroup m56Actions refActions
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : SiteUpdateAction
+		/// Parameters :
+		///	<ul>
+		///		<li>actionParamsi : site to update</li>
+		///		<li>actionParamna : new value for site name</li>
+		///		<li>...</li>
+		///		<li>actionParamda : new value for the display of the details of road approach</li>
+		///	</ul>
 		class SiteUpdateAction
 			: public util::FactorableTemplate<server::Action, SiteUpdateAction>
 		{
@@ -58,6 +68,7 @@ namespace synthese
 			static const std::string PARAMETER_USE_OLD_DATA;
 			static const std::string PARAMETER_MAX_CONNECTIONS;
 			static const std::string PARAMETER_USE_DATES_RANGE;
+			static const std::string PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL;
 
 		private:
 			boost::shared_ptr<Site>							_site;
@@ -69,6 +80,7 @@ namespace synthese
 			bool											_useOldData;
 			int												_maxConnections;
 			boost::gregorian::date_duration							_useDatesRange;
+			bool											_displayRoadApproachDetail;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -90,7 +102,7 @@ namespace synthese
 			
 			SiteUpdateAction();
 
-			void setSiteId(uid id);
+			void setSiteId(util::RegistryKeyType id);
 
 			virtual bool isAuthorized(const server::Session* session) const;
 		};

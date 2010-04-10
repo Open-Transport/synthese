@@ -40,7 +40,7 @@ namespace synthese
 
 
 
-		HikingTrail::HikingTrail( util::RegistryKeyType id /*= UNKNOWN_VALUE*/ ):
+		HikingTrail::HikingTrail( util::RegistryKeyType id  ):
 			Registrable(id)
 		{
 

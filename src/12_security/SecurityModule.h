@@ -23,14 +23,16 @@
 #ifndef SYNTHESE_SecurityModule_H__
 #define SYNTHESE_SecurityModule_H__
 
+#include "UtilTypes.h"
+
 #include <string>
 #include <utility>
 #include <vector>
 
 #include <boost/shared_ptr.hpp>
+#include <boost/optional.hpp>
 
 #include "ModuleClassTemplate.hpp"
-#include "UId.h"
 
 namespace synthese
 {
@@ -84,10 +86,13 @@ namespace synthese
 			static boost::shared_ptr<User>		_rootUser;
 
 		public:
-			static std::vector<std::pair<std::string, std::string> > getRightsTemplates();
-			static std::vector<std::pair<uid, std::string> > getProfileLabels(bool withAll=false, int first=0, int last=-1);
-			static std::vector<std::pair<uid, std::string> > getUserLabels(bool withAll=false, int first=0, int last=-1);
-			static std::vector<std::pair<std::string, std::string> > getRightLabels(bool withAll=false);
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
+
+			typedef std::vector<std::pair<boost::optional<std::string>, std::string> >  FactoryKeysLabels;
+			static FactoryKeysLabels getRightsTemplates();
+			static Labels getProfileLabels(bool withAll=false, int first=0, int last=-1);
+			static Labels getUserLabels(bool withAll=false, int first=0, int last=-1);
+			static FactoryKeysLabels getRightLabels(bool withAll=false);
 
 			/** List of the sub profiles of the current one.
 					@return std::vector<Profile*> List of the sub profiles of the current one.

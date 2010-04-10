@@ -102,8 +102,8 @@ namespace synthese
 			_isDisplayed = map.getDefault<bool>(PARAMETER_IS_DISPLAYED, false);
 
 			_place = dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(GeographyModule::FetchPlace(
-				map.getString(PARAMETER_CITY_NAME, true, FACTORY_KEY),
-				map.getString(PARAMETER_PLACE_NAME, true, FACTORY_KEY)
+				map.get<string>(PARAMETER_CITY_NAME),
+				map.get<string>(PARAMETER_PLACE_NAME)
 			));
 
 			if (_place == NULL)

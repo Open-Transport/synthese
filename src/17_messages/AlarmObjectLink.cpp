@@ -34,13 +34,6 @@ namespace synthese
 
 	namespace messages
 	{
-
-
-		uid AlarmObjectLink::getObjectId() const
-		{
-			return _objectId;
-		}
-
 		Alarm* AlarmObjectLink::getAlarm() const
 		{
 			return _alarm;
@@ -51,10 +44,7 @@ namespace synthese
 			return _recipientKey;
 		}
 
-		void AlarmObjectLink::setObjectId( uid key )
-		{
-			_objectId = key;
-		}
+
 
 		void AlarmObjectLink::setAlarm(Alarm* alarm)
 		{
@@ -69,7 +59,7 @@ namespace synthese
 
 
 		AlarmObjectLink::AlarmObjectLink(
-			RegistryKeyType key /*= UNKNOWN_VALUE*/
+			RegistryKeyType key 
 		):	Registrable(key),
 			_alarm(NULL)
 		{

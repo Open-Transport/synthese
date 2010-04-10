@@ -75,16 +75,16 @@ namespace synthese
 		
 		void ResaLogEntryUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setEntryId(map.getUid(PARAMETER_LOG_ENTRY_ID, true, FACTORY_KEY));
-			int type(map.getInt(PARAMETER_TYPE, false, FACTORY_KEY));
-			if (type != UNKNOWN_VALUE)
+			setEntryId(map.get<RegistryKeyType>(PARAMETER_LOG_ENTRY_ID));
+			optional<int> type(map.getOptional<int>(PARAMETER_TYPE));
+			if (type)
 			{
-				_type = static_cast<ResaDBLog::_EntryType>(type);
-				_text = map.getString(PARAMETER_TEXT, false, FACTORY_KEY);
+				_type = static_cast<ResaDBLog::_EntryType>(*type);
+				_text = map.getDefault<string>(PARAMETER_TEXT);
 				if (_text.empty())
 					throw ActionException("Vous devez saisir un texte complémentaire");
 			}
-			_callType = static_cast<ResaDBLog::_EntryType>(map.getInt(PARAMETER_CALL_TYPE, true, FACTORY_KEY));
+			_callType = static_cast<ResaDBLog::_EntryType>(map.get<int>(PARAMETER_CALL_TYPE));
 		}
 		
 		
@@ -111,7 +111,7 @@ namespace synthese
 
 
 
-		void ResaLogEntryUpdateAction::setEntryId( uid id )
+		void ResaLogEntryUpdateAction::setEntryId( RegistryKeyType id )
 		{
 			try
 			{

@@ -53,7 +53,7 @@ namespace synthese
 
 		AlarmTemplate::AlarmTemplate( const AlarmTemplate& source)
 		:	Alarm(source),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 
 		}
@@ -62,7 +62,7 @@ namespace synthese
 			const ScenarioTemplate& scenario,
 			const AlarmTemplate& source
 		):	Alarm(source, &scenario),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 
 		}

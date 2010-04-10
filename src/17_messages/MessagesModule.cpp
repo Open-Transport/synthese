@@ -68,16 +68,16 @@ namespace synthese
 
 	namespace messages
 	{
-		std::vector<pair<uid, std::string> > MessagesModule::GetScenarioTemplatesLabels(
+		MessagesModule::Labels MessagesModule::GetScenarioTemplatesLabels(
 			string withAllLabel,
 			string withNoLabel
-			, uid folderId
+			, optional<RegistryKeyType> folderId
 			, string prefix
 		){
-			vector<pair<uid,string> > m;
+			Labels m;
 			if (!withAllLabel.empty())
 			{
-				m.push_back(make_pair(UNKNOWN_VALUE, withAllLabel));
+				m.push_back(make_pair(optional<RegistryKeyType>(), withAllLabel));
 			}
 			if (!withNoLabel.empty())
 			{
@@ -93,14 +93,14 @@ namespace synthese
 				m.push_back(make_pair(st->getKey(), prefix + st->getName()));
 			}
 
-			if (folderId != UNKNOWN_VALUE)
+			if (folderId)
 			{
 				ScenarioFolderTableSync::SearchResult folders(
-					ScenarioFolderTableSync::Search(env, folderId)
+					ScenarioFolderTableSync::Search(env, *folderId)
 				);
 				BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, folders)
 				{
-					std::vector<pair<uid, std::string> > r(GetScenarioTemplatesLabels(string(), string(), folder->getKey(), prefix + folder->getName() +"/"));
+					Labels r(GetScenarioTemplatesLabels(string(), string(), folder->getKey(), prefix + folder->getName() +"/"));
 					m.insert(m.end(),r.begin(), r.end());
 				}
 			}
@@ -109,12 +109,12 @@ namespace synthese
 
 
 
-		std::vector<std::pair<uid, std::string> > MessagesModule::GetScenarioFoldersLabels(
-			uid folderId /*= 0 */
+		MessagesModule::Labels MessagesModule::GetScenarioFoldersLabels(
+			RegistryKeyType folderId /*= 0 */
 			, std::string prefix /*= std::string()  */
-			, uid forbiddenFolderId
+			, optional<RegistryKeyType> forbiddenFolderId
 		){
-			vector<pair<uid,string> > m;
+			Labels m;
 			if (folderId == 0)
 				m.push_back(make_pair(0, "(racine)"));
 
@@ -124,12 +124,12 @@ namespace synthese
 			);
 			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, folders)
 			{
-				if (folder->getKey() == forbiddenFolderId)
+				if (forbiddenFolderId && folder->getKey() == *forbiddenFolderId)
 					continue;
 
 				m.push_back(make_pair(folder->getKey(), prefix + folder->getName()));
 				
-				vector<pair<uid, string> > r(GetScenarioFoldersLabels(folder->getKey(), prefix + folder->getName() +"/", forbiddenFolderId));
+				Labels r(GetScenarioFoldersLabels(folder->getKey(), prefix + folder->getName() +"/", forbiddenFolderId));
 				m.insert(m.end(),r.begin(), r.end());
 			}
 			return m;
@@ -137,12 +137,14 @@ namespace synthese
 
 
 
-		std::vector<pair<AlarmLevel, std::string> > MessagesModule::getLevelLabels(
+		MessagesModule::LevelLabels MessagesModule::getLevelLabels(
 			bool withAll /*= false*/
 		){
-			vector<pair<AlarmLevel, string> > m;
+			LevelLabels m;
 			if (withAll)
-				m.push_back(make_pair(ALARM_LEVEL_UNKNOWN, "(tous)"));
+			{
+				m.push_back(make_pair(optional<AlarmLevel>(), "(tous)"));
+			}
 			m.push_back(make_pair(ALARM_LEVEL_INFO, getLevelLabel(ALARM_LEVEL_INFO)));
 			m.push_back(make_pair(ALARM_LEVEL_WARNING, getLevelLabel(ALARM_LEVEL_WARNING)));
 			return m;
@@ -150,15 +152,15 @@ namespace synthese
 
 
 
-		std::vector<pair<RegistryKeyType, std::string> > MessagesModule::GetLevelLabelsWithScenarios(
+		MessagesModule::Labels MessagesModule::GetLevelLabelsWithScenarios(
 			bool withAll /*= false*/
 		){
-			vector<pair<RegistryKeyType, string> > m;
+			Labels m;
 			if (withAll)
-				m.push_back(make_pair(static_cast<RegistryKeyType>(ALARM_LEVEL_UNKNOWN), "(tous)"));
+				m.push_back(make_pair(optional<RegistryKeyType>(), "(tous)"));
 			
-			vector<pair<uid, string> > s(MessagesModule::GetScenarioTemplatesLabels());
-			for(vector<pair<uid, string> >::const_iterator it(s.begin()); it != s.end(); ++it)
+			Labels s(MessagesModule::GetScenarioTemplatesLabels());
+			for(Labels::const_iterator it(s.begin()); it != s.end(); ++it)
 			{
 				m.push_back(make_pair(it->first, "Scénario " + it->second));
 			}
@@ -179,10 +181,12 @@ namespace synthese
 			return m;
 		}
 
-		std::vector<pair<uid, std::string> > MessagesModule::getTextTemplateLabels(const AlarmLevel& level)
+
+
+		MessagesModule::Labels MessagesModule::getTextTemplateLabels(const AlarmLevel& level)
 		{
 			Env env;
-			vector<pair<uid, string> > m;
+			Labels m;
 			TextTemplateTableSync::SearchResult templates(
 				TextTemplateTableSync::Search(env, level)
 			);

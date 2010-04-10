@@ -59,7 +59,7 @@ namespace synthese
 			Stops _stops;
 
 		public:
-			HikingTrail(util::RegistryKeyType id = UNKNOWN_VALUE);
+			HikingTrail(util::RegistryKeyType id = 0);
 
 			const std::string& getMap() const;
 			const std::string& getDuration() const;

@@ -45,7 +45,7 @@ namespace synthese
 	{
 		TimetableNoteInterfacePage::TimetableNoteInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, TimetableNoteInterfacePage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

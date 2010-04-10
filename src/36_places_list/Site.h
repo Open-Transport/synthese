@@ -32,6 +32,7 @@
 #include "City.h"
 #include "AccessParameters.h"
 #include "RollingStockFilter.h"
+#include "Named.h"
 
 #include <string>
 #include <set>
@@ -62,17 +63,19 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		/** Transport website.
-			@ingroup m56
-			@author Hugues Romain
-			@date 2005-2006
-
-			Includes :
-				- transport sub-environment definition
-
-		*/
-		class Site
-		:	public virtual util::Registrable
+		//////////////////////////////////////////////////////////////////////////
+		/// Transport website.
+		///	@ingroup m56
+		///	@author Hugues Romain
+		///	@date 2005-2006
+		//////////////////////////////////////////////////////////////////////////
+		/// Defines a  web site content, with :
+		///  - content management system
+		///  - transport objects selection
+		///  - algorithms parameters
+		class Site:
+			public virtual util::Registrable,
+			public util::Named
 		{
 		public:
 
@@ -100,7 +103,6 @@ namespace synthese
 			//! \name Properties
 			//@{
 				const interfaces::Interface*	_interface;
-				std::string						_name;  //!< Name of the site
 				boost::gregorian::date			_startValidityDate;
 				boost::gregorian::date			_endValidityDate;
 			//@}
@@ -117,6 +119,7 @@ namespace synthese
 				bool _onlineBookingAllowed;
 				bool _pastSolutionsDisplayed;
 				int		_maxTransportConnectionsCount;
+				bool _displayRoadApproachDetail;
 			//@}
 
 			//! \name Cached used days
@@ -134,34 +137,34 @@ namespace synthese
 
 			//! \name Constructeur
 			//@{
-				Site(util::RegistryKeyType uid = UNKNOWN_VALUE);
+				Site(util::RegistryKeyType id = 0);
 			//@}
 
 			//! \name Setters
 			//@{
-				void setInterface (const interfaces::Interface* interf);
+				void setInterface (const interfaces::Interface* value) { _interface = value; }
 				void setStartDate ( const boost::gregorian::date& dateDebut );
 				void setEndDate ( const boost::gregorian::date& dateFin );
 				void setOnlineBookingAllowed ( const bool valeur );
 				void setPastSolutionsDisplayed ( bool );
-				void setName(const std::string& name);
 				void setMaxTransportConnectionsCount(int number);
 				void setUseDateRange(boost::gregorian::date_duration range);
+				void setDisplayRoadApproachDetail(bool value) { _displayRoadApproachDetail = value; }
 			//@}
 
 			//! \name Getters
 			//@{
-				const interfaces::Interface*	getInterface() const;
-				bool							getOnlineBookingAllowed() const;
+				const interfaces::Interface*	getInterface() const { return _interface; }
+				bool							getOnlineBookingAllowed() const { return _onlineBookingAllowed; }
 				bool							getPastSolutionsDisplayed() const;
 				int								getMaxTransportConnectionsCount()	const;
 				const Periods&					getPeriods()	const;
-				const std::string&				getName()							const;
 				boost::gregorian::date_duration	getUseDatesRange()					const;
 				const boost::gregorian::date&	getStartDate()						const;
 				const boost::gregorian::date&	getEndDate()						const;
 				const CitiesMatcher&			getCitiesMatcher () const;
 				const RollingStockFilters&		getRollingStockFilters() const;
+				bool							getDisplayRoadApproachDetail() const { return _displayRoadApproachDetail; }
 			//@}
 
 			// \name Modifiers
@@ -174,7 +177,7 @@ namespace synthese
 				void clearRollingStockFilters();
 			//@}
 
-			//! \name Queries
+			//! \name Services
 			//@{
 				/** Access parameter generator.
 					@param parameter Access profile
@@ -262,7 +265,8 @@ namespace synthese
 					, const std::string& placeName
 				) const;
 
-				std::map<std::size_t, std::string> getRollingStockFiltersList() const;
+				typedef std::map<boost::optional<std::size_t>, std::string> Labels;
+				Labels getRollingStockFiltersList() const;
 			//@}
 
 		};

@@ -27,7 +27,6 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "UId.h"
 #include "ActionException.h"
 
 namespace synthese
@@ -62,7 +61,7 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map) throw(server::ActionException);
 
 		public:
-			void setScenarioId(uid scenarioId);
+			void setScenarioId(util::RegistryKeyType scenarioId);
 
 			/** Action to run, defined by each subclass.
 			*/

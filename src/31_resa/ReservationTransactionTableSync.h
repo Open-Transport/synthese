@@ -90,7 +90,7 @@ namespace synthese
 
 			static SearchResult Search(
 				util::Env& env,
-				uid userId
+				boost::optional<util::RegistryKeyType> userId
 				, const boost::posix_time::ptime& minDate
 				, const boost::posix_time::ptime& maxDate
 				, bool withCancelled = false

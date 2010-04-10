@@ -78,19 +78,41 @@ namespace synthese
 				template<class T>
 				void addValueField(const T& value, std::string alias = std::string());
 
-				template<class Table2>
-				void addTableAndEqualJoin(std::string field1, std::string field2, std::string alias = std::string());
 
 				template<class Table2>
-				void addTableAndEqualOtherJoin(std::string table1, std::string field1, std::string field2, std::string alias2 = std::string());
+				void addTableAndEqualJoin(std::string field2 = TABLE_COL_ID, std::string field1 = TABLE_COL_ID, std::string alias = std::string());
 
-				void addOrderField(const std::string field, bool raisingOrder);
+				template<class Table1, class Table2>
+				void addTableAndEqualOtherJoin(std::string field2 = TABLE_COL_ID, std::string field1 = TABLE_COL_ID, std::string alias2 = std::string());
+
+				template<class Table2>
+				void addTableAndEqualOtherJoinAlias(std::string field2, std::string table1, std::string field1 = TABLE_COL_ID, std::string alias2 = std::string());
+
+
+				void addOrderField(const std::string& field, bool raisingOrder);
+
+				template<class Table1>
+				void addOrderFieldOther(const std::string& field, bool raisingOrder);
+
+				void addOrderFieldOtherAlias(const std::string& table, const std::string& field, bool raisingOrder);
 
 				template<class T>
 				void addWhereField(const std::string field, const T& value, std::string op = ComposedExpression::OP_EQ);
 
+				template<class Table1, class T>
+				void addWhereFieldOther(const std::string field, const T& value, std::string op = ComposedExpression::OP_EQ);
+
 				template<class T>
-				void addWhereFieldOther(const std::string& table, const std::string field, const T& value, std::string op = ComposedExpression::OP_EQ);
+				void addWhereFieldOtherAlias(const std::string& table, const std::string field, const T& value, std::string op = ComposedExpression::OP_EQ);
+
+				void addWhere(boost::shared_ptr<SQLExpression> expression) { _wheres.push_back(expression); }
+
+				void addGroupByField(const std::string field = TABLE_COL_ID);
+			
+				template<class Table1>
+				void addGroupByFieldOther(const std::string field = TABLE_COL_ID);
+
+				void addGroupByFieldOtherAlias(const std::string& table, const std::string field = TABLE_COL_ID);
 			//@}
 
 			//! @name Services
@@ -107,7 +129,7 @@ namespace synthese
 		{
 			_fields.push_back(
 				std::make_pair(
-					boost::shared_ptr<SQLExpression>(new FieldExpression(Table::NAME, field)),
+					FieldExpression::Get(Table::TABLE.NAME, field),
 					alias
 			)	);
 		}
@@ -120,7 +142,7 @@ namespace synthese
 		{
 			_fields.push_back(
 				std::make_pair(
-					boost::shared_ptr<SQLExpression>(new ValueExpression<T>(value)),
+				ValueExpression<T>::Get(value),
 					alias
 			)	);
 		}
@@ -128,40 +150,71 @@ namespace synthese
 
 
 		template<class Table1> template <class Table2>
-		void SelectQuery<Table1>::addTableAndEqualJoin( std::string field1, std::string field2, std::string alias )
+		void SelectQuery<Table1>::addTableAndEqualJoin( std::string field2, std::string field1, std::string alias )
 		{
 			JoinedTable t;
 			t.alias = alias;
 			t.table = Table2::TABLE.NAME;
-			t.on.reset(new ComposedExpression(
-					boost::shared_ptr<SQLExpression>(new FieldExpression(Table1::TABLE.NAME, field1)),
-					ComposedExpression::OP_EQ,
-					boost::shared_ptr<SQLExpression>(new FieldExpression(alias.empty() ? Table2::TABLE.NAME : alias, field2))
-			)	);
+			t.on = ComposedExpression::Get(
+				FieldExpression::Get(Table1::TABLE.NAME, field1),
+				ComposedExpression::OP_EQ,
+				FieldExpression::Get(alias.empty() ? Table2::TABLE.NAME : alias, field2)
+			);
+			_tables.push_back(t);
+		}
+
+
+
+		template<class Table> template<class Table2, class Table1>
+		void SelectQuery<Table>::addTableAndEqualOtherJoin(std::string field2, std::string field1, std::string alias2 /*= std::string()*/ )
+		{
+			JoinedTable t;
+			t.alias = alias2;
+			t.table = Table2::TABLE.NAME;
+			t.on = ComposedExpression::Get(
+				FieldExpression::Get(Table1::TABLE.NAME, field1),
+				ComposedExpression::OP_EQ,
+				FieldExpression::Get(alias2.empty() ? Table2::TABLE.NAME : alias2, field2)
+			);
 			_tables.push_back(t);
 		}
 
 
 		template<class Table> template<class Table2>
-		void SelectQuery<Table>::addTableAndEqualOtherJoin( std::string table1, std::string field1, std::string field2, std::string alias2 /*= std::string()*/ )
+		void SelectQuery<Table>::addTableAndEqualOtherJoinAlias( std::string table1, std::string field1, std::string field2, std::string alias2 /*= std::string()*/ )
 		{
 			JoinedTable t;
 			t.alias = alias2;
 			t.table = Table2::TABLE.NAME;
-			t.on.reset(new ComposedExpression(
-					boost::shared_ptr<SQLExpression>(new FieldExpression(table1, field1)),
-					ComposedExpression::OP_EQ,
-					boost::shared_ptr<SQLExpression>(new FieldExpression(alias2.empty() ? Table2::TABLE.NAME : alias2, field2))
-			) );
+			t.on = ComposedExpression::Get(
+				FieldExpression::Get(table1, field1),
+				ComposedExpression::OP_EQ,
+				FieldExpression::Get(alias2.empty() ? Table2::TABLE.NAME : alias2, field2)
+			);
 			_tables.push_back(t);
 		}
 
 
 
 		template<class Table>
-		void SelectQuery<Table>::addOrderField( const std::string field, bool raisingOrder )
+		void SelectQuery<Table>::addOrderField( const std::string& field, bool raisingOrder )
 		{
-			_orders.push_back(std::make_pair(boost::shared_ptr<SQLExpression>(new FieldExpression(Table::TABLE.NAME, field)), raisingOrder));
+			_orders.push_back(std::make_pair(FieldExpression::Get(Table::TABLE.NAME, field), raisingOrder));
+		}
+
+
+		template<class Table> template<class Table1>
+		void SelectQuery<Table>::addOrderFieldOther( const std::string& field, bool raisingOrder )
+		{
+			_orders.push_back(std::make_pair(FieldExpression::Get(Table1::TABLE.NAME, field), raisingOrder));
+		}
+
+
+
+		template<class Table>
+		void SelectQuery<Table>::addOrderFieldOtherAlias(const std::string& table, const std::string& field, bool raisingOrder )
+		{
+			_orders.push_back(std::make_pair(FieldExpression::Get(table, field), raisingOrder));
 		}
 
 
@@ -170,27 +223,75 @@ namespace synthese
 		void SelectQuery<Table>::addWhereField( const std::string field, const T& value, std::string op)
 		{
 			_wheres.push_back(
-				boost::shared_ptr<SQLExpression>(
-					new ComposedExpression(
-						boost::shared_ptr<SQLExpression>(new FieldExpression(Table::TABLE.NAME, field)),
-						op,
-						boost::shared_ptr<SQLExpression>(new ValueExpression<T>(value))
-			)	)	);
+				ComposedExpression::Get(
+					FieldExpression::Get(Table::TABLE.NAME, field),
+					op,
+					ValueExpression<T>::Get(value)
+			)	);
+		}
+
+
+
+		template<class Table> template<class Table1, class T>
+		void SelectQuery<Table>::addWhereFieldOther(const std::string field, const T& value, std::string op)
+		{
+			_wheres.push_back(
+				ComposedExpression::Get(
+					FieldExpression::Get(Table1::TABLE.NAME, field),
+					op,
+					ValueExpression<T>::Get(value)
+			)	);
 		}
 
 
 
 		template<class Table> template<class T>
-		void SelectQuery<Table>::addWhereFieldOther(const std::string& table, const std::string field, const T& value, std::string op)
+		void SelectQuery<Table>::addWhereFieldOtherAlias(const std::string& table, const std::string field, const T& value, std::string op)
 		{
 			_wheres.push_back(
-				boost::shared_ptr<SQLExpression>(
-					new ComposedExpression(
-						boost::shared_ptr<SQLExpression>(new FieldExpression(table, field)),
-						op,
-						boost::shared_ptr<SQLExpression>(new ValueExpression<T>(value))
-			)	)	);
+				ComposedExpression::Get(
+					FieldExpression::Get(table, field),
+					op,
+					ValueExpression<T>::Get(value)
+			)	);
 		}
+
+
+
+		template<class Table>
+		void SelectQuery<Table>::addGroupByField( const std::string field)
+		{
+			_groups.push_back(
+				FieldExpression::Get(
+					Table::TABLE.NAME,
+					field
+			)	);
+		}
+
+
+
+		template<class Table> template<class Table1>
+		void SelectQuery<Table>::addGroupByFieldOther( const std::string field)
+		{
+			_groups.push_back(
+				FieldExpression::Get(
+					Table1::TABLE.NAME,
+					field
+			)	);
+		}
+
+
+
+		template<class Table>
+		void SelectQuery<Table>::addGroupByFieldOtherAlias(const std::string& alias, const std::string field)
+		{
+			_groups.push_back(
+				FieldExpression::Get(
+					alias,
+					field
+			)	);
+		}
+
 
 
 		template<class Table>

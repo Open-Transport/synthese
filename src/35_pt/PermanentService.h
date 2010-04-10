@@ -42,7 +42,7 @@ namespace synthese
 
 		public:
 			PermanentService(
-				util::RegistryKeyType id = UNKNOWN_VALUE,
+				util::RegistryKeyType id = 0,
 				graph::Path* path = NULL,
 				boost::optional<boost::posix_time::time_duration> duration = boost::optional<boost::posix_time::time_duration>()
 			);

@@ -36,38 +36,6 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-
-
-
-
-		uid ObjectSiteLink::getObjectId() const
-		{
-			return _objectId;
-		}
-
-
-
-		const Site* ObjectSiteLink::getSite() const
-		{
-			return _site;
-		}
-
-
-
-		void ObjectSiteLink::setObjectId( uid value )
-		{
-			_objectId = value;
-		}
-
-
-
-		void ObjectSiteLink::setSite( const Site* site )
-		{
-			_site = site;
-		}
-
-
-
 		ObjectSiteLink::ObjectSiteLink(
 			RegistryKeyType id
 		):	Registrable(id)

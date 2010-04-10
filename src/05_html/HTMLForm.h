@@ -312,8 +312,8 @@ namespace synthese
 				template<class K, class T>
 				std::string getSelectInput(
 					const std::string& name,
-					const std::vector<std::pair<K, T> >& choices,
-					const K& value
+					const std::vector<std::pair<boost::optional<K>, T> >& choices,
+					boost::optional<K> value
 				);
 
 
@@ -331,8 +331,8 @@ namespace synthese
 				template<class K, class T>
 				std::string getSelectInput(
 					const std::string& name,
-					const std::map<K, T>& choices,
-					const K& value
+					const std::map<boost::optional<K>, T>& choices,
+					boost::optional<K> value
 				);
 
 				
@@ -354,8 +354,8 @@ namespace synthese
 					const std::string& name,
 					const std::vector<boost::shared_ptr<T> >& registry,
 					boost::optional<boost::shared_ptr<T> > value,
-					const std::string& zeroLabel = std::string(),
-					const std::string& unknownLabel = std::string()
+					const std::string zeroLabel = std::string(),
+					const std::string unknownLabel = std::string()
 				);
 				
 				
@@ -372,10 +372,10 @@ namespace synthese
 				template<class K>
 				std::string getRadioInput(
 					const std::string& name,
-					const K& valueIfSelected,
-					const K& valueToSelect,
-					const std::string label="",
-					bool disabled=false
+					boost::optional<K> valueIfSelected,
+					boost::optional<K> valueToSelect,
+					const std::string label = std::string(),
+					bool disabled = false
 				);
 
 				
@@ -392,8 +392,8 @@ namespace synthese
 				template<class K>
 				std::string getRadioInputCollection(
 					const std::string& name,
-					const std::vector<std::pair<K, std::string> >& choices,
-					const K& value,
+					const std::vector<std::pair<boost::optional<K>, std::string> >& choices,
+					boost::optional<K> value,
 					bool withBR = false
 				);
 
@@ -411,8 +411,8 @@ namespace synthese
 				template<class K>
 				std::string getRadioInputCollection(
 					const std::string& name,
-					const std::map<K, std::string>& choices,
-					const K& value,
+					const std::map<boost::optional<K>, std::string>& choices,
+					boost::optional<K> value,
 					bool withBR = false
 				);
 
@@ -426,7 +426,11 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007
 				*/
-				std::string getTextInput(const std::string& name, const std::string& value, std::string displayTextBeforeTyping="");
+				std::string getTextInput(
+					const std::string& name,
+					const std::string& value,
+					std::string displayTextBeforeTyping = std::string()
+				);
 
 
 
@@ -638,8 +642,8 @@ namespace synthese
 			const std::string& name,
 			const std::vector<boost::shared_ptr<T> >& registry,
 			const boost::optional<boost::shared_ptr<T> > value,
-			const std::string& zeroLabel /*= std::string()*/,
-			const std::string& unknownLabel /*= std::string()*/
+			const std::string zeroLabel /*= std::string()*/,
+			const std::string unknownLabel /*= std::string()*/
 		){
 			std::stringstream s;
 
@@ -652,7 +656,7 @@ namespace synthese
 				s << "<select name=\"" << name << "\" id=\"" << _getFieldId(name) << "\" >";
 				if (!unknownLabel.empty())
 				{
-					s << "<option value=\"" << UNKNOWN_VALUE << "\"";
+					s << "<option value=\"\"";
 					if (value == boost::optional<boost::shared_ptr<T> >())
 						s << " selected=\"selected\"";
 					s << ">" << unknownLabel << "</option>";
@@ -680,14 +684,14 @@ namespace synthese
 		template<class K, class T>
 		std::string HTMLForm::getSelectInput(
 			const std::string& name,
-			const std::vector<std::pair<K, T> >& choices,
-			const K& value
+			const std::vector<std::pair<boost::optional<K>, T> >& choices,
+			boost::optional<K> value
 		){
 			std::stringstream s;
 
 			if (!_updateRight)
 			{
-				for (typename std::vector<std::pair<K, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
+				for (typename std::vector<std::pair<boost::optional<K>, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
 				{
 					if (it->first == value)	s << it->second;
 				}
@@ -695,9 +699,14 @@ namespace synthese
 			else
 			{
 				s << "<select name=\"" << name << "\" id=\"" << _getFieldId(name) << "\" >";
-				for (typename std::vector<std::pair<K, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
+				for (typename std::vector<std::pair<boost::optional<K>, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
 				{
-					s << "<option value=\"" << it->first << "\"";
+					s << "<option value=\"";
+					if(it->first)
+					{
+						s << *it->first;
+					}
+					s << "\"";
 					if (it->first == value)	s << " selected=\"selected\"";
 					s << ">" << it->second << "</option>";
 				}
@@ -710,35 +719,51 @@ namespace synthese
 		template<class K, class T>
 		std::string HTMLForm::getSelectInput(
 			const std::string& name,
-			const std::map<K, T>& choices,
-			const K& value
-			){
-				std::stringstream s;
+			const std::map<boost::optional<K>, T>& choices,
+			boost::optional<K> value
+		){
+			std::stringstream s;
 
-				if (!_updateRight)
+			if (!_updateRight)
+			{
+				typename std::map<boost::optional<K>,T>::const_iterator it = choices.find(value);
+				if(it != choices.end())
 				{
-					for (typename std::map<K,T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
-					{
-						if (it->first == value)	s << it->second;
-					}
+					s << it->second;
 				}
-				else
+			}
+			else
+			{
+				s << "<select name=\"" << name << "\" id=\"" << _getFieldId(name) << "\" >";
+				for (typename std::map<boost::optional<K>, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
 				{
-					s << "<select name=\"" << name << "\" id=\"" << _getFieldId(name) << "\" >";
-					for (typename std::map<K, T>::const_iterator it = choices.begin(); it != choices.end(); ++it)
+					s << "<option value=\"";
+					if(it->first)
 					{
-						s << "<option value=\"" << it->first << "\"";
-						if (it->first == value)	s << " selected=\"selected\"";
-						s << ">" << it->second << "</option>";
+						s << *it->first;
 					}
-					s << "</select>";
+					s << "\"";
+					if (it->first == value)
+					{
+						s << " selected=\"selected\"";
+					}
+					s << ">" << it->second << "</option>";
 				}
-				return s.str();
+				s << "</select>";
+			}
+			return s.str();
 		}
 
+
+
 		template<class K>
-		std::string HTMLForm::getRadioInput(const std::string& name, const K& valueIfSelected, const K& valueToSelect, const std::string label, bool disabled)
-		{
+		std::string HTMLForm::getRadioInput(
+			const std::string& name,
+			boost::optional<K> valueIfSelected,
+			boost::optional<K> valueToSelect,
+			const std::string label,
+			bool disabled
+		){
 			if (!_updateRight)
 			{
 				return (valueIfSelected == valueToSelect)
@@ -748,8 +773,12 @@ namespace synthese
 
 			std::stringstream s;
 			std::string id(_getFieldId(name));
-			s << "<input name=\"" << name << "\" type=\"radio\" value=\"" << valueIfSelected << "\""
-				<< " id=\"" << id << "\"";
+			s << "<input name=\"" << name << "\" type=\"radio\" value=\"";
+			if(valueIfSelected)
+			{
+				s << *valueIfSelected;
+			}
+			s << "\"" << " id=\"" << id << "\"";
 			if (valueIfSelected == valueToSelect)
 				s << " checked=\"checked\"";
 			if (disabled)
@@ -764,12 +793,12 @@ namespace synthese
 		template<class K>
 		std::string HTMLForm::getRadioInputCollection(
 			const std::string& name,
-			const std::vector<std::pair<K, std::string> >& choices,
-			const K& value,
+			const std::vector<std::pair<boost::optional<K>, std::string> >& choices,
+			boost::optional<K> value,
 			bool withBR
 		){
 			std::stringstream s;
-			for (typename std::vector<std::pair<K, std::string> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
+			for (typename std::vector<std::pair<boost::optional<K>, std::string> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
 			{
 				s << getRadioInput(name, it->first, value, it->second);
 				if(withBR)
@@ -785,12 +814,12 @@ namespace synthese
 		template<class K>
 		std::string HTMLForm::getRadioInputCollection(
 			const std::string& name,
-			const std::map<K, std::string>& choices,
-			const K& value,
+			const std::map<boost::optional<K>, std::string>& choices,
+			boost::optional<K> value,
 			bool withBR
 		){
 			std::stringstream s;
-			for (typename std::map<K, std::string>::const_iterator it = choices.begin(); it != choices.end(); ++it)
+			for (typename std::map<boost::optional<K>, std::string>::const_iterator it = choices.begin(); it != choices.end(); ++it)
 			{
 				s << getRadioInput(name, it->first, value, it->second);
 				if(withBR)

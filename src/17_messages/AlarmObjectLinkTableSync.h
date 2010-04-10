@@ -106,7 +106,10 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			static void Remove(uid alarmId, uid objectId = UNKNOWN_VALUE);
+			static void Remove(
+				util::RegistryKeyType alarmId,
+				boost::optional<util::RegistryKeyType> objectId = boost::optional<util::RegistryKeyType>()
+			);
 
 
 			static void CopyRecipients(

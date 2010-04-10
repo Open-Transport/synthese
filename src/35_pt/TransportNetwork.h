@@ -50,7 +50,7 @@ namespace synthese
 		 public:
 
 			TransportNetwork (
-				util::RegistryKeyType id = UNKNOWN_VALUE,
+				util::RegistryKeyType id = 0,
 				std::string name = std::string()
 			);
 			~TransportNetwork ();

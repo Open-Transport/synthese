@@ -25,104 +25,115 @@
 
 #include "DBModule.h"
 #include "SQLite.h"
+#include "SQLExpression.hpp"
+
+#include <vector>
 
 namespace synthese
 {
 	namespace db
 	{
-		/** ReplaceQuery class.
-			@ingroup m10
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// SQL REPLACE query generator.
+		/// @ingroup m10
+		/// @author Hugues Romain
+		/// @date 2010
+		//////////////////////////////////////////////////////////////////////////
 		template<class TableSync>
 		class ReplaceQuery
 		{
 		private:
-			std::vector<std::string> _fields;
+			typedef std::vector<boost::shared_ptr<SQLExpression> > Fields;
+
+			Fields _fields;
 			util::RegistryKeyType _id;
 
 		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor with auto-increment.
+			/// @param object object corresponding to the record in the database
+			/// @author Hugues Romain
+			/// @date 2010
+			//////////////////////////////////////////////////////////////////////////
+			/// If the id of the object is not defined, then the object is updated by
+			/// applying auto increment on it.
 			ReplaceQuery(
 				typename TableSync::ObjectType& object
 			){
-				if(object.getKey() <= 0)
+				if(object.getKey() == 0)
 				{
 					object.setKey(TableSync::getId());
 				}
-				_id=object.getKey();
+				_id = object.getKey();
 			}
 
-			
-			void addField(const boost::posix_time::ptime& value
-			){
-				_fields.push_back("'" + (value.is_not_a_date_time() ? "" : boost::gregorian::to_iso_extended_string(value.date()) + " " + boost::posix_time::to_simple_string(value.time_of_day())) + "'");
-			}
-			void addField(
-				const boost::gregorian::date& value
-			){
-				_fields.push_back("'" + (value.is_not_a_date() ? "" : boost::gregorian::to_iso_extended_string(value)) + "'");
-			}
-			
-			void addField(
-				const std::string& value
-			){
-				std::string result;
-				result.push_back('\'');
-				BOOST_FOREACH(char s, value)
-				{
-					// Escape several characters
-					if (s == '\'')
-						result.push_back('\'');
-					result.push_back(s);
-				}
-				result.push_back('\'');
-				_fields.push_back(result);
-			}
 
-			void addField(int value){
-				_fields.push_back(boost::lexical_cast<std::string>(value));
-			}
-
-			void addField(double value){
-				_fields.push_back(boost::lexical_cast<std::string>(value));
-			}
-
-			void addField(util::RegistryKeyType value){
-				_fields.push_back(boost::lexical_cast<std::string>(value));
-			}
-
-			void addField(boost::logic::tribool value){
-				_fields.push_back(boost::lexical_cast<std::string>(value == true ? 1 : value == false ? 0 : -1));
-			}
-
+			//////////////////////////////////////////////////////////////////////////
+			/// Adds a value field to the query
+			/// @param value value to add, handled by ValueExpression
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
 			template<class T>
-			void addField(std::set<T> value)
-			{
-				std::stringstream s;
-				bool first(true);
-				BOOST_FOREACH(const typename std::set<T>::value_type& o, value)
-				{
-					if(!first) s << ",";
-					s << o;
-					first = false;
-				}
-				_fields.push_back(s.str());
-			}
+			void addField(const T& value);
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Adds an expression field to the query
+			/// @param value expression to add (pointer to SQLExpression object)
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			void addFieldExpression(boost::shared_ptr<SQLExpression> value);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Runs the query.
+			/// @param transaction (optional) transaction within the query must be run
+			/// @author Hugues Romain
+			/// @date 2010
 			void execute(
 				boost::optional<SQLiteTransaction&> transaction
-			){
-				std::stringstream query;
-				query
-					<< " REPLACE INTO " << TableSync::TABLE.NAME << " VALUES("
-					<< _id;
-				BOOST_FOREACH(const std::string& field, _fields)
-				{
-					query << "," << field;
-				}
-				query << ");";
-				DBModule::GetSQLite()->execUpdate(query.str(), transaction);
-			}
+			) const;
 		};
+
+
+
+		template<class TableSync>
+		void synthese::db::ReplaceQuery<TableSync>::addFieldExpression( boost::shared_ptr<SQLExpression> value )
+		{
+			_fields.push_back(value);
+		}
+
+
+
+
+
+		template<class TableSync>
+		void ReplaceQuery<TableSync>::execute( boost::optional<SQLiteTransaction&> transaction ) const
+		{
+			std::stringstream query;
+			query
+				<< " REPLACE INTO " << TableSync::TABLE.NAME << " VALUES("
+				<< _id;
+			BOOST_FOREACH(const Fields::value_type& field, _fields)
+			{
+				query << "," << field->toString();
+			}
+			query << ");";
+			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+		}
+
+
+		template<class Table> template<class T>
+		void ReplaceQuery<Table>::addField(const T& value)
+		{
+			_fields.push_back(
+				ValueExpression<T>::Get(value)
+			);
+		}
 	}
 }
 

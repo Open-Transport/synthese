@@ -39,7 +39,7 @@ namespace synthese
 	namespace dblog
 	{
 
-		uid DBLog::_addEntry(
+		RegistryKeyType DBLog::_addEntry(
 			const std::string& logKey
 			, DBLogEntry::Level level
 			, const DBLogEntry::Content& content
@@ -77,10 +77,10 @@ namespace synthese
 					logKey,
 					ptime(not_a_date_time),
 					ptime(not_a_date_time),
-					UNKNOWN_VALUE,
+					optional<RegistryKeyType>(),
 					DBLogEntry::DB_LOG_UNKNOWN,
-					objectId ? *objectId : UNKNOWN_VALUE,
-					UNKNOWN_VALUE,
+					objectId,
+					optional<RegistryKeyType>(),
 					string(),
 					0, 1,
 					true, false, false,false
@@ -112,7 +112,7 @@ namespace synthese
 
 
 
-		uid DBLog::AddSimpleEntry(
+		RegistryKeyType DBLog::AddSimpleEntry(
 			const std::string& logKey,
 			DBLogEntry::Level level,
 			const std::string& content,

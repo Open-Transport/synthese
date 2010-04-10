@@ -30,7 +30,8 @@
 #include "Request.h"
 #include "ParametersMap.h"
 
-using boost::shared_ptr;
+using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -57,17 +58,17 @@ namespace synthese
 
 		void AddUserAction::_setFromParametersMap(const ParametersMap& map )
 		{
-			_name = map.getString(PARAMETER_NAME, true, FACTORY_KEY);
+			_name = map.get<string>(PARAMETER_NAME);
 			if (_name.empty())
 				throw ActionException("L'utilisateur ne peut être créé car le nom n'est pas renseigné. Veuillez renseigner le champ nom.");
 			
-			_login = map.getString(PARAMETER_LOGIN, true, FACTORY_KEY);
+			_login = map.get<string>(PARAMETER_LOGIN);
 			if (_login.empty())
 				throw ActionException("L'utilisateur ne peut être créé car le login n'est pas renseigné. Veuillez renseigner le champ login.");
 			if (UserTableSync::loginExists(_login))
 				throw ActionException("L'utilisateur ne peut être créé car le login entré est déjà utilisé. Veuillez choisir un autre login.");
 			
-			uid id(map.getUid(PARAMETER_PROFILE_ID, true, FACTORY_KEY));
+			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_PROFILE_ID));
 			try
 			{
 				_profile = ProfileTableSync::Get(id,*_env);

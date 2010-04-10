@@ -88,7 +88,7 @@ namespace synthese
 				@date 2007				
 			*/
 			SentAlarm(
-				util::RegistryKeyType key = UNKNOWN_VALUE,
+				util::RegistryKeyType key = 0,
 				const SentScenario* scenario = NULL
 			);
 

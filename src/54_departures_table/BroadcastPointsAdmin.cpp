@@ -79,8 +79,7 @@ namespace synthese
 		
 		BroadcastPointsAdmin::BroadcastPointsAdmin():
 			AdminInterfaceElementTemplate<BroadcastPointsAdmin>(),
-			_searchDevicesNumber(WITH_OR_WITHOUT_ANY_BROADCASTPOINT),
-			_lineUId(UNKNOWN_VALUE)
+			_searchDevicesNumber(WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
 		{}
 
 		void BroadcastPointsAdmin::setFromParametersMap(
@@ -93,7 +92,6 @@ namespace synthese
 			if (i)	_searchDevicesNumber = static_cast<BroadcastPointsPresence>(*i);
 
 			_lineUId = map.getOptional<RegistryKeyType>(PARAMETER_LINE_ID);
-			if(_lineUId && *_lineUId == UNKNOWN_VALUE) _lineUId = optional<RegistryKeyType>();
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_CITY_NAME, 30);
 		}
@@ -106,7 +104,10 @@ namespace synthese
 			m.insert(PARAMETER_CITY_NAME, _cityName);
 			m.insert(PARAMETER_PLACE_NAME, _placeName);
 			m.insert(PARAMETER_DEVICES_NUMBER, static_cast<int>(_searchDevicesNumber));
-			if(_lineUId) m.insert(PARAMETER_LINE_ID, *_lineUId);
+			if(_lineUId)
+			{
+				m.insert(PARAMETER_LINE_ID, *_lineUId);
+			}
 			return m;
 		}
 
@@ -117,7 +118,7 @@ namespace synthese
 			interfaces::VariablesMap& variables,
 			const admin::AdminRequest& _request) const
 		{
-			vector<pair<int, string> > m;
+			vector<pair<optional<int>, string> > m;
 			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre désactivé)"));
 			m.push_back(make_pair((int) AT_LEAST_ONE_BROADCASTPOINT, "Au moins un"));
 			m.push_back(make_pair((int) NO_BROADCASTPOINT, "Aucun"));
@@ -131,8 +132,11 @@ namespace synthese
 			stream << st.cell("Nom", st.getForm().getTextInput(PARAMETER_PLACE_NAME, _placeName));
 			stream << st.cell(
 				"Equipements",
-				st.getForm().getSelectInput(PARAMETER_DEVICES_NUMBER, m, static_cast<int>(_searchDevicesNumber))
-			);
+				st.getForm().getSelectInput(
+					PARAMETER_DEVICES_NUMBER,
+					m,
+					optional<int>(static_cast<int>(_searchDevicesNumber))
+			)	);
 			stream << st.cell("Ligne", st.getForm().getSelectInput(
 					PARAMETER_LINE_ID,
 					PTModule::getCommercialLineLabels(
@@ -141,7 +145,7 @@ namespace synthese
 						, READ
 						, true
 					),
-					_lineUId ? *_lineUId : UNKNOWN_VALUE
+					_lineUId
 			)	);
 			stream << st.close();
 

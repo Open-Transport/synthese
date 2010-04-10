@@ -26,13 +26,7 @@
 #ifndef SYNTHESE_DisplayScreenTableSync_H__
 #define SYNTHESE_DisplayScreenTableSync_H__
 
-#include <vector>
-#include <string>
-#include <iostream>
-
 #include "DisplayScreen.h"
-#include "01_util/Constants.h"
-#include "01_util/UId.h"
 #include "SQLiteRegistryTableSyncTemplate.h"
 #include "12_security/Types.h"
 
@@ -101,28 +95,28 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				boost::optional<const security::RightsOfSameClassMap&> rights = boost::optional<const security::RightsOfSameClassMap&>()
-				, bool totalControl = true
-				, security::RightLevel neededLevel = security::FORBIDDEN
-				, uid duid = UNKNOWN_VALUE
-				, uid localizationid = UNKNOWN_VALUE
-				, uid lineid = UNKNOWN_VALUE
-				, uid typeuid = UNKNOWN_VALUE
-				, std::string cityName = std::string()
-				, std::string stopName = std::string()
-				, std::string name = std::string()
-				, int state = UNKNOWN_VALUE
-				, int message = UNKNOWN_VALUE
-				, int first = 0
-				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
-				, bool orderByUid = false
-				, bool orderByCity = true
-				, bool orderByStopName = false
-				, bool orderByName = false
-				, bool orderByType = false
-				, bool orderByStatus = false
-				, bool orderByMessage = false
-				, bool raisingOrder = true,
+				boost::optional<const security::RightsOfSameClassMap&> rights = boost::optional<const security::RightsOfSameClassMap&>(),
+				bool totalControl = true,
+				security::RightLevel neededLevel = security::FORBIDDEN,
+				boost::optional<util::RegistryKeyType> duid = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> localizationid = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> lineid = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> typeuid = boost::optional<util::RegistryKeyType>(),
+				std::string cityName = std::string(),
+				std::string stopName = std::string(),
+				std::string name = std::string(),
+				boost::optional<int> state = boost::optional<int>(),
+				boost::optional<int> message = boost::optional<int>(),
+				size_t first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				bool orderByUid = false,
+				bool orderByCity = true,
+				bool orderByStopName = false,
+				bool orderByName = false,
+				bool orderByType = false,
+				bool orderByStatus = false,
+				bool orderByMessage = false,
+				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
@@ -164,7 +158,7 @@ namespace synthese
 			///	Gets the message currently displayed on a screen.
 			/// @param env Environment to populate
 			///	@param screenId id of the screen
-			/// @param number Number of results (<=0 : unlimited)
+			/// @param number Number of results (optional)
 			///	@return pointer to the message
 			///	@author Hugues Romain
 			///	@date 2008
@@ -174,7 +168,7 @@ namespace synthese
 			static std::vector<boost::shared_ptr<messages::SentAlarm> > GetCurrentDisplayedMessage(
 				util::Env& env,
 				util::RegistryKeyType screenId,
-				int number = UNKNOWN_VALUE
+				boost::optional<int> number = boost::optional<int>()
 			);
 
 

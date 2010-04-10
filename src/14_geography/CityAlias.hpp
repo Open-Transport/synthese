@@ -61,7 +61,7 @@ namespace synthese
 			std::string _code; //!< Unique code identifier for city within its country (france => INSEE code)
 
 		public:
-			CityAlias(util::RegistryKeyType id = UNKNOWN_VALUE);
+			CityAlias(util::RegistryKeyType id = 0);
 
 			//! @name Getters
 			//@{

@@ -38,13 +38,6 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-
-
-		void UserFavoriteJourney::setRank( int value )
-		{
-			_rank = value;
-		}
-
 		void UserFavoriteJourney::setOriginCityName( const std::string& value )
 		{
 			_originCityName = value;
@@ -68,11 +61,6 @@ namespace synthese
 		void UserFavoriteJourney::setAccessParameters( const AccessParameters& value )
 		{
 			_accessParameters = value;
-		}
-
-		int UserFavoriteJourney::getRank() const
-		{
-			return _rank;
 		}
 
 		const std::string& UserFavoriteJourney::getOriginCityName() const
@@ -100,20 +88,9 @@ namespace synthese
 			return _accessParameters;
 		}
 
-		void UserFavoriteJourney::setUser( const User* value )
-		{
-			_user = value;
-		}
-
-		const User* UserFavoriteJourney::getUser() const
-		{
-			return _user;
-		}
-
 		UserFavoriteJourney::UserFavoriteJourney(
 			RegistryKeyType key
 		):	Registrable(key)
-			, _rank(UNKNOWN_VALUE)
 			, _user(NULL)
 		{
 

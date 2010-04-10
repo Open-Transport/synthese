@@ -103,7 +103,7 @@ namespace synthese
 		public:
 
 			Line(
-				util::RegistryKeyType id = UNKNOWN_VALUE,
+				util::RegistryKeyType id = 0,
 				std::string name = std::string()
 			);
 

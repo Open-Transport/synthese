@@ -25,22 +25,20 @@
 #ifndef SYNTHESE_ObjectSiteLinkTableSync_H__
 #define SYNTHESE_ObjectSiteLinkTableSync_H__
 
-
-#include <vector>
-#include <string>
-#include <iostream>
-
+#include "ObjectSiteLink.h"
 #include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace transportwebsite
 	{
-		class ObjectSiteLink;
-
-		/** ObjectSiteLink table synchronizer.
-			@ingroup m56LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 56.10 Table : Links between sites and related objects.
+		/// @author Hugues Romain
+		/// @ingroup m56LS refLS
+		//////////////////////////////////////////////////////////////////////////
+		/// Table name : t001_object_site_links
+		/// Corresponding class : ObjectSiteLink
 		class ObjectSiteLinkTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>
 		{
@@ -68,11 +66,14 @@ namespace synthese
 
 			/** Remove a link between a site and an object specified by their id.
 				@param siteId ID of the site
-				@param objectId ID of the object. UNKNOWN_VALUE = Removes all links of the alarm
+				@param objectId ID of the object. undefined = Removes all links of the alarm
 				@author Hugues Romain
 				@date 2007				
 			*/
-			static void Remove(uid siteId, uid objectId = UNKNOWN_VALUE);
+			static void Remove(
+				util::RegistryKeyType siteId,
+				boost::optional<util::RegistryKeyType> objectId = boost::optional<util::RegistryKeyType>()
+			);
 		};
 	}
 }

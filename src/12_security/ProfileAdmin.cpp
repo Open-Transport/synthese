@@ -119,7 +119,7 @@ namespace synthese
 			AdminActionFunctionRequest<AddRightAction,ProfileAdmin> addRightRequest(_request);
 			addRightRequest.getAction()->setProfile(_profile);
 			
-			vector<pair<int, string> > privatePublicMap;
+			vector<pair<optional<int>, string> > privatePublicMap;
 			privatePublicMap.push_back(make_pair((int) FORBIDDEN, "Interdit"));
 			privatePublicMap.push_back(make_pair((int) USE, "Utilisation"));
 			privatePublicMap.push_back(make_pair((int) READ, "Lecture"));
@@ -161,9 +161,19 @@ namespace synthese
 						form.addHiddenField(UpdateRightAction::PARAMETER_RIGHT_CODE, right->getFactoryKey());
 						form.addHiddenField(UpdateRightAction::PARAMETER_RIGHT_PARAMETER, right->getParameter());
 						stream << form.open();
-						stream << "Public : " << form.getSelectInput(UpdateRightAction::PARAMETER_PUBLIC_VALUE, privatePublicMap, (int) right->getPublicRightLevel());
+						stream << "Public : " <<
+							form.getSelectInput(
+								UpdateRightAction::PARAMETER_PUBLIC_VALUE,
+								privatePublicMap,
+								optional<int>((int) right->getPublicRightLevel())
+							);
 						if (right->getUsePrivateRights())
-							stream << " Privé : " << form.getSelectInput(UpdateRightAction::PARAMETER_PRIVATE_VALUE, privatePublicMap, (int) right->getPrivateRightLevel());
+							stream << " Privé : " <<
+							form.getSelectInput(
+								UpdateRightAction::PARAMETER_PRIVATE_VALUE,
+								privatePublicMap,
+								optional<int>((int) right->getPrivateRightLevel())
+							);
 						stream << form.getSubmitButton("Modifier");
 						stream << form.close();
 					}
@@ -204,16 +214,16 @@ namespace synthese
 				if (pl.size() == 1)
 				{
 					stream << pl.at(0).second;
-					form.addHiddenField(AddRightAction::PARAMETER_PARAMETER, pl.at(0).first);
+					form.addHiddenField(AddRightAction::PARAMETER_PARAMETER, *pl.at(0).first);
 				}
 				else
-					stream << form.getSelectInput(AddRightAction::PARAMETER_PARAMETER, pl, GLOBAL_PERIMETER);
+					stream << form.getSelectInput(AddRightAction::PARAMETER_PARAMETER, pl, optional<string>(GLOBAL_PERIMETER));
 				stream
 					<< "</td>"
-					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, (int) USE) << "</td>"
+					<< "<td>" << form.getSelectInput(AddRightAction::PARAMETER_PUBLIC_LEVEL, privatePublicMap, optional<int>((int) USE)) << "</td>"
 					<< "<td>";
 				if (right->getUsePrivateRights())
-					stream << form.getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, (int) USE);
+					stream << form.getSelectInput(AddRightAction::PARAMETER_PRIVATE_LEVEL, privatePublicMap, optional<int>((int) USE));
 				stream
 					<< "</td>"
 					<< "<td>" 

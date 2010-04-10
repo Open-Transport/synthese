@@ -26,21 +26,20 @@
 #define SYNTHESE_TimetableRowTableSync_H__
 
 
-#include <vector>
-#include <string>
-#include <iostream>
-
+#include "TimetableRow.h"
 #include "SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace timetables
 	{
-		class TimetableRow;
-
-		/** TimetablesRow table synchronizer.
-			@ingroup m55LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 55.10 Table : Timetable row.
+		///	@ingroup m55LS refLS
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Table name : t053_timetable_rows
+		/// Corresponding class : TimetableRow
 		class TimetableRowTableSync:
 			public db::SQLiteNoSyncTableSyncTemplate<TimetableRowTableSync,TimetableRow>
 		{
@@ -65,7 +64,7 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				uid timetableId = UNKNOWN_VALUE
+				boost::optional<util::RegistryKeyType> timetableId = boost::optional<util::RegistryKeyType>()
 				, bool orderByTimetable = true
 				, bool raisingOrder = true
 				, int first = 0
@@ -76,12 +75,12 @@ namespace synthese
 
 
 			static void Shift(
-				uid timetableId
+				util::RegistryKeyType timetableId
 				, int rank
 				, int delta
-				);
+			);
 
-			static int GetMaxRank(uid timetableId);
+			static int GetMaxRank(util::RegistryKeyType timetableId);
 
 		};
 	}

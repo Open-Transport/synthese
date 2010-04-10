@@ -52,7 +52,7 @@ namespace synthese
 	namespace pt
 	{
 		PublicTransportStopZoneConnectionPlace::PublicTransportStopZoneConnectionPlace(
-			util::RegistryKeyType id /*= UNKNOWN_VALUE */
+			util::RegistryKeyType id
 			, bool allowedConnection/*= CONNECTION_TYPE_FORBIDDEN */
 			, posix_time::time_duration defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */
 		):	AddressablePlace(allowedConnection, defaultTransferDelay),

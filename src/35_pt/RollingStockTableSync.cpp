@@ -22,14 +22,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "RollingStockTableSync.h"
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
 #include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
 
 using namespace std;
 using namespace boost;
@@ -50,6 +45,8 @@ namespace synthese
 		const string RollingStockTableSync::COL_NAME("name");
 		const string RollingStockTableSync::COL_ARTICLE("article");
 		const string RollingStockTableSync::COL_INDICATOR("indicator_label");
+		const string RollingStockTableSync::COL_TRIDENT("trident_key");
+		const string RollingStockTableSync::COL_IS_TRIDENT_REFERENCE("is_trident_reference");
 	}
 
 	namespace db
@@ -64,11 +61,14 @@ namespace synthese
 			SQLiteTableSync::Field(RollingStockTableSync::COL_NAME, SQL_TEXT),
 			SQLiteTableSync::Field(RollingStockTableSync::COL_ARTICLE, SQL_TEXT),
 			SQLiteTableSync::Field(RollingStockTableSync::COL_INDICATOR, SQL_TEXT),
+			SQLiteTableSync::Field(RollingStockTableSync::COL_TRIDENT, SQL_TEXT),
+			SQLiteTableSync::Field(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 		
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<RollingStockTableSync>::_INDEXES[]=
 		{
+			SQLiteTableSync::Index(RollingStockTableSync::COL_TRIDENT.c_str(), RollingStockTableSync::COL_IS_TRIDENT_REFERENCE.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
@@ -83,6 +83,8 @@ namespace synthese
 			object->setName(rows->getText(RollingStockTableSync::COL_NAME));
 			object->setArticle(rows->getText(RollingStockTableSync::COL_ARTICLE));
 			object->setIndicator(rows->getText(RollingStockTableSync::COL_INDICATOR));
+			object->setTridentKey(rows->getText(RollingStockTableSync::COL_TRIDENT));
+			object->setIsTridentKeyReference(rows->getBool(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE));
 		}
 
 
@@ -95,6 +97,8 @@ namespace synthese
 			query.addField(object->getName());
 			query.addField(object->getArticle());
 			query.addField(object->getIndicator());
+			query.addField(object->getTridentKey());
+			query.addField(object->getIsTridentKeyReference());
 			query.execute(transaction);
 		}
 
@@ -117,29 +121,33 @@ namespace synthese
 
 
 
-		void RollingStockTableSync::Search(
+		RollingStockTableSync::SearchResult RollingStockTableSync::Search(
 			Env& env,
+			optional<string> tridentKey,
+			bool tridentReference,
+			bool orderByName,
+			bool raisingOrder,
 			int first /*= 0*/,
 			int number /*= 0*/,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
-			/// @todo Fill Where criteria
-			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-				;
-			//if (orderByName)
-			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
-			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
-
-			LoadFromQuery(query.str(), env, linkLevel);
+			SelectQuery<RollingStockTableSync> query;
+			if(tridentKey)
+			{
+				query.addWhereField(COL_TRIDENT, *tridentKey);
+			}
+			if(tridentReference)
+			{
+				query.addWhereField(COL_IS_TRIDENT_REFERENCE, 1);
+			}
+			if(orderByName)
+			{
+				query.addOrderField(COL_NAME, raisingOrder);
+			}
+			query.setNumber(number);
+			query.setFirst(first);
+		
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }

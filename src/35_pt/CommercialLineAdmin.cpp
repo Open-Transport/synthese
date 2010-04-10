@@ -96,7 +96,7 @@ namespace synthese
 		void CommercialLineAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			_searchName = map.getString(PARAMETER_SEARCH_NAME, false, FACTORY_KEY);
+			_searchName = map.getDefault<string>(PARAMETER_SEARCH_NAME);
 			if(!map.getDefault<string>(PARAMETER_DATES_START).empty()
 			){
 				_startDate = from_string(map.get<string>(PARAMETER_DATES_START));
@@ -161,7 +161,7 @@ namespace synthese
 					LineTableSync::Search(
 						_getEnv(),
 						_cline->getKey(),
-						UNKNOWN_VALUE,
+						optional<RegistryKeyType>(),
 						_requestParameters.first,
 						_requestParameters.maxSize,
 						_requestParameters.orderField == PARAMETER_SEARCH_NAME,
@@ -213,7 +213,7 @@ namespace synthese
 					t.getForm().getSelectInput(
 						CommercialLineCalendarTemplateUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID,
 						CalendarTemplateTableSync::GetCalendarTemplatesList("Pas de vérification"),
-						_cline->getCalendarTemplate() ? _cline->getCalendarTemplate()->getKey() : RegistryKeyType(0)
+						optional<RegistryKeyType>(_cline->getCalendarTemplate() ? _cline->getCalendarTemplate()->getKey() : 0)
 				)	);
 				stream << t.close();
 
@@ -345,13 +345,13 @@ namespace synthese
 						_request.getUser()->getProfile()->getGlobalPublicRight<TransportNetworkRight>() >= READ,
 						READ
 					),
-					RegistryKeyType(UNKNOWN_VALUE)
+					optional<RegistryKeyType>()
 				);
 				stream << t.col() <<
 					t.getActionForm().getSelectNumberInput(
 					NonConcurrencyRuleAddAction::PARAMETER_DURATION,
 					0, 120
-					);
+				);
 
 				stream << t.col() <<
 					t.getActionForm().getSubmitButton("Ajouter");

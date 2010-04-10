@@ -21,15 +21,12 @@
 */
 
 #include "SuperiorValueInterfaceElement.h"
-
-#include "11_interfaces/Interface.h"
-#include "11_interfaces/ValueElementList.h"
-#include "11_interfaces/InterfacePageException.h"
+#include "Interface.h"
+#include "ValueElementList.h"
+#include "InterfacePageException.h"
 
 #include <string>
-
-#include "01_util/UId.h"
-#include "01_util/Conversion.h"
+#include <boost/lexical_cast.hpp>
 
 using namespace boost;
 using namespace std;
@@ -53,7 +50,7 @@ namespace synthese
 			, const void* object
 			, const server::Request* request) const
 		{
-			stream << (Conversion::ToLongLong(_left->getValue(parameters, variables, object, request)) > Conversion::ToLongLong(_right->getValue(parameters, variables, object, request))) ? "1" : "0";
+			stream << (boost::lexical_cast<RegistryKeyType>(_left->getValue(parameters, variables, object, request)) > boost::lexical_cast<RegistryKeyType>(_right->getValue(parameters, variables, object, request))) ? "1" : "0";
 			return string();
 		}
 

@@ -170,15 +170,19 @@ namespace synthese
 
 	namespace messages
 	{
-		void AlarmObjectLinkTableSync::Remove( uid alarmId, uid objectId )
-		{
+		void AlarmObjectLinkTableSync::Remove(
+			RegistryKeyType alarmId,
+			optional<RegistryKeyType> objectId
+		){
 			stringstream query;
 			query
 				<< "DELETE FROM " << TABLE.NAME
 				<< " WHERE " 
 				<< COL_ALARM_ID << "=" << Conversion::ToString(alarmId);
-			if (objectId != UNKNOWN_VALUE)
-				query << " AND " << COL_OBJECT_ID << "=" << Conversion::ToString(objectId);
+			if (objectId)
+			{
+				query << " AND " << COL_OBJECT_ID << "=" << *objectId;
+			}
 
 			DBModule::GetSQLite()->execUpdate(query.str());
 		}

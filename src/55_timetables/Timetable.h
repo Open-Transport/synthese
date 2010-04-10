@@ -24,12 +24,12 @@
 #define SYNTHESE_timetables_Timetable_h__
 
 #include "Registrable.h"
-#include "UId.h"
 #include "Registry.h"
 #include "TimetableGenerator.h"
 #include "Exception.h"
 
 #include <string>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -92,7 +92,7 @@ namespace synthese
 			static std::string GetFormatName(ContentType value);
 			static std::string GetIcon(ContentType value);
 
-			typedef std::vector<std::pair<ContentType, std::string> > ContentTypesList;
+			typedef std::vector<std::pair<boost::optional<ContentType>, std::string> > ContentTypesList;
 
 			static ContentTypesList GetFormatsList();
 
@@ -120,7 +120,7 @@ namespace synthese
 
 		public:
 			// Constructeur
-			Timetable(util::RegistryKeyType id = UNKNOWN_VALUE);
+			Timetable(util::RegistryKeyType id = 0);
 
 
 
@@ -132,7 +132,7 @@ namespace synthese
 				void addAuthorizedPhysicalStop(const pt::PhysicalStop* stop);
 				void removeAuthorizedPhysicalStop(const pt::PhysicalStop* stop);
 				void clearAuthorizedPhysicalStops();
-				void setBookId(util::RegistryKeyType value);
+				void setBookId(util::RegistryKeyType value) { _bookId = value; }
 				void setTitle(const std::string& title);
 				void setBaseCalendar(const calendar::CalendarTemplate* calendar);
 				void setRank(int value);
@@ -152,7 +152,7 @@ namespace synthese
 				const calendar::CalendarTemplate*	getBaseCalendar()		const;
 				const std::string&		getTitle()				const;
 				const Rows&				getRows()				const;
-				uid						getBookId()				const;
+				util::RegistryKeyType	getBookId()				const { return _bookId; }
 				int						getRank()				const;
 				ContentType				getContentType()		const;
 				const interfaces::Interface* getInterface()		const;

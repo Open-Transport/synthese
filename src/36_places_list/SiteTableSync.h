@@ -23,22 +23,22 @@
 #ifndef SYNTHESE_SiteTableSync_H__
 #define SYNTHESE_SiteTableSync_H__
 
+#include "SQLiteRegistryTableSyncTemplate.h"
 #include "Site.h"
 
 #include <string>
 #include <iostream>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
-
 namespace synthese
 {
 	namespace transportwebsite
 	{
-		class Site;
-
-		/** Transport website SQLite table synchronizer.
-			@ingroup m56LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 56.10 Table : Transport web site.
+		///	@ingroup m56LS refLS
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Table name : t025_sites
 		class SiteTableSync : public db::SQLiteRegistryTableSyncTemplate<SiteTableSync,Site>
 		{
 		public:
@@ -51,6 +51,7 @@ namespace synthese
 			static const std::string COL_MAX_CONNECTIONS;
 			static const std::string COL_USE_DATES_RANGE;
 			static const std::string COL_PERIODS;
+			static const std::string COL_DISPLAY_ROAD_APPROACH_DETAILS;
 
 
 

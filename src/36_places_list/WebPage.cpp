@@ -40,7 +40,7 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		WebPage::WebPage( util::RegistryKeyType id /*= UNKNOWN_VALUE*/ ):
+		WebPage::WebPage( util::RegistryKeyType id  ):
 			Registrable(id),
 			_startDate(posix_time::not_a_date_time),
 			_endDate(posix_time::not_a_date_time)

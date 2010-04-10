@@ -93,20 +93,6 @@ namespace synthese
 
 
 
-		void Timetable::setBookId( uid id )
-		{
-			_bookId = id;
-		}
-
-
-
-		uid Timetable::getBookId() const
-		{
-			return _bookId;
-		}
-
-
-
 		void Timetable::setRank( int value )
 		{
 			_rank = value;

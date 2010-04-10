@@ -61,7 +61,7 @@ namespace synthese
 		void TridentExportFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_LINE_ID));
-			if (id == UNKNOWN_VALUE)
+			if (id == 0)
 				throw RequestException("Line id must be specified");
 
 			try
@@ -73,7 +73,7 @@ namespace synthese
 				throw RequestException("No such line");
 			}
 
-			_withTisseoExtension = map.getBool(PARAMETER_WITH_TISSEO_EXTENSION, false, false, FACTORY_KEY);
+			_withTisseoExtension = map.getDefault<bool>(PARAMETER_WITH_TISSEO_EXTENSION, false);
 		}
 
 		void TridentExportFunction::run( std::ostream& stream, const Request& request ) const

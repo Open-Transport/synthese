@@ -60,7 +60,7 @@ namespace synthese
 		ParametersMap AlarmAddLinkAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_ALARM_ID, _alarm.get() ? _alarm->getKey() : uid(0));
+			map.insert(PARAMETER_ALARM_ID, _alarm.get() ? _alarm->getKey() : RegistryKeyType(0));
 			map.insert(PARAMETER_RECIPIENT_KEY, _recipientKey);
 			map.insert(PARAMETER_OBJECT_ID, _objectId);
 			return map;
@@ -69,15 +69,15 @@ namespace synthese
 		void AlarmAddLinkAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Recipient key
-			_recipientKey = map.getString(PARAMETER_RECIPIENT_KEY, true, FACTORY_KEY);
+			_recipientKey = map.get<string>(PARAMETER_RECIPIENT_KEY);
 			if (!Factory<AlarmRecipient>::contains(_recipientKey))
 				throw ActionException("Specified recipient not found");
 
 			// Alarm ID
-			setAlarmId(map.getUid(PARAMETER_ALARM_ID, true, FACTORY_KEY));
+			setAlarmId(map.get<RegistryKeyType>(PARAMETER_ALARM_ID));
 			
 			// Object ID
-			setObjectId(map.getUid(PARAMETER_OBJECT_ID, true, FACTORY_KEY));
+			setObjectId(map.get<RegistryKeyType>(PARAMETER_OBJECT_ID));
 		}
 
 		void AlarmAddLinkAction::run(Request& request)

@@ -34,7 +34,7 @@ namespace synthese
 
 	namespace messages
 	{
-		AlarmObjectLinkException::AlarmObjectLinkException(uid objectId, uid alarmId, const std::string& message)
+		AlarmObjectLinkException::AlarmObjectLinkException(RegistryKeyType objectId, RegistryKeyType alarmId, const std::string& message)
 			: synthese::util::Exception(message + " "+ Conversion::ToString(objectId) +" in message " + Conversion::ToString(alarmId))
 		{
 		}

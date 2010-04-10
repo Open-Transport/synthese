@@ -138,10 +138,10 @@ namespace synthese
 
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
-				uid rollingStockId (rows->getLongLong (LineTableSync::COL_ROLLINGSTOCKID));
-				uid bikeComplianceId (rows->getLongLong (LineTableSync::COL_BIKECOMPLIANCEID));
-				uid pedestrianComplianceId (rows->getLongLong (LineTableSync::COL_PEDESTRIANCOMPLIANCEID));
-				uid handicappedComplianceId (rows->getLongLong (LineTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+				util::RegistryKeyType rollingStockId (rows->getLongLong (LineTableSync::COL_ROLLINGSTOCKID));
+				util::RegistryKeyType bikeComplianceId (rows->getLongLong (LineTableSync::COL_BIKECOMPLIANCEID));
+				util::RegistryKeyType pedestrianComplianceId (rows->getLongLong (LineTableSync::COL_PEDESTRIANCOMPLIANCEID));
+				util::RegistryKeyType handicappedComplianceId (rows->getLongLong (LineTableSync::COL_HANDICAPPEDCOMPLIANCEID));
 				RegistryKeyType commercialLineId(rows->getLongLong (LineTableSync::COL_COMMERCIAL_LINE_ID));
 
 				try
@@ -251,8 +251,8 @@ namespace synthese
 	{
 		LineTableSync::SearchResult LineTableSync::Search(
 			Env& env,
-			uid commercialLineId,
-			uid dataSourceId
+			boost::optional<util::RegistryKeyType> commercialLineId,
+			boost::optional<util::RegistryKeyType> dataSourceId
 			, int first /*= 0*/
 			, boost::optional<std::size_t> number
 			, bool orderByName
@@ -264,10 +264,10 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
-			if (commercialLineId != UNKNOWN_VALUE)
-				query << " AND " << COL_COMMERCIAL_LINE_ID << "=" << commercialLineId;
-			if (dataSourceId != UNKNOWN_VALUE)
-				query << " AND " << COL_DATASOURCE_ID << "=" << dataSourceId;
+			if (commercialLineId)
+				query << " AND " << COL_COMMERCIAL_LINE_ID << "=" << *commercialLineId;
+			if (dataSourceId)
+				query << " AND " << COL_DATASOURCE_ID << "=" << *dataSourceId;
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number)

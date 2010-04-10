@@ -78,7 +78,7 @@ namespace synthese
 			*/
 			int operator<=(const Profile& profile) const;
 
-			Profile(util::RegistryKeyType id = UNKNOWN_VALUE);
+			Profile(util::RegistryKeyType id = 0);
 			
 			//!	\name Getters
 			//@{

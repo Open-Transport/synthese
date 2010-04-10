@@ -1,6 +1,6 @@
 
-/** NonPredefinedInterfacePage class implementation.
-	@file NonPredefinedInterfacePage.cpp
+/** UtilTypes class implementation.
+	@file UtilTypes.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,23 +20,45 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "NonPredefinedInterfacePage.h"
-
-using namespace std;
+#include "UtilTypes.h"
 
 namespace synthese
 {
-	template<> const std::string util::FactorableTemplate<interfaces::InterfacePage,interfaces::NonPredefinedInterfacePage>::FACTORY_KEY("*");
-
-	namespace interfaces
+	namespace util
 	{
 
 
 
-		NonPredefinedInterfacePage::NonPredefinedInterfacePage()
-			: Registrable(0)
-		{
 
+		synthese::util::RegistryKeyType encodeUId( RegistryTableType tableId, RegistryNodeType gridNodeId, RegistryObjectType objectId )
+		{
+			RegistryKeyType id (objectId);
+			RegistryKeyType tmp = gridNodeId;
+			id |= (tmp << 32);
+			tmp = tableId;
+			id |= (tmp << 48);
+			return id;
+		}
+
+
+
+		synthese::util::RegistryTableType decodeTableId( RegistryKeyType id )
+		{
+			return static_cast<RegistryTableType>((id & 0xFFFF000000000000LL) >> 48);
+		}
+
+
+
+		synthese::util::RegistryNodeType decodeGridNodeId( RegistryKeyType id )
+		{
+			return static_cast<RegistryNodeType>((id & 0x0000FFFF00000000LL) >> 32);
+		}
+
+
+
+		synthese::util::RegistryObjectType decodeObjectId( RegistryKeyType id )
+		{
+			return static_cast<RegistryObjectType>(id & 0x00000000FFFFFFFFLL);
 		}
 	}
 }

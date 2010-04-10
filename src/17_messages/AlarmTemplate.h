@@ -51,7 +51,7 @@ namespace synthese
 				@param scenario pointer to the scenario its belong
 			*/
 			AlarmTemplate(
-				util::RegistryKeyType key = UNKNOWN_VALUE,
+				util::RegistryKeyType key = 0,
 				const ScenarioTemplate* scenario = NULL
 			);
 			AlarmTemplate(

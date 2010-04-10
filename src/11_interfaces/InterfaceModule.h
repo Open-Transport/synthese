@@ -30,7 +30,6 @@
 #include "ValueElementList.h"
 #include "StaticValueInterfaceElement.h"
 #include "ModuleClassTemplate.hpp"
-#include "UId.h"
 
 #include "11_interfaces/Types.h"
 

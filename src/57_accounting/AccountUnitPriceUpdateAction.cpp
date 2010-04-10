@@ -66,7 +66,7 @@ namespace synthese
 		
 		void AccountUnitPriceUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_value = map.getDouble(PARAMETER_VALUE, true, FACTORY_KEY);
+			_value = map.get<double>(PARAMETER_VALUE);
 
 			uid id(request.getObjectId());
 			try

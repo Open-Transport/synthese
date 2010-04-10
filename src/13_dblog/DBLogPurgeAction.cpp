@@ -58,7 +58,7 @@ namespace synthese
 
 		void DBLogPurgeAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setDBLog(map.getString(PARAMETER_LOG_KEY, true, FACTORY_KEY));
+			setDBLog(map.get<string>(PARAMETER_LOG_KEY));
 
 			try
 			{

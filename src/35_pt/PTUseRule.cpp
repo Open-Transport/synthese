@@ -49,7 +49,7 @@ namespace synthese
 	{
 
 		PTUseRule::PTUseRule(
-			util::RegistryKeyType key /*= UNKNOWN_VALUE */
+			util::RegistryKeyType key
 		):	Registrable(key),
 			_accessCapacity(0),
 			_reservationType(RESERVATION_RULE_FORBIDDEN),

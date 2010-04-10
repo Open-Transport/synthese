@@ -23,8 +23,6 @@
 #ifndef SYNTHESE_CreateDisplayTypeAction_H__
 #define SYNTHESE_CreateDisplayTypeAction_H__
 
-#include "UId.h"
-
 #include "Action.h"
 
 namespace synthese
@@ -36,10 +34,21 @@ namespace synthese
 
 	namespace departurestable
 	{
-		/** CreateDisplayTypeAction action class.
-			@ingroup m54
-		*/
-		class CreateDisplayTypeAction : public util::FactorableTemplate<server::Action, CreateDisplayTypeAction>
+		//////////////////////////////////////////////////////////////////////////
+		/// 54.15 Action : Display type creation.
+		///	@ingroup m54Action refAction
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : createdisplaytype
+		/// Parameters :
+		///	<ul>
+		///		<li>actionParamna : name</li>
+		///		<li>actionParamdi : id of display interface</li>
+		///		<li>actionParamro : number of rows the screens must display</li>
+		///		<li>actionParammi : id of monitoring interface</li>
+		///	</ul>
+		class CreateDisplayTypeAction:
+			public util::FactorableTemplate<server::Action, CreateDisplayTypeAction>
 		{
 		public:
 			static const std::string PARAMETER_NAME;

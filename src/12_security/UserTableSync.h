@@ -26,18 +26,13 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/shared_ptr.hpp>
 
-#include <vector>
-#include <string>
-#include <iostream>
-
+#include "User.h"
 #include "SQLiteNoSyncTableSyncTemplate.h"
 
 namespace synthese
 {
 	namespace security
 	{
-		class User;
-
 		/** User SQLite table synchronizer.
 			@ingroup m12LS refLS
 			@todo Update the opened session on user update

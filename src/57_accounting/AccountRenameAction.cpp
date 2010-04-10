@@ -66,9 +66,9 @@ namespace synthese
 		
 		void AccountRenameAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_value = map.getString(PARAMETER_VALUE, true, FACTORY_KEY);
+			_value = map.get<string>(PARAMETER_VALUE);
 
-			uid id(request.getObjectId());
+			RegistryKeyType id(request.getObjectId());
 			try
 			{
 				_account = AccountTableSync::GetEditable(id);

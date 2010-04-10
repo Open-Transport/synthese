@@ -30,6 +30,7 @@
 
 #include <vector>
 #include <utility>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -81,7 +82,7 @@ namespace synthese
 			public graph::GraphModuleTemplate<PTModule>
 		{
 		public:
-			typedef std::vector<std::pair<util::RegistryKeyType, std::string> > Labels;
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
 
 			static void RTDataCleaner();
 

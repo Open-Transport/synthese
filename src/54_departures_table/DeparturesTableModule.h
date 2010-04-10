@@ -96,17 +96,20 @@ namespace synthese
 			public server::ModuleClassTemplate<DeparturesTableModule>
 		{
 		public:
-			static std::vector<std::pair<uid, std::string> > getDisplayTypeLabels(
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
+
+			static Labels getDisplayTypeLabels(
 				bool withAll = false,
 				bool withNone = false
 			);
-			static std::vector<std::pair<uid, std::string> >	getPlacesWithBroadcastPointsLabels(
+			static Labels	getPlacesWithBroadcastPointsLabels(
 				const security::RightsOfSameClassMap& rights 
 				, bool totalControl 
 				, security::RightLevel neededLevel
 				, bool withAll = false
-				);
-			static std::vector<std::pair<uid, std::string> >	getCommercialLineWithBroadcastLabels(bool withAll = false);
+			);
+
+			static Labels	getCommercialLineWithBroadcastLabels(bool withAll = false);
 		};
 	}
 

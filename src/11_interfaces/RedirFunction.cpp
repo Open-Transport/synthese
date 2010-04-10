@@ -51,7 +51,7 @@ namespace synthese
 		{
 			RequestWithInterface::_setFromParametersMap(map);
 
-			_url = map.getString(PARAMETER_URL, true, FACTORY_KEY);
+			_url = map.get<string>(PARAMETER_URL);
 		}
 
 		void RedirFunction::run( std::ostream& stream, const Request& request ) const

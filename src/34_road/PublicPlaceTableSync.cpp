@@ -25,15 +25,9 @@
 
 #include "PublicPlaceTableSync.h"
 #include "PublicPlace.h"
-#include "City.h"
 #include "CityTableSync.h"
-
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
-
-#include "Conversion.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
 
 using namespace std;
 using namespace boost;
@@ -87,8 +81,7 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				uid cityId (rows->getLongLong (PublicPlaceTableSync::COL_CITYID));
-				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
+				City* city(CityTableSync::GetEditable(rows->getLongLong (PublicPlaceTableSync::COL_CITYID), env, linkLevel).get());
 				object->setCity(city);
 
 				city->addPlaceToMatcher<PublicPlace>(object);
@@ -111,20 +104,11 @@ namespace synthese
 			PublicPlace* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES(" <<
-				object->getKey() << "," <<
-				Conversion::ToSQLiteString(object->getName()) << "," <<
-				(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0)) <<
-			")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<PublicPlaceTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
+			query.execute(transaction);
 		}
-
 	}
 
 	namespace road
@@ -135,23 +119,13 @@ namespace synthese
 			boost::optional<std::size_t> number  /*= 0*/,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
-			/// @todo Fill Where criteria
-			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
-				;
-			//if (orderByName)
-			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			SelectQuery<PublicPlaceTableSync> query;
 			if (number)
-				query << " LIMIT " << (*number + 1);
+				query.setNumber(*number + 1);
 			if (first > 0)
-				query << " OFFSET " << first;
+				query.setFirst(first);
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }

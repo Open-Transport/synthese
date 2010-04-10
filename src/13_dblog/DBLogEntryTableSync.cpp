@@ -20,23 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
-#include <boost/tokenizer.hpp>
-
-#include "Conversion.h"
+#include "DeleteQuery.hpp"
+#include "SelectQuery.hpp"
 #include "ReplaceQuery.h"
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
-#include "DBModule.h"
 
-#include "User.h"
 #include "UserTableSync.h"
-
-#include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
+
+#include <sstream>
+#include <boost/tokenizer.hpp>
 
 using namespace std;
 using namespace boost;
@@ -128,8 +120,7 @@ namespace synthese
 				v.push_back(*it);
 			object->setContent(v);
 
-			uid userId(rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID));
-			object->setUserId(userId);
+			object->setUserId(rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID));
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::Unlink(
@@ -172,10 +163,10 @@ namespace synthese
 			const std::string& logKey
 			, const ptime& startDate
 			, const ptime& endDate
-			, uid userId
+			, optional<RegistryKeyType> userId
 			, DBLogEntry::Level level
-			, uid objectId
-			, uid objectId2
+			, optional<RegistryKeyType> objectId
+			, optional<RegistryKeyType> objectId2
 			, const std::string& text
 			, int first
 			, boost::optional<std::size_t> number
@@ -185,53 +176,67 @@ namespace synthese
 			, bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE "
-					<< COL_LOG_KEY << "=" << Conversion::ToSQLiteString(logKey);
+			SelectQuery<DBLogEntryTableSync> query;
+			query.addWhereField(COL_LOG_KEY, logKey);
 			if (!startDate.is_not_a_date_time())
-				query << " AND " << COL_DATE << ">='" << to_iso_extended_string(startDate.date()) << " " << to_simple_string(startDate.time_of_day()) << "'";
+			{
+				query.addWhereField(COL_DATE, startDate, ComposedExpression::OP_SUPEQ);
+			}
 			if (!endDate.is_not_a_date_time())
-				query << " AND " << COL_DATE << "<='" << to_iso_extended_string(endDate.date()) << " " << to_simple_string(endDate.time_of_day()) << "'";
-			if (userId != UNKNOWN_VALUE)
-				query << " AND " << COL_USER_ID << "=" << userId;
+			{
+				query.addWhereField(COL_DATE, endDate, ComposedExpression::OP_INFEQ);
+			}
+			if(userId)
+			{
+				query.addWhereField(COL_USER_ID, *userId);
+			}
 			if (level != DBLogEntry::DB_LOG_UNKNOWN)
-				query << " AND " << COL_LEVEL << "=" << Conversion::ToString((int) level);
+			{
+				query.addWhereField(COL_LEVEL, static_cast<int>(level));
+			}
 			if (!text.empty())
-				query << " AND " << COL_CONTENT << " LIKE '%" << Conversion::ToSQLiteString(text, false) << "%'";
-			if (objectId != UNKNOWN_VALUE)
-				query << " AND " << COL_OBJECT_ID << "=" << Conversion::ToString(objectId);
-			if (objectId2 != UNKNOWN_VALUE)
-				query << " AND " << COL_OBJECT2_ID << "=" << Conversion::ToString(objectId2);
+			{
+				query.addWhereField(COL_CONTENT, "%" + text + "%", ComposedExpression::OP_LIKE);
+			}
+			if(objectId)
+			{
+				query.addWhereField(COL_OBJECT_ID, *objectId);
+			}
+			if(objectId2)
+			{
+				query.addWhereField(COL_OBJECT2_ID, *objectId2);
+			}
 			if (orderByDate)
-				query << " ORDER BY " << COL_DATE << (raisingOrder ? " ASC" : " DESC");
-			if (orderByUser)
-				query << " ORDER BY " << COL_USER_ID << (raisingOrder ? " ASC" : " DESC") << "," << COL_DATE << (raisingOrder ? " ASC" : " DESC");
-			if (orderByLevel)
-				query << " ORDER BY " << COL_LEVEL << (raisingOrder ? " ASC" : " DESC") << "," << COL_DATE << (raisingOrder ? " ASC" : " DESC");
+			{
+				query.addOrderField(COL_DATE, raisingOrder);
+			}
+			else if (orderByUser)
+			{
+				query.addOrderField(COL_USER_ID, raisingOrder);
+				query.addOrderField(COL_DATE, raisingOrder);
+			}
+			else if (orderByLevel)
+			{
+				query.addOrderField(COL_LEVEL, raisingOrder);
+				query.addOrderField(COL_DATE, raisingOrder);
+			}
 			if (number)
 			{
-				query << " LIMIT " << (*number + 1);
-				if (first > 0)
-					query << " OFFSET " << first;
+				query.setNumber(*number + 1);
+				query.setFirst(first);
 			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 
 
 
 		void DBLogEntryTableSync::Purge( const std::string& logKey, const ptime& endDate )
 		{
-			stringstream query;
-			query <<
-				"DELETE FROM " << TABLE.NAME <<
-				" WHERE " << COL_DATE << "<='" << to_iso_extended_string(endDate.date()) << " " << to_simple_string(endDate.time_of_day()) << "'" <<
-				" AND " << COL_LOG_KEY << "=" << Conversion::ToSQLiteString(logKey)
-			;
-			DBModule::GetSQLite()->execQuery(query.str());
+			DeleteQuery<DBLogEntryTableSync> query;
+			query.addWhereField(COL_DATE, endDate, ComposedExpression::OP_INFEQ);
+			query.addWhereField(COL_LOG_KEY, logKey);
+			query.execute();
 		}
 	}
 }

@@ -70,7 +70,7 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				uid calendarId
+				boost::optional<util::RegistryKeyType> calendarId
 				, int first = 0
 				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
@@ -78,12 +78,12 @@ namespace synthese
 
 
 			static void Shift(
-				uid calendarId
+				util::RegistryKeyType calendarId
 				, int rank
 				, int delta
 			);
 
-			static int GetMaxRank(uid calendarId);
+			static int GetMaxRank(util::RegistryKeyType calendarId);
 		};
 	}
 }

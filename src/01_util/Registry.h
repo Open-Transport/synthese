@@ -157,7 +157,7 @@ namespace synthese
 
 				/** Adds an object to the registry.
 					@param ptr Shared pointer to the object to add
-					@throws RegistryKeyException if the key of the object is UNKNOWN_VALUE or if the keys is already used in the registry
+					@throws RegistryKeyException if the key of the object is 0 or if the keys is already used in the registry
 				*/
 				void add (boost::shared_ptr<T> ptr);
 				
@@ -221,9 +221,9 @@ namespace synthese
 		template<class T>
 		void Registry<T>::add (boost::shared_ptr<T> ptr)
 		{
-			if (ptr->getKey() == UNKNOWN_VALUE)
+			if (ptr->getKey() == 0)
 			{
-				throw RegistryKeyException<T>("Object with unknown key cannot be registered.", UNKNOWN_VALUE);
+				throw RegistryKeyException<T>("Object with unknown key cannot be registered.", 0);
 			}
 
 			if (contains (ptr->getKey ())) 

@@ -395,7 +395,7 @@ namespace synthese
 
 		void Journey::shift(
 			posix_time::time_duration duration,
-			posix_time::time_duration continuousServiceRange /*= UNKNOWN_VALUE*/
+			posix_time::time_duration continuousServiceRange 
 		){
 			for(ServiceUses::iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
 			{

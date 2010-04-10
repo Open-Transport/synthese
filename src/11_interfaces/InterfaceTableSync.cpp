@@ -23,7 +23,7 @@
 #include "Conversion.h"
 
 #include "SQLiteResult.h"
-
+#include "ReplaceQuery.h"
 #include "InterfaceTableSync.h"
 #include "InterfacePageTableSync.h"
 
@@ -93,18 +93,11 @@ namespace synthese
 			Interface* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-
-			query <<
-				" REPLACE INTO " << TABLE.NAME << " VALUES(" <<
-				Conversion::ToString(object->getKey()) << "," <<
-				Conversion::ToSQLiteString(object->getNoSessionDefaultPageCode()) << "," <<
-				Conversion::ToSQLiteString(object->getName()) << "," <<
-				Conversion::ToSQLiteString(object->getDefaultClientURL()) <<
-			")";
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+			ReplaceQuery<InterfaceTableSync> query(*object);
+			query.addField(object->getNoSessionDefaultPageCode());
+			query.addField(object->getName());
+			query.addField(object->getDefaultClientURL());
+			query.execute(transaction);
 		}
 	}
 
@@ -149,7 +142,7 @@ namespace synthese
 			OrderedInterfaceLabels m;
 			if (textWithUnknown)
 			{
-				m.push_back(make_pair(UNKNOWN_VALUE, *textWithUnknown));
+				m.push_back(make_pair(optional<RegistryKeyType>(), *textWithUnknown));
 			}
 			if (textWithNo)
 			{

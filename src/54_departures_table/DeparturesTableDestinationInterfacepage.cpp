@@ -51,7 +51,7 @@ namespace synthese
 	{
 		DeparturesTableDestinationInterfacepage::DeparturesTableDestinationInterfacepage()
 			: FactorableTemplate<interfaces::InterfacePage, DeparturesTableDestinationInterfacepage>(),
-			Registrable(UNKNOWN_VALUE)
+			Registrable(0)
 		{
 		}
 		

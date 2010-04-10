@@ -126,7 +126,7 @@ namespace synthese
 				typename ObjectClass::Registry& registry(env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>());
 				try
 				{
-					uid id = rows->getKey();
+					util::RegistryKeyType id = rows->getKey();
 					if (registry.contains(id))
 					{
 						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(

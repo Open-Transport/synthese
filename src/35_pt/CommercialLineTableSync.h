@@ -66,7 +66,7 @@ namespace synthese
 			static const std::string COL_CALENDAR_TEMPLATE_ID;
 
 			/** CommercialLine search.
-				@param networkId Id of the network which the lines must belong (default = UNKNOWN_VALUE = all networks)
+				@param networkId Id of the network which the lines must belong (default = undefined = all networks)
 				@param name SQL LIKE mask that line names must respect (default = "%" = all names). Use % and ? to specify jokers.
 				@param first First CommercialLine object to answer
 				@param number Number of CommercialLine objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.

@@ -61,7 +61,7 @@ namespace synthese
 		public:
 			////////////////////////////////////////////////////////////////////
 			/// ID of a table
-			typedef int	TableId;
+			typedef unsigned int	TableId;
 
 
 

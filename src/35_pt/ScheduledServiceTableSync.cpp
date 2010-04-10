@@ -106,7 +106,7 @@ namespace synthese
 		){
 		    string serviceNumber (rows->getText(ScheduledServiceTableSync::COL_SERVICENUMBER));
 
-			uid pathId(rows->getLongLong(ScheduledServiceTableSync::COL_PATHID));
+			util::RegistryKeyType pathId(rows->getLongLong(ScheduledServiceTableSync::COL_PATHID));
 
 			try
 			{
@@ -133,11 +133,11 @@ namespace synthese
 					throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");
 				}
 
-				uid bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
+				util::RegistryKeyType bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
 
-				uid handicappedComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+				util::RegistryKeyType handicappedComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
 
-				uid pedestrianComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
+				util::RegistryKeyType pedestrianComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
 
 
 				if(bikeComplianceId > 0)
@@ -235,7 +235,7 @@ namespace synthese
 			SelectQuery<ScheduledServiceTableSync> query;
 			if (commercialLineId || dataSourceId)
 			{
-				query.addTableAndEqualJoin<LineTableSync>(COL_PATHID, TABLE_COL_ID, "l");
+				query.addTableAndEqualJoin<LineTableSync>(TABLE_COL_ID, COL_PATHID);
 			}
 			if (lineId)
 			{
@@ -243,11 +243,11 @@ namespace synthese
 			}
 			if (commercialLineId)
 			{
-				query.addWhereFieldOther("l", LineTableSync::COL_COMMERCIAL_LINE_ID, *commercialLineId);
+				query.addWhereFieldOther<LineTableSync>(LineTableSync::COL_COMMERCIAL_LINE_ID, *commercialLineId);
 			}
 			if (dataSourceId)
 			{
-				query.addWhereFieldOther("l", LineTableSync::COL_DATASOURCE_ID, *dataSourceId);
+				query.addWhereFieldOther<LineTableSync>(LineTableSync::COL_DATASOURCE_ID, *dataSourceId);
 			}
 			if(serviceNumber)
 			{

@@ -129,7 +129,7 @@ namespace synthese
 				const server::Request& searchRequest
 			) const;
 
-			static uid AddCallEntry(const security::User* user);
+			static util::RegistryKeyType AddCallEntry(const security::User* user);
 			
 			static void AddCallInformationEntry(
 				const dblog::DBLogEntry& callEntry,
@@ -137,8 +137,8 @@ namespace synthese
 				const std::string& text,
 				const security::User& user
 			);
-			static void UpdateCallEntryDate(uid callId);
-			static void UpdateCallEntryCustomer(uid callId, uid customerId);
+			static void UpdateCallEntryDate(util::RegistryKeyType callId);
+			static void UpdateCallEntryCustomer(util::RegistryKeyType callId, util::RegistryKeyType customerId);
 
 			static void AddBookReservationEntry(
 				const server::Session* user,

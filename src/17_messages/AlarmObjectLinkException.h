@@ -25,11 +25,9 @@
 #ifndef SYNTHESE_AlarmObjectLinkException_H
 #define SYNTHESE_AlarmObjectLinkException_H
 
-// Util
 #include "Exception.h"
-#include "UId.h"
+#include "UtilTypes.h"
 
-// Std
 #include <string>
 #include <iostream>
 
@@ -47,7 +45,7 @@ namespace synthese
 			/** Constructor.
 				@param message Message to display when the exception occurs.
 			*/
-			AlarmObjectLinkException(uid objectId, uid alarmId, const std::string& message);
+			AlarmObjectLinkException(util::RegistryKeyType objectId, util::RegistryKeyType alarmId, const std::string& message);
 
 			/** Destructor.
 			*/

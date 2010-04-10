@@ -165,7 +165,7 @@ namespace synthese
 			stream << searchTable.cell("Profil", searchTable.getForm().getSelectInput(
 					PARAM_SEARCH_PROFILE_ID,
 					SecurityModule::getProfileLabels(true),
-					_searchProfile.get() ? _searchProfile->getKey() : RegistryKeyType(0)
+					optional<RegistryKeyType>(_searchProfile.get() ? _searchProfile->getKey() : 0)
 			)	);
 			stream << searchTable.close();
 
@@ -229,7 +229,11 @@ namespace synthese
 			stream << t.row();
 			stream << t.col() << t.getActionForm().getTextInput(AddUserAction::PARAMETER_LOGIN, "", "Entrez le login ici");
 			stream << t.col() << t.getActionForm().getTextInput(AddUserAction::PARAMETER_NAME, "", "Entrez le nom ici");
-			stream << t.col() << t.getActionForm().getSelectInput(AddUserAction::PARAMETER_PROFILE_ID, SecurityModule::getProfileLabels(), uid(0));
+			stream << t.col() << t.getActionForm().getSelectInput(
+				AddUserAction::PARAMETER_PROFILE_ID,
+				SecurityModule::getProfileLabels(),
+				optional<RegistryKeyType>(0)
+			);
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.close();
 		}

@@ -49,7 +49,7 @@ namespace synthese
 
 
 		ParseDisplayReturnInterfacePage::ParseDisplayReturnInterfacePage()
-			: Registrable(UNKNOWN_VALUE)
+			: Registrable(0)
 		{
 
 		}

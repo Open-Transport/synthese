@@ -76,8 +76,8 @@ namespace synthese
 				throw ActionException("No such page");
 			}
 
-			RegistryKeyType uid(map.get<RegistryKeyType>(PARAMETER_UP_ID));
-			if(uid > 0)
+			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_UP_ID));
+			if(id > 0)
 			try
 			{
 				_up = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_WEB_PAGE_ID), *_env);

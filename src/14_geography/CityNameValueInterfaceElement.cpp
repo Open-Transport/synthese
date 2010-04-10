@@ -26,9 +26,6 @@
 
 #include <string>
 
-#include "UId.h"
-#include "Conversion.h"
-
 #include "Interface.h"
 #include "ValueElementList.h"
 
@@ -54,19 +51,8 @@ namespace synthese
 			, interfaces::VariablesMap& variables
 			, const void* object, const server::Request* request) const
 		{
-/*			if (_uid == NULL || Conversion::ToLongLong(_uid->getValue(parameters)) == 0 )
-			{
-*/				const City* city = (const City*) object;
-				stream << city->getName();
-/*			}
-			else
-			{
-				const Environment* __Environnement = request->getSite()->getEnvironment();
-				uid cityUID = Conversion::ToLongLong(_uid->getValue(parameters));
-
-				const City* curCommune = __Environnement->getCities().get(cityUID);
-				return curCommune->getName();
-			}*/
+			const City* city = (const City*) object;
+			stream << city->getName();
 			return string ();
 		}
 

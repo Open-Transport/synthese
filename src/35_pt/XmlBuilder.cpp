@@ -26,11 +26,8 @@
 #include <assert.h>
 
 #include "PublicTransportStopZoneConnectionPlace.h"
-
 #include "Conversion.h"
 #include "XmlToolkit.h"
-#include "UId.h"
-
 #include "Point2D.h"
 
 using namespace synthese::util::XmlToolkit;
@@ -53,7 +50,7 @@ namespace synthese
 		shared_ptr<City> 
 		XmlBuilder::CreateCity (XMLNode& node)
 		{
-			uid id (GetLongLongAttr (node, "id"));
+			util::RegistryKeyType id (GetLongLongAttr (node, "id"));
 
 			std::string name (GetStringAttr (node, "name"));
 		    
@@ -69,10 +66,10 @@ namespace synthese
 		{
 			// assert ("connectionPlace" == node.getName ());
 		    
-			uid id (GetLongLongAttr (node, "id"));
+			util::RegistryKeyType id (GetLongLongAttr (node, "id"));
 
 			std::string name (GetStringAttr (node, "name"));
-			uid cityId (GetLongLongAttr (node, "cityId"));
+			util::RegistryKeyType cityId (GetLongLongAttr (node, "cityId"));
 		    
 			std::string typeStr (GetStringAttr (node, "connectionType"));
 
@@ -98,7 +95,7 @@ namespace synthese
 		shared_ptr<CommercialLine> 
 		XmlBuilder::CreateCommercialLine (XMLNode& node)
 		{
-			uid id (GetLongLongAttr (node, "id"));
+			util::RegistryKeyType id (GetLongLongAttr (node, "id"));
 
 			shared_ptr<CommercialLine> commercialLine (new CommercialLine ());
 
@@ -126,13 +123,13 @@ namespace synthese
 		XmlBuilder::CreateLine (XMLNode& node, 
 					const Registry<CommercialLine>& commercialLines)
 		{
-			uid id (GetLongLongAttr (node, "id"));
+			util::RegistryKeyType id (GetLongLongAttr (node, "id"));
 
 			std::string name (GetStringAttr (node, "name"));
 
 			shared_ptr<Line> line(new Line(id, name));
 
-			uid commercialLineId (GetLongLongAttr (node, "commercialLineId"));
+			util::RegistryKeyType commercialLineId (GetLongLongAttr (node, "commercialLineId"));
 			line->setCommercialLine (const_cast<CommercialLine*>(commercialLines.get(commercialLineId).get()));
 		 
 			std::string direction (GetStringAttr (node, "direction"));
@@ -151,10 +148,10 @@ namespace synthese
 		{
 			// assert ("lineStop" == node.getName ());
 
-			uid id (GetLongLongAttr (node, "id"));
+			util::RegistryKeyType id (GetLongLongAttr (node, "id"));
 
-			uid physicalStopId (GetLongLongAttr (node, "physicalStopId"));
-			uid lineId (GetLongLongAttr (node, "lineId"));
+			util::RegistryKeyType physicalStopId (GetLongLongAttr (node, "physicalStopId"));
+			util::RegistryKeyType lineId (GetLongLongAttr (node, "lineId"));
 			int rankInPath (GetIntAttr (node, "rankInPath"));
 			bool isDeparture (GetBoolAttr (node, "isDeparture"));
 			bool isArrival (GetBoolAttr (node, "isArrival"));
@@ -197,9 +194,9 @@ namespace synthese
 			const Registry<PublicTransportStopZoneConnectionPlace>& connectionPlaces)
 		{
 			// assert ("physicalStop" == node.getName ());
-			uid id (GetLongLongAttr (node, "id"));
+			util::RegistryKeyType id (GetLongLongAttr (node, "id"));
 			std::string name (GetStringAttr (node, "name"));
-			uid placeId (GetLongLongAttr (node, "placeId"));
+			util::RegistryKeyType placeId (GetLongLongAttr (node, "placeId"));
 			double x (GetDoubleAttr (node, "x"));
 			double y (GetDoubleAttr (node, "y"));
 

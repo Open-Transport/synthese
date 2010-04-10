@@ -28,6 +28,7 @@
 #include <vector>
 #include <map>
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/optional.hpp>
 
 #include "ServiceUse.h"
 #include "Registry.h"
@@ -59,9 +60,9 @@ namespace synthese
 		WITH_OR_WITHOUT_ANY_BROADCASTPOINT
 		} BroadcastPointsPresence;
 
-	typedef std::map<util::RegistryKeyType, const pt::PublicTransportStopZoneConnectionPlace*> DisplayedPlacesList;
+	typedef std::map<boost::optional<util::RegistryKeyType>, const pt::PublicTransportStopZoneConnectionPlace*> DisplayedPlacesList;
 	typedef std::map<util::RegistryKeyType,const pt::Line*> LineFilter;
-	typedef std::map<util::RegistryKeyType,const pt::PublicTransportStopZoneConnectionPlace*> ForbiddenPlacesList;
+	typedef std::map<boost::optional<util::RegistryKeyType>,const pt::PublicTransportStopZoneConnectionPlace*> ForbiddenPlacesList;
 	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;
 	typedef enum { ENDS_ONLY = 1, WITH_PASSING = 0 } EndFilter;
 	

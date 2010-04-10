@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_env_AdvancedSelectTableSync_h__
 #define SYNTHESE_env_AdvancedSelectTableSync_h__
 
-#include "UId.h"
 #include "Registry.h"
 
 #include <map>
@@ -50,8 +49,8 @@ namespace synthese
 			const boost::optional<boost::gregorian::date>& endDate
 		);
 
-		bool isPlaceServedByCommercialLine(uid Line, uid place);
-		bool isPlaceServedByNetwork(uid networkId, uid place);
+		bool isPlaceServedByCommercialLine(util::RegistryKeyType Line, util::RegistryKeyType place);
+		bool isPlaceServedByNetwork(util::RegistryKeyType networkId, util::RegistryKeyType place);
 		
 		/** Reads in database the rank of the last departure stop of a route.
 			@param line The ID of the route
@@ -63,7 +62,7 @@ namespace synthese
 				- no line-stop are registered for the specified route (database corruption)
 				- no departure line-stop are registered for the specified route (database corruption)
 		*/
-		int getRankOfLastDepartureLineStop(uid line);
+		int getRankOfLastDepartureLineStop(util::RegistryKeyType line);
 	}
 }
 

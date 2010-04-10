@@ -85,7 +85,6 @@ namespace synthese
 				_searchName = map.getOptional<string>(PARAMETER_NAME);
 			}
 			_searchInterfaceId = map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID);
-			if(_searchInterfaceId && *_searchInterfaceId == UNKNOWN_VALUE) _searchInterfaceId = optional<RegistryKeyType>();
 		}
 
 
@@ -132,7 +131,7 @@ namespace synthese
 				f.getForm().getSelectInput(
 					PARAMETER_INTERFACE_ID,
 					InterfaceTableSync::GetInterfaceLabels<DeparturesTableInterfacePage>(),
-					_searchInterfaceId ? *_searchInterfaceId : UNKNOWN_VALUE
+					_searchInterfaceId
 				)
 			);
 			stream << f.close();
@@ -228,7 +227,7 @@ namespace synthese
 					t.getActionForm().getSelectInput(
 						CreateDisplayTypeAction::PARAMETER_INTERFACE_ID,
 						InterfaceTableSync::GetInterfaceLabels<DeparturesTableInterfacePage>(optional<string>()),
-						RegistryKeyType(0)
+						optional<RegistryKeyType>(0)
 					)
 				;
 				stream <<
@@ -243,7 +242,7 @@ namespace synthese
 					t.getActionForm().getSelectInput(
 						CreateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID,
 						InterfaceTableSync::GetInterfaceLabels<ParseDisplayReturnInterfacePage>(optional<string>()),
-						RegistryKeyType(0)
+						optional<RegistryKeyType>(0)
 					)
 				;
 				stream << t.col(2) << t.getActionForm().getSubmitButton("Ajouter");
