@@ -50,6 +50,7 @@
 #include "PTRuleUserAdmin.hpp"
 #include "ServiceTimetableUpdateAction.h"
 #include "ServiceUpdateAction.h"
+#include "AdminModule.h"
 
 using namespace std;
 using namespace boost;
@@ -222,7 +223,9 @@ namespace synthese
 							ServiceTimetableUpdateAction::PARAMETER_TIME,
 							to_simple_string(
 								_service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath())
-						)	);
+							), string(),
+							AdminModule::CSS_TIME_INPUT
+						);
 						stream << tuForm.getSubmitButton("Change");
 						stream << tuForm.close();
 						
@@ -230,7 +233,9 @@ namespace synthese
 						stream << suForm.open();
 						stream << suForm.getTextInput(
 							ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY,
-							string()
+							string(),
+							string(),
+							AdminModule::CSS_2DIGIT_INPUT
 						);
 						stream << suForm.getSubmitButton("Shift");
 						stream << suForm.close();
@@ -251,7 +256,9 @@ namespace synthese
 							ServiceTimetableUpdateAction::PARAMETER_TIME,
 							to_simple_string(
 								_service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath())
-						)	);
+							), string(),
+							AdminModule::CSS_TIME_INPUT
+						);
 						stream << tuForm.getSubmitButton("Change");
 						stream << tuForm.close();
 
@@ -259,7 +266,9 @@ namespace synthese
 						stream << suForm.open();
 						stream << suForm.getTextInput(
 							ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY,
-							string()
+							string(),
+							string(),
+							AdminModule::CSS_2DIGIT_INPUT
 						);
 						stream << suForm.getSubmitButton("Shift");
 						stream << suForm.close();

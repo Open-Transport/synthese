@@ -25,22 +25,14 @@
 #include "Path.h"
 #include "PTModule.h"
 #include "LineTableSync.h"
-#include "CommercialLineTableSync.h"
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"
 #include "GraphConstants.h"
-#include <sstream>
-
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
 #include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
+#include "LineStopTableSync.h"
 
 #include <boost/date_time/posix_time/ptime.hpp>
-
-#include <assert.h>
-#include <set>
 
 using namespace std;
 using namespace boost;
@@ -127,6 +119,10 @@ namespace synthese
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				Path* path = LineTableSync::GetEditable(pathId, env, linkLevel).get();
+				if(path->getEdges().empty())
+				{
+					LineStopTableSync::Search(env, pathId);
+				}
 				
 				if(	path->getEdges ().size () != ss->getArrivalSchedules(false).size ()
 				){

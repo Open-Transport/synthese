@@ -174,7 +174,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 			CalendarTemplateTableSync::SearchResult calendars(
-				CalendarTemplateTableSync::Search(*_env)
+				CalendarTemplateTableSync::Search(Env::GetOfficialEnv())
 			);
 			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, calendars)
 			{

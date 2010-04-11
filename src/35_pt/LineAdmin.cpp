@@ -46,6 +46,10 @@
 #include "ServiceAddAction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "PTPlaceAdmin.h"
+#include "LineUpdateAction.h"
+#include "PTRuleUserAdmin.hpp"
+#include "PropertiesHTMLTable.h"
+#include "RollingStockTableSync.h"
 
 #include <boost/foreach.hpp>
 
@@ -361,11 +365,39 @@ namespace synthese
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				// LineUpdateAction
+				map<optional<bool>, string> waybackMap;
+				waybackMap.insert(make_pair(false, "Aller"));
+				waybackMap.insert(make_pair(true, "Retour"));
 
-				stream << "<h1>Règles d'accès</h1>";
+				AdminActionFunctionRequest<LineUpdateAction,LineAdmin> updateRequest(_request);
+				updateRequest.getAction()->setRoute(const_pointer_cast<Line>(_line));
+				PropertiesHTMLTable p(updateRequest.getHTMLForm());
+				stream << p.open();
+				stream << p.cell(
+					"Nom",
+					p.getForm().getTextInput(LineUpdateAction::PARAMETER_NAME, _line->getName())
+				);
+				stream << p.cell(
+					"Mode de transport",
+					p.getForm().getSelectInput(
+						LineUpdateAction::PARAMETER_TRANSPORT_MODE_ID,
+						RollingStockTableSync::GetLabels(),
+						_line->getRollingStock() ? _line->getRollingStock()->getKey() : optional<RegistryKeyType>()
+				)	);
+				stream << p.cell(
+					"Direction",
+					p.getForm().getTextInput(LineUpdateAction::PARAMETER_DIRECTION, _line->getDirection())
+				);
+				stream << p.cell(
+					"Sens",
+					p.getForm().getRadioInputCollection(
+						LineUpdateAction::PARAMETER_WAYBACK,
+						waybackMap,
+						optional<bool>(_line->getWayBack())
+				)	);
+				stream << p.close();
 
-				// RuleUserUpdateAction
+				PTRuleUserAdmin<Line,LineAdmin>::Display(stream, _line, _request);
 			}
 
 			////////////////////////////////////////////////////////////////////

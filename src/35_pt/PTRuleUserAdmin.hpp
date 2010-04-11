@@ -112,6 +112,12 @@ namespace synthese
 			);
 
 			stream << t.row();
+			stream << t.col(1, std::string(), true) << "Résultat";
+			stream << t.col() << (object->getUseRule(graph::USER_PEDESTRIAN).getUseRuleName());
+			stream << t.col() << (object->getUseRule(graph::USER_HANDICAPPED).getUseRuleName());
+			stream << t.col() << (object->getUseRule(graph::USER_BIKE).getUseRuleName());
+
+			stream << t.row();
 			stream << t.col(4, std::string(), true) << f.getSubmitButton("Enregistrer les modifications");
 
 			stream << t.close();

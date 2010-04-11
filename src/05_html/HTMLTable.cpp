@@ -46,10 +46,12 @@ namespace synthese
 			int colspan = 1;
 			for (ColsVector::const_iterator it = header.begin(); it != header.end(); ++it)
 			{
-				if (!lastHeader.empty())
+				if(it != header.begin())
 				{
-					if (*it == lastHeader)
+					if(*it == lastHeader)
+					{
 						++colspan;
+					}
 					else
 					{
 						s << "<th";

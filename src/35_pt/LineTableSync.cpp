@@ -22,12 +22,8 @@
 
 #include <sstream>
 
-#include "Conversion.h"
-
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
 #include "GraphConstants.h"
 #include "CommercialLineTableSync.h"
 #include "LineTableSync.h"
@@ -121,7 +117,6 @@ namespace synthese
 			bool useInDepartureBoards (rows->getBool (LineTableSync::COL_USEINDEPARTUREBOARDS));
 			bool useInTimetables (rows->getBool (LineTableSync::COL_USEINTIMETABLES));
 			bool useInRoutePlanning (rows->getBool (LineTableSync::COL_USEINROUTEPLANNING));
-			logic::tribool wayBack(rows->getTribool(LineTableSync::COL_WAYBACK));
 			
 			line->setName(name);
 			line->setTimetableName (timetableName);
@@ -130,7 +125,7 @@ namespace synthese
 			line->setUseInDepartureBoards (useInDepartureBoards);
 			line->setUseInTimetables (useInTimetables);
 			line->setUseInRoutePlanning (useInRoutePlanning);
-			line->setWayBack(wayBack);
+			line->setWayBack(rows->getBool(LineTableSync::COL_WAYBACK));
 			line->setRollingStock(NULL);
 			line->setCommercialLine(NULL);
 			line->setDataSource(NULL);
@@ -138,12 +133,7 @@ namespace synthese
 
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
-				util::RegistryKeyType rollingStockId (rows->getLongLong (LineTableSync::COL_ROLLINGSTOCKID));
-				util::RegistryKeyType bikeComplianceId (rows->getLongLong (LineTableSync::COL_BIKECOMPLIANCEID));
-				util::RegistryKeyType pedestrianComplianceId (rows->getLongLong (LineTableSync::COL_PEDESTRIANCOMPLIANCEID));
-				util::RegistryKeyType handicappedComplianceId (rows->getLongLong (LineTableSync::COL_HANDICAPPEDCOMPLIANCEID));
 				RegistryKeyType commercialLineId(rows->getLongLong (LineTableSync::COL_COMMERCIAL_LINE_ID));
-
 				try
 				{
 					CommercialLine* cline(CommercialLineTableSync::GetEditable(commercialLineId, env, linkLevel).get());
@@ -152,7 +142,7 @@ namespace synthese
 				}
 				catch(ObjectNotFoundException<CommercialLine>)
 				{
-					Log::GetInstance().warn("Bad value " + Conversion::ToString(commercialLineId) + " for fare in line " + Conversion::ToString(line->getKey()));
+					Log::GetInstance().warn("Bad value " + lexical_cast<string>(commercialLineId) + " for fare in line " + lexical_cast<string>(line->getKey()));
 				}
 
 				RegistryKeyType dataSourceId(rows->getLongLong(LineTableSync::COL_DATASOURCE_ID));
@@ -166,34 +156,68 @@ namespace synthese
 					}
 					catch(ObjectNotFoundException<DataSource>)
 					{
-						Log::GetInstance().warn("Bad value " + Conversion::ToString(dataSourceId) + " for data source in line " + Conversion::ToString(line->getKey()));
+						Log::GetInstance().warn("Bad value " + lexical_cast<string>(dataSourceId) + " for data source in line " + lexical_cast<string>(line->getKey()));
 					}
 				}
 
 
-				line->setRollingStock(RollingStockTableSync::GetEditable(rollingStockId, env, linkLevel, AUTO_CREATE).get());
+				RegistryKeyType rollingStockId (rows->getLongLong (LineTableSync::COL_ROLLINGSTOCKID));
+				if(rollingStockId > 0)
+				{
+					try
+					{
+						line->setRollingStock(RollingStockTableSync::GetEditable(rollingStockId, env, linkLevel, AUTO_CREATE).get());
+					}
+					catch(ObjectNotFoundException<RollingStock>)
+					{
+						Log::GetInstance().warn("Bad value " + lexical_cast<string>(rollingStockId) + " for rolling stock in line " + lexical_cast<string>(line->getKey()));
+				}	}
+
+
+				RegistryKeyType bikeComplianceId (rows->getLongLong (LineTableSync::COL_BIKECOMPLIANCEID));
 				if(bikeComplianceId > 0)
 				{
-					line->addRule(
-						USER_BIKE,
-						PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get()
-					);
-				}
+					try
+					{
+						line->addRule(
+							USER_BIKE,
+							PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get()
+						);
+					}
+					catch(ObjectNotFoundException<PTUseRule>)
+					{
+						Log::GetInstance().warn("Bad value " + lexical_cast<string>(bikeComplianceId) + " for bike compliance in line " + lexical_cast<string>(line->getKey()));
+				}	}
+
+				RegistryKeyType handicappedComplianceId (rows->getLongLong (LineTableSync::COL_HANDICAPPEDCOMPLIANCEID));
 				if(handicappedComplianceId > 0)
 				{
-					line->addRule(
-						USER_HANDICAPPED,
-						PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get()
-					);
-				}
+					try
+					{
+						line->addRule(
+							USER_HANDICAPPED,
+							PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get()
+							);
+					}
+					catch(ObjectNotFoundException<PTUseRule>)
+					{
+						Log::GetInstance().warn("Bad value " + lexical_cast<string>(handicappedComplianceId) + " for handicapped compliance in line " + lexical_cast<string>(line->getKey()));
+				}	}
+				
+				RegistryKeyType pedestrianComplianceId(rows->getLongLong (LineTableSync::COL_PEDESTRIANCOMPLIANCEID));
 				if(pedestrianComplianceId > 0)
 				{
-					line->addRule(
-						USER_PEDESTRIAN,
-						PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get()
-					);
-				}
-				
+					try
+					{
+						line->addRule(
+							USER_PEDESTRIAN,
+							PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get()
+							);
+					}
+					catch(ObjectNotFoundException<PTUseRule>)
+					{
+						Log::GetInstance().warn("Bad value " + lexical_cast<string>(pedestrianComplianceId) + " for pedestrian compliance in line " + lexical_cast<string>(line->getKey()));
+				}	}
 			}
 		}
 
@@ -204,37 +228,31 @@ namespace synthese
 			optional<SQLiteTransaction&> transaction
 		){
 			if(!object->getCommercialLine()) throw Exception("Line save error. Missing commercial line");
-			stringstream query;
-			if (object->getKey() <= 0) object->setKey(getId());
-			query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< object->getKey() <<
-				"," << object->getCommercialLine()->getKey() <<
-				"," << Conversion::ToSQLiteString(object->getName()) <<
-				"," << Conversion::ToSQLiteString(object->getTimetableName()) <<
-				"," << Conversion::ToSQLiteString(object->getDirection()) <<
-				"," << object->getWalkingLine() <<
-				"," << object->getUseInDepartureBoards() <<
-				"," << object->getUseInTimetables() <<
-				"," << object->getUseInRoutePlanning() <<
-				"," << (
-					object->getRollingStock() ? lexical_cast<string>(object->getRollingStock()->getKey()) : "0") <<
-				"," << (
-					object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
-					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey()) :
-				"0")
-					<< "," << (
-					object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
-					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey()) :
-				"0")
-					<< "," << (
-					object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
-					lexical_cast<string>(static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey()) :
-				"0") <<
-				"," << object->getWayBack() <<
-				"," << (object->getDataSource() ? lexical_cast<string>(object->getDataSource()->getKey()) : "0") <<
-			")";
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+			ReplaceQuery<LineTableSync> query(*object);
+			query.addField(object->getCommercialLine()->getKey());
+			query.addField(object->getName());
+			query.addField(object->getTimetableName());
+			query.addField(object->getDirection());
+			query.addField(object->getWalkingLine());
+			query.addField(object->getUseInDepartureBoards());
+			query.addField(object->getUseInTimetables());
+			query.addField(object->getUseInRoutePlanning());
+			query.addField(object->getRollingStock() ? object->getRollingStock()->getKey() : RegistryKeyType(0));
+			query.addField(
+				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?
+				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() : RegistryKeyType(0)
+			);
+			query.addField(
+				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
+				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() : RegistryKeyType(0)
+			);
+			query.addField(
+				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
+				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() : RegistryKeyType(0)
+			);
+			query.addField(object->getWayBack());
+			query.addField(object->getDataSource() ? object->getDataSource()->getKey() : RegistryKeyType(0));
+			query.execute(transaction);
 		}
 
 
@@ -242,9 +260,10 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Unlink(Line* obj)
 		{
 			if(obj->getCommercialLine())
+			{
 				const_cast<CommercialLine*>(obj->getCommercialLine())->removePath(obj);
+			}
 		}
-
 	}
 
 	namespace pt
@@ -259,24 +278,28 @@ namespace synthese
 			, bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
+			SelectQuery<LineTableSync> query;
 			if (commercialLineId)
-				query << " AND " << COL_COMMERCIAL_LINE_ID << "=" << *commercialLineId;
+			{
+				query.addWhereField(COL_COMMERCIAL_LINE_ID, *commercialLineId);
+			}
 			if (dataSourceId)
-				query << " AND " << COL_DATASOURCE_ID << "=" << *dataSourceId;
+			{
+				query.addWhereField(COL_DATASOURCE_ID, *dataSourceId);
+			}
 			if (orderByName)
-				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			{
+				query.addOrderField(COL_NAME, raisingOrder);
+			}
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
+			{
+				query.setNumber(*number + 1);
+			}
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
-
-			return LoadFromQuery(query.str(), env, linkLevel);
+			{
+				query.setFirst(first);
+			}
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }
-

@@ -68,7 +68,7 @@ namespace synthese
 				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool orderByRank = true
 				, bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
 	}

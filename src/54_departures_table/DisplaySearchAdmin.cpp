@@ -184,7 +184,7 @@ namespace synthese
 
 			DisplayScreenCPUTableSync::SearchResult cpus(
 				DisplayScreenCPUTableSync::Search(
-					_getEnv(),
+					Env::GetOfficialEnv(),
 					_place ? (_place->get() ? (*_place)->getKey() : 0) : optional<RegistryKeyType>(),
 					optional<string>(),
 					_requestParameters.first,
@@ -600,7 +600,7 @@ namespace synthese
 			)	){
 				DisplayScreenCPUTableSync::SearchResult cpus(
 					DisplayScreenCPUTableSync::Search(
-						_getEnv(),
+						Env::GetOfficialEnv(),
 						_place->get() ? (*_place)->getKey() : 0,
 						optional<string>()
 				)	);
@@ -612,13 +612,13 @@ namespace synthese
 				}
 				DisplayScreenTableSync::SearchResult screens(
 					DisplayScreenTableSync::Search(
-					_getEnv(),
-					request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>()
-					, request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
-					, READ
-					, UNKNOWN_VALUE
-					, _place->get() ? (*_place)->getKey() : 0
-					)	);
+						Env::GetOfficialEnv(),
+						request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>(),
+						request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ,
+						READ,
+						optional<RegistryKeyType>(),
+						_place->get() ? (*_place)->getKey() : 0
+				)	);
 				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
 				{
 					if(screen->getCPU()) continue;

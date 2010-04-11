@@ -26,6 +26,8 @@
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -148,6 +150,24 @@ namespace synthese
 			query.setFirst(first);
 		
 			return LoadFromQuery(query, env, linkLevel);
+		}
+
+
+
+		RollingStockTableSync::Labels RollingStockTableSync::GetLabels(
+			std::string unknownLabel
+		){
+			Labels result;
+			if(!unknownLabel.empty())
+			{
+				result.push_back(make_pair(optional<RegistryKeyType>(),unknownLabel));
+			}
+			SearchResult modes(Search(Env::GetOfficialEnv()));
+			BOOST_FOREACH(SearchResult::value_type& mode, modes)
+			{
+				result.push_back(make_pair(mode->getKey(), mode->getName()));
+			}
+			return result;
 		}
 	}
 }

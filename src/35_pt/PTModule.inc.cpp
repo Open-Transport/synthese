@@ -69,6 +69,7 @@
 #include "PTUseRuleUpdateAction.hpp"
 #include "ServiceTimetableUpdateAction.h"
 #include "ServiceUpdateAction.h"
+#include "LineUpdateAction.h"
 
 #include "TransportNetworkRight.h"
 

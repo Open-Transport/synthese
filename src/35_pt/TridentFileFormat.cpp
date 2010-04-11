@@ -1418,8 +1418,9 @@ namespace synthese
 				shared_ptr<Line> route;
 				BOOST_FOREACH(shared_ptr<Line> line, sroutes)
 				{
-					if(*line == routeStops)
-					{
+					if(	(!line->getRollingStock() || line->getRollingStock() == rollingStock.get()) &&
+						*line == routeStops
+					){
 						route = line;
 						continue;
 					}

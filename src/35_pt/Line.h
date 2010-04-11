@@ -98,7 +98,7 @@ namespace synthese
 
 			SubLines	_subLines;	//!< Copied lines handling services which not serve the line theory
 
-			boost::logic::tribool		_wayBack;	//!< true if back route, false if forward route, indeterminate if unknown
+			bool _wayBack;	//!< true if back route, false else (forward route or unknown)
 
 		public:
 
@@ -113,16 +113,16 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				bool					getUseInDepartureBoards ()	const;
-				bool					getUseInTimetables ()		const;
-				bool					getUseInRoutePlanning ()	const;
-				const std::string&		getDirection ()				const;
-				const std::string&		getTimetableName ()			const;
-				pt::RollingStock*			getRollingStock()			const;
-				bool					getWalkingLine ()			const;
-				CommercialLine*			getCommercialLine()			const;
-				const SubLines			getSubLines()				const;
-				boost::logic::tribool	getWayBack()				const;
+				bool				getUseInDepartureBoards ()	const;
+				bool				getUseInTimetables ()		const;
+				bool				getUseInRoutePlanning ()	const;
+				const std::string&	getDirection ()				const;
+				const std::string&	getTimetableName ()			const;
+				pt::RollingStock*	getRollingStock()			const;
+				bool				getWalkingLine ()			const;
+				CommercialLine*		getCommercialLine()			const;
+				const SubLines		getSubLines()				const;
+				bool				getWayBack()				const { return _wayBack; }
 			//@}
 
 
@@ -136,7 +136,7 @@ namespace synthese
 				void setUseInRoutePlanning (bool useInRoutePlanning);
 				void setUseInTimetables (bool useInTimetables);
 				void setCommercialLine(CommercialLine* value);
-				void setWayBack(boost::logic::tribool value);
+				void setWayBack(bool value) { _wayBack = value; }
 			//@}
 
 

@@ -56,7 +56,7 @@ namespace synthese
 			, _useInDepartureBoards (true)
 			, _useInTimetables (true)
 			, _useInRoutePlanning (true)
-			, _wayBack(boost::logic::indeterminate)
+			, _wayBack(false)
 		{	}
 
 
@@ -276,16 +276,6 @@ namespace synthese
 		const Line::SubLines Line::getSubLines() const
 		{
 			return _subLines;
-		}
-
-		boost::logic::tribool Line::getWayBack() const
-		{
-			return _wayBack;
-		}
-
-		void Line::setWayBack( boost::logic::tribool value )
-		{
-			_wayBack = value;
 		}
 		
 		

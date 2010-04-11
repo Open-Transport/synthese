@@ -69,7 +69,7 @@ namespace synthese
 			}
 
 			it = m.find(_getParameterCode(_PARAMETER_ORDER_FIELD));
-			orderField = (it == m.end()) ? defaultOrderField : it->second;
+			orderField = (it == m.end() || it->second.empty()) ? defaultOrderField : it->second;
 
 			it = m.find(_getParameterCode(_PARAMETER_RAISING_ORDER));
 			try

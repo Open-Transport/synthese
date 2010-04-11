@@ -135,7 +135,8 @@ namespace synthese
 			
 			
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
-			
+
+			AdminInterfaceElement::PageLinks CalendarTemplateAdmin::_getCurrentTreeBranch() const;
 		};
 	}
 }

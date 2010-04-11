@@ -59,6 +59,8 @@ namespace synthese
 	{
 		const std::string AdminModule::TABLE_COL_ID = "id";
 		const std::string AdminModule::ICON_PATH_INTERFACE_VARIABLE = "icon_path";
+		const std::string AdminModule::CSS_TIME_INPUT = "time_input";
+		const std::string AdminModule::CSS_2DIGIT_INPUT = "two_digit_input";
 
 
 

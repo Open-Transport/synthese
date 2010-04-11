@@ -422,14 +422,16 @@ namespace synthese
 					@param name Name of the field in the form
 					@param value Default value present in the field at the page load
 					@param displayTextBeforeTyping Text present in the field at the page load, that disapears when the field obtain the focus
+					@param className CSS class to use for display
 					@return std::string The generated HTML code
 					@author Hugues Romain
-					@date 2007
+					@date 2007-2010
 				*/
 				std::string getTextInput(
 					const std::string& name,
 					const std::string& value,
-					std::string displayTextBeforeTyping = std::string()
+					std::string displayTextBeforeTyping = std::string(),
+					std::string className = std::string()
 				);
 
 
@@ -618,16 +620,18 @@ namespace synthese
 					@param name name of the field in the form
 					@param value default value of the field
 					@param displayTextBeforeTyping text to be displayed at the page load and erased at the first field focus
-					@param fieldId unique ID of the field within the page
+					@param fieldId unique ID of the field within the page,
+					@param className CSS class to use for display
 					@return std::string the HTML generated code
 					@author Hugues Romain
-					@date 2008					
+					@date 2008-2010
 				*/
 				static std::string GetTextInput(
-					const std::string& name
-					, const std::string& value
-					, std::string displayTextBeforeTyping = std::string()
-					, std::string fieldId = std::string()
+					const std::string& name,
+					const std::string& value,
+					std::string displayTextBeforeTyping = std::string(),
+					std::string fieldId = std::string(),
+					std::string className = std::string()
 				);
 			//@}
 		};

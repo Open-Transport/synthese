@@ -81,6 +81,20 @@ namespace synthese
 				int number = 0,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
+
+
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
+
+			///////////////////////////////////////////////////////////////////////////
+			/// Generates a list of transport modes to be used by select input.
+			/// @param unknownLabel label of the undefined mode option. Empty = no undefined option
+			/// @return list of transport modes ordered by name.
+			/// @author Hugues Romain
+			/// @since 3.1.16
+			/// @date 2010
+			static Labels GetLabels(
+				std::string unknownLabel = "(inconnu)"
+			);
 		};
 	}
 }

@@ -51,6 +51,10 @@
 #include "CommercialLineUpdateAction.h"
 #include "PropertiesHTMLTable.h"
 #include "ReservationContact.h"
+#include "LineStop.h"
+#include "PhysicalStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "PTRuleUserAdmin.hpp"
 
 using namespace std;
 using namespace boost;
@@ -159,7 +163,7 @@ namespace synthese
 
 				LineTableSync::SearchResult routes(
 					LineTableSync::Search(
-						_getEnv(),
+						Env::GetOfficialEnv(),
 						_cline->getKey(),
 						optional<RegistryKeyType>(),
 						_requestParameters.first,
@@ -170,6 +174,11 @@ namespace synthese
 				
 				ResultHTMLTable::HeaderVector h;
 				h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
+				h.push_back(make_pair(string(), "Origne"));
+				h.push_back(make_pair(string(), "Destination"));
+				h.push_back(make_pair(string(), "Arrêts"));
+				h.push_back(make_pair(string(), "Longueur"));
+				h.push_back(make_pair(string(), "Services"));
 				h.push_back(make_pair(string(), "Actions"));
 				
 				ResultHTMLTable t(h,sortedForm,_requestParameters, routes);
@@ -182,6 +191,25 @@ namespace synthese
 					stream << t.row();
 					stream << t.col();
 					stream << line->getName();
+
+					if(line->getEdges().size() < 2)
+					{
+						stream << t.col(4) << "Trajet non défini";
+					}
+					else
+					{
+						stream << t.col();
+						stream << line->getLineStop(0)->getPhysicalStop()->getConnectionPlace()->getFullName();
+						stream << t.col();
+						stream << line->getLineStop(line->getEdges().size()-1)->getPhysicalStop()->getConnectionPlace()->getFullName();
+						stream << t.col();
+						stream << line->getEdges().size();
+						stream << t.col();
+						stream << line->getLineStop(line->getEdges().size()-1)->getMetricOffset();
+						stream << t.col();
+						stream << line->getServices().size();
+					}
+
 					stream << t.col();
 					stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
 				}
@@ -192,8 +220,8 @@ namespace synthese
 				creationRequest.getAction()->setCommercialLine(const_pointer_cast<CommercialLine>(_cline));
 
 				stream << t.row();
-				stream << t.col() << "Création d'itinéraire";
-				stream << t.col() << HTMLModule::getLinkButton(creationRequest.getURL(), "Créer");
+				stream << t.col(6) << "Création d'itinéraire";
+				stream << t.col() << HTMLModule::getLinkButton(creationRequest.getURL(), "Créer", "chart_line_add.png");
 
 				stream << t.close();
 			}
@@ -384,6 +412,8 @@ namespace synthese
 				stream << t.title("Réservation");
 				stream << t.cell("Centre de contact", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_RESERVATION_CONTACT_ID, _cline->getReservationContact() ? lexical_cast<string>(_cline->getReservationContact()->getKey()) : string()));
 				stream << t.close();
+
+				PTRuleUserAdmin<CommercialLine,CommercialLineAdmin>::Display(stream, _cline, _request);
 			}
 
 			////////////////////////////////////////////////////////////////////

@@ -184,7 +184,7 @@ namespace synthese
 				;
 				stream <<
 					t.cell(
-						"Durée entre les ¨requêtes",
+						"Durée entre les requêtes",
 						t.getForm().getSelectNumberInput(
 							DisplayScreenCPUMaintenanceUpdateAction::PARAMETER_MONITORING_DELAY,
 							1, 120,

@@ -107,23 +107,28 @@ namespace synthese
 
 
 
-		std::string HTMLForm::getTextInput(const std::string& name, const std::string& value, std::string displayTextBeforeTyping/*=""*/)
-		{
+		std::string HTMLForm::getTextInput(
+			const std::string& name,
+			const std::string& value,
+			string displayTextBeforeTyping/*=""*/,
+			string className
+		){
 			if (!_updateRight)
 				return value;
 
 			removeHiddenFieldIfExists(name, value);
 
-			return GetTextInput(name, value, displayTextBeforeTyping, _getFieldId(name));
+			return GetTextInput(name, value, displayTextBeforeTyping, _getFieldId(name), className);
 		}
 
 
 
 		std::string HTMLForm::GetTextInput(
-			const std::string& name
-			, const std::string& value
-			, std::string displayTextBeforeTyping /*= std::string() */
-			, std::string fieldId
+			const std::string& name,
+			const std::string& value,
+			std::string displayTextBeforeTyping /*= std::string() */,
+			std::string fieldId,
+			string className
 		){
 			if (fieldId.empty())
 				fieldId = name + "__ID";
@@ -134,12 +139,21 @@ namespace synthese
 				<< "name=\"" << name << "\" "
 				<< "value=\"";
 			if (value == "" && displayTextBeforeTyping != "")
-				s	<< displayTextBeforeTyping << "\" "
-				<< "onfocus=\"if(this.value == '" << displayTextBeforeTyping << "') this.value='';\" ";
+			{
+				s <<
+					displayTextBeforeTyping << "\" " <<
+					"onfocus=\"if(this.value == '" << displayTextBeforeTyping << "') this.value='';\" ";
+			}
 			else
+			{
 				s << value << "\" ";
-			s	<< "id=\"" << fieldId << "\" "
-				<< "/>";
+			}
+			s << "id=\"" << fieldId << "\" ";
+			if(!className.empty())
+			{
+				s << "class=\"" << className << "\" ";
+			}
+			s << "/>";
 			return s.str();
 		}
 

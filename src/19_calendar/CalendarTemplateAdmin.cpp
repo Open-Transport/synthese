@@ -307,5 +307,18 @@ namespace synthese
 
 			_tabBuilded = true;
 		}
+
+
+
+		AdminInterfaceElement::PageLinks CalendarTemplateAdmin::_getCurrentTreeBranch() const
+		{
+			shared_ptr<CalendarTemplatesAdmin> p(
+				getNewOtherPage<CalendarTemplatesAdmin>()
+			);
+
+			PageLinks links(p->_getCurrentTreeBranch());
+			links.push_back(p);
+			return links;
+		}
 	}
 }
