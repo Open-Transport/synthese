@@ -84,6 +84,7 @@ namespace synthese
 			_maxDelay(12 * 60),			// default = 24 hours
 			_clearingDelay(0),
 			_firstRow(0),
+			_routePlanningWithTransfer(false),
 			_generationMethod(STANDARD_METHOD),
 			_destinationForceDelay(120),	// default = 2 hours
 			_maintenanceIsOnline(true)

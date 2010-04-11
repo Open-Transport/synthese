@@ -19,12 +19,15 @@ Under Windows, the modules are built in the following order :
 	<li>34-road</li>
 	<li>17-messages</li>
 	<li>19-calendar</li>
+	<li>30-server</li>
 	<li>13-dblog</li>
 	<li>14-geography</li>
 	<li>11-interfaces</li>
 	<li>12-security</li>
 	<li>36-places-list</li>
 	<li>20-tree</li>
+	<li>16-impex</li>
+	<li>33-routeplanner</li>
 	<li>31-resa</li>
 	<li>58-hiking</li>
 	<li>54-departures-table</li>
