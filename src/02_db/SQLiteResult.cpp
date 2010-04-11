@@ -245,7 +245,7 @@ namespace synthese
 			std::vector<int> widths;
 			for (int c=0; c<getNbColumns (); ++c) 
 			{
-				int max = 0;
+				size_t max = 0;
 				std::string name (getColumnName (c));
 				if (name.length () > max) max = name.length ();
 

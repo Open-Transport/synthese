@@ -110,7 +110,7 @@ namespace synthese
 		private:
 			static const std::size_t INDICES_NUMBER;
 
-			int			_rankInPath;		//!< Rank in path.
+			std::size_t _rankInPath;		//!< Rank in path.
 
 			Edge* _previousConnectionDeparture;			//!< Previous connection departure edge along path.
 			Edge* _previousDepartureForFineSteppingOnly;	//!< Previous departure edge with or without connection
@@ -153,7 +153,7 @@ namespace synthese
 			//@{
 				void	setIsArrival(bool value);
 				void	setIsDeparture(bool value);
-				void	setRankInPath(int value);
+				void	setRankInPath(std::size_t value) { _rankInPath = value; }
 				void	setParentPath(const Path* path);
 				void	setPreviousConnectionDeparture(Edge* previousConnectionDeparture);
 				void	setPreviousDepartureForFineSteppingOnly (Edge* previousDeparture);
@@ -188,7 +188,7 @@ namespace synthese
 				const DepartureServiceIndices& getDepartureIndices() const;
 				const ArrivalServiceIndices& getArrivalIndices() const;
 
-				int getRankInPath () const;
+				std::size_t getRankInPath () const { return _rankInPath; }
 			//@}
 
 

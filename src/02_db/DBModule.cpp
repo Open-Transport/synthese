@@ -72,7 +72,7 @@ namespace synthese
 
 			Log::GetInstance ().info ("Using lib SQLite version " + SQLite::GetLibVersion ());
 			
-			bool autorespawn (true);
+//			bool autorespawn (true);
 
 			SQLiteSync* syncHook = new SQLiteSync ();
 			DBModule::_sqlite->registerUpdateHook(syncHook);

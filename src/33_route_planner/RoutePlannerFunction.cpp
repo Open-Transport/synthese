@@ -667,7 +667,7 @@ namespace synthese
 								}
 								stream <<
 										" startStopIsTerminus=\"" << (curET.getDepartureEdge()->getRankInPath() == 0 ? "true" : "false") << "\"" <<
-										" endStopIsTerminus=\"" << (curET.getArrivalEdge()->getRankInPath() == curET.getArrivalEdge()->getParentPath()->getEdges().size() - 1 ? "true" : "false") << "\"";
+										" endStopIsTerminus=\"" << (curET.getArrivalEdge()->getRankInPath()+1 == curET.getArrivalEdge()->getParentPath()->getEdges().size() ? "true" : "false") << "\"";
 								if(!line->getDirection().empty())
 								{
 									stream << " destinationText=\"" << line->getDirection() << "\"";
@@ -876,7 +876,7 @@ namespace synthese
 					{
 						GeoPoint gp(WGS84FromLambert(row.place->getPoint()));
 						assert(dynamic_cast<const NamedPlace*>(row.place));
-						const NamedPlace* np(dynamic_cast<const NamedPlace*>(row.place));
+//						const NamedPlace* np(dynamic_cast<const NamedPlace*>(row.place));
 
 						stream <<
 							"<row type=\"" << (row.isOrigin ? "departure" : row.isDestination ? "arrival" : "connection") << "\">" <<

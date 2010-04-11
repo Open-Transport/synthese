@@ -48,16 +48,16 @@ namespace synthese
 	{
 
 		Journey::Journey(
-		):	_continuousServiceRange (posix_time::not_a_date_time),
-			_effectiveDuration(posix_time::seconds(0))
-			, _transportConnectionCount (0)
-			, _distance (0)
-			, _startApproachDuration(posix_time::minutes(0))
-			, _endApproachDuration(posix_time::minutes(0))
-			, _endReached(false)
-			, _distanceToEnd(UNKNOWN_VALUE),
-			_method(UNDEFINED_DIRECTION),
-			_similarity(logic::indeterminate)
+		):	_method(UNDEFINED_DIRECTION),
+			_startApproachDuration(posix_time::minutes(0)),
+			_endApproachDuration(posix_time::minutes(0)),
+			_endReached(false),
+			_distanceToEnd(UNKNOWN_VALUE),
+			_similarity(logic::indeterminate),
+			_continuousServiceRange (posix_time::not_a_date_time),
+			_effectiveDuration(posix_time::seconds(0)),
+			_transportConnectionCount (0),
+			_distance (0)
 		{
 		}
 
@@ -66,7 +66,12 @@ namespace synthese
 		Journey::Journey(
 			const Journey& journey,
 			const ServiceUse& serviceUse
-		):	_continuousServiceRange(
+		):	_startApproachDuration(journey._startApproachDuration),
+			_endApproachDuration(posix_time::minutes(0)),
+			_endReached(false),
+			_distanceToEnd(UNKNOWN_VALUE),
+			_similarity(journey._similarity == false ? false : indeterminate),
+			_continuousServiceRange(
 				journey.getContinuousServiceRange().is_not_a_date_time() ||	
 				journey.getContinuousServiceRange() > serviceUse.getServiceRange() ?
 				serviceUse.getServiceRange() :
@@ -78,12 +83,7 @@ namespace synthese
 				journey._transportConnectionCount :
 				journey._transportConnectionCount + 1
 			),
-			_distance(journey._distance + serviceUse.getDistance()),
-			_startApproachDuration(journey._startApproachDuration),
-			_endApproachDuration(posix_time::minutes(0)),
-			_endReached(false),
-			_distanceToEnd(UNKNOWN_VALUE),
-			_similarity(journey._similarity == false ? false : indeterminate)
+			_distance(journey._distance + serviceUse.getDistance())
 		{
 			assert(journey._method == UNDEFINED_DIRECTION || journey._method == serviceUse.getMethod());
 
@@ -104,7 +104,12 @@ namespace synthese
 		Journey::Journey(
 			const Journey& journey1,
 			const Journey& journey2
-		):	_continuousServiceRange(
+		):	_startApproachDuration(journey1._startApproachDuration),
+			_endApproachDuration(journey2._endApproachDuration),
+			_endReached(journey2._endReached),
+			_distanceToEnd(journey2._distanceToEnd),
+			_similarity(journey1._similarity == false ? false : logic::indeterminate),
+			_continuousServiceRange(
 				journey1.getContinuousServiceRange().is_not_a_date_time() ||
 				journey1.getContinuousServiceRange() > journey2.getContinuousServiceRange() ?
 				journey2.getContinuousServiceRange() :
@@ -115,12 +120,7 @@ namespace synthese
 				journey1._transportConnectionCount +
 				journey2._transportConnectionCount + 1
 			),
-			_distance(journey1._distance + journey2._distance),
-			_startApproachDuration(journey1._startApproachDuration),
-			_endApproachDuration(journey2._endApproachDuration),
-			_endReached(journey2._endReached),
-			_distanceToEnd(journey2._distanceToEnd),
-			_similarity(journey1._similarity == false ? false : logic::indeterminate)
+			_distance(journey1._distance + journey2._distance)
 		{
 			assert(journey1._method == UNDEFINED_DIRECTION || journey2._method == UNDEFINED_DIRECTION || journey1._method == journey2._method);
 

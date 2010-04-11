@@ -124,8 +124,8 @@ namespace synthese
 		TransportSiteAdmin::TransportSiteAdmin()
 			: AdminInterfaceElementTemplate<TransportSiteAdmin>(),
 			_dateTime(not_a_date_time),
-			_log(false),
 			_accessibility(USER_PEDESTRIAN),
+			_log(false),
 			_rollingStockFilter(NULL)
 
 		{ }

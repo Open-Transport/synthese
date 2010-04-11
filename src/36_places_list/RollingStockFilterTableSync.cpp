@@ -203,8 +203,6 @@ namespace synthese
 			boost::optional<std::size_t> number,
 			LinkLevel linkLevel
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-
 			stringstream query;
 			query
 				<< " SELECT *"

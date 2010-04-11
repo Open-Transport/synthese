@@ -67,7 +67,7 @@ namespace synthese
 		) const	{
 			try
 			{
-				int tableId = decodeTableId(id);
+				RegistryTableType tableId = decodeTableId(id);
 				Env env;
 				if (tableId == ScenarioTableSync::TABLE.ID)
 				{

@@ -44,17 +44,17 @@ namespace synthese
 			Vertex* fromVertex,
 			double metricOffset
 		):	Registrable(0),
+			_fromVertex(fromVertex),
 			_parentPath (parentPath),
+			_metricOffset(metricOffset),
 			_rankInPath (rankInPath),
 			_previousConnectionDeparture(NULL),
 			_previousDepartureForFineSteppingOnly(NULL),
 			_followingConnectionArrival(NULL),
 			_followingArrivalForFineSteppingOnly(NULL),
-			_serviceIndexUpdateNeeded (true),
-			_fromVertex(fromVertex),
-			_metricOffset(metricOffset),
 			_departureIndex(INDICES_NUMBER),
-			_arrivalIndex(INDICES_NUMBER)
+			_arrivalIndex(INDICES_NUMBER),
+			_serviceIndexUpdateNeeded (true)
 		{}
 
 
@@ -187,14 +187,6 @@ namespace synthese
 			_viaPoints.clear ();
 		}
 
-
-
-
-		int 
-		Edge::getRankInPath () const
-		{
-			return _rankInPath;
-		}
 
 
 		const Path* 
@@ -422,7 +414,7 @@ namespace synthese
 			{
 				const Service* service = *it;
 				time_duration endHour(Service::GetTimeOfDay(service->getDepartureEndScheduleToIndex(RTData, getRankInPath())));
-				int endHours(endHour.hours());
+				size_t endHours(endHour.hours());
 				time_duration beginHour(Service::GetTimeOfDay(service->getDepartureBeginScheduleToIndex(RTData, getRankInPath())));
 
 				for (numHour = 0; numHour <= endHours; ++numHour)
@@ -451,7 +443,7 @@ namespace synthese
 				const Service* service = *it;
 				time_duration endHour(Service::GetTimeOfDay(service->getArrivalEndScheduleToIndex(RTData, getRankInPath())));
 				time_duration beginHour(Service::GetTimeOfDay(service->getArrivalBeginScheduleToIndex(RTData, getRankInPath())));
-				int beginHours(beginHour.hours());
+				size_t beginHours(beginHour.hours());
 
 				for (numHour = 23; numHour >= beginHours; --numHour)
 				{
@@ -464,7 +456,7 @@ namespace synthese
 				}
 				if (endHour < beginHour)
 				{
-					for (numHour = endHour.hours(); numHour >= 0; --numHour)
+					for (numHour = endHour.hours(); true; --numHour)
 					{
 						if(	_arrivalIndex[numHour].get(RTData) == services.rend())
 						{
@@ -483,12 +475,6 @@ namespace synthese
 			return getFromVertex()->getHub();
 		}
 
-
-
-		void Edge::setRankInPath( int value )
-		{
-			_rankInPath = value;
-		}
 
 		void Edge::setParentPath( const Path* path )
 		{

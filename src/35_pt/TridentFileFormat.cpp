@@ -124,12 +124,12 @@ namespace synthese
 			optional<RegistryKeyType> lineId,
 			bool withTisseoExtension
 		):	FileFormatTemplate<TridentFileFormat>(),
-			_commercialLineId(*lineId),
-			_withTisseoExtension(withTisseoExtension),
 			_importStops(false),
 			_importJunctions(false),
+			_defaultTransferDuration(minutes(8)),
 			_startDate(day_clock::local_day()),
-			_defaultTransferDuration(minutes(8))
+			_commercialLineId(*lineId),
+			_withTisseoExtension(withTisseoExtension)
 		{
 			_env = env;
 		}
@@ -685,7 +685,7 @@ namespace synthese
 						<< "</arrivalTime>" << "\n";
 
 					os	<< "<departureTime>";
-					if (ls->getRankInPath() != linestops.size () - 1 && ls->isDeparture())
+					if (ls->getRankInPath()+1 != linestops.size() && ls->isDeparture())
 					{
 						os << ToXsdTime (Service::GetTimeOfDay(srv->getDepartureBeginScheduleToIndex(false, ls->getRankInPath())));
 					}
@@ -1390,8 +1390,8 @@ namespace synthese
 				XMLNode nameNode(routeNode.getChildNode("name"));
 				routeNames[crouteKeyNode.getText()] = nameNode.getText();
 				routeWaybacks[crouteKeyNode.getText()] = (
-					waybackNode.getText() == "R" ||
-					waybackNode.getText() == "1"
+					waybackNode.getText() == string("R") ||
+					waybackNode.getText() == string("1")
 				);
 			}
 			
@@ -1439,7 +1439,7 @@ namespace synthese
 					_env->getEditableRegistry<Line>().add(route);
 					createdObjects.insert(route->getKey());
 					
-					int rank(0);
+					size_t rank(0);
 					BOOST_FOREACH(PhysicalStop* stop, routeStops)
 					{
 						shared_ptr<LineStop> ls(new LineStop);
@@ -1447,7 +1447,7 @@ namespace synthese
 						ls->setPhysicalStop(stop);
 						ls->setRankInPath(rank);
 						ls->setIsArrival(rank > 0);
-						ls->setIsDeparture(rank < routeStops.size() - 1);
+						ls->setIsDeparture(rank+1 < routeStops.size());
 						ls->setMetricOffset(0);
 						ls->setKey(LineStopTableSync::getId());
 						route->addEdge(ls.get());
@@ -1478,7 +1478,7 @@ namespace synthese
 				
 				// Creation of the service
 				Line* line(routes[jpKeyNode.getText()]);
-				int stopsNumber(serviceNode.nChildNode("VehicleJourneyAtStop"));
+				size_t stopsNumber(serviceNode.nChildNode("VehicleJourneyAtStop"));
 				if(stopsNumber != line->getEdges().size())
 				{
 					os << "WARN : Service " << numberNode.getText() << " / " << keyNode.getText() << " ignored due to bad stops number<br />";
@@ -1492,7 +1492,7 @@ namespace synthese
 				ScheduledService::Schedules arrs;
 				time_duration lastDep(0,0,0);
 				time_duration lastArr(0,0,0);
-				for(int stopRank(0); stopRank < stopsNumber; ++stopRank)
+				for(size_t stopRank(0); stopRank < stopsNumber; ++stopRank)
 				{
 					XMLNode vjsNode(serviceNode.getChildNode("VehicleJourneyAtStop", stopRank));
 					XMLNode depNode(vjsNode.getChildNode("departureTime"));

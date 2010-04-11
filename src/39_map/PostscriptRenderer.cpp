@@ -193,7 +193,7 @@ namespace synthese
 			for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
 				it != selectedLines.end () ; ++it) {
 			const DrawableLine* dbl = *it;
-			const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
+//			const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
 			
 			doDrawCurvedLine(_canvas, dbl);
 			}

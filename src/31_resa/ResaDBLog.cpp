@@ -64,17 +64,17 @@ namespace synthese
 
 	namespace resa
 	{
-		const int ResaDBLog::COL_TYPE(0);
-		const int ResaDBLog::COL_DATE2(1);
-		const int ResaDBLog::COL_TEXT(2);
-		const int ResaDBLog::COL_RESA(3);
+		const size_t ResaDBLog::COL_TYPE(0);
+		const size_t ResaDBLog::COL_DATE2(1);
+		const size_t ResaDBLog::COL_TEXT(2);
+		const size_t ResaDBLog::COL_RESA(3);
 
 
 		std::string ResaDBLog::getObjectName(
 			RegistryKeyType id,
 			const server::Request& searchRequest
 		) const	{
-			int tableId = decodeTableId(id);
+			RegistryTableType tableId = decodeTableId(id);
 
 			if (tableId == UserTableSync::TABLE.ID)
 			{

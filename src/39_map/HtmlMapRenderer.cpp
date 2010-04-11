@@ -156,7 +156,7 @@ namespace synthese
 					boost::replace_all (href, "$id", Conversion::ToString (dbl->getLineId ()));
 		
 					_output << "<area href='" << href << "' shape='poly' coords='";
-					for (int i=0; i<points1.size (); ++i)
+					for (size_t i=0; i<points1.size (); ++i)
 					{
 						_output << (int) points1[i].getX () << "," << (int) (map.getHeight () - points1[i].getY ()) << ",";
 					}
@@ -166,7 +166,7 @@ namespace synthese
 		
 					std::reverse (points2.begin (), points2.end ());
 		
-					for (int i=0; i<points2.size (); ++i)
+					for (size_t i=0; i<points2.size (); ++i)
 					{
 						_output << (int) points2[i].getX () << "," << (int) (map.getHeight () - points2[i].getY ());
 						if (i != points2.size ()-1) _output << ",";
@@ -191,7 +191,7 @@ namespace synthese
 					dbl->calculateAbsoluteShiftedPoints (shiftedPoints, - (_config.getBorderWidth () / 2));
 		
 				// TODO : to be reviewed when via points will be added
-				for (int i=0; i<lineStops.size (); ++i) 
+				for (size_t i=0; i<lineStops.size (); ++i) 
 				{
 					const LineStop* ls = dynamic_cast<const LineStop*> (lineStops.at(i));
 					std::string href (_urlPattern);
@@ -205,7 +205,7 @@ namespace synthese
 					_output << (int) points1[i+1].getX () << "," << (int) (map.getHeight () - points1[i+1].getY ()) << ",";
 					_output << (int) points2[i+1].getX () << "," << (int) (map.getHeight () - points2[i+1].getY ()) << ",";
 					_output << (int) points2[i].getX () << "," << (int) (map.getHeight () - points2[i].getY ());
-					if (i < lineStops.size ()-1) _output << ",";
+					if (i+1 < lineStops.size()) _output << ",";
 					_output << "'/>" << std::endl;
 				}
 			} 

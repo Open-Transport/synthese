@@ -98,7 +98,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Unlink(
 			PhysicalStop* obj
 		){
-			PublicTransportStopZoneConnectionPlace* place = const_cast<PublicTransportStopZoneConnectionPlace*>(obj->getConnectionPlace());
+//			PublicTransportStopZoneConnectionPlace* place = const_cast<PublicTransportStopZoneConnectionPlace*>(obj->getConnectionPlace());
 /// @todo	place->removePhysicalStop(obj);
 
 			obj->setHub(NULL);

@@ -92,7 +92,7 @@ namespace synthese
 		){
 			try
 			{
-				int tableId(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
+				RegistryTableType tableId(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
 				
 				if(tableId == ConnectionPlaceTableSync::TABLE.ID)
 				{

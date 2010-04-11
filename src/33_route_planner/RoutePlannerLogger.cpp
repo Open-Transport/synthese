@@ -46,8 +46,8 @@ namespace synthese
 			const graph::Journey& result
 		):	_stream(stream),
 			_t(9, ResultHTMLTable::CSS_CLASS),
-			_searchNumber(0),
-			_result(result)
+			_result(result),
+			_searchNumber(0)
 		{
 		}
 

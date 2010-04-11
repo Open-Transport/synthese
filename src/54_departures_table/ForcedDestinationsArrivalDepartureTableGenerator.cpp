@@ -146,7 +146,7 @@ namespace synthese
 					if (serviceInstance.getService() == NULL)
 						continue;
 
-					bool insertionIsDone = false;
+//					bool insertionIsDone = false;
 
 					// Exploration of the line
 					for(const LineStop* curGLA(

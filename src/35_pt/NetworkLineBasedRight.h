@@ -149,7 +149,7 @@ namespace synthese
 				}
 				if (tableId1 == CommercialLineTableSync::TABLE.ID)
 				{
-					int tableId2(util::decodeTableId(id2));
+					util::RegistryTableType tableId2(util::decodeTableId(id2));
 					if (tableId2 == CommercialLineTableSync::TABLE.ID)
 						return id1 == id2;
 					if (tableId2 == ConnectionPlaceTableSync::TABLE.ID)

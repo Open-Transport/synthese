@@ -26,6 +26,7 @@
 #include "SQLiteResult.h"
 #include "DBModule.h"
 #include "SQLExpression.hpp"
+#include "SQLite.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>

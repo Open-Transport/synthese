@@ -63,15 +63,15 @@ namespace synthese
 		DBLogHTMLView::DBLogHTMLView(
 			const std::string& code
 		):	_code(code),
-			_searchLevel(DBLogEntry::DB_LOG_UNKNOWN),
 			_searchStartDate(not_a_date_time),
-			_searchEndDate(not_a_date_time),
-			_fixedLevel(true),
 			_fixedStartDate(true),
+			_searchEndDate(not_a_date_time),
 			_fixedEndDate(true),
-			_fixedObjectId(true),
+			_searchLevel(DBLogEntry::DB_LOG_UNKNOWN),
+			_fixedLevel(true),
 			_fixedUserId(true),
-			_fixedText(true)
+			_fixedText(true),
+			_fixedObjectId(true)
 		{
 		}
 

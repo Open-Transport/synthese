@@ -167,7 +167,7 @@ namespace synthese
 			for(;
 				i < _orderedPlaces.size() && _orderedPlaces[i].place != NULL && _orderedPlaces[ i ].place != GareAChercher;
 				++i
-			);
+			) ;
 
 			// Gare trouvï¿e en suivant avant la fin du tableau
 			if (i < _orderedPlaces.size() && _orderedPlaces[i].place != NULL )
@@ -177,7 +177,7 @@ namespace synthese
 			for(i = 0;
 				i < _orderedPlaces.size() && _orderedPlaces[ i ].place != NULL && _orderedPlaces[i].place != GareAChercher;
 				++i
-			);
+			) ;
 
 			return i < _orderedPlaces.size() && _orderedPlaces[ i ].place != NULL;
 		}
@@ -221,7 +221,7 @@ namespace synthese
 			else if (isLockedAtTheTop)
 				position = 0;
 			else
-				for (; position < _orderedPlaces.size() && _orderedPlaces[position].isOrigin; ++position);
+				for (; position < _orderedPlaces.size() && _orderedPlaces[position].isOrigin; ++position) ;
 
 			// Insertion
 			PlaceInformation pi;
@@ -268,7 +268,7 @@ namespace synthese
 				i = PositionSouhaitee;
 				for ( j = PositionSouhaitee; true; ++j)
 				{
-					for (; i<LignesAPermuter.size() && !LignesAPermuter[i]; ++i);
+					for (; i<LignesAPermuter.size() && !LignesAPermuter[i]; ++i) ;
 
 					if ( i > PositionActuelle )
 						break;
@@ -289,7 +289,7 @@ namespace synthese
 			{
 				for ( j = 0; true; ++j)
 				{
-					for(i = j; i < LignesAPermuter.size() && !LignesAPermuter[ i ] && i <= PositionActuelle; ++i);
+					for(i = j; i < LignesAPermuter.size() && !LignesAPermuter[ i ] && i <= PositionActuelle; ++i) ;
 
 					if ( i > PositionActuelle )
 						break;

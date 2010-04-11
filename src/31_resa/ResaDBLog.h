@@ -104,10 +104,10 @@ namespace synthese
 				OTHER = 100
 			} _EntryType;
 
-			static const int COL_TYPE;
-			static const int COL_DATE2;
-			static const int COL_TEXT;
-			static const int COL_RESA;
+			static const std::size_t COL_TYPE;
+			static const std::size_t COL_DATE2;
+			static const std::size_t COL_TEXT;
+			static const std::size_t COL_RESA;
 
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;

@@ -43,9 +43,9 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		WebPageInterfacePage::WebPageInterfacePage()
-			: FactorableTemplate<interfaces::InterfacePage, WebPageInterfacePage>(),
-			Registrable(0)
+		WebPageInterfacePage::WebPageInterfacePage():
+			Registrable(0),
+			FactorableTemplate<interfaces::InterfacePage, WebPageInterfacePage>()
 		{
 		}
 		

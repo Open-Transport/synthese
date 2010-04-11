@@ -350,7 +350,7 @@ Map::findMostSharedLine (const std::set<DrawableLine*>& drawableLines,
 		int nbSharedPoints = 0;
 			
 		// Calculate the total of shared points of this line
-		for (int i=0; i<line->getFuzzyfiedPoints().size (); ++i) 
+		for (size_t i=0; i<line->getFuzzyfiedPoints().size (); ++i) 
 		{
 			nbSharedPoints += findLinesSharingPoint (
 			drawableLines, 
@@ -572,7 +572,7 @@ Map::preparePhysicalStops ()
         if (dbl->getWithPhysicalStops () == false) continue;
 
 	    const std::vector<const Point2D*>& points = dbl->getPoints ();
-	    for (int i=0; i<points.size (); ++i)
+	    for (size_t i=0; i<points.size (); ++i)
 	    {
 	        const Point2D* p = points[i];
 

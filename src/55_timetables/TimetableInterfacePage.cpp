@@ -56,9 +56,9 @@ namespace synthese
 
 	namespace timetables
 	{
-		TimetableInterfacePage::TimetableInterfacePage()
-			: FactorableTemplate<interfaces::InterfacePage, TimetableInterfacePage>(),
-			Registrable(0)
+		TimetableInterfacePage::TimetableInterfacePage():
+			Registrable(0),
+			FactorableTemplate<interfaces::InterfacePage, TimetableInterfacePage>()
 		{
 		}
 		

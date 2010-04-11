@@ -55,7 +55,7 @@ namespace synthese
 		void PTObjectInformationFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			RegistryKeyType id(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
-			int tableId(decodeTableId(id));
+			RegistryTableType tableId(decodeTableId(id));
 
 			if(tableId == TransportNetworkTableSync::TABLE.ID)
 			{

@@ -173,7 +173,7 @@ DrawableLine::setShift (int pointIndex, int shift)
 int 
 DrawableLine::firstIndexOf (const Point2D& p) const
 {
-    for(int i=0; i<_fuzzyfiedPoints.size (); ++i)
+    for(size_t i=0; i<_fuzzyfiedPoints.size (); ++i)
     {
 	if (_fuzzyfiedPoints[i] == p) return i;	 	
     }
@@ -220,7 +220,7 @@ DrawableLine::isFullyReverseWay (const DrawableLine* dbl) const
     std::vector<Point2D> points2 = dbl->getFuzzyfiedPoints ();
     std::reverse (points2.begin (), points2.end ());
     if (points2.size () != _fuzzyfiedPoints.size ()) return false;
-    for (int i=0; i<_fuzzyfiedPoints.size (); ++i)
+    for (size_t i=0; i<_fuzzyfiedPoints.size (); ++i)
     {
 	if ((_fuzzyfiedPoints[i]) != (points2[i])) return false;
     }
@@ -233,7 +233,7 @@ DrawableLine::isFullySameWay (const DrawableLine* dbl) const
 {
     const std::vector<Point2D>& points2 = dbl->getFuzzyfiedPoints ();
     if (points2.size () != _fuzzyfiedPoints.size ()) return false;
-    for (int i=0; i<_fuzzyfiedPoints.size (); ++i)
+    for (size_t i=0; i<_fuzzyfiedPoints.size (); ++i)
     {
 	if (_fuzzyfiedPoints[i] != points2[i]) return false;
     }

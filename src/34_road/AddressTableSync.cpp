@@ -103,7 +103,7 @@ namespace synthese
 				// Columns reading
 				RegistryKeyType placeId = rows->getLongLong (AddressTableSync::COL_PLACEID);
 				RegistryKeyType sourceId = rows->getLongLong (AddressTableSync::COL_SOURCE_ID);
-				int tableId = decodeTableId(placeId);
+				RegistryTableType tableId = decodeTableId(placeId);
 
 				// Links from the object
 				try

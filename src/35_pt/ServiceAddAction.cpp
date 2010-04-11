@@ -66,9 +66,9 @@ namespace synthese
 
 
 		ServiceAddAction::ServiceAddAction():
+			_period(minutes(0)),
 			_startDepartureTime(not_a_date_time),
-			_endDepartureTime(not_a_date_time),
-			_period(minutes(0))
+			_endDepartureTime(not_a_date_time)
 		{
 
 		}

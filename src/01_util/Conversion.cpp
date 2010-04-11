@@ -220,7 +220,7 @@ namespace synthese
 	    {
 		assert (s.length () <= paddedsize);
 		std::stringstream ss;
-		for (int i=0; i<(paddedsize - s.length ()); ++i) ss << padchar;
+		for (size_t i=0; i<(paddedsize - s.length ()); ++i) ss << padchar;
 		ss << s;
 		return ss.str ();
 	    }
@@ -231,7 +231,7 @@ namespace synthese
 		assert (s.length () <= paddedsize);
 		std::stringstream ss;
 		ss << s;
-		for (int i=0; i<(paddedsize - s.length ()); ++i) ss << padchar;
+		for (size_t i=0; i<(paddedsize - s.length ()); ++i) ss << padchar;
 		return ss.str ();
 	    }
 

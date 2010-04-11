@@ -49,9 +49,9 @@ namespace synthese
 		Path::Path():
 			RuleUser(),
 			Calendar(),
-			_allDays(false),
 			_pathGroup(NULL),
-			_pathClass(NULL)
+			_pathClass(NULL),
+			_allDays(false)
 		{
 		}
 		    
@@ -165,7 +165,7 @@ namespace synthese
 			Edges::iterator insertionPosition;
 			for(insertionPosition = _edges.begin();
 				insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() < edge->getRankInPath();
-				++insertionPosition);
+				++insertionPosition) ;
 
 			// If an edge with the same rank exists, then throw an exception or shift all ranks after it, depending on the autoshift parameter
 			if(insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() == edge->getRankInPath())
