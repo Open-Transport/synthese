@@ -141,9 +141,9 @@ namespace synthese
 			const TimetableServiceColCellInterfacePage* page(getInterface()->getPage<TimetableServiceColCellInterfacePage>());
 			stringstream content;
 			size_t colRank(0);
-			BOOST_FOREACH(const TimetableWarning* note, notes)
+			BOOST_FOREACH(const TimetableResult::RowNotesVector::value_type& note, notes)
 			{
-				page->display(content, note, 0, colRank++, variables, request);
+				page->display(content, note.get(), 0, colRank++, variables, request);
 			}
 			pv.push_back(content.str()); //1
 

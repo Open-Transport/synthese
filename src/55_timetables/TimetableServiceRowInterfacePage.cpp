@@ -80,8 +80,8 @@ namespace synthese
 			pv.push_back(lexical_cast<string>(Service::GetTimeOfDay(object.getContent().begin()->second).hours())); //0
 			pv.push_back(lexical_cast<string>(Service::GetTimeOfDay(object.getContent().begin()->second).minutes())); //1
 			pv.push_back(lexical_cast<string>(Service::GetTimeOfDay(lastSchedule).hours())); //2
-			pv.push_back(object.getWarning() ? lexical_cast<string>(object.getWarning()->getNumber()) : string()); //3
-			pv.push_back(object.getWarning() ? object.getWarning()->getText() : string()); //4
+			pv.push_back(object.getWarning().get() ? lexical_cast<string>(object.getWarning()->getNumber()) : string()); //3
+			pv.push_back(object.getWarning().get() ? object.getWarning()->getText() : string()); //4
 
 			// 5 : Cells content
 			stringstream content;

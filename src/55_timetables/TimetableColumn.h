@@ -73,7 +73,7 @@ namespace synthese
 			// Variables
 			Content		_content;
 			calendar::Calendar				_calendar;
-			const TimetableWarning*			_warning;
+			boost::shared_ptr<TimetableWarning>			_warning;
 			const pt::Line*				_line;
 			tTypeOD							_originType;
 			tTypeOD							_destinationType;
@@ -98,7 +98,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void	setWarning(const TimetableWarning* value) { _warning = value; }
+				void	setWarning(boost::shared_ptr<TimetableWarning> value) { _warning = value; }
 			//@}
 
 			//! @name Getters
@@ -108,7 +108,7 @@ namespace synthese
 				const pt::Line*						getLine()				const { return _line; }
 				tTypeOD									getOriginType()			const { return _originType; }
 				tTypeOD									getDestinationType()	const { return _destinationType; }
-				const TimetableWarning*					getWarning()			const { return _warning; }
+				boost::shared_ptr<TimetableWarning>					getWarning()			const { return _warning; }
 			//@}
 		};
 	}

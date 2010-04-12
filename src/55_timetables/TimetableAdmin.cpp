@@ -593,7 +593,7 @@ namespace synthese
 						{
 							stream << tw.row();
 							stream << tw.col() << warn.first;
-							stream << tw.col() << warn.second.getText();
+							stream << tw.col() << warn.second->getText();
 						}
 
 						stream << tw.close();

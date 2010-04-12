@@ -85,7 +85,7 @@ namespace synthese
 				const TimetableNoteInterfacePage* notePage(getInterface()->getPage<TimetableNoteInterfacePage>());
 				BOOST_FOREACH(const TimetableResult::Warnings::value_type& warning, result.getWarnings())
 				{
-					notePage->display(notes, warning.second, variables, request);
+					notePage->display(notes, *warning.second, variables, request);
 				}
 			}
 			pv.push_back(notes.str()); //2

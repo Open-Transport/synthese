@@ -48,9 +48,8 @@ namespace synthese
 		TimetableColumn::TimetableColumn(
 			const TimetableGenerator& timetablegenerator,
 			const SchedulesBasedService& service
-		):	_warning(NULL)
-			, _line(static_cast<const Line*>(service.getPath()))
-			, _calendar(service)
+		):	_line(static_cast<const Line*>(service.getPath())),
+			_calendar(service)
 		{
 			_calendar &= timetablegenerator.getBaseCalendar();
 			const TimetableGenerator::Rows& rows(timetablegenerator.getRows());

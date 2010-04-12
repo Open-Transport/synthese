@@ -56,9 +56,9 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<TimetableColumn>			Columns;
-			typedef std::map<std::size_t, TimetableWarning>		Warnings;
+			typedef std::map<std::size_t, boost::shared_ptr<TimetableWarning> >		Warnings;
 			typedef std::vector<pt::CommercialLine*> RowLinesVector;
-			typedef std::vector<const TimetableWarning*> RowNotesVector;
+			typedef std::vector<boost::shared_ptr<TimetableWarning> > RowNotesVector;
 			typedef std::vector<const pt::RollingStock*> RowRollingStockVector;
 			typedef std::vector<boost::posix_time::time_duration> RowTimesVector;
 			typedef std::vector<TimetableColumn::tTypeOD>	RowTypeODVector;

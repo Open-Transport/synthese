@@ -140,26 +140,26 @@ namespace synthese
 			{
 				if(itCol->getCalendar() == _baseCalendar) continue;
 
-				const TimetableWarning* warn(NULL);
+				shared_ptr<TimetableWarning> warn;
 				BOOST_FOREACH(const TimetableResult::Warnings::value_type& itWarn, result.getWarnings())
 				{
-					if(itWarn.second.getCalendar() == itCol->getCalendar())
+					if(itWarn.second->getCalendar() == itCol->getCalendar())
 					{
-						warn = &itWarn.second;
+						warn = itWarn.second;
 						break;
 					}
 				}
 				
-				if (warn == NULL)
+				if (!warn.get())
 				{
-					warn = &result.getWarnings().insert(
+					warn = result.getWarnings().insert(
 						make_pair(
 							nextNumber,
-							TimetableWarning(
+							shared_ptr<TimetableWarning>(new TimetableWarning(
 								itCol->getCalendar(),
 								nextNumber,
 								CalendarModule::GetBestCalendarTitle(itCol->getCalendar(), _baseCalendar)
-					)	)	).first->second;
+					)	)	)	).first->second;
 					++nextNumber;
 				}
 				
