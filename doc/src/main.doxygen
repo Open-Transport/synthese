@@ -35,13 +35,20 @@ SYNTHESE est le véritable couteau Suisse des transports publics.
 
 <h2>Documentation technique (en anglais)</h2>
 
+<h3>Developer documentation</h3>
+
 <ul>
 <li>@ref ref</li>
 <li>@ref mod</li>
 <li>@subpage thematics</li>
-<li>@subpage admindoc</li>
 <li>@subpage tools</li>
 <li>@subpage build</li>
+</ul>
+
+<h3>Administrator documentation</h3>
+
+<ul>
+	<li>@subpage admindoc</li>
 </ul>
 
 <h2>License</h2>
