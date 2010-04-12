@@ -26,29 +26,23 @@ SYNTHESE est le véritable couteau Suisse des transports publics.
 <li><a href="cccc/cccc.html">Metrics</a></li>
 </ul>
 
-<h2>Documentation utilisateur</h2>
+<h2>Documentation utilisateur / administrateur</h2>
 
 <ul>
-<li>@subpage userdoc</li>
-<li>@subpage admindoccompil</li>
+	<li>@subpage userdoc</li>
+	<li>@subpage admindoc</li>
 </ul>
 
-<h2>Documentation technique (en anglais)</h2>
+<h2>Documentation développeur (en anglais)</h2>
 
 <h3>Developer documentation</h3>
 
 <ul>
-<li>@ref ref</li>
-<li>@ref mod</li>
-<li>@subpage thematics</li>
-<li>@subpage tools</li>
-<li>@subpage build</li>
-</ul>
-
-<h3>Administrator documentation</h3>
-
-<ul>
-	<li>@subpage admindoc</li>
+	<li>@ref ref</li>
+	<li>@ref mod</li>
+	<li>@subpage thematics</li>
+	<li>@subpage tools</li>
+	<li>@subpage build</li>
 </ul>
 
 <h2>License</h2>
