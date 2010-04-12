@@ -219,7 +219,7 @@ namespace synthese
 				stream << t3.col() << HTMLModule::getLinkButton(deleteScenarioRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le scénario " + scenario->getName() + " ?", "cog_delete.png");
 			}
 
-			stream << t3.row();
+			stream << t3.row(string());
 			stream << t3.col() << t3.getActionForm().getTextInput(AddScenarioAction::PARAMETER_NAME, string(), "Entrez le nom ici");
 			stream << t3.col(2) << t3.getActionForm().getSubmitButton("Ajouter");
 			stream << t3.close();

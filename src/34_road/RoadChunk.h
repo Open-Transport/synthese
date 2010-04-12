@@ -68,7 +68,7 @@ namespace synthese
 		//@{
 			Address* getFromAddress() const;
 			void setFromAddress(Address* fromAddress);
-			void setRoad(const Road* road);
+			void setRoad(Road* road);
 		//@}
 		
 
@@ -77,7 +77,7 @@ namespace synthese
 			virtual bool isDepartureAllowed() const;
 			virtual bool isArrivalAllowed() const;
 
-			const Road* getRoad() const;
+			Road* getRoad() const;
 		//@}
 
 

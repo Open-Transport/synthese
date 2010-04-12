@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_ResaCustomersAdmin_H__
 #define SYNTHESE_ResaCustomersAdmin_H__
 
-#include "ActionResultHTMLTable.h"
+#include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
 
 namespace synthese
@@ -37,11 +37,14 @@ namespace synthese
 
 	namespace resa
 	{
-		/** ResaCustomersAdmin Class.
-			@ingroup m31Admin refAdmin
-			@author Hugues Romain
-			@date 2008
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 31.14 Admin : Reservation customers search.
+		///	@ingroup m31Admin refAdmin
+		///	@author Hugues Romain
+		///	@date 2008
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : ResaCustomersAdmin
+		///
 		class ResaCustomersAdmin : public admin::AdminInterfaceElementTemplate<ResaCustomersAdmin>
 		{
 		public:
@@ -53,7 +56,7 @@ namespace synthese
 			boost::optional<std::string>					_searchLogin;
 			boost::optional<std::string>					_searchName;
 			boost::optional<std::string>					_searchSurname;
-			html::ActionResultHTMLTable::RequestParameters	_requestParameters;
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
 		public:
 			

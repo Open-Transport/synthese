@@ -239,7 +239,7 @@ namespace synthese
 
 			//! @name Export parameters
 			//@{
-				util::RegistryKeyType	_commercialLineId;
+				boost::optional<util::RegistryKeyType>	_commercialLineId;
 				const bool				_withTisseoExtension;
 			//@}
 		

@@ -51,10 +51,13 @@
 #include "ServiceTimetableUpdateAction.h"
 #include "ServiceUpdateAction.h"
 #include "AdminModule.h"
+#include "ServiceApplyCalendarAction.h"
+#include "CalendarTemplateTableSync.h"
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -63,7 +66,6 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace security;
-	using namespace pt;
 	using namespace pt;
 	using namespace graph;
 	using namespace html;
@@ -326,10 +328,28 @@ namespace synthese
 			// TAB CALENDAR
 			if (openTabContent(stream, TAB_CALENDAR))
 			{
+				stream << "<h1>Modifier</h1>";
+
+				date now(day_clock::local_day());
+				AdminActionFunctionRequest<ServiceApplyCalendarAction,ServiceAdmin> updateRequest(request);
+				updateRequest.getAction()->setService(_service);
+				PropertiesHTMLTable p(updateRequest.getHTMLForm("applycalendar"));
+				stream << p.open();
+				stream << p.cell("Date début", p.getForm().getCalendarInput(ServiceApplyCalendarAction::PARAMETER_START_DATE, now));
+				stream << p.cell("Date fin", p.getForm().getCalendarInput(ServiceApplyCalendarAction::PARAMETER_END_DATE, now));
+				stream << p.cell("Période", p.getForm().getTextInput(ServiceApplyCalendarAction::PARAMETER_PERIOD, "1", string(), AdminModule::CSS_2DIGIT_INPUT));
+				stream << p.cell("Modèle", p.getForm().getSelectInput(
+					ServiceApplyCalendarAction::PARAMETER_CALENDAR_TEMPLATE_ID,
+					CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
+					optional<RegistryKeyType>(0)
+				);
+				stream << p.cell("Ajout", p.getForm().getOuiNonRadioInput(ServiceApplyCalendarAction::PARAMETER_ADD, true));
+				stream << p.close();
+
+				stream << "<h1>Résultat</h1>";
 				CalendarHTMLViewer cv(*_service);
 				cv.display(stream);
 
-				// ServiceApplyCalendarAction
 				// ServiceDateChangeAction
 			}
 		

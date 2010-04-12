@@ -128,7 +128,7 @@ namespace synthese
 			_importJunctions(false),
 			_defaultTransferDuration(minutes(8)),
 			_startDate(day_clock::local_day()),
-			_commercialLineId(*lineId),
+			_commercialLineId(lineId),
 			_withTisseoExtension(withTisseoExtension)
 		{
 			_env = env;
@@ -188,7 +188,7 @@ namespace synthese
 
 			// Collect all data related to selected commercial line
 			shared_ptr<CommercialLine> _commercialLine(
-				CommercialLineTableSync::GetEditable(_commercialLineId, *_env, UP_LINKS_LOAD_LEVEL)
+				CommercialLineTableSync::GetEditable(*_commercialLineId, *_env, UP_LINKS_LOAD_LEVEL)
 			);
 			LineTableSync::Search(
 				*_env,

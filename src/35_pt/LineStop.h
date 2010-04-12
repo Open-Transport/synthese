@@ -63,11 +63,11 @@ namespace synthese
 
 			LineStop(
 				util::RegistryKeyType id = 0,
-				const Line* line = NULL,
-				int rankInPath = UNKNOWN_VALUE,
+				Line* line = NULL,
+				std::size_t rankInPath = 0,
 				bool isDeparture = true,
 				bool isArrival = true,
-				double metricOffset = UNKNOWN_VALUE,
+				double metricOffset = 0,
 				pt::PhysicalStop* physicalStop = NULL
 			);
 			
@@ -76,32 +76,20 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const pt::PhysicalStop*	getPhysicalStop()	const;
-				Line*				getLine()			const;
-				bool				getScheduleInput()	const;
-				bool				getIsDeparture()	const;
-				bool				getIsArrival()		const;
+				bool getScheduleInput()	const { return _scheduleInput; }
+				bool getIsDeparture()	const { return _isDeparture; }
+				bool getIsArrival()		const { return _isArrival; }
 			//@}
 				
 			//!	@name Setters
 			//@{
-				/** Physical stop setter.
-					@param stop the physical stop supporting the linestop
-
-					The physical stop setter builds the links from the physical stop to the linestop.
-
-					@warning the isArrival and the isDeparture attributes must be up to date to avoid false links in the physical stop.
-				*/
-				void				setPhysicalStop(pt::PhysicalStop* stop);
-
-				void				setScheduleInput(bool value);
-				void				setLine(const Line* line);
-				void				setIsDeparture(bool value);
-				void				setIsArrival(bool value);
+				void				setScheduleInput(bool value) { _scheduleInput = value; }
+				void				setIsDeparture(bool value) { _isDeparture = value; }
+				void				setIsArrival(bool value) { _isArrival = value; }
 			//@}
 
 
-			//! @name Query methods
+			//! @name Services
 			//@{
 				/*! Estimates consistency of line stops sequence according to 
 					metric offsets and physical stops coordinates.
@@ -112,12 +100,25 @@ namespace synthese
 
 				virtual bool isDepartureAllowed() const;
 				virtual bool isArrivalAllowed() const;
+
+				PhysicalStop*	getPhysicalStop()	const;
+
+				Line*				getLine()			const;
 			//@}
 
 
-			//! @name Update methods
+			//! @name Modifiers
 			//@{
-		 
+				//////////////////////////////////////////////////////////////////////////
+ 				/// Physical stop modifier.
+				///	@param stop the physical stop supporting the linestop
+				///	The physical stop setter builds the links from the physical stop to the linestop.
+				///	Use this method instead of setFromVertex.
+				///
+				///	@warning the isArrival and the isDeparture attributes must be up to date to avoid false links in the physical stop.
+				void setPhysicalStop(PhysicalStop* stop);
+
+				void setLine(Line* line);
 		    //@}
 		};
 	}

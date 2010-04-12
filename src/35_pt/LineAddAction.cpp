@@ -27,9 +27,10 @@
 #include "LineAddAction.h"
 #include "TransportNetworkRight.h"
 #include "Request.h"
-#include "CommercialLine.h"
-#include "Line.h"
+#include "CommercialLineTableSync.h"
 #include "LineTableSync.h"
+#include "LineStopTableSync.h"
+#include "SQLiteTransaction.h"
 
 using namespace std;
 
@@ -39,6 +40,8 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace pt;
+	using namespace graph;
+	using namespace db;
 	
 	namespace util
 	{
@@ -48,16 +51,25 @@ namespace synthese
 	namespace pt
 	{
 		const string LineAddAction::PARAMETER_COMMERCIAL_LINE_ID = Action_PARAMETER_PREFIX + "cl";
+		const string LineAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+		const string LineAddAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "te";
+		const string LineAddAction::PARAMETER_REVERSE_COPY = Action_PARAMETER_PREFIX + "re";
 		
 		
 		
 		ParametersMap LineAddAction::getParametersMap() const
 		{
 			ParametersMap map;
+			if(_template.get())
+			{
+				map.insert(PARAMETER_TEMPLATE_ID, _template->getKey());
+				map.insert(PARAMETER_REVERSE_COPY, _reverse);
+			}
 			if(_commercialLine.get())
 			{
 				map.insert(PARAMETER_COMMERCIAL_LINE_ID, _commercialLine->getKey());
 			}
+			map.insert(PARAMETER_NAME, _name);
 			return map;
 		}
 		
@@ -65,15 +77,34 @@ namespace synthese
 		
 		void LineAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				_commercialLine = Env::GetOfficialEnv().getEditable<CommercialLine>(map.get<RegistryKeyType>(PARAMETER_COMMERCIAL_LINE_ID));
-			}
-			catch(ObjectNotFoundException<CommercialLine>& e)
-			{
-				throw ActionException("No such commercial line");
-			}
+			RegistryKeyType tid(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE_ID));
 
+			if(tid > 0)
+			{
+				try
+				{
+					_template = LineTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), *_env);
+				}
+				catch(ObjectNotFoundException<Line>& e)
+				{
+					throw ActionException("No such template route");
+				}
+				_reverse = map.getDefault<bool>(PARAMETER_REVERSE_COPY, false);
+
+				LineStopTableSync::Search(*_env, _template->getKey());
+			}
+			else
+			{
+				try
+				{
+					_commercialLine = CommercialLineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_COMMERCIAL_LINE_ID), *_env);
+				}
+				catch(ObjectNotFoundException<CommercialLine>& e)
+				{
+					throw ActionException("No such commercial line");
+				}
+			}
+			_name = map.getDefault<string>(PARAMETER_NAME);
 		}
 		
 		
@@ -81,9 +112,84 @@ namespace synthese
 		void LineAddAction::run(
 			Request& request
 		){
+			SQLiteTransaction transaction;
 			Line object;
-			object.setCommercialLine(_commercialLine.get());
-			LineTableSync::Save(&object);
+
+			if(_template.get())
+			{
+				object.setCommercialLine(_template->getCommercialLine());
+				object.setRollingStock(_template->getRollingStock());
+				if(_reverse)
+				{
+					object.setWayBack(!_template->getWayBack());
+				}
+				else
+				{
+					object.setWayBack(_template->getWayBack());
+					object.setDirection(_template->getDirection());
+				}
+			}
+			else
+			{
+				object.setCommercialLine(_commercialLine.get());
+			}
+			object.setName(_name);
+
+			LineTableSync::Save(&object, transaction);
+
+			// Stops copy
+			if(_template.get())
+			{
+				if(_reverse)
+				{
+					size_t rank(0);
+					const double maxMetricOffset(_template->getLastEdge()->getMetricOffset());
+					for(Path::Edges::const_reverse_iterator it(_template->getEdges().rbegin()); it != _template->getEdges().rend(); ++it)
+					{
+						const LineStop& other(static_cast<const LineStop&>(**it));
+						LineStop ls;
+						ls.setLine(&object);
+						ls.setIsArrival(other.getIsDeparture());
+						ls.setIsDeparture(other.getIsArrival());
+						ls.setPhysicalStop(other.getPhysicalStop());
+						ls.setScheduleInput(other.getScheduleInput());
+						ls.setMetricOffset(maxMetricOffset - other.getMetricOffset());
+						ls.setRankInPath(rank++);
+						Edge::ViaPoints vp;
+						if(it+1 != _template->getEdges().rend())
+						{
+							const Edge::ViaPoints& ovp((*(it+1))->getViaPoints());
+							for(Edge::ViaPoints::const_reverse_iterator p(ovp.rbegin()); p != ovp.rend(); ++p)
+							{
+								vp.push_back(*p);
+							}
+						}
+						ls.setViaPoints(vp);
+
+						LineStopTableSync::Save(&ls, transaction);
+					}
+				}
+				else
+				{
+					for(Path::Edges::const_iterator it(_template->getEdges().begin()); it != _template->getEdges().end(); ++it)
+					{
+						const LineStop& other(static_cast<const LineStop&>(**it));
+						LineStop ls;
+						ls.setLine(&object);
+						ls.setIsArrival(other.getIsArrival());
+						ls.setIsDeparture(other.getIsDeparture());
+						ls.setPhysicalStop(other.getPhysicalStop());
+						ls.setScheduleInput(other.getScheduleInput());
+						ls.setRankInPath(other.getRankInPath());
+						ls.setMetricOffset(other.getMetricOffset());
+						ls.setViaPoints(other.getViaPoints());
+						LineStopTableSync::Save(&ls, transaction);
+					}
+				}
+			}
+
+			transaction.run();
+
 			//::AddCreationEntry(object, request.getUser().get());
 			request.setActionCreatedId(object.getKey());
 		}

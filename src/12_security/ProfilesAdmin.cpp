@@ -198,7 +198,7 @@ namespace synthese
 						stream << deleteProfileRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?", "group_delete.png");
 			}	}	}
 
-			stream << t.row();
+			stream << t.row(string());
 			stream << t.col() << t.getActionForm().getTextInput(AddProfileAction::PARAMETER_NAME, "", "Entrez le nom du profil ici");
 			stream << t.col() << "(sélectionner un profil existant duquel héritera le nouveau profil)";
 			stream << t.col(2) << t.getActionForm().getSubmitButton("Ajouter");

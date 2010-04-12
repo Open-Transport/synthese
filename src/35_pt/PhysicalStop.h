@@ -27,6 +27,7 @@
 #include "Vertex.h"
 #include "Registry.h"
 #include "Importable.h"
+#include "Named.h"
 
 #include <string>
 
@@ -47,19 +48,16 @@ namespace synthese
 		///	RoutePoint
 		///	@ingroup m35
 		//////////////////////////////////////////////////////////////////////////
-		class PhysicalStop
-		:	public graph::Vertex,
-			public impex::Importable
+		class PhysicalStop:
+			public graph::Vertex,
+			public impex::Importable,
+			public util::Named
 		{
 		public:
 
 			/// Chosen registry class.
 			typedef util::Registry<PhysicalStop>	Registry;
 
-		private:
-
-			std::string _name; //! Physical stop name
-			
 		public:
 
 			PhysicalStop(
@@ -72,17 +70,10 @@ namespace synthese
 			~PhysicalStop ();
 		    
 
-			//! @name Getters/Setters
-			//@{
-			const pt::PublicTransportStopZoneConnectionPlace* getConnectionPlace() const;
-
-				const std::string& getName () const;
-				void setName (const std::string& name);
-			//@}
-
-
+		
 			//! @name Query methods
 			//@{
+				const pt::PublicTransportStopZoneConnectionPlace* getConnectionPlace() const;
 				virtual graph::GraphIdType getGraphType() const;
 			//@}
 

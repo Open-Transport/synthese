@@ -39,8 +39,8 @@ namespace synthese
 		const size_t Edge::INDICES_NUMBER(24);
 
 		Edge::Edge(
-			const Path* parentPath,
-			int rankInPath,
+			Path* parentPath,
+			size_t rankInPath,
 			Vertex* fromVertex,
 			double metricOffset
 		):	Registrable(0),
@@ -73,21 +73,6 @@ namespace synthese
 
 
 
-		double Edge::getMetricOffset () const
-		{
-			return _metricOffset;
-		}
-
-
-
-		void Edge::setMetricOffset(
-			double metricOffset
-		){
-			_metricOffset = metricOffset;
-		}
-
-
-
 		bool Edge::isArrival () const
 		{
 			return _previousDepartureForFineSteppingOnly && isArrivalAllowed();
@@ -98,78 +83,6 @@ namespace synthese
 		bool Edge::isDeparture () const
 		{
 			return _followingArrivalForFineSteppingOnly && isDepartureAllowed();
-		}
-
-
-
-		Vertex* Edge::getFromVertex() const
-		{
-			return _fromVertex;
-		}
-
-
-
-		Edge* Edge::getPreviousConnectionDeparture () const
-		{
-			return _previousConnectionDeparture;
-		}
-
-
-
-		Edge* Edge::getPreviousDepartureForFineSteppingOnly () const
-		{
-			return _previousDepartureForFineSteppingOnly;
-		}
-
-
-
-
-		Edge* Edge::getFollowingConnectionArrival () const
-		{
-			return _followingConnectionArrival;
-		}
-
-
-
-		Edge* Edge::getFollowingArrivalForFineSteppingOnly () const
-		{
-			return _followingArrivalForFineSteppingOnly;
-		}
-
-
-
-		void Edge::setPreviousConnectionDeparture(Edge* previousConnectionDeparture)
-		{
-			_previousConnectionDeparture = previousConnectionDeparture;
-		}
-
-
-
-		void Edge::setPreviousDepartureForFineSteppingOnly(Edge* previousDeparture)
-		{
-			_previousDepartureForFineSteppingOnly = previousDeparture;
-		}
-
-
-
-		void Edge::setFollowingConnectionArrival(Edge* followingConnectionArrival)
-		{
-			_followingConnectionArrival = followingConnectionArrival;
-		}
-
-
-
-		void Edge::setFollowingArrivalForFineSteppingOnly(Edge* followingArrival)
-		{
-			_followingArrivalForFineSteppingOnly = followingArrival;
-		}
-
-
-
-		const std::vector<const Point2D*>& 
-		Edge::getViaPoints () const
-		{
-			return _viaPoints;
 		}
 
 
@@ -187,13 +100,6 @@ namespace synthese
 			_viaPoints.clear ();
 		}
 
-
-
-		const Path* 
-		Edge::getParentPath () const
-		{
-			return _parentPath;
-		}
 
 
 
@@ -476,14 +382,8 @@ namespace synthese
 		}
 
 
-		void Edge::setParentPath( const Path* path )
-		{
-			_parentPath = path;
-		}
-
-
-
-	    void Edge::markServiceIndexUpdateNeeded(
+		
+		void Edge::markServiceIndexUpdateNeeded(
 			bool RTDataOnly
 		) const {
 			if(!RTDataOnly)
@@ -526,19 +426,5 @@ namespace synthese
 		bool Edge::_getServiceIndexUpdateNeeded( bool RTData ) const
 		{
 			return RTData ? _RTserviceIndexUpdateNeeded : _serviceIndexUpdateNeeded;
-		}
-
-
-
-		const Edge::DepartureServiceIndices& Edge::getDepartureIndices() const
-		{
-			return _departureIndex;
-		}
-
-
-
-		const Edge::ArrivalServiceIndices& Edge::getArrivalIndices() const
-		{
-			return _arrivalIndex;
 		}
 }	}

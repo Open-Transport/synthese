@@ -63,9 +63,9 @@ namespace synthese
 
 
 
-		void RoadChunk::setRoad(const Road* road)
+		void RoadChunk::setRoad(Road* road)
 		{
-			_parentPath = static_cast<const Path*>(road);
+			_parentPath = static_cast<Path*>(road);
 		}
 		
 		
@@ -104,9 +104,9 @@ namespace synthese
 
 
 
-		const Road* RoadChunk::getRoad() const
+		Road* RoadChunk::getRoad() const
 		{
-			return static_cast<const Road*>(_parentPath);
+			return static_cast<Road*>(_parentPath);
 		}
 	}
 }

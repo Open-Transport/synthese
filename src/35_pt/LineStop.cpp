@@ -47,8 +47,8 @@ namespace synthese
 	{
 		LineStop::LineStop(
 			RegistryKeyType id,
-			const Line* line,
-			int rankInPath,
+			Line* line,
+			size_t rankInPath,
 			bool isDeparture,
 			bool isArrival,		
 			double metricOffset,
@@ -99,23 +99,23 @@ namespace synthese
 
 		Line* LineStop::getLine() const
 		{
-			return (Line*) getParentPath();
+			return static_cast<Line*>(getParentPath());
 		}
 
-		const PhysicalStop* LineStop::getPhysicalStop() const
+		PhysicalStop* LineStop::getPhysicalStop() const
 		{
-			return static_cast<const PhysicalStop*>(_fromVertex);
+			return static_cast<PhysicalStop*>(getFromVertex());
 		}
 
-		void LineStop::setLine( const Line* line )
+		void LineStop::setLine(Line* line )
 		{
-			setParentPath(static_cast<const Path*>(line));
+			setParentPath(static_cast<Path*>(line));
 		}
 
 		void LineStop::setPhysicalStop(PhysicalStop* stop )
 		{
 			// Saving of the attribute
-			_fromVertex = static_cast<Vertex*>(stop);
+			setFromVertex(static_cast<Vertex*>(stop));
 
 			// Links from stop to the linestop
 			if(stop)
@@ -129,18 +129,6 @@ namespace synthese
 		
 		
 		
-		void LineStop::setIsArrival( bool value )
-		{
-			_isArrival = value;
-		}
-
-		void LineStop::setIsDeparture( bool value )
-		{
-			_isDeparture = value;
-		}
-
-
-
 		bool LineStop::isDepartureAllowed() const
 		{
 			return _isDeparture;
@@ -152,31 +140,4 @@ namespace synthese
 		{
 			return _isArrival;
 		}
-		
-		
-
-		void LineStop::setScheduleInput( bool value )
-		{
-			_scheduleInput = value;
-		}
-
-		bool LineStop::getScheduleInput() const
-		{
-			return _scheduleInput;
-		}
-		
-		
-		
-		bool LineStop::getIsDeparture() const
-		{
-			return _isDeparture;
-		}
-		
-		
-		
-		bool LineStop::getIsArrival() const
-		{
-			return _isArrival;
-		}
-	}
-}
+}	}

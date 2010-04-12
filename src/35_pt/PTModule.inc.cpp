@@ -70,6 +70,7 @@
 #include "ServiceTimetableUpdateAction.h"
 #include "ServiceUpdateAction.h"
 #include "LineUpdateAction.h"
+#include "ServiceApplyCalendarAction.h"
 
 #include "TransportNetworkRight.h"
 

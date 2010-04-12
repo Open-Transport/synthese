@@ -23,29 +23,33 @@
 #ifndef SYNTHESE_ActionResultHTMLTable_h__
 #define SYNTHESE_ActionResultHTMLTable_h__
 
-#include "05_html/ResultHTMLTable.h"
+#include "ResultHTMLTable.h"
 
 namespace synthese
 {
 	namespace html
 	{
-		/** ActionResultHTMLTable class.
-			@ingroup m05
-		*/
-		class ActionResultHTMLTable : public ResultHTMLTable
+		//////////////////////////////////////////////////////////////////////////
+		/// Extension of the search result display table (ResultHTMLTable) integrating the launch of an action with a parameter selected in the result list.
+		/// @ingroup m05
+		/// @author Hugues Romain
+		class ActionResultHTMLTable:
+			public ResultHTMLTable
 		{
 		protected:
 			HTMLForm	_actionForm;
 			std::string	_selectName;
 
 		public:
-			
-			/** Constructor.
-				@param header : vector of pairs field code / col caption. If field code is non empty then the searchRequest can be reloaded with an ordering by the column.
-				@param searchRequest The request to use to fill a similar table with other parameters
-				@param actionRequest A request to launch by the table content (NULL = no action request)
-				@param selectFieldName A first col with radio buttons will be drawn, named by the parameter. If empty then no radio button.
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor.
+			/// @param header : vector of pairs field code / col caption. If field code is non empty then the searchRequest can be reloaded with an ordering by the column.
+			/// @param searchForm : reference to the form which can relaunch the search of the results (used to do an other sorting method)
+			/// @param requestParameters : options of search
+			/// @param v : search result (type defined by template class)
+			/// @param actionForm : reference to the form to launch to do the associated action
+			/// @param selectName : the code of the field containing the selected object in the search result list, as it will be transmitted to the action. If empty, the first column with radio buttons is not displayed.
+			/// @param iconPath : path to icons
 			template<class T>
 			ActionResultHTMLTable(
 				const HeaderVector& header,
@@ -69,12 +73,35 @@ namespace synthese
 				_headers = s.str();
 			}
 
-			std::string open();
-			std::string close();
-			HTMLForm& getActionForm();
-			std::string row(std::string value, std::string className);
-			std::string row(std::string value=std::string());
+			//! @name Getters
+			//@{
+				HTMLForm& getActionForm() { return _actionForm; }
+			//@}
 
+			//! @name Services
+			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Generates the HTML code of table and form opening.
+				std::string open();
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Generates the HTML code of table and form closing.
+				std::string close();
+
+
+			
+				//////////////////////////////////////////////////////////////////////////
+				/// Generates the HTML code of a row opening.
+				/// @param value if defined and if the selectName parameter is defined for the table, then the row begins with a radio input which sends the specified value to the parameter named by selectName. If defined, the value must be a string.
+				/// @param className CSS class to associate to the generated <b>tr</b> tag. If empty, the class tag is not added to the tag.
+				/// @author Hugues Romain
+				std::string row(
+					boost::optional<std::string> value = boost::optional<std::string>(),
+					std::string className = std::string()
+				);
+			//@}
 		};
 	}
 }

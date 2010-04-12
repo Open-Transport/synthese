@@ -46,28 +46,22 @@ namespace synthese
 			return s.str();
 		}
 
-		HTMLForm& ActionResultHTMLTable::getActionForm()
-		{
-			return _actionForm;
-		}
 
-		std::string ActionResultHTMLTable::row(std::string value, std::string className )
-		{
+
+		std::string ActionResultHTMLTable::row(
+			optional<string> value,
+			std::string className
+		){
 			stringstream s;
 			s << HTMLTable::row(className);
 			if (!_selectName.empty())
 			{
 				s << col();
-				if (!value.empty())
-					s << _actionForm.getRadioInput(_selectName, optional<string>(value), optional<string>(), string());
+				if (value)
+				{
+					s << _actionForm.getRadioInput(_selectName, value, optional<string>(), string());
+				}
 			}
 			return s.str();
 		}
-
-		std::string ActionResultHTMLTable::row(std::string value)
-		{
-			return row(value, string());
-		}
-
-	}
-}
+}	}

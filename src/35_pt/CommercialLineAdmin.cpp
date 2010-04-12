@@ -42,7 +42,6 @@
 #include "AdminParametersException.h"
 #include "SearchFormHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
-#include "ActionResultHTMLTable.h"
 #include "NonPermanentService.h"
 #include "Profile.h"
 #include "LineAddAction.h"
@@ -55,6 +54,8 @@
 #include "PhysicalStop.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "PTRuleUserAdmin.hpp"
+#include "ActionResultHTMLTable.h"
+#include "AdminModule.h"
 
 using namespace std;
 using namespace boost;
@@ -142,7 +143,7 @@ namespace synthese
 			const admin::AdminRequest& _request
 		) const {
 			////////////////////////////////////////////////////////////////////
-			// TAB STOPS
+			// TAB ROUTES
 			if (openTabContent(stream, TAB_ROUTES))
 			{
 				// Requests
@@ -154,7 +155,6 @@ namespace synthese
 				SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 				stream << s.open();
 				stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, _searchName));
-				HTMLForm sortedForm(s.getForm());
 				stream << s.close();
 
 
@@ -172,6 +172,11 @@ namespace synthese
 						_requestParameters.raisingOrder
 				)	);
 				
+				AdminActionFunctionRequest<LineAddAction,LineAdmin> creationRequest(_request);
+				creationRequest.getFunction()->setActionFailedPage(getNewPage());
+				creationRequest.setActionWillCreateObject();
+				creationRequest.getAction()->setCommercialLine(const_pointer_cast<CommercialLine>(_cline));
+
 				ResultHTMLTable::HeaderVector h;
 				h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 				h.push_back(make_pair(string(), "Origne"));
@@ -181,14 +186,21 @@ namespace synthese
 				h.push_back(make_pair(string(), "Services"));
 				h.push_back(make_pair(string(), "Actions"));
 				
-				ResultHTMLTable t(h,sortedForm,_requestParameters, routes);
+				ActionResultHTMLTable t(
+					h,
+					s.getForm(),
+					_requestParameters,
+					routes,
+					creationRequest.getHTMLForm("addline"),
+					LineAddAction::PARAMETER_TEMPLATE_ID
+				);
 
 				stream << t.open();
 				AdminFunctionRequest<LineAdmin> lineOpenRequest(_request);
  				BOOST_FOREACH(shared_ptr<Line> line, routes)
 				{
 					lineOpenRequest.getPage()->setLine(line);
-					stream << t.row();
+					stream << t.row(lexical_cast<string>(line->getKey()));
 					stream << t.col();
 					stream << line->getName();
 
@@ -214,14 +226,10 @@ namespace synthese
 					stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
 				}
 
-				AdminActionFunctionRequest<LineAddAction,LineAdmin> creationRequest(_request);
-				creationRequest.getFunction()->setActionFailedPage(getNewPage());
-				creationRequest.setActionWillCreateObject();
-				creationRequest.getAction()->setCommercialLine(const_pointer_cast<CommercialLine>(_cline));
-
-				stream << t.row();
-				stream << t.col(6) << "Création d'itinéraire";
-				stream << t.col() << HTMLModule::getLinkButton(creationRequest.getURL(), "Créer", "chart_line_add.png");
+				stream << t.row(string());
+				stream << t.col() << t.getActionForm().getTextInput(LineAddAction::PARAMETER_NAME, string(), string(), AdminModule::CSS_2DIGIT_INPUT);
+				stream << t.col(5) << "Inversion : " << t.getActionForm().getOuiNonRadioInput(LineAddAction::PARAMETER_REVERSE_COPY, false);
+				stream << t.col() << t.getActionForm().getSubmitButton("Créer un itinéraire");
 
 				stream << t.close();
 			}

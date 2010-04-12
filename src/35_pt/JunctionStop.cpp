@@ -39,7 +39,7 @@ namespace synthese
 	namespace pt
 	{
 		JunctionStop::JunctionStop(
-			const Junction* parentPath /*= NULL*/,
+			Junction* parentPath /*= NULL*/,
 			PhysicalStop* fromVertex /*= NULL*/			
 		):	Edge(parentPath, 0, static_cast<PhysicalStop*>(fromVertex), 0),
 			Registrable(0)
@@ -51,7 +51,7 @@ namespace synthese
 
 		JunctionStop::JunctionStop(
 			double length,
-			const Junction* parentPath,
+			Junction* parentPath,
 			PhysicalStop* fromVertex
 		):	Edge(parentPath, 1, static_cast<PhysicalStop*>(fromVertex), length),
 			Registrable(0)

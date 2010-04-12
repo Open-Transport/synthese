@@ -351,7 +351,7 @@ namespace synthese
 					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?", "stop.png");
 				}
 			}
-			stream << t1.row();
+			stream << t1.row(string());
 			stream << t1.col();
 			stream << t1.col();
 			stream <<

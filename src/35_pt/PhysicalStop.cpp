@@ -31,7 +31,8 @@ namespace synthese
 {
 	using namespace util;
 	using namespace pt;
-	using namespace pt;
+	using namespace graph;
+	using namespace impex;
 
 	namespace util
 	{
@@ -40,17 +41,16 @@ namespace synthese
 
 	namespace pt
 	{
-
 		PhysicalStop::PhysicalStop(
 			RegistryKeyType id
 			, string name
 			, const PublicTransportStopZoneConnectionPlace* place
 			, double x
 			, double y
-		)	: Registrable(id)
-			, Vertex (place, x, y),
+		):	Registrable(id),
+			Vertex(place, x, y),
 			Importable(),
-			_name (name)
+			Named(name)
 		{
 		}
 
@@ -62,26 +62,13 @@ namespace synthese
 		}
 
 
-		const std::string& 
-		PhysicalStop::getName () const
-		{
-			return _name;
-		}
-
-
-
-		void 
-		PhysicalStop::setName (const std::string& name)
-		{
-			_name = name;
-		}
-
-
 
 		const PublicTransportStopZoneConnectionPlace* PhysicalStop::getConnectionPlace() const
 		{
 			return static_cast<const PublicTransportStopZoneConnectionPlace*>(Vertex::getHub());
 		}
+
+
 
 		graph::GraphIdType PhysicalStop::getGraphType() const
 		{

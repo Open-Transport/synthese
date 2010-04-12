@@ -75,6 +75,8 @@ namespace synthese
 			:	public virtual util::Registrable
 		{
 		public:
+			typedef std::vector<const geometry::Point2D*> ViaPoints;
+
 			template<class Iterator>
 			class ServiceIndex
 			{
@@ -104,7 +106,7 @@ namespace synthese
 
 		protected:
 			Vertex*	_fromVertex;
-			const Path*		_parentPath;		//!< The path the edge belongs
+			Path*		_parentPath;		//!< The path the edge belongs
 			double			_metricOffset;		//!< Metric offset
 		
 		private:
@@ -117,7 +119,7 @@ namespace synthese
 			Edge* _followingConnectionArrival;			//!< Next connection arrival edge along path.
 			Edge* _followingArrivalForFineSteppingOnly;	//!< Next arrival edge with or without connection
 
-			std::vector<const geometry::Point2D*> _viaPoints;				//!< Intermediate points along the edge (for map drawing)
+			ViaPoints _viaPoints;				//!< Intermediate points along the edge (for map drawing)
 
 			mutable DepartureServiceIndices _departureIndex;	//!< First service index by departure hour of day
 			mutable ArrivalServiceIndices _arrivalIndex;		//!< First service index by arrival hour of day
@@ -139,10 +141,10 @@ namespace synthese
 
 		protected:
 			Edge(
-				const Path* parentPath = NULL,
-				int rankInPath = UNKNOWN_VALUE,
+				Path* parentPath = NULL,
+				std::size_t rankInPath = 0,
 				Vertex* fromVertex = NULL,
-				double metricOffset = UNKNOWN_VALUE
+				double metricOffset = 0
 			);
 
 			
@@ -151,42 +153,42 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void	setIsArrival(bool value);
-				void	setIsDeparture(bool value);
-				void	setRankInPath(std::size_t value) { _rankInPath = value; }
-				void	setParentPath(const Path* path);
-				void	setPreviousConnectionDeparture(Edge* previousConnectionDeparture);
-				void	setPreviousDepartureForFineSteppingOnly (Edge* previousDeparture);
-				void	setFollowingConnectionArrival(Edge* followingConnectionArrival);
-				void	setFollowingArrivalForFineSteppingOnly(Edge* followingArrival);
-				void	setMetricOffset (double metricOffset);
+				void setRankInPath(std::size_t value) { _rankInPath = value; }
+				void setParentPath(Path* path) { _parentPath = path; }
+				void setPreviousConnectionDeparture(Edge* previousConnectionDeparture) { _previousConnectionDeparture = previousConnectionDeparture; }
+				void setPreviousDepartureForFineSteppingOnly (Edge* previousDeparture) { _previousDepartureForFineSteppingOnly = previousDeparture; }
+				void setFollowingConnectionArrival(Edge* followingConnectionArrival) {_followingConnectionArrival = followingConnectionArrival; }
+				void setFollowingArrivalForFineSteppingOnly(Edge* followingArrival) { _followingArrivalForFineSteppingOnly = followingArrival; }
+				void setMetricOffset (double metricOffset) { _metricOffset = metricOffset; }
+				void setViaPoints(const ViaPoints& value) { _viaPoints = value; }
+				void setFromVertex(Vertex* value) { _fromVertex = value; }
 			//@}
 
 			//! @name Getters
 			//@{
-				const Path* getParentPath () const;
+				Path* getParentPath () const { return _parentPath; }
 
 				/** Returns this edge origin vertex.
 				*/
-				Vertex* getFromVertex () const;
+				Vertex* getFromVertex () const { return _fromVertex; }
 
 				/** Returns metric offset of this edge from
 				parent path origin vertex.
 				*/
-				double getMetricOffset () const;
+				double getMetricOffset () const { return _metricOffset; }
 
-				Edge* getPreviousConnectionDeparture () const;
-				Edge* getPreviousDepartureForFineSteppingOnly () const;
-				Edge* getFollowingConnectionArrival () const;
-			    Edge* getFollowingArrivalForFineSteppingOnly () const;
+				Edge* getPreviousConnectionDeparture () const { return _previousConnectionDeparture; }
+				Edge* getPreviousDepartureForFineSteppingOnly () const { return _previousDepartureForFineSteppingOnly; }
+				Edge* getFollowingConnectionArrival () const { return _followingConnectionArrival; }
+				Edge* getFollowingArrivalForFineSteppingOnly () const { return _followingArrivalForFineSteppingOnly; }
 			    
 				/** Gets intermediate points 
 				* between this line stop and the next in path.
 				*/
-				const std::vector<const geometry::Point2D*>& getViaPoints () const;
+				const ViaPoints& getViaPoints () const { return _viaPoints; }
 
-				const DepartureServiceIndices& getDepartureIndices() const;
-				const ArrivalServiceIndices& getArrivalIndices() const;
+				const DepartureServiceIndices& getDepartureIndices() const { return _departureIndex; }
+				const ArrivalServiceIndices& getArrivalIndices() const { return _arrivalIndex; }
 
 				std::size_t getRankInPath () const { return _rankInPath; }
 			//@}
@@ -276,6 +278,7 @@ namespace synthese
 
 			//! @name Update methods
 			//@{
+				///TODO @todo Remove via point update methods due to thread unsafeness
 				void clearViaPoints ();
 				void addViaPoint (const geometry::Point2D& viaPoint);
 			    

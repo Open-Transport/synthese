@@ -58,7 +58,7 @@ namespace synthese
 			///
 			/// The start junction constructor is also the default constructor, but should not be used as it
 			JunctionStop(
-				const Junction* parentPath = NULL,
+				Junction* parentPath = NULL,
 				PhysicalStop* fromVertex = NULL
 			);
 
@@ -72,7 +72,7 @@ namespace synthese
 			/// @since 3.1.16
 			JunctionStop(
 				double length,
-				const Junction* parentPath,
+				Junction* parentPath,
 				PhysicalStop* fromVertex
 			);
 

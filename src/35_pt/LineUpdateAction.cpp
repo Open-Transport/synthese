@@ -84,10 +84,10 @@ namespace synthese
 			_name = map.get<string>(PARAMETER_NAME);
 			_wayback = map.get<bool>(PARAMETER_WAYBACK);
 
-			RegistryKeyType rid(map.get<RegistryKeyType>(PARAMETER_TRANSPORT_MODE_ID));
-			if(rid > 0)	try
+			optional<RegistryKeyType> rid(map.getOptional<RegistryKeyType>(PARAMETER_TRANSPORT_MODE_ID));
+			if(rid && *rid > 0)	try
 			{
-				_transportMode = RollingStockTableSync::GetEditable(rid, *_env);
+				_transportMode = RollingStockTableSync::GetEditable(*rid, *_env);
 			}
 			catch(ObjectNotFoundException<RollingStock>&)
 			{

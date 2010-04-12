@@ -39,11 +39,25 @@ namespace synthese
 
 	namespace pt
 	{
-		class NonPermanentService;
+		class SchedulesBasedService;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// ServiceApplyCalendarAction action class.
+		/// 35.15 Action : Update of the dates of a service.
 		/// @ingroup m35Actions refActions
+		/// @author Hugues Romain
+		/// @since 3.1.16
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : ServiceApplyCalendarAction
+		///
+		/// Parameters :
+		///	<ul>
+		///		<li>actionParamid : id of the service to update</li>
+		///		<li>actionParamct (optional) : id of the calendar template to use</li>
+		///		<li>actionParamsd : start date</li>
+		///		<li>actionParamed : end date</li>
+		///		<li>actionParampe : period in days</li>
+		///		<li>actionParamad : 1 if the days must be added, 0 if they must be removed</li>
+		///	</ul>
 		class ServiceApplyCalendarAction:
 			public util::FactorableTemplate<server::Action, ServiceApplyCalendarAction>
 		{
@@ -56,7 +70,7 @@ namespace synthese
 			static const std::string PARAMETER_ADD;
 
 		private:
-			boost::shared_ptr<NonPermanentService> _service;
+			boost::shared_ptr<SchedulesBasedService> _service;
 			boost::shared_ptr<const calendar::CalendarTemplate> _calendarTemplate;
 			boost::gregorian::date _startDate;
 			boost::gregorian::date _endDate;
@@ -78,6 +92,8 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			ServiceApplyCalendarAction();
+
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action
@@ -93,7 +109,10 @@ namespace synthese
 
 
 
-			/// @todo Setters for some attributes
+			//! @name Setters
+			//@{
+				void setService(boost::shared_ptr<SchedulesBasedService> value) { _service = value; }
+			//@}
 		};
 	}
 }

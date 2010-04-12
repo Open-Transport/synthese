@@ -24,7 +24,6 @@
 #include "ServerModule.h"
 
 #include "SearchFormHTMLTable.h"
-#include "ActionResultHTMLTable.h"
 #include "HTMLModule.h"
 #include "InterfaceModule.h"
 
@@ -196,22 +195,23 @@ namespace synthese
 				stream << "Aucun utilisateur trouvé";
 
 
-			ActionResultHTMLTable::HeaderVector v;
+			ResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAM_SEARCH_LOGIN, "Login"));
 			v.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			v.push_back(make_pair(PARAM_SEARCH_PROFILE_ID, "Profil"));
 			v.push_back(make_pair(string(), "Actions"));
 			
-			ActionResultHTMLTable t(
+			HTMLForm f(addUserRequest.getHTMLForm("add"));
+
+			ResultHTMLTable t(
 				v,
 				searchRequest.getHTMLForm(),
 				_requestParameters,
 				users,
-				addUserRequest.getHTMLForm("add"),
-				string(),
 				InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
 			);
 
+			stream << f.open();
 			stream << t.open();
 
 			BOOST_FOREACH(shared_ptr<User> user, users)
@@ -227,15 +227,16 @@ namespace synthese
 			}
 
 			stream << t.row();
-			stream << t.col() << t.getActionForm().getTextInput(AddUserAction::PARAMETER_LOGIN, "", "Entrez le login ici");
-			stream << t.col() << t.getActionForm().getTextInput(AddUserAction::PARAMETER_NAME, "", "Entrez le nom ici");
-			stream << t.col() << t.getActionForm().getSelectInput(
+			stream << t.col() << f.getTextInput(AddUserAction::PARAMETER_LOGIN, "", "Entrez le login ici");
+			stream << t.col() << f.getTextInput(AddUserAction::PARAMETER_NAME, "", "Entrez le nom ici");
+			stream << t.col() << f.getSelectInput(
 				AddUserAction::PARAMETER_PROFILE_ID,
 				SecurityModule::getProfileLabels(),
 				optional<RegistryKeyType>(0)
 			);
-			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
+			stream << t.col() << f.getSubmitButton("Ajouter");
 			stream << t.close();
+			stream << f.close();
 		}
 
 

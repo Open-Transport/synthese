@@ -33,21 +33,65 @@ namespace synthese
 	namespace pt
 	{
 		class CommercialLine;
+		class Line;
 	}
 
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// LineAddAction action class.
+		/// 35.15 Action : Route creation.
 		/// @ingroup m35Actions refActions
+		/// @author Hugues Romain
+		/// @date 2010
+		/// @since 3.1.15
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : LineAddAction
+		///
+		/// A route can be created in two ways :
+		///	<ul>
+		///		<li>from scratch</li>
+		///		<li>from a template</li>
+		///	</ul>
+		///
+		/// <h2>Creation from scratch</h2>
+		///
+		/// Parameters :
+		///	<ul>
+		///		<li>actionParamcl : id of the line which the route belongs to</li>
+		///		<li>actionParamna (optional) : name of the route</li>
+		///	</ul>
+		///
+		///	<h2>Creation from a template</h2>
+		///
+		/// Parameters :
+		///	<ul>
+		/// 	<li>actionParamte : id of the template to read</li>
+		///		<li>actionParamre (optional) : reverse copy</li>
+		///		<li>actionParamna (optional) : name of the route</li>
+		///	</ul>
+		///
+		/// The following elements are copied into the new route :
+		///	<ul>
+		///		<li>the list of served stops in the same order if reverse copy deactivated, or in the opposite order if reverse copy activated</li>
+		///		<li>the line which the route belongs to</li>
+		///		<li>the wayback attribute (inverted if reverse copy)</li>
+		///		<li>the direction only if no reverse copy</li>
+		///		<li>all transport attributes except direction if re</li>
+		///	</ul>
 		class LineAddAction:
 			public util::FactorableTemplate<server::Action, LineAddAction>
 		{
 		public:
 			static const std::string PARAMETER_COMMERCIAL_LINE_ID;
+			static const std::string PARAMETER_TEMPLATE_ID;
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_REVERSE_COPY;
 
 		private:
 			boost::shared_ptr<pt::CommercialLine> _commercialLine;
+			boost::shared_ptr<const pt::Line> _template;
+			bool _reverse;
+			std::string _name;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

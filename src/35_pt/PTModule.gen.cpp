@@ -78,6 +78,7 @@ synthese::pt::PTUseRuleUpdateAction::integrate();
 synthese::pt::ServiceTimetableUpdateAction::integrate();
 synthese::pt::ServiceUpdateAction::integrate();
 synthese::pt::LineUpdateAction::integrate();
+synthese::pt::ServiceApplyCalendarAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 
