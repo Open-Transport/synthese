@@ -1075,7 +1075,7 @@ namespace synthese
 					string(lineNode.getChildNode("transportModeName").getText()),
 					true
 			)	);
-			if(rollingStocks.empty())
+			if(!rollingStocks.empty())
 			{
 				rollingStock = rollingStocks.front();
 			}
