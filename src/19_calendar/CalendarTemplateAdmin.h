@@ -129,6 +129,7 @@ namespace synthese
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain
+
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
@@ -136,7 +137,7 @@ namespace synthese
 			
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 
-			AdminInterfaceElement::PageLinks CalendarTemplateAdmin::_getCurrentTreeBranch() const;
+			AdminInterfaceElement::PageLinks _getCurrentTreeBranch() const;
 		};
 	}
 }

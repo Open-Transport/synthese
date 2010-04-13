@@ -68,7 +68,7 @@ namespace synthese
 				map.insert(PARAMETER_ADD, _add);
 				if(!_period.is_special())
 				{
-					map.insert(PARAMETER_PERIOD, _period.days());
+					map.insert(PARAMETER_PERIOD, static_cast<int>(_period.days()));
 				}
 				if(_calendarTemplate.get())
 				{
