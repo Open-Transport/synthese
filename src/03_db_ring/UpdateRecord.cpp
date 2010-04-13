@@ -116,7 +116,7 @@ operator>> ( std::istream& is, UpdateRecord& op )
     op._key = Conversion::ToLongLong (buf);
 
     is.getline (buf, sizeof (buf), ' ');
-    op._timestamp = from_iso_string (buf);
+    op._timestamp = time_from_string (buf);
 
     //std::cerr << "..got timestamp " << to_iso_string (op._timestamp) << std::endl;
 

@@ -177,6 +177,15 @@
 											<xs:attribute name="endArrivalDateTime" type="xs:dateTime"/>
 											<xs:attribute name="departureDateTime" type="xs:dateTime"/>
 											<xs:attribute name="endDepartureDateTime" type="xs:dateTime"/>
+											<xs:attribute name="pedestrian">
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:enumeration value="departure"/>
+														<xs:enumeration value="arrival"/>
+														<xs:enumeration value="traversal"/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:attribute>
 										</xs:complexType>
 									</xs:element>
 								</xs:sequence>

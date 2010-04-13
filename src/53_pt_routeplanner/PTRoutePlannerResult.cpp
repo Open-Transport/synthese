@@ -366,6 +366,7 @@ namespace synthese
 			int solution(1);
 			ptime now(second_clock::local_time());
 			stream << t.open();
+			bool firstReservableFound(false);
 			for (PTRoutePlannerResult::Journeys::const_iterator it(_journeys.begin()); it != _journeys.end(); ++it)
 			{
 				stream << t.row();
@@ -374,14 +375,15 @@ namespace synthese
 					it->getReservationCompliance() &&
 					it->getReservationDeadLine() > now
 				){
+					string resaTime(to_simple_string(it->getDepartureTime().date()) +" "+to_simple_string(it->getDepartureTime().time_of_day()));
 					stream <<
 						resaForm->getRadioInput(
 							resaRadioFieldName,
-							optional<ptime>(it->getDepartureTime()),
-							optional<ptime>((solution==1) ? it->getDepartureTime() : ptime(not_a_date_time)),
-							" Solution "+ lexical_cast<string>(solution)
-						)
-					;
+							optional<string>(resaTime),
+							firstReservableFound ? optional<string>() : resaTime,
+							"Solution "+ lexical_cast<string>(solution)
+						);
+					firstReservableFound = true;
 				}
 				else
 					stream << "Solution " << solution;
@@ -396,13 +398,24 @@ namespace synthese
 					endRange += it->getContinuousServiceRange();
 					stream << " - Service continu jusqu'à " << endRange;
 				}
-				if (it->getReservationCompliance() == true)
+				if (it->getReservationCompliance() != false)
 				{
-					stream << " - " << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire") << " Réservation obligatoire avant le " << it->getReservationDeadLine();
-				}
-				if (it->getReservationCompliance() == boost::logic::indeterminate)
-				{
-					stream << " - " << HTMLModule::getHTMLImage("resa_optional.png", "Réservation facultative") << " Réservation facultative avant le " << it->getReservationDeadLine();
+					stream << " - ";
+					
+					if(it->getReservationCompliance() == true)
+					{
+						stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire") << " Réservation obligatoire";
+					}
+					else
+					{
+						stream << HTMLModule::getHTMLImage("resa_optional.png", "Réservation facultative") << " Réservation facultative";
+					}
+
+					const ptime deadline(it->getReservationDeadLine());
+					stream << " avant le " << 
+						deadline.date().day() << "/" << deadline.date().month() << "/" << deadline.date().year() << " à " <<
+						deadline.time_of_day().hours() << ":" << deadline.time_of_day().minutes()
+					;
 				}
 				if(dynamic_cast<const City*>(_departurePlace) || dynamic_cast<const City*>(_arrivalPlace))
 				{

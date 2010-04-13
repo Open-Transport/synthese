@@ -89,11 +89,11 @@ namespace synthese
 
 			if(!map.getDefault<string>(PARAMETER_START_DATE).empty())
 			{
-				_startDate = from_iso_string(map.get<string>(PARAMETER_START_DATE));
+				_startDate = time_from_string(map.get<string>(PARAMETER_START_DATE));
 			}
 			if(!map.getDefault<string>(PARAMETER_END_DATE).empty())
 			{
-				_endDate = from_iso_string(map.get<string>(PARAMETER_END_DATE));
+				_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
 			}
 
 			_title = map.getDefault<string>(PARAMETER_TITLE);

@@ -130,11 +130,12 @@ namespace synthese
 			_endPlace = map.getDefault<string>(PARAMETER_END_PLACE);
 			if(!map.getDefault<string>(PARAMETER_DATE).empty())
 			{
-				_dateTime = time_from_string(map.get<string>(PARAMETER_DATE));
-			}
-			if(!map.getDefault<string>(PARAMETER_TIME).empty())
-			{
-				_dateTime = ptime(_dateTime.date(), duration_from_string(map.get<string>(PARAMETER_TIME)));
+				_dateTime = ptime(
+					from_string(map.get<string>(PARAMETER_DATE)),
+					map.getDefault<string>(PARAMETER_TIME).empty() ?
+					minutes(0) :
+					duration_from_string(map.get<string>(PARAMETER_TIME))
+				);
 			}
 			_disabledPassenger = map.getDefault<bool>(PARAMETER_DISABLED_PASSENGER, false);
 			_withoutTransfer = map.getDefault<bool>(PARAMETER_WITHOUT_TRANSFER, false);

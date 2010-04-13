@@ -137,7 +137,7 @@ SQLiteStatement::bindParameterDouble (const std::string& name, double param)
 void 
 SQLiteStatement::bindParameterTimestamp (int index, const boost::posix_time::ptime& param)
 {
-    bindParameterText (index, to_iso_string (param));
+    bindParameterText (index, to_simple_string (param.date()) + " " + to_simple_string(param.time_of_day()));
 }
 
 

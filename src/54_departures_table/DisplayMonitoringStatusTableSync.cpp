@@ -25,15 +25,11 @@
 
 #include "DisplayMonitoringStatusTableSync.h"
 #include "DisplayMonitoringStatus.h"
-#include "DisplayScreen.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenTableSync.h"
 #include "DisplayScreenCPUTableSync.h"
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
-#include "Conversion.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
 #include "DisplayMaintenanceLog.h"
 
 #include <sstream>
@@ -170,36 +166,29 @@ namespace synthese
 			DisplayMonitoringStatus* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey()) << "," <<
-				(	(object->getScreen() == NULL) ? 
-					(object->getCPU() == NULL ? "0" : lexical_cast<string>(object->getCPU()->getKey())) : 
-					lexical_cast<string>(object->getScreen()->getKey())
-				) << "," <<
-				"'" << to_iso_string(object->getTime()) << "',"
-				<< static_cast<int>(object->getGeneralStatus()) << ","
-				<< static_cast<int>(object->getMemoryStatus()) << ","
-				<< static_cast<int>(object->getClockStatus()) << ","
-				<< static_cast<int>(object->getEepromStatus()) << ","
-				<< static_cast<int>(object->getTempSensorStatus()) << ","
-				<< static_cast<int>(object->getLightStatus()) << ","
-				<< Conversion::ToSQLiteString(object->getLightDetail()) << ","
-				<< static_cast<int>(object->getDisplayStatus()) << ","
-				<< Conversion::ToSQLiteString(object->getDisplayDetail()) << ","
-				<< static_cast<int>(object->getSoundStatus()) << ","
-				<< Conversion::ToSQLiteString(object->getSoundDetail()) << ","
-				<< static_cast<int>(object->getTemperatureStatus()) << ","
-				<< (object->getTemperatureValue() ? lexical_cast<string>(*object->getTemperatureValue()) : string()) << ","
-				<< static_cast<int>(object->getCommunicationStatus()) << ","
-				<< static_cast<int>(object->getLocalizationStatus())
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<DisplayMonitoringStatusTableSync> query(*object);
+			query.addField(
+				(object->getScreen() == NULL) ? 
+				(object->getCPU() == NULL ? RegistryKeyType(0) : object->getCPU()->getKey()) :
+				object->getScreen()->getKey()
+			);
+			query.addField(object->getTime());
+			query.addField(static_cast<int>(object->getGeneralStatus()));
+			query.addField(static_cast<int>(object->getMemoryStatus()));
+			query.addField(static_cast<int>(object->getClockStatus()));
+			query.addField(static_cast<int>(object->getEepromStatus()));
+			query.addField(static_cast<int>(object->getTempSensorStatus()));
+			query.addField(static_cast<int>(object->getLightStatus()));
+			query.addField(object->getLightDetail());
+			query.addField(static_cast<int>(object->getDisplayStatus()));
+			query.addField(object->getDisplayDetail());
+			query.addField(static_cast<int>(object->getSoundStatus()));
+			query.addField(object->getSoundDetail());
+			query.addField(static_cast<int>(object->getTemperatureStatus()));
+			query.addField(object->getTemperatureValue() ? lexical_cast<string>(*object->getTemperatureValue()) : string());
+			query.addField(static_cast<int>(object->getCommunicationStatus()));
+			query.addField(static_cast<int>(object->getLocalizationStatus()));
+			query.execute(transaction);
 		}
 
 
@@ -223,23 +212,25 @@ namespace synthese
 			bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
+			SelectQuery<DisplayMonitoringStatusTableSync> query;
 			if (screenId)
 			{
-				query << " AND " << COL_SCREEN_ID << "=" << *screenId;
+				query.addWhereField(COL_SCREEN_ID, *screenId);
 			}
 			if (orderByScreenId)
-				query << " ORDER BY " << COL_SCREEN_ID << (raisingOrder ? " ASC" : " DESC");
+			{
+				query.addOrderField(COL_SCREEN_ID, raisingOrder);
+			}
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
+			{
+				query.setNumber(*number + 1);
+			}
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			{
+				query.setFirst(first);
+			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 
 

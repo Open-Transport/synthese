@@ -94,7 +94,7 @@ namespace synthese
 
 		// First, read client last acknowledged timestamp
 		tcpStream.getline (buf, sizeof(buf), ETB);
-		const boost::posix_time::ptime timestamp (from_iso_string (std::string (buf)));
+		const boost::posix_time::ptime timestamp (time_from_string (std::string (buf)));
 
 		if (!tcpStream.good ()) throw 1;
 

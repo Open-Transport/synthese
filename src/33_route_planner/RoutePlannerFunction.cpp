@@ -510,6 +510,10 @@ namespace synthese
 									**itSheetRow << " endDepartureDateTime=\"" << 
 										posix_time::to_iso_extended_string(edTime) << "\"";
 								}
+								if(pedestrianMode)
+								{
+									**itSheetRow << " pedestrian=\"departure\"";
+								}
 								**itSheetRow << " />";
 
 								++itPlaces; ++itSheetRow;
@@ -528,7 +532,12 @@ namespace synthese
 								
 								for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
 								{
-									**itSheetRow << "<cell />";
+									**itSheetRow << "<cell";
+									if(pedestrianMode)
+									{
+										**itSheetRow << " pedestrian=\"traversal\"";
+									}
+									**itSheetRow << " />";
 								}
 								**itSheetRow << "<cell arrivalDateTime=\"" <<
 									posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
@@ -538,6 +547,10 @@ namespace synthese
 									eaTime += journey.getContinuousServiceRange();
 									**itSheetRow << " endArrivalDateTime=\"" <<
 										posix_time::to_iso_extended_string(eaTime) << "\"";
+								}
+								if(pedestrianMode)
+								{
+									**itSheetRow << " pedestrian=\"arrival\"";
 								}
 								if(	itl == jl.end() - 1)
 								{

@@ -293,6 +293,11 @@ namespace synthese
 		///			<li>endArrivalDateTime : dernière date/heure d'arrivée dans un service continu, fourni uniquement si la colonne représente une solution qui dessert en arrivée l'arrêt représenté par la ligne, et dans le cas d'un service continu</li>
 		///			<li>departureDateTime : date/heure de départ, fourni uniquement si la colonne représente une solution qui dessert en départ l'arrêt représenté par la ligne</li>
 		///			<li>endDepartureDateTime : dernière date/heure de départ dans un service continu, fourni uniquement si la colonne représente une solution qui dessert en départ l'arrêt représenté par la ligne, et dans le cas d'un service continu</li>
+		///			<li>pedestrian : si présent, indique que la cellule est concernée par un trajet piéton, qui peut alors être affiché différemment. Les valeurs possibles de pedestrian sont :
+		///			<ul><li>departure : indique qu'un trajet piéton démarre à la cellule. Un pictogramme peut remplacer l'heure de départ si souhaité.</li>
+		///				<li>arrival : indique qu'un trajet piéton se termine sur la cellule. Un pictograme peut remplacer l'heure d'arrivée si souhaité.</li>
+		///				<li>traversal : indique qu'un trajet piéton a démarré avant cette cellule et se terminera après cette cellule (dans le sens de lecture de la colonne). Un pictogramme peut l'indiquer si souhaité.</li>
+		///			</ul>
 		/// </ul></ul>
 		///
 		/// <h4>Lieux (générique)</h4>

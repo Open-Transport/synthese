@@ -139,7 +139,7 @@ namespace synthese
 				}
 				if (!_journey.getDepartureTime().is_not_a_date_time())
 				{
-					map.insert(PARAMETER_DATE_TIME, to_iso_string(_journey.getDepartureTime()));
+					map.insert(PARAMETER_DATE_TIME, _journey.getDepartureTime());
 				}
 				if(_site.get())
 				{
@@ -258,7 +258,7 @@ namespace synthese
 			}
 			
 			// Departure date time
-			ptime departureDateTime(from_iso_string(map.get<string>(PARAMETER_DATE_TIME)));
+			ptime departureDateTime(time_from_string(map.get<string>(PARAMETER_DATE_TIME)));
 			ptime arrivalDateTime(departureDateTime);
 			arrivalDateTime += days(1);
 			if(	!originPlace->getPoint().isUnknown() &&

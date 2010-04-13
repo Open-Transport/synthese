@@ -61,12 +61,11 @@ namespace synthese
 			const ServicePointer& servicePointer,
 			const Edge* edge
 		) const	{
-			double distance((servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
-				? edge->getMetricOffset() - servicePointer.getEdge()->getMetricOffset()
-				: servicePointer.getEdge()->getMetricOffset() - edge->getMetricOffset()
-			);
-
-			assert(distance >= 0);
+			double distance(edge->getMetricOffset() - servicePointer.getEdge()->getMetricOffset());
+			if(distance < 0)
+			{
+				distance = -distance;
+			}
 
 			posix_time::time_duration duration(
 				_duration ?
