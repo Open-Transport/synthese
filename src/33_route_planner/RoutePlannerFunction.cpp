@@ -107,6 +107,9 @@ namespace synthese
 		void RoutePlannerFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_FunctionWithSite::_setFromParametersMap(map);
+
+			_outputRoadApproachDetail = _site->getDisplayRoadApproachDetail();
+
 			if(_site->getInterface())
 			{
 				_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
