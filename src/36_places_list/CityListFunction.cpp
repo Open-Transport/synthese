@@ -21,7 +21,7 @@
 */
 
 #include "CityListFunction.h"
-
+#include "WebPage.h"
 #include "PlacesListInterfacePage.h"
 #include "Types.h"
 #include "Site.h"
@@ -52,6 +52,7 @@ namespace synthese
 		const string CityListFunction::PARAMETER_NUMBER("n");
 		const string CityListFunction::PARAMETER_IS_FOR_ORIGIN("o");
 		const string CityListFunction::PARAMETER_PAGE("p");
+		const string CityListFunction::PARAMETER_ITEM_PAGE("ip");
 		
 		void CityListFunction::run( std::ostream& stream, const Request& request ) const
 		{
@@ -59,7 +60,7 @@ namespace synthese
 				_site->getCitiesMatcher().bestMatches(_input, _n)
 			);
 
-			if(_page)
+			if(_page.get())
 			{
 				PlacesList placesList;
 				BOOST_FOREACH(LexicalMatcher<City*>::MatchHit it, matches)
@@ -67,8 +68,14 @@ namespace synthese
 					placesList.push_back(make_pair(it.value->getKey(), it.key.getSource()));
 				}
 
-				VariablesMap vm;
-				_page->display(stream, vm, placesList, true, _isForOrigin, NULL, &request);
+				PlacesListInterfacePage::DisplayCitiesList(
+					stream,
+					_page,
+					_itemPage,
+					request,
+					placesList,
+					_isForOrigin
+				);
 			}
 			else
 			{
@@ -90,7 +97,14 @@ namespace synthese
 			pm.insert(PARAMETER_INPUT, _input);
 			pm.insert(PARAMETER_NUMBER, _n);
 			pm.insert(PARAMETER_IS_FOR_ORIGIN, _isForOrigin);
-			if(_page) pm.insert(PARAMETER_PAGE, _page->getFactoryKey());
+			if(_page.get())
+			{
+				pm.insert(PARAMETER_PAGE, _page->getKey());
+			}
+			if(_itemPage.get())
+			{
+				pm.insert(PARAMETER_ITEM_PAGE, _itemPage->getKey());
+			}
 			return pm;
 		}
 
@@ -98,14 +112,18 @@ namespace synthese
 		{
 			_FunctionWithSite::_setFromParametersMap(map);
 
-			if(map.getOptional<string>(PARAMETER_PAGE))
+			if(map.getOptional<RegistryKeyType>(PARAMETER_PAGE))
 			{
-				_page = _site->getInterface()->getPage<PlacesListInterfacePage>(map.get<string>(PARAMETER_PAGE));
+				_page = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(PARAMETER_PAGE));
+			}
+			if(map.getOptional<RegistryKeyType>(PARAMETER_ITEM_PAGE))
+			{
+				_itemPage = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(PARAMETER_ITEM_PAGE));
 			}
 			_input = map.get<string>(PARAMETER_INPUT);
 			_isForOrigin = map.getDefault<bool>(PARAMETER_IS_FOR_ORIGIN, false);
 		
-			_n = map.get<int>(PARAMETER_NUMBER);
+			_n = map.get<size_t>(PARAMETER_NUMBER);
 			if (_n < 0)
 				throw RequestException("Bad value for number");
 		}
@@ -126,11 +144,6 @@ namespace synthese
 		}
 
 
-		CityListFunction::CityListFunction():
-			_page(NULL)
-		{
-		}
-
 
 		bool CityListFunction::isAuthorized(const Session* session
 		) const {
@@ -139,7 +152,7 @@ namespace synthese
 
 		std::string CityListFunction::getOutputMimeType() const
 		{
-			return _page ? _page->getMimeType() : "text/xml";
+			return _page.get() ? _page->getMimeType() : "text/xml";
 		}
 	}
 }

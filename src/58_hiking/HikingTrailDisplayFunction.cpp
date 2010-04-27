@@ -26,7 +26,7 @@
 #include "Request.h"
 #include "HikingRight.h"
 #include "HikingTrailDisplayFunction.h"
-#include "HikingTrail.h"
+#include "HikingTrailTableSync.h"
 
 using namespace std;
 
@@ -41,8 +41,7 @@ namespace synthese
 	
 	namespace hiking
 	{
-		/// @todo Parameter names declarations
-		//const string HikingTrailDisplayFunction::PARAMETER_PAGE("rub");
+		const string HikingTrailDisplayFunction::PARAMETER_KEY("key");
 		
 		ParametersMap HikingTrailDisplayFunction::_getParametersMap() const
 		{
@@ -50,6 +49,7 @@ namespace synthese
 			if(_hikingTrail.get())
 			{
 				map.insert(Request::PARAMETER_OBJECT_ID, _hikingTrail->getKey());
+				map.insert(PARAMETER_KEY, _key);
 			}
 			return map;
 		}
@@ -65,13 +65,33 @@ namespace synthese
 			{
 				throw RequestException("No such hiking trail");
 			}
+			_key = map.get<string>(PARAMETER_KEY);
 		}
 
 		void HikingTrailDisplayFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
-			/// @todo See the hiking trail through the interface
+			if(_key == HikingTrailTableSync::COL_DURATION)
+			{
+				stream << _hikingTrail->getDuration();
+			}
+			else if(_key == HikingTrailTableSync::COL_MAP)
+			{
+				stream << _hikingTrail->getMap();
+			}
+			else if(_key == HikingTrailTableSync::COL_NAME)
+			{
+				stream << _hikingTrail->getName();
+			}
+			else if(_key == HikingTrailTableSync::COL_PROFILE)
+			{
+				stream << _hikingTrail->getProfile();
+			}
+			else if(_key == HikingTrailTableSync::COL_URL)
+			{
+				stream << _hikingTrail->getURL();
+			}
 		}
 		
 		
@@ -86,7 +106,7 @@ namespace synthese
 
 		std::string HikingTrailDisplayFunction::getOutputMimeType() const
 		{
-			return "text/html";
+			return "text/plain";
 		}
 	}
 }

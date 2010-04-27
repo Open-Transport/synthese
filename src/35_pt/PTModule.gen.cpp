@@ -55,10 +55,6 @@ synthese::pt::PTObjectInformationFunction::integrate();
 
 synthese::pt::LineMarkerInterfacePage::integrate();
 synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
-synthese::pt::PTNetworkListItemInterfacePage::integrate();
-synthese::pt::PTLinesListItemInterfacePage::integrate();
-synthese::pt::PTRoutesListItemInterfacePage::integrate();
-synthese::pt::ReservationRuleInterfacePage::integrate();
 
 synthese::pt::NonConcurrencyRuleAddAction::integrate();
 synthese::pt::NonConcurrencyRuleRemoveAction::integrate();

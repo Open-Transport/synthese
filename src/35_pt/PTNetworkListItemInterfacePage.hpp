@@ -25,8 +25,9 @@
 #ifndef SYNTHESE_PTNetworkListItemInterfacePage_H__
 #define SYNTHESE_PTNetworkListItemInterfacePage_H__
 
-#include "InterfacePage.h"
-#include "FactorableTemplate.h"
+#include <string>
+#include <ostream>
+#include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
@@ -34,50 +35,48 @@ namespace synthese
 	{
 		class Request;
 	}
+
+	namespace transportwebsite
+	{
+		class WebPage;
+	}
 	
 	namespace pt
 	{
 		class TransportNetwork;
-	}
-
-	namespace pt
-	{
+	
 		/** PTNetworkListItemInterfacePage Interface Page Class.
 			@ingroup m35Pages refPages
 			@author Hugues Romain
 			@date 2010
 
-			@code transport_network_list_item @endcode
-
 			Parameters :
-				- 0 : Network id
-				- 1 : Network name
-				- 2 : Rank in the list
-				- 3 : Rank is odd
-
-			Object : TransportNetwork
+				- roid : Network id
+				- name : Network name
+				- rank : Rank in the list
+				- rank_is_odd : Rank is odd
 		*/
 		class PTNetworkListItemInterfacePage
-			: public util::FactorableTemplate<interfaces::InterfacePage, PTNetworkListItemInterfacePage>
 		{
 		public:
-			/** Overloaded display method for specific parameter conversion.
-				This function converts the parameters into a single ParametersVector object.
+			static const std::string DATA_NAME;
+			static const std::string DATA_RANK;
+			static const std::string DATA_RANK_IS_ODD;
+
+			/** Network display
 				@param stream Stream to write on
+				@param page page to use for display
+				@param request Source request
 				@param object Transport network to display
 				@param rank Rank of the item in the list
-				@param variables Execution variables
-				@param request Source request
 			*/
-			void display(
+			static void Display(
 				std::ostream& stream,
+				boost::shared_ptr<const transportwebsite::WebPage> page,
+				const server::Request& request,
 				const pt::TransportNetwork& object,
-				std::size_t rank,
-				interfaces::VariablesMap& variables,
-				const server::Request* request = NULL
-			) const;
-			
-			PTNetworkListItemInterfacePage();
+				std::size_t rank
+			);
 		};
 	}
 }

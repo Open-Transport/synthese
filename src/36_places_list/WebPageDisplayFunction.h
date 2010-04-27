@@ -34,11 +34,22 @@ namespace synthese
 	{
 		class WebPage;
 
-		/** WebPageDisplayFunction Function class.
-			@author Hugues
-			@date 2010
-			@ingroup m56Functions refFunctions
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 56.15 Function : display of a web page.
+		///	@author Hugues Romain
+		///	@date 2010
+		///	@ingroup m56Functions refFunctions
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : WebPageDisplayFunction
+		///
+		/// Parameters :
+		///	<ul>
+		///		<li>p : id of the page to display</li>
+		///		<li>all other parameters are available in the page (accessed by
+		///			the @ function (GetValueFunction)). </li>
+		///	</ul>
+		///
+		/// Other parameters can be added by using the aditionnalParameters attribute too.
 		class WebPageDisplayFunction:
 			public util::FactorableTemplate<server::Function, WebPageDisplayFunction>
 		{
@@ -49,6 +60,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const WebPage>	_page;
+				server::ParametersMap _aditionnalParameters;
 			//@}
 			
 			
@@ -75,12 +87,13 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setPage(boost::shared_ptr<const WebPage> value);
+				void setPage(boost::shared_ptr<const WebPage> value) { _page = value; }
+				void setAditionnalParametersMap(const server::ParametersMap& value){ _aditionnalParameters = value; }
 			//@}
 
 			//! @name Getters
 			//@{
-				boost::shared_ptr<const WebPage> getPage() const;
+				boost::shared_ptr<const WebPage> getPage() const { return _page; }
 			//@}
 
 

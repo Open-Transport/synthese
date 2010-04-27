@@ -25,11 +25,17 @@
 #ifndef SYNTHESE_PTRoutesListItemInterfacePage_H__
 #define SYNTHESE_PTRoutesListItemInterfacePage_H__
 
-#include "InterfacePage.h"
-#include "FactorableTemplate.h"
+#include <string>
+#include <ostream>
+#include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
+	namespace transportwebsite
+	{
+		class WebPage;
+	}
+
 	namespace server
 	{
 		class Request;
@@ -38,10 +44,7 @@ namespace synthese
 	namespace pt
 	{
 		class Line;
-	}
 
-	namespace pt
-	{
 		/** PTRoutesListItemInterfacePage Interface Page Class.
 			@ingroup m35Pages refPages
 			@author Hugues Romain
@@ -65,26 +68,34 @@ namespace synthese
 			Object : Line
 		*/
 		class PTRoutesListItemInterfacePage
-			: public util::FactorableTemplate<interfaces::InterfacePage, PTRoutesListItemInterfacePage>
 		{
 		public:
+			static const std::string DATA_NAME;
+			static const std::string DATA_LENGTH;
+			static const std::string DATA_STOPS_NUMBER;
+			static const std::string DATA_DIRECTION;
+			static const std::string DATA_ORIGIN_CITY_NAME;
+			static const std::string DATA_ORIGIN_STOP_NAME;
+			static const std::string DATA_DESTINATION_CITY_NAME;
+			static const std::string DATA_DESTINATION_STOP_NAME;
+			static const std::string DATA_RANK;
+			static const std::string DATA_RANK_IS_ODD;
+
+
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
 				@param object The route to display
 				@param rank The rank of the item in the list
-				@param variables Execution variables
 				@param request Source request
 			*/
-			void display(
+			static void Display(
 				std::ostream& stream,
+				boost::shared_ptr<const transportwebsite::WebPage> page,
+				const server::Request& request,
 				const pt::Line& object,
-				std::size_t rank,
-				interfaces::VariablesMap& variables,
-				const server::Request* request = NULL
-			) const;
-			
-			PTRoutesListItemInterfacePage();
+				std::size_t rank
+			);
 		};
 	}
 }

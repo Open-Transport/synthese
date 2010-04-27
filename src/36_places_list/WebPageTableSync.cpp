@@ -24,7 +24,7 @@
 #include "ReplaceQuery.h"
 #include "SQLiteResult.h"
 #include "SiteTableSync.h"
-
+#include "SelectQuery.hpp"
 
 using namespace boost;
 using namespace std;
@@ -50,12 +50,13 @@ namespace synthese
 		const string WebPageTableSync::COL_CONTENT1 = "content1";
 		const string WebPageTableSync::COL_START_TIME = "start_time";
 		const string WebPageTableSync::COL_END_TIME = "end_time";
+		const string WebPageTableSync::COL_MIME_TYPE = "mime_type";
 	}
 
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<WebPageTableSync>::TABLE(
-				"t063_web_pages"
+			"t063_web_pages"
 		);
 		
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<WebPageTableSync>::_FIELDS[] =
@@ -68,6 +69,7 @@ namespace synthese
 			SQLiteTableSync::Field(WebPageTableSync::COL_CONTENT1, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_START_TIME, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_END_TIME, SQL_TEXT),
+			SQLiteTableSync::Field(WebPageTableSync::COL_MIME_TYPE, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -88,6 +90,7 @@ namespace synthese
 			webpage->setName(rows->getText(WebPageTableSync::COL_TITLE));
 			webpage->setContent(rows->getText(WebPageTableSync::COL_CONTENT1));
 			webpage->setRank(rows->getInt(WebPageTableSync::COL_RANK));
+			webpage->setMimeType(rows->getText(WebPageTableSync::COL_MIME_TYPE));
 
 			if(!rows->getText(WebPageTableSync::COL_START_TIME).empty())
 			{
@@ -155,6 +158,7 @@ namespace synthese
 			query.addField(webPage->getContent());
 			query.addField(webPage->getStartDate());
 			query.addField(webPage->getEndDate());
+			query.addField(webPage->_getMimeType());
 			query.execute(transaction);
 		}
 	}
@@ -172,35 +176,43 @@ namespace synthese
 			bool raisingOrder /*= true*/,
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
+			SelectQuery<WebPageTableSync> query;
 			if (siteId)
 			{
-				query << " AND " << COL_SITE_ID << "=" << *siteId;
+				query.addWhereField(COL_SITE_ID, *siteId);
 			}
 			if(parentId)
 			{
-				query << " AND " << COL_UP_ID << "=" << *parentId;
+				if(*parentId == 0)
+				{
+					query.addWhere(
+						ComposedExpression::Get(
+							ComposedExpression::Get(FieldExpression::Get(TABLE.NAME, COL_UP_ID), ComposedExpression::OP_EQ, ValueExpression<RegistryKeyType>::Get(0)),
+							ComposedExpression::OP_OR,
+							IsNullExpression::Get(FieldExpression::Get(TABLE.NAME, COL_UP_ID))
+					)	);
+				}
+				else
+				{
+					query.addWhereField(COL_UP_ID, *parentId);
+				}
 			}
 			if(orderByRank)
 			{
-				query << " ORDER BY " << COL_RANK << (raisingOrder ? " ASC" : " DESC");
+				query.addOrderField(COL_RANK, raisingOrder);
 			}
 			else if (orderByTitle)
 			{
-				query << " ORDER BY " << COL_TITLE << (raisingOrder ? " ASC" : " DESC");
+				query.addOrderField(COL_TITLE, raisingOrder);
 			}
 			if (number)
 			{
-				query << " LIMIT " << (*number + 1);
+				query.setNumber(*number + 1);
 				if (first > 0)
-					query << " OFFSET " << first;
+					query.setFirst(first);
 			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 
 

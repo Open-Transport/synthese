@@ -21,8 +21,8 @@
 */
 
 #include "DateTimeInterfacePage.h"
-
-#include <boost/lexical_cast.hpp>
+#include "StaticFunctionRequest.h"
+#include "WebPageDisplayFunction.h"
 
 using namespace std;
 using namespace boost;
@@ -31,10 +31,8 @@ using namespace boost::gregorian;
 
 namespace synthese
 {
-	using namespace interfaces;
-	using namespace util;
-
-	template<> const string util::FactorableTemplate<InterfacePage,DateTimeInterfacePage>::FACTORY_KEY("datetime");
+	using namespace server;
+	using namespace transportwebsite;
 
 	namespace interfaces
 	{
@@ -44,48 +42,68 @@ namespace synthese
 		const string DateTimeInterfacePage::DATA_MINUTES("minutes");
 		const string DateTimeInterfacePage::DATA_MONTH("month");
 		const string DateTimeInterfacePage::DATA_YEAR("year");
+		const string DateTimeInterfacePage::DATA_TOTAL_MINUTES("total_minutes");
 
-		void DateTimeInterfacePage::display(
+		void DateTimeInterfacePage::Display(
 			std::ostream& stream,
-			VariablesMap& variables	,
-			const ptime& dateTime
-			, const server::Request* request /*= NULL*/
-		) const	{
-			ParametersVector pv;
+			boost::shared_ptr<const transportwebsite::WebPage> page,
+			const server::Request& request,
+			const boost::posix_time::ptime& dateTime
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			ParametersMap pm;
 
-			pv.push_back(lexical_cast<string>(dateTime.date().year()));
-			pv.push_back(lexical_cast<string>(dateTime.date().month()));
-			pv.push_back(lexical_cast<string>(dateTime.date().day()));
-			pv.push_back(lexical_cast<string>(dateTime.time_of_day().hours()));
-			pv.push_back(lexical_cast<string>(dateTime.time_of_day().minutes()));
-			pv.push_back(lexical_cast<string>(dateTime.date().day_of_week()));
+			pm.insert(DATA_YEAR, dateTime.date().year());
+			pm.insert(DATA_MONTH, dateTime.date().month());
+			pm.insert(DATA_DAY, dateTime.date().day());
+			pm.insert(DATA_HOURS, dateTime.time_of_day().hours());
+			pm.insert(DATA_MINUTES, dateTime.time_of_day().minutes());
+			pm.insert(DATA_DAY_OF_WEEK, dateTime.date().day_of_week());
 
-			InterfacePage::_display(stream, pv, variables, NULL, request);
-		}
-
-		void DateTimeInterfacePage::display(
-			std::ostream& stream ,
-			interfaces::VariablesMap& variables ,
-			const date& date ,
-			const server::Request* request /*= NULL  */
-		) const	{
-			ParametersVector pv;
-
-			pv.push_back(lexical_cast<string>(date.year()));
-			pv.push_back(lexical_cast<string>(date.month()));
-			pv.push_back(lexical_cast<string>(date.day()));
-			pv.push_back(lexical_cast<string>(UNKNOWN_VALUE));
-			pv.push_back(lexical_cast<string>(UNKNOWN_VALUE));
-			pv.push_back(lexical_cast<string>(date.day_of_week()));
-
-			InterfacePage::_display(stream, pv, variables, NULL, request);
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
 		}
 
 
 
-		DateTimeInterfacePage::DateTimeInterfacePage()
-			: Registrable(0)
-		{
+		void DateTimeInterfacePage::Display(
+			std::ostream& stream,
+			boost::shared_ptr<const transportwebsite::WebPage> page,
+			const server::Request& request,
+			const boost::gregorian::date& date
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			ParametersMap pm;
+
+			pm.insert(DATA_YEAR, date.year());
+			pm.insert(DATA_MONTH, date.month());
+			pm.insert(DATA_DAY, date.day());
+			pm.insert(DATA_DAY_OF_WEEK, date.day_of_week());
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+
+
+
+		void DateTimeInterfacePage::Display(
+			std::ostream& stream,
+			boost::shared_ptr<const transportwebsite::WebPage> page,
+			const server::Request& request,
+			const boost::posix_time::time_duration& duration
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			ParametersMap pm;
+
+			pm.insert(DATA_HOURS, duration.hours());
+			pm.insert(DATA_MINUTES, duration.minutes());
+			pm.insert(DATA_TOTAL_MINUTES, duration.total_seconds() / 60);
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
 
 		}
 	}

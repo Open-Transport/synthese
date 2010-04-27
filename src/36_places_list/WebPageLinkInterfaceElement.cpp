@@ -107,9 +107,9 @@ namespace synthese
 					StaticFunctionRequest<WebPageDisplayFunction> openRequest(*request, false);
 					shared_ptr<const WebPage> page(Env::GetOfficialEnv().get<WebPage>(pageId));
 					openRequest.getFunction()->setPage(page);
-					if(page->getRoot()->getInterface() && !page->getRoot()->getInterface()->getDefaultClientURL().empty())
+					if(!page->getRoot()->getClientURL().empty())
 					{
-						openRequest.setClientURL(page->getRoot()->getInterface()->getDefaultClientURL());
+						openRequest.setClientURL(page->getRoot()->getClientURL());
 					}
 					stream << HTMLModule::getHTMLLink(
 						openRequest.getURL(),

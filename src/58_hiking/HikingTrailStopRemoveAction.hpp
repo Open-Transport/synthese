@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// HikingTrailUpdateAction class header.
-///	@file HikingTrailUpdateAction.h
+/// HikingTrailStopRemoveAction class header.
+///	@file HikingTrailStopRemoveAction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///
@@ -22,8 +22,8 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_HikingTrailUpdateAction_H__
-#define SYNTHESE_HikingTrailUpdateAction_H__
+#ifndef SYNTHESE_HikingTrailStopRemoveAction_H__
+#define SYNTHESE_HikingTrailStopRemoveAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
@@ -35,41 +35,29 @@ namespace synthese
 		class HikingTrail;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 58.15 Action : HikingTrailUpdateAction.
+		/// 58.15 Action : HikingTrailStopRemoveAction.
 		/// @ingroup m58Actions refActions
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.1.16
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : HikingTrailUpdateAction
+		/// Key : HikingTrailStopRemoveAction
 		///
 		/// Parameters :
 		///	<ul>
-		///		<li>actionParamid : id of the object to update</li>
-		///		<li>actionParamna : name</li>
-		///		<li>actionParamma : map image URL</li>
-		///		<li>actionParamdu : duration image URL</li>
-		///		<li>actionParampr : profile image URL</li>
-		///		<li>actionParamur : link URL</li>
+		///		<li>actionParamid : id of the trail to update</li>
+		///		<li>actionParamrk : rank of the stop to remove</li>
 		///	</ul>
-		class HikingTrailUpdateAction:
-			public util::FactorableTemplate<server::Action, HikingTrailUpdateAction>
+		class HikingTrailStopRemoveAction:
+			public util::FactorableTemplate<server::Action, HikingTrailStopRemoveAction>
 		{
 		public:
 			static const std::string PARAMETER_TRAIL_ID;
-			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_MAP;
-			static const std::string PARAMETER_DURATION;
-			static const std::string PARAMETER_PROFILE;
-			static const std::string PARAMETER_URL;
+			static const std::string PARAMETER_RANK;
 
 		private:
 			boost::shared_ptr<HikingTrail> _trail;
-			std::string _name;
-			std::string _map;
-			std::string _duration;
-			std::string _profile;
-			std::string _url;
+			std::size_t _rank;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -104,9 +92,10 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setTrail(boost::shared_ptr<HikingTrail> value) { _trail = value; }
+				void setRank(std::size_t value){ _rank = value; }
 			//@}
 		};
 	}
 }
 
-#endif // SYNTHESE_HikingTrailUpdateAction_H__
+#endif // SYNTHESE_HikingTrailStopRemoveAction_H__

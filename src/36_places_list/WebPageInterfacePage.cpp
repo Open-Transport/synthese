@@ -24,58 +24,52 @@
 
 #include "WebPageInterfacePage.h"
 #include "WebPage.h"
+#include "StaticFunctionRequest.h"
+#include "WebPageDisplayFunction.h"
 
 #include <sstream>
-#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
 
 namespace synthese
 {
-	using namespace interfaces;
 	using namespace util;
-
-	namespace util
-	{
-		template<> const string FactorableTemplate<InterfacePage, transportwebsite::WebPageInterfacePage>::FACTORY_KEY("web_page");
-	}
+	using namespace server;
 
 	namespace transportwebsite
 	{
-		WebPageInterfacePage::WebPageInterfacePage():
-			Registrable(0),
-			FactorableTemplate<interfaces::InterfacePage, WebPageInterfacePage>()
-		{
-		}
-		
-		
+		const string WebPageInterfacePage::DATA_CONTENT("content");
+		const string WebPageInterfacePage::DATA_TITLE("title");
 
-		void WebPageInterfacePage::display(
+
+
+		void WebPageInterfacePage::Display(
 			std::ostream& stream,
-			const WebPage& webPage,
-			bool edit,
-			VariablesMap& variables,
-			const server::Request* request /*= NULL*/
-		) const	{
-			ParametersVector pv;
-		
-			pv.push_back(webPage.getName()); //0
+			boost::shared_ptr<const WebPage> templatePage,
+			const server::Request& request,
+			boost::shared_ptr<const WebPage> page,
+			bool edit
+		){
+			if(templatePage.get())
+			{
+				StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+				displayRequest.getFunction()->setPage(templatePage);
+				ParametersMap pm;
 
-			stringstream content;
-			webPage.display(content, *request);
-			pv.push_back(content.str()); //1
+				pm.insert(DATA_TITLE, page->getName());
+				stringstream content;
+				page->display(content, request);
+				pm.insert(DATA_CONTENT, content.str());
+				pm.insert(Request::PARAMETER_OBJECT_ID, page->getKey());
 
-			pv.push_back(lexical_cast<string>(webPage.getKey())); //2
-
-
-			InterfacePage::_display(
-				stream
-				, pv
-				, variables
-				, static_cast<const void*>(&webPage)
-				, request
-			);
+				displayRequest.getFunction()->setAditionnalParametersMap(pm);
+				displayRequest.run(stream);
+			}
+			else
+			{
+				page->display(stream, request);
+			}
 		}
 	}
 }

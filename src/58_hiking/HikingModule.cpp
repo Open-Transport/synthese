@@ -22,14 +22,39 @@
 
 #include "HikingModule.h"
 
+using namespace std;
+
 namespace synthese
 {
+	using namespace server;
+	using namespace hiking;
+
+	namespace util
+	{
+		template<>
+		const string FactorableTemplate<ModuleClass,HikingModule>::FACTORY_KEY("58_hiking");
+	}
+
+	namespace server
+	{
+		template<>
+		const string ModuleClassTemplate<HikingModule>::NAME("Randonnées");
+
+		template<> void ModuleClassTemplate<HikingModule>::PreInit()
+		{
+		}
+
+		template<> void ModuleClassTemplate<HikingModule>::Init()
+		{
+		}
+
+		template<> void ModuleClassTemplate<HikingModule>::End()
+		{
+		}
+	}
+
 	namespace hiking
 	{
-
-
-
-
 		void HikingModule::initialize()
 		{
 

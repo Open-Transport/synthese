@@ -21,14 +21,13 @@
 */
 
 #include "ReservationRuleInterfacePage.h"
-
 #include "Journey.h"
-
 #include "DateTimeInterfacePage.h"
-#include "Interface.h"
+#include "WebPage.h"
+#include "StaticFunctionRequest.h"
+#include "WebPageDisplayFunction.h"
 
 #include <sstream>
-#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -40,11 +39,8 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace pt;
-
-	namespace util
-	{
-		template<> const string FactorableTemplate<InterfacePage, ReservationRuleInterfacePage>::FACTORY_KEY("reservation_rule");
-	}
+	using namespace transportwebsite;
+	using namespace server;
 
 	namespace pt
 	{
@@ -53,38 +49,47 @@ namespace synthese
 		const string ReservationRuleInterfacePage::DATA_IS_COMPULSORY("is_compulsory");
 		const string ReservationRuleInterfacePage::DATA_IS_OPTIONAL("is_optional");
 
-		void ReservationRuleInterfacePage::display( std::ostream& stream , interfaces::VariablesMap& variables , const Journey& journey, const server::Request* request /*= NULL  */ ) const
-		{
+		void ReservationRuleInterfacePage::Display(
+			std::ostream& stream,
+			shared_ptr<const WebPage> page,
+			shared_ptr<const WebPage> dateTimePage,
+			const Request& request,
+			const Journey& journey
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			ParametersMap pm;
+
+
 			ptime now(second_clock::local_time());
-			ParametersVector pv;
 			ptime deadLine(journey.getReservationDeadLine());
 			logic::tribool compliance(journey.getReservationCompliance());
 
-			pv.push_back(lexical_cast<string>(logic::indeterminate(compliance) && (deadLine.is_not_a_date_time() || deadLine > now)));
-			pv.push_back(lexical_cast<string>(compliance == true));
-			pv.push_back(lexical_cast<string>(deadLine.is_not_a_date_time() ? 0 : (deadLine - now).total_seconds() / 60 ));
+			pm.insert(DATA_IS_OPTIONAL, logic::indeterminate(compliance) && (deadLine.is_not_a_date_time() || deadLine > now));
+			pm.insert(DATA_IS_COMPULSORY, compliance == true);
+			pm.insert(DATA_DELAY, deadLine.is_not_a_date_time() ? 0 : (deadLine - now).total_seconds() / 60);
 
-			if(deadLine.is_not_a_date_time())
+			if(!deadLine.is_not_a_date_time())
 			{
-				pv.push_back(string());
+				if(dateTimePage.get())
+				{
+					stringstream s;
+					DateTimeInterfacePage::Display(
+						s,
+						dateTimePage,
+						request,
+						deadLine
+						);
+					pm.insert(DATA_DEADLINE, s.str());
+				}
+				else
+				{
+					pm.insert(DATA_DEADLINE, deadLine);
+				}
 			}
-			else
-			{
-				stringstream s;
-				const DateTimeInterfacePage* datePage(getInterface()->getPage<DateTimeInterfacePage>());
-				datePage->display(s, variables, deadLine, request);
-				pv.push_back(s.str());
-			}
 
-			InterfacePage::_display(stream, pv, variables, static_cast<const void*>(&journey), request);
-		}
-
-
-
-		ReservationRuleInterfacePage::ReservationRuleInterfacePage()
-			: Registrable(0)
-		{
-
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
 		}
 	}
 }

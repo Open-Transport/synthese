@@ -25,8 +25,9 @@
 #ifndef SYNTHESE_WebPageInterfacePage_H__
 #define SYNTHESE_WebPageInterfacePage_H__
 
-#include "InterfacePage.h"
-#include "FactorableTemplate.h"
+#include <string>
+#include <ostream>
+#include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
@@ -47,16 +48,16 @@ namespace synthese
 			@code web_page @endcode
 
 			Parameters :
-				- 0 : title
-				- 1 : content
-				- 2 : page id
-
-			Object : WebPage
+				- title
+				- content
+				- roid : page id
 		*/
 		class WebPageInterfacePage
-			: public util::FactorableTemplate<interfaces::InterfacePage, WebPageInterfacePage>
 		{
 		public:
+			static const std::string DATA_TITLE;
+			static const std::string DATA_CONTENT;
+			
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
@@ -65,15 +66,13 @@ namespace synthese
 				@param variables Execution variables
 				@param request Source request
 			*/
-			void display(
+			static void Display(
 				std::ostream& stream,
-				const WebPage& page,
-				bool edit,
-				interfaces::VariablesMap& variables,
-				const server::Request* request = NULL
-			) const;
-			
-			WebPageInterfacePage();
+				boost::shared_ptr<const WebPage> templatePage,
+				const server::Request& request,
+				boost::shared_ptr<const WebPage> page,
+				bool edit
+			);
 		};
 	}
 }

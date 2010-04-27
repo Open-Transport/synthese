@@ -29,8 +29,8 @@
 #include "TransportNetworkTableSync.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
-#include "PTLinesListItemInterfacePage.hpp"
-#include "Interface.h"
+#include "LineMarkerInterfacePage.h"
+#include "WebPage.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -45,23 +45,26 @@ namespace synthese
 	using namespace pt;
 	using namespace security;
 	using namespace transportwebsite;
-	using namespace interfaces;
 	
-
-	template<> const string util::FactorableTemplate<pt::LinesListFunction::_FunctionWithSite,pt::LinesListFunction>::FACTORY_KEY(
+	template<> const string util::FactorableTemplate<server::Function,pt::LinesListFunction>::FACTORY_KEY(
 		"LinesListFunction2"
 	);
 	
 	namespace pt
 	{
 		const string LinesListFunction::PARAMETER_NETWORK_ID("ni");
+		const string LinesListFunction::PARAMETER_PAGE_ID("pi");
 		
 		ParametersMap LinesListFunction::_getParametersMap() const
 		{
-			ParametersMap result(FunctionWithSiteBase::_getParametersMap());
+			ParametersMap result;
 			if (_network.get() != NULL)
 			{
 				result.insert(PARAMETER_NETWORK_ID, _network->getKey());
+			}
+			if(_page.get())
+			{
+				result.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
 			return result;
 		}
@@ -69,12 +72,17 @@ namespace synthese
 		void LinesListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			setNetworkId(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID));
-
-			_FunctionWithSite::_setFromParametersMap(map);
-			if(_site.get() && _site->getInterface())
+			
+			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
+			if(id)
+			try
 			{
-				_page = _site->getInterface()->getPage<PTLinesListItemInterfacePage>();
+				_page = Env::GetOfficialEnv().get<WebPage>(*id);
 			}
+			catch (ObjectNotFoundException<WebPage>&)
+			{
+				throw RequestException("No such page");
+			}			
 		}
 
 
@@ -84,12 +92,17 @@ namespace synthese
 				CommercialLineTableSync::Search(*_env, _network->getKey())
 			);
 			size_t rank(0);
-			VariablesMap variables;
 			BOOST_FOREACH(shared_ptr<const CommercialLine> line, lines)
 			{
-				if(_page)
+				if(_page.get())
 				{
-					_page->display(stream, *line, rank++, variables, &request);
+					LineMarkerInterfacePage::Display(
+						stream,
+						_page,
+						request,
+						*line,
+						rank++
+					);
 				}
 				else
 				{
@@ -123,7 +136,7 @@ namespace synthese
 
 		std::string LinesListFunction::getOutputMimeType() const
 		{
-			return _page ? _page->getMimeType() : "text/csv";
+			return _page.get() ? _page->getMimeType() : "text/csv";
 		}
 	}
 }

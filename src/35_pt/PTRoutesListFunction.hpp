@@ -26,18 +26,18 @@
 #define SYNTHESE_PTRoutesListFunction_H__
 
 #include "FactorableTemplate.h"
-#include "FunctionWithSite.h"
+#include "Function.h"
 
 namespace synthese
 {
-	namespace pt
+	namespace transportwebsite
 	{
-		class CommercialLine;
+		class WebPage;
 	}
 
 	namespace pt
 	{
-		class PTRoutesListItemInterfacePage;
+		class CommercialLine;
 
 		/** Lists the routes of a line.
 			@author Hugues Romain
@@ -48,22 +48,24 @@ namespace synthese
 			Parameters :
 			<ul>
 				<li>roid : id of the line to display</li>
+				<li>p : page to use for the display of each route</li>
 				<li>msr : do not display a route if an other route follows the same stops list in the same order (the comparison is done on connection places and not physical stops)</li>
 				<li>mir : do not display a route if an other route serves the same stops list in the same order even if the other route serves other stops before, after, and inside</li>
 			</ul>
 		*/
 		class PTRoutesListFunction:
-			public util::FactorableTemplate<transportwebsite::FunctionWithSite<false>,PTRoutesListFunction>
+			public util::FactorableTemplate<server::Function,PTRoutesListFunction>
 		{
 		public:
 			static const std::string PARAMETER_MERGE_SAME_ROUTES;
 			static const std::string PARAMETER_MERGE_INCLUDING_ROUTES;
+			static const std::string PARAMETER_PAGE_ID;
 			
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const pt::CommercialLine> _line;
-				const PTRoutesListItemInterfacePage* _page;
+				boost::shared_ptr<const transportwebsite::WebPage> _page;
 				bool _mergeSameRoutes;
 				bool _mergeIncludingRoutes;
 			//@}

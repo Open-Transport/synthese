@@ -37,14 +37,28 @@ namespace synthese
 	{
 		class DisplayScreen;
 
-		/** Adds a displayed place to a display screen.
-			@ingroup m54Actions refActions
-
-			The place to add can be specified in two ways :
-				-  directly by a place ID
-				-  by city and place names : in this case the lexical matcher is used to determinate
-					the nearest choice
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 54.15 Action : adds a displayed place to a display screen.
+		/// @ingroup m54Actions refActions
+		//////////////////////////////////////////////////////////////////////////
+		/// The place to add can be specified in two ways :
+		///	<ul>
+		///		<li>directly by a place ID<br />
+		///		Parameters :</li>
+		///		<ul>
+		///			<li>actionParams : id of the screen to add the place to</li>
+		///			<li>actionParampl : place ID</li>
+		///		</ul>
+		///		<li>by city and place names : in this case the lexical matcher is used to determinate
+		///			the nearest choice<br />
+		///		Parameters :</li>
+		///		<ul>
+		///			<li>actionParams : id of the screen to add the place to</li>
+		///			<li>actionParamcn : Name of the city of the place</li>
+		///			<li>actionParampn : Name of the place in the city</li>
+		///		</ul>
+		///	</ul>
+		///
 		class DisplayScreenAddDisplayedPlaceAction:
 			public util::FactorableTemplate<server::Action, DisplayScreenAddDisplayedPlaceAction>
 		{

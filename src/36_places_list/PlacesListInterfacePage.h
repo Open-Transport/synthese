@@ -27,9 +27,6 @@
 
 #include "36_places_list/Types.h"
 
-#include "InterfacePage.h"
-#include "FactorableTemplate.h"
-
 namespace synthese
 {
 	namespace geography
@@ -44,6 +41,8 @@ namespace synthese
 
 	namespace transportwebsite
 	{
+		class WebPage;
+
 		/** PlacesListInterfacePage Interface Page Class.
 			@ingroup m56Pages refPages
 
@@ -59,7 +58,7 @@ namespace synthese
 			Object :
 			 - PlacesList list of results
 		*/
-		class PlacesListInterfacePage : public util::FactorableTemplate<interfaces::InterfacePage, PlacesListInterfacePage>
+		class PlacesListInterfacePage
 		{
 		public:
 			static const std::string PARAMETER_IS_CITY_LIST;
@@ -68,21 +67,42 @@ namespace synthese
 			static const std::string DATA_RESULTS_SIZE;
 			static const std::string DATA_CITY_ID;
 			static const std::string DATA_CITY_NAME;
+			static const std::string DATA_CONTENT;
 
-			PlacesListInterfacePage();
+			static const std::string DATA_NAME;
+			static const std::string DATA_RANK;
 
-			/** Overloaded display method for specific parameter conversion.
-				This function converts the parameters into a single ParametersVector object.
-			*/
-			void display(
-				std::ostream& stream
-				, interfaces::VariablesMap& variables
-				, const PlacesList& results
-				, bool isCities
-				, bool isForOrigin
-				, const geography::City* city
-				, const server::Request* request = NULL
-			) const;
+		private:
+			static void DisplayItem(
+				std::ostream& stream,
+				boost::shared_ptr<const WebPage> page,
+				const server::Request& request,
+				std::size_t n,
+				const std::string& name,
+				util::RegistryKeyType id
+			);
+
+
+		public:
+			static void DisplayPlacesList(
+				std::ostream& stream,
+				boost::shared_ptr<const WebPage> page,
+				boost::shared_ptr<const WebPage> itemPage,
+				const server::Request& request,
+				const PlacesList& results,
+				bool isForOrigin,
+				const geography::City* city
+			);
+
+
+			static void DisplayCitiesList(
+				std::ostream& stream,
+				boost::shared_ptr<const WebPage> page,
+				boost::shared_ptr<const WebPage> itemPage,
+				const server::Request& request,
+				const PlacesList& results,
+				bool isForOrigin
+			);
 		};
 	}
 }

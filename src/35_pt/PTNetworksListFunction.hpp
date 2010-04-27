@@ -26,28 +26,37 @@
 #define SYNTHESE_PTNetworksListFunction_H__
 
 #include "FactorableTemplate.h"
-#include "FunctionWithSite.h"
+#include "Function.h"
 
 namespace synthese
 {
+	namespace transportwebsite
+	{
+		class WebPage;
+	}
+
 	namespace pt
 	{
-		class PTNetworkListItemInterfacePage;
-
 		/** PTNetworksListFunction Function class.
 			@author Hugues Romain
 			@date 2010
 			@ingroup m35Functions refFunctions
+
+			Parameters :
+			<ul>
+				<li>p : page to use for display. If not defined, XML output</li>
+			</ul>
 		*/
 		class PTNetworksListFunction:
-			public util::FactorableTemplate<transportwebsite::FunctionWithSite<false>,PTNetworksListFunction>
+			public util::FactorableTemplate<server::Function,PTNetworksListFunction>
 		{
 		public:
-			
+			static const std::string PARAMETER_PAGE_ID;
+				
 		protected:
 			//! \name Page parameters
 			//@{
-				const PTNetworkListItemInterfacePage*			_page;
+			boost::shared_ptr<const transportwebsite::WebPage>			_page;
 			//@}
 			
 			

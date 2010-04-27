@@ -50,6 +50,7 @@
 #include "RollingStockFilter.h"
 #include "Address.h"
 #include "ContinuousService.h"
+#include "WebPage.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -94,6 +95,24 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_HIGHEST_ARRIVAL_TIME("ia");
 		const string RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID("tm");
 
+		const string RoutePlannerFunction::PARAMETER_PAGE("page");
+		const string RoutePlannerFunction::PARAMETER_SCHEDULES_ROW_PAGE("schedules_row_page");
+		const string RoutePlannerFunction::PARAMETER_SCHEDULES_CELL_PAGE("schedule_cell_page");
+		const string RoutePlannerFunction::PARAMETER_LINES_ROW_PAGE("lines_row_page");
+		const string RoutePlannerFunction::PARAMETER_LINE_MARKER_PAGE("line_marker_page");
+		const string RoutePlannerFunction::PARAMETER_BOARD_PAGE("board_page");
+		const string RoutePlannerFunction::PARAMETER_WARNING_PAGE("warning_page");
+		const string RoutePlannerFunction::PARAMETER_RESERVATION_PAGE("reservation_page");
+		const string RoutePlannerFunction::PARAMETER_DURATION_PAGE("duration_page");
+		const string RoutePlannerFunction::PARAMETER_MAP_PAGE("map_page");
+		const string RoutePlannerFunction::PARAMETER_MAP_LINE_PAGE("map_line_page");
+		const string RoutePlannerFunction::PARAMETER_DATE_TIME_PAGE("date_time_page");
+		const string RoutePlannerFunction::PARAMETER_STOP_CELL_PAGE("stop_cell_page");
+		const string RoutePlannerFunction::PARAMETER_SERVICE_CELL_PAGE("service_cell_page");
+		const string RoutePlannerFunction::PARAMETER_JUNCTION_CELL_PAGE("junction_cell_page");
+		const string RoutePlannerFunction::PARAMETER_MAP_STOP_PAGE("map_stop_page");
+		const string RoutePlannerFunction::PARAMETER_MAP_SERVICE_PAGE("map_service_page");
+		const string RoutePlannerFunction::PARAMETER_MAP_JUNCTION_PAGE("map_junction_page");
 
 
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
@@ -110,10 +129,6 @@ namespace synthese
 
 			_outputRoadApproachDetail = _site->getDisplayRoadApproachDetail();
 
-			if(_site->getInterface())
-			{
-				_page = _site->getInterface()->getPage<RoutePlannerInterfacePage>();
-			}
 
 			// Origin and destination places
 			optional<RegistryKeyType> favoriteId(map.getOptional<RegistryKeyType>(PARAMETER_FAVORITE_ID));
@@ -250,7 +265,7 @@ namespace synthese
 					_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
 				}
 			}
-			catch(ObjectNotFoundException<RollingStockFilter>& e)
+			catch(ObjectNotFoundException<RollingStockFilter>&)
 			{
 			}
 
@@ -264,10 +279,227 @@ namespace synthese
 				_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
 			);
 
-			if(	(!_departure_place.placeResult.value || !_arrival_place.placeResult.value) &&
-				!_page
+			if(	!_departure_place.placeResult.value || !_arrival_place.placeResult.value
 			){
 				throw RequestException("No calculation");
+			}
+
+			// Pages
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE));
+				if(id) 
+				{
+					_page = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such main page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SCHEDULES_ROW_PAGE));
+				if(id) 
+				{
+					_schedulesRowPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such schedules row page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SCHEDULES_CELL_PAGE));
+				if(id) 
+				{
+					_schedulesCellPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such schedules cell page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_LINES_ROW_PAGE));
+				if(id) 
+				{
+					_linesRowPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such lines row page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_LINE_MARKER_PAGE));
+				if(id) 
+				{
+					_lineMarkerPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such line marker page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_BOARD_PAGE));
+				if(id) 
+				{
+					_boardPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such board page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_WARNING_PAGE));
+				if(id)
+				{
+					_warningPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such warning page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_RESERVATION_PAGE));
+				if(id) 
+				{
+					_reservationPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such reservation page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_DURATION_PAGE));
+				if(id) 
+				{
+					_durationPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such duration page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_PAGE));
+				if(id) 
+				{
+					_mapPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such map page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_LINE_PAGE));
+				if(id) 
+				{
+					_mapLinePage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such map line page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_DATE_TIME_PAGE));
+				if(id) 
+				{
+					_dateTimePage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such date time page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_STOP_CELL_PAGE));
+				if(id) 
+				{
+					_stopCellPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such stop cell page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SERVICE_CELL_PAGE));
+				if(id) 
+				{
+					_serviceCellPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such service cell page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_JUNCTION_CELL_PAGE));
+				if(id)
+				{
+					_junctionPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such junction cell page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_STOP_PAGE));
+				if(id) 
+				{
+					_mapStopCellPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such map stop page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_SERVICE_PAGE));
+				if(id) 
+				{
+					_mapServiceCellPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such map service page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_JUNCTION_PAGE));
+				if(id)
+				{
+					_mapJunctionPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such map junction page : "+ e.getMessage());
 			}
 
 		}
@@ -278,108 +510,125 @@ namespace synthese
 			ostream& stream,
 			const Request& request
 		) const	{
-			VariablesMap vm;
-			if (_departure_place.placeResult.value && _arrival_place.placeResult.value)
+			if (!_departure_place.placeResult.value || !_arrival_place.placeResult.value)
 			{
-				ptime startDate(_planningOrder == DEPARTURE_FIRST ? _startDate : _endArrivalDate);
-				if(_planningOrder == ARRIVAL_FIRST)
-				{
-					startDate = ptime(startDate.date(), hours(3));
-				}
-				ptime endDate(_planningOrder == DEPARTURE_FIRST ? _endDate : _endArrivalDate);
+				return;
+			}
+
+			ptime startDate(_planningOrder == DEPARTURE_FIRST ? _startDate : _endArrivalDate);
+			if(_planningOrder == ARRIVAL_FIRST)
+			{
+				startDate = ptime(startDate.date(), hours(3));
+			}
+			ptime endDate(_planningOrder == DEPARTURE_FIRST ? _endDate : _endArrivalDate);
 
 
-				// Initialisation
-				PTTimeSlotRoutePlanner r(
+			// Initialisation
+			PTTimeSlotRoutePlanner r(
+				_departure_place.placeResult.value,
+				_arrival_place.placeResult.value,
+				startDate,
+				endDate,
+				_planningOrder == DEPARTURE_FIRST ? _startArrivalDate : startDate,
+				_endArrivalDate,
+				_planningOrder == DEPARTURE_FIRST ? _maxSolutionsNumber : optional<size_t>(),
+				_accessParameters,
+				DEPARTURE_FIRST
+			);
+
+			// Computing
+			PTRoutePlannerResult result = r.run();
+
+			if(	_planningOrder == ARRIVAL_FIRST &&
+				_maxSolutionsNumber &&
+				result.getJourneys().size() > *_maxSolutionsNumber
+			){
+				result.removeFirstJourneys(result.getJourneys().size() - *_maxSolutionsNumber);
+			}
+
+			// Display
+			if(_page.get())
+			{
+				RoutePlannerInterfacePage::Display(
+					stream,
+					_page,
+					_schedulesRowPage,
+					_schedulesCellPage,
+					_linesRowPage,
+					_lineMarkerPage,
+					_boardPage,
+					_warningPage,
+					_reservationPage,
+					_durationPage,
+					_mapPage,
+					_mapLinePage,
+					_dateTimePage,
+					_stopCellPage,
+					_serviceCellPage,
+					_junctionPage,
+					_mapStopCellPage,
+					_mapServiceCellPage,
+					_mapJunctionPage,
+					request,
+					result,
+					_startDate.date(),
+					_periodId,
 					_departure_place.placeResult.value,
 					_arrival_place.placeResult.value,
-					startDate,
-					endDate,
-					_planningOrder == DEPARTURE_FIRST ? _startArrivalDate : startDate,
-					_endArrivalDate,
-					_planningOrder == DEPARTURE_FIRST ? _maxSolutionsNumber : optional<size_t>(),
-					_accessParameters,
-					DEPARTURE_FIRST
+					_period,
+					_accessParameters
 				);
-
-				// Computing
-				PTRoutePlannerResult result = r.run();
-
-				if(	_planningOrder == ARRIVAL_FIRST &&
-					_maxSolutionsNumber &&
-					result.getJourneys().size() > *_maxSolutionsNumber
-				){
-					result.removeFirstJourneys(result.getJourneys().size() - *_maxSolutionsNumber);
-				}
-
-				// Display
-				if(_page)
+			}
+			else
+			{
+				stream <<
+					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+					"<routePlannerResult xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/routeplanner_result.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" <<
+					"<query"
+				;
+				if(_maxSolutionsNumber)
 				{
-					_page->display(
-						stream
-						, vm
-						, result
-						, _startDate.date()
-						, _periodId
-						, _departure_place.placeResult.value
-						, _arrival_place.placeResult.value
-						, _period
-						, _accessParameters
-						, &request
-						, _site.get()
-						, result.getSamePlaces()
-					);
+					stream << " maxSolutions=\"" << *_maxSolutionsNumber << "\"";
 				}
-				else
+				stream << " userProfile=\"" << _accessParameters.getUserClass() << "\"";
+				if(request.getSession())
+				{
+					stream << " sessionId=\"" << request.getSession()->getKey() << "\"";
+				}
+				stream <<
+					" siteId=\"" << _site->getKey() << "\">" <<
+					"<timeBounds" <<
+						" minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getLowestDepartureTime()) << "\"" <<
+						" minArrivalHour=\"" << posix_time::to_iso_extended_string(r.getLowestArrivalTime()) << "\"" <<
+						" maxArrivalHour=\"" << posix_time::to_iso_extended_string(r.getHighestArrivalTime()) << "\"" <<
+						" maxDepartureHour=\"" << posix_time::to_iso_extended_string(r.getHighestDepartureTime()) << "\"" <<
+					" />"
+				;
+				if(_period)
 				{
 					stream <<
-						"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
-						"<routePlannerResult xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/routeplanner_result.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" <<
-						"<query"
+						"<timePeriod id=\"" << _periodId << "\" date=\"" <<
+						to_iso_extended_string(_startDate.date()) << "\" name=\"" <<
+						_period->getCaption() << "\" />"
 					;
-					if(_maxSolutionsNumber)
-					{
-						stream << " maxSolutions=\"" << *_maxSolutionsNumber << "\"";
-					}
-					stream << " userProfile=\"" << _accessParameters.getUserClass() << "\"";
-					if(request.getSession())
-					{
-						stream << " sessionId=\"" << request.getSession()->getKey() << "\"";
-					}
+				}
+				stream <<
+					"<places departureCity=\"" << _departure_place.cityResult.key.getSource() << "\" departureCityNameTrust=\"" << _departure_place.cityResult.score.phoneticScore << "\"" <<
+					" arrivalCity=\"" << _arrival_place.cityResult.key.getSource() << "\" arrivalCityNameTrust=\"" << _arrival_place.cityResult.score.phoneticScore << "\""
+				;
+				if(dynamic_cast<const Place*>(_departure_place.cityResult.value) != dynamic_cast<const Place*>(_departure_place.placeResult.value))
+				{
 					stream <<
-						" siteId=\"" << _site->getKey() << "\">" <<
-						"<timeBounds" <<
-							" minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getLowestDepartureTime()) << "\"" <<
-							" minArrivalHour=\"" << posix_time::to_iso_extended_string(r.getLowestArrivalTime()) << "\"" <<
-							" maxArrivalHour=\"" << posix_time::to_iso_extended_string(r.getHighestArrivalTime()) << "\"" <<
-							" maxDepartureHour=\"" << posix_time::to_iso_extended_string(r.getHighestDepartureTime()) << "\"" <<
-						" />"
+						" departureStop=\"" << _departure_place.placeResult.key.getSource() << "\" departureStopNameTrust=\"" << _departure_place.placeResult.score.phoneticScore << "\""
 					;
-					if(_period)
-					{
-						stream <<
-							"<timePeriod id=\"" << _periodId << "\" date=\"" <<
-							to_iso_extended_string(_startDate.date()) << "\" name=\"" <<
-							_period->getCaption() << "\" />"
-						;
-					}
+				}
+				if(dynamic_cast<const Place*>(_arrival_place.cityResult.value) != dynamic_cast<const Place*>(_arrival_place.placeResult.value))
+				{
 					stream <<
-						"<places departureCity=\"" << _departure_place.cityResult.key.getSource() << "\" departureCityNameTrust=\"" << _departure_place.cityResult.score.phoneticScore << "\"" <<
-						" arrivalCity=\"" << _arrival_place.cityResult.key.getSource() << "\" arrivalCityNameTrust=\"" << _arrival_place.cityResult.score.phoneticScore << "\""
+						" arrivalStop=\"" << _arrival_place.placeResult.key.getSource() << "\" arrivalStopNameTrust=\"" << _arrival_place.placeResult.score.phoneticScore << "\""
 					;
-					if(dynamic_cast<const Place*>(_departure_place.cityResult.value) != dynamic_cast<const Place*>(_departure_place.placeResult.value))
-					{
-						stream <<
-							" departureStop=\"" << _departure_place.placeResult.key.getSource() << "\" departureStopNameTrust=\"" << _departure_place.placeResult.score.phoneticScore << "\""
-						;
-					}
-					if(dynamic_cast<const Place*>(_arrival_place.cityResult.value) != dynamic_cast<const Place*>(_arrival_place.placeResult.value))
-					{
-						stream <<
-							" arrivalStop=\"" << _arrival_place.placeResult.key.getSource() << "\" arrivalStopNameTrust=\"" << _arrival_place.placeResult.score.phoneticScore << "\""
-						;
-					}
-					stream << " />";
+				}
+				stream << " />";
 //					if(_favorite.get())
 //					{
 //						stream <<
@@ -387,365 +636,355 @@ namespace synthese
 //						;
 //					}
 
-					if(_rollingStockFilter.get())
-					{
-						stream << "<transportModeFilter id=\"" << _rollingStockFilter->getKey() << "\" name=\"" << _rollingStockFilter->getName() << "\"/>";
-					}
+				if(_rollingStockFilter.get())
+				{
+					stream << "<transportModeFilter id=\"" << _rollingStockFilter->getKey() << "\" name=\"" << _rollingStockFilter->getName() << "\"/>";
+				}
+
+				stream <<
+					"</query>" <<
+					"<journeys>"
+				;
+				const PTRoutePlannerResult::PlaceList& placesList(
+					result.getOrderedPlaces()
+				);
+				typedef vector<ostringstream*> PlacesContentVector;
+				PlacesContentVector sheetRows(placesList.size());
+				BOOST_FOREACH(PlacesContentVector::value_type& stream, sheetRows)
+				{
+					stream = new ostringstream;
+				}
+
+				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, result.getJourneys())
+				{
+					bool hasALineAlert(false); // Interactive
+					bool hasAStopAlert(false); // Interactive
+					bool pedestrianMode = false;
+					bool lastPedestrianMode = false;
+
+					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
+					PTRoutePlannerResult::PlaceList::const_iterator itPlaces(placesList.begin());
 
 					stream <<
-						"</query>" <<
-						"<journeys>"
+						"<journey hasALineAlert=\"" << (hasALineAlert ? "true" : "false") << "\" hasAStopAlert=\"" << (hasAStopAlert ? "true" : "false") << "\""
 					;
-					const PTRoutePlannerResult::PlaceList& placesList(
-						result.getOrderedPlaces()
-					);
-					typedef vector<ostringstream*> PlacesContentVector;
-					PlacesContentVector sheetRows(placesList.size());
-					BOOST_FOREACH(PlacesContentVector::value_type& stream, sheetRows)
+					if(journey.getContinuousServiceRange().total_seconds() > 0)
 					{
-						stream = new ostringstream;
+						stream << " continuousServiceDuration=\"" << journey.getContinuousServiceRange() << "\"";
 					}
+					stream << ">";
 
-					BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, result.getJourneys())
+					if(journey.getReservationCompliance() != false)
 					{
-						bool hasALineAlert(false); // Interactive
-						bool hasAStopAlert(false); // Interactive
-						bool pedestrianMode = false;
-						bool lastPedestrianMode = false;
+						set<const ReservationContact*> resaRules;
+						BOOST_FOREACH(const ServiceUse& su, journey.getServiceUses())
+						{
+							const Line* line(dynamic_cast<const Line*>(su.getService()->getPath()));
+							if(line == NULL) continue;
 
-						PlacesContentVector::iterator itSheetRow(sheetRows.begin());
-						PTRoutePlannerResult::PlaceList::const_iterator itPlaces(placesList.begin());
+							if(	line->getCommercialLine()->getReservationContact() &&
+								UseRule::IsReservationPossible(su.getUseRule()->getReservationAvailability(su))
+								){
+									resaRules.insert(line->getCommercialLine()->getReservationContact());
+							}
+						}
+						stringstream sPhones;
+						stringstream sOpeningHours;
+						bool onlineBooking(!resaRules.empty());
+						BOOST_FOREACH(const ReservationContact* rc, resaRules)
+						{
+							sPhones << rc->getPhoneExchangeNumber() << " ";
+							sOpeningHours << rc->getPhoneExchangeOpeningHours() << " ";
+							if (!OnlineReservationRule::GetOnlineReservationRule(rc))
+							{
+								onlineBooking = false;
+							}
+						}
 
-						stream <<
-							"<journey hasALineAlert=\"" << (hasALineAlert ? "true" : "false") << "\" hasAStopAlert=\"" << (hasAStopAlert ? "true" : "false") << "\""
+						stream << "<reservation" <<
+							" online=\"" << (onlineBooking ? "true" : "false") << "\"" <<
+							" type=\"" << (journey.getReservationCompliance() == true ? "compulsory" : "optional") << "\""
 						;
-						if(journey.getContinuousServiceRange().total_seconds() > 0)
+						if(!sOpeningHours.str().empty())
 						{
-							stream << " continuousServiceDuration=\"" << journey.getContinuousServiceRange() << "\"";
+							stream << " openingHours=\"" << sOpeningHours.str() << "\"";
 						}
-						stream << ">";
-
-						if(journey.getReservationCompliance() != false)
+						if(!sPhones.str().empty())
 						{
-							set<const ReservationContact*> resaRules;
-							BOOST_FOREACH(const ServiceUse& su, journey.getServiceUses())
-							{
-								const Line* line(dynamic_cast<const Line*>(su.getService()->getPath()));
-								if(line == NULL) continue;
-
-								if(	line->getCommercialLine()->getReservationContact() &&
-									UseRule::IsReservationPossible(su.getUseRule()->getReservationAvailability(su))
-									){
-										resaRules.insert(line->getCommercialLine()->getReservationContact());
-								}
-							}
-							stringstream sPhones;
-							stringstream sOpeningHours;
-							bool onlineBooking(!resaRules.empty());
-							BOOST_FOREACH(const ReservationContact* rc, resaRules)
-							{
-								sPhones << rc->getPhoneExchangeNumber() << " ";
-								sOpeningHours << rc->getPhoneExchangeOpeningHours() << " ";
-								if (!OnlineReservationRule::GetOnlineReservationRule(rc))
-								{
-									onlineBooking = false;
-								}
-							}
-
-							stream << "<reservation" <<
-								" online=\"" << (onlineBooking ? "true" : "false") << "\"" <<
-								" type=\"" << (journey.getReservationCompliance() == true ? "compulsory" : "optional") << "\""
-							;
-							if(!sOpeningHours.str().empty())
-							{
-								stream << " openingHours=\"" << sOpeningHours.str() << "\"";
-							}
-							if(!sPhones.str().empty())
-							{
-								stream << " phoneNumber=\"" << sPhones.str() << "\"";
-							}
-							stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey.getReservationDeadLine()) << "\" />";
+							stream << " phoneNumber=\"" << sPhones.str() << "\"";
 						}
-						stream << "<chunks>";
+						stream << " deadLine=\"" << posix_time::to_iso_extended_string(journey.getReservationDeadLine()) << "\" />";
+					}
+					stream << "<chunks>";
 
-						// Loop on each leg
-						const Journey::ServiceUses& jl(journey.getServiceUses());
-						double partialDistance(0);
-						bool firstApproach(true);
-						bool lastApproach(false);
-						Journey::ServiceUses::const_iterator lastApproachBeginning(jl.end());
+					// Loop on each leg
+					const Journey::ServiceUses& jl(journey.getServiceUses());
+					double partialDistance(0);
+					bool firstApproach(true);
+					Journey::ServiceUses::const_iterator lastApproachBeginning(jl.end());
 
-						for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
-						{
-							const ServiceUse& curET(*itl);
+					for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
+					{
+						const ServiceUse& curET(*itl);
 
-							if(	itl == jl.begin() ||
-								!curET.getEdge()->getParentPath()->isPedestrianMode() ||
-								lastPedestrianMode != curET.getEdge()->getParentPath()->isPedestrianMode()
-							){
-								const NamedPlace* placeToSearch(
-									(	itl == jl.begin() &&
-										dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
-									)?
-									dynamic_cast<const NamedPlace*>(_departure_place.placeResult.value) :
-									dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub())
-								);
+						if(	itl == jl.begin() ||
+							!curET.getEdge()->getParentPath()->isPedestrianMode() ||
+							lastPedestrianMode != curET.getEdge()->getParentPath()->isPedestrianMode()
+						){
+							const NamedPlace* placeToSearch(
+								(	itl == jl.begin() &&
+									dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
+								)?
+								dynamic_cast<const NamedPlace*>(_departure_place.placeResult.value) :
+								dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub())
+							);
 
-								for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
-								{
-									**itSheetRow << "<cell />";
-								}
+							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
+							{
+								**itSheetRow << "<cell />";
+							}
 
-								pedestrianMode = curET.getEdge()->getParentPath()->isPedestrianMode();
-								
-								// Saving of the columns on each lines
-								if(itl == jl.begin())
-								{
-									**itSheetRow << "<cell";
-								}
-								**itSheetRow <<
-									" departureDateTime=\"" <<
-									posix_time::to_iso_extended_string(curET.getDepartureDateTime()) << "\"";
-								if(journey.getContinuousServiceRange().total_seconds() > 0)
-								{
-									posix_time::ptime edTime(curET.getDepartureDateTime());
-									edTime += journey.getContinuousServiceRange();
-									**itSheetRow << " endDepartureDateTime=\"" << 
-										posix_time::to_iso_extended_string(edTime) << "\"";
-								}
+							pedestrianMode = curET.getEdge()->getParentPath()->isPedestrianMode();
+							
+							// Saving of the columns on each lines
+							if(itl == jl.begin())
+							{
+								**itSheetRow << "<cell";
+							}
+							**itSheetRow <<
+								" departureDateTime=\"" <<
+								posix_time::to_iso_extended_string(curET.getDepartureDateTime()) << "\"";
+							if(journey.getContinuousServiceRange().total_seconds() > 0)
+							{
+								posix_time::ptime edTime(curET.getDepartureDateTime());
+								edTime += journey.getContinuousServiceRange();
+								**itSheetRow << " endDepartureDateTime=\"" << 
+									posix_time::to_iso_extended_string(edTime) << "\"";
+							}
+							if(pedestrianMode)
+							{
+								**itSheetRow << " pedestrian=\"departure\"";
+							}
+							**itSheetRow << " />";
+
+							++itPlaces; ++itSheetRow;
+							lastPedestrianMode = pedestrianMode;
+						}
+						
+						if(	itl == jl.end()-1
+						||	!(itl+1)->getEdge()->getParentPath()->isPedestrianMode()
+						||	!curET.getEdge()->getParentPath()->isPedestrianMode()
+						){
+							const NamedPlace* placeToSearch(
+								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?
+								dynamic_cast<const NamedPlace*>(_arrival_place.placeResult.value) :
+								dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub())
+							);
+							
+							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
+							{
+								**itSheetRow << "<cell";
 								if(pedestrianMode)
 								{
-									**itSheetRow << " pedestrian=\"departure\"";
+									**itSheetRow << " pedestrian=\"traversal\"";
 								}
 								**itSheetRow << " />";
-
-								++itPlaces; ++itSheetRow;
-								lastPedestrianMode = pedestrianMode;
 							}
-							
-							if(	itl == jl.end()-1
-							||	!(itl+1)->getEdge()->getParentPath()->isPedestrianMode()
-							||	!curET.getEdge()->getParentPath()->isPedestrianMode()
-							){
-								const NamedPlace* placeToSearch(
-									itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?
-									dynamic_cast<const NamedPlace*>(_arrival_place.placeResult.value) :
-									dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub())
-								);
-								
-								for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
-								{
-									**itSheetRow << "<cell";
-									if(pedestrianMode)
-									{
-										**itSheetRow << " pedestrian=\"traversal\"";
-									}
-									**itSheetRow << " />";
-								}
-								**itSheetRow << "<cell arrivalDateTime=\"" <<
-									posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
-								if(journey.getContinuousServiceRange().total_seconds() > 0)
-								{
-									posix_time::ptime eaTime(curET.getArrivalDateTime());
-									eaTime += journey.getContinuousServiceRange();
-									**itSheetRow << " endArrivalDateTime=\"" <<
-										posix_time::to_iso_extended_string(eaTime) << "\"";
-								}
-								if(pedestrianMode)
-								{
-									**itSheetRow << " pedestrian=\"arrival\"";
-								}
-								if(	itl == jl.end() - 1)
-								{
-									**itSheetRow << " />";
-								}
-							}
-
-
-							const Line* line(dynamic_cast<const Line*> (curET.getService()->getPath()));
-							if(line != NULL)
+							**itSheetRow << "<cell arrivalDateTime=\"" <<
+								posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
+							if(journey.getContinuousServiceRange().total_seconds() > 0)
 							{
-								// Insertion of fake leg if site does not output road approach detail
-								if(!_outputRoadApproachDetail)
-								{
-									if(firstApproach)
-									{
-										if(line->isPedestrianMode())
-										{
-											partialDistance += curET.getDistance();
-										}
-										else
-										{
-											firstApproach = false;
-											if(itl != jl.begin())
-											{
-												const Road* road(dynamic_cast<const Road*> (jl.begin()->getService()->getPath ()));
-												const ptime& departureTime(jl.begin()->getDepartureDateTime());
-												const ptime& arrivalTime((itl-1)->getArrivalDateTime());
-												stream <<
-													"<street" <<
-													" length=\"" << ceil(partialDistance) << "\"" <<
-													" city=\"Departure approach\"" <<
-													" name=\"Departure approach\"" <<
-													" departureTime=\"" << posix_time::to_iso_extended_string(departureTime) << "\"" <<
-													" arrivalTime=\"" << posix_time::to_iso_extended_string(arrivalTime) << "\"";
-												if(journey.getContinuousServiceRange().total_seconds() > 0)
-												{
-													posix_time::ptime edTime(departureTime);
-													edTime += journey.getContinuousServiceRange();
-													posix_time::ptime eaTime(arrivalTime);
-													eaTime += journey.getContinuousServiceRange();
-													stream <<
-														" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
-														" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
-												}
-												stream << ">" <<
-													"<startAddress>";
-												if(dynamic_cast<const NamedPlace*>(jl.begin()->getDepartureEdge()->getHub()))
-												{
-													_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*jl.begin()->getDepartureEdge()->getHub()));
-												}
-												else if(dynamic_cast<const Address*>(jl.begin()->getDepartureEdge()->getFromVertex()))
-												{
-													if(dynamic_cast<const RoadPlace*>(_departure_place.placeResult.value))
-													{
-														_XMLDisplayRoadPlace(
-															stream,
-															dynamic_cast<const RoadPlace&>(*_departure_place.placeResult.value)
-														);
-													}
-													else
-													{
-														_XMLDisplayAddress(
-															stream,
-															*dynamic_cast<const Address*>(jl.begin()->getDepartureEdge()->getFromVertex()),
-															*road->getRoadPlace()
-														);
-													}
-												}
-												stream <<
-													"</startAddress>" <<
-													"<endAddress>";
-												if(dynamic_cast<const NamedPlace*>((itl-1)->getArrivalEdge()->getHub()))
-												{
-													_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*(itl-1)->getArrivalEdge()->getHub()));
-												}
-												else if(dynamic_cast<const Address*>((itl-1)->getArrivalEdge()->getFromVertex()))
-												{
-													_XMLDisplayAddress(
-														stream,
-														*dynamic_cast<const Address*>((itl-1)->getArrivalEdge()->getFromVertex()),
-														*road->getRoadPlace()
-													);
-												}
-												stream <<
-													"</endAddress>" <<
-													"</street>"
-												;
-											}
-										}
+								posix_time::ptime eaTime(curET.getArrivalDateTime());
+								eaTime += journey.getContinuousServiceRange();
+								**itSheetRow << " endArrivalDateTime=\"" <<
+									posix_time::to_iso_extended_string(eaTime) << "\"";
+							}
+							if(pedestrianMode)
+							{
+								**itSheetRow << " pedestrian=\"arrival\"";
+							}
+							if(	itl == jl.end() - 1)
+							{
+								**itSheetRow << " />";
+							}
+						}
 
-									}
-									if(!firstApproach && !lastApproach)
-									{
-										if(line->isPedestrianMode())
-										{
-											lastApproach = true;
-											lastApproachBeginning = itl;
-											partialDistance = 0;
-										}
-									}
-									if(lastApproach)
+
+						const Line* line(dynamic_cast<const Line*> (curET.getService()->getPath()));
+						if(line != NULL)
+						{
+							// Insertion of fake leg if site does not output road approach detail
+							if(!_outputRoadApproachDetail)
+							{
+								if(firstApproach)
+								{
+									if(line->isPedestrianMode())
 									{
 										partialDistance += curET.getDistance();
 									}
-								}
+									else
+									{
+										if(itl != jl.begin())
+										{
+											const Road* road(dynamic_cast<const Road*> (jl.begin()->getService()->getPath ()));
+											const ptime& departureTime(jl.begin()->getDepartureDateTime());
+											const ptime& arrivalTime((itl-1)->getArrivalDateTime());
+											stream <<
+												"<street" <<
+												" length=\"" << ceil(partialDistance) << "\"" <<
+												" city=\"Departure approach\"" <<
+												" name=\"Departure approach\"" <<
+												" departureTime=\"" << posix_time::to_iso_extended_string(departureTime) << "\"" <<
+												" arrivalTime=\"" << posix_time::to_iso_extended_string(arrivalTime) << "\"";
+											if(journey.getContinuousServiceRange().total_seconds() > 0)
+											{
+												posix_time::ptime edTime(departureTime);
+												edTime += journey.getContinuousServiceRange();
+												posix_time::ptime eaTime(arrivalTime);
+												eaTime += journey.getContinuousServiceRange();
+												stream <<
+													" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
+													" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
+											}
+											stream << ">" <<
+												"<startAddress>";
+											if(dynamic_cast<const NamedPlace*>(jl.begin()->getDepartureEdge()->getHub()))
+											{
+												_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*jl.begin()->getDepartureEdge()->getHub()));
+											}
+											else if(dynamic_cast<const Address*>(jl.begin()->getDepartureEdge()->getFromVertex()))
+											{
+												if(dynamic_cast<const RoadPlace*>(_departure_place.placeResult.value))
+												{
+													_XMLDisplayRoadPlace(
+														stream,
+														dynamic_cast<const RoadPlace&>(*_departure_place.placeResult.value)
+														);
+												}
+												else
+												{
+													_XMLDisplayAddress(
+														stream,
+														*dynamic_cast<const Address*>(jl.begin()->getDepartureEdge()->getFromVertex()),
+														*road->getRoadPlace()
+														);
+												}
+											}
+											stream <<
+												"</startAddress>" <<
+												"<endAddress>";
+											if(dynamic_cast<const NamedPlace*>((itl-1)->getArrivalEdge()->getHub()))
+											{
+												_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*(itl-1)->getArrivalEdge()->getHub()));
+											}
+											else if(dynamic_cast<const Address*>((itl-1)->getArrivalEdge()->getFromVertex()))
+											{
+												_XMLDisplayAddress(
+													stream,
+													*dynamic_cast<const Address*>((itl-1)->getArrivalEdge()->getFromVertex()),
+													*road->getRoadPlace()
+													);
+											}
+											stream <<
+												"</endAddress>" <<
+												"</street>"
+											;
+										}
 
-								stream <<
-									"<" << (line->isPedestrianMode() ? "connection" : "transport") <<
-										" length=\"" << ceil(curET.getDistance()) << "\"" <<
-										" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime()) << "\"" <<
-										" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
-								if(journey.getContinuousServiceRange().total_seconds() > 0)
-								{
-									posix_time::ptime edTime(curET.getDepartureDateTime());
-									edTime += journey.getContinuousServiceRange();
-									posix_time::ptime eaTime(curET.getArrivalDateTime());
-									eaTime += journey.getContinuousServiceRange();
-									stream <<
-										" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
-										" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
-								}
-								const ContinuousService* cserv(dynamic_cast<const ContinuousService*>(curET.getService()));
-								if(cserv && cserv->getMaxWaitingTime().total_seconds() > 0)
-								{
-									stream << " possibleWaitingTime=\"" << (cserv->getMaxWaitingTime().total_seconds() / 60) << "\"";
-								}
-								stream <<
-										" startStopIsTerminus=\"" << (curET.getDepartureEdge()->getRankInPath() == 0 ? "true" : "false") << "\"" <<
-										" endStopIsTerminus=\"" << (curET.getArrivalEdge()->getRankInPath()+1 == curET.getArrivalEdge()->getParentPath()->getEdges().size() ? "true" : "false") << "\"";
-								if(!line->getDirection().empty())
-								{
-									stream << " destinationText=\"" << line->getDirection() << "\"";
-								}
-								stream <<
-									">";
-								_XMLDisplayPhysicalStop(stream, "startStop", dynamic_cast<const PhysicalStop&>(*curET.getDepartureEdge()->getFromVertex()));
-								_XMLDisplayPhysicalStop(stream, "endStop", dynamic_cast<const PhysicalStop&>(*curET.getArrivalEdge()->getFromVertex()));
-								_XMLDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const PhysicalStop&>(*line->getLastEdge()->getFromVertex()));
-								if(!line->isPedestrianMode())
-								{
-									stream <<
-										"<line" <<
-										" id=\"" << line->getCommercialLine()->getKey() << "\"";
-									if(line->getCommercialLine()->getColor())
-									{
-										stream << " color=\"" << line->getCommercialLine()->getColor()->toXMLColor() << "\"";
-									}
-									if(!line->getCommercialLine()->getStyle().empty())
-									{
-										stream << " cssClass=\"" << line->getCommercialLine()->getStyle() << "\"";
-									}
-									if(!line->getCommercialLine()->getImage().empty())
-									{
-										stream << " imgURL=\"" << line->getCommercialLine()->getImage() << "\"";
-									}
-									if(!line->getCommercialLine()->getLongName().empty())
-									{
-										stream << " longName=\"" << line->getCommercialLine()->getLongName() << "\"";
-									}
-									if(!line->getCommercialLine()->getShortName().empty())
-									{
-										stream << " shortName=\"" << line->getCommercialLine()->getShortName() << "\"";
-									}
-									stream << ">";
-									if(false) // Transform into interactive
-									{
-									}
-									stream <<
-										"</line>";
-									if(line->getRollingStock())
-									{
-										stream <<
-											"<vehicleType" <<
-											" id=\"" << line->getRollingStock()->getKey() << "\"" <<
-											" name=\"" << line->getRollingStock()->getArticle() << line->getRollingStock()->getName() << "\"" <<
-											" />";
+										// Transport state
+										firstApproach = false;
+										partialDistance = 0;
 									}
 								}
-								stream << "</transport>";
 							}
 
-							const Road* road(dynamic_cast<const Road*> (curET.getService()->getPath ()));
-							if(road != NULL && _outputRoadApproachDetail)
+							stream <<
+								"<" << (line->isPedestrianMode() ? "connection" : "transport") <<
+									" length=\"" << ceil(curET.getDistance()) << "\"" <<
+									" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime()) << "\"" <<
+									" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
+							if(journey.getContinuousServiceRange().total_seconds() > 0)
+							{
+								posix_time::ptime edTime(curET.getDepartureDateTime());
+								edTime += journey.getContinuousServiceRange();
+								posix_time::ptime eaTime(curET.getArrivalDateTime());
+								eaTime += journey.getContinuousServiceRange();
+								stream <<
+									" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
+									" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
+							}
+							const ContinuousService* cserv(dynamic_cast<const ContinuousService*>(curET.getService()));
+							if(cserv && cserv->getMaxWaitingTime().total_seconds() > 0)
+							{
+								stream << " possibleWaitingTime=\"" << (cserv->getMaxWaitingTime().total_seconds() / 60) << "\"";
+							}
+							stream <<
+									" startStopIsTerminus=\"" << (curET.getDepartureEdge()->getRankInPath() == 0 ? "true" : "false") << "\"" <<
+									" endStopIsTerminus=\"" << (curET.getArrivalEdge()->getRankInPath()+1 == curET.getArrivalEdge()->getParentPath()->getEdges().size() ? "true" : "false") << "\"";
+							if(!line->getDirection().empty())
+							{
+								stream << " destinationText=\"" << line->getDirection() << "\"";
+							}
+							stream <<
+								">";
+							_XMLDisplayPhysicalStop(stream, "startStop", dynamic_cast<const PhysicalStop&>(*curET.getDepartureEdge()->getFromVertex()));
+							_XMLDisplayPhysicalStop(stream, "endStop", dynamic_cast<const PhysicalStop&>(*curET.getArrivalEdge()->getFromVertex()));
+							_XMLDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const PhysicalStop&>(*line->getLastEdge()->getFromVertex()));
+							if(!line->isPedestrianMode())
+							{
+								stream <<
+									"<line" <<
+									" id=\"" << line->getCommercialLine()->getKey() << "\"";
+								if(line->getCommercialLine()->getColor())
+								{
+									stream << " color=\"" << line->getCommercialLine()->getColor()->toXMLColor() << "\"";
+								}
+								if(!line->getCommercialLine()->getStyle().empty())
+								{
+									stream << " cssClass=\"" << line->getCommercialLine()->getStyle() << "\"";
+								}
+								if(!line->getCommercialLine()->getImage().empty())
+								{
+									stream << " imgURL=\"" << line->getCommercialLine()->getImage() << "\"";
+								}
+								if(!line->getCommercialLine()->getLongName().empty())
+								{
+									stream << " longName=\"" << line->getCommercialLine()->getLongName() << "\"";
+								}
+								if(!line->getCommercialLine()->getShortName().empty())
+								{
+									stream << " shortName=\"" << line->getCommercialLine()->getShortName() << "\"";
+								}
+								stream << ">";
+								if(false) // Transform into interactive
+								{
+								}
+								stream <<
+									"</line>";
+								if(line->getRollingStock())
+								{
+									stream <<
+										"<vehicleType" <<
+										" id=\"" << line->getRollingStock()->getKey() << "\"" <<
+										" name=\"" << line->getRollingStock()->getArticle() << line->getRollingStock()->getName() << "\"" <<
+										" />";
+								}
+							}
+							stream << "</transport>";
+						}
+
+						const Road* road(dynamic_cast<const Road*> (curET.getService()->getPath ()));
+						if(road != NULL)
+						{
+							if(_outputRoadApproachDetail)
 							{
 								stream << 
 									"<street" <<
-										" length=\"" << ceil(curET.getDistance()) << "\"" <<
-										" city=\"" << road->getRoadPlace()->getCity()->getName() << "\"" <<
-										" name=\"" << road->getRoadPlace()->getName() << "\"" <<
-										" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime()) << "\"" <<
-										" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
+									" length=\"" << ceil(curET.getDistance()) << "\"" <<
+									" city=\"" << road->getRoadPlace()->getCity()->getName() << "\"" <<
+									" name=\"" << road->getRoadPlace()->getName() << "\"" <<
+									" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime()) << "\"" <<
+									" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
 								if(journey.getContinuousServiceRange().total_seconds() > 0)
 								{
 									posix_time::ptime edTime(curET.getDepartureDateTime());
@@ -770,7 +1009,7 @@ namespace synthese
 										_XMLDisplayRoadPlace(
 											stream,
 											dynamic_cast<const RoadPlace&>(*_departure_place.placeResult.value)
-										);
+											);
 									}
 									else
 									{
@@ -778,7 +1017,7 @@ namespace synthese
 											stream,
 											*dynamic_cast<const Address*>(curET.getDepartureEdge()->getFromVertex()),
 											*road->getRoadPlace()
-										);
+											);
 									}
 								}
 								stream <<
@@ -795,7 +1034,7 @@ namespace synthese
 										_XMLDisplayRoadPlace(
 											stream,
 											dynamic_cast<const RoadPlace&>(*_arrival_place.placeResult.value)
-										);
+											);
 									}
 									else
 									{
@@ -803,7 +1042,7 @@ namespace synthese
 											stream,
 											*dynamic_cast<const Address*>(curET.getArrivalEdge()->getFromVertex()),
 											*road->getRoadPlace()
-										);
+											);
 									}
 								}
 								stream <<
@@ -811,132 +1050,122 @@ namespace synthese
 									"</street>"
 								;
 							}
+							else
+							{
+								partialDistance += ceil(curET.getDistance());
+								if(!firstApproach && lastApproachBeginning == jl.end())
+								{
+									lastApproachBeginning = itl;
+								}
+							}
 						}
+					}
 
-						if(!_outputRoadApproachDetail && lastApproachBeginning != jl.end())
+					if(!_outputRoadApproachDetail && lastApproachBeginning != jl.end())
+					{
+						const Road* road(dynamic_cast<const Road*> ((jl.end()-1)->getService()->getPath ()));
+						const ptime& departureTime(lastApproachBeginning->getDepartureDateTime());
+						const ptime& arrivalTime((jl.end()-1)->getArrivalDateTime());
+						stream <<
+							"<street" <<
+							" length=\"" << ceil(partialDistance) << "\"" <<
+							" city=\"Arrival approach\"" <<
+							" name=\"Arrival approach\"" <<
+							" departureTime=\"" << posix_time::to_iso_extended_string(departureTime) << "\"" <<
+							" arrivalTime=\"" << posix_time::to_iso_extended_string(arrivalTime) << "\"";
+						if(journey.getContinuousServiceRange().total_seconds() > 0)
 						{
-							const Road* road(dynamic_cast<const Road*> ((jl.end()-1)->getService()->getPath ()));
-							const ptime& departureTime(lastApproachBeginning->getDepartureDateTime());
-							const ptime& arrivalTime((jl.end()-1)->getArrivalDateTime());
+							posix_time::ptime edTime(departureTime);
+							edTime += journey.getContinuousServiceRange();
+							posix_time::ptime eaTime(arrivalTime);
+							eaTime += journey.getContinuousServiceRange();
 							stream <<
-								"<street" <<
-								" length=\"" << ceil(partialDistance) << "\"" <<
-								" city=\"Arrival approach\"" <<
-								" name=\"Arrival approach\"" <<
-								" departureTime=\"" << posix_time::to_iso_extended_string(departureTime) << "\"" <<
-								" arrivalTime=\"" << posix_time::to_iso_extended_string(arrivalTime) << "\"";
-							if(journey.getContinuousServiceRange().total_seconds() > 0)
+								" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
+								" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
+						}
+						stream << ">" <<
+							"<startAddress>";
+						if(dynamic_cast<const NamedPlace*>(lastApproachBeginning->getDepartureEdge()->getHub()))
+						{
+							_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*lastApproachBeginning->getDepartureEdge()->getHub()));
+						}
+						else if(dynamic_cast<const Address*>(lastApproachBeginning->getDepartureEdge()->getFromVertex()))
+						{
+							_XMLDisplayAddress(
+								stream,
+								*dynamic_cast<const Address*>(lastApproachBeginning->getDepartureEdge()->getFromVertex()),
+								*road->getRoadPlace()
+							);
+						}
+						stream <<
+							"</startAddress>" <<
+							"<endAddress>";
+						if(dynamic_cast<const NamedPlace*>((jl.end()-1)->getArrivalEdge()->getHub()))
+						{
+							_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*(jl.end()-1)->getArrivalEdge()->getHub()));
+						}
+						else if(dynamic_cast<const Address*>((jl.end()-1)->getArrivalEdge()->getFromVertex()))
+						{
+							if(dynamic_cast<const RoadPlace*>(_arrival_place.placeResult.value))
 							{
-								posix_time::ptime edTime(departureTime);
-								edTime += journey.getContinuousServiceRange();
-								posix_time::ptime eaTime(arrivalTime);
-								eaTime += journey.getContinuousServiceRange();
-								stream <<
-									" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
-									" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
+								_XMLDisplayRoadPlace(
+									stream,
+									dynamic_cast<const RoadPlace&>(*_arrival_place.placeResult.value)
+								);
 							}
-							stream << ">" <<
-								"<startAddress>";
-							if(dynamic_cast<const NamedPlace*>(lastApproachBeginning->getDepartureEdge()->getHub()))
-							{
-								_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*lastApproachBeginning->getDepartureEdge()->getHub()));
-							}
-							else if(dynamic_cast<const Address*>(lastApproachBeginning->getDepartureEdge()->getFromVertex()))
+							else
 							{
 								_XMLDisplayAddress(
 									stream,
-									*dynamic_cast<const Address*>(lastApproachBeginning->getDepartureEdge()->getFromVertex()),
+									*dynamic_cast<const Address*>((jl.end()-1)->getArrivalEdge()->getFromVertex()),
 									*road->getRoadPlace()
 								);
 							}
-							stream <<
-								"</startAddress>" <<
-								"<endAddress>";
-							if(dynamic_cast<const NamedPlace*>((jl.end()-1)->getArrivalEdge()->getHub()))
-							{
-								_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*(jl.end()-1)->getArrivalEdge()->getHub()));
-							}
-							else if(dynamic_cast<const Address*>((jl.end()-1)->getArrivalEdge()->getFromVertex()))
-							{
-								if(dynamic_cast<const RoadPlace*>(_arrival_place.placeResult.value))
-								{
-									_XMLDisplayRoadPlace(
-										stream,
-										dynamic_cast<const RoadPlace&>(*_arrival_place.placeResult.value)
-									);
-								}
-								else
-								{
-									_XMLDisplayAddress(
-										stream,
-										*dynamic_cast<const Address*>((jl.end()-1)->getArrivalEdge()->getFromVertex()),
-										*road->getRoadPlace()
-									);
-								}
-							}
-							stream <<
-								"</endAddress>" <<
-								"</street>"
-								;
-
 						}
+						stream <<
+							"</endAddress>" <<
+							"</street>"
+							;
 
-						stream << "</chunks></journey>";
 					}
-					stream <<
-						"</journeys>" <<
-						"<resultTable>";
 
-					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
-					BOOST_FOREACH(const PTRoutePlannerResult::PlaceList::value_type& row, result.getOrderedPlaces())
-					{
-						GeoPoint gp(WGS84FromLambert(row.place->getPoint()));
-						assert(dynamic_cast<const NamedPlace*>(row.place));
+					stream << "</chunks></journey>";
+				}
+				stream <<
+					"</journeys>" <<
+					"<resultTable>";
+
+				PlacesContentVector::iterator itSheetRow(sheetRows.begin());
+				BOOST_FOREACH(const PTRoutePlannerResult::PlaceList::value_type& row, result.getOrderedPlaces())
+				{
+					GeoPoint gp(WGS84FromLambert(row.place->getPoint()));
+					assert(dynamic_cast<const NamedPlace*>(row.place));
 //						const NamedPlace* np(dynamic_cast<const NamedPlace*>(row.place));
 
-						stream <<
-							"<row type=\"" << (row.isOrigin ? "departure" : row.isDestination ? "arrival" : "connection") << "\">" <<
-							"<cells>" <<
-							(*itSheetRow)->str() <<
-							"</cells>" <<
-							"<place>";
-						if(dynamic_cast<const RoadPlace*>(row.place))
-						{
-							_XMLDisplayRoadPlace(stream, dynamic_cast<const RoadPlace&>(*row.place));
-						}
-						else
-						{
-							_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*row.place));
-						}
-
-						stream <<
-							"</place>" <<
-							"</row>";
-						++itSheetRow;
-					}
 					stream <<
-						"</resultTable>" <<
-						"</routePlannerResult>"
-					;
+						"<row type=\"" << (row.isOrigin ? "departure" : row.isDestination ? "arrival" : "connection") << "\">" <<
+						"<cells>" <<
+						(*itSheetRow)->str() <<
+						"</cells>" <<
+						"<place>";
+					if(dynamic_cast<const RoadPlace*>(row.place))
+					{
+						_XMLDisplayRoadPlace(stream, dynamic_cast<const RoadPlace&>(*row.place));
+					}
+					else
+					{
+						_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*row.place));
+					}
+
+					stream <<
+						"</place>" <<
+						"</row>";
+					++itSheetRow;
 				}
-			}
-			else if(_page)
-			{
-				_page->display(
-					stream
-					, vm
-					, _startDate.date()
-					, _periodId
-					, _home
-					, _originCityText
-					, _originPlaceText
-					, _destinationCityText
-					, _destinationPlaceText
-					, _period
-					, _accessParameters
-					, &request
-					, _site.get()
-				);
+				stream <<
+					"</resultTable>" <<
+					"</routePlannerResult>"
+				;
 			}
 		}
 
@@ -947,7 +1176,6 @@ namespace synthese
 			, _endDate(not_a_date_time)
 			, _period(NULL)
 			, _home(false),
-			_page(NULL),
 			_startArrivalDate(not_a_date_time),
 			_endArrivalDate(not_a_date_time)
 		{			

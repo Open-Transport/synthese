@@ -41,6 +41,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		class Site;
+		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 56.15 Action : Transport web site update.
@@ -52,6 +53,8 @@ namespace synthese
 		///	<ul>
 		///		<li>actionParamsi : site to update</li>
 		///		<li>actionParamna : new value for site name</li>
+		///		<li>actionParamcu : new value for client URL</li>
+		///		<li>actionParamti : new value for default page template id</li>
 		///		<li>...</li>
 		///		<li>actionParamda : new value for the display of the details of road approach</li>
 		///	</ul>
@@ -61,7 +64,6 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_SITE_ID;
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_INTERFACE_ID;
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
 			static const std::string PARAMETER_ONLINE_BOOKING;
@@ -69,11 +71,12 @@ namespace synthese
 			static const std::string PARAMETER_MAX_CONNECTIONS;
 			static const std::string PARAMETER_USE_DATES_RANGE;
 			static const std::string PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL;
+			static const std::string PARAMETER_CLIENT_URL;
+			static const std::string PARAMETER_DEFAULT_PAGE_TEMPLATE_ID;
 
 		private:
 			boost::shared_ptr<Site>							_site;
 			std::string										_name;
-			boost::shared_ptr<const interfaces::Interface>	_interface;
 			boost::gregorian::date										_startDate;
 			boost::gregorian::date										_endDate;
 			bool											_onlineBooking;
@@ -81,6 +84,8 @@ namespace synthese
 			int												_maxConnections;
 			boost::gregorian::date_duration							_useDatesRange;
 			bool											_displayRoadApproachDetail;
+			std::string							_clientURL;
+			boost::shared_ptr<WebPage>			_defaultPageTemplate;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

@@ -26,16 +26,20 @@
 #define SYNTHESE_LinesListFunction_H__
 
 #include "FactorableTemplate.h"
-#include "FunctionWithSite.h"
+#include "Function.h"
 
 #include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
+	namespace transportwebsite
+	{
+		class WebPage;
+	}
+
 	namespace pt
 	{
 		class TransportNetwork;
-		class PTLinesListItemInterfacePage;
 	
 		////////////////////////////////////////////////////////////////////
 		/// Lines list public Function class.
@@ -43,16 +47,17 @@ namespace synthese
 		///	@date 2008
 		///	@ingroup m35Functions refFunctions
 		class LinesListFunction:
-			public util::FactorableTemplate<transportwebsite::FunctionWithSite<false>,LinesListFunction>
+			public util::FactorableTemplate<server::Function,LinesListFunction>
 		{
 		 public:
 			static const std::string PARAMETER_NETWORK_ID;
+			static const std::string PARAMETER_PAGE_ID;
 
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const pt::TransportNetwork> _network;
-				const PTLinesListItemInterfacePage* _page;
+				boost::shared_ptr<const transportwebsite::WebPage> _page;
 			//@}
 
 

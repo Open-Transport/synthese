@@ -35,8 +35,14 @@ namespace synthese
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// WebPageUpdateAction action class.
+		/// 56.15 Action : Web page properties update.
 		/// @ingroup m56Actions refActions
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Parameters :
+		/// <ul>
+		///		<li>mt : mime type</li>
+		/// </ul>
 		class WebPageUpdateAction:
 			public util::FactorableTemplate<server::Action, WebPageUpdateAction>
 		{
@@ -46,6 +52,7 @@ namespace synthese
 			static const std::string PARAMETER_UP_ID;
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
+			static const std::string PARAMETER_MIME_TYPE;
 
 		private:
 			boost::shared_ptr<WebPage> _page;
@@ -53,6 +60,7 @@ namespace synthese
 			std::string _title;
 			boost::posix_time::ptime _startDate;
 			boost::posix_time::ptime _endDate;
+			std::string _mimeType;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

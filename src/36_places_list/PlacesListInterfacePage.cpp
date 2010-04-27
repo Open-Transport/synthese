@@ -22,22 +22,17 @@
 
 #include "PlacesListInterfacePage.h"
 #include "City.h"
-#include "Conversion.h"
+#include "StaticFunctionRequest.h"
+#include "WebPageDisplayFunction.h"
 
 using namespace std;
 using namespace boost;
 
 namespace synthese
 {
-	using namespace interfaces;
-	using namespace transportwebsite;
 	using namespace util;
 	using namespace geography;
-
-	namespace util
-	{
-		template<> const string FactorableTemplate<InterfacePage, PlacesListInterfacePage>::FACTORY_KEY("places_list");
-	}
+	using namespace server;
 
 	namespace transportwebsite
 	{
@@ -47,32 +42,115 @@ namespace synthese
 		const std::string PlacesListInterfacePage::DATA_CITY_ID("city_id");
 		const std::string PlacesListInterfacePage::DATA_CITY_NAME("city_name");
 		const std::string PlacesListInterfacePage::DATA_RESULTS_SIZE("size");
+		const std::string PlacesListInterfacePage::DATA_CONTENT("content");
 
-		void PlacesListInterfacePage::display(
-			std::ostream& stream
-			, VariablesMap& variables
-			, const PlacesList& results
-			, bool isCities
-			, bool isForOrigin
-			, const City* city
-			, const server::Request* request /*= NULL*/) const
-		{
-			ParametersVector pv;
-			pv.push_back(Conversion::ToString(isCities));
-			pv.push_back(Conversion::ToString(isForOrigin));
-			pv.push_back(Conversion::ToString(results.size()));
-			pv.push_back((isCities || !city) ? string() : Conversion::ToString(city->getKey()));
-			pv.push_back((isCities || !city) ? string() : Conversion::ToString(city->getName()));
+		const string PlacesListInterfacePage::DATA_NAME("name");
+		const string PlacesListInterfacePage::DATA_RANK("rank");
 
-			InterfacePage::_display(stream, pv, variables, static_cast<const void*>(&results), request);
+		void PlacesListInterfacePage::DisplayPlacesList(
+			std::ostream& stream,
+			boost::shared_ptr<const WebPage> page,
+			boost::shared_ptr<const WebPage> itemPage,
+			const server::Request& request,
+			const PlacesList& results,
+			bool isForOrigin,
+			const geography::City* city
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			ParametersMap pm;
+
+			pm.insert(PARAMETER_IS_CITY_LIST, false);
+			pm.insert(PARAMETER_IS_FOR_ORIGIN, isForOrigin);
+			pm.insert(DATA_RESULTS_SIZE, results.size());
+			if(city)
+			{
+				pm.insert(DATA_CITY_ID, city->getKey());
+				pm.insert(DATA_CITY_NAME, city->getName());
+			}
+
+			if(itemPage.get())
+			{
+				stringstream content;
+				size_t i(0);
+				for (PlacesList::const_iterator it(results.begin()); it != results.end(); ++it, ++i)
+				{
+					DisplayItem(
+						content,
+						itemPage,
+						request,
+						i,
+						it->second,
+						it->first
+					);
+				}
+				pm.insert(DATA_CONTENT, content.str());
+			}
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
 		}
 
 
 
-		PlacesListInterfacePage::PlacesListInterfacePage()
-			: Registrable(0)
-		{
+		void PlacesListInterfacePage::DisplayCitiesList(
+			std::ostream& stream,
+			boost::shared_ptr<const WebPage> page,
+			boost::shared_ptr<const WebPage> itemPage,
+			const server::Request& request,
+			const PlacesList& results,
+			bool isForOrigin
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			ParametersMap pm;
 
+			pm.insert(PARAMETER_IS_CITY_LIST, true);
+			pm.insert(PARAMETER_IS_FOR_ORIGIN, isForOrigin);
+			pm.insert(DATA_RESULTS_SIZE, results.size());
+
+			if(itemPage.get())
+			{
+				stringstream content;
+				size_t i(0);
+				for (PlacesList::const_iterator it(results.begin()); it != results.end(); ++it, ++i)
+				{
+					DisplayItem(
+						content,
+						itemPage,
+						request,
+						i,
+						it->second,
+						it->first
+					);
+				}
+				pm.insert(DATA_CONTENT, content.str());
+			}
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+
+
+
+		void PlacesListInterfacePage::DisplayItem(
+			std::ostream& stream,
+			boost::shared_ptr<const WebPage> page,
+			const server::Request& request,
+			std::size_t n,
+			const std::string& name,
+			util::RegistryKeyType id
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			ParametersMap pm;
+
+			pm.insert(DATA_RANK, n);
+			pm.insert(DATA_NAME, name);
+			pm.insert(Request::PARAMETER_OBJECT_ID, id);
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
 		}
 	}
 }

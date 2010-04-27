@@ -34,8 +34,7 @@
 #include "City.h"
 #include "PTModule.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
-
-#include "Interface.h"
+#include "WebPage.h"
 
 #include <boost/foreach.hpp>
 
@@ -50,7 +49,6 @@ namespace synthese
 	using namespace server;
 	using namespace lexmatcher;
 	using namespace geography;
-	using namespace interfaces;
 	using namespace transportwebsite;
 
 	template<> const string util::FactorableTemplate<PlacesListFunction::_FunctionWithSite,PlacesListFunction>::FACTORY_KEY("lp");
@@ -63,11 +61,15 @@ namespace synthese
 		const std::string PlacesListFunction::PARAMETER_NUMBER("n");
 		const std::string PlacesListFunction::PARAMETER_IS_FOR_ORIGIN("o");
 		const std::string PlacesListFunction::PARAMETER_PAGE("p");
+		const string PlacesListFunction::PARAMETER_ITEM_PAGE("ip");
+
+
 
 		PlacesListFunction::PlacesListFunction()
-			: _page(NULL)
 		{
 		}
+
+
 
 		ParametersMap PlacesListFunction::_getParametersMap() const
 		{
@@ -76,16 +78,39 @@ namespace synthese
 			map.insert(PARAMETER_CITY_TEXT, _cityText);
 			map.insert(PARAMETER_NUMBER, _n);
 			map.insert(PARAMETER_IS_FOR_ORIGIN, _isForOrigin);
-			if(_page) map.insert(PARAMETER_PAGE, _page->getFactoryKey());
+			if(_page.get())
+			{
+				map.insert(PARAMETER_PAGE, _page->getKey());
+			}
+			if(_itemPage.get())
+			{
+				map.insert(PARAMETER_ITEM_PAGE, _itemPage->getKey());
+			}
 			return map;
 		}
+
+
 
 		void PlacesListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_FunctionWithSite::_setFromParametersMap(map);
-			if(map.getOptional<string>(PARAMETER_PAGE))
+			optional<RegistryKeyType> pageId(map.getOptional<RegistryKeyType>(PARAMETER_PAGE));
+			if (pageId) try
 			{
-				_page = _site->getInterface()->getPage<PlacesListInterfacePage>(map.get<string>(PARAMETER_PAGE));
+				_page = Env::GetOfficialEnv().get<WebPage>(*pageId);
+			}
+			catch(ObjectNotFoundException<WebPage>&)
+			{
+				throw RequestException("No such web page");
+			}
+			optional<RegistryKeyType> itemPageId(map.getOptional<RegistryKeyType>(PARAMETER_ITEM_PAGE));
+			if (itemPageId) try
+			{
+				_itemPage = Env::GetOfficialEnv().get<WebPage>(*itemPageId);
+			}
+			catch(ObjectNotFoundException<WebPage>&)
+			{
+				throw RequestException("No such web page");
 			}
 			_input =
 				map.getOptional<string>(PARAMETER_INPUT) ?
@@ -111,7 +136,7 @@ namespace synthese
 				city->getAllPlacesMatcher().bestMatches(_input, _n)
 			);
 
-			if(_page)
+			if(_page.get())
 			{
 				PlacesList placesList;
 				BOOST_FOREACH(const City::PlacesMatcher::MatchHit it, places)
@@ -123,8 +148,15 @@ namespace synthese
 					)	);
 				}
 
-				VariablesMap vm;
-				_page->display(stream, vm, placesList, false, _isForOrigin, city, &request);
+				PlacesListInterfacePage::DisplayPlacesList(
+					stream,
+					_page,
+					_itemPage,
+					request,
+					placesList,
+					_isForOrigin,
+					city
+				);
 			}
 			else
 			{

@@ -138,7 +138,7 @@ namespace synthese
 				date minDate(function->getSite()->getMinUseDate());
 				date maxDate(function->getSite()->getMaxUseDate());
 
-				const DateTimeInterfacePage* datePage(_page->getInterface()->getPage<DateTimeInterfacePage>(style));
+//				const DateTimeInterfacePage* datePage(_page->getInterface()->getPage<DateTimeInterfacePage>(style));
 
 				// Construction de l'objet HTML
 				stream << "<select name=\"" << RoutePlannerFunction::PARAMETER_DAY << "\">";
@@ -148,7 +148,8 @@ namespace synthese
 					if ( iDate == dateDefaut )
 						stream << "selected=\"selected\" ";
 					stream << "value=\"" << to_iso_extended_string(iDate) << "\">";
-					datePage->display(stream, variables, iDate, request);
+					stream << to_simple_string(iDate);
+					//datePage->display(stream, variables, iDate, request);
 					stream << "</option>";
 				}
 				stream << "</select>";

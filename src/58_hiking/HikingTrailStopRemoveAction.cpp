@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// HikingTrailAddAction class implementation.
-/// @file HikingTrailAddAction.cpp
+/// HikingTrailStopRemoveAction class implementation.
+/// @file HikingTrailStopRemoveAction.cpp
 /// @author Hugues Romain
 /// @date 2010
 ///
@@ -24,7 +24,7 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "HikingTrailAddAction.h"
+#include "HikingTrailStopRemoveAction.hpp"
 #include "HikingRight.h"
 #include "Request.h"
 #include "HikingTrailTableSync.h"
@@ -39,44 +39,67 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, hiking::HikingTrailAddAction>::FACTORY_KEY("HikingTrailAddAction");
+		template<> const string FactorableTemplate<Action, hiking::HikingTrailStopRemoveAction>::FACTORY_KEY("HikingTrailStopRemoveAction");
 	}
 
 	namespace hiking
 	{
-		const string HikingTrailAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+		const string HikingTrailStopRemoveAction::PARAMETER_TRAIL_ID = Action_PARAMETER_PREFIX + "id";
+		const string HikingTrailStopRemoveAction::PARAMETER_RANK = Action_PARAMETER_PREFIX + "rk";
 		
 		
 		
-		ParametersMap HikingTrailAddAction::getParametersMap() const
+		ParametersMap HikingTrailStopRemoveAction::getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_NAME, _name);
+			if(_trail.get())
+			{
+				map.insert(PARAMETER_TRAIL_ID, _trail->getKey());
+				map.insert(PARAMETER_RANK, _rank);
+			}
 			return map;
 		}
 		
 		
 		
-		void HikingTrailAddAction::_setFromParametersMap(const ParametersMap& map)
+		void HikingTrailStopRemoveAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_name = map.getDefault<string>(PARAMETER_NAME);
+			try
+			{
+				_trail = HikingTrailTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_TRAIL_ID), *_env);
+			}
+			catch(ObjectNotFoundException<HikingTrail>&)
+			{
+				throw ActionException("No such trail");
+			}
+			_rank = map.get<size_t>(PARAMETER_RANK);
+
+			if(_rank >= _trail->getStops().size())
+			{
+				throw ActionException("Rank is too high");
+			}
 		}
 		
 		
 		
-		void HikingTrailAddAction::run(
+		void HikingTrailStopRemoveAction::run(
 			Request& request
 		){
-			HikingTrail object;
-			object.setName(_name);
-			HikingTrailTableSync::Save(&object);
-			//::AddCreationEntry(object, request.getUser().get());
-			request.setActionCreatedId(object.getKey());
+//			stringstream text;
+//			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
+
+			HikingTrail::Stops stops(_trail->getStops());
+			stops.erase(stops.begin() + _rank);
+			_trail->setStops(stops);
+
+			HikingTrailTableSync::Save(_trail.get());
+
+			//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
 		
 		
 		
-		bool HikingTrailAddAction::isAuthorized(
+		bool HikingTrailStopRemoveAction::isAuthorized(
 			const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<HikingRight>(WRITE);

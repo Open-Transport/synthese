@@ -46,10 +46,6 @@
 #include "PTUseRuleAdmin.h"
 
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
-#include "PTNetworkListItemInterfacePage.hpp"
-#include "PTRoutesListItemInterfacePage.hpp"
-#include "PTLinesListItemInterfacePage.hpp"
-#include "ReservationRuleInterfacePage.h"
 #include "LineMarkerInterfacePage.h"
 
 #include "ScheduleRealTimeUpdateAction.h"

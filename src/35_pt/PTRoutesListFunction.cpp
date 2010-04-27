@@ -29,7 +29,7 @@
 #include "Line.h"
 #include "Env.h"
 #include "PTRoutesListItemInterfacePage.hpp"
-#include "Interface.h"
+#include "WebPage.h"
 
 #include <boost/foreach.hpp>
 
@@ -43,19 +43,23 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace transportwebsite;
-	using namespace interfaces;
 	using namespace graph;
 
-	template<> const string util::FactorableTemplate<pt::PTRoutesListFunction::_FunctionWithSite,pt::PTRoutesListFunction>::FACTORY_KEY("PTRoutesListFunction");
+	template<> const string FactorableTemplate<Function, PTRoutesListFunction>::FACTORY_KEY("PTRoutesListFunction");
 	
 	namespace pt
 	{
+		const string PTRoutesListFunction::PARAMETER_PAGE_ID("p");
 		const string PTRoutesListFunction::PARAMETER_MERGE_INCLUDING_ROUTES("mir");
 		const string PTRoutesListFunction::PARAMETER_MERGE_SAME_ROUTES("msr");
 		
 		ParametersMap PTRoutesListFunction::_getParametersMap() const
 		{
-			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
+			ParametersMap map;
+			if(_page.get())
+			{
+				map.insert(PARAMETER_PAGE_ID, _page->getKey());
+			}
 			map.insert(PARAMETER_MERGE_INCLUDING_ROUTES, _mergeIncludingRoutes);
 			map.insert(PARAMETER_MERGE_SAME_ROUTES, _mergeSameRoutes);
 			if(_line.get())
@@ -67,13 +71,15 @@ namespace synthese
 
 		void PTRoutesListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_FunctionWithSite::_setFromParametersMap(map);
-
-			if(_site.get() && _site->getInterface())
+			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
+			if(id) try
 			{
-				_page = _site->getInterface()->getPage<PTRoutesListItemInterfacePage>();
+				_page = Env::GetOfficialEnv().get<WebPage>(*id);
 			}
-
+			catch (ObjectNotFoundException<WebPage>&)
+			{
+				throw RequestException("No such page");
+			}
 			_mergeIncludingRoutes = map.getDefault<bool>(PARAMETER_MERGE_INCLUDING_ROUTES, false);
 			_mergeSameRoutes = map.getDefault<bool>(PARAMETER_MERGE_SAME_ROUTES, false);
 
@@ -142,18 +148,23 @@ namespace synthese
 			}
 
 
-			if(!_page)
+			if(!_page.get())
 			{
 				// XML header
 			}
 
 			size_t rank(0);
-			VariablesMap variables;
 			BOOST_FOREACH(const Line* route, routes)
 			{
-				if(_page)
+				if(_page.get())
 				{
-					_page->display(stream, *route, rank++, variables, &request);
+					PTRoutesListItemInterfacePage::Display(
+						stream,
+						_page,
+						request,
+						*route,
+						rank++
+					);
 				}
 				else
 				{
@@ -161,7 +172,7 @@ namespace synthese
 				}
 			}
 
-			if(!_page)
+			if(!_page.get())
 			{
 				// XML footer
 			}
@@ -179,7 +190,7 @@ namespace synthese
 
 		std::string PTRoutesListFunction::getOutputMimeType() const
 		{
-			return _page ? _page->getMimeType() : "text/xml";
+			return _page.get() ? _page->getMimeType() : "text/xml";
 		}
 	}
 }

@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// HikingTrailUpdateAction class header.
-///	@file HikingTrailUpdateAction.h
+/// HikingTrailStopAddAction class header.
+///	@file HikingTrailStopAddAction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///
@@ -22,54 +22,52 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_HikingTrailUpdateAction_H__
-#define SYNTHESE_HikingTrailUpdateAction_H__
+#ifndef SYNTHESE_HikingTrailStopAddAction_H__
+#define SYNTHESE_HikingTrailStopAddAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
 
 namespace synthese
 {
+	namespace pt
+	{
+		class PublicTransportStopZoneConnectionPlace;
+	}
+
 	namespace hiking
 	{
 		class HikingTrail;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 58.15 Action : HikingTrailUpdateAction.
+		/// 58.15 Action : HikingTrailStopAddAction.
 		/// @ingroup m58Actions refActions
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.1.16
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : HikingTrailUpdateAction
+		/// Key : HikingTrailStopAddAction
 		///
 		/// Parameters :
 		///	<ul>
-		///		<li>actionParamid : id of the object to update</li>
-		///		<li>actionParamna : name</li>
-		///		<li>actionParamma : map image URL</li>
-		///		<li>actionParamdu : duration image URL</li>
-		///		<li>actionParampr : profile image URL</li>
-		///		<li>actionParamur : link URL</li>
+		///		<li>actionParamid : id of the trail to add the stop to</li>
+		///		<li>actionParamci : city of the stop</li>
+		///		<li>actionParamna : name of the stop</li>
+		///		<li>actionParamrk : rank</li>
 		///	</ul>
-		class HikingTrailUpdateAction:
-			public util::FactorableTemplate<server::Action, HikingTrailUpdateAction>
+		class HikingTrailStopAddAction:
+			public util::FactorableTemplate<server::Action, HikingTrailStopAddAction>
 		{
 		public:
 			static const std::string PARAMETER_TRAIL_ID;
+			static const std::string PARAMETER_CITY;
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_MAP;
-			static const std::string PARAMETER_DURATION;
-			static const std::string PARAMETER_PROFILE;
-			static const std::string PARAMETER_URL;
+			static const std::string PARAMETER_RANK;
 
 		private:
 			boost::shared_ptr<HikingTrail> _trail;
-			std::string _name;
-			std::string _map;
-			std::string _duration;
-			std::string _profile;
-			std::string _url;
+			boost::shared_ptr<pt::PublicTransportStopZoneConnectionPlace> _stop;
+			boost::optional<std::size_t> _rank;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -109,4 +107,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_HikingTrailUpdateAction_H__
+#endif // SYNTHESE_HikingTrailStopAddAction_H__

@@ -70,8 +70,7 @@ namespace synthese
 			
 			General parameters :
 			<ul>
-				<li>i : id of display interface (optional if si is defined)</li>
-				<li>si : id of display website (ignored if i is defined)</li>
+				<li>i : id of display interface</li>
 				<li>rn : table rows number</li>
 			</ul>
 			
@@ -96,8 +95,7 @@ namespace synthese
 						
 			General parameters :
 			<ul>
-				<li>i : id of display interface (optional if si is defined)</li>
-				<li>si : id of display website (ignored if i is defined)</li>
+				<li>i : id of display interface</li>
 				<li>rn : table rows number</li>
 			</ul>
 			

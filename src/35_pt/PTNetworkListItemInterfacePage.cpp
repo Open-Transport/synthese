@@ -24,54 +24,44 @@
 
 #include "PTNetworkListItemInterfacePage.hpp"
 #include "TransportNetwork.h"
-
-#include <boost/lexical_cast.hpp>
+#include "StaticFunctionRequest.h"
+#include "WebPageDisplayFunction.h"
 
 using namespace std;
 using namespace boost;
 
 namespace synthese
 {
-	using namespace interfaces;
 	using namespace util;
 	using namespace pt;
-
-	namespace util
-	{
-		template<> const string FactorableTemplate<InterfacePage, pt::PTNetworkListItemInterfacePage>::FACTORY_KEY("transport_network_list_item");
-	}
+	using namespace transportwebsite;
+	using namespace server;
 
 	namespace pt
 	{
-		PTNetworkListItemInterfacePage::PTNetworkListItemInterfacePage()
-			: FactorableTemplate<interfaces::InterfacePage, PTNetworkListItemInterfacePage>(),
-			Registrable(0)
-		{
-		}
-		
+		const string PTNetworkListItemInterfacePage::DATA_NAME("name");	
+		const string PTNetworkListItemInterfacePage::DATA_RANK("rank");
+		const string PTNetworkListItemInterfacePage::DATA_RANK_IS_ODD("rank_is_odd");
 		
 
-		void PTNetworkListItemInterfacePage::display(
+		void PTNetworkListItemInterfacePage::Display(
 			std::ostream& stream,
-			const TransportNetwork& object,
-			size_t rank,
-			VariablesMap& variables,
-			const server::Request* request /*= NULL*/
-		) const	{
-			ParametersVector pv;
+			boost::shared_ptr<const transportwebsite::WebPage> page,
+			const server::Request& request,
+			const pt::TransportNetwork& object,
+			std::size_t rank
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			ParametersMap pm;
 		
-			pv.push_back(lexical_cast<string>(object.getKey()));
-			pv.push_back(object.getName()); //1
-			pv.push_back(lexical_cast<string>(rank));
-			pv.push_back(lexical_cast<string>(rank % 2)); //3
+			pm.insert(Request::PARAMETER_OBJECT_ID, object.getKey());
+			pm.insert(DATA_NAME, object.getName()); //1
+			pm.insert(DATA_RANK, rank);
+			pm.insert(DATA_RANK_IS_ODD, rank % 2); //3
 
-			InterfacePage::_display(
-				stream
-				, pv
-				, variables
-				, static_cast<const void*>(&object)
-				, request
-			);
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
 		}
 	}
 }

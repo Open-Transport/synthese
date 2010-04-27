@@ -28,60 +28,56 @@
 #include "PhysicalStop.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "City.h"
-
-#include <boost/lexical_cast.hpp>
+#include "StaticFunctionRequest.h"
+#include "WebPageDisplayFunction.h"
 
 using namespace std;
 using namespace boost;
 
 namespace synthese
 {
-	using namespace interfaces;
 	using namespace util;
-	using namespace pt;
-
-	namespace util
-	{
-		template<> const string FactorableTemplate<InterfacePage, pt::PTRoutesListItemInterfacePage>::FACTORY_KEY("ptroutes_list_item");
-	}
+	using namespace server;
+	using namespace transportwebsite;
 
 	namespace pt
 	{
-		PTRoutesListItemInterfacePage::PTRoutesListItemInterfacePage()
-			: FactorableTemplate<interfaces::InterfacePage, PTRoutesListItemInterfacePage>(),
-			Registrable(0)
-		{
-		}
-		
-		
+		const std::string PTRoutesListItemInterfacePage::DATA_NAME("name");
+		const std::string PTRoutesListItemInterfacePage::DATA_LENGTH("length");
+		const std::string PTRoutesListItemInterfacePage::DATA_STOPS_NUMBER("stops_number");
+		const std::string PTRoutesListItemInterfacePage::DATA_DIRECTION("direction");
+		const std::string PTRoutesListItemInterfacePage::DATA_ORIGIN_CITY_NAME("origin_city_name");
+		const std::string PTRoutesListItemInterfacePage::DATA_ORIGIN_STOP_NAME("origin_stop_name");
+		const std::string PTRoutesListItemInterfacePage::DATA_DESTINATION_CITY_NAME("destination_city_name");
+		const std::string PTRoutesListItemInterfacePage::DATA_DESTINATION_STOP_NAME("destination_stop_name");
+		const std::string PTRoutesListItemInterfacePage::DATA_RANK("rank");
+		const std::string PTRoutesListItemInterfacePage::DATA_RANK_IS_ODD("rank_is_odd");
 
-		void PTRoutesListItemInterfacePage::display(
+		void PTRoutesListItemInterfacePage::Display(
 			std::ostream& stream,
-			const Line& object,
-			size_t rank,
-			VariablesMap& variables,
-			const server::Request* request /*= NULL*/
-		) const	{
-			ParametersVector pv;
-			pv.push_back(lexical_cast<string>(object.getKey())); //0
-			pv.push_back(object.getName()); //1
-			pv.push_back(lexical_cast<string>(object.getLastEdge() ?  object.getLastEdge()->getMetricOffset() : double(0))); //2
-			pv.push_back(lexical_cast<string>(object.getEdges().size())); //3
-			pv.push_back(object.getDirection()); //4
-			pv.push_back(dynamic_cast<const LineStop*>(object.getEdge(0)) ? dynamic_cast<const LineStop*>(object.getEdge(0))->getPhysicalStop()->getConnectionPlace()->getCity()->getName() : string()); //5
-			pv.push_back(dynamic_cast<const LineStop*>(object.getEdge(0)) ? dynamic_cast<const LineStop*>(object.getEdge(0))->getPhysicalStop()->getConnectionPlace()->getName() : string()); //6
-			pv.push_back(dynamic_cast<const LineStop*>(object.getLastEdge()) ? dynamic_cast<const LineStop*>(object.getLastEdge())->getPhysicalStop()->getConnectionPlace()->getCity()->getName() : string()); //7
-			pv.push_back(dynamic_cast<const LineStop*>(object.getLastEdge()) ? dynamic_cast<const LineStop*>(object.getLastEdge())->getPhysicalStop()->getConnectionPlace()->getName() : string()); //8
-			pv.push_back(lexical_cast<string>(rank));
-			pv.push_back(lexical_cast<string>(rank % 2));
+			boost::shared_ptr<const transportwebsite::WebPage> page,
+			const server::Request& request,
+			const pt::Line& object,
+			std::size_t rank
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			ParametersMap pm;
 
-			InterfacePage::_display(
-				stream
-				, pv
-				, variables
-				, static_cast<const void*>(&object)
-				, request
-			);
+			pm.insert(Request::PARAMETER_OBJECT_ID, object.getKey()); //0
+			pm.insert(DATA_NAME, object.getName()); //1
+			pm.insert(DATA_LENGTH, object.getLastEdge() ?  object.getLastEdge()->getMetricOffset() : double(0)); //2
+			pm.insert(DATA_STOPS_NUMBER, object.getEdges().size()); //3
+			pm.insert(DATA_DIRECTION, object.getDirection()); //4
+			pm.insert(DATA_ORIGIN_CITY_NAME, dynamic_cast<const LineStop*>(object.getEdge(0)) ? dynamic_cast<const LineStop*>(object.getEdge(0))->getPhysicalStop()->getConnectionPlace()->getCity()->getName() : string()); //5
+			pm.insert(DATA_ORIGIN_STOP_NAME, dynamic_cast<const LineStop*>(object.getEdge(0)) ? dynamic_cast<const LineStop*>(object.getEdge(0))->getPhysicalStop()->getConnectionPlace()->getName() : string()); //6
+			pm.insert(DATA_DESTINATION_CITY_NAME, dynamic_cast<const LineStop*>(object.getLastEdge()) ? dynamic_cast<const LineStop*>(object.getLastEdge())->getPhysicalStop()->getConnectionPlace()->getCity()->getName() : string()); //7
+			pm.insert(DATA_DESTINATION_STOP_NAME, dynamic_cast<const LineStop*>(object.getLastEdge()) ? dynamic_cast<const LineStop*>(object.getLastEdge())->getPhysicalStop()->getConnectionPlace()->getName() : string()); //8
+			pm.insert(DATA_RANK, rank);
+			pm.insert(DATA_RANK_IS_ODD, rank % 2);
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
 		}
 	}
 }

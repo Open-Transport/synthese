@@ -46,6 +46,7 @@ namespace synthese
 				static const std::string COL_DURATION;
 				static const std::string COL_PROFILE;
 				static const std::string COL_STOPS;
+				static const std::string COL_URL;
 			//@}
 			
 
@@ -54,7 +55,7 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				///	HikingTrail search.
 				///	@param env Environment to populate
-				///	@param parameterId optional ID of a foreign key to filter on (deactivated if undefined)
+				///	@param name text to search in the name of the trail
 				///	@param first First  object to answer
 				///	@param number Number of  objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				///	@param linkLevel Level of links to build when reading foreign keys
@@ -63,7 +64,7 @@ namespace synthese
 				///	@date 2010
 				static SearchResult Search(
 					util::Env& env,
-					// boost::optional<util::RegistryKeyType> parameterId = boost::optional<util::RegistryKeyType>(),
+					boost::optional<std::string> name = boost::optional<std::string>(),
 					std::size_t first = 0,
 					boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 					bool orderByName = true,

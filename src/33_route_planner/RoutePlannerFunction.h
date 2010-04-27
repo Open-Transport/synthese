@@ -45,6 +45,7 @@ namespace synthese
 	{
 		class HourPeriod;
 		class RollingStockFilter;
+		class WebPage;
 	}
 
 	namespace geography
@@ -56,10 +57,6 @@ namespace synthese
 	namespace pt
 	{
 		class PhysicalStop;
-	}
-
-	namespace pt
-	{
 		class PublicTransportStopZoneConnectionPlace;
 	}
 
@@ -370,11 +367,28 @@ namespace synthese
 			static const std::string PARAMETER_HIGHEST_DEPARTURE_TIME;
 			static const std::string PARAMETER_HIGHEST_ARRIVAL_TIME;
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
+			static const std::string PARAMETER_PAGE;
+			static const std::string PARAMETER_SCHEDULES_ROW_PAGE;
+			static const std::string PARAMETER_SCHEDULES_CELL_PAGE;
+			static const std::string PARAMETER_LINES_ROW_PAGE;
+			static const std::string PARAMETER_LINE_MARKER_PAGE;
+			static const std::string PARAMETER_BOARD_PAGE;
+			static const std::string PARAMETER_WARNING_PAGE;
+			static const std::string PARAMETER_RESERVATION_PAGE;
+			static const std::string PARAMETER_DURATION_PAGE;
+			static const std::string PARAMETER_MAP_PAGE;
+			static const std::string PARAMETER_MAP_LINE_PAGE;
+			static const std::string PARAMETER_DATE_TIME_PAGE;
+			static const std::string PARAMETER_STOP_CELL_PAGE;
+			static const std::string PARAMETER_SERVICE_CELL_PAGE;
+			static const std::string PARAMETER_JUNCTION_CELL_PAGE;
+			static const std::string PARAMETER_MAP_STOP_PAGE;
+			static const std::string PARAMETER_MAP_SERVICE_PAGE;
+			static const std::string PARAMETER_MAP_JUNCTION_PAGE;
 			
 		private:
 			//! \name Parameters
 			//@{
-				const RoutePlannerInterfacePage*			_page;
 				transportwebsite::Site::ExtendedFetchPlaceResult	_departure_place;
 				transportwebsite::Site::ExtendedFetchPlaceResult	_arrival_place;
 				std::string									_originCityText;
@@ -396,6 +410,27 @@ namespace synthese
 				bool										_outputRoadApproachDetail;
 			//@}
 
+			//! @name Pages
+			//@{
+				boost::shared_ptr<const transportwebsite::WebPage> _page;
+				boost::shared_ptr<const transportwebsite::WebPage> _schedulesRowPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _schedulesCellPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _linesRowPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _lineMarkerPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _boardPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _warningPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _reservationPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _durationPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _mapPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _mapLinePage;
+				boost::shared_ptr<const transportwebsite::WebPage> _dateTimePage;
+				boost::shared_ptr<const transportwebsite::WebPage> _stopCellPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _serviceCellPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _junctionPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _mapStopCellPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _mapServiceCellPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _mapJunctionPage;
+			//@}
 
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map

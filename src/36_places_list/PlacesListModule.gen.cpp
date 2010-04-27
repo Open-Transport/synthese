@@ -10,7 +10,6 @@ synthese::transportwebsite::WebPageTableSync::integrate();
 
 synthese::transportwebsite::PlacesListModule::integrate();
 
-synthese::transportwebsite::CityListInterfaceElement::integrate();
 synthese::transportwebsite::CityListRequestInterfaceElement::integrate();
 synthese::transportwebsite::PlacesListRequestInterfaceElement::integrate();
 synthese::transportwebsite::UserFavoriteListInterfaceElement::integrate();
@@ -18,10 +17,7 @@ synthese::transportwebsite::WebPageFormInterfaceElement::integrate();
 synthese::transportwebsite::WebPageLinkInterfaceElement::integrate();
 synthese::transportwebsite::WebPageMenuInterfaceElement::integrate();
 
-synthese::transportwebsite::PlacesListInterfacePage::integrate();
-synthese::transportwebsite::PlacesListItemInterfacePage::integrate();
 synthese::transportwebsite::UserFavoriteInterfacePage::integrate();
-synthese::transportwebsite::WebPageInterfacePage::integrate();
 
 synthese::transportwebsite::CityListFunction::integrate();
 synthese::transportwebsite::PlacesListFunction::integrate();

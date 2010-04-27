@@ -8,7 +8,6 @@
 
 #include "PlacesListModule.h"
 
-#include "CityListInterfaceElement.h"
 #include "CityListRequestInterfaceElement.h"
 #include "PlacesListRequestInterfaceElement.h"
 #include "UserFavoriteListInterfaceElement.h"
@@ -20,10 +19,7 @@
 #include "PlacesListFunction.h"
 #include "WebPageDisplayFunction.h"
 
-#include "PlacesListInterfacePage.h"
-#include "PlacesListItemInterfacePage.h"
 #include "UserFavoriteInterfacePage.h"
-#include "WebPageInterfacePage.h"
 
 #include "SiteTableSync.h"
 #include "ObjectSiteLinkTableSync.h"

@@ -34,21 +34,36 @@ namespace synthese
 	{
 		class HikingTrail;
 		
-		/** Hiking trail display Function class.
-			@author Hugues Romain
-			@date 2010
-			@ingroup m58Functions refFunctions
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 58.15 Function : hiking trail value display.
+		///	@author Hugues Romain
+		///	@date 2010
+		///	@ingroup m58Functions refFunctions
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : HikingTrailDisplayFunction
+		///
+		/// Parameters :
+		///	<ul>
+		///		<li>roid : ID of the trail to extract the data from</li>
+		///		<li>key : Data to extract :</li>
+		///		<ul>
+		///			<li>name : name of the trail</li>
+		///			<li>duration : duration of the trail</li>
+		///			<li>profile : profile of the trail</li>
+		///			<li>url : url of link to the trail home page</li>
+		///		</ul>
+		///	</ul>
 		class HikingTrailDisplayFunction:
 			public util::FactorableTemplate<transportwebsite::FunctionWithSite<true>, HikingTrailDisplayFunction>
 		{
 		public:
+			static const std::string PARAMETER_KEY;
 			
-
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const HikingTrail> _hikingTrail;
+				std::string _key;
 			//@}
 			
 			
@@ -72,8 +87,6 @@ namespace synthese
 			
 			
 		public:
-			/// @todo Getters/Setters for parsed parameters
-
 
 
 			//////////////////////////////////////////////////////////////////////////

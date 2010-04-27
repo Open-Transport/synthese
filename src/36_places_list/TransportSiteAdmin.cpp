@@ -250,12 +250,13 @@ namespace synthese
 				stream << pt.cell("Nom", pt.getForm().getTextInput(SiteUpdateAction::PARAMETER_NAME, _site->getName()));
 				stream << pt.cell("Début validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_START_DATE, _site->getStartDate()));
 				stream << pt.cell("Fin validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_END_DATE, _site->getEndDate()));
-				stream << pt.title("Apparence");
-				stream << pt.cell("Interface", pt.getForm().getSelectInput(
-							SiteUpdateAction::PARAMETER_INTERFACE_ID,
-							InterfaceTableSync::GetInterfaceLabels<RoutePlannerInterfacePage>(optional<string>()),
-							optional<RegistryKeyType>(_site->getInterface() ? _site->getInterface()->getKey() : 0)
-					)	);
+				stream << pt.cell("URL", pt.getForm().getTextInput(SiteUpdateAction::PARAMETER_CLIENT_URL, _site->getClientURL()));
+				stream << pt.cell(
+					"Modèle de page par défaut",
+					pt.getForm().getTextInput(
+						SiteUpdateAction::PARAMETER_DEFAULT_PAGE_TEMPLATE_ID,
+						lexical_cast<string>(_site->getDefaultTemplate() ? _site->getDefaultTemplate()->getKey() : RegistryKeyType(0))
+				)	);
 				stream << pt.title("Recherche d'itinéraires");
 				stream << pt.cell("Max correspondances", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_MAX_CONNECTIONS, 0, 99, _site->getMaxTransportConnectionsCount(), 1, "illimité"));
 				stream << pt.cell("Réservation en ligne", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_ONLINE_BOOKING, _site->getOnlineBookingAllowed()));
@@ -342,10 +343,9 @@ namespace synthese
 				AdminFunctionRequest<WebPageAdmin> openRequest(_request);
 
 				StaticFunctionRequest<WebPageDisplayFunction> viewRequest(_request, false);
-				if(	_site->getInterface() &&
-					!_site->getInterface()->getDefaultClientURL().empty()
+				if(	!_site->getClientURL().empty()
 				){
-					viewRequest.setClientURL(_site->getInterface()->getDefaultClientURL());
+					viewRequest.setClientURL(_site->getClientURL());
 				}
 				
 				WebPageTableSync::SearchResult result(

@@ -27,8 +27,7 @@
 #include "SiteUpdateAction.h"
 #include "Site.h"
 #include "SiteTableSync.h"
-#include "Interface.h"
-#include "InterfaceTableSync.h"
+#include "WebPageTableSync.h"
 
 using namespace std;
 using namespace boost::gregorian;
@@ -36,7 +35,6 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace server;
-	using namespace interfaces;
 	using namespace util;
 	
 	namespace util
@@ -48,7 +46,6 @@ namespace synthese
 	{
 		const string SiteUpdateAction::PARAMETER_SITE_ID = Action_PARAMETER_PREFIX + "si";
 		const string SiteUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-		const string SiteUpdateAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "in";
 		const string SiteUpdateAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sd";
 		const string SiteUpdateAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "ed";
 		const string SiteUpdateAction::PARAMETER_ONLINE_BOOKING = Action_PARAMETER_PREFIX + "ob";
@@ -56,7 +53,9 @@ namespace synthese
 		const string SiteUpdateAction::PARAMETER_MAX_CONNECTIONS = Action_PARAMETER_PREFIX + "mc";
 		const string SiteUpdateAction::PARAMETER_USE_DATES_RANGE = Action_PARAMETER_PREFIX + "dr";
 		const string SiteUpdateAction::PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL = Action_PARAMETER_PREFIX + "da";
-
+		const string SiteUpdateAction::PARAMETER_CLIENT_URL = Action_PARAMETER_PREFIX + "cu";
+		const string SiteUpdateAction::PARAMETER_DEFAULT_PAGE_TEMPLATE_ID = Action_PARAMETER_PREFIX + "ti";
+		
 		
 		
 		SiteUpdateAction::SiteUpdateAction()
@@ -76,6 +75,8 @@ namespace synthese
 			{
 				map.insert(PARAMETER_SITE_ID, _site->getKey());
 				map.insert(PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL, _displayRoadApproachDetail);
+				map.insert(PARAMETER_CLIENT_URL, _clientURL);
+				map.insert(PARAMETER_DEFAULT_PAGE_TEMPLATE_ID, _defaultPageTemplate.get() ? _defaultPageTemplate->getKey() : RegistryKeyType(0));
 			}
 			return map;
 		}
@@ -86,14 +87,6 @@ namespace synthese
 		{
 			setSiteId(map.get<RegistryKeyType>(PARAMETER_SITE_ID));
 			_name = map.get<string>(PARAMETER_NAME);
-			try
-			{
-				_interface = InterfaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID), *_env);
-			}
-			catch (...)
-			{
-				throw ActionException("No such interface");
-			}
 			if(!map.getDefault<string>(PARAMETER_START_DATE).empty())
 			{
 				_startDate = from_string(map.get<string>(PARAMETER_START_DATE));
@@ -107,6 +100,16 @@ namespace synthese
 			_useDatesRange = days(map.get<int>(PARAMETER_USE_DATES_RANGE));
 			_maxConnections = map.get<int>(PARAMETER_MAX_CONNECTIONS);
 			_displayRoadApproachDetail = map.get<bool>(PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL);
+			_clientURL = map.get<string>(PARAMETER_CLIENT_URL);
+			RegistryKeyType pageTemplateId(map.get<RegistryKeyType>(PARAMETER_DEFAULT_PAGE_TEMPLATE_ID));
+			if(pageTemplateId > 0) try
+			{
+				_defaultPageTemplate = WebPageTableSync::GetEditable(pageTemplateId, *_env);
+			}
+			catch(ObjectNotFoundException<WebPage>&)
+			{
+				throw ActionException("No such page template");
+			}
 		}
 		
 		
@@ -114,7 +117,6 @@ namespace synthese
 		void SiteUpdateAction::run(Request& request)
 		{
 			_site->setName(_name);
-			_site->setInterface(_interface.get());
 			_site->setStartDate(_startDate);
 			_site->setEndDate(_endDate);
 			_site->setOnlineBookingAllowed(_onlineBooking);
@@ -122,6 +124,8 @@ namespace synthese
 			_site->setUseDateRange(_useDatesRange);
 			_site->setMaxTransportConnectionsCount(_maxConnections);
 			_site->setDisplayRoadApproachDetail(_displayRoadApproachDetail);
+			_site->setClientURL(_clientURL);
+			_site->setDefaultTemplate(_defaultPageTemplate.get());
 
 			SiteTableSync::Save(_site.get());
 		}
@@ -143,8 +147,7 @@ namespace synthese
 
 
 		bool SiteUpdateAction::isAuthorized(const Session* session
-
-			) const {
+		) const {
 			return true;
 		}
 	}

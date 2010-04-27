@@ -116,10 +116,9 @@ namespace synthese
 			stream << "<h1>Visualisation</h1>";
 
 			StaticFunctionRequest<WebPageDisplayFunction> viewRequest(_request, false);
-			if(	_page->getRoot()->getInterface() &&
-				!_page->getRoot()->getInterface()->getDefaultClientURL().empty()
+			if(	!_page->getRoot()->getClientURL().empty()
 			){
-				viewRequest.setClientURL(_page->getRoot()->getInterface()->getDefaultClientURL());
+				viewRequest.setClientURL(_page->getRoot()->getClientURL());
 			}
 			viewRequest.getFunction()->setPage(_page);
 			stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "page_go.png") << "</p>";
@@ -134,6 +133,7 @@ namespace synthese
 				stream << t.open();
 				stream << t.cell("ID", lexical_cast<string>(_page->getKey()));
 				stream << t.cell("Titre", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TITLE, _page->getName()));
+				stream << t.cell("Type MIME (défaut : text/html)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->_getMimeType()));
 				stream << t.cell(
 					"Page supérieure",
 					t.getForm().getSelectInput(

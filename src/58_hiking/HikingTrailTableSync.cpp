@@ -26,10 +26,7 @@
 
 #include "HikingTrailTableSync.h"
 #include "ReplaceQuery.h"
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
+#include "SelectQuery.hpp"
 #include "ConnectionPlaceTableSync.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 
@@ -54,6 +51,7 @@ namespace synthese
 		const string HikingTrailTableSync::COL_DURATION ("duration");
 		const string HikingTrailTableSync::COL_MAP ("map");
 		const string HikingTrailTableSync::COL_PROFILE ("profile");
+		const string HikingTrailTableSync::COL_URL ("url");
 		const string HikingTrailTableSync::COL_STOPS ("stops");
 	}
 	
@@ -69,8 +67,10 @@ namespace synthese
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(HikingTrailTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(HikingTrailTableSync::COL_DURATION, SQL_TEXT),
 			SQLiteTableSync::Field(HikingTrailTableSync::COL_MAP, SQL_TEXT),
 			SQLiteTableSync::Field(HikingTrailTableSync::COL_PROFILE, SQL_TEXT),
+			SQLiteTableSync::Field(HikingTrailTableSync::COL_URL, SQL_TEXT),
 			SQLiteTableSync::Field(HikingTrailTableSync::COL_STOPS, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
@@ -97,19 +97,18 @@ namespace synthese
 			object->setDuration(rows->getText(HikingTrailTableSync::COL_DURATION));
 			object->setMap(rows->getText(HikingTrailTableSync::COL_MAP));
 			object->setProfile(rows->getText(HikingTrailTableSync::COL_PROFILE));
+			object->setURL(rows->getText(HikingTrailTableSync::COL_URL));
 
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
 				vector<string> stopids = Conversion::ToStringVector(rows->getText (HikingTrailTableSync::COL_STOPS));
-				object->clearStops();
-				size_t rank(0);
+				HikingTrail::Stops stops;
 				BOOST_FOREACH(const string& stopid, stopids)
 				{
 					try
 					{
-						object->addStop(
-							ConnectionPlaceTableSync::GetEditable(lexical_cast<RegistryKeyType>(stopid), env, linkLevel).get(),
-							rank
+						stops.push_back(
+							ConnectionPlaceTableSync::GetEditable(lexical_cast<RegistryKeyType>(stopid), env, linkLevel).get()
 						);
 					}
 					catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
@@ -120,8 +119,8 @@ namespace synthese
 					{
 						Log::GetInstance().warn("No such stop "+ stopid +" in HikingTrail "+ lexical_cast<string>(object->getKey()));
 					}
-					++rank;
 				}
+				object->setStops(stops);
 			}
 		}
 
@@ -147,6 +146,7 @@ namespace synthese
 			query.addField(object->getDuration());
 			query.addField(object->getMap());
 			query.addField(object->getProfile());
+			query.addField(object->getURL());
 			query.addField(stops.str());
 			query.execute(transaction);
 		}
@@ -165,36 +165,32 @@ namespace synthese
 	{
 		HikingTrailTableSync::SearchResult HikingTrailTableSync::Search(
 			util::Env& env,
-			// boost::optional<util::RegistryKeyType> parameterId /*= boost::optional<util::RegistryKeyType>()*/,
+			optional<string> name,
 			size_t first /*= 0*/,
 			boost::optional<std::size_t> number /*= boost::optional<std::size_t>()*/,
 			bool orderByName,
 			bool raisingOrder,
 			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 "
-				;
-			// if(parameterId)
-			// {
-			// 	query << " AND " << COL_PARENT_ID << "=" << *parentFolderId;
-			// }
-			// if(orderByName)
-			// {
-			// 	query << " ORDER BY " << COL_NAME << " " << (raisingOrder ? "ASC" : "DESC");
-			// }
+			SelectQuery<HikingTrailTableSync> query;
+			if(name)
+			{
+				query.addWhereField(COL_NAME, *name, ComposedExpression::OP_LIKE);
+			}
+			if(orderByName)
+			{
+			 	query.addOrderField(COL_NAME, raisingOrder);
+			}
 			if (number)
 			{
-				query << " LIMIT " << (*number + 1);
-				if (first > 0)
-				{
-					query << " OFFSET " << first;
-			}	}
+				query.setNumber(*number + 1);
+			}
+			if (first > 0)
+			{
+				query.setFirst(first);
+			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }

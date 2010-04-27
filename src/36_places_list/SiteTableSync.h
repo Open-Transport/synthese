@@ -39,10 +39,10 @@ namespace synthese
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t025_sites
-		class SiteTableSync : public db::SQLiteRegistryTableSyncTemplate<SiteTableSync,Site>
+		class SiteTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<SiteTableSync,Site>
 		{
 		public:
-			static const std::string COL_INTERFACE_ID;
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_START_DATE;
 			static const std::string TABLE_COL_END_DATE;
@@ -52,6 +52,8 @@ namespace synthese
 			static const std::string COL_USE_DATES_RANGE;
 			static const std::string COL_PERIODS;
 			static const std::string COL_DISPLAY_ROAD_APPROACH_DETAILS;
+			static const std::string COL_CLIENT_URL;
+			static const std::string COL_DEFAULT_PAGE_TEMPLATE_ID;
 
 
 

@@ -115,18 +115,7 @@ namespace synthese
 					_type.reset(new DisplayType);
 					_type->setRowNumber(map.getDefault<size_t>(PARAMETER_ROWS_NUMBER, 10));
 
-					if(map.getDefault<RegistryKeyType>(PARAMETER_INTERFACE_ID) > 0)
-					{
-						_type->setDisplayInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID)).get());
-					}
-					else
-					{
-						if(!_site.get() || !_site->getInterface())
-						{
-							throw RequestException("Invalid site");
-						}
-						_type->setDisplayInterface(_site->getInterface());
-					}
+					_type->setDisplayInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID)).get());
 					screen->setType(_type.get());
 
 					// Way 3 : physical stop

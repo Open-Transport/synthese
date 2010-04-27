@@ -52,23 +52,23 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace interfaces;
-	using namespace pt;
 	using namespace geography;
 	using namespace calendar;
 	using namespace graph;
-	using namespace transportwebsite;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<timetables::TimetableGenerateFunction::_FunctionWithSite,timetables::TimetableGenerateFunction>::FACTORY_KEY("TimetableGenerateFunction");
+	template<> const string util::FactorableTemplate<Function,timetables::TimetableGenerateFunction>::FACTORY_KEY("TimetableGenerateFunction");
 	
 	namespace timetables
 	{
 		const string TimetableGenerateFunction::PARAMETER_CALENDAR_ID("cid");
 		const string TimetableGenerateFunction::PARAMETER_STOP_PREFIX("stop");
 		const string TimetableGenerateFunction::PARAMETER_CITY_PREFIX("city");
+		const string TimetableGenerateFunction::PARAMETER_INTERFACE_ID("i");
+
 
 		TimetableGenerateFunction::TimetableGenerateFunction():
-			FactorableTemplate<TimetableGenerateFunction::_FunctionWithSite,TimetableGenerateFunction>()
+			FactorableTemplate<Function,TimetableGenerateFunction>()
 		{
 			setEnv(shared_ptr<Env>(new Env));
 		}
@@ -77,9 +77,13 @@ namespace synthese
 
 		ParametersMap TimetableGenerateFunction::_getParametersMap() const
 		{
-			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
+			ParametersMap map;
 			if(_timetable.get())
 			{
+				if(_timetable->getInterface())
+				{
+					map.insert(PARAMETER_INTERFACE_ID, _timetable->getInterface()->getKey());
+				}
 				if(_line.get())
 				{
 					map.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
@@ -122,8 +126,6 @@ namespace synthese
 
 		void TimetableGenerateFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_FunctionWithSite::_setFromParametersMap(map);
-
 			// Way 1 : pre-configured timetable
 			if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == TimetableTableSync::TABLE.ID)
 			{
@@ -149,7 +151,18 @@ namespace synthese
 			else
 			{
 				shared_ptr<Timetable> timetable(new Timetable);
-				timetable->setInterface(_site->getInterface());
+
+				try
+				{
+					timetable->setInterface(
+						Env::GetOfficialEnv().get<Interface>(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID)).get()
+					);
+				}
+				catch(ObjectNotFoundException<Interface>&)
+				{
+					throw RequestException("No such interface");
+				}
+
 
 				if(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_ID))
 				{
@@ -247,7 +260,7 @@ namespace synthese
 				}
 				else // Way 3 : customized timetable
 				{
-					timetable->setContentType(Timetable::TABLE_SERVICES_IN_COLS);
+/*					timetable->setContentType(Timetable::TABLE_SERVICES_IN_COLS);
 					for(size_t rank(0);
 						!map.getDefault<string>(PARAMETER_CITY_PREFIX + lexical_cast<string>(rank)).empty() &&
 						!map.getDefault<string>(PARAMETER_STOP_PREFIX + lexical_cast<string>(rank)).empty();
@@ -267,16 +280,9 @@ namespace synthese
 						row.setRank(rank);
 						timetable->addRow(row);
 					}
-				}
+*/				}
 
 				_timetable = const_pointer_cast<const Timetable>(timetable);
-			}
-
-			if(	!_site.get() ||
-				!_site->getInterface() ||
-				!_timetable->getInterface()->hasPage<TimetableInterfacePage>()
-			){
-				throw RequestException("A site with valid interface must be defined");
 			}
 		}
 

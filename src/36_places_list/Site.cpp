@@ -44,7 +44,6 @@ namespace synthese
 	using namespace std;
 	using namespace util;
 	using namespace geography;
-	using namespace interfaces;
 	using namespace lexmatcher;
 	using namespace pt;
 	using namespace graph;
@@ -64,8 +63,8 @@ namespace synthese
 		):	Registrable(id),
 			_startValidityDate(not_a_date_time),
 			_endValidityDate(not_a_date_time),
-			_interface(NULL),
-			_displayRoadApproachDetail(true)
+			_displayRoadApproachDetail(true),
+			_defaultTemplate(NULL)
 		{		
 		}
 
@@ -218,11 +217,6 @@ namespace synthese
 		const Site::Periods& Site::getPeriods() const
 		{
 			return _periods;
-		}
-
-		void Site::setUseDateRange(date_duration range )
-		{
-			_useDateRange = range;
 		}
 
 

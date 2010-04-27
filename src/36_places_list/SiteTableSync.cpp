@@ -21,11 +21,9 @@
 */
 
 #include "SiteTableSync.h"
-#include "Site.h"
 #include "ReplaceQuery.h"
-#include "SQLiteResult.h"
-#include "Interface.h"
-#include "InterfaceTableSync.h"
+#include "SelectQuery.hpp"
+#include "WebPageTableSync.h"
 
 #include <sstream>
 #include <boost/tokenizer.hpp>
@@ -38,7 +36,6 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace interfaces;
 	using namespace pt;
 	using namespace util;
 	using namespace db;
@@ -52,7 +49,6 @@ namespace synthese
 	namespace transportwebsite
 	{
 		const string SiteTableSync::TABLE_COL_NAME = "name";
-		const string SiteTableSync::COL_INTERFACE_ID = "interface_id";
 		const string SiteTableSync::TABLE_COL_START_DATE = "start_date";
 		const string SiteTableSync::TABLE_COL_END_DATE = "end_date";
 		const string SiteTableSync::TABLE_COL_ONLINE_BOOKING = "online_booking";
@@ -61,6 +57,8 @@ namespace synthese
 		const string SiteTableSync::COL_USE_DATES_RANGE("use_dates_range");
 		const string SiteTableSync::COL_PERIODS("periods");
 		const string SiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS("display_road_approach_detail");
+		const string SiteTableSync::COL_CLIENT_URL("cient_url");
+		const string SiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID("default_page_template_id");
 	}
 
 	namespace db
@@ -73,7 +71,6 @@ namespace synthese
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(SiteTableSync::COL_INTERFACE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_START_DATE, SQL_DATE),
 			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_END_DATE, SQL_DATE),
 			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_ONLINE_BOOKING, SQL_INTEGER),
@@ -82,6 +79,8 @@ namespace synthese
 			SQLiteTableSync::Field(SiteTableSync::COL_USE_DATES_RANGE, SQL_INTEGER),
 			SQLiteTableSync::Field(SiteTableSync::COL_PERIODS, SQL_TEXT),
 			SQLiteTableSync::Field(SiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS, SQL_INTEGER),
+			SQLiteTableSync::Field(SiteTableSync::COL_CLIENT_URL, SQL_TEXT),
+			SQLiteTableSync::Field(SiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -105,6 +104,7 @@ namespace synthese
 		    site->setMaxTransportConnectionsCount(rows->getInt(SiteTableSync::COL_MAX_CONNECTIONS));
 		    site->setUseDateRange(days(rows->getInt(SiteTableSync::COL_USE_DATES_RANGE)));
 			site->setDisplayRoadApproachDetail(rows->getBool(SiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS));
+			site->setClientURL(rows->getText(SiteTableSync::COL_CLIENT_URL));
 		    
 		    string periodsStr(rows->getText(SiteTableSync::COL_PERIODS));
 
@@ -128,22 +128,19 @@ namespace synthese
 				site->addHourPeriod(period);
 			}
 
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				RegistryKeyType id(rows->getLongLong(SiteTableSync::COL_INTERFACE_ID));
-				if (id > 0)
+				RegistryKeyType templateId(rows->getLongLong(SiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID));
+				try
 				{
-					try
-					{
-						site->setInterface(InterfaceTableSync::Get(id, env, linkLevel).get());
-					}
-					catch(ObjectNotFoundException<Interface>& e)
-					{
-						Log::GetInstance().warn(
-							"Data corrupted in "+ TABLE.NAME + " on site " + lexical_cast<string>(site->getKey()) +" : interface " +
-							lexical_cast<string>(id) + " not found"
-						);
-					}
+					site->setDefaultTemplate(
+						templateId == 0 ? NULL :
+						WebPageTableSync::GetEditable(templateId, env, linkLevel).get()
+					);
+				}
+				catch(ObjectNotFoundException<WebPage>& e)
+				{
+					Log::GetInstance().warn("No such webpage in site", e);
 				}
 			}
 		}
@@ -153,7 +150,6 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Unlink(
 			Site* obj
 		){
-			obj->setInterface(NULL);
 		}
 
 
@@ -176,7 +172,6 @@ namespace synthese
 			// Query
 			ReplaceQuery<SiteTableSync> query(*site);
 			query.addField(site->getName());
-			query.addField(site->getInterface() ? site->getInterface()->getKey() : RegistryKeyType(0));
 			query.addField(site->getStartDate());
 			query.addField(site->getEndDate());
 			query.addField(site->getOnlineBookingAllowed());
@@ -185,6 +180,8 @@ namespace synthese
 			query.addField(static_cast<int>(site->getUseDatesRange().days()));
 			query.addField(periodstr.str());
 			query.addField(site->getDisplayRoadApproachDetail());
+			query.addField(site->getClientURL());
+			query.addField(site->getDefaultTemplate() ? site->getDefaultTemplate()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}
 	}
@@ -200,24 +197,25 @@ namespace synthese
 			, bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
+			SelectQuery<SiteTableSync> query;
 			if (!name.empty())
-			 	query << " AND " << TABLE_COL_NAME << " LIKE '" << Conversion::ToSQLiteString(name, false) << "'";
-				;
+			{
+				query.addWhereField(TABLE_COL_NAME, name, ComposedExpression::OP_LIKE);
+			}
 			if (orderByName)
-				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			{
+				query.addOrderField(TABLE_COL_NAME, raisingOrder);
+			}
 			if (number)
 			{
-				query << " LIMIT " << (*number + 1);
-				if (first > 0)
-					query << " OFFSET " << first;
+				query.setNumber(*number + 1);
+			}
+			if (first > 0)
+			{
+				query.setFirst(first);
 			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }

@@ -25,14 +25,23 @@
 #ifndef SYNTHESE_DateTimeInterfacePage_H__
 #define SYNTHESE_DateTimeInterfacePage_H__
 
-#include "InterfacePage.h"
-#include "FactorableTemplate.h"
-#include "Request.h"
-
+#include <string>
+#include <ostream>
+#include <boost/shared_ptr.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 
 namespace synthese
 {
+	namespace transportwebsite
+	{
+		class WebPage;
+	}
+
+	namespace server
+	{
+		class Request;
+	}
+
 	namespace interfaces
 	{
 		/** DateTimeInterfacePage Interface Page Class.
@@ -45,11 +54,8 @@ namespace synthese
 			 - hours (TIME_UNKNOWN = do not display hour)
 			 - minutes
 			 - day of week  : 0 = sunday, 1 = monday, ..., 6 = saturday 
-
-			Object :
-			 - boost::gregorian::date or boost::posix_time::ptime
 		*/
-		class DateTimeInterfacePage : public util::FactorableTemplate<InterfacePage,DateTimeInterfacePage>
+		class DateTimeInterfacePage
 		{
 		public:
 			static const std::string DATA_YEAR;
@@ -58,29 +64,36 @@ namespace synthese
 			static const std::string DATA_HOURS;
 			static const std::string DATA_MINUTES;
 			static const std::string DATA_DAY_OF_WEEK;
+			static const std::string DATA_TOTAL_MINUTES;
 
-			DateTimeInterfacePage();
+			//////////////////////////////////////////////////////////////////////////
+			/// Date time display.
+			static void Display(
+				std::ostream& stream,
+				boost::shared_ptr<const transportwebsite::WebPage> page,
+				const server::Request& request,
+				const boost::posix_time::ptime& dateTime
+			);
 
-			/** Overloaded display method for specific parameter conversion.
-				This function converts the parameters into a single ParametersVector object.
-			*/
-			void display(
-				std::ostream& stream
-				, interfaces::VariablesMap& variables
-				, const boost::posix_time::ptime& dateTime
-				, const server::Request* request = NULL
-			) const;
 
-			/** Overloaded display method for specific parameter conversion.
-				This function converts the parameters into a single ParametersVector object.
-			*/
-			void display(
-				std::ostream& stream
-				, interfaces::VariablesMap& variables
-				, const boost::gregorian::date& date
-				, const server::Request* request = NULL
-			) const;
+			//////////////////////////////////////////////////////////////////////////
+			/// Date display.
+			static void Display(
+				std::ostream& stream,
+				boost::shared_ptr<const transportwebsite::WebPage> page,
+				const server::Request& request,
+				const boost::gregorian::date& date
+			);
 
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Time or duration display.
+			static void Display(
+				std::ostream& stream,
+				boost::shared_ptr<const transportwebsite::WebPage> page,
+				const server::Request& request,
+				const boost::posix_time::time_duration& duration
+			);
 		};
 	}
 }

@@ -25,8 +25,9 @@
 
 #include "CommercialLine.h"
 #include "LineMarkerInterfacePage.h"
-
-#include <boost/lexical_cast.hpp>
+#include "StaticFunctionRequest.h"
+#include "WebPageDisplayFunction.h"
+#include "TransportNetwork.h"
 
 using namespace std;
 using namespace boost;
@@ -36,20 +37,22 @@ namespace synthese
 	using namespace util;
 	using namespace interfaces;
 	using namespace server;
+	using namespace transportwebsite;
+	
 
 	template<> const string util::FactorableTemplate<InterfacePage,pt::LineMarkerInterfacePage>::FACTORY_KEY("line_marker");
 
 	namespace pt
 	{
-		const string LineMarkerInterfacePage::PARAMETER_OPENING_HTML_CODE("opening_html_code");
-		const string LineMarkerInterfacePage::PARAMETER_CLOSING_HTML_CODE("closing_html_code");
-		const string LineMarkerInterfacePage::PARAMETER_WIDTH("width");
-		const string LineMarkerInterfacePage::PARAMETER_HEIGHT("height");
-
 		const string LineMarkerInterfacePage::DATA_STYLE_NAME("style");
-		const string LineMarkerInterfacePage::DATA_ID("id");
 		const string LineMarkerInterfacePage::DATA_IMAGE_URL("image");
 		const string LineMarkerInterfacePage::DATA_SHORT_NAME("short_name");
+		const string LineMarkerInterfacePage::DATA_NAME("name");
+		const string LineMarkerInterfacePage::DATA_COLOR("color");
+		const string LineMarkerInterfacePage::DATA_RANK("rank");
+		const string LineMarkerInterfacePage::DATA_RANK_IS_ODD("rank_is_odd");
+		const string LineMarkerInterfacePage::DATA_NETWORK_ID("network_id");
+		const string LineMarkerInterfacePage::DATA_NETWORK_NAME("network_name");
 
 		void LineMarkerInterfacePage::display(
 			ostream& stream
@@ -80,6 +83,43 @@ namespace synthese
 		):	Registrable(0)
 		{
 
+		}
+
+
+
+		void LineMarkerInterfacePage::Display(
+			std::ostream& stream,
+			boost::shared_ptr<const transportwebsite::WebPage> page,
+			const server::Request& request,
+			const pt::CommercialLine& commercialLine,
+			optional<size_t> rank
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			ParametersMap pm;
+
+			pm.insert(DATA_STYLE_NAME, commercialLine.getStyle());
+			pm.insert(DATA_IMAGE_URL, commercialLine.getImage());
+			pm.insert(DATA_SHORT_NAME, commercialLine.getShortName());
+			pm.insert(Request::PARAMETER_OBJECT_ID, commercialLine.getKey());
+			pm.insert(DATA_NAME, commercialLine.getName());
+			if(commercialLine.getColor())
+			{
+				pm.insert(DATA_COLOR, commercialLine.getColor()->toString());
+			}
+			if(commercialLine.getNetwork())
+			{
+				pm.insert(DATA_NETWORK_ID, commercialLine.getNetwork()->getKey());
+				pm.insert(DATA_NETWORK_NAME, commercialLine.getNetwork()->getName());
+			}
+			if(rank)
+			{
+				pm.insert(DATA_RANK, *rank);
+				pm.insert(DATA_RANK_IS_ODD, *rank % 2);
+			}
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
 		}
 	}
 }

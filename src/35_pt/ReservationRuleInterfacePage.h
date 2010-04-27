@@ -25,9 +25,9 @@
 #ifndef SYNTHESE_ReservationRuleInterfacePage_H__
 #define SYNTHESE_ReservationRuleInterfacePage_H__
 
-#include "InterfacePage.h"
-
-#include "FactorableTemplate.h"
+#include <string>
+#include <ostream>
+#include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
@@ -41,19 +41,23 @@ namespace synthese
 		class Journey;
 	}
 
+	namespace transportwebsite
+	{
+		class WebPage;
+	}
+
 	namespace pt
 	{
-		/** ReservationRuleInterfacePage Interface Page Class.
-			@ingroup m35Pages refPages
-
-			Available data :
-			 - is_optional : Reservation is optional 1|0
-			 - is_compulsory : Reservation is compulsory 1|0
-			 - delay : Reservation delay (0 if reservation impossible)
-			 - deadline : Reservation deadline (-1/-1/-1 if reservation impossible)
-		*/
-		class ReservationRuleInterfacePage:
-			public util::FactorableTemplate<interfaces::InterfacePage,ReservationRuleInterfacePage>
+		//////////////////////////////////////////////////////////////////////////
+		/// 35.11 Interface : display of the reservation rule of a journey.
+		///	@ingroup m35Pages refPages
+		///
+		///	Available data :
+		///	 - is_optional : Reservation is optional 1|0
+		///	 - is_compulsory : Reservation is compulsory 1|0
+		///	 - delay : Reservation delay (0 if reservation impossible)
+		///	 - deadline : Reservation deadline (-1/-1/-1 if reservation impossible)
+		class ReservationRuleInterfacePage
 		{
 		public:
 			static const std::string DATA_IS_OPTIONAL;
@@ -61,17 +65,20 @@ namespace synthese
 			static const std::string DATA_DELAY;
 			static const std::string DATA_DEADLINE;
 
-			ReservationRuleInterfacePage();
-
-			/** Overloaded display method for specific parameter conversion.
-				This function converts the parameters into a single ParametersVector object.
-			*/
-			void display(
-				std::ostream& stream
-				, interfaces::VariablesMap& variables
-				, const graph::Journey& journey
-				, const server::Request* request = NULL
-			) const;
+			//////////////////////////////////////////////////////////////////////////
+			/// Displays a reservation rule.
+			/// @param stream stream to display on
+			/// @param page page to use for the display. If null, no display is done.
+			/// @param dateTimePage page to use for the deadline display. If null, default output.
+			/// @param request current request
+			/// @param journey the journey to read
+			static void Display(
+				std::ostream& stream,
+				boost::shared_ptr<const transportwebsite::WebPage> page,
+				boost::shared_ptr<const transportwebsite::WebPage> dateTimePage,
+				const server::Request& request,
+				const graph::Journey& journey
+			);
 		};
 	}
 }

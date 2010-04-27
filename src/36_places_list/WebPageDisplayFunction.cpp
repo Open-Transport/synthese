@@ -51,7 +51,7 @@ namespace synthese
 
 		ParametersMap WebPageDisplayFunction::_getParametersMap() const
 		{
-			ParametersMap map;
+			ParametersMap map(_aditionnalParameters);
 			if(_page.get())
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
@@ -70,11 +70,6 @@ namespace synthese
 				throw RequestException("No such page");
 			}
 
-			if(_page->getRoot() == NULL || _page->getRoot()->getInterface() == NULL || !_page->getRoot()->getInterface()->hasPage<WebPageInterfacePage>())
-			{
-				throw RequestException("Inappropriate site");
-			}
-
 			if(	!_page->mustBeDisplayed()
 			){
 				throw RequestException("The page is not displayed right now");
@@ -85,16 +80,13 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-
-			VariablesMap variables;
-			_page->getRoot()->getInterface()->getPage<WebPageInterfacePage>()->display(
+			WebPageInterfacePage::Display(
 				stream,
-				*_page,
-				request.isAuthorized<TransportWebsiteRight>(WRITE),
-				variables,
-				&request
+				Env::GetOfficialEnv().getEditableSPtr(_page->getTemplate()),
+				request,
+				_page,
+				false
 			);
-
 		}
 		
 		
@@ -110,21 +102,6 @@ namespace synthese
 		std::string WebPageDisplayFunction::getOutputMimeType() const
 		{
 			return "text/html";
-		}
-	
-
-
-
-		void WebPageDisplayFunction::setPage( boost::shared_ptr<const WebPage> value )
-		{
-			_page = value;
-		}
-
-
-
-		boost::shared_ptr<const WebPage> WebPageDisplayFunction::getPage() const
-		{
-			return _page;
 		}
 	}
 }

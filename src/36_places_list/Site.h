@@ -56,13 +56,10 @@ namespace synthese
 		class CommercialLine;
 	}
 
-	namespace interfaces
-	{
-		class Interface;
-	}
-
 	namespace transportwebsite
 	{
+		class WebPage;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Transport website.
 		///	@ingroup m56
@@ -102,9 +99,10 @@ namespace synthese
 		private:
 			//! \name Properties
 			//@{
-				const interfaces::Interface*	_interface;
-				boost::gregorian::date			_startValidityDate;
-				boost::gregorian::date			_endValidityDate;
+				boost::gregorian::date		_startValidityDate;
+				boost::gregorian::date		_endValidityDate;
+				std::string					_clientURL;
+				WebPage*					_defaultTemplate;
 			//@}
 
 			//! \name Environment
@@ -142,19 +140,19 @@ namespace synthese
 
 			//! \name Setters
 			//@{
-				void setInterface (const interfaces::Interface* value) { _interface = value; }
 				void setStartDate ( const boost::gregorian::date& dateDebut );
 				void setEndDate ( const boost::gregorian::date& dateFin );
 				void setOnlineBookingAllowed ( const bool valeur );
 				void setPastSolutionsDisplayed ( bool );
 				void setMaxTransportConnectionsCount(int number);
-				void setUseDateRange(boost::gregorian::date_duration range);
+				void setUseDateRange(boost::gregorian::date_duration range) { _useDateRange = range; }
 				void setDisplayRoadApproachDetail(bool value) { _displayRoadApproachDetail = value; }
+				void setClientURL(const std::string& value) { _clientURL = value; }
+				void setDefaultTemplate(WebPage* value){ _defaultTemplate = value; }
 			//@}
 
 			//! \name Getters
 			//@{
-				const interfaces::Interface*	getInterface() const { return _interface; }
 				bool							getOnlineBookingAllowed() const { return _onlineBookingAllowed; }
 				bool							getPastSolutionsDisplayed() const;
 				int								getMaxTransportConnectionsCount()	const;
@@ -165,6 +163,8 @@ namespace synthese
 				const CitiesMatcher&			getCitiesMatcher () const;
 				const RollingStockFilters&		getRollingStockFilters() const;
 				bool							getDisplayRoadApproachDetail() const { return _displayRoadApproachDetail; }
+				const std::string& getClientURL() const { return _clientURL; }
+				WebPage* getDefaultTemplate() const { return _defaultTemplate; }
 			//@}
 
 			// \name Modifiers

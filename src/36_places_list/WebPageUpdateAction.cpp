@@ -50,6 +50,7 @@ namespace synthese
 		const string WebPageUpdateAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "ti";
 		const string WebPageUpdateAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sd";
 		const string WebPageUpdateAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "ed";
+		const string WebPageUpdateAction::PARAMETER_MIME_TYPE = Action_PARAMETER_PREFIX + "mt";
 
 		
 		
@@ -97,6 +98,7 @@ namespace synthese
 			}
 
 			_title = map.getDefault<string>(PARAMETER_TITLE);
+			_mimeType = map.getDefault<string>(PARAMETER_MIME_TYPE);
 		}
 		
 		
@@ -111,6 +113,7 @@ namespace synthese
 			_page->setParent(_up.get());
 			_page->setStartDate(_startDate);
 			_page->setEndDate(_endDate);
+			_page->setMimeType(_mimeType);
 
 			WebPageTableSync::Save(_page.get());
 

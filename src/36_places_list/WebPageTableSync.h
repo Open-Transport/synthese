@@ -47,6 +47,7 @@ namespace synthese
 			static const std::string COL_CONTENT1;
 			static const std::string COL_START_TIME;
 			static const std::string COL_END_TIME;
+			static const std::string COL_MIME_TYPE;
 		
 
 

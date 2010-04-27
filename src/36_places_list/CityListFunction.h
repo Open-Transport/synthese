@@ -38,6 +38,7 @@ namespace synthese
 	namespace transportwebsite
 	{
 		class PlacesListInterfacePage;
+		class WebPage;
 
 		/** City list query public function.
 			@ingroup m56Functions refFunctions
@@ -49,7 +50,8 @@ namespace synthese
 			si=<id website> : site id
 			t=<texte saisi> : texte entré par l’utilisateur
 			n=<nombre resultats> : nombre de résultats devant être fournis par le serveur
-			p=<page code> : code of page reffering to an instanciation of the PlacesListInterfacePage element in the specified website
+			p=<id> : id of page to use to display the list by PlacesListInterfacePage
+			ip=<id> : id of page to use to display each item of the list
 			</pre>
 
 			<h3>Réponse</h3>
@@ -93,20 +95,20 @@ namespace synthese
 			static const std::string PARAMETER_NUMBER;
 			static const std::string PARAMETER_IS_FOR_ORIGIN;
 			static const std::string PARAMETER_PAGE;
-			
+			static const std::string PARAMETER_ITEM_PAGE;
+
 		private:
 			std::string _input;
 			int _n;
 			bool _isForOrigin;
-			const PlacesListInterfacePage*	_page;
+			boost::shared_ptr<const transportwebsite::WebPage>	_page;
+			boost::shared_ptr<const transportwebsite::WebPage>	_itemPage;
 
 		protected:
 			server::ParametersMap _getParametersMap() const;
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			CityListFunction();
-
 			void run(std::ostream& stream, const server::Request& request) const;
 
 			void setTextInput(const std::string& text);

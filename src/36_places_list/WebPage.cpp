@@ -150,5 +150,27 @@ namespace synthese
 		{
 			_parse(stream, _content.begin(), _content.end(), request);
 		}
+
+
+
+		std::string WebPage::getMimeType() const
+		{
+			return _mimeType.empty() ? "text/html" : _mimeType;
+		}
+
+
+
+		WebPage* WebPage::getTemplate() const
+		{
+			if(_template && _template != this)
+			{
+				return _template;
+			}
+			if(getRoot()->getDefaultTemplate() != this)
+			{
+				return getRoot()->getDefaultTemplate();
+			}
+			return NULL;
+		}
 	}
 }

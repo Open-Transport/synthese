@@ -30,34 +30,46 @@
 #include "PTNetworkListItemInterfacePage.hpp"
 #include "TransportNetworkTableSync.h"
 #include "Env.h"
+#include "WebPage.h"
 
 #include <boost/foreach.hpp>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace server;
 	using namespace security;
+	using namespace transportwebsite;
 
-	template<> const string util::FactorableTemplate<pt::PTNetworksListFunction::_FunctionWithSite,pt::PTNetworksListFunction>::FACTORY_KEY("PTNetworksListFunction");
+	template<> const string util::FactorableTemplate<Function,pt::PTNetworksListFunction>::FACTORY_KEY("PTNetworksListFunction");
 	
 	namespace pt
 	{
+		const string PTNetworksListFunction::PARAMETER_PAGE_ID("p");
 		
 		ParametersMap PTNetworksListFunction::_getParametersMap() const
 		{
-			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
+			ParametersMap map;
+			if(_page.get())
+			{
+				map.insert(PARAMETER_PAGE_ID, _page->getKey());
+			}
 			return map;
 		}
 
 		void PTNetworksListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_FunctionWithSite::_setFromParametersMap(map);
-			if(_site.get() && _site->getInterface())
+			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
+			if(id) try
 			{
-				_page = _site->getInterface()->getPage<PTNetworkListItemInterfacePage>();
+				_page = Env::GetOfficialEnv().get<WebPage>(*id);
+			}
+			catch (ObjectNotFoundException<WebPage>&)
+			{
+				throw RequestException("No such web page");
 			}
 		}
 
@@ -79,7 +91,13 @@ namespace synthese
 			{
 				if(_page)
 				{
-					_page->display(stream, *it, rank++, variables, &request);
+					PTNetworkListItemInterfacePage::Display(
+						stream,
+						_page,
+						request,
+						*it,
+						rank++
+					);
 				}
 				else
 				{
@@ -104,7 +122,7 @@ namespace synthese
 
 		std::string PTNetworksListFunction::getOutputMimeType() const
 		{
-			return _page ? _page->getMimeType() : "text/xml";
+			return _page.get() ? _page->getMimeType() : "text/xml";
 		}
 	}
 }

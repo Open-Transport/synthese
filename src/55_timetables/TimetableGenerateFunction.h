@@ -26,7 +26,7 @@
 #define SYNTHESE_TimetableGenerateFunction_H__
 
 #include "FactorableTemplate.h"
-#include "FunctionWithSite.h"
+#include "Function.h"
 
 namespace synthese
 {
@@ -64,7 +64,7 @@ namespace synthese
 			<ul>
 				<li>roid : id of a Line object</li>
 				<li>cid : id of the CalendarTemplate object</li>
-				<li>sid : id of the site to use</li>
+				<li>i : id of the interface to use</li>
 			</ul>
 
 			The generated timetable is rendered as services_by_cols type.
@@ -81,7 +81,7 @@ namespace synthese
 				<li>cityn : nth city</li>
 				<li>stopn : nth stop</li>
 				<li>cid : id of the CalendarTemplate object</li>
-				<li>sid : id of the interface to use</li>
+				<li>i : id of the interface to use</li>
 			</ul>
 
 			The generated timetable is rendered as services_by_cols type.
@@ -92,18 +92,19 @@ namespace synthese
 			<ul>
 				<li>roid : id of a stop area (PublicStopZoneConnectionPlace) or stop zone (PhysicalStop) object</li>
 				<li>cid : id of the CalendarTemplate object</li>
-				<li>sid : id of the site to use</li>
+				<li>i : id of the interface to use</li>
 			</ul>
 
 			The generated timetable is rendered as services_by_rows type.
 		*/
 		class TimetableGenerateFunction:
-			public util::FactorableTemplate<transportwebsite::FunctionWithSite<false>,TimetableGenerateFunction>
+			public util::FactorableTemplate<server::Function,TimetableGenerateFunction>
 		{
 		public:
 			static const std::string PARAMETER_CALENDAR_ID;
 			static const std::string PARAMETER_STOP_PREFIX;
 			static const std::string PARAMETER_CITY_PREFIX;
+			static const std::string PARAMETER_INTERFACE_ID;
 			
 		protected:
 			//! \name Page parameters

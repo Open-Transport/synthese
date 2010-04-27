@@ -38,7 +38,7 @@ namespace synthese
 
 	namespace hiking
 	{
-		/** HikingTrail class.
+		/** Hiking trail.
 			@ingroup m56
 		*/
 		class HikingTrail:
@@ -56,22 +56,29 @@ namespace synthese
 			std::string _map;
 			std::string _duration;
 			std::string _profile;
+			std::string _url;
 			Stops _stops;
 
 		public:
 			HikingTrail(util::RegistryKeyType id = 0);
 
-			const std::string& getMap() const;
-			const std::string& getDuration() const;
-			const std::string& getProfile() const;
-			const Stops& getStops() const;
+			//! @name Getters
+			//@{
+				const std::string& getMap() const { return _map; }
+				const std::string& getDuration() const { return _duration; }
+				const std::string& getProfile() const { return _profile; }
+				const std::string& getURL() const { return _url; }
+				const Stops& getStops() const { return _stops; }
+			//@}
 
-			void setMap(const std::string& value);
-			void setDuration(const std::string& value);
-			void setProfile(const std::string& value);
-			void clearStops();
-			void addStop(pt::PublicTransportStopZoneConnectionPlace* value, size_t rank);
-			void removeStop(size_t rank);
+			//! @name Setters
+			//@{
+				void setMap(const std::string& value){ _map = value; }
+				void setDuration(const std::string& value){ _duration = value; }
+				void setProfile(const std::string& value){ _profile = value; }
+				void setURL(const std::string& value){ _url = value; }
+				void setStops(const Stops& value){ _stops = value; }
+			//@}
 		};
 	}
 }
