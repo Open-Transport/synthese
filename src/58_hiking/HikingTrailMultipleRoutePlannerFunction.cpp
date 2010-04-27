@@ -69,6 +69,7 @@ namespace synthese
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_SCHEDULES_ROW_PAGE("schedules_row_page");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_SCHEDULES_CELL_PAGE("schedule_cell_page");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_LINES_ROW_PAGE("lines_row_page");
+		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_LINE_MARKER_PAGE("line_marker_page");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_BOARD_PAGE("board_page");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_WARNING_PAGE("warning_page");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_RESERVATION_PAGE("reservation_page");
