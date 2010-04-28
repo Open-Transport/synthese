@@ -34,7 +34,7 @@
 #include <boost/test/auto_unit_test.hpp>
 
 using namespace synthese::util;
-using namespace synthese::env;
+using namespace synthese::pt;
 using namespace synthese;
 
 BOOST_AUTO_TEST_CASE (testEdgeOrderedLinking)

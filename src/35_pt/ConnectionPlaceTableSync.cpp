@@ -23,13 +23,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "ConnectionPlaceTableSync.h"
-#include "Conversion.h"
 #include "ReplaceQuery.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
 #include "LinkException.h"
-
 #include "CityTableSync.h"
+#include "SelectQuery.hpp"
 
 #include <boost/tokenizer.hpp>
 #include <assert.h>
@@ -239,55 +236,46 @@ namespace synthese
 			, int number /*= 0 */,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query <<
-				" SELECT " <<
-				TABLE.NAME << ".*" <<
-				" FROM " << TABLE.NAME;
+			SelectQuery<ConnectionPlaceTableSync> query;
 			if(orderByCityNameAndName)
 			{
-				query << " INNER JOIN " << CityTableSync::TABLE.NAME << " c ON c." << TABLE_COL_ID << "=" << TABLE.NAME << "." << TABLE_COL_CITYID;
+				query.addTableAndEqualJoin<CityTableSync>(TABLE_COL_ID, TABLE_COL_CITYID);
 			}
 
 			// Filters
-			query << " WHERE 1 ";
 			if (cityId)
 			{
-				query << " AND " << TABLE_COL_CITYID << "=" << *cityId;
+				query.addWhereField(TABLE_COL_CITYID, *cityId);
 			}
 			if (!logic::indeterminate(mainConnectionOnly))
 			{
-				query << " AND " << TABLE_COL_ISCITYMAINCONNECTION << "=" <<
-					Conversion::ToString(mainConnectionOnly)
-				;
+				query.addWhereField(TABLE_COL_ISCITYMAINCONNECTION, mainConnectionOnly);
 			}
 			if(creatorIdFilter)
 			{
-				query << " AND " << COL_CODE_BY_SOURCE << "=" << Conversion::ToSQLiteString(*creatorIdFilter);
+				query.addWhereField(COL_CODE_BY_SOURCE, *creatorIdFilter);
 			}
 			if(nameFilter)
 			{
-				query << " AND " << TABLE_COL_NAME << " LIKE " << Conversion::ToSQLiteString(*nameFilter);
+				query.addWhereField(TABLE_COL_NAME, *nameFilter, ComposedExpression::OP_LIKE);
 			}
 
 			// Ordering
 			if(orderByCityNameAndName)
 			{
-				query <<
-					" ORDER BY " <<
-					CityTableSync::TABLE.NAME << "." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << "," <<
-					TABLE.NAME << "." << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
+				query.addOrderField(TABLE_COL_NAME, raisingOrder);
 			}
 			if (number > 0)
 			{
-				query << " LIMIT " << Conversion::ToString(number + 1);
+				query.setNumber(number + 1);
 				if (first > 0)
 				{
-					query << " OFFSET " << Conversion::ToString(first);
+					query.setFirst(first);
 				}
 			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }

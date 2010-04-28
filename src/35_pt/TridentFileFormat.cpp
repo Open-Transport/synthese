@@ -703,7 +703,7 @@ namespace synthese
 					const UseRule& hRule(srv->getUseRule(USER_HANDICAPPED));
 					os <<
 						"<mobilityRestrictedSuitability>" <<
-						(hRule.getAccessCapacity() ? lexical_cast<string>(*hRule.getAccessCapacity()) : "999") <<
+						(!hRule.getAccessCapacity() || *hRule.getAccessCapacity()) <<
 						"</mobilityRestrictedSuitability>" <<
 						"\n"
 					;
@@ -724,7 +724,7 @@ namespace synthese
 					const UseRule& bRule(srv->getUseRule(USER_BIKE));
 					os <<
 						"<bikeSuitability>" <<
-						(bRule.getAccessCapacity() ? Conversion::ToString(*bRule.getAccessCapacity()) : "999") <<
+						(!bRule.getAccessCapacity() || *bRule.getAccessCapacity()) <<
 						"</bikeSuitability>" <<
 						"\n"
 					;

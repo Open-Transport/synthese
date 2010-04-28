@@ -106,6 +106,7 @@ namespace synthese
 				{
 					SQLiteResultSPtr rows(SQLiteTableSyncTemplate<K>::_GetRow(key));
 					object.reset(new T(rows->getKey()));
+					env.getEditableRegistry<T>().add(object);
 					Load(object.get(), rows, env, linkLevel);
 				}
 				catch (typename db::DBEmptyResultException<K>&)
@@ -117,7 +118,6 @@ namespace synthese
 					object.reset(new T(key));
 				}
 				
-				env.getEditableRegistry<T>().add(object);
 				return object;
 			}
 

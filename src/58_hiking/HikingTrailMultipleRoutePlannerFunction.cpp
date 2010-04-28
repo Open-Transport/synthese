@@ -222,7 +222,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_LINE_MARKER_PAGE));
-				if(id) 
+				if(id)
 				{
 					_lineMarkerPage = Env::GetOfficialEnv().get<WebPage>(*id);
 				}
