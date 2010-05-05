@@ -198,8 +198,9 @@ namespace synthese
 
 
 
-		std::string SchedulesBasedService::encodeSchedules()
-		{
+		std::string SchedulesBasedService::encodeSchedules(
+			boost::posix_time::time_duration shiftArrivals
+		) const {
 			stringstream str;
 			for(size_t i(0); i<_departureSchedules.size(); ++i)
 			{
@@ -207,15 +208,17 @@ namespace synthese
 				{
 					str << ",";
 				}
-				str << EncodeSchedule(_arrivalSchedules[i]) << "#" << EncodeSchedule(_departureSchedules[i]);
+				str << EncodeSchedule(_arrivalSchedules[i] + shiftArrivals) << "#" << EncodeSchedule(_departureSchedules[i]);
 			}
 			return str.str();
 		}
 
 
 
-		void SchedulesBasedService::decodeSchedules( const std::string value )
-		{
+		void SchedulesBasedService::decodeSchedules(
+			const std::string value,
+			boost::posix_time::time_duration shiftArrivals
+		){
 		    typedef tokenizer<char_separator<char> > tokenizer;
 
 		    // Parse all schedules arrival#departure,arrival#departure...
@@ -250,7 +253,7 @@ namespace synthese
 				}
 				
 				time_duration departureSchedule (DecodeSchedule(departureScheduleStr));
-				time_duration arrivalSchedule (DecodeSchedule(arrivalScheduleStr));
+				time_duration arrivalSchedule (DecodeSchedule(arrivalScheduleStr) + shiftArrivals);
 				
 				departureSchedules.push_back (departureSchedule);
 				arrivalSchedules.push_back (arrivalSchedule);

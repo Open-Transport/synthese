@@ -134,8 +134,27 @@ namespace synthese
 			//@{
 				static std::string EncodeSchedule(const boost::posix_time::time_duration& value);
 				static boost::posix_time::time_duration DecodeSchedule(const std::string value);
-				std::string encodeSchedules();
-				void decodeSchedules(const std::string value);
+				
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Encode schedules into a string.
+				/// @param shiftArrivals duration to add to the arrival times before encoding (default 0)
+				/// @author Hugues Romain
+				std::string encodeSchedules(
+					boost::posix_time::time_duration shiftArrivals = boost::posix_time::minutes(0)
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Reads schedules from encoded strings.
+				/// @param value encoded strings
+				/// @param shiftArrivals duration to add to the arrival times (default 0)
+				/// @author Hugues Romain
+				void decodeSchedules(
+					const std::string value,
+					boost::posix_time::time_duration shiftArrivals = boost::posix_time::minutes(0)
+				);
 			//@}
 		};
 	}

@@ -117,7 +117,8 @@ namespace synthese
 			try
 			{
 				cs->decodeSchedules(
-					rows->getText(ContinuousServiceTableSync::COL_SCHEDULES)
+					rows->getText(ContinuousServiceTableSync::COL_SCHEDULES),
+					maxWaitingTime
 				);
 			}
 			catch(...)
@@ -195,7 +196,7 @@ namespace synthese
 
 			ReplaceQuery<ContinuousServiceTableSync> query(*object);
 			query.addField(object->getServiceNumber());
-			query.addField(object->encodeSchedules());
+			query.addField(object->encodeSchedules(-object->getMaxWaitingTime()));
 			query.addField(object->getPathId());
 			query.addField(object->getRange().total_seconds() / 60);
 			query.addField(object->getMaxWaitingTime().total_seconds() / 60);
