@@ -257,7 +257,10 @@ namespace synthese
 				
 				Calendar mask(_resultStartDate, _resultEndDate);
 				Calendar result(_calendar->getResult(mask));
-				CalendarHTMLViewer v(result);
+
+				AdminActionFunctionRequest<CalendarTemplateElementAddAction,CalendarTemplateAdmin> addRequest(_request);
+				addRequest.getAction()->setCalendar(const_pointer_cast<CalendarTemplate>(_calendar));
+				CalendarHTMLViewer<AdminActionFunctionRequest<CalendarTemplateElementAddAction,CalendarTemplateAdmin> > v(result);
 				v.display(stream);
 			}
 

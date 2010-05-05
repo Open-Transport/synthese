@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace server
+	namespace transportwebsite
 	{
 		/** 56.15 Public function : Gets several values from the current request.
 			@author Hugues Romain
@@ -89,7 +89,10 @@ namespace synthese
 			
 			
 		public:
-	
+			//! @name Setters
+			//@{
+				void setParameter(const std::string& value){ _parameter = value; }
+			//@}
 
 
 			//////////////////////////////////////////////////////////////////////////

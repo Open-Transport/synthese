@@ -24,6 +24,7 @@
 #include "ParametersMap.h"
 #include "DynamicRequest.h"
 #include "FunctionWithSite.h"
+#include "GetValueFunction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -64,8 +65,10 @@ namespace synthese
 			std::ostream& stream,
 			std::string::const_iterator it,
 			std::string::const_iterator end,
+			std::string termination,
 			const server::Request& request
 		) const {
+			string labelToReach;
 			while(it != end)
 			{
 				// Special characters
@@ -74,21 +77,65 @@ namespace synthese
 					++it;
 					if(*it == 'n')
 					{
-						stream << endl;
+						if(labelToReach.empty())
+						{
+							stream << endl;
+						}
 					}
 					else if(*it == '\\')
 					{
-						stream << '\\';
+						if(labelToReach.empty())
+						{
+							stream << '\\';
+						}
+					}
+					else if(*it == '<' && it+1 != end && *(it+1)=='@')
+					{
+						if(labelToReach.empty())
+						{
+							++it;
+							stream << "<@";
+						}
 					}
 					else if(*it == '<' && it+1 != end && *(it+1)=='?')
 					{
-						++it;
-						stream << "<?";
+						if(labelToReach.empty())
+						{
+							++it;
+							stream << "<?";
+						}
+					}
+					else if(*it == '@' && it+1 != end && *(it+1)=='>')
+					{
+						if(labelToReach.empty())
+						{
+							++it;
+							stream << "@>";
+						}
+					}
+					else if(*it == '%' && it+1 != end && *(it+1)=='>')
+					{
+						if(labelToReach.empty())
+						{
+							++it;
+							stream << "%>";
+						}
+					}
+					else if(*it == '<' && it+1 != end && *(it+1)=='>')
+					{
+						if(labelToReach.empty())
+						{
+							++it;
+							stream << ">>";
+						}
 					}
 					else if(*it == '?' && it+1 != end && *(it+1)=='>')
 					{
-						++it;
-						stream << "?>";
+						if(labelToReach.empty())
+						{
+							++it;
+							stream << "?>";
+						}
 					}
 					++it;
 				} // Call to a public function
@@ -96,49 +143,83 @@ namespace synthese
 				{
 					stringstream query;
 					query << Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT;
-					it = _parse(query, it+2, end, request);
-
-					ParametersMap parametersMap(query.str());
-					ParametersMap requestParametersMap(
-						dynamic_cast<const DynamicRequest*>(&request) ?
-						dynamic_cast<const DynamicRequest&>(request).getParametersMap() :
-						ParametersMap()
-					);
-					requestParametersMap.remove(Request::PARAMETER_FUNCTION);
-					parametersMap.merge(requestParametersMap);
-					if(getRoot())
+					it = _parse(query, it+2, end, "?>", request);
+					if(labelToReach.empty())
 					{
-						parametersMap.insert(FunctionWithSiteBase::PARAMETER_SITE, getRoot()->getKey());
-					}
-					string functionName(parametersMap.getDefault<string>(Request::PARAMETER_FUNCTION));
-					if(!functionName.empty() && Factory<Function>::contains(functionName))
-					{
-						shared_ptr<Function> _function(Factory<Function>::create(functionName));
-						if(_function.get())
+						ParametersMap parametersMap(query.str());
+						ParametersMap requestParametersMap(
+							dynamic_cast<const DynamicRequest*>(&request) ?
+							dynamic_cast<const DynamicRequest&>(request).getParametersMap() :
+							ParametersMap()
+						);
+						requestParametersMap.remove(Request::PARAMETER_FUNCTION);
+						parametersMap.merge(requestParametersMap);
+						if(getRoot())
 						{
-							try
+							parametersMap.insert(FunctionWithSiteBase::PARAMETER_SITE, getRoot()->getKey());
+						}
+						string functionName(parametersMap.getDefault<string>(Request::PARAMETER_FUNCTION));
+						if(!functionName.empty() && Factory<Function>::contains(functionName))
+						{
+							shared_ptr<Function> _function(Factory<Function>::create(functionName));
+							if(_function.get())
 							{
-								_function->_setFromParametersMap(parametersMap);
-								if (_function->isAuthorized(request.getSession()))
+								try
 								{
-									_function->run(stream, request);
+									_function->_setFromParametersMap(parametersMap);
+									if (_function->isAuthorized(request.getSession()))
+									{
+										_function->run(stream, request);
+									}
+								}
+								catch(...)
+								{
+
 								}
 							}
-							catch(...)
-							{
 
-							}
 						}
-
+					}
+				} // Shortcut to GetValueFunction
+				else if(*it == '<' && it+1 != end && *(it+1)=='@' && it+2 != end)
+				{
+					stringstream parameter;
+					it = _parse(parameter, it+2, end, "@>", request);
+					if(labelToReach.empty())
+					{
+						GetValueFunction function;
+						function.setParameter(parameter.str());
+						function.run(stream, request);
+					}
+				} // Goto
+				else if(*it == '<' && it+1 != end && *(it+1)=='%' && it+2 != end)
+				{
+					stringstream label;
+					it = _parse(label, it+2, end, "%>", request);
+					if(labelToReach.empty() && !label.str().empty())
+					{
+						labelToReach = label.str();
+					}
+				} // Label
+				else if(*it == '<' && it+1 != end && *(it+1)=='<' && it+2 != end)
+				{
+					stringstream label;
+					it = _parse(label, it+2, end, ">>", request);
+					if(labelToReach == label.str())
+					{
+						labelToReach.clear();
 					}
 				} // Reached the end of a recursion level
-				else if(*it == '?' && it+1 != end && *(it+1)=='>')
+				else if(termination.size() == 2 && *it == termination.at(0) && it+1 != end && *(it+1)==termination.at(1))
 				{
 					return it+2;
 				}
 				else
 				{
-					stream << *it;
+					if(labelToReach.empty())
+					{
+						stream << *it;
+					}
 					++it;
 				}
 			}
@@ -149,7 +230,7 @@ namespace synthese
 
 		void WebPage::display( std::ostream& stream, const server::Request& request ) const
 		{
-			_parse(stream, _content.begin(), _content.end(), request);
+			_parse(stream, _content.begin(), _content.end(), string(), request);
 		}
 
 

@@ -191,37 +191,39 @@ namespace synthese
 				switch(*status)
 				{
 				case BROADCAST_OVER:
-					query << " AND " << ScenarioTableSync::COL_PERIODEND << " IS NOT NULL "
-						<< " AND " << ScenarioTableSync::COL_PERIODEND << "<'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
+					query << " AND " <<
+						ScenarioTableSync::COL_PERIODEND << " IS NOT NULL AND " <<
+						ScenarioTableSync::COL_PERIODEND << "!='' AND " <<
+						ScenarioTableSync::COL_PERIODEND << "<'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						;
 					break;
 
 				case BROADCAST_RUNNING:
-					query << " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL "
+					query << " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL OR " << ScenarioTableSync::COL_PERIODEND << "=''" 
 						<< " OR " << ScenarioTableSync::COL_PERIODEND << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						<< ") AND " << ScenarioTableSync::COL_ENABLED
 						;
 					break;
 
 				case BROADCAST_RUNNING_WITH_END:
-					query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL "
+					query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR " << ScenarioTableSync::COL_PERIODSTART << "!=''"
 						<< " OR " << ScenarioTableSync::COL_PERIODSTART << "<='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						<< ") AND " << ScenarioTableSync::COL_ENABLED
-						<<  " AND " << ScenarioTableSync::COL_PERIODEND << " IS NOT NULL "
+						<<  " AND " << ScenarioTableSync::COL_PERIODEND << " IS NOT NULL AND " << ScenarioTableSync::COL_PERIODEND << "!=''"
 						<< " AND " << ScenarioTableSync::COL_PERIODEND << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						;
 					break;
 
 				case BROADCAST_RUNNING_WITHOUT_END:
-					query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL "
+					query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR " << ScenarioTableSync::COL_PERIODSTART << "=''" 
 						<< " OR " << ScenarioTableSync::COL_PERIODSTART << "<='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						<< ") AND " << ScenarioTableSync::COL_ENABLED
-						<<  " AND " << ScenarioTableSync::COL_PERIODEND << " IS NULL "
+						<<  " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL OR " << ScenarioTableSync::COL_PERIODEND << "='')"
 						;
 					break;
 
 				case FUTURE_BROADCAST:
-					query << " AND " << ScenarioTableSync::COL_PERIODSTART << " IS NOT NULL "
+					query << " AND " << ScenarioTableSync::COL_PERIODSTART << " IS NOT NULL " << " AND " << ScenarioTableSync::COL_PERIODSTART << "!=''"
 						<< " AND " << ScenarioTableSync::COL_PERIODSTART << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						<< " AND " << ScenarioTableSync::COL_ENABLED
 						;
@@ -229,6 +231,7 @@ namespace synthese
 
 				case BROADCAST_DRAFT:
 					query << " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL "
+						<< " OR " << ScenarioTableSync::COL_PERIODEND << "=''"
 						<< " OR " << ScenarioTableSync::COL_PERIODEND << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						<< ") AND NOT " << ScenarioTableSync::COL_ENABLED
 						;
@@ -238,9 +241,9 @@ namespace synthese
 
 			if(!status && date)
 			{
-				query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR " <<
+				query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR " << ScenarioTableSync::COL_PERIODSTART << "='' OR " <<
 					ScenarioTableSync::COL_PERIODSTART << " <='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'" <<
-					") AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL OR " <<
+					") AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL OR " << ScenarioTableSync::COL_PERIODEND << "='' OR " <<
 					ScenarioTableSync::COL_PERIODEND << " >='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'" <<
 					")"
 				;

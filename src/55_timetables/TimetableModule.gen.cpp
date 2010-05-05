@@ -19,13 +19,6 @@ synthese::timetables::TimetableSetPhysicalStopAction::integrate();
 
 synthese::timetables::TimetableRight::integrate();
 
-synthese::timetables::TimetableInterfacePage::integrate();
-synthese::timetables::TimetableNoteInterfacePage::integrate();
-synthese::timetables::TimetableServiceRowInterfacePage::integrate();
-synthese::timetables::TimetableServiceRowCellInterfacePage::integrate();
-synthese::timetables::TimetableServiceColRowInterfacePage::integrate();
-synthese::timetables::TimetableServiceColCellInterfacePage::integrate();
-
 synthese::timetables::TimetableGenerateFunction::integrate();
 
 // Registries

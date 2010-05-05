@@ -35,18 +35,30 @@ namespace synthese
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// WebPageContentUpdateAction action class.
+		/// 56.16 Action : update of the content of a web page.
 		/// @ingroup m56Actions refActions
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : WebPageContentUpdateAction
+		///
+		/// Parameters :
+		/// <ul>
+		///		<li>wp : id of the page to update</li>
+		///		<li>c1 : new main content</li>
+		///		<li>ab : new abstract</li>
+		///	</ul>
 		class WebPageContentUpdateAction:
 			public util::FactorableTemplate<server::Action, WebPageContentUpdateAction>
 		{
 		public:
 			static const std::string PARAMETER_WEB_PAGE_ID;
 			static const std::string PARAMETER_CONTENT1;
+			static const std::string PARAMETER_ABSTRACT;
 
 		private:
 			boost::shared_ptr<WebPage> _page;
 			std::string _content1;
+			std::string _abstract;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

@@ -43,23 +43,8 @@ namespace synthese
 		Timetable::Timetable(RegistryKeyType id)
 		:	Registrable(id),
 			_bookId(0),
-			_baseCalendar(NULL),
-			_interface(NULL)
+			_baseCalendar(NULL)
 		{
-		}
-
-
-
-		void Timetable::setTitle( const std::string& title )
-		{
-			_title = title;
-		}
-
-
-
-		void Timetable::setBaseCalendar( const CalendarTemplate* calendar )
-		{
-			_baseCalendar = calendar;
 		}
 
 
@@ -72,37 +57,9 @@ namespace synthese
 
 
 
-		const CalendarTemplate* Timetable::getBaseCalendar() const
-		{
-			return _baseCalendar;
-		}
-
-
-
-		const std::string& Timetable::getTitle() const
-		{
-			return _title;
-		}
-
-
-
 		const Timetable::Rows& Timetable::getRows() const
 		{
 			return _rows;
-		}
-
-
-
-		void Timetable::setRank( int value )
-		{
-			_rank = value;
-		}
-
-
-
-		int Timetable::getRank() const
-		{
-			return _rank;
 		}
 
 
@@ -143,35 +100,6 @@ namespace synthese
 		{
 			auto_ptr<TimetableGenerator> g(getGenerator(Env::GetOfficialEnv()));
 			g->build();
-		}
-
-
-
-		const interfaces::Interface* Timetable::getInterface() const
-		{
-			return _interface;
-		}
-
-
-
-		Timetable::ContentType Timetable::getContentType() const
-		{
-			return _contentType;
-		}
-
-
-
-		void Timetable::setInterface( const interfaces::Interface* value )
-		{
-			_interface = value;
-		}
-
-
-
-		void Timetable::setContentType(
-			Timetable::ContentType value
-		){
-			_contentType = value;
 		}
 
 

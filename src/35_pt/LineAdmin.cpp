@@ -50,6 +50,10 @@
 #include "PTRuleUserAdmin.hpp"
 #include "PropertiesHTMLTable.h"
 #include "RollingStockTableSync.h"
+#include "LineStopAddAction.h"
+#include "LineStopRemoveAction.h"
+#include "PTPlacesAdmin.h"
+#include "City.h"
 
 #include <boost/foreach.hpp>
 
@@ -136,6 +140,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_STOPS))
 			{
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(_request);
+				AdminFunctionRequest<PTPlacesAdmin> openCityRequest(_request);
 				
 				// Reservation
 // 				bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
@@ -151,8 +156,16 @@ namespace synthese
 						UP_LINKS_LOAD_LEVEL
 				)	);
 
+				AdminActionFunctionRequest<LineStopRemoveAction,LineAdmin> lineStopRemoveAction(_request);
+				
+				AdminActionFunctionRequest<LineStopAddAction,LineAdmin> lineStopAddAction(_request);
+				lineStopAddAction.getAction()->setRoute(const_pointer_cast<Line>(_line));
+				HTMLForm f(lineStopAddAction.getHTMLForm());
+
 				HTMLTable::ColsVector v;
 				v.push_back("Rang");
+				v.push_back("Rang");
+				v.push_back("Localité");
 				v.push_back("Arrêt");
 				v.push_back("Quai");
 				v.push_back("A");
@@ -160,20 +173,32 @@ namespace synthese
 				v.push_back("Hor");
 // 				if (reservation)
 // 					v.push_back("Resa");
-				HTMLTable t(v,"adminresults");
+				v.push_back("Action");
+				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
 
+				stream << f.open();
 				stream << t.open();
 
 				BOOST_FOREACH(shared_ptr<LineStop> lineStop, lineStops)
 				{
+					lineStopRemoveAction.getAction()->setLineStop(const_pointer_cast<const LineStop>(lineStop));
+
 					openPlaceRequest.getPage()->setConnectionPlace(
 						Env::GetOfficialEnv().getSPtr(lineStop->getPhysicalStop()->getConnectionPlace())
 					);
+					openCityRequest.getPage()->setCity(
+						Env::GetOfficialEnv().getSPtr(lineStop->getPhysicalStop()->getConnectionPlace()->getCity())
+					);
 					stream << t.row();
+					stream << t.col() << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(lineStop->getRankInPath()), optional<size_t>());
 					stream << t.col() << lineStop->getRankInPath();
 					stream << t.col() << HTMLModule::getHTMLLink(
+						openCityRequest.getURL(),
+						lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName()
+					);
+					stream << t.col() << HTMLModule::getHTMLLink(
 						openPlaceRequest.getURL(),
-						lineStop->getPhysicalStop()->getConnectionPlace()->getFullName()
+						lineStop->getPhysicalStop()->getConnectionPlace()->getName()
 					);
 					stream << t.col() << lineStop->getPhysicalStop()->getName();
 					stream << t.col() << (lineStop->isArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"));
@@ -181,7 +206,19 @@ namespace synthese
 					stream << t.col() << (lineStop->getScheduleInput() ? HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") : HTMLModule::getHTMLImage("tree_vert.png", "Houraire non fourni à cet arrêt"));
 // 					if (reservation)
 // 						stream << t.col() << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire au départ de cet arrêt");
+					stream << t.col() << HTMLModule::getLinkButton(lineStopRemoveAction.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
 				}
+
+				stream << t.row();
+				stream << t.col() << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(_line->getEdges().size()), optional<size_t>());
+				stream << t.col() << _line->getEdges().size();
+				stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_CITY_NAME, string(), "(localité)");
+				stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_STOP_NAME, string(), "(arrêt)");
+				stream << t.col();
+				stream << t.col();
+				stream << t.col();
+				stream << t.col();
+				stream << t.col() << f.getSubmitButton("Ajouter");
 
 				stream << t.close();
 			}

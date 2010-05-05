@@ -74,6 +74,7 @@ namespace synthese
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_WARNING_PAGE("warning_page");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_RESERVATION_PAGE("reservation_page");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_DURATION_PAGE("duration_page");
+		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_TEXT_DURATION_PAGE("text_duration_page");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_MAP_PAGE("map_page");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_MAP_LINE_PAGE("map_line_page");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_DATE_TIME_PAGE("date_time_page");
@@ -281,6 +282,18 @@ namespace synthese
 			}
 			try
 			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_TEXT_DURATION_PAGE));
+				if(id) 
+				{
+					_textDurationPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such duration page : "+ e.getMessage());
+			}
+			try
+			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_PAGE));
 				if(id) 
 				{
@@ -442,6 +455,7 @@ namespace synthese
 					_warningPage,
 					_reservationPage,
 					_durationPage,
+					_textDurationPage,
 					_mapPage,
 					_mapLinePage,
 					_dateTimePage,
@@ -502,6 +516,7 @@ namespace synthese
 					_warningPage,
 					_reservationPage,
 					_durationPage,
+					_textDurationPage,
 					_mapPage,
 					_mapLinePage,
 					_dateTimePage,

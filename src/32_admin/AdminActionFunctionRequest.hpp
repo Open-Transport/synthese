@@ -43,9 +43,13 @@ namespace synthese
 			):	server::Request(request),
 				server::StaticActionFunctionRequest<A, AdminFunction>(request, true)
 			{
-				boost::shared_ptr<P> p(request.getFunction()->getPage()->template getNewOtherPage<P>());
+				boost::shared_ptr<P> p(
+					request.getFunction()->getPage() ?
+					request.getFunction()->getPage()->template getNewOtherPage<P>() :
+					boost::shared_ptr<P>(new P)
+				);
 				this->getFunction()->setPage(p);
-				if(P::FACTORY_KEY == request.getFunction()->getPage()->getFactoryKey())
+				if(request.getFunction()->getPage() && P::FACTORY_KEY == request.getFunction()->getPage()->getFactoryKey())
 				{
 					this->getFunction()->getPage()->setActiveTab(request.getFunction()->getPage()->getCurrentTab());
 				}

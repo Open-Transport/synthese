@@ -236,7 +236,7 @@ namespace synthese
 				static const std::string DATA_LINE_STYLE;
 				static const std::string DATA_LINE_IMAGE;
 				static const std::string DATA_LINE_ID;
-				static const std::string DATA_CONTINUOUS_SERVICE_RANGE;
+				static const std::string DATA_CONTINUOUS_SERVICE_WAITING;
 			//@}
 
 		private:

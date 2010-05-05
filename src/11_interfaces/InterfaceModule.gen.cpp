@@ -20,7 +20,6 @@ synthese::interfaces::AndValueInterfaceElement::integrate();
 synthese::interfaces::PlainCharFilterValueInterfaceElement::integrate();
 synthese::interfaces::InterfaceIdInterfaceElement::integrate();
 synthese::interfaces::LogicalAndInterfaceElement::integrate();
-
 synthese::interfaces::CommentInterfaceElement::integrate();
 synthese::interfaces::PrintInterfaceElement::integrate();
 synthese::interfaces::DebugInterfaceElement::integrate();
@@ -35,8 +34,6 @@ synthese::interfaces::InterfaceTableSync::integrate();
 synthese::interfaces::InterfacePageTableSync::integrate();
 
 synthese::interfaces::NonPredefinedInterfacePage::integrate();
-
-synthese::interfaces::SimplePageFunction::integrate();
 
 // Registries
 synthese::util::Env::Integrate<synthese::interfaces::Interface>();

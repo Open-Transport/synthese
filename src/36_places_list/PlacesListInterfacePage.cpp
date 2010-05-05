@@ -58,6 +58,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 
 			pm.insert(PARAMETER_IS_CITY_LIST, false);
@@ -103,6 +104,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 
 			pm.insert(PARAMETER_IS_CITY_LIST, true);

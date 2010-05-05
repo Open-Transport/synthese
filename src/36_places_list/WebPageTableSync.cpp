@@ -51,6 +51,7 @@ namespace synthese
 		const string WebPageTableSync::COL_START_TIME = "start_time";
 		const string WebPageTableSync::COL_END_TIME = "end_time";
 		const string WebPageTableSync::COL_MIME_TYPE = "mime_type";
+		const string WebPageTableSync::COL_ABSTRACT = "abstract";
 	}
 
 	namespace db
@@ -70,6 +71,7 @@ namespace synthese
 			SQLiteTableSync::Field(WebPageTableSync::COL_START_TIME, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_END_TIME, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_MIME_TYPE, SQL_TEXT),
+			SQLiteTableSync::Field(WebPageTableSync::COL_ABSTRACT, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -91,6 +93,7 @@ namespace synthese
 			webpage->setContent(rows->getText(WebPageTableSync::COL_CONTENT1));
 			webpage->setRank(rows->getInt(WebPageTableSync::COL_RANK));
 			webpage->setMimeType(rows->getText(WebPageTableSync::COL_MIME_TYPE));
+			webpage->setAbstract(rows->getText(WebPageTableSync::COL_ABSTRACT));
 
 			if(!rows->getText(WebPageTableSync::COL_START_TIME).empty())
 			{
@@ -159,6 +162,7 @@ namespace synthese
 			query.addField(webPage->getStartDate());
 			query.addField(webPage->getEndDate());
 			query.addField(webPage->_getMimeType());
+			query.addField(webPage->getAbstract());
 			query.execute(transaction);
 		}
 	}

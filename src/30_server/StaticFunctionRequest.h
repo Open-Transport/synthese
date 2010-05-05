@@ -54,21 +54,10 @@ namespace synthese
 				{
 					throw util::Exception("The source request does not allow copy");
 				}
-				if (FunctionT::FACTORY_KEY == request.getFunction()->getFactoryKey())
+				_function = boost::shared_ptr<Function>(new FunctionT);
+				if (FunctionT::FACTORY_KEY == request.getFunction()->getFactoryKey() && copyFunction)
 				{
-					if(copyFunction)
-					{
-						_function = boost::shared_ptr<Function>(new FunctionT);
-						_function->_copy(request.getFunction());
-					}
-					else
-					{
-						_function = boost::static_pointer_cast<FunctionT>(boost::const_pointer_cast<Function>(request.getFunction()));
-					}
-				}
-				else
-				{
-					_function = boost::shared_ptr<Function>(new FunctionT);
+					_function->_copy(request.getFunction());
 				}
 				_function->setEnv(request.getFunction()->getEnv());
 			}

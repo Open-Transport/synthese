@@ -52,6 +52,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 
 			pm.insert(DATA_YEAR, dateTime.date().year());
@@ -75,6 +76,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 
 			pm.insert(DATA_YEAR, date.year());
@@ -96,6 +98,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 
 			pm.insert(DATA_HOURS, duration.hours());

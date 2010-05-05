@@ -66,7 +66,6 @@ namespace synthese
 		const std::string TimetableTableSync::COL_TITLE("title");
 		const std::string TimetableTableSync::COL_CALENDAR_ID("calendar_id");
 		const std::string TimetableTableSync::COL_FORMAT("format");
-		const std::string TimetableTableSync::COL_INTERFACE_ID("interface_id");
 		const std::string TimetableTableSync::COL_AUTHORIZED_LINES("authorized_lines");
 		const std::string TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS("authorized_physical_stops");
 	}
@@ -88,7 +87,6 @@ namespace synthese
 			SQLiteTableSync::Field(TimetableTableSync::COL_TITLE, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_CALENDAR_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_FORMAT, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableTableSync::COL_INTERFACE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_AUTHORIZED_LINES, SQL_TEXT),
 			SQLiteTableSync::Field(TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS, SQL_TEXT),
 			SQLiteTableSync::Field()
@@ -177,20 +175,6 @@ namespace synthese
 						Log::GetInstance().warn("Error in timetable definition : no such calendar template");
 					}
 				}
-
-				if(rows->getLongLong(TimetableTableSync::COL_INTERFACE_ID) > 0)
-				{
-					try
-					{
-						object->setInterface(
-							Env::GetOfficialEnv().get<Interface>(rows->getLongLong(TimetableTableSync::COL_INTERFACE_ID)).get()
-						);
-					}
-					catch (ObjectNotFoundException<Interface> e)
-					{
-						Log::GetInstance().warn("Error in timetable definition : no such interface");
-					}
-				}
 			}
 		}
 
@@ -229,7 +213,6 @@ namespace synthese
 			query.addField(object->getTitle());
 			query.addField(object->getBaseCalendar() ? object->getBaseCalendar()->getKey() : RegistryKeyType(0));
 			query.addField(static_cast<int>(object->getContentType()));
-			query.addField(object->getInterface() ? object->getInterface()->getKey() : RegistryKeyType(0));
 			query.addField(authorizedLines.str());
 			query.addField(authorizedPhysicalStops.str());
 			query.execute(transaction);

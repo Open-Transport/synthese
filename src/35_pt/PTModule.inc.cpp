@@ -67,6 +67,9 @@
 #include "ServiceUpdateAction.h"
 #include "LineUpdateAction.h"
 #include "ServiceApplyCalendarAction.h"
+#include "LineStopAddAction.h"
+#include "LineStopRemoveAction.h"
+#include "ServiceDateChangeAction.h"
 
 #include "TransportNetworkRight.h"
 

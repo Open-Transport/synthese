@@ -55,7 +55,11 @@ namespace synthese
 			{
 				StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 				displayRequest.getFunction()->setPage(templatePage);
-				ParametersMap pm;
+				ParametersMap pm(
+					dynamic_pointer_cast<const WebPageDisplayFunction>(request.getFunction()) ?
+					dynamic_pointer_cast<const WebPageDisplayFunction>(request.getFunction())->getAditionnalParametersMap() :
+					ParametersMap()
+				);
 
 				pm.insert(DATA_TITLE, page->getName());
 				stringstream content;

@@ -72,7 +72,7 @@ namespace synthese
 		public:
 
 			TreeNode() : _parent(NULL) { }
-			~TreeNode() { setParent(NULL); }
+			~TreeNode() {}
 
 			//! @name Getters
 			//@{
@@ -82,12 +82,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setParent(ObjectType* object)
-				{
-					if(_parent) _parent->removeChild(static_cast<ObjectType*>(this));
-					_parent = object;
-					if(_parent) _parent->addChild(static_cast<ObjectType*>(this));
-				}
+				void setParent(ObjectType* object){	_parent = object; }
 			//@}
 
 			//! @name Updaters

@@ -28,8 +28,10 @@
 #include "FunctionWithSite.h"
 #include "WebPageDisplayFunction.h"
 #include "WebPage.h"
+#include "PlacesListModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -38,9 +40,9 @@ namespace synthese
 	using namespace security;
 	using namespace transportwebsite;
 
-	template<> const string util::FactorableTemplate<Function,server::GetValueFunction>::FACTORY_KEY("@");
+	template<> const string util::FactorableTemplate<Function, GetValueFunction>::FACTORY_KEY("@");
 	
-	namespace server
+	namespace transportwebsite
 	{
 		const string GetValueFunction::PARAMETER_PARAMETER("p");
 		
@@ -70,17 +72,10 @@ namespace synthese
 			}
 			else if(_parameter == "site")
 			{
-				ParametersMap map(request.getParametersMap());
-				if(map.getOptional<RegistryKeyType>(FunctionWithSiteBase::PARAMETER_SITE))
+				shared_ptr<const Site> site(PlacesListModule::GetSite(request));
+				if(site.get())
 				{
-					stream << map.get<RegistryKeyType>(FunctionWithSiteBase::PARAMETER_SITE);
-				}
-				else if(
-					dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) &&
-					dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get())->getPage().get() &&
-					dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get())->getPage()->getRoot()
-				){
-					stream << dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get())->getPage()->getRoot()->getKey();
+					stream << site->getKey();
 				}
 			}
 			else

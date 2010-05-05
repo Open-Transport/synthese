@@ -45,8 +45,6 @@
 #include "TimetableRowDeleteAction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
-#include "InterfaceTableSync.h"
-#include "TimetableInterfacePage.h"
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"
 #include "AdminParametersException.h"
@@ -70,7 +68,6 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace timetables;
@@ -138,7 +135,7 @@ namespace synthese
 		
 		void TimetableAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
+			interfaces::VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
 
@@ -174,13 +171,6 @@ namespace synthese
 					pt.getForm().getTextInput(
 						TimetableUpdateAction::PARAMETER_TITLE,
 						_timetable->getTitle()
-				)	);
-				stream << pt.cell(
-					"Interface",
-					pt.getForm().getSelectInput(
-						TimetableUpdateAction::PARAMETER_INTERFACE_ID,
-						InterfaceTableSync::GetInterfaceLabels<TimetableInterfacePage>(optional<string>()),
-						optional<RegistryKeyType>(_timetable->getInterface() ? _timetable->getInterface()->getKey() : 0)
 				)	);
 				stream << pt.cell(
 					"Format",
@@ -512,20 +502,6 @@ namespace synthese
 			// TAB RESULT
 			if (openTabContent(stream, TAB_RESULT))
 			{
-				if(_timetable->getInterface())
-				{
-					StaticFunctionRequest<TimetableGenerateFunction> viewRequest(_request, true);
-					viewRequest.getFunction()->setTimetable(_timetable);
-					if(	!_timetable->getInterface()->getDefaultClientURL().empty()
-					){
-						viewRequest.setClientURL(_timetable->getInterface()->getDefaultClientURL());
-					}
-
-					stream << "<h1>Résultat final</h1>";
-
-					stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), ICON) << "</p>";
-				}
-
 				if(
 					_timetable->getContentType() == Timetable::TABLE_SERVICES_IN_COLS ||
 					_timetable->getContentType() == Timetable::TABLE_SERVICES_IN_ROWS ||

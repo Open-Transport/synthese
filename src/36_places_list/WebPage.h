@@ -85,6 +85,7 @@ namespace synthese
 			boost::posix_time::ptime _startDate;
 			boost::posix_time::ptime _endDate;
 			std::string _mimeType;
+			std::string _abstract;
 
 
 
@@ -104,6 +105,7 @@ namespace synthese
 				std::ostream& stream,
 				std::string::const_iterator it,
 				std::string::const_iterator end,
+				std::string termination,
 				const server::Request& request
 			) const;
 
@@ -117,6 +119,7 @@ namespace synthese
 				const boost::posix_time::ptime& getEndDate() const { return _endDate; }
 				const std::string& _getMimeType() const { return _mimeType; }
 				WebPage* _getTemplate() const { return _template;}
+				const std::string& getAbstract() const { return _abstract; }
 			//@}
 
 			//! @name Setters
@@ -126,6 +129,7 @@ namespace synthese
 				void setEndDate(const boost::posix_time::ptime& value) { _endDate = value; }
 				void setMimeType(const std::string& value){ _mimeType = value; }
 				void setTemplate(WebPage* value){ _template = value; }
+				void setAbstract(const std::string& value){ _abstract = value; }
 			//@}
 
 			//! @name Services

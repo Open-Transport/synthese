@@ -22,11 +22,20 @@
 
 #include "PlacesListModule.h"
 #include "GraphConstants.h"
+#include "FunctionWithSite.h"
+#include "WebPageDisplayFunction.h"
+#include "Site.h"
+#include "Request.h"
+#include "Env.h"
+#include "WebPage.h"
 
 using namespace std;
+using namespace boost;
+
 
 namespace synthese
 {
+	using namespace util;
 	using namespace graph;
 	using namespace server;
 	using namespace transportwebsite;
@@ -59,6 +68,50 @@ namespace synthese
 			result.push_back(make_pair(USER_HANDICAPPED, "PMR"));
 			result.push_back(make_pair(USER_BIKE, "Vélo"));
 			return result;
+		}
+
+
+
+		boost::shared_ptr<const Site> PlacesListModule::GetSite( const server::Request& request )
+		{
+			{
+				shared_ptr<const FunctionWithSiteBase> function(
+					dynamic_pointer_cast<const FunctionWithSiteBase>(
+						request.getFunction()
+				)	);
+				if(function.get())
+				{
+					return function->getSite();
+				}
+			}
+
+			{
+				shared_ptr<const WebPageDisplayFunction> function(
+					dynamic_pointer_cast<const WebPageDisplayFunction>(
+						request.getFunction()
+				)	);
+				if(function.get() && function->getPage())
+				{
+					return Env::GetOfficialEnv().getSPtr<Site>(function->getPage()->getRoot());
+				}
+			}
+
+			return shared_ptr<const Site>();
+		}
+
+
+
+		boost::shared_ptr<const WebPage> PlacesListModule::GetWebPage( const server::Request& request )
+		{
+			shared_ptr<const WebPageDisplayFunction> function(
+				dynamic_pointer_cast<const WebPageDisplayFunction>(
+					request.getFunction()
+			)	);
+			if(function.get())
+			{
+				return function->getPage();
+			}
+
 		}
 	}
 }

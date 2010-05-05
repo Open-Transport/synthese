@@ -125,6 +125,7 @@ namespace synthese
 			shared_ptr<const WebPage> warningPage,
 			shared_ptr<const WebPage> reservationPage,
 			shared_ptr<const WebPage> durationPage,
+			shared_ptr<const WebPage> textDurationPage,
 			shared_ptr<const WebPage> mapPage,
 			shared_ptr<const WebPage> mapLinePage,
 			shared_ptr<const WebPage> dateTimePage,
@@ -145,6 +146,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 
 			const City* originCity(dynamic_cast<const City*>(originPlace));
@@ -426,7 +428,7 @@ namespace synthese
 					JourneyBoardInterfacePage::Display(
 						boards,
 						boardPage,
-						durationPage,
+						textDurationPage,
 						dateTimePage,
 						stopCellPage,
 						serviceCellPage,
@@ -545,7 +547,7 @@ namespace synthese
 					JourneyBoardInterfacePage::Display(
 						maps,
 						mapPage,
-						durationPage,
+						textDurationPage,
 						dateTimePage,
 						mapStopCellPage,
 						mapServiceCellPage,
@@ -587,6 +589,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 			pm.insert(DATA_IS_FIRST_ROW, isItFirstRow);
 			pm.insert(DATA_IS_LAST_ROW, isItLastRow);
@@ -627,6 +630,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 
 			pm.insert(DATA_COLUMN_NUMBER, columnNumber);
@@ -635,10 +639,10 @@ namespace synthese
 			if(lineMarkerPage.get())
 			{
 				stringstream content;
-				bool __AfficherLignesPied = Conversion::ToBool(
-					false
-					//_displayPedestrianLines->getValue(parameters, variables, object, request)
-				);
+				bool __AfficherLignesPied = false;
+				//	Conversion::ToBool(
+				//	_displayPedestrianLines->getValue(parameters, variables, object, request)
+				//	);
 
 				BOOST_FOREACH(const ServiceUse& leg, journey.getServiceUses())
 				{
@@ -666,6 +670,7 @@ namespace synthese
 		{
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 			pm.insert(Request::PARAMETER_OBJECT_ID, place.getKey());
 			pm.insert(DATA_CELLS, cells);

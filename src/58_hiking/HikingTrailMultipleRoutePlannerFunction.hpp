@@ -99,6 +99,7 @@ namespace synthese
 			static const std::string PARAMETER_WARNING_PAGE;
 			static const std::string PARAMETER_RESERVATION_PAGE;
 			static const std::string PARAMETER_DURATION_PAGE;
+			static const std::string PARAMETER_TEXT_DURATION_PAGE;
 			static const std::string PARAMETER_MAP_PAGE;
 			static const std::string PARAMETER_MAP_LINE_PAGE;
 			static const std::string PARAMETER_DATE_TIME_PAGE;
@@ -136,6 +137,7 @@ namespace synthese
 				boost::shared_ptr<const transportwebsite::WebPage> _warningPage;
 				boost::shared_ptr<const transportwebsite::WebPage> _reservationPage;
 				boost::shared_ptr<const transportwebsite::WebPage> _durationPage;
+				boost::shared_ptr<const transportwebsite::WebPage> _textDurationPage;
 				boost::shared_ptr<const transportwebsite::WebPage> _mapPage;
 				boost::shared_ptr<const transportwebsite::WebPage> _mapLinePage;
 				boost::shared_ptr<const transportwebsite::WebPage> _dateTimePage;

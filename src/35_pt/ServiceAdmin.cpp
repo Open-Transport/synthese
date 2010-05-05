@@ -53,6 +53,7 @@
 #include "AdminModule.h"
 #include "ServiceApplyCalendarAction.h"
 #include "CalendarTemplateTableSync.h"
+#include "ServiceDateChangeAction.h"
 
 using namespace std;
 using namespace boost;
@@ -347,7 +348,9 @@ namespace synthese
 				stream << p.close();
 
 				stream << "<h1>Résultat</h1>";
-				CalendarHTMLViewer cv(*_service);
+				AdminActionFunctionRequest<ServiceDateChangeAction,ServiceAdmin> updateDateRequest(request);
+				updateDateRequest.getAction()->setService(const_pointer_cast<SchedulesBasedService>(_service));
+				CalendarHTMLViewer<AdminActionFunctionRequest<ServiceDateChangeAction,ServiceAdmin> > cv(*_service, &updateDateRequest);
 				cv.display(stream);
 
 				// ServiceDateChangeAction

@@ -70,6 +70,32 @@ namespace synthese
 				, bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Inserts a stop in a route.
+			/// @param lineStop line stop to insert
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			//////////////////////////////////////////////////////////////////////////
+			static void InsertStop(
+				LineStop& lineStop
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Removes a stop from a route.
+			/// @param lineStop line stop to remove
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			//////////////////////////////////////////////////////////////////////////
+			static void RemoveStop(
+				const LineStop& lineStop
+			);
 		};
 	}
 }

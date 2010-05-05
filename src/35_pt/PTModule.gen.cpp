@@ -75,6 +75,9 @@ synthese::pt::ServiceTimetableUpdateAction::integrate();
 synthese::pt::ServiceUpdateAction::integrate();
 synthese::pt::LineUpdateAction::integrate();
 synthese::pt::ServiceApplyCalendarAction::integrate();
+synthese::pt::LineStopAddAction::integrate();
+synthese::pt::LineStopRemoveAction::integrate();
+synthese::pt::ServiceDateChangeAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 

@@ -80,7 +80,7 @@ namespace synthese
 
 			size_t rank(0);
 			interfaces::VariablesMap variables;
-			if(!_page)
+			if(!_page.get())
 			{
 				/// @todo generate XML header
 			}
@@ -89,7 +89,7 @@ namespace synthese
 			);
 			BOOST_FOREACH(const TransportNetworkTableSync::SearchResult::value_type& it, networks)
 			{
-				if(_page)
+				if(_page.get())
 				{
 					PTNetworkListItemInterfacePage::Display(
 						stream,
@@ -104,7 +104,7 @@ namespace synthese
 					/// @todo generate XML List item
 				}
 			}
-			if(!_page)
+			if(!_page.get())
 			{
 				/// @todo generate XML footer
 			}

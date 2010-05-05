@@ -29,13 +29,9 @@
 
 #include <sstream>
 
-#include "Conversion.h"
-
-#include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
-
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
+#include "SQLiteTransaction.h"
 #include "Point2D.h"
 
 #include <boost/foreach.hpp>
@@ -162,37 +158,28 @@ namespace synthese
 			LineStop* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			stringstream query;
-			
 			if(!object->getPhysicalStop()) throw Exception("Linestop save error. Missing physical stop");
 			if(!object->getLine()) throw Exception("Linestop Save error. Missing line");
-			
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-			
-			query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToString(object->getPhysicalStop()->getKey())
-				<< "," << Conversion::ToString(object->getLine()->getKey())
-				<< "," << object->getRankInPath()
-				<< "," << Conversion::ToString(object->isDeparture())
-				<< "," << Conversion::ToString(object->isArrival())
-				<< "," << object->getMetricOffset()
-				<< ",'";
+
+			stringstream viaPoints;
 			bool first(true);
 			BOOST_FOREACH(const geometry::Point2D* viaPoint, object->getViaPoints())
 			{
-				if(!first) query << ",";
-				query << viaPoint->getX() << ":" << viaPoint->getY();
+				if(!first) viaPoints << ",";
+				viaPoints << viaPoint->getX() << ":" << viaPoint->getY();
 				first = false;
 			}
-			query <<
-				"'" <<
-			")";
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
-		}
 
+			ReplaceQuery<LineStopTableSync> query(*object);
+			query.addField(object->getPhysicalStop()->getKey());
+			query.addField(object->getLine()->getKey());
+			query.addField(object->getRankInPath());
+			query.addField(object->isDeparture());
+			query.addField(object->isArrival());
+			query.addField(object->getMetricOffset());
+			query.addField(viaPoints.str());
+			query.execute(transaction);
+		}
 	}
 
 	namespace pt
@@ -207,23 +194,62 @@ namespace synthese
 			, bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
+			SelectQuery<LineStopTableSync> query;
 			if (lineId)
-				query << " AND " << COL_LINEID << "=" << *lineId;
+			{
+				query.addWhereField(COL_LINEID, *lineId);
+			}
 			if (physicalStopId)
-				query << " AND " << COL_PHYSICALSTOPID << "=" << *physicalStopId;
+			{
+				query.addWhereField(COL_PHYSICALSTOPID, *physicalStopId);
+			}
 			if (orderByRank)
-				query << " ORDER BY " << COL_RANKINPATH << (raisingOrder ? " ASC" : " DESC");
+			{
+				query.addOrderField(COL_RANKINPATH, raisingOrder);
+			}
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
+			{
+				query.setNumber(*number + 1);
+			}
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+			{
+				query.setFirst(first);
+			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
+		}
+
+
+
+		void LineStopTableSync::InsertStop(
+			LineStop& lineStop
+		){
+			stringstream query;
+			query << "UPDATE " << TABLE.NAME << " SET " << COL_RANKINPATH << "=" << COL_RANKINPATH << "+1 WHERE " <<
+				COL_LINEID << "=" << lineStop.getLine()->getKey() << " AND " << COL_RANKINPATH << ">=" << lineStop.getRankInPath();
+
+			SQLiteTransaction transaction;
+			transaction.add(query.str());
+
+			Save(&lineStop, transaction);
+
+			transaction.run();
+		}
+
+
+
+		void LineStopTableSync::RemoveStop(const LineStop& lineStop )
+		{
+			SQLiteTransaction transaction;
+
+			Remove(lineStop.getKey(), transaction);
+
+			stringstream query;
+			query << "UPDATE " << TABLE.NAME << " SET " << COL_RANKINPATH << "=" << COL_RANKINPATH << "-1 WHERE " <<
+				COL_LINEID << "=" << lineStop.getLine()->getKey() << " AND " << COL_RANKINPATH << ">" << lineStop.getRankInPath();
+			transaction.add(query.str());
+
+			transaction.run();
 		}
 	}
 }

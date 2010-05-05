@@ -124,6 +124,7 @@ namespace synthese
 				place.setName("TEST");
 				place.setCity(&city);
 				PhysicalStop ps(0, string(), &place);
+				place.addPhysicalStop(ps);
 				CommercialLine cline;
 				cline.setShortName("00");
 				Line line;

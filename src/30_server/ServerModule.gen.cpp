@@ -8,7 +8,6 @@ synthese::server::LogoutAction::integrate();
 synthese::server::ThreadKillAction::integrate();
 
 synthese::server::HtmlFormInterfaceElement::integrate();
-synthese::server::LogoutHTMLLinkInterfaceElement::integrate();
 synthese::server::ValidSessionInterfaceElement::integrate();
 synthese::server::HtmlFormCalendarFieldInterfaceElement::integrate();
 synthese::server::HtmlFormFieldInterfaceElement::integrate();
@@ -22,4 +21,3 @@ synthese::server::ThreadsAdmin::integrate();
 
 synthese::server::XMLSessionFunction::integrate();
 synthese::server::XMLSessionIsValidFunction::integrate();
-synthese::server::GetValueFunction::integrate();

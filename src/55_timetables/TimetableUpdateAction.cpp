@@ -55,7 +55,6 @@ namespace synthese
 		const string TimetableUpdateAction::PARAMETER_BASE_CALENDAR_ID = Action_PARAMETER_PREFIX + "ci";
 		const string TimetableUpdateAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "tt";
 		const string TimetableUpdateAction::PARAMETER_FORMAT = Action_PARAMETER_PREFIX + "fo";
-		const string TimetableUpdateAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "ii";
 		const string TimetableUpdateAction::PARAMETER_CONTAINER_ID = Action_PARAMETER_PREFIX + "co";
 		
 		
@@ -118,18 +117,6 @@ namespace synthese
 				}
 			}
 
-			if(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID) > 0)
-			{
-				try
-				{
-					_interface = InterfaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID), *_env);
-				}
-				catch (ObjectNotFoundException<CalendarTemplate>)
-				{
-					throw ActionException("No such interface");
-				}
-			}
-
 			_title = map.get<string>(PARAMETER_TITLE);
 			_format = static_cast<Timetable::ContentType>(map.get<int>(PARAMETER_FORMAT));
 		}
@@ -140,7 +127,6 @@ namespace synthese
 		{
 			_timetable->setBaseCalendar(_calendarTemplate.get());
 			_timetable->setTitle(_title);
-			_timetable->setInterface(_interface.get());
 			_timetable->setContentType(_format);
 			_timetable->setBookId(_container.get() ? _container->getKey() : RegistryKeyType(0));
 

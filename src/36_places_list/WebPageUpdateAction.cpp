@@ -81,7 +81,7 @@ namespace synthese
 			if(id > 0)
 			try
 			{
-				_up = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_WEB_PAGE_ID), *_env);
+				_up = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_UP_ID), *_env);
 			}
 			catch(ObjectNotFoundException<WebPage>& e)
 			{

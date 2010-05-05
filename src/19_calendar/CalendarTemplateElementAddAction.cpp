@@ -137,21 +137,18 @@ namespace synthese
 		}
 
 
-
-		void CalendarTemplateElementAddAction::setCalendar(boost::shared_ptr<CalendarTemplate> value)
-		{
-			_calendar = value;
-		}
-
-		void CalendarTemplateElementAddAction::setCalendar(boost::shared_ptr<const CalendarTemplate> value)
-		{
-			_calendar = const_pointer_cast<CalendarTemplate>(value);
-		}
-
-		
 		bool CalendarTemplateElementAddAction::isAuthorized(const server::Session* session) const
 		{
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CalendarRight>(WRITE);
+		}
+
+
+
+		void CalendarTemplateElementAddAction::setDate( boost::gregorian::date value )
+		{
+			_minDate = value;
+			_maxDate = value;
+			_positive = CalendarTemplateElement::ADD;
 		}
 	}
 }

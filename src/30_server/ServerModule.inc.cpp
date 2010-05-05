@@ -2,7 +2,6 @@
 #include "LoginAction.h"
 #include "LogoutAction.h"
 #include "HtmlFormInterfaceElement.h"
-#include "LogoutHTMLLinkInterfaceElement.h"
 #include "ValidSessionInterfaceElement.h"
 #include "HtmlFormCalendarFieldInterfaceElement.h"
 #include "HtmlFormFieldInterfaceElement.h"
@@ -15,4 +14,3 @@
 
 #include "XMLSessionFunction.h"
 #include "XMLSessionIsValidFunction.h"
-#include "GetValueFunction.hpp"

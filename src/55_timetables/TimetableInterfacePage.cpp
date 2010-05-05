@@ -26,15 +26,16 @@
 #include "Timetable.h"
 #include "TimetableGenerator.h"
 #include "TimetableNoteInterfacePage.h"
-#include "TimetableServiceColRowInterfacePage.hpp"
+#include "TimetableServiceColInterfacePage.hpp"
 #include "TimetableServiceRowInterfacePage.h"
-#include "Interface.h"
-#include "InterfacePageException.h"
 #include "Env.h"
 #include "TimetableTableSync.h"
 #include "Service.h"
 #include "TimetableResult.hpp"
 #include "CalendarTemplate.h"
+#include "StaticFunctionRequest.h"
+#include "WebPage.h"
+#include "WebPageDisplayFunction.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -44,53 +45,65 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace interfaces;
 	using namespace util;
 	using namespace timetables;
 	using namespace graph;
-
-	namespace util
-	{
-		template<> const string FactorableTemplate<InterfacePage, timetables::TimetableInterfacePage>::FACTORY_KEY("timetable");
-	}
+	using namespace server;
+	using namespace transportwebsite;
 
 	namespace timetables
 	{
-		TimetableInterfacePage::TimetableInterfacePage():
-			Registrable(0),
-			FactorableTemplate<interfaces::InterfacePage, TimetableInterfacePage>()
-		{
-		}
+		const std::string TimetableInterfacePage::DATA_GENERATOR_TYPE("generator_type");
+		const std::string TimetableInterfacePage::DATA_TITLE("title");
+		const std::string TimetableInterfacePage::DATA_NOTES("notes");
+		const std::string TimetableInterfacePage::DATA_CALENDAR_NAME("calendar_name");
+		const std::string TimetableInterfacePage::DATA_AT_LEAST_A_NOTE("at_least_a_note");
+		const std::string TimetableInterfacePage::DATA_CONTENT("content");
+
+		const std::string TimetableInterfacePage::DATA_SERVICES_IN_COLS_LINES_ROW("lines_row");
+		const std::string TimetableInterfacePage::DATA_SERVICES_IN_COLS_SCHEDULES_ROWS("schedules_rows");
+		const std::string TimetableInterfacePage::DATA_SERVICES_IN_COLS_ROLLING_STOCK_ROW("rolling_stock_row");
+		const std::string TimetableInterfacePage::DATA_SERVICES_IN_COLS_RESERVATIONS_ROW("reservation_row");
+		const std::string TimetableInterfacePage::DATA_SERVICES_IN_COLS_NOTES_ROW("notes_row");
+
+		const std::string TimetableInterfacePage::DATA_SERVICES_IN_ROWS_SCHEDULES_ROWS("schedules_rows");
 		
 		
 
-		void TimetableInterfacePage::display(
+		void TimetableInterfacePage::Display(
 			std::ostream& stream,
+			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const transportwebsite::WebPage> notePage,
+			boost::shared_ptr<const transportwebsite::WebPage> noteCalendarPage,
+			boost::shared_ptr<const transportwebsite::WebPage> pageForSubTimetable,
+			boost::shared_ptr<const transportwebsite::WebPage> rowPage,
+			boost::shared_ptr<const transportwebsite::WebPage> cellPage,
+			const server::Request& request,
 			const Timetable& object,
 			const timetables::TimetableGenerator& generator,
-			const timetables::TimetableResult& result,
-			VariablesMap& variables,
-			const server::Request* request /*= NULL*/
-		) const	{
-			ParametersVector pv;
+			const timetables::TimetableResult& result
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm;
 
 			// Common parameters
-			pv.push_back(GetTimetableTypeCode(object.getContentType())); //0
-			pv.push_back(object.getTitle()); //1
+			pm.insert(DATA_GENERATOR_TYPE, GetTimetableTypeCode(object.getContentType())); //0
+			pm.insert(DATA_TITLE, object.getTitle()); //1
 
 			// 2 : Notes
-			stringstream notes;
-			if(getInterface()->hasPage<TimetableNoteInterfacePage>())
+			if(notePage.get())
 			{
-				const TimetableNoteInterfacePage* notePage(getInterface()->getPage<TimetableNoteInterfacePage>());
+				stringstream notes;
 				BOOST_FOREACH(const TimetableResult::Warnings::value_type& warning, result.getWarnings())
 				{
-					notePage->display(notes, *warning.second, variables, request);
+					TimetableNoteInterfacePage::Display(notes, notePage, noteCalendarPage, request, *warning.second);
 				}
+				pm.insert(DATA_NOTES, notes.str()); //2
 			}
-			pv.push_back(notes.str()); //2
 
-			pv.push_back(object.getBaseCalendar()->getText()); //3
+			pm.insert(DATA_CALENDAR_NAME, object.getBaseCalendar()->getText()); //3
 
 
 			// Specific parameters
@@ -98,25 +111,35 @@ namespace synthese
 			{
 			case Timetable::CONTAINER:
 				{
-					stringstream content;
-					Env env;
-					TimetableTableSync::SearchResult contents(
-						TimetableTableSync::Search(
-							env,
-							object.getKey()
-					)	);
-					BOOST_FOREACH(shared_ptr<Timetable> tt, contents)
+					if(pageForSubTimetable.get())
 					{
-						const TimetableInterfacePage* page(
-							tt->getInterface() ?
-							tt->getInterface()->getPage<TimetableInterfacePage>() :
-							this
-						);
-						auto_ptr<TimetableGenerator> g(tt->getGenerator(Env::GetOfficialEnv()));
-						g->build();
-						page->display(content, *tt, *g, result, variables, request);
+						stringstream content;
+						Env env;
+						TimetableTableSync::SearchResult contents(
+							TimetableTableSync::Search(
+								env,
+								object.getKey()
+						)	);
+						BOOST_FOREACH(shared_ptr<Timetable> tt, contents)
+						{
+							auto_ptr<TimetableGenerator> g(tt->getGenerator(Env::GetOfficialEnv()));
+							g->build();
+							Display(
+								content,
+								pageForSubTimetable,
+								notePage,
+								noteCalendarPage,
+								pageForSubTimetable,
+								rowPage,
+								cellPage,
+								request,
+								*tt,
+								*g,
+								result
+							);
+						}
+						pm.insert(DATA_CONTENT, content.str()); //4
 					}
-					pv.push_back(content.str()); //4
 				}
 				break;
 
@@ -133,88 +156,107 @@ namespace synthese
 				break;
 				
 			case Timetable::TABLE_SERVICES_IN_COLS:
-				{
-					if(	getInterface()->hasPage<TimetableServiceColRowInterfacePage>()
-					){
-						const TimetableServiceColRowInterfacePage* page(getInterface()->getPage<TimetableServiceColRowInterfacePage>());
+				if(	rowPage.get()
+				){
+					// 4 : Lines row
+					stringstream linesContent;
+					TimetableServiceColInterfacePage::DisplayLinesRow(
+						linesContent,
+						rowPage,
+						cellPage,
+						request,
+						result.getRowLines()
+					);
+					pm.insert(DATA_SERVICES_IN_COLS_LINES_ROW, linesContent.str()); //4
 
-						// 4 : Lines row
-						stringstream linesContent;
-						page->display(linesContent, result.getRowLines(), variables, request);
-						pv.push_back(linesContent.str()); //4
-
-						// 5 : Time rows
-						stringstream timesContent;
-						BOOST_FOREACH(const TimetableGenerator::Rows::value_type& row, generator.getRows())
-						{
-							const TimetableResult::RowTimesVector times(result.getRowSchedules(row.getRank()));
-							page->display(timesContent, row, times, variables, request);
-						}
-						pv.push_back(timesContent.str()); //5
-						
-						// 6 : Rolling stock rows
-						stringstream rollingStockContent;
-						page->display(rollingStockContent, result.getRowRollingStock(), variables, request);
-						pv.push_back(rollingStockContent.str()); //6
-
-						// 7 : Booking rows
-						pv.push_back(string()); //7
-
-						// 8 : Note rows
-						stringstream notesContent;
-						const TimetableResult::RowNotesVector notes(result.getRowNotes());
-						page->display(notesContent, notes, variables, request);
-						pv.push_back(notesContent.str()); //8
-
-						// 9 : At least a note
-						bool aNote(false);
-						BOOST_FOREACH(const TimetableResult::RowNotesVector::value_type& note, notes)
-						{
-							if(note != NULL)
-							{
-								aNote = true;
-								break;
-							}
-						}
-						pv.push_back(lexical_cast<string>(aNote)); //9
-					}
-					else
+					// 5 : Time rows
+					stringstream timesContent;
+					BOOST_FOREACH(const TimetableGenerator::Rows::value_type& row, generator.getRows())
 					{
-						pv.push_back(string()); //3
-						pv.push_back(string()); //4
-						pv.push_back(string()); //5
-						pv.push_back(string()); //6
-						pv.push_back(string()); //7
+						const TimetableResult::RowTimesVector times(result.getRowSchedules(row.getRank()));
+						TimetableServiceColInterfacePage::DisplaySchedulesRow(
+							timesContent,
+							rowPage,
+							cellPage,
+							request,
+							row,
+							times
+						);
 					}
+					pm.insert(DATA_SERVICES_IN_COLS_SCHEDULES_ROWS, timesContent.str()); //5
+					
+					// 6 : Rolling stock rows
+					stringstream rollingStockContent;
+					TimetableServiceColInterfacePage::DisplayRollingStockRow(
+						rollingStockContent,
+						rowPage,
+						cellPage,
+						request,
+						result.getRowRollingStock()
+					);
+					pm.insert(DATA_SERVICES_IN_COLS_ROLLING_STOCK_ROW, rollingStockContent.str()); //6
+
+					// 7 : Booking rows
+					pm.insert(DATA_SERVICES_IN_COLS_RESERVATIONS_ROW, string()); //7
+
+					// 8 : Note rows
+					stringstream notesContent;
+					const TimetableResult::RowNotesVector notes(result.getRowNotes());
+					TimetableServiceColInterfacePage::DisplayNotesRow(
+						notesContent,
+						rowPage,
+						cellPage,
+						request,
+						notes
+					);
+					pm.insert(DATA_SERVICES_IN_COLS_NOTES_ROW, notesContent.str()); //8
+
+					// 9 : At least a note
+					bool aNote(false);
+					BOOST_FOREACH(const TimetableResult::RowNotesVector::value_type& note, notes)
+					{
+						if(note != NULL)
+						{
+							aNote = true;
+							break;
+						}
+					}
+					pm.insert(DATA_SERVICES_IN_COLS_NOTES_ROW, aNote); //9
 				}
 				break;
 
 			case Timetable::TABLE_SERVICES_IN_ROWS:
+				if(rowPage.get())
 				{
 					stringstream content;
-					if(getInterface()->hasPage<TimetableServiceRowInterfacePage>())
+					time_duration lastSchedule;
+					size_t rank(0);
+					size_t followingWithSameHour;
+					for(TimetableResult::Columns::const_iterator it(result.getColumns().begin()); it != result.getColumns().end(); ++it)
 					{
-						const TimetableServiceRowInterfacePage* page(getInterface()->getPage<TimetableServiceRowInterfacePage>());
-						time_duration lastSchedule;
-						size_t rank(0);
-						size_t followingWithSameHour;
-						for(TimetableResult::Columns::const_iterator it(result.getColumns().begin()); it != result.getColumns().end(); ++it)
-						{
-							const TimetableResult::Columns::value_type& column(*it);
+						const TimetableResult::Columns::value_type& column(*it);
 
-							followingWithSameHour = 1;
-							for(TimetableResult::Columns::const_iterator it2(it+1); 
-								it2 != result.getColumns().end() && Service::GetTimeOfDay(it2->getContent().begin()->second).hours() == Service::GetTimeOfDay(it->getContent().begin()->second).hours();
-								++it2
-							){
-								++followingWithSameHour;
-							}
-
-							page->display(content, column, lastSchedule, rank++, followingWithSameHour, variables, request);
-							lastSchedule = column.getContent().begin()->second;
+						followingWithSameHour = 1;
+						for(TimetableResult::Columns::const_iterator it2(it+1); 
+							it2 != result.getColumns().end() && Service::GetTimeOfDay(it2->getContent().begin()->second).hours() == Service::GetTimeOfDay(it->getContent().begin()->second).hours();
+							++it2
+						){
+							++followingWithSameHour;
 						}
+
+						TimetableServiceRowInterfacePage::Display(
+							content,
+							rowPage,
+							cellPage,
+							request,
+							column,
+							lastSchedule,
+							rank++,
+							followingWithSameHour
+						);
+						lastSchedule = column.getContent().begin()->second;
 					}
-					pv.push_back(content.str()); //3
+					pm.insert(DATA_CONTENT, content.str()); //3
 				}
 				break;
 
@@ -227,14 +269,8 @@ namespace synthese
 				break;
 			}
 
-		
-			InterfacePage::_display(
-				stream
-				, pv
-				, variables
-				, static_cast<const void*>(&object)
-				, request
-			);
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
 		}
 
 

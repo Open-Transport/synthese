@@ -8,16 +8,21 @@
 
 #include "PlacesListModule.h"
 
-#include "CityListRequestInterfaceElement.h"
-#include "PlacesListRequestInterfaceElement.h"
 #include "UserFavoriteListInterfaceElement.h"
-#include "WebPageFormInterfaceElement.h"
-#include "WebPageLinkInterfaceElement.h"
-#include "WebPageMenuInterfaceElement.hpp"
 
+#include "WebPageMenuFunction.hpp"
+#include "WebPageLinkFunction.hpp"
+#include "WebPageFormFunction.hpp"
+#include "PlacesListRequestFunction.hpp"
 #include "CityListFunction.h"
+#include "CityListRequestFunction.hpp"
 #include "PlacesListFunction.h"
 #include "WebPageDisplayFunction.h"
+#include "WebPageLastNewsFunction.hpp"
+#include "GetValueFunction.hpp"
+#include "IfFunction.hpp"
+#include "EqualFunction.hpp"
+#include "SuperiorFunction.hpp"
 
 #include "UserFavoriteInterfacePage.h"
 

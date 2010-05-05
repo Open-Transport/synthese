@@ -305,14 +305,16 @@ namespace synthese
 			}
 
 
-			static void Remove(util::RegistryKeyType key)
-			{
+			static void Remove(
+				util::RegistryKeyType key,
+				 boost::optional<SQLiteTransaction&> transaction = boost::optional<SQLiteTransaction&>()
+			){
 				SQLite* sqlite = DBModule::GetSQLite();
 				std::stringstream query;
 				query
 					<< "DELETE FROM " << K::TABLE.NAME
 					<< " WHERE " << TABLE_COL_ID << "=" << key;
-				sqlite->execUpdate(query.str());
+				sqlite->execUpdate(query.str(), transaction);
 			}
 		};
 

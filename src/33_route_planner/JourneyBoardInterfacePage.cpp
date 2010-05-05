@@ -97,7 +97,7 @@ namespace synthese
 		const string JourneyBoardInterfacePage::DATA_RESERVATION_PHONE_NUMBER("reservation_phone_number");
 		const string JourneyBoardInterfacePage::DATA_ONLINE_RESERVATION("online_reservation");
 		const string JourneyBoardInterfacePage::DATA_CONTENT("content");
-		const string JourneyBoardInterfacePage::DATA_CONTINUOUS_SERVICE_RANGE("continuous_service_range");
+		const string JourneyBoardInterfacePage::DATA_CONTINUOUS_SERVICE_WAITING("continuous_service_waiting");
 		
 		// Cells
 		const string JourneyBoardInterfacePage::DATA_ODD_ROW("is_odd_row");
@@ -158,6 +158,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 
 			// Rank
@@ -169,7 +170,11 @@ namespace synthese
 			pm.insert(DATA_BIKE_FILTER, bikeFilter);
 
 			// Departure time
-			pm.insert(DATA_DEPARTURE_TIME, to_simple_string(journey.getDepartureTime().time_of_day()));
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << journey.getDepartureTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << journey.getDepartureTime().time_of_day().minutes();
+				pm.insert(DATA_DEPARTURE_TIME, s.str());
+			}
 			if(datePage.get())
 			{
 				stringstream sDate;
@@ -202,7 +207,11 @@ namespace synthese
 			pm.insert(DATA_DEPARTURE_PLACE_LATITUDE, departurePoint.getLatitude());
 			
 			// Arrival time
-			pm.insert(DATA_ARRIVAL_TIME, to_simple_string(journey.getArrivalTime().time_of_day()));
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << journey.getArrivalTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << journey.getArrivalTime().time_of_day().minutes();
+				pm.insert(DATA_ARRIVAL_TIME, s.str());
+			}
 
 			if(journey.getContinuousServiceRange().total_seconds())
 			{
@@ -289,6 +298,8 @@ namespace synthese
 			// Content
 			if(stopCellPage.get() && serviceCellPage.get() && junctionPage.get())
 			{
+				stringstream content;
+
 				// Loop on lines of the board
 				bool __Couleur = false;
 
@@ -315,7 +326,7 @@ namespace synthese
 							*/
 
 							DisplayStopCell(
-								stream,
+								content,
 								stopCellPage,
 								request,
 								false
@@ -343,7 +354,7 @@ namespace synthese
 						*/
 
 						DisplayServiceCell(
-							stream,
+							content,
 							serviceCellPage,
 							request,
 							leg,
@@ -367,7 +378,7 @@ namespace synthese
 						*/
 
 						DisplayStopCell(
-							stream,
+							content,
 							stopCellPage,
 							request,
 							true
@@ -411,7 +422,7 @@ namespace synthese
 						)	);
 						*/
 						DisplayJunctionCell(
-							stream,
+							content,
 							junctionPage,
 							request,
 							*leg.getArrivalEdge()->getFromVertex()
@@ -425,7 +436,7 @@ namespace synthese
 						__Couleur = !__Couleur;
 					}
 				}
-
+				pm.insert(DATA_CONTENT, content.str());
 			}
 
 
@@ -450,6 +461,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 
 			ptime endRangeTime(time);
@@ -510,6 +522,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 
 			// Point
@@ -543,6 +556,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 
 			// Continuous service
@@ -612,7 +626,7 @@ namespace synthese
 			pm.insert(DATA_LINE_LONG_NAME, commercialLine->getLongName() ); // 13
 			if(continuousService)
 			{
-				pm.insert(DATA_CONTINUOUS_SERVICE_RANGE, continuousService->getMaxWaitingTime().total_seconds() / 60);
+				pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, continuousService->getMaxWaitingTime().total_seconds() / 60);
 			}
 			pm.insert(DATA_LINE_STYLE, commercialLine->getStyle() ); //15
 			pm.insert(DATA_LINE_IMAGE, commercialLine->getImage() );

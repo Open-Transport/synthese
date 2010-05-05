@@ -151,7 +151,8 @@ namespace synthese
 				contentUpdateRequest.getAction()->setWebPage(const_pointer_cast<WebPage>(_page));
 				PropertiesHTMLTable t(contentUpdateRequest.getHTMLForm());
 				stream << t.open();
-				stream << t.cell("Contenu 1", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_CONTENT1, _page->getContent(), 20, 60));
+				stream << t.cell("Contenu", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_CONTENT1, _page->getContent(), 15, 60));
+				stream << t.cell("Résumé", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_ABSTRACT, _page->getAbstract(), 5, 60));
 				stream << t.close();
 			}
 		}

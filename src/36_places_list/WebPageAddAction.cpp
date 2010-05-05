@@ -167,19 +167,19 @@ namespace synthese
 			{
 				object.setContent(_template->getContent());
 				object.setParent(_template->getParent());
-
-				WebPageTableSync::ShiftRank(
-					_site->getKey(),
-					_template->getParent() ? _template->getParent()->getKey() : 0,
-					_rank,
-					true
-				);
 			}
 
 			if(_parent.get())
 			{
 				object.setParent(_parent.get());
 			}
+
+			WebPageTableSync::ShiftRank(
+				_site->getKey(),
+				object.getParent() ? object.getParent()->getKey() : 0,
+				_rank,
+				true
+			);
 
 			WebPageTableSync::Save(&object);
 

@@ -25,12 +25,15 @@
 #ifndef SYNTHESE_TimetableInterfacePage_H__
 #define SYNTHESE_TimetableInterfacePage_H__
 
-#include "InterfacePage.h"
-#include "FactorableTemplate.h"
 #include "Timetable.h"
 
 namespace synthese
 {
+	namespace transportwebsite
+	{
+		class WebPage;
+	}
+
 	namespace server
 	{
 		class Request;
@@ -45,8 +48,6 @@ namespace synthese
 			@ingroup m55Pages refPages
 			@author Hugues Romain
 			@date 2009
-
-			@code timetable @endcode
 
 			The parameters structure depends on the type of the timetable generator.
 
@@ -107,12 +108,26 @@ namespace synthese
 			Object : TimetableGenerator
 		*/
 		class TimetableInterfacePage
-			: public util::FactorableTemplate<interfaces::InterfacePage, TimetableInterfacePage>
 		{
 		public:
+			static const std::string DATA_GENERATOR_TYPE;
+			static const std::string DATA_TITLE;
+			static const std::string DATA_NOTES;
+			static const std::string DATA_CALENDAR_NAME;
+			static const std::string DATA_AT_LEAST_A_NOTE;
+			static const std::string DATA_CONTENT;
+
+			static const std::string DATA_SERVICES_IN_COLS_LINES_ROW;
+			static const std::string DATA_SERVICES_IN_COLS_SCHEDULES_ROWS;
+			static const std::string DATA_SERVICES_IN_COLS_ROLLING_STOCK_ROW;
+			static const std::string DATA_SERVICES_IN_COLS_RESERVATIONS_ROW;
+			static const std::string DATA_SERVICES_IN_COLS_NOTES_ROW;
+
+			static const std::string DATA_SERVICES_IN_ROWS_SCHEDULES_ROWS;
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Timetable display.
-			///	This function converts the parameters into a single ParametersVector object.
 			///	@param stream Stream to write on
 			///	@param object Timetable parameters
 			///	@param generator Used timetable generator
@@ -121,20 +136,19 @@ namespace synthese
 			///	@param request Source request
 			///	@author Hugues Romain
 			///	@date 2009
-			void display(
+			static void Display(
 				std::ostream& stream,
+				boost::shared_ptr<const transportwebsite::WebPage> page,
+				boost::shared_ptr<const transportwebsite::WebPage> notePage,
+				boost::shared_ptr<const transportwebsite::WebPage> noteCalendarPage,
+				boost::shared_ptr<const transportwebsite::WebPage> pageForSubTimetable,
+				boost::shared_ptr<const transportwebsite::WebPage> rowPage,
+				boost::shared_ptr<const transportwebsite::WebPage> cellPage,
+				const server::Request& request,
 				const timetables::Timetable& object,
 				const timetables::TimetableGenerator& generator,
-				const timetables::TimetableResult& result,
-				interfaces::VariablesMap& variables,
-				const server::Request* request = NULL
-			) const;
-			
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Constructor.
-			TimetableInterfacePage();
+				const timetables::TimetableResult& result
+			);
 
 
 

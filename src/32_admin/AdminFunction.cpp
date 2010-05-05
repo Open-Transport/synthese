@@ -140,7 +140,7 @@ namespace synthese
 							stream,
 							_page.get(),
 							_errorMessage,
-							StaticFunctionRequest<AdminFunction>(request, false)
+							StaticFunctionRequest<AdminFunction>(request, true)
 						);
 					}
 					else
@@ -149,7 +149,7 @@ namespace synthese
 						_page->display(
 							stream,
 							variables,
-							StaticFunctionRequest<AdminFunction>(request, false)
+							StaticFunctionRequest<AdminFunction>(request, true)
 						);
 				}	} else if(
 					_interface &&
@@ -159,7 +159,7 @@ namespace synthese
 						stream,
 						NULL,
 						_errorMessage,
-						StaticFunctionRequest<AdminFunction>(request, false)
+						StaticFunctionRequest<AdminFunction>(request, true)
 					);
 			}	}
 			catch (Exception e)

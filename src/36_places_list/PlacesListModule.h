@@ -34,6 +34,11 @@
 
 namespace synthese
 {
+	namespace server
+	{
+		class Request;
+	}
+
 	/**	@defgroup m56Actions 56 Actions
 		@ingroup m56
 
@@ -68,6 +73,9 @@ namespace synthese
 	/** 56 Transport website namespace. */
 	namespace transportwebsite
 	{
+		class Site;
+		class WebPage;
+
 		/** 56 Transport website module class. */
 		class PlacesListModule:
 			public server::ModuleClassTemplate<PlacesListModule>
@@ -75,6 +83,30 @@ namespace synthese
 		public:
 			typedef std::vector<std::pair<boost::optional<graph::UserClassCode>, std::string> > UserClassNames;
 			static UserClassNames GetAccessibilityNames();
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the site used by the current request.
+			/// @param request current request
+			/// @author Hugues Romain
+			/// @version 3.1.16
+			//////////////////////////////////////////////////////////////////////////
+			/// The current function must belong to this list :
+			///	<ul>
+			///		<li>A subclass from FunctionWithSiteBase (the site is read in the base class)</li>
+			///		<li>WebPageDisplayFunction (the site is read from the displayed page)</li>
+			///	</ul>
+			static boost::shared_ptr<const Site> GetSite(const server::Request& request);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the current displayed web page.
+			/// @param request current request
+			/// @author Hugues Romain
+			/// @version 3.1.16
+			//////////////////////////////////////////////////////////////////////////
+			/// The current function must be WebPageDisplayFunction
+			static boost::shared_ptr<const WebPage> GetWebPage(const server::Request& request);
 		};
 	}
 

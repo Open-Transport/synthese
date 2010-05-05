@@ -40,11 +40,12 @@ namespace synthese
 		///	@date 2010
 		///	@ingroup m56Functions refFunctions
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : WebPageDisplayFunction
+		/// Key : page
 		///
 		/// Parameters :
 		///	<ul>
-		///		<li>p : id of the page to display</li>
+		///		<li><b>p</b> : id of the page to display</li>
+		///		<li><b>use_template<b> : <u>1</u>|0 : 1=use the template to display the page, 0=display only the page content</li>
 		///		<li>all other parameters are available in the page (accessed by
 		///			the @ function (GetValueFunction)). </li>
 		///	</ul>
@@ -55,12 +56,14 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_PAGE_ID;	
+			static const std::string PARAMETER_USE_TEMPLATE;	
 			
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const WebPage>	_page;
 				server::ParametersMap _aditionnalParameters;
+				bool					_useTemplate;
 			//@}
 			
 			
@@ -84,16 +87,20 @@ namespace synthese
 			
 			
 		public:
+			WebPageDisplayFunction();
 
 			//! @name Setters
 			//@{
 				void setPage(boost::shared_ptr<const WebPage> value) { _page = value; }
+				void setUseTemplate(bool value){ _useTemplate = value; }
 				void setAditionnalParametersMap(const server::ParametersMap& value){ _aditionnalParameters = value; }
 			//@}
 
 			//! @name Getters
 			//@{
 				boost::shared_ptr<const WebPage> getPage() const { return _page; }
+				bool getUseTemplate() const { return _useTemplate; }
+				const server::ParametersMap& getAditionnalParametersMap() const { return _aditionnalParameters; }
 			//@}
 
 

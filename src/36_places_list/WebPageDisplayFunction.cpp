@@ -33,6 +33,7 @@
 #include "TransportWebsiteRight.h"
 
 using namespace std;
+using namespace boost;
 using namespace boost::posix_time;
 
 namespace synthese
@@ -43,11 +44,12 @@ namespace synthese
 	using namespace interfaces;
 	using namespace transportwebsite;
 
-	template<> const string util::FactorableTemplate<Function,WebPageDisplayFunction>::FACTORY_KEY("WebPageDisplayFunction");
+	template<> const string util::FactorableTemplate<Function,WebPageDisplayFunction>::FACTORY_KEY("page");
 	
 	namespace transportwebsite
 	{
 		const string WebPageDisplayFunction::PARAMETER_PAGE_ID("p");
+		const string WebPageDisplayFunction::PARAMETER_USE_TEMPLATE("use_template");
 
 		ParametersMap WebPageDisplayFunction::_getParametersMap() const
 		{
@@ -70,6 +72,9 @@ namespace synthese
 				throw RequestException("No such page");
 			}
 
+			_useTemplate = map.getDefault<bool>(PARAMETER_USE_TEMPLATE, true);
+			_aditionnalParameters = map;
+
 			if(	!_page->mustBeDisplayed()
 			){
 				throw RequestException("The page is not displayed right now");
@@ -82,7 +87,7 @@ namespace synthese
 		) const {
 			WebPageInterfacePage::Display(
 				stream,
-				Env::GetOfficialEnv().getEditableSPtr(_page->getTemplate()),
+				_useTemplate ? Env::GetOfficialEnv().getEditableSPtr(_page->getTemplate()) : shared_ptr<WebPage>(),
 				request,
 				_page,
 				false
@@ -102,6 +107,14 @@ namespace synthese
 		std::string WebPageDisplayFunction::getOutputMimeType() const
 		{
 			return "text/html";
+		}
+
+
+
+		WebPageDisplayFunction::WebPageDisplayFunction():
+		_useTemplate(true)
+		{
+
 		}
 	}
 }

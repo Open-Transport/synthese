@@ -103,9 +103,16 @@ namespace synthese
 			
 			CalendarTemplateElementAddAction();
 
-			void setCalendar(boost::shared_ptr<CalendarTemplate> value);
-			void setCalendar(boost::shared_ptr<const CalendarTemplate> value);
-			
+			//! @name Setters
+			//@{
+				void setCalendar(boost::shared_ptr<CalendarTemplate> value){ _calendar = value;}
+			//@}
+
+			//! @name Modifiers
+			//@{
+				void setDate(boost::gregorian::date value);
+			//@}
+
 			virtual bool isAuthorized(const server::Session* session) const;
 		};
 	}

@@ -24,51 +24,62 @@
 
 #include "TimetableNoteInterfacePage.h"
 #include "TimetableWarning.h"
-
-#include <boost/lexical_cast.hpp>
+#include "WebPage.h"
+#include "WebPageDisplayFunction.h"
+#include "StaticFunctionRequest.h"
+#include "CalendarDateInterfacePage.hpp"
 
 using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
-	using namespace interfaces;
 	using namespace util;
 	using namespace timetables;
-
-	namespace util
-	{
-		template<> const string FactorableTemplate<InterfacePage, timetables::TimetableNoteInterfacePage>::FACTORY_KEY("timetable_note");
-	}
+	using namespace calendar;
+	using namespace server;
+	using namespace transportwebsite;
+	using namespace server;
 
 	namespace timetables
 	{
-		TimetableNoteInterfacePage::TimetableNoteInterfacePage()
-			: FactorableTemplate<interfaces::InterfacePage, TimetableNoteInterfacePage>(),
-			Registrable(0)
-		{
-		}
-		
-		
+		const string TimetableNoteInterfacePage::DATA_NUMBER("number");
+		const string TimetableNoteInterfacePage::DATA_TEXT("text");
+		const string TimetableNoteInterfacePage::DATA_CALENDAR("calendar");
 
-		void TimetableNoteInterfacePage::display(
+
+
+		void TimetableNoteInterfacePage::Display(
 			std::ostream& stream,
-			const TimetableWarning& object,
-			VariablesMap& variables,
-			const server::Request* request /*= NULL*/
-		) const	{
-			ParametersVector pv;
+			boost::shared_ptr<const WebPage> page,
+			boost::shared_ptr<const transportwebsite::WebPage> calendarDatePage,
+			const server::Request& request,
+			const TimetableWarning& object
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm;
 		
-			pv.push_back(lexical_cast<string>(object.getNumber()));
-			pv.push_back(object.getText());
+			pm.insert(DATA_NUMBER, object.getNumber());
+			pm.insert(DATA_TEXT, object.getText());
 
-			InterfacePage::_display(
-				stream
-				, pv
-				, variables
-				, static_cast<const void*>(&object)
-				, request
-			);
+			if(calendarDatePage.get())
+			{
+				stringstream calendarContent;
+				const Calendar& calendar(object.getCalendar());
+				date firstDate(calendar.getFirstActiveDate().year(), calendar.getFirstActiveDate().month(), 1);
+				date lastDate(calendar.getLastActiveDate().end_of_month());
+				for(date day(firstDate); day <lastDate; day += days(1))
+				{
+					CalendarDateInterfacePage::Display(calendarContent, calendarDatePage, request, day, calendar.isActive(day));
+				}
+				pm.insert(DATA_CALENDAR, calendarContent.str());
+			}
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
 		}
 	}
 }

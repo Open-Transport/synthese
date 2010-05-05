@@ -43,11 +43,6 @@ namespace synthese
 		class CalendarTemplate;
 	}
 
-	namespace interfaces
-	{
-		class Interface;
-	}
-	
 	namespace timetables
 	{
 		class TimetableRow;
@@ -59,7 +54,7 @@ namespace synthese
 				- un masque de circulation de base (JC)
 				- Un titre
 			@author Hugues Romain
-			@date 2001
+			@date 2001-2010
 			@ingroup m55
 		*/
 		class Timetable
@@ -100,7 +95,7 @@ namespace synthese
 			//! @name Position
 			//@{
 				util::RegistryKeyType	_bookId;
-				int						_rank;
+				std::size_t				_rank;
 			//@}
 
 			//! @name Content
@@ -111,11 +106,6 @@ namespace synthese
 				Rows					_rows;
 				const calendar::CalendarTemplate*			_baseCalendar;
 				std::string				_title;
-			//@}
-
-			//! @name Appearance
-			//@{
-				const interfaces::Interface*	_interface;
 			//@}
 
 		public:
@@ -133,11 +123,10 @@ namespace synthese
 				void removeAuthorizedPhysicalStop(const pt::PhysicalStop* stop);
 				void clearAuthorizedPhysicalStops();
 				void setBookId(util::RegistryKeyType value) { _bookId = value; }
-				void setTitle(const std::string& title);
-				void setBaseCalendar(const calendar::CalendarTemplate* calendar);
-				void setRank(int value);
-				void setContentType(ContentType value);
-				void setInterface(const interfaces::Interface* value);
+				void setTitle(const std::string& value){ _title = value; }
+				void setBaseCalendar(const calendar::CalendarTemplate* value){ _baseCalendar = value; }
+				void setRank(std::size_t value){ _rank = value; }
+				void setContentType(ContentType value){ _contentType = value; }
 			//@}
 
 			//! @name Modifiers
@@ -149,13 +138,12 @@ namespace synthese
 			//@{
 				const TimetableGenerator::AuthorizedLines&	getAuthorizedLines() const;
 				const TimetableGenerator::AuthorizedPhysicalStops& getAuthorizedPhysicalStops() const;
-				const calendar::CalendarTemplate*	getBaseCalendar()		const;
-				const std::string&		getTitle()				const;
+				const calendar::CalendarTemplate*	getBaseCalendar()		const { return _baseCalendar; }
+				const std::string&		getTitle()				const { return _title; }
 				const Rows&				getRows()				const;
 				util::RegistryKeyType	getBookId()				const { return _bookId; }
-				int						getRank()				const;
-				ContentType				getContentType()		const;
-				const interfaces::Interface* getInterface()		const;
+				std::size_t				getRank()				const { return _rank; }
+				ContentType				getContentType()		const { return _contentType; }
 			//@}
 
 			//! @name Queries

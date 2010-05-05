@@ -10,18 +10,23 @@ synthese::transportwebsite::WebPageTableSync::integrate();
 
 synthese::transportwebsite::PlacesListModule::integrate();
 
-synthese::transportwebsite::CityListRequestInterfaceElement::integrate();
-synthese::transportwebsite::PlacesListRequestInterfaceElement::integrate();
+synthese::transportwebsite::PlacesListRequestFunction::integrate();
 synthese::transportwebsite::UserFavoriteListInterfaceElement::integrate();
-synthese::transportwebsite::WebPageFormInterfaceElement::integrate();
-synthese::transportwebsite::WebPageLinkInterfaceElement::integrate();
-synthese::transportwebsite::WebPageMenuInterfaceElement::integrate();
 
 synthese::transportwebsite::UserFavoriteInterfacePage::integrate();
 
+synthese::transportwebsite::WebPageMenuFunction::integrate();
+synthese::transportwebsite::WebPageLinkFunction::integrate();
+synthese::transportwebsite::WebPageFormFunction::integrate();
+synthese::transportwebsite::CityListRequestFunction::integrate();
 synthese::transportwebsite::CityListFunction::integrate();
 synthese::transportwebsite::PlacesListFunction::integrate();
 synthese::transportwebsite::WebPageDisplayFunction::integrate();
+synthese::transportwebsite::WebPageLastNewsFunction::integrate();
+synthese::transportwebsite::GetValueFunction::integrate();
+synthese::transportwebsite::IfFunction::integrate();
+synthese::transportwebsite::EqualFunction::integrate();
+synthese::transportwebsite::SuperiorFunction::integrate();
 
 synthese::transportwebsite::SiteUpdateAction::integrate();
 synthese::transportwebsite::AddUserFavoriteJourneyAction::integrate();

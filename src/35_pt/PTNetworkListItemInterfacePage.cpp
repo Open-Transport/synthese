@@ -53,6 +53,7 @@ namespace synthese
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
 			ParametersMap pm;
 		
 			pm.insert(Request::PARAMETER_OBJECT_ID, object.getKey());

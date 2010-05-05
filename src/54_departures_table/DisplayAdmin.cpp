@@ -290,7 +290,7 @@ namespace synthese
 				// View the display type
 				AdminFunctionRequest<DisplayTypeAdmin> displayTypeRequest(_request);
 				displayTypeRequest.getPage()->setType(
-					_getEnv().getSPtr(_displayScreen->getType())
+					Env::GetOfficialEnv().getSPtr(_displayScreen->getType())
 				);
 				
 				// Log search

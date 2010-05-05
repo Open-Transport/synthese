@@ -29,7 +29,6 @@
 #include "LineTableSync.h"
 #include "Timetable.h"
 #include "TimetableRow.h"
-#include "Interface.h"
 #include "TimetableInterfacePage.h"
 #include "Env.h"
 #include "City.h"
@@ -41,6 +40,7 @@
 #include "TimetableResult.hpp"
 #include "PhysicalStopTableSync.h"
 #include "ConnectionPlaceTableSync.h"
+#include "WebPage.h"
 
 using namespace std;
 using namespace boost;
@@ -51,11 +51,11 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace interfaces;
 	using namespace geography;
 	using namespace calendar;
 	using namespace graph;
 	using namespace pt;
+	using namespace transportwebsite;
 
 	template<> const string util::FactorableTemplate<Function,timetables::TimetableGenerateFunction>::FACTORY_KEY("TimetableGenerateFunction");
 	
@@ -64,7 +64,13 @@ namespace synthese
 		const string TimetableGenerateFunction::PARAMETER_CALENDAR_ID("cid");
 		const string TimetableGenerateFunction::PARAMETER_STOP_PREFIX("stop");
 		const string TimetableGenerateFunction::PARAMETER_CITY_PREFIX("city");
-		const string TimetableGenerateFunction::PARAMETER_INTERFACE_ID("i");
+
+		const string TimetableGenerateFunction::PARAMETER_PAGE_ID("page_id");
+		const string TimetableGenerateFunction::PARAMETER_NOTE_PAGE_ID("note_page_id");
+		const string TimetableGenerateFunction::PARAMETER_NOTE_CALENDAR_PAGE_ID("note_calendar_page_id");
+		const string TimetableGenerateFunction::PARAMETER_ROW_PAGE_ID("row_page_id");
+		const string TimetableGenerateFunction::PARAMETER_CELL_PAGE_ID("cell_page_id");
+		const string TimetableGenerateFunction::PARAMETER_PAGE_FOR_SUB_TIMETABLE_ID("page_for_sub_timetable_id");
 
 
 		TimetableGenerateFunction::TimetableGenerateFunction():
@@ -80,10 +86,6 @@ namespace synthese
 			ParametersMap map;
 			if(_timetable.get())
 			{
-				if(_timetable->getInterface())
-				{
-					map.insert(PARAMETER_INTERFACE_ID, _timetable->getInterface()->getKey());
-				}
 				if(_line.get())
 				{
 					map.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
@@ -137,32 +139,10 @@ namespace synthese
 				{
 					throw RequestException("No such timetable");
 				}
-
-				if(!_timetable->getInterface())
-				{
-					throw RequestException("This timetable has not interface");
-				}
-				// Control
-				if(!_timetable->getInterface()->hasPage<TimetableInterfacePage>())
-				{
-					throw RequestException("This timetable uses an incompatible interface");
-				}
 			}
 			else
 			{
 				shared_ptr<Timetable> timetable(new Timetable);
-
-				try
-				{
-					timetable->setInterface(
-						Env::GetOfficialEnv().get<Interface>(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID)).get()
-					);
-				}
-				catch(ObjectNotFoundException<Interface>&)
-				{
-					throw RequestException("No such interface");
-				}
-
 
 				if(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_ID))
 				{
@@ -283,6 +263,82 @@ namespace synthese
 */				}
 
 				_timetable = const_pointer_cast<const Timetable>(timetable);
+
+				// Display template
+
+				try
+				{
+					optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
+					if(id)
+					{
+						_page = Env::GetOfficialEnv().get<WebPage>(*id);
+					}
+				}
+				catch (ObjectNotFoundException<WebPage>& e)
+				{
+					throw RequestException("No such page : "+ e.getMessage());
+				}
+				try
+				{
+					optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_NOTE_PAGE_ID));
+					if(id) 
+					{
+						_notePage = Env::GetOfficialEnv().get<WebPage>(*id);
+					}
+				}
+				catch (ObjectNotFoundException<WebPage>& e)
+				{
+					throw RequestException("No such note row page : "+ e.getMessage());
+				}
+				try
+				{
+					optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_NOTE_CALENDAR_PAGE_ID));
+					if(id)
+					{
+						_noteCalendarPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					}
+				}
+				catch (ObjectNotFoundException<WebPage>& e)
+				{
+					throw RequestException("No such note calendar page : "+ e.getMessage());
+				}
+				try
+				{
+					optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_ROW_PAGE_ID));
+					if(id)
+					{
+						_rowPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					}
+				}
+				catch (ObjectNotFoundException<WebPage>& e)
+				{
+					throw RequestException("No such row page : "+ e.getMessage());
+				}
+				try
+				{
+					optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_CELL_PAGE_ID));
+					if(id) 
+					{
+						_cellPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					}
+				}
+				catch (ObjectNotFoundException<WebPage>& e)
+				{
+					throw RequestException("No such cell page : "+ e.getMessage());
+				}
+				try
+				{
+					optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_FOR_SUB_TIMETABLE_ID));
+					if(id) 
+					{
+						_pageForSubTimetable = Env::GetOfficialEnv().get<WebPage>(*id);
+					}
+				}
+				catch (ObjectNotFoundException<WebPage>& e)
+				{
+					throw RequestException("No such page for sub timetable : "+ e.getMessage());
+				}
+
 			}
 		}
 
@@ -290,9 +346,19 @@ namespace synthese
 		{
 			auto_ptr<TimetableGenerator> generator(_timetable->getGenerator(Env::GetOfficialEnv()));
 			TimetableResult result(generator->build());
-			const TimetableInterfacePage* page(_timetable->getInterface()->getPage<TimetableInterfacePage>());
-			VariablesMap variables;
-			page->display(stream, *_timetable, *generator, result, variables, &request);
+			TimetableInterfacePage::Display(
+				stream,
+				_page,
+				_notePage,
+				_noteCalendarPage,
+				_pageForSubTimetable,
+				_rowPage,
+				_cellPage,
+				request,
+				*_timetable,
+				*generator,
+				result
+			);
 		}
 		
 		
@@ -306,7 +372,7 @@ namespace synthese
 
 		std::string TimetableGenerateFunction::getOutputMimeType() const
 		{
-			return "text/html";
+			return _page.get() ? _page->getMimeType() : "text/plain";
 		}
 	}
 }

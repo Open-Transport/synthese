@@ -47,6 +47,7 @@ namespace synthese
 	{
 		const string WebPageContentUpdateAction::PARAMETER_WEB_PAGE_ID = Action_PARAMETER_PREFIX + "wp";
 		const string WebPageContentUpdateAction::PARAMETER_CONTENT1 = Action_PARAMETER_PREFIX + "c1";
+		const string WebPageContentUpdateAction::PARAMETER_ABSTRACT = Action_PARAMETER_PREFIX + "ab";
 		
 		
 		
@@ -56,6 +57,8 @@ namespace synthese
 			if(_page.get())
 			{
 				map.insert(PARAMETER_WEB_PAGE_ID, _page->getKey());
+				map.insert(PARAMETER_CONTENT1, _content1);
+				map.insert(PARAMETER_ABSTRACT, _abstract);
 			}
 			return map;
 		}
@@ -74,6 +77,7 @@ namespace synthese
 			}
 
 			_content1 = map.getDefault<string>(PARAMETER_CONTENT1);
+			_abstract = map.getDefault<string>(PARAMETER_ABSTRACT);
 		}
 		
 		
@@ -84,6 +88,7 @@ namespace synthese
 			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			_page->setContent(_content1);
+			_page->setAbstract(_abstract);
 
 			WebPageTableSync::Save(_page.get());
 

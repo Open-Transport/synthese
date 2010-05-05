@@ -304,6 +304,7 @@ namespace synthese
 				boost::shared_ptr<const transportwebsite::WebPage> warningPage,
 				boost::shared_ptr<const transportwebsite::WebPage> reservationPage,
 				boost::shared_ptr<const transportwebsite::WebPage> durationPage,
+				boost::shared_ptr<const transportwebsite::WebPage> textDurationPage,
 				boost::shared_ptr<const transportwebsite::WebPage> mapPage,
 				boost::shared_ptr<const transportwebsite::WebPage> mapLinePage,
 				boost::shared_ptr<const transportwebsite::WebPage> dateTimePage,

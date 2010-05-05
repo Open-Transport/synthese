@@ -352,6 +352,22 @@ namespace synthese
 				}
 			}
 
+			// Group by
+			if(!_groups.empty())
+			{
+				s << " GROUP BY ";
+				bool first(true);
+				BOOST_FOREACH(const GroupsType::value_type& group, _groups)
+				{
+					if(!first)
+					{
+						s << ",";
+					}
+					s << group->toString();
+					first = false;
+				}
+			}
+
 			// Order
 			if(!_orders.empty())
 			{

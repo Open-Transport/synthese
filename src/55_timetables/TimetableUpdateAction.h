@@ -36,17 +36,22 @@ namespace synthese
 		class CalendarTemplate;
 	}
 
-	namespace interfaces
-	{
-		class Interface;
-	}
-
 	namespace timetables
 	{
 
-		/** TimetableUpdateAction action class.
-			@ingroup m55Actions refActions
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 55.15 Action : pre-configured timetable properties update
+		///	@ingroup m55Actions refActions
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Parameters :
+		///	<ul>
+		///		<li>actionParamti : timetable id</li>
+		///		<li>actionParamci : base calendar id</li>
+		///		<li>actionParamtt : title</li>
+		///		<li>actionParamfo : format</li>
+		///		<li>actionParamco : container id</li>
+		///	</ul>
 		class TimetableUpdateAction
 			: public util::FactorableTemplate<server::Action, TimetableUpdateAction>
 		{
@@ -55,7 +60,6 @@ namespace synthese
 			static const std::string PARAMETER_BASE_CALENDAR_ID;
 			static const std::string PARAMETER_TITLE;
 			static const std::string PARAMETER_FORMAT;
-			static const std::string PARAMETER_INTERFACE_ID;
 			static const std::string PARAMETER_CONTAINER_ID;
 
 		private:
@@ -63,7 +67,6 @@ namespace synthese
 			boost::shared_ptr<const Timetable> _container;
 			boost::shared_ptr<const calendar::CalendarTemplate> _calendarTemplate;
 			std::string _title;
-			boost::shared_ptr<const interfaces::Interface> _interface;
 			Timetable::ContentType _format;
 
 
