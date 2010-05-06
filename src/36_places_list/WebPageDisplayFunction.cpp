@@ -85,13 +85,16 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			WebPageInterfacePage::Display(
-				stream,
-				_useTemplate ? Env::GetOfficialEnv().getEditableSPtr(_page->getTemplate()) : shared_ptr<WebPage>(),
-				request,
-				_page,
-				false
-			);
+			if(_page.get())
+			{
+				WebPageInterfacePage::Display(
+					stream,
+					_useTemplate ? Env::GetOfficialEnv().getEditableSPtr(_page->getTemplate()) : shared_ptr<WebPage>(),
+					request,
+					*_page,
+					false
+				);
+			}
 		}
 		
 		

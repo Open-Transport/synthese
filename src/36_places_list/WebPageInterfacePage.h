@@ -70,7 +70,7 @@ namespace synthese
 				std::ostream& stream,
 				boost::shared_ptr<const WebPage> templatePage,
 				const server::Request& request,
-				boost::shared_ptr<const WebPage> page,
+				const WebPage& page,
 				bool edit
 			);
 		};

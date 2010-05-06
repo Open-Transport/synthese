@@ -42,10 +42,27 @@ namespace synthese
 		class TransportNetwork;
 	
 		////////////////////////////////////////////////////////////////////
-		/// Lines list public Function class.
+		/// 35.15 Function : Lines list public Function class.
 		/// @author Hugues Romain
 		///	@date 2008
 		///	@ingroup m35Functions refFunctions
+		//////////////////////////////////////////////////////////////////////////
+		/// <h2>Parameters</h2>
+		///
+		///	<ul>
+		///		<li>ni : id of the network of the lines</li>
+		///		<li>pi (optional) : id of the display template to use for each line. If pi is not
+		///		specified, then an XML output is generated instead.</li>
+		///	</ul>
+		///
+		/// <h2>Output</h2>
+		/// <h3>Use of display template</h3>
+		///
+		/// The display template is handled by LineMarkerInterfacePage::Display.
+		///
+		/// <h3>XML output (if no display template is specified)</h3>
+		///
+		/// To be specified.
 		class LinesListFunction:
 			public util::FactorableTemplate<server::Function,LinesListFunction>
 		{

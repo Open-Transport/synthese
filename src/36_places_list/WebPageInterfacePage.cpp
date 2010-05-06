@@ -48,7 +48,7 @@ namespace synthese
 			std::ostream& stream,
 			boost::shared_ptr<const WebPage> templatePage,
 			const server::Request& request,
-			boost::shared_ptr<const WebPage> page,
+			const WebPage& page,
 			bool edit
 		){
 			if(templatePage.get())
@@ -61,18 +61,18 @@ namespace synthese
 					ParametersMap()
 				);
 
-				pm.insert(DATA_TITLE, page->getName());
+				pm.insert(DATA_TITLE, page.getName());
 				stringstream content;
-				page->display(content, request);
+				page.display(content, request);
 				pm.insert(DATA_CONTENT, content.str());
-				pm.insert(Request::PARAMETER_OBJECT_ID, page->getKey());
+				pm.insert(Request::PARAMETER_OBJECT_ID, page.getKey());
 
 				displayRequest.getFunction()->setAditionnalParametersMap(pm);
 				displayRequest.run(stream);
 			}
 			else
 			{
-				page->display(stream, request);
+				page.display(stream, request);
 			}
 		}
 	}
