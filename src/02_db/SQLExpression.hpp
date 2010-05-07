@@ -217,12 +217,16 @@ namespace synthese
 		public:
 			ValueExpression(const boost::posix_time::ptime& value) {
 				std::stringstream s;
-				s << "'";
-				if(!value.is_not_a_date_time())
+				if(value.is_not_a_date_time())
 				{
-					s << boost::gregorian::to_iso_extended_string(value.date()) << " " << boost::posix_time::to_simple_string(value.time_of_day());
+					s << "NULL";
 				}
-				s << "'";
+				else
+				{
+					s << "'" <<
+						boost::gregorian::to_iso_extended_string(value.date()) << " " << boost::posix_time::to_simple_string(value.time_of_day()) <<
+						"'"
+					;
 				_value = s.str();
 			}
 			virtual std::string toString() const { return _value; }
@@ -239,12 +243,16 @@ namespace synthese
 		public:
 			ValueExpression(const boost::gregorian::date& value) {
 				std::stringstream s;
-				s << "'";
-				if(!value.is_not_a_date())
+				if(value.is_not_a_date())
 				{
-					s << boost::gregorian::to_iso_extended_string(value);
+					s << "NULL";
 				}
-				s << "'";
+				else
+				{
+					s << "'"
+						<< boost::gregorian::to_iso_extended_string(value)
+						<< "'";
+				}
 				_value = s.str();
 			}
 			virtual std::string toString() const { return _value; }

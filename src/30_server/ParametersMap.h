@@ -34,6 +34,7 @@
 #include <boost/optional.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 namespace synthese
 {
@@ -289,7 +290,7 @@ namespace synthese
 				{
 					throw ParametersMap::MissingParameterException(parameterName);
 				}
-				return boost::lexical_cast<C>(it->second);
+				return boost::lexical_cast<C>(boost::trim_copy(it->second));
 			}
 			catch(...)
 			{

@@ -404,13 +404,22 @@ namespace synthese
 		ParametersMap DBLogHTMLView::getParametersMap(
 		) const {
 			ParametersMap m(_requestParameters.getParametersMap());
-			m.insert(_getParameterName(PARAMETER_SEARCH_USER), _searchUserId);
+			if(_searchUserId)
+			{
+				m.insert(_getParameterName(PARAMETER_SEARCH_USER), *_searchUserId);
+			}
 			m.insert(_getParameterName(PARAMETER_SEARCH_TYPE), static_cast<int>(_searchLevel));
 			m.insert(_getParameterName(PARAMETER_START_DATE), _searchStartDate);
 			m.insert(_getParameterName(PARAMETER_END_DATE), _searchEndDate);
 			m.insert(_getParameterName(PARAMETER_SEARCH_TEXT), _searchText);
-			m.insert(_getParameterName(PARAMETER_OBJECT_ID), _searchObjectId);
-			m.insert(_getParameterName(PARAMETER_OBJECT_ID2), _searchObjectId2);
+			if(_searchObjectId)
+			{
+				m.insert(_getParameterName(PARAMETER_OBJECT_ID), *_searchObjectId);
+			}
+			if(_searchObjectId2)
+			{
+				m.insert(_getParameterName(PARAMETER_OBJECT_ID2), *_searchObjectId2);
+			}
 			return m;
 		}
 	}

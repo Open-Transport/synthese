@@ -369,7 +369,7 @@ namespace synthese
 					entryType == RADIO_CALL ||
 					entryType == OUTGOING_CALL ||
 					entry.getObjectId2() > 0
-				){
+				) try {
 					AdminFunctionRequest<ResaEditLogEntryAdmin> openCallRequest(
 						dynamic_cast<const AdminRequest& >(searchRequest)
 					);
@@ -381,6 +381,9 @@ namespace synthese
 							).getFunction()->getEnv()
 					)	);
 					stream << HTMLModule::getLinkButton(openCallRequest.getURL(), "Ouvrir", string(), GetIconURL(CALL_ENTRY));
+				} catch(...)
+				{
+
 				}
 			
 				result.push_back(stream.str());

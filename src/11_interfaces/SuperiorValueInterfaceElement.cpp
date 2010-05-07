@@ -27,9 +27,11 @@
 
 #include <string>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 using namespace boost;
 using namespace std;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -50,7 +52,10 @@ namespace synthese
 			, const void* object
 			, const server::Request* request) const
 		{
-			stream << (boost::lexical_cast<RegistryKeyType>(_left->getValue(parameters, variables, object, request)) > boost::lexical_cast<RegistryKeyType>(_right->getValue(parameters, variables, object, request))) ? "1" : "0";
+			stream << (
+					lexical_cast<RegistryKeyType>(trim_copy(_left->getValue(parameters, variables, object, request))) >
+					lexical_cast<RegistryKeyType>(trim_copy(_right->getValue(parameters, variables, object, request)))
+				) ? "1" : "0";
 			return string();
 		}
 
