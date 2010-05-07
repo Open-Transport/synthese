@@ -251,8 +251,8 @@ namespace synthese
 					snow += hours(24);
 				}
 				query <<
-					" AND s." << ScheduledServiceTableSync::COL_SCHEDULES << ">='00:00:00#" <<
-					to_simple_string(snow) << "'" ;
+					" AND s." << ScheduledServiceTableSync::COL_SCHEDULES << ">='00:00:00#00:" <<
+					to_simple_string(snow).substr(0, 5) << "'" ;
 			}
 			
 			if(orderByService)
