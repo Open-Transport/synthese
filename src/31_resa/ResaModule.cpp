@@ -167,7 +167,10 @@ namespace synthese
 				stream << " de " << (*itrs)->getDeparturePlaceName();
 				stream << " le " << (*itrs)->getDepartureTime().date().day_of_week() << " " << (*itrs)->getDepartureTime();
 				stream << " jusqu'à " << (*itrs)->getArrivalPlaceName();
-				stream << " le " << (*itrs)->getArrivalTime().date().day_of_week() << " " << (*itrs)->getArrivalTime();
+				if(!(*itrs)->getArrivalTime().is_not_a_date_time())
+				{
+					stream << " le " << (*itrs)->getArrivalTime().date().day_of_week() << " " << (*itrs)->getArrivalTime();
+				}
 				stream << "</li>";
 			}
 			stream << "</ul>";
