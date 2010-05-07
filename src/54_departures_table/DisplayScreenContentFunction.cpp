@@ -177,7 +177,7 @@ namespace synthese
 				}
 				
 				// Date
-				if(!map.getDefault<string>(PARAMETER_DATE).empty())
+				if(!map.getDefault<string>(PARAMETER_DATE).empty() && map.getDefault<string>(PARAMETER_DATE) != "A")
 				{
 					_date = time_from_string(map.get<string>(PARAMETER_DATE));
 				}
