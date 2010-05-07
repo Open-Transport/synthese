@@ -227,6 +227,7 @@ namespace synthese
 						boost::gregorian::to_iso_extended_string(value.date()) << " " << boost::posix_time::to_simple_string(value.time_of_day()) <<
 						"'"
 					;
+				}
 				_value = s.str();
 			}
 			virtual std::string toString() const { return _value; }
