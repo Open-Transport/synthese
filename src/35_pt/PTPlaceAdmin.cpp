@@ -44,6 +44,11 @@
 #include "StopAreaUpdateAction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "StopAreaNameUpdateAction.hpp"
+#include "PTPhysicalStopAdmin.h"
+#include "LineStop.h"
+#include "Line.h"
+#include "CommercialLine.h"
+#include "PhysicalStopAddAction.h"
 
 using namespace std;
 using namespace boost;
@@ -56,7 +61,7 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace pt;
-	using namespace pt;
+	using namespace graph;
 	using namespace geography;
 	using namespace road;
 	using namespace html;
@@ -182,23 +187,63 @@ namespace synthese
 			// TAB STOPS
 			if (openTabContent(stream, TAB_STOPS))
 			{
+				AdminFunctionRequest<PTPhysicalStopAdmin> openRequest(request);
+
+				AdminActionFunctionRequest<PhysicalStopAddAction,PTPlaceAdmin> addRequest(request);
+				addRequest.getAction()->setPlace(const_pointer_cast<PublicTransportStopZoneConnectionPlace>(_connectionPlace));
+
+				HTMLForm f(addRequest.getHTMLForm());
+				stream << f.open();
+
 				HTMLTable::ColsVector c;
 				c.push_back("Nom");
+				c.push_back("Code exploitant");
 				c.push_back("X");
 				c.push_back("Y");
 				c.push_back("Lignes");
+				c.push_back("Actions");
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
 				BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 				{
 					const PhysicalStop* stop(it.second);
+					openRequest.getPage()->setStop(Env::GetOfficialEnv().getSPtr(stop));
+
 					stream << t.row();
 					stream << t.col() << stop->getName();
+					stream << t.col() << stop->getCodeBySource();
 					stream << t.col() << stop->getX();
 					stream << t.col() << stop->getY();
+
+					// Lines cell
 					stream << t.col();
+					set<const CommercialLine*> lines;
+					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
+					{
+						lines.insert(
+							static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
+						);
+					}
+					BOOST_FOREACH(const CommercialLine* line, lines)
+					{
+						stream <<
+							"<span class=\"line " << line->getStyle() << "\">" <<
+							line->getShortName() <<
+							"</span>"
+						;
+					}
+
+					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPhysicalStopAdmin::ICON);
 				}
-				stream << t.close();
+				stream << t.row();
+				stream << t.col() << f.getTextInput(PhysicalStopAddAction::PARAMETER_NAME, string());
+				stream << t.col() << f.getTextInput(PhysicalStopAddAction::PARAMETER_OPERATOR_CODE, string());
+				stream << t.col() << f.getTextInput(PhysicalStopAddAction::PARAMETER_X, string());
+				stream << t.col() << f.getTextInput(PhysicalStopAddAction::PARAMETER_Y, string());
+				stream << t.col();
+				stream << t.col() << f.getSubmitButton("Ajouter");
+
+				stream << t.close() << f.close();
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -384,16 +429,14 @@ namespace synthese
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
-			
-			// const PTPlaceAdmin* ua(
-			//	dynamic_cast<const PTPlaceAdmin*>(&currentPage)
-			// );
-			
-			// if(ua)
-			// {
-			//	shared_ptr<PTPlaceAdmin> p(getNewOtherPage<PTPlaceAdmin>());
-			//	AddToLinks(links, p);
-			// }
+
+
+			BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
+			{
+				shared_ptr<PTPhysicalStopAdmin> p(getNewOtherPage<PTPhysicalStopAdmin>());
+				p->setStop(Env::GetOfficialEnv().getSPtr(it.second));
+				links.push_back(p);
+			}
 			
 			return links;
 		}

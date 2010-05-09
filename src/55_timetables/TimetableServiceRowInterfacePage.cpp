@@ -65,6 +65,7 @@ namespace synthese
 		const string TimetableServiceRowInterfacePage::DATA_LINE_PICTURE("line_picture");
 		const string TimetableServiceRowInterfacePage::DATA_ROLLING_STOCK_ID("rolling_stock_id");
 		const string TimetableServiceRowInterfacePage::DATA_RANK("rank");
+		const string TimetableServiceRowInterfacePage::DATA_RANK_IS_ODD("rank_is_odd");
 		const string TimetableServiceRowInterfacePage::DATA_FOLLOWING_SERVICES_WITH_SAME_DEPARTURE_HOUR("following_services_with_same_departure_hour");
 		const string TimetableServiceRowInterfacePage::DATA_LINE_DESTINATION_CITY_ID("line_destination_city_id");
 		const string TimetableServiceRowInterfacePage::DATA_LINE_DESTINATION_CITY_NAME("line_destination_city_name");
@@ -94,7 +95,11 @@ namespace synthese
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
 			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
 		
 			pm.insert(DATA_DEPARTURE_HOUR, Service::GetTimeOfDay(object.getContent().begin()->second).hours()); //0
 			pm.insert(DATA_DEPARTURE_MINUTES, Service::GetTimeOfDay(object.getContent().begin()->second).minutes()); //1
@@ -136,6 +141,7 @@ namespace synthese
 				pm.insert(DATA_ROLLING_STOCK_ID, object.getLine()->getRollingStock()->getKey()); //10
 			}
 			pm.insert(DATA_RANK, rank);
+			pm.insert(DATA_RANK_IS_ODD, rank % 2);
 			pm.insert(DATA_FOLLOWING_SERVICES_WITH_SAME_DEPARTURE_HOUR, followingServicesWithSameHour); //12
 
 			const PublicTransportStopZoneConnectionPlace* lastPlace(object.getLine()->getDestination()->getConnectionPlace());

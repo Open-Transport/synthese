@@ -43,6 +43,7 @@ synthese::pt::PTNetworksAdmin::integrate();
 synthese::pt::PTPlaceAdmin::integrate();
 synthese::pt::PTUseRuleAdmin::integrate();
 synthese::pt::PTUseRulesAdmin::integrate();
+synthese::pt::PTPhysicalStopAdmin::integrate();
 
 synthese::pt::RealTimeUpdateFunction::integrate();
 synthese::pt::PhysicalStopsCSVExportFunction::integrate();
@@ -78,6 +79,8 @@ synthese::pt::ServiceApplyCalendarAction::integrate();
 synthese::pt::LineStopAddAction::integrate();
 synthese::pt::LineStopRemoveAction::integrate();
 synthese::pt::ServiceDateChangeAction::integrate();
+synthese::pt::PhysicalStopUpdateAction::integrate();
+synthese::pt::PhysicalStopAddAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 

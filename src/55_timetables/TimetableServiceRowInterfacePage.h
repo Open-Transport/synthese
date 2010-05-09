@@ -74,6 +74,7 @@ namespace synthese
 			static const std::string DATA_LINE_PICTURE;
 			static const std::string DATA_ROLLING_STOCK_ID;
 			static const std::string DATA_RANK;
+			static const std::string DATA_RANK_IS_ODD;
 			static const std::string DATA_FOLLOWING_SERVICES_WITH_SAME_DEPARTURE_HOUR;
 			static const std::string DATA_LINE_DESTINATION_CITY_ID;
 			static const std::string DATA_LINE_DESTINATION_CITY_NAME;
@@ -114,7 +115,8 @@ namespace synthese
 			///		<li>8 : Line style</li>
 			///		<li>9 : Line picture</li>
 			///		<li>10 : Rolling stock id</li>
-			///		<li>11 : Rank</li>
+			///		<li>rank : Rank</li>
+			///		<li>rank_is_odd : rank is odd</li>
 			///		<li>12 : Following services with same departure hour</li>
 			///		<li>13 : Line destination city id</li>
 			///		<li>14 : Line destination city name</li>

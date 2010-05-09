@@ -44,6 +44,7 @@
 #include "PTPlaceAdmin.h"
 #include "PTUseRulesAdmin.h"
 #include "PTUseRuleAdmin.h"
+#include "PTPhysicalStopAdmin.h"
 
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "LineMarkerInterfacePage.h"
@@ -70,6 +71,8 @@
 #include "LineStopAddAction.h"
 #include "LineStopRemoveAction.h"
 #include "ServiceDateChangeAction.h"
+#include "PhysicalStopUpdateAction.h"
+#include "PhysicalStopAddAction.h"
 
 #include "TransportNetworkRight.h"
 

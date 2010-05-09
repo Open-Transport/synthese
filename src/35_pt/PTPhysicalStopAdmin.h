@@ -89,6 +89,9 @@ namespace synthese
 			///	@author Hugues
 			///	@date 2009
 			PTPhysicalStopAdmin();
+
+
+			void setStop(boost::shared_ptr<const PhysicalStop> value){ _stop = value; }
 			
 			
 			
@@ -136,7 +139,7 @@ namespace synthese
 			///	@author Hugues
 			///	@date 2009
 			bool isAuthorized(
-				const admin::AdminRequest& request
+				const security::User& user
 			) const;
 
 
@@ -147,6 +150,9 @@ namespace synthese
 			///	@author Hugues
 			///	@date 2009
 			virtual std::string getTitle() const;
+
+
+			AdminInterfaceElement::PageLinks _getCurrentTreeBranch() const;
 		};
 	}
 }
