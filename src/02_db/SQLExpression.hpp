@@ -44,6 +44,7 @@ namespace synthese
 		{
 		public:
 			virtual std::string toString() const = 0;
+			virtual ~SQLExpression() {}
 		};
 
 		class FieldExpression:
