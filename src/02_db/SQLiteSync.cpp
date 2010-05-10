@@ -23,7 +23,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "DBModule.h"
-#include "Conversion.h"
 #include "Log.h"
 #include "Factory.h"
 #include "02_db/Constants.h"
@@ -35,6 +34,7 @@
 
 #include <sqlite3.h>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -45,12 +45,9 @@ namespace synthese
 
 	namespace db
 	{
-
-
 		SQLiteSync::SQLiteSync ()
 		: _isRegistered (false)
 		{
-
 		}
 
 
@@ -134,8 +131,11 @@ namespace synthese
 				SQLiteCachedResult* const cachedResult = new SQLiteCachedResult (columnNames);
 				
 				SQLiteResultRow values;
-				values.push_back (new SQLiteValue (Conversion::ToString (event.rowId)));
-								cachedResult->addRow (values);
+				values.push_back(
+					shared_ptr<SQLiteValue>(
+						new SQLiteValue(lexical_cast<string>(event.rowId)
+				)	);
+				cachedResult->addRow (values);
 				
 				tableSync->rowsRemoved (emitter, this, SQLiteResultSPtr (cachedResult));
 		    }
