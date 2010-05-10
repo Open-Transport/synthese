@@ -165,7 +165,7 @@ namespace synthese
 
 
 
-		boost::shared_ptr<SQLiteValue> SQLiteResult::getValueSPtr( int column ) const
+		boost::shared_ptr<SQLiteValue> SQLiteDummyResult::getValueSPtr( int column ) const
 		{
 			throw SQLiteException ("Dummy result..."); 
 		}
