@@ -662,11 +662,11 @@ namespace synthese
 				const PTRoutePlannerResult::PlaceList& placesList(
 					result.getOrderedPlaces()
 				);
-				typedef vector<ostringstream*> PlacesContentVector;
+				typedef vector<shared_ptr<ostringstream> > PlacesContentVector;
 				PlacesContentVector sheetRows(placesList.size());
 				BOOST_FOREACH(PlacesContentVector::value_type& stream, sheetRows)
 				{
-					stream = new ostringstream;
+					stream.reset(new ostringstream);
 				}
 
 				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, result.getJourneys())
