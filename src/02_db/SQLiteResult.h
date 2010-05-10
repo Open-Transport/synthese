@@ -17,13 +17,12 @@ namespace synthese
 		class SQLiteResult;
 
 		typedef boost::shared_ptr<SQLiteResult> SQLiteResultSPtr;
-		typedef std::vector<SQLiteValue*> SQLiteResultRow;
+		typedef std::vector<boost::shared_ptr<SQLiteValue> > SQLiteResultRow;
 	    
-
-		/** Interface for access to a SQLite query result.
-
-		 @ingroup m10
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Interface for access to a SQLite query result.
+		/// @ingroup m10
+		/// @author Marc Jambert
 		class SQLiteResult 
 		{
 		 public:
@@ -46,9 +45,10 @@ namespace synthese
 			virtual std::string getColumnName (int column) const = 0;
 			virtual int getColumnIndex (const std::string& columnName) const;
 
-			virtual SQLiteValue* getValue (int column) const = 0;
-			virtual SQLiteValue* getValue (const std::string& name) const;
-
+			virtual SQLiteValue getValue (int column) const = 0;
+			virtual boost::shared_ptr<SQLiteValue> getValueSPtr (int column) const = 0;
+			virtual SQLiteValue getValue (const std::string& name) const;
+			
 			virtual std::string getText (int column) const;
 			virtual std::string getText (const std::string& name) const;
 
@@ -89,17 +89,11 @@ namespace synthese
 			std::vector<int> computeMaxColWidths () const;
 		    
 			virtual util::RegistryKeyType getKey() const;
-
 		};
 
 
-
 		std::ostream& operator<< ( std::ostream& os, const SQLiteResult& op );
-
 	}
 }
 
-
-
 #endif
-

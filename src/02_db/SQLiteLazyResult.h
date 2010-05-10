@@ -8,59 +8,46 @@
 namespace synthese
 {
 
-namespace db
-{
+	namespace db
+	{
+		//////////////////////////////////////////////////////////////////////////
+		/// Implementation class for access to a SQLite query result.
+		/// @author Marc Jambert
+		/// @ingroup m10
+		/// @date 2007
+		class SQLiteLazyResult:
+			public SQLiteResult
+		{
+		 public:
 
+		 private:
+			SQLiteStatementSPtr _statement;
+			mutable int _pos;
 
-/** Implementation class for access to a SQLite query result.
+			SQLiteLazyResult (SQLiteStatementSPtr statement);
 
- @ingroup m10
-*/
-class SQLiteLazyResult : public SQLiteResult
-{
- public:
+		 public:
 
- private:
+			~SQLiteLazyResult ();
+		    
+			//! @name Query methods.
+			//@{
+				virtual void reset () const;
+				virtual bool next () const;
 
-    SQLiteStatementSPtr _statement;
-    mutable int _pos;
+				virtual int getNbColumns () const;
 
-    SQLiteLazyResult (SQLiteStatementSPtr statement);
+				virtual std::string getColumnName (int column) const;
 
- public:
+				virtual SQLiteValue getValue (int column) const;
+				virtual boost::shared_ptr<SQLiteValue> getValueSPtr(int column) const;
+			//@}
 
-    ~SQLiteLazyResult ();
-    
-    //! @name Query methods.
-    //@{
+		 private:
 
-    void reset () const;
-    bool next () const;
-
-    int getNbColumns () const;
-
-    std::string getColumnName (int column) const;
-
-    SQLiteValue* getValue (int column) const;
-
-
-    //@}
-
- private:
-
-    friend class SQLiteHandle;
-
-    
-
-};
-
-
-
-
-
+			friend class SQLiteHandle;
+		};
+	}
 }
-}
-
 
 #endif
-

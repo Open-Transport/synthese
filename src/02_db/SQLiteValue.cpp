@@ -21,13 +21,15 @@
 */
 
 #include "SQLiteValue.h"
-#include "Conversion.h"
 #include "SQLiteException.h"
 
 #include <iomanip>
 #include <boost/date_time/posix_time/time_formatters.hpp>
 #include <boost/date_time/posix_time/time_parsers.hpp>
+#include <boost/lexical_cast.hpp>
 
+using namespace std;
+using namespace boost;
 using namespace boost::posix_time;
 
 namespace synthese
@@ -43,20 +45,24 @@ namespace synthese
 			switch (type)
 			{
 			case SQLITE_INTEGER:
-			_value = Conversion::ToString (sqlite3_value_int64 (value));
-			break;
+				_value = lexical_cast<string>(sqlite3_value_int64 (value));
+				break;
+
 			case SQLITE_FLOAT:
-			_value = Conversion::ToString (sqlite3_value_double (value));
-			break;
+				_value = lexical_cast<string>(sqlite3_value_double (value));
+				break;
+	
 			case SQLITE_BLOB:
-			_value.assign ((const char*) sqlite3_value_blob (value), sqlite3_value_bytes (value));
-			break;
+				_value.assign(static_cast<const char*>(sqlite3_value_blob(value)), sqlite3_value_bytes (value));
+				break;
+		
 			case SQLITE_NULL:
-			_value = "";
-			break;
+				_value = "";
+				break;
+		
 			case SQLITE_TEXT:
-			_value.assign ((const char*) sqlite3_value_text (value));
-			break;
+				_value.assign(static_cast<const char*>(sqlite3_value_text(value)));
+				break;
 			}
 		}
 

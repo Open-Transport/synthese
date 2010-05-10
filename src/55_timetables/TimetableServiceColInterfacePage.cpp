@@ -88,7 +88,11 @@ namespace synthese
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
 			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
 
 			pm.insert(DATA_TYPE, TYPE_LINE); //0
 		
@@ -119,7 +123,11 @@ namespace synthese
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
 			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
 
 			pm.insert(DATA_TYPE, TYPE_LINE); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
@@ -150,7 +158,12 @@ namespace synthese
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
 			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
+
 
 			pm.insert(DATA_TYPE, TYPE_TIME); //0
 		
@@ -198,7 +211,11 @@ namespace synthese
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
 			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
 
 			pm.insert(DATA_TYPE, TYPE_TIME); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
@@ -225,7 +242,11 @@ namespace synthese
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
 			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
 
 			pm.insert(DATA_TYPE, TYPE_NOTE); //0
 		
@@ -256,7 +277,11 @@ namespace synthese
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
 			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
 
 			pm.insert(DATA_TYPE, TYPE_NOTE); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
@@ -282,7 +307,11 @@ namespace synthese
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
 			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
 
 			pm.insert(DATA_TYPE, TYPE_ROLLING_STOCK); //0
 
@@ -312,7 +341,11 @@ namespace synthese
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
 			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
 
 			pm.insert(DATA_TYPE, TYPE_ROLLING_STOCK); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1

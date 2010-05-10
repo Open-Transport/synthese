@@ -37,50 +37,38 @@
 
 namespace synthese
 {
+	namespace db
+	{
+		//////////////////////////////////////////////////////////////////////////
+		/// Interface for access to an SQLite value.
+		/// @ingroup m10
+		/// @author Marc Jambert
+		class SQLiteValue
+		{
+		 public:
 
-namespace db
-{
+		 private:
 
-    
+			std::string _value;  
 
-/** Interface for access to an SQLite value.
+		 public:
 
- @ingroup m10
-*/
-class SQLiteValue
-{
- public:
+			SQLiteValue (sqlite3_value* value); 
+			SQLiteValue (const std::string& value); 
 
- private:
+			virtual ~SQLiteValue ();
 
-    std::string _value;  
-
- public:
-
-    SQLiteValue (sqlite3_value* value); 
-    SQLiteValue (const std::string& value); 
-
-    virtual ~SQLiteValue ();
-
-    virtual const std::string& getText () const;
-    virtual int getInt () const;
-    virtual long getLong () const;
-    virtual bool getBool () const;
-    virtual boost::logic::tribool getTribool () const;
-    virtual double getDouble () const;
-    virtual const std::string& getBlob () const;
-    virtual long long getLongLong () const;
-    virtual boost::posix_time::ptime getTimestamp () const;
-
-  private:
-
-
-};
-
-
+			virtual const std::string& getText () const;
+			virtual int getInt () const;
+			virtual long getLong () const;
+			virtual bool getBool () const;
+			virtual boost::logic::tribool getTribool () const;
+			virtual double getDouble () const;
+			virtual const std::string& getBlob () const;
+			virtual long long getLongLong () const;
+			virtual boost::posix_time::ptime getTimestamp () const;
+		};
+	}
 }
-}
-
 
 #endif
-

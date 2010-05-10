@@ -40,38 +40,38 @@ namespace synthese
 		{
 			for (int i=0; i<getNbColumns (); ++i)
 			{
-			if (getColumnName (i) == columnName) return i;
+				if (getColumnName (i) == columnName) return i;
 			}
 			return -1;
 		}
 
 
 
-		SQLiteValue*
-		SQLiteResult::getValue (const std::string& name) const
+		SQLiteValue SQLiteResult::getValue (const std::string& name) const
 		{
 			int index = getColumnIndex (name);
 			if (index == -1)
-			throw SQLiteException ("No such column " + name);
+			{
+				throw SQLiteException ("No such column " + name);
+			}
 			return getValue (index);
 		}
 
 
 
-		std::string 
-		SQLiteResult::getText (int column) const
+		std::string	SQLiteResult::getText (int column) const
 		{
-			return getValue (column)->getText ();
+			return getValue(column).getText ();
 		}
 
 
-		std::string
-		SQLiteResult::getText (const std::string& name) const
+
+		std::string	SQLiteResult::getText (const std::string& name) const
 		{
 			int index = getColumnIndex (name);
 			if (index == -1)
 			throw SQLiteException ("No such column " + name);
-			return getText (index);
+			return getText(index);
 		}
 
 
@@ -80,7 +80,7 @@ namespace synthese
 		int 
 		SQLiteResult::getInt (int column) const
 		{
-			return getValue (column)->getInt ();
+			return getValue(column).getInt ();
 		}
 
 		int 
@@ -89,7 +89,7 @@ namespace synthese
 			int index = getColumnIndex (name);
 			if (index == -1)
 			throw SQLiteException ("No such column " + name);
-			return getInt (index);
+			return getInt(index);
 		}
 
 
@@ -97,11 +97,12 @@ namespace synthese
 		long 
 		SQLiteResult::getLong (int column) const
 		{
-			return getValue (column)->getLong ();
+			return getValue(column).getLong ();
 		}
 
-		long
-		SQLiteResult::getLong (const std::string& name) const
+
+
+		long SQLiteResult::getLong (const std::string& name) const
 		{
 			int index = getColumnIndex (name);
 			if (index == -1)
@@ -111,15 +112,14 @@ namespace synthese
 
 
 
-
-		bool
-		SQLiteResult::getBool (int column) const
+		bool SQLiteResult::getBool (int column) const
 		{
-			return getValue (column)->getBool ();
+			return getValue(column).getBool ();
 		}
 
-		bool 
-		SQLiteResult::getBool (const std::string& name) const
+
+
+		bool SQLiteResult::getBool (const std::string& name) const
 		{
 			int index = getColumnIndex (name);
 			if (index == -1)
@@ -132,7 +132,7 @@ namespace synthese
 		boost::logic::tribool
 		SQLiteResult::getTribool (int column) const
 		{
-			return getValue (column)->getTribool ();
+			return getValue(column).getTribool ();
 		}
 
 
@@ -148,12 +148,13 @@ namespace synthese
 
 
 
-
 		double 
 		SQLiteResult::getDouble (int column) const
 		{
-			return getValue (column)->getDouble ();
+			return getValue (column).getDouble ();
 		}
+
+
 
 		double 
 		SQLiteResult::getDouble (const std::string& name) const
@@ -169,7 +170,7 @@ namespace synthese
 		std::string 
 		SQLiteResult::getBlob (int column) const
 		{
-			return getValue (column)->getBlob ();
+			return getValue (column).getBlob ();
 		}
 
 		std::string 
@@ -183,17 +184,14 @@ namespace synthese
 
 
 
-
-
-		long long 
-		SQLiteResult::getLongLong (int column) const
+		long long SQLiteResult::getLongLong (int column) const
 		{
-			return getValue (column)->getLongLong ();
+			return getValue (column).getLongLong ();
 		}
 
 
-		long long 
-		SQLiteResult::getLongLong (const std::string& name) const
+
+		long long SQLiteResult::getLongLong (const std::string& name) const
 		{
 			int index = getColumnIndex (name);
 			if (index == -1)
@@ -207,7 +205,7 @@ namespace synthese
 		boost::posix_time::ptime 
 		SQLiteResult::getTimestamp (int column) const
 		{
-			return getValue (column)->getTimestamp ();
+			return getValue (column).getTimestamp ();
 		}
 
 
@@ -228,17 +226,14 @@ namespace synthese
 			SQLiteResultRow row;
 			for (int i=0; i<getNbColumns (); ++i)
 			{
-			row.push_back (getValue (i));
+				row.push_back(getValueSPtr(i));
 			}
 			return row;
 		}
 
 
 
-
-
-		std::vector<int>
-		SQLiteResult::computeMaxColWidths () const
+		std::vector<int> SQLiteResult::computeMaxColWidths () const
 		{
 			reset ();
 
@@ -327,8 +322,7 @@ namespace synthese
 
 
 
-		std::ostream& 
-		operator<< ( std::ostream& os, const SQLiteResult& op )
+		std::ostream& operator<< ( std::ostream& os, const SQLiteResult& op )
 		{
 			std::vector<int> widths (op.computeMaxColWidths ());
 
@@ -351,7 +345,5 @@ namespace synthese
 			}
 			return os;
 		}
-
-
 	}
 }

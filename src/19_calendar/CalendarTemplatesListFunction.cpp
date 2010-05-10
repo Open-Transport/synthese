@@ -42,7 +42,7 @@ namespace synthese
 	namespace calendar
 	{
 		const string CalendarTemplatesListFunction::PARAMETER_ROOT_CALENDAR("root_calendar");
-		const string CalendarTemplatesListFunction::PARAMETER_DEFAULT_VALUE("defaut_value");
+		const string CalendarTemplatesListFunction::PARAMETER_DEFAULT_VALUE("default_value");
 		const string CalendarTemplatesListFunction::PARAMETER_FIELD_NAME("field_name");
 		
 		ParametersMap CalendarTemplatesListFunction::_getParametersMap() const
@@ -76,7 +76,7 @@ namespace synthese
 			}
 
 			// Default value
-			RegistryKeyType did(map.getDefault<RegistryKeyType>(PARAMETER_ROOT_CALENDAR, 0));
+			RegistryKeyType did(map.getDefault<RegistryKeyType>(PARAMETER_DEFAULT_VALUE, 0));
 			if(did)
 			{
 				if(	!Env::GetOfficialEnv().getRegistry<CalendarTemplate>().contains(did))

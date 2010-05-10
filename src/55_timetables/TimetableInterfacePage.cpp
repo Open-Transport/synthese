@@ -86,7 +86,12 @@ namespace synthese
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
 			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
+
 
 			// Common parameters
 			pm.insert(DATA_GENERATOR_TYPE, GetTimetableTypeCode(object.getContentType())); //0
@@ -221,7 +226,7 @@ namespace synthese
 							break;
 						}
 					}
-					pm.insert(DATA_SERVICES_IN_COLS_NOTES_ROW, aNote); //9
+					pm.insert(DATA_AT_LEAST_A_NOTE, aNote); //9
 				}
 				break;
 
@@ -257,6 +262,20 @@ namespace synthese
 						lastSchedule = column.getContent().begin()->second;
 					}
 					pm.insert(DATA_CONTENT, content.str()); //3
+
+					// 9 : At least a note
+					bool aNote(false);
+					const TimetableResult::RowNotesVector notes(result.getRowNotes());
+					BOOST_FOREACH(const TimetableResult::RowNotesVector::value_type& note, notes)
+					{
+						if(note != NULL)
+						{
+							aNote = true;
+							break;
+						}
+					}
+					pm.insert(DATA_AT_LEAST_A_NOTE, aNote); //9
+
 				}
 				break;
 

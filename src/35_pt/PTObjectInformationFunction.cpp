@@ -30,6 +30,9 @@
 #include "LineTableSync.h"
 #include "ConnectionPlaceTableSync.h"
 #include "City.h"
+#include "PhysicalStop.h"
+#include "PublicTransportStopZoneConnectionPlace.h"
+#include "Line.h"
 
 using namespace std;
 using namespace boost;
@@ -118,6 +121,22 @@ namespace synthese
 				if(_info == "line_id" && _route->getCommercialLine())
 				{
 					stream << _route->getCommercialLine()->getKey();
+				}
+				else if(_info == "origin_city_name" && _route->getEdges().size() > 1)
+				{
+					stream << _route->getOrigin()->getConnectionPlace()->getCity()->getName();
+				}
+				else if(_info == "origin_stop_name" && _route->getEdges().size() > 1)
+				{
+					stream << _route->getOrigin()->getConnectionPlace()->getName();
+				}
+				else if(_info == "destination_city_name" && _route->getEdges().size() > 1)
+				{
+					stream << _route->getDestination()->getConnectionPlace()->getCity()->getName();
+				}
+				else if(_info == "destination_stop_name" && _route->getEdges().size() > 1)
+				{
+					stream << _route->getDestination()->getConnectionPlace()->getName();
 				}
 			}
 			else if(_stop.get())

@@ -60,7 +60,12 @@ namespace synthese
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
 			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
+
 		
 			pm.insert(DATA_NUMBER, object.getNumber());
 			pm.insert(DATA_TEXT, object.getText());

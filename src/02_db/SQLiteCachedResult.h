@@ -1,75 +1,64 @@
 #ifndef SYNTHESE_DB_SQLITECACHEDRESULT_H
 #define SYNTHESE_DB_SQLITECACHEDRESULT_H
 
-#include "02_db/SQLiteResult.h"
-
+#include "SQLiteResult.h"
 
 namespace synthese
 {
 
-namespace db
-{
+	namespace db
+	{
+		//////////////////////////////////////////////////////////////////////////
+		/// Cached SQLite result.
+		/// @ingroup m10
+		/// @author Marc Jambert
+		class SQLiteCachedResult:
+			public SQLiteResult
+		{
+		 public:
 
+		 private:
 
-/** Cached SQLite result.
+			mutable int _pos;
+			std::vector<std::string> _columnNames;
+			std::vector<SQLiteResultRow> _rows;
+		    
 
- @ingroup m10
-*/
-class SQLiteCachedResult : public SQLiteResult
-{
- public:
+		 public:
 
- private:
+			/** Constructs a new SQLite result by storing in memory all values contained 
+			 * in another SQLite result.
+			 */
+			SQLiteCachedResult ();
+			SQLiteCachedResult (const std::vector<std::string>& columnNames);
+			SQLiteCachedResult (const SQLiteResultSPtr& result);
+			~SQLiteCachedResult ();
+		    
+			//! @name Query methods.
+			//@{
 
-    mutable int _pos;
-    std::vector<std::string> _columnNames;
-    std::vector<SQLiteResultRow> _rows;
-    
+			void reset () const;
+			bool next () const;
 
- public:
+			int getNbColumns () const;
 
-    /** Constructs a new SQLite result by storing in memory all values contained 
-     * in another SQLite result.
-     */
-    SQLiteCachedResult ();
-    SQLiteCachedResult (const std::vector<std::string>& columnNames);
-    SQLiteCachedResult (const SQLiteResultSPtr& result);
-    ~SQLiteCachedResult ();
-    
-    //! @name Query methods.
-    //@{
+			std::string getColumnName (int column) const;
 
-    void reset () const;
-    bool next () const;
+			virtual SQLiteValue getValue (int column) const;
+			virtual boost::shared_ptr<SQLiteValue> getValueSPtr(int column) const;
 
-    int getNbColumns () const;
+			SQLiteResultRow getRow () const;
+		    
+			void addRow (const SQLiteResultRow& row);
+			void addRow (int nbColumns, char** values, char** columns);
 
-    std::string getColumnName (int column) const;
+			//@}
 
-    SQLiteValue* getValue (int column) const;
+		 private:
 
-    SQLiteResultRow getRow () const;
-    
-    void addRow (const SQLiteResultRow& row);
-    void addRow (int nbColumns, char** values, char** columns);
-
-    //@}
-
- private:
-
-    friend class SQLiteHandle;
-
-    
-
-};
-
-
-
-
-
+			friend class SQLiteHandle;
+		};
+	}
 }
-}
-
 
 #endif
-
