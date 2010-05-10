@@ -65,24 +65,11 @@ namespace synthese
 
 		SQLiteCachedResult::~SQLiteCachedResult ()
 		{
-			for (std::vector<SQLiteResultRow>::iterator it = _rows.begin ();
-			 it != _rows.end (); ++it) 
-			{
-			SQLiteResultRow& row = *it;
-			for (SQLiteResultRow::iterator it2 = row.begin ();
-				 it2 != row.end (); ++it2) 
-			{
-				delete *it2;
-			}
-
-			}
 		}
 
 
 
-
-		void 
-		SQLiteCachedResult::reset () const
+		void SQLiteCachedResult::reset () const
 		{
 			_pos = -1;
 		}

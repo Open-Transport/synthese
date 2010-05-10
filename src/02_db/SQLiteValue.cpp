@@ -22,6 +22,7 @@
 
 #include "SQLiteValue.h"
 #include "SQLiteException.h"
+#include "Conversion.h"
 
 #include <iomanip>
 #include <boost/date_time/posix_time/time_formatters.hpp>
@@ -61,7 +62,7 @@ namespace synthese
 				break;
 		
 			case SQLITE_TEXT:
-				_value.assign(static_cast<const char*>(sqlite3_value_text(value)));
+				_value.assign((const char*) sqlite3_value_text(value));
 				break;
 			}
 		}
