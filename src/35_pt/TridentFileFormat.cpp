@@ -1,6 +1,6 @@
 
-/** tridentexport class implementation.
-	@file tridentexport.cpp
+/** TridentFileFormat class implementation.
+	@file TridentFileFormat.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -801,7 +801,7 @@ namespace synthese
 					const UseRule& hRule(srv->getUseRule(USER_HANDICAPPED));
 					os <<
 						"<mobilityRestrictedSuitability>" <<
-						(hRule.getAccessCapacity() ? lexical_cast<string>(*hRule.getAccessCapacity()) : "999") <<
+						(!hRule.getAccessCapacity() || *hRule.getAccessCapacity()) <<
 						"</mobilityRestrictedSuitability>" <<
 						"\n"
 					;
@@ -822,7 +822,7 @@ namespace synthese
 					const UseRule& bRule(srv->getUseRule(USER_BIKE));
 					os <<
 						"<bikeSuitability>" <<
-						(bRule.getAccessCapacity() ? Conversion::ToString(*bRule.getAccessCapacity()) : "999") <<
+						(!bRule.getAccessCapacity() || *bRule.getAccessCapacity()) <<
 						"</bikeSuitability>" <<
 						"\n"
 					;
