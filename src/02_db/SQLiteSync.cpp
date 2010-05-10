@@ -133,7 +133,7 @@ namespace synthese
 				SQLiteResultRow values;
 				values.push_back(
 					shared_ptr<SQLiteValue>(
-						new SQLiteValue(lexical_cast<string>(event.rowId)
+						new SQLiteValue(lexical_cast<string>(event.rowId))
 				)	);
 				cachedResult->addRow (values);
 				
