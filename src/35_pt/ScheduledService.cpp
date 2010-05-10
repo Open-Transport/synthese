@@ -82,7 +82,7 @@ namespace synthese
 				first.getDepartureSchedules(false) == second.getDepartureSchedules(false) &&
 				first.getArrivalSchedules(false) == second.getArrivalSchedules(false)
 			;
-		};
+		}
 
 
 

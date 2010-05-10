@@ -111,7 +111,7 @@ namespace synthese
 			{
 				return function->getPage();
 			}
-
+			return shared_ptr<const WebPage>();
 		}
 	}
 }

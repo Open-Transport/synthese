@@ -27,6 +27,7 @@
 #include <complex>
 #include <sstream>
 #include <iomanip>
+#include <stdio.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
 

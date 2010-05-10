@@ -55,7 +55,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Distance between two points.
-				double operator- ( const GeoPoint& other ) const;
+				//double operator- ( const GeoPoint& other ) const;
 
 				static double Deg2rad(double deg);
 				static double Rad2deg(double rad);

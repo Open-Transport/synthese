@@ -23,9 +23,9 @@
 
 #include "GeoPoint.h"
 
-#include <boost/math/complex/acos.hpp>
+//#include <boost/math/complex/acos.hpp>
 
-using namespace boost::math;
+//using namespace boost::math;
 
 namespace synthese
 {
@@ -40,7 +40,7 @@ namespace synthese
 
 
 
-		double GeoPoint::operator-( const GeoPoint& other ) const
+/*		double GeoPoint::operator-( const GeoPoint& other ) const
 		{
 			return
 				6366 *
@@ -52,7 +52,7 @@ namespace synthese
 					sin(Deg2rad(other.getLatitude()))
 				);
 		}
-
+*/
 
 		double GeoPoint::Deg2rad( double deg )
 		{
@@ -77,12 +77,12 @@ namespace synthese
 		}
 
 
+
 		bool
 		operator!= ( const GeoPoint& op1, const GeoPoint& op2 )
 		{
 			return !(op1 == op2);
 		}
-
 
 
 
