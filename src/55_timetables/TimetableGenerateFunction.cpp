@@ -35,6 +35,7 @@
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "Line.h"
 #include "CalendarTemplate.h"
+#include "Calendar.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
 #include "TimetableResult.hpp"
@@ -64,6 +65,7 @@ namespace synthese
 		const string TimetableGenerateFunction::PARAMETER_CALENDAR_ID("cid");
 		const string TimetableGenerateFunction::PARAMETER_STOP_PREFIX("stop");
 		const string TimetableGenerateFunction::PARAMETER_CITY_PREFIX("city");
+		const string TimetableGenerateFunction::PARAMETER_DAY("day");
 
 		const string TimetableGenerateFunction::PARAMETER_PAGE_ID("page_id");
 		const string TimetableGenerateFunction::PARAMETER_NOTE_PAGE_ID("note_page_id");
@@ -91,7 +93,14 @@ namespace synthese
 					map.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
 					if(_timetable->getBaseCalendar())
 					{
-						map.insert(PARAMETER_CALENDAR_ID, _timetable->getBaseCalendar()->getKey());
+						if(_timetable->getBaseCalendar()->getKey())
+						{
+							map.insert(PARAMETER_CALENDAR_ID, _timetable->getBaseCalendar()->getKey());
+						}
+						else if(_timetable->getBaseCalendar()->isLimited())
+						{
+							map.insert(PARAMETER_DAY, _timetable->getBaseCalendar()->getResult().getFirstActiveDate());
+						}
 					}
 				}
 				else
@@ -159,16 +168,24 @@ namespace synthese
 				}
 				else
 				{
+					date curDate(day_clock::local_day());
+					if(map.getOptional<string>(PARAMETER_DAY))
+					{
+						curDate = from_simple_string(map.get<string>(PARAMETER_DAY));
+					}
+
 					CalendarTemplate* calendarTemplate(new CalendarTemplate);
 					CalendarTemplateElement element;
 					element.setCalendar(calendarTemplate);
 					element.setInterval(days(1));
-					element.setMinDate(day_clock::local_day());
-					element.setMaxDate(day_clock::local_day());
+					element.setMinDate(curDate);
+					element.setMaxDate(curDate);
 					element.setOperation(CalendarTemplateElement::ADD);
 					element.setRank(0);
 					calendarTemplate->addElement(element);
-					calendarTemplate->setText("Aujourd'hui");
+					calendarTemplate->setText(
+						lexical_cast<string>(curDate.day()) + "/" + lexical_cast<string>(lexical_cast<int>(curDate.month())) + "/" + lexical_cast<string>(curDate.year())
+					);
 					timetable->setBaseCalendar(calendarTemplate);
 					_calendarTemplate.reset(calendarTemplate);
 				}

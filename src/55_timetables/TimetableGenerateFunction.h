@@ -75,7 +75,8 @@ namespace synthese
 			Parameters :
 			<ul>
 				<li>roid : id of a Line object</li>
-				<li>cid : id of the CalendarTemplate object</li>
+				<li>cid (optional) : id of the CalendarTemplate object (default : use day parameter)</li>
+				<li>day (optional) : day (default : today)</li>
 			</ul>
 
 			The generated timetable is rendered as services_by_cols type.
@@ -91,7 +92,8 @@ namespace synthese
 				<li>...</li>
 				<li>cityn : nth city</li>
 				<li>stopn : nth stop</li>
-				<li>cid : id of the CalendarTemplate object</li>
+				<li>cid (optional) : id of the CalendarTemplate object (default : use day parameter)</li>
+				<li>day (optional) : day (default : today)</li>
 			</ul>
 
 			The generated timetable is rendered as services_by_cols type.
@@ -101,7 +103,8 @@ namespace synthese
 			Parameters :
 			<ul>
 				<li>roid : id of a stop area (PublicStopZoneConnectionPlace) or stop zone (PhysicalStop) object</li>
-				<li>cid : id of the CalendarTemplate object</li>
+				<li>cid (optional) : id of the CalendarTemplate object (default : use day parameter)</li>
+				<li>day (optional) : day (default : today)</li>
 			</ul>
 
 			The generated timetable is rendered as services_by_rows type.
@@ -125,7 +128,8 @@ namespace synthese
 			static const std::string PARAMETER_CALENDAR_ID;
 			static const std::string PARAMETER_STOP_PREFIX;
 			static const std::string PARAMETER_CITY_PREFIX;
-			
+			static const std::string PARAMETER_DAY;
+
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_NOTE_PAGE_ID;
 			static const std::string PARAMETER_NOTE_CALENDAR_PAGE_ID;
