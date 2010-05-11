@@ -203,7 +203,8 @@ namespace synthese
 
 
 		graph::UseRule::ReservationAvailabilityType ScheduledService::getReservationAbility(
-			const date& date
+			const date& date,
+			std::size_t userClassRank
 		) const {
 			// Pedestrian
 			const Path::Edges& edges(getPath()->getEdges());
@@ -221,7 +222,7 @@ namespace synthese
 						false
 					)	);
 					if(!p.getService()) return UseRule::RESERVATION_FORBIDDEN;
-					return getUseRule(USER_PEDESTRIAN).getReservationAvailability(p);
+					return getUseRule(userClassRank).getReservationAvailability(p);
 				}
 			}
 			assert(false);
@@ -230,7 +231,8 @@ namespace synthese
 		
 		
 		ptime ScheduledService::getReservationDeadLine(
-			const date& date
+			const date& date,
+			std::size_t userClassRank
 		) const {
 			// Pedestrian
 			const Path::Edges& edges(getPath()->getEdges());
@@ -247,7 +249,7 @@ namespace synthese
 						false,
 						false
 					)	);
-					return getUseRule(USER_PEDESTRIAN).getReservationDeadLine(
+					return getUseRule(userClassRank).getReservationDeadLine(
 						p.getOriginDateTime(),
 						p.getActualDateTime()
 					);

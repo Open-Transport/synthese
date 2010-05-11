@@ -116,11 +116,13 @@ namespace synthese
 				virtual void clearNonConcurrencyCache() const;
 
 				graph::UseRule::ReservationAvailabilityType getReservationAbility(
-					const boost::gregorian::date& date
+					const boost::gregorian::date& date,
+					std::size_t userClassRank
 				) const;
 
 				boost::posix_time::ptime getReservationDeadLine(
-					const boost::gregorian::date& date
+					const boost::gregorian::date& date,
+					std::size_t userClassRank
 				) const;
 
 				/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.

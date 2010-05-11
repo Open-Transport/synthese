@@ -648,8 +648,8 @@ namespace synthese
 			{
 				const ScheduledService* srv(itsrv.second.get());
 				bool isDRT(
-					dynamic_cast<const PTUseRule*>(&srv->getUseRule(USER_PEDESTRIAN)) != NULL &&
-					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+					dynamic_cast<const PTUseRule*>(&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)) != NULL &&
+					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 				);
 
 				os << "<VehicleJourney";
@@ -700,7 +700,7 @@ namespace synthese
 
 				if (_withTisseoExtension)
 				{
-					const UseRule& hRule(srv->getUseRule(USER_HANDICAPPED));
+					const UseRule& hRule(srv->getUseRule(USER_HANDICAPPED - USER_CLASS_CODE_OFFSET));
 					os <<
 						"<mobilityRestrictedSuitability>" <<
 						(!hRule.getAccessCapacity() || *hRule.getAccessCapacity()) <<
@@ -721,7 +721,7 @@ namespace synthese
 						;
 					}
 
-					const UseRule& bRule(srv->getUseRule(USER_BIKE));
+					const UseRule& bRule(srv->getUseRule(USER_BIKE - USER_CLASS_CODE_OFFSET));
 					os <<
 						"<bikeSuitability>" <<
 						(!bRule.getAccessCapacity() || *bRule.getAccessCapacity()) <<
@@ -744,7 +744,7 @@ namespace synthese
 					}
 					if (isDRT)
 					{
-						const PTUseRule& pRule(static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)));
+						const PTUseRule& pRule(static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)));
 						os << "<reservationRule>" << TridentId(peerid, "ReservationRule", pRule.getKey()) << "</reservationRule>" << "\n";
 					}
 				}
@@ -755,8 +755,8 @@ namespace synthese
 			{
 				const ContinuousService* srv(itsrv.second.get());
 				bool isDRT(
-					dynamic_cast<const PTUseRule*>(&srv->getUseRule(USER_PEDESTRIAN)) &&
-					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
+					dynamic_cast<const PTUseRule*>(&srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)) &&
+					static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)).getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN
 				);
 
 				os << "<VehicleJourney";
@@ -798,7 +798,7 @@ namespace synthese
 
 				if (_withTisseoExtension)
 				{
-					const UseRule& hRule(srv->getUseRule(USER_HANDICAPPED));
+					const UseRule& hRule(srv->getUseRule(USER_HANDICAPPED - USER_CLASS_CODE_OFFSET));
 					os <<
 						"<mobilityRestrictedSuitability>" <<
 						(!hRule.getAccessCapacity() || *hRule.getAccessCapacity()) <<
@@ -819,7 +819,7 @@ namespace synthese
 						;
 					}
 
-					const UseRule& bRule(srv->getUseRule(USER_BIKE));
+					const UseRule& bRule(srv->getUseRule(USER_BIKE - USER_CLASS_CODE_OFFSET));
 					os <<
 						"<bikeSuitability>" <<
 						(!bRule.getAccessCapacity() || *bRule.getAccessCapacity()) <<
@@ -842,7 +842,7 @@ namespace synthese
 					}
 					if (isDRT)
 					{
-						const PTUseRule& pRule(static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN)));
+						const PTUseRule& pRule(static_cast<const PTUseRule&>(srv->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)));
 						os << "<reservationRule>" << TridentId(peerid, "ReservationRule", pRule.getKey()) << "</reservationRule>" << "\n";
 					}
 				}

@@ -113,9 +113,9 @@ namespace synthese
 
 			stream << t.row();
 			stream << t.col(1, std::string(), true) << "Résultat";
-			stream << t.col() << (object->getUseRule(graph::USER_PEDESTRIAN).getUseRuleName());
-			stream << t.col() << (object->getUseRule(graph::USER_HANDICAPPED).getUseRuleName());
-			stream << t.col() << (object->getUseRule(graph::USER_BIKE).getUseRuleName());
+			stream << t.col() << (object->getUseRule(graph::USER_PEDESTRIAN - graph::USER_CLASS_CODE_OFFSET).getUseRuleName());
+			stream << t.col() << (object->getUseRule(graph::USER_HANDICAPPED - graph::USER_CLASS_CODE_OFFSET).getUseRuleName());
+			stream << t.col() << (object->getUseRule(graph::USER_BIKE - graph::USER_CLASS_CODE_OFFSET).getUseRuleName());
 
 			stream << t.row();
 			stream << t.col(4, std::string(), true) << f.getSubmitButton("Enregistrer les modifications");
