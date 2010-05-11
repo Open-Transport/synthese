@@ -394,24 +394,66 @@ namespace synthese
 					
 					stream << t.col(1, string(), true);
 					
-					UseRule::ReservationAvailabilityType status(
-						sortedServices[0]->getReservationAbility(_date)
-					);
-					switch(status)
 					{
+						UseRule::ReservationAvailabilityType status(
+							service->getReservationAbility(_date, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+							);
+						switch(status)
+						{
 						case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
-							stream << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
+							stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
 							break;
-							
+
 						case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
-							stream << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
+							stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
 							break;
-							
+
 						case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
-							stream << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
+							stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
 							break;
+						}
 					}
-					
+
+					{
+						UseRule::ReservationAvailabilityType status(
+							service->getReservationAbility(_date, USER_HANDICAPPED - USER_CLASS_CODE_OFFSET)
+							);
+						switch(status)
+						{
+						case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
+							stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
+							break;
+
+						case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
+							stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
+							break;
+
+						case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
+							stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
+							break;
+						}
+					}
+
+					{
+						UseRule::ReservationAvailabilityType status(
+							service->getReservationAbility(_date, USER_BIKE - USER_CLASS_CODE_OFFSET)
+							);
+						switch(status)
+						{
+						case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
+							stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
+							break;
+
+						case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
+							stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
+							break;
+
+						case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
+							stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
+							break;
+						}
+					}
+
 					stream << t.col(6, string(), true) << "Service " << service->getServiceNumber() << " - départ de " <<
 						dynamic_cast<const NamedPlace*>(static_cast<const Line*>(service->getPath())->getEdge(0)->getHub())->getFullName() <<
 						" à " << Service::GetTimeOfDay(service->getDepartureSchedule(false, 0));
