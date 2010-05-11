@@ -32,7 +32,7 @@
 #include "Site.h"
 
 #include <ostream>
-#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace synthese
 {
@@ -165,7 +165,9 @@ namespace synthese
 				/// @return true if the page must be displayed
 				/// @author Hugues Romain
 				/// @date 2010
-				bool mustBeDisplayed(boost::posix_time::ptime now = boost::posix_time::second_clock::local_time()) const;
+				bool mustBeDisplayed(
+					boost::posix_time::ptime now = boost::posix_time::second_clock::local_time()
+				) const;
 
 
 
