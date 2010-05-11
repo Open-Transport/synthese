@@ -27,6 +27,7 @@ synthese::transportwebsite::GetValueFunction::integrate();
 synthese::transportwebsite::IfFunction::integrate();
 synthese::transportwebsite::EqualFunction::integrate();
 synthese::transportwebsite::SuperiorFunction::integrate();
+synthese::transportwebsite::AndFunction::integrate();
 
 synthese::transportwebsite::SiteUpdateAction::integrate();
 synthese::transportwebsite::AddUserFavoriteJourneyAction::integrate();

@@ -23,6 +23,7 @@
 #include "IfFunction.hpp"
 #include "EqualFunction.hpp"
 #include "SuperiorFunction.hpp"
+#include "AndFunction.hpp"
 
 #include "UserFavoriteInterfacePage.h"
 
