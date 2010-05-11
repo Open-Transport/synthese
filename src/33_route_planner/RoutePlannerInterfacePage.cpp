@@ -187,7 +187,7 @@ namespace synthese
 				pm.insert(DATA_PERIOD, period->getCaption());
 			}
 			pm.insert(DATA_SOLUTIONS_NUMBER, object.getJourneys().size());
-			pm.insert(DATA_ACCESSIBILITY_CODE, accessParameters.getUserClass());
+			pm.insert(DATA_ACCESSIBILITY_CODE, static_cast<int>(accessParameters.getUserClass()));
 			pm.insert(DATA_SITE_ID, page->getRoot()->getKey());
 			pm.insert(DATA_IS_SAME_PLACES, object.getSamePlaces());
 			if(request.getUser().get())
