@@ -31,9 +31,7 @@
 #include "PropertiesHTMLTable.h"
 #include "CalendarRight.h"
 #include "CalendarTemplate.h"
-#include "CalendarTemplateTableSync.h"
 #include "CalendarTemplateElement.h"
-#include "CalendarTemplateElementTableSync.h"
 #include "CalendarTemplateElementAddAction.h"
 #include "CalendarTemplateElementRemoveAction.h"
 #include "CalendarTemplatePropertiesUpdateAction.h"
@@ -44,6 +42,8 @@
 #include "AdminInterfaceElement.h"
 #include "SearchFormHTMLTable.h"
 #include "Profile.h"
+#include "CalendarTemplateElementTableSync.h"
+#include "CalendarTemplateTableSync.h"
 
 #include <boost/foreach.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -92,10 +92,7 @@ namespace synthese
 			_requestParameters.setFromParametersMap(map.getMap(), CalendarTemplateElementTableSync::COL_RANK);
 			try
 			{
-				_calendar = CalendarTemplateTableSync::Get(
-					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					Env::GetOfficialEnv()
-				);
+				_calendar = Env::GetOfficialEnv().get<CalendarTemplate>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 			}
 			catch(...)
 			{
