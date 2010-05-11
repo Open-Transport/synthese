@@ -120,12 +120,12 @@ namespace synthese
 		UseRule::RunPossibilityType ServiceUse::isUseRuleCompliant(
 		) const	{
 			return
-				_useRule->isRunPossible(*this) == UseRule::RUN_POSSIBLE &&
+				getUseRule().isRunPossible(*this) == UseRule::RUN_POSSIBLE &&
 				_service->nonConcurrencyRuleOK(
 					_originDateTime.date(),
 					*getDepartureEdge(),
 					*getArrivalEdge(),
-					_userClass
+					_userClassRank
 				) ?
 				UseRule::RUN_POSSIBLE :
 				UseRule::RUN_NOT_POSSIBLE
@@ -136,11 +136,11 @@ namespace synthese
 
 		ptime ServiceUse::getReservationDeadLine() const
 		{
-			UseRule::ReservationAvailabilityType resa(_useRule->getReservationAvailability(*this));
+			UseRule::ReservationAvailabilityType resa(getUseRule().getReservationAvailability(*this));
 			if(	resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
 				resa == UseRule::RESERVATION_OPTIONAL_POSSIBLE
 			){
-				return _useRule->getReservationDeadLine(
+				return getUseRule().getReservationDeadLine(
 					_originDateTime,
 					getDepartureDateTime()
 				);

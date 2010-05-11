@@ -47,13 +47,16 @@ namespace synthese
 		static const std::string ACCESSPARAMETERS_SERIALIZATION_SEPARATOR("|");
 		static const std::string ACCESSPARAMETERS_LIST_SEPARATOR(",");
 
-		/** Network access parameters class.
-			@ingroup m18
-
-			This class stores two types of information about how to use the transportation network :
-				- numeric parameters : speeds, maximums, etc.
-				- filters 
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Network access parameters class.
+		/// @ingroup m18
+		/// @author Hugues Romain
+		///
+		///	This class stores two types of information about how to use the transportation network :
+		///	<ul>
+		///		<li>numeric parameters : speeds, maximums, etc.</li>
+		///		<li>filters</li>
+		/// </ul>
 		class AccessParameters
 		{
 		public:
@@ -67,24 +70,22 @@ namespace synthese
 			bool		_drtOnly;
 			bool		_withoutDrt;
 			//const Fare*		_fare;
-			UserClassCode	_userClass;
+			std::size_t	_userClassRank; // Rank of the user class in the RuleUser rules vector.
 			AllowedPathClasses	_allowedPathClasses;
 
 		public:
 
 
 			/** AccessParameters constructor.
-				@param bikeCompliance (default = no constraint)
-				@param fare (default = no constraint)
-				@param handicappedCompliance (default = no constraint)
-				@param pedestrianCompliance (default = no constraint)
+				@param userClass User class code (See GraphConstants.h).
 				@param drtOnly if true, only demand responsive transport lines are used (default = no constraint)
 				@param withoutDrt if true, the demand responsive transport lines with compulsory reservation are not used (default = no constraint)
 				@param maxApproachDistance (default = 1000 m)
 				@param maxApproachTime (default = 23 min)
 				@param approachSpeed Approach speed (default = 67 m/min = 4 km/h)
 				@param maxTransportConnectionCount (default = 10 connections)
-				@date 2008
+				@date 2008-2010
+				@author Hugues Romain
 			*/
 			AccessParameters(
 				UserClassCode	userClass = USER_PEDESTRIAN
@@ -101,13 +102,17 @@ namespace synthese
 				, _maxTransportConnectionCount(maxTransportConnectionCount)
 				, _drtOnly(drtOnly)
 				, _withoutDrt(withoutDrt),
-				_userClass(userClass),
+				_userClassRank(userClass - USER_CLASS_CODE_OFFSET),
 				_allowedPathClasses(allowedPathClasses)
 			{
 
 			}
 
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Reads a serialized version of the object to update the attributes.
+			/// @param serialized the serialized string to read
+			/// @author Hugues Romain
 			AccessParameters& operator=(
 				const std::string& serialized
 			){
@@ -130,7 +135,7 @@ namespace synthese
 				++it;
 				_withoutDrt = boost::lexical_cast<bool>(*it);
 				++it;
-				_userClass = boost::lexical_cast<UserClassCode>(*it);
+				_userClassRank = boost::lexical_cast<size_t>(*it);
 				++it;
 
 				std::vector<std::string> elements2;
@@ -163,8 +168,20 @@ namespace synthese
 					return distance < _maxApproachDistance && duration < _maxApproachTime;
 				}
 
-				bool isAllowedPathClass(PathClass::Identifier value) const {	return _allowedPathClasses.empty() || _allowedPathClasses.find(value) != _allowedPathClasses.end();	}
 
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Controls if a path class is allowed by the object.
+				/// @param value the path class to control
+				/// @return true if the path class can be used
+				bool isAllowedPathClass(PathClass::Identifier value) const { return _allowedPathClasses.empty() || _allowedPathClasses.find(value) != _allowedPathClasses.end(); }
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Serialization of the object.
+				/// @return the serialized string version of the object
+				/// @author Hugues Romain
 				std::string serialize() const
 				{
 					std::stringstream stream;
@@ -175,7 +192,7 @@ namespace synthese
 						(getMaxtransportConnectionsCount() ? *getMaxtransportConnectionsCount() : double(0))  << ACCESSPARAMETERS_SERIALIZATION_SEPARATOR <<
 						getDRTOnly() << ACCESSPARAMETERS_SERIALIZATION_SEPARATOR <<
 						getWithoutDRT() << ACCESSPARAMETERS_SERIALIZATION_SEPARATOR <<
-						getUserClass() << ACCESSPARAMETERS_SERIALIZATION_SEPARATOR;
+						_userClassRank << ACCESSPARAMETERS_SERIALIZATION_SEPARATOR;
 					bool first(true);
 					BOOST_FOREACH(const AllowedPathClasses::value_type& element, getAllowedPathClasses())
 					{
@@ -183,12 +200,20 @@ namespace synthese
 					}
 					return stream.str();
 				}
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the user class code corresponding to the user class rank stored
+				/// in the object.
+				/// @return the user class code
+				/// @author Hugues Romain
+				graph::UserClassCode getUserClass()	const {	return _userClassRank + USER_CLASS_CODE_OFFSET;	}
 			//@}
 
 
 			//! @name Getters
 			//@{
-				graph::UserClassCode	getUserClass()	const {	return _userClass;	}
+				std::size_t getUserClassRank() const { return _userClassRank; }
 				double	getApproachSpeed()	const {	return _approachSpeed;	}
 				boost::optional<size_t>	getMaxtransportConnectionsCount() const { return _maxTransportConnectionCount;}
 				bool getDRTOnly() const {	return _drtOnly;}

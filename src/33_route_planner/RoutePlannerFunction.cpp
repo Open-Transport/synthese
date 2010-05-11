@@ -697,9 +697,9 @@ namespace synthese
 							if(line == NULL) continue;
 
 							if(	line->getCommercialLine()->getReservationContact() &&
-								UseRule::IsReservationPossible(su.getUseRule()->getReservationAvailability(su))
-								){
-									resaRules.insert(line->getCommercialLine()->getReservationContact());
+								UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su))
+							){
+								resaRules.insert(line->getCommercialLine()->getReservationContact());
 							}
 						}
 						stringstream sPhones;

@@ -27,6 +27,7 @@
 #include <sstream>
 #include <iomanip>
 #include <boost/tokenizer.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;

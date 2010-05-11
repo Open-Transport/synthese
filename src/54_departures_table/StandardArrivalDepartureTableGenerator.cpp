@@ -83,7 +83,7 @@ namespace synthese
 					{
 						ServicePointer servicePointer(
 							ls->getNextService(
-								USER_PEDESTRIAN,
+								USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
 								departureDateTime
 								, _endDateTime
 								, false

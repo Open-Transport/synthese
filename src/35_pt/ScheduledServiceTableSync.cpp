@@ -114,7 +114,7 @@ namespace synthese
 		    ss->setServiceNumber(serviceNumber);
 			ss->setTeam(rows->getText(ScheduledServiceTableSync::COL_TEAM));
 			ss->setPathId(pathId);
-			ss->clearRules();
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -138,25 +138,17 @@ namespace synthese
 
 				if(bikeComplianceId > 0)
 				{
-					ss->addRule(
-						USER_BIKE,
-						PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get()
-					);
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get();
 				}
 				if(handicappedComplianceId > 0)
 				{
-					ss->addRule(
-						USER_HANDICAPPED,
-						PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get()
-					);
+					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
 				}
 				if(pedestrianComplianceId > 0)
 				{
-					ss->addRule(
-						USER_PEDESTRIAN,
-						PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get()
-					);
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get();
 				}
+				ss->setRules(rules);
 
 				path->addService(
 					ss,

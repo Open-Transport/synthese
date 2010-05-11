@@ -357,7 +357,7 @@ namespace synthese
 							ServicePointer serviceInstance(
 								(_accessDirection == DEPARTURE_TO_ARRIVAL)
 								?	edge.getNextService(
-										_accessParameters.getUserClass(),
+										_accessParameters.getUserClassRank(),
 										departureMoment,
 										correctedMinMaxDateTimeAtOrigin
 										, true
@@ -365,7 +365,7 @@ namespace synthese
 										, _inverted
 									)
 								:	edge.getPreviousService(
-										_accessParameters.getUserClass(),
+										_accessParameters.getUserClassRank(),
 										departureMoment,
 										correctedMinMaxDateTimeAtOrigin
 										, true

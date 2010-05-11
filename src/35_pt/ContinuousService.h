@@ -97,7 +97,7 @@ namespace synthese
 				virtual graph::ServicePointer getFromPresenceTime(
 					bool RTData,
 					graph::AccessDirection method,
-					graph::UserClassCode userClass
+					std::size_t userClassRank
 					, const graph::Edge* edge
 					, const boost::posix_time::ptime& presenceDateTime
 					, bool controlIfTheServiceIsReachable

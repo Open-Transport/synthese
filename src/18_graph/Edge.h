@@ -243,7 +243,7 @@ namespace synthese
 					@retval minNextServiceIndex Index corresponding to the returned service
 				*/
 				ServicePointer getNextService (
-					UserClassCode userClass,
+					std::size_t userClassRank,
 					boost::posix_time::ptime departureMoment,
 					const boost::posix_time::ptime& maxDepartureMoment,
 					bool controlIfTheServiceIsReachable,
@@ -266,7 +266,7 @@ namespace synthese
 					@retval maxPreviousServiceIndex Index corresponding to the returned service
 				*/
 				ServicePointer getPreviousService(
-					UserClassCode userClass,
+					std::size_t userClassRank,
 					boost::posix_time::ptime arrivalMoment,
 					const boost::posix_time::ptime& minArrivalMoment,
 					bool controlIfTheServiceIsReachable,

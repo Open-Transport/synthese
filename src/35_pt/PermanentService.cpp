@@ -25,7 +25,7 @@
 #include "Path.h"
 
 #include <math.h>
-#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
@@ -42,7 +42,7 @@ namespace synthese
 		ServicePointer PermanentService::getFromPresenceTime(
 			bool RTData,
 			AccessDirection method,
-			UserClassCode userClass
+			size_t userClass
 			, const Edge* edge
 			, const ptime& presenceDateTime
 			, bool controlIfTheServiceIsReachable

@@ -65,7 +65,7 @@ namespace synthese
 				boost::tuples::tuple<
 					std::size_t,
 					std::size_t,
-					graph::UserClassCode,
+					std::size_t,
 					boost::gregorian::date
 				>, bool
 			> _NonConcurrencyCache;
@@ -110,7 +110,7 @@ namespace synthese
 					const boost::gregorian::date& date,
 					const graph::Edge& departureEdge,
 					const graph::Edge& arrivalEdge,
-					graph::UserClassCode userClass
+					std::size_t userClassRank
 				) const;
 
 				virtual void clearNonConcurrencyCache() const;
@@ -140,7 +140,7 @@ namespace synthese
 				virtual graph::ServicePointer getFromPresenceTime(
 					bool RTData,
 					graph::AccessDirection method,
-					graph::UserClassCode userClass
+					std::size_t userClassRank
 					, const graph::Edge* edge
 					, const boost::posix_time::ptime& presenceDateTime
 					, bool controlIfTheServiceIsReachable

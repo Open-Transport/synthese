@@ -391,7 +391,7 @@ namespace synthese
 				}
 
 
-				if(	UseRule::IsReservationPossible(su.getUseRule()->getReservationAvailability(su))
+				if(	UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su))
 				){
 					if(	dynamic_cast<const Line*>(su.getService()->getPath()) &&
 						static_cast<const Line*>(su.getService()->getPath())->getCommercialLine()
@@ -404,11 +404,11 @@ namespace synthese
 							reservationContact = onlineContact;
 						}
 					}
-					if(dynamic_cast<const PTUseRule*>(su.getUseRule()))
+					if(dynamic_cast<const PTUseRule*>(&su.getUseRule()))
 					{
-						r->setReservationRuleId(static_cast<const PTUseRule*>(su.getUseRule())->getKey());
+						r->setReservationRuleId(static_cast<const PTUseRule&>(su.getUseRule()).getKey());
 					}
-					r->setReservationDeadLine(su.getUseRule()->getReservationDeadLine(
+					r->setReservationDeadLine(su.getUseRule().getReservationDeadLine(
 						su.getOriginDateTime()
 						, su.getDepartureDateTime()
 					));

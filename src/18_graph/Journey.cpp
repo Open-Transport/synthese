@@ -524,7 +524,7 @@ namespace synthese
 			BOOST_FOREACH(const ServiceUse& su, _journeyLegs)
 			{
 				const UseRule::ReservationAvailabilityType& resa(
-					su.getUseRule()->getReservationAvailability(su)
+					su.getUseRule().getReservationAvailability(su)
 				);
 				if(resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE)
 					return true;
@@ -541,7 +541,7 @@ namespace synthese
 			BOOST_FOREACH(const ServiceUse& su, _journeyLegs)
 			{
 				const UseRule::ReservationAvailabilityType& resa(
-					su.getUseRule()->getReservationAvailability(su)
+					su.getUseRule().getReservationAvailability(su)
 				);
 				if(	(	boost::logic::indeterminate(compliance) &&
 						resa == UseRule::RESERVATION_OPTIONAL_POSSIBLE

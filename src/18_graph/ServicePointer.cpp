@@ -25,8 +25,6 @@
 #include "UseRule.h"
 #include "Edge.h"
 
-#include "01_util/Constants.h"
-
 using namespace boost;
 using namespace boost::posix_time;
 
@@ -34,19 +32,17 @@ namespace synthese
 {
 	namespace graph
 	{
-
 		ServicePointer::ServicePointer(
 			bool RTData,
 			AccessDirection method,
-			UserClassCode userClassCode,
+			size_t userClassRank,
 			const Edge* edge
 		):	_RTData(RTData),
 			_service(NULL),
 			_determinationMethod(method),
 			_range(posix_time::seconds(0)),
 			_edge(edge),
-			_userClass(userClassCode),
-			_useRule(NULL),
+			_userClassRank(userClassRank),
 			_RTVertex(edge ? edge->getFromVertex() : NULL)
 		{}
 
@@ -58,121 +54,22 @@ namespace synthese
 			_edge(NULL),
 			_RTVertex(NULL),
 			_determinationMethod(UNDEFINED_DIRECTION),
-			_useRule(NULL),
-			_range(posix_time::seconds(0))
+			_range(posix_time::seconds(0)),
+			_userClassRank(0)
 		{}
 
 
 
-		const UseRule* ServicePointer::getUseRule(
-		) const {
-			return _useRule;
+		const UseRule& ServicePointer::getUseRule() const
+		{
+			return _service->getUseRule(_userClassRank);
 		}
+
 		
-		
-
-		void ServicePointer::setActualTime( const ptime& dateTime )
-		{
-			_actualTime = dateTime;
-		}
-
-		void ServicePointer::setService( const Service* service )
-		{
-			_service = service;
-			_useRule = &service->getUseRule(_userClass);
-		}
-
-		void ServicePointer::setOriginDateTime( const ptime& dateTime )
-		{
-			_originDateTime = dateTime;
-		}
-
-
 
 		UseRule::RunPossibilityType ServicePointer::isUseRuleCompliant(
 		) const	{
-			return _useRule->isRunPossible(
-				*this
-			);
-		}
-
-		const Service* ServicePointer::getService() const
-		{
-			return _service;
-		}
-
-		const ptime& ServicePointer::getActualDateTime() const
-		{
-			return _actualTime;
-		}
-
-		const ptime& ServicePointer::getOriginDateTime() const
-		{
-			return _originDateTime;
-		}
-
-		AccessDirection ServicePointer::getMethod() const
-		{
-			return _determinationMethod;
-		}
-
-		const Edge* ServicePointer::getEdge() const
-		{
-			return _edge;
-		}
-
-		
-
-		void ServicePointer::setServiceRange(posix_time::time_duration duration)
-		{
-			_range = duration;
-		}
-
-
-
-		posix_time::time_duration ServicePointer::getServiceRange() const
-		{
-			return _range;
-		}
-		
-		UserClassCode ServicePointer::getUserClass() const
-		{
-			return _userClass;
-		}
-
-
-
-		bool ServicePointer::getRTData() const
-		{
-			return _RTData;
-		}
-
-
-
-		const ptime& ServicePointer::getTheoreticalDateTime() const
-		{
-			return _theoreticalTime;
-		}
-
-
-
-		void ServicePointer::setTheoreticalTime( const ptime& dateTime )
-		{
-			_theoreticalTime = dateTime;
-		}
-
-
-
-		void ServicePointer::setRealTimeVertex( const Vertex* value )
-		{
-			_RTVertex = value;
-		}
-
-
-
-		const Vertex* ServicePointer::getRealTimeVertex() const
-		{
-			return _RTVertex;
+			return getUseRule().isRunPossible(*this);
 		}
 	}
 }

@@ -39,8 +39,9 @@ namespace synthese
 
 		/** Service Pointer class.
 			@ingroup m18
+			@author Hugues Romain
 
-			A service pointer determinates :
+			A service pointer determines :
 				- a service
 				- a calendar date
 				- an edge
@@ -54,7 +55,7 @@ namespace synthese
 				AccessDirection		_determinationMethod;
 				const Edge*			_edge;
 				const Vertex*		_RTVertex;
-				UserClassCode		_userClass;
+				std::size_t			_userClassRank;
 				bool				_RTData;
 			//@}
 
@@ -64,60 +65,65 @@ namespace synthese
 				boost::posix_time::ptime		_originDateTime;
 				boost::posix_time::ptime		_actualTime;
 				boost::posix_time::ptime		_theoreticalTime;
-				const UseRule*		_useRule;
-			//@}
-
 				boost::posix_time::time_duration	_range;
-
+			//@}
+			
 		public:
 			ServicePointer(
 				bool RTData,
 				AccessDirection method,
-				UserClassCode userclass,
+				std::size_t userClassRank,
 				const Edge* edge = NULL
 			);
 			ServicePointer();
 
 			//! @name Setters
 			//@{
-				void	setActualTime(const boost::posix_time::ptime& dateTime);
-				void	setTheoreticalTime(const boost::posix_time::ptime& dateTime);
-				void	setService(const Service* service);
-				void	setOriginDateTime(const boost::posix_time::ptime& dateTime);
-				void	setServiceRange(boost::posix_time::time_duration duration);
-				void	setRealTimeVertex(const Vertex* value);
+				void	setActualTime(const boost::posix_time::ptime& dateTime) { _actualTime = dateTime; }
+				void	setTheoreticalTime(const boost::posix_time::ptime& dateTime) { _theoreticalTime = dateTime; }
+				void	setService(const Service* service) { _service = service; }
+				void	setOriginDateTime(const boost::posix_time::ptime& dateTime){ _originDateTime = dateTime; }
+				void	setServiceRange(boost::posix_time::time_duration duration){ _range = duration; }
+				void	setRealTimeVertex(const Vertex* value){ _RTVertex = value; }
 			//@}
 
 			//! @name Getters
 			//@{
-				const Edge*				getEdge()					const;
-				const Vertex*			getRealTimeVertex()			const;
-				const Service*			getService()				const;
-				const boost::posix_time::ptime&	getActualDateTime()			const;
-				const boost::posix_time::ptime&	getTheoreticalDateTime()	const;
-				const boost::posix_time::ptime&	getOriginDateTime()			const;
-				AccessDirection			getMethod()					const;
-				boost::posix_time::time_duration	getServiceRange()			const;
-				const UseRule*			getUseRule()				const;
-				UserClassCode			getUserClass()				const;
-				bool					getRTData()					const;
+				const Edge*				getEdge()	const { return _edge; }
+				const Vertex*			getRealTimeVertex()			const { return _RTVertex; }
+				const Service*			getService()				const { return _service; }
+				const boost::posix_time::ptime&	getActualDateTime()			const { return _actualTime; }
+				const boost::posix_time::ptime&	getTheoreticalDateTime()	const { return _theoreticalTime; }
+				const boost::posix_time::ptime&	getOriginDateTime()			const { return _originDateTime; }
+				AccessDirection			getMethod()					const { return _determinationMethod; }
+				boost::posix_time::time_duration	getServiceRange() const { return _range; }
+				std::size_t				getUserClassRank() const { return _userClassRank; }
+				bool					getRTData() const { return _RTData; }
 			//@}
 
 			//! @name Queries
 			//@{
 				/** Test the respect of the reservation rules.
 					@return bool true if the service can be used
-					@warning If the service is determinated by ARRIVAL_TO_DEPARTURE, then this method always aswers true, because the reservation
+					@warning If the service is determined by ARRIVAL_TO_DEPARTURE, then this method always aswers true, because the reservation
 						deadline depends only on the departure time, which is not known at this stage. Use ServiceUse::isReservationRuleCompliant method to validate the reservation
 						deadline respect.
 					@author Hugues Romain
 					@date 2007
 				*/
 				virtual UseRule::RunPossibilityType isUseRuleCompliant(
-				)	const;
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the use rule applicable to the user registered in the service use.
+				/// @return the use rule
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.18
+				const UseRule& getUseRule() const;
 			//@}
-
-
 		};
 	}
 }

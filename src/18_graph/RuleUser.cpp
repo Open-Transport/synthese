@@ -1,21 +1,29 @@
-//
-// C++ Implementation: RuleUser
-//
-// Description: 
-//
-//
-// Author: Hugues Romain (RCS) <hugues.romain@reseaux-conseil.com>, (C) 2009
-//
-// Copyright: See COPYING file that comes with this distribution
-//
-//
+
+/** RuleUser class implementation.
+	@file RuleUser.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
 
 #include "RuleUser.h"
 #include "ForbiddenUseRule.h"
 #include "Exception.h"
 #include "AccessParameters.h"
-
-#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -27,109 +35,43 @@ namespace synthese
 	
 	namespace graph
 	{
-		RuleUser::RuleUser(
-		){
-		}
-		
-		
-		const RuleUser::Map& RuleUser::getRules() const
-		{
-			return _rules;
-		}
-		
-		
-		
-		RuleUser::Map RuleUser::getActualRules() const
-		{
-			recursive_mutex::scoped_lock lock(_rulesMutex);
-
-			Map result;
-			for(const RuleUser* ruleUser(this); ruleUser != NULL; ruleUser = ruleUser->_getParentRuleUser())
-			{
-				BOOST_FOREACH(const Map::value_type& it, _rules)
-				{
-					Map::const_iterator its(result.find(it.first));
-					if(its != result.end())
-					{
-						continue;
-					}
-					result.insert(make_pair(it.first, it.second));
-				}
-			}
-			return result;
-		}
-		
-		
-
 		const UseRule& RuleUser::getUseRule(
-			const UserClassCode userClass
+			const size_t rank
 		) const	{
-			recursive_mutex::scoped_lock lock(_rulesMutex);
-
-			Map::const_iterator it(_rules.find(userClass));
-			if(it != _rules.end())
+			const UseRule* rule(_rules[rank]);
+			if(rule)
 			{
-				return *it->second;
+				return *rule;
 			}
-			if (_getParentRuleUser() == NULL)
+			const RuleUser* parentRuleUser(_getParentRuleUser());
+			if (parentRuleUser)
 			{
-				return *ForbiddenUseRule::INSTANCE;
+				return parentRuleUser->getUseRule(rank);
 			}
-			return _getParentRuleUser()->getUseRule(userClass);
+			return *ForbiddenUseRule::INSTANCE;
 		}
 		
 		
 		
-		void RuleUser::addRule(
-			const RuleUser::Map::key_type userClass,
-			const RuleUser::Map::mapped_type value
-		){
-			recursive_mutex::scoped_lock lock(_rulesMutex);
-
-			_rules[userClass] = value;
-		}
-
-
-
-		void RuleUser::removeRule(
-			const RuleUser::Map::key_type userClass
-		){
-			recursive_mutex::scoped_lock lock(_rulesMutex);
-
-			Map::iterator it(_rules.find(userClass));
-			if(it != _rules.end())
-			{
-				_rules.erase(it);
-			}
-		}
-
-		bool RuleUser::isCompatibleWith( const AccessParameters& accessParameters ) const
-		{
-			recursive_mutex::scoped_lock lock(_rulesMutex);
-
-			const UseRule& rule(getUseRule(accessParameters.getUserClass()));
+		bool RuleUser::isCompatibleWith(
+			const AccessParameters& accessParameters
+		) const	{
+			const UseRule& rule(getUseRule(accessParameters.getUserClassRank()));
 			return rule.isCompatibleWith(accessParameters);
 		}
 
 
 
-		RuleUser::Map::mapped_type RuleUser::getRule(
-			Map::key_type userClass
-		) const	{
-			recursive_mutex::scoped_lock lock(_rulesMutex);
-
-			Map::const_iterator it(_rules.find(userClass));
-			if(it == _rules.end()) return NULL;
-			return it->second;
+		const UseRule* RuleUser::getRule( UserClassCode classCode ) const
+		{
+			return _rules[classCode - USER_CLASS_CODE_OFFSET];
 		}
 
 
 
-		void RuleUser::clearRules()
+		RuleUser::Rules RuleUser::GetEmptyRules()
 		{
-			recursive_mutex::scoped_lock lock(_rulesMutex);
-
-			_rules.clear();
+			return Rules(USER_CLASSES_VECTOR_SIZE, NULL);
 		}
 	}
 }

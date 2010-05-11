@@ -126,7 +126,7 @@ namespace synthese
 						servicePointer.getOriginDateTime().date(),
 						*servicePointer.getEdge(),
 						*curLinestop,
-						USER_PEDESTRIAN
+						USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET
 				)	) continue;
 
 				place = curLinestop->getPhysicalStop()->getConnectionPlace();

@@ -104,14 +104,14 @@ namespace synthese
 		ServicePointer ContinuousService::getFromPresenceTime(
 			bool RTData,
 			AccessDirection method,
-			UserClassCode userClass
-			, const Edge* edge
-			, const ptime& presenceDateTime
-			, bool controlIfTheServiceIsReachable
-			, bool inverted
+			size_t userClassRank,
+			const Edge* edge,
+			const ptime& presenceDateTime,
+			bool controlIfTheServiceIsReachable,
+			bool inverted
 		) const	{
 
-			ServicePointer ptr(RTData, method, userClass, edge);
+			ServicePointer ptr(RTData, method, userClassRank, edge);
 			ptr.setService(this);
 			time_duration schedule;
 			ptime actualDateTime(presenceDateTime);
@@ -127,7 +127,7 @@ namespace synthese
 				){
 					if (presenceDateTime.time_of_day() > GetTimeOfDay(endSchedule))
 					{
-						return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClass);
+						return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClassRank);
 					}
 					if (presenceDateTime.time_of_day() < GetTimeOfDay(schedule))
 					{
@@ -161,7 +161,7 @@ namespace synthese
 				{
 					if (presenceDateTime.time_of_day() < GetTimeOfDay(schedule))
 					{
-						return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClass);
+						return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClassRank);
 					}
 					if (presenceDateTime.time_of_day() > GetTimeOfDay(endSchedule))
 					{
@@ -201,7 +201,7 @@ namespace synthese
 			// Date control
 			if (!isActive(calendarDateTime.date()))
 			{
-				return ServicePointer(RTData, method, userClass);
+				return ServicePointer(RTData, method, userClassRank);
 			}
 
 			// Saving of the result
@@ -214,7 +214,7 @@ namespace synthese
 			if (controlIfTheServiceIsReachable)
 			{
 				if (ptr.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
-					return ServicePointer(RTData, method, userClass);
+					return ServicePointer(RTData, method, userClassRank);
 			}
 			else
 			{

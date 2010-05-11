@@ -89,7 +89,7 @@ namespace synthese
 		ServicePointer ScheduledService::getFromPresenceTime(
 			bool RTData,
 			AccessDirection method,
-			UserClassCode userClass
+			size_t userClass
 			, const Edge* edge
 			, const ptime& presenceDateTime
 			, bool controlIfTheServiceIsReachable
@@ -100,18 +100,19 @@ namespace synthese
 			ServicePointer ptr(RTData,method, userClass, edge);
 			ptr.setService(this);
 			int edgeIndex(edge->getRankInPath());
-			const time_duration& thSchedule(method == DEPARTURE_TO_ARRIVAL ? _departureSchedules.at(edgeIndex) : _arrivalSchedules.at(edgeIndex));
-			const time_duration& rtSchedule(method == DEPARTURE_TO_ARRIVAL ? _RTDepartureSchedules.at(edgeIndex) : _RTArrivalSchedules.at(edgeIndex));
+			const time_duration& thSchedule(method == DEPARTURE_TO_ARRIVAL ? _departureSchedules[edgeIndex] : _arrivalSchedules[edgeIndex]);
+			const time_duration& rtSchedule(method == DEPARTURE_TO_ARRIVAL ? _RTDepartureSchedules[edgeIndex] : _RTArrivalSchedules[edgeIndex]);
 			const time_duration& schedule(RTData ? rtSchedule : thSchedule);
+			const time_duration timeOfDay(GetTimeOfDay(schedule));
 
 			// Actual time
-			if(	method == DEPARTURE_TO_ARRIVAL && presenceDateTime.time_of_day() > GetTimeOfDay(schedule) ||
-				method == ARRIVAL_TO_DEPARTURE && presenceDateTime.time_of_day() < GetTimeOfDay(schedule)
+			if(	method == DEPARTURE_TO_ARRIVAL && presenceDateTime.time_of_day() > timeOfDay ||
+				method == ARRIVAL_TO_DEPARTURE && presenceDateTime.time_of_day() < timeOfDay
 			){
 				return ServicePointer(RTData, method, userClass);
 			}
-			ptime actualTime(presenceDateTime.date(), GetTimeOfDay(schedule));
-			const time_duration& departureSchedule(RTData ? _RTDepartureSchedules.at(0) : _departureSchedules.at(0));
+			ptime actualTime(presenceDateTime.date(), timeOfDay);
+			const time_duration& departureSchedule(RTData ? _RTDepartureSchedules[0] : _departureSchedules[0]);
 
 			ptime originDateTime(actualTime);
 			originDateTime += (departureSchedule - schedule);
@@ -150,6 +151,8 @@ namespace synthese
 			return ptr;
 		}
 
+
+
 		ptime ScheduledService::getLeaveTime(
 			const ServicePointer& servicePointer,
 			const Edge* edge
@@ -157,32 +160,32 @@ namespace synthese
 			int edgeIndex(edge->getRankInPath());
 			time_duration schedule(
 				(servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
-				? getArrivalSchedules(servicePointer.getRTData()).at(edgeIndex)
-				: getDepartureSchedules(servicePointer.getRTData()).at(edgeIndex)
+				? getArrivalSchedules(servicePointer.getRTData())[edgeIndex]
+				: getDepartureSchedules(servicePointer.getRTData())[edgeIndex]
 			);
-			return servicePointer.getOriginDateTime() + (schedule - _departureSchedules.at(0));
+			return servicePointer.getOriginDateTime() + (schedule - _departureSchedules[0]);
 		}
 
 
 
 		time_duration ScheduledService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return getDepartureSchedules(RTData).at(rankInPath);
+			return getDepartureSchedules(RTData)[rankInPath];
 		}
 
 		time_duration ScheduledService::getDepartureEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return getDepartureSchedules(RTData).at(rankInPath);
+			return getDepartureSchedules(RTData)[rankInPath];
 		}
 
 		time_duration ScheduledService::getArrivalBeginScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return getArrivalSchedules(RTData).at(rankInPath);
+			return getArrivalSchedules(RTData)[rankInPath];
 		}
 
 		time_duration ScheduledService::getArrivalEndScheduleToIndex(bool RTData, size_t rankInPath) const
 		{
-			return getArrivalSchedules(RTData).at(rankInPath);
+			return getArrivalSchedules(RTData)[rankInPath];
 		}
 
 
@@ -260,7 +263,7 @@ namespace synthese
 			const date& date,
 			const Edge& departureEdge,
 			const Edge& arrivalEdge,
-			UserClassCode userClass
+			size_t userClass
 		) const {
 			const CommercialLine* line(getRoute()->getCommercialLine());
 			if(line->getNonConcurrencyRules().empty()) return true;

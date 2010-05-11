@@ -40,7 +40,6 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace pt;
 	using namespace impex;
 	using namespace graph;
 	using namespace pt;
@@ -129,7 +128,7 @@ namespace synthese
 			line->setRollingStock(NULL);
 			line->setCommercialLine(NULL);
 			line->setDataSource(NULL);
-			line->clearRules();
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
@@ -179,10 +178,7 @@ namespace synthese
 				{
 					try
 					{
-						line->addRule(
-							USER_BIKE,
-							PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get()
-						);
+						rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get();
 					}
 					catch(ObjectNotFoundException<PTUseRule>)
 					{
@@ -194,10 +190,7 @@ namespace synthese
 				{
 					try
 					{
-						line->addRule(
-							USER_HANDICAPPED,
-							PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get()
-							);
+						rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
 					}
 					catch(ObjectNotFoundException<PTUseRule>)
 					{
@@ -209,16 +202,14 @@ namespace synthese
 				{
 					try
 					{
-						line->addRule(
-							USER_PEDESTRIAN,
-							PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get()
-							);
+						rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get();
 					}
 					catch(ObjectNotFoundException<PTUseRule>)
 					{
 						Log::GetInstance().warn("Bad value " + lexical_cast<string>(pedestrianComplianceId) + " for pedestrian compliance in line " + lexical_cast<string>(line->getKey()));
 				}	}
 			}
+			line->setRules(rules);
 		}
 
 

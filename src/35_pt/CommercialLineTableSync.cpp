@@ -155,8 +155,8 @@ namespace synthese
 			object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
 		    object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
 		    object->setCreatorId(rows->getText ( CommercialLineTableSync::COL_CREATOR_ID));
-			object->clearRules();
-			object->addRule(USER_PEDESTRIAN, AllowedUseRule::INSTANCE.get());
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 			
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -220,13 +220,10 @@ namespace synthese
 				// Bike compliance
 				util::RegistryKeyType bikeComplianceId(
 					rows->getLongLong (CommercialLineTableSync::COL_BIKE_USE_RULE)
-					);
+				);
 				if(bikeComplianceId > 0)
 				{
-					object->addRule(
-						USER_BIKE,
-						PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get()
-					);
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get();
 				}
 				
 				// Handicapped compliance
@@ -235,22 +232,16 @@ namespace synthese
 				);
 				if(handicappedComplianceId > 0)
 				{
-					object->addRule(
-						USER_HANDICAPPED,
-						PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get()
-					);
+					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
 				}
 				
 				// Pedestrian compliance
 				util::RegistryKeyType pedestrianComplianceId(
 					rows->getLongLong (CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE)
-					);
+				);
 				if(pedestrianComplianceId > 0)
 				{
-					object->addRule(
-						USER_PEDESTRIAN,
-						PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get()
-					);
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get();
 				}
 
 				// Reservation contact
@@ -264,6 +255,7 @@ namespace synthese
 					);
 				}
 			}
+			object->setRules(rules);
 		}
 
 

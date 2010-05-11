@@ -28,8 +28,7 @@
 
 #include "Registry.h"
 #include "GraphTypes.h"
-
-#include <boost/thread/recursive_mutex.hpp>
+#include "GraphConstants.h"
 
 namespace synthese
 {
@@ -41,24 +40,24 @@ namespace synthese
 		/////////////////////////////////////////////////////////////////////////
 		/// Interface for user of rules defined by UseRules class.
 		/// @ingroup m18
+		/// @author Hugues Romain
 		class RuleUser
 		{
 		public:
-			typedef std::map<UserClassCode, const UseRule*> Map;
+			typedef std::vector<const UseRule*> Rules;
 
 		private:
-			Map _rules;
-			mutable boost::recursive_mutex _rulesMutex;
+			Rules _rules;
 		
 		protected:
 			
 			/////////////////////////////////////////////////////////////////////
 			/// Constructor.
-			RuleUser();
+			RuleUser() :
+			_rules(USER_CLASSES_VECTOR_SIZE, NULL)
+			{}
 			
 		public:
-			virtual const RuleUser* _getParentRuleUser() const = 0;
-
 			//! @name Getters
 			//@{
 				/////////////////////////////////////////////////////////////////
@@ -66,35 +65,27 @@ namespace synthese
 				/// @return only the rules registered to the current object.
 				/// To obtain the actual rule inherited from parent object,
 				/// use getActualRules() instead.
-				const Map& getRules() const;
+				const Rules& getRules() const { return _rules; }
 			//@}
 			
 			//! @name Setters
 			//@{
-				void addRule(
-					const Map::key_type userClass,
-					const Map::mapped_type value
-				);
-				void removeRule(
-					const Map::key_type userClass
-				);
-
-				void clearRules();
+				//////////////////////////////////////////////////////////////////////////
+				/// Rules setter.
+				/// @param value rules
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.18
+				void setRules(const Rules& value){ _rules = value; }
 			//@}
 
-			//! @name Getters
-			//@{
-				Map::mapped_type getRule(
-					Map::key_type userClass
-				) const;
-			//@}
-			
 			//! @name Queries
 			//@{
-				/////////////////////////////////////////////////////////////////
-				/// Consolidated rules query.
-				/// @return all the rules defined by the object and its parents.
-				Map getActualRules() const;
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the parent object to read if the current object does
+				/// not define the needed rule.
+				/// @return the parent object
+				virtual const RuleUser* _getParentRuleUser() const = 0;
 
 
 
@@ -104,15 +95,35 @@ namespace synthese
 				///  - if found in the object : return it.
 				///  - if the object has a parent in the RuleUser tree : recursive call
 				///  - it the object has no parent : return the FORBIDDEN default use rule.
+				/// @param rank rank of user class. To deduce the rank from the user class code,
+				///		do rank = classCode - USER_CLASS_CODE_OFFSET
+				/// @return the rule to apply to the user
+				/// @warning the value of rank is not checked. It must be lower than USER_CLASSES_VECTOR_SIZE.
 				const UseRule&	getUseRule(
-					const UserClassCode userClass
+					std::size_t rank
 				) const;
 
 
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the use rule recorded to the object (without recursion).
+				/// @param userClassCode class code (will be translated into rank)
+				/// @return pointer to the recorder rule or NULL if non defined
+				const UseRule* getRule(
+					UserClassCode classCode
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the rule user is compatible with access parameters.
+				/// @param accessParameters access parameters
+				/// @return true if the rule user is compatible with the specified parameters
+				/// @author Hugues Romain
 				bool isCompatibleWith(
 					const AccessParameters& accessParameters
 				) const;
+
 
 
 				//////////////////////////////////////////////////////////////////////////
@@ -122,6 +133,16 @@ namespace synthese
 				/// @date 2010
 				/// @since 3.1.16
 				virtual std::string getRuleUserName() const = 0;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Generates an empty vector of rules.
+				/// @return vector of rules initialized to NULL
+				/// @date 2010
+				/// @since 3.1.18
+				/// @author Hugues Romain
+				static Rules GetEmptyRules();
 			//@}
 		};
 	}

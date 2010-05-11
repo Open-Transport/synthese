@@ -130,7 +130,7 @@ namespace synthese
 			cs->setRange(range);
 			cs->setMaxWaitingTime(maxWaitingTime);
 			cs->setPathId(pathId);
-			cs->clearRules();
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -150,28 +150,20 @@ namespace synthese
 
 				if(bikeComplianceId > 0)
 				{
-					cs->addRule(
-						USER_BIKE,
-						PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get()
-					);
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get();
 				}
 				if(handicappedComplianceId > 0)
 				{
-					cs->addRule(
-						USER_HANDICAPPED,
-						PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get()
-					);
+					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
 				}
 				if(pedestrianComplianceId > 0)
 				{
-					cs->addRule(
-						USER_PEDESTRIAN,
-						PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get()
-					);
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get();
 				}
 
 				path->addService (cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
+			cs->setRules(rules);
 
 			// After path linking to update path calendar
 			cs->setFromSerializedString(rows->getText(ContinuousServiceTableSync::COL_DATES));

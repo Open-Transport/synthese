@@ -57,7 +57,9 @@ namespace synthese
 			_calendarTemplate(NULL)
 		{
 			// Default use rules
-			addRule(USER_PEDESTRIAN, AllowedUseRule::INSTANCE.get());
+			RuleUser::Rules rules(getRules());
+			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			setRules(rules);
 		}
 
 

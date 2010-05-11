@@ -28,6 +28,7 @@
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
@@ -40,6 +41,8 @@ namespace synthese
 
 	namespace graph
 	{
+		const time_duration Service::DAY_DURATION(hours(24));
+
 		Service::Service(
 			const string& serviceNumber,
 			Path* path
@@ -186,7 +189,7 @@ namespace synthese
 			const date& date,
 			const graph::Edge& departureEdge,
 			const graph::Edge& arrivalEdge,
-			graph::UserClassCode userClass
+			std::size_t userClassRank
 		) const	{
 			return true;
 		}
@@ -202,7 +205,11 @@ namespace synthese
 
 		boost::posix_time::time_duration Service::GetTimeOfDay( const boost::posix_time::time_duration& value )
 		{
-			return time_duration(value.hours() % 24, value.minutes(), value.seconds());
+			return
+				value >= DAY_DURATION ?
+				time_duration(value.hours() % 24, value.minutes(), value.seconds()) :
+				value
+			;
 		}
 
 

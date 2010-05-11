@@ -274,7 +274,7 @@ namespace synthese
 				if(line == NULL) continue;
 
 				if(	line->getCommercialLine()->getReservationContact() &&
-					UseRule::IsReservationPossible(su.getUseRule()->getReservationAvailability(su))
+					UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su))
 					){
 						resaRules.insert(line->getCommercialLine()->getReservationContact());
 				}
@@ -611,15 +611,15 @@ namespace synthese
 			pm.insert(DATA_HANDICAPPED_FILTER_STATUS, handicappedFilterStatus);
 			pm.insert(
 				DATA_HANDICAPPED_PLACES_NUMBER,
-				serviceUse.getUseRule()->getAccessCapacity () ?
-					lexical_cast<string>(*serviceUse.getUseRule()->getAccessCapacity ()) :
+				serviceUse.getUseRule().getAccessCapacity () ?
+					lexical_cast<string>(*serviceUse.getUseRule().getAccessCapacity ()) :
 					"9999"
 			);
 			pm.insert(DATA_BIKE_FILTER_STATUS, bikeFilterStatus);
 			pm.insert(
 				DATA_BIKE_PLACES_NUMBER,
-				serviceUse.getUseRule()->getAccessCapacity () ?
-					lexical_cast<string>(*serviceUse.getUseRule()->getAccessCapacity ()) :
+				serviceUse.getUseRule().getAccessCapacity () ?
+					lexical_cast<string>(*serviceUse.getUseRule().getAccessCapacity ()) :
 				"9999"
 			); // 11
 			pm.insert(DATA_LINE_SHORT_NAME, commercialLine->getShortName() ); // 12

@@ -67,6 +67,7 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<const Vertex*> ServedVertices;
+			static const boost::posix_time::time_duration DAY_DURATION;
 
 		protected:
 			std::string				_serviceNumber;
@@ -145,7 +146,7 @@ namespace synthese
 					const boost::gregorian::date& date,
 					const graph::Edge& departureEdge,
 					const graph::Edge& arrivalEdge,
-					graph::UserClassCode userClass
+					std::size_t userClassRank
 				) const;
 				
 				virtual void clearNonConcurrencyCache() const;
@@ -183,7 +184,7 @@ namespace synthese
 				virtual ServicePointer getFromPresenceTime(
 					bool RTData,
 					AccessDirection method,
-					UserClassCode userClass,
+					std::size_t userClassRank,
 					const Edge* edge,
 					const boost::posix_time::ptime& presenceDateTime
 					, bool controlIfTheServiceIsReachable

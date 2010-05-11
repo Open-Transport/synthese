@@ -126,7 +126,7 @@ namespace synthese
 					{
 						// Next service
 						serviceInstance = ls->getNextService(
-							USER_PEDESTRIAN,
+							USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
 							minTimeForForcedDestination,
 							maxTimeForForcedDestination,
 							false,

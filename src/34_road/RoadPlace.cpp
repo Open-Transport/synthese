@@ -54,9 +54,11 @@ namespace synthese
 		):	Registrable(key),
 			NamedPlaceTemplate<RoadPlace>()
 		{
-			addRule(USER_PEDESTRIAN, AllowedUseRule::INSTANCE.get());
-			addRule(USER_HANDICAPPED, AllowedUseRule::INSTANCE.get());
-			addRule(USER_BIKE, AllowedUseRule::INSTANCE.get());
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			setRules(rules);
 		}
 		
 		

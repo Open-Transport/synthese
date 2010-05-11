@@ -26,6 +26,8 @@
 #include "Service.h"
 #include "Vertex.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
@@ -153,7 +155,7 @@ namespace synthese
 
 
 		ServicePointer Edge::getNextService(
-			UserClassCode userClass,
+			size_t userClassRank,
 			ptime departureMoment,
 			const ptime& maxDepartureMoment,
 			bool controlIfTheServiceIsReachable,
@@ -165,7 +167,7 @@ namespace synthese
 
 			if(services.empty())
 			{
-				return ServicePointer(false, DEPARTURE_TO_ARRIVAL, userClass);
+				return ServicePointer(false, DEPARTURE_TO_ARRIVAL, userClassRank);
 			}
 
 			bool RTData(departureMoment < posix_time::second_clock().local_time() + posix_time::hours(23));
@@ -191,7 +193,7 @@ namespace synthese
 							(*next)->getFromPresenceTime(
 								RTData,
 								DEPARTURE_TO_ARRIVAL,
-								userClass
+								userClassRank
 								, this
 								, departureMoment
 								, controlIfTheServiceIsReachable
@@ -204,7 +206,7 @@ namespace synthese
 
 						// Control of validity of departure date time
 						if (servicePointer.getActualDateTime() > maxDepartureMoment )
-							return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClass);
+							return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClassRank);
 
 						// Store the service rank in edge
 						minNextServiceIndex = next;
@@ -218,13 +220,13 @@ namespace synthese
 				next = _departureIndex[0].get(RTData);
 			}
 
-			return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClass);
+			return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClassRank);
 		}
 
 
 
 		ServicePointer Edge::getPreviousService(
-			UserClassCode userClass,
+			size_t userClassRank,
 			ptime arrivalMoment,
 			const ptime& minArrivalMoment,
 			bool controlIfTheServiceIsReachable,
@@ -236,7 +238,7 @@ namespace synthese
 
 			if(services.empty())
 			{
-				return ServicePointer(false, ARRIVAL_TO_DEPARTURE, userClass);
+				return ServicePointer(false, ARRIVAL_TO_DEPARTURE, userClassRank);
 			}
 
 			bool RTData(arrivalMoment < posix_time::second_clock().local_time() + posix_time::hours(23));
@@ -260,8 +262,8 @@ namespace synthese
 							(*previous)->getFromPresenceTime(
 								RTData,
 								ARRIVAL_TO_DEPARTURE,
-								userClass
-								, this
+								userClassRank,
+								this
 								, arrivalMoment
 								, controlIfTheServiceIsReachable
 								, inverted
@@ -273,7 +275,7 @@ namespace synthese
 
 						// Control of validity of departure date time
 						if (servicePointer.getActualDateTime() < minArrivalMoment)
-							return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClass);
+							return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClassRank);
 
 						// Store service rank in edge
 						maxPreviousServiceIndex = previous;
@@ -286,7 +288,7 @@ namespace synthese
 				previous = _arrivalIndex[INDICES_NUMBER - 1].get(RTData);
 			}
 
-			return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClass);
+			return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClassRank);
 		}
 
 
