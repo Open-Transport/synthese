@@ -47,6 +47,12 @@ namespace synthese
 		const string TimetableNoteInterfacePage::DATA_NUMBER("number");
 		const string TimetableNoteInterfacePage::DATA_TEXT("text");
 		const string TimetableNoteInterfacePage::DATA_CALENDAR("calendar");
+		const string TimetableNoteInterfacePage::DATA_FIRST_YEAR("first_year");
+		const string TimetableNoteInterfacePage::DATA_FIRST_MONTH("first_month");
+		const string TimetableNoteInterfacePage::DATA_FIRST_DAY("first_day");
+		const string TimetableNoteInterfacePage::DATA_LAST_YEAR("last_year");
+		const string TimetableNoteInterfacePage::DATA_LAST_MONTH("last_month");
+		const string TimetableNoteInterfacePage::DATA_LAST_DAY("last_day");
 
 
 
@@ -81,6 +87,12 @@ namespace synthese
 					CalendarDateInterfacePage::Display(calendarContent, calendarDatePage, request, day, calendar.isActive(day));
 				}
 				pm.insert(DATA_CALENDAR, calendarContent.str());
+				pm.insert(DATA_FIRST_DAY, firstDate.day());
+				pm.insert(DATA_FIRST_MONTH, firstDate.month());
+				pm.insert(DATA_FIRST_YEAR, firstDate.year());
+				pm.insert(DATA_LAST_DAY, lastDate.day());
+				pm.insert(DATA_LAST_MONTH, lastDate.month());
+				pm.insert(DATA_LAST_YEAR, lastDate.year());
 			}
 
 			displayRequest.getFunction()->setAditionnalParametersMap(pm);
