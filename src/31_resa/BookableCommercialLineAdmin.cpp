@@ -329,16 +329,33 @@ namespace synthese
 				}
 				stream << "</h1>";
 
-				UseRule::ReservationAvailabilityType ability(sortedServices[0]->getReservationAbility(_date));
-				if(	ability == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
-					ability == UseRule::RESERVATION_OPTIONAL_POSSIBLE
+				UseRule::ReservationAvailabilityType pedestrianAbility(sortedServices[0]->getReservationAbility(_date, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+				UseRule::ReservationAvailabilityType handicappedAbility(sortedServices[0]->getReservationAbility(_date, USER_HANDICAPPED - USER_CLASS_CODE_OFFSET));
+				UseRule::ReservationAvailabilityType bikeAbility(sortedServices[0]->getReservationAbility(_date, USER_BIKE - USER_CLASS_CODE_OFFSET));
+				if(	pedestrianAbility == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
+					pedestrianAbility == UseRule::RESERVATION_OPTIONAL_POSSIBLE ||
+					handicappedAbility == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
+					handicappedAbility == UseRule::RESERVATION_OPTIONAL_POSSIBLE ||
+					bikeAbility == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
+					bikeAbility == UseRule::RESERVATION_OPTIONAL_POSSIBLE
 				){
 					stream <<
 						"<p class=\"info\">" <<
 						"ATTENTION Cette liste de réservations est provisoire tant que le service est ouvert à la réservation." <<
 						"</p>"
 					;
-					ptime deadLine(sortedServices[0]->getReservationDeadLine(_date));
+					ptime pedestrianDeadLine(sortedServices[0]->getReservationDeadLine(_date, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+					ptime handicappedDeadLine(sortedServices[0]->getReservationDeadLine(_date, USER_HANDICAPPED - USER_CLASS_CODE_OFFSET));
+					ptime bikeDeadLine(sortedServices[0]->getReservationDeadLine(_date, USER_BIKE - USER_CLASS_CODE_OFFSET));
+					ptime deadLine(pedestrianDeadLine);
+					if(deadLine.is_not_a_date_time() || (!handicappedDeadLine.is_not_a_date_time() && handicappedDeadLine > deadLine))
+					{
+						deadLine = handicappedDeadLine;
+					}
+					if(deadLine.is_not_a_date_time() || (!bikeDeadLine.is_not_a_date_time() && bikeDeadLine > deadLine))
+					{
+						deadLine = bikeDeadLine;
+					}
 					stream <<
 						"<p class=\"info\">" <<
 						"Le service sera fermé à la réservation à partir du " <<
