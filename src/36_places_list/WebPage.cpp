@@ -25,6 +25,7 @@
 #include "DynamicRequest.h"
 #include "FunctionWithSite.h"
 #include "GetValueFunction.hpp"
+#include "ServerModule.h"
 
 using namespace std;
 using namespace boost;
@@ -66,7 +67,8 @@ namespace synthese
 			std::string::const_iterator it,
 			std::string::const_iterator end,
 			std::string termination,
-			const server::Request& request
+			const server::Request& request,
+			bool encodeSubResults
 		) const {
 			string labelToReach;
 			while(it != end)
@@ -143,7 +145,7 @@ namespace synthese
 				{
 					stringstream query;
 					query << Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT;
-					it = _parse(query, it+2, end, "?>", request);
+					it = _parse(query, it+2, end, "?>", request, true);
 					if(labelToReach.empty())
 					{
 						ParametersMap parametersMap(query.str());
@@ -169,7 +171,9 @@ namespace synthese
 									_function->_setFromParametersMap(parametersMap);
 									if (_function->isAuthorized(request.getSession()))
 									{
-										_function->run(stream, request);
+										stringstream subresult;
+										_function->run(subresult, request);
+										stream << (encodeSubResults ? ServerModule::URLEncode(subresult.str()) : subresult.str());
 									}
 								}
 								catch(...)
@@ -184,18 +188,20 @@ namespace synthese
 				else if(*it == '<' && it+1 != end && *(it+1)=='@' && it+2 != end)
 				{
 					stringstream parameter;
-					it = _parse(parameter, it+2, end, "@>", request);
+					it = _parse(parameter, it+2, end, "@>", request, true);
 					if(labelToReach.empty())
 					{
+						stringstream subresult;
 						GetValueFunction function;
 						function.setParameter(parameter.str());
-						function.run(stream, request);
+						function.run(subresult, request);
+						stream << (encodeSubResults ? ServerModule::URLEncode(subresult.str()) : subresult.str());
 					}
 				} // Goto
 				else if(*it == '<' && it+1 != end && *(it+1)=='%' && it+2 != end)
 				{
 					stringstream label;
-					it = _parse(label, it+2, end, "%>", request);
+					it = _parse(label, it+2, end, "%>", request, false);
 					if(labelToReach.empty() && !label.str().empty())
 					{
 						labelToReach = label.str();
@@ -204,13 +210,13 @@ namespace synthese
 				else if(*it == '<' && it+1 != end && *(it+1)=='<' && it+2 != end)
 				{
 					stringstream label;
-					it = _parse(label, it+2, end, ">>", request);
+					it = _parse(label, it+2, end, ">>", request, false);
 					if(labelToReach == label.str())
 					{
 						labelToReach.clear();
 					}
 				} // Reached the end of a recursion level
-				else if(termination.size() == 2 && *it == termination.at(0) && it+1 != end && *(it+1)==termination.at(1))
+				else if(termination.size() == 2 && *it == termination[0] && it+1 != end && *(it+1)==termination[1])
 				{
 					return it+2;
 				}
@@ -230,7 +236,7 @@ namespace synthese
 
 		void WebPage::display( std::ostream& stream, const server::Request& request ) const
 		{
-			_parse(stream, _content.begin(), _content.end(), string(), request);
+			_parse(stream, _content.begin(), _content.end(), string(), request, false);
 		}
 
 

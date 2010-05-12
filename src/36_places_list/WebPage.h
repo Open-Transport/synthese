@@ -95,18 +95,23 @@ namespace synthese
 			/// @param it iterator on the beginning of the string to parse
 			/// @param end iterator on the end of the string to parse
 			/// @param request request which has launched the display of the webpage
+			/// @param recursionLevel level of recursion (default = 0).
 			/// @return iterator on the end of the parsing
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.1.16
 			/// The parsing stops when the iterator has reached the end of the string, or if the ?> sequence has been found, indicating that the following text belongs to
 			///	a lower level of recursion.
+			/// If the level of recursion is superior than 0, then the output is encoded
+			/// as an url to avoid mistake when the result of parsing is considered as
+			/// a single parameter of a function call.
 			std::string::const_iterator _parse(
 				std::ostream& stream,
 				std::string::const_iterator it,
 				std::string::const_iterator end,
 				std::string termination,
-				const server::Request& request
+				const server::Request& request,
+				bool encodeSubResults
 			) const;
 
 		public:

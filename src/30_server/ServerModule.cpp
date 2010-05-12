@@ -25,9 +25,11 @@
 #include "EMail.h"
 #include "Log.h"
 
+#include <iomanip>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread.hpp>
 #include <boost/bind.hpp>
+#include <boost/foreach.hpp>
 
 #ifdef UNIX
   #define DEFAULT_TEMP_DIR "/tmp"
@@ -512,6 +514,29 @@ namespace synthese
 				GetParameter(MODULE_PARAM_SMTP_SERVER),
 				GetParameter(MODULE_PARAM_SMTP_PORT)
 			);
+		}
+
+
+
+		std::string ServerModule::URLEncode( const std::string& value )
+		{
+			stringstream result;
+			BOOST_FOREACH(char c, value)
+			{
+				if(	(c >= 48 && c <= 57) ||
+					(c >= 65 && c <= 90) ||
+					(c >= 97 && c <= 122)
+				){
+					result << c;
+				}
+				else
+				{
+					result << "%";
+					if(c < 16) result << "0";
+					result << hex << static_cast<int>(c);
+				}
+			}
+			return result.str();
 		}
 
 
