@@ -79,6 +79,8 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<WebPage>	Registry;
 
+			typedef std::vector<WebPage*> Links;
+
 		private:
 			WebPage* _template;
 			std::string _content;
@@ -86,6 +88,8 @@ namespace synthese
 			boost::posix_time::ptime _endDate;
 			std::string _mimeType;
 			std::string _abstract;
+			std::string _image;
+			Links _links;
 
 
 
@@ -125,6 +129,8 @@ namespace synthese
 				const std::string& _getMimeType() const { return _mimeType; }
 				WebPage* _getTemplate() const { return _template;}
 				const std::string& getAbstract() const { return _abstract; }
+				const std::string& getImage() const { return _image; }
+				const Links& getLinks() const { return _links; }
 			//@}
 
 			//! @name Setters
@@ -135,6 +141,8 @@ namespace synthese
 				void setMimeType(const std::string& value){ _mimeType = value; }
 				void setTemplate(WebPage* value){ _template = value; }
 				void setAbstract(const std::string& value){ _abstract = value; }
+				void setImage(const std::string& value){ _image = value; }
+				void setLinks(const Links& value){ _links = value; }
 			//@}
 
 			//! @name Services

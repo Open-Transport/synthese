@@ -47,7 +47,7 @@ namespace synthese
 	{
 		const string WebPageUpdateAction::PARAMETER_WEB_PAGE_ID = Action_PARAMETER_PREFIX + "wp";
 		const string WebPageUpdateAction::PARAMETER_UP_ID = Action_PARAMETER_PREFIX + "ui";
-		const string WebPageUpdateAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "ti";
+		const string WebPageUpdateAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "te";
 		const string WebPageUpdateAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sd";
 		const string WebPageUpdateAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "ed";
 		const string WebPageUpdateAction::PARAMETER_MIME_TYPE = Action_PARAMETER_PREFIX + "mt";
@@ -61,6 +61,8 @@ namespace synthese
 			{
 				map.insert(PARAMETER_WEB_PAGE_ID, _page->getKey());
 			}
+			map.insert(PARAMETER_TEMPLATE_ID, _template.get() ? _template->getKey() : RegistryKeyType(0));
+			map.insert(PARAMETER_MIME_TYPE, _mimeType);
 			return map;
 		}
 		
@@ -81,11 +83,22 @@ namespace synthese
 			if(id > 0)
 			try
 			{
-				_up = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_UP_ID), *_env);
+				_up = WebPageTableSync::GetEditable(id, *_env);
 			}
-			catch(ObjectNotFoundException<WebPage>& e)
+			catch(ObjectNotFoundException<WebPage>&)
 			{
 				throw ActionException("No such up page");
+			}
+
+			RegistryKeyType templateId(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE_ID, 0));
+			if(templateId > 0)
+			try
+			{
+				_template = WebPageTableSync::GetEditable(templateId, *_env);
+			}
+			catch(ObjectNotFoundException<WebPage>&)
+			{
+				throw ActionException("No such template page");
 			}
 
 			if(!map.getDefault<string>(PARAMETER_START_DATE).empty())
@@ -97,7 +110,6 @@ namespace synthese
 				_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
 			}
 
-			_title = map.getDefault<string>(PARAMETER_TITLE);
 			_mimeType = map.getDefault<string>(PARAMETER_MIME_TYPE);
 		}
 		
@@ -109,11 +121,11 @@ namespace synthese
 			stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			
-			_page->setName(_title);
 			_page->setParent(_up.get());
 			_page->setStartDate(_startDate);
 			_page->setEndDate(_endDate);
 			_page->setMimeType(_mimeType);
+			_page->setTemplate(_template.get());
 
 			WebPageTableSync::Save(_page.get());
 

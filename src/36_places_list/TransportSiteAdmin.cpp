@@ -323,60 +323,13 @@ namespace synthese
 			// TAB WEB PAGES
 			if (openTabContent(stream, TAB_WEB_PAGES))
 			{
-				
-				stream << "<h1>Recherche</h1>";
-				AdminFunctionRequest<TransportSiteAdmin> searchRequest(_request);
-				SearchFormHTMLTable sft(searchRequest.getHTMLForm("pagesearch"));
-				stream << sft.open();
-				stream << sft.cell("Titre", sft.getForm().getTextInput(PARAMETER_SEARCH_PAGE, _searchPage));
-				stream << sft.close();
-
-				stream << "<h1>Résultat</h1>";
+				stream << "<h1>Pages</h1>";
 				AdminActionFunctionRequest<WebPageAddAction, TransportSiteAdmin> addRequest(_request);
-				addRequest.getAction()->setSite(const_pointer_cast<Site>(_site));
-
-				AdminActionFunctionRequest<WebPageAddAction, TransportSiteAdmin> parentAddRequest(_request);
 				addRequest.getAction()->setSite(const_pointer_cast<Site>(_site));
 
 				AdminActionFunctionRequest<WebPageRemoveAction, TransportSiteAdmin> deleteRequest(_request);
 
-				AdminFunctionRequest<WebPageAdmin> openRequest(_request);
-
-				StaticFunctionRequest<WebPageDisplayFunction> viewRequest(_request, false);
-				if(	!_site->getClientURL().empty()
-				){
-					viewRequest.setClientURL(_site->getClientURL());
-				}
-				
-				WebPageTableSync::SearchResult result(
-					WebPageTableSync::Search(
-						Env::GetOfficialEnv(),
-						_site->getKey(),
-						RegistryKeyType(0),
-						_pageSearchParameter.first,
-						_pageSearchParameter.maxSize,
-						_pageSearchParameter.orderField == PARAMETER_SEARCH_RANK,
-						_pageSearchParameter.orderField == PARAMETER_SEARCH_PAGE,
-						_pageSearchParameter.raisingOrder
-				)	);
-
-				ActionResultHTMLTable::HeaderVector h;
-				h.push_back(make_pair(PARAMETER_SEARCH_RANK, "#"));
-				h.push_back(make_pair(PARAMETER_SEARCH_PAGE, "Titre"));
-				h.push_back(make_pair(string(), "Actions"));
-				h.push_back(make_pair(string(), "Actions"));
-				h.push_back(make_pair(string(), "Actions"));
-				h.push_back(make_pair(string(), "Actions"));
-				ActionResultHTMLTable t(h, sft.getForm(), _pageSearchParameter, result, addRequest.getHTMLForm(), WebPageAddAction::PARAMETER_TEMPLATE_ID);
-				stream << t.open();
-
-				_displaySubPages(stream, result, openRequest, viewRequest, parentAddRequest, deleteRequest, t);
-
-				stream << t.row();
-				stream << t.col();
-				stream << t.col() << t.getActionForm().getTextInput(WebPageAddAction::PARAMETER_TITLE, string(), "(Entrez le titre ici)");
-				stream << t.col(4) << t.getActionForm().getSubmitButton("Créer");
-				stream << t.close();
+				WebPageAdmin::DisplaySubPages(stream, _site->getKey(), addRequest, deleteRequest, _request);
 			}
 
 
@@ -457,63 +410,6 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
 			closeTabContent(stream);
-		}
-
-
-
-		void TransportSiteAdmin::_displaySubPages(
-			std::ostream& stream,
-			const WebPageTableSync::SearchResult& pages,
-			AdminFunctionRequest<WebPageAdmin>& openRequest,
-			StaticFunctionRequest<WebPageDisplayFunction>& viewRequest,
-			AdminActionFunctionRequest<WebPageAddAction, TransportSiteAdmin>& createRequest,
-			AdminActionFunctionRequest<WebPageRemoveAction, TransportSiteAdmin>& deleteRequest,
-			ActionResultHTMLTable& t,
-			size_t depth
-		) const {
-
-			BOOST_FOREACH(shared_ptr<WebPage> page, pages)
-			{
-				openRequest.getPage()->setPage(const_pointer_cast<const WebPage>(page));
-				viewRequest.getFunction()->setPage(const_pointer_cast<const WebPage>(page));
-				deleteRequest.getAction()->setPage(page);
-
-				stream << t.row(lexical_cast<string>(page->getKey()));
-				stream << t.col();
-				for(size_t i(0); i<depth; ++i)
-					stream << "&nbsp;&nbsp;&nbsp;";
-				stream << page->getRank();
-				stream << t.col() << page->getName();
-				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), WebPageAdmin::ICON);
-				stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "page_go.png");
-				
-				WebPageTableSync::SearchResult result(
-					WebPageTableSync::Search(
-						Env::GetOfficialEnv(),
-						_site->getKey(),
-						page->getKey(),
-						_pageSearchParameter.first,
-						_pageSearchParameter.maxSize,
-						_pageSearchParameter.orderField == PARAMETER_SEARCH_RANK,
-						_pageSearchParameter.orderField == PARAMETER_SEARCH_PAGE,
-						_pageSearchParameter.raisingOrder
-				)	);
-
-				stream << t.col();
-				if(result.empty())
-				{
-					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la page "+ page->getName() +" ?", "page_delete.png");
-				}
-
-				stream << t.col();
-				if(result.empty())
-				{
-					createRequest.getAction()->setParent(page);
-					stream << HTMLModule::getLinkButton(createRequest.getURL(), "Créer sous-page", string(), "page_add.png");
-				}
-
-				_displaySubPages(stream, result, openRequest, viewRequest, createRequest, deleteRequest, t, depth+1);
-			}
 		}
 
 

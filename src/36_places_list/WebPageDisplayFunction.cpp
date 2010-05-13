@@ -87,13 +87,20 @@ namespace synthese
 		) const {
 			if(_page.get())
 			{
-				WebPageInterfacePage::Display(
-					stream,
-					_useTemplate ? Env::GetOfficialEnv().getEditableSPtr(_page->getTemplate()) : shared_ptr<WebPage>(),
-					request,
-					*_page,
-					false
-				);
+				if(_useTemplate && _page->getTemplate())
+				{
+					WebPageInterfacePage::Display(
+						stream,
+						*_page->getTemplate(),
+						request,
+						*_page,
+						false
+					);
+				}
+				else
+				{
+					_page->display(stream, request);
+				}
 			}
 		}
 		

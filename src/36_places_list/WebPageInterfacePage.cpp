@@ -28,6 +28,7 @@
 #include "WebPageDisplayFunction.h"
 
 #include <sstream>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -41,39 +42,41 @@ namespace synthese
 	{
 		const string WebPageInterfacePage::DATA_CONTENT("content");
 		const string WebPageInterfacePage::DATA_TITLE("title");
+		const string WebPageInterfacePage::DATA_ABSTRACT("abstract");
+		const string WebPageInterfacePage::DATA_IMAGE("image");
+		const string WebPageInterfacePage::DATA_PUBLICATION_DATE("date");
 
 
 
 		void WebPageInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const WebPage> templatePage,
+			const WebPage& templatePage,
 			const server::Request& request,
 			const WebPage& page,
 			bool edit
 		){
-			if(templatePage.get())
-			{
-				StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-				displayRequest.getFunction()->setPage(templatePage);
-				ParametersMap pm(
-					dynamic_pointer_cast<const WebPageDisplayFunction>(request.getFunction()) ?
-					dynamic_pointer_cast<const WebPageDisplayFunction>(request.getFunction())->getAditionnalParametersMap() :
-					ParametersMap()
-				);
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(Env::GetOfficialEnv().getSPtr(&templatePage));
+			ParametersMap pm(
+				dynamic_pointer_cast<const WebPageDisplayFunction>(request.getFunction()) ?
+				dynamic_pointer_cast<const WebPageDisplayFunction>(request.getFunction())->getAditionnalParametersMap() :
+				ParametersMap()
+			);
 
-				pm.insert(DATA_TITLE, page.getName());
-				stringstream content;
-				page.display(content, request);
-				pm.insert(DATA_CONTENT, content.str());
-				pm.insert(Request::PARAMETER_OBJECT_ID, page.getKey());
+			pm.insert(DATA_TITLE, page.getName());
+			stringstream content;
+			page.display(content, request);
+			pm.insert(DATA_CONTENT, content.str());
+			pm.insert(DATA_ABSTRACT, page.getAbstract());
+			pm.insert(DATA_IMAGE, page.getImage());
+			pm.insert(
+				DATA_PUBLICATION_DATE,
+				page.getStartDate().is_not_a_date_time() ? string() : lexical_cast<string>(page.getStartDate())
+			);
+			pm.insert(Request::PARAMETER_OBJECT_ID, page.getKey());
 
-				displayRequest.getFunction()->setAditionnalParametersMap(pm);
-				displayRequest.run(stream);
-			}
-			else
-			{
-				page.display(stream, request);
-			}
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
 		}
 	}
 }

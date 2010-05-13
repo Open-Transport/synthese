@@ -89,17 +89,6 @@ namespace synthese
 			html::ResultHTMLTable::RequestParameters	_pageSearchParameter;
 			boost::optional<size_t>			_resultsNumber;
 
-			void _displaySubPages(
-				std::ostream& stream,
-				const WebPageTableSync::SearchResult& pages,
-				admin::AdminFunctionRequest<WebPageAdmin>& openRequest,
-				server::StaticFunctionRequest<WebPageDisplayFunction>& viewRequest,
-				admin::AdminActionFunctionRequest<WebPageAddAction, TransportSiteAdmin>& createRequest,
-				admin::AdminActionFunctionRequest<WebPageRemoveAction, TransportSiteAdmin>& deleteRequest,
-				html::ActionResultHTMLTable& t,
-				std::size_t depth = 0
-			) const;
-
 		public:
 			TransportSiteAdmin();
 
@@ -179,9 +168,8 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds the tabs of the page.
-			/// @param request The current request (can be used to determinate the
-			///        current user rights.)
-			/// @author Hugues
+			/// @param profile The profile of the current user
+			/// @author Hugues Romain
 			/// @date 2010
 			virtual void _buildTabs(
 				const security::Profile& profile

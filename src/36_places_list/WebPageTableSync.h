@@ -34,10 +34,13 @@ namespace synthese
 {
 	namespace transportwebsite
 	{
-		/** Web page SQLite table synchronizer.
-			@ingroup m56LS refLS
-		*/
-		class WebPageTableSync : public db::SQLiteRegistryTableSyncTemplate<WebPageTableSync,WebPage>
+		//////////////////////////////////////////////////////////////////////////
+		/// 56.10 Table : Web page.
+		///	@ingroup m56LS refLS
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		class WebPageTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<WebPageTableSync,WebPage>
 		{
 		public:
 			static const std::string COL_TITLE;
@@ -49,6 +52,8 @@ namespace synthese
 			static const std::string COL_END_TIME;
 			static const std::string COL_MIME_TYPE;
 			static const std::string COL_ABSTRACT;
+			static const std::string COL_IMAGE;
+			static const std::string COL_LINKS;
 		
 
 

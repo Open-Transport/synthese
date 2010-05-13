@@ -26,30 +26,60 @@
 #ifndef SYNTHESE_WebPageAdmin_H__
 #define SYNTHESE_WebPageAdmin_H__
 
-#include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
+#include "StaticActionRequest.h"
+#include "WebPageTableSync.h"
 
 namespace synthese
 {
+	namespace html
+	{
+		class HTMLTable;
+		class HTMLForm;
+	}
+
 	namespace transportwebsite
 	{
+		class WebPageRemoveAction;
+		class WebPageAddAction;
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// WebPageAdmin Admin compound class.
+		/// 56.14 Admin : Web page edition.
 		///	@ingroup m56Admin refAdmin
-		///	@author Hugues
+		///	@author Hugues Romain
 		///	@date 2010
+		//////////////////////////////////////////////////////////////////////////
+		/// <h3>Parameters</h3>
+		///	<ul>
+		///		<li>roid : id of the page to edit</li>
+		///	</ul>
+		///
+		/// <h3>Tabs</h3>
+		/// @copydoc WebPageAdmin::_buildTabs
 		class WebPageAdmin:
 			public admin::AdminInterfaceElementTemplate<WebPageAdmin>
 		{
 		public:
+			static const std::string TAB_CONTENT;
+			static const std::string TAB_TREE;
+			static const std::string TAB_LINKS;
 			
 		private:
 			/// @name Attributes
 			//@{
 				boost::shared_ptr<const WebPage> _page;
 			//@}
+
+			static void _displaySubPages(
+				std::ostream& stream,
+				const WebPageTableSync::SearchResult& pages,
+				server::StaticActionRequest<WebPageRemoveAction>& deleteRequest,
+				const admin::AdminRequest& request,
+				html::HTMLTable& t,
+				html::HTMLForm& f,
+				std::size_t depth = 0
+			);
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -154,10 +184,38 @@ namespace synthese
 			virtual std::string getTitle() const;
 
 
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds the tabs of the page.
+			/// @param profile The profile of the user
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.18
+			//////////////////////////////////////////////////////////////////////////
+			/// The following tabs are created :
+			///	<ul>
+			///		<li>co : Contenu : edition of the content of the page</li>
+			///		<li>tr : Arborescence : edition of the position of the page in the site, handling of sub-pages</li>
+			///		<li>li : Liens : edition of the links starting from the page</li>
+			///	</ul>
+			virtual void _buildTabs(
+				const security::Profile& profile
+			) const;
+
+
 			//! @name Setters
 			//@{
 				void setPage(boost::shared_ptr<const WebPage> value) { _page = value; }
 			//@}
+
+
+			static void	DisplaySubPages(
+				std::ostream& stream,
+				util::RegistryKeyType parentId,
+				server::StaticActionRequest<WebPageAddAction>& createRequest,
+				server::StaticActionRequest<WebPageRemoveAction>& deleteRequest,
+				const admin::AdminRequest& request
+			);
 		};
 	}
 }

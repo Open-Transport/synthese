@@ -41,15 +41,20 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Parameters :
 		/// <ul>
-		///		<li>mt : mime type</li>
+		///		<li>wp : web page to update</li>
+		///		<li>ui : value of parent page id</li>
+		///		<li>te : value of template id</li>
+		///		<li>sd : value of publication start date</li>
+		///		<li>ed : value of publication end date</li>
+		///		<li>mt : value of mime type</li>
 		/// </ul>
 		class WebPageUpdateAction:
 			public util::FactorableTemplate<server::Action, WebPageUpdateAction>
 		{
 		public:
 			static const std::string PARAMETER_WEB_PAGE_ID;
-			static const std::string PARAMETER_TITLE;
 			static const std::string PARAMETER_UP_ID;
+			static const std::string PARAMETER_TEMPLATE_ID;
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
 			static const std::string PARAMETER_MIME_TYPE;
@@ -57,7 +62,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<WebPage> _page;
 			boost::shared_ptr<WebPage> _up;
-			std::string _title;
+			boost::shared_ptr<WebPage> _template;
 			boost::posix_time::ptime _startDate;
 			boost::posix_time::ptime _endDate;
 			std::string _mimeType;

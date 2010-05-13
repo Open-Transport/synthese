@@ -25,6 +25,9 @@
 #include "SQLiteResult.h"
 #include "SiteTableSync.h"
 #include "SelectQuery.hpp"
+#include "Conversion.h"
+
+#include <boost/foreach.hpp>
 
 using namespace boost;
 using namespace std;
@@ -52,6 +55,8 @@ namespace synthese
 		const string WebPageTableSync::COL_END_TIME = "end_time";
 		const string WebPageTableSync::COL_MIME_TYPE = "mime_type";
 		const string WebPageTableSync::COL_ABSTRACT = "abstract";
+		const string WebPageTableSync::COL_IMAGE = "image";
+		const string WebPageTableSync::COL_LINKS = "links";
 	}
 
 	namespace db
@@ -72,6 +77,8 @@ namespace synthese
 			SQLiteTableSync::Field(WebPageTableSync::COL_END_TIME, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_MIME_TYPE, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_ABSTRACT, SQL_TEXT),
+			SQLiteTableSync::Field(WebPageTableSync::COL_IMAGE, SQL_TEXT),
+			SQLiteTableSync::Field(WebPageTableSync::COL_LINKS, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -94,6 +101,7 @@ namespace synthese
 			webpage->setRank(rows->getInt(WebPageTableSync::COL_RANK));
 			webpage->setMimeType(rows->getText(WebPageTableSync::COL_MIME_TYPE));
 			webpage->setAbstract(rows->getText(WebPageTableSync::COL_ABSTRACT));
+			webpage->setImage(rows->getText(WebPageTableSync::COL_IMAGE));
 
 			if(!rows->getText(WebPageTableSync::COL_START_TIME).empty())
 			{
@@ -137,6 +145,33 @@ namespace synthese
 						);
 					}
 				}
+
+				vector<string> links(Conversion::ToStringVector(rows->getText(WebPageTableSync::COL_LINKS)));
+				WebPage::Links pageLinks;
+				BOOST_FOREACH(const string& link, links)
+				{
+					try
+					{
+						pageLinks.push_back(
+							WebPageTableSync::GetEditable(lexical_cast<RegistryKeyType>(link), env, linkLevel).get()
+						);
+					}
+					catch(bad_lexical_cast&)
+					{
+						Log::GetInstance().warn(
+							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : link " +
+							link + " is not a page id"
+						);
+					}
+					catch(ObjectNotFoundException<WebPage>&)
+					{
+						Log::GetInstance().warn(
+							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : link " +
+							link + " not found"
+						);
+					}
+				}
+				webpage->setLinks(pageLinks);
 			}
 		}
 
@@ -152,6 +187,22 @@ namespace synthese
 			WebPage* webPage,
 			optional<SQLiteTransaction&> transaction
 		){
+			// Links preparation
+			stringstream linksStream;
+			bool first(true);
+			BOOST_FOREACH(const WebPage::Links::value_type& link, webPage->getLinks())
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					linksStream << ",";
+				}
+				linksStream << link->getKey();
+			}
+
 			// Query
 			ReplaceQuery<WebPageTableSync> query(*webPage);
 			query.addField(webPage->getRoot() ? webPage->getRoot()->getKey() : RegistryKeyType(0));
@@ -163,6 +214,8 @@ namespace synthese
 			query.addField(webPage->getEndDate());
 			query.addField(webPage->_getMimeType());
 			query.addField(webPage->getAbstract());
+			query.addField(webPage->getImage());
+			query.addField(linksStream.str());
 			query.execute(transaction);
 		}
 	}

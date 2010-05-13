@@ -46,6 +46,7 @@ namespace synthese
 		///		<li>wp : id of the page to update</li>
 		///		<li>c1 : new main content</li>
 		///		<li>ab : new abstract</li>
+		///		<li>im : new image</li>
 		///	</ul>
 		class WebPageContentUpdateAction:
 			public util::FactorableTemplate<server::Action, WebPageContentUpdateAction>
@@ -54,11 +55,15 @@ namespace synthese
 			static const std::string PARAMETER_WEB_PAGE_ID;
 			static const std::string PARAMETER_CONTENT1;
 			static const std::string PARAMETER_ABSTRACT;
+			static const std::string PARAMETER_IMAGE;
+			static const std::string PARAMETER_TITLE;
 
 		private:
 			boost::shared_ptr<WebPage> _page;
 			std::string _content1;
 			std::string _abstract;
+			std::string _image;
+			std::string _title;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

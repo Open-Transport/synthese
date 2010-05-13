@@ -48,6 +48,8 @@ namespace synthese
 		const string WebPageContentUpdateAction::PARAMETER_WEB_PAGE_ID = Action_PARAMETER_PREFIX + "wp";
 		const string WebPageContentUpdateAction::PARAMETER_CONTENT1 = Action_PARAMETER_PREFIX + "c1";
 		const string WebPageContentUpdateAction::PARAMETER_ABSTRACT = Action_PARAMETER_PREFIX + "ab";
+		const string WebPageContentUpdateAction::PARAMETER_IMAGE = Action_PARAMETER_PREFIX + "im";
+		const string WebPageContentUpdateAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "ti";
 		
 		
 		
@@ -57,9 +59,11 @@ namespace synthese
 			if(_page.get())
 			{
 				map.insert(PARAMETER_WEB_PAGE_ID, _page->getKey());
-				map.insert(PARAMETER_CONTENT1, _content1);
-				map.insert(PARAMETER_ABSTRACT, _abstract);
 			}
+			map.insert(PARAMETER_CONTENT1, _content1);
+			map.insert(PARAMETER_ABSTRACT, _abstract);
+			map.insert(PARAMETER_IMAGE, _image);
+			map.insert(PARAMETER_TITLE, _title);
 			return map;
 		}
 		
@@ -78,6 +82,8 @@ namespace synthese
 
 			_content1 = map.getDefault<string>(PARAMETER_CONTENT1);
 			_abstract = map.getDefault<string>(PARAMETER_ABSTRACT);
+			_image = map.getDefault<string>(PARAMETER_IMAGE);
+			_image = map.getDefault<string>(PARAMETER_TITLE);
 		}
 		
 		
@@ -89,6 +95,8 @@ namespace synthese
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			_page->setContent(_content1);
 			_page->setAbstract(_abstract);
+			_page->setImage(_image);
+			_page->setName(_title);
 
 			WebPageTableSync::Save(_page.get());
 

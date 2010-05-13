@@ -40,35 +40,42 @@ namespace synthese
 	{
 		class WebPage;
 
-		/** WebPageInterfacePage Interface Page Class.
-			@ingroup m56Pages refPages
-			@author Hugues
-			@date 2010
-
-			@code web_page @endcode
-
-			Parameters :
-				- title
-				- content
-				- roid : page id
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 56.11 Interface : Web page display.
+		///	@ingroup m56Pages refPages
+		///	@author Hugues Romain
+		///	@date 2010
+		//////////////////////////////////////////////////////////////////////////
+		/// @copydoc WebPageInterfacePage::Display
 		class WebPageInterfacePage
 		{
 		public:
 			static const std::string DATA_TITLE;
 			static const std::string DATA_CONTENT;
+			static const std::string DATA_ABSTRACT;
+			static const std::string DATA_IMAGE;
+			static const std::string DATA_PUBLICATION_DATE;
 			
-			/** Overloaded display method for specific parameter conversion.
-				This function converts the parameters into a single ParametersVector object.
-				@param stream Stream to write on
-				@param page The page to display
-				@param edit True if the display must include inline edition forms
-				@param variables Execution variables
-				@param request Source request
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Display of a web page content by a template.
+			///	@param stream Stream to write on
+			/// @param templatePage The display template to use for the display
+			/// @param request The current request
+			///	@param page The page to display
+			///	@param edit True if the display must include inline edition forms (not yet implemented)
+			//////////////////////////////////////////////////////////////////////////
+			/// The following parameters are sent to the template :
+			///	<ul>
+			///		<li>title : title of the page</li>
+			///		<li>content : content of the page</li>
+			///		<li>roid : id of the page</li>
+			///		<li>abstract : abstract of the page</li>
+			///		<li>image : image of the page</li>
+			///		<li>date : date of beginning of publication of the page</li>
+			///	</ul>
 			static void Display(
 				std::ostream& stream,
-				boost::shared_ptr<const WebPage> templatePage,
+				const WebPage& templatePage,
 				const server::Request& request,
 				const WebPage& page,
 				bool edit
