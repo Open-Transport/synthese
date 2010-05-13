@@ -109,7 +109,14 @@ namespace synthese
 			)	);
 			if(function.get())
 			{
-				return function->getPage();
+				if(function->getAditionnalParametersMap().getDefault<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID, 0))
+				{
+					return Env::GetOfficialEnv().get<WebPage>(function->getAditionnalParametersMap().get<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID));
+				}
+				else
+				{
+					return function->getPage();
+				}
 			}
 			return shared_ptr<const WebPage>();
 		}

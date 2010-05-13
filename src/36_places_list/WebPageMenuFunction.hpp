@@ -55,7 +55,7 @@ namespace synthese
 		///			<li>beginning_x (x = depth) : code to output before the item if the item does not correspond to the current displayed page</li>
 		///			<li>ending_x (x = depth) : code to output after the item if the item does not correspond to the current displayed page</li>
 		///			<li>beginning_selected_x (x = depth) : code to output before the item if the item corresponds to the current displayed page (default is like beginning_x)</li>
-		///			<li>ending_selected_x (x = depth) : code to output after the item if the item corresponds to the current displayed page (default is like beginning_x)</li>
+		///			<li>ending_selected_x (x = depth) : code to output after the item if the item corresponds to the current displayed page (default is like ending_x)</li>
 		///			<li>beginning_before_submenu_x (x = depth) : code to output before a sub menu</li>
 		///			<li>ending_after_submenu_x (x = depth) : code to output after a sub menu</li>
 		///		</ul>

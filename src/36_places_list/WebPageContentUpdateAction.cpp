@@ -83,7 +83,7 @@ namespace synthese
 			_content1 = map.getDefault<string>(PARAMETER_CONTENT1);
 			_abstract = map.getDefault<string>(PARAMETER_ABSTRACT);
 			_image = map.getDefault<string>(PARAMETER_IMAGE);
-			_image = map.getDefault<string>(PARAMETER_TITLE);
+			_title = map.getDefault<string>(PARAMETER_TITLE);
 		}
 		
 		
