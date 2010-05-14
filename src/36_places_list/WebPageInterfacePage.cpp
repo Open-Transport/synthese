@@ -76,6 +76,7 @@ namespace synthese
 			pm.insert(Request::PARAMETER_OBJECT_ID, page.getKey());
 
 			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.getFunction()->setUseTemplate(false);
 			displayRequest.run(stream);
 		}
 	}

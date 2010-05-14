@@ -57,6 +57,7 @@ namespace synthese
 		const string WebPageTableSync::COL_ABSTRACT = "abstract";
 		const string WebPageTableSync::COL_IMAGE = "image";
 		const string WebPageTableSync::COL_LINKS = "links";
+		const string WebPageTableSync::COL_DO_NOT_USE_TEMPLATE = "do_not_use_template";
 	}
 
 	namespace db
@@ -79,6 +80,7 @@ namespace synthese
 			SQLiteTableSync::Field(WebPageTableSync::COL_ABSTRACT, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_IMAGE, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_LINKS, SQL_TEXT),
+			SQLiteTableSync::Field(WebPageTableSync::COL_DO_NOT_USE_TEMPLATE, SQL_BOOLEAN),
 			SQLiteTableSync::Field()
 		};
 
@@ -102,6 +104,7 @@ namespace synthese
 			webpage->setMimeType(rows->getText(WebPageTableSync::COL_MIME_TYPE));
 			webpage->setAbstract(rows->getText(WebPageTableSync::COL_ABSTRACT));
 			webpage->setImage(rows->getText(WebPageTableSync::COL_IMAGE));
+			webpage->setDoNotUseTemplate(rows->getBool(WebPageTableSync::COL_DO_NOT_USE_TEMPLATE));
 
 			if(!rows->getText(WebPageTableSync::COL_START_TIME).empty())
 			{
@@ -216,6 +219,7 @@ namespace synthese
 			query.addField(webPage->getAbstract());
 			query.addField(webPage->getImage());
 			query.addField(linksStream.str());
+			query.addField(webPage->getDoNotUseTemplate());
 			query.execute(transaction);
 		}
 	}
@@ -226,6 +230,7 @@ namespace synthese
 			util::Env& env,
 			boost::optional<util::RegistryKeyType> siteId /*= boost::optional<util::RegistryKeyType>()*/, 
 			optional<RegistryKeyType> parentId,
+			boost::optional<std::size_t> rank,
 			int first /*= 0 */,
 			boost::optional<std::size_t> number /* = boost::optional<std::size_t>()*/,
 			bool orderByRank,
@@ -253,6 +258,10 @@ namespace synthese
 				{
 					query.addWhereField(COL_UP_ID, *parentId);
 				}
+			}
+			if(rank)
+			{
+				query.addWhereField(COL_RANK, *rank);
 			}
 			if(orderByRank)
 			{
@@ -286,7 +295,7 @@ namespace synthese
 				result.push_back(make_pair(0, rootLabel));
 			}
 			Env env;
-			SearchResult pages(Search(env, siteId, upId, 0, optional<size_t>(), true));
+			SearchResult pages(Search(env, siteId, upId, optional<size_t>(), 0, optional<size_t>(), true));
 			BOOST_FOREACH(const SearchResult::value_type& page, pages)
 			{
 				result.push_back(make_pair(page->getKey(), prefix + page->getName()));

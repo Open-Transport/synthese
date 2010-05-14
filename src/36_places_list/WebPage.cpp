@@ -46,7 +46,8 @@ namespace synthese
 			Registrable(id),
 			_startDate(posix_time::not_a_date_time),
 			_endDate(posix_time::not_a_date_time),
-			_template(NULL)
+			_template(NULL),
+			_doNotUseTemplate(false)
 		{
 		}
 
@@ -250,6 +251,10 @@ namespace synthese
 
 		WebPage* WebPage::getTemplate() const
 		{
+			if(_doNotUseTemplate)
+			{
+				return NULL;
+			}
 			if(_template && _template != this)
 			{
 				return _template;

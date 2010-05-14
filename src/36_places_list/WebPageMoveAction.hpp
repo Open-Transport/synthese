@@ -1,8 +1,8 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// WebPageUpdateAction class header.
-///	@file WebPageUpdateAction.h
-///	@author Hugues
+/// WebPageMoveAction class header.
+///	@file WebPageMoveAction.hpp
+///	@author Hugues Romain
 ///	@date 2010
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -22,8 +22,8 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_WebPageUpdateAction_H__
-#define SYNTHESE_WebPageUpdateAction_H__
+#ifndef SYNTHESE_WebPageMoveAction_H__
+#define SYNTHESE_WebPageMoveAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
@@ -35,40 +35,29 @@ namespace synthese
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 56.15 Action : Web page properties update.
+		/// 56.15 Action : WebPageMoveAction.
 		/// @ingroup m56Actions refActions
-		/// @author Hugues Romain
+		///	@author Hugues Romain
+		///	@date 2010
+		/// @since 3.1.18
 		//////////////////////////////////////////////////////////////////////////
+		/// Key : WebPageMoveAction
+		///
 		/// Parameters :
-		/// <ul>
-		///		<li>wp : web page to update</li>
-		///		<li>ui : value of parent page id</li>
-		///		<li>te : value of template id</li>
-		///		<li>sd : value of publication start date</li>
-		///		<li>ed : value of publication end date</li>
-		///		<li>mt : value of mime type</li>
-		///		<li>du : value of do not use template</li>
-		/// </ul>
-		class WebPageUpdateAction:
-			public util::FactorableTemplate<server::Action, WebPageUpdateAction>
+		///	<ul>
+		///		<li>actionParamid : id of the page to move</li>
+		///		<li>actionParamdi : direction : 1=up, 0=down</li>
+		///	</ul>
+		class WebPageMoveAction:
+			public util::FactorableTemplate<server::Action, WebPageMoveAction>
 		{
 		public:
-			static const std::string PARAMETER_WEB_PAGE_ID;
-			static const std::string PARAMETER_UP_ID;
-			static const std::string PARAMETER_TEMPLATE_ID;
-			static const std::string PARAMETER_START_DATE;
-			static const std::string PARAMETER_END_DATE;
-			static const std::string PARAMETER_MIME_TYPE;
-			static const std::string PARAMETER_DO_NOT_USE_TEMPLATE;
+			static const std::string PARAMETER_PAGE_ID;
+			static const std::string PARAMETER_DIRECTION;
 
 		private:
 			boost::shared_ptr<WebPage> _page;
-			boost::shared_ptr<WebPage> _up;
-			boost::shared_ptr<WebPage> _template;
-			boost::posix_time::ptime _startDate;
-			boost::posix_time::ptime _endDate;
-			std::string _mimeType;
-			bool _doNotUseTemplate;
+			bool _up;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -85,7 +74,7 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			WebPageUpdateAction();
+			WebPageMoveAction();
 
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
@@ -102,9 +91,13 @@ namespace synthese
 
 
 
-			void setWebPage(boost::shared_ptr<WebPage> value);
+			//! @name Setters
+			//@{
+				void setPage(boost::shared_ptr<WebPage> value) { _page = value; }
+				void setUp(bool value){ _up = value; }
+			//@}
 		};
 	}
 }
 
-#endif // SYNTHESE_WebPageUpdateAction_H__
+#endif // SYNTHESE_WebPageMoveAction_H__

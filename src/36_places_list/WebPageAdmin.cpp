@@ -40,6 +40,9 @@
 #include "WebPageAddAction.h"
 #include "WebPageRemoveAction.h"
 #include "SiteTableSync.h"
+#include "WebPageLinkAddAction.hpp"
+#include "WebPageLinkRemoveAction.hpp"
+#include "WebPageMoveAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -166,6 +169,7 @@ namespace synthese
 					stream << t.open();
 					stream << t.cell("ID", lexical_cast<string>(_page->getKey()));
 					stream << t.cell("Modèle (défaut : modèle du site)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TEMPLATE_ID, _page->_getTemplate() ? lexical_cast<string>(_page->_getTemplate()->getKey()) : "0"));
+					stream << t.cell("Ne pas utiliser le modèle", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE, _page->getDoNotUseTemplate()));
 					stream << t.cell("Type MIME (défaut : text/html)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->_getMimeType()));
 					stream << t.cell("Début publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_START_DATE, _page->getStartDate()));
 					stream << t.cell("Fin publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_END_DATE, _page->getEndDate()));
@@ -197,31 +201,42 @@ namespace synthese
 			{
 				stream << "<h1>Liens</h1>";
 
+				AdminFunctionRequest<WebPageAdmin> openRequest(request);
+
+				AdminActionFunctionRequest<WebPageLinkAddAction, WebPageAdmin> addRequest(request);
+				addRequest.getAction()->setPage(const_pointer_cast<WebPage>(_page));
+
+				AdminActionFunctionRequest<WebPageLinkRemoveAction, WebPageAdmin> removeRequest(request);
+				removeRequest.getAction()->setPage(const_pointer_cast<WebPage>(_page));
+
+				HTMLForm f(addRequest.getHTMLForm());
+				stream << f.open();
+
 				HTMLTable::ColsVector h;
 				h.push_back("ID");
 				h.push_back("Titre");
 				h.push_back("Actions");
+				h.push_back("Actions");
 				HTMLTable t(h, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
-
-				AdminFunctionRequest<WebPageAdmin> openRequest(request);
-				
 				BOOST_FOREACH(const WebPage::Links::value_type& link, _page->getLinks())
 				{
 					openRequest.getPage()->setPage(Env::GetOfficialEnv().getEditableSPtr(link));
+					removeRequest.getAction()->setDestinationPage(Env::GetOfficialEnv().getEditableSPtr(link));
 
 					stream << t.row();
 					stream << t.col() << link->getKey();
-					stream << t.col() << HTMLModule::getHTMLLink(openRequest.getURL(), link->getName());
-					stream << t.col() << "Supprimer"; // WebPageLinkRemoveAction
+					stream << t.col() << link->getName();
+					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), ICON);
+					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le lien ?", "page_delete.png");
 				}
 
 				stream << t.row();
-				stream << t.col() << "id";
+				stream << t.col() << f.getTextInput(WebPageLinkAddAction::PARAMETER_DESTINATION_ID, string(), "(id page à lier)");
 				stream << t.col();
-				stream << t.col() << "Ajouter"; // WebPageLinkAddAction
+				stream << t.col(2) << f.getSubmitButton("Ajouter");
 
-				stream << t.close();
+				stream << t.close() << f.close();
 			}
 
 
@@ -316,11 +331,14 @@ namespace synthese
 
 			AdminFunctionRequest<WebPageAdmin> openRequest(request);
 			StaticFunctionRequest<WebPageDisplayFunction> viewRequest(request, false);
+			AdminActionFunctionRequest<WebPageMoveAction,WebPageAdmin> moveRequest(request);
 			
 			BOOST_FOREACH(shared_ptr<WebPage> page, pages)
 			{
 				openRequest.getPage()->setPage(const_pointer_cast<const WebPage>(page));
 				viewRequest.getFunction()->setPage(const_pointer_cast<const WebPage>(page));
+				moveRequest.getAction()->setPage(page);
+
 				if(	!page->getRoot()->getClientURL().empty()
 				){
 					viewRequest.setClientURL(page->getRoot()->getClientURL());
@@ -337,6 +355,13 @@ namespace synthese
 				for(size_t i(0); i<depth; ++i)
 					stream << "&nbsp;&nbsp;&nbsp;";
 				stream << page->getRank();
+				if(depth == 0)
+				{
+					moveRequest.getAction()->setUp(true);
+					stream << HTMLModule::getHTMLLink(moveRequest.getURL(), HTMLModule::getHTMLImage("arrow_up.png", "up"));
+					moveRequest.getAction()->setUp(false);
+					stream << HTMLModule::getHTMLLink(moveRequest.getURL(), HTMLModule::getHTMLImage("arrow_down.png", "down"));
+				}
 				stream << t.col() << page->getName();
 				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), WebPageAdmin::ICON);
 				stream << t.col() << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "page_go.png");
@@ -393,7 +418,7 @@ namespace synthese
 
 			stream << t.row();
 			stream << t.col() << f.getRadioInput(WebPageAddAction::PARAMETER_TEMPLATE_ID, optional<RegistryKeyType>(),optional<RegistryKeyType>(),string(), false);
-			stream << t.col();
+			stream << t.col() << result.size();
 			stream << t.col() << f.getTextInput(WebPageAddAction::PARAMETER_TITLE, string(), "(Entrez le titre ici)");
 			stream << t.col(3) << f.getSubmitButton("Créer");
 			stream << t.close();

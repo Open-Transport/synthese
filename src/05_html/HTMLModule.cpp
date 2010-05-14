@@ -20,14 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "HTMLModule.h"
+
+#include <map>
 #include <sstream>
 #include <boost/algorithm/string/replace.hpp>
-
-#include "HTMLModule.h"
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
-
 
 namespace synthese
 {
@@ -114,6 +115,39 @@ namespace synthese
 		std::string HTMLModule::GetHTMLJavascriptClose()
 		{
 			return string("\r// ]]>\r</script>");
+		}
+
+
+
+		std::string HTMLModule::HTMLEncode( const std::string& value )
+		{
+			static map<char,string> encodingTable;
+			if(encodingTable.empty())
+			{
+				encodingTable['&'] = "&amp;";
+				encodingTable['>'] = "&gt;";
+				encodingTable['<'] = "&lt;";
+				encodingTable['"'] = "&quot;";
+			}
+			stringstream s;
+			BOOST_FOREACH(char c, value)
+			{
+				if(c >= 128)
+				{
+					s << "&#" << static_cast<int>(c) << ";";
+					continue;
+				}
+				map<char,string>::const_iterator it(encodingTable.find(c));
+				if(it != encodingTable.end())
+				{
+					s << it->second;
+				}
+				else
+				{
+					s << c;
+				}
+			}
+			return s.str();
 		}
 	}
 }

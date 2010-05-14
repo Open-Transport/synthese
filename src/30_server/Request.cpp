@@ -202,9 +202,17 @@ namespace synthese
 
 
 
-		std::string Request::getURL( bool normalize /*= true*/ ) const
+		std::string Request::getURL( bool normalize /*= true*/, bool absolute ) const
 		{
 			std::stringstream str;
+			if(absolute)
+			{
+				str << "http://" << _hostName;
+				if(_clientURL.empty() || _clientURL[0] != '/')
+				{
+					str << "/";
+				}
+			}
 			str << _clientURL << Request::PARAMETER_STARTER << getURI();
 			return str.str();
 		}

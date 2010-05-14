@@ -1,0 +1,133 @@
+
+//////////////////////////////////////////////////////////////////////////
+/// WebPageMoveAction class implementation.
+/// @file WebPageMoveAction.cpp
+/// @author Hugues Romain
+/// @date 2010
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software
+///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "WebPageMoveAction.hpp"
+#include "TransportWebsiteRight.h"
+#include "Request.h"
+#include "WebPageTableSync.h"
+#include "SQLiteTransaction.h"
+
+using namespace std;
+using namespace boost;
+
+namespace synthese
+{
+	using namespace server;
+	using namespace security;
+	using namespace util;
+	using namespace db;
+	
+	namespace util
+	{
+		template<> const string FactorableTemplate<Action, transportwebsite::WebPageMoveAction>::FACTORY_KEY("WebPageMoveAction");
+	}
+
+	namespace transportwebsite
+	{
+		const string WebPageMoveAction::PARAMETER_PAGE_ID = Action_PARAMETER_PREFIX + "id";
+		const string WebPageMoveAction::PARAMETER_DIRECTION = Action_PARAMETER_PREFIX + "di";
+		
+		
+		
+		ParametersMap WebPageMoveAction::getParametersMap() const
+		{
+			ParametersMap map;
+			if(_page.get())
+			{
+				map.insert(PARAMETER_PAGE_ID, _page->getKey());
+			}
+			map.insert(PARAMETER_DIRECTION, _up);
+			return map;
+		}
+		
+		
+		
+		void WebPageMoveAction::_setFromParametersMap(const ParametersMap& map)
+		{
+			try
+			{
+				_page = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PAGE_ID), *_env);
+			}
+			catch(ObjectNotFoundException<WebPageTableSync>&)
+			{
+				throw ActionException("No such page");
+			}
+
+			_up = map.getDefault<bool>(PARAMETER_DIRECTION, false);
+		}
+		
+		
+		
+		void WebPageMoveAction::run(
+			Request& request
+		){
+//			stringstream text;
+//			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
+
+			WebPageTableSync::SearchResult pages(
+				WebPageTableSync::Search(
+					Env::GetOfficialEnv(),
+					_page->getParent() ? optional<RegistryKeyType>() : _page->getRoot()->getKey(),
+					_page->getParent() ? _page->getParent()->getKey() : optional<RegistryKeyType>(),
+					_up ? _page->getRank() + 1 : _page->getRank() - 1,
+					0,
+					1
+			)	);
+
+			SQLiteTransaction t;
+
+			_page->setRank(_up ? _page->getRank() + 1 : _page->getRank() - 1);
+			WebPageTableSync::Save(_page.get(), t);
+
+			if(!pages.empty())
+			{
+				shared_ptr<WebPage> page(pages.front());
+				page->setRank(_up ? page->getRank() - 1 : page->getRank() + 1);
+				WebPageTableSync::Save(page.get(), t);
+			}
+
+			t.run();
+
+//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
+		}
+		
+		
+		
+		bool WebPageMoveAction::isAuthorized(
+			const Session* session
+		) const {
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(WRITE);
+		}
+
+
+
+		WebPageMoveAction::WebPageMoveAction():
+			_up(false)
+		{
+
+		}
+	}
+}

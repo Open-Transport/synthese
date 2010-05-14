@@ -90,6 +90,7 @@ namespace synthese
 			std::string _abstract;
 			std::string _image;
 			Links _links;
+			bool _doNotUseTemplate;
 
 
 
@@ -131,6 +132,7 @@ namespace synthese
 				const std::string& getAbstract() const { return _abstract; }
 				const std::string& getImage() const { return _image; }
 				const Links& getLinks() const { return _links; }
+				bool getDoNotUseTemplate() const { return _doNotUseTemplate; }
 			//@}
 
 			//! @name Setters
@@ -143,6 +145,7 @@ namespace synthese
 				void setAbstract(const std::string& value){ _abstract = value; }
 				void setImage(const std::string& value){ _image = value; }
 				void setLinks(const Links& value){ _links = value; }
+				void setDoNotUseTemplate(bool value){ _doNotUseTemplate = value; }
 			//@}
 
 			//! @name Services
@@ -163,6 +166,7 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Gets the template applicable to the current page.
 				/// @return in decreasing priority order :
+				///		- NULL if the template must not be used according to the attribute
 				///		- the template specified in the attribute
 				///		- NULL if the page is the default template of the site
 				///		- the default template of the site

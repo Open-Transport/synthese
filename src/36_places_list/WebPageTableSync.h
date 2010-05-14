@@ -38,6 +38,8 @@ namespace synthese
 		/// 56.10 Table : Web page.
 		///	@ingroup m56LS refLS
 		/// @author Hugues Romain
+		/// @date 2010
+		/// @since 3.1.15
 		//////////////////////////////////////////////////////////////////////////
 		class WebPageTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<WebPageTableSync,WebPage>
@@ -54,26 +56,34 @@ namespace synthese
 			static const std::string COL_ABSTRACT;
 			static const std::string COL_IMAGE;
 			static const std::string COL_LINKS;
+			static const std::string COL_DO_NOT_USE_TEMPLATE;
 		
 
 
-			/** Web page search.
-				@param env Environment to use and populate by the search
-				@param siteId Id of the site the returned pages must belong
-				@param parentId Id of the parent page of the returned pages
-				@param first First Site object to answer
-				@param number Number of Site objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return Found Site objects.
-				@author Hugues Romain
-				@date 2006
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Web page search.
+			/// @param env Environment to use and populate by the search
+			/// @param siteId Id of the site the returned pages must belong
+			/// @param parentId Id of the parent page of the returned pages
+			/// @param rank Rank of the page
+			/// @param first First page to answer
+			/// @param number Number pages to answer. Undefined value seems unlimited size.
+			/// @param orderByRank the results are sorted by rank
+			/// @param orderByTitle the results are sorted alphabetically by title
+			/// @param raisingOrder the results are ordered ascendantly (true) or descendantly (false)
+			/// @param linkLevel level of link to apply when loading objects
+			/// @return Found web pages.
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.15
 			static SearchResult Search(
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> siteId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<util::RegistryKeyType> parentId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<std::size_t> rank = boost::optional<std::size_t>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
-				bool orderByRannk = true,
+				bool orderByRank = true,
 				bool orderByTitle = false,
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
@@ -91,6 +101,7 @@ namespace synthese
 			/// @param upId id of the top parent page (used by the recursion)
 			/// @author Hugues Romain
 			/// @date 2010
+			/// @since 3.1.15
 			static SiteWebPagesList GetPagesList(
 				util::RegistryKeyType siteId,
 				const std::string& rootLabel,

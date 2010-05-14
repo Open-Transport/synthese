@@ -28,6 +28,8 @@ synthese::transportwebsite::IfFunction::integrate();
 synthese::transportwebsite::EqualFunction::integrate();
 synthese::transportwebsite::SuperiorFunction::integrate();
 synthese::transportwebsite::AndFunction::integrate();
+synthese::transportwebsite::WebPageLinksFunction::integrate();
+synthese::transportwebsite::WebPagePositionFunction::integrate();
 
 synthese::transportwebsite::SiteUpdateAction::integrate();
 synthese::transportwebsite::AddUserFavoriteJourneyAction::integrate();
@@ -35,6 +37,9 @@ synthese::transportwebsite::WebPageAddAction::integrate();
 synthese::transportwebsite::WebPageUpdateAction::integrate();
 synthese::transportwebsite::WebPageRemoveAction::integrate();
 synthese::transportwebsite::WebPageContentUpdateAction::integrate();
+synthese::transportwebsite::WebPageLinkAddAction::integrate();
+synthese::transportwebsite::WebPageLinkRemoveAction::integrate();
+synthese::transportwebsite::WebPageMoveAction::integrate();
 
 synthese::transportwebsite::TransportWebsiteRight::integrate();
 

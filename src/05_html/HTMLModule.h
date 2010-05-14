@@ -99,6 +99,15 @@ input[type=submit]:hover {background-color:#0080E0;}
 			static std::string GetHTMLJavascriptOpen(std::string url=std::string());
 
 			static std::string GetHTMLJavascriptClose();
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Encodes a string into HTML string using HTML entities.
+			/// @param value the string to encode
+			/// @return the encoded string
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.18
+			static std::string HTMLEncode(const std::string& value);
 		};
 
 

@@ -24,6 +24,8 @@
 #include "EqualFunction.hpp"
 #include "SuperiorFunction.hpp"
 #include "AndFunction.hpp"
+#include "WebPageLinksFunction.hpp"
+#include "WebPagePositionFunction.hpp"
 
 #include "UserFavoriteInterfacePage.h"
 
@@ -39,6 +41,9 @@
 #include "WebPageUpdateAction.h"
 #include "WebPageRemoveAction.h"
 #include "WebPageContentUpdateAction.hpp"
+#include "WebPageLinkAddAction.hpp"
+#include "WebPageLinkRemoveAction.hpp"
+#include "WebPageMoveAction.hpp"
 
 #include "TransportWebsiteRight.h"
 

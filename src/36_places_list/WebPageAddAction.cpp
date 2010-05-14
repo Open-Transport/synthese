@@ -34,6 +34,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -111,6 +112,7 @@ namespace synthese
 							Env::GetOfficialEnv(),
 							_site->getKey(),
 							_parent->getKey(),
+							optional<size_t>(),
 							0,
 							1,
 							true,
@@ -138,6 +140,7 @@ namespace synthese
 							Env::GetOfficialEnv(),
 							_site->getKey(),
 							RegistryKeyType(0),
+							optional<size_t>(),
 							0,
 							1,
 							true,
@@ -161,6 +164,7 @@ namespace synthese
 			WebPage object;
 			object.setName(_title);
 			object.setRoot(_site.get());
+			object.setStartDate(second_clock::local_time());
 			object.setRank(_rank);
 
 			if(_template.get())
