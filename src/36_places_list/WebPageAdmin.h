@@ -42,6 +42,7 @@ namespace synthese
 	{
 		class WebPageRemoveAction;
 		class WebPageAddAction;
+		class WebPageMoveAction;
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -75,6 +76,7 @@ namespace synthese
 				std::ostream& stream,
 				const WebPageTableSync::SearchResult& pages,
 				server::StaticActionRequest<WebPageRemoveAction>& deleteRequest,
+				server::StaticActionRequest<WebPageMoveAction>& moveRequest,
 				const admin::AdminRequest& request,
 				html::HTMLTable& t,
 				html::HTMLForm& f,
@@ -214,6 +216,7 @@ namespace synthese
 				util::RegistryKeyType parentId,
 				server::StaticActionRequest<WebPageAddAction>& createRequest,
 				server::StaticActionRequest<WebPageRemoveAction>& deleteRequest,
+				server::StaticActionRequest<WebPageMoveAction>& moveRequest,
 				const admin::AdminRequest& request
 			);
 		};

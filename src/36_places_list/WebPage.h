@@ -200,6 +200,15 @@ namespace synthese
 					const server::Request& request
 				) const;
 
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Computes the depth level of the page position in the tree.
+				/// @return the depth of the page
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.18
+				std::size_t getDepth() const;
 			//@}
 		};
 	}

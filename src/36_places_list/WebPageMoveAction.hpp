@@ -57,6 +57,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<WebPage> _page;
+			boost::shared_ptr<WebPage> _switchedPage;
 			bool _up;
 
 		protected:

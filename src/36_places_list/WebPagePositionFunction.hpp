@@ -45,7 +45,7 @@ namespace synthese
 		///	<ul>
 		///		<li>p : id of the page to display</li>
 		///		<li>min_level (optional, default=1) : minimal level to display</li>
-		///		<li>max_level (optional, default=unlimited) : maximal level to display</li>
+		///		<li>max_level (optional, default=unlimited) : maximal level to display. Negative numbers seems backward level.</li>
 		///		<li>For each i level :</li>
 		///		<ul>
 		///			<li>beginning_x (x = depth) : code to output before the item if the item does not correspond to the current displayed page</li>

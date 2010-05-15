@@ -64,6 +64,7 @@
 #include "PTPlacesAdmin.h"
 #include "ObjectSiteLink.h"
 #include "ObjectSiteLinkTableSync.h"
+#include "WebPageMoveAction.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/foreach.hpp>
@@ -329,7 +330,9 @@ namespace synthese
 
 				AdminActionFunctionRequest<WebPageRemoveAction, TransportSiteAdmin> deleteRequest(_request);
 
-				WebPageAdmin::DisplaySubPages(stream, _site->getKey(), addRequest, deleteRequest, _request);
+				AdminActionFunctionRequest<WebPageMoveAction, TransportSiteAdmin> moveRequest(_request);
+
+				WebPageAdmin::DisplaySubPages(stream, _site->getKey(), addRequest, deleteRequest, moveRequest, _request);
 			}
 
 

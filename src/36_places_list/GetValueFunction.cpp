@@ -80,8 +80,18 @@ namespace synthese
 			}
 			else
 			{
-				ParametersMap map(request.getParametersMap());
-				stream << map.getDefault<string>(_parameter);
+				shared_ptr<const WebPageDisplayFunction> function(
+					dynamic_pointer_cast<const WebPageDisplayFunction>(
+						request.getFunction()
+				)	);
+				if(function.get() && function->getAditionnalParametersMap().getOptional<string>(_parameter))
+				{
+					stream << function->getAditionnalParametersMap().get<string>(_parameter);
+				}
+				else
+				{
+					stream << request.getParametersMap().getDefault<string>(_parameter);
+				}
 			}
 		}
 		

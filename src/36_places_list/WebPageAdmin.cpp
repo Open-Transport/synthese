@@ -190,9 +190,10 @@ namespace synthese
 
 					AdminActionFunctionRequest<WebPageRemoveAction, WebPageAdmin> deleteRequest(request);
 
-					WebPageAdmin::DisplaySubPages(stream, _page->getKey(), addRequest, deleteRequest, request);
-				}
+					AdminActionFunctionRequest<WebPageMoveAction, WebPageAdmin> moveRequest(request);
 
+					WebPageAdmin::DisplaySubPages(stream, _page->getKey(), addRequest, deleteRequest, moveRequest, request);
+				}
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -323,6 +324,7 @@ namespace synthese
 			std::ostream& stream,
 			const WebPageTableSync::SearchResult& pages,
 			StaticActionRequest<WebPageRemoveAction>& deleteRequest,
+			StaticActionRequest<WebPageMoveAction>& moveRequest,
 			const admin::AdminRequest& request,
 			HTMLTable& t,
 			HTMLForm& f,
@@ -331,10 +333,11 @@ namespace synthese
 
 			AdminFunctionRequest<WebPageAdmin> openRequest(request);
 			StaticFunctionRequest<WebPageDisplayFunction> viewRequest(request, false);
-			AdminActionFunctionRequest<WebPageMoveAction,WebPageAdmin> moveRequest(request);
 			
-			BOOST_FOREACH(shared_ptr<WebPage> page, pages)
+			for(WebPageTableSync::SearchResult::const_iterator it(pages.begin()); it != pages.end(); ++it)
 			{
+				shared_ptr<WebPage> page(*it);
+
 				openRequest.getPage()->setPage(const_pointer_cast<const WebPage>(page));
 				viewRequest.getFunction()->setPage(const_pointer_cast<const WebPage>(page));
 				moveRequest.getAction()->setPage(page);
@@ -357,10 +360,23 @@ namespace synthese
 				stream << page->getRank();
 				if(depth == 0)
 				{
-					moveRequest.getAction()->setUp(true);
-					stream << HTMLModule::getHTMLLink(moveRequest.getURL(), HTMLModule::getHTMLImage("arrow_up.png", "up"));
-					moveRequest.getAction()->setUp(false);
-					stream << HTMLModule::getHTMLLink(moveRequest.getURL(), HTMLModule::getHTMLImage("arrow_down.png", "down"));
+					stream << t.col();
+					if(it != pages.begin())
+					{
+						moveRequest.getAction()->setUp(true);
+						stream << HTMLModule::getHTMLLink(moveRequest.getURL(), HTMLModule::getHTMLImage("arrow_up.png", "up"));
+					}
+					stream << t.col();
+					if(it+1 != pages.end())
+					{
+						moveRequest.getAction()->setUp(false);
+						stream << HTMLModule::getHTMLLink(moveRequest.getURL(), HTMLModule::getHTMLImage("arrow_down.png", "down"));
+					}
+				}
+				else
+				{
+					stream << t.col();
+					stream << t.col();
 				}
 				stream << t.col() << page->getName();
 				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), WebPageAdmin::ICON);
@@ -379,7 +395,7 @@ namespace synthese
 					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la page "+ page->getName() +" ?", "page_delete.png");
 				}
 
-				_displaySubPages(stream, result, deleteRequest, request, t, f, depth+1);
+				_displaySubPages(stream, result, deleteRequest, moveRequest, request, t, f, depth+1);
 			}
 		}
 
@@ -390,6 +406,7 @@ namespace synthese
 			RegistryKeyType parentId,
 			server::StaticActionRequest<WebPageAddAction>& createRequest,
 			server::StaticActionRequest<WebPageRemoveAction>& deleteRequest,
+			server::StaticActionRequest<WebPageMoveAction>& moveRequest,
 			const admin::AdminRequest& request
 		){
 
@@ -403,7 +420,9 @@ namespace synthese
 			HTMLForm f(createRequest.getHTMLForm());
 
 			HTMLTable::ColsVector h;
-			h.push_back("");
+			h.push_back("Position");
+			h.push_back("Position");
+			h.push_back("Position");
 			h.push_back("Position");
 			h.push_back("Titre");
 			h.push_back("Actions");
@@ -414,7 +433,7 @@ namespace synthese
 			stream << f.open();
 			stream << t.open();
 
-			_displaySubPages(stream, result, deleteRequest, request, t, f);
+			_displaySubPages(stream, result, deleteRequest, moveRequest, request, t, f);
 
 			stream << t.row();
 			stream << t.col() << f.getRadioInput(WebPageAddAction::PARAMETER_TEMPLATE_ID, optional<RegistryKeyType>(),optional<RegistryKeyType>(),string(), false);

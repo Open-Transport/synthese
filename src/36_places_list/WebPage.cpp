@@ -265,5 +265,17 @@ namespace synthese
 			}
 			return NULL;
 		}
+
+
+
+		std::size_t WebPage::getDepth() const
+		{
+			size_t depth(0);
+			for(WebPage* page(getParent()); page; page = page->getParent())
+			{
+				++depth;
+			}
+			return depth;
+		}
 	}
 }

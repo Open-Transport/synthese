@@ -77,15 +77,6 @@ namespace synthese
 			}
 
 			_up = map.getDefault<bool>(PARAMETER_DIRECTION, false);
-		}
-		
-		
-		
-		void WebPageMoveAction::run(
-			Request& request
-		){
-//			stringstream text;
-//			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
 			WebPageTableSync::SearchResult pages(
 				WebPageTableSync::Search(
@@ -96,18 +87,33 @@ namespace synthese
 					0,
 					1
 			)	);
+			
+			if(pages.empty())
+			{
+				throw ActionException(
+					_up ?
+					"Forst page cannot be moved before its position" :
+					"Last page cannot be moved after its position"
+				);
+			}
+			_switchedPage = pages.front();
+		}
+		
+		
+		
+		void WebPageMoveAction::run(
+			Request& request
+		){
+//			stringstream text;
+//			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
 			SQLiteTransaction t;
 
 			_page->setRank(_up ? _page->getRank() + 1 : _page->getRank() - 1);
 			WebPageTableSync::Save(_page.get(), t);
 
-			if(!pages.empty())
-			{
-				shared_ptr<WebPage> page(pages.front());
-				page->setRank(_up ? page->getRank() - 1 : page->getRank() + 1);
-				WebPageTableSync::Save(page.get(), t);
-			}
+			_switchedPage->setRank(_up ? _switchedPage->getRank() - 1 : _switchedPage->getRank() + 1);
+			WebPageTableSync::Save(_switchedPage.get(), t);
 
 			t.run();
 

@@ -83,7 +83,19 @@ namespace synthese
 				throw RequestException("No such web page");
 			}
 			_minDepth = map.getDefault<size_t>(PARAMETER_MIN_DEPTH, 1);
-			_maxDepth = map.getOptional<size_t>(PARAMETER_MAX_DEPTH);
+			optional<int> depth = map.getOptional<int>(PARAMETER_MAX_DEPTH);
+			if(depth)
+			{
+				if(depth > 0)
+				{
+					_maxDepth = depth;
+				}
+				else
+				{
+					_maxDepth = _page->getDepth() + *depth;
+				}
+			}
+			
 			_beginning = map.getDefault<string>(PARAMETER_BEGINNING);
 			_beginningSelected = map.getDefault<string>(PARAMETER_BEGINNING_SELECTED, _beginning);
 			_ending = map.getDefault<string>(PARAMETER_ENDING);
