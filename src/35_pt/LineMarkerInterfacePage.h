@@ -47,7 +47,7 @@ namespace synthese
 		class CommercialLine;
 
 		/** Line marker.
-			@ingroup 15Library refLibrary
+			@ingroup m35Pages refPages
 			@code line_marker @endcode
 
 			Available data :
