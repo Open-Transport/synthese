@@ -33,7 +33,7 @@ namespace synthese
 
 
 		HTMLTable::HTMLTable(const HTMLTable::ColsVector& header, std::string className /*= ""*/ )
-			: _cols(0)
+			: _cols(header.size())
 			, _className(className)
 			, _curCol(-1)
 			, _curRow(-1)
@@ -59,12 +59,10 @@ namespace synthese
 							s << " colspan=\"" << colspan << "\"";
 						s << ">" << lastHeader << "</th>";
 						colspan=1;
-						++_cols;
 					}
 				}
 				lastHeader = *it;
 			}
-			++_cols;
 			s << "<th";
 			if (colspan > 1)
 				s << " colspan=\"" << colspan << "\"";
