@@ -102,29 +102,29 @@ namespace synthese
 			///	@param rank Rank of the row in the table
 			///	@param followingServicesWithSameHour 1 if the next service leaves the stop at the same hour (minutes ca n be different)
 			//////////////////////////////////////////////////////////////////////////
-			/// Parameters sent to the webpage :
+			/// <h3>Parameters sent to the display template</h3>
 			/// <ul>
-			///		<li>0 : Departure hour</li>
-			///		<li>1 : Departure minutes</li>
-			///		<li>2 : Last departure hour</li>
-			///		<li>3 : Note number</li>
-			///		<li>4 : Note text</li>
-			///		<li>5 : Cells content</li>
-			///		<li>6 : Departure quay</li>
-			///		<li>7 : Line short name</li>
-			///		<li>8 : Line style</li>
-			///		<li>9 : Line picture</li>
-			///		<li>10 : Rolling stock id</li>
+			///		<li>departure_hour : Departure hour</li>
+			///		<li>departure_minutes : Departure minutes</li>
+			///		<li>last_departure_hour : Last departure hour</li>
+			///		<li>note_number : Note number</li>
+			///		<li>note_text : Note text</li>
+			///		<li>cells_content : Cells content</li>
+			///		<li>departure_quay : Departure quay</li>
+			///		<li>line_short_name : Line short name</li>
+			///		<li>line_style : Line style</li>
+			///		<li>line_picture : Line picture</li>
+			///		<li>rolling_stock_id : Rolling stock id</li>
 			///		<li>rank : Rank</li>
 			///		<li>rank_is_odd : rank is odd</li>
-			///		<li>12 : Following services with same departure hour</li>
-			///		<li>13 : Line destination city id</li>
-			///		<li>14 : Line destination city name</li>
-			///		<li>15 : Line destination place id</li>
-			///		<li>16 : Line destination place name</li>
-			///		<li>17 : Text line destination</li>
-			///		<li>18 : Line id</li>
-			///		<li>19 : Route id</li>
+			///		<li>following_services_with_same_departure_hour : Following services with same departure hour</li>
+			///		<li>line_destination_city_id : Line destination city id</li>
+			///		<li>line_destination_city_name : Line destination city name</li>
+			///		<li>line_destination_place_id : Line destination place id</li>
+			///		<li>line_destination_place_name : Line destination place name</li>
+			///		<li>text_line_destination : Text line destination</li>
+			///		<li>line_id : Line id</li>
+			///		<li>route_id : Route id</li>
 			///	</ul>
 			static void Display(
 				std::ostream& stream,

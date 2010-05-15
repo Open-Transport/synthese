@@ -145,12 +145,12 @@ namespace synthese
 
 			/** Display of a cell of the lines row of the timetable.
 				@param stream Stream to write on
+				@param page Page to use for the display
+				@param request Source request
 				@param object Line to display
 				@param rowRank Row number
 				@param colRank Column number
-				@param variables Execution variables
-				@param request Source request
-
+				
 				Parameters sent to the page template :
 					- type : line
 					- cell_rank : column number
@@ -171,7 +171,6 @@ namespace synthese
 
 
 			/** Display of the row containing the schedules.
-				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
 				@param page Page to use for the display
 				@param cellPage Page to use for the display of each cell
@@ -201,14 +200,13 @@ namespace synthese
 
 
 			/** Display of a cell of a times row of the timetable.
-				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
+				@param page Page to use for the display
+				@param request Source request
 				@param object Time to display (not_a_date_time = stop not served)
 				@param rowRank Row number
 				@param colRank Column number
-				@param variables Execution variables
-				@param request Source request
-
+				
 				Parameters sent to the display template :
 					- type : time
 					- cell_rank : column number
@@ -228,7 +226,6 @@ namespace synthese
 
 
 			/** Display of the row containing the note numbers.
-				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
 				@param page Page to use for the display
 				@param cellPage Page to use for the display of each cell
@@ -250,13 +247,11 @@ namespace synthese
 			
 
 			/** Display of a cell of the notes row of the timetable.
-				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
+				@param page Page to use for the display
+				@param request Source request
 				@param object Note to display (NULL = no note)
 				@param rowRank Row number
-				@param colRank Column number
-				@param variables Execution variables
-				@param request Source request
 
 				Parameters sent to the display template :
 					- type : note
@@ -275,7 +270,6 @@ namespace synthese
 
 
 			/** Display of the row containing the rolling stock.
-				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
 				@param page Page to use for the display
 				@param cellPage Page to use for the display of each cell
@@ -296,21 +290,19 @@ namespace synthese
 
 
 			
-			/** Display of a cell of the rolling stock row of the timetable.
-				This function converts the parameters into a single ParametersVector object.
-				@param stream Stream to write on
-				@param object Rolling stock to display (NULL = no information)
-				@param colRank Column number
-				@param variables Execution variables
-				@param request Source request
-
-				Parameters sent to the display template :
-					- type : rollingstock
-					- cell_rank : column number
-					- roid : rolling stock id
-					- rolling_stock_name : rolling stock short name
-					- rolling_stock_alias : rolling stock long name
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Display of a cell of the rolling stock row of the timetable.
+			///	@param stream Stream to write on
+			///	@param page Page to use for the display
+			///	@param object Rolling stock to display (NULL = no information)
+			///	@param colRank Column number
+			//////////////////////////////////////////////////////////////////////////
+			///	Parameters sent to the display template :
+			///		- type : rollingstock
+			///		- cell_rank : column number
+			///		- roid : rolling stock id
+			///		- rolling_stock_name : rolling stock short name
+			///		- rolling_stock_alias : rolling stock long name
 			static void DisplayRollingStockCell(
 				std::ostream& stream,
 				boost::shared_ptr<const transportwebsite::WebPage> page,

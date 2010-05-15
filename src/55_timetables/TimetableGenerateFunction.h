@@ -113,12 +113,12 @@ namespace synthese
 
 			Parameters :
 			<ul>
-				<li>page</li>
-				<li>note_page</li>
-				<li>note_calendar_page</li>
+				<li>page : id of the template to use for the main display of the timetable (parameters sent by TimetableInterfacePage::Display)</li>
+				<li>note_page : id of the template to use for the display of a note (parameters sent by TimetableNoteInterfacePage::Display)</li>
+				<li>note_calendar_page : id of the template to use for the display of a date in a note (parameters sent by CalendarDateInterfacePage::Display)</li>
 				<li>row_page</li>
 				<li>cell_page</li>
-				<li>page_for_sub_timetable</li>
+				<li>page_for_sub_timetable : id of the template to use for the main display of each timetable if the displayed object is a container (parameters sent by TimetableInterfacePage::Display)</li>
 			</ul>
 		*/
 		class TimetableGenerateFunction:
