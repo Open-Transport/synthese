@@ -170,6 +170,7 @@ namespace synthese
 					stream << t.cell("ID", lexical_cast<string>(_page->getKey()));
 					stream << t.cell("Modèle (défaut : modèle du site)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TEMPLATE_ID, _page->_getTemplate() ? lexical_cast<string>(_page->_getTemplate()->getKey()) : "0"));
 					stream << t.cell("Ne pas utiliser le modèle", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE, _page->getDoNotUseTemplate()));
+					stream << t.cell("Inclure forum", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_HAS_FORUM, _page->getHasForum()));
 					stream << t.cell("Type MIME (défaut : text/html)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->_getMimeType()));
 					stream << t.cell("Début publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_START_DATE, _page->getStartDate()));
 					stream << t.cell("Fin publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_END_DATE, _page->getEndDate()));
@@ -437,7 +438,7 @@ namespace synthese
 
 			stream << t.row();
 			stream << t.col() << f.getRadioInput(WebPageAddAction::PARAMETER_TEMPLATE_ID, optional<RegistryKeyType>(),optional<RegistryKeyType>(),string(), false);
-			stream << t.col() << result.size();
+			stream << t.col(3) << result.size();
 			stream << t.col() << f.getTextInput(WebPageAddAction::PARAMETER_TITLE, string(), "(Entrez le titre ici)");
 			stream << t.col(3) << f.getSubmitButton("Créer");
 			stream << t.close();

@@ -91,6 +91,7 @@ namespace synthese
 			std::string _image;
 			Links _links;
 			bool _doNotUseTemplate;
+			bool _hasForum;
 
 
 
@@ -133,6 +134,7 @@ namespace synthese
 				const std::string& getImage() const { return _image; }
 				const Links& getLinks() const { return _links; }
 				bool getDoNotUseTemplate() const { return _doNotUseTemplate; }
+				bool getHasForum() const { return _hasForum; }
 			//@}
 
 			//! @name Setters
@@ -146,6 +148,7 @@ namespace synthese
 				void setImage(const std::string& value){ _image = value; }
 				void setLinks(const Links& value){ _links = value; }
 				void setDoNotUseTemplate(bool value){ _doNotUseTemplate = value; }
+				void setHasForum(bool value){ _hasForum = value; }
 			//@}
 
 			//! @name Services

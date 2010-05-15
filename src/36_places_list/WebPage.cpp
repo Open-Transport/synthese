@@ -47,7 +47,8 @@ namespace synthese
 			_startDate(posix_time::not_a_date_time),
 			_endDate(posix_time::not_a_date_time),
 			_template(NULL),
-			_doNotUseTemplate(false)
+			_doNotUseTemplate(false),
+			_hasForum(false)
 		{
 		}
 

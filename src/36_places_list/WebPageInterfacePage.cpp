@@ -45,6 +45,7 @@ namespace synthese
 		const string WebPageInterfacePage::DATA_ABSTRACT("abstract");
 		const string WebPageInterfacePage::DATA_IMAGE("image");
 		const string WebPageInterfacePage::DATA_PUBLICATION_DATE("date");
+		const string WebPageInterfacePage::DATA_FORUM("forum");
 
 
 
@@ -74,6 +75,7 @@ namespace synthese
 				page.getStartDate().is_not_a_date_time() ? string() : lexical_cast<string>(page.getStartDate())
 			);
 			pm.insert(Request::PARAMETER_OBJECT_ID, page.getKey());
+			pm.insert(DATA_FORUM, page.getHasForum());
 
 			displayRequest.getFunction()->setAditionnalParametersMap(pm);
 			displayRequest.getFunction()->setUseTemplate(false);

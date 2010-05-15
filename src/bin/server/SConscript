@@ -15,6 +15,7 @@ CppSynthese3BinProject(
 		's3-hiking.cpplib',
 		's3-route-planner.cpplib',
 		's3-timetables.cpplib',
+		's3-forum.cpplib',
 		'boost.cppinc',
 		('boost-program-options.cpplib',s3env['BOOSTVERSION'])
 	],

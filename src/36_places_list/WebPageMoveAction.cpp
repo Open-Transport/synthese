@@ -83,7 +83,7 @@ namespace synthese
 					Env::GetOfficialEnv(),
 					_page->getParent() ? optional<RegistryKeyType>() : _page->getRoot()->getKey(),
 					_page->getParent() ? _page->getParent()->getKey() : optional<RegistryKeyType>(),
-					_up ? _page->getRank() + 1 : _page->getRank() - 1,
+					_up ? _page->getRank() - 1 : _page->getRank() + 1,
 					0,
 					1
 			)	);
@@ -109,10 +109,10 @@ namespace synthese
 
 			SQLiteTransaction t;
 
-			_page->setRank(_up ? _page->getRank() + 1 : _page->getRank() - 1);
+			_page->setRank(_up ? _page->getRank() - 1 : _page->getRank() + 1);
 			WebPageTableSync::Save(_page.get(), t);
 
-			_switchedPage->setRank(_up ? _switchedPage->getRank() - 1 : _switchedPage->getRank() + 1);
+			_switchedPage->setRank(_up ? _switchedPage->getRank() + 1 : _switchedPage->getRank() - 1);
 			WebPageTableSync::Save(_switchedPage.get(), t);
 
 			t.run();

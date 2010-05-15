@@ -57,6 +57,7 @@ namespace synthese
 			static const std::string COL_IMAGE;
 			static const std::string COL_LINKS;
 			static const std::string COL_DO_NOT_USE_TEMPLATE;
+			static const std::string COL_HAS_FORUM;
 		
 
 

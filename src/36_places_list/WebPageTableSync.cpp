@@ -58,6 +58,7 @@ namespace synthese
 		const string WebPageTableSync::COL_IMAGE = "image";
 		const string WebPageTableSync::COL_LINKS = "links";
 		const string WebPageTableSync::COL_DO_NOT_USE_TEMPLATE = "do_not_use_template";
+		const string WebPageTableSync::COL_HAS_FORUM = "has_forum";
 	}
 
 	namespace db
@@ -81,6 +82,7 @@ namespace synthese
 			SQLiteTableSync::Field(WebPageTableSync::COL_IMAGE, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_LINKS, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_DO_NOT_USE_TEMPLATE, SQL_BOOLEAN),
+			SQLiteTableSync::Field(WebPageTableSync::COL_HAS_FORUM, SQL_BOOLEAN),
 			SQLiteTableSync::Field()
 		};
 
@@ -105,6 +107,7 @@ namespace synthese
 			webpage->setAbstract(rows->getText(WebPageTableSync::COL_ABSTRACT));
 			webpage->setImage(rows->getText(WebPageTableSync::COL_IMAGE));
 			webpage->setDoNotUseTemplate(rows->getBool(WebPageTableSync::COL_DO_NOT_USE_TEMPLATE));
+			webpage->setHasForum(rows->getBool(WebPageTableSync::COL_HAS_FORUM));
 
 			if(!rows->getText(WebPageTableSync::COL_START_TIME).empty())
 			{
@@ -220,6 +223,7 @@ namespace synthese
 			query.addField(webPage->getImage());
 			query.addField(linksStream.str());
 			query.addField(webPage->getDoNotUseTemplate());
+			query.addField(webPage->getHasForum());
 			query.execute(transaction);
 		}
 	}

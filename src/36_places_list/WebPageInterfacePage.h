@@ -55,6 +55,7 @@ namespace synthese
 			static const std::string DATA_ABSTRACT;
 			static const std::string DATA_IMAGE;
 			static const std::string DATA_PUBLICATION_DATE;
+			static const std::string DATA_FORUM;
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of a web page content by a template.
@@ -64,7 +65,7 @@ namespace synthese
 			///	@param page The page to display
 			///	@param edit True if the display must include inline edition forms (not yet implemented)
 			//////////////////////////////////////////////////////////////////////////
-			/// The following parameters are sent to the template :
+			/// <h3>Parameters sent to the display template</h3>
 			///	<ul>
 			///		<li>title : title of the page</li>
 			///		<li>content : content of the page</li>
@@ -72,6 +73,7 @@ namespace synthese
 			///		<li>abstract : abstract of the page</li>
 			///		<li>image : image of the page</li>
 			///		<li>date : date of beginning of publication of the page</li>
+			///		<li>forum : 1 if the page has a forum</li>
 			///	</ul>
 			static void Display(
 				std::ostream& stream,

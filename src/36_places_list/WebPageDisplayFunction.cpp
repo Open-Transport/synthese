@@ -31,6 +31,7 @@
 #include "Site.h"
 #include "WebPageInterfacePage.h"
 #include "TransportWebsiteRight.h"
+#include "Action.h"
 
 using namespace std;
 using namespace boost;
@@ -73,7 +74,18 @@ namespace synthese
 			}
 
 			_useTemplate = map.getDefault<bool>(PARAMETER_USE_TEMPLATE, true);
+			
 			_aditionnalParameters = map;
+			_aditionnalParameters.remove(Request::PARAMETER_ACTION);
+			BOOST_FOREACH(const ParametersMap::Map::value_type& it, map.getMap())
+			{
+				if(	it.first != Request::PARAMETER_FUNCTION &&
+					it.first != Request::PARAMETER_ACTION &&
+					(it.first.size() < Action_PARAMETER_PREFIX.size() || it.first.substr(0, Action_PARAMETER_PREFIX.size()) != Action_PARAMETER_PREFIX)
+				){
+					_aditionnalParameters.insert(it.first, it.second);
+				}
+			}
 
 			if(	!_page->mustBeDisplayed()
 			){

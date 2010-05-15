@@ -1,8 +1,8 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// WebPageUpdateAction class header.
-///	@file WebPageUpdateAction.h
-///	@author Hugues
+/// ForumMessagePostAction class header.
+///	@file ForumMessagePostAction.hpp
+///	@author Hugues Romain
 ///	@date 2010
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -22,58 +22,49 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_WebPageUpdateAction_H__
-#define SYNTHESE_WebPageUpdateAction_H__
+#ifndef SYNTHESE_ForumMessagePostAction_H__
+#define SYNTHESE_ForumMessagePostAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace forum
 	{
-		class WebPage;
+		class ForumTopic;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 56.15 Action : Web page properties update.
-		/// @ingroup m56Actions refActions
-		/// @author Hugues Romain
+		/// 52.15 Action : ForumMessagePostAction.
+		/// @ingroup m52Actions refActions
+		///	@author Hugues Romain
+		///	@date 2010
+		/// @since 3.1.18
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : WebPageUpdateAction
+		/// Key : ForumMessagePostAction
 		///
 		/// Parameters :
-		/// <ul>
-		///		<li>wp : web page to update</li>
-		///		<li>ui : value of parent page id</li>
-		///		<li>te : value of template id</li>
-		///		<li>sd : value of publication start date</li>
-		///		<li>ed : value of publication end date</li>
-		///		<li>mt : value of mime type</li>
-		///		<li>du : value of do not use template</li>
-		///		<li>fo : value of has forum</li>
-		/// </ul>
-		class WebPageUpdateAction:
-			public util::FactorableTemplate<server::Action, WebPageUpdateAction>
+		///	<ul>
+		///		<li>actionParamti : id of the topic of the message</li>
+		///		<li>actionParamun : user name</li>
+		///		<li>actionParamum : user e-mail</li>
+		///		<li>actionParamco : message content</li>
+		///	</ul>
+		class ForumMessagePostAction:
+			public util::FactorableTemplate<server::Action, ForumMessagePostAction>
 		{
 		public:
-			static const std::string PARAMETER_WEB_PAGE_ID;
-			static const std::string PARAMETER_UP_ID;
-			static const std::string PARAMETER_TEMPLATE_ID;
-			static const std::string PARAMETER_START_DATE;
-			static const std::string PARAMETER_END_DATE;
-			static const std::string PARAMETER_MIME_TYPE;
-			static const std::string PARAMETER_DO_NOT_USE_TEMPLATE;
-			static const std::string PARAMETER_HAS_FORUM;
+			static const std::string PARAMETER_TOPIC_ID;
+			static const std::string PARAMETER_USER_NAME;
+			static const std::string PARAMETER_USER_EMAIL;
+			static const std::string PARAMETER_MESSAGE;
 
 		private:
-			boost::shared_ptr<WebPage> _page;
-			boost::shared_ptr<WebPage> _up;
-			boost::shared_ptr<WebPage> _template;
-			boost::posix_time::ptime _startDate;
-			boost::posix_time::ptime _endDate;
-			std::string _mimeType;
-			bool _doNotUseTemplate;
-			bool _hasForum;
+			boost::shared_ptr<ForumTopic> _topic;
+			std::string _userName;
+			std::string _userEMail;
+			std::string _content;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -90,8 +81,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			WebPageUpdateAction();
-
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action
@@ -107,9 +96,12 @@ namespace synthese
 
 
 
-			void setWebPage(boost::shared_ptr<WebPage> value);
+			//! @name Setters
+			//@{
+				void setTopic(boost::shared_ptr<ForumTopic> value) { _topic = value; }
+			//@}
 		};
 	}
 }
 
-#endif // SYNTHESE_WebPageUpdateAction_H__
+#endif // SYNTHESE_ForumMessagePostAction_H__

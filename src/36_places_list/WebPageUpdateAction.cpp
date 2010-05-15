@@ -52,6 +52,7 @@ namespace synthese
 		const string WebPageUpdateAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "ed";
 		const string WebPageUpdateAction::PARAMETER_MIME_TYPE = Action_PARAMETER_PREFIX + "mt";
 		const string WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE = Action_PARAMETER_PREFIX + "du";
+		const string WebPageUpdateAction::PARAMETER_HAS_FORUM = Action_PARAMETER_PREFIX + "fo";
 
 		
 		
@@ -65,6 +66,7 @@ namespace synthese
 			map.insert(PARAMETER_TEMPLATE_ID, _template.get() ? _template->getKey() : RegistryKeyType(0));
 			map.insert(PARAMETER_MIME_TYPE, _mimeType);
 			map.insert(PARAMETER_DO_NOT_USE_TEMPLATE, _doNotUseTemplate);
+			map.insert(PARAMETER_HAS_FORUM, _hasForum);
 			return map;
 		}
 		
@@ -113,6 +115,7 @@ namespace synthese
 			}
 
 			_doNotUseTemplate = map.getDefault<bool>(PARAMETER_DO_NOT_USE_TEMPLATE, false);
+			_hasForum = map.getDefault<bool>(PARAMETER_HAS_FORUM, false);
 			_mimeType = map.getDefault<string>(PARAMETER_MIME_TYPE);
 		}
 		
@@ -130,6 +133,7 @@ namespace synthese
 			_page->setMimeType(_mimeType);
 			_page->setTemplate(_template.get());
 			_page->setDoNotUseTemplate(_doNotUseTemplate);
+			_page->setHasForum(_hasForum);
 
 			WebPageTableSync::Save(_page.get());
 
@@ -156,7 +160,8 @@ namespace synthese
 		WebPageUpdateAction::WebPageUpdateAction():
 			_startDate(not_a_date_time),
 			_endDate(not_a_date_time),
-			_doNotUseTemplate(false)
+			_doNotUseTemplate(false),
+			_hasForum(false)
 		{
 
 		}
