@@ -26,6 +26,7 @@
 #include "WebPage.h"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
+#include "PlacesListModule.h"
 
 #include <sstream>
 #include <boost/lexical_cast.hpp>
@@ -46,6 +47,8 @@ namespace synthese
 		const string WebPageInterfacePage::DATA_IMAGE("image");
 		const string WebPageInterfacePage::DATA_PUBLICATION_DATE("date");
 		const string WebPageInterfacePage::DATA_FORUM("forum");
+		const string WebPageInterfacePage::DATA_IS_CURRENT("is_the_current_page");
+		const string WebPageInterfacePage::DATA_DEPTH("depth");
 
 
 
@@ -54,7 +57,8 @@ namespace synthese
 			const WebPage& templatePage,
 			const server::Request& request,
 			const WebPage& page,
-			bool edit
+			bool edit,
+			bool displayContent
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(Env::GetOfficialEnv().getSPtr(&templatePage));
@@ -65,9 +69,13 @@ namespace synthese
 			);
 
 			pm.insert(DATA_TITLE, page.getName());
-			stringstream content;
-			page.display(content, request);
-			pm.insert(DATA_CONTENT, content.str());
+			
+			if(displayContent)
+			{
+				stringstream content;
+				page.display(content, request);
+				pm.insert(DATA_CONTENT, content.str());
+			}
 			pm.insert(DATA_ABSTRACT, page.getAbstract());
 			pm.insert(DATA_IMAGE, page.getImage());
 			pm.insert(
@@ -76,6 +84,11 @@ namespace synthese
 			);
 			pm.insert(Request::PARAMETER_OBJECT_ID, page.getKey());
 			pm.insert(DATA_FORUM, page.getHasForum());
+
+			shared_ptr<const WebPage> curPage(PlacesListModule::GetWebPage(request));
+			pm.insert(DATA_IS_CURRENT, curPage.get() == &page);
+
+			pm.insert(DATA_DEPTH, page.getDepth());
 
 			displayRequest.getFunction()->setAditionnalParametersMap(pm);
 			displayRequest.getFunction()->setUseTemplate(false);

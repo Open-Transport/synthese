@@ -26,9 +26,7 @@
 #include "Request.h"
 #include "WebPage.h"
 #include "WebPagePositionFunction.hpp"
-#include "HTMLModule.h"
-#include "StaticFunctionRequest.h"
-#include "WebPageDisplayFunction.h"
+#include "WebPageInterfacePage.h"
 #include "PlacesListModule.h"
 
 #include <deque>
@@ -42,20 +40,16 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace html;
-
+	
 	template<> const string util::FactorableTemplate<Function,transportwebsite::WebPagePositionFunction>::FACTORY_KEY("position");
 	
 	namespace transportwebsite
 	{
 		const string WebPagePositionFunction::PARAMETER_PAGE_ID("page_id");
+		const string WebPagePositionFunction::PARAMETER_DISPLAY_PAGE_ID("display_page_id");
 		const string WebPagePositionFunction::PARAMETER_MIN_DEPTH("min_depth");
 		const string WebPagePositionFunction::PARAMETER_MAX_DEPTH("max_depth");
-		const string WebPagePositionFunction::PARAMETER_BEGINNING("beginning");
-		const string WebPagePositionFunction::PARAMETER_ENDING("ending");
-		const string WebPagePositionFunction::PARAMETER_BEGINNING_SELECTED("beginning_selected");
-		const string WebPagePositionFunction::PARAMETER_ENDING_SELECTED("ending_selected");
-
+		
 		ParametersMap WebPagePositionFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -63,12 +57,12 @@ namespace synthese
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
+			if(_displayPage.get())
+			{
+				map.insert(PARAMETER_DISPLAY_PAGE_ID, _displayPage->getKey());
+			}
 			map.insert(PARAMETER_MIN_DEPTH, _minDepth);
 			map.insert(PARAMETER_MAX_DEPTH, _maxDepth);
-			map.insert(PARAMETER_BEGINNING, _beginning);
-			map.insert(PARAMETER_BEGINNING_SELECTED, _beginningSelected);
-			map.insert(PARAMETER_ENDING, _ending);
-			map.insert(PARAMETER_ENDING_SELECTED, _endingSelected);
 			return map;
 		}
 
@@ -81,6 +75,15 @@ namespace synthese
 			catch (ObjectNotFoundException<WebPage>&)
 			{
 				throw RequestException("No such web page");
+			}
+			optional<RegistryKeyType> displayPageId(map.getOptional<RegistryKeyType>(PARAMETER_DISPLAY_PAGE_ID));
+			if(displayPageId) try
+			{
+				_displayPage = Env::GetOfficialEnv().get<WebPage>(*displayPageId);
+			}
+			catch (ObjectNotFoundException<WebPage>&)
+			{
+				throw RequestException("No such display page");
 			}
 			_minDepth = map.getDefault<size_t>(PARAMETER_MIN_DEPTH, 1);
 			optional<int> depth = map.getOptional<int>(PARAMETER_MAX_DEPTH);
@@ -95,11 +98,6 @@ namespace synthese
 					_maxDepth = _page->getDepth() + *depth;
 				}
 			}
-			
-			_beginning = map.getDefault<string>(PARAMETER_BEGINNING);
-			_beginningSelected = map.getDefault<string>(PARAMETER_BEGINNING_SELECTED, _beginning);
-			_ending = map.getDefault<string>(PARAMETER_ENDING);
-			_endingSelected = map.getDefault<string>(PARAMETER_ENDING_SELECTED, _ending);
 		}
 
 		void WebPagePositionFunction::run(
@@ -112,10 +110,11 @@ namespace synthese
 			{
 				pages.push_front(page);
 			}
-			size_t depth(1);
-			StaticFunctionRequest<WebPageDisplayFunction> openPage(request, false);
+			size_t depth(0);
+			bool first(true);
 			BOOST_FOREACH(const WebPage* curPage, pages)
 			{
+				++depth;
 				if(depth < _minDepth)
 				{
 					continue;
@@ -124,12 +123,19 @@ namespace synthese
 				{
 					break;
 				}
-				openPage.getFunction()->setPage(Env::GetOfficialEnv().getSPtr(curPage));
-				stream <<
-					(curPage == currentPage.get() ? _beginningSelected : _beginning) <<
-					HTMLModule::getHTMLLink(openPage.getURL(), curPage->getName()) <<
-					(curPage == currentPage.get() ? _endingSelected : _ending);
-				++depth;
+				if(_displayPage.get())
+				{
+					WebPageInterfacePage::Display(stream, *_displayPage, request, *curPage, false);
+				}
+				else
+				{
+					if(!first)
+					{
+						stream << ",";
+					}
+					stream << curPage->getKey();
+					first = false;
+				}
 			}
 		}
 		

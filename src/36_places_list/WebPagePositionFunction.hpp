@@ -43,22 +43,18 @@ namespace synthese
 		///
 		/// Parameters :
 		///	<ul>
-		///		<li>p : id of the page to display</li>
+		///		<li>page_id : id of the page to display</li>
+		///		<li>display_page (optional) : id of the template to use for the display of each page (by WebPageInterfacePage::Display).
+		///			If not defined, then the id of each page is returned, separated by comas</li>
 		///		<li>min_level (optional, default=1) : minimal level to display</li>
 		///		<li>max_level (optional, default=unlimited) : maximal level to display. Negative numbers seems backward level.</li>
-		///		<li>For each i level :</li>
-		///		<ul>
-		///			<li>beginning_x (x = depth) : code to output before the item if the item does not correspond to the current displayed page</li>
-		///			<li>ending_x (x = depth) : code to output after the item if the item does not correspond to the current displayed page</li>
-		///			<li>beginning_selected_x (x = depth) : code to output before the item if the item corresponds to the current displayed page (default is like beginning_x)</li>
-		///			<li>ending_selected_x (x = depth) : code to output after the item if the item corresponds to the current displayed page (default is like ending_x)</li>
-		///		</ul>
 		///	</ul>
 		class WebPagePositionFunction:
 			public util::FactorableTemplate<server::Function,WebPagePositionFunction>
 		{
 		public:
 			static const std::string PARAMETER_PAGE_ID;
+			static const std::string PARAMETER_DISPLAY_PAGE_ID;
 			static const std::string PARAMETER_MIN_DEPTH;
 			static const std::string PARAMETER_MAX_DEPTH;
 			static const std::string PARAMETER_BEGINNING;
@@ -70,12 +66,9 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const WebPage> _page;
+				boost::shared_ptr<const WebPage> _displayPage;
 				std::size_t _minDepth;
 				boost::optional<std::size_t> _maxDepth;
-				std::string _beginning;
-				std::string _ending;
-				std::string _beginningSelected;
-				std::string _endingSelected;
 			//@}
 			
 			

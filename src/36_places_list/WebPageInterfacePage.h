@@ -56,14 +56,17 @@ namespace synthese
 			static const std::string DATA_IMAGE;
 			static const std::string DATA_PUBLICATION_DATE;
 			static const std::string DATA_FORUM;
+			static const std::string DATA_IS_CURRENT;
+			static const std::string DATA_DEPTH;
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of a web page content by a template.
 			///	@param stream Stream to write on
-			/// @param templatePage The display template to use for the display
+			/// @param templatePage the template to use for the display of the page.
 			/// @param request The current request
 			///	@param page The page to display
 			///	@param edit True if the display must include inline edition forms (not yet implemented)
+			/// @param displayContent if false, then the content is not rendered
 			//////////////////////////////////////////////////////////////////////////
 			/// <h3>Parameters sent to the display template</h3>
 			///	<ul>
@@ -74,13 +77,16 @@ namespace synthese
 			///		<li>image : image of the page</li>
 			///		<li>date : date of beginning of publication of the page</li>
 			///		<li>forum : 1 if the page has a forum</li>
+			///		<li>is_the_current_page : 1 if the displayed page is the current one</li>
+			///		<li>depth : depth of the page in the tree</li>
 			///	</ul>
 			static void Display(
 				std::ostream& stream,
 				const WebPage& templatePage,
 				const server::Request& request,
 				const WebPage& page,
-				bool edit
+				bool edit,
+				bool displayContent = true
 			);
 		};
 	}
