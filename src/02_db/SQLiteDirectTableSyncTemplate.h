@@ -234,8 +234,8 @@ namespace synthese
 						else
 						{
 							boost::shared_ptr<T> object(K::GetNewObject(rows));
-							Load(object.get(), rows, env, linkLevel);
 							registry.add(object);
+							Load(object.get(), rows, env, linkLevel);
 							result.push_back(object);
 					}	}
 					catch(std::exception& e)

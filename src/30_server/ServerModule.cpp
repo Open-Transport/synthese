@@ -521,7 +521,7 @@ namespace synthese
 		std::string ServerModule::URLEncode( const std::string& value )
 		{
 			stringstream result;
-			BOOST_FOREACH(char c, value)
+			BOOST_FOREACH(unsigned char c, value)
 			{
 				if(	(c >= 48 && c <= 57) ||
 					(c >= 65 && c <= 90) ||

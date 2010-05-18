@@ -78,6 +78,7 @@ namespace synthese
 			
 			// User e-mail
 			_userEMail = map.get<string>(PARAMETER_USER_EMAIL);
+
 			/// @todo control @ and .xx presence
 
 			_content = map.get<string>(PARAMETER_MESSAGE);

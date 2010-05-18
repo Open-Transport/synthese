@@ -30,6 +30,7 @@
 #include "WebPageTableSync.h"
 
 using namespace std;
+using namespace boost;
 using namespace boost::posix_time;
 
 namespace synthese
@@ -63,6 +64,7 @@ namespace synthese
 			{
 				map.insert(PARAMETER_WEB_PAGE_ID, _page->getKey());
 			}
+			map.insert(PARAMETER_UP_ID, _up.get() ?_up->getKey() : RegistryKeyType(0));
 			map.insert(PARAMETER_TEMPLATE_ID, _template.get() ? _template->getKey() : RegistryKeyType(0));
 			map.insert(PARAMETER_MIME_TYPE, _mimeType);
 			map.insert(PARAMETER_DO_NOT_USE_TEMPLATE, _doNotUseTemplate);
@@ -83,11 +85,19 @@ namespace synthese
 				throw ActionException("No such page");
 			}
 
+			// Up page
 			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_UP_ID));
 			if(id > 0)
 			try
 			{
 				_up = WebPageTableSync::GetEditable(id, *_env);
+				for(WebPage* page(_up.get()); page != NULL; page = page->getParent())
+				{
+					if(page == _page.get())
+					{
+						throw ActionException("A page cannot be moved into a subpage node");
+					}
+				}
 			}
 			catch(ObjectNotFoundException<WebPage>&)
 			{
@@ -127,7 +137,33 @@ namespace synthese
 			stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			
-			_page->setParent(_up.get());
+			// Moving the page into an other node of the tree
+			if(_up.get() != _page->getParent())
+			{
+				// Deleting the old position of the tree
+				WebPageTableSync::ShiftRank(
+					_page->getRoot()->getKey(),
+					_page->getParent() ? _page->getParent()->getKey() : RegistryKeyType(0),
+					_page->getRank(),
+					false
+				);
+
+				// Giving the highest rank into the new branch
+				WebPageTableSync::SearchResult lastRankPage(
+					WebPageTableSync::Search(
+						*_env,
+						_page->getRoot()->getKey(),
+						_up.get() ? _up->getKey() : RegistryKeyType(0),
+						optional<size_t>(),
+						0,
+						1,
+						true,
+						false,
+						false
+				)	);
+				_page->setRank(lastRankPage.empty() ? 0 : lastRankPage.front()->getRank() + 1);
+				_page->setParent(_up.get());
+			}
 			_page->setStartDate(_startDate);
 			_page->setEndDate(_endDate);
 			_page->setMimeType(_mimeType);
