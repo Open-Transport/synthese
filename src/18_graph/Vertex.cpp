@@ -23,6 +23,8 @@
 #include "Vertex.h"
 #include "Edge.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 
 namespace synthese
@@ -109,12 +111,17 @@ namespace synthese
 			pair<Edges::iterator, Edges::iterator> range(_arrivalEdges.equal_range(edge->getParentPath()));
 			assert(range.first != _arrivalEdges.end() && range.first->first == edge->getParentPath());
 
+			vector<Edges::iterator> toDelete;
 			for(Edges::iterator it(range.first); it!= range.second; ++it)
 			{
 				if(it->second == edge)
 				{
-					_arrivalEdges.erase(it);
+					toDelete.push_back(it);
 				}
+			}
+			BOOST_FOREACH(Edges::iterator it2, toDelete)
+			{
+				_arrivalEdges.erase(it2);
 			}
 		}
 
@@ -128,12 +135,17 @@ namespace synthese
 			pair<Edges::iterator, Edges::iterator> range(_departureEdges.equal_range(edge->getParentPath()));
 			assert(range.first != _departureEdges.end() && range.first->first == edge->getParentPath());
 
+			vector<Edges::iterator> toDelete;
 			for(Edges::iterator it(range.first); it!= range.second; ++it)
 			{
 				if(it->second == edge)
 				{
-					_departureEdges.erase(it);
+					toDelete.push_back(it);
 				}
+			}
+			BOOST_FOREACH(Edges::iterator it2, toDelete)
+			{
+				_departureEdges.erase(it2);
 			}
 		}
 	}
