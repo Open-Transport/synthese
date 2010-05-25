@@ -299,6 +299,7 @@ namespace synthese
 							stream << t.col();
 						}
 					}
+					stream << t.close();
 				}
 			}
 

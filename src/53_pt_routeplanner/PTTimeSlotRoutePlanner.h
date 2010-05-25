@@ -40,16 +40,58 @@ namespace synthese
 
 	namespace ptrouteplanner
 	{
-		/** PTTimeSlotRoutePlanner class.
-			@ingroup m53
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Public transportation route planner.
+		///	@ingroup m53
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Input : 2 places
+		/// Output : all solutions inside a time period between the two points,
+		/// composed by :
+		/// <ul>
+		///		<li>road approach between the departure point and a physical stop
+		///		(can be empty if the departure point is a physical stop and if the 
+		///		best solution runs from it)</li>
+		///		<li>public transportation journey with or without any transfer</li>
+		///		<li>road approach between the end stop and the arrival point (can be
+		///		empty if the journey goes directly to the arrival place)</li>
+		///	</ul>
+		/// 
+		/// When the departure and arrival places are not far away of each other,
+		/// it is possible to reach the arrival from the departure, using only the
+		/// road network.
+		///
+		/// If the _showFullRoadJourney attribute is on, the class returns a continuous 
+		/// service valid the entire day, representing the roads to use and the duration
+		/// of each leg. If sometimes the use of public transportation is faster than the
+		/// full road journey, then the public transportation solution is returned and the
+		/// continuous service is broken at the period where the public transportation 
+		/// solution is the best one.
+		///
+		/// If the _showFullRoadJourney attribute is off, then the class returns only the
+		/// public transportation solutions.
+		///
+		/// The _showFullRoadJourney has no effect on the route planning algorithm. It 
+		/// controls only the output.
+		///
 		class PTTimeSlotRoutePlanner:
 			public algorithm::TimeSlotRoutePlanner
 		{
 		private:
 			const geography::Place* const _departurePlace;
 			const geography::Place* const _arrivalPlace;
+			bool _showFullRoadJourney;
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Search of all physical stops reachable from the departure or the
+			/// arrival place.
+			/// @param vam the points to start the search from
+			/// @param destinationVam the points to reach if possible
+			/// @param direction the search is for departure or arrival places
+			/// @return the list of reachable stops with the duration of approach,
+			/// containing the departure and arrival places with empty approach, and
+			/// other stops with non empty approach, using the road network to reach them.
+			/// @author Hugues Romain
 			graph::VertexAccessMap _extendToPhysicalStops(
 				const graph::VertexAccessMap& vam,
 				const graph::VertexAccessMap& destinationVam,

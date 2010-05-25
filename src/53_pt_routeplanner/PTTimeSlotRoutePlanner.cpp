@@ -99,9 +99,11 @@ namespace synthese
 				getLowestDepartureTime() :
 				getHighestArrivalTime()
 			);
+			VertexAccessMap emptyMap;
 			BestVertexReachesMap bvrmd(
 				direction,
-				vam
+				vam,
+				emptyMap
 			); // was optim=true
 
 			ptime highestArrivalTime(direction == DEPARTURE_TO_ARRIVAL ? getHighestArrivalTime() : getLowestDepartureTime());
@@ -231,17 +233,23 @@ namespace synthese
 			TimeSlotRoutePlanner::Result result;
 
 			// Control if departure and arrival VAMs has contains at least one vertex
-			// or if the departure and arrival places are the same
 			if(	_originVam.getMap().empty() ||
-				_destinationVam.getMap().empty() ||
-				_originVam.intersercts(_destinationVam)
+				_destinationVam.getMap().empty()
+			){
+				return PTRoutePlannerResult(_departurePlace, _arrivalPlace, false, result);
+			}
+
+			// Control if the departure and arrival places are the same
+			if(	_originVam.intersercts(_destinationVam)
 			){
 				return PTRoutePlannerResult(_departurePlace, _arrivalPlace, true, result);
 			}
 
+			// Search stops around the departure and arrival places using the road network
 			VertexAccessMap ovam(_extendToPhysicalStops(_originVam, _destinationVam, DEPARTURE_TO_ARRIVAL));
 			VertexAccessMap dvam(_extendToPhysicalStops(_destinationVam, _originVam, ARRIVAL_TO_DEPARTURE));
 
+			// Log the result of road approaches calculation
 			if(	_logStream
 			){
 				*_logStream << "<h3>Origins</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
@@ -279,40 +287,58 @@ namespace synthese
 				}
 				*_logStream << "</table>";
 			}
-// 			if (result.empty())
-// 			{
-// 				_previousContinuousServiceDuration = posix_time::minutes(0);
-// 			}
-// 			else
-// 			{
-// 				shared_ptr<Journey> journey(_result.front());
-// 				_previousContinuousServiceDuration = journey->getDuration();
-// 				_previousContinuousServiceLastDeparture = journey->getDepartureTime();
-// 				_previousContinuousServiceLastDeparture += journey->getContinuousServiceRange();
-// 			}
-// TODO prepare continuous service
 
-			TimeSlotRoutePlanner r(
-				ovam,
-				dvam,
-				getLowestDepartureTime(),
-				getHighestDepartureTime(),
-				getLowestArrivalTime(),
-				getHighestArrivalTime(),
-				_whatToSearch,
-				_graphToUse,
-				_maxDuration,
-				_maxSolutionsNumber,
-				_accessParameters,
-				_planningOrder,
-				_logStream
-			);
-			return PTRoutePlannerResult(
-				_departurePlace,
-				_arrivalPlace,
-				false,
-				r.run()
-			);
+			// Handle of the case of possible full road approach
+			if(	ovam.intersercts(dvam)
+			){
+				result.push_back(ovam.getBestIntersection(dvam));
+			}
+
+			if(result.empty())
+			{
+				TimeSlotRoutePlanner r(
+					ovam,
+					dvam,
+					getLowestDepartureTime(),
+					getHighestDepartureTime(),
+					getLowestArrivalTime(),
+					getHighestArrivalTime(),
+					_whatToSearch,
+					_graphToUse,
+					_maxDuration,
+					_maxSolutionsNumber,
+					_accessParameters,
+					_planningOrder,
+					_logStream
+				);
+				return PTRoutePlannerResult(
+					_departurePlace,
+					_arrivalPlace,
+					false,
+					r.run()
+				);
+			}
+			else
+			{
+				TimeSlotRoutePlanner r(
+					ovam,
+					dvam,
+					result.front(),
+					_whatToSearch,
+					_graphToUse,
+					_maxDuration,
+					_maxSolutionsNumber,
+					_accessParameters,
+					_planningOrder,
+					_logStream
+				);
+				return PTRoutePlannerResult(
+					_departurePlace,
+					_arrivalPlace,
+					false,
+					r.run()
+				);
+			}
 		}
 	}
 }

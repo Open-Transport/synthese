@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
-/// PTRoutesListFunction class header.
-///	@file PTRoutesListFunction.hpp
+/// PTRouteDetailFunction class header.
+///	@file PTRouteDetailFunction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///
@@ -22,68 +22,53 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_PTRoutesListFunction_H__
-#define SYNTHESE_PTRoutesListFunction_H__
+#ifndef SYNTHESE_PTRouteDetailFunction_H__
+#define SYNTHESE_PTRouteDetailFunction_H__
 
 #include "FactorableTemplate.h"
 #include "Function.h"
 
 namespace synthese
 {
-	namespace transportwebsite
-	{
-		class WebPage;
-	}
-
 	namespace pt
 	{
-		class CommercialLine;
-
 		//////////////////////////////////////////////////////////////////////////
-		/// 35.15 Function : Lists the routes of a line.
+		///	35.15 Function : PTRouteDetailFunction.
+		///	@ingroup m35Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010
-		///	@since 3.1.16
-		///	@ingroup m35Functions refFunctions
+		/// @since 3.1.18
 		//////////////////////////////////////////////////////////////////////////
 		///	<h2>Usage</h2>
-		///	Key : PTRoutesListFunction
+		/// Key : PTRouteDetailFunction
 		///
-		///	Parameters :
+		/// Parameters :
 		///	<ul>
-		///		<li>fonction=PTRoutesListFunction</li>
-		///		<li>roid : id of the line to display</li>
-		///		<li>p : template to use for the display of each route (will be called by PTRoutesListItemInterfacePage).
-		///			If not defined, the standard XML output is generated.</li>
-		///		<li>msr : do not display a route if an other route follows the same stops list in the same order (the comparison is done on connection places and not physical stops)</li>
-		///		<li>mir : do not display a route if an other route serves the same stops list in the same order even if the other route serves other stops before, after, and inside</li>
+		///		<li>roid : id of the object to display</li>
 		///	</ul>
 		///
-		///	<h2>Standard XML Output</h2>
+		/// <h2>Standard XML output</h2>
 		///	<h3>Description</h3>
 		///
-		/// @image html PTRoutesListFunction.png
+		/// @image html PTRouteDetailFunction.png
 		///
 		///	<h3>Download</h3>
-		///
 		///	<ul>
-		///		<li><a href="include/35_pt/PTRoutesListFunction.xsd">XML output schema</a></li>
+		///		<li><a href="include/35_pt/PTRouteDetailFunction.xsd">XML output schema</a></li>
 		///	</ul>
-		class PTRoutesListFunction:
-			public util::FactorableTemplate<server::Function,PTRoutesListFunction>
+		class PTRouteDetailFunction:
+			public util::FactorableTemplate<server::Function,PTRouteDetailFunction>
 		{
 		public:
-			static const std::string PARAMETER_MERGE_SAME_ROUTES;
-			static const std::string PARAMETER_MERGE_INCLUDING_ROUTES;
-			static const std::string PARAMETER_PAGE_ID;
+			/// @todo request parameter names declaration
+			// eg : static const std::string PARAMETER_xxx;
 			
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const pt::CommercialLine> _line;
-				boost::shared_ptr<const transportwebsite::WebPage> _page;
-				bool _mergeSameRoutes;
-				bool _mergeIncludingRoutes;
+				/// @todo Parsed parameters declaration
+				// eg : const void*	_object;
+				// eg : ParametersMap			_parameters;
 			//@}
 			
 			
@@ -109,7 +94,7 @@ namespace synthese
 		public:
 			//! @name Setters
 			//@{
-				void setLine(boost::shared_ptr<const pt::CommercialLine> value) { _line = value; }
+			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
 			//@}
 
 
@@ -144,4 +129,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_PTRoutesListFunction_H__
+#endif // SYNTHESE_PTRouteDetailFunction_H__

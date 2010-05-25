@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
-/// PTRoutesListFunction class header.
-///	@file PTRoutesListFunction.hpp
+/// PTPhysicalStopsListFunction class header.
+///	@file PTPhysicalStopsListFunction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///
@@ -22,68 +22,92 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_PTRoutesListFunction_H__
-#define SYNTHESE_PTRoutesListFunction_H__
+#ifndef SYNTHESE_PTPhysicalStopsListFunction_H__
+#define SYNTHESE_PTPhysicalStopsListFunction_H__
 
 #include "FactorableTemplate.h"
 #include "Function.h"
 
 namespace synthese
 {
-	namespace transportwebsite
-	{
-		class WebPage;
-	}
-
 	namespace pt
 	{
-		class CommercialLine;
-
 		//////////////////////////////////////////////////////////////////////////
-		/// 35.15 Function : Lists the routes of a line.
+		///	35.15 Function : Physical Stops Search.
+		///	@ingroup m35Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010
-		///	@since 3.1.16
-		///	@ingroup m35Functions refFunctions
+		/// @since 3.1.18
 		//////////////////////////////////////////////////////////////////////////
-		///	<h2>Usage</h2>
-		///	Key : PTRoutesListFunction
+		/// Key : PTPhysicalStopsListFunction
 		///
-		///	Parameters :
+		/// <h2>Usage</h2>
+		///	<h3>Search by id</h3>
+		///
+		/// Parameters :
 		///	<ul>
-		///		<li>fonction=PTRoutesListFunction</li>
-		///		<li>roid : id of the line to display</li>
-		///		<li>p : template to use for the display of each route (will be called by PTRoutesListItemInterfacePage).
-		///			If not defined, the standard XML output is generated.</li>
-		///		<li>msr : do not display a route if an other route follows the same stops list in the same order (the comparison is done on connection places and not physical stops)</li>
-		///		<li>mir : do not display a route if an other route serves the same stops list in the same order even if the other route serves other stops before, after, and inside</li>
+		///		<li>fonction=PTPhysicalStopsListFunction</li>
+		///		<li>roid : id of the physical stop to return</li>
+		///		<li>p : id of the template to use for the display of each stop (will be used by PTPhysicalStopInterfacePage).
+		///			If not defined, the output respects the standard XML format defined below.</li>
+		///	</ul>
+		///
+		/// <h3>Search by operator code</h3>
+		///
+		/// The comparison between code and entered text is done by LIKE operator.
+		/// 
+		/// <ul>
+		///		<li>fonction=PTPhysicalStopsListFunction</li>
+		///		<li>code : operator code</li>
+		///		<li>n : max number of stops to return</li>
+		///		<li>p : id of the template to use for the display of each stop (will be used by PTPhysicalStopInterfacePage).
+		///			If not defined, the output respects the standard XML format defined below.</li>
+		///	</ul>
+		///
+		/// <h3>Search by route</h3>
+		///
+		///	<ul>
+		///		<li>fonction=PTPhysicalStopsListFunction</li>
+		///		<li>roid : id of the route to read</li>
+		///		<li>p : id of the template to use for the display of each stop (will be used by PTPhysicalStopInterfacePage).
+		///			If not defined, the output respects the standard XML format defined below.</li>
+		///	</ul>
+		/// 
+		/// <h3>Search by commercial stop area</h3>
+		///
+		///	<ul>
+		///		<li>fonction=PTPhysicalStopsListFunction</li>
+		///		<li>roid : id of the commercial stop area to read</li>
+		///		<li>ni (optional) : id of a transport network which must serve the stop</li>
+		///		<li>p : id of the template to use for the display of each stop (will be used by PTPhysicalStopInterfacePage).
+		///			If not defined, the output respects the standard XML format defined below.</li>
 		///	</ul>
 		///
 		///	<h2>Standard XML Output</h2>
-		///	<h3>Description</h3>
 		///
-		/// @image html PTRoutesListFunction.png
+		/// This chapter applies only if no display template is used.
+		///
+		///	<h3>Description</h3>
+		/// @image html PTPhysicalStopsListFunction.png
 		///
 		///	<h3>Download</h3>
 		///
 		///	<ul>
-		///		<li><a href="include/35_pt/PTRoutesListFunction.xsd">XML output schema</a></li>
+		///		<li><a href="include/35_pt/PTPhysicalStopsListFunction.xsd">XML output schema</a></li>
 		///	</ul>
-		class PTRoutesListFunction:
-			public util::FactorableTemplate<server::Function,PTRoutesListFunction>
+		class PTPhysicalStopsListFunction:
+			public util::FactorableTemplate<server::Function,PTPhysicalStopsListFunction>
 		{
 		public:
-			static const std::string PARAMETER_MERGE_SAME_ROUTES;
-			static const std::string PARAMETER_MERGE_INCLUDING_ROUTES;
-			static const std::string PARAMETER_PAGE_ID;
+			/// @todo request parameter names declaration
+			// eg : static const std::string PARAMETER_xxx;
 			
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const pt::CommercialLine> _line;
-				boost::shared_ptr<const transportwebsite::WebPage> _page;
-				bool _mergeSameRoutes;
-				bool _mergeIncludingRoutes;
+				/// @todo Parsed parameters declaration
+				// eg : const void*	_object;
+				// eg : ParametersMap			_parameters;
 			//@}
 			
 			
@@ -109,7 +133,7 @@ namespace synthese
 		public:
 			//! @name Setters
 			//@{
-				void setLine(boost::shared_ptr<const pt::CommercialLine> value) { _line = value; }
+			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
 			//@}
 
 
@@ -144,4 +168,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_PTRoutesListFunction_H__
+#endif // SYNTHESE_PTPhysicalStopsListFunction_H__

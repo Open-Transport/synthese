@@ -40,11 +40,8 @@ namespace synthese
 			@ingroup m54Functions refFunctions
 			@author Hugues Romain
 			@date 2002
-			
-			General parameters :
-			<ul>
-				<li>date (optional) : date of search (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
-			</ul>
+
+			<h2>Usage</h2>
 			
 			The content can be specified in 3 different ways :
 			
@@ -58,21 +55,17 @@ namespace synthese
 			Parameters :
 			<ul>
 				<li>roid / tb : id of the pre-configured display screen</li>
+				<li>date (optional) : date of search (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
 			</ul>
 
 			<h4>Usage 1.2 by mac address
 			Parameters :
 			<ul>
 				<li>m : MAC address of the display screen</li>
+				<li>date (optional) : date of search (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
 			</ul>
 			
 			<h3>Usage 2 : Generating from a connection place</h3>
-			
-			General parameters :
-			<ul>
-				<li>i : id of display interface</li>
-				<li>rn : table rows number</li>
-			</ul>
 			
 			The connection place can be specified by two ways :
 			
@@ -81,6 +74,9 @@ namespace synthese
 			Parameters :
 			<ul>
 				<li>roid : id of the connection place</li>
+				<li>i : id of display interface. If not specified, the standard XML output is used</li>
+				<li>rn : table rows number</li>
+				<li>date (optional) : date of search (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
 			</ul>
 			
 			<h4>Usage 2.2 : by name</h4>
@@ -89,16 +85,13 @@ namespace synthese
 			<ul>
 				<li>cn : name of the city</li>
 				<li>sn : name of the stop</li>
+				<li>i : id of display interface. If not specified, the standard XML output is used</li>
+				<li>rn : table rows number</li>
+				<li>date (optional) : date of search (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
 			</ul>
 			
 			<h3>Usage 3 : Generating from a physical stop</h3>
 						
-			General parameters :
-			<ul>
-				<li>i : id of display interface</li>
-				<li>rn : table rows number</li>
-			</ul>
-			
 			The physical stop can be specified by two ways :
 			
 			<h4>Usage 3.1 by id</h4>
@@ -106,6 +99,8 @@ namespace synthese
 			Parameters :
 			<ul>
 				<li>roid : id of the physical stop</li>
+				<li>i : id of display interface. If not specified, the standard XML output is used</li>
+				<li>rn : table rows number</li>
 			</ul>
 			
 			<h4>Usage 3.2 : by operator code</h4>
@@ -114,6 +109,18 @@ namespace synthese
 			<ul>
 				<li>roid : id of the connection place which belongs the stop</li>
 				<li>oc : operator code of the physical stop</li>
+				<li>i : id of display interface. If not specified, the standard XML output is used</li>
+				<li>rn : table rows number</li>
+			</ul>
+
+			<h2>Standard XML output</h2>
+			<h3>Description</h3>
+
+			@image html DisplayScreenContentFunction.png
+
+			<h3>Download</h3>
+			<ul>
+				<li><a href="include/54_departures_table/DisplayScreenContentFunction.xsd">XML output schema</a></li>
 			</ul>
 		*/
 		class DisplayScreenContentFunction:

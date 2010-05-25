@@ -47,22 +47,27 @@ namespace synthese
 		///	@date 2008
 		///	@ingroup m35Functions refFunctions
 		//////////////////////////////////////////////////////////////////////////
-		/// <h2>Parameters</h2>
+		/// <h2>Usage</h2>
+		///	Key : LinesListFunction2
 		///
+		///	Parameters :
 		///	<ul>
+		///		<li>fonction=LinesListFunction2</li>
 		///		<li>ni : id of the network of the lines</li>
-		///		<li>pi (optional) : id of the display template to use for each line. If pi is not
-		///		specified, then an XML output is generated instead.</li>
+		///		<li>pi (optional) : id of the display template to use for each line (will be called by LineMarkerInterfacePage).
+		///		If pi is not specified, the standard XML output is generated instead.</li>
 		///	</ul>
 		///
-		/// <h2>Output</h2>
-		/// <h3>Use of display template</h3>
+		/// <h2>Standard XML output</h2>
+		///	<h3>Description</h3>
+		/// 
+		///	@image html LinesListFunction.png
 		///
-		/// The display template is handled by LineMarkerInterfacePage::Display.
+		///	<h3>Download</h3>
 		///
-		/// <h3>XML output (if no display template is specified)</h3>
-		///
-		/// To be specified.
+		///	<ul>
+		///		<li><a href="include/35_pt/LinesListFunction.xsd">XML output schema</a></li>
+		///	</ul>
 		class LinesListFunction:
 			public util::FactorableTemplate<server::Function,LinesListFunction>
 		{
