@@ -44,7 +44,7 @@ namespace synthese
 		/// Parameters :
 		///	<ul>
 		///		<li>page_id : id of the page to display</li>
-		///		<li>display_page (optional) : id of the template to use for the display of each page (by WebPageInterfacePage::Display).
+		///		<li>display_page_id (optional) : id of the template to use for the display of each page (by WebPageInterfacePage::Display).
 		///			If not defined, then the id of each page is returned, separated by comas</li>
 		///		<li>min_level (optional, default=1) : minimal level to display</li>
 		///		<li>max_level (optional, default=unlimited) : maximal level to display. Negative numbers seems backward level.</li>
