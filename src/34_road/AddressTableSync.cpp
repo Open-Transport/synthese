@@ -129,11 +129,20 @@ namespace synthese
 					else
 					{
 						RegistryKeyType crossingId(
-							util::encodeUId(43,0,decodeObjectId(object->getKey()))
+							util::encodeUId(43,decodeGridNodeId(object->getKey()),decodeObjectId(object->getKey()))
 						);
-						shared_ptr<Crossing> crossing(new Crossing(crossingId));
-						crossing->setAddress(object);
-						env.getEditableRegistry<Crossing>().add(crossing);
+						shared_ptr<Crossing> crossing;
+						Crossing::Registry& registry(env.getEditableRegistry<Crossing>());
+						if(registry.contains(crossingId))
+						{
+							crossing = registry.getEditable(crossingId);
+						}
+						else
+						{
+							crossing.reset(new Crossing(crossingId));
+							crossing->setAddress(object);
+							registry.add(crossing);
+						}
 						object->setHub(crossing.get());
 					}
 					if(sourceId > 0)

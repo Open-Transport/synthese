@@ -33,6 +33,8 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
@@ -179,6 +181,30 @@ namespace synthese
 				if(other._map.find(it.first) != other._map.end()) return true;
 			}
 			return false;
+		}
+
+
+
+		Journey VertexAccessMap::getBestIntersection( const VertexAccessMap& other ) const
+		{
+			Journey result;
+			time_duration bestDuration(not_a_date_time);
+
+			BOOST_FOREACH(const VamMap::value_type& it, _map)
+			{
+				VamMap::const_iterator it2(other._map.find(it.first));
+				if(it2 != other._map.end())
+				{
+					if(	bestDuration.is_not_a_date_time() ||
+						it.second.approachTime + it2->second.approachTime < bestDuration
+					){
+						Journey secondJourney(it2->second.approachJourney);
+						secondJourney.reverse();
+						result = Journey(it.second.approachJourney, secondJourney);
+					}
+				}
+			}
+			return result;
 		}
 	}
 }

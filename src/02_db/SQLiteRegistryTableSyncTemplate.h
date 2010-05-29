@@ -72,8 +72,8 @@ namespace synthese
 						else
 						{
 							boost::shared_ptr<T> object(K::GetNewObject(rows));
-							Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 							registry.add(object);
+							Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						}
 					}
 					catch(util::Exception& e)

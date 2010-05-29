@@ -209,10 +209,13 @@ namespace synthese
 						it.first,
 						VertexAccess(
 							commonApproachTime + (
-								direction == DEPARTURE_TO_ARRIVAL ?
-								cp->getTransferDelay(v, *it.first) :
-								cp->getTransferDelay(*it.first, v)
-							),
+								(&v == it.first) ?
+								posix_time::seconds(0) :
+								(
+									direction == DEPARTURE_TO_ARRIVAL ?
+									cp->getTransferDelay(v, *it.first) :
+									cp->getTransferDelay(*it.first, v)
+							)	),
 							commonApproachDistance,
 							*oj
 					)	);

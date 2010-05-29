@@ -92,8 +92,8 @@ namespace synthese
 			_whatToSearch(whatToSearch),
 			_graphToUse(graphToUse),
 			_maxDuration(
-				(!maxDuration || continuousService.getDuration() - posix_time::minutes(1) < *maxDuration) ?
-				continuousService.getDuration() - posix_time::minutes(1) :
+				(!maxDuration || continuousService.getDuration() - posix_time::seconds(1) < *maxDuration) ?
+				continuousService.getDuration() - posix_time::seconds(1) :
 				maxDuration
 			),
 			_maxSolutionsNumber(maxSolutionsNumber),

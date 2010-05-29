@@ -266,17 +266,21 @@ namespace synthese
 
 		BestVertexReachesMap::BestVertexReachesMap(
 			graph::AccessDirection accessDirection,
-			const graph::VertexAccessMap& vam
+			const graph::VertexAccessMap& vam,
+			const graph::VertexAccessMap& destinationVam
 		):	_accessDirection(accessDirection)
 		{
 			for (VertexAccessMap::VamMap::const_iterator it(vam.getMap().begin()); it != vam.getMap().end(); ++it)
 			{
-				_insert(
-					it->first,
-					0,
-					it->second.approachTime,
-					shared_ptr<Journey>(new Journey)
-				);
+				if(destinationVam.getMap().find(it->first) != destinationVam.getMap().end())
+				{
+					_insert(
+						it->first,
+						0,
+						it->second.approachTime,
+						shared_ptr<Journey>(new Journey)
+						);
+				}
 			}
 		}
 	}

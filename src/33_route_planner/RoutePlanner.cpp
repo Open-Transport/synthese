@@ -87,7 +87,7 @@ namespace synthese
 
 		RoutePlanner::Result RoutePlanner::run(
 		){
-			if(_originVam.intersercts(_destinationVam)) throw SamePlacesException();
+//			if(_originVam.intersercts(_destinationVam)) throw SamePlacesException();
 
 			Result result;
 
@@ -277,7 +277,7 @@ namespace synthese
 			ptime lastBestEndTime(minMaxDateTimeAtDestination);
 			
 			// Initialization of the best vertex reaches map
-			BestVertexReachesMap bestVertexReachesMap(accessDirection, startVam);
+			BestVertexReachesMap bestVertexReachesMap(accessDirection, startVam, endVam);
 
 			optional<RoutePlannerLogger> logger(
 				_logStream ?

@@ -116,7 +116,18 @@ TRIDENT : VertexAccess => AccesPoint
 				@author Hugues Romain
 				@date 2009
 			*/
-			bool intersercts(const VertexAccessMap& other) const;					
+			bool intersercts(const VertexAccessMap& other) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Get the best journey between any point of the object and an other one.
+			/// @param other the other object
+			/// @return the best journey. If no journey is found, return an empty journey.
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.18
+			Journey getBestIntersection(const VertexAccessMap& other) const;
 
 
 

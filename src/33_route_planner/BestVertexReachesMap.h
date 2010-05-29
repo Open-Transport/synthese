@@ -131,7 +131,8 @@ namespace synthese
 		public:
 			BestVertexReachesMap(
 				graph::AccessDirection accessDirection,
-				const graph::VertexAccessMap& vam
+				const graph::VertexAccessMap& vam,
+				const graph::VertexAccessMap& destinationVam
 			);
 
 			//! @name Query methods
