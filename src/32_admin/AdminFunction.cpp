@@ -168,21 +168,7 @@ namespace synthese
 			}
 		}
 
-		void AdminFunction::setPage(shared_ptr<AdminInterfaceElement> aie )
-		{
-			_page = aie;
-		}
 
-		
-		shared_ptr<AdminInterfaceElement> AdminFunction::getPage() const
-		{
-			return _page;
-		}
-
-		void AdminFunction::setActionFailedPage(shared_ptr<AdminInterfaceElement> aie )
-		{
-			_actionFailedPage = aie;
-		}
 
 		bool AdminFunction::isAuthorized(const server::Session* session) const
 		{

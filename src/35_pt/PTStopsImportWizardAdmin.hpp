@@ -1,10 +1,10 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-/// PTImportAdmin class header.
-///	@file PTImportAdmin.h
-///	@author Hugues
-///	@date 2009
+/// PTStopsImportWizardAdmin class header.
+///	@file PTStopsImportWizardAdmin.hpp
+///	@author Hugues Romain
+///	@date 2010
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
 ///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -23,8 +23,8 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_PTImportAdmin_H__
-#define SYNTHESE_PTImportAdmin_H__
+#ifndef SYNTHESE_PTStopsImportWizardAdmin_H__
+#define SYNTHESE_PTStopsImportWizardAdmin_H__
 
 #include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
@@ -34,48 +34,40 @@ namespace synthese
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// PTImportAdmin Admin compound class.
+		/// 35.14 Admin : Stops import wizard.
 		///	@ingroup m35Admin refAdmin
-		///	@author Hugues
-		///	@date 2009
-		class PTImportAdmin:
-			public admin::AdminInterfaceElementTemplate<PTImportAdmin>
+		///	@author Hugues Romain
+		///	@date 2010
+		/// @since 3.1.18
+		//////////////////////////////////////////////////////////////////////////
+		/// The stops import wizard opens a file and shows the differences
+		/// between the database and allow to solve them by several action buttons.
+		///
+		class PTStopsImportWizardAdmin:
+			public admin::AdminInterfaceElementTemplate<PTStopsImportWizardAdmin>
 		{
 		public:
 			/// @name Parameter identifiers
 			//@{
-				static const std::string TAB_TRIDENT;
-				static const std::string TAB_NAVTEQ;
-				static const std::string TAB_CARPOSTAL;
+				static const std::string PARAM_BAHNHOF_FILE_NAME;
+				static const std::string PARAM_KOORDS_FILE_NAME;
 			//@}
 
 		private:
 			/// @name Search parameters
 			//@{
-			// boost::optional<std::string>				_searchXxx;
-			// html::ResultHTMLTable::RequestParameters	_requestParameters;
+				std::string				_bahnhofFileName;
+				std::string				_koordsFileName;
 			//@}
 
 		protected:
 
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Builds the tabs of the page.
-			/// @param request The current request (can be used to determinate the
-			///        current user rights.)
-			/// @author Hugues
-			/// @date 2009
-			virtual void _buildTabs(
-				const security::Profile& profile
-			) const;
-
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
-			///	@author Hugues
-			///	@date 2009
-			PTImportAdmin();
+			///	@author Hugues Romain
+			///	@date 2010
+			PTStopsImportWizardAdmin();
 			
 			
 			
@@ -83,8 +75,8 @@ namespace synthese
 			/// Initialization of the parameters from a parameters map.
 			///	@param map The parameters map to use for the initialization.
 			///	@throw AdminParametersException if a parameter has incorrect value.
-			///	@author Hugues
-			///	@date 2009
+			///	@author Hugues Romain
+			///	@date 2010
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
@@ -93,8 +85,8 @@ namespace synthese
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Creation of the parameters map from the object attributes.
-			///	@author Hugues
-			///	@date 2009
+			///	@author Hugues Romain
+			///	@date 2010
 			server::ParametersMap getParametersMap() const;
 
 
@@ -104,12 +96,12 @@ namespace synthese
 			///	@param stream Stream to write the page content on.
 			///	@param variables Environment variables defined by the interface
 			///	@param request The current request
-			///	@author Hugues
-			///	@date 2009
+			///	@author Hugues Romain
+			///	@date 2010
 			void display(
 				std::ostream& stream,
 				interfaces::VariablesMap& variables,
-				const admin::AdminRequest& request
+				const admin::AdminRequest& _request
 			) const;
 
 
@@ -120,48 +112,23 @@ namespace synthese
 			/// level is READ.
 			///	@param request The current request
 			///	@return bool True if the displayed page can be displayed
-			///	@author Hugues
-			///	@date 2009
+			///	@author Hugues Romain
+			///	@date 2010
 			bool isAuthorized(
 				const security::User& user
 			) const;
 
 
 			
+			
 			//////////////////////////////////////////////////////////////////////////
-			/// Builds links to the pages of the current class to put directly under
-			/// a module admin page in the pages tree.
-			///	@param moduleKey Key of the module
-			///	@param currentPage Currently displayed page
-			/// @param request Current request
-			///	@return PageLinks each page to put under the module page in the page
-			///	@author Hugues Romain
-			///	@date 2009
-			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
-				const std::string& moduleKey,
-				const AdminInterfaceElement& currentPage,
-				const admin::AdminRequest& request
-			) const;
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Sub pages getter.
-			///	@return PageLinks Ordered vector of sub pages links
-			///	@param currentPage Currently displayed page
-			/// @param request Current request
+			/// Title getter.
+			///	@return The title of the page
 			///	@author Hugues Romain
 			///	@date 2010
-			///	@since 3.1.18
-			//////////////////////////////////////////////////////////////////////////
-			///	The only one subpage is PTStopsImportWizardAdmin
-			virtual PageLinks getSubPages(
-				const AdminInterfaceElement& currentPage,
-				const admin::AdminRequest& request
-			) const;
-
+			virtual std::string getTitle() const;
 		};
 	}
 }
 
-#endif // SYNTHESE_PTImportAdmin_H__
+#endif // SYNTHESE_PTStopsImportWizardAdmin_H__

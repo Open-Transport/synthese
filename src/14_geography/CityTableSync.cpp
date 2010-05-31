@@ -25,6 +25,7 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "GeographyModule.h"
+#include "ReplaceQuery.h"
 
 #include <sqlite3.h>
 #include <assert.h>
@@ -96,7 +97,10 @@ namespace synthese
 			City* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			/// @todo Implement it
+			ReplaceQuery<CityTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getCode());
+			query.execute(transaction);
 		}
 	}
 

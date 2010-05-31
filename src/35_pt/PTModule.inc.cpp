@@ -3,6 +3,8 @@
 
 // Factories
 
+#include "PTModule.h"
+
 #include "TridentExportFunction.h"
 #include "LinesListFunction.h"
 #include "RealTimeUpdateFunction.h"
@@ -13,8 +15,8 @@
 #include "PTObjectInformationFunction.hpp"
 
 #include "TridentFileFormat.h"
-#include "PTModule.h"
 #include "NavteqWithProjectionFileFormat.h"
+#include "CarPostalFileFormat.hpp"
 
 #include "PTUseRuleTableSync.h"
 #include "ContinuousServiceTableSync.h"
@@ -36,6 +38,7 @@
 #include "LineAdmin.h"
 #include "ServiceAdmin.h"
 #include "PTImportAdmin.h"
+#include "PTStopsImportWizardAdmin.hpp"
 #include "PTCitiesAdmin.h"
 #include "PTPlacesAdmin.h"
 #include "PTRoadsAdmin.h"
@@ -73,6 +76,7 @@
 #include "ServiceDateChangeAction.h"
 #include "PhysicalStopUpdateAction.h"
 #include "PhysicalStopAddAction.h"
+#include "StopAreaAddAction.h"
 
 #include "TransportNetworkRight.h"
 

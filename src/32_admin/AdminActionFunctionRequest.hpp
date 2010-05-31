@@ -61,6 +61,26 @@ namespace synthese
 					this->getFunction()->getPage()
 				); 
 			}
+
+			boost::shared_ptr<AdminInterfaceElement> getActionFailedPage() const
+			{
+				return this->getFunction()->getActionFailedPage(); 
+			}
+
+
+
+			void setActionFailedPage(boost::shared_ptr<AdminInterfaceElement> aie)
+			{
+				this->getFunction()->setActionFailedPage(aie);
+			}
+
+			
+
+			template<class T>
+			void setActionFailedPage()
+			{
+				this->getFunction()->setActionFailedPage<T>();
+			}
 		};
 	}
 }

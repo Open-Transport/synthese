@@ -23,6 +23,7 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PTImportAdmin.h"
+#include "PTStopsImportWizardAdmin.hpp"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
 #include "PTModule.h"
@@ -36,6 +37,7 @@
 #include "TransportNetworkRight.h"
 #include "Profile.h"
 #include "AdminFunction.h"
+#include "CarPostalFileFormat.hpp"
 
 using namespace boost;
 using namespace std;
@@ -66,6 +68,7 @@ namespace synthese
 	{
 		const string PTImportAdmin::TAB_TRIDENT("tr");
 		const string PTImportAdmin::TAB_NAVTEQ("nt");
+		const string PTImportAdmin::TAB_CARPOSTAL("cp");
 
 
 
@@ -117,25 +120,6 @@ namespace synthese
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
-			// TAB NAVTEQ
-			if (openTabContent(stream, TAB_NAVTEQ))
-			{
-				DataSourceTableSync::SearchResult sources(DataSourceTableSync::Search(_getEnv(), string(), NavteqWithProjectionFileFormat::FACTORY_KEY));
-				StaticFunctionRequest<ImportFunction> importRequest(request, true);
-				
-				PropertiesHTMLTable t(importRequest.getHTMLForm());
-				stream << t.open();
-				stream << t.title("Propriétés");
-				stream << t.cell("Source de données", t.getForm().getSelectInput(ImportFunction::PARAMETER_DATA_SOURCE, sources, optional<shared_ptr<DataSource> >()));
-				stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(ImportFunction::PARAMETER_DO_IMPORT, false));
-				stream << t.title("Données");
-				stream << t.cell("Rues (streets)", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + NavteqWithProjectionFileFormat::FILE_STREETS, string()));
-				stream << t.cell("Noeuds (nodes)", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + NavteqWithProjectionFileFormat::FILE_NODES, string()));
-				stream << t.cell("Zones administratives (mtdarea)", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + NavteqWithProjectionFileFormat::FILE_MTDAREA, string()));
-				stream << t.close();
-			}
-
-			////////////////////////////////////////////////////////////////////
 			// TAB TRIDENT
 			if(openTabContent(stream, TAB_TRIDENT))
 			{
@@ -156,6 +140,43 @@ namespace synthese
 				stream << t.close();
 			}
 
+			////////////////////////////////////////////////////////////////////
+			// TAB NAVTEQ
+			if (openTabContent(stream, TAB_NAVTEQ))
+			{
+				DataSourceTableSync::SearchResult sources(DataSourceTableSync::Search(_getEnv(), string(), NavteqWithProjectionFileFormat::FACTORY_KEY));
+				StaticFunctionRequest<ImportFunction> importRequest(request, true);
+
+				PropertiesHTMLTable t(importRequest.getHTMLForm());
+				stream << t.open();
+				stream << t.title("Propriétés");
+				stream << t.cell("Source de données", t.getForm().getSelectInput(ImportFunction::PARAMETER_DATA_SOURCE, sources, optional<shared_ptr<DataSource> >()));
+				stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(ImportFunction::PARAMETER_DO_IMPORT, false));
+				stream << t.title("Données");
+				stream << t.cell("Rues (streets)", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + NavteqWithProjectionFileFormat::FILE_STREETS, string()));
+				stream << t.cell("Noeuds (nodes)", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + NavteqWithProjectionFileFormat::FILE_NODES, string()));
+				stream << t.cell("Zones administratives (mtdarea)", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + NavteqWithProjectionFileFormat::FILE_MTDAREA, string()));
+				stream << t.close();
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB CARPOSTAL
+			if (openTabContent(stream, TAB_CARPOSTAL))
+			{
+				DataSourceTableSync::SearchResult sources(DataSourceTableSync::Search(_getEnv(), string(), CarPostalFileFormat::FACTORY_KEY));
+				StaticFunctionRequest<ImportFunction> importRequest(request, true);
+
+				PropertiesHTMLTable t(importRequest.getHTMLForm());
+				stream << t.open();
+				stream << t.title("Propriétés");
+				stream << t.cell("Source de données", t.getForm().getSelectInput(ImportFunction::PARAMETER_DATA_SOURCE, sources, optional<shared_ptr<DataSource> >()));
+				stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(ImportFunction::PARAMETER_DO_IMPORT, false));
+				stream << t.title("Données");
+				stream << t.cell("Eckdaten", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + CarPostalFileFormat::FILE_ECKDATEN, string()));
+				stream << t.cell("Bitfeld", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + CarPostalFileFormat::FILE_BITFELD, string()));
+				stream << t.cell("Zugdat", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + CarPostalFileFormat::FILE_ZUGUDAT, string()));
+				stream << t.close();
+			}
 
 			////////////////////////////////////////////////////////////////////
 			// END TABS
@@ -190,7 +211,19 @@ namespace synthese
 			_tabs.clear();
 			_tabs.push_back(Tab("Trident", TAB_TRIDENT, true));
 			_tabs.push_back(Tab("Navteq", TAB_NAVTEQ, true));
+			_tabs.push_back(Tab("CarPostal", TAB_CARPOSTAL, true));
 			_tabBuilded = true;
+		}
+
+
+
+		PTImportAdmin::PageLinks PTImportAdmin::getSubPages(
+			const AdminInterfaceElement& currentPage,
+			const admin::AdminRequest& request
+		) const	{
+			AdminInterfaceElement::PageLinks links;
+			links.push_back(getNewOtherPage<PTStopsImportWizardAdmin>());
+			return links;
 		}
 	}
 }

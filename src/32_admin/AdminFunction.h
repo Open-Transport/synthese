@@ -76,28 +76,23 @@ namespace synthese
 		
 			//! @name Getters
 			//@{
-				boost::shared_ptr<AdminInterfaceElement> getPage() const;
+				boost::shared_ptr<AdminInterfaceElement> getPage() const { return _page; }
+				boost::shared_ptr<AdminInterfaceElement> getActionFailedPage() const { return _actionFailedPage; }
 			//@}
 			
 			//! @name Setters
 			//@{
-				void setPage(boost::shared_ptr<AdminInterfaceElement> aie);
-				void setActionFailedPage(boost::shared_ptr<AdminInterfaceElement> aie);
+				void setPage(boost::shared_ptr<AdminInterfaceElement> aie){ _page = aie; }
+				void setActionFailedPage(boost::shared_ptr<AdminInterfaceElement> aie){ _actionFailedPage = aie; }
 	
 				template<class T>
-				void setActionFailedPage();
+				void setActionFailedPage() { _actionFailedPage = _page->getNewOtherPage<T>(); }
 			//@}
 
 			virtual void _copy(boost::shared_ptr<const Function> function);
 
 			virtual std::string getOutputMimeType() const;
 		};
-
-		template<class T>
-		void AdminFunction::setActionFailedPage()
-		{
-		    _actionFailedPage = _page->getNewOtherPage<T>();
-		}
 	}
 }
 #endif // SYNTHESE_AdminRequest_H__
