@@ -39,12 +39,13 @@ namespace synthese
 		HTMLMap::HTMLMap(
 			const geometry::Point2D& center,
 			int zoom,
+			bool editable,
 			const std::string id /*= "map" */
 		):	_center(center.getX(), center.getY()),
 			_zoom(zoom),
+			_editable(editable),
 			_id(id)
 		{
-
 		}
 
 
@@ -56,47 +57,126 @@ namespace synthese
 			stream << HTMLModule::GetHTMLJavascriptOpen();
 			
 			stream << "var map, vectors, controls;";
-			stream << "function init(){";
-			stream << "map = new OpenLayers.Map('map');";
-			stream << "var mapnik = new OpenLayers.Layer.OSM();";
-			stream << "var vectorLayer = new OpenLayers.Layer.Vector(\"Vector\");";
-			stream << "map.addLayers([mapnik, vectorLayer]);";
+			//support functions
+			stream <<
+				"var lastFeature = null;" <<
+				"var tooltipPopup = null;" <<
+
+				"function init(){" <<
+					"map = new OpenLayers.Map('map');" <<
+					"var mapnik = new OpenLayers.Layer.OSM();" <<
+					"var vectorLayer = new OpenLayers.Layer.Vector(\"Vector\");" <<
+					"map.addLayers([mapnik, vectorLayer]);"
+			;
 
 			BOOST_FOREACH(const Point& point, _points)
 			{
 				GeoPoint geoPoint(WGS84FromLambert(point.point));
-				stream << "vectorLayer.addFeatures(new OpenLayers.Feature.Vector(" <<
-				"new OpenLayers.Geometry.Point(" << geoPoint.getLongitude() << "," << geoPoint.getLatitude() << ").transform(" <<
-				"new OpenLayers.Projection(\"EPSG:4326\")," << // transform from WGS 1984
-				"new OpenLayers.Projection(\"EPSG:900913\")" << // to Spherical Mercator Projection
-				"),"
-				"{editionGraphic:'" << point.editionIcon << "'}," <<
-				"{externalGraphic:'" << point.icon << "', graphicHeight: 25, graphicWidth: 21}));";
+				stream <<
+					"vectorLayer.addFeatures(" <<
+						"new OpenLayers.Feature.Vector(" <<
+							"new OpenLayers.Geometry.Point(" << geoPoint.getLongitude() << "," << geoPoint.getLatitude() << ").transform(" <<
+								"new OpenLayers.Projection(\"EPSG:4326\")," << // transform from WGS 1984
+								"new OpenLayers.Projection(\"EPSG:900913\")" << // to Spherical Mercator Projection
+							"),{ graphic:\"" << HTMLModule::EscapeDoubleQuotes(point.icon) << "\"," <<
+								"waitingGraphic:\"" << HTMLModule::EscapeDoubleQuotes(point.waitingIcon) << "\"," <<
+								"editionGraphic:\"" << HTMLModule::EscapeDoubleQuotes(point.editionIcon) << "\"," <<
+								"requestURL:\"" << HTMLModule::EscapeDoubleQuotes(point.updateRequest) << "\"," <<
+								"htmlPopup:\"" << HTMLModule::EscapeDoubleQuotes(point.htmlPopup) << "\"" <<
+							"},{ externalGraphic:\"" << HTMLModule::EscapeDoubleQuotes(point.icon) << "\"," <<
+								"graphicHeight: 25," <<
+								"graphicWidth: 21" <<
+							"}" <<
+					")	);"
+				;
 			}
 
-/*
-				var modifyFeature = new OpenLayers.Control.ModifyFeature(vectorLayer, {
-mode: OpenLayers.Control.ModifyFeature.DRAG,
-				});
-				map.addControl(modifyFeature);
-				modifyFeature.activate();
-				vectorLayer.events.on({
-					'beforefeaturemodified': function(evt) {
-						evt.feature.style.externalGraphic = 'marker.png';
-					},
-						'afterfeaturemodified': function(evt) {
-							evt.feature.style.externalGraphic = 'aqua.png';
-							vectorLayer.redraw();
-							var newpoint = evt.feature.geometry.clone();
-							newpoint.transform(
-								new OpenLayers.Projection("EPSG:900913"), // to Spherical Mercator Projection
-								new OpenLayers.Projection("EPSG:4326") // transform from WGS 1984
+			// Popup
+			stream <<
+				"var highlightCtrl = new OpenLayers.Control.SelectFeature(vectorLayer, {" <<
+					"hover: true, highlightOnly: true, renderIntent: \"temporary\"," <<
+					"eventListeners: {" <<
+						"featurehighlighted:	function(event){" <<
+							"var feature = event.feature;" <<
+							"var selectedFeature = feature;" <<
+							//if there is already an opened details window, don\'t draw the    tooltip
+							"if(feature.popup != null){" <<
+								"return;" <<
+							"}" <<
+							//if there are other tooltips active, destroy them
+							"if(tooltipPopup != null){" <<
+								"map.removePopup(tooltipPopup);" <<
+								"tooltipPopup.destroy();" <<
+								"if(lastFeature != null){" <<
+									"delete lastFeature.popup;" <<
+									"tooltipPopup = null;" <<
+								"}" <<
+							"}" <<
+							"lastFeature = feature;" <<
+							"var tooltipPopup = new OpenLayers.Popup('activetooltip'," <<
+								"feature.geometry.getBounds().getCenterLonLat()," <<
+								"new OpenLayers.Size(200,40)," <<
+								"feature.data.htmlPopup," <<
+								"false);"
+							//this is messy, but I'm not a CSS guru
+							"tooltipPopup.contentDiv.style.backgroundColor='ffffcb';" <<
+							"tooltipPopup.contentDiv.style.overflow='hidden';" <<
+							"tooltipPopup.contentDiv.style.padding='3px';" <<
+							"tooltipPopup.contentDiv.style.margin='0';" <<
+							"tooltipPopup.closeOnMove = true;" <<
+							"tooltipPopup.autoSize = true;" <<
+							"feature.popup = tooltipPopup;" <<
+							"map.addPopup(tooltipPopup);" <<
+						"}," <<
+						"featureunhighlighted: function (event){" <<
+							"var feature = event.feature;" <<
+							"if(feature != null && feature.popup != null){" <<
+								"map.removePopup(feature.popup);" <<
+								"feature.popup = null;" <<
+								"tooltipPopup = null;" <<
+								"lastFeature = null;" <<
+							"}" <<
+						"}" <<
+				" }	});" <<
 
-								);
-							alert("Save "+ newpoint.x + "/"+ newpoint.y);
-					}
-				});
-*/
+				"map.addControl(highlightCtrl);" <<
+				"highlightCtrl.activate();"
+			;
+
+
+			// Moving by drag and drop
+			if(_editable)
+			{
+				stream <<
+					"var modifyFeature = new OpenLayers.Control.ModifyFeature(vectorLayer, {" <<
+					"mode: OpenLayers.Control.ModifyFeature.DRAG," <<
+					"});" <<
+					"map.addControl(modifyFeature);" <<
+					"modifyFeature.activate();" <<
+					"vectorLayer.events.on({" <<
+						"'beforefeaturemodified': function(evt) {" <<
+							"evt.feature.style.externalGraphic = evt.feature.data.editionGraphic;" <<
+							"vectorLayer.redraw();" <<
+						"}," <<
+						"'afterfeaturemodified': function(evt) {" <<
+							"evt.feature.style.externalGraphic = evt.feature.data.waitingGraphic;" <<
+							"vectorLayer.redraw();" <<
+							"var newpoint = evt.feature.geometry.clone();" <<
+							"newpoint.transform(" <<
+								"new OpenLayers.Projection(\"EPSG:900913\")," << // to Spherical Mercator Projection
+								"new OpenLayers.Projection(\"EPSG:4326\")" << // transform from WGS 1984
+							");" <<
+							"new OpenLayers.Ajax.Request(evt.feature.data.requestURL + '&actionParamlon='+ newpoint.x +'&actionParamlat=' + newpoint.y," <<
+							"{   method: 'get'," <<
+								"onComplete: function(transport) {" <<
+									"evt.feature.style.externalGraphic = evt.feature.data.graphic;" <<
+									"vectorLayer.redraw();" <<
+								"}" <<
+							"}" <<
+						");" <<
+					"}" <<
+				"});";
+			}
 
 			GeoPoint center(WGS84FromLambert(_center));
 			stream <<

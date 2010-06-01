@@ -77,6 +77,8 @@
 #include "PhysicalStopUpdateAction.h"
 #include "PhysicalStopAddAction.h"
 #include "StopAreaAddAction.h"
+#include "LineStopUpdateAction.hpp"
+#include "PhysicalStopMoveAction.hpp"
 
 #include "TransportNetworkRight.h"
 

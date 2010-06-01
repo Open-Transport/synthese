@@ -49,6 +49,9 @@
 #include "Line.h"
 #include "CommercialLine.h"
 #include "PhysicalStopAddAction.h"
+#include "HTMLMap.hpp"
+#include "PhysicalStopMoveAction.hpp"
+#include "StaticActionRequest.h"
 
 using namespace std;
 using namespace boost;
@@ -164,6 +167,38 @@ namespace synthese
 			{
 				if(_connectionPlace.get())
 				{
+					stream << "<h1>Carte</h1>";
+
+					StaticActionRequest<PhysicalStopMoveAction> moveAction(request);
+					HTMLMap map(_connectionPlace->getPoint(), 18, true);
+					BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
+					{
+						moveAction.getAction()->setStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<PhysicalStop*>(it.second)));
+
+						stringstream popupcontent;
+						set<const CommercialLine*> lines;
+						BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
+						{
+							lines.insert(
+								static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
+							);
+						}
+						BOOST_FOREACH(const CommercialLine* line, lines)
+						{
+							popupcontent <<
+								"<span class=\"line " << line->getStyle() << "\">" <<
+								line->getShortName() <<
+								"</span>"
+							;
+						}
+						map.addPoint(HTMLMap::Point(*it.second, "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), it.second->getName() + "<br />" + popupcontent.str()));
+					}
+					BOOST_FOREACH(const AddressablePlace::Addresses::value_type& address, _addressablePlace->getAddresses())
+					{
+						map.addPoint(HTMLMap::Point(*address, "marker-green.png", "marker.png", "marker-gold.png", string(), string()));
+					}
+					map.draw(stream);
+
 					AdminActionFunctionRequest<StopAreaNameUpdateAction,PTPlaceAdmin> updateRequest(request);
 					updateRequest.getAction()->setPlace(const_pointer_cast<PublicTransportStopZoneConnectionPlace>(_connectionPlace));
 
@@ -455,7 +490,7 @@ namespace synthese
 			const security::Profile& profile
 		) const	{
 			_tabs.clear();
-			_tabs.push_back(Tab("Propriétés", TAB_GENERAL, true));
+			_tabs.push_back(Tab("Général", TAB_GENERAL, true));
 			if(_connectionPlace.get())
 			{
 				_tabs.push_back(Tab("Arrêts", TAB_STOPS, true));

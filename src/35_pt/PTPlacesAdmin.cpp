@@ -43,6 +43,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "CityUpdateAction.h"
 #include "PropertiesHTMLTable.h"
+#include "StopAreaAddAction.h"
 
 using namespace std;
 using namespace boost;
@@ -307,6 +308,35 @@ namespace synthese
 			// TAB CONNECTION PLACES
 			if (openTabContent(stream, TAB_CONNECTION_PLACES))
 			{
+				AdminActionFunctionRequest<StopAreaAddAction,PTPlaceAdmin> stopAddRequest(request);
+				stopAddRequest.getAction()->setCity(const_pointer_cast<City>(_city));
+				stopAddRequest.getAction()->setCreateCityIfNecessary(false);
+				stopAddRequest.getAction()->setCreatePhysicalStop(true);
+				stopAddRequest.setActionWillCreateObject();
+				stopAddRequest.setActionFailedPage<PTPlacesAdmin>();
+				static_pointer_cast<PTPlacesAdmin>(stopAddRequest.getActionFailedPage())->setCity(_city);
+	
+				HTMLForm f(stopAddRequest.getHTMLForm());
+				stream << f.open();
+
+				HTMLTable::ColsVector c;
+				c.push_back("id");
+				c.push_back("Nom");
+				c.push_back("X");
+				c.push_back("Y");
+				c.push_back("Actions");
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+
+				stream << t.row();
+				stream << t.col();
+				stream << t.col() << f.getTextInput(StopAreaAddAction::PARAMETER_NAME, string());
+				stream << t.col() << f.getTextInput(StopAreaAddAction::PARAMETER_PHYSICAL_STOP_X, string());
+				stream << t.col() << f.getTextInput(StopAreaAddAction::PARAMETER_PHYSICAL_STOP_Y, string());
+				stream << t.col() << f.getSubmitButton("Ajouter");
+
+				stream << t.close();
+				stream << f.close();
 			}
 
 			////////////////////////////////////////////////////////////////////

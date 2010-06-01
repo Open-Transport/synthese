@@ -149,5 +149,24 @@ namespace synthese
 			}
 			return s.str();
 		}
+
+
+
+		std::string HTMLModule::EscapeDoubleQuotes( const std::string value )
+		{
+			stringstream s;
+			BOOST_FOREACH(char c, value)
+			{
+				if(c == '"')
+				{
+					s << "\\\"";
+				}
+				else
+				{
+					s << c;
+				}
+			}
+			return s.str();
+		}
 	}
 }

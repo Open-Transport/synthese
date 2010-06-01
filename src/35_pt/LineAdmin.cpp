@@ -54,6 +54,7 @@
 #include "LineStopRemoveAction.h"
 #include "PTPlacesAdmin.h"
 #include "City.h"
+#include "LineStopUpdateAction.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -135,6 +136,33 @@ namespace synthese
 		) const	{
 			map<const Service*, string> services;
 
+			ScheduledServiceTableSync::SearchResult sservices(
+				ScheduledServiceTableSync::Search(
+					Env::GetOfficialEnv(),
+					_line->getKey(),
+					optional<RegistryKeyType>(),
+					optional<RegistryKeyType>(),
+					optional<string>(),
+					false,
+					0,
+					optional<size_t>(),
+					_requestParameters.orderField == ScheduledServiceTableSync::COL_SCHEDULES,
+					_requestParameters.raisingOrder,
+					UP_DOWN_LINKS_LOAD_LEVEL
+			)	);
+
+			ContinuousServiceTableSync::SearchResult cservices(
+				ContinuousServiceTableSync::Search(
+					Env::GetOfficialEnv(),
+					_line->getKey(),
+					optional<RegistryKeyType>(),
+					0,
+					optional<size_t>(),
+					_requestParameters.orderField == ScheduledServiceTableSync::COL_SCHEDULES,
+					_requestParameters.raisingOrder,
+					UP_DOWN_LINKS_LOAD_LEVEL
+			)	);
+
 			////////////////////////////////////////////////////////////////////
 			// TAB STOPS
 			if (openTabContent(stream, TAB_STOPS))
@@ -162,6 +190,8 @@ namespace synthese
 				lineStopAddAction.getAction()->setRoute(const_pointer_cast<Line>(_line));
 				HTMLForm f(lineStopAddAction.getHTMLForm());
 
+				AdminActionFunctionRequest<LineStopUpdateAction,LineAdmin> lineStopUpdateAction(_request);
+				
 				HTMLTable::ColsVector v;
 				v.push_back("Rang");
 				v.push_back("Rang");
@@ -176,12 +206,16 @@ namespace synthese
 				v.push_back("Action");
 				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
 
-				stream << f.open();
+				if(sservices.empty() && cservices.empty())
+				{
+					stream << f.open();
+				}
 				stream << t.open();
 
 				BOOST_FOREACH(shared_ptr<LineStop> lineStop, lineStops)
 				{
 					lineStopRemoveAction.getAction()->setLineStop(const_pointer_cast<const LineStop>(lineStop));
+					lineStopUpdateAction.getAction()->setLineStop(lineStop);
 
 					openPlaceRequest.getPage()->setConnectionPlace(
 						Env::GetOfficialEnv().getSPtr(lineStop->getPhysicalStop()->getConnectionPlace())
@@ -192,15 +226,28 @@ namespace synthese
 					stream << t.row();
 					stream << t.col() << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(lineStop->getRankInPath()), optional<size_t>());
 					stream << t.col() << lineStop->getRankInPath();
+
 					stream << t.col() << HTMLModule::getHTMLLink(
 						openCityRequest.getURL(),
 						lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName()
 					);
+
 					stream << t.col() << HTMLModule::getHTMLLink(
 						openPlaceRequest.getURL(),
 						lineStop->getPhysicalStop()->getConnectionPlace()->getName()
 					);
-					stream << t.col() << lineStop->getPhysicalStop()->getName();
+
+					stream << t.col();
+					HTMLForm f2(lineStopUpdateAction.getHTMLForm("quay"+lexical_cast<string>(lineStop->getRankInPath())));
+					stream << f2.open();
+					stream << f.getSelectInput(
+						LineStopUpdateAction::PARAMETER_PHYSICAL_STOP_ID,
+						lineStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStopLabels(),
+						optional<RegistryKeyType>(lineStop->getPhysicalStop()->getKey())
+					);
+					stream << f.getSubmitButton("OK");
+					stream << f2.close();
+
 					stream << t.col() << (lineStop->isArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"));
 					stream << t.col() << (lineStop->isDeparture() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"));
 					stream << t.col() << (lineStop->getScheduleInput() ? HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") : HTMLModule::getHTMLImage("tree_vert.png", "Houraire non fourni à cet arrêt"));
@@ -209,18 +256,25 @@ namespace synthese
 					stream << t.col() << HTMLModule::getLinkButton(lineStopRemoveAction.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
 				}
 
-				stream << t.row();
-				stream << t.col() << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(_line->getEdges().size()), optional<size_t>());
-				stream << t.col() << _line->getEdges().size();
-				stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_CITY_NAME, string(), "(localité)");
-				stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_STOP_NAME, string(), "(arrêt)");
-				stream << t.col();
-				stream << t.col();
-				stream << t.col();
-				stream << t.col();
-				stream << t.col() << f.getSubmitButton("Ajouter");
+				if(sservices.empty() && cservices.empty())
+				{
+					stream << t.row();
+					stream << t.col() << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(_line->getEdges().size()), optional<size_t>());
+					stream << t.col() << _line->getEdges().size();
+					stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_CITY_NAME, string(), "(localité)");
+					stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_STOP_NAME, string(), "(arrêt)");
+					stream << t.col();
+					stream << t.col();
+					stream << t.col();
+					stream << t.col();
+					stream << t.col() << f.getSubmitButton("Ajouter");
+				}
 
 				stream << t.close();
+				if(sservices.empty() && cservices.empty())
+				{
+					stream << f.close();
+				}
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -228,21 +282,6 @@ namespace synthese
 			if (openTabContent(stream, TAB_SCHEDULED_SERVICES))
 			{
 				stream << "<h1>Services à horaire</h1>";
-
-				ScheduledServiceTableSync::SearchResult sservices(
-					ScheduledServiceTableSync::Search(
-						Env::GetOfficialEnv(),
-						_line->getKey(),
-						optional<RegistryKeyType>(),
-						optional<RegistryKeyType>(),
-						optional<string>(),
-						false,
-						0,
-						optional<size_t>(),
-						_requestParameters.orderField == ScheduledServiceTableSync::COL_SCHEDULES,
-						_requestParameters.raisingOrder,
-						UP_DOWN_LINKS_LOAD_LEVEL
-				)	);
 
 				AdminFunctionRequest<LineAdmin> searchRequest(_request);
 				HTMLForm sortedForm(searchRequest.getHTMLForm());
@@ -312,18 +351,6 @@ namespace synthese
 			// TAB CONTINUOUS SERVICES
 			if (openTabContent(stream, TAB_CONTINUOUS_SERVICES))
 			{
-				ContinuousServiceTableSync::SearchResult cservices(
-					ContinuousServiceTableSync::Search(
-						Env::GetOfficialEnv(),
-						_line->getKey(),
-						optional<RegistryKeyType>(),
-						0,
-						optional<size_t>(),
-						_requestParameters.orderField == ScheduledServiceTableSync::COL_SCHEDULES,
-						_requestParameters.raisingOrder,
-						UP_DOWN_LINKS_LOAD_LEVEL
-				)	);
-
 				AdminFunctionRequest<LineAdmin> searchRequest(_request);
 				HTMLForm sortedForm(searchRequest.getHTMLForm());
 

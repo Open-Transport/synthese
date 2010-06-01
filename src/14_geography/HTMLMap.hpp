@@ -54,9 +54,23 @@ namespace synthese
 				geometry::Point2D point;
 				std::string icon;
 				std::string editionIcon;
+				std::string waitingIcon;
 				std::string updateRequest;
-				Point(geometry::Point2D _point, const std::string& _icon, const std::string _editionIcon, const std::string _updateRequest):
-				point(_point.getX(), _point.getY()), icon(_icon), editionIcon(_editionIcon), updateRequest(_updateRequest)
+				std::string htmlPopup;
+				
+				Point(
+					geometry::Point2D _point,
+					const std::string& _icon,
+					const std::string& _editionIcon,
+					const std::string& _waitingIcon,
+					const std::string& _updateRequest,
+					const std::string& _htmlPopup
+				):	point(_point.getX(), _point.getY()),
+					icon(_icon),
+					editionIcon(_editionIcon),
+					waitingIcon(_waitingIcon),
+					updateRequest(_updateRequest),
+					htmlPopup(_htmlPopup)
 				{}
 			};
 			typedef std::vector<Point> Points;
@@ -66,6 +80,7 @@ namespace synthese
 			const int _zoom;
 			const std::string _id;
 			Points _points;
+			bool _editable;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -79,6 +94,7 @@ namespace synthese
 			HTMLMap(
 				const geometry::Point2D& center,
 				int zoom,
+				bool editable,
 				const std::string id = "map"
 			);
 

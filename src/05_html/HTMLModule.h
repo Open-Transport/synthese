@@ -108,6 +108,17 @@ input[type=submit]:hover {background-color:#0080E0;}
 			/// @date 2010
 			/// @since 3.1.18
 			static std::string HTMLEncode(const std::string& value);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Adds backslashes before each double quote.
+			/// @param value text to escape
+			/// @return the encoded string
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.18
+			static std::string EscapeDoubleQuotes(const std::string value);
 		};
 
 

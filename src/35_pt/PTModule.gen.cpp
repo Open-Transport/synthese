@@ -84,6 +84,8 @@ synthese::pt::ServiceDateChangeAction::integrate();
 synthese::pt::PhysicalStopUpdateAction::integrate();
 synthese::pt::PhysicalStopAddAction::integrate();
 synthese::pt::StopAreaAddAction::integrate();
+synthese::pt::LineStopUpdateAction::integrate();
+synthese::pt::PhysicalStopMoveAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 

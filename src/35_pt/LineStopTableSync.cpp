@@ -174,8 +174,8 @@ namespace synthese
 			query.addField(object->getPhysicalStop()->getKey());
 			query.addField(object->getLine()->getKey());
 			query.addField(object->getRankInPath());
-			query.addField(object->isDeparture());
-			query.addField(object->isArrival());
+			query.addField(object->isDepartureAllowed());
+			query.addField(object->isArrivalAllowed());
 			query.addField(object->getMetricOffset());
 			query.addField(viaPoints.str());
 			query.execute(transaction);
