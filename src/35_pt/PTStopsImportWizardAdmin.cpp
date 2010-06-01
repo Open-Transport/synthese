@@ -126,17 +126,9 @@ namespace synthese
 			stream << t.cell("Fichier koords", t.getForm().getTextInput(PARAM_KOORDS_FILE_NAME, _koordsFileName));
 			stream << t.close();
 
+
 			if(!_bahnhofFileName.empty() && !_koordsFileName.empty())
 			{
-				struct Bahnhof 
-				{
-					string operatorCode;
-					string cityName;
-					string name;
-					Point2D coords;
-					shared_ptr<PhysicalStop> stop;
-				};
-				typedef map<string, Bahnhof> Bahnhofs;
 				Bahnhofs nonLinkedBahnhofs;
 				Bahnhofs linkedBahnhofs;
 
@@ -151,7 +143,8 @@ namespace synthese
 						bahnhof.operatorCode = line.substr(0, 7);
 
 						vector<string> cols;
-						split( cols, line.substr(12), is_any_of(","));
+						string fullstopname(line.substr(12));
+						boost::algorithm::split( cols, fullstopname, boost::algorithm::is_any_of(","));
 						bahnhof.cityName = cols[0];
 						bahnhof.name = (cols.size() == 1) ? "Arrêt" : cols[1];
 						

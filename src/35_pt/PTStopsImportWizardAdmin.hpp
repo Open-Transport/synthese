@@ -1,5 +1,4 @@
 
-
 //////////////////////////////////////////////////////////////////////////
 /// PTStopsImportWizardAdmin class header.
 ///	@file PTStopsImportWizardAdmin.hpp
@@ -28,11 +27,16 @@
 
 #include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
+#include "Point2D.h"
+
+#include <map>
 
 namespace synthese
 {
 	namespace pt
 	{
+		class PhysicalStop;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.14 Admin : Stops import wizard.
 		///	@ingroup m35Admin refAdmin
@@ -61,6 +65,15 @@ namespace synthese
 			//@}
 
 		protected:
+				struct Bahnhof 
+				{
+					std::string operatorCode;
+					std::string cityName;
+					std::string name;
+					geometry::Point2D coords;
+					boost::shared_ptr<PhysicalStop> stop;
+				};
+				typedef std::map<std::string, Bahnhof> Bahnhofs;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
