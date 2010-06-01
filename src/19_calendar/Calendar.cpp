@@ -347,10 +347,15 @@ namespace synthese
 			_markedDates.clear();
 			for(size_t p(0); p+369<value.size(); p += 370)
 			{
+				bitset<366> bits(value.substr(p+4, 366));
+				if(bits.none())
+				{
+					continue;
+				}
 				_markedDates.insert(
 					make_pair(
 						greg_year(lexical_cast<unsigned short>(value.substr(p, 4))),
-						bitset<366>(value.substr(p+4, 366))
+						bits
 				)	);
 			}
 		}
