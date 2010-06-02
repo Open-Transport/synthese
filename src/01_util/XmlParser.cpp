@@ -210,17 +210,20 @@ LPTSTR fromXMLString(LPCTSTR s, int lo)
             else if (_tcsnicmp(s,_T("quot;"),5)==0) { s+=4; lo-=5; }
             else
             {
-                ll=0; while (s[ll]&&(s[ll]!=_T(';'))&&(ll<10)) ll++; ll++;
-                d=(LPTSTR)malloc((ll+1)*sizeof(TCHAR));
-                d[ll]=0;
-                while(ll--) d[ll]=s[ll];
+                int ll2=0; while (s[ll2]&&(s[ll2]!=_T(';'))&&(ll2<10)) ll2++; ll2++;
+                d=(LPTSTR)malloc((ll2+1)*sizeof(TCHAR));
+                d[ll2]=0;
+				s += ll2;
+				lo -= (ll2+1);
+                while(ll2--) d[ll2]=s[ll2];
 #ifdef _UNICODE
                     printf("unknown escape character: '&%S'",d);
 #else
                     printf("unknown escape character: '&%s'",d);
 #endif
                 free(d);
-                exit(255);
+				++ll;
+//                exit(255);
             }
         };
         ll++; s++;
@@ -237,8 +240,11 @@ LPTSTR fromXMLString(LPCTSTR s, int lo)
             else if (_tcsnicmp(ss,_T("gt;"  ),3)==0) { *(d++)=_T('>' ); ss+=3; } 
             else if (_tcsnicmp(ss,_T("amp;" ),4)==0) { *(d++)=_T('&' ); ss+=4; }
             else if (_tcsnicmp(ss,_T("apos;"),5)==0) { *(d++)=_T('\''); ss+=5; }
-            else                                     {
-                *(d++)=_T('"' ); ss+=5; }
+            else if (_tcsnicmp(ss,_T("quot;"),5)==0) { *(d++)=_T('"' ); ss+=5; }
+			else {
+				int ll2=0; while (ss[ll2]&&(ss[ll2]!=_T(';'))&&(ll2<10)) ll2++; ll2++;
+				*(d++)=_T(' ' ); ss+=ll2;
+			}
         } else { *(d++)=*ss; ss++; }
     }
     *d=0;

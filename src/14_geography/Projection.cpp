@@ -37,23 +37,6 @@ namespace synthese
 
 	namespace geography
 	{
-
-
-		typedef struct {
-		double lambda; // Longitude
-		double phi;    // Latitude
-		double he;     // Height above ellipsoid
-		} LatLonHe;
-
-		typedef struct {
-		double x; 
-		double y; 
-		double z; 
-		} XYZ;
-
-
-
-
 		double
 		Ntf2Pos (double p, double m, double s)
 		{
@@ -191,17 +174,6 @@ namespace synthese
 
 			return p;
 		}
-
-
-
-			typedef struct {
-			double e; 
-			double n; 
-			double C; 
-			double lambdac; 
-			double Xs; 
-			double Ys; 
-			} LambertParams;
 
 
 

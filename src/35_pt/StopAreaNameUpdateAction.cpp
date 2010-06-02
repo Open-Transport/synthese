@@ -53,6 +53,7 @@ namespace synthese
 		const string StopAreaNameUpdateAction::PARAMETER_LONG_NAME = Action_PARAMETER_PREFIX + "ln";
 		const string StopAreaNameUpdateAction::PARAMETER_CITY_ID = Action_PARAMETER_PREFIX + "ci";
 		const string StopAreaNameUpdateAction::PARAMETER_CODE = Action_PARAMETER_PREFIX + "co";
+		const string StopAreaNameUpdateAction::PARAMETER_IS_MAIN = Action_PARAMETER_PREFIX + "ma";
 
 		
 		
@@ -62,15 +63,16 @@ namespace synthese
 			if(_place.get())
 			{
 				map.insert(PARAMETER_PLACE_ID, _place->getKey());
-				if(_city.get())
-				{
-					map.insert(PARAMETER_CITY_ID, _city->getKey());
-				}
-				map.insert(PARAMETER_LONG_NAME, _longName);
-				map.insert(PARAMETER_SHORT_NAME, _shortName);
-				map.insert(PARAMETER_NAME, _name);
-				map.insert(PARAMETER_CODE, _code);
 			}
+			if(_city.get())
+			{
+				map.insert(PARAMETER_CITY_ID, _city->getKey());
+			}
+			map.insert(PARAMETER_LONG_NAME, _longName);
+			map.insert(PARAMETER_SHORT_NAME, _shortName);
+			map.insert(PARAMETER_NAME, _name);
+			map.insert(PARAMETER_CODE, _code);
+			map.insert(PARAMETER_IS_MAIN, _isMain);
 			return map;
 		}
 		
@@ -81,7 +83,7 @@ namespace synthese
 			try
 			{
 				_place = ConnectionPlaceTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
-				_city = CityTableSync::Get(map.get<RegistryKeyType>(PARAMETER_CITY_ID), *_env);
+				_city = CityTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_CITY_ID), *_env);
 			}
 			catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
 			{
@@ -96,6 +98,7 @@ namespace synthese
 			_shortName = map.get<string>(PARAMETER_SHORT_NAME);
 			_longName = map.get<string>(PARAMETER_LONG_NAME);
 			_code = map.get<string>(PARAMETER_CODE);
+			_isMain = map.get<bool>(PARAMETER_IS_MAIN);
 		}
 		
 		
@@ -111,6 +114,14 @@ namespace synthese
 			_place->setName13(_shortName);
 			_place->setName26(_longName);
 			_place->setCodeBySource(_code);
+			if(_isMain && !_city->includes(_place.get()))
+			{
+				_city->addIncludedPlace(_place.get());
+			}
+			if(!_isMain && _city->includes(_place.get()))
+			{
+				_city->removeIncludedPlace(_place.get());
+			}
 
 			ConnectionPlaceTableSync::Save(_place.get());
 			

@@ -1,0 +1,95 @@
+
+/** SubStrFunction class implementation.
+	@file SubStrFunction.cpp
+	@author Hugues Romain
+	@date 2010
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "RequestException.h"
+#include "Request.h"
+#include "SubStrFunction.hpp"
+
+using namespace std;
+
+namespace synthese
+{
+	using namespace util;
+	using namespace server;
+	using namespace security;
+
+	template<> const string util::FactorableTemplate<Function,transportwebsite::SubStrFunction>::FACTORY_KEY("SubStrFunction");
+	
+	namespace transportwebsite
+	{
+		const string SubStrFunction::PARAMETER_TEXT("t");
+		const string SubStrFunction::PARAMETER_LENGTH("n");
+		const string SubStrFunction::PARAMETER_FIRST("f");
+
+
+
+		ParametersMap SubStrFunction::_getParametersMap() const
+		{
+			ParametersMap map;
+			map.insert(PARAMETER_TEXT, _text);
+			map.insert(PARAMETER_FIRST, _first);
+			if(_size)
+			{
+				map.insert(PARAMETER_LENGTH, *_size);
+			}
+			return map;
+		}
+
+		void SubStrFunction::_setFromParametersMap(const ParametersMap& map)
+		{
+			_text = map.getDefault<string>(PARAMETER_TEXT);
+			_first = map.getDefault<size_t>(PARAMETER_FIRST, 0);
+			_size = map.getOptional<size_t>(PARAMETER_LENGTH);
+		}
+
+		void SubStrFunction::run(
+			std::ostream& stream,
+			const Request& request
+		) const {
+			if(_size && *_size < _text.size() - _first)
+			{
+				stream << _text.substr(_first, *_size);
+			}
+			else
+			{
+				stream << _text.substr(_first);
+			}
+		}
+		
+		
+		
+		bool SubStrFunction::isAuthorized(
+			const Session* session
+		) const {
+			return true;
+		}
+
+
+
+		std::string SubStrFunction::getOutputMimeType() const
+		{
+			return "text/plain";
+		}
+	}
+}

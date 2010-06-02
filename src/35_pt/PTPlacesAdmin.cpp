@@ -41,6 +41,7 @@
 #include "PTCitiesAdmin.h"
 #include "Profile.h"
 #include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 #include "CityUpdateAction.h"
 #include "PropertiesHTMLTable.h"
 #include "StopAreaAddAction.h"
@@ -315,7 +316,9 @@ namespace synthese
 				stopAddRequest.setActionWillCreateObject();
 				stopAddRequest.setActionFailedPage<PTPlacesAdmin>();
 				static_pointer_cast<PTPlacesAdmin>(stopAddRequest.getActionFailedPage())->setCity(_city);
-	
+
+				AdminFunctionRequest<PTPlaceAdmin> openRequest(request);
+
 				HTMLForm f(stopAddRequest.getHTMLForm());
 				stream << f.open();
 
@@ -327,6 +330,22 @@ namespace synthese
 				c.push_back("Actions");
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
+
+				if(_city.get())
+				{
+					const City::PlacesMatcher::Map& places(_city->getLexicalMatcher(FactorableTemplate<geography::NamedPlace,pt::PublicTransportStopZoneConnectionPlace>::FACTORY_KEY).entries());
+					BOOST_FOREACH(const City::PlacesMatcher::Map::value_type& it, places)
+					{
+						const PublicTransportStopZoneConnectionPlace& stop(static_cast<const PublicTransportStopZoneConnectionPlace&>(*it.second));
+						openRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr<PublicTransportStopZoneConnectionPlace>(&stop));
+						stream << t.row();
+						stream << t.col() << stop.getKey();
+						stream << t.col() << stop.getName();
+						stream << t.col() << stop.getPoint().getX();
+						stream << t.col() << stop.getPoint().getY();
+						stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPlaceAdmin::ICON);
+					}
+				}
 
 				stream << t.row();
 				stream << t.col();

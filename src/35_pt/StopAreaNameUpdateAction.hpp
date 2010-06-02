@@ -57,6 +57,7 @@ namespace synthese
 		///		<li>actionParamln : name for display on 26 characters wide screens</li>
 		///		<li>actionParamci : city id</li>
 		///		<li>actionParamco : code of the place in the source database (if imported)</li>
+		///		<li>actionParamma : wether the stop is selected as default in the city when no stop is specified</li>
 		///	</ul>
 		class StopAreaNameUpdateAction:
 			public util::FactorableTemplate<server::Action, StopAreaNameUpdateAction>
@@ -68,6 +69,7 @@ namespace synthese
 			static const std::string PARAMETER_LONG_NAME;
 			static const std::string PARAMETER_CITY_ID;
 			static const std::string PARAMETER_CODE;
+			static const std::string PARAMETER_IS_MAIN;
 
 		private:
 			boost::shared_ptr<pt::PublicTransportStopZoneConnectionPlace> _place;
@@ -75,7 +77,8 @@ namespace synthese
 			std::string _shortName;
 			std::string _longName;
 			std::string _code;
-			boost::shared_ptr<const geography::City> _city;
+			boost::shared_ptr<geography::City> _city;
+			bool _isMain;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -92,6 +95,9 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			StopAreaNameUpdateAction():
+			  _isMain(false) {}
+
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action

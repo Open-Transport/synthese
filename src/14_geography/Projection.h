@@ -46,6 +46,39 @@ namespace synthese
 			LAMBERT_IIe
 		} LambertOrigin;
 
+		typedef struct {
+			double e; 
+			double n; 
+			double C; 
+			double lambdac; 
+			double Xs; 
+			double Ys; 
+		} LambertParams;
+
+		typedef struct {
+			double lambda; // Longitude
+			double phi;    // Latitude
+			double he;     // Height above ellipsoid
+		} LatLonHe;
+
+		typedef struct {
+			double x; 
+			double y; 
+			double z; 
+		} XYZ;
+
+		double ALG0001 (double phi, double e);
+		double ALG0002 (double L, double e, double epsilon);
+		geometry::Point2D ALG0003(double lambda, double phi, double e, double Xs, double Ys, double c, double n, double lambdac);
+		LatLonHe ALG0004(double X, double Y, double n, double c, double Xs, double Ys, double lambdac, double e, double epsilon);
+		XYZ	ALG0009 (double lambda, double phi, double he, double a, double e);
+		LatLonHe ALG0012 (double X,double Y,double Z,double a,double e,double epsilon);
+		XYZ	ALG0013 (double Tx,double Ty,double Tz,double D,double Rx,double Ry,double Rz, const XYZ& U);
+		LambertParams ALG0019 (double lambda0,double phi0,double k0,double X0,double Y0,double a,double e);
+		double ALG0021(double phi,double a,double e);
+		LambertParams ALG0054 (double lambda0,double phi0,double X0,double Y0,double phi1,double phi2,double a,double e);
+
+
 
 		//////////////////////////////////////////////////////////////////
 		/// WGS84 point generation from LambertII.

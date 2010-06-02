@@ -26,6 +26,8 @@
 #include "AndFunction.hpp"
 #include "WebPageLinksFunction.hpp"
 #include "WebPagePositionFunction.hpp"
+#include "StrLenFunction.hpp"
+#include "SubStrFunction.hpp"
 
 #include "UserFavoriteInterfacePage.h"
 

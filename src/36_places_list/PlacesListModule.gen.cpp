@@ -30,6 +30,8 @@ synthese::transportwebsite::SuperiorFunction::integrate();
 synthese::transportwebsite::AndFunction::integrate();
 synthese::transportwebsite::WebPageLinksFunction::integrate();
 synthese::transportwebsite::WebPagePositionFunction::integrate();
+synthese::transportwebsite::StrLenFunction::integrate();
+synthese::transportwebsite::SubStrFunction::integrate();
 
 synthese::transportwebsite::SiteUpdateAction::integrate();
 synthese::transportwebsite::AddUserFavoriteJourneyAction::integrate();
