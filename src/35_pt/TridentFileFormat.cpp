@@ -1593,7 +1593,7 @@ namespace synthese
 			}
 
 			// Clean useless services
-			for(map<string, ScheduledService*>::const_iterator its(services.begin()); its != services.end(); ++its)
+/*			for(map<string, ScheduledService*>::const_iterator its(services.begin()); its != services.end(); ++its)
 			{
 				if(its->second->empty() && createdObjects.find(its->second->getKey()) != createdObjects.end())
 				{
@@ -1601,7 +1601,7 @@ namespace synthese
 					_env->getEditableRegistry<ScheduledService>().remove(its->second->getKey());
 				}
 			}
-
+*/
 			// Clean useless routes
 /*			for(map<string, Line*>::const_iterator itr(routes.begin()); itr != routes.end(); ++itr)
 			{
