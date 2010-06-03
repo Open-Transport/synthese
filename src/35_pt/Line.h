@@ -195,11 +195,24 @@ namespace synthese
 				/** Content comparison operator.
 					@param stops Array of physical stops
 					@return true if the line serves exactly the stops in the same order.
-					@warning There is no test on the departure/arrival attributes
+					@warning there is no test on the departure/arrival attributes in this version of the operator
 				*/
-				bool operator==(const std::vector<pt::PhysicalStop*> stops) const;
+				bool operator==(const std::vector<pt::PhysicalStop*>& stops) const;
+
+				struct StopWithDepartureArrivalAuthorization
+				{
+					PhysicalStop* stop;
+					bool departure;
+					bool arrival;
+				};
+				typedef std::vector<StopWithDepartureArrivalAuthorization> StopsWithDepartureArrivalAuthorization;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Full content comparison operator.
+				///	@param stops Array of physical stops with arrival/departure information
+				/// @return true if the line serves exactly the stops in the same order with the same arrival/departure authorizations
+				bool operator==(const StopsWithDepartureArrivalAuthorization& stops) const;
 			//@}
-		    
 		};
 	}
 }

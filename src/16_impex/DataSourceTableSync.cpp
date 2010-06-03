@@ -24,11 +24,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "DataSourceTableSync.h"
+#include "SelectQuery.hpp"
+#include "ReplaceQuery.h"
 
-#include "SQLiteResult.h"
-#include "SQLite.h"
-
-#include "Conversion.h"
+#include <boost/lexical_cast.hpp>
 
 using namespace boost;
 using namespace std;
@@ -47,6 +46,7 @@ namespace synthese
 	{
 		const string DataSourceTableSync::COL_NAME("name");
 		const string DataSourceTableSync::COL_FORMAT("format");
+		const string DataSourceTableSync::COL_ICON("icon");
 	}
 
 	namespace db
@@ -60,6 +60,7 @@ namespace synthese
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(DataSourceTableSync::COL_NAME, SQL_TEXT),
 			SQLiteTableSync::Field(DataSourceTableSync::COL_FORMAT, SQL_TEXT),
+			SQLiteTableSync::Field(DataSourceTableSync::COL_ICON, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -79,24 +80,18 @@ namespace synthese
 
 			object->setName(name);
 			object->setFormat(format);
+			object->setIcon(rows->getText(DataSourceTableSync::COL_ICON));
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Save(
 			DataSource* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-
-			query
-				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToSQLiteString(object->getName())
-				<< "," << Conversion::ToSQLiteString(object->getFormat())
-				<< ")";
-			
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+			ReplaceQuery<DataSourceTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getFormat());
+			query.addField(object->getIcon());
+			query.execute(transaction);
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Unlink(
@@ -124,28 +119,29 @@ namespace synthese
 			, bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
+			SelectQuery<DataSourceTableSync> query;
 			if (!name.empty())
-				query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			{
+				query.addWhereField(COL_NAME, "%"+ lexical_cast<string>(name) + "%", ComposedExpression::OP_LIKE);
+			}
 			if(format)
 			{
-				query << " AND " << COL_FORMAT << "=" << Conversion::ToSQLiteString(*format);
+				query.addWhereField(COL_FORMAT, *format);
 			}
 			if (orderByName)
-				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			{
+				query.addOrderField(COL_NAME, raisingOrder);
+			}
 			if (number)
 			{
-				query << " LIMIT " << (*number + 1);
-				if (first > 0)
-					query << " OFFSET " << first;
+				query.setNumber(*number + 1);
 			}
-
-			return LoadFromQuery(query.str(), env, linkLevel);
+			if (first > 0)
+			{
+				query.setFirst(first);
+			}
+			
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }
- 

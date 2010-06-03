@@ -46,29 +46,5 @@ namespace synthese
 		):	Registrable(id)
 		{
 		}
-		
-		const string& DataSource::getName(
-		) const {
-			return _name;
-		}
-		
-		void DataSource::setName(
-			const string& value
-		){
-			_name = value;
-		}
-		
-		
-		const string& DataSource::getFormat(
-		) const {
-			return _format;
-		}
-		
-		void DataSource::setFormat(
-			const string& value
-		){
-			_format = value;
-		}
-
 	}
 }

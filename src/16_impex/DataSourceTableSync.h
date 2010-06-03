@@ -47,6 +47,7 @@ namespace synthese
 		 public:
 			 static const std::string COL_NAME;
 			 static const std::string COL_FORMAT;
+			 static const std::string COL_ICON;
 
 			DataSourceTableSync ();
 

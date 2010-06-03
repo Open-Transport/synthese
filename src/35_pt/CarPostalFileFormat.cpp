@@ -110,10 +110,6 @@ namespace synthese
 		void CarPostalFileFormat::save(std::ostream& os
 		) const {
 			SQLiteTransaction transaction;
-			BOOST_FOREACH(Registry<CommercialLine>::value_type cline, _env->getRegistry<CommercialLine>())
-			{
-				CommercialLineTableSync::Save(cline.second.get(), transaction);
-			}
 			BOOST_FOREACH(Registry<Line>::value_type line, _env->getRegistry<Line>())
 			{
 				LineTableSync::Save(line.second.get(), transaction);
@@ -124,7 +120,14 @@ namespace synthese
 			}
 			BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env->getRegistry<ScheduledService>())
 			{
-				ScheduledServiceTableSync::Save(service.second.get(), transaction);
+				if(service.second->empty())
+				{
+					ScheduledServiceTableSync::Remove(service.second->getKey(), transaction);
+				}
+				else
+				{
+					ScheduledServiceTableSync::Save(service.second.get(), transaction);
+				}
 			}
 			transaction.run();
 		}
@@ -214,12 +217,28 @@ namespace synthese
 			} // 3 : Services
 			else if (key == FILE_ZUGUDAT)
 			{
+				// Cleaning of each service handled by the datasource
+				ScheduledServiceTableSync::SearchResult originalServices(
+					ScheduledServiceTableSync::Search(
+						*_env,
+						optional<RegistryKeyType>(),
+						optional<RegistryKeyType>(),
+						_dataSource->getKey()
+				)	);
+				BOOST_FOREACH(shared_ptr<ScheduledService> service, originalServices)
+				{
+					for(date d(_startDate); d<=_endDate; d=d+days(1))
+					{
+						service->setInactive(d);
+					}
+				}
+
 				string line;
 				shared_ptr<ScheduledService> service;
 				string serviceNumber;
 				string lineNumber;
 				int calendarNumber;
-				vector<PhysicalStop*> stops;
+				Line::StopsWithDepartureArrivalAuthorization stops;
 				vector<time_duration> departures;
 				vector<time_duration> arrivals;
 				Calendar mask;
@@ -258,16 +277,24 @@ namespace synthese
 						}
 						else
 						{
-							stops.push_back(searchStop.front().get());
+							string departureTime(line.substr(34,4));
+							string arrivalTime(line.substr(29,4));
+
+							Line::StopWithDepartureArrivalAuthorization stop;
+							stop.stop = searchStop.front().get();
+							stop.departure = (departureTime != "9999" && departureTime != "    ");
+							stop.arrival = (arrivalTime != "9999" && arrivalTime != "    ");
+							stops.push_back(stop);
+							
 							arrivals.push_back(
-								(line.substr(29,4) == "    ") ?
-								minutes(0) :
-								hours(lexical_cast<int>(line.substr(29,2))) + minutes(lexical_cast<int>(line.substr(31,2)))
+								stop.arrival ?
+								hours(lexical_cast<int>(line.substr(29,2))) + minutes(lexical_cast<int>(line.substr(31,2))) :
+								minutes(0)
 							);
 							departures.push_back(
-								(line.substr(34,4) == "    ") ?
-								minutes(0) :
-								hours(lexical_cast<int>(line.substr(34,2))) + minutes(lexical_cast<int>(line.substr(36,2)))
+								stop.departure ?
+								hours(lexical_cast<int>(line.substr(34,2))) + minutes(lexical_cast<int>(line.substr(36,2))) :
+								minutes(0)
 							);
 						}
 					}
@@ -286,7 +313,7 @@ namespace synthese
 						{
 							CommercialLineTableSync::SearchResult lines(
 								CommercialLineTableSync::Search(*_env, optional<RegistryKeyType>(),optional<string>(), lineNumber)
-								);
+							);
 							if(lines.empty())
 							{
 								os << "WARN : commercial line with key " << lineNumber << "not found<br />";
@@ -356,14 +383,14 @@ namespace synthese
 							cline->addPath(route.get());
 							
 							size_t rank(0);
-							BOOST_FOREACH(PhysicalStop* stop, stops)
+							BOOST_FOREACH(const Line::StopsWithDepartureArrivalAuthorization::value_type& stop, stops)
 							{
 								shared_ptr<LineStop> ls(new LineStop);
 								ls->setLine(route.get());
-								ls->setPhysicalStop(stop);
+								ls->setPhysicalStop(stop.stop);
 								ls->setRankInPath(rank);
-								ls->setIsArrival(rank > 0);
-								ls->setIsDeparture(rank+1 < stops.size());
+								ls->setIsArrival(rank > 0 && stop.arrival);
+								ls->setIsDeparture(rank+1 < stops.size() && stop.departure);
 								ls->setMetricOffset(0);
 								ls->setKey(LineStopTableSync::getId());
 								route->addEdge(ls.get());

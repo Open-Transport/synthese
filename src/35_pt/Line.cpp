@@ -280,7 +280,7 @@ namespace synthese
 		
 		
 		
-		bool Line::operator==(const std::vector<PhysicalStop*> stops) const
+		bool Line::operator==(const std::vector<PhysicalStop*>& stops) const
 		{
 			if(getEdges().size() != stops.size()) return false;
 			
@@ -294,6 +294,30 @@ namespace synthese
 			return true;
 		}
 
+
+
+		bool Line::operator==( const StopsWithDepartureArrivalAuthorization& stops ) const
+		{
+			if(getEdges().size() != stops.size())
+			{
+				return false;
+			}
+
+			size_t rank(0);
+			BOOST_FOREACH(const Edge* edge, getEdges())
+			{
+				const StopsWithDepartureArrivalAuthorization::value_type& stop(stops[rank]);
+				if(	static_cast<const LineStop*>(edge)->getFromVertex() != stop.stop ||
+					edge->isDeparture() != stop.departure ||
+					edge->isArrival() != stop.arrival
+				){
+					return false;
+				}
+				++rank;
+			}
+
+			return true;
+		}
 
 
 		const LineStop* Line::getLineStop( std::size_t rank ) const

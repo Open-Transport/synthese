@@ -56,6 +56,8 @@
 #include "PTRuleUserAdmin.hpp"
 #include "ActionResultHTMLTable.h"
 #include "AdminModule.h"
+#include "DataSource.h"
+#include "PTImportAdmin.h"
 
 using namespace std;
 using namespace boost;
@@ -182,8 +184,9 @@ namespace synthese
 				h.push_back(make_pair(string(), "Origne"));
 				h.push_back(make_pair(string(), "Destination"));
 				h.push_back(make_pair(string(), "Arrêts"));
-				h.push_back(make_pair(string(), "Longueur"));
-				h.push_back(make_pair(string(), "Services"));
+				h.push_back(make_pair(string(), "Long."));
+				h.push_back(make_pair(string(), HTMLModule::getHTMLImage("car.png", "Services")));
+				h.push_back(make_pair(string(), "Source"));
 				h.push_back(make_pair(string(), "Actions"));
 				
 				ActionResultHTMLTable t(
@@ -218,8 +221,25 @@ namespace synthese
 						stream << line->getEdges().size();
 						stream << t.col();
 						stream << line->getLineStop(line->getEdges().size()-1)->getMetricOffset();
-						stream << t.col();
-						stream << line->getServices().size();
+					}
+
+					stream << t.col();
+					stream << line->getServices().size();
+
+					stream << t.col();
+					if(line->getDataSource())
+					{
+						stream <<
+							HTMLModule::getHTMLImage(
+								line->getDataSource()->getIcon().empty() ?
+								"note.png" :
+								line->getDataSource()->getIcon(),
+								line->getDataSource()->getName()
+							);
+						if(!line->getDataSource()->getFormat().empty())
+						{
+							HTMLModule::getHTMLImage(PTImportAdmin::ICON, "Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire");
+						}
 					}
 
 					stream << t.col();

@@ -36,6 +36,17 @@ namespace synthese
 		////////////////////////////////////////////////////////////////////////
 		/// DataSource class.
 		/// @ingroup m16
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// A data source identifies where an object come from.
+		/// Two types of data integration are available :
+		///	<ul>
+		///		<li>Manually data typing</li>
+		///		<li>Automated import </li>
+		///	</ul>
+		///
+		/// Sources with automated import refer to a FileFormat instance.
+		///
 		class DataSource
 		:	public virtual util::Registrable
 		{
@@ -50,6 +61,7 @@ namespace synthese
 			// Attributes
 			std::string	_name;
 			std::string _format;
+			std::string _icon;
 			
 		public:
 			/////////////////////////////////////////////////////////////////////
@@ -60,14 +72,16 @@ namespace synthese
 			
 			//! @name Getters
 			//@{
-				const std::string& getName() const;
-				const std::string& getFormat() const;
+				const std::string& getName() const { return _name; }
+				const std::string& getFormat() const { return _format; }
+				const std::string& getIcon() const { return _icon; }
 			//@}
 		
 			//! @name Setters
 			//@{
-				void setName(const std::string& value);
-				void setFormat(const std::string& value);
+				void setName(const std::string& value) { _name = value;	}
+				void setFormat(const std::string& value) { _format = value; }
+				void setIcon(const std::string& value) { _icon = value; }
 			//@}
 
 			//! @name Modifiers
