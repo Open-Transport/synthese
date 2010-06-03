@@ -238,7 +238,7 @@ namespace synthese
 							);
 						if(!line->getDataSource()->getFormat().empty())
 						{
-							HTMLModule::getHTMLImage(PTImportAdmin::ICON, "Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire");
+							stream << HTMLModule::getHTMLImage(PTImportAdmin::ICON, "Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire");
 						}
 					}
 
