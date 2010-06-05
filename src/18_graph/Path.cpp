@@ -41,17 +41,14 @@ namespace synthese
 {
 	using namespace util;
 	using namespace geometry;
-	using namespace calendar;
 
 	namespace graph
 	{
 
 		Path::Path():
 			RuleUser(),
-			Calendar(),
 			_pathGroup(NULL),
-			_pathClass(NULL),
-			_allDays(false)
+			_pathClass(NULL)
 		{
 		}
 		    
@@ -105,14 +102,6 @@ namespace synthese
 			_services.erase(service);
 
 			markScheduleIndexesUpdateNeeded ();
-		}
-
-
-
-
-		bool Path::isActive(const date& d) const
-		{
-			return _allDays || Calendar::isActive(d);
 		}
 
 

@@ -21,7 +21,7 @@
 */
 
 #include "NonPermanentService.h"
-#include "Path.h"
+#include "Line.h"
 #include "PTUseRule.h"
 
 using namespace std;
@@ -75,14 +75,14 @@ namespace synthese
 			// Mark the date in service calendar
 			Calendar::setActive(d);
 			
-			if(getPath())
+			if(dynamic_cast<Line*>(getPath()))
 			{
 				date newDate(d);
 				for(int i(getDepartureSchedule(false,0).hours() / 24);
 					i<= getLastArrivalSchedule(false).hours() / 24;
 					++i, newDate += days(1)
 				){
-					getPath()->setActive(newDate);
+					static_cast<Line*>(getPath())->setActive(newDate);
 				}
 			}
 			//environment.updateMinMaxDatesInUse (newDate, marked);
@@ -92,9 +92,9 @@ namespace synthese
 
 		void NonPermanentService::updatePathCalendar()
 		{
-			if(getPath())
+			if(dynamic_cast<Line*>(getPath()))
 			{
-				Calendar& pathC(*getPath());
+				Calendar& pathC(*static_cast<Line*>(getPath()));
 				Calendar copyCalendar(*this);
 				for(int i(getDepartureSchedule(false,0).hours() / 24);
 					i<= getLastArrivalSchedule(false).hours() / 24;

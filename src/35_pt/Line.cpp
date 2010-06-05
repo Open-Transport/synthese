@@ -37,6 +37,7 @@ namespace synthese
 	using namespace util;
 	using namespace impex;
 	using namespace pt;
+	using namespace calendar;
 	
 	namespace util
 	{
@@ -51,8 +52,9 @@ namespace synthese
 		):	util::Registrable(id)
 			, Path(),
 			Importable(),
-			Named(name)
-			, _isWalkingLine (false)
+			Named(name),
+			Calendar(),
+			_isWalkingLine (false)
 			, _useInDepartureBoards (true)
 			, _useInTimetables (true)
 			, _useInRoutePlanning (true)
@@ -323,6 +325,13 @@ namespace synthese
 		const LineStop* Line::getLineStop( std::size_t rank ) const
 		{
 			return static_cast<const LineStop*>(getEdge(rank));
+		}
+
+
+
+		bool Line::isActive( const boost::gregorian::date& date ) const
+		{
+			return Calendar::isActive(date);
 		}
 	}
 }

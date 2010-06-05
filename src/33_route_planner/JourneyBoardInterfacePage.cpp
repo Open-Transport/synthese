@@ -32,7 +32,6 @@
 #include "Crossing.h"
 #include "Line.h"
 #include "DateTimeInterfacePage.h"
-#include "Interface.h"
 #include "CommercialLine.h"
 #include "Env.h"
 #include "GeoPoint.h"
@@ -67,7 +66,6 @@ namespace synthese
 	using namespace geography;
 	using namespace server;
 	using namespace transportwebsite;
-	using namespace interfaces;
 	
 	
 	
@@ -574,7 +572,6 @@ namespace synthese
 			const ContinuousService* continuousService(dynamic_cast<const ContinuousService*>(serviceUse.getService()));
 
 			// Build of the parameters vector
-			ParametersVector pv;
 			{
 				stringstream s;
 				s << setw(2) << setfill('0') << serviceUse.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << serviceUse.getDepartureDateTime().time_of_day().minutes();

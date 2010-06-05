@@ -32,6 +32,7 @@
 #include "Importable.h"
 #include "Registry.h"
 #include "Named.h"
+#include "Calendar.h"
 
 namespace synthese
 {
@@ -77,7 +78,8 @@ namespace synthese
 		class Line:
 			public graph::Path,
 			public impex::Importable,
-			public util::Named
+			public util::Named,
+			public calendar::Calendar
 		{
 		public:
 
@@ -172,6 +174,8 @@ namespace synthese
 			//! @name Services
 			//@{
 				virtual std::string getRuleUserName() const { return "Mission " + getName(); }
+
+				virtual bool isActive(const boost::gregorian::date& date) const;
 
 				bool isPedestrianMode() const;
 

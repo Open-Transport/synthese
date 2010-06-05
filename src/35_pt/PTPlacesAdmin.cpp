@@ -45,6 +45,7 @@
 #include "CityUpdateAction.h"
 #include "PropertiesHTMLTable.h"
 #include "StopAreaAddAction.h"
+#include "ConnectionPlaceTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -309,6 +310,27 @@ namespace synthese
 			// TAB CONNECTION PLACES
 			if (openTabContent(stream, TAB_CONNECTION_PLACES))
 			{
+				AdminFunctionRequest<PTPlaceAdmin> searchRequest(request);
+				SearchFormHTMLTable st(searchRequest.getHTMLForm("connsearch"));
+				stream << st.open();
+				if(!_city.get())
+				{
+					stream << st.cell("Localité", st.getForm().getTextInput(PARAM_SEARCH_CITY, _searchCity));
+				}
+				stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
+				stream << st.close();
+
+				ConnectionPlaceTableSync::SearchResult places(
+					ConnectionPlaceTableSync::Search(
+						Env::GetOfficialEnv(),
+						_city.get() ? _city->getKey() : optional<RegistryKeyType>(),
+						logic::indeterminate,
+						optional<string>(),
+						_searchName.empty() ? string() : ("%"+ _searchName +"%"),
+						_city.get() ? optional<string>() : (_searchCity.empty() ? string() : ("%"+ _searchCity +"%"))
+					)
+				);
+
 				AdminActionFunctionRequest<StopAreaAddAction,PTPlaceAdmin> stopAddRequest(request);
 				stopAddRequest.getAction()->setCity(const_pointer_cast<City>(_city));
 				stopAddRequest.getAction()->setCreateCityIfNecessary(false);
@@ -324,6 +346,10 @@ namespace synthese
 
 				HTMLTable::ColsVector c;
 				c.push_back("id");
+				if(!_city.get())
+				{
+					c.push_back("Localité");
+				}
 				c.push_back("Nom");
 				c.push_back("X");
 				c.push_back("Y");
@@ -331,20 +357,20 @@ namespace synthese
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
 
-				if(_city.get())
+				BOOST_FOREACH(const ConnectionPlaceTableSync::SearchResult::value_type& place, places)
 				{
-					const City::PlacesMatcher::Map& places(_city->getLexicalMatcher(FactorableTemplate<geography::NamedPlace,pt::PublicTransportStopZoneConnectionPlace>::FACTORY_KEY).entries());
-					BOOST_FOREACH(const City::PlacesMatcher::Map::value_type& it, places)
+					stream << t.row();
+					stream << t.col() << place->getKey();
+					if(!_city.get())
 					{
-						const PublicTransportStopZoneConnectionPlace& stop(static_cast<const PublicTransportStopZoneConnectionPlace&>(*it.second));
-						openRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr<PublicTransportStopZoneConnectionPlace>(&stop));
-						stream << t.row();
-						stream << t.col() << stop.getKey();
-						stream << t.col() << stop.getName();
-						stream << t.col() << stop.getPoint().getX();
-						stream << t.col() << stop.getPoint().getY();
-						stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPlaceAdmin::ICON);
+						stream << t.col() << place->getCity()->getName();
 					}
+					stream << t.col() << place->getName();
+					stream << t.col() << place->getPoint().getX();
+					stream << t.col() << place->getPoint().getY();
+
+					openRequest.getPage()->setConnectionPlace(const_pointer_cast<const PublicTransportStopZoneConnectionPlace>(place));
+					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPlaceAdmin::ICON);
 				}
 
 				stream << t.row();

@@ -97,6 +97,7 @@ namespace synthese
 			virtual bool isPedestrianMode() const;
 			virtual bool isRoad() const;
 			virtual std::string getRuleUserName() const;
+			virtual bool isActive(const boost::gregorian::date& date) const;
 
 
 		  /** Find closest address of this road, before a given metric offset.

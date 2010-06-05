@@ -68,6 +68,7 @@ namespace synthese
 			/// @param mainConnection the returned stops must belong to the list of main stops of the city
 			/// @param creatorIdFilter search of a stop by creator ID
 			/// @param nameFilter search of a stop by name (uses the LIKE operator)
+			/// @param cityNameFilter search of a stop by the name of its city (uses the LIKE operator)
 			/// @param orderByCityNameAndName order the results by city name, then by stop name
 			/// @param raisingOrder order the results ascendantly
 			/// @param rank of the first result to return
@@ -81,6 +82,7 @@ namespace synthese
 				boost::logic::tribool mainConnection = boost::logic::indeterminate,
 				boost::optional<std::string> creatorIdFilter = boost::optional<std::string>(),
 				boost::optional<std::string> nameFilter = boost::optional<std::string>(),
+				boost::optional<std::string> cityNameFilter = boost::optional<std::string>(),
 				bool orderByCityNameAndName = true
 				, bool raisingOrder = true
 				, int first = 0

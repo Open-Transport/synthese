@@ -31,44 +31,28 @@
 
 namespace synthese
 {
+	namespace impex
+	{
+		class DataSource;
+	}
+
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// PTImportAdmin Admin compound class.
+		/// 35.14 Data sources access.
 		///	@ingroup m35Admin refAdmin
-		///	@author Hugues
-		///	@date 2009
+		///	@author Hugues Romain
+		///	@date 2009-2010
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : PTImportAdmin
 		class PTImportAdmin:
 			public admin::AdminInterfaceElementTemplate<PTImportAdmin>
 		{
 		public:
-			/// @name Parameter identifiers
-			//@{
-				static const std::string TAB_TRIDENT;
-				static const std::string TAB_NAVTEQ;
-				static const std::string TAB_CARPOSTAL;
-			//@}
-
+	
 		private:
-			/// @name Search parameters
-			//@{
-			// boost::optional<std::string>				_searchXxx;
-			// html::ResultHTMLTable::RequestParameters	_requestParameters;
-			//@}
-
+	
 		protected:
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Builds the tabs of the page.
-			/// @param request The current request (can be used to determinate the
-			///        current user rights.)
-			/// @author Hugues
-			/// @date 2009
-			virtual void _buildTabs(
-				const security::Profile& profile
-			) const;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -159,7 +143,6 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
-
 		};
 	}
 }

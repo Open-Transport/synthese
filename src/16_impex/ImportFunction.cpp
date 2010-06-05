@@ -52,7 +52,8 @@ namespace synthese
 
 
 		ImportFunction::ImportFunction()
-			: FactorableTemplate<Function, ImportFunction>()
+			: FactorableTemplate<Function, ImportFunction>(),
+			_doImport(false)
 		{
 			setEnv(shared_ptr<Env>(new Env));
 		}
@@ -62,6 +63,11 @@ namespace synthese
 		ParametersMap ImportFunction::_getParametersMap() const
 		{
 			ParametersMap map(_fileFormat.get() ? _fileFormat->_getParametersMap(true) : ParametersMap());
+			if(_dataSource.get())
+			{
+				map.insert(PARAMETER_DATA_SOURCE, _dataSource->getKey());
+			}
+			map.insert(PARAMETER_DO_IMPORT, _doImport);
 			return map;
 		}
 
@@ -122,6 +128,8 @@ namespace synthese
 				throw RequestException("Load failed : " + e.getMessage());
 			}
 		}
+		
+
 
 		void ImportFunction::run( std::ostream& stream, const Request& request ) const
 		{

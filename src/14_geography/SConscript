@@ -7,6 +7,7 @@ CppSynthese3LibProject(
 		's3-geometry.cpplib',
 		's3-lex-matcher.cpplib',
 		's3-graph.cpplib',
-		's3-interfaces.cpplib'
+		's3-interfaces.cpplib',
+		'proj.cpplib'
 	]
 )

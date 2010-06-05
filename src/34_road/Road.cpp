@@ -184,5 +184,12 @@ namespace synthese
 		{
 			return "Route " + getRoadPlace()->getFullName() + " sens "+ (_reverseRoad ? "direct" : "opposé");
 		}
+
+
+
+		bool Road::isActive( const boost::gregorian::date& date ) const
+		{
+			return true;
+		}
 	}
 }

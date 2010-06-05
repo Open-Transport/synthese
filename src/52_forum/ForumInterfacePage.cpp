@@ -36,7 +36,6 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace interfaces;
 	using namespace server;
 	using namespace transportwebsite;
 	using namespace util;

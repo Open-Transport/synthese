@@ -230,6 +230,7 @@ namespace synthese
 			logic::tribool mainConnectionOnly,
 			optional<string> creatorIdFilter,
 			optional<string> nameFilter,
+			optional<string> cityNameFilter,
 			bool orderByCityNameAndName /*= true */
 			, bool raisingOrder /*= true */
 			, int first /*= 0 */
@@ -237,7 +238,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			SelectQuery<ConnectionPlaceTableSync> query;
-			if(orderByCityNameAndName)
+			if(orderByCityNameAndName || cityNameFilter)
 			{
 				query.addTableAndEqualJoin<CityTableSync>(TABLE_COL_ID, TABLE_COL_CITYID);
 			}
@@ -258,6 +259,10 @@ namespace synthese
 			if(nameFilter)
 			{
 				query.addWhereField(TABLE_COL_NAME, *nameFilter, ComposedExpression::OP_LIKE);
+			}
+			if(cityNameFilter)
+			{
+				query.addWhereFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, *cityNameFilter, ComposedExpression::OP_LIKE);
 			}
 
 			// Ordering

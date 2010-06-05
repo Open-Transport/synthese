@@ -181,5 +181,12 @@ namespace synthese
 		{
 			return "Jonction " + getStart()->getConnectionPlace()->getFullName() + " -> " + getEnd()->getConnectionPlace()->getFullName();
 		}
+
+
+
+		bool Junction::isActive( const boost::gregorian::date& date ) const
+		{
+			return true;
+		}
 	}
 }

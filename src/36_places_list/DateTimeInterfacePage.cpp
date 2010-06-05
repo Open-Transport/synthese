@@ -32,9 +32,8 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace server;
-	using namespace transportwebsite;
-
-	namespace interfaces
+	
+	namespace transportwebsite
 	{
 		const string DateTimeInterfacePage::DATA_DAY("day");
 		const string DateTimeInterfacePage::DATA_DAY_OF_WEEK("day_of_week");

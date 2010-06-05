@@ -79,9 +79,9 @@ do_import=0|1
 				bool								_doImport;
 				boost::shared_ptr<const DataSource>	_dataSource;
 				boost::shared_ptr<FileFormat>		_fileFormat;
-				std::string							_output;
 			//@}
 			
+			std::string							_output;
 			
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map
@@ -101,6 +101,8 @@ do_import=0|1
 			virtual bool isAuthorized(const server::Session* session) const;
 
 			virtual std::string getOutputMimeType() const;
+
+			void setDataSource(boost::shared_ptr<const DataSource> value){ _dataSource = value; }
 		};
 	}
 }

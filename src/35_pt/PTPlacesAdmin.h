@@ -64,6 +64,7 @@ namespace synthese
 			//@{
 				std::string				_searchCity;
 				std::string				_searchName;
+				std::string				_searchPhysicalStopOperatorCode;
 				boost::shared_ptr<const geography::City> _city;
 				html::ResultHTMLTable::RequestParameters	_requestParameters;
 			//@}

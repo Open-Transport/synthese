@@ -24,9 +24,9 @@
 #define SYNTHESE_ENV_PATH_H
 
 #include "Registrable.h"
-#include "Calendar.h"
 #include "RuleUser.h"
 
+#include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/optional.hpp>
 #include <vector>
 #include <set>
@@ -72,7 +72,6 @@ namespace synthese
 		*/
 		class Path
 		:	public RuleUser,
-			public calendar::Calendar,
 			public virtual util::Registrable
 		{
 		public:
@@ -84,8 +83,6 @@ namespace synthese
 			Edges			_edges; 	//!< Down link 1 : edges
 			ServiceSet		_services;	//!< Down link 2 : services
 			
-			bool			_allDays;	//!< A permanent service is present : the calendar is ignored
-
 			/** Constructor.
 			*/
 			Path();
@@ -99,13 +96,11 @@ namespace synthese
 			//@{
 				const ServiceSet&	getServices()	const { return _services; }
 				const Edges&		getEdges()		const { return _edges; }
-				bool				getAllDays()	const { return _allDays; }
 				PathClass*			getPathClass()	const { return _pathClass; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setAllDays(bool value) { _allDays = value; }
 			//@}
 
 			//! @name Services.
@@ -135,7 +130,7 @@ namespace synthese
 				) const;
 
 				
-				virtual bool isActive(const boost::gregorian::date& date) const;
+				virtual bool isActive(const boost::gregorian::date& date) const = 0;
 
 
 

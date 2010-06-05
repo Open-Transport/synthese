@@ -1,4 +1,5 @@
 
+
 //////////////////////////////////////////////////////////////////////////
 /// PTStopsImportWizardAdmin class header.
 ///	@file PTStopsImportWizardAdmin.hpp
@@ -27,23 +28,28 @@
 
 #include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
-#include "Point2D.h"
-
-#include <map>
 
 namespace synthese
 {
+	namespace impex
+	{
+		class DataSource;
+	}
+
 	namespace pt
 	{
-		class PhysicalStop;
-
 		//////////////////////////////////////////////////////////////////////////
-		/// 35.14 Admin : Stops import wizard.
+		/// 35.14 Admin : Data source edition and use.
 		///	@ingroup m35Admin refAdmin
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.1.18
 		//////////////////////////////////////////////////////////////////////////
+		/// Key : PTStopsImportWizardAdmin
+		/// General parameters :
+		///	<ul>
+		///		<li>roid : id of the datasource to display</li>
+		///	</ul>
 		/// The stops import wizard opens a file and shows the differences
 		/// between the database and allow to solve them by several action buttons.
 		///
@@ -55,6 +61,9 @@ namespace synthese
 			//@{
 				static const std::string PARAM_BAHNHOF_FILE_NAME;
 				static const std::string PARAM_KOORDS_FILE_NAME;
+				static const std::string TAB_PROPERTIES;
+				static const std::string TAB_IMPORT;
+				static const std::string TAB_IMPORT_STOPS;
 			//@}
 
 		private:
@@ -64,16 +73,18 @@ namespace synthese
 				std::string				_koordsFileName;
 			//@}
 
+			boost::shared_ptr<const impex::DataSource> _dataSource;
+
 		protected:
-				struct Bahnhof 
-				{
-					std::string operatorCode;
-					std::string cityName;
-					std::string name;
-					geometry::Point2D coords;
-					boost::shared_ptr<PhysicalStop> stop;
-				};
-				typedef std::map<std::string, Bahnhof> Bahnhofs;
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds the tabs of the page.
+			/// @param request The current request (can be used to determinate the
+			///        current user rights.)
+			/// @author Hugues
+			/// @date 2009
+			virtual void _buildTabs(
+				const security::Profile& profile
+			) const;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -83,6 +94,7 @@ namespace synthese
 			PTStopsImportWizardAdmin();
 			
 			
+			void setDataSource(boost::shared_ptr<const impex::DataSource> value){ _dataSource = value; }
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.

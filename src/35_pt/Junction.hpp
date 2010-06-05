@@ -65,6 +65,7 @@ namespace synthese
 
 			//! @name Services
 			//@{
+				virtual bool isActive(const boost::gregorian::date& date) const;
 				virtual std::string getRuleUserName() const;
 				PhysicalStop* getStart() const;
 				PhysicalStop* getEnd() const;

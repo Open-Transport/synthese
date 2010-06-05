@@ -186,7 +186,7 @@ namespace synthese
 			}
 
 			// A0: Line selection upon calendar
-			if (!line.getAllDays() && !_baseCalendar.hasAtLeastOneCommonDateWith(line))
+			if (!_baseCalendar.hasAtLeastOneCommonDateWith(line))
 				return false;
 
 

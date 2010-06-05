@@ -35,7 +35,6 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace interfaces;
 	using namespace util;
 	using namespace graph;
 	using namespace pt;

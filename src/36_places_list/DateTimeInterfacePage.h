@@ -32,20 +32,17 @@
 
 namespace synthese
 {
-	namespace transportwebsite
-	{
-		class WebPage;
-	}
-
 	namespace server
 	{
 		class Request;
 	}
 
-	namespace interfaces
+	namespace transportwebsite
 	{
+		class WebPage;
+
 		/** DateTimeInterfacePage Interface Page Class.
-			@ingroup m11Pages refPages
+			@ingroup m56Pages refPages
 
 			Date :
 			 - year

@@ -121,8 +121,6 @@ namespace synthese
 			Service(string(), path),
 			_duration(duration)
 		{
-			if (path != NULL)
-				path->setAllDays(true);
 			clearRTData();
 		}
 
