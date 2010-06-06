@@ -280,82 +280,81 @@ namespace synthese
 */				}
 
 				_timetable = const_pointer_cast<const Timetable>(timetable);
+			}
+			
+			// Display templates
 
-				// Display template
-
-				try
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
+				if(id)
 				{
-					optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
-					if(id)
-					{
-						_page = Env::GetOfficialEnv().get<WebPage>(*id);
-					}
+					_page = Env::GetOfficialEnv().get<WebPage>(*id);
 				}
-				catch (ObjectNotFoundException<WebPage>& e)
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_NOTE_PAGE_ID));
+				if(id) 
 				{
-					throw RequestException("No such page : "+ e.getMessage());
+					_notePage = Env::GetOfficialEnv().get<WebPage>(*id);
 				}
-				try
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such note row page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_NOTE_CALENDAR_PAGE_ID));
+				if(id)
 				{
-					optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_NOTE_PAGE_ID));
-					if(id) 
-					{
-						_notePage = Env::GetOfficialEnv().get<WebPage>(*id);
-					}
+					_noteCalendarPage = Env::GetOfficialEnv().get<WebPage>(*id);
 				}
-				catch (ObjectNotFoundException<WebPage>& e)
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such note calendar page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_ROW_PAGE_ID));
+				if(id)
 				{
-					throw RequestException("No such note row page : "+ e.getMessage());
+					_rowPage = Env::GetOfficialEnv().get<WebPage>(*id);
 				}
-				try
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such row page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_CELL_PAGE_ID));
+				if(id) 
 				{
-					optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_NOTE_CALENDAR_PAGE_ID));
-					if(id)
-					{
-						_noteCalendarPage = Env::GetOfficialEnv().get<WebPage>(*id);
-					}
+					_cellPage = Env::GetOfficialEnv().get<WebPage>(*id);
 				}
-				catch (ObjectNotFoundException<WebPage>& e)
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such cell page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_FOR_SUB_TIMETABLE_ID));
+				if(id) 
 				{
-					throw RequestException("No such note calendar page : "+ e.getMessage());
+					_pageForSubTimetable = Env::GetOfficialEnv().get<WebPage>(*id);
 				}
-				try
-				{
-					optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_ROW_PAGE_ID));
-					if(id)
-					{
-						_rowPage = Env::GetOfficialEnv().get<WebPage>(*id);
-					}
-				}
-				catch (ObjectNotFoundException<WebPage>& e)
-				{
-					throw RequestException("No such row page : "+ e.getMessage());
-				}
-				try
-				{
-					optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_CELL_PAGE_ID));
-					if(id) 
-					{
-						_cellPage = Env::GetOfficialEnv().get<WebPage>(*id);
-					}
-				}
-				catch (ObjectNotFoundException<WebPage>& e)
-				{
-					throw RequestException("No such cell page : "+ e.getMessage());
-				}
-				try
-				{
-					optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_FOR_SUB_TIMETABLE_ID));
-					if(id) 
-					{
-						_pageForSubTimetable = Env::GetOfficialEnv().get<WebPage>(*id);
-					}
-				}
-				catch (ObjectNotFoundException<WebPage>& e)
-				{
-					throw RequestException("No such page for sub timetable : "+ e.getMessage());
-				}
-
+			}
+			catch (ObjectNotFoundException<WebPage>& e)
+			{
+				throw RequestException("No such page for sub timetable : "+ e.getMessage());
 			}
 		}
 

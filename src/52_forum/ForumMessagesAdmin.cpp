@@ -120,6 +120,7 @@ namespace synthese
 			h.push_back(make_pair("Sujet", string()));
 			h.push_back(make_pair("Message", string()));
 			h.push_back(make_pair("Actions", string()));
+			
 
 		}
 

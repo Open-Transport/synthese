@@ -94,8 +94,9 @@ namespace synthese
 
 
 			// Common parameters
-			pm.insert(DATA_GENERATOR_TYPE, GetTimetableTypeCode(object.getContentType())); //0
-			pm.insert(DATA_TITLE, object.getTitle()); //1
+			pm.insert(DATA_GENERATOR_TYPE, GetTimetableTypeCode(object.getContentType()));
+			pm.insert(DATA_TITLE, object.getTitle());
+			pm.insert(Request::PARAMETER_OBJECT_ID, object.getKey());
 
 			// 2 : Notes
 			if(notePage.get())
@@ -108,7 +109,10 @@ namespace synthese
 				pm.insert(DATA_NOTES, notes.str()); //2
 			}
 
-			pm.insert(DATA_CALENDAR_NAME, object.getBaseCalendar()->getText()); //3
+			if(object.getBaseCalendar())
+			{
+				pm.insert(DATA_CALENDAR_NAME, object.getBaseCalendar()->getText()); //3
+			}
 
 
 			// Specific parameters
@@ -128,7 +132,6 @@ namespace synthese
 						BOOST_FOREACH(shared_ptr<Timetable> tt, contents)
 						{
 							auto_ptr<TimetableGenerator> g(tt->getGenerator(Env::GetOfficialEnv()));
-							g->build();
 							Display(
 								content,
 								pageForSubTimetable,

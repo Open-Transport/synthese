@@ -97,6 +97,7 @@ namespace synthese
 			/// <h4>Parameters for container generator</h4>
 			///	<ul>
 			///		<li>title : Timetable title</li>
+			///		<li>roid : Timetable id</li>
 			///	</ul>
 			///
 			/// <h4>Parameters for calendar generator</h4>

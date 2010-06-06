@@ -2,6 +2,13 @@
 // 52 Forum Module
 
 // Factories
+synthese::forum::ForumModule::integrate();
+
+synthese::forum::ForumRight::integrate();
+
+synthese::forum::ForumMessagesAdmin::integrate();
+synthese::forum::ForumTopicsAdmin::integrate();
+
 synthese::forum::ForumTopicTableSync::integrate();
 synthese::forum::ForumMessageTableSync::integrate();
 

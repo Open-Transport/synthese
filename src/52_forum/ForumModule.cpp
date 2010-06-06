@@ -35,6 +35,23 @@ namespace synthese
 		const string FactorableTemplate<ModuleClass,ForumModule>::FACTORY_KEY("52_forum");
 	}
 
+	namespace server
+	{
+		template<> const string ModuleClassTemplate<ForumModule>::NAME("Forums");
+
+		template<> void ModuleClassTemplate<ForumModule>::PreInit()
+		{
+		}
+
+		template<> void ModuleClassTemplate<ForumModule>::Init()
+		{
+		}
+
+		template<> void ModuleClassTemplate<ForumModule>::End()
+		{
+		}
+	}
+
 	namespace forum
 	{
 		void ForumModule::initialize()

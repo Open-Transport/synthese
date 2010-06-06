@@ -2,6 +2,13 @@
 // 52 Forum Module
 
 // Factories
+#include "ForumModule.hpp"
+
+#include "ForumRight.hpp"
+
+#include "ForumTopicsAdmin.hpp"
+#include "ForumMessagesAdmin.hpp"
+
 #include "ForumTopicTableSync.hpp"
 #include "ForumMessageTableSync.hpp"
 
