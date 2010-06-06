@@ -7,7 +7,8 @@ source /etc/opt/rcs/$NAME.conf
 DAEMON=/opt/rcs/bin/$NAME
 
 test -x $DAEMON || exit 0
-
+olddir=`pwd`
+cd /opt/rcs/bin
 while true
 do
 	($DAEMON --pidfile $S3_SERVER_PID_FILE --logfile $S3_SERVER_LOG_FILE --db $S3_SERVER_DB_FILE --param tmp_dir=$S3_SERVER_TMP_DIR --param port=$S3_SERVER_PORT --param db_port=$S3_SERVER_DB_PORT --param log_level=$S3_SERVER_LOG_LEVEL --param dbring_node_id=$S3_SERVER_NODE_ID --param dbring_authority=$S3_SERVER_AUTHORITY_NODE_ID) || (echo "Failed!" && exit 1)
@@ -21,4 +22,4 @@ SYNTHESE3 a rebooté sur `hostname`, demarrage automatique en cours.
 ENDOFMAIL
 
 done
-
+cd $olddir
