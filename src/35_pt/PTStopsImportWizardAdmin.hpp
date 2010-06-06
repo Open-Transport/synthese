@@ -28,6 +28,7 @@
 
 #include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
+#include "Point2D.h"
 
 namespace synthese
 {
@@ -38,6 +39,8 @@ namespace synthese
 
 	namespace pt
 	{
+		class PhysicalStop;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.14 Admin : Data source edition and use.
 		///	@ingroup m35Admin refAdmin
@@ -65,6 +68,16 @@ namespace synthese
 				static const std::string TAB_IMPORT;
 				static const std::string TAB_IMPORT_STOPS;
 			//@}
+
+			struct Bahnhof 
+			{
+				std::string operatorCode;
+				std::string cityName;
+				std::string name;
+				geometry::Point2D coords;
+				boost::shared_ptr<PhysicalStop> stop;
+			};
+			typedef std::map<std::string, Bahnhof> Bahnhofs;
 
 		private:
 			/// @name Search parameters

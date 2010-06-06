@@ -50,6 +50,7 @@
 #include <fstream>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -217,15 +218,6 @@ namespace synthese
 
 				if(!_bahnhofFileName.empty() && !_koordsFileName.empty())
 				{
-					struct Bahnhof 
-					{
-						string operatorCode;
-						string cityName;
-						string name;
-						Point2D coords;
-						shared_ptr<PhysicalStop> stop;
-					};
-					typedef map<string, Bahnhof> Bahnhofs;
 					Bahnhofs nonLinkedBahnhofs;
 					Bahnhofs linkedBahnhofs;
 
@@ -240,7 +232,8 @@ namespace synthese
 							bahnhof.operatorCode = line.substr(0, 7);
 
 							vector<string> cols;
-							split( cols, line.substr(12), is_any_of(","));
+							std::string times(line.substr(12));
+							boost::algorithm::split( cols, times, boost::algorithm::is_any_of(","));
 							bahnhof.cityName = cols[0];
 							bahnhof.name = (cols.size() == 1) ? "Arrêt" : cols[1];
 							
