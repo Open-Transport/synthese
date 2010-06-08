@@ -63,11 +63,12 @@ namespace synthese
 			){
 				util::Env& env(util::Env::GetOfficialEnv());
 				typename ObjectClass::Registry& registry(env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>());
+				util::RegistryKeyType key(rows->getKey());
 				try
 				{
-					if (registry.contains(rows->getKey()))
+					if (registry.contains(key))
 					{
-						ObjectClass* object(static_cast<ObjectClass*>(registry.getEditable(rows->getKey()).get()));
+						ObjectClass* object(static_cast<ObjectClass*>(registry.getEditable(key).get()));
 						SQLiteInheritedTableSyncTemplate<ParentTableSyncClass,TableSyncClass,ObjectClass>::Unlink(
 							object
 						);
@@ -75,15 +76,16 @@ namespace synthese
 					}
 					else
 					{
-						boost::shared_ptr<ObjectClass> object(new ObjectClass(rows->getKey()));
-						Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+						boost::shared_ptr<ObjectClass> object(new ObjectClass(key));
 						registry.add(
 							boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
 						);
+						Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 					}
 				}
 				catch(util::Exception& e)
 				{
+					registry.remove(key);
 					util::Log::GetInstance().warn("Error on load after row insert/replace or at first sync : ", e);
 				}
 			}

@@ -73,6 +73,7 @@ namespace synthese
 				util::Registry<T>& registry(env.getEditableRegistry<T>());
 				while (rows->next ())
 				{
+					util::RegistryKeyType key(rows->getKey());
 					try
 					{
 						if(!IsLoaded(rows))
@@ -81,19 +82,20 @@ namespace synthese
 						}
 						if (registry.contains(rows->getLongLong (TABLE_COL_ID)))
 						{
-							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
+							boost::shared_ptr<T> address(registry.getEditable(key));
 							SQLiteDirectTableSyncTemplate<K,T>::Unlink(address.get());
 							Load (address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						}
 						else
 						{
 							boost::shared_ptr<T> object(K::GetNewObject(rows));
-							Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 							registry.add(object);
+							Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						}
 					}
 					catch(util::Exception& e)
 					{
+						registry.remove(key);
 						util::Log::GetInstance().warn("Error on load after row insert/replace or at first sync : ", e);
 					}
 				}

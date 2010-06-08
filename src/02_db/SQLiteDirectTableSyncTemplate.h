@@ -225,11 +225,12 @@ namespace synthese
 				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query, true);
 				while (rows->next ())
 				{
+					util::RegistryKeyType key(rows->getKey());
 					try
 					{
-						if(registry.contains(rows->getKey()))
+						if(registry.contains(key))
 						{
-							result.push_back(registry.getEditable(rows->getKey()));
+							result.push_back(registry.getEditable(key));
 						}
 						else
 						{
@@ -240,6 +241,7 @@ namespace synthese
 					}	}
 					catch(std::exception& e)
 					{
+						registry.remove(key);
 						util::Log::GetInstance().warn("Skipped object in results load of " + query, e);
 				}	}
 				return result;

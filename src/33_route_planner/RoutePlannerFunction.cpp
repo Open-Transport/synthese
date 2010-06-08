@@ -659,7 +659,7 @@ namespace synthese
 					"</query>" <<
 					"<journeys>"
 				;
-				const PTRoutePlannerResult::PlaceList& placesList(
+				const PTRoutePlannerResult::PlacesList& placesList(
 					result.getOrderedPlaces()
 				);
 				typedef vector<shared_ptr<ostringstream> > PlacesContentVector;
@@ -677,7 +677,7 @@ namespace synthese
 					bool lastPedestrianMode = false;
 
 					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
-					PTRoutePlannerResult::PlaceList::const_iterator itPlaces(placesList.begin());
+					PTRoutePlannerResult::PlacesList::const_iterator itPlaces(placesList.begin());
 
 					stream <<
 						"<journey hasALineAlert=\"" << (hasALineAlert ? "true" : "false") << "\" hasAStopAlert=\"" << (hasAStopAlert ? "true" : "false") << "\""
@@ -1150,7 +1150,7 @@ namespace synthese
 					"<resultTable>";
 
 				PlacesContentVector::iterator itSheetRow(sheetRows.begin());
-				BOOST_FOREACH(const PTRoutePlannerResult::PlaceList::value_type& row, result.getOrderedPlaces())
+				BOOST_FOREACH(const PTRoutePlannerResult::PlacesList::value_type& row, result.getOrderedPlaces())
 				{
 					GeoPoint gp(WGS84FromLambert(row.place->getPoint()));
 					assert(dynamic_cast<const NamedPlace*>(row.place));

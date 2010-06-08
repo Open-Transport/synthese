@@ -202,7 +202,7 @@ namespace synthese
 			if(schedulesRowPage.get() && schedulesCellPage.get())
 			{
 				stringstream rows;
-				const PTRoutePlannerResult::PlaceList& placesList(
+				const PTRoutePlannerResult::PlacesList& placesList(
 					object.getOrderedPlaces()
 				);
 				typedef vector<shared_ptr<ostringstream> > PlacesContentVector;
@@ -224,7 +224,7 @@ namespace synthese
 					bool lastPedestrianMode = false;
 
 					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
-					PTRoutePlannerResult::PlaceList::const_iterator itPlaces(placesList.begin());
+					PTRoutePlannerResult::PlacesList::const_iterator itPlaces(placesList.begin());
 
 					// Loop on each leg
 					const Journey::ServiceUses& jl(it->getServiceUses());
@@ -363,7 +363,7 @@ namespace synthese
 				// Initialization of text lines
 				bool color(false);
 				PlacesContentVector::const_iterator it(sheetRows.begin());
-				BOOST_FOREACH(const PTRoutePlannerResult::PlaceList::value_type& pi, placesList)
+				BOOST_FOREACH(const PTRoutePlannerResult::PlacesList::value_type& pi, placesList)
 				{
 					assert(dynamic_cast<const NamedPlace*>(pi.place));
 

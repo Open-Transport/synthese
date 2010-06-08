@@ -25,6 +25,8 @@
 #include "PhysicalStop.h"
 #include "LineStop.h"
 #include "Journey.h"
+#include "Line.h"
+#include "PermanentService.h"
 
 #include <boost/test/auto_unit_test.hpp>
 
@@ -35,37 +37,65 @@ using namespace synthese::ptrouteplanner;
 BOOST_AUTO_TEST_CASE (placesListOrder)
 {
 	Line L;
+	PermanentService S(0, &L, boost::posix_time::minutes(5));
 
 	PublicTransportStopZoneConnectionPlace CA;
+	CA.setName("A");
 	PhysicalStop PA;
 	PA.setHub(&CA);
 	LineStop A;
-	A.setPhysicalStop(&PA);
 	A.setLine(&L);
+	A.setPhysicalStop(&PA);
+	A.setRankInPath(0);
 
 	PublicTransportStopZoneConnectionPlace CB;
+	CB.setName("B");
 	PhysicalStop PB;
 	PB.setHub(&CB);
 	LineStop B;
-	B.setPhysicalStop(&PB);
 	B.setLine(&L);
+	B.setPhysicalStop(&PB);
+	B.setRankInPath(1);
 
 	PublicTransportStopZoneConnectionPlace CC;
+	CC.setName("C");
 	PhysicalStop PC;
 	PC.setHub(&CC);
 	LineStop C;
-	C.setPhysicalStop(&PC);
 	C.setLine(&L);
+	C.setPhysicalStop(&PC);
+	C.setRankInPath(2);
 
 	PublicTransportStopZoneConnectionPlace CD;
+	CD.setName("D");
 	PhysicalStop PD;
 	PD.setHub(&CD);
 	LineStop D;
-	D.setPhysicalStop(&PD);
 	D.setLine(&L);
+	D.setPhysicalStop(&PD);
+	D.setRankInPath(3);
+
+	PublicTransportStopZoneConnectionPlace CE;
+	CE.setName("E");
+	PhysicalStop PE;
+	PE.setHub(&CE);
+	LineStop E;
+	E.setLine(&L);
+	E.setPhysicalStop(&PE);
+	E.setRankInPath(4);
+
+	PublicTransportStopZoneConnectionPlace CF;
+	CF.setName("F");
+	PhysicalStop PF;
+	PF.setHub(&CF);
+	LineStop F;
+	F.setLine(&L);
+	F.setPhysicalStop(&PF);
+	F.setRankInPath(5);
 
 	Journey j0;
 	ServicePointer sp0_0(false, DEPARTURE_TO_ARRIVAL, 0, &A);
+	sp0_0.setService(&S);
 	ServiceUse s0_0(sp0_0,&B);
 	j0 = Journey(j0, s0_0);
 
@@ -77,18 +107,21 @@ BOOST_AUTO_TEST_CASE (placesListOrder)
 		const PTRoutePlannerResult::PlacesList& l(r.getOrderedPlaces());
 		PTRoutePlannerResult::PlacesList::const_iterator itl(l.begin());
 		BOOST_REQUIRE(itl != l.end());
-		BOOST_CHECK_EQUAL(itl->place, &CA);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CA.getName());
 		++itl;
 		BOOST_REQUIRE(itl != l.end());
-		BOOST_CHECK_EQUAL(itl->place, &CB);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CB.getName());
+		++itl;
 		BOOST_CHECK(itl == l.end());
 	}
 
 	Journey j1;
 	ServicePointer sp1_0(false, DEPARTURE_TO_ARRIVAL, 0, &A);
+	sp1_0.setService(&S);
 	ServiceUse s1_0(sp1_0,&C);
 	j1 = Journey(j1, s1_0);
 	ServicePointer sp1_1(false, DEPARTURE_TO_ARRIVAL, 0, &C);
+	sp1_1.setService(&S);
 	ServiceUse s1_1(sp1_1,&B);
 	j1 = Journey(j1, s1_1);
 	j.push_back(j1);
@@ -98,15 +131,210 @@ BOOST_AUTO_TEST_CASE (placesListOrder)
 		const PTRoutePlannerResult::PlacesList& l(r.getOrderedPlaces());
 		PTRoutePlannerResult::PlacesList::const_iterator itl(l.begin());
 		BOOST_REQUIRE(itl != l.end());
-		BOOST_CHECK_EQUAL(itl->place, &CA);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CA.getName());
 		++itl;
 		BOOST_REQUIRE(itl != l.end());
-		BOOST_CHECK_EQUAL(itl->place, &CC);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
 		++itl;
 		BOOST_REQUIRE(itl != l.end());
-		BOOST_CHECK_EQUAL(itl->place, &CB);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CB.getName());
+		++itl;
 		BOOST_CHECK(itl == l.end());
 	}
 
+	Journey j2;
+	ServicePointer sp2_0(false, DEPARTURE_TO_ARRIVAL, 0, &A);
+	sp2_0.setService(&S);
+	ServiceUse s2_0(sp2_0,&D);
+	j2 = Journey(j2, s2_0);
+	ServicePointer sp2_1(false, DEPARTURE_TO_ARRIVAL, 0, &D);
+	sp2_1.setService(&S);
+	ServiceUse s2_1(sp2_1,&B);
+	j2 = Journey(j2, s2_1);
+	j.push_back(j2);
+
+	{
+		PTRoutePlannerResult r(&CA, &CB, false, j);
+		const PTRoutePlannerResult::PlacesList& l(r.getOrderedPlaces());
+		PTRoutePlannerResult::PlacesList::const_iterator itl(l.begin());
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CA.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CB.getName());
+		++itl;
+		BOOST_CHECK(itl == l.end());
+	}
+
+	Journey j3;
+	ServicePointer sp3_0(false, DEPARTURE_TO_ARRIVAL, 0, &A);
+	sp3_0.setService(&S);
+	ServiceUse s3_0(sp3_0,&C);
+	j3 = Journey(j3, s3_0);
+	ServicePointer sp3_1(false, DEPARTURE_TO_ARRIVAL, 0, &C);
+	sp3_1.setService(&S);
+	ServiceUse s3_1(sp3_1,&D);
+	j3 = Journey(j3, s3_1);
+	ServicePointer sp3_2(false, DEPARTURE_TO_ARRIVAL, 0, &D);
+	sp3_2.setService(&S);
+	ServiceUse s3_2(sp3_2,&B);
+	j3 = Journey(j3, s3_2);
+	j.push_back(j3);
+
+	{
+		PTRoutePlannerResult r(&CA, &CB, false, j);
+		const PTRoutePlannerResult::PlacesList& l(r.getOrderedPlaces());
+		PTRoutePlannerResult::PlacesList::const_iterator itl(l.begin());
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CA.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CB.getName());
+		++itl;
+		BOOST_CHECK(itl == l.end());
+	}
+
+	Journey j4;
+	ServicePointer sp4_0(false, DEPARTURE_TO_ARRIVAL, 0, &A);
+	sp4_0.setService(&S);
+	ServiceUse s4_0(sp4_0,&E);
+	j4 = Journey(j4, s4_0);
+	ServicePointer sp4_1(false, DEPARTURE_TO_ARRIVAL, 0, &E);
+	sp4_1.setService(&S);
+	ServiceUse s4_1(sp4_1,&F);
+	j4 = Journey(j4, s4_1);
+	ServicePointer sp4_2(false, DEPARTURE_TO_ARRIVAL, 0, &F);
+	sp4_2.setService(&S);
+	ServiceUse s4_2(sp4_2,&B);
+	j4 = Journey(j4, s4_2);
+	j.push_back(j4);
+
+	{
+		PTRoutePlannerResult r(&CA, &CB, false, j);
+		const PTRoutePlannerResult::PlacesList& l(r.getOrderedPlaces());
+		PTRoutePlannerResult::PlacesList::const_iterator itl(l.begin());
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CA.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CE.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CF.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CB.getName());
+		++itl;
+		BOOST_CHECK(itl == l.end());
+	}
+
+	Journey j5;
+	ServicePointer sp5_0(false, DEPARTURE_TO_ARRIVAL, 0, &A);
+	sp5_0.setService(&S);
+	ServiceUse s5_0(sp5_0,&C);
+	j5 = Journey(j5, s5_0);
+	ServicePointer sp5_1(false, DEPARTURE_TO_ARRIVAL, 0, &C);
+	sp5_1.setService(&S);
+	ServiceUse s5_1(sp5_1,&D);
+	j5 = Journey(j5, s5_1);
+	ServicePointer sp5_2(false, DEPARTURE_TO_ARRIVAL, 0, &D);
+	sp5_2.setService(&S);
+	ServiceUse s5_2(sp5_2,&E);
+	j5 = Journey(j5, s5_2);
+	ServicePointer sp5_3(false, DEPARTURE_TO_ARRIVAL, 0, &E);
+	sp5_3.setService(&S);
+	ServiceUse s5_3(sp5_3,&F);
+	j5 = Journey(j5, s5_3);
+	ServicePointer sp5_4(false, DEPARTURE_TO_ARRIVAL, 0, &F);
+	sp5_4.setService(&S);
+	ServiceUse s5_4(sp5_4,&B);
+	j5 = Journey(j5, s5_4);
+	j.push_back(j5);
+
+	{
+		PTRoutePlannerResult r(&CA, &CB, false, j);
+		const PTRoutePlannerResult::PlacesList& l(r.getOrderedPlaces());
+		PTRoutePlannerResult::PlacesList::const_iterator itl(l.begin());
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CA.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CE.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CF.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CB.getName());
+		++itl;
+		BOOST_CHECK(itl == l.end());
+	}
+
+	Journey j6;
+	ServicePointer sp6_0(false, DEPARTURE_TO_ARRIVAL, 0, &A);
+	sp6_0.setService(&S);
+	ServiceUse s6_0(sp6_0,&D);
+	j6 = Journey(j6, s6_0);
+	ServicePointer sp6_1(false, DEPARTURE_TO_ARRIVAL, 0, &D);
+	sp6_1.setService(&S);
+	ServiceUse s6_1(sp6_1,&C);
+	j6 = Journey(j6, s6_1);
+	ServicePointer sp6_2(false, DEPARTURE_TO_ARRIVAL, 0, &C);
+	sp6_2.setService(&S);
+	ServiceUse s6_2(sp6_2,&B);
+	j6 = Journey(j6, s6_2);
+	j.push_back(j6);
+
+	{
+		PTRoutePlannerResult r(&CA, &CB, false, j);
+		const PTRoutePlannerResult::PlacesList& l(r.getOrderedPlaces());
+		PTRoutePlannerResult::PlacesList::const_iterator itl(l.begin());
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CA.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CE.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CF.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CB.getName());
+		++itl;
+		BOOST_CHECK(itl == l.end());
+	}
 }
 

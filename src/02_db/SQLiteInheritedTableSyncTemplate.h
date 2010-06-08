@@ -157,25 +157,27 @@ namespace synthese
 				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
 				while (rows->next ())
 				{
+					util::RegistryKeyType key(rows->getKey());
 					try
 					{
-						if(registry.contains(rows->getKey()))
+						if(registry.contains(key))
 						{
-							r.push_back(registry.getEditable(rows->getKey()));
+							r.push_back(registry.getEditable(key));
 						}
 						else
 						{
-							boost::shared_ptr<ObjectClass> object(new ObjectClass(rows->getKey()));
-							Load(object.get(), rows, env, linkLevel);
+							boost::shared_ptr<ObjectClass> object(new ObjectClass(key));
 							registry.add(
 								boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
 							);
+							Load(object.get(), rows, env, linkLevel);
 							r.push_back(
 								boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
 							);
 					}	}
 					catch(std::exception& e)
 					{
+						registry.remove(key);
 						util::Log::GetInstance().warn("Skipped object in results load of " + query, e);
 				}	}
 				return r;

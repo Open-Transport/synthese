@@ -48,27 +48,6 @@ namespace synthese
 
 	namespace ptrouteplanner
 	{
-		bool PTRoutePlannerResult::getSamePlaces() const
-		{
-			return _samePlaces;
-		}
-
-
-
-		const PTRoutePlannerResult::Journeys& PTRoutePlannerResult::getJourneys() const
-		{
-			return _journeys;
-		}
-
-
-
-		const PTRoutePlannerResult::PlaceList& PTRoutePlannerResult::getOrderedPlaces() const
-		{
-			return _orderedPlaces;
-		}
-
-
-
 		PTRoutePlannerResult::PTRoutePlannerResult(
 			const geography::Place* departurePlace,
 			const geography::Place* arrivalPlace,
@@ -79,71 +58,7 @@ namespace synthese
 			_samePlaces(samePlaces),
 			_journeys(journeys)
 		{
-			// Variables locales
-			size_t i;
-			optional<size_t> dernieri;
-
-			// Allocation
-			_orderedPlaces.clear();
-
-			// Horizontal loop
-			for (Journeys::const_iterator it(_journeys.begin()); it != _journeys.end(); ++it)
-			{
-				i = 0;
-				dernieri = optional<size_t>();
-
-				// Vertical loop
-				const Journey::ServiceUses& jl(it->getServiceUses());
-				for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
-				{
-					const ServiceUse& curET(*itl);
-
-					// Search of the place from the preceding one
-					if (itl == jl.begin())
-					{
-						const NamedPlace* placeToSearch(
-							dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub()) ?
-							dynamic_cast<const NamedPlace*>(_departurePlace) :
-							dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub())
-						);
-						assert(placeToSearch);
-
-						if(_ordrePARechercheGare(i, placeToSearch))
-						{
-							if (dernieri && i < *dernieri )
-								i = _ordrePAEchangeSiPossible(i, *dernieri);
-						}
-						else
-						{
-							i = _ordrePAInsere(placeToSearch, dernieri ? *dernieri + 1 : 0, itl == jl.begin(), false);
-						}
-
-						dernieri = i;
-						++i;
-					}
-
-					const NamedPlace* placeToSearch(
-						dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?
-						(itl == jl.end()-1 ? dynamic_cast<const NamedPlace*>(_arrivalPlace) : NULL) :
-						dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub())
-					);
-					if(placeToSearch)
-					{
-						if(_ordrePARechercheGare(i, placeToSearch))
-						{
-							if (dernieri && i < *dernieri )
-							{
-								i = _ordrePAEchangeSiPossible(*dernieri, i );
-							}
-						}
-						else
-						{
-							i = _ordrePAInsere(placeToSearch, dernieri ? *dernieri + 1 : 0, false, itl == jl.end()-1);
-						}
-						dernieri = i;
-					}
-				}
-			}
+			_buildPlacesList();
 		}
 
 
@@ -155,171 +70,6 @@ namespace synthese
 			_journeys = other._journeys;
 			_orderedPlaces = other._orderedPlaces;
 			_samePlaces = other._samePlaces;
-		}
-
-
-
-		bool PTRoutePlannerResult::_ordrePARechercheGare(
-			size_t& i,
-			const geography::NamedPlace* GareAChercher
-		){
-			// Recherche de la gare en suivant ï¿ partir de la position i
-			for(;
-				i < _orderedPlaces.size() && _orderedPlaces[i].place != NULL && _orderedPlaces[ i ].place != GareAChercher;
-				++i
-			) ;
-
-			// Gare trouvï¿e en suivant avant la fin du tableau
-			if (i < _orderedPlaces.size() && _orderedPlaces[i].place != NULL )
-				return true;
-
-			// Recherche de position antï¿rieure ï¿ i
-			for(i = 0;
-				i < _orderedPlaces.size() && _orderedPlaces[ i ].place != NULL && _orderedPlaces[i].place != GareAChercher;
-				++i
-			) ;
-
-			return i < _orderedPlaces.size() && _orderedPlaces[ i ].place != NULL;
-		}
-
-
-
-		std::vector<bool> PTRoutePlannerResult::_ordrePAConstruitLignesAPermuter(
-			const graph::Journey& __TrajetATester,
-			size_t LigneMax
-		) const {
-			vector<bool> result;
-			size_t l(0);
-			const ServiceUse* curET((l >= __TrajetATester.size()) ? NULL : &__TrajetATester.getJourneyLeg (l));
-			for (size_t i(0); i <= LigneMax && _orderedPlaces[ i ].place != NULL; i++ )
-			{
-				if(	curET != NULL &&
-					_orderedPlaces[i].place == dynamic_cast<const NamedPlace*>(curET->getDepartureEdge()->getHub())
-				){
-					result.push_back(true);
-					++l;
-					curET = (l >= __TrajetATester.size()) ? NULL : &__TrajetATester.getJourneyLeg (l);
-				}
-				else
-				{
-					result.push_back(false);
-				}
-			}
-			return result;
-		}
-
-
-
-		std::size_t PTRoutePlannerResult::_ordrePAInsere(
-			const geography::NamedPlace* place,
-			std::size_t position,
-			bool isLockedAtTheTop,
-			bool isLockedAtTheEnd
-		){
-			if (isLockedAtTheEnd)
-				position = _orderedPlaces.size();
-			else if (isLockedAtTheTop)
-				position = 0;
-			else
-				for (; position < _orderedPlaces.size() && _orderedPlaces[position].isOrigin; ++position) ;
-
-			// Insertion
-			PlaceInformation pi;
-			pi.isOrigin = isLockedAtTheTop;
-			pi.isDestination = isLockedAtTheEnd;
-			pi.place = place;
-
-			_orderedPlaces.insert(_orderedPlaces.begin() + position, pi);
-
-			// Retour de la position choisie
-			return position;
-		}
-
-
-
-		std::size_t PTRoutePlannerResult::_ordrePAEchangeSiPossible(
-			std::size_t PositionActuelle,
-			std::size_t PositionSouhaitee
-		){
-			vector<bool> LignesAPermuter(PositionActuelle + 1, false);
-			bool Echangeable(true);
-			PlaceInformation tempGare;
-			size_t i;
-			size_t j;
-
-			// Construction de l'ensemble des lignes a permuter
-			LignesAPermuter[ PositionActuelle ] = true;
-			for (Journeys::const_iterator it = _journeys.begin(); it != _journeys.end(); ++it)
-			{
-				vector<bool> curLignesET = _ordrePAConstruitLignesAPermuter(*it, PositionActuelle );
-				for ( i = PositionActuelle; i > PositionSouhaitee; --i)
-					if ( curLignesET[ i ] && LignesAPermuter[ i ] )
-						break;
-				for ( ; i > PositionSouhaitee; --i)
-					if ( curLignesET[ i ] )
-						LignesAPermuter[ i ] = true;
-			}
-
-			// Tests d'ï¿changeabilitï¿ binaire
-			// A la premiere contradiction on s'arrete
-			for(Journeys::const_iterator it = _journeys.begin(); it != _journeys.end(); ++it)
-			{
-				vector<bool> curLignesET = _ordrePAConstruitLignesAPermuter(*it, PositionActuelle );
-				i = PositionSouhaitee;
-				for ( j = PositionSouhaitee; true; ++j)
-				{
-					for (; i<LignesAPermuter.size() && !LignesAPermuter[i]; ++i) ;
-
-					if ( i > PositionActuelle )
-						break;
-
-					if ( curLignesET[ i ] && curLignesET[ j ] && !LignesAPermuter[ j ] )
-					{
-						Echangeable = false;
-						break;
-					}
-					i++;
-				}
-				if ( !Echangeable )
-					break;
-			}
-
-			// Echange ou insertion
-			if ( Echangeable )
-			{
-				for ( j = 0; true; ++j)
-				{
-					for(i = j; i < LignesAPermuter.size() && !LignesAPermuter[ i ] && i <= PositionActuelle; ++i) ;
-
-					if ( i > PositionActuelle )
-						break;
-
-					LignesAPermuter[ i ] = false;
-
-					tempGare = _orderedPlaces[ i ];
-					for ( ; i > PositionSouhaitee + j; --i)
-						_orderedPlaces[i] = _orderedPlaces[i-1];
-
-					_orderedPlaces[ i ] = tempGare;
-				}
-				return PositionSouhaitee + j;
-			}
-			else
-				return _ordrePAInsere(_orderedPlaces[ PositionSouhaitee ].place, PositionActuelle + 1, false, false);
-		}
-
-
-
-		const geography::Place* PTRoutePlannerResult::getDeparturePlace() const
-		{
-			return _departurePlace;
-		}
-
-
-
-		const geography::Place* PTRoutePlannerResult::getArrivalPlace() const
-		{
-			return _arrivalPlace;
 		}
 
 
@@ -513,6 +263,185 @@ namespace synthese
 			for(size_t i(0); i<value; ++i)
 			{
 				_journeys.pop_front();
+			}
+		}
+
+
+
+		void PTRoutePlannerResult::_buildPlacesList()
+		{
+			_orderedPlaces.clear();
+
+			for(Journeys::const_iterator itj(_journeys.begin()); itj != _journeys.end(); ++itj)
+			{
+				const Journey::ServiceUses& jl(itj->getServiceUses());
+				vector<PlacesList::iterator> placePositions;
+				PlacesList::iterator minPos(_orderedPlaces.begin());
+
+				for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
+				{
+					const ServiceUse& leg(*itl);
+
+					if(itl == jl.begin())
+					{
+						PlacesList::iterator pos(
+							_putPlace(
+								PlacesList::value_type(
+									dynamic_cast<const Crossing*>(leg.getDepartureEdge()->getHub()) ?
+										dynamic_cast<const NamedPlace*>(_departurePlace) :
+										dynamic_cast<const NamedPlace*>(leg.getDepartureEdge()->getHub()),
+									true,
+									false
+								), minPos
+						)	);
+						placePositions.push_back(pos);
+						minPos = ++pos;
+					}
+
+					PlacesList::iterator pos(
+						_putPlace(
+							PlacesList::value_type(
+								dynamic_cast<const Crossing*>(leg.getArrivalEdge()->getHub()) ?
+									dynamic_cast<const NamedPlace*>(_arrivalPlace) :
+									dynamic_cast<const NamedPlace*>(leg.getArrivalEdge()->getHub()),
+									false,
+									itl+1 == jl.end()
+							), minPos
+					)	);
+					placePositions.push_back(pos);
+					minPos = ++pos;
+				}
+				_journeysPlacePositions.insert(make_pair(itj, placePositions));
+			}
+		}
+
+
+
+		PTRoutePlannerResult::PlacesList::iterator PTRoutePlannerResult::_putPlace(
+			PlacesList::value_type value,
+			PlacesList::iterator minPos
+		){
+			if(!_orderedPlaces.empty())
+			{
+				PlacesList::iterator testPos;
+				// Search of the place after the minimal position
+				for(testPos = minPos;
+					testPos != _orderedPlaces.end() && testPos->place != value.place;
+					++testPos) ;
+
+				// If found, return of the position
+				if(testPos != _orderedPlaces.end())
+				{
+					return testPos;
+				}
+
+				// If not found, search of the place before the minimal position
+				if(minPos != _orderedPlaces.begin())
+				{
+					testPos = minPos;
+					for(--testPos;
+						testPos != _orderedPlaces.begin() && testPos->place != value.place;
+						--testPos) ;
+				}
+
+				// If found, try to swap items
+				if(testPos != _orderedPlaces.begin() && _canBeSwapped(testPos, minPos))
+				{
+					_swap(testPos, minPos);
+					return testPos;
+				}
+			}
+
+			// Else insert a new row
+			return _orderedPlaces.insert(
+				minPos,
+				value
+			);
+		}
+
+
+
+		PTRoutePlannerResult::PlacesList::iterator PTRoutePlannerResult::_getHighestPosition(
+			PlacesList::iterator source,
+			PlacesList::iterator target
+		) const {
+			PlacesList::iterator result(source);
+			PlacesList::const_iterator brake(_orderedPlaces.end());
+			BOOST_FOREACH(const JourneysPlacePositions::value_type& its, _journeysPlacePositions)
+			{
+				const JourneysPlacePositions::mapped_type& sequence(its.second);
+
+				// Search of the source iterator in the sequence
+				JourneysPlacePositions::mapped_type::const_iterator curPos;
+				for(curPos = sequence.begin(); curPos != sequence.end() && *curPos != source; ++curPos) ;
+
+				// If not found or if it is the last place, ok
+				if(curPos == sequence.end() || curPos + 1 == sequence.end())
+				{
+					continue;
+				}
+
+				// If found, search where the row can be pushed
+				PlacesList::iterator itNewPos;
+				for(itNewPos = (*curPos);
+					itNewPos != brake && itNewPos != *(curPos+1);
+					++itNewPos)
+				{
+					result = itNewPos;
+					++result;
+					if(result == target)
+					{
+						break;
+					}
+				}
+				
+				// If next element of the journey was found, it is the new brake
+				if(itNewPos == *(curPos + 1))
+				{
+					brake = *(curPos + 1);
+					continue;
+				}
+			}
+
+			return result;
+		}
+
+
+
+		bool PTRoutePlannerResult::_canBeSwapped(
+			PlacesList::iterator source,
+			PlacesList::iterator target
+		) const {
+			PlacesList::iterator maxPos(_getHighestPosition(source, target));
+			if(maxPos == target)
+			{
+				return true;
+			}
+			PlacesList::iterator nextMaxPos(maxPos);
+			++nextMaxPos;
+			if(maxPos != target && nextMaxPos != _orderedPlaces.end() && nextMaxPos != target)
+			{
+				return _canBeSwapped(maxPos, target);
+			}
+			return false;
+		}
+
+
+
+		void PTRoutePlannerResult::_swap(
+			PlacesList::iterator source,
+			PlacesList::iterator target
+		){
+			PlacesList::iterator maxPos(_getHighestPosition(source, target));
+			if(maxPos == target)
+			{
+				_orderedPlaces.splice(target, _orderedPlaces, source);
+				return;
+			}
+			if(maxPos != target)
+			{
+				_swap(maxPos, target);
+				_orderedPlaces.splice(maxPos, _orderedPlaces, source);
 			}
 		}
 	}
