@@ -241,7 +241,10 @@ namespace synthese
 					}	}
 					catch(std::exception& e)
 					{
-						registry.remove(key);
+						if(registry.contains(key))
+						{
+							registry.remove(key);
+						}
 						util::Log::GetInstance().warn("Skipped object in results load of " + query, e);
 				}	}
 				return result;
