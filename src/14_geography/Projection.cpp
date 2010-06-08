@@ -38,7 +38,7 @@ namespace synthese
 
 	namespace geography
 	{
-		const projPJ PROJ_LAMBERTIIE(pj_init_plus("+proj=lcc +nadgrids=./ntf_r93.gsb,null +a=6378249.2000 +rf=293.4660210000000 +pm=2.337229167 +lat_0=46.800000000 +lon_0=0.000000000 +k_0=0.99987742 +lat_1=46.800000000 +x_0=600000.000 +y_0=2200000.000 +units=m +no_defs <>"));
+		const projPJ PROJ_LAMBERTIIE(pj_init_plus("+proj=lcc +towgs84=-168.0000,-60.0000,320.0000 +a=6378249.2000 +rf=293.4660210000000 +pm=2.337229167 +lat_0=46.800000000 +lon_0=0.000000000 +k_0=0.99987742 +lat_1=46.800000000 +x_0=600000.000 +y_0=2200000.000 +units=m +no_defs <>"));
 		const projPJ PROJ_WGS84(pj_init_plus("+proj=longlat +towgs84=0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.000000 +a=6378137.0000 +rf=298.2572221010000 +units=m +no_defs <>"));
 
 		GeoPoint WGS84FromLambert(
