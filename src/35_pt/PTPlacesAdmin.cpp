@@ -310,7 +310,9 @@ namespace synthese
 			// TAB CONNECTION PLACES
 			if (openTabContent(stream, TAB_CONNECTION_PLACES))
 			{
-				AdminFunctionRequest<PTPlaceAdmin> searchRequest(request);
+				stream << "<h1>Recherche</h1>";
+				AdminFunctionRequest<PTPlacesAdmin> searchRequest(request);
+				searchRequest.getPage()->setCity(_city);
 				SearchFormHTMLTable st(searchRequest.getHTMLForm("connsearch"));
 				stream << st.open();
 				if(!_city.get())
@@ -320,16 +322,21 @@ namespace synthese
 				stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
 				stream << st.close();
 
+				stream << "<h1>Résultats</h1>";
+
 				ConnectionPlaceTableSync::SearchResult places(
 					ConnectionPlaceTableSync::Search(
 						Env::GetOfficialEnv(),
 						_city.get() ? _city->getKey() : optional<RegistryKeyType>(),
 						logic::indeterminate,
 						optional<string>(),
-						_searchName.empty() ? string() : ("%"+ _searchName +"%"),
-						_city.get() ? optional<string>() : (_searchCity.empty() ? string() : ("%"+ _searchCity +"%"))
-					)
-				);
+						_searchName.empty() ? optional<string>() : ("%"+ _searchName +"%"),
+						_city.get() ? optional<string>() : (_searchCity.empty() ? string() : ("%"+ _searchCity +"%")),
+						true,
+						true,
+						0,
+						50
+				)	);
 
 				AdminActionFunctionRequest<StopAreaAddAction,PTPlaceAdmin> stopAddRequest(request);
 				stopAddRequest.getAction()->setCity(const_pointer_cast<City>(_city));
