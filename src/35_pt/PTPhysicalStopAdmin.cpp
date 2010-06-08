@@ -147,7 +147,13 @@ namespace synthese
 
 		std::string PTPhysicalStopAdmin::getTitle() const
 		{
-			return _stop.get() ? _stop->getConnectionPlace()->getFullName() + "/" + _stop->getName() : DEFAULT_TITLE;
+			return
+				_stop.get() ?
+				(_stop->getName().empty() ?
+					lexical_cast<string>(_stop->getKey()) :
+					_stop->getName()) :
+				DEFAULT_TITLE
+			;
 		}
 
 

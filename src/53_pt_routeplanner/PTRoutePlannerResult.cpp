@@ -298,18 +298,22 @@ namespace synthese
 						minPos = ++pos;
 					}
 
-					PlacesList::iterator pos(
-						_putPlace(
-							PlacesList::value_type(
-								dynamic_cast<const Crossing*>(leg.getArrivalEdge()->getHub()) ?
-									dynamic_cast<const NamedPlace*>(_arrivalPlace) :
-									dynamic_cast<const NamedPlace*>(leg.getArrivalEdge()->getHub()),
+					if(	!dynamic_cast<const Crossing*>(leg.getArrivalEdge()->getHub()) ||
+						itl+1 == jl.end()
+					){
+						PlacesList::iterator pos(
+							_putPlace(
+								PlacesList::value_type(
+									dynamic_cast<const Crossing*>(leg.getArrivalEdge()->getHub()) ?
+										dynamic_cast<const NamedPlace*>(_arrivalPlace) :
+										dynamic_cast<const NamedPlace*>(leg.getArrivalEdge()->getHub()),
 									false,
 									itl+1 == jl.end()
-							), minPos
-					)	);
-					placePositions.push_back(pos);
-					minPos = ++pos;
+								), minPos
+						)	);
+						placePositions.push_back(pos);
+						minPos = ++pos;
+					}
 				}
 				_journeysPlacePositions.insert(make_pair(itj, placePositions));
 			}
@@ -342,19 +346,19 @@ namespace synthese
 					for(--testPos;
 						testPos != _orderedPlaces.begin() && testPos->place != value.place;
 						--testPos) ;
-				}
 
-				// If found, try to swap items
-				if(testPos != _orderedPlaces.begin() && _canBeSwapped(testPos, minPos))
-				{
-					_swap(testPos, minPos);
-					return testPos;
+					// If found, try to swap items
+					if(testPos != _orderedPlaces.begin() && _canBeSwapped(testPos, minPos))
+					{
+						_swap(testPos, minPos);
+						return testPos;
+					}
 				}
 			}
 
 			// Else insert a new row
 			return _orderedPlaces.insert(
-				minPos,
+				value.isDestination ? _orderedPlaces.end() : minPos,
 				value
 			);
 		}
