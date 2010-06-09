@@ -689,7 +689,7 @@ namespace synthese
 			}
 			else
 			{
-				estimatedTotalDuration = ceil(_totalDistance * 0.36);
+				estimatedTotalDuration = ceil(_totalDistance * 0.036);
 			}
 			long long unsigned int distanceToEnd(journey.getDistanceToEnd());
 			long long unsigned int journeyDuration(
@@ -703,8 +703,9 @@ namespace synthese
 			Journey::Score score(
 				(_totalDistance == 0 || estimatedTotalDuration == 0) ?
 				1000 :
-				static_cast<long long unsigned int>(1000 * distanceToEnd * distanceToEnd * journeyDuration) /
-				static_cast<long long unsigned int>(_totalDistance * _totalDistance * estimatedTotalDuration)
+				(20*(estimatedTotalDuration - journeyDuration))/distanceToEnd
+//				static_cast<long long unsigned int>(1000 * distanceToEnd * distanceToEnd * journeyDuration) /
+//				static_cast<long long unsigned int>(_totalDistance * _totalDistance * estimatedTotalDuration)
 			);
 
 
