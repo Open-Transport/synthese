@@ -103,7 +103,6 @@ namespace synthese
 			_parentContinuousService(continuousService),
 			_journeyTemplates(graphToUse)
 		{
-			assert(continuousService.getContinuousServiceRange().total_seconds() > 60);
 		}
 
 

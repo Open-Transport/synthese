@@ -1075,6 +1075,12 @@ namespace synthese
 						}
 					}
 
+					// Bug 7694 : fulfill unused arrival rows
+					for(++itSheetRow; itSheetRow != sheetRows.end(); ++itSheetRow)
+					{
+						**itSheetRow << "<cell />";
+					}
+
 					if(!_outputRoadApproachDetail && lastApproachBeginning != jl.end())
 					{
 						const Road* road(dynamic_cast<const Road*> ((jl.end()-1)->getService()->getPath ()));

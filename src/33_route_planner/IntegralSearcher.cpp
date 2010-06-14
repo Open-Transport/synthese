@@ -689,7 +689,7 @@ namespace synthese
 			}
 			else
 			{
-				estimatedTotalDuration = ceil(_totalDistance * 0.036);
+				estimatedTotalDuration = ceil(_totalDistance * 3.6);
 			}
 			long long unsigned int distanceToEnd(journey.getDistanceToEnd());
 			long long unsigned int journeyDuration(

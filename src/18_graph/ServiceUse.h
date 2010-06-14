@@ -46,8 +46,39 @@ namespace synthese
 			//@}
 
 		public:
-			ServiceUse(const ServicePointer& servicePointer, const Edge* edge);
-			
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor with automatic ending time calculation.
+			/// @param servicePointer beginning of the journey (departure if DEPARTURE_TO_ARRIVAL mode, arrival if ARRIVAL_TO_DEPARTURE mode)
+			/// @param edge ending point of the journey (arrival edge if DEPARTURE_TO_ARRIVAL mode, departure edge if ARRIVAL_TO_DEPARTURE mode)
+			/// The constructor initializes to real time vertex to the theoretical value.
+			//////////////////////////////////////////////////////////////////////////
+			ServiceUse(
+				const ServicePointer& servicePointer,
+				const Edge* edge
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor without automatic ending time calculation.
+			/// @param servicePointer beginning of the journey (departure if DEPARTURE_TO_ARRIVAL mode, arrival if ARRIVAL_TO_DEPARTURE mode)
+			/// @param edge ending point of the journey (arrival edge if DEPARTURE_TO_ARRIVAL mode, departure edge if ARRIVAL_TO_DEPARTURE mode)
+			/// @param dateTime ending time of the journey (arrival time if DEPARTURE_TO_ARRIVAL mode, departure time if ARRIVAL_TO_DEPARTURE mode)
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.18
+			//////////////////////////////////////////////////////////////////////////
+			/// The constructor initializes to real time vertex to the theoretical value.
+			ServiceUse(
+				const ServicePointer& servicePointer,
+				const Edge* edge,
+				boost::posix_time::ptime dateTime
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor of an empty object.
 			ServiceUse();
 			
 

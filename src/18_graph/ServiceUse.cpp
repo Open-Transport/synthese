@@ -52,6 +52,19 @@ namespace synthese
 		}
 
 
+
+		ServiceUse::ServiceUse(
+			const ServicePointer& servicePointer,
+			const Edge* edge,
+			boost::posix_time::ptime dateTime
+		):	ServicePointer(servicePointer),
+			_secondEdge(edge),
+			_secondRTVertex(edge->getFromVertex()),
+			_secondActualDateTime(dateTime)
+		{
+		}
+
+
 		const Edge* ServiceUse::getDepartureEdge() const
 		{
 			return (_determinationMethod == DEPARTURE_TO_ARRIVAL)
