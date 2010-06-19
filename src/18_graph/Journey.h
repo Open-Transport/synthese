@@ -50,7 +50,7 @@ namespace synthese
 		private:
 			typedef const ServiceUse& (Journey::*ServiceUseGetter) () const;
 			typedef const Edge* (Journey::*EdgeGetter) () const;
-			typedef boost::posix_time::ptime (Journey::*DateTimeGetter) () const;
+			typedef boost::posix_time::ptime (Journey::*DateTimeGetter) (bool) const;
 			typedef void (Journey::*JourneyPusher) (const Journey& journey);
 			typedef void (Journey::*ServiceUsePusher) (const ServiceUse& serviceUse);
 
@@ -161,11 +161,11 @@ namespace synthese
 				const Edge* getDestination() const;
 
 				const Edge* getEndEdge() const;
-				boost::posix_time::ptime getEndTime() const;
-				boost::posix_time::ptime getBeginTime() const;
+				boost::posix_time::ptime getEndTime(bool includeApproach = true) const;
+				boost::posix_time::ptime getBeginTime(bool includeApproach = true) const;
 
-				boost::posix_time::ptime getDepartureTime () const;
-				boost::posix_time::ptime getArrivalTime () const;
+				boost::posix_time::ptime getDepartureTime (bool includeApproach = true) const;
+				boost::posix_time::ptime getArrivalTime (bool includeApproach = true) const;
 
 				boost::posix_time::time_duration getDuration () const;
 				double getDistance () const;

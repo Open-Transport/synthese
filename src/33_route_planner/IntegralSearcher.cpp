@@ -138,7 +138,7 @@ namespace synthese
 			_integralSearch(
 				vam,
 				startJourney,
-				startJourney.getEndTime(),
+				startJourney.getEndTime(false),
 				_minMaxDateTimeAtDestination,
 				maxDepth,
 				totalDuration

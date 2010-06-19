@@ -199,10 +199,11 @@ namespace synthese
 
 
 
-		boost::posix_time::ptime Journey::getDepartureTime () const
-		{
+		ptime Journey::getDepartureTime(
+			bool includeApproach
+		) const	{
 			boost::posix_time::ptime d(getFirstJourneyLeg ().getDepartureDateTime());
-			if (d.is_not_a_date_time())
+			if (!includeApproach || d.is_not_a_date_time())
 				return d;
 			d -= (_method == DEPARTURE_TO_ARRIVAL) ? _startApproachDuration : _endApproachDuration;
 			return d;
@@ -210,10 +211,11 @@ namespace synthese
 
 
 
-		ptime Journey::getArrivalTime () const
-		{
+		ptime Journey::getArrivalTime(
+			bool includeApproach
+		) const	{
 			ptime d(getLastJourneyLeg ().getArrivalDateTime());
-			if (d.is_not_a_date_time())
+			if (!includeApproach || d.is_not_a_date_time())
 				return d;
 			d += (_method == DEPARTURE_TO_ARRIVAL) ? _endApproachDuration : _startApproachDuration;
 			return d;
@@ -456,20 +458,22 @@ namespace synthese
 			return (this->*_endEdgeGetter)();
 		}
 
-		ptime Journey::getEndTime() const
-		{
+		ptime Journey::getEndTime(
+			bool includeApproach
+		) const	{
 			assert(_method != UNDEFINED_DIRECTION);
 
-			return (this->*_endDateTimeGetter)();
+			return (this->*_endDateTimeGetter)(includeApproach);
 		}
 
 
 
-		ptime Journey::getBeginTime() const
-		{
+		ptime Journey::getBeginTime(
+			bool includeApproach
+		) const	{
 			assert(_method != UNDEFINED_DIRECTION);
 
-			return (this->*_beginDateTimeGetter)();
+			return (this->*_beginDateTimeGetter)(includeApproach);
 		}
 
 
