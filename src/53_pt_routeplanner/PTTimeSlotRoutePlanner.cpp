@@ -294,7 +294,14 @@ namespace synthese
 			// Handle of the case of possible full road approach
 			if(	ovam.intersercts(dvam)
 			){
-				result.push_back(ovam.getBestIntersection(dvam));
+				Journey resultJourney(ovam.getBestIntersection(dvam));
+				ptime departureTime(resultJourney.getFirstDepartureTime(false));
+				if(departureTime.time_of_day().seconds())
+				{
+					resultJourney.shift(seconds(60 - departureTime.time_of_day().seconds()), resultJourney.getContinuousServiceRange());
+				}
+
+				result.push_back(resultJourney);
 			}
 
 			if(result.empty())

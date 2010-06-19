@@ -137,9 +137,9 @@ namespace synthese
 					map.insert(PARAMETER_DESTINATION_CITY, place->getCity()->getName());
 					map.insert(PARAMETER_DESTINATION_PLACE, place->getName());
 				}
-				if (!_journey.getDepartureTime().is_not_a_date_time())
+				if (!_journey.getFirstDepartureTime().is_not_a_date_time())
 				{
-					map.insert(PARAMETER_DATE_TIME, _journey.getDepartureTime());
+					map.insert(PARAMETER_DATE_TIME, _journey.getFirstDepartureTime());
 				}
 				if(_site.get())
 				{

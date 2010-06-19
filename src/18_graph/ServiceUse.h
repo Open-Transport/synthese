@@ -107,6 +107,32 @@ namespace synthese
 			//! @name Update
 			//@{
 				void shift(boost::posix_time::time_duration duration);
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Switches the storage method between DEPARTURE_TO_ARRIVAL and ARRIVAL_TO_DEPARTURE.
+				/// @author Hugues Romain
+				//////////////////////////////////////////////////////////////////////////
+				/// Diagram for scheduled service based object :
+				/// @msc
+				///	Dep,Arr;
+				/// Dep=>Arr [label="< pointer | use >"];
+				/// --- [label="reverse"];
+				/// Arr=>Dep [label="< use | pointer >"];
+				/// @endmsc
+				/// 
+				/// Diagram for continuous service based object :
+				/// @msc
+				/// First_Dep,First_Arr,Last_Dep,Last_Arr;
+				/// First_Dep=>First_Arr [label="< pointer | use >"];
+				/// First_Dep>>Last_Dep [label="+range"];
+				/// First_Arr>>Last_Arr [label="+range"];
+				/// --- [label="reverse"];
+				/// Last_Arr=>Last_Dep [label="< use | pointer >"];
+				/// Last_Arr>>First_Arr [label="-range"];
+				/// Last_Dep>>First_Dep [label="-range"];
+				/// @endmsc
+				///
 				void reverse();
 			//@}
 		};

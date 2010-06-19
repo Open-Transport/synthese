@@ -199,10 +199,14 @@ namespace synthese
 
 
 
-		ptime Journey::getDepartureTime(
+		ptime Journey::getFirstDepartureTime(
 			bool includeApproach
 		) const	{
 			boost::posix_time::ptime d(getFirstJourneyLeg ().getDepartureDateTime());
+			if(_method == ARRIVAL_TO_DEPARTURE)
+			{
+				d -= _continuousServiceRange;
+			}
 			if (!includeApproach || d.is_not_a_date_time())
 				return d;
 			d -= (_method == DEPARTURE_TO_ARRIVAL) ? _startApproachDuration : _endApproachDuration;
@@ -211,16 +215,51 @@ namespace synthese
 
 
 
-		ptime Journey::getArrivalTime(
+		ptime Journey::getLastDepartureTime(
+			bool includeApproach
+		) const	{
+			boost::posix_time::ptime d(getFirstJourneyLeg ().getDepartureDateTime());
+			if(_method == DEPARTURE_TO_ARRIVAL)
+			{
+				d += _continuousServiceRange;
+			}
+			if (!includeApproach || d.is_not_a_date_time())
+				return d;
+			d -= (_method == DEPARTURE_TO_ARRIVAL) ? _startApproachDuration : _endApproachDuration;
+			return d;
+		}
+
+
+
+		ptime Journey::getFirstArrivalTime(
 			bool includeApproach
 		) const	{
 			ptime d(getLastJourneyLeg ().getArrivalDateTime());
+			if(_method == ARRIVAL_TO_DEPARTURE)
+			{
+				d -= _continuousServiceRange;
+			}
 			if (!includeApproach || d.is_not_a_date_time())
 				return d;
 			d += (_method == DEPARTURE_TO_ARRIVAL) ? _endApproachDuration : _startApproachDuration;
 			return d;
 		}
 
+
+
+		ptime Journey::getLastArrivalTime(
+			bool includeApproach
+		) const	{
+			ptime d(getLastJourneyLeg ().getArrivalDateTime());
+			if(_method == DEPARTURE_TO_ARRIVAL)
+			{
+				d += _continuousServiceRange;
+			}
+			if (!includeApproach || d.is_not_a_date_time())
+				return d;
+			d += (_method == DEPARTURE_TO_ARRIVAL) ? _endApproachDuration : _startApproachDuration;
+			return d;
+		}
 
 
 		void Journey::_prepend(
@@ -261,13 +300,25 @@ namespace synthese
 
 
 
-		posix_time::time_duration Journey::getDuration () const
-		{
-			if (getDepartureTime().is_not_a_date_time() ||
-				getArrivalTime ().is_not_a_date_time()
-			) return posix_time::time_duration(not_a_date_time);
+		posix_time::time_duration Journey::getDuration(
+			bool includeApproach
+		) const	{
+			if(empty())
+			{
+				return posix_time::time_duration(not_a_date_time);
+			}
+			const ptime& departureTime(getFirstJourneyLeg().getDepartureDateTime());
+			const ptime& arrivalTime(getLastJourneyLeg().getArrivalDateTime());
 		    
-			return getArrivalTime() - getDepartureTime();
+			time_duration duration(arrivalTime - departureTime);
+
+			if(includeApproach)
+			{
+				duration += _startApproachDuration;
+				duration += _endApproachDuration;
+			}
+
+			return duration;
 		}
 
 
@@ -501,8 +552,8 @@ namespace synthese
 				_beginServiceUseGetter = &Journey::getFirstJourneyLeg;
 				_endEdgeGetter = &Journey::getDestination;
 				_beginEdgeGetter = &Journey::getOrigin;
-				_endDateTimeGetter = &Journey::getArrivalTime;
-				_beginDateTimeGetter = &Journey::getDepartureTime;
+				_endDateTimeGetter = &Journey::getFirstArrivalTime;
+				_beginDateTimeGetter = &Journey::getFirstDepartureTime;
 			}
 			else
 			{
@@ -510,8 +561,8 @@ namespace synthese
 				_beginServiceUseGetter = &Journey::getLastJourneyLeg;
 				_endEdgeGetter = &Journey::getOrigin;
 				_beginEdgeGetter = &Journey::getDestination;
-				_endDateTimeGetter = &Journey::getDepartureTime;
-				_beginDateTimeGetter = &Journey::getArrivalTime;
+				_endDateTimeGetter = &Journey::getLastDepartureTime;
+				_beginDateTimeGetter = &Journey::getLastArrivalTime;
 			}
 		}
 

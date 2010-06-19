@@ -125,7 +125,7 @@ namespace synthese
 					it->getReservationCompliance() &&
 					it->getReservationDeadLine() > now
 				){
-					string resaTime(to_simple_string(it->getDepartureTime().date()) +" "+to_simple_string(it->getDepartureTime().time_of_day()));
+					string resaTime(to_simple_string(it->getFirstDepartureTime().date()) +" "+to_simple_string(it->getFirstDepartureTime().time_of_day()));
 					stream <<
 						resaForm->getRadioInput(
 							resaRadioFieldName,

@@ -918,7 +918,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 		BOOST_CHECK(itl == l.end());
 	}
 
-	{ // The actual destination must always be at the end of the table
+	{ // 7798 The actual destination must always be at the end of the table
 		Journey j0;
 		ServicePointer sp0_0(false, DEPARTURE_TO_ARRIVAL, 0, &A);
 		sp0_0.setService(&S);
@@ -960,7 +960,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 		BOOST_CHECK(itl == l.end());
 	}
 
-	{ // The actual destination must always be at the end of the table
+	{ // 7798 The actual destination must always be at the end of the table
 		Journey j0;
 		ServicePointer sp0_0(false, DEPARTURE_TO_ARRIVAL, 0, &D);
 		sp0_0.setService(&S);

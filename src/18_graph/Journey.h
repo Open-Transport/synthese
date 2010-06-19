@@ -164,10 +164,12 @@ namespace synthese
 				boost::posix_time::ptime getEndTime(bool includeApproach = true) const;
 				boost::posix_time::ptime getBeginTime(bool includeApproach = true) const;
 
-				boost::posix_time::ptime getDepartureTime (bool includeApproach = true) const;
-				boost::posix_time::ptime getArrivalTime (bool includeApproach = true) const;
+				boost::posix_time::ptime getFirstDepartureTime (bool includeApproach = true) const;
+				boost::posix_time::ptime getLastDepartureTime (bool includeApproach = true) const;
+				boost::posix_time::ptime getFirstArrivalTime (bool includeApproach = true) const;
+				boost::posix_time::ptime getLastArrivalTime (bool includeApproach = true) const;
 
-				boost::posix_time::time_duration getDuration () const;
+				boost::posix_time::time_duration getDuration (bool includeApproach = true) const;
 				double getDistance () const;
 		
 		

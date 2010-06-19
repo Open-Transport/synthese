@@ -25,6 +25,9 @@
 #include "Edge.h"
 #include "UseRule.h"
 
+#include <algorithm>
+
+using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
 
@@ -86,7 +89,7 @@ namespace synthese
 			return  (_determinationMethod == DEPARTURE_TO_ARRIVAL)
 				? _actualTime
 				: _secondActualDateTime
-				;
+			;
 		}
 
 		const ptime& ServiceUse::getArrivalDateTime() const
@@ -94,7 +97,7 @@ namespace synthese
 			return  (_determinationMethod == ARRIVAL_TO_DEPARTURE)
 				? _actualTime
 				: _secondActualDateTime
-				;
+			;
 		}
 
 		const Edge* ServiceUse::getSecondEdge() const
@@ -165,20 +168,27 @@ namespace synthese
 
 		void ServiceUse::reverse()
 		{
-			// Reverse edge
-			const Edge* edge(_secondEdge);
-			const Vertex* vertex(_secondRTVertex);
-			_secondEdge = _edge;
-			_edge = edge;
-			_secondRTVertex = _RTVertex;
-			_RTVertex = vertex;
+			// Swapping first and second elements
+			swap(_secondEdge, _edge);
+			swap(_secondRTVertex, _RTVertex);
+			swap(_secondActualDateTime, _actualTime);
 
-			// Reverse time
-			ptime dateTime(_secondActualDateTime);
-			_secondActualDateTime = _actualTime;
-			_actualTime = dateTime;
+			if(_determinationMethod == DEPARTURE_TO_ARRIVAL)
+			{
+				_determinationMethod = ARRIVAL_TO_DEPARTURE;
 
-			_determinationMethod = (_determinationMethod == DEPARTURE_TO_ARRIVAL) ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL;
+				// 7799 Handle of continuous services
+				_secondActualDateTime += _range;
+				_actualTime += _range;
+			}
+			else
+			{
+				_determinationMethod = DEPARTURE_TO_ARRIVAL;
+
+				// 7799 Handle of continuous services
+				_secondActualDateTime -= _range;
+				_actualTime -= _range;
+			}
 		}
 
 

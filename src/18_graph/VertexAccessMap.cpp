@@ -199,7 +199,27 @@ namespace synthese
 						it.second.approachTime + it2->second.approachTime < bestDuration
 					){
 						Journey secondJourney(it2->second.approachJourney);
-						secondJourney.reverse();
+						if(!secondJourney.empty())
+						{
+							if(!it.second.approachJourney.empty())
+							{
+								if(it.second.approachJourney.getMethod() != secondJourney.getMethod())
+								{
+									secondJourney.reverse();
+								}
+								secondJourney.shift(
+									it.second.approachJourney.getFirstArrivalTime() - secondJourney.getFirstDepartureTime(),
+									secondJourney.getContinuousServiceRange()
+								);
+							}
+							else
+							{
+								secondJourney.shift(
+									secondJourney.getDuration(false),
+									secondJourney.getContinuousServiceRange()
+								);
+							}
+						}
 						result = Journey(it.second.approachJourney, secondJourney);
 					}
 				}

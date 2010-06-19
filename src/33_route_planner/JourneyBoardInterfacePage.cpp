@@ -170,26 +170,24 @@ namespace synthese
 			// Departure time
 			{
 				stringstream s;
-				s << setw(2) << setfill('0') << journey.getDepartureTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << journey.getDepartureTime().time_of_day().minutes();
+				s << setw(2) << setfill('0') << journey.getFirstDepartureTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << journey.getFirstDepartureTime().time_of_day().minutes();
 				pm.insert(DATA_DEPARTURE_TIME, s.str());
 			}
 			if(datePage.get())
 			{
 				stringstream sDate;
-				DateTimeInterfacePage::Display(sDate, datePage, request, journey.getDepartureTime());
+				DateTimeInterfacePage::Display(sDate, datePage, request, journey.getFirstDepartureTime());
 				pm.insert(DATA_DEPARTURE_DATE, sDate.str());
 			}
 			else
 			{
-				pm.insert(DATA_DEPARTURE_DATE, journey.getDepartureTime());
+				pm.insert(DATA_DEPARTURE_DATE, journey.getFirstDepartureTime());
 			}
-			pm.insert(DATA_DEPARTURE_TIME_INTERNAL_FORMAT, to_iso_extended_string(journey.getDepartureTime()));
+			pm.insert(DATA_DEPARTURE_TIME_INTERNAL_FORMAT, to_iso_extended_string(journey.getFirstDepartureTime()));
 
 			if(journey.getContinuousServiceRange().total_seconds())
 			{
-				ptime lastDeparture(journey.getDepartureTime());
-				lastDeparture += journey.getContinuousServiceRange();
-				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME, to_simple_string(lastDeparture.time_of_day()));
+				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME, to_simple_string(journey.getLastDepartureTime().time_of_day()));
 			}
 
 			// Departure place
@@ -207,15 +205,13 @@ namespace synthese
 			// Arrival time
 			{
 				stringstream s;
-				s << setw(2) << setfill('0') << journey.getArrivalTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << journey.getArrivalTime().time_of_day().minutes();
+				s << setw(2) << setfill('0') << journey.getFirstArrivalTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << journey.getFirstArrivalTime().time_of_day().minutes();
 				pm.insert(DATA_ARRIVAL_TIME, s.str());
 			}
 
 			if(journey.getContinuousServiceRange().total_seconds())
 			{
-				ptime lastArrival(journey.getArrivalTime());
-				lastArrival += journey.getContinuousServiceRange();
-				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME, to_simple_string(lastArrival.time_of_day()));
+				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME, to_simple_string(journey.getLastArrivalTime().time_of_day()));
 			}
 
 			// Arrival place

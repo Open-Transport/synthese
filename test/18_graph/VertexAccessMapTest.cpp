@@ -21,15 +21,10 @@
 */
 
 #include "VertexAccessMap.h"
+#include "FakeGraphImplementation.hpp"
 #include "Journey.h"
-#include "Vertex.h"
-#include "Hub.h"
-#include "Path.h"
 #include "ServiceUse.h"
-#include "Service.h"
-#include "Edge.h"
 
-#include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/test/auto_unit_test.hpp>
 
 using namespace synthese::graph;
@@ -38,69 +33,10 @@ using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace boost;
 
-class FakeHub:
-	public Hub
-{
-public:
-	FakeHub() {}
-	Point2D p;
-
-	virtual boost::posix_time::time_duration getMinTransferDelay() const { return boost::posix_time::minutes(0); }
-	virtual void getVertexAccessMap(VertexAccessMap& result,const AccessDirection& accessDirection,	GraphIdType whatToSearch,const Vertex& vertex	) const {}
-	virtual bool isConnectionAllowed(const Vertex& origin, const Vertex& destination) const { return true; }
-	virtual boost::posix_time::time_duration getTransferDelay(	const Vertex& origin,const Vertex& destination	) const { return boost::posix_time::minutes(0); }
-	virtual HubScore getScore() const { return 0; }
-	virtual const Point2D& getPoint() const { return p; }
-	virtual bool containsAnyVertex(GraphIdType graphType) const { return true; }
-};
-
-class FakeVertex:
-	public Vertex
-{
-public:
-	FakeVertex(Hub* hub): Vertex(hub) {}
-	virtual GraphIdType getGraphType() const { return 0; }
-};
-
-class FakePath:
-	public Path
-{
-public:
-	FakePath() : Path() {}
-	virtual bool isPedestrianMode() const { return true; }
-	virtual bool isActive(const boost::gregorian::date& date) const { return true; }
-	virtual const RuleUser* _getParentRuleUser() const {return NULL; }
-	virtual std::string getRuleUserName() const { return "Path"; }
-};
-
-class FakeEdge:
-	public Edge
-{
-public:
-	FakeEdge() : Edge() {}
-	virtual bool isDepartureAllowed() const { return true; }
-	virtual bool isArrivalAllowed() const {return true;}
-};
-
-class FakeService:
-	public Service
-{
-public:
-	FakeService(): Service() {}
-	virtual void _computeNextRTUpdate() {}
-	virtual bool isContinuous () const { return true; }
-	virtual boost::posix_time::time_duration getDepartureBeginScheduleToIndex(bool RTData,std::size_t rankInPath) const {return minutes(0);}
-	virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(bool RTData,std::size_t rankInPath) const {return minutes(0);}
-	virtual boost::posix_time::time_duration getArrivalBeginScheduleToIndex(bool RTData,std::size_t rankInPath) const {return minutes(0);}
-	virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(bool RTData,std::size_t rankInPath) const {return minutes(0);}
-	virtual ServicePointer getFromPresenceTime(bool RTData,AccessDirection method,std::size_t userClassRank,const Edge* edge,const boost::posix_time::ptime& presenceDateTime, bool controlIfTheServiceIsReachable, bool inverted) const {return ServicePointer();}
-	virtual boost::posix_time::ptime getLeaveTime(const ServicePointer& servicePointer, const Edge* edge) const { return not_a_date_time; }
-	virtual boost::posix_time::time_duration getDepartureSchedule(bool RTData,size_t rank) const {return minutes(0); }
-};
 
 BOOST_AUTO_TEST_CASE (Intersections)
 {
-	{ // Simple intersection : a vertex belongs to the both maps
+	{ // Simple intersection : a vertex belongs to the both maps without approach time
 		VertexAccessMap map1;
 		VertexAccessMap map2;
 		FakeHub h1;
@@ -146,6 +82,52 @@ BOOST_AUTO_TEST_CASE (Intersections)
 
 		FakeVertex v1(&h1);
 		map1.insert(&v1, VertexAccess());
+		FakeEdge e1;
+		e1.setFromVertex(&v1);
+		e1.setParentPath(&L);
+
+		FakeVertex v2(&h1);
+		map2.insert(&v2, VertexAccess());
+		
+		FakeVertex v3(&h1);
+		map2.insert(&v3, VertexAccess());
+		Journey j3;
+		FakeEdge e3;
+		e3.setFromVertex(&v3);
+		e3.setParentPath(&L);
+		ServicePointer sp3_0(false, DEPARTURE_TO_ARRIVAL, 0, &e1);
+		sp3_0.setService(&S);
+		ptime d3_0s(date(2000,1,1), minutes(0));
+		sp3_0.setActualTime(d3_0s);
+		ptime d3_0e(date(2000,1,1), minutes(5));
+		ServiceUse s3_0(sp3_0,&e3,d3_0e);
+		j3 = Journey(j3, s3_0);
+
+		// The first map contains a point of the second one, reached in 5 minutes
+		map1.insert(&v3, VertexAccess(boost::posix_time::minutes(5), 1000, j3));
+
+		BOOST_CHECK(map1.intersercts(map2));
+		BOOST_CHECK(map2.intersercts(map1));
+		Journey jt(map1.getBestIntersection(map2));
+		BOOST_REQUIRE(!jt.empty());
+		BOOST_CHECK_EQUAL(jt.getMethod(), DEPARTURE_TO_ARRIVAL);
+		ServiceUse su(*jt.getServiceUses().begin());
+		BOOST_CHECK_EQUAL(su.getDepartureEdge(), &e1);
+		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getDepartureDateTime()), boost::posix_time::to_simple_string(d3_0s));
+		BOOST_CHECK_EQUAL(su.getArrivalEdge(), &e3);
+		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getArrivalDateTime()), boost::posix_time::to_simple_string(d3_0e));
+	}
+
+	{ // Simple approach intersection : a vertex allow to approach to a vertex of the other
+		VertexAccessMap map1;
+		VertexAccessMap map2;
+
+		FakePath L;
+		FakeService S;
+		FakeHub h1;
+
+		FakeVertex v1(&h1);
+		map1.insert(&v1, VertexAccess());
 
 		FakeVertex v2(&h1);
 		map2.insert(&v2, VertexAccess());
@@ -159,26 +141,99 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		FakeEdge e3;
 		e3.setFromVertex(&v3);
 		e3.setParentPath(&L);
-		ServicePointer sp3_0(false, DEPARTURE_TO_ARRIVAL, 0, &e2);
+		ServicePointer sp3_0(false, ARRIVAL_TO_DEPARTURE, 0, &e2);
 		sp3_0.setService(&S);
-		ptime d3_0s(date(2000,1,1), minutes(0));
-		sp3_0.setActualTime(d3_0s);
 		ptime d3_0e(date(2000,1,1), minutes(5));
-		ServiceUse s3_0(sp3_0,&e3,d3_0e);
+		sp3_0.setActualTime(d3_0e);
+		ptime d3_0s(date(2000,1,1), minutes(0));
+		ServiceUse s3_0(sp3_0,&e3,d3_0s);
 		j3 = Journey(j3, s3_0);
 
-		map2.insert(&v3, VertexAccess(boost::posix_time::minutes(10), 1000, j3));
-		
+		// The second map contains a point of the first one, reached in 5 minutes
+		map2.insert(&v3, VertexAccess(boost::posix_time::minutes(5), 1000, j3));
+
 		BOOST_CHECK(map1.intersercts(map2));
 		BOOST_CHECK(map2.intersercts(map1));
 		Journey jt(map1.getBestIntersection(map2));
 		BOOST_REQUIRE(!jt.empty());
 		ServiceUse su(*jt.getServiceUses().begin());
-		BOOST_CHECK_EQUAL(su.getDepartureEdge(), &e2);
-		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getDepartureDateTime()), boost::posix_time::to_simple_string(d3_0s));
-		BOOST_CHECK_EQUAL(su.getArrivalEdge(), &e3);
-		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getArrivalDateTime()), boost::posix_time::to_simple_string(d3_0e));
-
+		BOOST_CHECK_EQUAL(jt.getMethod(), ARRIVAL_TO_DEPARTURE);
+		BOOST_CHECK_EQUAL(su.getDepartureEdge(), &e3);
+		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getDepartureDateTime()), boost::posix_time::to_simple_string(d3_0s + minutes(5)));
+		BOOST_CHECK_EQUAL(su.getArrivalEdge(), &e2);
+		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getArrivalDateTime()), boost::posix_time::to_simple_string(d3_0e + minutes(5)));
 	}
 
+	{ // Double approach intersection : a vertex is reachable from two different vertices from the two maps
+		VertexAccessMap map1;
+		VertexAccessMap map2;
+
+		FakePath L;
+		FakeService S;
+		FakeHub h1;
+
+		FakeVertex v1(&h1);
+		map1.insert(&v1, VertexAccess());
+		FakeEdge e1;
+		e1.setFromVertex(&v1);
+		e1.setParentPath(&L);
+
+		FakeVertex v2(&h1);
+		map2.insert(&v2, VertexAccess());
+		FakeEdge e2;
+		e2.setFromVertex(&v2);
+		e2.setParentPath(&L);
+
+		FakeVertex v3(&h1);
+		FakeEdge e3;
+		e3.setFromVertex(&v3);
+		e3.setParentPath(&L);
+
+		Journey j3_1;
+		ServicePointer sp3_1(false, DEPARTURE_TO_ARRIVAL, 0, &e1);
+		sp3_1.setService(&S);
+		ptime d3_1s(date(2000,1,1), minutes(0));
+		sp3_1.setActualTime(d3_1s);
+		ptime d3_1e(date(2000,1,1), minutes(5));
+		ServiceUse s3_1(sp3_1,&e3,d3_1e);
+		j3_1 = Journey(j3_1, s3_1);
+
+		// The second map contains a point of the first one, reached in 5 minutes
+		map1.insert(&v3, VertexAccess(boost::posix_time::minutes(5), 1000, j3_1));
+
+		Journey j3_2;
+		ServicePointer sp3_2(false, ARRIVAL_TO_DEPARTURE, 0, &e2);
+		sp3_2.setService(&S);
+		ptime d3_2e(date(2000,1,1), minutes(5));
+		sp3_2.setActualTime(d3_2e);
+		ptime d3_2s(date(2000,1,1), minutes(0));
+		ServiceUse s3_2(sp3_2,&e3,d3_2s);
+		j3_2 = Journey(j3_2, s3_2);
+
+		// The second map contains a point of the first one, reached in 5 minutes
+		map2.insert(&v3, VertexAccess(boost::posix_time::minutes(5), 1000, j3_2));
+
+		time_duration shifting_delay(d3_2s - d3_1e);
+
+		BOOST_CHECK(map1.intersercts(map2));
+		BOOST_CHECK(map2.intersercts(map1));
+		Journey jt(map1.getBestIntersection(map2));
+		BOOST_REQUIRE(!jt.empty());
+		BOOST_CHECK_EQUAL(jt.getMethod(), DEPARTURE_TO_ARRIVAL);
+
+		ServiceUse su(*jt.getServiceUses().begin());
+		BOOST_CHECK_EQUAL(su.getDepartureEdge(), &e1);
+		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getDepartureDateTime()), boost::posix_time::to_simple_string(d3_1s));
+		BOOST_CHECK_EQUAL(su.getArrivalEdge(), &e3);
+		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getArrivalDateTime()), boost::posix_time::to_simple_string(d3_1e));
+
+		BOOST_REQUIRE(jt.getServiceUses().begin() + 1 != jt.getServiceUses().end());
+		ServiceUse su2(*(jt.getServiceUses().begin() + 1));
+		BOOST_CHECK_EQUAL(su2.getDepartureEdge(), &e3);
+		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su2.getDepartureDateTime()), boost::posix_time::to_simple_string(d3_2s - shifting_delay));
+		BOOST_CHECK_EQUAL(su2.getArrivalEdge(), &e2);
+		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su2.getArrivalDateTime()), boost::posix_time::to_simple_string(d3_2e - shifting_delay));
+
+		BOOST_CHECK(jt.getServiceUses().begin() + 2 == jt.getServiceUses().end());
+	}
 }

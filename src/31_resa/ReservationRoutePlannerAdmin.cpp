@@ -346,7 +346,7 @@ namespace synthese
 			if(!jv.getJourneys().empty())
 			{
 				PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().begin());
-				date = it->getArrivalTime();
+				date = it->getFirstArrivalTime();
 				date -= days(1);
 				searchRequest.getPage()->_dateTime = date;
 				searchRequest.getPage()->_planningOrder = ARRIVAL_FIRST;
@@ -369,7 +369,7 @@ namespace synthese
 			if(!jv.getJourneys().empty())
 			{
 				PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().end() - 1);
-				date = it->getDepartureTime();
+				date = it->getFirstDepartureTime();
 				date += days(1);
 				searchRequest.getPage()->_dateTime = date;
 				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions suivantes", string(), "resultset_next.png") << " ";

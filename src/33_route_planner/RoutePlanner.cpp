@@ -115,8 +115,8 @@ namespace synthese
 			){
 				endBound = 
 					_planningOrder == DEPARTURE_FIRST ?
-					result.getArrivalTime() - *_maxDuration :
-					result.getDepartureTime() + *_maxDuration
+					result.getFirstArrivalTime() - *_maxDuration :
+					result.getFirstDepartureTime() + *_maxDuration
 				;
 
 				if(	_planningOrder == DEPARTURE_FIRST && result.getEndTime() < endBound ||
@@ -153,7 +153,7 @@ namespace synthese
 					if (!goalApproachJourney.empty())
 					{
 						goalApproachJourney.shift(
-							(result.getArrivalTime() - goalApproachJourney.getDepartureTime()) +
+							(result.getFirstArrivalTime() - goalApproachJourney.getFirstDepartureTime()) +
 							result.getDestination()->getHub()->getTransferDelay(
 							*result.getDestination()->getFromVertex(),
 							*goalApproachJourney.getOrigin()->getFromVertex()
@@ -176,7 +176,7 @@ namespace synthese
 					if (!originApproachJourney.empty())
 					{
 						originApproachJourney.shift(
-							(result.getDepartureTime() - originApproachJourney.getDepartureTime()) -
+							(result.getFirstDepartureTime() - originApproachJourney.getFirstDepartureTime()) -
 							originApproachJourney.getDuration() -
 							result.getOrigin()->getHub()->getTransferDelay(
 							*originApproachJourney.getDestination()->getFromVertex(),
@@ -200,7 +200,7 @@ namespace synthese
 					if (!originApproachJourney.empty())
 					{
 						originApproachJourney.shift(
-							(result.getDepartureTime() - originApproachJourney.getDepartureTime()) -
+							(result.getFirstDepartureTime() - originApproachJourney.getFirstDepartureTime()) -
 							originApproachJourney.getDuration() -
 							result.getOrigin()->getHub()->getTransferDelay(
 								*originApproachJourney.getDestination()->getFromVertex(),
@@ -225,7 +225,7 @@ namespace synthese
 					if (!goalApproachJourney.empty())
 					{
 						goalApproachJourney.shift(
-							(result.getArrivalTime() - goalApproachJourney.getDepartureTime()) +
+							(result.getFirstArrivalTime() - goalApproachJourney.getFirstDepartureTime()) +
 							result.getDestination()->getHub()->getTransferDelay(
 							*result.getDestination()->getFromVertex(),
 							*goalApproachJourney.getOrigin()->getFromVertex()

@@ -85,10 +85,10 @@ namespace synthese
 			std::ostream* logStream
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
-			_lowestDepartureTime(continuousService.getDepartureTime()),
-			_highestDepartureTime(continuousService.getDepartureTime() + continuousService.getContinuousServiceRange()),
-			_lowestArrivalTime(continuousService.getArrivalTime()),
-			_highestArrivalTime(continuousService.getArrivalTime() + continuousService.getContinuousServiceRange()),
+			_lowestDepartureTime(continuousService.getFirstDepartureTime()),
+			_highestDepartureTime(continuousService.getLastDepartureTime()),
+			_lowestArrivalTime(continuousService.getFirstArrivalTime()),
+			_highestArrivalTime(continuousService.getLastArrivalTime()),
 			_whatToSearch(whatToSearch),
 			_graphToUse(graphToUse),
 			_maxDuration(
@@ -245,14 +245,12 @@ namespace synthese
 					if(_planningOrder == DEPARTURE_FIRST)
 					{
 						const Journey& last(result.back());
-						originDateTime = last.getDepartureTime();
-						originDateTime += last.getContinuousServiceRange();
+						originDateTime = last.getLastDepartureTime();
 					}
 					else
 					{
 						const Journey& first(result.front());
-						originDateTime = first.getArrivalTime();
-						originDateTime -= first.getContinuousServiceRange();
+						originDateTime = first.getFirstArrivalTime();
 					}
 				}
 			}
@@ -274,17 +272,17 @@ namespace synthese
 				return result;
 			}
 
-			ptime departureTime(parentContinuousService.getDepartureTime());
+			ptime departureTime(parentContinuousService.getFirstDepartureTime());
 			BOOST_FOREACH(const Journey& subJourney, subResult)
 			{
 				// Insertion of a journey of the parent continuous service before
-				ptime precedingLastDepartureTime(subJourney.getArrivalTime());
+				ptime precedingLastDepartureTime(subJourney.getFirstArrivalTime());
 				precedingLastDepartureTime -= days(1);
 				precedingLastDepartureTime -= parentContinuousService.getDuration();
 				if(precedingLastDepartureTime > departureTime)
 				{
 					posix_time::time_duration toShift(
-						departureTime - parentContinuousService.getDepartureTime()
+						departureTime - parentContinuousService.getFirstDepartureTime()
 					);
 					TimeSlotRoutePlanner::Result::value_type j(parentContinuousService);
 					BOOST_FOREACH(Journey::ServiceUses::value_type& leg, j.getServiceUses())
@@ -297,16 +295,15 @@ namespace synthese
 
 				result.push_back(subJourney);
 
-				departureTime = subJourney.getDepartureTime();
+				departureTime = subJourney.getFirstDepartureTime();
 				departureTime += days(1);
 			}
 
-			ptime lastDepartureTime(parentContinuousService.getDepartureTime());
-			lastDepartureTime += parentContinuousService.getContinuousServiceRange();
+			ptime lastDepartureTime(parentContinuousService.getLastDepartureTime());
 			if(departureTime <= lastDepartureTime)
 			{
 				posix_time::time_duration toShift(
-					departureTime - parentContinuousService.getDepartureTime()
+					departureTime - parentContinuousService.getFirstDepartureTime()
 				);
 				TimeSlotRoutePlanner::Result::value_type j(parentContinuousService);
 				BOOST_FOREACH(Journey::ServiceUses::value_type& leg, j.getServiceUses())
