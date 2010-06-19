@@ -917,4 +917,88 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 		++itl;
 		BOOST_CHECK(itl == l.end());
 	}
+
+	{ // The actual destination must always be at the end of the table
+		Journey j0;
+		ServicePointer sp0_0(false, DEPARTURE_TO_ARRIVAL, 0, &A);
+		sp0_0.setService(&S);
+		ServiceUse s0_0(sp0_0,&B);
+		j0 = Journey(j0, s0_0);
+
+		Journey j1;
+		ServicePointer sp1_0(false, DEPARTURE_TO_ARRIVAL, 0, &C);
+		sp1_0.setService(&S);
+		ServiceUse s1_0(sp1_0,&F);
+		j1 = Journey(j1, s1_0);
+
+		PTRoutePlannerResult::Journeys j;
+		j.push_back(j0);
+		j.push_back(j1);
+		PTRoutePlannerResult r(&CA, &CB, false, j);
+		const PTRoutePlannerResult::PlacesList& l(r.getOrderedPlaces());
+		PTRoutePlannerResult::PlacesList::const_iterator itl(l.begin());
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(itl->isOrigin);
+		BOOST_CHECK(!itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CA.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(itl->isOrigin);
+		BOOST_CHECK(!itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(!itl->isOrigin);
+		BOOST_CHECK(itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CF.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(!itl->isOrigin);
+		BOOST_CHECK(itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CB.getName());
+		++itl;
+		BOOST_CHECK(itl == l.end());
+	}
+
+	{ // The actual destination must always be at the end of the table
+		Journey j0;
+		ServicePointer sp0_0(false, DEPARTURE_TO_ARRIVAL, 0, &D);
+		sp0_0.setService(&S);
+		ServiceUse s0_0(sp0_0,&F);
+		j0 = Journey(j0, s0_0);
+
+		Journey j1;
+		ServicePointer sp1_0(false, DEPARTURE_TO_ARRIVAL, 0, &A);
+		sp1_0.setService(&S);
+		ServiceUse s1_0(sp1_0,&B);
+		j1 = Journey(j1, s1_0);
+
+		PTRoutePlannerResult::Journeys j;
+		j.push_back(j0);
+		j.push_back(j1);
+		PTRoutePlannerResult r(&CA, &CB, false, j);
+		const PTRoutePlannerResult::PlacesList& l(r.getOrderedPlaces());
+		PTRoutePlannerResult::PlacesList::const_iterator itl(l.begin());
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(itl->isOrigin);
+		BOOST_CHECK(!itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CA.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(itl->isOrigin);
+		BOOST_CHECK(!itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(!itl->isOrigin);
+		BOOST_CHECK(itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CF.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(!itl->isOrigin);
+		BOOST_CHECK(itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CB.getName());
+		++itl;
+		BOOST_CHECK(itl == l.end());
+	}
 }

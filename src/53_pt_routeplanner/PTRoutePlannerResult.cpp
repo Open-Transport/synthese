@@ -357,8 +357,32 @@ namespace synthese
 			}
 
 			// Else insert a new row
+			PlacesList::iterator position;
+			if(value.isDestination)
+			{
+				position = _orderedPlaces.end();
+				PlacesList::iterator previous(position);
+				--previous;
+				while(previous->place == _arrivalPlace)
+				{
+					--position;
+					--previous;
+				}
+			}
+			else if(value.isOrigin)
+			{
+				position = minPos;
+				while(position != _orderedPlaces.end() && position->place == _departurePlace)
+				{
+					++position;
+				}
+			}
+			else
+			{
+				position = minPos;
+			}
 			return _orderedPlaces.insert(
-				value.isDestination ? _orderedPlaces.end() : minPos,
+				position,
 				value
 			);
 		}
