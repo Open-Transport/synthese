@@ -159,9 +159,9 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		ServiceUse su(*jt.getServiceUses().begin());
 		BOOST_CHECK_EQUAL(jt.getMethod(), ARRIVAL_TO_DEPARTURE);
 		BOOST_CHECK_EQUAL(su.getDepartureEdge(), &e3);
-		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getDepartureDateTime()), boost::posix_time::to_simple_string(d3_0s + minutes(5)));
+		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getDepartureDateTime()), boost::posix_time::to_simple_string(d3_0s));
 		BOOST_CHECK_EQUAL(su.getArrivalEdge(), &e2);
-		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getArrivalDateTime()), boost::posix_time::to_simple_string(d3_0e + minutes(5)));
+		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getArrivalDateTime()), boost::posix_time::to_simple_string(d3_0e));
 	}
 
 	{ // Double approach intersection : a vertex is reachable from two different vertices from the two maps

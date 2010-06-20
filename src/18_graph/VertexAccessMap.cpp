@@ -212,13 +212,6 @@ namespace synthese
 									secondJourney.getContinuousServiceRange()
 								);
 							}
-							else
-							{
-								secondJourney.shift(
-									secondJourney.getDuration(false),
-									secondJourney.getContinuousServiceRange()
-								);
-							}
 						}
 						result = Journey(it.second.approachJourney, secondJourney);
 					}
