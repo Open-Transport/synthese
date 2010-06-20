@@ -1,10 +1,18 @@
 /** @page userdocMessages 17 Documentation utilisateur module d'actualités
 
-Envoi de messages sur les afficheurs
+<h1>Table des matières</h1>
 
-Messages uniques
+<ul>
+<li>@ref actuSend</li>
+<li>@ref actuLib</li>
+</ul>
+
+@section actuSend Envoi de messages sur les afficheurs
+
+<h2>Messages uniques</h2>
 
 L'envoi de message unique s'effectue de la manière suivante :
+<ol>
 1.	Accéder à l'écran « Messages »
 2.	La fenêtre de gestion des messages apparaît. Elle comporte trois sections : Recherche, Messages selon scénario, et messages seuls. 
 3.	Défiler l'écran jusqu'à la section messages seuls  
@@ -21,24 +29,64 @@ b.	La saisie directe d'un contenu court et d'un contenu long, sauvegardé ensuite
 10.	Dans la section Diffusion, les afficheurs destinataires du message sont sélectionnés. Pour cela, effectuer une recherche d'afficheur à l'aide des divers champs de recherche (cliquer sur Rechercher pour lancer la recherche), puis une fois l'afficheur désiré apparu, cliquer sur le bouton Ajouter pour diffuser le message sur l'afficheur.
 11.	Recommencer l'étape précédente jusqu'à obtention de la liste d'afficheurs destinataires souhaitée. En cas d'afficheur sélectionné par erreur, cliquer sur Supprimer pour le retirer.
 12.	Une fois la liste d'afficheurs remlie, retourner à la section Paramètres et cliquer sur OUI en face du champ « Actif ». Cliquer ensuite sur Enregistrer : le message est à présent diffusé.
+</ol>
 
-Envoi selon scénario
-1.	Accéder à la section « Messages »
-2.	La fenêtre de gestion des messages apparaît. Se rendre dans la section Messages selon scénario  
-3.	Sélectionner en bas du tableau le scénario à diffuser puis cliquer sur Nouvelle diffusion de scénario. L'écran de paramétrage d'envoi de scénario apparaît. Il reprend la liste des messages préparés par le scénario. 
-4.	Choisir la date et l'heure de début et de fin de diffusion à l'aide du contrôle calendrier. (cliquer sur l'icône calendrier). Pour changer la date, sélectionner le jour dans le calendrier. Pour augmenter l'heure, cliquer dessus à la souris. Pour la diminuer, cliquer sur l'heure à la souris en maintenant la touche Majuscules du clavier.
-5.	Cliquer sur OUI en face du champ Actif
-6.	Cliquer sur Enregistrer pour commencer la diffusion
+<h2>Envoi selon scénario</h2>
+<ol>
+<li>Accéder à la section « Messages »</li>
+<li>La fenêtre de gestion des messages apparaît. Se rendre dans la section Messages selon scénario</li>
+<li>Sélectionner en bas du tableau le scénario à diffuser puis cliquer sur Nouvelle diffusion de scénario. L'écran de paramétrage d'envoi de scénario apparaît. Il reprend la liste des messages préparés par le scénario.</li>
+<li>Choisir la date et l'heure de début et de fin de diffusion à l'aide du contrôle calendrier. (cliquer sur l'icône calendrier). Pour changer la date, sélectionner le jour dans le calendrier. Pour augmenter l'heure, cliquer dessus à la souris. Pour la diminuer, cliquer sur l'heure à la souris en maintenant la touche Majuscules du clavier.</li>
+<li>Cliquer sur OUI en face du champ Actif</li>
+<li>Cliquer sur Enregistrer pour commencer la diffusion</li>
+</ol>
 
-Arrêt de la diffusion d'un message
-1.	Se rendre à l'écran Messages
-2.	Si un message est en cours de diffusion, il comporte un bouton Arrêter  
-3.	Cliquer sur le bouton arrêter puis confirmer sur la boite de dialogue suivante  
-4.	Pour rediffuser un message arrêté, il est possible de l'éditer à nouveau en cliquant sur le bouton Modifier, puis de lui donner une date de fin ultérieure et enfin de sélectionner OUI dans le champ Actif.
+<h2>Arrêt de la diffusion d'un message</h2>
+<ol>
+<li>Se rendre à l'écran Messages</li>
+<li>Si un message est en cours de diffusion, il comporte un bouton Arrêter</li>
+<li>Cliquer sur le bouton arrêter puis confirmer sur la boite de dialogue suivante</li>
+<li>Pour rediffuser un message arrêté, il est possible de l'éditer à nouveau en cliquant sur le bouton Modifier, puis de lui donner une date de fin ultérieure et enfin de sélectionner OUI dans le champ Actif.</li>
+</ol>
 
-Conflits
+<h2>Conflits</h2>
+
 Les conflits entre messages correspondent à des situations où deux messages de niveau d'importance équivalent sont envoyés sur le même panneau. Ces situations sont représentées par une icône rouge dans la colonne Conflit.
 Pour résoudre un conflit, stopper la diffusion de l'un des messages portant ce statut. Dans tous les cas seul un message est diffusé sur le panneau : il s'agit du plus récent.
 
+@section actuLib Bibliothèque de messages
+
+La bibliothèque de messages contient des scénarios de diffusion prêts à être déclenchés. Ils sont eux-même organisés dans une structure de répertoires.
+
+Un scénario définit :
+<ul>
+	<li>Un nom de scénario</li>
+	<li>Une série de messages pouvant faire appel à des variables</li>
+	<li>Pour chaque message une série de destinataires</li>
+</ul>
+
+<h2>Fonctionnement des variables</h2>
+
+Les scénarios sont créés avec des variables déclarées directement dans le texte des messages, comme suit :
+<ul>
+<li>$$VARIABLE$$ = variable obligatoire (le scénario ne peut etre déclenché si non remplie)</li>
+<li>$VARIABLE$ = variable optionnelle</li>
+<li>$$$ = caractère $</li>
+<li>$VARIABLE|AIDE$ : le caractère | dans le nom de la variable permet de déclarer une aide à l’utilisateur à droite de celui-ci. Le nom de la variable est VARIABLE</li>
+</ul>
+
+Remarques :
+<ul>
+<li>Si le nom d’une variable est modifié dans un scénario, alors la variable est modifiée, et le lien entre le texte des scénarios déclenchés et le modèle d’origine est rompu (sans toutefois modifier le message lui-même).</li>
+<li>Si la partie Aide est modifiée, cela n’a aucun impact sur les scénarios déclenchés.</li>
+</ul>
+
+Fonctionnement pour l'utilisateur :
+<ol>
+<li>Lors du déclenchement d’un scénario comportant au moins une variable, l’écran de saisie propose la liste des variables, affichant également l’aide inscrite</li>
+<li>L’utilisateur remplit les champs donnant les valeurs aux variables</li>
+<li>L’utilisateur déclenche le scénario</li>
+<li>En cas de besoin l’utilisateur peut modifier la valeur des variables pendant l’exécution du scénario</li>
+</ol>
 
 */
