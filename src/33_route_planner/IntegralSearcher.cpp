@@ -701,7 +701,7 @@ namespace synthese
 
 
 			Journey::Score score(
-				(_totalDistance == 0 || estimatedTotalDuration == 0) ?
+				(distanceToEnd == 0 || estimatedTotalDuration == 0) ?
 				1000 :
 				(20*(estimatedTotalDuration - journeyDuration))/distanceToEnd
 //				static_cast<long long unsigned int>(1000 * distanceToEnd * distanceToEnd * journeyDuration) /
