@@ -164,21 +164,20 @@ namespace synthese
 			
 			//! @name Modifiers.
 			//@{
-				/** Inserts an edge in the path.
-					@param edge The edge to add
-					@param autoShift Shift the following edges if an edge with the same rank already exists, else throw an Exception. The value of autoShift is the distance between the edge and the next existing one.
-						- if the edge to insert is the not the first, the total length of the path is not changed. If the autoshift length is superior than the length between the two edges around the new one, then an exception is thrown
-						- if the edge to insert is the first one, then the total length of the path is changed.
-
-					All the pointer links necessary to the graph exploration are created :
-						- the links between edges (describing the path)
-
-					The order of addEdge calls can be random : the rankinpath attribute of edge
-					is used to insert the new object at the good position.
-				*/
+				//////////////////////////////////////////////////////////////////////////
+				/// Inserts an edge in the path.
+				///	@param edge The edge to add
+				/// @author Hugues Romain
+				/// @pre no existing edge in the path must have the same rank than the rank of the
+				/// edge to add
+				//////////////////////////////////////////////////////////////////////////
+				///	All the pointer links necessary to the graph exploration are created :
+				///		- the links between edges (describing the path)
+				///
+				///	The order of addEdge calls can be random : the rankinpath attribute of edge
+				///	is used to insert the new object at the good position.
 				void addEdge(
-					Edge* edge,
-					boost::optional<double> autoShift = boost::optional<double>()
+					Edge& edge
 				);
 
 

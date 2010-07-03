@@ -393,7 +393,7 @@ namespace synthese
 								ls->setIsDeparture(rank+1 < stops.size() && stop.departure);
 								ls->setMetricOffset(0);
 								ls->setKey(LineStopTableSync::getId());
-								route->addEdge(ls.get());
+								route->addEdge(*ls);
 								_env->getEditableRegistry<LineStop>().add(ls);
 
 								++rank;

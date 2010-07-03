@@ -102,8 +102,7 @@ namespace synthese
 			{
 				RegistryKeyType roadPlaceId(rows->getLongLong(RoadTableSync::COL_ROAD_PLACE_ID));
 				RoadPlace* roadPlace(RoadPlaceTableSync::GetEditable(roadPlaceId, env, linkLevel).get());
-				object->setRoadPlace(roadPlace);
-				roadPlace->addRoad(*object);
+				object->setRoadPlace(*roadPlace);
 				
 // 				object->setBikeCompliance (BikeComplianceTableSync::Get (rows->getLongLong (RoadTableSync::COL_BIKECOMPLIANCEID), env, linkLevel));
 

@@ -345,7 +345,7 @@ namespace synthese
 					int lAreaId(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_L_AREA_ID))));
 					int rAreaId(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_R_AREA_ID))));
 
-					for(size_t area(0); area< (lAreaId == rAreaId ? 1 : 2); ++area)
+					for(size_t area(0); area< (lAreaId == rAreaId ? size_t(1) : size_t(2)); ++area)
 					{
 						// Test if the record can be imported
 						_CitiesMap::const_iterator itc(_citiesMap.find(area ? lAreaId : rAreaId));
@@ -436,7 +436,7 @@ namespace synthese
 							secondRoadChunk->setRankInPath((*(road->getEdges().end()-1))->getRankInPath() + 1);
 							secondRoadChunk->setMetricOffset(startMetricOffset + length);
 							secondRoadChunk->setKey(RoadChunkTableSync::getId());
-							road->addRoadChunk(secondRoadChunk.get());
+							road->addRoadChunk(*secondRoadChunk);
 							_env->getEditableRegistry<RoadChunk>().add(secondRoadChunk);
 
 							// Search for a second existing road which starts at the right node
@@ -480,14 +480,13 @@ namespace synthese
 								firstRoadChunk->setRankInPath(0);
 								firstRoadChunk->setMetricOffset(0);
 								firstRoadChunk->setKey(RoadChunkTableSync::getId());
-								road->addRoadChunk(firstRoadChunk.get(), length);
+								road->insertRoadChunk(*firstRoadChunk, length, 1);
 								_env->getEditableRegistry<RoadChunk>().add(firstRoadChunk);
 							}
 							else
 							{
 								shared_ptr<Road> road(new Road(0, Road::ROAD_TYPE_UNKNOWN, false));
-								road->setRoadPlace(roadPlace.get());
-								roadPlace->addRoad(*road);
+								road->setRoadPlace(*roadPlace);
 								road->setKey(RoadTableSync::getId());
 								_env->getEditableRegistry<Road>().add(road);
 
@@ -498,7 +497,7 @@ namespace synthese
 								firstRoadChunk->setRankInPath(0);
 								firstRoadChunk->setMetricOffset(0);
 								firstRoadChunk->setKey(RoadChunkTableSync::getId());
-								road->addRoadChunk(firstRoadChunk.get());
+								road->addRoadChunk(*firstRoadChunk);
 								_env->getEditableRegistry<RoadChunk>().add(firstRoadChunk);
 
 								// Second road chunk
@@ -508,7 +507,7 @@ namespace synthese
 								secondRoadChunk->setRankInPath(1);
 								secondRoadChunk->setMetricOffset(length);
 								secondRoadChunk->setKey(RoadChunkTableSync::getId());
-								road->addRoadChunk(secondRoadChunk.get());
+								road->addRoadChunk(*secondRoadChunk);
 								_env->getEditableRegistry<RoadChunk>().add(secondRoadChunk);
 							}
 						}

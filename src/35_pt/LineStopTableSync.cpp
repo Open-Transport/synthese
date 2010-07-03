@@ -144,7 +144,7 @@ namespace synthese
 				ls->setLine(line);
 				ls->setPhysicalStop(PhysicalStopTableSync::GetEditable(fromPhysicalStopId, env, linkLevel).get());
 				
-				line->addEdge(ls);
+				line->addEdge(*ls);
 			}
 		}
 

@@ -69,7 +69,7 @@ namespace synthese
 						, (*it)->getMetricOffset()
 						, const_cast<PhysicalStop*>(static_cast<const LineStop*>(*it)->getPhysicalStop())
 				)	);
-				addEdge(newEdge);
+				addEdge(*newEdge);
 			}
 
 			_pathGroup->addPath(this);

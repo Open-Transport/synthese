@@ -139,39 +139,31 @@ namespace synthese
 
 
 		void Path::addEdge(
-			Edge* edge,
-			optional<double> autoShift
+			Edge& edge
 		){
 			// Empty path : just put the edge in the vector
 
 			if (_edges.empty())
 			{
-				_edges.push_back(edge);
+				_edges.push_back(&edge);
 				return;
 			}
 
 			// Non empty path : determinate the good position of the edge
 			Edges::iterator insertionPosition;
 			for(insertionPosition = _edges.begin();
-				insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() < edge->getRankInPath();
+				insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() < edge.getRankInPath();
 				++insertionPosition) ;
 
-			// If an edge with the same rank exists, then throw an exception or shift all ranks after it, depending on the autoshift parameter
-			if(insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() == edge->getRankInPath())
+			// If an edge with the same rank exists, then throw an exception
+			if(insertionPosition != _edges.end() && (*insertionPosition)->getRankInPath() == edge.getRankInPath())
 			{
 				// If the edge is the same, do nothing
-				if((*insertionPosition) == edge) return;
+				if((*insertionPosition) == &edge) return;
 
-				if(!autoShift) throw Exception("An edge with the rank "+ lexical_cast<string>(edge->getRankInPath()) + " already exists in the path " + lexical_cast<string>(getKey()));
-
-				for(Edges::iterator it(insertionPosition); it != _edges.end(); ++it)
-				{
-					(*it)->setRankInPath((*it)->getRankInPath() + 1);
-					if(insertionPosition == _edges.begin())
-					{
-						(*it)->setMetricOffset((*it)->getMetricOffset() + *autoShift);
-					}
-				}
+				throw Exception(
+					"An edge with the rank "+ lexical_cast<string>(edge.getRankInPath()) + " already exists in the path " + lexical_cast<string>(getKey())
+				);
 			}
 
 			// Next arrival and next in path of the previous
@@ -182,30 +174,30 @@ namespace synthese
 				Edge* nextConnectingArrival(previousEdge->getFollowingConnectionArrival());
 
 				// Next arrival of previous edges
-				if(edge->isArrivalAllowed())
+				if(edge.isArrivalAllowed())
 				{
 					for(Edges::iterator it(insertionPosition-1); 
 						(*it)->getFollowingArrivalForFineSteppingOnly() == nextArrival;
 						--it
 					){
-						(*it)->setFollowingArrivalForFineSteppingOnly(edge);
+						(*it)->setFollowingArrivalForFineSteppingOnly(&edge);
 						if (it == _edges.begin()) break;
 					}
 
-					if(edge->isConnectingEdge())
+					if(edge.isConnectingEdge())
 					{
 						for(Edges::iterator it(insertionPosition-1); 
 							(*it)->getFollowingConnectionArrival() == nextConnectingArrival;
 							--it
 						){
-							(*it)->setFollowingConnectionArrival(edge);
+							(*it)->setFollowingConnectionArrival(&edge);
 							if (it == _edges.begin()) break;
 						}
 					}
 				}
 
-				edge->setFollowingArrivalForFineSteppingOnly(nextArrival);
-				edge->setFollowingConnectionArrival(nextConnectingArrival);
+				edge.setFollowingArrivalForFineSteppingOnly(nextArrival);
+				edge.setFollowingConnectionArrival(nextConnectingArrival);
 			}
 			else
 			{
@@ -213,19 +205,19 @@ namespace synthese
 				Edge* firstEdge(*insertionPosition);
 				if(firstEdge->isArrivalAllowed())
 				{
-					edge->setFollowingArrivalForFineSteppingOnly(firstEdge);
+					edge.setFollowingArrivalForFineSteppingOnly(firstEdge);
 				}
 				else
 				{
-					edge->setFollowingArrivalForFineSteppingOnly(firstEdge->getFollowingArrivalForFineSteppingOnly());
+					edge.setFollowingArrivalForFineSteppingOnly(firstEdge->getFollowingArrivalForFineSteppingOnly());
 				}
 				if(firstEdge->isArrivalAllowed() && firstEdge->isConnectingEdge())
 				{
-					edge->setFollowingConnectionArrival(firstEdge);
+					edge.setFollowingConnectionArrival(firstEdge);
 				}
 				else
 				{
-					edge->setFollowingConnectionArrival(firstEdge->getFollowingConnectionArrival());
+					edge.setFollowingConnectionArrival(firstEdge->getFollowingConnectionArrival());
 				}
 			}
 		
@@ -237,28 +229,28 @@ namespace synthese
 				Edge* previousConnectingDeparture(nextEdge->getPreviousConnectionDeparture());
 
 				// Previous departure of next edges
-				if(edge->isDepartureAllowed())
+				if(edge.isDepartureAllowed())
 				{
 					for(Edges::iterator it(insertionPosition); 
 						it != _edges.end() && (*it)->getPreviousDepartureForFineSteppingOnly() == previousDeparture;
 						++it
 					){
-						(*it)->setPreviousDepartureForFineSteppingOnly(edge);
+						(*it)->setPreviousDepartureForFineSteppingOnly(&edge);
 					}
 
-					if(edge->isConnectingEdge())
+					if(edge.isConnectingEdge())
 					{
 						for(Edges::iterator it(insertionPosition); 
 							it != _edges.end() && (*it)->getPreviousConnectionDeparture() == previousConnectingDeparture;
 							++it
 						){
-							(*it)->setPreviousConnectionDeparture(edge);
+							(*it)->setPreviousConnectionDeparture(&edge);
 						}
 					}
 				}
 
-				edge->setPreviousDepartureForFineSteppingOnly(previousDeparture);
-				edge->setPreviousConnectionDeparture(previousConnectingDeparture);
+				edge.setPreviousDepartureForFineSteppingOnly(previousDeparture);
+				edge.setPreviousConnectionDeparture(previousConnectingDeparture);
 			}
 			else
 			{
@@ -266,25 +258,26 @@ namespace synthese
 				Edge* lastEdge(*(insertionPosition - 1));
 				if(lastEdge->isDepartureAllowed())
 				{
-					edge->setPreviousDepartureForFineSteppingOnly(lastEdge);
+					edge.setPreviousDepartureForFineSteppingOnly(lastEdge);
 				}
 				else
 				{
-					edge->setPreviousDepartureForFineSteppingOnly(lastEdge->getPreviousDepartureForFineSteppingOnly());
+					edge.setPreviousDepartureForFineSteppingOnly(lastEdge->getPreviousDepartureForFineSteppingOnly());
 				}
 				if(lastEdge->isDepartureAllowed() && lastEdge->isConnectingEdge())
 				{
-					edge->setPreviousConnectionDeparture(lastEdge);
+					edge.setPreviousConnectionDeparture(lastEdge);
 				}
 				else
 				{
-					edge->setPreviousConnectionDeparture(lastEdge->getPreviousConnectionDeparture());
+					edge.setPreviousConnectionDeparture(lastEdge->getPreviousConnectionDeparture());
 				}
 			}
 
 			// Insertion of the new edges
-			_edges.insert(insertionPosition, edge);
+			_edges.insert(insertionPosition, &edge);
 		}
+
 
 
 		Edge* Path::getLastEdge() const

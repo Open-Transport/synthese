@@ -83,17 +83,17 @@ namespace synthese
 		//! @name Getters
 		//@{
 			const RoadType& getType () const { return _type; }
-			RoadPlace* getRoadPlace() const;
+			Road* getReverseRoad() const { return _reverseRoad; }
 		//@}
 
 		//! @name Setters
 		//@{
 			  void setType (const RoadType& type);
-			  void setRoadPlace(RoadPlace* value);
 		//@}
 		
 		//! @name Services
 		//@{
+			RoadPlace* getRoadPlace() const;
 			virtual bool isPedestrianMode() const;
 			virtual bool isRoad() const;
 			virtual std::string getRuleUserName() const;
@@ -117,9 +117,48 @@ namespace synthese
 
 		//! @name Update methods.
 		//@{
+			//////////////////////////////////////////////////////////////////////////
+			/// Links the road to a road place.
+			/// @param value the road place to link to the current road
+			/// The following links are created :
+			/// <ul>
+			///	<li>the road to the road place</li>
+			///	<li>the road is added to the road place</li>
+			///	<li>the reverse road to the road place (if exists)</li>
+			///	<li>the reverse road is added to the road place (if exists)</li>
+			/// </ul>
+			/// If the road was already linked to an other place, then the corresponding links
+			/// are broken before.
+			void setRoadPlace(RoadPlace& value);
+
+		  
+		  
+			//////////////////////////////////////////////////////////////////////////
+			/// Adds a road chunk in the road at the space specified by the rank in path attribute.
+			/// @param chunk the chunk to add
+			/// @author Hugues Romain
 			void addRoadChunk(
-				RoadChunk* address,
-				boost::optional<double> autoShift = boost::optional<double>()
+				RoadChunk& chunk
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Inserts a road chunk at the beginning of the road 
+			/// @param chunk the chunk to add
+			/// @param length length of the chunk
+			/// @param rankShift 
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.18
+			/// @pre the road must contain at least one chunk
+			/// @pre the rank and the metric offset of the chunk to insert must be less
+			/// than the rank of the first edge raised by the rankShift.
+			/// @pre same condition on the metric offset
+			void insertRoadChunk(
+				RoadChunk& chunk,
+				double length,
+				std::size_t rankShift
 			);
 
 

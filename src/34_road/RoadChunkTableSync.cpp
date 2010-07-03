@@ -119,7 +119,7 @@ namespace synthese
 					object->setRoad(road.get());
 					Address* fromAddress(AddressTableSync::GetEditable (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID), env, linkLevel).get());
 					object->setFromAddress(fromAddress);
-					road->addRoadChunk(object);
+					road->addRoadChunk(*object);
 				}
 				catch (ObjectNotFoundException<Road>& e)
 				{

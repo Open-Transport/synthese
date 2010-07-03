@@ -177,14 +177,10 @@ namespace synthese
 				lineStop->addViaPoint (CreatePoint (pointNode));
 			}
 
-			line->addEdge (lineStop.get());
-
+			line->addEdge(*lineStop);
 
 			return lineStop;
-
 		}
-
-
 
 
 

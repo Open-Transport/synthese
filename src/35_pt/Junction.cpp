@@ -89,14 +89,14 @@ namespace synthese
 					this,
 					start
 			)	);
-			addEdge(startEdge);
+			addEdge(*startEdge);
 
 			Edge* endEdge(new JunctionStop(
 					length,
 					this,
 					end
 			)	);
-			addEdge(endEdge);
+			addEdge(*endEdge);
 
 			// Generation of service
 			Service* service(new PermanentService(
