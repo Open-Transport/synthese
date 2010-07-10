@@ -1,26 +1,42 @@
 /**
 @mainpage Project Home Page
 
-<h3>Qu'est-ce que SYNTHESE ?</h3>
+<h2>Qu'est-ce que SYNTHESE ?</h2>
 
-SYNTHESE est un serveur d'information voyageurs multimodale.
+SYNTHESE est une suite logicielle libre, serveur d’information-voyageurs multimodale, véritable trousse à outil du réseau de transport.
+Son statut sous licence GPL lui a permis une évolution très rapide, et quelques exclusivités fonctionnelles encore inégalées par les produits commerciaux.
+En tout état de cause, SYNTHESE est la solution métier transport public libre la plus avancée.
 
-Exploité par les opérateurs de transport public, il offre toutes les fonctions nécessaires à leurs utilisateurs :
+<h3>Fonctionnalités</li>
+
+Exploité par les opérateurs de transport public, SYNTHESE offre toutes les fonctions nécessaires à leurs utilisateurs :
 <ul>
-<li>multi-supports : de l'information statique sur papier aux écrans dynamiques temps réel</li>
-<li>multimodal : de la ligne de bus à la télécabine de montagne</li>
-<li>ouvert : 100% OpenSource et en lien avec les standards du métier</li>
-<li>innovant : bon nombre de fonctionnalités métier avancées sont proposées en exclusivité</li>
+<li><b>Référentiel de données multimodal</b> : modèle de données enrichi (route et transport public) et modifiable en temps réel si connexion à des SAE ou des écrans de gestion sur site</li>
+<li><b>Calcul d’itinéraires optimisé</b> : algorithme exact et performant de recherche d’itinéraires tous modes de transport (y compris si pas d’horaire défini)</li>
+<li><b>Téléaffichage intelligent</b> : génération de tableaux de départ multimodaux en approche chronologique classique, et également en approche par destination (innovation) : affichage de correspondances en lignes sur les écrans de quai, écrans généraux par destination en ordre alphabétique avec calcul temps réel de correspondances. Gestion du matériel et supervision</li>
+<li><b>Réservation de transport à la demande</b> : par opérateur professionnel ou directement par le client par compte sécurisé. Comporte toutes les fonctions nécessaires à la gestion du service (feuille de route conducteur, journal d’activité, statistiques, fichier clients, etc.)</li>
+<li><b>Génération de fiches horaires</b> : fabrication automatisée des classiques documents clientèle essentiellement destinés à être imprimés, avec approche classique par ligne, mais aussi par géographie (innovation) : fiches horaires multimodales par axes, extraction de troncs communs, génération de renvois, fusion de variantes, etc. En sortie, présentation en tableau horizontal ou vertical, ou en listing horizontal ou vertical</li>
+<li><b>Gestion d’actualités</b> : saisie de messages événementiels diffusés sur un ensemble de destinataires (lignes, arrêts, écrans, e-mail, RSS, etc.), basés ou non sur des scénarios préparés à l’avance et paramétrables par un système de variables</li>
+<li><b>Gestion des utilisateurs</b> : par profil, habilitations définies par périmètre géographique ou réseau, journaux d’activité, statistiques d’utilisation</li>
+<li><b>Module d’interface indépendant (CMS interne)</b> : séparation de la couche média permettant à partir d’une même instance du serveur d’alimenter plusieurs sites Internet (chartes graphiques programmables en toute liberté) et plusieurs types de matériel à protocole spécifique (ex : terminal à LED). Le module d’interface est intégralement programmé par configuration des données et ne nécessite aucune programmation lourde.</li>
+<li><b>Web 2.0</b> : intégration de forums de discussions dans les résultats produits par les services</li>
+<li><b>Module de randonnées</b> : fabrication de fiche de randonnées avec tous les accès en transport public disponibles</li>
 </ul>
 
-SYNTHESE est le véritable couteau Suisse des transports publics.
+<h3>Architectures système</h3>
 
-<h3>Le projet</h3>
+SYNTHESE est un système d'information aux voyageurs (SIV) qui s'intègre dans une infrastructure de transport intelligent (Intelligent Transport System - ITS) :
+<ul>
+<li>@subpage archi-external</li>
+<li>@subpage archi-monitoring</li>
+</ul>
+
+<h2>Le projet</h2>
 
 <ul>
+<li>@subpage history</li>
 <li>@subpage philo</li>
-<li>@subpage features</li>
-<li>@subpage technical</li>
+<li>@subpage archi-interne</li>
 <li>@subpage roadmap</li>
 <li>@subpage participate</li>
 <li><a href="cccc/cccc.html">Metrics</a></li>
