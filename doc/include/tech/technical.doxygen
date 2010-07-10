@@ -1,0 +1,32 @@
+/** @page technical Architecture technique
+
+SYNTHESE est développé dans une optique de haute performance.
+
+A ce titre, il utilise les technologies libres suivantes, dont l’efficacité reste inégalée à ce jour :
+<ul>
+<li><b>Code 100% C++</b> : optimisation de la mémoire et rapidité proche du maximum grâce au positionnement bas-niveau du C++</li>
+<li><b>Chargement de toutes les données utiles en mémoire vive</b> selon un modèle objet orienté performances de calcul</li>
+<li><b>Bibliothèques STL et Boost</b> : basées essentiellement sur des templates, évitent bon nombre de calculs à l’exécution et donc augmentation de la performance. Ces bibliothèques sont standard et sont donc connues de la grande majorité des développeurs C++.</li>
+<li><b>Base de données fichier SQLite</b> : l’une des plus rapides du marché, grâce à l’économie du passage par une socket. Permet en outre une synchronisation automatique avec la mémoire vive par l'usage des triggers C.</li>
+<li><b>Algorithmes optimisés</b> utilisant les données directement en mémoire vive pour maximiser les performances.</li>
+<li><b>Une API XML</b> est disponible pour un contrôle externe de l’application par d’autres serveurs, notamment gérant la couche média de manière déportée</li>
+</ul>
+ 
+SYNTHESE est développé en C++ dans le respect des normes ANSI, ce qui lui permet d’être compilé et de fonctionner sur les plateformes suivantes :
+<ul>
+<li>Windows</li>
+<li>Linux</li>
+<li>Mac</li>
+</ul>
+
+Quelques points clé à propos de SYNTHESE :
+<ul>
+<li>Aucune dépendance à bibliothèque non libre</li>
+<li>Modularité totale, utilisation d’un framework basé sur des factories permettant le dialogue entre modules ne se « connaissant pas »</li>
+<li>Codage respectueux des standards ANSI C++, totalement cross-plateforme (Linux, Windows, Mac) en faisant appel le moins possible à des doubles implémentations</li>
+<li>Documentation en ligne et complétée par des pages métier exploitées par Doxygen</li>
+<li>Livraison des binaires par packaging deb (sous Linux uniquement) avec installation automatique des dépendances</li>
+<li>Compilation par SCons</li>
+</ul>
+
+*/
