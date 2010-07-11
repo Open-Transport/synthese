@@ -1,11 +1,11 @@
-/** @page archi-externe Intégration de SYNTHESE dans une architecture type ITS
+/** @page archi-externe Intégration dans une architecture type ITS
 
 SYNTHESE est un système d'information-voyageurs (SIV) qui s'inscrit  dans une architecture de système de transports intelligents (ITS) à plusieurs composants, chacun ayant un périmètre d'intervention qui lui est propre :
 
 <ul>
-<li>les données théoriques proviennent des <a href="http://fr.wikipedia.org/wiki/Graphicage_et_habillage" terget="_blank">serveurs de graphicage</a> et/ou sont saisies par un opérateur. Dans tous les cas, celui-ci reste en général obligatoire pour effectuer la fusion des données issues de plusieurs réseaux et pour convertir ces données en données d'information. Les données importées respectent aujourd'hui le format français Trident, et seront demain remplacées par des données au format européen Netex.</li>
-<li>les données temps réel proviennent des serveurs d'aide à l'exploiation (SAE) et sont transmises à SYNTHESE sous le format européen SIRI.</li>
-<li>SYNTHESE constitue alors un référentiel d'information-voyageurs, sur lequel s'appuient des algorithmes avancés, réalisant le métier de l'information-voyageurs.</li>
+<li>les <b>données théoriques</b> proviennent des <a href="http://fr.wikipedia.org/wiki/Graphicage_et_habillage" terget="_blank">serveurs de graphicage</a> et/ou sont saisies par un opérateur. Dans tous les cas, celui-ci reste en général obligatoire pour effectuer la fusion des données issues de plusieurs réseaux et pour convertir ces données en données d'information. Les données importées respectent aujourd'hui le format français Trident, et seront demain remplacées par des données au format européen Netex.</li>
+<li>les <b>données temps réel</b> proviennent des serveurs d'aide à l'exploiation (SAE) et sont transmises à SYNTHESE sous le format européen SIRI.</li>
+<li>SYNTHESE constitue alors un référentiel d'information-voyageurs, sur lequel s'appuient des algorithmes avancés, réalisant le <b>métier de l'information-voyageurs</b>.</li>
 </ul>
 
 SYNTHESE est dédié à l'information-voyageurs : il est alimenté à partir de données d'exploitation transformées ou remplacées par des données d'information. Cette conversion est loin d'être triviale et porte en elle la richesse fonctionnelle du SIV. Ceci est l'une des principales raisons qui poussent aujourd'hui les exploitatnts de réseaux à découpler les SAE et les SIV.
@@ -16,7 +16,7 @@ Le diagramme suivant représente une architecture ITS standard intégrant le SIV S
 @image latex archi-externe.png width=10cm
 
 
-@page archi-monitoring Intégration de SYNTHESE dans une architecture de supervision basée sur Nagios
+@page archi-monitoring Intégration dans une architecture de supervision basée sur Nagios
 
 <h2>Présentation</h2>
 SYNTHESE peut être intégré à une centrale de supervision basée sur le serveur Nagios. Cette architecture repose sur un mécanisme à plusieurs rôles, qui échangent des informations de manière asynchrone.

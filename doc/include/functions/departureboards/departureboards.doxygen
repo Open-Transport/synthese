@@ -1,0 +1,24 @@
+/** @page departureboards Téléaffichage intellligent
+
+Les + de RCST : SYNTHESE propose en standard un module de téléaffichage dynamique, qui permet d’alimenter des écrans TFT ou spécifiques (LED, etc.) en se basant sur les données multimodales.
+L’approche de ce module est novatrice : il ne se contente pas d’afficher des listes chronologiques de départ, mais propose l’ensemble des outils nécessaires pour la mise en place d’un plan de signalétique managée.
+Les fonctions préférées du module de téléaffichage de SYNTHESE sont l’affichage des correspondances en ligne sur un écran de quai (utile lorsqu’une ligne se dédouble par exemple), ainsi que l’écran général par destination utilisant le calcul d’itinéraires pour construire l’affichage.
+Le module de téléaffichage prend également en charge la supervision du matériel.
+
+<h2>Ecran général par destination</h2>
+
+
+
+
+Ecran de quai affichant des correspondances bus aux arrêts desservis par le train
+ 
+Ecrans généraux par destination en ordre alphabétique avec correspondance si pas de solution directe.
+ 
+Ecran vertical intégré à un arrêt de bus.
+
+Le module de téléaffichage est intégré à SYNTHESE : il peut donc bénéficier des messages d’information temps réel diffusés par le SAE.
+
+ 
+Ecran d’administration d’un dispositif de téléaffichage
+ 
+*/
