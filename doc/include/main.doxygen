@@ -7,7 +7,7 @@ SYNTHESE est une suite logicielle libre, serveur d’information-voyageurs multimo
 Son statut sous licence GPL lui a permis une évolution très rapide, et quelques exclusivités fonctionnelles encore inégalées par les produits commerciaux.
 En tout état de cause, SYNTHESE est la solution métier transport public libre la plus avancée.
 
-<h3>Fonctionnalités</li>
+<h3>Fonctionnalités</h3>
 
 Exploité par les opérateurs de transport public, SYNTHESE offre toutes les fonctions nécessaires à leurs utilisateurs :
 <ul>
@@ -27,7 +27,7 @@ Exploité par les opérateurs de transport public, SYNTHESE offre toutes les fonct
 
 SYNTHESE est un système d'information aux voyageurs (SIV) qui s'intègre dans une infrastructure de transport intelligent (Intelligent Transport System - ITS) :
 <ul>
-<li>@subpage archi-external</li>
+<li>@subpage archi-externe</li>
 <li>@subpage archi-monitoring</li>
 </ul>
 
@@ -39,6 +39,7 @@ SYNTHESE est un système d'information aux voyageurs (SIV) qui s'intègre dans une
 <li>@subpage archi-interne</li>
 <li>@subpage roadmap</li>
 <li>@subpage participate</li>
+<li>@subpage svn</li>
 <li><a href="cccc/cccc.html">Metrics</a></li>
 </ul>
 

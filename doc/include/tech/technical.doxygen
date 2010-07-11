@@ -27,7 +27,7 @@ SYNTHESE peut être intégré à une centrale de supervision basée sur le serveur Na
 Les points pouvant être supervisés sont :
 <ul>
 <li>Etat du matériel de téléaffichage (fonction DisplayScreenSupervisionFunction)</li>
-<li>Cohérence des données (fonction CheckLineCalendarFunction)</li>
+<li>Cohérence des données (fonction pt::CheckLineCalendarFunction)</li>
 </ul>
 
 <h2>Services</h2>
