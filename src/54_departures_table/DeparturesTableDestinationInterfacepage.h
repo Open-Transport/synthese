@@ -37,7 +37,7 @@ namespace synthese
 	
 	namespace graph
 	{
-		class ServiceUse;
+		class ServicePointer;
 	}
 
 	namespace departurestable
@@ -63,7 +63,6 @@ namespace synthese
 				- 7 : is the end station
 				- 8 : transfer destinations from this stop (should be the output of DeparturesTableTransferDestinationInterfacePage)
 
-			Object : ServiceUse
 		*/
 		class DeparturesTableDestinationInterfacepage
 			: public util::FactorableTemplate<interfaces::InterfacePage, DeparturesTableDestinationInterfacepage>
@@ -78,7 +77,7 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				const graph::ServiceUse& object,
+				const graph::ServicePointer& object,
 				bool lastDisplayedStopWasInTheSameCity,
 				bool isTheEndStation,
 				const std::string& transfersString,

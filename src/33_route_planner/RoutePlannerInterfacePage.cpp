@@ -230,11 +230,11 @@ namespace synthese
 					const Journey::ServiceUses& jl(it->getServiceUses());
 					for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 					{
-						const ServiceUse& curET(*itl);
+						const ServicePointer& curET(*itl);
 
 						if(	itl == jl.begin() ||
-							!curET.getEdge()->getParentPath()->isPedestrianMode() ||
-							lastPedestrianMode != curET.getEdge()->getParentPath()->isPedestrianMode()
+							!curET.getService()->getPath()->isPedestrianMode() ||
+							lastPedestrianMode != curET.getService()->getPath()->isPedestrianMode()
 						){
 							const NamedPlace* placeToSearch(
 								(	itl == jl.begin() &&
@@ -267,7 +267,7 @@ namespace synthese
 								);
 							}
 
-							pedestrianMode = curET.getEdge()->getParentPath()->isPedestrianMode();
+							pedestrianMode = curET.getService()->getPath()->isPedestrianMode();
 
 							// Saving of the columns on each lines
 							DisplayScheduleCell(
@@ -290,8 +290,8 @@ namespace synthese
 						}
 
 						if(	itl == jl.end()-1
-							||	!(itl+1)->getEdge()->getParentPath()->isPedestrianMode()
-							||	!curET.getEdge()->getParentPath()->isPedestrianMode()
+							||	!(itl+1)->getService()->getPath()->isPedestrianMode()
+							||	!curET.getService()->getPath()->isPedestrianMode()
 						){
 							const NamedPlace* placeToSearch(
 								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?
@@ -501,7 +501,7 @@ namespace synthese
 				set<const CommercialLine*> lines;
 				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, object.getJourneys())
 				{
-					BOOST_FOREACH(const ServiceUse& service, journey.getServiceUses())
+					BOOST_FOREACH(const ServicePointer& service, journey.getServiceUses())
 					{
 						if(dynamic_cast<const Line*>(service.getService()->getPath()))
 						{
@@ -643,7 +643,7 @@ namespace synthese
 				//	_displayPedestrianLines->getValue(parameters, variables, object, request)
 				//	);
 
-				BOOST_FOREACH(const ServiceUse& leg, journey.getServiceUses())
+				BOOST_FOREACH(const ServicePointer& leg, journey.getServiceUses())
 				{
 					if ( __AfficherLignesPied || !dynamic_cast<const Road*> (leg.getService()->getPath ()) )
 					{

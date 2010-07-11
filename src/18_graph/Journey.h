@@ -27,7 +27,7 @@
 #include <boost/logic/tribool.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
-#include "ServiceUse.h"
+#include "ServicePointer.h"
 #include "GraphTypes.h"
 
 namespace synthese
@@ -37,37 +37,24 @@ namespace synthese
 		class Edge;
 		class VertexAccessMap;
 
-		/** Journey class.
-			@ingroup m35
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Journey using all kind of networks.
+		///	@ingroup m35
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// A journey consists in a succession of service uses.
+		/// It can represent a continuous service.
 		class Journey
 		{
 		public:
-			typedef std::deque<ServiceUse>	ServiceUses;
-			typedef unsigned int Score;
+			typedef std::deque<ServicePointer>	ServiceUses;
 			typedef unsigned int Distance;
 
-		private:
-			typedef const ServiceUse& (Journey::*ServiceUseGetter) () const;
-			typedef const Edge* (Journey::*EdgeGetter) () const;
-			typedef boost::posix_time::ptime (Journey::*DateTimeGetter) (bool) const;
-			typedef void (Journey::*JourneyPusher) (const Journey& journey);
-			typedef void (Journey::*ServiceUsePusher) (const ServiceUse& serviceUse);
+		protected:
 
 			//! @name Content
 			//@{
-				AccessDirection						_method;
 				ServiceUses							_journeyLegs;
-				boost::posix_time::time_duration	_startApproachDuration;
-				boost::posix_time::time_duration	_endApproachDuration;
-			//@}
-
-			//! @name Route planning data
-			//@{
-				bool						_endReached;
-				Distance					_distanceToEnd;
-				Score						_score;
-				boost::logic::tribool		_similarity;		
 			//@}
 
 			//! @name Query cache
@@ -78,27 +65,36 @@ namespace synthese
 				double			_distance;
 			//@}
 			
-			//! @name Oriented operators
-			//@{
-				ServiceUseGetter					_endServiceUseGetter;
-				ServiceUseGetter					_beginServiceUseGetter;
-				EdgeGetter							_endEdgeGetter;
-				EdgeGetter							_beginEdgeGetter;
-				DateTimeGetter						_endDateTimeGetter;
-				DateTimeGetter						_beginDateTimeGetter;
-			//@}
-
-				void _setMethod(AccessDirection method);
-				void _prepend(const ServiceUse& leg);
-				void _append(const ServiceUse& leg);
-				void _prepend (const Journey& journey);
-				void _append (const Journey& journey);
-
-
-		 public:
+		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// Empty journey constructor.
 			Journey();
-			Journey(const Journey& journey, const ServiceUse& serviceUse);
-			Journey(const Journey& journey1, const Journey& journey2);
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds a journey by adding a service use to an existing journey.
+			/// @param journey the journey to fill
+			/// @param serviceUse the leg to add to the journey
+			/// @param order if true the leg is pushed to the end of the journey, else to the beginning
+			Journey(
+				const Journey& journey,
+				const ServicePointer& serviceUse,
+				bool order = true
+			);
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds a journey by concatenation of two journeys.
+			/// @param journey1 first journey
+			/// @param journey2 second journey
+			/// @param order if true the second journey is pushed after the first, else the first is pushed after the second
+			Journey(
+				const Journey& journey1,
+				const Journey& journey2,
+				bool order = true
+			);
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Destructor.
 			~Journey();
 
 
@@ -109,10 +105,9 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007					
 				*/
-				const ServiceUses& getServiceUses() const;
-				ServiceUses& getServiceUses();
+				const ServiceUses& getServiceUses() const { return _journeyLegs; }
+				ServiceUses& getServiceUses() { return _journeyLegs; }
 
-				AccessDirection getMethod() const;
 
 				/** Returns the effective amount of time spent
 					travelling, excluding tranfer delays.
@@ -123,53 +118,33 @@ namespace synthese
 					@return Range duration in minutes, or 0 if unique service.
 				*/
 				boost::posix_time::time_duration			getContinuousServiceRange () const;
-				bool		getEndReached() const;
-				Score			getScore()	const;
-				boost::posix_time::time_duration getStartApproachDuration()	const;
-				boost::posix_time::time_duration getEndApproachDuration()	const;
-				Distance getDistanceToEnd() const;
-				boost::logic::tribool getSimilarity() const;
 			//@}
 
 			//! @name Setters
 			//@{
 				void setContinuousServiceRange (boost::posix_time::time_duration continuousServiceRange);
-				void setStartApproachDuration(boost::posix_time::time_duration duration);
-				void setEndApproachDuration(boost::posix_time::time_duration duration);
-				void setEndIsReached(bool value);
-				void setDistanceToEnd(Distance value);
-				void setScore(Score value);
-				void setSimilarity(boost::logic::tribool value);
 			//@}
 
-			//! @name Orientation relative methods
-			//@{
-				const ServiceUse& getEndServiceUse() const;
-				const ServiceUse& getStartServiceUse() const;
-			//@}
 
 			//! @name Query methods
 			//@{
 				bool empty()	const;
 				std::size_t size() const;
 				
-				const ServiceUse& getJourneyLeg (std::size_t index) const;
-				const ServiceUse& getFirstJourneyLeg () const;
-				const ServiceUse& getLastJourneyLeg () const;
+				const ServicePointer& getJourneyLeg (std::size_t index) const;
+				const ServicePointer& getFirstJourneyLeg () const;
+				const ServicePointer& getLastJourneyLeg () const;
 				
+				const boost::posix_time::ptime& getFirstDepartureTime () const;
+				boost::posix_time::ptime getLastDepartureTime () const;
+				const boost::posix_time::ptime& getFirstArrivalTime () const;
+				boost::posix_time::ptime getLastArrivalTime () const;
+
+				boost::posix_time::time_duration getDuration () const;
+
 				const Edge* getOrigin() const;
 				const Edge* getDestination() const;
 
-				const Edge* getEndEdge() const;
-				boost::posix_time::ptime getEndTime(bool includeApproach = true) const;
-				boost::posix_time::ptime getBeginTime(bool includeApproach = true) const;
-
-				boost::posix_time::ptime getFirstDepartureTime (bool includeApproach = true) const;
-				boost::posix_time::ptime getLastDepartureTime (bool includeApproach = true) const;
-				boost::posix_time::ptime getFirstArrivalTime (bool includeApproach = true) const;
-				boost::posix_time::ptime getLastArrivalTime (bool includeApproach = true) const;
-
-				boost::posix_time::time_duration getDuration (bool includeApproach = true) const;
 				double getDistance () const;
 		
 		
@@ -185,14 +160,6 @@ namespace synthese
 				*/
 				int getMaxAlarmLevel () const;
 
-				/** Comparison between journeys doing the same relation..
-					@param other Journey to compare with
-					@return true if the current journey is a best choice than the other one
-					@warning Journey objects must have same method
-				*/
-				bool isBestThan(const Journey& other) const;
-
-
 				boost::logic::tribool	getReservationCompliance() const;
 				boost::posix_time::ptime			getReservationDeadLine() const;
 			//@}
@@ -201,21 +168,19 @@ namespace synthese
 
 			//! @name Update methods
 			//@{
+				void prepend(const ServicePointer& leg);
+				void append(const ServicePointer& leg);
+				void prepend (const Journey& journey);
+				void append (const Journey& journey);
+
 				void clear ();
 
 				void shift(
 					boost::posix_time::time_duration duration,
 					boost::posix_time::time_duration continuousServiceRange = boost::posix_time::not_a_date_time
 				);
-				void reverse();
 			//@}
-
-//			Journey& operator = (const Journey& ref);
-
-
 		};
-
-
 	}
 }
 

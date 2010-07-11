@@ -38,11 +38,6 @@ namespace synthese
 			return ptime(pos_infin);
 		}
 
-		UseRule::RunPossibilityType ForbiddenUseRule::isRunPossible(
-			const ServiceUse& serviceUse
-		) const	{
-			return RUN_NOT_POSSIBLE;
-		}
 
 		UseRule::RunPossibilityType ForbiddenUseRule::isRunPossible(
 			const ServicePointer& servicePointer
@@ -50,11 +45,7 @@ namespace synthese
 			return RUN_NOT_POSSIBLE;
 		}
 
-		UseRule::ReservationAvailabilityType ForbiddenUseRule::getReservationAvailability(
-			const ServiceUse& serviceUse
-		) const	{
-			return RESERVATION_FORBIDDEN;
-		}
+
 
 		UseRule::ReservationAvailabilityType ForbiddenUseRule::getReservationAvailability(
 			const ServicePointer& servicePointer

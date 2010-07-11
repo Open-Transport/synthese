@@ -207,49 +207,28 @@ namespace synthese
 					dead line and be after reservation opening time.
 				*/
 				virtual RunPossibilityType isRunPossible (
-					const graph::ServiceUse& serviceUse
-				) const;
-
-
-				/** Indicates whether or not a path can be taken at a given date, 
-					taking into account reservation delay rules.
-					@return true if the line run can be taken, false otherwise.
-
-					This methods checks the following conditions :
-						- if reservation is not compulsory, the run can be taken.
-						- if reservation is compulsory, reservation time must precede reservation 
-					dead line and be after reservation opening time.
-				*/
-				virtual RunPossibilityType isRunPossible (
 					const graph::ServicePointer& servicePointer
 				) const;
 
 
-				/** Indicates whether or not a reservation is possible for a given run,
-					at a certain date, taking into account delay rules.
-					@return true if the reservation is possible, false otherwise.
-				 
-					This methods checks the following conditions :
-						- reservation time must precede reservation dead line
-						- reservation time must be later than reservation start time.
-				*/
-				virtual ReservationAvailabilityType getReservationAvailability(
-					const graph::ServiceUse& serviceUse
-				) const;
-
 
 				//////////////////////////////////////////////////////////////////////////
-				/// Temporary reservation availability getter.
-				/// 
-				/// @warning The reservation availability result produced by this method
-				/// is temporary : the departure time
+				/// Indicates whether or not a reservation is possible for a given run,
+				///	at a certain date, taking into account delay rules.
+				///	@return true if the reservation is possible, false otherwise.
+				///
+				///	This methods checks the following conditions :
+				///		- reservation time must precede reservation dead line
+				///		- reservation time must be later than reservation start time.
+				///
+				///	@warning If the service pointer departure time is not fully defined, then the method returns
+				/// a temporary reservation availability : the departure time
 				/// must be known to determinate the reservation availability definitely.
 				/// In ARRIVAL_TO_DEPARTURE method, the arrival time is the only one
 				/// known. The temporary result is based on the arrival time : if no
 				/// reservation can be done for the arrival time, it is not possible to do
 				/// one for any departure time, that is necessarily earlier. So the
-				/// result of this method MUST be confirmed by
-				/// getReservationAvailability(const ServiceUse&, ...)
+				/// result of this method MUST be confirmed by a call on a full service pointer.
 				virtual ReservationAvailabilityType getReservationAvailability(
 					const graph::ServicePointer& servicePointer
 				) const;

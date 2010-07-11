@@ -34,16 +34,18 @@ namespace synthese
 	{
 		ServicePointer::ServicePointer(
 			bool RTData,
-			AccessDirection method,
 			size_t userClassRank,
-			const Edge* edge
+			const Service& service,
+			const boost::posix_time::ptime& originDateTime
 		):	_RTData(RTData),
-			_service(NULL),
-			_determinationMethod(method),
+			_service(&service),
 			_range(posix_time::seconds(0)),
-			_edge(edge),
+			_departureEdge(NULL),
+			_realTimeDepartureVertex(NULL),
+			_arrivalEdge(NULL),
+			_realTimeArrivalVertex(NULL),
 			_userClassRank(userClassRank),
-			_RTVertex(edge ? edge->getFromVertex() : NULL)
+			_originDateTime(originDateTime)
 		{}
 
 
@@ -51,13 +53,49 @@ namespace synthese
 		ServicePointer::ServicePointer():
 			_RTData(false),
 			_service(NULL),
-			_edge(NULL),
-			_RTVertex(NULL),
-			_determinationMethod(UNDEFINED_DIRECTION),
+			_departureEdge(NULL),
+			_realTimeDepartureVertex(NULL),
+			_arrivalEdge(NULL),
+			_realTimeArrivalVertex(NULL),
 			_range(posix_time::seconds(0)),
 			_userClassRank(0)
 		{}
 
+
+
+		ServicePointer::ServicePointer(
+			const ServicePointer& partiallyFilledPointer,
+			const Edge& edge
+		):	_RTData(partiallyFilledPointer._RTData),
+			_service(partiallyFilledPointer._service),
+			_range(partiallyFilledPointer._range),
+			_userClassRank(partiallyFilledPointer._userClassRank),
+			_originDateTime(partiallyFilledPointer._originDateTime),
+			_departureEdge(NULL),
+			_arrivalEdge(NULL)
+		{
+			assert(!_departureEdge || !_arrivalEdge);
+
+			if(partiallyFilledPointer.getDepartureEdge())
+			{
+				setDepartureInformations(
+					*partiallyFilledPointer.getDepartureEdge(),
+					partiallyFilledPointer.getDepartureDateTime(),
+					partiallyFilledPointer.getTheoreticalDepartureDateTime(),
+					*partiallyFilledPointer.getRealTimeDepartureVertex()
+				);
+			}
+			else
+			{
+				setArrivalInformations(
+					*partiallyFilledPointer.getArrivalEdge(),
+					partiallyFilledPointer.getArrivalDateTime(),
+					partiallyFilledPointer.getTheoreticalArrivalDateTime(),
+					*partiallyFilledPointer.getRealTimeArrivalVertex()
+				);
+			}
+			complete(edge);
+		}
 
 
 		const UseRule& ServicePointer::getUseRule() const
@@ -69,7 +107,112 @@ namespace synthese
 
 		UseRule::RunPossibilityType ServicePointer::isUseRuleCompliant(
 		) const	{
-			return getUseRule().isRunPossible(*this);
+			if(getUseRule().isRunPossible(*this) != UseRule::RUN_POSSIBLE)
+			{
+				return UseRule::RUN_NOT_POSSIBLE;
+			}
+			if(_departureEdge && _arrivalEdge)
+			{
+				return _service->nonConcurrencyRuleOK(
+					_originDateTime.date(),
+					*getDepartureEdge(),
+					*getArrivalEdge(),
+					_userClassRank
+				) ?
+				UseRule::RUN_POSSIBLE :
+				UseRule::RUN_NOT_POSSIBLE;
+			}
+			return UseRule::RUN_POSSIBLE;
+		}
+
+
+
+		void ServicePointer::setDepartureInformations(
+			const graph::Edge& edge,
+			const boost::posix_time::ptime& dateTime,
+			const boost::posix_time::ptime& theoreticalDateTime,
+			const Vertex& realTimeVertex
+		){
+			_departureEdge = &edge;
+			_departureTime = dateTime;
+			_theoreticalDepartureTime = theoreticalDateTime;
+			_realTimeDepartureVertex = &realTimeVertex;
+		}
+
+
+
+		void ServicePointer::setArrivalInformations(
+			const graph::Edge& edge,
+			const boost::posix_time::ptime& dateTime,
+			const boost::posix_time::ptime& theoreticalDateTime,
+			const Vertex& realTimeVertex
+		){
+			_arrivalEdge = &edge;
+			_arrivalTime = dateTime;
+			_theoreticalArrivalTime = theoreticalDateTime;
+			_realTimeArrivalVertex = &realTimeVertex;
+		}
+
+
+
+		void ServicePointer::complete( const Edge& edge )
+		{
+			assert(_departureEdge || _arrivalEdge);
+
+			_service->completeServicePointer(*this, edge);
+		}
+
+
+
+		double ServicePointer::getDistance() const
+		{
+			assert(_arrivalEdge && _departureEdge);
+
+			return _arrivalEdge->getMetricOffset() - _departureEdge->getMetricOffset();
+		}
+
+
+
+		boost::posix_time::time_duration ServicePointer::getDuration() const
+		{
+			return getArrivalDateTime() - getDepartureDateTime();
+		}
+
+
+
+		void ServicePointer::shift( boost::posix_time::time_duration duration )
+		{
+			if (duration.total_seconds() == 0)
+				return;
+
+			if(_departureEdge)
+			{
+				_departureTime += duration;
+			}
+			if(_arrivalEdge)
+			{
+				_arrivalTime += duration;
+			}
+			_originDateTime += duration;
+			setServiceRange(getServiceRange() - duration);
+		}
+
+
+
+		boost::posix_time::ptime ServicePointer::getReservationDeadLine() const
+		{
+			assert(_departureEdge);
+
+			UseRule::ReservationAvailabilityType resa(getUseRule().getReservationAvailability(*this));
+			if(	resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
+				resa == UseRule::RESERVATION_OPTIONAL_POSSIBLE
+			){
+				return getUseRule().getReservationDeadLine(
+					_originDateTime,
+					getDepartureDateTime()
+				);
+			}
+			return ptime(not_a_date_time);
 		}
 	}
 }

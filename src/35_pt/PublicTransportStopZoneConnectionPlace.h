@@ -127,18 +127,17 @@ namespace synthese
 				) const;
 
 				virtual void getVertexAccessMap(
-					graph::VertexAccessMap& result
-					, const graph::AccessDirection& accessDirection
-					, graph::GraphIdType whatToSearch,
-					const graph::Vertex& origin
+					graph::VertexAccessMap& result,
+					graph::GraphIdType whatToSearch,
+					const graph::Vertex& origin,
+					bool vertexIsOrigin
 				) const;
 
 
 				virtual void getVertexAccessMap(
-					graph::VertexAccessMap& result
-					, const graph::AccessDirection& accessDirection
-					, const graph::AccessParameters& accessParameters
-					, const geography::Place::GraphTypes& whatToSearch
+					graph::VertexAccessMap& result,
+					const graph::AccessParameters& accessParameters,
+					const geography::Place::GraphTypes& whatToSearch
 				) const;
 
 				virtual bool containsAnyVertex(graph::GraphIdType graphType) const;

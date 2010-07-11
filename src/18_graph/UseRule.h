@@ -33,7 +33,6 @@ namespace synthese
 {
 	namespace graph
 	{
-		class ServiceUse;
 		class ServicePointer;
 		class AccessParameters;
 
@@ -159,12 +158,6 @@ namespace synthese
 					dead line and be after reservation opening time.
 				*/
 				virtual RunPossibilityType isRunPossible (
-					const ServiceUse& serviceUse
-				) const = 0;
-
-
-
-				virtual RunPossibilityType isRunPossible (
 					const ServicePointer& servicePointer
 				) const = 0;
 
@@ -180,11 +173,6 @@ namespace synthese
 						- reservation time must precede reservation dead line
 						- reservation time must be later than reservation start time.
 				*/
-				virtual ReservationAvailabilityType getReservationAvailability(
-					const ServiceUse& serviceUse
-				) const = 0;
-
-
 				virtual ReservationAvailabilityType getReservationAvailability(
 					const ServicePointer& servicePointer
 				) const = 0;

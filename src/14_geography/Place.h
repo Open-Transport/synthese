@@ -78,7 +78,6 @@ namespace synthese
 
 			virtual void getVertexAccessMap(
 				graph::VertexAccessMap& result,
-				const graph::AccessDirection& accessDirection,
 				const graph::AccessParameters& accessParameters,
 				const GraphTypes& whatToSearch
 			) const = 0;
@@ -86,7 +85,6 @@ namespace synthese
 
 
 			graph::VertexAccessMap getVertexAccessMap(
-				graph::AccessDirection accessDirection,
 				const graph::AccessParameters& accessParameters,
 				GraphTypes::value_type whatToSearch,
 				...

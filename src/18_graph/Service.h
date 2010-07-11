@@ -167,9 +167,7 @@ namespace synthese
 
 
 				/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
-					@param method Search departure or arrival :
-						- ServicePointer::DEPARTURE_TO_ARRIVAL
-						- ServicePointer::ARRIVAL_TO_DEPARTURE
+					@param getDeparture
 					@param edge Edge
 					@param presenceDateTime Goal  time
 					@param controlIfTheServiceIsReachable service selection method :
@@ -183,17 +181,19 @@ namespace synthese
 				*/
 				virtual ServicePointer getFromPresenceTime(
 					bool RTData,
-					AccessDirection method,
+					bool getDeparture,
 					std::size_t userClassRank,
-					const Edge* edge,
-					const boost::posix_time::ptime& presenceDateTime
-					, bool controlIfTheServiceIsReachable
-					, bool inverted
+					const Edge& edge,
+					const boost::posix_time::ptime& presenceDateTime,
+					bool controlIfTheServiceIsReachable,
+					bool inverted
 				) const = 0;
 
-				virtual boost::posix_time::ptime getLeaveTime(
-					const ServicePointer& servicePointer
-					, const Edge* edge
+
+
+				virtual void completeServicePointer(
+					ServicePointer& servicePointer,
+					const Edge& edge
 				) const = 0;
 
 				/** Date of the departure from the origin of the service.

@@ -57,10 +57,10 @@ namespace synthese
 			//@{
 
 				virtual void getVertexAccessMap(
-					graph::VertexAccessMap& result
-					, const graph::AccessDirection& accessDirection
-					, graph::GraphIdType whatToSearch,
-					const graph::Vertex& origin
+					graph::VertexAccessMap& result,
+					graph::GraphIdType whatToSearch,
+					const graph::Vertex& origin,
+					bool vertexIsOrigin
 				) const;
 
 				virtual bool isConnectionAllowed(

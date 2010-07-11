@@ -37,7 +37,7 @@ namespace synthese
 
 	namespace graph
 	{
-		class ServiceUse;
+		class ServicePointer;
 	}
 	
 	namespace departurestable
@@ -79,7 +79,7 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				const graph::ServiceUse& object,
+				const graph::ServicePointer& object,
 				std::size_t localTransferRank,
 				std::size_t totalTransferRank,
 				interfaces::VariablesMap& variables,

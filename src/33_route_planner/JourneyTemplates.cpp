@@ -24,7 +24,7 @@
 #include "Journey.h"
 #include "Edge.h"
 #include "Vertex.h"
-#include "ServiceUse.h"
+#include "ServicePointer.h"
 
 #include <boost/foreach.hpp>
 
@@ -41,13 +41,13 @@ namespace synthese
 			Hubs::value_type result;
 			BOOST_FOREACH(const Journey::ServiceUses::value_type& service, value.getServiceUses())
 			{
-				if(service.getEdge()->getFromVertex()->getGraphType() == _graphToUse)
+				if(service.getDepartureEdge()->getFromVertex()->getGraphType() == _graphToUse)
 				{
-					result.push_back(service.getEdge()->getFromVertex()->getHub());
+					result.push_back(service.getDepartureEdge()->getFromVertex()->getHub());
 				}
-				if(service.getSecondEdge()->getFromVertex()->getGraphType() == _graphToUse)
+				if(service.getArrivalEdge()->getFromVertex()->getGraphType() == _graphToUse)
 				{
-					result.push_back(service.getSecondEdge()->getFromVertex()->getHub());
+					result.push_back(service.getArrivalEdge()->getFromVertex()->getHub());
 				}
 			}
 			if(_hubs.find(result) == _hubs.end())
@@ -79,18 +79,18 @@ namespace synthese
 				bool ok(true);
 				BOOST_FOREACH(const Journey::ServiceUses::value_type& service, value.getServiceUses())
 				{
-					if(service.getEdge()->getFromVertex()->getGraphType() == _graphToUse)
+					if(service.getDepartureEdge()->getFromVertex()->getGraphType() == _graphToUse)
 					{
-						if(*it != service.getEdge()->getFromVertex()->getHub())
+						if(*it != service.getDepartureEdge()->getFromVertex()->getHub())
 						{
 							ok = false;
 							break;
 						}
 						++it;
 					}
-					if(service.getSecondEdge()->getFromVertex()->getGraphType() == _graphToUse)
+					if(service.getArrivalEdge()->getFromVertex()->getGraphType() == _graphToUse)
 					{
-						if(*it != service.getSecondEdge()->getFromVertex()->getHub())
+						if(*it != service.getArrivalEdge()->getFromVertex()->getHub())
 						{
 							ok = false;
 							break;

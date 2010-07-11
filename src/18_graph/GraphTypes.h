@@ -30,20 +30,6 @@ namespace synthese
 {
 	namespace graph
 	{
-		/** Service determination method.
-			- DEPARTURE_TO_ARRIVAL = the service is chosen from a presence time before a departure.
-				The arrival will be chosen in the following edges.
-			- ARRIVAL_TO_DEPARTURE = the service is chosen from a presence time after an arrival.
-				The departure will be chosen in the preceding edges.
-			- UNDEFINED_DIRECTION = the direction is not defined, generally because no service is chosen
-				at this stage
-		*/
-		typedef enum {
-			ARRIVAL_TO_DEPARTURE,
-			DEPARTURE_TO_ARRIVAL,
-			UNDEFINED_DIRECTION
-		} AccessDirection ;
-
 		typedef unsigned int GraphIdType;
 
 		typedef unsigned int UserClassCode;

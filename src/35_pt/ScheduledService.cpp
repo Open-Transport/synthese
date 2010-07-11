@@ -88,82 +88,111 @@ namespace synthese
 
 		ServicePointer ScheduledService::getFromPresenceTime(
 			bool RTData,
-			AccessDirection method,
-			size_t userClass
-			, const Edge* edge
-			, const ptime& presenceDateTime
-			, bool controlIfTheServiceIsReachable
-			, bool inverted
+			bool getDeparture,
+			size_t userClass,
+			const Edge& edge,
+			const ptime& presenceDateTime,
+			bool controlIfTheServiceIsReachable,
+			bool inverted
 		) const {
 
 			// Initializations
-			ServicePointer ptr(RTData,method, userClass, edge);
-			ptr.setService(this);
-			int edgeIndex(edge->getRankInPath());
-			const time_duration& thSchedule(method == DEPARTURE_TO_ARRIVAL ? _departureSchedules[edgeIndex] : _arrivalSchedules[edgeIndex]);
-			const time_duration& rtSchedule(method == DEPARTURE_TO_ARRIVAL ? _RTDepartureSchedules[edgeIndex] : _RTArrivalSchedules[edgeIndex]);
+			size_t edgeIndex(edge.getRankInPath());
+			const time_duration& thSchedule(getDeparture ? _departureSchedules[edgeIndex] : _arrivalSchedules[edgeIndex]);
+			const time_duration& rtSchedule(getDeparture ? _RTDepartureSchedules[edgeIndex] : _RTArrivalSchedules[edgeIndex]);
 			const time_duration& schedule(RTData ? rtSchedule : thSchedule);
 			const time_duration timeOfDay(GetTimeOfDay(schedule));
 
 			// Actual time
-			if(	method == DEPARTURE_TO_ARRIVAL && presenceDateTime.time_of_day() > timeOfDay ||
-				method == ARRIVAL_TO_DEPARTURE && presenceDateTime.time_of_day() < timeOfDay
+			if(	getDeparture && presenceDateTime.time_of_day() > timeOfDay ||
+				!getDeparture && presenceDateTime.time_of_day() < timeOfDay
 			){
-				return ServicePointer(RTData, method, userClass);
+				return ServicePointer();
 			}
+
 			ptime actualTime(presenceDateTime.date(), timeOfDay);
 			const time_duration& departureSchedule(RTData ? _RTDepartureSchedules[0] : _departureSchedules[0]);
 
 			ptime originDateTime(actualTime);
 			originDateTime += (departureSchedule - schedule);
 
+			// Date control
 			ptime calendarDateTime(originDateTime);
 			if(departureSchedule >= hours(24))
 			{
 				calendarDateTime -= days(floor(float(departureSchedule.total_seconds()) / float(86400)));
 			}
-
-			// Date control
 			if (!isActive(calendarDateTime.date()))
 			{
-				return ServicePointer(RTData, method, userClass);
+				return ServicePointer();
 			}
 
 			// Saving dates
-			ptr.setActualTime(actualTime);
-			ptr.setOriginDateTime(originDateTime);
+			ServicePointer ptr(RTData, userClass, *this, originDateTime);
+
+			if(getDeparture)
+			{
+				ptr.setDepartureInformations(
+					edge,
+					actualTime,
+					ptime(presenceDateTime.date(), GetTimeOfDay(schedule)),
+					*(RTData ? _RTVertices[edgeIndex] : edge.getFromVertex())
+				);
+			}
+			else
+			{
+				ptr.setArrivalInformations(
+					edge,
+					actualTime,
+					ptime(presenceDateTime.date(), GetTimeOfDay(schedule)),
+					*(RTData ? _RTVertices[edgeIndex] : edge.getFromVertex())
+				);
+			}
 
 			// Reservation control
 			if(	controlIfTheServiceIsReachable &&
 				ptr.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE
 			){
-				return ServicePointer(RTData, method, userClass);
+				return ServicePointer();
 			}		
 
-			// Theoretical time
-			ptr.setTheoreticalTime(ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)));
-
-			// Real time edge
-			if(RTData)
-			{
-				ptr.setRealTimeVertex(_RTVertices[edgeIndex]);
-			}
 			return ptr;
 		}
 
 
 
-		ptime ScheduledService::getLeaveTime(
-			const ServicePointer& servicePointer,
-			const Edge* edge
+		void ScheduledService::completeServicePointer(
+			ServicePointer& servicePointer,
+			const Edge& edge
 		) const	{
-			int edgeIndex(edge->getRankInPath());
-			time_duration schedule(
-				(servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
-				? getArrivalSchedules(servicePointer.getRTData())[edgeIndex]
-				: getDepartureSchedules(servicePointer.getRTData())[edgeIndex]
-			);
-			return servicePointer.getOriginDateTime() + (schedule - _departureSchedules[0]);
+			
+			size_t edgeIndex(edge.getRankInPath());
+			if(servicePointer.getArrivalEdge() == NULL)
+			{
+				time_duration schedule(
+					getArrivalSchedules(servicePointer.getRTData())[edgeIndex]
+				);
+
+				servicePointer.setArrivalInformations(
+					edge,
+					servicePointer.getOriginDateTime() + (schedule - _departureSchedules[0]),
+					servicePointer.getOriginDateTime() + (getArrivalSchedules(false)[edgeIndex] - _departureSchedules[0]),
+					*(servicePointer.getRTData() ? _RTVertices[edgeIndex] : edge.getFromVertex())
+				);
+			}
+			else
+			{
+				time_duration schedule(
+					getDepartureSchedules(servicePointer.getRTData())[edgeIndex]
+				);
+
+				servicePointer.setDepartureInformations(
+					edge,
+					servicePointer.getOriginDateTime() + (schedule - _departureSchedules[0]),
+					servicePointer.getOriginDateTime() + (getDepartureSchedules(false)[edgeIndex] - _departureSchedules[0]),
+					*(servicePointer.getRTData() ? _RTVertices[edgeIndex] : edge.getFromVertex())
+				);
+			}
 		}
 
 
@@ -214,9 +243,9 @@ namespace synthese
 				{
 					ServicePointer p(getFromPresenceTime(
 						false,
-						DEPARTURE_TO_ARRIVAL,
+						true,
 						USER_PEDESTRIAN,
-						*it,
+						**it,
 						ptime(date, GetTimeOfDay(getDepartureSchedule(false, (*it)->getRankInPath()))),
 						false,
 						false
@@ -242,16 +271,16 @@ namespace synthese
 				{
 					ServicePointer p(getFromPresenceTime(
 						false,
-						DEPARTURE_TO_ARRIVAL,
+						true,
 						USER_PEDESTRIAN,
-						*it,
+						**it,
 						ptime(date, getDepartureSchedule(false, (*it)->getRankInPath())),
 						false,
 						false
 					)	);
 					return getUseRule(userClassRank).getReservationDeadLine(
 						p.getOriginDateTime(),
-						p.getActualDateTime()
+						p.getDepartureDateTime()
 					);
 				}
 			}

@@ -33,6 +33,7 @@
 #include "DeparturesTableTypes.h"
 #include "DeparturesTableInterfaceElement.h"
 #include "DeparturesTableLineContentInterfaceElement.h"
+#include "Service.h"
 
 using namespace std;
 using namespace boost;
@@ -65,7 +66,7 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			const Line* line(static_cast<const LineStop*>(static_cast<const ArrivalDepartureRow*>(object)->first.getEdge())->getLine());
+			const Line* line(static_cast<const Line*>(static_cast<const ArrivalDepartureRow*>(object)->first.getService()->getPath()));
 			const LineMarkerInterfacePage* page(_page->getInterface()->getPage<LineMarkerInterfacePage>());
 
 			page->display(

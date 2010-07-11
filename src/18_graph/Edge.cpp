@@ -167,7 +167,7 @@ namespace synthese
 
 			if(services.empty())
 			{
-				return ServicePointer(false, DEPARTURE_TO_ARRIVAL, userClassRank);
+				return ServicePointer();
 			}
 
 			bool RTData(departureMoment < posix_time::second_clock().local_time() + posix_time::hours(23));
@@ -192,9 +192,9 @@ namespace synthese
 						ServicePointer servicePointer(
 							(*next)->getFromPresenceTime(
 								RTData,
-								DEPARTURE_TO_ARRIVAL,
+								true,
 								userClassRank
-								, this
+								, *this
 								, departureMoment
 								, controlIfTheServiceIsReachable
 								, inverted
@@ -205,13 +205,13 @@ namespace synthese
 							continue;
 
 						// Control of validity of departure date time
-						if (servicePointer.getActualDateTime() > maxDepartureMoment )
-							return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClassRank);
+						if (servicePointer.getDepartureDateTime() > maxDepartureMoment )
+							return ServicePointer();
 
 						// Limitation of continuous service range to the max departure time
-						if(servicePointer.getActualDateTime() + servicePointer.getServiceRange() > maxDepartureMoment)
+						if(servicePointer.getDepartureDateTime() + servicePointer.getServiceRange() > maxDepartureMoment)
 						{
-							servicePointer.setServiceRange(maxDepartureMoment - servicePointer.getActualDateTime());
+							servicePointer.setServiceRange(maxDepartureMoment - servicePointer.getDepartureDateTime());
 						}
 
 						// Store the service rank in edge
@@ -226,7 +226,7 @@ namespace synthese
 				next = _departureIndex[0].get(RTData);
 			}
 
-			return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClassRank);
+			return ServicePointer();
 		}
 
 
@@ -244,7 +244,7 @@ namespace synthese
 
 			if(services.empty())
 			{
-				return ServicePointer(false, ARRIVAL_TO_DEPARTURE, userClassRank);
+				return ServicePointer();
 			}
 
 			bool RTData(arrivalMoment < posix_time::second_clock().local_time() + posix_time::hours(23));
@@ -267,9 +267,9 @@ namespace synthese
 						ServicePointer servicePointer(
 							(*previous)->getFromPresenceTime(
 								RTData,
-								ARRIVAL_TO_DEPARTURE,
+								false,
 								userClassRank,
-								this
+								*this
 								, arrivalMoment
 								, controlIfTheServiceIsReachable
 								, inverted
@@ -280,13 +280,13 @@ namespace synthese
 							continue;
 
 						// Control of validity of departure date time
-						if (servicePointer.getActualDateTime() < minArrivalMoment)
-							return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClassRank);
+						if (servicePointer.getArrivalDateTime() < minArrivalMoment)
+							return ServicePointer();
 
 						// Limitation of continuous service range to the min arrival time
-						if(servicePointer.getActualDateTime() - servicePointer.getServiceRange() < minArrivalMoment)
+						if(servicePointer.getArrivalDateTime() - servicePointer.getServiceRange() < minArrivalMoment)
 						{
-							servicePointer.setServiceRange(servicePointer.getActualDateTime() - minArrivalMoment);
+							servicePointer.setServiceRange(servicePointer.getArrivalDateTime() - minArrivalMoment);
 						}
 
 						// Store service rank in edge
@@ -300,7 +300,7 @@ namespace synthese
 				previous = _arrivalIndex[INDICES_NUMBER - 1].get(RTData);
 			}
 
-			return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClassRank);
+			return ServicePointer();
 		}
 
 

@@ -25,7 +25,7 @@
 #include "DeparturesTableRoutePlanningRowInterfacePage.h"
 #include <boost/lexical_cast.hpp>
 #include "Journey.h"
-#include "ServiceUse.h"
+#include "ServicePointer.h"
 #include "PhysicalStop.h"
 #include "Service.h"
 #include "Line.h"
@@ -114,30 +114,30 @@ namespace synthese
 			// 5
 			if(!row.second.empty())
 			{
-				const ServiceUse& s(row.second.getStartServiceUse());
+				const ServicePointer& s(row.second.getFirstJourneyLeg());
 
 				v.push_back(lexical_cast<string>(s.getDepartureDateTime() - second_clock::local_time() <= posix_time::minutes(blinkingDelay)));
-				v.push_back(static_cast<const PhysicalStop*>(s.getDepartureRTVertex())->getName());
+				v.push_back(static_cast<const PhysicalStop*>(s.getRealTimeDepartureVertex())->getName());
 				v.push_back(s.getService()->getServiceNumber());
 				stringstream str;
 				str << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().minutes();
 				v.push_back(str.str());
-				const CommercialLine* line(static_cast<const Line*>(s.getEdge()->getParentPath())->getCommercialLine());
+				const CommercialLine* line(static_cast<const Line*>(s.getDepartureEdge()->getParentPath())->getCommercialLine());
 				v.push_back(line->getShortName());
 				v.push_back(line->getImage());
 				v.push_back(line->getStyle());
 
 				if(row.second.getServiceUses().size() > 1)
 				{
-					const ServiceUse& s(row.second.getEndServiceUse());
-					v.push_back(static_cast<const PhysicalStop*>(s.getDepartureRTVertex())->getName());
+					const ServicePointer& s(row.second.getLastJourneyLeg());
+					v.push_back(static_cast<const PhysicalStop*>(s.getRealTimeDepartureVertex())->getName());
 					v.push_back(s.getService()->getServiceNumber());
 
 					stringstream str;
 					str << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().minutes();
 					v.push_back(str.str());
 
-					const CommercialLine* line(static_cast<const Line*>(s.getEdge()->getParentPath())->getCommercialLine());
+					const CommercialLine* line(static_cast<const Line*>(s.getDepartureEdge()->getParentPath())->getCommercialLine());
 					v.push_back(line->getShortName());
 					v.push_back(line->getImage());
 					v.push_back(line->getStyle());
@@ -179,7 +179,7 @@ namespace synthese
 			//22
 			if(row.second.getServiceUses().size() > 1)
 			{
-				const ServiceUse& s(row.second.getEndServiceUse());
+				const ServicePointer& s(row.second.getLastJourneyLeg());
 				const PublicTransportStopZoneConnectionPlace* p(static_cast<const PublicTransportStopZoneConnectionPlace*>(s.getDepartureEdge()->getFromVertex()->getHub()));
 				v.push_back(p->getCity()->getName());
 				v.push_back(lexical_cast<string>(p->getCity()->getKey() != origin.getCity()->getKey()));
@@ -198,15 +198,15 @@ namespace synthese
 
 			if(!row.second.empty())
 			{
-				const ServiceUse& s(row.second.getStartServiceUse());
+				const ServicePointer& s(row.second.getFirstJourneyLeg());
 
-				const Line* line(static_cast<const Line*>(s.getEdge()->getParentPath()));
+				const Line* line(static_cast<const Line*>(s.getDepartureEdge()->getParentPath()));
 				v.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string());
 
 				if(row.second.getServiceUses().size() > 1)
 				{
-					const ServiceUse& s(row.second.getEndServiceUse());
-					const Line* line(static_cast<const Line*>(s.getEdge()->getParentPath()));
+					const ServicePointer& s(row.second.getLastJourneyLeg());
+					const Line* line(static_cast<const Line*>(s.getDepartureEdge()->getParentPath()));
 					v.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string());
 				}
 				else

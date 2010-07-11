@@ -43,7 +43,7 @@ namespace synthese
 		RoutePlannerLogger::RoutePlannerLogger(
 			std::ostream& stream,
 			const JourneysResult& emptyTodo,
-			const graph::Journey& result
+			const RoutePlanningIntermediateJourney& result
 		):	_stream(stream),
 			_t(9, ResultHTMLTable::CSS_CLASS),
 			_result(result),
@@ -174,9 +174,9 @@ namespace synthese
 //			_stream << _t.col(1, string(), true) << "journey";
 			
 			size_t r(1);
-			BOOST_FOREACH(shared_ptr<Journey> journey, _todoBeforeClean)
+			BOOST_FOREACH(shared_ptr<RoutePlanningIntermediateJourney> journey, _todoBeforeClean)
 			{
-				const Vertex* vertex(journey->getEndEdge()->getFromVertex());
+				const Vertex* vertex(journey->getEndEdge().getFromVertex());
 				_stream << _t.row();
 				if (journey->empty())
 				{
@@ -210,28 +210,28 @@ namespace synthese
 					_stream << "new";
 				}
 				_stream << _t.col();
-				if(dynamic_cast<const geography::NamedPlace*>(journey->getEndEdge()->getHub()))
+				if(dynamic_cast<const geography::NamedPlace*>(journey->getEndEdge().getHub()))
 				{
-					_stream << dynamic_cast<const geography::NamedPlace*>(journey->getEndEdge()->getHub())->getFullName();
+					_stream << dynamic_cast<const geography::NamedPlace*>(journey->getEndEdge().getHub())->getFullName();
 				}
 				_stream << _t.col() << journey->getEndTime();
 				_stream << _t.col() << journey->getScore();
 				_stream << _t.col() << journey->getDistanceToEnd();
 //				_stream << _t.col() << (60 * (journey->getMinSpeedToEnd() ? (journey->getDistanceToEnd() / journey->getMinSpeedToEnd()) : -1));
-				_stream << _t.col() << journey->getEndEdge()->getHub()->getScore();
+				_stream << _t.col() << journey->getEndEdge().getHub()->getScore();
 //				_stream << _t.col() << journey->getMinSpeedToEnd();
 			}
 
 			_lastTodo.clear();
 			BOOST_FOREACH(const JourneysResult::ResultSet::value_type& it, todo.getJourneys())
 			{
-				_lastTodo.insert(make_pair(it.first->getEndEdge()->getFromVertex(), it.first));
+				_lastTodo.insert(make_pair(it.first->getEndEdge().getFromVertex(), it.first));
 			}
 		}
 
 
 		void RoutePlannerLogger::recordNewResult(
-			const graph::Journey& result
+			const RoutePlanningIntermediateJourney& result
 		){
 			_result = result;
 
@@ -239,9 +239,9 @@ namespace synthese
 			{
 				_stream << _t.row();
 				_stream << _t.col(9, string(), true) << "New result : ";
-				if(dynamic_cast<const NamedPlace*>(result.getEndEdge()->getFromVertex()->getHub()))
+				if(dynamic_cast<const NamedPlace*>(result.getEndEdge().getFromVertex()->getHub()))
 				{
-					_stream << dynamic_cast<const NamedPlace*>(result.getEndEdge()->getFromVertex()->getHub())->getFullName();
+					_stream << dynamic_cast<const NamedPlace*>(result.getEndEdge().getFromVertex()->getHub())->getFullName();
 				}
 				_stream << " at " << result.getEndTime();
 			}

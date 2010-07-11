@@ -25,7 +25,7 @@
 
 #include "HTMLTable.h"
 #include "JourneysResult.h"
-#include "Journey.h"
+#include "RoutePlanningIntermediateJourney.hpp"
 
 namespace synthese
 {
@@ -36,12 +36,12 @@ namespace synthese
 		*/
 		class RoutePlannerLogger
 		{
-			typedef std::map<const graph::Vertex*, boost::shared_ptr<graph::Journey> > Map;
-			typedef std::vector<boost::shared_ptr<graph::Journey> > Vector;
+			typedef std::map<const graph::Vertex*, boost::shared_ptr<RoutePlanningIntermediateJourney> > Map;
+			typedef std::vector<boost::shared_ptr<RoutePlanningIntermediateJourney> > Vector;
 
 			std::ostream& _stream;
 			html::HTMLTable _t;
-			graph::Journey _result;
+			RoutePlanningIntermediateJourney _result;
 
 			std::size_t _searchNumber;
 			Map _lastTodo;
@@ -51,13 +51,13 @@ namespace synthese
 			RoutePlannerLogger(
 				std::ostream& stream,
 				const JourneysResult& emptyTodo,
-				const graph::Journey& result
+				const RoutePlanningIntermediateJourney& result
 			);
 
 			void open();
 			void recordIntegralSearch(const JourneysResult& todo);
 			void recordCleanup(const JourneysResult& todo);
-			void recordNewResult(const graph::Journey& result);
+			void recordNewResult(const RoutePlanningIntermediateJourney& result);
 			void close();
 		};
 	}

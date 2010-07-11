@@ -29,9 +29,8 @@
 #include <sstream>
 #include <boost/foreach.hpp>
 
-#include "JourneyComparator.h"
 #include "BestVertexReachesMap.h"
-#include "Journey.h"
+#include "RoutePlanningIntermediateJourney.hpp"
 #include "Edge.h"
 #include "Vertex.h"
 #include "Hub.h"
@@ -50,26 +49,30 @@ namespace synthese
 		{			
 		public:
 			typedef std::map<
-				boost::shared_ptr<graph::Journey>,
+				boost::shared_ptr<RoutePlanningIntermediateJourney>,
 				boost::posix_time::time_duration,
-				graph::JourneyComparator
+				RoutePlanningIntermediateJourney::Comparator
 			> ResultSet;
 
 		private:
 			typedef std::map<const graph::Vertex*, ResultSet::iterator> IndexMap;
 			
 			boost::posix_time::ptime _originDateTime;
-			boost::optional<graph::AccessDirection> _accessDirection;
+			const PlanningPhase _accessDirection;
 			ResultSet	_result;
 			IndexMap	_index;
 
 		public:
 			JourneysResult(
-				const boost::posix_time::ptime& originDateTime
-			):	_originDateTime(originDateTime)
+				const boost::posix_time::ptime& originDateTime,
+				PlanningPhase planningPhase
+			):	_originDateTime(originDateTime),
+				_accessDirection(planningPhase)
 			{}
 
 
+			//////////////////////////////////////////////////////////////////////////
+			/// @pre planning phase of the two objects must be the same
 			void operator=(const JourneysResult& other);
 
 
@@ -91,7 +94,7 @@ namespace synthese
 					@param journey the journey to remove
 					@author Hugues Romain
 				*/
-				void remove(boost::shared_ptr<graph::Journey> journey);
+				void remove(boost::shared_ptr<RoutePlanningIntermediateJourney> journey);
 
 
 				void remove(const graph::Vertex* vertex);
@@ -101,7 +104,7 @@ namespace synthese
 					@param journey the journey to add
 					@author Hugues Romain
 				*/
-				void add(boost::shared_ptr<graph::Journey> journey);
+				void add(boost::shared_ptr<RoutePlanningIntermediateJourney> journey);
 			
 				
 				/** Adds an empty journey for a specified vertex.
@@ -117,7 +120,7 @@ namespace synthese
 					@return Pointer to the first journey
 					@warning The returned pointer must be deleted after use
 				*/
-				boost::shared_ptr<graph::Journey> front();
+				boost::shared_ptr<RoutePlanningIntermediateJourney> front();
 
 				
 				
@@ -146,7 +149,7 @@ namespace synthese
 					@return const pt::Journey* const The result journey that reaches the specified vertex
 					@author Hugues Romain
 				*/
-				boost::shared_ptr<graph::Journey> get(const graph::Vertex* vertex) const;
+				boost::shared_ptr<RoutePlanningIntermediateJourney> get(const graph::Vertex* vertex) const;
 				
 				
 				

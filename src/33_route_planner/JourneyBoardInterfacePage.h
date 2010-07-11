@@ -45,7 +45,7 @@ namespace synthese
 
 	namespace graph
 	{
-		class ServiceUse;
+		class ServicePointer;
 		class Journey;
 		class Vertex;
 	}
@@ -304,7 +304,7 @@ namespace synthese
 				std::ostream& stream,
 				boost::shared_ptr<const transportwebsite::WebPage> page,
 				const server::Request& request,
-				const graph::ServiceUse& serviceUse,
+				const graph::ServicePointer& serviceUse,
 				boost::posix_time::time_duration continuousServiceRange,
 				boost::logic::tribool handicappedFilterStatus,
 				boost::logic::tribool bikeFilterStatus,

@@ -57,22 +57,14 @@ namespace synthese
 
 			virtual boost::posix_time::ptime getReservationOpeningTime ( 
 				const ServicePointer& servicePointer
-				) const;
-
-
-			virtual RunPossibilityType isRunPossible (
-				const ServiceUse& serviceUse
 			) const;
+
 
 
 			virtual RunPossibilityType isRunPossible (
 				const ServicePointer& servicePointer
-				) const;
+			) const;
 
-
-			virtual ReservationAvailabilityType getReservationAvailability(
-				const ServiceUse& serviceUse
-				) const;
 
 
 			virtual ReservationAvailabilityType getReservationAvailability(

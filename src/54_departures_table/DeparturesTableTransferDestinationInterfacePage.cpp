@@ -23,7 +23,7 @@
 */
 
 #include "DeparturesTableTransferDestinationInterfacePage.h"
-#include "ServiceUse.h"
+#include "ServicePointer.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "City.h"
 #include "Edge.h"
@@ -31,6 +31,7 @@
 #include "Vertex.h"
 #include "RollingStock.h"
 #include "CommercialLine.h"
+#include "Service.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -64,7 +65,7 @@ namespace synthese
 
 		void DeparturesTableTransferDestinationInterfacePage::display(
 			std::ostream& stream,
-			const ServiceUse& object,
+			const ServicePointer& object,
 			size_t localTransferRank,
 			size_t totalTransferRank,
 			VariablesMap& variables,
@@ -72,7 +73,7 @@ namespace synthese
 		) const	{
 			ParametersVector pv;
 
-			const Line* line(dynamic_cast<const Line*>(object.getEdge()->getParentPath()));
+			const Line* line(dynamic_cast<const Line*>(object.getService()->getPath()));
 			const PublicTransportStopZoneConnectionPlace* place(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(object.getArrivalEdge()->getFromVertex()->getHub()));
 		
 			pv.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string()); //0

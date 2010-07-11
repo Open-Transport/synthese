@@ -135,16 +135,15 @@ namespace synthese
 
 				virtual void getVertexAccessMap(
 					graph::VertexAccessMap& result, 
-					const graph::AccessDirection& accessDirection,
 					const graph::AccessParameters& accessParameters,
 					const geography::Place::GraphTypes& whatToSearch
 				) const;
 
 				virtual void getVertexAccessMap(
 					graph::VertexAccessMap& result, 
-					const graph::AccessDirection& accessDirection,
 					graph::GraphIdType whatToSearch,
-					const graph::Vertex& origin
+					const graph::Vertex& origin,
+					bool vertexIsOrigin
 				) const;
 
 				virtual graph::HubScore getScore() const;

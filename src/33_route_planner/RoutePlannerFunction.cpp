@@ -691,7 +691,7 @@ namespace synthese
 					if(journey.getReservationCompliance() != false)
 					{
 						set<const ReservationContact*> resaRules;
-						BOOST_FOREACH(const ServiceUse& su, journey.getServiceUses())
+						BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
 						{
 							const Line* line(dynamic_cast<const Line*>(su.getService()->getPath()));
 							if(line == NULL) continue;
@@ -739,11 +739,11 @@ namespace synthese
 
 					for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 					{
-						const ServiceUse& curET(*itl);
+						const ServicePointer& curET(*itl);
 
 						if(	itl == jl.begin() ||
-							!curET.getEdge()->getParentPath()->isPedestrianMode() ||
-							lastPedestrianMode != curET.getEdge()->getParentPath()->isPedestrianMode()
+							!curET.getService()->getPath()->isPedestrianMode() ||
+							lastPedestrianMode != curET.getService()->getPath()->isPedestrianMode()
 						){
 							const NamedPlace* placeToSearch(
 								(	itl == jl.begin() &&
@@ -758,7 +758,7 @@ namespace synthese
 								**itSheetRow << "<cell />";
 							}
 
-							pedestrianMode = curET.getEdge()->getParentPath()->isPedestrianMode();
+							pedestrianMode = curET.getService()->getPath()->isPedestrianMode();
 							
 							// Saving of the columns on each lines
 							if(itl == jl.begin())
@@ -786,8 +786,8 @@ namespace synthese
 						}
 						
 						if(	itl == jl.end()-1
-						||	!(itl+1)->getEdge()->getParentPath()->isPedestrianMode()
-						||	!curET.getEdge()->getParentPath()->isPedestrianMode()
+						||	!(itl+1)->getService()->getPath()->isPedestrianMode()
+						||	!curET.getService()->getPath()->isPedestrianMode()
 						){
 							const NamedPlace* placeToSearch(
 								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?

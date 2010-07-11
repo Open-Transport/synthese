@@ -30,7 +30,7 @@
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/optional.hpp>
 
-#include "ServiceUse.h"
+#include "ServicePointer.h"
 #include "Registry.h"
 #include "Journey.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
@@ -70,21 +70,21 @@ namespace synthese
 	{
 		bool operator()(const graph::ServicePointer& _Left, const graph::ServicePointer& _Right) const
 		{
-			return (_Left.getActualDateTime() < _Right.getActualDateTime()
-				|| _Left.getActualDateTime() == _Right.getActualDateTime() 
-				&& _Left.getEdge() < _Right.getEdge()
+			return (_Left.getDepartureDateTime() < _Right.getDepartureDateTime()
+				|| _Left.getDepartureDateTime() == _Right.getDepartureDateTime() 
+				&& _Left.getDepartureEdge() < _Right.getDepartureEdge()
 				);
 		}
 	};
 
-	struct DeparturesTableServiceUseElementLess : public std::binary_function<graph::ServiceUse, graph::ServiceUse, bool>
+	struct DeparturesTableServiceUseElementLess : public std::binary_function<graph::ServicePointer, graph::ServicePointer, bool>
 	{
-		bool operator()(const graph::ServiceUse& _Left, const graph::ServiceUse& _Right) const
+		bool operator()(const graph::ServicePointer& _Left, const graph::ServicePointer& _Right) const
 		{
 			return
-				_Left.getActualDateTime() < _Right.getActualDateTime() ||
-				_Left.getActualDateTime() == _Right.getActualDateTime() && _Left.getSecondActualDateTime() < _Right.getSecondActualDateTime() ||
-				_Left.getActualDateTime() == _Right.getActualDateTime() && _Left.getSecondActualDateTime() == _Right.getSecondActualDateTime() && _Left.getSecondEdge() < _Right.getSecondEdge()
+				_Left.getDepartureDateTime() < _Right.getDepartureDateTime() ||
+				_Left.getDepartureDateTime() == _Right.getDepartureDateTime() && _Left.getArrivalDateTime() < _Right.getArrivalDateTime() ||
+				_Left.getDepartureDateTime() == _Right.getDepartureDateTime() && _Left.getArrivalDateTime() == _Right.getArrivalDateTime() && _Left.getArrivalEdge() < _Right.getArrivalEdge()
 			;
 		}
 	};
@@ -96,12 +96,12 @@ namespace synthese
 	
 	struct IntermediateStop
 	{
-		typedef std::set<graph::ServiceUse, DeparturesTableServiceUseElementLess> TransferDestinations;
+		typedef std::set<graph::ServicePointer, DeparturesTableServiceUseElementLess> TransferDestinations;
 		const pt::PublicTransportStopZoneConnectionPlace* place;
-		graph::ServiceUse serviceUse;
+		graph::ServicePointer serviceUse;
 		TransferDestinations transferDestinations;
 		IntermediateStop(const pt::PublicTransportStopZoneConnectionPlace* _place) : place(_place), serviceUse(), transferDestinations() {}
-		IntermediateStop(const pt::PublicTransportStopZoneConnectionPlace* _place, const graph::ServiceUse& _serviceUse, const TransferDestinations& _transferDestinations) : place(_place), serviceUse(_serviceUse), transferDestinations(_transferDestinations) {}
+		IntermediateStop(const pt::PublicTransportStopZoneConnectionPlace* _place, const graph::ServicePointer& _serviceUse, const TransferDestinations& _transferDestinations) : place(_place), serviceUse(_serviceUse), transferDestinations(_transferDestinations) {}
 	};
 
 	typedef std::vector<IntermediateStop> ActualDisplayedArrivalsList;

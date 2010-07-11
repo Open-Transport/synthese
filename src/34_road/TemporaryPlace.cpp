@@ -93,7 +93,6 @@ namespace synthese
 		
 		void TemporaryPlace::getVertexAccessMap(
 			VertexAccessMap& result, 
-			const AccessDirection& accessDirection,
 			const AccessParameters& accessParameters,
 			GraphIdType whatToSearch
 		) const	{

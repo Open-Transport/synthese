@@ -85,11 +85,11 @@ namespace synthese
 
 
 
-		RoutePlanner::Result RoutePlanner::run(
+		Journey RoutePlanner::run(
 		){
 //			if(_originVam.intersercts(_destinationVam)) throw SamePlacesException();
 
-			Result result;
+			Result result(_planningOrder == DEPARTURE_FIRST ? DEPARTURE_TO_ARRIVAL : ARRIVAL_TO_DEPARTURE);
 
 			// Look for best time
 			_findBestJourney(
@@ -105,30 +105,30 @@ namespace synthese
 			);
 
 			if(result.empty()) return result;
-		    
-			result.reverse();
 
-			ptime beginBound(result.getBeginTime());
-			ptime endBound(result.getEndTime());
+			Result result2(result, _planningOrder == DEPARTURE_FIRST ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL);
+
+			ptime beginBound(result2.getBeginTime());
+			ptime endBound(result2.getEndTime());
 			if(	_maxDuration &&
-				result.getDuration() > _maxDuration
+				result2.getDuration() > _maxDuration
 			){
 				endBound = 
 					_planningOrder == DEPARTURE_FIRST ?
-					result.getFirstArrivalTime() - *_maxDuration :
-					result.getFirstDepartureTime() + *_maxDuration
+					result2.getFirstArrivalTime() - *_maxDuration :
+					result2.getFirstDepartureTime() + *_maxDuration
 				;
 
-				if(	_planningOrder == DEPARTURE_FIRST && result.getEndTime() < endBound ||
-					result.getEndTime() > endBound
+				if(	_planningOrder == DEPARTURE_FIRST && result2.getEndTime() < endBound ||
+					result2.getEndTime() > endBound
 				){
-					result.clear();
+					result2.clear();
 				}
 			}
 
 			// Look for best duration
 			_findBestJourney(
-				result,
+				result2,
 				_planningOrder == DEPARTURE_FIRST ? _destinationVam : _originVam,
 				_planningOrder == DEPARTURE_FIRST ? _originVam : _destinationVam,
 				_planningOrder == DEPARTURE_FIRST ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL,
@@ -139,123 +139,61 @@ namespace synthese
 				_maxDuration
 			);
 
-			if(result.empty()) return result;
+			if(result2.empty()) return Journey();
 
-			if(_planningOrder == DEPARTURE_FIRST)
+			// Inclusion of approach journeys in the result
+			Journey finalResult;
+
+			if (result2.getStartApproachDuration().total_seconds())
 			{
-				// Inclusion of approach journeys in the result
-				if (result.getStartApproachDuration().total_seconds())
+				Journey originApproachJourney(
+					_originVam.getVertexAccess(result2.getOrigin()->getFromVertex()).approachJourney
+				);
+				if (!originApproachJourney.empty())
 				{
-					result.setStartApproachDuration(posix_time::minutes(0));
-					Journey goalApproachJourney(
-						_destinationVam.getVertexAccess(result.getDestination()->getFromVertex()).approachJourney
-						);
-					if (!goalApproachJourney.empty())
-					{
-						goalApproachJourney.shift(
-							(result.getFirstArrivalTime() - goalApproachJourney.getFirstDepartureTime()) +
-							result.getDestination()->getHub()->getTransferDelay(
-							*result.getDestination()->getFromVertex(),
-							*goalApproachJourney.getOrigin()->getFromVertex()
-							),
-							result.getContinuousServiceRange()
-							);
-						goalApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
-						result = Journey(goalApproachJourney, result);
-					}
-				}
-
-				result.reverse();
-
-				if (result.getStartApproachDuration().total_seconds())
-				{
-					result.setStartApproachDuration(posix_time::minutes(0));
-					Journey originApproachJourney(
-						_originVam.getVertexAccess(result.getOrigin()->getFromVertex()).approachJourney
-						);
-					if (!originApproachJourney.empty())
-					{
-						originApproachJourney.shift(
-							(result.getFirstDepartureTime() - originApproachJourney.getFirstDepartureTime()) -
-							originApproachJourney.getDuration() -
-							result.getOrigin()->getHub()->getTransferDelay(
-							*originApproachJourney.getDestination()->getFromVertex(),
-							*result.getOrigin()->getFromVertex()
-							),
-							result.getContinuousServiceRange()
-							);
-						originApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
-						result = Journey(originApproachJourney, result);
-					}
-				}
-			}
-			else
-			{
-				if (result.getStartApproachDuration().total_seconds())
-				{
-					result.setStartApproachDuration(posix_time::minutes(0));
-					Journey originApproachJourney(
-						_originVam.getVertexAccess(result.getOrigin()->getFromVertex()).approachJourney
+					originApproachJourney.shift(
+						result2.getFirstDepartureTime() - originApproachJourney.getFirstDepartureTime(),
+						result2.getContinuousServiceRange()
 					);
-					if (!originApproachJourney.empty())
-					{
-						originApproachJourney.shift(
-							(result.getFirstDepartureTime() - originApproachJourney.getFirstDepartureTime()) -
-							originApproachJourney.getDuration() -
-							result.getOrigin()->getHub()->getTransferDelay(
-								*originApproachJourney.getDestination()->getFromVertex(),
-								*result.getOrigin()->getFromVertex()
-							),
-							result.getContinuousServiceRange()
-						);
-						originApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
-						result = Journey(originApproachJourney, result);
-					}
-				}
-
-				result.reverse();
-
-				// Inclusion of approach journeys in the result
-				if (result.getStartApproachDuration().total_seconds())
-				{
-					result.setStartApproachDuration(posix_time::minutes(0));
-					Journey goalApproachJourney(
-						_destinationVam.getVertexAccess(result.getDestination()->getFromVertex()).approachJourney
-					);
-					if (!goalApproachJourney.empty())
-					{
-						goalApproachJourney.shift(
-							(result.getFirstArrivalTime() - goalApproachJourney.getFirstDepartureTime()) +
-							result.getDestination()->getHub()->getTransferDelay(
-							*result.getDestination()->getFromVertex(),
-							*goalApproachJourney.getOrigin()->getFromVertex()
-							),
-							result.getContinuousServiceRange()
-							);
-						goalApproachJourney.setContinuousServiceRange(result.getContinuousServiceRange());
-						result = Journey(goalApproachJourney, result);
-					}
+					originApproachJourney.setContinuousServiceRange(result2.getContinuousServiceRange());
+					finalResult.append(originApproachJourney);
 				}
 			}
 
-			return result;
+			finalResult.append(static_cast<Journey>(result2));
+
+			if (result2.getEndApproachDuration().total_seconds())
+			{
+				Journey goalApproachJourney(
+					_destinationVam.getVertexAccess(result2.getDestination()->getFromVertex()).approachJourney
+				);
+				if (!goalApproachJourney.empty())
+				{
+					goalApproachJourney.shift(
+						result2.getFirstArrivalTime() - goalApproachJourney.getFirstArrivalTime(),
+						result2.getContinuousServiceRange()
+					);
+					goalApproachJourney.setContinuousServiceRange(result2.getContinuousServiceRange());
+					finalResult.append(goalApproachJourney);
+				}
+			}
+
+			return finalResult;
 		}
 
 // -------------------------------------------------------------------------- Recursion
 
 		void RoutePlanner::_findBestJourney(
-			Journey& result,
+			RoutePlanningIntermediateJourney& result,
 			const graph::VertexAccessMap& startVam,
 			const graph::VertexAccessMap& endVam,
-			AccessDirection accessDirection,
+			PlanningPhase accessDirection,
 			const ptime& originDateTime,
 			const ptime& minMaxDateTimeAtOrigin,
 			const ptime& minMaxDateTimeAtDestination,
 			bool secondTime,
 			boost::optional<boost::posix_time::time_duration> maxDuration
 		){
-			assert(accessDirection != UNDEFINED_DIRECTION);
-			assert(result.empty() || result.getMethod() == accessDirection);
 			if(accessDirection == DEPARTURE_TO_ARRIVAL &&
 				(originDateTime > minMaxDateTimeAtOrigin || originDateTime > minMaxDateTimeAtDestination || minMaxDateTimeAtOrigin > minMaxDateTimeAtDestination)
 			){
@@ -271,7 +209,7 @@ namespace synthese
 
 			ptime __minMaxDateTimeAtDestination(minMaxDateTimeAtDestination);
 
-			JourneysResult todo(originDateTime);
+			JourneysResult todo(originDateTime, accessDirection);
 			
 			ptime bestEndTime(minMaxDateTimeAtDestination);
 			ptime lastBestEndTime(minMaxDateTimeAtDestination);
@@ -317,8 +255,8 @@ namespace synthese
 					optional<posix_time::time_duration>() :
 					optional<posix_time::time_duration>(
 						accessDirection == DEPARTURE_TO_ARRIVAL ?
-						result.getEndTime() - originDateTime :
-						originDateTime - result.getEndTime()
+						result.getFirstArrivalTime() - originDateTime :
+						originDateTime - result.getFirstDepartureTime()
 					)
 			);
 
@@ -338,17 +276,17 @@ namespace synthese
 				){
 					JourneysResult::ResultSet::const_iterator next(it);
 					++next;
-					const Journey& journey(*it->first);
+					const RoutePlanningIntermediateJourney& journey(*it->first);
 					
 					if (!journey.getEndReached())
 						break;
 					
 					// A destination without any approach time stops the recursion
-					const Vertex* reachedVertex(journey.getEndEdge()->getFromVertex());
+					const Vertex* reachedVertex(journey.getEndEdge().getFromVertex());
 					const VertexAccess& va = endVam.getVertexAccess(reachedVertex);
 					
 					// Attempt to elect the solution as the result
-					if (journey.isBestThan(result))
+					if (journey > result)
 					{
 						result = journey;
 						if(logger)
@@ -392,7 +330,7 @@ namespace synthese
 
 				lastBestEndTime = bestEndTime;
 
-				shared_ptr<const Journey> journey(todo.front());
+				shared_ptr<const RoutePlanningIntermediateJourney> journey(todo.front());
 
 				is.integralSearch(
 					*journey,
@@ -401,8 +339,8 @@ namespace synthese
 						optional<posix_time::time_duration>() :
 						optional<posix_time::time_duration>(
 							accessDirection == DEPARTURE_TO_ARRIVAL ?
-							result.getEndTime() - originDateTime :
-							originDateTime - result.getEndTime()
+							result.getFirstDepartureTime() - originDateTime :
+							originDateTime - result.getFirstDepartureTime()
 						)
 				);
 

@@ -167,13 +167,13 @@ namespace synthese
 
 		void AddressablePlace::getVertexAccessMap(
 			VertexAccessMap& result, 
-			const AccessDirection& accessDirection,
 			GraphIdType whatToSearch,
-			const Vertex& origin
+			const Vertex& origin,
+			bool vertexIsOrigin
 		) const {
 			if (whatToSearch != RoadModule::GRAPH_ID) return;
 
-			if(accessDirection == DEPARTURE_TO_ARRIVAL)
+			if(vertexIsOrigin)
 			{
 				BOOST_FOREACH(const Address* address, _addresses)
 				{
@@ -201,7 +201,6 @@ namespace synthese
 
 		void AddressablePlace::getVertexAccessMap(
 			VertexAccessMap& result, 
-			const AccessDirection& accessDirection,
 			const AccessParameters& accessParameters,
 			const geography::Place::GraphTypes& whatToSearch
 		) const {

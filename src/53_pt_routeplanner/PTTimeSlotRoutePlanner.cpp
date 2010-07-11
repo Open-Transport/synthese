@@ -62,11 +62,9 @@ namespace synthese
 			std::ostream* logStream
 		):	TimeSlotRoutePlanner(
 				origin->getVertexAccessMap(
-					planningOrder == DEPARTURE_FIRST ? DEPARTURE_TO_ARRIVAL : ARRIVAL_TO_DEPARTURE,
 					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
 				),
 				destination->getVertexAccessMap(
-					planningOrder == ARRIVAL_FIRST ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL,
 					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
 				),
 				lowerDepartureTime, higherDepartureTime,
@@ -88,7 +86,7 @@ namespace synthese
 		VertexAccessMap PTTimeSlotRoutePlanner::_extendToPhysicalStops(
 			const VertexAccessMap& vam,
 			const VertexAccessMap& destinationVam,
-			AccessDirection direction
+			PlanningPhase direction
 		) const {
 
 			VertexAccessMap result;
@@ -97,7 +95,8 @@ namespace synthese
 			JourneysResult resultJourneys(
 				direction == DEPARTURE_TO_ARRIVAL ?
 				getLowestDepartureTime() :
-				getHighestArrivalTime()
+				getHighestArrivalTime(),
+				direction
 			);
 			VertexAccessMap emptyMap;
 			BestVertexReachesMap bvrmd(
@@ -140,9 +139,9 @@ namespace synthese
 				VertexAccessMap vam2;
 				vertex->getHub()->getVertexAccessMap(
 					vam2,
-					direction,
 					PTModule::GRAPH_ID,
-					*vertex
+					*vertex,
+					direction == DEPARTURE_TO_ARRIVAL
 				);
 				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam2.getMap())
 				{
@@ -198,10 +197,10 @@ namespace synthese
 					)->getFromVertex() 
 				);
 				cp->getVertexAccessMap(
-					vam2
-					, direction
-					, PTModule::GRAPH_ID
-					, v
+					vam2,
+					PTModule::GRAPH_ID,
+					v,
+					direction == DEPARTURE_TO_ARRIVAL
 				);
 				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam2.getMap())
 				{
@@ -295,7 +294,7 @@ namespace synthese
 			if(	ovam.intersercts(dvam)
 			){
 				Journey resultJourney(ovam.getBestIntersection(dvam));
-				ptime departureTime(resultJourney.getFirstDepartureTime(false));
+				ptime departureTime(resultJourney.getFirstDepartureTime());
 				if(departureTime.time_of_day().seconds())
 				{
 					resultJourney.shift(seconds(60 - departureTime.time_of_day().seconds()), resultJourney.getContinuousServiceRange());

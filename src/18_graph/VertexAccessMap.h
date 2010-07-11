@@ -141,11 +141,6 @@ TRIDENT : VertexAccess => AccesPoint
 			*/
 			void insert (const Vertex* vertex, const VertexAccess& vertexAccess);
 		    
-			void mergeWithFilter(
-				const VertexAccessMap& vam,
-				GraphIdType graphFilter,
-				AccessDirection direction
-			);
 
 			const geometry::IsoBarycentre& getIsobarycenter () const;
 		    

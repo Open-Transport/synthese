@@ -52,7 +52,6 @@ namespace synthese
 
 
 		graph::VertexAccessMap Place::getVertexAccessMap(
-			AccessDirection accessDirection,
 			const AccessParameters& accessParameters,
 			GraphTypes::value_type whatToSearch,
 			...
@@ -66,7 +65,7 @@ namespace synthese
 				whatToSearchSet.insert(col);
 			}
 			va_end(marker);
-			getVertexAccessMap(result, accessDirection, accessParameters, whatToSearchSet);
+			getVertexAccessMap(result, accessParameters, whatToSearchSet);
 			return result;
 		}
 	}

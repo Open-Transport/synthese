@@ -134,13 +134,13 @@ namespace synthese
 						);
 
 						if(	serviceInstance.getService() == NULL ||
-							_physicalStops.find(serviceInstance.getRealTimeVertex()->getKey()) != _physicalStops.end()
+							_physicalStops.find(serviceInstance.getRealTimeDepartureVertex()->getKey()) != _physicalStops.end()
 						){
 							break;
 						}
 
 						++*minIndex;
-						minTimeForForcedDestination = serviceInstance.getActualDateTime();
+						minTimeForForcedDestination = serviceInstance.getDepartureDateTime();
 					}
 
 					if (serviceInstance.getService() == NULL)
@@ -173,8 +173,8 @@ namespace synthese
 							reachedDestination[curGLA->getPhysicalStop()->getConnectionPlace()] = itr;
 						}
 						// Else optimizing a previously founded ptd
-						else if(serviceInstance.getActualDateTime() <
-							reachedDestination[connectionPlace]->first.getActualDateTime()
+						else if(serviceInstance.getDepartureDateTime() <
+							reachedDestination[connectionPlace]->first.getDepartureDateTime()
 						){
 							// Allocation
 							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);

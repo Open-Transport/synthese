@@ -164,15 +164,6 @@ namespace synthese
 
 
 
-		void VertexAccessMap::mergeWithFilter(
-			const VertexAccessMap& vam,
-			GraphIdType graphFilter,
-			AccessDirection direction
-		){
-		}
-
-
-
 		bool VertexAccessMap::intersercts( const VertexAccessMap& other ) const
 		{
 			// Control if the departure place and the arrival place have a common point
@@ -203,10 +194,6 @@ namespace synthese
 						{
 							if(!it.second.approachJourney.empty())
 							{
-								if(it.second.approachJourney.getMethod() != secondJourney.getMethod())
-								{
-									secondJourney.reverse();
-								}
 								secondJourney.shift(
 									it.second.approachJourney.getFirstArrivalTime() - secondJourney.getFirstDepartureTime(),
 									secondJourney.getContinuousServiceRange()

@@ -41,27 +41,41 @@ namespace synthese
 
 		ServicePointer PermanentService::getFromPresenceTime(
 			bool RTData,
-			AccessDirection method,
-			size_t userClass
-			, const Edge* edge
+			bool getDeparture,
+			size_t userClass,
+			const Edge& edge
 			, const ptime& presenceDateTime
 			, bool controlIfTheServiceIsReachable
 			, bool inverted
 		) const	{
-			ServicePointer sp(RTData, method,userClass,edge);
-			sp.setActualTime(presenceDateTime);
-			sp.setTheoreticalTime(presenceDateTime);
-			sp.setOriginDateTime(presenceDateTime);
-			sp.setService(this);
+			ServicePointer sp(RTData, userClass, *this, presenceDateTime);
+			if(getDeparture)
+			{
+				sp.setDepartureInformations(edge, presenceDateTime, presenceDateTime, *edge.getFromVertex());
+			}
+			else
+			{
+				sp.setArrivalInformations(edge, presenceDateTime, presenceDateTime, *edge.getFromVertex());
+			}
 			sp.setServiceRange(posix_time::hours(24));
 			return sp;
 		}
 
-		ptime PermanentService::getLeaveTime(
-			const ServicePointer& servicePointer,
-			const Edge* edge
+
+
+		void PermanentService::completeServicePointer(
+			ServicePointer& servicePointer,
+			const Edge& edge
 		) const	{
-			double distance(edge->getMetricOffset() - servicePointer.getEdge()->getMetricOffset());
+			double distance;
+			if(servicePointer.getArrivalEdge() == NULL)
+			{
+				distance = edge.getMetricOffset() - servicePointer.getDepartureEdge()->getMetricOffset();
+			}
+			else
+			{
+				distance = servicePointer.getArrivalEdge()->getMetricOffset() - edge.getMetricOffset();
+			}
 			if(distance < 0)
 			{
 				distance = -distance;
@@ -72,12 +86,18 @@ namespace synthese
 				*_duration :
 				posix_time::seconds(distance > 0 ? ceil(distance * 0.9) : 1)
 			);
-			posix_time::ptime dt(servicePointer.getActualDateTime());
-			if (servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
+			if(servicePointer.getArrivalEdge() == NULL)
+			{
+				posix_time::ptime dt(servicePointer.getDepartureDateTime());
 				dt += duration;
+				servicePointer.setArrivalInformations(edge, dt, dt, *edge.getFromVertex());
+			}
 			else
+			{
+				posix_time::ptime dt(servicePointer.getArrivalDateTime());
 				dt -= duration;
-			return dt;
+				servicePointer.setDepartureInformations(edge, dt, dt, *edge.getFromVertex());
+			}
 		}
 
 		time_duration PermanentService::getDepartureBeginScheduleToIndex(bool RTData, size_t rankInPath) const

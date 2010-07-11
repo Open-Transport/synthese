@@ -106,11 +106,11 @@ namespace synthese
 			set<const PublicTransportStopZoneConnectionPlace*> encounteredPlaces;
 			const PublicTransportStopZoneConnectionPlace* destinationPlace(
 				static_cast<const Line*>(
-					servicePointer.getEdge()->getParentPath()
+					servicePointer.getService()->getPath()
 				)->getDestination()->getConnectionPlace()
 			);
 
-			const LineStop* curLinestop(static_cast<const LineStop*>(servicePointer.getEdge()));
+			const LineStop* curLinestop(static_cast<const LineStop*>(servicePointer.getDepartureEdge()));
 			const LineStop* lastLineStop(NULL);
 			const PublicTransportStopZoneConnectionPlace* place(curLinestop->getPhysicalStop()->getConnectionPlace());
 
@@ -124,7 +124,7 @@ namespace synthese
 			){
 				if(!servicePointer.getService()->nonConcurrencyRuleOK(
 						servicePointer.getOriginDateTime().date(),
-						*servicePointer.getEdge(),
+						*servicePointer.getDepartureEdge(),
 						*curLinestop,
 						USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET
 				)	) continue;
@@ -137,15 +137,15 @@ namespace synthese
 					encounteredPlaces.find(place) == encounteredPlaces.end() &&
 					place != destinationPlace
 				){
-					ServiceUse serviceUse(servicePointer, curLinestop);
-					_push_back(arrivals, serviceUse);
+					ServicePointer completed(servicePointer, *curLinestop);
+					_push_back(arrivals, completed);
 					encounteredPlaces.insert(place);
 				}
 			}
 			// Add the ending stop
 			if((arrivals.end()-1)->place != place || arrivals.size() <= 1)
 			{
-				_push_back(arrivals, ServiceUse(servicePointer, lastLineStop));
+				_push_back(arrivals, ServicePointer(servicePointer, *lastLineStop));
 			}
 
 			/** - Insertion */
@@ -164,13 +164,13 @@ namespace synthese
 
 		void ArrivalDepartureTableGenerator::_push_back(
 			ActualDisplayedArrivalsList& list,
-			const graph::ServiceUse& serviceUse
+			const graph::ServicePointer& serviceUse
 		){
 			IntermediateStop::TransferDestinations transfers;
 
 			TransferDestinationsList::const_iterator it(
 				_transferDestinations.find(
-					dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getSecondEdge()->getFromVertex()->getHub())
+					dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getArrivalEdge()->getFromVertex()->getHub())
 			)	);
 			if(it != _transferDestinations.end())
 			{
@@ -179,7 +179,7 @@ namespace synthese
 				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
 				{
 					PTTimeSlotRoutePlanner rp(
-						dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getEdge()->getFromVertex()->getHub()),
+						dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getDepartureEdge()->getFromVertex()->getHub()),
 						it2,
 						_startDateTime,
 						_endDateTime,
@@ -213,7 +213,7 @@ namespace synthese
 				}
 			}
 			list.push_back(IntermediateStop(
-				dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getSecondEdge()->getFromVertex()->getHub()),
+				dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getArrivalEdge()->getFromVertex()->getHub()),
 				serviceUse,
 				transfers
 			)	);

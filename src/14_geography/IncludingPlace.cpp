@@ -64,17 +64,17 @@ namespace synthese
 
 
 		void IncludingPlace::getVertexAccessMap(
-			VertexAccessMap& result
-			, const AccessDirection& accessDirection
-			, const AccessParameters& accessParameters
-			, const GraphTypes& whatToSearch
+			VertexAccessMap& result,
+			const AccessParameters& accessParameters,
+			const GraphTypes& whatToSearch
 		) const	{
 			BOOST_FOREACH(
 				const Place* place, _includedPlaces
 			){
 				place->getVertexAccessMap(
-					result, accessDirection, accessParameters
-					, whatToSearch
+					result,
+					accessParameters,
+					whatToSearch
 				);
 			}
 		}

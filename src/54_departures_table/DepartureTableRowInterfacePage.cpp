@@ -22,7 +22,6 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "Conversion.h"
 #include "DepartureTableRowInterfacePage.h"
 #include "ScheduledService.h"
 #include "ServicePointer.h"
@@ -36,6 +35,7 @@
 #include "StaticFunctionRequest.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace boost;
 using namespace std;
@@ -78,12 +78,12 @@ namespace synthese
 			, const server::Request* request
 		) const {
 			ParametersVector parameters;
-			parameters.push_back(Conversion::ToString(rowId)); //0
-			parameters.push_back(Conversion::ToString(pageNumber));
-			parameters.push_back(Conversion::ToString(displayQuai));
-			parameters.push_back(Conversion::ToString(displayServiceNumber));
-			parameters.push_back(Conversion::ToString(intermediatesStopsToDisplay));
-			parameters.push_back(Conversion::ToString(displayTeam)); //5
+			parameters.push_back(lexical_cast<string>(rowId)); //0
+			parameters.push_back(lexical_cast<string>(pageNumber));
+			parameters.push_back(lexical_cast<string>(displayQuai));
+			parameters.push_back(lexical_cast<string>(displayServiceNumber));
+			parameters.push_back(lexical_cast<string>(intermediatesStopsToDisplay));
+			parameters.push_back(lexical_cast<string>(displayTeam)); //5
 			if(ptd.first.getService() == NULL)
 			{
 				parameters.push_back(string());
@@ -99,34 +99,34 @@ namespace synthese
 			else
 			{
 				parameters.push_back(
-					(blinkingDelay > 0 && (ptd.first.getActualDateTime() - second_clock::local_time()) <= posix_time::minutes(blinkingDelay)) ?
+					(blinkingDelay > 0 && (ptd.first.getDepartureDateTime() - second_clock::local_time()) <= posix_time::minutes(blinkingDelay)) ?
 					string("1") : string("0")
 				);
 
 				{
 					stringstream str;
-					str << setw(2) << setfill('0') << ptd.first.getActualDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << ptd.first.getActualDateTime().time_of_day().minutes();
+					str << setw(2) << setfill('0') << ptd.first.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << ptd.first.getDepartureDateTime().time_of_day().minutes();
 					parameters.push_back(str.str());
 				}
 
 				parameters.push_back(ptd.first.getService()->getServiceNumber());
 				parameters.push_back(
-					static_cast<const PhysicalStop*>(ptd.first.getRealTimeVertex())->getName()
+					static_cast<const PhysicalStop*>(ptd.first.getRealTimeDepartureVertex())->getName()
 					);
 				parameters.push_back(
 					ptd.first.getService()->getTeam()
 				);
-				const Line* line(static_cast<const Line*>(ptd.first.getEdge()->getParentPath()));
+				const Line* line(static_cast<const Line*>(ptd.first.getService()->getPath()));
 				parameters.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string());
 
 				{
 					stringstream str;
-					str << setw(2) << setfill('0') << ptd.first.getTheoreticalDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << ptd.first.getTheoreticalDateTime().time_of_day().minutes();
+					str << setw(2) << setfill('0') << ptd.first.getTheoreticalDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << ptd.first.getTheoreticalDepartureDateTime().time_of_day().minutes();
 					parameters.push_back(str.str());
 				}
 
 				parameters.push_back(
-					lexical_cast<string>((ptd.first.getActualDateTime() - ptd.first.getTheoreticalDateTime()).total_seconds() / 60)
+					lexical_cast<string>((ptd.first.getDepartureDateTime() - ptd.first.getTheoreticalDepartureDateTime()).total_seconds() / 60)
 				); //13
 
 				if(	getInterface()->hasPage<RealTimeUpdateScreenServiceInterfacePage>() &&
@@ -136,7 +136,7 @@ namespace synthese
 					StaticFunctionRequest<RealTimeUpdateFunction> realTimeRequest(*request, true);
 					realTimeRequest.getFunction()->setInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(getInterface()->getKey()));
 					realTimeRequest.getFunction()->setService(Env::GetOfficialEnv().getRegistry<ScheduledService>().get(ptd.first.getService()->getKey()));
-					realTimeRequest.getFunction()->setLineStopRank(ptd.first.getEdge()->getRankInPath());
+					realTimeRequest.getFunction()->setLineStopRank(ptd.first.getDepartureEdge()->getRankInPath());
 					parameters.push_back(realTimeRequest.getURL());				
 				}
 				else

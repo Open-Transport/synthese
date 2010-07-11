@@ -46,7 +46,7 @@
 #include "SearchFormHTMLTable.h"
 #include "PTConstants.h"
 #include "Journey.h"
-#include "ServiceUse.h"
+#include "ServicePointer.h"
 #include "Line.h"
 #include "CommercialLine.h"
 #include "LineStop.h"

@@ -36,13 +36,25 @@ namespace synthese
 		class DisplayScreen;
 		class DisplayType;
 
-		/** Centreon configuration export function class.
-
-			Parameters :
-				- ac=0|1 : action (0=clean the Centreon database, 1=export SYNTHESE configuration into Centreon database)
-
-			@ingroup m54Functions refFunctions
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Centreon configuration export function class.
+		/// @author Hugues Romain
+		/// @date 2009
+		/// @ingroup m54Functions refFunctions
+		//////////////////////////////////////////////////////////////////////////
+		/// <h2>Parameters</h2>
+		///	<ul>
+		///		<li>ac=0|1 : action (0=clean the Centreon database, 1=export SYNTHESE configuration into Centreon database)</li>
+		///	</ul>
+		///
+		/// <h2>Output</h2>
+		/// Le principe originel de Nagios (host/service) est légèrement détourné pour prendre en compte les spécificités de l'architecture :
+		///	<ul>
+		///		<li>Les « hosts » correspondent aux afficheurs et aux unités centrales. Ils seront nommés COMMUNE_Arret_Nom pour bénéficier de tris automatiques à l'affichage par Centréon. Leur type sera rappelé dans le champ Alias.</li>
+		///		<li>Un service est déclaré par host, dépendant du type d'entrée : un service de supervision d'afficheur ou un service de supervision d'unité centrale</li>
+		///		<li>Les afficheurs dépendants d'une unité centrale sont déclarés comme tels : en cas de panne de l'unité centrale, aucune alerte n'est envoyée concernant les afficheurs branchés dessus.</li>
+		///		<li>Le champ IP des hosts est utilisé pour stocker l'ID</li>
+		///	</ul>
 		class CentreonConfigExportFunction :
 			public util::FactorableTemplate<server::Function,CentreonConfigExportFunction>
 		{
@@ -85,8 +97,11 @@ namespace synthese
 		public:
 			CentreonConfigExportFunction();
 
-			/** Action to run, defined by each subclass.
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Generates the output of the function.
+			/// @param stream stream to write the output on
+			/// @param request request which has launched the function
+			//////////////////////////////////////////////////////////////////////////
 			void run(std::ostream& stream, const server::Request& request) const;
 
 			virtual bool isAuthorized(const server::Session* session) const;

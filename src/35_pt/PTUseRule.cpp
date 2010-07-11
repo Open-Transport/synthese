@@ -25,7 +25,6 @@
 #include "Line.h"
 #include "CommercialLine.h"
 #include "ServicePointer.h"
-#include "ServiceUse.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "AccessParameters.h"
 
@@ -123,13 +122,13 @@ namespace synthese
 				return RUN_POSSIBLE;
 
 			case RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE:
-				if(servicePointer.getMethod() == ARRIVAL_TO_DEPARTURE)
+				if(!servicePointer.getDepartureEdge())
 				{
 					return RUN_DEPENDING_ON_DEPARTURE_PLACE;
 				}
 				else
 				{
-					const Edge* departureEdge(servicePointer.getEdge());
+					const Edge* departureEdge(servicePointer.getDepartureEdge());
 					if(static_cast<const Line*>(departureEdge->getParentPath())->getCommercialLine()->isOptionalReservationPlace(
 						static_cast<const PublicTransportStopZoneConnectionPlace*>(departureEdge->getHub())
 					)){
@@ -158,54 +157,14 @@ namespace synthese
 
 
 
-		UseRule::RunPossibilityType PTUseRule::isRunPossible(
-			const graph::ServiceUse& serviceUse
-		) const	{
-			if(_accessCapacity && *_accessCapacity == 0)
-			{
-				return RUN_NOT_POSSIBLE;
-			}
-
-			switch(_reservationType)
-			{
-			case RESERVATION_RULE_FORBIDDEN:
-			case RESERVATION_RULE_OPTIONAL:
-				return RUN_POSSIBLE;
-
-			case RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE:
-			{
-				const Edge* departureEdge(serviceUse.getDepartureEdge());
-				if(static_cast<const Line*>(departureEdge->getParentPath())->getCommercialLine()->isOptionalReservationPlace(
-					static_cast<const PublicTransportStopZoneConnectionPlace*>(departureEdge->getHub())
-				)){
-					return RUN_POSSIBLE;
-				}
-				else
-				{
-					return
-						IsReservationPossible(getReservationAvailability(serviceUse)) ?
-						RUN_POSSIBLE :
-						RUN_NOT_POSSIBLE
-					;
-				}
-			}
-
-			case RESERVATION_RULE_COMPULSORY:
-				return
-					IsReservationPossible(getReservationAvailability(serviceUse)) ?
-					RUN_POSSIBLE :
-					RUN_NOT_POSSIBLE
-				;
-			}
-			
-			return RUN_NOT_POSSIBLE;
-		}
-
-
-
 		UseRule::ReservationAvailabilityType PTUseRule::getReservationAvailability(
 			const ServicePointer& servicePointer
 		) const	{
+			if(!servicePointer.getDepartureEdge() && !servicePointer.getArrivalEdge())
+			{
+				return RESERVATION_FORBIDDEN;
+			}
+
 			switch(_reservationType)
 			{
 			case RESERVATION_RULE_FORBIDDEN:
@@ -218,25 +177,32 @@ namespace synthese
 					){
 						return RESERVATION_OPTIONAL_TOO_EARLY;
 					}
-					if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getActualDateTime())
-					){
-						return RESERVATION_OPTIONAL_TOO_LATE;
-					}
-					if(servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
+					if(	servicePointer.getDepartureEdge())
 					{
+						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getDepartureDateTime())
+						){
+							return RESERVATION_OPTIONAL_TOO_LATE;
+						}
 						return RESERVATION_OPTIONAL_POSSIBLE;
 					}
-					if(reservationTime <= getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getOriginDateTime()))
+					else
 					{
-						return RESERVATION_OPTIONAL_POSSIBLE;
+						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getArrivalDateTime())
+						){
+							return RESERVATION_OPTIONAL_TOO_LATE;
+						}
+						if(reservationTime <= getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getOriginDateTime()))
+						{
+							return RESERVATION_OPTIONAL_POSSIBLE;
+						}
+						return RESERVATION_DEPENDING_ON_DEPARTURE_PLACE;
 					}
-					return RESERVATION_DEPENDING_ON_DEPARTURE_PLACE;
 				}
 
 			case RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE:
-				if(servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
+				if(servicePointer.getDepartureEdge())
 				{
-					const Edge* departureEdge(servicePointer.getEdge());
+					const Edge* departureEdge(servicePointer.getDepartureEdge());
 					ptime reservationTime(second_clock::local_time());
 					if(static_cast<const Line*>(departureEdge->getParentPath())->getCommercialLine()->isOptionalReservationPlace(
 						static_cast<const PublicTransportStopZoneConnectionPlace*>(departureEdge->getHub())
@@ -245,7 +211,7 @@ namespace synthese
 						){
 							return RESERVATION_OPTIONAL_TOO_EARLY;
 						}
-						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getActualDateTime())
+						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getDepartureDateTime())
 						){
 							return RESERVATION_OPTIONAL_TOO_LATE;
 						}
@@ -255,7 +221,7 @@ namespace synthese
 						){
 							return RESERVATION_COMPULSORY_TOO_EARLY;
 						}
-						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getActualDateTime())
+						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getDepartureDateTime())
 						){
 							return RESERVATION_COMPULSORY_TOO_LATE;
 						}
@@ -271,91 +237,26 @@ namespace synthese
 					){
 						return RESERVATION_COMPULSORY_TOO_EARLY;
 					}
-					if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getActualDateTime())
-					){
-						return RESERVATION_COMPULSORY_TOO_LATE;
-					}
-					if (servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL)
+					if(servicePointer.getDepartureEdge())
 					{
-						return RESERVATION_COMPULSORY_POSSIBLE;
-					}
-					if(reservationTime <= getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getOriginDateTime())
-					){
-						return RESERVATION_COMPULSORY_POSSIBLE;
-					}
-					return RESERVATION_DEPENDING_ON_DEPARTURE_PLACE;
-
-				}
-			}
-			
-			return RESERVATION_FORBIDDEN;
-		}
-
-
-
-		UseRule::ReservationAvailabilityType PTUseRule::getReservationAvailability(
-			const graph::ServiceUse& serviceUse
-		) const	{
-			switch(_reservationType)
-			{
-			case RESERVATION_RULE_FORBIDDEN:
-				return RESERVATION_FORBIDDEN;
-
-			case RESERVATION_RULE_OPTIONAL:
-				{
-					ptime reservationTime(second_clock::local_time());
-					if(	reservationTime < getReservationOpeningTime(serviceUse)
-						){
-							return RESERVATION_OPTIONAL_TOO_EARLY;
-					}
-					if(reservationTime > getReservationDeadLine(serviceUse.getOriginDateTime(), serviceUse.getDepartureDateTime())
-						){
-							return RESERVATION_OPTIONAL_TOO_LATE;
-					}
-					return RESERVATION_OPTIONAL_POSSIBLE;
-				}
-
-			case RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE:
-			{
-				ptime reservationTime(second_clock::local_time());
-				const Edge* departureEdge(serviceUse.getDepartureEdge());
-				if(static_cast<const Line*>(departureEdge->getParentPath())->getCommercialLine()->isOptionalReservationPlace(
-					static_cast<const PublicTransportStopZoneConnectionPlace*>(departureEdge->getHub())
-				)){
-					if(	reservationTime < getReservationOpeningTime(serviceUse)
-					){
-						return RESERVATION_OPTIONAL_TOO_EARLY;
-					}
-					if(reservationTime > getReservationDeadLine(serviceUse.getOriginDateTime(), serviceUse.getDepartureDateTime())
-					){
-						return RESERVATION_OPTIONAL_TOO_LATE;
-					}
-					return RESERVATION_OPTIONAL_POSSIBLE;
-				} else {
-					if(	reservationTime < getReservationOpeningTime(serviceUse)
-					){
-						return RESERVATION_COMPULSORY_TOO_EARLY;
-					}
-					if(reservationTime > getReservationDeadLine(serviceUse.getOriginDateTime(), serviceUse.getDepartureDateTime())
-					){
-						return RESERVATION_COMPULSORY_TOO_LATE;
-					}
-					return RESERVATION_COMPULSORY_POSSIBLE;
-				}
-			}
-			
-			case RESERVATION_RULE_COMPULSORY:
-				{
-					ptime reservationTime(second_clock::local_time());
-					if(	reservationTime < getReservationOpeningTime(serviceUse)
-						){
-							return RESERVATION_COMPULSORY_TOO_EARLY;
-					}
-					if(reservationTime > getReservationDeadLine(serviceUse.getOriginDateTime(), serviceUse.getDepartureDateTime())
+						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getDepartureDateTime())
 						){
 							return RESERVATION_COMPULSORY_TOO_LATE;
+						}
+						return RESERVATION_COMPULSORY_POSSIBLE;
 					}
-					return RESERVATION_COMPULSORY_POSSIBLE;
+					else
+					{
+						if(reservationTime > getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getArrivalDateTime())
+						){
+							return RESERVATION_COMPULSORY_TOO_LATE;
+						}
+						if(reservationTime <= getReservationDeadLine(servicePointer.getOriginDateTime(), servicePointer.getOriginDateTime())
+						){
+							return RESERVATION_COMPULSORY_POSSIBLE;
+						}
+						return RESERVATION_DEPENDING_ON_DEPARTURE_PLACE;
+					}
 				}
 			}
 			
@@ -373,6 +274,8 @@ namespace synthese
 			}
 			return neg_infin;
 		}
+
+
 
 		bool PTUseRule::isCompatibleWith( const AccessParameters& accessParameters ) const
 		{

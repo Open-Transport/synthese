@@ -56,9 +56,9 @@ namespace synthese
 
 				virtual void getVertexAccessMap(
 					VertexAccessMap& result,
-					const AccessDirection& accessDirection,
 					GraphIdType whatToSearch,
-					const Vertex& vertex
+					const Vertex& vertex,
+					bool vertexIsOrigin
 				) const = 0;
 
 				virtual bool isConnectionAllowed(

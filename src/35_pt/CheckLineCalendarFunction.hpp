@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 /// CheckLineCalendar class header.
-///	@file CheckLineCalendar.hpp
+///	@file CheckLineCalendarFunction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///

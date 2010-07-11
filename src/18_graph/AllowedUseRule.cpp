@@ -57,20 +57,8 @@ namespace synthese
 			return RUN_POSSIBLE;
 		}
 
-		UseRule::RunPossibilityType AllowedUseRule::isRunPossible(
-			const ServiceUse& serviceUse
-		) const	{
-			return RUN_POSSIBLE;
-		}
-
 		UseRule::ReservationAvailabilityType AllowedUseRule::getReservationAvailability(
-			const ServiceUse& serviceUse
-		) const	{
-			return RESERVATION_FORBIDDEN;
-		}
-
-		UseRule::ReservationAvailabilityType AllowedUseRule::getReservationAvailability(
-			const ServicePointer& servicePointer
+			const ServicePointer& serviceUse
 		) const	{
 			return RESERVATION_FORBIDDEN;
 		}

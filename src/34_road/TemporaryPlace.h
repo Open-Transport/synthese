@@ -67,7 +67,6 @@ namespace synthese
 			//@{
 				void getVertexAccessMap(
 					graph::VertexAccessMap& result,
-					const graph::AccessDirection& accessDirection,
 					const graph::AccessParameters& accessParameters,
 					graph::GraphIdType whatToSearch
 				) const;

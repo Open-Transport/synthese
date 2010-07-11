@@ -126,9 +126,7 @@ namespace synthese
 				) const;
 
 				/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
-					@param method Search departure or arrival :
-						- ServicePointer::DEPARTURE_TO_ARRIVAL
-						- ServicePointer::ARRIVAL_TO_DEPARTURE
+					@param getDeparture
 					@param edge Edge
 					@param presenceDateTime Goal  time
 					@param controlIfTheServiceIsReachable service selection method :
@@ -141,17 +139,17 @@ namespace synthese
 				*/
 				virtual graph::ServicePointer getFromPresenceTime(
 					bool RTData,
-					graph::AccessDirection method,
+					bool getDeparture,
 					std::size_t userClassRank
-					, const graph::Edge* edge
+					, const graph::Edge& edge
 					, const boost::posix_time::ptime& presenceDateTime
 					, bool controlIfTheServiceIsReachable
 					, bool inverted
 				) const;
 				
-				virtual boost::posix_time::ptime getLeaveTime(
-					const graph::ServicePointer& servicePointer
-					, const graph::Edge* edge
+				virtual void completeServicePointer(
+					graph::ServicePointer& servicePointer,
+					const graph::Edge& edge
 				) const;
 
 				

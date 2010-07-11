@@ -61,7 +61,7 @@ namespace synthese
 
 			void _push_back(
 				ActualDisplayedArrivalsList& list,
-				const graph::ServiceUse& serviceUse
+				const graph::ServicePointer& serviceUse
 			);
 
 		protected:

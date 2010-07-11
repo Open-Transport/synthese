@@ -161,7 +161,7 @@ namespace synthese
 					_logStream,
 					_journeyTemplates
 				);
-				RoutePlanner::Result journey(r.run());
+				Journey journey(r.run());
 
 				if(journey.empty()) break;
 

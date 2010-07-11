@@ -61,17 +61,7 @@ namespace synthese
 
 
 			virtual RunPossibilityType isRunPossible (
-				const ServiceUse& serviceUse
-			) const;
-
-
-			virtual RunPossibilityType isRunPossible (
 				const ServicePointer& servicePointer
-			) const;
-
-
-			virtual ReservationAvailabilityType getReservationAvailability(
-				const ServiceUse& serviceUse
 			) const;
 
 

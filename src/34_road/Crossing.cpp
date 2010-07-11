@@ -99,9 +99,9 @@ namespace synthese
 
 		void Crossing::getVertexAccessMap(
 			graph::VertexAccessMap& result,
-			const graph::AccessDirection& accessDirection,
 			graph::GraphIdType whatToSearch,
-			const graph::Vertex& origin
+			const graph::Vertex& origin,
+			bool vertexIsOrigin
 		) const	{
 			if(whatToSearch == RoadModule::GRAPH_ID)
 			{

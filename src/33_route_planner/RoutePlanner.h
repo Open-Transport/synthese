@@ -28,10 +28,11 @@
 #include <map>
 
 #include "VertexAccessMap.h"
-#include "ServiceUse.h"
+#include "ServicePointer.h"
 #include "AccessParameters.h"
 #include "RoutePlannerTypes.h"
 #include "Exception.h"
+#include "RoutePlanningIntermediateJourney.hpp"
 
 #include <boost/optional.hpp>
 
@@ -78,7 +79,7 @@ namespace synthese
 		class RoutePlanner
 		{
 		public:
-			typedef graph::Journey Result;
+			typedef RoutePlanningIntermediateJourney Result;
 			
 			/** Exception to throw when the route planning has no sense because of the presence of a common vertex in
 				both the the departure and the arrival vertex access maps.
@@ -128,10 +129,10 @@ namespace synthese
 					- false :solutions allowing a time saving are only selected
 			*/
 			void _findBestJourney(
-				graph::Journey& result,
+				RoutePlanningIntermediateJourney& result,
 				const graph::VertexAccessMap& originVam,
 				const graph::VertexAccessMap& destinationVam,
-				graph::AccessDirection direction,
+				PlanningPhase direction,
 				const boost::posix_time::ptime& originDateTime,
 				const boost::posix_time::ptime& maxMinDateTimeAtOrigin,
 				const boost::posix_time::ptime& maxMinDateTimeAtDestination,
@@ -177,7 +178,7 @@ namespace synthese
 				@author Hugues
 				@date 2009				
 			*/
-			Result run();
+			graph::Journey run();
 		};
 	}
 }

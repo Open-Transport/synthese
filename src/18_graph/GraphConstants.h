@@ -25,6 +25,8 @@
 
 #include "GraphTypes.h"
 
+#include <cstddef>
+
 namespace synthese
 {
 	namespace graph

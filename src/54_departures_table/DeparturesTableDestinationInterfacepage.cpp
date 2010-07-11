@@ -23,7 +23,7 @@
 */
 
 #include "DeparturesTableDestinationInterfacepage.h"
-#include "ServiceUse.h"
+#include "ServicePointer.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "City.h"
 #include "Edge.h"
@@ -59,14 +59,14 @@ namespace synthese
 
 		void DeparturesTableDestinationInterfacepage::display(
 			std::ostream& stream,
-			const ServiceUse& object,
+			const ServicePointer& object,
 			bool lastDisplayedStopWasInTheSameCity,
 			bool isTheEndStation,
 			const std::string& transfersString,
 			VariablesMap& variables,
 			const server::Request* request /*= NULL*/
 		) const	{
-			const PublicTransportStopZoneConnectionPlace* place(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(object.getSecondEdge()->getHub()));
+			const PublicTransportStopZoneConnectionPlace* place(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(object.getArrivalEdge()->getHub()));
 
 			ParametersVector pv;
 			pv.push_back(lexical_cast<string>(place->getKey())); //0
@@ -75,7 +75,7 @@ namespace synthese
 			pv.push_back(place->getName26()); //3
 			pv.push_back(place->getName13()); //4
 			pv.push_back(lexical_cast<string>(lastDisplayedStopWasInTheSameCity)); //5
-			pv.push_back(to_simple_string(object.getSecondActualDateTime())); //6
+			pv.push_back(to_simple_string(object.getArrivalDateTime())); //6
 			pv.push_back(lexical_cast<string>(isTheEndStation)); //7
 			pv.push_back(transfersString); //8
 

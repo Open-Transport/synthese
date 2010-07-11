@@ -32,6 +32,7 @@
 #include "CommercialLine.h"
 #include "RoadPlace.h"
 #include "Line.h"
+#include "Service.h"
 
 using namespace std;
 using namespace boost;
@@ -196,8 +197,8 @@ namespace synthese
 				stream << t.col() << "<b>" << its->getDepartureDateTime() << "</b>";
 
 				// Line
-				const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-				const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
+				const LineStop* ls(dynamic_cast<const LineStop*>(its->getDepartureEdge()));
+				const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
 				stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
 				stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
 
@@ -230,10 +231,10 @@ namespace synthese
 						stream << t.col() << its->getDepartureDateTime();
 
 						// Line
-						const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-						const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
-						stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
-						stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
+						const Line* ls(dynamic_cast<const Line*>(its->getService()->getPath()));
+						const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
+						stream << t.col(1, ls ? ls->getCommercialLine()->getStyle() : string());
+						stream << (ls ? ls->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
 
 						// Exit if last service use
 						if (its == it->getServiceUses().end() -1)
@@ -280,7 +281,7 @@ namespace synthese
 
 				for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 				{
-					const ServiceUse& leg(*itl);
+					const ServicePointer& leg(*itl);
 
 					if(itl == jl.begin())
 					{

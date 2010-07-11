@@ -81,9 +81,7 @@ namespace synthese
 				bool isContinuous () const;
 
 				/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
-					@param method Search departure or arrival :
-						- ServicePointer::DEPARTURE_TO_ARRIVAL
-						- ServicePointer::ARRIVAL_TO_DEPARTURE
+					@param getDeparture
 					@param edge Edge
 					@param presenceDateTime Goal  time
 					@param controlIfTheServiceIsReachable service selection method :
@@ -91,22 +89,22 @@ namespace synthese
 						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
 					@return A full ServicePointer to the service. If the service cannot be used at the specified date/time, then the ServicePointer points to a NULL service.
 					@author Hugues Romain
-					@date 2007
+					@date 2007-2010
 					@warning The service index is unknown in the generated ServicePointer.					
 				*/
 				virtual graph::ServicePointer getFromPresenceTime(
 					bool RTData,
-					graph::AccessDirection method,
-					std::size_t userClassRank
-					, const graph::Edge* edge
+					bool getDeparture,
+					std::size_t userClassRank,
+					const graph::Edge& edge
 					, const boost::posix_time::ptime& presenceDateTime
 					, bool controlIfTheServiceIsReachable
 					, bool inverted
 				) const;
 
-				virtual boost::posix_time::ptime getLeaveTime(
-					const graph::ServicePointer& servicePointer
-					, const graph::Edge* edge
+				virtual void completeServicePointer(
+					graph::ServicePointer& servicePointer,
+					const graph::Edge& edge
 				) const;
 
 

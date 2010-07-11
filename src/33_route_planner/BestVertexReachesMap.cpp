@@ -27,13 +27,11 @@
 #include "PhysicalStop.h"
 #include "Vertex.h"
 #include "Edge.h"
-#include "ServiceUse.h"
-#include "Journey.h"
+#include "ServicePointer.h"
+#include "RoutePlanningIntermediateJourney.hpp"
 #include "RoadModule.h"
 #include "PTModule.h"
 #include "VertexAccessMap.h"
-#include "JourneyComparator.h"
-
 #include <assert.h>
 
 using namespace std;
@@ -71,16 +69,16 @@ namespace synthese
 
 
 		bool BestVertexReachesMap::isUseLess(
-			boost::shared_ptr<graph::Journey> journeysptr,
+			boost::shared_ptr<RoutePlanningIntermediateJourney> journeysptr,
 			const ptime& originDateTime,
 			bool propagateInConnectionPlace,
 			bool strict
 		){
-			const Journey& journey(*journeysptr);
-			const Vertex* const vertex(journey.getEndEdge()->getFromVertex());
+			const RoutePlanningIntermediateJourney& journey(*journeysptr);
+			const Vertex* const vertex(journey.getEndEdge().getFromVertex());
 			const size_t transferNumber(journey.size());
 			const posix_time::time_duration duration(
-				journey.getMethod() == DEPARTURE_TO_ARRIVAL ?
+				_accessDirection == DEPARTURE_TO_ARRIVAL ?
 				journey.getEndTime() - originDateTime :
 				originDateTime - journey.getEndTime()
 			);
@@ -111,7 +109,7 @@ namespace synthese
 				else if(item.first == transferNumber)
 				{
 					if(	item.second.first < duration ||
-						item.second.first == duration && (strict || JourneyComparator().operator()(item.second.second, journeysptr))
+						item.second.first == duration && (strict || *item.second.second > *journeysptr)
 					){
 						return true;
 					}
@@ -165,7 +163,7 @@ namespace synthese
 			const TimeMap::key_type& vertex,
 			const TimeMap::mapped_type::key_type& transfers,
 			boost::posix_time::time_duration duration,
-			boost::shared_ptr<graph::Journey> journey
+			boost::shared_ptr<RoutePlanningIntermediateJourney> journey
 		){
 			TimeMap::iterator itc = _bestTimeMap.find (vertex);
 
@@ -191,7 +189,7 @@ namespace synthese
 			const TimeMap::key_type& vertex,
 			const TimeMap::mapped_type::key_type& transfers,
 			boost::posix_time::time_duration duration,
-			boost::shared_ptr<graph::Journey> journey
+			boost::shared_ptr<RoutePlanningIntermediateJourney> journey
 		){
 			_insert(vertex, transfers, duration, journey);
 			
@@ -265,7 +263,7 @@ namespace synthese
 
 
 		BestVertexReachesMap::BestVertexReachesMap(
-			graph::AccessDirection accessDirection,
+			PlanningPhase accessDirection,
 			const graph::VertexAccessMap& vam,
 			const graph::VertexAccessMap& destinationVam
 		):	_accessDirection(accessDirection)
@@ -278,8 +276,8 @@ namespace synthese
 						it->first,
 						0,
 						it->second.approachTime,
-						shared_ptr<Journey>(new Journey)
-						);
+						shared_ptr<RoutePlanningIntermediateJourney>(new RoutePlanningIntermediateJourney(accessDirection))
+					);
 				}
 			}
 		}

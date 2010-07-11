@@ -340,7 +340,7 @@ namespace synthese
 
 			// New reservation for each journey leg
 			const OnlineReservationRule* reservationContact(NULL);
-			BOOST_FOREACH(const ServiceUse& su, _journey.getServiceUses())
+			BOOST_FOREACH(const ServicePointer& su, _journey.getServiceUses())
 			{
 				assert(su.getService() != NULL);
 				assert(su.getDepartureEdge() != NULL);

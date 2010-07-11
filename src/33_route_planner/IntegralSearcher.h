@@ -38,8 +38,6 @@ namespace synthese
 		class Vertex;
 		class VertexAccessMap;
 		class Edge;
-		class Journey;
-		class JourneyComparator;
 	}
 
 	namespace algorithm
@@ -73,7 +71,7 @@ namespace synthese
 			//! @name Parameters
 			//@{
 				const graph::AccessParameters				_accessParameters;
-				const graph::AccessDirection				_accessDirection;
+				const PlanningPhase							_accessDirection;
 				const graph::GraphIdType					_whatToSearch;
 				const bool									_searchOnlyNodes;
 				const graph::GraphIdType					_graphToUse;
@@ -98,7 +96,7 @@ namespace synthese
 
 			void _integralSearch(
 				const graph::VertexAccessMap& vertices,
-				const graph::Journey& startJourney,
+				const RoutePlanningIntermediateJourney& startJourney,
 				const boost::posix_time::ptime& originDateTime,
 				const boost::posix_time::ptime& minMaxOriginDateTime,
 				boost::optional<std::size_t> maxDepth,
@@ -125,7 +123,7 @@ namespace synthese
 
 		public:
 			IntegralSearcher(
-				graph::AccessDirection								accessDirection,
+				PlanningPhase										accessDirection,
 				const graph::AccessParameters&						accessParameters,
 				graph::GraphIdType									whatToSearch,
 				bool												searchOnlyNodes,
@@ -163,7 +161,7 @@ namespace synthese
 			/// @param startJourney connecting journey
 			/// @param maxDepth limit of transfers
 			void integralSearch(
-				const graph::Journey& startJourney,
+				const RoutePlanningIntermediateJourney& startJourney,
 				boost::optional<std::size_t> maxDepth,
 				boost::optional<boost::posix_time::time_duration> totalDuration
 			);
@@ -179,30 +177,10 @@ namespace synthese
 				@date 2007				
 			*/
 			_JourneyUsefulness evaluateJourney(
-				boost::shared_ptr<graph::Journey> journey
+				boost::shared_ptr<RoutePlanningIntermediateJourney> journey
 			) const;
 
 
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Computes and stores the score of a journey.
-			/// @param journey the journey to evaluate
-			/// @param totalDuration the duration of the best journey found by the route planner (undefined if no journey has been found at the time)
-			/// @author Hugues Romain
-			/// @date 2009
-			///
-			/// The score is between 0 and 1000.
-			///
-			/// @image html scores_noresult.png
-			/// @image html scores_result.png
-			///
-			/// <h3>Attachments</h3>
-			/// <ul><li><a href="include/test-score.xslx">Score simulation table</a></li></ul>
-			void setJourneyScore(
-				graph::Journey& journey,
-				boost::optional<boost::posix_time::time_duration> totalDuration
-			) const;
 
 			//! @name Getters
 			//@{

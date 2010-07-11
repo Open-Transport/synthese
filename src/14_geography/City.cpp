@@ -70,10 +70,9 @@ namespace synthese
 
 
 		void City::getVertexAccessMap(
-			VertexAccessMap& result
-			, const AccessDirection& accessDirection
-			, const AccessParameters& accessParameters
-			, const GraphTypes& whatToSearch
+			VertexAccessMap& result,
+			const AccessParameters& accessParameters,
+			const GraphTypes& whatToSearch
 		) const {
 
 /*			if (_includedPlaces.empty ())
@@ -110,7 +109,8 @@ namespace synthese
 			else
 */			{
 				IncludingPlace::getVertexAccessMap(
-					result, accessDirection, accessParameters, 
+					result,
+					accessParameters, 
 					whatToSearch
 				);
 			}

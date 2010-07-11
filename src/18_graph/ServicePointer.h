@@ -46,63 +46,119 @@ namespace synthese
 				- a calendar date
 				- an edge
 				- a direction (departure from the edge or arrival at the edge)
+
+			If the departure edge is null, then all the informations about the departure are not known at the moment.
+			If the arrival edge is null, then all the informations about the arrival are not known at the moment.
 		*/
 		class ServicePointer
 		{
 		protected:
-			//! @name Initial parameters
+			//! @name Departure informations
 			//@{
-				AccessDirection		_determinationMethod;
-				const Edge*			_edge;
-				const Vertex*		_RTVertex;
-				std::size_t			_userClassRank;
-				bool				_RTData;
+				const Edge*			_departureEdge;
+				boost::posix_time::ptime	_departureTime;
+				const Vertex*		_realTimeDepartureVertex;
+				boost::posix_time::ptime		_theoreticalDepartureTime;
 			//@}
 
-			//! @name Result elements
+			//! @name Arrival informations
 			//@{
-				const Service*		_service;
+				const Edge*			_arrivalEdge;
+				boost::posix_time::ptime	_arrivalTime;
+				const Vertex*		_realTimeArrivalVertex;
+				boost::posix_time::ptime		_theoreticalArrivalTime;
+			//@}
+			
+			//! @name General information
+			//@{
+				std::size_t		_userClassRank;
+				bool				_RTData;
+				const Service*	_service;
 				boost::posix_time::ptime		_originDateTime;
-				boost::posix_time::ptime		_actualTime;
-				boost::posix_time::ptime		_theoreticalTime;
 				boost::posix_time::time_duration	_range;
 			//@}
 			
 		public:
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor.
 			ServicePointer(
 				bool RTData,
-				AccessDirection method,
 				std::size_t userClassRank,
-				const Edge* edge = NULL
+				const Service& service,
+				const boost::posix_time::ptime& originDateTime
 			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// @pre partially filled pointer must not be completed.
+			ServicePointer(
+				const ServicePointer& partiallyFilledPointer,
+				const Edge& edge
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Null service pointer.
 			ServicePointer();
 
 			//! @name Setters
 			//@{
-				void	setActualTime(const boost::posix_time::ptime& dateTime) { _actualTime = dateTime; }
-				void	setTheoreticalTime(const boost::posix_time::ptime& dateTime) { _theoreticalTime = dateTime; }
-				void	setService(const Service* service) { _service = service; }
-				void	setOriginDateTime(const boost::posix_time::ptime& dateTime){ _originDateTime = dateTime; }
 				void	setServiceRange(boost::posix_time::time_duration duration){ _range = duration; }
-				void	setRealTimeVertex(const Vertex* value){ _RTVertex = value; }
 			//@}
 
 			//! @name Getters
 			//@{
-				const Edge*				getEdge()	const { return _edge; }
-				const Vertex*			getRealTimeVertex()			const { return _RTVertex; }
+				const Edge*				getDepartureEdge()	const { return _departureEdge; }
+				const Edge*				getArrivalEdge()	const { return _arrivalEdge; }
+				const Vertex*			getRealTimeDepartureVertex()			const { return _realTimeDepartureVertex; }
+				const Vertex*			getRealTimeArrivalVertex()			const { return _realTimeArrivalVertex; }
 				const Service*			getService()				const { return _service; }
-				const boost::posix_time::ptime&	getActualDateTime()			const { return _actualTime; }
-				const boost::posix_time::ptime&	getTheoreticalDateTime()	const { return _theoreticalTime; }
+				const boost::posix_time::ptime&	getDepartureDateTime()			const { return _departureTime; }
+				const boost::posix_time::ptime&	getArrivalDateTime()			const { return _arrivalTime; }
+				const boost::posix_time::ptime&	getTheoreticalDepartureDateTime()	const { return _theoreticalDepartureTime; }
+				const boost::posix_time::ptime&	getTheoreticalArrivalDateTime()	const { return _theoreticalArrivalTime; }
 				const boost::posix_time::ptime&	getOriginDateTime()			const { return _originDateTime; }
-				AccessDirection			getMethod()					const { return _determinationMethod; }
 				boost::posix_time::time_duration	getServiceRange() const { return _range; }
 				std::size_t				getUserClassRank() const { return _userClassRank; }
 				bool					getRTData() const { return _RTData; }
 			//@}
 
+			//! @name Update methods
+			//@{
+				void	setDepartureInformations(
+					const graph::Edge& edge,
+					const boost::posix_time::ptime& dateTime,
+					const boost::posix_time::ptime& theoreticalDateTime,
+					const Vertex& realTimeVertex
+				);
+				void	setArrivalInformations(
+					const graph::Edge& edge,
+					const boost::posix_time::ptime& dateTime,
+					const boost::posix_time::ptime& theoreticalDateTime,
+					const Vertex& realTimeVertex
+				);
+
+				//////////////////////////////////////////////////////////////////////////
+				/// @pre at least one edge must be specified
+				void complete(
+					const Edge& edge
+				);
+
+				void shift(boost::posix_time::time_duration duration);
+			//@}
+
 			//! @name Queries
 			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// @pre both departure edge and arrival edge must be defined
+				double getDistance() const;
+
+
+				boost::posix_time::time_duration getDuration() const;
+
 				/** Test the respect of the reservation rules.
 					@return bool true if the service can be used
 					@warning If the service is determined by ARRIVAL_TO_DEPARTURE, then this method always aswers true, because the reservation
@@ -111,9 +167,13 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007
 				*/
-				virtual UseRule::RunPossibilityType isUseRuleCompliant(
+				UseRule::RunPossibilityType isUseRuleCompliant(
 				) const;
 
+
+				//////////////////////////////////////////////////////////////////////////
+				/// @pre departure informations must be set
+				boost::posix_time::ptime			getReservationDeadLine()	const;
 
 
 				//////////////////////////////////////////////////////////////////////////

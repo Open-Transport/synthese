@@ -31,14 +31,15 @@ namespace synthese
 	{
 		void JourneysResult::operator=(const JourneysResult& other)
 		{
+			assert(_accessDirection == other._accessDirection);
+
 			_originDateTime = other._originDateTime;
-			_accessDirection = other._accessDirection;
 			_result = other._result;
 			for(ResultSet::iterator it(_result.begin()); it != _result.end(); ++it)
 			{
 				_index.insert(
 					std::make_pair(
-						it->first->getEndEdge()->getFromVertex(),
+						it->first->getEndEdge().getFromVertex(),
 						it
 				)	);
 			}
@@ -66,9 +67,9 @@ namespace synthese
 				@param journey the journey to remove
 				@author Hugues Romain
 			*/
-			void JourneysResult::remove(boost::shared_ptr<graph::Journey> journey)
+			void JourneysResult::remove(boost::shared_ptr<RoutePlanningIntermediateJourney> journey)
 			{
-				const graph::Vertex* vertex(journey->getEndEdge()->getFromVertex());
+				const graph::Vertex* vertex(journey->getEndEdge().getFromVertex());
 				remove(vertex);
 			}
 
@@ -91,14 +92,11 @@ namespace synthese
 				@param journey the journey to add
 				@author Hugues Romain
 			*/
-			void JourneysResult::add(boost::shared_ptr<graph::Journey> journey)
+			void JourneysResult::add(boost::shared_ptr<RoutePlanningIntermediateJourney> journey)
 			{
-				if(!_accessDirection) _accessDirection = journey->getMethod();
-				assert(*_accessDirection == journey->getMethod());
-
-				const graph::Vertex* vertex(journey->getEndEdge()->getFromVertex());
+				const graph::Vertex* vertex(journey->getEndEdge().getFromVertex());
 				boost::posix_time::time_duration duration(
-					_accessDirection == graph::DEPARTURE_TO_ARRIVAL ?
+					_accessDirection == DEPARTURE_TO_ARRIVAL ?
 					journey->getEndTime() - _originDateTime :
 					_originDateTime - journey->getEndTime()
 				);
@@ -127,7 +125,7 @@ namespace synthese
 						nullVertex,
 						_result.insert(
 							std::make_pair(
-								boost::shared_ptr<graph::Journey>(new graph::Journey),
+								boost::shared_ptr<RoutePlanningIntermediateJourney>(new RoutePlanningIntermediateJourney(_accessDirection)),
 								boost::posix_time::minutes(0)
 						)	).first
 				)	);
@@ -139,12 +137,12 @@ namespace synthese
 				@return Pointer to the first journey
 				@warning The returned pointer must be deleted after use
 			*/
-			boost::shared_ptr<graph::Journey> JourneysResult::front()
+			boost::shared_ptr<RoutePlanningIntermediateJourney> JourneysResult::front()
 			{
 				assert(!empty());
 
-				boost::shared_ptr<graph::Journey> ptr(_result.begin()->first);
-				_index.erase(ptr->empty() ? NULL : ptr->getEndEdge()->getFromVertex());
+				boost::shared_ptr<RoutePlanningIntermediateJourney> ptr(_result.begin()->first);
+				_index.erase(ptr->empty() ? NULL : ptr->getEndEdge().getFromVertex());
 				_result.erase(_result.begin());
 				return ptr;
 			}
@@ -165,15 +163,15 @@ namespace synthese
 				bool strict,
 				const IntegralSearcher& is
 			){
-				std::vector<boost::shared_ptr<graph::Journey> > journeysToAdd;
-				std::vector<boost::shared_ptr<graph::Journey> > journeysToRemove;
+				std::vector<boost::shared_ptr<RoutePlanningIntermediateJourney> > journeysToAdd;
+				std::vector<boost::shared_ptr<RoutePlanningIntermediateJourney> > journeysToRemove;
 				for (IndexMap::iterator it(_index.begin()); it != _index.end();)
 				{
-					boost::shared_ptr<graph::Journey> journey(it->second->first);
+					boost::shared_ptr<RoutePlanningIntermediateJourney> journey(it->second->first);
 					IndexMap::iterator next(it);
 					++next;
-					if(	journey->getMethod() == graph::DEPARTURE_TO_ARRIVAL && journey->getEndTime() >= newMaxTime ||
-						journey->getMethod() == graph::ARRIVAL_TO_DEPARTURE && journey->getEndTime() <= newMaxTime
+					if(	_accessDirection == DEPARTURE_TO_ARRIVAL && journey->getEndTime() >= newMaxTime ||
+						_accessDirection == ARRIVAL_TO_DEPARTURE && journey->getEndTime() <= newMaxTime
 						// Add reach ability test
 					){
 						journeysToRemove.push_back(journey);
@@ -182,21 +180,21 @@ namespace synthese
 					{
 						_result.erase(it->second);
 						_index.erase(it);
-						is.setJourneyScore(
-							*journey,
-							journey->getMethod() == graph::DEPARTURE_TO_ARRIVAL ?
+						journey->updateScore(
+							_accessDirection == DEPARTURE_TO_ARRIVAL ?
 								newMaxTime - is.getOriginDateTime() :
-								is.getOriginDateTime() - newMaxTime
+								is.getOriginDateTime() - newMaxTime,
+							_originDateTime
 						);
 						journeysToAdd.push_back(journey);
 					}
 					it = next;
 				}
-				BOOST_FOREACH(boost::shared_ptr<graph::Journey> journey, journeysToRemove)
+				BOOST_FOREACH(boost::shared_ptr<RoutePlanningIntermediateJourney> journey, journeysToRemove)
 				{
 					remove(journey);
 				}
-				BOOST_FOREACH(boost::shared_ptr<graph::Journey> journey, journeysToAdd)
+				BOOST_FOREACH(boost::shared_ptr<RoutePlanningIntermediateJourney> journey, journeysToAdd)
 				{
 					add(journey);
 				}
@@ -212,7 +210,7 @@ namespace synthese
 				@return const pt::Journey* const The result journey that reaches the specified vertex
 				@author Hugues Romain
 			*/
-			boost::shared_ptr<graph::Journey> JourneysResult::get(const graph::Vertex* vertex) const
+			boost::shared_ptr<RoutePlanningIntermediateJourney> JourneysResult::get(const graph::Vertex* vertex) const
 			{
 				IndexMap::const_iterator it(_index.find(vertex));
 				if (it != _index.end())
@@ -221,7 +219,7 @@ namespace synthese
 					return its->first;
 				}
 				else
-					return boost::shared_ptr<graph::Journey>();
+					return boost::shared_ptr<RoutePlanningIntermediateJourney>();
 			}
 
 			

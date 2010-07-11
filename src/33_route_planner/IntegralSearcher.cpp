@@ -29,8 +29,7 @@
 #include "Edge.h"
 #include "Path.h"
 #include "Hub.h"
-#include "Journey.h"
-#include "JourneyComparator.h"
+#include "RoutePlanningIntermediateJourney.hpp"
 #include "JourneyTemplates.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 // To be removed by a log class
@@ -67,7 +66,7 @@ namespace synthese
 // -----------------------------------------------------------------------1 Construction
 
 		IntegralSearcher::IntegralSearcher(
-			AccessDirection accessDirection,
+			PlanningPhase accessDirection,
 			const AccessParameters&	accessParameters,
 			GraphIdType whatToSearch,
 			bool searchOnlyNodes,
@@ -110,7 +109,7 @@ namespace synthese
 			optional<size_t> maxDepth,
 			boost::optional<boost::posix_time::time_duration> totalDuration
 		){
-			Journey emptyJourney;
+			RoutePlanningIntermediateJourney emptyJourney(_accessDirection);
 			_integralSearch(
 				vertices,
 				emptyJourney,
@@ -124,16 +123,16 @@ namespace synthese
 
 
 		void IntegralSearcher::integralSearch(
-			const graph::Journey& startJourney,
+			const RoutePlanningIntermediateJourney& startJourney,
 			optional<std::size_t> maxDepth,
 			boost::optional<boost::posix_time::time_duration> totalDuration
 		){
 			VertexAccessMap vam;
-			startJourney.getEndEdge()->getHub()->getVertexAccessMap(
+			startJourney.getEndEdge().getHub()->getVertexAccessMap(
 				vam,
-				_accessDirection,
 				_graphToUse,
-				*startJourney.getEndEdge()->getFromVertex()
+				*startJourney.getEndEdge().getFromVertex(),
+				_accessDirection == DEPARTURE_TO_ARRIVAL
 			);
 			_integralSearch(
 				vam,
@@ -149,14 +148,14 @@ namespace synthese
 
 		void IntegralSearcher::_integralSearch(
 			const graph::VertexAccessMap& vam,
-			const graph::Journey& startJourney,
+			const RoutePlanningIntermediateJourney& startJourney,
 			const boost::posix_time::ptime& desiredTime,
 			const boost::posix_time::ptime& minMaxDateTimeAtOrigin,
 			optional<size_t> maxDepth,
 			boost::optional<boost::posix_time::time_duration> totalDuration
 		){
 			// Recursions to do
-			JourneysResult todo(_originDateTime);
+			JourneysResult todo(_originDateTime, _accessDirection);
 			todo.addEmptyJourney();
 
 			if (_logStream)
@@ -168,7 +167,7 @@ namespace synthese
 			while(!todo.empty())
 			{
 				this_thread::interruption_point();
-				shared_ptr<Journey> journey(todo.front());
+				shared_ptr<RoutePlanningIntermediateJourney> journey(todo.front());
 
 				VertexAccessMap curVam;
 				if(journey->empty())
@@ -177,11 +176,11 @@ namespace synthese
 				}
 				else
 				{
-					journey->getEndEdge()->getHub()->getVertexAccessMap(
+					journey->getEndEdge().getHub()->getVertexAccessMap(
 						curVam,
-						_accessDirection,
 						_graphToUse,
-						*journey->getEndEdge()->getFromVertex()
+						*journey->getEndEdge().getFromVertex(),
+						_accessDirection == DEPARTURE_TO_ARRIVAL
 					);
 				}
 
@@ -218,8 +217,10 @@ namespace synthese
 					*_logStream << "</td>";
 
 					// Line
-					const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-					const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
+					const LineStop* ls(dynamic_cast<const LineStop*>(
+						_accessDirection == DEPARTURE_TO_ARRIVAL ? its->getDepartureEdge() : its->getArrivalEdge()
+					)	);
+					const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
 					*_logStream << "<td";
 					if (ls)
 						*_logStream << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
@@ -261,8 +262,8 @@ namespace synthese
 							*_logStream << "<td>" << its->getDepartureDateTime() << "</td>";
 
 							// Line
-							const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
-							const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
+							const LineStop* ls(dynamic_cast<const LineStop*>(_accessDirection == DEPARTURE_TO_ARRIVAL ? its->getDepartureEdge() : its->getArrivalEdge()));
+							const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
 							*_logStream << "<td";
 							if (ls)
 								*_logStream << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
@@ -296,7 +297,10 @@ namespace synthese
 //					*_logStream << todo.getLog();
 				}
 
-				Journey currentJourney(startJourney, *journey);
+				RoutePlanningIntermediateJourney currentJourney(
+					_accessDirection == DEPARTURE_TO_ARRIVAL ? startJourney : *journey,
+					_accessDirection == DEPARTURE_TO_ARRIVAL ? *journey : startJourney
+				);
 
 				// Loop on each origin vertex
 				for(map<const Vertex*, VertexAccess>::const_iterator itVertex(curVam.getMap ().begin());
@@ -313,10 +317,18 @@ namespace synthese
 						continue;
 
 					// Approach to the vertex
-					Journey fullApproachJourney(currentJourney);
+					RoutePlanningIntermediateJourney fullApproachJourney(currentJourney);
 					if(fullApproachJourney.empty())
-						fullApproachJourney.setStartApproachDuration(itVertex->second.approachTime);
-
+					{
+						if(_accessDirection == DEPARTURE_TO_ARRIVAL)
+						{
+							fullApproachJourney.setStartApproachDuration(itVertex->second.approachTime);
+						}
+						else
+						{
+							fullApproachJourney.setEndApproachDuration(itVertex->second.approachTime);
+						}
+					}
 					ptime correctedDesiredTime(journey->empty() ? desiredTime : journey->getEndTime());
 					ptime correctedMinMaxDateTimeAtOrigin(minMaxDateTimeAtOrigin);
 					if (_accessDirection == DEPARTURE_TO_ARRIVAL)
@@ -381,12 +393,13 @@ namespace synthese
 							if(_accessDirection == DEPARTURE_TO_ARRIVAL)
 							{
 								++*departureServiceNumber; // To the next service
+								departureMoment = serviceInstance.getDepartureDateTime();
 							}
 							else
 							{
 								++*arrivalServiceNumber; // To the previous service (reverse iterator increment)
+								departureMoment = serviceInstance.getArrivalDateTime();
 							}
-							departureMoment = serviceInstance.getActualDateTime();
 
 							// Check for service compliance rules.
 							if (!serviceInstance.getService()->isCompatibleWith(_accessParameters))
@@ -451,7 +464,7 @@ namespace synthese
 								}
 
 								// Storage of the useful solution
-								ServiceUse serviceUse(serviceInstance, curEdge);
+								ServicePointer serviceUse(serviceInstance, *curEdge);
 								if (serviceUse.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
 								{
 									nonServedEdges.insert(curEdge);
@@ -459,14 +472,17 @@ namespace synthese
 								}
 
 								// Result journey writing
-								shared_ptr<Journey> resultJourney(
-									new Journey(fullApproachJourney, serviceUse)
-								);
-								_setJourneyRoutePlanningInformations(
-									*resultJourney,
-									isGoalReached,
-									totalDuration
-								);
+								shared_ptr<RoutePlanningIntermediateJourney> resultJourney(
+									new RoutePlanningIntermediateJourney(
+										fullApproachJourney,
+										serviceUse,
+										isGoalReached,
+										_destinationVam,
+										totalDuration,
+										_journeyTemplates,
+										_originDateTime,
+										_totalDistance
+								)	);
 
 
 								// Analyze of the utility of the edge
@@ -492,20 +508,33 @@ namespace synthese
 								// Storage of the journey for recursion
 								if(	isARecursionNode
 								){
-									shared_ptr<Journey> todoJourney(
-										new Journey(*journey, serviceUse)
-									);
+									shared_ptr<RoutePlanningIntermediateJourney> todoJourney(
+										new RoutePlanningIntermediateJourney(
+											*journey,
+											serviceUse,
+											false,
+											_destinationVam,
+											totalDuration,
+											_journeyTemplates,
+											_originDateTime,
+											_totalDistance
+									)	);
 									todo.add(todoJourney);
 								}
 
 								// Storage of the reach time at the goal if applicable
 								if (isGoalReached)
 								{
-									_minMaxDateTimeAtDestination = serviceUse.getSecondActualDateTime();
 									if (_accessDirection == DEPARTURE_TO_ARRIVAL)
+									{
+										_minMaxDateTimeAtDestination = serviceUse.getArrivalDateTime();
 										_minMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime;
+									}
 									else
+									{
+										_minMaxDateTimeAtDestination = serviceUse.getDepartureDateTime();
 										_minMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime;
+									}
 								}
 							} // next arrival edge
 
@@ -547,10 +576,10 @@ namespace synthese
 // ------------------------------------------------------------------------- Utilities
 
 		IntegralSearcher::_JourneyUsefulness IntegralSearcher::evaluateJourney(
-			shared_ptr<Journey> journeysptr
+			shared_ptr<RoutePlanningIntermediateJourney> journeysptr
 		) const {
 
-			const Journey& journey(*journeysptr);
+			const RoutePlanningIntermediateJourney& journey(*journeysptr);
 
 			assert(!journey.empty());
 
@@ -561,8 +590,13 @@ namespace synthese
 			}
 
 			/// <h2>Control of the compliance with the current filters</h2>
-			const ServiceUse& serviceUse(journey.getEndServiceUse());
-			const Vertex* reachedVertex(serviceUse.getSecondEdge()->getFromVertex());
+			const ServicePointer& serviceUse( journey.getEndServiceUse());
+			const Vertex* reachedVertex(	(
+					_accessDirection == DEPARTURE_TO_ARRIVAL ?
+					serviceUse.getArrivalEdge() :
+					serviceUse.getDepartureEdge()
+				)->getFromVertex()
+			);
 			if (reachedVertex->getGraphType() == RoadModule::GRAPH_ID)
 			{
 				/** - If the edge is an address, the currentJourney necessarily contains
@@ -575,12 +609,15 @@ namespace synthese
 			/// <h2>Determination of the usefulness to store the service use</h2>
 
 			/** - To be worse than the absolute best time is forbidden. */
-			const ptime& reachDateTime(serviceUse.getSecondActualDateTime());
-			const AccessDirection& method(journey.getMethod());
-			if(	(	(method == ARRIVAL_TO_DEPARTURE)
+			const ptime& reachDateTime(
+				_accessDirection == DEPARTURE_TO_ARRIVAL ?
+				serviceUse.getArrivalDateTime() :
+				serviceUse.getDepartureDateTime()
+			);
+			if(	(	(_accessDirection == ARRIVAL_TO_DEPARTURE)
 				&&	(reachDateTime < _minMaxDateTimeAtDestination)
 				)
-			||	(	(method == DEPARTURE_TO_ARRIVAL)
+			||	(	(_accessDirection == DEPARTURE_TO_ARRIVAL)
 				&&	(reachDateTime > _minMaxDateTimeAtDestination)
 				)
 			)	return _JourneyUsefulness(false,false);
@@ -614,15 +651,15 @@ namespace synthese
 					+ posix_time::minutes(1)						// Minimal time to reach the goal
 				);
 
-				if (method == DEPARTURE_TO_ARRIVAL)
+				if (_accessDirection == DEPARTURE_TO_ARRIVAL)
 					bestHopedGoalAccessDateTime += minimalGoalReachDuration;
 				else
 					bestHopedGoalAccessDateTime -= minimalGoalReachDuration;
 
-				if(	(	(method == ARRIVAL_TO_DEPARTURE)
+				if(	(	(_accessDirection == ARRIVAL_TO_DEPARTURE)
 					&&	(bestHopedGoalAccessDateTime < _minMaxDateTimeAtDestination)
 					)
-				||	(	(method == DEPARTURE_TO_ARRIVAL)
+				||	(	(_accessDirection == DEPARTURE_TO_ARRIVAL)
 					&&	(bestHopedGoalAccessDateTime > _minMaxDateTimeAtDestination)
 					)
 				)	return _JourneyUsefulness(false,true);
@@ -641,85 +678,6 @@ namespace synthese
 			}
 
 			return _JourneyUsefulness(true,true);
-		}
-
-
-
-		void IntegralSearcher::_setJourneyRoutePlanningInformations(
-			Journey& journey,
-			bool endIsReached,
-			boost::optional<boost::posix_time::time_duration> totalDuration
-		) const {
-			journey.setEndIsReached(endIsReached);
-
-			if(endIsReached)
-			{
-				journey.setEndApproachDuration(_destinationVam.getVertexAccess(journey.getEndEdge()->getFromVertex()).approachTime);
-				journey.setDistanceToEnd(0);
-			}
-			else
-			{
-				journey.setDistanceToEnd(
-					_destinationVam.getIsobarycenter().getDistanceTo(journey.getEndEdge()->getHub()->getPoint())
-				);
-				setJourneyScore(journey, totalDuration);
-			}
-		}
-
-
-
-		void IntegralSearcher::setJourneyScore(
-			Journey& journey,
-			boost::optional<boost::posix_time::time_duration> totalDuration
-		) const {
-			if(!totalDuration && logic::indeterminate(journey.getSimilarity()) && _journeyTemplates)
-			{
-				journey.setSimilarity(_journeyTemplates->testJourneySimilarity(journey));
-			}
-			if(journey.getSimilarity() == true)
-			{
-				journey.setScore(0);
-				return;
-			}
-
-			long long unsigned int estimatedTotalDuration;
-			if(totalDuration)
-			{
-				estimatedTotalDuration = totalDuration->total_seconds();
-			}
-			else
-			{
-				estimatedTotalDuration = ceil(_totalDistance * 3.6);
-			}
-			long long unsigned int distanceToEnd(journey.getDistanceToEnd());
-			long long unsigned int journeyDuration(
-				(	journey.getMethod() == DEPARTURE_TO_ARRIVAL ?
-					journey.getEndTime() - _originDateTime :
-					_originDateTime - journey.getEndTime()
-				).total_seconds()
-			);
-
-
-			Journey::Score score(
-				(distanceToEnd == 0 || estimatedTotalDuration == 0) ?
-				1000 :
-				(20*(estimatedTotalDuration - journeyDuration))/distanceToEnd
-//				static_cast<long long unsigned int>(1000 * distanceToEnd * distanceToEnd * journeyDuration) /
-//				static_cast<long long unsigned int>(_totalDistance * _totalDistance * estimatedTotalDuration)
-			);
-
-
-			HubScore hubScore(journey.getEndEdge()->getHub()->getScore());
-			if(hubScore > 1)
-			{
-				score /= hubScore;
-			}
-
-			if(score > 1000)
-			{
-				score = 1000;
-			}
-			journey.setScore(score);
 		}
 
 

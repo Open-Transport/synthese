@@ -103,22 +103,20 @@ namespace synthese
 
 		ServicePointer ContinuousService::getFromPresenceTime(
 			bool RTData,
-			AccessDirection method,
+			bool getDeparture,
 			size_t userClassRank,
-			const Edge* edge,
+			const Edge& edge,
 			const ptime& presenceDateTime,
 			bool controlIfTheServiceIsReachable,
 			bool inverted
 		) const	{
 
-			ServicePointer ptr(RTData, method, userClassRank, edge);
-			ptr.setService(this);
 			time_duration schedule;
 			ptime actualDateTime(presenceDateTime);
 			posix_time::time_duration range;
-			int edgeIndex(edge->getRankInPath());
+			size_t edgeIndex(edge.getRankInPath());
 			
-			if (method == DEPARTURE_TO_ARRIVAL)
+			if (getDeparture)
 			{
 				schedule = (RTData ? _RTDepartureSchedules : _departureSchedules).at(edgeIndex);
 				time_duration endSchedule(schedule + _range);
@@ -127,7 +125,7 @@ namespace synthese
 				){
 					if (presenceDateTime.time_of_day() > GetTimeOfDay(endSchedule))
 					{
-						return ServicePointer(RTData, DEPARTURE_TO_ARRIVAL, userClassRank);
+						return ServicePointer();
 					}
 					if (presenceDateTime.time_of_day() < GetTimeOfDay(schedule))
 					{
@@ -161,7 +159,7 @@ namespace synthese
 				{
 					if (presenceDateTime.time_of_day() < GetTimeOfDay(schedule))
 					{
-						return ServicePointer(RTData, ARRIVAL_TO_DEPARTURE, userClassRank);
+						return ServicePointer();
 					}
 					if (presenceDateTime.time_of_day() > GetTimeOfDay(endSchedule))
 					{
@@ -192,32 +190,34 @@ namespace synthese
 			const time_duration& departureSchedule(_departureSchedules.at(0));
 			ptime originDateTime(actualDateTime - (schedule - departureSchedule));
 
+			// Date control
 			ptime calendarDateTime(originDateTime);
 			if(departureSchedule >= hours(24))
 			{
 				calendarDateTime -= days(floor(float(departureSchedule.total_seconds()) / float(86400)));
 			}
-
-			// Date control
 			if (!isActive(calendarDateTime.date()))
 			{
-				return ServicePointer(RTData, method, userClassRank);
+				return ServicePointer();
 			}
 
 			// Saving of the result
-			ptr.setActualTime(actualDateTime);
-			ptr.setTheoreticalTime(actualDateTime);
+			ServicePointer ptr(RTData, userClassRank, *this, originDateTime);
+			if(getDeparture)
+			{
+				ptr.setDepartureInformations(edge, actualDateTime, actualDateTime, *edge.getFromVertex());
+			}
+			else
+			{
+				ptr.setArrivalInformations(edge, actualDateTime, actualDateTime, *edge.getFromVertex());
+			}
 			ptr.setServiceRange(range);
-			ptr.setOriginDateTime(originDateTime);
-
+			
 			// Reservation control
 			if (controlIfTheServiceIsReachable)
 			{
 				if (ptr.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
-					return ServicePointer(RTData, method, userClassRank);
-			}
-			else
-			{
+					return ServicePointer();
 			}
 
 			return ptr;
@@ -225,18 +225,35 @@ namespace synthese
 
 
 
-		ptime ContinuousService::getLeaveTime(
-			const ServicePointer& servicePointer,
-			const Edge* edge
+		void ContinuousService::completeServicePointer(
+			ServicePointer& servicePointer,
+			const Edge& edge
 		) const	{
-			int edgeIndex(edge->getRankInPath());
-			time_duration schedule(
-				(	servicePointer.getMethod() == DEPARTURE_TO_ARRIVAL ?
-					(servicePointer.getRTData() ? _RTArrivalSchedules : _arrivalSchedules) :
-					(servicePointer.getRTData() ? _RTDepartureSchedules : _departureSchedules)
-				).at(edgeIndex)
-			);
-			return servicePointer.getOriginDateTime() + (schedule - getDepartureSchedule(servicePointer.getRTData(), 0));
+			size_t edgeIndex(edge.getRankInPath());
+			if(servicePointer.getArrivalEdge() == NULL)
+			{
+				time_duration schedule(
+					(servicePointer.getRTData() ? _RTArrivalSchedules : _arrivalSchedules).at(edgeIndex)
+				);
+				servicePointer.setArrivalInformations(
+					edge,
+					servicePointer.getOriginDateTime() + (schedule - getDepartureSchedule(servicePointer.getRTData(), 0)),
+					servicePointer.getOriginDateTime() + (_arrivalSchedules[edgeIndex] - getDepartureSchedule(servicePointer.getRTData(), 0)),
+					*edge.getFromVertex()
+				);
+			}
+			else
+			{
+				time_duration schedule(
+					(servicePointer.getRTData() ? _RTDepartureSchedules : _departureSchedules).at(edgeIndex)
+				);
+				servicePointer.setDepartureInformations(
+					edge,
+					servicePointer.getOriginDateTime() + (schedule - getDepartureSchedule(servicePointer.getRTData(), 0)),
+					servicePointer.getOriginDateTime() + (_departureSchedules[edgeIndex] - getDepartureSchedule(servicePointer.getRTData(), 0)),
+					*edge.getFromVertex()
+				);
+			}
 		}
 
 

@@ -220,7 +220,7 @@ namespace synthese
 			ptime now(second_clock::local_time());
 			int maxAlarmLevel(0);
 		 
-			BOOST_FOREACH(const ServiceUse& leg, journey.getServiceUses())
+			BOOST_FOREACH(const ServicePointer& leg, journey.getServiceUses())
 			{
 				const Service* service(leg.getService());
 //				bool legIsConnection = (it < _journeyLegs.end() - 2);

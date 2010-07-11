@@ -262,7 +262,7 @@ namespace synthese
 
 			// Reservation contact
 			set<const ReservationContact*> resaRules;
-			BOOST_FOREACH(const ServiceUse& su, journey.getServiceUses())
+			BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
 			{
 				const Line* line(dynamic_cast<const Line*>(su.getService()->getPath()));
 				if(line == NULL) continue;
@@ -303,7 +303,7 @@ namespace synthese
 				const Journey::ServiceUses& services(journey.getServiceUses());
 				for (Journey::ServiceUses::const_iterator it = services.begin(); it != services.end(); ++it)
 				{
-					const ServiceUse& leg(*it);
+					const ServicePointer& leg(*it);
 
 					const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath ()));
 					if (road == NULL)
@@ -403,7 +403,7 @@ namespace synthese
 
 						if (it + 1 != services.end())
 						{
-							const ServiceUse& nextLeg(*(it+1));
+							const ServicePointer& nextLeg(*(it+1));
 							const Road* nextRoad(dynamic_cast<const Road*> (nextLeg.getService()->getPath ()));
 
 							if (nextRoad && nextRoad->getRoadPlace() == road->getRoadPlace())
@@ -541,7 +541,7 @@ namespace synthese
 			std::ostream& stream,
 			boost::shared_ptr<const transportwebsite::WebPage> page,
 			const server::Request& request,
-			const graph::ServiceUse& serviceUse,
+			const graph::ServicePointer& serviceUse,
 			boost::posix_time::time_duration continuousServiceRange,
 			boost::logic::tribool handicappedFilterStatus,
 			boost::logic::tribool bikeFilterStatus,

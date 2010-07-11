@@ -45,6 +45,7 @@
 #include "InterfacePageTableSync.h"
 #include "SentScenario.h"
 #include "PhysicalStop.h"
+#include "PermanentService.h"
 
 using namespace std;
 using namespace boost;
@@ -129,6 +130,7 @@ namespace synthese
 				cline.setShortName("00");
 				Line line;
 				line.setCommercialLine(&cline);
+				PermanentService s(0, &line, minutes(5));
 				LineStop lineStop;
 				lineStop.setLine(&line);
 				lineStop.setPhysicalStop(&ps);
@@ -136,9 +138,8 @@ namespace synthese
 
 				for (int i(0); i<_type->getRowNumber(); ++i)
 				{
-					ServicePointer sp(false, DEPARTURE_TO_ARRIVAL, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET, &lineStop);
-					sp.setActualTime(d);
-					sp.setTheoreticalTime(d);
+					ServicePointer sp(false, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET, s, d);
+					sp.setDepartureInformations(lineStop, d, d, ps);
 					ActualDisplayedArrivalsList destinations;
 					destinations.push_back(IntermediateStop(&place));
 					destinations.push_back(IntermediateStop(&place));

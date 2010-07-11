@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ROUTEPLANNER_BESTVERTEXREACHESMAP_H
 #define SYNTHESE_ROUTEPLANNER_BESTVERTEXREACHESMAP_H
 
-#include "GraphTypes.h"
+#include "RoutePlannerTypes.h"
 
 #include <map>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
@@ -33,7 +33,6 @@ namespace synthese
 {
 	namespace graph
 	{
-		class Journey;
 		class Vertex;
 		class VertexAccessMap;
 	}
@@ -41,6 +40,8 @@ namespace synthese
 
 	namespace algorithm
 	{
+		class RoutePlanningIntermediateJourney;
+
 		/** Best vertex reaches map class.
 			@ingroup m33
 
@@ -103,24 +104,24 @@ namespace synthese
 					std::size_t,
 					std::pair<
 						boost::posix_time::time_duration,
-						boost::shared_ptr<graph::Journey>
+						boost::shared_ptr<RoutePlanningIntermediateJourney>
 			>	>	> TimeMap;
 		    
 			TimeMap _bestTimeMap;
-			const graph::AccessDirection _accessDirection;
+			const PlanningPhase _accessDirection;
 
 			void _insert(
 				const TimeMap::key_type& vertex,
 				const TimeMap::mapped_type::key_type& transfers,
 				boost::posix_time::time_duration duration,
-				boost::shared_ptr<graph::Journey> journey
+				boost::shared_ptr<RoutePlanningIntermediateJourney> journey
 			);
 
 			void _insertAndPropagateInConnectionPlace(
 				const TimeMap::key_type& vertex,
 				const TimeMap::mapped_type::key_type& transfers,
 				boost::posix_time::time_duration duration,
-				boost::shared_ptr<graph::Journey> journey
+				boost::shared_ptr<RoutePlanningIntermediateJourney> journey
 			);
 
 			void _removeDurationsForMoreTransfers(
@@ -130,7 +131,7 @@ namespace synthese
 
 		public:
 			BestVertexReachesMap(
-				graph::AccessDirection accessDirection,
+				PlanningPhase accessDirection,
 				const graph::VertexAccessMap& vam,
 				const graph::VertexAccessMap& destinationVam
 			);
@@ -145,7 +146,7 @@ namespace synthese
 					@return true if the described journey is useful
 				*/
 				bool isUseLess(
-					boost::shared_ptr<graph::Journey> journey,
+					boost::shared_ptr<RoutePlanningIntermediateJourney> journey,
 					const boost::posix_time::ptime& originDateTime,
 					bool propagateInConnectionPlace,
 					bool strict = true

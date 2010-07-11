@@ -92,8 +92,8 @@ namespace synthese
 						if (!servicePointer.getService())
 							break;
 						++*index;
-						departureDateTime = servicePointer.getActualDateTime();
-						if(_physicalStops.find(servicePointer.getRealTimeVertex()->getKey()) == _physicalStops.end())
+						departureDateTime = servicePointer.getDepartureDateTime();
+						if(_physicalStops.find(servicePointer.getRealTimeDepartureVertex()->getKey()) == _physicalStops.end())
 							continue;
 						_insert(servicePointer);
 						++insertedServices;
