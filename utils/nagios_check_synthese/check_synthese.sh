@@ -26,14 +26,14 @@ i=1
 wget -q -O - $1 | (
 while read line
 do
-	        if [[ $i = 2 ]]
-        	then
-                	echo $line
-	        fi
-        	if [[ $i = 1 ]]
-	        then
-        	        ret=$line
-	        fi
+	if [[ $i = 2 ]]
+	then
+		echo $line
+	fi
+	if [[ $i = 1 ]]
+	then
+		ret=$line
+	fi
 	i=$((i+1))
 done
 
