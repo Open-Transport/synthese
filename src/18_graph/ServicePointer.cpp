@@ -194,7 +194,6 @@ namespace synthese
 				_arrivalTime += duration;
 			}
 			_originDateTime += duration;
-			setServiceRange(getServiceRange() - duration);
 		}
 
 

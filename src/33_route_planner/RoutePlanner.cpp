@@ -152,10 +152,9 @@ namespace synthese
 				if (!originApproachJourney.empty())
 				{
 					originApproachJourney.shift(
-						result2.getFirstDepartureTime() - originApproachJourney.getFirstDepartureTime(),
-						result2.getContinuousServiceRange()
+						result2.getFirstDepartureTime() - originApproachJourney.getFirstDepartureTime()
 					);
-					originApproachJourney.setContinuousServiceRange(result2.getContinuousServiceRange());
+					originApproachJourney.forceContinuousServiceRange(result2.getContinuousServiceRange());
 					finalResult.append(originApproachJourney);
 				}
 			}
@@ -170,10 +169,9 @@ namespace synthese
 				if (!goalApproachJourney.empty())
 				{
 					goalApproachJourney.shift(
-						result2.getFirstArrivalTime() - goalApproachJourney.getFirstArrivalTime(),
-						result2.getContinuousServiceRange()
+						result2.getFirstArrivalTime() - goalApproachJourney.getFirstArrivalTime()
 					);
-					goalApproachJourney.setContinuousServiceRange(result2.getContinuousServiceRange());
+					goalApproachJourney.forceContinuousServiceRange(result2.getContinuousServiceRange());
 					finalResult.append(goalApproachJourney);
 				}
 			}

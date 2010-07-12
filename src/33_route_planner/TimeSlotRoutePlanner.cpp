@@ -289,7 +289,7 @@ namespace synthese
 					{
 						leg.shift(toShift);
 					}
-					j.setContinuousServiceRange(precedingLastDepartureTime - departureTime);
+					j.forceContinuousServiceRange(precedingLastDepartureTime - departureTime);
 					result.push_back(j);
 				}
 
@@ -310,7 +310,7 @@ namespace synthese
 				{
 					leg.shift(toShift);
 				}
-				j.setContinuousServiceRange(lastDepartureTime - departureTime);
+				j.forceContinuousServiceRange(lastDepartureTime - departureTime);
 				result.push_back(j);
 			}
 

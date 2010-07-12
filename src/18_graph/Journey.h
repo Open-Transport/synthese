@@ -59,7 +59,6 @@ namespace synthese
 
 			//! @name Query cache
 			//@{
-				mutable boost::posix_time::time_duration	_continuousServiceRange;
 				boost::posix_time::time_duration	_effectiveDuration;
 				int				_transportConnectionCount;
 				double			_distance;
@@ -122,7 +121,6 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setContinuousServiceRange (boost::posix_time::time_duration continuousServiceRange);
 			//@}
 
 
@@ -176,8 +174,19 @@ namespace synthese
 				void clear ();
 
 				void shift(
-					boost::posix_time::time_duration duration,
-					boost::posix_time::time_duration continuousServiceRange = boost::posix_time::not_a_date_time
+					boost::posix_time::time_duration duration
+				);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Sets the continuous service range of each leg at the specified value.
+				/// @param duration the continuous service range to set
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.18
+				void forceContinuousServiceRange(
+					boost::posix_time::time_duration duration
 				);
 			//@}
 		};

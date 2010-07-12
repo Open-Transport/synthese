@@ -297,8 +297,12 @@ namespace synthese
 				ptime departureTime(resultJourney.getFirstDepartureTime());
 				if(departureTime.time_of_day().seconds())
 				{
-					resultJourney.shift(seconds(60 - departureTime.time_of_day().seconds()), resultJourney.getContinuousServiceRange());
+					resultJourney.shift(seconds(60 - departureTime.time_of_day().seconds()));
 				}
+				resultJourney.shift(
+					getLowestDepartureTime() - resultJourney.getFirstDepartureTime()
+				);
+				resultJourney.forceContinuousServiceRange(hours(24));
 
 				result.push_back(resultJourney);
 			}

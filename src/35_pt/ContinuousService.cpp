@@ -140,16 +140,10 @@ namespace synthese
 						actualDateTime = ptime(presenceDateTime.date(), GetTimeOfDay(schedule));
 					}
 				}
-				if (inverted)
-				{
-					ptime validityEndTime(presenceDateTime.date(), schedule);
-					range = actualDateTime - validityEndTime;
-				}
-				else
-				{
-					ptime validityEndTime(presenceDateTime.date(), endSchedule);
-					range = validityEndTime - actualDateTime;
-				}
+
+				// Range
+				ptime validityEndTime(presenceDateTime.date(), endSchedule);
+				range = validityEndTime - actualDateTime;
 			}
 			else
 			{
@@ -174,16 +168,10 @@ namespace synthese
 						actualDateTime = ptime(presenceDateTime.date(), GetTimeOfDay(endSchedule));
 					}
 				}
-				if (inverted)
-				{
-					ptime validityEndTime(presenceDateTime.date(), endSchedule);
-					range = validityEndTime - actualDateTime;
-				}
-				else
-				{
-					ptime validityEndTime(presenceDateTime.date(), schedule);
-					range = actualDateTime - validityEndTime;
-				}
+
+				// Range
+				ptime validityEndTime(presenceDateTime.date(), endSchedule);
+				range = validityEndTime - actualDateTime;
 			}
 
 			// Origin departure time
@@ -211,7 +199,6 @@ namespace synthese
 			{
 				ptr.setArrivalInformations(edge, actualDateTime, actualDateTime, *edge.getFromVertex());
 			}
-			ptr.setServiceRange(range);
 			
 			// Reservation control
 			if (controlIfTheServiceIsReachable)
@@ -220,6 +207,8 @@ namespace synthese
 					return ServicePointer();
 			}
 
+			// Range
+			ptr.setServiceRange(range);
 			return ptr;
 		}
 

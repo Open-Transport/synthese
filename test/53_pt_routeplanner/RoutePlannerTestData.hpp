@@ -186,6 +186,23 @@ place05.addPhysicalStop(ps86);
 Address a10(562949953421410, &place05,520000.0,1844000.0);
 place05.addAddress(&a10);
 
+// Place 06
+PublicTransportStopZoneConnectionPlace place06(1970324837184606, true, minutes(8));
+place06.setName("06");
+place06.setCity(&city54);
+place06.setAllowedConnection(true);
+
+PhysicalStop ps06(3377699720880606,"06", &place06,526000,1852000.0);
+place06.addPhysicalStop(ps06);
+
+// Place 07
+PublicTransportStopZoneConnectionPlace place07(1970324837184607, true, minutes(8));
+place07.setName("07");
+place07.setCity(&city54);
+place07.setAllowedConnection(true);
+
+PhysicalStop ps07(3377699720880607,"07", &place07,523000,1852000.0);
+place07.addPhysicalStop(ps07);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Crossings
@@ -238,6 +255,7 @@ ur53.setMinDelayMinutes(minutes(10));
 ur53.setMinDelayDays(days(0));
 ur53.setMaxDelayDays(days(60));
 ur53.setHourDeadLine(time_duration(23,59,0));
+ur53.setAccessCapacity(1);
 
 PTUseRule ur54(2305843009213693954);
 ur54.setName("1 seat only");
@@ -517,8 +535,11 @@ li94.addEdge(ls71);
 LineStop ls70(2814749767106570, &li94, 3, true, true, 17141, &ps76);
 li94.addEdge(ls70);
 
-LineStop ls68(2814749767106568, &li94, 4, false, true, 17641, &ps73);
+LineStop ls68(2814749767106568, &li94, 4, true, true, 17641, &ps73);
 li94.addEdge(ls68);
+
+LineStop ls9407(2814749767109407, &li94, 5, false, true, 18641, &ps07);
+li94.addEdge(ls9407);
 
 ScheduledService ss11(4503599627370511, "11", &li94);
 {
@@ -537,6 +558,9 @@ ScheduledService ss11(4503599627370511, "11", &li94);
 	d.push_back(time_duration(20,15,0));
 
 	a.push_back(time_duration(20,20,0));
+	d.push_back(time_duration(20,20,0));
+
+	a.push_back(time_duration(21,20,0));
 	d.push_back(time_duration(0,0,0));
 
 	ss11.setArrivalSchedules(a);
@@ -563,6 +587,9 @@ ScheduledService ss06(4503599627370506, "06", &li94);
 	d.push_back(time_duration(21,15,0));
 
 	a.push_back(time_duration(21,20,0));
+	d.push_back(time_duration(21,20,0));
+
+	a.push_back(time_duration(22,20,0));
 	d.push_back(time_duration(0,0,0));
 
 	ss06.setArrivalSchedules(a);
@@ -692,6 +719,96 @@ ss14.setActive(day_clock::local_day());
 ss14.setActive(day_clock::local_day() + days(1));
 li96.addService(&ss14, true);
 
+// Line 97
+
+CommercialLine cl97(11821949021891597);
+cl97.setNetwork(&n34);
+cl97.setShortName("97");
+cl97.setStyle("rose");
+{
+	RuleUser::Rules r(RuleUser::GetEmptyRules());
+	r[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+	cl97.setRules(r);
+}
+
+Line li97(2533274790397697, "97");
+li97.setTimetableName("97");
+li97.setUseInDepartureBoards(true);
+li97.setUseInTimetables(true);
+li97.setUseInRoutePlanning(true);
+li97.setRollingStock(&rs57);
+li97.setCommercialLine(&cl97);
+
+LineStop ls9773(2814749767109773, &li97, 0, true, false, 0, &ps73);
+li97.addEdge(ls9773);
+
+LineStop ls9706(2814749767109706, &li97, 1, false, true, 2000, &ps06);
+li97.addEdge(ls9706);
+
+ContinuousService cs9701(4503599627379701, "9701", &li97);
+{
+	ScheduledService::Schedules a;
+	ScheduledService::Schedules d;
+	a.push_back(time_duration(0,0,0));
+	d.push_back(time_duration(21,40,0));
+
+	a.push_back(time_duration(21,42,0));
+	d.push_back(time_duration(0,0,0));
+
+	cs9701.setArrivalSchedules(a);
+	cs9701.setDepartureSchedules(d);
+}
+cs9701.setActive(day_clock::local_day());
+cs9701.setActive(day_clock::local_day() + days(1));
+cs9701.setMaxWaitingTime(minutes(0));
+cs9701.setRange(minutes(30));
+li97.addService(&cs9701, true);
+
+
+// Line 98
+
+CommercialLine cl98(11821949021891598);
+cl98.setNetwork(&n34);
+cl98.setShortName("98");
+cl98.setStyle("vertclair");
+{
+	RuleUser::Rules r(RuleUser::GetEmptyRules());
+	r[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+	cl98.setRules(r);
+}
+
+Line li98(2533274790397698, "98");
+li98.setTimetableName("98");
+li98.setUseInDepartureBoards(true);
+li98.setUseInTimetables(true);
+li98.setUseInRoutePlanning(true);
+li98.setRollingStock(&rs57);
+li98.setCommercialLine(&cl98);
+
+LineStop ls9806(2814749767109806, &li98, 0, true, false, 0, &ps06);
+li98.addEdge(ls9806);
+
+LineStop ls9807(2814749767109807, &li98, 1, false, true, 2000, &ps07);
+li98.addEdge(ls9807);
+
+ContinuousService cs9801(4503599627379801, "9801", &li98);
+{
+	ScheduledService::Schedules a;
+	ScheduledService::Schedules d;
+	a.push_back(time_duration(0,0,0));
+	d.push_back(time_duration(21,50,0));
+
+	a.push_back(time_duration(22,00,0));
+	d.push_back(time_duration(0,0,0));
+
+	cs9801.setArrivalSchedules(a);
+	cs9801.setDepartureSchedules(d);
+}
+cs9801.setActive(day_clock::local_day());
+cs9801.setActive(day_clock::local_day() + days(1));
+cs9801.setMaxWaitingTime(minutes(0));
+cs9801.setRange(minutes(30));
+li98.addService(&cs9801, true);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Non concurrency rules
@@ -714,10 +831,10 @@ Road ro40(4222124650659840);
 ro40.setRoadPlace(rp40);
 
 RoadChunk rc87(3940649673949187, &a86, 0, &ro40, 0);
-ro40.addEdge(rc87);
+ro40.addRoadChunk(rc87);
 
 RoadChunk rc88(3940649673949188, &a89, 1, &ro40, 200);
-ro40.addEdge(rc88);
+ro40.addRoadChunk(rc88);
 
 // Road 41
 
@@ -729,16 +846,16 @@ Road ro41(4222124650659841);
 ro41.setRoadPlace(rp41);
 
 RoadChunk rc84(3940649673949184, &a88, 0, &ro41, 0);
-ro41.addEdge(rc84);
+ro41.addRoadChunk(rc84);
 
 RoadChunk rc85(3940649673949185, &a86, 1, &ro41, 300);
-ro41.addEdge(rc85);
+ro41.addRoadChunk(rc85);
 
 RoadChunk rc86(3940649673949186, &a74, 2, &ro41, 750);
-ro41.addEdge(rc86);
+ro41.addRoadChunk(rc86);
 
-RoadChunk rc75(3940649673949175, &a93, 3, &ro41, 1750);
-ro41.addEdge(rc75);
+RoadChunk rc75(3940649673949175, &a93, 3, &ro41, 1700);
+ro41.addRoadChunk(rc75);
 
 
 // Road 42
@@ -751,22 +868,22 @@ Road ro42(4222124650659842);
 ro42.setRoadPlace(rp42);
 
 RoadChunk rc97(3940649673949197, &a98, 0, &ro42, 0);
-ro42.addEdge(rc97);
+ro42.addRoadChunk(rc97);
 
 RoadChunk rc96(3940649673949196, &a97, 1, &ro42, 200);
-ro42.addEdge(rc96);
+ro42.addRoadChunk(rc96);
 
 Road ro44(4222124650659844);
 ro44.setRoadPlace(rp42);
 
 RoadChunk rc91(3940649673949191, &a98, 0, &ro44, 0);
-ro44.addEdge(rc91);
+ro44.addRoadChunk(rc91);
 
 RoadChunk rc92(3940649673949192, &a93, 1, &ro44, 800);
-ro44.addEdge(rc92);
+ro44.addRoadChunk(rc92);
 
 RoadChunk rc94(3940649673949194, &a94, 2, &ro44, 1600);
-ro44.addEdge(rc94);
+ro44.addRoadChunk(rc94);
 
 
 // Road 43
@@ -779,13 +896,13 @@ Road ro43(4222124650659843);
 ro43.setRoadPlace(rp43);
 
 RoadChunk rc00(3940649673949200, &a93, 0, &ro43, 0);
-ro43.addEdge(rc00);
+ro43.addRoadChunk(rc00);
 
 RoadChunk rc98(3940649673949198, &a96, 1, &ro43, 100);
-ro43.addEdge(rc98);
+ro43.addRoadChunk(rc98);
 
 RoadChunk rc99(3940649673949199, &a99, 2, &ro43, 150);
-ro43.addEdge(rc99);
+ro43.addRoadChunk(rc99);
 
 
 // Road 45
@@ -798,10 +915,10 @@ Road ro45(4222124650659845);
 ro45.setRoadPlace(rp45);
 
 RoadChunk rc11(3940649673949411, &a86, 0, &ro45, 0);
-ro45.addEdge(rc11);
+ro45.addRoadChunk(rc11);
 
 RoadChunk rc10(3940649673949410, &a10, 1, &ro45, 400);
-ro45.addEdge(rc10);
+ro45.addRoadChunk(rc10);
 
 
 // Road 46
@@ -814,13 +931,13 @@ Road ro46(4222124650659846);
 ro46.setRoadPlace(rp46);
 
 RoadChunk rc95(3940649673949295, &a93, 0, &ro46, 0);
-ro46.addEdge(rc95);
+ro46.addRoadChunk(rc95);
 
 RoadChunk rc89(3940649673949189, &a91, 1, &ro46, 400);
-ro46.addEdge(rc89);
+ro46.addRoadChunk(rc89);
 
 RoadChunk rc90(3940649673949190, &a90, 2, &ro46, 2000);
-ro46.addEdge(rc90);
+ro46.addRoadChunk(rc90);
 
 
 // Road 47
@@ -833,10 +950,10 @@ Road ro47(4222124650659847);
 ro47.setRoadPlace(rp47);
 
 RoadChunk rc78(3940649673949278, &a88, 0, &ro47, 0);
-ro47.addEdge(rc78);
+ro47.addRoadChunk(rc78);
 
 RoadChunk rc72(3940649673949272, &a92, 1, &ro47, 200);
-ro47.addEdge(rc72);
+ro47.addRoadChunk(rc72);
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

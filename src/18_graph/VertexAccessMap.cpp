@@ -195,8 +195,7 @@ namespace synthese
 							if(!it.second.approachJourney.empty())
 							{
 								secondJourney.shift(
-									it.second.approachJourney.getFirstArrivalTime() - secondJourney.getFirstDepartureTime(),
-									secondJourney.getContinuousServiceRange()
+									it.second.approachJourney.getFirstArrivalTime() - secondJourney.getFirstDepartureTime()
 								);
 							}
 						}

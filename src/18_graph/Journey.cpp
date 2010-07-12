@@ -48,8 +48,7 @@ namespace synthese
 	{
 
 		Journey::Journey(
-		):	_continuousServiceRange (posix_time::not_a_date_time),
-			_effectiveDuration(posix_time::seconds(0)),
+		):	_effectiveDuration(posix_time::seconds(0)),
 			_transportConnectionCount (0),
 			_distance (0)
 		{
@@ -61,13 +60,7 @@ namespace synthese
 			const Journey& journey,
 			const ServicePointer& serviceUse,
 			bool order
-		):	_continuousServiceRange(
-				journey.getContinuousServiceRange().is_not_a_date_time() ||	
-				journey.getContinuousServiceRange() > serviceUse.getServiceRange() ?
-				serviceUse.getServiceRange() :
-				journey.getContinuousServiceRange()
-			),
-			_effectiveDuration(journey._effectiveDuration + serviceUse.getDuration()),
+		):	_effectiveDuration(journey._effectiveDuration + serviceUse.getDuration()),
 			_transportConnectionCount(
 				serviceUse.getService()->getPath()->isRoad() ?
 				journey._transportConnectionCount :
@@ -92,13 +85,7 @@ namespace synthese
 			const Journey& journey1,
 			const Journey& journey2,
 			bool order
-		):	_continuousServiceRange(
-				journey1.getContinuousServiceRange().is_not_a_date_time() ||
-				journey1.getContinuousServiceRange() > journey2.getContinuousServiceRange() ?
-				journey2.getContinuousServiceRange() :
-				journey1.getContinuousServiceRange()
-			),
-			_effectiveDuration(journey1._effectiveDuration + journey2._effectiveDuration),
+		):	_effectiveDuration(journey1._effectiveDuration + journey2._effectiveDuration),
 			_transportConnectionCount(
 				journey1._transportConnectionCount +
 				journey2._transportConnectionCount + 1
@@ -219,34 +206,23 @@ namespace synthese
 
 		posix_time::time_duration Journey::getContinuousServiceRange(
 		) const	{
-			if (_continuousServiceRange.is_not_a_date_time())
+			time_duration result(not_a_date_time);
+			BOOST_FOREACH(const ServicePointer& leg, _journeyLegs)
 			{
-				BOOST_FOREACH(const ServicePointer& leg, _journeyLegs)
-				{
-					if(	_continuousServiceRange.is_not_a_date_time() ||
-						leg.getServiceRange() < _continuousServiceRange
-					){
-						_continuousServiceRange = leg.getServiceRange();
-					}
-					if (_continuousServiceRange.total_seconds() == 0) break;
+				if(	result.is_not_a_date_time() ||
+					leg.getServiceRange() < result
+				){
+					result = leg.getServiceRange();
 				}
+				if (result.total_seconds() == 0) break;
 			}
-			return _continuousServiceRange;
-		}
-
-
-
-		void Journey::setContinuousServiceRange(
-			posix_time::time_duration continuousServiceRange
-		){
-			_continuousServiceRange = continuousServiceRange;
+			return result;
 		}
 
 
 
 		void Journey::clear(
 		){
-			_continuousServiceRange = posix_time::not_a_date_time;
 			_effectiveDuration = posix_time::seconds(0);
 			_transportConnectionCount = 0;
 			_distance = 0;
@@ -275,14 +251,12 @@ namespace synthese
 
 
 		void Journey::shift(
-			posix_time::time_duration duration,
-			posix_time::time_duration continuousServiceRange 
+			posix_time::time_duration duration
 		){
 			for(ServiceUses::iterator it(_journeyLegs.begin()); it != _journeyLegs.end(); ++it)
 			{
 				it->shift(duration);
 			}
-			_continuousServiceRange = continuousServiceRange.is_not_a_date_time() ? _continuousServiceRange - duration : continuousServiceRange;
 		}
 
 
@@ -338,7 +312,7 @@ namespace synthese
 
 		boost::posix_time::ptime Journey::getLastDepartureTime() const
 		{
-			return getFirstJourneyLeg ().getDepartureDateTime() + _continuousServiceRange;
+			return getFirstJourneyLeg ().getDepartureDateTime() + getContinuousServiceRange();
 		}
 
 
@@ -352,7 +326,7 @@ namespace synthese
 
 		boost::posix_time::ptime Journey::getLastArrivalTime() const
 		{
-			return getLastJourneyLeg().getArrivalDateTime() + _continuousServiceRange;
+			return getLastJourneyLeg().getArrivalDateTime() + getContinuousServiceRange();
 		}
 
 
@@ -364,6 +338,16 @@ namespace synthese
 				return posix_time::time_duration(not_a_date_time);
 			}
 			return getFirstArrivalTime() - getFirstDepartureTime();
+		}
+
+
+
+		void Journey::forceContinuousServiceRange( boost::posix_time::time_duration duration )
+		{
+			BOOST_FOREACH(ServicePointer& service, _journeyLegs)
+			{
+				service.setServiceRange(duration);
+			}
 		}
 	}
 }
