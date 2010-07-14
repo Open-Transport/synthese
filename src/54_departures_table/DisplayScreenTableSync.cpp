@@ -362,7 +362,7 @@ namespace synthese
 				{
 					fpstream << ",";
 				}
-				fpstream << itf->first;
+				fpstream << *itf->first;
 				first = false;
 			}
 
