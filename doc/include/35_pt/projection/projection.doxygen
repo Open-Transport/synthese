@@ -1,0 +1,55 @@
+/** @page projection Projection
+
+@section projection-uc Use cases
+
+	The following table represents the independant layers used in SYNTHESE :
+
+<table>
+<tr><th>Layer</th><th>Vertex</th><th>Edge</th></tr>
+<tr><td>Road network</td><td>Crossing</td><td>RoadChunk</td></tr>
+<tr><td>Transport network</td><td>PhysicalStop / StationEntrance</td><td>LineStop</td></tr>
+<tr><td>Public places</td><td>PublicPlaceEntrance</td><td>N.A.</td></tr>
+<tr><td>Houses</td><td>Address</td><td>N.A.</td></tr>
+</table> 
+
+The projections must be done on road network.
+
+@subsection projection-ucpt Public transport
+
+@image html station-example1-0.png
+
+@image html station-example1-1.png
+
+@image html projection-uc1.png
+
+@image html projection-uc2.png
+
+@subsection projection-ucpp Public places
+
+Public places are similar to public transport (without PhysicalStop objects).
+
+@subsection projection-uchouses Houses
+
+@image html projection-uc3.png
+
+@image html projection-uc4.png
+
+@subsection projection-ucdb Special case : two addresses on a same road chunk
+
+Be careful to this configuration :
+
+@image html projection-uc5.png
+
+@section projection-impl Implementation
+
+The projections are done in the database :
+<ul>
+<li>PhysicalStop can be associated with a projected address</li>
+<li>PublicPlaceEntrance and StationEntrance are an address</li>
+</ul>
+
+
+
+
+
+*/
