@@ -70,8 +70,17 @@ namespace synthese
 		@defgroup m32 32 Geography
 		@ingroup m3
 		
-		@todo Write Module documentation
-		
+		The geography module contains the objects related to the locations on earth.
+
+		@image html uml_generic_place.png
+
+		It defines the concepts of :
+		<ul>
+		<li>@ref Place</li>
+		<li>@ref City</li>
+		<li>@ref GeoPoint</li>
+		</ul>
+
 		@{
 	*/
 

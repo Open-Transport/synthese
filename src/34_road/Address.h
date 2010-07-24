@@ -37,12 +37,16 @@ namespace synthese
 	{
 		class AddressablePlace;
 		
-		/** Address.
-
-			An address may be associated with a connection place in the following cases :
-			  - The address belongs to a logical stop
-			@ingroup m34
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Address.
+		/// @ingroup m34
+		/// @author Marc Jambert
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// An address corresponds to a point on a side of a street.
+		/// @image html uml_address.png
+		///
+		/// The address is defined by a RoadChunk and a metric offset.
 		class Address
 		:	public graph::Vertex,
 			public impex::Importable

@@ -68,6 +68,38 @@ namespace synthese
 
 		@defgroup m35 35 Transport
 		@ingroup m3
+
+		The pt module contains the graph of public transport lines and all associated objects.
+
+		@image hml uml_pt_graph.png
+
+		The pt graph is implemented by :
+		<table>
+		<tr><th>graph interface</th><th>road implementation</th></tr>
+		<tr><td>Service</td><td>ScheduledService and ContinuousService</td></tr>
+		<tr><td>PathGroup</td><td>CommercialLine</td></tr>
+		<tr><td>Path</td><td>Line</td></tr>
+		<tr><td>Edge</td><td>LineStop</td></tr>
+		<tr><td>Vertex</td><td>PhysicalStop</td></tr>
+		<tr><td>Hub</td><td>PublicTransportStopZoneConnectionPlace</td></tr>
+		</table>
+
+		A specific graph is defined by the junctions (links between stops qualified for use
+		inside a transfer) :
+
+		@image hml uml_junction_graph.png
+
+		The junction graph is implemented by :
+		<table>
+		<tr><th>graph interface</th><th>road implementation</th></tr>
+		<tr><td>Service</td><td>PermanentService</td></tr>
+		<tr><td>PathGroup</td><td>none</td></tr>
+		<tr><td>Path</td><td>Junction</td></tr>
+		<tr><td>Edge</td><td>JunctionStop</td></tr>
+		<tr><td>Vertex</td><td>PhysicalStop</td></tr>
+		<tr><td>Hub</td><td>PublicTransportStopZoneConnectionPlace</td></tr>
+		</table>
+
 	@{
 	*/
 

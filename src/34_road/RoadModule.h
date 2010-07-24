@@ -55,6 +55,22 @@ namespace synthese
 
 		@defgroup m34 34 Road network
 		@ingroup m3
+
+		The road module contains the graph of streets and all associated objects.
+
+		@image hml uml_road_graph.png
+
+		The road graph is implemented by :
+		<table>
+		<tr><th>graph interface</th><th>road implementation</th></tr>
+		<tr><td>Service</td><td>PermanentService</td></tr>
+		<tr><td>PathGroup</td><td>RoadPlace</td></tr>
+		<tr><td>Path</td><td>Road</td></tr>
+		<tr><td>Edge</td><td>RoadChunk</td></tr>
+		<tr><td>Vertex</td><td>Crossing</td></tr>
+		<tr><td>Hub</td><td>Crossing</td></tr>
+		</table>
+
 	@{
 	*/
 

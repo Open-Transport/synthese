@@ -33,9 +33,14 @@ namespace synthese
 {
 	namespace road
 	{
-		/** Public place class.
-			@ingroup m34
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Public place.
+		///	@ingroup m34
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Public place model :
+		/// @image html uml_public_place.png
+		///
 		class PublicPlace:
 			public road::AddressablePlace,
 			public geography::NamedPlaceTemplate<PublicPlace>
