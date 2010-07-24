@@ -51,10 +51,33 @@ namespace synthese
 	}
 
 	namespace pt
-	{		
-		/** PublicTransportStopZoneConnectionPlace class.
-			@ingroup m35
-		*/
+	{	
+		//////////////////////////////////////////////////////////////////////////
+		/// Stop area class.
+		///	@ingroup m35
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// <h2>Data modeling</h2>
+		/// @image html station-example1-0.png
+		///	@image html station-example1-1.png
+		///
+		/// See @ref projection.
+		///
+		/// <h2>Conceptual data model</h2>
+		///	@image html uml_stop_area.png
+		///
+		/// <h2>Physical data model</h2>
+		/// @ref ConnectionPlaceTableSync
+		///
+		/// <h2>Object model</h2>
+		/// For performance purpose, object model differs from conceptual model by
+		/// the following issues :
+		/// <ul>
+		///	<li>PhysicalStop and StationEntrance lists are separated and are hosted
+		/// by PublicTransportStopZoneConnectionPlace and not by Hub</li>
+		/// <li>There is no Transfer class : a TransferDelaysMap is hosted by
+		/// PublicTransportStopZoneConnectionPlace.</li>
+		/// </ul>
 		class PublicTransportStopZoneConnectionPlace:
 			public road::AddressablePlace,
 			public geography::NamedPlaceTemplate<PublicTransportStopZoneConnectionPlace>,
