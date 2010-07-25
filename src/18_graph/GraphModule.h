@@ -35,31 +35,31 @@ namespace synthese
 	/// @ingroup m18
 	namespace graph
 	{
-		/**	@defgroup m18Actions 18 Actions
+		/**	@defgroup m18Actions 18.15 Actions
 			@ingroup m18
 
-			@defgroup m18Pages 18 Pages
+			@defgroup m18Pages 18.11 Pages
 			@ingroup m18
 
-			@defgroup m18Functions 18 Functions
+			@defgroup m18Functions 18.15 Functions
 			@ingroup m18
 
-			@defgroup m18Exceptions 18 Exceptions
+			@defgroup m18Exceptions 18.01 Exceptions
 			@ingroup m18
 
-			@defgroup m18Alarm 18 Messages recipient
+			@defgroup m18Alarm 18.17 Messages recipient
 			@ingroup m18
 
-			@defgroup m18LS 18 Table synchronizers
+			@defgroup m18LS 18.10 Table synchronizers
 			@ingroup m18
 
-			@defgroup m18Admin 18 Administration pages
+			@defgroup m18Admin 18.14 Administration pages
 			@ingroup m18
 
-			@defgroup m18Rights 18 Rights
+			@defgroup m18Rights 18.12 Rights
 			@ingroup m18
 
-			@defgroup m18Logs 18 DB Logs
+			@defgroup m18Logs 18.13 DB Logs
 			@ingroup m18
 			
 			@defgroup m18 18 Graph
