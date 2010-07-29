@@ -53,15 +53,87 @@ namespace synthese
 	namespace pt
 	{	
 		//////////////////////////////////////////////////////////////////////////
-		/// Stop area class.
+		/// Stop area.
 		///	@ingroup m35
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
-		/// <h2>Data modeling</h2>
+		/// <h2>Use cases</h2>
+		/// <h3>Routing</h3>
+		/// The following example is a stop area with 2 railway platforms and 2 bus stops :
 		/// @image html station-example1-0.png
-		///	@image html station-example1-1.png
+		/// The railway platforms can be accessed from the road part by 3 points : the building main entrance, and two stairs located on each side of the street and giving access to a footbridge linked to the platforms by two ther stairs.
 		///
-		/// See @ref projection.
+		/// The next figure show how such a stop area can be modeled :
+		/// @image html station-example1-1.png
+		///	The target of the model is the routing algorithm, with 3 use cases :
+		/// <ul>
+		///	<li>find the entrance of the stop area from the roads (road to pt)</li>
+		///	<li>go out of the stop area to the road (pt to road)</li>
+		/// <li>transfers inside the stop area (pt to pt)</li>
+		/// </ul>
+		///
+		///	The stop area can be reached from the roads by one of the A1 to A5 points (A=address) :
+		/// <table class="table">
+		/// <tr><th>code</th><th>description</th><th>class</th></tr>
+		/// <tr><td>A1</td><td>Entrance of the station building</td><td>StationEntrance</td></tr>
+		/// <tr><td>A2</td><td>Stairs 3</td><td>StationEntrance</td></tr>
+		/// <tr><td>A3</td><td>@ref projection "Projection" of the bus stop</td><td>@ref road::Address "Address" embedded in PhysicalStop</td></tr>
+		/// <tr><td>A4</td><td>@ref projection "Projection" of the bus stop 2</td><td>@ref road::Address "Address" embedded in PhysicalStop</td></tr>
+		/// <tr><td>A5</td><td>Stairs 4</td><td>StationEntrance</td></tr>
+		/// </table>
+		///
+		/// There are 4 S1 to S4 boarding positions (S=stop) :
+		/// <ul>
+		/// <li>railway platform 2</li>
+		/// <li>railway platform 1</li>
+		/// <li>bus stop 1</li>
+		/// <li>bus stop 2</li>
+		/// </ul>
+		///
+		/// Notice : the ways inside the stop area are not modeled (footbridge, aisle in the building, stairs 1 and 2, pavement...) : the stop area is described on a service point of view and not a geographical point of vue. Such a detail level is useless for routing.
+		/// The stop area object must be able to give the possible links between two A or S points, and for each possible link the minimal duration to make the transfer.
+		///
+		/// The 3 routing use cases are handled by a transfer matrix :
+		/// 
+		///	1: Access to the stop area from the roads (from A1 to A5 points to S1 to S4 points)
+		/// The following table shows an example corresponding to the previous topology example.
+		/// <table class="table">
+		///	<tr><th></th><th>S1</th><th>S2</th><th>S3</th><th>S4</th></tr>
+		/// <tr><th>A1</th><td>3 min</td><td>1 min</td><td>forbidden</td><td>forbidden</td></tr>
+		/// <tr><th>A2</th><td>3 min</td><td>2 min</td><td>forbidden</td><td>forbidden</td></tr>
+		/// <tr><th>A3</th><td>forbidden</td><td>forbidden</td><td>0 min</td><td>forbidden</td></tr>
+		/// <tr><th>A4</th><td>forbidden</td><td>forbidden</td><td>forbidden</td><td>0 min</td></tr>
+		/// <tr><th>A5</th><td>3 min</td><td>3 min</td><td>forbidden</td><td>forbidden</td></tr>
+		/// </table>
+		/// 
+		/// Notes :
+		/// <ul>
+		/// <li>The 0 minutes durations correspond to projections of physical stops on the nearest road.</li>
+		/// <li>The other durations correspond to the needed time to reach the S points from the A points by the infrastructures of the stop area (stairs, footbridge...)</li>
+		/// </ul>
+		///
+		/// 2: Access to the road from the stop area (from S1 to S4 points to A1 to A5 points)
+		/// The following table corresponds to the reverse view of the previous one.
+		/// <table class="table">
+		/// <tr><th></th><th>A1</th><th>A2</th><th>A3</th><th>A4</th><th>A5</th></tr>
+		/// <tr><th>S1</th><td>3 min</td><td>3 min</td><td>forbidden</td><td>forbidden</td><td>3 min</td></tr>
+		/// <tr><th>S2</th><td>1 min</td><td>2 min</td><td>forbidden</td><td>forbidden</td><td>3 min</td></tr>
+		/// <tr><th>S3</th><td>forbidden</td><td>forbidden</td><td>0 min</td><td>forbidden</td><td>forbidden</td></tr>
+		/// <tr><th>S4</th><td>forbidden</td><td>forbidden</td><td>forbidden</td><td>0 min</td><td>forbidden</td></tr>
+		/// </table>
+		///
+		/// 3: Transfer between physical stops (between S1 to S4 points)
+		/// <table class="table"><th></th><th>S1</th>
+		///	<tr><th></th><th>S1</th><th>S2</th><th>S3</th><th>S4</th></tr>
+		/// <tr><th>S1</th><td>2 min</td><td>4 min</td><td>5 min</td><td>6 min</td></tr>
+		/// <tr><th>S2</th><td>4 min</td><td>2 min</td><td>4 min</td><td>5 min</td></tr>
+		/// <tr><th>S3</th><td>8 min</td><td>7 min</td><td>5 min</td><td>6 min</td></tr>
+		/// <tr><th>S4</th><td>9 min</td><td>8 min</td><td>6 min</td><td>5 min</td></tr>
+		/// </table>
+		///
+		/// The minimal durations of transfer are qualified by pair of stop, considering the time needed by the walk, but also other informations like probabilities of delay.
+		/// This duration must be seen as a contractual data instead of a geographical data : the transport network is responsible of the transfer conditions, contrary to the access from the departure place to the first stop of a journey, which is under the customers responsibility.
+		/// In most of cases, the durations include a security time defined by the transport mode arriving in the stop area, that is added to the time neeeded to walk between the stops. In the example, 2 min are added if the customer comes from the train line, 5 min for the bus line).
 		///
 		/// <h2>Conceptual data model</h2>
 		///	@image html uml_stop_area.png

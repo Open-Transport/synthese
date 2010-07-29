@@ -39,75 +39,77 @@ namespace synthese
 		class Journey;
 	}
 
-	/**	@defgroup m35Actions 35 Actions
-		@ingroup m35
 
-		@defgroup m35Pages 35 Pages
-		@ingroup m35
-
-		@defgroup m35Library 35 Interface library
-		@ingroup m35
-
-		@defgroup m35Functions 35 Functions
-		@ingroup m35
-
-		@defgroup m35LS 35 Table synchronizers
-		@ingroup m35
-
-		@defgroup m35Admin 35 Administration pages
-		@ingroup m35
-
-		@defgroup m35Rights 35 Rights
-		@ingroup m35
-
-		@defgroup m35Logs 35 DB Logs
-		@ingroup m35
-
-		@defgroup m35File 35.16 File formats
-		@ingroup m35
-
-		@defgroup m35 35 Transport
-		@ingroup m3
-
-		The pt module contains the graph of public transport lines and all associated objects.
-
-		@image html uml_pt_graph.png
-
-		The pt graph is implemented by :
-		<table>
-		<tr><th>@ref graph interface</th><th>road implementation</th></tr>
-		<tr><td>@ref Service</td><td>@ref ScheduledService and @ref ContinuousService</td></tr>
-		<tr><td>@ref PathGroup</td><td>@ref CommercialLine</td></tr>
-		<tr><td>@ref Path</td><td>@ref Line</td></tr>
-		<tr><td>@ref Edge</td><td>@ref LineStop</td></tr>
-		<tr><td>@ref Vertex</td><td>@ref PhysicalStop</td></tr>
-		<tr><td>@ref Hub</td><td>@ref PublicTransportStopZoneConnectionPlace</td></tr>
-		</table>
-
-		A specific graph is defined by the junctions (links between stops qualified for use
-		inside a transfer) :
-
-		@image html uml_junction_graph.png
-
-		The junction graph is implemented by :
-		<table>
-		<tr><th>@ref graph interface</th><th>road implementation</th></tr>
-		<tr><td>@ref Service</td><td>@ref PermanentService</td></tr>
-		<tr><td>@ref PathGroup</td><td>none</td></tr>
-		<tr><td>@ref Path</td><td>@ref Junction</td></tr>
-		<tr><td>@ref Edge</td><td>@ref JunctionStop</td></tr>
-		<tr><td>@ref Vertex</td><td>@ref PhysicalStop</td></tr>
-		<tr><td>@ref Hub</td><td>@ref PublicTransportStopZoneConnectionPlace</td></tr>
-		</table>
-
-	@{
-	*/
-
-	/** 35 Transport network module namespace.
-		The env name is due to historical reasons.
-	*/
+	//////////////////////////////////////////////////////////////////////////
+	/// 35 Transport network module namespace.
+	///	@author Hugues Romain
+	///	@ingroup m35
 	namespace pt
 	{
+		/**	@defgroup m35Actions 35 Actions
+			@ingroup m35
+
+			@defgroup m35Pages 35 Pages
+			@ingroup m35
+
+			@defgroup m35Library 35 Interface library
+			@ingroup m35
+
+			@defgroup m35Functions 35 Functions
+			@ingroup m35
+
+			@defgroup m35LS 35 Table synchronizers
+			@ingroup m35
+
+			@defgroup m35Admin 35 Administration pages
+			@ingroup m35
+
+			@defgroup m35Rights 35 Rights
+			@ingroup m35
+
+			@defgroup m35Logs 35 DB Logs
+			@ingroup m35
+
+			@defgroup m35File 35.16 File formats
+			@ingroup m35
+
+			@defgroup m35 35 Transport
+			@ingroup m3
+
+			The pt module contains the graph of public transport lines and all associated objects.
+
+			@image html uml_pt_graph.png
+
+			The pt graph is implemented by :
+			<table>
+			<tr><th>@ref graph interface</th><th>pt implementation</th></tr>
+			<tr><td>@ref Service</td><td>@ref ScheduledService and @ref ContinuousService</td></tr>
+			<tr><td>@ref PathGroup</td><td>@ref CommercialLine</td></tr>
+			<tr><td>@ref Path</td><td>@ref Line</td></tr>
+			<tr><td>@ref Edge</td><td>@ref LineStop</td></tr>
+			<tr><td>@ref Vertex</td><td>@ref PhysicalStop</td></tr>
+			<tr><td>@ref Hub</td><td>@ref PublicTransportStopZoneConnectionPlace</td></tr>
+			</table>
+
+			A specific graph is defined by the junctions (links between stops qualified for use
+			inside a transfer) :
+
+			@image html uml_junction_graph.png
+
+			The junction graph is implemented by :
+			<table>
+			<tr><th>@ref graph interface</th><th>pt junction implementation</th></tr>
+			<tr><td>@ref Service</td><td>@ref PermanentService</td></tr>
+			<tr><td>@ref PathGroup</td><td>none</td></tr>
+			<tr><td>@ref Path</td><td>@ref Junction</td></tr>
+			<tr><td>@ref Edge</td><td>@ref JunctionStop</td></tr>
+			<tr><td>@ref Vertex</td><td>@ref PhysicalStop</td></tr>
+			<tr><td>@ref Hub</td><td>@ref PublicTransportStopZoneConnectionPlace</td></tr>
+			</table>
+
+		@{
+		*/
+
 		/** 35 Transport network module class.
 		*/
 		class PTModule:

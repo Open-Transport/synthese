@@ -2,31 +2,23 @@
 
 @section projection-uc Use cases
 
-	The following table represents the independant layers used in SYNTHESE :
+The following table represents the independant layers used in SYNTHESE :
 
-<table>
+<table class="table">
 <tr><th>Layer</th><th>Vertex</th><th>Edge</th></tr>
-<tr><td>Road network</td><td>Crossing</td><td>RoadChunk</td></tr>
-<tr><td>Transport network</td><td>PhysicalStop / StationEntrance</td><td>LineStop</td></tr>
-<tr><td>Public places</td><td>PublicPlaceEntrance</td><td>N.A.</td></tr>
-<tr><td>Houses</td><td>Address</td><td>N.A.</td></tr>
+<tr><td>@ref road "Road network"</td><td>road::Crossing</td><td>RoadChunk</td></tr>
+<tr><td>@ref pt "Transport network"</td><td>PhysicalStop / StationEntrance</td><td>LineStop</td></tr>
+<tr><td>@ref road::PublicPlace "Public places"</td><td>PublicPlaceEntrance</td><td>N.A.</td></tr>
+<tr><td>@ref road::House "Houses"</td><td>Address</td><td>N.A.</td></tr>
 </table> 
 
-The projections must be done on road network.
+The projections are links between road, transport network, public places, houeses and the road network.
 
-@subsection projection-ucpt Public transport
-
-@image html station-example1-0.png
-
-@image html station-example1-1.png
+@subsection projection-ucpt Public transport or public places
 
 @image html projection-uc1.png
 
 @image html projection-uc2.png
-
-@subsection projection-ucpp Public places
-
-Public places are similar to public transport (without PhysicalStop objects).
 
 @subsection projection-uchouses Houses
 
@@ -42,14 +34,16 @@ Be careful to this configuration :
 
 @section projection-impl Implementation
 
-The projections are done in the database :
+The implementation of a projection is done by the road::Address base class :
+
+@copydoc road::Address
+
+The projection result is an Address object, which is linked to the source object by inheritance or inclusion :
 <ul>
-<li>PhysicalStop can be associated with a projected address</li>
-<li>PublicPlaceEntrance and StationEntrance are an address</li>
+<li>pt::PhysicalStop : includes an optional Address object (only bus stops are projected)</li>
+<li>pt::StationEntrance : inherits from Address</li>
+<li>road::PublicPlaceEntrance : inherits from Address</li>
+<li>road::House : inherits from Address</li>
 </ul>
-
-
-
-
 
 */
