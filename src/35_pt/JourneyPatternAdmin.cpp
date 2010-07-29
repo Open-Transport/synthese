@@ -46,7 +46,7 @@
 #include "ServiceAddAction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "PTPlaceAdmin.h"
-#include "LineUpdateAction.h"
+#include "JourneyPatternUpdateAction.hpp"
 #include "PTRuleUserAdmin.hpp"
 #include "PropertiesHTMLTable.h"
 #include "RollingStockTableSync.h"
@@ -433,29 +433,29 @@ namespace synthese
 				waybackMap.insert(make_pair(false, "Aller"));
 				waybackMap.insert(make_pair(true, "Retour"));
 
-				AdminActionFunctionRequest<LineUpdateAction,JourneyPatternAdmin> updateRequest(_request);
+				AdminActionFunctionRequest<JourneyPatternUpdateAction,JourneyPatternAdmin> updateRequest(_request);
 				updateRequest.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
 				PropertiesHTMLTable p(updateRequest.getHTMLForm());
 				stream << p.open();
 				stream << p.cell(
 					"Nom",
-					p.getForm().getTextInput(LineUpdateAction::PARAMETER_NAME, _line->getName())
+					p.getForm().getTextInput(JourneyPatternUpdateAction::PARAMETER_NAME, _line->getName())
 				);
 				stream << p.cell(
 					"Mode de transport",
 					p.getForm().getSelectInput(
-						LineUpdateAction::PARAMETER_TRANSPORT_MODE_ID,
+						JourneyPatternUpdateAction::PARAMETER_TRANSPORT_MODE_ID,
 						RollingStockTableSync::GetLabels(),
 						_line->getRollingStock() ? _line->getRollingStock()->getKey() : optional<RegistryKeyType>()
 				)	);
 				stream << p.cell(
 					"Direction",
-					p.getForm().getTextInput(LineUpdateAction::PARAMETER_DIRECTION, _line->getDirection())
+					p.getForm().getTextInput(JourneyPatternUpdateAction::PARAMETER_DIRECTION, _line->getDirection())
 				);
 				stream << p.cell(
 					"Sens",
 					p.getForm().getRadioInputCollection(
-						LineUpdateAction::PARAMETER_WAYBACK,
+						JourneyPatternUpdateAction::PARAMETER_WAYBACK,
 						waybackMap,
 						optional<bool>(_line->getWayBack())
 				)	);

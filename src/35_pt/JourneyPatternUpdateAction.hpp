@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// LineUpdateAction class header.
-///	@file LineUpdateAction.h
+/// JourneyPatternUpdateAction class header.
+///	@file JourneyPatternUpdateAction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///
@@ -42,7 +42,7 @@ namespace synthese
 		///	@date 2010
 		/// @since 3.1.16
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : LineUpdateAction
+		/// Key : JourneyPatternUpdateAction
 		///
 		/// Parameters :
 		///	<ul>
@@ -52,8 +52,8 @@ namespace synthese
 		///		<li>actionParamdi : direction to display instead of last stop name</li>
 		///		<li>actionParamwb : 1 if the route can be considered as "return route" of the line</li>
 		///	</ul>
-		class LineUpdateAction:
-			public util::FactorableTemplate<server::Action, LineUpdateAction>
+		class JourneyPatternUpdateAction:
+			public util::FactorableTemplate<server::Action, JourneyPatternUpdateAction>
 		{
 		public:
 			static const std::string PARAMETER_ROUTE_ID;

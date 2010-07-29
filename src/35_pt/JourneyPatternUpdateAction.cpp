@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// LineUpdateAction class implementation.
-/// @file LineUpdateAction.cpp
+/// JourneyPatternUpdateAction class implementation.
+/// @file JourneyPatternUpdateAction.cpp
 /// @author Hugues Romain
 /// @date 2010
 ///
@@ -24,7 +24,7 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "LineUpdateAction.h"
+#include "JourneyPatternUpdateAction.hpp"
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "JourneyPatternTableSync.hpp"
@@ -41,20 +41,20 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, pt::LineUpdateAction>::FACTORY_KEY("LineUpdateAction");
+		template<> const string FactorableTemplate<Action, pt::JourneyPatternUpdateAction>::FACTORY_KEY("JourneyPatternUpdateAction");
 	}
 
 	namespace pt
 	{
-		const string LineUpdateAction::PARAMETER_ROUTE_ID = Action_PARAMETER_PREFIX + "id";
-		const string LineUpdateAction::PARAMETER_TRANSPORT_MODE_ID = Action_PARAMETER_PREFIX + "tm";
-		const string LineUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-		const string LineUpdateAction::PARAMETER_DIRECTION = Action_PARAMETER_PREFIX + "di";
-		const string LineUpdateAction::PARAMETER_WAYBACK = Action_PARAMETER_PREFIX + "wb";
+		const string JourneyPatternUpdateAction::PARAMETER_ROUTE_ID = Action_PARAMETER_PREFIX + "id";
+		const string JourneyPatternUpdateAction::PARAMETER_TRANSPORT_MODE_ID = Action_PARAMETER_PREFIX + "tm";
+		const string JourneyPatternUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+		const string JourneyPatternUpdateAction::PARAMETER_DIRECTION = Action_PARAMETER_PREFIX + "di";
+		const string JourneyPatternUpdateAction::PARAMETER_WAYBACK = Action_PARAMETER_PREFIX + "wb";
 		
 		
 		
-		ParametersMap LineUpdateAction::getParametersMap() const
+		ParametersMap JourneyPatternUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if(_route.get())
@@ -70,7 +70,7 @@ namespace synthese
 		
 		
 		
-		void LineUpdateAction::_setFromParametersMap(const ParametersMap& map)
+		void JourneyPatternUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
@@ -97,7 +97,7 @@ namespace synthese
 		
 		
 		
-		void LineUpdateAction::run(
+		void JourneyPatternUpdateAction::run(
 			Request& request
 		){
 //			stringstream text;
@@ -115,7 +115,7 @@ namespace synthese
 		
 		
 		
-		bool LineUpdateAction::isAuthorized(
+		bool JourneyPatternUpdateAction::isAuthorized(
 			const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);

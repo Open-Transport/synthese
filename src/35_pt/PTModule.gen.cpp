@@ -76,7 +76,7 @@ synthese::pt::PTUseRuleAddAction::integrate();
 synthese::pt::PTUseRuleUpdateAction::integrate();
 synthese::pt::ServiceTimetableUpdateAction::integrate();
 synthese::pt::ServiceUpdateAction::integrate();
-synthese::pt::LineUpdateAction::integrate();
+synthese::pt::JourneyPatternUpdateAction::integrate();
 synthese::pt::ServiceApplyCalendarAction::integrate();
 synthese::pt::LineStopAddAction::integrate();
 synthese::pt::LineStopRemoveAction::integrate();

@@ -69,7 +69,7 @@
 #include "PTUseRuleUpdateAction.hpp"
 #include "ServiceTimetableUpdateAction.h"
 #include "ServiceUpdateAction.h"
-#include "LineUpdateAction.h"
+#include "JourneyPatternUpdateAction.hpp"
 #include "ServiceApplyCalendarAction.h"
 #include "LineStopAddAction.h"
 #include "LineStopRemoveAction.h"
