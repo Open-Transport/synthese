@@ -41,10 +41,10 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, transportwebsite::WebPageUpdateAction>::FACTORY_KEY("WebPageUpdateAction");
+		template<> const string FactorableTemplate<Action, cms::WebPageUpdateAction>::FACTORY_KEY("WebPageUpdateAction");
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
 		const string WebPageUpdateAction::PARAMETER_WEB_PAGE_ID = Action_PARAMETER_PREFIX + "wp";
 		const string WebPageUpdateAction::PARAMETER_UP_ID = Action_PARAMETER_PREFIX + "ui";

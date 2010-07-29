@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
 		class WebPage;
 

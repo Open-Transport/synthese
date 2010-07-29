@@ -32,12 +32,12 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		///	56.15 Function : Displays a set of sub-pages abstracts and links.
+		///	36.15 Function : Displays a set of sub-pages abstracts and links.
 		///	@ingroup m56Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010

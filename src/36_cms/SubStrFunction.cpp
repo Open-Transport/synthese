@@ -34,9 +34,9 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 
-	template<> const string util::FactorableTemplate<Function,transportwebsite::SubStrFunction>::FACTORY_KEY("substr");
+	template<> const string util::FactorableTemplate<Function,cms::SubStrFunction>::FACTORY_KEY("substr");
 	
-	namespace transportwebsite
+	namespace cms
 	{
 		const string SubStrFunction::PARAMETER_TEXT("t");
 		const string SubStrFunction::PARAMETER_LENGTH("n");

@@ -38,7 +38,7 @@ namespace synthese
 		class HTMLForm;
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
 		class WebPageRemoveAction;
 		class WebPageAddAction;
@@ -46,7 +46,7 @@ namespace synthese
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 56.14 Admin : Web page edition.
+		/// 36.14 Admin : Web page edition.
 		///	@ingroup m56Admin refAdmin
 		///	@author Hugues Romain
 		///	@date 2010

@@ -33,7 +33,7 @@ namespace synthese
 {
 	using namespace server;
 	
-	namespace transportwebsite
+	namespace cms
 	{
 		const string DateTimeInterfacePage::DATA_DAY("day");
 		const string DateTimeInterfacePage::DATA_DAY_OF_WEEK("day_of_week");
@@ -45,7 +45,7 @@ namespace synthese
 
 		void DateTimeInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::WebPage> page,
 			const server::Request& request,
 			const boost::posix_time::ptime& dateTime
 		){
@@ -69,7 +69,7 @@ namespace synthese
 
 		void DateTimeInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::WebPage> page,
 			const server::Request& request,
 			const boost::gregorian::date& date
 		){
@@ -91,7 +91,7 @@ namespace synthese
 
 		void DateTimeInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::WebPage> page,
 			const server::Request& request,
 			const boost::posix_time::time_duration& duration
 		){

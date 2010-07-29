@@ -39,7 +39,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 
-	namespace transportwebsite
+	namespace cms
 	{
 		const string WebPageInterfacePage::DATA_CONTENT("content");
 		const string WebPageInterfacePage::DATA_TITLE("title");

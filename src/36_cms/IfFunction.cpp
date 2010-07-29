@@ -34,9 +34,9 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 
-	template<> const string util::FactorableTemplate<Function,transportwebsite::IfFunction>::FACTORY_KEY("if");
+	template<> const string util::FactorableTemplate<Function,cms::IfFunction>::FACTORY_KEY("if");
 	
-	namespace transportwebsite
+	namespace cms
 	{
 		const string IfFunction::PARAMETER_CONDITION("cond");
 		const string IfFunction::PARAMETER_THEN("then");

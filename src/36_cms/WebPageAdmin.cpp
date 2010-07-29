@@ -54,7 +54,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace security;
-	using namespace transportwebsite;
+	using namespace cms;
 	using namespace html;
 
 	namespace util
@@ -68,7 +68,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<WebPageAdmin>::DEFAULT_TITLE("Page web");
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
 		const string WebPageAdmin::TAB_CONTENT("co");
 		const string WebPageAdmin::TAB_TREE("tr");

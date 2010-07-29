@@ -37,10 +37,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<transportwebsite::WebPage>::KEY("WebPage");
+		template<> const string Registry<cms::WebPage>::KEY("WebPage");
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
 		WebPage::WebPage( util::RegistryKeyType id  ):
 			Registrable(id),

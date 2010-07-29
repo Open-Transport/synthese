@@ -44,10 +44,10 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, transportwebsite::WebPageAddAction>::FACTORY_KEY("WebPageAddAction");
+		template<> const string FactorableTemplate<Action, cms::WebPageAddAction>::FACTORY_KEY("WebPageAddAction");
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
 		const string WebPageAddAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "ti";
 		const string WebPageAddAction::PARAMETER_SITE_ID = Action_PARAMETER_PREFIX + "si";

@@ -30,9 +30,9 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
-		/** 56.15 Public function : Gets several values from the current request.
+		/** 36.15 Public function : Gets several values from the current request.
 			@author Hugues Romain
 			@date 2010
 			@since 3.1.16

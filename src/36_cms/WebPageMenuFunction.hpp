@@ -32,12 +32,12 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		///	56.15 Function : WebPageMenuFunction.
+		///	36.15 Function : WebPageMenuFunction.
 		///	@ingroup m56Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010

@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ResaModule_h__
 #define SYNTHESE_ResaModule_h__
 
-#include "31_resa/Types.h"
+#include "ResaTypes.h"
 
 #include "ModuleClassTemplate.hpp"
 #include "Registry.h"
@@ -65,37 +65,37 @@ namespace synthese
 		class Session;
 	}
 
-	/**	@defgroup m31Actions 31 Actions
-		@ingroup m31
+	/**	@defgroup m51Actions 51 Actions
+		@ingroup m51
 
-		@defgroup m31Pages 31 Pages
-		@ingroup m31
+		@defgroup m51Pages 51 Pages
+		@ingroup m51
 
-		@defgroup m31Functions 31 Functions
-		@ingroup m31
+		@defgroup m51Functions 51 Functions
+		@ingroup m51
 
-		@defgroup m31Exceptions 31 Exceptions
-		@ingroup m31
+		@defgroup m51Exceptions 51 Exceptions
+		@ingroup m51
 
-		@defgroup m31Alarm 31 Messages recipient
-		@ingroup m31
+		@defgroup m51Alarm 51 Messages recipient
+		@ingroup m51
 
-		@defgroup m31LS 31 Table synchronizers
-		@ingroup m31
+		@defgroup m51LS 51 Table synchronizers
+		@ingroup m51
 
-		@defgroup m31Admin 31 Administration pages
-		@ingroup m31
+		@defgroup m51Admin 51 Administration pages
+		@ingroup m51
 
-		@defgroup m31Rights 31 Rights
-		@ingroup m31
+		@defgroup m51Rights 51 Rights
+		@ingroup m51
 
-		@defgroup m31Logs 31 DB Logs
-		@ingroup m31
+		@defgroup m51Logs 51 DB Logs
+		@ingroup m51
 
-		@defgroup m31 31 Reservation
-		@ingroup m3
+		@defgroup m51 51 Reservation
+		@ingroup m5
 
-		The reservation module provides the ability to book seats on transport on demand lines.
+		The reservation module provides the ability to book seats on demand responsive transport lines.
 
 		The features of the reservation module are :
 			- BoolingScreenFunction : booking screen, available directly in a route planner journey roadmap
@@ -133,7 +133,7 @@ namespace synthese
 	*/
 
 	//////////////////////////////////////////////////////////////////////////
-	/// 31 Reservation Module namespace.
+	/// 51 Reservation Module namespace.
 	///	@author Hugues Romain
 	///	@date 2008
 	//////////////////////////////////////////////////////////////////////////
@@ -143,7 +143,7 @@ namespace synthese
 		class CancelReservationAction;
 		class OnlineReservationRule;
 
-		/** 31 Reservation module class.
+		/** 51 Reservation module class.
 		*/
 		class ResaModule:
 			public server::ModuleClassTemplate<ResaModule>

@@ -40,9 +40,9 @@ namespace synthese
 	using namespace security;
 	using namespace html;
 
-	template<> const string util::FactorableTemplate<Function,transportwebsite::WebPageLinkFunction>::FACTORY_KEY("link");
+	template<> const string util::FactorableTemplate<Function,cms::WebPageLinkFunction>::FACTORY_KEY("link");
 	
-	namespace transportwebsite
+	namespace cms
 	{
 		const string WebPageLinkFunction::PARAMETER_TARGET("target");
 		const string WebPageLinkFunction::PARAMETER_TEXT("text");

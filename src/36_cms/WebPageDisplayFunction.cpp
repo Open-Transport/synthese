@@ -43,11 +43,11 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace interfaces;
-	using namespace transportwebsite;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,WebPageDisplayFunction>::FACTORY_KEY("page");
 	
-	namespace transportwebsite
+	namespace cms
 	{
 		const string WebPageDisplayFunction::PARAMETER_PAGE_ID("p");
 		const string WebPageDisplayFunction::PARAMETER_USE_TEMPLATE("use_template");

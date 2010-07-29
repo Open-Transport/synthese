@@ -37,14 +37,14 @@ namespace synthese
 	using namespace pt;
 	using namespace util;
 	using namespace db;
-	using namespace transportwebsite;
+	using namespace cms;
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,WebPageTableSync>::FACTORY_KEY("36.10 Web pages");
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
 		const string WebPageTableSync::COL_TITLE = "title";
 		const string WebPageTableSync::COL_SITE_ID = "site_id";
@@ -228,7 +228,7 @@ namespace synthese
 		}
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
 		WebPageTableSync::SearchResult WebPageTableSync::Search(
 			util::Env& env,

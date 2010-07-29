@@ -38,11 +38,11 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace transportwebsite;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function, GetValueFunction>::FACTORY_KEY("@");
 	
-	namespace transportwebsite
+	namespace cms
 	{
 		const string GetValueFunction::PARAMETER_PARAMETER("p");
 		

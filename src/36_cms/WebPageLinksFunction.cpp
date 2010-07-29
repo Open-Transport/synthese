@@ -41,9 +41,9 @@ namespace synthese
 	using namespace security;
 	using namespace admin;
 
-	template<> const string util::FactorableTemplate<Function,transportwebsite::WebPageLinksFunction>::FACTORY_KEY("links");
+	template<> const string util::FactorableTemplate<Function,cms::WebPageLinksFunction>::FACTORY_KEY("links");
 	
-	namespace transportwebsite
+	namespace cms
 	{
 		const string WebPageLinksFunction::PARAMETER_PAGE_ID("page_id");
 		const string WebPageLinksFunction::PARAMETER_DISPLAY_TEMPLATE_ID("display_page_id");

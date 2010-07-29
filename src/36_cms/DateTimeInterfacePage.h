@@ -37,7 +37,7 @@ namespace synthese
 		class Request;
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
 		class WebPage;
 
@@ -67,7 +67,7 @@ namespace synthese
 			/// Date time display.
 			static void Display(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
+				boost::shared_ptr<const cms::WebPage> page,
 				const server::Request& request,
 				const boost::posix_time::ptime& dateTime
 			);
@@ -77,7 +77,7 @@ namespace synthese
 			/// Date display.
 			static void Display(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
+				boost::shared_ptr<const cms::WebPage> page,
 				const server::Request& request,
 				const boost::gregorian::date& date
 			);
@@ -87,7 +87,7 @@ namespace synthese
 			/// Time or duration display.
 			static void Display(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
+				boost::shared_ptr<const cms::WebPage> page,
 				const server::Request& request,
 				const boost::posix_time::time_duration& duration
 			);

@@ -41,9 +41,9 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	
-	template<> const string util::FactorableTemplate<Function,transportwebsite::WebPagePositionFunction>::FACTORY_KEY("position");
+	template<> const string util::FactorableTemplate<Function,cms::WebPagePositionFunction>::FACTORY_KEY("position");
 	
-	namespace transportwebsite
+	namespace cms
 	{
 		const string WebPagePositionFunction::PARAMETER_PAGE_ID("page_id");
 		const string WebPagePositionFunction::PARAMETER_DISPLAY_PAGE_ID("display_page_id");

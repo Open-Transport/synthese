@@ -30,12 +30,12 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 56.15 Function : display of a web page.
+		/// 36.15 Function : display of a web page.
 		///	@author Hugues Romain
 		///	@date 2010
 		///	@ingroup m56Functions refFunctions

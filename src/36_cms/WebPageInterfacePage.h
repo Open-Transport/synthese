@@ -36,12 +36,12 @@ namespace synthese
 		class Request;
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 56.11 Interface : Web page display.
+		/// 36.11 Interface : Web page display.
 		///	@ingroup m56Pages refPages
 		///	@author Hugues Romain
 		///	@date 2010

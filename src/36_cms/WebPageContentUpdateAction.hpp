@@ -30,12 +30,12 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 56.16 Action : update of the content of a web page.
+		/// 36.16 Action : update of the content of a web page.
 		/// @ingroup m56Actions refActions
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////

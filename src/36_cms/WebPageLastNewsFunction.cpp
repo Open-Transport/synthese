@@ -45,9 +45,9 @@ namespace synthese
 	using namespace security;
 	using namespace html;
 
-	template<> const string util::FactorableTemplate<Function,transportwebsite::WebPageLastNewsFunction>::FACTORY_KEY("last_news");
+	template<> const string util::FactorableTemplate<Function,cms::WebPageLastNewsFunction>::FACTORY_KEY("last_news");
 	
-	namespace transportwebsite
+	namespace cms
 	{
 		const string WebPageLastNewsFunction::PARAMETER_ROOT_ID("root");
 		const string WebPageLastNewsFunction::PARAMETER_DISPLAY_PAGE_ID("display_page");
@@ -101,7 +101,7 @@ namespace synthese
 			const Request& request
 		) const {
 
-			shared_ptr<const Site> site(PlacesListModule::GetSite(request));
+			shared_ptr<const WebSite> site(PlacesListModule::GetSite(request));
 			shared_ptr<const WebPage> curPage(PlacesListModule::GetWebPage(request));
 
 			WebPageTableSync::SearchResult pages(

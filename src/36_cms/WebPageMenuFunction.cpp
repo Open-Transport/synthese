@@ -44,9 +44,9 @@ namespace synthese
 	using namespace security;
 	using namespace html;
 
-	template<> const string util::FactorableTemplate<Function,transportwebsite::WebPageMenuFunction>::FACTORY_KEY("menu");
+	template<> const string util::FactorableTemplate<Function,cms::WebPageMenuFunction>::FACTORY_KEY("menu");
 	
-	namespace transportwebsite
+	namespace cms
 	{
 		const std::string WebPageMenuFunction::PARAMETER_ROOT_ID("root");
 		const std::string WebPageMenuFunction::PARAMETER_MIN_DEPTH("min_depth");

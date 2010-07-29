@@ -30,10 +30,10 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
 		//////////////////////////////////////////////////////////////////////////
-		///	56.15 Function : StrLenFunction.
+		///	36.15 Function : StrLenFunction.
 		///	@ingroup m56Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010

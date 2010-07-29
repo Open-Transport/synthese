@@ -61,7 +61,7 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 
-	template<> const std::string util::FactorableTemplate<ModuleClass,ResaModule>::FACTORY_KEY("31_resa");
+	template<> const std::string util::FactorableTemplate<ModuleClass,ResaModule>::FACTORY_KEY("51_resa");
 
 	namespace resa
 	{

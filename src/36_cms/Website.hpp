@@ -1,6 +1,6 @@
 
-/** PTRoutePlannerModule class implementation.
-	@file PTRoutePlannerModule.cpp
+/** Website class header.
+	@file Website.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,38 +20,23 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "PTRoutePlannerModule.h"
+#ifndef SYNTHESE_cms_Website_hpp__
+#define SYNTHESE_cms_Website_hpp__
 
 namespace synthese
 {
-	using namespace server;
-	using namespace ptrouteplanner;
-
-	namespace util
+	namespace cms
 	{
-		template<>
-		const string FactorableTemplate<ModuleClass,PTRoutePlannerModule>::FACTORY_KEY("53_ptrouteplanner");
-	}
-
-	namespace server
-	{
-		template<> const string ModuleClassTemplate<PTRoutePlannerModule>::NAME("Calcul d'itinéraire transport public");
-
-		template<> void ModuleClassTemplate<PTRoutePlannerModule>::PreInit()
+		/** Website class.
+			@ingroup m36
+		*/
+		class Website
 		{
-		}
+		public:
+			Website();
 
-		template<> void ModuleClassTemplate<PTRoutePlannerModule>::Init()
-		{
-		}
-
-		template<> void ModuleClassTemplate<PTRoutePlannerModule>::End()
-		{
-		}
-	}
-
-	namespace ptrouteplanner
-	{
-
+		};
 	}
 }
+
+#endif // SYNTHESE_cms_Website_hpp__

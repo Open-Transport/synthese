@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_transportwebsite_WebPage_h__
-#define SYNTHESE_transportwebsite_WebPage_h__
+#ifndef SYNTHESE_cms_WebPage_h__
+#define SYNTHESE_cms_WebPage_h__
 
 #include "Registrable.h"
 #include "Registry.h"
@@ -29,7 +29,7 @@
 #include "TreeRankOrderingPolicy.hpp"
 #include "TreeOtherClassRootPolicy.hpp"
 #include "Named.h"
-#include "Site.h"
+#include "WebSite.hpp"
 
 #include <ostream>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -41,10 +41,10 @@ namespace synthese
 		class Request;
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
 		/** Web page class (CMS).
-			@ingroup m56
+			@ingroup m36
 
 			A web page is defined by a content, which can include recursively calls to public functions.
 
@@ -71,7 +71,7 @@ namespace synthese
 			public tree::TreeNode<
 				WebPage,
 				tree::TreeRankOrderingPolicy,
-				tree::TreeOtherClassRootPolicy<Site>
+				tree::TreeOtherClassRootPolicy<WebSite>
 			>,
 			public util::Named
 		{
@@ -217,4 +217,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_transportwebsite_WebPage_h__
+#endif // SYNTHESE_cms_WebPage_h__

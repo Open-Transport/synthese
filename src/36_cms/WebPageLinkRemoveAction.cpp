@@ -41,10 +41,10 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, transportwebsite::WebPageLinkRemoveAction>::FACTORY_KEY("WebPageLinkRemoveAction");
+		template<> const string FactorableTemplate<Action, cms::WebPageLinkRemoveAction>::FACTORY_KEY("WebPageLinkRemoveAction");
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
 		const string WebPageLinkRemoveAction::PARAMETER_PAGE_ID = Action_PARAMETER_PREFIX + "id";
 		const string WebPageLinkRemoveAction::PARAMETER_DESTINATION_ID = Action_PARAMETER_PREFIX + "to";

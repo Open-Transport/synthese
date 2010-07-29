@@ -30,12 +30,12 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
 		class WebPage;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 56.15 Action : WebPageLinkAddAction.
+		/// 36.15 Action : WebPageLinkAddAction.
 		/// @ingroup m56Actions refActions
 		///	@author Hugues Romain
 		///	@date 2010

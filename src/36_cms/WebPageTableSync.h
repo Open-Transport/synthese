@@ -32,10 +32,10 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 56.10 Table : Web page.
+		/// 36.10 Table : Web page.
 		///	@ingroup m56LS refLS
 		/// @author Hugues Romain
 		/// @date 2010
