@@ -1,6 +1,6 @@
 
-/** PlacesListModule class implementation.
-	@file PlacesListModule.cpp
+/** TransportWebsiteModule class implementation.
+	@file TransportWebsiteModule.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "PlacesListModule.h"
+#include "TransportWebsiteModule.h"
 #include "GraphConstants.h"
 #include "FunctionWithSite.h"
 #include "WebPageDisplayFunction.h"
@@ -38,28 +38,29 @@ namespace synthese
 	using namespace server;
 	using namespace transportwebsite;
 	
-	template<> const std::string util::FactorableTemplate<ModuleClass,PlacesListModule>::FACTORY_KEY("36_places_list");
+	template<> const std::string util::FactorableTemplate<ModuleClass,TransportWebsiteModule>::FACTORY_KEY("36_places_list");
 	
 	namespace server
 	{
-		template<> const string ModuleClassTemplate<PlacesListModule>::NAME("Site web transport public");
+		template<> const string ModuleClassTemplate<TransportWebsiteModule>::NAME("Site web transport public");
 		
-		template<> void ModuleClassTemplate<PlacesListModule>::PreInit()
+		template<> void ModuleClassTemplate<TransportWebsiteModule>::PreInit()
 		{
 		}
 		
-		template<> void ModuleClassTemplate<PlacesListModule>::Init()
+		template<> void ModuleClassTemplate<TransportWebsiteModule>::Init()
 		{
+			
 		}
 		
-		template<> void ModuleClassTemplate<PlacesListModule>::End()
+		template<> void ModuleClassTemplate<TransportWebsiteModule>::End()
 		{
 		}
 	}
 
 	namespace transportwebsite
 	{
-		PlacesListModule::UserClassNames PlacesListModule::GetAccessibilityNames()
+		TransportWebsiteModule::UserClassNames TransportWebsiteModule::GetAccessibilityNames()
 		{
 			UserClassNames result;
 			result.push_back(make_pair(USER_PEDESTRIAN, "Piéton"));

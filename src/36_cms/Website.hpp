@@ -23,18 +23,55 @@
 #ifndef SYNTHESE_cms_Website_hpp__
 #define SYNTHESE_cms_Website_hpp__
 
+#include "Named.h"
+
+#include <boost/date_time/gregorian/greg_date.hpp>
+
 namespace synthese
 {
 	namespace cms
 	{
-		/** Website class.
-			@ingroup m36
-		*/
-		class Website
-		{
-		public:
-			Website();
+		class Webpage;
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Website class.
+		///	@ingroup m36
+		/// @author Hugues Romain
+		/// @since 3.2.0
+		class Website:
+			public util::Named
+		{
+		private:
+			//! \name Properties
+			//@{
+				boost::gregorian::date		_startValidityDate;
+				boost::gregorian::date		_endValidityDate;
+				std::string					_clientURL;
+				Webpage*					_defaultTemplate;
+			//@}
+
+		public:
+			Website():
+			  _startValidityDate(boost::gregorian::not_a_date_time),
+			  _endValidityDate(boost::gregorian::not_a_date_time),
+			  _defaultTemplate(NULL)
+			{}
+
+			//! @name Setters
+			//@{
+				void setStartDate ( const boost::gregorian::date& value){ _startValidityDate = value; }
+				void setEndDate ( const boost::gregorian::date& value){ _endValidityDate = value; }
+				void setClientURL(const std::string& value) { _clientURL = value; }
+				void setDefaultTemplate(Webpage* value){ _defaultTemplate = value; }
+			//@}
+
+			//! @name Getters
+			//@{
+				const boost::gregorian::date& getStartDate() const { return _startValidityDate; }
+				const boost::gregorian::date& getEndDate() const { return _endValidityDate; }
+				const std::string& getClientURL() const { return _clientURL; }
+				Webpage* getDefaultTemplate() const { return _defaultTemplate; }
+			//@}
 		};
 	}
 }

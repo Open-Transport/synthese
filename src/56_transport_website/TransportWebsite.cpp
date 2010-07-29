@@ -1,6 +1,6 @@
 
-/** Site class implementation.
-	@file Site.cpp
+/** TransportWebsite class implementation.
+	@file TransportWebsite.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Site.h"
+#include "TransportWebsite.h"
 #include "Registry.h"
 #include "PTConstants.h"
 #include "PTModule.h"
@@ -50,27 +50,24 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<transportwebsite::Site>::KEY("Site");
+		template<> const string Registry<transportwebsite::TransportWebsite>::KEY("TransportWebsite");
 	}
 
 	namespace transportwebsite
 	{
-		const string Site::TEMPS_MIN_CIRCULATIONS ("r");
-		const string Site::TEMPS_MAX_CIRCULATIONS ("R");
+		const TransportWebsite TransportWebsite::TEMPS_MIN_CIRCULATIONS ("r");
+		const TransportWebsite TransportWebsite::TEMPS_MAX_CIRCULATIONS ("R");
 
-		Site::Site(
+		TransportWebsite::TransportWebsite(
 			RegistryKeyType id
 		):	Registrable(id),
-			_startValidityDate(not_a_date_time),
-			_endValidityDate(not_a_date_time),
-			_displayRoadApproachDetail(true),
-			_defaultTemplate(NULL)
+			_displayRoadApproachDetail(true)
 		{		
 		}
 
 
 
-		bool Site::dateControl() const
+		bool TransportWebsite::dateControl() const
 		{
 			date tempDate(day_clock::local_day());
 			return tempDate >= _startValidityDate && tempDate <= _endValidityDate;
@@ -78,46 +75,23 @@ namespace synthese
 
 		
 
-		void Site::setStartDate( const date& dateDebut )
-		{
-			_startValidityDate = dateDebut;
-		}
-
-		void Site::setEndDate( const date& dateFin )
-		{
-			_endValidityDate = dateFin;
-		}
-
-		void Site::setOnlineBookingAllowed( const bool valeur )
-		{
-			_onlineBookingAllowed = valeur;
-		}
-
-		void Site::setPastSolutionsDisplayed( bool pastSolutions)
-		{
-			_pastSolutionsDisplayed = pastSolutions;
-		}
-
-
-
-		bool Site::getPastSolutionsDisplayed() const
-		{
-			return _pastSolutionsDisplayed;
-		}
-
-		const date Site::getMinUseDate() const
+		const date TransportWebsite::getMinUseDate() const
 		{
 			return day_clock::local_day();
 		}
 
-		const date Site::getMaxUseDate() const
+
+
+		const date TransportWebsite::getMaxUseDate() const
 		{
 			date date(day_clock::local_day());
 			date += _useDateRange;
 			return date;
 		}
 
-		date Site::interpretDate( const std::string& text ) const
+
+
+		date TransportWebsite::interpretDate( const std::string& text ) const
 		{
 			if ( text.empty() )
 				return date(not_a_date_time);
@@ -136,21 +110,7 @@ namespace synthese
 
 
 
-		void Site::setMaxTransportConnectionsCount( int number )
-		{
-			_maxTransportConnectionsCount = number;
-		}
-
-
-
-		int Site::getMaxTransportConnectionsCount() const
-		{
-			return _maxTransportConnectionsCount;
-		}
-
-
-
-		graph::AccessParameters Site::getAccessParameters(
+		graph::AccessParameters TransportWebsite::getAccessParameters(
 			UserClassCode parameter,
 			const graph::AccessParameters::AllowedPathClasses& allowedPathClasses
 		) const	{
@@ -178,7 +138,7 @@ namespace synthese
 
 
 
-		void Site::applyPeriod(
+		void TransportWebsite::applyPeriod(
 			const HourPeriod& period
 			, ptime& startTime
 			, ptime& endTime
@@ -209,47 +169,21 @@ namespace synthese
 			}
 		}
 
-		void Site::addHourPeriod( const HourPeriod& hourPeriod )
+		void TransportWebsite::addHourPeriod( const HourPeriod& hourPeriod )
 		{
 			_periods.push_back(hourPeriod);
 		}
 
-		const Site::Periods& Site::getPeriods() const
-		{
-			return _periods;
-		}
 
-
-
-		date_duration Site::getUseDatesRange() const
-		{
-			return _useDateRange;
-		}
-
-
-
-		const date& Site::getStartDate() const
-		{
-			return _startValidityDate;
-		}
-
-
-
-		const date& Site::getEndDate() const
-		{
-			return _endValidityDate;
-		}
 		
-		
-		
-		const Site::CitiesMatcher& Site::getCitiesMatcher () const
+		const TransportWebsite::CitiesMatcher& TransportWebsite::getCitiesMatcher () const
 		{
 			return _citiesMatcher.size() ? _citiesMatcher : GeographyModule::GetCitiesMatcher();
 		}
 		
 		
 		
-		void Site::addCity(City* city)
+		void TransportWebsite::addCity(City* city)
 		{
 			if(!city) return;
 			
@@ -283,7 +217,7 @@ namespace synthese
 
 
 
-		const Place* Site::fetchPlace(
+		const Place* TransportWebsite::fetchPlace(
 			const string& cityName,
 			const string& placeName
 		) const {
@@ -292,7 +226,7 @@ namespace synthese
 
 
 
-		Site::ExtendedFetchPlaceResult Site::extendedFetchPlace(
+		TransportWebsite::ExtendedFetchPlaceResult TransportWebsite::extendedFetchPlace(
 			const std::string& cityName,
 			const std::string& placeName
 		) const	{
@@ -330,14 +264,14 @@ namespace synthese
 
 
 
-		void Site::addRollingStockFilter( RollingStockFilter& value )
+		void TransportWebsite::addRollingStockFilter( RollingStockFilter& value )
 		{
 			_rollingStockFilters[value.getRank()] = &value;
 		}
 
 
 
-		void Site::removeRollingStockFilter( RollingStockFilter& value )
+		void TransportWebsite::removeRollingStockFilter( RollingStockFilter& value )
 		{
 			RollingStockFilters::iterator it(_rollingStockFilters.find(value.getRank()));
 			if(it != _rollingStockFilters.end())
@@ -348,21 +282,14 @@ namespace synthese
 
 
 
-		void Site::clearRollingStockFilters()
+		void TransportWebsite::clearRollingStockFilters()
 		{
 			_rollingStockFilters.clear();
 		}
 
 
 
-		const Site::RollingStockFilters& Site::getRollingStockFilters() const
-		{
-			return _rollingStockFilters;
-		}
-
-
-
-		Site::Labels Site::getRollingStockFiltersList(
+		TransportWebsite::Labels TransportWebsite::getRollingStockFiltersList(
 		) const {
 			Labels result;
 			BOOST_FOREACH(const RollingStockFilters::value_type& it, _rollingStockFilters)
@@ -374,14 +301,14 @@ namespace synthese
 
 
 
-		void Site::clearHourPeriods()
+		void TransportWebsite::clearHourPeriods()
 		{
 			_periods.clear();
 		}
 
 
 
-		Site::ExtendedFetchPlaceResult::ExtendedFetchPlaceResult()
+		TransportWebsite::ExtendedFetchPlaceResult::ExtendedFetchPlaceResult()
 		{
 			cityResult.value = NULL;
 			placeResult.value = NULL;
@@ -389,7 +316,7 @@ namespace synthese
 
 
 
-		Site::ForbiddenDateException::ForbiddenDateException():
+		TransportWebsite::ForbiddenDateException::ForbiddenDateException():
 			Exception("Forbidden date")
 		{
 

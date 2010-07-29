@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ROUTEPLANNER_BESTVERTEXREACHESMAP_H
 #define SYNTHESE_ROUTEPLANNER_BESTVERTEXREACHESMAP_H
 
-#include "RoutePlannerTypes.h"
+#include "AlgorithmTypes.h"
 
 #include <map>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>

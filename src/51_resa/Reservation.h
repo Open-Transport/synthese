@@ -26,7 +26,7 @@
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <string>
 
-#include "31_resa/Types.h"
+#include "ResaTypes.h"
 
 #include "Registrable.h"
 #include "Registry.h"

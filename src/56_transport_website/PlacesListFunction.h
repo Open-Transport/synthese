@@ -35,10 +35,13 @@ namespace synthese
 		class City;
 	}
 
+	namespace cms
+	{
+		class Webpage;
+	}
+
 	namespace transportwebsite
 	{
-		class WebPage;
-
 		/** Places list query public function.
 			@author Hugues Romain
 			@date 2007
@@ -103,8 +106,8 @@ namespace synthese
 				std::string							_cityText;
 				int									_n;
 				bool								_isForOrigin;
-				boost::shared_ptr<const transportwebsite::WebPage> _page;
-				boost::shared_ptr<const transportwebsite::WebPage> _itemPage;
+				boost::shared_ptr<const cms::Webpage> _page;
+				boost::shared_ptr<const cms::Webpage> _itemPage;
 			//@}
 			
 			

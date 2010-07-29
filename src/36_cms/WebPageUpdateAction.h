@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 36.15 Action : Web page properties update.
@@ -66,9 +66,9 @@ namespace synthese
 			static const std::string PARAMETER_HAS_FORUM;
 
 		private:
-			boost::shared_ptr<WebPage> _page;
-			boost::shared_ptr<WebPage> _up;
-			boost::shared_ptr<WebPage> _template;
+			boost::shared_ptr<Webpage> _page;
+			boost::shared_ptr<Webpage> _up;
+			boost::shared_ptr<Webpage> _template;
 			boost::posix_time::ptime _startDate;
 			boost::posix_time::ptime _endDate;
 			std::string _mimeType;
@@ -107,7 +107,7 @@ namespace synthese
 
 
 
-			void setWebPage(boost::shared_ptr<WebPage> value);
+			void setWebPage(boost::shared_ptr<Webpage> value);
 		};
 	}
 }

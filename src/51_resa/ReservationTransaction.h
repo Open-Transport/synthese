@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_resa_ReservationTransaction_h__
 #define SYNTHESE_resa_ReservationTransaction_h__
 
-#include "31_resa/Types.h"
+#include "ResaTypes.h"
 
 #include "Registrable.h"
 #include "Registry.h"

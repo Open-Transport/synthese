@@ -25,7 +25,7 @@
 
 #include "TimeSlotRoutePlanner.h"
 #include "PTRoutePlannerResult.h"
-#include "RoutePlannerTypes.h"
+#include "AlgorithmTypes.h"
 #include "AccessParameters.h"
 #include "GraphTypes.h"
 

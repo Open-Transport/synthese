@@ -31,9 +31,9 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 	}
 
 	namespace server
@@ -91,7 +91,7 @@ namespace synthese
 			*/
 			static void Display(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
+				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
 				const pt::Line& object,
 				std::size_t rank

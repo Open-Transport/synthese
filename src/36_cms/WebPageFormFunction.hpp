@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : WebPageFormFunction.
@@ -61,7 +61,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				std::string _name;
-				boost::shared_ptr<const WebPage> _page;
+				boost::shared_ptr<const Webpage> _page;
 				std::string _script;
 			//@}
 			

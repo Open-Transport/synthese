@@ -42,7 +42,7 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		class Site;
+		class TransportWebsite;
 		class RollingStockFilter;
 	}
 
@@ -121,7 +121,7 @@ namespace synthese
 			bool								_createCustomer;
 			graph::AccessParameters				_accessParameters;
 			int									_seatsNumber;
-			boost::shared_ptr<const transportwebsite::Site>	_site;
+			boost::shared_ptr<const transportwebsite::TransportWebsite>	_site;
 			boost::shared_ptr<const transportwebsite::RollingStockFilter>	_rollingStockFilter;
 
 		protected:

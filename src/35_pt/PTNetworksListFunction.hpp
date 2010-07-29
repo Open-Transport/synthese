@@ -30,9 +30,9 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 	}
 
 	namespace pt
@@ -56,7 +56,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-			boost::shared_ptr<const transportwebsite::WebPage>			_page;
+			boost::shared_ptr<const cms::Webpage>			_page;
 			//@}
 			
 			

@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace transportwebsite
 	{
-		class WebPage;
+		class Webpage;
 	}
 
 	namespace pt
@@ -81,7 +81,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const pt::CommercialLine> _line;
-				boost::shared_ptr<const transportwebsite::WebPage> _page;
+				boost::shared_ptr<const cms::Webpage> _page;
 				bool _mergeSameRoutes;
 				bool _mergeIncludingRoutes;
 			//@}

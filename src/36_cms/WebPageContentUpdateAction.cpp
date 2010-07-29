@@ -27,7 +27,7 @@
 #include "WebPageContentUpdateAction.hpp"
 #include "TransportWebsiteRight.h"
 #include "Request.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "WebPageTableSync.h"
 
 using namespace std;
@@ -75,7 +75,7 @@ namespace synthese
 			{
 				_page = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_WEB_PAGE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<WebPage>& e)
+			catch(ObjectNotFoundException<Webpage>& e)
 			{
 				throw ActionException("No such page");
 			}
@@ -112,7 +112,7 @@ namespace synthese
 		}
 
 
-		void WebPageContentUpdateAction::setWebPage( boost::shared_ptr<WebPage> value )
+		void WebPageContentUpdateAction::setWebPage( boost::shared_ptr<Webpage> value )
 		{
 			_page = value;
 		}

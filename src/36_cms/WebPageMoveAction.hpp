@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 36.15 Action : WebPageMoveAction.
@@ -56,8 +56,8 @@ namespace synthese
 			static const std::string PARAMETER_DIRECTION;
 
 		private:
-			boost::shared_ptr<WebPage> _page;
-			boost::shared_ptr<WebPage> _switchedPage;
+			boost::shared_ptr<Webpage> _page;
+			boost::shared_ptr<Webpage> _switchedPage;
 			bool _up;
 
 		protected:
@@ -94,7 +94,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setPage(boost::shared_ptr<WebPage> value) { _page = value; }
+				void setPage(boost::shared_ptr<Webpage> value) { _page = value; }
 				void setUp(bool value){ _up = value; }
 			//@}
 		};

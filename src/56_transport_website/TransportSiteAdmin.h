@@ -39,15 +39,19 @@ namespace synthese
 		class ActionResultHTMLTable;
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
-		class Site;
-		class RollingStockFilter;
 		class WebPageAdmin;
 		class WebPageDisplayFunction;
 		class WebPageRemoveAction;
 		class WebPageAddAction;
+	}
 
+	namespace transportwebsite
+	{
+		class TransportWebsite;
+		class RollingStockFilter;
+		
 
 		/** Transport web site administration page class.
 			@ingroup m56Admin refAdmin
@@ -76,7 +80,7 @@ namespace synthese
 			static const std::string TAB_ROUTE_PLANNING;
 
 		private:
-			boost::shared_ptr<const Site>	_site;
+			boost::shared_ptr<const TransportWebsite>	_site;
 			std::string						_startCity;
 			std::string						_startPlace;
 			std::string						_endCity;
@@ -92,8 +96,8 @@ namespace synthese
 		public:
 			TransportSiteAdmin();
 
-			boost::shared_ptr<const Site> getSite() const;
-			void setSite(boost::shared_ptr<const Site> value);
+			boost::shared_ptr<const TransportWebsite> getSite() const { return _site; }
+			void setSite(boost::shared_ptr<const TransportWebsite> value){ _site = value; }
 
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.

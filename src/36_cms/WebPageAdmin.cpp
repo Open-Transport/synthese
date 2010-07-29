@@ -25,7 +25,7 @@
 #include "WebPageAdmin.h"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
-#include "TransportWebsiteRight.h"
+#include "CMSRight.h"
 #include "WebPageTableSync.h"
 #include "PropertiesHTMLTable.h"
 #include "WebPageUpdateAction.h"
@@ -34,12 +34,11 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "Interface.h"
 #include "WebPageInterfacePage.h"
-#include "TransportSiteAdmin.h"
+#include "WebsiteAdmin.hpp"
 #include "ResultHTMLTable.h"
 #include "HTMLModule.h"
 #include "WebPageAddAction.h"
 #include "WebPageRemoveAction.h"
-#include "SiteTableSync.h"
 #include "WebPageLinkAddAction.hpp"
 #include "WebPageLinkRemoveAction.hpp"
 #include "WebPageMoveAction.hpp"
@@ -95,7 +94,7 @@ namespace synthese
 			}
 			catch (...)
 			{
-				throw AdminParametersException("No such site");
+				throw AdminParametersException("No such page");
 			}
 		}
 
@@ -145,7 +144,7 @@ namespace synthese
 
 				{
 					AdminActionFunctionRequest<WebPageContentUpdateAction, WebPageAdmin> contentUpdateRequest(request);
-					contentUpdateRequest.getAction()->setWebPage(const_pointer_cast<WebPage>(_page));
+					contentUpdateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
 					PropertiesHTMLTable t(contentUpdateRequest.getHTMLForm());
 					stream << t.open();
 					stream << t.cell("Titre", t.getForm().getTextInput(WebPageContentUpdateAction::PARAMETER_TITLE, _page->getName()));
@@ -164,7 +163,7 @@ namespace synthese
 
 				{
 					AdminActionFunctionRequest<WebPageUpdateAction, WebPageAdmin> updateRequest(request);
-					updateRequest.getAction()->setWebPage(const_pointer_cast<WebPage>(_page));
+					updateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
 					PropertiesHTMLTable t(updateRequest.getHTMLForm());
 					stream << t.open();
 					stream << t.cell("ID", lexical_cast<string>(_page->getKey()));
@@ -187,7 +186,7 @@ namespace synthese
 				stream << "<h1>Sous-pages</h1>";
 				{
 					AdminActionFunctionRequest<WebPageAddAction, WebPageAdmin> addRequest(request);
-					addRequest.getAction()->setParent(const_pointer_cast<WebPage>(_page));
+					addRequest.getAction()->setParent(const_pointer_cast<Webpage>(_page));
 
 					AdminActionFunctionRequest<WebPageRemoveAction, WebPageAdmin> deleteRequest(request);
 
@@ -206,10 +205,10 @@ namespace synthese
 				AdminFunctionRequest<WebPageAdmin> openRequest(request);
 
 				AdminActionFunctionRequest<WebPageLinkAddAction, WebPageAdmin> addRequest(request);
-				addRequest.getAction()->setPage(const_pointer_cast<WebPage>(_page));
+				addRequest.getAction()->setPage(const_pointer_cast<Webpage>(_page));
 
 				AdminActionFunctionRequest<WebPageLinkRemoveAction, WebPageAdmin> removeRequest(request);
-				removeRequest.getAction()->setPage(const_pointer_cast<WebPage>(_page));
+				removeRequest.getAction()->setPage(const_pointer_cast<Webpage>(_page));
 
 				HTMLForm f(addRequest.getHTMLForm());
 				stream << f.open();
@@ -221,7 +220,7 @@ namespace synthese
 				h.push_back("Actions");
 				HTMLTable t(h, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
-				BOOST_FOREACH(const WebPage::Links::value_type& link, _page->getLinks())
+				BOOST_FOREACH(const Webpage::Links::value_type& link, _page->getLinks())
 				{
 					openRequest.getPage()->setPage(Env::GetOfficialEnv().getEditableSPtr(link));
 					removeRequest.getAction()->setDestinationPage(Env::GetOfficialEnv().getEditableSPtr(link));
@@ -269,12 +268,12 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 			WebPageTableSync::SearchResult pages(WebPageTableSync::Search(Env::GetOfficialEnv(), _page->getRoot()->getKey(), _page->getKey()));
-			BOOST_FOREACH(shared_ptr<WebPage> page, pages)
+			BOOST_FOREACH(shared_ptr<Webpage> page, pages)
 			{
 				shared_ptr<WebPageAdmin> p(
 					getNewOtherPage<WebPageAdmin>(false)
 				);
-				p->setPage(const_pointer_cast<const WebPage>(page));
+				p->setPage(const_pointer_cast<const Webpage>(page));
 				links.push_back(p);
 			}
 
@@ -283,7 +282,7 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks WebPageAdmin::_getCurrentTreeBranch() const
+/*		AdminInterfaceElement::PageLinks WebPageAdmin::_getCurrentTreeBranch() const
 		{
 			if(_page->getParent())
 			{
@@ -297,8 +296,8 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<TransportSiteAdmin> p(
-					getNewOtherPage<TransportSiteAdmin>()
+				shared_ptr<WebsiteAdmin> p(
+					getNewOtherPage<WebsiteAdmin>()
 				);
 				p->setSite(Env::GetOfficialEnv().getSPtr(_page->getRoot()));
 				PageLinks links(p->getCurrentTreeBranch());
@@ -306,7 +305,7 @@ namespace synthese
 				return links;
 			}
 		}
-
+*/
 
 
 		void WebPageAdmin::_buildTabs( const security::Profile& profile ) const
@@ -337,10 +336,10 @@ namespace synthese
 			
 			for(WebPageTableSync::SearchResult::const_iterator it(pages.begin()); it != pages.end(); ++it)
 			{
-				shared_ptr<WebPage> page(*it);
+				shared_ptr<Webpage> page(*it);
 
-				openRequest.getPage()->setPage(const_pointer_cast<const WebPage>(page));
-				viewRequest.getFunction()->setPage(const_pointer_cast<const WebPage>(page));
+				openRequest.getPage()->setPage(const_pointer_cast<const Webpage>(page));
+				viewRequest.getFunction()->setPage(const_pointer_cast<const Webpage>(page));
 				moveRequest.getAction()->setPage(page);
 
 				if(	!page->getRoot()->getClientURL().empty()
@@ -414,7 +413,7 @@ namespace synthese
 			WebPageTableSync::SearchResult result(
 				WebPageTableSync::Search(
 					Env::GetOfficialEnv(),
-					decodeTableId(parentId) == SiteTableSync::TABLE.ID ? parentId : optional<RegistryKeyType>(),
+					decodeTableId(parentId) == WebPageTableSync::TABLE.ID : optional<RegistryKeyType>() ? parentId,
 					decodeTableId(parentId) == WebPageTableSync::TABLE.ID ? parentId : RegistryKeyType(0)
 			)	);
 

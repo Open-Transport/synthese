@@ -25,8 +25,8 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "SiteUpdateAction.h"
-#include "Site.h"
-#include "SiteTableSync.h"
+#include "TransportWebsite.h"
+#include "TransportWebsiteTableSync.h"
 #include "WebPageTableSync.h"
 
 using namespace std;
@@ -106,7 +106,7 @@ namespace synthese
 			{
 				_defaultPageTemplate = WebPageTableSync::GetEditable(pageTemplateId, *_env);
 			}
-			catch(ObjectNotFoundException<WebPage>&)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw ActionException("No such page template");
 			}
@@ -127,7 +127,7 @@ namespace synthese
 			_site->setClientURL(_clientURL);
 			_site->setDefaultTemplate(_defaultPageTemplate.get());
 
-			SiteTableSync::Save(_site.get());
+			TransportWebsiteTableSync::Save(_site.get());
 		}
 
 
@@ -136,7 +136,7 @@ namespace synthese
 		{
 			try
 			{
-				_site = SiteTableSync::GetEditable(id, *_env);
+				_site = TransportWebsiteTableSync::GetEditable(id, *_env);
 			}
 			catch(...)
 			{

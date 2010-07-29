@@ -34,7 +34,7 @@ namespace synthese
 {
 	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : Displays a set of sub-pages abstracts and links.
@@ -77,8 +77,8 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const WebPage> _root;
-				boost::shared_ptr<const WebPage> _displayPage;
+				boost::shared_ptr<const Webpage> _root;
+				boost::shared_ptr<const Webpage> _displayPage;
 				boost::optional<std::size_t> _number;
 			//@}
 			

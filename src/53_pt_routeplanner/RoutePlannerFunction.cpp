@@ -23,7 +23,7 @@
 #include "RoutePlannerFunction.h"
 #include "UserFavoriteJourneyTableSync.h"
 #include "UserFavoriteJourney.h"
-#include "Site.h"
+#include "TransportWebsite.h"
 #include "HourPeriod.h"
 #include "RoutePlannerInterfacePage.h"
 #include "PTTimeSlotRoutePlanner.h"
@@ -50,7 +50,7 @@
 #include "RollingStockFilter.h"
 #include "Address.h"
 #include "ContinuousService.h"
-#include "WebPage.h"
+#include "Webpage.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -75,6 +75,7 @@ namespace synthese
 	using namespace ptrouteplanner;
 	using namespace resa;
 	using namespace pt;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<ptrouteplanner::RoutePlannerFunction::_FunctionWithSite,ptrouteplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
 
@@ -249,7 +250,7 @@ namespace synthese
 					}
 				}
 			}
-			catch(Site::ForbiddenDateException)
+			catch(TransportWebsite::ForbiddenDateException)
 			{
 				throw RequestException("Date in the past is forbidden");
 			}
@@ -291,10 +292,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE));
 				if(id) 
 				{
-					_page = Env::GetOfficialEnv().get<WebPage>(*id);
+					_page = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such main page : "+ e.getMessage());
 			}
@@ -303,10 +304,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SCHEDULES_ROW_PAGE));
 				if(id) 
 				{
-					_schedulesRowPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_schedulesRowPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such schedules row page : "+ e.getMessage());
 			}
@@ -315,10 +316,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SCHEDULES_CELL_PAGE));
 				if(id) 
 				{
-					_schedulesCellPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_schedulesCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such schedules cell page : "+ e.getMessage());
 			}
@@ -327,10 +328,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_LINES_ROW_PAGE));
 				if(id) 
 				{
-					_linesRowPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_linesRowPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such lines row page : "+ e.getMessage());
 			}
@@ -339,10 +340,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_LINE_MARKER_PAGE));
 				if(id) 
 				{
-					_lineMarkerPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_lineMarkerPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such line marker page : "+ e.getMessage());
 			}
@@ -351,10 +352,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_BOARD_PAGE));
 				if(id) 
 				{
-					_boardPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_boardPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such board page : "+ e.getMessage());
 			}
@@ -363,10 +364,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_WARNING_PAGE));
 				if(id)
 				{
-					_warningPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_warningPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such warning page : "+ e.getMessage());
 			}
@@ -375,10 +376,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_RESERVATION_PAGE));
 				if(id) 
 				{
-					_reservationPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_reservationPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such reservation page : "+ e.getMessage());
 			}
@@ -387,10 +388,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_DURATION_PAGE));
 				if(id) 
 				{
-					_durationPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_durationPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such duration page : "+ e.getMessage());
 			}
@@ -399,10 +400,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_TEXT_DURATION_PAGE));
 				if(id) 
 				{
-					_textDurationPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_textDurationPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such text duration page : "+ e.getMessage());
 			}
@@ -411,10 +412,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_PAGE));
 				if(id) 
 				{
-					_mapPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_mapPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such map page : "+ e.getMessage());
 			}
@@ -423,10 +424,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_LINE_PAGE));
 				if(id) 
 				{
-					_mapLinePage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_mapLinePage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such map line page : "+ e.getMessage());
 			}
@@ -435,10 +436,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_DATE_TIME_PAGE));
 				if(id) 
 				{
-					_dateTimePage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_dateTimePage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such date time page : "+ e.getMessage());
 			}
@@ -447,10 +448,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_STOP_CELL_PAGE));
 				if(id) 
 				{
-					_stopCellPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_stopCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such stop cell page : "+ e.getMessage());
 			}
@@ -459,10 +460,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SERVICE_CELL_PAGE));
 				if(id) 
 				{
-					_serviceCellPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_serviceCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such service cell page : "+ e.getMessage());
 			}
@@ -471,10 +472,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_JUNCTION_CELL_PAGE));
 				if(id)
 				{
-					_junctionPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_junctionPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such junction cell page : "+ e.getMessage());
 			}
@@ -483,10 +484,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_STOP_PAGE));
 				if(id) 
 				{
-					_mapStopCellPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_mapStopCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such map stop page : "+ e.getMessage());
 			}
@@ -495,10 +496,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_SERVICE_PAGE));
 				if(id) 
 				{
-					_mapServiceCellPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_mapServiceCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such map service page : "+ e.getMessage());
 			}
@@ -507,10 +508,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_JUNCTION_PAGE));
 				if(id)
 				{
-					_mapJunctionPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_mapJunctionPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such map junction page : "+ e.getMessage());
 			}

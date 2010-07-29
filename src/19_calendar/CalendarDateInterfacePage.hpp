@@ -35,9 +35,9 @@ namespace synthese
 		class Request;
 	}
 	
-	namespace transportwebsite
+	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 	}
 
 	namespace calendar
@@ -75,7 +75,7 @@ namespace synthese
 			*/
 			static void Display(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
+				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
 				boost::gregorian::date value,
 				bool isActive

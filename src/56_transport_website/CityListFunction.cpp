@@ -21,11 +21,10 @@
 */
 
 #include "CityListFunction.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "PlacesListInterfacePage.h"
 #include "Types.h"
-#include "Site.h"
-#include "PlacesListModule.h"
+#include "TransportWebsite.h"
 #include "RequestException.h"
 #include "City.h"
 #include "Interface.h"
@@ -43,6 +42,7 @@ namespace synthese
 	using namespace util;
 	using namespace lexmatcher;
 	using namespace transportwebsite;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<CityListFunction::_FunctionWithSite,CityListFunction>::FACTORY_KEY("lc");
 	
@@ -56,7 +56,7 @@ namespace synthese
 		
 		void CityListFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			Site::CitiesMatcher::MatchResult matches(
+			TransportWebsite::CitiesMatcher::MatchResult matches(
 				_site->getCitiesMatcher().bestMatches(_input, _n)
 			);
 
@@ -114,11 +114,11 @@ namespace synthese
 
 			if(map.getOptional<RegistryKeyType>(PARAMETER_PAGE))
 			{
-				_page = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(PARAMETER_PAGE));
+				_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE));
 			}
 			if(map.getOptional<RegistryKeyType>(PARAMETER_ITEM_PAGE))
 			{
-				_itemPage = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(PARAMETER_ITEM_PAGE));
+				_itemPage = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_ITEM_PAGE));
 			}
 			_input = map.get<string>(PARAMETER_INPUT);
 			_isForOrigin = map.getDefault<bool>(PARAMETER_IS_FOR_ORIGIN, false);

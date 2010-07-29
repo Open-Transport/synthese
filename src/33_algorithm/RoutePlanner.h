@@ -30,7 +30,7 @@
 #include "VertexAccessMap.h"
 #include "ServicePointer.h"
 #include "AccessParameters.h"
-#include "RoutePlannerTypes.h"
+#include "AlgorithmTypes.h"
 #include "Exception.h"
 #include "RoutePlanningIntermediateJourney.hpp"
 

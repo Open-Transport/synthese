@@ -26,7 +26,7 @@
 #include "StaticFunctionRequest.h"
 #include "ForumMessageTableSync.hpp"
 #include "ForumTopicTableSync.hpp"
-#include "WebPage.h"
+#include "Webpage.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -37,7 +37,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace server;
-	using namespace transportwebsite;
+	using namespace cms;
 	using namespace util;
 
 	namespace forum
@@ -61,8 +61,8 @@ namespace synthese
 
 		void ForumInterfacePage::DisplayTopic(
 			std::ostream& stream,
-			const transportwebsite::WebPage& page,
-			boost::shared_ptr<const transportwebsite::WebPage> dateDisplayPage,
+			const cms::Webpage& page,
+			boost::shared_ptr<const cms::Webpage> dateDisplayPage,
 			const server::Request& request,
 			const ForumTopic& topic,
 			std::size_t rank
@@ -147,8 +147,8 @@ namespace synthese
 
 		void ForumInterfacePage::DisplayMessage(
 			std::ostream& stream,
-			const transportwebsite::WebPage& page,
-			boost::shared_ptr<const transportwebsite::WebPage> dateDisplayPage,
+			const cms::Webpage& page,
+			boost::shared_ptr<const cms::Webpage> dateDisplayPage,
 			const server::Request& request,
 			const ForumMessage& message,
 			std::size_t rank

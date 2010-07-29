@@ -80,7 +80,7 @@ namespace synthese
 			{
 				_page = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_WEB_PAGE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<WebPage>& e)
+			catch(ObjectNotFoundException<Webpage>& e)
 			{
 				throw ActionException("No such page");
 			}
@@ -91,7 +91,7 @@ namespace synthese
 			try
 			{
 				_up = WebPageTableSync::GetEditable(id, *_env);
-				for(WebPage* page(_up.get()); page != NULL; page = page->getParent())
+				for(Webpage* page(_up.get()); page != NULL; page = page->getParent())
 				{
 					if(page == _page.get())
 					{
@@ -99,7 +99,7 @@ namespace synthese
 					}
 				}
 			}
-			catch(ObjectNotFoundException<WebPage>&)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw ActionException("No such up page");
 			}
@@ -110,7 +110,7 @@ namespace synthese
 			{
 				_template = WebPageTableSync::GetEditable(templateId, *_env);
 			}
-			catch(ObjectNotFoundException<WebPage>&)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw ActionException("No such template page");
 			}
@@ -186,7 +186,7 @@ namespace synthese
 
 
 
-		void WebPageUpdateAction::setWebPage( boost::shared_ptr<WebPage> value )
+		void WebPageUpdateAction::setWebPage( boost::shared_ptr<Webpage> value )
 		{
 			_page = value;
 		}

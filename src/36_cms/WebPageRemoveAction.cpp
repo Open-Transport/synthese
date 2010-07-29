@@ -66,7 +66,7 @@ namespace synthese
 			{
 				_page = WebPageTableSync::Get(map.get<RegistryKeyType>(PARAMETER_WEB_PAGE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<WebPage>& e)
+			catch(ObjectNotFoundException<Webpage>& e)
 			{
 				throw ActionException("No such page");
 			}
@@ -101,7 +101,7 @@ namespace synthese
 
 
 
-		void WebPageRemoveAction::setPage( boost::shared_ptr<const WebPage> value )
+		void WebPageRemoveAction::setPage( boost::shared_ptr<const Webpage> value )
 		{
 			_page = value;
 		}

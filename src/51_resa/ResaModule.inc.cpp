@@ -1,19 +1,19 @@
 
-#include "31_resa/ResaModule.h"
+#include "ResaModule.h"
 
-#include "31_resa/ReservationTableSync.h"
-#include "31_resa/ReservationTransactionTableSync.h"
-#include "31_resa/OnlineReservationRuleTableSync.h"
+#include "ReservationTableSync.h"
+#include "ReservationTransactionTableSync.h"
+#include "OnlineReservationRuleTableSync.h"
 
-#include "31_resa/ResaRight.h"
+#include "ResaRight.h"
 
-#include "31_resa/ResaDBLog.h"
+#include "ResaDBLog.h"
 
-#include "31_resa/BookReservationAction.h"
-#include "31_resa/CancelReservationAction.h"
-#include "31_resa/CallBeginAction.h"
-#include "31_resa/CallEndAction.h"
-#include "31_resa/ResaLogEntryUpdateAction.h"
+#include "BookReservationAction.h"
+#include "CancelReservationAction.h"
+#include "CallBeginAction.h"
+#include "CallEndAction.h"
+#include "ResaLogEntryUpdateAction.h"
 #include "ReservationUserUpdateAction.h"
 #include "SendPasswordAction.h"
 
@@ -34,13 +34,13 @@
 
 #include "ResaCallButtonInterfaceElement.h"
 
-#include "31_resa/BookableCommercialLineAdmin.h"
-#include "31_resa/BookableCommercialLinesAdmin.h"
-#include "31_resa/ResaCustomerAdmin.h"
-#include "31_resa/ResaCustomersAdmin.h"
-#include "31_resa/ReservationRoutePlannerAdmin.h"
-#include "31_resa/ResaLogAdmin.h"
-#include "31_resa/ResaEditLogEntryAdmin.h"
+#include "BookableCommercialLineAdmin.h"
+#include "BookableCommercialLinesAdmin.h"
+#include "ResaCustomerAdmin.h"
+#include "ResaCustomersAdmin.h"
+#include "ReservationRoutePlannerAdmin.h"
+#include "ResaLogAdmin.h"
+#include "ResaEditLogEntryAdmin.h"
 #include "CallStatisticsAdmin.h"
 #include "ResaStatisticsAdmin.h"
 #include "ResaStatisticsMenuAdmin.h"

@@ -45,7 +45,7 @@ namespace synthese
 
 		void DateTimeInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const cms::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			const boost::posix_time::ptime& dateTime
 		){
@@ -69,7 +69,7 @@ namespace synthese
 
 		void DateTimeInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const cms::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			const boost::gregorian::date& date
 		){
@@ -91,7 +91,7 @@ namespace synthese
 
 		void DateTimeInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const cms::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			const boost::posix_time::time_duration& duration
 		){

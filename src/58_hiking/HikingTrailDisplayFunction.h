@@ -54,7 +54,7 @@ namespace synthese
 		///		</ul>
 		///	</ul>
 		class HikingTrailDisplayFunction:
-			public util::FactorableTemplate<transportwebsite::FunctionWithSite<true>, HikingTrailDisplayFunction>
+			public util::FactorableTemplate<cms::FunctionWithSite<true>, HikingTrailDisplayFunction>
 		{
 		public:
 			static const std::string PARAMETER_KEY;

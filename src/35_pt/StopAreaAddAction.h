@@ -55,9 +55,9 @@ namespace synthese
 		///		<li>actionParamsn : stop name</li>
 		///		<li>actionParamcp : creation of a physical stop</li>
 		///		<li>actionParamsc : operator code of the physical stop to create (if creation activated)</li>
-		///		<li>actionParamxx : x coordinates of the physical stop to create (lambert II étandu projection)</li>
-		///		<li>actionParamyy : y coordinates of the physical stop to create (lambert II étandu projection)</li>
-		///		<li>actionParamyy : y coordinates of the physical stop to create (lambert II étandu projection)</li>
+		///		<li>actionParamxx : x coordinates of the physical stop to create (lambert II étendu projection)</li>
+		///		<li>actionParamyy : y coordinates of the physical stop to create (lambert II étendu projection)</li>
+		///		<li>actionParamyy : y coordinates of the physical stop to create (lambert II étendu projection)</li>
 		///	</ul>
 		class StopAreaAddAction:
 			public util::FactorableTemplate<server::Action, StopAreaAddAction>

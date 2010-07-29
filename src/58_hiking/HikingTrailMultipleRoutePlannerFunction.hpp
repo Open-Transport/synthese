@@ -27,7 +27,7 @@
 
 #include "FactorableTemplate.h"
 #include "Function.h"
-#include "Site.h"
+#include "TransportWebsite.h"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
 
@@ -38,9 +38,9 @@ namespace synthese
 		class NamedPlace;
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 	}
 
 	namespace hiking
@@ -113,40 +113,40 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				transportwebsite::Site::ExtendedFetchPlaceResult	_place;
+				cms::TransportWebsite::ExtendedFetchPlaceResult	_place;
 				boost::shared_ptr<const HikingTrail> _trail;
 				std::size_t _beginningRank;
 				std::vector<std::size_t> _endingRanks;
-				boost::shared_ptr<const transportwebsite::Site> _site;
+				boost::shared_ptr<const cms::TransportWebsite> _site;
 				boost::gregorian::date					_beginningDay;
 				std::size_t								_beginningPeriodId;
-				const transportwebsite::HourPeriod*		_beginningPeriod;
+				const cms::HourPeriod*		_beginningPeriod;
 				boost::gregorian::date					_endingDay;
 				std::size_t								_endingPeriodId;
-				const transportwebsite::HourPeriod*		_endingPeriod;
+				const cms::HourPeriod*		_endingPeriod;
 			//@}
 
 			//! @name Display pages
 			//@{
-				boost::shared_ptr<const transportwebsite::WebPage> _page;
-				boost::shared_ptr<const transportwebsite::WebPage> _schedulesRowPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _schedulesCellPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _linesRowPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _lineMarkerPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _boardPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _warningPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _reservationPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _durationPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _textDurationPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _mapPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _mapLinePage;
-				boost::shared_ptr<const transportwebsite::WebPage> _dateTimePage;
-				boost::shared_ptr<const transportwebsite::WebPage> _stopCellPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _serviceCellPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _junctionPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _mapStopCellPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _mapServiceCellPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _mapJunctionPage;
+				boost::shared_ptr<const cms::Webpage> _page;
+				boost::shared_ptr<const cms::Webpage> _schedulesRowPage;
+				boost::shared_ptr<const cms::Webpage> _schedulesCellPage;
+				boost::shared_ptr<const cms::Webpage> _linesRowPage;
+				boost::shared_ptr<const cms::Webpage> _lineMarkerPage;
+				boost::shared_ptr<const cms::Webpage> _boardPage;
+				boost::shared_ptr<const cms::Webpage> _warningPage;
+				boost::shared_ptr<const cms::Webpage> _reservationPage;
+				boost::shared_ptr<const cms::Webpage> _durationPage;
+				boost::shared_ptr<const cms::Webpage> _textDurationPage;
+				boost::shared_ptr<const cms::Webpage> _mapPage;
+				boost::shared_ptr<const cms::Webpage> _mapLinePage;
+				boost::shared_ptr<const cms::Webpage> _dateTimePage;
+				boost::shared_ptr<const cms::Webpage> _stopCellPage;
+				boost::shared_ptr<const cms::Webpage> _serviceCellPage;
+				boost::shared_ptr<const cms::Webpage> _junctionPage;
+				boost::shared_ptr<const cms::Webpage> _mapStopCellPage;
+				boost::shared_ptr<const cms::Webpage> _mapServiceCellPage;
+				boost::shared_ptr<const cms::Webpage> _mapJunctionPage;
 			//@}
 			
 			

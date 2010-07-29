@@ -22,7 +22,7 @@
 
 #include "BookReservationAction.h"
 
-#include "Site.h"
+#include "TransportWebsite.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "RoutePlannerFunction.h"
 #include "PTTimeSlotRoutePlanner.h"
@@ -49,7 +49,7 @@
 #include "UseRule.h"
 #include "NamedPlace.h"
 #include "RoadPlace.h"
-#include "Types.h"
+#include "ResaTypes.h"
 #include "User.h"
 #include "UserTableSync.h"
 #include "GeographyModule.h"
@@ -216,11 +216,11 @@ namespace synthese
 			if (_customer->getPhone().empty())
 				throw ActionException("Client sans numéro de téléphone. Veuillez renseigner ce champ dans la fiche client et recommencer la réservation.");
 
-			// Site
+			// Website
 			RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_SITE, 0));
-			if (id > 0 && Env::GetOfficialEnv().getRegistry<Site>().contains(id))
+			if (id > 0 && Env::GetOfficialEnv().getRegistry<TransportWebsite>().contains(id))
 			{
-				_site = Env::GetOfficialEnv().getRegistry<Site>().get(id);
+				_site = Env::GetOfficialEnv().getRegistry<TransportWebsite>().get(id);
 			}
 
 			// Seats number

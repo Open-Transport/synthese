@@ -26,7 +26,7 @@
 #include "Request.h"
 #include "WebPageLinkFunction.hpp"
 #include "HTMLModule.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
 
@@ -62,9 +62,9 @@ namespace synthese
 		{
 			try
 			{
-				_target = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(PARAMETER_TARGET));
+				_target = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_TARGET));
 			}
-			catch(ObjectNotFoundException<WebPage>&)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such web page");
 			}

@@ -25,12 +25,12 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "WebPageMenuFunction.hpp"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
 #include "WebPageTableSync.h"
 #include "HTMLModule.h"
-#include "PlacesListModule.h"
+#include "CMSModule.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -83,9 +83,9 @@ namespace synthese
 			{
 				if(*_rootId > 0) try
 				{
-					_root = Env::GetOfficialEnv().get<WebPage>(*_rootId);
+					_root = Env::GetOfficialEnv().get<Webpage>(*_rootId);
 				}
-				catch (ObjectNotFoundException<WebPage>&)
+				catch (ObjectNotFoundException<Webpage>&)
 				{
 					throw RequestException("No such root page");
 				}
@@ -125,7 +125,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			shared_ptr<const WebPage> currentPage(PlacesListModule::GetWebPage(request));
+			shared_ptr<const Webpage> currentPage(CMSModule::GetWebPage(request));
 			_getMenuContentRecursive(
 				stream,
 				request,
@@ -155,9 +155,9 @@ namespace synthese
 		bool WebPageMenuFunction::_getMenuContentRecursive(
 			std::ostream& stream,
 			const server::Request& request /*= NULL*/,
-			boost::shared_ptr<const WebPage> root,
+			boost::shared_ptr<const Webpage> root,
 			std::size_t depth,
-			boost::shared_ptr<const WebPage> currentPage
+			boost::shared_ptr<const Webpage> currentPage
 		) const	{
 			/** - Page in branch update */
 			bool returned_page_in_branch(currentPage.get() ? (root == currentPage) : false);
@@ -177,7 +177,7 @@ namespace synthese
 					root.get() ? optional<RegistryKeyType>() : currentPage->getRoot()->getKey(),
 					root.get() ? root->getKey() : optional<RegistryKeyType>(0)
 			)	);
-			BOOST_FOREACH(shared_ptr<WebPage> page, pages)
+			BOOST_FOREACH(shared_ptr<Webpage> page, pages)
 			{
 				if(!page->mustBeDisplayed())
 				{
@@ -187,7 +187,7 @@ namespace synthese
 				returned_page_in_branch |= _getMenuContentRecursive(
 					submenu,
 					request,
-					const_pointer_cast<const WebPage>(page),
+					const_pointer_cast<const Webpage>(page),
 					depth + 1,
 					currentPage
 				);

@@ -41,7 +41,7 @@
 #include "TimetableResult.hpp"
 #include "PhysicalStopTableSync.h"
 #include "ConnectionPlaceTableSync.h"
-#include "WebPage.h"
+#include "Webpage.h"
 
 using namespace std;
 using namespace boost;
@@ -56,7 +56,7 @@ namespace synthese
 	using namespace calendar;
 	using namespace graph;
 	using namespace pt;
-	using namespace transportwebsite;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,timetables::TimetableGenerateFunction>::FACTORY_KEY("TimetableGenerateFunction");
 	
@@ -289,10 +289,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
 				if(id)
 				{
-					_page = Env::GetOfficialEnv().get<WebPage>(*id);
+					_page = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such page : "+ e.getMessage());
 			}
@@ -301,10 +301,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_NOTE_PAGE_ID));
 				if(id) 
 				{
-					_notePage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_notePage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such note row page : "+ e.getMessage());
 			}
@@ -313,10 +313,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_NOTE_CALENDAR_PAGE_ID));
 				if(id)
 				{
-					_noteCalendarPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_noteCalendarPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such note calendar page : "+ e.getMessage());
 			}
@@ -325,10 +325,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_ROW_PAGE_ID));
 				if(id)
 				{
-					_rowPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_rowPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such row page : "+ e.getMessage());
 			}
@@ -337,10 +337,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_CELL_PAGE_ID));
 				if(id) 
 				{
-					_cellPage = Env::GetOfficialEnv().get<WebPage>(*id);
+					_cellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such cell page : "+ e.getMessage());
 			}
@@ -349,10 +349,10 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_FOR_SUB_TIMETABLE_ID));
 				if(id) 
 				{
-					_pageForSubTimetable = Env::GetOfficialEnv().get<WebPage>(*id);
+					_pageForSubTimetable = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
-			catch (ObjectNotFoundException<WebPage>& e)
+			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such page for sub timetable : "+ e.getMessage());
 			}

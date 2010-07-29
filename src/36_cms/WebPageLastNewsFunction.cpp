@@ -25,9 +25,9 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "WebPageLastNewsFunction.hpp"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "WebPageTableSync.h"
-#include "PlacesListModule.h"
+#include "CMSModule.hpp"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
 #include "WebPageInterfacePage.h"
@@ -76,9 +76,9 @@ namespace synthese
 			optional<RegistryKeyType> rootId(map.get<RegistryKeyType>(PARAMETER_ROOT_ID));
 			if(rootId) try
 			{
-				_root = Env::GetOfficialEnv().get<WebPage>(*rootId);
+				_root = Env::GetOfficialEnv().get<Webpage>(*rootId);
 			}
-			catch (ObjectNotFoundException<WebPage>&)
+			catch (ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such root page");
 			}
@@ -86,9 +86,9 @@ namespace synthese
 			optional<RegistryKeyType> displayId(map.getOptional<RegistryKeyType>(PARAMETER_DISPLAY_PAGE_ID));
 			if(displayId) try
 			{
-				_displayPage = Env::GetOfficialEnv().get<WebPage>(*displayId);
+				_displayPage = Env::GetOfficialEnv().get<Webpage>(*displayId);
 			}
-			catch (ObjectNotFoundException<WebPage>&)
+			catch (ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such display page");
 			}
@@ -101,8 +101,8 @@ namespace synthese
 			const Request& request
 		) const {
 
-			shared_ptr<const WebSite> site(PlacesListModule::GetSite(request));
-			shared_ptr<const WebPage> curPage(PlacesListModule::GetWebPage(request));
+			shared_ptr<const WebSite> site(CMSModule::GetSite(request));
+			shared_ptr<const Webpage> curPage(CMSModule::GetWebPage(request));
 
 			WebPageTableSync::SearchResult pages(
 				WebPageTableSync::Search(
@@ -137,7 +137,7 @@ namespace synthese
 			}
 
 			size_t number(0);
-			BOOST_FOREACH(shared_ptr<WebPage> page, pages)
+			BOOST_FOREACH(shared_ptr<Webpage> page, pages)
 			{
 				if(!page->mustBeDisplayed())
 				{

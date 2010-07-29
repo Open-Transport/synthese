@@ -25,12 +25,11 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "PTNetworksListFunction.hpp"
-#include "Site.h"
 #include "Interface.h"
 #include "PTNetworkListItemInterfacePage.hpp"
 #include "TransportNetworkTableSync.h"
 #include "Env.h"
-#include "WebPage.h"
+#include "Webpage.h"
 
 #include <boost/foreach.hpp>
 
@@ -42,7 +41,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace transportwebsite;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,pt::PTNetworksListFunction>::FACTORY_KEY("PTNetworksListFunction");
 	
@@ -65,9 +64,9 @@ namespace synthese
 			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
 			if(id) try
 			{
-				_page = Env::GetOfficialEnv().get<WebPage>(*id);
+				_page = Env::GetOfficialEnv().get<Webpage>(*id);
 			}
-			catch (ObjectNotFoundException<WebPage>&)
+			catch (ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such web page");
 			}

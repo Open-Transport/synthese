@@ -43,7 +43,7 @@ namespace synthese
 		class WebPageRemoveAction;
 		class WebPageAddAction;
 		class WebPageMoveAction;
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 36.14 Admin : Web page edition.
@@ -69,7 +69,7 @@ namespace synthese
 		private:
 			/// @name Attributes
 			//@{
-				boost::shared_ptr<const WebPage> _page;
+				boost::shared_ptr<const Webpage> _page;
 			//@}
 
 			static void _displaySubPages(
@@ -174,7 +174,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets the current tree branch.
 			/// @return the parent page
-			virtual AdminInterfaceElement::PageLinks _getCurrentTreeBranch() const;
+//			virtual AdminInterfaceElement::PageLinks _getCurrentTreeBranch() const;
 
 
 			
@@ -207,7 +207,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setPage(boost::shared_ptr<const WebPage> value) { _page = value; }
+				void setPage(boost::shared_ptr<const Webpage> value) { _page = value; }
 			//@}
 
 

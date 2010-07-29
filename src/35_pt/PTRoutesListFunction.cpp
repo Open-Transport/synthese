@@ -29,7 +29,7 @@
 #include "Line.h"
 #include "Env.h"
 #include "PTRoutesListItemInterfacePage.hpp"
-#include "WebPage.h"
+#include "Webpage.h"
 
 #include <boost/foreach.hpp>
 
@@ -74,9 +74,9 @@ namespace synthese
 			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
 			if(id) try
 			{
-				_page = Env::GetOfficialEnv().get<WebPage>(*id);
+				_page = Env::GetOfficialEnv().get<Webpage>(*id);
 			}
-			catch (ObjectNotFoundException<WebPage>&)
+			catch (ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such page");
 			}

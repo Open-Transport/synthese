@@ -24,7 +24,7 @@
 
 #include "SelectQuery.hpp"
 #include "ObjectSiteLinkTableSync.h"
-#include "SiteTableSync.h"
+#include "TransportWebsiteTableSync.h"
 #include "CityTableSync.h"
 #include "ReplaceQuery.h"
 #include "UtilTypes.h"
@@ -41,7 +41,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,ObjectSiteLinkTableSync>::FACTORY_KEY("36.11 Object Site Links");
+		template<> const string FactorableTemplate<SQLiteTableSync,ObjectSiteLinkTableSync>::FACTORY_KEY("56.11 Object Website Links");
 	}
 
 	namespace transportwebsite
@@ -86,7 +86,7 @@ namespace synthese
 			RegistryKeyType id(rows->getLongLong(ObjectSiteLinkTableSync::COL_SITE_ID));
 			try
 			{
-				object->setSite(SiteTableSync::Get(id, env, linkLevel).get());
+				object->setSite(TransportWebsiteTableSync::Get(id, env, linkLevel).get());
 			}
 			catch(Exception e)
 			{
@@ -96,7 +96,7 @@ namespace synthese
 			{
 				if(decodeTableId(object->getObjectId()) == CityTableSync::TABLE.ID)
 				{
-					shared_ptr<Site> site(SiteTableSync::GetEditable(id, env, linkLevel));
+					shared_ptr<TransportWebsite> site(TransportWebsite::GetEditable(id, env, linkLevel));
 					shared_ptr<City> city(CityTableSync::GetEditable(object->getObjectId(), env, linkLevel));
 					site->addCity(city.get());
 				}

@@ -34,7 +34,7 @@
 #include "TimetableResult.hpp"
 #include "CalendarTemplate.h"
 #include "StaticFunctionRequest.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "WebPageDisplayFunction.h"
 
 #include <boost/lexical_cast.hpp>
@@ -49,7 +49,7 @@ namespace synthese
 	using namespace timetables;
 	using namespace graph;
 	using namespace server;
-	using namespace transportwebsite;
+	using namespace cms;
 
 	namespace timetables
 	{
@@ -72,12 +72,12 @@ namespace synthese
 
 		void TimetableInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
-			boost::shared_ptr<const transportwebsite::WebPage> notePage,
-			boost::shared_ptr<const transportwebsite::WebPage> noteCalendarPage,
-			boost::shared_ptr<const transportwebsite::WebPage> pageForSubTimetable,
-			boost::shared_ptr<const transportwebsite::WebPage> rowPage,
-			boost::shared_ptr<const transportwebsite::WebPage> cellPage,
+			boost::shared_ptr<const cms::Webpage> page,
+			boost::shared_ptr<const cms::Webpage> notePage,
+			boost::shared_ptr<const cms::Webpage> noteCalendarPage,
+			boost::shared_ptr<const cms::Webpage> pageForSubTimetable,
+			boost::shared_ptr<const cms::Webpage> rowPage,
+			boost::shared_ptr<const cms::Webpage> cellPage,
 			const server::Request& request,
 			const Timetable& object,
 			const timetables::TimetableGenerator& generator,

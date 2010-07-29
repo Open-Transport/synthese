@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// WebPageRemoveAction action class.
@@ -44,7 +44,7 @@ namespace synthese
 			static const std::string PARAMETER_WEB_PAGE_ID;
 
 		private:
-			boost::shared_ptr<const WebPage> _page;
+			boost::shared_ptr<const Webpage> _page;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -76,7 +76,7 @@ namespace synthese
 
 
 
-			void setPage(boost::shared_ptr<const WebPage> value);
+			void setPage(boost::shared_ptr<const Webpage> value);
 		};
 	}
 }

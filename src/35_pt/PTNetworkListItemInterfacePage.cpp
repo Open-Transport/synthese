@@ -34,7 +34,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace pt;
-	using namespace transportwebsite;
+	using namespace cms;
 	using namespace server;
 
 	namespace pt
@@ -46,7 +46,7 @@ namespace synthese
 
 		void PTNetworkListItemInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const Webpage> page,
 			const server::Request& request,
 			const pt::TransportNetwork& object,
 			std::size_t rank

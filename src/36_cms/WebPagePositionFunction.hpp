@@ -65,8 +65,8 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const WebPage> _page;
-				boost::shared_ptr<const WebPage> _displayPage;
+				boost::shared_ptr<const Webpage> _page;
+				boost::shared_ptr<const Webpage> _displayPage;
 				std::size_t _minDepth;
 				boost::optional<std::size_t> _maxDepth;
 			//@}

@@ -27,7 +27,7 @@
 #include "PlacesListFunction.h"
 #include "PlacesListRequestFunction.hpp"
 #include "StaticFunctionRequest.h"
-#include "PlacesListModule.h"
+#include "CMSModule.hpp"
 
 using namespace std;
 
@@ -69,7 +69,7 @@ namespace synthese
 			const Request& request
 		) const {
 			StaticFunctionRequest<PlacesListFunction> plrequest(request, true);
-			plrequest.getFunction()->setSite(PlacesListModule::GetSite(request));
+			plrequest.getFunction()->setSite(dynamic_pointer_cast<const TransportWebsite, const Website>(CMSModule::GetSite(request)));
 			plrequest.getFunction()->setTextInput(_textField);
 			plrequest.getFunction()->setIsForOrigin(_forDeparture);
 			plrequest.getFunction()->setNumber(_number);

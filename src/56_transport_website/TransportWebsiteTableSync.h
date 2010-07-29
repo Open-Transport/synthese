@@ -1,6 +1,6 @@
 
-/** SiteTableSync class header.
-	@file SiteTableSync.h
+/** TransportWebsiteTableSync class header.
+	@file TransportWebsiteTableSync.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -24,7 +24,8 @@
 #define SYNTHESE_SiteTableSync_H__
 
 #include "SQLiteRegistryTableSyncTemplate.h"
-#include "Site.h"
+#include "TransportWebsite.h"
+#include "FetcherTemplate.h"
 
 #include <string>
 #include <iostream>
@@ -39,8 +40,9 @@ namespace synthese
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t025_sites
-		class SiteTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<SiteTableSync,Site>
+		class TransportWebsiteTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>,
+			public db::FetcherTemplate<cms::Website, TransportWebsiteTableSync>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;
@@ -57,11 +59,11 @@ namespace synthese
 
 
 
-			/** Site search.
+			/** TransportWebsite search.
 				(other search parameters)
-				@param first First Site object to answer
-				@param number Number of Site objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return Found Site objects.
+				@param first First TransportWebsite object to answer
+				@param number Number of TransportWebsite objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return Found TransportWebsite objects.
 				@author Hugues Romain
 				@date 2006
 			*/

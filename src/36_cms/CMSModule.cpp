@@ -22,7 +22,7 @@
 
 #include "CMSModule.hpp"
 #include "Website.hpp"
-#include "WebPage.h"
+#include "Webpage.h"
 
 namespace synthese
 {
@@ -54,7 +54,7 @@ namespace synthese
 
 	namespace cms
 	{
-
+		Registry<Website>::Map CMSModule::_sites;
 
 
 		boost::shared_ptr<const Website> CMSModule::GetSite(
@@ -87,7 +87,7 @@ namespace synthese
 
 
 
-		boost::shared_ptr<const WebPage> CMSModule::GetWebPage(
+		boost::shared_ptr<const Webpage> CMSModule::GetWebPage(
 			const server::Request& request
 		){
 			shared_ptr<const WebPageDisplayFunction> function(
@@ -98,14 +98,21 @@ namespace synthese
 			{
 				if(function->getAditionnalParametersMap().getDefault<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID, 0))
 				{
-					return Env::GetOfficialEnv().get<WebPage>(function->getAditionnalParametersMap().get<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID));
+					return Env::GetOfficialEnv().get<Webpage>(function->getAditionnalParametersMap().get<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID));
 				}
 				else
 				{
 					return function->getPage();
 				}
 			}
-			return shared_ptr<const WebPage>();
+			return shared_ptr<const Webpage>();
+		}
+
+
+
+		void CMSModule::AddSite( boost::shared_ptr<Website> site )
+		{
+			_site.insert(Registry<WebSite>::Map::value_type(site->getKey(), site));
 		}
 	}
 }

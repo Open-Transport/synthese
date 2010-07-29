@@ -27,7 +27,7 @@
 #include "CityListRequestFunction.hpp"
 #include "CityListFunction.h"
 #include "StaticFunctionRequest.h"
-#include "PlacesListModule.h"
+#include "CMSModule.hpp"
 
 using namespace std;
 
@@ -36,6 +36,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,transportwebsite::CityListRequestFunction>::FACTORY_KEY("city_list_request");
 	
@@ -66,7 +67,7 @@ namespace synthese
 			const Request& request
 		) const {
 			StaticFunctionRequest<CityListFunction> clrequest(request, true);
-			clrequest.getFunction()->setSite(PlacesListModule::GetSite(request));
+			clrequest.getFunction()->setSite(dynamic_pointer_cast<const TransportWebsite, const Website>(CMSModule::GetSite(request)));
 			clrequest.getFunction()->setTextInput(_text);
 			clrequest.getFunction()->setIsForOrigin(_forDeparture);
 			clrequest.getFunction()->setNumber(_number);

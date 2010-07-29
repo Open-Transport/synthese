@@ -1,6 +1,6 @@
 
-/** SiteTableSync class implementation.
-	@file SiteTableSync.cpp
+/** TransportWebsiteTableSync class implementation.
+	@file TransportWebsiteTableSync.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "SiteTableSync.h"
+#include "TransportWebsiteTableSync.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "WebPageTableSync.h"
@@ -43,70 +43,70 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,SiteTableSync>::FACTORY_KEY("36.01 Site");
+		template<> const string FactorableTemplate<SQLiteTableSync,TransportWebsiteTableSync>::FACTORY_KEY("56.01 TransportWebsite");
 	}
 
 	namespace transportwebsite
 	{
-		const string SiteTableSync::TABLE_COL_NAME = "name";
-		const string SiteTableSync::TABLE_COL_START_DATE = "start_date";
-		const string SiteTableSync::TABLE_COL_END_DATE = "end_date";
-		const string SiteTableSync::TABLE_COL_ONLINE_BOOKING = "online_booking";
-		const string SiteTableSync::TABLE_COL_USE_OLD_DATA = "use_old_data";
-		const string SiteTableSync::COL_MAX_CONNECTIONS = "max_connections";
-		const string SiteTableSync::COL_USE_DATES_RANGE("use_dates_range");
-		const string SiteTableSync::COL_PERIODS("periods");
-		const string SiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS("display_road_approach_detail");
-		const string SiteTableSync::COL_CLIENT_URL("cient_url");
-		const string SiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID("default_page_template_id");
+		const string TransportWebsiteTableSync::TABLE_COL_NAME = "name";
+		const string TransportWebsiteTableSync::TABLE_COL_START_DATE = "start_date";
+		const string TransportWebsiteTableSync::TABLE_COL_END_DATE = "end_date";
+		const string TransportWebsiteTableSync::TABLE_COL_ONLINE_BOOKING = "online_booking";
+		const string TransportWebsiteTableSync::TABLE_COL_USE_OLD_DATA = "use_old_data";
+		const string TransportWebsiteTableSync::COL_MAX_CONNECTIONS = "max_connections";
+		const string TransportWebsiteTableSync::COL_USE_DATES_RANGE("use_dates_range");
+		const string TransportWebsiteTableSync::COL_PERIODS("periods");
+		const string TransportWebsiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS("display_road_approach_detail");
+		const string TransportWebsiteTableSync::COL_CLIENT_URL("cient_url");
+		const string TransportWebsiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID("default_page_template_id");
 	}
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<SiteTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TransportWebsiteTableSync>::TABLE(
 			"t025_sites"
 		);
 		
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<SiteTableSync>::_FIELDS[] =
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<TransportWebsiteTableSync>::_FIELDS[] =
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_START_DATE, SQL_DATE),
-			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_END_DATE, SQL_DATE),
-			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_ONLINE_BOOKING, SQL_INTEGER),
-			SQLiteTableSync::Field(SiteTableSync::TABLE_COL_USE_OLD_DATA, SQL_INTEGER),
-			SQLiteTableSync::Field(SiteTableSync::COL_MAX_CONNECTIONS, SQL_INTEGER),
-			SQLiteTableSync::Field(SiteTableSync::COL_USE_DATES_RANGE, SQL_INTEGER),
-			SQLiteTableSync::Field(SiteTableSync::COL_PERIODS, SQL_TEXT),
-			SQLiteTableSync::Field(SiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS, SQL_INTEGER),
-			SQLiteTableSync::Field(SiteTableSync::COL_CLIENT_URL, SQL_TEXT),
-			SQLiteTableSync::Field(SiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID, SQL_TEXT),
+			SQLiteTableSync::Field(TransportWebsiteTableSync::TABLE_COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(TransportWebsiteTableSync::TABLE_COL_START_DATE, SQL_DATE),
+			SQLiteTableSync::Field(TransportWebsiteTableSync::TABLE_COL_END_DATE, SQL_DATE),
+			SQLiteTableSync::Field(TransportWebsiteTableSync::TABLE_COL_ONLINE_BOOKING, SQL_INTEGER),
+			SQLiteTableSync::Field(TransportWebsiteTableSync::TABLE_COL_USE_OLD_DATA, SQL_INTEGER),
+			SQLiteTableSync::Field(TransportWebsiteTableSync::COL_MAX_CONNECTIONS, SQL_INTEGER),
+			SQLiteTableSync::Field(TransportWebsiteTableSync::COL_USE_DATES_RANGE, SQL_INTEGER),
+			SQLiteTableSync::Field(TransportWebsiteTableSync::COL_PERIODS, SQL_TEXT),
+			SQLiteTableSync::Field(TransportWebsiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS, SQL_INTEGER),
+			SQLiteTableSync::Field(TransportWebsiteTableSync::COL_CLIENT_URL, SQL_TEXT),
+			SQLiteTableSync::Field(TransportWebsiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<SiteTableSync>::_INDEXES[] =
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TransportWebsiteTableSync>::_INDEXES[] =
 		{
 			SQLiteTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Load(
-			Site* site,
+		template<> void SQLiteDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Load(
+			TransportWebsite* site,
 			const SQLiteResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
-		    site->setName(rows->getText (SiteTableSync::TABLE_COL_NAME));
-		    site->setStartDate(rows->getDate(SiteTableSync::TABLE_COL_START_DATE));
-		    site->setEndDate(rows->getDate(SiteTableSync::TABLE_COL_END_DATE));
-		    site->setOnlineBookingAllowed(rows->getBool(SiteTableSync::TABLE_COL_ONLINE_BOOKING));
-		    site->setPastSolutionsDisplayed(rows->getBool(SiteTableSync::TABLE_COL_USE_OLD_DATA));
-		    site->setMaxTransportConnectionsCount(rows->getInt(SiteTableSync::COL_MAX_CONNECTIONS));
-		    site->setUseDateRange(days(rows->getInt(SiteTableSync::COL_USE_DATES_RANGE)));
-			site->setDisplayRoadApproachDetail(rows->getBool(SiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS));
-			site->setClientURL(rows->getText(SiteTableSync::COL_CLIENT_URL));
+		    site->setName(rows->getText (TransportWebsiteTableSync::TABLE_COL_NAME));
+		    site->setStartDate(rows->getDate(TransportWebsiteTableSync::TABLE_COL_START_DATE));
+		    site->setEndDate(rows->getDate(TransportWebsiteTableSync::TABLE_COL_END_DATE));
+		    site->setOnlineBookingAllowed(rows->getBool(TransportWebsiteTableSync::TABLE_COL_ONLINE_BOOKING));
+		    site->setPastSolutionsDisplayed(rows->getBool(TransportWebsiteTableSync::TABLE_COL_USE_OLD_DATA));
+		    site->setMaxTransportConnectionsCount(rows->getInt(TransportWebsiteTableSync::COL_MAX_CONNECTIONS));
+		    site->setUseDateRange(days(rows->getInt(TransportWebsiteTableSync::COL_USE_DATES_RANGE)));
+			site->setDisplayRoadApproachDetail(rows->getBool(TransportWebsiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS));
+			site->setClientURL(rows->getText(TransportWebsiteTableSync::COL_CLIENT_URL));
 		    
-		    string periodsStr(rows->getText(SiteTableSync::COL_PERIODS));
+		    string periodsStr(rows->getText(TransportWebsiteTableSync::COL_PERIODS));
 
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 
@@ -130,7 +130,7 @@ namespace synthese
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				RegistryKeyType templateId(rows->getLongLong(SiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID));
+				RegistryKeyType templateId(rows->getLongLong(TransportWebsiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID));
 				try
 				{
 					site->setDefaultTemplate(
@@ -138,7 +138,7 @@ namespace synthese
 						WebPageTableSync::GetEditable(templateId, env, linkLevel).get()
 					);
 				}
-				catch(ObjectNotFoundException<WebPage>& e)
+				catch(ObjectNotFoundException<Webpage>& e)
 				{
 					Log::GetInstance().warn("No such webpage in site", e);
 				}
@@ -147,20 +147,20 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Unlink(
-			Site* obj
+		template<> void SQLiteDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Unlink(
+			TransportWebsite* obj
 		){
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<SiteTableSync,Site>::Save(
-			Site* site,
+		template<> void SQLiteDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Save(
+			TransportWebsite* site,
 			optional<SQLiteTransaction&> transaction
 		){
 			// Preparation
 			stringstream periodstr;
-			const Site::Periods& periods(site->getPeriods());
-			for(Site::Periods::const_iterator it(periods.begin()); it != periods.end(); ++it)
+			const TransportWebsite::Periods& periods(site->getPeriods());
+			for(TransportWebsite::Periods::const_iterator it(periods.begin()); it != periods.end(); ++it)
 			{
 				if (it != periods.begin())
 					periodstr << ",";
@@ -170,7 +170,7 @@ namespace synthese
 			}
 
 			// Query
-			ReplaceQuery<SiteTableSync> query(*site);
+			ReplaceQuery<TransportWebsiteTableSync> query(*site);
 			query.addField(site->getName());
 			query.addField(site->getStartDate());
 			query.addField(site->getEndDate());
@@ -188,7 +188,7 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		SiteTableSync::SearchResult SiteTableSync::Search(
+		TransportWebsiteTableSync::SearchResult TransportWebsiteTableSync::Search(
 			Env& env,
 			std::string name
 			, int first /*= 0*/,
@@ -197,7 +197,7 @@ namespace synthese
 			, bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			SelectQuery<SiteTableSync> query;
+			SelectQuery<TransportWebsiteTableSync> query;
 			if (!name.empty())
 			{
 				query.addWhereField(TABLE_COL_NAME, name, ComposedExpression::OP_LIKE);

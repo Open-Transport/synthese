@@ -32,9 +32,9 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 	}
 
 	namespace server
@@ -128,8 +128,8 @@ namespace synthese
 			///	</ul>
 			static void Display(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
-				boost::shared_ptr<const transportwebsite::WebPage> cellPage,
+				boost::shared_ptr<const cms::Webpage> page,
+				boost::shared_ptr<const cms::Webpage> cellPage,
 				const server::Request& request,
 				const timetables::TimetableColumn& object,
 				const boost::posix_time::time_duration& lastSchedule,
@@ -161,7 +161,7 @@ namespace synthese
 			///	</ul>
 			static void DisplayCell(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
+				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
 				const TimetableColumn::Content::value_type& object,
 				const pt::RollingStock* rollingStock,

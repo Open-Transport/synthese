@@ -38,7 +38,7 @@ namespace synthese
 
 	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 36.11 Interface : Web page display.
@@ -82,9 +82,9 @@ namespace synthese
 			///	</ul>
 			static void Display(
 				std::ostream& stream,
-				const WebPage& templatePage,
+				const Webpage& templatePage,
 				const server::Request& request,
-				const WebPage& page,
+				const Webpage& page,
 				bool edit,
 				bool displayContent = true
 			);

@@ -24,8 +24,8 @@
 
 #include "PlacesListInterfacePage.h"
 #include "Types.h"
-#include "Site.h"
-#include "PlacesListModule.h"
+#include "TransportWebsite.h"
+#include "TransportWebsiteModule.h"
 #include "PlaceAlias.h"
 #include "RequestException.h"
 #include "RoadPlace.h"
@@ -34,7 +34,7 @@
 #include "City.h"
 #include "PTModule.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
-#include "WebPage.h"
+#include "Webpage.h"
 
 #include <boost/foreach.hpp>
 
@@ -50,8 +50,9 @@ namespace synthese
 	using namespace lexmatcher;
 	using namespace geography;
 	using namespace transportwebsite;
+	using namespace cms;
 
-	template<> const string util::FactorableTemplate<PlacesListFunction::_FunctionWithSite,PlacesListFunction>::FACTORY_KEY("lp");
+	template<> const string util::FactorableTemplate<CMSModule::_FunctionWithSite,PlacesListFunction>::FACTORY_KEY("lp");
 
 	namespace transportwebsite
 	{
@@ -97,18 +98,18 @@ namespace synthese
 			optional<RegistryKeyType> pageId(map.getOptional<RegistryKeyType>(PARAMETER_PAGE));
 			if (pageId) try
 			{
-				_page = Env::GetOfficialEnv().get<WebPage>(*pageId);
+				_page = Env::GetOfficialEnv().get<Webpage>(*pageId);
 			}
-			catch(ObjectNotFoundException<WebPage>&)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such web page");
 			}
 			optional<RegistryKeyType> itemPageId(map.getOptional<RegistryKeyType>(PARAMETER_ITEM_PAGE));
 			if (itemPageId) try
 			{
-				_itemPage = Env::GetOfficialEnv().get<WebPage>(*itemPageId);
+				_itemPage = Env::GetOfficialEnv().get<Webpage>(*itemPageId);
 			}
-			catch(ObjectNotFoundException<WebPage>&)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such web page");
 			}
@@ -121,9 +122,13 @@ namespace synthese
 			_cityText = map.get<string>(PARAMETER_CITY_TEXT);
 		}
 
-		void PlacesListFunction::run( std::ostream& stream, const Request& request ) const
-		{
-			Site::CitiesMatcher::MatchResult cities(
+
+
+		void PlacesListFunction::run(
+			std::ostream& stream,
+			const Request& request
+		) const	{
+			TransportWebsite::CitiesMatcher::MatchResult cities(
 				_site->getCitiesMatcher().bestMatches(_cityText, 1)
 			);
 			if (cities.empty())

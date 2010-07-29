@@ -30,9 +30,9 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 	}
 
 	namespace server
@@ -40,7 +40,7 @@ namespace synthese
 		class Request;
 	}
 	
-	namespace timetables
+	namespace cms
 	{
 		class TimetableWarning;
 	}
@@ -92,8 +92,8 @@ namespace synthese
 			///	</li>
 			static void Display(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
-				boost::shared_ptr<const transportwebsite::WebPage> calendarDatePage,
+				boost::shared_ptr<const cms::Webpage> page,
+				boost::shared_ptr<const cms::Webpage> calendarDatePage,
 				const server::Request& request,
 				const timetables::TimetableWarning& object
 			);

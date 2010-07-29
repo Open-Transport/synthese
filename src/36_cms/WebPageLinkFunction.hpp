@@ -33,7 +33,7 @@ namespace synthese
 {
 	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : WebPageLinkFunction.
@@ -68,7 +68,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const WebPage> _target;
+				boost::shared_ptr<const Webpage> _target;
 				std::string _text;
 				server::ParametersMap _otherParameters;
 			//@}

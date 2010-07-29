@@ -94,8 +94,8 @@ namespace synthese
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,WebPage>::Load(
-			WebPage* webpage,
+		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,Webpage>::Load(
+			Webpage* webpage,
 			const SQLiteResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
@@ -127,10 +127,10 @@ namespace synthese
 					{
 						webpage->setRoot(SiteTableSync::GetEditable(id, env, linkLevel).get());
 					}
-					catch(ObjectNotFoundException<Site>& e)
+					catch(ObjectNotFoundException<Website>& e)
 					{
 						Log::GetInstance().warn(
-							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : site " +
+							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : website " +
 							lexical_cast<string>(id) + " not found"
 						);
 					}
@@ -143,7 +143,7 @@ namespace synthese
 					{
 						webpage->setParent(WebPageTableSync::GetEditable(up_id, env, linkLevel).get());
 					}
-					catch(ObjectNotFoundException<WebPage>& e)
+					catch(ObjectNotFoundException<Webpage>& e)
 					{
 						Log::GetInstance().warn(
 							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : up web page " +
@@ -153,7 +153,7 @@ namespace synthese
 				}
 
 				vector<string> links(Conversion::ToStringVector(rows->getText(WebPageTableSync::COL_LINKS)));
-				WebPage::Links pageLinks;
+				Webpage::Links pageLinks;
 				BOOST_FOREACH(const string& link, links)
 				{
 					try
@@ -169,7 +169,7 @@ namespace synthese
 							link + " is not a page id"
 						);
 					}
-					catch(ObjectNotFoundException<WebPage>&)
+					catch(ObjectNotFoundException<Webpage>&)
 					{
 						Log::GetInstance().warn(
 							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : link " +
@@ -183,20 +183,20 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,WebPage>::Unlink(
-			WebPage* obj
+		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,Webpage>::Unlink(
+			Webpage* obj
 		){
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,WebPage>::Save(
-			WebPage* webPage,
+		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,Webpage>::Save(
+			Webpage* webPage,
 			optional<SQLiteTransaction&> transaction
 		){
 			// Links preparation
 			stringstream linksStream;
 			bool first(true);
-			BOOST_FOREACH(const WebPage::Links::value_type& link, webPage->getLinks())
+			BOOST_FOREACH(const Webpage::Links::value_type& link, webPage->getLinks())
 			{
 				if(first)
 				{

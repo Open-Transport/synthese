@@ -32,9 +32,9 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 	}
 
 	namespace hiking
@@ -82,7 +82,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				boost::optional<std::string> _searchName;
-				boost::shared_ptr<const transportwebsite::WebPage> _itemDisplayPage;
+				boost::shared_ptr<const cms::Webpage> _itemDisplayPage;
 			//@}
 			
 			

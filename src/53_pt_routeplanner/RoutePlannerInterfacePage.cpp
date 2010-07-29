@@ -23,7 +23,6 @@
 #include "RoutePlannerInterfacePage.h"
 #include "Request.h"
 #include "HourPeriod.h"
-#include "Site.h"
 #include "User.h"
 #include "City.h"
 #include "Place.h"
@@ -33,7 +32,7 @@
 #include "DateTimeInterfacePage.h"
 #include "PTRoutePlannerResult.h"
 #include "NamedPlace.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "PTRoutePlannerResult.h"
 #include "CommercialLine.h"
 #include "Line.h"
@@ -58,6 +57,7 @@ namespace synthese
 	using namespace pt;
 	using namespace util;
 	using namespace transportwebsite;
+	using namespace cms;	
 	using namespace geography;
 	using namespace graph;
 	using namespace server;
@@ -114,25 +114,25 @@ namespace synthese
 
 		void RoutePlannerInterfacePage::Display(
 			std::ostream& stream,
-			shared_ptr<const WebPage> page,
-			shared_ptr<const WebPage> schedulesRowPage,
-			shared_ptr<const WebPage> schedulesCellPage,
-			shared_ptr<const WebPage> linesRowPage,
-			shared_ptr<const WebPage> lineMarkerPage,
-			shared_ptr<const WebPage> boardPage,
-			shared_ptr<const WebPage> warningPage,
-			shared_ptr<const WebPage> reservationPage,
-			shared_ptr<const WebPage> durationPage,
-			shared_ptr<const WebPage> textDurationPage,
-			shared_ptr<const WebPage> mapPage,
-			shared_ptr<const WebPage> mapLinePage,
-			shared_ptr<const WebPage> dateTimePage,
-			boost::shared_ptr<const transportwebsite::WebPage> stopCellPage,
-			boost::shared_ptr<const transportwebsite::WebPage> serviceCellPage,
-			boost::shared_ptr<const transportwebsite::WebPage> junctionPage,
-			boost::shared_ptr<const transportwebsite::WebPage> mapStopCellPage,
-			boost::shared_ptr<const transportwebsite::WebPage> mapServiceCellPage,
-			boost::shared_ptr<const transportwebsite::WebPage> mapJunctionPage,
+			shared_ptr<const Webpage> page,
+			shared_ptr<const Webpage> schedulesRowPage,
+			shared_ptr<const Webpage> schedulesCellPage,
+			shared_ptr<const Webpage> linesRowPage,
+			shared_ptr<const Webpage> lineMarkerPage,
+			shared_ptr<const Webpage> boardPage,
+			shared_ptr<const Webpage> warningPage,
+			shared_ptr<const Webpage> reservationPage,
+			shared_ptr<const Webpage> durationPage,
+			shared_ptr<const Webpage> textDurationPage,
+			shared_ptr<const Webpage> mapPage,
+			shared_ptr<const Webpage> mapLinePage,
+			shared_ptr<const Webpage> dateTimePage,
+			boost::shared_ptr<const cms::Webpage> stopCellPage,
+			boost::shared_ptr<const cms::Webpage> serviceCellPage,
+			boost::shared_ptr<const cms::Webpage> junctionPage,
+			boost::shared_ptr<const cms::Webpage> mapStopCellPage,
+			boost::shared_ptr<const cms::Webpage> mapServiceCellPage,
+			boost::shared_ptr<const cms::Webpage> mapJunctionPage,
 			const server::Request& request,
 			const ptrouteplanner::PTRoutePlannerResult& object,
 			const boost::gregorian::date& date,
@@ -572,7 +572,7 @@ namespace synthese
 
 		void RoutePlannerInterfacePage::DisplayScheduleCell(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			bool isItFirstRow,
 			bool isItLastRow,
@@ -620,8 +620,8 @@ namespace synthese
 
 		void RoutePlannerInterfacePage::DisplayLinesCell(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
-			boost::shared_ptr<const transportwebsite::WebPage> lineMarkerPage,
+			boost::shared_ptr<const cms::Webpage> page,
+			boost::shared_ptr<const cms::Webpage> lineMarkerPage,
 			const server::Request& request,
 			std::size_t columnNumber,
 			const graph::Journey& journey
@@ -664,7 +664,7 @@ namespace synthese
 
 
 
-		void RoutePlannerInterfacePage::DisplayRow( std::ostream& stream, boost::shared_ptr<const transportwebsite::WebPage> page, const server::Request& request, const geography::NamedPlace& place, const std::string& cells, bool alternateColor, bool isOrigin, bool isDestination )
+		void RoutePlannerInterfacePage::DisplayRow( std::ostream& stream, boost::shared_ptr<const cms::Webpage> page, const server::Request& request, const geography::NamedPlace& place, const std::string& cells, bool alternateColor, bool isOrigin, bool isDestination )
 		{
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);

@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 36.15 Function : display of a web page.
@@ -61,7 +61,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const WebPage>	_page;
+				boost::shared_ptr<const Webpage>	_page;
 				server::ParametersMap _aditionnalParameters;
 				bool					_useTemplate;
 			//@}
@@ -91,14 +91,14 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setPage(boost::shared_ptr<const WebPage> value) { _page = value; }
+				void setPage(boost::shared_ptr<const Webpage> value) { _page = value; }
 				void setUseTemplate(bool value){ _useTemplate = value; }
 				void setAditionnalParametersMap(const server::ParametersMap& value){ _aditionnalParameters = value; }
 			//@}
 
 			//! @name Getters
 			//@{
-				boost::shared_ptr<const WebPage> getPage() const { return _page; }
+				boost::shared_ptr<const Webpage> getPage() const { return _page; }
 				bool getUseTemplate() const { return _useTemplate; }
 				const server::ParametersMap& getAditionnalParametersMap() const { return _aditionnalParameters; }
 			//@}

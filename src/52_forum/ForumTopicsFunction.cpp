@@ -27,7 +27,7 @@
 #include "ForumInterfacePage.hpp"
 #include "ForumTopicsFunction.hpp"
 #include "ForumTopicTableSync.hpp"
-#include "WebPage.h"
+#include "Webpage.h"
 
 #include <boost/foreach.hpp>
 
@@ -74,9 +74,9 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_DISPLAY_TEMPLATE));
 				if(id) try
 				{
-					_displayTemplate = Env::GetOfficialEnv().get<WebPage>(*id);
+					_displayTemplate = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
-				catch (ObjectNotFoundException<WebPage>&)
+				catch (ObjectNotFoundException<Webpage>&)
 				{
 					throw RequestException("No such display template");
 				}
@@ -84,9 +84,9 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_DATE_DISPLAY_TEMPLATE));
 				if(id) try
 				{
-					_dateDisplayTemplate = Env::GetOfficialEnv().get<WebPage>(*id);
+					_dateDisplayTemplate = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
-				catch (ObjectNotFoundException<WebPage>&)
+				catch (ObjectNotFoundException<Webpage>&)
 				{
 					throw RequestException("No such date display template");
 				}

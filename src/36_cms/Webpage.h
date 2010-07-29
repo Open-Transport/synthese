@@ -1,6 +1,6 @@
 
-/** WebPage class header.
-	@file WebPage.h
+/** Webpage class header.
+	@file Webpage.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -66,10 +66,10 @@ namespace synthese
 				<li>\?> ? ?></li>
 			</ul>
 		*/
-		class WebPage:
+		class Webpage:
 			public util::Registrable,
 			public tree::TreeNode<
-				WebPage,
+				Webpage,
 				tree::TreeRankOrderingPolicy,
 				tree::TreeOtherClassRootPolicy<WebSite>
 			>,
@@ -77,12 +77,12 @@ namespace synthese
 		{
 		public:
 			/// Chosen registry class.
-			typedef util::Registry<WebPage>	Registry;
+			typedef util::Registry<Webpage>	Registry;
 
-			typedef std::vector<WebPage*> Links;
+			typedef std::vector<Webpage*> Links;
 
 		private:
-			WebPage* _template;
+			Webpage* _template;
 			std::string _content;
 			boost::posix_time::ptime _startDate;
 			boost::posix_time::ptime _endDate;
@@ -121,7 +121,7 @@ namespace synthese
 			) const;
 
 		public:
-			WebPage(util::RegistryKeyType id = 0);
+			Webpage(util::RegistryKeyType id = 0);
 
 			//! @name Getters
 			//@{
@@ -129,7 +129,7 @@ namespace synthese
 				const boost::posix_time::ptime& getStartDate() const { return _startDate; }
 				const boost::posix_time::ptime& getEndDate() const { return _endDate; }
 				const std::string& _getMimeType() const { return _mimeType; }
-				WebPage* _getTemplate() const { return _template;}
+				Webpage* _getTemplate() const { return _template;}
 				const std::string& getAbstract() const { return _abstract; }
 				const std::string& getImage() const { return _image; }
 				const Links& getLinks() const { return _links; }
@@ -143,7 +143,7 @@ namespace synthese
 				void setStartDate(const boost::posix_time::ptime& value) { _startDate = value; }
 				void setEndDate(const boost::posix_time::ptime& value) { _endDate = value; }
 				void setMimeType(const std::string& value){ _mimeType = value; }
-				void setTemplate(WebPage* value){ _template = value; }
+				void setTemplate(Webpage* value){ _template = value; }
 				void setAbstract(const std::string& value){ _abstract = value; }
 				void setImage(const std::string& value){ _image = value; }
 				void setLinks(const Links& value){ _links = value; }
@@ -175,7 +175,7 @@ namespace synthese
 				///		- the default template of the site
 				/// @author Hugues Romain
 				/// @date 2010
-				WebPage* getTemplate() const;
+				Webpage* getTemplate() const;
 
 
 

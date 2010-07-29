@@ -32,11 +32,14 @@
 
 namespace synthese
 {
+	namespace cms
+	{
+		class Webpage;
+	}
+
 	namespace transportwebsite
 	{
 		class HourPeriod;
-		class Site;
-		class WebPage;
 	}
 
 	namespace server
@@ -221,7 +224,7 @@ namespace synthese
 			*/
 			static void DisplayScheduleCell(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
+				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
 				bool isItFirstRow
 				, bool isItLastRow
@@ -247,8 +250,8 @@ namespace synthese
 			*/
 			static void DisplayLinesCell(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
-				boost::shared_ptr<const transportwebsite::WebPage> lineMarkerPage,
+				boost::shared_ptr<const cms::Webpage> page,
+				boost::shared_ptr<const cms::Webpage> lineMarkerPage,
 				const server::Request& request,
 				std::size_t columnNumber,
 				const graph::Journey& journey
@@ -271,7 +274,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			static void DisplayRow(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
+				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
 				const geography::NamedPlace& place,
 				const std::string& cells,
@@ -292,25 +295,25 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			static void Display(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
-				boost::shared_ptr<const transportwebsite::WebPage> schedulesRowPage,
-				boost::shared_ptr<const transportwebsite::WebPage> schedulesCellPage,
-				boost::shared_ptr<const transportwebsite::WebPage> linesRowPage,
-				boost::shared_ptr<const transportwebsite::WebPage> lineMarkerPage,
-				boost::shared_ptr<const transportwebsite::WebPage> boardPage,
-				boost::shared_ptr<const transportwebsite::WebPage> warningPage,
-				boost::shared_ptr<const transportwebsite::WebPage> reservationPage,
-				boost::shared_ptr<const transportwebsite::WebPage> durationPage,
-				boost::shared_ptr<const transportwebsite::WebPage> textDurationPage,
-				boost::shared_ptr<const transportwebsite::WebPage> mapPage,
-				boost::shared_ptr<const transportwebsite::WebPage> mapLinePage,
-				boost::shared_ptr<const transportwebsite::WebPage> dateTimePage,
-				boost::shared_ptr<const transportwebsite::WebPage> stopCellPage,
-				boost::shared_ptr<const transportwebsite::WebPage> serviceCellPage,
-				boost::shared_ptr<const transportwebsite::WebPage> junctionPage,
-				boost::shared_ptr<const transportwebsite::WebPage> mapStopCellPage,
-				boost::shared_ptr<const transportwebsite::WebPage> mapServiceCellPage,
-				boost::shared_ptr<const transportwebsite::WebPage> mapJunctionPage,
+				boost::shared_ptr<const cms::Webpage> page,
+				boost::shared_ptr<const cms::Webpage> schedulesRowPage,
+				boost::shared_ptr<const cms::Webpage> schedulesCellPage,
+				boost::shared_ptr<const cms::Webpage> linesRowPage,
+				boost::shared_ptr<const cms::Webpage> lineMarkerPage,
+				boost::shared_ptr<const cms::Webpage> boardPage,
+				boost::shared_ptr<const cms::Webpage> warningPage,
+				boost::shared_ptr<const cms::Webpage> reservationPage,
+				boost::shared_ptr<const cms::Webpage> durationPage,
+				boost::shared_ptr<const cms::Webpage> textDurationPage,
+				boost::shared_ptr<const cms::Webpage> mapPage,
+				boost::shared_ptr<const cms::Webpage> mapLinePage,
+				boost::shared_ptr<const cms::Webpage> dateTimePage,
+				boost::shared_ptr<const cms::Webpage> stopCellPage,
+				boost::shared_ptr<const cms::Webpage> serviceCellPage,
+				boost::shared_ptr<const cms::Webpage> junctionPage,
+				boost::shared_ptr<const cms::Webpage> mapStopCellPage,
+				boost::shared_ptr<const cms::Webpage> mapServiceCellPage,
+				boost::shared_ptr<const cms::Webpage> mapJunctionPage,
 				const server::Request& request,
 				const ptrouteplanner::PTRoutePlannerResult& object,
 				const boost::gregorian::date& date,

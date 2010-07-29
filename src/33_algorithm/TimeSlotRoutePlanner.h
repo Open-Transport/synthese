@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_routeplanner_TimeSlotRoutePlanner_h__
 #define SYNTHESE_routeplanner_TimeSlotRoutePlanner_h__
 
-#include "RoutePlannerTypes.h"
+#include "AlgorithmTypes.h"
 #include "Journey.h"
 #include "AccessParameters.h"
 #include "VertexAccessMap.h"

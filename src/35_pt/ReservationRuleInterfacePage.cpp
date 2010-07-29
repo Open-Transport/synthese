@@ -23,7 +23,7 @@
 #include "ReservationRuleInterfacePage.h"
 #include "Journey.h"
 #include "DateTimeInterfacePage.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
 
@@ -38,7 +38,7 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace pt;
-	using namespace transportwebsite;
+	using namespace cms;
 	using namespace server;
 
 	namespace pt
@@ -50,8 +50,8 @@ namespace synthese
 
 		void ReservationRuleInterfacePage::Display(
 			std::ostream& stream,
-			shared_ptr<const WebPage> page,
-			shared_ptr<const WebPage> dateTimePage,
+			shared_ptr<const Webpage> page,
+			shared_ptr<const Webpage> dateTimePage,
 			const Request& request,
 			const Journey& journey
 		){

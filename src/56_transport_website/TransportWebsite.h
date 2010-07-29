@@ -1,6 +1,6 @@
 
-/** Site class header.
-	@file Site.h
+/** TransportWebsiteclass header.
+	@file TransportWebsite.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -25,18 +25,14 @@
 
 #include "HourPeriod.h"
 #include "LexicalMatcher.h"
-#include "Registrable.h"
-#include "Registry.h"
 #include "01_util/Constants.h"
 #include "GraphTypes.h"
 #include "City.h"
 #include "AccessParameters.h"
 #include "RollingStockFilter.h"
-#include "Named.h"
+#include "Website.hpp"
 
-#include <string>
 #include <set>
-#include <boost/date_time/gregorian/greg_date.hpp>
 #include <boost/date_time/gregorian/greg_duration.hpp>
 
 namespace synthese
@@ -58,8 +54,6 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		class WebPage;
-
 		//////////////////////////////////////////////////////////////////////////
 		/// Transport website.
 		///	@ingroup m56
@@ -70,9 +64,9 @@ namespace synthese
 		///  - content management system
 		///  - transport objects selection
 		///  - algorithms parameters
-		class Site:
+		class TransportWebsite:
 			public virtual util::Registrable,
-			public util::Named
+			public cms::Website
 		{
 		public:
 
@@ -88,7 +82,7 @@ namespace synthese
 			};
 
 			/// Chosen registry class.
-			typedef util::Registry<Site>	Registry;
+			typedef util::Registry<TransportWebsite>	Registry;
 
 			typedef std::vector<HourPeriod> Periods;
 			
@@ -97,14 +91,6 @@ namespace synthese
 			typedef std::map<std::size_t,RollingStockFilter*> RollingStockFilters;
 			
 		private:
-			//! \name Properties
-			//@{
-				boost::gregorian::date		_startValidityDate;
-				boost::gregorian::date		_endValidityDate;
-				std::string					_clientURL;
-				WebPage*					_defaultTemplate;
-			//@}
-
 			//! \name Environment
 			//@{
 				std::set<pt::CommercialLine*>	_lines;
@@ -135,36 +121,27 @@ namespace synthese
 
 			//! \name Constructeur
 			//@{
-				Site(util::RegistryKeyType id = 0);
+				TransportWebsite(util::RegistryKeyType id = 0);
 			//@}
 
 			//! \name Setters
 			//@{
-				void setStartDate ( const boost::gregorian::date& dateDebut );
-				void setEndDate ( const boost::gregorian::date& dateFin );
-				void setOnlineBookingAllowed ( const bool valeur );
-				void setPastSolutionsDisplayed ( bool );
-				void setMaxTransportConnectionsCount(int number);
+				void setOnlineBookingAllowed(const bool value){ _onlineBookingAllowed = value; }
+				void setPastSolutionsDisplayed(bool value){ _pastSolutionsDisplayed = value; }
+				void setMaxTransportConnectionsCount(int number){ _maxTransportConnectionsCount = value; }
 				void setUseDateRange(boost::gregorian::date_duration range) { _useDateRange = range; }
 				void setDisplayRoadApproachDetail(bool value) { _displayRoadApproachDetail = value; }
-				void setClientURL(const std::string& value) { _clientURL = value; }
-				void setDefaultTemplate(WebPage* value){ _defaultTemplate = value; }
 			//@}
 
 			//! \name Getters
 			//@{
 				bool							getOnlineBookingAllowed() const { return _onlineBookingAllowed; }
-				bool							getPastSolutionsDisplayed() const;
-				int								getMaxTransportConnectionsCount()	const;
-				const Periods&					getPeriods()	const;
-				boost::gregorian::date_duration	getUseDatesRange()					const;
-				const boost::gregorian::date&	getStartDate()						const;
-				const boost::gregorian::date&	getEndDate()						const;
-				const CitiesMatcher&			getCitiesMatcher () const;
-				const RollingStockFilters&		getRollingStockFilters() const;
+				bool							getPastSolutionsDisplayed() const { return _pastSolutionsDisplayed; }
+				int								getMaxTransportConnectionsCount() const { return _maxTransportConnectionsCount; }
+				const Periods&					getPeriods() const { return _periods; }
+				boost::gregorian::date_duration	getUseDatesRange() const { return _useDateRange; }
+				const RollingStockFilters&		getRollingStockFilters() const { return _rollingStockFilters; }
 				bool							getDisplayRoadApproachDetail() const { return _displayRoadApproachDetail; }
-				const std::string& getClientURL() const { return _clientURL; }
-				WebPage* getDefaultTemplate() const { return _defaultTemplate; }
 			//@}
 
 			// \name Modifiers
@@ -192,6 +169,7 @@ namespace synthese
 				) const;
 	
 				bool dateControl() const;
+				const CitiesMatcher&			getCitiesMatcher() const;
 
 				const boost::gregorian::date				getMinUseDate() const;
 				const boost::gregorian::date				getMaxUseDate() const;

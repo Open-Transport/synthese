@@ -90,8 +90,8 @@ namespace synthese
 			<h3>Attachments</h3>
 
 			<ul>
-			<li><a href="include/31_resa/xml_reservation_function.xsd">Response XSD Schema</a></li>
-			<li><a href="include/31_resa/XMLReservationFunctionSample.xml">Example of XML response</a></li>
+			<li><a href="include/51_resa/xml_reservation_function.xsd">Response XSD Schema</a></li>
+			<li><a href="include/51_resa/XMLReservationFunctionSample.xml">Example of XML response</a></li>
 			</ul>
 		*/
 		class XMLReservationFunction:

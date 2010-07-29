@@ -40,8 +40,8 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		class Site;
-		class WebPage;
+		class TransportWebsite;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 56.15 Action : Transport web site update.
@@ -75,7 +75,7 @@ namespace synthese
 			static const std::string PARAMETER_DEFAULT_PAGE_TEMPLATE_ID;
 
 		private:
-			boost::shared_ptr<Site>							_site;
+			boost::shared_ptr<TransportWebsite>							_site;
 			std::string										_name;
 			boost::gregorian::date										_startDate;
 			boost::gregorian::date										_endDate;
@@ -85,7 +85,7 @@ namespace synthese
 			boost::gregorian::date_duration							_useDatesRange;
 			bool											_displayRoadApproachDetail;
 			std::string							_clientURL;
-			boost::shared_ptr<WebPage>			_defaultPageTemplate;
+			boost::shared_ptr<Webpage>			_defaultPageTemplate;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

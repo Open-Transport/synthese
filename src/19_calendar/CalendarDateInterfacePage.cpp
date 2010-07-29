@@ -23,7 +23,7 @@
 */
 
 #include "CalendarDateInterfacePage.hpp"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
 
@@ -34,7 +34,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
-	using namespace transportwebsite;
+	using namespace cms;
 
 
 	namespace calendar
@@ -48,7 +48,7 @@ namespace synthese
 
 		void CalendarDateInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const Webpage> page,
 			const server::Request& request,
 			boost::gregorian::date value,
 			bool isActive

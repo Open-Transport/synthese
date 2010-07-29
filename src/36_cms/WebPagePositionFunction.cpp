@@ -24,10 +24,10 @@
 
 #include "RequestException.h"
 #include "Request.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "WebPagePositionFunction.hpp"
 #include "WebPageInterfacePage.h"
-#include "PlacesListModule.h"
+#include "CMSModule.hpp"
 
 #include <deque>
 #include <boost/foreach.hpp>
@@ -70,18 +70,18 @@ namespace synthese
 		{
 			try
 			{
-				_page = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
+				_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
 			}
-			catch (ObjectNotFoundException<WebPage>&)
+			catch (ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such web page");
 			}
 			optional<RegistryKeyType> displayPageId(map.getOptional<RegistryKeyType>(PARAMETER_DISPLAY_PAGE_ID));
 			if(displayPageId) try
 			{
-				_displayPage = Env::GetOfficialEnv().get<WebPage>(*displayPageId);
+				_displayPage = Env::GetOfficialEnv().get<Webpage>(*displayPageId);
 			}
-			catch (ObjectNotFoundException<WebPage>&)
+			catch (ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such display page");
 			}
@@ -104,15 +104,15 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			shared_ptr<const WebPage> currentPage(PlacesListModule::GetWebPage(request));
-			deque<const WebPage*> pages;
-			for(const WebPage* page(_page.get()); page != NULL; page = page->getParent())
+			shared_ptr<const Webpage> currentPage(CMSModule::GetWebPage(request));
+			deque<const Webpage*> pages;
+			for(const Webpage* page(_page.get()); page != NULL; page = page->getParent())
 			{
 				pages.push_front(page);
 			}
 			size_t depth(0);
 			bool first(true);
-			BOOST_FOREACH(const WebPage* curPage, pages)
+			BOOST_FOREACH(const Webpage* curPage, pages)
 			{
 				++depth;
 				if(depth < _minDepth)

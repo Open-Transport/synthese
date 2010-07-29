@@ -40,9 +40,9 @@ namespace synthese
 		class Line;
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 	}
 
 	namespace timetables
@@ -143,12 +143,12 @@ namespace synthese
 				boost::shared_ptr<const Timetable>	_timetable;
 				boost::shared_ptr<const calendar::CalendarTemplate>	_calendarTemplate;
 				boost::shared_ptr<const pt::Line> _line;
-				boost::shared_ptr<const transportwebsite::WebPage> _page;
-				boost::shared_ptr<const transportwebsite::WebPage> _notePage;
-				boost::shared_ptr<const transportwebsite::WebPage> _noteCalendarPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _rowPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _cellPage;
-				boost::shared_ptr<const transportwebsite::WebPage> _pageForSubTimetable;
+				boost::shared_ptr<const cms::Webpage> _page;
+				boost::shared_ptr<const cms::Webpage> _notePage;
+				boost::shared_ptr<const cms::Webpage> _noteCalendarPage;
+				boost::shared_ptr<const cms::Webpage> _rowPage;
+				boost::shared_ptr<const cms::Webpage> _cellPage;
+				boost::shared_ptr<const cms::Webpage> _pageForSubTimetable;
 			//@}
 			
 			

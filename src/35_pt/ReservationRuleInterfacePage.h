@@ -41,9 +41,9 @@ namespace synthese
 		class Journey;
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 	}
 
 	namespace pt
@@ -74,8 +74,8 @@ namespace synthese
 			/// @param journey the journey to read
 			static void Display(
 				std::ostream& stream,
-				boost::shared_ptr<const transportwebsite::WebPage> page,
-				boost::shared_ptr<const transportwebsite::WebPage> dateTimePage,
+				boost::shared_ptr<const cms::Webpage> page,
+				boost::shared_ptr<const cms::Webpage> dateTimePage,
 				const server::Request& request,
 				const graph::Journey& journey
 			);

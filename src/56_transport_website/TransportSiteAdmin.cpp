@@ -91,6 +91,8 @@ namespace synthese
 	using namespace graph;
 	using namespace geography;
 	using namespace pt;
+	using namespace cms;
+	
 
 	namespace util
 	{
@@ -136,7 +138,7 @@ namespace synthese
 		){
 			try
 			{
-				_site = SiteTableSync::Get(
+				_site = TransportWebsite::Get(
 					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
 					Env::GetOfficialEnv(),
 					UP_LINKS_LOAD_LEVEL
@@ -432,12 +434,12 @@ namespace synthese
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(moduleKey == PlacesListModule::FACTORY_KEY && request.getUser() &&
+			if(moduleKey == TransportWebsiteModule::FACTORY_KEY && request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser()))
 			{
-				SiteTableSync::SearchResult sites(
-					SiteTableSync::Search(*_env)
+				TransportWebsiteTableSync::SearchResult sites(
+					TransportWebsiteTableSync::Search(*_env)
 				);
 				BOOST_FOREACH(shared_ptr<Site> site, sites)
 				{
@@ -459,7 +461,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 			if(	currentPage == *this ||
-				currentPage.getCurrentTreeBranch().find(*this)
+				dynamic_cast<const WebPageAdmin*>(&currentPage)
 			){
 				WebPageTableSync::SearchResult pages(WebPageTableSync::Search(Env::GetOfficialEnv(), _site->getKey(), RegistryKeyType(0)));
 				BOOST_FOREACH(shared_ptr<WebPage> page, pages)
@@ -501,20 +503,6 @@ namespace synthese
 			_tabs.push_back(Tab("Calcul d'itinéraires", TAB_ROUTE_PLANNING, true));
 
 			_tabBuilded = true;
-		}
-
-
-
-		boost::shared_ptr<const Site> TransportSiteAdmin::getSite() const
-		{
-			return _site;
-		}
-
-
-
-		void TransportSiteAdmin::setSite( boost::shared_ptr<const Site> value )
-		{
-			_site = value;
 		}
 	}
 }

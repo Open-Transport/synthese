@@ -34,7 +34,7 @@ namespace synthese
 {
 	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : WebPageMenuFunction.
@@ -88,7 +88,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				boost::optional<util::RegistryKeyType> _rootId;
-				boost::shared_ptr<const WebPage> _root;
+				boost::shared_ptr<const Webpage> _root;
 				std::size_t _minDepth;
 				std::size_t _maxDepth;
 				std::map<std::size_t, MenuDefinition_> _menuDefinition;
@@ -123,9 +123,9 @@ namespace synthese
 			bool _getMenuContentRecursive(
 				std::ostream& stream,
 				const server::Request& request /*= NULL*/,
-				boost::shared_ptr<const WebPage> root,
+				boost::shared_ptr<const Webpage> root,
 				std::size_t depth,
-				boost::shared_ptr<const WebPage> currentPage
+				boost::shared_ptr<const Webpage> currentPage
 			) const;
 
 		public:

@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 36.15 Action : WebPageLinkRemoveAction.
@@ -56,8 +56,8 @@ namespace synthese
 			static const std::string PARAMETER_DESTINATION_ID;
 
 		private:
-			boost::shared_ptr<WebPage> _page;
-			boost::shared_ptr<WebPage> _destinationPage;
+			boost::shared_ptr<Webpage> _page;
+			boost::shared_ptr<Webpage> _destinationPage;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -91,8 +91,8 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setPage(boost::shared_ptr<WebPage> value) { _page = value; }
-				void setDestinationPage(boost::shared_ptr<WebPage> value) { _destinationPage = value; }
+				void setPage(boost::shared_ptr<Webpage> value) { _page = value; }
+				void setDestinationPage(boost::shared_ptr<Webpage> value) { _destinationPage = value; }
 			//@}
 		};
 	}

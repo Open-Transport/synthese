@@ -24,7 +24,7 @@
 
 #include "TimetableNoteInterfacePage.h"
 #include "TimetableWarning.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "WebPageDisplayFunction.h"
 #include "StaticFunctionRequest.h"
 #include "CalendarDateInterfacePage.hpp"
@@ -39,7 +39,7 @@ namespace synthese
 	using namespace timetables;
 	using namespace calendar;
 	using namespace server;
-	using namespace transportwebsite;
+	using namespace cms;
 	using namespace server;
 
 	namespace timetables
@@ -58,8 +58,8 @@ namespace synthese
 
 		void TimetableNoteInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const WebPage> page,
-			boost::shared_ptr<const transportwebsite::WebPage> calendarDatePage,
+			boost::shared_ptr<const Webpage> page,
+			boost::shared_ptr<const cms::Webpage> calendarDatePage,
 			const server::Request& request,
 			const TimetableWarning& object
 		){

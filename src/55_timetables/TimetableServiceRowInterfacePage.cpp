@@ -32,7 +32,7 @@
 #include "Service.h"
 #include "PublicTransportStopZoneConnectionPlace.h"
 #include "StaticFunctionRequest.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "WebPageDisplayFunction.h"
 #include "City.h"
 
@@ -48,7 +48,7 @@ namespace synthese
 	using namespace timetables;
 	using namespace graph;
 	using namespace pt;
-	using namespace transportwebsite;
+	using namespace cms;
 	using namespace server;
 
 	namespace timetables
@@ -84,8 +84,8 @@ namespace synthese
 
 		void TimetableServiceRowInterfacePage::Display(
 			std::ostream& stream,
-			shared_ptr<const WebPage> page,
-			shared_ptr<const WebPage> cellPage,
+			shared_ptr<const Webpage> page,
+			shared_ptr<const Webpage> cellPage,
 			const server::Request& request,
 			const TimetableColumn& object,
 			const time_duration& lastSchedule,
@@ -163,7 +163,7 @@ namespace synthese
 
 		void TimetableServiceRowInterfacePage::DisplayCell(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			const TimetableColumn::Content::value_type& object,
 			const pt::RollingStock* rollingStock,

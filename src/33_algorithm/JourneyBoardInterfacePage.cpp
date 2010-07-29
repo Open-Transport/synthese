@@ -139,12 +139,12 @@ namespace synthese
 
 		void JourneyBoardInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
-			boost::shared_ptr<const transportwebsite::WebPage> durationPage,
-			boost::shared_ptr<const transportwebsite::WebPage> datePage,
-			boost::shared_ptr<const transportwebsite::WebPage> stopCellPage,
-			boost::shared_ptr<const transportwebsite::WebPage> serviceCellPage,
-			boost::shared_ptr<const transportwebsite::WebPage> junctionPage,
+			boost::shared_ptr<const cms::Webpage> page,
+			boost::shared_ptr<const cms::Webpage> durationPage,
+			boost::shared_ptr<const cms::Webpage> datePage,
+			boost::shared_ptr<const cms::Webpage> stopCellPage,
+			boost::shared_ptr<const cms::Webpage> serviceCellPage,
+			boost::shared_ptr<const cms::Webpage> junctionPage,
 			const server::Request& request,
 			size_t n
 			, const Journey& journey
@@ -442,7 +442,7 @@ namespace synthese
 
 		void JourneyBoardInterfacePage::DisplayStopCell(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			bool isItArrival,
 			const messages::SentAlarm* alarm,
@@ -506,7 +506,7 @@ namespace synthese
 
 		void JourneyBoardInterfacePage::DisplayJunctionCell(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const Request& request,
 			const graph::Vertex& vertex,
 			const messages::SentAlarm* alarm,
@@ -539,7 +539,7 @@ namespace synthese
 
 		void JourneyBoardInterfacePage::DisplayServiceCell(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			const graph::ServicePointer& serviceUse,
 			boost::posix_time::time_duration continuousServiceRange,

@@ -34,8 +34,8 @@ namespace synthese
 {
 	namespace cms
 	{
-		class Site;
-		class WebPage;
+		class Website;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Web page creation action.
@@ -57,9 +57,9 @@ namespace synthese
 		private:
 			std::string _title;
 			std::size_t _rank;
-			boost::shared_ptr<Site> _site;
-			boost::shared_ptr<const WebPage> _template;
-			boost::shared_ptr<WebPage> _parent;
+			boost::shared_ptr<Website> _site;
+			boost::shared_ptr<const Webpage> _template;
+			boost::shared_ptr<Webpage> _parent;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -92,9 +92,9 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setSite(boost::shared_ptr<Site> value);
-				void setTitle(const std::string& value);
-				void setParent(boost::shared_ptr<WebPage> value);
+				void setSite(boost::shared_ptr<Website> value) { _site = value; }
+				void setTitle(const std::string& value) { _title = value; }
+				void setParent(boost::shared_ptr<Webpage> value) { _parent = value; }
 			//@}
 			
 		};

@@ -25,7 +25,7 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "WebPageFormFunction.hpp"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
 #include "HTMLForm.h"
@@ -68,9 +68,9 @@ namespace synthese
 			_script = map.getDefault<string>(PARAMETER_SCRIPT);
 			try
 			{
-				_page = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
+				_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
 			}
-			catch (ObjectNotFoundException<WebPage>&)
+			catch (ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such page");
 			}
@@ -102,7 +102,7 @@ namespace synthese
 				stream << form.open(_script.empty() ? string() : ("onsubmit=\"return "+ _script +"\""));
 				stream << form.getHiddenFields();
 			}
-			catch(ObjectNotFoundException<WebPage>&)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 			}
 		}

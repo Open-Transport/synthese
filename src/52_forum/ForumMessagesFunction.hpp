@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace transportwebsite
 	{
-		class WebPage;
+		class Webpage;
 	}
 
 	namespace forum
@@ -68,8 +68,8 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const ForumTopic> _topic;
-				boost::shared_ptr<const transportwebsite::WebPage> _displayTemplate;
-				boost::shared_ptr<const transportwebsite::WebPage> _dateDisplayTemplate;
+				boost::shared_ptr<const cms::Webpage> _displayTemplate;
+				boost::shared_ptr<const cms::Webpage> _dateDisplayTemplate;
 			//@}
 			
 			

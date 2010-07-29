@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace cms
 	{
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 36.16 Action : update of the content of a web page.
@@ -59,7 +59,7 @@ namespace synthese
 			static const std::string PARAMETER_TITLE;
 
 		private:
-			boost::shared_ptr<WebPage> _page;
+			boost::shared_ptr<Webpage> _page;
 			std::string _content1;
 			std::string _abstract;
 			std::string _image;
@@ -95,7 +95,7 @@ namespace synthese
 
 
 
-			void setWebPage(boost::shared_ptr<WebPage> value);
+			void setWebPage(boost::shared_ptr<Webpage> value);
 		};
 	}
 }

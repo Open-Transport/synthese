@@ -23,10 +23,10 @@
 */
 
 #include "WebPageInterfacePage.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
-#include "PlacesListModule.h"
+#include "CMSModule.hpp"
 
 #include <sstream>
 #include <boost/lexical_cast.hpp>
@@ -54,9 +54,9 @@ namespace synthese
 
 		void WebPageInterfacePage::Display(
 			std::ostream& stream,
-			const WebPage& templatePage,
+			const Webpage& templatePage,
 			const server::Request& request,
-			const WebPage& page,
+			const Webpage& page,
 			bool edit,
 			bool displayContent
 		){
@@ -85,7 +85,7 @@ namespace synthese
 			pm.insert(Request::PARAMETER_OBJECT_ID, page.getKey());
 			pm.insert(DATA_FORUM, page.getHasForum());
 
-			shared_ptr<const WebPage> curPage(PlacesListModule::GetWebPage(request));
+			shared_ptr<const Webpage> curPage(CMSModule::GetWebPage(request));
 			pm.insert(DATA_IS_CURRENT, curPage.get() == &page);
 
 			pm.insert(DATA_DEPTH, page.getDepth());

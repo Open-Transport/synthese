@@ -89,7 +89,7 @@ namespace synthese
 
 		void LineMarkerInterfacePage::Display(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			const pt::CommercialLine& commercialLine,
 			optional<size_t> rank

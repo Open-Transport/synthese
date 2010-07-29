@@ -27,8 +27,8 @@
 #include "WebPageDisplayFunction.h"
 #include "Env.h"
 #include "Interface.h"
-#include "WebPage.h"
-#include "Site.h"
+#include "Webpage.h"
+#include "Website.hpp"
 #include "WebPageInterfacePage.h"
 #include "TransportWebsiteRight.h"
 #include "Action.h"
@@ -66,9 +66,9 @@ namespace synthese
 		{
 			try
 			{
-				_page = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
+				_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
 			}
-			catch (ObjectNotFoundException<WebPage>)
+			catch (ObjectNotFoundException<Webpage>)
 			{
 				throw RequestException("No such page");
 			}

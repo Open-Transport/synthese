@@ -24,7 +24,7 @@
 #define SYNTHESE_algorithm_RoutePlanningIntermediateJourney_hpp__
 
 #include "Journey.h"
-#include "RoutePlannerTypes.h"
+#include "AlgorithmTypes.h"
 
 namespace synthese
 {

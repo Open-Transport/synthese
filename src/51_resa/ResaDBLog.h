@@ -25,7 +25,7 @@
 
 #include <string>
 
-#include "31_resa/Types.h"
+#include "ResaTypes.h"
 #include "DBLogTemplate.h"
 
 namespace synthese
@@ -45,7 +45,7 @@ namespace synthese
 		class ReservationTransaction;
 
 		/** Reservation Log.
-			@ingroup m31Logs refLogs
+			@ingroup m51Logs refLogs
 
 			Columns :
 				- standard user_id : Person who made the action

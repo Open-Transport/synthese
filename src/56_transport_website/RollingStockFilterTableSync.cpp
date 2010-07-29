@@ -28,8 +28,8 @@
 #include "RollingStockFilter.h"
 #include "RollingStockTableSync.h"
 #include "RollingStock.h"
-#include "Site.h"
-#include "SiteTableSync.h"
+#include "TransportWebsite.h"
+#include "TransportWebsiteTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
 #include "SQLite.h"
@@ -107,8 +107,8 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<Site> site(
-						SiteTableSync::GetEditable(
+					shared_ptr<TransportWebsite> site(
+						TransportWebsiteTableSync::GetEditable(
 							rows->getLongLong(RollingStockFilterTableSync::COL_SITE_ID),
 							environment,
 							linkLevel
@@ -116,9 +116,9 @@ namespace synthese
 					object->setSite(site.get());
 					site->addRollingStockFilter(*object);
 				}
-				catch (ObjectNotFoundException<Site> e)
+				catch (ObjectNotFoundException<TransportWebsite> e)
 				{
-					Log::GetInstance().warn("Site not found in rolling stock filter "+ lexical_cast<string>(object->getKey()));
+					Log::GetInstance().warn("Website not found in rolling stock filter "+ lexical_cast<string>(object->getKey()));
 				}
 
 				vector< string > parsed_ids;
@@ -188,7 +188,7 @@ namespace synthese
 		){
 			if(obj->getSite())
 			{
-				const_cast<Site*>(obj->getSite())->removeRollingStockFilter(*obj);
+				const_cast<TransportWebsite*>(obj->getSite())->removeRollingStockFilter(*obj);
 			}
 		}
 	}

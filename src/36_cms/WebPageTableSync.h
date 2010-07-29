@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_WebPageTableSync_H__
 #define SYNTHESE_WebPageTableSync_H__
 
-#include "WebPage.h"
+#include "Webpage.h"
 
 #include <string>
 #include <iostream>
@@ -42,7 +42,7 @@ namespace synthese
 		/// @since 3.1.15
 		//////////////////////////////////////////////////////////////////////////
 		class WebPageTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<WebPageTableSync,WebPage>
+			public db::SQLiteRegistryTableSyncTemplate<WebPageTableSync,Webpage>
 		{
 		public:
 			static const std::string COL_TITLE;

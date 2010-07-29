@@ -27,8 +27,8 @@
 #include "GetValueFunction.hpp"
 #include "FunctionWithSite.h"
 #include "WebPageDisplayFunction.h"
-#include "WebPage.h"
-#include "PlacesListModule.h"
+#include "Webpage.h"
+#include "CMSModule.hpp"
 
 using namespace std;
 using namespace boost;
@@ -72,7 +72,7 @@ namespace synthese
 			}
 			else if(_parameter == "site")
 			{
-				shared_ptr<const Site> site(PlacesListModule::GetSite(request));
+				shared_ptr<const Website> site(CMSModule::GetSite(request));
 				if(site.get())
 				{
 					stream << site->getKey();

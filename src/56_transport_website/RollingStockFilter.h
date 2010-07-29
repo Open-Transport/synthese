@@ -40,7 +40,7 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		class Site;
+		class TransportWebsite;
 
 		/** RollingStockFilter class.
 			@ingroup m56
@@ -73,7 +73,7 @@ namespace synthese
 				const std::string& getName() const { return _name; }
 				bool getAuthorizedOnly() const { return _authorized_only; }
 				const List& getList() const { return _list; }
-				const Site* getSite() const { return _site; }
+				const TransportWebsite* getSite() const { return _site; }
 				std::size_t getRank() const { return _rank; }
 			//@}
 
@@ -81,7 +81,7 @@ namespace synthese
 			//@{
 				void setName(const std::string& value) { _name=value; }
 				void setAuthorizedOnly(bool value) { _authorized_only = value; }
-				void setSite(const Site* value) { _site = value; }
+				void setSite(const TransportWebsite* value) { _site = value; }
 				void setRank(std::size_t value) { _rank = value; }
 			//@}
 

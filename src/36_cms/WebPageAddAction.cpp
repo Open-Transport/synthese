@@ -27,9 +27,9 @@
 #include "WebPageAddAction.h"
 #include "TransportWebsiteRight.h"
 #include "Request.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "WebPageTableSync.h"
-#include "Site.h"
+#include "Website.hpp"
 #include "SiteTableSync.h"
 
 using namespace std;
@@ -92,7 +92,7 @@ namespace synthese
 					_rank = _template->getRank();
 					_site = _env->getEditableSPtr(_template->getRoot());
 				}
-				catch(ObjectNotFoundException<WebPage>& e)
+				catch(ObjectNotFoundException<Webpage>& e)
 				{
 					throw ActionException("No such web page template");
 				}
@@ -121,7 +121,7 @@ namespace synthese
 					)	);
 					_rank = result.empty() ? 0 : (*result.begin())->getRank() + 1;
 				}
-				catch(ObjectNotFoundException<WebPage>& e)
+				catch(ObjectNotFoundException<Webpage>& e)
 				{
 					throw ActionException("No such web page template");
 				}
@@ -149,9 +149,9 @@ namespace synthese
 					)	);
 					_rank = result.empty() ? 0 : (*result.begin())->getRank() + 1;
 				}
-				catch(ObjectNotFoundException<Site>& e)
+				catch(ObjectNotFoundException<Website>& e)
 				{
-					throw ActionException("No such site");
+					throw ActionException("No such website");
 				}
 			}
 		}
@@ -161,7 +161,7 @@ namespace synthese
 		void WebPageAddAction::run(
 			Request& request
 		){
-			WebPage object;
+			Webpage object;
 			object.setName(_title);
 			object.setRoot(_site.get());
 			object.setStartDate(second_clock::local_time());
@@ -196,27 +196,6 @@ namespace synthese
 			const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(WRITE);
-		}
-
-
-
-		void WebPageAddAction::setSite( boost::shared_ptr<Site> value )
-		{
-			_site = value;
-		}
-
-
-
-		void WebPageAddAction::setTitle( const std::string& value )
-		{
-			_title = value;
-		}
-
-
-
-		void WebPageAddAction::setParent( boost::shared_ptr<WebPage> value )
-		{
-			_parent = value;
 		}
 	}
 }

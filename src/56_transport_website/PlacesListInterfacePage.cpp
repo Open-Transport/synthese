@@ -49,8 +49,8 @@ namespace synthese
 
 		void PlacesListInterfacePage::DisplayPlacesList(
 			std::ostream& stream,
-			boost::shared_ptr<const WebPage> page,
-			boost::shared_ptr<const WebPage> itemPage,
+			boost::shared_ptr<const Webpage> page,
+			boost::shared_ptr<const Webpage> itemPage,
 			const server::Request& request,
 			const PlacesList& results,
 			bool isForOrigin,
@@ -96,8 +96,8 @@ namespace synthese
 
 		void PlacesListInterfacePage::DisplayCitiesList(
 			std::ostream& stream,
-			boost::shared_ptr<const WebPage> page,
-			boost::shared_ptr<const WebPage> itemPage,
+			boost::shared_ptr<const Webpage> page,
+			boost::shared_ptr<const Webpage> itemPage,
 			const server::Request& request,
 			const PlacesList& results,
 			bool isForOrigin
@@ -137,7 +137,7 @@ namespace synthese
 
 		void PlacesListInterfacePage::DisplayItem(
 			std::ostream& stream,
-			boost::shared_ptr<const WebPage> page,
+			boost::shared_ptr<const Webpage> page,
 			const server::Request& request,
 			std::size_t n,
 			const std::string& name,

@@ -35,7 +35,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace transportwebsite;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<hiking::HikingTrailDisplayFunction::_FunctionWithSite,hiking::HikingTrailDisplayFunction>::FACTORY_KEY("HikingTrailDisplayFunction");
 	

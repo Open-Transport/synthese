@@ -26,9 +26,9 @@
 #include "Request.h"
 #include "PTRoutePlannerInputFunction.hpp"
 #include "DynamicRequest.h"
-#include "Site.h"
+#include "TransportWebsite.h"
 #include "RoutePlannerFunction.h"
-#include "PlacesListModule.h"
+#include "CMSModule.hpp"
 #include "WebPageDisplayFunction.h"
 
 using namespace std;
@@ -42,6 +42,7 @@ namespace synthese
 	using namespace security;
 	using namespace transportwebsite;
 	using namespace routeplanner;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,ptrouteplanner::PTRoutePlannerInputFunction>::FACTORY_KEY("PTRoutePlannerInputFunction");
 	
@@ -91,7 +92,10 @@ namespace synthese
 				ParametersMap()
 			);
 
-			shared_ptr<const Site> site(PlacesListModule::GetSite(request));
+			shared_ptr<const TransportWebsite> site(
+				dynamic_pointer_cast<const TransportWebsite, const Website>(
+					CMSModule::GetSite(request)
+			)	);
 			if(!site.get())
 			{
 				return;
@@ -99,7 +103,7 @@ namespace synthese
 
 			if(_field == FIELD_PERIOD)
 			{
-				const Site::Periods& periods(site->getPeriods());
+				const TransportWebsite::Periods& periods(site->getPeriods());
 
 				size_t current(
 					_value.empty() ?

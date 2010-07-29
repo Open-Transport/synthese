@@ -1,6 +1,6 @@
 
-/** WebPage class implementation.
-	@file WebPage.cpp
+/** Webpage class implementation.
+	@file Webpage.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "WebPage.h"
+#include "Webpage.h"
 #include "ParametersMap.h"
 #include "DynamicRequest.h"
 #include "FunctionWithSite.h"
@@ -37,12 +37,12 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<cms::WebPage>::KEY("WebPage");
+		template<> const string Registry<cms::Webpage>::KEY("Webpage");
 	}
 
 	namespace cms
 	{
-		WebPage::WebPage( util::RegistryKeyType id  ):
+		Webpage::Webpage( util::RegistryKeyType id  ):
 			Registrable(id),
 			_startDate(posix_time::not_a_date_time),
 			_endDate(posix_time::not_a_date_time),
@@ -54,7 +54,7 @@ namespace synthese
 
 
 
-		bool WebPage::mustBeDisplayed( boost::posix_time::ptime now /*= boost::posix_time::second_clock::local_time()*/ ) const
+		bool Webpage::mustBeDisplayed( boost::posix_time::ptime now /*= boost::posix_time::second_clock::local_time()*/ ) const
 		{
 			return
 				(_startDate.is_not_a_date_time() || _startDate <= now) &&
@@ -64,7 +64,7 @@ namespace synthese
 
 
 
-		std::string::const_iterator WebPage::_parse(
+		std::string::const_iterator Webpage::_parse(
 			std::ostream& stream,
 			std::string::const_iterator it,
 			std::string::const_iterator end,
@@ -236,21 +236,21 @@ namespace synthese
 
 
 
-		void WebPage::display( std::ostream& stream, const server::Request& request ) const
+		void Webpage::display( std::ostream& stream, const server::Request& request ) const
 		{
 			_parse(stream, _content.begin(), _content.end(), string(), request, false);
 		}
 
 
 
-		std::string WebPage::getMimeType() const
+		std::string Webpage::getMimeType() const
 		{
 			return _mimeType.empty() ? "text/html" : _mimeType;
 		}
 
 
 
-		WebPage* WebPage::getTemplate() const
+		Webpage* Webpage::getTemplate() const
 		{
 			if(_doNotUseTemplate)
 			{
@@ -269,10 +269,10 @@ namespace synthese
 
 
 
-		std::size_t WebPage::getDepth() const
+		std::size_t Webpage::getDepth() const
 		{
 			size_t depth(0);
-			for(WebPage* page(getParent()); page; page = page->getParent())
+			for(Webpage* page(getParent()); page; page = page->getParent())
 			{
 				++depth;
 			}

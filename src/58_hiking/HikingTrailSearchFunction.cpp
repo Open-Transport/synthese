@@ -29,7 +29,7 @@
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
 #include "ParametersMap.h"
-#include "WebPage.h"
+#include "Webpage.h"
 
 using namespace std;
 using namespace boost;
@@ -39,7 +39,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace transportwebsite;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,hiking::HikingTrailSearchFunction>::FACTORY_KEY("HikingTrailSearchFunction");
 	
@@ -65,9 +65,9 @@ namespace synthese
 			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_ITEM_DISPLAY_PAGE_ID));
 			if(id) try
 			{
-				_itemDisplayPage = Env::GetOfficialEnv().get<WebPage>(*id);
+				_itemDisplayPage = Env::GetOfficialEnv().get<Webpage>(*id);
 			}
-			catch(ObjectNotFoundException<WebPage>&)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such web page");
 			}

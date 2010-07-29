@@ -30,7 +30,7 @@
 #include "Interface.h"
 #include "CommercialLine.h"
 #include "StaticFunctionRequest.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "WebPageDisplayFunction.h"
 #include "RollingStock.h"
 
@@ -42,7 +42,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace transportwebsite;
+	using namespace cms;
 	using namespace util;
 	using namespace timetables;
 	using namespace pt;
@@ -80,8 +80,8 @@ namespace synthese
 
 		void TimetableServiceColInterfacePage::DisplayLinesRow(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
-			boost::shared_ptr<const transportwebsite::WebPage> cellPage,
+			boost::shared_ptr<const cms::Webpage> page,
+			boost::shared_ptr<const cms::Webpage> cellPage,
 			const server::Request& request,
 			const TimetableResult::RowLinesVector& lines
 		){
@@ -115,7 +115,7 @@ namespace synthese
 
 		void TimetableServiceColInterfacePage::DisplayLineCell(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			const pt::CommercialLine& object,
 			std::size_t colRank
@@ -149,8 +149,8 @@ namespace synthese
 
 		void TimetableServiceColInterfacePage::DisplaySchedulesRow(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
-			boost::shared_ptr<const transportwebsite::WebPage> cellPage,
+			boost::shared_ptr<const cms::Webpage> page,
+			boost::shared_ptr<const cms::Webpage> cellPage,
 			const server::Request& request,
 			const TimetableRow& place,
 			const TimetableResult::RowTimesVector& times
@@ -202,7 +202,7 @@ namespace synthese
 
 		void TimetableServiceColInterfacePage::DisplayScheduleCell(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			boost::posix_time::time_duration object,
 			std::size_t rowRank,
@@ -234,8 +234,8 @@ namespace synthese
 
 		void TimetableServiceColInterfacePage::DisplayNotesRow(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
-			boost::shared_ptr<const transportwebsite::WebPage> cellPage,
+			boost::shared_ptr<const cms::Webpage> page,
+			boost::shared_ptr<const cms::Webpage> cellPage,
 			const server::Request& request,
 			const TimetableResult::RowNotesVector& notes
 		){
@@ -269,7 +269,7 @@ namespace synthese
 
 		void TimetableServiceColInterfacePage::DisplayNoteCell(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			const TimetableWarning* object,
 			std::size_t colRank
@@ -299,8 +299,8 @@ namespace synthese
 
 		void TimetableServiceColInterfacePage::DisplayRollingStockRow(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
-			boost::shared_ptr<const transportwebsite::WebPage> cellPage,
+			boost::shared_ptr<const cms::Webpage> page,
+			boost::shared_ptr<const cms::Webpage> cellPage,
 			const server::Request& request,
 			const TimetableResult::RowRollingStockVector& rollingStock
 		){
@@ -333,7 +333,7 @@ namespace synthese
 
 		void TimetableServiceColInterfacePage::DisplayRollingStockCell(
 			std::ostream& stream,
-			boost::shared_ptr<const transportwebsite::WebPage> page,
+			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			const pt::RollingStock* object,
 			std::size_t colRank

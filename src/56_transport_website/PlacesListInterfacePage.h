@@ -41,7 +41,7 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		class WebPage;
+		class Webpage;
 
 		/** PlacesListInterfacePage Interface Page Class.
 			@ingroup m56Pages refPages
@@ -75,7 +75,7 @@ namespace synthese
 		private:
 			static void DisplayItem(
 				std::ostream& stream,
-				boost::shared_ptr<const WebPage> page,
+				boost::shared_ptr<const Webpage> page,
 				const server::Request& request,
 				std::size_t n,
 				const std::string& name,
@@ -86,8 +86,8 @@ namespace synthese
 		public:
 			static void DisplayPlacesList(
 				std::ostream& stream,
-				boost::shared_ptr<const WebPage> page,
-				boost::shared_ptr<const WebPage> itemPage,
+				boost::shared_ptr<const Webpage> page,
+				boost::shared_ptr<const Webpage> itemPage,
 				const server::Request& request,
 				const PlacesList& results,
 				bool isForOrigin,
@@ -97,8 +97,8 @@ namespace synthese
 
 			static void DisplayCitiesList(
 				std::ostream& stream,
-				boost::shared_ptr<const WebPage> page,
-				boost::shared_ptr<const WebPage> itemPage,
+				boost::shared_ptr<const Webpage> page,
+				boost::shared_ptr<const Webpage> itemPage,
 				const server::Request& request,
 				const PlacesList& results,
 				bool isForOrigin

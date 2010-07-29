@@ -69,8 +69,8 @@ namespace synthese
 	namespace transportwebsite
 	{
 		/** 56 Transport website module class. */
-		class PlacesListModule:
-			public server::ModuleClassTemplate<PlacesListModule>
+		class TransportWebsiteModule:
+			public server::ModuleClassTemplate<TransportWebsiteModule>
 		{
 		public:
 			typedef std::vector<std::pair<boost::optional<graph::UserClassCode>, std::string> > UserClassNames;

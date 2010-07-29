@@ -83,7 +83,7 @@ namespace synthese
 		*/
 
 		class Website;
-		class WebPage;
+		class Webpage;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 36 CMS Module class.
@@ -92,7 +92,11 @@ namespace synthese
 		class CMSModule:
 			public server::ModuleClassTemplate<CMSModule>
 		{
+		private:
+			static util::Registry<Website>::Map _sites;
+
 		public:
+			static void AddSite(boost::shared_ptr<Website> site);
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets the site used by the current request.
@@ -116,7 +120,7 @@ namespace synthese
 			/// @version 3.1.16
 			//////////////////////////////////////////////////////////////////////////
 			/// The current function must be WebPageDisplayFunction
-			static boost::shared_ptr<const WebPage> GetWebPage(const server::Request& request);
+			static boost::shared_ptr<const Webpage> GetWebPage(const server::Request& request);
 
 		
 		};

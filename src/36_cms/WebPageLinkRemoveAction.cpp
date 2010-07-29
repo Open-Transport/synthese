@@ -73,7 +73,7 @@ namespace synthese
 			{
 				_page = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PAGE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<WebPage>&)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw ActionException("No such web page");
 			}
@@ -81,7 +81,7 @@ namespace synthese
 			{
 				_destinationPage = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_DESTINATION_ID), *_env);
 			}
-			catch(ObjectNotFoundException<WebPage>&)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw ActionException("No such destination web page");
 			}
@@ -95,9 +95,9 @@ namespace synthese
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			WebPage::Links links(_page->getLinks());
-			WebPage::Links newLinks;
-			BOOST_FOREACH(const WebPage::Links::value_type& link, links)
+			Webpage::Links links(_page->getLinks());
+			Webpage::Links newLinks;
+			BOOST_FOREACH(const Webpage::Links::value_type& link, links)
 			{
 				if(link != _destinationPage.get())
 				{

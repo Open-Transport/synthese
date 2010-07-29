@@ -35,10 +35,14 @@ namespace synthese
 		class City;
 	}
 
+	namespace cms
+	{
+		class Webpage;
+	}
+
 	namespace transportwebsite
 	{
 		class PlacesListInterfacePage;
-		class WebPage;
 
 		/** City list query public function.
 			@ingroup m56Functions refFunctions
@@ -101,8 +105,8 @@ namespace synthese
 			std::string _input;
 			int _n;
 			bool _isForOrigin;
-			boost::shared_ptr<const transportwebsite::WebPage>	_page;
-			boost::shared_ptr<const transportwebsite::WebPage>	_itemPage;
+			boost::shared_ptr<const cms::Webpage>	_page;
+			boost::shared_ptr<const cms::Webpage>	_itemPage;
 
 		protected:
 			server::ParametersMap _getParametersMap() const;

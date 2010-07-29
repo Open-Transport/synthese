@@ -24,7 +24,7 @@
 
 #include "RequestException.h"
 #include "Request.h"
-#include "WebPage.h"
+#include "Webpage.h"
 #include "WebPageLinksFunction.hpp"
 #include "AdminParametersException.h"
 #include "WebPageInterfacePage.h"
@@ -66,17 +66,17 @@ namespace synthese
 		{
 			try
 			{
-				_page = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
+				_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
 			}
-			catch(ObjectNotFoundException<WebPage>&)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw AdminParametersException("No such page");
 			}
 			try
 			{
-				_displayPage = Env::GetOfficialEnv().get<WebPage>(map.get<RegistryKeyType>(PARAMETER_DISPLAY_TEMPLATE_ID));
+				_displayPage = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_DISPLAY_TEMPLATE_ID));
 			}
-			catch(ObjectNotFoundException<WebPage>&)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw AdminParametersException("No such template page");
 			}
@@ -88,7 +88,7 @@ namespace synthese
 		) const {
 			
 			size_t number(0);
-			BOOST_FOREACH(const WebPage::Links::value_type& link, _page->getLinks())
+			BOOST_FOREACH(const Webpage::Links::value_type& link, _page->getLinks())
 			{
 				if(!link->mustBeDisplayed())
 				{

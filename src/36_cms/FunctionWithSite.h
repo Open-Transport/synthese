@@ -27,12 +27,12 @@
 
 #include "FunctionWithSiteBase.hpp"
 #include "RequestException.h"
-#include "Website.h"
+#include "Website.hpp"
 #include "Env.h"
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
 		/** Function With website class.
 			@author Hugues Romain
@@ -60,7 +60,7 @@ namespace synthese
 				);
 				if(id <= 0 && compulsory)
 				{
-					throw server::RequestException("Site id must be specified");
+					throw server::RequestException("Website id must be specified");
 				}
 				if(id > 0)
 				{
@@ -70,7 +70,7 @@ namespace synthese
 					}
 					catch (util::ObjectNotFoundException<Website>&)
 					{
-						throw server::RequestException("Specified site not found");
+						throw server::RequestException("Specified website not found");
 					}
 				}
 			}

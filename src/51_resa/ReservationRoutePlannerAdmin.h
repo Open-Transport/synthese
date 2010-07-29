@@ -26,7 +26,7 @@
 #define SYNTHESE_ReservationRoutePlannerAdmin_H__
 
 #include "AdminInterfaceElementTemplate.h"
-#include "RoutePlannerTypes.h"
+#include "AlgorithmTypes.h"
 
 namespace synthese
 {

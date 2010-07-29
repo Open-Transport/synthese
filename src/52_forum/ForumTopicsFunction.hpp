@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace transportwebsite
 	{
-		class WebPage;
+		class Webpage;
 	}
 
 	namespace forum
@@ -71,8 +71,8 @@ namespace synthese
 			//@{
 				util::RegistryKeyType _nodeId;
 				std::string _nodeExtension;
-				boost::shared_ptr<const transportwebsite::WebPage> _displayTemplate;
-				boost::shared_ptr<const transportwebsite::WebPage> _dateDisplayTemplate;
+				boost::shared_ptr<const cms::Webpage> _displayTemplate;
+				boost::shared_ptr<const cms::Webpage> _dateDisplayTemplate;
 				bool _raisingOrder;
 			//@}
 			
