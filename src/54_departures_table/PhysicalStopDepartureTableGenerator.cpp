@@ -21,7 +21,7 @@
 */
 
 #include "PhysicalStopDepartureTableGenerator.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"

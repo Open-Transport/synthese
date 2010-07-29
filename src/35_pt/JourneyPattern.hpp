@@ -44,7 +44,7 @@ namespace synthese
 	namespace pt
 	{
 		class TransportNetwork;
-		class PhysicalStop;
+		class StopPoint;
 		class RollingStock;
 		class JourneyPatternCopy;
 	}
@@ -181,8 +181,8 @@ namespace synthese
 
 				bool isReservable () const;
 
-				const pt::PhysicalStop* getDestination () const;
-				const pt::PhysicalStop* getOrigin () const;
+				const pt::StopPoint* getDestination () const;
+				const pt::StopPoint* getOrigin () const;
 				const LineStop* getLineStop(std::size_t rank) const;
 
 				/** Tests if the line theory would be respected if the service were inserted into the line.
@@ -201,11 +201,11 @@ namespace synthese
 					@return true if the line serves exactly the stops in the same order.
 					@warning there is no test on the departure/arrival attributes in this version of the operator
 				*/
-				bool operator==(const std::vector<pt::PhysicalStop*>& stops) const;
+				bool operator==(const std::vector<pt::StopPoint*>& stops) const;
 
 				struct StopWithDepartureArrivalAuthorization
 				{
-					PhysicalStop* stop;
+					StopPoint* stop;
 					bool departure;
 					bool arrival;
 				};

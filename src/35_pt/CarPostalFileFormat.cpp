@@ -22,7 +22,7 @@
 
 #include "CarPostalFileFormat.hpp"
 #include "DataSource.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "PhysicalStopTableSync.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"

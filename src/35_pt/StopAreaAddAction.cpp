@@ -146,7 +146,7 @@ namespace synthese
 
 			if(_createPhysicalStop)
 			{
-				PhysicalStop stop;
+				StopPoint stop;
 				stop.setName(_name);
 				stop.setHub(&stopArea);
 				stop.setCodeBySource(_physicalStopOperatorCode);

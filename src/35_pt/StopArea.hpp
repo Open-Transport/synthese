@@ -47,7 +47,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 	}
 
 	namespace pt
@@ -77,8 +77,8 @@ namespace synthese
 		/// <tr><th>code</th><th>description</th><th>class</th></tr>
 		/// <tr><td>A1</td><td>Entrance of the station building</td><td>StationEntrance</td></tr>
 		/// <tr><td>A2</td><td>Stairs 3</td><td>StationEntrance</td></tr>
-		/// <tr><td>A3</td><td>@ref projection "Projection" of the bus stop</td><td>@ref road::Address "Address" embedded in PhysicalStop</td></tr>
-		/// <tr><td>A4</td><td>@ref projection "Projection" of the bus stop 2</td><td>@ref road::Address "Address" embedded in PhysicalStop</td></tr>
+		/// <tr><td>A3</td><td>@ref projection "Projection" of the bus stop</td><td>@ref road::Address "Address" embedded in StopPoint</td></tr>
+		/// <tr><td>A4</td><td>@ref projection "Projection" of the bus stop 2</td><td>@ref road::Address "Address" embedded in StopPoint</td></tr>
 		/// <tr><td>A5</td><td>Stairs 4</td><td>StationEntrance</td></tr>
 		/// </table>
 		///
@@ -145,7 +145,7 @@ namespace synthese
 		/// For performance purpose, object model differs from conceptual model by
 		/// the following issues :
 		/// <ul>
-		///	<li>PhysicalStop and StationEntrance lists are separated and are hosted
+		///	<li>StopPoint and StationEntrance lists are separated and are hosted
 		/// by StopArea and not by Hub</li>
 		/// <li>There is no Transfer class : a TransferDelaysMap is hosted by
 		/// StopArea.</li>
@@ -160,7 +160,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<StopArea>	Registry;
 
-			typedef std::map<util::RegistryKeyType,const pt::PhysicalStop*> PhysicalStops;
+			typedef std::map<util::RegistryKeyType,const pt::StopPoint*> PhysicalStops;
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > PhysicalStopsLabels;
 
 		private:
@@ -192,7 +192,7 @@ namespace synthese
 
 			//! @name Update methods.
 			//@{
-				void addPhysicalStop(const pt::PhysicalStop& physicalStop);
+				void addPhysicalStop(const pt::StopPoint& physicalStop);
 			//@}
 
 

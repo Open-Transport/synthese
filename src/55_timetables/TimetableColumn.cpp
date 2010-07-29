@@ -30,7 +30,7 @@
 #include "JourneyPattern.hpp"
 #include "Edge.h"
 #include "Vertex.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 
 using namespace std;
@@ -68,13 +68,13 @@ namespace synthese
 						) &&
 						(	!first ||
 							timetablegenerator.getAuthorizedPhysicalStops().empty() ||
-							timetablegenerator.getAuthorizedPhysicalStops().find(dynamic_cast<const PhysicalStop*>((*itEdge2)->getFromVertex())) != timetablegenerator.getAuthorizedPhysicalStops().end()
+							timetablegenerator.getAuthorizedPhysicalStops().find(dynamic_cast<const StopPoint*>((*itEdge2)->getFromVertex())) != timetablegenerator.getAuthorizedPhysicalStops().end()
 						)
 					){
 						first = false;
 						_content.push_back(
 							make_pair(
-								dynamic_cast<const PhysicalStop*>((*itEdge2)->getFromVertex()),
+								dynamic_cast<const StopPoint*>((*itEdge2)->getFromVertex()),
 								((*itEdge2)->isDeparture() && itRow->getIsDeparture()) ?
 									service.getDepartureBeginScheduleToIndex(false, itEdge2 - edges.begin()) :
 									service.getArrivalBeginScheduleToIndex(false, itEdge2 - edges.begin())
@@ -89,7 +89,7 @@ namespace synthese
 				}
 				if (itEdge2 == edges.end())
 				{
-					_content.push_back(make_pair<const PhysicalStop*, time_duration>(NULL, time_duration(not_a_date_time)));
+					_content.push_back(make_pair<const StopPoint*, time_duration>(NULL, time_duration(not_a_date_time)));
 				}
 			}
 		}

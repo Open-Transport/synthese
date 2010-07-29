@@ -26,7 +26,7 @@
 #include <boost/lexical_cast.hpp>
 #include "Journey.h"
 #include "ServicePointer.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "Service.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
@@ -117,7 +117,7 @@ namespace synthese
 				const ServicePointer& s(row.second.getFirstJourneyLeg());
 
 				v.push_back(lexical_cast<string>(s.getDepartureDateTime() - second_clock::local_time() <= posix_time::minutes(blinkingDelay)));
-				v.push_back(static_cast<const PhysicalStop*>(s.getRealTimeDepartureVertex())->getName());
+				v.push_back(static_cast<const StopPoint*>(s.getRealTimeDepartureVertex())->getName());
 				v.push_back(s.getService()->getServiceNumber());
 				stringstream str;
 				str << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().minutes();
@@ -130,7 +130,7 @@ namespace synthese
 				if(row.second.getServiceUses().size() > 1)
 				{
 					const ServicePointer& s(row.second.getLastJourneyLeg());
-					v.push_back(static_cast<const PhysicalStop*>(s.getRealTimeDepartureVertex())->getName());
+					v.push_back(static_cast<const StopPoint*>(s.getRealTimeDepartureVertex())->getName());
 					v.push_back(s.getService()->getServiceNumber());
 
 					stringstream str;

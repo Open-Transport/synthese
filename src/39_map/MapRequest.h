@@ -32,7 +32,7 @@
 #include "JourneyPattern.hpp"
 #include "LineStop.h"
 #include "StopArea.hpp"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 
 #include "Env.h"
 

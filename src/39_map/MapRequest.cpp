@@ -180,7 +180,7 @@ namespace synthese
 			for (int i=0; i<nbPhysicalStops; ++i) 
 			{
 				XMLNode physicalStopNode = GetChildNode (physicalStopsNode, "physicalStop", i);
-				_temporaryEnvironment.getEditableRegistry<PhysicalStop>().add (synthese::pt::XmlBuilder::CreatePhysicalStop (physicalStopNode, _temporaryEnvironment.getEditableRegistry<StopArea>()));
+				_temporaryEnvironment.getEditableRegistry<StopPoint>().add (synthese::pt::XmlBuilder::CreatePhysicalStop (physicalStopNode, _temporaryEnvironment.getEditableRegistry<StopArea>()));
 			}
 
 			XMLNode commercialLinesNode = GetChildNode (dataNode, "commercialLines", 0);
@@ -208,7 +208,7 @@ namespace synthese
 			for (int i=0; i<nbLineStops; ++i) 
 			{
 				XMLNode lineStopNode = GetChildNode (lineStopsNode, "lineStop", i);
-				_temporaryEnvironment.getEditableRegistry<LineStop>().add (synthese::pt::XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.getEditableRegistry<JourneyPattern>(), _temporaryEnvironment.getEditableRegistry<PhysicalStop>()));
+				_temporaryEnvironment.getEditableRegistry<LineStop>().add (synthese::pt::XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.getEditableRegistry<JourneyPattern>(), _temporaryEnvironment.getEditableRegistry<StopPoint>()));
 			}
 		}
 

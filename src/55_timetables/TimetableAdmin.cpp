@@ -50,7 +50,7 @@
 #include "AdminParametersException.h"
 #include "TimetableAddAction.h"
 #include "TimetableSetLineAction.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "LineStop.h"
 #include "Profile.h"
 #include "TimetableSetPhysicalStopAction.h"

@@ -23,7 +23,7 @@
 #include "TimetableGenerator.h"
 #include "JourneyPattern.hpp"
 #include "LineStop.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "SchedulesBasedService.h"
 #include "StopArea.hpp"
 #include "Env.h"
@@ -202,7 +202,7 @@ namespace synthese
 					if(	(*itEdge)->isDeparture() &&
 						dynamic_cast<const StopArea*>((*itEdge)->getHub())->getKey() == itRow->getPlace()->getKey() &&
 						(	_authorizedPhysicalStops.empty() ||
-							_authorizedPhysicalStops.find(dynamic_cast<const PhysicalStop*>((*itEdge)->getFromVertex())) != _authorizedPhysicalStops.end()
+							_authorizedPhysicalStops.find(dynamic_cast<const StopPoint*>((*itEdge)->getFromVertex())) != _authorizedPhysicalStops.end()
 						)	
 					){
 						lineIsSelected = true;

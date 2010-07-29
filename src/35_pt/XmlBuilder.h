@@ -30,7 +30,7 @@
 #include "JourneyPattern.hpp"
 #include "LineStop.h"
 #include "Registry.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 
 
@@ -130,9 +130,9 @@ class XmlBuilder
 
 	 static boost::shared_ptr<LineStop> CreateLineStop (XMLNode& node, 
 		 util::Registry<JourneyPattern>& lines,
-		 const util::Registry<pt::PhysicalStop>& physicalStops);
+		 const util::Registry<pt::StopPoint>& physicalStops);
 
-	 static boost::shared_ptr<pt::PhysicalStop> CreatePhysicalStop (XMLNode& node, 
+	 static boost::shared_ptr<pt::StopPoint> CreatePhysicalStop (XMLNode& node, 
 		 const util::Registry<StopArea>& connectionPlaces
 	);
     

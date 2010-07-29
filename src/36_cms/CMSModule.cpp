@@ -54,9 +54,6 @@ namespace synthese
 
 	namespace cms
 	{
-		Registry<Website>::Map CMSModule::_sites;
-
-
 		boost::shared_ptr<const Website> CMSModule::GetSite(
 			const server::Request& request
 		){
@@ -106,13 +103,6 @@ namespace synthese
 				}
 			}
 			return shared_ptr<const Webpage>();
-		}
-
-
-
-		void CMSModule::AddSite( boost::shared_ptr<Website> site )
-		{
-			_site.insert(Registry<WebSite>::Map::value_type(site->getKey(), site));
 		}
 	}
 }

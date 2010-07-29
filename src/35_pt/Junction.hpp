@@ -31,7 +31,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Link between two stops allowing pedestrians to do a transfer outside of a StopArea.
@@ -67,8 +67,8 @@ namespace synthese
 			//@{
 				virtual bool isActive(const boost::gregorian::date& date) const;
 				virtual std::string getRuleUserName() const;
-				PhysicalStop* getStart() const;
-				PhysicalStop* getEnd() const;
+				StopPoint* getStart() const;
+				StopPoint* getEnd() const;
 				double getLength() const;
 				boost::posix_time::time_duration getDuration() const;
 				virtual bool isPedestrianMode() const;
@@ -89,8 +89,8 @@ namespace synthese
 				/// @date 2010
 				/// @since 3.1.16
 				void setStops(
-					PhysicalStop* start,
-					PhysicalStop* end,
+					StopPoint* start,
+					StopPoint* end,
 					double length,
 					boost::posix_time::time_duration duration,
 					bool doBack

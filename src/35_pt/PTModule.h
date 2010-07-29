@@ -87,7 +87,7 @@ namespace synthese
 			<tr><td>@ref PathGroup</td><td>@ref CommercialLine</td></tr>
 			<tr><td>@ref Path</td><td>@ref JourneyPattern</td></tr>
 			<tr><td>@ref Edge</td><td>@ref LineStop</td></tr>
-			<tr><td>@ref Vertex</td><td>@ref PhysicalStop</td></tr>
+			<tr><td>@ref Vertex</td><td>@ref StopPoint</td></tr>
 			<tr><td>@ref Hub</td><td>@ref StopArea</td></tr>
 			</table>
 
@@ -103,7 +103,7 @@ namespace synthese
 			<tr><td>@ref PathGroup</td><td>none</td></tr>
 			<tr><td>@ref Path</td><td>@ref Junction</td></tr>
 			<tr><td>@ref Edge</td><td>@ref JunctionStop</td></tr>
-			<tr><td>@ref Vertex</td><td>@ref PhysicalStop</td></tr>
+			<tr><td>@ref Vertex</td><td>@ref StopPoint</td></tr>
 			<tr><td>@ref Hub</td><td>@ref StopArea</td></tr>
 			</table>
 

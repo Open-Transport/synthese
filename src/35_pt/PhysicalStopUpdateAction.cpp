@@ -74,7 +74,7 @@ namespace synthese
 			{
 				_stop = PhysicalStopTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_STOP_ID), *_env);
 			}
-			catch(ObjectNotFoundException<PhysicalStop>&)
+			catch(ObjectNotFoundException<StopPoint>&)
 			{
 				throw ActionException("No such physical stop");
 			}

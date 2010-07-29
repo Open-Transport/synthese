@@ -67,7 +67,7 @@ namespace synthese
 						, (*it)->isDeparture()
 						, (*it)->isArrival()
 						, (*it)->getMetricOffset()
-						, const_cast<PhysicalStop*>(static_cast<const LineStop*>(*it)->getPhysicalStop())
+						, const_cast<StopPoint*>(static_cast<const LineStop*>(*it)->getPhysicalStop())
 				)	);
 				addEdge(*newEdge);
 			}

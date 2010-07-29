@@ -28,7 +28,7 @@
 #include "PropertiesHTMLTable.h"
 #include "StopAreaTableSync.hpp"
 #include "StopArea.hpp"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"

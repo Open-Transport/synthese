@@ -42,9 +42,9 @@ namespace synthese
 			This is avoided by the rule saying that no stop can be added once a service is inserted in the line (a subline is created only if at least a service is registered)
 		*/
 		class JourneyPatternCopy:
-			public pt::JourneyPattern
+			public JourneyPattern
 		{
-			pt::JourneyPattern*	_mainLine;
+			JourneyPattern*	_mainLine;
 
 		public:
 			/** Constructor.
@@ -56,7 +56,7 @@ namespace synthese
 					- copy all data (including LineStop) of the original line
 					- insert the subline in the sublines registry of the line.
 			*/
-			JourneyPatternCopy(pt::JourneyPattern* line);
+			JourneyPatternCopy(JourneyPattern* line);
 
 
 			/** Destructor.
@@ -82,7 +82,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008				
 			*/
-			pt::JourneyPattern*	getMainLine()	const;
+			JourneyPattern*	getMainLine()	const;
 		};
 	}
 }

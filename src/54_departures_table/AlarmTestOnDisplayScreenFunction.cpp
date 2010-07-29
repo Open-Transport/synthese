@@ -44,7 +44,7 @@
 #include "GraphConstants.h"
 #include "InterfacePageTableSync.h"
 #include "SentScenario.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "PermanentService.h"
 
 using namespace std;
@@ -124,7 +124,7 @@ namespace synthese
 				StopArea place;
 				place.setName("TEST");
 				place.setCity(&city);
-				PhysicalStop ps(0, string(), &place);
+				StopPoint ps(0, string(), &place);
 				place.addPhysicalStop(ps);
 				CommercialLine cline;
 				cline.setShortName("00");

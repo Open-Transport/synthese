@@ -25,7 +25,7 @@
 #include "RollingStock.h"
 #include "Service.h"
 #include "LineStop.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "CommercialLine.h"
 #include "JourneyPatternCopy.hpp"
 
@@ -183,20 +183,20 @@ namespace synthese
 
 
 
-		const PhysicalStop* JourneyPattern::getOrigin() const
+		const StopPoint* JourneyPattern::getOrigin() const
 		{
 			if (getEdges().empty())
 				return NULL;
-		    return static_cast<const PhysicalStop*>((getEdges().at (0))->getFromVertex());
+		    return static_cast<const StopPoint*>((getEdges().at (0))->getFromVertex());
 		}
 
 
-		const PhysicalStop* JourneyPattern::getDestination() const
+		const StopPoint* JourneyPattern::getDestination() const
 		{
 			if (getEdges().empty())
 				return NULL;
 			Edge* edge = getLastEdge();
-			return static_cast<const PhysicalStop*>(edge->getFromVertex());
+			return static_cast<const StopPoint*>(edge->getFromVertex());
 		}
 
 
@@ -282,7 +282,7 @@ namespace synthese
 		
 		
 		
-		bool JourneyPattern::operator==(const std::vector<PhysicalStop*>& stops) const
+		bool JourneyPattern::operator==(const std::vector<StopPoint*>& stops) const
 		{
 			if(getEdges().size() != stops.size()) return false;
 			

@@ -1,6 +1,6 @@
 
-/** PhysicalStop class implementation.
-	@file PhysicalStop.cpp
+/** StopPoint class implementation.
+	@file StopPoint.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "Registry.h"
 #include "PTModule.h"
 #include "StopArea.hpp"
@@ -36,12 +36,12 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<PhysicalStop>::KEY("PhysicalStop");
+		template<> const string Registry<StopPoint>::KEY("StopPoint");
 	}
 
 	namespace pt
 	{
-		PhysicalStop::PhysicalStop(
+		StopPoint::StopPoint(
 			RegistryKeyType id
 			, string name
 			, const StopArea* place
@@ -56,21 +56,21 @@ namespace synthese
 
 
 
-		PhysicalStop::~PhysicalStop()
+		StopPoint::~StopPoint()
 		{
 
 		}
 
 
 
-		const StopArea* PhysicalStop::getConnectionPlace() const
+		const StopArea* StopPoint::getConnectionPlace() const
 		{
 			return static_cast<const StopArea*>(Vertex::getHub());
 		}
 
 
 
-		graph::GraphIdType PhysicalStop::getGraphType() const
+		graph::GraphIdType StopPoint::getGraphType() const
 		{
 			return PTModule::GRAPH_ID;
 		}

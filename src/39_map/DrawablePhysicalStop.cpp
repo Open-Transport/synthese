@@ -22,7 +22,7 @@
 
 #include "DrawablePhysicalStop.h"
 
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "AddressablePlace.h"
 #include "StopArea.hpp"
 #include "RGBColor.h"
@@ -30,7 +30,7 @@
 #include "Map.h"
 #include "PostscriptCanvas.h"
 
-using synthese::pt::PhysicalStop;
+using synthese::pt::StopPoint;
 
 namespace synthese
 {
@@ -40,7 +40,7 @@ namespace synthese
 	namespace map
 	{
 		DrawablePhysicalStop::DrawablePhysicalStop(
-			const PhysicalStop* physicalStop
+			const StopPoint* physicalStop
 		): _physicalStopId(physicalStop->getKey())
 			, _name(physicalStop->getConnectionPlace()->getName ())
 			, _point (*physicalStop)

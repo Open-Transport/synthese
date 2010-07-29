@@ -51,7 +51,7 @@
 #include "PropertiesHTMLTable.h"
 #include "ReservationContact.h"
 #include "LineStop.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "PTRuleUserAdmin.hpp"
 #include "ActionResultHTMLTable.h"

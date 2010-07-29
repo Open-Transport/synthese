@@ -102,7 +102,7 @@ namespace synthese
 
 			Parameters :
 			<ul>
-				<li>roid : id of a stop area (PublicStopZoneConnectionPlace) or stop zone (PhysicalStop) object</li>
+				<li>roid : id of a stop area (PublicStopZoneConnectionPlace) or stop zone (StopPoint) object</li>
 				<li>cid (optional) : id of the CalendarTemplate object (default : use day parameter)</li>
 				<li>day (optional) : day (default : today)</li>
 			</ul>

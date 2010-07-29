@@ -123,8 +123,8 @@ namespace synthese
 					// 3.1 by id
 					if(decodeTableId(id) == PhysicalStopTableSync::TABLE.ID)
 					{
-						shared_ptr<const PhysicalStop> stop(
-							Env::GetOfficialEnv().get<PhysicalStop>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
+						shared_ptr<const StopPoint> stop(
+							Env::GetOfficialEnv().get<StopPoint>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
 						);
 
 						screen->setLocalization(stop->getConnectionPlace());
@@ -190,7 +190,7 @@ namespace synthese
 			{
 				throw RequestException("Connection place not found "+ e.getMessage());
 			}
-			catch (ObjectNotFoundException<PhysicalStop>& e)
+			catch (ObjectNotFoundException<StopPoint>& e)
 			{
 				throw RequestException("Physical stop not found "+ e.getMessage());
 			}

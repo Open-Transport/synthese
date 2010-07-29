@@ -29,7 +29,7 @@
 #include "TransportNetworkRight.h"
 #include "PropertiesHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "PhysicalStopUpdateAction.h"
 #include "StopArea.hpp"
 #include "PTPlaceAdmin.h"
@@ -79,9 +79,9 @@ namespace synthese
 		){
 			try
 			{
-				_stop = Env::GetOfficialEnv().get<PhysicalStop>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+				_stop = Env::GetOfficialEnv().get<StopPoint>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 			}
-			catch (ObjectNotFoundException<PhysicalStop>&)
+			catch (ObjectNotFoundException<StopPoint>&)
 			{
 				throw AdminParametersException("No such physical stop");
 			}
@@ -120,7 +120,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
 				AdminActionFunctionRequest<PhysicalStopUpdateAction, PTPhysicalStopAdmin> updateRequest(request);
-				updateRequest.getAction()->setStop(const_pointer_cast<PhysicalStop>(_stop));
+				updateRequest.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
 				
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();

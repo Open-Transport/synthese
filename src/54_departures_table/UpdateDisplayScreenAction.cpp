@@ -24,7 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "StopArea.hpp"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "ObjectNotFoundException.h"
 #include "ActionException.h"
 #include "Request.h"

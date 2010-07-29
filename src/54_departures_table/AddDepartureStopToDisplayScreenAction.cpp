@@ -29,7 +29,7 @@
 #include "PhysicalStopTableSync.h"
 #include "Conversion.h"
 #include "ArrivalDepartureTableLog.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 
 using namespace std;
 using namespace boost;
@@ -121,7 +121,7 @@ namespace synthese
 			{
 				_stop = PhysicalStopTableSync::Get(id, *_env, UP_LINKS_LOAD_LEVEL);
 			}
-			catch (ObjectNotFoundException<PhysicalStop>& e)
+			catch (ObjectNotFoundException<StopPoint>& e)
 			{
 				throw ActionException("Departure physical stop", e, *this);
 			}

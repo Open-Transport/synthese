@@ -119,8 +119,8 @@ namespace synthese
 				void addAuthorizedLine(const pt::CommercialLine* line);
 				void removeAuthorizedLine(const pt::CommercialLine* line);
 				void clearAuthorizedLines();
-				void addAuthorizedPhysicalStop(const pt::PhysicalStop* stop);
-				void removeAuthorizedPhysicalStop(const pt::PhysicalStop* stop);
+				void addAuthorizedPhysicalStop(const pt::StopPoint* stop);
+				void removeAuthorizedPhysicalStop(const pt::StopPoint* stop);
 				void clearAuthorizedPhysicalStops();
 				void setBookId(util::RegistryKeyType value) { _bookId = value; }
 				void setTitle(const std::string& value){ _title = value; }

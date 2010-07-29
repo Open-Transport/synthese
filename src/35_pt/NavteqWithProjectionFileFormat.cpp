@@ -25,7 +25,7 @@
 #include "DataSource.h"
 #include "Address.h"
 #include "AddressTableSync.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "PhysicalStopTableSync.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
@@ -264,7 +264,7 @@ namespace synthese
 					{ // PT Connection place
 						try
 						{
-							shared_ptr<PhysicalStop> stop(PhysicalStopTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL));
+							shared_ptr<StopPoint> stop(PhysicalStopTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL));
 							StopArea* place(const_cast<StopArea*>(stop->getConnectionPlace()));
 							PhysicalStopTableSync::Search(*_env, place->getKey());
 							AddressTableSync::Search(*_env, place->getKey());

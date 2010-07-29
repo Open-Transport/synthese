@@ -32,7 +32,7 @@
 #include "Conversion.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 
 
 namespace synthese
@@ -262,7 +262,7 @@ bool
 DrawableLine::isStopPoint (int pointIndex) const
 {
     const Point2D* p = _points[pointIndex];
-    return dynamic_cast<const PhysicalStop*> (p) != 0;
+    return dynamic_cast<const StopPoint*> (p) != 0;
 }
 
 

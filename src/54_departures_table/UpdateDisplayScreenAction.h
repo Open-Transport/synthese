@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 	}
 
 	namespace departurestable

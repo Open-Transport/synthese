@@ -35,7 +35,7 @@
 #include "SQLiteException.h"
 #include "Interface.h"
 #include "CommercialLine.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "ReplaceQuery.h"
 
 #include "01_util/Conversion.h"
@@ -143,9 +143,9 @@ namespace synthese
 					try
 					{
 						RegistryKeyType id(lexical_cast<RegistryKeyType>(pstop));
-						object->addAuthorizedPhysicalStop(Env::GetOfficialEnv().get<PhysicalStop>(id).get());
+						object->addAuthorizedPhysicalStop(Env::GetOfficialEnv().get<StopPoint>(id).get());
 					}
-					catch (ObjectNotFoundException<PhysicalStop>& e)
+					catch (ObjectNotFoundException<StopPoint>& e)
 					{
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS);
 					}
@@ -198,7 +198,7 @@ namespace synthese
 			stringstream authorizedPhysicalStops;
 			{
 				bool first(true);
-				BOOST_FOREACH(const PhysicalStop* pstop, object->getAuthorizedPhysicalStops())
+				BOOST_FOREACH(const StopPoint* pstop, object->getAuthorizedPhysicalStops())
 				{
 					if(!first) authorizedPhysicalStops << ",";
 					authorizedPhysicalStops << pstop->getKey();

@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 	}
 
 	namespace departurestable
@@ -56,7 +56,7 @@ namespace synthese
 			typedef enum { FORCE_UNLIMITED_SIZE, SIZE_AS_DEFINED } UnlimitedSize;
 			static const size_t UNLIMITED_SIZE = 0;
 
-			typedef std::map<util::RegistryKeyType, const pt::PhysicalStop*> PhysicalStops;
+			typedef std::map<util::RegistryKeyType, const pt::StopPoint*> PhysicalStops;
 		private:
 
 			void _push_back(

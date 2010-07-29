@@ -41,7 +41,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 	}
 
 	/**	@defgroup m54Actions 54 Actions

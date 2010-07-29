@@ -40,7 +40,7 @@ namespace synthese
 			:	public ArrivalDepartureTableGenerator
 		{
 		public:
-			typedef std::map<util::RegistryKeyType, const pt::PhysicalStop*> PhysicalStops;
+			typedef std::map<util::RegistryKeyType, const pt::StopPoint*> PhysicalStops;
 
 		private:
 

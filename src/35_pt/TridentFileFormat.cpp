@@ -29,7 +29,7 @@
 #include "CommercialLineTableSync.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "PhysicalStopTableSync.h"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
@@ -285,10 +285,10 @@ namespace synthese
 			// BoardingPosition corresponds to a very accurate location along a quay for instance.
 			// Not implemented right now.
 
-			// --------------------------------------------------- StopArea (type = Quay) <=> PhysicalStop
-			BOOST_FOREACH(Registry<PhysicalStop>::value_type itps, _env->getRegistry<PhysicalStop>())
+			// --------------------------------------------------- StopArea (type = Quay) <=> StopPoint
+			BOOST_FOREACH(Registry<StopPoint>::value_type itps, _env->getRegistry<StopPoint>())
 			{
-				const PhysicalStop* ps(itps.second.get());
+				const StopPoint* ps(itps.second.get());
 				if (ps->getDepartureEdges().empty() && ps->getArrivalEdges().empty()) continue;
 
 				os << "<StopArea>" << "\n";
@@ -353,9 +353,9 @@ namespace synthese
 
 
 			// --------------------------------------------------- AreaCentroid
-			BOOST_FOREACH(Registry<PhysicalStop>::value_type itps, _env->getRegistry<PhysicalStop>())
+			BOOST_FOREACH(Registry<StopPoint>::value_type itps, _env->getRegistry<StopPoint>())
 			{
-				const PhysicalStop* ps(itps.second.get());
+				const StopPoint* ps(itps.second.get());
 				os << "<AreaCentroid>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "AreaCentroid", *ps) << "</objectId>" << "\n";
 			    
@@ -511,13 +511,13 @@ namespace synthese
 				
 				os << "<publishedName>";
 				{
-					const PhysicalStop* ps(line->getOrigin());
+					const StopPoint* ps(line->getOrigin());
 					if (ps && ps->getConnectionPlace () && ps->getConnectionPlace ()->getCity ())
 						os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
 				}
 				os << " -&gt; ";
 				{
-					const PhysicalStop* ps(line->getDestination());
+					const StopPoint* ps(line->getDestination());
 					if (ps && ps->getConnectionPlace () && ps->getConnectionPlace ()->getCity ())
 						os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
 				}
@@ -552,7 +552,7 @@ namespace synthese
 			BOOST_FOREACH(Registry<LineStop>::value_type itls, _env->getRegistry<LineStop>())
 			{
 				const LineStop* ls(itls.second.get());
-				const PhysicalStop* ps = static_cast<const PhysicalStop*>(ls->getFromVertex());
+				const StopPoint* ps = static_cast<const StopPoint*>(ls->getFromVertex());
 
 				os << "<StopPoint" << (_withTisseoExtension ? " xsi:type=\"TisseoStopPointType\"" : "") << ">" << "\n";
 				os << "<objectId>" << TridentId (peerid, "StopPoint", *ls) << "</objectId>" << "\n";
@@ -1227,7 +1227,7 @@ namespace synthese
 			}
 
 			// Stops
-			map<string, PhysicalStop*> stops;
+			map<string, StopPoint*> stops;
 			XMLNode chouetteAreaNode(allNode.getChildNode("ChouetteArea"));
 			int stopsNumber(chouetteAreaNode.nChildNode("StopArea"));
 			for(int stopRank(0); stopRank < stopsNumber; ++stopRank)
@@ -1264,7 +1264,7 @@ namespace synthese
 					os << "WARN : more than one stop with key" << stopKey << "<br />";
 				}
 				
-				shared_ptr<PhysicalStop> curStop;
+				shared_ptr<StopPoint> curStop;
 				if(pstops.empty())
 				{
 					// Stop creation
@@ -1275,11 +1275,11 @@ namespace synthese
 						failure = true;
 						continue;
 					}
-					curStop.reset(new PhysicalStop);
+					curStop.reset(new StopPoint);
 					curStop->setHub(itcstop->second);
 					curStop->setCodeBySource(stopKey);
 					curStop->setKey(PhysicalStopTableSync::getId());
-					_env->getEditableRegistry<PhysicalStop>().add(curStop);
+					_env->getEditableRegistry<StopPoint>().add(curStop);
 
 					os << "CREA : Creation of the physical stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
 
@@ -1328,13 +1328,13 @@ namespace synthese
 
 			// JourneyPattern stops
 			int stopPointsNumber(chouetteLineDescriptionNode.nChildNode("StopPoint"));
-			map<string,PhysicalStop*> stopPoints;
+			map<string,StopPoint*> stopPoints;
 			for(int stopPointRank(0); stopPointRank < stopPointsNumber; ++stopPointRank)
 			{
 				XMLNode stopPointNode(chouetteLineDescriptionNode.getChildNode("StopPoint", stopPointRank));
 				XMLNode spKeyNode(stopPointNode.getChildNode("objectId"));
 				XMLNode containedNode(stopPointNode.getChildNode("containedIn"));
-				map<string, PhysicalStop*>::iterator it(stops.find(containedNode.getText()));
+				map<string, StopPoint*>::iterator it(stops.find(containedNode.getText()));
 				if(it == stops.end())
 				{
 					os << "ERR  : stop " << containedNode.getText() << " not found by stop point " << spKeyNode.getText() << ")<br />";
@@ -1406,7 +1406,7 @@ namespace synthese
 				XMLNode routeIdNode(routeNode.getChildNode("routeId"));
 				
 				// Reading stops list
-				vector<PhysicalStop*> routeStops;
+				vector<StopPoint*> routeStops;
 				int lineStopsNumber(routeNode.nChildNode("stopPointList"));
 				for(int lineStopRank(0); lineStopRank < lineStopsNumber; ++lineStopRank)
 				{
@@ -1441,7 +1441,7 @@ namespace synthese
 					createdObjects.insert(route->getKey());
 					
 					size_t rank(0);
-					BOOST_FOREACH(PhysicalStop* stop, routeStops)
+					BOOST_FOREACH(StopPoint* stop, routeStops)
 					{
 						shared_ptr<LineStop> ls(new LineStop);
 						ls->setLine(route.get());
@@ -1645,8 +1645,8 @@ namespace synthese
 						os << "WARN : Connection link " << key.getText() << " rejected because of inexistent stop (" << startNode.getText() << "/" << endNode.getText() << ")<br />";
 						continue;
 					}
-					shared_ptr<PhysicalStop> startStop = startStops.front();
-					shared_ptr<PhysicalStop> endStop = endStops.front();
+					shared_ptr<StopPoint> startStop = startStops.front();
+					shared_ptr<StopPoint> endStop = endStops.front();
 
 					// Internal or external connection
 					if(startStop->getConnectionPlace() == endStop->getConnectionPlace())
@@ -1710,7 +1710,7 @@ namespace synthese
 				{
 					StopAreaTableSync::Save(cstop.second.get(), transaction);
 				}
-				BOOST_FOREACH(Registry<PhysicalStop>::value_type stop, _env->getRegistry<PhysicalStop>())
+				BOOST_FOREACH(Registry<StopPoint>::value_type stop, _env->getRegistry<StopPoint>())
 				{
 					PhysicalStopTableSync::Save(stop.second.get(), transaction);
 				}

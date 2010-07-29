@@ -26,7 +26,7 @@
 #include "Interface.h"
 #include "InterfacePageException.h"
 #include "StopArea.hpp"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "Edge.h"
 #include "DisplayScreen.h"
 #include "DisplayType.h"
@@ -180,7 +180,7 @@ namespace synthese
 			_serviceNumberDisplay = value;
 		}
 
-		void DisplayScreen::addPhysicalStop(const PhysicalStop* physicalStop)
+		void DisplayScreen::addPhysicalStop(const StopPoint* physicalStop)
 		{
 			_physicalStops.insert(make_pair(physicalStop->getKey(),physicalStop));
 		}
@@ -483,7 +483,7 @@ namespace synthese
 			map<std::string, std::pair<RegistryKeyType, string> > m;
 			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, getPhysicalStops())
 			{
-				const PhysicalStop* p(it.second);
+				const StopPoint* p(it.second);
 				const Vertex::Edges& edges = p->getDepartureEdges();
 				BOOST_FOREACH(const Vertex::Edges::value_type& e, edges)
 				{
@@ -533,7 +533,7 @@ namespace synthese
 			_forcedDestinations.clear();
 		}
 
-		void DisplayScreen::removePhysicalStop(const PhysicalStop* stop)
+		void DisplayScreen::removePhysicalStop(const StopPoint* stop)
 		{
 			ArrivalDepartureTableGenerator::PhysicalStops::iterator it = _physicalStops.find(stop->getKey());
 			if (it != _physicalStops.end())

@@ -24,7 +24,7 @@
 
 #include "StopArea.hpp"
 #include "Address.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "Vertex.h"
 #include "Edge.h"
 #include "ServicePointer.h"

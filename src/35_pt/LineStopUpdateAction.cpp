@@ -93,7 +93,7 @@ namespace synthese
 			{
 				throw ActionException("No such line stop");
 			}
-			catch(ObjectNotFoundException<PhysicalStop>&)
+			catch(ObjectNotFoundException<StopPoint>&)
 			{
 				throw ActionException("No such physical stop");
 			}

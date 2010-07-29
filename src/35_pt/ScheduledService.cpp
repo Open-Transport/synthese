@@ -28,7 +28,7 @@
 
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "NonConcurrencyRule.h"
 #include "StopArea.hpp"
 
@@ -315,7 +315,7 @@ namespace synthese
 
 			const CommercialLine::NonConcurrencyRules& rules(line->getNonConcurrencyRules());
 			const StopArea::PhysicalStops& startStops(
-				static_cast<const PhysicalStop*>(departureEdge.getFromVertex())->getConnectionPlace()->getPhysicalStops()
+				static_cast<const StopPoint*>(departureEdge.getFromVertex())->getConnectionPlace()->getPhysicalStops()
 			);
 			const Hub* arrivalHub(
 				arrivalEdge.getFromVertex()->getHub()

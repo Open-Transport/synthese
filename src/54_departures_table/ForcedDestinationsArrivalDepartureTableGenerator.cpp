@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"

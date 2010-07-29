@@ -33,7 +33,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// PTPhysicalStopAdmin Admin compound class.
@@ -54,7 +54,7 @@ namespace synthese
 		private:
 			/// @name Search parameters
 			//@{
-				boost::shared_ptr<const pt::PhysicalStop>	_stop;
+				boost::shared_ptr<const pt::StopPoint>	_stop;
 			// html::ResultHTMLTable::RequestParameters	_requestParameters;
 			//@}
 
@@ -91,7 +91,7 @@ namespace synthese
 			PTPhysicalStopAdmin();
 
 
-			void setStop(boost::shared_ptr<const PhysicalStop> value){ _stop = value; }
+			void setStop(boost::shared_ptr<const StopPoint> value){ _stop = value; }
 			
 			
 			

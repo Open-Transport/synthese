@@ -22,7 +22,7 @@
 
 #include "JunctionStop.hpp"
 #include "Junction.hpp"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 
 using namespace std;
 
@@ -40,8 +40,8 @@ namespace synthese
 	{
 		JunctionStop::JunctionStop(
 			Junction* parentPath /*= NULL*/,
-			PhysicalStop* fromVertex /*= NULL*/			
-		):	Edge(parentPath, 0, static_cast<PhysicalStop*>(fromVertex), 0),
+			StopPoint* fromVertex /*= NULL*/			
+		):	Edge(parentPath, 0, static_cast<StopPoint*>(fromVertex), 0),
 			Registrable(0)
 		{
 
@@ -52,8 +52,8 @@ namespace synthese
 		JunctionStop::JunctionStop(
 			double length,
 			Junction* parentPath,
-			PhysicalStop* fromVertex
-		):	Edge(parentPath, 1, static_cast<PhysicalStop*>(fromVertex), length),
+			StopPoint* fromVertex
+		):	Edge(parentPath, 1, static_cast<StopPoint*>(fromVertex), length),
 			Registrable(0)
 		{
 		}

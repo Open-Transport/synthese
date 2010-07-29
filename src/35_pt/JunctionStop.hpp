@@ -30,7 +30,7 @@ namespace synthese
 	namespace pt
 	{
 		class Junction;
-		class PhysicalStop;
+		class StopPoint;
 
 		/** Edge of a junction.
 			@ingroup m35
@@ -59,7 +59,7 @@ namespace synthese
 			/// The start junction constructor is also the default constructor, but should not be used as it
 			JunctionStop(
 				Junction* parentPath = NULL,
-				PhysicalStop* fromVertex = NULL
+				StopPoint* fromVertex = NULL
 			);
 
 			//////////////////////////////////////////////////////////////////////////
@@ -73,7 +73,7 @@ namespace synthese
 			JunctionStop(
 				double length,
 				Junction* parentPath,
-				PhysicalStop* fromVertex
+				StopPoint* fromVertex
 			);
 
 			//! @name Services

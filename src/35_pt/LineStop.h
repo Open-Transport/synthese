@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 	}
 
 	namespace pt
@@ -68,7 +68,7 @@ namespace synthese
 				bool isDeparture = true,
 				bool isArrival = true,
 				double metricOffset = 0,
-				pt::PhysicalStop* physicalStop = NULL
+				pt::StopPoint* physicalStop = NULL
 			);
 			
 			~LineStop();
@@ -101,7 +101,7 @@ namespace synthese
 				virtual bool isDepartureAllowed() const;
 				virtual bool isArrivalAllowed() const;
 
-				PhysicalStop*	getPhysicalStop()	const;
+				StopPoint*	getPhysicalStop()	const;
 
 				JourneyPattern*				getLine()			const;
 			//@}
@@ -116,7 +116,7 @@ namespace synthese
 				///	Use this method instead of setFromVertex.
 				///
 				///	@warning the isArrival and the isDeparture attributes must be up to date to avoid false links in the physical stop.
-				void setPhysicalStop(PhysicalStop* stop);
+				void setPhysicalStop(StopPoint* stop);
 
 				void setLine(JourneyPattern* line);
 		    //@}

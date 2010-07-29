@@ -22,7 +22,7 @@
 
 #include "LineStop.h"
 #include "StopArea.hpp"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StandardArrivalDepartureTableGenerator.h"
 #include "GraphConstants.h"
 

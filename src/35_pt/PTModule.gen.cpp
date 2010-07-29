@@ -97,7 +97,7 @@ synthese::util::Env::Integrate<synthese::pt::JourneyPattern>();
 synthese::util::Env::Integrate<synthese::pt::LineStop>();
 synthese::util::Env::Integrate<synthese::pt::StopArea>();
 synthese::util::Env::Integrate<synthese::pt::CommercialLine>();
-synthese::util::Env::Integrate<synthese::pt::PhysicalStop>();
+synthese::util::Env::Integrate<synthese::pt::StopPoint>();
 synthese::util::Env::Integrate<synthese::pt::Junction>();
 synthese::util::Env::Integrate<synthese::pt::TransportNetwork>();
 synthese::util::Env::Integrate<synthese::pt::PTUseRule>();

@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.14 Admin : Data source edition and use.
@@ -75,7 +75,7 @@ namespace synthese
 				std::string cityName;
 				std::string name;
 				geometry::Point2D coords;
-				boost::shared_ptr<PhysicalStop> stop;
+				boost::shared_ptr<StopPoint> stop;
 			};
 			typedef std::map<std::string, Bahnhof> Bahnhofs;
 

@@ -42,7 +42,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 	}
 
 	namespace pt
@@ -90,7 +90,7 @@ namespace synthese
 			, bool raisingOrder = true
 		);
 
-		typedef struct { boost::shared_ptr<const pt::PhysicalStop> stop; boost::shared_ptr<BroadcastPoint> bp; } PhysicalStopAndBroadcastPoint;
+		typedef struct { boost::shared_ptr<const pt::StopPoint> stop; boost::shared_ptr<BroadcastPoint> bp; } PhysicalStopAndBroadcastPoint;
 
 
 		/** JourneyPattern searcher.

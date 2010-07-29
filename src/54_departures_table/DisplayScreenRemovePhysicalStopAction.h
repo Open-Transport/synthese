@@ -30,7 +30,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 	}
 
 	namespace departurestable
@@ -49,7 +49,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<DisplayScreen>		_screen;
-			boost::shared_ptr<const pt::PhysicalStop>	_stop;
+			boost::shared_ptr<const pt::StopPoint>	_stop;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

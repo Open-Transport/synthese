@@ -63,7 +63,7 @@ namespace synthese
 	namespace pt
 	{
 		class ReservationContact;
-		class PhysicalStop;
+		class StopPoint;
 	}
 
 	namespace road
@@ -258,7 +258,7 @@ namespace synthese
 				bool isItArrival,
 				const messages::SentAlarm* alarm,
 				bool isItTerminus,
-				const pt::PhysicalStop& physicalStop,
+				const pt::StopPoint& physicalStop,
 				bool color,
 				const boost::posix_time::ptime& time,
 				boost::posix_time::time_duration continuousServiceRange,

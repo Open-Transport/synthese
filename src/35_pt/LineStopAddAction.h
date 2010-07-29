@@ -33,7 +33,7 @@ namespace synthese
 	namespace pt
 	{
 		class JourneyPattern;
-		class PhysicalStop;
+		class StopPoint;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : Adds a stop into a route.
@@ -75,7 +75,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<JourneyPattern> _route;
-			boost::shared_ptr<PhysicalStop> _stop;
+			boost::shared_ptr<StopPoint> _stop;
 			std::size_t _rank;
 			double _metricOffset;
 

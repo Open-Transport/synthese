@@ -27,7 +27,7 @@
 #include "LineStopAddAction.h"
 #include "TransportNetworkRight.h"
 #include "Request.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "City.h"
 #include "JourneyPatternTableSync.hpp"
@@ -111,7 +111,7 @@ namespace synthese
 			{
 				throw ActionException("Commercial stop without physical stop");
 			}
-			_stop = const_pointer_cast<PhysicalStop>(_env->getSPtr(stop->getPhysicalStops().begin()->second));
+			_stop = const_pointer_cast<StopPoint>(_env->getSPtr(stop->getPhysicalStops().begin()->second));
 
 			_rank = map.getOptional<size_t>(PARAMETER_RANK) ?
 				map.get<size_t>(PARAMETER_RANK) : _route->getEdges().size();

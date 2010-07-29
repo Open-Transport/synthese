@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : PhysicalStopUpdateAction.
@@ -62,7 +62,7 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 
 		private:
-			boost::shared_ptr<PhysicalStop> _stop;
+			boost::shared_ptr<StopPoint> _stop;
 			double _x;
 			double _y;
 			std::string _operatorCode;
@@ -100,7 +100,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setStop(boost::shared_ptr<PhysicalStop> value) { _stop = value; }
+				void setStop(boost::shared_ptr<StopPoint> value) { _stop = value; }
 			//@}
 		};
 	}

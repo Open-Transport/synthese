@@ -40,7 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace transportwebsite;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,forum::ForumMessagesFunction>::FACTORY_KEY("forum_messages");
 	

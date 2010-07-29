@@ -25,7 +25,7 @@
 #include "DepartureTableRowInterfacePage.h"
 #include "ScheduledService.h"
 #include "ServicePointer.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "Edge.h"
 #include "JourneyPattern.hpp"
 #include "RollingStock.h"
@@ -111,7 +111,7 @@ namespace synthese
 
 				parameters.push_back(ptd.first.getService()->getServiceNumber());
 				parameters.push_back(
-					static_cast<const PhysicalStop*>(ptd.first.getRealTimeDepartureVertex())->getName()
+					static_cast<const StopPoint*>(ptd.first.getRealTimeDepartureVertex())->getName()
 					);
 				parameters.push_back(
 					ptd.first.getService()->getTeam()

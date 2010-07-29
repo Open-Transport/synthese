@@ -92,7 +92,7 @@ namespace synthese
 		void PhysicalStopAddAction::run(
 			Request& request
 		){
-			PhysicalStop object;
+			StopPoint object;
 			object.setHub(_place.get());
 			object.setName(_name);
 			object.setCodeBySource(_operatorCode);

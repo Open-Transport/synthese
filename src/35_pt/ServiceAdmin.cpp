@@ -34,7 +34,7 @@
 #include "ResultHTMLTable.h"
 #include "JourneyPattern.hpp"
 #include "LineStop.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "HTMLForm.h"
 #include "AdminActionFunctionRequest.hpp"

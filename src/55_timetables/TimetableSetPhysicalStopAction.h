@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 	}
 
 	namespace timetables
@@ -51,7 +51,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<Timetable> _timetable;
-			boost::shared_ptr<const pt::PhysicalStop> _physicalStop;
+			boost::shared_ptr<const pt::StopPoint> _physicalStop;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ namespace synthese
 
 
 			void setTimetable(boost::shared_ptr<Timetable> value);
-			void setPhysicalStop(boost::shared_ptr<const pt::PhysicalStop> value);
+			void setPhysicalStop(boost::shared_ptr<const pt::StopPoint> value);
 		};
 	}
 }

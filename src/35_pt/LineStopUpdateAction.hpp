@@ -33,7 +33,7 @@ namespace synthese
 	namespace pt
 	{
 		class LineStop;
-		class PhysicalStop;
+		class StopPoint;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : LineStopUpdateAction.
@@ -62,7 +62,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<LineStop> _lineStop;
-			boost::shared_ptr<PhysicalStop> _physicalStop;
+			boost::shared_ptr<StopPoint> _physicalStop;
 			boost::optional<bool> _allowedDeparture;
 			boost::optional<bool> _allowedArrival;
 

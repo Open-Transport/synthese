@@ -23,7 +23,7 @@
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
 #include "StopArea.hpp"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "Service.h"
 #include "ArrivalDepartureTableGenerator.h"
 #include "GraphConstants.h"

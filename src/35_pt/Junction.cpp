@@ -23,7 +23,7 @@
 #include "Junction.hpp"
 #include "JunctionStop.hpp"
 #include "PermanentService.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 
 using namespace boost;
@@ -65,8 +65,8 @@ namespace synthese
 
 
 		void Junction::setStops(
-			PhysicalStop* start,
-			PhysicalStop* end,
+			StopPoint* start,
+			StopPoint* end,
 			double length,
 			boost::posix_time::time_duration duration,
 			bool doBack
@@ -124,18 +124,18 @@ namespace synthese
 
 
 
-		PhysicalStop* Junction::getStart() const
+		StopPoint* Junction::getStart() const
 		{
 			assert(isValid());
-			return dynamic_cast<PhysicalStop*>((*_edges.begin())->getFromVertex());
+			return dynamic_cast<StopPoint*>((*_edges.begin())->getFromVertex());
 		}
 
 
 
-		PhysicalStop* Junction::getEnd() const
+		StopPoint* Junction::getEnd() const
 		{
 			assert(isValid());
-			return dynamic_cast< PhysicalStop*>((*(_edges.begin()+1))->getFromVertex());
+			return dynamic_cast< StopPoint*>((*(_edges.begin()+1))->getFromVertex());
 		}
 
 

@@ -22,7 +22,7 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "PhysicalStopTableSync.h"
 #include "ActionException.h"
 #include "Request.h"
@@ -125,7 +125,7 @@ namespace synthese
 			{
 				_stop = PhysicalStopTableSync::Get(id, *_env, UP_LINKS_LOAD_LEVEL);
 			}
-			catch (ObjectNotFoundException<PhysicalStop>& e)
+			catch (ObjectNotFoundException<StopPoint>& e)
 			{
 				throw ActionException("Departure physical stop", e, *this);
 			}

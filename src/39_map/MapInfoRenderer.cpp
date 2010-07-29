@@ -30,7 +30,7 @@
 
 #include "Log.h"
 #include "Conversion.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 
 #include <boost/algorithm/string/replace.hpp>
 
@@ -121,7 +121,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 	// find first stop index
 	for (int i=0; i<points.size ();++i)
 	{
-	    const PhysicalStop* stop = dynamic_cast<const PhysicalStop*> (points[i]);
+	    const StopPoint* stop = dynamic_cast<const StopPoint*> (points[i]);
 	    if (stop == 0) continue;
 	    firstStopIndex = i;
 	    break;
@@ -139,7 +139,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 
 	    for (int i=firstStopIndex+1; i<points.size (); ++i)
 	    {
-		const PhysicalStop* stop = dynamic_cast<const PhysicalStop*> (points[i]);
+		const StopPoint* stop = dynamic_cast<const StopPoint*> (points[i]);
 		if (stop == 0) continue;
 		secondStopIndex = i;
 		break;
@@ -162,8 +162,8 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 		       (int) dbl->getColor ().b)) // pen color
 		  << ")" << std::endl;
 
-	    midof << ((const PhysicalStop*) points[firstStopIndex])->getName ()
-		  << " > " << ((const PhysicalStop*) points[secondStopIndex])->getName ()
+	    midof << ((const StopPoint*) points[firstStopIndex])->getName ()
+		  << " > " << ((const StopPoint*) points[secondStopIndex])->getName ()
 		  << std::endl;
 	    
 	    firstStopIndex = secondStopIndex;

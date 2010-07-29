@@ -25,7 +25,7 @@
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "ScheduledService.h"
 #include "LineStop.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
@@ -88,7 +88,7 @@ namespace synthese
 				lineStop.getLine()->getDestination()->getConnectionPlace()->getName26()
 			); //5
 
-			pv.push_back(static_cast<const PhysicalStop*>(service.getRealTimeVertex(lineStop.getRankInPath()))->getName()); //6
+			pv.push_back(static_cast<const StopPoint*>(service.getRealTimeVertex(lineStop.getRankInPath()))->getName()); //6
 
 			pv.push_back(
 				lineStop.getLine()->getRollingStock() ?

@@ -35,7 +35,7 @@ namespace synthese
 
 namespace pt
 {
-    class PhysicalStop;
+    class StopPoint;
 }
 
 
@@ -64,7 +64,7 @@ protected:
 
 public:
 
-    DrawablePhysicalStop (const synthese::pt::PhysicalStop* physicalStop);
+    DrawablePhysicalStop (const synthese::pt::StopPoint* physicalStop);
     ~DrawablePhysicalStop ();
 	
     //! @name Getters/Setters

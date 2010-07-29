@@ -38,7 +38,7 @@
 #include "Projection.h"
 #include "WebPageDisplayFunction.h"
 #include "Road.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "SentAlarm.h"
 #include "ContinuousService.h"
 #include "RollingStock.h"
@@ -326,7 +326,7 @@ namespace synthese
 								false
 								, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 								, false
-								, *static_cast<const PhysicalStop*>(leg.getDepartureEdge()->getFromVertex())
+								, *static_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex())
 								, __Couleur
 								, leg.getDepartureDateTime()
 								, journey.getContinuousServiceRange(),
@@ -378,7 +378,7 @@ namespace synthese
 							true
 							, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 							, leg.getArrivalEdge()->getHub() == leg.getService()->getPath()->getEdges().back()->getHub()
-							, *static_cast<const PhysicalStop*>(leg.getArrivalEdge()->getFromVertex())
+							, *static_cast<const StopPoint*>(leg.getArrivalEdge()->getFromVertex())
 							, __Couleur
 							, leg.getArrivalDateTime()
 							, journey.getContinuousServiceRange(),
@@ -447,7 +447,7 @@ namespace synthese
 			bool isItArrival,
 			const messages::SentAlarm* alarm,
 			bool isItTerminus,
-			const pt::PhysicalStop& physicalStop,
+			const pt::StopPoint& physicalStop,
 			bool color,
 			const boost::posix_time::ptime& time,
 			boost::posix_time::time_duration continuousServiceRange,

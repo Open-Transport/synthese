@@ -27,9 +27,9 @@
 #include "TimetableSetPhysicalStopAction.h"
 #include "TimetableRight.h"
 #include "Request.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "TimetableTableSync.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "Env.h"
 #include "Timetable.h"
 
@@ -85,9 +85,9 @@ namespace synthese
 
 			try
 			{
-				_physicalStop = Env::GetOfficialEnv().get<PhysicalStop>(map.get<RegistryKeyType>(PARAMETER_PHYSICAL_STOP_ID));
+				_physicalStop = Env::GetOfficialEnv().get<StopPoint>(map.get<RegistryKeyType>(PARAMETER_PHYSICAL_STOP_ID));
 			}
-			catch(ObjectNotFoundException<PhysicalStop>& e)
+			catch(ObjectNotFoundException<StopPoint>& e)
 			{
 				throw ActionException("No such physical stop", e, *this);
 			}
@@ -126,7 +126,7 @@ namespace synthese
 
 
 
-		void TimetableSetPhysicalStopAction::setPhysicalStop( boost::shared_ptr<const pt::PhysicalStop> value )
+		void TimetableSetPhysicalStopAction::setPhysicalStop( boost::shared_ptr<const pt::StopPoint> value )
 		{
 			_physicalStop = value;
 		}

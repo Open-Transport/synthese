@@ -144,7 +144,7 @@ namespace synthese
 		shared_ptr<LineStop> 
 		XmlBuilder::CreateLineStop (XMLNode& node, 
 						Registry<JourneyPattern>& lines,
-						const Registry<PhysicalStop>& physicalStops)
+						const Registry<StopPoint>& physicalStops)
 		{
 			// assert ("lineStop" == node.getName ());
 
@@ -166,7 +166,7 @@ namespace synthese
 				rankInPath, 
 				isDeparture, isArrival,
 				metricOffset, 
-				const_cast<PhysicalStop*>(physicalStops.get(physicalStopId).get())))
+				const_cast<StopPoint*>(physicalStops.get(physicalStopId).get())))
 			;
 
 			// Add via points
@@ -184,7 +184,7 @@ namespace synthese
 
 
 
-		shared_ptr<PhysicalStop> 
+		shared_ptr<StopPoint> 
 		XmlBuilder::CreatePhysicalStop(
 			XMLNode& node,
 			const Registry<StopArea>& connectionPlaces)
@@ -196,8 +196,8 @@ namespace synthese
 			double x (GetDoubleAttr (node, "x"));
 			double y (GetDoubleAttr (node, "y"));
 
-			return shared_ptr<PhysicalStop>(
-			new synthese::pt::PhysicalStop (
+			return shared_ptr<StopPoint>(
+			new synthese::pt::StopPoint (
 				id,
 				name, 
 				connectionPlaces.get (placeId).get(), 

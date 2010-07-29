@@ -34,7 +34,7 @@ namespace synthese
 	namespace pt
 	{
 		class SchedulesBasedService;
-		class PhysicalStop;
+		class StopPoint;
 	}
 
 	namespace pt
@@ -61,7 +61,7 @@ namespace synthese
 		class TimetableColumn
 		{
 		public:
-			typedef std::vector<std::pair<const pt::PhysicalStop*, boost::posix_time::time_duration> > Content;
+			typedef std::vector<std::pair<const pt::StopPoint*, boost::posix_time::time_duration> > Content;
 			enum tTypeOD
 			{
 				Texte,

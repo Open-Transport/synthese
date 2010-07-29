@@ -28,7 +28,7 @@
 #include "Profile.h"
 #include "CommercialLine.h"
 #include "HTMLModule.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "JourneyPattern.hpp"
 #include "LineStop.h"
 #include "LineStopTableSync.h"

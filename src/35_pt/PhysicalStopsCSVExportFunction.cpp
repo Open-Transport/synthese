@@ -25,7 +25,7 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "PhysicalStopsCSVExportFunction.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "City.h"
 
@@ -90,11 +90,11 @@ namespace synthese
 		) const	{
 			
 			stream << fixed;
-			BOOST_FOREACH(Registry<PhysicalStop>::value_type itps, Env::GetOfficialEnv().getRegistry<PhysicalStop>())
+			BOOST_FOREACH(Registry<StopPoint>::value_type itps, Env::GetOfficialEnv().getRegistry<StopPoint>())
 			{
 				if(!itps.second.get()) continue;
 
-				const PhysicalStop& ps(*itps.second);
+				const StopPoint& ps(*itps.second);
 
 				if(	_bbox &&
 					(	ps.getX() < _bbox->first.getX() ||

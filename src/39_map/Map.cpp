@@ -42,7 +42,7 @@
 
 #include "Point2D.h"
 
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 
 #include "Log.h"
 #include "Conversion.h"
@@ -561,7 +561,7 @@ Map::findBestAvailableReference (const DrawableLine* line,
 void 
 Map::preparePhysicalStops () 
 {
-    std::set<const PhysicalStop*> iteratedStops;
+    std::set<const StopPoint*> iteratedStops;
 	std::vector<Point2D> fuzzyStopPoints;
 
     // Create drawable physical stops (for each physical stop)
@@ -576,7 +576,7 @@ Map::preparePhysicalStops ()
 	    {
 	        const Point2D* p = points[i];
 
-	        const PhysicalStop* physicalStop = dynamic_cast<const PhysicalStop*> (p);
+	        const StopPoint* physicalStop = dynamic_cast<const StopPoint*> (p);
 	        if (physicalStop)
 	        {
 				Point2D fuzzyPoint (_indexedLines.getFuzzyPoint (*p));

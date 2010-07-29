@@ -94,7 +94,7 @@
 #include "TransportNetwork.h"
 #include "PTUseRule.h"
 #include "Junction.hpp"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "RollingStock.h"
 #include "Fare.h"
 #include "ScheduledService.h"

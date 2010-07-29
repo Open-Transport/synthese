@@ -30,7 +30,7 @@
 #include "JourneyPatternTableSync.hpp"
 #include "StopAreaTableSync.hpp"
 #include "City.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "JourneyPattern.hpp"
 

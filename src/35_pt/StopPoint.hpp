@@ -1,6 +1,6 @@
 
-/** PhysicalStop class header.
-	@file PhysicalStop.h
+/** StopPoint class header.
+	@file StopPoint.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -48,7 +48,7 @@ namespace synthese
 		///	RoutePoint
 		///	@ingroup m35
 		//////////////////////////////////////////////////////////////////////////
-		class PhysicalStop:
+		class StopPoint:
 			public graph::Vertex,
 			public impex::Importable,
 			public util::Named
@@ -56,18 +56,18 @@ namespace synthese
 		public:
 
 			/// Chosen registry class.
-			typedef util::Registry<PhysicalStop>	Registry;
+			typedef util::Registry<StopPoint>	Registry;
 
 		public:
 
-			PhysicalStop(
+			StopPoint(
 				util::RegistryKeyType id = 0,
 				std::string name = std::string(), 
 				const pt::StopArea* place = NULL,
 				double x = UNKNOWN_VALUE,
 				double y = UNKNOWN_VALUE);
 
-			~PhysicalStop ();
+			~StopPoint ();
 		    
 
 		

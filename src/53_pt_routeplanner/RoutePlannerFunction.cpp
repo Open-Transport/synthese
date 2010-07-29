@@ -44,7 +44,7 @@
 #include "RollingStock.h"
 #include "RGBColor.h"
 #include "Crossing.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "OnlineReservationRule.h"
 #include "ReservationContact.h"
 #include "RollingStockFilter.h"
@@ -942,9 +942,9 @@ namespace synthese
 							}
 							stream <<
 								">";
-							_XMLDisplayPhysicalStop(stream, "startStop", dynamic_cast<const PhysicalStop&>(*curET.getDepartureEdge()->getFromVertex()));
-							_XMLDisplayPhysicalStop(stream, "endStop", dynamic_cast<const PhysicalStop&>(*curET.getArrivalEdge()->getFromVertex()));
-							_XMLDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const PhysicalStop&>(*line->getLastEdge()->getFromVertex()));
+							_XMLDisplayPhysicalStop(stream, "startStop", dynamic_cast<const StopPoint&>(*curET.getDepartureEdge()->getFromVertex()));
+							_XMLDisplayPhysicalStop(stream, "endStop", dynamic_cast<const StopPoint&>(*curET.getArrivalEdge()->getFromVertex()));
+							_XMLDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const StopPoint&>(*line->getLastEdge()->getFromVertex()));
 							if(!line->isPedestrianMode())
 							{
 								stream <<
@@ -1272,7 +1272,7 @@ namespace synthese
 		void RoutePlannerFunction::_XMLDisplayPhysicalStop(
 			std::ostream& stream,
 			const std::string& tag,
-			const pt::PhysicalStop& stop
+			const pt::StopPoint& stop
 		){
 			GeoPoint gp(WGS84FromLambert(stop));
 

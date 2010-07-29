@@ -37,7 +37,7 @@
 #include "CalendarTemplate.h"
 #include "Calendar.h"
 #include "LineStop.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "TimetableResult.hpp"
 #include "PhysicalStopTableSync.h"
 #include "StopAreaTableSync.hpp"
@@ -237,12 +237,12 @@ namespace synthese
 				} // Way 4.2 : physical stop timetable
 				else if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == PhysicalStopTableSync::TABLE.ID)
 				{
-					shared_ptr<const PhysicalStop> stop;
+					shared_ptr<const StopPoint> stop;
 					try
 					{
-						stop = Env::GetOfficialEnv().get<PhysicalStop>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+						stop = Env::GetOfficialEnv().get<StopPoint>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 					}
-					catch(ObjectNotFoundException<PhysicalStop>&)
+					catch(ObjectNotFoundException<StopPoint>&)
 					{
 						throw RequestException("No such stop");
 					}

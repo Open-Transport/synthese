@@ -39,7 +39,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "StopAreaAddAction.h"
 #include "StopArea.hpp"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "DataSourceTableSync.h"
 #include "ImportFunction.h"
 #include "FileFormat.h"

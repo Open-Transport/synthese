@@ -48,7 +48,7 @@
 #include "PlaceAliasTableSync.h"
 #include "Address.h"
 #include "AddressTableSync.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "PhysicalStopTableSync.h"
 #include "12_security/Constants.h"
 #include "Right.h"

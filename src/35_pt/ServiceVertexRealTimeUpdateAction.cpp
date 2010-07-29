@@ -27,7 +27,7 @@
 #include "ServiceVertexRealTimeUpdateAction.h"
 #include "Request.h"
 #include "ScheduledService.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "Env.h"
 #include "JourneyPattern.hpp"
 #include "LineStop.h"
@@ -79,7 +79,7 @@ namespace synthese
 				_service = Env::GetOfficialEnv().getEditableRegistry<ScheduledService>().getEditable(
 					map.get<RegistryKeyType>(PARAMETER_SERVICE_ID)
 				);
-				_physicalStop = Env::GetOfficialEnv().getEditableRegistry<PhysicalStop>().getEditable(
+				_physicalStop = Env::GetOfficialEnv().getEditableRegistry<StopPoint>().getEditable(
 					map.get<RegistryKeyType>(PARAMETER_STOP_ID)
 				);
 			}
@@ -87,7 +87,7 @@ namespace synthese
 			{
 				throw ActionException("No such service");
 			}
-			catch(ObjectNotFoundException<PhysicalStop>)
+			catch(ObjectNotFoundException<StopPoint>)
 			{
 				throw ActionException("No such physical stop");
 			}
@@ -121,7 +121,7 @@ namespace synthese
 
 
 
-		void ServiceVertexRealTimeUpdateAction::setPhysicalStop( boost::shared_ptr<const pt::PhysicalStop> value )
+		void ServiceVertexRealTimeUpdateAction::setPhysicalStop( boost::shared_ptr<const pt::StopPoint> value )
 		{
 			_physicalStop = value;
 		}

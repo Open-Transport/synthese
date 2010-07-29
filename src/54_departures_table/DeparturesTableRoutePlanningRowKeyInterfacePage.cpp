@@ -25,7 +25,7 @@
 #include "DeparturesTableRoutePlanningRowKeyInterfacePage.h"
 #include "StopArea.hpp"
 #include "City.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 
 #include <boost/lexical_cast.hpp>
 

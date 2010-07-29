@@ -60,7 +60,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class PhysicalStop;
+		class StopPoint;
 		class StopArea;
 	}
 
@@ -455,7 +455,7 @@ namespace synthese
 			static void _XMLDisplayPhysicalStop(
 				std::ostream& stream,
 				const std::string& tag,
-				const pt::PhysicalStop& place
+				const pt::StopPoint& place
 			);
 			static void _XMLDisplayAddress(
 				std::ostream& stream,

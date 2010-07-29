@@ -23,7 +23,7 @@
 #include "StopArea.hpp"
 #include "Registry.h"
 #include "PTModule.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "Edge.h"
 #include "CommercialLine.h"
 #include "JourneyPattern.hpp"
@@ -69,7 +69,7 @@ namespace synthese
 		}
 
 		void StopArea::addPhysicalStop(
-			const PhysicalStop& physicalStop
+			const StopPoint& physicalStop
 		){
 			_isoBarycentreToUpdate = true;
 			_physicalStops.insert(make_pair(physicalStop.getKey(), &physicalStop));

@@ -33,7 +33,7 @@
 #include "StopArea.hpp"
 #include "PublicPlace.h"
 #include "ResultHTMLTable.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "PTPlacesAdmin.h"
 #include "City.h"
 #include "Profile.h"
@@ -173,7 +173,7 @@ namespace synthese
 					HTMLMap map(_connectionPlace->getPoint(), 18, true);
 					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 					{
-						moveAction.getAction()->setStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<PhysicalStop*>(it.second)));
+						moveAction.getAction()->setStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<StopPoint*>(it.second)));
 
 						stringstream popupcontent;
 						set<const CommercialLine*> lines;
@@ -242,7 +242,7 @@ namespace synthese
 				stream << t.open();
 				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 				{
-					const PhysicalStop* stop(it.second);
+					const StopPoint* stop(it.second);
 					openRequest.getPage()->setStop(Env::GetOfficialEnv().getSPtr(stop));
 
 					stream << t.row();

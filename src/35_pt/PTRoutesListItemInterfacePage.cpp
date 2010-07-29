@@ -25,7 +25,7 @@
 #include "PTRoutesListItemInterfacePage.hpp"
 #include "JourneyPattern.hpp"
 #include "LineStop.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "City.h"
 #include "StaticFunctionRequest.h"

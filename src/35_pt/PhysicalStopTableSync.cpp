@@ -73,8 +73,8 @@ namespace synthese
 
 
 		/** Does not update the place */
-		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Load(
-			PhysicalStop* object,
+		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,StopPoint>::Load(
+			StopPoint* object,
 			const db::SQLiteResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
@@ -95,8 +95,8 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Unlink(
-			PhysicalStop* obj
+		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,StopPoint>::Unlink(
+			StopPoint* obj
 		){
 //			StopArea* place = const_cast<StopArea*>(obj->getConnectionPlace());
 /// @todo	place->removePhysicalStop(obj);
@@ -106,8 +106,8 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Save(
-			PhysicalStop* object,
+		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,StopPoint>::Save(
+			StopPoint* object,
 			optional<SQLiteTransaction&> transaction
 		){
 			ReplaceQuery<PhysicalStopTableSync> query(*object);

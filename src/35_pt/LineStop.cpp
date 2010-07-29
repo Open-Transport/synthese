@@ -26,7 +26,7 @@
 #include "JourneyPattern.hpp"
 #include "Service.h"
 #include "ContinuousService.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "StopArea.hpp"
 
 using namespace std;
@@ -52,7 +52,7 @@ namespace synthese
 			bool isDeparture,
 			bool isArrival,		
 			double metricOffset,
-			PhysicalStop* physicalStop
+			StopPoint* physicalStop
 		):	Registrable(id),
 			_isDeparture(isDeparture),
 			_isArrival(isArrival),
@@ -102,9 +102,9 @@ namespace synthese
 			return static_cast<JourneyPattern*>(getParentPath());
 		}
 
-		PhysicalStop* LineStop::getPhysicalStop() const
+		StopPoint* LineStop::getPhysicalStop() const
 		{
-			return static_cast<PhysicalStop*>(getFromVertex());
+			return static_cast<StopPoint*>(getFromVertex());
 		}
 
 		void LineStop::setLine(JourneyPattern* line )
@@ -112,7 +112,7 @@ namespace synthese
 			setParentPath(static_cast<Path*>(line));
 		}
 
-		void LineStop::setPhysicalStop(PhysicalStop* stop )
+		void LineStop::setPhysicalStop(StopPoint* stop )
 		{
 			// Saving of the attribute
 			setFromVertex(static_cast<Vertex*>(stop));

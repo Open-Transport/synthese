@@ -28,7 +28,7 @@
 #include "JourneysResult.h"
 #include "VertexAccessMap.h"
 #include "IntegralSearcher.h"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "NamedPlace.h"
 
 #include <sstream>
@@ -261,7 +261,7 @@ namespace synthese
 					*_logStream	<<
 						"<tr><td>" <<
 						dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
-						"</td><td>" << static_cast<const PhysicalStop*>(it.first)->getName() <<
+						"</td><td>" << static_cast<const StopPoint*>(it.first)->getName() <<
 						"</td><td>" << it.second.approachDistance <<
 						"</td><td>" << it.second.approachTime.total_seconds() / 60 <<
 						"</td></tr>"
@@ -279,7 +279,7 @@ namespace synthese
 						"<tr><td>" <<
 						dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
 						"</td><td>" <<
-						static_cast<const PhysicalStop* const>(it.first)->getName() <<
+						static_cast<const StopPoint* const>(it.first)->getName() <<
 						"</td><td>" <<
 						it.second.approachDistance <<
 						"</td><td>" <<

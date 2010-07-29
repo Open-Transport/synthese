@@ -180,14 +180,14 @@ namespace synthese
 
 
 
-		void Timetable::addAuthorizedPhysicalStop( const pt::PhysicalStop* stop )
+		void Timetable::addAuthorizedPhysicalStop( const pt::StopPoint* stop )
 		{
 			_authorizedPhysicalStops.insert(stop);
 		}
 
 
 
-		void Timetable::removeAuthorizedPhysicalStop( const pt::PhysicalStop* stop )
+		void Timetable::removeAuthorizedPhysicalStop( const pt::StopPoint* stop )
 		{
 			_authorizedPhysicalStops.erase(stop);
 		}

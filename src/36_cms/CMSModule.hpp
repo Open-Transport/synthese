@@ -93,10 +93,8 @@ namespace synthese
 			public server::ModuleClassTemplate<CMSModule>
 		{
 		private:
-			static util::Registry<Website>::Map _sites;
 
 		public:
-			static void AddSite(boost::shared_ptr<Website> site);
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets the site used by the current request.

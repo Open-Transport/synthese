@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ENVLSSQL_PHYSICALSTOPTABLESYNC_H
 #define SYNTHESE_ENVLSSQL_PHYSICALSTOPTABLESYNC_H
 
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 
 #include <string>
 #include <iostream>
@@ -35,7 +35,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		/** PhysicalStop SQLite table synchronizer.
+		/** StopPoint SQLite table synchronizer.
 			@ingroup m35LS refLS
 			
 			Physical stops table :
@@ -44,7 +44,7 @@ namespace synthese
 				- on delete : X
 		*/
 		class PhysicalStopTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>,
+			public db::SQLiteRegistryTableSyncTemplate<PhysicalStopTableSync,StopPoint>,
 			public db::FetcherTemplate<graph::Vertex, PhysicalStopTableSync>
 		{
 		public:

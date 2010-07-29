@@ -193,7 +193,7 @@ namespace synthese
 				void	addDisplayedPlace(const pt::StopArea*);
 				void	addForbiddenPlace(const pt::StopArea*);
 				void	addForcedDestination(const pt::StopArea*);
-				void	addPhysicalStop(const pt::PhysicalStop*);
+				void	addPhysicalStop(const pt::StopPoint*);
 				void	clearDisplayedPlaces();
 				void	clearForbiddenPlaces();
 				void	clearForcedDestinations();
@@ -202,7 +202,7 @@ namespace synthese
 				void	removeDisplayedPlace(const pt::StopArea*);
 				void	removeForbiddenPlace(const pt::StopArea*);
 				void	removeForcedDestination(const pt::StopArea*);
-				void	removePhysicalStop(const pt::PhysicalStop*);
+				void	removePhysicalStop(const pt::StopPoint*);
 				
 				//////////////////////////////////////////////////////////////////////////
 				/// Adds a destination by transfer to display if necessary.

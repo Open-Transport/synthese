@@ -37,7 +37,7 @@
 #include "CommercialLineTableSync.h"
 #include "CityTableSync.h"
 #include "StopArea.hpp"
-#include "PhysicalStop.h"
+#include "StopPoint.hpp"
 #include "PhysicalStopTableSync.h"
 #include "JourneyPattern.hpp"
 #include "DBLogEntryTableSync.h"
@@ -247,7 +247,7 @@ namespace synthese
 						RegistryKeyType id(Conversion::ToLongLong(stop));
 						object->addPhysicalStop(PhysicalStopTableSync::Get(id, env, linkLevel).get());
 					}
-					catch (ObjectNotFoundException<PhysicalStop>& e)
+					catch (ObjectNotFoundException<StopPoint>& e)
 					{
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
 					}
