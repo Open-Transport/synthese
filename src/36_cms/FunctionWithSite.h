@@ -25,56 +25,19 @@
 #ifndef SYNTHESE_FunctionWithSite_H__
 #define SYNTHESE_FunctionWithSite_H__
 
-#include "Function.h"
-#include "Site.h"
+#include "FunctionWithSiteBase.hpp"
 #include "RequestException.h"
+#include "Website.h"
 #include "Env.h"
 
 namespace synthese
 {
 	namespace transportwebsite
 	{
-		class FunctionWithSiteBase:
-			public server::Function
-		{
-		public:
-			static const std::string PARAMETER_SITE;
-
-		protected:
-			//! \name Page parameters
-			//@{
-				boost::shared_ptr<const Site>	_site;
-			//@}
-
-
-			/** Conversion from attributes to generic parameter maps.
-				@return Generated parameters map
-			*/
-			server::ParametersMap _getParametersMap() const;
-			
-			//////////////////////////////////////////////////////////////////////////
-			/// Public function with site copy.
-			/// @param function function to copy
-			/// @author Hugues Romain
-			virtual void _copy(boost::shared_ptr<const Function> function);
-
-		public:
-			//! @name Getters
-			//@{
-				boost::shared_ptr<const Site> getSite() const {	return _site; }
-			//@}
-
-			//! @name Setters
-			//@{
-				void setSite(boost::shared_ptr<const Site> value) {	_site = value; }
-			//@}
-
-		};
-
-		/** Function With Site Function class.
+		/** Function With website class.
 			@author Hugues Romain
 			@date 2007
-			@ingroup m56
+			@ingroup m36
 		*/
 		template<bool compulsory>
 		class FunctionWithSite:
@@ -103,9 +66,9 @@ namespace synthese
 				{
 					try
 					{
-						_site = util::Env::GetOfficialEnv().getRegistry<Site>().get(id);
+						_site = util::Env::GetOfficialEnv().getRegistry<Website>().get(id);
 					}
-					catch (util::ObjectNotFoundException<Site>&)
+					catch (util::ObjectNotFoundException<Website>&)
 					{
 						throw server::RequestException("Specified site not found");
 					}
