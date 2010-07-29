@@ -43,7 +43,7 @@
 #include "Journey.h"
 #include "Service.h"
 #include "Edge.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "Road.h"
 #include "UseRule.h"
@@ -375,7 +375,7 @@ namespace synthese
 				);
 				r->setArrivalTime(su.getArrivalDateTime());
 				
-				const Line* line(dynamic_cast<const Line*>(su.getService()->getPath()));
+				const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
 				if (line)
 				{
 					assert(line->getCommercialLine() != NULL);
@@ -393,11 +393,11 @@ namespace synthese
 
 				if(	UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su))
 				){
-					if(	dynamic_cast<const Line*>(su.getService()->getPath()) &&
-						static_cast<const Line*>(su.getService()->getPath())->getCommercialLine()
+					if(	dynamic_cast<const JourneyPattern*>(su.getService()->getPath()) &&
+						static_cast<const JourneyPattern*>(su.getService()->getPath())->getCommercialLine()
 					){
 						const OnlineReservationRule* onlineContact(OnlineReservationRule::GetOnlineReservationRule(
-								static_cast<const Line*>(su.getService()->getPath())->getCommercialLine()->getReservationContact()
+								static_cast<const JourneyPattern*>(su.getService()->getPath())->getCommercialLine()->getReservationContact()
 						)	);
 						if(onlineContact)
 						{

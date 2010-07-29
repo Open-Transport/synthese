@@ -1,6 +1,6 @@
 
-/** LineTableSync class implementation.
-	@file LineTableSync.cpp
+/** JourneyPatternTableSync class implementation.
+	@file JourneyPatternTableSync.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -26,7 +26,7 @@
 #include "SelectQuery.hpp"
 #include "GraphConstants.h"
 #include "CommercialLineTableSync.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "FareTableSync.h"
 #include "RollingStockTableSync.h"
 #include "DataSourceTableSync.h"
@@ -44,78 +44,78 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,LineTableSync>::FACTORY_KEY(
-		"15.30.01 Lines"
+	template<> const string util::FactorableTemplate<SQLiteTableSync,JourneyPatternTableSync>::FACTORY_KEY(
+		"15.30.01 Journey patterns"
 	);
 
 	namespace pt
 	{
-		const string LineTableSync::COL_COMMERCIAL_LINE_ID = "commercial_line_id";
-		const string LineTableSync::COL_NAME ("name");
-		const string LineTableSync::COL_TIMETABLENAME ("timetable_name");
-		const string LineTableSync::COL_DIRECTION ("direction");
-		const string LineTableSync::COL_ISWALKINGLINE ("is_walking_line");
-		const string LineTableSync::COL_USEINDEPARTUREBOARDS ("use_in_departure_boards");
-		const string LineTableSync::COL_USEINTIMETABLES ("use_in_timetables");
-		const string LineTableSync::COL_USEINROUTEPLANNING ("use_in_routeplanning");
-		const string LineTableSync::COL_ROLLINGSTOCKID ("rolling_stock_id");
-		const string LineTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
-		const string LineTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
-		const string LineTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-		const string LineTableSync::COL_WAYBACK("wayback");
-		const string LineTableSync::COL_DATASOURCE_ID("data_source");
+		const string JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID = "commercial_line_id";
+		const string JourneyPatternTableSync::COL_NAME ("name");
+		const string JourneyPatternTableSync::COL_TIMETABLENAME ("timetable_name");
+		const string JourneyPatternTableSync::COL_DIRECTION ("direction");
+		const string JourneyPatternTableSync::COL_ISWALKINGLINE ("is_walking_line");
+		const string JourneyPatternTableSync::COL_USEINDEPARTUREBOARDS ("use_in_departure_boards");
+		const string JourneyPatternTableSync::COL_USEINTIMETABLES ("use_in_timetables");
+		const string JourneyPatternTableSync::COL_USEINROUTEPLANNING ("use_in_routeplanning");
+		const string JourneyPatternTableSync::COL_ROLLINGSTOCKID ("rolling_stock_id");
+		const string JourneyPatternTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
+		const string JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
+		const string JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
+		const string JourneyPatternTableSync::COL_WAYBACK("wayback");
+		const string JourneyPatternTableSync::COL_DATASOURCE_ID("data_source");
 	}
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<LineTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<JourneyPatternTableSync>::TABLE(
 			"t009_lines"
-			);
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<LineTableSync>::_FIELDS[]=
+		);
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<JourneyPatternTableSync>::_FIELDS[]=
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(LineTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(LineTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(LineTableSync::COL_TIMETABLENAME, SQL_TEXT),
-			SQLiteTableSync::Field(LineTableSync::COL_DIRECTION, SQL_TEXT),
-			SQLiteTableSync::Field(LineTableSync::COL_ISWALKINGLINE, SQL_BOOLEAN),
-			SQLiteTableSync::Field(LineTableSync::COL_USEINDEPARTUREBOARDS, SQL_BOOLEAN),
-			SQLiteTableSync::Field(LineTableSync::COL_USEINTIMETABLES, SQL_BOOLEAN),
-			SQLiteTableSync::Field(LineTableSync::COL_USEINROUTEPLANNING, SQL_BOOLEAN),
-			SQLiteTableSync::Field(LineTableSync::COL_ROLLINGSTOCKID, SQL_INTEGER),
-			SQLiteTableSync::Field(LineTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(LineTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(LineTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(LineTableSync::COL_WAYBACK, SQL_INTEGER),
-			SQLiteTableSync::Field(LineTableSync::COL_DATASOURCE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_TIMETABLENAME, SQL_TEXT),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_DIRECTION, SQL_TEXT),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_ISWALKINGLINE, SQL_BOOLEAN),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_USEINDEPARTUREBOARDS, SQL_BOOLEAN),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_USEINTIMETABLES, SQL_BOOLEAN),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_USEINROUTEPLANNING, SQL_BOOLEAN),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_ROLLINGSTOCKID, SQL_INTEGER),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_WAYBACK, SQL_INTEGER),
+			SQLiteTableSync::Field(JourneyPatternTableSync::COL_DATASOURCE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<LineTableSync>::_INDEXES[]=
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<JourneyPatternTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(LineTableSync::COL_COMMERCIAL_LINE_ID.c_str(), ""),
-			SQLiteTableSync::Index(LineTableSync::COL_DATASOURCE_ID.c_str(), ""),
+			SQLiteTableSync::Index(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID.c_str(), ""),
+			SQLiteTableSync::Index(JourneyPatternTableSync::COL_DATASOURCE_ID.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,JourneyPattern>::Load(
+		template<> void SQLiteDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Load(
 			JourneyPattern* line,
 			const db::SQLiteResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
 			string name (
-			    rows->getText (LineTableSync::COL_NAME));
+			    rows->getText (JourneyPatternTableSync::COL_NAME));
 			string timetableName (
-			    rows->getText (LineTableSync::COL_TIMETABLENAME));
+			    rows->getText (JourneyPatternTableSync::COL_TIMETABLENAME));
 			string direction (
-			    rows->getText (LineTableSync::COL_DIRECTION));
+			    rows->getText (JourneyPatternTableSync::COL_DIRECTION));
 
-			bool isWalkingLine (rows->getBool (LineTableSync::COL_ISWALKINGLINE));
-			bool useInDepartureBoards (rows->getBool (LineTableSync::COL_USEINDEPARTUREBOARDS));
-			bool useInTimetables (rows->getBool (LineTableSync::COL_USEINTIMETABLES));
-			bool useInRoutePlanning (rows->getBool (LineTableSync::COL_USEINROUTEPLANNING));
+			bool isWalkingLine (rows->getBool (JourneyPatternTableSync::COL_ISWALKINGLINE));
+			bool useInDepartureBoards (rows->getBool (JourneyPatternTableSync::COL_USEINDEPARTUREBOARDS));
+			bool useInTimetables (rows->getBool (JourneyPatternTableSync::COL_USEINTIMETABLES));
+			bool useInRoutePlanning (rows->getBool (JourneyPatternTableSync::COL_USEINROUTEPLANNING));
 			
 			line->setName(name);
 			line->setTimetableName (timetableName);
@@ -124,7 +124,7 @@ namespace synthese
 			line->setUseInDepartureBoards (useInDepartureBoards);
 			line->setUseInTimetables (useInTimetables);
 			line->setUseInRoutePlanning (useInRoutePlanning);
-			line->setWayBack(rows->getBool(LineTableSync::COL_WAYBACK));
+			line->setWayBack(rows->getBool(JourneyPatternTableSync::COL_WAYBACK));
 			line->setRollingStock(NULL);
 			line->setCommercialLine(NULL);
 			line->setDataSource(NULL);
@@ -132,7 +132,7 @@ namespace synthese
 
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
-				RegistryKeyType commercialLineId(rows->getLongLong (LineTableSync::COL_COMMERCIAL_LINE_ID));
+				RegistryKeyType commercialLineId(rows->getLongLong (JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID));
 				try
 				{
 					CommercialLine* cline(CommercialLineTableSync::GetEditable(commercialLineId, env, linkLevel).get());
@@ -144,7 +144,7 @@ namespace synthese
 					Log::GetInstance().warn("Bad value " + lexical_cast<string>(commercialLineId) + " for fare in line " + lexical_cast<string>(line->getKey()));
 				}
 
-				RegistryKeyType dataSourceId(rows->getLongLong(LineTableSync::COL_DATASOURCE_ID));
+				RegistryKeyType dataSourceId(rows->getLongLong(JourneyPatternTableSync::COL_DATASOURCE_ID));
 				if(dataSourceId > 0)
 				{
 					try
@@ -160,7 +160,7 @@ namespace synthese
 				}
 
 
-				RegistryKeyType rollingStockId (rows->getLongLong (LineTableSync::COL_ROLLINGSTOCKID));
+				RegistryKeyType rollingStockId (rows->getLongLong (JourneyPatternTableSync::COL_ROLLINGSTOCKID));
 				if(rollingStockId > 0)
 				{
 					try
@@ -173,7 +173,7 @@ namespace synthese
 				}	}
 
 
-				RegistryKeyType bikeComplianceId (rows->getLongLong (LineTableSync::COL_BIKECOMPLIANCEID));
+				RegistryKeyType bikeComplianceId (rows->getLongLong (JourneyPatternTableSync::COL_BIKECOMPLIANCEID));
 				if(bikeComplianceId > 0)
 				{
 					try
@@ -185,7 +185,7 @@ namespace synthese
 						Log::GetInstance().warn("Bad value " + lexical_cast<string>(bikeComplianceId) + " for bike compliance in line " + lexical_cast<string>(line->getKey()));
 				}	}
 
-				RegistryKeyType handicappedComplianceId (rows->getLongLong (LineTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+				RegistryKeyType handicappedComplianceId (rows->getLongLong (JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID));
 				if(handicappedComplianceId > 0)
 				{
 					try
@@ -197,7 +197,7 @@ namespace synthese
 						Log::GetInstance().warn("Bad value " + lexical_cast<string>(handicappedComplianceId) + " for handicapped compliance in line " + lexical_cast<string>(line->getKey()));
 				}	}
 				
-				RegistryKeyType pedestrianComplianceId(rows->getLongLong (LineTableSync::COL_PEDESTRIANCOMPLIANCEID));
+				RegistryKeyType pedestrianComplianceId(rows->getLongLong (JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID));
 				if(pedestrianComplianceId > 0)
 				{
 					try
@@ -214,12 +214,12 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,JourneyPattern>::Save(
+		template<> void SQLiteDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Save(
 			JourneyPattern* object,
 			optional<SQLiteTransaction&> transaction
 		){
 			if(!object->getCommercialLine()) throw Exception("JourneyPattern save error. Missing commercial line");
-			ReplaceQuery<LineTableSync> query(*object);
+			ReplaceQuery<JourneyPatternTableSync> query(*object);
 			query.addField(object->getCommercialLine()->getKey());
 			query.addField(object->getName());
 			query.addField(object->getTimetableName());
@@ -248,7 +248,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,JourneyPattern>::Unlink(JourneyPattern* obj)
+		template<> void SQLiteDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Unlink(JourneyPattern* obj)
 		{
 			if(obj->getCommercialLine())
 			{
@@ -259,7 +259,7 @@ namespace synthese
 
 	namespace pt
 	{
-		LineTableSync::SearchResult LineTableSync::Search(
+		JourneyPatternTableSync::SearchResult JourneyPatternTableSync::Search(
 			Env& env,
 			boost::optional<util::RegistryKeyType> commercialLineId,
 			boost::optional<util::RegistryKeyType> dataSourceId
@@ -269,7 +269,7 @@ namespace synthese
 			, bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			SelectQuery<LineTableSync> query;
+			SelectQuery<JourneyPatternTableSync> query;
 			if (commercialLineId)
 			{
 				query.addWhereField(COL_COMMERCIAL_LINE_ID, *commercialLineId);

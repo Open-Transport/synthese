@@ -136,7 +136,7 @@ namespace synthese
 		///		<li>is_destination_row : 0|1 is destination row</li>
 		///	</ul>
 		///
-		/// <h2>Line cell</h2>
+		/// <h2>JourneyPattern cell</h2>
 		///
 		///	Parameters sent to the web page :
 		///	<ul>

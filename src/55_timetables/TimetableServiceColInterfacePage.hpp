@@ -68,7 +68,7 @@ namespace synthese
 		///		<li>rollingstock</li>
 		///	</ul>
 		///
-		///	<h2>Line row</h2>
+		///	<h2>JourneyPattern row</h2>
 		///
 		///	@copydoc TimetableServiceColInterfacePage::DisplayLinesRow 
 		/// @copydoc TimetableServiceColInterfacePage::DisplayLineCell
@@ -126,7 +126,7 @@ namespace synthese
 			///	@param page Page to use for the display
 			///	@param cellPage Page to use for the display of each cell
 			///	@param request Source request
-			///	@param lines Line of each column
+			///	@param lines JourneyPattern of each column
 			//////////////////////////////////////////////////////////////////////////
 			/// Parameters sent to the page template :
 			/// <ul>
@@ -147,7 +147,7 @@ namespace synthese
 				@param stream Stream to write on
 				@param page Page to use for the display
 				@param request Source request
-				@param object Line to display
+				@param object JourneyPattern to display
 				@param rowRank Row number
 				@param colRank Column number
 				

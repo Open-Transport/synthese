@@ -25,7 +25,7 @@
 #include "CommercialLine.h"
 #include "TransportNetworkTableSync.h"
 #include "TransportNetwork.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "Place.h"
 #include "PTModule.h"
 #include "StopArea.hpp"

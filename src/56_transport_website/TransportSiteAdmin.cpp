@@ -41,7 +41,7 @@
 #include "Profile.h"
 #include "StaticFunctionRequest.h"
 #include "Profile.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "PlacesListModule.h"
 #include "Site.h"
 #include "SiteTableSync.h"

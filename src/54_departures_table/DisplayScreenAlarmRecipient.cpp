@@ -45,7 +45,7 @@
 // transport
 #include "StopArea.hpp"
 #include "JourneyPattern.hpp"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "PTModule.h"
 
 // messages
@@ -262,7 +262,7 @@ namespace synthese
 			optional<RegistryKeyType> id(parameters.getOptional<RegistryKeyType>(PARAMETER_SEARCH_LINE));
 			if (id)
 			{
-				line  = LineTableSync::Get(*id, env, FIELDS_ONLY_LOAD_LEVEL);
+				line  = JourneyPatternTableSync::Get(*id, env, FIELDS_ONLY_LOAD_LEVEL);
 			}
 
 			AlarmRecipientSearchFieldsMap map;

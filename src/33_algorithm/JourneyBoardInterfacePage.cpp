@@ -30,7 +30,7 @@
 #include "ReservationContact.h"
 #include "Service.h"
 #include "Crossing.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "DateTimeInterfacePage.h"
 #include "CommercialLine.h"
 #include "Env.h"
@@ -264,7 +264,7 @@ namespace synthese
 			set<const ReservationContact*> resaRules;
 			BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
 			{
-				const Line* line(dynamic_cast<const Line*>(su.getService()->getPath()));
+				const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
 				if(line == NULL) continue;
 
 				if(	line->getCommercialLine()->getReservationContact() &&
@@ -562,8 +562,8 @@ namespace synthese
 				lastDepartureDateTime += continuousServiceRange;
 			}
 
-			// Line extraction
-			const Line* line(static_cast<const Line*>(serviceUse.getService()->getPath()));
+			// JourneyPattern extraction
+			const JourneyPattern* line(static_cast<const JourneyPattern*>(serviceUse.getService()->getPath()));
 			const CommercialLine* commercialLine(line->getCommercialLine());
 			const ContinuousService* continuousService(dynamic_cast<const ContinuousService*>(serviceUse.getService()));
 

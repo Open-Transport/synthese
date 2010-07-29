@@ -23,7 +23,7 @@
 */
 
 #include "PTRoutesListItemInterfacePage.hpp"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineStop.h"
 #include "PhysicalStop.h"
 #include "StopArea.hpp"
@@ -57,7 +57,7 @@ namespace synthese
 			std::ostream& stream,
 			boost::shared_ptr<const Webpage> page,
 			const server::Request& request,
-			const pt::Line& object,
+			const pt::JourneyPattern& object,
 			std::size_t rank
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);

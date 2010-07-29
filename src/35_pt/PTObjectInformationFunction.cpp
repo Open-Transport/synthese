@@ -27,7 +27,7 @@
 #include "PTObjectInformationFunction.hpp"
 #include "TransportNetworkTableSync.h"
 #include "CommercialLineTableSync.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "StopAreaTableSync.hpp"
 #include "City.h"
 #include "PhysicalStop.h"
@@ -68,7 +68,7 @@ namespace synthese
 			{
 				_line = Env::GetOfficialEnv().get<CommercialLine>(id);
 			}
-			else if(tableId == LineTableSync::TABLE.ID)
+			else if(tableId == JourneyPatternTableSync::TABLE.ID)
 			{
 				_route = Env::GetOfficialEnv().get<JourneyPattern>(id);
 			}

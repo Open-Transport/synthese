@@ -138,12 +138,12 @@ namespace synthese
 				- 9 : handicappedPlacesNumber (9)
 				- 10 : bikeFilterStatus (10)
 				- 11 : bikePlacesNumber (11)
-				- 12 : Line short name
-				- 13 : Line full description
+				- 12 : JourneyPattern short name
+				- 13 : JourneyPattern full description
 				- 14 : Waiting duration
-				- 15 : Line style
-				- 16 : Line picto url
-				- 17 : Line id
+				- 15 : JourneyPattern style
+				- 16 : JourneyPattern picto url
+				- 17 : JourneyPattern id
 				- 18 : (nothing)
 				- 19 : Alarm message
 				- 20 : Alarm level

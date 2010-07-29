@@ -26,7 +26,7 @@
 #include "PhysicalStop.h"
 #include "Edge.h"
 #include "CommercialLine.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "VertexAccessMap.h"
 #include "Address.h"
 
@@ -109,7 +109,7 @@ namespace synthese
 					{
 						BOOST_FOREACH(const Vertex::Edges::value_type& edge, its.second->getDepartureEdges())
 						{
-							const Line* route(static_cast<const Line*>(edge.first));
+							const JourneyPattern* route(static_cast<const JourneyPattern*>(edge.first));
 							ScoresMap::iterator itl(
 								scores.find(route->getCommercialLine())
 							);

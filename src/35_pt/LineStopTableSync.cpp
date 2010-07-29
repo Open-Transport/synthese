@@ -24,7 +24,7 @@
 
 #include "LineStopTableSync.h"
 
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "PhysicalStopTableSync.h"
 
 #include <sstream>
@@ -139,7 +139,7 @@ namespace synthese
 					rows->getLongLong (LineStopTableSync::COL_PHYSICALSTOPID));
 
 				util::RegistryKeyType lineId (rows->getLongLong (LineStopTableSync::COL_LINEID));
-				JourneyPattern* line(LineTableSync::GetEditable (lineId, env, linkLevel).get());
+				JourneyPattern* line(JourneyPatternTableSync::GetEditable (lineId, env, linkLevel).get());
 
 				ls->setLine(line);
 				ls->setPhysicalStop(PhysicalStopTableSync::GetEditable(fromPhysicalStopId, env, linkLevel).get());

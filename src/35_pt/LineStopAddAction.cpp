@@ -30,7 +30,7 @@
 #include "PhysicalStop.h"
 #include "StopArea.hpp"
 #include "City.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "GeographyModule.h"
 
@@ -81,7 +81,7 @@ namespace synthese
 		{
 			try
 			{
-				_route = LineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROUTE_ID), *_env);
+				_route = JourneyPatternTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROUTE_ID), *_env);
 				LineStopTableSync::Search(*_env, _route->getKey());
 			}
 			catch(ObjectNotFoundException<JourneyPattern>&)

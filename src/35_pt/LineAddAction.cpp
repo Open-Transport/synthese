@@ -28,7 +28,7 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "CommercialLineTableSync.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "SQLiteTransaction.h"
 
@@ -83,7 +83,7 @@ namespace synthese
 			{
 				try
 				{
-					_template = LineTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), *_env);
+					_template = JourneyPatternTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), *_env);
 				}
 				catch(ObjectNotFoundException<JourneyPattern>& e)
 				{
@@ -135,7 +135,7 @@ namespace synthese
 			}
 			object.setName(_name);
 
-			LineTableSync::Save(&object, transaction);
+			JourneyPatternTableSync::Save(&object, transaction);
 
 			// Stops copy
 			if(_template.get())

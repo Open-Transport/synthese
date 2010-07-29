@@ -43,7 +43,7 @@ namespace synthese
 	
 	namespace pt
 	{
-		class Line;
+		class JourneyPattern;
 
 		/** PTRoutesListItemInterfacePage Interface Page Class.
 			@ingroup m35Pages refPages
@@ -65,7 +65,7 @@ namespace synthese
 				- 9 : Rank in the list
 				- 10 : Rank is odd
 
-			Object : Line
+			Object : JourneyPattern
 		*/
 		class PTRoutesListItemInterfacePage
 		{
@@ -93,7 +93,7 @@ namespace synthese
 				std::ostream& stream,
 				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
-				const pt::Line& object,
+				const pt::JourneyPattern& object,
 				std::size_t rank
 			);
 		};

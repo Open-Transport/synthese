@@ -35,7 +35,7 @@
 #include "Projection.h"
 #include "PTRoutePlannerResult.h"
 #include "Edge.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "Road.h"
 #include "RoadPlace.h"
 #include "Hub.h"
@@ -694,7 +694,7 @@ namespace synthese
 						set<const ReservationContact*> resaRules;
 						BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
 						{
-							const Line* line(dynamic_cast<const Line*>(su.getService()->getPath()));
+							const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
 							if(line == NULL) continue;
 
 							if(	line->getCommercialLine()->getReservationContact() &&
@@ -825,7 +825,7 @@ namespace synthese
 						}
 
 
-						const Line* line(dynamic_cast<const Line*> (curET.getService()->getPath()));
+						const JourneyPattern* line(dynamic_cast<const JourneyPattern*> (curET.getService()->getPath()));
 						if(line != NULL)
 						{
 							// Insertion of fake leg if site does not output road approach detail

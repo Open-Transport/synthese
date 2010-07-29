@@ -25,7 +25,7 @@
 #include "TimetableServiceRowInterfacePage.h"
 #include "TimetableColumn.h"
 #include "PhysicalStop.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "RollingStock.h"
 #include "TimetableWarning.h"

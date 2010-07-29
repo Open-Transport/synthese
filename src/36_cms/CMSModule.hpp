@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_CMSModule_H__
 #define SYNTHESE_CMSModule_H__
 
-#include "ModuleClassTemplate.h"
+#include "ModuleClassTemplate.hpp"
 
 namespace synthese
 {

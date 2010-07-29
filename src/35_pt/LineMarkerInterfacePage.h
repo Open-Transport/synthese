@@ -46,7 +46,7 @@ namespace synthese
 	{
 		class CommercialLine;
 
-		/** Line marker.
+		/** JourneyPattern marker.
 			@ingroup m35Pages refPages
 			@code line_marker @endcode
 
@@ -55,8 +55,8 @@ namespace synthese
 				- style : line CSS style name
 				- image : line picto image url
 				- short_name : line short name
-				- name : Line name
-				- color : Line color
+				- name : JourneyPattern name
+				- color : JourneyPattern color
 				- rank : Item rank if the line belongs to a list
 				- rank_is_odd : Item rank is odd
 				- network_id : Network id
@@ -86,7 +86,7 @@ namespace synthese
 				@param tableClosingHTML HTML de fermeture du tableau (RIEN = Pas de fermeture du tableau)
 				@param pixelWidth Largeur de la case en pixels
 				@param pixelHeight Hauteur de la case en pixels
-				@param commercialLine Commercial Line to display
+				@param commercialLine Commercial JourneyPattern to display
 				@param request Request
 			*/
 			void display(
@@ -105,7 +105,7 @@ namespace synthese
 				@param stream Stream to write on
 				@param page page to use for display
 				@param request Request
-				@param commercialLine Commercial Line to display
+				@param commercialLine Commercial JourneyPattern to display
 			*/
 			static void Display(
 				std::ostream& stream,

@@ -31,7 +31,7 @@
 #include "StopAreaTableSync.hpp"
 #include "FareTableSync.h"
 #include "LineStopTableSync.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 
 #include "TransportNetworkAdmin.h"
 #include "CommercialLineAdmin.h"

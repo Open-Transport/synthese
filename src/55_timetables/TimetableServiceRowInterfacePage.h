@@ -111,19 +111,19 @@ namespace synthese
 			///		<li>note_text : Note text</li>
 			///		<li>cells_content : Cells content</li>
 			///		<li>departure_quay : Departure quay</li>
-			///		<li>line_short_name : Line short name</li>
-			///		<li>line_style : Line style</li>
-			///		<li>line_picture : Line picture</li>
+			///		<li>line_short_name : JourneyPattern short name</li>
+			///		<li>line_style : JourneyPattern style</li>
+			///		<li>line_picture : JourneyPattern picture</li>
 			///		<li>rolling_stock_id : Rolling stock id</li>
 			///		<li>rank : Rank</li>
 			///		<li>rank_is_odd : rank is odd</li>
 			///		<li>following_services_with_same_departure_hour : Following services with same departure hour</li>
-			///		<li>line_destination_city_id : Line destination city id</li>
-			///		<li>line_destination_city_name : Line destination city name</li>
-			///		<li>line_destination_place_id : Line destination place id</li>
-			///		<li>line_destination_place_name : Line destination place name</li>
+			///		<li>line_destination_city_id : JourneyPattern destination city id</li>
+			///		<li>line_destination_city_name : JourneyPattern destination city name</li>
+			///		<li>line_destination_place_id : JourneyPattern destination place id</li>
+			///		<li>line_destination_place_name : JourneyPattern destination place name</li>
 			///		<li>text_line_destination : Text line destination</li>
-			///		<li>line_id : Line id</li>
+			///		<li>line_id : JourneyPattern id</li>
 			///		<li>route_id : Route id</li>
 			///	</ul>
 			static void Display(

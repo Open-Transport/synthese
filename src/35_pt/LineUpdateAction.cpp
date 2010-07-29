@@ -27,7 +27,7 @@
 #include "LineUpdateAction.h"
 #include "TransportNetworkRight.h"
 #include "Request.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "RollingStockTableSync.h"
 
 using namespace std;
@@ -74,7 +74,7 @@ namespace synthese
 		{
 			try
 			{
-				_route = LineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROUTE_ID), *_env);
+				_route = JourneyPatternTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROUTE_ID), *_env);
 			}
 			catch(ObjectNotFoundException<JourneyPattern>&)
 			{
@@ -108,7 +108,7 @@ namespace synthese
 			_route->setDirection(_direction);
 			_route->setWayBack(_wayback);
 			
-			LineTableSync::Save(_route.get());
+			JourneyPatternTableSync::Save(_route.get());
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}

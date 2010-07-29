@@ -24,7 +24,7 @@
 #include "LoadException.h"
 #include "Path.h"
 #include "PTModule.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"
 #include "GraphConstants.h"
@@ -118,7 +118,7 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				Path* path = LineTableSync::GetEditable(pathId, env, linkLevel).get();
+				Path* path = JourneyPatternTableSync::GetEditable(pathId, env, linkLevel).get();
 				if(path->getEdges().empty())
 				{
 					LineStopTableSync::Search(env, pathId);
@@ -223,7 +223,7 @@ namespace synthese
 			SelectQuery<ScheduledServiceTableSync> query;
 			if (commercialLineId || dataSourceId)
 			{
-				query.addTableAndEqualJoin<LineTableSync>(TABLE_COL_ID, COL_PATHID);
+				query.addTableAndEqualJoin<JourneyPatternTableSync>(TABLE_COL_ID, COL_PATHID);
 			}
 			if (lineId)
 			{
@@ -231,11 +231,11 @@ namespace synthese
 			}
 			if (commercialLineId)
 			{
-				query.addWhereFieldOther<LineTableSync>(LineTableSync::COL_COMMERCIAL_LINE_ID, *commercialLineId);
+				query.addWhereFieldOther<JourneyPatternTableSync>(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID, *commercialLineId);
 			}
 			if (dataSourceId)
 			{
-				query.addWhereFieldOther<LineTableSync>(LineTableSync::COL_DATASOURCE_ID, *dataSourceId);
+				query.addWhereFieldOther<JourneyPatternTableSync>(JourneyPatternTableSync::COL_DATASOURCE_ID, *dataSourceId);
 			}
 			if(serviceNumber)
 			{

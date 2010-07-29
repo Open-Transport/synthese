@@ -26,14 +26,14 @@
 #include "Request.h"
 #include "TimetableGenerateFunction.h"
 #include "TimetableTableSync.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "Timetable.h"
 #include "TimetableRow.h"
 #include "TimetableInterfacePage.h"
 #include "Env.h"
 #include "City.h"
 #include "StopArea.hpp"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CalendarTemplate.h"
 #include "Calendar.h"
 #include "LineStop.h"
@@ -196,9 +196,9 @@ namespace synthese
 				{
 					try
 					{
-						_line = Env::GetOfficialEnv().get<Line>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+						_line = Env::GetOfficialEnv().get<JourneyPattern>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 					}
-					catch(ObjectNotFoundException<Line>&)
+					catch(ObjectNotFoundException<JourneyPattern>&)
 					{
 						throw RequestException("No such line route");
 					}

@@ -93,7 +93,7 @@ synthese::pt::StopArea::integrate();
 
 
 // Registries
-synthese::util::Env::Integrate<synthese::pt::Line>();
+synthese::util::Env::Integrate<synthese::pt::JourneyPattern>();
 synthese::util::Env::Integrate<synthese::pt::LineStop>();
 synthese::util::Env::Integrate<synthese::pt::StopArea>();
 synthese::util::Env::Integrate<synthese::pt::CommercialLine>();

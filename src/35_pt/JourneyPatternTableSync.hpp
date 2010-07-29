@@ -1,6 +1,6 @@
 
-/** LineTableSync class header.
-	@file LineTableSync.h
+/** JourneyPatternTableSync class header.
+	@file JourneyPatternTableSync.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -46,7 +46,7 @@ namespace synthese
 			- on update : 
 			- on delete : X
 		*/
-		class LineTableSync : public db::SQLiteRegistryTableSyncTemplate<LineTableSync,JourneyPattern>
+		class JourneyPatternTableSync : public db::SQLiteRegistryTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>
 		{
 		public:
 			static const std::string COL_COMMERCIAL_LINE_ID;

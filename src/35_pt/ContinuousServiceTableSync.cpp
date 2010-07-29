@@ -25,7 +25,7 @@
 #include "ContinuousServiceTableSync.h"
 
 #include "JourneyPattern.hpp"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "PTModule.h"
 
 #include <sstream>
@@ -134,7 +134,7 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				Path* path(LineTableSync::GetEditable(pathId, env, linkLevel).get());
+				Path* path(JourneyPatternTableSync::GetEditable(pathId, env, linkLevel).get());
 				assert (path);
 	//			assert (path->getEdges ().size () == arrivalSchedules.size ());
 
@@ -233,7 +233,7 @@ namespace synthese
 				<< " FROM " << TABLE.NAME;
 			if (commercialLineId)
 			{
-				query << " INNER JOIN " << LineTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
+				query << " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=" << COL_PATHID;
 			}
 			query << " WHERE 1 ";
 			if (lineId)
@@ -242,7 +242,7 @@ namespace synthese
 			}
 			if (commercialLineId)
 			{
-				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << *commercialLineId;
+				query << " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=" << *commercialLineId;
 			}
 			if (orderByDepartureTime)
 			{

@@ -32,7 +32,7 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
 #include "LineStopTableSync.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "StopAreaTableSync.hpp"
 #include "CommercialLineTableSync.h"
 #include "CityTableSync.h"
@@ -501,7 +501,7 @@ namespace synthese
 				if (lineid || neededLevel > FORBIDDEN)
 				{
 					query.addTableAndEqualOtherJoin<LineStopTableSync,PhysicalStopTableSync>(LineStopTableSync::COL_PHYSICALSTOPID, TABLE_COL_ID);
-					query.addTableAndEqualOtherJoin<LineTableSync,LineStopTableSync>(TABLE_COL_ID, LineStopTableSync::COL_LINEID);
+					query.addTableAndEqualOtherJoin<JourneyPatternTableSync,LineStopTableSync>(TABLE_COL_ID, LineStopTableSync::COL_LINEID);
 				}
 
 				if(orderByType)
@@ -518,7 +518,7 @@ namespace synthese
 					query.addWhere(
 						ComposedExpression::Get(
 							FieldExpression::Get(
-								LineTableSync::TABLE.NAME, LineTableSync::COL_COMMERCIAL_LINE_ID
+								JourneyPatternTableSync::TABLE.NAME, JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID
 							),
 							ComposedExpression::OP_IN,
 							SubQueryExpression::Get(
@@ -535,7 +535,7 @@ namespace synthese
 				}
 				if (lineid)
 				{
-					query.addWhereFieldOther<LineTableSync>(LineTableSync::COL_COMMERCIAL_LINE_ID, *lineid);
+					query.addWhereFieldOther<JourneyPatternTableSync>(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID, *lineid);
 				}
 			}
 			if(state)

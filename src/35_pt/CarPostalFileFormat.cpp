@@ -29,7 +29,7 @@
 #include "City.h"
 #include "CityTableSync.h"
 #include "SQLiteTransaction.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "LineStopTableSync.h"
@@ -112,7 +112,7 @@ namespace synthese
 			SQLiteTransaction transaction;
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env->getRegistry<JourneyPattern>())
 			{
-				LineTableSync::Save(line.second.get(), transaction);
+				JourneyPatternTableSync::Save(line.second.get(), transaction);
 			}
 			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env->getRegistry<LineStop>())
 			{
@@ -332,8 +332,8 @@ namespace synthese
 							os << "LOAD : use of existing commercial line" << cline->getKey() << " (" << cline->getName() << ")<br />";
 
 							// Load of existing routes
-							LineTableSync::SearchResult sroutes(
-								LineTableSync::Search(*_env, cline->getKey(), _dataSource->getKey())
+							JourneyPatternTableSync::SearchResult sroutes(
+								JourneyPatternTableSync::Search(*_env, cline->getKey(), _dataSource->getKey())
 							);
 							BOOST_FOREACH(shared_ptr<JourneyPattern> sroute, sroutes)
 							{
@@ -378,7 +378,7 @@ namespace synthese
 							route.reset(new JourneyPattern);
 							route->setCommercialLine(cline.get());
 							route->setDataSource(_dataSource);
-							route->setKey(LineTableSync::getId());
+							route->setKey(JourneyPatternTableSync::getId());
 							_env->getEditableRegistry<JourneyPattern>().add(route);
 							cline->addPath(route.get());
 							

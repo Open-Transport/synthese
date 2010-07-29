@@ -34,7 +34,7 @@
 #include "ResaCustomerAdmin.h"
 #include "ResaRight.h"
 #include "JourneyPattern.hpp"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "LineStop.h"
 #include "LineStopTableSync.h"
 #include "SearchFormHTMLTable.h"
@@ -139,8 +139,8 @@ namespace synthese
 			}
 
 			// Routes reading
-			LineTableSync::SearchResult routes(
-				LineTableSync::Search(_getEnv(), _line->getKey())
+			JourneyPatternTableSync::SearchResult routes(
+				JourneyPatternTableSync::Search(_getEnv(), _line->getKey())
 			);
 			BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 			{

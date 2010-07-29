@@ -27,7 +27,7 @@
 #include "PhysicalStopTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "LineStopTableSync.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "StopArea.hpp"
 #include "CommercialLine.h"
 #include "AdvancedSelectTableSync.h"
@@ -85,13 +85,13 @@ namespace synthese
 					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << StopAreaTableSync::TABLE_COL_CITYID
 					<< " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS ps ON " 	<< " ps." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
 					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
-					<< " INNER JOIN " << LineTableSync::TABLE.NAME << " as l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID;
+					<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " as l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID;
 			// Where	
 			query << " WHERE 1 ";
 			if (neededLevel > FORBIDDEN)
-				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel, false) << ")";
+				query << " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel, false) << ")";
 			if (lineId)
-				query << " AND l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << *lineId;
+				query << " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=" << *lineId;
 			if (!cityName.empty())
 				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
 			if (!placeName.empty())
@@ -161,7 +161,7 @@ namespace synthese
 			query << " SELECT "
 				<< "c." << TABLE_COL_ID << " AS " << TABLE_COL_ID
 				<< " FROM " << CommercialLineTableSync::TABLE.NAME << " AS c "
-				<< " INNER JOIN " << LineTableSync::TABLE.NAME << " AS l ON l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=c." << TABLE_COL_ID
+				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=c." << TABLE_COL_ID
 				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS s ON s." << LineStopTableSync::COL_LINEID << "=l." << TABLE_COL_ID
 				<< " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=s." << LineStopTableSync::COL_PHYSICALSTOPID
 				<< " INNER JOIN " << DisplayScreenTableSync::TABLE.NAME << " AS b ON b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << PhysicalStopTableSync::COL_PLACEID

@@ -31,7 +31,7 @@
 #include "ReservationTableSync.h"
 #include "ReservationTransactionTableSync.h"
 #include "ScheduledServiceTableSync.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -216,7 +216,7 @@ namespace synthese
 				" FROM " << TABLE.NAME <<
 				" INNER JOIN " << ScheduledServiceTableSync::TABLE.NAME <<
 					" s ON s." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_SERVICE_ID <<
-				" INNER JOIN " << LineTableSync::TABLE.NAME <<
+				" INNER JOIN " << JourneyPatternTableSync::TABLE.NAME <<
 					" l ON l." << TABLE_COL_ID << "=s." << ScheduledServiceTableSync::COL_PATHID
 			;
 			if(!indeterminate(cancellations))
@@ -225,7 +225,7 @@ namespace synthese
 			}
 			query <<
 				" WHERE " <<
-				"l." << LineTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId << " AND " <<
+				"l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId << " AND " <<
 				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << ">='" << to_iso_extended_string(day) << " 03:00' ";
 			date dayp(day);
 			dayp += days(1);

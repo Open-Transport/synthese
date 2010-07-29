@@ -35,7 +35,7 @@
 #include "Webpage.h"
 #include "PTRoutePlannerResult.h"
 #include "CommercialLine.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
 #include "Crossing.h"
@@ -502,9 +502,9 @@ namespace synthese
 				{
 					BOOST_FOREACH(const ServicePointer& service, journey.getServiceUses())
 					{
-						if(dynamic_cast<const Line*>(service.getService()->getPath()))
+						if(dynamic_cast<const JourneyPattern*>(service.getService()->getPath()))
 						{
-							lines.insert(static_cast<const Line*>(service.getService()->getPath())->getCommercialLine());
+							lines.insert(static_cast<const JourneyPattern*>(service.getService()->getPath())->getCommercialLine());
 						}
 					}
 				}
@@ -650,7 +650,7 @@ namespace synthese
 							content,
 							lineMarkerPage,
 							request,
-							*static_cast<const Line*>(leg.getService()->getPath ())->getCommercialLine()
+							*static_cast<const JourneyPattern*>(leg.getService()->getPath ())->getCommercialLine()
 						);
 					}
 				}

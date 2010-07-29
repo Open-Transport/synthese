@@ -36,7 +36,7 @@
 #include "ContinuousService.h"
 #include "ContinuousServiceTableSync.h"
 #include "JourneyPattern.hpp"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "LineStop.h"
 #include "LineStopTableSync.h"
 #include "TransportNetwork.h"
@@ -190,7 +190,7 @@ namespace synthese
 			shared_ptr<CommercialLine> _commercialLine(
 				CommercialLineTableSync::GetEditable(*_commercialLineId, *_env, UP_LINKS_LOAD_LEVEL)
 			);
-			LineTableSync::Search(
+			JourneyPatternTableSync::Search(
 				*_env,
 				_commercialLine->getKey(),
 				optional<RegistryKeyType>(),
@@ -1351,8 +1351,8 @@ namespace synthese
 			}
 
 			// Load of existing routes
-			LineTableSync::SearchResult sroutes(
-				LineTableSync::Search(*_env, cline->getKey(), _dataSource->getKey())
+			JourneyPatternTableSync::SearchResult sroutes(
+				JourneyPatternTableSync::Search(*_env, cline->getKey(), _dataSource->getKey())
 			);
 			BOOST_FOREACH(shared_ptr<JourneyPattern> line, sroutes)
 			{
@@ -1436,7 +1436,7 @@ namespace synthese
 					route->setCodeBySource(routeNames[routeIdNode.getText()]);
 					route->setWayBack(routeWaybacks[routeIdNode.getText()]);
 					route->setDataSource(_dataSource);
-					route->setKey(LineTableSync::getId());
+					route->setKey(JourneyPatternTableSync::getId());
 					_env->getEditableRegistry<JourneyPattern>().add(route);
 					createdObjects.insert(route->getKey());
 					
@@ -1725,7 +1725,7 @@ namespace synthese
 			}
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env->getRegistry<JourneyPattern>())
 			{
-				LineTableSync::Save(line.second.get(), transaction);
+				JourneyPatternTableSync::Save(line.second.get(), transaction);
 			}
 			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env->getRegistry<LineStop>())
 			{

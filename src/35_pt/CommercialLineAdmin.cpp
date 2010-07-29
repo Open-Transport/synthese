@@ -32,7 +32,7 @@
 #include "CommercialLineTableSync.h"
 #include "JourneyPattern.hpp"
 #include "LineAdmin.h"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "TransportNetworkRight.h"
 #include "TridentExportFunction.h"
 #include "AdminInterfaceElement.h"
@@ -163,8 +163,8 @@ namespace synthese
 				// Results display
 				stream << "<h1>Parcours de la ligne</h1>";
 
-				LineTableSync::SearchResult routes(
-					LineTableSync::Search(
+				JourneyPatternTableSync::SearchResult routes(
+					JourneyPatternTableSync::Search(
 						Env::GetOfficialEnv(),
 						_cline->getKey(),
 						optional<RegistryKeyType>(),
@@ -486,8 +486,8 @@ namespace synthese
 			if(	currentPage == *this ||
 				currentPage.getCurrentTreeBranch().find(*this)
 			){
-				LineTableSync::SearchResult routes(
-					LineTableSync::Search(*_env, _cline->getKey())
+				JourneyPatternTableSync::SearchResult routes(
+					JourneyPatternTableSync::Search(*_env, _cline->getKey())
 				);
 				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 				{

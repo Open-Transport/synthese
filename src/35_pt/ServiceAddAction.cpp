@@ -32,7 +32,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "JourneyPattern.hpp"
-#include "LineTableSync.h"
+#include "JourneyPatternTableSync.hpp"
 #include "Fetcher.h"
 #include "SQLiteTransaction.h"
 
@@ -137,7 +137,7 @@ namespace synthese
 
 			try
 			{
-				_line = LineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_LINE_ID), Env::GetOfficialEnv());
+				_line = JourneyPatternTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_LINE_ID), Env::GetOfficialEnv());
 			}
 			catch(ObjectNotFoundException<JourneyPattern>& e)
 			{
