@@ -9,7 +9,6 @@ CppSynthese3LibProject(
 		's3-db.cpplib',
 		's3-util.cpplib',
 		's3-admin.cpplib',
-		's3-server.cpplib',
-		's3-places-list.cpplib'
+		's3-server.cpplib'
 	]
 )

@@ -7,7 +7,7 @@ CppSynthese3LibProject(
 		's3-security.cpplib',
 		's3-util.cpplib',
 		's3-db.cpplib',
-		's3-places-list.cpplib',
+		's3-cms.cpplib',
 		's3-interfaces.cpplib'
 	]
 )
