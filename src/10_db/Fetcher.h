@@ -25,7 +25,7 @@
 
 #include "Factory.h"
 #include "UtilTypes.h"
-#include "02_db/Types.h"
+#include "DBTypes.h"
 #include "SQLiteTransaction.h"
 #include "Env.h"
 

@@ -24,7 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "01_util/Constants.h"
-#include "02_db/Constants.h"
+#include "DBConstants.h"
 #include "SQLite.h"
 #include "SQLiteTableSync.h"
 #include "SQLiteException.h"

@@ -23,12 +23,12 @@
 #include "DeleteTextTemplateAction.h"
 #include "TextTemplateTableSync.h"
 
-#include "17_messages/MessagesLibraryLog.h"
-#include "17_messages/MessagesLibraryRight.h"
+#include "MessagesLibraryLog.h"
+#include "MessagesLibraryRight.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/Request.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "Request.h"
+#include "ParametersMap.h"
 
 using namespace std;
 

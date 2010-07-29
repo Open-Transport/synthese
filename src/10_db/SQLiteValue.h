@@ -24,16 +24,13 @@
 #ifndef SYNTHESE_DB_SQLITEVALUE_H
 #define SYNTHESE_DB_SQLITEVALUE_H
 
-
-#include "02_db/SQLiteValue.h"
+#include "SQLiteValue.h"
 #include <sqlite3.h>
-
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #include <boost/logic/tribool.hpp>
-
 
 namespace synthese
 {

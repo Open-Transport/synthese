@@ -6,8 +6,8 @@
 #include "03_db_ring/UpdateRecordTableSync.h"
 #include "03_db_ring/UpdateChronologyException.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteException.h"
   
 #include "01_util/Log.h"
 #include "01_util/Conversion.h"

@@ -22,12 +22,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
-#include "30_server/Request.h"
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "Request.h"
 
-#include "57_accounting/Account.h"
-#include "57_accounting/AccountTableSync.h"
+#include "Account.h"
+#include "AccountTableSync.h"
 
 #include "AccountLockAction.h"
 

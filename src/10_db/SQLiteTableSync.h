@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_DB_SQLITETABLESYNC_H
 #define SYNTHESE_DB_SQLITETABLESYNC_H
 
-#include "02_db/Types.h"
+#include "DBTypes.h"
 #include "SQLiteResult.h"
 #include "SQLiteStatement.h"
 #include "FactoryBase.h"

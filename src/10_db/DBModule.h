@@ -28,7 +28,7 @@
 #include <boost/filesystem/path.hpp>
 
 #include "ModuleClassTemplate.hpp"
-#include "02_db/Constants.h"
+#include "DBConstants.h"
 #include "Registry.h"
 
 namespace synthese

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// DB Constants header.
-///	@file Constants.h
+///	@file DBConstants.h
 ///	@author Marc Jambert
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized

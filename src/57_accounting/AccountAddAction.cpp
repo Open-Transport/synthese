@@ -24,16 +24,16 @@
 
 #include "AccountAddAction.h"
 
-#include "12_security/User.h"
-#include "12_security/UserTableSync.h"
+#include "User.h"
+#include "UserTableSync.h"
 
-#include "30_server/ActionException.h"
-#include "30_server/ParametersMap.h"
+#include "ActionException.h"
+#include "ParametersMap.h"
 
-#include "57_accounting/Account.h"
-#include "57_accounting/AccountTableSync.h"
-#include "57_accounting/Currency.h"
-#include "57_accounting/CurrencyTableSync.h"
+#include "Account.h"
+#include "AccountTableSync.h"
+#include "Currency.h"
+#include "CurrencyTableSync.h"
 
 using namespace std;
 

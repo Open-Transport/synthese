@@ -27,9 +27,9 @@
 #include <string>
 #include <iostream>
 
-#include "02_db/SQLiteNoSyncTableSyncTemplate.h"
+#include "SQLiteNoSyncTableSyncTemplate.h"
 
-#include "04_time/DateTime.h"
+#include "DateTime.h"
 
 namespace synthese
 {

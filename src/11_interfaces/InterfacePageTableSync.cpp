@@ -29,7 +29,7 @@
 #include "Conversion.h"
 #include "Log.h"
 #include "Factory.h"
-#include "02_db/Constants.h"
+#include "DBConstants.h"
 #include "SQLiteResult.h"
 #include "InterfacePageException.h"
 #include "ReplaceQuery.h"

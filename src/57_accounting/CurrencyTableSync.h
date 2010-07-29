@@ -29,7 +29,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "02_db/SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {

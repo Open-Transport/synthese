@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_db_SQLiteInheritedTableSyncTemplate_h__
 #define SYNTHESE_db_SQLiteInheritedTableSyncTemplate_h__
 
-#include "02_db/Types.h"
+#include "DBTypes.h"
 #include "SQLiteResult.h"
 #include "SQLiteTableSyncTemplate.h"
 #include "SQLiteException.h"

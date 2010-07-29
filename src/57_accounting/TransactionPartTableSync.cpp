@@ -23,23 +23,23 @@
 
 #include <sstream>
 
-#include "01_util/Conversion.h"
+#include "Conversion.h"
 
-#include "02_db/DBModule.h"
-#include "02_db/SQLiteResult.h"
-#include "02_db/SQLite.h"
-#include "02_db/SQLiteException.h"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
+#include "SQLiteException.h"
 
-#include "12_security/User.h"
+#include "User.h"
 
-#include "57_accounting/AccountingModule.h"
-#include "57_accounting/Account.h"
-#include "57_accounting/Transaction.h"
-#include "57_accounting/TransactionTableSync.h"
-#include "57_accounting/TransactionPart.h"
-#include "57_accounting/TransactionPartTableSync.h"
-#include "57_accounting/Account.h"
-#include "57_accounting/AccountTableSync.h"
+#include "AccountingModule.h"
+#include "Account.h"
+#include "Transaction.h"
+#include "TransactionTableSync.h"
+#include "TransactionPart.h"
+#include "TransactionPartTableSync.h"
+#include "Account.h"
+#include "AccountTableSync.h"
 
 using namespace std;
 using boost::shared_ptr;

@@ -24,11 +24,9 @@
 
 #include "UserIdInterfaceElement.h"
 
-#include "30_server/Request.h"
-
-#include "12_security/User.h"
-
-#include "11_interfaces/ValueElementList.h"
+#include "Request.h"
+#include "User.h"
+#include "ValueElementList.h"
 
 using namespace std;
 using namespace boost;

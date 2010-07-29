@@ -25,9 +25,9 @@
 
 #include "SQLiteInheritedTableSyncTemplate.h"
 
-#include "02_db/Constants.h"
+#include "DBConstants.h"
 
-#include "01_util/ConstantReturner.h"
+#include "ConstantReturner.h"
 
 namespace synthese
 {

@@ -25,7 +25,7 @@
 #include "DBModule.h"
 #include "Log.h"
 #include "Factory.h"
-#include "02_db/Constants.h"
+#include "DBConstants.h"
 #include "SQLiteHandle.h"
 #include "SQLiteTableSync.h"
 #include "SQLiteCachedResult.h"

@@ -2,7 +2,7 @@
 #include "00_tcp/SocketException.h"
 #include "00_tcp/Constants.h"
 
-#include "02_db/SQLite.h"
+#include "SQLite.h"
 
 #include "01_util/iostreams/Compression.h"
 #include "01_util/Conversion.h"

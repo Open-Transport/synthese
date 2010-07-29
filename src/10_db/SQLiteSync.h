@@ -25,8 +25,8 @@
 #ifndef SYNTHESE_DB_SQLITESYNC_H
 #define SYNTHESE_DB_SQLITESYNC_H
 
-#include "02_db/SQLiteUpdateHook.h"
-#include "02_db/Constants.h"
+#include "SQLiteUpdateHook.h"
+#include "DBConstants.h"
 
 #include <map>
 #include <string>

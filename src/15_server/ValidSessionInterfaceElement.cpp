@@ -24,10 +24,9 @@
 
 #include "ValidSessionInterfaceElement.h"
 
-#include "30_server/Request.h"
-#include "30_server/Session.h"
-
-#include "11_interfaces/ValueElementList.h"
+#include "Request.h"
+#include "Session.h"
+#include "ValueElementList.h"
 
 using namespace std;
 

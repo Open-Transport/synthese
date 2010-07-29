@@ -65,8 +65,8 @@ namespace synthese
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
 		/// http://www.swisstopo.admin.ch/internet/swisstopo/en/home/products/software/products/skripts.html
-		/// <a href="include/14_geography/ch1903wgs84en.pdf">Algorithm documentation (EN)</a>
-		/// <a href="include/14_geography/ch1903wgs84fr.pdf">Algorithm documentation (FR)</a>
+		/// <a href="include/32_geography/ch1903wgs84en.pdf">Algorithm documentation (EN)</a>
+		/// <a href="include/32_geography/ch1903wgs84fr.pdf">Algorithm documentation (FR)</a>
 		GeoPoint WGS84FromCH1903(
 			const geometry::Point2D& point
 		);

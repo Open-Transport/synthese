@@ -25,9 +25,8 @@
 #ifndef SYNTHESE_DisplayScreenPhysicalStopFunction_H__
 #define SYNTHESE_DisplayScreenPhysicalStopFunction_H__
 
-#include "01_util/FactorableTemplate.h"
-
-#include "30_server/Function.h"
+#include "FactorableTemplate.h"
+#include "Function.h"
 
 namespace synthese
 {

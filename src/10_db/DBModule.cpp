@@ -41,7 +41,7 @@ namespace synthese
 	using namespace db;
 	using namespace server;
 
-	template<> const string util::FactorableTemplate<ModuleClass,DBModule>::FACTORY_KEY("02_db");
+	template<> const string util::FactorableTemplate<ModuleClass,DBModule>::FACTORY_KEY("10_db");
 	
 	namespace db
 	{
