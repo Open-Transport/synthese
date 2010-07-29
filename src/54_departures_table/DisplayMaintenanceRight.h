@@ -38,7 +38,7 @@ namespace synthese
 
 			Définition du périmètre :
 				- TransportNetwork : Autorisation portant sur les afficheurs situés sur un point de diffusion desservi par une ligne du réseau spécifié
-				- Line : Autorisation portant sur les afficheurs situés sur un arrêt desservi par la ligne spécifiée
+				- JourneyPattern : Autorisation portant sur les afficheurs situés sur un arrêt desservi par la ligne spécifiée
 				- Place : Autorisation portant sur les afficheurs situés sur un arrêt appartenant au lieu logique spécifié
 				- BroadcastPoint : Autorisation portant sur les afficheurs situés sur le point de diffusion spécifié
 				- NB : la notion de situation d'un afficheur est définie de deux manières :

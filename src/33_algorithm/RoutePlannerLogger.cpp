@@ -98,7 +98,7 @@ namespace synthese
 							stream << "<tr>";
 							stream << "<td>" << its->getDepartureDateTime() << "</td>";
 
-							// Line
+							// JourneyPattern
 							const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
 							const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
 							stream << "<td";
@@ -132,7 +132,7 @@ namespace synthese
 									// Departure
 									stream << "<td>" << its->getDepartureDateTime() << "</td>";
 
-									// Line
+									// JourneyPattern
 									const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
 									const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
 									stream << "<td";

@@ -44,7 +44,7 @@ namespace synthese
 			typedef std::vector<std::string> ColsVector;
 
 		protected:
-			std::string			_headers;	//<! Line of th columns. Will be displayed between tr tags
+			std::string			_headers;	//<! JourneyPattern of th columns. Will be displayed between tr tags
 			int					_cols;
 
 			int					_getColsNumber() const;

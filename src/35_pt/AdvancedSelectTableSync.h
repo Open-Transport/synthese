@@ -49,7 +49,7 @@ namespace synthese
 			const boost::optional<boost::gregorian::date>& endDate
 		);
 
-		bool isPlaceServedByCommercialLine(util::RegistryKeyType Line, util::RegistryKeyType place);
+		bool isPlaceServedByCommercialLine(util::RegistryKeyType JourneyPattern, util::RegistryKeyType place);
 		bool isPlaceServedByNetwork(util::RegistryKeyType networkId, util::RegistryKeyType place);
 		
 		/** Reads in database the rank of the last departure stop of a route.

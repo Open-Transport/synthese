@@ -1,6 +1,6 @@
 
-/** Line class header.
-	@file Line.h
+/** JourneyPattern class header.
+	@file JourneyPattern.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -75,7 +75,7 @@ namespace synthese
 
 			If a service is responsible of a break of the preceding rules, then the line is copied as a SubLine, and the service is linked to the new line. The _sublines container keeps a pointer on each SubLine.
 		*/
-		class Line:
+		class JourneyPattern:
 			public graph::Path,
 			public impex::Importable,
 			public util::Named,
@@ -84,7 +84,7 @@ namespace synthese
 		public:
 
 			/// Chosen registry class.
-			typedef util::Registry<Line>	Registry;
+			typedef util::Registry<JourneyPattern>	Registry;
 
 			typedef std::vector<pt::SubLine*> SubLines;
 
@@ -104,12 +104,12 @@ namespace synthese
 
 		public:
 
-			Line(
+			JourneyPattern(
 				util::RegistryKeyType id = 0,
 				std::string name = std::string()
 			);
 
-			virtual ~Line();
+			virtual ~JourneyPattern();
 
 
 

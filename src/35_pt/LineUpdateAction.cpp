@@ -76,7 +76,7 @@ namespace synthese
 			{
 				_route = LineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROUTE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<Line>&)
+			catch(ObjectNotFoundException<JourneyPattern>&)
 			{
 				throw ActionException("No such route");
 			}

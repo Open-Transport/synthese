@@ -99,8 +99,8 @@ namespace synthese
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Load(
-			Line* line,
+		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,JourneyPattern>::Load(
+			JourneyPattern* line,
 			const db::SQLiteResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
@@ -214,11 +214,11 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Save(
-			Line* object,
+		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,JourneyPattern>::Save(
+			JourneyPattern* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			if(!object->getCommercialLine()) throw Exception("Line save error. Missing commercial line");
+			if(!object->getCommercialLine()) throw Exception("JourneyPattern save error. Missing commercial line");
 			ReplaceQuery<LineTableSync> query(*object);
 			query.addField(object->getCommercialLine()->getKey());
 			query.addField(object->getName());
@@ -248,7 +248,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,Line>::Unlink(Line* obj)
+		template<> void SQLiteDirectTableSyncTemplate<LineTableSync,JourneyPattern>::Unlink(JourneyPattern* obj)
 		{
 			if(obj->getCommercialLine())
 			{

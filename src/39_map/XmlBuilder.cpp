@@ -48,13 +48,13 @@ namespace synthese
 	{
 		DrawableLine* XmlBuilder::CreateDrawableLine(
 			XMLNode& node,
-			const Registry<Line>& lines
+			const Registry<JourneyPattern>& lines
 		){
 			// assert ("drawableLine" == node.getName ());
 			
 			util::RegistryKeyType lineId (GetLongLongAttr (node, "lineId"));
 			
-			shared_ptr<const Line> line = lines.get (lineId);
+			shared_ptr<const JourneyPattern> line = lines.get (lineId);
 			
 			const vector<Edge*>& lineStops = line->getEdges ();
 			
@@ -77,7 +77,7 @@ namespace synthese
 		
 		
 		Map* 
-		XmlBuilder::CreateMap (XMLNode& node, const Registry<Line>& lines)
+		XmlBuilder::CreateMap (XMLNode& node, const Registry<JourneyPattern>& lines)
 		{
 			// assert ("map" == node.getName ());
 			

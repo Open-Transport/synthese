@@ -33,7 +33,7 @@
 #include "CancelReservationAction.h"
 #include "ResaCustomerAdmin.h"
 #include "ResaRight.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineTableSync.h"
 #include "LineStop.h"
 #include "LineStopTableSync.h"
@@ -142,7 +142,7 @@ namespace synthese
 			LineTableSync::SearchResult routes(
 				LineTableSync::Search(_getEnv(), _line->getKey())
 			);
-			BOOST_FOREACH(shared_ptr<Line> line, routes)
+			BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 			{
 				LineStopTableSync::Search(
 					_getEnv(),
@@ -455,7 +455,7 @@ namespace synthese
 					}
 
 					stream << t.col(6, string(), true) << "Service " << service->getServiceNumber() << " - départ de " <<
-						dynamic_cast<const NamedPlace*>(static_cast<const Line*>(service->getPath())->getEdge(0)->getHub())->getFullName() <<
+						dynamic_cast<const NamedPlace*>(static_cast<const JourneyPattern*>(service->getPath())->getEdge(0)->getHub())->getFullName() <<
 						" à " << Service::GetTimeOfDay(service->getDepartureSchedule(false, 0));
 					if (serviceSeatsNumber > 0)
 						stream << " - " << serviceSeatsNumber << " place" << plural << " réservée" << plural;
@@ -605,7 +605,7 @@ namespace synthese
 						"Ligne " << _line->getShortName() <<
 						" - service " << services[0]->getServiceNumber() <<
 						" - départ de " << dynamic_cast<const NamedPlace*>(
-								static_cast<const Line*>(services[0]->getPath())->getEdge(0)->getHub()
+								static_cast<const JourneyPattern*>(services[0]->getPath())->getEdge(0)->getHub()
 							)->getFullName() <<
 						" le " << date.date() <<
 						" à " << date.time_of_day()

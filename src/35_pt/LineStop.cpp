@@ -23,7 +23,7 @@
 #include "LineStop.h"
 #include "Registry.h"
 
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "Service.h"
 #include "ContinuousService.h"
 #include "PhysicalStop.h"
@@ -47,7 +47,7 @@ namespace synthese
 	{
 		LineStop::LineStop(
 			RegistryKeyType id,
-			Line* line,
+			JourneyPattern* line,
 			size_t rankInPath,
 			bool isDeparture,
 			bool isArrival,		
@@ -97,9 +97,9 @@ namespace synthese
 
 
 
-		Line* LineStop::getLine() const
+		JourneyPattern* LineStop::getLine() const
 		{
-			return static_cast<Line*>(getParentPath());
+			return static_cast<JourneyPattern*>(getParentPath());
 		}
 
 		PhysicalStop* LineStop::getPhysicalStop() const
@@ -107,7 +107,7 @@ namespace synthese
 			return static_cast<PhysicalStop*>(getFromVertex());
 		}
 
-		void LineStop::setLine(Line* line )
+		void LineStop::setLine(JourneyPattern* line )
 		{
 			setParentPath(static_cast<Path*>(line));
 		}

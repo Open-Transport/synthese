@@ -48,7 +48,7 @@ namespace synthese
 			The days when the service is provided are stored in a Calendar object.
 			Even if a Service intrinsically corresponds to a sequence of 
 			(arrival schedule - departure schedule) couples, these schedules are not
-			stored in Service objects but per Edge (Line/Road). However, this is how 
+			stored in Service objects but per Edge (JourneyPattern/Road). However, this is how 
 			Service objects are persisted.
 
 			It is completely independent from the "vehicle" : this ability 

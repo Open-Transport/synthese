@@ -29,7 +29,7 @@
 #include "CommercialLine.h"
 #include "HTMLModule.h"
 #include "PhysicalStop.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineStop.h"
 #include "LineStopTableSync.h"
 #include "ScheduledService.h"
@@ -105,11 +105,11 @@ namespace synthese
 		){
 			try
 			{
-				_line = Env::GetOfficialEnv().get<Line>(
+				_line = Env::GetOfficialEnv().get<JourneyPattern>(
 					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
 				);
 			}
-			catch (ObjectNotFoundException<Line>&)
+			catch (ObjectNotFoundException<JourneyPattern>&)
 			{
 				throw AdminParametersException("No such line");
 			}
@@ -187,7 +187,7 @@ namespace synthese
 				AdminActionFunctionRequest<LineStopRemoveAction,LineAdmin> lineStopRemoveAction(_request);
 				
 				AdminActionFunctionRequest<LineStopAddAction,LineAdmin> lineStopAddAction(_request);
-				lineStopAddAction.getAction()->setRoute(const_pointer_cast<Line>(_line));
+				lineStopAddAction.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
 				HTMLForm f(lineStopAddAction.getHTMLForm());
 
 				AdminActionFunctionRequest<LineStopUpdateAction,LineAdmin> lineStopUpdateAction(_request);
@@ -287,7 +287,7 @@ namespace synthese
 				HTMLForm sortedForm(searchRequest.getHTMLForm());
 
 				AdminActionFunctionRequest<ServiceAddAction, LineAdmin> newRequest(_request);
-				newRequest.getAction()->setLine(const_pointer_cast<Line>(_line));
+				newRequest.getAction()->setLine(const_pointer_cast<JourneyPattern>(_line));
 				newRequest.getAction()->setIsContinuous(false);
 
 				ActionResultHTMLTable::HeaderVector vs;
@@ -355,7 +355,7 @@ namespace synthese
 				HTMLForm sortedForm(searchRequest.getHTMLForm());
 
 				AdminActionFunctionRequest<ServiceAddAction, LineAdmin> newRequest(_request);
-				newRequest.getAction()->setLine(const_pointer_cast<Line>(_line));
+				newRequest.getAction()->setLine(const_pointer_cast<JourneyPattern>(_line));
 				newRequest.getAction()->setIsContinuous(true);
 
 				AdminFunctionRequest<ServiceAdmin> serviceRequest(_request);
@@ -434,7 +434,7 @@ namespace synthese
 				waybackMap.insert(make_pair(true, "Retour"));
 
 				AdminActionFunctionRequest<LineUpdateAction,LineAdmin> updateRequest(_request);
-				updateRequest.getAction()->setRoute(const_pointer_cast<Line>(_line));
+				updateRequest.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
 				PropertiesHTMLTable p(updateRequest.getHTMLForm());
 				stream << p.open();
 				stream << p.cell(
@@ -461,7 +461,7 @@ namespace synthese
 				)	);
 				stream << p.close();
 
-				PTRuleUserAdmin<Line,LineAdmin>::Display(stream, _line, _request);
+				PTRuleUserAdmin<JourneyPattern,LineAdmin>::Display(stream, _line, _request);
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -558,7 +558,7 @@ namespace synthese
 
 
 
-		boost::shared_ptr<const Line> LineAdmin::getLine() const
+		boost::shared_ptr<const JourneyPattern> LineAdmin::getLine() const
 		{
 			return _line;
 		}
@@ -581,7 +581,7 @@ namespace synthese
 		
 
 
-		void LineAdmin::setLine(boost::shared_ptr<const Line> value)
+		void LineAdmin::setLine(boost::shared_ptr<const JourneyPattern> value)
 		{
 			_line = value;
 		}

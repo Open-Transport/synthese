@@ -46,7 +46,7 @@
 #include "StopAreaNameUpdateAction.hpp"
 #include "PTPhysicalStopAdmin.h"
 #include "LineStop.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "PhysicalStopAddAction.h"
 #include "HTMLMap.hpp"

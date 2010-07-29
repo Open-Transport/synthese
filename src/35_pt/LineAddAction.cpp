@@ -85,7 +85,7 @@ namespace synthese
 				{
 					_template = LineTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), *_env);
 				}
-				catch(ObjectNotFoundException<Line>& e)
+				catch(ObjectNotFoundException<JourneyPattern>& e)
 				{
 					throw ActionException("No such template route");
 				}
@@ -113,7 +113,7 @@ namespace synthese
 			Request& request
 		){
 			SQLiteTransaction transaction;
-			Line object;
+			JourneyPattern object;
 
 			if(_template.get())
 			{

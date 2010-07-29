@@ -26,7 +26,7 @@
 #include "Registry.h"
 #include "GraphConstants.h"
 
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "PhysicalStop.h"
 #include "NonConcurrencyRule.h"
@@ -408,9 +408,9 @@ namespace synthese
 
 
 
-		const Line* ScheduledService::getRoute() const
+		const JourneyPattern* ScheduledService::getRoute() const
 		{
-			return static_cast<const Line*>(getPath());
+			return static_cast<const JourneyPattern*>(getPath());
 		}
 
 

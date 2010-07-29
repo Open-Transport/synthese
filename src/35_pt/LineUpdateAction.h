@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class Line;
+		class JourneyPattern;
 		class RollingStock;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -63,7 +63,7 @@ namespace synthese
 			static const std::string PARAMETER_WAYBACK;
 
 		private:
-			boost::shared_ptr<Line> _route;
+			boost::shared_ptr<JourneyPattern> _route;
 			boost::shared_ptr<RollingStock> _transportMode;
 			std::string _name;
 			std::string _direction;
@@ -101,7 +101,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setRoute(boost::shared_ptr<Line> value) { _route = value; }
+				void setRoute(boost::shared_ptr<JourneyPattern> value) { _route = value; }
 			//@}
 		};
 	}

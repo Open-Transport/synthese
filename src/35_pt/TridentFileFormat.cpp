@@ -35,7 +35,7 @@
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousService.h"
 #include "ContinuousServiceTableSync.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineTableSync.h"
 #include "LineStop.h"
 #include "LineStopTableSync.h"
@@ -204,9 +204,9 @@ namespace synthese
 
 			// Lines
 			const RollingStock* rollingStock(NULL);
-			BOOST_FOREACH(Registry<Line>::value_type itline, _env->getRegistry<Line>())
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type itline, _env->getRegistry<JourneyPattern>())
 			{
-				const Line& line(*itline.second);
+				const JourneyPattern& line(*itline.second);
 				if (line.getRollingStock())
 					rollingStock = line.getRollingStock();
 				LineStopTableSync::Search(
@@ -258,7 +258,7 @@ namespace synthese
 			os << "<registration>" << "\n";
 			os << "<registrationNumber>" << Conversion::ToString (tn->getKey ()) << "</registrationNumber>" << "\n";
 			os << "</registration>" << "\n";
-			os << "<lineId>" << TridentId (peerid, "Line", *_commercialLine) << "</lineId>" << "\n";
+			os << "<lineId>" << TridentId (peerid, "JourneyPattern", *_commercialLine) << "</lineId>" << "\n";
 			os << "<comment/>" << "\n";
 			os << "</PTNetwork>" << "\n";
 
@@ -475,10 +475,10 @@ namespace synthese
 			{
 			os << "<ChouetteLineDescription>" << "\n";
 			
-			// --------------------------------------------------- Line
+			// --------------------------------------------------- JourneyPattern
 			{
-				os << "<Line>" << "\n";
-				os << "<objectId>" << TridentId (peerid, "Line", *_commercialLine) << "</objectId>" << "\n";
+				os << "<JourneyPattern>" << "\n";
+				os << "<objectId>" << TridentId (peerid, "JourneyPattern", *_commercialLine) << "</objectId>" << "\n";
 				os << "<name>" << _commercialLine->getName () << "</name>" << "\n";
 				os << "<number>" << _commercialLine->getShortName () << "</number>" << "\n";
 				os << "<publishedName>" << _commercialLine->getLongName () << "</publishedName>" << "\n";
@@ -489,7 +489,7 @@ namespace synthese
 					"</transportModeName>" <<
 				"\n";
 			    
-				BOOST_FOREACH(Registry<Line>::value_type line, _env->getRegistry<Line>())
+				BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env->getRegistry<JourneyPattern>())
 				{
 					os << "<routeId>" << TridentId (peerid, "ChouetteRoute", *line.second) << "</routeId>" << "\n";
 				}
@@ -497,13 +497,13 @@ namespace synthese
 				os << "<registrationNumber>" << Conversion::ToString (_commercialLine->getKey ()) << "</registrationNumber>" << "\n";
 				os << "</registration>" << "\n";
 
-				os << "</Line>" << "\n";
+				os << "</JourneyPattern>" << "\n";
 			}
 
 			// --------------------------------------------------- ChouetteRoute
-			BOOST_FOREACH(Registry<Line>::value_type itline, _env->getRegistry<Line>())
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type itline, _env->getRegistry<JourneyPattern>())
 			{
-				const Line* line(itline.second.get());
+				const JourneyPattern* line(itline.second.get());
 				
 				os << "<ChouetteRoute>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</objectId>" << "\n";
@@ -580,7 +580,7 @@ namespace synthese
 				if (ps->getName ().empty () == false) os << " (" + ps->getName () + ")";
 				os << "</name>" << "\n";
 				
-				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_commercialLine) << "</lineIdShortcut>" << "\n";
+				os << "<lineIdShortcut>" << TridentId (peerid, "JourneyPattern", *_commercialLine) << "</lineIdShortcut>" << "\n";
 				os << "<ptNetworkIdShortcut>" << TridentId (peerid, "PTNetwork", *tn) << "</ptNetworkIdShortcut>" << "\n";
 
 				if (_withTisseoExtension)
@@ -598,7 +598,7 @@ namespace synthese
 
 
 			// --------------------------------------------------- PtLink
-			BOOST_FOREACH(Registry<Line>::value_type line, _env->getRegistry<Line>())
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env->getRegistry<JourneyPattern>())
 			{
 				const Edge* from(NULL);
 				BOOST_FOREACH(const Edge* to, line.second->getEdges())
@@ -618,9 +618,9 @@ namespace synthese
 
 			// --------------------------------------------------- JourneyPattern
 			// One per route 
-			BOOST_FOREACH(Registry<Line>::value_type itline, _env->getRegistry<Line>())
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type itline, _env->getRegistry<JourneyPattern>())
 			{
-				const Line* line(itline.second.get());
+				const JourneyPattern* line(itline.second.get());
 				if (line->getEdges().empty())
 					continue;
 
@@ -639,7 +639,7 @@ namespace synthese
 					os << "<stopPointList>" << TridentId (peerid, "StopPoint", *lineStop) << "</stopPointList>" << "\n";
 				}
 
-				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_commercialLine) << "</lineIdShortcut>" << "\n";
+				os << "<lineIdShortcut>" << TridentId (peerid, "JourneyPattern", *_commercialLine) << "</lineIdShortcut>" << "\n";
 				os << "</JourneyPattern>" << "\n";
 			}
 		
@@ -662,7 +662,7 @@ namespace synthese
 				os << "<creatorId>" << srv->getServiceNumber() << "</creatorId>" << "\n";
 				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", srv->getPathId()) << "</routeId>" << "\n";
 				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", srv->getPathId()) << "</journeyPatternId>" << "\n";
-				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_commercialLine) << "</lineIdShortcut>" << "\n";
+				os << "<lineIdShortcut>" << TridentId (peerid, "JourneyPattern", *_commercialLine) << "</lineIdShortcut>" << "\n";
 				os << "<routeIdShortcut>" << TridentId (peerid, "ChouetteRoute", srv->getPathId()) << "</routeIdShortcut>" << "\n";
 				if (!srv->getServiceNumber().empty())
 				{
@@ -769,7 +769,7 @@ namespace synthese
 				os << "<creatorId>" << srv->getServiceNumber() << "</creatorId>" << "\n";
 				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", srv->getPathId()) << "</routeId>" << "\n";
 				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", srv->getPathId()) << "</journeyPatternId>" << "\n";
-				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_commercialLine) << "</lineIdShortcut>" << "\n";
+				os << "<lineIdShortcut>" << TridentId (peerid, "JourneyPattern", *_commercialLine) << "</lineIdShortcut>" << "\n";
 				os << "<routeIdShortcut>" << TridentId (peerid, "ChouetteRoute", srv->getPathId()) << "</routeIdShortcut>" << "\n";
 				if (!srv->getServiceNumber().empty())
 				{
@@ -902,8 +902,8 @@ namespace synthese
 					const NonConcurrencyRule& rule(*itrule.second);
 					os << "<LineConflict>" << "\n";
 					os << "<objectId>" << TridentId (peerid, "LineConflict", rule) << "</objectId>" << "\n";
-					os << "<forbiddenLine>" << TridentId (peerid, "Line", rule.getHiddenLine()->getKey()) << "</forbiddenLine>" << "\n";
-					os << "<usedLine>" << TridentId (peerid, "Line", rule.getPriorityLine()->getKey()) << "</usedLine>" << "\n";
+					os << "<forbiddenLine>" << TridentId (peerid, "JourneyPattern", rule.getHiddenLine()->getKey()) << "</forbiddenLine>" << "\n";
+					os << "<usedLine>" << TridentId (peerid, "JourneyPattern", rule.getPriorityLine()->getKey()) << "</usedLine>" << "\n";
 					os << "<conflictDelay>" << ToXsdDuration(rule.getDelay()) << "</conflictDelay>" << "\n";
 					os << "</LineConflict>" << "\n";
 				}
@@ -977,7 +977,7 @@ namespace synthese
 			
 			// Title
 			XMLNode chouetteLineDescriptionNode(allNode.getChildNode("ChouetteLineDescription"));
-			XMLNode lineNode(chouetteLineDescriptionNode.getChildNode("Line"));
+			XMLNode lineNode(chouetteLineDescriptionNode.getChildNode("JourneyPattern"));
 			XMLNode clineNameNode = lineNode.getChildNode("name");
 				
 			os << "<h2>Trident import of " << clineNameNode.getText() << "</h2>";
@@ -1326,7 +1326,7 @@ namespace synthese
 				throw Exception("At least a stop is missing : load interrupted");
 			}
 
-			// Line stops
+			// JourneyPattern stops
 			int stopPointsNumber(chouetteLineDescriptionNode.nChildNode("StopPoint"));
 			map<string,PhysicalStop*> stopPoints;
 			for(int stopPointRank(0); stopPointRank < stopPointsNumber; ++stopPointRank)
@@ -1354,7 +1354,7 @@ namespace synthese
 			LineTableSync::SearchResult sroutes(
 				LineTableSync::Search(*_env, cline->getKey(), _dataSource->getKey())
 			);
-			BOOST_FOREACH(shared_ptr<Line> line, sroutes)
+			BOOST_FOREACH(shared_ptr<JourneyPattern> line, sroutes)
 			{
 				LineStopTableSync::Search(
 					*_env,
@@ -1397,7 +1397,7 @@ namespace synthese
 			
 			
 			// Routes
-			map<string,Line*> routes;
+			map<string,JourneyPattern*> routes;
 			int routesNumber(chouetteLineDescriptionNode.nChildNode("JourneyPattern"));
 			for(int routeRank(0); routeRank < routesNumber; ++routeRank)
 			{
@@ -1415,8 +1415,8 @@ namespace synthese
 				}
 				
 				// Attempting to find an existing route
-				shared_ptr<Line> route;
-				BOOST_FOREACH(shared_ptr<Line> line, sroutes)
+				shared_ptr<JourneyPattern> route;
+				BOOST_FOREACH(shared_ptr<JourneyPattern> line, sroutes)
 				{
 					if(	(!line->getRollingStock() || line->getRollingStock() == rollingStock.get()) &&
 						*line == routeStops
@@ -1430,14 +1430,14 @@ namespace synthese
 				if(!route.get())
 				{
 					os << "CREA : Creation of route " << routeNames[routeIdNode.getText()] << " for " << jpKeyNode.getText() << "<br />";
-					route.reset(new Line);
+					route.reset(new JourneyPattern);
 					route->setCommercialLine(cline.get());
 					route->setName(routeNames[routeIdNode.getText()]);
 					route->setCodeBySource(routeNames[routeIdNode.getText()]);
 					route->setWayBack(routeWaybacks[routeIdNode.getText()]);
 					route->setDataSource(_dataSource);
 					route->setKey(LineTableSync::getId());
-					_env->getEditableRegistry<Line>().add(route);
+					_env->getEditableRegistry<JourneyPattern>().add(route);
 					createdObjects.insert(route->getKey());
 					
 					size_t rank(0);
@@ -1478,7 +1478,7 @@ namespace synthese
 				XMLNode numberNode(serviceNode.getChildNode("publishedJourneyName"));
 				
 				// Creation of the service
-				Line* line(routes[jpKeyNode.getText()]);
+				JourneyPattern* line(routes[jpKeyNode.getText()]);
 				size_t stopsNumber(serviceNode.nChildNode("VehicleJourneyAtStop"));
 				if(stopsNumber != line->getEdges().size())
 				{
@@ -1603,7 +1603,7 @@ namespace synthese
 			}
 */
 			// Clean useless routes
-/*			for(map<string, Line*>::const_iterator itr(routes.begin()); itr != routes.end(); ++itr)
+/*			for(map<string, JourneyPattern*>::const_iterator itr(routes.begin()); itr != routes.end(); ++itr)
 			{
 				if(itr->second->getServices().empty() && createdObjects.find(itr->second->getKey()) != createdObjects.end())
 				{
@@ -1611,7 +1611,7 @@ namespace synthese
 					{
 						_env->getEditableRegistry<LineStop>().remove(static_cast<const LineStop*>(ls)->getKey());
 					}
-					_env->getEditableRegistry<Line>().remove(itr->second->getKey());
+					_env->getEditableRegistry<JourneyPattern>().remove(itr->second->getKey());
 				}
 			}
 */
@@ -1723,7 +1723,7 @@ namespace synthese
 			{
 				CommercialLineTableSync::Save(cline.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<Line>::value_type line, _env->getRegistry<Line>())
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env->getRegistry<JourneyPattern>())
 			{
 				LineTableSync::Save(line.second.get(), transaction);
 			}

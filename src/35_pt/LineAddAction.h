@@ -33,7 +33,7 @@ namespace synthese
 	namespace pt
 	{
 		class CommercialLine;
-		class Line;
+		class JourneyPattern;
 	}
 
 	namespace pt
@@ -89,7 +89,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<pt::CommercialLine> _commercialLine;
-			boost::shared_ptr<const pt::Line> _template;
+			boost::shared_ptr<const pt::JourneyPattern> _template;
 			bool _reverse;
 			std::string _name;
 

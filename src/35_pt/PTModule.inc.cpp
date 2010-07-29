@@ -86,7 +86,7 @@
 
 // Registries
 
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineStop.h"
 #include "StopArea.hpp"
 #include "ReservationContact.h"

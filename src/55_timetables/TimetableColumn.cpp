@@ -27,7 +27,7 @@
 
 #include "SchedulesBasedService.h"
 #include "Path.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "Edge.h"
 #include "Vertex.h"
 #include "PhysicalStop.h"
@@ -48,7 +48,7 @@ namespace synthese
 		TimetableColumn::TimetableColumn(
 			const TimetableGenerator& timetablegenerator,
 			const SchedulesBasedService& service
-		):	_line(static_cast<const Line*>(service.getPath())),
+		):	_line(static_cast<const JourneyPattern*>(service.getPath())),
 			_calendar(service)
 		{
 			_calendar &= timetablegenerator.getBaseCalendar();

@@ -47,7 +47,7 @@
 #include "PTConstants.h"
 #include "Journey.h"
 #include "ServicePointer.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "LineStop.h"
 #include "Road.h"

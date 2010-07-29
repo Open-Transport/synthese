@@ -44,7 +44,7 @@
 
 // transport
 #include "StopArea.hpp"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineTableSync.h"
 #include "PTModule.h"
 
@@ -257,7 +257,7 @@ namespace synthese
 
 		AlarmRecipientSearchFieldsMap DisplayScreenAlarmRecipient::getSearchFields(HTMLForm& form, const ParametersMap& parameters) const
 		{
-			shared_ptr<const Line> line;
+			shared_ptr<const JourneyPattern> line;
 			Env env;
 			optional<RegistryKeyType> id(parameters.getOptional<RegistryKeyType>(PARAMETER_SEARCH_LINE));
 			if (id)

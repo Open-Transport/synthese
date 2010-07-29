@@ -47,7 +47,7 @@ namespace synthese
 	namespace pt
 	{
 		class StopArea;
-		class Line;
+		class JourneyPattern;
 	}
 
 	namespace departurestable

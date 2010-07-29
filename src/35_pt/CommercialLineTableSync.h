@@ -43,7 +43,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		/** Commercial Line table synchronizer.
+		/** Commercial JourneyPattern table synchronizer.
 			@ingroup m35LS refLS
 		*/
 		class CommercialLineTableSync:

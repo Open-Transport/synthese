@@ -43,7 +43,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class Line;
+		class JourneyPattern;
 		class LineStop;
 	}
 
@@ -90,7 +90,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				virtual std::string getTeam() const;
-				const pt::Line* getRoute() const;
+				const pt::JourneyPattern* getRoute() const;
 			//@}
 
 			//! @name Setters

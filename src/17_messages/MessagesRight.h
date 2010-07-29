@@ -43,7 +43,7 @@ namespace synthese
 
 			Définition du périmètre :
 				- TransportNetwork : Autorisation portant sur les messages diffusés sur un point de diffusion desservi par une ligne du réseau spécifié
-				- Line : Autorisation portant sur les messages diffusés sur un arrêt desservi par la ligne spécifiée
+				- JourneyPattern : Autorisation portant sur les messages diffusés sur un arrêt desservi par la ligne spécifiée
 				- Place : Autorisation portant sur les messages diffusés sur un arrêt appartenant au lieu logique spécifié
 				- BroadcastPoint : Autorisation portant sur les messages diffusés sur le point de diffusion spécifié
 				- NB : le périmètre est construit par ajout : si un message est diffusé par un arrêt desservi par une ligne autorisée alors il entre dans le champ de l'habilitation, même s'il est diffusé sur un autre arrêt dont la ligne n'y figure pas.

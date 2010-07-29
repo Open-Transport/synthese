@@ -119,7 +119,7 @@ namespace synthese
 
 
 
-		shared_ptr<Line> 
+		shared_ptr<JourneyPattern> 
 		XmlBuilder::CreateLine (XMLNode& node, 
 					const Registry<CommercialLine>& commercialLines)
 		{
@@ -127,7 +127,7 @@ namespace synthese
 
 			std::string name (GetStringAttr (node, "name"));
 
-			shared_ptr<Line> line(new Line(id, name));
+			shared_ptr<JourneyPattern> line(new JourneyPattern(id, name));
 
 			util::RegistryKeyType commercialLineId (GetLongLongAttr (node, "commercialLineId"));
 			line->setCommercialLine (const_cast<CommercialLine*>(commercialLines.get(commercialLineId).get()));
@@ -143,7 +143,7 @@ namespace synthese
 
 		shared_ptr<LineStop> 
 		XmlBuilder::CreateLineStop (XMLNode& node, 
-						Registry<Line>& lines,
+						Registry<JourneyPattern>& lines,
 						const Registry<PhysicalStop>& physicalStops)
 		{
 			// assert ("lineStop" == node.getName ());
@@ -157,7 +157,7 @@ namespace synthese
 			bool isArrival (GetBoolAttr (node, "isArrival"));
 			double metricOffset (GetDoubleAttr (node, "metricOffset"));
 		   
-			shared_ptr<Line> line = lines.getEditable (lineId);
+			shared_ptr<JourneyPattern> line = lines.getEditable (lineId);
 
 			shared_ptr<LineStop> lineStop (
 			new LineStop (

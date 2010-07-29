@@ -36,7 +36,7 @@
 #include "Log.h"
 #include "Conversion.h"
 #include "Registry.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 
 #include <cmath>
 #include <iostream>
@@ -76,7 +76,7 @@ namespace synthese
 		PostscriptRenderer::render (
 		const boost::filesystem::path& tempDir, 
 		const std::string& filenamePrefix,
-		const Registry<Line>& lines,
+		const Registry<JourneyPattern>& lines,
 		synthese::map::Map& map,
 		const synthese::map::RenderingConfig& config
 		)		{

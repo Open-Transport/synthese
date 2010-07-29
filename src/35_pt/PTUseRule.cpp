@@ -22,7 +22,7 @@
 
 #include "PTUseRule.h"
 #include "Edge.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "ServicePointer.h"
 #include "StopArea.hpp"
@@ -129,7 +129,7 @@ namespace synthese
 				else
 				{
 					const Edge* departureEdge(servicePointer.getDepartureEdge());
-					if(static_cast<const Line*>(departureEdge->getParentPath())->getCommercialLine()->isOptionalReservationPlace(
+					if(static_cast<const JourneyPattern*>(departureEdge->getParentPath())->getCommercialLine()->isOptionalReservationPlace(
 						static_cast<const StopArea*>(departureEdge->getHub())
 					)){
 						return RUN_POSSIBLE;
@@ -204,7 +204,7 @@ namespace synthese
 				{
 					const Edge* departureEdge(servicePointer.getDepartureEdge());
 					ptime reservationTime(second_clock::local_time());
-					if(static_cast<const Line*>(departureEdge->getParentPath())->getCommercialLine()->isOptionalReservationPlace(
+					if(static_cast<const JourneyPattern*>(departureEdge->getParentPath())->getCommercialLine()->isOptionalReservationPlace(
 						static_cast<const StopArea*>(departureEdge->getHub())
 					)){
 						if(	reservationTime < getReservationOpeningTime(servicePointer)

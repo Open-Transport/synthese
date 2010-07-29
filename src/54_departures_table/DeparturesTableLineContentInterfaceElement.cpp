@@ -28,7 +28,7 @@
 #include "Interface.h"
 #include "LineMarkerInterfacePage.h"
 #include "LineStop.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "Request.h"
 #include "DeparturesTableTypes.h"
 #include "DeparturesTableInterfaceElement.h"
@@ -66,7 +66,7 @@ namespace synthese
 			, const void* object /*= NULL*/
 			, const server::Request* request /*= NULL*/ ) const
 		{
-			const Line* line(static_cast<const Line*>(static_cast<const ArrivalDepartureRow*>(object)->first.getService()->getPath()));
+			const JourneyPattern* line(static_cast<const JourneyPattern*>(static_cast<const ArrivalDepartureRow*>(object)->first.getService()->getPath()));
 			const LineMarkerInterfacePage* page(_page->getInterface()->getPage<LineMarkerInterfacePage>());
 
 			page->display(

@@ -49,7 +49,7 @@ namespace synthese
 				throw InterfacePageException("Malformed line label declaration");
 			shared_ptr<LibraryInterfaceElement> vie = vel.front();
             if (!dynamic_pointer_cast<StaticValueInterfaceElement, LibraryInterfaceElement>(vie).get())
-				throw InterfacePageException("Line label must be statically defined");
+				throw InterfacePageException("JourneyPattern label must be statically defined");
 			ParametersVector pv;
 			VariablesMap vars;
 			_label = vie->getValue(pv, vars);

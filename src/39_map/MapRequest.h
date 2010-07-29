@@ -29,7 +29,7 @@
 
 #include "City.h"
 #include "CommercialLine.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineStop.h"
 #include "StopArea.hpp"
 #include "PhysicalStop.h"

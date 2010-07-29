@@ -41,7 +41,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class Line;
+		class JourneyPattern;
 		class CommercialLine;
 	}
 
@@ -80,10 +80,10 @@ namespace synthese
 
 			//! @name Algorithms
 			//@{
-				bool	_isLineSelected(const pt::Line& line)	const;
+				bool	_isLineSelected(const pt::JourneyPattern& line)	const;
 				void	_insert(TimetableResult& result, const TimetableColumn& col);
 				void	_buildWarnings(TimetableResult& result);
-				void	_scanServices(TimetableResult& result, const pt::Line& line);
+				void	_scanServices(TimetableResult& result, const pt::JourneyPattern& line);
 			//@}
 
 		public:

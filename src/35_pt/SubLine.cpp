@@ -37,8 +37,8 @@ namespace synthese
 	
 	namespace pt
 	{
-		SubLine::SubLine( Line* line )
-			: Line()
+		SubLine::SubLine( JourneyPattern* line )
+			: JourneyPattern()
 			, _mainLine(line),
 			Registrable(0)
 		{
@@ -93,7 +93,7 @@ namespace synthese
 			_pathGroup->removePath(this);
 		}
 
-		Line* SubLine::getMainLine() const
+		JourneyPattern* SubLine::getMainLine() const
 		{
 			return _mainLine;
 		}

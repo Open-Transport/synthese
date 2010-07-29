@@ -24,7 +24,7 @@
 
 #include "ContinuousServiceTableSync.h"
 
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineTableSync.h"
 #include "PTModule.h"
 

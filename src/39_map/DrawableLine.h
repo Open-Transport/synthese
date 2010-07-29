@@ -35,7 +35,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class Line;
+		class JourneyPattern;
 	}
 
 
@@ -70,7 +70,7 @@ namespace synthese
 
 			typedef enum { NONE, SINGLE, SQL_DOUBLE } PointShiftingMode;
 		    
-			DrawableLine (const synthese::pt::Line* line,
+			DrawableLine (const synthese::pt::JourneyPattern* line,
 				  int fromLineStopIndex,
 				  int toLineStopIndex,
 				  bool withPhysicalStops = true);

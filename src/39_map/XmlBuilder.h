@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_MAP_XMLBUILDER_H
 #define SYNTHESE_MAP_XMLBUILDER_H
 
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "Registry.h"
 
 struct XMLNode;
@@ -51,12 +51,12 @@ namespace synthese
 		public:
 			static DrawableLine* CreateDrawableLine(
 				 XMLNode& node,
-				 const util::Registry<pt::Line>& lines
+				 const util::Registry<pt::JourneyPattern>& lines
 			);
 
 			static Map* CreateMap(
 				XMLNode& node,
-				const util::Registry<pt::Line>& lines
+				const util::Registry<pt::JourneyPattern>& lines
 			);
 		};
 	}

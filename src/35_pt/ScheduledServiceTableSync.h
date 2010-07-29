@@ -61,7 +61,7 @@ namespace synthese
 			
 
 			/** ScheduledService search.
-				@param line Line which the service must belong to
+				@param line JourneyPattern which the service must belong to
 				@param commercialLine Commercial line which the service must belong to
 				@param dataSource Filter on the data source of the route
 				@param first First ScheduledService object to answer

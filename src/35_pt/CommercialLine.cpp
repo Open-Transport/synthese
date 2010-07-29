@@ -24,7 +24,7 @@
 #include "Registry.h"
 #include "GraphConstants.h"
 #include "AllowedUseRule.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "NonPermanentService.h"
 #include "SubLine.h"
 #include "CalendarTemplate.h"
@@ -148,7 +148,7 @@ namespace synthese
 					}
 				}
 
-				BOOST_FOREACH(const SubLine* subline, static_cast<const Line*>(path)->getSubLines())
+				BOOST_FOREACH(const SubLine* subline, static_cast<const JourneyPattern*>(path)->getSubLines())
 				{
 					BOOST_FOREACH(const Service* service, subline->getServices())
 					{

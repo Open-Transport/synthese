@@ -39,7 +39,7 @@ namespace synthese
 	namespace departurestable
 	{
 
-		/** Line content interface element.
+		/** JourneyPattern content interface element.
 			@ingroup m54Library refLibrary
 		*/
 		class DeparturesTableLineContentInterfaceElement : public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableLineContentInterfaceElement>

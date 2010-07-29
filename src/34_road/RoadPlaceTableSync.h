@@ -54,8 +54,8 @@ namespace synthese
 			/** RoadPlace search.
 				@param env Environment to read and populate
 				@param name Part of the name of the server
-				@param first First Line object to answer
-				@param number Number of Line objects to answer (0 = all) The size of the vector is less
+				@param first First JourneyPattern object to answer
+				@param number Number of JourneyPattern objects to answer (0 = all) The size of the vector is less
 					or equal to number, then all users were returned despite of the number limit. If the 
 					size is greater than number (actually equal to number + 1) then there is others accounts 
 					to show. Test it to know if the situation needs a "click for more" button.

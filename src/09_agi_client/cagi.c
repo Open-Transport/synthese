@@ -350,10 +350,10 @@ int AGITool_channel_status(AGI_TOOLS *tool, AGI_CMD_RESULT *res, char *channel)
 		case AST_STATE_RESERVED: snprintf(res->data, sizeof(res->data), "Channel is down, but reserved"); break;
 		case AST_STATE_OFFHOOK: snprintf(res->data, sizeof(res->data), "Channel is off hook"); break;
 		case AST_STATE_DIALING: snprintf(res->data, sizeof(res->data), "Digits (or equivalent) have been dialed"); break;
-		case AST_STATE_RING: snprintf(res->data, sizeof(res->data), "Line is ringing"); break;
+		case AST_STATE_RING: snprintf(res->data, sizeof(res->data), "JourneyPattern is ringing"); break;
 		case AST_STATE_RINGING: snprintf(res->data, sizeof(res->data), "Remote end is ringing"); break;
-		case AST_STATE_UP: snprintf(res->data, sizeof(res->data), "Line is up"); break;
-		case AST_STATE_BUSY: snprintf(res->data, sizeof(res->data), "Line is busy"); break;
+		case AST_STATE_UP: snprintf(res->data, sizeof(res->data), "JourneyPattern is up"); break;
+		case AST_STATE_BUSY: snprintf(res->data, sizeof(res->data), "JourneyPattern is busy"); break;
 		case AST_STATE_DIALING_OFFHOOK: snprintf(res->data, sizeof(res->data), "Digits (or equivalent) have been dialed while offhook"); break;
 		case AST_STATE_PRERING: snprintf(res->data, sizeof(res->data), "Channel has detected an incoming call and is waiting for ring"); break;
 		default: snprintf(res->data, sizeof(res->data), "Unknown result: %s", res->result); break;

@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class Line;
+		class JourneyPattern;
 		class PhysicalStop;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ namespace synthese
 			static const std::string PARAMETER_METRIC_OFFSET;
 
 		private:
-			boost::shared_ptr<Line> _route;
+			boost::shared_ptr<JourneyPattern> _route;
 			boost::shared_ptr<PhysicalStop> _stop;
 			std::size_t _rank;
 			double _metricOffset;
@@ -113,7 +113,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setRoute(boost::shared_ptr<Line> value) { _route = value; }
+				void setRoute(boost::shared_ptr<JourneyPattern> value) { _route = value; }
 				void setRank(std::size_t value){ _rank = value; }
 			//@}
 		};

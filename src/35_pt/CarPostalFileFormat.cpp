@@ -110,7 +110,7 @@ namespace synthese
 		void CarPostalFileFormat::save(std::ostream& os
 		) const {
 			SQLiteTransaction transaction;
-			BOOST_FOREACH(Registry<Line>::value_type line, _env->getRegistry<Line>())
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env->getRegistry<JourneyPattern>())
 			{
 				LineTableSync::Save(line.second.get(), transaction);
 			}
@@ -238,7 +238,7 @@ namespace synthese
 				string serviceNumber;
 				string lineNumber;
 				int calendarNumber;
-				Line::StopsWithDepartureArrivalAuthorization stops;
+				JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
 				vector<time_duration> departures;
 				vector<time_duration> arrivals;
 				Calendar mask;
@@ -280,7 +280,7 @@ namespace synthese
 							string departureTime(line.substr(34,4));
 							string arrivalTime(line.substr(29,4));
 
-							Line::StopWithDepartureArrivalAuthorization stop;
+							JourneyPattern::StopWithDepartureArrivalAuthorization stop;
 							stop.stop = searchStop.front().get();
 							stop.departure = (departureTime != "9999" && departureTime != "    ");
 							stop.arrival = (arrivalTime != "9999" && arrivalTime != "    ");
@@ -302,7 +302,7 @@ namespace synthese
 					// End of service
 					if(line.size() < 54 && !serviceMustBeAvoided)
 					{
-						// Line
+						// JourneyPattern
 						map<string, shared_ptr<CommercialLine> >::const_iterator itLine(lines.find(lineNumber));
 						shared_ptr<CommercialLine> cline;
 						if(itLine != lines.end())
@@ -335,7 +335,7 @@ namespace synthese
 							LineTableSync::SearchResult sroutes(
 								LineTableSync::Search(*_env, cline->getKey(), _dataSource->getKey())
 							);
-							BOOST_FOREACH(shared_ptr<Line> sroute, sroutes)
+							BOOST_FOREACH(shared_ptr<JourneyPattern> sroute, sroutes)
 							{
 								LineStopTableSync::Search(
 									*_env,
@@ -360,13 +360,13 @@ namespace synthese
 						}
 
 						// Attempting to find an existing route
-						shared_ptr<Line> route;
+						shared_ptr<JourneyPattern> route;
 						BOOST_FOREACH(const Path* sroute, cline->getPaths())
 						{
-							const Line* lroute(static_cast<const Line*>(sroute));
+							const JourneyPattern* lroute(static_cast<const JourneyPattern*>(sroute));
 							if(	*lroute == stops
 							){
-								route = const_pointer_cast<Line>(_env->getSPtr(lroute));
+								route = const_pointer_cast<JourneyPattern>(_env->getSPtr(lroute));
 								continue;
 							}
 						}
@@ -375,15 +375,15 @@ namespace synthese
 						if(!route.get())
 						{
 							os << "CREA : Creation of route for " << cline->getName() << "<br />";
-							route.reset(new Line);
+							route.reset(new JourneyPattern);
 							route->setCommercialLine(cline.get());
 							route->setDataSource(_dataSource);
 							route->setKey(LineTableSync::getId());
-							_env->getEditableRegistry<Line>().add(route);
+							_env->getEditableRegistry<JourneyPattern>().add(route);
 							cline->addPath(route.get());
 							
 							size_t rank(0);
-							BOOST_FOREACH(const Line::StopsWithDepartureArrivalAuthorization::value_type& stop, stops)
+							BOOST_FOREACH(const JourneyPattern::StopsWithDepartureArrivalAuthorization::value_type& stop, stops)
 							{
 								shared_ptr<LineStop> ls(new LineStop);
 								ls->setLine(route.get());

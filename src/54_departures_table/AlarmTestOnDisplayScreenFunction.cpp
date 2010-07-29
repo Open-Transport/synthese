@@ -36,7 +36,7 @@
 #include "InterfacePageException.h"
 #include "StopArea.hpp"
 #include "ServicePointer.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineStop.h"
 #include "City.h"
 #include "CommercialLine.h"
@@ -128,7 +128,7 @@ namespace synthese
 				place.addPhysicalStop(ps);
 				CommercialLine cline;
 				cline.setShortName("00");
-				Line line;
+				JourneyPattern line;
 				line.setCommercialLine(&cline);
 				PermanentService s(0, &line, minutes(5));
 				LineStop lineStop;

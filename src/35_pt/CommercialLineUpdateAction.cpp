@@ -88,7 +88,7 @@ namespace synthese
 		
 		void CommercialLineUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Line
+			// JourneyPattern
 			try
 			{
 				_line = CommercialLineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_LINE_ID), *_env);

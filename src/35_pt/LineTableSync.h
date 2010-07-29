@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "Line.h"
+#include "JourneyPattern.hpp"
 
 #include "SQLiteRegistryTableSyncTemplate.h"
 
@@ -36,9 +36,9 @@ namespace synthese
 {
 	namespace pt
 	{
-		class Line;
+		class JourneyPattern;
 
-		/** Line table synchronizer.
+		/** JourneyPattern table synchronizer.
 			@ingroup m35LS refLS
 
 		Lines table :
@@ -46,7 +46,7 @@ namespace synthese
 			- on update : 
 			- on delete : X
 		*/
-		class LineTableSync : public db::SQLiteRegistryTableSyncTemplate<LineTableSync,Line>
+		class LineTableSync : public db::SQLiteRegistryTableSyncTemplate<LineTableSync,JourneyPattern>
 		{
 		public:
 			static const std::string COL_COMMERCIAL_LINE_ID;
@@ -65,11 +65,11 @@ namespace synthese
 			static const std::string COL_DATASOURCE_ID;
 
 
-			/** Line search.
+			/** JourneyPattern search.
 				@param commercialLineId Id of commercial line which must belong the results (undefined = all lines)
-				@param first First Line object to answer
-				@param number Number of Line objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return Found Line objects.
+				@param first First JourneyPattern object to answer
+				@param number Number of JourneyPattern objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return Found JourneyPattern objects.
 				@author Hugues Romain
 				@date 2006
 			*/

@@ -32,7 +32,7 @@
 #include "StopArea.hpp"
 #include "City.h"
 #include "Calendar.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "CalendarTemplateTableSync.h"
 #include "Timetable.h"

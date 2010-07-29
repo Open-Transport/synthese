@@ -21,7 +21,7 @@
 */
 
 #include "TimetableResult.hpp"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 
 namespace synthese
 {

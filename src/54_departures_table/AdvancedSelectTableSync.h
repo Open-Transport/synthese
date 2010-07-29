@@ -93,7 +93,7 @@ namespace synthese
 		typedef struct { boost::shared_ptr<const pt::PhysicalStop> stop; boost::shared_ptr<BroadcastPoint> bp; } PhysicalStopAndBroadcastPoint;
 
 
-		/** Line searcher.
+		/** JourneyPattern searcher.
 			@result found physical stops from the live data objects with the corresponding broadcast point if exists (NULL else) The broadcast points are temporary object and must be deleted after use. 
 		*/
 		std::vector<boost::shared_ptr<const pt::CommercialLine> > getCommercialLineWithBroadcastPoints(

@@ -21,7 +21,7 @@
 */
 
 #include "TimetableGenerator.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineStop.h"
 #include "PhysicalStop.h"
 #include "SchedulesBasedService.h"
@@ -63,16 +63,16 @@ namespace synthese
 			if(!_rows.empty())
 			{
 				// Loop on each line of the database
-				BOOST_FOREACH(Registry<Line>::value_type it, _env.getRegistry<Line>())
+				BOOST_FOREACH(Registry<JourneyPattern>::value_type it, _env.getRegistry<JourneyPattern>())
 				{
-					// Line selection
-					const Line& line(*it.second);
+					// JourneyPattern selection
+					const JourneyPattern& line(*it.second);
 					if (!_isLineSelected(line))
 						continue;
 
 					_scanServices(result, line);
 
-					BOOST_FOREACH(const Line::SubLines::value_type& subline, line.getSubLines())
+					BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, line.getSubLines())
 					{
 						_scanServices(result, *subline);
 					}
@@ -86,7 +86,7 @@ namespace synthese
 
 
 
-		void TimetableGenerator::_scanServices(TimetableResult& result, const pt::Line& line )
+		void TimetableGenerator::_scanServices(TimetableResult& result, const pt::JourneyPattern& line )
 		{
 			// Loop on each service
 			BOOST_FOREACH(const Service* servicePtr, line.getServices())
@@ -169,7 +169,7 @@ namespace synthese
 
 
 
-		bool TimetableGenerator::_isLineSelected( const pt::Line& line ) const
+		bool TimetableGenerator::_isLineSelected( const pt::JourneyPattern& line ) const
 		{
 			if (!line.getUseInTimetables())
 				return false;
@@ -179,18 +179,18 @@ namespace synthese
 			Path::Edges::const_iterator itEdge;
 			const Path::Edges& edges(line.getEdges());
 
-			// Line is authorized
+			// JourneyPattern is authorized
 			if(!_authorizedLines.empty() && _authorizedLines.find(line.getCommercialLine()) == _authorizedLines.end())
 			{
 				return false;
 			}
 
-			// A0: Line selection upon calendar
+			// A0: JourneyPattern selection upon calendar
 			if (!_baseCalendar.hasAtLeastOneCommonDateWith(line))
 				return false;
 
 
-			// A1: Line selection : there must be at least a departure stop of the line in the departures rows
+			// A1: JourneyPattern selection : there must be at least a departure stop of the line in the departures rows
 			Rows::const_iterator itRow;
 			for (itRow = _rows.begin(); itRow != _rows.end(); ++itRow)
 			{
@@ -218,7 +218,7 @@ namespace synthese
 				return false;
 
 
-			// A2: Line selection : there must be at least an arrival stop of the line in the arrival rows, after the departure
+			// A2: JourneyPattern selection : there must be at least an arrival stop of the line in the arrival rows, after the departure
 			// this test is ignored if the timetable is defined only by a departure stop
 			if(_rows.size() > 1)
 			{

@@ -27,7 +27,7 @@
 #include "StopArea.hpp"
 #include "City.h"
 #include "Edge.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "Vertex.h"
 #include "RollingStock.h"
 #include "CommercialLine.h"
@@ -73,7 +73,7 @@ namespace synthese
 		) const	{
 			ParametersVector pv;
 
-			const Line* line(dynamic_cast<const Line*>(object.getService()->getPath()));
+			const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(object.getService()->getPath()));
 			const StopArea* place(dynamic_cast<const StopArea*>(object.getArrivalEdge()->getFromVertex()->getHub()));
 		
 			pv.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string()); //0

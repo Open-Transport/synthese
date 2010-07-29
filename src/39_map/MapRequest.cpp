@@ -25,7 +25,7 @@
 #include "01_util/XmlToolkit.h"
 
 #include "35_pt/XmlBuilder.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 
 #include "RequestException.h"
 
@@ -129,7 +129,7 @@ namespace synthese
 			ptime timems (boost::date_time::microsec_clock<ptime>::local_time ());
 			std::string filePrefix = "map_" + to_iso_string (timems);
 
-			std::string resultFilename = renderer->render (tempDir, filePrefix, _temporaryEnvironment.getRegistry<Line>(), *_map, conf);
+			std::string resultFilename = renderer->render (tempDir, filePrefix, _temporaryEnvironment.getRegistry<JourneyPattern>(), *_map, conf);
 
 			// Broadcast of the result
 			std::string resultURL = MapModule::GetParameter (MapModule::PARAM_HTTP_TEMP_URL) 
@@ -196,7 +196,7 @@ namespace synthese
 			for (int i=0; i<nbLines; ++i) 
 			{
 				XMLNode lineNode = GetChildNode (linesNode, "line", i);
-				_temporaryEnvironment.getEditableRegistry<Line>().add(
+				_temporaryEnvironment.getEditableRegistry<JourneyPattern>().add(
 					pt::XmlBuilder::CreateLine(
 						lineNode,
 						_temporaryEnvironment.getEditableRegistry<CommercialLine>()
@@ -208,7 +208,7 @@ namespace synthese
 			for (int i=0; i<nbLineStops; ++i) 
 			{
 				XMLNode lineStopNode = GetChildNode (lineStopsNode, "lineStop", i);
-				_temporaryEnvironment.getEditableRegistry<LineStop>().add (synthese::pt::XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.getEditableRegistry<Line>(), _temporaryEnvironment.getEditableRegistry<PhysicalStop>()));
+				_temporaryEnvironment.getEditableRegistry<LineStop>().add (synthese::pt::XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.getEditableRegistry<JourneyPattern>(), _temporaryEnvironment.getEditableRegistry<PhysicalStop>()));
 			}
 		}
 
@@ -221,7 +221,7 @@ namespace synthese
 			/// @todo Throw an exception if xml parsing fails
 			XMLNode mapNode = XMLNode::parseString (_query.c_str (), "map");
 
-			_map.reset(map::XmlBuilder::CreateMap (mapNode, (_useEnvironment ? Env::GetOfficialEnv() : _temporaryEnvironment).getRegistry<Line>() ));
+			_map.reset(map::XmlBuilder::CreateMap (mapNode, (_useEnvironment ? Env::GetOfficialEnv() : _temporaryEnvironment).getRegistry<JourneyPattern>() ));
 		}
 
 

@@ -50,17 +50,17 @@ namespace synthese
 				- 5 : Track number 1
 				- 6 : Service number 1
 				- 7 : Time 1 : if empty : no solution
-				- 8 : Line text 1
-				- 9 : Line image 1
-				- 10 : Line style 1
+				- 8 : JourneyPattern text 1
+				- 9 : JourneyPattern image 1
+				- 10 : JourneyPattern style 1
 				- 27 : Rolling stock id
 			Second line :
 				- 11 : Track number 2
 				- 12 : Service number 2
 				- 13: Time 2 : if empty : no 2nd step
-				- 14 : Line text 2
-				- 15 : Line image 2
-				- 16 : Line style 2
+				- 14 : JourneyPattern text 2
+				- 15 : JourneyPattern image 2
+				- 16 : JourneyPattern style 2
 				- 28 : Rolling stock id
 			Destination :
 				- 17 : City name

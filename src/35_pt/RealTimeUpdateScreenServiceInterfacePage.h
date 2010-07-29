@@ -53,9 +53,9 @@ namespace synthese
 
 			Parameters :
 				- 0 : Place full name
-				- 1 : Line class
-				- 2 : Line short name
-				- 3 : Line picture
+				- 1 : JourneyPattern class
+				- 2 : JourneyPattern short name
+				- 3 : JourneyPattern picture
 				- 4 : Service number
 				- 5 : Destination long name
 				- 6 : Departure physical stop

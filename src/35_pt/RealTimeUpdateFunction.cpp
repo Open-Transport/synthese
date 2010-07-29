@@ -31,7 +31,7 @@
 #include "ScheduledService.h"
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "Interface.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 
 using namespace std;
 

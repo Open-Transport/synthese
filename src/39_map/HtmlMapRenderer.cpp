@@ -31,7 +31,7 @@
 
 #include "Log.h"
 #include "Conversion.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineStop.h"
 #include "Point2D.h"
 
@@ -82,7 +82,7 @@ namespace synthese
 		std::string
 		HtmlMapRenderer::render(const boost::filesystem::path& tempDir, 
 					const std::string& filenamePrefix,
-					const Registry<Line>& lines,
+					const Registry<JourneyPattern>& lines,
 					synthese::map::Map& map,
 					const synthese::map::RenderingConfig& config)
 		{
@@ -125,7 +125,7 @@ namespace synthese
 		
 				void HtmlMapRenderer::renderLines(
 					std::ostream& _output,
-					const Registry<Line>& lines,
+					const Registry<JourneyPattern>& lines,
 					Map& map
 				){
 			const std::set<DrawableLine*>& selectedLines = map.getSelectedLines ();
@@ -179,7 +179,7 @@ namespace synthese
 			{
 				// Differentiation on line stops
 				const DrawableLine* dbl = *(selectedLines.begin ());
-				shared_ptr<const Line> line = lines.get (dbl->getLineId ());
+				shared_ptr<const JourneyPattern> line = lines.get (dbl->getLineId ());
 				const vector<Edge*>& lineStops =  line->getEdges();
 				const vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
 		

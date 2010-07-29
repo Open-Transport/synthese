@@ -39,7 +39,7 @@
 #include "StopArea.hpp"
 #include "PhysicalStop.h"
 #include "PhysicalStopTableSync.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "DBLogEntryTableSync.h"
 #include "SentAlarm.h"
 #include "DisplayScreenCPU.h"

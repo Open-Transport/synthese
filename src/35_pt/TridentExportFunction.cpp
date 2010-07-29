@@ -62,7 +62,7 @@ namespace synthese
 		{
 			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_LINE_ID));
 			if (id == 0)
-				throw RequestException("Line id must be specified");
+				throw RequestException("JourneyPattern id must be specified");
 
 			try
 			{

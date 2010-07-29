@@ -47,7 +47,7 @@ namespace synthese
 	using namespace geometry;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,LineStopTableSync>::FACTORY_KEY("15.57.01 Line stops");
+	template<> const string util::FactorableTemplate<SQLiteTableSync,LineStopTableSync>::FACTORY_KEY("15.57.01 JourneyPattern stops");
 
 	namespace pt
 	{
@@ -139,7 +139,7 @@ namespace synthese
 					rows->getLongLong (LineStopTableSync::COL_PHYSICALSTOPID));
 
 				util::RegistryKeyType lineId (rows->getLongLong (LineStopTableSync::COL_LINEID));
-				Line* line(LineTableSync::GetEditable (lineId, env, linkLevel).get());
+				JourneyPattern* line(LineTableSync::GetEditable (lineId, env, linkLevel).get());
 
 				ls->setLine(line);
 				ls->setPhysicalStop(PhysicalStopTableSync::GetEditable(fromPhysicalStopId, env, linkLevel).get());

@@ -34,7 +34,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class Line;
+		class JourneyPattern;
 	}
 
 	namespace pt

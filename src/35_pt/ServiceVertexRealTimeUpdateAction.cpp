@@ -29,7 +29,7 @@
 #include "ScheduledService.h"
 #include "PhysicalStop.h"
 #include "Env.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineStop.h"
 
 using namespace std;

@@ -21,7 +21,7 @@
 */
 
 #include "LineStop.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "StopArea.hpp"
 #include "PhysicalStop.h"
 #include "Service.h"
@@ -105,7 +105,7 @@ namespace synthese
 			ActualDisplayedArrivalsList arrivals;
 			set<const StopArea*> encounteredPlaces;
 			const StopArea* destinationPlace(
-				static_cast<const Line*>(
+				static_cast<const JourneyPattern*>(
 					servicePointer.getService()->getPath()
 				)->getDestination()->getConnectionPlace()
 			);

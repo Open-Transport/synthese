@@ -81,7 +81,7 @@ namespace synthese
 			std::string			_name;		//!< Name (code)
 			std::string			_shortName;	//!< Name (cartouche)
 			std::string			_longName;	//!< Name for schedule card
-			boost::optional<util::RGBColor>		_color;		//!< Line color
+			boost::optional<util::RGBColor>		_color;		//!< JourneyPattern color
 			std::string			_style;		//!< CSS style (cartouche)
 			std::string			_image;		//!< Display image (cartouche)
 			boost::shared_ptr<const TransportNetwork>	_network;	//!< Network

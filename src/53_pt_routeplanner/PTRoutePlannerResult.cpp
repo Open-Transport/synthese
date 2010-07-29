@@ -31,7 +31,7 @@
 #include "StopArea.hpp"
 #include "CommercialLine.h"
 #include "RoadPlace.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "Service.h"
 
 using namespace std;
@@ -196,7 +196,7 @@ namespace synthese
 				stream << t.row();
 				stream << t.col() << "<b>" << its->getDepartureDateTime() << "</b>";
 
-				// Line
+				// JourneyPattern
 				const LineStop* ls(dynamic_cast<const LineStop*>(its->getDepartureEdge()));
 				const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
 				stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
@@ -230,8 +230,8 @@ namespace synthese
 						// Departure
 						stream << t.col() << its->getDepartureDateTime();
 
-						// Line
-						const Line* ls(dynamic_cast<const Line*>(its->getService()->getPath()));
+						// JourneyPattern
+						const JourneyPattern* ls(dynamic_cast<const JourneyPattern*>(its->getService()->getPath()));
 						const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
 						stream << t.col(1, ls ? ls->getCommercialLine()->getStyle() : string());
 						stream << (ls ? ls->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());

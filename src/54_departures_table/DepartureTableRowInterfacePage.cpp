@@ -27,7 +27,7 @@
 #include "ServicePointer.h"
 #include "PhysicalStop.h"
 #include "Edge.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "RollingStock.h"
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "RealTimeUpdateFunction.h"
@@ -116,7 +116,7 @@ namespace synthese
 				parameters.push_back(
 					ptd.first.getService()->getTeam()
 				);
-				const Line* line(static_cast<const Line*>(ptd.first.getService()->getPath()));
+				const JourneyPattern* line(static_cast<const JourneyPattern*>(ptd.first.getService()->getPath()));
 				parameters.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string());
 
 				{

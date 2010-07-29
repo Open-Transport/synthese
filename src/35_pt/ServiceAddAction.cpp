@@ -31,7 +31,7 @@
 #include "ScheduledService.h"
 #include "ContinuousServiceTableSync.h"
 #include "ScheduledServiceTableSync.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineTableSync.h"
 #include "Fetcher.h"
 #include "SQLiteTransaction.h"
@@ -139,7 +139,7 @@ namespace synthese
 			{
 				_line = LineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_LINE_ID), Env::GetOfficialEnv());
 			}
-			catch(ObjectNotFoundException<Line>& e)
+			catch(ObjectNotFoundException<JourneyPattern>& e)
 			{
 				throw ActionException("No such line");
 			}
@@ -279,7 +279,7 @@ namespace synthese
 
 
 
-		void ServiceAddAction::setLine( boost::shared_ptr<pt::Line> value )
+		void ServiceAddAction::setLine( boost::shared_ptr<pt::JourneyPattern> value )
 		{
 			_line = value;
 		}

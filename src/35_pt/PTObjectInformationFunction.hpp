@@ -34,7 +34,7 @@ namespace synthese
 	{
 		class TransportNetwork;
 		class CommercialLine;
-		class Line;
+		class JourneyPattern;
 		class StopArea;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -92,7 +92,7 @@ namespace synthese
 				std::string _info;
 				boost::shared_ptr<const TransportNetwork> _network;
 				boost::shared_ptr<const CommercialLine> _line;
-				boost::shared_ptr<const Line> _route;
+				boost::shared_ptr<const JourneyPattern> _route;
 				boost::shared_ptr<const StopArea> _stop;
 			//@}
 			

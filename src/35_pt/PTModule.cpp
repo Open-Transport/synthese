@@ -35,7 +35,7 @@
 #include "CommercialLineTableSync.h"
 #include "CommercialLine.h"
 #include "Crossing.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
 #include "RoadPlace.h"

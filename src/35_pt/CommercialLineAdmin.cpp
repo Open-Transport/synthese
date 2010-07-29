@@ -30,7 +30,7 @@
 #include "TransportNetwork.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineAdmin.h"
 #include "LineTableSync.h"
 #include "TransportNetworkRight.h"
@@ -200,7 +200,7 @@ namespace synthese
 
 				stream << t.open();
 				AdminFunctionRequest<LineAdmin> lineOpenRequest(_request);
- 				BOOST_FOREACH(shared_ptr<Line> line, routes)
+ 				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 				{
 					lineOpenRequest.getPage()->setLine(line);
 					stream << t.row(lexical_cast<string>(line->getKey()));
@@ -489,7 +489,7 @@ namespace synthese
 				LineTableSync::SearchResult routes(
 					LineTableSync::Search(*_env, _cline->getKey())
 				);
-				BOOST_FOREACH(shared_ptr<Line> line, routes)
+				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 				{
 					shared_ptr<LineAdmin> p(
 						getNewOtherPage<LineAdmin>()

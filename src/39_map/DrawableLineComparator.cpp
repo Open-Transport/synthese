@@ -25,7 +25,7 @@
 #include "DrawableLine.h"
 #include "Geometry.h"
 
-#include "Line.h"
+#include "JourneyPattern.hpp"
 
 #include <assert.h>
 

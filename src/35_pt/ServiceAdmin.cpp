@@ -32,7 +32,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "ContinuousService.h"
 #include "ResultHTMLTable.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "LineStop.h"
 #include "PhysicalStop.h"
 #include "StopArea.hpp"
@@ -441,7 +441,7 @@ namespace synthese
 			shared_ptr<LineAdmin> p(
 				getNewOtherPage<LineAdmin>()
 			);
-			p->setLine(Env::GetOfficialEnv().get<Line>(_service->getPathId()));
+			p->setLine(Env::GetOfficialEnv().get<JourneyPattern>(_service->getPathId()));
 
 			PageLinks links(p->_getCurrentTreeBranch());
 			links.push_back(p);

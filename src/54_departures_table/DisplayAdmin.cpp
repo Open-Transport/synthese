@@ -67,7 +67,7 @@
 #include "DisplayTypeAdmin.h"
 #include "PhysicalStopTableSync.h"
 #include "LineStopTableSync.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "ArrivalDepartureTableLog.h"
 #include "MessageAdmin.h"

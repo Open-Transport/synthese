@@ -59,9 +59,9 @@ namespace synthese
 		/** Commercial line.
 			@ingroup m35
 
-			TRIDENT = Line
+			TRIDENT = JourneyPattern
 
-			A commercial line is a group of @ref Line "routes" known as a same offer unit by the customers and by the network organization. It belongs to a @ref TransportNetwork "transport network".
+			A commercial line is a group of @ref JourneyPattern "routes" known as a same offer unit by the customers and by the network organization. It belongs to a @ref TransportNetwork "transport network".
 
 			The commercial line handles the denomination of the group of routes.
 		*/
@@ -82,7 +82,7 @@ namespace synthese
 			std::string			_shortName;	//!< Name (cartouche)
 			std::string			_longName;	//!< Name for schedule card
 
-			boost::optional<util::RGBColor>		_color;		//!< Line color
+			boost::optional<util::RGBColor>		_color;		//!< JourneyPattern color
 			std::string			_style;		//!< CSS style (cartouche)
 			std::string			_image;		//!< Display image (cartouche)
 

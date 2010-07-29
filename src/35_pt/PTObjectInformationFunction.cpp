@@ -32,7 +32,7 @@
 #include "City.h"
 #include "PhysicalStop.h"
 #include "StopArea.hpp"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 
 using namespace std;
 using namespace boost;
@@ -70,7 +70,7 @@ namespace synthese
 			}
 			else if(tableId == LineTableSync::TABLE.ID)
 			{
-				_route = Env::GetOfficialEnv().get<Line>(id);
+				_route = Env::GetOfficialEnv().get<JourneyPattern>(id);
 			}
 			else if(StopAreaTableSync::TABLE.ID)
 			{

@@ -37,7 +37,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class Line;
+		class JourneyPattern;
 		class StopArea;
 
 		/** Association class between line and physical stop.
@@ -63,7 +63,7 @@ namespace synthese
 
 			LineStop(
 				util::RegistryKeyType id = 0,
-				Line* line = NULL,
+				JourneyPattern* line = NULL,
 				std::size_t rankInPath = 0,
 				bool isDeparture = true,
 				bool isArrival = true,
@@ -103,7 +103,7 @@ namespace synthese
 
 				PhysicalStop*	getPhysicalStop()	const;
 
-				Line*				getLine()			const;
+				JourneyPattern*				getLine()			const;
 			//@}
 
 
@@ -118,7 +118,7 @@ namespace synthese
 				///	@warning the isArrival and the isDeparture attributes must be up to date to avoid false links in the physical stop.
 				void setPhysicalStop(PhysicalStop* stop);
 
-				void setLine(Line* line);
+				void setLine(JourneyPattern* line);
 		    //@}
 		};
 	}

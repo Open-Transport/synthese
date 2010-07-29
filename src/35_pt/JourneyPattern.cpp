@@ -1,6 +1,6 @@
 
-/** Line class implementation.
-	@file Line.cpp
+/** JourneyPattern class implementation.
+	@file JourneyPattern.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "Registry.h"
 #include "RollingStock.h"
 #include "Service.h"
@@ -41,12 +41,12 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const std::string Registry<pt::Line>::KEY("Line");
+		template<> const std::string Registry<pt::JourneyPattern>::KEY("JourneyPattern");
 	}
 
 	namespace pt
 	{
-		Line::Line(
+		JourneyPattern::JourneyPattern(
 			util::RegistryKeyType id,
 			std::string name
 		):	util::Registrable(id)
@@ -63,7 +63,7 @@ namespace synthese
 
 
 
-		Line::~Line ()
+		JourneyPattern::~JourneyPattern ()
 		{
 			for (SubLines::const_iterator it(_subLines.begin()); it != _subLines.end(); ++it)
 				delete *it;
@@ -73,7 +73,7 @@ namespace synthese
 
 
 		bool 
-		Line::getUseInDepartureBoards () const
+		JourneyPattern::getUseInDepartureBoards () const
 		{
 			return _useInDepartureBoards;
 		}
@@ -81,7 +81,7 @@ namespace synthese
 
 
 		void 
-		Line::setUseInDepartureBoards (bool useInDepartureBoards)
+		JourneyPattern::setUseInDepartureBoards (bool useInDepartureBoards)
 		{
 			_useInDepartureBoards = useInDepartureBoards;
 		}
@@ -90,7 +90,7 @@ namespace synthese
 
 
 		bool 
-		Line::getUseInTimetables () const
+		JourneyPattern::getUseInTimetables () const
 		{
 			return _useInTimetables;
 		}
@@ -98,7 +98,7 @@ namespace synthese
 
 
 		void 
-		Line::setUseInTimetables (bool useInTimetables)
+		JourneyPattern::setUseInTimetables (bool useInTimetables)
 		{
 			_useInTimetables = useInTimetables;
 		}
@@ -107,7 +107,7 @@ namespace synthese
 
 
 		bool 
-		Line::getUseInRoutePlanning () const
+		JourneyPattern::getUseInRoutePlanning () const
 		{
 			return _useInRoutePlanning;
 		}
@@ -116,7 +116,7 @@ namespace synthese
 
 
 		void 
-		Line::setUseInRoutePlanning (bool useInRoutePlanning)
+		JourneyPattern::setUseInRoutePlanning (bool useInRoutePlanning)
 		{
 			_useInRoutePlanning = useInRoutePlanning;
 		}
@@ -124,7 +124,7 @@ namespace synthese
 
 
 		const std::string& 
-		Line::getDirection () const
+		JourneyPattern::getDirection () const
 		{
 			return _direction;
 		}
@@ -132,7 +132,7 @@ namespace synthese
 
 
 		void 
-		Line::setDirection (const std::string& direction)
+		JourneyPattern::setDirection (const std::string& direction)
 		{
 			_direction = direction;
 		}
@@ -140,7 +140,7 @@ namespace synthese
 
 
 		const std::string& 
-		Line::getTimetableName () const
+		JourneyPattern::getTimetableName () const
 		{
 			return _timetableName;
 		}
@@ -148,42 +148,42 @@ namespace synthese
 
 
 		void 
-		Line::setTimetableName (const std::string& timetableName)
+		JourneyPattern::setTimetableName (const std::string& timetableName)
 		{
 			_timetableName = timetableName;
 		}
 
 
 
-		RollingStock*	Line::getRollingStock () const
+		RollingStock*	JourneyPattern::getRollingStock () const
 		{
 			return static_cast<RollingStock*>(_pathClass);
 		}
 
 
 
-		void Line::setRollingStock(RollingStock* rollingStock)
+		void JourneyPattern::setRollingStock(RollingStock* rollingStock)
 		{
 			_pathClass = static_cast<PathClass*>(rollingStock);
 		}
 
 
 
-		void Line::setWalkingLine (bool isWalkingLine)
+		void JourneyPattern::setWalkingLine (bool isWalkingLine)
 		{
 			_isWalkingLine = isWalkingLine;
 		}
 
 
 
-		bool Line::getWalkingLine () const
+		bool JourneyPattern::getWalkingLine () const
 		{
 			return _isWalkingLine;
 		}
 
 
 
-		const PhysicalStop* Line::getOrigin() const
+		const PhysicalStop* JourneyPattern::getOrigin() const
 		{
 			if (getEdges().empty())
 				return NULL;
@@ -191,7 +191,7 @@ namespace synthese
 		}
 
 
-		const PhysicalStop* Line::getDestination() const
+		const PhysicalStop* JourneyPattern::getDestination() const
 		{
 			if (getEdges().empty())
 				return NULL;
@@ -201,28 +201,28 @@ namespace synthese
 
 
 
-		void Line::setCommercialLine(CommercialLine* commercialLine )
+		void JourneyPattern::setCommercialLine(CommercialLine* commercialLine )
 		{
 			_pathGroup = commercialLine;
 		}
 
-		CommercialLine* Line::getCommercialLine() const
+		CommercialLine* JourneyPattern::getCommercialLine() const
 		{
 			return static_cast<CommercialLine*>(_pathGroup);
 		}
 
-		bool Line::isPedestrianMode() const
+		bool JourneyPattern::isPedestrianMode() const
 		{
 			return getWalkingLine();
 		}
 
-		int Line::addSubLine( SubLine* line )
+		int JourneyPattern::addSubLine( SubLine* line )
 		{
 			SubLines::iterator it(_subLines.insert(_subLines.end(), line));
 			return (it - _subLines.begin());
 		}
 
-		void Line::addService(
+		void JourneyPattern::addService(
 			Service* service,
 			bool ensureLineTheory
 		){
@@ -250,7 +250,7 @@ namespace synthese
 
 
 
-		bool Line::respectsLineTheory(
+		bool JourneyPattern::respectsLineTheory(
 			bool RTData,
 			const Service& service			
 		) const {
@@ -275,14 +275,14 @@ namespace synthese
 			return true;
 		}
 
-		const Line::SubLines Line::getSubLines() const
+		const JourneyPattern::SubLines JourneyPattern::getSubLines() const
 		{
 			return _subLines;
 		}
 		
 		
 		
-		bool Line::operator==(const std::vector<PhysicalStop*>& stops) const
+		bool JourneyPattern::operator==(const std::vector<PhysicalStop*>& stops) const
 		{
 			if(getEdges().size() != stops.size()) return false;
 			
@@ -298,7 +298,7 @@ namespace synthese
 
 
 
-		bool Line::operator==( const StopsWithDepartureArrivalAuthorization& stops ) const
+		bool JourneyPattern::operator==( const StopsWithDepartureArrivalAuthorization& stops ) const
 		{
 			if(getEdges().size() != stops.size())
 			{
@@ -322,14 +322,14 @@ namespace synthese
 		}
 
 
-		const LineStop* Line::getLineStop( std::size_t rank ) const
+		const LineStop* JourneyPattern::getLineStop( std::size_t rank ) const
 		{
 			return static_cast<const LineStop*>(getEdge(rank));
 		}
 
 
 
-		bool Line::isActive( const boost::gregorian::date& date ) const
+		bool JourneyPattern::isActive( const boost::gregorian::date& date ) const
 		{
 			return Calendar::isActive(date);
 		}

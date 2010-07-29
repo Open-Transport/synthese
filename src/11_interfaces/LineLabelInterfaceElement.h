@@ -33,7 +33,7 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		/** Line lablizer virtual library interface element
+		/** JourneyPattern lablizer virtual library interface element
 			usage :
 			@code label <label> @endcode
 			@ingroup m11Library refLibrary

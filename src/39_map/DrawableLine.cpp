@@ -30,7 +30,7 @@
 #include <iostream>
 
 #include "Conversion.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "PhysicalStop.h"
 
@@ -50,7 +50,7 @@ namespace map
 
 
 
-DrawableLine::DrawableLine (const Line* line,
+DrawableLine::DrawableLine (const JourneyPattern* line,
 			    int fromLineStopIndex,
 			    int toLineStopIndex,
 			    bool withPhysicalStops)

@@ -35,7 +35,7 @@
 // To be removed by a log class
 #include "LineStop.h"
 #include "Road.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "RoadModule.h"
 #include "Service.h"
@@ -216,7 +216,7 @@ namespace synthese
 					*_logStream << its->getDepartureDateTime();
 					*_logStream << "</td>";
 
-					// Line
+					// JourneyPattern
 					const LineStop* ls(dynamic_cast<const LineStop*>(
 						_accessDirection == DEPARTURE_TO_ARRIVAL ? its->getDepartureEdge() : its->getArrivalEdge()
 					)	);
@@ -261,7 +261,7 @@ namespace synthese
 							// Departure
 							*_logStream << "<td>" << its->getDepartureDateTime() << "</td>";
 
-							// Line
+							// JourneyPattern
 							const LineStop* ls(dynamic_cast<const LineStop*>(_accessDirection == DEPARTURE_TO_ARRIVAL ? its->getDepartureEdge() : its->getArrivalEdge()));
 							const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
 							*_logStream << "<td";

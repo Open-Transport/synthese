@@ -27,7 +27,7 @@
 #include "LineStop.h"
 #include "PhysicalStop.h"
 #include "StopArea.hpp"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "RollingStock.h"
 #include "ScheduleRealTimeUpdateAction.h"

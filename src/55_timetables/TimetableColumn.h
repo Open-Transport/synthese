@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class Line;
+		class JourneyPattern;
 	}
 
 	namespace timetables
@@ -74,7 +74,7 @@ namespace synthese
 			Content		_content;
 			calendar::Calendar				_calendar;
 			boost::shared_ptr<TimetableWarning>			_warning;
-			const pt::Line*				_line;
+			const pt::JourneyPattern*				_line;
 			tTypeOD							_originType;
 			tTypeOD							_destinationType;
 
@@ -105,7 +105,7 @@ namespace synthese
 			//@{
 				const calendar::Calendar&				getCalendar()			const { return _calendar; }
 				const Content&							getContent()			const { return _content; }
-				const pt::Line*						getLine()				const { return _line; }
+				const pt::JourneyPattern*						getLine()				const { return _line; }
 				tTypeOD									getOriginType()			const { return _originType; }
 				tTypeOD									getDestinationType()	const { return _destinationType; }
 				boost::shared_ptr<TimetableWarning>					getWarning()			const { return _warning; }

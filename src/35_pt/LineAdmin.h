@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class Line;
+		class JourneyPattern;
 	}
 
 	namespace pt
@@ -52,7 +52,7 @@ namespace synthese
 			static const std::string TAB_INDICES;
 
 		private:
-			boost::shared_ptr<const pt::Line>	_line;
+			boost::shared_ptr<const pt::JourneyPattern>	_line;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
 		public:
@@ -60,8 +60,8 @@ namespace synthese
 
 			virtual PageLinks _getCurrentTreeBranch() const;
 
-			boost::shared_ptr<const pt::Line> getLine() const;
-			void setLine(boost::shared_ptr<const pt::Line> value);
+			boost::shared_ptr<const pt::JourneyPattern> getLine() const;
+			void setLine(boost::shared_ptr<const pt::JourneyPattern> value);
 
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.

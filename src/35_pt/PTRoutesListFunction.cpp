@@ -26,7 +26,7 @@
 #include "Request.h"
 #include "PTRoutesListFunction.hpp"
 #include "CommercialLine.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "Env.h"
 #include "PTRoutesListItemInterfacePage.hpp"
 #include "Webpage.h"
@@ -98,7 +98,7 @@ namespace synthese
 			const Request& request
 		) const {
 			
-			set<const Line*> routes;
+			set<const JourneyPattern*> routes;
 			// Selection of routes by same comparison
 			BOOST_FOREACH(const Path* path, _line->getPaths())
 			{
@@ -106,7 +106,7 @@ namespace synthese
 
 				if(_mergeSameRoutes)
 				{
-					BOOST_FOREACH(const Line* existingRoute, routes)
+					BOOST_FOREACH(const JourneyPattern* existingRoute, routes)
 					{
 						if(existingRoute->sameContent(*path, false, false))
 						{
@@ -118,17 +118,17 @@ namespace synthese
 
 				if(toInsert)
 				{
-					routes.insert(dynamic_cast<const Line*>(path));
+					routes.insert(dynamic_cast<const JourneyPattern*>(path));
 				}
 			}
 
 			// Selection of routes by inclusion
 			if(_mergeIncludingRoutes)
 			{
-				vector<const Line*> routesToRemove;
-				BOOST_FOREACH(const Line* route, routes)
+				vector<const JourneyPattern*> routesToRemove;
+				BOOST_FOREACH(const JourneyPattern* route, routes)
 				{
-					BOOST_FOREACH(const Line* otherRoute, routes)
+					BOOST_FOREACH(const JourneyPattern* otherRoute, routes)
 					{
 						if(otherRoute == route)
 						{
@@ -141,7 +141,7 @@ namespace synthese
 						}
 					}
 				}
-				BOOST_FOREACH(const Line* route, routesToRemove)
+				BOOST_FOREACH(const JourneyPattern* route, routesToRemove)
 				{
 					routes.erase(route);
 				}
@@ -154,7 +154,7 @@ namespace synthese
 			}
 
 			size_t rank(0);
-			BOOST_FOREACH(const Line* route, routes)
+			BOOST_FOREACH(const JourneyPattern* route, routes)
 			{
 				if(_page.get())
 				{

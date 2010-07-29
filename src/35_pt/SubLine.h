@@ -23,13 +23,13 @@
 #ifndef SYNTHESE_env_SubLine_h__
 #define SYNTHESE_env_SubLine_h__
 
-#include "Line.h"
+#include "JourneyPattern.hpp"
 
 namespace synthese
 {
 	namespace pt
 	{
-		/** Sub-Line class.
+		/** Sub-JourneyPattern class.
 			@ingroup m35
 
 			A sub-line is a copy of a line, which handles services which would break the line theory if they have been inserted in the original line.
@@ -42,13 +42,13 @@ namespace synthese
 			This is avoided by the rule saying that no stop can be added once a service is inserted in the line (a subline is created only if at least a service is registered)
 		*/
 		class SubLine:
-			public pt::Line
+			public pt::JourneyPattern
 		{
-			pt::Line*	_mainLine;
+			pt::JourneyPattern*	_mainLine;
 
 		public:
 			/** Constructor.
-				@param line Line to copy
+				@param line JourneyPattern to copy
 				@author Hugues Romain
 				@date 2008
 				
@@ -56,7 +56,7 @@ namespace synthese
 					- copy all data (including LineStop) of the original line
 					- insert the subline in the sublines registry of the line.
 			*/
-			SubLine(pt::Line* line);
+			SubLine(pt::JourneyPattern* line);
 
 
 			/** Destructor.
@@ -78,11 +78,11 @@ namespace synthese
 
 
 			/** Main line getter.
-				@return Line* The line from which the sub-line was extracted
+				@return JourneyPattern* The line from which the sub-line was extracted
 				@author Hugues Romain
 				@date 2008				
 			*/
-			pt::Line*	getMainLine()	const;
+			pt::JourneyPattern*	getMainLine()	const;
 		};
 	}
 }

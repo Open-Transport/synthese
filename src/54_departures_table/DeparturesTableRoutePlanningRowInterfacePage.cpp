@@ -28,7 +28,7 @@
 #include "ServicePointer.h"
 #include "PhysicalStop.h"
 #include "Service.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "Edge.h"
 #include "City.h"
@@ -122,7 +122,7 @@ namespace synthese
 				stringstream str;
 				str << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().minutes();
 				v.push_back(str.str());
-				const CommercialLine* line(static_cast<const Line*>(s.getDepartureEdge()->getParentPath())->getCommercialLine());
+				const CommercialLine* line(static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine());
 				v.push_back(line->getShortName());
 				v.push_back(line->getImage());
 				v.push_back(line->getStyle());
@@ -137,7 +137,7 @@ namespace synthese
 					str << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().minutes();
 					v.push_back(str.str());
 
-					const CommercialLine* line(static_cast<const Line*>(s.getDepartureEdge()->getParentPath())->getCommercialLine());
+					const CommercialLine* line(static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine());
 					v.push_back(line->getShortName());
 					v.push_back(line->getImage());
 					v.push_back(line->getStyle());
@@ -200,13 +200,13 @@ namespace synthese
 			{
 				const ServicePointer& s(row.second.getFirstJourneyLeg());
 
-				const Line* line(static_cast<const Line*>(s.getDepartureEdge()->getParentPath()));
+				const JourneyPattern* line(static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath()));
 				v.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string());
 
 				if(row.second.getServiceUses().size() > 1)
 				{
 					const ServicePointer& s(row.second.getLastJourneyLeg());
-					const Line* line(static_cast<const Line*>(s.getDepartureEdge()->getParentPath()));
+					const JourneyPattern* line(static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath()));
 					v.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string());
 				}
 				else

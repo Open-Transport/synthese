@@ -30,7 +30,7 @@
 
 #include "Registry.h"
 #include "RenderingConfig.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 
 #include "FactoryBase.h"
 
@@ -63,7 +63,7 @@ namespace synthese
 
 			virtual std::string render (const boost::filesystem::path& tempDir, 
 						    const std::string& filenamePrefix,
-							const util::Registry<pt::Line>& lines,
+							const util::Registry<pt::JourneyPattern>& lines,
 						    synthese::map::Map& map,
 						    const synthese::map::RenderingConfig& config) = 0;
 		    

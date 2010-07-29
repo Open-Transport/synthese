@@ -85,7 +85,7 @@ namespace synthese
 			<tr><th>@ref graph interface</th><th>pt implementation</th></tr>
 			<tr><td>@ref Service</td><td>@ref ScheduledService and @ref ContinuousService</td></tr>
 			<tr><td>@ref PathGroup</td><td>@ref CommercialLine</td></tr>
-			<tr><td>@ref Path</td><td>@ref Line</td></tr>
+			<tr><td>@ref Path</td><td>@ref JourneyPattern</td></tr>
 			<tr><td>@ref Edge</td><td>@ref LineStop</td></tr>
 			<tr><td>@ref Vertex</td><td>@ref PhysicalStop</td></tr>
 			<tr><td>@ref Hub</td><td>@ref StopArea</td></tr>

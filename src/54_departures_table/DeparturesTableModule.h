@@ -36,7 +36,7 @@ namespace synthese
 	{
 		class LineStop;
 		class StopArea;
-		class Line;
+		class JourneyPattern;
 	}
 
 	namespace pt
