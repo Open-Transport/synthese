@@ -60,7 +60,7 @@ namespace synthese
 		class PublicTransportStopZoneConnectionPlace;
 	}
 
-	namespace routeplanner
+	namespace ptrouteplanner
 	{
 		class RoutePlannerInterfacePage;
 		class UserFavoriteJourney;

@@ -76,9 +76,9 @@ namespace synthese
 	using namespace resa;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<routeplanner::RoutePlannerFunction::_FunctionWithSite,routeplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
+	template<> const string util::FactorableTemplate<ptrouteplanner::RoutePlannerFunction::_FunctionWithSite,ptrouteplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
 
-	namespace routeplanner
+	namespace ptrouteplanner
 	{
 		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER("msn");
 		const string RoutePlannerFunction::PARAMETER_DAY("dy");

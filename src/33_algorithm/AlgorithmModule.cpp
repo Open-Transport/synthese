@@ -1,6 +1,6 @@
 
-/** RoutePlannerModule class implementation.
-	@file RoutePlannerModule.cpp
+/** AlgorithmModule class implementation.
+	@file AlgorithmModule.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RoutePlannerModule.h"
+#include "AlgorithmModule.h"
 
 using namespace std;
 
@@ -32,22 +32,22 @@ namespace synthese
 	namespace util
 	{
 		template<>
-		const string FactorableTemplate<ModuleClass,RoutePlannerModule>::FACTORY_KEY("53_route_planner");
+		const string FactorableTemplate<ModuleClass,AlgorithmModule>::FACTORY_KEY("33_algorithm");
 	}
 	
 	namespace server
 	{
-		template<> const string ModuleClassTemplate<RoutePlannerModule>::NAME("Calcul d'itinéraires");
+		template<> const string ModuleClassTemplate<AlgorithmModule>::NAME("Algorithmes");
 		
-		template<> void ModuleClassTemplate<RoutePlannerModule>::PreInit()
+		template<> void ModuleClassTemplate<AlgorithmModule>::PreInit()
 		{
 		}
 		
-		template<> void ModuleClassTemplate<RoutePlannerModule>::Init()
+		template<> void ModuleClassTemplate<AlgorithmModule>::Init()
 		{
 		}
 		
-		template<> void ModuleClassTemplate<RoutePlannerModule>::End()
+		template<> void ModuleClassTemplate<AlgorithmModule>::End()
 		{
 		}
 	}
