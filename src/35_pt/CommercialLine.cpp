@@ -26,7 +26,7 @@
 #include "AllowedUseRule.h"
 #include "JourneyPattern.hpp"
 #include "NonPermanentService.h"
-#include "SubLine.h"
+#include "JourneyPatternCopy.hpp"
 #include "CalendarTemplate.h"
 
 #include <boost/foreach.hpp>
@@ -148,7 +148,7 @@ namespace synthese
 					}
 				}
 
-				BOOST_FOREACH(const SubLine* subline, static_cast<const JourneyPattern*>(path)->getSubLines())
+				BOOST_FOREACH(const JourneyPatternCopy* subline, static_cast<const JourneyPattern*>(path)->getSubLines())
 				{
 					BOOST_FOREACH(const Service* service, subline->getServices())
 					{

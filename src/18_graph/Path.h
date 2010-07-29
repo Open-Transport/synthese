@@ -189,7 +189,7 @@ namespace synthese
 					@date 2007
 
 					The method is virtual to avoid subclasses to have a different behavior than 
-					the simple add to the services list (see SubLine).
+					the simple add to the services list (see JourneyPatternCopy).
 					
 					@todo Update dates of the path
 				*/

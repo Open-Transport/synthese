@@ -27,7 +27,7 @@
 #include "LineStop.h"
 #include "PhysicalStop.h"
 #include "CommercialLine.h"
-#include "SubLine.h"
+#include "JourneyPatternCopy.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -216,7 +216,7 @@ namespace synthese
 			return getWalkingLine();
 		}
 
-		int JourneyPattern::addSubLine( SubLine* line )
+		int JourneyPattern::addSubLine( JourneyPatternCopy* line )
 		{
 			SubLines::iterator it(_subLines.insert(_subLines.end(), line));
 			return (it - _subLines.begin());
@@ -242,7 +242,7 @@ namespace synthese
 			}
 		
 			// If no subline can handle the service, create one for it
-			SubLine* subline(new SubLine(this));
+			JourneyPatternCopy* subline(new JourneyPatternCopy(this));
 			bool isok(subline->addServiceIfCompatible(service));
 
 			assert(isok);

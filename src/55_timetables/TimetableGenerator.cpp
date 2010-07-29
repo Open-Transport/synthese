@@ -28,7 +28,7 @@
 #include "StopArea.hpp"
 #include "Env.h"
 #include "CalendarModule.h"
-#include "SubLine.h"
+#include "JourneyPatternCopy.hpp"
 
 #include <boost/foreach.hpp>
 

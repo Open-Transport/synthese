@@ -1,7 +1,7 @@
 
 
-/** SubLine class implementation.
-	@file SubLine.cpp
+/** JourneyPatternCopy class implementation.
+	@file JourneyPatternCopy.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -21,7 +21,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "SubLine.h"
+#include "JourneyPatternCopy.hpp"
 #include "Conversion.h"
 #include "Edge.h"
 #include "LineStop.h"
@@ -37,7 +37,7 @@ namespace synthese
 	
 	namespace pt
 	{
-		SubLine::SubLine( JourneyPattern* line )
+		JourneyPatternCopy::JourneyPatternCopy( JourneyPattern* line )
 			: JourneyPattern()
 			, _mainLine(line),
 			Registrable(0)
@@ -75,7 +75,7 @@ namespace synthese
 			_pathGroup->addPath(this);
 		}
 
-		bool SubLine::addServiceIfCompatible( Service* service )
+		bool JourneyPatternCopy::addServiceIfCompatible( Service* service )
 		{
 			if (!respectsLineTheory(false, *service))
 				return false;
@@ -85,7 +85,7 @@ namespace synthese
 			return true;
 		}
 
-		SubLine::~SubLine()
+		JourneyPatternCopy::~JourneyPatternCopy()
 		{
 			for (Path::Edges::iterator it(_edges.begin()); it != _edges.end(); ++it)
 				delete *it;
@@ -93,7 +93,7 @@ namespace synthese
 			_pathGroup->removePath(this);
 		}
 
-		JourneyPattern* SubLine::getMainLine() const
+		JourneyPattern* JourneyPatternCopy::getMainLine() const
 		{
 			return _mainLine;
 		}

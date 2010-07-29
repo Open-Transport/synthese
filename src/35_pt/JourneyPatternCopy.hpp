@@ -1,6 +1,6 @@
 
-/** SubLine class header.
-	@file SubLine.h
+/** JourneyPatternCopy class header.
+	@file JourneyPatternCopy.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -41,7 +41,7 @@ namespace synthese
 			In theory, a stop could be added in the main line without doing the update in the subline.
 			This is avoided by the rule saying that no stop can be added once a service is inserted in the line (a subline is created only if at least a service is registered)
 		*/
-		class SubLine:
+		class JourneyPatternCopy:
 			public pt::JourneyPattern
 		{
 			pt::JourneyPattern*	_mainLine;
@@ -56,7 +56,7 @@ namespace synthese
 					- copy all data (including LineStop) of the original line
 					- insert the subline in the sublines registry of the line.
 			*/
-			SubLine(pt::JourneyPattern* line);
+			JourneyPatternCopy(pt::JourneyPattern* line);
 
 
 			/** Destructor.
@@ -65,7 +65,7 @@ namespace synthese
 				
 				Deletes all the contained linestops;
 			*/
-			~SubLine();
+			~JourneyPatternCopy();
 
 
 			/** Adds the service only if it is compatible according to the line theory.

@@ -128,8 +128,8 @@ namespace synthese
 			//@{
 				void setOnlineBookingAllowed(const bool value){ _onlineBookingAllowed = value; }
 				void setPastSolutionsDisplayed(bool value){ _pastSolutionsDisplayed = value; }
-				void setMaxTransportConnectionsCount(int number){ _maxTransportConnectionsCount = value; }
-				void setUseDateRange(boost::gregorian::date_duration range) { _useDateRange = range; }
+				void setMaxTransportConnectionsCount(int value){ _maxTransportConnectionsCount = value; }
+				void setUseDateRange(boost::gregorian::date_duration value) { _useDateRange = value; }
 				void setDisplayRoadApproachDetail(bool value) { _displayRoadApproachDetail = value; }
 			//@}
 

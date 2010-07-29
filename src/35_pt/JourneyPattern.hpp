@@ -46,7 +46,7 @@ namespace synthese
 		class TransportNetwork;
 		class PhysicalStop;
 		class RollingStock;
-		class SubLine;
+		class JourneyPatternCopy;
 	}
 	
 	namespace pt
@@ -73,7 +73,7 @@ namespace synthese
 
 			NB : la correspondance entre deux services d'une mÃÂªme ligne est interdite, sauf dans les axes libres.
 
-			If a service is responsible of a break of the preceding rules, then the line is copied as a SubLine, and the service is linked to the new line. The _sublines container keeps a pointer on each SubLine.
+			If a service is responsible of a break of the preceding rules, then the line is copied as a JourneyPatternCopy, and the service is linked to the new line. The _sublines container keeps a pointer on each JourneyPatternCopy.
 		*/
 		class JourneyPattern:
 			public graph::Path,
@@ -86,7 +86,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<JourneyPattern>	Registry;
 
-			typedef std::vector<pt::SubLine*> SubLines;
+			typedef std::vector<pt::JourneyPatternCopy*> SubLines;
 
 		private:
 			std::string _timetableName; //!< Name for timetable
@@ -152,14 +152,14 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008
 				*/
-				int addSubLine(pt::SubLine* line);
+				int addSubLine(pt::JourneyPatternCopy* line);
 
 
 				/** Adds a service to a line.
 					@param service Service to add
 					@param ensureLineTheory If true, the method verifies if the service is compatible 
 							with the other ones, by the way of the lines theory. If not, then it attempts 
-							to register the service in an existing SubLine, or creates one if necessary.
+							to register the service in an existing JourneyPatternCopy, or creates one if necessary.
 							Note : in this case, the service is NOT added to the current line.
 
 					@author Hugues Romain
