@@ -60,11 +60,10 @@ namespace synthese
 	using namespace transportwebsite;
 	using namespace geography;
 	using namespace graph;
-	using namespace ptrouteplanner;
 	using namespace server;
 	using namespace road;
 
-	namespace routeplanner
+	namespace ptrouteplanner
 	{
 		const string RoutePlannerInterfacePage::DATA_SOLUTIONS_NUMBER("solutions_number");
 		const string RoutePlannerInterfacePage::DATA_LINES("lines");

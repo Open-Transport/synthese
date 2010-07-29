@@ -59,10 +59,7 @@ namespace synthese
 	namespace ptrouteplanner
 	{
 		class PTRoutePlannerResult;
-	}
-
-	namespace routeplanner
-	{
+	
 		//////////////////////////////////////////////////////////////////////////
 		/// 53.11 Interface Page : route planner result display.
 		///	@ingroup m53Pages refPages
