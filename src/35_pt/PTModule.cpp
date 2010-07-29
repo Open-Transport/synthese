@@ -49,7 +49,7 @@
 #include "Address.h"
 #include "AddressTableSync.h"
 #include "StopPoint.hpp"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "12_security/Constants.h"
 #include "Right.h"
 #include "PTUseRuleTableSync.h"

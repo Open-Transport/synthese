@@ -54,7 +54,7 @@
 #include "LineStop.h"
 #include "Profile.h"
 #include "TimetableSetPhysicalStopAction.h"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "TimetableResult.hpp"
 
 #include <boost/foreach.hpp>
@@ -472,10 +472,10 @@ namespace synthese
 						AdminActionFunctionRequest<TimetableSetPhysicalStopAction,TimetableAdmin> setStopRequest(_request);
 						setStopRequest.getAction()->setTimetable(const_pointer_cast<Timetable>(_timetable));
 
-						PhysicalStopTableSync::SearchResult stops(
-							PhysicalStopTableSync::Search(Env::GetOfficialEnv(), rows[0]->getPlace()->getKey())
+						StopPointTableSync::SearchResult stops(
+							StopPointTableSync::Search(Env::GetOfficialEnv(), rows[0]->getPlace()->getKey())
 						);
-						BOOST_FOREACH(const PhysicalStopTableSync::SearchResult::value_type& stop, stops)
+						BOOST_FOREACH(const StopPointTableSync::SearchResult::value_type& stop, stops)
 						{
 							setStopRequest.getAction()->setPhysicalStop(stop);
 

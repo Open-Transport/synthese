@@ -23,11 +23,18 @@
 #include "CMSModule.hpp"
 #include "Website.hpp"
 #include "Webpage.h"
+#include "FunctionWithSiteBase.hpp"
+#include "WebPageDisplayFunction.h"
+#include "Request.h"
+
+using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace server;
 	using namespace cms;
+	using namespace util;
 
 	namespace util
 	{

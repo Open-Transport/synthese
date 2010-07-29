@@ -26,7 +26,7 @@
 #include "Request.h"
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayScreenTableSync.h"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "Conversion.h"
 #include "ArrivalDepartureTableLog.h"
 #include "StopPoint.hpp"
@@ -119,7 +119,7 @@ namespace synthese
 		){
 			try
 			{
-				_stop = PhysicalStopTableSync::Get(id, *_env, UP_LINKS_LOAD_LEVEL);
+				_stop = StopPointTableSync::Get(id, *_env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (ObjectNotFoundException<StopPoint>& e)
 			{

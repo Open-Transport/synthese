@@ -1,6 +1,6 @@
 
-/** PhysicalStopTableSync class implementation.
-    @file PhysicalStopTableSync.cpp
+/** StopPointTableSync class implementation.
+    @file StopPointTableSync.cpp
 
     This file belongs to the SYNTHESE project (public transportation specialized software)
     Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "StopAreaTableSync.hpp"
@@ -35,58 +35,58 @@ namespace synthese
     using namespace util;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,PhysicalStopTableSync>::FACTORY_KEY("15.55.01 Physical stops");
-	template<> const string FactorableTemplate<Fetcher<graph::Vertex>, PhysicalStopTableSync>::FACTORY_KEY("12");
+	template<> const string util::FactorableTemplate<SQLiteTableSync,StopPointTableSync>::FACTORY_KEY("15.55.01 Physical stops");
+	template<> const string FactorableTemplate<Fetcher<graph::Vertex>, StopPointTableSync>::FACTORY_KEY("12");
 
 	namespace pt
 	{
-		const string PhysicalStopTableSync::COL_NAME = "name";
-		const string PhysicalStopTableSync::COL_PLACEID = "place_id";
-		const string PhysicalStopTableSync::COL_X = "x";
-		const string PhysicalStopTableSync::COL_Y = "y";
-		const string PhysicalStopTableSync::COL_OPERATOR_CODE("operator_code");
+		const string StopPointTableSync::COL_NAME = "name";
+		const string StopPointTableSync::COL_PLACEID = "place_id";
+		const string StopPointTableSync::COL_X = "x";
+		const string StopPointTableSync::COL_Y = "y";
+		const string StopPointTableSync::COL_OPERATOR_CODE("operator_code");
 	}
 
     namespace db
     {
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<PhysicalStopTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<StopPointTableSync>::TABLE(
 			"t012_physical_stops"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<PhysicalStopTableSync>::_FIELDS[]=
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<StopPointTableSync>::_FIELDS[]=
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(PhysicalStopTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(PhysicalStopTableSync::COL_PLACEID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(PhysicalStopTableSync::COL_X, SQL_DOUBLE),
-			SQLiteTableSync::Field(PhysicalStopTableSync::COL_Y, SQL_DOUBLE),
-			SQLiteTableSync::Field(PhysicalStopTableSync::COL_OPERATOR_CODE, SQL_TEXT),
+			SQLiteTableSync::Field(StopPointTableSync::COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(StopPointTableSync::COL_PLACEID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(StopPointTableSync::COL_X, SQL_DOUBLE),
+			SQLiteTableSync::Field(StopPointTableSync::COL_Y, SQL_DOUBLE),
+			SQLiteTableSync::Field(StopPointTableSync::COL_OPERATOR_CODE, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<PhysicalStopTableSync>::_INDEXES[]=
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<StopPointTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(PhysicalStopTableSync::COL_PLACEID.c_str(), ""),
-			SQLiteTableSync::Index(PhysicalStopTableSync::COL_OPERATOR_CODE.c_str(), ""),
+			SQLiteTableSync::Index(StopPointTableSync::COL_PLACEID.c_str(), ""),
+			SQLiteTableSync::Index(StopPointTableSync::COL_OPERATOR_CODE.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
 
 		/** Does not update the place */
-		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,StopPoint>::Load(
+		template<> void SQLiteDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Load(
 			StopPoint* object,
 			const db::SQLiteResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
-			object->setName(rows->getText ( PhysicalStopTableSync::COL_NAME));
-			object->setXY (rows->getDouble ( PhysicalStopTableSync::COL_X), rows->getDouble ( PhysicalStopTableSync::COL_Y));
-			object->setCodeBySource(rows->getText ( PhysicalStopTableSync::COL_OPERATOR_CODE));
+			object->setName(rows->getText ( StopPointTableSync::COL_NAME));
+			object->setXY (rows->getDouble ( StopPointTableSync::COL_X), rows->getDouble ( StopPointTableSync::COL_Y));
+			object->setCodeBySource(rows->getText ( StopPointTableSync::COL_OPERATOR_CODE));
 			object->setHub(NULL);
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				StopArea* place = StopAreaTableSync::GetEditable(rows->getLongLong (PhysicalStopTableSync::COL_PLACEID), env, linkLevel).get();
+				StopArea* place = StopAreaTableSync::GetEditable(rows->getLongLong (StopPointTableSync::COL_PLACEID), env, linkLevel).get();
 				object->setHub(place);
 
 				place->addPhysicalStop(*object);
@@ -95,7 +95,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,StopPoint>::Unlink(
+		template<> void SQLiteDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Unlink(
 			StopPoint* obj
 		){
 //			StopArea* place = const_cast<StopArea*>(obj->getConnectionPlace());
@@ -106,11 +106,11 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,StopPoint>::Save(
+		template<> void SQLiteDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Save(
 			StopPoint* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			ReplaceQuery<PhysicalStopTableSync> query(*object);
+			ReplaceQuery<StopPointTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(dynamic_cast<const StopArea*>(object->getHub()) ? dynamic_cast<const StopArea*>(object->getHub())->getKey() : RegistryKeyType(0));
 			query.addField(object->getX());
@@ -122,7 +122,7 @@ namespace synthese
 
     namespace pt
     {
-		PhysicalStopTableSync::SearchResult PhysicalStopTableSync::Search(
+		StopPointTableSync::SearchResult StopPointTableSync::Search(
 			Env& env, 
 			optional<RegistryKeyType> placeId,
 			optional<string> operatorCode,
@@ -130,7 +130,7 @@ namespace synthese
 			boost::optional<std::size_t> number  /*= 0 */,
 			LinkLevel linkLevel
 		){
-			SelectQuery<PhysicalStopTableSync> query;
+			SelectQuery<StopPointTableSync> query;
 			if(operatorCode)
 			{
 				query.addWhereField(COL_OPERATOR_CODE, *operatorCode, ComposedExpression::OP_LIKE);

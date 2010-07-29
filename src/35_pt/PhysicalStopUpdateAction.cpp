@@ -27,7 +27,7 @@
 #include "PhysicalStopUpdateAction.h"
 #include "TransportNetworkRight.h"
 #include "Request.h"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 
 using namespace std;
 
@@ -72,7 +72,7 @@ namespace synthese
 		{
 			try
 			{
-				_stop = PhysicalStopTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_STOP_ID), *_env);
+				_stop = StopPointTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_STOP_ID), *_env);
 			}
 			catch(ObjectNotFoundException<StopPoint>&)
 			{
@@ -97,7 +97,7 @@ namespace synthese
 			_stop->setCodeBySource(_operatorCode);
 			_stop->setName(_name);
 
-			PhysicalStopTableSync::Save(_stop.get());
+			StopPointTableSync::Save(_stop.get());
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}

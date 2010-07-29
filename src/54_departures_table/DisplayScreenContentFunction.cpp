@@ -26,7 +26,7 @@
 
 #include "RequestException.h"
 #include "Request.h"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "DisplayScreenContentFunction.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
@@ -121,7 +121,7 @@ namespace synthese
 					// Way 3 : physical stop
 					
 					// 3.1 by id
-					if(decodeTableId(id) == PhysicalStopTableSync::TABLE.ID)
+					if(decodeTableId(id) == StopPointTableSync::TABLE.ID)
 					{
 						shared_ptr<const StopPoint> stop(
 							Env::GetOfficialEnv().get<StopPoint>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))

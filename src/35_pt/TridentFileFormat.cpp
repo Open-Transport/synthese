@@ -30,7 +30,7 @@
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopPoint.hpp"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousService.h"
@@ -1246,8 +1246,8 @@ namespace synthese
 				XMLNode nameNode(stopAreaNode.getChildNode("name", 0));
 				string stopKey(keyNode.getText());
 			
-				PhysicalStopTableSync::SearchResult pstops(
-					PhysicalStopTableSync::Search(
+				StopPointTableSync::SearchResult pstops(
+					StopPointTableSync::Search(
 						*_env,
 						optional<RegistryKeyType>(),
 						stopKey
@@ -1278,7 +1278,7 @@ namespace synthese
 					curStop.reset(new StopPoint);
 					curStop->setHub(itcstop->second);
 					curStop->setCodeBySource(stopKey);
-					curStop->setKey(PhysicalStopTableSync::getId());
+					curStop->setKey(StopPointTableSync::getId());
 					_env->getEditableRegistry<StopPoint>().add(curStop);
 
 					os << "CREA : Creation of the physical stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
@@ -1288,7 +1288,7 @@ namespace synthese
 				else
 				{
 					RegistryKeyType stopId(pstops.front()->getKey());
-					curStop = PhysicalStopTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL);
+					curStop = StopPointTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL);
 
 					os << "LOAD : link between stops " << stopKey << " (" << nameNode.getText() << ") and "
 						<< curStop->getKey() << " (" << curStop->getConnectionPlace()->getName() << ")<br />";
@@ -1632,12 +1632,12 @@ namespace synthese
 					XMLNode durationNode(connectionNode.getChildNode("defaultDuration", 0));
 
 					// Fetching the stops
-					PhysicalStopTableSync::SearchResult startStops(
-						PhysicalStopTableSync::Search(
+					StopPointTableSync::SearchResult startStops(
+						StopPointTableSync::Search(
 							*_env, optional<RegistryKeyType>(), string(startNode.getText()), 0, 1
 					)	);
-					PhysicalStopTableSync::SearchResult endStops(
-						PhysicalStopTableSync::Search(
+					StopPointTableSync::SearchResult endStops(
+						StopPointTableSync::Search(
 							*_env, optional<RegistryKeyType>(), string(endNode.getText()), 0, 1
 					)	);
 					if(startStops.empty() || endStops.empty())
@@ -1712,7 +1712,7 @@ namespace synthese
 				}
 				BOOST_FOREACH(Registry<StopPoint>::value_type stop, _env->getRegistry<StopPoint>())
 				{
-					PhysicalStopTableSync::Save(stop.second.get(), transaction);
+					StopPointTableSync::Save(stop.second.get(), transaction);
 				}
 			}
 			BOOST_FOREACH(Registry<TransportNetwork>::value_type network, _env->getRegistry<TransportNetwork>())

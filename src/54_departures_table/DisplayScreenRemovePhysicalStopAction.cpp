@@ -23,7 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "StopPoint.hpp"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
@@ -123,7 +123,7 @@ namespace synthese
 		){
 			try
 			{
-				_stop = PhysicalStopTableSync::Get(id, *_env, UP_LINKS_LOAD_LEVEL);
+				_stop = StopPointTableSync::Get(id, *_env, UP_LINKS_LOAD_LEVEL);
 			}
 			catch (ObjectNotFoundException<StopPoint>& e)
 			{

@@ -28,7 +28,7 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "StopAreaTableSync.hpp"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "SQLiteTransaction.h"
 #include "CityTableSync.h"
 
@@ -151,7 +151,7 @@ namespace synthese
 				stop.setHub(&stopArea);
 				stop.setCodeBySource(_physicalStopOperatorCode);
 				stop.setXY(_point.getX(), _point.getY());
-				PhysicalStopTableSync::Save(&stop, transaction);
+				StopPointTableSync::Save(&stop, transaction);
 			}
 			transaction.run();
 

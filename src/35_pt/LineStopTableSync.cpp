@@ -25,7 +25,7 @@
 #include "LineStopTableSync.h"
 
 #include "JourneyPatternTableSync.hpp"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 
 #include <sstream>
 
@@ -142,7 +142,7 @@ namespace synthese
 				JourneyPattern* line(JourneyPatternTableSync::GetEditable (lineId, env, linkLevel).get());
 
 				ls->setLine(line);
-				ls->setPhysicalStop(PhysicalStopTableSync::GetEditable(fromPhysicalStopId, env, linkLevel).get());
+				ls->setPhysicalStop(StopPointTableSync::GetEditable(fromPhysicalStopId, env, linkLevel).get());
 				
 				line->addEdge(*ls);
 			}

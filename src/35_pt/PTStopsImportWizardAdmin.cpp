@@ -32,7 +32,7 @@
 #include "Projection.h"
 #include "AdminFunctionRequest.hpp"
 #include "Point2D.h"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "PTPlaceAdmin.h"
 #include "HTMLModule.h"
 #include "PTPhysicalStopAdmin.h"
@@ -237,7 +237,7 @@ namespace synthese
 							bahnhof.cityName = cols[0];
 							bahnhof.name = (cols.size() == 1) ? "Arrêt" : cols[1];
 							
-							PhysicalStopTableSync::SearchResult stops(PhysicalStopTableSync::Search(Env::GetOfficialEnv(), optional<RegistryKeyType>(), bahnhof.operatorCode, 0, 1));
+							StopPointTableSync::SearchResult stops(StopPointTableSync::Search(Env::GetOfficialEnv(), optional<RegistryKeyType>(), bahnhof.operatorCode, 0, 1));
 							if(!stops.empty())
 							{
 								bahnhof.stop = stops.front();

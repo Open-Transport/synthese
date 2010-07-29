@@ -6,8 +6,8 @@
 synthese::pt::TransportNetworkTableSync::integrate();
 
 synthese::pt::PTUseRuleTableSync::integrate();
-synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::PhysicalStopTableSync>::integrate();
-synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex>, synthese::pt::PhysicalStopTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::StopPointTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex>, synthese::pt::StopPointTableSync>::integrate();
 synthese::pt::JunctionTableSync::integrate();
 synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::ContinuousServiceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::SchedulesBasedService>, synthese::pt::ContinuousServiceTableSync>::integrate();

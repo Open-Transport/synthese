@@ -39,7 +39,7 @@
 #include "LineStop.h"
 #include "StopPoint.hpp"
 #include "TimetableResult.hpp"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "StopAreaTableSync.hpp"
 #include "Webpage.h"
 
@@ -235,7 +235,7 @@ namespace synthese
 					row.setRank(0);
 					timetable->addRow(row);
 				} // Way 4.2 : physical stop timetable
-				else if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == PhysicalStopTableSync::TABLE.ID)
+				else if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == StopPointTableSync::TABLE.ID)
 				{
 					shared_ptr<const StopPoint> stop;
 					try

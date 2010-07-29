@@ -27,7 +27,7 @@
 #include "PhysicalStopMoveAction.hpp"
 #include "TransportNetworkRight.h"
 #include "Request.h"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "Projection.h"
 
 using namespace std;
@@ -69,7 +69,7 @@ namespace synthese
 		{
 			try
 			{
-				_stop = PhysicalStopTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_STOP_ID), *_env);
+				_stop = StopPointTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_STOP_ID), *_env);
 			}
 			catch(ObjectNotFoundException<StopPoint>&)
 			{
@@ -90,7 +90,7 @@ namespace synthese
 			Point2D projected(LambertFromWGS84(_point));
 			_stop->setXY(projected.getX(), projected.getY());
 
-			PhysicalStopTableSync::Save(_stop.get());
+			StopPointTableSync::Save(_stop.get());
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
 		

@@ -23,7 +23,7 @@
 #include "CarPostalFileFormat.hpp"
 #include "DataSource.h"
 #include "StopPoint.hpp"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
 #include "City.h"
@@ -266,8 +266,8 @@ namespace synthese
 					}
 					else if(line.substr(0,1) != "*")
 					{
-						PhysicalStopTableSync::SearchResult searchStop(
-							PhysicalStopTableSync::Search(
+						StopPointTableSync::SearchResult searchStop(
+							StopPointTableSync::Search(
 								*_env, optional<RegistryKeyType>(), line.substr(0,7)
 						)	);
 						if(searchStop.empty())

@@ -24,7 +24,7 @@
 
 #include "LineStopTableSync.h"
 #include "JourneyPatternTableSync.hpp"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "CommercialLineTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousServiceTableSync.h"
@@ -56,10 +56,10 @@ namespace synthese
 			query
 				<< "SELECT ls." << TABLE_COL_ID << " FROM "
 				<< LineStopTableSync::TABLE.NAME << " AS ls "
-				<< " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_PHYSICALSTOPID
+				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_PHYSICALSTOPID
 				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID
 				<< " WHERE "
-				<< "p." << PhysicalStopTableSync::COL_PLACEID << "=" << placeId
+				<< "p." << StopPointTableSync::COL_PLACEID << "=" << placeId
 				<< " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineId
 				<< " LIMIT 1";
 			SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str()));
@@ -72,11 +72,11 @@ namespace synthese
 			query
 				<< "SELECT ls." << TABLE_COL_ID << " FROM "
 				<< LineStopTableSync::TABLE.NAME << " AS ls "
-				<< " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_PHYSICALSTOPID
+				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_PHYSICALSTOPID
 				<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " AS l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID
 				<< " INNER JOIN " << CommercialLineTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID
 				<< " WHERE "
-				<< "p." << PhysicalStopTableSync::COL_PLACEID << "=" << placeId
+				<< "p." << StopPointTableSync::COL_PLACEID << "=" << placeId
 				<< " AND c." << CommercialLineTableSync::COL_NETWORK_ID << "=" << networkId
 				<< " LIMIT 1";
 			SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str()));

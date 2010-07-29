@@ -65,7 +65,7 @@
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenAppearanceUpdateAction.h"
 #include "DisplayTypeAdmin.h"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"

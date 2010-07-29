@@ -28,7 +28,7 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "LineStopTableSync.h"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 
 using namespace std;
 
@@ -84,7 +84,7 @@ namespace synthese
 				RegistryKeyType psid(map.getDefault<RegistryKeyType>(PARAMETER_PHYSICAL_STOP_ID, 0));
 				if(psid)
 				{
-					_physicalStop = PhysicalStopTableSync::GetEditable(psid, *_env);
+					_physicalStop = StopPointTableSync::GetEditable(psid, *_env);
 				}
 				_allowedArrival = map.getOptional<bool>(PARAMETER_ALLOWED_ARRIVAL);
 				_allowedDeparture = map.getOptional<bool>(PARAMETER_ALLOWED_DEPARTURE);

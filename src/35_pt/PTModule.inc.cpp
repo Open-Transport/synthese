@@ -22,7 +22,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "JunctionTableSync.hpp"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
 #include "NonConcurrencyRuleTableSync.h"
 #include "RollingStockTableSync.h"

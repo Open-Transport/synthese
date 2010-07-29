@@ -1,6 +1,6 @@
 
-/** PhysicalStopTableSync class header.
-	@file PhysicalStopTableSync.h
+/** StopPointTableSync class header.
+	@file StopPointTableSync.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -43,9 +43,9 @@ namespace synthese
 				- on update : 
 				- on delete : X
 		*/
-		class PhysicalStopTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<PhysicalStopTableSync,StopPoint>,
-			public db::FetcherTemplate<graph::Vertex, PhysicalStopTableSync>
+		class StopPointTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<StopPointTableSync,StopPoint>,
+			public db::FetcherTemplate<graph::Vertex, StopPointTableSync>
 		{
 		public:
 			static const std::string COL_NAME;

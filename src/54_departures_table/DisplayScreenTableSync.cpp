@@ -38,7 +38,7 @@
 #include "CityTableSync.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "JourneyPattern.hpp"
 #include "DBLogEntryTableSync.h"
 #include "SentAlarm.h"
@@ -245,7 +245,7 @@ namespace synthese
 					try
 					{
 						RegistryKeyType id(Conversion::ToLongLong(stop));
-						object->addPhysicalStop(PhysicalStopTableSync::Get(id, env, linkLevel).get());
+						object->addPhysicalStop(StopPointTableSync::Get(id, env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<StopPoint>& e)
 					{
@@ -496,11 +496,11 @@ namespace synthese
 			{
 				query.addTableAndEqualJoin<StopAreaTableSync>(TABLE_COL_ID, COL_PLACE_ID);
 				query.addTableAndEqualOtherJoin<CityTableSync,StopAreaTableSync>(TABLE_COL_ID, StopAreaTableSync::TABLE_COL_CITYID);
-				query.addTableAndEqualOtherJoin<PhysicalStopTableSync,StopAreaTableSync>(PhysicalStopTableSync::COL_PLACEID, TABLE_COL_ID);
+				query.addTableAndEqualOtherJoin<StopPointTableSync,StopAreaTableSync>(StopPointTableSync::COL_PLACEID, TABLE_COL_ID);
 			
 				if (lineid || neededLevel > FORBIDDEN)
 				{
-					query.addTableAndEqualOtherJoin<LineStopTableSync,PhysicalStopTableSync>(LineStopTableSync::COL_PHYSICALSTOPID, TABLE_COL_ID);
+					query.addTableAndEqualOtherJoin<LineStopTableSync,StopPointTableSync>(LineStopTableSync::COL_PHYSICALSTOPID, TABLE_COL_ID);
 					query.addTableAndEqualOtherJoin<JourneyPatternTableSync,LineStopTableSync>(TABLE_COL_ID, LineStopTableSync::COL_LINEID);
 				}
 
@@ -703,17 +703,17 @@ namespace synthese
 			stringstream q;
 			q	<< "SELECT l." << TABLE_COL_ID
 				<< " FROM " << TABLE.NAME << " AS d"
-				<< " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS s ON s." << PhysicalStopTableSync::COL_PLACEID << "=d." << COL_PLACE_ID
+				<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS s ON s." << StopPointTableSync::COL_PLACEID << "=d." << COL_PLACE_ID
 				<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l ON l." << LineStopTableSync::COL_PHYSICALSTOPID << "=s." << TABLE_COL_ID
 				<< " WHERE d." << TABLE_COL_ID << "=" << screenId
 				<< " AND (d." << COL_ALL_PHYSICAL_DISPLAYED << " OR d." << COL_PHYSICAL_STOPS_IDS << " LIKE ('%'|| s." << TABLE_COL_ID << " ||'%'))"
 				<< " AND (l." << LineStopTableSync::COL_ISDEPARTURE << " AND d." << COL_DIRECTION << " OR l." << LineStopTableSync::COL_ISARRIVAL << " AND NOT d." << COL_DIRECTION << ")"
 				<< " AND (NOT d." << COL_ORIGINS_ONLY << " OR l." << LineStopTableSync::COL_RANKINPATH << "=0)"
-				<< " AND NOT EXISTS(SELECT p2." << PhysicalStopTableSync::COL_PLACEID << " FROM " << PhysicalStopTableSync::TABLE.NAME << " AS p2 INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l2 ON l2." << LineStopTableSync::COL_PHYSICALSTOPID << "=p2." << TABLE_COL_ID
+				<< " AND NOT EXISTS(SELECT p2." << StopPointTableSync::COL_PLACEID << " FROM " << StopPointTableSync::TABLE.NAME << " AS p2 INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS l2 ON l2." << LineStopTableSync::COL_PHYSICALSTOPID << "=p2." << TABLE_COL_ID
 				<< " WHERE l2." << LineStopTableSync::COL_LINEID << "=l." << LineStopTableSync::COL_LINEID
 				<< " AND l2." << LineStopTableSync::COL_RANKINPATH << ">l." << LineStopTableSync::COL_RANKINPATH
 				<< " AND l2." << LineStopTableSync::COL_ISARRIVAL
-				<< " AND ('%'|| p2." << PhysicalStopTableSync::COL_PLACEID << " ||'%') LIKE d." << COL_FORBIDDEN_ARRIVAL_PLACES_IDS
+				<< " AND ('%'|| p2." << StopPointTableSync::COL_PLACEID << " ||'%') LIKE d." << COL_FORBIDDEN_ARRIVAL_PLACES_IDS
 				<< ")"
 				<< " LIMIT 1";
 			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(q.str());

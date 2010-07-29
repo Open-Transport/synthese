@@ -27,7 +27,7 @@
 #include "PhysicalStopAddAction.h"
 #include "TransportNetworkRight.h"
 #include "Request.h"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
 
@@ -98,7 +98,7 @@ namespace synthese
 			object.setCodeBySource(_operatorCode);
 			object.setXY(_x, _y);
 
-			PhysicalStopTableSync::Save(&object);
+			StopPointTableSync::Save(&object);
 
 //			::AddCreationEntry(object, request.getUser().get());
 			request.setActionCreatedId(object.getKey());

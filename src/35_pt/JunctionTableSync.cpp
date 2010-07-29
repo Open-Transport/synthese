@@ -31,7 +31,7 @@
 #include "SQLite.h"
 #include "SQLiteException.h"
 #include "DataSourceTableSync.h"
-#include "PhysicalStopTableSync.h"
+#include "StopPointTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -113,8 +113,8 @@ namespace synthese
 					try
 					{
 						object->setStops(
-							PhysicalStopTableSync::GetEditable(sid, env, linkLevel).get(),
-							PhysicalStopTableSync::GetEditable(eid, env, linkLevel).get(),
+							StopPointTableSync::GetEditable(sid, env, linkLevel).get(),
+							StopPointTableSync::GetEditable(eid, env, linkLevel).get(),
 							length,
 							duration,
 							bidir
