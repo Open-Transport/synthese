@@ -22,7 +22,7 @@
 
 #include "RemovePreselectionPlaceFromDisplayScreenAction.h"
 #include "DisplayScreenTableSync.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "ArrivalDepartureTableRight.h"
 #include "ActionException.h"
 #include "Request.h"
@@ -64,7 +64,7 @@ namespace synthese
 					*_env
 				);
 
-				_place = ConnectionPlaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PLACE), *_env);
+				_place = StopAreaTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PLACE), *_env);
 
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)

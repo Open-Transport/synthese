@@ -26,7 +26,7 @@
 #include "Line.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "City.h"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"

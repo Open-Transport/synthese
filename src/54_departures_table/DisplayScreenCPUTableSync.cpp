@@ -31,7 +31,7 @@
 #include "SQLiteException.h"
 #include "Conversion.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 
 #include <sstream>
 
@@ -106,7 +106,7 @@ namespace synthese
 				RegistryKeyType placeId(rows->getLongLong(DisplayScreenCPUTableSync::COL_PLACE_ID));
 				if(placeId != 0) try
 				{
-					object->setPlace(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
+					object->setPlace(StopAreaTableSync::Get(placeId, env, linkLevel).get());
 				}
 				catch(ObjectNotFoundException<DisplayScreenCPU>& e)
 				{

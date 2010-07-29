@@ -31,7 +31,7 @@
 #include "GeographyModule.h"
 #include "Webpage.h"
 #include "PTTimeSlotRoutePlanner.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "RoutePlannerInterfacePage.h"
 
 using namespace std;

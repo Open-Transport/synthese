@@ -28,7 +28,7 @@
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
 #include "AddressablePlace.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "PublicPlaceTableSync.h"
 #include "StopArea.hpp"
 #include "PublicPlace.h"
@@ -102,7 +102,7 @@ namespace synthese
 			{
 				RegistryTableType tableId(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
 				
-				if(tableId == ConnectionPlaceTableSync::TABLE.ID)
+				if(tableId == StopAreaTableSync::TABLE.ID)
 				{
 					setConnectionPlace(Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
 				}

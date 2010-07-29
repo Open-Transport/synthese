@@ -33,7 +33,7 @@
 #include "AlarmTableSync.h"
 #include "LineStopTableSync.h"
 #include "LineTableSync.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "CommercialLineTableSync.h"
 #include "CityTableSync.h"
 #include "StopArea.hpp"
@@ -200,7 +200,7 @@ namespace synthese
 				RegistryKeyType placeId(rows->getLongLong( DisplayScreenTableSync::COL_PLACE_ID));
 				if(placeId != 0) try
 				{
-					object->setLocalization(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
+					object->setLocalization(StopAreaTableSync::Get(placeId, env, linkLevel).get());
 				}
 				catch(ObjectNotFoundException<StopArea>& e)
 				{
@@ -259,7 +259,7 @@ namespace synthese
 				{
 					try
 					{
-						object->addForbiddenPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
+						object->addForbiddenPlace(StopAreaTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
@@ -273,7 +273,7 @@ namespace synthese
 				{
 					try
 					{
-						object->addDisplayedPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
+						object->addDisplayedPlace(StopAreaTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
@@ -287,7 +287,7 @@ namespace synthese
 				{
 					try
 					{
-						object->addForcedDestination(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
+						object->addForcedDestination(StopAreaTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
@@ -308,8 +308,8 @@ namespace synthese
 					try
 					{
 						object->addTransferDestination(
-							ConnectionPlaceTableSync::Get(lexical_cast<RegistryKeyType>(id1), env, linkLevel).get(),
-							ConnectionPlaceTableSync::Get(lexical_cast<RegistryKeyType>(id2), env, linkLevel).get()
+							StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(id1), env, linkLevel).get(),
+							StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(id2), env, linkLevel).get()
 						);
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
@@ -494,9 +494,9 @@ namespace synthese
 			// Tables
 			if(!localizationid || *localizationid != 0)
 			{
-				query.addTableAndEqualJoin<ConnectionPlaceTableSync>(TABLE_COL_ID, COL_PLACE_ID);
-				query.addTableAndEqualOtherJoin<CityTableSync,ConnectionPlaceTableSync>(TABLE_COL_ID, ConnectionPlaceTableSync::TABLE_COL_CITYID);
-				query.addTableAndEqualOtherJoin<PhysicalStopTableSync,ConnectionPlaceTableSync>(PhysicalStopTableSync::COL_PLACEID, TABLE_COL_ID);
+				query.addTableAndEqualJoin<StopAreaTableSync>(TABLE_COL_ID, COL_PLACE_ID);
+				query.addTableAndEqualOtherJoin<CityTableSync,StopAreaTableSync>(TABLE_COL_ID, StopAreaTableSync::TABLE_COL_CITYID);
+				query.addTableAndEqualOtherJoin<PhysicalStopTableSync,StopAreaTableSync>(PhysicalStopTableSync::COL_PLACEID, TABLE_COL_ID);
 			
 				if (lineid || neededLevel > FORBIDDEN)
 				{
@@ -531,7 +531,7 @@ namespace synthese
 				}
 				if (!stopName.empty())
 				{
-					query.addWhereFieldOther<ConnectionPlaceTableSync>(ConnectionPlaceTableSync::TABLE_COL_NAME, "%"+stopName+"%", ComposedExpression::OP_LIKE);
+					query.addWhereFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, "%"+stopName+"%", ComposedExpression::OP_LIKE);
 				}
 				if (lineid)
 				{
@@ -574,12 +574,12 @@ namespace synthese
 			else if ((!localizationid || *localizationid != 0) && orderByCity)
 			{
 				query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
-				query.addOrderFieldOther<ConnectionPlaceTableSync>(ConnectionPlaceTableSync::TABLE_COL_NAME, raisingOrder);
+				query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
 				query.addOrderField(COL_NAME, raisingOrder);
 			}
 			else if ((!localizationid || *localizationid != 0) && orderByStopName)
 			{
-				query.addOrderFieldOther<ConnectionPlaceTableSync>(ConnectionPlaceTableSync::TABLE_COL_NAME, raisingOrder);
+				query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
 				query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
 				query.addOrderField(COL_NAME, raisingOrder);
 			}
@@ -589,7 +589,7 @@ namespace synthese
 				if(!localizationid || *localizationid != 0)
 				{
 					query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
-					query.addOrderFieldOther<ConnectionPlaceTableSync>(ConnectionPlaceTableSync::TABLE_COL_NAME, raisingOrder);
+					query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
 			}	}
 			else if (orderByType)
 			{
@@ -597,7 +597,7 @@ namespace synthese
 				if(!localizationid || *localizationid != 0)
 				{
 					query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
-					query.addOrderFieldOther<ConnectionPlaceTableSync>(ConnectionPlaceTableSync::TABLE_COL_NAME, raisingOrder);
+					query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
 				}
 				query.addOrderField(COL_NAME, raisingOrder);
 			}

@@ -22,7 +22,7 @@
 
 #include "DisplayScreenAddDisplayedPlaceAction.h"
 #include "DisplayScreenTableSync.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "ArrivalDepartureTableRight.h"
 #include "ActionException.h"
 #include "Request.h"
@@ -77,7 +77,7 @@ namespace synthese
 				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_PLACE, 0));
 				if(id > 0)
 				{
-					_placeSptr = ConnectionPlaceTableSync::Get(id, *_env);
+					_placeSptr = StopAreaTableSync::Get(id, *_env);
 					_place = _placeSptr.get();
 				}
 				else

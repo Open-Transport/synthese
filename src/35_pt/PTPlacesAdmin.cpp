@@ -45,7 +45,7 @@
 #include "CityUpdateAction.h"
 #include "PropertiesHTMLTable.h"
 #include "StopAreaAddAction.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -324,8 +324,8 @@ namespace synthese
 
 				stream << "<h1>Résultats</h1>";
 
-				ConnectionPlaceTableSync::SearchResult places(
-					ConnectionPlaceTableSync::Search(
+				StopAreaTableSync::SearchResult places(
+					StopAreaTableSync::Search(
 						Env::GetOfficialEnv(),
 						_city.get() ? _city->getKey() : optional<RegistryKeyType>(),
 						logic::indeterminate,
@@ -364,7 +364,7 @@ namespace synthese
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
 
-				BOOST_FOREACH(const ConnectionPlaceTableSync::SearchResult::value_type& place, places)
+				BOOST_FOREACH(const StopAreaTableSync::SearchResult::value_type& place, places)
 				{
 					stream << t.row();
 					stream << t.col() << place->getKey();

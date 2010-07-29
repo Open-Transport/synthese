@@ -37,7 +37,7 @@
 #include "Crossing.h"
 #include "Line.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "RoadPlace.h"
 #include "RoadPlaceTableSync.h"
 #include "PublicPlace.h"

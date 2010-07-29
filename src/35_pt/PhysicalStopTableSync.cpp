@@ -23,7 +23,7 @@
 #include "PhysicalStopTableSync.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -86,7 +86,7 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				StopArea* place = ConnectionPlaceTableSync::GetEditable(rows->getLongLong (PhysicalStopTableSync::COL_PLACEID), env, linkLevel).get();
+				StopArea* place = StopAreaTableSync::GetEditable(rows->getLongLong (PhysicalStopTableSync::COL_PLACEID), env, linkLevel).get();
 				object->setHub(place);
 
 				place->addPhysicalStop(*object);

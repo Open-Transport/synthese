@@ -32,7 +32,7 @@
 #include "DeparturesTableRoutePlanningRowInterfacePage.h"
 #include "DeparturesTableRoutePlanningRowKeyInterfacePage.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -90,7 +90,7 @@ namespace synthese
 			bool displayQuai(_displayQuai ? Conversion::ToBool(_displayQuai->getValue(parameters, variables, object, request)) : false);
 			int withtransfer(_withTransfer ? Conversion::ToBool(_withTransfer->getValue(parameters, variables, object, request)) : false);
 			int blinkingDelay(_blinkingDelay? Conversion::ToInt(_blinkingDelay->getValue(parameters, variables, object, request)) : 0);
-			shared_ptr<const StopArea> place(ConnectionPlaceTableSync::Get(lexical_cast<RegistryKeyType>(_originId->getValue(parameters, variables, object, request)), Env::GetOfficialEnv()));
+			shared_ptr<const StopArea> place(StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(_originId->getValue(parameters, variables, object, request)), Env::GetOfficialEnv()));
 			int departuresNumber = ptds.size() - departuresToHide;
 
 			// Lancement de l'affichage de la rangee

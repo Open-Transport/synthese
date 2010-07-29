@@ -25,7 +25,7 @@
 #include "TimetableRowTableSync.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "DBModule.h"
 #include "SQLite.h"
 #include "SQLiteResult.h"
@@ -100,7 +100,7 @@ namespace synthese
 			try
 			{
 				object->setPlace(
-					ConnectionPlaceTableSync::GetEditable(
+					StopAreaTableSync::GetEditable(
 						rows->getLongLong(TimetableRowTableSync::COL_PLACE_ID),
 						env, linkLevel
 					).get()

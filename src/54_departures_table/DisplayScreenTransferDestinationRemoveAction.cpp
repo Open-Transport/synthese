@@ -28,7 +28,7 @@
 #include "ArrivalDepartureTableRight.h"
 #include "Request.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
 #include "ArrivalDepartureTableLog.h"
@@ -76,8 +76,8 @@ namespace synthese
 			try
 			{
 				_screen = DisplayScreenTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_DISPLAY_SCREEN_ID), *_env);
-				_transferPlace = ConnectionPlaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TRANSFER_PLACE_ID), *_env);
-				_destinationPlace = ConnectionPlaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_DESTINATION_PLACE_ID), *_env);
+				_transferPlace = StopAreaTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TRANSFER_PLACE_ID), *_env);
+				_destinationPlace = StopAreaTableSync::Get(map.get<RegistryKeyType>(PARAMETER_DESTINATION_PLACE_ID), *_env);
 			}
 			catch(ObjectNotFoundException<DisplayScreen>& e)
 			{

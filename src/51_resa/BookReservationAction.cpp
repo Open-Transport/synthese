@@ -23,7 +23,7 @@
 #include "BookReservationAction.h"
 
 #include "TransportWebsite.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "RoutePlannerFunction.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "JourneysResult.h"
@@ -352,7 +352,7 @@ namespace synthese
 				r->setKey(ReservationTableSync::getId());
 				_env->getEditableRegistry<Reservation>().add(r);
 				r->setDeparturePlaceId(
-					dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(
+					dynamic_cast<const StopArea*>(
 						su.getDepartureEdge()->getHub()
 					)->getKey()
 				);
@@ -364,7 +364,7 @@ namespace synthese
 				r->setDepartureTime(su.getDepartureDateTime());
 				r->setOriginDateTime(su.getOriginDateTime());
 				r->setArrivalPlaceId(
-					dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(
+					dynamic_cast<const StopArea*>(
 						su.getArrivalEdge()->getHub()
 					)->getKey()
 				);

@@ -27,7 +27,7 @@
 #include "AddPreselectionPlaceToDisplayScreenAction.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "ArrivalDepartureTableLog.h"
 
 using namespace std;
@@ -71,7 +71,7 @@ namespace synthese
 					map.get<RegistryKeyType>(PARAMETER_SCREEN_ID),
 					*_env
 				);
-				_place = ConnectionPlaceTableSync::Get(
+				_place = StopAreaTableSync::Get(
 					map.get<RegistryKeyType>(PARAMETER_PLACE),
 					*_env
 				);

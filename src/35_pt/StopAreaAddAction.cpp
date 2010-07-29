@@ -27,7 +27,7 @@
 #include "StopAreaAddAction.h"
 #include "TransportNetworkRight.h"
 #include "Request.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "PhysicalStopTableSync.h"
 #include "SQLiteTransaction.h"
 #include "CityTableSync.h"
@@ -138,11 +138,11 @@ namespace synthese
 				CityTableSync::Save(_city.get(), transaction);
 			}
 			stopArea.setCity(_city.get());
-			stopArea.setKey(ConnectionPlaceTableSync::getId());
+			stopArea.setKey(StopAreaTableSync::getId());
 			stopArea.setDefaultTransferDelay(minutes(2));
 
 			stopArea.setName(_name);
-			ConnectionPlaceTableSync::Save(&stopArea, transaction);
+			StopAreaTableSync::Save(&stopArea, transaction);
 
 			if(_createPhysicalStop)
 			{

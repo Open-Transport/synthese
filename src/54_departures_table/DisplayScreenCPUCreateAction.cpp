@@ -30,7 +30,7 @@
 #include "ParametersMap.h"
 #include "Request.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "Conversion.h"
 
 using namespace std;
@@ -69,7 +69,7 @@ namespace synthese
 			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_LOCALIZATION_ID));
 			if(id != 0) try
 			{
-				_place = ConnectionPlaceTableSync::Get(id, *_env);
+				_place = StopAreaTableSync::Get(id, *_env);
 			}
 			catch (...)
 			{

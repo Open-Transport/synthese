@@ -44,7 +44,7 @@
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "City.h"
 #include "SentAlarm.h"
 #include "DisplayScreenCPU.h"

@@ -28,7 +28,7 @@
 #include "TransportNetworkTableSync.h"
 #include "TransportNetwork.h"
 #include "CommercialLineTableSync.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "CommercialLine.h"
 #include "AdvancedSelectTableSync.h"
 #include "PTModule.h"
@@ -144,7 +144,7 @@ namespace synthese
 						);
 						return line->getNetwork() == network.get();
 					}
-					if (tableId2 == ConnectionPlaceTableSync::TABLE.ID)
+					if (tableId2 == StopAreaTableSync::TABLE.ID)
 						return isPlaceServedByNetwork(id1, id2);
 				}
 				if (tableId1 == CommercialLineTableSync::TABLE.ID)
@@ -152,7 +152,7 @@ namespace synthese
 					util::RegistryTableType tableId2(util::decodeTableId(id2));
 					if (tableId2 == CommercialLineTableSync::TABLE.ID)
 						return id1 == id2;
-					if (tableId2 == ConnectionPlaceTableSync::TABLE.ID)
+					if (tableId2 == StopAreaTableSync::TABLE.ID)
 						return isPlaceServedByCommercialLine(id1, id2);
 				}
 			}

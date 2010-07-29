@@ -61,7 +61,7 @@ namespace synthese
 	namespace pt
 	{
 		class PhysicalStop;
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 	}
 
 	namespace ptrouteplanner

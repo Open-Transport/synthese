@@ -22,7 +22,7 @@
 
 #include "DisplayScreenRemoveDisplayedPlaceAction.h"
 #include "DisplayScreenTableSync.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "ArrivalDepartureTableRight.h"
 #include "ActionException.h"
 #include "Request.h"
@@ -117,7 +117,7 @@ namespace synthese
 		{
 			try
 			{
-				_place = ConnectionPlaceTableSync::Get(id, *_env);
+				_place = StopAreaTableSync::Get(id, *_env);
 
 			}
 			catch (ObjectNotFoundException<StopArea>&)

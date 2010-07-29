@@ -29,7 +29,7 @@
 #include "Request.h"
 #include "PhysicalStopTableSync.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 
 using namespace std;
 
@@ -74,7 +74,7 @@ namespace synthese
 		{
 			try
 			{
-				_place = ConnectionPlaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
+				_place = StopAreaTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
 			}
 			catch(ObjectNotFoundException<StopArea>&)
 			{

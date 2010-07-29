@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// ConnectionPlaceTableSync class implementation.
-///	@file ConnectionPlaceTableSync.cpp
+/// StopAreaTableSync class implementation.
+///	@file StopAreaTableSync.cpp
 ///	@author Hugues Romain
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
@@ -22,7 +22,7 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "LinkException.h"
 #include "CityTableSync.h"
@@ -42,67 +42,67 @@ namespace synthese
 	using namespace geography;
 	using namespace road;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,pt::ConnectionPlaceTableSync>::FACTORY_KEY("15.40.01 Connection places");
-	template<> const string FactorableTemplate<Fetcher<NamedPlace>, ConnectionPlaceTableSync>::FACTORY_KEY("7");
+	template<> const string util::FactorableTemplate<SQLiteTableSync,pt::StopAreaTableSync>::FACTORY_KEY("15.40.01 Connection places");
+	template<> const string FactorableTemplate<Fetcher<NamedPlace>, StopAreaTableSync>::FACTORY_KEY("7");
 
 	namespace pt
 	{
-		const string ConnectionPlaceTableSync::TABLE_COL_NAME = "name";
-		const string ConnectionPlaceTableSync::TABLE_COL_CITYID = "city_id";
-		const string ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE = "connection_type";
-		const string ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION = "is_city_main_connection";
-		const string ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY = "default_transfer_delay";
-		const string ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS = "transfer_delays";
-		const string ConnectionPlaceTableSync::COL_NAME13("short_display_name");
-		const string ConnectionPlaceTableSync::COL_NAME26("long_display_name");
-		const string ConnectionPlaceTableSync::COL_CODE_BY_SOURCE("code_by_source");
+		const string StopAreaTableSync::TABLE_COL_NAME = "name";
+		const string StopAreaTableSync::TABLE_COL_CITYID = "city_id";
+		const string StopAreaTableSync::TABLE_COL_CONNECTIONTYPE = "connection_type";
+		const string StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION = "is_city_main_connection";
+		const string StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY = "default_transfer_delay";
+		const string StopAreaTableSync::TABLE_COL_TRANSFERDELAYS = "transfer_delays";
+		const string StopAreaTableSync::COL_NAME13("short_display_name");
+		const string StopAreaTableSync::COL_NAME26("long_display_name");
+		const string StopAreaTableSync::COL_CODE_BY_SOURCE("code_by_source");
 		
-		const string ConnectionPlaceTableSync::FORBIDDEN_DELAY_SYMBOL("F");
+		const string StopAreaTableSync::FORBIDDEN_DELAY_SYMBOL("F");
 	}
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::TABLE(
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<StopAreaTableSync>::TABLE(
 			"t007_connection_places"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::_FIELDS[] =
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<StopAreaTableSync>::_FIELDS[] =
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_CITYID, SQL_INTEGER),
-			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE, SQL_INTEGER),
-			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
-			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY, SQL_INTEGER),
-			SQLiteTableSync::Field(ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS, SQL_TEXT),
-			SQLiteTableSync::Field(ConnectionPlaceTableSync::COL_NAME13, SQL_TEXT),
-			SQLiteTableSync::Field(ConnectionPlaceTableSync::COL_NAME26, SQL_TEXT),
-			SQLiteTableSync::Field(ConnectionPlaceTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
+			SQLiteTableSync::Field(StopAreaTableSync::TABLE_COL_NAME, SQL_TEXT),
+			SQLiteTableSync::Field(StopAreaTableSync::TABLE_COL_CITYID, SQL_INTEGER),
+			SQLiteTableSync::Field(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE, SQL_INTEGER),
+			SQLiteTableSync::Field(StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
+			SQLiteTableSync::Field(StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY, SQL_INTEGER),
+			SQLiteTableSync::Field(StopAreaTableSync::TABLE_COL_TRANSFERDELAYS, SQL_TEXT),
+			SQLiteTableSync::Field(StopAreaTableSync::COL_NAME13, SQL_TEXT),
+			SQLiteTableSync::Field(StopAreaTableSync::COL_NAME26, SQL_TEXT),
+			SQLiteTableSync::Field(StopAreaTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ConnectionPlaceTableSync>::_INDEXES[] =
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<StopAreaTableSync>::_INDEXES[] =
 		{
-			SQLiteTableSync::Index(ConnectionPlaceTableSync::TABLE_COL_CITYID.c_str(), ConnectionPlaceTableSync::TABLE_COL_NAME.c_str(), ""),
-			SQLiteTableSync::Index(ConnectionPlaceTableSync::COL_CODE_BY_SOURCE.c_str(), ""),
+			SQLiteTableSync::Index(StopAreaTableSync::TABLE_COL_CITYID.c_str(), StopAreaTableSync::TABLE_COL_NAME.c_str(), ""),
+			SQLiteTableSync::Index(StopAreaTableSync::COL_CODE_BY_SOURCE.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,StopArea>::Load(
+		template<> void SQLiteDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Load(
 			StopArea* cp,
 			const db::SQLiteResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
 			// Reading of the row
-			string name (rows->getText (ConnectionPlaceTableSync::TABLE_COL_NAME));
-			string name13(rows->getText(ConnectionPlaceTableSync::COL_NAME13));
-			string name26(rows->getText(ConnectionPlaceTableSync::COL_NAME26));
-			bool connectionType(rows->getBool(ConnectionPlaceTableSync::TABLE_COL_CONNECTIONTYPE));
-			posix_time::time_duration defaultTransferDelay(posix_time::minutes(rows->getInt (ConnectionPlaceTableSync::TABLE_COL_DEFAULTTRANSFERDELAY)));
-			string transferDelaysStr (rows->getText (ConnectionPlaceTableSync::TABLE_COL_TRANSFERDELAYS));
-			string codeBySource(rows->getText(ConnectionPlaceTableSync::COL_CODE_BY_SOURCE));
+			string name (rows->getText (StopAreaTableSync::TABLE_COL_NAME));
+			string name13(rows->getText(StopAreaTableSync::COL_NAME13));
+			string name26(rows->getText(StopAreaTableSync::COL_NAME26));
+			bool connectionType(rows->getBool(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE));
+			posix_time::time_duration defaultTransferDelay(posix_time::minutes(rows->getInt (StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY)));
+			string transferDelaysStr (rows->getText (StopAreaTableSync::TABLE_COL_TRANSFERDELAYS));
+			string codeBySource(rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE));
 
 			// Update of the object
 			cp->setName (name);
@@ -130,7 +130,7 @@ namespace synthese
 				RegistryKeyType startStop(Conversion::ToLongLong(*valueIter));
 				RegistryKeyType endStop(Conversion::ToLongLong(*(++valueIter)));
 				const string delay(*(++valueIter));
-				if(delay == ConnectionPlaceTableSync::FORBIDDEN_DELAY_SYMBOL)
+				if(delay == StopAreaTableSync::FORBIDDEN_DELAY_SYMBOL)
 				{
 					cp->addForbiddenTransferDelay(startStop, endStop);
 				}
@@ -143,7 +143,7 @@ namespace synthese
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				cp->setCity(NULL);
-				util::RegistryKeyType cityId (rows->getLongLong (ConnectionPlaceTableSync::TABLE_COL_CITYID));
+				util::RegistryKeyType cityId (rows->getLongLong (StopAreaTableSync::TABLE_COL_CITYID));
 
 				try
 				{
@@ -153,7 +153,7 @@ namespace synthese
 					{
 						shared_ptr<City> city = CityTableSync::GetEditable (cp->getCity ()->getKey (), env, linkLevel);
 
-						bool isCityMainConnection (	rows->getBool (ConnectionPlaceTableSync::TABLE_COL_ISCITYMAINCONNECTION));
+						bool isCityMainConnection (	rows->getBool (StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION));
 						if (isCityMainConnection)
 						{
 							city->addIncludedPlace (cp);
@@ -167,13 +167,13 @@ namespace synthese
 				}
 				catch(ObjectNotFoundException<City>& e)
 				{
-					throw LinkException<ConnectionPlaceTableSync>(rows, ConnectionPlaceTableSync::TABLE_COL_CITYID, e);
+					throw LinkException<StopAreaTableSync>(rows, StopAreaTableSync::TABLE_COL_CITYID, e);
 				}
 			}
 
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,StopArea>::Save(
+		template<> void SQLiteDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Save(
 			StopArea* object,
 			optional<SQLiteTransaction&> transaction
 		){
@@ -186,7 +186,7 @@ namespace synthese
 				delays << td.first.first << ":" << td.first.second << ":";
 				if(td.second.is_not_a_date_time())
 				{
-					delays << ConnectionPlaceTableSync::FORBIDDEN_DELAY_SYMBOL;
+					delays << StopAreaTableSync::FORBIDDEN_DELAY_SYMBOL;
 				}
 				else
 				{
@@ -196,7 +196,7 @@ namespace synthese
 			}
 
 			// The query
-			ReplaceQuery<ConnectionPlaceTableSync> query(*object);
+			ReplaceQuery<StopAreaTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
 			query.addField(object->getAllowedConnection());
@@ -210,7 +210,7 @@ namespace synthese
 		}
 
 		
-		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,StopArea>::Unlink(
+		template<> void SQLiteDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Unlink(
 			StopArea* cp
 		){
 			City* city(const_cast<City*>(cp->getCity()));
@@ -224,7 +224,7 @@ namespace synthese
 
 	namespace pt
 	{
-		ConnectionPlaceTableSync::SearchResult ConnectionPlaceTableSync::Search(
+		StopAreaTableSync::SearchResult StopAreaTableSync::Search(
 			Env& env,
 			optional<RegistryKeyType> cityId,
 			logic::tribool mainConnectionOnly,
@@ -237,7 +237,7 @@ namespace synthese
 			, int number /*= 0 */,
 			LinkLevel linkLevel
 		){
-			SelectQuery<ConnectionPlaceTableSync> query;
+			SelectQuery<StopAreaTableSync> query;
 			if(orderByCityNameAndName || cityNameFilter)
 			{
 				query.addTableAndEqualJoin<CityTableSync>(TABLE_COL_ID, TABLE_COL_CITYID);

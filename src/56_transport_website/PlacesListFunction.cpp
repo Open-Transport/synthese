@@ -33,7 +33,7 @@
 #include "Address.h"
 #include "City.h"
 #include "PTModule.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "Webpage.h"
 
 #include <boost/foreach.hpp>
@@ -172,7 +172,7 @@ namespace synthese
 				BOOST_FOREACH(const City::PlacesMatcher::MatchHit it, places)
 				{
 					stream << "<option type=\"";
-					if(	dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(it.value) ||
+					if(	dynamic_cast<const StopArea*>(it.value) ||
 						dynamic_cast<const PlaceAlias*>(it.value)
 					){
 						stream << "stop";

@@ -28,7 +28,7 @@
 #include "TransportNetworkTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "LineTableSync.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "City.h"
 #include "PhysicalStop.h"
 #include "StopArea.hpp"
@@ -72,7 +72,7 @@ namespace synthese
 			{
 				_route = Env::GetOfficialEnv().get<Line>(id);
 			}
-			else if(ConnectionPlaceTableSync::TABLE.ID)
+			else if(StopAreaTableSync::TABLE.ID)
 			{
 				_stop = Env::GetOfficialEnv().get<StopArea>(id);
 			}

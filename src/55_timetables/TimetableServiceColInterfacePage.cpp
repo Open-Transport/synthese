@@ -24,7 +24,7 @@
 
 #include "TimetableServiceColInterfacePage.hpp"
 #include "TimetableRow.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "City.h"
 #include "TimetableResult.hpp"
 #include "Interface.h"

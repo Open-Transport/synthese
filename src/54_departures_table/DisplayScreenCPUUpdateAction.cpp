@@ -30,7 +30,7 @@
 #include "ParametersMap.h"
 #include "Request.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "DBLogModule.h"
 
 #include <boost/lexical_cast.hpp>

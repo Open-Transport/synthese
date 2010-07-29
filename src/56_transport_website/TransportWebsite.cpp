@@ -25,7 +25,7 @@
 #include "PTConstants.h"
 #include "PTModule.h"
 #include "City.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "AccessParameters.h"
 #include "GeographyModule.h"
 #include "LexicalMatcher.h"

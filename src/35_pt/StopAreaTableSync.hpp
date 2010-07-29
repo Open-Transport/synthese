@@ -1,6 +1,6 @@
 
-/** ConnectionPlaceTableSync class header.
-	@file ConnectionPlaceTableSync.h
+/** StopAreaTableSync class header.
+	@file StopAreaTableSync.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -43,9 +43,9 @@ namespace synthese
 				- on update : 
 				- on delete : X
 		*/
-		class ConnectionPlaceTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<ConnectionPlaceTableSync,StopArea>,
-			public db::FetcherTemplate<geography::NamedPlace, ConnectionPlaceTableSync>
+		class StopAreaTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<StopAreaTableSync,StopArea>,
+			public db::FetcherTemplate<geography::NamedPlace, StopAreaTableSync>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;

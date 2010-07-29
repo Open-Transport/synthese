@@ -28,7 +28,7 @@
 #include "PhysicalStop.h"
 #include "PhysicalStopTableSync.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "Road.h"
 #include "RoadTableSync.h"
 #include "RoadChunk.h"
@@ -132,7 +132,7 @@ namespace synthese
 			}
 			BOOST_FOREACH(Registry<StopArea>::value_type stop, _env->getEditableRegistry<StopArea>())
 			{
-				ConnectionPlaceTableSync::Save(stop.second.get(),transaction);
+				StopAreaTableSync::Save(stop.second.get(),transaction);
 			}
 			BOOST_FOREACH(Registry<RoadPlace>::value_type roadplace, _env->getEditableRegistry<RoadPlace>())
 			{

@@ -27,7 +27,7 @@
 #include "StopAreaNameUpdateAction.hpp"
 #include "TransportNetworkRight.h"
 #include "Request.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "CityTableSync.h"
 
 using namespace std;
@@ -82,7 +82,7 @@ namespace synthese
 		{
 			try
 			{
-				_place = ConnectionPlaceTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
+				_place = StopAreaTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
 				_city = CityTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_CITY_ID), *_env);
 			}
 			catch(ObjectNotFoundException<StopArea>&)
@@ -123,7 +123,7 @@ namespace synthese
 				_city->removeIncludedPlace(_place.get());
 			}
 
-			ConnectionPlaceTableSync::Save(_place.get());
+			StopAreaTableSync::Save(_place.get());
 			
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}

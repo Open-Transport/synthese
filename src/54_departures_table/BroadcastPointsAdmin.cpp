@@ -28,7 +28,7 @@
 #include "DeparturesTableModule.h"
 #include "SearchFormHTMLTable.h"
 #include "ResultHTMLTable.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "City.h"
 #include "StopArea.hpp"
 #include "PTModule.h"

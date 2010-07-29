@@ -31,7 +31,7 @@
 #include "StopArea.hpp"
 #include "City.h"
 #include "GeographyModule.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 
 using namespace std;
 
@@ -102,7 +102,7 @@ namespace synthese
 			{
 				throw ActionException("Place not found");
 			}
-			_stop = ConnectionPlaceTableSync::GetEditable(stops.front()->getKey(), *_env);
+			_stop = StopAreaTableSync::GetEditable(stops.front()->getKey(), *_env);
 
 			_rank = map.getOptional<size_t>(PARAMETER_RANK);
 			if(_rank && *_rank > _trail->getStops().size())

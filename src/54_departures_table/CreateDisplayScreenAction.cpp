@@ -30,7 +30,7 @@
 #include "ParametersMap.h"
 #include "Request.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "Conversion.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
@@ -120,7 +120,7 @@ namespace synthese
 			if(id <= 0) return;
 			try
 			{
-				_place = ConnectionPlaceTableSync::Get(id, *_env);
+				_place = StopAreaTableSync::Get(id, *_env);
 			}
 			catch (...)
 			{

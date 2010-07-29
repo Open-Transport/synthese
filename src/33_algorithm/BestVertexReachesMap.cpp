@@ -22,7 +22,7 @@
 
 #include "BestVertexReachesMap.h"
 
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "Address.h"
 #include "PhysicalStop.h"
 #include "Vertex.h"
@@ -222,9 +222,9 @@ namespace synthese
 			}
 			else
 			{
-				const PublicTransportStopZoneConnectionPlace* cp(static_cast<const PublicTransportStopZoneConnectionPlace*>(p));
-				const PublicTransportStopZoneConnectionPlace::PhysicalStops& ps(cp->getPhysicalStops());
-				for (PublicTransportStopZoneConnectionPlace::PhysicalStops::const_iterator itp(ps.begin()); itp != ps.end(); ++itp)
+				const StopArea* cp(static_cast<const StopArea*>(p));
+				const StopArea::PhysicalStops& ps(cp->getPhysicalStops());
+				for (StopArea::PhysicalStops::const_iterator itp(ps.begin()); itp != ps.end(); ++itp)
 				{
 					posix_time::time_duration bestTimeAtStop(duration);
 					if (_accessDirection == DEPARTURE_TO_ARRIVAL)

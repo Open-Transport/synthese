@@ -25,7 +25,7 @@
 #include "PhysicalStop.h"
 #include "PhysicalStopTableSync.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "City.h"
 #include "CityTableSync.h"
 #include "SQLiteTransaction.h"

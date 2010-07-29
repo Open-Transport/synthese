@@ -33,7 +33,7 @@
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
 #include "DeparturesTableInterfacePage.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 
 #include "Interface.h"
 
@@ -153,7 +153,7 @@ namespace synthese
 					// Way 2 : connection place
 				
 					// 2.1 by id
-					else if(decodeTableId(id) == ConnectionPlaceTableSync::TABLE.ID)
+					else if(decodeTableId(id) == StopAreaTableSync::TABLE.ID)
 					{
 						screen->setLocalization(Env::GetOfficialEnv().getRegistry<StopArea>().get(id).get());
 						screen->setAllPhysicalStopsDisplayed(true);

@@ -28,7 +28,7 @@
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "PhysicalStop.h"
 #include "PhysicalStopTableSync.h"
 #include "ScheduledService.h"
@@ -917,8 +917,8 @@ namespace synthese
 
 					// Contained connection places
 					Env senv;
-					ConnectionPlaceTableSync::SearchResult places(
-						ConnectionPlaceTableSync::Search(senv, city->getKey(), true)
+					StopAreaTableSync::SearchResult places(
+						StopAreaTableSync::Search(senv, city->getKey(), true)
 					);
 					BOOST_FOREACH(shared_ptr<const StopArea> cp, places)
 					{
@@ -1159,8 +1159,8 @@ namespace synthese
 
 					// Search of an existing connection place with the same code
 					shared_ptr<StopArea> curStop;
-					ConnectionPlaceTableSync::SearchResult cstops(
-						ConnectionPlaceTableSync::Search(
+					StopAreaTableSync::SearchResult cstops(
+						StopAreaTableSync::Search(
 							*_env,
 							optional<RegistryKeyType>(),
 							logic::indeterminate,
@@ -1182,8 +1182,8 @@ namespace synthese
 					}
 					else
 					{
-						ConnectionPlaceTableSync::SearchResult cstops(
-							ConnectionPlaceTableSync::Search(
+						StopAreaTableSync::SearchResult cstops(
+							StopAreaTableSync::Search(
 								*_env,
 								city->getKey(),
 								logic::indeterminate,
@@ -1205,7 +1205,7 @@ namespace synthese
 							curStop->setCodeBySource(stopKey);
 							curStop->setAllowedConnection(true);
 							curStop->setDefaultTransferDelay(_defaultTransferDuration);
-							curStop->setKey(ConnectionPlaceTableSync::getId());
+							curStop->setKey(StopAreaTableSync::getId());
 							_env->getEditableRegistry<StopArea>().add(curStop);
 
 							os << "CREA : Creation of the commercial stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
@@ -1708,7 +1708,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env->getRegistry<StopArea>())
 				{
-					ConnectionPlaceTableSync::Save(cstop.second.get(), transaction);
+					StopAreaTableSync::Save(cstop.second.get(), transaction);
 				}
 				BOOST_FOREACH(Registry<PhysicalStop>::value_type stop, _env->getRegistry<PhysicalStop>())
 				{

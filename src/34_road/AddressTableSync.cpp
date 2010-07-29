@@ -28,7 +28,7 @@
 #include "PublicPlace.h"
 #include "PublicPlaceTableSync.h"
 #include "RoadTableSync.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "Crossing.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
@@ -108,12 +108,12 @@ namespace synthese
 				// Links from the object
 				try
 				{
-					if(tableId == ConnectionPlaceTableSync::TABLE.ID)
+					if(tableId == StopAreaTableSync::TABLE.ID)
 					{
-						object->setHub(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
+						object->setHub(StopAreaTableSync::Get(placeId, env, linkLevel).get());
 						
 						// Links to the object
-						StopArea* place(ConnectionPlaceTableSync::GetEditable(placeId, env, linkLevel).get());
+						StopArea* place(StopAreaTableSync::GetEditable(placeId, env, linkLevel).get());
 				
 						place->addAddress(object);
 					}

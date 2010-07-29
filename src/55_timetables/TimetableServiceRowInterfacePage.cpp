@@ -30,7 +30,7 @@
 #include "RollingStock.h"
 #include "TimetableWarning.h"
 #include "Service.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "StaticFunctionRequest.h"
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
@@ -144,7 +144,7 @@ namespace synthese
 			pm.insert(DATA_RANK_IS_ODD, rank % 2);
 			pm.insert(DATA_FOLLOWING_SERVICES_WITH_SAME_DEPARTURE_HOUR, followingServicesWithSameHour); //12
 
-			const PublicTransportStopZoneConnectionPlace* lastPlace(object.getLine()->getDestination()->getConnectionPlace());
+			const StopArea* lastPlace(object.getLine()->getDestination()->getConnectionPlace());
 			pm.insert(DATA_LINE_DESTINATION_CITY_ID, lastPlace->getCity()->getKey()); //13
 			pm.insert(DATA_LINE_DESTINATION_CITY_NAME, lastPlace->getCity()->getName()); //14
 			pm.insert(DATA_LINE_DESTINATION_PLACE_ID, lastPlace->getKey()); //15

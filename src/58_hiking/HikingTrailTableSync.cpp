@@ -27,7 +27,7 @@
 #include "HikingTrailTableSync.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "StopArea.hpp"
 
 using namespace std;
@@ -108,7 +108,7 @@ namespace synthese
 					try
 					{
 						stops.push_back(
-							ConnectionPlaceTableSync::GetEditable(lexical_cast<RegistryKeyType>(stopid), env, linkLevel).get()
+							StopAreaTableSync::GetEditable(lexical_cast<RegistryKeyType>(stopid), env, linkLevel).get()
 						);
 					}
 					catch(ObjectNotFoundException<StopArea>& e)

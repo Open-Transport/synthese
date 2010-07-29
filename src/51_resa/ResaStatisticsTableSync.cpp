@@ -23,7 +23,7 @@
 #include "ResaStatisticsTableSync.h"
 #include "ReservationTableSync.h"
 #include "ReservationTransactionTableSync.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "CityTableSync.h"
 
 #include <boost/optional.hpp>
@@ -59,10 +59,10 @@ namespace synthese
 				if(hasColStep) s << "," << GetSQLColumn(colStep) << " AS col";
 			s << " FROM " << ReservationTableSync::TABLE.NAME << " AS r " <<
 				" INNER JOIN " << ReservationTransactionTableSync::TABLE.NAME << " AS t ON t." << TABLE_COL_ID << "=r." << ReservationTableSync::COL_TRANSACTION_ID <<
-				" LEFT JOIN " << ConnectionPlaceTableSync::TABLE.NAME << " AS sd ON sd." << TABLE_COL_ID << "=r." << ReservationTableSync::COL_DEPARTURE_PLACE_ID <<
-				" LEFT JOIN " << CityTableSync::TABLE.NAME << " AS cd ON cd." << TABLE_COL_ID << "=sd." << ConnectionPlaceTableSync::TABLE_COL_CITYID <<
-				" LEFT JOIN " << ConnectionPlaceTableSync::TABLE.NAME << " AS sa ON sa." << TABLE_COL_ID << "=r." << ReservationTableSync::COL_ARRIVAL_PLACE_ID <<
-				" LEFT JOIN " << CityTableSync::TABLE.NAME << " AS ca ON ca." << TABLE_COL_ID << "=sa." << ConnectionPlaceTableSync::TABLE_COL_CITYID <<
+				" LEFT JOIN " << StopAreaTableSync::TABLE.NAME << " AS sd ON sd." << TABLE_COL_ID << "=r." << ReservationTableSync::COL_DEPARTURE_PLACE_ID <<
+				" LEFT JOIN " << CityTableSync::TABLE.NAME << " AS cd ON cd." << TABLE_COL_ID << "=sd." << StopAreaTableSync::TABLE_COL_CITYID <<
+				" LEFT JOIN " << StopAreaTableSync::TABLE.NAME << " AS sa ON sa." << TABLE_COL_ID << "=r." << ReservationTableSync::COL_ARRIVAL_PLACE_ID <<
+				" LEFT JOIN " << CityTableSync::TABLE.NAME << " AS ca ON ca." << TABLE_COL_ID << "=sa." << StopAreaTableSync::TABLE_COL_CITYID <<
 				" WHERE " <<
 				ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << gregorian::to_iso_extended_string(period.begin())  << " 00:00:00' AND " <<
 				ReservationTableSync::COL_ORIGIN_DATE_TIME << "<'" << gregorian::to_iso_extended_string(period.end()) << " 00:00:00'";
@@ -139,9 +139,9 @@ namespace synthese
 			if(step == MONTH_STEP) return "strftime('%W'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
 			if(step == YEAR_STEP) return "strftime('%Y'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
 			if(step == DEPARTURE_STOP_STEP) return ReservationTableSync::COL_DEPARTURE_PLACE_ID;
-			if(step == DEPARTURE_CITY_STEP) return "sd." + ConnectionPlaceTableSync::TABLE_COL_CITYID;
+			if(step == DEPARTURE_CITY_STEP) return "sd." + StopAreaTableSync::TABLE_COL_CITYID;
 			if(step == ARRIVAL_STOP_STEP) return ReservationTableSync::COL_ARRIVAL_PLACE_ID;
-			if(step == ARRIVAL_CITY_STEP) return "sa." + ConnectionPlaceTableSync::TABLE_COL_CITYID;
+			if(step == ARRIVAL_CITY_STEP) return "sa." + StopAreaTableSync::TABLE_COL_CITYID;
 			if(step == RESERVATION_DELAY_10_MIN_STEP) return "10*((strftime('%s',r."+ ReservationTableSync::COL_DEPARTURE_TIME +") - strftime('%s',t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +")) / 600)";
 			if(step == RESERVATION_DELAY_30_MIN_STEP) return "30*((strftime('%s',r."+ ReservationTableSync::COL_DEPARTURE_TIME +") - strftime('%s',t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +")) / 1800)";
 			if(step == RESERVATION_DELAY_60_MIN_STEP) return "(strftime('%s',r."+ ReservationTableSync::COL_DEPARTURE_TIME +") - strftime('%s',t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +")) / 3600";

@@ -22,7 +22,7 @@
 
 #include "DBModule.h"
 #include "SQLite.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "CityTableSync.h"
 #include "PhysicalStopTableSync.h"
 #include "CommercialLineTableSync.h"
@@ -81,8 +81,8 @@ namespace synthese
 					<< ",(SELECT COUNT(b." << TABLE_COL_ID << ") FROM " << DisplayScreenTableSync::TABLE.NAME << " AS b WHERE b." << DisplayScreenTableSync::COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS bc"
 					<< ",(SELECT COUNT(s." << TABLE_COL_ID << ") FROM " << DisplayScreenCPUTableSync::TABLE.NAME << " AS s WHERE s." << DisplayScreenCPUTableSync::COL_PLACE_ID << "=p." << TABLE_COL_ID << ") AS cc"
 				<< " FROM " // Tables
-					<< ConnectionPlaceTableSync::TABLE.NAME << " AS p"
-					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << ConnectionPlaceTableSync::TABLE_COL_CITYID
+					<< StopAreaTableSync::TABLE.NAME << " AS p"
+					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << StopAreaTableSync::TABLE_COL_CITYID
 					<< " INNER JOIN " << PhysicalStopTableSync::TABLE.NAME << " AS ps ON " 	<< " ps." << PhysicalStopTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
 					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
 					<< " INNER JOIN " << LineTableSync::TABLE.NAME << " as l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID;
@@ -109,11 +109,11 @@ namespace synthese
 			// Order
 			if (orderByCity)
 			{
-				query << " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",p."  << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY c." << CityTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC") << ",p."  << StopAreaTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			}
 			else if (orderByName)
 			{
-				query << " ORDER BY p." << ConnectionPlaceTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
+				query << " ORDER BY p." << StopAreaTableSync::TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			}
 			else if (orderByNumber)
 			{
@@ -138,7 +138,7 @@ namespace synthese
 					object->broadCastPointsNumber = rows->getInt ("bc");
 					object->cpuNumber = rows->getInt("cc");
 					object->place.reset(new StopArea(rows->getKey()));
-					ConnectionPlaceTableSync::Load(object->place.get(), rows, env);
+					StopAreaTableSync::Load(object->place.get(), rows, env);
 					object->cityName = rows->getText ("city_name");
 					objects.push_back(object);
 				}

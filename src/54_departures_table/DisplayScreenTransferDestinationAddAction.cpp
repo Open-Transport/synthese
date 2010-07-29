@@ -32,7 +32,7 @@
 #include "GeographyModule.h"
 #include "ArrivalDepartureTableLog.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -81,7 +81,7 @@ namespace synthese
 			try
 			{
 				_screen = DisplayScreenTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_DISPLAY_SCREEN_ID), *_env);
-				_transferPlace = ConnectionPlaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TRANSFER_PLACE_ID), *_env);
+				_transferPlace = StopAreaTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TRANSFER_PLACE_ID), *_env);
 			}
 			catch(ObjectNotFoundException<DisplayScreen>& e)
 			{

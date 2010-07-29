@@ -1,6 +1,6 @@
 
-/** PublicTransportStopZoneConnectionPlace class implementation.
-	@file PublicTransportStopZoneConnectionPlace.cpp
+/** StopArea class implementation.
+	@file StopArea.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "Registry.h"
 #include "PTModule.h"
 #include "PhysicalStop.h"
@@ -45,37 +45,37 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<pt::PublicTransportStopZoneConnectionPlace>::KEY("PublicTransportStopZoneConnectionPlace");
-		template<> const string FactorableTemplate<geography::NamedPlace,pt::PublicTransportStopZoneConnectionPlace>::FACTORY_KEY("PublicTransportStopZoneConnectionPlace");
+		template<> const string Registry<pt::StopArea>::KEY("StopArea");
+		template<> const string FactorableTemplate<geography::NamedPlace,pt::StopArea>::FACTORY_KEY("StopArea");
 	}
 
 	namespace pt
 	{
-		PublicTransportStopZoneConnectionPlace::PublicTransportStopZoneConnectionPlace(
+		StopArea::StopArea(
 			util::RegistryKeyType id
 			, bool allowedConnection/*= CONNECTION_TYPE_FORBIDDEN */
 			, posix_time::time_duration defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */
 		):	AddressablePlace(allowedConnection, defaultTransferDelay),
 			Registrable(id),
-			NamedPlaceTemplate<PublicTransportStopZoneConnectionPlace>()
+			NamedPlaceTemplate<StopArea>()
 			, _score(UNKNOWN_VALUE)
 		{
 
 		}
 
-		const PublicTransportStopZoneConnectionPlace::PhysicalStops& PublicTransportStopZoneConnectionPlace::getPhysicalStops() const
+		const StopArea::PhysicalStops& StopArea::getPhysicalStops() const
 		{
 			return _physicalStops;
 		}
 
-		void PublicTransportStopZoneConnectionPlace::addPhysicalStop(
+		void StopArea::addPhysicalStop(
 			const PhysicalStop& physicalStop
 		){
 			_isoBarycentreToUpdate = true;
 			_physicalStops.insert(make_pair(physicalStop.getKey(), &physicalStop));
 		}
 
-		PublicTransportStopZoneConnectionPlace::PhysicalStopsLabels PublicTransportStopZoneConnectionPlace::getPhysicalStopLabels( bool withAll /*= false*/ ) const
+		StopArea::PhysicalStopsLabels StopArea::getPhysicalStopLabels( bool withAll /*= false*/ ) const
 		{
 			PhysicalStopsLabels m;
 			if (withAll)
@@ -85,7 +85,7 @@ namespace synthese
 			return m;
 		}
 
-		PublicTransportStopZoneConnectionPlace::PhysicalStopsLabels PublicTransportStopZoneConnectionPlace::getPhysicalStopLabels( const PhysicalStops& noDisplay ) const
+		StopArea::PhysicalStopsLabels StopArea::getPhysicalStopLabels( const PhysicalStops& noDisplay ) const
 		{
 			PhysicalStopsLabels m;
 			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
@@ -94,7 +94,7 @@ namespace synthese
 			return m;
 		}
 
-		HubScore PublicTransportStopZoneConnectionPlace::getScore() const
+		HubScore StopArea::getScore() const
 		{
 			typedef map<const CommercialLine*, int> ScoresMap;
 
@@ -147,7 +147,7 @@ namespace synthese
 			return _score;
 		}
 
-		void PublicTransportStopZoneConnectionPlace::getVertexAccessMap(
+		void StopArea::getVertexAccessMap(
 			VertexAccessMap& result,
 			GraphIdType whatToSearch,
 			const Vertex& origin,
@@ -191,7 +191,7 @@ namespace synthese
 
 
 
-		void PublicTransportStopZoneConnectionPlace::getVertexAccessMap(
+		void StopArea::getVertexAccessMap(
 			VertexAccessMap& result,
 			const AccessParameters& accessParameters,
 			const geography::Place::GraphTypes& whatToSearch
@@ -214,7 +214,7 @@ namespace synthese
 			}
 		}
 
-		const geometry::Point2D& PublicTransportStopZoneConnectionPlace::getPoint() const
+		const geometry::Point2D& StopArea::getPoint() const
 		{
 			if (_isoBarycentreToUpdate)
 			{
@@ -234,7 +234,7 @@ namespace synthese
 
 
 
-		bool PublicTransportStopZoneConnectionPlace::containsAnyVertex(
+		bool StopArea::containsAnyVertex(
 			GraphIdType graphType
 		) const	{
 			if(graphType == PTModule::GRAPH_ID)
@@ -246,7 +246,7 @@ namespace synthese
 
 
 
-		std::string PublicTransportStopZoneConnectionPlace::getNameForAllPlacesMatcher(
+		std::string StopArea::getNameForAllPlacesMatcher(
 			std::string text
 		) const	{
 			return (text.empty() ? getName() : text);
@@ -254,7 +254,7 @@ namespace synthese
 
 
 
-		bool PublicTransportStopZoneConnectionPlace::isConnectionPossible() const
+		bool StopArea::isConnectionPossible() const
 		{
 			return _allowedConnection;
 		}

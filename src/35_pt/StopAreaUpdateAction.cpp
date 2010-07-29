@@ -28,7 +28,7 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 
 using namespace std;
 using namespace boost::posix_time;
@@ -72,7 +72,7 @@ namespace synthese
 		{
 			try
 			{
-				_place = ConnectionPlaceTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
+				_place = StopAreaTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
 			}
 			catch(ObjectNotFoundException<StopArea>&)
 			{
@@ -94,7 +94,7 @@ namespace synthese
 			_place->setAllowedConnection(_allowedConnections);
 			_place->setDefaultTransferDelay(_defaultTransferDuration);
 
-			ConnectionPlaceTableSync::Save(_place.get());
+			StopAreaTableSync::Save(_place.get());
 
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}

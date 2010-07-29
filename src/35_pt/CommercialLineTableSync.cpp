@@ -29,7 +29,7 @@
 #include "Place.h"
 #include "PTModule.h"
 #include "StopArea.hpp"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "PTUseRule.h"
 #include "PTUseRuleTableSync.h"
 #include "ReservationContact.h"
@@ -207,7 +207,7 @@ namespace synthese
 					try
 					{
 						placesWithOptionalReservation.insert(
-							ConnectionPlaceTableSync::Get(lexical_cast<RegistryKeyType>(stop),env,linkLevel).get()
+							StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(stop),env,linkLevel).get()
 						);
 					}
 					catch(ObjectNotFoundException<StopArea>&)

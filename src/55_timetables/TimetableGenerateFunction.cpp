@@ -32,7 +32,7 @@
 #include "TimetableInterfacePage.h"
 #include "Env.h"
 #include "City.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "Line.h"
 #include "CalendarTemplate.h"
 #include "Calendar.h"
@@ -40,7 +40,7 @@
 #include "PhysicalStop.h"
 #include "TimetableResult.hpp"
 #include "PhysicalStopTableSync.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "Webpage.h"
 
 using namespace std;
@@ -120,11 +120,11 @@ namespace synthese
 						{
 							map.insert(
 								PARAMETER_CITY_PREFIX + lexical_cast<string>(rank++),
-								static_cast<const PublicTransportStopZoneConnectionPlace*>(row.getPlace())->getCity()->getName()
+								static_cast<const StopArea*>(row.getPlace())->getCity()->getName()
 							);
 							map.insert(
 								PARAMETER_STOP_PREFIX + lexical_cast<string>(rank++),
-								static_cast<const PublicTransportStopZoneConnectionPlace*>(row.getPlace())->getName()
+								static_cast<const StopArea*>(row.getPlace())->getName()
 							);
 						}
 					}
@@ -216,14 +216,14 @@ namespace synthese
 						timetable->addRow(row);
 					}
 				} // Way 4.1 : stop area timetable
-				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == ConnectionPlaceTableSync::TABLE.ID)
+				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == StopAreaTableSync::TABLE.ID)
 				{
-					shared_ptr<const PublicTransportStopZoneConnectionPlace> place;
+					shared_ptr<const StopArea> place;
 					try
 					{
-						place = Env::GetOfficialEnv().get<PublicTransportStopZoneConnectionPlace>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+						place = Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 					}
-					catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
+					catch(ObjectNotFoundException<StopArea>&)
 					{
 						throw RequestException("No such place");
 					}
@@ -269,11 +269,11 @@ namespace synthese
 								map.get<string>(PARAMETER_STOP_PREFIX + lexical_cast<string>(rank))
 						)	);
 						TimetableRow row;
-						if(!dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(placeResult.placeResult.value))
+						if(!dynamic_cast<const StopArea*>(placeResult.placeResult.value))
 						{
 							throw RequestException("No such place at rank "+ lexical_cast<string>(rank));
 						}
-						row.setPlace(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(placeResult.placeResult.value));
+						row.setPlace(dynamic_cast<const StopArea*>(placeResult.placeResult.value));
 						row.setRank(rank);
 						timetable->addRow(row);
 					}

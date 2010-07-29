@@ -42,7 +42,7 @@
 #include "SentAlarm.h"
 #include "ContinuousService.h"
 #include "RollingStock.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "RoadPlace.h"
 
 #include <sstream>

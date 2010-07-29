@@ -28,7 +28,7 @@
 #include "RollingStockTableSync.h"
 #include "ReservationContactTableSync.h"
 #include "CommercialLineTableSync.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "FareTableSync.h"
 #include "LineStopTableSync.h"
 #include "LineTableSync.h"

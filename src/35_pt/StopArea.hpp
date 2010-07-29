@@ -1,6 +1,6 @@
 
-/** PublicTransportStopZoneConnectionPlace class header.
-	@file PublicTransportStopZoneConnectionPlace.h
+/** StopArea class header.
+	@file StopArea.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -139,26 +139,26 @@ namespace synthese
 		///	@image html uml_stop_area.png
 		///
 		/// <h2>Physical data model</h2>
-		/// @ref ConnectionPlaceTableSync
+		/// @ref StopAreaTableSync
 		///
 		/// <h2>Object model</h2>
 		/// For performance purpose, object model differs from conceptual model by
 		/// the following issues :
 		/// <ul>
 		///	<li>PhysicalStop and StationEntrance lists are separated and are hosted
-		/// by PublicTransportStopZoneConnectionPlace and not by Hub</li>
+		/// by StopArea and not by Hub</li>
 		/// <li>There is no Transfer class : a TransferDelaysMap is hosted by
-		/// PublicTransportStopZoneConnectionPlace.</li>
+		/// StopArea.</li>
 		/// </ul>
-		class PublicTransportStopZoneConnectionPlace:
+		class StopArea:
 			public road::AddressablePlace,
-			public geography::NamedPlaceTemplate<PublicTransportStopZoneConnectionPlace>,
+			public geography::NamedPlaceTemplate<StopArea>,
 			public impex::Importable
 		{
 		public:
 
 			/// Chosen registry class.
-			typedef util::Registry<PublicTransportStopZoneConnectionPlace>	Registry;
+			typedef util::Registry<StopArea>	Registry;
 
 			typedef std::map<util::RegistryKeyType,const pt::PhysicalStop*> PhysicalStops;
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > PhysicalStopsLabels;
@@ -179,7 +179,7 @@ namespace synthese
 
 		public:
 
-			PublicTransportStopZoneConnectionPlace(
+			StopArea(
 				util::RegistryKeyType id = 0
 				, bool allowedConnection = false
 				, boost::posix_time::time_duration defaultTransferDelay = boost::posix_time::time_duration()

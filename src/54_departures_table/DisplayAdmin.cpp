@@ -26,7 +26,7 @@
 #include "HTMLTable.h"
 #include "HTMLList.h"
 #include "PropertiesHTMLTable.h"
-#include "ConnectionPlaceTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "StopArea.hpp"
 #include "PhysicalStop.h"
 #include "AdminActionFunctionRequest.hpp"
@@ -829,11 +829,11 @@ namespace synthese
 
 					BOOST_FOREACH(const TransferDestinationsList::value_type& it, _displayScreen->getTransferdestinations())
 					{
-						rmTransferRequest.getAction()->setTransferPlace(ConnectionPlaceTableSync::Get(it.first->getKey(), _getEnv()));
+						rmTransferRequest.getAction()->setTransferPlace(StopAreaTableSync::Get(it.first->getKey(), _getEnv()));
 
 						BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it.second)
 						{
-							rmTransferRequest.getAction()->setDestinationPlace(ConnectionPlaceTableSync::Get(it2->getKey(), _getEnv()));
+							rmTransferRequest.getAction()->setDestinationPlace(StopAreaTableSync::Get(it2->getKey(), _getEnv()));
 
 							stream << tt.row();
 							stream << tt.col() << it.first->getCity()->getName();
