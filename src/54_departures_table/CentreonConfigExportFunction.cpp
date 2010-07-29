@@ -34,7 +34,7 @@
 #include "User.h"
 #include "UserTableSync.h"
 #include "SecurityModule.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ProfileTableSync.h"
 #include "DisplayMaintenanceRight.h"
 #include "Interface.h"

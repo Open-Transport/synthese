@@ -31,7 +31,7 @@
 #include "LineStop.h"
 #include "Registry.h"
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 
 
 struct XMLNode;
@@ -119,7 +119,7 @@ class XmlBuilder
 	 static boost::shared_ptr<geography::City> CreateCity (XMLNode& node);
 
     
-	 static boost::shared_ptr<PublicTransportStopZoneConnectionPlace> CreateConnectionPlace(
+	 static boost::shared_ptr<StopArea> CreateConnectionPlace(
 		 XMLNode& node, 
 		 const util::Registry<geography::City>& cities);
 
@@ -133,7 +133,7 @@ class XmlBuilder
 		 const util::Registry<pt::PhysicalStop>& physicalStops);
 
 	 static boost::shared_ptr<pt::PhysicalStop> CreatePhysicalStop (XMLNode& node, 
-		 const util::Registry<PublicTransportStopZoneConnectionPlace>& connectionPlaces
+		 const util::Registry<StopArea>& connectionPlaces
 	);
     
 	 static geometry::Point2D CreatePoint (XMLNode& node);

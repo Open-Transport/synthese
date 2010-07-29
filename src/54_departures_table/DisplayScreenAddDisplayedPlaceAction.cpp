@@ -91,8 +91,8 @@ namespace synthese
 					}
 
 					const string place(map.get<string>(PARAMETER_PLACE_NAME));
-					vector<const PublicTransportStopZoneConnectionPlace*> stops(
-						cities.front()->search<PublicTransportStopZoneConnectionPlace>(place, 1)
+					vector<const StopArea*> stops(
+						cities.front()->search<StopArea>(place, 1)
 					);
 					if(stops.empty())
 					{

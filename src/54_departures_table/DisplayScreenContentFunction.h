@@ -124,7 +124,7 @@ namespace synthese
 			</ul>
 		*/
 		class DisplayScreenContentFunction:
-			public util::FactorableTemplate<transportwebsite::FunctionWithSite<false>,DisplayScreenContentFunction>
+			public util::FactorableTemplate<cms::FunctionWithSite<false>,DisplayScreenContentFunction>
 		{
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_TB;

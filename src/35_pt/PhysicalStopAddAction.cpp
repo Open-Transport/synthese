@@ -28,7 +28,7 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "PhysicalStopTableSync.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ConnectionPlaceTableSync.h"
 
 using namespace std;
@@ -76,7 +76,7 @@ namespace synthese
 			{
 				_place = ConnectionPlaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
+			catch(ObjectNotFoundException<StopArea>&)
 			{
 				throw ActionException("No such connection place");
 			}

@@ -256,7 +256,7 @@ namespace synthese
 			///
 			/// The Trident file import loads the following objects :
 			///	<ul>
-			///		<li>Commercial stop points (PublicTransportStopZoneConnectionPlace) : city, name, specific transfer delays (only if stop import mode)</li>
+			///		<li>Commercial stop points (StopArea) : city, name, specific transfer delays (only if stop import mode)</li>
 			///		<li>Physical stop points (PhysicalStop) : commercial stop point (only at physical stop creation), x, y, name (only if stop import mode)</li>
 			///		<li>Scheduled services (ScheduledService) : all. Not imported if the service runs never.
 			/// </ul>

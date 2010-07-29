@@ -33,7 +33,7 @@
 #include "ServicePointer.h"
 #include "Registry.h"
 #include "Journey.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 
 namespace synthese
 {
@@ -60,9 +60,9 @@ namespace synthese
 		WITH_OR_WITHOUT_ANY_BROADCASTPOINT
 		} BroadcastPointsPresence;
 
-	typedef std::map<boost::optional<util::RegistryKeyType>, const pt::PublicTransportStopZoneConnectionPlace*> DisplayedPlacesList;
+	typedef std::map<boost::optional<util::RegistryKeyType>, const pt::StopArea*> DisplayedPlacesList;
 	typedef std::map<util::RegistryKeyType,const pt::Line*> LineFilter;
-	typedef std::map<boost::optional<util::RegistryKeyType>,const pt::PublicTransportStopZoneConnectionPlace*> ForbiddenPlacesList;
+	typedef std::map<boost::optional<util::RegistryKeyType>,const pt::StopArea*> ForbiddenPlacesList;
 	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;
 	typedef enum { ENDS_ONLY = 1, WITH_PASSING = 0 } EndFilter;
 	
@@ -90,18 +90,18 @@ namespace synthese
 	};
 
 	typedef std::map<
-		const pt::PublicTransportStopZoneConnectionPlace*,
-		std::set<const pt::PublicTransportStopZoneConnectionPlace*>
+		const pt::StopArea*,
+		std::set<const pt::StopArea*>
 	> TransferDestinationsList;
 	
 	struct IntermediateStop
 	{
 		typedef std::set<graph::ServicePointer, DeparturesTableServiceUseElementLess> TransferDestinations;
-		const pt::PublicTransportStopZoneConnectionPlace* place;
+		const pt::StopArea* place;
 		graph::ServicePointer serviceUse;
 		TransferDestinations transferDestinations;
-		IntermediateStop(const pt::PublicTransportStopZoneConnectionPlace* _place) : place(_place), serviceUse(), transferDestinations() {}
-		IntermediateStop(const pt::PublicTransportStopZoneConnectionPlace* _place, const graph::ServicePointer& _serviceUse, const TransferDestinations& _transferDestinations) : place(_place), serviceUse(_serviceUse), transferDestinations(_transferDestinations) {}
+		IntermediateStop(const pt::StopArea* _place) : place(_place), serviceUse(), transferDestinations() {}
+		IntermediateStop(const pt::StopArea* _place, const graph::ServicePointer& _serviceUse, const TransferDestinations& _transferDestinations) : place(_place), serviceUse(_serviceUse), transferDestinations(_transferDestinations) {}
 	};
 
 	typedef std::vector<IntermediateStop> ActualDisplayedArrivalsList;
@@ -120,14 +120,14 @@ namespace synthese
 		const messages::Alarm* alarm;
 	};
 
-	struct RoutePlanningListElementLess : public std::binary_function<pt::PublicTransportStopZoneConnectionPlace*, pt::PublicTransportStopZoneConnectionPlace*, bool>
+	struct RoutePlanningListElementLess : public std::binary_function<pt::StopArea*, pt::StopArea*, bool>
 	{
-		bool operator()(const pt::PublicTransportStopZoneConnectionPlace* _Left, const pt::PublicTransportStopZoneConnectionPlace* _Right) const
+		bool operator()(const pt::StopArea* _Left, const pt::StopArea* _Right) const
 		{
 			return _Left->getFullName() < _Right->getFullName();
 		}
 	};
-	typedef std::map<const pt::PublicTransportStopZoneConnectionPlace*, graph::Journey, RoutePlanningListElementLess> RoutePlanningList;
+	typedef std::map<const pt::StopArea*, graph::Journey, RoutePlanningListElementLess> RoutePlanningList;
 	typedef RoutePlanningList::value_type RoutePlanningRow;
 	struct RoutePlanningListWithAlarm { RoutePlanningList map; const messages::Alarm* alarm; };
 

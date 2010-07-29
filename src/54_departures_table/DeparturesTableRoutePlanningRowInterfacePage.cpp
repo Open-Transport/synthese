@@ -98,7 +98,7 @@ namespace synthese
 			bool displayServiceNumber ,
 			int blinkingDelay,
 			bool withTransfer,
-			const pt::PublicTransportStopZoneConnectionPlace& origin,
+			const pt::StopArea& origin,
 			const RoutePlanningRow& row ,
 			const server::Request* request /*= NULL */
 		) const	{
@@ -180,7 +180,7 @@ namespace synthese
 			if(row.second.getServiceUses().size() > 1)
 			{
 				const ServicePointer& s(row.second.getLastJourneyLeg());
-				const PublicTransportStopZoneConnectionPlace* p(static_cast<const PublicTransportStopZoneConnectionPlace*>(s.getDepartureEdge()->getFromVertex()->getHub()));
+				const StopArea* p(static_cast<const StopArea*>(s.getDepartureEdge()->getFromVertex()->getHub()));
 				v.push_back(p->getCity()->getName());
 				v.push_back(lexical_cast<string>(p->getCity()->getKey() != origin.getCity()->getKey()));
 				v.push_back(p->getName());

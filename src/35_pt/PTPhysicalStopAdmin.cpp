@@ -31,7 +31,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "PhysicalStop.h"
 #include "PhysicalStopUpdateAction.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "PTPlaceAdmin.h"
 
 #include <boost/lexical_cast.hpp>

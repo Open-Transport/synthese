@@ -120,7 +120,7 @@ namespace synthese
 				_place = ConnectionPlaceTableSync::Get(id, *_env);
 
 			}
-			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
+			catch (ObjectNotFoundException<StopArea>&)
 			{
 				throw ActionException("Specified place not found");
 			}

@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 	}
 
 	namespace departurestable
@@ -52,8 +52,8 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<DisplayScreen> _screen;
-			boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> _transferPlace;
-			boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> _destinationPlace;
+			boost::shared_ptr<const pt::StopArea> _transferPlace;
+			boost::shared_ptr<const pt::StopArea> _destinationPlace;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -76,8 +76,8 @@ namespace synthese
 			virtual bool isAuthorized(const server::Session* session) const;
 
 			void setScreen(boost::shared_ptr<const DisplayScreen> value);
-			void setTransferPlace(boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> value);
-			void setDestinationPlace(boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> value);
+			void setTransferPlace(boost::shared_ptr<const pt::StopArea> value);
+			void setDestinationPlace(boost::shared_ptr<const pt::StopArea> value);
 		};
 	}
 }

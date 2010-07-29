@@ -35,7 +35,7 @@ namespace synthese
 	namespace pt
 	{
 		class LineStop;
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 		class Line;
 	}
 

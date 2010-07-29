@@ -113,7 +113,7 @@ namespace synthese
 						object->setHub(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
 						
 						// Links to the object
-						PublicTransportStopZoneConnectionPlace* place(ConnectionPlaceTableSync::GetEditable(placeId, env, linkLevel).get());
+						StopArea* place(ConnectionPlaceTableSync::GetEditable(placeId, env, linkLevel).get());
 				
 						place->addAddress(object);
 					}
@@ -150,7 +150,7 @@ namespace synthese
 						object->setDataSource(DataSourceTableSync::Get(sourceId, env, linkLevel).get());
 					}
 				}
-				catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+				catch (ObjectNotFoundException<StopArea>& e)
 				{
 					throw LinkException<AddressTableSync>(rows, AddressTableSync::COL_PLACEID, e);
 				}

@@ -79,7 +79,7 @@ namespace synthese
 		}
 
 		RoutePlanningTableGenerator::RoutePlanningTableGenerator(
-			const PublicTransportStopZoneConnectionPlace& origin,
+			const StopArea& origin,
 			const DisplayedPlacesList& destinations,
 			const ptime& startDateTime,
 			const ptime& endDateTime,

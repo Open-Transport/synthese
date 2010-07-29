@@ -27,7 +27,7 @@
 #include "DisplayScreenTransferDestinationRemoveAction.h"
 #include "ArrivalDepartureTableRight.h"
 #include "Request.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ConnectionPlaceTableSync.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
@@ -83,7 +83,7 @@ namespace synthese
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+			catch(ObjectNotFoundException<StopArea>& e)
 			{
 				throw ActionException("Transfer place not found");
 			}
@@ -134,14 +134,14 @@ namespace synthese
 
 
 
-		void DisplayScreenTransferDestinationRemoveAction::setTransferPlace( boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> value )
+		void DisplayScreenTransferDestinationRemoveAction::setTransferPlace( boost::shared_ptr<const pt::StopArea> value )
 		{
 			_transferPlace = value;
 		}
 
 
 
-		void DisplayScreenTransferDestinationRemoveAction::setDestinationPlace( boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> value )
+		void DisplayScreenTransferDestinationRemoveAction::setDestinationPlace( boost::shared_ptr<const pt::StopArea> value )
 		{
 			_destinationPlace = value;
 		}

@@ -27,7 +27,7 @@
 #include "HTMLList.h"
 #include "PropertiesHTMLTable.h"
 #include "ConnectionPlaceTableSync.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "PhysicalStop.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
@@ -148,7 +148,7 @@ namespace synthese
 			{
 				throw AdminParametersException("Display screen not found");
 			}
-			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+			catch (ObjectNotFoundException<StopArea>& e)
 			{
 				throw AdminParametersException("Place not found");
 			}

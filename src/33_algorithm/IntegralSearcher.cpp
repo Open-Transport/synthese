@@ -31,7 +31,7 @@
 #include "Hub.h"
 #include "RoutePlanningIntermediateJourney.hpp"
 #include "JourneyTemplates.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 // To be removed by a log class
 #include "LineStop.h"
 #include "Road.h"

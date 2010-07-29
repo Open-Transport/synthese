@@ -29,7 +29,7 @@
 #include "ActionResultHTMLTable.h"
 #include "HTMLModule.h"
 #include "CalendarModule.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "City.h"
 #include "Calendar.h"
 #include "Line.h"
@@ -351,8 +351,8 @@ namespace synthese
 						lastRank = row->getRank();
 						deleteRowRequest.getAction()->setElement(const_pointer_cast<const TimetableRow>(row));
 
-						const PublicTransportStopZoneConnectionPlace& place(*Env::GetOfficialEnv().get<PublicTransportStopZoneConnectionPlace>(row->getPlace()->getKey()));
-						BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& stop, place.getPhysicalStops())
+						const StopArea& place(*Env::GetOfficialEnv().get<StopArea>(row->getPlace()->getKey()));
+						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& stop, place.getPhysicalStops())
 						{
 							BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop.second->getDepartureEdges())
 							{

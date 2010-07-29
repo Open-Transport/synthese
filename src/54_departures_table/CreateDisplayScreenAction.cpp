@@ -29,7 +29,7 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "Request.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ConnectionPlaceTableSync.h"
 #include "Conversion.h"
 #include "DisplayScreenCPU.h"

@@ -28,7 +28,7 @@
 #include "LineStop.h"
 #include "Road.h"
 #include "City.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "CommercialLine.h"
 #include "RoadPlace.h"
 #include "Line.h"
@@ -174,7 +174,7 @@ namespace synthese
 					if(dynamic_cast<const City*>(_departurePlace))
 					{
 						stream << "départ de " << 
-							static_cast<const PublicTransportStopZoneConnectionPlace*>(
+							static_cast<const StopArea*>(
 								its->getDepartureEdge()->getHub()
 							)->getFullName()
 						;
@@ -184,7 +184,7 @@ namespace synthese
 						if(dynamic_cast<const City*>(_departurePlace)) stream << " - ";
 						Journey::ServiceUses::const_iterator ite(it->getServiceUses().end() - 1);
 						stream << "arrivée à " << 
-							static_cast<const PublicTransportStopZoneConnectionPlace*>(
+							static_cast<const StopArea*>(
 								ite->getArrivalEdge()->getHub()
 							)->getFullName()
 						;
@@ -216,10 +216,10 @@ namespace synthese
 
 						// Place
 						stream << t.col();
-						if(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(its->getArrivalEdge()->getHub()))
+						if(dynamic_cast<const StopArea*>(its->getArrivalEdge()->getHub()))
 						{
 							stream <<
-								static_cast<const PublicTransportStopZoneConnectionPlace*>(
+								static_cast<const StopArea*>(
 									its->getArrivalEdge()->getHub()
 								)->getFullName();
 						}

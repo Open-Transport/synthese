@@ -24,7 +24,7 @@
 #include "DataSource.h"
 #include "PhysicalStop.h"
 #include "PhysicalStopTableSync.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ConnectionPlaceTableSync.h"
 #include "City.h"
 #include "CityTableSync.h"

@@ -26,7 +26,7 @@
 #include "Request.h"
 #include "TransportNetworkRight.h"
 #include "RealTimeUpdateFunction.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "LineStop.h"
 #include "ScheduledService.h"
 #include "RealTimeUpdateScreenServiceInterfacePage.h"

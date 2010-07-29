@@ -38,7 +38,7 @@
 #include "PTPhysicalStopAdmin.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "StopAreaAddAction.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "PhysicalStop.h"
 #include "DataSourceTableSync.h"
 #include "ImportFunction.h"

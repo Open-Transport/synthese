@@ -24,7 +24,7 @@
 #include "JunctionStop.hpp"
 #include "PermanentService.h"
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 
 using namespace boost;
 using namespace boost::posix_time;

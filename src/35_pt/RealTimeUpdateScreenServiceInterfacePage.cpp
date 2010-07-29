@@ -26,7 +26,7 @@
 #include "ScheduledService.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "Line.h"
 #include "CommercialLine.h"
 #include "RollingStock.h"

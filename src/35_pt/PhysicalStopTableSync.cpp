@@ -86,7 +86,7 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				PublicTransportStopZoneConnectionPlace* place = ConnectionPlaceTableSync::GetEditable(rows->getLongLong (PhysicalStopTableSync::COL_PLACEID), env, linkLevel).get();
+				StopArea* place = ConnectionPlaceTableSync::GetEditable(rows->getLongLong (PhysicalStopTableSync::COL_PLACEID), env, linkLevel).get();
 				object->setHub(place);
 
 				place->addPhysicalStop(*object);
@@ -98,7 +98,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<PhysicalStopTableSync,PhysicalStop>::Unlink(
 			PhysicalStop* obj
 		){
-//			PublicTransportStopZoneConnectionPlace* place = const_cast<PublicTransportStopZoneConnectionPlace*>(obj->getConnectionPlace());
+//			StopArea* place = const_cast<StopArea*>(obj->getConnectionPlace());
 /// @todo	place->removePhysicalStop(obj);
 
 			obj->setHub(NULL);
@@ -112,7 +112,7 @@ namespace synthese
 		){
 			ReplaceQuery<PhysicalStopTableSync> query(*object);
 			query.addField(object->getName());
-			query.addField(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(object->getHub()) ? dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(object->getHub())->getKey() : RegistryKeyType(0));
+			query.addField(dynamic_cast<const StopArea*>(object->getHub()) ? dynamic_cast<const StopArea*>(object->getHub())->getKey() : RegistryKeyType(0));
 			query.addField(object->getX());
 			query.addField(object->getY());
 			query.addField(object->getCodeBySource());

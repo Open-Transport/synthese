@@ -27,7 +27,7 @@
 #include "GraphConstants.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ConnectionPlaceTableSync.h"
 #include "PhysicalStop.h"
 #include "PhysicalStopTableSync.h"
@@ -320,17 +320,17 @@ namespace synthese
 		    
 			// --------------------------------------------------- StopArea (type = CommercialStopPoint)
 			BOOST_FOREACH(
-				Registry<PublicTransportStopZoneConnectionPlace>::value_type itcp,
-				_env->getRegistry<PublicTransportStopZoneConnectionPlace>()
+				Registry<StopArea>::value_type itcp,
+				_env->getRegistry<StopArea>()
 			){
-				const PublicTransportStopZoneConnectionPlace* cp(itcp.second.get());
+				const StopArea* cp(itcp.second.get());
 				os << "<StopArea>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "StopArea", *cp) << "</objectId>" << "\n";
 				os << "<name>" << cp->getName () << "</name>" << "\n";
 
 				// Contained physical stops
-				const PublicTransportStopZoneConnectionPlace::PhysicalStops& stops(cp->getPhysicalStops());
-				for(PublicTransportStopZoneConnectionPlace::PhysicalStops::const_iterator it(stops.begin()); it != stops.end(); ++it)
+				const StopArea::PhysicalStops& stops(cp->getPhysicalStops());
+				for(StopArea::PhysicalStops::const_iterator it(stops.begin()); it != stops.end(); ++it)
 				{
 					os << "<contains>" << TridentId (peerid, "StopArea", *it->second)  << "</contains>" << "\n";
 				}
@@ -386,17 +386,17 @@ namespace synthese
 
 			// --------------------------------------------------- ConnectionLink
 			BOOST_FOREACH(
-				Registry<PublicTransportStopZoneConnectionPlace>::value_type itcp,
-				_env->getRegistry<PublicTransportStopZoneConnectionPlace>()
+				Registry<StopArea>::value_type itcp,
+				_env->getRegistry<StopArea>()
 			){
-				const PublicTransportStopZoneConnectionPlace& cp(*itcp.second);
+				const StopArea& cp(*itcp.second);
 				if(!cp.isConnectionPossible()) continue;
 				
 				// Contained physical stops
-				const PublicTransportStopZoneConnectionPlace::PhysicalStops& stops(cp.getPhysicalStops());
-				BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& it1, stops)
+				const StopArea::PhysicalStops& stops(cp.getPhysicalStops());
+				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it1, stops)
 				{
-					BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& it2, stops)
+					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it2, stops)
 					{
 						if(!cp.isConnectionAllowed(*it1.second, *it2.second))
 							continue;
@@ -920,10 +920,10 @@ namespace synthese
 					ConnectionPlaceTableSync::SearchResult places(
 						ConnectionPlaceTableSync::Search(senv, city->getKey(), true)
 					);
-					BOOST_FOREACH(shared_ptr<const PublicTransportStopZoneConnectionPlace> cp, places)
+					BOOST_FOREACH(shared_ptr<const StopArea> cp, places)
 					{
 						// filter physical stops not concerned by this line.
-						if(!_env->getRegistry<PublicTransportStopZoneConnectionPlace>().contains(cp->getKey())) continue;
+						if(!_env->getRegistry<StopArea>().contains(cp->getKey())) continue;
 
 						containedStopAreas.push_back (TridentId (peerid, "StopArea", *cp));
 
@@ -1100,7 +1100,7 @@ namespace synthese
 
 
 			// Commercial stops
-			map<string, PublicTransportStopZoneConnectionPlace*> commercialStopsByPhysicalStop;
+			map<string, StopArea*> commercialStopsByPhysicalStop;
 			if(_importStops)
 			{
 				XMLNode chouetteAreaNode(allNode.getChildNode("ChouetteArea"));
@@ -1158,7 +1158,7 @@ namespace synthese
 					}
 
 					// Search of an existing connection place with the same code
-					shared_ptr<PublicTransportStopZoneConnectionPlace> curStop;
+					shared_ptr<StopArea> curStop;
 					ConnectionPlaceTableSync::SearchResult cstops(
 						ConnectionPlaceTableSync::Search(
 							*_env,
@@ -1201,12 +1201,12 @@ namespace synthese
 						else
 						{
 							// Commercial stop point creation with some default values
-							curStop.reset(new PublicTransportStopZoneConnectionPlace);
+							curStop.reset(new StopArea);
 							curStop->setCodeBySource(stopKey);
 							curStop->setAllowedConnection(true);
 							curStop->setDefaultTransferDelay(_defaultTransferDuration);
 							curStop->setKey(ConnectionPlaceTableSync::getId());
-							_env->getEditableRegistry<PublicTransportStopZoneConnectionPlace>().add(curStop);
+							_env->getEditableRegistry<StopArea>().add(curStop);
 
 							os << "CREA : Creation of the commercial stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
 
@@ -1268,7 +1268,7 @@ namespace synthese
 				if(pstops.empty())
 				{
 					// Stop creation
-					map<string,PublicTransportStopZoneConnectionPlace*>::const_iterator itcstop(commercialStopsByPhysicalStop.find(stopKey));
+					map<string,StopArea*>::const_iterator itcstop(commercialStopsByPhysicalStop.find(stopKey));
 					if(itcstop == commercialStopsByPhysicalStop.end())
 					{
 						os << "ERR  : stop " << stopKey << " not found in any commercia stop (" << nameNode.getText() << ")<br />";
@@ -1657,7 +1657,7 @@ namespace synthese
 							continue;
 						}
 
-						const_cast<PublicTransportStopZoneConnectionPlace*>(startStop->getConnectionPlace())->addTransferDelay(
+						const_cast<StopArea*>(startStop->getConnectionPlace())->addTransferDelay(
 							startStop->getKey(),
 							endStop->getKey(),
 							FromXsdDuration(durationNode.getText())
@@ -1706,7 +1706,7 @@ namespace synthese
 			// Saving of each created or altered objects
 			if(_importStops)
 			{
-				BOOST_FOREACH(Registry<PublicTransportStopZoneConnectionPlace>::value_type cstop, _env->getRegistry<PublicTransportStopZoneConnectionPlace>())
+				BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env->getRegistry<StopArea>())
 				{
 					ConnectionPlaceTableSync::Save(cstop.second.get(), transaction);
 				}

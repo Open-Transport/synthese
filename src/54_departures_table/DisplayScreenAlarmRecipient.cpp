@@ -43,7 +43,7 @@
 #include "Profile.h"
 
 // transport
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "Line.h"
 #include "LineTableSync.h"
 #include "PTModule.h"

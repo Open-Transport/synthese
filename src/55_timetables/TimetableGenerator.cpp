@@ -25,7 +25,7 @@
 #include "LineStop.h"
 #include "PhysicalStop.h"
 #include "SchedulesBasedService.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "Env.h"
 #include "CalendarModule.h"
 #include "SubLine.h"
@@ -200,7 +200,7 @@ namespace synthese
 				for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
 				{
 					if(	(*itEdge)->isDeparture() &&
-						dynamic_cast<const PublicTransportStopZoneConnectionPlace*>((*itEdge)->getHub())->getKey() == itRow->getPlace()->getKey() &&
+						dynamic_cast<const StopArea*>((*itEdge)->getHub())->getKey() == itRow->getPlace()->getKey() &&
 						(	_authorizedPhysicalStops.empty() ||
 							_authorizedPhysicalStops.find(dynamic_cast<const PhysicalStop*>((*itEdge)->getFromVertex())) != _authorizedPhysicalStops.end()
 						)	
@@ -240,7 +240,7 @@ namespace synthese
 							arrivalLinestop != NULL;
 							arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
 						){
-							if(	dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(arrivalLinestop->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
+							if(	dynamic_cast<const StopArea*>(arrivalLinestop->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
 							){
 								lineIsSelected = true;
 								break;

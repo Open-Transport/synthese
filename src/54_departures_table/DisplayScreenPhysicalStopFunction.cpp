@@ -23,7 +23,7 @@
 */
 
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "Interface.h"
 #include "RequestException.h"
 #include "Request.h"
@@ -63,8 +63,8 @@ namespace synthese
 		void DisplayScreenPhysicalStopFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			string oc(map.get<string>(PARAMETER_OPERATOR_CODE));
-			shared_ptr<const PublicTransportStopZoneConnectionPlace> place(
-				Env::GetOfficialEnv().get<PublicTransportStopZoneConnectionPlace>(
+			shared_ptr<const StopArea> place(
+				Env::GetOfficialEnv().get<StopArea>(
 					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
 			)	);
 

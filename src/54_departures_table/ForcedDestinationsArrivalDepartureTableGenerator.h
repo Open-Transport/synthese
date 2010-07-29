@@ -31,7 +31,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 	}
 
 	namespace departurestable
@@ -45,7 +45,7 @@ namespace synthese
 		:	public ArrivalDepartureTableGenerator
 		{
 		public:
-			typedef std::map<boost::optional<util::RegistryKeyType>, const pt::PublicTransportStopZoneConnectionPlace*> ForcedDestinationsSet;
+			typedef std::map<boost::optional<util::RegistryKeyType>, const pt::StopArea*> ForcedDestinationsSet;
 
 		private:
 

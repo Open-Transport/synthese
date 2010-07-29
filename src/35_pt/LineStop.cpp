@@ -27,7 +27,7 @@
 #include "Service.h"
 #include "ContinuousService.h"
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 
 using namespace std;
 

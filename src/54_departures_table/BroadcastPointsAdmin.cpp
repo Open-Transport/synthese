@@ -30,7 +30,7 @@
 #include "ResultHTMLTable.h"
 #include "ConnectionPlaceTableSync.h"
 #include "City.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "PTModule.h"
 #include "StaticFunctionRequest.h"
 #include "Session.h"

@@ -88,7 +88,7 @@
 
 #include "Line.h"
 #include "LineStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ReservationContact.h"
 #include "CommercialLine.h"
 #include "TransportNetwork.h"

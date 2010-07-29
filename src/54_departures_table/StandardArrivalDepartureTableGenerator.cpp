@@ -21,7 +21,7 @@
 */
 
 #include "LineStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "PhysicalStop.h"
 #include "StandardArrivalDepartureTableGenerator.h"
 #include "GraphConstants.h"
@@ -64,7 +64,7 @@ namespace synthese
 		{
 			if(_physicalStops.empty()) return _result;
 
-			const PublicTransportStopZoneConnectionPlace::PhysicalStops& physicalStops(_physicalStops.begin()->second->getConnectionPlace()->getPhysicalStops());
+			const StopArea::PhysicalStops& physicalStops(_physicalStops.begin()->second->getConnectionPlace()->getPhysicalStops());
 
 			BOOST_FOREACH(PhysicalStops::value_type it, physicalStops)
 			{

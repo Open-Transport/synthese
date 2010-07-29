@@ -35,7 +35,7 @@ namespace synthese
 		class TransportNetwork;
 		class CommercialLine;
 		class Line;
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	35.15 Function : PTObjectInformationFunction.
@@ -93,7 +93,7 @@ namespace synthese
 				boost::shared_ptr<const TransportNetwork> _network;
 				boost::shared_ptr<const CommercialLine> _line;
 				boost::shared_ptr<const Line> _route;
-				boost::shared_ptr<const PublicTransportStopZoneConnectionPlace> _stop;
+				boost::shared_ptr<const StopArea> _stop;
 			//@}
 			
 			

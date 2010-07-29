@@ -38,7 +38,7 @@ namespace synthese
 	namespace pt
 	{
 		class Line;
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 
 		/** Association class between line and physical stop.
 			The linestop is the implementation of the edge of a transport line.

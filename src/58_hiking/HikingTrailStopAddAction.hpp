@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 	}
 
 	namespace hiking
@@ -66,7 +66,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<HikingTrail> _trail;
-			boost::shared_ptr<pt::PublicTransportStopZoneConnectionPlace> _stop;
+			boost::shared_ptr<pt::StopArea> _stop;
 			boost::optional<std::size_t> _rank;
 
 		protected:

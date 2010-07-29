@@ -29,7 +29,7 @@
 #include "ValueElementList.h"
 #include "InterfacePageException.h"
 #include "City.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "DeparturesTableTypes.h"
 #include "DeparturesTableDestinationContentInterfaceElement.h"
 #include "DepartureTableRowInterfacePage.h"
@@ -105,7 +105,7 @@ namespace synthese
 				)	continue;
 
 				// Place
-				const PublicTransportStopZoneConnectionPlace* place(__DP->second.at(i).place);
+				const StopArea* place(__DP->second.at(i).place);
 
 				if (i > firstIntermediatesStops)
 					stream << __SeparateurEntreArrets;

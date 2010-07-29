@@ -31,7 +31,7 @@
 #include "DisplayScreenTableSync.h"
 #include "GeographyModule.h"
 #include "ArrivalDepartureTableLog.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ConnectionPlaceTableSync.h"
 
 using namespace std;
@@ -87,7 +87,7 @@ namespace synthese
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+			catch(ObjectNotFoundException<StopArea>& e)
 			{
 				throw ActionException("Transfer place not found");
 			}
@@ -101,8 +101,8 @@ namespace synthese
 			}
 
 			const string place(map.get<string>(PARAMETER_DESTINATION_PLACE_NAME));
-			vector<const PublicTransportStopZoneConnectionPlace*> stops(
-				cities.front()->search<PublicTransportStopZoneConnectionPlace>(place, 1)
+			vector<const StopArea*> stops(
+				cities.front()->search<StopArea>(place, 1)
 			);
 			if(stops.empty())
 			{

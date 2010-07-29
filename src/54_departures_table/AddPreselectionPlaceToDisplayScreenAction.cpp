@@ -80,7 +80,7 @@ namespace synthese
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+			catch (ObjectNotFoundException<StopArea>& e)
 			{
 				throw ActionException("Specified place not found");
 			}

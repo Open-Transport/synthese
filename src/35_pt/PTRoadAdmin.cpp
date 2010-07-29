@@ -32,7 +32,7 @@
 #include "ResultHTMLTable.h"
 #include "Crossing.h"
 #include "PublicPlace.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "Edge.h"
 #include "Vertex.h"
 #include "City.h"
@@ -164,16 +164,16 @@ namespace synthese
 						stream << t.col(2);
 						stream << "Intersection de routes";
 					}
-					else if(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(place))
+					else if(dynamic_cast<const StopArea*>(place))
 					{
 						openPlaceRequest.getPage()->setConnectionPlace(
-							Env::GetOfficialEnv().getSPtr(static_cast<const PublicTransportStopZoneConnectionPlace*>(place))
+							Env::GetOfficialEnv().getSPtr(static_cast<const StopArea*>(place))
 						);
 
 						stream << t.col();
 						stream << "Zone d'arrêt";
 						stream << t.col();
-						stream << HTMLModule::getHTMLLink(openPlaceRequest.getURL(), static_cast<const PublicTransportStopZoneConnectionPlace*>(place)->getName());
+						stream << HTMLModule::getHTMLLink(openPlaceRequest.getURL(), static_cast<const StopArea*>(place)->getName());
 					}
 					else if(dynamic_cast<const PublicPlace*>(place))
 					{

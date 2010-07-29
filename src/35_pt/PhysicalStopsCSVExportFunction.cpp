@@ -26,7 +26,7 @@
 #include "Request.h"
 #include "PhysicalStopsCSVExportFunction.h"
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "City.h"
 
 #include <sstream>

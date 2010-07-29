@@ -21,7 +21,7 @@
 */
 
 #include "DeparturesTableRoutePlanningInterfacePage.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -61,7 +61,7 @@ namespace synthese
 			bool withTransfer,
 			int blinkingDelay,
 			bool displayClock,
-			const pt::PublicTransportStopZoneConnectionPlace& place,
+			const pt::StopArea& place,
 			const RoutePlanningListWithAlarm& rows ,
 			const server::Request* request /*= NULL */ 
 		) const	{

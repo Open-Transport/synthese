@@ -25,7 +25,7 @@
 #include "Line.h"
 #include "CommercialLine.h"
 #include "ServicePointer.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "AccessParameters.h"
 
 using namespace boost;
@@ -130,7 +130,7 @@ namespace synthese
 				{
 					const Edge* departureEdge(servicePointer.getDepartureEdge());
 					if(static_cast<const Line*>(departureEdge->getParentPath())->getCommercialLine()->isOptionalReservationPlace(
-						static_cast<const PublicTransportStopZoneConnectionPlace*>(departureEdge->getHub())
+						static_cast<const StopArea*>(departureEdge->getHub())
 					)){
 						return RUN_POSSIBLE;
 					}
@@ -205,7 +205,7 @@ namespace synthese
 					const Edge* departureEdge(servicePointer.getDepartureEdge());
 					ptime reservationTime(second_clock::local_time());
 					if(static_cast<const Line*>(departureEdge->getParentPath())->getCommercialLine()->isOptionalReservationPlace(
-						static_cast<const PublicTransportStopZoneConnectionPlace*>(departureEdge->getHub())
+						static_cast<const StopArea*>(departureEdge->getHub())
 					)){
 						if(	reservationTime < getReservationOpeningTime(servicePointer)
 						){

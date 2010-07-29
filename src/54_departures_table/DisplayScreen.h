@@ -46,7 +46,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 		class Line;
 	}
 
@@ -98,7 +98,7 @@ namespace synthese
 		protected:
 			//! \name Technical data
 			//@{
-				const pt::PublicTransportStopZoneConnectionPlace*	_localization;		//!< Localization of the display screen (belongs to a place)
+				const pt::StopArea*	_localization;		//!< Localization of the display screen (belongs to a place)
 				std::string											_localizationComment;
 				const DisplayType*									_displayType;
 				int													_wiringCode;	// Display ID in a bus
@@ -169,7 +169,7 @@ namespace synthese
 				void	setDirection(DeparturesTableDirection direction);
 				void	setFirstRow(int row);
 				void	setGenerationMethod(GenerationMethod method);
-				void	setLocalization(const pt::PublicTransportStopZoneConnectionPlace*);
+				void	setLocalization(const pt::StopArea*);
 				void	setLocalizationComment(const std::string&);
 				void	setMaintenanceIsOnline(bool value);
 				void	setMaintenanceMessage(const std::string& message);
@@ -190,18 +190,18 @@ namespace synthese
 
 			//! \name Modifiers
 			//@{
-				void	addDisplayedPlace(const pt::PublicTransportStopZoneConnectionPlace*);
-				void	addForbiddenPlace(const pt::PublicTransportStopZoneConnectionPlace*);
-				void	addForcedDestination(const pt::PublicTransportStopZoneConnectionPlace*);
+				void	addDisplayedPlace(const pt::StopArea*);
+				void	addForbiddenPlace(const pt::StopArea*);
+				void	addForcedDestination(const pt::StopArea*);
 				void	addPhysicalStop(const pt::PhysicalStop*);
 				void	clearDisplayedPlaces();
 				void	clearForbiddenPlaces();
 				void	clearForcedDestinations();
 				void	clearPhysicalStops();
 				void	copy(const DisplayScreen*);
-				void	removeDisplayedPlace(const pt::PublicTransportStopZoneConnectionPlace*);
-				void	removeForbiddenPlace(const pt::PublicTransportStopZoneConnectionPlace*);
-				void	removeForcedDestination(const pt::PublicTransportStopZoneConnectionPlace*);
+				void	removeDisplayedPlace(const pt::StopArea*);
+				void	removeForbiddenPlace(const pt::StopArea*);
+				void	removeForcedDestination(const pt::StopArea*);
 				void	removePhysicalStop(const pt::PhysicalStop*);
 				
 				//////////////////////////////////////////////////////////////////////////
@@ -231,7 +231,7 @@ namespace synthese
 
 			//!	\name Getters
 			//@{
-				const pt::PublicTransportStopZoneConnectionPlace*	getLocalization()	const;
+				const pt::StopArea*	getLocalization()	const;
 				const std::string&				getLocalizationComment()		const;
 				const DisplayType*				getType()						const;				
 				int								getWiringCode()					const;

@@ -33,7 +33,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 	}
 
 	namespace hiking
@@ -50,7 +50,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<HikingTrail>	Registry;
 
-			typedef std::vector<pt::PublicTransportStopZoneConnectionPlace*> Stops;
+			typedef std::vector<pt::StopArea*> Stops;
 
 		private:
 			std::string _map;

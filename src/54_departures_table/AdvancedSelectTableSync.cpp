@@ -28,7 +28,7 @@
 #include "CommercialLineTableSync.h"
 #include "LineStopTableSync.h"
 #include "LineTableSync.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "CommercialLine.h"
 #include "AdvancedSelectTableSync.h"
 #include "DisplayScreenTableSync.h"
@@ -137,7 +137,7 @@ namespace synthese
 					shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
 					object->broadCastPointsNumber = rows->getInt ("bc");
 					object->cpuNumber = rows->getInt("cc");
-					object->place.reset(new PublicTransportStopZoneConnectionPlace(rows->getKey()));
+					object->place.reset(new StopArea(rows->getKey()));
 					ConnectionPlaceTableSync::Load(object->place.get(), rows, env);
 					object->cityName = rows->getText ("city_name");
 					objects.push_back(object);

@@ -28,7 +28,7 @@
 #include "HikingRight.h"
 #include "Request.h"
 #include "HikingTrailTableSync.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "City.h"
 #include "GeographyModule.h"
 #include "ConnectionPlaceTableSync.h"
@@ -95,8 +95,8 @@ namespace synthese
 			}
 
 			const string place(map.get<string>(PARAMETER_NAME));
-			vector<const PublicTransportStopZoneConnectionPlace*> stops(
-				cities.front()->search<PublicTransportStopZoneConnectionPlace>(place, 1)
+			vector<const StopArea*> stops(
+				cities.front()->search<StopArea>(place, 1)
 			);
 			if(stops.empty())
 			{

@@ -21,7 +21,7 @@
 */
 
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "LineStop.h"
 #include "Line.h"
 #include "ForcedDestinationsArrivalDepartureTableGenerator.h"
@@ -84,7 +84,7 @@ namespace synthese
 					if (!_allowedLineStop(ls))
 						continue;
 
-					const PublicTransportStopZoneConnectionPlace* place(
+					const StopArea* place(
 						ls->getLine()->getDestination()->getConnectionPlace()
 					);
 					_forcedDestinations.insert(make_pair(place->getKey(), place));
@@ -100,10 +100,10 @@ namespace synthese
 			if(_physicalStops.empty()) return _result;
 
 			/** - Search of best departure for each forced destination */
-			typedef map<const PublicTransportStopZoneConnectionPlace*, ArrivalDepartureList::iterator> ReachedDestinationMap;
+			typedef map<const StopArea*, ArrivalDepartureList::iterator> ReachedDestinationMap;
 			ReachedDestinationMap reachedDestination;
 
-			const PublicTransportStopZoneConnectionPlace::PhysicalStops& physicalStops(_physicalStops.begin()->second->getConnectionPlace()->getPhysicalStops());
+			const StopArea::PhysicalStops& physicalStops(_physicalStops.begin()->second->getConnectionPlace()->getPhysicalStops());
 			
 			BOOST_FOREACH(const PhysicalStops::value_type& it, physicalStops)
 			{
@@ -155,7 +155,7 @@ namespace synthese
 						curGLA != NULL;
 						curGLA = static_cast<const LineStop*>(curGLA->getFollowingArrivalForFineSteppingOnly())
 					){
-						const PublicTransportStopZoneConnectionPlace* connectionPlace(
+						const StopArea* connectionPlace(
 							curGLA->getPhysicalStop()->getConnectionPlace()
 						);
 

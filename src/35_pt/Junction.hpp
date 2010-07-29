@@ -34,7 +34,7 @@ namespace synthese
 		class PhysicalStop;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// Link between two stops allowing pedestrians to do a transfer outside of a PublicTransportStopZoneConnectionPlace.
+		/// Link between two stops allowing pedestrians to do a transfer outside of a StopArea.
 		///	@ingroup m35
 		/// @author Hugues Romain
 		/// @date 2010

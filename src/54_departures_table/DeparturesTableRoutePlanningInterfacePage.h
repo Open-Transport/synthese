@@ -33,7 +33,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 	}
 
 	namespace departurestable
@@ -90,7 +90,7 @@ namespace synthese
 				bool withTransfer
 				, int blinkingDelay,
 				bool displayClock
-				, const pt::PublicTransportStopZoneConnectionPlace& place
+				, const pt::StopArea& place
 				, const RoutePlanningListWithAlarm& rows
 				, const server::Request* request = NULL
 			) const;

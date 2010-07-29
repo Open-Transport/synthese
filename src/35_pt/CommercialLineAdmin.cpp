@@ -52,7 +52,7 @@
 #include "ReservationContact.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "PTRuleUserAdmin.hpp"
 #include "ActionResultHTMLTable.h"
 #include "AdminModule.h"

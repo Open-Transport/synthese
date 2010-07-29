@@ -137,8 +137,8 @@ namespace synthese
 					{
 						
 						string oc(map.get<string>(PARAMETER_OPERATOR_CODE));
-						shared_ptr<const PublicTransportStopZoneConnectionPlace> place(
-							Env::GetOfficialEnv().get<PublicTransportStopZoneConnectionPlace>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
+						shared_ptr<const StopArea> place(
+							Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
 						);
 						screen->setLocalization(place.get());
 						screen->setAllPhysicalStopsDisplayed(false);
@@ -155,7 +155,7 @@ namespace synthese
 					// 2.1 by id
 					else if(decodeTableId(id) == ConnectionPlaceTableSync::TABLE.ID)
 					{
-						screen->setLocalization(Env::GetOfficialEnv().getRegistry<PublicTransportStopZoneConnectionPlace>().get(id).get());
+						screen->setLocalization(Env::GetOfficialEnv().getRegistry<StopArea>().get(id).get());
 						screen->setAllPhysicalStopsDisplayed(true);
 					}
 					
@@ -186,7 +186,7 @@ namespace synthese
 			{
 				throw RequestException("Display screen not found "+ e.getMessage());
 			}
-			catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+			catch (ObjectNotFoundException<StopArea>& e)
 			{
 				throw RequestException("Connection place not found "+ e.getMessage());
 			}

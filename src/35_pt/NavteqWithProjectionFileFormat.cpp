@@ -27,7 +27,7 @@
 #include "AddressTableSync.h"
 #include "PhysicalStop.h"
 #include "PhysicalStopTableSync.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ConnectionPlaceTableSync.h"
 #include "Road.h"
 #include "RoadTableSync.h"
@@ -130,7 +130,7 @@ namespace synthese
 			{
 				AddressTableSync::Save(address.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<PublicTransportStopZoneConnectionPlace>::value_type stop, _env->getEditableRegistry<PublicTransportStopZoneConnectionPlace>())
+			BOOST_FOREACH(Registry<StopArea>::value_type stop, _env->getEditableRegistry<StopArea>())
 			{
 				ConnectionPlaceTableSync::Save(stop.second.get(),transaction);
 			}
@@ -265,7 +265,7 @@ namespace synthese
 						try
 						{
 							shared_ptr<PhysicalStop> stop(PhysicalStopTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL));
-							PublicTransportStopZoneConnectionPlace* place(const_cast<PublicTransportStopZoneConnectionPlace*>(stop->getConnectionPlace()));
+							StopArea* place(const_cast<StopArea*>(stop->getConnectionPlace()));
 							PhysicalStopTableSync::Search(*_env, place->getKey());
 							AddressTableSync::Search(*_env, place->getKey());
 							place->addAddress(address.get());
@@ -281,7 +281,7 @@ namespace synthese
 									place->addForbiddenTransferDelay(address->getKey(), add2->getKey());
 								}
 							}
-							BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& ps2, place->getPhysicalStops())
+							BOOST_FOREACH(const StopArea::PhysicalStops::value_type& ps2, place->getPhysicalStops())
 							{
 								if(ps2.second == stop.get())
 								{

@@ -32,7 +32,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : Physical stop creation.
@@ -62,7 +62,7 @@ namespace synthese
 			static const std::string PARAMETER_PLACE_ID;
 
 		private:
-			boost::shared_ptr<const PublicTransportStopZoneConnectionPlace> _place;
+			boost::shared_ptr<const StopArea> _place;
 			double _x;
 			double _y;
 			std::string _operatorCode;
@@ -98,7 +98,7 @@ namespace synthese
 			/// @return true if the action can be launched in the current session
 			virtual bool isAuthorized(const server::Session* session) const;
 
-			void setPlace(boost::shared_ptr<const PublicTransportStopZoneConnectionPlace> value){ _place = value; }
+			void setPlace(boost::shared_ptr<const StopArea> value){ _place = value; }
 		};
 	}
 }

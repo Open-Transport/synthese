@@ -22,7 +22,7 @@
 
 #include "LineStop.h"
 #include "Line.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "PhysicalStop.h"
 #include "Service.h"
 #include "ArrivalDepartureTableGenerator.h"
@@ -103,8 +103,8 @@ namespace synthese
 			, UnlimitedSize unlimitedSize
 		){
 			ActualDisplayedArrivalsList arrivals;
-			set<const PublicTransportStopZoneConnectionPlace*> encounteredPlaces;
-			const PublicTransportStopZoneConnectionPlace* destinationPlace(
+			set<const StopArea*> encounteredPlaces;
+			const StopArea* destinationPlace(
 				static_cast<const Line*>(
 					servicePointer.getService()->getPath()
 				)->getDestination()->getConnectionPlace()
@@ -112,7 +112,7 @@ namespace synthese
 
 			const LineStop* curLinestop(static_cast<const LineStop*>(servicePointer.getDepartureEdge()));
 			const LineStop* lastLineStop(NULL);
-			const PublicTransportStopZoneConnectionPlace* place(curLinestop->getPhysicalStop()->getConnectionPlace());
+			const StopArea* place(curLinestop->getPhysicalStop()->getConnectionPlace());
 
 			// Adding of the beginning place
 			arrivals.push_back(IntermediateStop(place));
@@ -170,7 +170,7 @@ namespace synthese
 
 			TransferDestinationsList::const_iterator it(
 				_transferDestinations.find(
-					dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getArrivalEdge()->getFromVertex()->getHub())
+					dynamic_cast<const StopArea*>(serviceUse.getArrivalEdge()->getFromVertex()->getHub())
 			)	);
 			if(it != _transferDestinations.end())
 			{
@@ -179,7 +179,7 @@ namespace synthese
 				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
 				{
 					PTTimeSlotRoutePlanner rp(
-						dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getDepartureEdge()->getFromVertex()->getHub()),
+						dynamic_cast<const StopArea*>(serviceUse.getDepartureEdge()->getFromVertex()->getHub()),
 						it2,
 						_startDateTime,
 						_endDateTime,
@@ -213,7 +213,7 @@ namespace synthese
 				}
 			}
 			list.push_back(IntermediateStop(
-				dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(serviceUse.getArrivalEdge()->getFromVertex()->getHub()),
+				dynamic_cast<const StopArea*>(serviceUse.getArrivalEdge()->getFromVertex()->getHub()),
 				serviceUse,
 				transfers
 			)	);

@@ -92,7 +92,7 @@ namespace synthese
 			</ul>
 		*/
 		class CityListFunction:
-			public util::FactorableTemplate<FunctionWithSite<true>, CityListFunction>
+			public util::FactorableTemplate<cms::FunctionWithSite<true>, CityListFunction>
 		{
 		public:
 			static const std::string PARAMETER_INPUT;

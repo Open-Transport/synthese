@@ -65,7 +65,7 @@ namespace synthese
 
 
 		bool CommercialLine::isOptionalReservationPlace(
-			const PublicTransportStopZoneConnectionPlace* place
+			const StopArea* place
 		) const	{
 			return _optionalReservationPlaces.find(place) != _optionalReservationPlaces.end();
 		}

@@ -35,7 +35,7 @@
 #include "Line.h"
 #include "LineStop.h"
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "HTMLForm.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "ScheduleRealTimeUpdateAction.h"

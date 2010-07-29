@@ -23,7 +23,7 @@
 #include "PhysicalStop.h"
 #include "Registry.h"
 #include "PTModule.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 
 using namespace std;
 
@@ -44,7 +44,7 @@ namespace synthese
 		PhysicalStop::PhysicalStop(
 			RegistryKeyType id
 			, string name
-			, const PublicTransportStopZoneConnectionPlace* place
+			, const StopArea* place
 			, double x
 			, double y
 		):	Registrable(id),
@@ -63,9 +63,9 @@ namespace synthese
 
 
 
-		const PublicTransportStopZoneConnectionPlace* PhysicalStop::getConnectionPlace() const
+		const StopArea* PhysicalStop::getConnectionPlace() const
 		{
-			return static_cast<const PublicTransportStopZoneConnectionPlace*>(Vertex::getHub());
+			return static_cast<const StopArea*>(Vertex::getHub());
 		}
 
 

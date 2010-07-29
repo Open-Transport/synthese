@@ -31,7 +31,7 @@
 #include "DisplayMaintenanceLog.h"
 #include "Request.h"
 #include "DisplayMaintenanceRight.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 
 using namespace std;
 using namespace boost;

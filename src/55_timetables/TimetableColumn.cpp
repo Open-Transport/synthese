@@ -31,7 +31,7 @@
 #include "Edge.h"
 #include "Vertex.h"
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 
 using namespace std;
 using namespace boost::posix_time;
@@ -62,7 +62,7 @@ namespace synthese
 				Path::Edges::const_iterator itEdge2;
 				for (itEdge2 = itEdge; itEdge2 != edges.end(); ++itEdge2)
 				{
-					if(	dynamic_cast<const PublicTransportStopZoneConnectionPlace*>((*itEdge2)->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
+					if(	dynamic_cast<const StopArea*>((*itEdge2)->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
 						&&(	(*itEdge2)->isDeparture() == itRow->getIsDeparture()
 							|| (*itEdge2)->isArrival() == itRow->getIsArrival()
 						) &&

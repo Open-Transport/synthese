@@ -24,7 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "DisplayScreenCPU.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "DisplayMonitoringStatus.h"
 
 #include <sstream>
@@ -72,7 +72,7 @@ namespace synthese
 
 
 
-		const pt::PublicTransportStopZoneConnectionPlace* DisplayScreenCPU::getPlace(
+		const pt::StopArea* DisplayScreenCPU::getPlace(
 		) const {
 			return _place;
 		}
@@ -116,7 +116,7 @@ namespace synthese
 
 
 		void DisplayScreenCPU::setPlace(
-			const pt::PublicTransportStopZoneConnectionPlace* const value
+			const pt::StopArea* const value
 		){
 			_place = value;
 		}

@@ -34,7 +34,7 @@
 #include "Interface.h"
 #include "InterfacePage.h"
 #include "InterfacePageException.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ServicePointer.h"
 #include "Line.h"
 #include "LineStop.h"
@@ -121,7 +121,7 @@ namespace synthese
 
 				City city;
 				city.setName("CITY");
-				PublicTransportStopZoneConnectionPlace place;
+				StopArea place;
 				place.setName("TEST");
 				place.setCity(&city);
 				PhysicalStop ps(0, string(), &place);

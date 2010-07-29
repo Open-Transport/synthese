@@ -28,7 +28,7 @@
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "ConnectionPlaceTableSync.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 
 using namespace std;
 using namespace boost;
@@ -111,7 +111,7 @@ namespace synthese
 							ConnectionPlaceTableSync::GetEditable(lexical_cast<RegistryKeyType>(stopid), env, linkLevel).get()
 						);
 					}
-					catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+					catch(ObjectNotFoundException<StopArea>& e)
 					{
 						Log::GetInstance().warn("No such stop "+ stopid +" in HikingTrail "+ lexical_cast<string>(object->getKey()));
 					}
@@ -133,7 +133,7 @@ namespace synthese
 			stringstream stops;
 			{
 				bool first(true);
-				BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace* stop, object->getStops())
+				BOOST_FOREACH(const StopArea* stop, object->getStops())
 				{
 					if(!first) stops << ",";
 					stops << stop->getKey();

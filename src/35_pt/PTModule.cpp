@@ -36,7 +36,7 @@
 #include "CommercialLine.h"
 #include "Crossing.h"
 #include "Line.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ConnectionPlaceTableSync.h"
 #include "RoadPlace.h"
 #include "RoadPlaceTableSync.h"

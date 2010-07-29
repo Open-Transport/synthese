@@ -1,6 +1,8 @@
 
 // 36 CMS
 
+#include "CMSModule.hpp"
+
 #include "WebPageAddAction.h"
 #include "WebPageUpdateAction.h"
 #include "WebPageRemoveAction.h"

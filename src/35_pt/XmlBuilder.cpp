@@ -25,7 +25,7 @@
 
 #include <assert.h>
 
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "Conversion.h"
 #include "XmlToolkit.h"
 #include "Point2D.h"
@@ -60,7 +60,7 @@ namespace synthese
 
 
 
-		shared_ptr<PublicTransportStopZoneConnectionPlace>
+		shared_ptr<StopArea>
 		XmlBuilder::CreateConnectionPlace (XMLNode& node, 
 						   const Registry<City>& cities)
 		{
@@ -82,8 +82,8 @@ namespace synthese
 
 			shared_ptr<const City> city = cities.get (cityId);
 
-			shared_ptr<PublicTransportStopZoneConnectionPlace> p(
-				new PublicTransportStopZoneConnectionPlace(id, type, defaultTransferDelay)
+			shared_ptr<StopArea> p(
+				new StopArea(id, type, defaultTransferDelay)
 			);
 			p->setCity(city.get());
 			p->setName(name);
@@ -187,7 +187,7 @@ namespace synthese
 		shared_ptr<PhysicalStop> 
 		XmlBuilder::CreatePhysicalStop(
 			XMLNode& node,
-			const Registry<PublicTransportStopZoneConnectionPlace>& connectionPlaces)
+			const Registry<StopArea>& connectionPlaces)
 		{
 			// assert ("physicalStop" == node.getName ());
 			util::RegistryKeyType id (GetLongLongAttr (node, "id"));

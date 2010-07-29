@@ -30,7 +30,7 @@
 #include "AddressablePlace.h"
 #include "ConnectionPlaceTableSync.h"
 #include "PublicPlaceTableSync.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "PublicPlace.h"
 #include "ResultHTMLTable.h"
 #include "PhysicalStop.h"
@@ -104,7 +104,7 @@ namespace synthese
 				
 				if(tableId == ConnectionPlaceTableSync::TABLE.ID)
 				{
-					setConnectionPlace(Env::GetOfficialEnv().get<PublicTransportStopZoneConnectionPlace>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
+					setConnectionPlace(Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
 				}
 				else if(tableId == PublicPlaceTableSync::TABLE.ID)
 				{
@@ -119,7 +119,7 @@ namespace synthese
 			{
 				throw AdminParametersException("No such public place");
 			}
-			catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace> e)
+			catch(ObjectNotFoundException<StopArea> e)
 			{
 				throw AdminParametersException("No such connection place");
 			}
@@ -171,7 +171,7 @@ namespace synthese
 
 					StaticActionRequest<PhysicalStopMoveAction> moveAction(request);
 					HTMLMap map(_connectionPlace->getPoint(), 18, true);
-					BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
+					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 					{
 						moveAction.getAction()->setStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<PhysicalStop*>(it.second)));
 
@@ -200,7 +200,7 @@ namespace synthese
 					map.draw(stream);
 
 					AdminActionFunctionRequest<StopAreaNameUpdateAction,PTPlaceAdmin> updateRequest(request);
-					updateRequest.getAction()->setPlace(const_pointer_cast<PublicTransportStopZoneConnectionPlace>(_connectionPlace));
+					updateRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
 
 					stream << "<h1>Propriétés</h1>";
 
@@ -226,7 +226,7 @@ namespace synthese
 				AdminFunctionRequest<PTPhysicalStopAdmin> openRequest(request);
 
 				AdminActionFunctionRequest<PhysicalStopAddAction,PTPlaceAdmin> addRequest(request);
-				addRequest.getAction()->setPlace(const_pointer_cast<PublicTransportStopZoneConnectionPlace>(_connectionPlace));
+				addRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
 
 				HTMLForm f(addRequest.getHTMLForm());
 				stream << f.open();
@@ -240,7 +240,7 @@ namespace synthese
 				c.push_back("Actions");
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
-				BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
+				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 				{
 					const PhysicalStop* stop(it.second);
 					openRequest.getPage()->setStop(Env::GetOfficialEnv().getSPtr(stop));
@@ -311,7 +311,7 @@ namespace synthese
 					stream << "<h1>Propriétés</h1>";
 
 					AdminActionFunctionRequest<StopAreaUpdateAction,PTPlaceAdmin> updateRequest(request);
-					updateRequest.getAction()->setPlace(const_pointer_cast<PublicTransportStopZoneConnectionPlace>(_connectionPlace));
+					updateRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
 
 					PropertiesHTMLTable t(updateRequest.getHTMLForm());
 					stream << t.open();
@@ -467,7 +467,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 
-			BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
+			BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 			{
 				shared_ptr<PTPhysicalStopAdmin> p(getNewOtherPage<PTPhysicalStopAdmin>());
 				p->setStop(Env::GetOfficialEnv().getSPtr(it.second));
@@ -520,10 +520,10 @@ namespace synthese
 
 
 
-		void PTPlaceAdmin::setConnectionPlace( boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> value )
+		void PTPlaceAdmin::setConnectionPlace( boost::shared_ptr<const pt::StopArea> value )
 		{
 			_connectionPlace = value;
-			_addressablePlace = static_pointer_cast<const AddressablePlace, const PublicTransportStopZoneConnectionPlace>(_connectionPlace);
+			_addressablePlace = static_pointer_cast<const AddressablePlace, const StopArea>(_connectionPlace);
 		}
 
 

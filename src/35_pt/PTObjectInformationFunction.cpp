@@ -31,7 +31,7 @@
 #include "ConnectionPlaceTableSync.h"
 #include "City.h"
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "Line.h"
 
 using namespace std;
@@ -74,7 +74,7 @@ namespace synthese
 			}
 			else if(ConnectionPlaceTableSync::TABLE.ID)
 			{
-				_stop = Env::GetOfficialEnv().get<PublicTransportStopZoneConnectionPlace>(id);
+				_stop = Env::GetOfficialEnv().get<StopArea>(id);
 			}
 
 			_info = map.get<string>(PARAMETER_INFO);

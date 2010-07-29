@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 	}
 
 	namespace pt
@@ -64,7 +64,7 @@ namespace synthese
 		private:
 			/// @name Search parameters
 			//@{
-				boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace>	_connectionPlace;
+				boost::shared_ptr<const pt::StopArea>	_connectionPlace;
 				boost::shared_ptr<const road::PublicPlace>	_publicPlace;
 				boost::shared_ptr<const road::AddressablePlace>	_addressablePlace;
 			// html::ResultHTMLTable::RequestParameters	_requestParameters;
@@ -175,7 +175,7 @@ namespace synthese
 			///	@date 2009
 			virtual std::string getTitle() const;
 
-			void setConnectionPlace(boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> value);
+			void setConnectionPlace(boost::shared_ptr<const pt::StopArea> value);
 			void setPublicPlace(boost::shared_ptr<const road::PublicPlace> value);
 
 			virtual PageLinks _getCurrentTreeBranch() const;

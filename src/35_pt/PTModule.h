@@ -88,7 +88,7 @@ namespace synthese
 			<tr><td>@ref Path</td><td>@ref Line</td></tr>
 			<tr><td>@ref Edge</td><td>@ref LineStop</td></tr>
 			<tr><td>@ref Vertex</td><td>@ref PhysicalStop</td></tr>
-			<tr><td>@ref Hub</td><td>@ref PublicTransportStopZoneConnectionPlace</td></tr>
+			<tr><td>@ref Hub</td><td>@ref StopArea</td></tr>
 			</table>
 
 			A specific graph is defined by the junctions (links between stops qualified for use
@@ -104,7 +104,7 @@ namespace synthese
 			<tr><td>@ref Path</td><td>@ref Junction</td></tr>
 			<tr><td>@ref Edge</td><td>@ref JunctionStop</td></tr>
 			<tr><td>@ref Vertex</td><td>@ref PhysicalStop</td></tr>
-			<tr><td>@ref Hub</td><td>@ref PublicTransportStopZoneConnectionPlace</td></tr>
+			<tr><td>@ref Hub</td><td>@ref StopArea</td></tr>
 			</table>
 
 		@{

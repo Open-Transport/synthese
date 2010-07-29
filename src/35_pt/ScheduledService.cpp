@@ -30,7 +30,7 @@
 #include "CommercialLine.h"
 #include "PhysicalStop.h"
 #include "NonConcurrencyRule.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 
 using namespace std;
 using namespace boost;
@@ -314,7 +314,7 @@ namespace synthese
 			recursive_mutex::scoped_lock lineLock(line->getNonConcurrencyRulesMutex());
 
 			const CommercialLine::NonConcurrencyRules& rules(line->getNonConcurrencyRules());
-			const PublicTransportStopZoneConnectionPlace::PhysicalStops& startStops(
+			const StopArea::PhysicalStops& startStops(
 				static_cast<const PhysicalStop*>(departureEdge.getFromVertex())->getConnectionPlace()->getPhysicalStops()
 			);
 			const Hub* arrivalHub(
@@ -339,7 +339,7 @@ namespace synthese
 				maxStartTime += rule->getDelay();
 
 				// Loop on all vertices of the starting place
-				BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace::PhysicalStops::value_type& itStartStop, startStops)
+				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStartStop, startStops)
 				{
 					// Loop on all non concurrent paths
 					BOOST_FOREACH(const Path* path, paths)

@@ -36,7 +36,7 @@
 #include "ConnectionPlaceTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "CityTableSync.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "PhysicalStop.h"
 #include "PhysicalStopTableSync.h"
 #include "Line.h"
@@ -202,7 +202,7 @@ namespace synthese
 				{
 					object->setLocalization(ConnectionPlaceTableSync::Get(placeId, env, linkLevel).get());
 				}
-				catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+				catch(ObjectNotFoundException<StopArea>& e)
 				{
 					Log::GetInstance().warn(
 						"Data corrupted in "+ TABLE.NAME + " on display screen : localization "+ lexical_cast<string>(placeId) + " not found"
@@ -216,7 +216,7 @@ namespace synthese
 					object->setCPU(DisplayScreenCPUTableSync::Get(cpuId, env, linkLevel).get());
 					DisplayScreenCPUTableSync::GetEditable(cpuId, env, linkLevel)->addWiredScreen(object);
 				}
-				catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+				catch(ObjectNotFoundException<StopArea>& e)
 				{
 					Log::GetInstance().warn(
 						"Data corrupted in "+ TABLE.NAME + " on display screen : cpu host " +
@@ -261,7 +261,7 @@ namespace synthese
 					{
 						object->addForbiddenPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
 					}
-					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+					catch (ObjectNotFoundException<StopArea>& e)
 					{
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, e);
 					}
@@ -275,7 +275,7 @@ namespace synthese
 					{
 						object->addDisplayedPlace(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
 					}
-					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+					catch (ObjectNotFoundException<StopArea>& e)
 					{
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, e);
 					}
@@ -289,7 +289,7 @@ namespace synthese
 					{
 						object->addForcedDestination(ConnectionPlaceTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
 					}
-					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+					catch (ObjectNotFoundException<StopArea>& e)
 					{
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
 				}	}
@@ -312,7 +312,7 @@ namespace synthese
 							ConnectionPlaceTableSync::Get(lexical_cast<RegistryKeyType>(id2), env, linkLevel).get()
 						);
 					}
-					catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>& e)
+					catch (ObjectNotFoundException<StopArea>& e)
 					{
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
 					}

@@ -35,7 +35,7 @@
 #include "FrenchSentence.h"
 #include "PTPlaceAdmin.h"
 #include "PTRoadsAdmin.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "PublicPlace.h"
 #include "RoadPlace.h"
 #include "PTCitiesAdmin.h"
@@ -204,9 +204,9 @@ namespace synthese
 							stream << t.col() << it.score.levenshtein;
 							stream << t.col() << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
-						else if(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(it.value))
+						else if(dynamic_cast<const StopArea*>(it.value))
 						{
-							const PublicTransportStopZoneConnectionPlace* connectionPlace(static_cast<const PublicTransportStopZoneConnectionPlace*>(it.value));
+							const StopArea* connectionPlace(static_cast<const StopArea*>(it.value));
 							openPlaceRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr(connectionPlace));
 
 							stream << t.col();
@@ -274,9 +274,9 @@ namespace synthese
 							stream << t.col() << roadPlace->getName();
 							stream << t.col() << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
-						else if(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(it))
+						else if(dynamic_cast<const StopArea*>(it))
 						{
-							const PublicTransportStopZoneConnectionPlace* connectionPlace(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(it));
+							const StopArea* connectionPlace(dynamic_cast<const StopArea*>(it));
 							openPlaceRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr(connectionPlace));
 
 							stream << t.col();
@@ -376,7 +376,7 @@ namespace synthese
 					stream << t.col() << place->getPoint().getX();
 					stream << t.col() << place->getPoint().getY();
 
-					openRequest.getPage()->setConnectionPlace(const_pointer_cast<const PublicTransportStopZoneConnectionPlace>(place));
+					openRequest.getPage()->setConnectionPlace(const_pointer_cast<const StopArea>(place));
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPlaceAdmin::ICON);
 				}
 

@@ -23,7 +23,7 @@
 */
 
 #include "DeparturesTableRoutePlanningRowKeyInterfacePage.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "City.h"
 #include "PhysicalStop.h"
 
@@ -55,7 +55,7 @@ namespace synthese
 
 		void DeparturesTableRoutePlanningRowKeyInterfacePage::display(
 			std::ostream& stream,
-			const pt::PublicTransportStopZoneConnectionPlace& origin,
+			const pt::StopArea& origin,
 			const RoutePlanningRow& row ,
 			VariablesMap& variables,
 			const server::Request* request /*= NULL*/

@@ -28,7 +28,7 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "City.h"
 #include "LineTableSync.h"
 #include "LineStopTableSync.h"
@@ -98,14 +98,14 @@ namespace synthese
 			}
 
 			const string place(map.get<string>(PARAMETER_STOP_NAME));
-			vector<const PublicTransportStopZoneConnectionPlace*> stops(
-				cities.front()->search<PublicTransportStopZoneConnectionPlace>(place, 1)
+			vector<const StopArea*> stops(
+				cities.front()->search<StopArea>(place, 1)
 			);
 			if(stops.empty())
 			{
 				throw ActionException("Place not found");
 			}
-			const PublicTransportStopZoneConnectionPlace* stop = stops.front();
+			const StopArea* stop = stops.front();
 
 			if(stop->getPhysicalStops().empty())
 			{

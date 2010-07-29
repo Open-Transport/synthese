@@ -28,7 +28,7 @@
 #include "LineTableSync.h"
 #include "Place.h"
 #include "PTModule.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ConnectionPlaceTableSync.h"
 #include "PTUseRule.h"
 #include "PTUseRuleTableSync.h"
@@ -210,7 +210,7 @@ namespace synthese
 							ConnectionPlaceTableSync::Get(lexical_cast<RegistryKeyType>(stop),env,linkLevel).get()
 						);
 					}
-					catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
+					catch(ObjectNotFoundException<StopArea>&)
 					{
 						Log::GetInstance().warn("No such place "+ stop +" in optional reservation places of commercial line "+ lexical_cast<string>(object->getKey()));
 					}
@@ -275,7 +275,7 @@ namespace synthese
 			// Preparation of places with optional reservation
 			stringstream optionalReservationPlaces;
 			bool first(true);
-			BOOST_FOREACH(const PublicTransportStopZoneConnectionPlace* place, object->getOptionalReservationPlaces())
+			BOOST_FOREACH(const StopArea* place, object->getOptionalReservationPlaces())
 			{
 				if (first)
 				{

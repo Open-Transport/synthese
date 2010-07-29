@@ -29,7 +29,7 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "Request.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ConnectionPlaceTableSync.h"
 #include "Conversion.h"
 
@@ -96,7 +96,7 @@ namespace synthese
 			ArrivalDepartureTableLog::addCreateEntry(cpu, *request.getUser());
 		}
 
-		void DisplayScreenCPUCreateAction::setPlace( boost::shared_ptr<const PublicTransportStopZoneConnectionPlace> place )
+		void DisplayScreenCPUCreateAction::setPlace( boost::shared_ptr<const StopArea> place )
 		{
 			_place = place;
 		}

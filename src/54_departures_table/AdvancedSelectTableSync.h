@@ -47,7 +47,7 @@ namespace synthese
 
 	namespace pt
 	{
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 		class CommercialLine;
 	}
 
@@ -57,7 +57,7 @@ namespace synthese
 
 		struct ConnectionPlaceWithBroadcastPoint
 		{
-			boost::shared_ptr<pt::PublicTransportStopZoneConnectionPlace> place;
+			boost::shared_ptr<pt::StopArea> place;
 			std::string	cityName;
 			int broadCastPointsNumber;
 			int cpuNumber;

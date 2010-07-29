@@ -24,7 +24,7 @@
 
 #include "DeparturesTableDestinationInterfacepage.h"
 #include "ServicePointer.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "City.h"
 #include "Edge.h"
 
@@ -66,7 +66,7 @@ namespace synthese
 			VariablesMap& variables,
 			const server::Request* request /*= NULL*/
 		) const	{
-			const PublicTransportStopZoneConnectionPlace* place(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(object.getArrivalEdge()->getHub()));
+			const StopArea* place(dynamic_cast<const StopArea*>(object.getArrivalEdge()->getHub()));
 
 			ParametersVector pv;
 			pv.push_back(lexical_cast<string>(place->getKey())); //0

@@ -28,7 +28,7 @@
 #include "HikingModule.h"
 #include "HikingRight.h"
 #include "HTMLModule.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "City.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "HikingTrailUpdateAction.h"

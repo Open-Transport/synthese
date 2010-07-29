@@ -25,7 +25,7 @@
 #include "Registry.h"
 #include "Interface.h"
 #include "InterfacePageException.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "PhysicalStop.h"
 #include "Edge.h"
 #include "DisplayScreen.h"
@@ -102,7 +102,7 @@ namespace synthese
 			_maxDelay = maxDelay;
 		}
 
-		void DisplayScreen::addForbiddenPlace(const pt::PublicTransportStopZoneConnectionPlace* place)
+		void DisplayScreen::addForbiddenPlace(const pt::StopArea* place)
 		{
 			_forbiddenArrivalPlaces.insert(make_pair(place->getKey(),place));
 		}
@@ -110,27 +110,27 @@ namespace synthese
 
 		/** Modificateur du point d'arrêt.
 		*/
-		void DisplayScreen::setLocalization(const PublicTransportStopZoneConnectionPlace* bp)
+		void DisplayScreen::setLocalization(const StopArea* bp)
 		{
 			_localization = bp;
 		}
 
 
-		void DisplayScreen::addDisplayedPlace(const pt::PublicTransportStopZoneConnectionPlace* __PointArret)
+		void DisplayScreen::addDisplayedPlace(const pt::StopArea* __PointArret)
 		{
 			_displayedPlaces.insert(make_pair(__PointArret->getKey(),__PointArret));
 		}
 
 		
 
-		void DisplayScreen::addForcedDestination(const pt::PublicTransportStopZoneConnectionPlace* place)
+		void DisplayScreen::addForcedDestination(const pt::StopArea* place)
 		{
 			_forcedDestinations.insert(make_pair(place->getKey(), place));
 		}
 
 
 
-		const PublicTransportStopZoneConnectionPlace* DisplayScreen::getLocalization() const
+		const StopArea* DisplayScreen::getLocalization() const
 		{
 			return _localization;
 		}
@@ -495,7 +495,7 @@ namespace synthese
 							make_pair(
 								dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName(),
 								make_pair(
-									dynamic_cast<const pt::PublicTransportStopZoneConnectionPlace*>(edge->getHub())->getKey(),
+									dynamic_cast<const pt::StopArea*>(edge->getHub())->getKey(),
 									dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName()
 						)	)	);
 					}
@@ -511,7 +511,7 @@ namespace synthese
 
 
 
-		void DisplayScreen::removeForcedDestination(const PublicTransportStopZoneConnectionPlace* place)
+		void DisplayScreen::removeForcedDestination(const StopArea* place)
 		{
 			DisplayedPlacesList::iterator it = _forcedDestinations.find(place->getKey());
 			if (it != _forcedDestinations.end())
@@ -540,14 +540,14 @@ namespace synthese
 				_physicalStops.erase(it);
 		}
 
-		void DisplayScreen::removeDisplayedPlace(const PublicTransportStopZoneConnectionPlace* place)
+		void DisplayScreen::removeDisplayedPlace(const StopArea* place)
 		{
 			DisplayedPlacesList::iterator it = _displayedPlaces.find(place->getKey());
 			if (it != _displayedPlaces.end())
 				_displayedPlaces.erase(it);
 		}
 
-		void DisplayScreen::removeForbiddenPlace(const PublicTransportStopZoneConnectionPlace* place)
+		void DisplayScreen::removeForbiddenPlace(const StopArea* place)
 		{
 			DisplayedPlacesList::iterator it = _forbiddenArrivalPlaces.find(place->getKey());
 			if (it != _forbiddenArrivalPlaces.end())

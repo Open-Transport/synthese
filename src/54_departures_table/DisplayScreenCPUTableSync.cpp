@@ -30,7 +30,7 @@
 #include "SQLite.h"
 #include "SQLiteException.h"
 #include "Conversion.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ConnectionPlaceTableSync.h"
 
 #include <sstream>

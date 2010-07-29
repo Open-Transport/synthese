@@ -36,7 +36,7 @@
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousService.h"
 #include "ContinuousServiceTableSync.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "TransportNetworkRight.h"
 #include "ServiceAdmin.h"
 #include "Request.h"

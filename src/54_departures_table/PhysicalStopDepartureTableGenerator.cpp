@@ -22,7 +22,7 @@
 
 #include "PhysicalStopDepartureTableGenerator.h"
 #include "PhysicalStop.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "LineStop.h"
 #include "Line.h"
 #include "ForcedDestinationsArrivalDepartureTableGenerator.h"
@@ -74,7 +74,7 @@ namespace synthese
 
 		const ArrivalDepartureList& PhysicalStopDepartureTableGenerator::generate()
 		{
-			typedef map<const PublicTransportStopZoneConnectionPlace*, ArrivalDepartureList::iterator> ReachedDestinationMap;
+			typedef map<const StopArea*, ArrivalDepartureList::iterator> ReachedDestinationMap;
 			ReachedDestinationMap reachedDestination;
 			
 			BOOST_FOREACH(const PhysicalStops::value_type& it, _physicalStops)

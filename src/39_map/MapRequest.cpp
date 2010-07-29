@@ -172,7 +172,7 @@ namespace synthese
 			for (int i=0; i<nbConnectionPlaces; ++i) 
 			{
 				XMLNode connectionPlaceNode = GetChildNode (connectionPlacesNode, "connectionPlace", i);
-				_temporaryEnvironment.getEditableRegistry<PublicTransportStopZoneConnectionPlace>().add (synthese::pt::XmlBuilder::CreateConnectionPlace (connectionPlaceNode, _temporaryEnvironment.getEditableRegistry<City>()));
+				_temporaryEnvironment.getEditableRegistry<StopArea>().add (synthese::pt::XmlBuilder::CreateConnectionPlace (connectionPlaceNode, _temporaryEnvironment.getEditableRegistry<City>()));
 			}
 
 			XMLNode physicalStopsNode = GetChildNode (dataNode, "physicalStops", 0);
@@ -180,7 +180,7 @@ namespace synthese
 			for (int i=0; i<nbPhysicalStops; ++i) 
 			{
 				XMLNode physicalStopNode = GetChildNode (physicalStopsNode, "physicalStop", i);
-				_temporaryEnvironment.getEditableRegistry<PhysicalStop>().add (synthese::pt::XmlBuilder::CreatePhysicalStop (physicalStopNode, _temporaryEnvironment.getEditableRegistry<PublicTransportStopZoneConnectionPlace>()));
+				_temporaryEnvironment.getEditableRegistry<PhysicalStop>().add (synthese::pt::XmlBuilder::CreatePhysicalStop (physicalStopNode, _temporaryEnvironment.getEditableRegistry<StopArea>()));
 			}
 
 			XMLNode commercialLinesNode = GetChildNode (dataNode, "commercialLines", 0);

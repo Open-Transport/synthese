@@ -85,7 +85,7 @@ namespace synthese
 				_place = ConnectionPlaceTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
 				_city = CityTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_CITY_ID), *_env);
 			}
-			catch(ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
+			catch(ObjectNotFoundException<StopArea>&)
 			{
 				throw ActionException("No such place");
 			}

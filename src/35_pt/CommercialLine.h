@@ -46,7 +46,7 @@ namespace synthese
 	
 	namespace pt
 	{
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 	}
 
 	namespace calendar
@@ -74,7 +74,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<CommercialLine>	Registry;
 
-			typedef std::set<const pt::PublicTransportStopZoneConnectionPlace*> PlacesSet;
+			typedef std::set<const pt::StopArea*> PlacesSet;
 
 			typedef std::set<const pt::NonConcurrencyRule*> NonConcurrencyRules;
 
@@ -147,7 +147,7 @@ namespace synthese
 				/// @return true if the place belongs to the list of optional reservation places of the line.
 				/// @author Hugues Romain
 				bool isOptionalReservationPlace(
-					const pt::PublicTransportStopZoneConnectionPlace* place
+					const pt::StopArea* place
 				) const;
 
 

@@ -127,7 +127,7 @@ namespace synthese
 
 			SQLiteTransaction transaction;
 
-			PublicTransportStopZoneConnectionPlace stopArea;
+			StopArea stopArea;
 			stopArea.setAllowedConnection(true);
 			
 			if(!_city.get())

@@ -31,7 +31,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 	}
 
 	namespace departurestable
@@ -118,7 +118,7 @@ namespace synthese
 			std::string										_searchName;
 			boost::optional<util::RegistryKeyType>				_searchLineId;
 			boost::optional<util::RegistryKeyType>				_searchTypeId;
-			boost::optional<boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> >
+			boost::optional<boost::shared_ptr<const pt::StopArea> >
 															_place;
 			boost::optional<int>							_searchState;
 			boost::optional<int>							_searchMessage;
@@ -212,7 +212,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				boost::optional<boost::shared_ptr<const pt::PublicTransportStopZoneConnectionPlace> > getPlace() const { return _place; }
+				boost::optional<boost::shared_ptr<const pt::StopArea> > getPlace() const { return _place; }
 			//@}
 		};
 	}

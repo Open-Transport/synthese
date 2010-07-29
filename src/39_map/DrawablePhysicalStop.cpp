@@ -24,7 +24,7 @@
 
 #include "PhysicalStop.h"
 #include "AddressablePlace.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "RGBColor.h"
 
 #include "Map.h"

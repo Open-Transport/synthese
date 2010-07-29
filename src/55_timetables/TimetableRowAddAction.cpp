@@ -34,7 +34,7 @@
 #include "TimetableRowTableSync.h"
 
 #include "GeographyModule.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 
 using namespace std;
 
@@ -101,7 +101,7 @@ namespace synthese
 			_isSufficient = map.getDefault<bool>(PARAMETER_IS_SUFFICIENT, false);
 			_isDisplayed = map.getDefault<bool>(PARAMETER_IS_DISPLAYED, false);
 
-			_place = dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(GeographyModule::FetchPlace(
+			_place = dynamic_cast<const StopArea*>(GeographyModule::FetchPlace(
 				map.get<string>(PARAMETER_CITY_NAME),
 				map.get<string>(PARAMETER_PLACE_NAME)
 			));

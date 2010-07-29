@@ -43,7 +43,7 @@
 #include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "ConnectionPlaceTableSync.h"
 #include "City.h"
 #include "SentAlarm.h"
@@ -568,12 +568,12 @@ namespace synthese
 			{
 				// General search
 				shared_ptr<DisplaySearchAdmin> p1(getNewOtherPage<DisplaySearchAdmin>());
-				p1->_place = optional<shared_ptr<const PublicTransportStopZoneConnectionPlace> >();
+				p1->_place = optional<shared_ptr<const StopArea> >();
 				links.push_back(p1);
 			
 				// Stock
 				shared_ptr<DisplaySearchAdmin> p2(getNewOtherPage<DisplaySearchAdmin>());
-				p2->_place = shared_ptr<const PublicTransportStopZoneConnectionPlace>();
+				p2->_place = shared_ptr<const StopArea>();
 				links.push_back(p2);
 			}
 			
@@ -672,15 +672,15 @@ namespace synthese
 			}
 			if(*id == 0)
 			{
-				_place = shared_ptr<const PublicTransportStopZoneConnectionPlace>();
+				_place = shared_ptr<const StopArea>();
 			}
 			else
 			{
 				try
 				{
-					_place = Env::GetOfficialEnv().get<PublicTransportStopZoneConnectionPlace>(*id);
+					_place = Env::GetOfficialEnv().get<StopArea>(*id);
 				}
-				catch (ObjectNotFoundException<PublicTransportStopZoneConnectionPlace>&)
+				catch (ObjectNotFoundException<StopArea>&)
 				{
 					throw AdminParametersException("Specified place not found");
 				}

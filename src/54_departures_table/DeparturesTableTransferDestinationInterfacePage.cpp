@@ -24,7 +24,7 @@
 
 #include "DeparturesTableTransferDestinationInterfacePage.h"
 #include "ServicePointer.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 #include "City.h"
 #include "Edge.h"
 #include "Line.h"
@@ -74,7 +74,7 @@ namespace synthese
 			ParametersVector pv;
 
 			const Line* line(dynamic_cast<const Line*>(object.getService()->getPath()));
-			const PublicTransportStopZoneConnectionPlace* place(dynamic_cast<const PublicTransportStopZoneConnectionPlace*>(object.getArrivalEdge()->getFromVertex()->getHub()));
+			const StopArea* place(dynamic_cast<const StopArea*>(object.getArrivalEdge()->getFromVertex()->getHub()));
 		
 			pv.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string()); //0
 			pv.push_back(lexical_cast<string>(line->getCommercialLine()->getKey())); //1

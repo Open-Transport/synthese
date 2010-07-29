@@ -89,8 +89,8 @@ namespace synthese
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::Load(
-			PublicTransportStopZoneConnectionPlace* cp,
+		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,StopArea>::Load(
+			StopArea* cp,
 			const db::SQLiteResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
@@ -162,7 +162,7 @@ namespace synthese
 						{
 							city->removeIncludedPlace(cp);
 						}
-						city->addPlaceToMatcher<PublicTransportStopZoneConnectionPlace>(cp);
+						city->addPlaceToMatcher<StopArea>(cp);
 					}
 				}
 				catch(ObjectNotFoundException<City>& e)
@@ -173,8 +173,8 @@ namespace synthese
 
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::Save(
-			PublicTransportStopZoneConnectionPlace* object,
+		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,StopArea>::Save(
+			StopArea* object,
 			optional<SQLiteTransaction&> transaction
 		){
 			// Transfer delay matrix
@@ -210,13 +210,13 @@ namespace synthese
 		}
 
 		
-		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>::Unlink(
-			PublicTransportStopZoneConnectionPlace* cp
+		template<> void SQLiteDirectTableSyncTemplate<ConnectionPlaceTableSync,StopArea>::Unlink(
+			StopArea* cp
 		){
 			City* city(const_cast<City*>(cp->getCity()));
 			if (city != NULL)
 			{
-				city->removePlaceFromMatcher<PublicTransportStopZoneConnectionPlace>(cp);
+				city->removePlaceFromMatcher<StopArea>(cp);
 				city->removeIncludedPlace(cp);
 			}
 		}

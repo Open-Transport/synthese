@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ENVLSSQL_CONNECTIONPLACETABLESYNC_H
 #define SYNTHESE_ENVLSSQL_CONNECTIONPLACETABLESYNC_H
 
-#include "PublicTransportStopZoneConnectionPlace.h"
+#include "StopArea.hpp"
 
 #include "SQLiteRegistryTableSyncTemplate.h"
 #include "FetcherTemplate.h"
@@ -44,7 +44,7 @@ namespace synthese
 				- on delete : X
 		*/
 		class ConnectionPlaceTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<ConnectionPlaceTableSync,PublicTransportStopZoneConnectionPlace>,
+			public db::SQLiteRegistryTableSyncTemplate<ConnectionPlaceTableSync,StopArea>,
 			public db::FetcherTemplate<geography::NamedPlace, ConnectionPlaceTableSync>
 		{
 		public:

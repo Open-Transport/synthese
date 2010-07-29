@@ -37,7 +37,7 @@ namespace synthese
 	namespace pt
 	{
 		class LineStop;
-		class PublicTransportStopZoneConnectionPlace;
+		class StopArea;
 	}
 
 	namespace pt
@@ -63,7 +63,7 @@ namespace synthese
 			PhysicalStop(
 				util::RegistryKeyType id = 0,
 				std::string name = std::string(), 
-				const pt::PublicTransportStopZoneConnectionPlace* place = NULL,
+				const pt::StopArea* place = NULL,
 				double x = UNKNOWN_VALUE,
 				double y = UNKNOWN_VALUE);
 
@@ -73,7 +73,7 @@ namespace synthese
 		
 			//! @name Query methods
 			//@{
-				const pt::PublicTransportStopZoneConnectionPlace* getConnectionPlace() const;
+				const pt::StopArea* getConnectionPlace() const;
 				virtual graph::GraphIdType getGraphType() const;
 			//@}
 
