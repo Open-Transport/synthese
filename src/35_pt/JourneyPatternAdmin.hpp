@@ -1,6 +1,6 @@
 
-/** LineAdmin class header.
-	@file LineAdmin.h
+/** JourneyPatternAdmin class header.
+	@file JourneyPatternAdmin.hpp
 	@author Hugues Romain
 	@date 2008
 
@@ -33,16 +33,13 @@ namespace synthese
 	namespace pt
 	{
 		class JourneyPattern;
-	}
 
-	namespace pt
-	{
-		/** LineAdmin Class.
+		/** Journey pattern edition.
 			@ingroup m35Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/
-		class LineAdmin : public admin::AdminInterfaceElementTemplate<LineAdmin>
+		class JourneyPatternAdmin : public admin::AdminInterfaceElementTemplate<JourneyPatternAdmin>
 		{
 		public:
 			static const std::string TAB_STOPS;
@@ -56,7 +53,7 @@ namespace synthese
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
 		public:
-			LineAdmin();
+			JourneyPatternAdmin();
 
 			virtual PageLinks _getCurrentTreeBranch() const;
 

@@ -192,7 +192,7 @@ namespace synthese
 				
 
 				// Way 2 : line time table
-				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == LineTableSync::TABLE.ID)
+				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == JourneyPatternTableSync::TABLE.ID)
 				{
 					try
 					{

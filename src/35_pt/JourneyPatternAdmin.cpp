@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// LineAdmin class implementation.
-///	@file LineAdmin.cpp
+/// JourneyPatternAdmin class implementation.
+///	@file JourneyPatternAdmin.cpp
 ///	@author Hugues Romain
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
@@ -22,7 +22,7 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "LineAdmin.h"
+#include "JourneyPatternAdmin.hpp"
 #include "CommercialLineAdmin.h"
 #include "PTModule.h"
 #include "Profile.h"
@@ -79,28 +79,28 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, LineAdmin>::FACTORY_KEY("LineAdmin");
+		template<> const string FactorableTemplate<AdminInterfaceElement, JourneyPatternAdmin>::FACTORY_KEY("JourneyPatternAdmin");
 	}
 
 	namespace admin
 	{
-		template<> const string AdminInterfaceElementTemplate<LineAdmin>::ICON("chart_line.png");
-		template<> const string AdminInterfaceElementTemplate<LineAdmin>::DEFAULT_TITLE("Ligne inconnue");
+		template<> const string AdminInterfaceElementTemplate<JourneyPatternAdmin>::ICON("chart_line.png");
+		template<> const string AdminInterfaceElementTemplate<JourneyPatternAdmin>::DEFAULT_TITLE("Ligne inconnue");
 	}
 
 	namespace pt
 	{
-		const string LineAdmin::TAB_STOPS("st");
-		const string LineAdmin::TAB_SCHEDULED_SERVICES("ss");
-		const string LineAdmin::TAB_CONTINUOUS_SERVICES("cs");
-		const string LineAdmin::TAB_PROPERTIES("pr");
-		const string LineAdmin::TAB_INDICES("in");
+		const string JourneyPatternAdmin::TAB_STOPS("st");
+		const string JourneyPatternAdmin::TAB_SCHEDULED_SERVICES("ss");
+		const string JourneyPatternAdmin::TAB_CONTINUOUS_SERVICES("cs");
+		const string JourneyPatternAdmin::TAB_PROPERTIES("pr");
+		const string JourneyPatternAdmin::TAB_INDICES("in");
 
-		LineAdmin::LineAdmin()
-			: AdminInterfaceElementTemplate<LineAdmin>()
+		JourneyPatternAdmin::JourneyPatternAdmin()
+			: AdminInterfaceElementTemplate<JourneyPatternAdmin>()
 		{ }
 		
-		void LineAdmin::setFromParametersMap(
+		void JourneyPatternAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
 			try
@@ -120,7 +120,7 @@ namespace synthese
 		
 		
 		
-		server::ParametersMap LineAdmin::getParametersMap() const
+		server::ParametersMap JourneyPatternAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			if(_line.get()) m.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
@@ -129,7 +129,7 @@ namespace synthese
 
 
 		
-		void LineAdmin::display(
+		void JourneyPatternAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
 			const admin::AdminRequest& _request
@@ -184,13 +184,13 @@ namespace synthese
 						UP_LINKS_LOAD_LEVEL
 				)	);
 
-				AdminActionFunctionRequest<LineStopRemoveAction,LineAdmin> lineStopRemoveAction(_request);
+				AdminActionFunctionRequest<LineStopRemoveAction,JourneyPatternAdmin> lineStopRemoveAction(_request);
 				
-				AdminActionFunctionRequest<LineStopAddAction,LineAdmin> lineStopAddAction(_request);
+				AdminActionFunctionRequest<LineStopAddAction,JourneyPatternAdmin> lineStopAddAction(_request);
 				lineStopAddAction.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
 				HTMLForm f(lineStopAddAction.getHTMLForm());
 
-				AdminActionFunctionRequest<LineStopUpdateAction,LineAdmin> lineStopUpdateAction(_request);
+				AdminActionFunctionRequest<LineStopUpdateAction,JourneyPatternAdmin> lineStopUpdateAction(_request);
 				
 				HTMLTable::ColsVector v;
 				v.push_back("Rang");
@@ -283,10 +283,10 @@ namespace synthese
 			{
 				stream << "<h1>Services à horaire</h1>";
 
-				AdminFunctionRequest<LineAdmin> searchRequest(_request);
+				AdminFunctionRequest<JourneyPatternAdmin> searchRequest(_request);
 				HTMLForm sortedForm(searchRequest.getHTMLForm());
 
-				AdminActionFunctionRequest<ServiceAddAction, LineAdmin> newRequest(_request);
+				AdminActionFunctionRequest<ServiceAddAction, JourneyPatternAdmin> newRequest(_request);
 				newRequest.getAction()->setLine(const_pointer_cast<JourneyPattern>(_line));
 				newRequest.getAction()->setIsContinuous(false);
 
@@ -351,10 +351,10 @@ namespace synthese
 			// TAB CONTINUOUS SERVICES
 			if (openTabContent(stream, TAB_CONTINUOUS_SERVICES))
 			{
-				AdminFunctionRequest<LineAdmin> searchRequest(_request);
+				AdminFunctionRequest<JourneyPatternAdmin> searchRequest(_request);
 				HTMLForm sortedForm(searchRequest.getHTMLForm());
 
-				AdminActionFunctionRequest<ServiceAddAction, LineAdmin> newRequest(_request);
+				AdminActionFunctionRequest<ServiceAddAction, JourneyPatternAdmin> newRequest(_request);
 				newRequest.getAction()->setLine(const_pointer_cast<JourneyPattern>(_line));
 				newRequest.getAction()->setIsContinuous(true);
 
@@ -433,7 +433,7 @@ namespace synthese
 				waybackMap.insert(make_pair(false, "Aller"));
 				waybackMap.insert(make_pair(true, "Retour"));
 
-				AdminActionFunctionRequest<LineUpdateAction,LineAdmin> updateRequest(_request);
+				AdminActionFunctionRequest<LineUpdateAction,JourneyPatternAdmin> updateRequest(_request);
 				updateRequest.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
 				PropertiesHTMLTable p(updateRequest.getHTMLForm());
 				stream << p.open();
@@ -461,7 +461,7 @@ namespace synthese
 				)	);
 				stream << p.close();
 
-				PTRuleUserAdmin<JourneyPattern,LineAdmin>::Display(stream, _line, _request);
+				PTRuleUserAdmin<JourneyPattern,JourneyPatternAdmin>::Display(stream, _line, _request);
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -542,7 +542,7 @@ namespace synthese
 
 
 
-		bool LineAdmin::isAuthorized(
+		bool JourneyPatternAdmin::isAuthorized(
 			const security::User& user
 		) const	{
 			if (_line.get() == NULL) return false;
@@ -551,21 +551,21 @@ namespace synthese
 		
 		
 
-		std::string LineAdmin::getTitle() const
+		std::string JourneyPatternAdmin::getTitle() const
 		{
 			return _line.get() ? "Route " + _line->getName() : DEFAULT_TITLE;
 		}
 
 
 
-		boost::shared_ptr<const JourneyPattern> LineAdmin::getLine() const
+		boost::shared_ptr<const JourneyPattern> JourneyPatternAdmin::getLine() const
 		{
 			return _line;
 		}
 
 
 
-		void LineAdmin::_buildTabs(
+		void JourneyPatternAdmin::_buildTabs(
 			const security::Profile& profile
 		) const {
 			_tabs.clear();
@@ -581,21 +581,21 @@ namespace synthese
 		
 
 
-		void LineAdmin::setLine(boost::shared_ptr<const JourneyPattern> value)
+		void JourneyPatternAdmin::setLine(boost::shared_ptr<const JourneyPattern> value)
 		{
 			_line = value;
 		}
 		
 		
 
-		bool LineAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		bool JourneyPatternAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
-			return _line->getKey() == static_cast<const LineAdmin&>(other)._line->getKey();
+			return _line->getKey() == static_cast<const JourneyPatternAdmin&>(other)._line->getKey();
 		}
 
 
 
-		AdminInterfaceElement::PageLinks LineAdmin::getSubPages(
+		AdminInterfaceElement::PageLinks JourneyPatternAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
@@ -634,7 +634,7 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks LineAdmin::_getCurrentTreeBranch() const
+		AdminInterfaceElement::PageLinks JourneyPatternAdmin::_getCurrentTreeBranch() const
 		{
 			shared_ptr<CommercialLineAdmin> p(
 				getNewOtherPage<CommercialLineAdmin>()

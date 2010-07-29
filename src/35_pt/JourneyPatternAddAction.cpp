@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// LineAddAction class implementation.
-/// @file LineAddAction.cpp
+/// JourneyPatternAddAction class implementation.
+/// @file JourneyPatternAddAction.cpp
 /// @author Hugues
 /// @date 2010
 ///
@@ -24,7 +24,7 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "LineAddAction.h"
+#include "JourneyPatternAddAction.hpp"
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "CommercialLineTableSync.h"
@@ -45,19 +45,19 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, pt::LineAddAction>::FACTORY_KEY("LineAddAction");
+		template<> const string FactorableTemplate<Action, pt::JourneyPatternAddAction>::FACTORY_KEY("JourneyPatternAddAction");
 	}
 
 	namespace pt
 	{
-		const string LineAddAction::PARAMETER_COMMERCIAL_LINE_ID = Action_PARAMETER_PREFIX + "cl";
-		const string LineAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-		const string LineAddAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "te";
-		const string LineAddAction::PARAMETER_REVERSE_COPY = Action_PARAMETER_PREFIX + "re";
+		const string JourneyPatternAddAction::PARAMETER_COMMERCIAL_LINE_ID = Action_PARAMETER_PREFIX + "cl";
+		const string JourneyPatternAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+		const string JourneyPatternAddAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "te";
+		const string JourneyPatternAddAction::PARAMETER_REVERSE_COPY = Action_PARAMETER_PREFIX + "re";
 		
 		
 		
-		ParametersMap LineAddAction::getParametersMap() const
+		ParametersMap JourneyPatternAddAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if(_template.get())
@@ -75,7 +75,7 @@ namespace synthese
 		
 		
 		
-		void LineAddAction::_setFromParametersMap(const ParametersMap& map)
+		void JourneyPatternAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			RegistryKeyType tid(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE_ID));
 
@@ -109,7 +109,7 @@ namespace synthese
 		
 		
 		
-		void LineAddAction::run(
+		void JourneyPatternAddAction::run(
 			Request& request
 		){
 			SQLiteTransaction transaction;
@@ -196,7 +196,7 @@ namespace synthese
 		
 		
 		
-		bool LineAddAction::isAuthorized(
+		bool JourneyPatternAddAction::isAuthorized(
 			const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
@@ -204,7 +204,7 @@ namespace synthese
 
 
 
-		void LineAddAction::setCommercialLine( boost::shared_ptr<pt::CommercialLine> value )
+		void JourneyPatternAddAction::setCommercialLine( boost::shared_ptr<pt::CommercialLine> value )
 		{
 			_commercialLine = value;
 		}

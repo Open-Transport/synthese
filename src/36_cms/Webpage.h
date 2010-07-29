@@ -71,7 +71,7 @@ namespace synthese
 			public tree::TreeNode<
 				Webpage,
 				tree::TreeRankOrderingPolicy,
-				tree::TreeOtherClassRootPolicy<WebSite>
+				tree::TreeOtherClassRootPolicy<Website>
 			>,
 			public util::Named
 		{

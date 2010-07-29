@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// LineAddAction class header.
-///	@file LineAddAction.h
+/// JourneyPatternAddAction class header.
+///	@file JourneyPatternAddAction.hpp
 ///	@author Hugues
 ///	@date 2010
 ///
@@ -45,7 +45,7 @@ namespace synthese
 		/// @date 2010
 		/// @since 3.1.15
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : LineAddAction
+		/// Key : JourneyPatternAddAction
 		///
 		/// A route can be created in two ways :
 		///	<ul>
@@ -78,8 +78,8 @@ namespace synthese
 		///		<li>the direction only if no reverse copy</li>
 		///		<li>all transport attributes except direction if re</li>
 		///	</ul>
-		class LineAddAction:
-			public util::FactorableTemplate<server::Action, LineAddAction>
+		class JourneyPatternAddAction:
+			public util::FactorableTemplate<server::Action, JourneyPatternAddAction>
 		{
 		public:
 			static const std::string PARAMETER_COMMERCIAL_LINE_ID;

@@ -31,7 +31,7 @@
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 #include "JourneyPattern.hpp"
-#include "LineAdmin.h"
+#include "JourneyPatternAdmin.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "TransportNetworkRight.h"
 #include "TridentExportFunction.h"
@@ -44,7 +44,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "NonPermanentService.h"
 #include "Profile.h"
-#include "LineAddAction.h"
+#include "JourneyPatternAddAction.hpp"
 #include "CalendarTemplateTableSync.h"
 #include "CommercialLineCalendarTemplateUpdateAction.hpp"
 #include "CommercialLineUpdateAction.h"
@@ -174,7 +174,7 @@ namespace synthese
 						_requestParameters.raisingOrder
 				)	);
 				
-				AdminActionFunctionRequest<LineAddAction,LineAdmin> creationRequest(_request);
+				AdminActionFunctionRequest<JourneyPatternAddAction,JourneyPatternAdmin> creationRequest(_request);
 				creationRequest.getFunction()->setActionFailedPage(getNewPage());
 				creationRequest.setActionWillCreateObject();
 				creationRequest.getAction()->setCommercialLine(const_pointer_cast<CommercialLine>(_cline));
@@ -195,11 +195,11 @@ namespace synthese
 					_requestParameters,
 					routes,
 					creationRequest.getHTMLForm("addline"),
-					LineAddAction::PARAMETER_TEMPLATE_ID
+					JourneyPatternAddAction::PARAMETER_TEMPLATE_ID
 				);
 
 				stream << t.open();
-				AdminFunctionRequest<LineAdmin> lineOpenRequest(_request);
+				AdminFunctionRequest<JourneyPatternAdmin> lineOpenRequest(_request);
  				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 				{
 					lineOpenRequest.getPage()->setLine(line);
@@ -247,8 +247,8 @@ namespace synthese
 				}
 
 				stream << t.row(string());
-				stream << t.col() << t.getActionForm().getTextInput(LineAddAction::PARAMETER_NAME, string(), string(), AdminModule::CSS_2DIGIT_INPUT);
-				stream << t.col(5) << "Inversion : " << t.getActionForm().getOuiNonRadioInput(LineAddAction::PARAMETER_REVERSE_COPY, false);
+				stream << t.col() << t.getActionForm().getTextInput(JourneyPatternAddAction::PARAMETER_NAME, string(), string(), AdminModule::CSS_2DIGIT_INPUT);
+				stream << t.col(5) << "Inversion : " << t.getActionForm().getOuiNonRadioInput(JourneyPatternAddAction::PARAMETER_REVERSE_COPY, false);
 				stream << t.col() << t.getActionForm().getSubmitButton("Créer un itinéraire");
 
 				stream << t.close();
@@ -491,8 +491,8 @@ namespace synthese
 				);
 				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 				{
-					shared_ptr<LineAdmin> p(
-						getNewOtherPage<LineAdmin>()
+					shared_ptr<JourneyPatternAdmin> p(
+						getNewOtherPage<JourneyPatternAdmin>()
 					);
 					p->setLine(line);
 					links.push_back(p);
@@ -506,7 +506,7 @@ namespace synthese
 		) const {
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Parcours", TAB_ROUTES, true, LineAdmin::ICON));
+			_tabs.push_back(Tab("Parcours", TAB_ROUTES, true, JourneyPatternAdmin::ICON));
 			_tabs.push_back(Tab("Dates de fonctionnement", TAB_DATES, true, "calendar.png"));
 			_tabs.push_back(Tab("Non concurrence", TAB_NON_CONCURRENCY, true, "lock.png"));
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));

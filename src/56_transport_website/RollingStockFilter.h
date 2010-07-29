@@ -57,7 +57,7 @@ namespace synthese
 		private:
 
 			std::string _name;
-			const Site* _site;
+			const TransportWebsite* _site;
 			std::size_t _rank;
 			List _list;
 			bool _authorized_only;

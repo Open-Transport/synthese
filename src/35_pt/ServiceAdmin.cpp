@@ -41,7 +41,7 @@
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
 #include "CalendarHTMLViewer.h"
-#include "LineAdmin.h"
+#include "JourneyPatternAdmin.hpp"
 #include "Profile.h"
 #include "PTPlaceAdmin.h"
 #include "AdminFunctionRequest.hpp"
@@ -438,8 +438,8 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks ServiceAdmin::_getCurrentTreeBranch() const
 		{
-			shared_ptr<LineAdmin> p(
-				getNewOtherPage<LineAdmin>()
+			shared_ptr<JourneyPatternAdmin> p(
+				getNewOtherPage<JourneyPatternAdmin>()
 			);
 			p->setLine(Env::GetOfficialEnv().get<JourneyPattern>(_service->getPathId()));
 
