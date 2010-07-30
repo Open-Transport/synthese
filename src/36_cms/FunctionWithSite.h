@@ -29,6 +29,7 @@
 #include "RequestException.h"
 #include "Website.hpp"
 #include "Env.h"
+#include "Fetcher.h"
 
 namespace synthese
 {
@@ -66,7 +67,7 @@ namespace synthese
 				{
 					try
 					{
-						_site = util::Env::GetOfficialEnv().getRegistry<Website>().get(id);
+						_site = db::Fetcher<Website>::Fetch(id, _env);
 					}
 					catch (util::ObjectNotFoundException<Website>&)
 					{

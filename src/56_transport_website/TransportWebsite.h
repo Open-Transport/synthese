@@ -173,7 +173,6 @@ namespace synthese
 				const boost::gregorian::date				getMinUseDate() const;
 				const boost::gregorian::date				getMaxUseDate() const;
 				
-				virtual util::RegistryKeyType getKey() const { return util::Registrable::getKey(); }
 
 				/** Interprets date from text and environment data.
 					@param text Text to interpret

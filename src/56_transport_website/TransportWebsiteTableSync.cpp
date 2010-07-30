@@ -45,6 +45,7 @@ namespace synthese
 	namespace util
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,TransportWebsiteTableSync>::FACTORY_KEY("56.01 TransportWebsite");
+		template<> const string FactorableTemplate<Fetcher<Website>, TransportWebsiteTableSync>::FACTORY_KEY("25");
 	}
 
 	namespace transportwebsite

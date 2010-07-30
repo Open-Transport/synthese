@@ -6,6 +6,6 @@ CppSynthese3LibProject(
 	dependencies = [
 		's3-pt.cpplib',
 		's3-transport-website.cpplib',
-		's3-pt-routeplanner.cpplib'
+		's3-pt-route-planner.cpplib'
 	]
 )

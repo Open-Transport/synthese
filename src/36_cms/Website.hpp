@@ -24,7 +24,7 @@
 #define SYNTHESE_cms_Website_hpp__
 
 #include "Named.h"
-#include "Registry.h"
+#include "Registrable.h"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 
@@ -40,7 +40,8 @@ namespace synthese
 		/// @author Hugues Romain
 		/// @since 3.2.0
 		class Website:
-			public util::Named
+			public util::Named,
+			public virtual util::Registrable
 		{
 		private:
 			//! \name Properties
@@ -76,8 +77,6 @@ namespace synthese
 			
 			//! @name Services
 			//@{
-				virtual util::RegistryKeyType getKey() const = 0;
-				
 				bool dateControl() const
 				{
 				    boost::gregorian::date tempDate(boost::gregorian::day_clock::local_day());
