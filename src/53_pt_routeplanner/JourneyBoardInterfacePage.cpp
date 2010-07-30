@@ -57,7 +57,6 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace routeplanner;
 	using namespace util;
 	using namespace pt;
 	using namespace resa;
@@ -69,7 +68,7 @@ namespace synthese
 	
 	
 	
-	namespace routeplanner
+	namespace ptrouteplanner
 	{
 		const string JourneyBoardInterfacePage::DATA_RANK("rank");
 		const string JourneyBoardInterfacePage::DATA_IS_THE_LAST_JOURNEY_BOARD("is_the_last_journey_board");
