@@ -90,7 +90,7 @@ namespace synthese
 						*_env
 					);
 					_rank = _template->getRank();
-					_site = _env->getEditableSPtr(_template->getRoot());
+					_site = Fetcher<Website>::FetchEditable(_template->getRoot()->getKey(), *_env);
 				}
 				catch(ObjectNotFoundException<Webpage>& e)
 				{
@@ -105,7 +105,7 @@ namespace synthese
 						map.get<RegistryKeyType>(PARAMETER_PARENT_ID),
 						*_env
 					);
-					_site = _env->getEditableSPtr(_parent->getRoot());
+					_site = Fetcher<Website>::FetchEditable(_parent->getRoot()->getKey(), *_env);
 
 					WebPageTableSync::SearchResult result(
 						WebPageTableSync::Search(
