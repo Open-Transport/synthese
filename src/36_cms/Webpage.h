@@ -29,7 +29,7 @@
 #include "TreeRankOrderingPolicy.hpp"
 #include "TreeOtherClassRootPolicy.hpp"
 #include "Named.h"
-#include "WebSite.hpp"
+#include "Website.hpp"
 
 #include <ostream>
 #include <boost/date_time/posix_time/posix_time.hpp>

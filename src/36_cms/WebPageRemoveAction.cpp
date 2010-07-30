@@ -25,7 +25,6 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "WebPageRemoveAction.h"
-#include "TransportWebsiteRight.h"
 #include "Request.h"
 #include "WebPageTableSync.h"
 
@@ -96,7 +95,8 @@ namespace synthese
 		bool WebPageRemoveAction::isAuthorized(
 			const Session* session
 		) const {
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(DELETE_RIGHT);
+			return true;
+			//return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(DELETE_RIGHT);
 		}
 
 

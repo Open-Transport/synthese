@@ -37,7 +37,7 @@ namespace synthese
 	using namespace util;
 	using namespace interfaces;
 	using namespace server;
-	using namespace transportwebsite;
+	using namespace cms;
 	
 
 	template<> const string util::FactorableTemplate<InterfacePage,pt::LineMarkerInterfacePage>::FACTORY_KEY("line_marker");

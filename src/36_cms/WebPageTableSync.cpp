@@ -23,7 +23,8 @@
 #include "WebPageTableSync.h"
 #include "ReplaceQuery.h"
 #include "SQLiteResult.h"
-#include "SiteTableSync.h"
+#include "Fetcher.h"
+#include "Website.hpp"
 #include "SelectQuery.hpp"
 #include "Conversion.h"
 
@@ -34,7 +35,6 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace pt;
 	using namespace util;
 	using namespace db;
 	using namespace cms;
@@ -125,7 +125,7 @@ namespace synthese
 				{
 					try
 					{
-						webpage->setRoot(SiteTableSync::GetEditable(id, env, linkLevel).get());
+						webpage->setRoot(Fetcher<Website>::FetchEditable(id, env, linkLevel).get());
 					}
 					catch(ObjectNotFoundException<Website>& e)
 					{

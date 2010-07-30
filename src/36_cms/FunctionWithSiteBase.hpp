@@ -31,7 +31,7 @@ namespace synthese
 {
 	namespace cms
 	{
-		class WebSite;
+		class Website;
 
 		/** Function With website class.
 			@author Hugues Romain

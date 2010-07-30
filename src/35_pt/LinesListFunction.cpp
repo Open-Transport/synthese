@@ -44,7 +44,7 @@ namespace synthese
 	using namespace server;
 	using namespace pt;
 	using namespace security;
-	using namespace transportwebsite;
+	using namespace cms;
 	
 	template<> const string util::FactorableTemplate<server::Function,pt::LinesListFunction>::FACTORY_KEY(
 		"LinesListFunction2"

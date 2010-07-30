@@ -36,7 +36,7 @@ namespace synthese
 		class Request;
 	}
 
-	namespace transportwebsite
+	namespace cms
 	{
 		class Webpage;
 	}

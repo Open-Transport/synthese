@@ -20,13 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "FunctionWithSite.h"
+#include "FunctionWithSiteBase.hpp"
+#include "Website.hpp"
 
 using namespace std;
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace cms
 	{
 		const string FunctionWithSiteBase::PARAMETER_SITE("si");
 

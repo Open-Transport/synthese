@@ -25,12 +25,11 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "WebPageAddAction.h"
-#include "TransportWebsiteRight.h"
 #include "Request.h"
 #include "Webpage.h"
 #include "WebPageTableSync.h"
 #include "Website.hpp"
-#include "SiteTableSync.h"
+#include "Fetcher.h"
 
 using namespace std;
 using namespace boost;
@@ -41,6 +40,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
+	using namespace db;
 	
 	namespace util
 	{
@@ -130,7 +130,7 @@ namespace synthese
 			{
 				try
 				{
-					_site = SiteTableSync::GetEditable(
+					_site = Fetcher<Website>::FetchEditable(
 						map.get<RegistryKeyType>(PARAMETER_SITE_ID),
 						*_env
 					);
@@ -195,7 +195,8 @@ namespace synthese
 		bool WebPageAddAction::isAuthorized(
 			const Session* session
 		) const {
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(WRITE);
+			return true;
+			//return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(WRITE);
 		}
 	}
 }

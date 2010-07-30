@@ -24,6 +24,7 @@
 #define SYNTHESE_cms_Website_hpp__
 
 #include "Named.h"
+#include "Registry.h"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
 
@@ -71,6 +72,11 @@ namespace synthese
 				const boost::gregorian::date& getEndDate() const { return _endValidityDate; }
 				const std::string& getClientURL() const { return _clientURL; }
 				Webpage* getDefaultTemplate() const { return _defaultTemplate; }
+			//@}
+			
+			//! @name Services
+			//@{
+				virtual util::RegistryKeyType getKey() const = 0;
 			//@}
 		};
 	}

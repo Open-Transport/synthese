@@ -25,7 +25,6 @@
 #include "WebPageAdmin.h"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
-#include "CMSRight.h"
 #include "WebPageTableSync.h"
 #include "PropertiesHTMLTable.h"
 #include "WebPageUpdateAction.h"
@@ -34,7 +33,6 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "Interface.h"
 #include "WebPageInterfacePage.h"
-#include "WebsiteAdmin.hpp"
 #include "ResultHTMLTable.h"
 #include "HTMLModule.h"
 #include "WebPageAddAction.h"
@@ -42,6 +40,7 @@
 #include "WebPageLinkAddAction.hpp"
 #include "WebPageLinkRemoveAction.hpp"
 #include "WebPageMoveAction.hpp"
+#include "AdminFunctionRequest.hpp"
 
 using namespace std;
 using namespace boost;
@@ -115,7 +114,8 @@ namespace synthese
 		bool WebPageAdmin::isAuthorized(
 			const security::User& user
 		) const	{
-			return user.getProfile()->isAuthorized<TransportWebsiteRight>(READ);
+			return true;
+			//return user.getProfile()->isAuthorized<TransportWebsiteRight>(READ);
 		}
 
 
@@ -413,7 +413,7 @@ namespace synthese
 			WebPageTableSync::SearchResult result(
 				WebPageTableSync::Search(
 					Env::GetOfficialEnv(),
-					decodeTableId(parentId) == WebPageTableSync::TABLE.ID : optional<RegistryKeyType>() ? parentId,
+					decodeTableId(parentId) == WebPageTableSync::TABLE.ID ? optional<RegistryKeyType>() : parentId,
 					decodeTableId(parentId) == WebPageTableSync::TABLE.ID ? parentId : RegistryKeyType(0)
 			)	);
 

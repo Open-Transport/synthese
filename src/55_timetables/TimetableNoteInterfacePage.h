@@ -40,13 +40,10 @@ namespace synthese
 		class Request;
 	}
 	
-	namespace cms
-	{
-		class TimetableWarning;
-	}
-
 	namespace timetables
 	{
+		class TimetableWarning;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// 55.11 Interface : Timetable note display.
 		///	@ingroup m55Pages refPages
