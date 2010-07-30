@@ -1,8 +1,8 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-/// PTPhysicalStopAdmin class header.
-///	@file PTPhysicalStopAdmin.h
+/// StopPointAdmin class header.
+///	@file StopPointAdmin.hpp
 ///	@author Hugues
 ///	@date 2009
 ///
@@ -36,12 +36,12 @@ namespace synthese
 		class StopPoint;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// PTPhysicalStopAdmin Admin compound class.
+		/// StopPointAdmin Admin compound class.
 		///	@ingroup m35Admin refAdmin
 		///	@author Hugues
 		///	@date 2009
-		class PTPhysicalStopAdmin:
-			public admin::AdminInterfaceElementTemplate<PTPhysicalStopAdmin>
+		class StopPointAdmin:
+			public admin::AdminInterfaceElementTemplate<StopPointAdmin>
 		{
 		public:
 			/// @name Parameter identifiers
@@ -88,7 +88,7 @@ namespace synthese
 			/// Constructor.
 			///	@author Hugues
 			///	@date 2009
-			PTPhysicalStopAdmin();
+			StopPointAdmin();
 
 
 			void setStop(boost::shared_ptr<const StopPoint> value){ _stop = value; }

@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// PTPhysicalStopAdmin class implementation.
-///	@file PTPhysicalStopAdmin.cpp
+/// StopPointAdmin class implementation.
+///	@file StopPointAdmin.cpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///
@@ -22,7 +22,7 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "PTPhysicalStopAdmin.h"
+#include "StopPointAdmin.hpp"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
 #include "PTModule.h"
@@ -51,30 +51,30 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, PTPhysicalStopAdmin>::FACTORY_KEY("PTPhysicalStopAdmin");
+		template<> const string FactorableTemplate<AdminInterfaceElement, StopPointAdmin>::FACTORY_KEY("StopPointAdmin");
 	}
 
 	namespace admin
 	{
-		template<> const string AdminInterfaceElementTemplate<PTPhysicalStopAdmin>::ICON("building.png");
-		template<> const string AdminInterfaceElementTemplate<PTPhysicalStopAdmin>::DEFAULT_TITLE("Arrêt physique");
+		template<> const string AdminInterfaceElementTemplate<StopPointAdmin>::ICON("building.png");
+		template<> const string AdminInterfaceElementTemplate<StopPointAdmin>::DEFAULT_TITLE("Arrêt physique");
 	}
 
 	namespace pt
 	{
-		const string PTPhysicalStopAdmin::TAB_LINKS("li");
-		const string PTPhysicalStopAdmin::TAB_OPERATOR_CODES("oc");
-		const string PTPhysicalStopAdmin::TAB_PROPERTIES("pr");
+		const string StopPointAdmin::TAB_LINKS("li");
+		const string StopPointAdmin::TAB_OPERATOR_CODES("oc");
+		const string StopPointAdmin::TAB_PROPERTIES("pr");
 
 
 
-		PTPhysicalStopAdmin::PTPhysicalStopAdmin()
-			: AdminInterfaceElementTemplate<PTPhysicalStopAdmin>()
+		StopPointAdmin::StopPointAdmin()
+			: AdminInterfaceElementTemplate<StopPointAdmin>()
 		{ }
 
 
 		
-		void PTPhysicalStopAdmin::setFromParametersMap(
+		void StopPointAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
 			try
@@ -89,7 +89,7 @@ namespace synthese
 
 
 
-		ParametersMap PTPhysicalStopAdmin::getParametersMap() const
+		ParametersMap StopPointAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(_stop.get())
@@ -101,7 +101,7 @@ namespace synthese
 
 
 		
-		bool PTPhysicalStopAdmin::isAuthorized(
+		bool StopPointAdmin::isAuthorized(
 			const security::User& user
 		) const	{
 			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
@@ -109,7 +109,7 @@ namespace synthese
 
 
 
-		void PTPhysicalStopAdmin::display(
+		void StopPointAdmin::display(
 			ostream& stream,
 			VariablesMap& variables,
 			const admin::AdminRequest& request
@@ -119,7 +119,7 @@ namespace synthese
 			// PROPERTIES TAB
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
-				AdminActionFunctionRequest<StopPointUpdateAction, PTPhysicalStopAdmin> updateRequest(request);
+				AdminActionFunctionRequest<StopPointUpdateAction, StopPointAdmin> updateRequest(request);
 				updateRequest.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
 				
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
@@ -145,7 +145,7 @@ namespace synthese
 
 
 
-		std::string PTPhysicalStopAdmin::getTitle() const
+		std::string StopPointAdmin::getTitle() const
 		{
 			return
 				_stop.get() ?
@@ -158,14 +158,14 @@ namespace synthese
 
 
 
-		bool PTPhysicalStopAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		bool StopPointAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
-			return _stop->getKey() == static_cast<const PTPhysicalStopAdmin&>(other)._stop->getKey();
+			return _stop->getKey() == static_cast<const StopPointAdmin&>(other)._stop->getKey();
 		}
 
 
 
-		void PTPhysicalStopAdmin::_buildTabs(
+		void StopPointAdmin::_buildTabs(
 			const security::Profile& profile
 		) const	{
 			_tabs.clear();
@@ -177,7 +177,7 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks PTPhysicalStopAdmin::_getCurrentTreeBranch() const
+		AdminInterfaceElement::PageLinks StopPointAdmin::_getCurrentTreeBranch() const
 		{
 			PageLinks links;
 

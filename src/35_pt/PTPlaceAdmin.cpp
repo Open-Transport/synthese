@@ -44,7 +44,7 @@
 #include "StopAreaUpdateAction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "StopAreaNameUpdateAction.hpp"
-#include "PTPhysicalStopAdmin.h"
+#include "StopPointAdmin.hpp"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
@@ -223,7 +223,7 @@ namespace synthese
 			// TAB STOPS
 			if (openTabContent(stream, TAB_STOPS))
 			{
-				AdminFunctionRequest<PTPhysicalStopAdmin> openRequest(request);
+				AdminFunctionRequest<StopPointAdmin> openRequest(request);
 
 				AdminActionFunctionRequest<StopPointAddAction,PTPlaceAdmin> addRequest(request);
 				addRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
@@ -269,7 +269,7 @@ namespace synthese
 						;
 					}
 
-					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPhysicalStopAdmin::ICON);
+					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), StopPointAdmin::ICON);
 				}
 				stream << t.row();
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_NAME, string());
@@ -469,7 +469,7 @@ namespace synthese
 
 			BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 			{
-				shared_ptr<PTPhysicalStopAdmin> p(getNewOtherPage<PTPhysicalStopAdmin>());
+				shared_ptr<StopPointAdmin> p(getNewOtherPage<StopPointAdmin>());
 				p->setStop(Env::GetOfficialEnv().getSPtr(it.second));
 				links.push_back(p);
 			}

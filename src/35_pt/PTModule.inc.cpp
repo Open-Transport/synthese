@@ -47,7 +47,7 @@
 #include "PTPlaceAdmin.h"
 #include "PTUseRulesAdmin.h"
 #include "PTUseRuleAdmin.h"
-#include "PTPhysicalStopAdmin.h"
+#include "StopPointAdmin.hpp"
 
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "LineMarkerInterfacePage.h"

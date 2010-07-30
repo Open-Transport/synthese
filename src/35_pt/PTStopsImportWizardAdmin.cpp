@@ -35,7 +35,7 @@
 #include "StopPointTableSync.hpp"
 #include "PTPlaceAdmin.h"
 #include "HTMLModule.h"
-#include "PTPhysicalStopAdmin.h"
+#include "StopPointAdmin.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "StopAreaAddAction.h"
 #include "StopArea.hpp"
@@ -347,7 +347,7 @@ namespace synthese
 						c.push_back("Actions");
 
 						AdminFunctionRequest<PTPlaceAdmin> openRequest(request);
-						AdminFunctionRequest<PTPhysicalStopAdmin> openPhysicalRequest(request);
+						AdminFunctionRequest<StopPointAdmin> openPhysicalRequest(request);
 
 						HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 						stream << t.open();

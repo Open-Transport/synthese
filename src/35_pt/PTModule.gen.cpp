@@ -45,7 +45,7 @@ synthese::pt::PTNetworksAdmin::integrate();
 synthese::pt::PTPlaceAdmin::integrate();
 synthese::pt::PTUseRuleAdmin::integrate();
 synthese::pt::PTUseRulesAdmin::integrate();
-synthese::pt::PTPhysicalStopAdmin::integrate();
+synthese::pt::StopPointAdmin::integrate();
 
 synthese::pt::RealTimeUpdateFunction::integrate();
 synthese::pt::PhysicalStopsCSVExportFunction::integrate();
