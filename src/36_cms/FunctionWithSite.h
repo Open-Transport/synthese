@@ -67,7 +67,7 @@ namespace synthese
 				{
 					try
 					{
-						_site = db::Fetcher<Website>::Fetch(id, _env);
+						_site = db::Fetcher<Website>::Fetch(id, *_env);
 					}
 					catch (util::ObjectNotFoundException<Website>&)
 					{
