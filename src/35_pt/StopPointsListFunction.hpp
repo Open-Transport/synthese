@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
-/// PTPhysicalStopsListFunction class header.
-///	@file PTPhysicalStopsListFunction.hpp
+/// StopPointsListFunction class header.
+///	@file StopPointsListFunction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///
@@ -39,17 +39,18 @@ namespace synthese
 		///	@date 2010
 		/// @since 3.1.18
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : PTPhysicalStopsListFunction
+		/// Key : StopPointsListFunction
 		///
 		/// <h2>Usage</h2>
 		///	<h3>Search by id</h3>
 		///
 		/// Parameters :
 		///	<ul>
-		///		<li>fonction=PTPhysicalStopsListFunction</li>
+		///		<li>fonction=StopPointsListFunction</li>
 		///		<li>roid : id of the physical stop to return</li>
 		///		<li>p : id of the template to use for the display of each stop (will be used by PTPhysicalStopInterfacePage).
 		///			If not defined, the output respects the standard XML format defined below.</li>
+		///		<li>o : output format [xml|csv] (ignored if p is defined, default is xml)</li>
 		///	</ul>
 		///
 		/// <h3>Search by operator code</h3>
@@ -57,46 +58,60 @@ namespace synthese
 		/// The comparison between code and entered text is done by LIKE operator.
 		/// 
 		/// <ul>
-		///		<li>fonction=PTPhysicalStopsListFunction</li>
+		///		<li>fonction=StopPointsListFunction</li>
 		///		<li>code : operator code</li>
 		///		<li>n : max number of stops to return</li>
 		///		<li>p : id of the template to use for the display of each stop (will be used by PTPhysicalStopInterfacePage).
 		///			If not defined, the output respects the standard XML format defined below.</li>
+		///		<li>o : output format [xml|csv] (ignored if p is defined, default is xml)</li>
 		///	</ul>
 		///
 		/// <h3>Search by route</h3>
 		///
 		///	<ul>
-		///		<li>fonction=PTPhysicalStopsListFunction</li>
+		///		<li>fonction=StopPointsListFunction</li>
 		///		<li>roid : id of the route to read</li>
 		///		<li>p : id of the template to use for the display of each stop (will be used by PTPhysicalStopInterfacePage).
 		///			If not defined, the output respects the standard XML format defined below.</li>
+		///		<li>o : output format [xml|csv] (ignored if p is defined, default is xml)</li>
 		///	</ul>
 		/// 
 		/// <h3>Search by commercial stop area</h3>
 		///
 		///	<ul>
-		///		<li>fonction=PTPhysicalStopsListFunction</li>
+		///		<li>fonction=StopPointsListFunction</li>
 		///		<li>roid : id of the commercial stop area to read</li>
 		///		<li>ni (optional) : id of a transport network which must serve the stop</li>
 		///		<li>p : id of the template to use for the display of each stop (will be used by PTPhysicalStopInterfacePage).
 		///			If not defined, the output respects the standard XML format defined below.</li>
+		///		<li>o : output format [xml|csv] (ignored if p is defined, default is xml)</li>
 		///	</ul>
+		///
+		/// <h3>Search by coordinates (bounding box)</h3>
+		///	<ul>
+		///		<li>fonction=StopPointsListFunction</li>
+		///		<li>bbox : x1,y1,x2,y2 : bounding box (lambert II Etendu projection)</li>
+		///		<li>ni (optional) : id of a transport network which must serve the stop</li>
+		///		<li>p : id of the template to use for the display of each stop (will be used by PTPhysicalStopInterfacePage).
+		///			If not defined, the output respects the standard XML format defined below.</li>
+		///		<li>o : output format [xml|csv] (ignored if p is defined, default is xml)</li>
+		///	</ul>
+		///
 		///
 		///	<h2>Standard XML Output</h2>
 		///
 		/// This chapter applies only if no display template is used.
 		///
 		///	<h3>Description</h3>
-		/// @image html PTPhysicalStopsListFunction.png
+		/// @image html StopPointsListFunction.png
 		///
 		///	<h3>Download</h3>
 		///
 		///	<ul>
-		///		<li><a href="include/35_pt/PTPhysicalStopsListFunction.xsd">XML output schema</a></li>
+		///		<li><a href="include/35_pt/StopPointsListFunction.xsd">XML output schema</a></li>
 		///	</ul>
-		class PTPhysicalStopsListFunction:
-			public util::FactorableTemplate<server::Function,PTPhysicalStopsListFunction>
+		class StopPointsListFunction:
+			public util::FactorableTemplate<server::Function,StopPointsListFunction>
 		{
 		public:
 			/// @todo request parameter names declaration

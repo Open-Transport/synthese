@@ -1,6 +1,6 @@
 
-/** PTPhysicalStopsListFunction class implementation.
-	@file PTPhysicalStopsListFunction.cpp
+/** StopPointsListFunction class implementation.
+	@file StopPointsListFunction.cpp
 	@author Hugues Romain
 	@date 2010
 
@@ -24,7 +24,7 @@
 
 #include "RequestException.h"
 #include "Request.h"
-#include "PTPhysicalStopsListFunction.hpp"
+#include "StopPointsListFunction.hpp"
 
 using namespace std;
 
@@ -34,14 +34,14 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 
-	template<> const string util::FactorableTemplate<Function,pt::PTPhysicalStopsListFunction>::FACTORY_KEY("PTPhysicalStopsListFunction");
+	template<> const string util::FactorableTemplate<Function,pt::StopPointsListFunction>::FACTORY_KEY("StopPointsListFunction");
 	
 	namespace pt
 	{
 		/// @todo Parameter names declarations
-		//const string PTPhysicalStopsListFunction::PARAMETER_PAGE("rub");
+		//const string StopPointsListFunction::PARAMETER_PAGE("rub");
 		
-		ParametersMap PTPhysicalStopsListFunction::_getParametersMap() const
+		ParametersMap StopPointsListFunction::_getParametersMap() const
 		{
 			ParametersMap map;
 			/// @todo Map filling
@@ -49,7 +49,7 @@ namespace synthese
 			return map;
 		}
 
-		void PTPhysicalStopsListFunction::_setFromParametersMap(const ParametersMap& map)
+		void StopPointsListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			/// @todo Initialize internal attributes from the map
 			// 	string a = map.get<string>(PARAM_SEARCH_XXX);
@@ -57,7 +57,7 @@ namespace synthese
 			// 	optional<string> c = map.getOptional<string>(PARAM_SEARCH_XXX);
 		}
 
-		void PTPhysicalStopsListFunction::run(
+		void StopPointsListFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -66,7 +66,7 @@ namespace synthese
 		
 		
 		
-		bool PTPhysicalStopsListFunction::isAuthorized(
+		bool StopPointsListFunction::isAuthorized(
 			const Session* session
 		) const {
 			return true;
@@ -74,7 +74,7 @@ namespace synthese
 
 
 
-		std::string PTPhysicalStopsListFunction::getOutputMimeType() const
+		std::string StopPointsListFunction::getOutputMimeType() const
 		{
 			return "text/html";
 		}
