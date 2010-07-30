@@ -1,12 +1,12 @@
 Import ('s3env')
 
 CppSynthese3LibProject(
-	s3env, 's3-departures-table', s3env['S3VERSION'], 
+	s3env, 's3-departure-boards', s3env['S3VERSION'], 
     source_files = s3env.Glob ('*.cpp'),
     dependencies = [
 		's3-messages.cpplib',
 		's3-pt.cpplib',
-		's3-lex-matcher.cpplib',
+		's3-lexical-matcher.cpplib',
 		's3-geometry.cpplib',
 		's3-geography.cpplib',
 		's3-db.cpplib',

@@ -5,7 +5,7 @@ CppSynthese3LibProject(
 	source_files = s3env.Glob ('*.cpp'),
 	dependencies = [
 		's3-geometry.cpplib',
-		's3-lex-matcher.cpplib',
+		's3-lexical-matcher.cpplib',
 		's3-graph.cpplib',
 		's3-interfaces.cpplib',
 		'proj.cpplib'

@@ -7,7 +7,7 @@ CppBinProject(
 	include_dir = s3env.SrcDir('.'),
 	source_files = s3env.Glob ('main.cpp'),
 	dependencies = [
-		's3-departures-table.cpplib',
+		's3-departure-boards.cpplib',
 		's3-server.cpplib',
 		'boost.cppinc',
 		('boost-program-options.cpplib',s3env['BOOSTVERSION'])

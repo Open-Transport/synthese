@@ -1,7 +1,7 @@
 Import ('s3env')
 
 CppSynthese3LibProject(
-	s3env, 's3-lex-matcher', s3env['S3VERSION'], 
+	s3env, 's3-lexical-matcher', s3env['S3VERSION'], 
 	source_files = s3env.Glob ('*.cpp', excludes = ['old_main.cpp']),
 	dependencies = ['s3-util.cpplib']
 )

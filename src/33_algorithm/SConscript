@@ -8,6 +8,5 @@ CppSynthese3LibProject(
 		's3-road.cpplib',
 		's3-resa.cpplib',
 		's3-messages.cpplib',
-		's3-pt-route-planner.cpplib'
 	]
 )
