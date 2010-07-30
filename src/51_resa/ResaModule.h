@@ -103,10 +103,10 @@ namespace synthese
 			
 		A logged standard user uses the administration panel to access to the following features :
 			- edit personal informations (in security module)
-			- edit favorites journeys (in ptrouteplanner module)
+			- edit favorites journeys (in pt_journeyplanner module)
 			- display reservations history
 				- cancel a reservation
-			- display an integrated route planner (in ptrouteplanner module)
+			- display an integrated route planner (in pt_journeyplanner module)
 
 		A logged operator uses the administration panel to access to the following features :
 			- personal informations (security module)
@@ -117,7 +117,7 @@ namespace synthese
 			- display the commercial lines with reservations
 				- display the reservation list of the line
 					- ServiceReservationsRoadMapFunction : display the detailed reservation list of a service / course (pop up : not in the admin panel, optimized for printing)
-			- display an integrated route planner (ptrouteplanner module)
+			- display an integrated route planner (pt_journeyplanner module)
 			
 			Move the following features in a call center module :
 			- display the call center planning

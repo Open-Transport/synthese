@@ -42,7 +42,7 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace algorithm;
-	using namespace ptrouteplanner;
+	using namespace pt_journeyplanner;
 		
 
 	namespace departurestable

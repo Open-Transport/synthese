@@ -75,7 +75,7 @@ namespace synthese
 	using namespace resa;
 	using namespace pt;
 	using namespace html;
-	using namespace ptrouteplanner;
+	using namespace pt_journeyplanner;
 	using namespace algorithm;	
 	using namespace security;
 	using namespace graph;

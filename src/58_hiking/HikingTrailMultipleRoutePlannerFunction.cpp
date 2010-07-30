@@ -47,7 +47,7 @@ namespace synthese
 	using namespace geography;
 	using namespace cms;
 	using namespace graph;
-	using namespace ptrouteplanner;
+	using namespace pt_journeyplanner;
 	using namespace algorithm;
 	using namespace transportwebsite;
 

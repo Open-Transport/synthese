@@ -59,7 +59,7 @@ namespace synthese
 		class AccessParameters;
 	}
 
-	namespace ptrouteplanner
+	namespace pt_journeyplanner
 	{
 		class PTRoutePlannerResult;
 	
@@ -315,7 +315,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> mapServiceCellPage,
 				boost::shared_ptr<const cms::Webpage> mapJunctionPage,
 				const server::Request& request,
-				const ptrouteplanner::PTRoutePlannerResult& object,
+				const pt_journeyplanner::PTRoutePlannerResult& object,
 				const boost::gregorian::date& date,
 				size_t periodId,
 				const geography::Place* originPlace,

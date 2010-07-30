@@ -67,7 +67,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace server;
-	using namespace ptrouteplanner;
+	using namespace pt_journeyplanner;
 	using namespace security;
 	using namespace pt;
 	using namespace transportwebsite;

@@ -75,7 +75,7 @@ namespace synthese
 	using namespace transportwebsite;
 	using namespace html;
 	using namespace security;
-	using namespace ptrouteplanner;
+	using namespace pt_journeyplanner;
 	using namespace algorithm;
 	using namespace html;
 	using namespace pt;

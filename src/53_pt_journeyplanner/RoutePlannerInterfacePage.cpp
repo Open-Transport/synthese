@@ -63,7 +63,7 @@ namespace synthese
 	using namespace server;
 	using namespace road;
 
-	namespace ptrouteplanner
+	namespace pt_journeyplanner
 	{
 		const string RoutePlannerInterfacePage::DATA_SOLUTIONS_NUMBER("solutions_number");
 		const string RoutePlannerInterfacePage::DATA_LINES("lines");
@@ -134,7 +134,7 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> mapServiceCellPage,
 			boost::shared_ptr<const cms::Webpage> mapJunctionPage,
 			const server::Request& request,
-			const ptrouteplanner::PTRoutePlannerResult& object,
+			const pt_journeyplanner::PTRoutePlannerResult& object,
 			const boost::gregorian::date& date,
 			size_t periodId,
 			const geography::Place* originPlace,

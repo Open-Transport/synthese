@@ -44,9 +44,9 @@ namespace synthese
 	using namespace algorithm;
 	using namespace cms;
 
-	template<> const string util::FactorableTemplate<Function,ptrouteplanner::PTRoutePlannerInputFunction>::FACTORY_KEY("PTRoutePlannerInputFunction");
+	template<> const string util::FactorableTemplate<Function,pt_journeyplanner::PTRoutePlannerInputFunction>::FACTORY_KEY("PTRoutePlannerInputFunction");
 	
-	namespace ptrouteplanner
+	namespace pt_journeyplanner
 	{
 		const string PTRoutePlannerInputFunction::PARAMETER_FIELD("field");
 		const string PTRoutePlannerInputFunction::PARAMETER_VALUE("value");

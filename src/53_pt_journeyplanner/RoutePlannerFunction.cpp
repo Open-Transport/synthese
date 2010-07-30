@@ -72,14 +72,14 @@ namespace synthese
 	using namespace geography;
 	using namespace road;
 	using namespace algorithm;
-	using namespace ptrouteplanner;
+	using namespace pt_journeyplanner;
 	using namespace resa;
 	using namespace pt;
 	using namespace cms;
 
-	template<> const string util::FactorableTemplate<ptrouteplanner::RoutePlannerFunction::_FunctionWithSite,ptrouteplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
+	template<> const string util::FactorableTemplate<pt_journeyplanner::RoutePlannerFunction::_FunctionWithSite,pt_journeyplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
 
-	namespace ptrouteplanner
+	namespace pt_journeyplanner
 	{
 		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER("msn");
 		const string RoutePlannerFunction::PARAMETER_DAY("dy");

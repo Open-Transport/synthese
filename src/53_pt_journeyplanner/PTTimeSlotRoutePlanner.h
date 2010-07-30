@@ -38,7 +38,7 @@ namespace synthese
 		class Place;
 	}
 
-	namespace ptrouteplanner
+	namespace pt_journeyplanner
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Public transportation route planner.

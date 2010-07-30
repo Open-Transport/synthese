@@ -68,7 +68,7 @@ namespace synthese
 	
 	
 	
-	namespace ptrouteplanner
+	namespace pt_journeyplanner
 	{
 		const string JourneyBoardInterfacePage::DATA_RANK("rank");
 		const string JourneyBoardInterfacePage::DATA_IS_THE_LAST_JOURNEY_BOARD("is_the_last_journey_board");

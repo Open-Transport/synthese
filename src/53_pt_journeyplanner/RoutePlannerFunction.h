@@ -64,7 +64,7 @@ namespace synthese
 		class StopArea;
 	}
 
-	namespace ptrouteplanner
+	namespace pt_journeyplanner
 	{
 		class RoutePlannerInterfacePage;
 		class UserFavoriteJourney;

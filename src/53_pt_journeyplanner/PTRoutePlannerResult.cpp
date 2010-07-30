@@ -47,7 +47,7 @@ namespace synthese
 	using namespace html;
 	using namespace pt;
 
-	namespace ptrouteplanner
+	namespace pt_journeyplanner
 	{
 		PTRoutePlannerResult::PTRoutePlannerResult(
 			const geography::Place* departurePlace,
