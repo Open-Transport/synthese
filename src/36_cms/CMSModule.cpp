@@ -36,6 +36,7 @@ namespace synthese
 	using namespace server;
 	using namespace cms;
 	using namespace util;
+	using namespace db;
 
 	namespace util
 	{
@@ -83,7 +84,7 @@ namespace synthese
 				)	);
 				if(function.get() && function->getPage())
 				{
-					return Fetcher<Website>::Fetch(function->getPage()->getRoot()->getKey());
+					return Fetcher<Website>::Fetch(function->getPage()->getRoot()->getKey(), Env::GetOfficialEnv());
 				}
 			}
 

@@ -76,8 +76,6 @@ namespace synthese
 
 		ResaStatisticsAdmin::ResaStatisticsAdmin():
 			AdminInterfaceElementTemplate<ResaStatisticsAdmin>(),
-			_searchRowStep(ResaStatisticsTableSync::SERVICE_STEP),
-			_searchColStep(ResaStatisticsTableSync::DATE_STEP),
 			_searchPeriod(
 				gregorian::date(
 					gregorian::day_clock::local_day().month() == 1 ? gregorian::day_clock::local_day().year() - 1 : static_cast<size_t>(gregorian::day_clock::local_day().year()),
@@ -89,8 +87,9 @@ namespace synthese
 					gregorian::day_clock::local_day().month(),
 					1
 				)
-			)
-
+			),
+			_searchRowStep(ResaStatisticsTableSync::SERVICE_STEP),
+			_searchColStep(ResaStatisticsTableSync::DATE_STEP)
 		{ }
 
 

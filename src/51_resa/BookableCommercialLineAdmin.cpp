@@ -204,9 +204,9 @@ namespace synthese
 
 			// Temporary variables
 			int seatsNumber(0);
-			bool round_trip = false;
-			bool next_overflow = false;
-			bool course = false;
+//			bool round_trip = false;
+//			bool next_overflow = false;
+//			bool course = false;
 
 			// Reservations reading
 			ReservationTableSync::SearchResult sqlreservations(

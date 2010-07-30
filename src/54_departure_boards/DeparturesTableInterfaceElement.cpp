@@ -114,7 +114,7 @@ namespace synthese
 				for (ArrivalDepartureList::const_iterator it = ptds.begin(); departuresNumber && (it != ptds.end()); ++it, --departuresNumber)
 				{
 					const ActualDisplayedArrivalsList& displayedList = it->second;
-					if (displayedList.size () - 2 > __NombrePages )
+					if (displayedList.size() > __NombrePages + 2)
 						__NombrePages = displayedList.size () - 2;
 				}
 				if (__Pages != UNKNOWN_VALUE && __NombrePages > __Pages)
