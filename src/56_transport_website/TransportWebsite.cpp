@@ -55,8 +55,8 @@ namespace synthese
 
 	namespace transportwebsite
 	{
-		const TransportWebsite TransportWebsite::TEMPS_MIN_CIRCULATIONS ("r");
-		const TransportWebsite TransportWebsite::TEMPS_MAX_CIRCULATIONS ("R");
+		const string TransportWebsite::TEMPS_MIN_CIRCULATIONS ("r");
+		const string TransportWebsite::TEMPS_MAX_CIRCULATIONS ("R");
 
 		TransportWebsite::TransportWebsite(
 			RegistryKeyType id
@@ -66,14 +66,6 @@ namespace synthese
 		}
 
 
-
-		bool TransportWebsite::dateControl() const
-		{
-			date tempDate(day_clock::local_day());
-			return tempDate >= _startValidityDate && tempDate <= _endValidityDate;
-		}
-
-		
 
 		const date TransportWebsite::getMinUseDate() const
 		{

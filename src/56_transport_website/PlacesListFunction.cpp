@@ -23,7 +23,7 @@
 #include "PlacesListFunction.h"
 
 #include "PlacesListInterfacePage.h"
-#include "Types.h"
+#include "TransportWebsiteTypes.hpp"
 #include "TransportWebsite.h"
 #include "TransportWebsiteModule.h"
 #include "PlaceAlias.h"
@@ -52,7 +52,7 @@ namespace synthese
 	using namespace transportwebsite;
 	using namespace cms;
 
-	template<> const string util::FactorableTemplate<CMSModule::_FunctionWithSite,PlacesListFunction>::FACTORY_KEY("lp");
+	template<> const string util::FactorableTemplate<PlacesListFunction::_FunctionWithSite,PlacesListFunction>::FACTORY_KEY("lp");
 
 	namespace transportwebsite
 	{
@@ -128,8 +128,11 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const	{
+			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
+			if(!site) throw RequestException("Incorrect site");
+		
 			TransportWebsite::CitiesMatcher::MatchResult cities(
-				_site->getCitiesMatcher().bestMatches(_cityText, 1)
+				site->getCitiesMatcher().bestMatches(_cityText, 1)
 			);
 			if (cities.empty())
 			{

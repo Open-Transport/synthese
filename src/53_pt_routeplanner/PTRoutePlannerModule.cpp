@@ -22,6 +22,8 @@
 
 #include "PTRoutePlannerModule.h"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace server;

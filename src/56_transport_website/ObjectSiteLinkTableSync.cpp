@@ -96,7 +96,7 @@ namespace synthese
 			{
 				if(decodeTableId(object->getObjectId()) == CityTableSync::TABLE.ID)
 				{
-					shared_ptr<TransportWebsite> site(TransportWebsite::GetEditable(id, env, linkLevel));
+					shared_ptr<TransportWebsite> site(TransportWebsiteTableSync::GetEditable(id, env, linkLevel));
 					shared_ptr<City> city(CityTableSync::GetEditable(object->getObjectId(), env, linkLevel));
 					site->addCity(city.get());
 				}

@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_PlacesListInterfacePage_H__
 #define SYNTHESE_PlacesListInterfacePage_H__
 
-#include "36_places_list/Types.h"
+#include "TransportWebsiteTypes.hpp"
 
 namespace synthese
 {
@@ -39,10 +39,13 @@ namespace synthese
 		class Request;
 	}
 
+	namespace cms
+	{
+	    class Webpage;
+	}
+	
 	namespace transportwebsite
 	{
-		class Webpage;
-
 		/** PlacesListInterfacePage Interface Page Class.
 			@ingroup m56Pages refPages
 
@@ -75,7 +78,7 @@ namespace synthese
 		private:
 			static void DisplayItem(
 				std::ostream& stream,
-				boost::shared_ptr<const Webpage> page,
+				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
 				std::size_t n,
 				const std::string& name,
@@ -86,8 +89,8 @@ namespace synthese
 		public:
 			static void DisplayPlacesList(
 				std::ostream& stream,
-				boost::shared_ptr<const Webpage> page,
-				boost::shared_ptr<const Webpage> itemPage,
+				boost::shared_ptr<const cms::Webpage> page,
+				boost::shared_ptr<const cms::Webpage> itemPage,
 				const server::Request& request,
 				const PlacesList& results,
 				bool isForOrigin,
@@ -97,8 +100,8 @@ namespace synthese
 
 			static void DisplayCitiesList(
 				std::ostream& stream,
-				boost::shared_ptr<const Webpage> page,
-				boost::shared_ptr<const Webpage> itemPage,
+				boost::shared_ptr<const cms::Webpage> page,
+				boost::shared_ptr<const cms::Webpage> itemPage,
 				const server::Request& request,
 				const PlacesList& results,
 				bool isForOrigin

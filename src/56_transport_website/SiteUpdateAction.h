@@ -37,12 +37,16 @@ namespace synthese
 	{
 		class Interface;
 	}
+	
+	namespace cms
+	{
+	    class Webpage;
+	}
 
 	namespace transportwebsite
 	{
 		class TransportWebsite;
-		class Webpage;
-
+	
 		//////////////////////////////////////////////////////////////////////////
 		/// 56.15 Action : Transport web site update.
 		/// @ingroup m56Actions refActions
@@ -85,7 +89,7 @@ namespace synthese
 			boost::gregorian::date_duration							_useDatesRange;
 			bool											_displayRoadApproachDetail;
 			std::string							_clientURL;
-			boost::shared_ptr<Webpage>			_defaultPageTemplate;
+			boost::shared_ptr<cms::Webpage>			_defaultPageTemplate;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

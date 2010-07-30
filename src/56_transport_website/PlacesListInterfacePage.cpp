@@ -33,6 +33,7 @@ namespace synthese
 	using namespace util;
 	using namespace geography;
 	using namespace server;
+	using namespace cms;
 
 	namespace transportwebsite
 	{

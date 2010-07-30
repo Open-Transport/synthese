@@ -30,6 +30,7 @@
 #include "CMSModule.hpp"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -67,7 +68,7 @@ namespace synthese
 			const Request& request
 		) const {
 			StaticFunctionRequest<CityListFunction> clrequest(request, true);
-			clrequest.getFunction()->setSite(dynamic_pointer_cast<const TransportWebsite, const Website>(CMSModule::GetSite(request)));
+			clrequest.getFunction()->setSite(CMSModule::GetSite(request));
 			clrequest.getFunction()->setTextInput(_text);
 			clrequest.getFunction()->setIsForOrigin(_forDeparture);
 			clrequest.getFunction()->setNumber(_number);

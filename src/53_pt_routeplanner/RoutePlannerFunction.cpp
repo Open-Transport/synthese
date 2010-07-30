@@ -129,7 +129,10 @@ namespace synthese
 		{
 			_FunctionWithSite::_setFromParametersMap(map);
 
-			_outputRoadApproachDetail = _site->getDisplayRoadApproachDetail();
+			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
+			if(!site) throw RequestException("Incorrect site");
+			
+			_outputRoadApproachDetail = site->getDisplayRoadApproachDetail();
 
 
 			// Origin and destination places
@@ -163,8 +166,8 @@ namespace synthese
 			}
 			if (!_home)
 			{
-				_departure_place = _site->extendedFetchPlace(_originCityText, _originPlaceText);
-				_arrival_place = _site->extendedFetchPlace(_destinationCityText, _destinationPlaceText);
+				_departure_place = site->extendedFetchPlace(_originCityText, _originPlaceText);
+				_arrival_place = site->extendedFetchPlace(_destinationCityText, _destinationPlaceText);
 			}
 
 			try
@@ -176,14 +179,14 @@ namespace synthese
 
 					_planningOrder = DEPARTURE_FIRST;
 					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
-					if (_periodId >= _site->getPeriods().size())
+					if (_periodId >= site->getPeriods().size())
 					{
 						throw RequestException("Bad value for period id");
 					}
 					_startDate = ptime(day, time_duration(0, 0, 0));
 					_endDate = _startDate;
-					_period = &_site->getPeriods().at(_periodId);
-					_site->applyPeriod(*_period, _startDate, _endDate);
+					_period = &site->getPeriods().at(_periodId);
+					site->applyPeriod(*_period, _startDate, _endDate);
 					_startArrivalDate = _startDate;
 					_endArrivalDate = _endDate;
 					if(	_departure_place.placeResult.value &&
@@ -276,7 +279,7 @@ namespace synthese
 
 			// Accessibility
 			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
-			_accessParameters = _site->getAccessParameters(
+			_accessParameters = site->getAccessParameters(
 				acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
 				_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
 			);

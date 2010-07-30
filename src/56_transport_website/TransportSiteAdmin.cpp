@@ -23,9 +23,9 @@
 */
 
 #include "TransportSiteAdmin.h"
-#include "PlacesListModule.h"
-#include "SiteTableSync.h"
-#include "Site.h"
+#include "TransportWebsiteModule.h"
+#include "TransportWebsiteTableSync.h"
+#include "TransportWebsite.h"
 #include "SiteUpdateAction.h"
 #include "TransportWebsiteRight.h"
 #include "RoutePlannerFunction.h"
@@ -38,17 +38,11 @@
 #include "Interface.h"
 #include "InterfaceTableSync.h"
 #include "RoutePlannerInterfacePage.h"
-#include "Profile.h"
 #include "StaticFunctionRequest.h"
 #include "Profile.h"
 #include "JourneyPattern.hpp"
-#include "PlacesListModule.h"
-#include "Site.h"
-#include "SiteTableSync.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "SearchFormHTMLTable.h"
-#include "AdminParametersException.h"
-#include "AdminInterfaceElement.h"
 #include "HTMLForm.h"
 #include "PTRoutePlannerResult.h"
 #include "WebPageAdmin.h"
@@ -57,8 +51,6 @@
 #include "WebPageRemoveAction.h"
 #include "AdminFunctionRequest.hpp"
 #include "WebPageDisplayFunction.h"
-#include "StaticFunctionRequest.h"
-#include "WebPageRemoveAction.h"
 #include "City.h"
 #include "CityTableSync.h"
 #include "PTPlacesAdmin.h"
@@ -82,7 +74,6 @@ namespace synthese
 	using namespace util;
 	using namespace transportwebsite;
 	using namespace html;
-	using namespace routeplanner;
 	using namespace security;
 	using namespace ptrouteplanner;
 	using namespace algorithm;
@@ -138,7 +129,7 @@ namespace synthese
 		){
 			try
 			{
-				_site = TransportWebsite::Get(
+				_site = TransportWebsiteTableSync::Get(
 					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
 					Env::GetOfficialEnv(),
 					UP_LINKS_LOAD_LEVEL
@@ -176,7 +167,7 @@ namespace synthese
 			{
 				if(map.getOptional<size_t>(PARAMETER_ROLLING_STOCK_FILTER))
 				{
-					Site::RollingStockFilters::const_iterator it(_site->getRollingStockFilters().find(map.get<size_t>(PARAMETER_ROLLING_STOCK_FILTER)));
+					TransportWebsite::RollingStockFilters::const_iterator it(_site->getRollingStockFilters().find(map.get<size_t>(PARAMETER_ROLLING_STOCK_FILTER)));
 					if(it == _site->getRollingStockFilters().end())
 					{
 						throw AdminParametersException("No such rolling stock filter");
@@ -275,8 +266,8 @@ namespace synthese
 				cv.push_back("Heure fin");
 				HTMLTable ct(cv, ResultHTMLTable::CSS_CLASS);
 				stream << ct.open();
-				const Site::Periods& periods(_site->getPeriods());
-				for (Site::Periods::const_iterator it(periods.begin()); it != periods.end(); ++it)
+				const TransportWebsite::Periods& periods(_site->getPeriods());
+				for (TransportWebsite::Periods::const_iterator it(periods.begin()); it != periods.end(); ++it)
 				{
 					stream << ct.row();
 					stream << ct.col() << it->getCaption();
@@ -328,7 +319,7 @@ namespace synthese
 			{
 				stream << "<h1>Pages</h1>";
 				AdminActionFunctionRequest<WebPageAddAction, TransportSiteAdmin> addRequest(_request);
-				addRequest.getAction()->setSite(const_pointer_cast<Site>(_site));
+				addRequest.getAction()->setSite(const_pointer_cast<TransportWebsite>(_site));
 
 				AdminActionFunctionRequest<WebPageRemoveAction, TransportSiteAdmin> deleteRequest(_request);
 
@@ -365,7 +356,7 @@ namespace synthese
 				)	);
 				stream << st.cell(
 					"Accessibilité",
-					st.getForm().getSelectInput(PARAMETER_ACCESSIBILITY, PlacesListModule::GetAccessibilityNames(), optional<UserClassCode>(_accessibility)));
+					st.getForm().getSelectInput(PARAMETER_ACCESSIBILITY, TransportWebsiteModule::GetAccessibilityNames(), optional<UserClassCode>(_accessibility)));
 				stream << st.cell("Trace", st.getForm().getOuiNonRadioInput(PARAMETER_LOG, _log));
 				if(!_site->getRollingStockFilters().empty())
 				{
@@ -441,12 +432,15 @@ namespace synthese
 				TransportWebsiteTableSync::SearchResult sites(
 					TransportWebsiteTableSync::Search(*_env)
 				);
-				BOOST_FOREACH(shared_ptr<Site> site, sites)
+				BOOST_FOREACH(shared_ptr<TransportWebsite> site, sites)
 				{
 					shared_ptr<TransportSiteAdmin> p(
 						getNewOtherPage<TransportSiteAdmin>(false)
 					);
-					p->_site = const_pointer_cast<const Site>(site);
+					p->_site = 
+					    const_pointer_cast<const TransportWebsite>(
+						site
+					    );
 					links.push_back(p);
 				}
 			}
@@ -464,12 +458,12 @@ namespace synthese
 				dynamic_cast<const WebPageAdmin*>(&currentPage)
 			){
 				WebPageTableSync::SearchResult pages(WebPageTableSync::Search(Env::GetOfficialEnv(), _site->getKey(), RegistryKeyType(0)));
-				BOOST_FOREACH(shared_ptr<WebPage> page, pages)
+				BOOST_FOREACH(shared_ptr<Webpage> page, pages)
 				{
 					shared_ptr<WebPageAdmin> p(
 						getNewOtherPage<WebPageAdmin>(false)
 					);
-					p->setPage(const_pointer_cast<const WebPage>(page));
+					p->setPage(const_pointer_cast<const Webpage>(page));
 					links.push_back(p);
 				}	}
 			

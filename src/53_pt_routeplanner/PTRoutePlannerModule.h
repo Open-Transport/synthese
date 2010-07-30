@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_PTRoutePlannerModule_H__
 #define SYNTHESE_PTRoutePlannerModule_H__
 
-#include "ModuleClassTemplate.h"
+#include "ModuleClassTemplate.hpp"
 
 namespace synthese
 {

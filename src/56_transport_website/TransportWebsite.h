@@ -168,7 +168,6 @@ namespace synthese
 					const graph::AccessParameters::AllowedPathClasses& allowedPathClasses
 				) const;
 	
-				bool dateControl() const;
 				const CitiesMatcher&			getCitiesMatcher() const;
 
 				const boost::gregorian::date				getMinUseDate() const;

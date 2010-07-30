@@ -40,6 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace transportwebsite;
+	using namespace cms;
 
 	namespace util
 	{

@@ -26,7 +26,7 @@
 #include "Named.h"
 #include "Registry.h"
 
-#include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
 
 namespace synthese
 {
@@ -77,6 +77,12 @@ namespace synthese
 			//! @name Services
 			//@{
 				virtual util::RegistryKeyType getKey() const = 0;
+				
+				bool dateControl() const
+				{
+				    boost::gregorian::date tempDate(boost::gregorian::day_clock::local_day());
+				    return tempDate >= _startValidityDate && tempDate <= _endValidityDate;
+				}
 			//@}
 		};
 	}

@@ -56,8 +56,11 @@ namespace synthese
 		
 		void CityListFunction::run( std::ostream& stream, const Request& request ) const
 		{
+			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
+			if(!site) throw RequestException("Incorrect site");
+			
 			TransportWebsite::CitiesMatcher::MatchResult matches(
-				_site->getCitiesMatcher().bestMatches(_input, _n)
+				site->getCitiesMatcher().bestMatches(_input, _n)
 			);
 
 			if(_page.get())

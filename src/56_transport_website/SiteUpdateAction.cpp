@@ -36,6 +36,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
+	using namespace cms;
 	
 	namespace util
 	{

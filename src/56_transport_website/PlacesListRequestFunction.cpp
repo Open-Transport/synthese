@@ -36,6 +36,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,transportwebsite::PlacesListRequestFunction>::FACTORY_KEY("places_list_request");
 	
@@ -69,7 +70,7 @@ namespace synthese
 			const Request& request
 		) const {
 			StaticFunctionRequest<PlacesListFunction> plrequest(request, true);
-			plrequest.getFunction()->setSite(dynamic_pointer_cast<const TransportWebsite, const Website>(CMSModule::GetSite(request)));
+			plrequest.getFunction()->setSite(CMSModule::GetSite(request));
 			plrequest.getFunction()->setTextInput(_textField);
 			plrequest.getFunction()->setIsForOrigin(_forDeparture);
 			plrequest.getFunction()->setNumber(_number);

@@ -41,7 +41,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace transportwebsite;
-	using namespace routeplanner;
+	using namespace algorithm;
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,ptrouteplanner::PTRoutePlannerInputFunction>::FACTORY_KEY("PTRoutePlannerInputFunction");
