@@ -38,14 +38,14 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace messages;
-	using namespace departurestable;
+	using namespace departure_boards;
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<LibraryInterfaceElement, DisplayScreenAlarmContentValueInterfaceElement>::FACTORY_KEY("displayscreenalarmcontent");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayScreenAlarmContentValueInterfaceElement::VALUE_BIG = "big";
 		const string DisplayScreenAlarmContentValueInterfaceElement::VALUE_SMALL = "small";

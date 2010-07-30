@@ -27,7 +27,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace server;
-	using namespace pt_journeyplanner;
+	using namespace pt_journey_planner;
 
 	namespace util
 	{
@@ -52,7 +52,7 @@ namespace synthese
 		}
 	}
 
-	namespace pt_journeyplanner
+	namespace pt_journey_planner
 	{
 
 	}

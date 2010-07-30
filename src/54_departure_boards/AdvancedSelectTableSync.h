@@ -51,7 +51,7 @@ namespace synthese
 		class CommercialLine;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		class BroadcastPoint;
 

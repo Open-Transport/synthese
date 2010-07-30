@@ -44,9 +44,9 @@ namespace synthese
 	using namespace dblog;
 	using namespace security;
 
-	template<> const string util::FactorableTemplate<Action, departurestable::UpdateDisplayPreselectionParametersAction>::FACTORY_KEY("udpp");
+	template<> const string util::FactorableTemplate<Action, departure_boards::UpdateDisplayPreselectionParametersAction>::FACTORY_KEY("udpp");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_SCREEN(Action_PARAMETER_PREFIX + "ds");
 		const string UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY = Action_PARAMETER_PREFIX + "pd";

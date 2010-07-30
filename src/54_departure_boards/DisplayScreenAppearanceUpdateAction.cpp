@@ -46,10 +46,10 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, departurestable::DisplayScreenAppearanceUpdateAction>::FACTORY_KEY("DisplayScreenAppearanceUpdateAction");
+		template<> const string FactorableTemplate<Action, departure_boards::DisplayScreenAppearanceUpdateAction>::FACTORY_KEY("DisplayScreenAppearanceUpdateAction");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_SCREEN(Action_PARAMETER_PREFIX + "id");
 		const string DisplayScreenAppearanceUpdateAction::PARAMETER_BLINKING_DELAY = Action_PARAMETER_PREFIX + "bd";

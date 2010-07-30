@@ -36,7 +36,7 @@ namespace synthese
 		class Alarm;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		class DisplayType;
 

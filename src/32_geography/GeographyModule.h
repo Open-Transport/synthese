@@ -98,7 +98,7 @@ namespace synthese
 			public server::ModuleClassTemplate<GeographyModule>
 		{
 		public:
-			typedef lexmatcher::LexicalMatcher<City*> CitiesMatcher;
+			typedef lexical_matcher::LexicalMatcher<City*> CitiesMatcher;
 			typedef std::vector<CitiesMatcher::Content> CityList;
 
 		private:

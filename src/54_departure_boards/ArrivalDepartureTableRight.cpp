@@ -29,7 +29,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace security;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace pt;
 
 	namespace util
@@ -54,7 +54,7 @@ namespace synthese
 		}
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 	}
 }

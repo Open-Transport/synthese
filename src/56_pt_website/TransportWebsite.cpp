@@ -44,16 +44,16 @@ namespace synthese
 	using namespace std;
 	using namespace util;
 	using namespace geography;
-	using namespace lexmatcher;
+	using namespace lexical_matcher;
 	using namespace pt;
 	using namespace graph;
 
 	namespace util
 	{
-		template<> const string Registry<transportwebsite::TransportWebsite>::KEY("TransportWebsite");
+		template<> const string Registry<pt_website::TransportWebsite>::KEY("TransportWebsite");
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		const string TransportWebsite::TEMPS_MIN_CIRCULATIONS ("r");
 		const string TransportWebsite::TEMPS_MAX_CIRCULATIONS ("R");

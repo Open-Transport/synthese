@@ -44,9 +44,9 @@ namespace synthese
 	using namespace dblog;
 	using namespace security;
 
-	template<> const string util::FactorableTemplate<Action, departurestable::UpdateDisplayMaintenanceAction>::FACTORY_KEY("udm");
+	template<> const string util::FactorableTemplate<Action, departure_boards::UpdateDisplayMaintenanceAction>::FACTORY_KEY("udm");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string UpdateDisplayMaintenanceAction::PARAMETER_SCREEN_ID = Action_PARAMETER_PREFIX + "si";
 		const string UpdateDisplayMaintenanceAction::PARAMETER_ONLINE = Action_PARAMETER_PREFIX + "oli";

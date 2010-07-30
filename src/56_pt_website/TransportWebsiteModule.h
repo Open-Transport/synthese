@@ -66,7 +66,7 @@ namespace synthese
 	*/
 
 	/** 56 Transport website namespace. */
-	namespace transportwebsite
+	namespace pt_website
 	{
 		/** 56 Transport website module class. */
 		class TransportWebsiteModule:

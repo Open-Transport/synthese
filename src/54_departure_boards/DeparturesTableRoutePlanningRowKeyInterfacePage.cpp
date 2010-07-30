@@ -36,14 +36,14 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	using namespace departurestable;
+	using namespace departure_boards;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<InterfacePage, departurestable::DeparturesTableRoutePlanningRowKeyInterfacePage>::FACTORY_KEY("departures_table_route_planning_row_key");
+		template<> const string FactorableTemplate<InterfacePage, departure_boards::DeparturesTableRoutePlanningRowKeyInterfacePage>::FACTORY_KEY("departures_table_route_planning_row_key");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		DeparturesTableRoutePlanningRowKeyInterfacePage::DeparturesTableRoutePlanningRowKeyInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, DeparturesTableRoutePlanningRowKeyInterfacePage>(),

@@ -52,7 +52,7 @@ namespace synthese
 		class CommercialLine;
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Transport website.
@@ -86,7 +86,7 @@ namespace synthese
 
 			typedef std::vector<HourPeriod> Periods;
 			
-			typedef lexmatcher::LexicalMatcher<geography::City*> CitiesMatcher;
+			typedef lexical_matcher::LexicalMatcher<geography::City*> CitiesMatcher;
 
 			typedef std::map<std::size_t,RollingStockFilter*> RollingStockFilters;
 			
@@ -233,7 +233,7 @@ namespace synthese
 				struct ExtendedFetchPlaceResult
 				{
 					CitiesMatcher::MatchResult::value_type cityResult;
-					lexmatcher::LexicalMatcher<const geography::Place*>::MatchResult::value_type placeResult;
+					lexical_matcher::LexicalMatcher<const geography::Place*>::MatchResult::value_type placeResult;
 
 					ExtendedFetchPlaceResult();
 				};

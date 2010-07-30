@@ -38,7 +38,7 @@ namespace synthese
 		class Interface;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		////////////////////////////////////////////////////////////////////
 		/// Type of display screen, describing the input and output facilities.

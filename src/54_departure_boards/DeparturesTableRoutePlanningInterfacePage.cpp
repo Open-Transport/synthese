@@ -35,10 +35,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<interfaces::InterfacePage, departurestable::DeparturesTableRoutePlanningInterfacePage>::FACTORY_KEY("departurestablerouteplanning");
+		template<> const string FactorableTemplate<interfaces::InterfacePage, departure_boards::DeparturesTableRoutePlanningInterfacePage>::FACTORY_KEY("departurestablerouteplanning");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DeparturesTableRoutePlanningInterfacePage::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
 		const string DeparturesTableRoutePlanningInterfacePage::DATA_DISPLAY_TRACK_NUMBER("display_track_number");

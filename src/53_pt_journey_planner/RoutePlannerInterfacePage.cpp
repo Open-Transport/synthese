@@ -56,14 +56,14 @@ namespace synthese
 {
 	using namespace pt;
 	using namespace util;
-	using namespace transportwebsite;
+	using namespace pt_website;
 	using namespace cms;	
 	using namespace geography;
 	using namespace graph;
 	using namespace server;
 	using namespace road;
 
-	namespace pt_journeyplanner
+	namespace pt_journey_planner
 	{
 		const string RoutePlannerInterfacePage::DATA_SOLUTIONS_NUMBER("solutions_number");
 		const string RoutePlannerInterfacePage::DATA_LINES("lines");
@@ -134,12 +134,12 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> mapServiceCellPage,
 			boost::shared_ptr<const cms::Webpage> mapJunctionPage,
 			const server::Request& request,
-			const pt_journeyplanner::PTRoutePlannerResult& object,
+			const pt_journey_planner::PTRoutePlannerResult& object,
 			const boost::gregorian::date& date,
 			size_t periodId,
 			const geography::Place* originPlace,
 			const geography::Place* destinationPlace,
-			const transportwebsite::HourPeriod* period,
+			const pt_website::HourPeriod* period,
 			const graph::AccessParameters& accessParameters
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);

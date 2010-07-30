@@ -37,14 +37,14 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace messages;
-	using namespace departurestable;
+	using namespace departure_boards;
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<LibraryInterfaceElement, DisplayScreenHasAlarmValueInterfaceElement>::FACTORY_KEY("displayscreenalarmlevel");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		string DisplayScreenHasAlarmValueInterfaceElement::display(
 			ostream& stream

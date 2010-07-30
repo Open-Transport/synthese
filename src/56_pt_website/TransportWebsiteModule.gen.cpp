@@ -1,33 +1,33 @@
 
-synthese::transportwebsite::TransportSiteAdmin::integrate();
+synthese::pt_website::TransportSiteAdmin::integrate();
 
-synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::transportwebsite::TransportWebsiteTableSync>::integrate();
-synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::cms::Website>, synthese::transportwebsite::TransportWebsiteTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt_website::TransportWebsiteTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::cms::Website>, synthese::pt_website::TransportWebsiteTableSync>::integrate();
 
-synthese::transportwebsite::ObjectSiteLinkTableSync::integrate();
-synthese::transportwebsite::RollingStockFilterTableSync::integrate();
-synthese::transportwebsite::UserFavoriteJourneyTableSync::integrate();
+synthese::pt_website::ObjectSiteLinkTableSync::integrate();
+synthese::pt_website::RollingStockFilterTableSync::integrate();
+synthese::pt_website::UserFavoriteJourneyTableSync::integrate();
 
-synthese::transportwebsite::TransportWebsiteModule::integrate();
+synthese::pt_website::TransportWebsiteModule::integrate();
 
-synthese::transportwebsite::PlacesListRequestFunction::integrate();
-synthese::transportwebsite::UserFavoriteListInterfaceElement::integrate();
+synthese::pt_website::PlacesListRequestFunction::integrate();
+synthese::pt_website::UserFavoriteListInterfaceElement::integrate();
 
-synthese::transportwebsite::UserFavoriteInterfacePage::integrate();
+synthese::pt_website::UserFavoriteInterfacePage::integrate();
 
-synthese::transportwebsite::CityListRequestFunction::integrate();
-synthese::transportwebsite::CityListFunction::integrate();
-synthese::transportwebsite::PlacesListFunction::integrate();
+synthese::pt_website::CityListRequestFunction::integrate();
+synthese::pt_website::CityListFunction::integrate();
+synthese::pt_website::PlacesListFunction::integrate();
 
-synthese::transportwebsite::SiteUpdateAction::integrate();
-synthese::transportwebsite::AddUserFavoriteJourneyAction::integrate();
+synthese::pt_website::SiteUpdateAction::integrate();
+synthese::pt_website::AddUserFavoriteJourneyAction::integrate();
 
-synthese::transportwebsite::TransportWebsiteRight::integrate();
+synthese::pt_website::TransportWebsiteRight::integrate();
 
 // Registries
-synthese::util::Env::Integrate<synthese::transportwebsite::ObjectSiteLink>();
-synthese::util::Env::Integrate<synthese::transportwebsite::TransportWebsite>();
-synthese::util::Env::Integrate<synthese::transportwebsite::SiteCommercialLineLink>();
-synthese::util::Env::Integrate<synthese::transportwebsite::RollingStockFilter>();
-synthese::util::Env::Integrate<synthese::transportwebsite::UserFavoriteJourney>();
+synthese::util::Env::Integrate<synthese::pt_website::ObjectSiteLink>();
+synthese::util::Env::Integrate<synthese::pt_website::TransportWebsite>();
+synthese::util::Env::Integrate<synthese::pt_website::SiteCommercialLineLink>();
+synthese::util::Env::Integrate<synthese::pt_website::RollingStockFilter>();
+synthese::util::Env::Integrate<synthese::pt_website::UserFavoriteJourney>();
 

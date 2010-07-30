@@ -41,10 +41,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<departurestable::DisplayMonitoringStatus>::KEY("DisplayMonitoringStatus");
+		template<> const string Registry<departure_boards::DisplayMonitoringStatus>::KEY("DisplayMonitoringStatus");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 
 

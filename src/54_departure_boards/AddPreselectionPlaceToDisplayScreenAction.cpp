@@ -43,10 +43,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, departurestable::AddPreselectionPlaceToDisplayScreenAction>::FACTORY_KEY("apptds");
+		template<> const string FactorableTemplate<Action, departure_boards::AddPreselectionPlaceToDisplayScreenAction>::FACTORY_KEY("apptds");
 	}
 	
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string AddPreselectionPlaceToDisplayScreenAction::PARAMETER_SCREEN_ID(
 			Action_PARAMETER_PREFIX + "s"

@@ -31,7 +31,7 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace lexmatcher;
+	using namespace lexical_matcher;
 	using namespace util;
 	using namespace graph;
 

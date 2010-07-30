@@ -52,10 +52,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<interfaces::InterfacePage, departurestable::DeparturesTableRoutePlanningRowInterfacePage>::FACTORY_KEY("departurestablerouteplanningrow");
+		template<> const string FactorableTemplate<interfaces::InterfacePage, departure_boards::DeparturesTableRoutePlanningRowInterfacePage>::FACTORY_KEY("departurestablerouteplanningrow");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DeparturesTableRoutePlanningRowInterfacePage::DATA_RANK("rank");
 		const string DeparturesTableRoutePlanningRowInterfacePage::DATA_WITH_TRANSFER("with_transfer");

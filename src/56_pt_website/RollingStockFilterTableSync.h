@@ -34,7 +34,7 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace pt_website
 	{
 		class RollingStockFilter;
 

@@ -56,7 +56,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace html;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace security;
 
 	namespace util
@@ -70,7 +70,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<BroadcastPointsAdmin>::DEFAULT_TITLE("Lieux de diffusion");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string BroadcastPointsAdmin::PARAMETER_DEVICES_NUMBER("cn");
 		const string BroadcastPointsAdmin::PARAMETER_CITY_NAME = "city";

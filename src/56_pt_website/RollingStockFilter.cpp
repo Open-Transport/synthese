@@ -34,10 +34,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<transportwebsite::RollingStockFilter>::KEY("RollingStockFilter");
+		template<> const string Registry<pt_website::RollingStockFilter>::KEY("RollingStockFilter");
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		graph::AccessParameters::AllowedPathClasses RollingStockFilter::getAllowedPathClasses() const
 		{

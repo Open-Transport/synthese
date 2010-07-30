@@ -43,9 +43,9 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	
-	template<> const string util::FactorableTemplate<Function,departurestable::CPUGetWiredScreensFunction>::FACTORY_KEY("CPUGetWiredScreensFunction");
+	template<> const string util::FactorableTemplate<Function,departure_boards::CPUGetWiredScreensFunction>::FACTORY_KEY("CPUGetWiredScreensFunction");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string CPUGetWiredScreensFunction::PARAMETER_CPU_ID("id");
 		const string CPUGetWiredScreensFunction::PARAMETER_CPU_MAC_ADDRESS("ma");

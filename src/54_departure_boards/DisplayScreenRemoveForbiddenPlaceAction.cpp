@@ -41,9 +41,9 @@ namespace synthese
 	using namespace security;
 	using namespace dblog;
 
-	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemoveForbiddenPlaceAction>::FACTORY_KEY("dsrfp");
+	template<> const string util::FactorableTemplate<Action, departure_boards::DisplayScreenRemoveForbiddenPlaceAction>::FACTORY_KEY("dsrfp");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_SCREEN_ID = Action_PARAMETER_PREFIX + "s";
 		const string DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "pla";

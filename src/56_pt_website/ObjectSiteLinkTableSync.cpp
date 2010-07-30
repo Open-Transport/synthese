@@ -36,7 +36,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace transportwebsite;
+	using namespace pt_website;
 	using namespace geography;
 
 	namespace util
@@ -44,7 +44,7 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,ObjectSiteLinkTableSync>::FACTORY_KEY("56.11 Object Website Links");
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		const string ObjectSiteLinkTableSync::COL_OBJECT_ID("object_id");
 		const string ObjectSiteLinkTableSync::COL_SITE_ID("site_id");
@@ -125,7 +125,7 @@ namespace synthese
 	
 	
 	
-	namespace transportwebsite
+	namespace pt_website
 	{
 		ObjectSiteLinkTableSync::SearchResult ObjectSiteLinkTableSync::Search(
 			Env& env,

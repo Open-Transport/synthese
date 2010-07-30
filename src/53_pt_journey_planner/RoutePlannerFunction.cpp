@@ -66,20 +66,20 @@ namespace synthese
 	using namespace server;
 	using namespace pt;
 	using namespace interfaces;
-	using namespace transportwebsite;
+	using namespace pt_website;
 	using namespace db;
 	using namespace graph;
 	using namespace geography;
 	using namespace road;
 	using namespace algorithm;
-	using namespace pt_journeyplanner;
+	using namespace pt_journey_planner;
 	using namespace resa;
 	using namespace pt;
 	using namespace cms;
 
-	template<> const string util::FactorableTemplate<pt_journeyplanner::RoutePlannerFunction::_FunctionWithSite,pt_journeyplanner::RoutePlannerFunction>::FACTORY_KEY("rp");
+	template<> const string util::FactorableTemplate<pt_journey_planner::RoutePlannerFunction::_FunctionWithSite,pt_journey_planner::RoutePlannerFunction>::FACTORY_KEY("rp");
 
-	namespace pt_journeyplanner
+	namespace pt_journey_planner
 	{
 		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER("msn");
 		const string RoutePlannerFunction::PARAMETER_DAY("dy");

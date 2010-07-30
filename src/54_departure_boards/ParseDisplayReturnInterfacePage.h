@@ -36,7 +36,7 @@ namespace synthese
 		class Request;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		/** Interface Page Class to parse a string returned by a managed display screen.
 

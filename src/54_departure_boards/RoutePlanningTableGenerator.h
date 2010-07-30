@@ -32,7 +32,7 @@ namespace synthese
 		class StopArea;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 
 		class RoutePlanningTableGenerator

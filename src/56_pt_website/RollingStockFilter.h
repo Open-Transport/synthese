@@ -38,7 +38,7 @@ namespace synthese
 		class RollingStock;
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		class TransportWebsite;
 

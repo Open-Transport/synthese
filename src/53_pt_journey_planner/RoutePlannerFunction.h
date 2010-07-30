@@ -46,7 +46,7 @@ namespace synthese
 		class Webpage;
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		class HourPeriod;
 		class RollingStockFilter;
@@ -64,7 +64,7 @@ namespace synthese
 		class StopArea;
 	}
 
-	namespace pt_journeyplanner
+	namespace pt_journey_planner
 	{
 		class RoutePlannerInterfacePage;
 		class UserFavoriteJourney;
@@ -394,8 +394,8 @@ namespace synthese
 		private:
 			//! \name Parameters
 			//@{
-				transportwebsite::TransportWebsite::ExtendedFetchPlaceResult	_departure_place;
-				transportwebsite::TransportWebsite::ExtendedFetchPlaceResult	_arrival_place;
+				pt_website::TransportWebsite::ExtendedFetchPlaceResult	_departure_place;
+				pt_website::TransportWebsite::ExtendedFetchPlaceResult	_arrival_place;
 				std::string									_originCityText;
 				std::string									_destinationCityText;
 				std::string									_originPlaceText;
@@ -408,10 +408,10 @@ namespace synthese
 				graph::AccessParameters						_accessParameters;
 				boost::optional<std::size_t>				_maxSolutionsNumber;
 				std::size_t									_periodId;
-				const transportwebsite::HourPeriod*			_period;
+				const pt_website::HourPeriod*			_period;
 				bool										_home;
 				boost::shared_ptr<const UserFavoriteJourney>		_favorite;
-				boost::shared_ptr<const transportwebsite::RollingStockFilter>	_rollingStockFilter;
+				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
 				bool										_outputRoadApproachDetail;
 			//@}
 

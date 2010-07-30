@@ -37,7 +37,7 @@ namespace synthese
 		class Webpage;
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		class HourPeriod;
 	}
@@ -59,7 +59,7 @@ namespace synthese
 		class AccessParameters;
 	}
 
-	namespace pt_journeyplanner
+	namespace pt_journey_planner
 	{
 		class PTRoutePlannerResult;
 	
@@ -315,12 +315,12 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> mapServiceCellPage,
 				boost::shared_ptr<const cms::Webpage> mapJunctionPage,
 				const server::Request& request,
-				const pt_journeyplanner::PTRoutePlannerResult& object,
+				const pt_journey_planner::PTRoutePlannerResult& object,
 				const boost::gregorian::date& date,
 				size_t periodId,
 				const geography::Place* originPlace,
 				const geography::Place* destinationPlace,
-				const transportwebsite::HourPeriod* period,
+				const pt_website::HourPeriod* period,
 				const graph::AccessParameters& accessParameters
 			);
 

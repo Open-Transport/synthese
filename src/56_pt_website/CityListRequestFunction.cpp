@@ -39,9 +39,9 @@ namespace synthese
 	using namespace security;
 	using namespace cms;
 
-	template<> const string util::FactorableTemplate<Function,transportwebsite::CityListRequestFunction>::FACTORY_KEY("city_list_request");
+	template<> const string util::FactorableTemplate<Function,pt_website::CityListRequestFunction>::FACTORY_KEY("city_list_request");
 	
-	namespace transportwebsite
+	namespace pt_website
 	{
 		const string CityListRequestFunction::PARAMETER_FOR_DEPARTURE("for_departure");
 		const string CityListRequestFunction::PARAMETER_NUMBER("number");

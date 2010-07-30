@@ -80,7 +80,7 @@ using namespace std;
 using boost::asio::ip::tcp;
 using namespace synthese::server;
 using namespace boost;
-using namespace synthese::departurestable;
+using namespace synthese::departure_boards;
 
 
 std::string SendToDisplay(const std::string& comPort, const std::string& text)

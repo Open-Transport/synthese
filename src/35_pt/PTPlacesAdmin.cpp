@@ -60,7 +60,7 @@ namespace synthese
 	using namespace pt;
 	using namespace geography;
 	using namespace html;
-	using namespace lexmatcher;
+	using namespace lexical_matcher;
 	using namespace road;
 	using namespace pt;
 

@@ -40,9 +40,9 @@ namespace synthese
 	using namespace security;
 	using namespace dblog;
 
-	template<> const string util::FactorableTemplate<Action, departurestable::UpdateAllStopsDisplayScreenAction>::FACTORY_KEY("uasdsa");
+	template<> const string util::FactorableTemplate<Action, departure_boards::UpdateAllStopsDisplayScreenAction>::FACTORY_KEY("uasdsa");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string UpdateAllStopsDisplayScreenAction::PARAMETER_SCREEN_ID = Action_PARAMETER_PREFIX + "s";
 		const string UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE = Action_PARAMETER_PREFIX + "val";

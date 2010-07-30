@@ -32,7 +32,7 @@
 
 namespace synthese
 {
-	namespace departurestable
+	namespace departure_boards
 	{
 		/** Departure Table Destination Content Interface Element Class.
 			@ingroup m54Library refLibrary

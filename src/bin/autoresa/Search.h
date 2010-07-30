@@ -9,7 +9,7 @@
 
 
 using namespace std;
-using namespace synthese::transportwebsite;
+using namespace synthese::pt_website;
 using namespace synthese::env;
 using namespace synthese::routeplanner;
 

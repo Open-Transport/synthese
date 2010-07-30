@@ -43,7 +43,7 @@ namespace synthese
 	    class Webpage;
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		class TransportWebsite;
 	

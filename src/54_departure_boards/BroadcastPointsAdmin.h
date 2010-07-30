@@ -37,7 +37,7 @@ namespace synthese
 		class StopArea;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		/** Ecran de recherche de lieux pour administration des points de diffusion.
 			@ingroup m54Admin refAdmin

@@ -29,7 +29,7 @@
 
 namespace synthese
 {
-	namespace departurestable
+	namespace departure_boards
 	{
 
 		/** Route planning departure table based on a display screen definition.

@@ -40,7 +40,7 @@ namespace synthese
 		class StopArea;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		/** DeparturesTableRoutePlanningRowKeyInterfacePage Interface Page Class.
 			@ingroup m54Pages refPages

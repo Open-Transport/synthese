@@ -21,7 +21,7 @@ namespace synthese
 
 	/** 07 Lexical matcher namespace.
 	*/
-	namespace lexmatcher
+	namespace lexical_matcher
 	{
 
 		/** 

@@ -72,10 +72,10 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
-	using namespace transportwebsite;
+	using namespace pt_website;
 	using namespace html;
 	using namespace security;
-	using namespace pt_journeyplanner;
+	using namespace pt_journey_planner;
 	using namespace algorithm;
 	using namespace html;
 	using namespace pt;
@@ -96,7 +96,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<TransportSiteAdmin>::DEFAULT_TITLE("Site inconnu");
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		const string TransportSiteAdmin::PARAMETER_SEARCH_PAGE("pp");
 		const string TransportSiteAdmin::PARAMETER_SEARCH_RANK("pr");

@@ -39,7 +39,7 @@ namespace synthese
 		class SentAlarm;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		/** DisplayScreen table synchronizer.
 			@ingroup m54LS refLS

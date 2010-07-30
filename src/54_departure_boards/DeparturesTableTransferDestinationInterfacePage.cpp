@@ -50,10 +50,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<InterfacePage, departurestable::DeparturesTableTransferDestinationInterfacePage>::FACTORY_KEY("departures_table_transfer_destination");
+		template<> const string FactorableTemplate<InterfacePage, departure_boards::DeparturesTableTransferDestinationInterfacePage>::FACTORY_KEY("departures_table_transfer_destination");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		DeparturesTableTransferDestinationInterfacePage::DeparturesTableTransferDestinationInterfacePage()
 			: FactorableTemplate<interfaces::InterfacePage, DeparturesTableTransferDestinationInterfacePage>(),

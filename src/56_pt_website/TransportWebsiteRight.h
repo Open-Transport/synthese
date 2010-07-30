@@ -29,7 +29,7 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace pt_website
 	{
 		/** TransportWebsiteRight Right Class.
 			@ingroup m56Rights refRights

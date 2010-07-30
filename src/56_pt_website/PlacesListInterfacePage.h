@@ -44,7 +44,7 @@ namespace synthese
 	    class Webpage;
 	}
 	
-	namespace transportwebsite
+	namespace pt_website
 	{
 		/** PlacesListInterfacePage Interface Page Class.
 			@ingroup m56Pages refPages

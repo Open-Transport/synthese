@@ -36,7 +36,7 @@ namespace synthese
 		class ValueInterfaceElement;
 	}
 	
-	namespace departurestable
+	namespace departure_boards
 	{
 
 		/** JourneyPattern content interface element.

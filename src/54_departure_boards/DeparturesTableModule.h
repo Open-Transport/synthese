@@ -90,7 +90,7 @@ namespace synthese
 
 	/** 54 departures table module namespace.
 	*/
-	namespace departurestable
+	namespace departure_boards
 	{
 		class DeparturesTableModule:
 			public server::ModuleClassTemplate<DeparturesTableModule>

@@ -42,10 +42,10 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace algorithm;
-	using namespace pt_journeyplanner;
+	using namespace pt_journey_planner;
 		
 
-	namespace departurestable
+	namespace departure_boards
 	{
 
 		ArrivalDepartureTableGenerator::ArrivalDepartureTableGenerator(

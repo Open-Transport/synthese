@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace pt_website
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///	56.15 Function : CityListRequestFunction.

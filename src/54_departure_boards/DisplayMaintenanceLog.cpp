@@ -44,7 +44,7 @@ namespace synthese
 {
 	using namespace dblog;
 	using namespace security;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace util;
 	using namespace server;
 
@@ -53,7 +53,7 @@ namespace synthese
 		template<> const string FactorableTemplate<DBLog, DisplayMaintenanceLog>::FACTORY_KEY("displaymaintenance");
 	}
     
-	namespace departurestable
+	namespace departure_boards
 	{
 		const int DisplayMaintenanceLog::_COL_TYPE(0);
 		const int DisplayMaintenanceLog::_COL_FIELD(1);

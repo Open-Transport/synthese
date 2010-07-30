@@ -46,7 +46,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace transportwebsite;
+	using namespace pt_website;
 	using namespace pt;
 
 	namespace util
@@ -55,7 +55,7 @@ namespace synthese
 	}
 
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		const std::string RollingStockFilterTableSync::COL_SITE_ID("site_id");
 		const std::string RollingStockFilterTableSync::COL_RANK("rank");
@@ -195,7 +195,7 @@ namespace synthese
 	
 	
 	
-	namespace transportwebsite
+	namespace pt_website
 	{
 		vector<shared_ptr<RollingStockFilter> > RollingStockFilterTableSync::Search(
 			Env& env,

@@ -37,10 +37,10 @@ namespace synthese
 {
 	namespace util
 	{
-		template<> const string Registry<departurestable::DisplayScreenCPU>::KEY("DisplayScreenCPU");
+		template<> const string Registry<departure_boards::DisplayScreenCPU>::KEY("DisplayScreenCPU");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		using namespace util;
 

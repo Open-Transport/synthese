@@ -36,11 +36,11 @@ namespace synthese
 		class StopArea;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		/** Departures table.
 			
-			@code departurestable P1 P2 P3 @endcode
+			@code departure_boards P1 P2 P3 @endcode
 			
 			Available data :
 				- 0 : Title of the screen

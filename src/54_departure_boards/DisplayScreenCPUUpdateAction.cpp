@@ -47,9 +47,9 @@ namespace synthese
 	using namespace security;
 	using namespace dblog;
 
-	template<> const string FactorableTemplate<Action, departurestable::DisplayScreenCPUUpdateAction>::FACTORY_KEY("DisplayScreenCPUUpdateAction");
+	template<> const string FactorableTemplate<Action, departure_boards::DisplayScreenCPUUpdateAction>::FACTORY_KEY("DisplayScreenCPUUpdateAction");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const std::string DisplayScreenCPUUpdateAction::PARAMETER_CPU = Action_PARAMETER_PREFIX + "cp";
 		const std::string DisplayScreenCPUUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";

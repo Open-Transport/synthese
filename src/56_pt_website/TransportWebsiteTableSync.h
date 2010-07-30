@@ -32,7 +32,7 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace pt_website
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// 56.10 Table : Transport web site.

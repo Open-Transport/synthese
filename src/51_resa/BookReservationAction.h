@@ -40,7 +40,7 @@ namespace synthese
 		class User;
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		class TransportWebsite;
 		class RollingStockFilter;
@@ -121,8 +121,8 @@ namespace synthese
 			bool								_createCustomer;
 			graph::AccessParameters				_accessParameters;
 			int									_seatsNumber;
-			boost::shared_ptr<const transportwebsite::TransportWebsite>	_site;
-			boost::shared_ptr<const transportwebsite::RollingStockFilter>	_rollingStockFilter;
+			boost::shared_ptr<const pt_website::TransportWebsite>	_site;
+			boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

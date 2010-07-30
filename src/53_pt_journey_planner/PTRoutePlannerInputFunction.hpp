@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace pt_journeyplanner
+	namespace pt_journey_planner
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///	53.15 Function : PTRoutePlannerInputFunction.

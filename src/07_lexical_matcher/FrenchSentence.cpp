@@ -35,7 +35,7 @@ using namespace boost;
 
 namespace synthese
 {
-	namespace lexmatcher
+	namespace lexical_matcher
 	{
 		FrenchSentence::FrenchSentence()
 		{}

@@ -31,7 +31,7 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace pt_website
 	{
 		/** @addtogroup m56
 			@{

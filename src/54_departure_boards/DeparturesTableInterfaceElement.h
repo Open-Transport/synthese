@@ -36,7 +36,7 @@ namespace synthese
     }
 
 
-	namespace departurestable
+	namespace departure_boards
 	{
 
 		/** Departure table based on a display screen definition.

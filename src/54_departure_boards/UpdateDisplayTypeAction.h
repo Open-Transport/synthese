@@ -34,7 +34,7 @@ namespace synthese
 		class Interface;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		class DisplayType;
 

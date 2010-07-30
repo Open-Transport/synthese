@@ -29,10 +29,10 @@ namespace synthese
 {
 	namespace util
 	{
-		template<> const string Registry<transportwebsite::SiteCommercialLineLink>::KEY("SiteCommercialLineLink");
+		template<> const string Registry<pt_website::SiteCommercialLineLink>::KEY("SiteCommercialLineLink");
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		SiteCommercialLineLink::SiteCommercialLineLink(
 			util::RegistryKeyType id 

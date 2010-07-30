@@ -42,7 +42,7 @@ namespace synthese
 		class StopPoint;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 
 		/** Arrivals/Departures Table generator interface.

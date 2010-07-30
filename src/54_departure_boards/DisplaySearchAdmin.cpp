@@ -68,7 +68,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace html;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace security;
 	using namespace messages;
 	
@@ -84,7 +84,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::DEFAULT_TITLE("Recherche d'équipements");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplaySearchAdmin::TAB_CPU("cp");
 		const string DisplaySearchAdmin::TAB_DISPLAY_SCREENS("ds");

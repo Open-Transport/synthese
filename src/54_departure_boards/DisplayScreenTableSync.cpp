@@ -59,7 +59,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace pt;
 	using namespace dblog;
 	using namespace security;
@@ -73,7 +73,7 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync, DisplayScreenTableSync>::FACTORY_KEY("34.50 Display Screens");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayScreenTableSync::COL_PLACE_ID = "broadcast_point_id";
 		const string DisplayScreenTableSync::COL_NAME = "broadcast_point_comment";
@@ -461,7 +461,7 @@ namespace synthese
 			query.execute(transaction);
 	}	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 	    DisplayScreenTableSync::SearchResult DisplayScreenTableSync::Search(
 			Env& env,

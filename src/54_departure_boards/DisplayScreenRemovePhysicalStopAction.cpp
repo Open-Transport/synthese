@@ -46,9 +46,9 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemovePhysicalStopAction>::FACTORY_KEY("dsrps");
+	template<> const string util::FactorableTemplate<Action, departure_boards::DisplayScreenRemovePhysicalStopAction>::FACTORY_KEY("dsrps");
 	
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayScreenRemovePhysicalStopAction::PARAMETER_SCREEN_ID(
 			Action_PARAMETER_PREFIX + "s"

@@ -32,7 +32,7 @@
 
 namespace synthese
 {
-	namespace lexmatcher
+	namespace lexical_matcher
 	{
 		class FrenchPhoneticString
 		{

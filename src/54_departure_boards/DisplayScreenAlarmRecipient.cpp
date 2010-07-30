@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-// departurestable
+// departure_boards
 #include "DisplayScreenAlarmRecipient.h"
 #include "AlarmTestOnDisplayScreenFunction.h"
 #include "DeparturesTableModule.h"
@@ -69,7 +69,7 @@ namespace synthese
 {
 	using namespace messages;
 	using namespace util;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace server;
 	using namespace pt;
 	using namespace admin;
@@ -108,7 +108,7 @@ namespace synthese
 	}
 
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_CITY_NAME = "dsascity";
 		const std::string DisplayScreenAlarmRecipient::PARAMETER_SEARCH_STOP_NAME = "dsaslid";

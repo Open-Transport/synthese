@@ -34,7 +34,7 @@ namespace synthese
 		class StopArea;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Departure table generator : chronological order with priority to 

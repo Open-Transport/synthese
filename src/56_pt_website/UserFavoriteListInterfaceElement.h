@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace pt_website
 	{
 		/** UserFavoriteListInterfaceElement Library Interface Element Class.
 			@author Hugues Romain

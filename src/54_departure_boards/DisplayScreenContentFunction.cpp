@@ -51,11 +51,11 @@ namespace synthese
 	using namespace interfaces;
 	using namespace db;
 	using namespace pt;
-	using namespace departurestable;
+	using namespace departure_boards;
 
 	template<> const string util::FactorableTemplate<DisplayScreenContentFunction::_FunctionWithSite,DisplayScreenContentFunction>::FACTORY_KEY("tdg");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayScreenContentFunction::PARAMETER_DATE = "date";
 		const string DisplayScreenContentFunction::PARAMETER_TB = "tb";

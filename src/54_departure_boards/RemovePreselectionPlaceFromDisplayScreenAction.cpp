@@ -40,9 +40,9 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 
-	template<> const string util::FactorableTemplate<Action, departurestable::RemovePreselectionPlaceFromDisplayScreenAction>::FACTORY_KEY("rmpsfds");
+	template<> const string util::FactorableTemplate<Action, departure_boards::RemovePreselectionPlaceFromDisplayScreenAction>::FACTORY_KEY("rmpsfds");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string RemovePreselectionPlaceFromDisplayScreenAction::PARAMETER_SCREEN_ID = Action_PARAMETER_PREFIX + "s";
 		const string RemovePreselectionPlaceFromDisplayScreenAction::PARAMETER_PLACE = Action_PARAMETER_PREFIX + "pla";

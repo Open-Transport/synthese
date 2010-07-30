@@ -40,7 +40,7 @@ namespace synthese
 		class ServicePointer;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		/** DeparturesTableDestinationInterfacepage Interface Page Class.
 			@ingroup m54Pages refPages

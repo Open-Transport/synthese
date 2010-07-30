@@ -61,10 +61,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<departurestable::DisplayScreen>::KEY("DisplayScreen");
+		template<> const string Registry<departure_boards::DisplayScreen>::KEY("DisplayScreen");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		DisplayScreen::DisplayScreen(RegistryKeyType key)
 		:	Registrable(key),

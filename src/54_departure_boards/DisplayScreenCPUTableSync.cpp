@@ -43,7 +43,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace pt;
 
 	namespace util
@@ -51,7 +51,7 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,DisplayScreenCPUTableSync>::FACTORY_KEY("34.49 Display screen CPU");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const std::string DisplayScreenCPUTableSync::COL_NAME("name");
 		const std::string DisplayScreenCPUTableSync::COL_PLACE_ID("place_id");
@@ -150,7 +150,7 @@ namespace synthese
 	
 	
 	
-	namespace departurestable
+	namespace departure_boards
 	{
 		DisplayScreenCPUTableSync::SearchResult DisplayScreenCPUTableSync::Search(
 			Env& env,

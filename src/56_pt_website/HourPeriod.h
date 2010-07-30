@@ -28,7 +28,7 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace pt_website
 	{
 		/** ptime period in a day.
 			@ingroup m56

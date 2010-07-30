@@ -34,7 +34,7 @@ namespace synthese
 	///	@author Hugues Romain
 	///	@date 2010
 	/// @ingroup m53
-	namespace pt_journeyplanner
+	namespace pt_journey_planner
 	{
 		/**	@defgroup m53Exceptions 53.01 Exceptions
 			@ingroup m53

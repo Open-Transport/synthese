@@ -27,7 +27,7 @@
 
 namespace synthese
 {
-	namespace departurestable
+	namespace departure_boards
 	{
 		/** Habilitation portant sur le téléaffichage.
 			@ingroup m54Rights refRights

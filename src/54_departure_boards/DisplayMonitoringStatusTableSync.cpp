@@ -43,14 +43,14 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace departurestable;
+	using namespace departure_boards;
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<SQLiteTableSync,DisplayMonitoringStatusTableSync>::FACTORY_KEY("34.10 Display monitoring status");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayMonitoringStatusTableSync::COL_SCREEN_ID("screen_id");
 		const string DisplayMonitoringStatusTableSync::COL_TIME("time");
@@ -201,7 +201,7 @@ namespace synthese
 	
 	
 	
-	namespace departurestable
+	namespace departure_boards
 	{
 		DisplayMonitoringStatusTableSync::SearchResult DisplayMonitoringStatusTableSync::Search(
 			Env& env,

@@ -54,10 +54,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<server::Action, departurestable::UpdateDisplayTypeAction>::FACTORY_KEY("updatedisplaytype");
+		template<> const string FactorableTemplate<server::Action, departure_boards::UpdateDisplayTypeAction>::FACTORY_KEY("updatedisplaytype");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string UpdateDisplayTypeAction::PARAMETER_ID = Action_PARAMETER_PREFIX + "dtu_id";
 		const string UpdateDisplayTypeAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "dtu_na";

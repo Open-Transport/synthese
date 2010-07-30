@@ -39,7 +39,7 @@ namespace synthese
 	using namespace pt;
 	using namespace util;
 	using namespace db;
-	using namespace transportwebsite;
+	using namespace pt_website;
 	using namespace cms;
 
 	namespace util
@@ -48,7 +48,7 @@ namespace synthese
 		template<> const string FactorableTemplate<Fetcher<Website>, TransportWebsiteTableSync>::FACTORY_KEY("25");
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		const string TransportWebsiteTableSync::TABLE_COL_NAME = "name";
 		const string TransportWebsiteTableSync::TABLE_COL_START_DATE = "start_date";
@@ -188,7 +188,7 @@ namespace synthese
 		}
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		TransportWebsiteTableSync::SearchResult TransportWebsiteTableSync::Search(
 			Env& env,

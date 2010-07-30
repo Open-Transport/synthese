@@ -56,11 +56,11 @@ namespace synthese
 	using namespace interfaces;
 	using namespace db;
 	using namespace security;
-	using namespace departurestable;
+	using namespace departure_boards;
 
-	template<> const string util::FactorableTemplate<Function,departurestable::CentreonConfigExportFunction>::FACTORY_KEY("CentreonConfigExportFunction");
+	template<> const string util::FactorableTemplate<Function,departure_boards::CentreonConfigExportFunction>::FACTORY_KEY("CentreonConfigExportFunction");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string CentreonConfigExportFunction::PARAMETER_ACTION("ac");
 

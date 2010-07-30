@@ -28,7 +28,7 @@
 
 namespace synthese
 {
-	namespace departurestable
+	namespace departure_boards
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// 54.17 Alarm recipient : display screen.

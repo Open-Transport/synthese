@@ -40,7 +40,7 @@
 
 namespace synthese
 {
-	namespace departurestable
+	namespace departure_boards
 	{
 		class DisplayMonitoringStatus;
 		class DisplayScreen;

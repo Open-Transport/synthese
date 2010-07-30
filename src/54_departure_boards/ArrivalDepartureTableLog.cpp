@@ -45,7 +45,7 @@ namespace synthese
 	using namespace db;
 	using namespace dblog;
 	using namespace security;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace util;
 	using namespace server;
 	using namespace admin;
@@ -53,10 +53,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<DBLog, ArrivalDepartureTableLog>::FACTORY_KEY = "departurestable";
+		template<> const std::string FactorableTemplate<DBLog, ArrivalDepartureTableLog>::FACTORY_KEY = "departure_boards";
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		DBLog::ColumnsVector ArrivalDepartureTableLog::getColumnNames() const
 		{

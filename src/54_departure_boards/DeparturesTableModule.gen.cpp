@@ -1,77 +1,77 @@
 
-synthese::departurestable::DeparturesTableModule::integrate();
+synthese::departure_boards::DeparturesTableModule::integrate();
 
-synthese::departurestable::DeparturesTableInterfaceElement::integrate();
-synthese::departurestable::DeparturesTableRoutePlanningInterfaceElement::integrate();
-synthese::departurestable::DeparturesTableLineContentInterfaceElement::integrate();
-synthese::departurestable::DeparturesTableDestinationContentInterfaceElement::integrate();
-synthese::departurestable::DisplayScreenHasAlarmValueInterfaceElement::integrate();
-synthese::departurestable::DisplayScreenAlarmContentValueInterfaceElement::integrate();
+synthese::departure_boards::DeparturesTableInterfaceElement::integrate();
+synthese::departure_boards::DeparturesTableRoutePlanningInterfaceElement::integrate();
+synthese::departure_boards::DeparturesTableLineContentInterfaceElement::integrate();
+synthese::departure_boards::DeparturesTableDestinationContentInterfaceElement::integrate();
+synthese::departure_boards::DisplayScreenHasAlarmValueInterfaceElement::integrate();
+synthese::departure_boards::DisplayScreenAlarmContentValueInterfaceElement::integrate();
 
-synthese::departurestable::DeparturesTableInterfacePage::integrate();
-synthese::departurestable::DeparturesTableRoutePlanningInterfacePage::integrate();
-synthese::departurestable::DepartureTableRowInterfacePage::integrate();
-synthese::departurestable::DeparturesTableRoutePlanningRowInterfacePage::integrate();
-synthese::departurestable::DeparturesTableRoutePlanningRowKeyInterfacePage::integrate();
-synthese::departurestable::ParseDisplayReturnInterfacePage::integrate();
-synthese::departurestable::DeparturesTableTransferDestinationInterfacePage::integrate();
-synthese::departurestable::DeparturesTableDestinationInterfacepage::integrate();
+synthese::departure_boards::DeparturesTableInterfacePage::integrate();
+synthese::departure_boards::DeparturesTableRoutePlanningInterfacePage::integrate();
+synthese::departure_boards::DepartureTableRowInterfacePage::integrate();
+synthese::departure_boards::DeparturesTableRoutePlanningRowInterfacePage::integrate();
+synthese::departure_boards::DeparturesTableRoutePlanningRowKeyInterfacePage::integrate();
+synthese::departure_boards::ParseDisplayReturnInterfacePage::integrate();
+synthese::departure_boards::DeparturesTableTransferDestinationInterfacePage::integrate();
+synthese::departure_boards::DeparturesTableDestinationInterfacepage::integrate();
 
-synthese::departurestable::DisplaySearchAdmin::integrate();
-synthese::departurestable::DisplayTypesAdmin::integrate();
-synthese::departurestable::BroadcastPointsAdmin::integrate();
-synthese::departurestable::DisplayAdmin::integrate();
-synthese::departurestable::DisplayTypeAdmin::integrate();
-synthese::departurestable::DisplayScreenCPUAdmin::integrate();
-synthese::departurestable::DeparturesTableBenchmarkAdmin::integrate();
+synthese::departure_boards::DisplaySearchAdmin::integrate();
+synthese::departure_boards::DisplayTypesAdmin::integrate();
+synthese::departure_boards::BroadcastPointsAdmin::integrate();
+synthese::departure_boards::DisplayAdmin::integrate();
+synthese::departure_boards::DisplayTypeAdmin::integrate();
+synthese::departure_boards::DisplayScreenCPUAdmin::integrate();
+synthese::departure_boards::DeparturesTableBenchmarkAdmin::integrate();
 
-synthese::departurestable::DisplayTypeTableSync::integrate();
-synthese::departurestable::DisplayScreenTableSync::integrate();
-synthese::departurestable::DisplayMonitoringStatusTableSync::integrate();
-synthese::departurestable::DisplayScreenCPUTableSync::integrate();
+synthese::departure_boards::DisplayTypeTableSync::integrate();
+synthese::departure_boards::DisplayScreenTableSync::integrate();
+synthese::departure_boards::DisplayMonitoringStatusTableSync::integrate();
+synthese::departure_boards::DisplayScreenCPUTableSync::integrate();
 
-synthese::departurestable::CreateDisplayTypeAction::integrate();
-synthese::departurestable::UpdateDisplayTypeAction::integrate();
-synthese::departurestable::CreateDisplayScreenAction::integrate();
-synthese::departurestable::UpdateDisplayScreenAction::integrate();
-synthese::departurestable::AddPreselectionPlaceToDisplayScreenAction::integrate();
-synthese::departurestable::RemovePreselectionPlaceFromDisplayScreenAction::integrate();
-synthese::departurestable::UpdateAllStopsDisplayScreenAction::integrate();
-synthese::departurestable::AddDepartureStopToDisplayScreenAction::integrate();
-synthese::departurestable::AddForbiddenPlaceToDisplayScreenAction::integrate();
-synthese::departurestable::UpdateDisplayPreselectionParametersAction::integrate();
-synthese::departurestable::DisplayScreenAddDisplayedPlaceAction::integrate();
-synthese::departurestable::DisplayScreenRemovePhysicalStopAction::integrate();
-synthese::departurestable::DisplayScreenRemoveDisplayedPlaceAction::integrate();
-synthese::departurestable::DisplayScreenRemoveForbiddenPlaceAction::integrate();
-synthese::departurestable::UpdateDisplayMaintenanceAction::integrate();
-synthese::departurestable::DisplayTypeRemoveAction::integrate();
-synthese::departurestable::DisplayScreenRemoveAction::integrate();
-synthese::departurestable::DisplayScreenAppearanceUpdateAction::integrate();
-synthese::departurestable::DisplayScreenCPUCreateAction::integrate();
-synthese::departurestable::DisplayScreenCPUUpdateAction::integrate();
-synthese::departurestable::DisplayScreenCPUMaintenanceUpdateAction::integrate();
-synthese::departurestable::DisplayScreenTransferDestinationAddAction::integrate();
-synthese::departurestable::DisplayScreenTransferDestinationRemoveAction::integrate();
+synthese::departure_boards::CreateDisplayTypeAction::integrate();
+synthese::departure_boards::UpdateDisplayTypeAction::integrate();
+synthese::departure_boards::CreateDisplayScreenAction::integrate();
+synthese::departure_boards::UpdateDisplayScreenAction::integrate();
+synthese::departure_boards::AddPreselectionPlaceToDisplayScreenAction::integrate();
+synthese::departure_boards::RemovePreselectionPlaceFromDisplayScreenAction::integrate();
+synthese::departure_boards::UpdateAllStopsDisplayScreenAction::integrate();
+synthese::departure_boards::AddDepartureStopToDisplayScreenAction::integrate();
+synthese::departure_boards::AddForbiddenPlaceToDisplayScreenAction::integrate();
+synthese::departure_boards::UpdateDisplayPreselectionParametersAction::integrate();
+synthese::departure_boards::DisplayScreenAddDisplayedPlaceAction::integrate();
+synthese::departure_boards::DisplayScreenRemovePhysicalStopAction::integrate();
+synthese::departure_boards::DisplayScreenRemoveDisplayedPlaceAction::integrate();
+synthese::departure_boards::DisplayScreenRemoveForbiddenPlaceAction::integrate();
+synthese::departure_boards::UpdateDisplayMaintenanceAction::integrate();
+synthese::departure_boards::DisplayTypeRemoveAction::integrate();
+synthese::departure_boards::DisplayScreenRemoveAction::integrate();
+synthese::departure_boards::DisplayScreenAppearanceUpdateAction::integrate();
+synthese::departure_boards::DisplayScreenCPUCreateAction::integrate();
+synthese::departure_boards::DisplayScreenCPUUpdateAction::integrate();
+synthese::departure_boards::DisplayScreenCPUMaintenanceUpdateAction::integrate();
+synthese::departure_boards::DisplayScreenTransferDestinationAddAction::integrate();
+synthese::departure_boards::DisplayScreenTransferDestinationRemoveAction::integrate();
 
-synthese::departurestable::DisplayScreenContentFunction::integrate();
-synthese::departurestable::DisplayScreenSupervisionFunction::integrate();
-synthese::departurestable::AlarmTestOnDisplayScreenFunction::integrate();
-synthese::departurestable::DisplayGetNagiosStatusFunction::integrate();
-synthese::departurestable::CentreonConfigExportFunction::integrate();
-synthese::departurestable::CPUGetWiredScreensFunction::integrate();
+synthese::departure_boards::DisplayScreenContentFunction::integrate();
+synthese::departure_boards::DisplayScreenSupervisionFunction::integrate();
+synthese::departure_boards::AlarmTestOnDisplayScreenFunction::integrate();
+synthese::departure_boards::DisplayGetNagiosStatusFunction::integrate();
+synthese::departure_boards::CentreonConfigExportFunction::integrate();
+synthese::departure_boards::CPUGetWiredScreensFunction::integrate();
 
-synthese::departurestable::ArrivalDepartureTableRight::integrate();
-synthese::departurestable::DisplayMaintenanceRight::integrate();
+synthese::departure_boards::ArrivalDepartureTableRight::integrate();
+synthese::departure_boards::DisplayMaintenanceRight::integrate();
 
-synthese::departurestable::ArrivalDepartureTableLog::integrate();
-synthese::departurestable::DisplayMaintenanceLog::integrate();
+synthese::departure_boards::ArrivalDepartureTableLog::integrate();
+synthese::departure_boards::DisplayMaintenanceLog::integrate();
 
-synthese::departurestable::DisplayScreenAlarmRecipient::integrate();
+synthese::departure_boards::DisplayScreenAlarmRecipient::integrate();
 
 
 // Registries
-synthese::util::Env::Integrate<synthese::departurestable::DisplayScreen>();
-synthese::util::Env::Integrate<synthese::departurestable::DisplayType>();
-synthese::util::Env::Integrate<synthese::departurestable::DisplayMonitoringStatus>();
-synthese::util::Env::Integrate<synthese::departurestable::DisplayScreenCPU>();
+synthese::util::Env::Integrate<synthese::departure_boards::DisplayScreen>();
+synthese::util::Env::Integrate<synthese::departure_boards::DisplayType>();
+synthese::util::Env::Integrate<synthese::departure_boards::DisplayMonitoringStatus>();
+synthese::util::Env::Integrate<synthese::departure_boards::DisplayScreenCPU>();

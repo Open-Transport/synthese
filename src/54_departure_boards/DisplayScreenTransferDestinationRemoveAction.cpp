@@ -45,10 +45,10 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, departurestable::DisplayScreenTransferDestinationRemoveAction>::FACTORY_KEY("DisplayScreenTransferDestinationRemoveAction");
+		template<> const string FactorableTemplate<Action, departure_boards::DisplayScreenTransferDestinationRemoveAction>::FACTORY_KEY("DisplayScreenTransferDestinationRemoveAction");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayScreenTransferDestinationRemoveAction::PARAMETER_DISPLAY_SCREEN_ID = Action_PARAMETER_PREFIX + "ds";
 		const string DisplayScreenTransferDestinationRemoveAction::PARAMETER_TRANSFER_PLACE_ID = Action_PARAMETER_PREFIX + "tp";

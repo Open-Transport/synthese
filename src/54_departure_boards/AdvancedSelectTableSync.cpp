@@ -53,7 +53,7 @@ namespace synthese
 	
 	
 
-	namespace departurestable
+	namespace departure_boards
 	{
 
 		std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints(

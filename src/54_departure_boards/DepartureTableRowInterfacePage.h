@@ -29,7 +29,7 @@
 
 namespace synthese
 {
-	namespace departurestable
+	namespace departure_boards
 	{
 		/** Departure table row Interface Page.
 			@code departurestablerow @endcode

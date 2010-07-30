@@ -32,7 +32,7 @@ namespace synthese
 	{
 		class ValueElementList;
 	}
-	namespace departurestable
+	namespace departure_boards
 	{
 		/** Value Interface Element : Test of presence of an alarm on the display screen.
 			@ingroup m54Values refLibrary

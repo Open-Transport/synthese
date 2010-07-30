@@ -14,7 +14,7 @@
 
 using synthese::util::Log;
 using synthese::util::Conversion;
-using namespace synthese::lexmatcher;
+using namespace synthese::lexical_matcher;
 
 
 namespace po = boost::program_options;

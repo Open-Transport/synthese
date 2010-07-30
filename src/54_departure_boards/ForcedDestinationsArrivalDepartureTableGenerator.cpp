@@ -43,7 +43,7 @@ namespace synthese
 	using namespace pt;
 	
 
-	namespace departurestable
+	namespace departure_boards
 	{
 
 		ForcedDestinationsArrivalDepartureTableGenerator::ForcedDestinationsArrivalDepartureTableGenerator(

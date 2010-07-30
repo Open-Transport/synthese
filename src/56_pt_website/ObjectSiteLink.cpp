@@ -31,10 +31,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string Registry<transportwebsite::ObjectSiteLink>::KEY("ObjectSiteLink");
+		template<> const string Registry<pt_website::ObjectSiteLink>::KEY("ObjectSiteLink");
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		ObjectSiteLink::ObjectSiteLink(
 			RegistryKeyType id

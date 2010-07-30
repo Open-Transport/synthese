@@ -40,13 +40,13 @@ namespace synthese
 	using namespace server;
 	using namespace interfaces;
 	using namespace util;
-	using namespace lexmatcher;
-	using namespace transportwebsite;
+	using namespace lexical_matcher;
+	using namespace pt_website;
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<CityListFunction::_FunctionWithSite,CityListFunction>::FACTORY_KEY("lc");
 	
-	namespace transportwebsite
+	namespace pt_website
 	{
 		const string CityListFunction::PARAMETER_INPUT("t");
 		const string CityListFunction::PARAMETER_NUMBER("n");

@@ -113,17 +113,17 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				transportwebsite::TransportWebsite::ExtendedFetchPlaceResult	_place;
+				pt_website::TransportWebsite::ExtendedFetchPlaceResult	_place;
 				boost::shared_ptr<const HikingTrail> _trail;
 				std::size_t _beginningRank;
 				std::vector<std::size_t> _endingRanks;
-				boost::shared_ptr<const transportwebsite::TransportWebsite> _site;
+				boost::shared_ptr<const pt_website::TransportWebsite> _site;
 				boost::gregorian::date					_beginningDay;
 				std::size_t								_beginningPeriodId;
-				const transportwebsite::HourPeriod*		_beginningPeriod;
+				const pt_website::HourPeriod*		_beginningPeriod;
 				boost::gregorian::date					_endingDay;
 				std::size_t								_endingPeriodId;
-				const transportwebsite::HourPeriod*		_endingPeriod;
+				const pt_website::HourPeriod*		_endingPeriod;
 			//@}
 
 			//! @name Display pages

@@ -32,12 +32,12 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace pt;
-	using namespace pt_journeyplanner;
+	using namespace pt_journey_planner;
 	using namespace graph;
 	using namespace algorithm;
 	using namespace pt;
 
-	namespace departurestable
+	namespace departure_boards
 	{
 
 

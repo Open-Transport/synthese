@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace lexmatcher
+	namespace lexical_matcher
 	{
 		/** FrenchSentence class.
 			@ingroup m07

@@ -44,9 +44,9 @@ namespace synthese
 	using namespace dblog;
 	using namespace interfaces;
 
-	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenSupervisionFunction>::FACTORY_KEY("tds");
+	template<> const string util::FactorableTemplate<Function,departure_boards::DisplayScreenSupervisionFunction>::FACTORY_KEY("tds");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const std::string DisplayScreenSupervisionFunction::PARAMETER_DISPLAY_SCREEN_ID = "tb";
 		const std::string DisplayScreenSupervisionFunction::PARAMETER_STATUS = "status";

@@ -35,7 +35,7 @@ namespace synthese
 		class User;
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		class UserFavoriteJourney;
 

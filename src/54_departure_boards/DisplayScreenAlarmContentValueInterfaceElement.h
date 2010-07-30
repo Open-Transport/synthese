@@ -32,7 +32,7 @@ namespace synthese
 	{
 		class ValueElementList;
 	}
-	namespace departurestable
+	namespace departure_boards
 	{
 		/** Value Interface Element : Display screen alarm content (if applicable).
 			@ingroup m54Values refLibrary

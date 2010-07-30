@@ -28,7 +28,7 @@
 
 namespace synthese
 {
-	namespace departurestable
+	namespace departure_boards
 	{
 
 		/** Ecran d'administration des types d'affichage.

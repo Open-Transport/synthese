@@ -51,7 +51,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace util;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace html;
 	using namespace security;
 
@@ -66,7 +66,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<DisplayTypeAdmin>::DEFAULT_TITLE("Type d'affichage");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		DisplayTypeAdmin::DisplayTypeAdmin()
 			: AdminInterfaceElementTemplate<DisplayTypeAdmin>()

@@ -31,7 +31,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace security;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace pt;
 
 	namespace util

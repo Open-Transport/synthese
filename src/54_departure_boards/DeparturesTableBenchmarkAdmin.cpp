@@ -55,7 +55,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace html;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace security;
 
 	namespace util
@@ -69,7 +69,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<DeparturesTableBenchmarkAdmin>::DEFAULT_TITLE("Benchmark");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DeparturesTableBenchmarkAdmin::PARAMETER_DOIT("di");
 

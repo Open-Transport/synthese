@@ -32,11 +32,11 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string Registry<departurestable::DisplayType>::KEY("DisplayType");
+		template<> const std::string Registry<departure_boards::DisplayType>::KEY("DisplayType");
 	}
 
 
-	namespace departurestable
+	namespace departure_boards
 	{
 
 

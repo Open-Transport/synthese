@@ -40,13 +40,13 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace transportwebsite;
+	using namespace pt_website;
 	using namespace algorithm;
 	using namespace cms;
 
-	template<> const string util::FactorableTemplate<Function,pt_journeyplanner::PTRoutePlannerInputFunction>::FACTORY_KEY("PTRoutePlannerInputFunction");
+	template<> const string util::FactorableTemplate<Function,pt_journey_planner::PTRoutePlannerInputFunction>::FACTORY_KEY("PTRoutePlannerInputFunction");
 	
-	namespace pt_journeyplanner
+	namespace pt_journey_planner
 	{
 		const string PTRoutePlannerInputFunction::PARAMETER_FIELD("field");
 		const string PTRoutePlannerInputFunction::PARAMETER_VALUE("value");

@@ -30,7 +30,7 @@
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace pt_website
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// 56.10 Table : Links between sites and related objects.

@@ -45,9 +45,9 @@ namespace synthese
 	using namespace pt;
 	using namespace interfaces;
 	
-	template<> const string util::FactorableTemplate<Function,departurestable::DisplayScreenPhysicalStopFunction>::FACTORY_KEY("td");
+	template<> const string util::FactorableTemplate<Function,departure_boards::DisplayScreenPhysicalStopFunction>::FACTORY_KEY("td");
 	
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayScreenPhysicalStopFunction::PARAMETER_INTERFACE_ID("i");
 		const string DisplayScreenPhysicalStopFunction::PARAMETER_OPERATOR_CODE("oc");

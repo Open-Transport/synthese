@@ -38,9 +38,9 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 
-	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemoveAction>::FACTORY_KEY("dsra");
+	template<> const string util::FactorableTemplate<Action, departure_boards::DisplayScreenRemoveAction>::FACTORY_KEY("dsra");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayScreenRemoveAction::PARAMETER_DISPLAY_SCREEN_ID(Action_PARAMETER_PREFIX + "dsi");
 

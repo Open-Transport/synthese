@@ -1,3 +1,3 @@
 
-synthese::pt_journeyplanner::PTRoutePlannerInputFunction::integrate();
-synthese::pt_journeyplanner::RoutePlannerFunction::integrate();
+synthese::pt_journey_planner::PTRoutePlannerInputFunction::integrate();
+synthese::pt_journey_planner::RoutePlannerFunction::integrate();

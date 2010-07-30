@@ -36,7 +36,7 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace server;
-	using namespace transportwebsite;
+	using namespace pt_website;
 	
 	template<> const std::string util::FactorableTemplate<ModuleClass,TransportWebsiteModule>::FACTORY_KEY("36_places_list");
 	
@@ -58,7 +58,7 @@ namespace synthese
 		}
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		TransportWebsiteModule::UserClassNames TransportWebsiteModule::GetAccessibilityNames()
 		{

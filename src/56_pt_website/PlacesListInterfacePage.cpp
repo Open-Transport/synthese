@@ -35,7 +35,7 @@ namespace synthese
 	using namespace server;
 	using namespace cms;
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		const std::string PlacesListInterfacePage::PARAMETER_IS_CITY_LIST("is_city_list");
 		const std::string PlacesListInterfacePage::PARAMETER_IS_FOR_ORIGIN("is_for_origin");

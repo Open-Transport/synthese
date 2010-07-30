@@ -37,10 +37,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<InterfacePage, transportwebsite::UserFavoriteInterfacePage>::FACTORY_KEY("user_favorite_journey");
+		template<> const string FactorableTemplate<InterfacePage, pt_website::UserFavoriteInterfacePage>::FACTORY_KEY("user_favorite_journey");
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		const string UserFavoriteInterfacePage::DATA_ID("id");
 		const string UserFavoriteInterfacePage::DATA_RANK("rank");

@@ -28,7 +28,7 @@
 
 namespace synthese
 {
-	namespace departurestable
+	namespace departure_boards
 	{
 
 		class StandardArrivalDepartureTableGenerator : public ArrivalDepartureTableGenerator

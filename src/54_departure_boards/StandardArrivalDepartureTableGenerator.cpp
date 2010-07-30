@@ -38,7 +38,7 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 
-	namespace departurestable
+	namespace departure_boards
 	{
 
 		StandardArrivalDepartureTableGenerator::StandardArrivalDepartureTableGenerator(

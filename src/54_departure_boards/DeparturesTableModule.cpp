@@ -39,12 +39,12 @@ namespace synthese
 	using namespace pt;
 	using namespace security;
 	using namespace util;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace server;
 
 	namespace util
 	{
-		template<> const std::string util::FactorableTemplate<ModuleClass, departurestable::DeparturesTableModule>::FACTORY_KEY("54_departures_table");
+		template<> const std::string util::FactorableTemplate<ModuleClass, departure_boards::DeparturesTableModule>::FACTORY_KEY("54_departures_table");
 	}
 	
 	namespace server
@@ -64,7 +64,7 @@ namespace synthese
 		}
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		DeparturesTableModule::Labels DeparturesTableModule::getDisplayTypeLabels(
 			bool withAll, /*= false*/

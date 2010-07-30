@@ -42,9 +42,9 @@ namespace synthese
 	using namespace security;
 	using namespace geography;
 
-	template<> const string util::FactorableTemplate<Action,departurestable::DisplayScreenAddDisplayedPlaceAction>::FACTORY_KEY("dsadp");
+	template<> const string util::FactorableTemplate<Action,departure_boards::DisplayScreenAddDisplayedPlaceAction>::FACTORY_KEY("dsadp");
 	
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayScreenAddDisplayedPlaceAction::PARAMETER_SCREEN_ID(
 			Action_PARAMETER_PREFIX + "s"

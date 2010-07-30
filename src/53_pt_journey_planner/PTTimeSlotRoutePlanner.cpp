@@ -47,7 +47,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 
-	namespace pt_journeyplanner
+	namespace pt_journey_planner
 	{
 		PTTimeSlotRoutePlanner::PTTimeSlotRoutePlanner(
 			const geography::Place* origin,

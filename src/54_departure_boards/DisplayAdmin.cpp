@@ -99,7 +99,7 @@ namespace synthese
 	using namespace pt;
 	using namespace html;
 	using namespace db;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace security;
 	using namespace dblog;
 	using namespace messages;
@@ -118,7 +118,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<DisplayAdmin>::DEFAULT_TITLE("Afficheur inconnu");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayAdmin::TAB_TECHNICAL("tech");
 		const string DisplayAdmin::TAB_MAINTENANCE("maint");

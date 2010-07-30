@@ -47,9 +47,9 @@ namespace synthese
 	using namespace geography;
 	using namespace cms;
 	using namespace graph;
-	using namespace pt_journeyplanner;
+	using namespace pt_journey_planner;
 	using namespace algorithm;
-	using namespace transportwebsite;
+	using namespace pt_website;
 
 	template<> const string util::FactorableTemplate<Function,hiking::HikingTrailMultipleRoutePlannerFunction>::FACTORY_KEY("HikingTrailMultipleRoutePlannerFunction");
 	

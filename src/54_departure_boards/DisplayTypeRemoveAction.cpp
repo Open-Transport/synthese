@@ -38,9 +38,9 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 
-	template<> const string FactorableTemplate<Action, departurestable::DisplayTypeRemoveAction>::FACTORY_KEY("dtra");
+	template<> const string FactorableTemplate<Action, departure_boards::DisplayTypeRemoveAction>::FACTORY_KEY("dtra");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		 const string DisplayTypeRemoveAction::PARAMETER_TYPE_ID(Action_PARAMETER_PREFIX + "ti");
 

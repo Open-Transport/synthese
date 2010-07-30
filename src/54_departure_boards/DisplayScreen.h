@@ -50,7 +50,7 @@ namespace synthese
 		class JourneyPattern;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		class DisplayType;
 		class DisplayScreenCPU;

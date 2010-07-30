@@ -27,7 +27,7 @@
 
 namespace synthese
 {
-	namespace departurestable
+	namespace departure_boards
 	{
 		/** Habilitation portant sur la maintenance des afficheurs.
 			@ingroup m54Rights refRights

@@ -44,9 +44,9 @@ namespace synthese
 	using namespace pt;
 	using namespace util;
 
-	template<> const string util::FactorableTemplate<LibraryInterfaceElement, departurestable::DeparturesTableLineContentInterfaceElement>::FACTORY_KEY("departurestablelinecell");
+	template<> const string util::FactorableTemplate<LibraryInterfaceElement, departure_boards::DeparturesTableLineContentInterfaceElement>::FACTORY_KEY("departurestablelinecell");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		void DeparturesTableLineContentInterfaceElement::storeParameters( ValueElementList& vel )
 		{

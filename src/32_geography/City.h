@@ -57,7 +57,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<City>	Registry;
 
-			typedef lexmatcher::LexicalMatcher<const NamedPlace*> PlacesMatcher;
+			typedef lexical_matcher::LexicalMatcher<const NamedPlace*> PlacesMatcher;
 
 		private:
 			typedef std::map<std::string, PlacesMatcher> PlacesMatchers;

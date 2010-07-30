@@ -27,7 +27,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	namespace transportwebsite
+	namespace pt_website
 	{
 		HourPeriod::HourPeriod (
 			const string& caption

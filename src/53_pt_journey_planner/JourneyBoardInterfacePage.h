@@ -71,7 +71,7 @@ namespace synthese
 		class Road;
 	}
 
-	namespace pt_journeyplanner
+	namespace pt_journey_planner
 	{
 		/** JourneyBoardInterfacePage Interface Page Class.
 			@ingroup m53Pages refPages

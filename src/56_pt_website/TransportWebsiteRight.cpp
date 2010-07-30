@@ -30,12 +30,12 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace transportwebsite;
+	using namespace pt_website;
 	using namespace security;
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<Right, TransportWebsiteRight>::FACTORY_KEY("transportwebsite");
+		template<> const std::string FactorableTemplate<Right, TransportWebsiteRight>::FACTORY_KEY("pt_website");
 	}
 
 	namespace security
@@ -53,7 +53,7 @@ namespace synthese
 		}
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		string TransportWebsiteRight::displayParameter(
 			util::Env& env

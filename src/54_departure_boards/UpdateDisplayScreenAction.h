@@ -35,7 +35,7 @@ namespace synthese
 		class StopPoint;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		class DisplayScreen;
 		class DisplayType;

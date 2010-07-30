@@ -33,7 +33,7 @@ namespace synthese
 		class StopPoint;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		class DisplayScreen;
 
@@ -41,7 +41,7 @@ namespace synthese
 			@ingroup m54Actions refActions
 		*/
 		class DisplayScreenRemovePhysicalStopAction :
-			public util::FactorableTemplate<server::Action, departurestable::DisplayScreenRemovePhysicalStopAction>
+			public util::FactorableTemplate<server::Action, departure_boards::DisplayScreenRemovePhysicalStopAction>
 		{
 		public:
 			static const std::string PARAMETER_SCREEN_ID;

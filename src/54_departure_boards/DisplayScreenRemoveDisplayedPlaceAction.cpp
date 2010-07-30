@@ -41,9 +41,9 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 
-	template<> const string util::FactorableTemplate<Action, departurestable::DisplayScreenRemoveDisplayedPlaceAction>::FACTORY_KEY("dsrdp");
+	template<> const string util::FactorableTemplate<Action, departure_boards::DisplayScreenRemoveDisplayedPlaceAction>::FACTORY_KEY("dsrdp");
 	
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayScreenRemoveDisplayedPlaceAction::PARAMETER_PLACE(Action_PARAMETER_PREFIX + "pl");
 		const string DisplayScreenRemoveDisplayedPlaceAction::PARAMETER_SCREEN(Action_PARAMETER_PREFIX + "sc");

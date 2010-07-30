@@ -37,7 +37,7 @@ namespace synthese
 		class User;
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		/** AddUserFavoriteJourneyAction action class.
 			@ingroup m56Actions refActions

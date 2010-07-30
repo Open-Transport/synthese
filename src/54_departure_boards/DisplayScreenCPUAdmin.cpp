@@ -61,7 +61,7 @@ namespace synthese
 	using namespace admin;
 	using namespace interfaces;
 	using namespace server;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace security;
 	using namespace html;
 	using namespace util;
@@ -78,7 +78,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<DisplayScreenCPUAdmin>::DEFAULT_TITLE("Unité centrale");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayScreenCPUAdmin::TAB_DISPLAYS("di");
 		const string DisplayScreenCPUAdmin::TAB_MAINTENANCE("ma");

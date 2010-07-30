@@ -47,14 +47,14 @@ namespace synthese
 	using namespace road;
 	using namespace util;
 	using namespace server;
-	using namespace lexmatcher;
+	using namespace lexical_matcher;
 	using namespace geography;
-	using namespace transportwebsite;
+	using namespace pt_website;
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<PlacesListFunction::_FunctionWithSite,PlacesListFunction>::FACTORY_KEY("lp");
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		const std::string PlacesListFunction::PARAMETER_OLD_INPUT("i");
 		const std::string PlacesListFunction::PARAMETER_INPUT("t");

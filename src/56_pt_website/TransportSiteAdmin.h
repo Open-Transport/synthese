@@ -47,7 +47,7 @@ namespace synthese
 		class WebPageAddAction;
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		class TransportWebsite;
 		class RollingStockFilter;

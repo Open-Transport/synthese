@@ -27,14 +27,14 @@ using namespace std;
 namespace synthese
 {
 	using namespace interfaces;
-	using namespace departurestable;
+	using namespace departure_boards;
 
 	namespace util
 	{
 		 template<> const string FactorableTemplate<InterfacePage, ParseDisplayReturnInterfacePage>::FACTORY_KEY("parse_display_return");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string ParseDisplayReturnInterfacePage::DATA_STRING("string");
 

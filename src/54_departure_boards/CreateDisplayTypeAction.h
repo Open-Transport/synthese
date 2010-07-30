@@ -32,7 +32,7 @@ namespace synthese
 		class Interface;
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// 54.15 Action : Display type creation.

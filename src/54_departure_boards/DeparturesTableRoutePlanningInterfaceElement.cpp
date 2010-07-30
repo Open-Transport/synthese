@@ -47,10 +47,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<interfaces::LibraryInterfaceElement, departurestable::DeparturesTableRoutePlanningInterfaceElement>::FACTORY_KEY("departurestablerouteplanning");
+		template<> const string FactorableTemplate<interfaces::LibraryInterfaceElement, departure_boards::DeparturesTableRoutePlanningInterfaceElement>::FACTORY_KEY("departurestablerouteplanning");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		void DeparturesTableRoutePlanningInterfaceElement::storeParameters( ValueElementList& vel )
 		{

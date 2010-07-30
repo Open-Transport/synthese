@@ -46,9 +46,9 @@ namespace synthese
 	using namespace db;
 	using namespace security;
 	
-	template<> const string FactorableTemplate<Action, departurestable::CreateDisplayScreenAction>::FACTORY_KEY("createdisplayscreen");
+	template<> const string FactorableTemplate<Action, departure_boards::CreateDisplayScreenAction>::FACTORY_KEY("createdisplayscreen");
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const std::string CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "pti";
 		const string CreateDisplayScreenAction::PARAMETER_LOCALIZATION_ID(Action_PARAMETER_PREFIX + "pli");

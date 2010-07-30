@@ -40,10 +40,10 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, transportwebsite::SiteUpdateAction>::FACTORY_KEY("SiteUpdateAction");
+		template<> const string FactorableTemplate<Action, pt_website::SiteUpdateAction>::FACTORY_KEY("SiteUpdateAction");
 	}
 
-	namespace transportwebsite
+	namespace pt_website
 	{
 		const string SiteUpdateAction::PARAMETER_SITE_ID = Action_PARAMETER_PREFIX + "si";
 		const string SiteUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";

@@ -40,7 +40,7 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace db;
-	using namespace departurestable;
+	using namespace departure_boards;
 	using namespace interfaces;
 	using namespace util;
 
@@ -49,7 +49,7 @@ namespace synthese
 		template<> const string FactorableTemplate<SQLiteTableSync,DisplayTypeTableSync>::FACTORY_KEY("34.00 Display Types");
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		const string DisplayTypeTableSync::COL_NAME = "name";
 		const string DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID = "interface_id";
@@ -163,7 +163,7 @@ namespace synthese
 
 	}
 
-	namespace departurestable
+	namespace departure_boards
 	{
 		DisplayTypeTableSync::SearchResult DisplayTypeTableSync::Search(
 			Env& env,
