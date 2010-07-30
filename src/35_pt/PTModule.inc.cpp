@@ -74,11 +74,11 @@
 #include "LineStopAddAction.h"
 #include "LineStopRemoveAction.h"
 #include "ServiceDateChangeAction.h"
-#include "PhysicalStopUpdateAction.h"
-#include "PhysicalStopAddAction.h"
+#include "StopPointUpdateAction.hpp"
+#include "StopPointAddAction.hpp"
 #include "StopAreaAddAction.h"
 #include "LineStopUpdateAction.hpp"
-#include "PhysicalStopMoveAction.hpp"
+#include "StopPointMoveAction.hpp"
 
 #include "TransportNetworkRight.h"
 

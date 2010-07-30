@@ -48,9 +48,9 @@
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
-#include "PhysicalStopAddAction.h"
+#include "StopPointAddAction.hpp"
 #include "HTMLMap.hpp"
-#include "PhysicalStopMoveAction.hpp"
+#include "StopPointMoveAction.hpp"
 #include "StaticActionRequest.h"
 
 using namespace std;
@@ -169,7 +169,7 @@ namespace synthese
 				{
 					stream << "<h1>Carte</h1>";
 
-					StaticActionRequest<PhysicalStopMoveAction> moveAction(request);
+					StaticActionRequest<StopPointMoveAction> moveAction(request);
 					HTMLMap map(_connectionPlace->getPoint(), 18, true);
 					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 					{
@@ -225,7 +225,7 @@ namespace synthese
 			{
 				AdminFunctionRequest<PTPhysicalStopAdmin> openRequest(request);
 
-				AdminActionFunctionRequest<PhysicalStopAddAction,PTPlaceAdmin> addRequest(request);
+				AdminActionFunctionRequest<StopPointAddAction,PTPlaceAdmin> addRequest(request);
 				addRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
 
 				HTMLForm f(addRequest.getHTMLForm());
@@ -272,10 +272,10 @@ namespace synthese
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPhysicalStopAdmin::ICON);
 				}
 				stream << t.row();
-				stream << t.col() << f.getTextInput(PhysicalStopAddAction::PARAMETER_NAME, string());
-				stream << t.col() << f.getTextInput(PhysicalStopAddAction::PARAMETER_OPERATOR_CODE, string());
-				stream << t.col() << f.getTextInput(PhysicalStopAddAction::PARAMETER_X, string());
-				stream << t.col() << f.getTextInput(PhysicalStopAddAction::PARAMETER_Y, string());
+				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_NAME, string());
+				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_OPERATOR_CODE, string());
+				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_X, string());
+				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_Y, string());
 				stream << t.col();
 				stream << t.col() << f.getSubmitButton("Ajouter");
 

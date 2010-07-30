@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// PhysicalStopAddAction class header.
-///	@file PhysicalStopAddAction.hpp
+/// StopPointAddAction class header.
+///	@file StopPointAddAction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///
@@ -41,7 +41,7 @@ namespace synthese
 		///	@date 2010
 		/// @since 3.1.17
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : PhysicalStopAddAction
+		/// Key : StopPointAddAction
 		///
 		/// Parameters :
 		///	<ul>
@@ -51,8 +51,8 @@ namespace synthese
 		///		<li>actionParamx (optional) : x</li>
 		///		<li>actionParamy (optional) : y</li>
 		///	</ul>
-		class PhysicalStopAddAction:
-			public util::FactorableTemplate<server::Action, PhysicalStopAddAction>
+		class StopPointAddAction:
+			public util::FactorableTemplate<server::Action, StopPointAddAction>
 		{
 		public:
 			static const std::string PARAMETER_X;
@@ -83,7 +83,7 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			PhysicalStopAddAction(): _x(0), _y(0) {}
+			StopPointAddAction(): _x(0), _y(0) {}
 
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.

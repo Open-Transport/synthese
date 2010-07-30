@@ -81,11 +81,11 @@ synthese::pt::ServiceApplyCalendarAction::integrate();
 synthese::pt::LineStopAddAction::integrate();
 synthese::pt::LineStopRemoveAction::integrate();
 synthese::pt::ServiceDateChangeAction::integrate();
-synthese::pt::PhysicalStopUpdateAction::integrate();
-synthese::pt::PhysicalStopAddAction::integrate();
+synthese::pt::StopPointUpdateAction::integrate();
+synthese::pt::StopPointAddAction::integrate();
 synthese::pt::StopAreaAddAction::integrate();
 synthese::pt::LineStopUpdateAction::integrate();
-synthese::pt::PhysicalStopMoveAction::integrate();
+synthese::pt::StopPointMoveAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 

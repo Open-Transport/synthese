@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// PhysicalStopUpdateAction class header.
-///	@file PhysicalStopUpdateAction.h
+/// StopPointMoveAction class header.
+///	@file StopPointMoveAction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///
@@ -22,11 +22,12 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_PhysicalStopUpdateAction_H__
-#define SYNTHESE_PhysicalStopUpdateAction_H__
+#ifndef SYNTHESE_PhysicalStopMoveAction_H__
+#define SYNTHESE_PhysicalStopMoveAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "GeoPoint.h"
 
 namespace synthese
 {
@@ -35,38 +36,31 @@ namespace synthese
 		class StopPoint;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 35.15 Action : PhysicalStopUpdateAction.
+		/// 35.15 Action : StopPointMoveAction.
 		/// @ingroup m35Actions refActions
 		///	@author Hugues Romain
 		///	@date 2010
-		/// @since 3.1.16
+		/// @since 3.1.18
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : PhysicalStopUpdateAction
+		/// Key : StopPointMoveAction
 		///
 		/// Parameters :
 		///	<ul>
 		///		<li>actionParamid : id of the object to update</li>
-		///		<li>actionParamx : x</li>
-		///		<li>actionParamy : y</li>
-		///		<li>actionParamoc : operator code</li>
-		///		<li>actionParamna : name</li>
+		///		<li>actionParamlon : longitude WGS84</li>
+		///		<li>actionParamlat : latitude WGS84</li>
 		///	</ul>
-		class PhysicalStopUpdateAction:
-			public util::FactorableTemplate<server::Action, PhysicalStopUpdateAction>
+		class StopPointMoveAction:
+			public util::FactorableTemplate<server::Action, StopPointMoveAction>
 		{
 		public:
 			static const std::string PARAMETER_STOP_ID;
-			static const std::string PARAMETER_X;
-			static const std::string PARAMETER_Y;
-			static const std::string PARAMETER_OPERATOR_CODE;
-			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_LONGITUDE;
+			static const std::string PARAMETER_LATITUDE;
 
 		private:
 			boost::shared_ptr<StopPoint> _stop;
-			double _x;
-			double _y;
-			std::string _operatorCode;
-			std::string _name;
+			geography::GeoPoint _point;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -83,6 +77,9 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			StopPointMoveAction():
+			  _point(0,0,0) {}
+
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action
@@ -106,4 +103,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_PhysicalStopUpdateAction_H__
+#endif // SYNTHESE_PhysicalStopMoveAction_H__

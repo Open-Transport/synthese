@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// PhysicalStopMoveAction class implementation.
-/// @file PhysicalStopMoveAction.cpp
+/// StopPointMoveAction class implementation.
+/// @file StopPointMoveAction.cpp
 /// @author Hugues Romain
 /// @date 2010
 ///
@@ -24,7 +24,7 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "PhysicalStopMoveAction.hpp"
+#include "StopPointMoveAction.hpp"
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
@@ -42,18 +42,18 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, pt::PhysicalStopMoveAction>::FACTORY_KEY("PhysicalStopMoveAction");
+		template<> const string FactorableTemplate<Action, pt::StopPointMoveAction>::FACTORY_KEY("StopPointMoveAction");
 	}
 
 	namespace pt
 	{
-		const string PhysicalStopMoveAction::PARAMETER_STOP_ID = Action_PARAMETER_PREFIX + "id";
-		const string PhysicalStopMoveAction::PARAMETER_LONGITUDE = Action_PARAMETER_PREFIX + "lon";
-		const string PhysicalStopMoveAction::PARAMETER_LATITUDE = Action_PARAMETER_PREFIX + "lat";
+		const string StopPointMoveAction::PARAMETER_STOP_ID = Action_PARAMETER_PREFIX + "id";
+		const string StopPointMoveAction::PARAMETER_LONGITUDE = Action_PARAMETER_PREFIX + "lon";
+		const string StopPointMoveAction::PARAMETER_LATITUDE = Action_PARAMETER_PREFIX + "lat";
 		
 		
 		
-		ParametersMap PhysicalStopMoveAction::getParametersMap() const
+		ParametersMap StopPointMoveAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if(_stop.get())
@@ -65,7 +65,7 @@ namespace synthese
 		
 		
 		
-		void PhysicalStopMoveAction::_setFromParametersMap(const ParametersMap& map)
+		void StopPointMoveAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
@@ -81,7 +81,7 @@ namespace synthese
 		
 		
 		
-		void PhysicalStopMoveAction::run(
+		void StopPointMoveAction::run(
 			Request& request
 		){
 			stringstream text;
@@ -96,7 +96,7 @@ namespace synthese
 		
 		
 		
-		bool PhysicalStopMoveAction::isAuthorized(
+		bool StopPointMoveAction::isAuthorized(
 			const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);

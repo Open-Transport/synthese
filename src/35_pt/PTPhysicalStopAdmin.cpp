@@ -30,7 +30,7 @@
 #include "PropertiesHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "StopPoint.hpp"
-#include "PhysicalStopUpdateAction.h"
+#include "StopPointUpdateAction.hpp"
 #include "StopArea.hpp"
 #include "PTPlaceAdmin.h"
 
@@ -119,15 +119,15 @@ namespace synthese
 			// PROPERTIES TAB
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
-				AdminActionFunctionRequest<PhysicalStopUpdateAction, PTPhysicalStopAdmin> updateRequest(request);
+				AdminActionFunctionRequest<StopPointUpdateAction, PTPhysicalStopAdmin> updateRequest(request);
 				updateRequest.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
 				
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
-				stream << t.cell("Nom", t.getForm().getTextInput(PhysicalStopUpdateAction::PARAMETER_NAME, _stop->getName()));
-				stream << t.cell("X", t.getForm().getTextInput(PhysicalStopUpdateAction::PARAMETER_X, lexical_cast<string>(_stop->getX())));
-				stream << t.cell("Y", t.getForm().getTextInput(PhysicalStopUpdateAction::PARAMETER_Y, lexical_cast<string>(_stop->getY())));
-				stream << t.cell("Code opérateur", t.getForm().getTextInput(PhysicalStopUpdateAction::PARAMETER_OPERATOR_CODE, _stop->getCodeBySource()));
+				stream << t.cell("Nom", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_NAME, _stop->getName()));
+				stream << t.cell("X", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_X, lexical_cast<string>(_stop->getX())));
+				stream << t.cell("Y", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_Y, lexical_cast<string>(_stop->getY())));
+				stream << t.cell("Code opérateur", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_OPERATOR_CODE, _stop->getCodeBySource()));
 				stream << t.close();
 			}
 

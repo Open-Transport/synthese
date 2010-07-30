@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// PhysicalStopAddAction class implementation.
-/// @file PhysicalStopAddAction.cpp
+/// StopPointUpdateAction class implementation.
+/// @file StopPointUpdateAction.cpp
 /// @author Hugues Romain
 /// @date 2010
 ///
@@ -24,12 +24,10 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "PhysicalStopAddAction.h"
+#include "StopPointUpdateAction.hpp"
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
-#include "StopArea.hpp"
-#include "StopAreaTableSync.hpp"
 
 using namespace std;
 
@@ -41,72 +39,72 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, pt::PhysicalStopAddAction>::FACTORY_KEY("PhysicalStopAddAction");
+		template<> const string FactorableTemplate<Action, pt::StopPointUpdateAction>::FACTORY_KEY("StopPointUpdateAction");
 	}
 
 	namespace pt
 	{
-		const string PhysicalStopAddAction::PARAMETER_PLACE_ID = Action_PARAMETER_PREFIX + "pl";
-		const string PhysicalStopAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-		const string PhysicalStopAddAction::PARAMETER_OPERATOR_CODE = Action_PARAMETER_PREFIX + "oc";
-		const string PhysicalStopAddAction::PARAMETER_X = Action_PARAMETER_PREFIX + "x";
-		const string PhysicalStopAddAction::PARAMETER_Y = Action_PARAMETER_PREFIX + "y";
+		const string StopPointUpdateAction::PARAMETER_STOP_ID = Action_PARAMETER_PREFIX + "id";
+		const string StopPointUpdateAction::PARAMETER_X = Action_PARAMETER_PREFIX + "x";
+		const string StopPointUpdateAction::PARAMETER_Y = Action_PARAMETER_PREFIX + "y";
+		const string StopPointUpdateAction::PARAMETER_OPERATOR_CODE = Action_PARAMETER_PREFIX + "oc";
+		const string StopPointUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+
 		
 		
-		
-		ParametersMap PhysicalStopAddAction::getParametersMap() const
+		ParametersMap StopPointUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if(_place.get())
+			if(_stop.get())
 			{
-				map.insert(PARAMETER_PLACE_ID, _place->getKey());
+				map.insert(PARAMETER_STOP_ID, _stop->getKey());
 			}
-			map.insert(PARAMETER_OPERATOR_CODE, _operatorCode);
 			map.insert(PARAMETER_X, _x);
 			map.insert(PARAMETER_Y, _y);
+			map.insert(PARAMETER_OPERATOR_CODE, _operatorCode);
 			map.insert(PARAMETER_NAME, _name);
 			return map;
 		}
 		
 		
 		
-		void PhysicalStopAddAction::_setFromParametersMap(const ParametersMap& map)
+		void StopPointUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
 			{
-				_place = StopAreaTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
+				_stop = StopPointTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_STOP_ID), *_env);
 			}
-			catch(ObjectNotFoundException<StopArea>&)
+			catch(ObjectNotFoundException<StopPoint>&)
 			{
-				throw ActionException("No such connection place");
+				throw ActionException("No such physical stop");
 			}
 
-			_name = map.getDefault<string>(PARAMETER_NAME);
-			_operatorCode = map.getDefault<string>(PARAMETER_OPERATOR_CODE);
-			_x = map.getDefault<double>(PARAMETER_X, 0);
-			_y = map.getDefault<double>(PARAMETER_Y, 0);
+			_x = map.get<double>(PARAMETER_X);
+			_y = map.get<double>(PARAMETER_Y);
+			_operatorCode = map.get<string>(PARAMETER_OPERATOR_CODE);
+			_name = map.get<string>(PARAMETER_NAME);
 		}
 		
 		
 		
-		void PhysicalStopAddAction::run(
+		void StopPointUpdateAction::run(
 			Request& request
 		){
-			StopPoint object;
-			object.setHub(_place.get());
-			object.setName(_name);
-			object.setCodeBySource(_operatorCode);
-			object.setXY(_x, _y);
+//			stringstream text;
+//			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			StopPointTableSync::Save(&object);
+			_stop->setXY(_x, _y);
+			_stop->setCodeBySource(_operatorCode);
+			_stop->setName(_name);
 
-//			::AddCreationEntry(object, request.getUser().get());
-			request.setActionCreatedId(object.getKey());
+			StopPointTableSync::Save(_stop.get());
+
+//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
 		
 		
 		
-		bool PhysicalStopAddAction::isAuthorized(
+		bool StopPointUpdateAction::isAuthorized(
 			const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
