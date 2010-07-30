@@ -26,6 +26,7 @@
 #include "FunctionWithSiteBase.hpp"
 #include "WebPageDisplayFunction.h"
 #include "Request.h"
+#include "Fetcher.h"
 
 using namespace std;
 using namespace boost;
@@ -82,7 +83,7 @@ namespace synthese
 				)	);
 				if(function.get() && function->getPage())
 				{
-					return Env::GetOfficialEnv().getSPtr<Website>(function->getPage()->getRoot());
+					return Fetcher<Website>::Fetch(function->getPage()->getRoot()->getKey());
 				}
 			}
 
