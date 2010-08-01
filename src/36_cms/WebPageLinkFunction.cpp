@@ -46,6 +46,7 @@ namespace synthese
 	{
 		const string WebPageLinkFunction::PARAMETER_TARGET("target");
 		const string WebPageLinkFunction::PARAMETER_TEXT("text");
+		const string WebPageLinkFunction::PARAMETER_USE_SMART_URL("use_smart_url");
 		
 		ParametersMap WebPageLinkFunction::_getParametersMap() const
 		{
@@ -55,8 +56,11 @@ namespace synthese
 				map.insert(PARAMETER_TARGET, _target->getKey());
 			}
 			map.insert(PARAMETER_TEXT, _text);
+			map.insert(PARAMETER_USE_SMART_URL, _useSmartURL);
 			return map;
 		}
+
+
 
 		void WebPageLinkFunction::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -74,23 +78,40 @@ namespace synthese
 			_otherParameters.remove(PARAMETER_TARGET);
 			_otherParameters.remove(PARAMETER_TEXT);
 			_otherParameters.remove(Request::PARAMETER_FUNCTION);
+			_useSmartURL = map.getDefault<bool>(PARAMETER_USE_SMART_URL, true);
 		}
+
+
 
 		void WebPageLinkFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
-			StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
-			openRequest.getFunction()->setPage(_target);
-			openRequest.getFunction()->setAditionnalParametersMap(_otherParameters);
-			if(!_target->getRoot()->getClientURL().empty())
-			{
-				openRequest.setClientURL(_target->getRoot()->getClientURL());
+			string url;
+			shared_ptr<const WebPageDisplayFunction> webpageDisplayFunction(
+				dynamic_pointer_cast<const WebPageDisplayFunction,const Function>(
+					request.getFunction()
+			)	);
+
+			if(	_useSmartURL &&
+				!_target->getSmartURLPath().empty()
+			){	// URL is smart URL
+				url = _target->getSmartURLPath();
+
+				// TODO : add parameter
 			}
-			stream << HTMLModule::getHTMLLink(
-				openRequest.getURL(),
-				_text
-			);
+			else
+			{	// Classic URL
+				StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
+				openRequest.getFunction()->setPage(_target);
+				openRequest.getFunction()->setAditionnalParametersMap(_otherParameters);
+				if(!_target->getRoot()->getClientURL().empty())
+				{
+					openRequest.setClientURL(_target->getRoot()->getClientURL());
+				}
+				url = openRequest.getURL();
+			}
+			stream << HTMLModule::getHTMLLink(url, _text);
 		}
 		
 		
@@ -106,6 +127,14 @@ namespace synthese
 		std::string WebPageLinkFunction::getOutputMimeType() const
 		{
 			return "text/html";
+		}
+
+
+
+		WebPageLinkFunction::WebPageLinkFunction():
+			_useSmartURL(true)
+		{
+
 		}
 	}
 }

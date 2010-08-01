@@ -216,6 +216,11 @@ namespace synthese
 				Log::GetInstance().debug("Forbidden request");
 				rep = HTTPReply::stock_reply(HTTPReply::forbidden);
 			}
+			catch(Request::NotFoundException& e)
+			{
+				Log::GetInstance().debug("Path not found");
+				rep = HTTPReply::stock_reply(HTTPReply::not_found);
+			}
 			catch (RequestException& e)
 			{
 				Log::GetInstance().debug("Request error", e);

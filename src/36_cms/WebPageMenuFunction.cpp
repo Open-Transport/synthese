@@ -204,7 +204,7 @@ namespace synthese
 
 				StaticFunctionRequest<WebPageDisplayFunction> subPageRequest(request, false);
 				subPageRequest.getFunction()->setPage(root);
-				stream << HTMLModule::getHTMLLink(subPageRequest.getURL(), root->getName());
+				stream << HTMLModule::getHTMLLink(root->getSmartURLPath().empty() ? subPageRequest.getURL() : root->getSmartURLPath(), root->getName());
 
 				stream <<
 					(	(root == currentPage || returned_page_in_branch) ?

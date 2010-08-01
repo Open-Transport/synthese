@@ -31,9 +31,13 @@
 #include "Website.hpp"
 #include "WebPageInterfacePage.h"
 #include "Action.h"
+#include "CMSModule.hpp"
+
+#include <boost/algorithm/string/split.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::algorithm;
 using namespace boost::posix_time;
 
 namespace synthese
@@ -44,12 +48,13 @@ namespace synthese
 	using namespace interfaces;
 	using namespace cms;
 
-	template<> const string util::FactorableTemplate<Function,WebPageDisplayFunction>::FACTORY_KEY("page");
+	template<> const string util::FactorableTemplate<FunctionWithSite<false>,WebPageDisplayFunction>::FACTORY_KEY("page");
 	
 	namespace cms
 	{
 		const string WebPageDisplayFunction::PARAMETER_PAGE_ID("p");
 		const string WebPageDisplayFunction::PARAMETER_USE_TEMPLATE("use_template");
+		const string WebPageDisplayFunction::PARAMETER_SMART_URL("smart_url");
 
 		ParametersMap WebPageDisplayFunction::_getParametersMap() const
 		{
@@ -63,17 +68,8 @@ namespace synthese
 
 		void WebPageDisplayFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
-			}
-			catch (ObjectNotFoundException<Webpage>)
-			{
-				throw RequestException("No such page");
-			}
+			_FunctionWithSite::_setFromParametersMap(map);
 
-			_useTemplate = map.getDefault<bool>(PARAMETER_USE_TEMPLATE, true);
-			
 			_aditionnalParameters = map;
 			_aditionnalParameters.remove(Request::PARAMETER_ACTION);
 			BOOST_FOREACH(const ParametersMap::Map::value_type& it, map.getMap())
@@ -86,10 +82,53 @@ namespace synthese
 				}
 			}
 
-			if(	!_page->mustBeDisplayed()
-			){
-				throw RequestException("The page is not displayed right now");
+			if(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID))
+			{
+				try
+				{
+					_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
+				}
+				catch (ObjectNotFoundException<Webpage>)
+				{
+					throw RequestException("No such page");
+				}
+				if(	!_page->mustBeDisplayed()
+				){
+					throw Request::ForbiddenRequestException();
+				}
 			}
+			else
+			{
+				_smartURL = map.get<string>(PARAMETER_SMART_URL);
+				if(_smartURL.empty() || !getSite().get())
+				{
+					throw RequestException("Smart URL and site, or page ID must be specified");
+				}
+
+				_page = Env::GetOfficialEnv().getSPtr(getSite()->getPageBySmartURL(_smartURL));
+				WebPageDisplayFunction f;
+				f._aditionnalParameters = _aditionnalParameters;
+				if(!_page.get())
+				{ // Attempt to find a page with a parameter
+					vector<string> paths;
+					iter_split(paths, _smartURL, last_finder("/"));
+					if(paths.size() != 2)
+					{
+						throw Request::NotFoundException();
+					}
+
+					_page = Env::GetOfficialEnv().getSPtr(getSite()->getPageBySmartURL(paths[0]));
+
+					if(!_page.get() || _page->getSmartURLDefaultParameterName().empty())
+					{
+						throw Request::NotFoundException();
+					}
+
+					_aditionnalParameters.insert(_page->getSmartURLDefaultParameterName(), paths[1]);
+				}
+			}
+
+			_useTemplate = map.getDefault<bool>(PARAMETER_USE_TEMPLATE, true);
 		}
 
 		void WebPageDisplayFunction::run(

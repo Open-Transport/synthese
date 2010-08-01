@@ -26,7 +26,7 @@
 #define SYNTHESE_WebPageDisplayFunction_H__
 
 #include "FactorableTemplate.h"
-#include "Function.h"
+#include "FunctionWithSite.h"
 
 namespace synthese
 {
@@ -40,10 +40,12 @@ namespace synthese
 		///	@date 2010
 		///	@ingroup m56Functions refFunctions
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : page
+		///
+		/// <h3>Access by page id</h3>
 		///
 		/// Parameters :
 		///	<ul>
+		///		<li><b>fonction=page</b></li>
 		///		<li><b>p</b> : id of the page to display</li>
 		///		<li><b>use_template<b> : <u>1</u>|0 : 1=use the template to display the page, 0=display only the page content</li>
 		///		<li>all other parameters are available in the page (accessed by
@@ -51,12 +53,24 @@ namespace synthese
 		///	</ul>
 		///
 		/// Other parameters can be added by using the aditionnalParameters attribute too.
+		///
+		/// <h3>Access by smart URL</h3>
+		/// Parameters :
+		///	<ul>
+		///		<li><b>fonction=page</b></li>
+		///		<li><b>si</b> : site id</i>
+		///		<li><b>smart_url</b> : smart URL of the page to display</i>
+		///		<li><b>use_template<b> : <u>1</u>|0 : 1=use the template to display the page, 0=display only the page content</li>
+		///		<li>all other parameters are available in the page (accessed by
+		///			the @ function (GetValueFunction)). </li>
+		///	</ul>
 		class WebPageDisplayFunction:
-			public util::FactorableTemplate<server::Function, WebPageDisplayFunction>
+			public util::FactorableTemplate<FunctionWithSite<false>, WebPageDisplayFunction>
 		{
 		public:
 			static const std::string PARAMETER_PAGE_ID;	
-			static const std::string PARAMETER_USE_TEMPLATE;	
+			static const std::string PARAMETER_USE_TEMPLATE;
+			static const std::string PARAMETER_SMART_URL;
 			
 		protected:
 			//! \name Page parameters
@@ -64,6 +78,7 @@ namespace synthese
 				boost::shared_ptr<const Webpage>	_page;
 				server::ParametersMap _aditionnalParameters;
 				bool					_useTemplate;
+				std::string _smartURL;
 			//@}
 			
 			
@@ -101,6 +116,7 @@ namespace synthese
 				boost::shared_ptr<const Webpage> getPage() const { return _page; }
 				bool getUseTemplate() const { return _useTemplate; }
 				const server::ParametersMap& getAditionnalParametersMap() const { return _aditionnalParameters; }
+				const std::string& getSmartURL() const { return _smartURL; }
 			//@}
 
 

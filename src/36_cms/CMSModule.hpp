@@ -89,10 +89,18 @@ namespace synthese
 		/// 36 CMS Module class.
 		///	@author Hugues Romain
 		///	@date 2010
+		/// @since 3.2.0
+		//////////////////////////////////////////////////////////////////////////
+		/// Sites ares indexed in the module by their client URL, to allow to load
+		/// a site by simple URL interpretation.
 		class CMSModule:
 			public server::ModuleClassTemplate<CMSModule>
 		{
+		public:
+			typedef std::map<std::string, Website*> SitesByClientURL;
+
 		private:
+			static SitesByClientURL _sitesByClientURL;
 
 		public:
 
@@ -121,6 +129,36 @@ namespace synthese
 			static boost::shared_ptr<const Webpage> GetWebPage(const server::Request& request);
 
 		
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Removes a site from the map of sites indexed by client URL.
+			/// @param key client URL of the site to remove
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.2.0
+			static void RemoveSite(const std::string& key);
+
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			/// Adds a site on the map of sites indexed by client URL.
+			/// @param value the site to add
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.2.0
+			static void AddSite(Website& value);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Finds a site by its client URL.
+			/// @param key client URL to search
+			/// @return pointer to the site if found, NULL else
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.2.0
+			/// @warning Non thread safe
+			static Website* GetSiteByClientURL(const std::string& key);
 		};
 	}
 	/** @} */

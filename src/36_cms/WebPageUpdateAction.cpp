@@ -53,6 +53,8 @@ namespace synthese
 		const string WebPageUpdateAction::PARAMETER_MIME_TYPE = Action_PARAMETER_PREFIX + "mt";
 		const string WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE = Action_PARAMETER_PREFIX + "du";
 		const string WebPageUpdateAction::PARAMETER_HAS_FORUM = Action_PARAMETER_PREFIX + "fo";
+		const string WebPageUpdateAction::PARAMETER_SMART_URL_PATH(Action_PARAMETER_PREFIX + "sp");
+		const string WebPageUpdateAction::PARAMETER_SMART_URL_DEFAULT_PARAMETER_NAME(Action_PARAMETER_PREFIX + "sn");
 
 		
 		
@@ -68,6 +70,8 @@ namespace synthese
 			map.insert(PARAMETER_MIME_TYPE, _mimeType);
 			map.insert(PARAMETER_DO_NOT_USE_TEMPLATE, _doNotUseTemplate);
 			map.insert(PARAMETER_HAS_FORUM, _hasForum);
+			map.insert(PARAMETER_SMART_URL_PATH, _smartURLPath);
+			map.insert(PARAMETER_SMART_URL_DEFAULT_PARAMETER_NAME, _smartURLDefaultParameterName);
 			return map;
 		}
 		
@@ -126,6 +130,8 @@ namespace synthese
 			_doNotUseTemplate = map.getDefault<bool>(PARAMETER_DO_NOT_USE_TEMPLATE, false);
 			_hasForum = map.getDefault<bool>(PARAMETER_HAS_FORUM, false);
 			_mimeType = map.getDefault<string>(PARAMETER_MIME_TYPE);
+			_smartURLPath = map.getDefault<string>(PARAMETER_SMART_URL_PATH);
+			_smartURLDefaultParameterName = map.getDefault<string>(PARAMETER_SMART_URL_DEFAULT_PARAMETER_NAME);
 		}
 		
 		
@@ -169,6 +175,8 @@ namespace synthese
 			_page->setTemplate(_template.get());
 			_page->setDoNotUseTemplate(_doNotUseTemplate);
 			_page->setHasForum(_hasForum);
+			_page->setSmartURLPath(_smartURLPath);
+			_page->setSmartURLDefaultParameterName(_smartURLDefaultParameterName);
 
 			WebPageTableSync::Save(_page.get());
 

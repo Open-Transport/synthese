@@ -43,6 +43,9 @@ namespace synthese
 			public util::Named,
 			public virtual util::Registrable
 		{
+		public:
+			typedef std::map<std::string, Webpage*> WebpagesBySmartURL;
+
 		private:
 			//! \name Properties
 			//@{
@@ -50,6 +53,7 @@ namespace synthese
 				boost::gregorian::date		_endValidityDate;
 				std::string					_clientURL;
 				Webpage*					_defaultTemplate;
+				WebpagesBySmartURL			_webpagesBySmartURL;
 			//@}
 
 		public:
@@ -77,11 +81,17 @@ namespace synthese
 			
 			//! @name Services
 			//@{
-				bool dateControl() const
-				{
-				    boost::gregorian::date tempDate(boost::gregorian::day_clock::local_day());
-				    return tempDate >= _startValidityDate && tempDate <= _endValidityDate;
-				}
+				bool dateControl() const;
+			//@}
+
+			//! @name Modifiers
+			//@{
+				void addPage(Webpage& page);
+				
+				void removePage(const std::string& page);
+
+				/// Non thread safe
+				Webpage* getPageBySmartURL(const std::string& key) const;
 			//@}
 		};
 	}

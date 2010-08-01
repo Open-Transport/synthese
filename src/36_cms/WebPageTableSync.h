@@ -58,6 +58,8 @@ namespace synthese
 			static const std::string COL_LINKS;
 			static const std::string COL_DO_NOT_USE_TEMPLATE;
 			static const std::string COL_HAS_FORUM;
+			static const std::string COL_SMART_URL_PATH;
+			static const std::string COL_SMART_URL_DEFAULT_PARAMETER_NAME;
 		
 
 

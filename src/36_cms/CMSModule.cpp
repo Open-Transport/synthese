@@ -63,6 +63,9 @@ namespace synthese
 
 	namespace cms
 	{
+		CMSModule::SitesByClientURL CMSModule::_sitesByClientURL;
+
+
 		boost::shared_ptr<const Website> CMSModule::GetSite(
 			const server::Request& request
 		){
@@ -112,6 +115,47 @@ namespace synthese
 				}
 			}
 			return shared_ptr<const Webpage>();
+		}
+
+
+
+		void CMSModule::RemoveSite( const std::string& key )
+		{
+			if(key.empty())
+			{
+				return;
+			}
+
+			_sitesByClientURL.erase(key);
+		}
+
+
+
+		void CMSModule::AddSite( Website& value )
+		{
+			if(value.getClientURL().empty())
+			{
+				return;
+			}
+
+			_sitesByClientURL.insert(make_pair(value.getClientURL(), &value));
+		}
+
+
+
+		Website* CMSModule::GetSiteByClientURL( const std::string& key )
+		{
+			if(key.empty())
+			{
+				return NULL;
+			}
+
+			SitesByClientURL::const_iterator it(_sitesByClientURL.find(key));
+			if(it == _sitesByClientURL.end())
+			{
+				return NULL;
+			}
+			return it->second;
 		}
 	}
 }

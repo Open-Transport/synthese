@@ -24,6 +24,7 @@
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "WebPageTableSync.h"
+#include "CMSModule.hpp"
 
 #include <sstream>
 #include <boost/tokenizer.hpp>
@@ -98,6 +99,8 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
+			string clientURL(site->getClientURL());
+
 		    site->setName(rows->getText (TransportWebsiteTableSync::TABLE_COL_NAME));
 		    site->setStartDate(rows->getDate(TransportWebsiteTableSync::TABLE_COL_START_DATE));
 		    site->setEndDate(rows->getDate(TransportWebsiteTableSync::TABLE_COL_END_DATE));
@@ -145,6 +148,13 @@ namespace synthese
 					Log::GetInstance().warn("No such webpage in site", e);
 				}
 			}
+
+			// Registration of the site if loaded in official env
+			if(&env == &Env::GetOfficialEnv())
+			{
+				CMSModule::RemoveSite(clientURL);
+				CMSModule::AddSite(*site);
+			}
 		}
 
 
@@ -152,6 +162,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Unlink(
 			TransportWebsite* obj
 		){
+			CMSModule::RemoveSite(obj->getClientURL());
 		}
 
 

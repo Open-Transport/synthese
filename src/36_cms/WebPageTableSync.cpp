@@ -59,6 +59,8 @@ namespace synthese
 		const string WebPageTableSync::COL_LINKS = "links";
 		const string WebPageTableSync::COL_DO_NOT_USE_TEMPLATE = "do_not_use_template";
 		const string WebPageTableSync::COL_HAS_FORUM = "has_forum";
+		const string WebPageTableSync::COL_SMART_URL_PATH("smart_url_path");
+		const string WebPageTableSync::COL_SMART_URL_DEFAULT_PARAMETER_NAME("smart_url_default_parameter_name");
 	}
 
 	namespace db
@@ -83,6 +85,8 @@ namespace synthese
 			SQLiteTableSync::Field(WebPageTableSync::COL_LINKS, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_DO_NOT_USE_TEMPLATE, SQL_BOOLEAN),
 			SQLiteTableSync::Field(WebPageTableSync::COL_HAS_FORUM, SQL_BOOLEAN),
+			SQLiteTableSync::Field(WebPageTableSync::COL_SMART_URL_PATH, SQL_TEXT),
+			SQLiteTableSync::Field(WebPageTableSync::COL_SMART_URL_DEFAULT_PARAMETER_NAME, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -100,6 +104,7 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
+			string smartURLPath(webpage->getSmartURLPath());
 			webpage->setName(rows->getText(WebPageTableSync::COL_TITLE));
 			webpage->setContent(rows->getText(WebPageTableSync::COL_CONTENT1));
 			webpage->setRank(rows->getInt(WebPageTableSync::COL_RANK));
@@ -108,6 +113,8 @@ namespace synthese
 			webpage->setImage(rows->getText(WebPageTableSync::COL_IMAGE));
 			webpage->setDoNotUseTemplate(rows->getBool(WebPageTableSync::COL_DO_NOT_USE_TEMPLATE));
 			webpage->setHasForum(rows->getBool(WebPageTableSync::COL_HAS_FORUM));
+			webpage->setSmartURLPath(rows->getText(WebPageTableSync::COL_SMART_URL_PATH));
+			webpage->setSmartURLDefaultParameterName(rows->getText(WebPageTableSync::COL_SMART_URL_DEFAULT_PARAMETER_NAME));
 
 			if(!rows->getText(WebPageTableSync::COL_START_TIME).empty())
 			{
@@ -126,6 +133,8 @@ namespace synthese
 					try
 					{
 						webpage->setRoot(Fetcher<Website>::FetchEditable(id, env, linkLevel).get());
+						webpage->getRoot()->removePage(smartURLPath);
+						webpage->getRoot()->addPage(*webpage);
 					}
 					catch(ObjectNotFoundException<Website>& e)
 					{
@@ -224,6 +233,8 @@ namespace synthese
 			query.addField(linksStream.str());
 			query.addField(webPage->getDoNotUseTemplate());
 			query.addField(webPage->getHasForum());
+			query.addField(webPage->getSmartURLPath());
+			query.addField(webPage->getSmartURLDefaultParameterName());
 			query.execute(transaction);
 		}
 	}

@@ -417,7 +417,7 @@ namespace synthese
 
 
 			_score =
-				(_distanceToEnd == 0 || totalDuration.total_seconds() == 0) ?
+				(!_distanceToEnd || *_distanceToEnd == 0 || totalDuration.total_seconds() == 0) ?
 				1000 :
 				(20*(totalDuration.total_seconds() - journeyDuration)) / *_distanceToEnd
 				//				static_cast<long long unsigned int>(1000 * distanceToEnd * distanceToEnd * journeyDuration) /

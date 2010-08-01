@@ -22,8 +22,6 @@
 
 #include <sstream>
 
-#include "Conversion.h"
-
 #include "RequestException.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
@@ -33,10 +31,9 @@
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
 #include "DeparturesTableInterfacePage.h"
+#include "DeparturesTableRoutePlanningInterfacePage.h"
 #include "StopAreaTableSync.hpp"
-
 #include "Interface.h"
-
 #include "Env.h"
 
 using namespace std;
@@ -210,13 +207,17 @@ namespace synthese
 
 		std::string DisplayScreenContentFunction::getOutputMimeType() const
 		{
-			return
-				(	_screen.get() &&
+			return(	_screen.get() &&
 					_screen->getType() &&
 					_screen->getType()->getDisplayInterface() &&
-					_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
-				) ?
-				_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()->getMimeType() :
+					(	_screen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING ?
+						_screen->getType()->getDisplayInterface()->hasPage<DeparturesTableRoutePlanningInterfacePage>()	:
+						_screen->getType()->getDisplayInterface()->hasPage<DeparturesTableInterfacePage>()
+				)	) ?
+				(	_screen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING ?
+					_screen->getType()->getDisplayInterface()->getPage<DeparturesTableRoutePlanningInterfacePage>()->getMimeType() :
+					_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()->getMimeType()
+				) :
 				"text/plain"
 			;
 		}

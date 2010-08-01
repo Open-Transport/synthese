@@ -180,6 +180,8 @@ namespace synthese
 							WebPageTableSync::GetPagesList(_page->getRoot()->getKey(), "(racine)"),
 							optional<RegistryKeyType>(_page->getParent() ? _page->getParent()->getKey() : 0)
 					)	);
+					stream << t.cell("Chemin URL (facultatif)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_SMART_URL_PATH, _page->getSmartURLPath()));
+					stream << t.cell("Champ par défaut paramètre (facultatif)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_SMART_URL_DEFAULT_PARAMETER_NAME, _page->getSmartURLDefaultParameterName()));
 					stream << t.close();
 				}
 

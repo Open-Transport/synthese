@@ -124,6 +124,14 @@ namespace synthese
 			{
 			};
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Specified path is not found
+			/// @ingroup m15
+			class NotFoundException:
+				public std::exception
+			{
+			};
+
 			static const std::string PARAMETER_SEPARATOR;
 			static const std::string PARAMETER_ASSIGNMENT;
 

@@ -65,6 +65,35 @@ namespace synthese
 				<li>\<? = <?</li>
 				<li>\?> ? ?></li>
 			</ul>
+
+			<h3>Smart URLS</h3>
+
+			A webpage can be found by a real URL instead of its id, in order to raise up the score of the page
+			in the search engines.
+
+			The full smart URL for displaying a page follows this pattern :
+			<pre>http://<host><page smart path>[/<main parameter value>][&<other parameters>]</pre>
+
+			To transfert the smart URL into a real one, a Apache Rewrite Rule is necessary. After the rule, the 
+			URL is transformed into :
+			<pre>http://<host>/<site client url>?fonction=page&smart_url=<page smart path>[/<main parameter value>][&<other parameters>]</pre>
+
+			The corresponding normal URL is :
+			<pre>http://<host>/<site client url>?<site client url>?fonction=page&p=<page id>[&<main parameter name>=<main parameter value>][&<other parameters>]</pre>
+
+			The Rewrite Rule to insert in the Apache configuration file :
+			<pre>
+			<Directory /var/www/example.com>
+				RewriteEngine on
+				RewriteBase /
+				RewriteCond %{REQUEST_FILENAME} !-f
+				RewriteCond %{REQUEST_FILENAME} !-d
+				RewriteRule ^(.*)$ <site client url>?fonction=page&pu=$1 [L,QSA]
+			</Directory>
+			</pre>
+
+			If the page smart path does not begin with a / character, it is automatically added. The smart path can be /. It must be unique in a website.
+			Pages without smart path are accessible only by their id.
 		*/
 		class Webpage:
 			public util::Registrable,
@@ -82,6 +111,9 @@ namespace synthese
 			typedef std::vector<Webpage*> Links;
 
 		private:
+			std::string _smartURLPath;
+			std::string _smartURLDefaultParameterName;
+
 			Webpage* _template;
 			std::string _content;
 			boost::posix_time::ptime _startDate;
@@ -135,6 +167,8 @@ namespace synthese
 				const Links& getLinks() const { return _links; }
 				bool getDoNotUseTemplate() const { return _doNotUseTemplate; }
 				bool getHasForum() const { return _hasForum; }
+				const std::string& getSmartURLPath() const { return _smartURLPath; }
+				const std::string& getSmartURLDefaultParameterName() const { return _smartURLDefaultParameterName; }
 			//@}
 
 			//! @name Setters
@@ -149,6 +183,8 @@ namespace synthese
 				void setLinks(const Links& value){ _links = value; }
 				void setDoNotUseTemplate(bool value){ _doNotUseTemplate = value; }
 				void setHasForum(bool value){ _hasForum = value; }
+				void setSmartURLPath(const std::string& value){ _smartURLPath = value; }
+				void setSmartURLDefaultParameterName(const std::string& value){ _smartURLDefaultParameterName = value; }
 			//@}
 
 			//! @name Services

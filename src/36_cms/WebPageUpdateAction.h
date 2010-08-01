@@ -51,6 +51,8 @@ namespace synthese
 		///		<li>mt : value of mime type</li>
 		///		<li>du : value of do not use template</li>
 		///		<li>fo : value of has forum</li>
+		///		<li>sp : value of smart URL path</li>
+		///		<li>sn : value of smart URL default parameter name</li>
 		/// </ul>
 		class WebPageUpdateAction:
 			public util::FactorableTemplate<server::Action, WebPageUpdateAction>
@@ -64,6 +66,8 @@ namespace synthese
 			static const std::string PARAMETER_MIME_TYPE;
 			static const std::string PARAMETER_DO_NOT_USE_TEMPLATE;
 			static const std::string PARAMETER_HAS_FORUM;
+			static const std::string PARAMETER_SMART_URL_PATH;
+			static const std::string PARAMETER_SMART_URL_DEFAULT_PARAMETER_NAME;
 
 		private:
 			boost::shared_ptr<Webpage> _page;
@@ -74,6 +78,8 @@ namespace synthese
 			std::string _mimeType;
 			bool _doNotUseTemplate;
 			bool _hasForum;
+			std::string _smartURLPath;
+			std::string _smartURLDefaultParameterName;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
