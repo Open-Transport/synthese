@@ -41,6 +41,7 @@ namespace synthese
 		///
 		/// Parameters :
 		///	<ul>
+		///		<li>a=CityAddAction</li>
 		///		<li>actionParamna : name (optional)</li>
 		///		<li>actionParamco : code (optional)</li>
 		///	</ul>

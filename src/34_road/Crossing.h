@@ -34,12 +34,10 @@ namespace synthese
 		class Address;
 		
 		/** Crossing class.
-			Special kind of ConnectionPlace between roads, with a zero transfer delay between them.
-
+			
 			Score getter is not overloaded : all the crossing are considered interesting in routing.
-			@todo See later if this assertion is the best choice.
 
-			@ingroup m35
+			@ingroup m34
 		*/
 		class Crossing
 		:	public graph::Hub,
