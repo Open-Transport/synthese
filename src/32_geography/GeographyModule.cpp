@@ -72,13 +72,13 @@ namespace synthese
 		void GeographyModule::AddToCitiesMatchers(
 			GeographyModule::CitiesMatcher::Content city
 		){
-			_citiesMatcher.add(city->getName (), city);
+			_citiesMatcher.add(city->getName() +" "+ city->getCode(), city);
 
 			stringstream ss;
 			boost::iostreams::filtering_ostream out;
 			out.push (T9Filter());
 			out.push (ss);
-			out << city->getName() << " " << city->getCode() << flush;
+			out << city->getName() << flush;
 
 			_citiesT9Matcher.add(ss.str(), city);
 		}
@@ -88,7 +88,7 @@ namespace synthese
 		void GeographyModule::RemoveFromCitiesMatchers(
 			GeographyModule::CitiesMatcher::Content city
 		){
-			_citiesMatcher.remove(city->getName());
+			_citiesMatcher.remove(city->getName() +" "+ city->getCode());
 
 			stringstream ss;
 			boost::iostreams::filtering_ostream out;
