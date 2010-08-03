@@ -78,7 +78,7 @@ namespace synthese
 			boost::iostreams::filtering_ostream out;
 			out.push (T9Filter());
 			out.push (ss);
-			out << city->getName() << flush;
+			out << city->getName() << " " << city->getCode() << flush;
 
 			_citiesT9Matcher.add(ss.str(), city);
 		}
