@@ -27,6 +27,8 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "Point2D.h"
+#include "GeoPoint.h"
 
 namespace synthese
 {
@@ -50,7 +52,11 @@ namespace synthese
 		///		<li>actionParamoc (optional) : operator code</li>
 		///		<li>actionParamx (optional) : x</li>
 		///		<li>actionParamy (optional) : y</li>
+		///		<li>actionParamlon (optional) : longitude</li>
+		///		<li>actionParamlat (optional) : latitude</li>
 		///	</ul>
+		///
+		/// If both lon/lat and x/y coordinates are specified, then x/y has priority.
 		class StopPointAddAction:
 			public util::FactorableTemplate<server::Action, StopPointAddAction>
 		{
@@ -60,13 +66,15 @@ namespace synthese
 			static const std::string PARAMETER_OPERATOR_CODE;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_PLACE_ID;
+			static const std::string PARAMETER_LONGITUDE;
+			static const std::string PARAMETER_LATITUDE;
+
 
 		private:
 			boost::shared_ptr<const StopArea> _place;
-			double _x;
-			double _y;
 			std::string _operatorCode;
 			std::string _name;
+			geometry::Point2D _point;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -83,7 +91,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			StopPointAddAction(): _x(0), _y(0) {}
 
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.

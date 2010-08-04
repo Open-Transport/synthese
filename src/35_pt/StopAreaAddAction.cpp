@@ -144,7 +144,7 @@ namespace synthese
 			stopArea.setName(_name);
 			StopAreaTableSync::Save(&stopArea, transaction);
 
-			if(_createPhysicalStop)
+			if(_createPhysicalStop || !_point.isUnknown() && _point.getX() && _point.getY())
 			{
 				StopPoint stop;
 				stop.setName(_name);

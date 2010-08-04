@@ -95,6 +95,8 @@ namespace synthese
 			typedef typename Map::iterator iterator;
 			typedef typename Map::const_iterator const_iterator;
 			typedef typename Map::value_type value_type;
+			typedef typename Map::reverse_iterator reverse_iterator;
+			typedef typename Map::const_reverse_iterator const_reverse_iterator;
 			
 		private:
 			
@@ -146,6 +148,10 @@ namespace synthese
 				const_iterator begin() const { return _registry.begin(); }
 				iterator end() { return _registry.end(); }
 				const_iterator end() const { return _registry.end(); }
+				reverse_iterator rbegin() { return _registry.rbegin(); }
+				const_reverse_iterator rbegin() const { return _registry.rbegin(); }
+				reverse_iterator rend() { return _registry.rend(); }
+				const_reverse_iterator rend() const { return _registry.rend(); }
 			//@}
 
 		    

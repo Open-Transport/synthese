@@ -68,6 +68,7 @@ namespace synthese
 	using namespace geography;
 	using namespace road;
 	using namespace html;
+	using namespace geometry;
 
 	namespace util
 	{
@@ -170,7 +171,21 @@ namespace synthese
 					stream << "<h1>Carte</h1>";
 
 					StaticActionRequest<StopPointMoveAction> moveAction(request);
-					HTMLMap map(_connectionPlace->getPoint(), 18, true);
+
+					Point2D mapCenter(_connectionPlace->getPoint());
+					if(mapCenter.isUnknown()) // If the place does not contain any point, it has no coordinate : search the last created place with coordinates
+					{
+						const Registry<StopArea>& registry(Env::GetOfficialEnv().getRegistry<StopArea>());
+						BOOST_REVERSE_FOREACH(Registry<StopArea>::value_type stopArea, registry)
+						{
+							if(!stopArea.second->getPoint().isUnknown())
+							{
+								mapCenter = stopArea.second->getPoint();
+								break;
+							}
+						}
+					}
+					HTMLMap map(mapCenter, 18, true, true);
 					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 					{
 						moveAction.getAction()->setStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<StopPoint*>(it.second)));
@@ -198,6 +213,11 @@ namespace synthese
 						map.addPoint(HTMLMap::Point(*address, "marker-green.png", "marker.png", "marker-gold.png", string(), string()));
 					}
 					map.draw(stream);
+
+					AdminActionFunctionRequest<StopPointAddAction,PTPlaceAdmin> stopPointAddRequest(request);
+					stopPointAddRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
+					stream << map.getAddPointLink(stopPointAddRequest.getURL(), "Ajouter arrêt");
+
 
 					AdminActionFunctionRequest<StopAreaNameUpdateAction,PTPlaceAdmin> updateRequest(request);
 					updateRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));

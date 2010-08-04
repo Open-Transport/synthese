@@ -341,7 +341,6 @@ namespace synthese
 				AdminActionFunctionRequest<StopAreaAddAction,PTPlaceAdmin> stopAddRequest(request);
 				stopAddRequest.getAction()->setCity(const_pointer_cast<City>(_city));
 				stopAddRequest.getAction()->setCreateCityIfNecessary(false);
-				stopAddRequest.getAction()->setCreatePhysicalStop(true);
 				stopAddRequest.setActionWillCreateObject();
 				stopAddRequest.setActionFailedPage<PTPlacesAdmin>();
 				static_pointer_cast<PTPlacesAdmin>(stopAddRequest.getActionFailedPage())->setCity(_city);

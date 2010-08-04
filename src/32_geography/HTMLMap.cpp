@@ -26,6 +26,7 @@
 #include "GeoPoint.h"
 
 #include <boost/foreach.hpp>
+#include <sstream>
 
 using namespace std;
 
@@ -40,12 +41,22 @@ namespace synthese
 			const geometry::Point2D& center,
 			int zoom,
 			bool editable,
+			bool addable,
 			const std::string id /*= "map" */
 		):	_center(center.getX(), center.getY()),
 			_zoom(zoom),
 			_editable(editable),
 			_id(id)
 		{
+			_controls.push_back(Control(Control::HIGHLIGHT, "highlight", true));
+			if(editable)
+			{
+				_controls.push_back(Control(Control::DRAG, "modify", true));
+			}
+			if(addable)
+			{
+				_controls.push_back(Control(Control::DRAW_POINT, "point", false));
+			}
 		}
 
 
@@ -61,6 +72,7 @@ namespace synthese
 			stream <<
 				"var lastFeature = null;" <<
 				"var tooltipPopup = null;" <<
+				"var addURL = '';" <<
 
 				"function init(){" <<
 					"map = new OpenLayers.Map('map');" <<
@@ -91,68 +103,38 @@ namespace synthese
 				;
 			}
 
-			// Popup
-			stream <<
-				"var highlightCtrl = new OpenLayers.Control.SelectFeature(vectorLayer, {" <<
-					"hover: true, highlightOnly: true, renderIntent: \"temporary\"," <<
-					"eventListeners: {" <<
-						"featurehighlighted:	function(event){" <<
-							"var feature = event.feature;" <<
-							"var selectedFeature = feature;" <<
-							//if there is already an opened details window, don\'t draw the    tooltip
-							"if(feature.popup != null){" <<
-								"return;" <<
-							"}" <<
-							//if there are other tooltips active, destroy them
-							"if(tooltipPopup != null){" <<
-								"map.removePopup(tooltipPopup);" <<
-								"tooltipPopup.destroy();" <<
-								"if(lastFeature != null){" <<
-									"delete lastFeature.popup;" <<
-									"tooltipPopup = null;" <<
-								"}" <<
-							"}" <<
-							"lastFeature = feature;" <<
-							"var tooltipPopup = new OpenLayers.Popup('activetooltip'," <<
-								"feature.geometry.getBounds().getCenterLonLat()," <<
-								"new OpenLayers.Size(200,40)," <<
-								"feature.data.htmlPopup," <<
-								"false);"
-							//this is messy, but I'm not a CSS guru
-							"tooltipPopup.contentDiv.style.backgroundColor='ffffcb';" <<
-							"tooltipPopup.contentDiv.style.overflow='hidden';" <<
-							"tooltipPopup.contentDiv.style.padding='3px';" <<
-							"tooltipPopup.contentDiv.style.margin='0';" <<
-							"tooltipPopup.closeOnMove = true;" <<
-							"tooltipPopup.autoSize = true;" <<
-							"feature.popup = tooltipPopup;" <<
-							"map.addPopup(tooltipPopup);" <<
-						"}," <<
-						"featureunhighlighted: function (event){" <<
-							"var feature = event.feature;" <<
-							"if(feature != null && feature.popup != null){" <<
-								"map.removePopup(feature.popup);" <<
-								"feature.popup = null;" <<
-								"tooltipPopup = null;" <<
-								"lastFeature = null;" <<
-							"}" <<
-						"}" <<
-				" }	});" <<
-
-				"map.addControl(highlightCtrl);" <<
-				"highlightCtrl.activate();"
-			;
+			if(!_controls.empty())
+			{
+				stream << "controls = {";
+				bool first(true);
+				BOOST_FOREACH(const Control& control, _controls)
+				{
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						stream << ",";
+					}
+					stream << control.getInitializationString("vectorLayer");
+				}
+				stream << "};";
+				BOOST_FOREACH(const Control& control, _controls)
+				{
+					stream << "map.addControl(controls['" << control.getName() << "']);";
+					if(control.getActivated())
+					{
+						stream << "controls['" << control.getName() << "'].activate();";
+					}
+				}
+			}
 
 
 			// Moving by drag and drop
 			if(_editable)
 			{
 				stream <<
-					"var modifyFeature = new OpenLayers.Control.ModifyFeature(vectorLayer, {" <<
-					"mode: OpenLayers.Control.ModifyFeature.DRAG," <<
-					"});" <<
-					"map.addControl(modifyFeature);" <<
-					"modifyFeature.activate();" <<
 					"vectorLayer.events.on({" <<
 						"'beforefeaturemodified': function(evt) {" <<
 							"evt.feature.style.externalGraphic = evt.feature.data.editionGraphic;" <<
@@ -172,10 +154,25 @@ namespace synthese
 									"evt.feature.style.externalGraphic = evt.feature.data.graphic;" <<
 									"vectorLayer.redraw();" <<
 								"}" <<
-							"}" <<
-						");" <<
-					"}" <<
-				"});";
+							"});" <<
+						"}," <<
+						"'featureadded': function(evt) {" <<
+							"var newpoint = evt.feature.geometry.clone();" <<
+							"newpoint.transform(" <<
+								"new OpenLayers.Projection(\"EPSG:900913\")," << // to Spherical Mercator Projection
+								"new OpenLayers.Projection(\"EPSG:4326\")" << // transform from WGS 1984
+							");" <<
+							"new OpenLayers.Ajax.Request(addURL + '&actionParamlon='+ newpoint.x +'&actionParamlat=' + newpoint.y," <<
+							"{   method: 'get'," <<
+								"onComplete: function(transport) {" <<
+//									"evt.feature.style.externalGraphic = evt.feature.data.graphic;" <<
+									"vectorLayer.redraw();" <<
+								"}" <<
+							"});" <<
+							"controls['point'].deactivate();" <<
+						"}" <<
+					"});"
+				;
 			}
 
 			GeoPoint center(WGS84FromLambert(_center));
@@ -186,9 +183,94 @@ namespace synthese
 				")," << _zoom << // Zoom level
 			");" <<
 			"}" <<
-			"init();";
-			
+			"init();" <<
+			"function activateAddPoint_" << _id << "(requestURL)" <<
+			"{" <<
+				"addURL = requestURL;"
+				"controls['point'].activate();" <<
+			"}"
+			;
+
 			stream << HTMLModule::GetHTMLJavascriptClose();
+		}
+
+
+
+		std::string HTMLMap::getAddPointLink(
+			const std::string& requestURL,
+			const std::string& content
+		) const {
+			stringstream stream;
+			stream << "<a href=\"#\" onclick=\"activateAddPoint_" << _id << "('" << requestURL << "');\">" << content << "</a>";
+			return stream.str();
+		}
+
+
+
+		std::string HTMLMap::Control::getInitializationString(
+			const std::string& layerName
+		) const	{
+			stringstream stream;
+			stream << _name << ": new OpenLayers.Control.";
+			if(_controlType == Control::DRAW_POINT)
+			{
+				stream << "DrawFeature(" << layerName << ", OpenLayers.Handler.Point)";
+			}
+			else if(_controlType == Control::DRAG)
+			{
+				stream << "ModifyFeature(" << layerName << ", { mode: OpenLayers.Control.ModifyFeature.DRAG })";
+			}
+			else if(_controlType == Control::HIGHLIGHT)
+			{
+				stream <<
+					"SelectFeature(" << layerName << ", {" <<
+						"hover: true, highlightOnly: true, renderIntent: \"temporary\"," <<
+						"eventListeners: {" <<
+							"featurehighlighted:	function(event){" <<
+								"var feature = event.feature;" <<
+								"var selectedFeature = feature;" <<
+								//if there is already an opened details window, don\'t draw the    tooltip
+								"if(feature.popup != null){" <<
+									"return;" <<
+								"}" <<
+								//if there are other tooltips active, destroy them
+								"if(tooltipPopup != null){" <<
+									"map.removePopup(tooltipPopup);" <<
+									"tooltipPopup.destroy();" <<
+									"if(lastFeature != null){" <<
+										"delete lastFeature.popup;" <<
+										"tooltipPopup = null;" <<
+									"}" <<
+								"}" <<
+								"lastFeature = feature;" <<
+								"var tooltipPopup = new OpenLayers.Popup('activetooltip'," <<
+									"feature.geometry.getBounds().getCenterLonLat()," <<
+									"new OpenLayers.Size(200,40)," <<
+									"feature.data.htmlPopup," <<
+									"false);"
+								//this is messy, but I'm not a CSS guru
+								"tooltipPopup.contentDiv.style.backgroundColor='ffffcb';" <<
+								"tooltipPopup.contentDiv.style.overflow='hidden';" <<
+								"tooltipPopup.contentDiv.style.padding='3px';" <<
+								"tooltipPopup.contentDiv.style.margin='0';" <<
+								"tooltipPopup.closeOnMove = true;" <<
+								"tooltipPopup.autoSize = true;" <<
+								"feature.popup = tooltipPopup;" <<
+								"map.addPopup(tooltipPopup);" <<
+							"}," <<
+							"featureunhighlighted: function (event){" <<
+								"var feature = event.feature;" <<
+								"if(feature != null && feature.popup != null){" <<
+									"map.removePopup(feature.popup);" <<
+									"feature.popup = null;" <<
+									"tooltipPopup = null;" <<
+									"lastFeature = null;" <<
+								"}" <<
+							"}" <<
+					" }	})"
+				;
+			}
+			return stream.str();
 		}
 	}
 }

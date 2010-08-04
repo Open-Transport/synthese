@@ -147,6 +147,10 @@ namespace synthese
 							_reverseRoad,
 							-chunk.getMetricOffset()
 					)	);
+					BOOST_REVERSE_FOREACH(const geometry::Point2D *pt, chunk.getViaPoints())
+					{
+						reverseChunk->addViaPoint(*pt);
+					}
 					_reverseRoad->addEdge(*reverseChunk);
 				}
 				else
@@ -301,5 +305,9 @@ namespace synthese
 		{
 			return true;
 		}
-	}
-}
+
+		bool Road::isReversed() const
+		{
+			return (_reverseRoad == NULL);
+		}
+}	}

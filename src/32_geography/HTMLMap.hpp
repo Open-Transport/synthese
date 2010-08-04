@@ -75,11 +75,45 @@ namespace synthese
 			};
 			typedef std::vector<Point> Points;
 
+			class Control
+			{
+			public:
+				enum ControlType
+				{
+					DRAW_POINT,
+					DRAG,
+					HIGHLIGHT
+				};
+
+			private:
+				ControlType _controlType;
+				std::string _name;
+				bool _activated;
+
+			public:
+				Control(
+					ControlType controlType,
+					const std::string& name,
+					bool activated
+				):	_controlType(controlType),
+					_name(name),
+					_activated(activated)
+				{}
+
+				std::string getInitializationString(const std::string& layerName) const;
+
+				const std::string& getName() const { return _name; }
+				const bool getActivated() const { return _activated; }
+			};
+
+			typedef std::vector<Control> Controls;
+
 		private:
 			const geometry::Point2D _center;
 			const int _zoom;
 			const std::string _id;
 			Points _points;
+			Controls _controls;
 			bool _editable;
 
 		public:
@@ -95,6 +129,7 @@ namespace synthese
 				const geometry::Point2D& center,
 				int zoom,
 				bool editable,
+				bool addable,
 				const std::string id = "map"
 			);
 
@@ -113,6 +148,11 @@ namespace synthese
 				/// @since 3.1.18
 				/// @param stream stream to write the code on
 				void draw(std::ostream& stream) const;
+
+				std::string getAddPointLink(
+					const std::string& requestURL,
+					const std::string& content
+				) const;
 			//@}
 		};
 	}

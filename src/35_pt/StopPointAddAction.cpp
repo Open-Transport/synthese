@@ -30,6 +30,7 @@
 #include "StopPointTableSync.hpp"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
+#include "Projection.h"
 
 using namespace std;
 
@@ -38,6 +39,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
+	using namespace geography;
 	
 	namespace util
 	{
@@ -51,7 +53,9 @@ namespace synthese
 		const string StopPointAddAction::PARAMETER_OPERATOR_CODE = Action_PARAMETER_PREFIX + "oc";
 		const string StopPointAddAction::PARAMETER_X = Action_PARAMETER_PREFIX + "x";
 		const string StopPointAddAction::PARAMETER_Y = Action_PARAMETER_PREFIX + "y";
-		
+		const string StopPointAddAction::PARAMETER_LONGITUDE = Action_PARAMETER_PREFIX + "lon";
+		const string StopPointAddAction::PARAMETER_LATITUDE = Action_PARAMETER_PREFIX + "lat";
+
 		
 		
 		ParametersMap StopPointAddAction::getParametersMap() const
@@ -62,8 +66,11 @@ namespace synthese
 				map.insert(PARAMETER_PLACE_ID, _place->getKey());
 			}
 			map.insert(PARAMETER_OPERATOR_CODE, _operatorCode);
-			map.insert(PARAMETER_X, _x);
-			map.insert(PARAMETER_Y, _y);
+			if(!_point.isUnknown())
+			{
+				map.insert(PARAMETER_X, _point.getX());
+				map.insert(PARAMETER_Y, _point.getY());
+			}
 			map.insert(PARAMETER_NAME, _name);
 			return map;
 		}
@@ -83,8 +90,14 @@ namespace synthese
 
 			_name = map.getDefault<string>(PARAMETER_NAME);
 			_operatorCode = map.getDefault<string>(PARAMETER_OPERATOR_CODE);
-			_x = map.getDefault<double>(PARAMETER_X, 0);
-			_y = map.getDefault<double>(PARAMETER_Y, 0);
+			if(map.getDefault<double>(PARAMETER_X, 0) && map.getDefault<double>(PARAMETER_Y, 0))
+			{
+				_point.setXY(map.get<double>(PARAMETER_X), map.get<double>(PARAMETER_Y));
+			}
+			else if(map.getDefault<double>(PARAMETER_LONGITUDE, 0) && map.getDefault<double>(PARAMETER_LATITUDE, 0))
+			{
+				_point = LambertFromWGS84(GeoPoint(map.get<double>(PARAMETER_LATITUDE), map.get<double>(PARAMETER_LONGITUDE), 0));
+			}
 		}
 		
 		
@@ -96,7 +109,7 @@ namespace synthese
 			object.setHub(_place.get());
 			object.setName(_name);
 			object.setCodeBySource(_operatorCode);
-			object.setXY(_x, _y);
+			object.setXY(_point.getX(), _point.getY());
 
 			StopPointTableSync::Save(&object);
 
