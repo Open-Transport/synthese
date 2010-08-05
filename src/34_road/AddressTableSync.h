@@ -43,6 +43,19 @@ namespace synthese
 				- on insert : 
 				- on update : 
 				- on delete : X
+
+			Table number : 2
+
+			<h2>Fields</h2>
+
+			<dl>
+			<dt>id</dt><dd>primary key</dd>
+			<dt>place_id</dt><dd>id of the @ref pt::StopAreaTableSync "stop area" which the address belongs to. 0 = Crossing</dd>
+			<dt>code_by_source</dt><dd>code of the address in the source database</dd>
+			<dt>source_id</dt><dd>id of the @ref impex::DataSourceTableSync "source database" of the address</dd>
+			<dt>longitude</dt><dd>longitude of the address in degrees</dd>
+			<dt>latitude</dt><dd>latitude of the address in degrees</dd>
+			</dl>
 		*/
 		class AddressTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<AddressTableSync,Address>,
