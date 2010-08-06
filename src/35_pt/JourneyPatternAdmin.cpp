@@ -188,7 +188,7 @@ namespace synthese
 				
 				AdminActionFunctionRequest<LineStopAddAction,JourneyPatternAdmin> lineStopAddAction(_request);
 				lineStopAddAction.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
-				HTMLForm f(lineStopAddAction.getHTMLForm());
+				HTMLForm f(lineStopAddAction.getHTMLForm("add_journey_pattern_stop"));
 
 				AdminActionFunctionRequest<LineStopUpdateAction,JourneyPatternAdmin> lineStopUpdateAction(_request);
 				
@@ -238,16 +238,16 @@ namespace synthese
 					);
 
 					stream << t.col();
-					HTMLForm f2(lineStopUpdateAction.getHTMLForm("quay"+lexical_cast<string>(lineStop->getRankInPath())));
+/*					HTMLForm f2(lineStopUpdateAction.getHTMLForm("quay"+lexical_cast<string>(lineStop->getRankInPath())));
 					stream << f2.open();
-					stream << f.getSelectInput(
+					stream << f2.getSelectInput(
 						LineStopUpdateAction::PARAMETER_PHYSICAL_STOP_ID,
 						lineStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStopLabels(),
 						optional<RegistryKeyType>(lineStop->getPhysicalStop()->getKey())
 					);
-					stream << f.getSubmitButton("OK");
+					stream << f2.getSubmitButton("OK");
 					stream << f2.close();
-
+*/
 					stream << t.col() << (lineStop->isArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"));
 					stream << t.col() << (lineStop->isDeparture() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"));
 					stream << t.col() << (lineStop->getScheduleInput() ? HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") : HTMLModule::getHTMLImage("tree_vert.png", "Houraire non fourni à cet arrêt"));
@@ -424,7 +424,7 @@ namespace synthese
 			}
 
 			////////////////////////////////////////////////////////////////////
-			// TAB INDICES
+			// TAB PROPERTIES
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
 				stream << "<h1>Propriétés</h1>";

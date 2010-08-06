@@ -179,9 +179,9 @@ namespace synthese
 		){
 			static const string peerid ("SYNTHESE");
 
-			os.imbue (locale(""));
+			//os.imbue (locale("POSIX"));
 			// os.imbue (locale("en_US.ISO-8859-15"));
-			cerr << "locale = " << os.getloc ().name () << "\n";
+			//cerr << "locale = " << os.getloc ().name () << "\n";
 
 			// Collect all data related to selected commercial line
 			shared_ptr<CommercialLine> _commercialLine(
@@ -353,6 +353,7 @@ namespace synthese
 			BOOST_FOREACH(Registry<StopPoint>::value_type itps, _env->getRegistry<StopPoint>())
 			{
 				const StopPoint* ps(itps.second.get());
+				os << fixed;
 				os << "<AreaCentroid>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "AreaCentroid", *ps) << "</objectId>" << "\n";
 			    
@@ -550,6 +551,7 @@ namespace synthese
 				const LineStop* ls(itls.second.get());
 				const StopPoint* ps = static_cast<const StopPoint*>(ls->getFromVertex());
 
+				os << fixed;
 				os << "<StopPoint" << (_withTisseoExtension ? " xsi:type=\"TisseoStopPointType\"" : "") << ">" << "\n";
 				os << "<objectId>" << TridentId (peerid, "StopPoint", *ls) << "</objectId>" << "\n";
 				os << "<creatorId>" << ps->getCodeBySource() << "</creatorId>" << "\n";

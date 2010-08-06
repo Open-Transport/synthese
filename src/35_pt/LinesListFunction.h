@@ -56,6 +56,11 @@ namespace synthese
 		///		<li>ni : id of the network of the lines</li>
 		///		<li>pi (optional) : id of the display template to use for each line (will be called by LineMarkerInterfacePage).
 		///		If pi is not specified, the standard XML output is generated instead.</li>
+		///		<li>of (optional) : output format. If not defined, output is CSV. If pi is defined, of is ignored. Available formats :</li>
+		///		<ul>
+		///			<li>csv : CSV (id;short name)</li>
+		///			<li>xml : XML (see details above)</li>
+		///		</ul>
 		///	</ul>
 		///
 		/// <h2>Standard XML output</h2>

@@ -101,7 +101,7 @@ namespace synthese
 
 			const string place(map.get<string>(PARAMETER_STOP_NAME));
 			vector<const StopArea*> stops(
-				city->search<StopArea>(place, 1)
+				cities.front()->search<StopArea>(place, 1)
 			);
 			if(stops.empty())
 			{
