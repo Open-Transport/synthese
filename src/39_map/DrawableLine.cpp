@@ -34,10 +34,12 @@
 #include "CommercialLine.h"
 #include "StopPoint.hpp"
 
+#include <geos/geom/Coordinate.h>
+
+using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geometry;
 	using namespace pt;
 	using namespace util;
 	using namespace pt;
@@ -73,7 +75,7 @@ DrawableLine::DrawableLine (const JourneyPattern* line,
 
     
 DrawableLine::DrawableLine (const util::RegistryKeyType& lineId, 
-			    const std::vector<const Point2D*>& points,
+			    const std::vector<const Coordinate*>& points,
 			    const std::string& shortName,
 			    const synthese::util::RGBColor& color,
 			    bool withPhysicalStops)
@@ -112,21 +114,21 @@ DrawableLine::getLineId () const
 
 
 bool 
-DrawableLine::hasPoint (const Point2D& p) const
+DrawableLine::hasPoint (const Coordinate& p) const
 {
     return firstIndexOf (p) != -1;
 }
 
 
 
-const std::vector<const Point2D*>& 
+const std::vector<const Coordinate*>& 
 DrawableLine::getPoints () const
 {
     return _points;
 }
 
 
-const std::vector<Point2D>& 
+const std::vector<Coordinate>& 
 DrawableLine::getFuzzyfiedPoints () const
 {
     return _fuzzyfiedPoints;
@@ -135,7 +137,7 @@ DrawableLine::getFuzzyfiedPoints () const
 
 
 
-const std::vector<Point2D>&
+const std::vector<Coordinate>&
 DrawableLine::getShiftedPoints () const
 {
     return _shiftedPoints;
@@ -171,7 +173,7 @@ DrawableLine::setShift (int pointIndex, int shift)
 
 
 int 
-DrawableLine::firstIndexOf (const Point2D& p) const
+DrawableLine::firstIndexOf (const Coordinate& p) const
 {
     for(size_t i=0; i<_fuzzyfiedPoints.size (); ++i)
     {
@@ -183,10 +185,10 @@ DrawableLine::firstIndexOf (const Point2D& p) const
 
 
 bool 
-DrawableLine::isReverseWayAt (const Point2D& p, 
+DrawableLine::isReverseWayAt (const Coordinate& p, 
 			      const DrawableLine* dbl) const
 {
-    const std::vector<Point2D>& points2 = dbl->getFuzzyfiedPoints ();
+    const std::vector<Coordinate>& points2 = dbl->getFuzzyfiedPoints ();
 	
     // if _point has a following point in _points which is the
     // previous one in points2 or if _point has a previous point in _points
@@ -198,13 +200,13 @@ DrawableLine::isReverseWayAt (const Point2D& p,
     
     if ((index1+1 < (int) getFuzzyfiedPoints ().size ())) 
     {
-	Point2D fp1 = _fuzzyfiedPoints[index1+1];
+	Coordinate fp1 = _fuzzyfiedPoints[index1+1];
 	if ((index2-1 >= 0) && (points2[index2-1] == fp1)) reverse = true;
     }
     
     if (index1-1 >= 0) 
     {
-	Point2D pp1 = _fuzzyfiedPoints[index1-1];
+	Coordinate pp1 = _fuzzyfiedPoints[index1-1];
 	if ((index2+1 < (int) points2.size ()) && (points2[index2+1] == pp1)) reverse = true;
     }
     
@@ -217,7 +219,7 @@ DrawableLine::isReverseWayAt (const Point2D& p,
 bool 
 DrawableLine::isFullyReverseWay (const DrawableLine* dbl) const
 {
-    std::vector<Point2D> points2 = dbl->getFuzzyfiedPoints ();
+    std::vector<Coordinate> points2 = dbl->getFuzzyfiedPoints ();
     std::reverse (points2.begin (), points2.end ());
     if (points2.size () != _fuzzyfiedPoints.size ()) return false;
     for (size_t i=0; i<_fuzzyfiedPoints.size (); ++i)
@@ -231,7 +233,7 @@ DrawableLine::isFullyReverseWay (const DrawableLine* dbl) const
 bool 
 DrawableLine::isFullySameWay (const DrawableLine* dbl) const
 {
-    const std::vector<Point2D>& points2 = dbl->getFuzzyfiedPoints ();
+    const std::vector<Coordinate>& points2 = dbl->getFuzzyfiedPoints ();
     if (points2.size () != _fuzzyfiedPoints.size ()) return false;
     for (size_t i=0; i<_fuzzyfiedPoints.size (); ++i)
     {
@@ -241,13 +243,12 @@ DrawableLine::isFullySameWay (const DrawableLine* dbl) const
 }
 
 
-int 
-DrawableLine::numberOfCommonPointsWith (const DrawableLine* dbl) const
+size_t DrawableLine::numberOfCommonPointsWith(const DrawableLine* dbl) const
 {
-    int nb = 0;
-    for (int i=0; i<_fuzzyfiedPoints.size (); ++i) 
+    size_t nb = 0;
+    for (size_t i=0; i<_fuzzyfiedPoints.size (); ++i) 
     {
-	const Point2D& p = _fuzzyfiedPoints[i];
+	const Coordinate& p = _fuzzyfiedPoints[i];
 	if (dbl->firstIndexOf (p) != -1) 
 	{
 	    ++nb;
@@ -261,8 +262,9 @@ DrawableLine::numberOfCommonPointsWith (const DrawableLine* dbl) const
 bool 
 DrawableLine::isStopPoint (int pointIndex) const
 {
-    const Point2D* p = _points[pointIndex];
-    return dynamic_cast<const StopPoint*> (p) != 0;
+return false;
+//	const Coordinate* p = _points[pointIndex];
+//    return dynamic_cast<const StopPoint*> (p) != 0;
 }
 
 
@@ -277,17 +279,17 @@ DrawableLine::isViaPoint (int pointIndex) const
 
 
 
-Point2D 
-DrawableLine::calculateSingleShiftedPoint (Point2D a, 
-					   Point2D b, 
+Coordinate 
+DrawableLine::calculateSingleShiftedPoint (Coordinate a, 
+					   Coordinate b, 
 					   double distance) const
 {
-    double gamma = calculateAngle (b, a, Point2D (b.getX(), a.getY()));
+    double gamma = calculateAngle (b, a, Coordinate (b.x, a.y));
 
 	double deltax = distance * cos (M_PI_2 - gamma);
     double deltay = distance * sin (M_PI_2 - gamma);
     
-    Point2D a_ (a.getX() + deltax, a.getY() + deltay);
+    Coordinate a_ (a.x + deltax, a.y + deltay);
         
     double angle = calculateAngle (b, a, a_);
     
@@ -295,7 +297,7 @@ DrawableLine::calculateSingleShiftedPoint (Point2D a,
     // reverse point.
     if (((distance > 0) && (angle < 0)) 
         || ((distance < 0) && (angle > 0)) ) {
-        return Point2D (a.getX() - deltax, a.getY() - deltay);
+        return Coordinate (a.x - deltax, a.y - deltay);
     } 
     return a_;
     
@@ -303,10 +305,10 @@ DrawableLine::calculateSingleShiftedPoint (Point2D a,
 
 
 
-Point2D  
-DrawableLine::calculateSingleShiftedPoint (Point2D a, 
-					   Point2D b, 
-					   Point2D c, 
+Coordinate  
+DrawableLine::calculateSingleShiftedPoint (Coordinate a, 
+					   Coordinate b, 
+					   Coordinate c, 
 					   double distance) const
 {
 
@@ -315,7 +317,7 @@ DrawableLine::calculateSingleShiftedPoint (Point2D a,
 
     double alpha = calculateAngle (a, b, c);
 
-    double gamma = calculateAngle (b, a, Point2D (b.getX(), a.getY()));
+    double gamma = calculateAngle (b, a, Coordinate (b.x, a.y));
 
     double deltax = (distance / sin (alpha/2.0)) * (cos ((alpha/2.0) - gamma));
     double deltay = (distance / sin (alpha/2.0)) * (sin ((alpha/2.0) - gamma));
@@ -324,7 +326,7 @@ DrawableLine::calculateSingleShiftedPoint (Point2D a,
 		int yy = 5;
 	} */
 
-    Point2D b_ ( b.getX() + deltax , b.getY() + deltay );
+    Coordinate b_ ( b.x + deltax , b.y + deltay );
         
     // Check that the angle formed by (b, a, b_) is positive otherwise
     // reverse point.
@@ -332,7 +334,7 @@ DrawableLine::calculateSingleShiftedPoint (Point2D a,
     
     if (((distance > 0) && (angle < 0)) 
         || ((distance < 0) && (angle > 0)) ) {
-        return Point2D (b.getX() - deltax, b.getY() - deltay);
+        return Coordinate (b.x - deltax, b.y - deltay);
     } 
     return b_;
     
@@ -342,30 +344,30 @@ DrawableLine::calculateSingleShiftedPoint (Point2D a,
 
 
 
-Point2D  
-DrawableLine::calculateDoubleShiftedPoint (Point2D a, 
-					   Point2D b, 
-					   Point2D c, 
+Coordinate  
+DrawableLine::calculateDoubleShiftedPoint (Coordinate a, 
+					   Coordinate b, 
+					   Coordinate c, 
 					   double incomingDistance, 
 					   double outgoingDistance) const
 {
 	// Special case if a == c, then replace c with symetric of a regarding b
 	if (a == c) c = calculateSymetric (a, b);
 
-/*	std::cerr << "a=" << a.getX() << "," << a.getY () << ";   "
-			  << "b=" << b.getX() << "," << b.getY () << ";   "
-			  << "c=" << c.getX() << "," << c.getY () << std::endl; */
+/*	std::cerr << "a=" << a.x << "," << a.y << ";   "
+			  << "b=" << b.x << "," << b.y << ";   "
+			  << "c=" << c.x << "," << c.y << std::endl; */
 	
 	if (incomingDistance == outgoingDistance) {
         return calculateSingleShiftedPoint (a, b, c, incomingDistance);
     }
     
-    double gamma0 = calculateAngle (b, a, Point2D (b.getX(), a.getY()));
-    double gamma1 = calculateAngle (c, b, Point2D (c.getX(), b.getY()));
+    double gamma0 = calculateAngle (b, a, Coordinate (b.x, a.y));
+    double gamma1 = calculateAngle (c, b, Coordinate (c.x, b.y));
     
     if (gamma0 == gamma1) {
         // A, B, C are aligned; thus d0 == d1.
-        Point2D p = 
+        Coordinate p = 
 	    calculateSingleShiftedPoint (a, b, c, incomingDistance);    
         return p;
     }
@@ -397,34 +399,34 @@ DrawableLine::calculateDoubleShiftedPoint (Point2D a,
 
     if (gamma0 == -M_PI_2) {
         
-        xk = b.getX() - incomingDistance;
-        double sign1 = c.getX() - b.getX() >=0 ? 1.0 : -1.0;
+        xk = b.x - incomingDistance;
+        double sign1 = c.x - b.x >=0 ? 1.0 : -1.0;
         double bk1 = b1 + sign1 * outgoingDistance / cosGamma1;
         yk = a1 * xk + bk1;
         
     } else if (gamma0 == M_PI_2) {
         
-        xk = b.getX() + incomingDistance;
-        double sign1 = c.getX() - b.getX() >=0 ? 1.0 : -1.0;
+        xk = b.x + incomingDistance;
+        double sign1 = c.x - b.x >=0 ? 1.0 : -1.0;
         double bk1 = b1 + sign1 * outgoingDistance / cosGamma1;
         yk = a1 * xk + bk1;
 
     } else if (gamma1 == -M_PI_2) {
-        xk = b.getX() - outgoingDistance;
-        double sign0 = b.getX() - a.getX() >=0 ? 1.0 : -1.0;
+        xk = b.x - outgoingDistance;
+        double sign0 = b.x - a.x >=0 ? 1.0 : -1.0;
         double bk0 = b0 + sign0 * incomingDistance / cosGamma0;
         yk = a0 * xk + bk0;
         
     } else if (gamma1 == M_PI_2) {
         
-        xk = b.getX() + outgoingDistance;
-        double sign0 = b.getX() - a.getX() >=0 ? 1.0 : -1.0;
+        xk = b.x + outgoingDistance;
+        double sign0 = b.x - a.x >=0 ? 1.0 : -1.0;
         double bk0 = b0 + sign0 * incomingDistance / cosGamma0;
         yk = a0 * xk + bk0;
     
     } else {
-        double sign0 = b.getX() - a.getX() >=0 ? 1.0 : -1.0;
-        double sign1 = c.getX() - b.getX() >=0 ? 1.0 : -1.0;
+        double sign0 = b.x - a.x >=0 ? 1.0 : -1.0;
+        double sign1 = c.x - b.x >=0 ? 1.0 : -1.0;
         
         double bk0 = b0 +  sign0 * incomingDistance / cosGamma0;
         double bk1 = b1 +  sign1 * outgoingDistance / cosGamma1;
@@ -434,7 +436,7 @@ DrawableLine::calculateDoubleShiftedPoint (Point2D a,
         yk = a1 * xk + bk1;
     }
 
-	Point2D k (xk, yk);
+	Coordinate k (xk, yk);
 
 	// <Heuristic 1 : 
 	// Note : this is experimental... but necessary. A better way
@@ -470,12 +472,12 @@ DrawableLine::fuzzyfyPoints (const DrawableLineIndex& lineIndex)
 
 
 
-const std::vector<Point2D>
-DrawableLine::calculateShiftedPoints (const std::vector<Point2D>& points, 
+const std::vector<Coordinate>
+DrawableLine::calculateShiftedPoints (const std::vector<Coordinate>& points, 
 				      double spacing, 
 				      PointShiftingMode shiftMode) const
 {
-    std::vector<Point2D> shiftedPoints;
+    std::vector<Coordinate> shiftedPoints;
     
     // First point
     shiftedPoints.push_back (
@@ -487,9 +489,9 @@ DrawableLine::calculateShiftedPoints (const std::vector<Point2D>& points,
     // All triplets in between
     for (unsigned int i=0; i<points.size()-2; ++i) 
     {
-	const Point2D& p_i = points[i]; 
-	const Point2D& p_i_plus_1 = points[i+1];
-	const Point2D& p_i_plus_2 = points[i+2];
+	const Coordinate& p_i = points[i]; 
+	const Coordinate& p_i_plus_1 = points[i+1];
+	const Coordinate& p_i_plus_2 = points[i+2];
 	
 	if (_shifts[i+1] != 0) 
 	{
@@ -591,11 +593,11 @@ DrawableLine::calculateShiftedPoints (const std::vector<Point2D>& points,
 
 
 
-const std::vector<Point2D>
-DrawableLine::calculateAbsoluteShiftedPoints (const std::vector<Point2D>& points, 
+const std::vector<Coordinate>
+DrawableLine::calculateAbsoluteShiftedPoints (const std::vector<Coordinate>& points, 
 										 double spacing) const
 {
-    std::vector<Point2D> shiftedPoints;
+    std::vector<Coordinate> shiftedPoints;
     
     // First point
     shiftedPoints.push_back (
@@ -607,9 +609,9 @@ DrawableLine::calculateAbsoluteShiftedPoints (const std::vector<Point2D>& points
     // All triplets in between
     for (unsigned int i=0; i<points.size()-2; ++i) 
     {
-		const Point2D& p_i = points[i]; 
-		const Point2D& p_i_plus_1 = points[i+1];
-		const Point2D& p_i_plus_2 = points[i+2];
+		const Coordinate& p_i = points[i]; 
+		const Coordinate& p_i_plus_1 = points[i+1];
+		const Coordinate& p_i_plus_2 = points[i+2];
 
 		double distance =  _shifts[i+1] * spacing;
 		shiftedPoints.push_back ( calculateSingleShiftedPoint (
@@ -638,23 +640,23 @@ DrawableLine::calculateAbsoluteShiftedPoints (const std::vector<Point2D>& points
 void 
 DrawableLine::prepare (Map& map, double spacing, PointShiftingMode shiftMode) const
 {
-    std::vector<Point2D> points;
+    std::vector<Coordinate> points;
     
 	const DrawableLineIndex& lineIndex = map.getLineIndex ();
 
-	Point2D previousPoint (-1, -1);
+	Coordinate previousPoint (-1, -1);
     // Convert coordinates to output frame
     for (unsigned int i=0; i<_fuzzyfiedPoints.size(); ++i) {
-		Point2D p = _fuzzyfiedPoints[i];
+		Coordinate p = _fuzzyfiedPoints[i];
 
 		// Fuzzyfication of points can lead to having to points exactly
 		// identical in the list. Slightly move them (not filtering to
 		// keep bijection with reference points.
-		Point2D outputPoint = map.toOutputFrame(p);
+		Coordinate outputPoint = map.toOutputFrame(p);
 		 
 		if (outputPoint == previousPoint) 
 		{
-			outputPoint.setXY(outputPoint.getX() + 0.1, outputPoint.getY() + 0.1);
+			outputPoint = Coordinate(outputPoint.x + 0.1, outputPoint.y + 0.1);
 		} 
 		previousPoint = outputPoint; 
         points.push_back (outputPoint);
@@ -679,7 +681,7 @@ DrawableLine::getShortName () const
 
 
 
-const synthese::util::RGBColor& 
+const util::RGBColor& 
 DrawableLine::getColor () const
 {
 	return _color;
@@ -698,5 +700,3 @@ DrawableLine::getWithPhysicalStops () const
 
 }
 }
-
-

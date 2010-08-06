@@ -51,8 +51,7 @@
 #include "ReservationContactTableSync.h"
 #include "PTUseRule.h"
 #include "PTConstants.h"
-#include "Projection.h"
-#include "Point2D.h"
+#include "CoordinatesSystem.hpp"
 #include "Conversion.h"
 #include "XmlToolkit.h"
 #include "SQLiteTransaction.h"
@@ -76,13 +75,11 @@ using namespace boost;
 using namespace boost::gregorian;
 using namespace boost::filesystem;
 using namespace boost::posix_time;
-
+using namespace geos::geom;
 
 namespace synthese
 {
 	using namespace geography;
-	using namespace geometry;
-	using namespace pt;
 	using namespace util::XmlToolkit;
 	using namespace util;
 	using namespace graph;
@@ -359,22 +356,21 @@ namespace synthese
 				os << "<AreaCentroid>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "AreaCentroid", *ps) << "</objectId>" << "\n";
 			    
-
-				Point2D pt (ps->getX (), ps->getY ());
-				GeoPoint gp = WGS84FromLambert(pt);
-				
-				os << "<longitude>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(gp.getLongitude ())) << "</longitude>" << "\n";
-				os << "<latitude>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(gp.getLatitude ())) << "</latitude>" << "\n";
-				os << "<longLatType>" << "WGS84" << "</longLatType>" << "\n";
+				os << "<longitude>" << (ps->isNull() ? 0 : ps->getLongitude()) << "</longitude>" << "\n";
+				os << "<latitude>" << (ps->isNull() ? 0 : ps->getLatitude()) << "</latitude>" << "\n";
+				os << "<longLatType>WGS84</longLatType>" << "\n";
 
 				// we do not provide full addresses right now.
 				os << "<address><countryCode>" << ps->getConnectionPlace()->getCity()->getCode() << "</countryCode></address>";
 
-				os << "<projectedPoint>" << "\n";
-				os << "<X>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(pt.getX())) << "</X>" << "\n";
-				os << "<Y>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(pt.getY())) << "</Y>" << "\n";
-				os << "<projectionType>" << "LambertIIe" << "</projectionType>" << "\n";
-				os << "</projectedPoint>" << "\n";
+				if(!ps->isNull())
+				{
+					os << "<projectedPoint>" << "\n";
+					os << "<X>" << ps->x << "</X>" << "\n";
+					os << "<Y>" << ps->y << "</Y>" << "\n";
+					os << "<projectionType>" << ps->getCoordinatesSystem().getTridentKey() << "</projectionType>" << "\n";
+					os << "</projectedPoint>" << "\n";
+				}
 
 				os << "<containedIn>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</containedIn>" << "\n";
 				os << "<name>" << Conversion::ToString (ps->getKey ()) << "</name>" << "\n";
@@ -475,10 +471,10 @@ namespace synthese
 			{
 			os << "<ChouetteLineDescription>" << "\n";
 			
-			// --------------------------------------------------- JourneyPattern
+			// --------------------------------------------------- Line
 			{
-				os << "<JourneyPattern>" << "\n";
-				os << "<objectId>" << TridentId (peerid, "JourneyPattern", *_commercialLine) << "</objectId>" << "\n";
+				os << "<Line>" << "\n";
+				os << "<objectId>" << TridentId (peerid, "Line", *_commercialLine) << "</objectId>" << "\n";
 				os << "<name>" << _commercialLine->getName () << "</name>" << "\n";
 				os << "<number>" << _commercialLine->getShortName () << "</number>" << "\n";
 				os << "<publishedName>" << _commercialLine->getLongName () << "</publishedName>" << "\n";
@@ -497,7 +493,7 @@ namespace synthese
 				os << "<registrationNumber>" << Conversion::ToString (_commercialLine->getKey ()) << "</registrationNumber>" << "\n";
 				os << "</registration>" << "\n";
 
-				os << "</JourneyPattern>" << "\n";
+				os << "</Line>" << "\n";
 			}
 
 			// --------------------------------------------------- ChouetteRoute
@@ -557,21 +553,20 @@ namespace synthese
 				os << "<StopPoint" << (_withTisseoExtension ? " xsi:type=\"TisseoStopPointType\"" : "") << ">" << "\n";
 				os << "<objectId>" << TridentId (peerid, "StopPoint", *ls) << "</objectId>" << "\n";
 				os << "<creatorId>" << ps->getCodeBySource() << "</creatorId>" << "\n";
-
-				Point2D pt (ps->getX (), ps->getY ());
-				GeoPoint gp = WGS84FromLambert(pt);
-				
-				os << "<longitude>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(gp.getLongitude())) << "</longitude>" << "\n";
-				os << "<latitude>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(gp.getLatitude())) << "</latitude>" << "\n";
+				os << "<longitude>" << (ps->isNull() ? 0 : ps->getLongitude()) << "</longitude>" << "\n";
+				os << "<latitude>" << (ps->isNull() ? 0 : ps->getLatitude()) << "</latitude>" << "\n";
 				os << "<longLatType>" << "WGS84" << "</longLatType>" << "\n";
 				
 				os << "<address><countryCode>" << ps->getConnectionPlace()->getCity()->getCode() << "</countryCode></address>";
 
-				os << "<projectedPoint>" << "\n";
-				os << "<X>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(pt.getX())) << "</X>" << "\n";
-				os << "<Y>" << ((ps->getX() <= 0 || ps->getY() <= 0) ? "0" : GetCoordinate(pt.getY())) << "</Y>" << "\n";
-				os << "<projectionType>" << "LambertIIe" << "</projectionType>" << "\n";
-				os << "</projectedPoint>" << "\n";
+				if(!ps->isNull())
+				{
+					os << "<projectedPoint>" << "\n";
+					os << "<X>" << ps->x << "</X>" << "\n";
+					os << "<Y>" << ps->y << "</Y>" << "\n";
+					os << "<projectionType>" << ps->getCoordinatesSystem().getTridentKey() << "</projectionType>" << "\n";
+					os << "</projectedPoint>" << "\n";
+				}
 
 
 				os << "<containedIn>" << TridentId (peerid, "StopArea", *ps) << "</containedIn>" << "\n";
@@ -580,7 +575,7 @@ namespace synthese
 				if (ps->getName ().empty () == false) os << " (" + ps->getName () + ")";
 				os << "</name>" << "\n";
 				
-				os << "<lineIdShortcut>" << TridentId (peerid, "JourneyPattern", *_commercialLine) << "</lineIdShortcut>" << "\n";
+				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_commercialLine) << "</lineIdShortcut>" << "\n";
 				os << "<ptNetworkIdShortcut>" << TridentId (peerid, "PTNetwork", *tn) << "</ptNetworkIdShortcut>" << "\n";
 
 				if (_withTisseoExtension)
@@ -639,7 +634,7 @@ namespace synthese
 					os << "<stopPointList>" << TridentId (peerid, "StopPoint", *lineStop) << "</stopPointList>" << "\n";
 				}
 
-				os << "<lineIdShortcut>" << TridentId (peerid, "JourneyPattern", *_commercialLine) << "</lineIdShortcut>" << "\n";
+				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_commercialLine) << "</lineIdShortcut>" << "\n";
 				os << "</JourneyPattern>" << "\n";
 			}
 		
@@ -662,7 +657,7 @@ namespace synthese
 				os << "<creatorId>" << srv->getServiceNumber() << "</creatorId>" << "\n";
 				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", srv->getPathId()) << "</routeId>" << "\n";
 				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", srv->getPathId()) << "</journeyPatternId>" << "\n";
-				os << "<lineIdShortcut>" << TridentId (peerid, "JourneyPattern", *_commercialLine) << "</lineIdShortcut>" << "\n";
+				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_commercialLine) << "</lineIdShortcut>" << "\n";
 				os << "<routeIdShortcut>" << TridentId (peerid, "ChouetteRoute", srv->getPathId()) << "</routeIdShortcut>" << "\n";
 				if (!srv->getServiceNumber().empty())
 				{
@@ -769,7 +764,7 @@ namespace synthese
 				os << "<creatorId>" << srv->getServiceNumber() << "</creatorId>" << "\n";
 				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", srv->getPathId()) << "</routeId>" << "\n";
 				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", srv->getPathId()) << "</journeyPatternId>" << "\n";
-				os << "<lineIdShortcut>" << TridentId (peerid, "JourneyPattern", *_commercialLine) << "</lineIdShortcut>" << "\n";
+				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_commercialLine) << "</lineIdShortcut>" << "\n";
 				os << "<routeIdShortcut>" << TridentId (peerid, "ChouetteRoute", srv->getPathId()) << "</routeIdShortcut>" << "\n";
 				if (!srv->getServiceNumber().empty())
 				{
@@ -902,8 +897,8 @@ namespace synthese
 					const NonConcurrencyRule& rule(*itrule.second);
 					os << "<LineConflict>" << "\n";
 					os << "<objectId>" << TridentId (peerid, "LineConflict", rule) << "</objectId>" << "\n";
-					os << "<forbiddenLine>" << TridentId (peerid, "JourneyPattern", rule.getHiddenLine()->getKey()) << "</forbiddenLine>" << "\n";
-					os << "<usedLine>" << TridentId (peerid, "JourneyPattern", rule.getPriorityLine()->getKey()) << "</usedLine>" << "\n";
+					os << "<forbiddenLine>" << TridentId (peerid, "Line", rule.getHiddenLine()->getKey()) << "</forbiddenLine>" << "\n";
+					os << "<usedLine>" << TridentId (peerid, "Line", rule.getPriorityLine()->getKey()) << "</usedLine>" << "\n";
 					os << "<conflictDelay>" << ToXsdDuration(rule.getDelay()) << "</conflictDelay>" << "\n";
 					os << "</LineConflict>" << "\n";
 				}
@@ -977,7 +972,7 @@ namespace synthese
 			
 			// Title
 			XMLNode chouetteLineDescriptionNode(allNode.getChildNode("ChouetteLineDescription"));
-			XMLNode lineNode(chouetteLineDescriptionNode.getChildNode("JourneyPattern"));
+			XMLNode lineNode(chouetteLineDescriptionNode.getChildNode("Line"));
 			XMLNode clineNameNode = lineNode.getChildNode("name");
 				
 			os << "<h2>Trident import of " << clineNameNode.getText() << "</h2>";
@@ -1305,13 +1300,25 @@ namespace synthese
 					else
 					{
 						XMLNode& areaCentroid(itPlace->second);
-						XMLNode projectedPointNode(areaCentroid.getChildNode("projectedPoint", 0));
-						if(!projectedPointNode.isEmpty())
+						XMLNode longitudeNode(areaCentroid.getChildNode("longitude", 0));
+						XMLNode latitudeNode(areaCentroid.getChildNode("latitude", 0));
+						if(!longitudeNode.isEmpty() && !latitudeNode.isEmpty())
 						{
-							curStop->setXY(
-								lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
-								lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
+							*curStop = GeoPoint(
+								lexical_cast<double>(longitudeNode.getText()),
+								lexical_cast<double>(latitudeNode.getText())
 							);
+						}
+						else
+						{
+							XMLNode projectedPointNode(areaCentroid.getChildNode("projectedPoint", 0));
+							if(!projectedPointNode.isEmpty())
+							{
+								*curStop = GeoPoint(Coordinate(
+									lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
+									lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
+								)	);
+							}
 						}
 					}
 				}

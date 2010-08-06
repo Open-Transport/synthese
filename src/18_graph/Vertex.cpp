@@ -29,24 +29,22 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace geometry;
+	using namespace geography;
 
 	namespace graph
 	{
 		Vertex::Vertex(
 			const Hub* hub,
-			double x,
-			double y) 
-		:	Point2D (x, y), // By default geolocation is unknown.
+			double longitude,
+			double latitude
+		):	GeoPoint(longitude, latitude),
 			_hub(hub)
-		{
-		}
+		{}
 
 
 
 		Vertex::~Vertex ()
-		{
-		}
+		{}
 
 
 
@@ -57,9 +55,8 @@ namespace synthese
 
 
 		
-		const Vertex::Edges& 
-		Vertex::getDepartureEdges () const
-		{
+		const Vertex::Edges& Vertex::getDepartureEdges(
+		) const	{
 			return _departureEdges;
 		}
 

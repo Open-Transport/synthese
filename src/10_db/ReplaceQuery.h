@@ -120,7 +120,7 @@ namespace synthese
 				<< _id;
 			BOOST_FOREACH(const Fields::value_type& field, _fields)
 			{
-				query << "," << field->toString();
+				query << std::fixed << "," << field->toString();
 			}
 			query << ");";
 			DBModule::GetSQLite()->execUpdate(query.str(), transaction);

@@ -34,13 +34,16 @@
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
+namespace geos
+{
+	namespace geom
+	{
+		class Coordinate;
+	}
+}
+
 namespace synthese
 {
-	namespace geometry
-	{
-		class Point2D;
-	}
-
 	namespace graph
 	{
 		class Path;
@@ -75,7 +78,7 @@ namespace synthese
 			:	public virtual util::Registrable
 		{
 		public:
-			typedef std::vector<const geometry::Point2D*> ViaPoints;
+			typedef std::vector<const geos::geom::Coordinate*> ViaPoints;
 
 			template<class Iterator>
 			class ServiceIndex
@@ -280,7 +283,7 @@ namespace synthese
 			//@{
 				///TODO @todo Remove via point update methods due to thread unsafeness
 				void clearViaPoints ();
-				void addViaPoint (const geometry::Point2D& viaPoint);
+				void addViaPoint (const geos::geom::Coordinate& viaPoint);
 			    
 				void markServiceIndexUpdateNeeded(bool RTDataOnly) const;
 			//@}

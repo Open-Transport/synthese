@@ -25,13 +25,16 @@
 
 #include <vector>
 
+namespace geos
+{
+	namespace geom
+	{
+		class Coordinate;
+	}
+}
 
 namespace synthese
 {
-namespace geometry
-{
-    class Point2D;
-}
 
 
 namespace map
@@ -70,13 +73,13 @@ public:
     bool isMarked (int tileX, int tileY) const;
     
 	
-    void markTilesForPoint (const geometry::Point2D& p);
+    void markTilesForPoint (const geos::geom::Coordinate& p);
 
-    void markTilesForLine (const geometry::Point2D& from, 
-			   const geometry::Point2D& to);
+    void markTilesForLine (const geos::geom::Coordinate& from, 
+			   const geos::geom::Coordinate& to);
 
-    void markTilesForRectangle (const geometry::Point2D& from, 
-				const geometry::Point2D& to, 
+    void markTilesForRectangle (const geos::geom::Coordinate& from, 
+				const geos::geom::Coordinate& to, 
 				bool filled = true);
 	
 

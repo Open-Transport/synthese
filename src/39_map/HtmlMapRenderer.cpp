@@ -33,10 +33,10 @@
 #include "Conversion.h"
 #include "JourneyPattern.hpp"
 #include "LineStop.h"
-#include "Point2D.h"
 
 #include "MapModule.h"
 
+#include <geos/geom/Coordinate.h>
 #include <cmath>
 #include <algorithm>
 #include <fstream>
@@ -44,10 +44,10 @@
 
 using namespace boost;
 using namespace std;
+using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geometry;
 	using namespace util;
 	using namespace map;
 	using namespace pt;
@@ -65,28 +65,22 @@ namespace synthese
 		
 		HtmlMapRenderer::HtmlMapRenderer()
 		: FactorableTemplate<Renderer,HtmlMapRenderer>()
-		{
-		
-		}
-		
-		
+		{}
+				
 		
 		
 		HtmlMapRenderer::~HtmlMapRenderer()
-		{
-		}
+		{}
 		
 		
-		
-		
-		std::string
-		HtmlMapRenderer::render(const boost::filesystem::path& tempDir, 
-					const std::string& filenamePrefix,
-					const Registry<JourneyPattern>& lines,
-					synthese::map::Map& map,
-					const synthese::map::RenderingConfig& config)
-		{
-		
+				
+		std::string	HtmlMapRenderer::render(
+			const boost::filesystem::path& tempDir, 
+			const std::string& filenamePrefix,
+			const Registry<JourneyPattern>& lines,
+			synthese::map::Map& map,
+			const synthese::map::RenderingConfig& config
+		){
 			JpegRenderer jpegRenderer;
 			jpegRenderer.render(tempDir, filenamePrefix, lines, map, config);
 		
@@ -123,11 +117,11 @@ namespace synthese
 		
 		
 		
-				void HtmlMapRenderer::renderLines(
-					std::ostream& _output,
-					const Registry<JourneyPattern>& lines,
-					Map& map
-				){
+		void HtmlMapRenderer::renderLines(
+			std::ostream& _output,
+			const Registry<JourneyPattern>& lines,
+			Map& map
+		){
 			const std::set<DrawableLine*>& selectedLines = map.getSelectedLines ();
 			
 			for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
@@ -146,10 +140,10 @@ namespace synthese
 					it != selectedLines.end () ; ++it) 
 				{
 					const DrawableLine* dbl = *it;
-					const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
+					const std::vector<Coordinate>& shiftedPoints = dbl->getShiftedPoints ();
 		
 					// Shift them again on right and left of half-width to get the enveloppe.
-					const std::vector<Point2D> points1 =
+					const std::vector<Coordinate> points1 =
 					dbl->calculateAbsoluteShiftedPoints (shiftedPoints, (_config.getBorderWidth () / 2));
 					
 					std::string href (_urlPattern);
@@ -158,17 +152,17 @@ namespace synthese
 					_output << "<area href='" << href << "' shape='poly' coords='";
 					for (size_t i=0; i<points1.size (); ++i)
 					{
-						_output << (int) points1[i].getX () << "," << (int) (map.getHeight () - points1[i].getY ()) << ",";
+						_output << (int) points1[i].x << "," << (int) (map.getHeight () - points1[i].y) << ",";
 					}
 		
-					std::vector<Point2D> points2 = 
+					std::vector<Coordinate> points2 = 
 						dbl->calculateAbsoluteShiftedPoints (shiftedPoints, - (_config.getBorderWidth () / 2));
 		
 					std::reverse (points2.begin (), points2.end ());
 		
 					for (size_t i=0; i<points2.size (); ++i)
 					{
-						_output << (int) points2[i].getX () << "," << (int) (map.getHeight () - points2[i].getY ());
+						_output << (int) points2[i].x << "," << (int) (map.getHeight () - points2[i].y);
 						if (i != points2.size ()-1) _output << ",";
 					}
 					_output << "'/>" << std::endl;
@@ -181,13 +175,13 @@ namespace synthese
 				const DrawableLine* dbl = *(selectedLines.begin ());
 				shared_ptr<const JourneyPattern> line = lines.get (dbl->getLineId ());
 				const vector<Edge*>& lineStops =  line->getEdges();
-				const vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
+				const vector<Coordinate>& shiftedPoints = dbl->getShiftedPoints ();
 		
 				// Shift them again on right and left of half-width to get the enveloppe.
-				std::vector<Point2D> points1 =
+				std::vector<Coordinate> points1 =
 					dbl->calculateAbsoluteShiftedPoints (shiftedPoints, (_config.getBorderWidth () / 2));
 					
-				std::vector<Point2D> points2 = 
+				std::vector<Coordinate> points2 = 
 					dbl->calculateAbsoluteShiftedPoints (shiftedPoints, - (_config.getBorderWidth () / 2));
 		
 				// TODO : to be reviewed when via points will be added
@@ -201,10 +195,10 @@ namespace synthese
 					boost::replace_all (href, "$id", Conversion::ToString(ls->getMetricOffset()));
 					_output << "<area href='" << href << "' shape='poly' coords='";
 					
-					_output << (int) points1[i].getX () << "," << (int) (map.getHeight () - points1[i].getY ()) << ",";
-					_output << (int) points1[i+1].getX () << "," << (int) (map.getHeight () - points1[i+1].getY ()) << ",";
-					_output << (int) points2[i+1].getX () << "," << (int) (map.getHeight () - points2[i+1].getY ()) << ",";
-					_output << (int) points2[i].getX () << "," << (int) (map.getHeight () - points2[i].getY ());
+					_output << (int) points1[i].x << "," << (int) (map.getHeight () - points1[i].y) << ",";
+					_output << (int) points1[i+1].x << "," << (int) (map.getHeight () - points1[i+1].y) << ",";
+					_output << (int) points2[i+1].x << "," << (int) (map.getHeight () - points2[i+1].y) << ",";
+					_output << (int) points2[i].x << "," << (int) (map.getHeight () - points2[i].y);
 					if (i+1 < lineStops.size()) _output << ",";
 					_output << "'/>" << std::endl;
 				}
@@ -228,8 +222,8 @@ namespace synthese
 			boost::replace_all (href, "$id", Conversion::ToString (dps->getPhysicalStopId ()));
 		
 			_output << "<area href='" << href << "' shape='circle' coords='";
-			_output << dps->getPoint ().getX ()  << "," 
-				<< (int) (map.getHeight () - dps->getPoint ().getY()) << "," 
+			_output << dps->getPoint ().x  << "," 
+				<< (int) (map.getHeight () - dps->getPoint ().y) << "," 
 				<< _config.getLineWidth () << "'/>" << std::endl;
 			}
 		}

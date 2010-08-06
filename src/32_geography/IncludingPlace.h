@@ -71,7 +71,7 @@ namespace synthese
 					const GraphTypes& whatToSearch
 				) const;
 
-				virtual const geometry::Point2D& getPoint() const;
+				virtual const GeoPoint& getPoint() const;
 
 				virtual bool includes(const Place* place) const;
 

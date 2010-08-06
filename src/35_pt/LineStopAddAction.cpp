@@ -33,6 +33,9 @@
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "GeographyModule.h"
+#include "CityTableSync.h"
+#include "StopAreaTableSync.hpp"
+#include "StopPointTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -89,23 +92,23 @@ namespace synthese
 				throw ActionException("No such line");
 			}
 
-			const string city(map.get<string>(PARAMETER_CITY_NAME));
-
-			GeographyModule::CityList cities(GeographyModule::GuessCity(city, 1));
+			GeographyModule::CityList cities(GeographyModule::GuessCity(map.get<string>(PARAMETER_CITY_NAME), 1));
 			if(cities.empty())
 			{
 				throw ActionException("City not found");
 			}
+			shared_ptr<City> city(CityTableSync::GetEditable(cities.front()->getKey(), *_env));
 
 			const string place(map.get<string>(PARAMETER_STOP_NAME));
 			vector<const StopArea*> stops(
-				cities.front()->search<StopArea>(place, 1)
+				city->search<StopArea>(place, 1)
 			);
 			if(stops.empty())
 			{
 				throw ActionException("Place not found");
 			}
-			const StopArea* stop = stops.front();
+			shared_ptr<StopArea> stop(StopAreaTableSync::GetEditable(stops.front()->getKey(), *_env));
+			StopPointTableSync::Search(*_env, stop->getKey());
 
 			if(stop->getPhysicalStops().empty())
 			{

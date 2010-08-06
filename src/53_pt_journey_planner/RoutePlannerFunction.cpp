@@ -32,7 +32,6 @@
 #include "Interface.h"
 #include "ObjectNotFoundException.h"
 #include "GeoPoint.h"
-#include "Projection.h"
 #include "PTRoutePlannerResult.h"
 #include "Edge.h"
 #include "JourneyPattern.hpp"
@@ -191,10 +190,10 @@ namespace synthese
 					_endArrivalDate = _endDate;
 					if(	_departure_place.placeResult.value &&
 						_arrival_place.placeResult.value &&
-						!_departure_place.placeResult.value->getPoint().isUnknown() &&
-						!_arrival_place.placeResult.value->getPoint().isUnknown()
+						!_departure_place.placeResult.value->getPoint().isNull() &&
+						!_arrival_place.placeResult.value->getPoint().isNull()
 					){
-						_endArrivalDate += minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000));
+						_endArrivalDate += minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint().distance(_arrival_place.placeResult.value->getPoint()) / 1000));
 					}
 				}
 				else
@@ -223,10 +222,10 @@ namespace synthese
 						_endArrivalDate = _endDate;
 						if(	_departure_place.placeResult.value &&
 							_arrival_place.placeResult.value &&
-							!_departure_place.placeResult.value->getPoint().isUnknown() &&
-							!_arrival_place.placeResult.value->getPoint().isUnknown()
+							!_departure_place.placeResult.value->getPoint().isNull() &&
+							!_arrival_place.placeResult.value->getPoint().isNull()
 						){
-							_endArrivalDate += minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000));
+							_endArrivalDate += minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint().distance(_arrival_place.placeResult.value->getPoint()) / 1000));
 						}
 					}
 					else if(!map.getOptional<string>(PARAMETER_LOWEST_DEPARTURE_TIME))
@@ -245,10 +244,10 @@ namespace synthese
 						_startDate = _startArrivalDate;
 						if(	_departure_place.placeResult.value &&
 							_arrival_place.placeResult.value &&
-							!_departure_place.placeResult.value->getPoint().isUnknown() &&
-							!_arrival_place.placeResult.value->getPoint().isUnknown()
+							!_departure_place.placeResult.value->getPoint().isNull() &&
+							!_arrival_place.placeResult.value->getPoint().isNull()
 						){
-							_startDate -= minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint().getDistanceTo(_arrival_place.placeResult.value->getPoint()) / 1000));
+							_startDate -= minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint().distance(_arrival_place.placeResult.value->getPoint()) / 1000));
 						}
 					}
 				}
@@ -1162,7 +1161,7 @@ namespace synthese
 				PlacesContentVector::iterator itSheetRow(sheetRows.begin());
 				BOOST_FOREACH(const PTRoutePlannerResult::PlacesList::value_type& row, result.getOrderedPlaces())
 				{
-					GeoPoint gp(WGS84FromLambert(row.place->getPoint()));
+					GeoPoint gp(row.place->getPoint());
 					assert(dynamic_cast<const NamedPlace*>(row.place));
 //						const NamedPlace* np(dynamic_cast<const NamedPlace*>(row.place));
 
@@ -1244,7 +1243,7 @@ namespace synthese
 			std::ostream& stream,
 			const NamedPlace& np
 		){
-			GeoPoint gp(WGS84FromLambert(np.getPoint()));
+			GeoPoint gp(np.getPoint());
 
 			stream <<
 				"<connectionPlace" <<
@@ -1252,8 +1251,8 @@ namespace synthese
 					" longitude=\"" << gp.getLongitude() << "\"" <<
 					" id=\"" << np.getKey() << "\"" <<
 					" city=\"" << np.getCity()->getName() << "\"" <<
-					" x=\"" << static_cast<int>(np.getPoint().getX()) << "\"" <<
-					" y=\"" << static_cast<int>(np.getPoint().getY()) << "\""
+					" x=\"" << static_cast<int>(np.getPoint().x) << "\"" <<
+					" y=\"" << static_cast<int>(np.getPoint().y) << "\""
 					" name=\"" << np.getName() << "\"" <<
 				">";
 			if(false) // Test if alarm on place
@@ -1277,15 +1276,15 @@ namespace synthese
 			const std::string& tag,
 			const pt::StopPoint& stop
 		){
-			GeoPoint gp(WGS84FromLambert(stop));
+			GeoPoint gp(stop);
 
 			stream <<
 				"<" << tag <<
 					" latitude=\"" << gp.getLatitude() << "\"" <<
 					" longitude=\"" << gp.getLongitude() << "\"" <<
 					" id=\"" << stop.getKey() << "\"" <<
-					" x=\"" << static_cast<int>(stop.getX()) << "\"" <<
-					" y=\"" << static_cast<int>(stop.getY()) << "\"" <<
+					" x=\"" << static_cast<int>(stop.x) << "\"" <<
+					" y=\"" << static_cast<int>(stop.y) << "\"" <<
 					" name=\"" << stop.getName() << "\"" <<
 				">";
 			_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*stop.getHub()));
@@ -1299,15 +1298,15 @@ namespace synthese
 			const road::Address& address,
 			const road::RoadPlace& roadPlace
 		){
-			GeoPoint gp(WGS84FromLambert(address));
+			GeoPoint gp(address);
 
 			stream <<
 				"<address" <<
 				" latitude=\"" << gp.getLatitude() << "\"" <<
 				" longitude=\"" << gp.getLongitude() << "\"" <<
 				" id=\"" << address.getKey() << "\"" <<
-				" x=\"" << static_cast<int>(address.getX()) << "\"" <<
-				" y=\"" << static_cast<int>(address.getY()) << "\"" <<
+				" x=\"" << static_cast<int>(address.x) << "\"" <<
+				" y=\"" << static_cast<int>(address.y) << "\"" <<
 				" city=\"" << roadPlace.getCity()->getName() << "\"" <<
 				" streetName=\"" << roadPlace.getName() << "\"" <<
 				" />";
@@ -1319,15 +1318,15 @@ namespace synthese
 			std::ostream& stream,
 			const road::RoadPlace& roadPlace
 		){
-			GeoPoint gp(WGS84FromLambert(roadPlace.getPoint()));
+			GeoPoint gp(roadPlace.getPoint());
 
 			stream <<
 				"<address" <<
 				" latitude=\"" << gp.getLatitude() << "\"" <<
 				" longitude=\"" << gp.getLongitude() << "\"" <<
 				" id=\"" << roadPlace.getKey() << "\"" <<
-				" x=\"" << static_cast<int>(roadPlace.getPoint().getX()) << "\"" <<
-				" y=\"" << static_cast<int>(roadPlace.getPoint().getY()) << "\"" <<
+				" x=\"" << static_cast<int>(roadPlace.getPoint().x) << "\"" <<
+				" y=\"" << static_cast<int>(roadPlace.getPoint().y) << "\"" <<
 				" city=\"" << roadPlace.getCity()->getName() << "\"" <<
 				" streetName=\"" << roadPlace.getName() << "\"" <<
 				" />";

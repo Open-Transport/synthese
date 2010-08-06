@@ -21,22 +21,23 @@
 */
 
 #include "RoadChunkTableSync.h"
-#include "AddressTableSync.h"
+#include "CrossingTableSync.hpp"
 #include "RoadTableSync.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "LinkException.h"
 
 #include <boost/tokenizer.hpp>
+#include <geos/geom/Coordinate.h>
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace geometry;
 	using namespace road;
 
 	namespace util
@@ -107,8 +108,11 @@ namespace synthese
 				tokenizer::iterator valueIter = valueTokens.begin();
 				
 				// X:Y
-				object->addViaPoint (Point2D (Conversion::ToDouble (*valueIter), 
-						      Conversion::ToDouble (*(++valueIter))));
+				object->addViaPoint(
+					Coordinate(
+						Conversion::ToDouble(*valueIter), 
+						Conversion::ToDouble(*(++valueIter))
+				)	);
 		    }
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
@@ -117,7 +121,7 @@ namespace synthese
 				{
 					shared_ptr<Road> road(RoadTableSync::GetEditable(rows->getLongLong(RoadChunkTableSync::COL_ROADID), env, linkLevel));
 					object->setRoad(road.get());
-					Address* fromAddress(AddressTableSync::GetEditable (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID), env, linkLevel).get());
+					Address* fromAddress(CrossingTableSync::GetEditable (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID), env, linkLevel).get());
 					object->setFromAddress(fromAddress);
 					road->addRoadChunk(*object);
 				}
@@ -142,10 +146,19 @@ namespace synthese
 			RoadChunk* object,
 			optional<SQLiteTransaction&> transaction
 		){
+			stringstream viaPoints;
+			bool first(true);
+			BOOST_FOREACH(const geos::geom::Coordinate* viaPoint, object->getViaPoints())
+			{
+				if(!first) viaPoints << ",";
+				viaPoints << viaPoint->x << ":" << viaPoint->y;
+				first = false;
+			}
+
 			ReplaceQuery<RoadChunkTableSync> query(*object);
 			query.addField(object->getFromAddress() ? object->getFromAddress()->getKey() : RegistryKeyType(0));
 			query.addField(object->getRankInPath());
-			query.addField(string());
+			query.addField(viaPoints.str());
 			query.addField(object->getRoad() ? object->getRoad()->getKey() : RegistryKeyType(0));
 			query.addField(object->getMetricOffset());
 			query.execute(transaction);

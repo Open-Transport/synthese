@@ -32,19 +32,19 @@
 #include <assert.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
+#include <geos/geom/Coordinate.h>
 
 using namespace std;
 using namespace boost;
 using namespace boost::gregorian;
+using namespace geos::geom;
 
 namespace synthese
 {
 	using namespace util;
-	using namespace geometry;
 
 	namespace graph
 	{
-
 		Path::Path():
 			RuleUser(),
 			_pathGroup(NULL),
@@ -113,25 +113,25 @@ namespace synthese
 
 
 
-		std::vector<const Point2D*> 
-		Path::getPoints (int fromEdgeIndex,
-				int toEdgeIndex) const
-		{
+		std::vector<const Coordinate*> Path::getPoints(
+			int fromEdgeIndex,
+			int toEdgeIndex
+		) const	{
 			if (toEdgeIndex == -1) toEdgeIndex = _edges.size () - 1;
-			std::vector<const Point2D*> points;
+			std::vector<const Coordinate*> points;
 		    
 			for (int i=fromEdgeIndex; i<=toEdgeIndex; ++i)
 			{
-			points.push_back (_edges[i]->getFromVertex ());
-			
-			// Adds all the via points of the line stop
-			const std::vector<const Point2D*>& viaPoints = _edges[i]->getViaPoints ();
-			for (std::vector<const Point2D*>::const_iterator it = viaPoints.begin (); 
-				it != viaPoints.end (); 
-				++it)
-			{
-				points.push_back (*it);
-			}
+				points.push_back(_edges[i]->getFromVertex());
+				
+				// Adds all the via points of the line stop
+				const Edge::ViaPoints& viaPoints = _edges[i]->getViaPoints ();
+				for(Edge::ViaPoints::const_iterator it = viaPoints.begin (); 
+					it != viaPoints.end (); 
+					++it
+				){
+					points.push_back (*it);
+				}
 			}
 			return points;
 		}

@@ -24,16 +24,20 @@
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "StopAreaTableSync.hpp"
+#include "CoordinatesSystem.hpp"
+
+#include <geos/geom/Coordinate.h>
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
     using namespace db;
-    using namespace pt;
     using namespace util;
 	using namespace pt;
+	using namespace geography;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,StopPointTableSync>::FACTORY_KEY("15.55.01 Physical stops");
 	template<> const string FactorableTemplate<Fetcher<graph::Vertex>, StopPointTableSync>::FACTORY_KEY("12");
@@ -80,7 +84,19 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			object->setName(rows->getText ( StopPointTableSync::COL_NAME));
-			object->setXY (rows->getDouble ( StopPointTableSync::COL_X), rows->getDouble ( StopPointTableSync::COL_Y));
+			if(rows->getDouble(StopPointTableSync::COL_X) <= 0 || rows->getDouble(StopPointTableSync::COL_Y) <= 0)
+			{
+				object->setNull();
+			}
+			else
+			{
+				*object = GeoPoint(
+					Coordinate(
+					rows->getDouble(StopPointTableSync::COL_X),
+					rows->getDouble(StopPointTableSync::COL_Y)
+					), CoordinatesSystem::GetCoordinatesSystem("EPSG:27572")
+				);
+			}
 			object->setCodeBySource(rows->getText ( StopPointTableSync::COL_OPERATOR_CODE));
 			object->setHub(NULL);
 
@@ -113,8 +129,8 @@ namespace synthese
 			ReplaceQuery<StopPointTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(dynamic_cast<const StopArea*>(object->getHub()) ? dynamic_cast<const StopArea*>(object->getHub())->getKey() : RegistryKeyType(0));
-			query.addField(object->getX());
-			query.addField(object->getY());
+			query.addField(object->x);
+			query.addField(object->y);
 			query.addField(object->getCodeBySource());
 			query.execute(transaction);
 		}

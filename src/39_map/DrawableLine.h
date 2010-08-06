@@ -29,8 +29,14 @@
 #include "UtilTypes.h"
 #include "Drawable.h"
 #include "RGBColor.h"
-#include "Point2D.h"
 
+namespace geos
+{
+	namespace geom
+	{
+		class Coordinate;
+	}
+}
 namespace synthese
 {
 	namespace pt
@@ -52,7 +58,7 @@ namespace synthese
 
 			const util::RegistryKeyType _lineId;
 
-			std::vector<const geometry::Point2D*> _points;  //!< Reference line points
+			std::vector<const geos::geom::Coordinate*> _points;  //!< Reference line points
 			const std::string _shortName;
 			const synthese::util::RGBColor _color;
 			const bool _withPhysicalStops;
@@ -60,8 +66,8 @@ namespace synthese
 			std::vector<int> _shifts;
 			std::vector<bool> _shifted;
 			
-			std::vector<geometry::Point2D> _fuzzyfiedPoints;
-			mutable std::vector<geometry::Point2D> _shiftedPoints;
+			std::vector<geos::geom::Coordinate> _fuzzyfiedPoints;
+			mutable std::vector<geos::geom::Coordinate> _shiftedPoints;
 
 			
 
@@ -77,7 +83,7 @@ namespace synthese
 
 
 			DrawableLine (const util::RegistryKeyType& lineId,
-				  const std::vector<const geometry::Point2D*>& points,
+				const std::vector<const geos::geom::Coordinate*>& points,
 				  const std::string& shortName,
 				  const synthese::util::RGBColor& color,
 				  bool withPhysicalStops = true);
@@ -92,14 +98,14 @@ namespace synthese
 			const synthese::util::RGBColor& getColor () const;
 			bool getWithPhysicalStops () const;
 
-			const std::vector<const geometry::Point2D*>& 
+			const std::vector<const geos::geom::Coordinate*>& 
 			getPoints () const;
 
-			const std::vector<geometry::Point2D>& 
+			const std::vector<geos::geom::Coordinate>& 
 			getFuzzyfiedPoints () const;
 
 
-			bool hasPoint (const geometry::Point2D&) const;
+			bool hasPoint (const geos::geom::Coordinate&) const;
 
 			bool isStopPoint (int pointIndex) const;
 			bool isViaPoint (int pointIndex) const;
@@ -108,7 +114,7 @@ namespace synthese
 			int getShift (int pointIndex) const;
 			void setShift (int pointIndex, int shift);
 
-			const std::vector<geometry::Point2D>& getShiftedPoints () const;
+			const std::vector<geos::geom::Coordinate>& getShiftedPoints () const;
 
 			//@}
 
@@ -116,51 +122,48 @@ namespace synthese
 
 			bool isFullyReverseWay (const DrawableLine* dbl) const;
 			bool isFullySameWay (const DrawableLine* dbl) const;
-			bool isReverseWayAt (const geometry::Point2D& p, const DrawableLine* dbl) const;
-			int numberOfCommonPointsWith (const DrawableLine* dbl) const;
+			bool isReverseWayAt (const geos::geom::Coordinate& p, const DrawableLine* dbl) const;
+			std::size_t numberOfCommonPointsWith (const DrawableLine* dbl) const;
 
 			virtual void prepare (Map& map, double spacing, PointShiftingMode shiftMode = SQL_DOUBLE) const;
 		    
 			/** Find first point in this line points
 			which is equal (by value) to a given point.
 			*/
-			int firstIndexOf (const geometry::Point2D& p) const;
+			int firstIndexOf (const geos::geom::Coordinate& p) const;
 
-			const std::vector<geometry::Point2D> 
-			calculateShiftedPoints (const std::vector<geometry::Point2D>& points, 
+			const std::vector<geos::geom::Coordinate> 
+				calculateShiftedPoints (const std::vector<geos::geom::Coordinate>& points, 
 						double spacing, 
 						PointShiftingMode shiftMode) const;
 
-			const std::vector<geometry::Point2D>
-			calculateAbsoluteShiftedPoints (const std::vector<geometry::Point2D>& points, 
+			const std::vector<geos::geom::Coordinate>
+			calculateAbsoluteShiftedPoints (const std::vector<geos::geom::Coordinate>& points, 
 												 double spacing) const;
 
 		private:
 
 
-			geometry::Point2D  
-			calculateSingleShiftedPoint (geometry::Point2D a, 
-							 geometry::Point2D b, 
+			geos::geom::Coordinate  
+			calculateSingleShiftedPoint (geos::geom::Coordinate a, 
+							 geos::geom::Coordinate b, 
 							 double distance) const;
 
-			geometry::Point2D  
-			calculateSingleShiftedPoint (geometry::Point2D a, 
-							 geometry::Point2D b, 
-							 geometry::Point2D c, 
+			geos::geom::Coordinate
+			calculateSingleShiftedPoint (geos::geom::Coordinate a, 
+							 geos::geom::Coordinate b, 
+							 geos::geom::Coordinate c, 
 							 double distance) const;
-			geometry::Point2D  
-			calculateDoubleShiftedPoint (geometry::Point2D a, 
-							 geometry::Point2D b, 
-							 geometry::Point2D c, 
-							 double incomingDistance, 
-							 double outgoingDistance) const;
-		    
-		    
-		    
+			
+			geos::geom::Coordinate calculateDoubleShiftedPoint(
+				geos::geom::Coordinate a, 
+				geos::geom::Coordinate b, 
+				geos::geom::Coordinate c, 
+				double incomingDistance, 
+				double outgoingDistance
+			) const;
 		};
-	 
-	}
-}
+}	}
 
 #endif
 

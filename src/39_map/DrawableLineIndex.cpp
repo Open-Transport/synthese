@@ -25,10 +25,12 @@
 #include "Geometry.h"
 
 #include <iostream>
+#include <geos/geom/Coordinate.h>
+
+using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geometry;
 
 namespace map
 {
@@ -77,25 +79,25 @@ DrawableLineIndex::setScaleY (double scaleY)
 
 
 const std::set<DrawableLine*>&
-DrawableLineIndex::find (const Point2D& point) const
+DrawableLineIndex::find (const Coordinate& point) const
 {
     return doFind (point);
 }
 	
 
 std::set<DrawableLine*>&
-DrawableLineIndex::doFind (const Point2D& point) const
+DrawableLineIndex::doFind (const Coordinate& point) const
 {
-    Index1D* xmap = _index[point.getX ()];
+    Index1D* xmap = _index[point.x];
     if (xmap == 0) {
 	xmap = new Index1D ();
-	_index[point.getX ()] = xmap;
+	_index[point.x] = xmap;
     } 
 	
-    std::set<DrawableLine*>* dlset = (*xmap)[point.getY ()];
+    std::set<DrawableLine*>* dlset = (*xmap)[point.y];
     if (dlset == 0) {
 	dlset = new std::set<DrawableLine*> ();
-	(*xmap)[point.getY ()] = dlset;
+	(*xmap)[point.y] = dlset;
     }
 	
     return *dlset; 	
@@ -104,7 +106,7 @@ DrawableLineIndex::doFind (const Point2D& point) const
 
 
 void 
-DrawableLineIndex::add (const Point2D& point, 
+DrawableLineIndex::add (const Coordinate& point, 
 			DrawableLine* line) const
 {
     doFind (point).insert (line);
@@ -112,18 +114,18 @@ DrawableLineIndex::add (const Point2D& point,
 
 
 
-Point2D 
-DrawableLineIndex::getFuzzyPoint (const Point2D& point) const
+Coordinate 
+DrawableLineIndex::getFuzzyPoint (const Coordinate& point) const
 {
 	// Iterate on all stored points looking for one which is 
 	// distant to point of less than a minimum distance on the 
 	// final rendered map.
-	for (std::vector<Point2D>::iterator it = _fuzzyPoints.begin ();
+	for (std::vector<Coordinate>::iterator it = _fuzzyPoints.begin ();
 		it != _fuzzyPoints.end (); ++it) {
-		Point2D fuzzyOutputPoint (it->getX() * _scaleX, 
-								it->getY() * _scaleY);
-		Point2D outputPoint (point.getX() * _scaleX, 
-						   point.getY() * _scaleY);
+		Coordinate fuzzyOutputPoint (it->x * _scaleX, 
+								it->y * _scaleY);
+		Coordinate outputPoint (point.x * _scaleX, 
+						   point.y * _scaleY);
 	    double d = calculateDistance (outputPoint, fuzzyOutputPoint);
 		if (d <= 20) return (*it); // 5 pixels
 	}

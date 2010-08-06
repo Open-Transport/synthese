@@ -35,6 +35,7 @@
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -77,10 +78,10 @@ namespace synthese
 			map.insert(PARAMETER_CREATE_PHYSICAL_STOP, _createPhysicalStop);
 			map.insert(PARAMETER_CREATE_CITY_IF_NECESSARY, _createCityIfNecessary);
 			map.insert(PARAMETER_PHYSICAL_STOP_OPERATOR_CODE, _physicalStopOperatorCode);
-			if(!_point.isUnknown())
+			if(!_point.isNull())
 			{
-				map.insert(PARAMETER_PHYSICAL_STOP_X, _point.getX());
-				map.insert(PARAMETER_PHYSICAL_STOP_Y, _point.getY());
+				map.insert(PARAMETER_PHYSICAL_STOP_X, _point.x);
+				map.insert(PARAMETER_PHYSICAL_STOP_Y, _point.y);
 			}
 			return map;
 		}
@@ -115,7 +116,7 @@ namespace synthese
 			optional<double> y(map.getOptional<double>(PARAMETER_PHYSICAL_STOP_Y));
 			if(x && y)
 			{
-				_point.setXY(*x, *y);
+				_point = GeoPoint(Coordinate(*x, *y));
 			}
 		}
 		
@@ -144,13 +145,13 @@ namespace synthese
 			stopArea.setName(_name);
 			StopAreaTableSync::Save(&stopArea, transaction);
 
-			if(_createPhysicalStop || !_point.isUnknown() && _point.getX() && _point.getY())
+			if(_createPhysicalStop || !_point.isNull() && _point.x && _point.y)
 			{
 				StopPoint stop;
 				stop.setName(_name);
 				stop.setHub(&stopArea);
 				stop.setCodeBySource(_physicalStopOperatorCode);
-				stop.setXY(_point.getX(), _point.getY());
+				stop = _point;
 				StopPointTableSync::Save(&stop, transaction);
 			}
 			transaction.run();

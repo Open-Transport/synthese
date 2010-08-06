@@ -1,15 +1,37 @@
+
+/** GeoPoint class header.
+	@file GeoPoint.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #ifndef SYNTHESE_GEOGRAPHY_GEOPOINT_H
 #define SYNTHESE_GEOGRAPHY_GEOPOINT_H
 
-
 #include <iostream>
-
-
+#include <geos/geom/Coordinate.h>
 
 namespace synthese
 {
 	namespace geography
 	{
+		class CoordinatesSystem;
+
 		/** Geographical point class.
 			Geodetic point, based on WGS84 System (used by GPSs), usually expressed as 
 			latitude, longitude, and ellipsoid height (height above WGS84 reference ellipsoid -
@@ -23,42 +45,87 @@ namespace synthese
 		    
 			@ingroup m32
 		*/
-		class GeoPoint
+		class GeoPoint:
+			public geos::geom::Coordinate
 		{
 		private:
+			static const std::string _WGS84_CODE;
 
-			double _latitude;         //!< Latitude in degrees.
 			double _longitude;        //!< Longitude in degrees.
+			double _latitude;         //!< Latitude in degrees.
 			double _ellipsoidHeight;  //!< Height above ellipsoid in meters.
+			const CoordinatesSystem& _coordinatesSystem;
 
 		public:
 
-			GeoPoint (double latitude, double longitude, double ellipsoidHeight);
+			GeoPoint();
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor.
+			GeoPoint(
+				double longitude,
+				double latitude,
+				double ellipsoidHeight = 0
+			);
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor by conversion of a projected point.
+			/// @param coordinate projected point to import
+			/// @param coordinatesSystem projection used to create the point to import
+			GeoPoint(
+				const geos::geom::Coordinate& coordinate,
+				const CoordinatesSystem& coordinatesSystem
+			);
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor by conversion of a projected point in the instance
+			/// coordinates system.
+			/// @param coordinate projected point to import
+			GeoPoint(
+				const geos::geom::Coordinate& coordinate
+			);
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor by conversion of a GeoPoint object into an other
+			///	coordinates system.
+			/// @param point point to convert
+			/// @param coordinatesSystem coordinates system to use
+			GeoPoint(
+				const GeoPoint& point,
+				const CoordinatesSystem& coordinatesSystem
+			);
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Copy of an other point. The two points must be in the same coordinates
+			/// systems.
+			/// @param point point to convert
+			void operator=(
+				const GeoPoint& point
+			);
+
 			~GeoPoint () {}
 
 
-			//! @name Getters/Setters
+			//! @name Getters
 			//@{
 				/// Latitude (phi).
 				double getLatitude () const { return _latitude; }
-				void setLatitude (double latitude) { _latitude = latitude; }
 
 				/// Longitude (lambda).
 				double getLongitude () const { return _longitude; }
-				void setLongitude (double longitude) { _longitude = longitude; }
 
 				/// Height above GRS_80 ellipsoid (he).
 				///	This is NOT the commonly known concept of altitude 
 				///	(even if it could be a very rough approximation +-100m) !  
 				double getEllipsoidHeight () const { return _ellipsoidHeight; }
+
+				const CoordinatesSystem& getCoordinatesSystem() const { return _coordinatesSystem; }
+			//@}
+
+			//! @name Setters
+			//@{
 				void setEllipsoidHeight (double ellipsoidHeight) { _ellipsoidHeight = ellipsoidHeight; }
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Distance between two points.
-				//double operator- ( const GeoPoint& other ) const;
-
-				static double Deg2rad(double deg);
-				static double Rad2deg(double rad);
 			//@}
 		};
 

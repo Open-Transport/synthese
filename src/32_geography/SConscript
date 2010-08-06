@@ -4,10 +4,10 @@ CppSynthese3LibProject(
 	s3env, 's3-geography', s3env['S3VERSION'], 
 	source_files = s3env.Glob ('*.cpp'),
 	dependencies = [
-		's3-geometry.cpplib',
 		's3-lexical-matcher.cpplib',
 		's3-graph.cpplib',
 		's3-interfaces.cpplib',
-		'proj.cpplib'
+		'proj.cpplib',
+		'geos.cpplib'
 	]
 )

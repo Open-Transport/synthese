@@ -23,8 +23,7 @@
 #ifndef SYNTHESE_CARTO_DRAWABLELINECOMPARATOR_H
 #define SYNTHESE_CARTO_DRAWABLELINECOMPARATOR_H
 
-#include "06_geometry/Point2D.h"
-
+#include <geos/geom/Coordinate.h>
 #include <vector>
 
 namespace synthese
@@ -41,41 +40,41 @@ class DrawableLineComparator
 private:	
 
     const DrawableLine* _reference;
-    const geometry::Point2D _referencePoint;
+    const geos::geom::Coordinate _referencePoint;
     
-    geometry::Point2D _point;
+    geos::geom::Coordinate _point;
     
     
-    int firstIndexOf (const geometry::Point2D& point, 
-      const std::vector<geometry::Point2D>& points) const;
+    int firstIndexOf (const geos::geom::Coordinate& point, 
+      const std::vector<geos::geom::Coordinate>& points) const;
 	
 public:
 
     DrawableLineComparator(const DrawableLine* reference, 
-			   const geometry::Point2D& referencePoint, 
-			   const geometry::Point2D& point);
+			   const geos::geom::Coordinate& referencePoint, 
+			   const geos::geom::Coordinate& point);
     
     ~DrawableLineComparator();
 	
-    void setPoint (const geometry::Point2D& point);
+    void setPoint (const geos::geom::Coordinate& point);
 
 
     std::pair<double, double>
-	calculateStartAngles (const std::vector<geometry::Point2D>& points1, int index1,
-			      const std::vector<geometry::Point2D>& points2, int index2) const;
+	calculateStartAngles (const std::vector<geos::geom::Coordinate>& points1, int index1,
+			      const std::vector<geos::geom::Coordinate>& points2, int index2) const;
 
     std::pair<double, double>
-	calculateEndAngles (const std::vector<geometry::Point2D>& points1, int index1,
-			    const std::vector<geometry::Point2D>& points2, int index2) const;
+	calculateEndAngles (const std::vector<geos::geom::Coordinate>& points1, int index1,
+			    const std::vector<geos::geom::Coordinate>& points2, int index2) const;
 
 
 	
     double calculateStartAngleAtIndex (
-	const std::vector<geometry::Point2D>& points, 
+	const std::vector<geos::geom::Coordinate>& points, 
 	int index) const;
     
     double calculateEndAngleAtIndex (
-	const std::vector<geometry::Point2D>& points, 
+	const std::vector<geos::geom::Coordinate>& points, 
 	int index) const;
 	
     int operator() (const DrawableLine* bl1, const DrawableLine* bl2) const;

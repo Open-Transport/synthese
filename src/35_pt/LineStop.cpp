@@ -34,7 +34,6 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
-	using namespace geometry;
 	using namespace graph;
 	using namespace pt;
 
@@ -71,16 +70,17 @@ namespace synthese
 
 
 
-		bool 
-		LineStop::seemsGeographicallyConsistent (const LineStop& other) const
+		bool LineStop::seemsGeographicallyConsistent (const LineStop& other) const
 		{
 			double deltaMO; // meters
 			if ( getMetricOffset () > other.getMetricOffset () )
-				deltaMO = ( getMetricOffset () - other.getMetricOffset () ) / 1000;
+				deltaMO = ( getMetricOffset () - other.getMetricOffset () );
 			else
-				deltaMO = ( other.getMetricOffset () - getMetricOffset () ) / 1000;
+				deltaMO = ( other.getMetricOffset () - getMetricOffset () );
 
-			const int deltaGPS = getFromVertex()->getDistanceTo(*other.getFromVertex()); // kilometers
+			const double deltaGPS(
+				getFromVertex()->distance(*other.getFromVertex())
+			);
 
 			if ( deltaMO > 10 * deltaGPS && deltaMO - deltaGPS > 1 )
 			{

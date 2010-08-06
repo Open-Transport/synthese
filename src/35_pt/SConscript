@@ -12,7 +12,6 @@ CppSynthese3LibProject(
 		's3-security.cpplib',
 		's3-util.cpplib',
 		's3-interfaces.cpplib',
-		's3-geometry.cpplib',
 		's3-geography.cpplib',
 		's3-calendar.cpplib',
 		's3-messages.cpplib',

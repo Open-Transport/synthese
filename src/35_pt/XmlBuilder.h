@@ -136,7 +136,7 @@ class XmlBuilder
 		 const util::Registry<StopArea>& connectionPlaces
 	);
     
-	 static geometry::Point2D CreatePoint (XMLNode& node);
+	 static geos::geom::Coordinate CreatePoint (XMLNode& node);
 
 
 };

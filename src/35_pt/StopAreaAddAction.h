@@ -27,7 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "Point2D.h"
+#include "GeoPoint.h"
 
 namespace synthese
 {
@@ -79,7 +79,7 @@ namespace synthese
 			std::string _name;
 			bool _createPhysicalStop;
 			std::string _physicalStopOperatorCode;
-			geometry::Point2D _point;
+			geography::GeoPoint _point;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -122,7 +122,7 @@ namespace synthese
 				void setCity(boost::shared_ptr<geography::City> value){ _city = value; }
 				void setCreateCityIfNecessary(bool value) { _createCityIfNecessary = value; }
 				void setCreatePhysicalStop(bool value) { _createPhysicalStop = value; }
-				void setPoint(geometry::Point2D& value) { _point = value; }
+				void setPoint(const geography::GeoPoint& value) { _point = value; }
 				void setCityName(const std::string& value) { _cityName = value; }
 				void setName(const std::string& value) { _name = value; }
 				void setOperatorCode(const std::string& value) { _physicalStopOperatorCode = value; }

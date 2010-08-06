@@ -29,9 +29,8 @@
 #include "TransportNetworkRight.h"
 #include "PropertiesHTMLTable.h"
 #include "GeoPoint.h"
-#include "Projection.h"
+#include "CoordinatesSystem.hpp"
 #include "AdminFunctionRequest.hpp"
-#include "Point2D.h"
 #include "StopPointTableSync.hpp"
 #include "PTPlaceAdmin.h"
 #include "HTMLModule.h"
@@ -54,6 +53,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -64,7 +64,6 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace html;
-	using namespace geometry;
 	using namespace geography;
 	using namespace impex;
 
@@ -272,9 +271,11 @@ namespace synthese
 							}
 							if(ok)
 							{
-								it->second.coords.setXY(
-									1000 * lexical_cast<double>(line.substr(10,7)),
-									1000 * lexical_cast<double>(line.substr(20,7))
+								it->second.coords = GeoPoint(
+									Coordinate(
+										1000 * lexical_cast<double>(line.substr(10,7)),
+										1000 * lexical_cast<double>(line.substr(20,7))
+									), CoordinatesSystem::GetCoordinatesSystem("EPSG:21781")
 								);
 							}
 						}
@@ -308,15 +309,10 @@ namespace synthese
 							stream << bahnhof.second.name;
 
 							stream << t.col();
-							Point2D lambert(
-								LambertFromWGS84(
-									WGS84FromCH1903(
-										bahnhof.second.coords
-							)	)	);
-							stream << lambert.getX();
+							stream << bahnhof.second.coords.x;
 
 							stream << t.col();
-							stream << lambert.getY();
+							stream << bahnhof.second.coords.y;
 
 							stream << t.col();
 							AdminActionFunctionRequest<StopAreaAddAction, PTStopsImportWizardAdmin> addRequest(request);
@@ -325,7 +321,7 @@ namespace synthese
 							addRequest.getAction()->setName(bahnhof.second.name);
 							addRequest.getAction()->setCityName(bahnhof.second.cityName);
 							addRequest.getAction()->setOperatorCode(bahnhof.first);
-							addRequest.getAction()->setPoint(lambert);
+							addRequest.getAction()->setPoint(bahnhof.second.coords);
 							stream << HTMLModule::getLinkButton(addRequest.getURL(), "Ajouter");
 						}
 						stream << t.close();
@@ -372,21 +368,16 @@ namespace synthese
 							stream << bahnhof.second.name;
 
 							stream << t.col();
-							stream << bahnhof.second.stop->getX();
+							stream << bahnhof.second.stop->x;
 
 							stream << t.col();
-							stream << bahnhof.second.stop->getY();
+							stream << bahnhof.second.stop->y;
 
 							stream << t.col();
-							Point2D lambert(
-								LambertFromWGS84(
-									WGS84FromCH1903(
-										bahnhof.second.coords
-							)	)	);
-							stream << lambert.getX();
+							stream << bahnhof.second.coords.x;
 
 							stream << t.col();
-							stream << lambert.getY();
+							stream << bahnhof.second.coords.y;
 
 							stream << t.col();
 							stream << "Mettre à jour coordonnées";

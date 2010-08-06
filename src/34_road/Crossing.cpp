@@ -35,6 +35,8 @@ namespace synthese
 {
 	using namespace util;
 	using namespace graph;
+	using namespace geography;
+	
 
 	namespace util
 	{
@@ -65,7 +67,7 @@ namespace synthese
 		}
 
 
-		const geometry::Point2D& Crossing::getPoint() const
+		const GeoPoint& Crossing::getPoint() const
 		{
 			return *_address;
 		}

@@ -125,8 +125,8 @@ namespace synthese
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
 				stream << t.cell("Nom", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_NAME, _stop->getName()));
-				stream << t.cell("X", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_X, lexical_cast<string>(_stop->getX())));
-				stream << t.cell("Y", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_Y, lexical_cast<string>(_stop->getY())));
+				stream << t.cell("X", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_X, lexical_cast<string>(_stop->x)));
+				stream << t.cell("Y", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_Y, lexical_cast<string>(_stop->y)));
 				stream << t.cell("Code opérateur", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_OPERATOR_CODE, _stop->getCodeBySource()));
 				stream << t.close();
 			}

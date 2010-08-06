@@ -27,6 +27,7 @@
 #include "Edge.h"
 #include "Hub.h"
 
+#include <geos/geom/Envelope.h>
 #include <boost/foreach.hpp>
 #include <assert.h>
 #include <set>
@@ -34,12 +35,12 @@
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
-
+using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geometry;
-
+	using namespace geography;
+	
 	namespace graph
 	{
 		VertexAccessMap::VertexAccessMap ()
@@ -132,16 +133,18 @@ namespace synthese
 
 
 
-		const IsoBarycentre& 
-		VertexAccessMap::getIsobarycenter () const
-		{
+		const GeoPoint& VertexAccessMap::getIsobarycenter(
+		) const	{
 			if (_isobarycentreToUpdate)
 			{
-				_isobarycentre.clear();
+				Envelope e;
 				BOOST_FOREACH(VamMap::value_type it, _map)
 				{
-					_isobarycentre.add(*it.first);
+					e.expandToInclude(*it.first);
 				}
+				Coordinate c;
+				e.centre(c);
+				_isobarycentre = GeoPoint(c);
 				_isobarycentreToUpdate = false;
 			}
 			return _isobarycentre;

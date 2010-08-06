@@ -1,7 +1,6 @@
 
-
-/** AddressTableSync class implementation.
-	@file AddressTableSync.cpp
+/** CrossingTableSync class implementation.
+	@file CrossingTableSync.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -21,23 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
-#include "AddressTableSync.h"
-
-#include "PublicPlace.h"
-#include "PublicPlaceTableSync.h"
+#include "CrossingTableSync.hpp"
 #include "RoadTableSync.h"
-#include "StopAreaTableSync.hpp"
 #include "Crossing.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
-#include "SQLiteException.h"
 #include "LinkException.h"
 #include "DataSource.h"
 #include "DataSourceTableSync.h"
-#include "Conversion.h"
+#include "SelectQuery.hpp"
+#include "ReplaceQuery.h"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -46,204 +39,145 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace pt;
 	using namespace road;
 	using namespace impex;
 	using namespace graph;
+	using namespace geography;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,AddressTableSync>::FACTORY_KEY("34.20.01 Addresses");
-		template<> const string FactorableTemplate<Fetcher<Vertex>, AddressTableSync>::FACTORY_KEY("2");
+		template<> const string FactorableTemplate<SQLiteTableSync, CrossingTableSync>::FACTORY_KEY("34.20.01 Crossings");
+		template<> const string FactorableTemplate<Fetcher<Vertex>, CrossingTableSync>::FACTORY_KEY("43");
 	}
 
 	namespace road
 	{
-		const std::string AddressTableSync::COL_PLACEID ("place_id");  // NU
-		const std::string AddressTableSync::COL_X ("x");  // U ??
-		const std::string AddressTableSync::COL_Y ("y");  // U ??
-		const std::string AddressTableSync::COL_CODE_BY_SOURCE ("code_by_source");  // U ??
-		const std::string AddressTableSync::COL_SOURCE_ID ("source_id");  // U ??
+		const std::string CrossingTableSync::COL_CODE_BY_SOURCE ("code_by_source");
+		const std::string CrossingTableSync::COL_SOURCE_ID ("source_id");
+		const std::string CrossingTableSync::COL_LONGITUDE ("longitude");
+		const std::string CrossingTableSync::COL_LATITUDE ("latitude");
 	}
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<AddressTableSync>::TABLE(
-			"t002_addresses"
+		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CrossingTableSync>::TABLE(
+			"t043_crossings"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<AddressTableSync>::_FIELDS[] =
+		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CrossingTableSync>::_FIELDS[] =
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(AddressTableSync::COL_PLACEID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(AddressTableSync::COL_X, SQL_DOUBLE),
-			SQLiteTableSync::Field(AddressTableSync::COL_Y, SQL_DOUBLE),
-			SQLiteTableSync::Field(AddressTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
-			SQLiteTableSync::Field(AddressTableSync::COL_SOURCE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(CrossingTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
+			SQLiteTableSync::Field(CrossingTableSync::COL_SOURCE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(CrossingTableSync::COL_LONGITUDE, SQL_DOUBLE),
+			SQLiteTableSync::Field(CrossingTableSync::COL_LATITUDE, SQL_DOUBLE),
 			SQLiteTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<AddressTableSync>::_INDEXES[] =
+		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CrossingTableSync>::_INDEXES[] =
 		{
 			SQLiteTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::Load(
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Address>::Load(
 			Address* object
 			, const db::SQLiteResultSPtr& rows
 			, Env& env
 			, LinkLevel linkLevel
 		){
 			// Properties
-		    object->setXY (rows->getDouble (AddressTableSync::COL_X), rows->getDouble (AddressTableSync::COL_Y));
-			object->setCodeBySource(rows->getText(AddressTableSync::COL_CODE_BY_SOURCE));
+		    *object = GeoPoint(
+				rows->getDouble(CrossingTableSync::COL_LONGITUDE),
+				rows->getDouble(CrossingTableSync::COL_LATITUDE)
+			);
+			object->setCodeBySource(rows->getText(CrossingTableSync::COL_CODE_BY_SOURCE));
 		
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
 				// Columns reading
-				RegistryKeyType placeId = rows->getLongLong (AddressTableSync::COL_PLACEID);
-				RegistryKeyType sourceId = rows->getLongLong (AddressTableSync::COL_SOURCE_ID);
-				RegistryTableType tableId = decodeTableId(placeId);
+				RegistryKeyType sourceId = rows->getLongLong(CrossingTableSync::COL_SOURCE_ID);
 
 				// Links from the object
 				try
 				{
-					if(tableId == StopAreaTableSync::TABLE.ID)
+					RegistryKeyType crossingId(
+						util::encodeUId(43,decodeGridNodeId(object->getKey()),decodeObjectId(object->getKey()))
+					);
+					shared_ptr<Crossing> crossing;
+					Crossing::Registry& registry(env.getEditableRegistry<Crossing>());
+					if(registry.contains(crossingId))
 					{
-						object->setHub(StopAreaTableSync::Get(placeId, env, linkLevel).get());
-						
-						// Links to the object
-						StopArea* place(StopAreaTableSync::GetEditable(placeId, env, linkLevel).get());
-				
-						place->addAddress(object);
-					}
-					else if(tableId == PublicPlaceTableSync::TABLE.ID)
-					{
-						object->setHub(PublicPlaceTableSync::Get(placeId, env, linkLevel).get());
-
-						// Links to the object
-						PublicPlace* place(PublicPlaceTableSync::GetEditable(placeId, env, linkLevel).get());
-
-						place->addAddress(object);
+						crossing = registry.getEditable(crossingId);
 					}
 					else
 					{
-						RegistryKeyType crossingId(
-							util::encodeUId(43,decodeGridNodeId(object->getKey()),decodeObjectId(object->getKey()))
-						);
-						shared_ptr<Crossing> crossing;
-						Crossing::Registry& registry(env.getEditableRegistry<Crossing>());
-						if(registry.contains(crossingId))
-						{
-							crossing = registry.getEditable(crossingId);
-						}
-						else
-						{
-							crossing.reset(new Crossing(crossingId));
-							crossing->setAddress(object);
-							registry.add(crossing);
-						}
-						object->setHub(crossing.get());
+						crossing.reset(new Crossing(crossingId));
+						crossing->setAddress(object);
+						registry.add(crossing);
 					}
+					object->setHub(crossing.get());
 					if(sourceId > 0)
 					{
 						object->setDataSource(DataSourceTableSync::Get(sourceId, env, linkLevel).get());
 					}
 				}
-				catch (ObjectNotFoundException<StopArea>& e)
+				catch (ObjectNotFoundException<DataSource>& e)
 				{
-					throw LinkException<AddressTableSync>(rows, AddressTableSync::COL_PLACEID, e);
+					throw LinkException<DataSourceTableSync>(rows, CrossingTableSync::COL_SOURCE_ID, e);
 				}
 			}
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::Unlink(
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Address>::Unlink(
 			Address* obj
 		){
-			AddressablePlace* place(
-				const_cast<AddressablePlace*>(
-					static_cast<const AddressablePlace*>(
-						obj->getHub()
-			)	)	);
-			if (place != NULL)
-			{
-//				place->removeAddress(obj);
-			}
-
-//			Road* road(const_cast<Road*>(obj->getRoad()));
-//			if (road != NULL)
-			{
-//				road->removeAddress(obj);
-			}
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<AddressTableSync,Address>::Save(
+
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Address>::Save(
 			Address* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			 query <<
-				" REPLACE INTO " << TABLE.NAME << " VALUES(" <<
-				object->getKey() << "," <<
-				(	dynamic_cast<const Registrable*>(object->getHub()) && !dynamic_cast<const Crossing*>(object->getHub()) ?
-					lexical_cast<string>(dynamic_cast<const Registrable*>(object->getHub())->getKey()) :
-					"0"
-				) << "," << fixed <<
-				object->getX() << "," <<
-				object->getY() << "," <<
-				Conversion::ToSQLiteString(object->getCodeBySource()) << "," <<
-				(object->getDataSource() ? lexical_cast<string>(object->getDataSource()->getKey()) : "0") <<
-			")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<CrossingTableSync> query(*object);
+			query.addField(object->getCodeBySource());
+			query.addField(object->getDataSource() ? lexical_cast<string>(object->getDataSource()->getKey()) : 0);
+			query.addField(object->getLongitude());
+			query.addField(object->getLatitude());
+			query.execute(transaction);
 		}
-
 	}
 
 	namespace road
 	{
-		AddressTableSync::AddressTableSync()
-			: SQLiteRegistryTableSyncTemplate<AddressTableSync,Address>()
+		CrossingTableSync::CrossingTableSync()
+			: SQLiteRegistryTableSyncTemplate<CrossingTableSync,Address>()
 		{
 		}
 
-		AddressTableSync::~AddressTableSync()
+		CrossingTableSync::~CrossingTableSync()
 		{
 
 		}
 
-		AddressTableSync::SearchResult AddressTableSync::Search(
+		CrossingTableSync::SearchResult CrossingTableSync::Search(
 			Env& env,
-			boost::optional<util::RegistryKeyType> placeId /*= boost::optional<util::RegistryKeyType>()*/,
 			int first /*= 0*/,
 			boost::optional<std::size_t> number /*= 0*/,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
-			if(placeId)
+			SelectQuery<CrossingTableSync> query;
+ 			if (number)
 			{
-				query << " AND " << COL_PLACEID << "=" << *placeId;
+				query.setNumber(*number + 1);
 			}
-			if (number)
+			if (first > 0)
 			{
-				query << " LIMIT " << (*number + 1);
-				if (first > 0)
-				{
-					query << " OFFSET " << first;
-				}
+				query.setFirst(first);
 			}
-
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }

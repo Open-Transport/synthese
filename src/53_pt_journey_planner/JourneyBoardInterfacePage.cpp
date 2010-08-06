@@ -35,7 +35,6 @@
 #include "CommercialLine.h"
 #include "Env.h"
 #include "GeoPoint.h"
-#include "Projection.h"
 #include "WebPageDisplayFunction.h"
 #include "Road.h"
 #include "StopPoint.hpp"
@@ -197,7 +196,7 @@ namespace synthese
 				).getFullName()
 			);
 			pm.insert(DATA_DEPARTURE_PLACE_NAME, displayedDeparturePlace);
-			GeoPoint departurePoint(WGS84FromLambert(departurePlace.getPoint()));
+			GeoPoint departurePoint(departurePlace.getPoint());
 			pm.insert(DATA_DEPARTURE_PLACE_LONGITUDE, departurePoint.getLongitude());
 			pm.insert(DATA_DEPARTURE_PLACE_LATITUDE, departurePoint.getLatitude());
 			
@@ -221,7 +220,7 @@ namespace synthese
 				).getFullName()
 			);
 			pm.insert(DATA_ARRIVAL_PLACE_NAME, displayedArrivalPlace);
-			GeoPoint arrivalPoint(WGS84FromLambert(arrivalPlace.getPoint()));
+			GeoPoint arrivalPoint(arrivalPlace.getPoint());
 			pm.insert(DATA_ARRIVAL_PLACE_LONGITUDE, arrivalPoint.getLongitude());
 			pm.insert(DATA_ARRIVAL_PLACE_LATITUDE, arrivalPoint.getLatitude());
 
@@ -491,7 +490,7 @@ namespace synthese
 			}
 
 			// Point
-			GeoPoint point(WGS84FromLambert(physicalStop));
+			GeoPoint point(physicalStop);
 			pm.insert(DATA_LONGITUDE, point.getLongitude());
 			pm.insert(DATA_LATITUDE, point.getLatitude());
 			
@@ -519,7 +518,7 @@ namespace synthese
 			ParametersMap pm;
 
 			// Point
-			GeoPoint point(WGS84FromLambert(vertex));
+			GeoPoint point(vertex);
 			pm.insert(DATA_LONGITUDE, point.getLongitude());
 			pm.insert(DATA_LATITUDE, point.getLatitude());
 			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(vertex.getHub()) != NULL);

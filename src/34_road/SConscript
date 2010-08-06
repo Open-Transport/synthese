@@ -6,7 +6,6 @@ CppSynthese3LibProject(
 	dependencies = [
 		's3-graph.cpplib',
 		's3-impex.cpplib',
-		's3-geography.cpplib',
-		's3-pt.cpplib'
+		's3-geography.cpplib'
 	]
 )

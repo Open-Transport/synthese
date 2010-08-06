@@ -32,9 +32,9 @@
 
 namespace synthese
 {
-	namespace geometry
+	namespace geography
 	{
-		class Point2D;
+		class GeoPoint;
 	}
 
 	namespace graph
@@ -88,7 +88,7 @@ namespace synthese
 				virtual HubScore getScore(
 				) const = 0;
 
-				virtual const geometry::Point2D& getPoint() const = 0;
+				virtual const geography::GeoPoint& getPoint() const = 0;
 
 				virtual bool containsAnyVertex(GraphIdType graphType) const = 0;
 

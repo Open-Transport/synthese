@@ -26,7 +26,7 @@
 #include <map>
 
 #include "Registrable.h"
-#include "Point2D.h"
+#include "GeoPoint.h"
 #include "GraphTypes.h"
 #include "FactoryBase.h"
 
@@ -42,7 +42,7 @@ namespace synthese
 			@ingroup m18
 		*/
 		class Vertex :
-			public geometry::Point2D,
+			public geography::GeoPoint,
 			public virtual util::Registrable
 		{
 		public:
@@ -58,8 +58,8 @@ namespace synthese
 
 			Vertex(
 				const Hub* hub,
-				double x = UNKNOWN_VALUE,
-				double y = UNKNOWN_VALUE
+				double longitude,
+				double latitude
 			);
 
 		public:

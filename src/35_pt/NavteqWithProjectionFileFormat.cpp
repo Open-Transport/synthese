@@ -24,7 +24,7 @@
 #include "cdbfile.h"
 #include "DataSource.h"
 #include "Address.h"
-#include "AddressTableSync.h"
+#include "CrossingTableSync.hpp"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
 #include "StopArea.hpp"
@@ -39,8 +39,8 @@
 #include "CityTableSync.h"
 #include "Crossing.h"
 #include "shapefil.h"
-#include "Point2D.h"
 #include "SQLiteTransaction.h"
+#include "CoordinatesSystem.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -49,6 +49,8 @@
 using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
+using namespace geos::geom;
+
 
 namespace synthese
 {
@@ -59,7 +61,6 @@ namespace synthese
 	using namespace pt;
 	using namespace geography;
 	using namespace db;
-	using namespace geometry;
 	using namespace graph;
 	
 
@@ -128,7 +129,7 @@ namespace synthese
 			SQLiteTransaction transaction;
 			BOOST_FOREACH(Registry<Address>::value_type address, _env->getEditableRegistry<Address>())
 			{
-				AddressTableSync::Save(address.second.get(), transaction);
+				CrossingTableSync::Save(address.second.get(), transaction);
 			}
 			BOOST_FOREACH(Registry<StopArea>::value_type stop, _env->getEditableRegistry<StopArea>())
 			{
@@ -242,13 +243,16 @@ namespace synthese
 					shared_ptr<Record> record(dbfile.ReadRecord(i));
 					shared_ptr<Address> address(new Address);
 
-					address->setCodeBySource(algorithm::trim_copy(dbfile.getText(*record, _FIELD_ID)));
-					address->setXY(
-						lexical_cast<double>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_X))),
-						lexical_cast<double>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_Y)))
+					GeoPoint gp(
+						Coordinate(
+							lexical_cast<double>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_X))),
+							lexical_cast<double>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_Y)))
+						), CoordinatesSystem::GetCoordinatesSystem("EPSG:27572")
 					);
+					*address = gp;
+					address->setCodeBySource(algorithm::trim_copy(dbfile.getText(*record, _FIELD_ID)));
 					address->setDataSource(_dataSource);
-					address->setKey(AddressTableSync::getId());
+					address->setKey(CrossingTableSync::getId());
 
 					RegistryKeyType stopId(0); 
 					try
@@ -260,14 +264,14 @@ namespace synthese
 
 					}
 
-					if(stopId > 0)
+/*					if(stopId > 0)
 					{ // PT Connection place
 						try
 						{
 							shared_ptr<StopPoint> stop(StopPointTableSync::GetEditable(stopId, *_env, UP_LINKS_LOAD_LEVEL));
 							StopArea* place(const_cast<StopArea*>(stop->getConnectionPlace()));
 							StopPointTableSync::Search(*_env, place->getKey());
-							AddressTableSync::Search(*_env, place->getKey());
+							CrossingTableSync::Search(*_env, place->getKey());
 							place->addAddress(address.get());
 							BOOST_FOREACH(const Address* add2, place->getAddresses())
 							{
@@ -314,7 +318,7 @@ namespace synthese
 						}
 					}
 					else
-					{ // Crossing
+*/					{ // Crossing
 						shared_ptr<Crossing> crossing(new Crossing);
 						crossing->setKey(util::encodeUId(43,0,decodeObjectId(address->getKey())));
 						crossing->setAddress(address.get());
@@ -363,13 +367,13 @@ namespace synthese
 						string roadName(algorithm::trim_copy(dbfile.getText(*record, _FIELD_ST_NAME)));
 						SHPObject* shpObject(SHPReadObject(shapeFile, int(i-1)));
 						double length(0);
-						optional<Point2D> lastPt;
+						optional<Coordinate> lastPt;
 						for(int p(0); p< shpObject->nVertices; ++p)
 						{
-							Point2D point(shpObject->padfX[p], shpObject->padfY[p]);
+							Coordinate point(shpObject->padfX[p], shpObject->padfY[p]);
 							if(lastPt)
 							{
-								length += point.getDistanceTo(*lastPt);
+								length += point.distance(*lastPt);
 							}
 							lastPt = point;
 						}

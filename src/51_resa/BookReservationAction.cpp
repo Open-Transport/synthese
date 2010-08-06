@@ -261,10 +261,10 @@ namespace synthese
 			ptime departureDateTime(time_from_string(map.get<string>(PARAMETER_DATE_TIME)));
 			ptime arrivalDateTime(departureDateTime);
 			arrivalDateTime += days(1);
-			if(	!originPlace->getPoint().isUnknown() &&
-				!destinationPlace->getPoint().isUnknown()
+			if(	!originPlace->getPoint().isNull() &&
+				!destinationPlace->getPoint().isNull()
 			){
-				arrivalDateTime += minutes(2 * static_cast<int>(originPlace->getPoint().getDistanceTo(destinationPlace->getPoint()) / 1000));
+				arrivalDateTime += minutes(2 * static_cast<int>(originPlace->getPoint().distance(destinationPlace->getPoint()) / 1000));
 			}
 
 			// Accessibility

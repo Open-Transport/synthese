@@ -25,6 +25,7 @@
 #include "T9Filter.h"
 #include "Exception.h"
 #include "NamedPlace.h"
+#include "CoordinatesSystem.hpp"
 
 #include <sstream>
 #include <boost/iostreams/filtering_stream.hpp>
@@ -42,7 +43,12 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<ModuleClass,GeographyModule>::FACTORY_KEY("32_geography");
 	}
-	
+
+	namespace geography
+	{
+		const string GeographyModule::_INSTANCE_COORDINATES_SYSTEM("instance_coordinates_system");
+		const CoordinatesSystem* GeographyModule::_instanceCoordinatesSystem(NULL);
+	}
 	
 	namespace server
 	{
@@ -50,6 +56,8 @@ namespace synthese
 	
 		template<> void ModuleClassTemplate<GeographyModule>::PreInit()
 		{
+			CoordinatesSystem::AddCoordinatesSystems();
+			RegisterParameter(GeographyModule::_INSTANCE_COORDINATES_SYSTEM, "EPSG:27572", &GeographyModule::ChangeInstanceCoordinatesSystem);
 		}
 		
 		template<> void ModuleClassTemplate<GeographyModule>::Init()
@@ -152,5 +160,18 @@ namespace synthese
 			return _citiesMatcher;
 		}
 
+
+
+		void GeographyModule::ChangeInstanceCoordinatesSystem( const std::string&, const std::string& value )
+		{
+			_instanceCoordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(value);
+		}
+
+
+
+		const CoordinatesSystem& GeographyModule::GetInstanceCoordinatesSystem()
+		{
+			return *_instanceCoordinatesSystem;
+		}
 	}
 }

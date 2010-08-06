@@ -29,12 +29,12 @@
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace graph;
-	using namespace pt;
 
 	namespace util
 	{
@@ -147,7 +147,7 @@ namespace synthese
 							_reverseRoad,
 							-chunk.getMetricOffset()
 					)	);
-					BOOST_REVERSE_FOREACH(const geometry::Point2D *pt, chunk.getViaPoints())
+					BOOST_REVERSE_FOREACH(const Coordinate*pt, chunk.getViaPoints())
 					{
 						reverseChunk->addViaPoint(*pt);
 					}

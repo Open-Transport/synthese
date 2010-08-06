@@ -90,6 +90,8 @@ namespace synthese
 	*/
 	namespace geography
 	{
+		class CoordinatesSystem;
+
 		/** 09 Geography Module class.
 			@author Hugues Romain
 			@date 2008
@@ -101,10 +103,13 @@ namespace synthese
 			typedef lexical_matcher::LexicalMatcher<City*> CitiesMatcher;
 			typedef std::vector<CitiesMatcher::Content> CityList;
 
+			static const std::string _INSTANCE_COORDINATES_SYSTEM;
+
 		private:
 
 			static CitiesMatcher _citiesMatcher;
 			static CitiesMatcher _citiesT9Matcher;
+			static const CoordinatesSystem* _instanceCoordinatesSystem;
 
 		public:
 
@@ -147,6 +152,12 @@ namespace synthese
 
 			static const CitiesMatcher& GetCitiesMatcher();
 
+			static void ChangeInstanceCoordinatesSystem(
+				const std::string&,
+				const std::string& value
+			);
+
+			static const CoordinatesSystem& GetInstanceCoordinatesSystem();
 		};
 	}
 	/** @} */

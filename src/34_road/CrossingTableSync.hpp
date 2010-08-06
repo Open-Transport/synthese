@@ -1,6 +1,6 @@
 
-/** AddressTableSync class header.
-	@file AddressTableSync.h
+/** CrossingTableSync class header.
+	@file CrossignTableSync.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_AddressTableSync_H__
-#define SYNTHESE_AddressTableSync_H__
+#ifndef SYNTHESE_CrossingTableSync_H__
+#define SYNTHESE_CrossingTableSync_H__
 
 
 #include <vector>
@@ -36,7 +36,7 @@ namespace synthese
 {
 	namespace road
 	{
-		/** Address table synchronizer.
+		/** 34.10 Crossing table synchronizer.
 			@ingroup m34LS refLS
 
 			Addresses table :
@@ -50,26 +50,24 @@ namespace synthese
 
 			<dl>
 			<dt>id</dt><dd>primary key</dd>
-			<dt>place_id</dt><dd>id of the @ref pt::StopAreaTableSync "stop area" which the address belongs to. 0 = Crossing</dd>
 			<dt>code_by_source</dt><dd>code of the address in the source database</dd>
 			<dt>source_id</dt><dd>id of the @ref impex::DataSourceTableSync "source database" of the address</dd>
 			<dt>longitude</dt><dd>longitude of the address in degrees</dd>
 			<dt>latitude</dt><dd>latitude of the address in degrees</dd>
 			</dl>
 		*/
-		class AddressTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<AddressTableSync,Address>,
-			public db::FetcherTemplate<graph::Vertex, AddressTableSync>
+		class CrossingTableSync:
+			public db::SQLiteRegistryTableSyncTemplate<CrossingTableSync,Address>,
+			public db::FetcherTemplate<graph::Vertex, CrossingTableSync>
 		{
 		public:
-			static const std::string COL_PLACEID;  // NU
-			static const std::string COL_X;  // U ??
-			static const std::string COL_Y;  // U ??
 			static const std::string COL_CODE_BY_SOURCE;
 			static const std::string COL_SOURCE_ID;
+			static const std::string COL_LONGITUDE;
+			static const std::string COL_LATITUDE;
 			
-			AddressTableSync();
-			~AddressTableSync();
+			CrossingTableSync();
+			~CrossingTableSync();
 
 
 			/** Address search.
@@ -82,7 +80,6 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				boost::optional<util::RegistryKeyType> placeId = boost::optional<util::RegistryKeyType>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL

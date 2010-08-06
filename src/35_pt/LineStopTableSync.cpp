@@ -32,19 +32,18 @@
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "SQLiteTransaction.h"
-#include "Point2D.h"
 
+#include <geos/geom/Coordinate.h>
 #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace pt;
-	using namespace geometry;
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,LineStopTableSync>::FACTORY_KEY("15.57.01 JourneyPattern stops");
@@ -119,7 +118,7 @@ namespace synthese
 				tokenizer::iterator valueIter = valueTokens.begin();
 
 				// X:Y
-				ls->addViaPoint (Point2D (Conversion::ToDouble (*valueIter), 
+				ls->addViaPoint(Coordinate(Conversion::ToDouble (*valueIter), 
 					Conversion::ToDouble (*(++valueIter))));
 			}
 
@@ -163,10 +162,10 @@ namespace synthese
 
 			stringstream viaPoints;
 			bool first(true);
-			BOOST_FOREACH(const geometry::Point2D* viaPoint, object->getViaPoints())
+			BOOST_FOREACH(const geos::geom::Coordinate* viaPoint, object->getViaPoints())
 			{
 				if(!first) viaPoints << ",";
-				viaPoints << viaPoint->getX() << ":" << viaPoint->getY();
+				viaPoints << viaPoint->x << ":" << viaPoint->y;
 				first = false;
 			}
 

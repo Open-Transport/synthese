@@ -28,7 +28,6 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
-#include "Projection.h"
 
 using namespace std;
 
@@ -38,7 +37,6 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace geography;
-	using namespace geometry;
 	
 	namespace util
 	{
@@ -75,8 +73,10 @@ namespace synthese
 			{
 				throw ActionException("No such physical stop");
 			}
-			_point.setLongitude(map.get<double>(PARAMETER_LONGITUDE));
-			_point.setLatitude(map.get<double>(PARAMETER_LATITUDE));
+			_point = GeoPoint(
+				map.get<double>(PARAMETER_LONGITUDE),
+				map.get<double>(PARAMETER_LATITUDE)
+			);
 		}
 		
 		
@@ -87,8 +87,7 @@ namespace synthese
 			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			
-			Point2D projected(LambertFromWGS84(_point));
-			_stop->setXY(projected.getX(), projected.getY());
+			*_stop = _point;
 
 			StopPointTableSync::Save(_stop.get());
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());

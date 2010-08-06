@@ -22,11 +22,12 @@
 
 #include "Rectangle.h"
 
-#include "06_geometry/Point2D.h"
+#include <geos/geom/Coordinate.h>
+
+using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geometry;
 	
 namespace map
 {
@@ -50,10 +51,10 @@ namespace map
     }
 
     bool
-    Rectangle::contains (const Point2D& p) const
+    Rectangle::contains (const Coordinate& p) const
     {
-	return (p.getX() >= _x) && (p.getX() < _x+_width) 
-	    && (p.getY() >= _y) && (p.getY() < _y+_height);
+	return (p.x >= _x) && (p.x < _x+_width) 
+	    && (p.y >= _y) && (p.y < _y+_height);
     }
 
 

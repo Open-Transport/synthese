@@ -22,9 +22,11 @@
 
 #include "IncludingPlace.h"
 
+#include <geos/geom/Envelope.h>
 #include <boost/foreach.hpp>
 
 using namespace std;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -79,15 +81,18 @@ namespace synthese
 			}
 		}
 
-		const geometry::Point2D& IncludingPlace::getPoint() const
+		const GeoPoint& IncludingPlace::getPoint() const
 		{
 			if (_isoBarycentreToUpdate)
 			{
-				_isoBarycentre.clear();
+				Envelope e;
 				BOOST_FOREACH(const Place* place, _includedPlaces)
 				{
-					_isoBarycentre.add(place->getPoint());
+					e.expandToInclude(place->getPoint());
 				}
+				Coordinate c;
+				e.centre(c);
+				_isoBarycentre = GeoPoint(c);
 				_isoBarycentreToUpdate = false;
 			}
 			return _isoBarycentre;

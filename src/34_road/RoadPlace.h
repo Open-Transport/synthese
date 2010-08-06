@@ -91,7 +91,7 @@ namespace synthese
 					const GraphTypes& whatToSearch
 				) const;
 
-				virtual const geometry::Point2D& getPoint() const;
+				virtual const geography::GeoPoint& getPoint() const;
 
 				virtual std::string getNameForAllPlacesMatcher(
 					std::string text = std::string()

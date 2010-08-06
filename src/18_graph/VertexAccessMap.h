@@ -23,13 +23,12 @@
 #ifndef SYNTHESE_ENV_VERTEXACCESSMAP_H
 #define SYNTHESE_ENV_VERTEXACCESSMAP_H
 
+#include "Journey.h"
+#include "GeoPoint.h"
+
 #include <vector>
 #include <map>
 #include <set>
-
-#include "Journey.h"
-
-#include "IsoBarycentre.h"
 
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
@@ -84,7 +83,7 @@ TRIDENT : VertexAccess => AccesPoint
 		    
 			mutable bool _isobarycentreToUpdate;
 		
-			mutable geometry::IsoBarycentre _isobarycentre;   //!< Isobarycenter of all points contained in this map.
+			mutable geography::GeoPoint _isobarycentre;   //!< Isobarycenter of all points contained in this map.
 		
 			boost::posix_time::time_duration _minApproachTime;
 
@@ -142,7 +141,7 @@ TRIDENT : VertexAccess => AccesPoint
 			void insert (const Vertex* vertex, const VertexAccess& vertexAccess);
 		    
 
-			const geometry::IsoBarycentre& getIsobarycenter () const;
+			const geography::GeoPoint& getIsobarycenter () const;
 		    
 			boost::posix_time::time_duration getMinApproachTime () const;
 

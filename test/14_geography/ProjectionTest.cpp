@@ -22,65 +22,58 @@
 
 #include <boost/test/auto_unit_test.hpp>
 
-#include "Projection.h"
-#include "Point2D.h"
+#include "GeoPoint.h"
+#include "GeographyModule.h"
+#include "CoordinatesSystem.hpp"
 
 using namespace synthese::geography;
-using namespace synthese::geometry;
-
+using namespace geos::geom;
+using namespace std;
 
 BOOST_AUTO_TEST_CASE (testFromLambertIIe)
 {
-    {
-		// Toulouse LambertIIe
-		Point2D p2d (527674.0, 1845128.0);
-		GeoPoint gp = WGS84FromLambert(p2d);
-		
-		BOOST_CHECK_CLOSE(43.60435799, gp.getLatitude(), 0.00001);
-		BOOST_CHECK_CLOSE(1.44199101, gp.getLongitude(), 0.00001);
-    }
-    {
-		// Brest
-		Point2D p2d (95151.0, 2398703.0);
-		GeoPoint gp = WGS84FromLambert(p2d);
+	GeographyModule::PreInit();
+	GeographyModule::ChangeInstanceCoordinatesSystem(string(), "EPSG:27572");
 
-		BOOST_CHECK_CLOSE(48.38984464, gp.getLatitude(), 0.00001);
-		BOOST_CHECK_CLOSE(-4.48683053, gp.getLongitude(), 0.00001);
-    }
-	{
-		// Strasbourg
-		Point2D p2d (999096.6, 2412064.0);
-		GeoPoint gp = WGS84FromLambert(p2d);
+	// Toulouse LambertIIe
+	GeoPoint gp1(
+		Coordinate(527674.0, 1845128.0),
+		CoordinatesSystem::GetCoordinatesSystem("EPSG:27572")
+	);
+	BOOST_CHECK_CLOSE(43.60435799, gp1.getLatitude(), 0.00001);
+	BOOST_CHECK_CLOSE(1.44199101, gp1.getLongitude(), 0.00001);
 
-		BOOST_CHECK_CLOSE(48.5836, gp.getLatitude(), 0.00001);
-		BOOST_CHECK_CLOSE(7.74806, gp.getLongitude(), 0.00001);
-	}
+	// Brest
+	GeoPoint gp2(
+		Coordinate(95151.0, 2398703.0),
+		CoordinatesSystem::GetCoordinatesSystem("EPSG:27572")
+	);
+	BOOST_CHECK_CLOSE(48.38984464, gp2.getLatitude(), 0.00001);
+	BOOST_CHECK_CLOSE(-4.48683053, gp2.getLongitude(), 0.00001);
+
+	// Strasbourg
+	GeoPoint gp3(
+		Coordinate(999096.6, 2412064.0),
+		CoordinatesSystem::GetCoordinatesSystem("EPSG:27572")
+	);
+	BOOST_CHECK_CLOSE(48.5836, gp3.getLatitude(), 0.00001);
+	BOOST_CHECK_CLOSE(7.74806, gp3.getLongitude(), 0.00001);
 }
 
 BOOST_AUTO_TEST_CASE (testToLambertIIe)
 {
-	{
-		// Toulouse LambertIIe
-		GeoPoint gp(43.60435799, 1.44199101, 0);
-		Point2D p2d(LambertFromWGS84(gp));
+	// Toulouse LambertIIe
+	GeoPoint gp1(1.44199101, 43.60435799);
+	BOOST_CHECK_CLOSE(527674.0, gp1.x, 1.0);
+	BOOST_CHECK_CLOSE(1845128.0, gp1.y, 1.0);
 
-		BOOST_CHECK_CLOSE(527674.0, p2d.getX(), 1.0);
-		BOOST_CHECK_CLOSE(1845128.0, p2d.getY(), 1.0);
-	}
-	{
-		// Brest LambertIIe
-		GeoPoint gp(48.38984464, -4.48683053, 0);
-		Point2D p2d(LambertFromWGS84(gp));
+	// Brest LambertIIe
+	GeoPoint gp2(-4.48683053, 48.38984464);
+	BOOST_CHECK_CLOSE(95151.0, gp2.x, 1.0);
+	BOOST_CHECK_CLOSE(2398703.0, gp2.y, 1.0);
 
-		BOOST_CHECK_CLOSE(95151.0, p2d.getX(), 1.0);
-		BOOST_CHECK_CLOSE(2398703.0, p2d.getY(), 1.0);
-	}
-	{
-		// Strasbourg
-		GeoPoint gp(48.5836, 7.74806, 0);
-		Point2D p2d(LambertFromWGS84(gp));
-
-		BOOST_CHECK_CLOSE(999096.6, p2d.getX(), 1.0);
-		BOOST_CHECK_CLOSE(2412064.0, p2d.getY(), 1.0);
-	}
+	// Strasbourg
+	GeoPoint gp3(7.74806, 48.5836);
+	BOOST_CHECK_CLOSE(999096.6, gp3.x, 1.0);
+	BOOST_CHECK_CLOSE(2412064.0, gp3.y, 1.0);
 }

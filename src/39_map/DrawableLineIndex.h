@@ -23,11 +23,17 @@
 #ifndef SYNTHESE_CARTO_DRAWABLELINEINDEX_H
 #define SYNTHESE_CARTO_DRAWABLELINEINDEX_H
 
-#include "06_geometry/Point2D.h"
-
 #include <map>
 #include <vector>
 #include <set>
+
+namespace geos
+{
+	namespace geom
+	{
+		class Coordinate;
+	}
+}
 
 namespace synthese
 {
@@ -52,7 +58,7 @@ private:
     double _scaleX;
     double _scaleY;
     
-    mutable std::vector<geometry::Point2D> _fuzzyPoints;
+    mutable std::vector<geos::geom::Coordinate> _fuzzyPoints;
 
 protected:
 
@@ -62,23 +68,23 @@ public:
     ~DrawableLineIndex();
 	
     const std::set<DrawableLine*>&
-	find (const geometry::Point2D& point) const;
+	find (const geos::geom::Coordinate& point) const;
     
 
 	void setScaleX (double scaleX);
 	void setScaleY (double scaleY);
 
-    void add (const geometry::Point2D& point, 
+    void add (const geos::geom::Coordinate& point, 
 	      DrawableLine* line) const;
 
-    geometry::Point2D getFuzzyPoint (const geometry::Point2D& point) const;
+    geos::geom::Coordinate getFuzzyPoint (const geos::geom::Coordinate& point) const;
 
 
 
 private:
 
     std::set<DrawableLine*>&
-	doFind (const geometry::Point2D& point) const;
+	doFind (const geos::geom::Coordinate& point) const;
 
 
 };

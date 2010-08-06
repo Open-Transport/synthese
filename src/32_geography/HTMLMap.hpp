@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_html_HTMLMap_hpp__
 #define SYNTHESE_html_HTMLMap_hpp__
 
-#include "Point2D.h"
+#include "GeoPoint.h"
 
 #include <vector>
 
@@ -51,7 +51,7 @@ namespace synthese
 		public:
 			struct Point
 			{
-				geometry::Point2D point;
+				GeoPoint point;
 				std::string icon;
 				std::string editionIcon;
 				std::string waitingIcon;
@@ -59,13 +59,13 @@ namespace synthese
 				std::string htmlPopup;
 				
 				Point(
-					geometry::Point2D _point,
+					const GeoPoint& _point,
 					const std::string& _icon,
 					const std::string& _editionIcon,
 					const std::string& _waitingIcon,
 					const std::string& _updateRequest,
 					const std::string& _htmlPopup
-				):	point(_point.getX(), _point.getY()),
+				):	point(_point),
 					icon(_icon),
 					editionIcon(_editionIcon),
 					waitingIcon(_waitingIcon),
@@ -109,7 +109,7 @@ namespace synthese
 			typedef std::vector<Control> Controls;
 
 		private:
-			const geometry::Point2D _center;
+			const GeoPoint _center;
 			const int _zoom;
 			const std::string _id;
 			Points _points;
@@ -126,7 +126,7 @@ namespace synthese
 			/// @param zoom zoom level of the map at opening
 			/// @param id id of the div in the DOM
 			HTMLMap(
-				const geometry::Point2D& center,
+				const GeoPoint& center,
 				int zoom,
 				bool editable,
 				bool addable,

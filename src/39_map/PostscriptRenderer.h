@@ -26,22 +26,24 @@
 #include "Renderer.h"
 #include "PostscriptCanvas.h"
 
-#include "01_util/RGBColor.h"
-#include "01_util/FactorableTemplate.h"
+#include "RGBColor.h"
+#include "FactorableTemplate.h"
 
 #include <iostream>
 #include <string>
 #include <vector>
 
 
+namespace geos
+{
+	namespace geom
+	{
+		class Coordinate;
+	}
+}
 
 namespace synthese
 {
-	namespace geometry
-	{
-		class Point2D;
-	}
-	
 
 namespace map
 {
@@ -71,13 +73,13 @@ namespace map
 
     void doDrawCurvedLine (PostscriptCanvas& _canvas,const DrawableLine* dbl);
 
-    void doDrawTriangleArrow (PostscriptCanvas& _canvas,const geometry::Point2D& point, 
+	void doDrawTriangleArrow (PostscriptCanvas& _canvas,const geos::geom::Coordinate& point, 
                               double angle);
     
-    void doDrawSquareStop (PostscriptCanvas& _canvas,const geometry::Point2D& point, 
+	void doDrawSquareStop (PostscriptCanvas& _canvas,const geos::geom::Coordinate& point, 
                            double angle);
     
-    void doDrawSquareTerminus (PostscriptCanvas& _canvas,const geometry::Point2D& point, 
+	void doDrawSquareTerminus (PostscriptCanvas& _canvas,const geos::geom::Coordinate& point, 
 			       double angle);
 
 };

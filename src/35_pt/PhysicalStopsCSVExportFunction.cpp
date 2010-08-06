@@ -36,13 +36,13 @@
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace geometry;
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<Function,pt::PhysicalStopsCSVExportFunction>::FACTORY_KEY("PhysicalStopsCSVExportFunction");
@@ -57,8 +57,8 @@ namespace synthese
 			if(_bbox)
 			{
 				stringstream s;
-				s << _bbox->first.getX() << "," << _bbox->first.getY() << "," <<
-					_bbox->second.getX() << "," << _bbox->second.getY();
+				s << _bbox->getMinX() << "," << _bbox->getMinY() << "," <<
+					_bbox->getMaxX() << "," << _bbox->getMaxY();
 				map.insert(PARAMETER_BBOX, s.str());
 			}
 			return map;
@@ -77,9 +77,11 @@ namespace synthese
 					throw RequestException("Malformed bbox.");
 				}
 
-				_bbox = make_pair(
-					Point2D(lexical_cast<double>(parsed_bbox[0]), lexical_cast<double>(parsed_bbox[1])),
-					Point2D(lexical_cast<double>(parsed_bbox[2]), lexical_cast<double>(parsed_bbox[3]))
+				_bbox = Envelope(
+					lexical_cast<double>(parsed_bbox[0]),
+					lexical_cast<double>(parsed_bbox[1]),
+					lexical_cast<double>(parsed_bbox[2]),
+					lexical_cast<double>(parsed_bbox[3])
 				);
 			}
 		}
@@ -97,19 +99,16 @@ namespace synthese
 				const StopPoint& ps(*itps.second);
 
 				if(	_bbox &&
-					(	ps.getX() < _bbox->first.getX() ||
-						ps.getY() < _bbox->first.getY() ||
-						ps.getX() > _bbox->second.getX() ||
-						ps.getY() > _bbox->second.getY()
-				)	){
+					!_bbox->contains(ps)
+				){
 					continue;
 				}
 
 				stream <<
 					ps.getKey() << ";" <<
 					ps.getCodeBySource() << ";" <<
-					ps.getX() << ";" <<
-					ps.getY() << ";" <<
+					ps.x << ";" <<
+					ps.y << ";" <<
 					"\"" << ps.getConnectionPlace()->getCity()->getName() << "\";" <<
 					"\"" << ps.getConnectionPlace()->getName() << "\";" <<
 					"\"" << ps.getName() << "\";" <<

@@ -42,8 +42,6 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace geometry;
-
 	namespace graph
 	{
 

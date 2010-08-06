@@ -25,7 +25,6 @@
 #include "RoadTableSync.h"
 #include "RoadPlaceTableSync.h"
 #include "CityTableSync.h"
-#include "FareTableSync.h"
 #include "RoadChunkTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"

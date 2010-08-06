@@ -21,15 +21,15 @@
 */
 
 #include "TileGrid.h"
-
 #include "Geometry.h"
-#include "06_geometry/Point2D.h"
 
 #include <cmath>
+#include <geos/geom/Coordinate.h>
+
+using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geometry;
 	
 
 namespace map
@@ -69,30 +69,30 @@ TileGrid::~TileGrid ()
 
 	
 void 
-TileGrid::markTilesForPoint (const Point2D& p)
+TileGrid::markTilesForPoint (const Coordinate& p)
 {
-    int tileX = (int) (p.getX () / _tileWidth);
-    int tileY = (int) (p.getY () / _tileHeight);
+    int tileX = (int) (p.x / _tileWidth);
+    int tileY = (int) (p.y / _tileHeight);
     _tiles[tileX][tileY] = true;
 }
 
 
 
 void 
-TileGrid::markTilesForLine (const Point2D& from, 
-			    const Point2D& to)
+TileGrid::markTilesForLine (const Coordinate& from, 
+			    const Coordinate& to)
 {
     markTilesForPoint (from);
     markTilesForPoint (to);
 
-    // Special case if from.getX () == to.getX ()
-    if (from.getX () == to.getX ())
+    // Special case if from.x == to.x
+    if (from.x == to.x)
     {
-	Point2D next (from);
+	Coordinate next (from);
 	while (1)
 	{
-	    next.setXY (next.getX(), next.getY () + _tileHeight);
-	    if (next.getY () > to.getY ()) break;
+	    next = Coordinate(next.x, next.y + _tileHeight);
+	    if (next.y > to.y) break;
 	    markTilesForPoint (next);
 	}
 	return;
@@ -103,8 +103,8 @@ TileGrid::markTilesForLine (const Point2D& from,
     double a = ab.first;
 
     // Walk through the intersections with vertical lines grid
-    int startTileX = (int) (from.getX () / _tileWidth + 1);
-    int endTileX = (int) (to.getX () / _tileWidth);
+    int startTileX = (int) (from.x / _tileWidth + 1);
+    int endTileX = (int) (to.x / _tileWidth);
     if (startTileX > endTileX)
     {
 	int tmp = startTileX;
@@ -114,16 +114,16 @@ TileGrid::markTilesForLine (const Point2D& from,
 
     for (int i=startTileX; i<=endTileX; ++i)
     {
-	Point2D p (i*_tileWidth, 
-		 from.getY () + a * ((i*_tileWidth) - from.getX ()));
+	Coordinate p (i*_tileWidth, 
+		 from.y + a * ((i*_tileWidth) - from.x));
 	markTilesForPoint (p);
     }
 
 
     a = 1 / a;
     // Walk through the intersections with horizontal lines grid
-    int startTileY = (int) (from.getY () / _tileHeight + 1);
-    int endTileY = (int) (to.getY () / _tileHeight);
+    int startTileY = (int) (from.y / _tileHeight + 1);
+    int endTileY = (int) (to.y / _tileHeight);
     if (startTileY > endTileY)
     {
 	int tmp = startTileY;
@@ -133,7 +133,7 @@ TileGrid::markTilesForLine (const Point2D& from,
 
     for (int i=startTileY; i<=endTileY; ++i)
     {
-	Point2D p (from.getX () + a * (i*_tileHeight - from.getY()), 
+	Coordinate p (from.x + a * (i*_tileHeight - from.y), 
 		 i*_tileHeight);
 	markTilesForPoint (p);
     }
@@ -142,8 +142,8 @@ TileGrid::markTilesForLine (const Point2D& from,
 
 
 void 
-TileGrid::markTilesForRectangle (const Point2D& from, 
-				 const Point2D& to, 
+TileGrid::markTilesForRectangle (const Coordinate& from, 
+				 const Coordinate& to, 
 				 bool filled)
 {
 
@@ -155,15 +155,5 @@ TileGrid::isMarked (int tileX, int tileY) const
 {
     return _tiles[tileX][tileY];
 }
-	
-
-
-
-
-
-
-
+	}
 }
-}
-
-

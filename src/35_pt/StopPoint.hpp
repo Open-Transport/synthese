@@ -69,7 +69,7 @@ namespace synthese
 
 			~StopPoint ();
 		    
-
+			using GeoPoint::operator=;
 		
 			//! @name Query methods
 			//@{

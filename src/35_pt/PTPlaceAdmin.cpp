@@ -68,7 +68,6 @@ namespace synthese
 	using namespace geography;
 	using namespace road;
 	using namespace html;
-	using namespace geometry;
 
 	namespace util
 	{
@@ -172,13 +171,13 @@ namespace synthese
 
 					StaticActionRequest<StopPointMoveAction> moveAction(request);
 
-					Point2D mapCenter(_connectionPlace->getPoint());
-					if(mapCenter.isUnknown()) // If the place does not contain any point, it has no coordinate : search the last created place with coordinates
+					GeoPoint mapCenter(_connectionPlace->getPoint());
+					if(mapCenter.isNull()) // If the place does not contain any point, it has no coordinate : search the last created place with coordinates
 					{
 						const Registry<StopArea>& registry(Env::GetOfficialEnv().getRegistry<StopArea>());
 						BOOST_REVERSE_FOREACH(Registry<StopArea>::value_type stopArea, registry)
 						{
-							if(!stopArea.second->getPoint().isUnknown())
+							if(!stopArea.second->getPoint().isNull())
 							{
 								mapCenter = stopArea.second->getPoint();
 								break;
@@ -254,6 +253,8 @@ namespace synthese
 				HTMLTable::ColsVector c;
 				c.push_back("Nom");
 				c.push_back("Code exploitant");
+				c.push_back("Lon");
+				c.push_back("Lat");
 				c.push_back("X");
 				c.push_back("Y");
 				c.push_back("Lignes");
@@ -268,8 +269,10 @@ namespace synthese
 					stream << t.row();
 					stream << t.col() << stop->getName();
 					stream << t.col() << stop->getCodeBySource();
-					stream << t.col() << stop->getX();
-					stream << t.col() << stop->getY();
+					stream << t.col() << stop->getLongitude();
+					stream << t.col() << stop->getLatitude();
+					stream << t.col() << stop->x;
+					stream << t.col() << stop->y;
 
 					// Lines cell
 					stream << t.col();
@@ -306,7 +309,9 @@ namespace synthese
 			// TAB ADDRESSES
 			if (openTabContent(stream, TAB_ADDRESSES))
 			{
-				HTMLTable::ColsVector c;
+/*				HTMLTable::ColsVector c;
+				c.push_back("Longitude");
+				c.push_back("Latitude");
 				c.push_back("X");
 				c.push_back("Y");
 				c.push_back("Rues");
@@ -315,12 +320,14 @@ namespace synthese
 				BOOST_FOREACH(const AddressablePlace::Addresses::value_type& address, _addressablePlace->getAddresses())
 				{
 					stream << t.row();
-					stream << t.col() << address->getX();
-					stream << t.col() << address->getY();
+					stream << t.col() << address->getLongitude();
+					stream << t.col() << address->getLatitude();
+					stream << t.col() << address->x;
+					stream << t.col() << address->y;
 					stream << t.col();
 				}
 				stream << t.close();
-			}
+*/			}
 
 			////////////////////////////////////////////////////////////////////
 			// TAB TRANSFER

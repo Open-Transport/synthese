@@ -24,9 +24,7 @@
 #define SYNTHESE_CARTO_GEOMETRY_H
 
 #include <vector>
-
-#include "06_geometry/Point2D.h"
-
+#include <geos/geom/Coordinate.h>
 
 namespace synthese
 {
@@ -39,34 +37,29 @@ namespace map
     /** Calculates the oriented angle formed by vectors -ba> and -bc>.
      * @return The angle in radians on [-PI..PI] domain.
      */
-    double calculateAngle (const geometry::Point2D& a, 
-			   const geometry::Point2D& b, 
-			   const geometry::Point2D& c);
+    double calculateAngle (const geos::geom::Coordinate& a, 
+			   const geos::geom::Coordinate& b, 
+			   const geos::geom::Coordinate& c);
 
 
     /** Calculates the euclidian distance between points a and b.
      * @return The calculated distance.
      */
-    double calculateDistance (const geometry::Point2D& a, 
-			      const geometry::Point2D& b);
+    double calculateDistance (const geos::geom::Coordinate& a, 
+			      const geos::geom::Coordinate& b);
 	
 
     /** Returns symetric of a regarding b
      */
-    geometry::Point2D calculateSymetric (const geometry::Point2D& a, 
-					    const geometry::Point2D& b);
+    geos::geom::Coordinate calculateSymetric (const geos::geom::Coordinate& a, 
+					    const geos::geom::Coordinate& b);
     
 	
     std::pair<double, double>
-	calculateAffineEquation (const geometry::Point2D& p0, 
-				 const geometry::Point2D& p1);
+	calculateAffineEquation (const geos::geom::Coordinate& p0, 
+				 const geos::geom::Coordinate& p1);
 	
 
-    /** Converts the given angle to degrees.
-     * @param angle The angle in radians.
-     * @return The angle in radians.
-     */
-    double toDegrees (double angle);
 	
 
     /** Calculates the intersection between two affines defined by 
@@ -79,7 +72,7 @@ namespace map
      * @param b2 
      * @return The intersection point.
      */
-    geometry::Point2D calculateIntersection (double a1, 
+    geos::geom::Coordinate calculateIntersection (double a1, 
 						double b1, 
 						double a2, 
 						double b2);
@@ -95,11 +88,11 @@ namespace map
      @param p3 
      @return The intersection point.
     */
-    geometry::Point2D calculateIntersection (
-	const geometry::Point2D& p0, 
-	const geometry::Point2D& p1, 
-	const geometry::Point2D& p2, 
-	const geometry::Point2D& p3);
+    geos::geom::Coordinate calculateIntersection (
+	const geos::geom::Coordinate& p0, 
+	const geos::geom::Coordinate& p1, 
+	const geos::geom::Coordinate& p2, 
+	const geos::geom::Coordinate& p3);
     
 
 

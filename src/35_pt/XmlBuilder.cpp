@@ -28,16 +28,15 @@
 #include "StopArea.hpp"
 #include "Conversion.h"
 #include "XmlToolkit.h"
-#include "Point2D.h"
 
 using namespace synthese::util::XmlToolkit;
 using namespace boost;
+using namespace geos::geom;
 
 
 namespace synthese
 {
 	using namespace geography;	
-	using namespace geometry;
 	using namespace util;
 	using namespace pt;
 	
@@ -208,16 +207,15 @@ namespace synthese
 
 
 
-		Point2D
-		XmlBuilder::CreatePoint (XMLNode& node)
-		{
+		Coordinate XmlBuilder::CreatePoint(
+			XMLNode& node
+		){
 			// assert ("point" == node.getName ());
 
-			double x (GetDoubleAttr (node, "x"));
-			double y (GetDoubleAttr (node, "y"));
-
-			return Point2D (x, y);
+			return Coordinate(
+				GetDoubleAttr (node, "x"),
+				GetDoubleAttr (node, "y")
+			);
 		}
-
 	}
 }

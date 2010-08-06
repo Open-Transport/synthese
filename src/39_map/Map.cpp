@@ -40,26 +40,21 @@
 #include <cmath>
 #include <limits>
 
-#include "Point2D.h"
-
 #include "StopPoint.hpp"
 
 #include "Log.h"
 #include "Conversion.h"
 #include "RGBColor.h"
 
-#undef min
-#undef max
+#include <geos/geom/Coordinate.h>
 
 using namespace std;
-
+using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geometry;
 	using namespace pt;
 	using namespace util;
-	using namespace pt;
 	
 	
 namespace map
@@ -139,15 +134,15 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 it != selectedLines.end ();
 	 ++it)
     {
-	const std::vector<const Point2D*>& points = (*it)->getPoints ();
-	for (std::vector<const Point2D*>::const_iterator itp = points.begin ();
+	const std::vector<const Coordinate*>& points = (*it)->getPoints ();
+	for (std::vector<const Coordinate*>::const_iterator itp = points.begin ();
 	     itp != points.end () ; ++itp)
 	{
-	    const Point2D* p = *itp;
-	    if (p->getX () < lowerLeftLatitude) lowerLeftLatitude = p->getX ();
-	    if (p->getY () < lowerLeftLongitude) lowerLeftLongitude = p->getY ();
-	    if (p->getX () > upperRightLatitude) upperRightLatitude = p->getX ();
-	    if (p->getY () > upperRightLongitude) upperRightLongitude = p->getY ();
+	    const Coordinate* p = *itp;
+	    if (p->x < lowerLeftLatitude) lowerLeftLatitude = p->x;
+	    if (p->y < lowerLeftLongitude) lowerLeftLongitude = p->y;
+	    if (p->x > upperRightLatitude) upperRightLatitude = p->x;
+	    if (p->y > upperRightLongitude) upperRightLongitude = p->y;
 	}
     }
 
@@ -204,8 +199,8 @@ Map::populateLineIndex (const DrawableLineIndex& lineIndex, const std::set<Drawa
     {
 		(*it)->fuzzyfyPoints (lineIndex);
 
-		const std::vector<Point2D>& points = (*it)->getFuzzyfiedPoints ();
-		for (std::vector<Point2D>::const_iterator itp = points.begin ();
+		const std::vector<Coordinate>& points = (*it)->getFuzzyfiedPoints ();
+		for (std::vector<Coordinate>::const_iterator itp = points.begin ();
 			itp != points.end () ; ++itp)
 		{
 			lineIndex.add (*itp, *it);
@@ -240,24 +235,23 @@ Map::~Map()
 }
 
 
-Point2D 
-Map::toRealFrame (const Point2D& p)
+Coordinate 
+Map::toRealFrame (const Coordinate& p)
 {
-    return Point2D (
-        (p.getX () * _realFrame.getWidth()) / _width + _realFrame.getX(),
-        (p.getY () * _realFrame.getHeight()) / _height + _realFrame.getY());
+    return Coordinate (
+        (p.x * _realFrame.getWidth()) / _width + _realFrame.getX(),
+        (p.y * _realFrame.getHeight()) / _height + _realFrame.getY());
 }
 
 
 
-Point2D 
-Map::toOutputFrame (const Point2D& p)
+Coordinate 
+Map::toOutputFrame (const Coordinate& p)
 {
-    return Point2D (
-	((p.getX() - _realFrame.getX()) / _realFrame.getWidth ()) * _width ,
-	((p.getY() - _realFrame.getY()) / _realFrame.getHeight()) * _height );
+    return Coordinate (
+	((p.x - _realFrame.getX()) / _realFrame.getWidth ()) * _width ,
+	((p.y - _realFrame.getY()) / _realFrame.getHeight()) * _height );
 }
-
 
 
 
@@ -269,16 +263,12 @@ Map::getUrlPattern () const
 
 
 
-
-
-
-
 std::vector<DrawableLine*>
 Map::findLinesSharingPoint (const std::set<DrawableLine*>& drawableLines,
-			    const Point2D& point) const 
+			    const Coordinate& point) const 
 {
 	// std::cerr << "*** findLinesSharingPoint " << drawableLines.size () << " x="
-	// 	<< point.getX () << " y=" << point.getY () << std::endl;
+	// 	<< point.x << " y=" << point.y << std::endl;
 	if (drawableLines.size () == 0) {
 		int a = 0;
 	}
@@ -300,13 +290,13 @@ Map::findLinesSharingPoint (const std::set<DrawableLine*>& drawableLines,
 
 
 
-std::pair<Point2D, int>
+std::pair<Coordinate, int>
 Map::findMostSharedPoint (const DrawableLine* line, 
 			  const std::set<DrawableLine*>& exclusionList) const {
     int curPointIndex = -1;
     unsigned int cpt = 1;
 	
-    const std::vector<Point2D>& points = line->getFuzzyfiedPoints ();
+    const std::vector<Coordinate>& points = line->getFuzzyfiedPoints ();
     for (unsigned int i=0; i<points.size (); ++i) 
     {
 	// Create a copy 
@@ -324,10 +314,8 @@ Map::findMostSharedPoint (const DrawableLine* line,
 	    curPointIndex = i;
 	}
     }
-    return std::pair<Point2D, int> (points[curPointIndex], cpt);
+    return std::pair<Coordinate, int> (points[curPointIndex], cpt);
 }
-
-
 
 
 
@@ -335,7 +323,7 @@ DrawableLine*
 Map::findMostSharedLine (const std::set<DrawableLine*>& drawableLines, 
 			 const std::set<DrawableLine*>& exclusionList) const
 {
-    std::pair<const Point2D*, int> curPointCpt	(0, -1);
+    std::pair<const Coordinate*, int> curPointCpt	(0, -1);
 	
     DrawableLine* dbl;
 	
@@ -367,12 +355,8 @@ Map::findMostSharedLine (const std::set<DrawableLine*>& drawableLines,
 
 
 
-
-
-
-
 std::pair<const DrawableLine*, int>
-Map::findLeftMostLine (const Point2D& v, const DrawableLine* reference, const std::set<DrawableLine*>& lines) const
+Map::findLeftMostLine (const Coordinate& v, const DrawableLine* reference, const std::set<DrawableLine*>& lines) const
 {
     int leftMostShift = -10000;
     const DrawableLine* leftMostLine = 0;
@@ -402,11 +386,8 @@ Map::findLeftMostLine (const Point2D& v, const DrawableLine* reference, const st
 
 
 
-
-
-
 std::pair<const DrawableLine*, int>
-Map::findRightMostLine (const Point2D& v, const DrawableLine* reference, const std::set<DrawableLine*>& lines) const
+Map::findRightMostLine (const Coordinate& v, const DrawableLine* reference, const std::set<DrawableLine*>& lines) const
 {
     int rightMostShift = +10000;
     const DrawableLine* rightMostLine = 0;
@@ -438,7 +419,7 @@ Map::findRightMostLine (const Point2D& v, const DrawableLine* reference, const s
 
 void 
 Map::assignShiftFactors (const DrawableLine* reference, 
-			 const Point2D& referencePoint, 
+			 const Coordinate& referencePoint, 
 			 DrawableLine* line, 
 			 const std::set<DrawableLine*>& exclusionList)
 {
@@ -452,7 +433,7 @@ Map::assignShiftFactors (const DrawableLine* reference,
     for (unsigned int j=0; j<line->getFuzzyfiedPoints().size (); ++j) {
 	// cout << "Processing point " << j << endl;
 	
-	const Point2D& v = line->getFuzzyfiedPoints()[j];
+	const Coordinate& v = line->getFuzzyfiedPoints()[j];
 	
 	if (_lineGrouping)
 	{
@@ -562,7 +543,7 @@ void
 Map::preparePhysicalStops () 
 {
     std::set<const StopPoint*> iteratedStops;
-	std::vector<Point2D> fuzzyStopPoints;
+	std::vector<Coordinate> fuzzyStopPoints;
 
     // Create drawable physical stops (for each physical stop)
     for (std::set<DrawableLine*>::const_iterator it = _selectedLines.begin ();
@@ -571,15 +552,15 @@ Map::preparePhysicalStops ()
 	    const DrawableLine* dbl = *it;
         if (dbl->getWithPhysicalStops () == false) continue;
 
-	    const std::vector<const Point2D*>& points = dbl->getPoints ();
+	    const std::vector<const Coordinate*>& points = dbl->getPoints ();
 	    for (size_t i=0; i<points.size (); ++i)
 	    {
-	        const Point2D* p = points[i];
+	        const Coordinate* p = points[i];
 
-	        const StopPoint* physicalStop = dynamic_cast<const StopPoint*> (p);
+/*	        const StopPoint* physicalStop = dynamic_cast<const StopPoint*> (p);
 	        if (physicalStop)
 	        {
-				Point2D fuzzyPoint (_indexedLines.getFuzzyPoint (*p));
+				Coordinate fuzzyPoint (_indexedLines.getFuzzyPoint (*p));
                 if ( (iteratedStops.find (physicalStop) == iteratedStops.end ()) &&
 					 (find (fuzzyStopPoints.begin(), fuzzyStopPoints.end(), fuzzyPoint) == fuzzyStopPoints.end ()) )
                 {
@@ -597,7 +578,7 @@ Map::preparePhysicalStops ()
 
                 }
             }
-        }
+*/		}
     }
 }
 
@@ -624,13 +605,13 @@ Map::prepareLines ()
 		
 	// Get the most shared point of the most shared bus line
 	// TODO : check there cannot be an infinite loop going through this.
-	std::pair<Point2D, int> pointAndCpt = findMostSharedPoint (mostSharedLine);
+	std::pair<Coordinate, int> pointAndCpt = findMostSharedPoint (mostSharedLine);
 
 	// Check if the most shared bus line is sharing its most shared point
 	// with a line which is in the exclusion list. If yes, this line becomes
 	// the reference; otherwiese, the reference is the most shared line itself.
 	std::vector<DrawableLine*> lines = findLinesSharingPoint(exclusionList, pointAndCpt.first);
-	// cout << "lines.size ()=" << lines.size () << " point = " << pointAndCpt.first->getX () << ";" << pointAndCpt.first->getY ()<< endl;
+	// cout << "lines.size ()=" << lines.size () << " point = " << pointAndCpt.first->x << ";" << pointAndCpt.first->y<< endl;
 
 	const DrawableLine* reference = 
 	    findBestAvailableReference (mostSharedLine, lines); 
@@ -684,13 +665,11 @@ Map::prepareLines ()
 
 
 
-
 bool 
 Map::hasBackgroundManager () const
 {
     return _backgroundManager != 0;   
 }
-
 
 
 
@@ -725,11 +704,6 @@ Map::prepare ()
 	prepareLines ();
     preparePhysicalStops ();
 }
-
-
-
-
-
 
 
 
@@ -799,16 +773,5 @@ Map::getLineIndex () const
 {
 	return _indexedLines;
 }
-
-
-
-
-
-
-
-
 }
 }
-
-
-

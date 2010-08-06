@@ -31,11 +31,10 @@
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
+using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geometry;
-
 	namespace graph
 	{
 		const size_t Edge::INDICES_NUMBER(24);
@@ -63,7 +62,7 @@ namespace synthese
 		Edge::~Edge ()
 		{
 			// Delete via points
-			for (std::vector<const Point2D*>::iterator iter = _viaPoints.begin (); 
+			for (std::vector<const Coordinate*>::iterator iter = _viaPoints.begin (); 
 			iter != _viaPoints.end (); 
 			++iter)
 			{
@@ -90,9 +89,9 @@ namespace synthese
 
 
 		void 
-		Edge::addViaPoint (const Point2D& viaPoint)
+		Edge::addViaPoint (const Coordinate& viaPoint)
 		{
-			_viaPoints.push_back (new Point2D (viaPoint));
+			_viaPoints.push_back(new Coordinate(viaPoint));
 		}
 
 

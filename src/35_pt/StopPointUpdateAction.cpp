@@ -30,12 +30,14 @@
 #include "StopPointTableSync.hpp"
 
 using namespace std;
+using namespace geos::geom;
 
 namespace synthese
 {
 	using namespace server;
 	using namespace security;
 	using namespace util;
+	using namespace geography;
 	
 	namespace util
 	{
@@ -59,8 +61,11 @@ namespace synthese
 			{
 				map.insert(PARAMETER_STOP_ID, _stop->getKey());
 			}
-			map.insert(PARAMETER_X, _x);
-			map.insert(PARAMETER_Y, _y);
+			if(!_point.isNull())
+			{
+				map.insert(PARAMETER_X, _point.x);
+				map.insert(PARAMETER_Y, _point.y);
+			}
 			map.insert(PARAMETER_OPERATOR_CODE, _operatorCode);
 			map.insert(PARAMETER_NAME, _name);
 			return map;
@@ -79,8 +84,7 @@ namespace synthese
 				throw ActionException("No such physical stop");
 			}
 
-			_x = map.get<double>(PARAMETER_X);
-			_y = map.get<double>(PARAMETER_Y);
+			_point = GeoPoint(Coordinate(map.get<double>(PARAMETER_X), map.get<double>(PARAMETER_Y)));
 			_operatorCode = map.get<string>(PARAMETER_OPERATOR_CODE);
 			_name = map.get<string>(PARAMETER_NAME);
 		}
@@ -93,7 +97,7 @@ namespace synthese
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			_stop->setXY(_x, _y);
+			*_stop = _point;
 			_stop->setCodeBySource(_operatorCode);
 			_stop->setName(_name);
 

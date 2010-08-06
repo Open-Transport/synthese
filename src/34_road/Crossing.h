@@ -96,7 +96,7 @@ namespace synthese
 				void setAddress(Address* address);
 				Address* getAddress() const;
 
-				virtual const geometry::Point2D& getPoint() const;
+				virtual const geography::GeoPoint& getPoint() const;
 
 			//@}
 

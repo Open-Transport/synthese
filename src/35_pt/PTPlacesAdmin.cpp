@@ -372,8 +372,8 @@ namespace synthese
 						stream << t.col() << place->getCity()->getName();
 					}
 					stream << t.col() << place->getName();
-					stream << t.col() << place->getPoint().getX();
-					stream << t.col() << place->getPoint().getY();
+					stream << t.col() << place->getPoint().x;
+					stream << t.col() << place->getPoint().y;
 
 					openRequest.getPage()->setConnectionPlace(const_pointer_cast<const StopArea>(place));
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPlaceAdmin::ICON);

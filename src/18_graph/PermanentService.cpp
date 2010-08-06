@@ -34,9 +34,8 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace util;
-	using namespace graph;
 
-	namespace pt
+	namespace graph
 	{
 
 		ServicePointer PermanentService::getFromPresenceTime(

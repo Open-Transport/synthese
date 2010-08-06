@@ -23,12 +23,16 @@
 #ifndef SYNTHESE_CARTO_RECTANGLE_H
 #define SYNTHESE_CARTO_RECTANGLE_H
 
+namespace geos
+{
+	namespace geom
+	{
+		class Coordinate;
+	}
+}
+
 namespace synthese
 {
-namespace geometry
-{
-    class Point2D;
-}
 
 
 namespace map
@@ -55,7 +59,7 @@ public:
 	double getWidth () const { return _width; }
 	double getHeight () const { return _height; }
 			
-	bool contains (const geometry::Point2D& p) const;
+	bool contains (const geos::geom::Coordinate& p) const;
 			
 	Rectangle& operator= (const Rectangle& rhs);
 	bool operator== (const Rectangle& rhs) const;

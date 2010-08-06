@@ -27,7 +27,6 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "Point2D.h"
 #include "GeoPoint.h"
 
 namespace synthese
@@ -74,7 +73,7 @@ namespace synthese
 			boost::shared_ptr<const StopArea> _place;
 			std::string _operatorCode;
 			std::string _name;
-			geometry::Point2D _point;
+			geography::GeoPoint _point;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

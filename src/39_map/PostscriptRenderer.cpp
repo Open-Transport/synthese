@@ -31,8 +31,6 @@
 #include "MapBackground.h"
 #include "MapBackgroundManager.h"
 
-#include "Point2D.h"
-
 #include "Log.h"
 #include "Conversion.h"
 #include "Registry.h"
@@ -41,12 +39,15 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <geos/geom/Coordinate.h>
+#include <geos/algorithm/Angle.h>
 
 using namespace std;
+using namespace geos::geom;
+using namespace geos::algorithm;
 
 namespace synthese
 {
-	using namespace geometry;
 	using namespace util;
 	using namespace map;
 	using namespace pt;
@@ -136,10 +137,10 @@ namespace synthese
 							Conversion::ToString (mbg->getScaleX ()) + " scaleY=" + 
 							Conversion::ToString (mbg->getScaleY ()));
 					// Draw background
-					std::pair<int,int>  tlIndexes = mbg->getIndexesOfTileContaining (realFrame.getX(), realFrame.getY ());
+					std::pair<int,int>  tlIndexes = mbg->getIndexesOfTileContaining (realFrame.getX(), realFrame.getY());
 					std::pair<int,int>  brIndexes = mbg->getIndexesOfTileContaining (
-				realFrame.getX () + realFrame.getWidth (), 
-				realFrame.getY () + realFrame.getHeight ());
+				realFrame.getX() + realFrame.getWidth (), 
+				realFrame.getY() + realFrame.getHeight ());
 		            
 				// TODO : additional checks in case indexes are negative/out of frame.
 
@@ -193,7 +194,7 @@ namespace synthese
 			for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
 				it != selectedLines.end () ; ++it) {
 			const DrawableLine* dbl = *it;
-//			const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
+//			const std::vector<Coordinate>& shiftedPoints = dbl->getShiftedPoints ();
 			
 			doDrawCurvedLine(_canvas, dbl);
 			}
@@ -202,7 +203,7 @@ namespace synthese
 			for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
 				it != selectedLines.end () ; ++it) {
 			const DrawableLine* dbl = *it;
-			const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
+			const std::vector<Coordinate>& shiftedPoints = dbl->getShiftedPoints ();
 			_canvas.setrgbcolor(dbl->getColor ());
 
 			doDrawCurvedLine(_canvas, dbl);
@@ -212,16 +213,16 @@ namespace synthese
 				it != selectedLines.end () ; ++it) {
 			const DrawableLine* dbl = *it;
 			if (dbl->getWithPhysicalStops() == false) continue;
-			const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
+			const std::vector<Coordinate>& shiftedPoints = dbl->getShiftedPoints ();
 			for (unsigned int i=1; i<shiftedPoints.size()-1; ++i) 
 			{
-				Point2D pt (shiftedPoints[i].getX() + 100.0, shiftedPoints[i].getY());
+				Coordinate pt (shiftedPoints[i].x + 100.0, shiftedPoints[i].y);
 				double angle = calculateAngle (pt, shiftedPoints[i], shiftedPoints[i+1]);
 
 				if (dbl->isStopPoint (i)) 
 				{
-				doDrawTriangleArrow(_canvas, shiftedPoints[i], toDegrees(angle - M_PI_2));
-				doDrawSquareStop(_canvas, shiftedPoints[i], toDegrees(angle - M_PI_2));
+					doDrawTriangleArrow(_canvas, shiftedPoints[i], Angle::toDegrees(angle - M_PI_2));
+					doDrawSquareStop(_canvas, shiftedPoints[i], Angle::toDegrees(angle - M_PI_2));
 				}
 			
 			}
@@ -232,67 +233,62 @@ namespace synthese
 			for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
 				it != selectedLines.end () ; ++it) {
 			const DrawableLine* dbl = *it;
-			const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
+			const std::vector<Coordinate>& shiftedPoints = dbl->getShiftedPoints ();
 
 			// Draw Terminuses
 			if (shiftedPoints.size () >= 2) {
 
-				Point2D pt (shiftedPoints[0].getX() + 100.0, 
-					shiftedPoints[0].getY());
+				Coordinate pt (shiftedPoints[0].x + 100.0, 
+					shiftedPoints[0].y);
 
 				double angle = calculateAngle (pt, 
 							shiftedPoints[0], 
 							shiftedPoints[1]);
 
 				doDrawSquareTerminus (_canvas, shiftedPoints[0], 
-						toDegrees(angle - M_PI_2));
+					Angle::toDegrees(angle - M_PI_2));
 		        
-				pt = Point2D (shiftedPoints[shiftedPoints.size ()-2].getX() + 100.0, 
-					shiftedPoints[shiftedPoints.size ()-2].getY());
+				pt = Coordinate (shiftedPoints[shiftedPoints.size ()-2].x + 100.0, 
+					shiftedPoints[shiftedPoints.size ()-2].y);
 
 				angle = calculateAngle (pt, 
 							shiftedPoints[shiftedPoints.size ()-2], 
 							shiftedPoints[shiftedPoints.size ()-1]);
 		     
 				doDrawSquareTerminus (_canvas, shiftedPoints[shiftedPoints.size ()-1], 
-						toDegrees(angle - M_PI_2));
+					Angle::toDegrees(angle - M_PI_2));
 			}
 
 
 			}    
-
-
-
 		}
-
-
 
 
 
 		void 
 		PostscriptRenderer::doDrawCurvedLine (PostscriptCanvas& _canvas,const DrawableLine* dbl)
 		{
-			const std::vector<Point2D>& shiftedPoints = dbl->getShiftedPoints ();
+			const std::vector<Coordinate>& shiftedPoints = dbl->getShiftedPoints ();
 			_canvas.newpath();
 		/*
-			_canvas.moveto(shiftedPoints[0].getX()+5, shiftedPoints[0].getY()+10);
+			_canvas.moveto(shiftedPoints[0].x+5, shiftedPoints[0].y+10);
 			_canvas.rotate (45.0);
 			_canvas.text (dbl->getShortName ());
 			_canvas.rotate (-45.0);
 		*/
-			_canvas.moveto(shiftedPoints[0].getX(), shiftedPoints[0].getY());
+			_canvas.moveto(shiftedPoints[0].x, shiftedPoints[0].y);
 		    
 			for (unsigned int i=1; i<shiftedPoints.size (); ++i) 
 			{
-			double x = shiftedPoints[i].getX();
-			double y = shiftedPoints[i].getY();
+			double x = shiftedPoints[i].x;
+			double y = shiftedPoints[i].y;
 			double radiusShift = 0.0;
 			
 			if (_config.getEnableCurves () && (i < shiftedPoints.size () - 1)) 
 			{
 				// Take care of intern/extern turn to invert radius
-				const Point2D& p_minus_1 = shiftedPoints[i-1];
-				const Point2D& p_plus_1 = shiftedPoints[i+1];
+				const Coordinate& p_minus_1 = shiftedPoints[i-1];
+				const Coordinate& p_plus_1 = shiftedPoints[i+1];
 			    
 				double angle = calculateAngle (p_minus_1, shiftedPoints[i], p_plus_1);
 				if (angle < 0) 
@@ -317,8 +313,8 @@ namespace synthese
 				}
 			    
 			    
-				_canvas.arct(x, y, shiftedPoints[i+1].getX(), 
-					shiftedPoints[i+1].getY(), radiusToUse);
+				_canvas.arct(x, y, shiftedPoints[i+1].x, 
+					shiftedPoints[i+1].y, radiusToUse);
 			    
 			} 
 			else 
@@ -334,20 +330,13 @@ namespace synthese
 
 
 
-
-
-
-
-
-
-
 		void 
-		PostscriptRenderer::doDrawTriangleArrow (PostscriptCanvas& _canvas,const Point2D& point, 
+		PostscriptRenderer::doDrawTriangleArrow (PostscriptCanvas& _canvas,const Coordinate& point, 
 							double angle)
 		{
 			_canvas.gsave ();
 			_canvas.setrgbcolor(0, 0, 0);
-			_canvas.moveto(point.getX(), point.getY ());
+			_canvas.moveto(point.x, point.y);
 			_canvas.rotate (angle);
 			_canvas.rmoveto (0.0, _config.getLineWidth () / 2.0 + 1);
 			_canvas.triangle(_config.getLineWidth ()-1);  // size of the base side
@@ -358,12 +347,12 @@ namespace synthese
 
 
 		void 
-		PostscriptRenderer::doDrawSquareStop (PostscriptCanvas& _canvas,const Point2D& point, 
+		PostscriptRenderer::doDrawSquareStop (PostscriptCanvas& _canvas,const Coordinate& point, 
 							double angle)
 		{
 			_canvas.gsave ();
 			_canvas.setrgbcolor(0, 0, 0);
-			_canvas.moveto(point.getX(), point.getY ());
+			_canvas.moveto(point.x, point.y);
 			_canvas.rotate (angle);
 			_canvas.square(_config.getLineWidth ()-1);  // size of the base side
 			_canvas.fill ();
@@ -377,12 +366,12 @@ namespace synthese
 
 
 		void 
-		PostscriptRenderer::doDrawSquareTerminus (PostscriptCanvas& _canvas,const Point2D& point, 
+		PostscriptRenderer::doDrawSquareTerminus (PostscriptCanvas& _canvas,const Coordinate& point, 
 							double angle)
 		{
 			_canvas.gsave ();
 			_canvas.setrgbcolor(0, 0, 0);
-			_canvas.moveto(point.getX(), point.getY ());
+			_canvas.moveto(point.x, point.y);
 			_canvas.rotate (angle);
 			_canvas.square(_config.getLineWidth ()*2);  // size of the base side
 			_canvas.fill ();
@@ -400,14 +389,14 @@ namespace synthese
 
 			// Draw
 			for (std::set<DrawablePhysicalStop*>::const_iterator it = 
-				map.getSelectedPhysicalStops ().begin ();
+				map.getSelectedPhysicalStops().begin ();
 				it != map.getSelectedPhysicalStops ().end () ; ++it) 
 			{
 				const DrawablePhysicalStop* dps = *it;
 			
-			Point2D cp = dps->getPoint ();
-			_canvas.moveto (cp.getX (), cp.getY ());
-			_canvas.sticker (dps->getName (), synthese::util::RGBColor ("yellow"), 10, 10);
+			Coordinate cp = dps->getPoint ();
+			_canvas.moveto (cp.x, cp.y);
+			_canvas.sticker (dps->getName (), util::RGBColor ("yellow"), 10, 10);
 			}
 
 		}

@@ -26,6 +26,7 @@
 #include "Exception.h"
 #include "RoadModule.h"
 
+#include <geos/geom/Envelope.h>
 #include <boost/foreach.hpp>
 #include <assert.h>
 
@@ -33,12 +34,13 @@ using namespace std;
 using namespace boost;
 using namespace boost::date_time;
 using namespace boost::posix_time;
+using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geometry;
 	using namespace util;
 	using namespace graph;
+	using namespace geography;
 
 	namespace road
 	{
@@ -215,13 +217,18 @@ namespace synthese
 		}	}
 
 
-		const geometry::Point2D& AddressablePlace::getPoint() const
+		const GeoPoint& AddressablePlace::getPoint() const
 		{
 			if (_isoBarycentreToUpdate)
 			{
-				_isoBarycentre.clear();
-				for (Addresses::const_iterator it(_addresses.begin()); it != _addresses.end(); ++it)
-					_isoBarycentre.add(**it);
+				Envelope e;
+				BOOST_FOREACH(const Addresses::value_type& place, _addresses)
+				{
+					e.expandToInclude(*place);
+				}
+				Coordinate c;
+				e.centre(c);
+				_isoBarycentre = GeoPoint(c);
 				_isoBarycentreToUpdate = false;
 			}
 			return _isoBarycentre;

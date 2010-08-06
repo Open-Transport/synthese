@@ -30,11 +30,10 @@
 #include "Map.h"
 #include "PostscriptCanvas.h"
 
-using synthese::pt::StopPoint;
+using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geometry;
 	using namespace pt;
 	
 	namespace map
@@ -68,7 +67,7 @@ namespace synthese
 		}
 		
 		
-		const Point2D& 
+		const Coordinate& 
 		DrawablePhysicalStop::getPoint () const
 		{
 			return _point;
@@ -81,11 +80,5 @@ namespace synthese
 		{
 			_point = map.toOutputFrame (_point);
 		}
-		
-		
-		
-		
-		
 	}
 }
-

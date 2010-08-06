@@ -22,23 +22,20 @@
 
 #include "Geometry.h"
 
-#include <cmath>
-
+using namespace geos::geom;
 using namespace std;
 
 namespace synthese
 {
-	using namespace geometry;
-	
 namespace map
 {
 
 
 double 
-calculateAngle (const Point2D& a, const Point2D& b, const Point2D& c)
+calculateAngle (const Coordinate& a, const Coordinate& b, const Coordinate& c)
 {
-    double angle = atan2 (c.getY()-b.getY(), c.getX()-b.getX()) - 
-	atan2 (a.getY()-b.getY(), a.getX()-b.getX());
+    double angle = atan2 (c.y-b.y, c.x-b.x) - 
+	atan2 (a.y-b.y, a.x-b.x);
 
     if (angle > M_PI) angle = angle - 2*M_PI;
     if (angle < -M_PI) angle = angle + 2*M_PI;
@@ -49,34 +46,26 @@ calculateAngle (const Point2D& a, const Point2D& b, const Point2D& c)
 
 
 double 
-calculateDistance (const Point2D& a, const Point2D& b) 
+calculateDistance (const Coordinate& a, const Coordinate& b) 
 {
-    return sqrt((b.getX()-a.getX())*(b.getX()-a.getX()) + 
-		(b.getY()-a.getY())*(b.getY()-a.getY()));
+    return sqrt((b.x-a.x)*(b.x-a.x) + 
+		(b.y-a.y)*(b.y-a.y));
 }
 
 
 
-double 
-toDegrees (double angle)
+Coordinate  
+calculateSymetric (const Coordinate& a, const Coordinate& b)
 {
-    return 180.0 * angle / M_PI;
-}
-
-
-
-Point2D  
-calculateSymetric (const Point2D& a, const Point2D& b)
-{
-    double deltax = b.getX() - a.getX();
-    double deltay = b.getY() - a.getY();
-    return Point2D (b.getX() + deltax, b.getY() + deltay);
+    double deltax = b.x - a.x;
+    double deltay = b.y - a.y;
+    return Coordinate (b.x + deltax, b.x + deltay);
 } 
 
 
 
 
-Point2D 
+Coordinate 
 calculateIntersection (double a1, double b1, double a2, double b2)
 {
     // Intersection of :
@@ -85,7 +74,7 @@ calculateIntersection (double a1, double b1, double a2, double b2)
     
     if (a1 == a2) throw "No intersection";
     
-    return Point2D ( (b2 - b1) / (a1 -a2),
+    return Coordinate ( (b2 - b1) / (a1 -a2),
 		     (b2*a1 - a2*b1) / (a1 - a2) );
 }
 
@@ -93,14 +82,14 @@ calculateIntersection (double a1, double b1, double a2, double b2)
 
 
 std::pair<double, double>
-calculateAffineEquation (const Point2D& p0, const Point2D& p1) {
+calculateAffineEquation (const Coordinate& p0, const Coordinate& p1) {
     // Given 2 points return a and b so that y = a.x + b
     // goes through p0 and p1
-    double u0 = p1.getX() - p0.getX ();
-    double v0 = p1.getY() - p0.getY ();
+    double u0 = p1.x - p0.x;
+    double v0 = p1.y - p0.y;
 
     double a = v0 / u0;
-    double b = p0.getY () - a * p0.getX ();
+    double b = p0.y - a * p0.x;
 	
     return std::pair<double, double> (a,b);	
 }
@@ -109,38 +98,23 @@ calculateAffineEquation (const Point2D& p0, const Point2D& p1) {
 
 
 
-Point2D 
-calculateIntersection (const Point2D& p0, const Point2D& p1, 
-		       const Point2D& p2, const Point2D& p3)
+Coordinate 
+calculateIntersection (const Coordinate& p0, const Coordinate& p1, 
+		       const Coordinate& p2, const Coordinate& p3)
 {
-    double u0 = p1.getX() - p0.getX ();
-    double v0 = p1.getY() - p0.getY ();
+    double u0 = p1.x - p0.x;
+    double v0 = p1.y - p0.y;
     
-    double u1 = p3.getX() - p2.getX ();
-    double v1 = p3.getY() - p2.getY ();
+    double u1 = p3.x - p2.x;
+    double v1 = p3.y - p2.y;
     
     double a1 = v0 / u0;
-    double b1 = p0.getY () - a1 * p0.getX ();
+    double b1 = p0.y - a1 * p0.x;
     
     double a2 = v1 / u1;
-    double b2 = p2.getY () - a2 * p2.getX ();
+    double b2 = p2.y - a2 * p2.x;
     
     return calculateIntersection (a1, b1, a2, b2);
 }
-
-
-
-
-
-
 }
 }
-
-
-
-
-
-
-
-
-

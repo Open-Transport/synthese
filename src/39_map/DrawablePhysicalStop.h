@@ -23,12 +23,10 @@
 #ifndef SYNTHESE_CARTO_DRAWABLEPHYSICALSTOP_H
 #define SYNTHESE_CARTO_DRAWABLEPHYSICALSTOP_H
 
-#include <string>
-
 #include "Drawable.h"
 
-#include "06_geometry/Point2D.h"
-
+#include <string>
+#include <geos/geom/Coordinate.h>
 
 namespace synthese
 {
@@ -58,7 +56,7 @@ private:
 
     const int _physicalStopId;
     const std::string _name;
-    geometry::Point2D _point;
+	geos::geom::Coordinate _point;
 
 protected:
 
@@ -71,7 +69,7 @@ public:
     //@{
     int getPhysicalStopId () const;
     const std::string& getName () const;
-    const geometry::Point2D& getPoint () const;
+	const geos::geom::Coordinate& getPoint () const;
 
     //@}
 

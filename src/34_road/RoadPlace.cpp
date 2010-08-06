@@ -32,8 +32,11 @@
 #include "AllowedUseRule.h"
 #include "GraphConstants.h"
 
+#include <geos/geom/Envelope.h>
+
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -102,19 +105,21 @@ namespace synthese
 
 
 
-		const geometry::Point2D& RoadPlace::getPoint() const
+		const GeoPoint& RoadPlace::getPoint() const
 		{
 			if (_isoBarycentreToUpdate)
 			{
-				_isoBarycentre.clear();
-
+				Envelope e;
 				BOOST_FOREACH(const Path* road, _paths)
 				{
 					BOOST_FOREACH(const Edge* edge, road->getEdges())
 					{
-						_isoBarycentre.add(*edge->getFromVertex());
+						e.expandToInclude(*edge->getFromVertex());
 					}
 				}
+				Coordinate c;
+				e.centre(c);
+				_isoBarycentre = GeoPoint(c);
 				_isoBarycentreToUpdate = false;
 			}
 			return _isoBarycentre;

@@ -25,16 +25,16 @@
 #include "Map.h"
 #include "PostscriptCanvas.h"
 
-#include "06_geometry/Point2D.h"
-
+#include <geos/geom/Coordinate.h>
 #include <iostream>
 #include <fstream>
 
 using namespace std;
+using namespace geos::geom;
+
 
 namespace synthese
 {
-	using namespace geometry;
 	
 namespace map
 {
@@ -104,15 +104,16 @@ MapBackgroundTile::postDraw (Map& map, PostscriptCanvas& canvas) const
 void
 MapBackgroundTile::draw (Map& map, PostscriptCanvas& canvas) const
 {
-    Point2D tl = map.toOutputFrame (Point2D (_topLeftX, _topLeftY));
-    Point2D br = map.toOutputFrame (Point2D (_bottomRightX, _bottomRightY));
+
+    Coordinate tl = map.toOutputFrame (Coordinate (_topLeftX, _topLeftY));
+    Coordinate br = map.toOutputFrame (Coordinate (_bottomRightX, _bottomRightY));
     
-    double outputWidth = br.getX () - tl.getX ();
-    double outputHeight = tl.getY () - br.getY ();
+    double outputWidth = br.x - tl.x;
+    double outputHeight = tl.y - br.y;
    
    
-    double translateX = tl.getX ();
-    double translateY = br.getY () ; //map.getHeight () - tl.getY ();
+    double translateX = tl.x;
+    double translateY = br.y; //map.getHeight () - tl.getY ();
     
     ostream& os = canvas.getOutput ();
     

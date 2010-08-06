@@ -27,10 +27,9 @@
 
 #include "FactorableTemplate.h"
 #include "Function.h"
-#include "Point2D.h"
 
+#include <geos/geom/Envelope.h>
 #include <boost/optional.hpp>
-#include <utility>
 
 namespace synthese
 {
@@ -50,7 +49,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-			boost::optional<std::pair<geometry::Point2D, geometry::Point2D> > _bbox;
+				boost::optional<geos::geom::Envelope> _bbox;
 			//@}
 			
 			

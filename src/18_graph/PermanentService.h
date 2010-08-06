@@ -27,10 +27,10 @@
 
 namespace synthese
 {
-	namespace pt
+	namespace graph
 	{
 		/** PermanentService class.
-			@ingroup m35
+			@ingroup m18
 		*/
 		class PermanentService
 		:	public graph::Service

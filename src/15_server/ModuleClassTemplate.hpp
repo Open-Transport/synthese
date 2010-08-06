@@ -47,7 +47,8 @@ namespace synthese
 			virtual void init() const { Init(); }
 			virtual void end() const { End(); }
 			virtual const std::string& getName() const { return NAME; }
-			
+
+		public:
 			/** First step of initialization of the module.
 				This method is launched when the server starts.
 				Must be implemented for each instanciation.

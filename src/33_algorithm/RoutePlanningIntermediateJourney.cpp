@@ -79,7 +79,7 @@ namespace synthese
 			_distanceToEnd(
 				endIsReached ?
 				0 :
-				destinationVam.getIsobarycenter().getDistanceTo(GetEndEdge(journey._phase, serviceUse)->getHub()->getPoint())
+				destinationVam.getIsobarycenter().distance(GetEndEdge(journey._phase, serviceUse)->getHub()->getPoint())
 			),
 			_similarity(journey._similarity == false ? false : indeterminate)
 		{

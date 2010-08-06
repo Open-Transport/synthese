@@ -22,49 +22,137 @@
 
 
 #include "GeoPoint.h"
+#include "GeographyModule.h"
+#include "CoordinatesSystem.hpp"
 
-//#include <boost/math/complex/acos.hpp>
+#include <proj_api.h>
+#include <geos/algorithm/Angle.h>
 
-//using namespace boost::math;
+using namespace std;
+using namespace geos::algorithm;
+using namespace geos::geom;
 
 namespace synthese
 {
 	namespace geography
 	{
-		GeoPoint::GeoPoint (double latitude, double longitude, double ellipsoidHeight)
-			: _latitude (latitude)
-			, _longitude (longitude)
-			, _ellipsoidHeight (ellipsoidHeight)
+		const string GeoPoint::_WGS84_CODE("EPSG:4326");
+
+		GeoPoint::GeoPoint(
+			double longitude,
+			double latitude,
+			double ellipsoidHeight
+		):	_longitude (longitude),
+			_latitude (latitude),
+			_ellipsoidHeight(ellipsoidHeight),
+			_coordinatesSystem(GeographyModule::GetInstanceCoordinatesSystem()),
+			Coordinate(Angle::toRadians(longitude), Angle::toRadians(latitude))
 		{
+			// projection
+			pj_transform(
+				CoordinatesSystem::GetCoordinatesSystem(_WGS84_CODE).getProjObject(),
+				_coordinatesSystem.getProjObject(),
+				1, 1,
+				&x, &y, NULL
+			);
 		}
 
 
 
-/*		double GeoPoint::operator-( const GeoPoint& other ) const
+		GeoPoint::GeoPoint(
+			const GeoPoint& point,
+			const CoordinatesSystem& coordinatesSystem
+		):	Coordinate(Angle::toRadians(point._longitude), Angle::toRadians(point._latitude)),
+			_latitude(point._latitude),
+			_longitude(point._longitude),
+			_ellipsoidHeight(point._ellipsoidHeight),
+			_coordinatesSystem(coordinatesSystem)
 		{
-			return
-				6366 *
-				acos(
-					cos(Deg2rad(getLatitude())) *
-					cos(Deg2rad(other.getLatitude())) *
-					cos(Deg2rad(other.getLongitude()) - Deg2rad(getLongitude())) +
-					sin(Deg2rad(getLatitude())) *
-					sin(Deg2rad(other.getLatitude()))
-				);
-		}
-*/
-
-		double GeoPoint::Deg2rad( double deg )
-		{
-			const float Pi = 3.141592654f;
-			return deg / 180 * Pi;
+			// projection
+			pj_transform(
+				CoordinatesSystem::GetCoordinatesSystem(_WGS84_CODE).getProjObject(),
+				_coordinatesSystem.getProjObject(),
+				1, 1,
+				&x, &y, NULL
+			);
 		}
 
-		double GeoPoint::Rad2deg(double rad)
+
+		GeoPoint::GeoPoint(
+			const geos::geom::Coordinate& coordinate,
+			const CoordinatesSystem& coordinatesSystem
+		):	_latitude(coordinate.y),
+			_longitude(coordinate.x),
+			_ellipsoidHeight(0),
+			_coordinatesSystem(GeographyModule::GetInstanceCoordinatesSystem())
 		{
-			const float Pi = 3.141592654f;
-			return rad / Pi * 180;
+			//transformation into wgs84
+			pj_transform(
+				coordinatesSystem.getProjObject(),
+				CoordinatesSystem::GetCoordinatesSystem(_WGS84_CODE).getProjObject(),
+				1, 1,
+				&_longitude, &_latitude, NULL
+			);
+			
+			//projection
+			x = _longitude;
+			y = _latitude;
+			pj_transform(
+				CoordinatesSystem::GetCoordinatesSystem(_WGS84_CODE).getProjObject(),
+				_coordinatesSystem.getProjObject(),
+				1, 1,
+				&x, &y, NULL
+			);
+
+			// Storage into degrees
+			_latitude = Angle::toDegrees(_latitude);
+			_longitude = Angle::toDegrees(_longitude);
 		}
+
+
+
+		GeoPoint::GeoPoint(
+			const geos::geom::Coordinate& coordinate
+		):	Coordinate(coordinate),
+			_longitude(coordinate.x),
+			_latitude(coordinate.y),
+			_ellipsoidHeight(0),
+			_coordinatesSystem(GeographyModule::GetInstanceCoordinatesSystem())
+		{
+			//transformation into wgs84
+			pj_transform(
+				_coordinatesSystem.getProjObject(),
+				CoordinatesSystem::GetCoordinatesSystem(_WGS84_CODE).getProjObject(),
+				1, 1,
+				&_longitude, &_latitude, NULL
+			);
+
+			// Storage into degrees
+			_latitude = Angle::toDegrees(_latitude);
+			_longitude = Angle::toDegrees(_longitude);
+		}
+
+
+
+		GeoPoint::GeoPoint():
+			_longitude(0),
+			_latitude(0),
+			_coordinatesSystem(GeographyModule::GetInstanceCoordinatesSystem())
+		{
+			setNull();
+		}
+
+
+
+		void GeoPoint::operator=( const GeoPoint& point )
+		{
+			_longitude = point._longitude;
+			_latitude = point._latitude;
+			x = point.x;
+			y = point.y;
+		}
+
+
 
 		bool
 		operator== ( const GeoPoint& op1, const GeoPoint& op2 )

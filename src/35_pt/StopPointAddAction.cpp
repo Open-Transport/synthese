@@ -30,9 +30,9 @@
 #include "StopPointTableSync.hpp"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
-#include "Projection.h"
 
 using namespace std;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -66,10 +66,10 @@ namespace synthese
 				map.insert(PARAMETER_PLACE_ID, _place->getKey());
 			}
 			map.insert(PARAMETER_OPERATOR_CODE, _operatorCode);
-			if(!_point.isUnknown())
+			if(!_point.isNull())
 			{
-				map.insert(PARAMETER_X, _point.getX());
-				map.insert(PARAMETER_Y, _point.getY());
+				map.insert(PARAMETER_X, _point.x);
+				map.insert(PARAMETER_Y, _point.y);
 			}
 			map.insert(PARAMETER_NAME, _name);
 			return map;
@@ -92,11 +92,13 @@ namespace synthese
 			_operatorCode = map.getDefault<string>(PARAMETER_OPERATOR_CODE);
 			if(map.getDefault<double>(PARAMETER_X, 0) && map.getDefault<double>(PARAMETER_Y, 0))
 			{
-				_point.setXY(map.get<double>(PARAMETER_X), map.get<double>(PARAMETER_Y));
+				_point = GeoPoint(
+					Coordinate(map.get<double>(PARAMETER_X), map.get<double>(PARAMETER_Y))
+				);
 			}
 			else if(map.getDefault<double>(PARAMETER_LONGITUDE, 0) && map.getDefault<double>(PARAMETER_LATITUDE, 0))
 			{
-				_point = LambertFromWGS84(GeoPoint(map.get<double>(PARAMETER_LATITUDE), map.get<double>(PARAMETER_LONGITUDE), 0));
+				_point = GeoPoint(map.get<double>(PARAMETER_LONGITUDE), map.get<double>(PARAMETER_LATITUDE));
 			}
 		}
 		
@@ -109,7 +111,7 @@ namespace synthese
 			object.setHub(_place.get());
 			object.setName(_name);
 			object.setCodeBySource(_operatorCode);
-			object.setXY(_point.getX(), _point.getY());
+			object = _point;
 
 			StopPointTableSync::Save(&object);
 

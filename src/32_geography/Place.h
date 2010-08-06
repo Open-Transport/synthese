@@ -31,15 +31,10 @@
 
 #include "Registrable.h"
 #include "GraphTypes.h"
-#include "IsoBarycentre.h"
+#include "GeoPoint.h"
 
 namespace synthese
 {
-	namespace geometry
-	{
-		class Point2D;
-	}
-
 	namespace graph
 	{
 		class AccessParameters;
@@ -62,7 +57,7 @@ namespace synthese
 
 		protected:
 			mutable bool _isoBarycentreToUpdate;
-			mutable geometry::IsoBarycentre _isoBarycentre;
+			mutable GeoPoint _isoBarycentre;
 
 		protected:
 
@@ -90,7 +85,7 @@ namespace synthese
 				...
 			) const;
 
-			virtual const geometry::Point2D& getPoint() const = 0;
+			virtual const GeoPoint& getPoint() const = 0;
 
 			virtual bool includes(const Place* place) const;
 			//@}

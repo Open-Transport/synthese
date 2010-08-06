@@ -38,7 +38,6 @@
 #include "SQLiteException.h"
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"
-#include "Point2D.h"
 #include "GraphConstants.h"
 #include "ReplaceQuery.h"
 #include "LoadException.h"

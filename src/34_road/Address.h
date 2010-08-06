@@ -40,8 +40,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Address.
 		/// @ingroup m34
-		/// @author Marc Jambert
-		/// @author Hugues Romain
+		/// @author Marc Jambert, Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
 		/// An address corresponds to a point on a side of a street.
 		/// @image html uml_address.png
@@ -70,6 +69,7 @@ namespace synthese
 
 			~Address();
 
+			using GeoPoint::operator=;
 
 			//! @name Getters
 			//@{

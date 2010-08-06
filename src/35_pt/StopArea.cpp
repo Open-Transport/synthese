@@ -31,9 +31,12 @@
 #include "Address.h"
 
 #include <boost/foreach.hpp>
+#include <geos/geom/Envelope.h>
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
+
 
 namespace synthese
 {
@@ -214,19 +217,22 @@ namespace synthese
 			}
 		}
 
-		const geometry::Point2D& StopArea::getPoint() const
+		const GeoPoint& StopArea::getPoint() const
 		{
 			if (_isoBarycentreToUpdate)
 			{
-				_isoBarycentre.clear();
+				Envelope e;
 				BOOST_FOREACH(const PhysicalStops::value_type& it, _physicalStops)
 				{
-					_isoBarycentre.add(*it.second);
+					e.expandToInclude(*it.second);
 				}
 				BOOST_FOREACH(const Address* address, _addresses)
 				{
-					_isoBarycentre.add(*address);
+					e.expandToInclude(*address);
 				}
+				Coordinate c;
+				e.centre(c);
+				_isoBarycentre = GeoPoint(c);
 				_isoBarycentreToUpdate = false;
 			}
 			return _isoBarycentre;

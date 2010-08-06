@@ -31,13 +31,16 @@
 #include <vector>
 #include <set>
 
+namespace geos
+{
+	namespace geom
+	{
+		class Coordinate;
+	}
+}
+
 namespace synthese
 {
-	namespace geometry
-	{
-		class Point2D;
-	}
-	
 	namespace graph
 	{
 		class Service;
@@ -124,7 +127,7 @@ namespace synthese
 					- vertices (address/physical stops)
 					- via points
 				*/
-				std::vector<const geometry::Point2D*> getPoints(
+				std::vector<const geos::geom::Coordinate*> getPoints(
 					int fromEdgeIndex = 0,
 					int toEdgeIndex = -1
 				) const;

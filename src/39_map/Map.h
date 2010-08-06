@@ -34,14 +34,16 @@
 #include <map>
 #include <vector>
 
-
+namespace geos
+{
+	namespace geom
+	{
+		class Coordinate;
+	}
+}
 
 namespace synthese
 {
-	namespace geometry
-	{
-		class Point2D;
-	}
 
 namespace map
 {
@@ -80,9 +82,9 @@ private:
     
     std::vector<DrawableLine*>
 	findLinesSharingPoint (const std::set<DrawableLine*>& drawableLines,
-			       const geometry::Point2D& point) const;
+			       const geos::geom::Coordinate& point) const;
     
-    std::pair<geometry::Point2D, int>
+    std::pair<geos::geom::Coordinate, int>
 	findMostSharedPoint (const DrawableLine* drawableLine, 
 			     const std::set<DrawableLine*>& exclusionList = 
 			     std::set<DrawableLine*> ()) const;
@@ -92,20 +94,20 @@ private:
     
     
     std::pair<const DrawableLine*, int>
-	findLeftMostLine (const geometry::Point2D& vertex, 
+	findLeftMostLine (const geos::geom::Coordinate& vertex, 
 			  const DrawableLine* reference, 
 			  const std::set<DrawableLine*>& lines) const;
     
 
     std::pair<const DrawableLine*, int>
-	findRightMostLine (const geometry::Point2D& vertex, 
+	findRightMostLine (const geos::geom::Coordinate& vertex, 
 			   const DrawableLine* reference, 
 			   const std::set<DrawableLine*>& lines) const;
     
     
     void 
 	assignShiftFactors (const DrawableLine* reference, 
-			    const geometry::Point2D& referencePoint, 
+			    const geos::geom::Coordinate& referencePoint, 
 			    DrawableLine* drawableLine, 
 			    const std::set<DrawableLine*>& exclusionList);
     
@@ -145,8 +147,8 @@ public:
     
     virtual ~Map();
     
-    geometry::Point2D toRealFrame (const geometry::Point2D& p);
-    geometry::Point2D toOutputFrame (const geometry::Point2D& p);
+    geos::geom::Coordinate toRealFrame (const geos::geom::Coordinate& p);
+    geos::geom::Coordinate toOutputFrame (const geos::geom::Coordinate& p);
 	
     //! @name Getters/Setters
     //@{

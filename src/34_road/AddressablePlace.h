@@ -148,7 +148,7 @@ namespace synthese
 
 				virtual graph::HubScore getScore() const;
 
-				virtual const geometry::Point2D& getPoint() const;
+				virtual const geography::GeoPoint& getPoint() const;
 
 				virtual bool containsAnyVertex(graph::GraphIdType graphType) const;
 			//@}

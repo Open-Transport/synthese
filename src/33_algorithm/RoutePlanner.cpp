@@ -47,7 +47,6 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace geography;
-	using namespace geometry;
 	using namespace util;
 	using namespace graph;
 	
@@ -78,7 +77,7 @@ namespace synthese
 			_whatToSearch(whatToSearch),
 			_graphToUse(graphToUse),
 			_logStream(logStream),
-			_totalDistance(destinationVam.getIsobarycenter().getDistanceTo(originVam.getIsobarycenter())),
+			_totalDistance(destinationVam.getIsobarycenter().distance(originVam.getIsobarycenter())),
 			_journeyTemplates(journeyTemplates)
 		{
 		}

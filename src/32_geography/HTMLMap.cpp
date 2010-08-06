@@ -22,8 +22,6 @@
 
 #include "HTMLMap.hpp"
 #include "HTMLModule.h"
-#include "Projection.h"
-#include "GeoPoint.h"
 
 #include <boost/foreach.hpp>
 #include <sstream>
@@ -32,18 +30,17 @@ using namespace std;
 
 namespace synthese
 {
-	using namespace geometry;
 	using namespace html;
 
 	namespace geography
 	{
 		HTMLMap::HTMLMap(
-			const geometry::Point2D& center,
+			const GeoPoint& center,
 			int zoom,
 			bool editable,
 			bool addable,
 			const std::string id /*= "map" */
-		):	_center(center.getX(), center.getY()),
+		):	_center(center),
 			_zoom(zoom),
 			_editable(editable),
 			_id(id)
@@ -83,11 +80,10 @@ namespace synthese
 
 			BOOST_FOREACH(const Point& point, _points)
 			{
-				GeoPoint geoPoint(WGS84FromLambert(point.point));
 				stream <<
 					"vectorLayer.addFeatures(" <<
 						"new OpenLayers.Feature.Vector(" <<
-							"new OpenLayers.Geometry.Point(" << geoPoint.getLongitude() << "," << geoPoint.getLatitude() << ").transform(" <<
+							"new OpenLayers.Geometry.Point(" << point.point.getLongitude() << "," << point.point.getLatitude() << ").transform(" <<
 								"new OpenLayers.Projection(\"EPSG:4326\")," << // transform from WGS 1984
 								"new OpenLayers.Projection(\"EPSG:900913\")" << // to Spherical Mercator Projection
 							"),{ graphic:\"" << HTMLModule::EscapeDoubleQuotes(point.icon) << "\"," <<
@@ -175,9 +171,8 @@ namespace synthese
 				;
 			}
 
-			GeoPoint center(WGS84FromLambert(_center));
 			stream <<
-				"map.setCenter(new OpenLayers.LonLat(" << center.getLongitude() << "," << center.getLatitude() << ")" <<
+				"map.setCenter(new OpenLayers.LonLat(" << _center.getLongitude() << "," << _center.getLatitude() << ")" <<
 				".transform(" <<
 					"new OpenLayers.Projection(\"EPSG:4326\"), new OpenLayers.Projection(\"EPSG:900913\")" << // WGS84 to Spherical Mercator Projection
 				")," << _zoom << // Zoom level

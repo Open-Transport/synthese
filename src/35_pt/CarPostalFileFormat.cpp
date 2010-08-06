@@ -56,7 +56,6 @@ namespace synthese
 	using namespace pt;
 	using namespace geography;
 	using namespace db;
-	using namespace geometry;
 	using namespace graph;
 	using namespace calendar;
 	

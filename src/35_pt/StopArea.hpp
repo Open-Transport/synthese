@@ -26,7 +26,6 @@
 #include "NamedPlaceTemplate.h"
 #include "AddressablePlace.h"
 #include "Registry.h"
-#include "IsoBarycentre.h"
 #include "Importable.h"
 
 #include <map>
@@ -48,10 +47,7 @@ namespace synthese
 	namespace pt
 	{
 		class StopPoint;
-	}
 
-	namespace pt
-	{	
 		//////////////////////////////////////////////////////////////////////////
 		/// Stop area.
 		///	@ingroup m35
@@ -123,7 +119,7 @@ namespace synthese
 		/// </table>
 		///
 		/// 3: Transfer between physical stops (between S1 to S4 points)
-		/// <table class="table"><th></th><th>S1</th>
+		/// <table class="table">
 		///	<tr><th></th><th>S1</th><th>S2</th><th>S3</th><th>S4</th></tr>
 		/// <tr><th>S1</th><td>2 min</td><td>4 min</td><td>5 min</td><td>6 min</td></tr>
 		/// <tr><th>S2</th><td>4 min</td><td>2 min</td><td>4 min</td><td>5 min</td></tr>
@@ -213,7 +209,7 @@ namespace synthese
 				*/
 				virtual graph::HubScore getScore() const;
 
-				virtual const geometry::Point2D& getPoint() const;
+				virtual const geography::GeoPoint& getPoint() const;
 
 				virtual bool isConnectionPossible() const;
 
