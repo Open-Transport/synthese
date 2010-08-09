@@ -49,6 +49,8 @@ namespace synthese
 		const string StopPointTableSync::COL_X = "x";
 		const string StopPointTableSync::COL_Y = "y";
 		const string StopPointTableSync::COL_OPERATOR_CODE("operator_code");
+		const string StopPointTableSync::COL_LONGITUDE("longitude");
+		const string StopPointTableSync::COL_LATITUDE("latitude");
 	}
 
     namespace db
@@ -65,6 +67,8 @@ namespace synthese
 			SQLiteTableSync::Field(StopPointTableSync::COL_X, SQL_DOUBLE),
 			SQLiteTableSync::Field(StopPointTableSync::COL_Y, SQL_DOUBLE),
 			SQLiteTableSync::Field(StopPointTableSync::COL_OPERATOR_CODE, SQL_TEXT),
+			SQLiteTableSync::Field(StopPointTableSync::COL_LONGITUDE, SQL_DOUBLE),
+			SQLiteTableSync::Field(StopPointTableSync::COL_LATITUDE, SQL_DOUBLE),
 			SQLiteTableSync::Field()
 		};
 
@@ -84,19 +88,25 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			object->setName(rows->getText ( StopPointTableSync::COL_NAME));
-			if(rows->getDouble(StopPointTableSync::COL_X) <= 0 || rows->getDouble(StopPointTableSync::COL_Y) <= 0)
+
+			// Position : Lon/lat prior to x/y
+			if(!rows->getText(StopPointTableSync::COL_LONGITUDE).empty() && !rows->getText(StopPointTableSync::COL_LATITUDE).empty())
 			{
-				object->setNull();
+				*object = GeoPoint(rows->getDouble(StopPointTableSync::COL_LONGITUDE), rows->getDouble(StopPointTableSync::COL_LATITUDE));
 			}
-			else
+			else if(rows->getDouble(StopPointTableSync::COL_X) > 0 && rows->getDouble(StopPointTableSync::COL_Y) > 0)
 			{
 				*object = GeoPoint(
 					Coordinate(
 					rows->getDouble(StopPointTableSync::COL_X),
 					rows->getDouble(StopPointTableSync::COL_Y)
-					), CoordinatesSystem::GetCoordinatesSystem("EPSG:27572")
-				);
+				)	);
 			}
+			else
+			{
+				object->setNull();
+			}
+
 			object->setCodeBySource(rows->getText ( StopPointTableSync::COL_OPERATOR_CODE));
 			object->setHub(NULL);
 
@@ -129,9 +139,11 @@ namespace synthese
 			ReplaceQuery<StopPointTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(dynamic_cast<const StopArea*>(object->getHub()) ? dynamic_cast<const StopArea*>(object->getHub())->getKey() : RegistryKeyType(0));
-			query.addField(object->x);
-			query.addField(object->y);
+			query.addField(object->isNull() ? 0 : object->x);
+			query.addField(object->isNull() ? 0 : object->y);
 			query.addField(object->getCodeBySource());
+			query.addField(object->isNull() ? string() : lexical_cast<string>(object->getLongitude()));
+			query.addField(object->isNull() ? string() : lexical_cast<string>(object->getLatitude()));
 			query.execute(transaction);
 		}
     }

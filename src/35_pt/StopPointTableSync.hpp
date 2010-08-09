@@ -42,6 +42,19 @@ namespace synthese
 				- on insert : 
 				- on update : 
 				- on delete : X
+
+			Corresponding class : StopPoint
+
+			<h2>Fields</h2>
+
+			<table class="table">
+			<tr><th>field</th><th>Description</th><th>Comments</th><th>Possible values</th><th>Corresponding attribute</th></tr>
+			<tr><th>id</th><td>Unique identifier</td><td>Primary key</td><td>Table #12 : 3377699720527872 to 3659174697238527</td><td>StopPoint::_key</td></tr>
+			<tr><th>name</th><td>Name of the stop point</td><td></td><td>String. Avoid " characters</td><td>StopPoint::_name</td></tr>
+			<tr><th>x, y</th><td>Coordinates in the default projection of the instance</td><td>If lon/lat are not null, x and y are ignored</td><td>Positive numbers</td><td>StopPoint::x, StopPoint::y</td></tr>
+			<tr><th>operator_code</th><td>Identifier of the stop in the source database</td><td>To be used when the stop is imported from an other system</td><td></td><td>StopPoint::_operator_code</td></tr>
+			<tr><th>longitude, latitude</th><td>Longitude and latitude in degrees</td><td>Can be null if x,y are defined. If lon/lat are not null, x and y are ignored</td><td>between -180 and 180</td><td>StopPoint::_logitude, StopPoint::_latitude</td></tr>
+			</table>
 		*/
 		class StopPointTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<StopPointTableSync,StopPoint>,
@@ -53,6 +66,8 @@ namespace synthese
 			static const std::string COL_X;
 			static const std::string COL_Y;
 			static const std::string COL_OPERATOR_CODE;
+			static const std::string COL_LONGITUDE;
+			static const std::string COL_LATITUDE;
 
 
 
