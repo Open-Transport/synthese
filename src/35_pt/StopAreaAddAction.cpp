@@ -111,7 +111,7 @@ namespace synthese
 
 			_name = map.get<string>(PARAMETER_NAME);
 			_physicalStopOperatorCode = map.getDefault<string>(PARAMETER_PHYSICAL_STOP_OPERATOR_CODE);
-			_createPhysicalStop = map.getDefault<bool>(PARAMETER_CREATE_PHYSICAL_STOP, true);
+			_createPhysicalStop = map.getDefault<bool>(PARAMETER_CREATE_PHYSICAL_STOP, false);
 			optional<double> x(map.getOptional<double>(PARAMETER_PHYSICAL_STOP_X));
 			optional<double> y(map.getOptional<double>(PARAMETER_PHYSICAL_STOP_Y));
 			if(x && y)

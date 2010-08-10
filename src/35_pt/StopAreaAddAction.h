@@ -98,7 +98,7 @@ namespace synthese
 		public:
 			StopAreaAddAction():
 				_createCityIfNecessary(false),
-				_createPhysicalStop(true)
+				_createPhysicalStop(false)
 			{}
 
 

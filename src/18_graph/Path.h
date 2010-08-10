@@ -185,6 +185,22 @@ namespace synthese
 
 
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Removes an edge from the path.
+				/// @param edge The edge to remove
+				/// @author Hugues Romain
+				/// @since 3.2.0
+				/// @date 2010
+				/// @pre no existing edge in the path must have the same rank than the rank of the
+				/// edge to add
+				//////////////////////////////////////////////////////////////////////////
+				/// The rank of the following edges of the path are not updated.
+				void removeEdge(
+					Edge& edge
+				);
+
+
+
 				/** Adds a service to a path.
 					@param service Service to add
 					@param ensureLineTheory

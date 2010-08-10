@@ -419,6 +419,84 @@ namespace synthese
 		}
 
 
+
+		void Path::removeEdge( Edge& edge )
+		{
+			// Empty path : just clear the path
+			if (_edges.size() == 1)
+			{
+				_edges.clear();
+				return;
+			}
+
+			// Non empty path : determinate the position of the edge
+			Edges::iterator removalPosition;
+			for(removalPosition = _edges.begin();
+				removalPosition != _edges.end() && *removalPosition != &edge;
+				++removalPosition) ;
+
+			// If edge was not found, nothing to do
+			if(removalPosition == _edges.end())
+			{
+				return;
+			}
+
+			// Next arrival and next in path of the previous
+			if(removalPosition != _edges.begin() && edge.isArrivalAllowed())
+			{
+				Edge* nextArrival(edge.getFollowingArrivalForFineSteppingOnly());
+				Edge* nextConnectingArrival(edge.getFollowingConnectionArrival());
+
+				for(Edges::iterator it(removalPosition-1); 
+					(*it)->getFollowingArrivalForFineSteppingOnly() == &edge;
+					--it
+				){
+					(*it)->setFollowingArrivalForFineSteppingOnly(nextArrival);
+					if (it == _edges.begin()) break;
+				}
+
+				if(edge.isConnectingEdge())
+				{
+					for(Edges::iterator it(removalPosition-1); 
+						(*it)->getFollowingConnectionArrival() == &edge;
+						--it
+					){
+						(*it)->setFollowingConnectionArrival(nextConnectingArrival);
+						if (it == _edges.begin()) break;
+					}
+				}
+			}
+		
+			// Previous departure
+			if(removalPosition != _edges.end() && edge.isDepartureAllowed())
+			{
+				Edge* previousDeparture(edge.getPreviousDepartureForFineSteppingOnly());
+				Edge* previousConnectingDeparture(edge.getPreviousConnectionDeparture());
+
+				for(Edges::iterator it(removalPosition + 1); 
+					it != _edges.end() && (*it)->getPreviousDepartureForFineSteppingOnly() == &edge;
+					++it
+				){
+					(*it)->setPreviousDepartureForFineSteppingOnly(previousDeparture);
+				}
+
+				if(edge.isConnectingEdge())
+				{
+					for(Edges::iterator it(removalPosition + 1); 
+						it != _edges.end() && (*it)->getPreviousConnectionDeparture() == &edge;
+						++it
+					){
+						(*it)->setPreviousConnectionDeparture(previousConnectingDeparture);
+					}
+				}
+			}
+
+			// Insertion of the new edges
+			_edges.erase(removalPosition);
+		}
+
+
+
 		bool cmpService::operator ()(const Service *s1, const Service *s2) const
 		{
 			return (s1->getDepartureSchedule (false,0) < s2->getDepartureSchedule (false,0))

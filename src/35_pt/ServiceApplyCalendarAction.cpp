@@ -115,8 +115,8 @@ namespace synthese
 				throw ActionException("Period must be at least one day long");
 			}
 
-			_startDate = date_from_iso_string(map.get<string>(PARAMETER_START_DATE));
-			_endDate = date_from_iso_string(map.get<string>(PARAMETER_END_DATE));
+			_startDate = from_string(map.get<string>(PARAMETER_START_DATE));
+			_endDate = from_string(map.get<string>(PARAMETER_END_DATE));
 
 			if(_startDate > _endDate)
 			{

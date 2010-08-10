@@ -255,7 +255,7 @@ namespace synthese
 			os << "<registration>" << "\n";
 			os << "<registrationNumber>" << Conversion::ToString (tn->getKey ()) << "</registrationNumber>" << "\n";
 			os << "</registration>" << "\n";
-			os << "<lineId>" << TridentId (peerid, "JourneyPattern", *_commercialLine) << "</lineId>" << "\n";
+			os << "<lineId>" << TridentId (peerid, "Line", *_commercialLine) << "</lineId>" << "\n";
 			os << "<comment/>" << "\n";
 			os << "</PTNetwork>" << "\n";
 
@@ -297,11 +297,18 @@ namespace synthese
 				if (!ps->getName().empty()) os << " (" + ps->getName () + ")";
 				os << "</name>" << "\n";
 
-				Vertex::Edges edges(ps->getDepartureEdges());
-				edges.insert(ps->getArrivalEdges().begin(), ps->getArrivalEdges().end());
-				BOOST_FOREACH(const Vertex::Edges::value_type& ls, edges)
+				set<const Edge*> edges;
+				BOOST_FOREACH(const Vertex::Edges::value_type& cEdge, ps->getDepartureEdges())
 				{
-					os << "<contains>" << TridentId (peerid, "StopPoint", *ls.second)  << "</contains>" << "\n";
+					edges.insert(cEdge.second);
+				}
+				BOOST_FOREACH(const Vertex::Edges::value_type& cEdge, ps->getArrivalEdges())
+				{
+					edges.insert(cEdge.second);
+				}
+				BOOST_FOREACH(const Edge* ls, edges)
+				{
+					os << "<contains>" << TridentId(peerid, "StopPoint", *ls)  << "</contains>" << "\n";
 				}
 
 				os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", *ps) << "</centroidOfArea>" << "\n";

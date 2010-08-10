@@ -147,11 +147,28 @@ namespace synthese
 			}
 		}
 
+
+
 		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Unlink(
 			LineStop* obj
 		){
-			/// @todo line remove edge
+			// Removing edge from journey pattern
+			JourneyPattern* journeyPattern(obj->getLine());
+			journeyPattern->removeEdge(*obj);
+
+			// Removing edge from stop point
+			StopPoint* stop(obj->getPhysicalStop());
+			if(obj->getIsArrival())
+			{
+				stop->removeArrivalEdge(obj);
+			}
+			if(obj->getIsDeparture())
+			{
+				stop->removeDepartureEdge(obj);
+			}
 		}
+
+
 
 		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Save(
 			LineStop* object,
