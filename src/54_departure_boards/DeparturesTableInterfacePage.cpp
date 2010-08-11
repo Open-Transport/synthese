@@ -35,7 +35,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<interfaces::InterfacePage, departure_boards::DeparturesTableInterfacePage>::FACTORY_KEY("departure_boards");
+		template<> const string FactorableTemplate<interfaces::InterfacePage, departure_boards::DeparturesTableInterfacePage>::FACTORY_KEY("departurestable");
 	}
 
 	namespace departure_boards

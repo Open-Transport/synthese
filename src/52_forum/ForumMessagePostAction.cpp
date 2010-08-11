@@ -78,11 +78,26 @@ namespace synthese
 				throw ActionException("No such topic");
 			}
 
-			_content = map.get<string>(PARAMETER_MESSAGE);
 			_userName = map.get<string>(PARAMETER_USER_NAME);
+			if(_userName.empty())
+			{
+				throw ActionException("Veuillez entrer votre nom");
+			}
+
 			// User e-mail
 			_userEMail = map.get<string>(PARAMETER_USER_EMAIL);
+			if(_userEMail.empty())
+			{
+				throw ActionException("Veuillez entrer votre e-mail");
+			}
 			/// @todo control @ and .xx presence
+
+			_content = map.get<string>(PARAMETER_MESSAGE);
+			if(_content.empty())
+			{
+				throw ActionException("Veuillez entrer un contenu de message");
+			}
+
 		}
 		
 		

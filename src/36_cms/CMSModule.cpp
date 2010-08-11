@@ -70,6 +70,17 @@ namespace synthese
 			const server::Request& request
 		){
 			{
+				shared_ptr<const WebPageDisplayFunction> function(
+					dynamic_pointer_cast<const WebPageDisplayFunction>(
+					request.getFunction()
+					)	);
+				if(function.get() && function->getPage())
+				{
+					return Fetcher<Website>::Fetch(function->getPage()->getRoot()->getKey(), Env::GetOfficialEnv());
+				}
+			}
+
+			{
 				shared_ptr<const FunctionWithSiteBase> function(
 						dynamic_pointer_cast<const FunctionWithSiteBase>(
 						request.getFunction()
@@ -77,17 +88,6 @@ namespace synthese
 				if(function.get())
 				{
 					return function->getSite();
-				}
-			}
-
-			{
-				shared_ptr<const WebPageDisplayFunction> function(
-						dynamic_pointer_cast<const WebPageDisplayFunction>(
-						request.getFunction()
-				)	);
-				if(function.get() && function->getPage())
-				{
-					return Fetcher<Website>::Fetch(function->getPage()->getRoot()->getKey(), Env::GetOfficialEnv());
 				}
 			}
 
