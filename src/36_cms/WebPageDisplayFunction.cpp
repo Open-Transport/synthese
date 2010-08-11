@@ -106,8 +106,6 @@ namespace synthese
 				}
 
 				_page = Env::GetOfficialEnv().getSPtr(getSite()->getPageBySmartURL(_smartURL));
-				WebPageDisplayFunction f;
-				f._aditionnalParameters = _aditionnalParameters;
 				if(!_page.get())
 				{ // Attempt to find a page with a parameter
 					vector<string> paths;
@@ -126,6 +124,7 @@ namespace synthese
 
 					_aditionnalParameters.insert(_page->getSmartURLDefaultParameterName(), paths[1]);
 				}
+				_aditionnalParameters.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
 
 			_useTemplate = map.getDefault<bool>(PARAMETER_USE_TEMPLATE, true);
