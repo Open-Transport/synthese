@@ -30,6 +30,11 @@
 
 namespace synthese
 {
+	namespace cms
+	{
+		class Webpage;
+	}
+
 	namespace pt_journey_planner
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -54,6 +59,7 @@ namespace synthese
 		///		</ul>
 		///		<li>value : default value</li>
 		///		<li>html : html code to add in the input field</li>
+		///		<li>date_display_template : cms page to use to display a date (used by date_list only)</li>
 		///	</ul>
 		class PTRoutePlannerInputFunction:
 			public util::FactorableTemplate<server::Function,PTRoutePlannerInputFunction>
@@ -62,6 +68,7 @@ namespace synthese
 			static const std::string PARAMETER_FIELD;
 			static const std::string PARAMETER_VALUE;
 			static const std::string PARAMETER_HTML;
+			static const std::string PARAMETER_DATE_DISPLAY_TEMPLATE;
 
 			static const std::string FIELD_ORIGIN_CITY;
 			static const std::string FIELD_DESTINATION_CITY;
@@ -76,6 +83,7 @@ namespace synthese
 				std::string _field;
 				std::string _value;
 				std::string _html;
+				boost::shared_ptr<const cms::Webpage> _dateDisplayTemplate;
 			//@}
 			
 			

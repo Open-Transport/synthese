@@ -48,6 +48,7 @@ namespace synthese
 		///		<li>name : name of the form</li>
 		///		<li>page_id : id of the page to display when the form is submitted</li>
 		///		<li>script : javascript function to run before submitting the form</li>
+		///		<li>idem : 0|1 : if true, the form will display the same page. In this case, the page_id parameter is ignored.</li>
 		///	</ul>
 		class WebPageFormFunction:
 			public util::FactorableTemplate<server::Function,WebPageFormFunction>
@@ -56,6 +57,7 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_SCRIPT;
+			static const std::string PARAMETER_IDEM;
 			
 		protected:
 			//! \name Page parameters
@@ -63,6 +65,7 @@ namespace synthese
 				std::string _name;
 				boost::shared_ptr<const Webpage> _page;
 				std::string _script;
+				bool _idem;
 			//@}
 			
 			
@@ -86,6 +89,9 @@ namespace synthese
 			
 			
 		public:
+			WebPageFormFunction():
+			  _idem(false){}
+
 			//! @name Setters
 			//@{
 			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }

@@ -32,7 +32,9 @@
 #include "CalendarTemplateAdmin.h"
 #include "CalendarTemplateTableSync.h"
 #include "CalendarTemplateAddAction.h"
+#include "CalendarTemplateRemoveAction.hpp"
 #include "CalendarRight.h"
+#include "CalendarTemplateElementTableSync.h"
 
 #include "Request.h"
 #include "AdminFunctionRequest.hpp"
@@ -99,6 +101,7 @@ namespace synthese
 			addCalendar.getFunction()->setActionFailedPage<CalendarTemplatesAdmin>();
 			addCalendar.setActionWillCreateObject();
 			
+			AdminActionFunctionRequest<CalendarTemplateRemoveAction,CalendarTemplatesAdmin> removeCalendar(_request);
 			
 			// Display
 			stream << "<h1>Calendriers</h1>";
@@ -110,7 +113,8 @@ namespace synthese
 			HTMLForm f(addCalendar.getHTMLForm("add"));
 			HTMLTable::ColsVector c;
 			c.push_back("Description");
-			c.push_back("Action");
+			c.push_back("Actions");
+			c.push_back("Actions");
 			HTMLTable t(c,ResultHTMLTable::CSS_CLASS);
 			stream << f.open() << t.open();
 
@@ -120,6 +124,7 @@ namespace synthese
 				calendars
 			){
 				editCalendar.getPage()->setCalendar(ct);
+				removeCalendar.getAction()->setCalendarTemplate(const_pointer_cast<const CalendarTemplate>(ct));
 
 				stream << t.row();
 				stream << t.col() << ct->getText();
@@ -132,6 +137,22 @@ namespace synthese
 						"calendar_edit.png"
 					)
 				;
+				stream << t.col();
+				CalendarTemplateElementTableSync::SearchResult result(
+					CalendarTemplateElementTableSync::Search(
+						_getEnv(), optional<RegistryKeyType>(), ct->getKey(), 0, 1
+				)	);
+				if(result.empty())
+				{
+					stream <<
+						HTMLModule::getLinkButton(
+							removeCalendar.getURL(),
+							"Supprimer",
+							"Etes-vous sûr de vouloir supprimer le calendrier "+ ct->getText() +" ?",
+							"calendar_delete.png"
+						)
+					;
+				}
 			}
 
 			stream << t.row();

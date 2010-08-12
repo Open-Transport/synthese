@@ -44,6 +44,8 @@
 #include "Profile.h"
 #include "CalendarTemplateElementTableSync.h"
 #include "CalendarTemplateTableSync.h"
+#include "CalendarTemplateCleanAction.hpp"
+#include "CalendarTemplateRemoveAction.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -152,12 +154,34 @@ namespace synthese
 				AdminActionFunctionRequest<CalendarTemplateElementAddAction,CalendarTemplateAdmin> addRequest(_request);
 				addRequest.getAction()->setCalendar(const_pointer_cast<CalendarTemplate>(_calendar));
 
+				AdminActionFunctionRequest<CalendarTemplateCleanAction,CalendarTemplateAdmin> cleanRequest(_request);
+				cleanRequest.getAction()->setCalendar(_calendar);
+
+				AdminActionFunctionRequest<CalendarTemplateRemoveAction,CalendarTemplatesAdmin> removeCalendar(_request);
+				removeCalendar.getAction()->setCalendarTemplate(_calendar);
+
 				AdminActionFunctionRequest<CalendarTemplateElementRemoveAction,CalendarTemplateAdmin> delRequest(_request);
 
 				AdminFunctionRequest<CalendarTemplateAdmin> searchRequest(_request);
 
 				AdminFunctionRequest<CalendarTemplateAdmin> goRequest(_request);
 				
+				stream <<
+					"<p>" <<
+					HTMLModule::getLinkButton(cleanRequest.getURL(), "Vider le calendrier", "Etes-vous sûr de vouloir vider le calendrier "+ _calendar->getText() +" ?")
+				;
+
+				CalendarTemplateElementTableSync::SearchResult result(
+					CalendarTemplateElementTableSync::Search(
+						_getEnv(), optional<RegistryKeyType>(), _calendar->getKey(), 0, 1
+				)	);
+				if(result.empty())
+				{
+					stream << " " <<
+					HTMLModule::getLinkButton(removeCalendar.getURL(), "Supprimer le calendrier", "Etes-vous sûr de vouloir supprimer le calendrier "+ _calendar->getText() +" ?", "calendar_delete.png");
+				}
+				stream << "</p>";
+
 				// Display
 				CalendarTemplateElementTableSync::SearchResult elements(
 					CalendarTemplateElementTableSync::Search(Env::GetOfficialEnv(), _calendar->getKey())

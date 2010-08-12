@@ -33,6 +33,8 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
+#include "SelectQuery.hpp"
+#include "ReplaceQuery.h"
 
 using namespace std;
 using namespace boost;
@@ -85,6 +87,8 @@ namespace synthese
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CalendarTemplateElementTableSync>::_INDEXES[]=
 		{
+			SQLiteTableSync::Index(CalendarTemplateElementTableSync::COL_CALENDAR_ID.c_str(), ""),
+			SQLiteTableSync::Index(CalendarTemplateElementTableSync::COL_INCLUDE_ID.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
 
@@ -155,23 +159,15 @@ namespace synthese
 			CalendarTemplateElement* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< object->getKey()
-				<< "," << (object->getCalendar() ? object->getCalendar()->getKey() : RegistryKeyType(0))
-				<< "," << object->getRank()
-				<< ",'" << (object->getMinDate().is_special() ? string() : to_iso_extended_string(object->getMinDate())) << "'"
-				<< ",'" << (object->getMaxDate().is_special() ? string() : to_iso_extended_string(object->getMaxDate())) << "'"
-				<< "," << (object->getInterval().days())
-				<< "," << static_cast<int>(object->getOperation())
-				<< "," << (object->getInclude() ? object->getInclude()->getKey() : RegistryKeyType(0))
-				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			ReplaceQuery<CalendarTemplateElementTableSync> query(*object);
+			query.addField(object->getCalendar() ? object->getCalendar()->getKey() : RegistryKeyType(0));
+			query.addField(object->getRank());
+			query.addField(object->getMinDate().is_special() ? string() : to_iso_extended_string(object->getMinDate()));
+			query.addField(object->getMaxDate().is_special() ? string() : to_iso_extended_string(object->getMaxDate()));
+			query.addField(object->getInterval().days());
+			query.addField(static_cast<int>(object->getOperation()));
+			query.addField(object->getInclude() ? object->getInclude()->getKey() : RegistryKeyType(0));
+			query.execute(transaction);
 		}
 
 
@@ -192,28 +188,32 @@ namespace synthese
 	{
 		CalendarTemplateElementTableSync::SearchResult CalendarTemplateElementTableSync::Search(
 			Env& env,
-			optional<RegistryKeyType> calendarId
-			, int first /*= 0*/
-			, boost::optional<std::size_t> number  /*= 0*/,
+			optional<RegistryKeyType> calendarId,
+			optional<RegistryKeyType> calendarIncludeId,
+			int first /*= 0*/,
+			boost::optional<std::size_t> number  /*= 0*/,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
-			if (calendarId)
-				query << " AND " << COL_CALENDAR_ID << "=" << *calendarId
-			;
-			query << " ORDER BY " << COL_RANK << " ASC";
+			SelectQuery<CalendarTemplateElementTableSync> query;
+			if(calendarId)
+			{
+				query.addWhereField(COL_CALENDAR_ID, *calendarId);
+			}
+			if(calendarIncludeId)
+			{
+				query.addWhereField(COL_INCLUDE_ID, *calendarIncludeId);
+			}
+			query.addOrderField(COL_RANK, true);
 			if (number)
 			{
-				query << " LIMIT " << (*number + 1);
-				if (first > 0)
-					query << " OFFSET " << first;
+				query.setNumber(*number + 1);
+			}
+			if (first > 0)
+			{
+				query.setFirst(first);
 			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 
 
@@ -263,6 +263,23 @@ namespace synthese
 			{
 				throw Exception(e.getMessage());
 			}
+		}
+
+
+
+		void CalendarTemplateElementTableSync::Clean( util::RegistryKeyType calendarId )
+		{
+			SQLite* sqlite = DBModule::GetSQLite();
+
+			stringstream query;
+
+			// Content
+			query
+				<< "DELETE FROM " << TABLE.NAME
+				<< " WHERE " << COL_CALENDAR_ID << "=" << calendarId
+			;
+
+			sqlite->execUpdate(query.str());
 		}
 	}
 }

@@ -61,20 +61,23 @@ namespace synthese
 			/** CalendarTemplateElement search.
 				@param env Environment to populate
 				@param calendarId ID of the calendar which the searched elements must belong
+				@param calendarIncludeId ID of the calendar that must be included by the returned elements
 				@param first First CalendarTemplateElement object to answer
 				@param number Number of CalendarTemplateElement objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@param linkLevel level of link of the objects in the environment
 				@return found objects
 				@author Hugues Romain
-				@date 2006
+				@date 2008-2010
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				boost::optional<util::RegistryKeyType> calendarId
-				, int first = 0
-				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				boost::optional<util::RegistryKeyType> calendarId,
+				boost::optional<util::RegistryKeyType> calendarIncludeId = boost::optional<util::RegistryKeyType>(),
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
+
 
 
 			static void Shift(
@@ -84,6 +87,10 @@ namespace synthese
 			);
 
 			static int GetMaxRank(util::RegistryKeyType calendarId);
+
+			static void Clean(
+				util::RegistryKeyType calendarId
+			);
 		};
 	}
 }

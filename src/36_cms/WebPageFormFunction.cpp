@@ -47,7 +47,8 @@ namespace synthese
 		const string WebPageFormFunction::PARAMETER_NAME("name");
 		const string WebPageFormFunction::PARAMETER_PAGE_ID("page_id");
 		const string WebPageFormFunction::PARAMETER_SCRIPT("script");
-		
+		const string WebPageFormFunction::PARAMETER_IDEM("idem");
+
 		ParametersMap WebPageFormFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -57,6 +58,7 @@ namespace synthese
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
+			map.insert(PARAMETER_IDEM, _idem);
 			return map;
 		}
 
@@ -66,13 +68,17 @@ namespace synthese
 		{
 			_name = map.get<string>(PARAMETER_NAME);
 			_script = map.getDefault<string>(PARAMETER_SCRIPT);
-			try
+			_idem = map.getDefault<bool>(PARAMETER_IDEM, false);
+			if(!_idem)
 			{
-				_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
-			}
-			catch (ObjectNotFoundException<Webpage>&)
-			{
-				throw RequestException("No such page");
+				try
+				{
+					_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
+				}
+				catch (ObjectNotFoundException<Webpage>&)
+				{
+					throw RequestException("No such page");
+				}
 			}
 		}
 
@@ -82,28 +88,37 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			
-			shared_ptr<const Function> fws(request.getFunction());
-			if(!fws.get())
-			{
-				return;
-			}
 
-			try
+			if(_idem)
 			{
-				StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
-				openRequest.getFunction()->setPage(_page);
-				if(!_page->getRoot()->getClientURL().empty())
-				{
-					openRequest.setClientURL(_page->getRoot()->getClientURL());
-				}
-
-				HTMLForm form(openRequest.getHTMLForm(_name));
+				HTMLForm form(request.getHTMLForm(_name));
 				stream << form.open(_script.empty() ? string() : ("onsubmit=\"return "+ _script +"\""));
 				stream << form.getHiddenFields();
 			}
-			catch(ObjectNotFoundException<Webpage>&)
+			else
 			{
+				shared_ptr<const Function> fws(request.getFunction());
+				if(!fws.get())
+				{
+					return;
+				}
+
+				try
+				{
+					StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
+					openRequest.getFunction()->setPage(_page);
+					if(!_page->getRoot()->getClientURL().empty())
+					{
+						openRequest.setClientURL(_page->getRoot()->getClientURL());
+					}
+
+					HTMLForm form(openRequest.getHTMLForm(_name));
+					stream << form.open(_script.empty() ? string() : ("onsubmit=\"return "+ _script +"\""));
+					stream << form.getHiddenFields();
+				}
+				catch(ObjectNotFoundException<Webpage>&)
+				{
+				}
 			}
 		}
 		

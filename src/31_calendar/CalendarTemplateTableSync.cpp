@@ -90,6 +90,7 @@ namespace synthese
  					CalendarTemplateElementTableSync::Search(
  						env,
  						object->getKey(),
+						optional<RegistryKeyType>(),
  						0, optional<size_t>(),
  						DOWN_LINKS_LOAD_LEVEL
  				)	);

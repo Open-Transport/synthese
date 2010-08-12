@@ -30,6 +30,8 @@
 #include "RoutePlannerFunction.h"
 #include "CMSModule.hpp"
 #include "WebPageDisplayFunction.h"
+#include "Webpage.h"
+#include "DateTimeInterfacePage.h"
 
 using namespace std;
 using namespace boost;
@@ -51,6 +53,7 @@ namespace synthese
 		const string PTRoutePlannerInputFunction::PARAMETER_FIELD("field");
 		const string PTRoutePlannerInputFunction::PARAMETER_VALUE("value");
 		const string PTRoutePlannerInputFunction::PARAMETER_HTML("html");
+		const string PTRoutePlannerInputFunction::PARAMETER_DATE_DISPLAY_TEMPLATE("date_display_template");
 
 		const string PTRoutePlannerInputFunction::FIELD_ORIGIN_CITY("origin_city");
 		const string PTRoutePlannerInputFunction::FIELD_DESTINATION_CITY("destination_city");
@@ -67,6 +70,10 @@ namespace synthese
 			map.insert(PARAMETER_FIELD, _field);
 			map.insert(PARAMETER_VALUE, _value);
 			map.insert(PARAMETER_HTML, _html);
+			if(_dateDisplayTemplate.get())
+			{
+				map.insert(PARAMETER_DATE_DISPLAY_TEMPLATE, _dateDisplayTemplate->getKey());
+			}
 			return map;
 		}
 
@@ -77,6 +84,17 @@ namespace synthese
 			_field = map.get<string>(PARAMETER_FIELD);
 			_value = map.getDefault<string>(PARAMETER_VALUE);
 			_html = map.getDefault<string>(PARAMETER_HTML);
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_DATE_DISPLAY_TEMPLATE));
+				if(id) try
+				{
+					_dateDisplayTemplate = Env::GetOfficialEnv().get<Webpage>(*id);
+				}
+				catch (ObjectNotFoundException<Webpage>&)
+				{
+					throw RequestException("No such date display template");
+				}
+			}
 		}
 
 
@@ -146,8 +164,14 @@ namespace synthese
 					if ( iDate == dateDefaut )
 						stream << "selected=\"selected\" ";
 					stream << "value=\"" << to_iso_extended_string(iDate) << "\">";
-					stream << to_simple_string(iDate);
-					//datePage->display(stream, variables, iDate, request);
+					if(_dateDisplayTemplate.get())
+					{
+						DateTimeInterfacePage::Display(stream, _dateDisplayTemplate, request, iDate);
+					}
+					else
+					{
+						stream << to_simple_string(iDate);
+					}
 					stream << "</option>";
 				}
 				stream << "</select>";
