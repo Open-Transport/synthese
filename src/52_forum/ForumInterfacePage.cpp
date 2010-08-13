@@ -137,7 +137,7 @@ namespace synthese
 			}
 
 			pm.insert(DATA_RANK, rank);
-			pm.insert(DATA_RANK_IS_ODD, rank % 1);
+			pm.insert(DATA_RANK_IS_ODD, rank % 2);
 
 			displayRequest.getFunction()->setAditionnalParametersMap(pm);
 			displayRequest.run(stream);
