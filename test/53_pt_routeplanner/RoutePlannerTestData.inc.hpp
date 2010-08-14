@@ -21,8 +21,8 @@
 */
 
 #include "City.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
-#include "PhysicalStop.h"
+#include "StopArea.hpp"
+#include "StopPoint.hpp"
 #include "Address.h"
 #include "Crossing.h"
 #include "TransportNetwork.h"
@@ -31,7 +31,7 @@
 #include "PTUseRule.h"
 #include "OnlineReservationRule.h"
 #include "ReservationContact.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "RollingStock.h"
 #include "LineStop.h"
 #include "ScheduledService.h"
@@ -44,6 +44,7 @@
 #include "ResaModule.h"
 #include "RuleUser.h"
 #include "NonConcurrencyRule.h"
+#include "GeographyModule.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>

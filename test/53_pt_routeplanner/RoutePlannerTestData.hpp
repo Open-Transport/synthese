@@ -26,13 +26,15 @@ using namespace boost::gregorian;
 using namespace synthese::resa;
 using namespace synthese::geography;
 using namespace synthese::road;
-using namespace synthese::geometry;
 using namespace synthese::util;
 using namespace synthese::graph;
 using namespace synthese::impex;
 using namespace synthese::pt;
 
-	
+using namespace geos::geom;
+
+GeographyModule::PreInit();
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Cities
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -46,14 +48,14 @@ City city38(1688849860530938,"City38");
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Place 93
-PublicTransportStopZoneConnectionPlace place93(1970324837184593,true,minutes(8));
+StopArea place93(1970324837184593,true,minutes(8));
 place93.setName("93");
 place93.setCity(&city54);
 place93.setAllowedConnection(true);
 city54.addIncludedPlace(&place93);
 place93.addTransferDelay(562949953421389,3377699720880573,minutes(0));
 
-PhysicalStop ps73(3377699720880573,"93/73", &place93,521000.0,1847000.0);
+StopPoint ps73(3377699720880573,"93/73", &place93,521000.0,1847000.0);
 ps73.setCodeBySource("CTP:StopArea:SPOCE87446179");
 place93.addPhysicalStop(ps73);
 
@@ -61,7 +63,7 @@ Address a89(562949953421389, &place93,521000.0,1845000.0);
 place93.addAddress(&a89);
 
 // Place 94
-PublicTransportStopZoneConnectionPlace place94(1970324837184594,false,minutes(8));
+StopArea place94(1970324837184594,false,minutes(8));
 place94.setName("94");
 place94.setCity(&city54);
 place94.setAllowedConnection(true);
@@ -72,10 +74,10 @@ place94.addTransferDelay(562949953421374,3377699720880574,minutes(0));
 place94.addTransferDelay(3377699720880575,562949953421374,minutes(0));
 place94.addTransferDelay(562949953421374,3377699720880575,minutes(0));
 
-PhysicalStop ps74(3377699720880574,"94/74", &place94,523000,1844000);
+StopPoint ps74(3377699720880574,"94/74", &place94,523000,1844000);
 place94.addPhysicalStop(ps74);
 
-PhysicalStop ps75(3377699720880575,"94/75", &place94,523000.0,1845000.0);
+StopPoint ps75(3377699720880575,"94/75", &place94,523000.0,1845000.0);
 ps75.setCodeBySource("CTP:StopArea:SPOCE87353573");
 place94.addPhysicalStop(ps75);
 
@@ -83,13 +85,13 @@ Address a74(562949953421374, &place94,523000.0,1844000.0);
 place94.addAddress(&a74);
 
 // Place 95
-PublicTransportStopZoneConnectionPlace place95(1970324837184595,false,minutes(8));
+StopArea place95(1970324837184595,false,minutes(8));
 place95.setName("95");
 place95.setCity(&city95);
 place95.setAllowedConnection(false);
 place95.addTransferDelay(562949953421397,377699720880576,minutes(0));
 
-PhysicalStop ps76(3377699720880576,"95/76", &place95,523266.0,1845339.0);
+StopPoint ps76(3377699720880576,"95/76", &place95,523266.0,1845339.0);
 ps76.setCodeBySource("CTP:StopArea:SPOCE87611939");
 place95.addPhysicalStop(ps76);
 
@@ -97,19 +99,19 @@ Address a97(562949953421397, &place95,523266.0,1845341.0);
 place95.addAddress(&a97);
 
 // Place 96
-PublicTransportStopZoneConnectionPlace place96(1970324837184596,false,minutes(8));
+StopArea place96(1970324837184596,false,minutes(8));
 place96.setName("96");
 place96.setCity(&city38);
 place96.setAllowedConnection(false);
 
-PhysicalStop ps77(3377699720880577,"96/77", &place96,524000.0,1849500.0);
+StopPoint ps77(3377699720880577,"96/77", &place96,524000.0,1849500.0);
 place96.addPhysicalStop(ps77);
 
-PhysicalStop ps78(3377699720880578,"96/78", &place96,524000.0,1849500.0);
+StopPoint ps78(3377699720880578,"96/78", &place96,524000.0,1849500.0);
 place96.addPhysicalStop(ps78);
 
 // Place 97
-PublicTransportStopZoneConnectionPlace place97(1970324837184597,true,minutes(8));
+StopArea place97(1970324837184597,true,minutes(8));
 place97.setName("97");
 place97.setCity(&city38);
 place97.setAllowedConnection(true);
@@ -119,11 +121,11 @@ place97.addTransferDelay(562949953421399,3377699720880579,minutes(0));
 place97.addTransferDelay(3377699720880580,562949953421396,minutes(0));
 place97.addTransferDelay(3377699720880579,562949953421399,minutes(0));
 
-PhysicalStop ps79(3377699720880579,"97/79", &place97,526000,1845000);
+StopPoint ps79(3377699720880579,"97/79", &place97,526000,1845000);
 ps79.setCodeBySource("CTP:StopArea:SPOCE87353599");
 place97.addPhysicalStop(ps79);
 
-PhysicalStop ps80(3377699720880580,"97/80", &place97,526000.0,1847000.0);
+StopPoint ps80(3377699720880580,"97/80", &place97,526000.0,1847000.0);
 place97.addPhysicalStop(ps80);
 
 Address a96(562949953421396, &place97,526000.0,1847000.0);
@@ -133,24 +135,24 @@ Address a99(562949953421399, &place97,526000.0,1845000.0);
 place97.addAddress(&a99);
 
 // Place 98
-PublicTransportStopZoneConnectionPlace place98(1970324837184598,false,minutes(8));
+StopArea place98(1970324837184598,false,minutes(8));
 place98.setName("98");
 place98.setCity(&city38);
 place98.setAllowedConnection(true);
 /*'562949953421391:3377699720880581:0,562949953421391:3377699720880582:0,3377699720880581:562949953421391:0,3377699720880582:562949953421391:0'*/
 
-PhysicalStop ps81(3377699720880581,"98/81", &place98,525000.0,1844000.0);
+StopPoint ps81(3377699720880581,"98/81", &place98,525000.0,1844000.0);
 ps81.setCodeBySource("CTP:StopArea:SPOCE87353581");
 place98.addPhysicalStop(ps81);
 
-PhysicalStop ps82(3377699720880582,"98/82", &place98,525000.0,1844000.0);
+StopPoint ps82(3377699720880582,"98/82", &place98,525000.0,1844000.0);
 place98.addPhysicalStop(ps82);
 
 Address a91(562949953421391, &place98,525000.0,1844000.0);
 place98.addAddress(&a91);
 
 // Place 99
-PublicTransportStopZoneConnectionPlace place99(1970324837184599,true,minutes(8));
+StopArea place99(1970324837184599,true,minutes(8));
 place99.setName("99");
 place99.setCity(&city38);
 // connection type 5
@@ -158,13 +160,13 @@ city38.addIncludedPlace(&place99);
 place99.addTransferDelay(3377699720880585,562949953421390,minutes(0));
 place99.addTransferDelay(562949953421390,3377699720880585,minutes(0));
 
-PhysicalStop ps83(3377699720880583,"99/83", &place99,528000.0,1849000.0);
+StopPoint ps83(3377699720880583,"99/83", &place99,528000.0,1849000.0);
 ps83.setCodeBySource("CTP:StopArea:SPOCE87611467");
 
-PhysicalStop ps84(3377699720880584,"99/84", &place99,528000.0,1845000.0);
+StopPoint ps84(3377699720880584,"99/84", &place99,528000.0,1845000.0);
 place99.addPhysicalStop(ps84);
 
-PhysicalStop ps85(3377699720880585,"99/85", &place99,528000.0,1847000.0);
+StopPoint ps85(3377699720880585,"99/85", &place99,528000.0,1847000.0);
 place99.addPhysicalStop(ps85);
 
 Address a90(562949953421390, &place99,528000.0,1844000.0);
@@ -174,34 +176,34 @@ Address a94(562949953421394, &place99,523000.0,1845342.0);
 place99.addAddress(&a94);
 
 // Place 05
-PublicTransportStopZoneConnectionPlace place05(1970324837184605, true, minutes(8));
+StopArea place05(1970324837184605, true, minutes(8));
 place05.setName("05");
 place05.setCity(&city54);
 place05.setAllowedConnection(true);
 place05.addTransferDelay(562949953421410,3377699720880586,minutes(0));
 
-PhysicalStop ps86(3377699720880586,"05/86", &place05,520000,1845000.0);
+StopPoint ps86(3377699720880586,"05/86", &place05,520000,1845000.0);
 place05.addPhysicalStop(ps86);
 
 Address a10(562949953421410, &place05,520000.0,1844000.0);
 place05.addAddress(&a10);
 
 // Place 06
-PublicTransportStopZoneConnectionPlace place06(1970324837184606, true, minutes(8));
+StopArea place06(1970324837184606, true, minutes(8));
 place06.setName("06");
 place06.setCity(&city54);
 place06.setAllowedConnection(true);
 
-PhysicalStop ps06(3377699720880606,"06", &place06,526000,1852000.0);
+StopPoint ps06(3377699720880606,"06", &place06,526000,1852000.0);
 place06.addPhysicalStop(ps06);
 
 // Place 07
-PublicTransportStopZoneConnectionPlace place07(1970324837184607, true, minutes(8));
+StopArea place07(1970324837184607, true, minutes(8));
 place07.setName("07");
 place07.setCity(&city54);
 place07.setAllowedConnection(true);
 
-PhysicalStop ps07(3377699720880607,"07", &place07,523000,1852000.0);
+StopPoint ps07(3377699720880607,"07", &place07,523000,1852000.0);
 place07.addPhysicalStop(ps07);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -293,7 +295,7 @@ rs57.setName("test");
 // Lines
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Line 92
+// JourneyPattern 92
 
 CommercialLine cl92(11821949021891592);
 cl92.setNetwork(&n34);
@@ -306,7 +308,7 @@ cl92.setStyle("vertfonce");
 	cl92.setRules(r);
 }
 
-Line li92(2533274790397692, "92");
+JourneyPattern li92(2533274790397692, "92");
 li92.setTimetableName("92.1");
 li92.setUseInDepartureBoards(true);
 li92.setUseInTimetables(true);
@@ -408,7 +410,7 @@ ss02.setActive(day_clock::local_day());
 ss02.setActive(day_clock::local_day() + days(1));
 li92.addService(&ss02, true);
 
-// Line 93
+// JourneyPattern 93
 
 CommercialLine cl93(11821949021891593);
 cl93.setNetwork(&n34);
@@ -420,7 +422,7 @@ cl93.setStyle("bleuclair");
 	cl93.setRules(r);
 }
 
-Line li93(2533274790397693, "93-2");
+JourneyPattern li93(2533274790397693, "93-2");
 li93.setTimetableName("93.2");
 li93.setUseInDepartureBoards(true);
 li93.setUseInTimetables(true);
@@ -434,8 +436,8 @@ li93.addEdge(ls64);
 LineStop ls65(2814749767106565, &li93, 1, true, true, 12141, &ps81);
 {
 	LineStop::ViaPoints v;
-	v.push_back(new Point2D(523000,1843000));
-	v.push_back(new Point2D(525000,1843000));
+	v.push_back(new Coordinate(523000,1843000));
+	v.push_back(new Coordinate(525000,1843000));
 	ls65.setViaPoints(v);
 }
 li93.addEdge(ls65);
@@ -503,7 +505,7 @@ ss07.setActive(day_clock::local_day());
 ss07.setActive(day_clock::local_day() + days(1));
 li93.addService(&ss07, true);
 
-// Line 94
+// JourneyPattern 94
 
 CommercialLine cl94(11821949021891594);
 cl94.setNetwork(&n34);
@@ -515,7 +517,7 @@ cl94.setStyle("orange");
 	cl94.setRules(r);
 }
 
-Line li94(2533274790397694, "94-3");
+JourneyPattern li94(2533274790397694, "94-3");
 li94.setTimetableName("94.3");
 li94.setUseInDepartureBoards(true);
 li94.setUseInTimetables(true);
@@ -599,7 +601,7 @@ ss06.setActive(day_clock::local_day());
 ss06.setActive(day_clock::local_day() + days(1));
 li94.addService(&ss06, true);
 
-// Line 95
+// JourneyPattern 95
 
 CommercialLine cl95(11821949021891595);
 cl95.setNetwork(&n34);
@@ -611,7 +613,7 @@ cl95.setStyle("rouge");
 	cl95.setRules(r);
 }
 
-Line li95(2533274790397695, "95-1");
+JourneyPattern li95(2533274790397695, "95-1");
 li95.setTimetableName("95.1");
 li95.setUseInDepartureBoards(true);
 li95.setUseInTimetables(true);
@@ -659,7 +661,7 @@ ss10.setActive(day_clock::local_day());
 ss10.setActive(day_clock::local_day() + days(1));
 li95.addService(&ss10, true);
 
-// Line 96
+// JourneyPattern 96
 
 CommercialLine cl96(11821949021891596);
 cl96.setNetwork(&n34);
@@ -671,7 +673,7 @@ cl96.setStyle("jaune");
 	cl96.setRules(r);
 }
 
-Line li96(2533274790397696, "96-1");
+JourneyPattern li96(2533274790397696, "96-1");
 li96.setTimetableName("96.1");
 li96.setUseInDepartureBoards(true);
 li96.setUseInTimetables(true);
@@ -719,7 +721,7 @@ ss14.setActive(day_clock::local_day());
 ss14.setActive(day_clock::local_day() + days(1));
 li96.addService(&ss14, true);
 
-// Line 97
+// JourneyPattern 97
 
 CommercialLine cl97(11821949021891597);
 cl97.setNetwork(&n34);
@@ -731,7 +733,7 @@ cl97.setStyle("rose");
 	cl97.setRules(r);
 }
 
-Line li97(2533274790397697, "97");
+JourneyPattern li97(2533274790397697, "97");
 li97.setTimetableName("97");
 li97.setUseInDepartureBoards(true);
 li97.setUseInTimetables(true);
@@ -765,7 +767,7 @@ cs9701.setRange(minutes(30));
 li97.addService(&cs9701, true);
 
 
-// Line 98
+// JourneyPattern 98
 
 CommercialLine cl98(11821949021891598);
 cl98.setNetwork(&n34);
@@ -777,7 +779,7 @@ cl98.setStyle("vertclair");
 	cl98.setRules(r);
 }
 
-Line li98(2533274790397698, "98");
+JourneyPattern li98(2533274790397698, "98");
 li98.setTimetableName("98");
 li98.setUseInDepartureBoards(true);
 li98.setUseInTimetables(true);

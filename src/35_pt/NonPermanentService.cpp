@@ -80,9 +80,9 @@ namespace synthese
 				date newDate(d);
 				for(int i(getDepartureSchedule(false,0).hours() / 24);
 					i<= getLastArrivalSchedule(false).hours() / 24;
-					++i, newDate += days(1)
+					++i
 				){
-					static_cast<JourneyPattern*>(getPath())->setActive(newDate);
+					static_cast<JourneyPattern*>(getPath())->setActive(newDate + days(i));
 				}
 			}
 			//environment.updateMinMaxDatesInUse (newDate, marked);
@@ -98,9 +98,9 @@ namespace synthese
 				Calendar copyCalendar(*this);
 				for(int i(getDepartureSchedule(false,0).hours() / 24);
 					i<= getLastArrivalSchedule(false).hours() / 24;
-					++i, copyCalendar <<= 1
+					++i
 				){
-					pathC |= copyCalendar;
+					pathC |= (copyCalendar << i);
 				}
 			}
 		}

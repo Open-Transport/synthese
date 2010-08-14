@@ -21,17 +21,18 @@
 */
 
 #include "PTRoutePlannerResult.h"
-#include "PublicTransportStopZoneConnectionPlace.h"
-#include "PhysicalStop.h"
+#include "StopArea.hpp"
+#include "StopPoint.hpp"
 #include "LineStop.h"
 #include "Journey.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "PermanentService.h"
-#include "Line.h"
+#include "JourneyPattern.hpp"
 #include "Road.h"
 #include "RoadChunk.h"
 #include "Crossing.h"
 #include "Address.h"
+#include "GeographyModule.h"
 
 #include <boost/test/auto_unit_test.hpp>
 
@@ -40,64 +41,67 @@ using namespace boost::posix_time;
 using namespace synthese::pt;
 using namespace synthese::road;
 using namespace synthese::graph;
-using namespace synthese::ptrouteplanner;
+using namespace synthese::geography;
+using namespace synthese::pt_journey_planner;
 
 
 BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 {
+	GeographyModule::PreInit();
+
 	ptime now(second_clock::local_time());
 
-	Line L;
+	JourneyPattern L;
 	PermanentService S(0, &L, boost::posix_time::minutes(5));
 
-	PublicTransportStopZoneConnectionPlace CA;
+	StopArea CA;
 	CA.setName("A");
-	PhysicalStop PA;
+	StopPoint PA;
 	PA.setHub(&CA);
 	LineStop A;
 	A.setLine(&L);
 	A.setPhysicalStop(&PA);
 	A.setRankInPath(0);
 
-	PublicTransportStopZoneConnectionPlace CB;
+	StopArea CB;
 	CB.setName("B");
-	PhysicalStop PB;
+	StopPoint PB;
 	PB.setHub(&CB);
 	LineStop B;
 	B.setLine(&L);
 	B.setPhysicalStop(&PB);
 	B.setRankInPath(1);
 
-	PublicTransportStopZoneConnectionPlace CC;
+	StopArea CC;
 	CC.setName("C");
-	PhysicalStop PC;
+	StopPoint PC;
 	PC.setHub(&CC);
 	LineStop C;
 	C.setLine(&L);
 	C.setPhysicalStop(&PC);
 	C.setRankInPath(2);
 
-	PublicTransportStopZoneConnectionPlace CD;
+	StopArea CD;
 	CD.setName("D");
-	PhysicalStop PD;
+	StopPoint PD;
 	PD.setHub(&CD);
 	LineStop D;
 	D.setLine(&L);
 	D.setPhysicalStop(&PD);
 	D.setRankInPath(3);
 
-	PublicTransportStopZoneConnectionPlace CE;
+	StopArea CE;
 	CE.setName("E");
-	PhysicalStop PE;
+	StopPoint PE;
 	PE.setHub(&CE);
 	LineStop E;
 	E.setLine(&L);
 	E.setPhysicalStop(&PE);
 	E.setRankInPath(4);
 
-	PublicTransportStopZoneConnectionPlace CF;
+	StopArea CF;
 	CF.setName("F");
-	PhysicalStop PF;
+	StopPoint PF;
 	PF.setHub(&CF);
 	LineStop F;
 	F.setLine(&L);
@@ -362,57 +366,57 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 {
 	ptime now(second_clock::local_time());
 
-	Line L;
+	JourneyPattern L;
 	PermanentService S(0, &L, boost::posix_time::minutes(5));
 
-	PublicTransportStopZoneConnectionPlace CA;
+	StopArea CA;
 	CA.setName("A");
-	PhysicalStop PA;
+	StopPoint PA;
 	PA.setHub(&CA);
 	LineStop A;
 	A.setLine(&L);
 	A.setPhysicalStop(&PA);
 	A.setRankInPath(0);
 
-	PublicTransportStopZoneConnectionPlace CB;
+	StopArea CB;
 	CB.setName("B");
-	PhysicalStop PB;
+	StopPoint PB;
 	PB.setHub(&CB);
 	LineStop B;
 	B.setLine(&L);
 	B.setPhysicalStop(&PB);
 	B.setRankInPath(1);
 
-	PublicTransportStopZoneConnectionPlace CC;
+	StopArea CC;
 	CC.setName("C");
-	PhysicalStop PC;
+	StopPoint PC;
 	PC.setHub(&CC);
 	LineStop C;
 	C.setLine(&L);
 	C.setPhysicalStop(&PC);
 	C.setRankInPath(2);
 
-	PublicTransportStopZoneConnectionPlace CD;
+	StopArea CD;
 	CD.setName("D");
-	PhysicalStop PD;
+	StopPoint PD;
 	PD.setHub(&CD);
 	LineStop D;
 	D.setLine(&L);
 	D.setPhysicalStop(&PD);
 	D.setRankInPath(3);
 
-	PublicTransportStopZoneConnectionPlace CE;
+	StopArea CE;
 	CE.setName("E");
-	PhysicalStop PE;
+	StopPoint PE;
 	PE.setHub(&CE);
 	LineStop E;
 	E.setLine(&L);
 	E.setPhysicalStop(&PE);
 	E.setRankInPath(4);
 
-	PublicTransportStopZoneConnectionPlace CF;
+	StopArea CF;
 	CF.setName("F");
-	PhysicalStop PF;
+	StopPoint PF;
 	PF.setHub(&CF);
 	LineStop F;
 	F.setLine(&L);
@@ -727,57 +731,57 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 {
 	ptime now(second_clock::local_time());
 
-	Line L;
+	JourneyPattern L;
 	PermanentService S(0, &L, boost::posix_time::minutes(5));
 
-	PublicTransportStopZoneConnectionPlace CA;
+	StopArea CA;
 	CA.setName("A");
-	PhysicalStop PA;
+	StopPoint PA;
 	PA.setHub(&CA);
 	LineStop A;
 	A.setLine(&L);
 	A.setPhysicalStop(&PA);
 	A.setRankInPath(0);
 
-	PublicTransportStopZoneConnectionPlace CB;
+	StopArea CB;
 	CB.setName("B");
-	PhysicalStop PB;
+	StopPoint PB;
 	PB.setHub(&CB);
 	LineStop B;
 	B.setLine(&L);
 	B.setPhysicalStop(&PB);
 	B.setRankInPath(1);
 
-	PublicTransportStopZoneConnectionPlace CC;
+	StopArea CC;
 	CC.setName("C");
-	PhysicalStop PC;
+	StopPoint PC;
 	PC.setHub(&CC);
 	LineStop C;
 	C.setLine(&L);
 	C.setPhysicalStop(&PC);
 	C.setRankInPath(2);
 
-	PublicTransportStopZoneConnectionPlace CD;
+	StopArea CD;
 	CD.setName("D");
-	PhysicalStop PD;
+	StopPoint PD;
 	PD.setHub(&CD);
 	LineStop D;
 	D.setLine(&L);
 	D.setPhysicalStop(&PD);
 	D.setRankInPath(3);
 
-	PublicTransportStopZoneConnectionPlace CE;
+	StopArea CE;
 	CE.setName("E");
-	PhysicalStop PE;
+	StopPoint PE;
 	PE.setHub(&CE);
 	LineStop E;
 	E.setLine(&L);
 	E.setPhysicalStop(&PE);
 	E.setRankInPath(4);
 
-	PublicTransportStopZoneConnectionPlace CF;
+	StopArea CF;
 	CF.setName("F");
-	PhysicalStop PF;
+	StopPoint PF;
 	PF.setHub(&CF);
 	LineStop F;
 	F.setLine(&L);

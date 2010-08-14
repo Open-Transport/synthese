@@ -370,5 +370,14 @@ namespace synthese
 			}
 			return *this;
 		}
+
+
+
+		Calendar Calendar::operator<<( size_t i )
+		{
+			Calendar obj(*this);
+			obj <<= i;
+			return obj;
+		}
 	}
 }

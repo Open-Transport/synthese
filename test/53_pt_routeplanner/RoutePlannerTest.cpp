@@ -28,7 +28,7 @@
 
 #include <boost/test/auto_unit_test.hpp>
 
-using namespace synthese::ptrouteplanner;
+using namespace synthese::pt_journey_planner;
 using namespace synthese::algorithm;
 using namespace synthese::graph;
 using namespace synthese::util;
@@ -275,6 +275,6 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			);
 		PTRoutePlannerResult result(r.run());
 
-		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 1);
+		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 3);
 	}
 }
