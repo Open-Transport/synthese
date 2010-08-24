@@ -11,6 +11,7 @@
 #include "PhysicalStopsCSVExportFunction.h"
 #include "PTNetworksListFunction.hpp"
 #include "PTRoutesListFunction.hpp"
+#include "PTRouteDetailFunction.hpp"
 #include "CheckLineCalendarFunction.hpp"
 #include "PTObjectInformationFunction.hpp"
 

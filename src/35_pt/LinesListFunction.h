@@ -77,6 +77,7 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,LinesListFunction>
 		{
 		 public:
+			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string PARAMETER_NETWORK_ID;
 			static const std::string PARAMETER_PAGE_ID;
 
@@ -85,6 +86,7 @@ namespace synthese
 			//@{
 				boost::shared_ptr<const pt::TransportNetwork> _network;
 				boost::shared_ptr<const cms::Webpage> _page;
+				std::string _outputFormat;
 			//@}
 
 

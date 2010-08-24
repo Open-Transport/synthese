@@ -31,6 +31,9 @@
 #include "CommercialLineTableSync.h"
 #include "LineMarkerInterfacePage.h"
 #include "Webpage.h"
+#include "RollingStock.h"
+#include "Path.h"
+#include "JourneyPattern.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -45,6 +48,7 @@ namespace synthese
 	using namespace pt;
 	using namespace security;
 	using namespace cms;
+	using namespace graph;
 	
 	template<> const string util::FactorableTemplate<server::Function,pt::LinesListFunction>::FACTORY_KEY(
 		"LinesListFunction2"
@@ -52,19 +56,16 @@ namespace synthese
 	
 	namespace pt
 	{
+		const string LinesListFunction::PARAMETER_OUTPUT_FORMAT("of");
 		const string LinesListFunction::PARAMETER_NETWORK_ID("ni");
 		const string LinesListFunction::PARAMETER_PAGE_ID("pi");
-		
+
 		ParametersMap LinesListFunction::_getParametersMap() const
 		{
 			ParametersMap result;
 			if (_network.get() != NULL)
 			{
 				result.insert(PARAMETER_NETWORK_ID, _network->getKey());
-			}
-			if(_page.get())
-			{
-				result.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
 			return result;
 		}
@@ -82,32 +83,83 @@ namespace synthese
 			catch (ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such page");
-			}			
+			}
+			optional<string> idOf(map.getOptional<string>(PARAMETER_OUTPUT_FORMAT));
+			_outputFormat = (*idOf);
 		}
 
 
 		void LinesListFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			CommercialLineTableSync::SearchResult lines(
-				CommercialLineTableSync::Search(*_env, _network->getKey())
+					CommercialLineTableSync::Search(*_env,
+							                        _network->getKey(),
+							                        boost::optional<std::string>(),
+							                        boost::optional<std::string>(),
+							                        0,
+							                        boost::optional<std::size_t>(),
+							                        true,//OrderByNetwork
+							                        true,//OrderByName
+							                        true)//is Ascendent ordering
 			);
+			if((!_page.get())&&(_outputFormat =="xml"))
+			{
+				// XML header
+				stream <<
+					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+					"<lines xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/LinesListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+					;
+			}
 			size_t rank(0);
 			BOOST_FOREACH(shared_ptr<const CommercialLine> line, lines)
 			{
 				if(_page.get())
 				{
 					LineMarkerInterfacePage::Display(
-						stream,
-						_page,
-						request,
-						*line,
-						rank++
+							stream,
+							_page,
+							request,
+							*line,
+							rank++
 					);
 				}
-				else
+				else if(_outputFormat =="xml")
+				{
+					stream <<"<line id=\""<< line->getKey() <<
+						"\" creatorId=\"" << line->getCreatorId() <<
+						"\" name=\""      << line->getName() <<
+						"\" shortName=\"" << line->getShortName() <<
+						"\" longName=\""  << line->getLongName() <<
+						"\" color=\""     << line->getColor() <<
+						"\" style=\""     << line->getStyle() <<
+						"\" image=\""     << line->getImage() <<
+						"\" >";
+
+					set<RollingStock *> rollingStocks;
+					BOOST_FOREACH(Path* path, line->getPaths())
+					{
+						rollingStocks.insert(
+								static_cast<const JourneyPattern*>(path)->getRollingStock()
+						);
+					}
+					BOOST_FOREACH(RollingStock * rs, rollingStocks)
+					{
+						stream <<"<transportMode id=\""<< rs->getKey() <<
+							"\" name=\""    << rs->getName() <<
+							"\" article=\"" << rs->getArticle()<<
+							"\" />";
+					}
+					stream <<"</line>";
+				}
+				else//default case : csv outputFormat
 				{
 					stream << line->getKey() << ";" << line->getShortName() << "\n";
 				}
+			}
+			if((!_page.get())&&(_outputFormat =="xml"))
+			{
+				// XML footer
+				stream << "</lines>";
 			}
 		}
 
@@ -136,7 +188,20 @@ namespace synthese
 
 		std::string LinesListFunction::getOutputMimeType() const
 		{
-			return _page.get() ? _page->getMimeType() : "text/csv";
+			std::string mimeType;
+			if(_page.get())
+			{
+				mimeType = _page->getMimeType();
+			}
+			else if(_outputFormat =="xml")
+			{
+				mimeType = "text/xml";
+			}
+			else//default case : csv outputFormat
+			{
+				mimeType = "text/csv";
+			}
+			return mimeType;
 		}
 	}
 }

@@ -32,6 +32,11 @@ namespace synthese
 {
 	namespace pt
 	{
+		class JourneyPattern;
+	}
+
+	namespace pt
+	{
 		//////////////////////////////////////////////////////////////////////////
 		///	35.15 Function : PTRouteDetailFunction.
 		///	@ingroup m35Functions refFunctions
@@ -59,16 +64,10 @@ namespace synthese
 		class PTRouteDetailFunction:
 			public util::FactorableTemplate<server::Function,PTRouteDetailFunction>
 		{
-		public:
-			/// @todo request parameter names declaration
-			// eg : static const std::string PARAMETER_xxx;
-			
 		protected:
 			//! \name Page parameters
 			//@{
-				/// @todo Parsed parameters declaration
-				// eg : const void*	_object;
-				// eg : ParametersMap			_parameters;
+				boost::shared_ptr<const JourneyPattern> _journeyPattern;
 			//@}
 			
 			

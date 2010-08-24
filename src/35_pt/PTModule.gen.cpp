@@ -53,6 +53,7 @@ synthese::pt::LinesListFunction::integrate();
 synthese::pt::TridentExportFunction::integrate ();
 synthese::pt::PTNetworksListFunction::integrate();
 synthese::pt::PTRoutesListFunction::integrate();
+synthese::pt::PTRouteDetailFunction::integrate();
 synthese::pt::CheckLineCalendarFunction::integrate();
 synthese::pt::PTObjectInformationFunction::integrate();
 

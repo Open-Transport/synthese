@@ -30,6 +30,9 @@
 #include "Env.h"
 #include "PTRoutesListItemInterfacePage.hpp"
 #include "Webpage.h"
+#include "StopPoint.hpp"
+#include "City.h"
+#include "StopArea.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -151,6 +154,10 @@ namespace synthese
 			if(!_page.get())
 			{
 				// XML header
+				stream <<
+					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+					"<directions xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/PTRoutesListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+					;
 			}
 
 			size_t rank(0);
@@ -169,12 +176,39 @@ namespace synthese
 				else
 				{
 					// XML
+					stream << "<direction id=\""<< route->getKey() <<
+						"\" name=\""            << route->getName() <<
+						"\" directionText=\""   << route->getDirection() <<
+						"\" >";
+
+					const StopArea & origin(
+						*route->getOrigin()->getConnectionPlace()
+					);
+					stream << "<origin id=\""  << origin.getKey() <<
+						"\" name=\""           << origin.getName() <<
+						"\" cityId=\""         << origin.getCity()->getKey() <<
+						"\" cityName=\""       << origin.getCity()->getName() <<
+						"\" directionAlias=\"" << origin.getName26() <<
+						"\" />";
+
+					const StopArea & destination(
+						*route->getDestination()->getConnectionPlace()
+					);
+					stream << "<destination id=\"" << destination.getKey() <<
+						"\" name=\""           << destination.getName() <<
+						"\" cityId=\""         << destination.getCity()->getKey() <<
+						"\" cityName=\""       << destination.getCity()->getName() <<
+						"\" directionAlias=\"" << destination.getName26() <<
+						"\" />";
+
+					stream <<"</direction>";
 				}
 			}
 
 			if(!_page.get())
 			{
 				// XML footer
+				stream << "</directions>";
 			}
 		}
 		
