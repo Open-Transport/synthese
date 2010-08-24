@@ -190,9 +190,12 @@ namespace synthese
 
 		boost::posix_time::time_duration SchedulesBasedService::DecodeSchedule( const std::string value )
 		{
+			int days(lexical_cast<int>(value.substr(0, 2)));
+			int hours(lexical_cast<int>(value.substr(3, 2)));
+			int minutes(lexical_cast<int>(value.substr(6, 2)));
 			return time_duration(
-				24 * lexical_cast<int>(value.substr(0, 2)) + lexical_cast<int>(value.substr(3, 2)),
-				lexical_cast<int>(value.substr(6, 2)),
+				(days > 0 ? 24 * days : 0) + (hours > 0 ? hours : 0),
+				(minutes > 0 ? minutes : 0),
 				0
 			);
 		}
