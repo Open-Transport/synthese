@@ -165,6 +165,17 @@ namespace synthese
 
 		std::string WebPageDisplayFunction::getOutputMimeType() const
 		{
+			if(_page.get())
+			{
+				if(_useTemplate && _page->getTemplate())
+				{
+					return _page->getTemplate()->getMimeType();
+				}
+				else
+				{
+					return _page->getMimeType();
+				}
+			}
 			return "text/html";
 		}
 
