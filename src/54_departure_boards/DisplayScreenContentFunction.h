@@ -31,6 +31,9 @@
 
 namespace synthese
 {
+	class graph::ServicePointer;
+	class pt::StopPoint;
+
 	namespace departure_boards
 	{
 		class DisplayScreen;
@@ -113,8 +116,19 @@ namespace synthese
 				<li>rn : table rows number</li>
 			</ul>
 
+
 			<h2>Standard XML output</h2>
 			<h3>Description</h3>
+
+			For XML output, following parameters are used:
+			<ul>
+				<li>roid : id of the physical stop</li>
+				<li>rn : table rows number</li>
+				<li>date (optional) : reference date (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
+				<li>way (optional) : "backward" or "forward" Default value : "forward"</li>
+			</ul>
+			If 'way' is "forward" the answer will be the 'rn' next departures after 'date'.
+			If 'way' is "backward" the answer will be the 'rn' previous departures just before 'date'.
 
 			@image html DisplayScreenContentFunction.png
 
@@ -127,6 +141,7 @@ namespace synthese
 			public util::FactorableTemplate<cms::FunctionWithSite<false>,DisplayScreenContentFunction>
 		{
 			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_WAY;
 			static const std::string PARAMETER_TB;
 			static const std::string PARAMETER_INTERFACE_ID;
 			static const std::string PARAMETER_MAC_ADDRESS;
@@ -140,8 +155,8 @@ namespace synthese
 				boost::shared_ptr<const DisplayScreen>	_screen;
 				boost::shared_ptr<DisplayType>			_type;
 				boost::optional<boost::posix_time::ptime>			_date;
+				bool	_wayIsBackward;
 			//@}
-
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
@@ -150,6 +165,14 @@ namespace synthese
 			/** Conversion from generic parameters map to attributes.
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
+
+			/** Concat an search XML result to stream
+			*/
+			void concatXMLResult(
+				std::ostream& stream,
+				graph::ServicePointer& servicePointer,
+				const pt::StopPoint* stop
+				)const;
 
 		public:
 			/** Launches the display.
