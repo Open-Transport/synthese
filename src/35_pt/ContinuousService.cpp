@@ -216,7 +216,8 @@ namespace synthese
 
 		void ContinuousService::completeServicePointer(
 			ServicePointer& servicePointer,
-			const Edge& edge
+			const Edge& edge,
+			const AccessParameters&
 		) const	{
 			size_t edgeIndex(edge.getRankInPath());
 			if(servicePointer.getArrivalEdge() == NULL)

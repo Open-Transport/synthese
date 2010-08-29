@@ -52,6 +52,7 @@ namespace synthese
 			optional<size_t> maxSolutionsNumber,
 			AccessParameters accessParameters,
 			PlanningOrder planningOrder,
+			double vmax,
 			std::ostream* logStream
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
@@ -65,8 +66,9 @@ namespace synthese
 			_maxSolutionsNumber(maxSolutionsNumber),
 			_accessParameters(accessParameters),
 			_planningOrder(planningOrder),
-			_logStream(logStream),
-			_journeyTemplates(graphToUse)
+			_journeyTemplates(graphToUse),
+			_vmax(vmax),
+			_logStream(logStream)
 		{
 		}
 
@@ -82,6 +84,7 @@ namespace synthese
 			optional<std::size_t>	maxSolutionsNumber,
 			AccessParameters accessParameters,
 			const PlanningOrder planningOrder,
+			double vmax,
 			std::ostream* logStream
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
@@ -99,9 +102,10 @@ namespace synthese
 			_maxSolutionsNumber(maxSolutionsNumber),
 			_accessParameters(),
 			_planningOrder(planningOrder),
-			_logStream(logStream),
 			_parentContinuousService(continuousService),
-			_journeyTemplates(graphToUse)
+			_journeyTemplates(graphToUse),
+			_vmax(vmax),
+			_logStream(logStream)
 		{
 		}
 
@@ -158,6 +162,7 @@ namespace synthese
 					_planningOrder == DEPARTURE_FIRST ? _highestArrivalTime : _lowestDepartureTime,
 					_whatToSearch,
 					_graphToUse,
+					_vmax,
 					_logStream,
 					_journeyTemplates
 				);
@@ -178,6 +183,7 @@ namespace synthese
 						_maxSolutionsNumber ? *_maxSolutionsNumber - result.size() : _maxSolutionsNumber,
 						_accessParameters,
 						_planningOrder,
+						_vmax,
 						_logStream
 					);
 					Result subResult(_MergeSubResultAndParentContinuousService(journey, tsr.run()));

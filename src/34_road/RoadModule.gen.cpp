@@ -13,6 +13,7 @@ synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::road:
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::road::PublicPlaceTableSync>::integrate();
 synthese::road::RoadPlace::integrate();
 synthese::road::PublicPlace::integrate();
+synthese::road::NavstreetsFileFormat::integrate();
 
 // Registries
 

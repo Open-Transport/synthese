@@ -68,6 +68,11 @@ namespace synthese
 				boost::optional<SQLiteTransaction&> transaction
 			) const = 0;
 
+			virtual void _remove(
+				const BaseClass& object,
+				boost::optional<SQLiteTransaction&> transaction
+			) const = 0;
+
 		public:
 			Fetcher() {}
 
@@ -100,6 +105,17 @@ namespace synthese
 				std::string ts(boost::lexical_cast<std::string>(util::decodeTableId(object.getKey())));
 				std::auto_ptr<Fetcher<BaseClass> > pf(util::Factory<Fetcher<BaseClass> >::create(ts));
 				pf->_save(object, transaction);
+			}
+
+
+
+			static void FetchRemove(
+				const BaseClass& object,
+				boost::optional<SQLiteTransaction&> transaction = boost::optional<SQLiteTransaction&>()
+			){
+				std::string ts(boost::lexical_cast<std::string>(util::decodeTableId(object.getKey())));
+				std::auto_ptr<Fetcher<BaseClass> > pf(util::Factory<Fetcher<BaseClass> >::create(ts));
+				pf->_remove(object, transaction);
 			}
 		};
 	}

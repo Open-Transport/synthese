@@ -38,10 +38,10 @@ namespace synthese
 	namespace graph
 	{
 		class Path;
+		class AccessParameters;
 
 		/** Service abstract base class.
-			TRIDENT = VehicleJourney
-
+			
 			A service represents the ability to follow a path
 			at certain days and hours.
 
@@ -193,7 +193,8 @@ namespace synthese
 
 				virtual void completeServicePointer(
 					ServicePointer& servicePointer,
-					const Edge& edge
+					const Edge& edge,
+					const AccessParameters& accessParameters
 				) const = 0;
 
 				/** Date of the departure from the origin of the service.

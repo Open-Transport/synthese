@@ -75,7 +75,7 @@ DrawableLine::DrawableLine (const JourneyPattern* line,
 
     
 DrawableLine::DrawableLine (const util::RegistryKeyType& lineId, 
-			    const std::vector<const Coordinate*>& points,
+			    const std::vector<const Coordinate>& points,
 			    const std::string& shortName,
 			    const synthese::util::RGBColor& color,
 			    bool withPhysicalStops)
@@ -121,7 +121,7 @@ DrawableLine::hasPoint (const Coordinate& p) const
 
 
 
-const std::vector<const Coordinate*>& 
+const std::vector<const Coordinate>& 
 DrawableLine::getPoints () const
 {
     return _points;
@@ -463,7 +463,7 @@ DrawableLine::fuzzyfyPoints (const DrawableLineIndex& lineIndex)
 {
 	_fuzzyfiedPoints.clear ();
 	for (int i=0; i<_points.size(); ++i) {
-		_fuzzyfiedPoints.push_back (lineIndex.getFuzzyPoint(*_points[i]));
+		_fuzzyfiedPoints.push_back (lineIndex.getFuzzyPoint(_points[i]));
 		// _fuzzyfiedPoints.push_back (*(_points[i]));
 	}
 }

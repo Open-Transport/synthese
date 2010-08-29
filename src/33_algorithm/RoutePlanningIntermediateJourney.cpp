@@ -54,10 +54,9 @@ namespace synthese
 			const graph::ServicePointer& serviceUse,
 			bool endIsReached,
 			const graph::VertexAccessMap& destinationVam,
-			boost::optional<boost::posix_time::time_duration> totalDuration,
-			boost::optional<const JourneyTemplates&> journeyTemplates,
-			const boost::posix_time::ptime& originDateTime,
-			const int totalDistance
+			graph::Journey::Distance distanceToEnd,
+			bool similarity,
+			Score score
 		):	Journey(journey, serviceUse, journey._phase == DEPARTURE_TO_ARRIVAL),
 			_phase(journey._phase),
 			_startApproachDuration(
@@ -76,17 +75,10 @@ namespace synthese
 				journey._endApproachDuration
 			),
 			_endReached(endIsReached),
-			_distanceToEnd(
-				endIsReached ?
-				0 :
-				destinationVam.getIsobarycenter().distance(GetEndEdge(journey._phase, serviceUse)->getHub()->getPoint())
-			),
-			_similarity(journey._similarity == false ? false : indeterminate)
+			_distanceToEnd(distanceToEnd),
+			_similarity(similarity),
+			_score(similarity ? 0 : score)
 		{
-			if(!endIsReached)
-			{
-				setScore(totalDuration, journeyTemplates, originDateTime, totalDistance);
-			}
 		}
 
 
@@ -343,99 +335,6 @@ namespace synthese
 
 			// Priority 4 : addresses order (to differentiate journeys in all cases)
 			return this < &other;
-		}
-
-
-
-		void RoutePlanningIntermediateJourney::setScore(
-			boost::optional<boost::posix_time::time_duration> totalDuration,
-			boost::optional<const JourneyTemplates&> journeyTemplates,
-			const boost::posix_time::ptime& originDateTime,
-			const int _totalDistance
-		){
-			if(!totalDuration && logic::indeterminate(_similarity) && journeyTemplates)
-			{
-				_similarity = journeyTemplates->testJourneySimilarity(*this);
-			}
-			if(_similarity == true)
-			{
-				_score = 0;
-				return;
-			}
-
-			long long unsigned int estimatedTotalDuration;
-			if(totalDuration)
-			{
-				estimatedTotalDuration = totalDuration->total_seconds();
-			}
-			else
-			{
-				estimatedTotalDuration = ceil(_totalDistance * 3.6);
-			}
-			long long unsigned int distanceToEnd(*_distanceToEnd);
-			long long unsigned int journeyDuration(
-				(	_phase == DEPARTURE_TO_ARRIVAL ?
-					getEndTime() - originDateTime :
-					originDateTime - getEndTime()
-				).total_seconds()
-			);
-
-
-			_score =
-				(distanceToEnd == 0 || estimatedTotalDuration == 0) ?
-				1000 :
-					(20*(estimatedTotalDuration - journeyDuration))/distanceToEnd
-				//				static_cast<long long unsigned int>(1000 * distanceToEnd * distanceToEnd * journeyDuration) /
-				//				static_cast<long long unsigned int>(_totalDistance * _totalDistance * estimatedTotalDuration)
-			;
-
-
-			HubScore hubScore(getEndEdge().getHub()->getScore());
-			if(hubScore > 1)
-			{
-				_score /= hubScore;
-			}
-
-			if(_score > 1000)
-			{
-				_score = 1000;
-			}
-		}
-
-
-
-		void RoutePlanningIntermediateJourney::updateScore(
-			const boost::posix_time::time_duration& totalDuration,
-			const boost::posix_time::ptime& originDateTime
-		){
-			long long unsigned int journeyDuration(
-				(	_phase == DEPARTURE_TO_ARRIVAL ?
-					getEndTime() - originDateTime :
-					originDateTime - getEndTime()
-				).total_seconds()
-			);
-
-
-			_score =
-				(!_distanceToEnd || *_distanceToEnd == 0 || totalDuration.total_seconds() == 0) ?
-				1000 :
-				(20*(totalDuration.total_seconds() - journeyDuration)) / *_distanceToEnd
-				//				static_cast<long long unsigned int>(1000 * distanceToEnd * distanceToEnd * journeyDuration) /
-				//				static_cast<long long unsigned int>(_totalDistance * _totalDistance * estimatedTotalDuration)
-			;
-
-
-			HubScore hubScore(getEndEdge().getHub()->getScore());
-			if(hubScore > 1)
-			{
-				_score /= hubScore;
-			}
-
-			if(_score > 1000)
-			{
-				_score = 1000;
-			}
-
 		}
 	}
 }

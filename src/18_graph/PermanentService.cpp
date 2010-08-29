@@ -23,6 +23,7 @@
 #include "PermanentService.h"
 #include "Edge.h"
 #include "Path.h"
+#include "AccessParameters.h"
 
 #include <math.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -64,7 +65,8 @@ namespace synthese
 
 		void PermanentService::completeServicePointer(
 			ServicePointer& servicePointer,
-			const Edge& edge
+			const Edge& edge,
+			const AccessParameters& accessParameters
 		) const	{
 			double distance;
 			if(servicePointer.getArrivalEdge() == NULL)
@@ -83,7 +85,7 @@ namespace synthese
 			posix_time::time_duration duration(
 				_duration ?
 				*_duration :
-				posix_time::seconds(distance > 0 ? ceil(distance * 0.9) : 1)
+				posix_time::seconds(distance > 0 ? ceil(distance / accessParameters.getApproachSpeed()) : 1)
 			);
 			if(servicePointer.getArrivalEdge() == NULL)
 			{

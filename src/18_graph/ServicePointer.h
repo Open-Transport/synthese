@@ -95,7 +95,8 @@ namespace synthese
 			/// @pre partially filled pointer must not be completed.
 			ServicePointer(
 				const ServicePointer& partiallyFilledPointer,
-				const Edge& edge
+				const Edge& edge,
+				const AccessParameters& accessParameters
 			);
 
 
@@ -141,11 +142,6 @@ namespace synthese
 					const Vertex& realTimeVertex
 				);
 
-				//////////////////////////////////////////////////////////////////////////
-				/// @pre at least one edge must be specified
-				void complete(
-					const Edge& edge
-				);
 
 				void shift(boost::posix_time::time_duration duration);
 			//@}

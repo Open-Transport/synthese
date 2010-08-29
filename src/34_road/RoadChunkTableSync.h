@@ -35,9 +35,23 @@ namespace synthese
 {
 	namespace road
 	{
-		/** RoadChunk table synchronizer.
-			@ingroup m35LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 34.10 Road chunk table.
+		///	@ingroup m35LS refLS
+		/// @author Marc Jambert, Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// Table name : t014_road_chunks
+		///	Corresponding class : RoadChunk
+		///
+		/// Fields :
+		///	<ul>
+		///		<li>address_id</li>
+		///		<li>rank_in_path</li>
+		///		<li>via_points : optional. Defines the geometry of the chunk. Each point is separated
+		///		by coma. Longitude and latitude are stored and are separated by :.</li>
+		///		<li>road_id</li>
+		///		<li>metric_offset</li>
+		///	</ul>
 		class RoadChunkTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<RoadChunkTableSync,RoadChunk>
 		{
@@ -53,7 +67,8 @@ namespace synthese
 			static const std::string COL_ROADID ;  // NU
 			static const std::string COL_METRICOFFSET;  // U ??
 			
-
+			static const std::string SEP_POINTS;
+			static const std::string SEP_LON_LAT;
 
 			/** RoadChunk search.
 				(other search parameters)

@@ -104,7 +104,8 @@ namespace synthese
 
 				virtual void completeServicePointer(
 					graph::ServicePointer& servicePointer,
-					const graph::Edge& edge
+					const graph::Edge& edge,
+					const graph::AccessParameters&
 				) const;
 
 

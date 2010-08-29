@@ -163,7 +163,8 @@ namespace synthese
 
 		void ScheduledService::completeServicePointer(
 			ServicePointer& servicePointer,
-			const Edge& edge
+			const Edge& edge,
+			const AccessParameters&
 		) const	{
 			
 			size_t edgeIndex(edge.getRankInPath());

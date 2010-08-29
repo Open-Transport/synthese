@@ -79,6 +79,7 @@ namespace synthese
 			bool inverted,
 			bool optim,
 			optional<posix_time::time_duration> maxDuration,
+			double vmax,
 			ostream* const logStream,
 			int totalDistance,
 			boost::optional<const JourneyTemplates&> journeyTemplates
@@ -96,6 +97,7 @@ namespace synthese
 			_inverted(inverted),
 			_optim(optim),
 			_maxDuration(maxDuration),
+			_vmax(vmax),
 			_logStream(logStream),
 			_totalDistance(totalDistance),
 			_journeyTemplates(journeyTemplates)
@@ -463,7 +465,7 @@ namespace synthese
 								}
 
 								// Storage of the useful solution
-								ServicePointer serviceUse(serviceInstance, *curEdge);
+								ServicePointer serviceUse(serviceInstance, *curEdge, _accessParameters);
 								if (serviceUse.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
 								{
 									nonServedEdges.insert(curEdge);
@@ -471,16 +473,28 @@ namespace synthese
 								}
 
 								// Result journey writing
+								graph::Journey::Distance distanceToEnd(
+									isGoalReached ?
+									0 :
+									_destinationVam.getIsobarycenter().distance(reachedVertex->getHub()->getPoint())
+								);
+
 								shared_ptr<RoutePlanningIntermediateJourney> resultJourney(
 									new RoutePlanningIntermediateJourney(
 										fullApproachJourney,
 										serviceUse,
 										isGoalReached,
 										_destinationVam,
-										totalDuration,
-										_journeyTemplates,
-										_originDateTime,
-										_totalDistance
+										distanceToEnd,
+										_journeyTemplates->testSimilarity(fullApproachJourney, *reachedVertex->getHub(), _accessDirection),
+										_getScore(
+											totalDuration,
+											distanceToEnd,
+											_accessDirection == DEPARTURE_TO_ARRIVAL ?
+												serviceUse.getArrivalDateTime() - _originDateTime :
+												_originDateTime - serviceUse.getDepartureDateTime(),
+											*reachedVertex->getHub()
+										)
 								)	);
 
 
@@ -513,10 +527,9 @@ namespace synthese
 											serviceUse,
 											false,
 											_destinationVam,
-											totalDuration,
-											_journeyTemplates,
-											_originDateTime,
-											_totalDistance
+											distanceToEnd,
+											_journeyTemplates->testSimilarity(*journey, *reachedVertex->getHub(), _accessDirection),
+											resultJourney->getScore()
 									)	);
 									todo.add(todoJourney);
 								}
@@ -626,28 +639,18 @@ namespace synthese
 				The time used for comparison corresponds to the minimal time to reach the goal from the vertex, constituted of : 
 					-# the known time to reach the current vertex
 					-# the minimal time to do a transfer in the connecting place
-					-# the minimal travel time from the connecting place and the goal (=1 minute)
-
-				@todo Replace the third value (1 minute) by a more accurate value ("VMAX algorithm")
+					-# the minimal travel time from the connecting place and the goal according to the current vmax
 			*/
 			if(	!_destinationVam.contains(reachedVertex) &&
 				reachedVertex->getHub()->isConnectionPossible() &&
 				_searchOnlyNodes
 			){
+				assert(journey.getDistanceToEnd());
 
-/* Extract of the old VMAX code
-				SquareDistance sqd;
-				if (sqd.getSquareDistance () == UNKNOWN_VALUE)
-				{
-				sqd.setFromPoints (*goalVertex, _destinationVam.getIsobarycenter ());  
-				sqd.setSquareDistance (sqd.getSquareDistance () - 
-				_destinationVam.getIsobarycenterMaxSquareDistance ().getSquareDistance ());
-				}
-*/
 				ptime bestHopedGoalAccessDateTime (reachDateTime);
 				posix_time::time_duration minimalGoalReachDuration(
 					reachedVertex->getHub()->getMinTransferDelay()	// Minimal time to transfer
-					+ posix_time::minutes(1)						// Minimal time to reach the goal
+					+ seconds(*journey.getDistanceToEnd() / _vmax)						// Minimal time to reach the goal
 				);
 
 				if (_accessDirection == DEPARTURE_TO_ARRIVAL)
@@ -684,6 +687,55 @@ namespace synthese
 		const ptime& IntegralSearcher::getOriginDateTime() const
 		{
 			return _originDateTime;
+		}
+
+
+
+		RoutePlanningIntermediateJourney::Score IntegralSearcher::_getScore(
+			boost::optional<boost::posix_time::time_duration> totalDuration,
+			int distanceToEnd,
+			time_duration journeyDuration,
+			const Hub& hub
+		) const	{
+			RoutePlanningIntermediateJourney::Score score(1000);
+
+			// Case a journey was already found
+			if(totalDuration)
+			{
+				// Part 1+2 : 75% needed speed to reach the goal shorter
+				if(totalDuration != journeyDuration)
+				{
+					score = (distanceToEnd * 750) / (_vmax * (*totalDuration - journeyDuration).total_seconds());
+				}
+			}
+			else
+			{
+				if(_totalDistance > distanceToEnd)
+				{
+					// Part 1 : 25% projected speed
+					score = ((_totalDistance - distanceToEnd) * 250) / (_vmax * journeyDuration.total_seconds());
+					if(score > 250)
+					{
+						score = 250;
+					}
+					else
+					{
+						score = 250 - score;
+					}
+
+					// Part 2 : 50% projected distance
+					score += ((500 * distanceToEnd) / _totalDistance);
+				}
+			}
+
+			// Part 3 : 25% hub score
+			HubScore hubScore(hub.getScore());
+			if(hubScore > 1)
+			{
+				score += 250 - 2.5 * hubScore;
+			}
+
+			return score;
 		}
 
 

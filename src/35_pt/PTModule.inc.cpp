@@ -80,6 +80,8 @@
 #include "StopAreaAddAction.h"
 #include "LineStopUpdateAction.hpp"
 #include "StopPointMoveAction.hpp"
+#include "ServiceRemoveAction.h"
+#include "JourneyPatternRemoveAction.hpp"
 
 #include "TransportNetworkRight.h"
 

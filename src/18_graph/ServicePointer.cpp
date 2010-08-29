@@ -65,7 +65,8 @@ namespace synthese
 
 		ServicePointer::ServicePointer(
 			const ServicePointer& partiallyFilledPointer,
-			const Edge& edge
+			const Edge& edge,
+			const AccessParameters& accessParameters
 		):	_RTData(partiallyFilledPointer._RTData),
 			_service(partiallyFilledPointer._service),
 			_range(partiallyFilledPointer._range),
@@ -94,7 +95,7 @@ namespace synthese
 					*partiallyFilledPointer.getRealTimeArrivalVertex()
 				);
 			}
-			complete(edge);
+			_service->completeServicePointer(*this, edge, accessParameters);
 		}
 
 
@@ -151,15 +152,6 @@ namespace synthese
 			_arrivalTime = dateTime;
 			_theoreticalArrivalTime = theoreticalDateTime;
 			_realTimeArrivalVertex = &realTimeVertex;
-		}
-
-
-
-		void ServicePointer::complete( const Edge& edge )
-		{
-			assert(_departureEdge || _arrivalEdge);
-
-			_service->completeServicePointer(*this, edge);
 		}
 
 

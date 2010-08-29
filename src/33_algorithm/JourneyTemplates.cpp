@@ -21,7 +21,7 @@
 */
 
 #include "JourneyTemplates.h"
-#include "Journey.h"
+#include "RoutePlanningIntermediateJourney.hpp"
 #include "Edge.h"
 #include "Vertex.h"
 #include "ServicePointer.h"
@@ -65,7 +65,7 @@ namespace synthese
 		}
 
 
-
+/*
 		bool JourneyTemplates::testJourneySimilarity( const graph::Journey& value ) const
 		{
 			BOOST_FOREACH(const Hubs::value_type& journeyTemplate, _hubs)
@@ -105,6 +105,31 @@ namespace synthese
 			}
 			return false;
 		}
+*/
 
+
+		bool JourneyTemplates::testSimilarity(
+			const RoutePlanningIntermediateJourney& precedingJourney,
+			const graph::Hub& hub,
+			PlanningPhase direction
+		) const	{
+			if(!precedingJourney.getSimilarity())
+			{
+				return false;
+			}
+			BOOST_FOREACH(const Hubs::value_type& journeyTemplate, _hubs)
+			{
+				if(2 * (precedingJourney.size() + 1) > journeyTemplate.size())
+				{
+					continue;
+				}
+
+				return journeyTemplate[
+					direction == DEPARTURE_TO_ARRIVAL ?
+					2 * precedingJourney.size() + 1 :
+					journeyTemplate.size() - 1 - 2 * precedingJourney.size()
+				] == &hub;
+			}
+		}
 	}
 }

@@ -165,6 +165,13 @@ namespace synthese
 			){
 				std::vector<boost::shared_ptr<RoutePlanningIntermediateJourney> > journeysToAdd;
 				std::vector<boost::shared_ptr<RoutePlanningIntermediateJourney> > journeysToRemove;
+
+				time_duration newTotalDuration(
+					_accessDirection == DEPARTURE_TO_ARRIVAL ?
+					newMaxTime - is.getOriginDateTime() :
+					is.getOriginDateTime() - newMaxTime
+				);
+
 				for (IndexMap::iterator it(_index.begin()); it != _index.end();)
 				{
 					boost::shared_ptr<RoutePlanningIntermediateJourney> journey(it->second->first);
@@ -180,12 +187,18 @@ namespace synthese
 					{
 						_result.erase(it->second);
 						_index.erase(it);
-						journey->updateScore(
-							_accessDirection == DEPARTURE_TO_ARRIVAL ?
-								newMaxTime - is.getOriginDateTime() :
-								is.getOriginDateTime() - newMaxTime,
-							_originDateTime
-						);
+						journey->setScore(
+							is._getScore(
+								newTotalDuration,
+								*journey->getDistanceToEnd(), 
+								_accessDirection == DEPARTURE_TO_ARRIVAL ?
+									journey->getFirstArrivalTime() - is.getOriginDateTime() :
+									is.getOriginDateTime() - journey->getLastDepartureTime(),
+								*(	_accessDirection == DEPARTURE_TO_ARRIVAL ?
+									journey->getDestination():
+									journey->getOrigin()
+								)->getFromVertex()->getHub()
+						)	);
 						journeysToAdd.push_back(journey);
 					}
 					it = next;

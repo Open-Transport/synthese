@@ -65,6 +65,12 @@ namespace synthese
 				TableSync::Save(&static_cast<typename TableSync::ObjectType&>(object), transaction);
 			}
 
+			virtual void _remove(
+				const BaseClass& object,
+				boost::optional<SQLiteTransaction&> transaction
+			) const {
+				TableSync::Remove(static_cast<const typename TableSync::ObjectType&>(object).getKey(), transaction);
+			}
 		};
 	}
 }

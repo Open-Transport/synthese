@@ -82,7 +82,7 @@ namespace synthese
 				@param withoutDrt if true, the demand responsive transport lines with compulsory reservation are not used (default = no constraint)
 				@param maxApproachDistance (default = 1000 m)
 				@param maxApproachTime (default = 23 min)
-				@param approachSpeed Approach speed (default = 67 m/min = 4 km/h)
+				@param approachSpeed Approach speed (default = 1.111 m/s = 4 km/h)
 				@param maxTransportConnectionCount (default = 10 connections)
 				@date 2008-2010
 				@author Hugues Romain
@@ -93,7 +93,7 @@ namespace synthese
 				, bool			withoutDrt = false
 				, double		maxApproachDistance = 1000
 				, boost::posix_time::time_duration maxApproachTime = boost::posix_time::minutes(23)
-				, double		approachSpeed = 67
+				, double		approachSpeed = 1.111
 				, boost::optional<size_t>	maxTransportConnectionCount = boost::optional<size_t>(),
 				AllowedPathClasses allowedPathClasses = AllowedPathClasses()
 			):	_maxApproachDistance(maxApproachDistance)

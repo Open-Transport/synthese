@@ -105,6 +105,7 @@ namespace synthese
 				const graph::GraphIdType			_whatToSearch;
 				const graph::GraphIdType			_graphToUse;
 				boost::optional<const JourneyTemplates&> _journeyTemplates;
+				const double						_vmax;
 			//@}
 
 			//! @name Logging
@@ -164,6 +165,7 @@ namespace synthese
 				const boost::posix_time::ptime&				maxEndTime,
 				graph::GraphIdType			whatToSearch,
 				graph::GraphIdType			graphToUse,
+				double						vmax,
 				std::ostream* logStream = NULL,
 				boost::optional<const JourneyTemplates&> journeyTemplates = boost::optional<const JourneyTemplates&>()
 			);

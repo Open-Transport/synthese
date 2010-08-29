@@ -32,7 +32,11 @@
 #include "LineStopTableSync.h"
 #include "SQLiteTransaction.h"
 
+#include <geos/geom/LineString.h>
+
 using namespace std;
+using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -155,17 +159,13 @@ namespace synthese
 						ls.setScheduleInput(other.getScheduleInput());
 						ls.setMetricOffset(maxMetricOffset - other.getMetricOffset());
 						ls.setRankInPath(rank++);
-						Edge::ViaPoints vp;
-						if(it+1 != _template->getEdges().rend())
+						if(other.getStoredGeometry().get())
 						{
-							const Edge::ViaPoints& ovp((*(it+1))->getViaPoints());
-							for(Edge::ViaPoints::const_reverse_iterator p(ovp.rbegin()); p != ovp.rend(); ++p)
-							{
-								vp.push_back(*p);
-							}
+							ls.setGeometry(
+								shared_ptr<LineString>(
+									dynamic_cast<LineString*>(other.getStoredGeometry()->reverse())
+							)	);
 						}
-						ls.setViaPoints(vp);
-
 						LineStopTableSync::Save(&ls, transaction);
 					}
 				}
@@ -182,7 +182,13 @@ namespace synthese
 						ls.setScheduleInput(other.getScheduleInput());
 						ls.setRankInPath(other.getRankInPath());
 						ls.setMetricOffset(other.getMetricOffset());
-						ls.setViaPoints(other.getViaPoints());
+						if(other.getStoredGeometry().get())
+						{
+							ls.setGeometry(
+								shared_ptr<LineString>(
+									dynamic_cast<LineString*>(other.getStoredGeometry()->clone())
+							)	);
+						}
 						LineStopTableSync::Save(&ls, transaction);
 					}
 				}

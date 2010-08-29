@@ -30,6 +30,7 @@
 #include <boost/optional.hpp>
 #include <vector>
 #include <set>
+#include <geos/geom/Geometry.h>
 
 namespace geos
 {
@@ -56,6 +57,7 @@ namespace synthese
 		typedef std::set<Service*, cmpService> ServiceSet;
 
 		/** Path abstract base class.
+			@author Marc Jambert
 
 			A path is a sequence of edges.
 
@@ -117,24 +119,72 @@ namespace synthese
 				virtual bool isRoad() const;
 				virtual bool isPedestrianMode() const = 0;
 
-				/** Gets all the geographical points linked by the path
-					between two of its edges. If no from/to edge
-					index is provided, all the edges are considered.
-					@param fromEdgeIndex 
-					@param toEdgeIndex 
-
-					This includes :
-					- vertices (address/physical stops)
-					- via points
-				*/
-				std::vector<const geos::geom::Coordinate*> getPoints(
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets all the geographical points linked by the path
+				///	between two of its edges. If no from/to edge
+				///	index is provided, all the edges are considered.
+				///	@param fromEdgeIndex 
+				///	@param toEdgeIndex 
+				///	@author Marc Jambert
+				//////////////////////////////////////////////////////////////////////////
+				///	This includes :
+				///	- vertices (address/physical stops)
+				///	- via points
+				std::vector<const geos::geom::Coordinate> getPoints(
 					int fromEdgeIndex = 0,
 					int toEdgeIndex = -1
 				) const;
 
+
 				
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests the possibility of finding a running service at a given date.
+				/// @param date the date to test
+				/// @return true if the path should contain a running service at the date.
+				/// @warning this test does not certify that a service is actually running
+				/// at the given date. If the response is false, then it is sure that 
+				/// no service runs at the given date.
+				/// @author Hugues Romain
 				virtual bool isActive(const boost::gregorian::date& date) const = 0;
 
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// builds a geos linestring of all the points linked by the path.
+				/// @author Thomas Bonfort
+				/// @date 2010
+				/// @since 3.2.0
+				boost::shared_ptr<geos::geom::Geometry> getGeometry() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Returns the distance from this path to the given point.
+				/// @param pt point
+				/// @return the distance from this path to the given point.
+				/// @author Thomas Bonfort
+				/// @date 2010
+				/// @since 3.2.0
+				double distance(const geos::geom::Point& pt) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the geometry of the path is relevant.
+				/// @author Thomas Bonfort
+				/// @date 2010
+				/// @since 3.2.0
+				void validateGeometry() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the length of the path.
+				/// @return the length of the path
+				/// @author Thomas Bonfort
+				/// @date 2010
+				/// @since 3.2.0
+				double length() const;
 
 
 				//////////////////////////////////////////////////////////////////////////
@@ -163,6 +213,16 @@ namespace synthese
 				/// @date 2010
 				/// @since 3.1.16
 				bool includes(const Path& other, bool considerVertices) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Returns the edge that contains the point at given distance from start.
+				/// @param offset distance along the line, must be in ]0,length()[
+				/// @author Thomas Bonfort
+				/// @date 2010
+				/// @since 3.2.0
+				Edge* getEdgeAtOffset(double offset) const;
 			//@}
 			
 			//! @name Modifiers.
@@ -214,6 +274,12 @@ namespace synthese
 				*/
 				virtual void addService (Service* service, bool ensureLineTheory);
 
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Removes a service from the path.
+				/// @param service the service to remove
+				/// @author Hugues Romain
 				void removeService (Service* service);
 
 
@@ -228,6 +294,7 @@ namespace synthese
 				///  - shift the metric offset in the second path
 				///  - change the pointers
 				///  - delete the second path in the PathGroup
+				/// @author Hugues Romain
 				void merge(Path& other);
 
 		private:
@@ -235,7 +302,6 @@ namespace synthese
 				void markScheduleIndexesUpdateNeeded ();
 
 			//@}
-		    
 		};
 	}
 }

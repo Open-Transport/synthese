@@ -64,6 +64,7 @@ namespace synthese
 			const ptime& maxEndTime,
 			graph::GraphIdType whatToSearch,
 			graph::GraphIdType graphToUse,
+			double vmax,
 			std::ostream* logStream /*= NULL*/,
 			boost::optional<const JourneyTemplates&> journeyTemplates
 		):	_originVam(originVam),
@@ -78,7 +79,8 @@ namespace synthese
 			_graphToUse(graphToUse),
 			_logStream(logStream),
 			_totalDistance(destinationVam.getIsobarycenter().distance(originVam.getIsobarycenter())),
-			_journeyTemplates(journeyTemplates)
+			_journeyTemplates(journeyTemplates),
+			_vmax(vmax)
 		{
 		}
 
@@ -240,6 +242,7 @@ namespace synthese
 				secondTime,
 				secondTime,
 				_maxDuration,
+				_vmax,
 				NULL,
 				_totalDistance,
 				_journeyTemplates

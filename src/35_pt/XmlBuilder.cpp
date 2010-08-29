@@ -169,12 +169,12 @@ namespace synthese
 			;
 
 			// Add via points
-			int nbPoints = GetChildNodeCount(node, "point");
-			for (int i=0; i<nbPoints; ++i) 
-			{
-				XMLNode pointNode = GetChildNode (node, "point", i);
-				lineStop->addViaPoint (CreatePoint (pointNode));
-			}
+//			int nbPoints = GetChildNodeCount(node, "point");
+//			for (int i=0; i<nbPoints; ++i) 
+//			{
+//				XMLNode pointNode = GetChildNode (node, "point", i);
+//				lineStop->addViaPoint (CreatePoint (pointNode));
+//			}
 
 			line->addEdge(*lineStop);
 

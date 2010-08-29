@@ -28,11 +28,17 @@
 #include "Exception.h"
 #include "Conversion.h"
 #include "Hub.h"
+#include "Log.h"
 
 #include <assert.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
+#include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Coordinate.h>
+#include <geos/geom/Point.h>
+#include <geos/geom/LineString.h>
+#include <geos/geom/CoordinateSequenceFactory.h>
+#include <geos/linearref/LengthIndexedLine.h>
 
 using namespace std;
 using namespace boost;
@@ -113,24 +119,28 @@ namespace synthese
 
 
 
-		std::vector<const Coordinate*> Path::getPoints(
+		std::vector<const Coordinate> Path::getPoints(
 			int fromEdgeIndex,
 			int toEdgeIndex
 		) const	{
 			if (toEdgeIndex == -1) toEdgeIndex = _edges.size () - 1;
-			std::vector<const Coordinate*> points;
+			vector<const Coordinate> points;
 		    
 			for (int i=fromEdgeIndex; i<=toEdgeIndex; ++i)
 			{
-				points.push_back(_edges[i]->getFromVertex());
-				
-				// Adds all the via points of the line stop
-				const Edge::ViaPoints& viaPoints = _edges[i]->getViaPoints ();
-				for(Edge::ViaPoints::const_iterator it = viaPoints.begin (); 
-					it != viaPoints.end (); 
-					++it
-				){
-					points.push_back (*it);
+				shared_ptr<Geometry> geometry(_edges[i]->getGeometry());
+				CoordinateSequence* coords(
+					geometry->getCoordinates()
+				);
+
+				if(i == fromEdgeIndex)
+				{
+					points.push_back(coords->getAt(0));
+				}
+
+				for(i=1; i<coords->getSize(); ++i)
+				{
+					points.push_back(coords->getAt(i));
 				}
 			}
 			return points;
@@ -142,7 +152,6 @@ namespace synthese
 			Edge& edge
 		){
 			// Empty path : just put the edge in the vector
-
 			if (_edges.empty())
 			{
 				_edges.push_back(&edge);
@@ -361,6 +370,33 @@ namespace synthese
 
 
 
+		double Path::length(
+		) const {
+			return getLastEdge()->getMetricOffset();
+		}
+
+
+
+		Edge* Path::getEdgeAtOffset(
+			double offset
+		) const {
+			Edges::const_iterator edgeIt;
+			Edge* previous;
+			if(offset == 0)
+				return _edges.front();
+			if(offset == _edges.back()->getMetricOffset())
+				return _edges.back();
+			for(edgeIt = _edges.begin();edgeIt != _edges.end();++edgeIt) {
+				if((*edgeIt)->getMetricOffset() > offset)
+					break;
+				previous = *edgeIt;
+			}
+			//assert(edgeIt!=_edges.end());
+			return previous;
+		}
+
+
+
 		bool Path::isRoad() const
 		{
 			return false;
@@ -504,5 +540,67 @@ namespace synthese
 				&& s1 < s2)						
 				;
 		}
+
+
+		shared_ptr<Geometry> Path::getGeometry(
+		) const {
+			const GeometryFactory *gf = GeometryFactory::getDefaultInstance();
+			std::vector<const Coordinate> points(getPoints());
+			std::vector<Coordinate>* coordinates = new std::vector<geos::geom::Coordinate>();
+			BOOST_FOREACH(const Coordinate& pt, points)
+			{
+			   if(pt.isNull())
+			   {
+				   continue;
+			   }
+			   coordinates->push_back(pt);
+			}
+			CoordinateSequence *cs = gf->getCoordinateSequenceFactory()->create(coordinates);
+			//coordinates* is now owned by cs
+
+			shared_ptr<Geometry> geosGeom(static_cast<Geometry*>(gf->createLineString(cs)));
+			//cs* owned by geometry
+
+			return geosGeom;
+		}
+
+
+
+		double Path::distance(
+			const Point& pt
+		) const {
+			if(pt.isEmpty())
+			{
+				return std::numeric_limits<double>::infinity();
+			}
+			return getGeometry()->distance(&pt);
+		}
+
+
+
+      void Path::validateGeometry() const
+	  {
+         if(!_edges.size()) return;
+         double graphlength  = _edges.back()->getMetricOffset();
+         double geomLength = getGeometry()->getLength();
+         if(std::abs(graphlength-geomLength)>0.1) {
+            std::stringstream ss;
+            ss.precision(10);
+            ss << "discrepancy found in geometries for path " << getKey() << std::endl;
+
+            BOOST_FOREACH(const Coordinate& pt, getPoints()) {
+               ss << "("<<pt.x<<","<<pt.y<<")";
+            }
+            ss<<std::endl<<getGeometry()->toText()<<std::endl;
+            util::Log::GetInstance().warn(ss.str());
+         }
+         double offset = 0;
+         const Coordinate* prevPnt = NULL;
+         BOOST_FOREACH(const graph::Edge* edge, _edges) {
+			shared_ptr<Geometry> geometry(edge->getGeometry());
+			offset += geometry->getLength();
+         }
+         assert(std::abs(offset-_edges.back()->getMetricOffset())<0.1);
+      }
 	}
 }

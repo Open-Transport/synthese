@@ -50,6 +50,8 @@ namespace synthese
 	namespace pt
 	{
 		/** Scheduled service.
+		TRIDENT = VehicleJourney
+
 			@ingroup m35
 		*/
 		class ScheduledService
@@ -149,7 +151,8 @@ namespace synthese
 				
 				virtual void completeServicePointer(
 					graph::ServicePointer& servicePointer,
-					const graph::Edge& edge
+					const graph::Edge& edge,
+					const graph::AccessParameters& accessParameters
 				) const;
 
 				

@@ -84,6 +84,7 @@ namespace synthese
 				const bool									_optim;
 				std::ostream* const							_logStream;
 				boost::optional<boost::posix_time::time_duration>	_maxDuration;
+				const double								_vmax;
 			//@}
 
 			//! @name Route planning data
@@ -122,6 +123,32 @@ namespace synthese
 			) const;
 
 		public:
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Computes and stores the score of a journey.
+			/// @param totalDuration the duration of the best journey found by the route planner (undefined if no journey has been found at the time)
+			/// @param journeyTemplates journeys to compare with for similarity test
+			/// @param originDateTime time at the beginning of the search
+			/// @param totalDistance distance between origin and destination places
+			/// @author Hugues Romain
+			/// @date 2009-2010
+			//////////////////////////////////////////////////////////////////////////
+			/// The score is between 0 and 1000.
+			/// 0 is a special value indicating that the journey
+			///
+			/// @image html scores_noresult.png
+			/// @image html scores_result.png
+			///
+			/// <h3>Attachments</h3>
+			/// <ul><li><a href="include/test-score.xslx">Score simulation table</a></li></ul>
+			RoutePlanningIntermediateJourney::Score _getScore(
+				boost::optional<boost::posix_time::time_duration> totalDuration,
+				int distanceToEnd,
+				boost::posix_time::time_duration journeyDuration,
+				const graph::Hub& hub
+			) const;
+
+
 			IntegralSearcher(
 				PlanningPhase										accessDirection,
 				const graph::AccessParameters&						accessParameters,
@@ -137,6 +164,7 @@ namespace synthese
 				bool												inverted,
 				bool												optim,
 				boost::optional<boost::posix_time::time_duration>	maxDuration,
+				double												vmax,
 				std::ostream* const									logStream = NULL,
 				int													totalDistance = 0,
 				boost::optional<const JourneyTemplates&>			journeyTemplates = boost::optional<const JourneyTemplates&>()

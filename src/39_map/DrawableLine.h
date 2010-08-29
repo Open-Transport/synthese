@@ -58,7 +58,7 @@ namespace synthese
 
 			const util::RegistryKeyType _lineId;
 
-			std::vector<const geos::geom::Coordinate*> _points;  //!< Reference line points
+			std::vector<const geos::geom::Coordinate> _points;  //!< Reference line points
 			const std::string _shortName;
 			const synthese::util::RGBColor _color;
 			const bool _withPhysicalStops;
@@ -83,7 +83,7 @@ namespace synthese
 
 
 			DrawableLine (const util::RegistryKeyType& lineId,
-				const std::vector<const geos::geom::Coordinate*>& points,
+				const std::vector<const geos::geom::Coordinate>& points,
 				  const std::string& shortName,
 				  const synthese::util::RGBColor& color,
 				  bool withPhysicalStops = true);
@@ -98,7 +98,7 @@ namespace synthese
 			const synthese::util::RGBColor& getColor () const;
 			bool getWithPhysicalStops () const;
 
-			const std::vector<const geos::geom::Coordinate*>& 
+			const std::vector<const geos::geom::Coordinate>& 
 			getPoints () const;
 
 			const std::vector<geos::geom::Coordinate>& 

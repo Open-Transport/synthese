@@ -38,7 +38,7 @@ namespace geos
 {
 	namespace geom
 	{
-		class Coordinate;
+		class LineString;
 	}
 }
 
@@ -73,13 +73,12 @@ namespace synthese
 				and as an arrival edge.
 
 			@ingroup m18
+			@author Marc Jambert, Hugues Romain
 		*/
 		class Edge
 			:	public virtual util::Registrable
 		{
 		public:
-			typedef std::vector<const geos::geom::Coordinate*> ViaPoints;
-
 			template<class Iterator>
 			class ServiceIndex
 			{
@@ -122,7 +121,7 @@ namespace synthese
 			Edge* _followingConnectionArrival;			//!< Next connection arrival edge along path.
 			Edge* _followingArrivalForFineSteppingOnly;	//!< Next arrival edge with or without connection
 
-			ViaPoints _viaPoints;				//!< Intermediate points along the edge (for map drawing)
+			boost::shared_ptr<geos::geom::LineString> _geometry;				//!< Intermediate points along the edge (for map drawing)
 
 			mutable DepartureServiceIndices _departureIndex;	//!< First service index by departure hour of day
 			mutable ArrivalServiceIndices _arrivalIndex;		//!< First service index by arrival hour of day
@@ -163,7 +162,7 @@ namespace synthese
 				void setFollowingConnectionArrival(Edge* followingConnectionArrival) {_followingConnectionArrival = followingConnectionArrival; }
 				void setFollowingArrivalForFineSteppingOnly(Edge* followingArrival) { _followingArrivalForFineSteppingOnly = followingArrival; }
 				void setMetricOffset (double metricOffset) { _metricOffset = metricOffset; }
-				void setViaPoints(const ViaPoints& value) { _viaPoints = value; }
+				void setGeometry(boost::shared_ptr<geos::geom::LineString> value) { _geometry = value; }
 				void setFromVertex(Vertex* value) { _fromVertex = value; }
 			//@}
 
@@ -185,15 +184,12 @@ namespace synthese
 				Edge* getFollowingConnectionArrival () const { return _followingConnectionArrival; }
 				Edge* getFollowingArrivalForFineSteppingOnly () const { return _followingArrivalForFineSteppingOnly; }
 			    
-				/** Gets intermediate points 
-				* between this line stop and the next in path.
-				*/
-				const ViaPoints& getViaPoints () const { return _viaPoints; }
-
 				const DepartureServiceIndices& getDepartureIndices() const { return _departureIndex; }
 				const ArrivalServiceIndices& getArrivalIndices() const { return _arrivalIndex; }
 
 				std::size_t getRankInPath () const { return _rankInPath; }
+
+				boost::shared_ptr<geos::geom::LineString> getStoredGeometry() const { return _geometry; }
 			//@}
 
 
@@ -218,6 +214,24 @@ namespace synthese
 				
 				bool isArrival() const;
 				bool isDeparture() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the geometry of the edge.
+				/// @return the geometry of the edge including starting and ending points (vertices)
+				/// @author Hugues Romain
+				/// @since 3.2.0
+				/// @date 2010
+				//////////////////////////////////////////////////////////////////////////
+				/// A geometry is generated if no geometry is stored in the object :
+				///	<ul>
+				///		<li>If the edge is the last edge, the vertex point is returned</li>
+				///		<li>Else a right line string between the vertex and the next one is returned</li>
+				/// </ul>
+				boost::shared_ptr<geos::geom::Geometry> getGeometry(
+				) const;
+
 
 //				int getBestRunTime (const Edge& other ) const;
 			    
@@ -281,10 +295,6 @@ namespace synthese
 
 			//! @name Update methods
 			//@{
-				///TODO @todo Remove via point update methods due to thread unsafeness
-				void clearViaPoints ();
-				void addViaPoint (const geos::geom::Coordinate& viaPoint);
-			    
 				void markServiceIndexUpdateNeeded(bool RTDataOnly) const;
 			//@}
 		};

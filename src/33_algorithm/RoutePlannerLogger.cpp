@@ -216,7 +216,7 @@ namespace synthese
 				}
 				_stream << _t.col() << journey->getEndTime();
 				_stream << _t.col() << journey->getScore();
-				_stream << _t.col() << journey->getDistanceToEnd();
+				_stream << _t.col() << *journey->getDistanceToEnd();
 //				_stream << _t.col() << (60 * (journey->getMinSpeedToEnd() ? (journey->getDistanceToEnd() / journey->getMinSpeedToEnd()) : -1));
 				_stream << _t.col() << journey->getEndEdge().getHub()->getScore();
 //				_stream << _t.col() << journey->getMinSpeedToEnd();

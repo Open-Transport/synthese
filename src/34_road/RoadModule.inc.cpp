@@ -9,6 +9,7 @@
 #include "RoadChunkTableSync.h"
 #include "RoadModule.h"
 #include "PublicPlaceTableSync.h"
+#include "NavstreetsFileFormat.hpp"
 
 // Registries
 

@@ -27,6 +27,7 @@
 #include <vector>
 
 #include "GraphTypes.h"
+#include "AlgorithmTypes.h"
 
 namespace synthese
 {
@@ -38,6 +39,8 @@ namespace synthese
 
 	namespace algorithm
 	{
+		class RoutePlanningIntermediateJourney;
+
 		/** JourneyTemplates class.
 			@ingroup m33
 		*/
@@ -54,7 +57,20 @@ namespace synthese
 			JourneyTemplates(const graph::GraphIdType graphToUse);
 
 			void addResult(const graph::Journey& value);
-			bool testJourneySimilarity(const graph::Journey& value) const;
+			
+			//////////////////////////////////////////////////////////////////////////
+			/// Tests if a new journey composed by adding a new chunk to an existing 
+			/// journey gets a journey similar to one of the templates.
+			/// @param precedingJourney preceding journey
+			/// @param hub hub to add as new destination
+			/// @param direction DEPARTURE_TO_ARRIVAL : the hub is an arrival after the 
+			///		existing journey, else it is a departure before
+			/// @return true if the new journey is similar with one of the journeys of the template
+			bool testSimilarity(
+				const RoutePlanningIntermediateJourney& precedingJourney, 
+				const graph::Hub& hub,
+				PlanningPhase direction
+			) const;
 		};
 	}
 }

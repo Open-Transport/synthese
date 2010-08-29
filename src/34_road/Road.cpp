@@ -27,6 +27,8 @@
 #include "PermanentService.h"
 #include "Registry.h"
 
+#include <geos/geom/LineString.h>
+
 using namespace std;
 using namespace boost;
 using namespace geos::geom;
@@ -147,9 +149,13 @@ namespace synthese
 							_reverseRoad,
 							-chunk.getMetricOffset()
 					)	);
-					BOOST_REVERSE_FOREACH(const Coordinate*pt, chunk.getViaPoints())
+					shared_ptr<LineString> geometry(chunk.getStoredGeometry());
+					if(geometry.get())
 					{
-						reverseChunk->addViaPoint(*pt);
+						reverseChunk->setGeometry(
+							shared_ptr<LineString>(
+								dynamic_cast<LineString*>(chunk.getStoredGeometry()->reverse())
+						)	);
 					}
 					_reverseRoad->addEdge(*reverseChunk);
 				}

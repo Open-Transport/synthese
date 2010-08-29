@@ -29,6 +29,8 @@ namespace synthese
 {
 	namespace graph
 	{
+		class AccessParameters;
+
 		/** PermanentService class.
 			@ingroup m18
 		*/
@@ -92,7 +94,8 @@ namespace synthese
 
 			virtual void completeServicePointer(
 				graph::ServicePointer& servicePointer,
-				const graph::Edge& edge
+				const graph::Edge& edge,
+				const AccessParameters& accessParameters
 			) const;
 
 		};

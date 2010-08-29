@@ -55,6 +55,7 @@
 #include "PTPlacesAdmin.h"
 #include "City.h"
 #include "LineStopUpdateAction.hpp"
+#include "ServiceRemoveAction.h"
 
 #include <boost/foreach.hpp>
 
@@ -290,6 +291,8 @@ namespace synthese
 				newRequest.getAction()->setLine(const_pointer_cast<JourneyPattern>(_line));
 				newRequest.getAction()->setIsContinuous(false);
 
+				AdminActionFunctionRequest<ServiceRemoveAction, JourneyPatternAdmin> removeRequest(_request);
+
 				ActionResultHTMLTable::HeaderVector vs;
 				vs.push_back(make_pair(string(), "Num"));
 				vs.push_back(make_pair(string(), "Numéro"));
@@ -309,6 +312,9 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<ScheduledService> service, sservices)
 				{
 					serviceRequest.getPage()->setService(service);
+					removeRequest.getAction()->setService(
+						const_pointer_cast<const Service>(static_pointer_cast<Service, ScheduledService>(service))
+					);
 
 					string number("S"+ lexical_cast<string>(i++));
 					services[service.get()] = number;
@@ -333,7 +339,7 @@ namespace synthese
 					serviceRequest.getPage()->setActiveTab(string());
 					stream << ts.col() << HTMLModule::getLinkButton(serviceRequest.getURL(), "Ouvrir", string(), ServiceAdmin::ICON);
 
-					stream << ts.col() << "Supprimer";
+					stream << ts.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le service "+ service->getServiceNumber() +" ?");
 				}
 
 				stream << ts.row();
@@ -360,6 +366,8 @@ namespace synthese
 
 				AdminFunctionRequest<ServiceAdmin> serviceRequest(_request);
 
+				AdminActionFunctionRequest<ServiceRemoveAction, JourneyPatternAdmin> removeRequest(_request);
+
 				ActionResultHTMLTable::HeaderVector vc;
 				vc.push_back(make_pair(string(), "Num"));
 				vc.push_back(make_pair(ScheduledServiceTableSync::COL_SCHEDULES, "Départ premier"));
@@ -381,6 +389,9 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<ContinuousService> service, cservices)
 				{
 					serviceRequest.getPage()->setService(service);
+					removeRequest.getAction()->setService(
+						const_pointer_cast<const Service>(static_pointer_cast<Service, ContinuousService>(service))
+					);
 
 					string number("C"+ lexical_cast<string>(i++));
 					services[service.get()] = number;
@@ -409,7 +420,7 @@ namespace synthese
 
 					stream << tc.col() << HTMLModule::getLinkButton(serviceRequest.getURL(), "Ouvrir", string(), ServiceAdmin::ICON);
 
-					stream << tc.col() << "Supprimer";
+					stream << tc.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le service ?");
 				}
 
 				stream << tc.row();

@@ -110,7 +110,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
          it != selectedLines.end () ; ++it) 
     {
 	const DrawableLine* dbl = *it;
-	const std::vector<const Coordinate*>& points = dbl->getPoints ();
+	const std::vector<const Coordinate>& points = dbl->getPoints ();
 
 
 	
@@ -149,7 +149,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 	    // Dump points between first stop index and second point index
 	    for (int i=firstStopIndex; i<=secondStopIndex; ++i)
 	    {
-		mifof << points[i]->x << " " << points[i]->y << std::endl;
+		mifof << points[i].x << " " << points[i].y << std::endl;
 	    }
 	    mifof << "    Pen (" 
 		  << 3 << "," // pen width
@@ -159,9 +159,9 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 		       (int) dbl->getColor ().b)) // pen color
 		  << ")" << std::endl;
 
-	    midof << ((const StopPoint*) points[firstStopIndex])->getName ()
-		  << " > " << ((const StopPoint*) points[secondStopIndex])->getName ()
-		  << std::endl;
+//	    midof << ((const StopPoint*) points[firstStopIndex])->getName ()
+//		  << " > " << ((const StopPoint*) points[secondStopIndex])->getName ()
+//		  << std::endl;
 	    
 	    firstStopIndex = secondStopIndex;
 	}

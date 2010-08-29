@@ -65,6 +65,7 @@ namespace synthese
 				const graph::GraphIdType			_whatToSearch;
 				const graph::GraphIdType			_graphToUse;
 				const graph::Journey				_parentContinuousService;
+				double								_vmax;
 			//@}
 
 			//! @name Logging
@@ -97,6 +98,7 @@ namespace synthese
 				boost::optional<std::size_t>	maxSolutionsNumber,
 				graph::AccessParameters		accessParameters,
 				PlanningOrder					planningOrder,
+				double							vmax,
 				std::ostream* logStream = NULL
 			);
 
@@ -122,6 +124,7 @@ namespace synthese
 				boost::optional<std::size_t>	maxSolutionsNumber,
 				graph::AccessParameters		accessParameters,
 				PlanningOrder					planningOrder,
+				double						vmax,
 				std::ostream* logStream = NULL
 			);
 

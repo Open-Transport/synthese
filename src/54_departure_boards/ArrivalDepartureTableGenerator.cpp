@@ -117,6 +117,7 @@ namespace synthese
 			// Adding of the beginning place
 			arrivals.push_back(IntermediateStop(place));
 			encounteredPlaces.insert(place);
+			AccessParameters ap;
 
 			for(curLinestop = static_cast<const LineStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly());
 				curLinestop != NULL;
@@ -137,7 +138,7 @@ namespace synthese
 					encounteredPlaces.find(place) == encounteredPlaces.end() &&
 					place != destinationPlace
 				){
-					ServicePointer completed(servicePointer, *curLinestop);
+					ServicePointer completed(servicePointer, *curLinestop, ap);
 					_push_back(arrivals, completed);
 					encounteredPlaces.insert(place);
 				}
@@ -145,7 +146,7 @@ namespace synthese
 			// Add the ending stop
 			if((arrivals.end()-1)->place != place || arrivals.size() <= 1)
 			{
-				_push_back(arrivals, ServicePointer(servicePointer, *lastLineStop));
+				_push_back(arrivals, ServicePointer(servicePointer, *lastLineStop, ap));
 			}
 
 			/** - Insertion */

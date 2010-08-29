@@ -105,10 +105,9 @@ namespace synthese
 					const graph::ServicePointer& serviceUse,
 					bool endIsReached,
 					const graph::VertexAccessMap& destinationVam,
-					boost::optional<boost::posix_time::time_duration> totalDuration,
-					boost::optional<const JourneyTemplates&> journeyTemplates,
-					const boost::posix_time::ptime& originDateTime,
-					const int totalDistance
+					graph::Journey::Distance distanceToEnd,
+					bool similarity,
+					Score score
 				);
 
 
@@ -131,44 +130,15 @@ namespace synthese
 				bool getEndReached() const { return _endReached; }
 				boost::optional<graph::Journey::Distance> getDistanceToEnd() const { return _distanceToEnd; }
 				Score getScore() const { return _score; }
+				bool getSimilarity() const { return _similarity; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setStartApproachDuration(const boost::posix_time::time_duration& value){ _startApproachDuration = value; }
 				void setEndApproachDuration(const boost::posix_time::time_duration& value){ _endApproachDuration = value; }
+				void setScore(Score value){ _score = value; }
 			//@}
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Computes and stores the score of a journey.
-			/// @param totalDuration the duration of the best journey found by the route planner (undefined if no journey has been found at the time)
-			/// @param journeyTemplates journeys to compare with for similarity test
-			/// @param originDateTime time at the beginning of the search
-			/// @param totalDistance distance between origin and destination places
-			/// @author Hugues Romain
-			/// @date 2009-2010
-			//////////////////////////////////////////////////////////////////////////
-			/// The score is between 0 and 1000.
-			///
-			/// @image html scores_noresult.png
-			/// @image html scores_result.png
-			///
-			/// <h3>Attachments</h3>
-			/// <ul><li><a href="include/test-score.xslx">Score simulation table</a></li></ul>
-			void setScore(
-				boost::optional<boost::posix_time::time_duration> totalDuration,
-				boost::optional<const JourneyTemplates&> journeyTemplates,
-				const boost::posix_time::ptime& originDateTime,
-				const int _totalDistance
-			);
-
-
-			void updateScore(
-				const boost::posix_time::time_duration& totalDuration,
-				const boost::posix_time::ptime& originDateTime
-			);
 
 
 

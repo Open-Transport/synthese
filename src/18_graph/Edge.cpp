@@ -26,7 +26,12 @@
 #include "Service.h"
 #include "Vertex.h"
 
+#include <boost/foreach.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <geos/geom/LineString.h>
+#include <geos/geom/Point.h>
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/CoordinateSequenceFactory.h>
 
 using namespace boost;
 using namespace boost::posix_time;
@@ -61,15 +66,6 @@ namespace synthese
 
 		Edge::~Edge ()
 		{
-			// Delete via points
-			for (std::vector<const Coordinate*>::iterator iter = _viaPoints.begin (); 
-			iter != _viaPoints.end (); 
-			++iter)
-			{
-				delete (*iter);
-			}
-			_viaPoints.clear ();
-		    
 		}
 
 
@@ -85,22 +81,6 @@ namespace synthese
 		{
 			return _followingArrivalForFineSteppingOnly && isDepartureAllowed();
 		}
-
-
-
-		void 
-		Edge::addViaPoint (const Coordinate& viaPoint)
-		{
-			_viaPoints.push_back(new Coordinate(viaPoint));
-		}
-
-
-		void 
-		Edge::clearViaPoints ()
-		{
-			_viaPoints.clear ();
-		}
-
 
 
 
@@ -427,5 +407,34 @@ namespace synthese
 		bool Edge::_getServiceIndexUpdateNeeded( bool RTData ) const
 		{
 			return RTData ? _RTserviceIndexUpdateNeeded : _serviceIndexUpdateNeeded;
+		}
+
+
+
+		shared_ptr<Geometry> Edge::getGeometry(
+		) const	{
+			if(_geometry.get())
+			{
+				return static_pointer_cast<Geometry,LineString>(_geometry);
+			}
+			assert(getFromVertex());
+			if(	getParentPath() &&
+				getParentPath()->getEdge(getRankInPath()) == this &&
+				getParentPath()->getEdges().size() != getRankInPath()+1
+			){
+				const Edge* nextEdge(getParentPath()->getEdge(getRankInPath() + 1));
+				const GeometryFactory* geometryFactory(GeometryFactory::getDefaultInstance());
+				std::vector<Coordinate>* coordinates = new std::vector<geos::geom::Coordinate>();
+				coordinates->push_back(*getFromVertex());
+				coordinates->push_back(*nextEdge->getFromVertex());
+				CoordinateSequence *cs = geometryFactory->getCoordinateSequenceFactory()->create(coordinates);
+				shared_ptr<LineString> geometry(geometryFactory->createLineString(cs));
+				return static_pointer_cast<Geometry, LineString>(geometry);
+			}
+
+			return static_pointer_cast<Geometry, Point>(
+				shared_ptr<Point>(
+					GeometryFactory::getDefaultInstance()->createPoint(*getFromVertex())
+			)	);
 		}
 }	}

@@ -26,9 +26,14 @@
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "LinkException.h"
+#include "GeoPoint.h"
 
-#include <boost/tokenizer.hpp>
-#include <geos/geom/Coordinate.h>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+#include <geos/geom/LineString.h>
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/CoordinateSequenceFactory.h>
+
 
 using namespace std;
 using namespace boost;
@@ -39,6 +44,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace road;
+	using namespace geography;
 
 	namespace util
 	{
@@ -52,6 +58,9 @@ namespace synthese
 		const string RoadChunkTableSync::COL_VIAPOINTS ("via_points");  // list of ids
 		const string RoadChunkTableSync::COL_ROADID ("road_id");  // NU
 		const string RoadChunkTableSync::COL_METRICOFFSET ("metric_offset");  // U ??
+
+		const string RoadChunkTableSync::SEP_POINTS(",");
+		const string RoadChunkTableSync::SEP_LON_LAT(":");
 	}
 
 	namespace db
@@ -94,26 +103,53 @@ namespace synthese
 			// Metric offset
 			object->setMetricOffset(rows->getDouble (RoadChunkTableSync::COL_METRICOFFSET));
 
-		    // Via points
-		    object->clearViaPoints ();
-		    string viaPointsStr (rows->getText (RoadChunkTableSync::COL_VIAPOINTS));
-		    typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-		    boost::char_separator<char> sep1 (",");
-		    boost::char_separator<char> sep2 (":");
-		    tokenizer viaPointsTokens (viaPointsStr, sep1);
-		    for (tokenizer::iterator viaPointIter = viaPointsTokens.begin();
-			 viaPointIter != viaPointsTokens.end (); ++viaPointIter)
-		    {
-				tokenizer valueTokens (*viaPointIter, sep2);
-				tokenizer::iterator valueIter = valueTokens.begin();
-				
-				// X:Y
-				object->addViaPoint(
-					Coordinate(
-						Conversion::ToDouble(*valueIter), 
-						Conversion::ToDouble(*(++valueIter))
-				)	);
-		    }
+		    // Geometry
+			string viaPointsStr(rows->getText (RoadChunkTableSync::COL_VIAPOINTS));
+			if(viaPointsStr.empty())
+			{
+				object->setGeometry(shared_ptr<LineString>());
+			}
+			else
+			{
+				const GeometryFactory* geometryFactory(GeometryFactory::getDefaultInstance());
+				vector<Coordinate>* coordinates = new vector<Coordinate>();
+
+				vector<string> points;
+				algorithm::split(points, viaPointsStr, algorithm::is_any_of(RoadChunkTableSync::SEP_POINTS));
+
+				if(points.size() > 1)
+				{
+					BOOST_FOREACH(const string& point, points)
+					{
+						vector<string> lonlat;
+						algorithm::split(lonlat, point, algorithm::is_any_of(RoadChunkTableSync::SEP_LON_LAT));
+
+						if(lonlat.size() < 2)
+						{
+							continue;
+						}
+
+						GeoPoint pt(
+							lexical_cast<double>(lonlat[0]),
+							lexical_cast<double>(lonlat[1])
+						);
+
+						coordinates->push_back(
+							pt
+						);
+					}
+
+					CoordinateSequence *cs = geometryFactory->getCoordinateSequenceFactory()->create(coordinates);
+					//coordinates is now owned by cs
+
+					object->setGeometry(shared_ptr<LineString>(geometryFactory->createLineString(cs)));
+					//cs is now owned by the geometry
+				}
+				else
+				{
+					object->setGeometry(shared_ptr<LineString>());
+				}
+			}
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -147,12 +183,20 @@ namespace synthese
 			optional<SQLiteTransaction&> transaction
 		){
 			stringstream viaPoints;
-			bool first(true);
-			BOOST_FOREACH(const geos::geom::Coordinate* viaPoint, object->getViaPoints())
+			if(object->getStoredGeometry().get())
 			{
-				if(!first) viaPoints << ",";
-				viaPoints << viaPoint->x << ":" << viaPoint->y;
-				first = false;
+				viaPoints << fixed;
+				const CoordinateSequence* coords(object->getStoredGeometry()->getCoordinatesRO());
+				
+				for(size_t i(0); i<coords->getSize(); ++i)
+				{
+					if(i>0)
+					{
+						viaPoints << RoadChunkTableSync::SEP_POINTS;
+					}
+					GeoPoint pt(coords->getAt(i));
+					viaPoints << pt.getLongitude() << RoadChunkTableSync::SEP_LON_LAT << pt.getLatitude();
+				}
 			}
 
 			ReplaceQuery<RoadChunkTableSync> query(*object);

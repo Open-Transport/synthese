@@ -58,6 +58,7 @@
 #include "AdminModule.h"
 #include "DataSource.h"
 #include "PTImportAdmin.h"
+#include "JourneyPatternRemoveAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -150,6 +151,8 @@ namespace synthese
 			{
 				// Requests
 				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request);
+
+				AdminActionFunctionRequest<JourneyPatternRemoveAction, CommercialLineAdmin> removeRequest(_request);
 				
 				// Search form
 				stream << "<h1>Recherche</h1>";
@@ -188,7 +191,8 @@ namespace synthese
 				h.push_back(make_pair(string(), HTMLModule::getHTMLImage("car.png", "Services")));
 				h.push_back(make_pair(string(), "Source"));
 				h.push_back(make_pair(string(), "Actions"));
-				
+				h.push_back(make_pair(string(), "Actions"));
+
 				ActionResultHTMLTable t(
 					h,
 					s.getForm(),
@@ -203,6 +207,8 @@ namespace synthese
  				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 				{
 					lineOpenRequest.getPage()->setLine(line);
+					removeRequest.getAction()->setJourneyPattern(const_pointer_cast<const JourneyPattern>(line));
+
 					stream << t.row(lexical_cast<string>(line->getKey()));
 					stream << t.col();
 					stream << line->getName();
@@ -244,12 +250,15 @@ namespace synthese
 
 					stream << t.col();
 					stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
+
+					stream << t.col();
+					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le parcours ? Tous les services du parcours seront également supprimés.", "chart_line_delete.png");
 				}
 
 				stream << t.row(string());
 				stream << t.col() << t.getActionForm().getTextInput(JourneyPatternAddAction::PARAMETER_NAME, string(), string(), AdminModule::CSS_2DIGIT_INPUT);
 				stream << t.col(5) << "Inversion : " << t.getActionForm().getOuiNonRadioInput(JourneyPatternAddAction::PARAMETER_REVERSE_COPY, false);
-				stream << t.col() << t.getActionForm().getSubmitButton("Créer un itinéraire");
+				stream << t.col(2) << t.getActionForm().getSubmitButton("Créer un itinéraire");
 
 				stream << t.close();
 			}
