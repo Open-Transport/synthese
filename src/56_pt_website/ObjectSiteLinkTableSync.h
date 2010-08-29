@@ -70,10 +70,10 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			static void Remove(
-				util::RegistryKeyType siteId,
-				boost::optional<util::RegistryKeyType> objectId = boost::optional<util::RegistryKeyType>()
-			);
+//			static void Remove(
+//				util::RegistryKeyType siteId,
+//				boost::optional<util::RegistryKeyType> objectId = boost::optional<util::RegistryKeyType>()
+//			);
 		};
 	}
 }

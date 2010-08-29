@@ -106,24 +106,22 @@ namespace synthese
 			UserClassCode parameter,
 			const graph::AccessParameters::AllowedPathClasses& allowedPathClasses
 		) const	{
-			AccessParameters ap;
-
 			switch(parameter)
 			{
 			case USER_HANDICAPPED:
 				return AccessParameters(
-					parameter, false, false, 300, posix_time::minutes(23), 34, _maxTransportConnectionsCount, allowedPathClasses
+					parameter, false, false, 300, posix_time::minutes(23), 0.556, _maxTransportConnectionsCount, allowedPathClasses
 				);
 
 			case USER_BIKE:
 				return AccessParameters(
-					parameter, false, false, 3000, posix_time::minutes(23), 201, _maxTransportConnectionsCount, allowedPathClasses
+					parameter, false, false, 3000, posix_time::minutes(23), 4.167, _maxTransportConnectionsCount, allowedPathClasses
 				);
 
 			case USER_PEDESTRIAN:
 			default:
 				return AccessParameters(
-					USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 67, _maxTransportConnectionsCount, allowedPathClasses
+					USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 1.111, _maxTransportConnectionsCount, allowedPathClasses
 				);
 			}
 		}

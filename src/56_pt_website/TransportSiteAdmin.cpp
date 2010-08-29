@@ -57,6 +57,9 @@
 #include "ObjectSiteLink.h"
 #include "ObjectSiteLinkTableSync.h"
 #include "WebPageMoveAction.hpp"
+#include "SiteCityAddAction.hpp"
+#include "SiteObjectLinkRemoveAction.hpp"
+#include "RoadJourneyPlanner.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/foreach.hpp>
@@ -83,7 +86,8 @@ namespace synthese
 	using namespace geography;
 	using namespace pt;
 	using namespace cms;
-	
+	using namespace road_journey_planner;
+		
 
 	namespace util
 	{
@@ -109,6 +113,7 @@ namespace synthese
 		const string TransportSiteAdmin::PARAMETER_ACCESSIBILITY("ac");
 		const string TransportSiteAdmin::PARAMETER_LOG("lo");
 		const string TransportSiteAdmin::PARAMETER_ROLLING_STOCK_FILTER("rf");
+		const string TransportSiteAdmin::PARAMETER_JOURNEY_PLANNING_ALGORITHM("ja");
 
 		const string TransportSiteAdmin::TAB_PROPERTIES("pr");
 		const string TransportSiteAdmin::TAB_PERIMETER("pe");
@@ -120,8 +125,8 @@ namespace synthese
 			_dateTime(not_a_date_time),
 			_accessibility(USER_PEDESTRIAN),
 			_log(false),
-			_rollingStockFilter(NULL)
-
+			_rollingStockFilter(NULL),
+			_pt_journey_planning(true)
 		{ }
 		
 		void TransportSiteAdmin::setFromParametersMap(
@@ -149,6 +154,7 @@ namespace synthese
 			_endPlace = map.getDefault<string>(PARAMETER_END_PLACE);
 			_log = map.getDefault<bool>(PARAMETER_LOG, false);
 			_pageSearchParameter.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_RANK);
+			_pt_journey_planning = map.getDefault<bool>(PARAMETER_JOURNEY_PLANNING_ALGORITHM, true);
 
 			if(!map.getDefault<string>(PARAMETER_DATE_TIME).empty())
 			{
@@ -198,6 +204,7 @@ namespace synthese
 			m.insert(PARAMETER_RESULTS_NUMBER, _resultsNumber);
 			m.insert(PARAMETER_ACCESSIBILITY, static_cast<int>(_accessibility));
 			m.insert(PARAMETER_SEARCH_PAGE, _searchPage);
+			m.insert(PARAMETER_JOURNEY_PLANNING_ALGORITHM, _pt_journey_planning);
 			if(_site.get())
 			{
 				m.insert(Request::PARAMETER_OBJECT_ID, _site->getKey());
@@ -283,17 +290,32 @@ namespace synthese
 			{
 				stream << "<h1>Communes autorisées</h1>";
 
-				ObjectSiteLinkTableSync::SearchResult cities(ObjectSiteLinkTableSync::Search(_getEnv(), _site->getKey(), optional<RegistryKeyType>(), CityTableSync::TABLE.ID));
+				ObjectSiteLinkTableSync::SearchResult cities(
+					ObjectSiteLinkTableSync::Search(
+						_getEnv(),
+						_site->getKey(),
+						optional<RegistryKeyType>(),
+						CityTableSync::TABLE.ID
+				)	);
 
 				AdminFunctionRequest<PTPlacesAdmin> openCityRequest(_request);
 
+				AdminActionFunctionRequest<SiteCityAddAction,TransportSiteAdmin> cityAddRequest(_request);
+				cityAddRequest.getAction()->setSite(_site);
+
+				AdminActionFunctionRequest<SiteObjectLinkRemoveAction,TransportSiteAdmin> cityRemoveRequest(_request);
+
+				HTMLForm f(cityAddRequest.getHTMLForm("add_city"));
 				HTMLTable::ColsVector v;
 				v.push_back("Localité");
-				v.push_back("Action");
+				v.push_back("Actions");
+				v.push_back("Actions");
 				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
-				stream << t.open();
+				stream << f.open() << t.open();
 				BOOST_FOREACH(shared_ptr<ObjectSiteLink> link, cities)
 				{
+					cityRemoveRequest.getAction()->setLink(const_pointer_cast<ObjectSiteLink>(link));
+
 					stream << t.row();
 					if(Env::GetOfficialEnv().getRegistry<City>().contains(link->getObjectId()))
 					{
@@ -309,8 +331,13 @@ namespace synthese
 						stream << t.col() << "Unconsistent city " << link->getObjectId();
 						stream << t.col();
 					}
+					stream << t.col() << HTMLModule::getLinkButton(cityRemoveRequest.getHTMLForm().getURL(), "Supprimer", "Etes-vous sûe de vouloir supprimer le lien ?");
 				}
-				stream << t.close();
+				stream << t.row();
+				stream << t.col(2) << f.getTextInput(SiteCityAddAction::PARAMETER_CITY_NAME, string());
+				stream << t.col() << f.getSubmitButton("Ajouter");
+
+				stream << t.close() << f.close();
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -368,6 +395,7 @@ namespace synthese
 							optional<size_t>(_rollingStockFilter->getRank())
 					)	);
 				}
+				stream << st.cell("Transport public", st.getForm().getOuiNonRadioInput(PARAMETER_JOURNEY_PLANNING_ALGORITHM, _pt_journey_planning));
 				stream << st.close();
 
 				// No calculation without cities
@@ -383,24 +411,64 @@ namespace synthese
 				// Route planning
 				const Place* startPlace(_site->fetchPlace(_startCity, _startPlace));
 				const Place* endPlace(_site->fetchPlace(_endCity, _endPlace));
-				PTTimeSlotRoutePlanner r(
-					startPlace,
-					endPlace,
-					_dateTime,
-					endDate,
-					_dateTime,
-					endDate,
-					_resultsNumber,
-					_site->getAccessParameters(_accessibility, _rollingStockFilter ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()),
-					DEPARTURE_FIRST,
-					_log ? &stream : NULL
-				);
-				const PTRoutePlannerResult jv(r.run());
 
 				stream << "<h1>Résultats</h1>";
 
-				jv.displayHTMLTable(stream, optional<HTMLForm&>(), string());
+				algorithm::PlanningOrder _planningOrder(DEPARTURE_FIRST);
 
+				if(_pt_journey_planning)
+				{
+					PTTimeSlotRoutePlanner r(
+						startPlace,
+						endPlace,
+						_dateTime,
+						endDate,
+						_dateTime,
+						endDate,
+						_resultsNumber,
+						_site->getAccessParameters(_accessibility, _rollingStockFilter ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()),
+						_planningOrder,
+						_log ? &stream : NULL
+						);
+					const PTRoutePlannerResult jv(r.run());
+
+					jv.displayHTMLTable(stream, optional<HTMLForm&>(), string());
+				}
+				else
+				{
+					// Route planning
+					AccessParameters ap(
+						USER_PEDESTRIAN,
+						false, false, 30000, posix_time::hours(5), 1.111,
+						1000
+					);
+					RoadJourneyPlanner r(
+						startPlace,
+						endPlace,
+						_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
+						_planningOrder == DEPARTURE_FIRST ? endDate : _dateTime,
+						_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
+						_planningOrder == DEPARTURE_FIRST ? endDate : _dateTime,
+						1,
+						ap,
+						_planningOrder
+					);
+					RoadJourneyPlannerResult jv(r.run());
+
+					jv.displayHTMLTable(stream);
+
+					if(jv.getJourneys().size())
+					{
+						stream << "<h2>Carte</h2><div id=\"olmap\"></div>" << std::endl;
+						stream << HTMLModule::GetHTMLJavascriptOpen();
+						stream << "var tripWKT=\"" << jv.getTripWKT() << "\";";
+						stream << HTMLModule::GetHTMLJavascriptClose();
+						stream << HTMLModule::GetHTMLJavascriptOpen("http://proj4js.org/lib/proj4js-compressed.js");
+						stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openlayers.org/api/OpenLayers.js");
+						stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openstreetmap.org/openlayers/OpenStreetMap.js");
+						stream << HTMLModule::GetHTMLJavascriptOpen("pedestrianroutemap.js");
+					}
+				}
 			}
 
 			////////////////////////////////////////////////////////////////////

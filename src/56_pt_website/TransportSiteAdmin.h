@@ -73,6 +73,7 @@ namespace synthese
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER;
 			static const std::string PARAMETER_SEARCH_PAGE;
 			static const std::string PARAMETER_SEARCH_RANK;
+			static const std::string PARAMETER_JOURNEY_PLANNING_ALGORITHM;
 
 			static const std::string TAB_PROPERTIES;
 			static const std::string TAB_PERIMETER;
@@ -92,6 +93,7 @@ namespace synthese
 			std::string						_searchPage;
 			html::ResultHTMLTable::RequestParameters	_pageSearchParameter;
 			boost::optional<size_t>			_resultsNumber;
+			bool							_pt_journey_planning;
 
 		public:
 			TransportSiteAdmin();

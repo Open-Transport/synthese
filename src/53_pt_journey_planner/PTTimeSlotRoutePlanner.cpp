@@ -75,6 +75,7 @@ namespace synthese
 				maxSolutionsNumber,
 				accessParameters,
 				planningOrder,
+				100,
 				logStream
 			),
 			_departurePlace(origin),
@@ -121,6 +122,7 @@ namespace synthese
 				false,
 				false,
 				_accessParameters.getMaxApproachTime(),
+				_accessParameters.getApproachSpeed(),
 				_logStream
 			);
 			iso.integralSearch(vam, optional<size_t>(), optional<posix_time::time_duration>());
@@ -322,6 +324,7 @@ namespace synthese
 					_maxSolutionsNumber,
 					_accessParameters,
 					_planningOrder,
+					100,
 					_logStream
 				);
 				return PTRoutePlannerResult(
@@ -343,6 +346,7 @@ namespace synthese
 					_maxSolutionsNumber,
 					_accessParameters,
 					_planningOrder,
+					100,
 					_logStream
 				);
 				return PTRoutePlannerResult(

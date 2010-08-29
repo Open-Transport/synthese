@@ -162,6 +162,12 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007
 					@todo Modify the generated object to avoid memory leaks due to the use of new operator
+
+					Default values :
+					<ul>
+					<li>Handicapped : 0.556 m/s = 2 km/h</li>
+					<li>Bike : 4.167 m/s = 15 km/h</li>
+					<li>Pedestrian : 1.111 m/s = 4 km/h</li>
 				*/
 				graph::AccessParameters	getAccessParameters(
 					graph::UserClassCode parameter,
