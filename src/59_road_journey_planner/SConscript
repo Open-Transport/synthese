@@ -1,0 +1,7 @@
+Import ('s3env')
+
+CppSynthese3LibProject(
+	s3env, 's3-road-journey-planner', s3env['S3VERSION'], 
+	source_files = s3env.Glob ('*.cpp'),
+	dependencies = ['s3-admin.cpplib', 's3-road.cpplib', 's3-algorithm.cpplib', 'geos.cpplib']
+)
