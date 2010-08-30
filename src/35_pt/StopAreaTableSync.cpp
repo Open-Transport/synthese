@@ -180,7 +180,7 @@ namespace synthese
 			// Transfer delay matrix
 			stringstream delays;
 			bool first(true);
-			BOOST_FOREACH(const AddressablePlace::TransferDelaysMap::value_type& td, object->getTransferDelays())
+			BOOST_FOREACH(const StopArea::TransferDelaysMap::value_type& td, object->getTransferDelays())
 			{
 				if(!first) delays << ",";
 				delays << td.first.first << ":" << td.first.second << ":";

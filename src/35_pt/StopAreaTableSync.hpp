@@ -71,8 +71,8 @@ namespace synthese
 			/// @param cityNameFilter search of a stop by the name of its city (uses the LIKE operator)
 			/// @param orderByCityNameAndName order the results by city name, then by stop name
 			/// @param raisingOrder order the results ascendantly
-			/// @param rank of the first result to return
-			/// @param maximal number of results to return
+			/// @param first rank of the first result to return
+			/// @param number maximal number of results to return
 			/// @param linkLevel level of link to follow when loading data of the returned objects
 			/// @return the commercial stop points whose respect the search criterias
 			/// @author Hugues Romain

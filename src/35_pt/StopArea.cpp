@@ -28,7 +28,7 @@
 #include "CommercialLine.h"
 #include "JourneyPattern.hpp"
 #include "VertexAccessMap.h"
-#include "Address.h"
+#include "RoadModule.h"
 
 #include <boost/foreach.hpp>
 #include <geos/geom/Envelope.h>
@@ -36,6 +36,7 @@
 using namespace std;
 using namespace boost;
 using namespace geos::geom;
+using namespace boost::posix_time;
 
 
 namespace synthese
@@ -58,18 +59,15 @@ namespace synthese
 			util::RegistryKeyType id
 			, bool allowedConnection/*= CONNECTION_TYPE_FORBIDDEN */
 			, posix_time::time_duration defaultTransferDelay /*= FORBIDDEN_TRANSFER_DELAY  */
-		):	AddressablePlace(allowedConnection, defaultTransferDelay),
-			Registrable(id),
-			NamedPlaceTemplate<StopArea>()
-			, _score(UNKNOWN_VALUE)
+		):	Registrable(id),
+			NamedPlaceTemplate<StopArea>(),
+			_allowedConnection(allowedConnection),
+			_defaultTransferDelay(defaultTransferDelay),
+			_score(UNKNOWN_VALUE)
 		{
-
 		}
 
-		const StopArea::PhysicalStops& StopArea::getPhysicalStops() const
-		{
-			return _physicalStops;
-		}
+
 
 		void StopArea::addPhysicalStop(
 			const StopPoint& physicalStop
@@ -77,6 +75,8 @@ namespace synthese
 			_isoBarycentreToUpdate = true;
 			_physicalStops.insert(make_pair(physicalStop.getKey(), &physicalStop));
 		}
+
+
 
 		StopArea::PhysicalStopsLabels StopArea::getPhysicalStopLabels( bool withAll /*= false*/ ) const
 		{
@@ -88,6 +88,8 @@ namespace synthese
 			return m;
 		}
 
+
+
 		StopArea::PhysicalStopsLabels StopArea::getPhysicalStopLabels( const PhysicalStops& noDisplay ) const
 		{
 			PhysicalStopsLabels m;
@@ -96,6 +98,8 @@ namespace synthese
 					m.push_back(make_pair(it->first, it->second->getCodeBySource() + " / " + it->second->getName()));
 			return m;
 		}
+
+
 
 		HubScore StopArea::getScore() const
 		{
@@ -150,15 +154,41 @@ namespace synthese
 			return _score;
 		}
 
+
+
 		void StopArea::getVertexAccessMap(
 			VertexAccessMap& result,
 			GraphIdType whatToSearch,
 			const Vertex& origin,
 			bool vertexIsOrigin
 		) const {
-			AddressablePlace::getVertexAccessMap(
-				result, whatToSearch, origin, vertexIsOrigin
-			);
+			if(whatToSearch == RoadModule::GRAPH_ID)
+			{
+				/*
+				if(vertexIsOrigin)
+				{
+					BOOST_FOREACH(const Address* address, _addresses)
+					{
+						if(!isConnectionAllowed(origin, *address)) continue;
+
+						result.insert(
+							address,
+							VertexAccess(getTransferDelay(origin, *address))
+						);
+					}
+				} else {
+					BOOST_FOREACH(const Address* address, _addresses)
+					{
+						if(!isConnectionAllowed(*address, origin)) continue;
+
+						result.insert(
+							address,
+							VertexAccess(getTransferDelay(*address, origin))
+						);
+					}
+				}
+				*/
+			}
 		    
 			if (whatToSearch != PTModule::GRAPH_ID) return;
 
@@ -199,10 +229,18 @@ namespace synthese
 			const AccessParameters& accessParameters,
 			const geography::Place::GraphTypes& whatToSearch
 		) const {
-			AddressablePlace::getVertexAccessMap(
-				result, accessParameters
-				, whatToSearch
-			);
+			if(whatToSearch.find(RoadModule::GRAPH_ID) != whatToSearch.end())
+			{
+				/*
+				BOOST_FOREACH(const Address* address, _addresses)
+				{
+					result.insert(
+						address,
+						VertexAccess()
+					);
+				}
+				*/
+			}
 		    
 			if (whatToSearch.find(PTModule::GRAPH_ID) == whatToSearch.end()) return;
 
@@ -217,6 +255,8 @@ namespace synthese
 			}
 		}
 
+
+
 		const GeoPoint& StopArea::getPoint() const
 		{
 			if (_isoBarycentreToUpdate)
@@ -225,10 +265,6 @@ namespace synthese
 				BOOST_FOREACH(const PhysicalStops::value_type& it, _physicalStops)
 				{
 					e.expandToInclude(*it.second);
-				}
-				BOOST_FOREACH(const Address* address, _addresses)
-				{
-					e.expandToInclude(*address);
 				}
 				Coordinate c;
 				e.centre(c);
@@ -247,7 +283,11 @@ namespace synthese
 			{
 				return !_physicalStops.empty();
 			}
-			return AddressablePlace::containsAnyVertex(graphType);
+			if(graphType == RoadModule::GRAPH_ID)
+			{
+//				return !_addresses.empty(); @todo Station entrances
+			}
+			return false;
 		}
 
 
@@ -263,6 +303,83 @@ namespace synthese
 		bool StopArea::isConnectionPossible() const
 		{
 			return _allowedConnection;
+		}
+
+
+
+		bool StopArea::isConnectionAllowed( const graph::Vertex& fromVertex , const graph::Vertex& toVertex ) const
+		{
+			return !getTransferDelay(fromVertex, toVertex).is_not_a_date_time();
+		}
+
+
+
+		boost::posix_time::time_duration StopArea::getTransferDelay(
+			const graph::Vertex& fromVertex,
+			const graph::Vertex& toVertex
+		) const	{
+			TransferDelaysMap::const_iterator it(
+				_transferDelays.find(make_pair(fromVertex.getKey(), toVertex.getKey()))
+			);
+
+			// If not defined in map, return default transfer delay
+			return (it == _transferDelays.end ()) ? _defaultTransferDelay : it->second;
+		}
+
+
+
+		boost::posix_time::time_duration StopArea::getMinTransferDelay() const
+		{
+			if (_minTransferDelay.is_not_a_date_time())
+			{
+				_minTransferDelay = _defaultTransferDelay;
+				for (TransferDelaysMap::const_iterator it(_transferDelays.begin()); it != _transferDelays.end(); ++it)
+					if (it->second < _minTransferDelay)
+						_minTransferDelay = it->second;
+			}
+			return _minTransferDelay;
+		}
+
+
+
+		void StopArea::addTransferDelay(
+			TransferDelaysMap::key_type::first_type fromVertex,
+			TransferDelaysMap::key_type::second_type toVertex,
+			boost::posix_time::time_duration transferDelay
+		){
+			assert(transferDelay >= minutes(0) && !transferDelay.is_not_a_date_time());
+
+			_transferDelays[std::make_pair (fromVertex, toVertex)] = transferDelay;
+			_minTransferDelay = posix_time::time_duration(not_a_date_time);
+		}
+
+
+
+		void StopArea::addForbiddenTransferDelay(
+			TransferDelaysMap::key_type::first_type fromVertex,
+			TransferDelaysMap::key_type::second_type toVertex
+		){
+			_transferDelays[std::make_pair (fromVertex, toVertex)] = posix_time::time_duration(not_a_date_time);
+			_minTransferDelay = posix_time::time_duration(not_a_date_time);
+		}
+
+
+
+		void StopArea::clearTransferDelays()
+		{
+			_transferDelays.clear ();
+			_defaultTransferDelay = posix_time::time_duration(not_a_date_time);
+			_minTransferDelay = posix_time::time_duration(not_a_date_time);
+		}
+
+
+
+		void StopArea::setDefaultTransferDelay( boost::posix_time::time_duration defaultTransferDelay )
+		{
+			assert(defaultTransferDelay >= minutes(0) && !defaultTransferDelay.is_not_a_date_time());
+
+			_defaultTransferDelay = defaultTransferDelay;
+			_minTransferDelay = posix_time::time_duration(not_a_date_time);
 		}
 	}
 }

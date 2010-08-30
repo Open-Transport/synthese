@@ -27,10 +27,10 @@
 #include "RoadModule.h"
 #include "RoadChunk.h"
 #include "Registry.h"
-#include "Address.h"
 #include "VertexAccessMap.h"
 #include "AllowedUseRule.h"
 #include "GraphConstants.h"
+#include "Vertex.h"
 
 #include <geos/geom/Envelope.h>
 

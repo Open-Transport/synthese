@@ -42,7 +42,6 @@
 #include "DataSourceTableSync.h"
 #include "ImportFunction.h"
 #include "FileFormat.h"
-#include "NavteqWithProjectionFileFormat.h"
 #include "TridentFileFormat.h"
 #include "CarPostalFileFormat.hpp"
 
@@ -149,7 +148,7 @@ namespace synthese
 			// TAB IMPORT
 			if (openTabContent(stream, TAB_IMPORT))
 			{
-				if(_dataSource->getFormat() == NavteqWithProjectionFileFormat::FACTORY_KEY)
+/*				if(_dataSource->getFormat() == NavteqWithProjectionFileFormat::FACTORY_KEY)
 				{
 					StaticFunctionRequest<ImportFunction> importRequest(request, true);
 					importRequest.getFunction()->setDataSource(_dataSource);
@@ -164,7 +163,7 @@ namespace synthese
 					stream << t.cell("Zones administratives (mtdarea)", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + NavteqWithProjectionFileFormat::FILE_MTDAREA, string()));
 					stream << t.close();
 				}
-				else if(_dataSource->getFormat() == TridentFileFormat::FACTORY_KEY)
+				else*/ if(_dataSource->getFormat() == TridentFileFormat::FACTORY_KEY)
 				{
 					StaticFunctionRequest<ImportFunction> importRequest(request, true);
 					importRequest.getFunction()->setDataSource(_dataSource);
@@ -236,7 +235,16 @@ namespace synthese
 							bahnhof.cityName = cols[0];
 							bahnhof.name = (cols.size() == 1) ? "Arrêt" : cols[1];
 							
-							StopPointTableSync::SearchResult stops(StopPointTableSync::Search(Env::GetOfficialEnv(), optional<RegistryKeyType>(), bahnhof.operatorCode, 0, 1));
+							StopPointTableSync::SearchResult stops(
+								StopPointTableSync::Search(
+									Env::GetOfficialEnv(),
+									optional<RegistryKeyType>(),
+									bahnhof.operatorCode,
+									false,
+									true,
+									0,
+									1
+							)	);
 							if(!stops.empty())
 							{
 								bahnhof.stop = stops.front();

@@ -38,10 +38,7 @@ namespace synthese
 	{
 		class Registrable;
 	}
-	namespace road
-	{
-		class Address;
-	}
+
 	namespace geography
 	{
 		class City;

@@ -28,23 +28,29 @@
 
 namespace synthese
 {
+	namespace geography
+	{
+		class GeoPoint;
+	}
+
 	namespace road
 	{
 		class Road;
-		class Address;
+		class Crossing;
 	
 		//////////////////////////////////////////////////////////////////////////
-		/// Association class between road and address.
+		/// Association class between road and crossings.
+		///	@ingroup m35
+		/// @author Marc Jambert, Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
 		///	A road chunk is always delimited by two adresses, with no other
 		///	address in between.
 		///	These delimiting addresses can correspond to :
 		///		- a crossing address
 		///		- a physical stop address
 		///		- a public place address
-		///	@ingroup m35
-		//////////////////////////////////////////////////////////////////////////
-		class RoadChunk
-		:	public graph::Edge
+		class RoadChunk:
+			public graph::Edge
 		{
 		public:
 
@@ -52,33 +58,48 @@ namespace synthese
 			typedef util::Registry<RoadChunk>	Registry;
 
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor.
+			/// @param id identifier (default 0)
+			/// @param fromCrossing crossing where the chunk begins (default NULL)
+			/// @param rankInRoad rank of the chunk in the road path (default unknown)
+			/// @param road road which the chunk belongs to (default NULL)
+			/// @param metricOffset distance between the the chunk beginning and the road beginning (default unknown)
 			RoadChunk(
 				util::RegistryKeyType id = 0,
-				Address* fromAddress = NULL,
+				Crossing* fromCrossing = NULL,
 				int rankInRoad = UNKNOWN_VALUE,
-				Road* street = NULL,
+				Road* road = NULL,
 				double metricOffset = UNKNOWN_VALUE
 			);
 
-		  
-		  virtual ~RoadChunk ();
+			virtual ~RoadChunk ();
 
 
-		//! @name Getters/Setters
-		//@{
-			Address* getFromAddress() const;
-			void setFromAddress(Address* fromAddress);
-			void setRoad(Road* road);
-		//@}
-		
+			//! @name Getters/Setters
+			//@{
+				Crossing* getFromCrossing() const;
+			//@}
 
-		//! @name Query methods.
-		//@{
-			virtual bool isDepartureAllowed() const;
-			virtual bool isArrivalAllowed() const;
 
-			Road* getRoad() const;
-		//@}
+
+			//! @name Setters
+			//@{
+				void setFromCrossing(Crossing* value);
+				void setRoad(Road* road);
+			//@}
+
+			
+
+			//! @name Query methods.
+			//@{
+				virtual bool isDepartureAllowed() const;
+				virtual bool isArrivalAllowed() const;
+
+				Road* getRoad() const;
+
+				geography::GeoPoint getGeoPoint(double metricOffset) const;
+			//@}
 
 
 		};

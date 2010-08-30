@@ -16,7 +16,6 @@
 #include "PTObjectInformationFunction.hpp"
 
 #include "TridentFileFormat.h"
-#include "NavteqWithProjectionFileFormat.h"
 #include "CarPostalFileFormat.hpp"
 
 #include "PTUseRuleTableSync.h"
@@ -82,6 +81,7 @@
 #include "StopPointMoveAction.hpp"
 #include "ServiceRemoveAction.h"
 #include "JourneyPatternRemoveAction.hpp"
+#include "ProjectAllStopPointsAction.hpp"
 
 #include "TransportNetworkRight.h"
 

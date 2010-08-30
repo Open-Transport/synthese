@@ -22,10 +22,6 @@
 
 #include "Crossing.h"
 #include "RoadModule.h"
-#include "Address.h"
-#include "AddressablePlace.h"
-#include "Road.h"
-#include "Registry.h"
 #include "VertexAccessMap.h"
 
 using namespace std;
@@ -36,6 +32,8 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace geography;
+	using namespace impex;
+	
 	
 
 	namespace util
@@ -46,18 +44,23 @@ namespace synthese
 	namespace road
 	{
 		Crossing::Crossing(
-			util::RegistryKeyType key
+			util::RegistryKeyType key,
+			double lon,
+			double lat,
+			std::string codeBySource,
+			const impex::DataSource* source
 		):	Hub(),
-			Registrable(key)
-		{
-		}
+			Vertex(this, lon, lat),
+			Registrable(key),
+			Importable(codeBySource, source)
+		{}
 		
 		
 		
 		Crossing::~Crossing ()
-		{
-		
-		}
+		{}
+
+
 
 		bool Crossing::isConnectionAllowed(
 			const Vertex& fromVertex,
@@ -67,10 +70,12 @@ namespace synthese
 		}
 
 
+
 		const GeoPoint& Crossing::getPoint() const
 		{
-			return *_address;
+			return static_cast<const GeoPoint&>(*this);
 		}
+
 
 
 		posix_time::time_duration Crossing::getMinTransferDelay() const
@@ -79,18 +84,6 @@ namespace synthese
 		}
 
 
-
-		void Crossing::setAddress(Address* address)
-		{
-			_address = address;
-		}
-		
-		
-		
-		Address* Crossing::getAddress() const
-		{
-			return _address;
-		}
 
 		bool Crossing::containsAnyVertex( graph::GraphIdType graphType ) const
 		{
@@ -108,7 +101,7 @@ namespace synthese
 			if(whatToSearch == RoadModule::GRAPH_ID)
 			{
 				result.insert(
-					_address,
+					this,
 					VertexAccess()
 				);
 			}
@@ -128,6 +121,13 @@ namespace synthese
 			const graph::Vertex& toVertex
 		) const	{
 			return posix_time::minutes(0);
+		}
+
+
+
+		graph::GraphIdType Crossing::getGraphType() const
+		{
+			return RoadModule::GRAPH_ID;
 		}
 	}
 }

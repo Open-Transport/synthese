@@ -53,7 +53,7 @@ namespace synthese
 
 	namespace road
 	{
-		const string RoadChunkTableSync::COL_ADDRESSID ("address_id");
+		const string RoadChunkTableSync::COL_CROSSING_ID("address_id");
 		const string RoadChunkTableSync::COL_RANKINPATH ("rank_in_path");
 		const string RoadChunkTableSync::COL_VIAPOINTS ("via_points");  // list of ids
 		const string RoadChunkTableSync::COL_ROADID ("road_id");  // NU
@@ -72,7 +72,7 @@ namespace synthese
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<RoadChunkTableSync>::_FIELDS[]=
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_ADDRESSID, SQL_INTEGER, false),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_CROSSING_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_RANKINPATH, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_VIAPOINTS, SQL_TEXT),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_ROADID, SQL_INTEGER, false),
@@ -157,17 +157,22 @@ namespace synthese
 				{
 					shared_ptr<Road> road(RoadTableSync::GetEditable(rows->getLongLong(RoadChunkTableSync::COL_ROADID), env, linkLevel));
 					object->setRoad(road.get());
-					Address* fromAddress(CrossingTableSync::GetEditable (rows->getLongLong (RoadChunkTableSync::COL_ADDRESSID), env, linkLevel).get());
-					object->setFromAddress(fromAddress);
+					object->setFromCrossing(
+						CrossingTableSync::GetEditable(
+							rows->getLongLong(RoadChunkTableSync::COL_CROSSING_ID),
+							env,
+							linkLevel
+						).get()
+					);
 					road->addRoadChunk(*object);
 				}
 				catch (ObjectNotFoundException<Road>& e)
 				{
 					throw LinkException<RoadChunkTableSync>(rows, RoadChunkTableSync::COL_ROADID, e);
 				}
-				catch (ObjectNotFoundException<Address>& e)
+				catch (ObjectNotFoundException<Crossing>& e)
 				{
-					throw LinkException<RoadChunkTableSync>(rows, RoadChunkTableSync::COL_ADDRESSID, e);
+					throw LinkException<RoadChunkTableSync>(rows, RoadChunkTableSync::COL_CROSSING_ID, e);
 				}
 			}
 		}
@@ -200,7 +205,7 @@ namespace synthese
 			}
 
 			ReplaceQuery<RoadChunkTableSync> query(*object);
-			query.addField(object->getFromAddress() ? object->getFromAddress()->getKey() : RegistryKeyType(0));
+			query.addField(object->getFromCrossing() ? object->getFromCrossing()->getKey() : RegistryKeyType(0));
 			query.addField(object->getRankInPath());
 			query.addField(viaPoints.str());
 			query.addField(object->getRoad() ? object->getRoad()->getKey() : RegistryKeyType(0));

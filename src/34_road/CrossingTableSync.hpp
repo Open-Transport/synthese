@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "Address.h"
+#include "Crossing.h"
 #include "FetcherTemplate.h"
 #include "SQLiteRegistryTableSyncTemplate.h"
 
@@ -38,26 +38,29 @@ namespace synthese
 	{
 		/** 34.10 Crossing table synchronizer.
 			@ingroup m34LS refLS
+			@author Marc Jambert, Hugues Romain
+			@date 2006
 
-			Addresses table :
-				- on insert : 
-				- on update : 
-				- on delete : X
-
-			Table number : 2
+			Table number : 43
+			Corresponding class : Crossing
 
 			<h2>Fields</h2>
 
 			<dl>
 			<dt>id</dt><dd>primary key</dd>
 			<dt>code_by_source</dt><dd>code of the address in the source database</dd>
-			<dt>source_id</dt><dd>id of the @ref impex::DataSourceTableSync "source database" of the address</dd>
 			<dt>longitude</dt><dd>longitude of the address in degrees</dd>
 			<dt>latitude</dt><dd>latitude of the address in degrees</dd>
 			</dl>
+
+			<h2>Up links</h2>
+
+			<dl>
+			<dt>source_id</dt><dd>id of the @ref impex::DataSourceTableSync "source database" of the crossing</dd>
+			</dl>
 		*/
 		class CrossingTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<CrossingTableSync,Address>,
+			public db::SQLiteRegistryTableSyncTemplate<CrossingTableSync, Crossing>,
 			public db::FetcherTemplate<graph::Vertex, CrossingTableSync>
 		{
 		public:
@@ -70,21 +73,21 @@ namespace synthese
 			~CrossingTableSync();
 
 
-			/** Address search.
-				(other search parameters)
-				@param first First Address object to answer
-				@param number Number of Address objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return Found Address objects.
-				@author Hugues Romain
-				@date 2006
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Crossings search.
+			///	@param env Environment to populate when loading objects
+			///	@param first First Crossing object to answer
+			///	@param number Number of Crossing objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+			/// @param linkLevel level of link
+			///	@return Found Crossing objects.
+			///	@author Hugues Romain
+			///	@date 2006
 			static SearchResult Search(
 				util::Env& env,
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
-
 		};
 	}
 }

@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_road_House_hpp__
 #define SYNTHESE_road_House_hpp__
 
+#include "Address.h"
+
 namespace synthese
 {
 	namespace road
@@ -34,7 +36,8 @@ namespace synthese
 		/// @since 3.2
 		//////////////////////////////////////////////////////////////////////////
 		/// @image html uml_house.png
-		class House
+		class House:
+			public Address
 		{
 		public:
 			House();

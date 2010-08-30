@@ -26,7 +26,6 @@
 #include "NamedPlace.h"
 #include "Journey.h"
 #include "Edge.h"
-#include "AddressablePlace.h"
 #include "ReservationContact.h"
 #include "Service.h"
 #include "Crossing.h"
@@ -408,11 +407,6 @@ namespace synthese
 								continue;
 						}
 
-						/*					const AddressablePlace* aPlace(
-						AddressablePlace::GetPlace(
-						leg.getArrivalEdge()->getHub()
-						)	);
-						*/
 						DisplayJunctionCell(
 							content,
 							junctionPage,

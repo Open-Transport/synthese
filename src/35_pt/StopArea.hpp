@@ -24,7 +24,7 @@
 #define SYNTHESE_env_PublicTransportStopZoneConnectionPlace_h__
 
 #include "NamedPlaceTemplate.h"
-#include "AddressablePlace.h"
+#include "Hub.h"
 #include "Registry.h"
 #include "Importable.h"
 
@@ -147,7 +147,7 @@ namespace synthese
 		/// StopArea.</li>
 		/// </ul>
 		class StopArea:
-			public road::AddressablePlace,
+			public graph::Hub,
 			public geography::NamedPlaceTemplate<StopArea>,
 			public impex::Importable
 		{
@@ -159,19 +159,34 @@ namespace synthese
 			typedef std::map<util::RegistryKeyType,const pt::StopPoint*> PhysicalStops;
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > PhysicalStopsLabels;
 
+			typedef std::map<
+				std::pair<
+					util::RegistryKeyType,
+					util::RegistryKeyType
+				>, boost::posix_time::time_duration
+			> TransferDelaysMap;
+
 		private:
 
 			//! @name Content
 			//@{
 				PhysicalStops			_physicalStops; 
+//				Addresses _addresses; //<! Station entrances
+			//@}
+
+			//! @name Transfer parameters
+			//@{
+				bool					_allowedConnection;
+				TransferDelaysMap		_transferDelays; //!< Transfer delays between vertices (in minutes)
+				boost::posix_time::time_duration	_defaultTransferDelay;
 			//@}
 
 			//! @name Caching
 			//@{
 				mutable int _score;
+				mutable boost::posix_time::time_duration _minTransferDelay;
 			//@}
 
-			
 
 		public:
 
@@ -183,17 +198,55 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const PhysicalStops&	getPhysicalStops() const;
+				const PhysicalStops& getPhysicalStops() const { return _physicalStops; }
+				bool getAllowedConnection() const { return _allowedConnection; }
+				boost::posix_time::time_duration	getDefaultTransferDelay() const { return _defaultTransferDelay; }
+				const TransferDelaysMap& getTransferDelays() const { return _transferDelays; }
+			//@}
+
+			//! @name Setters
+			//@{
+				void setDefaultTransferDelay(
+					boost::posix_time::time_duration defaultTransferDelay
+				);
+
+				void setAllowedConnection(bool value) { _allowedConnection = value; }
 			//@}
 
 			//! @name Update methods.
 			//@{
 				void addPhysicalStop(const pt::StopPoint& physicalStop);
+
+				void addTransferDelay(
+					TransferDelaysMap::key_type::first_type departure,
+					TransferDelaysMap::key_type::second_type arrival,
+					boost::posix_time::time_duration transferDelay
+				);
+
+				void addForbiddenTransferDelay(
+					TransferDelaysMap::key_type::first_type departure,
+					TransferDelaysMap::key_type::second_type arrival
+				);
+
+				void clearTransferDelays ();
 			//@}
 
 
-			//! @name Virtual queries
+			//! @name Virtual queries for Hub interface
 			//@{
+				virtual boost::posix_time::time_duration	getMinTransferDelay() const;
+
+				virtual bool isConnectionAllowed(
+					const graph::Vertex& fromVertex
+					, const graph::Vertex& toVertex
+				) const;
+
+				virtual boost::posix_time::time_duration getTransferDelay(
+					const graph::Vertex& fromVertex
+					, const graph::Vertex& toVertex
+				) const;
+
+				
 				/** Score getter.
 					@return int the score of the place
 					@author Hugues Romain
@@ -225,14 +278,21 @@ namespace synthese
 				) const;
 
 
+
+				virtual bool containsAnyVertex(graph::GraphIdType graphType) const;
+			//@}
+
+
+
+			//! @name Virtual queries for Place interface
+			//@{
 				virtual void getVertexAccessMap(
 					graph::VertexAccessMap& result,
 					const graph::AccessParameters& accessParameters,
 					const geography::Place::GraphTypes& whatToSearch
 				) const;
-
-				virtual bool containsAnyVertex(graph::GraphIdType graphType) const;
 			//@}
+
 
 			//! @name Queries
 			//@{

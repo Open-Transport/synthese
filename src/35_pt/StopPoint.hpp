@@ -28,6 +28,7 @@
 #include "Registry.h"
 #include "Importable.h"
 #include "Named.h"
+#include "Address.h"
 
 #include <string>
 
@@ -38,10 +39,7 @@ namespace synthese
 	{
 		class LineStop;
 		class StopArea;
-	}
 
-	namespace pt
-	{	 
 		//////////////////////////////////////////////////////////////////////////
 		/// Physical stop (bus stop, etc.).
 		///	A physical stop is an entry point to the transport network.
@@ -58,6 +56,9 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<StopPoint>	Registry;
 
+		private:
+			road::Address _projectedPoint;
+
 		public:
 
 			StopPoint(
@@ -70,6 +71,16 @@ namespace synthese
 			~StopPoint ();
 		    
 			using GeoPoint::operator=;
+
+			//! @name Getters
+			//@{
+				const road::Address& getProjectedPoint() const { return _projectedPoint; }
+			//@}
+
+			//! @name Setters
+			//@{
+				void setProjectedPoint(const road::Address& value){ _projectedPoint = value; }
+			//@}
 		
 			//! @name Query methods
 			//@{

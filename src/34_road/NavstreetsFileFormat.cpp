@@ -211,8 +211,8 @@ namespace synthese
 					throw Exception("Could no open the shapefile corresponding to " + filePath.file_string());
 				}
 
-				typedef map<string, shared_ptr<Address> > _AddressesMap;
-				_AddressesMap _navteqAddressses;	
+				typedef map<string, shared_ptr<Crossing> > _CrossingsMap;
+				_CrossingsMap _navteqCrossings;	
 
 				const GeometryFactory* geometryFactory(GeometryFactory::getDefaultInstance());
 
@@ -269,26 +269,25 @@ namespace synthese
 						City* city(itc->second);
 
 						// Left node
-						_AddressesMap::const_iterator ita1(_navteqAddressses.find(leftId));
-						shared_ptr<Address> leftNode;
-						if(ita1 == _navteqAddressses.end())
+						_CrossingsMap::const_iterator ita1(_navteqCrossings.find(leftId));
+						shared_ptr<Crossing> leftNode;
+						if(ita1 == _navteqCrossings.end())
 						{
-							leftNode.reset(new Address(CrossingTableSync::getId()));
 							GeoPoint gp(
-								leftNodeCoordinate, CoordinatesSystem::GetCoordinatesSystem("EPSG:27572")
+								leftNodeCoordinate,
+								CoordinatesSystem::GetCoordinatesSystem("EPSG:27572")
 							);
-							*leftNode = gp;
-							leftNode->setCodeBySource(leftId);
-							leftNode->setDataSource(_dataSource);
+							leftNode.reset(
+								new Crossing(
+									CrossingTableSync::getId(),
+									gp.getLongitude(),
+									gp.getLatitude(),
+									leftId,
+									_dataSource
+							)	);
 
-							shared_ptr<Crossing> crossing(new Crossing);
-							crossing->setKey(util::encodeUId(43,0,decodeObjectId(leftNode->getKey())));
-							crossing->setAddress(leftNode.get());
-							leftNode->setHub(crossing.get());
-							_env->getEditableRegistry<Crossing>().add(crossing);
-
-							_navteqAddressses.insert(make_pair(leftId, leftNode));
-							_env->getEditableRegistry<Address>().add(leftNode);
+							_navteqCrossings.insert(make_pair(leftId, leftNode));
+							_env->getEditableRegistry<Crossing>().add(leftNode);
 						}
 						else
 						{
@@ -297,26 +296,25 @@ namespace synthese
 
 
 						// Right node
-						_AddressesMap::const_iterator ita2(_navteqAddressses.find(rightId));
-						shared_ptr<Address> rightNode;
-						if(ita2 == _navteqAddressses.end())
+						_CrossingsMap::const_iterator ita2(_navteqCrossings.find(rightId));
+						shared_ptr<Crossing> rightNode;
+						if(ita2 == _navteqCrossings.end())
 						{
-							rightNode.reset(new Address(CrossingTableSync::getId()));
 							GeoPoint gp(
-								rightNodeCoordinate, CoordinatesSystem::GetCoordinatesSystem("EPSG:27572")
+								rightNodeCoordinate,
+								CoordinatesSystem::GetCoordinatesSystem("EPSG:27572")
 							);
-							*rightNode = gp;
-							rightNode->setCodeBySource(rightId);
-							rightNode->setDataSource(_dataSource);
-
-							shared_ptr<Crossing> crossing(new Crossing);
-							crossing->setKey(util::encodeUId(43,0,decodeObjectId(rightNode->getKey())));
-							crossing->setAddress(rightNode.get());
-							rightNode->setHub(crossing.get());
-							_env->getEditableRegistry<Crossing>().add(crossing);
-
-							_navteqAddressses.insert(make_pair(rightId, rightNode));
-							_env->getEditableRegistry<Address>().add(rightNode);
+							rightNode.reset(
+								new Crossing(
+									CrossingTableSync::getId(),
+									gp.getLongitude(),
+									gp.getLatitude(),
+									rightId,
+									_dataSource
+							)	);
+							
+							_navteqCrossings.insert(make_pair(rightId, rightNode));
+							_env->getEditableRegistry<Crossing>().add(rightNode);
 						}
 						else
 						{
@@ -380,7 +378,7 @@ namespace synthese
 							// Second road chunk creation
 							shared_ptr<RoadChunk> secondRoadChunk(new RoadChunk);
 							secondRoadChunk->setRoad(road);
-							secondRoadChunk->setFromAddress(rightNode.get());
+							secondRoadChunk->setFromCrossing(rightNode.get());
 							secondRoadChunk->setRankInPath((*(road->getEdges().end()-1))->getRankInPath() + 1);
 							secondRoadChunk->setMetricOffset(startMetricOffset + length);
 							secondRoadChunk->setKey(RoadChunkTableSync::getId());
@@ -424,7 +422,7 @@ namespace synthese
 								// First road chunk creation
 								shared_ptr<RoadChunk> firstRoadChunk(new RoadChunk);
 								firstRoadChunk->setRoad(road);
-								firstRoadChunk->setFromAddress(leftNode.get());
+								firstRoadChunk->setFromCrossing(leftNode.get());
 								firstRoadChunk->setRankInPath(0);
 								firstRoadChunk->setMetricOffset(0);
 								firstRoadChunk->setKey(RoadChunkTableSync::getId());
@@ -442,7 +440,7 @@ namespace synthese
 								// First road chunk
 								shared_ptr<RoadChunk> firstRoadChunk(new RoadChunk);
 								firstRoadChunk->setRoad(road.get());
-								firstRoadChunk->setFromAddress(leftNode.get());
+								firstRoadChunk->setFromCrossing(leftNode.get());
 								firstRoadChunk->setRankInPath(0);
 								firstRoadChunk->setMetricOffset(0);
 								firstRoadChunk->setKey(RoadChunkTableSync::getId());
@@ -453,7 +451,7 @@ namespace synthese
 								// Second road chunk
 								shared_ptr<RoadChunk> secondRoadChunk(new RoadChunk);
 								secondRoadChunk->setRoad(road.get());
-								secondRoadChunk->setFromAddress(rightNode.get());
+								secondRoadChunk->setFromCrossing(rightNode.get());
 								secondRoadChunk->setRankInPath(1);
 								secondRoadChunk->setMetricOffset(length);
 								secondRoadChunk->setKey(RoadChunkTableSync::getId());
@@ -474,9 +472,9 @@ namespace synthese
 		void NavstreetsFileFormat::save( std::ostream& os ) const
 		{
 			SQLiteTransaction transaction;
-			BOOST_FOREACH(Registry<Address>::value_type address, _env->getEditableRegistry<Address>())
+			BOOST_FOREACH(Registry<Crossing>::value_type crossing, _env->getEditableRegistry<Crossing>())
 			{
-				CrossingTableSync::Save(address.second.get(), transaction);
+				CrossingTableSync::Save(crossing.second.get(), transaction);
 			}
 			BOOST_FOREACH(Registry<RoadPlace>::value_type roadplace, _env->getEditableRegistry<RoadPlace>())
 			{

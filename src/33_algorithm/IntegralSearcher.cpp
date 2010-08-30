@@ -734,6 +734,10 @@ namespace synthese
 			{
 				score += 250 - 2.5 * hubScore;
 			}
+			else
+			{
+				score += 250;
+			}
 
 			return score;
 		}

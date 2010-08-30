@@ -58,10 +58,10 @@ namespace synthese
 
 		The road module contains the graph of streets and all associated objects.
 
-		@image hml uml_road_graph.png
+		@image html uml_road_graph.png
 
 		The road graph is implemented by :
-		<table>
+		<table class="table">
 		<tr><th>graph interface</th><th>road implementation</th></tr>
 		<tr><td>Service</td><td>PermanentService</td></tr>
 		<tr><td>PathGroup</td><td>RoadPlace</td></tr>

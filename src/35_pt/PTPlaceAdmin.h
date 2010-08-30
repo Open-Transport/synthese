@@ -31,12 +31,6 @@
 
 namespace synthese
 {
-	namespace road
-	{
-		class AddressablePlace;
-		class PublicPlace;
-	}
-
 	namespace pt
 	{
 		class StopArea;
@@ -47,7 +41,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// PTPlaceAdmin Admin compound class.
 		///	@ingroup m35Admin refAdmin
-		///	@author Hugues
+		///	@author Hugues Romain
 		///	@date 2009
 		class PTPlaceAdmin:
 			public admin::AdminInterfaceElementTemplate<PTPlaceAdmin>
@@ -65,9 +59,6 @@ namespace synthese
 			/// @name Search parameters
 			//@{
 				boost::shared_ptr<const pt::StopArea>	_connectionPlace;
-				boost::shared_ptr<const road::PublicPlace>	_publicPlace;
-				boost::shared_ptr<const road::AddressablePlace>	_addressablePlace;
-			// html::ResultHTMLTable::RequestParameters	_requestParameters;
 			//@}
 
 		protected:
@@ -77,7 +68,7 @@ namespace synthese
 			///	       of the same class. 
 			/// @return true if the other page can be considered as the same than the
 			///         current one.
-			/// @author Hugues
+			/// @author Hugues Romain
 			/// @date 2009
 			virtual bool _hasSameContent(
 				const AdminInterfaceElement& other
@@ -89,7 +80,7 @@ namespace synthese
 			/// Builds the tabs of the page.
 			/// @param request The current request (can be used to determinate the
 			///        current user rights.)
-			/// @author Hugues
+			/// @author Hugues Romain
 			/// @date 2009
 			virtual void _buildTabs(
 				const security::Profile& profile
@@ -98,7 +89,7 @@ namespace synthese
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
-			///	@author Hugues
+			///	@author Hugues Romain
 			///	@date 2009
 			PTPlaceAdmin();
 			
@@ -108,7 +99,7 @@ namespace synthese
 			/// Initialization of the parameters from a parameters map.
 			///	@param map The parameters map to use for the initialization.
 			///	@throw AdminParametersException if a parameter has incorrect value.
-			///	@author Hugues
+			///	@author Hugues Romain
 			///	@date 2009
 			void setFromParametersMap(
 				const server::ParametersMap& map
@@ -118,7 +109,7 @@ namespace synthese
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Creation of the parameters map from the object attributes.
-			///	@author Hugues
+			///	@author Hugues Romain
 			///	@date 2009
 			server::ParametersMap getParametersMap() const;
 
@@ -129,7 +120,7 @@ namespace synthese
 			///	@param stream Stream to write the page content on.
 			///	@param variables Environment variables defined by the interface
 			///	@param request The current request
-			///	@author Hugues
+			///	@author Hugues Romain
 			///	@date 2009
 			void display(
 				std::ostream& stream,
@@ -145,7 +136,7 @@ namespace synthese
 			/// level is READ.
 			///	@param request The current request
 			///	@return bool True if the displayed page can be displayed
-			///	@author Hugues
+			///	@author Hugues Romain
 			///	@date 2009
 			bool isAuthorized(
 				const security::User& user
@@ -159,7 +150,7 @@ namespace synthese
 			///	@param currentPage Currently displayed page
 			/// @param request Current request
 			///	@return PageLinks each page to put under the current page
-			///	@author Hugues
+			///	@author Hugues Romain
 			///	@date 2009
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
@@ -171,12 +162,14 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Title getter.
 			///	@return The title of the page
-			///	@author Hugues
+			///	@author Hugues Romain
 			///	@date 2009
 			virtual std::string getTitle() const;
 
-			void setConnectionPlace(boost::shared_ptr<const pt::StopArea> value);
-			void setPublicPlace(boost::shared_ptr<const road::PublicPlace> value);
+			//! @name Setters
+			//@{
+				void setConnectionPlace(boost::shared_ptr<const pt::StopArea> value){ _connectionPlace = value; }
+			//@}
 
 			virtual PageLinks _getCurrentTreeBranch() const;
 		};

@@ -23,7 +23,6 @@
 #include "DrawablePhysicalStop.h"
 
 #include "StopPoint.hpp"
-#include "AddressablePlace.h"
 #include "StopArea.hpp"
 #include "RGBColor.h"
 

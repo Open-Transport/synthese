@@ -22,7 +22,7 @@
 
 #include "RoadChunk.h"
 #include "Road.h"
-#include "Address.h"
+#include "Crossing.h"
 #include "Registry.h"
 
 using namespace std;
@@ -30,6 +30,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace graph;
+	using namespace geography;
 	
 	namespace util
 	{
@@ -40,7 +41,7 @@ namespace synthese
 	{
 		RoadChunk::RoadChunk(
 			util::RegistryKeyType id,
-			Address* fromAddress,
+			Crossing* fromCrossing,
 			int rankInRoad,
 			Road* street,
 			double metricOffset
@@ -48,11 +49,14 @@ namespace synthese
 			Edge(
 				street,
 				rankInRoad,
-				fromAddress,
+				fromCrossing,
 				metricOffset
 			)
 		{
-			if(fromAddress) setFromAddress(fromAddress);
+			if(fromCrossing)
+			{
+				setFromCrossing(fromCrossing);
+			}
 		}
 
 		
@@ -84,14 +88,14 @@ namespace synthese
 		
 
 
-		Address* RoadChunk::getFromAddress() const
+		Crossing* RoadChunk::getFromCrossing() const
 		{
-			return static_cast<Address*>(_fromVertex);
+			return static_cast<Crossing*>(_fromVertex);
 		}
 
 
 
-		void RoadChunk::setFromAddress(Address* fromAddress )
+		void RoadChunk::setFromCrossing(Crossing* fromAddress )
 		{
 			_fromVertex = static_cast<Vertex*>(fromAddress);
 
@@ -107,6 +111,13 @@ namespace synthese
 		Road* RoadChunk::getRoad() const
 		{
 			return static_cast<Road*>(_parentPath);
+		}
+
+
+
+		geography::GeoPoint RoadChunk::getGeoPoint( double metricOffset ) const
+		{
+			return GeoPoint(); /// @todo implementation
 		}
 	}
 }

@@ -23,56 +23,78 @@
 #ifndef SYNTHESE_ENV_ADDRESS_H
 #define SYNTHESE_ENV_ADDRESS_H
 
-#include "Vertex.h"
-#include "Registry.h"
 #include "01_util/Constants.h"
-#include "Importable.h"
+#include "GeoPoint.h"
 
 #include <vector>
 #include <set>
+
+namespace geos
+{
+	namespace geom
+	{
+		class Coordinate;
+	}
+}
 
 namespace synthese
 {
 	namespace road
 	{
-		class AddressablePlace;
-		
+		class RoadChunk;
+		class Road;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Address.
 		/// @ingroup m34
-		/// @author Marc Jambert, Hugues Romain
+		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
 		/// An address corresponds to a point on a side of a street.
 		/// @image html uml_address.png
 		///
 		/// The address is defined by a RoadChunk and a metric offset.
-		class Address
-		:	public graph::Vertex,
-			public impex::Importable
+		class Address:
+			public geography::GeoPoint
 		{
 		public:
 
-			/// Chosen registry class.
-			typedef util::Registry<Address> Registry;
 
 		private:
+			RoadChunk* _roadChunk;
+			double	_metricOffset;
 
 
 		public:
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Direct constructor.
+			/// @param roadChunk road chunk where the address points to
+			/// @param metricOffset offset after the beginning of the chunk (and not the road)
 			Address(
-				util::RegistryKeyType id = 0,
-				const AddressablePlace* place = NULL,
-				double x = UNKNOWN_VALUE,
-				double y = UNKNOWN_VALUE
+				RoadChunk* roadChunk = NULL,
+				double metricOffset = UNKNOWN_VALUE
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor by road and offset
+			/// @param road road
+			/// @param metricOffset offset after the beginning of the road
+			/// @param coordinate coordinate of the address
+			Address(
+				const Road* road,
+				double metricOffset,
+				const geos::geom::Coordinate& coordinate
 			);
 
 			~Address();
 
-			using GeoPoint::operator=;
 
 			//! @name Getters
 			//@{
+				RoadChunk* getRoadChunk() const { return _roadChunk; }
+				double getMetricOffset() const { return _metricOffset; }
 			//@}
 
 			//! @name Setters
@@ -81,7 +103,6 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-				virtual graph::GraphIdType getGraphType() const;
 			//@}
 		};
 	}

@@ -144,7 +144,7 @@ namespace synthese
 					RoadChunk* reverseChunk(
 						new RoadChunk(
 							0,
-							chunk.getFromAddress(),
+							chunk.getFromCrossing(),
 							0,
 							_reverseRoad,
 							-chunk.getMetricOffset()
@@ -167,7 +167,7 @@ namespace synthese
 						RoadChunk* reverseChunk(
 							new RoadChunk(
 								0,
-								chunk.getFromAddress(),
+								chunk.getFromCrossing(),
 								0,
 								_reverseRoad,
 								-chunk.getMetricOffset()
@@ -183,7 +183,7 @@ namespace synthese
 						RoadChunk* reverseChunk(
 							new RoadChunk(
 								0,
-								chunk.getFromAddress(),
+								chunk.getFromCrossing(),
 								lastEdge.getRankInPath() - chunk.getRankInPath(),
 								_reverseRoad,
 								-chunk.getMetricOffset()
@@ -233,7 +233,7 @@ namespace synthese
 				RoadChunk* reverseChunk(
 					new RoadChunk(
 						0,
-						chunk.getFromAddress(),
+						chunk.getFromCrossing(),
 						lastEdge.getRankInPath() + rankShift,
 						_reverseRoad,
 						0

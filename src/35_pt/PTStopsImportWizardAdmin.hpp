@@ -47,6 +47,7 @@ namespace synthese
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.1.18
+		/// @todo Move streets import screen into road module
 		//////////////////////////////////////////////////////////////////////////
 		/// Key : PTStopsImportWizardAdmin
 		/// General parameters :

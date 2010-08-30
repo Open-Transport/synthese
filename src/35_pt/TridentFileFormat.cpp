@@ -1650,11 +1650,11 @@ namespace synthese
 					// Fetching the stops
 					StopPointTableSync::SearchResult startStops(
 						StopPointTableSync::Search(
-							*_env, optional<RegistryKeyType>(), string(startNode.getText()), 0, 1
+							*_env, optional<RegistryKeyType>(), string(startNode.getText()), false, true,  0, 1
 					)	);
 					StopPointTableSync::SearchResult endStops(
 						StopPointTableSync::Search(
-							*_env, optional<RegistryKeyType>(), string(endNode.getText()), 0, 1
+							*_env, optional<RegistryKeyType>(), string(endNode.getText()), false, true, 0, 1
 					)	);
 					if(startStops.empty() || endStops.empty())
 					{

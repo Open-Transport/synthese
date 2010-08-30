@@ -23,9 +23,7 @@
 #include "BestVertexReachesMap.h"
 
 #include "StopArea.hpp"
-#include "Address.h"
 #include "StopPoint.hpp"
-#include "Vertex.h"
 #include "Edge.h"
 #include "ServicePointer.h"
 #include "RoutePlanningIntermediateJourney.hpp"
@@ -198,29 +196,7 @@ namespace synthese
 			const Hub* p(vertex->getHub());
 			assert (p != 0);
 
-			if (vertex->getGraphType() == RoadModule::GRAPH_ID)
-			{
-				if(dynamic_cast<const AddressablePlace*>(p))
-				{
-					const AddressablePlace::Addresses& ads(AddressablePlace::GetPlace(p)->getAddresses());
-					for(AddressablePlace::Addresses::const_iterator ita(ads.begin()); ita != ads.end(); ++ita)
-					{
-						posix_time::time_duration bestTimeAtAddress(duration);
-						if (_accessDirection == DEPARTURE_TO_ARRIVAL)
-						{
-							if (!p->isConnectionAllowed(*vertex, **ita)) continue;
-							bestTimeAtAddress += p->getTransferDelay(*vertex, **ita);
-						}
-						else
-						{
-							if (!p->isConnectionAllowed(**ita, *vertex)) continue;
-							bestTimeAtAddress += p->getTransferDelay(**ita, *vertex);
-						}
-						_insert (*ita, transfers+1, bestTimeAtAddress, journey);
-					}
-				}
-			}
-			else
+			if (vertex->getGraphType() == PTModule::GRAPH_ID) /// @todo Move this section into PT Module
 			{
 				const StopArea* cp(static_cast<const StopArea*>(p));
 				const StopArea::PhysicalStops& ps(cp->getPhysicalStops());

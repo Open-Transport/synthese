@@ -27,11 +27,9 @@
 #include "ParametersMap.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
-#include "AddressablePlace.h"
 #include "StopAreaTableSync.hpp"
 #include "PublicPlaceTableSync.h"
 #include "StopArea.hpp"
-#include "PublicPlace.h"
 #include "ResultHTMLTable.h"
 #include "StopPoint.hpp"
 #include "PTPlacesAdmin.h"
@@ -40,7 +38,6 @@
 #include "PropertiesHTMLTable.h"
 #include "AdminFunctionRequest.hpp"
 #include "JunctionTableSync.hpp"
-#include "Address.h"
 #include "StopAreaUpdateAction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "StopAreaNameUpdateAction.hpp"
@@ -102,22 +99,7 @@ namespace synthese
 			{
 				RegistryTableType tableId(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
 				
-				if(tableId == StopAreaTableSync::TABLE.ID)
-				{
-					setConnectionPlace(Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
-				}
-				else if(tableId == PublicPlaceTableSync::TABLE.ID)
-				{
-					setPublicPlace(Env::GetOfficialEnv().get<PublicPlace>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
-				}
-				else
-				{
-					throw AdminParametersException("Invalid ID");
-				}
-			}
-			catch(ObjectNotFoundException<PublicPlace> e)
-			{
-				throw AdminParametersException("No such public place");
+				setConnectionPlace(Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
 			}
 			catch(ObjectNotFoundException<StopArea> e)
 			{
@@ -136,10 +118,6 @@ namespace synthese
 			if(_connectionPlace.get())
 			{
 				m.insert(Request::PARAMETER_OBJECT_ID, _connectionPlace->getKey());
-			}
-			if(_publicPlace.get())
-			{
-				m.insert(Request::PARAMETER_OBJECT_ID, _publicPlace->getKey());
 			}
 
 			return m;
@@ -207,11 +185,14 @@ namespace synthese
 						}
 						map.addPoint(HTMLMap::Point(*it.second, "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), it.second->getName() + "<br />" + popupcontent.str()));
 					}
+					/*
 					BOOST_FOREACH(const AddressablePlace::Addresses::value_type& address, _addressablePlace->getAddresses())
 					{
 						map.addPoint(HTMLMap::Point(*address, "marker-green.png", "marker.png", "marker-gold.png", string(), string()));
 					}
 					map.draw(stream);
+					*/
+					/// @todo Station entrances
 
 					AdminActionFunctionRequest<StopPointAddAction,PTPlaceAdmin> stopPointAddRequest(request);
 					stopPointAddRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
@@ -308,7 +289,7 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			// TAB ADDRESSES
 			if (openTabContent(stream, TAB_ADDRESSES))
-			{
+			{	/// @todo Station entrances
 /*				HTMLTable::ColsVector c;
 				c.push_back("Longitude");
 				c.push_back("Latitude");
@@ -358,10 +339,10 @@ namespace synthese
 					stream << t.open();
 					stream << t.row();
 					stream << t.col(2) << "<b>Valeur par défaut</b>";
-					stream << t.col() << (_addressablePlace->getDefaultTransferDelay().total_seconds() / 60) << " min";
+					stream << t.col() << (_connectionPlace->getDefaultTransferDelay().total_seconds() / 60) << " min";
 					stream << t.col();
 
-					BOOST_FOREACH(const AddressablePlace::TransferDelaysMap::value_type& it, _addressablePlace->getTransferDelays())
+					BOOST_FOREACH(const StopArea::TransferDelaysMap::value_type& it, _connectionPlace->getTransferDelays())
 					{
 						stream << t.row();
 						stream << t.col() << it.first.first;
@@ -508,7 +489,6 @@ namespace synthese
 		std::string PTPlaceAdmin::getTitle() const
 		{
 			if(_connectionPlace.get()) return _connectionPlace->getFullName();
-			if(_publicPlace.get()) return _publicPlace->getFullName();
 			return DEFAULT_TITLE;
 		}
 
@@ -537,28 +517,7 @@ namespace synthese
 				return 
 					_connectionPlace->getKey() == static_cast<const PTPlaceAdmin&>(other)._connectionPlace->getKey();
 			}
-			if(_publicPlace.get() && static_cast<const PTPlaceAdmin&>(other)._publicPlace.get())
-			{
-				return 
-					_publicPlace->getKey() == static_cast<const PTPlaceAdmin&>(other)._publicPlace->getKey();
-			}
 			return false;
-		}
-
-
-
-		void PTPlaceAdmin::setConnectionPlace( boost::shared_ptr<const pt::StopArea> value )
-		{
-			_connectionPlace = value;
-			_addressablePlace = static_pointer_cast<const AddressablePlace, const StopArea>(_connectionPlace);
-		}
-
-
-
-		void PTPlaceAdmin::setPublicPlace( boost::shared_ptr<const road::PublicPlace> value )
-		{
-			_publicPlace = value;
-			_addressablePlace = static_pointer_cast<const AddressablePlace, const PublicPlace>(_publicPlace);
 		}
 
 
@@ -569,7 +528,7 @@ namespace synthese
 
 			shared_ptr<PTPlacesAdmin> p(getNewOtherPage<PTPlacesAdmin>(false));
 			p->setCity(Env::GetOfficialEnv().getSPtr(
-					_connectionPlace.get() ? _connectionPlace->getCity() : _publicPlace->getCity()
+					_connectionPlace->getCity()
 			)	);
 			links = p->_getCurrentTreeBranch();
 			links.push_back(getNewPage());

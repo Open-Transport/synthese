@@ -41,7 +41,6 @@ namespace synthese
 		PublicPlace::PublicPlace (
 			util::RegistryKeyType id
 		):	Registrable(id),
-			AddressablePlace(),
 			NamedPlaceTemplate<PublicPlace>()
 		{
 		}
@@ -56,6 +55,21 @@ namespace synthese
 			std::string text
 		) const	{
 			return (text.empty() ? getName() : text);
+		}
+
+
+
+		void PublicPlace::getVertexAccessMap( graph::VertexAccessMap& result, const graph::AccessParameters& accessParameters, const geography::Place::GraphTypes& whatToSearch ) const
+		{
+			/// @todo Place entrances
+		}
+
+
+
+		const geography::GeoPoint& PublicPlace::getPoint() const
+		{
+			/// @todo Envelope of entrances
+			return GeoPoint();
 		}
 	}
 }

@@ -39,19 +39,24 @@ namespace synthese
 		/// 34.10 Road chunk table.
 		///	@ingroup m35LS refLS
 		/// @author Marc Jambert, Hugues Romain
+		/// @date 2006
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t014_road_chunks
 		///	Corresponding class : RoadChunk
 		///
-		/// Fields :
+		/// <h2>Fields</h2>
 		///	<ul>
-		///		<li>address_id</li>
 		///		<li>rank_in_path</li>
 		///		<li>via_points : optional. Defines the geometry of the chunk. Each point is separated
 		///		by coma. Longitude and latitude are stored and are separated by :.</li>
-		///		<li>road_id</li>
 		///		<li>metric_offset</li>
 		///	</ul>
+		///
+		/// <h2>Up links</h2>
+		///	<dl>
+		///		<dt>address_id</dt><dd>id of the @ref road::CrossingTableSync "crossing" where the chunk begins</dd>
+		///		<dt>road_id</dt><dd>id of the @ref road::RoadTableSync "road" which the chunk belongs to</dd>
+		///	</dl>
 		class RoadChunkTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<RoadChunkTableSync,RoadChunk>
 		{
@@ -61,7 +66,7 @@ namespace synthese
 			- on update : 
 			- on delete : X
 			*/
-			static const std::string COL_ADDRESSID;
+			static const std::string COL_CROSSING_ID;
 			static const std::string COL_RANKINPATH;
 			static const std::string COL_VIAPOINTS;  // list of ids
 			static const std::string COL_ROADID ;  // NU
@@ -70,14 +75,17 @@ namespace synthese
 			static const std::string SEP_POINTS;
 			static const std::string SEP_LON_LAT;
 
-			/** RoadChunk search.
-				(other search parameters)
-				@param first First RoadChunk object to answer
-				@param number Number of RoadChunk objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return vector<RoadChunk> Founded RoadChunk objects.
-				@author Hugues Romain
-				@date 2006
-			*/
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Road chunks search.
+			///	@param env Environment to populate when loading objects
+			///	@param first First road chunk object to answer
+			///	@param number Number of road chunk objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+			/// @param linkLevel level of link
+			///	@return Found road chunks objects.
+			///	@author Hugues Romain
+			///	@date 2006
 			static SearchResult Search(
 				util::Env& env,
 				int first = 0,

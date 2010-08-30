@@ -15,6 +15,7 @@ CppSynthese3LibProject(
 		's3-geography.cpplib',
 		's3-calendar.cpplib',
 		's3-messages.cpplib',
-		's3-road.cpplib'
+		's3-road.cpplib',
+		's3-algorithm.cpplib'
 	]
 )

@@ -37,9 +37,7 @@
 #include "Vertex.h"
 #include "City.h"
 #include "HTMLModule.h"
-#include "Address.h"
 #include "AdminFunctionRequest.hpp"
-#include "AddressablePlace.h"
 #include "PTRoadsAdmin.h"
 #include "PTPlaceAdmin.h"
 #include "Profile.h"
@@ -152,68 +150,25 @@ namespace synthese
 				stream << t.open();
 				BOOST_FOREACH(const Edge* edge, _road->getEdges())
 				{
-					const Hub* place(edge->getFromVertex()->getHub());
+					const Crossing& crossing(static_cast<const Crossing&>(*edge->getFromVertex()->getHub()));
 
 					stream << t.row();
 					stream << t.col();
 					stream << edge->getRankInPath();
 					stream << t.col();
 					stream << edge->getMetricOffset();
-					if(dynamic_cast<const Crossing*>(place))
-					{
-						stream << t.col(2);
-						stream << "Intersection de routes";
-					}
-					else if(dynamic_cast<const StopArea*>(place))
-					{
-						openPlaceRequest.getPage()->setConnectionPlace(
-							Env::GetOfficialEnv().getSPtr(static_cast<const StopArea*>(place))
-						);
-
-						stream << t.col();
-						stream << "Zone d'arrêt";
-						stream << t.col();
-						stream << HTMLModule::getHTMLLink(openPlaceRequest.getURL(), static_cast<const StopArea*>(place)->getName());
-					}
-					else if(dynamic_cast<const PublicPlace*>(place))
-					{
-						openPlaceRequest.getPage()->setPublicPlace(
-							Env::GetOfficialEnv().getSPtr(static_cast<const PublicPlace*>(place))
-						);
-
-						stream << t.col();
-						stream << "Lieu public";
-						stream << t.col();
-						stream << HTMLModule::getHTMLLink(openPlaceRequest.getURL(), static_cast<const PublicPlace*>(place)->getName());
-					}
+					stream << t.col(2);
+					stream << "Intersection de routes";
 
 					stream << t.col();
 					set<const Road*> roads;
-					if(dynamic_cast<const Crossing*>(place))
+					BOOST_FOREACH(const Vertex::Edges::value_type& edge, crossing.getDepartureEdges())
 					{
-						const Address* address(static_cast<const Crossing*>(place)->getAddress());
-						BOOST_FOREACH(const Vertex::Edges::value_type& edge, address->getDepartureEdges())
-						{
-							roads.insert(dynamic_cast<const Road*>(edge.second->getParentPath()));
-						}
-						BOOST_FOREACH(const Vertex::Edges::value_type& edge, address->getArrivalEdges())
-						{
-							roads.insert(dynamic_cast<const Road*>(edge.second->getParentPath()));
-						}
+						roads.insert(dynamic_cast<const Road*>(edge.second->getParentPath()));
 					}
-					if(dynamic_cast<const AddressablePlace*>(place))
+					BOOST_FOREACH(const Vertex::Edges::value_type& edge, crossing.getArrivalEdges())
 					{
-						BOOST_FOREACH(const Address* address, static_cast<const AddressablePlace*>(place)->getAddresses())
-						{
-							BOOST_FOREACH(const Vertex::Edges::value_type& edge, address->getDepartureEdges())
-							{
-								roads.insert(dynamic_cast<const Road*>(edge.second->getParentPath()));
-							}
-							BOOST_FOREACH(const Vertex::Edges::value_type& edge, address->getArrivalEdges())
-							{
-								roads.insert(dynamic_cast<const Road*>(edge.second->getParentPath()));
-							}
-						}
+						roads.insert(dynamic_cast<const Road*>(edge.second->getParentPath()));
 					}
 					BOOST_FOREACH(const Road* road, roads)
 					{

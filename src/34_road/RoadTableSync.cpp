@@ -140,8 +140,9 @@ namespace synthese
 		RoadTableSync::SearchResult RoadTableSync::Search(
 			Env& env,
 			boost::optional<util::RegistryKeyType> roadPlaceId,
-			boost::optional<util::RegistryKeyType> startingNodeId,
-			boost::optional<util::RegistryKeyType> endingNodeId,
+			boost::optional<util::RegistryKeyType> cityId,
+//			boost::optional<util::RegistryKeyType> startingNodeId,
+//			boost::optional<util::RegistryKeyType> endingNodeId,
 			int first /*= 0*/,
 			boost::optional<std::size_t> number /*= 0*/,
 			LinkLevel linkLevel
@@ -154,16 +155,16 @@ namespace synthese
 			if(roadPlaceId)
 			{
 				query << " AND " << COL_ROAD_PLACE_ID << "=" << *roadPlaceId;
-			}
-			if(startingNodeId)
+			} /// @todo implementation
+/*			if(startingNodeId)
 			{
-				query << " AND (SELECT " << RoadChunkTableSync::COL_ADDRESSID << " FROM " << RoadChunkTableSync::TABLE.NAME << " WHERE " << RoadChunkTableSync::COL_ROADID << "=" << TABLE.NAME << "." << TABLE_COL_ID << " AND " << RoadChunkTableSync::COL_RANKINPATH << "=0)=" << *startingNodeId;
+				query << " AND (SELECT " << RoadChunkTableSync::COL_CROSSING_ID << " FROM " << RoadChunkTableSync::TABLE.NAME << " WHERE " << RoadChunkTableSync::COL_ROADID << "=" << TABLE.NAME << "." << TABLE_COL_ID << " AND " << RoadChunkTableSync::COL_RANKINPATH << "=0)=" << *startingNodeId;
 			}
 			if(endingNodeId)
 			{
-				query << " AND (SELECT " << RoadChunkTableSync::COL_ADDRESSID << " FROM " << RoadChunkTableSync::TABLE.NAME << " WHERE " << RoadChunkTableSync::COL_ROADID << "=" << TABLE.NAME << "." << TABLE_COL_ID << " ORDER BY " << RoadChunkTableSync::COL_RANKINPATH << " DESC LIMIT 1)=" << *startingNodeId;
+				query << " AND (SELECT " << RoadChunkTableSync::COL_CROSSING_ID << " FROM " << RoadChunkTableSync::TABLE.NAME << " WHERE " << RoadChunkTableSync::COL_ROADID << "=" << TABLE.NAME << "." << TABLE_COL_ID << " ORDER BY " << RoadChunkTableSync::COL_RANKINPATH << " DESC LIMIT 1)=" << *startingNodeId;
 			}
-			if (number)
+*/			if (number)
 			{
 				query << " LIMIT " << (*number + 1);
 				if (first > 0)

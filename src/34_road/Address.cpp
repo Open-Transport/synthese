@@ -21,55 +21,40 @@
 */
 
 #include "Address.h"
-#include "AddressablePlace.h"
-#include "Edge.h"
-#include "Registry.h"
-#include "Crossing.h"
-#include "RoadModule.h"
+#include "Road.h"
+#include "RoadChunk.h"
 
 using namespace std;
 
 namespace synthese
 {
-	using namespace graph;
-	using namespace util;
-	
-	namespace util
-	{
-		template<> const string Registry<road::Address>::KEY("Address");
-	}
-
 	namespace road
 	{
-
-
 		Address::Address (
-			RegistryKeyType id,
-			const AddressablePlace* place,
-			double x,
-			double y
-		):	util::Registrable(id),
-			Vertex (place, x, y)
+			RoadChunk* roadChunk,
+			double metricOffset
+		):	GeoPoint(roadChunk->getGeoPoint(metricOffset)),
+			_roadChunk(roadChunk),
+			_metricOffset(metricOffset)
 		{
 		}
 
 
 
-/*		const AddressablePlace* Address::getAddressablePlace() const
+		Address::Address(
+			const Road* road,
+			double metricOffset,
+			const geos::geom::Coordinate& coordinate
+		):	GeoPoint(coordinate),
+			_roadChunk(static_cast<RoadChunk*>(road->getEdgeAtOffset(metricOffset))),
+			_metricOffset(metricOffset - _roadChunk->getMetricOffset())
 		{
-			return static_cast<const AddressablePlace*>(_place);
 		}
-*/
+
+
 
 		Address::~Address()
 		{
-		}
-
-
-
-		graph::GraphIdType Address::getGraphType() const
-		{
-			return RoadModule::GRAPH_ID;
 		}
 	}
 }

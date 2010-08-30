@@ -28,7 +28,6 @@ synthese::pt::LineStopTableSync::integrate();
 synthese::pt::PTModule::integrate();
 
 synthese::pt::TridentFileFormat::integrate ();
-synthese::pt::NavteqWithProjectionFileFormat::integrate();
 synthese::pt::CarPostalFileFormat::integrate();
 
 synthese::pt::PTStopsImportWizardAdmin::integrate();
@@ -89,6 +88,7 @@ synthese::pt::LineStopUpdateAction::integrate();
 synthese::pt::StopPointMoveAction::integrate();
 synthese::pt::ServiceRemoveAction::integrate();
 synthese::pt::JourneyPatternRemoveAction::integrate();
+synthese::pt::ProjectAllStopPointsAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 

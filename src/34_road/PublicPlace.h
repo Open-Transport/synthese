@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_road_PUBLICPLACE_H
 #define SYNTHESE_road_PUBLICPLACE_H
 
-#include "AddressablePlace.h"
 #include "Registry.h"
 #include "NamedPlaceTemplate.h"
 
@@ -42,7 +41,6 @@ namespace synthese
 		/// @image html uml_public_place.png
 		///
 		class PublicPlace:
-			public road::AddressablePlace,
 			public geography::NamedPlaceTemplate<PublicPlace>
 		{
 		public:
@@ -59,6 +57,17 @@ namespace synthese
 			virtual std::string getNameForAllPlacesMatcher(
 				std::string text = std::string()
 			) const;
+
+			//! @name Virtual queries for geography::Place interface
+			//@{
+				virtual void getVertexAccessMap(
+					graph::VertexAccessMap& result,
+					const graph::AccessParameters& accessParameters,
+					const geography::Place::GraphTypes& whatToSearch
+				) const;
+
+				virtual const geography::GeoPoint& getPoint() const;
+			//@}
 		};
 	}
 }

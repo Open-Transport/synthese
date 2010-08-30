@@ -56,19 +56,23 @@ namespace synthese
 			
 
 
-			/** Road search.
-				(other search parameters)
-				@param first First Road object to answer
-				@param number Number of Road objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return Found Road objects.
-				@author Hugues Romain
-				@date 2006
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Road path search.
+			///	@param env Environment to populate when loading objects
+			///	@param roadPlaceId id of the road place the returned objects must belong to
+			///	@param cityId id of the city the returned objects must belong to
+			///	@param first First Road object to answer
+			///	@param number Number of Road objects to return (undefined = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+			/// @param linkLevel level of link
+			///	@return Found Road objects.
+			///	@author Hugues Romain
+			///	@date 2006
 			static SearchResult Search(
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> roadPlaceId = boost::optional<util::RegistryKeyType>(),
-				boost::optional<util::RegistryKeyType> startingNodeId = boost::optional<util::RegistryKeyType>(),
-				boost::optional<util::RegistryKeyType> endingNodeId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> cityId = boost::optional<util::RegistryKeyType>(),
+//				boost::optional<util::RegistryKeyType> startingNodeId = boost::optional<util::RegistryKeyType>(),
+//				boost::optional<util::RegistryKeyType> endingNodeId = boost::optional<util::RegistryKeyType>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL

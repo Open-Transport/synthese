@@ -37,7 +37,7 @@ namespace synthese
 {
 	namespace road
 	{
-		class Address;
+		class Crossing;
 		class RoadPlace;
 	}
 
@@ -459,7 +459,7 @@ namespace synthese
 			);
 			static void _XMLDisplayAddress(
 				std::ostream& stream,
-				const road::Address& place,
+				const road::Crossing& place,
 				const road::RoadPlace& roadPlace
 			);
 			static void _XMLDisplayRoadPlace(

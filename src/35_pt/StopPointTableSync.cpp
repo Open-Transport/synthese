@@ -25,6 +25,9 @@
 #include "SelectQuery.hpp"
 #include "StopAreaTableSync.hpp"
 #include "CoordinatesSystem.hpp"
+#include "RoadChunkTableSync.h"
+#include "LinkException.h"
+#include "CityTableSync.h"
 
 #include <geos/geom/Coordinate.h>
 
@@ -38,6 +41,7 @@ namespace synthese
     using namespace util;
 	using namespace pt;
 	using namespace geography;
+	using namespace road;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,StopPointTableSync>::FACTORY_KEY("15.55.01 Physical stops");
 	template<> const string FactorableTemplate<Fetcher<graph::Vertex>, StopPointTableSync>::FACTORY_KEY("12");
@@ -51,6 +55,8 @@ namespace synthese
 		const string StopPointTableSync::COL_OPERATOR_CODE("operator_code");
 		const string StopPointTableSync::COL_LONGITUDE("longitude");
 		const string StopPointTableSync::COL_LATITUDE("latitude");
+		const string StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID("projected_road_chunk_id");
+		const string StopPointTableSync::COL_PROJECTED_METRIC_OFFSET("projected_metric_offset");
 	}
 
     namespace db
@@ -69,6 +75,8 @@ namespace synthese
 			SQLiteTableSync::Field(StopPointTableSync::COL_OPERATOR_CODE, SQL_TEXT),
 			SQLiteTableSync::Field(StopPointTableSync::COL_LONGITUDE, SQL_DOUBLE),
 			SQLiteTableSync::Field(StopPointTableSync::COL_LATITUDE, SQL_DOUBLE),
+			SQLiteTableSync::Field(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, SQL_DOUBLE),
 			SQLiteTableSync::Field()
 		};
 
@@ -112,10 +120,41 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				StopArea* place = StopAreaTableSync::GetEditable(rows->getLongLong (StopPointTableSync::COL_PLACEID), env, linkLevel).get();
-				object->setHub(place);
+				// Stop area
+				try
+				{
+					StopArea* place(
+						StopAreaTableSync::GetEditable(
+							rows->getLongLong (StopPointTableSync::COL_PLACEID),
+							env,
+							linkLevel
+						).get()
+					);
+					object->setHub(place);
 
-				place->addPhysicalStop(*object);
+					place->addPhysicalStop(*object);
+				}
+				catch (ObjectNotFoundException<StopArea>& e)
+				{
+					throw LinkException<StopAreaTableSync>(rows, StopPointTableSync::COL_PLACEID, e);
+				}
+
+				// Projected point
+				RegistryKeyType chunkId(rows->getLongLong(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID));
+				if(chunkId > 0)
+				{
+					try
+					{
+						RoadChunk* chunk(RoadChunkTableSync::GetEditable(chunkId, env, linkLevel).get());
+						double metricOffset(rows->getDouble(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET));
+
+						object->setProjectedPoint(Address(chunk, metricOffset));
+					}
+					catch (ObjectNotFoundException<RoadChunk>& e)
+					{
+						throw LinkException<RoadChunkTableSync>(rows, StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, e);
+					}
+				}
 			}
 		}
 
@@ -144,6 +183,8 @@ namespace synthese
 			query.addField(object->getCodeBySource());
 			query.addField(object->isNull() ? string() : lexical_cast<string>(object->getLongitude()));
 			query.addField(object->isNull() ? string() : lexical_cast<string>(object->getLatitude()));
+			query.addField(object->getProjectedPoint().getRoadChunk() ? object->getProjectedPoint().getRoadChunk()->getKey() : 0);
+			query.addField(object->getProjectedPoint().getRoadChunk() ? object->getProjectedPoint().getMetricOffset() : 0);
 			query.execute(transaction);
 		}
     }
@@ -154,6 +195,8 @@ namespace synthese
 			Env& env, 
 			optional<RegistryKeyType> placeId,
 			optional<string> operatorCode,
+			bool orderByCityAndStopName,
+			bool raisingOrder,
 			int first /*= 0 */,
 			boost::optional<std::size_t> number  /*= 0 */,
 			LinkLevel linkLevel
@@ -166,6 +209,14 @@ namespace synthese
 			if(placeId)
 			{
 				query.addWhereField(COL_PLACEID, *placeId);
+			}
+			if(orderByCityAndStopName)
+			{
+				query.addTableAndEqualJoin<StopAreaTableSync>(TABLE_COL_ID, COL_PLACEID);
+				query.addTableAndEqualOtherJoin<StopAreaTableSync, CityTableSync>(TABLE_COL_ID, StopAreaTableSync::TABLE_COL_CITYID);
+				query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
+				query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
+				query.addOrderField(StopPointTableSync::COL_NAME, raisingOrder);
 			}
 			if (number)
 			{

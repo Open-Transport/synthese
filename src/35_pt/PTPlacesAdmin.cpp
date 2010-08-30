@@ -218,7 +218,7 @@ namespace synthese
 							stream << t.col() << it.score.levenshtein;
 							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
-						else if(dynamic_cast<const PublicPlace*>(it.value))
+/*						else if(dynamic_cast<const PublicPlace*>(it.value))
 						{
 							const PublicPlace* publicPlace(static_cast<const PublicPlace*>(it.value));
 							openPlaceRequest.getPage()->setPublicPlace(Env::GetOfficialEnv().getSPtr(publicPlace));
@@ -232,7 +232,7 @@ namespace synthese
 							stream << t.col() << it.score.levenshtein;
 							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
-						else
+*/						else
 						{
 							stream << t.col();
 							stream << t.col() << "???";
@@ -284,7 +284,7 @@ namespace synthese
 							stream << t.col() << connectionPlace->getName();
 							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
-						else if(dynamic_cast<const PublicPlace*>(it))
+/*						else if(dynamic_cast<const PublicPlace*>(it))
 						{
 							const PublicPlace* publicPlace(dynamic_cast<const PublicPlace*>(it));
 							openPlaceRequest.getPage()->setPublicPlace(Env::GetOfficialEnv().getSPtr(publicPlace));
@@ -294,7 +294,7 @@ namespace synthese
 							stream << t.col() << publicPlace->getName();
 							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
-						else
+*/						else
 						{
 							stream << t.col();
 							stream << t.col() << "???";

@@ -79,14 +79,14 @@ namespace synthese
 			SQLiteTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Address>::Load(
-			Address* object
-			, const db::SQLiteResultSPtr& rows
-			, Env& env
-			, LinkLevel linkLevel
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync, Crossing>::Load(
+			Crossing* object,
+			const db::SQLiteResultSPtr& rows,
+			Env& env,
+			LinkLevel linkLevel
 		){
 			// Properties
-		    *object = GeoPoint(
+		    static_cast<GeoPoint&>(*object) = GeoPoint(
 				rows->getDouble(CrossingTableSync::COL_LONGITUDE),
 				rows->getDouble(CrossingTableSync::COL_LATITUDE)
 			);
@@ -100,22 +100,6 @@ namespace synthese
 				// Links from the object
 				try
 				{
-					RegistryKeyType crossingId(
-						util::encodeUId(43,decodeGridNodeId(object->getKey()),decodeObjectId(object->getKey()))
-					);
-					shared_ptr<Crossing> crossing;
-					Crossing::Registry& registry(env.getEditableRegistry<Crossing>());
-					if(registry.contains(crossingId))
-					{
-						crossing = registry.getEditable(crossingId);
-					}
-					else
-					{
-						crossing.reset(new Crossing(crossingId));
-						crossing->setAddress(object);
-						registry.add(crossing);
-					}
-					object->setHub(crossing.get());
 					if(sourceId > 0)
 					{
 						object->setDataSource(DataSourceTableSync::Get(sourceId, env, linkLevel).get());
@@ -130,15 +114,15 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Address>::Unlink(
-			Address* obj
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync, Crossing>::Unlink(
+			Crossing* obj
 		){
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync,Address>::Save(
-			Address* object,
+		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync, Crossing>::Save(
+			Crossing* object,
 			optional<SQLiteTransaction&> transaction
 		){
 			ReplaceQuery<CrossingTableSync> query(*object);
@@ -153,7 +137,7 @@ namespace synthese
 	namespace road
 	{
 		CrossingTableSync::CrossingTableSync()
-			: SQLiteRegistryTableSyncTemplate<CrossingTableSync,Address>()
+			: SQLiteRegistryTableSyncTemplate<CrossingTableSync, Crossing>()
 		{
 		}
 

@@ -20,6 +20,5 @@ synthese::road::NavstreetsFileFormat::integrate();
 synthese::util::Env::Integrate<synthese::road::Road>();
 synthese::util::Env::Integrate<synthese::road::Crossing>();
 synthese::util::Env::Integrate<synthese::road::RoadPlace>();
-synthese::util::Env::Integrate<synthese::road::Address>();
 synthese::util::Env::Integrate<synthese::road::RoadChunk>();
 synthese::util::Env::Integrate<synthese::road::PublicPlace>();

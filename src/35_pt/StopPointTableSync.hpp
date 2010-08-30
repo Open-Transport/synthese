@@ -35,27 +35,32 @@ namespace synthese
 {
 	namespace pt
 	{
-		/** StopPoint SQLite table synchronizer.
-			@ingroup m35LS refLS
-			
-			Physical stops table :
-				- on insert : 
-				- on update : 
-				- on delete : X
-
-			Corresponding class : StopPoint
-
-			<h2>Fields</h2>
-
-			<table class="table">
-			<tr><th>field</th><th>Description</th><th>Comments</th><th>Possible values</th><th>Corresponding attribute</th></tr>
-			<tr><th>id</th><td>Unique identifier</td><td>Primary key</td><td>Table #12 : 3377699720527872 to 3659174697238527</td><td>StopPoint::_key</td></tr>
-			<tr><th>name</th><td>Name of the stop point</td><td></td><td>String. Avoid " characters</td><td>StopPoint::_name</td></tr>
-			<tr><th>x, y</th><td>Coordinates in the default projection of the instance</td><td>If lon/lat are not null, x and y are ignored</td><td>Positive numbers</td><td>StopPoint::x, StopPoint::y</td></tr>
-			<tr><th>operator_code</th><td>Identifier of the stop in the source database</td><td>To be used when the stop is imported from an other system</td><td></td><td>StopPoint::_operator_code</td></tr>
-			<tr><th>longitude, latitude</th><td>Longitude and latitude in degrees</td><td>Can be null if x,y are defined. If lon/lat are not null, x and y are ignored</td><td>between -180 and 180</td><td>StopPoint::_logitude, StopPoint::_latitude</td></tr>
-			</table>
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// StopPoint SQLite table synchronizer.
+		///	@ingroup m35LS refLS
+		/// @author Marc Jambert, Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		///	Corresponding class : StopPoint
+		///	Table number : 12
+		///
+		///	<h2>Fields</h2>
+		///
+		///	<table class="table">
+		///	<tr><th>field</th><th>Description</th><th>Comments</th><th>Possible values</th><th>Corresponding attribute</th></tr>
+		///	<tr><th>id</th><td>Unique identifier</td><td>Primary key</td><td>Table #12 : 3377699720527872 to 3659174697238527</td><td>StopPoint::_key</td></tr>
+		///	<tr><th>name</th><td>Name of the stop point</td><td></td><td>String. Avoid " characters</td><td>StopPoint::_name</td></tr>
+		///	<tr><th>x, y</th><td>Coordinates in the default projection of the instance</td><td>If lon/lat are not null, x and y are ignored</td><td>Positive numbers</td><td>StopPoint::x, StopPoint::y</td></tr>
+		///	<tr><th>operator_code</th><td>Identifier of the stop in the source database</td><td>To be used when the stop is imported from an other system</td><td></td><td>StopPoint::_operator_code</td></tr>
+		///	<tr><th>longitude, latitude</th><td>Longitude and latitude in degrees</td><td>Can be null if x,y are defined. If lon/lat are not null, x and y are ignored</td><td>between -180 and 180</td><td>StopPoint::_logitude, StopPoint::_latitude</td></tr>
+		///	</table>
+		///
+		///	<h2>Up links</h2>
+		///
+		///	<dl>
+		///	<dt>place_id</dt><dd>id of @ref StopAreaTableSync "stop area" which the stop point belongs to</dd>
+		///	<dt>projected_road_chunk_id</dt><dd>id of @ref road::RoadChunkTableSync "road chunk" on which the stop point is projected</dd>
+		///	<dt>projected_metric_offset</dt><dd>metric offset of the projected point on the road chunk</dd>
+		///	</dl>
 		class StopPointTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<StopPointTableSync,StopPoint>,
 			public db::FetcherTemplate<graph::Vertex, StopPointTableSync>
@@ -68,13 +73,28 @@ namespace synthese
 			static const std::string COL_OPERATOR_CODE;
 			static const std::string COL_LONGITUDE;
 			static const std::string COL_LATITUDE;
+			static const std::string COL_PROJECTED_ROAD_CHUNK_ID;
+			static const std::string COL_PROJECTED_METRIC_OFFSET;
 
 
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Stop points search.
+			/// @param env environment to populate when loading objects
+			/// @param placeId id of stop area which returned stops must belong to
+			/// @param operatorCode LIKE expression operator code must correspond to
+			/// @param orderByCityAndStopName results are ordered by city name, then stop area name, then stop point name
+			/// @param raisingOrder results are ordered ascendantly
+			/// @param first first element to return
+			///	@param number Number of objects to return (undefined = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+			/// @param linkLevel level of link
+			/// @return stop points corresponding to search criteria
 			static SearchResult Search(
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> placeId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<std::string> operatorCode = boost::optional<std::string>(),
+				bool orderByCityAndStopName = true,
+				bool raisingOrder = true,
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
