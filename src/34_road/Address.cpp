@@ -33,7 +33,7 @@ namespace synthese
 		Address::Address (
 			RoadChunk* roadChunk,
 			double metricOffset
-		):	GeoPoint(roadChunk->getGeoPoint(metricOffset)),
+		):	GeoPoint(roadChunk ? roadChunk->getGeoPoint(metricOffset) : GeoPoint()),
 			_roadChunk(roadChunk),
 			_metricOffset(metricOffset)
 		{
