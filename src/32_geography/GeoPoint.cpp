@@ -36,8 +36,6 @@ namespace synthese
 {
 	namespace geography
 	{
-		const string GeoPoint::_WGS84_CODE("EPSG:4326");
-
 		GeoPoint::GeoPoint(
 			double longitude,
 			double latitude,
@@ -50,7 +48,7 @@ namespace synthese
 		{
 			// projection
 			pj_transform(
-				CoordinatesSystem::GetCoordinatesSystem(_WGS84_CODE).getProjObject(),
+				CoordinatesSystem::GetCoordinatesSystem(CoordinatesSystem::WGS84_CODE).getProjObject(),
 				_coordinatesSystem.getProjObject(),
 				1, 1,
 				&x, &y, NULL
@@ -70,7 +68,7 @@ namespace synthese
 		{
 			// projection
 			pj_transform(
-				CoordinatesSystem::GetCoordinatesSystem(_WGS84_CODE).getProjObject(),
+				CoordinatesSystem::GetCoordinatesSystem(CoordinatesSystem::WGS84_CODE).getProjObject(),
 				_coordinatesSystem.getProjObject(),
 				1, 1,
 				&x, &y, NULL
@@ -89,7 +87,7 @@ namespace synthese
 			//transformation into wgs84
 			pj_transform(
 				coordinatesSystem.getProjObject(),
-				CoordinatesSystem::GetCoordinatesSystem(_WGS84_CODE).getProjObject(),
+				CoordinatesSystem::GetCoordinatesSystem(CoordinatesSystem::WGS84_CODE).getProjObject(),
 				1, 1,
 				&_longitude, &_latitude, NULL
 			);
@@ -98,7 +96,7 @@ namespace synthese
 			x = _longitude;
 			y = _latitude;
 			pj_transform(
-				CoordinatesSystem::GetCoordinatesSystem(_WGS84_CODE).getProjObject(),
+				CoordinatesSystem::GetCoordinatesSystem(CoordinatesSystem::WGS84_CODE).getProjObject(),
 				_coordinatesSystem.getProjObject(),
 				1, 1,
 				&x, &y, NULL
@@ -122,7 +120,7 @@ namespace synthese
 			//transformation into wgs84
 			pj_transform(
 				_coordinatesSystem.getProjObject(),
-				CoordinatesSystem::GetCoordinatesSystem(_WGS84_CODE).getProjObject(),
+				CoordinatesSystem::GetCoordinatesSystem(CoordinatesSystem::WGS84_CODE).getProjObject(),
 				1, 1,
 				&_longitude, &_latitude, NULL
 			);

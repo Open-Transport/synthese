@@ -29,6 +29,7 @@ namespace synthese
 	namespace geography
 	{
 		CoordinatesSystem::Map CoordinatesSystem::_coordinates_systems;
+		const string CoordinatesSystem::WGS84_CODE("EPSG:4326");
 
 
 
@@ -65,7 +66,7 @@ namespace synthese
 			);
 
 			AddCoordinatesSystem(
-				"EPSG:4326",
+				WGS84_CODE,
 				"WGS84",
 				"WGS84",
 				"+proj=longlat +towgs84=0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.000000 +a=6378137.0000 +rf=298.2572221010000 +units=m +no_defs <>"

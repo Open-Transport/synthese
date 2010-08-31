@@ -42,6 +42,9 @@ namespace synthese
 		*/
 		class CoordinatesSystem
 		{
+		public:
+			static const std::string WGS84_CODE;
+
 		private:
 			std::string _code;
 			std::string _name;

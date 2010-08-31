@@ -49,7 +49,6 @@ namespace synthese
 			public geos::geom::Coordinate
 		{
 		private:
-			static const std::string _WGS84_CODE;
 
 			double _longitude;        //!< Longitude in degrees.
 			double _latitude;         //!< Latitude in degrees.
