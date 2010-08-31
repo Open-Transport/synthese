@@ -30,13 +30,13 @@
 #include <boost/optional.hpp>
 #include <vector>
 #include <set>
-#include <geos/geom/Geometry.h>
 
 namespace geos
 {
 	namespace geom
 	{
-		class Coordinate;
+		class Point;
+		class LineString;
 	}
 }
 
@@ -119,24 +119,8 @@ namespace synthese
 				virtual bool isRoad() const;
 				virtual bool isPedestrianMode() const = 0;
 
-				//////////////////////////////////////////////////////////////////////////
-				/// Gets all the geographical points linked by the path
-				///	between two of its edges. If no from/to edge
-				///	index is provided, all the edges are considered.
-				///	@param fromEdgeIndex 
-				///	@param toEdgeIndex 
-				///	@author Marc Jambert
-				//////////////////////////////////////////////////////////////////////////
-				///	This includes :
-				///	- vertices (address/physical stops)
-				///	- via points
-				std::vector<const geos::geom::Coordinate> getPoints(
-					int fromEdgeIndex = 0,
-					int toEdgeIndex = -1
-				) const;
 
 
-				
 				//////////////////////////////////////////////////////////////////////////
 				/// Tests the possibility of finding a running service at a given date.
 				/// @param date the date to test
@@ -151,10 +135,15 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// builds a geos linestring of all the points linked by the path.
-				/// @author Thomas Bonfort
+				///	@param fromEdgeIndex first edge to include
+				///	@param toEdgeIndex last edge to include (undefined = all edges)
+				/// @author Thomas Bonfort, Hugues Romain
 				/// @date 2010
 				/// @since 3.2.0
-				boost::shared_ptr<geos::geom::Geometry> getGeometry() const;
+				boost::shared_ptr<geos::geom::LineString> getGeometry(
+					std::size_t fromEdgeIndex = 0,
+					boost::optional<std::size_t> toEdgeIndex = boost::optional<std::size_t>()
+				) const;
 
 
 
@@ -170,10 +159,14 @@ namespace synthese
 
 
 				//////////////////////////////////////////////////////////////////////////
-				/// Tests if the geometry of the path is relevant.
+				/// Productes a log output if the geometry of the path is unrelevant.
 				/// @author Thomas Bonfort
 				/// @date 2010
 				/// @since 3.2.0
+				//////////////////////////////////////////////////////////////////////////
+				/// The test consists in comparison between the differences between
+				/// metric offsets of the last and the first edges, and the sum of the
+				/// length of each geometry
 				void validateGeometry() const;
 
 

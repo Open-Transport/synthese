@@ -34,6 +34,7 @@
 
 #include <boost/algorithm/string/replace.hpp>
 #include <geos/geom/Coordinate.h>
+#include <geos/geom/LineString.h>
 #include <fstream>
 #include <cmath>
 #include <algorithm>
@@ -41,6 +42,7 @@
 
 using namespace std;
 using namespace geos::geom;
+using namespace boost;
 
 namespace synthese
 {
@@ -110,13 +112,13 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
          it != selectedLines.end () ; ++it) 
     {
 	const DrawableLine* dbl = *it;
-	const std::vector<const Coordinate>& points = dbl->getPoints ();
+	shared_ptr<LineString> points = dbl->getPoints ();
 
 
 	
 	int firstStopIndex = -1;
 	// find first stop index
-	for (int i=0; i<points.size ();++i)
+	for (int i=0; i<points->getCoordinatesRO()->getSize();++i)
 	{
 //	    const StopPoint* stop = dynamic_cast<const StopPoint*> (points[i]);
 //	    if (stop == 0) continue;
@@ -134,7 +136,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 	    int secondStopIndex = -1;
 
 
-	    for (int i=firstStopIndex+1; i<points.size (); ++i)
+	    for (int i=firstStopIndex+1; i<points->getCoordinatesRO()->getSize(); ++i)
 	    {
 //		const StopPoint* stop = dynamic_cast<const StopPoint*> (points[i]);
 //		if (stop == 0) continue;
@@ -149,7 +151,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 	    // Dump points between first stop index and second point index
 	    for (int i=firstStopIndex; i<=secondStopIndex; ++i)
 	    {
-		mifof << points[i].x << " " << points[i].y << std::endl;
+		mifof << points->getCoordinateN(i).x << " " << points->getCoordinateN(i).y << std::endl;
 	    }
 	    mifof << "    Pen (" 
 		  << 3 << "," // pen width
@@ -178,7 +180,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
     
     Log::GetInstance ().debug (zipcmd.str ());
     
-    int ret = system (zipcmd.str ().c_str ());
+	int ret = ::system (zipcmd.str ().c_str ());
     
     if (ret != 0)
     {

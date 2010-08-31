@@ -25,7 +25,13 @@
 #include "Crossing.h"
 #include "Registry.h"
 
+#include <geos/geom/LineString.h>
+#include <geos/linearref/LengthIndexedLine.h>
+
 using namespace std;
+using namespace boost;
+using namespace geos::geom;
+using namespace geos::linearref;
 
 namespace synthese
 {
@@ -117,7 +123,8 @@ namespace synthese
 
 		geography::GeoPoint RoadChunk::getGeoPoint( double metricOffset ) const
 		{
-			return GeoPoint(); /// @todo implementation
+			shared_ptr<LineString> geometry(getGeometry());
+			return GeoPoint(LengthIndexedLine(geometry.get()).extractPoint(metricOffset));
 		}
 	}
 }

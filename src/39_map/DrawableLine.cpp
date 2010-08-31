@@ -35,7 +35,9 @@
 #include "StopPoint.hpp"
 
 #include <geos/geom/Coordinate.h>
+#include <geos/geom/LineString.h>
 
+using namespace boost;
 using namespace geos::geom;
 
 namespace synthese
@@ -57,12 +59,12 @@ DrawableLine::DrawableLine (const JourneyPattern* line,
 			    int toLineStopIndex,
 			    bool withPhysicalStops)
     : _lineId (line->getKey())
-    , _points (line->getPoints (fromLineStopIndex, toLineStopIndex))
+    , _geometry (line->getGeometry(fromLineStopIndex, toLineStopIndex))
     , _shortName (line->getName ())
 	, _color (line->getCommercialLine()->getColor() ? *line->getCommercialLine ()->getColor() : RGBColor(0,0,0))
     , _withPhysicalStops (withPhysicalStops)
 {
-    for (unsigned int i=0; i<_points.size (); ++i) {
+    for (unsigned int i=0; i<_geometry->getCoordinatesRO()->getSize(); ++i) {
         // Shift initially to 0; 
 	_shifts.push_back (0); 
         
@@ -75,17 +77,17 @@ DrawableLine::DrawableLine (const JourneyPattern* line,
 
     
 DrawableLine::DrawableLine (const util::RegistryKeyType& lineId, 
-			    const std::vector<const Coordinate>& points,
+			    shared_ptr<LineString> points,
 			    const std::string& shortName,
 			    const synthese::util::RGBColor& color,
 			    bool withPhysicalStops)
     : _lineId (lineId)
-    , _points (points)
+    , _geometry (points)
     , _shortName (shortName)
     , _color (color)
     , _withPhysicalStops (withPhysicalStops)
 {
-    for (unsigned int i=0; i<_points.size (); ++i) {
+    for (unsigned int i=0; i<_geometry->getCoordinatesRO()->getSize(); ++i) {
         // Shift initially to 0; 
 	_shifts.push_back (0); 
         
@@ -119,13 +121,6 @@ DrawableLine::hasPoint (const Coordinate& p) const
     return firstIndexOf (p) != -1;
 }
 
-
-
-const std::vector<const Coordinate>& 
-DrawableLine::getPoints () const
-{
-    return _points;
-}
 
 
 const std::vector<Coordinate>& 
@@ -190,8 +185,8 @@ DrawableLine::isReverseWayAt (const Coordinate& p,
 {
     const std::vector<Coordinate>& points2 = dbl->getFuzzyfiedPoints ();
 	
-    // if _point has a following point in _points which is the
-    // previous one in points2 or if _point has a previous point in _points
+    // if _point has a following point in _geometry which is the
+    // previous one in points2 or if _point has a previous point in _geometry
     // which is the next one in points2 then reverse points2.
     int index1 = firstIndexOf (p);
     int index2 = dbl->firstIndexOf (p);
@@ -263,7 +258,7 @@ bool
 DrawableLine::isStopPoint (int pointIndex) const
 {
 return false;
-//	const Coordinate* p = _points[pointIndex];
+//	const Coordinate* p = _geometry[pointIndex];
 //    return dynamic_cast<const StopPoint*> (p) != 0;
 }
 
@@ -462,8 +457,8 @@ void
 DrawableLine::fuzzyfyPoints (const DrawableLineIndex& lineIndex)
 {
 	_fuzzyfiedPoints.clear ();
-	for (int i=0; i<_points.size(); ++i) {
-		_fuzzyfiedPoints.push_back (lineIndex.getFuzzyPoint(_points[i]));
+	for (int i=0; i<_geometry->getCoordinatesRO()->getSize(); ++i) {
+		_fuzzyfiedPoints.push_back (lineIndex.getFuzzyPoint(_geometry->getCoordinatesRO()->getAt(i)));
 		// _fuzzyfiedPoints.push_back (*(_points[i]));
 	}
 }

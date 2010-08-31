@@ -54,7 +54,6 @@ namespace synthese
 		const string RoadTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
 		const string RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
 		const string RoadTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
-		const string RoadTableSync::COL_VIAPOINTS ("via_points");
 		const string RoadTableSync::COL_ROAD_PLACE_ID("road_place_id");
 	}
 
@@ -73,7 +72,6 @@ namespace synthese
 			SQLiteTableSync::Field(RoadTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadTableSync::COL_VIAPOINTS, SQL_TEXT),
 			SQLiteTableSync::Field(RoadTableSync::COL_ROAD_PLACE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
@@ -129,7 +127,6 @@ namespace synthese
 			query.addField(0);
 			query.addField(0);
 			query.addField(0);
-			query.addField(string());
 			query.addField(object->getRoadPlace() ? object->getRoadPlace()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}

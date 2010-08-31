@@ -121,7 +121,7 @@ namespace synthese
 			Edge* _followingConnectionArrival;			//!< Next connection arrival edge along path.
 			Edge* _followingArrivalForFineSteppingOnly;	//!< Next arrival edge with or without connection
 
-			boost::shared_ptr<geos::geom::LineString> _geometry;				//!< Intermediate points along the edge (for map drawing)
+			boost::shared_ptr<geos::geom::LineString> _geometry;	//!< Geometry, including beginning and ending vertices
 
 			mutable DepartureServiceIndices _departureIndex;	//!< First service index by departure hour of day
 			mutable ArrivalServiceIndices _arrivalIndex;		//!< First service index by arrival hour of day
@@ -229,7 +229,7 @@ namespace synthese
 				///		<li>If the edge is the last edge, the vertex point is returned</li>
 				///		<li>Else a right line string between the vertex and the next one is returned</li>
 				/// </ul>
-				boost::shared_ptr<geos::geom::Geometry> getGeometry(
+				boost::shared_ptr<geos::geom::LineString> getGeometry(
 				) const;
 
 

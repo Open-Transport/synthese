@@ -42,16 +42,11 @@ namespace synthese
 		:	public db::SQLiteRegistryTableSyncTemplate<RoadTableSync,Road>
 		{
 		public:
-			/** Roads table :
-			- on insert : 
-			- on update : 
-			- on delete : X
-			*/
+			
 			static const std::string COL_ROADTYPE;
 			static const std::string COL_BIKECOMPLIANCEID;
 			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
-			static const std::string COL_VIAPOINTS;
 			static const std::string COL_ROAD_PLACE_ID;
 			
 

@@ -196,19 +196,19 @@ namespace synthese
 								addViaPoints = false;
 							if(addViaPoints)
 							{
-								shared_ptr<Geometry> geometry(e->getGeometry());
+								shared_ptr<LineString> geometry(e->getGeometry());
 								if(geometry.get())
 								{
-									for(size_t i(0); i<geometry->getCoordinates()->getSize(); ++i)
+									for(size_t i(0); i<geometry->getCoordinatesRO()->getSize(); ++i)
 									{
-										coords->add(geometry->getCoordinates()->getAt(i),0);
+										coords->add(geometry->getCoordinatesRO()->getAt(i), false);
 									}
 								}
 							}
 							if(road->isReversed())
 							{
 								c = *e->getFromVertex();
-								coords->add(c,0);
+								coords->add(c, false);
 							}
 							if(e == su.getArrivalEdge())
 								break;

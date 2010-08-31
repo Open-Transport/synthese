@@ -411,30 +411,27 @@ namespace synthese
 
 
 
-		shared_ptr<Geometry> Edge::getGeometry(
+		shared_ptr<LineString> Edge::getGeometry(
 		) const	{
 			if(_geometry.get())
 			{
-				return static_pointer_cast<Geometry,LineString>(_geometry);
+				return _geometry;
 			}
+
 			assert(getFromVertex());
+			const GeometryFactory* geometryFactory(GeometryFactory::getDefaultInstance());
+
 			if(	getParentPath() &&
 				getParentPath()->getEdge(getRankInPath()) == this &&
 				getParentPath()->getEdges().size() != getRankInPath()+1
 			){
 				const Edge* nextEdge(getParentPath()->getEdge(getRankInPath() + 1));
-				const GeometryFactory* geometryFactory(GeometryFactory::getDefaultInstance());
-				std::vector<Coordinate>* coordinates = new std::vector<geos::geom::Coordinate>();
-				coordinates->push_back(*getFromVertex());
-				coordinates->push_back(*nextEdge->getFromVertex());
-				CoordinateSequence *cs = geometryFactory->getCoordinateSequenceFactory()->create(coordinates);
-				shared_ptr<LineString> geometry(geometryFactory->createLineString(cs));
-				return static_pointer_cast<Geometry, LineString>(geometry);
+				CoordinateSequence* cs(geometryFactory->getCoordinateSequenceFactory()->create(0, 2));
+				cs->add(*getFromVertex(), false);
+				cs->add(*nextEdge->getFromVertex(), false);
+				return shared_ptr<LineString>(geometryFactory->createLineString(cs));
 			}
 
-			return static_pointer_cast<Geometry, Point>(
-				shared_ptr<Point>(
-					GeometryFactory::getDefaultInstance()->createPoint(*getFromVertex())
-			)	);
+			return shared_ptr<LineString>(geometryFactory->createLineString());
 		}
 }	}

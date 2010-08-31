@@ -119,35 +119,6 @@ namespace synthese
 
 
 
-		std::vector<const Coordinate> Path::getPoints(
-			int fromEdgeIndex,
-			int toEdgeIndex
-		) const	{
-			if (toEdgeIndex == -1) toEdgeIndex = _edges.size () - 1;
-			vector<const Coordinate> points;
-		    
-			for (int i=fromEdgeIndex; i<=toEdgeIndex; ++i)
-			{
-				shared_ptr<Geometry> geometry(_edges[i]->getGeometry());
-				CoordinateSequence* coords(
-					geometry->getCoordinates()
-				);
-
-				if(i == fromEdgeIndex)
-				{
-					points.push_back(coords->getAt(0));
-				}
-
-				for(i=1; i<coords->getSize(); ++i)
-				{
-					points.push_back(coords->getAt(i));
-				}
-			}
-			return points;
-		}
-
-
-
 		void Path::addEdge(
 			Edge& edge
 		){
@@ -538,30 +509,38 @@ namespace synthese
 			return (s1->getDepartureSchedule (false,0) < s2->getDepartureSchedule (false,0))
 				|| (s1->getDepartureSchedule (false,0) == s2->getDepartureSchedule (false,0)
 				&& s1 < s2)						
-				;
+			;
 		}
 
 
-		shared_ptr<Geometry> Path::getGeometry(
+		shared_ptr<LineString> Path::getGeometry(
+			std::size_t fromEdgeIndex,
+			boost::optional<std::size_t> toEdgeIndex
 		) const {
+
+			// Geos factories
 			const GeometryFactory *gf = GeometryFactory::getDefaultInstance();
-			std::vector<const Coordinate> points(getPoints());
-			std::vector<Coordinate>* coordinates = new std::vector<geos::geom::Coordinate>();
-			BOOST_FOREACH(const Coordinate& pt, points)
+			geos::geom::CoordinateSequence *coords(gf->getCoordinateSequenceFactory()->create(0,2));
+
+			// Auto get end edge index
+			if(!toEdgeIndex)
 			{
-			   if(pt.isNull())
-			   {
-				   continue;
-			   }
-			   coordinates->push_back(pt);
+				*toEdgeIndex = _edges.size () - 1;
 			}
-			CoordinateSequence *cs = gf->getCoordinateSequenceFactory()->create(coordinates);
-			//coordinates* is now owned by cs
 
-			shared_ptr<Geometry> geosGeom(static_cast<Geometry*>(gf->createLineString(cs)));
-			//cs* owned by geometry
+			// Gets the coordinates of each edge
+			for(size_t i=fromEdgeIndex; i<=*toEdgeIndex; ++i)
+			{
+				const CoordinateSequence& geometry(*_edges[i]->getGeometry()->getCoordinatesRO());
 
-			return geosGeom;
+				for(size_t j(0); j<geometry.getSize(); ++j)
+				{
+					coords->add(geometry.getAt(j), false);
+				}
+			}
+
+			//coords* owned by the shared pointer
+			return shared_ptr<LineString>(gf->createLineString(coords));
 		}
 
 
@@ -578,29 +557,25 @@ namespace synthese
 
 
 
-      void Path::validateGeometry() const
-	  {
-         if(!_edges.size()) return;
-         double graphlength  = _edges.back()->getMetricOffset();
-         double geomLength = getGeometry()->getLength();
-         if(std::abs(graphlength-geomLength)>0.1) {
-            std::stringstream ss;
-            ss.precision(10);
-            ss << "discrepancy found in geometries for path " << getKey() << std::endl;
+		void Path::validateGeometry() const
+		{
+			if(!_edges.size()) return;
+			double graphlength = _edges.back()->getMetricOffset() - _edges.front()->getMetricOffset();
+			shared_ptr<LineString> geometry(getGeometry());
+			double geomLength = geometry->getLength();
+			if(std::abs(graphlength-geomLength)>0.1)
+			{
+				std::stringstream ss;
+				ss.precision(10);
+				ss << "discrepancy found in geometries for path " << getKey() << std::endl;
 
-            BOOST_FOREACH(const Coordinate& pt, getPoints()) {
-               ss << "("<<pt.x<<","<<pt.y<<")";
-            }
-            ss<<std::endl<<getGeometry()->toText()<<std::endl;
-            util::Log::GetInstance().warn(ss.str());
-         }
-         double offset = 0;
-         const Coordinate* prevPnt = NULL;
-         BOOST_FOREACH(const graph::Edge* edge, _edges) {
-			shared_ptr<Geometry> geometry(edge->getGeometry());
-			offset += geometry->getLength();
-         }
-         assert(std::abs(offset-_edges.back()->getMetricOffset())<0.1);
-      }
+				for(size_t i(0); i<geometry->getCoordinatesRO()->getSize(); ++i)
+				{
+					ss << "("<<geometry->getCoordinateN(i).x<< "," << geometry->getCoordinateN(i).y <<")";
+				}
+				ss<<std::endl<< geometry->toText()<<std::endl;
+				util::Log::GetInstance().warn(ss.str());
+			}
+		}
 	}
 }

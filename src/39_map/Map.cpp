@@ -47,9 +47,11 @@
 #include "RGBColor.h"
 
 #include <geos/geom/Coordinate.h>
+#include <geos/geom/LineString.h>
 
 using namespace std;
 using namespace geos::geom;
+using namespace boost;
 
 namespace synthese
 {
@@ -134,16 +136,15 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 	 it != selectedLines.end ();
 	 ++it)
     {
-	const std::vector<const Coordinate>& points = (*it)->getPoints ();
-	for (std::vector<const Coordinate>::const_iterator itp = points.begin ();
-	     itp != points.end () ; ++itp)
-	{
-	    const Coordinate& p(*itp);
-	    if (p.x < lowerLeftLatitude) lowerLeftLatitude = p.x;
-	    if (p.y < lowerLeftLongitude) lowerLeftLongitude = p.y;
-	    if (p.x > upperRightLatitude) upperRightLatitude = p.x;
-	    if (p.y > upperRightLongitude) upperRightLongitude = p.y;
-	}
+		shared_ptr<LineString> points = (*it)->getPoints();
+		for(size_t i(0); i<points->getCoordinatesRO()->getSize(); ++i)
+		{
+			const Coordinate& p(points->getCoordinatesRO()->getAt(i));
+			if (p.x < lowerLeftLatitude) lowerLeftLatitude = p.x;
+			if (p.y < lowerLeftLongitude) lowerLeftLongitude = p.y;
+			if (p.x > upperRightLatitude) upperRightLatitude = p.x;
+			if (p.y > upperRightLongitude) upperRightLongitude = p.y;
+		}
     }
 
     _realFrame = synthese::map::Rectangle (lowerLeftLatitude - _neighborhood,
@@ -552,8 +553,8 @@ Map::preparePhysicalStops ()
 	    const DrawableLine* dbl = *it;
         if (dbl->getWithPhysicalStops () == false) continue;
 
-	    const std::vector<const Coordinate>& points = dbl->getPoints ();
-	    for (size_t i=0; i<points.size (); ++i)
+	    shared_ptr<LineString> points = dbl->getPoints ();
+	    for (size_t i=0; i<points->getCoordinatesRO()->getSize(); ++i)
 	    {
 /*	        const Coordinate* p = points[i];
 

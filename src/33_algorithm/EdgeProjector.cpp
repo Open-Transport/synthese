@@ -33,6 +33,7 @@
 
 #include <geos/geom/Geometry.h>
 #include <geos/geom/Point.h>
+#include <geos/geom/LineString.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/linearref/LinearLocation.h>
 #include <geos/linearref/LengthIndexedLine.h>
@@ -218,13 +219,13 @@ namespace synthese
 		   geos::geom::Point* ptGeom(geometryFactory.createPoint(pt));
 		   BOOST_FOREACH(const Path* road, _from) {
 			  //TODO optimization: first compute distance to road bbox
-			  boost::shared_ptr<geos::geom::Geometry> roadGeom = road->getGeometry();
-			  double bboxdistance = roadGeom->getEnvelope()->distance(ptGeom);
-			  if(_distanceLimit != -1 && bboxdistance >= _distanceLimit)
-				 continue;
+			  boost::shared_ptr<LineString> roadGeom = road->getGeometry();
+//			  double bboxdistance = roadGeom->getEnvelope()->distance(ptGeom);
+//			  if(_distanceLimit != -1 && bboxdistance >= _distanceLimit)
+//				 continue;
 			  double distance = roadGeom->distance(ptGeom);
 			  if(_distanceLimit == -1 || distance < _distanceLimit) {
-				 geos::linearref::LengthIndexedLine lil(roadGeom.get());
+				 geos::linearref::LengthIndexedLine lil(static_cast<const Geometry*>(roadGeom.get()));
 				 const geos::geom::Coordinate *ptCoords = ptGeom->getCoordinate();
 				 geos::geom::Coordinate coord(*ptCoords);
 				 double index = lil.project(coord);
