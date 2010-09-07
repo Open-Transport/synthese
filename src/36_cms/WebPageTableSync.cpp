@@ -314,7 +314,7 @@ namespace synthese
 			BOOST_FOREACH(const SearchResult::value_type& page, pages)
 			{
 				result.push_back(make_pair(page->getKey(), prefix + page->getName()));
-				SiteWebPagesList subResult(GetPagesList(siteId, string(), prefix + "&nbsp;&nbsp;&nbsp;", page->getKey()));
+				SiteWebPagesList subResult(GetPagesList(siteId, string(), prefix + "   ", page->getKey()));
 				result.insert(result.end(), subResult.begin(), subResult.end());
 			}
 			return result;

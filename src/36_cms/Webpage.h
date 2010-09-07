@@ -39,6 +39,7 @@ namespace synthese
 	namespace server
 	{
 		class Request;
+		class ParametersMap;
 	}
 
 	namespace cms
@@ -149,7 +150,8 @@ namespace synthese
 				std::string::const_iterator end,
 				std::string termination,
 				const server::Request& request,
-				bool encodeSubResults
+				bool encodeSubResults,
+				const server::ParametersMap& aditionalParametersMap
 			) const;
 
 		public:
@@ -236,7 +238,8 @@ namespace synthese
 				/// @since 3.1.16
 				void display(
 					std::ostream& stream,
-					const server::Request& request
+					const server::Request& request,
+					const server::ParametersMap& aditionalParametersMap
 				) const;
 
 

@@ -26,8 +26,6 @@
 #include "Request.h"
 #include "GetValueFunction.hpp"
 #include "FunctionWithSite.h"
-#include "WebPageDisplayFunction.h"
-#include "Webpage.h"
 #include "CMSModule.hpp"
 
 using namespace std;
@@ -80,17 +78,14 @@ namespace synthese
 			}
 			else
 			{
-				shared_ptr<const WebPageDisplayFunction> function(
-					dynamic_pointer_cast<const WebPageDisplayFunction>(
-						request.getFunction()
-				)	);
-				if(function.get() && function->getAditionnalParametersMap().getOptional<string>(_parameter))
+				string value(_aditionnalParameters.getDefault<string>(_parameter));
+				if(value.empty())
 				{
-					stream << function->getAditionnalParametersMap().get<string>(_parameter);
+					value = request.getParametersMap().getDefault<string>(_parameter);
 				}
 				else
 				{
-					stream << request.getParametersMap().getDefault<string>(_parameter);
+					stream << value;
 				}
 			}
 		}

@@ -73,7 +73,7 @@ namespace synthese
 			if(displayContent)
 			{
 				stringstream content;
-				page.display(content, request);
+				page.display(content, request, pm);
 				pm.insert(DATA_CONTENT, content.str());
 			}
 			pm.insert(DATA_ABSTRACT, page.getAbstract());

@@ -70,8 +70,6 @@ namespace synthese
 		{
 			_FunctionWithSite::_setFromParametersMap(map);
 
-			_aditionnalParameters = map;
-			_aditionnalParameters.remove(Request::PARAMETER_ACTION);
 			BOOST_FOREACH(const ParametersMap::Map::value_type& it, map.getMap())
 			{
 				if(	it.first != Request::PARAMETER_FUNCTION &&
@@ -136,6 +134,27 @@ namespace synthese
 		) const {
 			if(_page.get())
 			{
+				// If page has been fetched by its id and its smart URL is defined, then
+				// redirect permanently to the smart url
+				if(_smartURL.empty() && !_page->getSmartURLPath().empty())
+				{
+					/// @todo handle default parameter of smart url
+					stringstream url;
+					url << "http://" << request.getHostName() << _page->getSmartURLPath();
+
+					ParametersMap pm(_aditionnalParameters);
+					pm.remove(PARAMETER_PAGE_ID);
+					pm.remove(PARAMETER_SMART_URL);
+					pm.remove(FunctionWithSite::PARAMETER_SITE);
+					string parameters(pm.getURI());
+					if(!parameters.empty())
+					{
+						url << Request::PARAMETER_STARTER << parameters;
+					}
+					
+					throw Request::RedirectException(url.str(), true);
+				}
+
 				if(_useTemplate && _page->getTemplate())
 				{
 					WebPageInterfacePage::Display(
@@ -148,7 +167,7 @@ namespace synthese
 				}
 				else
 				{
-					_page->display(stream, request);
+					_page->display(stream, request, _aditionnalParameters);
 				}
 			}
 		}

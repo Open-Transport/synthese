@@ -55,6 +55,7 @@ namespace synthese
 
 			<@***@>
 
+			If the function is called by quick call from a page, it can read the additional parameters of the page prior to the request parameters.
 		*/
 		class GetValueFunction:
 			public util::FactorableTemplate<server::Function,GetValueFunction>
@@ -66,6 +67,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				std::string		_parameter;
+				server::ParametersMap _aditionnalParameters;
 			//@}
 			
 			
@@ -92,6 +94,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setParameter(const std::string& value){ _parameter = value; }
+				void setAditionnalParametersMap(const server::ParametersMap& value){ _aditionnalParameters = value; }
 			//@}
 
 

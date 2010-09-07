@@ -26,6 +26,7 @@
 #include "FunctionWithSite.h"
 #include "GetValueFunction.hpp"
 #include "ServerModule.h"
+#include "WebPageDisplayFunction.h"
 
 using namespace std;
 using namespace boost;
@@ -70,7 +71,8 @@ namespace synthese
 			std::string::const_iterator end,
 			std::string termination,
 			const server::Request& request,
-			bool encodeSubResults
+			bool encodeSubResults,
+			const server::ParametersMap& aditionalParametersMap
 		) const {
 			string labelToReach;
 			while(it != end)
@@ -109,6 +111,14 @@ namespace synthese
 							stream << "<?";
 						}
 					}
+					else if(*it == '<' && it+1 != end && *(it+1)=='#')
+					{
+						if(labelToReach.empty())
+						{
+							++it;
+							stream << "<#";
+						}
+					}
 					else if(*it == '@' && it+1 != end && *(it+1)=='>')
 					{
 						if(labelToReach.empty())
@@ -141,13 +151,21 @@ namespace synthese
 							stream << "?>";
 						}
 					}
+					else if(*it == '#' && it+1 != end && *(it+1)=='>')
+					{
+						if(labelToReach.empty())
+						{
+							++it;
+							stream << "#>";
+						}
+					}
 					++it;
 				} // Call to a public function
 				else if(*it == '<' && it+1 != end && *(it+1)=='?' && it+2 != end)
 				{
 					stringstream query;
 					query << Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT;
-					it = _parse(query, it+2, end, "?>", request, true);
+					it = _parse(query, it+2, end, "?>", request, true, aditionalParametersMap);
 					if(labelToReach.empty())
 					{
 						ParametersMap parametersMap(query.str());
@@ -190,20 +208,50 @@ namespace synthese
 				else if(*it == '<' && it+1 != end && *(it+1)=='@' && it+2 != end)
 				{
 					stringstream parameter;
-					it = _parse(parameter, it+2, end, "@>", request, true);
+					it = _parse(parameter, it+2, end, "@>", request, true, aditionalParametersMap);
 					if(labelToReach.empty())
 					{
 						stringstream subresult;
 						GetValueFunction function;
 						function.setParameter(parameter.str());
+						function.setAditionnalParametersMap(aditionalParametersMap);
 						function.run(subresult, request);
 						stream << (encodeSubResults ? ServerModule::URLEncode(subresult.str()) : subresult.str());
+					}
+				} // Shortcut to WebPageDisplayFunction
+				else if(*it == '<' && it+1 != end && *(it+1)=='#' && it+2 != end)
+				{
+					stringstream query;
+					query << WebPageDisplayFunction::PARAMETER_SMART_URL << Request::PARAMETER_ASSIGNMENT << "!";
+					it = _parse(query, it+2, end, "#>", request, true, aditionalParametersMap);
+					if(labelToReach.empty())
+					{
+						ParametersMap parametersMap(query.str());
+						ParametersMap requestParametersMap(
+							dynamic_cast<const DynamicRequest*>(&request) ?
+							dynamic_cast<const DynamicRequest&>(request).getParametersMap() :
+							ParametersMap()
+						);
+						requestParametersMap.remove(Request::PARAMETER_FUNCTION);
+						parametersMap.merge(requestParametersMap);
+						if(getRoot())
+						{
+							parametersMap.insert(FunctionWithSiteBase::PARAMETER_SITE, getRoot()->getKey());
+						}
+						WebPageDisplayFunction function;
+						function._setFromParametersMap(parametersMap);
+						if (function.isAuthorized(request.getSession()))
+						{
+							stringstream subresult;
+							function.run(subresult, request);
+							stream << (encodeSubResults ? ServerModule::URLEncode(subresult.str()) : subresult.str());
+						}
 					}
 				} // Goto
 				else if(*it == '<' && it+1 != end && *(it+1)=='%' && it+2 != end)
 				{
 					stringstream label;
-					it = _parse(label, it+2, end, "%>", request, false);
+					it = _parse(label, it+2, end, "%>", request, false, aditionalParametersMap);
 					if(labelToReach.empty() && !label.str().empty())
 					{
 						labelToReach = label.str();
@@ -212,7 +260,7 @@ namespace synthese
 				else if(*it == '<' && it+1 != end && *(it+1)=='<' && it+2 != end)
 				{
 					stringstream label;
-					it = _parse(label, it+2, end, ">>", request, false);
+					it = _parse(label, it+2, end, ">>", request, false, aditionalParametersMap);
 					if(labelToReach == label.str())
 					{
 						labelToReach.clear();
@@ -236,9 +284,12 @@ namespace synthese
 
 
 
-		void Webpage::display( std::ostream& stream, const server::Request& request ) const
-		{
-			_parse(stream, _content.begin(), _content.end(), string(), request, false);
+		void Webpage::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const server::ParametersMap& aditionalParametersMap
+		) const	{
+			_parse(stream, _content.begin(), _content.end(), string(), request, false, aditionalParametersMap);
 		}
 
 

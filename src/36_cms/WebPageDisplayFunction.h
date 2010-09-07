@@ -82,6 +82,7 @@ namespace synthese
 			//@}
 			
 			
+		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
@@ -101,7 +102,6 @@ namespace synthese
 			);
 			
 			
-		public:
 			WebPageDisplayFunction();
 
 			//! @name Setters
