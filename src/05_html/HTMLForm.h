@@ -39,6 +39,7 @@
 #include <boost/optional.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/lexical_cast.hpp>
 
 namespace synthese
 {
@@ -426,6 +427,7 @@ namespace synthese
 					@return std::string The generated HTML code
 					@author Hugues Romain
 					@date 2007-2010
+					@pre the value must not be already encoded with HTML entities
 				*/
 				std::string getTextInput(
 					const std::string& name,
@@ -498,7 +500,8 @@ namespace synthese
 					@param cols number of columns to be displayed (horizontal size)
 					@return std::string the HTML generated code
 					@author Hugues Romain
-					@date 2008					
+					@date 2008-2010
+					@pre the value must not be already encoded with HTML entities
 				*/
 				std::string getTextAreaInput(const std::string& name, const std::string& value, int rows, int cols);
 
@@ -663,21 +666,21 @@ namespace synthese
 					s << "<option value=\"\"";
 					if (value == boost::optional<boost::shared_ptr<T> >())
 						s << " selected=\"selected\"";
-					s << ">" << unknownLabel << "</option>";
+					s << ">" << HTMLModule::HTMLEncode(unknownLabel) << "</option>";
 				}
 				if (!zeroLabel.empty())
 				{
 					s << "<option value=\"0\"";
 					if (value && *value == boost::shared_ptr<T>())
 						s << " selected=\"selected\"";
-					s << ">" << zeroLabel << "</option>";
+					s << ">" << HTMLModule::HTMLEncode(zeroLabel) << "</option>";
 				}
 				BOOST_FOREACH(boost::shared_ptr<const T> object, registry)
 				{
 					s << "<option value=\"" << object->getKey() << "\"";
 					if (value && object == *value)
 						s << " selected=\"selected\"";
-					s << ">" << object->getName() << "</option>";
+					s << ">" << HTMLModule::HTMLEncode(object->getName()) << "</option>";
 				}
 				s << "</select>";
 			}
@@ -697,8 +700,10 @@ namespace synthese
 			{
 				for (typename std::vector<std::pair<boost::optional<K>, T> >::const_iterator it = choices.begin(); it != choices.end(); ++it)
 				{
-					if (it->first == value)	s << it->second;
-				}
+					if (it->first == value)
+					{
+						s << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(it->second));
+				}	}
 			}
 			else
 			{
@@ -708,11 +713,14 @@ namespace synthese
 					s << "<option value=\"";
 					if(it->first)
 					{
-						s << *it->first;
+						s << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(*it->first));
 					}
 					s << "\"";
-					if (it->first == value)	s << " selected=\"selected\"";
-					s << ">" << it->second << "</option>";
+					if (it->first == value)
+					{
+						s << " selected=\"selected\"";
+					}
+					s << ">" <<  HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(it->second)) << "</option>";
 				}
 				s << "</select>";
 			}
@@ -733,7 +741,7 @@ namespace synthese
 				typename std::map<boost::optional<K>,T>::const_iterator it = choices.find(value);
 				if(it != choices.end())
 				{
-					s << it->second;
+					s << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(it->second));
 				}
 			}
 			else
@@ -744,14 +752,14 @@ namespace synthese
 					s << "<option value=\"";
 					if(it->first)
 					{
-						s << *it->first;
+						s << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(*it->first));
 					}
 					s << "\"";
 					if (it->first == value)
 					{
 						s << " selected=\"selected\"";
 					}
-					s << ">" << it->second << "</option>";
+					s << ">" << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(it->second)) << "</option>";
 				}
 				s << "</select>";
 			}
@@ -770,9 +778,10 @@ namespace synthese
 		){
 			if (!_updateRight)
 			{
-				return (valueIfSelected == valueToSelect)
-					? label
-					: std::string();
+				return
+					(valueIfSelected == valueToSelect) ?
+					HTMLModule::HTMLEncode(label) :
+					std::string();
 			}
 
 			std::stringstream s;
@@ -780,17 +789,19 @@ namespace synthese
 			s << "<input name=\"" << name << "\" type=\"radio\" value=\"";
 			if(valueIfSelected)
 			{
-				s << *valueIfSelected;
+				s << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(*valueIfSelected));
 			}
 			s << "\"" << " id=\"" << id << "\"";
 			if (valueIfSelected == valueToSelect)
+			{
 				s << " checked=\"checked\"";
+			}
 			if (disabled)
+			{
 				s << " disabled=\"disabled\"";
-			s << " /><label for=\"" << id << "\">" << label << "</label>";
-			std::stringstream vs;
-			vs << valueToSelect;
-			removeHiddenFieldIfExists(name, vs.str());
+			}
+			s << " /><label for=\"" << id << "\">" << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(label)) << "</label>";
+			removeHiddenFieldIfExists(name, valueToSelect ? boost::lexical_cast<std::string>(*valueToSelect) : string());
 			return s.str();
 		}
 

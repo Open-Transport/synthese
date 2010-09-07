@@ -114,7 +114,7 @@ namespace synthese
 			string className
 		){
 			if (!_updateRight)
-				return value;
+				return HTMLModule::HTMLEncode(value);
 
 			removeHiddenFieldIfExists(name, value);
 
@@ -138,7 +138,7 @@ namespace synthese
 				<< "type=\"text\" "
 				<< "name=\"" << name << "\" "
 				<< "value=\"";
-			if (value == "" && displayTextBeforeTyping != "")
+			if (value.empty() && displayTextBeforeTyping != "")
 			{
 				s <<
 					displayTextBeforeTyping << "\" " <<
@@ -146,7 +146,7 @@ namespace synthese
 			}
 			else
 			{
-				s << value << "\" ";
+				s << HTMLModule::HTMLEncode(value) << "\" ";
 			}
 			s << "id=\"" << fieldId << "\" ";
 			if(!className.empty())
@@ -165,7 +165,7 @@ namespace synthese
 			stringstream s;
 			s	<< "<input "
 				<< "type=\"submit\" "
-				<< "value=\"" << caption << "\" "
+				<< "value=\"" << HTMLModule::HTMLEncode(caption) << "\" "
 				<< "/>";
 			return s.str();
 		}
@@ -197,7 +197,9 @@ namespace synthese
 		std::string HTMLForm::getTextAreaInput( const std::string& name, const std::string& value, int rows, int cols )
 		{
 			if (!_updateRight)
-				return value;
+			{
+				return HTMLModule::HTMLEncode(value);
+			}
 
 			removeHiddenFieldIfExists(name, value);
 			stringstream s;
@@ -207,7 +209,7 @@ namespace synthese
 				<< "cols=\"" << cols << "\" "
 				<< "id=\"" << _getFieldId(name) << "\" "
 				<< ">" 
-				<< value << "</textarea>";
+				<< HTMLModule::HTMLEncode(value) << "</textarea>";
 			return s.str();
 		}
 
@@ -235,6 +237,8 @@ namespace synthese
 				<< "/>";
 			return s.str();
 		}
+
+
 
 		std::string HTMLForm::getPasswordInput( const std::string& name, const std::string& value )
 		{
@@ -472,7 +476,7 @@ namespace synthese
 			{
 				s <<
 					"<input type=\"hidden\" name=\"" << it->first << "\" " <<
-					"value=\"" << it->second << "\" " <<
+					"value=\"" << HTMLModule::HTMLEncode(it->second) << "\" " <<
 					"id=\"" << _getFieldId(it->first) << "\" " <<
 				"/>";
 			}
@@ -526,7 +530,7 @@ namespace synthese
 				<< "src=\"" << imageURL << "\" "
 				<< "name=\"" << name << "\" "
 				<< "id=\"" << _getFieldId(name) << "\" "
-				<< "alt=\"" << alt << "\" "
+				<< "alt=\"" << HTMLModule::HTMLEncode(alt) << "\" "
 				<< " />";
 			return s.str();
 		}

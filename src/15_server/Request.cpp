@@ -156,7 +156,7 @@ namespace synthese
 				if (_action.get() && _redirectAfterAction)
 				{
 					_deleteAction();
-					throw RedirectException(getURL());
+					throw RedirectException(getURL(), false);
 				}
 
 				if (!_function->isAuthorized(_session))

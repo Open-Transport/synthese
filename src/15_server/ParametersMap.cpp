@@ -135,13 +135,13 @@ namespace synthese
 
 
 
-		string ParametersMap::getURI()
+		string ParametersMap::getURI() const
 		{
 			stringstream ss;
 			for (Map::const_iterator iter = _map.begin(); 
 				iter != _map.end(); 
 				++iter
-				){
+			){
 					if (iter != _map.begin ())
 						ss << Request::PARAMETER_SEPARATOR;
 					ss << iter->first << Request::PARAMETER_ASSIGNMENT << iter->second;

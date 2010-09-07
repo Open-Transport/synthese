@@ -135,7 +135,7 @@ namespace synthese
 				///	@return the generated query string
 				///	@author Hugues Romain
 				///	@date 2007					
-				std::string getURI();
+				std::string getURI() const;
 
 
 

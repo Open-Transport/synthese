@@ -102,18 +102,29 @@ namespace synthese
 		class Request
 		{
 		public:
-			/** RedirectException class.
-			@ingroup m15
+			/** Exception asking the server to redirect.
+				@ingroup m15
 			*/
 			class RedirectException:
 				public std::exception
 			{
-				std::string _location;
+				const std::string _location;
+				const bool _permanently;
 
 			public:
-				RedirectException(const std::string& location): _location(location) {}
-				const std::string& getLocation() { return _location; }
+				//////////////////////////////////////////////////////////////////////////
+				/// Constructor.
+				/// @param location location where the request must be redirected
+				/// @param permanently true=301 redirection, else 302
+				RedirectException(const std::string& location, bool permanently): _location(location), _permanently(permanently) {}
+
 				virtual ~RedirectException() throw() {}
+
+				//! @name Getters
+				//@{
+					const std::string& getLocation() { return _location; }
+					bool getPermanently() const { return _permanently; }
+				//@}
 			};
 
 			/** Forbidden request Exception class.

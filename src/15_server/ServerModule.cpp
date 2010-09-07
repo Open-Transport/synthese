@@ -208,7 +208,7 @@ namespace synthese
 			}
 			catch(Request::RedirectException& e)
 			{
-				rep = HTTPReply::stock_reply(HTTPReply::moved_temporarily);
+				rep = HTTPReply::stock_reply(e.getPermanently() ? HTTPReply::moved_permanently : HTTPReply::moved_temporarily);
 				rep.headers.insert(make_pair("Location", e.getLocation()));
 			}
 			catch(Request::ForbiddenRequestException& e)
