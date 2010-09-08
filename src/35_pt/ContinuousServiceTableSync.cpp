@@ -58,7 +58,7 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,ContinuousServiceTableSync>::FACTORY_KEY("15.60.02 Continuous services");
+	template<> const string util::FactorableTemplate<SQLiteTableSync,ContinuousServiceTableSync>::FACTORY_KEY("35.60.02 Continuous services");
 	template<> const string FactorableTemplate<Fetcher<SchedulesBasedService>, ContinuousServiceTableSync>::FACTORY_KEY("17");
 	template<> const string FactorableTemplate<Fetcher<Service>, ContinuousServiceTableSync>::FACTORY_KEY("17");
 

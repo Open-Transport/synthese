@@ -45,7 +45,7 @@ namespace synthese
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,JourneyPatternTableSync>::FACTORY_KEY(
-		"15.30.01 Journey patterns"
+		"35.30.01 Journey patterns"
 	);
 
 	namespace pt

@@ -38,7 +38,7 @@ namespace synthese
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,TransportNetworkTableSync>::FACTORY_KEY(
-		"15.20.02 Network transport"
+		"35.20.02 Network transport"
 	);
 
 	namespace pt

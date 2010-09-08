@@ -43,7 +43,7 @@ namespace synthese
 	using namespace geography;
 	using namespace road;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,StopPointTableSync>::FACTORY_KEY("15.55.01 Physical stops");
+	template<> const string util::FactorableTemplate<SQLiteTableSync,StopPointTableSync>::FACTORY_KEY("35.55.01 Physical stops");
 	template<> const string FactorableTemplate<Fetcher<graph::Vertex>, StopPointTableSync>::FACTORY_KEY("12");
 
 	namespace pt
@@ -213,7 +213,7 @@ namespace synthese
 			if(orderByCityAndStopName)
 			{
 				query.addTableAndEqualJoin<StopAreaTableSync>(TABLE_COL_ID, COL_PLACEID);
-				query.addTableAndEqualOtherJoin<StopAreaTableSync, CityTableSync>(TABLE_COL_ID, StopAreaTableSync::TABLE_COL_CITYID);
+				query.addTableAndEqualOtherJoin<CityTableSync, StopAreaTableSync>(TABLE_COL_ID, StopAreaTableSync::TABLE_COL_CITYID);
 				query.addOrderFieldOther<CityTableSync>(CityTableSync::TABLE_COL_NAME, raisingOrder);
 				query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
 				query.addOrderField(StopPointTableSync::COL_NAME, raisingOrder);

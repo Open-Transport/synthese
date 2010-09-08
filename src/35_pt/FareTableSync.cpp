@@ -41,7 +41,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync, FareTableSync>::FACTORY_KEY("15.10.02 Fares");
+	template<> const string util::FactorableTemplate<SQLiteTableSync, FareTableSync>::FACTORY_KEY("35.10.02 Fares");
 
 	namespace pt
 	{

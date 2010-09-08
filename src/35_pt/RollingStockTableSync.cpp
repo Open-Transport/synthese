@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,RollingStockTableSync>::FACTORY_KEY("15.10.07 Rolling Stock");
+		template<> const string FactorableTemplate<SQLiteTableSync,RollingStockTableSync>::FACTORY_KEY("35.10.07 Rolling Stock");
 	}
 
 	namespace pt

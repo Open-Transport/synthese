@@ -51,7 +51,7 @@ namespace synthese
 	using namespace pt;
 	using namespace geography;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,LineStopTableSync>::FACTORY_KEY("15.57.01 JourneyPattern stops");
+	template<> const string util::FactorableTemplate<SQLiteTableSync,LineStopTableSync>::FACTORY_KEY("35.57.01 JourneyPattern stops");
 
 	namespace pt
 	{

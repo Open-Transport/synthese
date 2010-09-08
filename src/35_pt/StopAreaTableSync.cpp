@@ -42,7 +42,7 @@ namespace synthese
 	using namespace geography;
 	using namespace road;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,pt::StopAreaTableSync>::FACTORY_KEY("15.40.01 Connection places");
+	template<> const string util::FactorableTemplate<SQLiteTableSync,pt::StopAreaTableSync>::FACTORY_KEY("35.40.01 Connection places");
 	template<> const string FactorableTemplate<Fetcher<NamedPlace>, StopAreaTableSync>::FACTORY_KEY("7");
 
 	namespace pt

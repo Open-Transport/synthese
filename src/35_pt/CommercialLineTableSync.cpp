@@ -73,7 +73,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,CommercialLineTableSync>::FACTORY_KEY("15.25.01 Commercial lines");
+		template<> const string FactorableTemplate<SQLiteTableSync,CommercialLineTableSync>::FACTORY_KEY("35.25.01 Commercial lines");
 	}
 	namespace pt
 	{

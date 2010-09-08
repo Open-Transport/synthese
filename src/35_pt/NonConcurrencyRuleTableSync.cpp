@@ -49,7 +49,7 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,NonConcurrencyRuleTableSync>::FACTORY_KEY("15.25.02 Non concurrency rules");
+		template<> const string FactorableTemplate<SQLiteTableSync,NonConcurrencyRuleTableSync>::FACTORY_KEY("35.25.02 Non concurrency rules");
 	}
 	
 	namespace pt

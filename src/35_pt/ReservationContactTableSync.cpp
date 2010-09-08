@@ -40,7 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,ReservationContactTableSync>::FACTORY_KEY("15.10.06 Reservation contacts");
+	template<> const string util::FactorableTemplate<SQLiteTableSync,ReservationContactTableSync>::FACTORY_KEY("35.10.06 Reservation contacts");
 
 	namespace pt
 	{
