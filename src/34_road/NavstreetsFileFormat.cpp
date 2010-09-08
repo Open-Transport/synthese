@@ -142,6 +142,7 @@ namespace synthese
 
 					if(dbfile.getText(*record, _FIELD_ADMIN_LVL) != "3") continue;
 					string item(algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_3)));
+
 					if(departementCodes.find(item) != departementCodes.end()) continue;
 					departementCodes.insert(make_pair(item, algorithm::trim_copy(dbfile.getText(*record, _FIELD_GOVT_CODE))));
 				}

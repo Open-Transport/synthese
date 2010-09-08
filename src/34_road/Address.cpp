@@ -41,18 +41,6 @@ namespace synthese
 
 
 
-		Address::Address(
-			const Road* road,
-			double metricOffset,
-			const geos::geom::Coordinate& coordinate
-		):	GeoPoint(coordinate),
-			_roadChunk(static_cast<RoadChunk*>(road->getEdgeAtOffset(metricOffset))),
-			_metricOffset(metricOffset - _roadChunk->getMetricOffset())
-		{
-		}
-
-
-
 		Address::~Address()
 		{
 		}

@@ -77,17 +77,6 @@ namespace synthese
 
 
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Constructor by road and offset
-			/// @param road road
-			/// @param metricOffset offset after the beginning of the road
-			/// @param coordinate coordinate of the address
-			Address(
-				const Road* road,
-				double metricOffset,
-				const geos::geom::Coordinate& coordinate
-			);
-
 			~Address();
 
 

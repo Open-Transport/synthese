@@ -124,6 +124,21 @@ namespace synthese
 		geography::GeoPoint RoadChunk::getGeoPoint( double metricOffset ) const
 		{
 			shared_ptr<LineString> geometry(getGeometry());
+			if(!geometry.get())
+			{
+				return *getFromVertex();
+			}
+			if(metricOffset > geometry->getLength())
+			{
+				if(getFollowingArrivalForFineSteppingOnly())
+				{
+					return static_cast<RoadChunk*>(getFollowingArrivalForFineSteppingOnly())->getGeoPoint(metricOffset - geometry->getLength());
+				}
+				else
+				{
+					return *getFromVertex();
+				}
+			}
 			return GeoPoint(LengthIndexedLine(geometry.get()).extractPoint(metricOffset));
 		}
 	}
