@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="reservation" type="ReservationType"/>
+	<xs:complexType name="ReservationType">
+		<xs:sequence maxOccurs="unbounded">
+			<xs:element name="chunk">
+				<xs:complexType>
+					<xs:attribute name="departurePlaceName" type="xs:string" use="required"/>
+					<xs:attribute name="departureDateTime" type="xs:dateTime" use="required"/>
+					<xs:attribute name="arrivalPlaceName" type="xs:string" use="required"/>
+					<xs:attribute name="arrivalDateTime" type="xs:dateTime" use="required"/>
+					<xs:attribute name="lineNumber" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="id" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:long">
+					<xs:minInclusive value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="customerId" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:long">
+					<xs:minInclusive value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="cancellationDeadLine" type="xs:dateTime" use="required"/>
+		<xs:attribute name="departureStop" type="xs:string" use="required"/>
+		<xs:attribute name="arrivalStop" type="xs:string" use="required"/>
+		<xs:attribute name="travelDate" type="xs:dateTime" use="required"/>
+		<xs:attribute name="customerName" type="xs:string" use="required"/>
+		<xs:attribute name="customerPhone" type="xs:string" use="required"/>
+		<xs:attribute name="status" type="xs:string" use="required"/>
+		<xs:attribute name="canBeCancelled" type="xs:boolean" use="required"/>
+		<xs:attribute name="seats" type="xs:integer" use="required"/>
+		<xs:attribute name="cancellationDateTime" type="xs:dateTime"/>
+	</xs:complexType>
+</xs:schema>

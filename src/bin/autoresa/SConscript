@@ -1,0 +1,11 @@
+Import ('s3env')
+
+senv = s3env.Clone ()
+
+if senv.GetPlatform () == 'posix':
+  # not in forge	    
+  CppBinProject (senv, 's3-autoresa', s3env['S3VERSION'], 
+                       source_files = senv.Glob ('*.cpp'),
+                       dependencies = ['s3-security.cpplib', 's3-acapela-client.cpplib', 's3-agi-client.cpplib'])
+  
+

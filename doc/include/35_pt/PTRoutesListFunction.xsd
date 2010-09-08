@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="directions">
+		<xs:annotation>
+			<xs:documentation>List of significant routes</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="direction" type="RouteType" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="RouteType">
+		<xs:annotation>
+			<xs:documentation>A route</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="origin" type="StopType"/>
+			<xs:element name="destination" type="StopType"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:long" use="required"/>
+		<xs:attribute name="directionText" type="xs:string"/>
+		<xs:attribute name="name" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="StopType">
+		<xs:annotation>
+			<xs:documentation>A commercial stop area</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="id" type="xs:long" use="required"/>
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="cityId" type="xs:long" use="required"/>
+		<xs:attribute name="cityName" type="xs:string" use="required"/>
+		<xs:attribute name="directionAlias" type="xs:string"/>
+	</xs:complexType>
+</xs:schema>

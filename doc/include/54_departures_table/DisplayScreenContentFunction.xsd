@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="timeTable">
+		<xs:annotation>
+			<xs:documentation>Departure or arrival schedules</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="journey" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Each departure/arrival</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="physicalStop">
+								<xs:annotation>
+									<xs:documentation>The physical stop used by the vehicle</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:attribute name="id" type="physicalStopId" use="required"/>
+									<xs:attribute name="name" type="xs:string"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="transportMode" type="TransportModeType" minOccurs="0"/>
+							<xs:element name="line" type="LineType">
+								<xs:annotation>
+									<xs:documentation>The line</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+							<xs:element name="stopArea" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>The destinations reached by the vehicle</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:complexContent>
+										<xs:extension base="StopAreaType">
+											<xs:attribute name="dateTime" type="xs:dateTime"/>
+										</xs:extension>
+									</xs:complexContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="routeId" type="routeId" use="required"/>
+						<xs:attribute name="dateTime" type="xs:dateTime"/>
+						<xs:attribute name="blink" type="xs:boolean"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="type" default="departure">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="departure"/>
+						<xs:enumeration value="arrival"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="cityId">
+		<xs:annotation>
+			<xs:documentation>Unique id of city (table 6)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:long">
+			<xs:minInclusive value="1688849860263937"/>
+			<xs:maxInclusive value="1970324836974591"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="stopAreaId">
+		<xs:annotation>
+			<xs:documentation>Unique id of stop area (table 7)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:long">
+			<xs:minInclusive value="1970324836974593"/>
+			<xs:maxInclusive value="2251799813685247"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="routeId">
+		<xs:annotation>
+			<xs:documentation>Unique id of line (table 9)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:long">
+			<xs:minInclusive value="2533274790395905"/>
+			<xs:maxInclusive value="2814749767106559"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="physicalStopId">
+		<xs:annotation>
+			<xs:documentation>Unique id of physical stop (table 12)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:long">
+			<xs:minInclusive value="3377699720527873"/>
+			<xs:maxInclusive value="3659174697238527"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="lineId">
+		<xs:annotation>
+			<xs:documentation>Unique id of line (table 42)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:long">
+			<xs:minInclusive value="11821949021847553"/>
+			<xs:maxInclusive value="12103423998558207"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="transportModeId">
+		<xs:annotation>
+			<xs:documentation>Unique id of transport mode (table 49)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:long">
+			<xs:minInclusive value="11821949021847553"/>
+			<xs:maxInclusive value="12103423998558207"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="LineType">
+		<xs:annotation>
+			<xs:documentation>A line</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="id" type="lineId" use="required"/>
+		<xs:attribute name="creatorId" type="xs:string"/>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="shortName" type="xs:string"/>
+		<xs:attribute name="longName" type="xs:string"/>
+		<xs:attribute name="color" type="xs:string"/>
+		<xs:attribute name="style" type="xs:string"/>
+		<xs:attribute name="image" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="StopAreaType">
+		<xs:annotation>
+			<xs:documentation>Stop area</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="id" type="stopAreaId" use="required"/>
+		<xs:attribute name="name" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:minLength value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="cityId" type="cityId" use="required"/>
+		<xs:attribute name="cityName" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:minLength value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="directionAlias"/>
+	</xs:complexType>
+	<xs:complexType name="TransportModeType">
+		<xs:annotation>
+			<xs:documentation>A transport mode</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="id" type="transportModeId" use="required"/>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="article" type="xs:string"/>
+	</xs:complexType>
+</xs:schema>

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XMLSpy v2007 (http://www.altova.com) by Totot (Tutut) -->
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Christophe Duquesne (DRYADE SARL) -->
+<!--
+@@LICENCE@@
+-->
+<!-- ==========================================================================	-->
+<!--  																			-->
+<!-- Societe DRYADE																-->
+<!--  																			-->
+<!-- projet chouette : Schema XSD												-->
+<!--  																			-->
+<!-- build.xml : Description XML du profil Chouette 							-->
+<!--  																			-->
+<!-- Version : $Revision: 1.3 $												-->
+<!--  																			-->
+<!-- Historique des modifications :												-->
+<!-- Date      | Auteur         | Libelle										-->
+<!-- ==========================================================================	-->
+<!-- 01/10/2004|Marc FLORISSON  | Creation										-->
+<!-- ==========================================================================	-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.trident.org/schema/trident" xmlns:trd="http://www.trident.org/schema/trident" targetNamespace="http://www.trident.org/schema/trident" elementFormDefault="qualified" version="1.00">
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">Proposition d'extension du profil Trident Chouette pour échange de données CIMM Tisséo, par Hugues ROMAIN RCSI 2008</xsd:documentation>
+	</xsd:annotation>
+	<xsd:include schemaLocation="Chouette.xsd"/>
+	<!-- **************************************************************** -->
+	<xsd:annotation>
+		<xsd:documentation>New fields ==================================================</xsd:documentation>
+	</xsd:annotation>
+	<xsd:complexType name="NoteType">
+		<xsd:sequence>
+			<xsd:element name="code" type="xsd:string"/>
+			<xsd:element name="description" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TisseoVehicleJourneyType">
+		<xsd:complexContent>
+			<xsd:extension base="trd:VehicleJourneyType">
+				<xsd:sequence>
+					<xsd:sequence minOccurs="0">
+						<xsd:element name="mobilityRestrictedSuitability" type="xsd:boolean"/>
+						<xsd:element name="mobilityRestrictedReservationRule" minOccurs="0"/>
+					</xsd:sequence>
+					<xsd:sequence minOccurs="0">
+						<xsd:element name="bikeSuitability" type="xsd:boolean"/>
+						<xsd:element name="bikeReservationRule" type="trd:TridentIdType" minOccurs="0"/>
+					</xsd:sequence>
+					<xsd:element name="Note" type="NoteType" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TisseoStopPointType">
+		<xsd:complexContent>
+			<xsd:extension base="StopPointType">
+				<xsd:sequence>
+					<xsd:element name="mobilityRestrictedSuitability" type="xsd:boolean"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TisseoPtlinkType">
+		<xsd:complexContent>
+			<xsd:extension base="PTLinkType">
+				<xsd:sequence>
+					<xsd:element name="fixedTimeOnLinkStart" type="xsd:boolean" minOccurs="0"/>
+					<xsd:element name="fixedTimeOnLinkEnd" type="xsd:boolean" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:annotation>
+		<xsd:documentation>DRT =========================================================</xsd:documentation>
+	</xsd:annotation>
+	<xsd:complexType name="DRTStopAreaType">
+		<xsd:annotation>
+			<xsd:documentation> A PT area made up of a set of StopArea, containing stops served at the same theoritical time by a DRT</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="StopAreaType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:simpleType name="ReservationCompulsoryType">
+		<xsd:annotation>
+			<xsd:documentation>Indicates if the reservation is optional or compulsory or depending of the starting area</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="compulsory"/>
+			<xsd:enumeration value="optional"/>
+			<xsd:enumeration value="dependsOnStartingArea"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="ReservationRuleType">
+		<xsd:annotation>
+			<xsd:documentation>Determinates if a DRT can be booked considering the current time and other parameters</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:TridentObjectType">
+				<xsd:sequence>
+					<xsd:element name="ReservationCompulsory" type="ReservationCompulsoryType"/>
+					<xsd:element name="deadLineIsTheCustomerDeparture" type="xsd:boolean"/>
+					<xsd:choice>
+						<xsd:element name="minMinutesDurationBeforeDeadline" type="xsd:duration"/>
+						<xsd:element name="minDaysDurationBeforeDeadline" type="xsd:duration"/>
+					</xsd:choice>
+					<xsd:element name="yesterdayBookingMaxTime" type="xsd:time" minOccurs="0"/>
+					<xsd:element name="maxDaysDurationBeforeDeadline" type="xsd:duration" minOccurs="0"/>
+					<xsd:sequence minOccurs="0" maxOccurs="unbounded">
+						<xsd:element name="phoneNumber" type="xsd:string"/>
+						<xsd:element name="callcenterOpeningPeriod" type="xsd:string"/>
+					</xsd:sequence>
+					<xsd:element name="bookingWebsiteURL" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="DRTVehicleJourneyType">
+		<xsd:annotation>
+			<xsd:documentation>Instance of a Journey Pattern on a DRT line</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="TisseoVehicleJourneyType">
+				<xsd:sequence>
+					<xsd:element name="reservationRule" type="TridentIdType"/>
+					<xsd:element name="optionalReservationDepartureAreas" type="TridentIdType" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="maxSeats" type="xsd:integer" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:annotation>
+		<xsd:documentation>Lines conflicts rules ==========================================</xsd:documentation>
+	</xsd:annotation>
+	<xsd:complexType name="LineConflictType">
+		<xsd:annotation>
+			<xsd:documentation>Gives the priority of use of a line when another one runs at the same time on a common route</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:TridentObjectType">
+				<xsd:sequence>
+					<xsd:element name="forbiddenLine" type="trd:TridentIdType"/>
+					<xsd:element name="usedLine" type="TridentIdType"/>
+					<xsd:element name="conflictDelay" type="xsd:duration" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:annotation>
+		<xsd:documentation>Continous services ===========================================</xsd:documentation>
+	</xsd:annotation>
+	<xsd:complexType name="ContinuousServiceJourneyType">
+		<xsd:annotation>
+			<xsd:documentation>Provides a time range where a journey pattern is usable without time constraints</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:VehicleJourneyType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:annotation>
+		<xsd:documentation>CITY =======================================================</xsd:documentation>
+	</xsd:annotation>
+	<xsd:complexType name="CityMainStopsType">
+		<xsd:annotation>
+			<xsd:documentation>City containing at least one stop</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="AreaType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:annotation>
+		<xsd:documentation>Tisseo PTNetwork ============================================</xsd:documentation>
+	</xsd:annotation>
+	<xsd:complexType name="TisseoPTNetworkType">
+		<xsd:annotation>
+			<xsd:documentation> the container</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="ChouettePTNetworkType">
+				<xsd:sequence>
+					<xsd:element name="ReservationRule" type="ReservationRuleType" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="DRTStopArea" type="DRTStopAreaType" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="LineConflict" type="LineConflictType" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="CityMainStops" type="CityMainStopsType" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:element name="TisseoPTNetwork" type="TisseoPTNetworkType"/>
+</xsd:schema>

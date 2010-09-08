@@ -1,0 +1,15 @@
+Import ('s3env')
+
+CppSynthese3LibProject(
+	s3env,
+	's3-calendar',
+	s3env['S3VERSION'],
+	source_files = s3env.Glob ('*.cpp'),
+	dependencies = [
+		's3-db.cpplib',
+		's3-util.cpplib',
+		's3-admin.cpplib',
+		's3-server.cpplib',
+		's3-cms.cpplib'
+	]
+)

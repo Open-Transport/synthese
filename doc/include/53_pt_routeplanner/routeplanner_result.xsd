@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="routePlannerResult" type="RoutePlannerResultType">
+		<xs:annotation>
+			<xs:documentation>Root element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="RoutePlannerResultType">
+		<xs:sequence>
+			<xs:element name="query" type="QueryType"/>
+			<xs:element name="journeys" type="JourneysType"/>
+			<xs:element name="resultTable" type="ResultTableType"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="QueryType">
+		<xs:sequence>
+			<xs:element name="timeBounds">
+				<xs:complexType>
+					<xs:attribute name="minDepartureHour" type="xs:dateTime" use="required"/>
+					<xs:attribute name="maxDepartureHour" type="xs:dateTime" use="required"/>
+					<xs:attribute name="minArrivalHour" type="xs:dateTime" use="required"/>
+					<xs:attribute name="maxArrivalHour" type="xs:dateTime" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="timePeriod" minOccurs="0">
+				<xs:complexType>
+					<xs:attribute name="date" type="xs:date" use="required"/>
+					<xs:attribute name="id" type="xs:long" use="required"/>
+					<xs:attribute name="name" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="places">
+				<xs:complexType>
+					<xs:attribute name="departureCity" use="required">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="1"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<xs:attribute name="departureCityNameTrust" use="required">
+						<xs:simpleType>
+							<xs:restriction base="xs:double">
+								<xs:minInclusive value="0"/>
+								<xs:maxInclusive value="1"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<xs:attribute name="departureStop">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="1"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<xs:attribute name="departureStopNameTrust">
+						<xs:simpleType>
+							<xs:restriction base="xs:double">
+								<xs:minInclusive value="0"/>
+								<xs:maxInclusive value="1"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<xs:attribute name="arrivalCity" use="required">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="1"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<xs:attribute name="arrivalCityNameTrust" use="required">
+						<xs:simpleType>
+							<xs:restriction base="xs:double">
+								<xs:minInclusive value="0"/>
+								<xs:maxInclusive value="1"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<xs:attribute name="arrivalStop">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="1"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<xs:attribute name="arrivalStopNameTrust">
+						<xs:simpleType>
+							<xs:restriction base="xs:double">
+								<xs:minInclusive value="0"/>
+								<xs:maxInclusive value="1"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="favorite" minOccurs="0">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:long" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="transportModeFilter" minOccurs="0">
+				<xs:complexType>
+					<xs:attribute name="id" type="xs:long" use="required"/>
+					<xs:attribute name="name" use="required"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="siteId" type="xs:long" use="required"/>
+		<xs:attribute name="userProfile" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:enumeration value="35001"/>
+					<xs:enumeration value="35002"/>
+					<xs:enumeration value="35003"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="maxSolutions">
+			<xs:simpleType>
+				<xs:restriction base="xs:integer">
+					<xs:minInclusive value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="sessionId" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="JourneysType">
+		<xs:sequence>
+			<xs:element name="journey" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="reservation" minOccurs="0">
+							<xs:complexType>
+								<xs:attribute name="type" use="required">
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:enumeration value="compulsory"/>
+											<xs:enumeration value="optional"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:attribute>
+								<xs:attribute name="deadLine" type="xs:dateTime" use="required"/>
+								<xs:attribute name="online" type="xs:boolean" use="required"/>
+								<xs:attribute name="phoneNumber" type="xs:string"/>
+								<xs:attribute name="openingHours" type="xs:string"/>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="chunks">
+							<xs:complexType>
+								<xs:choice maxOccurs="unbounded">
+									<xs:element name="connection" type="JourneyConnectionType"/>
+									<xs:element name="street" type="JourneyStreetType"/>
+									<xs:element name="transport" type="JourneyTransportType"/>
+								</xs:choice>
+							</xs:complexType>
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="continuousServiceDuration" type="xs:duration"/>
+					<xs:attribute name="hasAStopAlert" type="xs:boolean" use="required"/>
+					<xs:attribute name="hasALineAlert" type="xs:boolean" use="required"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ResultTableType">
+		<xs:sequence>
+			<xs:element name="row" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="cells">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="cell" minOccurs="0" maxOccurs="unbounded">
+										<xs:complexType>
+											<xs:attribute name="arrivalDateTime" type="xs:dateTime"/>
+											<xs:attribute name="endArrivalDateTime" type="xs:dateTime"/>
+											<xs:attribute name="departureDateTime" type="xs:dateTime"/>
+											<xs:attribute name="endDepartureDateTime" type="xs:dateTime"/>
+											<xs:attribute name="pedestrian">
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:enumeration value="departure"/>
+														<xs:enumeration value="arrival"/>
+														<xs:enumeration value="traversal"/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:attribute>
+										</xs:complexType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="place" type="PlaceType"/>
+					</xs:sequence>
+					<xs:attribute name="type" use="required">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="departure"/>
+								<xs:enumeration value="connection"/>
+								<xs:enumeration value="arrival"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="JourneyConnectionType">
+		<xs:annotation>
+			<xs:documentation>Foot link between two stops without details about the used streets</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="JourneyChunkType">
+				<xs:sequence>
+					<xs:element name="startStop" type="PhysicalStopType"/>
+					<xs:element name="endStop" type="PhysicalStopType"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="JourneyStreetType">
+		<xs:annotation>
+			<xs:documentation>Foot way along a street</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="JourneyChunkType">
+				<xs:sequence>
+					<xs:element name="startAddress" type="PlaceType"/>
+					<xs:element name="endAddress" type="PlaceType"/>
+				</xs:sequence>
+				<xs:attribute name="city" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="name" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="JourneyTransportType">
+		<xs:annotation>
+			<xs:documentation>Use of public transportation system</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="JourneyChunkType">
+				<xs:sequence>
+					<xs:element name="startStop" type="PhysicalStopType"/>
+					<xs:element name="endStop" type="PhysicalStopType"/>
+					<xs:element name="destinationStop" type="PhysicalStopType"/>
+					<xs:element name="line">
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="alert" type="AlertType" minOccurs="0"/>
+							</xs:sequence>
+							<xs:attribute name="id" type="SYNTHESEObjectIdType" use="required"/>
+							<xs:attribute name="color"/>
+							<xs:attribute name="imgURL" type="xs:string"/>
+							<xs:attribute name="cssClass"/>
+							<xs:attribute name="shortName"/>
+							<xs:attribute name="longName"/>
+						</xs:complexType>
+					</xs:element>
+					<xs:element name="vehicleType" minOccurs="0">
+						<xs:complexType>
+							<xs:attribute name="id" type="SYNTHESEObjectIdType" use="required"/>
+							<xs:attribute name="name"/>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="possibleWaitingTime" type="xs:duration"/>
+				<xs:attribute name="startStopIsTerminus" type="xs:boolean" use="required"/>
+				<xs:attribute name="endStopIsTerminus" type="xs:boolean" use="required"/>
+				<xs:attribute name="destinationText">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="JourneyChunkType">
+		<xs:attribute name="departureTime" type="xs:dateTime" use="required"/>
+		<xs:attribute name="endDepartureTime" type="xs:dateTime"/>
+		<xs:attribute name="arrivalTime" type="xs:dateTime" use="required"/>
+		<xs:attribute name="endArrivalTime" type="xs:dateTime"/>
+		<xs:attribute name="length" type="MetersLengthType" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="PointType">
+		<xs:attribute name="x" type="xs:integer"/>
+		<xs:attribute name="y" type="xs:integer"/>
+		<xs:attribute name="latitude" type="xs:decimal"/>
+		<xs:attribute name="longitude" type="xs:decimal"/>
+	</xs:complexType>
+	<xs:complexType name="PhysicalStopType">
+		<xs:complexContent>
+			<xs:extension base="PointType">
+				<xs:sequence>
+					<xs:element name="connectionPlace" type="ConnectionPlaceType"/>
+				</xs:sequence>
+				<xs:attribute name="id" type="SYNTHESEObjectIdType" use="required"/>
+				<xs:attribute name="name" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="ConnectionPlaceType">
+		<xs:complexContent>
+			<xs:extension base="PointType">
+				<xs:sequence>
+					<xs:element name="alert" type="AlertType" minOccurs="0"/>
+				</xs:sequence>
+				<xs:attribute name="id" type="SYNTHESEObjectIdType" use="required"/>
+				<xs:attribute name="city" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="name" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PublicPlaceType">
+		<xs:complexContent>
+			<xs:extension base="PointType">
+				<xs:attribute name="id" type="SYNTHESEObjectIdType" use="required"/>
+				<xs:attribute name="city" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+				<xs:attribute name="name" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="AddressType">
+		<xs:complexContent>
+			<xs:extension base="PointType">
+				<xs:attribute name="id" use="required"/>
+				<xs:attribute name="city" use="required"/>
+				<xs:attribute name="number" type="xs:string"/>
+				<xs:attribute name="streetName" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="PlaceType">
+		<xs:choice>
+			<xs:element name="connectionPlace" type="ConnectionPlaceType"/>
+			<xs:element name="publicPlace" type="PublicPlaceType"/>
+			<xs:element name="address" type="AddressType"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:simpleType name="SYNTHESEObjectIdType">
+		<xs:restriction base="xs:long">
+			<xs:minInclusive value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MetersLengthType">
+		<xs:annotation>
+			<xs:documentation>Length in meters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="AlertType" mixed="true">
+		<xs:attribute name="id" type="SYNTHESEObjectIdType" use="required"/>
+		<xs:attribute name="level" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="info"/>
+					<xs:enumeration value="warning"/>
+					<xs:enumeration value="interruption"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="startValidity" type="xs:dateTime"/>
+		<xs:attribute name="endValidity" type="xs:dateTime"/>
+	</xs:complexType>
+</xs:schema>

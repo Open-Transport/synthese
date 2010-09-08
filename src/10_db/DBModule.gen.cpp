@@ -1,0 +1,2 @@
+
+synthese::db::DBModule::integrate();

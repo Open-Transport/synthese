@@ -1,0 +1,436 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XMLSpy v2007 sp2 (http://www.altova.com) by christophe duquesne (Dryade SARL) -->
+<!-- edited with XML Spy v4.0.1 U (http://www.xmlspy.com) by David Lellouche (RATP/CGF) -->
+<!--  File: trident_Location_schema.xsd  -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.trident.org/schema/trident" xmlns:trd="http://www.trident.org/schema/trident" targetNamespace="http://www.trident.org/schema/trident" elementFormDefault="qualified" version="2.0">
+	<xsd:annotation>
+		<xsd:appinfo>trident.xsd v1.00 2002-10</xsd:appinfo>
+		<xsd:documentation xml:lang="en">
+TRIDENT exchange schema. 
+Location referencing Description
+Copyright (c) 2001 TRIDENT consortium, All Rights Reserved.
+		</xsd:documentation>
+	</xsd:annotation>
+	<!--  included files (if any) -->
+	<xsd:include schemaLocation="trident_Global_schema.xsd"/>
+	<!-- ==============================================================
+     object declarations
+     ============================================================== -->
+	<!-- LOCATION ===================================================== -->
+	<xsd:complexType name="LogicalLocationType" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		General description of a logical location (point, area, link,network,line....)
+		This type is an abstract type
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:TridentObjectType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="LocationType" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		General description of a location (point, area, link)
+		This type is an abstract type
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:LogicalLocationType"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- POINTS ===================================================== -->
+	<xsd:complexType name="AddressType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		Full Description of an address
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="streetName" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="countryCode" type="xsd:string" minOccurs="0"/>
+			<!-- REMARK : LanguageCode is a code from code list ISO 639-1988 -->
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RoadAddressType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		Full Description of an address
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:AddressType">
+				<xsd:sequence>
+					<xsd:element name="number" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="name" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PostalAddressType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		Full Description of an address
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:AddressType">
+				<xsd:sequence>
+					<xsd:element name="province" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="region" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="town" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="roadNumber" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="houseNumber" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="postalCode" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PointOfInterestType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		Description of a point of interest: this is provided if the point is at or near a major landmark or point of interest.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="name" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="type" type="trd:POITypeType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="WGS84PositionType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		Position of a point in WGS 84 Coordinate.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Longitude" type="trd:LongitudeType"/>
+			<xsd:element name="Latitude" type="trd:LatitudeType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ProjectedPointType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		Position of a point in a projection system.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="X" type="xsd:decimal"/>
+			<xsd:element name="Y" type="xsd:decimal"/>
+			<xsd:element name="projectionType" type="xsd:string" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ProprietaryIdentifierType">
+		<xsd:sequence>
+			<xsd:element name="id" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="PointType" abstract="true">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		General point used to build any kind of point
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:LocationType">
+				<xsd:sequence>
+					<xsd:element name="longitude" type="trd:LongitudeType"/>
+					<xsd:element name="latitude" type="trd:LatitudeType"/>
+					<xsd:element name="longLatType" type="LongLatTypeType"/>
+					<xsd:element name="address" type="trd:AddressType" minOccurs="0"/>
+					<xsd:element name="projectedPoint" type="trd:ProjectedPointType" minOccurs="0"/>
+					<xsd:element name="containedIn" type="trd:TridentIdType"/>
+					<!-- REMARK : The IsContainedBy element refers to Area via Id -->
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PlaceType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		StopPoint on a Route of a Line of a PT Network
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:PointType">
+				<xsd:sequence>
+					<xsd:element name="name" type="xsd:string"/>
+					<xsd:element name="comment" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RoadPointType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		General point used to build any kind of point
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:PointType">
+				<xsd:sequence>
+					<xsd:element name="LanguageCode" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="Name" type="xsd:string"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PTAccessPointType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		The physical (spatial) possibility for a passenger
+		to access or leave the PT network.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:PointType">
+				<xsd:sequence>
+					<xsd:element name="name" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="type" minOccurs="0">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="In"/>
+								<xsd:enumeration value="Out"/>
+								<xsd:enumeration value="InOut"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="openingTime" type="xsd:time" minOccurs="0"/>
+					<xsd:element name="closingTime" type="xsd:time" minOccurs="0"/>
+					<xsd:element name="mobilityRestrictedSuitability" type="xsd:boolean" minOccurs="0"/>
+					<xsd:element name="stairsAvailability" type="xsd:boolean" minOccurs="0"/>
+					<xsd:element name="liftAvailability" type="xsd:boolean" minOccurs="0"/>
+					<xsd:element name="comment" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NonPTAccessLinkendType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+An origin place not belonging to the PT network.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:PointType">
+				<xsd:sequence/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="StopPointType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		StopPoint on a Route of a Line of a PT Network
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:PointType">
+				<xsd:sequence>
+					<xsd:element name="name" type="xsd:string"/>
+					<xsd:element name="lineIdShortcut" type="trd:TridentIdType" minOccurs="0"/>
+					<xsd:element name="ptNetworkIdShortcut" type="trd:TridentIdType" minOccurs="0"/>
+					<xsd:element name="comment" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="AirportStopPointType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		An airport
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:StopPointType">
+				<xsd:sequence>
+					<xsd:element name="terminalIdentifier" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="gateIdentifier" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="BusStopPointType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		An bus sopt point
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:StopPointType">
+				<xsd:sequence>
+					<xsd:element name="ptDirection" type="PTDirectionType" minOccurs="0"/>
+					<xsd:element name="streetName" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="streetNumber" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="platformIdentifier" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="TramStopPointType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		An TRAM stop point
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:StopPointType">
+				<xsd:sequence>
+					<xsd:element name="streetName" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="streetNumber" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="ptDirection" type="PTDirectionType" minOccurs="0"/>
+					<xsd:element name="platformIdentifier" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="MetroStopPointType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		An metro stop point
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:StopPointType">
+				<xsd:sequence>
+					<xsd:element name="lineName" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="lineNumber" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="platformIdentifier" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="ptDirection" type="PTDirectionType" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RailwayStopPointType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		An Railwaystop point
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:StopPointType">
+				<xsd:sequence>
+					<xsd:element name="stationInternalDivision" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="platformIdentifier" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- LINKS ===================================================== -->
+	<xsd:complexType name="GeneralLinkType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		A General Link Between two Points (or object inheriting 
+from Point)
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:LocationType">
+				<xsd:sequence>
+					<xsd:element name="name" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="startOfLink" type="trd:TridentIdType"/>
+					<xsd:element name="endOfLink" type="trd:TridentIdType"/>
+					<xsd:element name="linkDistance" type="xsd:decimal" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="ConnectionLinkType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		The path between two places covered by any "personal" mean of transport 
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:GeneralLinkType">
+				<xsd:sequence>
+					<xsd:element name="linkType" type="trd:ConnectionLinkTypeType" minOccurs="0"/>
+					<xsd:element name="defaultDuration" type="xsd:duration" minOccurs="0"/>
+					<xsd:element name="frequentTravellerDuration" type="xsd:duration" minOccurs="0"/>
+					<xsd:element name="occasionalTravellerDuration" type="xsd:duration" minOccurs="0"/>
+					<xsd:element name="mobilityRestrictedTravellerDuration" type="xsd:duration" minOccurs="0"/>
+					<xsd:element name="mobilityRestrictedSuitability" type="xsd:boolean" minOccurs="0"/>
+					<xsd:element name="stairsAvailability" type="xsd:boolean" minOccurs="0"/>
+					<xsd:element name="liftAvailability" type="xsd:boolean" minOccurs="0"/>
+					<xsd:element name="comment" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PTAccessLinkType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		Link between a StopPoint and an AccessPoint.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:ConnectionLinkType">
+				<xsd:sequence>
+					<xsd:element name="Comment" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="NonPTAccessLinkType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		Link between a StopPoint and an AccessPoint.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:ConnectionLinkType">
+				<xsd:sequence>
+					<xsd:element name="Comment" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="PTLinkType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		A Link between two StopPoints
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:GeneralLinkType">
+				<xsd:sequence>
+					<xsd:element name="Comment" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="CarType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		The path between two places covered on the road network by a private means of transport (car, truck, etc).
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:GeneralLinkType">
+				<xsd:sequence>
+					<xsd:element name="Comment" type="xsd:string" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- AREA ===================================================== -->
+	<xsd:complexType name="AreaType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+		An area made up of a set of Points
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:LocationType">
+				<xsd:sequence>
+					<xsd:element name="name" type="xsd:string" minOccurs="0"/>
+					<xsd:element name="contains" type="trd:TridentIdType" maxOccurs="unbounded"/>
+					<xsd:element name="boundaryPoint" type="trd:TridentIdType" minOccurs="0" maxOccurs="unbounded"/>
+					<xsd:element name="centroidOfArea" type="trd:TridentIdType" minOccurs="0"/>
+					<!-- REMARK : The following element refers to Points via Id -->
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- ALLERT C TYPE DEFINITIONS ================================= -->
+	<!--Non utile pour amivif-->
+</xsd:schema>

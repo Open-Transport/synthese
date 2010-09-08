@@ -1,0 +1,330 @@
+/** @page customer_spec_sai_tisseo Spécification détaillée SAI SYNTHESE
+
+	@section csst_sommaire Sommaire du document
+	
+		- @ref csst_glossary
+		- @ref csst_ihm
+		- @ref csst_security
+		- @ref csst_logs
+
+	@section csst_glossary Glossaire
+
+		Le téléaffichage (SAI) consiste en la diffusion de la liste des prochains départs aux arrêts, de manire dynamique.
+	
+	@subsection csst_securite Sécurité
+
+		@subsubsection defRight Habilitation
+		@copydoc synthese::security::Right
+
+		@subsubsection defUserProfile Profil utilisateur
+		@copydoc synthese::security::Profile
+
+		@subsubsection defUser Utilisateur
+		@copydoc synthese::security::User
+	
+	@subsection csst_divers Divers
+	
+		@subsubsection defAdmin Composants d'administration
+		@copydoc synthese::interfaces::AdminInterfaceElement
+
+		@subsubsection defLog Journaux
+		@copydoc synthese::dblog::DBLog
+
+		@subsubsection defBroadcastPoint Point de diffusion
+		@copydoc synthese::departurestable::BroadcastPoint
+
+		@subsubsection defDisplayTerminal Terminal d'affichage
+		@copydoc synthese::departurestable::DisplayScreen
+
+
+	@section csst_ihm Interface Homme Machine (IHM)
+	
+		@subsection csst_ihm_generique Ecran générique
+		@copydoc synthese::admin::HomeAdmin
+
+		@subsection csst_ihm_liste Liste des écrans
+		
+		L'ensemble des écrans de gestion du SAI SYNTHESE est centralisé dans une "console d'administration", qui donne accès à l'ensemble des écrans d'administraion :
+			- @ref csst_ihm_users
+				- @ref csst_ihm_users_login
+				- @ref csst_ihm_users_profiles
+				- @ref csst_ihm_users_profile
+				- @ref csst_ihm_users_users
+				- @ref csst_ihm_users_user
+			- @ref csst_ihm_places
+				- @ref csst_ihm_places_places
+				- @ref csst_ihm_places_place
+			- @ref csst_ihm_display
+				- @ref csst_ihm_display_DisplayTypesAdmin
+				- @ref csst_ihm_display_DisplaySearchAdmin
+				- @ref csst_ihm_display_DisplayAdmin
+				- @ref csst_ihm_display_DisplayMaintenanceAdmin
+			- @ref csst_ihm_messages
+				- @ref csst_ihm_messages_MessagesLibraryAdmin
+				- @ref csst_ihm_messages_MessagesScenarioAdmin
+				- @ref csst_ihm_messages_MessagesAdmin
+				- @ref csst_ihm_messages_MessageAdmin
+				- @ref csst_ihm_messages_MessagesScenarioSend
+			- @ref csst_ihm_journal
+				- @ref csst_ihm_journal_liste
+				- @ref csst_ihm_journal_viewer
+		
+		Le schéma suivant représente l'arborescence des pages et actions utilisées pour la gestion autonome du téléaffichage.
+
+		<i>Légende</i>
+			- <tt>C/E/S</tt> = Création / Edition / Suppression
+			- fond jaune = page de la console d'administration
+			- fond vert = page de journal
+			- fond bleu = accàs à une fonction SYNTHESE hors administration
+			- fond blanc = fonction intégrée à la page de niveau supérieur
+
+		@dot
+		digraph {
+			size="6,12"
+			rankdir=LR
+		    edge [fontname="FreeSans",fontsize=10,labelfontname="FreeSans",labelfontsize=10];
+  			node [shape=rectangle style=filled color="red" fontname="FreeSans" fontsize=10 shape=record]
+	
+			{
+				node [fillcolor="gold"]
+				Login [URL="\ref csst_ihm_users_login"]
+				Accueil [URL="\ref csst_ihm_generique"]
+				Messages [URL="\ref csst_ihm_messages_MessagesAdmin"]
+				Message [label="C/E/S Diffusion message" URL="\ref csst_ihm_messages_MessageAdmin"]
+				Bibliotheque [URL="\ref csst_ihm_messages_MessagesLibraryAdmin"]
+				Scenario [label="C/E/S Scenario" URL="\ref csst_ihm_messages_MessagesScenarioAdmin"]
+				MessageScenario [label="C/E/S Message de scenario (bibliotheque)" URL="\ref csst_ihm_messages_MessageAdmin"]
+				ScenarioSend [label="C/E/S Diffusion scenario de message" URL="\ref csst_ihm_messages_MessagesScenarioSend"]
+				MessageScenarioSend [label="C/E/S Message de scenario (pour diffusion)" URL="\ref csst_ihm_messages_MessageAdmin"]
+				Utilisateurs [URL="\ref csst_ihm_users_users"]
+				User [label="C/E/S utilisateur" URL="\ref csst_ihm_users_user"]
+				Profils [URL="\ref csst_ihm_users_profiles"]
+				Profile [label="C/E/S profil" URL="\ref csst_ihm_users_profile"]
+				Emplacements [URL="\ref csst_ihm_places_places"]
+				Afficheurs [URL="\ref csst_ihm_display_DisplaySearchAdmin"]
+				Display [label="C/E/S afficheur" URL="\ref csst_ihm_display_DisplayAdmin"]
+				DisplayTypes [label="Types d'afficheurs" URL="\ref csst_ihm_display_DisplayTypesAdmin"]
+				Journal [URL="\ref csst_ihm_journal_liste"]
+				Place [label="Edition emplacement" URL="\ref csst_ihm_places_place"]
+				Maintenance [label="Supervision afficheur" URL="\ref csst_ihm_display_DisplayMaintenanceAdmin"]
+			}
+			{
+				node [fillcolor="lightskyblue"]
+				"Simulation afficheur"
+			}
+			{
+				node [fillcolor="seagreen3"]
+				"Securite" [URL="\ref csst_ihm_journal_viewer"]
+				"Administration tableaux departs" [URL="\ref csst_ihm_journal_viewer"]
+				"Supervision tableaux departs" [URL="\ref csst_ihm_journal_viewer"]
+				"Administration bibliotheque messages" [URL="\ref csst_ihm_journal_viewer"]
+				"Diffusion de messages" [URL="\ref csst_ihm_journal_viewer"]
+				"Administration donnees reseau" [URL="\ref csst_ihm_journal_viewer"]
+			}
+			{
+				node [fillcolor="white"]
+
+				Login -> Accueil
+					Accueil -> Messages
+						Messages -> Bibliotheque
+					Accueil -> Utilisateurs
+						Utilisateurs -> Profils
+					Accueil -> Emplacements
+					Accueil -> Afficheurs
+						Afficheurs -> DisplayTypes;
+					Accueil -> Journal;
+
+				Messages -> Message;
+				Messages -> ScenarioSend;
+					ScenarioSend -> MessageScenarioSend;
+
+				Bibliotheque -> "C/E/S Modele de message complementaire";
+				Bibliotheque -> "C/E/S Modele de message prioritaire";
+				Bibliotheque -> Scenario;
+					Scenario -> MessageScenario;
+
+				Utilisateurs -> User;
+				
+				Profils -> Profile;
+				
+				Emplacements -> Place;
+
+				Afficheurs -> Display;
+				Afficheurs -> "Simulation afficheur";
+				Afficheurs -> Maintenance;
+
+				
+				Journal -> "Securite";
+				Journal -> "Administration tableaux departs";
+				Journal -> "Supervision tableaux departs";
+				Journal -> "Administration bibliotheque messages";
+				Journal -> "Diffusion de messages";
+				Journal -> "Administration donnees reseau";
+			}
+		}
+		@enddot
+
+
+
+	@subsection csst_ihm_users Gestion des utilisateurs
+	
+		@subsubsection csst_ihm_users_login Ecran de connexion
+		
+			@image html cap_admin_login.png
+			@image latex cap_admin_login.png "Maquette de l'écran de connexion intégré à la console d'administration" width=14cm
+
+			<i>Titre de la fenêtre</i> :
+				- SYNTHESE Admin - Login
+
+			<i>Barre de navigation</i> :
+				- Bienvenue sur SYNTHESE Admin
+
+			<i>Zone de contenus</i> : Il s'agit d'un <b>Formulaire de connexion</b>.
+				-# <tt>Utilisateur</tt> : Champ texte destiné à recevoir le nom d'utilisateur.
+				-# <tt>Mot de passe</tt> : Champ texte caché destiné à recevoir le mot de passe de l'utilisateur.
+				-# bouton <tt>Connexion</tt> : Lance la tentative d'identification :
+				- Si l'utilisateur a le droit de se connecter (habilitation privée SecurityRight de niveau USE) et si le mot de passe est valide alors l'utilisateur est conduit sur la page d'accueil HomeAdmin.
+				- Sinon un message d'erreur "Utilisateur incorrect" est retourné.
+
+			<i>Sécurité</i>
+				- Cette page est accessible sans restriction
+				- Une habilitation privée SecurityRight de niveau USE est nécessaire pour pouvoir se connecter.
+
+			<i>Journaux</i> : Les opérations suivantes sont consignées dans le journal de sécurité SecurityLog :
+				- INFO : Connexion d'utilisateur
+				- WARNING : Refus de connexion aprs cinq tentatives sur une même session
+	
+		@subsubsection csst_ihm_users_profiles Liste des profils d'habilitations
+		@copydoc synthese::security::ProfilesAdmin
+		
+		@subsubsection csst_ihm_users_profile Edition d'un profil d'habilitations
+		@copydoc synthese::security::ProfileAdmin
+		
+		@subsubsection csst_ihm_users_users Liste et recherche des utilisateurs
+		@copydoc synthese::security::UsersAdmin
+		
+		@subsubsection csst_ihm_users_user Edition d'un utilisateur
+		@copydoc synthese::security::UserAdmin
+
+
+
+	@subsection csst_ihm_places Gestion des emplacements
+	
+		@subsubsection csst_ihm_places_places Liste et recherche de lieux logiques
+		@copydoc synthese::departurestable::BroadcastPointsAdmin
+		
+		@subsubsection csst_ihm_places_place Edition de lieu logique
+		@copydoc synthese::departurestable::BroadcastPointAdmin
+			
+	
+	
+	@subsection csst_ihm_display Gestion des afficheurs
+		
+		@subsubsection csst_ihm_display_DisplayTypesAdmin Gestion des types d'affichage
+		@copydoc synthese::departurestable::DisplayTypesAdmin	
+		
+		@subsubsection csst_ihm_display_DisplaySearchAdmin Gestion du parc matériel d'afficheurs
+		@copydoc synthese::departurestable::DisplaySearchAdmin
+		
+		@subsubsection csst_ihm_display_DisplayAdmin Edition des paramtres d'un afficheur
+		@copydoc synthese::departurestable::DisplayAdmin
+
+		@subsubsection csst_ihm_display_DisplayMaintenanceAdmin Supervision d'un afficheur
+		@copydoc synthese::departurestable::DisplayMaintenanceAdmin
+
+
+	
+	@subsection csst_ihm_messages Gestion des messages
+	
+		@subsubsection csst_ihm_messages_MessagesLibraryAdmin Bibliothèque de messages prédéfinis
+		@copydoc synthese::messages::MessagesLibraryAdmin
+		
+		@subsubsection csst_ihm_messages_MessagesScenarioAdmin Edition de scénario de diffusion prédéfini
+		@copydoc synthese::messages::MessagesScenarioAdmin
+		
+		@subsubsection csst_ihm_messages_MessagesAdmin Liste et recherche de messages
+		@copydoc synthese::messages::MessagesAdmin
+
+		@subsubsection csst_ihm_messages_MessageAdmin Edition d'un message
+		@copydoc synthese::messages::MessageAdmin
+		
+		@subsubsection csst_ihm_messages_MessagesScenarioSend Diffusion de messages selon un scénario prédéfini
+		@copydoc synthese::messages::MessagesScenarioSendAdmin
+
+	
+	
+	@subsection csst_ihm_journal Journal des événements
+	
+		@subsubsection csst_ihm_journal_liste Liste des journaux
+		@copydoc synthese::dblog::DBLogList
+
+		@subsubsection csst_ihm_journal_viewer Visualisation d'un journal
+		@copydoc synthese::dblog::DBLogAdmin
+
+
+
+	@section csst_security Sécurité
+	
+		Les habilitations suivantes sont utilisées par le SAI :
+			- @ref csst_security_right
+			- @ref csst_security_messages
+			- @ref csst_security_messages_library
+			- @ref csst_security_log
+			- @ref csst_security_arrivaldeparturestables
+			- @ref csst_security_maintenance
+			- @ref csst_security_places
+		
+		Leur utilisation précise est spécifiée dans la documentation de chaque écran.
+		
+		@subsection csst_security_right Sécurité (SecurityRight)
+		@copydoc synthese::security::SecurityRight
+		
+		@subsection csst_security_messages Messages (MessagesRight)
+		@copydoc synthese::messages::MessagesRight
+
+		@subsection csst_security_messages_library Bibliothque de messages (MessagesLibraryRight)
+		@copydoc synthese::messages::MessagesLibraryRight
+	
+		@subsection csst_security_log Journaux (DBLogRight)
+		@copydoc synthese::dblog::DBLogRight
+		
+		@subsection csst_security_arrivaldeparturestables Tableaux de départs et d'arrivée (ArrivalDepartureTableRight)
+		@copydoc synthese::departurestable::ArrivalDepartureTableRight
+		
+		@subsection csst_security_maintenance Maintenance des afficheurs (DisplayMaintenanceRight)
+		@copydoc synthese::departurestable::DisplayMaintenanceRight
+		
+		@subsection csst_security_places Gestion des emplacements (PlacesRight)
+		@copydoc synthese::departurestable::BroadcastPointsRight
+	
+	
+	
+	@section csst_logs Journaux
+	
+		Les journaux suivants sont alimentés pour le SAI :
+			- @ref csst_logs_security
+			- @ref csst_logs_displays
+			- @ref csst_logs_maintenance
+			- @ref csst_logs_messages_library
+			- @ref csst_logs_messages
+			- @ref csst_logs_transport
+		
+		@subsection csst_logs_security Sécurité (SecurityLog)
+		@copydoc synthese::security::SecurityLog
+		
+		@subsection csst_logs_messages Envois de messages (MessagesLog)
+		@copydoc synthese::messages::MessagesLog
+		
+		@subsection csst_logs_messages_library Bibliothque de messages (MessagesLibraryLog)
+		@copydoc synthese::messages::MessagesLibraryLog
+		
+		@subsection csst_logs_displays Gestion des afficheurs (ArrivalDepartureTableLog)
+		@copydoc synthese::departurestable::ArrivalDepartureTableLog
+		
+		@subsection csst_logs_maintenance Maintenance des afficheurs (DisplayMaintenanceLog)
+		@copydoc synthese::departurestable::DisplayMaintenanceLog
+		
+		@subsection csst_logs_transport Données réseau, emplacements (TransportNetworkDataLog)
+		@copydoc synthese::departurestable::BroadcastPointsDataLog
+		
+*/

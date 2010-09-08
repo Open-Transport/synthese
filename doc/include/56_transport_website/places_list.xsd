@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="options" type="OptionsListType">
+		<xs:annotation>
+			<xs:documentation>Main container</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="OptionsListType">
+		<xs:annotation>
+			<xs:documentation>Contains the list of returned items</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="option" type="OptionItemType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="OptionItemType" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Contains the informations about a returned item</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="type" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="city"/>
+					<xs:enumeration value="stop"/>
+					<xs:enumeration value="publicPlace"/>
+					<xs:enumeration value="street"/>
+					<xs:enumeration value="address"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="score" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:double">
+					<xs:minInclusive value="0"/>
+					<xs:maxInclusive value="1"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:complexType>
+</xs:schema>

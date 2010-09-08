@@ -1,0 +1,7 @@
+Import ('s3env')
+
+CppLibProject(
+	s3env, 's3-util-threads', s3env['S3VERSION'], 
+	source_files = s3env.Glob ('*.cpp'),
+	dependencies = ['s3-util.cpplib']
+)

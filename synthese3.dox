@@ -1,0 +1,14 @@
+/**	
+
+  @defgroup s3 synthese3
+  @ingroup dev
+
+
+  @defgroup m0 M0
+  @ingroup s3
+
+  @defgroup m1 M1
+  @ingroup s3
+
+*/
+

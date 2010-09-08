@@ -1,0 +1,10 @@
+Import ('s3env')
+
+CppSynthese3LibProject(
+	s3env, 's3-db', s3env['S3VERSION'], 
+    source_files = s3env.Glob ('*.cpp'),
+    dependencies = [
+		's3-server.cpplib',
+    	's3-util-threads.cpplib', 's3-util.cpplib', 'sqlite3.cpplib']
+)
+

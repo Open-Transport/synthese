@@ -1,0 +1,14 @@
+/** @page thematics Thematic documentation
+
+@section howto How-to
+
+
+@section thematicsother Other
+
+<ul>
+<li>@subpage xmlapi</li>
+<li>@subpage customer_specs</li>
+<li>@subpage annexes</li>
+</li>
+
+*/

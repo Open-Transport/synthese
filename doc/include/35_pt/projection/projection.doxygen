@@ -1,0 +1,49 @@
+/** @page projection Projection
+
+@section projection-uc Use cases
+
+The following table represents the independant layers used in SYNTHESE :
+
+<table class="table">
+<tr><th>Layer</th><th>Vertex</th><th>Edge</th></tr>
+<tr><td>@ref road "Road network"</td><td>road::Crossing</td><td>RoadChunk</td></tr>
+<tr><td>@ref pt "Transport network"</td><td>PhysicalStop / StationEntrance</td><td>LineStop</td></tr>
+<tr><td>@ref road::PublicPlace "Public places"</td><td>PublicPlaceEntrance</td><td>N.A.</td></tr>
+<tr><td>@ref road::House "Houses"</td><td>Address</td><td>N.A.</td></tr>
+</table> 
+
+The projections are links between road, transport network, public places, houeses and the road network.
+
+@subsection projection-ucpt Public transport or public places
+
+@image html projection-uc1.png
+
+@image html projection-uc2.png
+
+@subsection projection-uchouses Houses
+
+@image html projection-uc3.png
+
+@image html projection-uc4.png
+
+@subsection projection-ucdb Special case : two addresses on a same road chunk
+
+Be careful to this configuration :
+
+@image html projection-uc5.png
+
+@section projection-impl Implementation
+
+The implementation of a projection is done by the road::Address base class :
+
+@copydoc road::Address
+
+The projection result is an Address object, which is linked to the source object by inheritance or inclusion :
+<ul>
+<li>pt::PhysicalStop : includes an optional Address object (only bus stops are projected)</li>
+<li>pt::StationEntrance : inherits from Address</li>
+<li>road::PublicPlaceEntrance : inherits from Address</li>
+<li>road::House : inherits from Address</li>
+</ul>
+
+*/

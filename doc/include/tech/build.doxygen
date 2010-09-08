@@ -1,0 +1,36 @@
+/** @page build Building SYNTHESE
+
+<h1>How to</h1>
+
+To build the SYNTHESE server, go at the forge2 root directory, and type :
+
+<pre>scons s3-server.cppbin</pre>
+
+To build SYNTHESE packages (on a package repository server only), go at the forge2 root directory, and type :
+
+<pre>scons _DEB_BUILD_DEPS=True s3-server.deb</pre>
+
+<h1>Build order</h1>
+
+Under Windows, the modules are built in the following order :
+<ul>
+	<li>55-timetables</li>
+	<li>35-pt</li>
+	<li>34-road</li>
+	<li>17-messages</li>
+	<li>19-calendar</li>
+	<li>30-server</li>
+	<li>13-dblog</li>
+	<li>14-geography</li>
+	<li>11-interfaces</li>
+	<li>12-security</li>
+	<li>36-places-list</li>
+	<li>20-tree</li>
+	<li>16-impex</li>
+	<li>33-routeplanner</li>
+	<li>31-resa</li>
+	<li>58-hiking</li>
+	<li>54-departures-table</li>
+</ul>
+
+*/

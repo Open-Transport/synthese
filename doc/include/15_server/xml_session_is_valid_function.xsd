@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="validSession">
+		<xs:annotation>
+			<xs:documentation>Indicates if the session is valid</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="id" type="xs:string" use="required"/>
+			<xs:attribute name="valid" type="xs:boolean" use="required"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

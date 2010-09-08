@@ -1,0 +1,11 @@
+Import ('s3env')
+
+CppSynthese3LibProject(
+	s3env, 's3-pt-website', s3env['S3VERSION'], 
+	source_files = s3env.Glob ('*.cpp'),
+	dependencies = [
+		's3-cms.cpplib',
+		's3-pt-journey-planner.cpplib',
+		's3-road-journey-planner.cpplib'
+	]
+)

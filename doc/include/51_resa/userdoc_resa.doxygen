@@ -1,0 +1,379 @@
+/** @page userdocResa 31 Documentation module de réservation SYNTHESE
+
+<h2>Table des matières</h2>
+
+<ul>
+	<li>@ref userdocLoginOperator</li>
+	<li>@ref userdocResaOperator</li>
+	<li>@ref userdocResaListe</li>
+	<li>@ref userdocResaLog</li>
+	<li>@ref tadToolsSYNTHESEOnlineResa</li>
+	<li>@ref tadToolsSYNTHESETakeOnlineResa</li>
+</ul>
+
+@section userdocLoginOperator Connexion au système par un opérateur via la console d'administration
+
+Le premier accès s'effectue via l'écran de connexion :
+
+@image html syntheseouverturesession.png
+@image latex syntheseouverturesession.png width=14cm
+
+Entrer le login et le mot de passe pour se connecter.
+
+@subsection tadToolsSYNTHESEScreenParts Découpage de l'écran
+
+Un compte comportant les habilitations d'opérateur TAD fait apparaitre l'écran suivant :
+
+@image html fenetreouverturesynthese.png
+@image latex fenetreouverturesynthese.png width=14cm
+
+L'écran est composé de 5 zones :
+	- La @ref tadToolsSYNTHESEScreenPartsCall en haut à droite
+	- La @ref tadToolsSYNTHESEScreenPartsArbo à gauche
+	- Le fil d'Ariane en haut
+	- Le bouton de déconnexion en haut à droite
+	- La zone d'affichage principale sur le reste de l'écran
+
+@subsubsection tadToolsSYNTHESEScreenPartsCall Zone de gestion des appels 
+
+La zone de gestion des appels permet de :
+	- enregistrer le démarrage d'un appel
+	- enregistrer la fin d'un appel
+	
+Lorsque l'utilisateur n'est pas en cours d'appel, le bouton suivant lui permet de démarrer un appel :
+
+@image html boutonprendreappel.png
+@image latex boutonprendreappel.png width=14cm
+
+Pour notifier la fin de l'appel, cliquer sur le bouton d'arrêt d'appel. Le bouton de démarrage d'appel apparaît à nouveau :
+
+@image html boutonstopperappel.png
+@image latex boutonstopperappel.png width=14cm
+
+@subsubsection tadToolsSYNTHESEScreenPartsArbo Arborescence de navigation
+
+L'arborescence de navigation permet d'accéder à tout moment aux rubriques de SYNTHESE.
+
+Dans certains cas, des pages peuvent donner accès directement à des sous-pages. Elles sont signalées par une icone + :
+
+@image html iconeplus.png
+@image latex iconeplus.png width=14cm
+
+Cliquer sur l'icone pour ouvrir la liste des sous-pages sans avoir à charger la page intermédiaire. La liste des sous-pages apparaît alors, et l'icone + se transforme en icone - :
+
+@image html arbodeployee.png
+@image latex arbodeployee.png width=14cm
+
+Cliquer sur l'icone pour refermer la liste des sous-pages.
+
+
+
+@section userdocResaOperator Réservation par un opérateur via la console d'administration
+
+
+@subsection tadToolsSYNTHESEDepartureStatus Modalités de réservation d'une solution
+
+<table>
+<tr><td>
+</td><td>Réservation impossible</td></tr>
+<tr><td>
+@image html resa_compulsory.png
+@image latex resa_compulsory.png "" width=0.3cm
+</td><td>Réservation obligatoire : le client doit réserver pour emprunter ce service</td></tr>
+<tr><td>
+@image html resa_optional.png
+@image latex resa_optional.png "" width=0.3cm
+</td><td>Réservation facultative : le client peut emprunter ce service sans réserver, et a la possibilité de réserver pour obtenir une place assise garantie</td></tr>
+<tr><td>
+@image html resa-optional-expired.png
+@image latex resa-optional-expired.png "" width=0.3cm
+</td><td>Réservation facultative, mais délai de réservation expiré : le client peut emprunter ce service sans réserver, mais ne peut plus y réserver de place</td></tr>
+</table>
+
+Une icone affichée en clignotant indique que l'heure limite de réservation est proche.
+
+
+
+
+@section userdocResaLog Journal des appels
+
+@subsection tadToolsSYNTHESECallTypes Types d'appels
+
+<table>
+<tr><td>
+@image html phone.png
+@image latex phone.png "" width=0.3cm
+</td><td>Appel téléphonique entrant provenant d'un client</td></tr>
+<tr><td>
+@image html phone_sound.png
+@image latex phone_sound.png "" width=0.3cm
+</td><td>Appel téléphonique sortant</td></tr>
+<tr><td>
+@image html transmit.png
+@image latex transmit.png "" width=0.3cm
+</td><td>Appel radio ou téléphonique provenant du service (conducteurs...)</td></tr>
+<tr><td>
+@image html keyboard.png
+@image latex keyboard.png "" width=0.3cm
+</td><td>Opération de saisie (n'est pas réellement un appel mais permet de décompter le temps passé)</td></tr>
+<tr><td>
+@image html email.png
+@image latex email.png "" width=0.3cm
+</td><td>Envoi d'e-mail (n'est pas réellement un appel mais permet de tracer les prises de comptact)</td></tr>
+</table>
+
+@subsection tadToolsSYNTHESECallTypes Types d'événements enregistrés aucours d'un appel
+
+<table>
+<tr><td>
+@image html resa_compulsory.png
+@image latex resa_compulsory.png "" width=0.3cm
+</td><td>Prise de réservation</td></tr>
+<tr><td>
+@image html cross.png
+@image latex cross.png "" width=0.3cm
+</td><td>Annulation de réservation dans les délais</td></tr>
+<tr><td>
+@image html asterisk_red.png
+@image latex asterisk_red.png "" width=0.3cm
+</td><td>Annulation de réservation annulée hors délai</td></tr>
+<tr><td>
+@image html user_cross.png
+@image latex user_cross.png "" width=0.3cm
+</td><td>Signalement de client absent</td></tr>
+<tr><td>
+@image html wrench.png
+@image latex wrench.png "" width=0.3cm
+</td><td>Support technique auprès du client pour la réservation en ligne</td></tr>
+<tr><td>
+@image html user_comment.png
+@image latex user_comment.png "" width=0.3cm
+</td><td>Réclamation</td></tr>
+<tr><td>
+@image html information.png
+@image latex information.png "" width=0.3cm
+</td><td>Information</td></tr>
+<tr><td>
+@image html lorry.png
+@image latex lorry.png "" width=0.3cm
+</td><td>Redirection vers une ligne régulière</td></tr>
+<tr><td>
+@image html application_form_add.png
+@image latex application_form_add.png "" width=0.3cm
+</td><td>Activation de l'auto-réservation</td></tr>
+<tr><td>
+@image html application_form_delete.png
+@image latex application_form_delete.png "" width=0.3cm
+</td><td>Désactivation de l'auto-réservation</td></tr>
+<tr><td>
+@image html help.png
+@image latex help.png "" width=0.3cm
+</td><td>Autre</td></tr>
+</table>
+
+
+@section userdocResaListe Liste des réservations
+
+	
+@subsection tadToolsSYNTHESEResaStatus Statuts d'une réservation
+
+<table>
+<tr><td>
+@image html stop_blue.png
+@image latex stop_blue.png "" width=0.3cm
+</td><td>Réservation pouvant être annulée (option)</td></tr>
+<tr><td>
+@image html stop_green.png
+@image latex stop_green.png "" width=0.3cm
+</td><td>Réservation ne pouvant plus être annulée</td></tr>
+<tr><td>
+@image html car.png
+@image latex car.png "" width=0.3cm
+</td><td>Transport en cours</td></tr>
+<tr><td>
+@image html cross.png
+@image latex cross.png "" width=0.3cm
+</td><td>Réservation annulée dans les délais</td></tr>
+<tr><td>
+@image html asterisk_red.png
+@image latex asterisk_red.png "" width=0.3cm
+</td><td>Réservation annulée hors délai</td></tr>
+<tr><td>
+@image html user_cross.png
+@image latex user_cross.png "" width=0.3cm
+</td><td>Client signalé absent</td></tr>
+<tr><td>
+@image html tick.png
+@image latex tick.png "" width=0.3cm
+</td><td>Transport effectué</td></tr>
+</table>
+
+
+
+@section tadToolsSYNTHESEOnlineResa Activation compte de réservation en ligne pour utilisateur final
+
+@subsection tadToolsSYNTHESEOnlineResaPresentation Présentation
+
+La réservation en ligne comporte quatre fonctions principales :
+	- l'@ref tadToolsSYNTHESEOnlineResaActivation
+	- la @ref tadToolsSYNTHESETakeOnlineResa
+	- l'@ref tadToolsSYNTHESECancelOnlineResa
+	- la @subpage tadProceduresUserPasswordReinit
+
+@ref tadToolsSYNTHESEOnlineResaFAQ
+
+@subsection tadToolsSYNTHESEOnlineResaActivation Activation d'un compte de réservation en ligne
+
+L'activation d'un compte de réservation en ligne s'effectue par l'écran d'édition de client de TAD.
+
+Elle nécessite que les champs suivants soient préalablement remplis :
+	- Nom
+	- Prénom
+	- Téléphone
+	- E-mail
+	
+L'activation du compte s'effectue en sélectionnant la valeur OUI dans le champ <b>Auto-réservation activée</b>.
+
+Lorsque l'activation est enregistrée, SYNTHESE effectue les opérations suivantes :
+	- Génération d'un login composé de la première lettre du prénom du client, du nom du client, et d'un numéro complémentaire permettant de distinguer le client d'homonymes (ex : Gérard Dupont donne gdupont. Un second Gérard Dupont recevra le login gdupont1, etc.)
+	- Génération d'un mot de passe de 8 caractères composé aléatoirement de lettres minuscules, de lettres majuscules, et de chiffres (ex : dGeF4j7S)
+	- Envoi d'un mail de confirmation à l'utilisateur, reprenant ses informations personnelles, et rappelant certaines règles d'utilisation.
+
+Exemple de contenu d'e-mail d'activation de compte :
+
+<pre>
+
+________________________________________
+De : Centrale de réservation TAD [mailto:noreply@reservation.com] 
+Envoyé : dimanche, 23. août 2009 17:50
+À : Gérard Dupont
+Objet : Activation de votre accès à la réservation en ligne (gdupont)
+
+Le réseau TAD vous remercie pour votre inscription à son service de réservation en 
+ligne de TAD !
+
+MODE D'EMPLOI
+
+Votre compte est à présent activé pour effectuer vos réservations de TAD en 
+ligne sur le site Internet du réseau TAD.
+
+Lors de la préparation de votre déplacement, veuillez effectuer les opérations 
+suivantes :
+ * Accédez au service de recherche d'itinéraires
+ * Entrez votre trajet et la date de votre déplacement dans le formulaire 
+   puis cliquer sur Itinéraire aller
+ * Le tableau qui apparaît vous présente toutes les solutions possibles (bus 
+   et/ou TAD). Cliquez sur celle qui vous convient le mieux.
+ * Si le trajet proposé utilise une ligne TAD à réservation obligatoire, 
+   renseignez votre login et votre mot de passe dans le formulaire prévu à 
+   cet effet.
+ * Indiquez ensuite le nombre de places puis cliquer sur Réserver pour 
+   confirmer votre réservation.
+ * Un e-mail de confirmation vous est alors envoyé.
+ * En cas de désistement, conformez vous aux instructions présentes sur 
+   l'e-mail de confirmation. Toute réservation doit donner lieu à un 
+   déplacement, sous peine de fermeture de votre accès.
+
+Pour tout renseignement complémentaire, vous pouvez contacter par téléphone 
+le 0800 929 929 (appel gratuit depuis un poste fixe) ou le 05 34 25 33 75 
+(appel non surtaxé depuis un téléphone mobile) aux horaires d'ouverture du 
+service (de 6h30 à 22h30 tous les jours)
+
+Le service de réservation en ligne vous est offert pour faciliter vos 
+déplacements en TAD, en complément de la centrale d'information et de 
+réservation téléphonique. Votre accès peut à tout moment être suspendu par 
+Tisséo, notamment en cas d'utilisation abusive (ex : absences répétées).
+
+VOTRE ACCÈS
+
+Login : gdupont
+Mot de passe : dGeF4j7S
+Adresse du site de réservation : http://www.reservation.com/routeplanner/
+
+Pour modifier votre login ou pour réinitialiser votre mot de passe, vous 
+pouvez contacter par téléphone le 0800 929 929 (appel gratuit depuis un poste 
+fixe) ou le 05 34 25 33 75 (appel non surtaxé depuis un téléphone mobile) aux 
+horaires d'ouverture du service (de 6h30 à 22h30 tous les jours)
+
+RÉCAPITULATIF DE VOS INFORMATIONS DE CONTACT
+
+Prénom : Gérard
+Nom : Dupont
+Numéro de téléphone : 0534253375
+E-Mail : gerard@dupont.com
+
+Pour modifier vos informations de contact, vous pouvez contacter par téléphone 
+le 0800 929 929 (appel gratuit depuis un poste fixe) ou le 05 34 25 33 75 (appel 
+non surtaxé depuis un téléphone mobile) aux horaires d'ouverture du service (de 
+6h30 à 22h30 tous les jours)
+
+________________________________________
+
+Veuillez ne pas répondre à cet e-mail
+</pre>
+
+
+
+@section tadToolsSYNTHESETakeOnlineResa Réservation et annulation en ligne par client final
+
+@subsection tadToolsSYNTHESETakeOnlineResaReservation Réservation
+
+Le client doit cliquer sur le lien contenu dans le mail d'activation (voir ci-dessus).
+
+@image html routeplanner.png
+@image latex routeplanner.png width=14cm
+
+Saisir Commune de départ<br>
+Saisir Arrêt de départ<br>
+Saisir Commune d'arrivée<br>
+Saisir Arrêt d'arrivée<br>
+Vérifier la date du trajet et la période de la journée<br>
+Saisir Utilisateur et Mot de passe conformément au contenu du mail d'activation<br>
+
+Puis cliquer sur <b>"OK"</b>
+
+@image html onlineresaselectionhoraire.png
+@image latex onlineresaselectionhoraire.png width=14cm
+
+Cliquer sur la colonne de l'horaire choisit pour afficher la feuille de route correspondante.
+
+@image html onlineresarouteplan.png
+@image latex onlineresarouteplan.png width=14cm
+
+Sélectionner le nombre de places désiré.<br>
+Cliquer sur <b>"Réserver"</b>
+
+La réservation est validée :
+
+@image html onlineresarouteplanresaeffectuee.png
+@image latex onlineresarouteplanresaeffectuee.png width=14cm
+
+fermer la fenêtre (en cliquant sur le "x" en haut à droite de celle-ci)
+
+si un retour est désiré cliquer sur le bouton <b>"Retour"</b>
+
+un mail est envoyé automatiquement au client.
+
+
+@subsection tadToolsSYNTHESECancelOnlineResa Annulation de réservation en ligne
+
+Depuis le mail de confirmation de réservation.
+Aller dans la section ANNULATION
+
+@image html onlineresamailannul.png
+@image latex onlineresamailannul.png width=14cm
+
+cliquer sur le lien.<br>
+Se connecter avec ses identifiants.
+
+@image html onlineresacancel.png
+@image latex onlineresacancel.png width=14cm
+
+Cliquer sur <b>"Annuler la réservation"</b><br>
+Sur la fenêtre de confirmation, cliquer sur <b>OK</b>
+
+@image html onlineresaconfirmcancel.png
+@image latex onlineresaconfirmcancel.png width=14cm
+
+
+*/

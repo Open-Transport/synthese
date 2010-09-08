@@ -1,0 +1,2 @@
+
+synthese::graph::RuleUserUpdateAction::integrate();

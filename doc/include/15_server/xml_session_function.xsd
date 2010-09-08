@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="login" type="LoginType">
+		<xs:annotation>
+			<xs:documentation>root element</xs:documentation>
+		</xs:annotation>
+	</xs:element>
+	<xs:complexType name="LoginType">
+		<xs:sequence>
+			<xs:element name="session" type="xs:string"/>
+			<xs:sequence minOccurs="0">
+				<xs:element name="name" type="xs:string"/>
+				<xs:element name="phone" type="xs:string"/>
+				<xs:element name="email" type="xs:string"/>
+				<xs:element name="user_id" type="xs:long"/>
+			</xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

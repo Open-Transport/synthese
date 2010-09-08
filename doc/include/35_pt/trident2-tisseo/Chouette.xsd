@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- edited with XMLSpy v2007 (http://www.altova.com) by Totot (Tutut) -->
+<!-- edited with XMLSPY v2004 rel. 3 U (http://www.xmlspy.com) by Christophe Duquesne (DRYADE SARL) -->
+<!--
+@@LICENCE@@
+-->
+<!-- ==========================================================================	-->
+<!--  																			-->
+<!-- Societe DRYADE																-->
+<!--  																			-->
+<!-- projet chouette : Schema XSD												-->
+<!--  																			-->
+<!-- build.xml : Description XML du profil Chouette 							-->
+<!--  																			-->
+<!-- Version : $Revision: 1.3 $												-->
+<!--  																			-->
+<!-- Historique des modifications :												-->
+<!-- Date      | Auteur         | Libelle										-->
+<!-- ==========================================================================	-->
+<!-- 01/10/2004|Marc FLORISSON  | Creation										-->
+<!-- ==========================================================================	-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.trident.org/schema/trident" xmlns:trd="http://www.trident.org/schema/trident" targetNamespace="http://www.trident.org/schema/trident" elementFormDefault="qualified" version="1.00">
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+TRIDENT exchange schema.
+Request / Answer schema
+Copyright (c) 2001 TRIDENT consortium, All Rights Reserved.
+		</xsd:documentation>
+	</xsd:annotation>
+	<xsd:include schemaLocation="./trident/trident_Global_schema.xsd"/>
+	<xsd:include schemaLocation="./trident/trident_Location_schema.xsd"/>
+	<xsd:include schemaLocation="./trident/trident_PT_schema.xsd"/>
+	<!-- **************************************************************** -->
+	<xsd:complexType name="ITLType">
+		<xsd:annotation>
+			<xsd:documentation>Interdiction de trafic local</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="areaId" type="TridentIdType"/>
+			<xsd:element name="lineIdShortCut" type="TridentIdType" minOccurs="0"/>
+			<xsd:element name="name" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="TimeSlotType">
+		<xsd:annotation>
+			<xsd:documentation>Type pour les fréquences horaire</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexContent>
+			<xsd:extension base="trd:TridentObjectType">
+				<xsd:sequence>
+					<xsd:element name="beginningSlotTime" type="xsd:time"/>
+					<xsd:element name="endSlotTime" type="xsd:time"/>
+					<xsd:element name="firstDepartureTimeInSlot" type="xsd:time"/>
+					<xsd:element name="lastDepartureTimeInSlot" type="xsd:time"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<xsd:complexType name="RouteExtension">
+		<xsd:annotation>
+			<xsd:documentation>Extension d'itinéraire qui en précise le sens, aller ou retour</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="wayBack" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="StopAreaExtension">
+		<xsd:annotation>
+			<xsd:documentation>Extension de zone d'arrêts qui précise notamment un code tarifaire et un identifiant fonctionnel</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="areaType" type="ChouetteAreaType"/>
+			<xsd:element name="nearestTopicName" type="xsd:string" minOccurs="0"/>
+			<xsd:element name="fareCode" type="xsd:int" minOccurs="0"/>
+			<xsd:element name="registration" type="RegistrationType" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ChouettePTNetworkType">
+		<xsd:annotation>
+			<xsd:documentation>La strucutre d'échange d'une ligne de transport.
+Cette strucuture contient la totalité des données qui décrivent la ligne.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PTNetwork" type="trd:PTNetworkType">
+				<xsd:annotation>
+					<xsd:documentation>Le réseau de la ligne</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="GroupOfLine" type="GroupOfLineType" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>Groupe de ligne auquel appartient la ligne décrite</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Company" type="trd:CompanyType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>La compagnie de transport qui assure l'exploitation de la ligne.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="ChouetteArea">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="StopArea" minOccurs="0" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>La liste des zones dons le type figure sur l'extension</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:complexContent>
+									<xsd:extension base="StopAreaType">
+										<xsd:sequence>
+											<xsd:element name="StopAreaExtension" type="StopAreaExtension" minOccurs="0"/>
+										</xsd:sequence>
+									</xsd:extension>
+								</xsd:complexContent>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="AreaCentroid" minOccurs="0" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Liste de position géographiques</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:complexContent>
+									<xsd:extension base="PlaceType"/>
+								</xsd:complexContent>
+							</xsd:complexType>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="ConnectionLink" type="ConnectionLinkType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>La liste de toutes les correspondances sur la ligne.
+Les correspondances relient un arrêt de la ligne avec un autre arrêt de cette même ligne ou d'une autre ligne.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Timetable" type="TimetableType" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>La liste des tableaux de marche.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="TimeSlot" type="TimeSlotType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="ChouetteLineDescription">
+				<xsd:annotation>
+					<xsd:documentation>Structure qui regroupe les autres données de la ligne.
+</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Line" type="LineType">
+							<xsd:annotation>
+								<xsd:documentation>La ligne et ses références vers ses itinéraires et son réseau</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="ChouetteRoute" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>La liste de tous les itinéraires de la ligne.</xsd:documentation>
+							</xsd:annotation>
+							<xsd:complexType>
+								<xsd:complexContent>
+									<xsd:extension base="RouteType">
+										<xsd:sequence>
+											<xsd:element name="RouteExtension" type="RouteExtension" minOccurs="0"/>
+										</xsd:sequence>
+									</xsd:extension>
+								</xsd:complexContent>
+							</xsd:complexType>
+						</xsd:element>
+						<xsd:element name="StopPoint" type="StopPointType" minOccurs="2" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>La liste de tous les arrêts parcourus par les tronçons des itinéraires de ligne.
+
+</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="ITL" type="ITLType" minOccurs="0" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>Liste des interdictions de trafic local auxquelles doivent se conformer les voyageurs de la ligne</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="PtLink" type="PTLinkType" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>La liste de tous les tronçons des itinéraires de la ligne.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="JourneyPattern" type="JourneyPatternType" minOccurs="0" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>La liste de toutes les missions des courses de la ligne.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+						<xsd:element name="VehicleJourney" type="VehicleJourneyType" minOccurs="0" maxOccurs="unbounded">
+							<xsd:annotation>
+								<xsd:documentation>La liste de toutes les courses de la ligne qui sont effectives pour au moins l'un des tableaux de marche de la ligne.</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- Definition des instances -->
+	<xsd:element name="ChouettePTNetwork" type="ChouettePTNetworkType"/>
+	<xsd:simpleType name="ChouetteAreaType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="Quay"/>
+			<xsd:enumeration value="BoardingPosition"/>
+			<xsd:enumeration value="CommercialStopPoint"/>
+			<xsd:enumeration value="StopPlace"/>
+			<xsd:enumeration value="ITL"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>

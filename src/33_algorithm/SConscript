@@ -1,0 +1,12 @@
+Import ('s3env')
+
+CppSynthese3LibProject(
+	s3env, 's3-algorithm', s3env['S3VERSION'], 
+	source_files = s3env.Glob ('*.cpp'),
+	dependencies = [
+		's3-pt.cpplib',
+		's3-road.cpplib',
+		's3-resa.cpplib',
+		's3-messages.cpplib',
+	]
+)

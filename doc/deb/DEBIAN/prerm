@@ -1,0 +1,10 @@
+#!/bin/bash
+
+
+rm -f /var/www/s3-doc
+
+exit 0
+
+
+
+

@@ -1,0 +1,26 @@
+Import ('s3env')
+
+if (s3env['_PLATFORM']=='win32'):
+	s3env.Append ( LIBS = [] )  
+
+CppSynthese3BinProject(
+	s3env,
+	's3-server',
+	s3env['S3VERSION'], 
+    include_dir = s3env.SrcDir('.'),
+    source_files = s3env.Glob ('main.cpp'),
+	dependencies = [
+		's3-departure-boards.cpplib',
+		's3-map.cpplib',
+		's3-hiking.cpplib',
+		's3-road-journey-planner.cpplib',
+		's3-pt-journey-planner.cpplib',
+		's3-timetables.cpplib',
+		's3-forum.cpplib',
+		'boost.cppinc',
+		('boost-program-options.cpplib',s3env['BOOSTVERSION'])
+	],
+	extra_dependencies = [
+		('psmisc', '22')
+	]
+)

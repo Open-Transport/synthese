@@ -1,0 +1,13 @@
+Import ('s3env')
+
+CppSynthese3LibProject(
+	s3env, 's3-road', s3env['S3VERSION'], 
+	source_files = s3env.Glob ('*.cpp'),
+	dependencies = [
+		'shapelib.cpplib',
+		's3-graph.cpplib',
+		's3-impex.cpplib',
+		's3-geography.cpplib',
+		's3-openstreetmap.cpplib'
+	]
+)

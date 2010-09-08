@@ -1,0 +1,46 @@
+#!/bin/bash
+
+
+NAME=s3-server
+
+source /etc/opt/rcs/$NAME.conf
+
+DAEMON=/opt/rcs/bin/$NAME
+
+test -x $DAEMON || exit 0
+
+# delete stale pid file if any
+(pgrep -P 1 ${NAME:0:15} >& /dev/null) || (rm -f $S3_SERVER_PID_FILE)
+
+case "$1" in
+
+    start)
+	echo "Starting $NAME server... "
+	/opt/rcs/bin/$NAME-wd.sh &
+	while [ ! -e $S3_SERVER_PID_FILE ]
+	do
+		sleep 1
+	done
+	;;
+    stop)
+	echo "Stopping $NAME server... "
+	killall -q $NAME-wd.sh
+	test -f $S3_SERVER_PID_FILE && kill -15 `cat $S3_SERVER_PID_FILE`
+	pkill -P 1 ${NAME:0:15} >& /dev/null
+	;;
+    restart)
+	$0 stop
+	sleep 1
+	$0 start
+	;;
+    status)
+	(test -r $S3_SERVER_PID_FILE && echo "Process $NAME is running with pid $(cat $S3_SERVER_PID_FILE).") || echo "$NAME server is not running."
+	;;
+    *)
+	echo "Usage: $0 start|stop|restart|status" >&2
+	exit 1
+	;;
+esac
+
+exit 0
+
