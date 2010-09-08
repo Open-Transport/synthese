@@ -145,7 +145,7 @@ namespace synthese
 					ParametersMap pm(_aditionnalParameters);
 					pm.remove(PARAMETER_PAGE_ID);
 					pm.remove(PARAMETER_SMART_URL);
-					pm.remove(FunctionWithSite::PARAMETER_SITE);
+					pm.remove(FunctionWithSiteBase::PARAMETER_SITE);
 					string parameters(pm.getURI());
 					if(!parameters.empty())
 					{
