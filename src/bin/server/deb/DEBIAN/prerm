@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source /etc/opt/rcs/s3-server.conf
+
+test ! -x /etc/init.d/s3-server || /etc/init.d/s3-server stop && 
+exit 0
+
+

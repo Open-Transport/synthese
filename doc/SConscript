@@ -1,0 +1,3 @@
+Import ('s3env')
+
+DoxProject(s3env, 's3-doc', s3env.SrcFile('Doxyfile.doxyfile'), s3env['S3VERSION'])

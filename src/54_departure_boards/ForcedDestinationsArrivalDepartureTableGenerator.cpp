@@ -1,0 +1,227 @@
+
+/** ForcedDestinationsArrivalDepartureTableGenerator class implementation.
+	@file ForcedDestinationsArrivalDepartureTableGenerator.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "StopPoint.hpp"
+#include "StopArea.hpp"
+#include "LineStop.h"
+#include "JourneyPattern.hpp"
+#include "ForcedDestinationsArrivalDepartureTableGenerator.h"
+#include "StandardArrivalDepartureTableGenerator.h"
+#include "GraphConstants.h"
+
+#include <boost/foreach.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+using namespace std;
+using namespace boost;
+using namespace boost::posix_time;
+
+
+namespace synthese
+{
+	using namespace pt;
+	using namespace graph;
+	using namespace pt;
+	
+
+	namespace departure_boards
+	{
+
+		ForcedDestinationsArrivalDepartureTableGenerator::ForcedDestinationsArrivalDepartureTableGenerator(
+			const PhysicalStops& physicalStops
+			, const DeparturesTableDirection& direction
+			, const EndFilter& endfilter
+			, const LineFilter& lineFilter
+			, const DisplayedPlacesList& displayedPlacesList
+			, const ForbiddenPlacesList& forbiddenPlaces,
+			const TransferDestinationsList& transferDestinations
+			, const ptime& startTime
+			, const ptime& endDateTime
+			, size_t maxSize
+			, const ForcedDestinationsSet& forcedDestinations
+			, time_duration persistanceDuration
+		):	ArrivalDepartureTableGenerator(
+				physicalStops,
+				direction,
+				endfilter,
+				lineFilter,
+				displayedPlacesList,
+				forbiddenPlaces,
+				transferDestinations,
+				startTime,
+				endDateTime,
+				maxSize
+			),
+			_forcedDestinations(forcedDestinations),
+			_persistanceDuration(persistanceDuration)
+		{
+			// Add terminuses to forced destinations
+			BOOST_FOREACH(const PhysicalStops::value_type& it, _physicalStops)
+			{
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
+				{
+					const LineStop* ls = static_cast<const LineStop*>(edge.second);
+
+					if (!_allowedLineStop(ls))
+						continue;
+
+					const StopArea* place(
+						ls->getLine()->getDestination()->getConnectionPlace()
+					);
+					_forcedDestinations.insert(make_pair(place->getKey(), place));
+				}
+			}
+		}
+
+
+
+
+		const ArrivalDepartureList& ForcedDestinationsArrivalDepartureTableGenerator::generate()
+		{
+			if(_physicalStops.empty()) return _result;
+
+			/** - Search of best departure for each forced destination */
+			typedef map<const StopArea*, ArrivalDepartureList::iterator> ReachedDestinationMap;
+			ReachedDestinationMap reachedDestination;
+
+			const StopArea::PhysicalStops& physicalStops(_physicalStops.begin()->second->getConnectionPlace()->getPhysicalStops());
+			
+			BOOST_FOREACH(const PhysicalStops::value_type& it, physicalStops)
+			{
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
+				{
+					const LineStop* ls = static_cast<const LineStop*>(edge.second);
+
+					// Selection of the line
+					if (!_allowedLineStop(ls))
+						continue;
+
+					// Max time for forced destination
+					ptime maxTimeForForcedDestination(_startDateTime);
+					maxTimeForForcedDestination += _persistanceDuration;
+					ptime minTimeForForcedDestination(_startDateTime);
+					ServicePointer serviceInstance;
+
+					optional<Edge::DepartureServiceIndex::Value> minIndex;
+					while(true)
+					{
+						// Next service
+						serviceInstance = ls->getNextService(
+							USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
+							minTimeForForcedDestination,
+							maxTimeForForcedDestination,
+							false,
+							minIndex
+						);
+
+						if(	serviceInstance.getService() == NULL ||
+							_physicalStops.find(serviceInstance.getRealTimeDepartureVertex()->getKey()) != _physicalStops.end()
+						){
+							break;
+						}
+
+						++*minIndex;
+						minTimeForForcedDestination = serviceInstance.getDepartureDateTime();
+					}
+
+					if (serviceInstance.getService() == NULL)
+						continue;
+
+//					bool insertionIsDone = false;
+
+					// Exploration of the line
+					for(const LineStop* curGLA(
+							static_cast<const LineStop*>(ls->getFollowingArrivalForFineSteppingOnly())
+						);
+						curGLA != NULL;
+						curGLA = static_cast<const LineStop*>(curGLA->getFollowingArrivalForFineSteppingOnly())
+					){
+						const StopArea* connectionPlace(
+							curGLA->getPhysicalStop()->getConnectionPlace()
+						);
+
+						// Attempting to select the destination
+						if (_forcedDestinations.find(connectionPlace->getKey()) == _forcedDestinations.end())
+							continue;
+
+						// If first reach
+						if (reachedDestination.find(connectionPlace) == reachedDestination.end())
+						{
+							// Allocation
+							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
+
+							// Links
+							reachedDestination[curGLA->getPhysicalStop()->getConnectionPlace()] = itr;
+						}
+						// Else optimizing a previously founded ptd
+						else if(serviceInstance.getDepartureDateTime() <
+							reachedDestination[connectionPlace]->first.getDepartureDateTime()
+						){
+							// Allocation
+							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
+							ArrivalDepartureList::iterator oldIt = reachedDestination[connectionPlace];
+
+							reachedDestination[curGLA->getPhysicalStop()->getConnectionPlace()] = itr;
+
+								// If the preceding ptd is not used for an other place, deletion
+							ReachedDestinationMap::iterator it;
+							for (it	= reachedDestination.begin();
+								it != reachedDestination.end(); ++it)
+								if (it->second == oldIt)
+									break;
+							if (it == reachedDestination.end())
+								_result.erase(oldIt);
+						}
+					}
+				}
+			}
+
+			// In case of incomplete departure table, the serie is filled with normal algorithm
+			if (_result.size() < _maxSize)
+			{
+				StandardArrivalDepartureTableGenerator standardTable(_physicalStops, _direction, _endFilter
+					, _lineFilter, DisplayedPlacesList(), _forbiddenPlaces, _transferDestinations, _startDateTime, _endDateTime, _maxSize + _result.size());
+				const ArrivalDepartureList& standardTableResult = standardTable.generate();
+
+				for (ArrivalDepartureList::const_iterator itr = standardTableResult.begin();
+					_result.size() < _maxSize && itr != standardTableResult.end(); ++itr)
+				{
+					if (_result.find(itr->first) == _result.end())
+						_insert(itr->first);
+				}
+			}
+
+
+			if (_result.size() > _maxSize)
+			{
+			    ArrivalDepartureList::iterator itr = _result.begin ();
+			    std::advance(itr, _maxSize);
+			    _result.erase (itr, _result.end ());
+			}
+
+
+			return _result;
+
+		}
+
+	}
+}

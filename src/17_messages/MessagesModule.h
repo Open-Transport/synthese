@@ -1,0 +1,127 @@
+
+/** MessagesModule class header.
+	@file MessagesModule.h
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#ifndef SYNTHESE_MessagesModule_H__
+#define SYNTHESE_MessagesModule_H__
+
+#include "01_util/Constants.h"
+#include "ModuleClassTemplate.hpp"
+#include "Registry.h"
+#include "17_messages/Types.h"
+
+#include <vector>
+#include <string>
+#include <boost/optional.hpp>
+
+namespace synthese
+{
+	/** @defgroup m17Exceptions 17.01 Exceptions
+		@ingroup m17
+		
+		@defgroup m17LS 17.10 Table synchronizers
+		@ingroup m17
+
+		@defgroup m17Pages 17.11 Pages
+		@ingroup m17
+
+		@defgroup m17Rights 17.12 Rights
+		@ingroup m17
+
+		@defgroup m17Logs 17.13 DB Logs
+		@ingroup m17
+
+		@defgroup m17Admin 17.14 Administration pages
+		@ingroup m17
+
+		@defgroup m17Functions 17.15 Functions
+		@ingroup m17
+
+		@defgroup m17Actions 17.15 Actions
+		@ingroup m17
+		
+		@defgroup m17 17 Messages
+		@ingroup m1
+	@{	*/
+
+	/** 17 Messages module namespace.
+	*/
+	namespace messages
+	{
+		/** 17 Messages module class.
+		*/
+		class MessagesModule:
+			public server::ModuleClassTemplate<MessagesModule>
+		{
+		public:
+			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
+
+			/** Labels list containing each scenario template ordered by folder, indicating the full path in the folder tree.
+				@param withAllLabel if non empty, add an option "all scenarios" (value -1) with the specified label
+				@param folderId id of the main parent folder (optional) :
+					- 0/default value is the root folder
+					- UNKWNOWN_VALUE = do not use this criteria : return all templates without their full path
+				@param prefix text to add at the beginning of each item (optional)
+				@return The list
+				@author Hugues Romain
+				@date 2008
+			*/
+			static Labels GetScenarioTemplatesLabels(
+				std::string withAllLabel = std::string(),
+				std::string withNoLabel = std::string(),
+				boost::optional<util::RegistryKeyType> folderId = boost::optional<util::RegistryKeyType>(),
+				std::string prefix = std::string()
+			);
+
+
+
+			/** Labels list containing each scenario template folder, indicating the full path in the folder tree.
+				@param folderId id of the main parent folder (optional)
+				@param prefix text to add at the beginning of each item (optional)
+				@param forbiddenFolderId id of a folder which must not be present in the result
+				@return The list
+				@author Hugues Romain
+				@date 2008
+			*/
+			static Labels GetScenarioFoldersLabels(
+				util::RegistryKeyType folderId = 0
+				, std::string prefix = std::string()
+				, boost::optional<util::RegistryKeyType> forbiddenFolderId = boost::optional<util::RegistryKeyType>()
+			);
+
+			typedef std::vector<std::pair<boost::optional<AlarmLevel>, std::string> > LevelLabels;
+
+			static LevelLabels getLevelLabels(bool withAll = false);
+			
+			static Labels GetLevelLabelsWithScenarios(
+				bool withAll
+			);
+			static std::vector<std::pair<AlarmConflict, std::string> >	getConflictLabels(bool withAll = false);
+			static Labels			getTextTemplateLabels(const AlarmLevel& level);
+
+			static std::string							getLevelLabel(const AlarmLevel& level);
+			static std::string							getConflictLabel(const AlarmConflict& conflict);
+		};
+	}
+	/** @} */
+}
+
+#endif // SYNTHESE_MessagesModule_H__

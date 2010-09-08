@@ -1,0 +1,18 @@
+/** @page admindoc Administrator manual
+
+<ul>
+	<li>Installation</li>
+	<li>Binaries</li>
+	<ul>
+		<li>SYNTHESE server</li>
+		<li>RS485 Client</li>
+	</ul>
+	<li>Third-party software</li>
+	<ul>
+		<li><a href="http://www.sqlite.org/sqlite.html">SQLite binary</a></li>
+		<li><a href="http://www.sqlite.org/lang.html">SQLite SQL language</a></li>
+		<li><a href="http://www.math-linux.com/spip.php?article58">APT documentation</a></li>
+	</ul>
+</ul>
+
+*/

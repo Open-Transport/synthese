@@ -1,0 +1,25 @@
+#!/bin/bash
+
+
+mkdir -p /srv/tmp
+
+source /etc/opt/rcs/s3-server.conf
+
+# Create var dir
+mkdir -p `dirname $S3_SERVER_DB_FILE`
+mkdir -p $S3_SERVER_TMP_DIR
+mkdir -p `dirname $S3_SERVER_PID_FILE`
+mkdir -p `dirname $S3_SERVER_LOG_FILE`
+
+# Auto start at boot time
+update-rc.d -f s3-server defaults
+
+# Start server
+test -x /etc/init.d/s3-server && /etc/init.d/s3-server start && exit 0
+
+
+
+
+
+
+

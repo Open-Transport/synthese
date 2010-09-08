@@ -1,0 +1,60 @@
+/** @page drt Réservation de transport à la demande (TAD)
+
+SYNTHESE embarque en standard un module de gestion des réservations TAD utilisé sur l’agglomération toulousaine depuis 2004, et ayant pris en charge depuis cette date environ 1 200 000 réservations (par téléphone ou par Internet)
+Les + de SYNTHESE : fort de 5 ans d’expérience dans l’exploitation du plus important réseau TAD de France (2000 clients par jour), le module réservation de SYNTHESE est un outil parfaitement maitrisé, y compris en auto-réservation par Internet avec protection par mot de passe. Il est donc proposé d’ouvrir la fonction réservation au public également.
+
+Il propose deux vues :
+<ul>
+<li>Une vue client, permettant après identification par mot de passe, de prendre une réservation, de la consulter, et de l’annuler</li>
+<li>Une vue opérateur, permettant d’accéder à toutes les fonctionnalités, dont les feuilles de route pour conducteurs</li>
+</ul>
+
+<h2>Vue client</h2>
+ 
+La vue client est organisée comme suit :
+ 
+La vue client consiste en l’utilisation du calculateur d’itinéraires, présentant un formulaire de prise de réservation dans la feuille de route si besoin :
+ 
+Si le client n’est pas identifié, il doit tout d’abord renseigner un champ login et un champ mot de passe. Les login et mots de passe sont créés par téléphone par un opérateur humain, afin d’effectuer divers contrôles de routine et de dissuader d’éventuelles personnes mal intentionnées.
+Une fois la réservation prise, le client reçoit un e-mail de confirmation comportant un lien vers la page de consultation/annulation :
+ 
+L’annulation de réservation  donne lieu à un affichage de confirmation :
+
+<h2>Vue opérateur</h2>
+ 
+La vue opérateur se présente quant à elle dans la console d’administration :
+ 
+Il comporte 5 rubriques :
+<ul>
+<li>Consultation des réservations</li>
+<li>Fichier clients</li>
+<li>Journal des événements (dont appels)</li>
+<li>Statistiques</li>
+<li>Calcul d’itinéraire par interface professionnelle</li>
+</ul>
+
+Quelques captures d’écran :
+ 
+Liste des réservations triées par ordre de desserte, à destination des conducteurs
+
+ 
+Fiche client (noter que ce client dispose d’un compte pour auto-réservation par internet). Un onglet donne accès au journal complet du client (appels et réservations)
+
+ 
+Journal chronologique Noter les envois d’e-mail lors de l’utilisation des fonctions d’auto-réservation par Internet
+
+ 
+Ecran de statistiques des événements
+
+ 
+Calculateur d’itinéraires professionnel (pas de phrases explicatives, vue concise, et navigation 100% clavier pour augmenter le rendement d’utilisation)
+
+
+<h2>Liens vers la documentation technique</h2>
+
+<ul>
+<li>@ref m31</li>
+<li>@ref m53</li>
+</ul>
+
+*/

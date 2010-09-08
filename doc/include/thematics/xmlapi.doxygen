@@ -1,0 +1,26 @@
+/** @page xmlapi XML API
+
+@section xmlsession 15 Server and sessions 
+
+@copydoc synthese::server::LoginAction
+@copydoc synthese::server::LogoutAction
+@copydoc synthese::server::XMLSessionFunction
+@copydoc synthese::server::XMLSessionIsValidFunction
+
+@section xmlresa 31 Reservation
+
+@copydoc synthese::resa::BookReservationAction
+@copydoc synthese::resa::CancelReservationAction
+@copydoc synthese::resa::XMLReservationFunction
+
+@section xmlrouteplanning 53 PT Journey Planner
+
+@copydoc synthese::pt_journey_planner::RoutePlannerFunction
+
+@section xmlptwebsite 56 Transport web site
+
+@copydoc synthese::pt_website::CityListFunction
+@copydoc synthese::pt_website::PlacesListFunction
+
+
+*/

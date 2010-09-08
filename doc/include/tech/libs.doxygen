@@ -1,0 +1,22 @@
+/** @page tools Libraries and tools
+
+<h1>Libraries</h1>
+
+<ul>
+	<li><a href="http://www.boost.org/">Boost</a></li>
+	<ul>
+		<li><a href="http://www.boost.org/doc/libs/1_39_0/doc/html/boost_asio.html">AsIO (HTTP server)</a></li>
+		<li><a href="http://www.boost.org/doc/libs/1_39_0/doc/html/date_time.html">Date Time</a></li>
+		<li><a href="http://www.boost.org/doc/libs/1_39_0/doc/html/foreach.html">ForEach</a></li>
+		<li><a href="http://www.boost.org/doc/libs/1_39_0/libs/filesystem/doc/index.htm">Filesystem</a></li>
+		<li><a href="http://www.boost.org/doc/libs/1_39_0/libs/optional/doc/html/index.html">Optional</a></li>
+		<li><a href="http://www.boost.org/doc/libs/1_39_0/doc/html/program_options.html">Program options</a></li>
+		<li><a href="http://www.boost.org/doc/libs/1_39_0/doc/html/string_algo.html">String algorithms</a></li>
+		<li><a href="http://www.boost.org/doc/libs/1_39_0/doc/html/thread.html">Threads</a></li>
+		<li><a href="http://www.boost.org/doc/libs/1_39_0/libs/tokenizer/index.html">Tokenizer</a></li>
+	</ul>
+	<li><a href="http://www.cplusplus.com/reference/stl/">STL</a></li>
+	<li><a href="http://www.sqlite.org/cintro.html">SQLite API</a></li>
+</ul>
+
+*/

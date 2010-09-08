@@ -1,0 +1,16 @@
+Import ('s3env')
+
+senv = s3env.Clone ()
+
+CppSynthese3LibProject(
+	senv,
+	's3-timetables',
+	s3env['S3VERSION'],
+	source_files = senv.Glob ('*.cpp'),
+	dependencies = [
+		's3-util.cpplib',
+		's3-db.cpplib',
+		's3-pt.cpplib',
+		'boost.cppinc'
+	]
+)

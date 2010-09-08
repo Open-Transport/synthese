@@ -1,0 +1,8 @@
+Import ('s3env')
+
+senv = s3env.Clone ()
+
+if s3env.GetPlatform () == 'posix':
+   CppLibProject (senv, 's3-acapela-client', s3env['S3VERSION'], 
+                        source_files = senv.Glob ('*.cpp'),
+                        dependencies = ['nscube.cpplib'])
