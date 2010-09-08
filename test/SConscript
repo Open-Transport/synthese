@@ -11,4 +11,6 @@ s3env.Append(BOOSTVERSION = '1.39')
 
 #s3env.Append (CPPPATH = [Dir ('.').abspath])
 
+Export ('s3env')
+
 s3env.SubBuild ()

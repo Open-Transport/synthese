@@ -801,7 +801,7 @@ namespace synthese
 				s << " disabled=\"disabled\"";
 			}
 			s << " /><label for=\"" << id << "\">" << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(label)) << "</label>";
-			removeHiddenFieldIfExists(name, valueToSelect ? boost::lexical_cast<std::string>(*valueToSelect) : string());
+			removeHiddenFieldIfExists(name, valueToSelect ? boost::lexical_cast<std::string>(*valueToSelect) : std::string());
 			return s.str();
 		}
 
