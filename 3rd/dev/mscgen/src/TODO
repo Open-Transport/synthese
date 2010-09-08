@@ -1,0 +1,3 @@
+Make the entitiy spacing dependent on the number of entities.
+  i.e. 2 entities are more spaced than an MSC with 8.
+  

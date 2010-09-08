@@ -1,0 +1,177 @@
+Import ('env')
+
+import os
+
+senv = env.Clone ()
+
+
+
+## BOOST #############################################################################################################################
+## http://www.boost.org/doc/libs/1_39_0/libs/iostreams/doc/installation.html
+
+class BoostProject (CppLibProject):
+
+	def __init__ (self, senv, name, version):
+		if (name == 'boost_iostreams' and senv.GetPlatform () != 'win32'):
+			deps = ['boost-zlib.cpplib']
+		else:
+			deps = None
+		CppLibProject.__init__ (
+			self
+			, senv
+			, name
+			, version
+			, source_files = ['src/boost-build.jam']
+			, include_dir = senv.SrcDir('src')
+			, dependencies = deps
+			, filesrootdir = senv.SrcDir('src' + os.sep + 'boost' + os.sep + name.replace('boost_',''))
+		)
+
+	def get_libs(self):
+		name = 'lib'
+		if self.name == 'boost_test':
+			name = name + 'boost_unit_test_framework'
+		else:
+			name = name + self.name
+		if self.env.GetPlatform () == 'win32':
+			name = name + '-vc90'
+			name = name + '-mt-s'
+		#if self.env.GetPlatform () == 'posix':
+		#	name = name + '-gcc'
+		if self.env.IsCppModeDebug():
+			if self.env.GetPlatform () == 'win32':
+				name = name + 'gd'
+		#	if self.env.GetPlatform () == 'posix':
+		#		name = name + '-d'
+		if self.env.GetPlatform () == 'win32':
+			name = name + '-' + self.version.version.replace('.','_')
+		return [name]
+	
+
+	def declare(self):
+		if self.env.GetPlatform () == 'win32' and self.name == 'boost_zlib':
+			return
+		zlibinclude = env.SrcDir('#3rd/dev/zlib/src')
+		if self.mode == 'static':
+			zlibpath = self.env.GetBuildPath('#build/'+ env.GetCppMode () +'/3rd/dev/zlib')
+			options = ['--build-dir="%s"' % Dir ('.').abspath,
+					   '--toolset=' + env.GetCppToolset (),
+					   '--layout="system"',
+					   '--stagedir="%s"' % Dir ('.').abspath,
+					   '--debug-configuration=%s' % env.IsCppModeDebug(),
+					   '-sTOOLS=%s' % env.GetCppToolset (),
+					   '-sNO_GNU_LN=1 -sNO_BZIP2=1',
+					   '-sZLIB_SOURCE="%s"' % zlibinclude,
+					   '-sZLIB_INCLUDE="%s"' % zlibinclude,
+					   '-sBUILD="%s <runtime-link>%s <threading>%s" stage' % (env.GetCppMode (), 'static', 'multi'),
+					   '--with-' + self.name.replace ('boost_', ''),
+					   env.GetCppMode ()               
+					   ]
+
+			targets = list ()
+			itargets = list ()
+			if self.env.GetPlatform () == 'win32':
+			  suffix = '-mt'
+			  if self.env.IsCppModeDebug (): suffix = suffix + '-sgd'
+			  suffix2 = '-vc90-mt-s'
+			  if self.env.IsCppModeDebug (): suffix2 = suffix2 + 'gd-'
+			  suffix2 = suffix2 + self.version.version.replace('.','_')
+			  if self.name == 'boost_test':
+				for libname in ['boost_prg_exec_monitor', 'boost_unit_test_framework']:
+				  targets.append (File (libname + suffix2 + '.lib', 'lib'))
+				  itargets.append (File (libname.replace ('_', '-') + '.lib', self.env.Dir('.')))
+			  else:
+				#targets.append (File (self.name + suffix + '.lib', 'lib'))
+				targets.append (File ('lib'+ self.name + '.lib', 'lib'))
+				itargets.append (File(self.get_libs()[0] +'.lib',  env['_REPO_STLIB_DIR']))
+			else:
+			  suffix = '-mt'
+			  if self.env.IsCppModeDebug () : suffix = suffix + '-d'
+			  if self.name == 'boost_test':
+				for libname in ['boost_prg_exec_monitor', 'boost_unit_test_framework']:
+				  targetname = self.env.subst ('$LIBPREFIX') + libname + suffix + self.env.subst('$LIBSUFFIX')	  
+				  targets.append (File (targetname, 'lib'))
+				  itargets.append (File (self.env.subst ('$LIBPREFIX') + libname.replace ('_', '-') + self.env.subst('$LIBSUFFIX'), env['_REPO_STLIB_DIR']))
+			  else:
+				targetname = self.get_libs()[0] + self.env.subst('$LIBSUFFIX')	  
+				targets.append (File (targetname, 'lib'))
+				itargets.append (File (targetname, env['_REPO_STLIB_DIR']))
+
+			lenv = self.env.Clone ()
+			lenv['BJAMOPTIONS'] = options
+			lenv.BJam (targets, 'src/boost-build.jam')
+			self.env.InstallAs (itargets, targets)
+			self.targets.extend(itargets)
+
+		else: # shared mode
+			zlibpath = Dir (env['_REPO_SHLIB_DIR']).abspath
+
+			if self.name == 'boost_zlib':
+				withname = 'iostreams'
+			else:
+				withname = self.name.replace('boost_','')
+
+			options = ['--build-dir="%s"' % Dir ('.').abspath,
+					   '--toolset=' + env.GetCppToolset (),
+					   '--layout="system"',
+					   '--stagedir="%s"' % Dir ('.').abspath,
+					   '--debug-configuration=%s' % env.IsCppModeDebug(),
+					   '-sTOOLS=%s' % env.GetCppToolset (),
+					   '-sNO_GNU_LN=1 -sNO_BZIP2=1',
+					   '-sZLIB_SOURCE="%s"' % zlibinclude,
+					   '-sBUILD="%s <runtime-link>%s <threading>%s" stage' % (env.GetCppMode (), 'dynamic', 'multi'),
+					   '--with-' + withname,
+					   env.GetCppMode ()               
+					   ]
+
+			targets = list ()
+			itargets = list ()
+			if self.env.GetPlatform () == 'win32':
+			  suffix = '-vc90-mt-'
+			  if self.env.IsCppModeDebug (): suffix = suffix + 'gd-'
+			  suffix = suffix + self.version.version.replace('.','_')
+			  if self.name == 'boost_test':
+				for libname in ['boost_prg_exec_monitor', 'boost_unit_test_framework']:
+				  targets.append (File (self.name + suffix +'.dll', 'lib'))
+				  itargets.append (File (self.name + suffix + '.dll', env['_REPO_SHLIB_DIR']))
+				  targets.append (File (libname + suffix + '.lib', 'lib'))
+				  itargets.append (File (libname.replace ('_', '-') + '.lib', env['_REPO_SHLIB_DIR']))
+			  else:
+				targets.append (File (self.name + suffix +'.dll', 'lib'))
+				itargets.append (File (self.name + suffix +'.dll', env['_REPO_SHLIB_DIR']))
+				targets.append (File (self.name + suffix +'.lib', 'lib'))
+				itargets.append (File (self.name.replace ('_', '-') + '.lib', env['_REPO_SHLIB_DIR']))
+			else:
+			  suffix = '' #'-mt'
+			  if self.env.IsCppModeDebug () : suffix = suffix + '-d'
+			  if self.name == 'boost_test':
+				for libname in ['boost_prg_exec_monitor', 'boost_unit_test_framework']:
+				  targetname = self.env.subst ('$SHLIBPREFIX') + libname + suffix + self.env.subst('$SHLIBSUFFIX')	  
+				  targets.append (File (targetname, 'lib'))
+				  itargets.append (File (self.env.subst ('$SHLIBPREFIX') + libname.replace ('_', '-') + self.env.subst('$SHLIBSUFFIX'), env['_REPO_SHLIB_DIR']))
+			  else:
+#				targetname = self.env.subst ('$SHLIBPREFIX') + self.name + suffix + self.env.subst('$SHLIBSUFFIX')	  
+				targetname = self.env.subst ('$SHLIBPREFIX') + self.name + self.env.subst('$SHLIBSUFFIX')	  
+				targets.append (File (targetname, 'lib'))
+				#itargets.append (File (self.get_libs()[0] + self.env.subst('$SHLIBSUFFIX'), env['_REPO_SHLIB_DIR']))
+				itargets.append( File ("lib" + self.name + self.env.subst('$SHLIBSUFFIX') + "." + self.version.version + ".0", env['_REPO_SHLIB_DIR']))
+				self.env.InstallAs(File ("lib" + self.name + self.env.subst('$SHLIBSUFFIX'), env['_REPO_SHLIB_DIR']), File (targetname, 'lib')) 
+			lenv = self.env.Clone ()
+			lenv['BJAMOPTIONS'] = options
+			lenv.BJam (targets, 'src/boost-build.jam')
+			self.add_target(self.env.InstallAs (itargets, targets))
+
+
+
+for prjname in ['zlib', 'date_time', 'filesystem', 'iostreams', 
+                'program_options', 'regex', 
+                'thread',  'test', 'system']:
+	BoostProject (senv, 'boost_' + prjname, '1.39')
+
+CppIncludeProject(
+	env,
+	'boost',
+	'1.39',
+	filesrootdir = env.SrcDir('src/boost'),
+	include_dir = env.SrcDir('src')
+)
