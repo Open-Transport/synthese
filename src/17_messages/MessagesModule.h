@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_MessagesModule_H__
 #define SYNTHESE_MessagesModule_H__
 
-#include "01_util/Constants.h"
+#include "UtilConstants.h"
 #include "ModuleClassTemplate.hpp"
 #include "Registry.h"
 #include "17_messages/Types.h"

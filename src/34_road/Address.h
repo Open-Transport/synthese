@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ENV_ADDRESS_H
 #define SYNTHESE_ENV_ADDRESS_H
 
-#include "01_util/Constants.h"
+#include "UtilConstants.h"
 #include "GeoPoint.h"
 
 #include <vector>

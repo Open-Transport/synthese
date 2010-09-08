@@ -25,7 +25,7 @@
 
 #include <vector>
 
-#include "01_util/Constants.h"
+#include "UtilConstants.h"
 #include "Registrable.h"
 #include "GraphTypes.h"
 #include "Path.h"

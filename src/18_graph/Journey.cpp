@@ -29,7 +29,7 @@
 #include "VertexAccessMap.h"
 #include "Hub.h"
 
-#include "01_util/Constants.h"
+#include "UtilConstants.h"
 
 #include <limits>
 #include <boost/foreach.hpp>
