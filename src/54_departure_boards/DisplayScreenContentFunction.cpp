@@ -131,7 +131,6 @@ namespace synthese
 						try
 						{
 							_type->setDisplayInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(*idReg).get());
-							//screen->setType(_type.get());
 						}
 						catch (ObjectNotFoundException<Interface>&)
 						{
@@ -217,6 +216,12 @@ namespace synthese
 				{
 					_date = time_from_string(map.get<string>(PARAMETER_DATE));
 				}
+
+				// Type control
+				if(!_screen->getType())
+				{
+					throw RequestException("The screen "+ lexical_cast<string>(id) +" has no type.");
+				}
 			}
 			catch (ObjectNotFoundException<DisplayScreen> e)
 			{
@@ -284,8 +289,10 @@ namespace synthese
 
 		void DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			if(_type->getDisplayInterface()!=NULL)
+			if(_screen->getType()->getDisplayInterface())
+			{
 				_screen->display(stream, _date ? *_date : second_clock::local_time(), &request);
+			}
 			else
 			{
 
@@ -346,7 +353,7 @@ namespace synthese
 
 						if(!_wayIsBackward)//Forward way : print service
 						{
-							if(insertedServices >= _type->getRowNumber()) break;
+							if(insertedServices >= _screen->getType()->getRowNumber()) break;
 							concatXMLResult(stream,
 									servicePointer,
 									stop);
@@ -358,7 +365,7 @@ namespace synthese
 						++insertedServices;
 					}
 
-					if(insertedServices >= _type->getRowNumber()) break;
+					if(insertedServices >= _screen->getType()->getRowNumber()) break;
 				}
 
 				//If backward : reverse display
@@ -367,9 +374,11 @@ namespace synthese
 					if(insertedServices>0)
 					{
 						//Loop backward on vector
-						int lastIndex = insertedServices - _type->getRowNumber();
+						int lastIndex = insertedServices - _screen->getType()->getRowNumber();
 						if(lastIndex<0)
+						{
 							lastIndex=0;
+						}
 
 						for(int i=insertedServices-1;i>=lastIndex;i--)
 						{
@@ -396,7 +405,7 @@ namespace synthese
 
 		std::string DisplayScreenContentFunction::getOutputMimeType() const
 		{
-			return (_type->getDisplayInterface()==NULL) ? "text/xml" :
+			return (_screen->getType()->getDisplayInterface()) ? "text/xml" :
 					(
 						(   _screen.get() &&
 						    _screen->getType() &&

@@ -175,10 +175,12 @@ namespace synthese
 				)const;
 
 		public:
-			/** Launches the display.
-				@param stream stream to write the output on
-				@param request request which has launched the function
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Launches the display.
+			///	@param stream stream to write the output on
+			///	@param request request which has launched the function
+			/// @pre _screen and _screen->getType() must be not null
+			/// @author Hugues Romain, Xavier Raffin
 			void run(std::ostream& stream, const server::Request& request) const;
 
 			virtual bool isAuthorized(const server::Session* session) const;
