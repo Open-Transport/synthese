@@ -25,7 +25,7 @@
 
 #include "Registrable.h"
 #include "Registry.h"
-#include "01_util/Constants.h"
+#include "UtilConstants.h"
 
 namespace synthese
 {

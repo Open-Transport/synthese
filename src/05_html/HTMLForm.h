@@ -26,7 +26,7 @@
 #ifndef SYNTHESE_HTMLForm_h__
 #define SYNTHESE_HTMLForm_h__
 
-#include "01_util/Constants.h"
+#include "UtilConstants.h"
 #include "HTMLModule.h"
 #include "Registry.h"
 

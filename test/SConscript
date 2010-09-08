@@ -1,4 +1,13 @@
-Import ('s3env')
+Import ('env')
+
+s3env = env.Clone ()
+if s3env.GetPlatform () == 'posix':
+  s3env.Append ( CCFLAGS = ['-fpermissive'] )
+  s3env.Append ( CPPDEFINES = ['BOOST_ALL_DYN_LINK'] )
+
+#s3env.Append ( CPPDEFINES = ['BOOST_ALL_NO_LIB'] )
+
+s3env.Append(BOOSTVERSION = '1.39')
 
 #s3env.Append (CPPPATH = [Dir ('.').abspath])
 

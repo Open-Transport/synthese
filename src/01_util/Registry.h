@@ -32,7 +32,7 @@
 
 #include "UtilTypes.h"
 #include "RegistryBase.h"
-#include "01_util/Constants.h"
+#include "UtilConstants.h"
 #include "RegistryKeyException.h"
 #include "ObjectNotFoundInRegistryException.h"
 #include "ObjectNotFoundException.h"
