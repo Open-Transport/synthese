@@ -1,0 +1,16 @@
+
+Import ('env')
+
+## GD-CHART ##########################################################################################################################
+
+files = ['src/array_alloc.c', 'src/gdc.c', 'src/gdchart.c', 'src/gdc_pie.c', 'src/price_conv.c']
+
+CppLibProject(
+	env
+	, 'gdchart'
+	, '0.11.5'
+	, source_files = files
+	, include_dir = env.SrcDir('src')
+	, dependencies = ['gd.cpplib', 'png.cpplib']
+	, filesrootdir = env.SrcDir('src')
+)

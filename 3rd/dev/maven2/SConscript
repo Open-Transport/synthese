@@ -1,0 +1,11 @@
+Import ('env')
+
+DebianPaquetProject(
+	env,
+	'maven2',
+	'2.0.9',
+	extra_dependencies = [
+        ('sun-java6-jre', '6-00-2'),
+        ('sun-java6-jdk', '6-00-2'),
+    ], 
+)

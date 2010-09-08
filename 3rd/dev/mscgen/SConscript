@@ -1,0 +1,27 @@
+Import ('env')
+
+senv = env.Clone ()
+
+version = '0.10'
+files = list()
+
+if senv['_BUILD_STEP']==0:
+	files = ['src/src/renderer/adraw.c', 'src/src/renderer/cmdparse.c', 'src/src/renderer/cmdparse.h', 'src/src/renderer/gd_out.c', 'src/src/renderer/main.c',
+		   'src/src/renderer/null_out.c', 'src/src/renderer/ps_out.c', 'src/src/renderer/svg_out.c', 'src/src/parser/msc.c']
+	senv.Append ( CPPPATH = [senv.Dir ('./src/parser').abspath, senv.Dir ('./src/renderer').abspath] )
+	senv.Append ( CPPDEFINES = [('VERSION', version)] )
+	senv.Append ( LIBS = ['m'] )
+	lexyyc = senv.Command (senv.File ('lex.yy.c'), senv.File ('src/parser/language.l'), 'flex -o $TARGET $SOURCE')
+	ltabc = senv.Command (senv.File ('language.tab.c'), senv.File ('src/parser/language.y'), 'bison -o $TARGET $SOURCE')
+	files.append (lexyyc)
+	files.append (ltabc)
+
+
+CppBinProject(
+	senv,
+	'mscgen',
+	version,
+	source_files = files,
+	dependencies = ['gd.cpplib', 'png.cpplib', 'zlib.cpplib'],
+	filesrootdir = senv.SrcDir('src')
+)

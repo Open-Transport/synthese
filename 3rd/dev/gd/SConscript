@@ -1,0 +1,29 @@
+Import ('env')
+
+import os
+
+senv = env.Clone ()
+
+
+## GD ##########################################################################################################################
+
+senv.Append ( CPPDEFINES = ['HAVE_LIBPNG'] )
+
+if env.GetPlatform () == 'win32':
+  senv.Append ( CPPDEFINES = ['BGDWIN32'] )
+
+files = ['src/annotate.c', 'src/gdcache.c', 'src/gdfontmb.c', 'src/gd_gd2.c', 'src/gd_io.c', 'src/gdkanji.c', 'src/gdtables.c',  
+         'src/gd_wbmp.c', 'src/gdfonts.c', 'src/gd_gd.c', 'src/gd_io_dp.c', 'src/gdxpm.c', 'src/gdfontt.c',
+         'src/gd_gif_in.c', 'src/gd_io_file.c', 'src/gd_png.c', 'src/gdfontg.c', 'src/gdft.c', 'src/gd_gif_out.c', 'src/gd_io_ss.c',    
+         'src/gd_security.c', 'src/gd_topal.c', 'src/wbmp.c', 'src/gd.c', 'src/gdfontl.c', 'src/gdfx.c', 'src/gdhelpers.c',
+         'src/gd_jpeg.c', 'src/gd_ss.c']
+
+CppLibProject (
+	senv
+	, 'gd'
+	, '2.0.34'
+	, source_files = files
+	, include_dir = senv.SrcDir('src')
+	, dependencies = ['png.cpplib']
+	, filesrootdir = senv.SrcDir('src')
+)
