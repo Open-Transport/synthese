@@ -78,8 +78,8 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Load(
-			TreeFolderRoot* object,
+		template<> void SQLiteDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderChild>::Load(
+			TreeFolderChild* object,
 			const db::SQLiteResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
@@ -105,8 +105,8 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Save(
-			TreeFolderRoot* object,
+		template<> void SQLiteDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderChild>::Save(
+			TreeFolderChild* object,
 			optional<SQLiteTransaction&> transaction
 		){
 			ReplaceQuery<TreeFolderTableSync> query(*object);
@@ -117,8 +117,8 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Unlink(
-			TreeFolderRoot* obj
+		template<> void SQLiteDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderChild>::Unlink(
+			TreeFolderChild* obj
 		){			
 		}
 	}

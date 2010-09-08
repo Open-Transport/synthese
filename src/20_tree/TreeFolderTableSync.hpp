@@ -31,18 +31,17 @@
 #include <iostream>
 
 #include "SQLiteNoSyncTableSyncTemplate.h"
+#include "TreeFolderChild.hpp"
 
 namespace synthese
 {
 	namespace tree
 	{
-		class TreeFolderRoot;
-
 		/** TreeFolder table synchronizer.
 			@ingroup m20LS refLS
 		*/
 		class TreeFolderTableSync:
-			public db::SQLiteNoSyncTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>
+			public db::SQLiteNoSyncTableSyncTemplate<TreeFolderTableSync,TreeFolderChild>
 		{
 		public:
 			static const std::string COL_PARENT_ID;
@@ -58,7 +57,7 @@ namespace synthese
 			){
 				if(env.getEditableRegistry<TreeFolderRoot>().contains(id))
 				{
-					return env.getEditable<TreeFolderRoot>().get(id);
+					return env.getEditable<TreeFolderRoot>(id);
 				}
 				
 				boost::shared_ptr<typename ObjectType::Folder> object;
