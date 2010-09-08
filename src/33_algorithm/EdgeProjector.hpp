@@ -33,9 +33,7 @@ namespace synthese
 {
 	namespace graph
 	{
-		class Path;
 		class Edge;
-		class Vertex;
 	}
 
 	namespace algorithm
@@ -51,7 +49,7 @@ namespace synthese
 		public:
 			typedef boost::tuple<
 				geos::geom::Coordinate, //! coordinates of the projection of the point on the line
-				const graph::Path*, //!corresponding road
+				graph::Edge*, //!corresponding road
 			  double //! metric offset of the projected point
 			> PathNearby;
 
@@ -60,7 +58,7 @@ namespace synthese
 				PathNearby
 			> PathsNearby;
 
-			typedef std::vector<const graph::Path*> From;
+			typedef std::vector<graph::Edge*> From;
 
 			class NotFoundException:
 			   public util::Exception
@@ -107,14 +105,10 @@ namespace synthese
 			/// Gets all relevant projections.
 			/// @param pt point to project
 			/// @return a projected point per path of the graph
-		   PathsNearby getPathsByDistance(
-			   const geos::geom::Coordinate& pt
+			/// Only one edge per path group is returned
+			PathsNearby getPathsByDistance(
+				const geos::geom::Coordinate& pt
 			) const;
-
-
-		protected:
-
-		//	graph::Edge* splitRoad(graph::Path* road, double metricOffset, graph::Vertex *pt);
 		};
 }	}
 

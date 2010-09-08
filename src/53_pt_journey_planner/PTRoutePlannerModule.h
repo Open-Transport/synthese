@@ -30,7 +30,7 @@
 namespace synthese
 {
 	//////////////////////////////////////////////////////////////////////////
-	/// 53 pt_routeplanner Module namespace.
+	/// 53 Public transport journey planner module namespace.
 	///	@author Hugues Romain
 	///	@date 2010
 	/// @ingroup m53
@@ -69,7 +69,7 @@ namespace synthese
 			@defgroup m53Alarm 53.17 Messages recipient
 			@ingroup m53
 			
-			@defgroup m53 53 pt_routeplanner
+			@defgroup m53 53 Public transport journey planner module namespace.
 			@ingroup m5
 			
 			<h3>Road exploration : Transport public stops approach</h3>
@@ -117,12 +117,12 @@ namespace synthese
 			Les désignations de référence des points d'arrêts PA 1 et PA 2 n'ont pas besoin d'être copiées, puisque la distance vers les communes A et B est forcément plus courte
 
 			Reference classes :
-			- IntegralSearch
+			- algorithm::IntegralSearch
 
 			<h3>Multipoint Route Planning</h3>
 
 			Reference classes :
-			- RoutePlanner
+			- algorithm::RoutePlanner
 
 			<h3>Monopoint Approach Exploration + Route Planning</h3>
 

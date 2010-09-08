@@ -35,6 +35,7 @@
 #include "SQLiteTransaction.h"
 #include "StopArea.hpp"
 #include "Road.h"
+#include "RoadChunk.h"
 
 #include <boost/foreach.hpp>
 
@@ -93,7 +94,7 @@ namespace synthese
 			)	);
 
 			const City* curCity(NULL);
-			vector<const Path*> paths;
+			EdgeProjector::From paths;
 
 			BOOST_FOREACH(shared_ptr<StopPoint> stopPoint, stopPoints)
 			{
@@ -112,7 +113,14 @@ namespace synthese
 						const RoadPlace& roadPlace(*static_cast<const RoadPlace*>(item.second));
 						BOOST_FOREACH(Path* path, roadPlace.getPaths())
 						{
-							paths.push_back(path);
+							if(!static_cast<Road*>(path)->getReverseRoad())
+							{
+								continue;
+							}
+							BOOST_FOREACH(Edge* edge, path->getEdges())
+							{
+								paths.push_back(edge);
+							}
 						}
 					}
 				}
@@ -124,9 +132,8 @@ namespace synthese
 					EdgeProjector::PathNearby projection(projector.projectEdge(*stopPoint));
 					
 					Address projectedAddress(
-						static_cast<const Road*>(projection.get<1>()),
-						projection.get<2>(),
-						projection.get<0>()
+						static_cast<RoadChunk*>(projection.get<1>()),
+						projection.get<2>()
 					);
 					stopPoint->setProjectedPoint(projectedAddress);
 				}
