@@ -1,0 +1,32 @@
+
+Import ('env')
+
+import os
+
+## NSCUBE (ACAPELA) ##########################################################################################################################
+## http://www.sqlite.org/
+
+
+class NscubeProject(CppIncludeProject):
+
+  def __init__ (self, senv, name, version):
+    CppIncludeProject.__init__(
+		self
+		, senv
+		, name
+		, version
+		, include_dir = senv.SrcDir('src')
+	)
+
+    
+  def declare (self):
+    CppIncludeProject.declare (self)
+    if self.env.GetPlatform () == 'posix':
+      ##if self.mode == 'static':
+      ##  self.targets.extend(self.env.Install (self.env.GetBuildPath('.'), 
+      #                                                 self.env.subst ('$LIBPREFIX') + self.name + self.env.subst('$LIBSUFFIX')))
+      ##else:
+      self.targets.extend(self.env.Install (self.env.GetBuildPath('.'), self.env.subst ('$SHLIBPREFIX') + self.name + self.env.subst('$SHLIBSUFFIX')))
+
+
+NscubeProject (env, 'nscube', '6-101')

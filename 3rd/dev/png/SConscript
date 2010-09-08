@@ -1,0 +1,18 @@
+Import ('env')
+
+## LIBPNG ##########################################################################################################################
+## http://www.libpng.org/pub/png/libpng.html
+
+files = ['src/pngerror.c', 'src/pngget.c', 'src/pngpread.c', 'src/pngrio.c', 'src/pngrutil.c', 'src/pngtest.c', 'src/pngvcrd.c', 'src/pngwrite.c', 
+         'src/pngwutil.c', 'src/png.c', 'src/pnggccrd.c', 'src/pngmem.c', 'src/pngread.c', 'src/pngrtran.c', 'src/pngset.c', 'src/pngtrans.c', 
+         'src/pngwio.c', 'src/pngwtran.c']
+
+CppLibProject(
+	env
+	, 'png'
+	, '1.2.16'
+	, source_files = files
+	, include_dir = env.SrcDir('src')
+	, dependencies = ['zlib.cpplib']
+	, filesrootdir = env.SrcDir('src')
+)

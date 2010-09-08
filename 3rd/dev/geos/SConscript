@@ -1,0 +1,29 @@
+Import ('env')
+
+## GEOS ##########################################################################################################################
+## http://trac.osgeo.org/geos/
+
+senv = env.Clone ()
+
+class GeosProject (CppLibProject):
+	def declare(self):
+		if self.env.GetPlatform () == 'win32':
+			self.env.InstallAs('#3rd/dev/geos/src/headers/geos/platform.h','#3rd/dev/geos/src/headers/geos/platform.h.vc')
+			self.env.InstallAs('#3rd/dev/geos/src/headers/geos/version.h','#3rd/dev/geos/src/headers/geos/version.h.vc')
+		else:
+			self.env.InstallAs('#3rd/dev/geos/src/headers/geos/platform.h','#3rd/dev/geos/src/headers/geos/platform.h.in')
+			self.env.InstallAs('#3rd/dev/geos/src/headers/geos/version.h','#3rd/dev/geos/src/headers/geos/version.h.in')
+
+		CppLibProject.declare(self)
+
+
+
+GeosProject(
+	env
+	, 'geos'
+	, '3.2'
+	, source_files = senv.Glob ('*.cpp', ['examples'], senv.SrcDir('src'), prefix='src/', recursive=True)
+	, include_dir = senv.SrcDir('src/headers')
+	, filesrootdir = senv.SrcDir('src')
+)
+

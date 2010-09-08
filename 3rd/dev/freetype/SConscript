@@ -1,0 +1,50 @@
+Import ('env')
+
+import os
+
+senv = env.Clone ()
+
+
+## FREETYPE ##########################################################################################################################
+
+senv.Append ( CPPDEFINES = ['FT2_BUILD_LIBRARY', '_LIB'] )
+
+files = ['src/src/base/ftsystem.c', 'src/src/base/ftinit.c', 'src/src/base/ftdebug.c',
+         'src/src/base/ftbase.c', 'src/src/base/ftbbox.c', 'src/src/base/ftglyph.c',
+         'src/src/base/ftbdf.c', 'src/src/base/ftbitmap.c', 'src/src/base/ftgxval.c',
+         'src/src/base/ftmm.c', 'src/src/base/ftotval.c', 'src/src/base/ftpfr.c', 'src/src/base/ftstroke.c',
+         'src/src/base/ftsynth.c', 'src/src/base/fttype1.c', 'src/src/base/ftwinfnt.c',
+         
+         'src/src/bdf/bdf.c',   		# BDF font driver
+         'src/src/cff/cff.c',   		# CFF/OpenType font driver
+         'src/src/cid/type1cid.c',  	# Type 1 CID-keyed font driver
+         'src/src/pcf/pcf.c',   		# PCF font driver
+         'src/src/pfr/pfr.c', 			# PFR/TrueDoc font driver
+         'src/src/sfnt/sfnt.c', 		# SFNT files support (TrueType & OpenType)
+         'src/src/truetype/truetype.c',	# TrueType font driver
+         'src/src/type1/type1.c',		# Type 1 font driver
+         'src/src/type42/type42.c', 	# Type 42 font driver
+         'src/src/winfonts/winfnt.c',	# Windows FONT / FNT font driver
+         
+         'src/src/raster/raster.c', 	# monochrome rasterizer
+         'src/src/smooth/smooth.c', 	# anti-aliasing rasterizer
+         
+         'src/src/autofit/autofit.c', 	# auto hinting module
+         'src/src/cache/ftcache.c', 	# cache sub-system (in beta)
+         'src/src/gzip/ftgzip.c', 		# support for compressed fonts (.gz)
+         'src/src/lzw/ftlzw.c',			# support for compressed fonts (.Z)
+         'src/src/gxvalid/gxvalid.c',	# TrueTypeGX/AAT table validation
+         'src/src/otvalid/otvalid.c',	# OpenType table validation
+         'src/src/psaux/psaux.c', 		# PostScript Type 1 parsing
+         'src/src/pshinter/pshinter.c',	# PS hinting module
+         'src/src/psnames/psnames.c' 	# PostScript glyph names support
+         ]
+
+CppLibProject(
+	senv,
+	'freetype',
+	'2.3.4',
+	source_files = files,
+	include_dir = senv.SrcDir('src/include'),
+	filesrootdir = senv.SrcDir('src')
+)

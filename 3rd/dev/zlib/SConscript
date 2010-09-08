@@ -1,0 +1,20 @@
+
+Import ('env')
+
+## ZLIB #############################################################################################################################
+
+#if env.GetPlatform () == 'win32':
+#  senv.Append (CPPDEFINES = ['ZLIB_DLL'] )
+
+files = ['src/adler32.c', 'src/compress.c', 'src/crc32.c', 'src/deflate.c', 'src/gzio.c', 'src/infback.c', 
+         'src/inffast.c', 'src/inflate.c', 'src/inftrees.c', 'src/trees.c', 'src/uncompr.c', 'src/zutil.c']
+
+CppLibProject(
+	env
+	, 'zlib'
+	, '1.2.3'
+	, source_files = files
+	, include_dir = env.SrcDir('src')
+	, filesrootdir = env.SrcDir('src')
+	, dependencies = []
+)
