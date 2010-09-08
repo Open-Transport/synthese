@@ -397,7 +397,7 @@ namespace synthese
 						DisplayMonitoringStatus::GetStatusString(globalStatus)
 					;
 					stream << l.element() << "Température : "
-						<< _status->getTemperatureValue();
+						<< *_status->getTemperatureValue();
 					stream << l.element() << "Détail : "
 						<< _status->getDetail();
 				}
