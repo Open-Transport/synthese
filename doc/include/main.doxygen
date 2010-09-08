@@ -35,7 +35,6 @@ SYNTHESE est un système d'information aux voyageurs (SIV) qui s'intègre dans une
 
 <ul>
 <li>@subpage history</li>
-<li>@subpage philo</li>
 <li>@subpage archi-interne</li>
 <li>@subpage roadmap</li>
 <li>@subpage participate</li>

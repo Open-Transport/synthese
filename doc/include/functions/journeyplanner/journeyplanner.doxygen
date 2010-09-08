@@ -26,12 +26,16 @@ Le même formulaire présentant en premier l'arrêt « Basso Cambo » alors que l'uti
 Les champs arrêts sont facultatifs dans SYNTHESE. En cas de non remplissage de ceux-ci, une sélection d'arrêts principaux est utilisée. Pour chaque commune, cette sélection est paramétrée dans la console d'administration. Il est conseillé de choisir comme arrêts par défaut à la fois le lieu le plus central de la commune et la gare SNCF si elle existe.
 
 <h3>Choix de période dans la journée</h3>
- 
+
+@image html form-alternate.png
+
 Cette autre version du formulaire remplace le champ d'heure précise par des périodes de la journée, et produit des grilles horaires de grande amplitude. Cette option pourrait être intéressante pour un réseau comme celui de Belfort, où la majorité des lignes sont cadencées, ce qui serait alors mis en valeur.
 
 <h3>Choix de date</h3>
- 
-La capture ci-dessus montre un contrôle calendrier disponible dans SYNTHESE. Il est cependant conseillé de garder une liste d'options HTML standard, car elle est utilisable au clavier (contrairement aux calendriers graphiques) et est donc accessible aux utilisateurs sur terminaux mobiles ainsi qu'aux personnes malvoyantes utilisant une lecture vocale.
+
+@image html form-calendar.png
+
+La capture ci-dessus montre un exemple de contrôle calendrier. Il est cependant conseillé de garder une liste d'options HTML standard, car elle est utilisable au clavier (contrairement aux calendriers graphiques) et est donc accessible aux utilisateurs sur terminaux mobiles ainsi qu'aux personnes malvoyantes utilisant une lecture vocale.
 
 <h2>Résultats produits</h2>
 
@@ -39,8 +43,8 @@ La capture ci-dessus montre un contrôle calendrier disponible dans SYNTHESE. Il 
 
 Le résultat du calcul d'itinéraires est une suite de solutions, calculées selon un algorithme spécifique au transport public.
 
-Risque majeur : certains algorithmes utilisés par certains produits du marché présents y compris sur des centrales multimodales de grande importance, dérivés de la logique de calcul routier (implémentation de Dijkstra) sont inadaptés à la problématique et produisent des résultats qui se révèlent inutilisables pour les voyageurs. Dans un tel cas, les utilisateurs se détournent du site dès lors qu'ils rencontrent un échec qui les a mis dans l'embarras.
-Solution : l'algorithme du module de calcul d'itinéraires de SYNTHESE a été qualifié pour le transport public, et s'appuie sur une logique de prise de rendez-vous (logique temporelle) et non sur des parcours de graphes (logique géographique). La confusion entre les deux logiques s'explique par le fait qu'en mode routier le temps et la distance sont proportionnels, alors qu'ils sont indépendants en transport public. Enfin, les algorithmes de prise de rendez-vous nécessitent une double passe afin de calculer séparément l'heure de meilleure arrivée et l'heure de meilleur départ. Certains produits omettent malheureusement cette nuance et produisent des résultats dégradant fortement l'offre perçue, notamment lorsque la fréquence des lignes n'est pas régulières toute la journée.
+Risque majeur : certains algorithmes utilisés par certains produits du marché présents y compris sur des centrales multimodales de grande importance, sont inadaptés à la problématique et produisent des résultats qui se révèlent inutilisables pour les voyageurs. Dans un tel cas, les utilisateurs se détournent du site dès lors qu'ils rencontrent un échec qui les a mis dans l'embarras.
+Solution : l'algorithme du module de calcul d'itinéraires de SYNTHESE a été qualifié pour les particularités du transport public, et s'appuie sur une logique de prise de rendez-vous (logique temporelle) et non sur des parcours de graphes (logique géographique). La confusion entre les deux logiques s'explique par le fait qu'en mode routier le temps et la distance sont proportionnels, alors qu'ils sont indépendants en transport public. Enfin, les algorithmes de prise de rendez-vous nécessitent une double passe afin de calculer séparément l'heure de meilleure arrivée et l'heure de meilleur départ. Certains produits omettent malheureusement cette nuance et produisent des résultats dégradant fortement l'offre perçue, notamment lorsque la fréquence des lignes n'est pas régulières toute la journée.
 
 Les + de SYNTHESE : historiquement, le fait de restreindre l'échelle temporelle des réponses du calculateur d'itinéraires s'explique par des contraintes de performance qui sont sans objet avec SYNTHESE.
 En effet, la qualité de l'optimisation de SYNTHESE ainsi que les choix technologiques orientés sur la performance (C++, modèle objet adapté, etc.) permettent de calculer quasiment aussi rapidement les solutions d'une journée entière (en moins d'une seconde dans quasiment tous les cas) (des informations issues des solutions précédentes sont utilisées pour le calcul des solutions suivantes).
@@ -54,7 +58,9 @@ Les avantages seraient les suivants :
 </ul>
 
 Exemples de captures d'écran :
- 
+
+@image html result-table.png
+
 Noter sur cette capture :
 <ul>
 <li>Seuls deux champs ont dû être remplis pour obtenir le résultat</li>
@@ -63,10 +69,15 @@ Noter sur cette capture :
 <li>Les plans des lieux de départ et d'arrivée sont affichés par un module OpenLayers ergonomique sur la base de la cartographie OpenStreetMap . Il est possible de naviguer sur la carte à l'aide de la souris, et de changer le fond de carte par la photo aérienne Google.</li>
 <li>La présence des pictogrammes R sur certaines solutions indiquant que l'offre nécessite une réservation (transport à la demande) (sur certains sites, ce type d'offre ne peut être intégré au calcul d'itinéraires)<(li>
 <li>Le clic sur les colonnes affiche la feuille de route détaillée de chaque solution, sous forme d'un faux pop-up (respectant les normes d'accessibilité si lue par un système mobile ou  pour personne malvoyante)</li>
-<li>La capture suivante présente une feuille de route détaillée obtenue en cliquant sur la colonne en surbrillance sur la capture précédente.</li>
 </ul>
- 
+
+
+
 <h3>Les feuilles de route</h3>
+
+La capture suivante présente une feuille de route détaillée obtenue en cliquant sur la colonne en surbrillance sur la capture précédente.
+
+@image html result-roadmap.png "Exemple de feuille de route avec cartographie"
 
 La feuille de route détaillée présente les éléments suivants :
 <ul>
@@ -76,13 +87,6 @@ La feuille de route détaillée présente les éléments suivants :
 <li>Le détail du trajet, avec à chaque étape un lien permettant de zoomer sur le lieu de la correspondance</li>
 <li>La carte générale du trajet avec en rouge le point de correspondance</li>
 </ul>
-
-Les + de SYNTHESE : Le code HTML produit par SYNTHESE est 100% paramétrable par des opérations de configuration des données. Cela permet également de garantir que le code produit est accessible (terminaux mobiles et lecture vocale pour malvoyants)
-
-Par exemple, la même capture d'écran que précédemment vue par un système de lecture vocale se présente de manière claire et structurée, et dans un ordre compatible avec une lecture audio :
- 
-Capture obtenue en désactivant les CSS dans le navigateur Mozilla Firefox
-
 
 <h2>Liens vers la documentation technique</h2>
 
