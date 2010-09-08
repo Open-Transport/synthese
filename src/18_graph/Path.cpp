@@ -522,20 +522,30 @@ namespace synthese
 			const GeometryFactory *gf = GeometryFactory::getDefaultInstance();
 			geos::geom::CoordinateSequence *coords(gf->getCoordinateSequenceFactory()->create(0,2));
 
+			// Handle empty roads
+			if(_edges.empty())
+			{
+				return shared_ptr<LineString>(gf->createLineString());
+			}
+
 			// Auto get end edge index
 			if(!toEdgeIndex)
 			{
-				*toEdgeIndex = _edges.size () - 1;
+				toEdgeIndex = _edges.size () - 1;
 			}
 
 			// Gets the coordinates of each edge
 			for(size_t i=fromEdgeIndex; i<=*toEdgeIndex; ++i)
 			{
-				const CoordinateSequence& geometry(*_edges[i]->getGeometry()->getCoordinatesRO());
-
-				for(size_t j(0); j<geometry.getSize(); ++j)
+				shared_ptr<LineString> geometry(_edges[i]->getGeometry());
+				if(!geometry.get())
 				{
-					coords->add(geometry.getAt(j), false);
+					break;
+				}
+
+				for(size_t j(0); j<geometry->getCoordinatesRO()->getSize(); ++j)
+				{
+					coords->add(geometry->getCoordinateN(j), false);
 				}
 			}
 
