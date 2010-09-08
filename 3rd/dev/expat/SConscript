@@ -1,0 +1,21 @@
+Import ('env')
+
+## EXPAT ##########################################################################################################################
+## http://expat.sourceforge.net/
+
+senv = env.Clone()
+
+senv.Append ( CPPDEFINES = ['COMPILED_FROM_DSP', '_LIB'] )
+if (senv['_PLATFORM']=='win32'):
+	senv.Append ( CPPDEFINES = ['COMPILED_FROM_DSP', 'XML_UNICODE_WCHAR_T'] )
+
+
+CppLibProject(
+	senv
+	, 'expat'
+	, '2.0.1'
+	, source_files = senv.Glob ('*.c', dir=senv.SrcDir('src'), prefix='src/')
+	, include_dir = senv.SrcDir('src')
+	, filesrootdir = senv.SrcDir('src')
+)
+
