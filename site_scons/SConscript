@@ -1,0 +1,3 @@
+Import ('env')
+
+VCProjVisualStudioProject(env, 'forge', ['*.py'], ['../SConstruct', '../config.py', '../scons_tree_dot.py'])
