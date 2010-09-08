@@ -37,7 +37,7 @@
 #include "ReservationCancellationEMailSubjectInterfacePage.h"
 #include "ReservationContact.h"
 
-#include "01_util/Constants.h"
+#include "UtilConstants.h"
 
 using namespace boost;
 using namespace std;

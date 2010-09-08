@@ -27,7 +27,7 @@
 #define SYNTHESE_UTIL_REGISTRABLE_H
 
 #include "UtilTypes.h"
-#include "01_util/Constants.h"
+#include "UtilConstants.h"
 
 namespace synthese
 {

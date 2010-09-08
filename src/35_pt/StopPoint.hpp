@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ENV_PHYSICALSTOP_H
 #define SYNTHESE_ENV_PHYSICALSTOP_H
 
-#include "01_util/Constants.h"
+#include "UtilConstants.h"
 #include "Vertex.h"
 #include "Registry.h"
 #include "Importable.h"

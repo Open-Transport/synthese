@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "01_util/Constants.h"
+#include "UtilConstants.h"
 #include "ActionResultHTMLTable.h"
 #include "SearchFormHTMLTable.h"
 #include "HTMLList.h"
