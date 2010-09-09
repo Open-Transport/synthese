@@ -31,7 +31,7 @@
 #include <iostream>
 
 #include "SQLiteNoSyncTableSyncTemplate.h"
-#include "TreeFolderChild.hpp"
+#include "TreeFolderRoot.hpp"
 
 namespace synthese
 {
@@ -41,7 +41,7 @@ namespace synthese
 			@ingroup m20LS refLS
 		*/
 		class TreeFolderTableSync:
-			public db::SQLiteNoSyncTableSyncTemplate<TreeFolderTableSync,TreeFolderChild>
+			public db::SQLiteNoSyncTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>
 		{
 		public:
 			static const std::string COL_PARENT_ID;
@@ -49,31 +49,31 @@ namespace synthese
 			
 			TreeFolderTableSync();
 
-			template<class ObjectType>
-			static boost::shared_ptr<typename ObjectType::Folder> GetTreeFolder(
+			template<class ObjectType_>
+			static boost::shared_ptr<typename ObjectType_::TreeFolderType> GetTreeFolder(
 				util::RegistryKeyType id,
 				util::Env& env,
 				util::LinkLevel linkLevel
 			){
-				if(env.getEditableRegistry<TreeFolderRoot>().contains(id))
+/*				if(env.getEditableRegistry<TreeFolderRoot>().contains(id))
 				{
 					return env.getEditable<TreeFolderRoot>(id);
 				}
 				
-				boost::shared_ptr<typename ObjectType::Folder> object;
-				try
+*/				boost::shared_ptr<typename ObjectType_::TreeFolderType> object;
+/*				try
 				{
-					SQLiteResultSPtr rows(SQLiteTableSyncTemplate<TreeFolderTableSync>::_GetRow(key));
-					object.reset(new typename ObjectType::Folder(rows->getKey()));
+					db::SQLiteResultSPtr rows(db::SQLiteTableSyncTemplate<TreeFolderTableSync>::_GetRow(id));
+					object.reset(new typename ObjectType_::TreeFolderType(rows->getKey()));
 					Load(object.get(), rows, env, linkLevel);
 				}
-				catch (typename db::DBEmptyResultException<K>&)
+				catch (typename db::DBEmptyResultException<TreeFolderRoot>&)
 				{
-					throw util::ObjectNotFoundException<T>(key, "Object not found in "+ K::TABLE.NAME);
+					throw util::ObjectNotFoundException<ObjectType_>(id, "Object not found in "+ TreeFolderTableSync::TABLE.NAME);
 				}
 
-				env.getEditableRegistry<TreeFolderRoot>().add(static_pointer_cast<TreeFolderRoot, typename ObjectType::Folder>(object));
-				return object;
+				env.getEditableRegistry<TreeFolderRoot>().add(boost::static_pointer_cast<TreeFolderRoot, typename ObjectType_::TreeFolderType>(object));
+*/				return object;
 			}
 
 
