@@ -5,10 +5,11 @@ Import ('env')
 
 senv = env.Clone()
 
-senv.Append ( CPPDEFINES = ['COMPILED_FROM_DSP', '_LIB'] )
+senv.Append ( CPPDEFINES = ['_LIB'] )
 if (senv['_PLATFORM']=='win32'):
 	senv.Append ( CPPDEFINES = ['COMPILED_FROM_DSP', 'XML_UNICODE_WCHAR_T'] )
-
+else:
+	senv.Append ( CPPDEFINES = ['HAVE_MEMMOVE'])
 
 CppLibProject(
 	senv
