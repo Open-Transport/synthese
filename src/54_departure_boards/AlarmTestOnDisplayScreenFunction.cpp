@@ -136,13 +136,16 @@ namespace synthese
 				lineStop.setPhysicalStop(&ps);
 				ptime d(second_clock::local_time());
 
+				IntermediateStop::TransferDestinations emptyTransferDestinations;
 				for (int i(0); i<_type->getRowNumber(); ++i)
 				{
 					ServicePointer sp(false, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET, s, d);
 					sp.setDepartureInformations(lineStop, d, d, ps);
+					sp.setArrivalInformations(lineStop, d, d, ps);
 					ActualDisplayedArrivalsList destinations;
-					destinations.push_back(IntermediateStop(&place));
-					destinations.push_back(IntermediateStop(&place));
+
+					destinations.push_back(IntermediateStop(&place, sp, emptyTransferDestinations));
+					destinations.push_back(IntermediateStop(&place, sp, emptyTransferDestinations));
 
 					displayedObject.map.insert(
 						make_pair(
