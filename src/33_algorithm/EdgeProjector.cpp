@@ -41,6 +41,7 @@
 using namespace std;
 using namespace geos::geom;
 using namespace geos::linearref;
+using namespace boost;
 
 namespace synthese
 {
@@ -86,7 +87,7 @@ namespace synthese
 			}
 
 			const GeometryFactory *gf = GeometryFactory::getDefaultInstance();
-			Point* ptGeom(gf->createPoint(pt));
+			shared_ptr<Point> ptGeom(gf->createPoint(pt));
 
 			typedef map<PathGroup*, EdgeProjector::PathsNearby::iterator> ListByPathGroup;
 			ListByPathGroup listByPathGroup;
@@ -94,20 +95,20 @@ namespace synthese
 			BOOST_FOREACH(Edge* edge, _from)
 			{
 				boost::shared_ptr<LineString> edgeGeom = edge->getGeometry();
-				if(!edgeGeom.get())
+				if(!edgeGeom.get() || edgeGeom->isEmpty())
 				{
 					continue;
 				}
 
 				// optimization: first compute distance to road bbox
-				double bboxdistance = edgeGeom->getEnvelope()->distance(ptGeom);
+				double bboxdistance = edgeGeom->getEnvelope()->distance(ptGeom.get());
 				if(bboxdistance >= _distanceLimit)
 				{
 					continue;
 				}
 
 				// real distance
-				double distance = edgeGeom->distance(ptGeom);
+				double distance = edgeGeom->distance(ptGeom.get());
 				if(distance >= _distanceLimit)
 				{
 					continue;
@@ -115,12 +116,15 @@ namespace synthese
 
 				// tests if this pathgroup has already been found at a shorter distance
 				ListByPathGroup::iterator it(listByPathGroup.find(edge->getParentPath()->getPathGroup()));
-				if(it != listByPathGroup.end() && it->second->first < distance)
+				if(it != listByPathGroup.end())
 				{
-					continue;
+					if(it->second->first < distance)
+					{
+						continue;
+					}
+					ret.erase(it->second);
+					listByPathGroup.erase(it);
 				}
-				ret.erase(it->second);
-				listByPathGroup.erase(it);
 
 				// projection
 				LengthIndexedLine lil(static_cast<const Geometry*>(edgeGeom.get()));

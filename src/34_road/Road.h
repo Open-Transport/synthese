@@ -36,10 +36,20 @@ namespace synthese
 		class RoadChunk;
 		class Address;
 		
-		/** Road class.
-			@ingroup m34
-			@author Marc Jambert
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Contiguous part of a named road.
+		/// Road class.
+		///	@ingroup m34
+		///	@author Marc Jambert, Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
+		/// A road object designates only one direction of the road part, called
+		/// main direction.
+		/// The other direction is an other Road object, which is auto-generated
+		/// by the constructor.
+		///
+		/// A physical road part is modeled by two Road objects, one per direction.
+		/// The _side attribute tells if the direction corresponds to the right or
+		///	left side of the road.
 		class Road:
 			public graph::Path
 		{
@@ -61,7 +71,12 @@ namespace synthese
 			ROAD_TYPE_HIGHWAY, /* route secondaire */
 			ROAD_TYPE_STEPS /* steps */
 		} RoadType;
-		
+
+		typedef enum
+		{
+			RIGHT_SIDE,
+			LEFT_SIDE
+		} Side;
 
 		/// Chosen registry class.
 		typedef util::Registry<Road>	Registry;
@@ -69,6 +84,7 @@ namespace synthese
 		private:
 			RoadType _type;
 			Road*	_reverseRoad;
+			Side	_side;
 
 			Road(const Road& reverseRoad);
 		public:
@@ -86,11 +102,13 @@ namespace synthese
 		//@{
 			const RoadType& getType () const { return _type; }
 			Road* getReverseRoad() const { return _reverseRoad; }
+			Side getSide() const { return _side; }
 		//@}
 
 		//! @name Setters
 		//@{
-			  void setType (const RoadType& type);
+			void setType (const RoadType& type);
+			void setSide(Side value);
 		//@}
 		
 		//! @name Services

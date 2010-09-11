@@ -106,10 +106,12 @@ namespace synthese
 			typedef std::vector<DepartureServiceIndex> DepartureServiceIndices;
 			typedef std::vector<ArrivalServiceIndex> ArrivalServiceIndices;
 
+			typedef double MetricOffset;
+
 		protected:
 			Vertex*	_fromVertex;
 			Path*		_parentPath;		//!< The path the edge belongs
-			double			_metricOffset;		//!< Metric offset
+			MetricOffset _metricOffset;		//!< Metric offset
 		
 		private:
 			static const std::size_t INDICES_NUMBER;
@@ -146,7 +148,7 @@ namespace synthese
 				Path* parentPath = NULL,
 				std::size_t rankInPath = 0,
 				Vertex* fromVertex = NULL,
-				double metricOffset = 0
+				MetricOffset metricOffset = 0
 			);
 
 			
@@ -161,7 +163,7 @@ namespace synthese
 				void setPreviousDepartureForFineSteppingOnly (Edge* previousDeparture) { _previousDepartureForFineSteppingOnly = previousDeparture; }
 				void setFollowingConnectionArrival(Edge* followingConnectionArrival) {_followingConnectionArrival = followingConnectionArrival; }
 				void setFollowingArrivalForFineSteppingOnly(Edge* followingArrival) { _followingArrivalForFineSteppingOnly = followingArrival; }
-				void setMetricOffset (double metricOffset) { _metricOffset = metricOffset; }
+				void setMetricOffset (MetricOffset metricOffset) { _metricOffset = metricOffset; }
 				void setGeometry(boost::shared_ptr<geos::geom::LineString> value) { _geometry = value; }
 				void setFromVertex(Vertex* value) { _fromVertex = value; }
 			//@}
@@ -177,7 +179,7 @@ namespace synthese
 				/** Returns metric offset of this edge from
 				parent path origin vertex.
 				*/
-				double getMetricOffset () const { return _metricOffset; }
+				MetricOffset getMetricOffset () const { return _metricOffset; }
 
 				Edge* getPreviousConnectionDeparture () const { return _previousConnectionDeparture; }
 				Edge* getPreviousDepartureForFineSteppingOnly () const { return _previousDepartureForFineSteppingOnly; }
@@ -232,6 +234,18 @@ namespace synthese
 				boost::shared_ptr<geos::geom::LineString> getGeometry(
 				) const;
 
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the metric offset of the end of the edge
+				/// @return the metric offset of the end of the edge if not the last edge of the path,
+				/// the metric offset of the beginning else.
+				/// @pre the path must be linked, and the next edge must be linked to the path too
+				/// @author Hugues Romain
+				/// @since 3.2.0
+				/// @date 2010
+				MetricOffset getEndMetricOffset() const;
+				
 
 //				int getBestRunTime (const Edge& other ) const;
 			    

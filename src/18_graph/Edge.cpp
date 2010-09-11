@@ -434,4 +434,17 @@ namespace synthese
 
 			return shared_ptr<LineString>(geometryFactory->createLineString());
 		}
+
+
+
+		Edge::MetricOffset Edge::getEndMetricOffset() const
+		{
+			if(	!_parentPath ||
+				_parentPath->getLastEdge() == this ||
+				!_parentPath->getEdge(_rankInPath + 1)
+			){
+				return getMetricOffset();
+			}
+			return _parentPath->getEdge(_rankInPath + 1)->getMetricOffset();
+		}
 }	}

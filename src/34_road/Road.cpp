@@ -316,4 +316,15 @@ namespace synthese
 		{
 			return (_reverseRoad == NULL);
 		}
+
+
+
+		void Road::setSide( Side value )
+		{
+			_side = value;
+			if(_reverseRoad)
+			{
+				_reverseRoad->setSide(value == LEFT_SIDE ? RIGHT_SIDE : LEFT_SIDE);
+			}
+		}
 }	}
