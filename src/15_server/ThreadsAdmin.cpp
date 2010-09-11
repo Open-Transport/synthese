@@ -30,6 +30,8 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "ThreadKillAction.h"
 #include "Profile.h"
+#include "QuitAction.hpp"
+#include "StaticActionRequest.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -128,6 +130,13 @@ namespace synthese
 			}
 
 			stream << t.close();
+
+			stream << "<h1>Arrêt du serveur</h1>";
+
+			StaticActionRequest<QuitAction> quitAction(request);
+			stream << "<p>";
+			stream << HTMLModule::getLinkButton(quitAction.getURL(), "Arrêter le serveur", "Etes-vous sûr de vouloir arrêter le serveur ?");
+			stream << "</p>";
 		}
 
 		bool ThreadsAdmin::isAuthorized(

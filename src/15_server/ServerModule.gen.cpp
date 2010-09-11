@@ -6,6 +6,7 @@ synthese::server::LoginInterfacePage::integrate();
 synthese::server::LoginAction::integrate();
 synthese::server::LogoutAction::integrate();
 synthese::server::ThreadKillAction::integrate();
+synthese::server::QuitAction::integrate();
 
 synthese::server::HtmlFormInterfaceElement::integrate();
 synthese::server::ValidSessionInterfaceElement::integrate();
