@@ -257,7 +257,7 @@ namespace synthese
 
 					RoutePlanningListWithAlarm displayedObject;
 					displayedObject.map = generator.run();
-					displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this);
+					displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this, date);
 
 					page->display(
 						stream,
@@ -322,7 +322,7 @@ namespace synthese
 
 					ArrivalDepartureListWithAlarm displayedObject;
 					displayedObject.map = generator->generate();
-					displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this);
+					displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this, date);
 				
 					page->display(
 						stream
