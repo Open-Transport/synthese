@@ -150,5 +150,16 @@ namespace synthese
 			}
 			return DBLog::getObjectName(id, request);
 		}
+
+
+
+		void SecurityLog::AddQuitEntry( const User& user )
+		{
+			DBLogEntry::Content c;
+			c.push_back(lexical_cast<string>(QUIT_ENTRY));
+			c.push_back(string());
+			c.push_back("SYNTHESE exited by user command");
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_WARNING, c, &user, user.getKey());
+		}
 	}
 }

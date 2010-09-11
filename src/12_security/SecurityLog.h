@@ -59,7 +59,8 @@ namespace synthese
 			typedef enum {
 				LOGIN_ENTRY = 10,
 				USER_ADMIN_ENTRY = 20,
-				PROFILE_ADMIN_ENTRY = 30
+				PROFILE_ADMIN_ENTRY = 30,
+				QUIT_ENTRY = 40
 			} _EntryType;
 
 		public:
@@ -85,6 +86,10 @@ namespace synthese
 				const User* user
 				, const Profile* subject
 				, const std::string& text
+			);
+
+			static void AddQuitEntry(
+				const User& user
 			);
 		};
 	}
