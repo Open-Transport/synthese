@@ -140,6 +140,7 @@ namespace synthese
 		class DisplayScreenContentFunction:
 			public util::FactorableTemplate<cms::FunctionWithSite<false>,DisplayScreenContentFunction>
 		{
+		public:
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_WAY;
 			static const std::string PARAMETER_TB;
@@ -150,6 +151,7 @@ namespace synthese
 			static const std::string PARAMETER_CITY_NAME;
 			static const std::string PARAMETER_STOP_NAME;
 
+		private:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const DisplayScreen>	_screen;
