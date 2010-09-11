@@ -69,7 +69,13 @@ namespace synthese
 		const string NavstreetsFileFormat::_FIELD_NREF_IN_ID("NREF_IN_ID");
 		const string NavstreetsFileFormat::_FIELD_L_AREA_ID("L_AREA_ID");
 		const string NavstreetsFileFormat::_FIELD_R_AREA_ID("R_AREA_ID");
-		
+		const string NavstreetsFileFormat::_FIELD_L_REFADDR("L_REFADDR");
+		const string NavstreetsFileFormat::_FIELD_L_NREFADDR("L_NREFADDR");
+		const string NavstreetsFileFormat::_FIELD_R_REFADDR("R_REFADDR");
+		const string NavstreetsFileFormat::_FIELD_R_NREFADDR("R_NREFADDR");
+		const string NavstreetsFileFormat::_FIELD_L_ADDRSCH("L_ADDRSCH");
+		const string NavstreetsFileFormat::_FIELD_R_ADDRSCH("R_ADDRSCH");
+
 		const string NavstreetsFileFormat::_FIELD_AREA_ID("AREA_ID");
 		const string NavstreetsFileFormat::_FIELD_AREACODE_3("AREACODE_3");
 		const string NavstreetsFileFormat::_FIELD_AREACODE_4("AREACODE_4");
@@ -229,6 +235,10 @@ namespace synthese
 					string rightId(algorithm::trim_copy(dbfile.getText(*record, _FIELD_NREF_IN_ID)));
 					int lAreaId(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_L_AREA_ID))));
 					int rAreaId(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_R_AREA_ID))));
+					string leftMinHouseNumber(algorithm::trim_copy(dbfile.getText(*record, _FIELD_L_REFADDR)));
+					string leftMaxHouseNumber(algorithm::trim_copy(dbfile.getText(*record, _FIELD_L_NREFADDR)));
+					string rightMinHouseNumber(algorithm::trim_copy(dbfile.getText(*record, _FIELD_R_REFADDR)));
+					string rightMaxHouseNumber(algorithm::trim_copy(dbfile.getText(*record, _FIELD_R_NREFADDR)));
 
 ///	@todo Handle this case with aliases
 //					for(size_t area(0); area< (lAreaId == rAreaId ? size_t(1) : size_t(2)); ++area)

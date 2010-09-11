@@ -141,5 +141,51 @@ namespace synthese
 			}
 			return GeoPoint(LengthIndexedLine(geometry.get()).extractPoint(metricOffset));
 		}
+
+
+
+		RoadChunk* RoadChunk::getReverseChunk() const
+		{
+			if(!getRoad() || !getRoad()->getReverseRoad())
+			{
+				return NULL;
+			}
+			return static_cast<RoadChunk*>(getRoad()->getReverseRoad()->getEdges().operator[](-getRankInPath()));
+		}
+
+
+
+		bool RoadChunk::testIfHouseNumberBelongsToChunk( HouseNumber houseNumber ) const
+		{
+			if(!_houseNumberBounds)
+			{
+				return false;
+			}
+
+			if(houseNumber < _houseNumberBounds->first && houseNumber > _houseNumberBounds->second)
+			{
+				return false;
+			}
+
+			switch(_houseNumberingPolicy)
+			{
+			case ALL: return true;
+			case ODD: return houseNumber % 2;
+			case EVEN: return !(houseNumber % 2); 
+			}
+
+			// Never execute
+			return false;
+		}
+
+
+
+		RoadChunk::MetricOffset RoadChunk::getHouseNumberMetricOffset( HouseNumber houseNumber ) const
+		{
+			return getMetricOffset() +
+				((houseNumber - _houseNumberBounds->first) / (_houseNumberBounds->second - _houseNumberBounds->first)) *
+				(getEndMetricOffset() - getMetricOffset())
+				;
+		}
 	}
 }

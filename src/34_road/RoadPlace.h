@@ -41,14 +41,15 @@ namespace synthese
 		////////////////////////////////////////////////////////////////////////
 		/// Road place class.
 		/// @ingroup m34
+		/// @author Hugues Romain
+		//////////////////////////////////////////////////////////////////////////
 		class RoadPlace:
 			public virtual geography::Place,
 			public graph::PathGroup,
 			public geography::NamedPlaceTemplate<RoadPlace>
 		{
 		public:
-			// Typedefs
-			
+	
 			/// Chosen registry class.
 			typedef util::Registry<RoadPlace> Registry;
 
