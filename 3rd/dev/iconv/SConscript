@@ -1,0 +1,24 @@
+Import ('env')
+
+## ICONV ##########################################################################################################################
+## http://www.gnu.org/software/libiconv
+
+class IconvProject (CppIncludeProject):
+	def declare(self):
+		self.env.InstallAs('#3rd/dev/iconv/lib/libiconv.lib','#build/'+env.GetCppMode()+'/repo/libiconv.lib')
+		self.env.InstallAs('#3rd/dev/iconv/lib/libcharset.lib','#build/'+env.GetCppMode()+'/repo/libcharset.lib')
+		self.env.InstallAs('#3rd/dev/iconv/lib/libcharset-bcc.lib','#build/'+env.GetCppMode()+'/repo/libcharset-bcc.lib')
+		self.env.InstallAs('#3rd/dev/iconv/lib/libiconv-bcc.lib','#build/'+env.GetCppMode()+'/repo/libiconv-bcc.lib')
+		
+		CppIncludeProject.declare(self)
+
+
+if self.env.GetPlatform () == 'win32':
+	CppIncludeProject(
+		env
+		, 'iconv'
+		, '1.9.2'
+		, include_dir = env.SrcDir('include')
+		, filesrootdir = env.SrcDir('include')
+	)
+
