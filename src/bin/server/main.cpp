@@ -25,6 +25,10 @@
 // At first to avoid the Windows bug "WinSock.h has already been included"
 #include "ServerModule.h"
 
+#ifdef WIN32
+#include <vld.h>
+#endif
+
 #include "Exception.h"
 #include "Log.h"
 #include "Factory.h"
@@ -58,7 +62,7 @@ namespace po = boost::program_options;
 
 boost::filesystem::path* pidFile (0);
 
-void quit();
+void quit(bool doExit = true);
 
 void sig_INT_handler(int sig)
 {
@@ -142,7 +146,7 @@ filesystem::path createCompletePath (const std::string& s)
 }
 
 
-void quit()
+void quit(bool doExit)
 {
 	// End all threads
 	ServerModule::KillAllHTTPThreads(false);
@@ -162,16 +166,18 @@ void quit()
 
     Log::GetInstance ().info ("Exit!");
 
-	exit(0);
+	if(doExit)
+	{
+		exit(0);
+	}
 }
 
 
 int main( int argc, char **argv )
 {
 #ifdef WIN32
-	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF );
+	VLDDisable();
 #endif
-
 	std::signal (SIGINT, sig_INT_handler);
     std::signal (SIGTERM, sig_INT_handler);
     std::signal (SIGSEGV, sig_INT_handler);
@@ -183,150 +189,158 @@ int main( int argc, char **argv )
 
     try 
     {
-		std::string db;
-		std::string pidf;
-		std::string logf;
-		std::vector<std::string> params;
+		{
+			std::string db;
+			std::string pidf;
+			std::string logf;
+			std::vector<std::string> params;
 
-		// To define several params on the command line, the syntax is --param name1=val1 --param name2=val2 ....
+			// To define several params on the command line, the syntax is --param name1=val1 --param name2=val2 ....
 
-		po::options_description desc("Allowed options");
-		desc.add_options()
-			("help", "produce this help message")
-			("db", po::value<std::string>(&db)->default_value (std::string ("config.db3")), "SQLite database file")
+			po::options_description desc("Allowed options");
+			desc.add_options()
+				("help", "produce this help message")
+				("db", po::value<std::string>(&db)->default_value (std::string ("config.db3")), "SQLite database file")
 #ifndef WIN32
-			("daemon", "Run server in daemon mode")
+				("daemon", "Run server in daemon mode")
 #endif        
-			("logfile", po::value<std::string>(&logf)->default_value (std::string ("-")), "Log file path or - for standard output)")
+				("logfile", po::value<std::string>(&logf)->default_value (std::string ("-")), "Log file path or - for standard output)")
 #ifndef WIN32
-			("pidfile", po::value<std::string>(&pidf)->default_value (std::string ("s3_server.pid")), "PID file ( - = no pid file )")
+				("pidfile", po::value<std::string>(&pidf)->default_value (std::string ("s3_server.pid")), "PID file ( - = no pid file )")
 #endif
-			("param", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
-		
-		po::variables_map vm;
-		po::store(po::parse_command_line(argc, argv, desc), vm);
-		po::notify(vm);    
-	    
-		if (vm.count("help"))
-		{
-			std::cout << desc << std::endl;
-			return 1;
-		}
+				("param", po::value<std::vector<std::string> >(&params), "Default parameters values (if not defined in db)");
+
+			po::variables_map vm;
+			po::store(po::parse_command_line(argc, argv, desc), vm);
+			po::notify(vm);    
+
+			if (vm.count("help"))
+			{
+				std::cout << desc << std::endl;
+				return 1;
+			}
 #ifndef WIN32
-		bool daemonMode (vm.count("daemon") != 0);
+			bool daemonMode (vm.count("daemon") != 0);
 #endif
-		 
-		ModuleClass::Parameters defaultParams;
-		for (std::vector<std::string>::const_iterator it = params.begin (); 
-			 it != params.end (); ++it)
-		{
-			int index = it->find ("=");
-		
-			std::string paramName (it->substr (0, index));
-			std::string paramValue (it->substr (index+1));
 
-			defaultParams.insert (std::make_pair (paramName, paramValue));
-		}
+			ModuleClass::Parameters defaultParams;
+			for (std::vector<std::string>::const_iterator it = params.begin (); 
+				it != params.end (); ++it)
+			{
+				int index = it->find ("=");
+
+				std::string paramName (it->substr (0, index));
+				std::string paramValue (it->substr (index+1));
+
+				defaultParams.insert (std::make_pair (paramName, paramValue));
+			}
 
 #ifndef WIN32
-		pid_t pid = getpid ();
-		if(pidf != "-")
-		{
-			// Check if a daemon instance is already running (PID file existence)
-			pidFile = new boost::filesystem::path (createCompletePath (pidf));
-			if (boost::filesystem::exists (*pidFile) == true)
+			pid_t pid = getpid ();
+			if(pidf != "-")
 			{
-				std::ifstream is (pidFile->string ().c_str (), std::ios_base::in);
-				is >> pid;
-				is.close ();
-				std::cerr << "Process s3_server is already running with PID " << pid << "." << std::endl;
-				exit (1);
+				// Check if a daemon instance is already running (PID file existence)
+				pidFile = new boost::filesystem::path (createCompletePath (pidf));
+				if (boost::filesystem::exists (*pidFile) == true)
+				{
+					std::ifstream is (pidFile->string ().c_str (), std::ios_base::in);
+					is >> pid;
+					is.close ();
+					std::cerr << "Process s3_server is already running with PID " << pid << "." << std::endl;
+					exit (1);
+				}
+				ensureWritablePath (*pidFile, true);
 			}
-			ensureWritablePath (*pidFile, true);
-		}
 #endif        
 
-		boost::filesystem::path dbpath (createCompletePath (db));
-		boost::filesystem::path logFile (createCompletePath (logf));
+			boost::filesystem::path dbpath (createCompletePath (db));
+			boost::filesystem::path logFile (createCompletePath (logf));
 
-		ensureWritablePath (dbpath, false);
-		std::ostream* logStream = &std::cout;
-		if (logf != "-")
-		{
-			ensureWritablePath (logFile, false);
-			// Create log file output stream
-			logStream = new std::ofstream (logFile.string ().c_str (), std::ios_base::app);
-			if (logStream->good () == false)
+			ensureWritablePath (dbpath, false);
+			std::ostream* logStream = &std::cout;
+			if (logf != "-")
 			{
-			std::cerr << "Cannot open " << logFile.string () << " for writing." << std::endl;
-			exit (1);
+				ensureWritablePath (logFile, false);
+				// Create log file output stream
+				logStream = new std::ofstream (logFile.string ().c_str (), std::ios_base::app);
+				if (logStream->good () == false)
+				{
+					std::cerr << "Cannot open " << logFile.string () << " for writing." << std::endl;
+					exit (1);
+				}
+				else
+				{
+					Log::GetInstance ().setOutputStream (logStream);
+				}
 			}
-			else
-			{
-			Log::GetInstance ().setOutputStream (logStream);
-			}
-		}
 
 
 
 #ifndef WIN32
-		if (daemonMode)
-		{
-			pid = daemonize ();
-		}
-		Log::GetInstance ().info ("Process PID = " + lexical_cast<string>(pid) + (daemonMode ? " (daemon mode)" : ""));
+			if (daemonMode)
+			{
+				pid = daemonize ();
+			}
+			Log::GetInstance ().info ("Process PID = " + lexical_cast<string>(pid) + (daemonMode ? " (daemon mode)" : ""));
 #endif        
 
-		// included auto generated code
-		#include "generated.cpp.inc"
+			// included auto generated code
+#include "generated.cpp.inc"
 
-		const boost::filesystem::path& workingDir = boost::filesystem::current_path();
-		Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
+			const boost::filesystem::path& workingDir = boost::filesystem::current_path();
+			Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
 
-		ModuleClass::SetDefaultParameters (defaultParams);
-		DBModule::SetDatabasePath (dbpath);
-	    
-		// Initialize modules
-//		if (Factory<ModuleClass>::size() == 0)
-//			throw std::exception("No registered module !");
-	    
+			ModuleClass::SetDefaultParameters (defaultParams);
+			DBModule::SetDatabasePath (dbpath);
 
-		vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
-		BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
-		{
-			Log::GetInstance ().info ("Pre-initializing module " + module->getFactoryKey() + "...");
-			module->preInit();
-		}
-	    
-		BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
-		{
-			Log::GetInstance ().info ("Initializing module " + module->getFactoryKey() + "...");
-			module->init();
-		}
+			// Initialize modules
+			//		if (Factory<ModuleClass>::size() == 0)
+			//			throw std::exception("No registered module !");
+
+
+			vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
+			BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
+			{
+				Log::GetInstance ().info ("Pre-initializing module " + module->getFactoryKey() + "...");
+				module->preInit();
+			}
+
+			BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
+			{
+				Log::GetInstance ().info ("Initializing module " + module->getFactoryKey() + "...");
+				module->init();
+			}
 
 
 #ifndef WIN32
-		// Create the real PID file
-		if(pidf != "-")
-		{
-			std::ofstream os (pidFile->string ().c_str (), std::ios_base::out);
-			os << pid << std::endl;
-			os.close ();
-		}
+			// Create the real PID file
+			if(pidf != "-")
+			{
+				std::ofstream os (pidFile->string ().c_str (), std::ios_base::out);
+				os << pid << std::endl;
+				os.close ();
+			}
 
-		if (daemonMode)
-		{
-			// redirect I/O streams to /dev/null
-			freopen ("/dev/null", "r", stdin);
-			freopen ("/dev/null", "w", stdout);
-			freopen ("/dev/null", "w", stderr);
-		}
+			if (daemonMode)
+			{
+				// redirect I/O streams to /dev/null
+				freopen ("/dev/null", "r", stdin);
+				freopen ("/dev/null", "w", stdout);
+				freopen ("/dev/null", "w", stderr);
+			}
 #endif    
 
-		ServerModule::RunHTTPServer();
-		ServerModule::Wait();
+#ifdef WIN32
+			VLDEnable();
+#endif
+
+			ServerModule::RunHTTPServer();
+			ServerModule::Wait();
+
+			quit(false);
+		}
 		
-		quit();
+		exit(0);
     }
     catch (std::exception& e)
     {
