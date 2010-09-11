@@ -46,6 +46,7 @@ namespace synthese
 		/// @date 2010
 		/// @todo Replace cdbfile.h use by shapefil.h dbf support and remove cdbfile.h
 		/// @bug the imported files must allow writing (it is not used by synthese)
+		/// @bug the circulation side on the streets is forced to right
 		//////////////////////////////////////////////////////////////////////////
 		/// A large documentation about Navstreets format can be found at
 		/// http://www.nn4d.com/ (valid user required, registration is free)
@@ -118,6 +119,12 @@ namespace synthese
 				static const std::string _FIELD_NREF_IN_ID;
 				static const std::string _FIELD_L_AREA_ID;
 				static const std::string _FIELD_R_AREA_ID;
+				static const std::string _FIELD_L_REFADDR;
+				static const std::string _FIELD_L_NREFADDR;
+				static const std::string _FIELD_R_REFADDR;
+				static const std::string _FIELD_R_NREFADDR;
+				static const std::string _FIELD_L_ADDRSCH;
+				static const std::string _FIELD_R_ADDRSCH;
 			//@}
 
 			//! @name Fields of mtdarea table

@@ -58,6 +58,12 @@ namespace synthese
 		const string RoadChunkTableSync::COL_VIAPOINTS ("via_points");  // list of ids
 		const string RoadChunkTableSync::COL_ROADID ("road_id");  // NU
 		const string RoadChunkTableSync::COL_METRICOFFSET ("metric_offset");  // U ??
+		const string RoadChunkTableSync::COL_LEFT_MIN_HOUSE_NUMBER("left_min_house_number");
+		const string RoadChunkTableSync::COL_LEFT_MAX_HOUSE_NUMBER("left_max_house_number");
+		const string RoadChunkTableSync::COL_RIGHT_MIN_HOUSE_NUMBER("right_min_house_number");
+		const string RoadChunkTableSync::COL_RIGHT_MAX_HOUSE_NUMBER("right_max_house_number");
+		const string RoadChunkTableSync::COL_LEFT_HOUSE_NUMBERING_POLICY("left_house_numbering_policy");
+		const string RoadChunkTableSync::COL_RIGHT_HOUSE_NUMBERING_POLICY("right_house_numbering_policy");
 
 		const string RoadChunkTableSync::SEP_POINTS(",");
 		const string RoadChunkTableSync::SEP_LON_LAT(":");
@@ -77,6 +83,12 @@ namespace synthese
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_VIAPOINTS, SQL_TEXT),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_ROADID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_METRICOFFSET, SQL_DOUBLE, false),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_LEFT_MIN_HOUSE_NUMBER, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_LEFT_MAX_HOUSE_NUMBER, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_RIGHT_MIN_HOUSE_NUMBER, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_RIGHT_MAX_HOUSE_NUMBER, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_LEFT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_RIGHT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
@@ -174,6 +186,39 @@ namespace synthese
 				{
 					throw LinkException<RoadChunkTableSync>(rows, RoadChunkTableSync::COL_CROSSING_ID, e);
 				}
+
+				// Left house number bounds
+				if(	!rows->getText(RoadChunkTableSync::COL_LEFT_MIN_HOUSE_NUMBER).empty() &&
+					!rows->getText(RoadChunkTableSync::COL_LEFT_MAX_HOUSE_NUMBER).empty()
+				){
+					((object->getRoad()->getSide() == Road::LEFT_SIDE) ? object : object->getReverseChunk())->setHouseNumberBounds(
+						RoadChunk::HouseNumberBounds(RoadChunk::HouseNumberBounds::value_type(
+							rows->getInt(RoadChunkTableSync::COL_LEFT_MIN_HOUSE_NUMBER),
+							rows->getInt(RoadChunkTableSync::COL_LEFT_MIN_HOUSE_NUMBER)
+					)	));
+
+					// Left House numbering policy
+					((object->getRoad()->getSide() == Road::LEFT_SIDE) ? object : object->getReverseChunk())->setHouseNumberingPolicy(
+						static_cast<RoadChunk::HouseNumberingPolicy>(rows->getInt(RoadChunkTableSync::COL_LEFT_HOUSE_NUMBERING_POLICY))
+					);
+				}
+
+
+				// Right house number bounds
+				if(	!rows->getText(RoadChunkTableSync::COL_RIGHT_MIN_HOUSE_NUMBER).empty() &&
+					!rows->getText(RoadChunkTableSync::COL_RIGHT_MAX_HOUSE_NUMBER).empty()
+				){
+					((object->getRoad()->getSide() == Road::RIGHT_SIDE) ? object : object->getReverseChunk())->setHouseNumberBounds(
+						RoadChunk::HouseNumberBounds(RoadChunk::HouseNumberBounds::value_type(
+							rows->getInt(RoadChunkTableSync::COL_RIGHT_MIN_HOUSE_NUMBER),
+							rows->getInt(RoadChunkTableSync::COL_RIGHT_MIN_HOUSE_NUMBER)
+					)	));
+
+					// Right House numbering policy
+					((object->getRoad()->getSide() == Road::RIGHT_SIDE) ? object : object->getReverseChunk())->setHouseNumberingPolicy(
+						static_cast<RoadChunk::HouseNumberingPolicy>(rows->getInt(RoadChunkTableSync::COL_RIGHT_HOUSE_NUMBERING_POLICY))
+					);
+				}
 			}
 		}
 
@@ -204,12 +249,35 @@ namespace synthese
 				}
 			}
 
+			RoadChunk* leftChunk(NULL);
+			RoadChunk* rightChunk(NULL);
+			
+			if(object->getRoad())
+			{
+				if(object->getRoad()->getSide() == Road::LEFT_SIDE)
+				{
+					leftChunk = object;
+					rightChunk = object->getReverseChunk();
+				}
+				else
+				{
+					leftChunk = object->getReverseChunk();
+					rightChunk = object;
+				}
+			}
+
 			ReplaceQuery<RoadChunkTableSync> query(*object);
 			query.addField(object->getFromCrossing() ? object->getFromCrossing()->getKey() : RegistryKeyType(0));
 			query.addField(object->getRankInPath());
 			query.addField(viaPoints.str());
 			query.addField(object->getRoad() ? object->getRoad()->getKey() : RegistryKeyType(0));
 			query.addField(object->getMetricOffset());
+			query.addField((leftChunk && leftChunk->getHouseNumberBounds()) ? lexical_cast<string>(leftChunk->getHouseNumberBounds()->first) : string());
+			query.addField((leftChunk && leftChunk->getHouseNumberBounds()) ? lexical_cast<string>(leftChunk->getHouseNumberBounds()->second) :	string());
+			query.addField((rightChunk && rightChunk->getHouseNumberBounds()) ? lexical_cast<string>(rightChunk->getHouseNumberBounds()->first) : string());
+			query.addField((rightChunk && rightChunk->getHouseNumberBounds()) ? lexical_cast<string>(rightChunk->getHouseNumberBounds()->second) :	string());
+			query.addField(static_cast<int>((leftChunk && leftChunk->getHouseNumberBounds()) ? leftChunk->getHouseNumberingPolicy() : RoadChunk::ALL));
+			query.addField(static_cast<int>((rightChunk && rightChunk->getHouseNumberBounds()) ? rightChunk->getHouseNumberingPolicy() : RoadChunk::ALL));
 			query.execute(transaction);
 	    }
 	}
