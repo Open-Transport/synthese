@@ -982,10 +982,21 @@ namespace synthese
 					stream << "<p>Aucun contenu en attente</p>";
 				}
 
-				stream << "<h1>Visualisation</h1>";
+				stream << "<h1>Visualisation en direct</h1>";
 
 				stream << "<p>";
 				stream << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "monitor_go.png") << " ";
+				stream << "</p>";
+
+				stream << "<h1>Simulation</h1>";
+
+				stream << "<p>";
+				HTMLForm viewForm(viewRequest.getHTMLForm("simulate"));
+				ptime now(second_clock::local_time());
+				stream << viewForm.open();
+				stream << viewForm.getCalendarInput(DisplayScreenContentFunction::PARAMETER_DATE, now) << " ";
+				stream << viewForm.getSubmitButton("Simuler");
+				stream << viewForm.close();
 				stream << "</p>";
 			}
 			
