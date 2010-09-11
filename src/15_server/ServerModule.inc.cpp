@@ -11,6 +11,7 @@
 #include "ServerAdminRight.h"
 #include "ThreadsAdmin.h"
 #include "ThreadKillAction.h"
+#include "QuitAction.hpp"
 
 #include "XMLSessionFunction.h"
 #include "XMLSessionIsValidFunction.h"
