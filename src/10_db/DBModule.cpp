@@ -75,7 +75,7 @@ namespace synthese
 
 			// Initialization of SpatiaLite (inspired from official init_spatialite-2.3.sql)
 			SQLiteTransaction t;
-			SQLiteResultSPtr res = GetSQLite()->execQuery ("SELECT * FROM SQLITE_MASTER WHERE name='spatial_ref_sys' AND type='table'");
+			SQLiteResultSPtr res = DBModule::GetSQLite()->execQuery ("SELECT * FROM SQLITE_MASTER WHERE name='spatial_ref_sys' AND type='table'");
 			if (res->next () == false)
 			{
 				t.add("SELECT InitSpatialMetaData();");

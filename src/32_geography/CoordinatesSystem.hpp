@@ -31,6 +31,8 @@
 #include <map>
 #include <proj_api.h>
 #include <boost/lexical_cast.hpp>
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/PrecisionModel.h>
 
 namespace synthese
 {
@@ -49,12 +51,15 @@ namespace synthese
 			std::string _name;
 			std::string _projSequence;
 			projPJ _projObject;
+			geos::geom::GeometryFactory _geometryFactory;
 
 			typedef std::map<db::SRID, CoordinatesSystem> Map;
 
 			////////////////////////////////////////////////////////////////////
 			/// All coordinates systems.
 			static Map _coordinates_systems;
+
+			static Map::const_iterator _defaultCoordinatesSystem;
 
 		public:
 			class NotFoundException:
@@ -73,7 +78,8 @@ namespace synthese
 			):	_srid(srid),
 				_name(name),
 				_projSequence(projSequence),
-				_projObject(pj_init_plus(projSequence.c_str()))
+				_projObject(pj_init_plus(projSequence.c_str())),
+				_geometryFactory(new geos::geom::PrecisionModel(), srid)
 			{}
 
 			CoordinatesSystem() {}
@@ -81,6 +87,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const projPJ& getProjObject() const { return _projObject; }
+				const geos::geom::GeometryFactory getGeometryFactory() const { return _geometryFactory; }
 				const std::string& getName() const { return _name; }
 			//@}
 
@@ -95,6 +102,9 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// @throws NotFoundException if the system was not found
 			static const CoordinatesSystem& GetCoordinatesSystem(db::SRID srid);
+
+
+			static const CoordinatesSystem& GetInstanceCoordinateSystem();
 		};
 	}
 }

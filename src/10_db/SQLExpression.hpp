@@ -290,15 +290,15 @@ namespace synthese
 				if(value.get())
 				{
 					std::stringstream str;
-					if(DBModule::GetStorageSRID() != DBModule::GetInstanceSRID())
+					if(DBModule::GetStorageSRID() != value->getSRID())
 					{
 						str << "Transform(";
 					}
 					str << "GeomFromWKB('";
 					geos::io::WKBWriter writer(2, getMachineByteOrder(), true);
-					writer.write(*value, str);
-					str << "')";
-					if(DBModule::GetStorageSRID() != DBModule::GetInstanceSRID())
+					writer.writeHEX(*value, str);
+					str << "," << value->getSRID() << ')";
+					if(DBModule::GetStorageSRID() != value->getSRID())
 					{
 						str << "," << DBModule::GetStorageSRID() << ")";
 					}
@@ -310,7 +310,12 @@ namespace synthese
 				}
 			}
 			virtual std::string toString() const { return _value; }
-			static boost::shared_ptr<SQLExpression> Get(const boost::shared_ptr<geos::geom::Geometry>& value);
+			static boost::shared_ptr<SQLExpression> Get(const boost::shared_ptr<geos::geom::Geometry>& value)
+			{
+				return boost::shared_ptr<SQLExpression>(
+					static_cast<SQLExpression*>(new ValueExpression<boost::shared_ptr<geos::geom::Geometry> >(value))
+				);
+			}
 		};
 
 

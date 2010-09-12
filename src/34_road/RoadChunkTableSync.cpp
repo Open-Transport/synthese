@@ -218,7 +218,7 @@ namespace synthese
 			ReplaceQuery<RoadChunkTableSync> query(*object);
 			query.addField(object->getFromCrossing() ? object->getFromCrossing()->getKey() : RegistryKeyType(0));
 			query.addField(object->getRankInPath());
-			query.addField(object->getStoredGeometry());
+			query.addField(static_pointer_cast<Geometry,LineString>(object->getStoredGeometry()));
 			query.addField(object->getRoad() ? object->getRoad()->getKey() : RegistryKeyType(0));
 			query.addField(object->getMetricOffset());
 			query.addField((leftChunk && leftChunk->getHouseNumberBounds()) ? lexical_cast<string>(leftChunk->getHouseNumberBounds()->first) : string());
