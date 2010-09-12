@@ -29,13 +29,12 @@
 #include "Request.h"
 #include "StopPointTableSync.hpp"
 #include "EdgeProjector.hpp"
-#include "City.h"
 #include "RoadPlace.h"
 #include "LexicalMatcher.h"
 #include "SQLiteTransaction.h"
 #include "StopArea.hpp"
 #include "Road.h"
-#include "RoadChunk.h"
+#include "RoadChunkTableSync.h"
 
 #include <boost/foreach.hpp>
 
@@ -93,51 +92,27 @@ namespace synthese
 					true
 			)	);
 
-			const City* curCity(NULL);
-			EdgeProjector::From paths;
 
 			BOOST_FOREACH(shared_ptr<StopPoint> stopPoint, stopPoints)
 			{
-				// Other city
-				if(stopPoint->getConnectionPlace()->getCity() != curCity)
-				{
-					curCity = stopPoint->getConnectionPlace()->getCity();
+				EdgeProjector<RoadChunk>::From paths(
+					RoadChunkTableSync::SearchByMaxDistance(
+						*stopPoint, _maxDistance
+				)	);
 
-					const City::PlacesMatcher::Map& roadPlaces(
-						curCity->getLexicalMatcher(FactorableTemplate<NamedPlace,road::RoadPlace>::FACTORY_KEY).entries()
-					);
-					
-					paths.clear();
-					BOOST_FOREACH(const City::PlacesMatcher::Map::value_type& item, roadPlaces)
-					{
-						const RoadPlace& roadPlace(*static_cast<const RoadPlace*>(item.second));
-						BOOST_FOREACH(Path* path, roadPlace.getPaths())
-						{
-							if(!static_cast<Road*>(path)->getReverseRoad())
-							{
-								continue;
-							}
-							BOOST_FOREACH(Edge* edge, path->getEdges())
-							{
-								paths.push_back(edge);
-							}
-						}
-					}
-				}
-
-				EdgeProjector projector(paths, _maxDistance);
+				EdgeProjector<RoadChunk> projector(paths, _maxDistance);
 
 				try
 				{
-					EdgeProjector::PathNearby projection(projector.projectEdge(*stopPoint));
+					EdgeProjector<RoadChunk>::PathNearby projection(projector.projectEdge(*stopPoint));
 					
 					Address projectedAddress(
-						static_cast<RoadChunk*>(projection.get<1>()),
+						projection.get<1>().get(),
 						projection.get<2>()
 					);
 					stopPoint->setProjectedPoint(projectedAddress);
 				}
-				catch(EdgeProjector::NotFoundException)
+				catch(EdgeProjector<RoadChunk>::NotFoundException)
 				{
 					Address emptyAddress;
 					stopPoint->setProjectedPoint(emptyAddress);

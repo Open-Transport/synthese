@@ -28,7 +28,7 @@
 #include "01_util/threads/ThreadAware.h"
 
 
-#include <sqlite3.h>
+#include <spatialite/sqlite3.h>
 
 #include <boost/shared_ptr.hpp>
 

@@ -77,6 +77,15 @@ namespace synthese
 			/// object.
 			static const SQLiteTableSync::Index _INDEXES[];
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Replacement of * fields getter to ensure conversion of geometry
+			/// columns into WKB format
+			/// @author Hugues Romain
+			/// @since 3.2.0
+			/// @date 2010
+			static std::string _fieldsGetter;
 			
 		private:
 			////////////////////////////////////////////////////////////////////
@@ -221,8 +230,8 @@ namespace synthese
 					SQLite* sqlite = DBModule::GetSQLite();
 					std::stringstream query;
 					query
-						<< "SELECT * "
-						<< "FROM " << K::TABLE.NAME
+						<< "SELECT " << _fieldsGetter
+						<< " FROM " << K::TABLE.NAME
 						<< " WHERE " << TABLE_COL_ID << "=" << key
 						<< " LIMIT 1";
 					SQLiteResultSPtr rows (sqlite->execQuery (query.str()));
@@ -248,7 +257,7 @@ namespace synthese
 			virtual SQLiteResultSPtr getRowById(SQLite* sqlite, util::RegistryKeyType id) const
 			{
 				std::stringstream ss;
-				ss << "SELECT * FROM " << K::TABLE.NAME << " WHERE ROWID=" << id << " LIMIT 1";
+				ss << "SELECT " << _fieldsGetter << " FROM " << K::TABLE.NAME << " WHERE ROWID=" << id << " LIMIT 1";
 
 				return sqlite->execQuery (ss.str (), false); 
 			}
@@ -269,7 +278,7 @@ namespace synthese
 				if (!K::TABLE.IGNORE_CALLBACKS_ON_FIRST_SYNC)
 				{
 					std::stringstream ss;
-					ss << "SELECT *  FROM " << K::TABLE.NAME;
+					ss << "SELECT " << _fieldsGetter << " FROM " << K::TABLE.NAME;
 					SQLiteResultSPtr result = sqlite->execQuery (ss.str (), true);
 					K().rowsAdded (sqlite, sync, result);
 				}
@@ -321,6 +330,10 @@ namespace synthese
 
 
 // IMPLEMENTATIONS ==============================================================================
+
+
+		template<class K>
+		std::string SQLiteTableSyncTemplate<K>::_fieldsGetter;
 
 
 		template <class K>
@@ -412,9 +425,39 @@ namespace synthese
 		template <class K>
 		void synthese::db::SQLiteTableSyncTemplate<K>::_UpdateSchema(
 			SQLite* sqlite
-		) {
+		){
 			std::string tableSchema = _GetSQLFieldsSchema();
 			std::string triggerNoUpdate = _GetSQLTriggerNoUpdate();
+
+			// * Fields getter
+			std::stringstream fieldsGetter;
+			for(size_t i(0); !_FIELDS[i].empty(); ++i)
+			{
+				if(i>0)
+				{
+					fieldsGetter << ",";
+				}
+				if(_FIELDS[i].isGeometry())
+				{
+					fieldsGetter << "AsBinary(";
+					if(DBModule::GetStorageSRID() != DBModule::GetInstanceSRID())
+					{
+						fieldsGetter << "Transform(";
+					}
+					fieldsGetter << _FIELDS[i].name;
+					if(DBModule::GetStorageSRID() != DBModule::GetInstanceSRID())
+					{
+						fieldsGetter << "," << DBModule::GetInstanceSRID() << ")";
+					}
+					fieldsGetter << ") AS " << _FIELDS[i].name;
+				}
+				else
+				{
+					fieldsGetter << _FIELDS[i].name;
+				}
+			}
+			_fieldsGetter = fieldsGetter.str();
+
 
 			// Check if the table already exists
 			std::string sql = "SELECT * FROM SQLITE_MASTER WHERE name='" + TABLE.NAME + "' AND type='table'";
@@ -477,6 +520,86 @@ namespace synthese
 
 				sqlite->execUpdate (str.str ());
 			}
+
+			// Search for geometry columns to add
+			for(size_t i(0); !_FIELDS[i].empty(); ++i)
+			{
+				if(!_FIELDS[i].isGeometry())
+				{
+					continue;
+				}
+
+				// Search if the geom column is declared
+				std::stringstream sql;
+				sql << "SELECT type FROM geometry_columns WHERE f_table_name='" << TABLE.NAME 
+					<< "' AND f_geometry_column='" << _FIELDS[i].name << "'";
+				SQLiteResultSPtr res = sqlite->execQuery (sql.str());
+
+				bool toUpdate(false);
+				if(res->next())
+				{
+					if(res->getText("type") != _FIELDS[i].getGeometryType())
+					{
+						std::stringstream sql;
+						sql <<
+							"SELECT DisableSpatialIndex('" << TABLE.NAME << "','" <<
+							_FIELDS[i].name << "');" <<
+							"SELECT DiscardGeometryColumn('" << TABLE.NAME << "','" <<
+							_FIELDS[i].name << "');";
+						sqlite->execUpdate(sql.str());
+						toUpdate = true;
+					}
+				}
+				else
+				{
+					toUpdate = true;
+				}
+
+				if(toUpdate)
+				{
+					std::stringstream sql;
+					sql <<
+						"SELECT RecoverGeometryColumn('" << TABLE.NAME << "','" <<
+						_FIELDS[i].name << "',4326,'" << _FIELDS[i].getGeometryType() << "',2);" <<
+						"SELECT CreateSpatialIndex('" << TABLE.NAME << "','" <<
+						_FIELDS[i].name << "');"
+					;
+					sqlite->execUpdate(sql.str());
+				}
+			}
+
+			// Search for geometry columns to remove
+			{
+				std::stringstream sql;
+				sql << "SELECT f_geometry_column, type FROM geometry_columns WHERE f_table_name='" << TABLE.NAME << "'";
+				SQLiteResultSPtr res = sqlite->execQuery (sql.str());
+				while(res->next())
+				{
+					bool toKeep(false);
+					for(size_t i(0); !_FIELDS[i].empty(); ++i)
+					{
+						if(	_FIELDS[i].isGeometry() &&
+							_FIELDS[i].name == res->getText("f_geometry_column") &&
+							_FIELDS[i].getGeometryType() == res->getText("type")
+						){
+							toKeep = true;
+							break;
+						}
+					}
+
+					if(!toKeep)
+					{
+						std::stringstream sql;
+						sql <<
+							"SELECT DisableSpatialIndex('" << TABLE.NAME << "','" <<
+							res->getText("f_geometry_column") << "');" <<
+							"SELECT DiscardGeometryColumn('" << TABLE.NAME << "','" <<
+							res->getText("f_geometry_column") << "');";
+						sqlite->execUpdate(sql.str());
+					}
+				}
+			}
+
 
 			// Indexes
 			for(size_t i(0); !_INDEXES[i].empty(); ++i)

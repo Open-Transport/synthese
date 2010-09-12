@@ -3,22 +3,40 @@ Import ('env')
 ## ICONV ##########################################################################################################################
 ## http://www.gnu.org/software/libiconv
 
+class CharSetProject(CppIncludeProject):
+	def declare(self):
+		self.add_target(self.env.Install(self.env['_REPO_STLIB_DIR'],'#3rd/dev/iconv/lib/libcharset.lib'))
+		
+	def get_libs(self):
+		return ['libcharset.lib']
+
+
 class IconvProject (CppIncludeProject):
 	def declare(self):
-		self.env.InstallAs('#3rd/dev/iconv/lib/libiconv.lib','#build/'+env.GetCppMode()+'/repo/libiconv.lib')
-		self.env.InstallAs('#3rd/dev/iconv/lib/libcharset.lib','#build/'+env.GetCppMode()+'/repo/libcharset.lib')
-		self.env.InstallAs('#3rd/dev/iconv/lib/libcharset-bcc.lib','#build/'+env.GetCppMode()+'/repo/libcharset-bcc.lib')
-		self.env.InstallAs('#3rd/dev/iconv/lib/libiconv-bcc.lib','#build/'+env.GetCppMode()+'/repo/libiconv-bcc.lib')
+		self.add_target(self.env.Install(self.env['_REPO_STLIB_DIR'],'#3rd/dev/iconv/lib/libiconv.lib'))
+		self.add_target(self.env.Install(self.env['_REPO_SHLIB_DIR'],'#3rd/dev/iconv/dll/libiconv2.dll'))
 		
 		CppIncludeProject.declare(self)
 
+	def get_libs(self):
+		return ['libiconv.lib']
 
-if self.env.GetPlatform () == 'win32':
-	CppIncludeProject(
+
+if env.GetPlatform () == 'win32':
+	CharSetProject(
+		env
+		, 'charset'
+		, '1.9.2'
+		, include_dir = env.SrcDir('include')
+		, filesrootdir = env.SrcDir('include')
+	)
+
+	IconvProject(
 		env
 		, 'iconv'
 		, '1.9.2'
 		, include_dir = env.SrcDir('include')
 		, filesrootdir = env.SrcDir('include')
+		, dependencies = ['charset.cppinc']
 	)
 

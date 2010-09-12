@@ -286,7 +286,7 @@ namespace synthese
 						{
 							GeoPoint gp(
 								leftNodeCoordinate,
-								CoordinatesSystem::GetCoordinatesSystem("EPSG:27572")
+								CoordinatesSystem::GetCoordinatesSystem(27572)
 							);
 							leftNode.reset(
 								new Crossing(
@@ -313,7 +313,7 @@ namespace synthese
 						{
 							GeoPoint gp(
 								rightNodeCoordinate,
-								CoordinatesSystem::GetCoordinatesSystem("EPSG:27572")
+								CoordinatesSystem::GetCoordinatesSystem(27572)
 							);
 							rightNode.reset(
 								new Crossing(

@@ -133,6 +133,11 @@ namespace synthese
 				return "DATE";
 			case SQL_TIMESTAMP:
 				return "TIMESTAMP";
+			default:
+				if(isGeometry())
+				{
+					return "BLOB";
+				}
 			}
 			return string();
 		}
@@ -143,6 +148,51 @@ namespace synthese
 		) const {
 			return name.empty();
 		}
+
+
+
+		bool SQLiteTableSync::Field::isGeometry() const
+		{
+			switch(type)
+			{
+				case SQL_GEOM_GEOMETRYCOLLECTION:
+				case SQL_GEOM_LINESTRING:
+				case SQL_GEOM_MULTILINESTRING:
+				case SQL_GEOM_MULTIPOINT:
+				case SQL_GEOM_MULTIPOLYGON:
+				case SQL_GEOM_POINT:
+				case SQL_GEOM_POLYGON:
+					return true;
+				default:
+					return false;
+			}
+		}
+
+
+
+		std::string SQLiteTableSync::Field::getGeometryType() const
+		{
+			switch(type)
+			{
+			case SQL_GEOM_GEOMETRYCOLLECTION:
+				return "GEOMETRYCOLLECTION";
+			case SQL_GEOM_LINESTRING:
+				return "LINESTRING";
+			case SQL_GEOM_MULTILINESTRING:
+				return "MULTILINESTRING";
+			case SQL_GEOM_MULTIPOINT:
+				return "MULTIPOINT";
+			case SQL_GEOM_MULTIPOLYGON:
+				return "MULTIPOLYGON";
+			case SQL_GEOM_POINT:
+				return "POINT";
+			case SQL_GEOM_POLYGON:
+				return "POLYGON";
+			default:
+				return string();
+			}
+		}
+
 
 
 		SQLiteTableSync::Index::Index(

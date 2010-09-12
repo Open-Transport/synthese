@@ -1,0 +1,24 @@
+Import ('env')
+
+## SPATIALITE / SQLITE ##########################################################################################################################
+## http://www.gaia-gis.it/spatialite/ http://www.sqlite.org/
+
+senv = env.Clone()
+
+deps = ['proj.cppbin']
+if senv.GetPlatform () == 'win32':
+	deps.append('iconv.cppinc')
+	senv.Append( CPPDEFINES = ['_WIN32'] )
+
+senv.Append( CPPDEFINES = ['OMIT_GEOS', 'SQLITE_ENABLE_RTREE'])
+
+CppLibProject(
+	senv
+	, 'spatialite'
+	, '2.3.1'
+	, source_files = senv.Glob ('*.c', [], senv.SrcDir('src'), prefix='src/', recursive=True)
+	, include_dir = senv.SrcDir('src/headers')
+	, filesrootdir = senv.SrcDir('src')
+	, dependencies = deps
+)
+

@@ -27,7 +27,6 @@
 #include "GeographyModule.h"
 #include "ReplaceQuery.h"
 
-#include <sqlite3.h>
 #include <assert.h>
 
 using namespace boost;

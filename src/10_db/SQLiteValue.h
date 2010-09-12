@@ -25,7 +25,7 @@
 #define SYNTHESE_DB_SQLITEVALUE_H
 
 #include "SQLiteValue.h"
-#include <sqlite3.h>
+#include <spatialite/sqlite3.h>
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
