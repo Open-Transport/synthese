@@ -32,7 +32,7 @@
 #include "SQLiteException.h"
 #include "SQLiteSync.h"
 
-#include <sqlite3.h>
+#include <spatialite/sqlite3.h>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 

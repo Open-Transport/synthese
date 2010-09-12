@@ -26,38 +26,47 @@
 #include "Exception.h"
 #include "NamedPlace.h"
 #include "CoordinatesSystem.hpp"
+#include "DBModule.h"
+#include "SQLiteResult.h"
+#include "SQLite.h"
 
 #include <sstream>
 #include <boost/iostreams/filtering_stream.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace geography;
 	using namespace server;
+	using namespace db;
+
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<ModuleClass,GeographyModule>::FACTORY_KEY("32_geography");
 	}
 
-	namespace geography
-	{
-		const string GeographyModule::_INSTANCE_COORDINATES_SYSTEM("instance_coordinates_system");
-		const CoordinatesSystem* GeographyModule::_instanceCoordinatesSystem(NULL);
-	}
-	
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<GeographyModule>::NAME("Géographie");
 	
 		template<> void ModuleClassTemplate<GeographyModule>::PreInit()
 		{
-			CoordinatesSystem::AddCoordinatesSystems();
-			RegisterParameter(GeographyModule::_INSTANCE_COORDINATES_SYSTEM, "EPSG:27572", &GeographyModule::ChangeInstanceCoordinatesSystem);
+			SQLiteResultSPtr systems(DBModule::GetSQLite()->execQuery("SELECT * FROM spatial_ref_sys;"));
+			while(systems->next())
+			{
+				CoordinatesSystem::AddCoordinatesSystem(
+					systems->getInt("auth_srid"),
+					systems->getText("ref_sys_name"),
+					systems->getText("proj4text")
+				);
+			}
 		}
 		
 		template<> void ModuleClassTemplate<GeographyModule>::Init()
@@ -162,16 +171,9 @@ namespace synthese
 
 
 
-		void GeographyModule::ChangeInstanceCoordinatesSystem( const std::string&, const std::string& value )
-		{
-			_instanceCoordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(value);
-		}
-
-
-
 		const CoordinatesSystem& GeographyModule::GetInstanceCoordinatesSystem()
 		{
-			return *_instanceCoordinatesSystem;
+			return CoordinatesSystem::GetCoordinatesSystem(DBModule::GetInstanceSRID());
 		}
 	}
 }

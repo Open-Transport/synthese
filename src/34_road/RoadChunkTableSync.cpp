@@ -27,6 +27,7 @@
 #include "SelectQuery.hpp"
 #include "LinkException.h"
 #include "GeoPoint.h"
+#include "CoordinatesSystem.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -55,7 +56,7 @@ namespace synthese
 	{
 		const string RoadChunkTableSync::COL_CROSSING_ID("address_id");
 		const string RoadChunkTableSync::COL_RANKINPATH ("rank_in_path");
-		const string RoadChunkTableSync::COL_VIAPOINTS ("via_points");  // list of ids
+		const string RoadChunkTableSync::COL_GEOMETRY("geometry");  // list of ids
 		const string RoadChunkTableSync::COL_ROADID ("road_id");  // NU
 		const string RoadChunkTableSync::COL_METRICOFFSET ("metric_offset");  // U ??
 		const string RoadChunkTableSync::COL_LEFT_MIN_HOUSE_NUMBER("left_min_house_number");
@@ -80,7 +81,7 @@ namespace synthese
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_CROSSING_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_RANKINPATH, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_VIAPOINTS, SQL_TEXT),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_GEOMETRY, SQL_GEOM_LINESTRING),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_ROADID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_METRICOFFSET, SQL_DOUBLE, false),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_LEFT_MIN_HOUSE_NUMBER, SQL_INTEGER),
@@ -116,51 +117,16 @@ namespace synthese
 			object->setMetricOffset(rows->getDouble (RoadChunkTableSync::COL_METRICOFFSET));
 
 		    // Geometry
-			string viaPointsStr(rows->getText (RoadChunkTableSync::COL_VIAPOINTS));
+			string viaPointsStr(rows->getText (RoadChunkTableSync::COL_GEOMETRY));
 			if(viaPointsStr.empty())
 			{
 				object->setGeometry(shared_ptr<LineString>());
 			}
 			else
 			{
-				const GeometryFactory* geometryFactory(GeometryFactory::getDefaultInstance());
-				vector<Coordinate>* coordinates = new vector<Coordinate>();
-
-				vector<string> points;
-				algorithm::split(points, viaPointsStr, algorithm::is_any_of(RoadChunkTableSync::SEP_POINTS));
-
-				if(points.size() > 1)
-				{
-					BOOST_FOREACH(const string& point, points)
-					{
-						vector<string> lonlat;
-						algorithm::split(lonlat, point, algorithm::is_any_of(RoadChunkTableSync::SEP_LON_LAT));
-
-						if(lonlat.size() < 2)
-						{
-							continue;
-						}
-
-						GeoPoint pt(
-							lexical_cast<double>(lonlat[0]),
-							lexical_cast<double>(lonlat[1])
-						);
-
-						coordinates->push_back(
-							pt
-						);
-					}
-
-					CoordinateSequence *cs = geometryFactory->getCoordinateSequenceFactory()->create(coordinates);
-					//coordinates is now owned by cs
-
-					object->setGeometry(shared_ptr<LineString>(geometryFactory->createLineString(cs)));
-					//cs is now owned by the geometry
-				}
-				else
-				{
-					object->setGeometry(shared_ptr<LineString>());
-				}
+				object->setGeometry(
+					dynamic_pointer_cast<LineString,Geometry>(rows->getGeometry(RoadChunkTableSync::COL_GEOMETRY))
+				);
 			}
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
@@ -232,23 +198,6 @@ namespace synthese
 			RoadChunk* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			stringstream viaPoints;
-			if(object->getStoredGeometry().get())
-			{
-				viaPoints << fixed;
-				const CoordinateSequence* coords(object->getStoredGeometry()->getCoordinatesRO());
-				
-				for(size_t i(0); i<coords->getSize(); ++i)
-				{
-					if(i>0)
-					{
-						viaPoints << RoadChunkTableSync::SEP_POINTS;
-					}
-					GeoPoint pt(coords->getAt(i));
-					viaPoints << pt.getLongitude() << RoadChunkTableSync::SEP_LON_LAT << pt.getLatitude();
-				}
-			}
-
 			RoadChunk* leftChunk(NULL);
 			RoadChunk* rightChunk(NULL);
 			
@@ -269,7 +218,7 @@ namespace synthese
 			ReplaceQuery<RoadChunkTableSync> query(*object);
 			query.addField(object->getFromCrossing() ? object->getFromCrossing()->getKey() : RegistryKeyType(0));
 			query.addField(object->getRankInPath());
-			query.addField(viaPoints.str());
+			query.addField(object->getStoredGeometry());
 			query.addField(object->getRoad() ? object->getRoad()->getKey() : RegistryKeyType(0));
 			query.addField(object->getMetricOffset());
 			query.addField((leftChunk && leftChunk->getHouseNumberBounds()) ? lexical_cast<string>(leftChunk->getHouseNumberBounds()->first) : string());
@@ -298,5 +247,29 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 	    }
+
+
+
+		RoadChunkTableSync::SearchResult RoadChunkTableSync::SearchByMaxDistance(
+			const geos::geom::Coordinate& point,
+			double distanceLimit,
+			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+		){
+			Coordinate minCoord(point.x - distanceLimit, point.y - distanceLimit);
+			GeoPoint minPoint(minCoord, CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()));
+			Coordinate maxCoord(point.x + distanceLimit, point.y + distanceLimit);
+			GeoPoint maxPoint(maxCoord, CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()));
+
+			stringstream subQuery;
+			subQuery << "SELECT pkid FROM idx_" << RoadChunkTableSync::TABLE.NAME << " WHERE " <<
+				"xmin > " << minPoint.getLongitude() << " AND xmax < " << maxPoint.getLongitude() <<
+				" AND ymin > " << minPoint.getLatitude() << " AND ymax < " << maxPoint.getLatitude()
+			;
+
+			SelectQuery<RoadChunkTableSync> query;
+			query.addTableField(TABLE_COL_ID);
+			query.addWhereField(TABLE_COL_ID, SubQueryExpression::Get(subQuery.str()), ComposedExpression::OP_IN);
+			return LoadFromQuery(query, Env::GetOfficialEnv(), linkLevel);
+		}
 	}
 }

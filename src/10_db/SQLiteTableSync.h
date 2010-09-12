@@ -104,6 +104,26 @@ namespace synthese
 				///	@author Hugues Romain
 				///	@date 2008
 				bool empty() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the field type corresponds to a geometry.
+				/// @return true if the field corresponds to a geometry
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.2.0
+				bool isGeometry() const;
+
+
+				
+				////////////////////////////////////////////////////////////////////
+				///	Gets the geometry type of the field as SpatiaLite keyword.
+				///	@return The geometry type of the field according to http://www.gaia-gis.it/spatialite/spatialite-sql-2.3.1.html#p16
+				///	@author Hugues Romain
+				///	@date 2010
+				/// @since 3.2.0
+				std::string getGeometryType() const;
 			};
 
 

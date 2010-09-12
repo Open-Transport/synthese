@@ -23,10 +23,12 @@
 #ifndef SYNTHESE_db_SQLExpression_hpp__
 #define SYNTHESE_db_SQLExpression_hpp__
 
+#include "DBModule.h"
+
 #include <set>
 #include <vector>
 #include <string>
-
+#include <geos/io/WKBWriter.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -114,7 +116,6 @@ namespace synthese
 			virtual std::string toString() const { return _value; }
 			static boost::shared_ptr<SQLExpression> Get(const T& value);
 		};
-
 
 		class NotExpression:
 			public SQLExpression
@@ -276,6 +277,41 @@ namespace synthese
 			static boost::shared_ptr<SQLExpression> Get(const boost::logic::tribool& value);
 		};
 
+
+
+		template <>
+		class ValueExpression<boost::shared_ptr<geos::geom::Geometry> >:
+			public SQLExpression
+		{
+			std::string _value;
+		public:
+			ValueExpression(const boost::shared_ptr<geos::geom::Geometry>& value)
+			{
+				if(value.get())
+				{
+					std::stringstream str;
+					if(DBModule::GetStorageSRID() != DBModule::GetInstanceSRID())
+					{
+						str << "Transform(";
+					}
+					str << "GeomFromWKB('";
+					geos::io::WKBWriter writer(2, getMachineByteOrder(), true);
+					writer.write(*value, str);
+					str << "')";
+					if(DBModule::GetStorageSRID() != DBModule::GetInstanceSRID())
+					{
+						str << "," << DBModule::GetStorageSRID() << ")";
+					}
+					_value = str.str();
+				}
+				else
+				{
+					_value ="''";
+				}
+			}
+			virtual std::string toString() const { return _value; }
+			static boost::shared_ptr<SQLExpression> Get(const boost::shared_ptr<geos::geom::Geometry>& value);
+		};
 
 
 

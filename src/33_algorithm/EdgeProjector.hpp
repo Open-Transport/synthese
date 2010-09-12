@@ -23,19 +23,21 @@
 #ifndef EDGE_PROJECTOR_H_
 #define EDGE_PROJECTOR_H_
 
+#include "Exception.h"
+
 #include <map>
 #include <vector>
 #include <boost/tuple/tuple.hpp>
+#include <geos/geom/Geometry.h>
 #include <geos/geom/Coordinate.h>
-#include "Exception.h"
+#include <geos/geom/Point.h>
+#include <geos/geom/LineString.h>
+#include <geos/geom/GeometryFactory.h>
+#include <geos/linearref/LinearLocation.h>
+#include <geos/linearref/LengthIndexedLine.h>
 
 namespace synthese
 {
-	namespace graph
-	{
-		class Edge;
-	}
-
 	namespace algorithm
 	{
 
@@ -44,13 +46,14 @@ namespace synthese
 		/// @author Thomas Bonfort
 		/// @date 2010
 		/// @since 3.2.0
+		template<class T>
 		class EdgeProjector
 		{
 		public:
 			typedef boost::tuple<
 				geos::geom::Coordinate, //! coordinates of the projection of the point on the line
-				graph::Edge*, //!corresponding road
-			  double //! metric offset of the projected point
+				boost::shared_ptr<T>, //!corresponding road
+				double //! metric offset of the projected point
 			> PathNearby;
 
 			typedef std::multimap<
@@ -58,14 +61,14 @@ namespace synthese
 				PathNearby
 			> PathsNearby;
 
-			typedef std::vector<graph::Edge*> From;
+			typedef std::vector<boost::shared_ptr<T> > From;
 
 			class NotFoundException:
 			   public util::Exception
 			{
 			public:
 			   NotFoundException():
-				util::Exception("No road was found to project the point")
+				util::Exception("No object was found to project the point")
 				{
 				}
 			};
@@ -85,9 +88,11 @@ namespace synthese
 			EdgeProjector(
 				const From& from,
 				double distance_limit=30
-			);
+			):	_from(from),
+				_distanceLimit(distance_limit)
+			{}
 
-			virtual ~EdgeProjector();
+			virtual ~EdgeProjector() {}
 
 
 
@@ -110,6 +115,111 @@ namespace synthese
 				const geos::geom::Coordinate& pt
 			) const;
 		};
+
+
+
+		template<class T>
+		typename EdgeProjector<T>::PathNearby EdgeProjector<T>::projectEdge(
+			const geos::geom::Coordinate& pt
+		) const	{
+			if(pt.isNull())
+			{
+				throw NotFoundException();
+			}
+
+			const geos::geom::GeometryFactory *gf = geos::geom::GeometryFactory::getDefaultInstance();
+			boost::shared_ptr<geos::geom::Point> ptGeom(gf->createPoint(pt));
+
+			boost::shared_ptr<geos::geom::LineString> bestEdgeGeom;
+			boost::shared_ptr<T> bestEdge;
+			double bestDistance;
+
+			BOOST_FOREACH(boost::shared_ptr<T> edge, _from)
+			{
+				boost::shared_ptr<geos::geom::LineString> edgeGeom = edge->getGeometry();
+				if(!edgeGeom.get() || edgeGeom->isEmpty())
+				{
+					continue;
+				}
+
+				// real distance
+				double distance = edgeGeom->distance(ptGeom.get());
+				if(	distance >= _distanceLimit ||
+					(bestEdgeGeom.get() && bestDistance < distance)
+				){
+					continue;
+				}
+
+				bestEdgeGeom = edgeGeom;
+				bestEdge = edge;
+				bestDistance = distance;
+			}
+
+			if(!bestEdgeGeom.get())
+			{
+				throw NotFoundException();
+			}
+
+			// projection
+			geos::linearref::LengthIndexedLine lil(static_cast<const geos::geom::Geometry*>(bestEdgeGeom.get()));
+			const geos::geom::Coordinate *ptCoords = ptGeom->getCoordinate();
+			geos::geom::Coordinate coord(*ptCoords);
+			double index = lil.project(coord);
+			geos::geom::Coordinate projectedCoords = lil.extractPoint(index);
+			return boost::make_tuple(
+				projectedCoords,
+				bestEdge,
+				index
+			);
+		}
+
+
+
+		template<class T>
+		typename EdgeProjector<T>::PathsNearby EdgeProjector<T>::getPathsByDistance(
+			const geos::geom::Coordinate& pt
+		) const	{
+			PathsNearby ret;
+			if(pt.isNull())
+			{
+				return ret;
+			}
+
+			const geos::geom::GeometryFactory *gf = geos::geom::GeometryFactory::getDefaultInstance();
+			boost::shared_ptr<geos::geom::Point> ptGeom(gf->createPoint(pt));
+
+			BOOST_FOREACH(T* edge, _from)
+			{
+				boost::shared_ptr<LineString> edgeGeom = edge->getGeometry();
+				if(!edgeGeom.get() || edgeGeom->isEmpty())
+				{
+					continue;
+				}
+
+				// real distance
+				double distance = edgeGeom->distance(ptGeom.get());
+				if(distance >= _distanceLimit)
+				{
+					continue;
+				}
+
+				// projection
+				geos::linearref::LengthIndexedLine lil(static_cast<const geos::geom::Geometry*>(edgeGeom.get()));
+				const geos::geom::Coordinate *ptCoords = ptGeom->getCoordinate();
+				geos::geom::Coordinate coord(*ptCoords);
+				double index = lil.project(coord);
+				geos::geom::Coordinate projectedCoords = lil.extractPoint(index);
+				ret.insert(
+					std::make_pair(
+						distance,
+						boost::make_tuple(
+							projectedCoords,
+							edge,
+							index
+				)	)	);
+			}
+			return ret;
+		}
 }	}
 
 #endif /* LINESTOPPROJECTOR_H_ */

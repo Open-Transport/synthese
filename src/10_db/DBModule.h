@@ -29,6 +29,7 @@
 
 #include "ModuleClassTemplate.hpp"
 #include "DBConstants.h"
+#include "DBTypes.h"
 #include "Registry.h"
 
 namespace synthese
@@ -64,6 +65,8 @@ namespace synthese
 		public:
 			typedef std::map<util::RegistryKeyType, std::string>	SubClassMap;
 
+			static const std::string _INSTANCE_COORDINATES_SYSTEM;
+			
 		private:
 
 		    static SQLiteHandle*	_sqlite;
@@ -71,6 +74,8 @@ namespace synthese
 			static std::map<std::string,std::string>	_tableSyncMap;
 			static std::map<int,std::string>	_idTableSyncMap;
 		    static boost::filesystem::path _DatabasePath;
+			static SRID _instanceSRID;
+			static SRID _storageSRID;
 
 		public:
 
@@ -106,6 +111,14 @@ namespace synthese
 
 			static void AddSubClass(util::RegistryKeyType, const std::string&);
 			static std::string GetSubClass(util::RegistryKeyType id);
+
+			static void ChangeInstanceCoordinatesSystem(
+				const std::string&,
+				const std::string& value
+			);
+
+			static SRID GetInstanceSRID(){ return _instanceSRID; }
+			static SRID GetStorageSRID(){ return _storageSRID; }
 		};
 	}
 

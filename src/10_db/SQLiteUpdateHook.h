@@ -34,7 +34,7 @@
 
 #include <boost/filesystem/path.hpp>
 
-#include <sqlite3.h>
+#include <spatialite/sqlite3.h>
 
 
 namespace synthese

@@ -28,7 +28,7 @@ namespace synthese
 	namespace db
 	{
 		////////////////////////////////////////////////////////////////////
-		/// SQLite data types (see http://www.sqlite.org/datatype3.html)
+		/// SQLite data types (see http://www.sqlite.org/datatype3.html and http://www.gaia-gis.it/spatialite/spatialite-sql-2.3.1.html#p16)
 		typedef enum
 		{
 			SQL_INTEGER,
@@ -38,7 +38,14 @@ namespace synthese
 			SQL_BOOLEAN,
 			SQL_TIME,
 			SQL_DATE,
-			SQL_TIMESTAMP
+			SQL_TIMESTAMP,
+			SQL_GEOM_POINT,
+			SQL_GEOM_LINESTRING,
+			SQL_GEOM_POLYGON,
+			SQL_GEOM_MULTIPOINT,
+			SQL_GEOM_MULTILINESTRING,
+			SQL_GEOM_MULTIPOLYGON,
+			SQL_GEOM_GEOMETRYCOLLECTION
 		} FieldType;
 
 		typedef enum
@@ -46,6 +53,8 @@ namespace synthese
 			AUTO_CREATE,
 			NEVER_CREATE
 		} AutoCreation;
+
+		typedef unsigned int SRID;
 	}
 }
 
