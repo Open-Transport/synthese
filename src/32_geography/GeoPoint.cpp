@@ -24,6 +24,7 @@
 #include "GeoPoint.h"
 #include "GeographyModule.h"
 #include "CoordinatesSystem.hpp"
+#include "DBModule.h"
 
 #include <proj_api.h>
 #include <geos/algorithm/Angle.h>
@@ -34,6 +35,8 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace db;
+	
 	namespace geography
 	{
 		GeoPoint::GeoPoint(
@@ -48,7 +51,7 @@ namespace synthese
 		{
 			// projection
 			pj_transform(
-				CoordinatesSystem::GetCoordinatesSystem(CoordinatesSystem::WGS84_CODE).getProjObject(),
+				CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()).getProjObject(),
 				_coordinatesSystem.getProjObject(),
 				1, 1,
 				&x, &y, NULL
@@ -68,7 +71,7 @@ namespace synthese
 		{
 			// projection
 			pj_transform(
-				CoordinatesSystem::GetCoordinatesSystem(CoordinatesSystem::WGS84_CODE).getProjObject(),
+				CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()).getProjObject(),
 				_coordinatesSystem.getProjObject(),
 				1, 1,
 				&x, &y, NULL
@@ -87,7 +90,7 @@ namespace synthese
 			//transformation into wgs84
 			pj_transform(
 				coordinatesSystem.getProjObject(),
-				CoordinatesSystem::GetCoordinatesSystem(CoordinatesSystem::WGS84_CODE).getProjObject(),
+				CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()).getProjObject(),
 				1, 1,
 				&_longitude, &_latitude, NULL
 			);
@@ -96,7 +99,7 @@ namespace synthese
 			x = _longitude;
 			y = _latitude;
 			pj_transform(
-				CoordinatesSystem::GetCoordinatesSystem(CoordinatesSystem::WGS84_CODE).getProjObject(),
+				CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()).getProjObject(),
 				_coordinatesSystem.getProjObject(),
 				1, 1,
 				&x, &y, NULL
@@ -120,7 +123,7 @@ namespace synthese
 			//transformation into wgs84
 			pj_transform(
 				_coordinatesSystem.getProjObject(),
-				CoordinatesSystem::GetCoordinatesSystem(CoordinatesSystem::WGS84_CODE).getProjObject(),
+				CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()).getProjObject(),
 				1, 1,
 				&_longitude, &_latitude, NULL
 			);

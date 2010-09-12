@@ -283,7 +283,7 @@ namespace synthese
 									Coordinate(
 										1000 * lexical_cast<double>(line.substr(10,7)),
 										1000 * lexical_cast<double>(line.substr(20,7))
-									), CoordinatesSystem::GetCoordinatesSystem("EPSG:21781")
+									), CoordinatesSystem::GetCoordinatesSystem(21781)
 								);
 							}
 						}

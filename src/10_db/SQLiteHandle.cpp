@@ -266,7 +266,7 @@ namespace synthese
 						sqlite3_free (errMsg);
 
 						throw SQLiteException ("Error executing batch update \"" + Conversion::ToTruncatedString (sql) + "\" : " + 
-							msg + " (error=" + Conversion::ToString (retc) + ")");
+							msg + " (error=" + Conversion::ToString (retc) + ":" + msg + ")");
 					}
 				}
 			}
@@ -279,7 +279,7 @@ namespace synthese
 					sqlite3_free (errMsg);
 
 					throw SQLiteException ("Error executing batch update when commiting transaction, database may be locked : " + 
-						msg + " (error=" + Conversion::ToString (retc) + ")");
+						msg + " (error=" + Conversion::ToString (retc) + ":" + msg + ")");
 				}
 			}
 
@@ -290,7 +290,7 @@ namespace synthese
 				sqlite3_free (errMsg);
 
 				throw SQLiteException ("Error executing batch update when commiting transaction, database may be locked : " + 
-					msg + " (error=" + Conversion::ToString (retc) + ")");
+					msg + " (error=" + Conversion::ToString (retc) + ":" + msg + ")");
 			}
 
 			BOOST_FOREACH(const SQLiteEvent& event, tss->events)

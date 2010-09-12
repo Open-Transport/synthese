@@ -376,7 +376,7 @@ namespace synthese
 					os << "<projectedPoint>" << "\n";
 					os << "<X>" << ps->x << "</X>" << "\n";
 					os << "<Y>" << ps->y << "</Y>" << "\n";
-					os << "<projectionType>" << ps->getCoordinatesSystem().getTridentKey() << "</projectionType>" << "\n";
+					os << "<projectionType>" << ps->getCoordinatesSystem().getName() << "</projectionType>" << "\n";
 					os << "</projectedPoint>" << "\n";
 				}
 
@@ -573,7 +573,7 @@ namespace synthese
 					os << "<projectedPoint>" << "\n";
 					os << "<X>" << ps->x << "</X>" << "\n";
 					os << "<Y>" << ps->y << "</Y>" << "\n";
-					os << "<projectionType>" << ps->getCoordinatesSystem().getTridentKey() << "</projectionType>" << "\n";
+					os << "<projectionType>" << ps->getCoordinatesSystem().getName() << "</projectionType>" << "\n";
 					os << "</projectedPoint>" << "\n";
 				}
 

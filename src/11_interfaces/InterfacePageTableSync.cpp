@@ -61,8 +61,8 @@ namespace synthese
 	namespace db
 	{
 		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<InterfacePageTableSync>::TABLE(
-				"t023_interface_pages"
-				);
+			"t023_interface_pages"
+		);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<InterfacePageTableSync>::_FIELDS[]=
 		{

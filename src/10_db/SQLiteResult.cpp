@@ -21,22 +21,22 @@
 */
 
 #include "SQLiteResult.h"
-
-#include "Conversion.h"
-
 #include "SQLiteException.h"
-#include "sqlite3.h"
-
 #include "DBConstants.h"
 
 #include <iomanip>
+#include <spatialite/sqlite3.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/lexical_cast.hpp>
+#include <geos/io/WKBReader.h>
+#include <geos/geom/Geometry.h>
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
+using namespace geos::geom;
+using namespace geos::io;
 
 namespace synthese
 {
@@ -340,6 +340,17 @@ namespace synthese
 			{
 				return time_duration(not_a_date_time);
 			}
+		}
+
+
+
+		boost::shared_ptr<Geometry> SQLiteResult::getGeometry(
+			const std::string& col
+		) const	{
+			stringstream str(getText(col));
+
+			WKBReader reader;
+			return shared_ptr<Geometry>(reader.read(str));
 		}
 
 

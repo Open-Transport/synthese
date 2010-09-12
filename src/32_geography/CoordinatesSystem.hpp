@@ -25,10 +25,12 @@
 
 #include "Exception.h"
 #include "GeographyModule.h"
+#include "DBTypes.h"
 
 #include <string>
 #include <map>
 #include <proj_api.h>
+#include <boost/lexical_cast.hpp>
 
 namespace synthese
 {
@@ -42,17 +44,13 @@ namespace synthese
 		*/
 		class CoordinatesSystem
 		{
-		public:
-			static const std::string WGS84_CODE;
-
 		private:
-			std::string _code;
+			db::SRID _srid;
 			std::string _name;
-			std::string _tridentKey;
 			std::string _projSequence;
 			projPJ _projObject;
 
-			typedef std::map<std::string, CoordinatesSystem> Map;
+			typedef std::map<db::SRID, CoordinatesSystem> Map;
 
 			////////////////////////////////////////////////////////////////////
 			/// All coordinates systems.
@@ -63,19 +61,17 @@ namespace synthese
 				public util::Exception
 			{
 			public:
-				NotFoundException(const std::string& key):
-					util::Exception("Coordinates system "+ key +" not found")
+				NotFoundException(db::SRID srid):
+				  util::Exception("Coordinates system "+ boost::lexical_cast<std::string>(srid) +" not found")
 				{}
 			};
 
 			CoordinatesSystem(
-				const std::string& code,
+				db::SRID srid,
 				const std::string& name,
-				const std::string& tridentKey,
 				const std::string& projSequence
-			):	_code(code),
+			):	_srid(srid),
 				_name(name),
-				_tridentKey(tridentKey),
 				_projSequence(projSequence),
 				_projObject(pj_init_plus(projSequence.c_str()))
 			{}
@@ -85,25 +81,20 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const projPJ& getProjObject() const { return _projObject; }
-				const std::string& getTridentKey() const { return _tridentKey; }
+				const std::string& getName() const { return _name; }
 			//@}
 
 				
-			//////////////////////////////////////////////////////////////////////////
-			/// Initializes all coordinates systems.
-			static void AddCoordinatesSystems();
-
 			static void AddCoordinatesSystem(
-				const std::string& code,
+				db::SRID srid,
 				const std::string& name,
-				const std::string& tridentKey,
 				const std::string& projSequence
 			);
 
 
 			//////////////////////////////////////////////////////////////////////////
 			/// @throws NotFoundException if the system was not found
-			static const CoordinatesSystem& GetCoordinatesSystem(const std::string& key);
+			static const CoordinatesSystem& GetCoordinatesSystem(db::SRID srid);
 		};
 	}
 }

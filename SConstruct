@@ -153,6 +153,7 @@ elif (env['_PLATFORM']=='win32'):
    if (env.IsCppModeDebug ()):
       #env.Append ( CCFLAGS = ['/Od', '/MTd', '/Gm', '/RTC1', '/ZI', '/showIncludes'] )
       env.Append ( CCFLAGS = ['/Od', '/MTd', '/Gm', '/RTC1', '/ZI'] )
+      env.AddIncludeDir('#3rd/msvs/vld/include')
    else:  
       env.Append ( CCFLAGS = ['/Ox', '/FD', '/MT', '/Zi'] )
 

@@ -8,6 +8,13 @@
 #include <vector>
 #include <boost/optional.hpp>
 
+namespace geos
+{
+	namespace geom
+	{
+		class Geometry;
+	}
+}
 
 namespace synthese
 {
@@ -89,6 +96,16 @@ namespace synthese
 			std::vector<int> computeMaxColWidths () const;
 		    
 			virtual util::RegistryKeyType getKey() const;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Reads a WKB column and transform it into geometry.
+			/// @param col the colume to read
+			/// @return the geometry object corresponding to the WKB data
+			/// @pre the column must store WKB data
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.2.0
+			boost::shared_ptr<geos::geom::Geometry> getGeometry(const std::string& col) const;
 		};
 
 
