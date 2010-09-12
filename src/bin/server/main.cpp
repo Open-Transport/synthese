@@ -25,7 +25,7 @@
 // At first to avoid the Windows bug "WinSock.h has already been included"
 #include "ServerModule.h"
 
-#ifdef WIN32
+#ifdef VLD
 #include <vld.h>
 #endif
 
@@ -175,7 +175,7 @@ void quit(bool doExit)
 
 int main( int argc, char **argv )
 {
-#ifdef WIN32
+#ifdef VLD
 	VLDDisable();
 #endif
 	std::signal (SIGINT, sig_INT_handler);
@@ -330,7 +330,7 @@ int main( int argc, char **argv )
 			}
 #endif    
 
-#ifdef WIN32
+#ifdef VLD
 			VLDEnable();
 #endif
 

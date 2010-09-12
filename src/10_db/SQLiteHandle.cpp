@@ -33,6 +33,7 @@
 
 #include <algorithm>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -50,7 +51,7 @@ namespace synthese
 			int retc = sqlite3_close (tss->handle);
 			if (retc != SQLITE_OK)
 			{
-			throw SQLiteException ("Cannot close SQLite handle (error=" + Conversion::ToString (retc) + ")");
+			throw SQLiteException ("Cannot close SQLite handle (error=" + lexical_cast<string>(retc) + ")");
 			}
 			delete tss;
 		}
@@ -144,7 +145,7 @@ namespace synthese
 			if (retc != SQLITE_OK)
 			{
 				throw SQLiteException ("Cannot open SQLite handle to " + 
-						   _databaseFile.string () + "(error=" + Conversion::ToString (retc) + ")");
+						   _databaseFile.string () + "(error=" + lexical_cast<string>(retc) + ")");
 			}
 			
 			// int 
@@ -215,7 +216,7 @@ namespace synthese
 			}
 			if (retc != SQLITE_DONE)
 			{
-			throw SQLiteException ("Error executing precompiled statement (error=" + Conversion::ToString (retc) + ")" + 
+			throw SQLiteException ("Error executing precompiled statement (error=" + lexical_cast<string>(retc) + ")" + 
 						   Conversion::ToTruncatedString (statement->getSQL ()));
 			}
 
@@ -241,14 +242,14 @@ namespace synthese
 
 			char* errMsg = 0;
 
-			int retc = sqlite3_exec(getHandle(),"BEGIN TRANSACTION;", 0,	0, &errMsg);
+			int retc = sqlite3_exec(getHandle(),"BEGIN TRANSACTION;", 0, 0, &errMsg);
 			if (retc != SQLITE_OK)
 			{
 				std::string msg (errMsg);
 				sqlite3_free (errMsg);
 
 				throw SQLiteException ("Error executing batch update when opening transaction : " + 
-					msg + " (error=" + Conversion::ToString (retc) + ")");
+					msg + " (error=" + lexical_cast<string>(retc) + ")");
 			}
 
 			try
@@ -266,12 +267,10 @@ namespace synthese
 						sqlite3_free (errMsg);
 
 						throw SQLiteException ("Error executing batch update \"" + Conversion::ToTruncatedString (sql) + "\" : " + 
-							msg + " (error=" + Conversion::ToString (retc) + ":" + msg + ")");
+							msg + " (error=" + lexical_cast<string>(retc) + ")");
 					}
 				}
-			}
-			catch(...)
-			{
+
 				retc = sqlite3_exec(getHandle(),"COMMIT;", 0,	0, &errMsg);
 				if (retc != SQLITE_OK)
 				{
@@ -279,19 +278,15 @@ namespace synthese
 					sqlite3_free (errMsg);
 
 					throw SQLiteException ("Error executing batch update when commiting transaction, database may be locked : " + 
-						msg + " (error=" + Conversion::ToString (retc) + ":" + msg + ")");
+						msg + " (error=" + lexical_cast<string>(retc) + ")");
 				}
-			}
 
-			retc = sqlite3_exec(getHandle(),"COMMIT;", 0,	0, &errMsg);
-			if (retc != SQLITE_OK)
+			}
+			catch(...)
 			{
-				std::string msg (errMsg);
-				sqlite3_free (errMsg);
-
-				throw SQLiteException ("Error executing batch update when commiting transaction, database may be locked : " + 
-					msg + " (error=" + Conversion::ToString (retc) + ":" + msg + ")");
+				throw SQLiteException ("Error executing batch update when commiting transaction, database may be locked : unhandled exception");
 			}
+
 
 			BOOST_FOREACH(const SQLiteEvent& event, tss->events)
 			{
@@ -335,7 +330,7 @@ namespace synthese
 			sqlite3_free (errMsg);
 			
 			throw SQLiteException ("Error executing batch update \"" + Conversion::ToTruncatedString (sql) + "\" : " + 
-						   msg + " (error=" + Conversion::ToString (retc) + ")");
+						   msg + " (error=" + lexical_cast<string>(retc) + ")");
 			}
 
 			const std::vector<SQLiteEvent>& events = tss->events;
@@ -358,7 +353,7 @@ namespace synthese
 
 			if (retc != SQLITE_OK)
 			{
-			throw SQLiteException ("Error compiling \"" + sql + "\" (error=" + Conversion::ToString (retc) + ")");
+			throw SQLiteException ("Error compiling \"" + sql + "\" (error=" + lexical_cast<string>(retc) + ")");
 			}
 			return SQLiteStatementSPtr (new SQLiteStatement (st, sql));
 		}

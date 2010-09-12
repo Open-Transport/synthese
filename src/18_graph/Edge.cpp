@@ -419,20 +419,22 @@ namespace synthese
 			}
 
 			assert(getFromVertex());
-			const GeometryFactory* geometryFactory(GeometryFactory::getDefaultInstance());
+			const GeometryFactory& geometryFactory(
+				CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory()
+			);
 
 			if(	getParentPath() &&
 				getParentPath()->getEdge(getRankInPath()) == this &&
 				getParentPath()->getEdges().size() != getRankInPath()+1
 			){
 				const Edge* nextEdge(getParentPath()->getEdge(getRankInPath() + 1));
-				CoordinateSequence* cs(geometryFactory->getCoordinateSequenceFactory()->create(0, 2));
+				CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 				cs->add(*getFromVertex(), false);
 				cs->add(*nextEdge->getFromVertex(), false);
-				return shared_ptr<LineString>(geometryFactory->createLineString(cs));
+				return shared_ptr<LineString>(geometryFactory.createLineString(cs));
 			}
 
-			return shared_ptr<LineString>(geometryFactory->createLineString());
+			return shared_ptr<LineString>(geometryFactory.createLineString());
 		}
 
 

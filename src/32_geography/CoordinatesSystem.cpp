@@ -21,6 +21,7 @@
 */
 
 #include "CoordinatesSystem.hpp"
+#include "DBModule.h"
 
 using namespace std;
 
@@ -31,7 +32,7 @@ namespace synthese
 	namespace geography
 	{
 		CoordinatesSystem::Map CoordinatesSystem::_coordinates_systems;
-
+		CoordinatesSystem::Map::const_iterator CoordinatesSystem::_defaultCoordinatesSystem(CoordinatesSystem::_coordinates_systems.end());
 
 
 		void CoordinatesSystem::AddCoordinatesSystem(
@@ -53,5 +54,16 @@ namespace synthese
 				throw NotFoundException(srid);
 			}
 			return it->second;
+		}
+
+
+
+		const CoordinatesSystem& CoordinatesSystem::GetInstanceCoordinateSystem()
+		{
+			if(_defaultCoordinatesSystem == _coordinates_systems.end())
+			{
+				_defaultCoordinatesSystem = _coordinates_systems.find(DBModule::GetInstanceSRID());
+			}
+			return _defaultCoordinatesSystem->second;
 		}
 }	}
