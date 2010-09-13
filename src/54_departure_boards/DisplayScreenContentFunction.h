@@ -25,6 +25,7 @@
 
 #include "FunctionWithSite.h"
 #include "FactorableTemplate.h"
+#include "UtilTypes.h"
 
 #include <boost/optional.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -117,18 +118,33 @@ namespace synthese
 			</ul>
 
 
-			<h2>Standard XML output</h2>
-			<h3>Description</h3>
+			<h3>Usage 4 : Standard XML output</h2>
 
-			For XML output, following parameters are used:
+			<h4>Usage 4.1 : by operator code</h4>
+			<ul>
+				<li>oc : operator code of the physical stop</li>
+				<li>rn : table rows number</li>
+				<li>date (optional) : reference date (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
+				<li>way (optional) : "backward" or "forward" Default value : "forward"</li>
+				<li>lineid (optional) : Commercial line ID : if given then results are only for this line</li>
+			</ul>
+			If 'way' is "forward" the answer will be the 'rn' next departures after 'date'.
+			If 'way' is "backward" the answer will be the 'rn' previous departures just before 'date'.
+			<u>WARNING :</u> rn is the number of departures which have different start time.
+			Consequently, if two service starts at the same minutes it will count for 1 start !
+
+			<h4>Usage 4.2 : by physical stop ID</h4>
 			<ul>
 				<li>roid : id of the physical stop</li>
 				<li>rn : table rows number</li>
 				<li>date (optional) : reference date (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
 				<li>way (optional) : "backward" or "forward" Default value : "forward"</li>
+				<li>lineid (optional) : Commercial line ID : if given then results are only for this line</li>
 			</ul>
 			If 'way' is "forward" the answer will be the 'rn' next departures after 'date'.
 			If 'way' is "backward" the answer will be the 'rn' previous departures just before 'date'.
+			<u>WARNING :</u> rn is the number of departures which have different start time.
+			Consequently, if two service starts at the same minutes it will count for 1 start !
 
 			@image html DisplayScreenContentFunction.png
 
@@ -150,13 +166,15 @@ namespace synthese
 			static const std::string PARAMETER_ROWS_NUMBER;
 			static const std::string PARAMETER_CITY_NAME;
 			static const std::string PARAMETER_STOP_NAME;
+			static const std::string PARAMETER_LINE_ID;
 
 		private:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const DisplayScreen>	_screen;
-				boost::shared_ptr<DisplayType>			_type;
-				boost::optional<boost::posix_time::ptime>			_date;
+				boost::shared_ptr<const DisplayScreen>	  _screen;
+				boost::shared_ptr<DisplayType>			  _type;
+				boost::optional<boost::posix_time::ptime> _date;
+				boost::optional<util::RegistryKeyType>    _lineToDisplay;
 				bool	_wayIsBackward;
 			//@}
 

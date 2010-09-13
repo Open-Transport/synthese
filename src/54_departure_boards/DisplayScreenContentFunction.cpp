@@ -71,6 +71,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_ROWS_NUMBER("rn");
 		const string DisplayScreenContentFunction::PARAMETER_CITY_NAME("cn");
 		const string DisplayScreenContentFunction::PARAMETER_STOP_NAME("sn");
+		const string DisplayScreenContentFunction::PARAMETER_LINE_ID("lineid");
 		
 		
 		
@@ -137,6 +138,7 @@ namespace synthese
 							throw RequestException("No such screen type");
 						}
 
+
 						// Way 3 : physical stop
 
 						// 3.1 by id
@@ -192,12 +194,32 @@ namespace synthese
 						}
 
 					}else{//answer will be XML
-						RegistryKeyType id = map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID);
-						shared_ptr<const StopPoint> stop(
-								Env::GetOfficialEnv().get<StopPoint>(id)
-						);
-						screen->addPhysicalStop(stop.get());
 
+						//4.1 by operator code
+						if(!map.getDefault<string>(PARAMETER_OPERATOR_CODE).empty())
+						{
+							//If an oc was given we search corresponding physical stop
+							string oc(map.get<string>(PARAMETER_OPERATOR_CODE));
+
+							//Get StopPoint Global Registry
+							typedef const pair<const RegistryKeyType, shared_ptr<StopPoint> > myType;
+							BOOST_FOREACH(myType&  myStop,Env::GetOfficialEnv().getRegistry<StopPoint>())
+							{
+								if(myStop.second->getCodeBySource() == oc)
+								{
+									screen->addPhysicalStop(myStop.second.get());
+									break;
+								}
+							}
+						}
+						else //4.2 by physical stop
+						{
+							RegistryKeyType id = map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID);
+							shared_ptr<const StopPoint> stop(
+									Env::GetOfficialEnv().get<StopPoint>(id)
+							);
+							screen->addPhysicalStop(stop.get());
+						}
 						// Way
 						_wayIsBackward = false;
 						optional<string> way(map.getOptional<string>(PARAMETER_WAY));
@@ -205,9 +227,9 @@ namespace synthese
 						{
 							_wayIsBackward = true;
 						}
+
+						_lineToDisplay = map.getOptional<RegistryKeyType>(PARAMETER_LINE_ID);
 					}
-
-
 					_screen.reset(screen);
 				}
 				
@@ -275,7 +297,21 @@ namespace synthese
 				"\" image=\""     << commercialLine->getImage() <<
 				"\" />";
 
-			const StopArea * connPlace(journeyPattern->getDestination()->getConnectionPlace());
+			const StopArea & origin(
+					*journeyPattern->getOrigin()->getConnectionPlace()
+			);
+			stream << "<origin id=\""  << origin.getKey() <<
+					"\" name=\""           << origin.getName() <<
+					"\" />";
+
+			const StopArea & destination(
+					*journeyPattern->getDestination()->getConnectionPlace()
+			);
+			stream << "<destination id=\"" << destination.getKey() <<
+					"\" name=\""           << destination.getName() <<
+					"\" />";
+
+			const StopArea * connPlace(stop->getConnectionPlace());
 
 			stream << "<stopArea id=\""<< connPlace->getKey()<<
 				"\" name=\""           << connPlace->getName() <<
@@ -289,7 +325,7 @@ namespace synthese
 
 		void DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			if(_screen->getType()->getDisplayInterface())
+			if(_type->getDisplayInterface()!=NULL)
 			{
 				_screen->display(stream, _date ? *_date : second_clock::local_time(), &request);
 			}
@@ -302,91 +338,137 @@ namespace synthese
 					"<timeTable xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/54_departures_table/DisplayScreenContentFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" type=\"departure\">"
 					;
 
-				const StopPoint * stop = _screen->getPhysicalStops().begin()->second;
-
-				//Calculate start time and end time of the searched interval
-				ptime startDateTime,endDateTime;
-				if(_wayIsBackward)
+				BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
 				{
-					//ptime(gregorian::date d,time_duration_type td):
+					const StopPoint * stop = it.second;
 
-					//If way is backward : endDateTime = _date
-					endDateTime = (_date ? *_date : second_clock::local_time());
-					//and startDateTime is begin of the day (a day begin at 3:00):
-					startDateTime = endDateTime - endDateTime.time_of_day() + hours(3);
-				}
-				else //Way is forward
-				{
-					// If way is forward : realStartDateTime = date
-					startDateTime = (_date ? *_date : second_clock::local_time());
-					//startDateTime -= minutes(0); //substract clearing delay
-					//and endDateTime is end of the day (a day end at 27:00):
-					endDateTime = startDateTime - startDateTime.time_of_day() + hours(27);
-				}
-
-				vector<ServicePointer> servicePointerVector;
-				int insertedServices =0;
-
-				BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
-				{
-					const LineStop* ls = static_cast<const LineStop*>(edge.second);
-
-					ptime departureDateTime = startDateTime;
-					// Loop on services
-					optional<Edge::DepartureServiceIndex::Value> index;
-					while(true)
+					//Calculate start time and end time of the searched interval
+					ptime startDateTime,endDateTime;
+					if(_wayIsBackward)
 					{
-						ServicePointer servicePointer(
-								ls->getNextService(
-										USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
-										departureDateTime
-										, endDateTime
-										, false
-										, index
-								)	);
-						if (!servicePointer.getService())
-							break;
-						++*index;
-						departureDateTime = servicePointer.getDepartureDateTime();
-						if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
-							continue;
+						//ptime(gregorian::date d,time_duration_type td):
 
-						if(!_wayIsBackward)//Forward way : print service
-						{
-							if(insertedServices >= _screen->getType()->getRowNumber()) break;
-							concatXMLResult(stream,
-									servicePointer,
-									stop);
-						}
-						else//Backward Way add service in Vector for reverse display
-						{
-							servicePointerVector.push_back(servicePointer);
-						}
-						++insertedServices;
+						//If way is backward : endDateTime = _date
+						endDateTime = (_date ? *_date : second_clock::local_time());
+						//and startDateTime is begin of the day (a day begin at 3:00):
+						startDateTime = endDateTime - endDateTime.time_of_day() + hours(3);
+					}
+					else //Way is forward
+					{
+						// If way is forward : realStartDateTime = date
+						startDateTime = (_date ? *_date : second_clock::local_time());
+						//startDateTime -= minutes(0); //substract clearing delay
+						//and endDateTime is end of the day (a day end at 27:00):
+						endDateTime = startDateTime - startDateTime.time_of_day() + hours(27);
 					}
 
-					if(insertedServices >= _screen->getType()->getRowNumber()) break;
-				}
+					//We populate a map of vector : key is minutes of departures
+					//each vector contain all service wich pass in the same minute
+					map<long long,vector<ServicePointer> > servicePointerMap;
 
-				//If backward : reverse display
-				if(_wayIsBackward)
-				{
-					if(insertedServices>0)
+					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
+					{
+						const LineStop* ls = static_cast<const LineStop*>(edge.second);
+
+						ptime departureDateTime = startDateTime;
+						// Loop on services
+						optional<Edge::DepartureServiceIndex::Value> index;
+						while(true)
+						{
+							ServicePointer servicePointer(
+									ls->getNextService(
+											USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
+											departureDateTime
+											, endDateTime
+											, false
+											, index
+									)	);
+							if (!servicePointer.getService())
+								break;
+							++*index;
+							departureDateTime = servicePointer.getDepartureDateTime();
+							if(stop->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
+								continue;
+
+							//If a lineid arg was passed : only one line will be displayed
+							if(_lineToDisplay)
+							{
+								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+								const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+								if(commercialLine->getKey()!=(*_lineToDisplay))
+									continue;
+							}
+
+							long long mapKeyMinutes = departureDateTime.time_of_day().minutes()
+										+ departureDateTime.time_of_day().hours()*60 //Add hour *60
+										+ (departureDateTime.date().day_number()-startDateTime.date().day_number())*1440;//Add 0 or 1 day * 1440
+
+							map<long long,vector<ServicePointer> >::iterator it;
+							it=servicePointerMap.find(mapKeyMinutes);
+
+							//Check if a service is already inserted for this date
+
+							if(it==servicePointerMap.end()) //There is no service for this minute
+							{
+								vector<ServicePointer> tmpVect;
+
+								tmpVect.push_back(servicePointer);
+
+								//Call copy constructor of vector
+								servicePointerMap[mapKeyMinutes] = tmpVect;
+							}
+							else //A service already exist for this minute
+							{
+								servicePointerMap[mapKeyMinutes].push_back(servicePointer);
+							}
+						}
+					}
+
+					//If backward : reverse display
+					if(_wayIsBackward)
 					{
 						//Loop backward on vector
-						int lastIndex = insertedServices - _screen->getType()->getRowNumber();
+						int lastIndex = servicePointerMap.size() - _screen->getType()->getRowNumber();
 						if(lastIndex<0)
 						{
 							lastIndex=0;
 						}
 
-						for(int i=insertedServices-1;i>=lastIndex;i--)
+						map<long long,vector<ServicePointer> >::iterator it = servicePointerMap.begin();
+						int minutesCounter=0;
+						for(;it!=servicePointerMap.end();it++)//For each minute
 						{
-							concatXMLResult(
-								stream,
-								servicePointerVector[i],
-								stop
-							);
+							if(minutesCounter>=lastIndex)
+							{
+								for(int i=0;i<it->second.size();i++)//For each service at this minute
+								{
+									concatXMLResult(
+											stream,
+											it->second[i],
+											stop
+									);
+								}
+							}
+							++minutesCounter;
+						}
+					}
+					else//If forward : normal display
+					{
+						map<long long,vector<ServicePointer> >::iterator it = servicePointerMap.begin();
+						int minutesCounter=0;
+						for(;it!=servicePointerMap.end();it++)//For each minute
+						{
+							if(minutesCounter >= _screen->getType()->getRowNumber())
+								break;
+							minutesCounter++;
+							for(int i=0;i<it->second.size();i++)//For each service at this minute
+							{
+								concatXMLResult(
+										stream,
+										it->second[i],
+										stop
+								);
+							}
 						}
 					}
 				}
@@ -405,7 +487,7 @@ namespace synthese
 
 		std::string DisplayScreenContentFunction::getOutputMimeType() const
 		{
-			return (_screen->getType()->getDisplayInterface()) ? "text/xml" :
+			return (_screen->getType()->getDisplayInterface()==NULL) ? "text/xml" :
 					(
 						(   _screen.get() &&
 						    _screen->getType() &&
