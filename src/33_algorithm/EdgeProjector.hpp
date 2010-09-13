@@ -191,7 +191,7 @@ namespace synthese
 
 			BOOST_FOREACH(T* edge, _from)
 			{
-				boost::shared_ptr<LineString> edgeGeom = edge->getGeometry();
+				boost::shared_ptr<geos::geom::LineString> edgeGeom = edge->getGeometry();
 				if(!edgeGeom.get() || edgeGeom->isEmpty())
 				{
 					continue;
