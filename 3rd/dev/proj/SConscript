@@ -5,7 +5,7 @@ Import ('env')
 
 senv = env.Clone ()
 if senv['_PLATFORM'] == 'posix':
-	senv.Append ( LINKFLAGS = ['lm'] )
+	senv.Append ( LINKFLAGS = ['-lm'] )
 CppLibProject(
 	senv
 	, 'proj'
@@ -17,7 +17,7 @@ CppLibProject(
 
 senv2 = env.Clone ()
 if senv2['_PLATFORM'] == 'posix':
-	senv2.Append ( LINKFLAGS = ['lm'] )
+	senv2.Append ( LINKFLAGS = ['-lm'] )
 CppBinProject(
 	senv2
 	, 'proj'
