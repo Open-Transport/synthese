@@ -4,6 +4,8 @@ Import ('env')
 ## http://trac.osgeo.org/proj/
 
 senv = env.Clone ()
+if senv['_PLATFORM'] == 'posix':
+	senv.Append ( LINKFLAGS = ['lm'] )
 CppLibProject(
 	senv
 	, 'proj'
@@ -14,6 +16,8 @@ CppLibProject(
 )
 
 senv2 = env.Clone ()
+if senv2['_PLATFORM'] == 'posix':
+	senv2.Append ( LINKFLAGS = ['lm'] )
 CppBinProject(
 	senv2
 	, 'proj'
