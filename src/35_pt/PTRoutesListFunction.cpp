@@ -38,6 +38,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -55,6 +56,7 @@ namespace synthese
 		const string PTRoutesListFunction::PARAMETER_PAGE_ID("p");
 		const string PTRoutesListFunction::PARAMETER_MERGE_INCLUDING_ROUTES("mir");
 		const string PTRoutesListFunction::PARAMETER_MERGE_SAME_ROUTES("msr");
+		const string PTRoutesListFunction::PARAMETER_DATE("date");
 		
 		ParametersMap PTRoutesListFunction::_getParametersMap() const
 		{
@@ -94,6 +96,11 @@ namespace synthese
 			{
 				throw RequestException("No such line");
 			}
+
+			if(!map.getDefault<string>(PARAMETER_DATE).empty())
+			{
+				_date = time_from_string(map.get<string>(PARAMETER_DATE));
+			}
 		}
 
 		void PTRoutesListFunction::run(
@@ -106,6 +113,16 @@ namespace synthese
 			BOOST_FOREACH(const Path* path, _line->getPaths())
 			{
 				bool toInsert(true);
+
+				if(_date)
+				{
+					const JourneyPattern* thisRoute = dynamic_cast<const JourneyPattern*>(path);
+
+					if(thisRoute->isActive(_date->date()))
+					{
+						toInsert = false;
+					}
+				}
 
 				if(_mergeSameRoutes)
 				{
@@ -156,8 +173,9 @@ namespace synthese
 				// XML header
 				stream <<
 					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
-					"<directions xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/PTRoutesListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-					;
+					"<directions xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/PTRoutesListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""<<
+					" lineName=\"" << _line->getName() <<
+					"\">";
 			}
 
 			size_t rank(0);
@@ -173,9 +191,12 @@ namespace synthese
 						rank++
 					);
 				}
-				else
+				else // XML
 				{
-					// XML
+					//Ignore auto-generated routes
+					if(route->getKey()==0)
+						continue;
+
 					stream << "<direction id=\""<< route->getKey() <<
 						"\" name=\""            << route->getName() <<
 						"\" directionText=\""   << route->getDirection() <<

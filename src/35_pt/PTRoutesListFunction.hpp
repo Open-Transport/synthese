@@ -28,6 +28,9 @@
 #include "FactorableTemplate.h"
 #include "Function.h"
 
+#include <boost/optional.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
+
 namespace synthese
 {
 	namespace cms
@@ -57,6 +60,7 @@ namespace synthese
 		///			If not defined, the standard XML output is generated.</li>
 		///		<li>msr : do not display a route if an other route follows the same stops list in the same order (the comparison is done on connection places and not physical stops)</li>
 		///		<li>mir : do not display a route if an other route serves the same stops list in the same order even if the other route serves other stops before, after, and inside</li>
+		///		<li>date (optionnal) : display only active route for this date</li>
 		///	</ul>
 		///
 		///	<h2>Standard XML Output</h2>
@@ -76,12 +80,14 @@ namespace synthese
 			static const std::string PARAMETER_MERGE_SAME_ROUTES;
 			static const std::string PARAMETER_MERGE_INCLUDING_ROUTES;
 			static const std::string PARAMETER_PAGE_ID;
+			static const std::string PARAMETER_DATE;
 			
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const pt::CommercialLine> _line;
 				boost::shared_ptr<const cms::Webpage> _page;
+				boost::optional<boost::posix_time::ptime> _date;
 				bool _mergeSameRoutes;
 				bool _mergeIncludingRoutes;
 			//@}
