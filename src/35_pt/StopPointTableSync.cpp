@@ -30,6 +30,7 @@
 #include "CityTableSync.h"
 
 #include <geos/geom/Coordinate.h>
+#include <geos/geom/Point.h>
 
 using namespace std;
 using namespace boost;
@@ -53,10 +54,9 @@ namespace synthese
 		const string StopPointTableSync::COL_X = "x";
 		const string StopPointTableSync::COL_Y = "y";
 		const string StopPointTableSync::COL_OPERATOR_CODE("operator_code");
-		const string StopPointTableSync::COL_LONGITUDE("longitude");
-		const string StopPointTableSync::COL_LATITUDE("latitude");
 		const string StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID("projected_road_chunk_id");
 		const string StopPointTableSync::COL_PROJECTED_METRIC_OFFSET("projected_metric_offset");
+		const string StopPointTableSync::COL_GEOMETRY("geometry");
 	}
 
     namespace db
@@ -73,10 +73,9 @@ namespace synthese
 			SQLiteTableSync::Field(StopPointTableSync::COL_X, SQL_DOUBLE),
 			SQLiteTableSync::Field(StopPointTableSync::COL_Y, SQL_DOUBLE),
 			SQLiteTableSync::Field(StopPointTableSync::COL_OPERATOR_CODE, SQL_TEXT),
-			SQLiteTableSync::Field(StopPointTableSync::COL_LONGITUDE, SQL_DOUBLE),
-			SQLiteTableSync::Field(StopPointTableSync::COL_LATITUDE, SQL_DOUBLE),
 			SQLiteTableSync::Field(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, SQL_DOUBLE),
+			SQLiteTableSync::Field(StopPointTableSync::COL_GEOMETRY, SQL_GEOM_POINT),
 			SQLiteTableSync::Field()
 		};
 
@@ -98,9 +97,16 @@ namespace synthese
 			object->setName(rows->getText ( StopPointTableSync::COL_NAME));
 
 			// Position : Lon/lat prior to x/y
-			if(!rows->getText(StopPointTableSync::COL_LONGITUDE).empty() && !rows->getText(StopPointTableSync::COL_LATITUDE).empty())
+			if(!rows->getText(StopPointTableSync::COL_GEOMETRY).empty())
 			{
-				*object = GeoPoint(rows->getDouble(StopPointTableSync::COL_LONGITUDE), rows->getDouble(StopPointTableSync::COL_LATITUDE));
+				shared_ptr<Point> point(
+					static_pointer_cast<Point, Geometry>(
+						rows->getGeometry(StopPointTableSync::COL_GEOMETRY)
+				)	);
+				if(point.get())
+				{
+					*object = GeoPoint(point->getX(), point->getY());
+				}
 			}
 			else if(rows->getDouble(StopPointTableSync::COL_X) > 0 && rows->getDouble(StopPointTableSync::COL_Y) > 0)
 			{
@@ -175,16 +181,20 @@ namespace synthese
 			StopPoint* object,
 			optional<SQLiteTransaction&> transaction
 		){
+			GeoPoint geoPoint(*object);
+			Coordinate coord(geoPoint.getLongitude(), geoPoint.getLatitude());
+			shared_ptr<Point> point(DBModule::GetStorageCoordinatesSystem().getGeometryFactory().createPoint(coord));
+
 			ReplaceQuery<StopPointTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(dynamic_cast<const StopArea*>(object->getHub()) ? dynamic_cast<const StopArea*>(object->getHub())->getKey() : RegistryKeyType(0));
 			query.addField(object->isNull() ? 0 : object->x);
 			query.addField(object->isNull() ? 0 : object->y);
 			query.addField(object->getCodeBySource());
-			query.addField(object->isNull() ? string() : lexical_cast<string>(object->getLongitude()));
-			query.addField(object->isNull() ? string() : lexical_cast<string>(object->getLatitude()));
 			query.addField(object->getProjectedPoint().getRoadChunk() ? object->getProjectedPoint().getRoadChunk()->getKey() : 0);
 			query.addField(object->getProjectedPoint().getRoadChunk() ? object->getProjectedPoint().getMetricOffset() : 0);
+			query.addField(static_pointer_cast<Geometry,Point>(point));
+
 			query.execute(transaction);
 		}
     }

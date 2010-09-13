@@ -25,6 +25,7 @@
 #include "Path.h"
 #include "Service.h"
 #include "Vertex.h"
+#include "DBModule.h"
 
 #include <boost/foreach.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -40,6 +41,8 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace db;
+
 	namespace graph
 	{
 		const size_t Edge::INDICES_NUMBER(24);
@@ -420,7 +423,7 @@ namespace synthese
 
 			assert(getFromVertex());
 			const GeometryFactory& geometryFactory(
-				CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory()
+				DBModule::GetDefaultGeometryFactory()
 			);
 
 			if(	getParentPath() &&

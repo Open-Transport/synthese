@@ -35,8 +35,6 @@
 #include "GeoPoint.h"
 
 #include <geos/geom/LineString.h>
-#include <geos/geom/GeometryFactory.h>
-#include <geos/geom/CoordinateSequenceFactory.h>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -62,10 +60,7 @@ namespace synthese
 		const std::string LineStopTableSync::COL_ISARRIVAL ("is_arrival");
 		const std::string LineStopTableSync::COL_METRICOFFSET ("metric_offset");
 		const std::string LineStopTableSync::COL_SCHEDULEINPUT ("schedule_input");
-		const std::string LineStopTableSync::COL_VIAPOINTS ("via_points");
-
-		const string LineStopTableSync::SEP_POINTS(",");
-		const string LineStopTableSync::SEP_LON_LAT(":");
+		const std::string LineStopTableSync::COL_GEOMETRY("geometry");
 	}
 
 	namespace db
@@ -85,7 +80,7 @@ namespace synthese
 			SQLiteTableSync::Field(LineStopTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
 			SQLiteTableSync::Field(LineStopTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
 			SQLiteTableSync::Field(LineStopTableSync::COL_METRICOFFSET, SQL_DOUBLE),
-			SQLiteTableSync::Field(LineStopTableSync::COL_VIAPOINTS, SQL_TEXT),
+			SQLiteTableSync::Field(LineStopTableSync::COL_GEOMETRY, SQL_GEOM_LINESTRING),
 			SQLiteTableSync::Field()
 		};
 
@@ -113,51 +108,16 @@ namespace synthese
 			double metricOffset (rows->getDouble (LineStopTableSync::COL_METRICOFFSET));
 			
 		    // Geometry
-			string viaPointsStr(rows->getText (LineStopTableSync::COL_VIAPOINTS));
+			string viaPointsStr(rows->getText(LineStopTableSync::COL_GEOMETRY));
 			if(viaPointsStr.empty())
 			{
 				ls->setGeometry(shared_ptr<LineString>());
 			}
 			else
 			{
-				const GeometryFactory* geometryFactory(GeometryFactory::getDefaultInstance());
-				vector<Coordinate>* coordinates = new vector<Coordinate>();
-
-				vector<string> points;
-				algorithm::split(points, viaPointsStr, algorithm::is_any_of(LineStopTableSync::SEP_POINTS));
-
-				if(points.size() > 1)
-				{
-					BOOST_FOREACH(const string& point, points)
-					{
-						vector<string> lonlat;
-						algorithm::split(lonlat, point, algorithm::is_any_of(LineStopTableSync::SEP_LON_LAT));
-
-						if(lonlat.size() < 2)
-						{
-							continue;
-						}
-
-						GeoPoint pt(
-							lexical_cast<double>(lonlat[0]),
-							lexical_cast<double>(lonlat[1])
-						);
-
-						coordinates->push_back(
-							pt
-						);
-					}
-
-					CoordinateSequence *cs = geometryFactory->getCoordinateSequenceFactory()->create(coordinates);
-					//coordinates is now owned by cs
-
-					ls->setGeometry(shared_ptr<LineString>(geometryFactory->createLineString(cs)));
-					//cs is now owned by the geometry
-				}
-				else
-				{
-					ls->setGeometry(shared_ptr<LineString>());
-				}
+				ls->setGeometry(
+					dynamic_pointer_cast<LineString,Geometry>(rows->getGeometry(LineStopTableSync::COL_GEOMETRY))
+				);
 			}
 
 			ls->setMetricOffset(metricOffset);
@@ -215,23 +175,6 @@ namespace synthese
 			if(!object->getPhysicalStop()) throw Exception("Linestop save error. Missing physical stop");
 			if(!object->getLine()) throw Exception("Linestop Save error. Missing line");
 
-			stringstream viaPoints;
-			if(object->getStoredGeometry().get())
-			{
-				viaPoints << fixed;
-				const CoordinateSequence* coords(object->getStoredGeometry()->getCoordinatesRO());
-
-				for(size_t i(0); i<coords->getSize(); ++i)
-				{
-					if(i>0)
-					{
-						viaPoints << LineStopTableSync::SEP_POINTS;
-					}
-					GeoPoint pt(coords->getAt(i));
-					viaPoints << pt.getLongitude() << LineStopTableSync::SEP_LON_LAT << pt.getLatitude();
-				}
-			}
-
 			ReplaceQuery<LineStopTableSync> query(*object);
 			query.addField(object->getPhysicalStop()->getKey());
 			query.addField(object->getLine()->getKey());
@@ -239,7 +182,7 @@ namespace synthese
 			query.addField(object->isDepartureAllowed());
 			query.addField(object->isArrivalAllowed());
 			query.addField(object->getMetricOffset());
-			query.addField(viaPoints.str());
+			query.addField(static_pointer_cast<Geometry,LineString>(object->getStoredGeometry()));
 			query.execute(transaction);
 		}
 	}

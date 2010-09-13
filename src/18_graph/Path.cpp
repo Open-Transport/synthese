@@ -29,6 +29,7 @@
 #include "Conversion.h"
 #include "Hub.h"
 #include "Log.h"
+#include "DBModule.h"
 
 #include <assert.h>
 #include <boost/lexical_cast.hpp>
@@ -48,6 +49,7 @@ using namespace geos::geom;
 namespace synthese
 {
 	using namespace util;
+	using namespace db;
 
 	namespace graph
 	{
@@ -519,13 +521,13 @@ namespace synthese
 		) const {
 
 			// Geos factories
-			const GeometryFactory *gf = GeometryFactory::getDefaultInstance();
-			geos::geom::CoordinateSequence *coords(gf->getCoordinateSequenceFactory()->create(0,2));
+			const GeometryFactory& gf(DBModule::GetDefaultGeometryFactory());
+			geos::geom::CoordinateSequence *coords(gf.getCoordinateSequenceFactory()->create(0,2));
 
 			// Handle empty roads
 			if(_edges.empty())
 			{
-				return shared_ptr<LineString>(gf->createLineString());
+				return shared_ptr<LineString>(gf.createLineString());
 			}
 
 			// Auto get end edge index
@@ -550,7 +552,7 @@ namespace synthese
 			}
 
 			//coords* owned by the shared pointer
-			return shared_ptr<LineString>(gf->createLineString(coords));
+			return shared_ptr<LineString>(gf.createLineString(coords));
 		}
 
 

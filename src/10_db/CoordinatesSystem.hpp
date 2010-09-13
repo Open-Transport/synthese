@@ -24,7 +24,6 @@
 #define SYNTHESE_geography_CoordinatesSystem_hpp__
 
 #include "Exception.h"
-#include "GeographyModule.h"
 #include "DBTypes.h"
 
 #include <string>
@@ -36,10 +35,10 @@
 
 namespace synthese
 {
-	namespace geography
+	namespace db
 	{
 		/** CoordinatesSystem class.
-			@ingroup m32
+			@ingroup m10
 			@author Hugues Romain
 			@since 3.2.0
 			@date 2010
@@ -47,29 +46,13 @@ namespace synthese
 		class CoordinatesSystem
 		{
 		private:
-			db::SRID _srid;
+			SRID _srid;
 			std::string _name;
 			std::string _projSequence;
 			projPJ _projObject;
 			geos::geom::GeometryFactory _geometryFactory;
 
-			typedef std::map<db::SRID, CoordinatesSystem> Map;
-
-			////////////////////////////////////////////////////////////////////
-			/// All coordinates systems.
-			static Map _coordinates_systems;
-
-			static Map::const_iterator _defaultCoordinatesSystem;
-
 		public:
-			class NotFoundException:
-				public util::Exception
-			{
-			public:
-				NotFoundException(db::SRID srid):
-				  util::Exception("Coordinates system "+ boost::lexical_cast<std::string>(srid) +" not found")
-				{}
-			};
 
 			CoordinatesSystem(
 				db::SRID srid,
@@ -87,24 +70,10 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const projPJ& getProjObject() const { return _projObject; }
-				const geos::geom::GeometryFactory getGeometryFactory() const { return _geometryFactory; }
+				const geos::geom::GeometryFactory& getGeometryFactory() const { return _geometryFactory; }
 				const std::string& getName() const { return _name; }
+				SRID getSRID() const { return _srid; }
 			//@}
-
-				
-			static void AddCoordinatesSystem(
-				db::SRID srid,
-				const std::string& name,
-				const std::string& projSequence
-			);
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// @throws NotFoundException if the system was not found
-			static const CoordinatesSystem& GetCoordinatesSystem(db::SRID srid);
-
-
-			static const CoordinatesSystem& GetInstanceCoordinateSystem();
 		};
 	}
 }

@@ -221,7 +221,7 @@ namespace synthese
 				typedef map<string, shared_ptr<Crossing> > _CrossingsMap;
 				_CrossingsMap _navteqCrossings;	
 
-				const GeometryFactory* geometryFactory(GeometryFactory::getDefaultInstance());
+				const GeometryFactory& geometryFactory(DBModule::GetDefaultGeometryFactory());
 
 				// Recently added road places
 				typedef map<pair<RegistryKeyType, string>, shared_ptr<RoadPlace> > RecentlyCreatedRoadPlaces;
@@ -264,10 +264,10 @@ namespace synthese
 						Coordinate leftNodeCoordinate(shpObject->padfX[0], shpObject->padfY[0]);
 						Coordinate rightNodeCoordinate(shpObject->padfX[shpObject->nVertices-1], shpObject->padfY[shpObject->nVertices-1]);
 						SHPDestroyObject(shpObject);
-						CoordinateSequence *cs = geometryFactory->getCoordinateSequenceFactory()->create(coordinates);
+						CoordinateSequence *cs = geometryFactory.getCoordinateSequenceFactory()->create(coordinates);
 						//coordinates is now owned by cs
 
-						shared_ptr<LineString> geometry(geometryFactory->createLineString(cs));
+						shared_ptr<LineString> geometry(geometryFactory.createLineString(cs));
 						//cs is now owned by geometry
 
 						// Chunk length
@@ -286,7 +286,7 @@ namespace synthese
 						{
 							GeoPoint gp(
 								leftNodeCoordinate,
-								CoordinatesSystem::GetCoordinatesSystem(27572)
+								DBModule::GetCoordinatesSystem(27572)
 							);
 							leftNode.reset(
 								new Crossing(
@@ -313,7 +313,7 @@ namespace synthese
 						{
 							GeoPoint gp(
 								rightNodeCoordinate,
-								CoordinatesSystem::GetCoordinatesSystem(27572)
+								DBModule::GetCoordinatesSystem(27572)
 							);
 							rightNode.reset(
 								new Crossing(

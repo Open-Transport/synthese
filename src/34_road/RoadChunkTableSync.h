@@ -93,9 +93,6 @@ namespace synthese
 			static const std::string COL_LEFT_HOUSE_NUMBERING_POLICY;
 			static const std::string COL_RIGHT_HOUSE_NUMBERING_POLICY;
 
-			static const std::string SEP_POINTS;
-			static const std::string SEP_LON_LAT;
-
 
 
 			//////////////////////////////////////////////////////////////////////////
