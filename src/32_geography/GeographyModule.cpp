@@ -58,15 +58,6 @@ namespace synthese
 	
 		template<> void ModuleClassTemplate<GeographyModule>::PreInit()
 		{
-			SQLiteResultSPtr systems(DBModule::GetSQLite()->execQuery("SELECT * FROM spatial_ref_sys;"));
-			while(systems->next())
-			{
-				CoordinatesSystem::AddCoordinatesSystem(
-					systems->getInt("auth_srid"),
-					systems->getText("ref_sys_name"),
-					systems->getText("proj4text")
-				);
-			}
 		}
 		
 		template<> void ModuleClassTemplate<GeographyModule>::Init()
@@ -167,13 +158,6 @@ namespace synthese
 		const GeographyModule::CitiesMatcher& GeographyModule::GetCitiesMatcher()
 		{
 			return _citiesMatcher;
-		}
-
-
-
-		const CoordinatesSystem& GeographyModule::GetInstanceCoordinatesSystem()
-		{
-			return CoordinatesSystem::GetCoordinatesSystem(DBModule::GetInstanceSRID());
 		}
 	}
 }

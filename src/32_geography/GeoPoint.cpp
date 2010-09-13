@@ -46,12 +46,12 @@ namespace synthese
 		):	_longitude (longitude),
 			_latitude (latitude),
 			_ellipsoidHeight(ellipsoidHeight),
-			_coordinatesSystem(GeographyModule::GetInstanceCoordinatesSystem()),
+			_coordinatesSystem(DBModule::GetInstanceCoordinatesSystem()),
 			Coordinate(Angle::toRadians(longitude), Angle::toRadians(latitude))
 		{
 			// projection
 			pj_transform(
-				CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()).getProjObject(),
+				DBModule::GetStorageCoordinatesSystem().getProjObject(),
 				_coordinatesSystem.getProjObject(),
 				1, 1,
 				&x, &y, NULL
@@ -71,7 +71,7 @@ namespace synthese
 		{
 			// projection
 			pj_transform(
-				CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()).getProjObject(),
+				DBModule::GetStorageCoordinatesSystem().getProjObject(),
 				_coordinatesSystem.getProjObject(),
 				1, 1,
 				&x, &y, NULL
@@ -85,12 +85,12 @@ namespace synthese
 		):	_latitude(coordinate.y),
 			_longitude(coordinate.x),
 			_ellipsoidHeight(0),
-			_coordinatesSystem(GeographyModule::GetInstanceCoordinatesSystem())
+			_coordinatesSystem(DBModule::GetInstanceCoordinatesSystem())
 		{
 			//transformation into wgs84
 			pj_transform(
 				coordinatesSystem.getProjObject(),
-				CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()).getProjObject(),
+				DBModule::GetStorageCoordinatesSystem().getProjObject(),
 				1, 1,
 				&_longitude, &_latitude, NULL
 			);
@@ -99,7 +99,7 @@ namespace synthese
 			x = _longitude;
 			y = _latitude;
 			pj_transform(
-				CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()).getProjObject(),
+				DBModule::GetStorageCoordinatesSystem().getProjObject(),
 				_coordinatesSystem.getProjObject(),
 				1, 1,
 				&x, &y, NULL
@@ -118,12 +118,12 @@ namespace synthese
 			_longitude(coordinate.x),
 			_latitude(coordinate.y),
 			_ellipsoidHeight(0),
-			_coordinatesSystem(GeographyModule::GetInstanceCoordinatesSystem())
+			_coordinatesSystem(DBModule::GetInstanceCoordinatesSystem())
 		{
 			//transformation into wgs84
 			pj_transform(
 				_coordinatesSystem.getProjObject(),
-				CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()).getProjObject(),
+				DBModule::GetStorageCoordinatesSystem().getProjObject(),
 				1, 1,
 				&_longitude, &_latitude, NULL
 			);
@@ -138,7 +138,7 @@ namespace synthese
 		GeoPoint::GeoPoint():
 			_longitude(0),
 			_latitude(0),
-			_coordinatesSystem(GeographyModule::GetInstanceCoordinatesSystem())
+			_coordinatesSystem(DBModule::GetInstanceCoordinatesSystem())
 		{
 			setNull();
 		}
@@ -181,9 +181,4 @@ namespace synthese
 			os << "(" << op.getLatitude () << "," << op.getLongitude () << "," << op.getEllipsoidHeight () << ")";
 			return os;
 		}
-
-
-
-	}
-}
-
+}	}

@@ -30,6 +30,7 @@
 #include "RoadPlace.h"
 #include "Service.h"
 #include "Vertex.h"
+#include "DBModule.h"
 
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/Coordinate.h>
@@ -51,6 +52,7 @@ namespace synthese
 	using namespace geography;
 	using namespace algorithm;
 	using namespace html;
+	using namespace db;
 
 	namespace road_journey_planner
 	{
@@ -172,12 +174,12 @@ namespace synthese
 
 		std::string RoadJourneyPlannerResult::getTripWKT() const
 		{
-			const geos::geom::GeometryFactory *gf = geos::geom::GeometryFactory::getDefaultInstance();
+			const geos::geom::GeometryFactory& gf(DBModule::GetDefaultGeometryFactory());
 			std::vector<geos::geom::Geometry*> geoms;
 
 			if(!_journeys.empty()) {
 				for (RoadJourneyPlannerResult::Journeys::const_iterator it(_journeys.begin()); it != _journeys.end(); ++it) {
-					geos::geom::CoordinateSequence *coords(gf->getCoordinateSequenceFactory()->create(0,2));
+					geos::geom::CoordinateSequence *coords(gf.getCoordinateSequenceFactory()->create(0,2));
 
 					BOOST_FOREACH(graph::ServicePointer su,it->getServiceUses()) {
 						const graph::Edge *e = su.getDepartureEdge();
@@ -215,10 +217,10 @@ namespace synthese
 							e = e->getFollowingArrivalForFineSteppingOnly();
 						}
 					}
-					geoms.push_back((geos::geom::Geometry*)(gf->createLineString(coords)));
+					geoms.push_back(static_cast<geos::geom::Geometry*>(gf.createLineString(coords)));
 				}
 			}
-			geos::geom::GeometryCollection *geom = gf->createGeometryCollection(geoms);
+			geos::geom::GeometryCollection *geom = gf.createGeometryCollection(geoms);
 			return geom->toText();
 		}
 	}

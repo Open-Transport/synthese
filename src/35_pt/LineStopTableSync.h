@@ -47,8 +47,8 @@ namespace synthese
 		///		<li>is_arrival</li>
 		///		<li>metric_offset</li>
 		///		<li>schedule_input</li>
-		///		<li>via_points : optional. Defines the geometry of the edge. Each point is separated
-		///		by coma. Longitude and latitude are stored and are separated by :.</li>
+		///		<li>geometry : optional. Defines the geometry of the edge. Each point is separated
+		///		by coma.</li>
 		///	</ul>
 		class LineStopTableSync:
 			public db::SQLiteRegistryTableSyncTemplate<LineStopTableSync,LineStop>
@@ -61,10 +61,7 @@ namespace synthese
 			static const std::string COL_ISARRIVAL;
 			static const std::string COL_METRICOFFSET;
 			static const std::string COL_SCHEDULEINPUT;
-			static const std::string COL_VIAPOINTS;
-			
-			static const std::string SEP_POINTS;
-			static const std::string SEP_LON_LAT;
+			static const std::string COL_GEOMETRY;
 
 			/** LineStop search.
 				(other search parameters)

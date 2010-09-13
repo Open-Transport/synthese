@@ -23,6 +23,7 @@
 #include "SQLiteResult.h"
 #include "SQLiteException.h"
 #include "DBConstants.h"
+#include "DBModule.h"
 
 #include <iomanip>
 #include <spatialite/sqlite3.h>
@@ -349,8 +350,8 @@ namespace synthese
 		) const	{
 			stringstream str(getText(col));
 
-			WKBReader reader;
-			return shared_ptr<Geometry>(reader.read(str));
+			WKBReader reader(DBModule::GetDefaultGeometryFactory());
+			return shared_ptr<Geometry>(reader.readHEX(str));
 		}
 
 

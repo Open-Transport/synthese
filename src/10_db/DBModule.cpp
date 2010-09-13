@@ -52,12 +52,13 @@ namespace synthese
 		map<string,string>	DBModule::_tableSyncMap;
 		map<int,string>	DBModule::_idTableSyncMap;
 
-		SQLiteHandle* DBModule::_sqlite = 0;
+		SQLiteHandle* DBModule::_sqlite(NULL);
 		DBModule::SubClassMap DBModule::_subClassMap;
 
 		const string DBModule::_INSTANCE_COORDINATES_SYSTEM("instance_coordinates_system");
-		SRID DBModule::_instanceSRID(27572);
-		SRID DBModule::_storageSRID(4326);
+		const CoordinatesSystem* DBModule::_instanceCoordinatesSystem(NULL);
+		const CoordinatesSystem* DBModule::_storageCoordinatesSystem(NULL);
+		DBModule::CoordinatesSystemsMap DBModule::_coordinates_systems;
 	}
 
 	namespace server
@@ -3601,6 +3602,16 @@ namespace synthese
 			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (32766, 'epsg', 32766, 'WGS 84 / TM 36 SE', '+proj=tmerc +lat_0=0 +lon_0=36 +k=0.9996 +x_0=500000 +y_0=10000000 +ellps=WGS84 +datum=WGS84 +units=m +no_defs');");
 			t.run();
 
+			SQLiteResultSPtr systems(DBModule::GetSQLite()->execQuery("SELECT * FROM spatial_ref_sys;"));
+			while(systems->next())
+			{
+				DBModule::AddCoordinatesSystem(
+					systems->getInt("auth_srid"),
+					systems->getText("ref_sys_name"),
+					systems->getText("proj4text")
+				);
+			}
+
 			RegisterParameter(DBModule::_INSTANCE_COORDINATES_SYSTEM, "27572", DBModule::ChangeInstanceCoordinatesSystem);
 		}
 
@@ -3608,9 +3619,6 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<DBModule>::Init()
 		{
-			
-//			bool autorespawn (true);
-
 			SQLiteSync* syncHook = new SQLiteSync ();
 			DBModule::_sqlite->registerUpdateHook(syncHook);
 
@@ -3621,7 +3629,6 @@ namespace synthese
 				DBModule::_tableSyncMap[sync->getFormat().NAME] = sync->getFactoryKey();
 				DBModule::_idTableSyncMap[sync->getFormat().ID] = sync->getFactoryKey();
 			}
-
 	    }
 	
 	
@@ -3683,6 +3690,10 @@ namespace synthese
 		DBModule::ParameterCallback (const string& name, 
 						 const string& value)
 	    {
+			if(name == _INSTANCE_COORDINATES_SYSTEM)
+			{
+				SetDefaultCoordinatesSystems(lexical_cast<SRID>(value));
+			}
 	    }
 
 
@@ -3704,7 +3715,34 @@ namespace synthese
 
 		void DBModule::ChangeInstanceCoordinatesSystem( const std::string&, const std::string& value )
 		{
-			_instanceSRID = lexical_cast<unsigned int>(value);
+			SetDefaultCoordinatesSystems(lexical_cast<SRID>(value));
+		}
+
+
+
+		const CoordinatesSystem& DBModule::GetCoordinatesSystem( SRID srid )
+		{
+			CoordinatesSystemsMap::const_iterator it(_coordinates_systems.find(srid));
+			if(it == _coordinates_systems.end())
+			{
+				throw CoordinatesSystemNotFoundException(srid);
+			}
+			return it->second;
+		}
+
+
+
+		void DBModule::AddCoordinatesSystem( SRID srid, const std::string& name, const std::string& projSequence )
+		{
+			_coordinates_systems[srid] = CoordinatesSystem(srid,name, projSequence);
+		}
+
+
+
+		void DBModule::SetDefaultCoordinatesSystems( SRID instanceSRID )
+		{
+			_instanceCoordinatesSystem = &GetCoordinatesSystem(instanceSRID);
+			_storageCoordinatesSystem = &GetCoordinatesSystem(4326);
 		}
 	}
 }
