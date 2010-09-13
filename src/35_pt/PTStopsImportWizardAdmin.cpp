@@ -44,6 +44,7 @@
 #include "FileFormat.h"
 #include "TridentFileFormat.h"
 #include "CarPostalFileFormat.hpp"
+#include "DBModule.h"
 
 #include <fstream>
 #include <boost/lexical_cast.hpp>
@@ -65,6 +66,8 @@ namespace synthese
 	using namespace html;
 	using namespace geography;
 	using namespace impex;
+	using namespace db;
+	
 
 	namespace util
 	{
@@ -283,7 +286,7 @@ namespace synthese
 									Coordinate(
 										1000 * lexical_cast<double>(line.substr(10,7)),
 										1000 * lexical_cast<double>(line.substr(20,7))
-									), CoordinatesSystem::GetCoordinatesSystem(21781)
+									), DBModule::GetCoordinatesSystem(21781)
 								);
 							}
 						}

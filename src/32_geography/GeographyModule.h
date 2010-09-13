@@ -90,8 +90,6 @@ namespace synthese
 	*/
 	namespace geography
 	{
-		class CoordinatesSystem;
-
 		/** 09 Geography Module class.
 			@author Hugues Romain
 			@date 2008
@@ -148,8 +146,6 @@ namespace synthese
 			);
 
 			static const CitiesMatcher& GetCitiesMatcher();
-
-			static const CoordinatesSystem& GetInstanceCoordinatesSystem();
 		};
 	}
 	/** @} */

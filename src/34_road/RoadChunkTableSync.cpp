@@ -32,8 +32,6 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 #include <geos/geom/LineString.h>
-#include <geos/geom/GeometryFactory.h>
-#include <geos/geom/CoordinateSequenceFactory.h>
 
 
 using namespace std;
@@ -65,9 +63,6 @@ namespace synthese
 		const string RoadChunkTableSync::COL_RIGHT_MAX_HOUSE_NUMBER("right_max_house_number");
 		const string RoadChunkTableSync::COL_LEFT_HOUSE_NUMBERING_POLICY("left_house_numbering_policy");
 		const string RoadChunkTableSync::COL_RIGHT_HOUSE_NUMBERING_POLICY("right_house_numbering_policy");
-
-		const string RoadChunkTableSync::SEP_POINTS(",");
-		const string RoadChunkTableSync::SEP_LON_LAT(":");
 	}
 
 	namespace db
@@ -81,7 +76,6 @@ namespace synthese
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_CROSSING_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_RANKINPATH, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_GEOMETRY, SQL_GEOM_LINESTRING),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_ROADID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_METRICOFFSET, SQL_DOUBLE, false),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_LEFT_MIN_HOUSE_NUMBER, SQL_INTEGER),
@@ -90,6 +84,7 @@ namespace synthese
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_RIGHT_MAX_HOUSE_NUMBER, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_LEFT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_RIGHT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
+			SQLiteTableSync::Field(RoadChunkTableSync::COL_GEOMETRY, SQL_GEOM_LINESTRING),
 			SQLiteTableSync::Field()
 		};
 
@@ -218,7 +213,6 @@ namespace synthese
 			ReplaceQuery<RoadChunkTableSync> query(*object);
 			query.addField(object->getFromCrossing() ? object->getFromCrossing()->getKey() : RegistryKeyType(0));
 			query.addField(object->getRankInPath());
-			query.addField(static_pointer_cast<Geometry,LineString>(object->getStoredGeometry()));
 			query.addField(object->getRoad() ? object->getRoad()->getKey() : RegistryKeyType(0));
 			query.addField(object->getMetricOffset());
 			query.addField((leftChunk && leftChunk->getHouseNumberBounds()) ? lexical_cast<string>(leftChunk->getHouseNumberBounds()->first) : string());
@@ -227,6 +221,7 @@ namespace synthese
 			query.addField((rightChunk && rightChunk->getHouseNumberBounds()) ? lexical_cast<string>(rightChunk->getHouseNumberBounds()->second) :	string());
 			query.addField(static_cast<int>((leftChunk && leftChunk->getHouseNumberBounds()) ? leftChunk->getHouseNumberingPolicy() : RoadChunk::ALL));
 			query.addField(static_cast<int>((rightChunk && rightChunk->getHouseNumberBounds()) ? rightChunk->getHouseNumberingPolicy() : RoadChunk::ALL));
+			query.addField(static_pointer_cast<Geometry,LineString>(object->getStoredGeometry()));
 			query.execute(transaction);
 	    }
 	}
@@ -256,9 +251,9 @@ namespace synthese
 			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
 		){
 			Coordinate minCoord(point.x - distanceLimit, point.y - distanceLimit);
-			GeoPoint minPoint(minCoord, CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()));
+			GeoPoint minPoint(minCoord, DBModule::GetInstanceCoordinatesSystem());
 			Coordinate maxCoord(point.x + distanceLimit, point.y + distanceLimit);
-			GeoPoint maxPoint(maxCoord, CoordinatesSystem::GetCoordinatesSystem(DBModule::GetStorageSRID()));
+			GeoPoint maxPoint(maxCoord, DBModule::GetInstanceCoordinatesSystem());
 
 			stringstream subQuery;
 			subQuery << "SELECT pkid FROM idx_" << RoadChunkTableSync::TABLE.NAME << " WHERE " <<

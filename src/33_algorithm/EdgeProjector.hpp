@@ -24,6 +24,7 @@
 #define EDGE_PROJECTOR_H_
 
 #include "Exception.h"
+#include "DBModule.h"
 
 #include <map>
 #include <vector>
@@ -43,7 +44,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Projects a point to the nearest edge(s).
-		/// @author Thomas Bonfort
+		/// @author Thomas Bonfort, Hugues Romain
 		/// @date 2010
 		/// @since 3.2.0
 		template<class T>
@@ -127,8 +128,8 @@ namespace synthese
 				throw NotFoundException();
 			}
 
-			const geos::geom::GeometryFactory *gf = geos::geom::GeometryFactory::getDefaultInstance();
-			boost::shared_ptr<geos::geom::Point> ptGeom(gf->createPoint(pt));
+			const geos::geom::GeometryFactory& gf(db::DBModule::GetDefaultGeometryFactory());
+			boost::shared_ptr<geos::geom::Point> ptGeom(gf.createPoint(pt));
 
 			boost::shared_ptr<geos::geom::LineString> bestEdgeGeom;
 			boost::shared_ptr<T> bestEdge;
@@ -185,8 +186,8 @@ namespace synthese
 				return ret;
 			}
 
-			const geos::geom::GeometryFactory *gf = geos::geom::GeometryFactory::getDefaultInstance();
-			boost::shared_ptr<geos::geom::Point> ptGeom(gf->createPoint(pt));
+			const geos::geom::GeometryFactory& gf(db::DBModule::GetDefaultGeometryFactory());
+			boost::shared_ptr<geos::geom::Point> ptGeom(gf.createPoint(pt));
 
 			BOOST_FOREACH(T* edge, _from)
 			{

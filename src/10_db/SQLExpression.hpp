@@ -29,6 +29,7 @@
 #include <vector>
 #include <string>
 #include <geos/io/WKBWriter.h>
+#include <geos/geom/Geometry.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -287,20 +288,20 @@ namespace synthese
 		public:
 			ValueExpression(const boost::shared_ptr<geos::geom::Geometry>& value)
 			{
-				if(value.get())
+				if(value.get() && !value->isEmpty())
 				{
 					std::stringstream str;
-					if(DBModule::GetStorageSRID() != value->getSRID())
+					if(DBModule::GetStorageCoordinatesSystem().getSRID() != value->getSRID())
 					{
 						str << "Transform(";
 					}
-					str << "GeomFromWKB('";
-					geos::io::WKBWriter writer(2, getMachineByteOrder(), true);
+					str << "GeomFromWKB(X'";
+					geos::io::WKBWriter writer;
 					writer.writeHEX(*value, str);
-					str << "," << value->getSRID() << ')";
-					if(DBModule::GetStorageSRID() != value->getSRID())
+					str << "'," << value->getSRID() << ")";
+					if(DBModule::GetStorageCoordinatesSystem().getSRID() != value->getSRID())
 					{
-						str << "," << DBModule::GetStorageSRID() << ")";
+						str << "," << DBModule::GetStorageCoordinatesSystem().getSRID() << ")";
 					}
 					_value = str.str();
 				}

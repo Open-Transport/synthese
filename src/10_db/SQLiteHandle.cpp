@@ -284,7 +284,16 @@ namespace synthese
 			}
 			catch(...)
 			{
-				throw SQLiteException ("Error executing batch update when commiting transaction, database may be locked : unhandled exception");
+				retc = sqlite3_exec(getHandle(),"ROLLBACK;", 0,	0, &errMsg);
+				if (retc != SQLITE_OK)
+				{
+					std::string msg (errMsg);
+					sqlite3_free (errMsg);
+
+					throw SQLiteException ("Error executing batch update when rollback transaction, database may be locked : " + 
+						msg + " (error=" + lexical_cast<string>(retc) + ")");
+				}
+				throw SQLiteException ("Error executing batch update when reading transaction, database may be locked : unhandled exception");
 			}
 
 

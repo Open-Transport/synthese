@@ -47,7 +47,10 @@ namespace synthese
 	{
 		////////////////////////////////////////////////////////////////////
 		/// Table synchronizer template.
+		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m10
+		/// @warning Geometry columns must always be at the end. If non geometry
+		/// columns are present after any geometry column, they will be ignored.
 		template <class K>
 		class SQLiteTableSyncTemplate:
 			public util::FactorableTemplate<SQLiteTableSync, K>
@@ -91,11 +94,33 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			///	Gets the SQL schema of the table.
 			///	@return the SQL schema of the table
-			///	@author Marc Jambert
+			///	@author Marc Jambert, Hugues Romain
 			/// @warning this method considers that the first field is always
 			/// the primary key of the table. To avoid this behavior, do not
 			/// use the SQLiteTableSyncTemplate class.
+			//////////////////////////////////////////////////////////////////////////
+			/// This method builds the same text as present in the the sql field of
+			/// the SQL_MASTER virtual table in the record corresponding to the current
+			/// table. A difference between the two texts seems that the schema is
+			/// different.
+			/// 
+			/// Note : The name of the geometry columns created by SpatiaLite are double-
+			/// quoted.
 			static std::string _GetSQLFieldsSchema();
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the SQL code to execute to create the table in the database.
+			/// Note : This method is different to _GetSQLFieldsSchema because the
+			/// creation of geometry columns is done by AddGeometryColumn and not only
+			/// by specifying the schema.
+			//////////////////////////////////////////////////////////////////////////
+			/// @return the SQL command which creates the table in the database
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.2.0
+			static std::string _GetTableCreationSQL();
 
 
 
@@ -440,14 +465,14 @@ namespace synthese
 				if(_FIELDS[i].isGeometry())
 				{
 					fieldsGetter << "AsBinary(";
-					if(DBModule::GetStorageSRID() != DBModule::GetInstanceSRID())
+					if(DBModule::GetStorageCoordinatesSystem().getSRID() != DBModule::GetInstanceCoordinatesSystem().getSRID())
 					{
 						fieldsGetter << "Transform(";
 					}
 					fieldsGetter << _FIELDS[i].name;
-					if(DBModule::GetStorageSRID() != DBModule::GetInstanceSRID())
+					if(DBModule::GetStorageCoordinatesSystem().getSRID() != DBModule::GetInstanceCoordinatesSystem().getSRID())
 					{
-						fieldsGetter << "," << DBModule::GetInstanceSRID() << ")";
+						fieldsGetter << "," << DBModule::GetInstanceCoordinatesSystem().getSRID() << ")";
 					}
 					fieldsGetter << ") AS " << _FIELDS[i].name;
 				}
@@ -499,105 +524,38 @@ namespace synthese
 				// Drop triggers
 				if (!SQLiteTableSync::GetTriggerNoUpdateDb(sqlite, TABLE.NAME).empty())
 				{
-					str << "DROP TRIGGER " << K::TABLE.NAME << "_no_update ;";
+					str << "DROP TRIGGER " << TABLE.NAME << "_no_update ;";
 				}
 
-				// Convert table schema (through temporary table)
+				// Backup of old data in a temporary table
 				str << "CREATE TEMPORARY TABLE " << buTableName << " (" 
-					<< colsStr.str () << "); ";
-				str << "INSERT INTO " << buTableName 
-					<< " SELECT " << colsStr.str () << " FROM " << TABLE.NAME << "; ";
-				str << "DROP TABLE " << TABLE.NAME << "; ";
-				str << tableSchema << "; ";
-				str << "INSERT INTO " << TABLE.NAME << " (" << filteredColsStr.str () << ")"
-					<< " SELECT " << filteredColsStr.str () << " FROM " << buTableName << "; ";
-				str << "DROP TABLE " << buTableName << "; ";
+					<< colsStr.str () << "); "
+					<< "INSERT INTO " << buTableName 
+					<< " SELECT " << colsStr.str () << " FROM " << TABLE.NAME << "; "
 
-				// Redefine triggers
-				if (triggerNoUpdate != "") str << triggerNoUpdate << " ;";
+					// Deletion of the table with the old schema
+					<< "DROP TABLE " << TABLE.NAME << "; "
+
+					// Creation of the table with the new schema
+					<< _GetTableCreationSQL()
+
+					// Restoration of the data in the table
+					<< "INSERT INTO " << TABLE.NAME << " (" << filteredColsStr.str () << ")"
+					<< " SELECT " << filteredColsStr.str () << " FROM " << buTableName << "; "
+
+					// Deletion of the temporary table
+					<< "DROP TABLE " << buTableName << "; "
+				;
+
+				// Redefine triggers if necessary
+				if(	!triggerNoUpdate.empty())
+				{
+					str << triggerNoUpdate << " ;";
+				}
 
 				str << "COMMIT;";
 
 				sqlite->execUpdate (str.str ());
-			}
-
-			// Search for geometry columns to add
-			for(size_t i(0); !_FIELDS[i].empty(); ++i)
-			{
-				if(!_FIELDS[i].isGeometry())
-				{
-					continue;
-				}
-
-				// Search if the geom column is declared
-				std::stringstream sql;
-				sql << "SELECT type FROM geometry_columns WHERE f_table_name='" << TABLE.NAME 
-					<< "' AND f_geometry_column='" << _FIELDS[i].name << "'";
-				SQLiteResultSPtr res = sqlite->execQuery (sql.str());
-
-				bool toUpdate(false);
-				if(res->next())
-				{
-					if(res->getText("type") != _FIELDS[i].getGeometryType())
-					{
-						std::stringstream sql;
-						sql <<
-							"SELECT DisableSpatialIndex('" << TABLE.NAME << "','" <<
-							_FIELDS[i].name << "');" <<
-							"SELECT DiscardGeometryColumn('" << TABLE.NAME << "','" <<
-							_FIELDS[i].name << "');";
-						sqlite->execUpdate(sql.str());
-						toUpdate = true;
-					}
-				}
-				else
-				{
-					toUpdate = true;
-				}
-
-				if(toUpdate)
-				{
-					std::stringstream sql;
-					sql <<
-						"SELECT RecoverGeometryColumn('" << TABLE.NAME << "','" <<
-						_FIELDS[i].name << "',4326,'" << _FIELDS[i].getGeometryType() << "',2);" <<
-						"SELECT CreateSpatialIndex('" << TABLE.NAME << "','" <<
-						_FIELDS[i].name << "');"
-					;
-					sqlite->execUpdate(sql.str());
-				}
-			}
-
-			// Search for geometry columns to remove
-			{
-				std::stringstream sql;
-				sql << "SELECT f_geometry_column, type FROM geometry_columns WHERE f_table_name='" << TABLE.NAME << "'";
-				SQLiteResultSPtr res = sqlite->execQuery (sql.str());
-				while(res->next())
-				{
-					bool toKeep(false);
-					for(size_t i(0); !_FIELDS[i].empty(); ++i)
-					{
-						if(	_FIELDS[i].isGeometry() &&
-							_FIELDS[i].name == res->getText("f_geometry_column") &&
-							_FIELDS[i].getGeometryType() == res->getText("type")
-						){
-							toKeep = true;
-							break;
-						}
-					}
-
-					if(!toKeep)
-					{
-						std::stringstream sql;
-						sql <<
-							"SELECT DisableSpatialIndex('" << TABLE.NAME << "','" <<
-							res->getText("f_geometry_column") << "');" <<
-							"SELECT DiscardGeometryColumn('" << TABLE.NAME << "','" <<
-							res->getText("f_geometry_column") << "');";
-						sqlite->execUpdate(sql.str());
-					}
-				}
 			}
 
 
@@ -640,9 +598,63 @@ namespace synthese
 
 			for(size_t i(1); !_FIELDS[i].empty(); ++i)
 			{
-				sql << ", " << _FIELDS[i].name << " " << _FIELDS[i].getSQLType();
+				sql << ", ";
+				if(_FIELDS[i].isGeometry())
+				{
+					sql << "\"";
+				}
+				sql << _FIELDS[i].name;
+				if(_FIELDS[i].isGeometry())
+				{
+					sql << "\"";
+				}
+				sql << " " << _FIELDS[i].getSQLType();
 			}
 			sql << ")";
+			return sql.str();
+		}
+
+
+
+		template <class K>
+		std::string synthese::db::SQLiteTableSyncTemplate<K>::_GetTableCreationSQL()
+		{
+			std::stringstream sql;
+
+			// Init and primary key
+			sql << "CREATE TABLE " << TABLE.NAME << " ("
+				<< _FIELDS[0].name << " " << _FIELDS[0].getSQLType()
+				<< " UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK";
+
+			// Non geometry columns
+			size_t i(1);
+			for(; !_FIELDS[i].empty() && !_FIELDS[i].isGeometry(); ++i)
+			{
+				sql << ", ";
+				sql << _FIELDS[i].name;
+				sql << " " << _FIELDS[i].getSQLType();
+			}
+			sql << ");";
+
+			// Geometry columns
+			for(; !_FIELDS[i].empty() && _FIELDS[i].isGeometry(); ++i)
+			{
+				sql << "SELECT AddGeometryColumn('" << TABLE.NAME << "','" <<
+					_FIELDS[i].name << "'," << DBModule::GetStorageCoordinatesSystem().getSRID() <<
+					",'" << _FIELDS[i].getSQLType() << "',2);" <<
+					"SELECT CreateSpatialIndex('" << TABLE.NAME << "','" <<
+					_FIELDS[i].name << "');"
+				;
+			}
+
+			// Control
+			if(!_FIELDS[i].empty())
+			{
+				util::Log::GetInstance().error(
+					"Fields are present after geometry column and will be ignored (possible data loss)."
+				);
+			}
+
 			return sql.str();
 		}
 

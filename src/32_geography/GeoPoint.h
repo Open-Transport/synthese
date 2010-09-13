@@ -28,10 +28,13 @@
 
 namespace synthese
 {
-	namespace geography
+	namespace db
 	{
 		class CoordinatesSystem;
+	}
 
+	namespace geography
+	{
 		/** Geographical point class.
 			Geodetic point, based on WGS84 System (used by GPSs), usually expressed as 
 			latitude, longitude, and ellipsoid height (height above WGS84 reference ellipsoid -
@@ -53,7 +56,7 @@ namespace synthese
 			double _longitude;        //!< Longitude in degrees.
 			double _latitude;         //!< Latitude in degrees.
 			double _ellipsoidHeight;  //!< Height above ellipsoid in meters.
-			const CoordinatesSystem& _coordinatesSystem;
+			const db::CoordinatesSystem& _coordinatesSystem;
 
 		public:
 
@@ -73,7 +76,7 @@ namespace synthese
 			/// @param coordinatesSystem projection used to create the point to import
 			GeoPoint(
 				const geos::geom::Coordinate& coordinate,
-				const CoordinatesSystem& coordinatesSystem
+				const db::CoordinatesSystem& coordinatesSystem
 			);
 
 			//////////////////////////////////////////////////////////////////////////
@@ -91,7 +94,7 @@ namespace synthese
 			/// @param coordinatesSystem coordinates system to use
 			GeoPoint(
 				const GeoPoint& point,
-				const CoordinatesSystem& coordinatesSystem
+				const db::CoordinatesSystem& coordinatesSystem
 			);
 
 
@@ -119,7 +122,7 @@ namespace synthese
 				///	(even if it could be a very rough approximation +-100m) !  
 				double getEllipsoidHeight () const { return _ellipsoidHeight; }
 
-				const CoordinatesSystem& getCoordinatesSystem() const { return _coordinatesSystem; }
+				const db::CoordinatesSystem& getCoordinatesSystem() const { return _coordinatesSystem; }
 			//@}
 
 			//! @name Setters
