@@ -307,7 +307,7 @@ namespace synthese
 				}
 				else
 				{
-					_value ="''";
+					_value ="NULL";
 				}
 			}
 			virtual std::string toString() const { return _value; }
