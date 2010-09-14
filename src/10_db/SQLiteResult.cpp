@@ -31,6 +31,7 @@
 #include <boost/lexical_cast.hpp>
 #include <geos/io/WKBReader.h>
 #include <geos/geom/Geometry.h>
+#include <geos/io/ParseException.h>
 
 using namespace std;
 using namespace boost;
@@ -348,10 +349,23 @@ namespace synthese
 		boost::shared_ptr<Geometry> SQLiteResult::getGeometry(
 			const std::string& col
 		) const	{
-			stringstream str(getText(col));
+			string colStr(getText(col));
+			
+			if(colStr.empty())
+			{
+				return shared_ptr<Geometry>();
+			}
 
+			stringstream str(colStr);
 			WKBReader reader(DBModule::GetDefaultGeometryFactory());
-			return shared_ptr<Geometry>(reader.readHEX(str));
+			try
+			{
+				return shared_ptr<Geometry>(reader.read(str));
+			}
+			catch(geos::io::ParseException& e)
+			{
+				return shared_ptr<Geometry>();
+			}
 		}
 
 
