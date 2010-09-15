@@ -98,8 +98,9 @@ namespace synthese
 
 				const StopArea * connPlace(stopPoint->getConnectionPlace());
 
-				stream << "<stop id=\""  << stopPoint->getKey() <<
+				stream << "<stop id=\""   << stopPoint->getKey() <<
 					"\" name=\""          << stopPoint->getName() <<
+					"\" operatorCode=\""  << stopPoint->getCodeBySource() <<
 					"\" cityId=\""        << connPlace->getCity()->getKey() <<
 					"\" cityName=\""      << connPlace->getCity()->getName() <<
 					"\" directionAlias=\""<< connPlace->getName26() <<
