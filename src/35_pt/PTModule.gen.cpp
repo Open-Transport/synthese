@@ -49,6 +49,7 @@ synthese::pt::StopPointAdmin::integrate();
 synthese::pt::RealTimeUpdateFunction::integrate();
 synthese::pt::PhysicalStopsCSVExportFunction::integrate();
 synthese::pt::LinesListFunction::integrate();
+synthese::pt::StopAreasListFunction::integrate();
 synthese::pt::TridentExportFunction::integrate ();
 synthese::pt::PTNetworksListFunction::integrate();
 synthese::pt::PTRoutesListFunction::integrate();
