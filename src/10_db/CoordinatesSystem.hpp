@@ -74,8 +74,20 @@ namespace synthese
 				const std::string& getName() const { return _name; }
 				SRID getSRID() const { return _srid; }
 			//@}
+
+			//! @name Services
+			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion of the coordinate system of a point.
+				//////////////////////////////////////////////////////////////////////////
+				/// @param source point to convert
+				/// @return result of the conversion
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.2.0
+				boost::shared_ptr<geos::geom::Point> convertPoint(const geos::geom::Point& source) const;
+			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_geography_CoordinatesSystem_hpp__
