@@ -42,7 +42,7 @@ namespace synthese
 
 		/** Arrival/departures table generator function.
 			@ingroup m54Functions refFunctions
-			@author Hugues Romain
+			@author Hugues Romain, Xavier Raffin
 			@date 2002
 
 			<h2>Usage</h2>
