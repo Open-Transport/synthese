@@ -276,8 +276,9 @@ namespace synthese
 
 			RollingStock * rs = journeyPattern->getRollingStock();
 
-			stream << "<stop id=\""<< stop->getKey() <<
-				"\" name=\""       << stop->getName() <<
+			stream << "<stop id=\"" << stop->getKey() <<
+				"\" operatorCode=\""<< stop->getCodeBySource() <<
+				"\" name=\""        << stop->getName() <<
 				"\" />";
 
 			stream <<"<transportMode id=\""<< rs->getKey() <<
@@ -302,6 +303,7 @@ namespace synthese
 			);
 			stream << "<origin id=\""  << origin.getKey() <<
 					"\" name=\""           << origin.getName() <<
+					"\" cityName=\""       << origin.getCity()->getName() <<
 					"\" />";
 
 			const StopArea & destination(
@@ -309,6 +311,7 @@ namespace synthese
 			);
 			stream << "<destination id=\"" << destination.getKey() <<
 					"\" name=\""           << destination.getName() <<
+					"\" cityName=\""       << destination.getCity()->getName() <<
 					"\" />";
 
 			const StopArea * connPlace(stop->getConnectionPlace());

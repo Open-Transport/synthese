@@ -8,6 +8,7 @@
 #include "TridentExportFunction.h"
 #include "LinesListFunction.h"
 #include "StopAreasListFunction.hpp"
+#include "StopPointsListFunction.hpp"
 #include "RealTimeUpdateFunction.h"
 #include "PhysicalStopsCSVExportFunction.h"
 #include "PTNetworksListFunction.hpp"

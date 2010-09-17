@@ -24,13 +24,27 @@
 
 #include "RequestException.h"
 #include "Request.h"
+#include "ServicePointer.h"
 #include "StopPointsListFunction.hpp"
+#include "StopArea.hpp"
+#include "StopPoint.hpp"
+#include "Edge.h"
+#include "LineStop.h"
+#include "SchedulesBasedService.h"
+#include "JourneyPattern.hpp"
+#include "CommercialLine.h"
+#include "City.h"
+
+#include <sstream>
 
 using namespace std;
+using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
 	using namespace util;
+	using namespace graph;
 	using namespace server;
 	using namespace security;
 
@@ -38,30 +52,143 @@ namespace synthese
 	
 	namespace pt
 	{
-		/// @todo Parameter names declarations
-		//const string StopPointsListFunction::PARAMETER_PAGE("rub");
-		
+		const string StopPointsListFunction::PARAMETER_LINE_ID = "lineid";
+		const string StopPointsListFunction::PARAMETER_DATE = "date";
+
 		ParametersMap StopPointsListFunction::_getParametersMap() const
 		{
 			ParametersMap map;
-			/// @todo Map filling
-			// eg : map.insert(PARAMETER_PAGE, _page->getFactoryKey());
+			if(_date && _date->is_not_a_date_time()) map.insert(PARAMETER_DATE, *_date);
 			return map;
 		}
 
 		void StopPointsListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			/// @todo Initialize internal attributes from the map
-			// 	string a = map.get<string>(PARAM_SEARCH_XXX);
-			// 	string b = map.getDefault<string>(PARAM_SEARCH_XXX);
-			// 	optional<string> c = map.getOptional<string>(PARAM_SEARCH_XXX);
+			try
+			{
+				_stopArea = Env::GetOfficialEnv().getRegistry<StopArea>().get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+			}
+			catch (ObjectNotFoundException<StopArea>&)
+			{
+				throw RequestException("No such stop area");
+			}
+			_commercialLineID = map.getOptional<RegistryKeyType>(PARAMETER_LINE_ID);
+			if(_commercialLineID)
+			{
+				// Date is usefull only if a line was given
+				if(!map.getDefault<string>(PARAMETER_DATE).empty() && map.getDefault<string>(PARAMETER_DATE) != "A")
+				{
+					_date = time_from_string(map.get<string>(PARAMETER_DATE));
+				}
+			}
+
 		}
 
 		void StopPointsListFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
-			/// @todo Fill it
+
+			ptime startDateTime,endDateTime;
+
+			ptime date = _date ? *_date : second_clock::local_time();
+
+			//and startDateTime is begin of the day (a day begin at 3:00):
+			startDateTime = date - date.time_of_day() + hours(3);
+			//and endDateTime is end of the day (a day end at 27:00):
+			endDateTime = date - date.time_of_day() + hours(27);
+
+			// XML header
+			if(_commercialLineID)//destination of this line will be displayed
+			{
+				stream <<
+					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+					"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
+					"\" stopAreaName=\""<< _stopArea->getName() <<
+					"\" lineName=\""    << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getName() <<
+					"\">";
+			}
+			else
+			{
+				stream <<
+					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+					"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
+					"\" stopAreaName=\"" << _stopArea->getName() <<
+					"\">";
+			}
+
+			const StopArea::PhysicalStops& stops(_stopArea->getPhysicalStops());
+			BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, stops)
+			{
+				if(_commercialLineID)//only physicalStop used by the commercial line will be displayed
+				{
+					typedef map<RegistryKeyType, const StopArea * > stopAreaMapType;
+					stopAreaMapType stopAreaMap;
+
+					BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
+					{
+						const LineStop* ls = static_cast<const LineStop*>(edge.second);
+
+						ptime departureDateTime = startDateTime;
+						// Loop on services
+						optional<Edge::DepartureServiceIndex::Value> index;
+						while(true)
+						{
+							ServicePointer servicePointer(
+									ls->getNextService(
+											USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
+											departureDateTime
+											, endDateTime
+											, false
+											, index
+									)	);
+							if (!servicePointer.getService())
+								break;
+							++*index;
+							departureDateTime = servicePointer.getDepartureDateTime();
+							if(it.second->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
+								continue;
+
+							//only physical stops the commercial line given will be displayed
+							const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+							const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+							if(commercialLine->getKey()!=_commercialLineID)
+								continue;
+
+							const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
+
+							stopAreaMap[destination->getKey()] = destination;
+						}
+					}
+
+					//Generate output only if commercial line use stoppoint
+					if(stopAreaMap.empty())
+						continue;
+
+					stream << "<physicalStop id=\"" << it.second->getKey() <<
+						"\" operatorCode=\""    << it.second->getCodeBySource() <<
+						"\">";
+
+					BOOST_FOREACH(const stopAreaMapType::value_type& destination, stopAreaMap)
+					{
+						stream << "<destination id=\"" << destination.second->getKey() <<
+							"\" name=\""    << destination.second->getName() <<
+							"\" cityName=\""<< destination.second->getCity()->getName() <<
+							"\" />";
+					}
+
+					stream << "</physicalStop>";
+				}
+				else//all physical stop will be displayed, without lines destination information
+				{
+					stream << "<physicalStop id=\"" << it.second->getKey() <<
+						"\" operatorCode=\""    << it.second->getCodeBySource() <<
+						"\" />";
+				}
+			}
+
+			// XML footer
+			stream << "</physicalStops>";
 		}
 		
 		
@@ -76,7 +203,7 @@ namespace synthese
 
 		std::string StopPointsListFunction::getOutputMimeType() const
 		{
-			return "text/html";
+			return "text/xml";
 		}
 	}
 }
