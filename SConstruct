@@ -148,7 +148,7 @@ elif (env['_PLATFORM'] == 'darwin'):
 
 elif (env['_PLATFORM']=='win32'):
    env.Append ( CCFLAGS = ['/bigobj', '/EHsc', '/GR', '/GS', '/W3', '/nologo', '/c'] )
-   env.Append ( CCFLAGS = ['/wd4005', '/wd4996', '/wd4290'])
+   env.Append ( CCFLAGS = ['/wd4005', '/wd4996', '/wd4290', '/wd4503'])
    
    if (env.IsCppModeDebug ()):
       #env.Append ( CCFLAGS = ['/Od', '/MTd', '/Gm', '/RTC1', '/ZI', '/showIncludes'] )
