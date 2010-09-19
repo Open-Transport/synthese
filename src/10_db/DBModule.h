@@ -31,13 +31,14 @@
 #include "DBConstants.h"
 #include "DBTypes.h"
 #include "Registry.h"
-#include "CoordinatesSystem.hpp"
 
 #include <map>
 #include <boost/lexical_cast.hpp>
 
 namespace synthese
 {
+	class CoordinatesSystem;
+
 	/** @defgroup m10Exceptions 10 Exceptions
 		@ingroup m10
 	
@@ -69,18 +70,6 @@ namespace synthese
 		public:
 			typedef std::map<util::RegistryKeyType, std::string>	SubClassMap;
 
-			static const std::string _INSTANCE_COORDINATES_SYSTEM;
-
-			typedef std::map<SRID, CoordinatesSystem> CoordinatesSystemsMap;
-
-			class CoordinatesSystemNotFoundException:
-				public util::Exception
-			{
-			public:
-				CoordinatesSystemNotFoundException(SRID srid):
-				  util::Exception("Coordinates system "+ boost::lexical_cast<std::string>(srid) +" not found")
-				  {}
-			};
 
 		private:
 
@@ -89,12 +78,7 @@ namespace synthese
 			static std::map<std::string,std::string>	_tableSyncMap;
 			static std::map<int,std::string>	_idTableSyncMap;
 		    static boost::filesystem::path _DatabasePath;
-			static const CoordinatesSystem* _instanceCoordinatesSystem;
 			static const CoordinatesSystem* _storageCoordinatesSystem;
-
-			////////////////////////////////////////////////////////////////////
-			/// All coordinates systems.
-			static CoordinatesSystemsMap _coordinates_systems;
 
 		public:
 
@@ -131,28 +115,8 @@ namespace synthese
 			static void AddSubClass(util::RegistryKeyType, const std::string&);
 			static std::string GetSubClass(util::RegistryKeyType id);
 
-			static void ChangeInstanceCoordinatesSystem(
-				const std::string&,
-				const std::string& value
-			);
-
-
-
-			static void AddCoordinatesSystem(
-				SRID srid,
-				const std::string& name,
-				const std::string& projSequence
-			);
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// @throws NotFoundException if the system was not found
-			static const CoordinatesSystem& GetCoordinatesSystem(SRID srid);
-
-			static void SetDefaultCoordinatesSystems(SRID instanceSRID);
-			static const CoordinatesSystem& GetInstanceCoordinatesSystem() { return *_instanceCoordinatesSystem; }
 			static const CoordinatesSystem& GetStorageCoordinatesSystem() { return *_storageCoordinatesSystem; }
-			static const geos::geom::GeometryFactory& GetDefaultGeometryFactory() { return GetInstanceCoordinatesSystem().getGeometryFactory(); }
+			static void SetStorageCoordinatesSystem(const CoordinatesSystem& value) { _storageCoordinatesSystem = &value; }
 		};
 	}
 

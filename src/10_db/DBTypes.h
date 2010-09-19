@@ -53,10 +53,7 @@ namespace synthese
 			AUTO_CREATE,
 			NEVER_CREATE
 		} AutoCreation;
-
-		typedef unsigned int SRID;
-	}
-}
+}	}
 
 #endif // SYNTHESE_db_Types_h__
 

@@ -5,6 +5,10 @@ CppSynthese3LibProject(
     source_files = s3env.Glob ('*.cpp'),
     dependencies = [
 		's3-server.cpplib',
-    	's3-util-threads.cpplib', 's3-util.cpplib', 'spatialite.cpplib', 'geos.cpplib']
+    	's3-util-threads.cpplib',
+    	's3-util.cpplib',
+    	'spatialite.cpplib',
+    	's3-framework.cpplib'
+    ]
 )
 

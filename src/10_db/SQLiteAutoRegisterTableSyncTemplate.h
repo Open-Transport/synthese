@@ -69,7 +69,7 @@ namespace synthese
 							Load (address.get(), rows, env, util::FIELDS_ONLY_LOAD_LEVEL);
 						}
 					}
-					catch(util::Exception& e)
+					catch(Exception& e)
 					{
 						util::Log::GetInstance().warn("Error on load after row insert/replace or at first sync : ", e);
 					}
@@ -99,7 +99,7 @@ namespace synthese
 							Load (address.get(), rows, env, util::FIELDS_ONLY_LOAD_LEVEL);
 						}
 					}
-					catch (util::Exception& e)
+					catch (Exception& e)
 					{
 						util::Log::GetInstance().warn("Error on load after row update : ", e);
 					}
@@ -129,7 +129,7 @@ namespace synthese
 							registry.remove(id);
 						}
 					}
-					catch (util::Exception& e)
+					catch (Exception& e)
 					{
 						util::Log::GetInstance().warn("Error on unload after row deletion : ", e);
 					}
