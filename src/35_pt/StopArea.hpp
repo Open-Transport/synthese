@@ -262,7 +262,7 @@ namespace synthese
 				*/
 				virtual graph::HubScore getScore() const;
 
-				virtual const geography::GeoPoint& getPoint() const;
+				virtual boost::shared_ptr<geos::geom::Point> getPoint() const;
 
 				virtual bool isConnectionPossible() const;
 

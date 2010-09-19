@@ -23,9 +23,9 @@
 #ifndef SYNTHESE_html_HTMLMap_hpp__
 #define SYNTHESE_html_HTMLMap_hpp__
 
-#include "GeoPoint.h"
-
 #include <vector>
+#include <boost/shared_ptr.hpp>
+#include <geos/geom/Point.h>
 
 namespace synthese
 {
@@ -49,23 +49,23 @@ namespace synthese
 		class HTMLMap
 		{
 		public:
-			struct Point
+			struct MapPoint
 			{
-				GeoPoint point;
+				boost::shared_ptr<geos::geom::Point> point;
 				std::string icon;
 				std::string editionIcon;
 				std::string waitingIcon;
 				std::string updateRequest;
 				std::string htmlPopup;
 				
-				Point(
-					const GeoPoint& _point,
+				MapPoint(
+					const geos::geom::Point& _point,
 					const std::string& _icon,
 					const std::string& _editionIcon,
 					const std::string& _waitingIcon,
 					const std::string& _updateRequest,
 					const std::string& _htmlPopup
-				):	point(_point),
+				):	point(static_cast<geos::geom::Point*>(_point.clone())),
 					icon(_icon),
 					editionIcon(_editionIcon),
 					waitingIcon(_waitingIcon),
@@ -73,7 +73,7 @@ namespace synthese
 					htmlPopup(_htmlPopup)
 				{}
 			};
-			typedef std::vector<Point> Points;
+			typedef std::vector<MapPoint> Points;
 
 			class Control
 			{
@@ -109,7 +109,7 @@ namespace synthese
 			typedef std::vector<Control> Controls;
 
 		private:
-			const GeoPoint _center;
+			boost::shared_ptr<geos::geom::Point> _center;
 			const int _zoom;
 			const std::string _id;
 			Points _points;
@@ -126,7 +126,7 @@ namespace synthese
 			/// @param zoom zoom level of the map at opening
 			/// @param id id of the div in the DOM
 			HTMLMap(
-				const GeoPoint& center,
+				const geos::geom::Point& center,
 				int zoom,
 				bool editable,
 				bool addable,
@@ -136,7 +136,7 @@ namespace synthese
 
 			//! @name Update methods
 			//@{
-				void addPoint(Point value){ _points.push_back(value); }
+				void addPoint(MapPoint value){ _points.push_back(value); }
 			//@}
 
 			//! @name Services

@@ -78,7 +78,6 @@ namespace synthese
 		<ul>
 		<li>@ref Place</li>
 		<li>@ref City</li>
-		<li>@ref GeoPoint</li>
 		</ul>
 
 		@{
@@ -98,7 +97,7 @@ namespace synthese
 			public server::ModuleClassTemplate<GeographyModule>
 		{
 		public:
-			typedef lexical_matcher::LexicalMatcher<City*> CitiesMatcher;
+			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<City> > CitiesMatcher;
 			typedef std::vector<CitiesMatcher::Content> CityList;
 
 		private:
@@ -107,19 +106,6 @@ namespace synthese
 			static CitiesMatcher _citiesT9Matcher;
 
 		public:
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Finds the best place corresponding to a pair of texts : city name and
-			/// place name.
-			/// @param city name of the city
-			/// @param place name of the place within the city
-			/// @return the best choice
-			/// Even if no place name really corresponds to the entered texts,
-			/// a result is ever returned.
-			static const Place* FetchPlace(
-				const std::string& city,
-				const std::string& place
-			);
 
 
 

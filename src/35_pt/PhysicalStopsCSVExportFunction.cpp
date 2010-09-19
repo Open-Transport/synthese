@@ -99,16 +99,17 @@ namespace synthese
 				const StopPoint& ps(*itps.second);
 
 				if(	_bbox &&
-					!_bbox->contains(ps)
-				){
+					(	!ps.hasGeometry() ||
+						!_bbox->contains(*ps.getGeometry()->getCoordinate())
+				)	){
 					continue;
 				}
 
 				stream <<
 					ps.getKey() << ";" <<
 					ps.getCodeBySource() << ";" <<
-					ps.x << ";" <<
-					ps.y << ";" <<
+					ps.getGeometry()->getX() << ";" <<
+					ps.getGeometry()->getY() << ";" <<
 					"\"" << ps.getConnectionPlace()->getCity()->getName() << "\";" <<
 					"\"" << ps.getConnectionPlace()->getName() << "\";" <<
 					"\"" << ps.getName() << "\";" <<

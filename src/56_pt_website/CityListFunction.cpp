@@ -59,14 +59,14 @@ namespace synthese
 			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
 			if(!site) throw RequestException("Incorrect site");
 			
-			TransportWebsite::CitiesMatcher::MatchResult matches(
+			GeographyModule::CitiesMatcher::MatchResult matches(
 				site->getCitiesMatcher().bestMatches(_input, _n)
 			);
 
 			if(_page.get())
 			{
 				PlacesList placesList;
-				BOOST_FOREACH(LexicalMatcher<City*>::MatchHit it, matches)
+				BOOST_FOREACH(LexicalMatcher<shared_ptr<City> >::MatchHit it, matches)
 				{
 					placesList.push_back(make_pair(it.value->getKey(), it.key.getSource()));
 				}
@@ -86,7 +86,7 @@ namespace synthese
 					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 					"<options xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
 				;
-				BOOST_FOREACH(LexicalMatcher<City*>::MatchHit it, matches)
+				BOOST_FOREACH(LexicalMatcher<shared_ptr<City> >::MatchHit it, matches)
 				{
 					stream << "<option type=\"city\" score=\"" << it.score.phoneticScore << "\">" << it.key.getSource() << "</option>";
 				}

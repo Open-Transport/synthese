@@ -51,7 +51,7 @@ namespace synthese
 
 		void Timetable::addRow( const TimetableRow& row )
 		{
-			if(row.getRank() > _rows.size()) throw util::Exception("Invalid rank in timetable");
+			if(row.getRank() > _rows.size()) throw synthese::Exception("Invalid rank in timetable");
 			_rows.insert(_rows.begin() + row.getRank(), row);
 		}
 
@@ -207,7 +207,7 @@ namespace synthese
 		}
 
 		Timetable::ImpossibleGenerationException::ImpossibleGenerationException():
-			Exception("Timetable generation is impossible.")
+		synthese::Exception("Timetable generation is impossible.")
 		{
 
 		}

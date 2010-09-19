@@ -109,36 +109,6 @@ namespace synthese
 
 
 
-		const Place* GeographyModule::FetchPlace(
-			const std::string& cityName,
-			const std::string& placeName
-		){
-			const Place* place(NULL);
-
-			if (cityName.empty())
-				throw Exception("Empty city name");
-
-			CityList cityList = GuessCity(cityName, 1);
-			if (cityName.empty())
-				throw Exception("An error has occured in city name search");
-			CitiesMatcher::Content city(cityList.front());
-			place = city;
-			assert(place != NULL);
-
-			if (!placeName.empty())
-			{
-				City::PlacesMatcher::MatchResult places(city->getAllPlacesMatcher().bestMatches(placeName, 1));
-				if (!places.empty())
-				{
-					place = places.front().value;
-				}
-			}
-
-			return place;		
-		}
-
-
-
 		GeographyModule::CityList GeographyModule::GuessCity (
 			const std::string& fuzzyName,
 			int nbMatches,

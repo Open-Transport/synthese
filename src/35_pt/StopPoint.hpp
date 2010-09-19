@@ -65,12 +65,11 @@ namespace synthese
 				util::RegistryKeyType id = 0,
 				std::string name = std::string(), 
 				const pt::StopArea* place = NULL,
-				double x = UNKNOWN_VALUE,
-				double y = UNKNOWN_VALUE);
+				boost::shared_ptr<geos::geom::Point> geometry = boost::shared_ptr<geos::geom::Point>()
+			);
 
 			~StopPoint ();
 		    
-			using GeoPoint::operator=;
 
 			//! @name Getters
 			//@{

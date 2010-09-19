@@ -91,7 +91,7 @@ namespace synthese
 			{
 				throw ActionException("No such city");
 			}
-			_city = list.front();
+			_city = list.front().get();
 		}
 		
 		

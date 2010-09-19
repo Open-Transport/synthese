@@ -65,11 +65,11 @@ namespace synthese
 			typedef std::vector<boost::shared_ptr<T> > From;
 
 			class NotFoundException:
-			   public util::Exception
+			   public synthese::Exception
 			{
 			public:
 			   NotFoundException():
-				util::Exception("No object was found to project the point")
+				Exception("No object was found to project the point")
 				{
 				}
 			};
@@ -128,7 +128,7 @@ namespace synthese
 				throw NotFoundException();
 			}
 
-			const geos::geom::GeometryFactory& gf(db::DBModule::GetDefaultGeometryFactory());
+			const geos::geom::GeometryFactory& gf(CoordinatesSystem::GetDefaultGeometryFactory());
 			boost::shared_ptr<geos::geom::Point> ptGeom(gf.createPoint(pt));
 
 			boost::shared_ptr<geos::geom::LineString> bestEdgeGeom;
@@ -137,7 +137,7 @@ namespace synthese
 
 			BOOST_FOREACH(boost::shared_ptr<T> edge, _from)
 			{
-				boost::shared_ptr<geos::geom::LineString> edgeGeom = edge->getGeometry();
+				boost::shared_ptr<geos::geom::LineString> edgeGeom = edge->getRealGeometry();
 				if(!edgeGeom.get() || edgeGeom->isEmpty())
 				{
 					continue;

@@ -33,7 +33,6 @@
 #include "DateTimeInterfacePage.h"
 #include "CommercialLine.h"
 #include "Env.h"
-#include "GeoPoint.h"
 #include "WebPageDisplayFunction.h"
 #include "Road.h"
 #include "StopPoint.hpp"
@@ -51,7 +50,7 @@
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
-
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -195,9 +194,13 @@ namespace synthese
 				).getFullName()
 			);
 			pm.insert(DATA_DEPARTURE_PLACE_NAME, displayedDeparturePlace);
-			GeoPoint departurePoint(departurePlace.getPoint());
-			pm.insert(DATA_DEPARTURE_PLACE_LONGITUDE, departurePoint.getLongitude());
-			pm.insert(DATA_DEPARTURE_PLACE_LATITUDE, departurePoint.getLatitude());
+			
+			shared_ptr<Point> departurePoint(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*departurePlace.getPoint()
+			)	);
+			pm.insert(DATA_DEPARTURE_PLACE_LONGITUDE, departurePoint->getX());
+			pm.insert(DATA_DEPARTURE_PLACE_LATITUDE, departurePoint->getY());
 			
 			// Arrival time
 			{
@@ -219,9 +222,13 @@ namespace synthese
 				).getFullName()
 			);
 			pm.insert(DATA_ARRIVAL_PLACE_NAME, displayedArrivalPlace);
-			GeoPoint arrivalPoint(arrivalPlace.getPoint());
-			pm.insert(DATA_ARRIVAL_PLACE_LONGITUDE, arrivalPoint.getLongitude());
-			pm.insert(DATA_ARRIVAL_PLACE_LATITUDE, arrivalPoint.getLatitude());
+			
+			shared_ptr<Point> arrivalPoint(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*arrivalPlace.getPoint()
+			)	);
+			pm.insert(DATA_ARRIVAL_PLACE_LONGITUDE, arrivalPoint->getX());
+			pm.insert(DATA_ARRIVAL_PLACE_LATITUDE, arrivalPoint->getX());
 
 			// Duration
 			if(durationPage.get())
@@ -484,9 +491,12 @@ namespace synthese
 			}
 
 			// Point
-			GeoPoint point(physicalStop);
-			pm.insert(DATA_LONGITUDE, point.getLongitude());
-			pm.insert(DATA_LATITUDE, point.getLatitude());
+			shared_ptr<Point> point(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*physicalStop.getGeometry()
+			)	);
+			pm.insert(DATA_LONGITUDE, point->getX());
+			pm.insert(DATA_LATITUDE, point->getY());
 			
 			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
 
@@ -512,9 +522,12 @@ namespace synthese
 			ParametersMap pm;
 
 			// Point
-			GeoPoint point(vertex);
-			pm.insert(DATA_LONGITUDE, point.getLongitude());
-			pm.insert(DATA_LATITUDE, point.getLatitude());
+			shared_ptr<Point> point(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*vertex.getGeometry()
+			)	);
+			pm.insert(DATA_LONGITUDE, point->getX());
+			pm.insert(DATA_LATITUDE, point->getY());
 			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(vertex.getHub()) != NULL);
 			pm.insert(DATA_ODD_ROW, color);
 			if(road && road->getRoadPlace())

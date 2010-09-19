@@ -31,7 +31,6 @@
 #include "Request.h"
 #include "Interface.h"
 #include "ObjectNotFoundException.h"
-#include "GeoPoint.h"
 #include "PTRoutePlannerResult.h"
 #include "Edge.h"
 #include "JourneyPattern.hpp"
@@ -50,6 +49,7 @@
 #include "Address.h"
 #include "ContinuousService.h"
 #include "Webpage.h"
+#include "CoordinatesSystem.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
@@ -58,6 +58,7 @@ using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -190,10 +191,12 @@ namespace synthese
 					_endArrivalDate = _endDate;
 					if(	_departure_place.placeResult.value &&
 						_arrival_place.placeResult.value &&
-						!_departure_place.placeResult.value->getPoint().isNull() &&
-						!_arrival_place.placeResult.value->getPoint().isNull()
+						_departure_place.placeResult.value->getPoint().get() &&
+						_arrival_place.placeResult.value->getPoint().get() &&
+						!_departure_place.placeResult.value->getPoint()->isEmpty() &&
+						!_arrival_place.placeResult.value->getPoint()->isEmpty()
 					){
-						_endArrivalDate += minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint().distance(_arrival_place.placeResult.value->getPoint()) / 1000));
+						_endArrivalDate += minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint()->distance(_arrival_place.placeResult.value->getPoint().get()) / 1000));
 					}
 				}
 				else
@@ -222,10 +225,12 @@ namespace synthese
 						_endArrivalDate = _endDate;
 						if(	_departure_place.placeResult.value &&
 							_arrival_place.placeResult.value &&
-							!_departure_place.placeResult.value->getPoint().isNull() &&
-							!_arrival_place.placeResult.value->getPoint().isNull()
+							_departure_place.placeResult.value->getPoint().get() &&
+							_arrival_place.placeResult.value->getPoint() &&
+							!_departure_place.placeResult.value->getPoint()->isEmpty() &&
+							!_arrival_place.placeResult.value->getPoint()->isEmpty()
 						){
-							_endArrivalDate += minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint().distance(_arrival_place.placeResult.value->getPoint()) / 1000));
+							_endArrivalDate += minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint()->distance(_arrival_place.placeResult.value->getPoint().get()) / 1000));
 						}
 					}
 					else if(!map.getOptional<string>(PARAMETER_LOWEST_DEPARTURE_TIME))
@@ -244,10 +249,12 @@ namespace synthese
 						_startDate = _startArrivalDate;
 						if(	_departure_place.placeResult.value &&
 							_arrival_place.placeResult.value &&
-							!_departure_place.placeResult.value->getPoint().isNull() &&
-							!_arrival_place.placeResult.value->getPoint().isNull()
+							_departure_place.placeResult.value->getPoint().get() &&
+							_arrival_place.placeResult.value->getPoint().get() &&
+							!_departure_place.placeResult.value->getPoint()->isEmpty() &&
+							!_arrival_place.placeResult.value->getPoint()->isEmpty()
 						){
-							_startDate -= minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint().distance(_arrival_place.placeResult.value->getPoint()) / 1000));
+							_startDate -= minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint()->distance(_arrival_place.placeResult.value->getPoint().get()) / 1000));
 						}
 					}
 				}
@@ -541,8 +548,8 @@ namespace synthese
 
 			// Initialisation
 			PTTimeSlotRoutePlanner r(
-				_departure_place.placeResult.value,
-				_arrival_place.placeResult.value,
+				_departure_place.placeResult.value.get(),
+				_arrival_place.placeResult.value.get(),
 				startDate,
 				endDate,
 				_planningOrder == DEPARTURE_FIRST ? _startArrivalDate : startDate,
@@ -590,8 +597,8 @@ namespace synthese
 					result,
 					_startDate.date(),
 					_periodId,
-					_departure_place.placeResult.value,
-					_arrival_place.placeResult.value,
+					_departure_place.placeResult.value.get(),
+					_arrival_place.placeResult.value.get(),
 					_period,
 					_accessParameters
 				);
@@ -633,13 +640,13 @@ namespace synthese
 					"<places departureCity=\"" << _departure_place.cityResult.key.getSource() << "\" departureCityNameTrust=\"" << _departure_place.cityResult.score.phoneticScore << "\"" <<
 					" arrivalCity=\"" << _arrival_place.cityResult.key.getSource() << "\" arrivalCityNameTrust=\"" << _arrival_place.cityResult.score.phoneticScore << "\""
 				;
-				if(dynamic_cast<const Place*>(_departure_place.cityResult.value) != dynamic_cast<const Place*>(_departure_place.placeResult.value))
+				if(dynamic_cast<Place*>(_departure_place.cityResult.value.get()) != dynamic_cast<Place*>(_departure_place.placeResult.value.get()))
 				{
 					stream <<
 						" departureStop=\"" << _departure_place.placeResult.key.getSource() << "\" departureStopNameTrust=\"" << _departure_place.placeResult.score.phoneticScore << "\""
 					;
 				}
-				if(dynamic_cast<const Place*>(_arrival_place.cityResult.value) != dynamic_cast<const Place*>(_arrival_place.placeResult.value))
+				if(dynamic_cast<Place*>(_arrival_place.cityResult.value.get()) != dynamic_cast<Place*>(_arrival_place.placeResult.value.get()))
 				{
 					stream <<
 						" arrivalStop=\"" << _arrival_place.placeResult.key.getSource() << "\" arrivalStopNameTrust=\"" << _arrival_place.placeResult.score.phoneticScore << "\""
@@ -752,7 +759,7 @@ namespace synthese
 								(	itl == jl.begin() &&
 									dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
 								)?
-								dynamic_cast<const NamedPlace*>(_departure_place.placeResult.value) :
+								dynamic_cast<const NamedPlace*>(_departure_place.placeResult.value.get()) :
 								dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub())
 							);
 
@@ -794,7 +801,7 @@ namespace synthese
 						){
 							const NamedPlace* placeToSearch(
 								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?
-								dynamic_cast<const NamedPlace*>(_arrival_place.placeResult.value) :
+								dynamic_cast<const NamedPlace*>(_arrival_place.placeResult.value.get()) :
 								dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub())
 							);
 							
@@ -871,11 +878,11 @@ namespace synthese
 											}
 											else if(dynamic_cast<const Crossing*>(jl.begin()->getDepartureEdge()->getFromVertex()))
 											{
-												if(dynamic_cast<const RoadPlace*>(_departure_place.placeResult.value))
+												if(dynamic_cast<const RoadPlace*>(_departure_place.placeResult.value.get()))
 												{
 													_XMLDisplayRoadPlace(
 														stream,
-														dynamic_cast<const RoadPlace&>(*_departure_place.placeResult.value)
+														dynamic_cast<const RoadPlace&>(*_departure_place.placeResult.value.get())
 													);
 												}
 												else
@@ -1021,12 +1028,12 @@ namespace synthese
 								}
 								else if(dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getFromVertex()))
 								{
-									if(itl == jl.begin() && dynamic_cast<const RoadPlace*>(_departure_place.placeResult.value))
+									if(itl == jl.begin() && dynamic_cast<const RoadPlace*>(_departure_place.placeResult.value.get()))
 									{
 										_XMLDisplayRoadPlace(
 											stream,
 											dynamic_cast<const RoadPlace&>(*_departure_place.placeResult.value)
-											);
+										);
 									}
 									else
 									{
@@ -1046,7 +1053,7 @@ namespace synthese
 								}
 								else if(dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getFromVertex()))
 								{
-									if(itl == jl.end() - 1 && dynamic_cast<const RoadPlace*>(_arrival_place.placeResult.value))
+									if(itl == jl.end() - 1 && dynamic_cast<const RoadPlace*>(_arrival_place.placeResult.value.get()))
 									{
 										_XMLDisplayRoadPlace(
 											stream,
@@ -1129,7 +1136,7 @@ namespace synthese
 						}
 						else if(dynamic_cast<const Crossing*>((jl.end()-1)->getArrivalEdge()->getFromVertex()))
 						{
-							if(dynamic_cast<const RoadPlace*>(_arrival_place.placeResult.value))
+							if(dynamic_cast<const RoadPlace*>(_arrival_place.placeResult.value.get()))
 							{
 								_XMLDisplayRoadPlace(
 									stream,
@@ -1161,7 +1168,6 @@ namespace synthese
 				PlacesContentVector::iterator itSheetRow(sheetRows.begin());
 				BOOST_FOREACH(const PTRoutePlannerResult::PlacesList::value_type& row, result.getOrderedPlaces())
 				{
-					GeoPoint gp(row.place->getPoint());
 					assert(dynamic_cast<const NamedPlace*>(row.place));
 //						const NamedPlace* np(dynamic_cast<const NamedPlace*>(row.place));
 
@@ -1243,16 +1249,19 @@ namespace synthese
 			std::ostream& stream,
 			const NamedPlace& np
 		){
-			GeoPoint gp(np.getPoint());
+			shared_ptr<Point> gp(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*np.getPoint()
+			)	);
 
 			stream <<
 				"<connectionPlace" <<
-					" latitude=\"" << gp.getLatitude() << "\"" <<
-					" longitude=\"" << gp.getLongitude() << "\"" <<
+					" latitude=\"" << gp->getX() << "\"" <<
+					" longitude=\"" << gp->getY() << "\"" <<
 					" id=\"" << np.getKey() << "\"" <<
 					" city=\"" << np.getCity()->getName() << "\"" <<
-					" x=\"" << static_cast<int>(np.getPoint().x) << "\"" <<
-					" y=\"" << static_cast<int>(np.getPoint().y) << "\""
+					" x=\"" << static_cast<int>(np.getPoint()->getX()) << "\"" <<
+					" y=\"" << static_cast<int>(np.getPoint()->getY()) << "\""
 					" name=\"" << np.getName() << "\"" <<
 				">";
 			if(false) // Test if alarm on place
@@ -1276,15 +1285,18 @@ namespace synthese
 			const std::string& tag,
 			const pt::StopPoint& stop
 		){
-			GeoPoint gp(stop);
+			shared_ptr<Point> gp(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*stop.getGeometry()
+			)	);
 
 			stream <<
 				"<" << tag <<
-					" latitude=\"" << gp.getLatitude() << "\"" <<
-					" longitude=\"" << gp.getLongitude() << "\"" <<
+					" latitude=\"" << gp->getX() << "\"" <<
+					" longitude=\"" << gp->getY() << "\"" <<
 					" id=\"" << stop.getKey() << "\"" <<
-					" x=\"" << static_cast<int>(stop.x) << "\"" <<
-					" y=\"" << static_cast<int>(stop.y) << "\"" <<
+					" x=\"" << static_cast<int>(stop.getGeometry()->getX()) << "\"" <<
+					" y=\"" << static_cast<int>(stop.getGeometry()->getY()) << "\"" <<
 					" name=\"" << stop.getName() << "\"" <<
 				">";
 			_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*stop.getHub()));
@@ -1298,15 +1310,18 @@ namespace synthese
 			const road::Crossing& address,
 			const road::RoadPlace& roadPlace
 		){
-			GeoPoint gp(address);
+			shared_ptr<Point> gp(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*address.getGeometry()
+			)	);
 
 			stream <<
 				"<address" <<
-				" latitude=\"" << gp.getLatitude() << "\"" <<
-				" longitude=\"" << gp.getLongitude() << "\"" <<
+				" latitude=\"" << gp->getX() << "\"" <<
+				" longitude=\"" << gp->getY() << "\"" <<
 				" id=\"" << address.getKey() << "\"" <<
-				" x=\"" << static_cast<int>(address.x) << "\"" <<
-				" y=\"" << static_cast<int>(address.y) << "\"" <<
+				" x=\"" << static_cast<int>(address.getGeometry()->getX()) << "\"" <<
+				" y=\"" << static_cast<int>(address.getGeometry()->getY()) << "\"" <<
 				" city=\"" << roadPlace.getCity()->getName() << "\"" <<
 				" streetName=\"" << roadPlace.getName() << "\"" <<
 				" />";
@@ -1318,15 +1333,18 @@ namespace synthese
 			std::ostream& stream,
 			const road::RoadPlace& roadPlace
 		){
-			GeoPoint gp(roadPlace.getPoint());
+			shared_ptr<Point> gp(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*roadPlace.getPoint()
+			)	);
 
 			stream <<
 				"<address" <<
-				" latitude=\"" << gp.getLatitude() << "\"" <<
-				" longitude=\"" << gp.getLongitude() << "\"" <<
+				" latitude=\"" << gp->getX() << "\"" <<
+				" longitude=\"" << gp->getY() << "\"" <<
 				" id=\"" << roadPlace.getKey() << "\"" <<
-				" x=\"" << static_cast<int>(roadPlace.getPoint().x) << "\"" <<
-				" y=\"" << static_cast<int>(roadPlace.getPoint().y) << "\"" <<
+				" x=\"" << static_cast<int>(roadPlace.getPoint()->getX()) << "\"" <<
+				" y=\"" << static_cast<int>(roadPlace.getPoint()->getY()) << "\"" <<
 				" city=\"" << roadPlace.getCity()->getName() << "\"" <<
 				" streetName=\"" << roadPlace.getName() << "\"" <<
 				" />";

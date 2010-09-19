@@ -36,7 +36,6 @@ using namespace geos::linearref;
 namespace synthese
 {
 	using namespace graph;
-	using namespace geography;
 	
 	namespace util
 	{
@@ -57,7 +56,8 @@ namespace synthese
 				rankInRoad,
 				fromCrossing,
 				metricOffset
-			)
+			),
+			_reverseRoadChunk(NULL)
 		{
 			if(fromCrossing)
 			{
@@ -121,36 +121,22 @@ namespace synthese
 
 
 
-		geography::GeoPoint RoadChunk::getGeoPoint( double metricOffset ) const
-		{
-			shared_ptr<LineString> geometry(getGeometry());
+		boost::shared_ptr<geos::geom::Point> RoadChunk::getPointFromOffset(
+			double metricOffset
+		) const	{
+			shared_ptr<LineString> geometry(getRealGeometry());
 			if(!geometry.get())
 			{
-				return *getFromVertex();
+				return getFromVertex()->getGeometry();
 			}
 			if(metricOffset > geometry->getLength())
 			{
-				if(getFollowingArrivalForFineSteppingOnly())
-				{
-					return static_cast<RoadChunk*>(getFollowingArrivalForFineSteppingOnly())->getGeoPoint(metricOffset - geometry->getLength());
-				}
-				else
-				{
-					return *getFromVertex();
-				}
+				return shared_ptr<Point>(static_cast<Point*>(geometry->getEndPoint()->clone()));
 			}
-			return GeoPoint(LengthIndexedLine(geometry.get()).extractPoint(metricOffset));
-		}
-
-
-
-		RoadChunk* RoadChunk::getReverseChunk() const
-		{
-			if(!getRoad() || !getRoad()->getReverseRoad())
-			{
-				return NULL;
-			}
-			return static_cast<RoadChunk*>(getRoad()->getReverseRoad()->getEdges().operator[](-getRankInPath()));
+			return shared_ptr<Point>(
+				geometry->getFactory()->createPoint(
+					LengthIndexedLine(geometry.get()).extractPoint(metricOffset)
+			)	);
 		}
 
 

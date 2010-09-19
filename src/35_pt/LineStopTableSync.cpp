@@ -32,7 +32,6 @@
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "SQLiteTransaction.h"
-#include "GeoPoint.h"
 
 #include <geos/geom/LineString.h>
 #include <boost/foreach.hpp>
@@ -182,7 +181,7 @@ namespace synthese
 			query.addField(object->isDepartureAllowed());
 			query.addField(object->isArrivalAllowed());
 			query.addField(object->getMetricOffset());
-			query.addField(static_pointer_cast<Geometry,LineString>(object->getStoredGeometry()));
+			query.addField(static_pointer_cast<Geometry,LineString>(object->getGeometry()));
 			query.execute(transaction);
 		}
 	}

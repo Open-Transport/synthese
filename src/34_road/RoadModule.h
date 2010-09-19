@@ -23,12 +23,16 @@
 #ifndef SYNTHESE_RoadModule_H__
 #define SYNTHESE_RoadModule_H__
 
-
+#include "GeographyModule.h"
 #include "GraphModuleTemplate.h"
-
 
 namespace synthese
 {
+	namespace geography
+	{
+		class NamedPlace;
+	}
+
 	/**	@defgroup m34Actions 34 Actions
 		@ingroup m34
 
@@ -85,6 +89,73 @@ namespace synthese
 		{
 		public:
 			
+			//////////////////////////////////////////////////////////////////////////
+			/// Exception to throw when text fields does not permit to determinate a undetermined place.
+			//////////////////////////////////////////////////////////////////////////
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.2.0
+			class UndeterminedPlaceException:
+				public synthese::Exception
+			{
+			public:
+				typedef enum
+				{
+					EMPTY_CITY,
+					NO_RESULT_FROM_CITY_SEARCH
+				} Reason;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Construction from two fields.
+				/// @param cityName entered city name
+				/// @param placeName entered place name
+				/// @param reason reason of the problem
+				UndeterminedPlaceException(
+					const std::string& cityName,
+					const std::string& placeName,
+					Reason reason
+				);
+
+
+			};
+
+			struct ExtendedFetchPlaceResult
+			{
+				geography::GeographyModule::CitiesMatcher::MatchResult::value_type cityResult;
+				lexical_matcher::LexicalMatcher<boost::shared_ptr<geography::Place> >::MatchResult::value_type placeResult;
+			};
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Interprets text from two fields to determinate a place.
+			/// Scenarios :
+			///	<table class="table">
+			///	<tr><th>cityName</th><th>placeName</th><th>Returned place</th></tr>
+			///	<tr><td>empty</td><td>empty</td><td>throws UndeterminedPlaceException</td></tr>
+			///	<tr><td>non empty</td><td>empty</td><td>default places of the city</td></tr>
+			///	<tr><td>non empty</td><td>non empty, beginning by a number</td><td>first try to find a stop which begins by the numberm then try to generate an address</td></tr>
+			///	<tr><td>non empty</td><td>non empty, without number</td><td>try to find a stop or a road</td></tr>
+			///	</table>
+			static ExtendedFetchPlaceResult ExtendedFetchPlace(
+				const geography::GeographyModule::CitiesMatcher& citiesMatcher,
+				const std::string& cityName,
+				const std::string& placeName
+			);
+
+			static boost::shared_ptr<geography::Place> FetchPlace(
+				const geography::GeographyModule::CitiesMatcher& citiesMatcher,
+				const std::string& cityName,
+				const std::string& placeName
+			);
+
+			static ExtendedFetchPlaceResult ExtendedFetchPlace(
+				const std::string& cityName,
+				const std::string& placeName
+			);
+
+			static boost::shared_ptr<geography::Place> FetchPlace(
+				const std::string& cityName,
+				const std::string& placeName
+			);
 		};
 	}
 	/** @} */

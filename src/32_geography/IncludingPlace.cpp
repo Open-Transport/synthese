@@ -21,12 +21,15 @@
 */
 
 #include "IncludingPlace.h"
+#include "CoordinatesSystem.hpp"
 
 #include <geos/geom/Envelope.h>
+#include <geos/geom/Point.h>
 #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace geos::geom;
+using namespace boost;
 
 namespace synthese
 {
@@ -59,7 +62,7 @@ namespace synthese
 		void 
 		IncludingPlace::addIncludedPlace (const Place* place)
 		{
-			_isoBarycentreToUpdate = true;
+			_isoBarycentre.reset();
 			_includedPlaces.insert(place);
 		}
 
@@ -81,19 +84,18 @@ namespace synthese
 			}
 		}
 
-		const GeoPoint& IncludingPlace::getPoint() const
+		shared_ptr<Point> IncludingPlace::getPoint() const
 		{
-			if (_isoBarycentreToUpdate)
+			if (!_isoBarycentre.get())
 			{
 				Envelope e;
 				BOOST_FOREACH(const Place* place, _includedPlaces)
 				{
-					e.expandToInclude(place->getPoint());
+					e.expandToInclude(*place->getPoint()->getCoordinate());
 				}
 				Coordinate c;
 				e.centre(c);
-				_isoBarycentre = GeoPoint(c);
-				_isoBarycentreToUpdate = false;
+				_isoBarycentre.reset(CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().createPoint(c));
 			}
 			return _isoBarycentre;
 		}
@@ -113,7 +115,7 @@ namespace synthese
 
 		void IncludingPlace::removeIncludedPlace( const Place* place )
 		{
-			_isoBarycentreToUpdate = true;
+			_isoBarycentre.reset();
 			_includedPlaces.erase(place);
 		}
 	}

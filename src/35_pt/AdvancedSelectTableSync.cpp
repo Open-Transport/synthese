@@ -31,7 +31,7 @@
 
 #include "DBModule.h"
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <sstream>
 

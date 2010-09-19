@@ -33,7 +33,7 @@
 #include "TimetableRow.h"
 #include "TimetableRowTableSync.h"
 
-#include "GeographyModule.h"
+#include "RoadModule.h"
 #include "StopArea.hpp"
 
 using namespace std;
@@ -44,7 +44,7 @@ namespace synthese
 	using namespace pt;
 	using namespace security;
 	using namespace util;
-	using namespace geography;
+	using namespace road;
 	
 	namespace util
 	{
@@ -101,10 +101,10 @@ namespace synthese
 			_isSufficient = map.getDefault<bool>(PARAMETER_IS_SUFFICIENT, false);
 			_isDisplayed = map.getDefault<bool>(PARAMETER_IS_DISPLAYED, false);
 
-			_place = dynamic_cast<const StopArea*>(GeographyModule::FetchPlace(
+			_place = dynamic_cast<const StopArea*>(RoadModule::FetchPlace(
 				map.get<string>(PARAMETER_CITY_NAME),
 				map.get<string>(PARAMETER_PLACE_NAME)
-			));
+			).get());
 
 			if (_place == NULL)
 				throw ActionException("No such place");

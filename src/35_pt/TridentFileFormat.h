@@ -25,10 +25,12 @@
 #define SYNTHESE_IMPEX_TRIDENTEXPORT_H
 
 #include "FileFormatTemplate.h"
+#include "CoordinatesSystem.hpp"
 
 #include <iostream>
 #include <vector>
 #include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/bimap.hpp>
 
 namespace synthese
 {
@@ -242,7 +244,10 @@ namespace synthese
 				boost::optional<util::RegistryKeyType>	_commercialLineId;
 				const bool				_withTisseoExtension;
 			//@}
-		
+
+			typedef boost::bimap<CoordinatesSystem::SRID, std::string> SRIDConversionMap;
+			static SRIDConversionMap _SRIDConversionMap;
+
 		protected:
 				
 
@@ -319,6 +324,10 @@ namespace synthese
 			static std::string TridentId (const std::string& peer, const std::string clazz, const std::string& s);
 			static std::string TridentId (const std::string& peer, const std::string clazz, const util::Registrable& obj);
 			static std::string GetCoordinate(const double value);
+			
+			static void _populateSRIDTridentConversionMap();
+			static CoordinatesSystem::SRID _getSRIDFromTrident(const std::string& value);
+			static const std::string& _getTridentFromSRID(const CoordinatesSystem::SRID value);
 		};
 	}
 }

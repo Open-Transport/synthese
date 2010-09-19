@@ -104,6 +104,59 @@ namespace synthese
 					for(ObjectType* parent(_parent); parent; parent = parent->_parent, ++result) ;
 					return result;
 				}
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the next sibling object.
+				//////////////////////////////////////////////////////////////////////////
+				/// @return NULL if the object is the last item of the parents children
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.2.0
+				ObjectType* getNextSibling() const
+				{
+					if(!_parent)
+					{
+						return NULL;
+					}
+					ChildrenType::const_iterator it(_parent->_children.find(this->getTreeOrderingKey()));
+					if(it == _parent->_children.end())
+					{
+						return NULL;
+					}
+					++it;
+					if(it == _parent->_children.end())
+					{
+						return NULL;
+					}
+					return it->second;
+				}
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the previous sibling object.
+				//////////////////////////////////////////////////////////////////////////
+				/// @return NULL if the object is the first item of the parents children
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.2.0
+				ObjectType* getPreviousSibling() const
+				{
+					if(!_parent)
+					{
+						return NULL;
+					}
+					ChildrenType::const_iterator it(_parent->_children.find(this->getTreeOrderingKey()));
+					if(it == _parent->_children.end() || it == _parent->_children.begin())
+					{
+						return NULL;
+					}
+					--it;
+					return it->second;
+				}
+
 			//@}
 		};
 	}

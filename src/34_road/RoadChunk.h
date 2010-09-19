@@ -28,13 +28,15 @@
 
 #include <utility>
 
+namespace geos
+{
+	namespace geom
+	{
+		class Point;
+}	}
+
 namespace synthese
 {
-	namespace geography
-	{
-		class GeoPoint;
-	}
-
 	namespace road
 	{
 		class Road;
@@ -72,6 +74,7 @@ namespace synthese
 		private:
 			HouseNumberBounds _houseNumberBounds;
 			HouseNumberingPolicy	_houseNumberingPolicy;
+			RoadChunk* _reverseRoadChunk;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -97,6 +100,7 @@ namespace synthese
 				Crossing* getFromCrossing() const;
 				HouseNumberBounds getHouseNumberBounds() const { return _houseNumberBounds; }
 				HouseNumberingPolicy getHouseNumberingPolicy() const { return _houseNumberingPolicy; }
+				RoadChunk* getReverseChunk() const { return _reverseRoadChunk; }
 			//@}
 
 
@@ -107,6 +111,7 @@ namespace synthese
 				void setRoad(Road* road);
 				void setHouseNumberBounds(HouseNumberBounds value){ _houseNumberBounds = value; }
 				void setHouseNumberingPolicy(HouseNumberingPolicy value){ _houseNumberingPolicy = value; }
+				void setReverseRoadChunk(RoadChunk* value){ _reverseRoadChunk = value; }
 			//@}
 
 			
@@ -118,20 +123,18 @@ namespace synthese
 
 				Road* getRoad() const;
 
-				geography::GeoPoint getGeoPoint(double metricOffset) const;
-
 				//////////////////////////////////////////////////////////////////////////
-				/// Gets the corresponding chunk of the reverse Road object.
-				/// @return the corresponding chunk of the reverse Road object, NULL if
-				/// the chunks belongs to a reverse Road object.
-				/// @author Hugues Romain
-				/// @since 3.2.0
-				/// @warning this method returns always NULL if the chunk does not belong
-				/// to a main road.
-				/// @todo Replace NULL return by an exception
-				RoadChunk* getReverseChunk() const;
+				/// Extracts the point corresponding to an offset from the beginning of the chunk.
+				/// If the offset is greater than the length of the chunk, then the method
+				///	returns the last point of the chunk
+				/// @param metricOffset
+				/// @return the point corresponding to an offset from the beginning of the chunk.
+				boost::shared_ptr<geos::geom::Point> getPointFromOffset(
+					MetricOffset metricOffset
+				) const;
 
 
+				
 				//////////////////////////////////////////////////////////////////////////
 				/// Tests if a numeric house number belongs to the chunk
 				/// @param houseNumber the house number to test

@@ -38,10 +38,10 @@ namespace synthese
 		public:
 			typedef std::vector<boost::posix_time::time_duration> Schedules;
 
-			class BadSchedulesException: public util::Exception
+			class BadSchedulesException: public synthese::Exception
 			{
 			public:
-				BadSchedulesException(): util::Exception("Bad schedule") {}
+				BadSchedulesException(): Exception("Bad schedule") {}
 			};
 
 		protected:

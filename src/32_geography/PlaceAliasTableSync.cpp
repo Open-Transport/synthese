@@ -104,9 +104,9 @@ namespace synthese
 				bool isCityMainConnection (rows->getBool ( PlaceAliasTableSync::COL_ISCITYMAINCONNECTION));
 				if (isCityMainConnection)
 				{
-					city->addIncludedPlace (obj);
+					city->addIncludedPlace(obj);
 				}
-				city->addPlaceToMatcher<PlaceAlias>(obj);
+				city->addPlaceToMatcher<PlaceAlias>(env.getEditableSPtr(obj));
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace synthese
 			City* city(const_cast<City*>(obj->getCity()));
 			if (city != NULL)
 			{
-				city->removePlaceFromMatcher<PlaceAlias>(obj);
+//				city->removePlaceFromMatcher<PlaceAlias>(obj);
 				obj->setCity(NULL);
 			}
 		}

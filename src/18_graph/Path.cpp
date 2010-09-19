@@ -30,6 +30,7 @@
 #include "Hub.h"
 #include "Log.h"
 #include "DBModule.h"
+#include "CoordinatesSystem.hpp"
 
 #include <assert.h>
 #include <boost/lexical_cast.hpp>
@@ -286,7 +287,7 @@ namespace synthese
 				_edges.empty() ||
 				other.getEdge(0)->getFromVertex() != getLastEdge()->getFromVertex()
 			){
-				throw util::Exception("The two roads cannot be merged");
+				throw Exception("The two roads cannot be merged");
 			}
 
 			Edge* lastEdge(getLastEdge());
@@ -521,7 +522,7 @@ namespace synthese
 		) const {
 
 			// Geos factories
-			const GeometryFactory& gf(DBModule::GetDefaultGeometryFactory());
+			const GeometryFactory& gf(CoordinatesSystem::GetDefaultGeometryFactory());
 			geos::geom::CoordinateSequence *coords(gf.getCoordinateSequenceFactory()->create(0,2));
 
 			// Handle empty roads
@@ -539,7 +540,7 @@ namespace synthese
 			// Gets the coordinates of each edge
 			for(size_t i=fromEdgeIndex; i<=*toEdgeIndex; ++i)
 			{
-				shared_ptr<LineString> geometry(_edges[i]->getGeometry());
+				shared_ptr<LineString> geometry(_edges[i]->getRealGeometry());
 				if(!geometry.get())
 				{
 					break;

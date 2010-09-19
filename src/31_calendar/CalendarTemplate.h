@@ -51,7 +51,7 @@ namespace synthese
 			typedef util::Registry<CalendarTemplate>	Registry;
 
 			class InfiniteCalendarException:
-				public util::Exception
+				public synthese::Exception
 			{
 			public:
 				InfiniteCalendarException();

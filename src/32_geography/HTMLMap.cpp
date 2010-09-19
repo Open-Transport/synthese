@@ -22,11 +22,14 @@
 
 #include "HTMLMap.hpp"
 #include "HTMLModule.h"
+#include "CoordinatesSystem.hpp"
 
 #include <boost/foreach.hpp>
 #include <sstream>
 
 using namespace std;
+using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -35,12 +38,12 @@ namespace synthese
 	namespace geography
 	{
 		HTMLMap::HTMLMap(
-			const GeoPoint& center,
+			const Point& center,
 			int zoom,
 			bool editable,
 			bool addable,
 			const std::string id /*= "map" */
-		):	_center(center),
+		):	_center(static_cast<Point*>(center.clone())),
 			_zoom(zoom),
 			_editable(editable),
 			_id(id)
@@ -78,12 +81,16 @@ namespace synthese
 					"map.addLayers([mapnik, vectorLayer]);"
 			;
 
-			BOOST_FOREACH(const Point& point, _points)
+			BOOST_FOREACH(const Points::value_type& point, _points)
 			{
+				shared_ptr<Point> wgs84Point(
+					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+						*point.point
+				)	);
 				stream <<
 					"vectorLayer.addFeatures(" <<
 						"new OpenLayers.Feature.Vector(" <<
-							"new OpenLayers.Geometry.Point(" << point.point.getLongitude() << "," << point.point.getLatitude() << ").transform(" <<
+							"new OpenLayers.Geometry.Point(" << wgs84Point->getX() << "," << wgs84Point->getY() << ").transform(" <<
 								"new OpenLayers.Projection(\"EPSG:4326\")," << // transform from WGS 1984
 								"new OpenLayers.Projection(\"EPSG:900913\")" << // to Spherical Mercator Projection
 							"),{ graphic:\"" << HTMLModule::EscapeDoubleQuotes(point.icon) << "\"," <<
@@ -171,8 +178,12 @@ namespace synthese
 				;
 			}
 
+			shared_ptr<Point> wgs84Center(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*_center
+			)	);
 			stream <<
-				"map.setCenter(new OpenLayers.LonLat(" << _center.getLongitude() << "," << _center.getLatitude() << ")" <<
+				"map.setCenter(new OpenLayers.LonLat(" << wgs84Center->getX() << "," << wgs84Center->getY() << ")" <<
 				".transform(" <<
 					"new OpenLayers.Projection(\"EPSG:4326\"), new OpenLayers.Projection(\"EPSG:900913\")" << // WGS84 to Spherical Mercator Projection
 				")," << _zoom << // Zoom level

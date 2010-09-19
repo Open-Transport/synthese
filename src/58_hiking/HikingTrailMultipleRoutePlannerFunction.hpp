@@ -28,6 +28,7 @@
 #include "FactorableTemplate.h"
 #include "Function.h"
 #include "TransportWebsite.h"
+#include "RoadModule.h"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
 
@@ -113,7 +114,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				pt_website::TransportWebsite::ExtendedFetchPlaceResult	_place;
+				road::RoadModule::ExtendedFetchPlaceResult	_place;
 				boost::shared_ptr<const HikingTrail> _trail;
 				std::size_t _beginningRank;
 				std::vector<std::size_t> _endingRanks;
