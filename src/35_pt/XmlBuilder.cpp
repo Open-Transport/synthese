@@ -196,12 +196,12 @@ namespace synthese
 			double y (GetDoubleAttr (node, "y"));
 
 			return shared_ptr<StopPoint>(
-			new synthese::pt::StopPoint (
-				id,
-				name, 
-				connectionPlaces.get (placeId).get(), 
-				x, y))
-			;
+				new synthese::pt::StopPoint(
+					id,
+					name, 
+					connectionPlaces.get (placeId).get(), 
+					CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(x, y)
+			)	);
 
 		}
 

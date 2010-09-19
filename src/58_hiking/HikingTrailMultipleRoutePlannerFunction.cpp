@@ -91,15 +91,15 @@ namespace synthese
 			if(_trail.get())
 			{
 				map.insert(Request::PARAMETER_OBJECT_ID, _trail->getKey());
-				const NamedPlace* namedPlace(dynamic_cast<const NamedPlace*>(_place.placeResult.value));
+				const NamedPlace* namedPlace(dynamic_cast<const NamedPlace*>(_place.placeResult.value.get()));
 				if(namedPlace)
 				{
 					map.insert(PARAMETER_CITY, namedPlace->getCity()->getName());
 					map.insert(PARAMETER_STOP, namedPlace->getName());
 				}
-				else if(dynamic_cast<const City*>(_place.cityResult.value))
+				else if(dynamic_cast<const City*>(_place.cityResult.value.get()))
 				{
-					map.insert(PARAMETER_CITY, dynamic_cast<const City*>(_place.cityResult.value)->getName());
+					map.insert(PARAMETER_CITY, dynamic_cast<const City*>(_place.cityResult.value.get())->getName());
 				}
 
 				if(_page.get())
@@ -429,7 +429,7 @@ namespace synthese
 
 				// Initialisation
 				PTTimeSlotRoutePlanner r(
-					_place.placeResult.value,
+					_place.placeResult.value.get(),
 					_trail->getStops().at(_beginningRank),
 					startDate,
 					endDate,
@@ -469,7 +469,7 @@ namespace synthese
 					result,
 					_beginningDay,
 					_beginningPeriodId,
-					_place.placeResult.value,
+					_place.placeResult.value.get(),
 					_trail->getStops().at(_beginningRank),
 					_beginningPeriod,
 					accessParameters
@@ -491,7 +491,7 @@ namespace synthese
 				// Initialisation
 				PTTimeSlotRoutePlanner r(
 					_trail->getStops().at(rank),
-					_place.placeResult.value,
+					_place.placeResult.value.get(),
 					startDate,
 					endDate,
 					startDate,
@@ -531,7 +531,7 @@ namespace synthese
 					_endingDay,
 					_endingPeriodId,
 					_trail->getStops().at(rank),
-					_place.placeResult.value,
+					_place.placeResult.value.get(),
 					_endingPeriod,
 					accessParameters
 				);

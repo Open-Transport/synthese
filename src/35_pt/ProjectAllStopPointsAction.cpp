@@ -95,19 +95,24 @@ namespace synthese
 
 			BOOST_FOREACH(shared_ptr<StopPoint> stopPoint, stopPoints)
 			{
+				if(!stopPoint->hasGeometry())
+				{
+					continue;
+				}
+
 				EdgeProjector<RoadChunk>::From paths(
 					RoadChunkTableSync::SearchByMaxDistance(
-						*stopPoint, _maxDistance
+						*stopPoint->getGeometry(), _maxDistance
 				)	);
 
 				EdgeProjector<RoadChunk> projector(paths, _maxDistance);
 
 				try
 				{
-					EdgeProjector<RoadChunk>::PathNearby projection(projector.projectEdge(*stopPoint));
+					EdgeProjector<RoadChunk>::PathNearby projection(projector.projectEdge(*stopPoint->getGeometry()->getCoordinate()));
 					
 					Address projectedAddress(
-						projection.get<1>().get(),
+						*projection.get<1>(),
 						projection.get<2>()
 					);
 					stopPoint->setProjectedPoint(projectedAddress);

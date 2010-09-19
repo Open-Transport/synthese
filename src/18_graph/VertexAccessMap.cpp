@@ -27,6 +27,7 @@
 #include "Edge.h"
 #include "Hub.h"
 
+#include <geos/geom/Point.h>
 #include <geos/geom/Envelope.h>
 #include <boost/foreach.hpp>
 #include <assert.h>
@@ -39,12 +40,9 @@ using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geography;
-	
 	namespace graph
 	{
 		VertexAccessMap::VertexAccessMap ()
-			: _isobarycentreToUpdate (false)
 		{
 		}
 
@@ -99,7 +97,7 @@ namespace synthese
 			{
 				// Insertion of a new vertex
 				_map.insert (std::make_pair (vertex, vertexAccess));
-				_isobarycentreToUpdate = true;
+				_isobarycentre.reset();
 				
 				// Updating the paths which needs fine stepping set
 				if (!vertex->getHub()->isConnectionPossible())
@@ -133,22 +131,27 @@ namespace synthese
 
 
 
-		const GeoPoint& VertexAccessMap::getIsobarycenter(
+		shared_ptr<Point> VertexAccessMap::getCentroid(
 		) const	{
-			if (_isobarycentreToUpdate)
+			if(!_isobarycentre.get())
 			{
 				Envelope e;
 				BOOST_FOREACH(VamMap::value_type it, _map)
 				{
-					e.expandToInclude(*it.first);
+					if(it.first->hasGeometry())
+					{
+						e.expandToInclude(*it.first->getGeometry()->getCoordinate());
+					}
 				}
-				Coordinate c;
-				e.centre(c);
-				_isobarycentre = GeoPoint(c);
-				_isobarycentreToUpdate = false;
+				if(!e.isNull())
+				{
+					Coordinate c;
+					e.centre(c);
+					_isobarycentre.reset(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(c));
+				}
 			}
+
 			return _isobarycentre;
-		    
 		}
 
 

@@ -26,7 +26,7 @@
 #include "Map.h"
 
 #include "01_util/Log.h"
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <boost/filesystem/operations.hpp>
 
@@ -78,7 +78,7 @@ namespace synthese
 
 			if (ret != 0)
 			{
-				throw synthese::util::Exception ("Error executing GhostScript (gs executable in path ?)");
+				throw synthese::Exception ("Error executing GhostScript (gs executable in path ?)");
 			}
 
 			return resultFilename;

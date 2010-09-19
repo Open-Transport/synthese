@@ -84,7 +84,7 @@ namespace synthese
 				City* city(CityTableSync::GetEditable(rows->getLongLong (PublicPlaceTableSync::COL_CITYID), env, linkLevel).get());
 				object->setCity(city);
 
-				city->addPlaceToMatcher<PublicPlace>(object);
+				city->addPlaceToMatcher<PublicPlace>(env.getEditableSPtr(object));
 			}
 		}
 
@@ -94,7 +94,7 @@ namespace synthese
 			City* city(const_cast<City*>(obj->getCity()));
 			if (city != NULL)
 			{
-				city->removePlaceFromMatcher<PublicPlace>(obj);
+//				city->removePlaceFromMatcher<PublicPlace>(obj);
 				obj->setCity(NULL);
 			}
 		}

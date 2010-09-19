@@ -31,6 +31,7 @@
 #include "StopPointTableSync.hpp"
 #include "SQLiteTransaction.h"
 #include "CityTableSync.h"
+#include "CoordinatesSystem.hpp"
 
 using namespace std;
 using namespace boost;
@@ -78,10 +79,10 @@ namespace synthese
 			map.insert(PARAMETER_CREATE_PHYSICAL_STOP, _createPhysicalStop);
 			map.insert(PARAMETER_CREATE_CITY_IF_NECESSARY, _createCityIfNecessary);
 			map.insert(PARAMETER_PHYSICAL_STOP_OPERATOR_CODE, _physicalStopOperatorCode);
-			if(!_point.isNull())
+			if(_point.get() && !_point->isEmpty())
 			{
-				map.insert(PARAMETER_PHYSICAL_STOP_X, _point.x);
-				map.insert(PARAMETER_PHYSICAL_STOP_Y, _point.y);
+				map.insert(PARAMETER_PHYSICAL_STOP_X, _point->getX());
+				map.insert(PARAMETER_PHYSICAL_STOP_Y, _point->getY());
 			}
 			return map;
 		}
@@ -116,7 +117,10 @@ namespace synthese
 			optional<double> y(map.getOptional<double>(PARAMETER_PHYSICAL_STOP_Y));
 			if(x && y)
 			{
-				_point = GeoPoint(Coordinate(*x, *y));
+				_point = 
+					CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+						*DBModule::GetStorageCoordinatesSystem().createPoint(*x, *y)
+					);
 			}
 		}
 		
@@ -145,13 +149,13 @@ namespace synthese
 			stopArea.setName(_name);
 			StopAreaTableSync::Save(&stopArea, transaction);
 
-			if(_createPhysicalStop || !_point.isNull() && _point.x && _point.y)
+			if(_createPhysicalStop || _point.get() && !_point->isEmpty() && _point->getX() && _point->getY())
 			{
 				StopPoint stop;
 				stop.setName(_name);
 				stop.setHub(&stopArea);
 				stop.setCodeBySource(_physicalStopOperatorCode);
-				stop = _point;
+				stop.setGeometry(_point);
 				StopPointTableSync::Save(&stop, transaction);
 			}
 			transaction.run();

@@ -72,7 +72,7 @@ namespace synthese
 		void StopArea::addPhysicalStop(
 			const StopPoint& physicalStop
 		){
-			_isoBarycentreToUpdate = true;
+			_isoBarycentre.reset();
 			_physicalStops.insert(make_pair(physicalStop.getKey(), &physicalStop));
 		}
 
@@ -257,19 +257,24 @@ namespace synthese
 
 
 
-		const GeoPoint& StopArea::getPoint() const
+		shared_ptr<Point> StopArea::getPoint() const
 		{
-			if (_isoBarycentreToUpdate)
+			if (!_isoBarycentre.get())
 			{
 				Envelope e;
 				BOOST_FOREACH(const PhysicalStops::value_type& it, _physicalStops)
 				{
-					e.expandToInclude(*it.second);
+					if(it.second->hasGeometry())
+					{
+						e.expandToInclude(*it.second->getGeometry()->getCoordinate());
+					}
 				}
-				Coordinate c;
-				e.centre(c);
-				_isoBarycentre = GeoPoint(c);
-				_isoBarycentreToUpdate = false;
+				if(!e.isNull())
+				{
+					Coordinate c;
+					e.centre(c);
+					_isoBarycentre.reset(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(c));
+				}
 			}
 			return _isoBarycentre;
 		}

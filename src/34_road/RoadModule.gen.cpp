@@ -14,6 +14,7 @@ synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::Na
 synthese::road::RoadPlace::integrate();
 synthese::road::PublicPlace::integrate();
 synthese::road::NavstreetsFileFormat::integrate();
+synthese::road::House::integrate();
 
 // Registries
 

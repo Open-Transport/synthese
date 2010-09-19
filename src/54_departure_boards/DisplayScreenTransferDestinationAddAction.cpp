@@ -101,14 +101,14 @@ namespace synthese
 			}
 
 			const string place(map.get<string>(PARAMETER_DESTINATION_PLACE_NAME));
-			vector<const StopArea*> stops(
+			vector<shared_ptr<StopArea> > stops(
 				cities.front()->search<StopArea>(place, 1)
 			);
 			if(stops.empty())
 			{
 				throw ActionException("Place not found");
 			}
-			_destinationPlace = stops.front();
+			_destinationPlace = stops.front().get();
 		}
 		
 		

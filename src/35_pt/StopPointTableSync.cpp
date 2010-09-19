@@ -97,6 +97,7 @@ namespace synthese
 			object->setName(rows->getText ( StopPointTableSync::COL_NAME));
 
 			// Position : Lon/lat prior to x/y
+			object->resetGeometry();
 			if(!rows->getText(StopPointTableSync::COL_GEOMETRY).empty())
 			{
 				shared_ptr<Point> point(
@@ -105,20 +106,16 @@ namespace synthese
 				)	);
 				if(point.get())
 				{
-					*object = GeoPoint(point->getX(), point->getY());
+					object->setGeometry(point);
 				}
 			}
 			else if(rows->getDouble(StopPointTableSync::COL_X) > 0 && rows->getDouble(StopPointTableSync::COL_Y) > 0)
 			{
-				*object = GeoPoint(
-					Coordinate(
-					rows->getDouble(StopPointTableSync::COL_X),
-					rows->getDouble(StopPointTableSync::COL_Y)
+				object->setGeometry(
+					CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+						rows->getDouble(StopPointTableSync::COL_X),
+						rows->getDouble(StopPointTableSync::COL_Y)
 				)	);
-			}
-			else
-			{
-				object->setNull();
 			}
 
 			object->setCodeBySource(rows->getText ( StopPointTableSync::COL_OPERATOR_CODE));
@@ -151,8 +148,8 @@ namespace synthese
 				{
 					try
 					{
-						RoadChunk* chunk(RoadChunkTableSync::GetEditable(chunkId, env, linkLevel).get());
-						double metricOffset(rows->getDouble(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET));
+						RoadChunk& chunk(*RoadChunkTableSync::GetEditable(chunkId, env, linkLevel));
+						RoadChunk::MetricOffset metricOffset(rows->getDouble(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET));
 
 						object->setProjectedPoint(Address(chunk, metricOffset));
 					}
@@ -181,19 +178,31 @@ namespace synthese
 			StopPoint* object,
 			optional<SQLiteTransaction&> transaction
 		){
-			GeoPoint geoPoint(*object);
-			Coordinate coord(geoPoint.getLongitude(), geoPoint.getLatitude());
-			shared_ptr<Point> point(DBModule::GetStorageCoordinatesSystem().getGeometryFactory().createPoint(coord));
-
 			ReplaceQuery<StopPointTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(dynamic_cast<const StopArea*>(object->getHub()) ? dynamic_cast<const StopArea*>(object->getHub())->getKey() : RegistryKeyType(0));
-			query.addField(object->isNull() ? 0 : object->x);
-			query.addField(object->isNull() ? 0 : object->y);
+			if(object->hasGeometry())
+			{
+				query.addField(object->getGeometry()->getX());
+				query.addField(object->getGeometry()->getY());
+			}
+			else
+			{
+				query.addFieldNull();
+				query.addFieldNull();
+			}
 			query.addField(object->getCodeBySource());
-			query.addField(object->getProjectedPoint().getRoadChunk() ? object->getProjectedPoint().getRoadChunk()->getKey() : 0);
-			query.addField(object->getProjectedPoint().getRoadChunk() ? object->getProjectedPoint().getMetricOffset() : 0);
-			query.addField(static_pointer_cast<Geometry,Point>(point));
+			if(object->getProjectedPoint().getRoadChunk())
+			{
+				query.addField(object->getProjectedPoint().getRoadChunk()->getKey());
+				query.addField(object->getProjectedPoint().getMetricOffset());
+			}
+			else
+			{
+				query.addFieldNull();
+				query.addFieldNull();
+			}
+			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
 
 			query.execute(transaction);
 		}

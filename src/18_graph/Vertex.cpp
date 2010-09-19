@@ -26,18 +26,16 @@
 #include <boost/foreach.hpp>
 
 using namespace std;
+using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geography;
-
 	namespace graph
 	{
 		Vertex::Vertex(
 			const Hub* hub,
-			double longitude,
-			double latitude
-		):	GeoPoint(longitude, latitude),
+			boost::shared_ptr<Point> geometry
+		):	WithGeometry<Point>(geometry),
 			_hub(hub)
 		{}
 

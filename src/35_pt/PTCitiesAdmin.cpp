@@ -147,7 +147,7 @@ namespace synthese
 										
 					BOOST_FOREACH(const GeographyModule::CitiesMatcher::MatchHit& it, result)
 					{
-						openCityRequest.getPage()->setCity(Env::GetOfficialEnv().getSPtr(it.value));
+						openCityRequest.getPage()->setCity(it.value);
 
 						stream << t.row();
 						stream << t.col() << it.key.getSource();

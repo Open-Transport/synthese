@@ -190,10 +190,10 @@ namespace synthese
 					{
 						stream << t.row();
 
-						if(dynamic_cast<const RoadPlace*>(it.value))
+						if(dynamic_pointer_cast<RoadPlace>(it.value).get())
 						{
-							const RoadPlace* roadPlace(static_cast<const RoadPlace*>(it.value));
-							openRoadRequest.getPage()->setRoadPlace(Env::GetOfficialEnv().getSPtr(roadPlace));
+							shared_ptr<RoadPlace> roadPlace(static_pointer_cast<RoadPlace>(it.value));
+							openRoadRequest.getPage()->setRoadPlace(roadPlace);
 
 							stream << t.col();
 							stream << t.col() << "Route";
@@ -204,10 +204,10 @@ namespace synthese
 							stream << t.col() << it.score.levenshtein;
 							stream << t.col() << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
-						else if(dynamic_cast<const StopArea*>(it.value))
+						else if(dynamic_pointer_cast<StopArea>(it.value).get())
 						{
-							const StopArea* connectionPlace(static_cast<const StopArea*>(it.value));
-							openPlaceRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr(connectionPlace));
+							shared_ptr<StopArea> connectionPlace(static_pointer_cast<StopArea>(it.value));
+							openPlaceRequest.getPage()->setConnectionPlace(connectionPlace);
 
 							stream << t.col();
 							stream << t.col() << "Zone d'arrêt";
@@ -372,8 +372,15 @@ namespace synthese
 						stream << t.col() << place->getCity()->getName();
 					}
 					stream << t.col() << place->getName();
-					stream << t.col() << place->getPoint().x;
-					stream << t.col() << place->getPoint().y;
+					if(place->getPoint().get())
+					{
+						stream << t.col() << place->getPoint()->getX();
+						stream << t.col() << place->getPoint()->getY();
+					}
+					else
+					{
+						stream << t.col(2) << "Non localisé";
+					}
 
 					openRequest.getPage()->setConnectionPlace(const_pointer_cast<const StopArea>(place));
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPlaceAdmin::ICON);

@@ -108,6 +108,8 @@ namespace synthese
 		const string TridentFileFormat::PARAMETER_WITH_OLD_DATES("wod");
 		const string TridentFileFormat::PARAMETER_DEFAULT_TRANSFER_DURATION("dtd");
 
+		TridentFileFormat::SRIDConversionMap TridentFileFormat::_SRIDConversionMap;
+
 		string ToXsdDaysDuration (date_duration daysDelay);
 		string ToXsdDuration(posix_time::time_duration duration);
 		string ToXsdTime (const time_duration& time);
@@ -359,29 +361,35 @@ namespace synthese
 			// --------------------------------------------------- AreaCentroid
 			BOOST_FOREACH(Registry<StopPoint>::value_type itps, _env->getRegistry<StopPoint>())
 			{
-				const StopPoint* ps(itps.second.get());
+				const StopPoint& ps(*itps.second);
+
+				shared_ptr<Point> wgs84ps;
+				if(ps.hasGeometry())
+				{
+					wgs84ps = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(*ps.getGeometry());
+				}
 				os << fixed;
 				os << "<AreaCentroid>" << "\n";
-				os << "<objectId>" << TridentId (peerid, "AreaCentroid", *ps) << "</objectId>" << "\n";
+				os << "<objectId>" << TridentId (peerid, "AreaCentroid", ps) << "</objectId>" << "\n";
 			    
-				os << "<longitude>" << (ps->isNull() ? 0 : ps->getLongitude()) << "</longitude>" << "\n";
-				os << "<latitude>" << (ps->isNull() ? 0 : ps->getLatitude()) << "</latitude>" << "\n";
-				os << "<longLatType>WGS84</longLatType>" << "\n";
+				os << "<longitude>" << (ps.hasGeometry() ? 0 : wgs84ps->getX()) << "</longitude>" << "\n";
+				os << "<latitude>" << (ps.hasGeometry() ? 0 : wgs84ps->getY()) << "</latitude>" << "\n";
+				os << "<longLatType>" << _getTridentFromSRID(wgs84ps->getSRID()) << "</longLatType>" << "\n";
 
 				// we do not provide full addresses right now.
-				os << "<address><countryCode>" << ps->getConnectionPlace()->getCity()->getCode() << "</countryCode></address>";
+				os << "<address><countryCode>" << ps.getConnectionPlace()->getCity()->getCode() << "</countryCode></address>";
 
-				if(!ps->isNull())
+				if(ps.hasGeometry())
 				{
 					os << "<projectedPoint>" << "\n";
-					os << "<X>" << ps->x << "</X>" << "\n";
-					os << "<Y>" << ps->y << "</Y>" << "\n";
-					os << "<projectionType>" << ps->getCoordinatesSystem().getName() << "</projectionType>" << "\n";
+					os << "<X>" << ps.getGeometry()->getX() << "</X>" << "\n";
+					os << "<Y>" << ps.getGeometry()->getY() << "</Y>" << "\n";
+					os << "<projectionType>" << _getTridentFromSRID(ps.getGeometry()->getSRID()) << "</projectionType>" << "\n";
 					os << "</projectedPoint>" << "\n";
 				}
 
-				os << "<containedIn>" << TridentId (peerid, "StopArea", ps->getKey ()) << "</containedIn>" << "\n";
-				os << "<name>" << Conversion::ToString (ps->getKey ()) << "</name>" << "\n";
+				os << "<containedIn>" << TridentId (peerid, "StopArea", ps.getKey ()) << "</containedIn>" << "\n";
+				os << "<name>" << ps.getKey() << "</name>" << "\n";
 
 				os << "</AreaCentroid>" << "\n";
 			}
@@ -558,22 +566,28 @@ namespace synthese
 				const LineStop* ls(itls.second.get());
 				const StopPoint* ps = static_cast<const StopPoint*>(ls->getFromVertex());
 
+				shared_ptr<Point> wgs84ps;
+				if(ps->hasGeometry())
+				{
+					wgs84ps = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(*ps->getGeometry());
+				}
+
 				os << fixed;
 				os << "<StopPoint" << (_withTisseoExtension ? " xsi:type=\"TisseoStopPointType\"" : "") << ">" << "\n";
 				os << "<objectId>" << TridentId (peerid, "StopPoint", *ls) << "</objectId>" << "\n";
 				os << "<creatorId>" << ps->getCodeBySource() << "</creatorId>" << "\n";
-				os << "<longitude>" << (ps->isNull() ? 0 : ps->getLongitude()) << "</longitude>" << "\n";
-				os << "<latitude>" << (ps->isNull() ? 0 : ps->getLatitude()) << "</latitude>" << "\n";
-				os << "<longLatType>" << "WGS84" << "</longLatType>" << "\n";
+				os << "<longitude>" << (ps->hasGeometry() ? 0 : wgs84ps->getX()) << "</longitude>" << "\n";
+				os << "<latitude>" << (ps->hasGeometry() ? 0 : wgs84ps->getY()) << "</latitude>" << "\n";
+				os << "<longLatType>" << _getTridentFromSRID(wgs84ps->getSRID()) << "</longLatType>" << "\n";
 				
 				os << "<address><countryCode>" << ps->getConnectionPlace()->getCity()->getCode() << "</countryCode></address>";
 
-				if(!ps->isNull())
+				if(ps->hasGeometry())
 				{
 					os << "<projectedPoint>" << "\n";
-					os << "<X>" << ps->x << "</X>" << "\n";
-					os << "<Y>" << ps->y << "</Y>" << "\n";
-					os << "<projectionType>" << ps->getCoordinatesSystem().getName() << "</projectionType>" << "\n";
+					os << "<X>" << ps->getGeometry()->getX() << "</X>" << "\n";
+					os << "<Y>" << ps->getGeometry()->getY() << "</Y>" << "\n";
+					os << "<projectionType>" << _getTridentFromSRID(ps->getGeometry()->getSRID()) << "</projectionType>" << "\n";
 					os << "</projectedPoint>" << "\n";
 				}
 
@@ -1313,20 +1327,26 @@ namespace synthese
 						XMLNode latitudeNode(areaCentroid.getChildNode("latitude", 0));
 						if(!longitudeNode.isEmpty() && !latitudeNode.isEmpty())
 						{
-							*curStop = GeoPoint(
-								lexical_cast<double>(longitudeNode.getText()),
-								lexical_cast<double>(latitudeNode.getText())
-							);
+							curStop->setGeometry(
+								CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+									*CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
+										lexical_cast<double>(longitudeNode.getText()),
+										lexical_cast<double>(latitudeNode.getText())
+							)	)	);
 						}
 						else
 						{
 							XMLNode projectedPointNode(areaCentroid.getChildNode("projectedPoint", 0));
 							if(!projectedPointNode.isEmpty())
 							{
-								*curStop = GeoPoint(Coordinate(
-									lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
-									lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
-								)	);
+								curStop->setGeometry(
+									CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+										*CoordinatesSystem::GetCoordinatesSystem(
+											_getSRIDFromTrident(projectedPointNode.getChildNode("projectionType", 0).getText())
+										).createPoint(
+											lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
+											lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
+								)	)	);
 							}
 						}
 					}
@@ -1874,6 +1894,43 @@ namespace synthese
 		bool TridentFileFormat::getImportStops() const
 		{
 			return _importStops;
+		}
+
+
+
+		void TridentFileFormat::_populateSRIDTridentConversionMap()
+		{
+			if(_SRIDConversionMap.left.empty())
+			{
+				_SRIDConversionMap.left.insert(SRIDConversionMap::left_value_type(4326, "WGS84"));
+				_SRIDConversionMap.left.insert(SRIDConversionMap::left_value_type(27572, "Lambert II étendu"));
+			}
+		}
+
+
+
+		CoordinatesSystem::SRID TridentFileFormat::_getSRIDFromTrident( const std::string& value )
+		{
+			_populateSRIDTridentConversionMap();
+			SRIDConversionMap::right_const_iterator it(_SRIDConversionMap.right.find(value));
+			if(it == _SRIDConversionMap.right.end())
+			{
+				throw Exception("Trident SRID not found");
+			}
+			return it->second;
+		}
+
+
+
+		const std::string& TridentFileFormat::_getTridentFromSRID( const CoordinatesSystem::SRID value )
+		{
+			_populateSRIDTridentConversionMap();
+			SRIDConversionMap::left_const_iterator it(_SRIDConversionMap.left.find(value));
+			if(it == _SRIDConversionMap.left.end())
+			{
+				throw Exception("Trident SRID not found");
+			}
+			return it->second;
 		}
 	}
 }

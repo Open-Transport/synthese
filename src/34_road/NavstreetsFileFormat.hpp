@@ -24,10 +24,19 @@
 #define SYNTHESE_road_NavstreetFileFormat_hpp__
 
 #include "FileFormatTemplate.h"
+#include "RoadChunk.h"
 
 #include <map>
 #include <ostream>
 #include <string>
+
+namespace geos
+{
+	namespace geom
+	{
+		class LineString;
+	}
+}
 
 namespace synthese
 {
@@ -139,6 +148,23 @@ namespace synthese
 			typedef std::map<int, geography::City*> _CitiesMap;
 
 			_CitiesMap _citiesMap;	//!< Correspondence table between Navstreets and SYNTHESE id for streets
+
+			static road::RoadChunk::HouseNumberingPolicy _getHouseNumberingPolicyFromAddressSchema(
+				const std::string& addressSchema
+			);
+			static road::RoadChunk::HouseNumberBounds _getHouseNumberBoundsFromAddresses(
+				const std::string& minAddress,
+				const std::string maxAddress
+			);
+			static void _setGeometryAndHouses(
+				road::RoadChunk& chunk,
+				boost::shared_ptr<geos::geom::LineString> geometry,
+				road::RoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
+				road::RoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
+				road::RoadChunk::HouseNumberBounds rightHouseNumberBounds,
+				road::RoadChunk::HouseNumberBounds leftHouseNumberBounds
+			);
+
 
 		protected:
 

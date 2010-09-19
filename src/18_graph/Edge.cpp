@@ -414,26 +414,28 @@ namespace synthese
 
 
 
-		shared_ptr<LineString> Edge::getGeometry(
+		shared_ptr<LineString> Edge::getRealGeometry(
 		) const	{
-			if(_geometry.get())
+			if(getGeometry().get())
 			{
-				return _geometry;
+				return getGeometry();
 			}
 
 			assert(getFromVertex());
 			const GeometryFactory& geometryFactory(
-				DBModule::GetDefaultGeometryFactory()
+				CoordinatesSystem::GetDefaultGeometryFactory()
 			);
 
+			const Edge* nextEdge(getParentPath()->getEdge(getRankInPath() + 1));
 			if(	getParentPath() &&
 				getParentPath()->getEdge(getRankInPath()) == this &&
-				getParentPath()->getEdges().size() != getRankInPath()+1
+				getParentPath()->getEdges().size() != getRankInPath()+1 &&
+				getFromVertex()->hasGeometry() &&
+				nextEdge->getFromVertex()->hasGeometry()
 			){
-				const Edge* nextEdge(getParentPath()->getEdge(getRankInPath() + 1));
 				CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
-				cs->add(*getFromVertex(), false);
-				cs->add(*nextEdge->getFromVertex(), false);
+				cs->add(*getFromVertex()->getGeometry()->getCoordinate(), false);
+				cs->add(*nextEdge->getFromVertex()->getGeometry()->getCoordinate(), false);
 				return shared_ptr<LineString>(geometryFactory.createLineString(cs));
 			}
 

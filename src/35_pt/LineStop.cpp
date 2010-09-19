@@ -79,7 +79,7 @@ namespace synthese
 				deltaMO = ( other.getMetricOffset () - getMetricOffset () );
 
 			const double deltaGPS(
-				getFromVertex()->distance(*other.getFromVertex())
+				getFromVertex()->getGeometry()->distance(other.getFromVertex()->getGeometry().get())
 			);
 
 			if ( deltaMO > 10 * deltaGPS && deltaMO - deltaGPS > 1 )

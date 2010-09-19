@@ -28,7 +28,8 @@
 
 #include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
-#include "GeoPoint.h"
+
+#include <geos/geom/Point.h>
 
 namespace synthese
 {
@@ -75,7 +76,7 @@ namespace synthese
 				std::string operatorCode;
 				std::string cityName;
 				std::string name;
-				geography::GeoPoint coords;
+				boost::shared_ptr<geos::geom::Point> coords;
 				boost::shared_ptr<StopPoint> stop;
 			};
 			typedef std::map<std::string, Bahnhof> Bahnhofs;

@@ -82,14 +82,14 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				GeographyModule::AddToCitiesMatchers(object);
+				GeographyModule::AddToCitiesMatchers(env.getEditableSPtr(object));
 			}
 		}
 
 
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Unlink(City* obj)
 		{
-			GeographyModule::RemoveFromCitiesMatchers(obj);
+//			GeographyModule::RemoveFromCitiesMatchers(obj);
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Save(

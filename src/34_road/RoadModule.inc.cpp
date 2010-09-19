@@ -10,6 +10,7 @@
 #include "RoadModule.h"
 #include "PublicPlaceTableSync.h"
 #include "NavstreetsFileFormat.hpp"
+#include "House.hpp"
 
 // Registries
 

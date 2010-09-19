@@ -26,6 +26,8 @@
 #include "StopArea.hpp"
 
 using namespace std;
+using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -44,11 +46,10 @@ namespace synthese
 		StopPoint::StopPoint(
 			RegistryKeyType id
 			, string name
-			, const StopArea* place
-			, double x
-			, double y
+			, const StopArea* place,
+			shared_ptr<Point> geometry
 		):	Registrable(id),
-			Vertex(place, x, y),
+			Vertex(place, geometry),
 			Importable(),
 			Named(name)
 		{

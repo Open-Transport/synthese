@@ -27,7 +27,14 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "GeoPoint.h"
+
+namespace geos
+{
+	namespace geom
+	{
+		class Point;
+	}
+}
 
 namespace synthese
 {
@@ -73,7 +80,7 @@ namespace synthese
 			boost::shared_ptr<const StopArea> _place;
 			std::string _operatorCode;
 			std::string _name;
-			geography::GeoPoint _point;
+			boost::shared_ptr<geos::geom::Point> _point;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

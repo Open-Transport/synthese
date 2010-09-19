@@ -174,7 +174,7 @@ namespace synthese
 
 		std::string RoadJourneyPlannerResult::getTripWKT() const
 		{
-			const geos::geom::GeometryFactory& gf(DBModule::GetDefaultGeometryFactory());
+			const GeometryFactory& gf(CoordinatesSystem::GetDefaultGeometryFactory());
 			std::vector<geos::geom::Geometry*> geoms;
 
 			if(!_journeys.empty()) {
@@ -183,12 +183,13 @@ namespace synthese
 
 					BOOST_FOREACH(graph::ServicePointer su,it->getServiceUses()) {
 						const graph::Edge *e = su.getDepartureEdge();
-						while(true) {
+						while(true)
+						{
 							geos::geom::Coordinate c;
 							const road::Road *road = dynamic_cast<const road::Road*>(e->getParentPath());
 							if(!road->isReversed()) {
-								c.x = e->getFromVertex()->x;
-								c.y = e->getFromVertex()->y;
+								c.x = e->getFromVertex()->getGeometry()->getX();
+								c.y = e->getFromVertex()->getGeometry()->getY();
 								coords->add(c,0);
 							}
 							bool addViaPoints = true;
@@ -209,7 +210,8 @@ namespace synthese
 							}
 							if(road->isReversed())
 							{
-								c = *e->getFromVertex();
+								c.x = e->getFromVertex()->getGeometry()->getX();
+								c.y = e->getFromVertex()->getGeometry()->getY();
 								coords->add(c, false);
 							}
 							if(e == su.getArrivalEdge())

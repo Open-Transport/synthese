@@ -31,6 +31,8 @@
 #include "AccessParameters.h"
 #include "RollingStockFilter.h"
 #include "Website.hpp"
+#include "GeographyModule.h"
+#include "RoadModule.h"
 
 #include <set>
 #include <boost/date_time/gregorian/greg_duration.hpp>
@@ -75,7 +77,7 @@ namespace synthese
 			/// specified dates according to the site rules.
 			/// @ingroup m36
 			class ForbiddenDateException:
-				public util::Exception
+				public synthese::Exception
 			{
 			public:
 				ForbiddenDateException();
@@ -86,15 +88,13 @@ namespace synthese
 
 			typedef std::vector<HourPeriod> Periods;
 			
-			typedef lexical_matcher::LexicalMatcher<geography::City*> CitiesMatcher;
-
 			typedef std::map<std::size_t,RollingStockFilter*> RollingStockFilters;
 			
 		private:
 			//! \name Environment
 			//@{
 				std::set<pt::CommercialLine*>	_lines;
-				CitiesMatcher _citiesMatcher;
+				geography::GeographyModule::CitiesMatcher _citiesMatcher;
 				RollingStockFilters _rollingStockFilters;
 			//@}
 
@@ -148,7 +148,7 @@ namespace synthese
 			//@{
 				void addHourPeriod(const HourPeriod& hourPeriod);
 				void clearHourPeriods();
-				void addCity(geography::City* value);
+				void addCity(boost::shared_ptr<geography::City> value);
 				void addRollingStockFilter(RollingStockFilter& value);
 				void removeRollingStockFilter(RollingStockFilter& value);
 				void clearRollingStockFilters();
@@ -174,7 +174,7 @@ namespace synthese
 					const graph::AccessParameters::AllowedPathClasses& allowedPathClasses
 				) const;
 	
-				const CitiesMatcher&			getCitiesMatcher() const;
+				const geography::GeographyModule::CitiesMatcher&			getCitiesMatcher() const;
 
 				const boost::gregorian::date				getMinUseDate() const;
 				const boost::gregorian::date				getMaxUseDate() const;
@@ -230,23 +230,26 @@ namespace synthese
 					@throw Exception if no place can be found
 					@todo Implement a true place fetcher which takes into account the place selection of the site
 				*/
-				const geography::Place* fetchPlace(
+				const boost::shared_ptr<geography::Place> fetchPlace(
 					const std::string& cityName
 					, const std::string& placeName
 				) const;
 
 
-				struct ExtendedFetchPlaceResult
-				{
-					CitiesMatcher::MatchResult::value_type cityResult;
-					lexical_matcher::LexicalMatcher<const geography::Place*>::MatchResult::value_type placeResult;
 
-					ExtendedFetchPlaceResult();
-				};
-
-				ExtendedFetchPlaceResult extendedFetchPlace(
-					const std::string& cityName
-					, const std::string& placeName
+				//////////////////////////////////////////////////////////////////////////
+				/// Interprets text from two fields to determinate a place.
+				/// Scenarios :
+				///	<table class="table">
+				///	<tr><th>cityName</th><th>placeName</th><th>Returned place</th></tr>
+				///	<tr><td>empty</td><td>empty</td><td>throws UndeterminedPlaceException</td></tr>
+				///	<tr><td>non empty</td><td>empty</td><td>default places of the city</td></tr>
+				///	<tr><td>non empty</td><td>non empty, beginning by a number</td><td>first try to find a stop which begins by the numberm then try to generate an address</td></tr>
+				///	<tr><td>non empty</td><td>non empty, without number</td><td>try to find a stop or a road</td></tr>
+				///	</table>
+				road::RoadModule::ExtendedFetchPlaceResult extendedFetchPlace(
+					const std::string& cityName,
+					const std::string& placeName
 				) const;
 
 				typedef std::map<boost::optional<std::size_t>, std::string> Labels;

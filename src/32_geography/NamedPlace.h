@@ -53,7 +53,10 @@ namespace synthese
 			const City* _city; //!< The city where this place is located
 
 		protected:
+			//////////////////////////////////////////////////////////////////////////
+			/// Default constructor.
 			NamedPlace();
+
 
 		public:
 			//! @name Getters
@@ -61,36 +64,33 @@ namespace synthese
 
 				/** Gets name of this place.
 				*/
-				const std::string& getName () const;
-				const std::string& getName13() const;
-				const std::string& getName26() const;
-
-
-				/** Gets official name of this place.
-				* The default implementation is to return this name.
-				*/
-				virtual const std::string& getOfficialName () const;
-
-				const std::string getFullName() const;
-
+				const std::string& getName () const { return _name; }
+				const std::string& getName13() const { return _name13; }
+				const std::string& getName26() const { return _name26; }
 
 				/** Gets city where this place is located.
 				*/
-				const City* getCity () const;
-
+				const City* getCity () const { return _city; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setName (const std::string& name);
-				void setCity(const City* city);
-				void setName13(const std::string& name);
-				void setName26(const std::string& name);
+				void setName (const std::string& value){ _name = value; }
+				void setCity(const City* value){ _city = value; }
+				void setName13(const std::string& value){ _name13 = value; }
+				void setName26(const std::string& value){ _name26 = value; }
 			//@}
 
 
-			//! @name Query methods
+			//! @name Services
 			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets a concatenation between city name and place name.
+				/// @return city name, a space, and place name. Empty string if the city is
+				///	undefined
+				std::string getFullName() const;
+
+
 
 				/** Gets a 13 characters name for the place.
 					@return string :
@@ -113,6 +113,12 @@ namespace synthese
 				virtual std::string getNameForAllPlacesMatcher(
 					std::string text = std::string()
 				) const = 0;
+
+
+				/** Gets official name of this place.
+				* The default implementation is to return this name.
+				*/
+				virtual const std::string& getOfficialName () const;
 			//@}
 		};
 	}

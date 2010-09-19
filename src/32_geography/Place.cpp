@@ -34,7 +34,7 @@ namespace synthese
 	namespace geography
 	{
 		Place::Place(
-		):	_isoBarycentreToUpdate(false)
+		)
 		{
 		}
 

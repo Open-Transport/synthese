@@ -24,13 +24,19 @@
 #define SYNTHESE_ENV_VERTEXACCESSMAP_H
 
 #include "Journey.h"
-#include "GeoPoint.h"
 
 #include <vector>
 #include <map>
 #include <set>
-
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
+
+namespace geos
+{
+	namespace geom
+	{
+		class Point;
+	}
+}
 
 namespace synthese
 {
@@ -81,9 +87,7 @@ TRIDENT : VertexAccess => AccesPoint
 			std::set<const Path*> _pathOnWhichFineSteppingForDeparture;
 			std::set<const Path*> _pathOnWhichFineSteppingForArrival;
 		    
-			mutable bool _isobarycentreToUpdate;
-		
-			mutable geography::GeoPoint _isobarycentre;   //!< Isobarycenter of all points contained in this map.
+			mutable boost::shared_ptr<geos::geom::Point> _isobarycentre;   //!< Isobarycenter of all points contained in this map.
 		
 			boost::posix_time::time_duration _minApproachTime;
 
@@ -98,7 +102,10 @@ TRIDENT : VertexAccess => AccesPoint
 			~VertexAccessMap ();
 
 
-			const VamMap& getMap () const;
+			//! @name Getters
+			//@{
+				const VamMap& getMap () const;
+			//@}
 
 			const VertexAccess& getVertexAccess (const Vertex* vertex) const;
 
@@ -141,7 +148,7 @@ TRIDENT : VertexAccess => AccesPoint
 			void insert (const Vertex* vertex, const VertexAccess& vertexAccess);
 		    
 
-			const geography::GeoPoint& getIsobarycenter () const;
+			boost::shared_ptr<geos::geom::Point> getCentroid() const;
 		    
 			boost::posix_time::time_duration getMinApproachTime () const;
 

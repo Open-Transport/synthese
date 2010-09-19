@@ -29,6 +29,7 @@
 #include "Registrable.h"
 #include "GraphTypes.h"
 #include "Path.h"
+#include "WithGeometry.hpp"
 
 #include <boost/optional.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -75,8 +76,9 @@ namespace synthese
 			@ingroup m18
 			@author Marc Jambert, Hugues Romain
 		*/
-		class Edge
-			:	public virtual util::Registrable
+		class Edge:
+			public virtual util::Registrable,
+			public WithGeometry<geos::geom::LineString>
 		{
 		public:
 			template<class Iterator>
@@ -123,8 +125,6 @@ namespace synthese
 			Edge* _followingConnectionArrival;			//!< Next connection arrival edge along path.
 			Edge* _followingArrivalForFineSteppingOnly;	//!< Next arrival edge with or without connection
 
-			boost::shared_ptr<geos::geom::LineString> _geometry;	//!< Geometry, including beginning and ending vertices
-
 			mutable DepartureServiceIndices _departureIndex;	//!< First service index by departure hour of day
 			mutable ArrivalServiceIndices _arrivalIndex;		//!< First service index by arrival hour of day
 
@@ -164,7 +164,6 @@ namespace synthese
 				void setFollowingConnectionArrival(Edge* followingConnectionArrival) {_followingConnectionArrival = followingConnectionArrival; }
 				void setFollowingArrivalForFineSteppingOnly(Edge* followingArrival) { _followingArrivalForFineSteppingOnly = followingArrival; }
 				void setMetricOffset (MetricOffset metricOffset) { _metricOffset = metricOffset; }
-				void setGeometry(boost::shared_ptr<geos::geom::LineString> value) { _geometry = value; }
 				void setFromVertex(Vertex* value) { _fromVertex = value; }
 			//@}
 
@@ -190,8 +189,6 @@ namespace synthese
 				const ArrivalServiceIndices& getArrivalIndices() const { return _arrivalIndex; }
 
 				std::size_t getRankInPath () const { return _rankInPath; }
-
-				boost::shared_ptr<geos::geom::LineString> getStoredGeometry() const { return _geometry; }
 			//@}
 
 
@@ -231,7 +228,7 @@ namespace synthese
 				///		<li>If the edge is the last edge, the vertex point is returned</li>
 				///		<li>Else a right line string between the vertex and the next one is returned</li>
 				/// </ul>
-				boost::shared_ptr<geos::geom::LineString> getGeometry(
+				boost::shared_ptr<geos::geom::LineString> getRealGeometry(
 				) const;
 
 

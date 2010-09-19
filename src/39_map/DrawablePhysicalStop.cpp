@@ -41,7 +41,7 @@ namespace synthese
 			const StopPoint* physicalStop
 		): _physicalStopId(physicalStop->getKey())
 			, _name(physicalStop->getConnectionPlace()->getName ())
-			, _point (*physicalStop)
+			, _point (*physicalStop->getGeometry()->getCoordinate())
 		{
 		}
 		

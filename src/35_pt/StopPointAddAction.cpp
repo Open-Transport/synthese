@@ -30,9 +30,13 @@
 #include "StopPointTableSync.hpp"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
+#include "DBModule.h"
+
+#include <geos/geom/Point.h>
 
 using namespace std;
 using namespace geos::geom;
+using namespace boost;
 
 namespace synthese
 {
@@ -40,6 +44,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace geography;
+	using namespace db;
 	
 	namespace util
 	{
@@ -66,10 +71,10 @@ namespace synthese
 				map.insert(PARAMETER_PLACE_ID, _place->getKey());
 			}
 			map.insert(PARAMETER_OPERATOR_CODE, _operatorCode);
-			if(!_point.isNull())
+			if(_point.get() && !_point->isEmpty())
 			{
-				map.insert(PARAMETER_X, _point.x);
-				map.insert(PARAMETER_Y, _point.y);
+				map.insert(PARAMETER_X, _point->getX());
+				map.insert(PARAMETER_Y, _point->getY());
 			}
 			map.insert(PARAMETER_NAME, _name);
 			return map;
@@ -92,13 +97,18 @@ namespace synthese
 			_operatorCode = map.getDefault<string>(PARAMETER_OPERATOR_CODE);
 			if(map.getDefault<double>(PARAMETER_X, 0) && map.getDefault<double>(PARAMETER_Y, 0))
 			{
-				_point = GeoPoint(
-					Coordinate(map.get<double>(PARAMETER_X), map.get<double>(PARAMETER_Y))
+				_point = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+					map.get<double>(PARAMETER_X),
+					map.get<double>(PARAMETER_Y)
 				);
 			}
 			else if(map.getDefault<double>(PARAMETER_LONGITUDE, 0) && map.getDefault<double>(PARAMETER_LATITUDE, 0))
 			{
-				_point = GeoPoint(map.get<double>(PARAMETER_LONGITUDE), map.get<double>(PARAMETER_LATITUDE));
+				_point = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+					*DBModule::GetStorageCoordinatesSystem().createPoint(
+						map.get<double>(PARAMETER_LONGITUDE),
+						map.get<double>(PARAMETER_LATITUDE)
+				)	);
 			}
 		}
 		
@@ -111,7 +121,7 @@ namespace synthese
 			object.setHub(_place.get());
 			object.setName(_name);
 			object.setCodeBySource(_operatorCode);
-			object = _point;
+			object.setGeometry(_point);
 
 			StopPointTableSync::Save(&object);
 

@@ -30,13 +30,16 @@
 
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
+namespace geos
+{
+	namespace geom
+	{
+		class Point;
+	}
+}
+
 namespace synthese
 {
-	namespace geography
-	{
-		class GeoPoint;
-	}
-
 	namespace graph
 	{
 		class Vertex;
@@ -88,7 +91,11 @@ namespace synthese
 				virtual HubScore getScore(
 				) const = 0;
 
-				virtual const geography::GeoPoint& getPoint() const = 0;
+
+
+				//////////////////////////////////////////////////////////////////////////
+				///	Virtual centroid getter.
+				virtual boost::shared_ptr<geos::geom::Point> getPoint() const = 0;
 
 				virtual bool containsAnyVertex(GraphIdType graphType) const = 0;
 

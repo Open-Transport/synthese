@@ -162,7 +162,7 @@ namespace synthese
 						{
 							city->removeIncludedPlace(cp);
 						}
-						city->addPlaceToMatcher<StopArea>(cp);
+						city->addPlaceToMatcher<StopArea>(env.getEditableSPtr(cp));
 					}
 				}
 				catch(ObjectNotFoundException<City>& e)
@@ -216,7 +216,8 @@ namespace synthese
 			City* city(const_cast<City*>(cp->getCity()));
 			if (city != NULL)
 			{
-				city->removePlaceFromMatcher<StopArea>(cp);
+				/// @todo make the remove : segfautl !!!!
+//				city->removePlaceFromMatcher<StopArea>(cp);
 				city->removeIncludedPlace(cp);
 			}
 		}

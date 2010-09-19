@@ -103,7 +103,7 @@ namespace synthese
 			{
 				mbm = MapBackgroundManager::GetMapBackgroundManager (backgroundId);
 			}
-			catch (synthese::util::Exception& ex)
+			catch (synthese::Exception& ex)
 			{
 				Log::GetInstance ().warn ("Cannot find background", ex);
 			}

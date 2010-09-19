@@ -34,6 +34,7 @@
 #include "StopAreaTableSync.hpp"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -95,7 +96,7 @@ namespace synthese
 			}
 
 			const string place(map.get<string>(PARAMETER_NAME));
-			vector<const StopArea*> stops(
+			vector<shared_ptr<StopArea> > stops(
 				cities.front()->search<StopArea>(place, 1)
 			);
 			if(stops.empty())

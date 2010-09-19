@@ -1,6 +1,6 @@
 #include "MapBackgroundManager.h"
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include "MapBackground.h"
 
@@ -149,7 +149,7 @@ MapBackgroundManager::GetMapBackgroundManager (const std::string& id)
 {
     if (_managers.find (id) == _managers.end ())
     {
-        throw synthese::util::Exception ("Missing background directory " + id);
+        throw synthese::Exception ("Missing background directory " + id);
     }
 
     return _managers.find (id)->second;

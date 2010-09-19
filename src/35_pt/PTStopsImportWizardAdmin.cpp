@@ -28,7 +28,6 @@
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
 #include "PropertiesHTMLTable.h"
-#include "GeoPoint.h"
 #include "CoordinatesSystem.hpp"
 #include "AdminFunctionRequest.hpp"
 #include "StopPointTableSync.hpp"
@@ -282,11 +281,9 @@ namespace synthese
 							}
 							if(ok)
 							{
-								it->second.coords = GeoPoint(
-									Coordinate(
-										1000 * lexical_cast<double>(line.substr(10,7)),
-										1000 * lexical_cast<double>(line.substr(20,7))
-									), DBModule::GetCoordinatesSystem(21781)
+								it->second.coords = CoordinatesSystem::GetCoordinatesSystem(21781).createPoint(
+									1000 * lexical_cast<double>(line.substr(10,7)),
+									1000 * lexical_cast<double>(line.substr(20,7))
 								);
 							}
 						}
@@ -320,10 +317,10 @@ namespace synthese
 							stream << bahnhof.second.name;
 
 							stream << t.col();
-							stream << bahnhof.second.coords.x;
+							stream << bahnhof.second.coords->getX();
 
 							stream << t.col();
-							stream << bahnhof.second.coords.y;
+							stream << bahnhof.second.coords->getY();
 
 							stream << t.col();
 							AdminActionFunctionRequest<StopAreaAddAction, PTStopsImportWizardAdmin> addRequest(request);
@@ -379,16 +376,16 @@ namespace synthese
 							stream << bahnhof.second.name;
 
 							stream << t.col();
-							stream << bahnhof.second.stop->x;
+							stream << bahnhof.second.stop->getGeometry()->getX();
 
 							stream << t.col();
-							stream << bahnhof.second.stop->y;
+							stream << bahnhof.second.stop->getGeometry()->getY();
 
 							stream << t.col();
-							stream << bahnhof.second.coords.x;
+							stream << bahnhof.second.coords->getX();
 
 							stream << t.col();
-							stream << bahnhof.second.coords.y;
+							stream << bahnhof.second.coords->getY();
 
 							stream << t.col();
 							stream << "Mettre à jour coordonnées";

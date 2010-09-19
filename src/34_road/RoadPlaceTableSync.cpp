@@ -96,7 +96,7 @@ namespace synthese
 				// City
 				object->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
 				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
-				city->addPlaceToMatcher<RoadPlace>(object);
+				city->addPlaceToMatcher<RoadPlace>(env.getEditableSPtr(object));
 			}
 		}
 
@@ -128,7 +128,7 @@ namespace synthese
 			City* city = const_cast<City*>(obj->getCity ());
 			if (city != NULL)
 			{
-				city->removePlaceFromMatcher<RoadPlace>(obj);
+//				city->removePlaceFromMatcher<RoadPlace>(obj);
 				obj->setCity(NULL);
 			}
 		}

@@ -6,7 +6,7 @@
 
 #include "01_util/iostreams/Compression.h"
 #include "01_util/Conversion.h"
-#include "01_util/Exception.h"
+#include "Exception.h"
 #include "01_util/Log.h"
 #include "01_util/threads/Thread.h"
 
@@ -206,7 +206,7 @@ int main( int argc, char **argv )
 	}
     } 
 	
-    catch (synthese::util::Exception& ex)
+    catch (synthese::Exception& ex)
     {
 	Log::GetInstance ().fatal ("Exit!", ex);
     }
