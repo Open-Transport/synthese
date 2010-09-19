@@ -26,6 +26,8 @@
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
+
 
 namespace synthese
 {
@@ -45,12 +47,11 @@ namespace synthese
 	{
 		Crossing::Crossing(
 			util::RegistryKeyType key,
-			double lon,
-			double lat,
+			shared_ptr<Point> geometry,
 			std::string codeBySource,
 			const impex::DataSource* source
 		):	Hub(),
-			Vertex(this, lon, lat),
+			Vertex(this, geometry),
 			Registrable(key),
 			Importable(codeBySource, source)
 		{}
@@ -71,9 +72,9 @@ namespace synthese
 
 
 
-		const GeoPoint& Crossing::getPoint() const
+		boost::shared_ptr<geos::geom::Point> Crossing::getPoint() const
 		{
-			return static_cast<const GeoPoint&>(*this);
+			return WithGeometry<Point>::getGeometry();
 		}
 
 

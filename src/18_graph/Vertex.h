@@ -23,12 +23,21 @@
 #ifndef SYNTHESE_ENV_VERTEX_H
 #define SYNTHESE_ENV_VERTEX_H
 
-#include <map>
-
 #include "Registrable.h"
-#include "GeoPoint.h"
 #include "GraphTypes.h"
 #include "FactoryBase.h"
+#include "WithGeometry.hpp"
+
+#include <map>
+#include <geos/geom/Point.h>
+
+namespace geos
+{
+	namespace geom
+	{
+		class Point;
+	}
+}
 
 namespace synthese
 {
@@ -38,12 +47,12 @@ namespace synthese
 		class Edge;
 		class Path;
 
-		/** Vertex base class.
-			@ingroup m18
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Vertex base class.
+		///	@ingroup m18
 		class Vertex :
-			public geography::GeoPoint,
-			public virtual util::Registrable
+			public virtual util::Registrable,
+			public WithGeometry<geos::geom::Point>
 		{
 		public:
 			typedef std::multimap<const Path*, const Edge*> Edges;
@@ -58,8 +67,7 @@ namespace synthese
 
 			Vertex(
 				const Hub* hub,
-				double longitude,
-				double latitude
+				boost::shared_ptr<geos::geom::Point> geometry
 			);
 
 		public:

@@ -27,7 +27,14 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "GeoPoint.h"
+
+namespace geos
+{
+	namespace geom
+	{
+		class Point;
+	}
+}
 
 namespace synthese
 {
@@ -60,7 +67,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<StopPoint> _stop;
-			geography::GeoPoint _point;
+			boost::shared_ptr<geos::geom::Point> _point;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -77,8 +84,6 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			StopPointMoveAction():
-			  _point(0,0,0) {}
 
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.

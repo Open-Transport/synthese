@@ -322,7 +322,7 @@ namespace synthese
 			}
 			catch(SQLiteException& e)
 			{
-				throw util::Exception(e.getMessage());
+				throw Exception(e.getMessage());
 			}
 		}
 	}

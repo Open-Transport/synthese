@@ -30,6 +30,7 @@
 #include "StopPointTableSync.hpp"
 
 using namespace std;
+using namespace boost;
 using namespace geos::geom;
 
 namespace synthese
@@ -61,10 +62,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_STOP_ID, _stop->getKey());
 			}
-			if(!_point.isNull())
+			if(_point.get() && !_point->isEmpty())
 			{
-				map.insert(PARAMETER_X, _point.x);
-				map.insert(PARAMETER_Y, _point.y);
+				map.insert(PARAMETER_X, _point->getX());
+				map.insert(PARAMETER_Y, _point->getY());
 			}
 			map.insert(PARAMETER_OPERATOR_CODE, _operatorCode);
 			map.insert(PARAMETER_NAME, _name);
@@ -84,7 +85,10 @@ namespace synthese
 				throw ActionException("No such physical stop");
 			}
 
-			_point = GeoPoint(Coordinate(map.get<double>(PARAMETER_X), map.get<double>(PARAMETER_Y)));
+			_point = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+				map.get<double>(PARAMETER_X),
+				map.get<double>(PARAMETER_Y)
+			);
 			_operatorCode = map.get<string>(PARAMETER_OPERATOR_CODE);
 			_name = map.get<string>(PARAMETER_NAME);
 		}
@@ -97,7 +101,7 @@ namespace synthese
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			*_stop = _point;
+			_stop->setGeometry(_point);
 			_stop->setCodeBySource(_operatorCode);
 			_stop->setName(_name);
 

@@ -39,7 +39,7 @@
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
-
+#include "RoadModule.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "PTRoutePlannerResult.h"
 
@@ -240,13 +240,13 @@ namespace synthese
 			// Search form
 			stream << "<h1>Recherche</h1>";
 
-			const Place* startPlace(NULL);
-			const Place* endPlace(NULL);
+			shared_ptr<Place> startPlace;
+			shared_ptr<Place> endPlace;
 
 			if (!_startCity.empty() && !_endCity.empty())
 			{
-				startPlace = GeographyModule::FetchPlace(_startCity, _startPlace);
-				endPlace = GeographyModule::FetchPlace(_endCity, _endPlace);
+				startPlace = RoadModule::FetchPlace(_startCity, _startPlace);
+				endPlace = RoadModule::FetchPlace(_endCity, _endPlace);
 			}
 
 			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request);
@@ -255,25 +255,25 @@ namespace synthese
 			stream << st.cell("Commune départ", st.getForm().getTextInput(
 						PARAMETER_START_CITY, 
 						startPlace ? 
-						(dynamic_cast<const City*>(startPlace) ? dynamic_cast<const City*>(startPlace)->getName() : dynamic_cast<const NamedPlace*>(startPlace)->getCity()->getName()) :
+						(dynamic_cast<City*>(startPlace.get()) ? dynamic_cast<City*>(startPlace.get())->getName() : dynamic_cast<NamedPlace*>(startPlace.get())->getCity()->getName()) :
 						_startCity
 				)	);
 			stream << st.cell("Arrêt départ", st.getForm().getTextInput(
 						PARAMETER_START_PLACE,
 						startPlace ? 
-						(dynamic_cast<const City*>(startPlace) ? string() : dynamic_cast<const NamedPlace*>(startPlace)->getName()) :
+						(dynamic_cast<City*>(startPlace.get()) ? string() : dynamic_cast<NamedPlace*>(startPlace.get())->getName()) :
 						_startPlace
 				)	);
 			stream << st.cell("Commune arrivée", st.getForm().getTextInput(
 						PARAMETER_END_CITY,
 						endPlace ? 
-						(dynamic_cast<const City*>(endPlace) ? dynamic_cast<const City*>(endPlace)->getName() : dynamic_cast<const NamedPlace*>(endPlace)->getCity()->getName()) :
+						(dynamic_cast<const City*>(endPlace.get()) ? dynamic_cast<City*>(endPlace.get())->getName() : dynamic_cast<NamedPlace*>(endPlace.get())->getCity()->getName()) :
 						_endCity
 				)	);	
 			stream << st.cell("Arrêt arrivée", st.getForm().getTextInput(
 						PARAMETER_END_PLACE,
 						endPlace ? 
-						(dynamic_cast<const City*>(endPlace) ? string() : dynamic_cast<const NamedPlace*>(endPlace)->getName()) :
+						(dynamic_cast<const City*>(endPlace.get()) ? string() : dynamic_cast<NamedPlace*>(endPlace.get())->getName()) :
 						_endPlace
 				)	);
 			stream << st.cell(
@@ -300,7 +300,7 @@ namespace synthese
 				return;
 
 			TimeSlotRoutePlanner::Result dummy;
-			PTRoutePlannerResult jv(startPlace, endPlace, false, dummy);
+			PTRoutePlannerResult jv(startPlace.get(), endPlace.get(), false, dummy);
 			ptime now(second_clock::local_time());
 
 			if(!_confirmedTransaction.get())
@@ -324,8 +324,8 @@ namespace synthese
 				resaRequest.getAction()->setAccessParameters(ap);
 				stringstream trace;
 				PTTimeSlotRoutePlanner r(
-					startPlace,
-					endPlace,
+					startPlace.get(),
+					endPlace.get(),
 					_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
 					_planningOrder == DEPARTURE_FIRST ? endDate : _dateTime,
 					_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,

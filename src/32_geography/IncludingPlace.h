@@ -71,7 +71,7 @@ namespace synthese
 					const GraphTypes& whatToSearch
 				) const;
 
-				virtual const GeoPoint& getPoint() const;
+				virtual boost::shared_ptr<geos::geom::Point> getPoint() const;
 
 				virtual bool includes(const Place* place) const;
 

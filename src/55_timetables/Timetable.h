@@ -67,7 +67,7 @@ namespace synthese
 			typedef util::Registry<Timetable>	Registry;
 
 			class ImpossibleGenerationException:
-				public util::Exception
+				public synthese::Exception
 			{
 			public:
 				ImpossibleGenerationException();

@@ -24,37 +24,30 @@
 #define SYNTHESE_ENV_ADDRESS_H
 
 #include "UtilConstants.h"
-#include "GeoPoint.h"
+#include "RoadChunk.h"
+#include "Place.h"
 
 #include <vector>
 #include <set>
-
-namespace geos
-{
-	namespace geom
-	{
-		class Coordinate;
-	}
-}
+#include <boost/optional.hpp>
+#include <geos/geom/Point.h>
 
 namespace synthese
 {
 	namespace road
 	{
-		class RoadChunk;
-		class Road;
-
 		//////////////////////////////////////////////////////////////////////////
-		/// Address.
+		/// Point on a side of a street.
 		/// @ingroup m34
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
-		/// An address corresponds to a point on a side of a street.
+		/// The address is defined by a RoadChunk and a metric offset.
 		/// @image html uml_address.png
 		///
-		/// The address is defined by a RoadChunk and a metric offset.
+		/// It can correspond to a registered number on the street, or not
+		/// (optional _houseNumber attribute)
 		class Address:
-			public geography::GeoPoint
+			public WithGeometry<geos::geom::Point>
 		{
 		public:
 
@@ -62,17 +55,25 @@ namespace synthese
 		private:
 			RoadChunk* _roadChunk;
 			double	_metricOffset;
+			boost::optional<RoadChunk::HouseNumber> _houseNumber;
 
 
 		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// Empty constructor.
+			Address();
+
+
 
 			//////////////////////////////////////////////////////////////////////////
-			/// Direct constructor.
+			/// Constructor from values.
 			/// @param roadChunk road chunk where the address points to
 			/// @param metricOffset offset after the beginning of the chunk (and not the road)
+			/// @param houseNumber registered number of the point in the street
 			Address(
-				RoadChunk* roadChunk = NULL,
-				double metricOffset = UNKNOWN_VALUE
+				RoadChunk& roadChunk,
+				RoadChunk::MetricOffset metricOffset,
+				boost::optional<RoadChunk::HouseNumber> houseNumber = boost::optional<RoadChunk::HouseNumber>()
 			);
 
 
@@ -90,8 +91,26 @@ namespace synthese
 			//@{
 			//@}
 
-			//! @name Query methods
+			//! @name Services
 			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the vertices directly reachable from the house.
+				///	Two vertices are returned if the graph type is road : 
+				///	<ul>
+				///	<li>the beginning of the two chunk linked with the house</li>
+				///	<li>the beginning ot the revered chunk from the preceding one</li>
+				///	</ul>
+				///	Approach durations are computed from the accessParameters.
+				//////////////////////////////////////////////////////////////////////////
+				/// @retval result the two vertices
+				/// @param accessParameters parameters of access
+				/// @param whatToSearch graph of the returned vertices
+				void getVertexAccessMap(
+					graph::VertexAccessMap& result,
+					const graph::AccessParameters& accessParameters,
+					const geography::Place::GraphTypes& whatToSearch
+				) const;
+
 			//@}
 		};
 	}

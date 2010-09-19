@@ -31,6 +31,7 @@
 #include "AllowedUseRule.h"
 #include "GraphConstants.h"
 #include "Vertex.h"
+#include "House.hpp"
 
 #include <geos/geom/Envelope.h>
 
@@ -70,7 +71,7 @@ namespace synthese
 			Road& road
 		){
 			addPath(static_cast<Path*>(&road));
-			_isoBarycentreToUpdate = true;
+			_isoBarycentre.reset();
 		}
 		
 		
@@ -79,7 +80,7 @@ namespace synthese
 			Road& road
 		){
 			removePath(static_cast<Path*>(&road));
-			_isoBarycentreToUpdate = true;
+			_isoBarycentre.reset();
 		}
 
 
@@ -105,22 +106,27 @@ namespace synthese
 
 
 
-		const GeoPoint& RoadPlace::getPoint() const
+		boost::shared_ptr<geos::geom::Point> RoadPlace::getPoint() const
 		{
-			if (_isoBarycentreToUpdate)
+			if (!_isoBarycentre.get())
 			{
 				Envelope e;
 				BOOST_FOREACH(const Path* road, _paths)
 				{
 					BOOST_FOREACH(const Edge* edge, road->getEdges())
 					{
-						e.expandToInclude(*edge->getFromVertex());
+						if(edge->getFromVertex()->hasGeometry())
+						{
+							e.expandToInclude(*edge->getFromVertex()->getGeometry()->getCoordinate());
+						}
 					}
 				}
-				Coordinate c;
-				e.centre(c);
-				_isoBarycentre = GeoPoint(c);
-				_isoBarycentreToUpdate = false;
+				if(!e.isNull())
+				{
+					Coordinate c;
+					e.centre(c);
+					_isoBarycentre.reset(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(c));
+				}
 			}
 			return _isoBarycentre;
 
@@ -139,6 +145,28 @@ namespace synthese
 		std::string RoadPlace::getRuleUserName() const
 		{
 			return "Route "+ getFullName();
+		}
+
+
+
+		boost::shared_ptr<House> RoadPlace::getHouse( RoadChunk::HouseNumber houseNumber ) const
+		{
+			BOOST_FOREACH(Path* path, getPaths())
+			{
+				BOOST_FOREACH(Edge* edge, path->getEdges())
+				{
+					RoadChunk& chunk(static_cast<RoadChunk&>(*edge));
+					if(chunk.testIfHouseNumberBelongsToChunk(houseNumber))
+					{
+						return shared_ptr<House>(
+							new House(
+								chunk,
+								houseNumber
+						)	);
+					}
+				}
+			}
+			return shared_ptr<House>();
 		}
 	}
 }

@@ -21,13 +21,24 @@
 */
 
 #include "RoadModule.h"
+#include "GeographyModule.h"
+#include "RoadChunk.h"
+#include "House.hpp"
+#include "RoadPlace.h"
+
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
+using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
 	using namespace road;
 	using namespace server;
+	using namespace geography;
+
 
 	namespace graph
 	{
@@ -59,5 +70,119 @@ namespace synthese
 
 	namespace road
 	{
-	}
-}
+		RoadModule::ExtendedFetchPlaceResult RoadModule::ExtendedFetchPlace(
+			const GeographyModule::CitiesMatcher& citiesMatcher,
+			const std::string& cityName,
+			const std::string& placeName
+		){
+
+			ExtendedFetchPlaceResult result;
+
+			if (cityName.empty())
+			{
+				throw UndeterminedPlaceException(cityName, placeName, UndeterminedPlaceException::EMPTY_CITY);
+			}
+
+			GeographyModule::CitiesMatcher::MatchResult cities(
+				citiesMatcher.bestMatches(cityName,1)
+			);
+			if(cities.empty())
+			{
+				throw UndeterminedPlaceException(cityName, placeName, UndeterminedPlaceException::NO_RESULT_FROM_CITY_SEARCH);
+			}
+			result.cityResult = cities.front();
+			result.placeResult.key = result.cityResult.key;
+			result.placeResult.score = result.cityResult.score;
+			result.placeResult.value = result.cityResult.value;
+
+			assert(result.placeResult.value != NULL);
+			
+			if (!placeName.empty())
+			{
+				vector<string> words;
+				split(words, placeName, is_any_of(", "));
+				if(words.size() > 1)
+				{
+					try
+					{
+						RoadChunk::HouseNumber number(lexical_cast<RoadChunk::HouseNumber>(words[0]));
+
+						string roadName(placeName.substr(words[0].size() + 1));
+
+						City::PlacesMatcher::MatchResult places(
+							result.cityResult.value->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(roadName, 1)
+						);
+
+						if (!places.empty())
+						{
+							const RoadPlace& roadPlace(
+								dynamic_cast<const RoadPlace&>(*places.front().value)
+							);
+
+							shared_ptr<House> house(roadPlace.getHouse(number));
+
+							result.placeResult.key = places.front().key;
+							result.placeResult.score = places.front().score;
+							result.placeResult.value = house;
+						}
+
+						return result;
+					}
+					catch (bad_lexical_cast)
+					{
+					}
+				}
+
+
+
+				City::PlacesMatcher::MatchResult places(
+					result.cityResult.value->getAllPlacesMatcher().bestMatches(placeName, 1)
+				);
+				if (!places.empty())
+				{
+					result.placeResult.key = places.front().key;
+					result.placeResult.score = places.front().score;
+					result.placeResult.value = places.front().value;
+				}
+			}
+
+			return result;
+
+		}
+
+
+
+		RoadModule::ExtendedFetchPlaceResult RoadModule::ExtendedFetchPlace( const std::string& cityName, const std::string& placeName )
+		{
+			return ExtendedFetchPlace(GeographyModule::GetCitiesMatcher(), cityName, placeName);
+		}
+
+
+
+		boost::shared_ptr<geography::Place> RoadModule::FetchPlace(
+			const GeographyModule::CitiesMatcher& citiesMatcher,
+			const std::string& cityName,
+			const std::string& placeName
+		){
+			return ExtendedFetchPlace(citiesMatcher, cityName, placeName).placeResult.value;
+		}
+
+
+
+		boost::shared_ptr<geography::Place> RoadModule::FetchPlace( const std::string& cityName, const std::string& placeName )
+		{
+			return FetchPlace(GeographyModule::GetCitiesMatcher(), cityName, placeName);
+		}
+
+		
+
+		RoadModule::UndeterminedPlaceException::UndeterminedPlaceException(
+			const std::string& cityName,
+			const std::string& placeName,
+			RoadModule::UndeterminedPlaceException::Reason reason
+		):	Exception(
+				"Undetermined place, because " + string((reason == EMPTY_CITY) ? "city text is empty" : "city search got no results") + " (entered text was city="+ cityName + ", place="+ placeName +")"
+			)
+		{
+		}
+}	}

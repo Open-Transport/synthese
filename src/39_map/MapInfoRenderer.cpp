@@ -184,7 +184,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
     
     if (ret != 0)
     {
-	throw synthese::util::Exception ("Error executing Zip (zip executable in path ?)");
+	throw synthese::Exception ("Error executing Zip (zip executable in path ?)");
     }
     
 

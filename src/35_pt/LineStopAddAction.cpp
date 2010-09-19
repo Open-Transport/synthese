@@ -100,7 +100,7 @@ namespace synthese
 			shared_ptr<City> city(CityTableSync::GetEditable(cities.front()->getKey(), *_env));
 
 			const string place(map.get<string>(PARAMETER_STOP_NAME));
-			vector<const StopArea*> stops(
+			vector<shared_ptr<StopArea> > stops(
 				cities.front()->search<StopArea>(place, 1)
 			);
 			if(stops.empty())

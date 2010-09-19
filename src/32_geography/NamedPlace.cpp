@@ -41,23 +41,6 @@ namespace synthese
 
 
 		const std::string& 
-			NamedPlace::getName () const
-		{
-			return _name;
-		}
-
-
-
-		void 
-			NamedPlace::setName (const std::string& name)
-		{
-			_name = name;
-		}
-
-
-
-
-		const std::string& 
 			NamedPlace::getOfficialName () const
 		{
 			return getName ();
@@ -65,48 +48,19 @@ namespace synthese
 
 
 
-		const City* NamedPlace::getCity () const
-		{
-			return _city;
-		}
-
-
-
-		const std::string& NamedPlace::getName13() const
-		{
-			return _name13;
-		}
-
-		const std::string& NamedPlace::getName26() const
-		{
-			return _name26;
-		}
-
-		const std::string NamedPlace::getFullName() const
+		std::string NamedPlace::getFullName() const
 		{
 			return ((_city != NULL) ? (_city->getName() + " ") : "") + getName();
 		}
 
-		void NamedPlace::setCity( const City* city )
-		{
-			_city = city;
-		}
-
-
-		void NamedPlace::setName13( const std::string& name )
-		{
-			_name13 = name;
-		}
-
-		void NamedPlace::setName26( const std::string& name )
-		{
-			_name26 = name;
-		}
-
+		
+		
 		string NamedPlace::getName13OrName() const
 		{
 			return _name13.empty() ? _name.substr(0, 13) : _name13;
 		}
+
+
 
 		std::string NamedPlace::getName26OrName() const
 		{

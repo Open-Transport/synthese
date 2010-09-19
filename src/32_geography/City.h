@@ -57,7 +57,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<City>	Registry;
 
-			typedef lexical_matcher::LexicalMatcher<const NamedPlace*> PlacesMatcher;
+			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> > PlacesMatcher;
 
 		private:
 			typedef std::map<std::string, PlacesMatcher> PlacesMatchers;
@@ -116,11 +116,11 @@ namespace synthese
 
 
 				template<class T>
-				std::vector<const T*> search(
+				std::vector<boost::shared_ptr<T> > search(
 					const std::string& fuzzyName,
 					int nbMatches = 10
 				) const {
-					std::vector<const T*> result;
+					std::vector<boost::shared_ptr<T> > result;
 					const PlacesMatchers::const_iterator itMatcher(_lexicalMatchers.find(T::FACTORY_KEY));
 					assert(itMatcher != _lexicalMatchers.end());
 					PlacesMatcher::MatchResult matches = itMatcher->second.bestMatches (
@@ -128,7 +128,7 @@ namespace synthese
 					);
 					BOOST_FOREACH(const PlacesMatcher::MatchResult::value_type& it, matches)
 					{
-						result.push_back(static_cast<const T*>(it.value));
+						result.push_back(boost::static_pointer_cast<T>(it.value));
 					}
 					return result;
 				}

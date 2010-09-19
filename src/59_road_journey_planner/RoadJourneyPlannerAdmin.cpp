@@ -45,6 +45,7 @@
 #include "RoadPlace.h"
 #include "User.h"
 #include "UserTableSync.h"
+#include "RoadModule.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -137,8 +138,8 @@ namespace synthese
 
 			if (!_startCity.empty() && !_endCity.empty())
 			{
-				startPlace = GeographyModule::FetchPlace(_startCity, _startPlace);
-				endPlace = GeographyModule::FetchPlace(_endCity, _endPlace);
+				startPlace = RoadModule::FetchPlace(_startCity, _startPlace).get();
+				endPlace = RoadModule::FetchPlace(_endCity, _endPlace).get();
 			}
 
 			AdminFunctionRequest<RoadJourneyPlannerAdmin> searchRequest(_request);

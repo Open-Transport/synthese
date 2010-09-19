@@ -42,7 +42,7 @@
 #include "Log.h"
 
 #include <sstream>
-
+#include <limits>
 #include <boost/thread/thread.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -476,7 +476,13 @@ namespace synthese
 								graph::Journey::Distance distanceToEnd(
 									isGoalReached ?
 									0 :
-									_destinationVam.getIsobarycenter().distance(reachedVertex->getHub()->getPoint())
+									(
+										(_destinationVam.getCentroid().get() && reachedVertex->getHub()->getPoint().get()) ?
+										_destinationVam.getCentroid()->distance(
+											reachedVertex->getHub()->getPoint().get()
+										):
+										numeric_limits<graph::Journey::Distance>::max()
+									)
 								);
 
 								shared_ptr<RoutePlanningIntermediateJourney> resultJourney(

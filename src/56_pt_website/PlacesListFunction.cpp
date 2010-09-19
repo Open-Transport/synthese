@@ -131,14 +131,14 @@ namespace synthese
 			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
 			if(!site) throw RequestException("Incorrect site");
 		
-			TransportWebsite::CitiesMatcher::MatchResult cities(
+			GeographyModule::CitiesMatcher::MatchResult cities(
 				site->getCitiesMatcher().bestMatches(_cityText, 1)
 			);
 			if (cities.empty())
 			{
 				return;
 			}
-			const City* city(cities.front().value);
+			City* city(cities.front().value.get());
 
 			City::PlacesMatcher::MatchResult places(
 				city->getAllPlacesMatcher().bestMatches(_input, _n)
@@ -150,8 +150,8 @@ namespace synthese
 				BOOST_FOREACH(const City::PlacesMatcher::MatchHit it, places)
 				{
 					placesList.push_back(make_pair(
-						dynamic_cast<const Registrable*>(it.value) ? 
-						dynamic_cast<const Registrable*>(it.value)->getKey() : 0,
+						dynamic_cast<Registrable*>(it.value.get()) ? 
+						dynamic_cast<Registrable*>(it.value.get())->getKey() : 0,
 						it.key.getSource()
 					)	);
 				}
@@ -175,20 +175,20 @@ namespace synthese
 				BOOST_FOREACH(const City::PlacesMatcher::MatchHit it, places)
 				{
 					stream << "<option type=\"";
-					if(	dynamic_cast<const StopArea*>(it.value) ||
-						dynamic_cast<const PlaceAlias*>(it.value)
+					if(	dynamic_cast<StopArea*>(it.value.get()) ||
+						dynamic_cast<PlaceAlias*>(it.value.get())
 					){
 						stream << "stop";
 					}
-					else if(dynamic_cast<const PublicPlace*>(it.value))
+					else if(dynamic_cast<const PublicPlace*>(it.value.get()))
 					{
 						stream << "publicPlace";
 					}
-					else if(dynamic_cast<const RoadPlace*>(it.value))
+					else if(dynamic_cast<const RoadPlace*>(it.value.get()))
 					{
 						stream << "street";
 					}
-					else if(dynamic_cast<const Address*>(it.value))
+					else if(dynamic_cast<const Address*>(it.value.get()))
 					{
 						stream << "address";
 					}

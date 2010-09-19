@@ -149,15 +149,16 @@ namespace synthese
 							_reverseRoad,
 							-chunk.getMetricOffset()
 					)	);
-					shared_ptr<LineString> geometry(chunk.getStoredGeometry());
+					shared_ptr<LineString> geometry(chunk.getGeometry());
 					if(geometry.get())
 					{
 						reverseChunk->setGeometry(
 							shared_ptr<LineString>(
-								dynamic_cast<LineString*>(chunk.getStoredGeometry()->reverse())
+								dynamic_cast<LineString*>(chunk.getGeometry()->reverse())
 						)	);
 					}
 					_reverseRoad->addEdge(*reverseChunk);
+					chunk.setReverseRoadChunk(reverseChunk);
 				}
 				else
 				{
@@ -177,6 +178,7 @@ namespace synthese
 							0,
 							chunk.getRankInPath() - lastEdge.getRankInPath()
 						);
+						chunk.setReverseRoadChunk(reverseChunk);
 					}
 					else
 					{
@@ -191,6 +193,7 @@ namespace synthese
 						_reverseRoad->addEdge(
 							*reverseChunk							
 						);
+						chunk.setReverseRoadChunk(reverseChunk);
 					}
 				}
 			}
@@ -241,6 +244,7 @@ namespace synthese
 				_reverseRoad->addEdge(
 					*reverseChunk							
 				);
+				chunk.setReverseRoadChunk(reverseChunk);
 			}
 		}
 
@@ -288,6 +292,7 @@ namespace synthese
 			if(_reverseRoad && other._reverseRoad)
 			{
 				other._reverseRoad->merge(*_reverseRoad);
+				swap(other._reverseRoad, _reverseRoad);
 			}
 		}
 

@@ -394,8 +394,8 @@ namespace synthese
 		private:
 			//! \name Parameters
 			//@{
-				pt_website::TransportWebsite::ExtendedFetchPlaceResult	_departure_place;
-				pt_website::TransportWebsite::ExtendedFetchPlaceResult	_arrival_place;
+				road::RoadModule::ExtendedFetchPlaceResult	_departure_place;
+				road::RoadModule::ExtendedFetchPlaceResult	_arrival_place;
 				std::string									_originCityText;
 				std::string									_destinationCityText;
 				std::string									_originPlaceText;

@@ -159,11 +159,11 @@ namespace synthese
 						ls.setScheduleInput(other.getScheduleInput());
 						ls.setMetricOffset(maxMetricOffset - other.getMetricOffset());
 						ls.setRankInPath(rank++);
-						if(other.getStoredGeometry().get())
+						if(other.getGeometry().get())
 						{
 							ls.setGeometry(
 								shared_ptr<LineString>(
-									dynamic_cast<LineString*>(other.getStoredGeometry()->reverse())
+									dynamic_cast<LineString*>(other.getGeometry()->reverse())
 							)	);
 						}
 						LineStopTableSync::Save(&ls, transaction);
@@ -182,11 +182,11 @@ namespace synthese
 						ls.setScheduleInput(other.getScheduleInput());
 						ls.setRankInPath(other.getRankInPath());
 						ls.setMetricOffset(other.getMetricOffset());
-						if(other.getStoredGeometry().get())
+						if(other.getGeometry().get())
 						{
 							ls.setGeometry(
 								shared_ptr<LineString>(
-									dynamic_cast<LineString*>(other.getStoredGeometry()->clone())
+									dynamic_cast<LineString*>(other.getGeometry()->clone())
 							)	);
 						}
 						LineStopTableSync::Save(&ls, transaction);

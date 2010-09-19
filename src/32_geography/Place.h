@@ -23,15 +23,21 @@
 #ifndef SYNTHESE_ENV_PLACE_H
 #define SYNTHESE_ENV_PLACE_H
 
+#include "Registrable.h"
+#include "GraphTypes.h"
 
 #include <map>
 #include <string>
 #include <vector>
 #include <set>
+#include <boost/shared_ptr.hpp>
 
-#include "Registrable.h"
-#include "GraphTypes.h"
-#include "GeoPoint.h"
+namespace geos
+{
+	namespace geom
+	{
+		class Point;
+}	}
 
 namespace synthese
 {
@@ -56,8 +62,7 @@ namespace synthese
 			typedef std::set<graph::GraphIdType> GraphTypes;
 
 		protected:
-			mutable bool _isoBarycentreToUpdate;
-			mutable GeoPoint _isoBarycentre;
+			mutable boost::shared_ptr<geos::geom::Point> _isoBarycentre;
 
 		protected:
 
@@ -70,29 +75,26 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-
-			virtual void getVertexAccessMap(
-				graph::VertexAccessMap& result,
-				const graph::AccessParameters& accessParameters,
-				const GraphTypes& whatToSearch
-			) const = 0;
-
+				virtual void getVertexAccessMap(
+					graph::VertexAccessMap& result,
+					const graph::AccessParameters& accessParameters,
+					const GraphTypes& whatToSearch
+				) const = 0;
 
 
-			graph::VertexAccessMap getVertexAccessMap(
-				const graph::AccessParameters& accessParameters,
-				GraphTypes::value_type whatToSearch,
-				...
-			) const;
 
-			virtual const GeoPoint& getPoint() const = 0;
+				graph::VertexAccessMap getVertexAccessMap(
+					const graph::AccessParameters& accessParameters,
+					GraphTypes::value_type whatToSearch,
+					...
+				) const;
 
-			virtual bool includes(const Place* place) const;
+				virtual boost::shared_ptr<geos::geom::Point> getPoint() const = 0;
+
+				virtual bool includes(const Place* place) const;
 			//@}
 		    
 		};
-	}
-}
+}	}
 
 #endif
-

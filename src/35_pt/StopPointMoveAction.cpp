@@ -30,6 +30,8 @@
 #include "StopPointTableSync.hpp"
 
 using namespace std;
+using namespace geos::geom;
+using namespace boost;
 
 namespace synthese
 {
@@ -37,6 +39,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace geography;
+	using namespace db;
 	
 	namespace util
 	{
@@ -73,10 +76,11 @@ namespace synthese
 			{
 				throw ActionException("No such physical stop");
 			}
-			_point = GeoPoint(
-				map.get<double>(PARAMETER_LONGITUDE),
-				map.get<double>(PARAMETER_LATITUDE)
-			);
+			_point = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+				*DBModule::GetStorageCoordinatesSystem().createPoint(
+					map.get<double>(PARAMETER_LONGITUDE),
+					map.get<double>(PARAMETER_LATITUDE)
+			)	);
 		}
 		
 		
@@ -87,7 +91,7 @@ namespace synthese
 			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			
-			*_stop = _point;
+			_stop->setGeometry(_point);
 
 			StopPointTableSync::Save(_stop.get());
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());

@@ -85,7 +85,7 @@ namespace synthese
 				both the the departure and the arrival vertex access maps.
 			*/
 			class SamePlacesException:
-				public util::Exception
+				public synthese::Exception
 			{
 			public:
 				SamePlacesException();

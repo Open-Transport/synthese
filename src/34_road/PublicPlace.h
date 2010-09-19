@@ -66,7 +66,7 @@ namespace synthese
 					const geography::Place::GraphTypes& whatToSearch
 				) const;
 
-				virtual const geography::GeoPoint& getPoint() const;
+				virtual boost::shared_ptr<geos::geom::Point> getPoint() const;
 			//@}
 		};
 	}

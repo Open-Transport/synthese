@@ -29,15 +29,21 @@
 #include "AccessParameters.h"
 #include "GeographyModule.h"
 #include "LexicalMatcher.h"
+#include "RoadChunk.h"
+#include "RoadPlace.h"
+#include "House.hpp"
+#include "Env.h"
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace boost;
 using namespace std;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -47,6 +53,7 @@ namespace synthese
 	using namespace lexical_matcher;
 	using namespace pt;
 	using namespace graph;
+	using namespace road;
 
 	namespace util
 	{
@@ -166,24 +173,24 @@ namespace synthese
 
 
 		
-		const TransportWebsite::CitiesMatcher& TransportWebsite::getCitiesMatcher () const
+		const GeographyModule::CitiesMatcher& TransportWebsite::getCitiesMatcher () const
 		{
 			return _citiesMatcher.size() ? _citiesMatcher : GeographyModule::GetCitiesMatcher();
 		}
 		
 		
 		
-		void TransportWebsite::addCity(City* city)
+		void TransportWebsite::addCity(shared_ptr<City> city)
 		{
 			if(!city) return;
 			
 			// Conflict control
 			string name(city->getName());
-			CitiesMatcher::Map::const_iterator it(_citiesMatcher.entries().find(name));
+			GeographyModule::CitiesMatcher::Map::const_iterator it(_citiesMatcher.entries().find(name));
 			if(it != _citiesMatcher.entries().end())
 			{
 				string oldName(it->first.getSource());
-				City* oldCity(it->second);
+				shared_ptr<City> oldCity(it->second);
 				_citiesMatcher.remove(oldName);
 				_citiesMatcher.add(oldName + " (" + oldCity->getCode().substr(0,2) + ")", oldCity);
 				name += " (" + city->getCode().substr(0,2) + ")";
@@ -207,7 +214,7 @@ namespace synthese
 
 
 
-		const Place* TransportWebsite::fetchPlace(
+		const shared_ptr<Place> TransportWebsite::fetchPlace(
 			const string& cityName,
 			const string& placeName
 		) const {
@@ -216,40 +223,15 @@ namespace synthese
 
 
 
-		TransportWebsite::ExtendedFetchPlaceResult TransportWebsite::extendedFetchPlace(
+		RoadModule::ExtendedFetchPlaceResult TransportWebsite::extendedFetchPlace(
 			const std::string& cityName,
 			const std::string& placeName
 		) const	{
-			ExtendedFetchPlaceResult result;
-
-			if (cityName.empty())
-				throw Exception("Empty city name");
-
-			CitiesMatcher::MatchResult cities(
-				getCitiesMatcher().bestMatches(cityName,1)
+			return RoadModule::ExtendedFetchPlace(
+				getCitiesMatcher(),
+				cityName,
+				placeName
 			);
-			if(cities.empty()) throw Exception("An error has occured in city name search");
-			result.cityResult = cities.front();
-			result.placeResult.key = result.cityResult.key;
-			result.placeResult.score = result.cityResult.score;
-			result.placeResult.value = result.cityResult.value;
-
-			assert(result.placeResult.value != NULL);
-			
-			if (!placeName.empty())
-			{
-				City::PlacesMatcher::MatchResult places(
-					result.cityResult.value->getAllPlacesMatcher().bestMatches(placeName, 1)
-				);
-				if (!places.empty())
-				{
-					result.placeResult.key = places.front().key;
-					result.placeResult.score = places.front().score;
-					result.placeResult.value = places.front().value;
-				}
-			}
-
-			return result;
 		}
 
 
@@ -298,18 +280,9 @@ namespace synthese
 
 
 
-		TransportWebsite::ExtendedFetchPlaceResult::ExtendedFetchPlaceResult()
-		{
-			cityResult.value = NULL;
-			placeResult.value = NULL;
-		}
-
-
-
 		TransportWebsite::ForbiddenDateException::ForbiddenDateException():
-			Exception("Forbidden date")
+		Exception("Forbidden date")
 		{
 
 		}
-	}
-}
+}	}

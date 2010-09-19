@@ -54,6 +54,7 @@
 #include "UserTableSync.h"
 #include "GeographyModule.h"
 #include "OnlineReservationRule.h"
+#include "Env.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -229,30 +230,24 @@ namespace synthese
 				throw ActionException("Invalid seats number");
 
 			// Journey
-			const Place* originPlace(_site.get() 
-				? _site->fetchPlace(
-					map.get<string>(PARAMETER_ORIGIN_CITY)
-					, map.get<string>(PARAMETER_ORIGIN_PLACE)
-				) : GeographyModule::FetchPlace(
-					map.get<string>(PARAMETER_ORIGIN_CITY)
-					, map.get<string>(PARAMETER_ORIGIN_PLACE)
-				)
-			);
-			if(!originPlace)
+			shared_ptr<Place> originPlace(
+				RoadModule::FetchPlace(
+					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+					map.get<string>(PARAMETER_ORIGIN_CITY),
+					map.get<string>(PARAMETER_ORIGIN_PLACE)
+			)	);
+			if(!originPlace.get())
 			{
 				throw ActionException("Invalid origin place");
 			}
 
-			const Place* destinationPlace(_site.get()
-				? _site->fetchPlace(
-					map.get<string>(PARAMETER_DESTINATION_CITY)
-					, map.get<string>(PARAMETER_DESTINATION_PLACE)
-				) : GeographyModule::FetchPlace(
-					map.get<string>(PARAMETER_DESTINATION_CITY)
-					, map.get<string>(PARAMETER_DESTINATION_PLACE)
-				)
-			);
-			if(!destinationPlace)
+			shared_ptr<Place> destinationPlace(
+				RoadModule::FetchPlace(
+					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+					map.get<string>(PARAMETER_DESTINATION_CITY),
+					map.get<string>(PARAMETER_DESTINATION_PLACE)
+			)	);
+			if(!destinationPlace.get())
 			{
 				throw ActionException("Invalid destination place");
 			}
@@ -261,10 +256,12 @@ namespace synthese
 			ptime departureDateTime(time_from_string(map.get<string>(PARAMETER_DATE_TIME)));
 			ptime arrivalDateTime(departureDateTime);
 			arrivalDateTime += days(1);
-			if(	!originPlace->getPoint().isNull() &&
-				!destinationPlace->getPoint().isNull()
+			if(	originPlace->getPoint().get() &&
+				!originPlace->getPoint()->isEmpty() &&
+				destinationPlace->getPoint().get() &&
+				!destinationPlace->getPoint()->isEmpty()
 			){
-				arrivalDateTime += minutes(2 * static_cast<int>(originPlace->getPoint().distance(destinationPlace->getPoint()) / 1000));
+				arrivalDateTime += minutes(2 * static_cast<int>(originPlace->getPoint()->distance(destinationPlace->getPoint().get()) / 1000));
 			}
 
 			// Accessibility
@@ -298,8 +295,8 @@ namespace synthese
 			}
 
 			PTTimeSlotRoutePlanner rp(
-				originPlace
-				, destinationPlace
+				originPlace.get()
+				, destinationPlace.get()
 				, departureDateTime
 				, departureDateTime,
 				arrivalDateTime,

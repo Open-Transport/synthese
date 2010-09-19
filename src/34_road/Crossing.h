@@ -61,14 +61,13 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			/// @param key identifier (default=0)
-			/// @param lon longitude (default unknown)
+			/// @param geometry (default unknown) will not be cloned !
 			/// @param lat latitude (default unknown)
 			/// @param codeBySource code of the crossing in the data source (default empty)
 			/// @param source data source (default NULL)
 			Crossing(
 				util::RegistryKeyType key = 0,
-				double lon = UNKNOWN_VALUE,
-				double lat = UNKNOWN_VALUE,
+				boost::shared_ptr<geos::geom::Point> geometry = boost::shared_ptr<geos::geom::Point>(),
 				std::string codeBySource = std::string(),
 				const impex::DataSource* source = NULL
 			);
@@ -77,7 +76,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Destructor.
-			~Crossing ();
+			virtual ~Crossing ();
 
 
 
@@ -160,7 +159,7 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Gets the point representing the hub
 				/// @return itself (got from vertex superclass)
-				virtual const geography::GeoPoint& getPoint() const;
+				virtual boost::shared_ptr<geos::geom::Point> getPoint() const;
 			//@}
 
 

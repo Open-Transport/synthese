@@ -62,7 +62,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<const TransportWebsite> _site;
-			const geography::City* _city;
+			geography::City* _city;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

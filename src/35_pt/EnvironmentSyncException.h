@@ -2,7 +2,7 @@
 #define SYNTHESE_ENVLSSQL_ENVIRONMENTSYNCEXCEPTION_H
 
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <string>
 #include <iostream>
@@ -18,7 +18,7 @@ namespace envlssql
 @ingroup m17
 */
 
-class EnvironmentSyncException : public synthese::util::Exception
+class EnvironmentSyncException : public synthese::Exception
 {
  private:
 

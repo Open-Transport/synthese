@@ -31,12 +31,14 @@
 #include "PathGroup.h"
 #include "Registrable.h"
 #include "Registry.h"
+#include "RoadChunk.h"
 
 namespace synthese
 {
 	namespace road
 	{
 		class Road;
+		class House;
 		
 		////////////////////////////////////////////////////////////////////////
 		/// Road place class.
@@ -92,12 +94,27 @@ namespace synthese
 					const GraphTypes& whatToSearch
 				) const;
 
-				virtual const geography::GeoPoint& getPoint() const;
+				virtual boost::shared_ptr<geos::geom::Point> getPoint() const;
 
 				virtual std::string getNameForAllPlacesMatcher(
 					std::string text = std::string()
 				) const;
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets a house from a number.
+				/// Much cases :
+				/// <ul>
+				///	<li>the number is found inside a road chunk : OK</li>
+				///	</ul>
+				//////////////////////////////////////////////////////////////////////////
+				/// @param houseNumber the number of the house to get
+				/// @return auto generated House object corresponding to the point
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.2.0
+				boost::shared_ptr<House> getHouse(
+					RoadChunk::HouseNumber houseNumber
+				) const;
 			//@}
 		
 			//! @name Static algorithms

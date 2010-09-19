@@ -409,8 +409,8 @@ namespace synthese
 				endDate += days(1);
 
 				// Route planning
-				const Place* startPlace(_site->fetchPlace(_startCity, _startPlace));
-				const Place* endPlace(_site->fetchPlace(_endCity, _endPlace));
+				const Place* startPlace(_site->fetchPlace(_startCity, _startPlace).get());
+				const Place* endPlace(_site->fetchPlace(_endCity, _endPlace).get());
 
 				stream << "<h1>Résultats</h1>";
 

@@ -35,6 +35,7 @@
 #include <algorithm>
 #include <set>
 #include <sstream>
+#include <limits>
 
 #undef max
 #undef min
@@ -78,7 +79,11 @@ namespace synthese
 			_whatToSearch(whatToSearch),
 			_graphToUse(graphToUse),
 			_logStream(logStream),
-			_totalDistance(destinationVam.getIsobarycenter().distance(originVam.getIsobarycenter())),
+			_totalDistance(
+				(destinationVam.getCentroid().get() && originVam.getCentroid().get()) ?
+				destinationVam.getCentroid()->distance(originVam.getCentroid().get()) :
+				numeric_limits<int>::max()
+			),
 			_journeyTemplates(journeyTemplates),
 			_vmax(vmax)
 		{
@@ -355,7 +360,7 @@ namespace synthese
 
 
 		RoutePlanner::SamePlacesException::SamePlacesException()
-			: util::Exception("Same places in route planner")
+			: Exception("Same places in route planner")
 		{
 
 		}

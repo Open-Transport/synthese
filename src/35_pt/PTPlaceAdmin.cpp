@@ -49,9 +49,11 @@
 #include "HTMLMap.hpp"
 #include "StopPointMoveAction.hpp"
 #include "StaticActionRequest.h"
+#include "DBModule.h"
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -65,6 +67,7 @@ namespace synthese
 	using namespace geography;
 	using namespace road;
 	using namespace html;
+	using namespace db;
 
 	namespace util
 	{
@@ -149,20 +152,20 @@ namespace synthese
 
 					StaticActionRequest<StopPointMoveAction> moveAction(request);
 
-					GeoPoint mapCenter(_connectionPlace->getPoint());
-					if(mapCenter.isNull()) // If the place does not contain any point, it has no coordinate : search the last created place with coordinates
+					shared_ptr<Point> mapCenter(_connectionPlace->getPoint());
+					if(!mapCenter.get() || mapCenter->isEmpty()) // If the place does not contain any point, it has no coordinate : search the last created place with coordinates
 					{
 						const Registry<StopArea>& registry(Env::GetOfficialEnv().getRegistry<StopArea>());
 						BOOST_REVERSE_FOREACH(Registry<StopArea>::value_type stopArea, registry)
 						{
-							if(!stopArea.second->getPoint().isNull())
+							if(!stopArea.second->getPoint()->isEmpty())
 							{
 								mapCenter = stopArea.second->getPoint();
 								break;
 							}
 						}
 					}
-					HTMLMap map(mapCenter, 18, true, true);
+					HTMLMap map(*mapCenter, 18, true, true);
 					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 					{
 						moveAction.getAction()->setStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<StopPoint*>(it.second)));
@@ -183,16 +186,16 @@ namespace synthese
 								"</span>"
 							;
 						}
-						map.addPoint(HTMLMap::Point(*it.second, "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), it.second->getName() + "<br />" + popupcontent.str()));
+						map.addPoint(HTMLMap::MapPoint(*it.second->getGeometry(), "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), it.second->getName() + "<br />" + popupcontent.str()));
 					}
 					/*
 					BOOST_FOREACH(const AddressablePlace::Addresses::value_type& address, _addressablePlace->getAddresses())
 					{
 						map.addPoint(HTMLMap::Point(*address, "marker-green.png", "marker.png", "marker-gold.png", string(), string()));
 					}
-					map.draw(stream);
 					*/
 					/// @todo Station entrances
+					map.draw(stream);
 
 					AdminActionFunctionRequest<StopPointAddAction,PTPlaceAdmin> stopPointAddRequest(request);
 					stopPointAddRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
@@ -247,13 +250,16 @@ namespace synthese
 					const StopPoint* stop(it.second);
 					openRequest.getPage()->setStop(Env::GetOfficialEnv().getSPtr(stop));
 
+					shared_ptr<Point> pt(DBModule::GetStorageCoordinatesSystem().convertPoint(*stop->getGeometry()));
+
+					stream << fixed;
 					stream << t.row();
 					stream << t.col() << stop->getName();
 					stream << t.col() << stop->getCodeBySource();
-					stream << t.col() << stop->getLongitude();
-					stream << t.col() << stop->getLatitude();
-					stream << t.col() << stop->x;
-					stream << t.col() << stop->y;
+					stream << t.col() << pt->getX();
+					stream << t.col() << pt->getY();
+					stream << t.col() << stop->getGeometry()->getX();
+					stream << t.col() << stop->getGeometry()->getY();
 
 					// Lines cell
 					stream << t.col();

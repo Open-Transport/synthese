@@ -31,9 +31,11 @@
 #include "ReplaceQuery.h"
 
 #include <sstream>
+#include <geos/geom/Point.h>
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -42,7 +44,6 @@ namespace synthese
 	using namespace road;
 	using namespace impex;
 	using namespace graph;
-	using namespace geography;
 
 	namespace util
 	{
@@ -54,8 +55,7 @@ namespace synthese
 	{
 		const std::string CrossingTableSync::COL_CODE_BY_SOURCE ("code_by_source");
 		const std::string CrossingTableSync::COL_SOURCE_ID ("source_id");
-		const std::string CrossingTableSync::COL_LONGITUDE ("longitude");
-		const std::string CrossingTableSync::COL_LATITUDE ("latitude");
+		const std::string CrossingTableSync::COL_GEOMETRY("geometry");
 	}
 
 	namespace db
@@ -69,8 +69,7 @@ namespace synthese
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(CrossingTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
 			SQLiteTableSync::Field(CrossingTableSync::COL_SOURCE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(CrossingTableSync::COL_LONGITUDE, SQL_DOUBLE),
-			SQLiteTableSync::Field(CrossingTableSync::COL_LATITUDE, SQL_DOUBLE),
+			SQLiteTableSync::Field(CrossingTableSync::COL_GEOMETRY, SQL_GEOM_POINT),
 			SQLiteTableSync::Field()
 		};
 
@@ -85,11 +84,18 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Properties
-		    static_cast<GeoPoint&>(*object) = GeoPoint(
-				rows->getDouble(CrossingTableSync::COL_LONGITUDE),
-				rows->getDouble(CrossingTableSync::COL_LATITUDE)
-			);
+
+			// Geometry
+			shared_ptr<Point> point(
+				static_pointer_cast<Point, Geometry>(
+					rows->getGeometry(CrossingTableSync::COL_GEOMETRY)
+			)	);
+			if(point.get())
+			{
+				object->setGeometry(point);
+			}
+
+			// Code by source
 			object->setCodeBySource(rows->getText(CrossingTableSync::COL_CODE_BY_SOURCE));
 		
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
@@ -128,8 +134,7 @@ namespace synthese
 			ReplaceQuery<CrossingTableSync> query(*object);
 			query.addField(object->getCodeBySource());
 			query.addField(object->getDataSource() ? lexical_cast<string>(object->getDataSource()->getKey()) : 0);
-			query.addField(object->getLongitude());
-			query.addField(object->getLatitude());
+			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
 			query.execute(transaction);
 		}
 	}

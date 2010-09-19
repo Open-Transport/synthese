@@ -23,7 +23,10 @@
 #include "PublicPlace.h"
 #include "Registry.h"
 
+#include <geos/geom/Point.h>
+
 using namespace std;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -66,10 +69,10 @@ namespace synthese
 
 
 
-		const geography::GeoPoint& PublicPlace::getPoint() const
+		boost::shared_ptr<Point> PublicPlace::getPoint() const
 		{
 			/// @todo Envelope of entrances
-			return GeoPoint();
+			return boost::shared_ptr<Point>();
 		}
 	}
 }
