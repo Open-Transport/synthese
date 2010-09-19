@@ -25,7 +25,7 @@
 
 // Util
 #include "Conversion.h"
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <string>
 #include <iostream>
@@ -42,7 +42,7 @@ namespace synthese
 		@ingroup m01Registry m01Exceptions refExceptions
 		*/
 		template<class T>
-		class RegistryKeyException : public Exception
+		class RegistryKeyException : public synthese::Exception
 		{
 		 private:
 

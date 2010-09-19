@@ -129,7 +129,7 @@ namespace synthese
 			    }
 
 			}
-			catch (util::Exception& e)
+			catch (Exception& e)
 			{
 			    Log::GetInstance().debug("Exception", e);
 			    reply << "01" << e.what () << std::flush;

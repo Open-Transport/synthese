@@ -15,6 +15,7 @@
 #include <geos/geom/prep/PreparedPolygon.h>
 #include <proj_api.h>
 #include "Road.h"
+#include "OSMException.h"
 
 namespace synthese {
 namespace osm {

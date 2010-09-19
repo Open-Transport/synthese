@@ -1,7 +1,7 @@
 #include "07_lex_matcher/LexicalMatcher.h"
 
 #include "01_util/Conversion.h"
-#include "01_util/Exception.h"
+#include "Exception.h"
 #include "01_util/Log.h"
 
 #include <iostream>
@@ -94,7 +94,7 @@ int old_main( int argc, char **argv )
 	    std::cout << "? ";
 	}
     }
-    catch (synthese::util::Exception& ex)
+    catch (synthese::Exception& ex)
     {
 	Log::GetInstance ().fatal ("Exit!", ex);
     }

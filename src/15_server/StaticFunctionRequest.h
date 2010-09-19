@@ -52,7 +52,7 @@ namespace synthese
 			{
 				if(!request.getFunction().get())
 				{
-					throw util::Exception("The source request does not allow copy");
+					throw synthese::Exception("The source request does not allow copy");
 				}
 				_function = boost::shared_ptr<Function>(new FunctionT);
 				if (FunctionT::FACTORY_KEY == request.getFunction()->getFactoryKey() && copyFunction)

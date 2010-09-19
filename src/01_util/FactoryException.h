@@ -38,11 +38,11 @@ namespace synthese
 		/// Factory related exception class.
 		/// @ingroup m01Factory m01Exceptions refExceptions
 		template<class T>
-		class FactoryException : public synthese::util::Exception
+		class FactoryException : public synthese::Exception
 		{
 		public:
 
-			explicit FactoryException ( const std::string& message) : synthese::util::Exception(message) {}
+			explicit FactoryException ( const std::string& message) : synthese::Exception(message) {}
 			~FactoryException () throw () {}
 		};
 	}

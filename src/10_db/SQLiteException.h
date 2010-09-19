@@ -26,7 +26,7 @@
 #define SYNTHESE_DB_SQLITEEXCEPTION_H
 
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <string>
 #include <iostream>
@@ -49,7 +49,7 @@ namespace db
 	An empty result after a select query is not a SQLiteException error (use TableSyncEmptyResultError instead)
 */
 
-class SQLiteException : public synthese::util::Exception
+class SQLiteException : public synthese::Exception
 {
  private:
 

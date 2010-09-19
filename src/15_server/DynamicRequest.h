@@ -43,10 +43,10 @@ namespace synthese
 		public:
 			template<class T>
 			class BadTypeException:
-				public util::Exception
+				public synthese::Exception
 			{
 				BadTypeException(const std::string& factoryKey):
-					util::Exception("Bad type conversion on DynamicRequestPolicy : " + factoryKey + " was attempted to be converted into "+ T::FACTORY_KEY)
+					Exception("Bad type conversion on DynamicRequestPolicy : " + factoryKey + " was attempted to be converted into "+ T::FACTORY_KEY)
 				{
 				}
 			};

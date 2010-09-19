@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_db_LinkException_h__
 #define SYNTHESE_db_LinkException_h__
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 namespace synthese
 {
@@ -41,14 +41,14 @@ namespace synthese
 			@ingroup m10Exceptions refExceptions
 		*/
 		template<class C>
-		class LinkException : public util::Exception
+		class LinkException : public synthese::Exception
 		{
 		public:
 			LinkException(
 				const db::SQLiteResultSPtr& row,
 				const std::string& field,
-				const util::Exception& e
-			):	util::Exception(
+				const Exception& e
+			):	Exception(
 					"There was a link error in "+ C::TABLE.NAME +
 					" table at row "+ row->getText(TABLE_COL_ID) +
 					" when loading object "+ row->getText(field) +

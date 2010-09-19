@@ -22,7 +22,7 @@
 
 #include <sstream>
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 #include "Registry.h"
 
 #include "Profile.h"

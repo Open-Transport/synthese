@@ -5,7 +5,7 @@ namespace synthese
 	namespace dbring
 	{
 		DbRingException::DbRingException ( const std::string& message)
-			: synthese::util::Exception (message)
+			: synthese::Exception (message)
 		{
 		}
 

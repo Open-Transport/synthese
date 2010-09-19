@@ -24,7 +24,7 @@
 #define SYNTHESE_UTIL_XMLEXCEPTION_H
 
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <string>
 #include <iostream>
@@ -40,7 +40,7 @@ namespace util
 @ingroup m01XML m01Exceptions refExceptions
 */
 
-class XmlException : public synthese::util::Exception
+class XmlException : public synthese::Exception
 {
  private:
 
