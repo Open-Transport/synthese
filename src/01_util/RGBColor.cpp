@@ -79,7 +79,7 @@ namespace synthese
 
 
 		RGBColor::Exception::Exception()
-			: util::Exception("No such color")
+			: synthese::Exception("No such color")
 		{
 
 		}

@@ -24,7 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "DataSource.h"
-#include "01_util/Exception.h"
+#include "Exception.h"
 #include "FileFormat.h"
 #include "Factory.h"
 

@@ -24,7 +24,7 @@
 #define SYNTHESE_UTIL_THREADEXCEPTION_H
 
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <string>
 #include <iostream>
@@ -40,7 +40,7 @@ namespace util
 @ingroup m01Exceptions refExceptions
 */
 
-class ThreadException : public synthese::util::Exception
+class ThreadException : public synthese::Exception
 {
  private:
 

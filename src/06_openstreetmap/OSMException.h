@@ -5,8 +5,8 @@
  *      Author: tbonfort
  */
 
-#ifndef EXCEPTION_H_
-#define EXCEPTION_H_
+#ifndef OSM_EXCEPTION_H_
+#define OSM_EXCEPTION_H_
 
 #include <stdexcept>
 #include <string>
@@ -17,26 +17,26 @@ namespace osm {
 /**
  * \brief application specific exception
  */
-class Exception: public std::runtime_error {
+class OSMException: public std::runtime_error {
 public:
    /**
     * \param msg Textual representation of error
     */
-   explicit Exception(const std::string &msg);
+   explicit OSMException(const std::string &msg);
 };
 
 
-class RefNotFoundException: public Exception {
+class RefNotFoundException: public OSMException {
 public:
    explicit RefNotFoundException(const std::string &msg);
 };
 
-class UnknownTagException: public Exception {
+class UnknownTagException: public OSMException {
 public:
    explicit UnknownTagException(const std::string &tagname);
 };
 
-class TopologyException: public Exception {
+class TopologyException: public OSMException {
 public:
    explicit TopologyException(const std::string &msg);
 };

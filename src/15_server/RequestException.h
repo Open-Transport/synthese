@@ -2,7 +2,7 @@
 #define SYNTHESE_SERVER_REQUESTEXCEPTION_H
 
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <string>
 #include <iostream>
@@ -18,7 +18,7 @@ namespace server
 @ingroup m15
 */
 
-class RequestException : public synthese::util::Exception
+class RequestException : public synthese::Exception
 {
  private:
 

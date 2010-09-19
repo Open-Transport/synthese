@@ -41,8 +41,6 @@ namespace synthese
 {
 	namespace util
 	{
-		class Exception;
-
 		/** @defgroup m01Registry Registry and environments.
 			@ingroup m01
 			@{

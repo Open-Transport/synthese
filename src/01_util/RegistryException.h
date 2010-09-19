@@ -24,7 +24,7 @@
 #define SYNTHESE_UTIL_REGISTRYEXCEPTION_H
 
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <string>
 #include <iostream>
@@ -40,7 +40,7 @@ namespace synthese
 		@ingroup m01Registry m01Exceptions refExceptions
 		*/
 		template<class T>
-		class RegistryException : public synthese::util::Exception
+		class RegistryException : public synthese::Exception
 		{
 		 private:
 

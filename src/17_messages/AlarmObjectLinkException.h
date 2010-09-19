@@ -38,7 +38,7 @@ namespace synthese
 		/** Link to the alarm is broken
 			@ingroup m17Exceptions refExceptions
 		*/
-		class AlarmObjectLinkException : public synthese::util::Exception
+		class AlarmObjectLinkException : public synthese::Exception
 		{
 		public:
 

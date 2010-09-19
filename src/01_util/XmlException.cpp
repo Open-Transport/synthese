@@ -8,7 +8,7 @@ namespace util
 
 
 XmlException::XmlException ( const std::string& message)
-    : synthese::util::Exception (message)
+    : synthese::Exception (message)
 {
 }
 

@@ -29,7 +29,7 @@ namespace synthese
 
 
 		AdminParametersException::AdminParametersException( const std::string& message )
-			: util::Exception(message)
+			: Exception(message)
 		{
 
 		}

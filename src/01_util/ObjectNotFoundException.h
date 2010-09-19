@@ -37,7 +37,7 @@ namespace synthese
 			@ingroup m01Exceptions refExceptions
 		*/
 		template<class T>
-		class ObjectNotFoundException : public Exception
+		class ObjectNotFoundException : public synthese::Exception
 		{
 			const RegistryKeyType _key;
 

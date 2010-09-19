@@ -3,7 +3,7 @@
 #define SYNTHESE_UserException_H__
 
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <string>
 
@@ -12,7 +12,7 @@ namespace synthese
 {
 	namespace security
 	{
-		class UserException : public synthese::util::Exception
+		class UserException : public synthese::Exception
 		{
 		public:
 

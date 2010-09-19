@@ -27,7 +27,7 @@
 #include "Alarm.h"
 #include "17_messages/Types.h"
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <string>
 

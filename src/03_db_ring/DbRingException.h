@@ -2,7 +2,7 @@
 #define SYNTHESE_DBRING_DBRINGEXCEPTION_H
 
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <string>
 #include <iostream>
@@ -19,7 +19,7 @@ namespace dbring
 
 */
 
-class DbRingException : public synthese::util::Exception
+class DbRingException : public synthese::Exception
 {
  private:
 

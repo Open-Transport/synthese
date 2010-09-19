@@ -4,7 +4,7 @@
 
 
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <string>
 #include <iostream>
@@ -19,7 +19,7 @@ namespace synthese
 		/** Interface page parameters count related exception class
 			@ingroup m11Exceptions
 		*/
-		class InterfacePageException : public synthese::util::Exception
+		class InterfacePageException : public synthese::Exception
 		{
 		private:
 
