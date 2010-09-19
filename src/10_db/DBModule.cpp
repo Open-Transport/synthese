@@ -28,6 +28,7 @@
 #include "SQLiteTransaction.h"
 #include "Log.h"
 #include "Factory.h"
+#include "CoordinatesSystem.hpp"
 
 #include <iostream>
 #include <spatialite.h>
@@ -55,10 +56,7 @@ namespace synthese
 		SQLiteHandle* DBModule::_sqlite(NULL);
 		DBModule::SubClassMap DBModule::_subClassMap;
 
-		const string DBModule::_INSTANCE_COORDINATES_SYSTEM("instance_coordinates_system");
-		const CoordinatesSystem* DBModule::_instanceCoordinatesSystem(NULL);
 		const CoordinatesSystem* DBModule::_storageCoordinatesSystem(NULL);
-		DBModule::CoordinatesSystemsMap DBModule::_coordinates_systems;
 	}
 
 	namespace server
@@ -2813,7 +2811,8 @@ namespace synthese
 			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (27563, 'epsg', 27563, 'NTF (Paris) / Lambert Sud France', '+proj=lcc +lat_1=44.10000000000001 +lat_0=44.10000000000001 +lon_0=0 +k_0=0.999877499 +x_0=600000 +y_0=200000 +a=6378249.2 +b=6356515 +towgs84=-168,-60,320,0,0,0,0 +pm=paris +units=m +no_defs');");
 			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (27564, 'epsg', 27564, 'NTF (Paris) / Lambert Corse', '+proj=lcc +lat_1=42.16500000000001 +lat_0=42.16500000000001 +lon_0=0 +k_0=0.99994471 +x_0=234.358 +y_0=185861.369 +a=6378249.2 +b=6356515 +towgs84=-168,-60,320,0,0,0,0 +pm=paris +units=m +no_defs');");
 			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (27571, 'epsg', 27571, 'NTF (Paris) / Lambert zone I', '+proj=lcc +lat_1=49.50000000000001 +lat_0=49.50000000000001 +lon_0=0 +k_0=0.999877341 +x_0=600000 +y_0=1200000 +a=6378249.2 +b=6356515 +towgs84=-168,-60,320,0,0,0,0 +pm=paris +units=m +no_defs');");
-			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (27572, 'epsg', 27572, 'NTF (Paris) / Lambert zone II', '+proj=lcc +lat_1=46.8 +lat_0=46.8 +lon_0=0 +k_0=0.99987742 +x_0=600000 +y_0=2200000 +a=6378249.2 +b=6356515 +towgs84=-168,-60,320,0,0,0,0 +pm=paris +units=m +no_defs');");
+//			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (27572, 'epsg', 27572, 'NTF (Paris) / Lambert zone II', '+proj=lcc +lat_1=46.8 +lat_0=46.8 +lon_0=0 +k_0=0.99987742 +x_0=600000 +y_0=2200000 +a=6378249.2 +b=6356515 +towgs84=-168,-60,320,0,0,0,0 +pm=paris +units=m +no_defs');");
+			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (27572, 'epsg', 27572, 'NTF (Paris) / Lambert zone II', '+proj=lcc +lat_1=46.8 +lat_0=46.8 +lon_0=0 +k_0=0.99987742 +x_0=600000 +y_0=2200000 +a=6378249.2 +rf=293.4660210000000 +pm=2.337229167 +towgs84=-168,-60,320,0,0,0,0 +pm=paris +units=m +no_defs');");
 			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (27573, 'epsg', 27573, 'NTF (Paris) / Lambert zone III', '+proj=lcc +lat_1=44.10000000000001 +lat_0=44.10000000000001 +lon_0=0 +k_0=0.999877499 +x_0=600000 +y_0=3200000 +a=6378249.2 +b=6356515 +towgs84=-168,-60,320,0,0,0,0 +pm=paris +units=m +no_defs');");
 			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (27574, 'epsg', 27574, 'NTF (Paris) / Lambert zone IV', '+proj=lcc +lat_1=42.16500000000001 +lat_0=42.16500000000001 +lon_0=0 +k_0=0.99994471 +x_0=234.358 +y_0=4185861.369 +a=6378249.2 +b=6356515 +towgs84=-168,-60,320,0,0,0,0 +pm=paris +units=m +no_defs');");
 			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (27581, 'epsg', 27581, 'NTF (Paris) / France I (deprecated)', '+proj=lcc +lat_1=49.50000000000001 +lat_0=49.50000000000001 +lon_0=0 +k_0=0.999877341 +x_0=600000 +y_0=1200000 +a=6378249.2 +b=6356515 +towgs84=-168,-60,320,0,0,0,0 +pm=paris +units=m +no_defs');");
@@ -3600,19 +3599,25 @@ namespace synthese
 			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (32760, 'epsg', 32760, 'WGS 84 / UTM zone 60S', '+proj=utm +zone=60 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs');");
 			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (32761, 'epsg', 32761, 'WGS 84 / UPS South', '+proj=stere +lat_0=-90 +lat_ts=-90 +lon_0=0 +k=0.994 +x_0=2000000 +y_0=2000000 +ellps=WGS84 +datum=WGS84 +units=m +no_defs');");
 			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (32766, 'epsg', 32766, 'WGS 84 / TM 36 SE', '+proj=tmerc +lat_0=0 +lon_0=36 +k=0.9996 +x_0=500000 +y_0=10000000 +ellps=WGS84 +datum=WGS84 +units=m +no_defs');");
+			t.add("REPLACE INTO spatial_ref_sys (srid, auth_name, auth_srid, ref_sys_name, proj4text) VALUES (900913, 'epsg', 900913, 'Spherical Mercator Projection', '+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +no_defs');");
 			t.run();
 
 			SQLiteResultSPtr systems(DBModule::GetSQLite()->execQuery("SELECT * FROM spatial_ref_sys;"));
 			while(systems->next())
 			{
-				DBModule::AddCoordinatesSystem(
+				CoordinatesSystem::AddCoordinatesSystem(
 					systems->getInt("auth_srid"),
 					systems->getText("ref_sys_name"),
 					systems->getText("proj4text")
 				);
 			}
 
-			RegisterParameter(DBModule::_INSTANCE_COORDINATES_SYSTEM, "27572", DBModule::ChangeInstanceCoordinatesSystem);
+			DBModule::SetStorageCoordinatesSystem(CoordinatesSystem::GetCoordinatesSystem(4326));
+			RegisterParameter(
+				CoordinatesSystem::_INSTANCE_COORDINATES_SYSTEM,
+				"27572",
+				CoordinatesSystem::ChangeInstanceCoordinatesSystem
+			);
 		}
 
 
@@ -3660,7 +3665,7 @@ namespace synthese
 			map<string,string>::const_iterator it(_tableSyncMap.find(tableName));
 			if (it == _tableSyncMap.end())
 			{
-				throw SQLiteException("Table not found in database");
+				return shared_ptr<SQLiteTableSync>();
 			}
 			return shared_ptr<SQLiteTableSync>(Factory<SQLiteTableSync>::create(it->second));
 		}
@@ -3690,9 +3695,9 @@ namespace synthese
 		DBModule::ParameterCallback (const string& name, 
 						 const string& value)
 	    {
-			if(name == _INSTANCE_COORDINATES_SYSTEM)
+			if(name == CoordinatesSystem::_INSTANCE_COORDINATES_SYSTEM)
 			{
-				SetDefaultCoordinatesSystems(lexical_cast<SRID>(value));
+				CoordinatesSystem::SetDefaultCoordinatesSystems(lexical_cast<CoordinatesSystem::SRID>(value));
 			}
 	    }
 
@@ -3709,40 +3714,6 @@ namespace synthese
 		{
 			SubClassMap::const_iterator it(_subClassMap.find(id));
 			return (it == _subClassMap.end()) ? string() : it->second;
-		}
-
-
-
-		void DBModule::ChangeInstanceCoordinatesSystem( const std::string&, const std::string& value )
-		{
-			SetDefaultCoordinatesSystems(lexical_cast<SRID>(value));
-		}
-
-
-
-		const CoordinatesSystem& DBModule::GetCoordinatesSystem( SRID srid )
-		{
-			CoordinatesSystemsMap::const_iterator it(_coordinates_systems.find(srid));
-			if(it == _coordinates_systems.end())
-			{
-				throw CoordinatesSystemNotFoundException(srid);
-			}
-			return it->second;
-		}
-
-
-
-		void DBModule::AddCoordinatesSystem( SRID srid, const std::string& name, const std::string& projSequence )
-		{
-			_coordinates_systems[srid] = CoordinatesSystem(srid,name, projSequence);
-		}
-
-
-
-		void DBModule::SetDefaultCoordinatesSystems( SRID instanceSRID )
-		{
-			_instanceCoordinatesSystem = &GetCoordinatesSystem(instanceSRID);
-			_storageCoordinatesSystem = &GetCoordinatesSystem(4326);
 		}
 	}
 }

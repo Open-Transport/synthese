@@ -24,6 +24,7 @@
 #include "SQLiteException.h"
 #include "DBConstants.h"
 #include "DBModule.h"
+#include "CoordinatesSystem.hpp"
 
 #include <iomanip>
 #include <spatialite/sqlite3.h>
@@ -357,7 +358,7 @@ namespace synthese
 			}
 
 			stringstream str(colStr);
-			WKBReader reader(DBModule::GetDefaultGeometryFactory());
+			WKBReader reader(CoordinatesSystem::GetDefaultGeometryFactory());
 			try
 			{
 				return shared_ptr<Geometry>(reader.read(str));

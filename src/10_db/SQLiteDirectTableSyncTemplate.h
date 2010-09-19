@@ -32,7 +32,7 @@
 #include "SQLiteResult.h"
 #include "DBEmptyResultException.h"
 #include "SQLiteException.h"
-#include "01_util/Exception.h"
+#include "Exception.h"
 #include "SelectQuery.hpp"
 
 #include <sstream>

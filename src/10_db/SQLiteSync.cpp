@@ -114,6 +114,10 @@ namespace synthese
 			if (_isRegistered == false) return;
 
 			shared_ptr<SQLiteTableSync> tableSync(DBModule::GetTableSync(event.tbName));
+			if(!tableSync.get())
+			{
+				return;
+			}
 
 		    if (event.opType == SQLITE_INSERT) 
 		    {

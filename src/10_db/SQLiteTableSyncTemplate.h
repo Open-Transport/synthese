@@ -34,6 +34,7 @@
 #include "FactorableTemplate.h"
 #include "UtilTypes.h"
 #include "Log.h"
+#include "CoordinatesSystem.hpp"
 
 #include <sstream>
 #include <string>
@@ -465,14 +466,14 @@ namespace synthese
 				if(_FIELDS[i].isGeometry())
 				{
 					fieldsGetter << "AsBinary(";
-					if(DBModule::GetStorageCoordinatesSystem().getSRID() != DBModule::GetInstanceCoordinatesSystem().getSRID())
+					if(DBModule::GetStorageCoordinatesSystem().getSRID() != CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
 					{
 						fieldsGetter << "Transform(";
 					}
 					fieldsGetter << _FIELDS[i].name;
-					if(DBModule::GetStorageCoordinatesSystem().getSRID() != DBModule::GetInstanceCoordinatesSystem().getSRID())
+					if(DBModule::GetStorageCoordinatesSystem().getSRID() != CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
 					{
-						fieldsGetter << "," << DBModule::GetInstanceCoordinatesSystem().getSRID() << ")";
+						fieldsGetter << "," << CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID() << ")";
 					}
 					fieldsGetter << ") AS " << _FIELDS[i].name;
 				}

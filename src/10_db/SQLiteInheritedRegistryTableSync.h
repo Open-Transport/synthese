@@ -83,7 +83,7 @@ namespace synthese
 						Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 					}
 				}
-				catch(util::Exception& e)
+				catch(Exception& e)
 				{
 					if(registry.contains(key))
 					{
@@ -114,7 +114,7 @@ namespace synthese
 						Load(object, rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 					}
 				}
-				catch (util::Exception& e)
+				catch (Exception& e)
 				{
 					util::Log::GetInstance().warn("Error on load after row update : ", e);
 				}
@@ -140,7 +140,7 @@ namespace synthese
 						registry.remove(id);
 					}
 				}
-				catch (util::Exception& e)
+				catch (Exception& e)
 				{
 					util::Log::GetInstance().warn("Error on unload after row deletion : ", e);
 				}
