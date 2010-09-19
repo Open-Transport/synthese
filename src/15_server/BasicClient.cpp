@@ -13,12 +13,8 @@ using boost::asio::ip::tcp;
 
 namespace synthese
 {
-	using namespace util;
-	
 	namespace server
 	{
-
-
 		BasicClient::BasicClient(
 			const std::string& serverHost,
 			const string serverPort,
@@ -28,9 +24,7 @@ namespace synthese
 			_serverPort (serverPort),
 			_timeOut (timeOut),
 			_outputHTTPHeaders(outputHTTPHeaders)
-		{
-		}
-
+		{}
 
 
 	    
@@ -127,5 +121,4 @@ namespace synthese
 				throw Exception(e.what());
 			}
 		}
-	}
-}
+}	}

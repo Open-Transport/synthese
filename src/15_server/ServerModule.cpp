@@ -231,7 +231,7 @@ namespace synthese
 				Log::GetInstance().debug("Action error", e);
 				rep = HTTPReply::stock_reply(HTTPReply::bad_request);
 			}
-			catch(util::Exception& e)
+			catch(Exception& e)
 			{
 				Log::GetInstance().debug("Exception", e);
 				rep = HTTPReply::stock_reply(HTTPReply::internal_server_error);

@@ -24,6 +24,7 @@
 #define SYNTHESE_db_SQLExpression_hpp__
 
 #include "DBModule.h"
+#include "CoordinatesSystem.hpp"
 
 #include <set>
 #include <vector>
@@ -48,6 +49,14 @@ namespace synthese
 		public:
 			virtual std::string toString() const = 0;
 			virtual ~SQLExpression() {}
+		};
+
+		class NullExpression:
+			public SQLExpression
+		{
+		public:
+			virtual std::string toString() const { return "NULL"; }
+			static boost::shared_ptr<SQLExpression> Get() { return boost::shared_ptr<NullExpression>(new NullExpression); }
 		};
 
 		class FieldExpression:
@@ -290,19 +299,17 @@ namespace synthese
 			{
 				if(value.get() && !value->isEmpty())
 				{
-					std::stringstream str;
+					boost::shared_ptr<geos::geom::Geometry> projected(value);
 					if(DBModule::GetStorageCoordinatesSystem().getSRID() != value->getSRID())
 					{
-						str << "Transform(";
+						projected = DBModule::GetStorageCoordinatesSystem().convertGeometry(*value);
 					}
+
+					std::stringstream str;
 					str << "GeomFromWKB(X'";
 					geos::io::WKBWriter writer;
-					writer.writeHEX(*value, str);
-					str << "'," << value->getSRID() << ")";
-					if(DBModule::GetStorageCoordinatesSystem().getSRID() != value->getSRID())
-					{
-						str << "," << DBModule::GetStorageCoordinatesSystem().getSRID() << ")";
-					}
+					writer.writeHEX(*projected, str);
+					str << "'," << DBModule::GetStorageCoordinatesSystem().getSRID() << ")";
 					_value = str.str();
 				}
 				else
@@ -310,7 +317,9 @@ namespace synthese
 					_value ="NULL";
 				}
 			}
+
 			virtual std::string toString() const { return _value; }
+			
 			static boost::shared_ptr<SQLExpression> Get(const boost::shared_ptr<geos::geom::Geometry>& value)
 			{
 				return boost::shared_ptr<SQLExpression>(

@@ -1,6 +1,6 @@
 
 /** Exception class implementation.
-	@file 01_util/Exception.cpp
+	@file Exception.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -25,46 +25,36 @@
 
 namespace synthese
 {
-namespace util
-{
+	Exception::Exception ( const std::string& message ) throw ()
+		: _message (message)
+	{
+	}
+
+
+	Exception::~Exception () throw ()
+	{
+	}
 
 
 
-Exception::Exception ( const std::string& message ) throw ()
-    : _message (message)
-{
-}
-
-
-Exception::~Exception () throw ()
-{
-}
+	Exception::Exception ( const Exception& ref )
+		: _message (ref._message)
+	{
+	}
 
 
 
-Exception::Exception ( const Exception& ref )
-    : _message (ref._message)
-{
-}
+	const std::string& 
+	Exception::getMessage () const
+	{
+		return _message;
+	}
 
 
-
-const std::string& 
-Exception::getMessage () const
-{
-    return _message;
-}
-
-
-const char* 
-Exception::what () const throw ()
-{
-	return _message.c_str ();
-}
-
-
-
-
-}
+	const char* 
+	Exception::what () const throw ()
+	{
+		return _message.c_str ();
+	}
 }
 

@@ -42,7 +42,7 @@ namespace synthese
 		/// Action related exception class.
 		/// @ingroup m15/exception
 		class ActionException:
-			public util::Exception
+			public synthese::Exception
 		{
 			//lint --e{1712}
 

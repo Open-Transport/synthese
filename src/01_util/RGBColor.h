@@ -40,7 +40,7 @@ namespace synthese
 			/** Exception to raise if a constructor fails to initialize.
 				@ingroup m01
 			*/
-			class Exception : public util::Exception
+			class Exception : public synthese::Exception
 			{
 			public:
 				Exception();

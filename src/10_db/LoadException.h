@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_db_LoadException_h__
 #define SYNTHESE_db_LoadException_h__
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -37,14 +37,14 @@ namespace synthese
 		*/
 		template<class C>
 		class LoadException:
-			public util::Exception
+			public synthese::Exception
 		{
 		public:
 			LoadException(
 				const db::SQLiteResultSPtr& row,
 				const std::string& field,
 				const std::string& text
-			):	util::Exception(
+			):	Exception(
 					"There was a load error in "+ C::TABLE.NAME +
 					" table at row "+ boost::lexical_cast<std::string>(row->getLongLong(TABLE_COL_ID)) +
 					" in field "+ field +" : "+ text

@@ -7,7 +7,7 @@ namespace synthese
 	{
 
 		UserException::UserException(const std::string& message)
-			: util::Exception(message)
+			: Exception(message)
 		{
 
 		}

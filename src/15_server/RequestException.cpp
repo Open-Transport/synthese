@@ -29,7 +29,7 @@ namespace synthese
 	namespace server
 	{
 		RequestException::RequestException ( const std::string& message) throw()
-			: synthese::util::Exception (message)
+			: synthese::Exception (message)
 		{
 		}
 

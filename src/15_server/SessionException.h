@@ -1,5 +1,5 @@
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 
 #include <string>
 #include <iostream>
@@ -15,7 +15,7 @@ namespace synthese
 		@ingroup m15
 		*/
 
-		class SessionException : public synthese::util::Exception
+		class SessionException : public synthese::Exception
 		{
 		private:
 

@@ -153,7 +153,7 @@ namespace synthese
 						linkLevel
 						)	);
 				}
-				catch(util::Exception& e)
+				catch(Exception& e)
 				{
 					util::Log::GetInstance().warn(e.getMessage(), e);
 				}

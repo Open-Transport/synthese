@@ -26,7 +26,7 @@ namespace synthese
 	namespace server
 	{
 		ClientException::ClientException(const std::string& message)
-			: util::Exception(message)
+			: Exception(message)
 		{
 
 		}

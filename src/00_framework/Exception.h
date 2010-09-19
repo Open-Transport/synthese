@@ -33,43 +33,40 @@
 
 namespace synthese
 {
-	namespace util
+	//lint --e{1712}
+
+	////////////////////////////////////////////////////////////////////
+	/// Base exception class
+	///	@ingroup m01
+	class Exception : public std::exception
 	{
-		//lint --e{1712}
+	 private:
 
-		////////////////////////////////////////////////////////////////////
-		/// Base exception class
-		///	@ingroup m01
-		class Exception : public std::exception
-		{
-		 private:
-
-			const std::string _message; //!< Error message
+		const std::string _message; //!< Error message
 
 
-		 public:
+	 public:
 
-			Exception(const std::string& message ) throw ();
-			Exception(const synthese::util::Exception& ref );
+		Exception(const std::string& message ) throw ();
+		Exception(const synthese::Exception& ref );
 
-			virtual ~Exception () throw ();
-		    
+		virtual ~Exception () throw ();
+	    
 
-			//! @name Getters/Setters
-			//@{
-			const std::string& getMessage () const;
-			//@}
-		    
-			//! @name Query methods
-			//@{
-			const char* what () const throw ();
+		//! @name Getters/Setters
+		//@{
+		const std::string& getMessage () const;
+		//@}
+	    
+		//! @name Query methods
+		//@{
+		const char* what () const throw ();
 
-		 private:
+	 private:
 
-			Exception& operator= ( const Exception& rhs );
+		Exception& operator= ( const Exception& rhs );
 
-		};
-	}
+	};
 }
 
 #endif

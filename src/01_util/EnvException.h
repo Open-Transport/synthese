@@ -34,7 +34,7 @@ namespace synthese
 			@ingroup m01Registry
 		*/
 		class EnvException
-		: public util::Exception
+			: public synthese::Exception
 		{
 		public:
 			//////////////////////////////////////////////////////////////////////////

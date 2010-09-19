@@ -60,7 +60,7 @@ namespace synthese
 				}
 				else
 				{
-					throw util::Exception("The source request does not allow copy");
+					throw Exception("The source request does not allow copy");
 				}
 			}
 

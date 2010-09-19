@@ -27,7 +27,7 @@ namespace synthese
 	namespace db
 	{
 		SQLiteException::SQLiteException ( const std::string& message)
-			: synthese::util::Exception (message)
+			: synthese::Exception (message)
 		{
 		}
 
