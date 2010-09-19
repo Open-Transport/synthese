@@ -25,6 +25,8 @@
 #include "WebPageMenuFunction.hpp"
 #include "WebPageLinkFunction.hpp"
 #include "WebPageFormFunction.hpp"
+#include "WebpageNextFunction.hpp"
+#include "WebpagePreviousFunction.hpp"
 
 #include "WebPageAdmin.h"
 
