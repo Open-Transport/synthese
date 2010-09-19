@@ -78,6 +78,9 @@ namespace synthese
 			void addField(const T& value);
 
 
+			void addFieldNull();
+
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Adds an expression field to the query
@@ -98,6 +101,16 @@ namespace synthese
 				boost::optional<SQLiteTransaction&> transaction
 			) const;
 		};
+
+
+
+		template<class TableSync>
+		void synthese::db::ReplaceQuery<TableSync>::addFieldNull()
+		{
+			_fields.push_back(
+				NullExpression::Get()
+			);
+		}
 
 
 

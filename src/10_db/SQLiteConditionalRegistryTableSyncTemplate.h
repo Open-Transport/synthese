@@ -28,7 +28,7 @@
 
 #include "SQLiteDirectTableSyncTemplate.h"
 
-#include "01_util/Exception.h"
+#include "Exception.h"
 #include "Log.h"
 
 namespace synthese
@@ -93,7 +93,7 @@ namespace synthese
 							Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						}
 					}
-					catch(util::Exception& e)
+					catch(Exception& e)
 					{
 						if(registry.contains(key))
 						{
@@ -129,7 +129,7 @@ namespace synthese
 							Load(address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 						}
 					}
-					catch (util::Exception& e)
+					catch (Exception& e)
 					{
 						util::Log::GetInstance().warn("Error on load after row update : ", e);
 					}
@@ -160,7 +160,7 @@ namespace synthese
 							registry.remove(id);
 						}
 					}
-					catch (util::Exception& e)
+					catch (Exception& e)
 					{
 						util::Log::GetInstance().warn("Error on unload after row deletion : ", e);
 					}

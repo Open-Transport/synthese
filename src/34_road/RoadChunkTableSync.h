@@ -35,7 +35,7 @@ namespace geos
 {
 	namespace geom
 	{
-		class Coordinate;
+		class Point;
 	}
 }
 
@@ -125,7 +125,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// The official environment is used.
 			static RoadChunkTableSync::SearchResult SearchByMaxDistance(
-				const geos::geom::Coordinate& point,
+				const geos::geom::Point& point,
 				double distanceLimit,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);

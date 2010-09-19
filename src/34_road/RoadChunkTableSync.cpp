@@ -26,7 +26,6 @@
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "LinkException.h"
-#include "GeoPoint.h"
 #include "CoordinatesSystem.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -43,7 +42,6 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace road;
-	using namespace geography;
 
 	namespace util
 	{
@@ -221,7 +219,7 @@ namespace synthese
 			query.addField((rightChunk && rightChunk->getHouseNumberBounds()) ? lexical_cast<string>(rightChunk->getHouseNumberBounds()->second) :	string());
 			query.addField(static_cast<int>((leftChunk && leftChunk->getHouseNumberBounds()) ? leftChunk->getHouseNumberingPolicy() : RoadChunk::ALL));
 			query.addField(static_cast<int>((rightChunk && rightChunk->getHouseNumberBounds()) ? rightChunk->getHouseNumberingPolicy() : RoadChunk::ALL));
-			query.addField(static_pointer_cast<Geometry,LineString>(object->getStoredGeometry()));
+			query.addField(static_pointer_cast<Geometry,LineString>(object->getGeometry()));
 			query.execute(transaction);
 	    }
 	}
@@ -246,24 +244,43 @@ namespace synthese
 
 
 		RoadChunkTableSync::SearchResult RoadChunkTableSync::SearchByMaxDistance(
-			const geos::geom::Coordinate& point,
+			const geos::geom::Point& point,
 			double distanceLimit,
-			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+			util::LinkLevel linkLevel
 		){
-			Coordinate minCoord(point.x - distanceLimit, point.y - distanceLimit);
-			GeoPoint minPoint(minCoord, DBModule::GetInstanceCoordinatesSystem());
-			Coordinate maxCoord(point.x + distanceLimit, point.y + distanceLimit);
-			GeoPoint maxPoint(maxCoord, DBModule::GetInstanceCoordinatesSystem());
+			if(point.isEmpty())
+			{
+				return SearchResult();
+			}
 
+			shared_ptr<Point> minPoint(
+				DBModule::GetStorageCoordinatesSystem().convertPoint(
+					*CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+						point.getX() - distanceLimit,
+						point.getY() - distanceLimit
+			)	)	);
+			shared_ptr<Point> maxPoint(
+				DBModule::GetStorageCoordinatesSystem().convertPoint(
+					*CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+						point.getX() + distanceLimit,
+						point.getY() + distanceLimit
+			)	)	);
+			
 			stringstream subQuery;
-			subQuery << "SELECT pkid FROM idx_" << RoadChunkTableSync::TABLE.NAME << " WHERE " <<
-				"xmin > " << minPoint.getLongitude() << " AND xmax < " << maxPoint.getLongitude() <<
-				" AND ymin > " << minPoint.getLatitude() << " AND ymax < " << maxPoint.getLatitude()
+			subQuery << "SELECT pkid FROM idx_" << RoadChunkTableSync::TABLE.NAME << "_" << RoadChunkTableSync::COL_GEOMETRY << " WHERE " <<
+				"xmin > " << minPoint->getX() << " AND xmax < " << maxPoint->getX() <<
+				" AND ymin > " << minPoint->getY() << " AND ymax < " << maxPoint->getY()
 			;
 
 			SelectQuery<RoadChunkTableSync> query;
 			query.addTableField(TABLE_COL_ID);
-			query.addWhereField(TABLE_COL_ID, SubQueryExpression::Get(subQuery.str()), ComposedExpression::OP_IN);
+			query.addWhere(
+				ComposedExpression::Get(
+					FieldExpression::Get(RoadChunkTableSync::TABLE.NAME, TABLE_COL_ID),
+					ComposedExpression::OP_IN,
+					SubQueryExpression::Get(subQuery.str())
+			)	);
+
 			return LoadFromQuery(query, Env::GetOfficialEnv(), linkLevel);
 		}
 	}
