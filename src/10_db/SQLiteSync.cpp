@@ -113,11 +113,7 @@ namespace synthese
 			boost::recursive_mutex::scoped_lock lock (_tableSynchronizersMutex);
 			if (_isRegistered == false) return;
 
-			shared_ptr<SQLiteTableSync> tableSync(DBModule::GetTableSync(event.tbName));
-			if(!tableSync.get())
-			{
-				return;
-			}
+			SQLiteTableSync* tableSync(event.table);
 
 		    if (event.opType == SQLITE_INSERT) 
 		    {
