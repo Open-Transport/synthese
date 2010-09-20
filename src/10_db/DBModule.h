@@ -52,7 +52,6 @@ namespace synthese
 	*/
 	namespace db
 	{
-
 	    class SQLite;
 	    class SQLiteHandle;
 		class SQLiteTableSync;
@@ -69,14 +68,15 @@ namespace synthese
 			
 		public:
 			typedef std::map<util::RegistryKeyType, std::string>	SubClassMap;
+			typedef std::map<std::string, boost::shared_ptr<SQLiteTableSync> > TablesByNameMap;
+			typedef std::map<int, boost::shared_ptr<SQLiteTableSync> > TablesByIdMap;
 
 
 		private:
-
 		    static SQLiteHandle*	_sqlite;
 			static SubClassMap		_subClassMap;
-			static std::map<std::string,std::string>	_tableSyncMap;
-			static std::map<int,std::string>	_idTableSyncMap;
+			static TablesByNameMap	_tableSyncMap;
+			static TablesByIdMap	_idTableSyncMap;
 		    static boost::filesystem::path _DatabasePath;
 			static const CoordinatesSystem* _storageCoordinatesSystem;
 
@@ -94,6 +94,7 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.1.16
+			/// @throws SQLiteException if the table was not found
 			static boost::shared_ptr<SQLiteTableSync> GetTableSync(const std::string& tableName);
 			
 
@@ -105,7 +106,12 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.1.16
+			/// @throws SQLiteException if the table was not found
 			static boost::shared_ptr<SQLiteTableSync> GetTableSync(int tableId);
+
+			//////////////////////////////////////////////////////////////////////////
+			/// @since 3.2.0
+			static const TablesByNameMap& GetTablesByName(){ return _tableSyncMap; }
 
 		    /** Called whenever a parameter registered by this module is changed
 		     */

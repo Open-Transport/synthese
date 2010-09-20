@@ -38,48 +38,38 @@
 
 namespace synthese
 {
-namespace db
-{
+	namespace db
+	{
+		class SQLiteHandle;
+		class SQLiteTableSync;
+		
+		/** SQLite synchronizer class.
+			Manages a set of table synchronizers which synchronize 
+			db data with live object model.
+			@ingroup m10
+		*/
+		class SQLiteSync:
+			public SQLiteUpdateHook
+		{
+		private:
 
-    class SQLiteHandle;
-    class SQLiteTableSync;
+			bool _isRegistered;
 
+			std::map<std::string, boost::shared_ptr<SQLiteTableSync> > _tableSynchronizers;
+			std::map<std::string, boost::shared_ptr<SQLiteTableSync> > _rankedTableSynchronizers;
+			mutable boost::recursive_mutex _tableSynchronizersMutex; 
 
+		public:
 
-/** SQLite synchronizer class.
-    Manages a set of table synchronizers which synchronize 
-    db data with live object model.
+			SQLiteSync ();
+			~SQLiteSync ();
 
+			void registerCallback (SQLiteHandle* emitter);
 
-@ingroup m10
-*/
-
-class SQLiteSync : public synthese::db::SQLiteUpdateHook
-{
- private:
-
-    bool _isRegistered;
-
-	std::map<std::string, boost::shared_ptr<SQLiteTableSync> > _tableSynchronizers;
-	std::map<std::string, boost::shared_ptr<SQLiteTableSync> > _rankedTableSynchronizers;
-	mutable boost::recursive_mutex _tableSynchronizersMutex; 
-
- public:
-
-    SQLiteSync ();
-    ~SQLiteSync ();
-
-    void registerCallback (SQLiteHandle* emitter);
-    
-    void eventCallback (SQLiteHandle* emitter,
-			const SQLiteEvent& event);
-};
-
-
-
-
-}
-
-}
+			//////////////////////////////////////////////////////////////////////////
+			/// @pre event table attribute must be not null
+			void eventCallback (SQLiteHandle* emitter,
+					const SQLiteEvent& event);
+		};
+}	}
 #endif
-
