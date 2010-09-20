@@ -1,0 +1,28 @@
+</div>
+<div id="copyright">&copy; RCSmobility - Ce document est la propriété exclusive de RCSmobility et ne peut être copié ni diffusé sans l'autorisation de RCSmobility.<br />Dernière mise à jour : $datetime</div>
+
+<script type="text/javascript">
+//<![CDATA[
+
+// Clickable diagrams
+var divcoll = document.getElementsByTagName("div");
+var o;
+for(o in divcoll)
+{
+	if(divcoll[o].className == 'dynsection')
+	{
+		var imgs = divcoll[o].getElementsByTagName("img");
+		var i;
+		for(i in imgs)
+		{
+			imgs[i].onclick = function(){
+				if(this.className == '') this.className = 'imgactivated'; else this.className='';
+			};
+		}
+	}
+}
+
+//]]>
+</script>
+</body>
+</html>

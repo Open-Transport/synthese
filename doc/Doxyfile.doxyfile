@@ -592,8 +592,8 @@ WARN_LOGFILE           =
 
 INPUT                  = ../src \
                          ../utils \
-                         ../../../doc/res \
-                         include
+                         include \
+                         template
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
@@ -686,8 +686,8 @@ EXAMPLE_RECURSIVE      = YES
 
 IMAGE_PATH             = img \
                          include \
-                         ../../../doc/res \
-                         ../../../data/interface/common/s3-admin/deb/opt/rcs/common-datas3-interface-admin/files
+                         ../../../data/interface/common/s3-admin/deb/opt/rcs/common-datas3-interface-admin/files \
+                         template
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should 
 # invoke to filter for each input file. Doxygen will invoke the filter program 
@@ -817,13 +817,13 @@ HTML_FILE_EXTENSION    = .html
 # each generated HTML page. If it is left blank doxygen will generate a 
 # standard header.
 
-HTML_HEADER            = ../../../doc/res/header.html
+HTML_HEADER            = template/header.html
 
 # The HTML_FOOTER tag can be used to specify a personal HTML footer for 
 # each generated HTML page. If it is left blank doxygen will generate a 
 # standard footer.
 
-HTML_FOOTER            = ../../../doc/res/footer.html
+HTML_FOOTER            = template/footer.html
 
 # The HTML_STYLESHEET tag can be used to specify a user-defined cascading 
 # style sheet that is used by each HTML page. It can be used to 
@@ -832,7 +832,7 @@ HTML_FOOTER            = ../../../doc/res/footer.html
 # the style sheet file to the HTML output directory, so don't put your own 
 # stylesheet in the HTML output directory as well, or it will be erased!
 
-HTML_STYLESHEET        = ../../../doc/res/default.css
+HTML_STYLESHEET        = template/default.css
 
 # If the HTML_TIMESTAMP tag is set to YES then the footer of each generated HTML 
 # page will contain the date and time when the page was generated. Setting 
