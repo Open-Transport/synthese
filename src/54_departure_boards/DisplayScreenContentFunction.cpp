@@ -328,7 +328,7 @@ namespace synthese
 
 		void DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			if(_type->getDisplayInterface()!=NULL)
+			if(_screen->getType() && _screen->getType()->getDisplayInterface()!=NULL)
 			{
 				_screen->display(stream, _date ? *_date : second_clock::local_time(), &request);
 			}
