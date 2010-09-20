@@ -55,7 +55,7 @@ namespace synthese
 
 		void WebpageNextFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			optional<RegistryKeyType> pageId(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
+			optional<RegistryKeyType> pageId(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
 			if(pageId) try
 			{
 				_webpage = Env::GetOfficialEnv().get<Webpage>(*pageId);
