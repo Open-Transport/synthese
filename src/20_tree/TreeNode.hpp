@@ -120,7 +120,7 @@ namespace synthese
 					{
 						return NULL;
 					}
-					ChildrenType::const_iterator it(_parent->_children.find(this->getTreeOrderingKey()));
+					typename ChildrenType::const_iterator it(_parent->_children.find(this->getTreeOrderingKey()));
 					if(it == _parent->_children.end())
 					{
 						return NULL;
@@ -148,7 +148,7 @@ namespace synthese
 					{
 						return NULL;
 					}
-					ChildrenType::const_iterator it(_parent->_children.find(this->getTreeOrderingKey()));
+					typename ChildrenType::const_iterator it(_parent->_children.find(this->getTreeOrderingKey()));
 					if(it == _parent->_children.end() || it == _parent->_children.begin())
 					{
 						return NULL;
