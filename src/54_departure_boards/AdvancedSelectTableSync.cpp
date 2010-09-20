@@ -137,8 +137,16 @@ namespace synthese
 					shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
 					object->broadCastPointsNumber = rows->getInt ("bc");
 					object->cpuNumber = rows->getInt("cc");
-					object->place.reset(new StopArea(rows->getKey()));
-					StopAreaTableSync::Load(object->place.get(), rows, env);
+					if(env.getRegistry<StopArea>().contains(rows->getKey()))
+					{
+						object->place = env.getEditable<StopArea>(rows->getKey());
+					}
+					else
+					{
+						object->place.reset(new StopArea(rows->getKey()));
+						env.getEditableRegistry<StopArea>().add(object->place);
+						StopAreaTableSync::Load(object->place.get(), rows, env);
+					}
 					object->cityName = rows->getText ("city_name");
 					objects.push_back(object);
 				}
