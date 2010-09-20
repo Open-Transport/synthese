@@ -186,7 +186,7 @@ namespace synthese
 				return ret;
 			}
 
-			const geos::geom::GeometryFactory& gf(db::DBModule::GetDefaultGeometryFactory());
+			const geos::geom::GeometryFactory& gf(CoordinatesSystem::GetDefaultGeometryFactory());
 			boost::shared_ptr<geos::geom::Point> ptGeom(gf.createPoint(pt));
 
 			BOOST_FOREACH(T* edge, _from)
