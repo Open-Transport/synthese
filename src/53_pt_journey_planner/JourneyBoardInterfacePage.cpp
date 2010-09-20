@@ -228,7 +228,7 @@ namespace synthese
 					*arrivalPlace.getPoint()
 			)	);
 			pm.insert(DATA_ARRIVAL_PLACE_LONGITUDE, arrivalPoint->getX());
-			pm.insert(DATA_ARRIVAL_PLACE_LATITUDE, arrivalPoint->getX());
+			pm.insert(DATA_ARRIVAL_PLACE_LATITUDE, arrivalPoint->getY());
 
 			// Duration
 			if(durationPage.get())
