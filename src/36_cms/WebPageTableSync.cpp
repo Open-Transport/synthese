@@ -151,6 +151,7 @@ namespace synthese
 					try
 					{
 						webpage->setParent(WebPageTableSync::GetEditable(up_id, env, linkLevel).get());
+						webpage->getParent()->addChild(webpage);
 					}
 					catch(ObjectNotFoundException<Webpage>& e)
 					{
@@ -195,6 +196,8 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,Webpage>::Unlink(
 			Webpage* obj
 		){
+			if(obj->getParent())
+				obj->getParent()->removeChild(obj);
 		}
 
 
