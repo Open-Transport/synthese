@@ -27,7 +27,7 @@
 #include "SQLiteLazyResult.h"
 #include "SQLiteCachedResult.h"
 #include "SQLiteTransaction.h"
-
+#include "DBModule.h"
 #include "Conversion.h"
 #include "Log.h"
 
@@ -69,18 +69,21 @@ namespace synthese
 		
 		void sqliteUpdateHook (void* userData, int opType, const char* dbName, const char* tbName, sqlite_int64 rowId)
 		{
-
 			// WARNING : the update hook is invoked only when working with the connection
 			// created inside the body of this thread (initialize).
 			SQLiteTSS* tss = (SQLiteTSS*) userData;
+
+			const DBModule::TablesByNameMap& tm(DBModule::GetTablesByName());
+			DBModule::TablesByNameMap::const_iterator it(tm.find(tbName));
+			if(it != tm.end())
+			{
+				SQLiteEvent event;
+				event.opType = opType;
+				event.table =  it->second.get();
+				event.rowId = rowId;
 		    
-			SQLiteEvent event;
-			event.opType = opType;
-			event.dbName = dbName;
-			event.tbName = tbName;
-			event.rowId = rowId;
-		    
-			tss->events.push_back (event);
+				tss->events.push_back (event);
+			}
 		}
 		
 
@@ -96,12 +99,12 @@ namespace synthese
 		SQLiteHandle::callHooks (const SQLiteEvent& event)
 		{
 			// Call hooks!
-			for (std::vector<SQLiteUpdateHook*>::const_iterator ith = _hooks.begin ();
-			 ith != _hooks.end (); ++ith)
-			{
-			(*ith)->eventCallback (this, event);
-			}
-		    
+			for(vector<SQLiteUpdateHook*>::const_iterator ith = _hooks.begin();
+				ith != _hooks.end();
+				++ith
+			){
+				(*ith)->eventCallback(this, event);
+			}	    
 		}
 
 		
@@ -113,7 +116,6 @@ namespace synthese
 			, _updateMutex (new boost::recursive_mutex ())
 		{
 		}
-
 		
 		
 		
@@ -138,64 +140,62 @@ namespace synthese
 		{
 			if (_tss.get () == 0)
 			{
-			// Create the sqlite handle
-			
-			sqlite3* handle;
-			int retc = sqlite3_open (_databaseFile.string ().c_str (), &handle);
-			if (retc != SQLITE_OK)
-			{
-				throw SQLiteException ("Cannot open SQLite handle to " + 
-						   _databaseFile.string () + "(error=" + lexical_cast<string>(retc) + ")");
-			}
-			
-			// int 
-			sqlite3_busy_handler(handle, &sqliteBusyHandler, 0);
+				// Create the sqlite handle
+				
+				sqlite3* handle;
+				int retc = sqlite3_open (_databaseFile.string ().c_str (), &handle);
+				if (retc != SQLITE_OK)
+				{
+					throw SQLiteException ("Cannot open SQLite handle to " + 
+							   _databaseFile.string () + "(error=" + lexical_cast<string>(retc) + ")");
+				}
+				
+				// int 
+				sqlite3_busy_handler(handle, &sqliteBusyHandler, 0);
 
-			//lint --e{429}
-			SQLiteTSS* tss = new SQLiteTSS ();
+				//lint --e{429}
+				SQLiteTSS* tss = new SQLiteTSS ();
 
-			sqlite3_update_hook (handle, &sqliteUpdateHook, tss);
-			sqlite3_rollback_hook (handle, &sqliteRollbackHook, tss);
-			
-			tss->handle = handle;
+				sqlite3_update_hook (handle, &sqliteUpdateHook, tss);
+				sqlite3_rollback_hook (handle, &sqliteRollbackHook, tss);
+				
+				tss->handle = handle;
 
-			_tss.reset (tss);
+				_tss.reset (tss);
 			}
 			return _tss.get ();
 		}
 		
 		
 
-
-		SQLiteResultSPtr 
-		SQLiteHandle::execQuery (const SQLiteStatementSPtr& statement, bool lazy)
-		{
+		SQLiteResultSPtr SQLiteHandle::execQuery(
+			const SQLiteStatementSPtr& statement,
+			bool lazy
+		){
 //			assert (lazy == false);
 //			lazy = false;
 			SQLiteResultSPtr result (new SQLiteLazyResult (statement));
 			if (lazy)
 			{
-			return result;
+				return result;
 			}
 			else
 			{
-			SQLiteCachedResult* cachedResult = new SQLiteCachedResult (result);
-			return SQLiteResultSPtr (cachedResult);
+				SQLiteCachedResult* cachedResult = new SQLiteCachedResult (result);
+				return SQLiteResultSPtr (cachedResult);
 			}
 		}
 
 
 
-
-		sqlite3* 
-		SQLiteHandle::getHandle () const 
+		sqlite3* SQLiteHandle::getHandle () const 
 		{
 			return getSQLiteTSS ()->handle;
 		}
 
 
-		void 
-		SQLiteHandle::execUpdate (const SQLiteStatementSPtr& statement)
+
+		void SQLiteHandle::execUpdate (const SQLiteStatementSPtr& statement)
 		{
 			// Lock this method so that no database update can start before hooks
 			// have finished their execution. The mutex is recursive so that
@@ -206,17 +206,17 @@ namespace synthese
 
 			if (statement->insideOwnerThread () == false)
 			{
-			throw SQLiteException ("SQLiteStatement called outside its creation thread is forbidden.");
+				throw SQLiteException ("SQLiteStatement called outside its creation thread is forbidden.");
 			}
 
 			int retc = SQLITE_ROW;
 			while (retc == SQLITE_ROW)
 			{
-			retc = sqlite3_step (statement->getStatement ());
+				retc = sqlite3_step (statement->getStatement ());
 			}
 			if (retc != SQLITE_DONE)
 			{
-			throw SQLiteException ("Error executing precompiled statement (error=" + lexical_cast<string>(retc) + ")" + 
+				throw SQLiteException ("Error executing precompiled statement (error=" + lexical_cast<string>(retc) + ")" + 
 						   Conversion::ToTruncatedString (statement->getSQL ()));
 			}
 
@@ -224,7 +224,7 @@ namespace synthese
 			for (std::vector<SQLiteEvent>::const_iterator it = events.begin ();
 			 it != events.end (); ++it)
 			{
-			callHooks (*it);
+				callHooks (*it);
 			}
 		}
 
@@ -328,17 +328,20 @@ namespace synthese
 			tss->events.clear ();
 
 			char* errMsg = 0;
-			int retc = sqlite3_exec (getHandle (), 
-						 sql.c_str (), 
-						 0, 
-						 0, &errMsg);
+			int retc = sqlite3_exec(
+				getHandle (), 
+				sql.c_str (), 
+				0, 
+				0,
+				&errMsg
+			);
 		    
 			if (retc != SQLITE_OK)
 			{
-			std::string msg (errMsg);
-			sqlite3_free (errMsg);
-			
-			throw SQLiteException ("Error executing batch update \"" + Conversion::ToTruncatedString (sql) + "\" : " + 
+				std::string msg (errMsg);
+				sqlite3_free (errMsg);
+				
+				throw SQLiteException ("Error executing batch update \"" + Conversion::ToTruncatedString (sql) + "\" : " + 
 						   msg + " (error=" + lexical_cast<string>(retc) + ")");
 			}
 
@@ -346,7 +349,7 @@ namespace synthese
 			for (std::vector<SQLiteEvent>::const_iterator it = events.begin ();
 			 it != events.end (); ++it)
 			{
-			callHooks (*it);
+				callHooks (*it);
 			}
 		}
 
@@ -357,12 +360,17 @@ namespace synthese
 		{
 			sqlite3_stmt* st;
 		    
-			int retc = sqlite3_prepare_v2 (getHandle (), 
-						   sql.c_str (), sql.length (), &st, 0);
+			int retc = sqlite3_prepare_v2(
+				getHandle(), 
+				sql.c_str(),
+				sql.length(),
+				&st,
+				0
+			);
 
 			if (retc != SQLITE_OK)
 			{
-			throw SQLiteException ("Error compiling \"" + sql + "\" (error=" + lexical_cast<string>(retc) + ")");
+				throw SQLiteException ("Error compiling \"" + sql + "\" (error=" + lexical_cast<string>(retc) + ")");
 			}
 			return SQLiteStatementSPtr (new SQLiteStatement (st, sql));
 		}
