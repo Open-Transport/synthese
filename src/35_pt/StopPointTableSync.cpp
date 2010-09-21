@@ -28,6 +28,7 @@
 #include "RoadChunkTableSync.h"
 #include "LinkException.h"
 #include "CityTableSync.h"
+#include "CrossingTableSync.hpp"
 
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/Point.h>
@@ -152,6 +153,8 @@ namespace synthese
 						RoadChunk::MetricOffset metricOffset(rows->getDouble(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET));
 
 						object->setProjectedPoint(Address(chunk, metricOffset));
+
+						chunk.getFromCrossing()->addReachableVertex(object);
 					}
 					catch (ObjectNotFoundException<RoadChunk>& e)
 					{
@@ -170,6 +173,11 @@ namespace synthese
 /// @todo	place->removePhysicalStop(obj);
 
 			obj->setHub(NULL);
+
+			if(obj->getProjectedPoint().getRoadChunk())
+			{
+				obj->getProjectedPoint().getRoadChunk()->getFromCrossing()->removeReachableVertex(obj);
+			}
 		}
 
 

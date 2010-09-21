@@ -29,9 +29,9 @@
 #include "Importable.h"
 #include "Named.h"
 #include "Address.h"
+#include "ReachableFromCrossing.hpp"
 
 #include <string>
-
 
 namespace synthese
 {
@@ -49,7 +49,8 @@ namespace synthese
 		class StopPoint:
 			public graph::Vertex,
 			public impex::Importable,
-			public util::Named
+			public util::Named,
+			public road::ReachableFromCrossing
 		{
 		public:
 
@@ -68,7 +69,7 @@ namespace synthese
 				boost::shared_ptr<geos::geom::Point> geometry = boost::shared_ptr<geos::geom::Point>()
 			);
 
-			~StopPoint ();
+			~StopPoint();
 		    
 
 			//! @name Getters
@@ -85,8 +86,8 @@ namespace synthese
 			//@{
 				const pt::StopArea* getConnectionPlace() const;
 				virtual graph::GraphIdType getGraphType() const;
+				virtual graph::VertexAccess getVertexAccess(const road::Crossing& crossing) const;
 			//@}
-
 		};
 
 	}

@@ -33,6 +33,8 @@ namespace synthese
 {
 	namespace road
 	{
+		class ReachableFromCrossing;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Intersection between at least two roads.
 		/// @ingroup m34
@@ -55,7 +57,11 @@ namespace synthese
 			  /// Chosen registry class.
 			  typedef util::Registry<Crossing>	Registry;
 
+			  typedef std::set<ReachableFromCrossing*> ReachableVertices;
+
 		private:
+
+			ReachableVertices _reachableVertices;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -77,6 +83,12 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Destructor.
 			virtual ~Crossing ();
+
+			//! @name Modifiers
+			//@{
+				void addReachableVertex(ReachableFromCrossing* value){ _reachableVertices.insert(value); }
+				void removeReachableVertex(ReachableFromCrossing* value){ _reachableVertices.erase(value); }
+			//@}
 
 
 
