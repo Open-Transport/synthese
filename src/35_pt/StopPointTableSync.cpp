@@ -202,7 +202,14 @@ namespace synthese
 				query.addFieldNull();
 				query.addFieldNull();
 			}
-			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
+			if(object->hasGeometry())
+			{
+				query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
+			}
+			else
+			{
+				query.addFieldNull();
+			}
 
 			query.execute(transaction);
 		}
