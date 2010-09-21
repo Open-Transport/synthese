@@ -465,17 +465,7 @@ namespace synthese
 				}
 				if(_FIELDS[i].isGeometry())
 				{
-					fieldsGetter << "AsBinary(";
-					if(DBModule::GetStorageCoordinatesSystem().getSRID() != CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
-					{
-						fieldsGetter << "Transform(";
-					}
-					fieldsGetter << _FIELDS[i].name;
-					if(DBModule::GetStorageCoordinatesSystem().getSRID() != CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
-					{
-						fieldsGetter << "," << CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID() << ")";
-					}
-					fieldsGetter << ") AS " << _FIELDS[i].name;
+					fieldsGetter << "AsBinary(" << _FIELDS[i].name << ") AS " << _FIELDS[i].name;
 				}
 				else
 				{
