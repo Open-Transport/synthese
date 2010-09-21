@@ -29,6 +29,7 @@
 #include "JourneyPattern.hpp"
 #include "VertexAccessMap.h"
 #include "RoadModule.h"
+#include "Crossing.h"
 
 #include <boost/foreach.hpp>
 #include <geos/geom/Envelope.h>
@@ -162,33 +163,6 @@ namespace synthese
 			const Vertex& origin,
 			bool vertexIsOrigin
 		) const {
-			if(whatToSearch == RoadModule::GRAPH_ID)
-			{
-				/*
-				if(vertexIsOrigin)
-				{
-					BOOST_FOREACH(const Address* address, _addresses)
-					{
-						if(!isConnectionAllowed(origin, *address)) continue;
-
-						result.insert(
-							address,
-							VertexAccess(getTransferDelay(origin, *address))
-						);
-					}
-				} else {
-					BOOST_FOREACH(const Address* address, _addresses)
-					{
-						if(!isConnectionAllowed(*address, origin)) continue;
-
-						result.insert(
-							address,
-							VertexAccess(getTransferDelay(*address, origin))
-						);
-					}
-				}
-				*/
-			}
 		    
 			if (whatToSearch != PTModule::GRAPH_ID) return;
 
@@ -231,15 +205,25 @@ namespace synthese
 		) const {
 			if(whatToSearch.find(RoadModule::GRAPH_ID) != whatToSearch.end())
 			{
-				/*
-				BOOST_FOREACH(const Address* address, _addresses)
-				{
+				BOOST_FOREACH(
+					const PhysicalStops::value_type& it,
+					_physicalStops
+				){
+					if(!it.second->getProjectedPoint().getRoadChunk())
+					{
+						continue;
+					}
 					result.insert(
-						address,
-						VertexAccess()
+						it.second->getProjectedPoint().getRoadChunk()->getFromCrossing(),
+						VertexAccess(minutes(it.second->getProjectedPoint().getMetricOffset() / 50), it.second->getProjectedPoint().getMetricOffset())
 					);
+					result.insert(
+						it.second->getProjectedPoint().getRoadChunk()->getReverseChunk()->getFromCrossing(),
+						VertexAccess(
+							minutes((it.second->getProjectedPoint().getRoadChunk()->getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()) / 50),
+							it.second->getProjectedPoint().getRoadChunk()->getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()
+					)	);
 				}
-				*/
 			}
 		    
 			if (whatToSearch.find(PTModule::GRAPH_ID) == whatToSearch.end()) return;

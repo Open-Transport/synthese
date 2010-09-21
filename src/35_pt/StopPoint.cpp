@@ -25,9 +25,12 @@
 #include "PTModule.h"
 #include "StopArea.hpp"
 
+#include <boost/date_time/time_duration.hpp>
+
 using namespace std;
 using namespace boost;
 using namespace geos::geom;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -74,6 +77,28 @@ namespace synthese
 		graph::GraphIdType StopPoint::getGraphType() const
 		{
 			return PTModule::GRAPH_ID;
+		}
+
+
+
+		graph::VertexAccess StopPoint::getVertexAccess( const road::Crossing& crossing ) const
+		{
+			if(_projectedPoint.getRoadChunk())
+			{
+				if(_projectedPoint.getRoadChunk()->getFromCrossing() == &crossing)
+				{
+					return VertexAccess(minutes(_projectedPoint.getMetricOffset() / 50), _projectedPoint.getMetricOffset());
+				}
+				if(	_projectedPoint.getRoadChunk()->getReverseChunk() &&
+					_projectedPoint.getRoadChunk()->getReverseChunk()->getFromCrossing() == &crossing
+				){
+					return VertexAccess(
+						minutes((_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getRoadChunk()->getMetricOffset() - _projectedPoint.getMetricOffset()) / 50),
+						_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getRoadChunk()->getMetricOffset() - _projectedPoint.getMetricOffset()
+					);
+				}
+			}
+			return VertexAccess();
 		}
 	}
 }

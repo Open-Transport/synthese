@@ -23,6 +23,7 @@
 #include "Crossing.h"
 #include "RoadModule.h"
 #include "VertexAccessMap.h"
+#include "ReachableFromCrossing.hpp"
 
 using namespace std;
 using namespace boost;
@@ -88,7 +89,20 @@ namespace synthese
 
 		bool Crossing::containsAnyVertex( graph::GraphIdType graphType ) const
 		{
-			return graphType == RoadModule::GRAPH_ID;
+			if(graphType == RoadModule::GRAPH_ID)
+			{
+				return true;
+			}
+
+			BOOST_FOREACH(ReachableFromCrossing* vertex, _reachableVertices)
+			{
+				if(vertex->getGraphType() == graphType)
+				{
+					return true;
+				}
+			}
+
+			return false;
 		}
 
 
@@ -104,6 +118,19 @@ namespace synthese
 				result.insert(
 					this,
 					VertexAccess()
+				);
+			}
+
+			BOOST_FOREACH(ReachableFromCrossing* vertex, _reachableVertices)
+			{
+				if(vertex->getGraphType() != whatToSearch)
+				{
+					continue;
+				}
+
+				result.insert(
+					dynamic_cast<Vertex*>(vertex),
+					vertex->getVertexAccess(*this)
 				);
 			}
 		}

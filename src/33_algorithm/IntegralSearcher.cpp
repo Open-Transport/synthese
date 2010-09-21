@@ -492,7 +492,7 @@ namespace synthese
 										isGoalReached,
 										_destinationVam,
 										distanceToEnd,
-										_journeyTemplates->testSimilarity(fullApproachJourney, *reachedVertex->getHub(), _accessDirection),
+										_journeyTemplates ? _journeyTemplates->testSimilarity(fullApproachJourney, *reachedVertex->getHub(), _accessDirection) : false,
 										_getScore(
 											totalDuration,
 											distanceToEnd,
@@ -534,7 +534,7 @@ namespace synthese
 											false,
 											_destinationVam,
 											distanceToEnd,
-											_journeyTemplates->testSimilarity(*journey, *reachedVertex->getHub(), _accessDirection),
+											_journeyTemplates ? _journeyTemplates->testSimilarity(*journey, *reachedVertex->getHub(), _accessDirection) : false,
 											resultJourney->getScore()
 									)	);
 									todo.add(todoJourney);
