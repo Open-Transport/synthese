@@ -43,7 +43,6 @@ namespace synthese
 	namespace server
 	{
 		const size_t Session::KEY_LENGTH = 20;
-		const int Session::MAX_MINUTES_DURATION = 30;
 
 		Session::Session(const std::string& ip)
 			: _ip(ip)
@@ -59,7 +58,7 @@ namespace synthese
 				throw SessionException("IP has changed during the session.");
 
 			ptime now(second_clock::local_time());
-			if( (now - _lastUse) > minutes(MAX_MINUTES_DURATION))
+			if( (now - _lastUse) > ServerModule::GetSessionMaxDuration())
 			{
 				throw SessionException("Session is too old");
 			}

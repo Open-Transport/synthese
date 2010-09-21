@@ -48,6 +48,7 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -65,6 +66,7 @@ namespace synthese
 		ServerModule::Threads ServerModule::_threads;
 		size_t ServerModule::_waitingThreads(0);
 		recursive_mutex ServerModule::_threadManagementMutex;
+		time_duration ServerModule::_sessionMaxDuration(minutes(30));
 
 
 		const string ServerModule::MODULE_PARAM_PORT ("port");
@@ -72,6 +74,7 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_LOG_LEVEL ("log_level");
 		const string ServerModule::MODULE_PARAM_SMTP_PORT ("smtp_port");
 		const string ServerModule::MODULE_PARAM_SMTP_SERVER ("smtp_server");
+		const string ServerModule::MODULE_PARAM_SESSION_MAX_DURATION("session_max_duration");
 
 		const std::string ServerModule::VERSION("3.2.0");
 
@@ -85,6 +88,7 @@ namespace synthese
 			RegisterParameter(ServerModule::MODULE_PARAM_LOG_LEVEL, "1", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_SERVER, "smtp", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT, "mail", &ServerModule::ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_LOG_LEVEL, "30", &ServerModule::ParameterCallback);
 		}
 
 
@@ -161,6 +165,10 @@ namespace synthese
 			if(name == MODULE_PARAM_NB_THREADS)
 			{
 				
+			}
+			if(name == MODULE_PARAM_SESSION_MAX_DURATION)
+			{
+				_sessionMaxDuration = minutes(lexical_cast<int>(value));
 			}
 		}
 		
@@ -542,6 +550,13 @@ namespace synthese
 				}
 			}
 			return result.str();
+		}
+
+
+
+		boost::posix_time::time_duration ServerModule::GetSessionMaxDuration()
+		{
+			return _sessionMaxDuration;
 		}
 
 
