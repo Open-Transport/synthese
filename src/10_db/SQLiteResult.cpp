@@ -358,10 +358,13 @@ namespace synthese
 			}
 
 			stringstream str(colStr);
-			WKBReader reader(CoordinatesSystem::GetDefaultGeometryFactory());
+			WKBReader reader(DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
 			try
 			{
-				return shared_ptr<Geometry>(reader.read(str));
+				return 
+					CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
+						*shared_ptr<Geometry>(reader.read(str))
+					);
 			}
 			catch(geos::io::ParseException& e)
 			{
