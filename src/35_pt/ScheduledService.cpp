@@ -421,5 +421,54 @@ namespace synthese
 			recursive_mutex::scoped_lock serviceLock(_nonConcurrencyCacheMutex);
 			_nonConcurrencyCache.clear();
 		}
+
+
+
+		ServicePointer ScheduledService::getDeparturePosition(
+			bool RTdata,
+			size_t userClass,
+			const boost::posix_time::ptime& date
+		) const	{
+
+			const Edge* edge(_path->getEdge(0));
+			ptime originTime(date.date(), minutes(0));
+
+			ServicePointer originPtr(
+				getFromPresenceTime(
+					RTdata,
+					true,
+					userClass,
+					*edge,
+					originTime,
+					false,
+					false
+			)	);
+
+			if(!originPtr.getService())
+			{
+				return originPtr;
+			}
+			
+			for(edge = edge->getFollowingArrivalForFineSteppingOnly(); edge; edge = edge->getFollowingArrivalForFineSteppingOnly())
+			{
+				ptime arrivalTime(
+					originPtr.getOriginDateTime() + (getArrivalSchedules(false)[edge->getRankInPath()] - _departureSchedules[0])
+				);
+				
+				if(arrivalTime > date)
+				{
+					edge = edge->getPreviousDepartureForFineSteppingOnly();
+					ServicePointer result(RTdata, userClass, *this, originPtr.getOriginDateTime());
+					result.setDepartureInformations(
+						*edge,
+						originPtr.getOriginDateTime() + (_RTDepartureSchedules[edge->getRankInPath()] - _departureSchedules[0]),
+						originPtr.getOriginDateTime() + (_departureSchedules[edge->getRankInPath()] - _departureSchedules[0]),
+						*(RTdata ? _RTVertices[edge->getRankInPath()] : edge->getFromVertex())
+					);
+					return result;
+				}
+			}
+			return originPtr;
+		}
 	}
 }
