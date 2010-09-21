@@ -49,7 +49,6 @@ namespace synthese
 			boost::posix_time::ptime	_lastUse;
 
 			static const size_t KEY_LENGTH;
-			static const int MAX_MINUTES_DURATION;
 			static std::string generateKey();
 
 		public:
