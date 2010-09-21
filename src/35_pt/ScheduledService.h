@@ -161,6 +161,12 @@ namespace synthese
 				virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
 				virtual boost::posix_time::time_duration getArrivalBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
 				virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
+
+				graph::ServicePointer getDeparturePosition(
+					bool RTData,
+					std::size_t userClassRank,
+					const boost::posix_time::ptime& date
+				) const;
 			//@}
 
 		};
