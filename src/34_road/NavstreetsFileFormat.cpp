@@ -221,7 +221,7 @@ namespace synthese
 				typedef map<string, shared_ptr<Crossing> > _CrossingsMap;
 				_CrossingsMap _navteqCrossings;	
 
-				const GeometryFactory& geometryFactory(DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
+				const GeometryFactory& geometryFactory(CoordinatesSystem::GetCoordinatesSystem(27572).getGeometryFactory());
 
 				// Recently added road places
 				typedef map<pair<RegistryKeyType, string>, shared_ptr<RoadPlace> > RecentlyCreatedRoadPlaces;
@@ -297,7 +297,7 @@ namespace synthese
 						if(ita1 == _navteqCrossings.end())
 						{
 							shared_ptr<Point> gp(
-								CoordinatesSystem::GetCoordinatesSystem(27572).getGeometryFactory().createPoint(
+								geometryFactory.createPoint(
 									leftNodeCoordinate
 							)	);
 							leftNode.reset(
@@ -323,7 +323,7 @@ namespace synthese
 						if(ita2 == _navteqCrossings.end())
 						{
 							shared_ptr<Point> gp(
-								CoordinatesSystem::GetCoordinatesSystem(27572).getGeometryFactory().createPoint(
+								geometryFactory.createPoint(
 									rightNodeCoordinate
 							)	);
 							rightNode.reset(
