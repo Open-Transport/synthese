@@ -296,8 +296,13 @@ namespace synthese
 			stream << st.getForm().setFocus(PARAMETER_START_CITY);
 
 			// No calculation without cities
-			if (_startCity.empty() || _endCity.empty())
+			if(	_startCity.empty() ||
+				_endCity.empty() ||
+				!startPlace.get() ||
+				!endPlace.get()
+			){
 				return;
+			}
 
 			TimeSlotRoutePlanner::Result dummy;
 			PTRoutePlannerResult jv(startPlace.get(), endPlace.get(), false, dummy);

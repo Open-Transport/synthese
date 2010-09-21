@@ -13,6 +13,7 @@
 #include "CityListFunction.h"
 #include "CityListRequestFunction.hpp"
 #include "PlacesListFunction.h"
+#include "ServiceInformationsFunction.hpp"
 
 #include "UserFavoriteInterfacePage.h"
 

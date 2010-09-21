@@ -169,8 +169,10 @@ namespace synthese
 		RoadChunk::MetricOffset RoadChunk::getHouseNumberMetricOffset( HouseNumber houseNumber ) const
 		{
 			return getMetricOffset() +
+				(_houseNumberBounds->second == _houseNumberBounds->first ? 0 :
+
 				((houseNumber - _houseNumberBounds->first) / (_houseNumberBounds->second - _houseNumberBounds->first)) *
-				(getEndMetricOffset() - getMetricOffset())
+				(getEndMetricOffset() - getMetricOffset()))
 				;
 		}
 	}
