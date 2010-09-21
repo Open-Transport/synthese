@@ -49,7 +49,7 @@ namespace synthese
 				chunk,
 				chunk.getMetricOffset() + chunk.getHouseNumberMetricOffset(houseNumber),
 				houseNumber
-			)
+			), Registrable(0)
 		{
 			setName(string(
 					(numberAtBeginning ? lexical_cast<string>(houseNumber) : chunk.getRoad()->getRoadPlace()->getName()) +
@@ -61,7 +61,8 @@ namespace synthese
 
 
 
-		House::House()
+		House::House():
+		Registrable(0)
 		{
 
 		}
