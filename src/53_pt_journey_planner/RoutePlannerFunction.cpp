@@ -116,6 +116,10 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_MAP_SERVICE_PAGE("map_service_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_JUNCTION_PAGE("map_junction_page");
 
+		//XML output only:
+		const string RoutePlannerFunction::PARAMETER_SHOW_RESULT_TABLE("showResTab");
+		const string RoutePlannerFunction::PARAMETER_SHOW_COORDINATES("showCoords");
+
 
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
@@ -293,6 +297,22 @@ namespace synthese
 			if(	!_departure_place.placeResult.value || !_arrival_place.placeResult.value
 			){
 				throw RequestException("No calculation");
+			}
+
+			//XML output options
+			_showResTab = true;
+			optional<string> showResTabLabel(map.getOptional<string>(PARAMETER_SHOW_RESULT_TABLE));
+			if((showResTabLabel)
+				&&(*showResTabLabel=="no"))
+			{
+				_showResTab = false;
+			}
+			_showCoords = true;
+			optional<string> showCoordsLabel(map.getOptional<string>(PARAMETER_SHOW_COORDINATES));
+			if((showCoordsLabel)
+				&&(*showCoordsLabel=="no"))
+			{
+				_showCoords = false;
 			}
 
 			// Pages
@@ -874,7 +894,7 @@ namespace synthese
 												"<startAddress>";
 											if(dynamic_cast<const NamedPlace*>(jl.begin()->getDepartureEdge()->getHub()))
 											{
-												_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*jl.begin()->getDepartureEdge()->getHub()));
+												_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*jl.begin()->getDepartureEdge()->getHub()),_showCoords);
 											}
 											else if(dynamic_cast<const Crossing*>(jl.begin()->getDepartureEdge()->getFromVertex()))
 											{
@@ -882,7 +902,8 @@ namespace synthese
 												{
 													_XMLDisplayRoadPlace(
 														stream,
-														dynamic_cast<const RoadPlace&>(*_departure_place.placeResult.value.get())
+														dynamic_cast<const RoadPlace&>(*_departure_place.placeResult.value.get()),
+														_showCoords
 													);
 												}
 												else
@@ -890,7 +911,8 @@ namespace synthese
 													_XMLDisplayAddress(
 														stream,
 														*dynamic_cast<const Crossing*>(jl.begin()->getDepartureEdge()->getFromVertex()),
-														*road->getRoadPlace()
+														*road->getRoadPlace(),
+														_showCoords
 													);
 												}
 											}
@@ -899,14 +921,15 @@ namespace synthese
 												"<endAddress>";
 											if(dynamic_cast<const NamedPlace*>((itl-1)->getArrivalEdge()->getHub()))
 											{
-												_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*(itl-1)->getArrivalEdge()->getHub()));
+												_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*(itl-1)->getArrivalEdge()->getHub()),_showCoords);
 											}
 											else if(dynamic_cast<const Crossing*>((itl-1)->getArrivalEdge()->getFromVertex()))
 											{
 												_XMLDisplayAddress(
 													stream,
 													*dynamic_cast<const Crossing*>((itl-1)->getArrivalEdge()->getFromVertex()),
-													*road->getRoadPlace()
+													*road->getRoadPlace(),
+													_showCoords
 												);
 											}
 											stream <<
@@ -951,9 +974,9 @@ namespace synthese
 							}
 							stream <<
 								">";
-							_XMLDisplayPhysicalStop(stream, "startStop", dynamic_cast<const StopPoint&>(*curET.getDepartureEdge()->getFromVertex()));
-							_XMLDisplayPhysicalStop(stream, "endStop", dynamic_cast<const StopPoint&>(*curET.getArrivalEdge()->getFromVertex()));
-							_XMLDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const StopPoint&>(*line->getLastEdge()->getFromVertex()));
+							_XMLDisplayPhysicalStop(stream, "startStop", dynamic_cast<const StopPoint&>(*curET.getDepartureEdge()->getFromVertex()),_showCoords);
+							_XMLDisplayPhysicalStop(stream, "endStop", dynamic_cast<const StopPoint&>(*curET.getArrivalEdge()->getFromVertex()),_showCoords);
+							_XMLDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const StopPoint&>(*line->getLastEdge()->getFromVertex()),_showCoords);
 							if(!line->isPedestrianMode())
 							{
 								stream <<
@@ -1024,7 +1047,7 @@ namespace synthese
 									"<startAddress>";
 								if(dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub()))
 								{
-									_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getDepartureEdge()->getHub()));
+									_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getDepartureEdge()->getHub()),_showCoords);
 								}
 								else if(dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getFromVertex()))
 								{
@@ -1032,7 +1055,8 @@ namespace synthese
 									{
 										_XMLDisplayRoadPlace(
 											stream,
-											dynamic_cast<const RoadPlace&>(*_departure_place.placeResult.value)
+											dynamic_cast<const RoadPlace&>(*_departure_place.placeResult.value),
+											_showCoords
 										);
 									}
 									else
@@ -1040,7 +1064,8 @@ namespace synthese
 										_XMLDisplayAddress(
 											stream,
 											*dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getFromVertex()),
-											*road->getRoadPlace()
+											*road->getRoadPlace(),
+											_showCoords
 											);
 									}
 								}
@@ -1049,7 +1074,7 @@ namespace synthese
 									"<endAddress>";
 								if(dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub()))
 								{
-									_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getArrivalEdge()->getHub()));
+									_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getArrivalEdge()->getHub()),_showCoords);
 								}
 								else if(dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getFromVertex()))
 								{
@@ -1057,7 +1082,8 @@ namespace synthese
 									{
 										_XMLDisplayRoadPlace(
 											stream,
-											dynamic_cast<const RoadPlace&>(*_arrival_place.placeResult.value)
+											dynamic_cast<const RoadPlace&>(*_arrival_place.placeResult.value),
+											_showCoords
 										);
 									}
 									else
@@ -1065,7 +1091,8 @@ namespace synthese
 										_XMLDisplayAddress(
 											stream,
 											*dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getFromVertex()),
-											*road->getRoadPlace()
+											*road->getRoadPlace(),
+											_showCoords
 										);
 									}
 								}
@@ -1117,14 +1144,15 @@ namespace synthese
 							"<startAddress>";
 						if(dynamic_cast<const NamedPlace*>(lastApproachBeginning->getDepartureEdge()->getHub()))
 						{
-							_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*lastApproachBeginning->getDepartureEdge()->getHub()));
+							_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*lastApproachBeginning->getDepartureEdge()->getHub()),_showCoords);
 						}
 						else if(dynamic_cast<const Crossing*>(lastApproachBeginning->getDepartureEdge()->getFromVertex()))
 						{
 							_XMLDisplayAddress(
 								stream,
 								*dynamic_cast<const Crossing*>(lastApproachBeginning->getDepartureEdge()->getFromVertex()),
-								*road->getRoadPlace()
+								*road->getRoadPlace(),
+								_showCoords
 							);
 						}
 						stream <<
@@ -1132,7 +1160,7 @@ namespace synthese
 							"<endAddress>";
 						if(dynamic_cast<const NamedPlace*>((jl.end()-1)->getArrivalEdge()->getHub()))
 						{
-							_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*(jl.end()-1)->getArrivalEdge()->getHub()));
+							_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*(jl.end()-1)->getArrivalEdge()->getHub()),_showCoords);
 						}
 						else if(dynamic_cast<const Crossing*>((jl.end()-1)->getArrivalEdge()->getFromVertex()))
 						{
@@ -1140,7 +1168,8 @@ namespace synthese
 							{
 								_XMLDisplayRoadPlace(
 									stream,
-									dynamic_cast<const RoadPlace&>(*_arrival_place.placeResult.value)
+									dynamic_cast<const RoadPlace&>(*_arrival_place.placeResult.value),
+									_showCoords
 								);
 							}
 							else
@@ -1148,7 +1177,8 @@ namespace synthese
 								_XMLDisplayAddress(
 									stream,
 									*dynamic_cast<const Crossing*>((jl.end()-1)->getArrivalEdge()->getFromVertex()),
-									*road->getRoadPlace()
+									*road->getRoadPlace(),
+									_showCoords
 								);
 							}
 						}
@@ -1162,38 +1192,41 @@ namespace synthese
 					stream << "</chunks></journey>";
 				}
 				stream <<
-					"</journeys>" <<
-					"<resultTable>";
+					"</journeys>";
 
-				PlacesContentVector::iterator itSheetRow(sheetRows.begin());
-				BOOST_FOREACH(const PTRoutePlannerResult::PlacesList::value_type& row, result.getOrderedPlaces())
+				if(_showResTab)
 				{
-					assert(dynamic_cast<const NamedPlace*>(row.place));
-//						const NamedPlace* np(dynamic_cast<const NamedPlace*>(row.place));
+					stream << "<resultTable>";
 
-					stream <<
-						"<row type=\"" << (row.isOrigin ? "departure" : row.isDestination ? "arrival" : "connection") << "\">" <<
-						"<cells>" <<
-						(*itSheetRow)->str() <<
-						"</cells>" <<
-						"<place>";
-					if(dynamic_cast<const RoadPlace*>(row.place))
+					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
+					BOOST_FOREACH(const PTRoutePlannerResult::PlacesList::value_type& row, result.getOrderedPlaces())
 					{
-						_XMLDisplayRoadPlace(stream, dynamic_cast<const RoadPlace&>(*row.place));
-					}
-					else
-					{
-						_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*row.place));
-					}
+						assert(dynamic_cast<const NamedPlace*>(row.place));
+						//						const NamedPlace* np(dynamic_cast<const NamedPlace*>(row.place));
 
-					stream <<
-						"</place>" <<
-						"</row>";
-					++itSheetRow;
+						stream <<
+							"<row type=\"" << (row.isOrigin ? "departure" : row.isDestination ? "arrival" : "connection") << "\">" <<
+							"<cells>" <<
+							(*itSheetRow)->str() <<
+							"</cells>" <<
+							"<place>";
+						if(dynamic_cast<const RoadPlace*>(row.place))
+						{
+							_XMLDisplayRoadPlace(stream, dynamic_cast<const RoadPlace&>(*row.place),_showCoords);
+						}
+						else
+						{
+							_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*row.place),_showCoords);
+						}
+
+						stream <<
+							"</place>" <<
+							"</row>";
+						++itSheetRow;
+					}
+					stream << "</resultTable>";
 				}
-				stream <<
-					"</resultTable>" <<
-					"</routePlannerResult>"
+				stream << "</routePlannerResult>"
 				;
 			}
 		}
@@ -1247,15 +1280,18 @@ namespace synthese
 
 		void RoutePlannerFunction::_XMLDisplayConnectionPlace(
 			std::ostream& stream,
-			const NamedPlace& np
+			const NamedPlace& np,
+			bool showCoords
 		){
 			shared_ptr<Point> gp(
 				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 					*np.getPoint()
 			)	);
 
-			stream <<
-				"<connectionPlace" <<
+			if(showCoords)
+			{
+				stream <<
+					"<connectionPlace" <<
 					" latitude=\"" << gp->getX() << "\"" <<
 					" longitude=\"" << gp->getY() << "\"" <<
 					" id=\"" << np.getKey() << "\"" <<
@@ -1263,7 +1299,17 @@ namespace synthese
 					" x=\"" << static_cast<int>(np.getPoint()->getX()) << "\"" <<
 					" y=\"" << static_cast<int>(np.getPoint()->getY()) << "\""
 					" name=\"" << np.getName() << "\"" <<
-				">";
+					">";
+			}
+			else //Don't show coords
+			{
+				stream <<
+					"<connectionPlace" <<
+					" id=\"" << np.getKey() << "\"" <<
+					" city=\"" << np.getCity()->getName() << "\"" <<
+					" name=\"" << np.getName() << "\"" <<
+					">";
+			}
 			if(false) // Test if alarm on place
 			{
 				stream <<
@@ -1272,7 +1318,7 @@ namespace synthese
 						" level=\"interruption\"" <<
 						" startValidity=\"2000-01-01T00:00:07.0Z\"" <<
 						" endValidity=\"2099-12-31T23:59:00.0Z\"" <<
-					">SNCF en grève</alert>"
+					">SNCF en grï¿½ve</alert>"
 				;
 			}
 			stream << "</connectionPlace>";
@@ -1283,23 +1329,35 @@ namespace synthese
 		void RoutePlannerFunction::_XMLDisplayPhysicalStop(
 			std::ostream& stream,
 			const std::string& tag,
-			const pt::StopPoint& stop
+			const pt::StopPoint& stop,
+			bool showCoords
 		){
 			shared_ptr<Point> gp(
 				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 					*stop.getGeometry()
 			)	);
 
-			stream <<
-				"<" << tag <<
+			if(showCoords)
+			{
+				stream <<
+					"<" << tag <<
 					" latitude=\"" << gp->getX() << "\"" <<
 					" longitude=\"" << gp->getY() << "\"" <<
 					" id=\"" << stop.getKey() << "\"" <<
 					" x=\"" << static_cast<int>(stop.getGeometry()->getX()) << "\"" <<
 					" y=\"" << static_cast<int>(stop.getGeometry()->getY()) << "\"" <<
 					" name=\"" << stop.getName() << "\"" <<
-				">";
-			_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*stop.getHub()));
+					">";
+			}
+			else//Don't show coords
+			{
+				stream <<
+					"<" << tag <<
+					" id=\"" << stop.getKey() << "\"" <<
+					" name=\"" << stop.getName() << "\"" <<
+					">";
+			}
+			_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*stop.getHub()),showCoords);
 			stream << "</" << tag << ">";
 		}
 
@@ -1308,46 +1366,72 @@ namespace synthese
 		void RoutePlannerFunction::_XMLDisplayAddress(
 			std::ostream& stream,
 			const road::Crossing& address,
-			const road::RoadPlace& roadPlace
+			const road::RoadPlace& roadPlace,
+			bool showCoords
 		){
 			shared_ptr<Point> gp(
 				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 					*address.getGeometry()
 			)	);
 
-			stream <<
-				"<address" <<
-				" latitude=\"" << gp->getX() << "\"" <<
-				" longitude=\"" << gp->getY() << "\"" <<
-				" id=\"" << address.getKey() << "\"" <<
-				" x=\"" << static_cast<int>(address.getGeometry()->getX()) << "\"" <<
-				" y=\"" << static_cast<int>(address.getGeometry()->getY()) << "\"" <<
-				" city=\"" << roadPlace.getCity()->getName() << "\"" <<
-				" streetName=\"" << roadPlace.getName() << "\"" <<
-				" />";
+			if(showCoords)
+			{
+				stream <<
+					"<address" <<
+					" latitude=\"" << gp->getX() << "\"" <<
+					" longitude=\"" << gp->getY() << "\"" <<
+					" id=\"" << address.getKey() << "\"" <<
+					" x=\"" << static_cast<int>(address.getGeometry()->getX()) << "\"" <<
+					" y=\"" << static_cast<int>(address.getGeometry()->getY()) << "\"" <<
+					" city=\"" << roadPlace.getCity()->getName() << "\"" <<
+					" streetName=\"" << roadPlace.getName() << "\"" <<
+					" />";
+			}
+			else
+			{
+				stream <<
+					"<address" <<
+					" id=\"" << address.getKey() << "\"" <<
+					" city=\"" << roadPlace.getCity()->getName() << "\"" <<
+					" streetName=\"" << roadPlace.getName() << "\"" <<
+					" />";
+			}
 		}
 
 
 
 		void RoutePlannerFunction::_XMLDisplayRoadPlace(
 			std::ostream& stream,
-			const road::RoadPlace& roadPlace
+			const road::RoadPlace& roadPlace,
+			bool showCoords
 		){
 			shared_ptr<Point> gp(
 				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 					*roadPlace.getPoint()
 			)	);
 
-			stream <<
-				"<address" <<
-				" latitude=\"" << gp->getX() << "\"" <<
-				" longitude=\"" << gp->getY() << "\"" <<
-				" id=\"" << roadPlace.getKey() << "\"" <<
-				" x=\"" << static_cast<int>(roadPlace.getPoint()->getX()) << "\"" <<
-				" y=\"" << static_cast<int>(roadPlace.getPoint()->getY()) << "\"" <<
-				" city=\"" << roadPlace.getCity()->getName() << "\"" <<
-				" streetName=\"" << roadPlace.getName() << "\"" <<
-				" />";
+			if(showCoords)
+			{
+				stream <<
+					"<address" <<
+					" latitude=\"" << gp->getX() << "\"" <<
+					" longitude=\"" << gp->getY() << "\"" <<
+					" id=\"" << roadPlace.getKey() << "\"" <<
+					" x=\"" << static_cast<int>(roadPlace.getPoint()->getX()) << "\"" <<
+					" y=\"" << static_cast<int>(roadPlace.getPoint()->getY()) << "\"" <<
+					" city=\"" << roadPlace.getCity()->getName() << "\"" <<
+					" streetName=\"" << roadPlace.getName() << "\"" <<
+					" />";
+			}
+			else
+			{
+				stream <<
+					"<address" <<
+					" id=\"" << roadPlace.getKey() << "\"" <<
+					" city=\"" << roadPlace.getCity()->getName() << "\"" <<
+					" streetName=\"" << roadPlace.getName() << "\"" <<
+					" />";
+			}
 		}
 	}
 }
