@@ -107,20 +107,20 @@ namespace synthese
 				}
 
 				// Interface
-				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID));
-				if (id > 0)
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID));
+				if (id && *id)
 				{
-					_interface = InterfaceTableSync::Get(id, *_env);
+					_interface = InterfaceTableSync::Get(*id, *_env);
 				}
-				id = map.get<RegistryKeyType>(PARAMETER_AUDIO_INTERFACE_ID);
-				if (id > 0)
+				id = map.getOptional<RegistryKeyType>(PARAMETER_AUDIO_INTERFACE_ID);
+				if (id && *id)
 				{
-					_audioInterface = InterfaceTableSync::Get(id, *_env);
+					_audioInterface = InterfaceTableSync::Get(*id, *_env);
 				}
-				id = map.get<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID);
-				if (id > 0)
+				id = map.getOptional<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID);
+				if (id && *id)
 				{
-					_monitoringInterface = InterfaceTableSync::Get(id, *_env);
+					_monitoringInterface = InterfaceTableSync::Get(*id, *_env);
 				}
 
 				// Max stops number
