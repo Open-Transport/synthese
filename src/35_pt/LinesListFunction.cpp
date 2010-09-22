@@ -136,12 +136,6 @@ namespace synthese
 						_end = "";
 					}
 				}
-				cout << "str = " << str;
-				cout << "_numericalValue = " << _numericalValue;
-				cout << "_numberType = " << _numberType;
-				cout << "_begin = " << _begin;
-				cout << "_end = " << _end;
-				cout << "_value = " << _value << endl;
 			}
 
 			bool operator<(sortableNumber const &otherNumber) const
@@ -200,10 +194,6 @@ namespace synthese
 			typedef const pair<const RegistryKeyType, shared_ptr<CommercialLine> > myType;
 			BOOST_FOREACH(myType&  myLine,Env::GetOfficialEnv().getRegistry<CommercialLine>())
 			{
-				/*string shortname = myLine.second->getShortName();
-				sortableNumber toti = sortableNumber(shortname);
-				shared_ptr<CommercialLine> toto = myLine.second;
-				linesMap[toti]=toto;*/
 				//Insert respecting order described up there
 				linesMap[sortableNumber(myLine.second->getShortName())] = myLine.second;
 			}
