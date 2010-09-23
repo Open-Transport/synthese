@@ -100,7 +100,9 @@ namespace synthese
 			stream <<
 					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 					"<stopAreas xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopAreasListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
-					"\" lineName=\"" << _commercialLine->getName() <<
+					"\" lineName=\""      << _commercialLine->getName() <<
+					"\" lineShortName=\"" << _commercialLine->getShortName() <<
+					"\" lineStyle=\""     << _commercialLine->getStyle() <<
 					"\">";
 
 			BOOST_FOREACH(stopMap::value_type& it, stopAreaMap)
