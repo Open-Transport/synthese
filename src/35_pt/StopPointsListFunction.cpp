@@ -104,8 +104,10 @@ namespace synthese
 				stream <<
 					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 					"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
-					"\" stopAreaName=\""<< _stopArea->getName() <<
-					"\" lineName=\""    << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getName() <<
+					"\" stopAreaName=\"" << _stopArea->getName() <<
+					"\" lineName=\""     << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getName() <<
+					"\" lineShortName=\""<< Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getShortName() <<
+					"\" lineStyle=\""    << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getStyle() <<
 					"\">";
 			}
 			else
