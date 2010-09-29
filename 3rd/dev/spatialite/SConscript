@@ -11,6 +11,7 @@ if senv.GetPlatform () == 'win32':
 	senv.Append( CPPDEFINES = ['_WIN32'] )
 
 senv.Append( CPPDEFINES = ['OMIT_GEOS', 'SQLITE_ENABLE_RTREE'])
+senv.Append( LINKFLAGS = ['-lm', '-lproj'] )
 
 CppLibProject(
 	senv
