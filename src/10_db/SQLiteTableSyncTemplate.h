@@ -481,7 +481,7 @@ namespace synthese
 			if (res->next () == false)
 			{
 				// Create the table if it does not already exist.
-				sqlite->execUpdate (tableSchema);
+				sqlite->execUpdate (_GetTableCreationSQL());
 
 				// Insert some triggers to prevent non allowed operations
 				if (!triggerNoUpdate.empty()) sqlite->execUpdate (triggerNoUpdate);
