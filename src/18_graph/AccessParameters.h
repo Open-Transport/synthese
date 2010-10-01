@@ -222,6 +222,11 @@ namespace synthese
 				double getMaxApproachDistance() const { return _maxApproachDistance; }
 				const AllowedPathClasses& getAllowedPathClasses() const { return _allowedPathClasses; } 
 			//@}
+
+			//! @name Setters
+			//@{
+				void setMaxtransportConnectionsCount(boost::optional<size_t> value){ _maxTransportConnectionCount = value;}
+			//@}
 		};
 	}
 }

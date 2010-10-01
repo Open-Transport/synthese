@@ -362,6 +362,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_SITE;
 			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER;
+			static const std::string PARAMETER_MAX_DEPTH;
 			static const std::string PARAMETER_DEPARTURE_CITY_TEXT;
 			static const std::string PARAMETER_ARRIVAL_CITY_TEXT;
 			static const std::string PARAMETER_DEPARTURE_PLACE_TEXT;
