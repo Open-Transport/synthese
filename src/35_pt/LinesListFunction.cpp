@@ -193,6 +193,11 @@ namespace synthese
 			typedef const pair<const RegistryKeyType, shared_ptr<CommercialLine> > myType;
 			BOOST_FOREACH(myType&  myLine,Env::GetOfficialEnv().getRegistry<CommercialLine>())
 			{
+				if(_network.get() && myLine.second->getNetwork() != _network.get())
+				{
+					continue;
+				}
+
 				//Insert respecting order described up there
 				linesMap[sortableNumber(myLine.second->getShortName())] = myLine.second;
 			}
