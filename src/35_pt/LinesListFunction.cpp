@@ -82,8 +82,7 @@ namespace synthese
 			{
 				throw RequestException("No such page");
 			}
-			optional<string> idOf(map.getOptional<string>(PARAMETER_OUTPUT_FORMAT));
-			_outputFormat = (*idOf);
+			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
 		}
 
 		//Class used for trim:
