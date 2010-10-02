@@ -62,6 +62,7 @@ namespace synthese
 				- 6 : arrival time
 				- 7 : is the end station
 				- 8 : transfer destinations from this stop (should be the output of DeparturesTableTransferDestinationInterfacePage)
+				- 9 : rank
 
 		*/
 		class DeparturesTableDestinationInterfacepage
@@ -81,6 +82,7 @@ namespace synthese
 				bool lastDisplayedStopWasInTheSameCity,
 				bool isTheEndStation,
 				const std::string& transfersString,
+				std::size_t rank,
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL
 			) const;
