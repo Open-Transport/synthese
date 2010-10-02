@@ -63,6 +63,7 @@ namespace synthese
 			bool lastDisplayedStopWasInTheSameCity,
 			bool isTheEndStation,
 			const std::string& transfersString,
+			size_t rank,
 			VariablesMap& variables,
 			const server::Request* request /*= NULL*/
 		) const	{
@@ -78,6 +79,7 @@ namespace synthese
 			pv.push_back(to_simple_string(object.getArrivalDateTime())); //6
 			pv.push_back(lexical_cast<string>(isTheEndStation)); //7
 			pv.push_back(transfersString); //8
+			pv.push_back(lexical_cast<string>(rank)); //9
 
 			InterfacePage::_display(
 				stream
