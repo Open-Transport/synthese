@@ -34,6 +34,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/filesystem.hpp>
 #include <geos/geom/CoordinateSequenceFactory.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/LineString.h>
@@ -106,24 +107,16 @@ namespace synthese
 		{
 			// MTDAREA
 			FilePathsMap::const_iterator it(paths.find(FILE_MTDAREA));
-			if(it == paths.end() || it->second.empty()) return false;
+			if(it == paths.end() || it->second.empty() || !exists(it->second))
 			{
-				std::ifstream f(it->second.file_string().c_str());
-				if(f.fail())
-				{
-					return false;
-				}
+				return false;
 			}
 
 			// STREETS
 			it = paths.find(FILE_STREETS);
-			if(it == paths.end() || it->second.empty()) return false;
+			if(it == paths.end() || it->second.empty() || !exists(it->second))
 			{
-				std::ifstream f(it->second.file_string().c_str());
-				if(f.fail())
-				{
-					return false;
-				}
+				return false;
 			}
 
 			// OK
