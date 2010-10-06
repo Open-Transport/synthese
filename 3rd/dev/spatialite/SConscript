@@ -5,12 +5,13 @@ Import ('env')
 
 senv = env.Clone()
 
-deps = ['proj.cppbin']
+deps = ['proj.cpplib', 'geosc.cpplib']
 if senv.GetPlatform () == 'win32':
 	deps.append('iconv.cppinc')
 	senv.Append( CPPDEFINES = ['_WIN32'] )
+#'OMIT_GEOS', 
+senv.Append( CPPDEFINES = ['SQLITE_ENABLE_RTREE'])
 
-senv.Append( CPPDEFINES = ['OMIT_GEOS', 'SQLITE_ENABLE_RTREE'])
 senv.Append( LINKFLAGS = ['-lm', '-lproj'] )
 
 CppLibProject(
