@@ -27,3 +27,19 @@ GeosProject(
 	, filesrootdir = senv.SrcDir('src')
 )
 
+
+class GeosCProject (CppLibProject):
+	def declare(self):
+		self.env.InstallAs('#3rd/dev/geos/capi/geos_c.h','#3rd/dev/geos/capi/geos_c.h.in')
+
+		CppLibProject.declare(self)
+
+GeosCProject(
+	env,
+	'geosc',
+	'3.2',
+	source_files = senv.Glob ('*.cpp', [], senv.SrcDir('capi'), prefix='capi/', recursive=True),
+	include_dir = senv.SrcDir('capi'),
+	filesrootdir = senv.SrcDir('capi'),
+	dependencies = ['geos.cpplib']
+)
