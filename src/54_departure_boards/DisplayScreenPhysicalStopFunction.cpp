@@ -75,7 +75,7 @@ namespace synthese
 				Env::GetOfficialEnv().get<Interface>(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID)).get()
 			);
 
-			screen->setLocalization(place.get());
+			screen->setDisplayedPlace(place.get());
 			screen->setAllPhysicalStopsDisplayed(false);
 			const ArrivalDepartureTableGenerator::PhysicalStops& stops(place->getPhysicalStops());
 			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, stops)

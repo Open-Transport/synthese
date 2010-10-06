@@ -6,6 +6,7 @@ synthese::cms::WebPageTableSync::integrate();
 
 synthese::cms::CMSModule::integrate();
 
+synthese::cms::BitAndFunction::integrate();
 synthese::cms::WebPageDisplayFunction::integrate();
 synthese::cms::WebPageLastNewsFunction::integrate();
 synthese::cms::GetValueFunction::integrate();

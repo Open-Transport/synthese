@@ -47,7 +47,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,DisplayMonitoringStatusTableSync>::FACTORY_KEY("34.10 Display monitoring status");
+		template<> const string FactorableTemplate<SQLiteTableSync,DisplayMonitoringStatusTableSync>::FACTORY_KEY("54.10 Display monitoring status");
 	}
 
 	namespace departure_boards

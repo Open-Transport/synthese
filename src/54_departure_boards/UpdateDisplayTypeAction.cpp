@@ -26,10 +26,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "ArrivalDepartureTableLog.h"
 #include "ArrivalDepartureTableRight.h"
 #include "DBLogModule.h"
-
+#include "WebPageTableSync.h"
+#include "Webpage.h"
 #include "Interface.h"
 #include "InterfaceTableSync.h"
-
+#include "ObjectNotFoundException.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
@@ -50,7 +51,8 @@ namespace synthese
 	using namespace db;
 	using namespace dblog;
 	using namespace security;
-	
+	using namespace cms;
+		
 
 	namespace util
 	{
@@ -67,6 +69,11 @@ namespace synthese
 		const string UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER = Action_PARAMETER_PREFIX + "dtu_ro";
 		const string UpdateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER(Action_PARAMETER_PREFIX + "dtu_st");
 		const string UpdateDisplayTypeAction::PARAMETER_TIME_BETWEEN_CHECKS(Action_PARAMETER_PREFIX + "dtu_tc");
+		const string UpdateDisplayTypeAction::PARAMETER_DISPLAY_MAIN_PAGE_ID(Action_PARAMETER_PREFIX + "mp");
+		const string UpdateDisplayTypeAction::PARAMETER_DISPLAY_ROW_PAGE_ID(Action_PARAMETER_PREFIX + "rp");
+		const string UpdateDisplayTypeAction::PARAMETER_DISPLAY_DESTINATION_PAGE_ID(Action_PARAMETER_PREFIX + "dp");
+		const string UpdateDisplayTypeAction::PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID(Action_PARAMETER_PREFIX + "tp");
+
 
 		ParametersMap UpdateDisplayTypeAction::getParametersMap() const
 		{
@@ -78,6 +85,22 @@ namespace synthese
 				map.insert(PARAMETER_INTERFACE_ID, _interface->getKey());
 			map.insert(PARAMETER_ROWS_NUMBER, _rows_number);
 			map.insert(PARAMETER_MAX_STOPS_NUMBER, _max_stops_number);
+			if(_displayMainPage.get())
+			{
+				map.insert(PARAMETER_DISPLAY_MAIN_PAGE_ID, _displayMainPage->getKey());
+			}
+			if(_displayRowPage.get())
+			{
+				map.insert(PARAMETER_DISPLAY_ROW_PAGE_ID, _displayRowPage->getKey());
+			}
+			if(_displayDestinationPage.get())
+			{
+				map.insert(PARAMETER_DISPLAY_DESTINATION_PAGE_ID, _displayDestinationPage->getKey());
+			}
+			if(_displayTransferDestinationPage.get())
+			{
+				map.insert(PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, _displayTransferDestinationPage->getKey());
+			}
 			return map;
 		}
 
@@ -111,6 +134,60 @@ namespace synthese
 				if (id && *id)
 				{
 					_interface = InterfaceTableSync::Get(*id, *_env);
+				}
+				else
+				{ // CMS webpage instead
+					RegistryKeyType mid(map.getDefault<RegistryKeyType>(PARAMETER_DISPLAY_MAIN_PAGE_ID, 0));
+					if(mid)
+					{
+						try
+						{
+							_displayMainPage = WebPageTableSync::Get(mid, *_env);
+						}
+						catch(ObjectNotFoundException<Webpage>&)
+						{
+							throw ActionException("No such main page");
+						}
+
+						RegistryKeyType rid(map.getDefault<RegistryKeyType>(PARAMETER_DISPLAY_ROW_PAGE_ID, 0));
+						if(rid)
+						{
+							try
+							{
+								_displayRowPage = WebPageTableSync::Get(rid, *_env);
+							}
+							catch (ObjectNotFoundException<Webpage>&)
+							{
+								throw ActionException("No such row page");
+							}
+
+							RegistryKeyType did(map.getDefault<RegistryKeyType>(PARAMETER_DISPLAY_DESTINATION_PAGE_ID, 0));
+							if(did)
+							{
+								try
+								{
+									_displayDestinationPage = WebPageTableSync::Get(did, *_env);
+								}
+								catch (ObjectNotFoundException<Webpage>&)
+								{
+									throw ActionException("No such destination page");
+								}
+							}
+
+							RegistryKeyType sid(map.getDefault<RegistryKeyType>(PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, 0));
+							if(sid)
+							{
+								try
+								{
+									_displayTransferDestinationPage = WebPageTableSync::Get(sid, *_env);
+								}
+								catch (ObjectNotFoundException<Webpage>&)
+								{
+									throw ActionException("No such destination sorting page");
+								}
+							}
+						}
+					}
 				}
 				id = map.getOptional<RegistryKeyType>(PARAMETER_AUDIO_INTERFACE_ID);
 				if (id && *id)
@@ -154,6 +231,30 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(log, "Nombre de lignes", _dt->getRowNumber(), _rows_number);
 			DBLogModule::appendToLogIfChange(log, "Nombre d'arrêts intermédiaires", _dt->getMaxStopsNumber(), _max_stops_number);
 			DBLogModule::appendToLogIfChange(log, "Temps entre les contrôles de supervision", to_simple_string(_dt->getTimeBetweenChecks()), to_simple_string(_timeBetweenChecks));
+			DBLogModule::appendToLogIfChange(
+				log,
+				"Page CMS principale",
+				(_dt->getDisplayMainPage() != NULL) ? _dt->getDisplayMainPage()->getFullName() : "(aucune)",
+				(_displayMainPage.get() != NULL) ? _displayMainPage->getFullName() : "(aucune)"
+			);
+			DBLogModule::appendToLogIfChange(
+				log,
+				"Page CMS pour rangée",
+				(_dt->getDisplayRowPage() != NULL) ? _dt->getDisplayRowPage()->getFullName() : "(aucune)",
+				(_displayRowPage.get() != NULL) ? _displayRowPage->getFullName() : "(aucune)"
+			);
+			DBLogModule::appendToLogIfChange(
+				log,
+				"Page CMS pour destination",
+				(_dt->getDisplayDestinationPage() != NULL) ? _dt->getDisplayDestinationPage()->getFullName() : "(aucune)",
+				(_displayDestinationPage.get() != NULL) ? _displayDestinationPage->getFullName() : "(aucune)"
+			);
+			DBLogModule::appendToLogIfChange(
+				log,
+				"Page CMS pour destination en correspondance",
+				(_dt->getDisplayTransferDestinationPage() != NULL) ? _dt->getDisplayTransferDestinationPage()->getFullName() : "(aucune)",
+				(_displayTransferDestinationPage.get() != NULL) ? _displayTransferDestinationPage->getFullName() : "(aucune)"
+			);
 
 			// Update
 			_dt->setName(_name);
@@ -163,6 +264,10 @@ namespace synthese
 			_dt->setRowNumber(_rows_number);
 			_dt->setMaxStopsNumber(_max_stops_number);
 			_dt->setTimeBetweenChecks(_timeBetweenChecks);
+			_dt->setDisplayMainPage(_displayMainPage.get());
+			_dt->setDisplayRowPage(_displayRowPage.get());
+			_dt->setDisplayDestinationPage(_displayDestinationPage.get());
+			_dt->setDisplayTransferDestinationPage(_displayTransferDestinationPage.get());
 			DisplayTypeTableSync::Save(_dt.get());
 
 			// Log
@@ -187,10 +292,13 @@ namespace synthese
 
 
 
-		bool UpdateDisplayTypeAction::isAuthorized(const Session* session
-
-			) const {
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+		bool UpdateDisplayTypeAction::isAuthorized(
+			const Session* session
+		) const {
+			return
+				session &&
+				session->hasProfile() &&
+				session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE)
+			;
 		}
-	}
-}
+}	}

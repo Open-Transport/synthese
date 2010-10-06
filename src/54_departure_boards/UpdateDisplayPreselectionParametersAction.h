@@ -52,9 +52,7 @@ namespace synthese
 				ARRIVAL_PRESELECTION,
 				ROUTE_PLANNING_WITH_TRANSFER,
 				ROUTE_PLANNING_WITHOUT_TRANSFER,
-				DEPARTURES_BY_PHYSICAL_STOP,
-				ARRIVALS_BY_PHYSICAL_STOP
-
+				DISPLAY_CHILDREN_ONLY
 			} DisplayFunction;
 
 			typedef std::map<boost::optional<DisplayFunction>, std::string> DisplayFunctionNames;

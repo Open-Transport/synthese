@@ -96,11 +96,6 @@ namespace synthese
 			ArrivalDepartureTableLog::addCreateEntry(cpu, *request.getUser());
 		}
 
-		void DisplayScreenCPUCreateAction::setPlace( boost::shared_ptr<const StopArea> place )
-		{
-			_place = place;
-		}
-
 
 
 		bool DisplayScreenCPUCreateAction::isAuthorized(const Session* session

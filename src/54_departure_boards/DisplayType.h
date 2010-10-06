@@ -33,6 +33,11 @@
 
 namespace synthese
 {
+	namespace cms
+	{
+		class Webpage;
+	}
+
 	namespace interfaces
 	{
 		class Interface;
@@ -67,6 +72,11 @@ namespace synthese
 			int								_maxStopsNumber;
 			boost::posix_time::time_duration	_timeBetweenChecks;		//!< Time between monitoring checks (0 = no value)
 
+			const cms::Webpage*	_displayMainPage;
+			const cms::Webpage* _displayRowPage;
+			const cms::Webpage* _displayDestinationPage;
+			const cms::Webpage* _displayTransferDestinationPage;
+
 		public:
 			
 			
@@ -89,6 +99,10 @@ namespace synthese
 				int								getRowNumber()				const;
 				int								getMaxStopsNumber()			const;
 				const boost::posix_time::time_duration&	getTimeBetweenChecks()		const;
+				const cms::Webpage*	getDisplayMainPage() const { return _displayMainPage; }
+				const cms::Webpage* getDisplayRowPage() const { return _displayRowPage; }
+				const cms::Webpage* getDisplayDestinationPage() const { return _displayDestinationPage; }
+				const cms::Webpage* getDisplayTransferDestinationPage() const { return _displayTransferDestinationPage; }
 			//@}
 
 			//! @name Setters
@@ -100,6 +114,10 @@ namespace synthese
 				void setRowNumber(int number);
 				void setMaxStopsNumber(int number);
 				void setTimeBetweenChecks(const boost::posix_time::time_duration& value);
+				void setDisplayMainPage(const cms::Webpage* value){ _displayMainPage = value; }
+				void setDisplayRowPage(const cms::Webpage* value){ _displayRowPage = value; }
+				void setDisplayDestinationPage(const cms::Webpage* value){ _displayDestinationPage = value; }
+				void setDisplayTransferDestinationPage(const cms::Webpage* value){ _displayTransferDestinationPage = value; }
 			//@}
 		};
 	}

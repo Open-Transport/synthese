@@ -53,7 +53,10 @@ namespace synthese
 			static const std::string COL_ROWS_NUMBER;
 			static const std::string COL_MAX_STOPS_NUMBER;
 			static const std::string COL_TIME_BETWEEN_CHECKS;
-	
+			static const std::string COL_DISPLAY_MAIN_PAGE_ID;
+			static const std::string COL_DISPLAY_ROW_PAGE_ID;
+			static const std::string COL_DISPLAY_DESTINATION_PAGE_ID;
+			static const std::string COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID;
 
 
 			////////////////////////////////////////////////////////////////////

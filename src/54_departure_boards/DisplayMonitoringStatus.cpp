@@ -199,7 +199,7 @@ namespace synthese
 			// Localization
 			if (_displayScreen != NULL)
 			{
-				_localizationStatus = (_displayScreen->getLocalization() != NULL) ?
+				_localizationStatus = (_displayScreen->getLocation() != NULL) ?
 					DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR;
 			}
 		}

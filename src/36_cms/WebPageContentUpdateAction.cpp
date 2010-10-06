@@ -74,7 +74,7 @@ namespace synthese
 			{
 				_page = WebPageTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_WEB_PAGE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<Webpage>& e)
+			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw ActionException("No such page");
 			}

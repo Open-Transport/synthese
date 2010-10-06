@@ -29,6 +29,11 @@
 
 namespace synthese
 {
+	namespace cms
+	{
+		class Webpage;
+	}
+
 	namespace interfaces
 	{
 		class Interface;
@@ -52,6 +57,10 @@ namespace synthese
 			static const std::string PARAMETER_ROWS_NUMBER;
 			static const std::string PARAMETER_MAX_STOPS_NUMBER;
 			static const std::string PARAMETER_TIME_BETWEEN_CHECKS;
+			static const std::string PARAMETER_DISPLAY_MAIN_PAGE_ID;
+			static const std::string PARAMETER_DISPLAY_ROW_PAGE_ID;
+			static const std::string PARAMETER_DISPLAY_DESTINATION_PAGE_ID;
+			static const std::string PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID;
 
 		private:
 			boost::shared_ptr<DisplayType> _dt;
@@ -62,6 +71,10 @@ namespace synthese
 			int	_rows_number;
 			int	_max_stops_number;
 			boost::posix_time::time_duration	_timeBetweenChecks;
+			boost::shared_ptr<const cms::Webpage> _displayMainPage;
+			boost::shared_ptr<const cms::Webpage> _displayRowPage;
+			boost::shared_ptr<const cms::Webpage> _displayDestinationPage;
+			boost::shared_ptr<const cms::Webpage> _displayTransferDestinationPage;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

@@ -41,6 +41,7 @@
 #include "ParseDisplayReturnInterfacePage.h"
 #include "InterfaceTableSync.h"
 #include "Profile.h"
+#include "Webpage.h"
 
 using namespace std;
 using namespace boost;
@@ -54,6 +55,8 @@ namespace synthese
 	using namespace departure_boards;
 	using namespace html;
 	using namespace security;
+	using namespace cms;
+	
 
 	namespace util
 	{
@@ -128,6 +131,38 @@ namespace synthese
 						UpdateDisplayTypeAction::PARAMETER_INTERFACE_ID,
 						InterfaceTableSync::GetInterfaceLabels<DeparturesTableInterfacePage>(optional<string>()),
 						optional<RegistryKeyType>(_type->getDisplayInterface() ? _type->getDisplayInterface()->getKey() : 0)
+				)	)
+			;
+			stream <<
+				t.cell(
+					"Page CMS principale",
+					t.getForm().getTextInput(
+						UpdateDisplayTypeAction::PARAMETER_DISPLAY_MAIN_PAGE_ID,
+						_type->getDisplayMainPage() ? lexical_cast<string>(_type->getDisplayMainPage()->getKey()) : string()
+				)	)
+			;
+			stream <<
+				t.cell(
+					"Page CMS pour rangée",
+					t.getForm().getTextInput(
+						UpdateDisplayTypeAction::PARAMETER_DISPLAY_ROW_PAGE_ID,
+						_type->getDisplayRowPage() ? lexical_cast<string>(_type->getDisplayRowPage()->getKey()) : string()
+				)	)
+			;
+			stream <<
+				t.cell(
+					"Page CMS pour destination",
+					t.getForm().getTextInput(
+						UpdateDisplayTypeAction::PARAMETER_DISPLAY_DESTINATION_PAGE_ID,
+						_type->getDisplayDestinationPage() ? lexical_cast<string>(_type->getDisplayDestinationPage()->getKey()) : string()
+				)	)
+			;
+			stream <<
+				t.cell(
+					"Page CMS pour destination en correspondance",
+					t.getForm().getTextInput(
+						UpdateDisplayTypeAction::PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID,
+						_type->getDisplayTransferDestinationPage() ? lexical_cast<string>(_type->getDisplayTransferDestinationPage()->getKey()) : string()
 				)	)
 			;
 			stream <<

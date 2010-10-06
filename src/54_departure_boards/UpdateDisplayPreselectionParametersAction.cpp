@@ -104,9 +104,8 @@ namespace synthese
 				_screen->setGenerationMethod(DisplayScreen::ROUTE_PLANNING);
 				break;
 
-			case DEPARTURES_BY_PHYSICAL_STOP:
-			case ARRIVALS_BY_PHYSICAL_STOP:
-				_screen->setGenerationMethod(DisplayScreen::BY_PHYSICAL_STOP);
+			case DISPLAY_CHILDREN_ONLY:
+				_screen->setGenerationMethod(DisplayScreen::DISPLAY_CHILDREN_ONLY);
 				break;
 			}
 			switch (_function)
@@ -115,13 +114,12 @@ namespace synthese
 			case DEPARTURES_PRESELECTION:
 			case ROUTE_PLANNING_WITHOUT_TRANSFER:
 			case ROUTE_PLANNING_WITH_TRANSFER:
-			case DEPARTURES_BY_PHYSICAL_STOP:
+			case DISPLAY_CHILDREN_ONLY:
 				_screen->setDirection(DISPLAY_DEPARTURES);
 				break;
 
 			case ARRIVAL_CHRONOLOGICAL:
 			case ARRIVAL_PRESELECTION:
-			case ARRIVALS_BY_PHYSICAL_STOP:
 				_screen->setDirection(DISPLAY_ARRIVALS);
 				break;
 			}
@@ -181,8 +179,7 @@ namespace synthese
 			directionMap.insert(make_pair(ARRIVAL_PRESELECTION, "Arrivées avec présélection"));
 			directionMap.insert(make_pair(ROUTE_PLANNING_WITH_TRANSFER, "Calcul d'itinéraire avec correspondance"));
 			directionMap.insert(make_pair(ROUTE_PLANNING_WITHOUT_TRANSFER, "Calcul d'itinéraire sans correspondance"));
-			directionMap.insert(make_pair(DEPARTURES_BY_PHYSICAL_STOP, "Départs par arrêt physique"));
-			directionMap.insert(make_pair(ARRIVALS_BY_PHYSICAL_STOP, "Arrivées par arrêt physique"));
+			directionMap.insert(make_pair(DISPLAY_CHILDREN_ONLY, "Affichage des fils uniquement"));
 			return directionMap;
 		}
 
@@ -226,9 +223,9 @@ namespace synthese
 		bool UpdateDisplayPreselectionParametersAction::isAuthorized(const Session* session
 		) const {
 			assert(_screen.get() != NULL);
-			if (_screen->getLocalization() != NULL)
+			if (_screen->getLocation() != NULL)
 			{
-				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocation()->getKey()));
 			}
 			else
 			{

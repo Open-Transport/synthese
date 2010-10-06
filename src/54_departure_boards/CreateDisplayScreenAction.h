@@ -30,9 +30,9 @@
 
 namespace synthese
 {
-	namespace pt
+	namespace geography
 	{
-		class StopArea;
+		class NamedPlace;
 	}
 
 	namespace departure_boards
@@ -49,11 +49,13 @@ namespace synthese
 			static const std::string PARAMETER_LOCALIZATION_ID;
 			static const std::string PARAMETER_TEMPLATE_ID;
 			static const std::string PARAMETER_CPU_ID;
+			static const std::string PARAMETER_UP_ID;
 
 		private:
 			boost::shared_ptr<const DisplayScreen>			_template;
-			boost::shared_ptr<const pt::StopArea>	_place;
+			boost::shared_ptr<const geography::NamedPlace>	_place;
 			boost::shared_ptr<const DisplayScreenCPU>		_cpu;
+			boost::shared_ptr<const DisplayScreen>			_up;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -70,8 +72,9 @@ namespace synthese
 			*/
 			void run(server::Request& request);
 
-			void setPlace(util::RegistryKeyType id);
-			void setCPU(util::RegistryKeyType id);
+			void setPlace(boost::shared_ptr<const geography::NamedPlace> value){ _place = value; }
+			void setCPU(boost::shared_ptr<const DisplayScreenCPU> value){ _cpu = value; }
+			void setUp(boost::shared_ptr<const DisplayScreen> value){ _up = value; }
 
 			virtual bool isAuthorized(const server::Session* session) const;
 		};

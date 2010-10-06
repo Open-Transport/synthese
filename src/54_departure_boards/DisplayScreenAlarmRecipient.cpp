@@ -171,12 +171,7 @@ namespace synthese
 					stream << l.element("display");
 					stream << HTMLModule::getHTMLLink(removeRequest.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer"));
 					
-					if(ds->getLocalization())
-					{
-						stream << ds->getLocalization()->getFullName() << "/" << ds->getLocalization()->getName();
-						if (ds->getLocalizationComment() != "")
-							stream << "/" << ds->getLocalizationComment();
-					}
+					stream << ds->getFullName();
 				}
 
 				stream << l.close();
@@ -237,8 +232,10 @@ namespace synthese
 
 			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
 			{
-				if (screen->getLocalization() == NULL)
+				if(!screen->getLocation())
+				{
 					continue;
+				}
 				if (usedDisplayScreens.find(screen->getKey()) != usedDisplayScreens.end())
 					continue;
 

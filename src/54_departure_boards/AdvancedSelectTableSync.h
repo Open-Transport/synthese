@@ -43,12 +43,12 @@ namespace synthese
 	namespace pt
 	{
 		class StopPoint;
+		class CommercialLine;
 	}
 
-	namespace pt
+	namespace geography
 	{
-		class StopArea;
-		class CommercialLine;
+		class NamedPlace;
 	}
 
 	namespace departure_boards
@@ -57,7 +57,7 @@ namespace synthese
 
 		struct ConnectionPlaceWithBroadcastPoint
 		{
-			boost::shared_ptr<pt::StopArea> place;
+			boost::shared_ptr<geography::NamedPlace> place;
 			std::string	cityName;
 			int broadCastPointsNumber;
 			int cpuNumber;

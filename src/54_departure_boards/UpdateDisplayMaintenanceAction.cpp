@@ -33,6 +33,8 @@
 #include "DisplayMaintenanceRight.h"
 #include "StopArea.hpp"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -115,9 +117,9 @@ namespace synthese
 
 		bool UpdateDisplayMaintenanceAction::isAuthorized(const Session* session
 		) const {
-			if (_displayScreen->getLocalization() != NULL)
+			if (_displayScreen->getLocation() != NULL)
 			{
-				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<DisplayMaintenanceRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_displayScreen->getLocation()->getKey()));
 			}
 			else
 			{
