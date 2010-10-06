@@ -81,6 +81,7 @@ namespace synthese
 				static const std::string COL_MAC_ADDRESS;
 				static const std::string COL_ROUTE_PLANNING_WITH_TRANSFER;
 				static const std::string COL_TRANSFER_DESTINATIONS;
+				static const std::string COL_UP_ID;
 			//@}
 			
 

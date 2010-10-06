@@ -41,6 +41,8 @@ namespace synthese
 			TreeUniqueRootPolicy();
 
 			static T* getRoot() { return &boost::detail::thread::singleton<T>.instance(); }
+
+			void setSameRoot(const TreeUniqueRootPolicy<T>&){ }
 		};
 	}
 }

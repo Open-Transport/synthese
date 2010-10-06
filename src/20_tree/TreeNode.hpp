@@ -82,13 +82,27 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setParent(ObjectType* object){	_parent = object; }
-			//@}
+				void setParent(ObjectType* parent)
+				{
+					_parent = parent;
+				}
 
-			//! @name Updaters
-			//@{
-				void addChild(ObjectType* object) { _children.insert(std::make_pair(object->getTreeOrderingKey(), object)); }
-				void removeChild(ObjectType* object) { _children.erase(object->getTreeOrderingKey()); }
+				static void SetParent(ObjectType& child, ObjectType* parent)
+				{
+					if(child._parent != parent)
+					{
+						if(child._parent)
+						{
+							child._parent->_children.erase(child.getTreeOrderingKey());
+						}
+						child.setParent(parent);
+						if(parent)
+						{
+							parent->_children.insert(std::make_pair(child.getTreeOrderingKey(), &child));
+							child.setSameRoot(*parent);
+						}
+					}
+				}
 			//@}
 
 			//! @name Services
@@ -103,6 +117,27 @@ namespace synthese
 					std::size_t result(0);
 					for(ObjectType* parent(_parent); parent; parent = parent->_parent, ++result) ;
 					return result;
+				}
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the object is a child of an other one.
+				/// @param other object that should be parent of this object
+				/// @return true or false
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.2.0
+				bool isChildOf(const ObjectType& other) const
+				{
+					for(ObjectType* parent(_parent); parent; parent = parent->_parent)
+					{
+						if(parent == &other)
+						{
+							return true;
+						}
+					}
+					return false;
 				}
 
 

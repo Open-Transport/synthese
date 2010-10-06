@@ -70,7 +70,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync, DisplayScreenTableSync>::FACTORY_KEY("34.50 Display Screens");
+		template<> const string FactorableTemplate<SQLiteTableSync, DisplayScreenTableSync>::FACTORY_KEY("54.50 Display Screens");
 	}
 
 	namespace departure_boards
@@ -106,6 +106,7 @@ namespace synthese
 		const string DisplayScreenTableSync::COL_MAC_ADDRESS("mac_address");
 		const string DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER("route_planning_with_transfer");
 		const string DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS("transfer_destinations");
+		const string DisplayScreenTableSync::COL_UP_ID("up_id");
 	}
 
 	namespace db
@@ -148,6 +149,7 @@ namespace synthese
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAC_ADDRESS, SQL_TEXT),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER, SQL_BOOLEAN),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS, SQL_TEXT),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_UP_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 		
@@ -164,7 +166,7 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			object->setLocalizationComment (rows->getText ( DisplayScreenTableSync::COL_NAME));
+			object->setName(rows->getText ( DisplayScreenTableSync::COL_NAME));
 			object->setWiringCode (rows->getInt ( DisplayScreenTableSync::COL_WIRING_CODE));
 			object->setTitle (rows->getText ( DisplayScreenTableSync::COL_TITLE));
 			object->setBlinkingDelay (rows->getInt ( DisplayScreenTableSync::COL_BLINKING_DELAY));
@@ -185,8 +187,8 @@ namespace synthese
 			object->setComPort(rows->getInt(DisplayScreenTableSync::COL_COM_PORT));
 			object->setMacAddress(rows->getText(DisplayScreenTableSync::COL_MAC_ADDRESS));
 			object->setRoutePlanningWithTransfer(rows->getBool(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER));
-			object->setLocalization(NULL);
-			object->setCPU(NULL);
+			object->setNullRoot();
+			object->setDisplayedPlace(NULL);
 			object->setType(NULL);
 			object->clearForbiddenPlaces();
 			object->clearDisplayedPlaces();
@@ -196,33 +198,54 @@ namespace synthese
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				// Localization
+				// Displayed place
 				RegistryKeyType placeId(rows->getLongLong( DisplayScreenTableSync::COL_PLACE_ID));
 				if(placeId != 0) try
 				{
-					object->setLocalization(StopAreaTableSync::Get(placeId, env, linkLevel).get());
+					object->setDisplayedPlace(StopAreaTableSync::Get(placeId, env, linkLevel).get());
 				}
-				catch(ObjectNotFoundException<StopArea>& e)
+				catch(ObjectNotFoundException<StopArea>&)
 				{
 					Log::GetInstance().warn(
 						"Data corrupted in "+ TABLE.NAME + " on display screen : localization "+ lexical_cast<string>(placeId) + " not found"
 					);
 				}
-				
-				// CPU
-				RegistryKeyType cpuId(rows->getLongLong(DisplayScreenTableSync::COL_CPU_HOST_ID));
-				if (cpuId > 0) try
+
+				// Up & root
+				RegistryKeyType upId(rows->getLongLong(DisplayScreenTableSync::COL_UP_ID));
+				if(upId > 0) try
 				{
-					object->setCPU(DisplayScreenCPUTableSync::Get(cpuId, env, linkLevel).get());
-					DisplayScreenCPUTableSync::GetEditable(cpuId, env, linkLevel)->addWiredScreen(object);
+					DisplayScreen::SetParent(*object, DisplayScreenTableSync::GetEditable(upId, env, linkLevel).get());
 				}
-				catch(ObjectNotFoundException<StopArea>& e)
+				catch(ObjectNotFoundException<DisplayScreen>&)
 				{
 					Log::GetInstance().warn(
-						"Data corrupted in "+ TABLE.NAME + " on display screen : cpu host " +
-						lexical_cast<string>(cpuId) + " not found"
+						"Data corrupted in "+ TABLE.NAME + " on display screen : up display screen " +
+						lexical_cast<string>(upId) + " not found"
 					);
 				}
+				else
+				{
+					// CPU
+					RegistryKeyType cpuId(rows->getLongLong(DisplayScreenTableSync::COL_CPU_HOST_ID));
+					if (cpuId > 0) try
+					{
+						object->setRoot(DisplayScreenCPUTableSync::GetEditable(cpuId, env, linkLevel).get());
+						DisplayScreenCPUTableSync::GetEditable(cpuId, env, linkLevel)->addWiredScreen(object);
+					}
+					catch(ObjectNotFoundException<StopArea>&)
+					{
+						Log::GetInstance().warn(
+							"Data corrupted in "+ TABLE.NAME + " on display screen : cpu host " +
+							lexical_cast<string>(cpuId) + " not found"
+						);
+					}
+					else
+					{
+						object->setRoot(static_cast<NamedPlace*>(const_cast<StopArea*>(object->getDisplayedPlace())));
+					}
+				}
+
 
 				// Type
 				RegistryKeyType typeId(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID));
@@ -230,7 +253,7 @@ namespace synthese
 				{
 					object->setType(DisplayTypeTableSync::Get(typeId, env, linkLevel).get());
 				}
-				catch(ObjectNotFoundException<DisplayType>& e)
+				catch(ObjectNotFoundException<DisplayType>&)
 				{
 					Log::GetInstance().warn(
 						"Data corrupted in "+ TABLE.NAME + " on display screen : type " +
@@ -247,7 +270,7 @@ namespace synthese
 						RegistryKeyType id(Conversion::ToLongLong(stop));
 						object->addPhysicalStop(StopPointTableSync::Get(id, env, linkLevel).get());
 					}
-					catch (ObjectNotFoundException<StopPoint>& e)
+					catch (ObjectNotFoundException<StopPoint>&)
 					{
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
 					}
@@ -325,10 +348,11 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Unlink(
 			DisplayScreen* object
 		){
-			if(object->getCPU())
+			if(object->getRoot<DisplayScreenCPU>() && !object->getParent())
 			{
-				const_cast<DisplayScreenCPU*>(object->getCPU())->removeWiredScreen(object);
+				const_cast<DisplayScreenCPU*>(object->getRoot<DisplayScreenCPU>())->removeWiredScreen(object);
 			}
+			DisplayScreen::SetParent(*object, NULL);
 		}
 
 
@@ -427,8 +451,8 @@ namespace synthese
 
 			// Query
 			ReplaceQuery<DisplayScreenTableSync> query(*object);
-			query.addField(object->getLocalization() ? object->getLocalization()->getKey() : RegistryKeyType(0));
-			query.addField(object->getLocalizationComment());
+			query.addField(object->getDisplayedPlace() ? object->getDisplayedPlace()->getKey() : RegistryKeyType(0));
+			query.addField(object->getName());
 			query.addField(object->getType() ? object->getType()->getKey() : RegistryKeyType(0));
 			query.addField(object->getWiringCode());
 			query.addField(object->getTitle());
@@ -454,10 +478,11 @@ namespace synthese
 			query.addField(object->getMaintenanceMessage());
 			query.addField(object->getDisplayClock());
 			query.addField(object->getComPort());
-			query.addField(object->getCPU() != NULL ? object->getCPU()->getKey() : RegistryKeyType(0));
+			query.addField((object->getRoot<DisplayScreenCPU>() && !object->getParent()) ? object->getRoot<DisplayScreenCPU>()->getKey() : RegistryKeyType(0));
 			query.addField(object->getMacAddress());
 			query.addField(object->getRoutePlanningWithTransfer());
 			query.addField(tdstream.str());
+			query.addField(object->getParent() ? object->getParent()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 	}	}
 

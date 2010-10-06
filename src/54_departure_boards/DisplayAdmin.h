@@ -212,6 +212,11 @@ namespace synthese
 			virtual void _buildTabs(
 				const security::Profile& profile
 			) const;
+
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				const AdminInterfaceElement& currentPage,
+				const admin::AdminRequest& request
+			) const;
 		};
 	}
 }
