@@ -158,7 +158,7 @@ namespace synthese
 						const Registry<StopArea>& registry(Env::GetOfficialEnv().getRegistry<StopArea>());
 						BOOST_REVERSE_FOREACH(Registry<StopArea>::value_type stopArea, registry)
 						{
-							if(!stopArea.second->getPoint()->isEmpty())
+							if(stopArea.second->getPoint() && !stopArea.second->getPoint()->isEmpty())
 							{
 								mapCenter = stopArea.second->getPoint();
 								break;
@@ -168,6 +168,11 @@ namespace synthese
 					HTMLMap map(*mapCenter, 18, true, true);
 					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 					{
+						if(!it.second->getGeometry().get())
+						{
+							continue;
+						}
+
 						moveAction.getAction()->setStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<StopPoint*>(it.second)));
 
 						stringstream popupcontent;
