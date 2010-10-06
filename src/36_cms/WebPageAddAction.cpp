@@ -92,7 +92,7 @@ namespace synthese
 					_rank = _template->getRank();
 					_site = Fetcher<Website>::FetchEditable(_template->getRoot()->getKey(), *_env);
 				}
-				catch(ObjectNotFoundException<Webpage>& e)
+				catch(ObjectNotFoundException<Webpage>&)
 				{
 					throw ActionException("No such web page template");
 				}
@@ -121,7 +121,7 @@ namespace synthese
 					)	);
 					_rank = result.empty() ? 0 : (*result.begin())->getRank() + 1;
 				}
-				catch(ObjectNotFoundException<Webpage>& e)
+				catch(ObjectNotFoundException<Webpage>&)
 				{
 					throw ActionException("No such web page template");
 				}
@@ -149,7 +149,7 @@ namespace synthese
 					)	);
 					_rank = result.empty() ? 0 : (*result.begin())->getRank() + 1;
 				}
-				catch(ObjectNotFoundException<Website>& e)
+				catch(ObjectNotFoundException<Website>&)
 				{
 					throw ActionException("No such website");
 				}

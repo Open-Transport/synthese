@@ -28,6 +28,7 @@
 
 #include "Registrable.h"
 #include "Registry.h"
+#include "Named.h"
 
 #include <string>
 #include <set>
@@ -35,9 +36,9 @@
 
 namespace synthese
 {
-	namespace pt
+	namespace geography
 	{
-		class StopArea;
+		class NamedPlace;
 	}
 
 	namespace departure_boards
@@ -52,8 +53,9 @@ namespace synthese
 		///	
 		///	@ingroup m54
 		////////////////////////////////////////////////////////////////////////
-		class DisplayScreenCPU
-		:	public util::Registrable
+		class DisplayScreenCPU:
+			public util::Registrable,
+			public util::Named
 		{
 		public:
 			typedef util::Registry<DisplayScreenCPU> Registry;
@@ -61,8 +63,7 @@ namespace synthese
 			
 		protected:
 			// Attributes
-			std::string											_name;
-			const pt::StopArea*	_place;
+			const geography::NamedPlace*	_place;
 			std::string											_mac_address;
 			boost::posix_time::time_duration					_monitoring_delay;
 			bool												_is_online;
@@ -88,8 +89,7 @@ namespace synthese
 			
 			//! @name Getters
 			//@{
-				const std::string&									getName()				const;
-				const pt::StopArea*	getPlace()				const;
+				const geography::NamedPlace*	getPlace()				const { return _place; }
 				const std::string&									getMacAddress()			const;
 				boost::posix_time::time_duration					getMonitoringDelay()	const;
 				bool												getIsOnline()			const;
@@ -99,8 +99,7 @@ namespace synthese
 			
 			//! @name Setters
 			//@{
-				void setName(const std::string& value);
-				void setPlace(const pt::StopArea* const value);
+				void setPlace(const geography::NamedPlace* value){ _place = value; }
 				void setMacAddress(const std::string& value);
 				void setMonitoringDelay(const boost::posix_time::time_duration value);
 				void setIsOnline(const bool value);

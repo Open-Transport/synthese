@@ -30,9 +30,9 @@
 
 namespace synthese
 {
-	namespace pt
+	namespace geography
 	{
-		class StopArea;
+		class NamedPlace;
 	}
 
 	namespace departure_boards
@@ -50,7 +50,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<const DisplayScreenCPU>			_template;
-			boost::shared_ptr<const pt::StopArea>	_place;
+			boost::shared_ptr<const geography::NamedPlace>	_place;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -67,7 +67,7 @@ namespace synthese
 			*/
 			void run(server::Request& request);
 
-			void setPlace(boost::shared_ptr<const pt::StopArea> place);
+			void setPlace(boost::shared_ptr<const geography::NamedPlace> place){ _place = place; }
 
 			virtual bool isAuthorized(const server::Session* session) const;
 		};

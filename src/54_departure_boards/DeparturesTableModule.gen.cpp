@@ -53,6 +53,7 @@ synthese::departure_boards::DisplayScreenCPUUpdateAction::integrate();
 synthese::departure_boards::DisplayScreenCPUMaintenanceUpdateAction::integrate();
 synthese::departure_boards::DisplayScreenTransferDestinationAddAction::integrate();
 synthese::departure_boards::DisplayScreenTransferDestinationRemoveAction::integrate();
+synthese::departure_boards::DisplayScreenUpdateDisplayedStopAreaAction::integrate();
 
 synthese::departure_boards::DisplayScreenContentFunction::integrate();
 synthese::departure_boards::DisplayScreenSupervisionFunction::integrate();

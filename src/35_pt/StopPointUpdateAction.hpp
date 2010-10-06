@@ -41,6 +41,7 @@ namespace synthese
 	namespace pt
 	{
 		class StopPoint;
+		class StopArea;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : StopPointUpdateAction.
@@ -58,6 +59,7 @@ namespace synthese
 		///		<li>actionParamy : y</li>
 		///		<li>actionParamoc : operator code</li>
 		///		<li>actionParamna : name</li>
+		///		<li>actionParamsa : stop area</li>
 		///	</ul>
 		class StopPointUpdateAction:
 			public util::FactorableTemplate<server::Action, StopPointUpdateAction>
@@ -68,12 +70,14 @@ namespace synthese
 			static const std::string PARAMETER_Y;
 			static const std::string PARAMETER_OPERATOR_CODE;
 			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_STOP_AREA;
 
 		private:
 			boost::shared_ptr<StopPoint> _stop;
 			boost::shared_ptr<geos::geom::Point> _point;
 			std::string _operatorCode;
 			std::string _name;
+			boost::shared_ptr<const StopArea> _stopArea;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

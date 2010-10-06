@@ -47,34 +47,17 @@ namespace synthese
 		DisplayScreenCPU::DisplayScreenCPU(
 			RegistryKeyType id
 		):	Registrable(id),
-			_name(),
 			_place(NULL),
 			_mac_address(),
 			_is_online(true),
 			_maintenance_message()
-		{
-
-		}
+		{}
 
 
 
 		DisplayScreenCPU::~DisplayScreenCPU(
 		){
 			_place = NULL;
-		}
-
-
-
-		const std::string& DisplayScreenCPU::getName(
-		) const {
-			return _name;
-		}
-
-
-
-		const pt::StopArea* DisplayScreenCPU::getPlace(
-		) const {
-			return _place;
 		}
 
 
@@ -103,22 +86,6 @@ namespace synthese
 		const std::string& DisplayScreenCPU::getMaintenanceMessage(
 		) const {
 			return _maintenance_message;
-		}
-
-
-
-		void DisplayScreenCPU::setName(
-			const std::string& value
-		){
-			_name = value;
-		}
-
-
-
-		void DisplayScreenCPU::setPlace(
-			const pt::StopArea* const value
-		){
-			_place = value;
 		}
 
 
@@ -156,7 +123,7 @@ namespace synthese
 		void DisplayScreenCPU::copy( const DisplayScreenCPU& e )
 		{
 			_mac_address = e._mac_address;
-			_name = e._name;
+			setName(e.getName());
 			_place = e._place;
 			_monitoring_delay = e._monitoring_delay;
 		}
@@ -164,13 +131,15 @@ namespace synthese
 		std::string DisplayScreenCPU::getFullName() const
 		{
 			if (!_place)
-				return _name + " (not localized)";
+			{
+				return getName() + " (not localized)";
+			}
 			else
 			{
 				stringstream s;
 				s << _place->getFullName();
-				if (!_name.empty())
-					s << "/" << _name;
+				if (!getName().empty())
+					s << "/" << getName();
 				return s.str();
 			}
 		}

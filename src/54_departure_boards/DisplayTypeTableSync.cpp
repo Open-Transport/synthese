@@ -30,6 +30,7 @@
 #include "InterfaceTableSync.h"
 #include "Conversion.h"
 #include "ReplaceQuery.h"
+#include "WebPageTableSync.h"
 
 #include <sstream>
 
@@ -43,10 +44,11 @@ namespace synthese
 	using namespace departure_boards;
 	using namespace interfaces;
 	using namespace util;
+	using namespace cms;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,DisplayTypeTableSync>::FACTORY_KEY("34.00 Display Types");
+		template<> const string FactorableTemplate<SQLiteTableSync,DisplayTypeTableSync>::FACTORY_KEY("54.00 Display Types");
 	}
 
 	namespace departure_boards
@@ -58,6 +60,10 @@ namespace synthese
 		const string DisplayTypeTableSync::COL_ROWS_NUMBER = "rows_number";
 		const string DisplayTypeTableSync::COL_MAX_STOPS_NUMBER("max_stops_number");
 		const string DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS("time_between_checks");
+		const string DisplayTypeTableSync::COL_DISPLAY_MAIN_PAGE_ID("display_main_page_id");
+		const string DisplayTypeTableSync::COL_DISPLAY_ROW_PAGE_ID("display_row_page_id");
+		const string DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID("display_destination_page_id");
+		const string DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID("display_transfer_destination_page_id");
 	}
 
 	namespace db
@@ -76,6 +82,10 @@ namespace synthese
 			SQLiteTableSync::Field(DisplayTypeTableSync::COL_ROWS_NUMBER, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayTypeTableSync::COL_MAX_STOPS_NUMBER, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_MAIN_PAGE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_ROW_PAGE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
@@ -136,6 +146,64 @@ namespace synthese
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID, e);
 				}
+
+				// Display pages
+				try
+				{
+					object->setDisplayMainPage(NULL);
+					util::RegistryKeyType id(rows->getLongLong(DisplayTypeTableSync::COL_DISPLAY_MAIN_PAGE_ID));
+					if (id > 0)
+					{
+						object->setDisplayMainPage(WebPageTableSync::Get(id, env, linkLevel).get());
+					}
+				}
+				catch (ObjectNotFoundException<Webpage>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_MAIN_PAGE_ID, e);
+				}
+
+				try
+				{
+					object->setDisplayRowPage(NULL);
+					util::RegistryKeyType id(rows->getLongLong(DisplayTypeTableSync::COL_DISPLAY_ROW_PAGE_ID));
+					if (id > 0)
+					{
+						object->setDisplayRowPage(WebPageTableSync::Get(id, env, linkLevel).get());
+					}
+				}
+				catch (ObjectNotFoundException<Webpage>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_ROW_PAGE_ID, e);
+				}
+
+				try
+				{
+					object->setDisplayDestinationPage(NULL);
+					util::RegistryKeyType id(rows->getLongLong(DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID));
+					if (id > 0)
+					{
+						object->setDisplayDestinationPage(WebPageTableSync::Get(id, env, linkLevel).get());
+					}
+				}
+				catch (ObjectNotFoundException<Webpage>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID, e);
+				}
+
+
+				try
+				{
+					object->setDisplayTransferDestinationPage(NULL);
+					util::RegistryKeyType id(rows->getLongLong(DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID));
+					if (id > 0)
+					{
+						object->setDisplayTransferDestinationPage(WebPageTableSync::Get(id, env, linkLevel).get());
+					}
+				}
+				catch (ObjectNotFoundException<Webpage>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, e);
+				}
 			}
 		}
 
@@ -158,6 +226,10 @@ namespace synthese
 			query.addField(object->getRowNumber());
 			query.addField(object->getMaxStopsNumber());
 			query.addField(object->getTimeBetweenChecks().total_seconds() / 60);
+			query.addField(object->getDisplayMainPage() ? object->getDisplayMainPage()->getKey() : RegistryKeyType(0));
+			query.addField(object->getDisplayRowPage() ? object->getDisplayRowPage()->getKey() : RegistryKeyType(0));
+			query.addField(object->getDisplayDestinationPage() ? object->getDisplayDestinationPage()->getKey() : RegistryKeyType(0));
+			query.addField(object->getDisplayTransferDestinationPage() ? object->getDisplayTransferDestinationPage()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}
 

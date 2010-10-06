@@ -31,7 +31,7 @@
 #include "SQLiteException.h"
 #include "Conversion.h"
 #include "StopArea.hpp"
-#include "StopAreaTableSync.hpp"
+#include "Fetcher.h"
 
 #include <sstream>
 
@@ -45,10 +45,11 @@ namespace synthese
 	using namespace util;
 	using namespace departure_boards;
 	using namespace pt;
+	using namespace geography;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,DisplayScreenCPUTableSync>::FACTORY_KEY("34.49 Display screen CPU");
+		template<> const string FactorableTemplate<SQLiteTableSync,DisplayScreenCPUTableSync>::FACTORY_KEY("54.49 Display screen CPU");
 	}
 
 	namespace departure_boards
@@ -106,7 +107,7 @@ namespace synthese
 				RegistryKeyType placeId(rows->getLongLong(DisplayScreenCPUTableSync::COL_PLACE_ID));
 				if(placeId != 0) try
 				{
-					object->setPlace(StopAreaTableSync::Get(placeId, env, linkLevel).get());
+					object->setPlace(Fetcher<NamedPlace>::Fetch(placeId, env, linkLevel).get());
 				}
 				catch(ObjectNotFoundException<DisplayScreenCPU>& e)
 				{

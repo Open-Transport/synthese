@@ -229,6 +229,8 @@ namespace synthese
 				);
 
 				void clearTransferDelays ();
+
+				void removePhysicalStop(const pt::StopPoint& physicalStop);
 			//@}
 
 

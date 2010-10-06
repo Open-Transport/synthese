@@ -187,7 +187,7 @@ namespace synthese
 					, displayedObject
 				);
 			}
-			catch (InterfacePageException& e)
+			catch (InterfacePageException&)
 			{
 			}
 		}
