@@ -28,16 +28,16 @@
 #include "CityTableSync.h"
 #include "DataSource.h"
 #include "Crossing.h"
-#include "cdbfile.h"
 #include "CoordinatesSystem.hpp"
 #include "SQLiteTransaction.h"
+#include "VirtualShapeVirtualTable.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
-#include <shapefil.h>
 #include <geos/geom/CoordinateSequenceFactory.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/LineString.h>
+#include <fstream>
 
 using namespace std;
 using namespace boost;
@@ -75,6 +75,7 @@ namespace synthese
 		const string NavstreetsFileFormat::_FIELD_R_NREFADDR("R_NREFADDR");
 		const string NavstreetsFileFormat::_FIELD_L_ADDRSCH("L_ADDRSCH");
 		const string NavstreetsFileFormat::_FIELD_R_ADDRSCH("R_ADDRSCH");
+		const string NavstreetsFileFormat::_FIELD_GEOMETRY("Geometry");
 
 		const string NavstreetsFileFormat::_FIELD_AREA_ID("AREA_ID");
 		const string NavstreetsFileFormat::_FIELD_AREACODE_3("AREACODE_3");
@@ -103,10 +104,29 @@ namespace synthese
 
 		bool NavstreetsFileFormat::_controlPathsMap( const FilePathsMap& paths )
 		{
+			// MTDAREA
 			FilePathsMap::const_iterator it(paths.find(FILE_MTDAREA));
 			if(it == paths.end() || it->second.empty()) return false;
+			{
+				std::ifstream f(it->second.file_string().c_str());
+				if(f.fail())
+				{
+					return false;
+				}
+			}
+
+			// STREETS
 			it = paths.find(FILE_STREETS);
 			if(it == paths.end() || it->second.empty()) return false;
+			{
+				std::ifstream f(it->second.file_string().c_str());
+				if(f.fail())
+				{
+					return false;
+				}
+			}
+
+			// OK
 			return true;
 		}
 
@@ -126,98 +146,90 @@ namespace synthese
 
 		void NavstreetsFileFormat::_parse( const boost::filesystem::path& filePath, std::ostream& os, std::string key )
 		{
-
-			CDBFile dbfile;
-			dbfile.OpenFile(filePath.file_string().c_str());
-			if(!dbfile.IsOpen())
-			{
-				throw Exception("Could not open the file " + filePath.file_string());
-			}
-
 			// 1 : Administrative areas
 			if(key == FILE_MTDAREA)
 			{
+				// Loading the file into SQLite as virtual table
+				VirtualShapeVirtualTable table(filePath, "CP1252", 27572);
+
 				map<string, string> departementCodes;
 				typedef map<pair<string, string>, City*> CityCodes;
 				CityCodes cityCodes;
-				
-				// 1.1 Departements
-				for(unsigned long i(1); i <= dbfile.GetRecordCount(); ++i)
-				{
-					shared_ptr<Record> record(dbfile.ReadRecord(i));
-
-					if(dbfile.getText(*record, _FIELD_ADMIN_LVL) != "3") continue;
-					string item(algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_3)));
-
-					if(departementCodes.find(item) != departementCodes.end()) continue;
-					departementCodes.insert(make_pair(item, algorithm::trim_copy(dbfile.getText(*record, _FIELD_GOVT_CODE))));
-				}
-
-				// 1.2 Cities
-				for(unsigned long i(1); i <= dbfile.GetRecordCount(); ++i)
-				{
-					shared_ptr<Record> record(dbfile.ReadRecord(i));
-
-					if(dbfile.getText(*record, _FIELD_ADMIN_LVL) != "4") continue;
-					stringstream code;
-					int cityID(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREA_ID))));
-					code << departementCodes[algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_3))];
-					code << setw(3) << setfill('0') << lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_GOVT_CODE)));
-					if(_citiesMap.find(cityID) != _citiesMap.end()) continue;
-
-					shared_ptr<City> city(CityTableSync::GetEditableFromCode(code.str(), *_env));
-
-					if(!city.get())
+			
+				{	// 1.1 Departements
+					stringstream query;
+					query << "SELECT * FROM " << table.getName() << " WHERE " << _FIELD_ADMIN_LVL << "=3";
+					SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
+					while(rows->next())
 					{
-						os << "WARN : City " << code.str() << " not found.<br />";
-						continue;
-					}
+						string item(rows->getText(_FIELD_AREACODE_3));
 
-					_citiesMap.insert(make_pair(
-							cityID,
-							city.get()
-					)	);
-					cityCodes.insert(make_pair(
-							make_pair(algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_3)), algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_4))),
-							city.get()
-					)	);
-				}
+						if(departementCodes.find(item) != departementCodes.end())
+						{
+							continue;
+						}
+						departementCodes.insert(
+							make_pair(item, rows->getText(_FIELD_GOVT_CODE))
+						);
+				}	}
 
-				// 1.3 Settlements
-				for(unsigned long i(1); i <= dbfile.GetRecordCount(); ++i)
-				{
-					shared_ptr<Record> record(dbfile.ReadRecord(i));
-
-					if(dbfile.getText(*record, _FIELD_ADMIN_LVL) != "5") continue;
-
-					CityCodes::const_iterator it(cityCodes.find(
-							make_pair(algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_3)), algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_4)))
-					)	);
-					
-					if(it == cityCodes.end())
+				{	// 1.2 Cities
+					stringstream query;
+					query << "SELECT * FROM " << table.getName() << " WHERE " << _FIELD_ADMIN_LVL << "=4";
+					SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
+					while(rows->next())
 					{
-						os << "WARN : City " << algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_3)) << "/" << algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREACODE_4)) << " not found.<br />";
-						continue;
-					}
+						stringstream code;
+						int cityID(rows->getInt(_FIELD_AREA_ID));
+						code << departementCodes[rows->getText(_FIELD_AREACODE_3)];
+						code << setw(3) << setfill('0') << rows->getInt(_FIELD_GOVT_CODE);
+						if(_citiesMap.find(cityID) != _citiesMap.end())
+						{
+							continue;
+						}
 
-					_citiesMap.insert(make_pair(
-							lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_AREA_ID))),
-							it->second
-					)	);
-				}
+						shared_ptr<City> city(CityTableSync::GetEditableFromCode(code.str(), *_env));
+
+						if(!city.get())
+						{
+							os << "WARN : City " << code.str() << " not found.<br />";
+							continue;
+						}
+
+						_citiesMap.insert(make_pair(
+								cityID,
+								city.get()
+						)	);
+						cityCodes.insert(make_pair(
+								make_pair(rows->getText(_FIELD_AREACODE_3), rows->getText(_FIELD_AREACODE_4)),
+								city.get()
+						)	);
+				}	}
+
+				{
+					// 1.3 Settlements
+					stringstream query;					query << "SELECT * FROM " << table.getName() << " WHERE " << _FIELD_ADMIN_LVL << "=5";					SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));					while(rows->next())					{						CityCodes::const_iterator it(cityCodes.find(
+								make_pair(rows->getText(_FIELD_AREACODE_3), rows->getText(_FIELD_AREACODE_4))
+						)	);
+
+						if(it == cityCodes.end())
+						{
+							os << "WARN : City " << rows->getText(_FIELD_AREACODE_3) << "/" << rows->getText(_FIELD_AREACODE_4) << " not found.<br />";
+							continue;
+						}
+
+						_citiesMap.insert(make_pair(
+								rows->getInt(_FIELD_AREA_ID),
+								it->second
+						)	);
+				}	}
 
 			} // 2 : Streets and nodes
 			else if(key == FILE_STREETS)
 			{
-				// Opening of corresponding shapefile to get the geometry
-				path shapeFilePath(filePath);
-				shapeFilePath.replace_extension("shp");
-				SHPHandle shapeFile(SHPOpen(shapeFilePath.file_string().c_str(), "rb"));
-				if(!shapeFile)
-				{
-					throw Exception("Could no open the shapefile corresponding to " + filePath.file_string());
-				}
-
+				// Loading the file into SQLite as virtual table
+				VirtualShapeVirtualTable table(filePath, "CP1252", 27572);
+				
 				typedef map<string, shared_ptr<Crossing> > _CrossingsMap;
 				_CrossingsMap _navteqCrossings;	
 
@@ -227,20 +239,26 @@ namespace synthese
 				typedef map<pair<RegistryKeyType, string>, shared_ptr<RoadPlace> > RecentlyCreatedRoadPlaces;
 				RecentlyCreatedRoadPlaces recentlyCreatedRoadPlaces;
 
-				for(unsigned long i(1); i <= dbfile.GetRecordCount(); ++i)
+				stringstream query;
+				query << "SELECT *, AsBinary(" << _FIELD_GEOMETRY << ") AS " << _FIELD_GEOMETRY << " FROM " << table.getName();
+				SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
+				while(rows->next())
 				{
 					// Fields to test if the record can be imported
-					shared_ptr<Record> record(dbfile.ReadRecord(i));
-					string leftId(algorithm::trim_copy(dbfile.getText(*record, _FIELD_REF_IN_ID)));
-					string rightId(algorithm::trim_copy(dbfile.getText(*record, _FIELD_NREF_IN_ID)));
-					int lAreaId(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_L_AREA_ID))));
-					int rAreaId(lexical_cast<int>(algorithm::trim_copy(dbfile.getText(*record, _FIELD_R_AREA_ID))));
-					string leftMinHouseNumber(algorithm::trim_copy(dbfile.getText(*record, _FIELD_L_REFADDR)));
-					string leftMaxHouseNumber(algorithm::trim_copy(dbfile.getText(*record, _FIELD_L_NREFADDR)));
-					string rightMinHouseNumber(algorithm::trim_copy(dbfile.getText(*record, _FIELD_R_REFADDR)));
-					string rightMaxHouseNumber(algorithm::trim_copy(dbfile.getText(*record, _FIELD_R_NREFADDR)));
-					string leftAddressSchema(algorithm::trim_copy(dbfile.getText(*record, _FIELD_L_ADDRSCH)));
-					string rightAddressSchema(algorithm::trim_copy(dbfile.getText(*record, _FIELD_R_ADDRSCH)));
+					string leftId(rows->getText(_FIELD_REF_IN_ID));
+					string rightId(rows->getText(_FIELD_NREF_IN_ID));
+					int lAreaId(rows->getInt(_FIELD_L_AREA_ID));
+					int rAreaId(rows->getInt(_FIELD_R_AREA_ID));
+					string leftMinHouseNumber(rows->getText(_FIELD_L_REFADDR));
+					string leftMaxHouseNumber(rows->getText(_FIELD_L_NREFADDR));
+					string rightMinHouseNumber(rows->getText(_FIELD_R_REFADDR));
+					string rightMaxHouseNumber(rows->getText(_FIELD_R_NREFADDR));
+					string leftAddressSchema(rows->getText(_FIELD_L_ADDRSCH));
+					string rightAddressSchema(rows->getText(_FIELD_R_ADDRSCH));
+					shared_ptr<LineString> geometry(
+						dynamic_pointer_cast<LineString, Geometry>(
+							rows->getGeometry(_FIELD_GEOMETRY)
+					)	);
 
 
 ///	@todo Handle this case with aliases
@@ -253,31 +271,11 @@ namespace synthese
 							continue;
 						}
 
-						// Fields to load
-
-						// Geometry of the street and the crossings
-						SHPObject* shpObject(SHPReadObject(shapeFile, int(i-1)));
-						std::vector<Coordinate>* coordinates = new std::vector<geos::geom::Coordinate>();
-						for(int p(0); p< shpObject->nVertices; ++p)
-						{
-							coordinates->push_back(
-								Coordinate(shpObject->padfX[p], shpObject->padfY[p])
-							);
-						}
-						Coordinate leftNodeCoordinate(shpObject->padfX[0], shpObject->padfY[0]);
-						Coordinate rightNodeCoordinate(shpObject->padfX[shpObject->nVertices-1], shpObject->padfY[shpObject->nVertices-1]);
-						SHPDestroyObject(shpObject);
-						CoordinateSequence *cs = geometryFactory.getCoordinateSequenceFactory()->create(coordinates);
-						//coordinates is now owned by cs
-
-						shared_ptr<LineString> geometry(geometryFactory.createLineString(cs));
-						//cs is now owned by geometry
-
 						// Chunk length
 						double length(geometry->getLength());
 
 						// Name
-						string roadName(algorithm::trim_copy(dbfile.getText(*record, _FIELD_ST_NAME)));
+						string roadName(rows->getText(_FIELD_ST_NAME));
 
 						// City
 						City* city(itc->second);
@@ -296,14 +294,10 @@ namespace synthese
 						shared_ptr<Crossing> leftNode;
 						if(ita1 == _navteqCrossings.end())
 						{
-							shared_ptr<Point> gp(
-								geometryFactory.createPoint(
-									leftNodeCoordinate
-							)	);
 							leftNode.reset(
 								new Crossing(
 									CrossingTableSync::getId(),
-									gp,
+									shared_ptr<Point>(geometry->getStartPoint()),
 									leftId,
 									_dataSource
 							)	);
@@ -322,14 +316,10 @@ namespace synthese
 						shared_ptr<Crossing> rightNode;
 						if(ita2 == _navteqCrossings.end())
 						{
-							shared_ptr<Point> gp(
-								geometryFactory.createPoint(
-									rightNodeCoordinate
-							)	);
 							rightNode.reset(
 								new Crossing(
 									CrossingTableSync::getId(),
-									gp,
+									shared_ptr<Point>(geometry->getEndPoint()),
 									rightId,
 									_dataSource
 							)	);
@@ -518,9 +508,6 @@ namespace synthese
 //					}
 				}
 			}
-
-			dbfile.CloseFile();
-
 		}
 
 

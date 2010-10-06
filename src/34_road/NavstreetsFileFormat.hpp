@@ -134,6 +134,7 @@ namespace synthese
 				static const std::string _FIELD_R_NREFADDR;
 				static const std::string _FIELD_L_ADDRSCH;
 				static const std::string _FIELD_R_ADDRSCH;
+				static const std::string _FIELD_GEOMETRY;
 			//@}
 
 			//! @name Fields of mtdarea table
