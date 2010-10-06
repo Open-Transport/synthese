@@ -270,7 +270,7 @@ namespace synthese
 					_request
 				);
 				createDisplayRequest.setActionWillCreateObject();
-				createDisplayRequest.getAction()->setCPU(_cpu->getKey());
+				createDisplayRequest.getAction()->setCPU(_cpu);
 				
 				DisplayScreenTableSync::SearchResult screens(
 					DisplayScreenTableSync::SearchFromCPU(_getEnv(), _cpu->getKey())
@@ -288,7 +288,7 @@ namespace synthese
 				{
 					displayRequest.getPage()->setScreen(screen);
 					stream << t.row();
-					stream << t.col() << screen->getLocalizationComment();
+					stream << t.col() << screen->getName();
 					stream << t.col() << screen->getComPort();
 					stream << t.col() << screen->getWiringCode();
 					stream << t.col() << screen->getKey();

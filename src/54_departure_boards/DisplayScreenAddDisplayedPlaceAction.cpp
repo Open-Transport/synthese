@@ -61,7 +61,14 @@ namespace synthese
 		ParametersMap DisplayScreenAddDisplayedPlaceAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if(_screen.get()) map.insert(PARAMETER_SCREEN_ID, _screen->getKey());
+			if(_screen.get())
+			{
+				map.insert(PARAMETER_SCREEN_ID, _screen->getKey());
+			}
+			if(_place.get())
+			{
+				map.insert(PARAMETER_PLACE, _place->getKey());
+			}
 			return map;
 		}
 
@@ -77,8 +84,7 @@ namespace synthese
 				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_PLACE, 0));
 				if(id > 0)
 				{
-					_placeSptr = StopAreaTableSync::Get(id, *_env);
-					_place = _placeSptr.get();
+					_place = StopAreaTableSync::Get(id, *_env);
 				}
 				else
 				{
@@ -98,7 +104,7 @@ namespace synthese
 					{
 						throw ActionException("Place not found");
 					}
-					_place = stops.front().get();
+					_place = stops.front();
 				}
 			}
 			catch (ObjectNotFoundException<DisplayScreen>&)
@@ -109,7 +115,7 @@ namespace synthese
 
 		void DisplayScreenAddDisplayedPlaceAction::run(Request& request)
 		{
-			_screen->addDisplayedPlace(_place);
+			_screen->addDisplayedPlace(_place.get());
 
 			DisplayScreenTableSync::Save(_screen.get());
 
@@ -126,9 +132,9 @@ namespace synthese
 		bool DisplayScreenAddDisplayedPlaceAction::isAuthorized(const Session* session
 		) const {
 			assert(_screen.get() != NULL);
-			if (_screen->getLocalization() != NULL)
+			if (_screen->getLocation() != NULL)
 			{
-				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocation()->getKey()));
 			}
 			else
 			{

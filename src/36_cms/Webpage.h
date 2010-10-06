@@ -251,6 +251,16 @@ namespace synthese
 				/// @date 2010
 				/// @since 3.1.18
 				std::size_t getDepth() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the name of each page from the top of the tree
+				/// @return the name of each page from the top of the tree
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.2.0
+				std::string getFullName() const;
 			//@}
 		};
 	}

@@ -114,20 +114,20 @@ namespace synthese
 		{
 			// Comparison for log text generation
 			stringstream log;
-			DBLogModule::appendToLogIfChange(log, "Nom", _screen->getLocalizationComment(), _name);
+			DBLogModule::appendToLogIfChange(log, "Nom", _screen->getName(), _name);
 			DBLogModule::appendToLogIfChange(log, "Code de branchement bus RS485", _screen->getWiringCode(), _wiringCode);
 			DBLogModule::appendToLogIfChange(log, "Type de panneau", ((_screen->getType() != NULL) ? _screen->getType()->getName() : string()), ((_type.get() != NULL) ? _type->getName() : string()));
 			DBLogModule::appendToLogIfChange(log, "Port COM", _screen->getComPort(), _comPort);
-			DBLogModule::appendToLogIfChange(log, "Unité centrale hôte", ((_screen->getCPU() != NULL) ? _screen->getCPU()->getName() : string()), ((_cpu.get() != NULL) ? _cpu->getName() : string()));
+			DBLogModule::appendToLogIfChange(log, "Unité centrale hôte", ((_screen->getRoot<DisplayScreenCPU>() != NULL) ? _screen->getRoot<DisplayScreenCPU>()->getName() : string()), ((_cpu.get() != NULL) ? _cpu->getName() : string()));
 			DBLogModule::appendToLogIfChange(log, "Adresse MAC", _screen->getMacAddress(), _macAddress);
 
 
 			// Preparation of the action
-			_screen->setLocalizationComment(_name);
+			_screen->setName(_name);
 			_screen->setWiringCode(_wiringCode);
 			_screen->setType(_type.get());
 			_screen->setComPort(_comPort);
-			_screen->setCPU(_cpu.get());
+			_screen->setRoot(const_cast<DisplayScreenCPU*>(_cpu.get()));
 			_screen->setMacAddress(_macAddress);
 
 			// The action
@@ -157,9 +157,9 @@ namespace synthese
 		bool UpdateDisplayScreenAction::isAuthorized(const Session* session
 		) const {
 			assert(_screen.get() != NULL);
-			if (_screen->getLocalization() != NULL)
+			if (_screen->getLocation() != NULL)
 			{
-				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocation()->getKey()));
 			}
 			else
 			{

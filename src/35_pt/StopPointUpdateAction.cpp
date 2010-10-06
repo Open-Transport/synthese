@@ -28,6 +28,7 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
+#include "StopAreaTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -52,8 +53,9 @@ namespace synthese
 		const string StopPointUpdateAction::PARAMETER_Y = Action_PARAMETER_PREFIX + "y";
 		const string StopPointUpdateAction::PARAMETER_OPERATOR_CODE = Action_PARAMETER_PREFIX + "oc";
 		const string StopPointUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-
+		const string StopPointUpdateAction::PARAMETER_STOP_AREA = Action_PARAMETER_PREFIX + "sa";
 		
+
 		
 		ParametersMap StopPointUpdateAction::getParametersMap() const
 		{
@@ -69,6 +71,10 @@ namespace synthese
 			}
 			map.insert(PARAMETER_OPERATOR_CODE, _operatorCode);
 			map.insert(PARAMETER_NAME, _name);
+			if(_stopArea.get())
+			{
+				map.insert(PARAMETER_STOP_AREA, _stopArea->getKey());
+			}
 			return map;
 		}
 		
@@ -83,6 +89,15 @@ namespace synthese
 			catch(ObjectNotFoundException<StopPoint>&)
 			{
 				throw ActionException("No such physical stop");
+			}
+
+			try
+			{
+				_stopArea = StopAreaTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA), *_env);
+			}
+			catch(ObjectNotFoundException<StopArea>&)
+			{
+				throw ActionException("No such stop area");
 			}
 
 			_point = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
@@ -104,6 +119,7 @@ namespace synthese
 			_stop->setGeometry(_point);
 			_stop->setCodeBySource(_operatorCode);
 			_stop->setName(_name);
+			_stop->setHub(_stopArea.get());
 
 			StopPointTableSync::Save(_stop.get());
 

@@ -329,5 +329,21 @@ namespace synthese
 			}
 			return depth;
 		}
+
+
+
+		std::string Webpage::getFullName() const
+		{
+			string result;
+			for(const Webpage* page(this); page; page = page->getParent())
+			{
+				result = page->getName() + (result.empty() ? "/" : string()) + result;
+			}
+			if(getRoot())
+			{
+				result = getRoot()->getName() + "/" + result;
+			}
+			return result;
+		}
 	}
 }

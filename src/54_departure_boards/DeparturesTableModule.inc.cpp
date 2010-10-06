@@ -63,6 +63,7 @@
 #include "DisplayScreenCPUMaintenanceUpdateAction.h"
 #include "DisplayScreenTransferDestinationAddAction.h"
 #include "DisplayScreenTransferDestinationRemoveAction.h"
+#include "DisplayScreenUpdateDisplayedStopAreaAction.hpp"
 
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayMaintenanceRight.h"

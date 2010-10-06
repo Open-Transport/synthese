@@ -34,6 +34,7 @@
 #include "Conversion.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
+#include "Fetcher.h"
 
 using namespace std;
 using namespace boost;
@@ -45,19 +46,25 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace security;
+	using namespace geography;
 	
 	template<> const string FactorableTemplate<Action, departure_boards::CreateDisplayScreenAction>::FACTORY_KEY("createdisplayscreen");
 
 	namespace departure_boards
 	{
-		const std::string CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "pti";
+		const string CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "pti";
 		const string CreateDisplayScreenAction::PARAMETER_LOCALIZATION_ID(Action_PARAMETER_PREFIX + "pli");
 		const string CreateDisplayScreenAction::PARAMETER_CPU_ID(Action_PARAMETER_PREFIX + "cp");
+		const string CreateDisplayScreenAction::PARAMETER_UP_ID(Action_PARAMETER_PREFIX + "up");
 
 		ParametersMap CreateDisplayScreenAction::getParametersMap() const
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_TEMPLATE_ID, _template ? _template->getKey() : RegistryKeyType(0));
+			if(_up.get())
+			{
+				map.insert(PARAMETER_UP_ID, _up->getKey());
+			}
 			if(_cpu.get())
 			{
 				map.insert(PARAMETER_CPU_ID, _cpu->getKey());
@@ -71,38 +78,86 @@ namespace synthese
 
 		void CreateDisplayScreenAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE_ID));
-			if (id > 0)
+			// Template
+			try
 			{
-				_template = DisplayScreenTableSync::Get(id, *_env);
-			}
-
-			id = map.getDefault<RegistryKeyType>(PARAMETER_CPU_ID);
-			if (id > 0)
-			{
-				setCPU(id);
-			}
-			else
-			{
-				id = map.getDefault<RegistryKeyType>(PARAMETER_LOCALIZATION_ID);
+				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE_ID));
 				if (id > 0)
 				{
-					setPlace(id);
+					_template = DisplayScreenTableSync::Get(id, *_env);
 				}
 			}
+			catch (ObjectNotFoundException<DisplayScreen>& e)
+			{
+				throw ActionException("Template display screen not found "+ e.getMessage());
+			}
+
+			// Parent
+			try
+			{
+				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_UP_ID));
+				if(id > 0)
+				{
+					_up = DisplayScreenTableSync::Get(id, *_env);
+				}
+				else
+				{
+					RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_CPU_ID));
+					if (id > 0)
+					{
+						_cpu = DisplayScreenCPUTableSync::Get(id, *_env);
+					}
+					else
+					{
+						id = map.getDefault<RegistryKeyType>(PARAMETER_LOCALIZATION_ID);
+						if (id > 0)
+						{
+							_place = Fetcher<NamedPlace>::Fetch(id, *_env);
+						}
+				}	}
+			}
+			catch (ObjectNotFoundException<DisplayScreen>& e)
+			{
+				throw ActionException("Parent display screen not found "+ e.getMessage());
+			}
+			catch (ObjectNotFoundException<DisplayScreenCPU>& e)
+			{
+				throw ActionException("Parent central unit not found "+ e.getMessage());
+			}
+			catch (ObjectNotFoundException<NamedPlace>& e)
+			{
+				throw ActionException("parent location not found "+ e.getMessage());
+			}
 		}
+
+
 
 		void CreateDisplayScreenAction::run(Request& request)
 		{
 			// Preparation
 			DisplayScreen screen;
 			if (_template.get())
-				screen.copy(_template.get());
-			screen.setLocalization(_place.get());
-			if(_cpu.get())
 			{
-				screen.setCPU(_cpu.get());
+				screen.copy(*_template);
 			}
+			if(_up.get())
+			{
+				DisplayScreen::SetParent(screen, const_cast<DisplayScreen*>(_up.get()));
+			}
+			else if(_cpu.get())
+			{
+				screen.setRoot<DisplayScreenCPU>(const_cast<DisplayScreenCPU*>(_cpu.get()));
+			}
+			else
+			{
+				screen.setRoot<NamedPlace>(const_cast<NamedPlace*>(_place.get()));
+			}
+
+			if(dynamic_cast<const StopArea*>(screen.getLocation()))
+			{
+				screen.setDisplayedPlace(static_cast<StopArea*>(const_cast<NamedPlace*>(screen.getLocation())));
+			}
+			
 			screen.setMaintenanceIsOnline(true);
 
 			// Action
@@ -115,45 +170,24 @@ namespace synthese
 			ArrivalDepartureTableLog::addCreateEntry(screen, *request.getUser());
 		}
 
-		void CreateDisplayScreenAction::setPlace(RegistryKeyType id)
-		{
-			if(id <= 0) return;
-			try
-			{
-				_place = StopAreaTableSync::Get(id, *_env);
-			}
-			catch (...)
-			{
-				throw ActionException("Specified localization not found");
-			}
-		}
-
 
 
 		bool CreateDisplayScreenAction::isAuthorized(const Session* session
 		) const {
+			const NamedPlace* place(_place.get());
+			if(!place && _cpu.get())
+			{
+				place = _cpu->getPlace();
+			}
+			if(!place && _up.get())
+			{
+				place = _up->getLocation();
+			}
+
 			return
-				_place.get() ?
-				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey())) :
+				place ?
+				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(place->getKey())) :
 				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE)
 			;
 		}
-
-		void CreateDisplayScreenAction::setCPU( util::RegistryKeyType id )
-		{
-			if(id <= 0) return;
-			try
-			{
-				_cpu = DisplayScreenCPUTableSync::Get(id, *_env);
-				if(_cpu->getPlace())
-				{
-					setPlace(_cpu->getPlace()->getKey());
-				}
-			}
-			catch (...)
-			{
-				throw ActionException("Specified CPU not found");
-			}
-		}
-	}
-}
+}	}

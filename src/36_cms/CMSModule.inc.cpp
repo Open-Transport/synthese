@@ -10,7 +10,7 @@
 #include "WebPageLinkAddAction.hpp"
 #include "WebPageLinkRemoveAction.hpp"
 #include "WebPageMoveAction.hpp"
-
+#include "BitAndFunction.hpp"
 #include "WebPageDisplayFunction.h"
 #include "WebPageLastNewsFunction.hpp"
 #include "GetValueFunction.hpp"

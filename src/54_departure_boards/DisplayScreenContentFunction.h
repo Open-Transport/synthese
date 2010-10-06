@@ -26,6 +26,8 @@
 #include "FunctionWithSite.h"
 #include "FactorableTemplate.h"
 #include "UtilTypes.h"
+#include "DeparturesTableTypes.h"
+#include "DisplayScreen.h"
 
 #include <boost/optional.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -34,10 +36,10 @@ namespace synthese
 {
 	class graph::ServicePointer;
 	class pt::StopPoint;
+	class pt::StopArea;
 
 	namespace departure_boards
 	{
-		class DisplayScreen;
 		class DisplayType;
 
 		/** Arrival/departures table generator function.
@@ -210,6 +212,314 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setScreen(boost::shared_ptr<const DisplayScreen> value);
+			//@}
+
+			//! @name Static methods to set CMS page variables for departure board
+			//@{
+				static const std::string DATA_TITLE;
+				static const std::string DATA_WIRING_CODE;
+				static const std::string DATA_DISPLAY_SERVICE_NUMBER;
+				static const std::string DATA_DISPLAY_TRACK_NUMBER;
+				static const std::string DATA_DISPLAY_TEAM;
+				static const std::string DATA_STOP_NAME;
+				static const std::string DATA_INTERMEDIATE_STOPS_NUMBER;
+				static const std::string DATA_DISPLAY_CLOCK;
+				static const std::string DATA_ROWS;
+				static const std::string DATA_MESSAGE_LEVEL;
+				static const std::string DATA_MESSAGE_CONTENT;
+				static const std::string DATA_DATE;
+				static const std::string DATA_SUBSCREEN_;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Display of a departure board.
+				///	Variables sent to the cms :
+				/// <dl>
+				///	<dt>title</dt><dd>title of the screen</dd>
+				/// <dt>date</dt><dd>date of the display</dd>
+				///	<dt>wiring_code</dt><dd>wiring code of the screen</dd>
+				///	<dt>display_service_number</dt><dd>service number must be displayed (1|0)</dd>
+				///	<dt>display_track_number</dt><dd>track number must be displayed (1|0)</dd>
+				///	<dt>intermediate_stops_number</dt><dd>number of intermediates stops to display</dd>
+				///	<dt>display_team</dt><dd>team identifier must be displayed (1|0)</dd>
+				///	<dt>stop_name</dt><dd>name of the departure stop area</dd>
+				///	<dt>display_clock</dt><dd>clock must be displayed (1|0)</dd>
+				///	<dt>rows</dt><dd>rows of the departure board</dd>
+				///	<dt>message_level</dt><dd>level of the message linked with the screen (undefined if no message)</dd>
+				/// <dt>message_content</dt><dd>content of the message linked with the screen (undefined if no message)</dd>
+				/// <dt>subscreen_x</dt><dd>id of the xth sub screen (x replaced by numeric value 0, 1, 2, ... The cms must lauch itself the display for each subscreen.</dd>
+				/// </dl>
+				///
+				//////////////////////////////////////////////////////////////////////////
+				/// @param stream stream to write the result on
+				/// @param page page to use to display the departure board
+				static void DisplayDepartureBoard(
+					std::ostream& stream,
+					const server::Request& request,
+					boost::shared_ptr<const cms::Webpage> page,
+					boost::shared_ptr<const cms::Webpage> rowPage,
+					boost::shared_ptr<const cms::Webpage> destinationPage,
+					boost::shared_ptr<const cms::Webpage> transferPage,
+					const boost::posix_time::ptime&  date,
+					const std::string& title,
+					int wiringCode,
+					bool displayServiceNumber,
+					bool displayTrackNumber,
+					bool displayTeam,
+					int intermediatesStopsToDisplay,
+					boost::posix_time::time_duration blinkingDelay,
+					bool displayClock,
+					const pt::StopArea& place,
+					const ArrivalDepartureListWithAlarm& rows,
+					const DisplayScreen::ChildrenType& subscreens
+				);
+
+
+
+				static const std::string DATA_ROW_RANK;
+				static const std::string DATA_PAGE_NUMBER;
+				static const std::string DATA_BLINKS;
+				static const std::string DATA_TIME;
+				static const std::string DATA_PLANNED_TIME;
+				static const std::string DATA_DELAY;
+				static const std::string DATA_SERVICE_ID;
+				static const std::string DATA_SERVICE_NUMBER;
+				static const std::string DATA_TRACK;
+				static const std::string DATA_TEAM;
+				static const std::string DATA_TRANSPORT_MODE;
+				static const std::string DATA_RANK_IN_PATH;
+				static const std::string DATA_DESTINATIONS;
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Displays a row of a departure board.
+				///	Variables sent to the cms :
+				/// <dl>
+				///	<dt>row_rank</dt><dd>Rank of the row in the departure table</dd>
+				///	<dt>page_number</dt><dd>Number of the page to display for multiple page protocol (eg Lumiplan)</dd>
+				///	<dt>display_service_number</dt><dd>service number must be displayed (1|0)</dd>
+				///	<dt>display_track_number</dt><dd>track number must be displayed (1|0)</dd>
+				///	<dt>intermediate_stops_number</dt><dd>number of intermediates stops to display</dd>
+				///	<dt>display_team</dt><dd>team identifier must be displayed (1|0)</dd>
+				///	<dt>blinks</dt><dd>Departure blinks ? (1|0)</dd>
+				///	<dt>time</dt><dd>Departure date time</dd>
+				/// <dt>planned_time</dt><dd>Planned departure date time</dd>
+				/// <dt>service_id</dt><dd>ID of the service</dd>
+				///	<dt>service_number</dt><dd>Service number</dd>
+				///	<dt>track</dt><dd>Track name</dd>
+				///	<dt>team</dt><dd>Team number</dd>
+				///	<dt>transport_mode</dt><dd>ID of the transport mode</dd>
+				///	<dt>delay</dt><dd>delay duration</dd>
+				/// <dt>rank_in_path</dt><dd>Rank of the departure stop in the path of the service</dd>
+				/// <dt>destinations</dt><dd>Destinations (content generated by the cms if a destinationPage is defined)</dd>
+				/// <dt>subscreen_x</dt><dd>id of the xth sub screen (x replaced by numeric value 0, 1, 2, ... The cms must lauch itself the display for each subscreen.</dd>
+				/// </dl>
+				static void DisplayDepartureBoardRow(
+					std::ostream& stream,
+					const server::Request& request,
+					boost::shared_ptr<const cms::Webpage> page,
+					boost::shared_ptr<const cms::Webpage> destinationPage,
+					boost::shared_ptr<const cms::Webpage> transferPage,
+					int rowId,
+					int pageNumber,
+					bool displayQuaiNumber,
+					bool displayServiceNumber,
+					bool displayTeam,
+					int intermediatesStopsToDisplay,
+					boost::posix_time::time_duration blinkingDelay,
+					const ArrivalDepartureRow& row,
+					const DisplayScreen::ChildrenType& subscreens
+				);
+
+
+
+				static const std::string DATA_STOP_ID;
+				static const std::string DATA_CITY_NAME;
+				static const std::string DATA_STOP_NAME_26;
+				static const std::string DATA_STOP_NAME_13;
+				static const std::string DATA_IS_SAME_CITY;
+				static const std::string DATA_IS_END_STATION;
+				static const std::string DATA_DESTINATION_RANK;
+				static const std::string DATA_TRANSFERS;
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Display of an intermediate or ending destination of a departure board.
+				///
+				/// Variables sent to the cms :
+				/// <dl>
+				///	<dt>stop_id</dt><dd>stop ID</dd>
+				///	<dt>city_name</dt><dd>stop city name</dd>
+				///	<dt>stop_name</dt><dd>stop name</dd>
+				///	<dt>stop_name_26</dt><dd>stop 26 characters alias</dd>
+				///	<dt>stop_name_13</dt><dd>stop 13 characters alias</dd>
+				///	<dt>is_same_city</dt><dd>last displayed stop was in the same city ? (1|0)</dd>
+				///	<dt>time</dt><dd>arrival date time</dd>
+				///	<dt>is_end_station</dt><dd>is the end station</dd>
+				///	<dt>destination_rank</dt><dd>rank of the destination in the board (not rank in path)</dd>
+				/// <dt>transfers</dt><dd>Transfers (content generated by the cms if a transferPage is defined)</dd>
+				/// <dt>subscreen_x</dt><dd>id of the xth sub screen (x replaced by numeric value 0, 1, 2, ... The cms must lauch itself the display for each subscreen.</dd>
+				/// </dl>
+				static void DisplayDepartureBoardDestination(
+					std::ostream& stream,
+					const server::Request& request,
+					boost::shared_ptr<const cms::Webpage> page,
+					boost::shared_ptr<const cms::Webpage> transferPage,
+					const graph::ServicePointer& object,
+					bool lastDisplayedStopWasInTheSameCity,
+					bool isTheEndStation,
+					std::size_t rank,
+					const IntermediateStop::TransferDestinations& transferDestinations,
+					const DisplayScreen::ChildrenType& subscreens
+				);
+
+
+
+				static const std::string DATA_LINE_ID;
+				static const std::string DATA_LINE_SHORT_NAME;
+				static const std::string DATA_LINE_CSS;
+				static const std::string DATA_LINE_IMG;
+				static const std::string DATA_DEPARTURE_TIME;
+				static const std::string DATA_ARRIVAL_TIME;
+				static const std::string DATA_TRANSFER_RANK;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Display of a transfer destination from an intermediate stop.
+				/// <dl>
+				///	<dt>transport_mode</dt><dd>transport mode ID</dd>
+				///	<dt>line_id</dt><dd>line ID</dd>
+				///	<dt>line_short_name</dt><dd>line number (short name)</dd>
+				///	<dt>line_css</dt><dd>line CSS class</dd>
+				///	<dt>line_img</dt><dd>line img path</dd>
+				///	<dt>stop_id</dt><dd>destination ID</dd>
+				///	<dt>city_name</dt><dd>destination city name</dd>
+				///	<dt>stop_name</dt><dd>destination name</dd>
+				///	<dt>stop_name_26</dt><dd>destination 26 characters alias</dd>
+				///	<dt>stop_name_13</dt><dd>destination 13 characters alias</dd>
+				///	<dt>departure_time</dt><dd>departure time</dd>
+				///	<dt>arrival_time</dt><dd>arrival time</dd>
+				///	<dt>transfer_rank</dt><dd>transfer rank in the transfer place</dd>
+				///	<dt>subscreen_x</dt><dd>id of the xth sub screen (x replaced by numeric value 0, 1, 2, ... The cms must lauch itself the display for each subscreen.</dd>
+				/// </dl>
+				static void DisplayDepartureBoardTrandferDestination(
+					std::ostream& stream,
+					const server::Request& request,
+					boost::shared_ptr<const cms::Webpage> page,
+					const graph::ServicePointer& object,
+					std::size_t localTransferRank,
+					const DisplayScreen::ChildrenType& subscreens
+				);
+
+			//@}
+
+			//! @name Static methods to set CMS page variables for route planning board
+			//@{
+				static const std::string DATA_WITH_TRANSFER;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Display of a route planning board.
+				/// Variables sent to the cms :
+				/// <dl>
+				/// <dt>title</dt><dd>Title of the screen</dd>
+				/// <dt>wiring_code</dt><dd>Wiring code</dd>
+				///	<dt>display_service_number</dt><dd>service number must be displayed (1|0)</dd>
+				///	<dt>display_track_number</dt><dd>track number must be displayed (1|0)</dd>
+				///	<dt>with_transfer</dt><dd>with transfer</dd>
+				///	<dt>stop_id</dt><dd>id of the origin place</dd>
+				///	<dt>stop_name</dt><dd>name of the origin place</dd>
+				///	<dt>display_clock</dt><dd>display clock</dd>
+				///	<dt>rows</dt><dd>rows of the departure board</dd>
+				///	<dt>message_level</dt><dd>level of the message linked with the screen (undefined if no message)</dd>
+				/// <dt>message_content</dt><dd>content of the message linked with the screen (undefined if no message)</dd>
+				///	<dt>subscreen_x</dt><dd>id of the xth sub screen (x replaced by numeric value 0, 1, 2, ... The cms must lauch itself the display for each subscreen.</dd>
+				/// </dl>
+				static void DisplayRoutePlanningBoard(
+					std::ostream& stream,
+					const server::Request& request,
+					boost::shared_ptr<const cms::Webpage> page,
+					boost::shared_ptr<const cms::Webpage> rowPage,
+					boost::shared_ptr<const cms::Webpage> destinationPage,
+					const std::string& title,
+					int wiringCode,
+					bool displayServiceNumber,
+					bool displayTrackNumber,
+					bool withTransfer,
+					boost::posix_time::time_duration blinkingDelay,
+					bool displayClock,
+					const pt::StopArea& place,
+					const RoutePlanningListWithAlarm& rows,
+					const DisplayScreen::ChildrenType& subscreens
+				);
+
+
+				static const std::string DATA_SECOND_TRACK;
+				static const std::string DATA_SECOND_SERVICE_NUMBER;
+				static const std::string DATA_SECOND_TIME;
+				static const std::string DATA_SECOND_LINE_SHORT_NAME;
+				static const std::string DATA_SECOND_LINE_IMG;
+				static const std::string DATA_SECOND_LINE_CSS;
+				static const std::string DATA_SECOND_TRANSPORT_MODE;
+				static const std::string DATA_TRANSFER_STOP_NAME;
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Displays a row of a route planning board.
+				///	Display parameters :
+				/// <dl>
+				///		<dt>row_rank</dt><dd>Rank of the row in the departure table</dd>
+				///		<dt>with_transfer</dt><dd>With transfer</dd>
+				///		<dt>display_track_number</dt><dd>Display track number</dd>
+				///		<dt>display_service_number</dt><dd>Display service number</dd>
+				///		<dt>stop_name</dt><dd>Destination name (content generated by the cms if destinationPage is defined, else by pt::StopArea::getFullName)</dd>
+				/// </dl>
+				///	First line :
+				/// <dl>
+				///		<dt>blinks</dt><dd>Blinks<dd>
+				///		<dt>track</dt><dd>Track number 1</dd>
+				///		<dt>service_number</dt><dd>Service number 1</dd>
+				///		<dt>time</dt><dd>Time 1 : if empty : no solution</dd>
+				///		<dt>line_short_name</dt><dd>Line text 1</dd>
+				///		<dt>line_img</dt><dd>Line image 1</dd>
+				///		<dt>line_css</dt><dd>Line CSS style 1</dd>
+				///		<dt>transport_mode</dt><dd>Transport mode 1 id</dd>
+				/// </dl>
+				///	Second line :
+				/// <dl>
+				///		<dt>second_track_number</dt><dd>Track number 2</dd>
+				///		<dt>second_service_number</dt><dd>Service number 2</dd>
+				///		<dt>second_departure_time</dt><dd>Time 2 : if empty : no 2nd step</dd>
+				///		<dt>second_line_short_name</dt><dd>Line text 2</dd>
+				///		<dt>second_line_img</dt><dd>Line image 2</dd>
+				///		<dt>second_line_css</dt><dd>Line CSS style 2</dd>
+				///		<dt>second_transport_mode</dt><dd>Rolling stock id 2</dd>
+				///		<dt>transfer_stop_name</dt><dd>Transfer stop name</dd>
+				/// </dl>
+				static void DisplayRoutePlanningBoardRow(
+					std::ostream& stream,
+					const server::Request& request,
+					boost::shared_ptr<const cms::Webpage> page,
+					boost::shared_ptr<const cms::Webpage> destinationPage,
+					std::size_t rowId,
+					bool displayQuaiNumber,
+					bool displayServiceNumber,
+					boost::posix_time::time_duration blinkingDelay,
+					bool withTransfer,
+					const pt::StopArea& origin,
+					const RoutePlanningRow& row,
+					const DisplayScreen::ChildrenType& subscreens
+				);
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Variables sent to the cms :
+				/// <dl>
+				///	<dt>city_name</dt><dd>City name</dd>
+				///	<dt>stop_name</dt><dd>Place name</dd>
+				///	<dt>stop_name_13</dt><dd>Place name (13 chars)</dd>
+				///	<dt>stop_name_26</dt><dd>Place name (26 chars)</dd>
+				/// </dl>
+				static void DisplayRoutePlanningBoardDestination(
+					std::ostream& stream,
+					const server::Request& request,
+					boost::shared_ptr<const cms::Webpage> page,
+					const pt::StopArea& place
+				);
 			//@}
 		};
 	}

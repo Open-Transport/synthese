@@ -62,9 +62,12 @@ namespace synthese
 			_monitoringInterface(NULL),
 			_timeBetweenChecks(minutes(1)),
 			_rowNumber(1),
-			_maxStopsNumber(UNKNOWN_VALUE)
-		{
-		}
+			_maxStopsNumber(UNKNOWN_VALUE),
+			_displayMainPage(NULL),
+			_displayRowPage(NULL),
+			_displayDestinationPage(NULL),
+			_displayTransferDestinationPage(NULL)
+		{}
 
 
 

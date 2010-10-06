@@ -49,13 +49,9 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace geography;
-	using namespace pt;
-	
-	
 
 	namespace departure_boards
 	{
-
 		std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints(
 			Env& env,
 			const security::RightsOfSameClassMap& rights 
@@ -139,13 +135,14 @@ namespace synthese
 					object->cpuNumber = rows->getInt("cc");
 					if(env.getRegistry<StopArea>().contains(rows->getKey()))
 					{
-						object->place = env.getEditable<StopArea>(rows->getKey());
+						object->place = static_pointer_cast<NamedPlace, StopArea>(env.getEditable<StopArea>(rows->getKey()));
 					}
 					else
 					{
-						object->place.reset(new StopArea(rows->getKey()));
-						env.getEditableRegistry<StopArea>().add(object->place);
-						StopAreaTableSync::Load(object->place.get(), rows, env);
+						StopArea* stopArea(new StopArea(rows->getKey()));
+						object->place.reset(stopArea);
+						env.getEditableRegistry<StopArea>().add(static_pointer_cast<StopArea,NamedPlace>(object->place));
+						StopAreaTableSync::Load(stopArea, rows, env);
 					}
 					object->cityName = rows->getText ("city_name");
 					objects.push_back(object);

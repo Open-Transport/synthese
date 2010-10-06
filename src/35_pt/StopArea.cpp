@@ -370,5 +370,13 @@ namespace synthese
 			_defaultTransferDelay = defaultTransferDelay;
 			_minTransferDelay = posix_time::time_duration(not_a_date_time);
 		}
+
+
+
+		void StopArea::removePhysicalStop( const pt::StopPoint& physicalStop )
+		{
+			_isoBarycentre.reset();
+			_physicalStops.erase(physicalStop.getKey());
+		}
 	}
 }

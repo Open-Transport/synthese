@@ -80,7 +80,7 @@ namespace synthese
 			{
 				throw ActionException("Display screen not found");
 			}
-			catch (ObjectNotFoundException<StopArea>& e)
+			catch (ObjectNotFoundException<StopArea>&)
 			{
 				throw ActionException("Specified place not found");
 			}
@@ -104,9 +104,9 @@ namespace synthese
 		bool AddPreselectionPlaceToDisplayScreenAction::isAuthorized(const Session* session
 		) const {
 			assert(_screen.get() != NULL);
-			if (_screen->getLocalization() != NULL)
+			if (_screen->getLocation() != NULL)
 			{
-				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocalization()->getKey()));
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocation()->getKey()));
 			}
 			else
 			{

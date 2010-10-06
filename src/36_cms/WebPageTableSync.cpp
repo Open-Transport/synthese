@@ -105,6 +105,8 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			string smartURLPath(webpage->getSmartURLPath());
+			Webpage::SetParent(*webpage, NULL);
+			webpage->setNullRoot();
 			webpage->setName(rows->getText(WebPageTableSync::COL_TITLE));
 			webpage->setContent(rows->getText(WebPageTableSync::COL_CONTENT1));
 			webpage->setRank(rows->getInt(WebPageTableSync::COL_RANK));
@@ -150,8 +152,7 @@ namespace synthese
 				{
 					try
 					{
-						webpage->setParent(WebPageTableSync::GetEditable(up_id, env, linkLevel).get());
-						webpage->getParent()->addChild(webpage);
+						Webpage::SetParent(*webpage, WebPageTableSync::GetEditable(up_id, env, linkLevel).get());
 					}
 					catch(ObjectNotFoundException<Webpage>& e)
 					{
@@ -196,8 +197,7 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,Webpage>::Unlink(
 			Webpage* obj
 		){
-			if(obj->getParent())
-				obj->getParent()->removeChild(obj);
+			obj->setParent(NULL);
 		}
 
 

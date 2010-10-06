@@ -89,7 +89,7 @@ namespace synthese
 
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Unlink(City* obj)
 		{
-//			GeographyModule::RemoveFromCitiesMatchers(obj);
+			GeographyModule::RemoveFromCitiesMatchers(Env::GetOfficialEnv().getEditableSPtr(obj));
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Save(
