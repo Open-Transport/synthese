@@ -24,10 +24,12 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 
 using namespace boost;
 using namespace std;
 using namespace boost::algorithm;
+using namespace boost::filesystem;
 
 namespace synthese
 {
@@ -39,7 +41,7 @@ namespace synthese
 			CoordinatesSystem::SRID srid
 		):	SQLiteVirtualTable(
 			GetTableName(path),
-			"VirtualShape(\"" + replace_all_copy(path.file_string(), "\\", "\\\\") + "\"," + codePage + "," + lexical_cast<string>(srid) + ")"
+			"VirtualShape(\"" + replace_all_copy(change_extension(path, string()).file_string(), "\\", "\\\\") + "\"," + codePage + "," + lexical_cast<string>(srid) + ")"
 		)
 		{}
 
@@ -47,7 +49,7 @@ namespace synthese
 
 		std::string VirtualShapeVirtualTable::GetTableName( const boost::filesystem::path& path )
 		{
-			string out(path.file_string());
+			string out(change_extension(path, string()).file_string());
 			replace_if(out.begin(), out.end(), is_any_of(" \\:/"), '_');
 			return "shapefile_" + out;
 		}
