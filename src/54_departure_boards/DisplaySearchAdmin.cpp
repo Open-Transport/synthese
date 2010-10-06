@@ -71,7 +71,8 @@ namespace synthese
 	using namespace departure_boards;
 	using namespace security;
 	using namespace messages;
-	
+	using namespace geography;
+		
 
 	namespace util
 	{
@@ -204,7 +205,7 @@ namespace synthese
 				createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
 				if(_place)
 				{
-					createDisplayRequest.getAction()->setPlace(_place->get() ? (*_place)->getKey() : 0);
+					createDisplayRequest.getAction()->setPlace(*_place);
 				}
 				createDisplayRequest.setActionWillCreateObject();
 
@@ -252,6 +253,10 @@ namespace synthese
 
 				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
 				{
+					if(screen->getParent())
+					{
+						continue;
+					}
 					updateRequest.getPage()->setScreen(screen);
 					viewRequest.getFunction()->setScreen(screen);
 					if(	screen->getType() &&
@@ -271,20 +276,20 @@ namespace synthese
 					{
 						stream <<
 							t.col() <<
-							(	screen->getLocalization() ?
-								screen->getLocalization()->getCity()->getName() :
+							(	screen->getLocation() ?
+								screen->getLocation()->getCity()->getName() :
 								"(indéterminé)"
 							)
 						;
 						stream <<
 							t.col() <<
-							(	screen->getLocalization() ?
-								screen->getLocalization()->getName() :
+							(	screen->getLocation() ?
+								screen->getLocation()->getName() :
 								"(indéterminé)"
 							)
 						;
 					}
-					stream << t.col() << screen->getLocalizationComment();
+					stream << t.col() << screen->getName();
 					stream <<
 						t.col() <<
 						(	screen->getType() ?
@@ -595,7 +600,7 @@ namespace synthese
 
 			if( _place &&
 				(	sa && sa->_place == _place ||	
-					da && da->getScreen()->getLocalization() == _place->get() ||
+					da && da->getScreen()->getRoot<NamedPlace>() == _place->get() ||
 					ca && ca->getCPU()->getPlace() == _place->get()
 			)	){
 				DisplayScreenCPUTableSync::SearchResult cpus(
@@ -621,7 +626,11 @@ namespace synthese
 				)	);
 				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
 				{
-					if(screen->getCPU()) continue;
+					if(	screen->getRoot<DisplayScreenCPU>() ||
+						screen->getParent() != NULL
+					){
+						continue;
+					}
 					shared_ptr<DisplayAdmin> p(getNewOtherPage<DisplayAdmin>());
 					p->setScreen(screen);
 					links.push_back(p);

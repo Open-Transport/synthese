@@ -45,6 +45,10 @@ namespace synthese
 			TreeRootType* getRoot() const { return _root; }
 
 			void setRoot(TreeRootType* value) { _root=value; }
+
+			void setSameRoot(const TreeOtherClassRootPolicy<O>& value){ _root = value._root; }
+
+			void setNullRoot(){ _root = NULL; }
 		};
 	}
 }

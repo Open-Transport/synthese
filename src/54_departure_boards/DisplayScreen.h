@@ -36,12 +36,21 @@
 #include "DeparturesTableTypes.h"
 #include "ForcedDestinationsArrivalDepartureTableGenerator.h"
 #include "StandardArrivalDepartureTableGenerator.h"
+#include "TreeNode.hpp"
+#include "TreeAlphabeticalOrderingPolicy.hpp"
+#include "TreeMultiClassRootPolicy.hpp"
+#include "Named.h"
 
 namespace synthese
 {
 	namespace server
 	{
 		class Request;
+	}
+
+	namespace geography
+	{
+		class NamedPlace;
 	}
 
 	namespace pt
@@ -79,8 +88,14 @@ namespace synthese
 						- Autres paramètres (liste complète : voir IHM)
 
 		*/
-		class DisplayScreen
-		:	public virtual util::Registrable
+		class DisplayScreen:
+			public virtual util::Registrable,
+			public tree::TreeNode<
+				DisplayScreen,
+				tree::TreeAlphabeticalOrderingPolicy,
+				tree::TreeMultiClassRootPolicy<geography::NamedPlace, DisplayScreenCPU>
+			>,
+			public util::Named
 		{
 		public:
 
@@ -91,19 +106,16 @@ namespace synthese
 				STANDARD_METHOD = 0,
 				WITH_FORCED_DESTINATIONS_METHOD = 1,
 				ROUTE_PLANNING = 2,
-				BY_PHYSICAL_STOP = 3
+				DISPLAY_CHILDREN_ONLY = 3
 			} GenerationMethod;
 
 
 		protected:
 			//! \name Technical data
 			//@{
-				const pt::StopArea*	_localization;		//!< Localization of the display screen (belongs to a place)
-				std::string											_localizationComment;
 				const DisplayType*									_displayType;
 				int													_wiringCode;	// Display ID in a bus
 				int													_comPort;
-				const DisplayScreenCPU*								_cpu;
 				std::string											_macAddress;
 			//@}
 
@@ -121,6 +133,7 @@ namespace synthese
 
 			//! \name Content
 			//@{
+				const pt::StopArea*			_displayedPlace;		//!< Place where the services must depart or arrive
 				ArrivalDepartureTableGenerator::PhysicalStops	_physicalStops;				//!< Quai(s) affichés
 				bool						_allPhysicalStopsDisplayed;
 				ForbiddenPlacesList			_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
@@ -169,8 +182,7 @@ namespace synthese
 				void	setDirection(DeparturesTableDirection direction);
 				void	setFirstRow(int row);
 				void	setGenerationMethod(GenerationMethod method);
-				void	setLocalization(const pt::StopArea*);
-				void	setLocalizationComment(const std::string&);
+				void	setDisplayedPlace(const pt::StopArea* value){ _displayedPlace = value; }
 				void	setMaintenanceIsOnline(bool value);
 				void	setMaintenanceMessage(const std::string& message);
 				void	setMaxDelay(int);
@@ -181,7 +193,6 @@ namespace synthese
 				void	setType(const DisplayType*);
 				void	setWiringCode(int);				
 				void	setDisplayTeam(bool value);
-				void	setCPU(const DisplayScreenCPU* value);
 				void	setDisplayClock(bool value);
 				void	setComPort(int value);
 				void	setMacAddress(const std::string& value);
@@ -198,7 +209,7 @@ namespace synthese
 				void	clearForbiddenPlaces();
 				void	clearForcedDestinations();
 				void	clearPhysicalStops();
-				void	copy(const DisplayScreen*);
+				void	copy(const DisplayScreen&);
 				void	removeDisplayedPlace(const pt::StopArea*);
 				void	removeForbiddenPlace(const pt::StopArea*);
 				void	removeForcedDestination(const pt::StopArea*);
@@ -231,8 +242,7 @@ namespace synthese
 
 			//!	\name Getters
 			//@{
-				const pt::StopArea*	getLocalization()	const;
-				const std::string&				getLocalizationComment()		const;
+				const pt::StopArea*				getDisplayedPlace()				const { return _displayedPlace; }
 				const DisplayType*				getType()						const;				
 				int								getWiringCode()					const;
 				const std::string&				getTitle()						const;
@@ -254,7 +264,6 @@ namespace synthese
 				bool							getIsOnline()					const;
 				const std::string&				getMaintenanceMessage()			const;
 				bool							getDisplayTeam()				const;
-				const DisplayScreenCPU*			getCPU()						const;
 				int								getComPort()					const;
 				bool							getDisplayClock()				const;
 				std::string						getMacAddress()					const;
@@ -262,9 +271,11 @@ namespace synthese
 				const TransferDestinationsList&	getTransferdestinations()		const;
 			//@}
 
-			//! \name Queries
+			//! \name Services
 			//@{
 				boost::shared_ptr<ArrivalDepartureTableGenerator>	getGenerator(const boost::posix_time::ptime& startTime)		const;
+
+				const geography::NamedPlace* getLocation() const;
 				
 				//////////////////////////////////////////////////////////////////////////
 				/// Display the content generated for the screen

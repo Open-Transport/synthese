@@ -38,10 +38,12 @@
 #include "NamedPlace.h"
 #include "DisplayMonitoringStatus.h"
 #include "RoutePlanningTableGenerator.h"
+#include "Webpage.h"
+#include "DisplayScreenContentFunction.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
-#include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 using namespace boost;
@@ -68,11 +70,10 @@ namespace synthese
 	{
 		DisplayScreen::DisplayScreen(RegistryKeyType key)
 		:	Registrable(key),
-			_localization(NULL),
+			_displayedPlace(NULL),
 			_displayType(NULL),
 			_wiringCode(0),
 			_comPort(0),
-			_cpu(NULL),
 			_blinkingDelay(1),
 			_trackNumberDisplay(false),
 			_serviceNumberDisplay(false),
@@ -108,13 +109,6 @@ namespace synthese
 		}
 
 
-		/** Modificateur du point d'arrêt.
-		*/
-		void DisplayScreen::setLocalization(const StopArea* bp)
-		{
-			_localization = bp;
-		}
-
 
 		void DisplayScreen::addDisplayedPlace(const pt::StopArea* __PointArret)
 		{
@@ -129,21 +123,6 @@ namespace synthese
 		}
 
 
-
-		const StopArea* DisplayScreen::getLocalization() const
-		{
-			return _localization;
-		}
-
-		const string& DisplayScreen::getLocalizationComment() const
-		{
-			return _localizationComment;
-		}
-
-		void DisplayScreen::setLocalizationComment( const std::string& text)
-		{
-			_localizationComment = text;
-		}
 
 		void DisplayScreen::setType(const DisplayType* displayType)
 		{
@@ -226,8 +205,13 @@ namespace synthese
 			const ptime& date,
 			const server::Request* request
 		) const {
-			if (!_displayType || !_displayType->getDisplayInterface() || !_maintenanceIsOnline || !_localization)
+			if(	!_displayType ||
+				(	!_displayType->getDisplayInterface() && !_displayType->getDisplayMainPage()) ||
+				!_maintenanceIsOnline ||
+				!_displayedPlace
+			){
 				return;
+			}
 
 			try
 			{
@@ -243,12 +227,8 @@ namespace synthese
 
 				if(_generationMethod == ROUTE_PLANNING)
 				{
-					const DeparturesTableRoutePlanningInterfacePage* page(
-						_displayType->getDisplayInterface()->getPage<DeparturesTableRoutePlanningInterfacePage>()
-					);
-
 					RoutePlanningTableGenerator generator(
-						*_localization,
+						*_displayedPlace,
 						getDisplayedPlaces(),
 						realStartDateTime,
 						endDateTime,
@@ -259,31 +239,53 @@ namespace synthese
 					displayedObject.map = generator.run();
 					displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this, date);
 
-					page->display(
-						stream,
-						variables,
-						getTitle(),
-						getWiringCode(),
-						getServiceNumberDisplay(),
-						getTrackNumberDisplay(),
-						getRoutePlanningWithTransfer(),
-						getBlinkingDelay(),
-						getDisplayClock(),
-						*getLocalization(),
-						displayedObject,
-						request
-					);
+					if(	_displayType->getDisplayInterface() &&
+						_displayType->getDisplayInterface()->getPage<DeparturesTableRoutePlanningInterfacePage>()
+					){
+						_displayType->getDisplayInterface()->getPage<DeparturesTableRoutePlanningInterfacePage>()->display(
+							stream,
+							variables,
+							getTitle(),
+							getWiringCode(),
+							getServiceNumberDisplay(),
+							getTrackNumberDisplay(),
+							getRoutePlanningWithTransfer(),
+							getBlinkingDelay(),
+							getDisplayClock(),
+							*getDisplayedPlace(),
+							displayedObject,
+							request
+						);
+					}
+					else
+					{
+						assert(_displayType->getDisplayMainPage());
+
+						DisplayScreenContentFunction::DisplayRoutePlanningBoard(
+							stream,
+							*request,
+							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayMainPage()),
+							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayRowPage()),
+							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayDestinationPage()),
+							getTitle(),
+							getWiringCode(),
+							getServiceNumberDisplay(),
+							getTrackNumberDisplay(),
+							getRoutePlanningWithTransfer(),
+							posix_time::minutes(getBlinkingDelay()),
+							getDisplayClock(),
+							*getDisplayedPlace(),
+							displayedObject,
+							getChildren()
+						);
+					}
 				}
-				else if(_generationMethod == BY_PHYSICAL_STOP)
+				else if(_generationMethod == DISPLAY_CHILDREN_ONLY)
 				{
-					// To be implemented
+					// computes nothing, children will be called by the cms method
 				}
 				else
 				{
-					const DeparturesTableInterfacePage* page(
-						_displayType->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
-					);
-
 					switch (_generationMethod)
 					{
 					case STANDARD_METHOD:
@@ -323,25 +325,54 @@ namespace synthese
 					ArrivalDepartureListWithAlarm displayedObject;
 					displayedObject.map = generator->generate();
 					displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this, date);
-				
-					page->display(
-						stream
-						, variables
-						, getTitle()
-						, getWiringCode()
-						, getServiceNumberDisplay()
-						, getTrackNumberDisplay()
-						, getDisplayTeam()
-						, getType()->getMaxStopsNumber(),
-						getBlinkingDelay(),
-						getDisplayClock()
-						, getLocalization()
-						, displayedObject,
-						request
-					);
+
+					if(	_displayType->getDisplayInterface() &&
+						_displayType->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
+					){
+						_displayType->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()->display(
+							stream,
+							variables,
+							getTitle(),
+							getWiringCode(),
+							getServiceNumberDisplay(),
+							getTrackNumberDisplay(),
+							getDisplayTeam(),
+							getType()->getMaxStopsNumber(),
+							getBlinkingDelay(),
+							getDisplayClock(),
+							getDisplayedPlace(),
+							displayedObject,
+							request
+						);
+					}
+					else
+					{
+						assert(_displayType->getDisplayMainPage());
+
+						DisplayScreenContentFunction::DisplayDepartureBoard(
+							stream,
+							*request,
+							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayMainPage()),
+							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayRowPage()),
+							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayDestinationPage()),
+							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayTransferDestinationPage()),
+							realStartDateTime,
+							getTitle(),
+							getWiringCode(),
+							getServiceNumberDisplay(),
+							getTrackNumberDisplay(),
+							getDisplayTeam(),
+							getType()->getMaxStopsNumber(),
+							posix_time::minutes(getBlinkingDelay()),
+							getDisplayClock(),
+							*getDisplayedPlace(),
+							displayedObject,
+							getChildren()
+						);
+					}
 				}
 			}
-			catch (InterfacePageException& e)
+			catch (InterfacePageException&)
 			{
 			}
 		}
@@ -388,9 +419,11 @@ namespace synthese
 
 		const ArrivalDepartureTableGenerator::PhysicalStops& DisplayScreen::getPhysicalStops(bool result) const
 		{
-			return (_allPhysicalStopsDisplayed && _localization && result)
-				? _localization->getPhysicalStops()
-				: _physicalStops;
+			return
+				(_allPhysicalStopsDisplayed && _displayedPlace && result) ?
+				_displayedPlace->getPhysicalStops() :
+				_physicalStops
+			;
 		}
 
 		const ForbiddenPlacesList& DisplayScreen::getForbiddenPlaces() const
@@ -463,15 +496,17 @@ namespace synthese
 
 		std::string DisplayScreen::getFullName() const
 		{
-			if (!_localization)
-				return _localizationComment + " (not localized)";
-			else
+			if(getLocation())
 			{
 				stringstream s;
-				s << _localization->getFullName();
-				if (_localizationComment.size())
-					s << "/" << _localizationComment;
+				s << getLocation()->getFullName();
+				if (!getName().empty())
+					s << "/" << getName();
 				return s.str();
+			}
+			else
+			{
+				return getName() + " (not located)";
 			}
 		}
 
@@ -554,36 +589,37 @@ namespace synthese
 				_forbiddenArrivalPlaces.erase(it);
 		}
 
-		void DisplayScreen::copy(const DisplayScreen* other )
+		void DisplayScreen::copy(const DisplayScreen& other )
 		{
-			setAllPhysicalStopsDisplayed(other->getAllPhysicalStopsDisplayed());
-			setBlinkingDelay(other->getBlinkingDelay());
-			setClearingDelay(other->getClearingDelay());
-			setDestinationForceDelay(other->getForceDestinationDelay());
-			setDirection(other->getDirection());
-			setFirstRow(other->getFirstRow());
-			setGenerationMethod(other->getGenerationMethod());
-			setLocalization(other->getLocalization());
-			setMaxDelay(other->getMaxDelay());
-			setOriginsOnly(other->getEndFilter());
-			setServiceNumberDisplay(other->getServiceNumberDisplay());
-			setTitle(other->getTitle());
-			setTrackNumberDisplay(other->getTrackNumberDisplay());
-			setType(other->getType());
-			setWiringCode(other->getWiringCode());
-			for (DisplayedPlacesList::const_iterator it = other->getDisplayedPlaces().begin(); it != other->getDisplayedPlaces().end(); ++it)
+			setAllPhysicalStopsDisplayed(other.getAllPhysicalStopsDisplayed());
+			setBlinkingDelay(other.getBlinkingDelay());
+			setClearingDelay(other.getClearingDelay());
+			setDestinationForceDelay(other.getForceDestinationDelay());
+			setDirection(other.getDirection());
+			setFirstRow(other.getFirstRow());
+			setGenerationMethod(other.getGenerationMethod());
+			setDisplayedPlace(other.getDisplayedPlace());
+			setSameRoot(other);
+			setMaxDelay(other.getMaxDelay());
+			setOriginsOnly(other.getEndFilter());
+			setServiceNumberDisplay(other.getServiceNumberDisplay());
+			setTitle(other.getTitle());
+			setTrackNumberDisplay(other.getTrackNumberDisplay());
+			setType(other.getType());
+			setWiringCode(other.getWiringCode());
+			for (DisplayedPlacesList::const_iterator it = other.getDisplayedPlaces().begin(); it != other.getDisplayedPlaces().end(); ++it)
 			{
 				addDisplayedPlace(it->second);
 			}
-			for (DisplayedPlacesList::const_iterator it2 = other->getForcedDestinations().begin(); it2 != other->getForcedDestinations().end(); ++it2)
+			for (DisplayedPlacesList::const_iterator it2 = other.getForcedDestinations().begin(); it2 != other.getForcedDestinations().end(); ++it2)
 			{
 				addForcedDestination(it2->second);
 			}
-			for (ForbiddenPlacesList::const_iterator it3 = other->getForbiddenPlaces().begin(); it3 != other->getForbiddenPlaces().end(); ++it3)
+			for (ForbiddenPlacesList::const_iterator it3 = other.getForbiddenPlaces().begin(); it3 != other.getForbiddenPlaces().end(); ++it3)
 			{
 				addForbiddenPlace(it3->second);
 			}
-			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it4, other->getPhysicalStops(false))
+			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it4, other.getPhysicalStops(false))
 			{
 				addPhysicalStop(it4.second);
 			}
@@ -604,19 +640,7 @@ namespace synthese
 
 		DisplayScreen::~DisplayScreen(
 		){
-			_localization = NULL;
 			_displayType = NULL;
-			_cpu = NULL;
-		}
-
-
-
-		void DisplayScreen::setCPU(
-			const DisplayScreenCPU* value
-		){
-			assert(value == NULL || value->getPlace() == _localization);
-
-			_cpu = value;
 		}
 
 
@@ -633,13 +657,6 @@ namespace synthese
 			int value
 		) {
 			_comPort = value;
-		}
-
-
-
-		const DisplayScreenCPU* DisplayScreen::getCPU(
-		) const {
-			return _cpu;
 		}
 
 
@@ -740,6 +757,21 @@ namespace synthese
 		void DisplayScreen::clearTransferDestinations()
 		{
 			_transfers.clear();
+		}
+
+
+
+		const geography::NamedPlace* DisplayScreen::getLocation() const
+		{
+			if(getRoot<NamedPlace>())
+			{
+				return getRoot<NamedPlace>();
+			}
+			if(getRoot<DisplayScreenCPU>())
+			{
+				return getRoot<DisplayScreenCPU>()->getPlace();
+			}
+			return NULL;
 		}
 	}
 }

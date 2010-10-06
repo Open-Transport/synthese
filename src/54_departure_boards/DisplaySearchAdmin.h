@@ -29,9 +29,9 @@
 
 namespace synthese
 {
-	namespace pt
+	namespace geography
 	{
-		class StopArea;
+		class NamedPlace;
 	}
 
 	namespace departure_boards
@@ -118,7 +118,7 @@ namespace synthese
 			std::string										_searchName;
 			boost::optional<util::RegistryKeyType>				_searchLineId;
 			boost::optional<util::RegistryKeyType>				_searchTypeId;
-			boost::optional<boost::shared_ptr<const pt::StopArea> >
+			boost::optional<boost::shared_ptr<const geography::NamedPlace> >
 															_place;
 			boost::optional<int>							_searchState;
 			boost::optional<int>							_searchMessage;
@@ -212,7 +212,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				boost::optional<boost::shared_ptr<const pt::StopArea> > getPlace() const { return _place; }
+				boost::optional<boost::shared_ptr<const geography::NamedPlace> > getPlace() const { return _place; }
 			//@}
 		};
 	}

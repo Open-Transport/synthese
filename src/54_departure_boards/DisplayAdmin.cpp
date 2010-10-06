@@ -79,6 +79,8 @@
 #include "DisplayScreenTransferDestinationAddAction.h"
 #include "DisplayScreenTransferDestinationRemoveAction.h"
 #include "Profile.h"
+#include "CreateDisplayScreenAction.h"
+#include "DisplayScreenUpdateDisplayedStopAreaAction.hpp"
 
 #include <utility>
 #include <sstream>
@@ -144,11 +146,11 @@ namespace synthese
 				_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _displayScreen->getKey());
 				_generalLogView.set(map, ArrivalDepartureTableLog::FACTORY_KEY, _displayScreen->getKey());
 			}
-			catch (ObjectNotFoundException<DisplayScreen>& e)
+			catch (ObjectNotFoundException<DisplayScreen>&)
 			{
 				throw AdminParametersException("Display screen not found");
 			}
-			catch (ObjectNotFoundException<StopArea>& e)
+			catch (ObjectNotFoundException<StopArea>&)
 			{
 				throw AdminParametersException("Place not found");
 			}
@@ -190,15 +192,19 @@ namespace synthese
 
 				stream << t.open();
 				stream << t.title("Emplacement");
-				if(_displayScreen->getLocalization())
+				if(_displayScreen->getLocation())
 				{
-					stream << t.cell("Zone d'arrêt", _displayScreen->getLocalization()->getFullName());
+					stream << t.cell("Localisation", _displayScreen->getLocation()->getFullName());
 				}
 				else
 				{
 					stream << t.cell("Localisation","Stock");
 				}
-				stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_NAME, _displayScreen->getLocalizationComment()));
+				if(_displayScreen->getParent())
+				{
+					stream << t.cell("Fils de", _displayScreen->getParent()->getFullName());
+				}
+				stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_NAME, _displayScreen->getName()));
 
 				stream << t.title("Données techniques");
 				stream << t.cell("UID", Conversion::ToString(_displayScreen->getKey()));
@@ -215,20 +221,20 @@ namespace synthese
 				
 				stream << t.title("Connexion");
 				
-				if (_displayScreen->getLocalization() != NULL)
+				if (_displayScreen->getLocation() != NULL && _displayScreen->getParent() == NULL)
 				{
 					// CPU search
 					DisplayScreenCPUTableSync::SearchResult cpus(
 						DisplayScreenCPUTableSync::Search(
 							_getEnv(),
-							_displayScreen->getLocalization()->getKey()
+							_displayScreen->getLocation()->getKey()
 					)	);
 					
 					if(!cpus.empty())
 					{
 						AdminFunctionRequest<DisplayScreenCPUAdmin> goCPURequest(_request);
 						goCPURequest.getPage()->setCPU(
-							_getEnv().getSPtr(_displayScreen->getCPU())
+							_getEnv().getSPtr(_displayScreen->getRoot<DisplayScreenCPU>())
 						);
 						
 						stream << t.cell(
@@ -238,16 +244,16 @@ namespace synthese
 								cpus,
 								optional<shared_ptr<DisplayScreenCPU> >(
 									_getEnv().getEditableSPtr(
-										const_cast<DisplayScreenCPU*>(_displayScreen->getCPU())
+										const_cast<DisplayScreenCPU*>(_displayScreen->getRoot<DisplayScreenCPU>())
 								)	),
 								"(pas d'unité centrale)"
 							) + " " +(
-								_displayScreen->getCPU() ?
+								_displayScreen->getRoot<DisplayScreenCPU>() ?
 								goCPURequest.getHTMLForm().getLinkButton(
-										"Ouvrir",
-										string(),
-										"server.png"
-									) :
+									"Ouvrir",
+									string(),
+									"server.png"
+								) :
 								string()
 							)
 						);
@@ -456,60 +462,77 @@ namespace synthese
 				AdminActionFunctionRequest<DisplayScreenRemoveForbiddenPlaceAction,DisplayAdmin> rmForbiddenRequest(_request);
 				rmForbiddenRequest.getAction()->setScreen(_displayScreen);
 
+				// Change displayed stop area request
+				AdminActionFunctionRequest<DisplayScreenUpdateDisplayedStopAreaAction,DisplayAdmin> updateDisplayedPlaceRequest(_request);
+				updateDisplayedPlaceRequest.getAction()->setScreen(const_pointer_cast<DisplayScreen>(_displayScreen));
+
 				vector<pair<optional<EndFilter>, string> > endFilterMap;
 				endFilterMap.push_back(make_pair(WITH_PASSING, "Origines/Terminus et passages"));
 				endFilterMap.push_back(make_pair(ENDS_ONLY, "Origines/Terminus seulement"));
 
-				// Propriétés
-				stream << "<h1>Propriétés</h1>";
+				{	// Properties
+					stream << "<h1>Propriétés</h1>";
 
-				PropertiesHTMLTable t(updPreselRequest.getHTMLForm("updpresel"));
-				t.getForm().setUpdateRight(tabHasWritePermissions());
+					PropertiesHTMLTable t(updPreselRequest.getHTMLForm("updpresel"));
+					t.getForm().setUpdateRight(tabHasWritePermissions());
 
-				stream << t.open();
-				stream << t.title("Contenu");
-				stream << t.cell("Type de contenu", t.getForm().getRadioInputCollection(
+					stream << t.open();
+					stream << t.title("Contenu");
+					stream << t.cell("Type de contenu", t.getForm().getRadioInputCollection(
 						UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_FUNCTION,
 						UpdateDisplayPreselectionParametersAction::GetFunctionList(),
 						optional<UpdateDisplayPreselectionParametersAction::DisplayFunction>(UpdateDisplayPreselectionParametersAction::GetFunction(*_displayScreen)),
 						true
-				)	);
-				stream << t.cell("Terminus", t.getForm().getRadioInputCollection(
+						)	);
+					stream << t.cell("Terminus", t.getForm().getRadioInputCollection(
 						UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_END_FILTER,
 						endFilterMap,
 						optional<EndFilter>(_displayScreen->getEndFilter()),
 						true
-				)	);
-				stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) + " minutes");
-				stream << t.cell("Délai d'effacement", t.getForm().getSelectInput(
-					UpdateDisplayPreselectionParametersAction::PARAMETER_CLEANING_DELAY,
-					UpdateDisplayPreselectionParametersAction::GetClearDelaysList(),
-					optional<int>(_displayScreen->getClearingDelay())
-				));
+						)	);
+					stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) + " minutes");
+					stream << t.cell("Délai d'effacement", t.getForm().getSelectInput(
+						UpdateDisplayPreselectionParametersAction::PARAMETER_CLEANING_DELAY,
+						UpdateDisplayPreselectionParametersAction::GetClearDelaysList(),
+						optional<int>(_displayScreen->getClearingDelay())
+						));
 
-				if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
-				{
-					stream << t.title("Présélection");
-					stream <<
-						t.cell(
+					if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
+					{
+						stream << t.title("Présélection");
+						stream <<
+							t.cell(
 							"Délai maximum présélection",
 							t.getForm().getTextInput(
-								UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY,
-								Conversion::ToString(_displayScreen->getForceDestinationDelay())
+							UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY,
+							Conversion::ToString(_displayScreen->getForceDestinationDelay())
 							) + " minutes"
-						)
-					;
+							)
+							;
+					}
+
+					stream << t.close();
 				}
+
+				{	// Displayed stop area
+					stream << "<h1>Arrêt de départ</h1>";
+					PropertiesHTMLTable t(updateDisplayedPlaceRequest.getHTMLForm("stopareachange"));
+					t.getForm().setUpdateRight(tabHasWritePermissions());
+					stream << t.open();
+					stream << t.cell("Localité", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_CITY_NAME, _displayScreen->getDisplayedPlace() ? _displayScreen->getDisplayedPlace()->getCity()->getName() : string()));
+					stream << t.cell("Arrêt", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_PLACE_NAME, _displayScreen->getDisplayedPlace() ? _displayScreen->getDisplayedPlace()->getName() : string()));
+					stream << t.close();
+				}
+
 				
-				stream << t.close();
 
 				if(_displayScreen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
 				{
 					stream << "<h1>Arrêts de destination</h1>";
 
-					if(_displayScreen->getLocalization() == NULL)
+					if(_displayScreen->getDisplayedPlace() == NULL)
 					{
-						stream << "Afficheur non localisé, aucune destination ne peut être sélectionnée.";
+						stream << "Arrêt de départ non spécifié, aucune destination ne peut être sélectionnée.";
 					}
 					else
 					{
@@ -558,9 +581,9 @@ namespace synthese
 
 					if (!_displayScreen->getAllPhysicalStopsDisplayed())
 					{
-						if(_displayScreen->getLocalization() == NULL)
+						if(_displayScreen->getDisplayedPlace() == NULL)
 						{
-							stream << "Afficheur non localisé, aucun arrêt à sélectionner.";
+							stream << "Arrêt de départ non spécifié, aucun arrêt à sélectionner.";
 						}
 						else
 						{
@@ -573,7 +596,7 @@ namespace synthese
 							stream << t.col(1, string(), true) << "Affiché";
 							BOOST_FOREACH(
 								const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it,
-								_displayScreen->getLocalization()->getPhysicalStops()
+								_displayScreen->getDisplayedPlace()->getPhysicalStops()
 							){
 								stream << t.row();
 								stream << t.col() << it.second->getName();
@@ -713,6 +736,44 @@ namespace synthese
 
 					stream << "<p class=\"info\">Les terminus de lignes sont automatiquement présélectionnés.</p>";
 				}
+
+				stream << "<h1>Contenus inclus</h1>";
+
+				AdminFunctionRequest<DisplayAdmin> displayRequest(_request);
+
+				AdminActionFunctionRequest<CreateDisplayScreenAction,DisplayAdmin> createDisplayRequest(
+					_request
+				);
+				createDisplayRequest.setActionWillCreateObject();
+				createDisplayRequest.getAction()->setUp(_displayScreen);
+
+				AdminActionFunctionRequest<DisplayScreenRemoveAction,DisplayAdmin> removeDisplayRequest(
+					_request
+				);
+
+				HTMLTable::ColsVector c;
+				c.push_back("Nom");
+				c.push_back("ID");
+				c.push_back("Actions");
+				c.push_back("Actions");
+				HTMLTable td(c, ResultHTMLTable::CSS_CLASS);
+				stream << td.open();
+				BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, _displayScreen->getChildren())
+				{
+					const DisplayScreen& screen(*it.second);
+					displayRequest.getPage()->setScreen(Env::GetOfficialEnv().getSPtr(&screen));
+					removeDisplayRequest.getAction()->setDisplayScreen(Env::GetOfficialEnv().getSPtr(&screen));
+
+					stream << td.row();
+					stream << td.col() << screen.getName();
+					stream << td.col() << screen.getKey();
+					stream << td.col() << displayRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "monitor.png");
+					stream << td.col() << removeDisplayRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le contenu "+ screen.getName() + " ?", "monitor_delete.png");
+				}
+
+				stream << td.close();
+
+				stream << createDisplayRequest.getHTMLForm().getLinkButton("Créer un nouveau contenu inclus", string(), "monitor_add.png");
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -1020,10 +1081,10 @@ namespace synthese
 			const security::User& user
 		) const	{
 			if (_displayScreen.get() == NULL) return false;
-			if (_displayScreen->getLocalization() == NULL) return user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ) || user.getProfile()->isAuthorized<DisplayMaintenanceRight>(READ);
+			if (_displayScreen->getLocation() == NULL) return user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ) || user.getProfile()->isAuthorized<DisplayMaintenanceRight>(READ);
 			return
-				user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())) ||
-				user.getProfile()->isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey()));
+				user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocation()->getKey())) ||
+				user.getProfile()->isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocation()->getKey()));
 		}
 
 		DisplayAdmin::DisplayAdmin(
@@ -1036,7 +1097,7 @@ namespace synthese
 
 		std::string DisplayAdmin::getTitle() const
 		{
-			return _displayScreen.get() ? _displayScreen->getLocalizationComment() : DEFAULT_TITLE;
+			return _displayScreen.get() ? _displayScreen->getName() : DEFAULT_TITLE;
 		}
 
 
@@ -1046,23 +1107,23 @@ namespace synthese
 		) const {
 			_tabs.clear();
 
-			if(	_displayScreen->getLocalization() &&
+			if(	_displayScreen->getLocation() &&
 				profile.isAuthorized<ArrivalDepartureTableRight>(
 					READ,
 					UNKNOWN_RIGHT_LEVEL,
-					lexical_cast<string>(_displayScreen->getLocalization()->getKey())
+					lexical_cast<string>(_displayScreen->getLocation()->getKey())
 				) ||
-				!_displayScreen->getLocalization() &&
+				!_displayScreen->getLocation() &&
 				profile.isAuthorized<ArrivalDepartureTableRight>(
 					READ,
 					UNKNOWN_RIGHT_LEVEL
 			)	){
 				bool writeRight(
-					_displayScreen->getLocalization() ?
+					_displayScreen->getLocation() ?
 					profile.isAuthorized<ArrivalDepartureTableRight>(
 						WRITE,
 						UNKNOWN_RIGHT_LEVEL,
-						Conversion::ToString(_displayScreen->getLocalization()->getKey())
+						Conversion::ToString(_displayScreen->getLocation()->getKey())
 					) :
 					profile.isAuthorized<ArrivalDepartureTableRight>(
 						WRITE,
@@ -1071,21 +1132,21 @@ namespace synthese
 				_tabs.push_back(Tab("Technique", TAB_TECHNICAL, writeRight, "cog.png"));
 			}
 
-			if(	_displayScreen->getLocalization() &&
+			if(	_displayScreen->getLocation() &&
 				profile.isAuthorized<DisplayMaintenanceRight>(
 					READ,
 					UNKNOWN_RIGHT_LEVEL,
-					lexical_cast<string>(_displayScreen->getLocalization()->getKey())
+					lexical_cast<string>(_displayScreen->getLocation()->getKey())
 				) ||
-				!_displayScreen->getLocalization() &&
+				!_displayScreen->getLocation() &&
 				profile.isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL)
 			){
 				bool writeRight(
-					_displayScreen->getLocalization() ?
+					_displayScreen->getLocation() ?
 					profile.isAuthorized<DisplayMaintenanceRight>(
 						WRITE,
 						UNKNOWN_RIGHT_LEVEL,
-						lexical_cast<string>(_displayScreen->getLocalization()->getKey())
+						lexical_cast<string>(_displayScreen->getLocation()->getKey())
 					) :
 					profile.isAuthorized<DisplayMaintenanceRight>(
 						WRITE,
@@ -1094,22 +1155,25 @@ namespace synthese
 				_tabs.push_back(Tab("Maintenance", TAB_MAINTENANCE, writeRight, "wrench.png"));
 			}
 
-			if (_displayScreen->getLocalization() &&
-				profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocalization()->getKey())) ||
-				!_displayScreen->getLocalization() &&
+			if (_displayScreen->getLocation() &&
+				profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_displayScreen->getLocation()->getKey())) ||
+				!_displayScreen->getLocation() &&
 				profile.isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL)
 			){
 				bool writeRight(
-					_displayScreen->getLocalization() ?
+					_displayScreen->getLocation() ?
 					profile.isAuthorized<ArrivalDepartureTableRight>(
 						WRITE,
 						UNKNOWN_RIGHT_LEVEL,
-						lexical_cast<string>(_displayScreen->getLocalization()->getKey())
+						lexical_cast<string>(_displayScreen->getLocation()->getKey())
 					) :
 					profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL)
 				);
 				_tabs.push_back(Tab("Sélection", TAB_CONTENT, writeRight, "times_display.png"));
-				_tabs.push_back(Tab("Apparence", TAB_APPEARANCE, writeRight, "font.png"));
+				if(_displayScreen->getGenerationMethod() != DisplayScreen::DISPLAY_CHILDREN_ONLY)
+				{
+					_tabs.push_back(Tab("Apparence", TAB_APPEARANCE, writeRight, "font.png"));
+				}
 				_tabs.push_back(Tab("Résultat", TAB_RESULT, writeRight, "zoom.png"));
 
 				if (ArrivalDepartureTableLog::IsAuthorized(profile, READ))
@@ -1134,6 +1198,31 @@ namespace synthese
 		boost::shared_ptr<const DisplayScreen> DisplayAdmin::getScreen() const
 		{
 			return _displayScreen;
+		}
+
+
+
+		AdminInterfaceElement::PageLinks DisplayAdmin::getSubPages(
+			const AdminInterfaceElement& currentPage,
+			const admin::AdminRequest& request
+		) const	{
+			AdminInterfaceElement::PageLinks links;
+			const DisplayAdmin* da(dynamic_cast<const DisplayAdmin*>(&currentPage));
+
+			if(	da &&
+				(da->getScreen() == _displayScreen || da->getScreen()->isChildOf(*_displayScreen))
+			){
+				BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, _displayScreen->getChildren())
+				{
+					shared_ptr<DisplayAdmin> p(
+						getNewOtherPage<DisplayAdmin>(false)
+					);
+					p->setScreen(Env::GetOfficialEnv().getSPtr(it.second));
+					links.push_back(p);
+				}
+			}
+
+			return links;
 		}
 	}
 }
