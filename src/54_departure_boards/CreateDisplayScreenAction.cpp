@@ -146,11 +146,11 @@ namespace synthese
 			}
 			else if(_cpu.get())
 			{
-				screen.setRoot<DisplayScreenCPU>(const_cast<DisplayScreenCPU*>(_cpu.get()));
+				screen.setRoot(const_cast<DisplayScreenCPU*>(_cpu.get()));
 			}
 			else
 			{
-				screen.setRoot<NamedPlace>(const_cast<NamedPlace*>(_place.get()));
+				screen.setRoot(const_cast<NamedPlace*>(_place.get()));
 			}
 
 			if(dynamic_cast<const StopArea*>(screen.getLocation()))
