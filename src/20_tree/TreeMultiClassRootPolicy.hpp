@@ -43,26 +43,17 @@ namespace synthese
 			C1* _root1;
 			C2* _root2;
 
+			C1* _getRoot(boost::optional<C1>){ return _root1; }
+			C2* _getRoot(boost::optional<C2>){ return _root2; }
+
 		public:
 			TreeMultiClassRootPolicy() : _root1(NULL), _root2(NULL) {}
 
 			template<class C>
-			C* getRoot() const { BOOST_STATIC_ASSERT(false); }
+			C* getRoot() const { return _getRoot(boost::optional<C>()); }
 
-			template<>
-			C1* getRoot<>() const { return _root1; }
-
-			template<>
-			C2* getRoot<>() const { return _root2; }
-
-			template<class C>
-			void setRoot(C* value) { BOOST_STATIC_ASSERT(false); }
-
-			template<>
-			void setRoot<>(C1* value) { _root1 = value; _root2 = NULL; } 
-
-			template<>
-			void setRoot<>(C2* value) { _root2 = value; _root1 = NULL; }
+			void setRoot(C1* value){ _root1 = value; _root2 = NULL; }
+			void setRoot(C2* value){ _root2 = value; _root1 = NULL; }
 
 			void setSameRoot(const TreeMultiClassRootPolicy<C1, C2>& value){ _root1 = value._root1; _root2 = value._root2; }
 
