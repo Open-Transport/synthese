@@ -43,14 +43,14 @@ namespace synthese
 			C1* _root1;
 			C2* _root2;
 
-			C1* _getRoot(boost::optional<C1>){ return _root1; }
-			C2* _getRoot(boost::optional<C2>){ return _root2; }
+			C1* _getRoot(std::auto_ptr<C1>) const { return _root1; }
+			C2* _getRoot(std::auto_ptr<C2>) const { return _root2; }
 
 		public:
 			TreeMultiClassRootPolicy() : _root1(NULL), _root2(NULL) {}
 
 			template<class C>
-			C* getRoot() const { return _getRoot(boost::optional<C>()); }
+			C* getRoot() const { return _getRoot(std::auto_ptr<C>()); }
 
 			void setRoot(C1* value){ _root1 = value; _root2 = NULL; }
 			void setRoot(C2* value){ _root2 = value; _root1 = NULL; }
