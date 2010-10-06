@@ -385,7 +385,7 @@ namespace synthese
 
 		std::string ServiceAdmin::getTitle() const
 		{
-			return _service.get() ? _service->getServiceNumber() + (_scheduledService.get() ? " (service à horaires)" : " (service continu)") : DEFAULT_TITLE;
+			return _service.get() ? _service->getServiceNumber() : DEFAULT_TITLE;
 		}
 
 
@@ -446,6 +446,13 @@ namespace synthese
 			PageLinks links(p->_getCurrentTreeBranch());
 			links.push_back(p);
 			return links;
+		}
+
+
+
+		std::string ServiceAdmin::getIcon() const
+		{
+			return _continuousService.get() ? "arrow_ew.png" : ICON;
 		}
 	}
 }

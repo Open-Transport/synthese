@@ -118,7 +118,7 @@ namespace synthese
 			///	@param stream Stream to write the page content on.
 			///	@param variables Environment variables defined by the interface
 			///	@param request The current request
-			///	@author Hugues
+			///	@author Hugues Romain
 			///	@date 2009
 			void display(
 				std::ostream& stream,
@@ -134,7 +134,7 @@ namespace synthese
 			/// level is READ.
 			///	@param request The current request
 			///	@return bool True if the displayed page can be displayed
-			///	@author Hugues
+			///	@author Hugues Romain
 			///	@date 2009
 			bool isAuthorized(
 				const security::User& user
@@ -145,9 +145,21 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Title getter.
 			///	@return The title of the page
-			///	@author Hugues
+			///	@author Hugues Romain
 			///	@date 2009
 			virtual std::string getTitle() const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Icon getter.
+			/// @return a car for scheduled service, a double arrow for continuous services.
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.2.0
+			virtual std::string getIcon() const;
+
+
 
 			void setService(boost::shared_ptr<const ScheduledService> value);
 			void setService(boost::shared_ptr<const ContinuousService> value);
