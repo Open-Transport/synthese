@@ -100,12 +100,16 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads a WKB column and transform it into geometry.
 			/// @param col the colume to read
+			/// @param isWKB true if the field is encoded as WKB, false for WKT
 			/// @return the geometry object corresponding to the WKB data
 			/// @pre the column must store WKB data
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.2.0
-			boost::shared_ptr<geos::geom::Geometry> getGeometry(const std::string& col) const;
+			boost::shared_ptr<geos::geom::Geometry> getGeometry(
+				const std::string& col,
+				bool isWKB = true
+			) const;
 		};
 
 
