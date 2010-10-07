@@ -50,7 +50,7 @@ namespace synthese
 		std::string VirtualShapeVirtualTable::GetTableName( const boost::filesystem::path& path )
 		{
 			string out(change_extension(path, string()).file_string());
-			replace_if(out.begin(), out.end(), is_any_of(" \\:/"), '_');
+			replace_if(out.begin(), out.end(), is_any_of(" \\:/()"), '_');
 			return "shapefile_" + out;
 		}
 	}
