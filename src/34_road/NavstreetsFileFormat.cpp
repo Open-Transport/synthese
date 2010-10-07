@@ -233,7 +233,7 @@ namespace synthese
 				RecentlyCreatedRoadPlaces recentlyCreatedRoadPlaces;
 
 				stringstream query;
-				query << "SELECT *, AsBinary(" << _FIELD_GEOMETRY << ") AS " << _FIELD_GEOMETRY << "_ASBINARY" << " FROM " << table.getName();
+				query << "SELECT *, AsText(" << _FIELD_GEOMETRY << ") AS " << _FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
 				SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
 				while(rows->next())
 				{
@@ -250,7 +250,7 @@ namespace synthese
 					string rightAddressSchema(rows->getText(_FIELD_R_ADDRSCH));
 					shared_ptr<LineString> geometry(
 						dynamic_pointer_cast<LineString, Geometry>(
-							rows->getGeometry(_FIELD_GEOMETRY+"_ASBINARY")
+							rows->getGeometry(_FIELD_GEOMETRY+"_ASTEXT",false)
 					)	);
 
 					if(!geometry.get())
