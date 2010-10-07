@@ -31,7 +31,6 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/lexical_cast.hpp>
 #include <geos/io/WKBReader.h>
-#include <geos/io/WKTReader.h>
 #include <geos/geom/Geometry.h>
 #include <geos/io/ParseException.h>
 
@@ -349,8 +348,7 @@ namespace synthese
 
 
 		boost::shared_ptr<Geometry> SQLiteResult::getGeometry(
-			const std::string& col,
-			bool isWKB
+			const std::string& col
 		) const	{
 			string colStr(getText(col));
 			
@@ -359,25 +357,14 @@ namespace synthese
 				return shared_ptr<Geometry>();
 			}
 
+			stringstream str(colStr);
+			WKBReader reader(DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
 			try
 			{
-				if(isWKB)
-				{
-					stringstream str(colStr);
-					WKBReader reader(DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
-					return 
-						CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
-							*shared_ptr<Geometry>(reader.read(str))
-						);
-				}
-				else
-				{
-					WKTReader reader(&DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
-					return 
-						CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
-							*shared_ptr<Geometry>(reader.read(colStr))
-						);
-				}
+				return 
+					CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
+						*shared_ptr<Geometry>(reader.read(str))
+					);
 			}
 			catch(geos::io::ParseException& e)
 			{
