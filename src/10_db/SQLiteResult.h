@@ -13,6 +13,7 @@ namespace geos
 	namespace geom
 	{
 		class Geometry;
+		class GeometryFactory;
 	}
 }
 
@@ -100,16 +101,59 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads a WKB column and transform it into geometry.
 			/// @param col the colume to read
+			/// @return the geometry object corresponding to the WKB data
+			/// @pre the column must store WKB data
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.2.0
+			boost::shared_ptr<geos::geom::Geometry> getGeometryFromWKB(
+				const std::string& col,
+				const geos::geom::GeometryFactory& factory
+			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Reads a WKB column using default storage SRID and transform it into geometry.
+			/// @param col the colume to read
 			/// @param isWKB true if the field is encoded as WKB, false for WKT
 			/// @return the geometry object corresponding to the WKB data
 			/// @pre the column must store WKB data
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.2.0
-			boost::shared_ptr<geos::geom::Geometry> getGeometry(
-				const std::string& col,
-				bool isWKB = true
+			boost::shared_ptr<geos::geom::Geometry> getGeometryFromWKB(
+				const std::string& col
 			) const;
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Reads a WKT column and transform it into geometry.
+			/// @param col the colume to read
+			/// @return the geometry object corresponding to the WKT data
+			/// @pre the column must store WKB data
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.2.0
+			boost::shared_ptr<geos::geom::Geometry> getGeometryFromWKT(
+				const std::string& col,
+				const geos::geom::GeometryFactory& factory
+			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Reads a WKT column using default storage SRID and transform it into geometry.
+			/// @param col the colume to read
+			/// @return the geometry object corresponding to the WKB data
+			/// @pre the column must store WKB data
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.2.0
+			boost::shared_ptr<geos::geom::Geometry> getGeometryFromWKT(
+				const std::string& col
+			) const;
+
 		};
 
 
