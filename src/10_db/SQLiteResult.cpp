@@ -348,9 +348,9 @@ namespace synthese
 
 
 
-		boost::shared_ptr<Geometry> SQLiteResult::getGeometry(
+		boost::shared_ptr<Geometry> SQLiteResult::getGeometryFromWKB(
 			const std::string& col,
-			bool isWKB
+			const geos::geom::GeometryFactory& factory
 		) const	{
 			string colStr(getText(col));
 			
@@ -361,23 +361,12 @@ namespace synthese
 
 			try
 			{
-				if(isWKB)
-				{
-					stringstream str(colStr);
-					WKBReader reader(DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
-					return 
-						CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
-							*shared_ptr<Geometry>(reader.read(str))
-						);
-				}
-				else
-				{
-					WKTReader reader(&DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
-					return 
-						CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
-							*shared_ptr<Geometry>(reader.read(colStr))
-						);
-				}
+				stringstream str(colStr);
+				WKBReader reader(factory);
+				return 
+					CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
+						*shared_ptr<Geometry>(reader.read(str))
+					);
 			}
 			catch(geos::io::ParseException& e)
 			{
@@ -387,6 +376,47 @@ namespace synthese
 
 
 
+		boost::shared_ptr<geos::geom::Geometry> SQLiteResult::getGeometryFromWKB( const std::string& col ) const
+		{
+			return getGeometryFromWKB(col, DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
+		}
+
+
+
+		boost::shared_ptr<geos::geom::Geometry> SQLiteResult::getGeometryFromWKT(
+			const std::string& col,
+			const geos::geom::GeometryFactory& factory
+		) const	{
+			string colStr(getText(col));
+
+			if(colStr.empty())
+			{
+				return shared_ptr<Geometry>();
+			}
+
+			try
+			{
+				WKTReader reader(&factory);
+				return 
+					CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
+						*shared_ptr<Geometry>(reader.read(colStr))
+				);
+			}
+			catch(geos::io::ParseException& e)
+			{
+				return shared_ptr<Geometry>();
+			}
+		}
+
+
+
+		boost::shared_ptr<geos::geom::Geometry> SQLiteResult::getGeometryFromWKT( const std::string& col ) const
+		{
+			return getGeometryFromWKT(col, DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
+		}
+
+
+		
 		std::ostream& operator<< ( std::ostream& os, const SQLiteResult& op )
 		{
 			std::vector<int> widths (op.computeMaxColWidths ());

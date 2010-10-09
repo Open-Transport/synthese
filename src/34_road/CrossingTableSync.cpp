@@ -88,7 +88,7 @@ namespace synthese
 			// Geometry
 			shared_ptr<Point> point(
 				static_pointer_cast<Point, Geometry>(
-					rows->getGeometry(CrossingTableSync::COL_GEOMETRY)
+					rows->getGeometryFromWKB(CrossingTableSync::COL_GEOMETRY)
 			)	);
 			if(point.get())
 			{
