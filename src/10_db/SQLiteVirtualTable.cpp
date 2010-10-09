@@ -38,7 +38,10 @@ namespace synthese
 		):	_name(name)
 		{
 			stringstream s;
-			s << "CREATE VIRTUAL TABLE " << _name << " USING " << using_param << ";";
+			s <<
+				"DROP TABLE IF EXISTS " << _name << ";" <<
+				"CREATE VIRTUAL TABLE " << _name << " USING " << using_param << ";"
+			;
 			DBModule::GetSQLite()->execUpdate(s.str());
 		}
 

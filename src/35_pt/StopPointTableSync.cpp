@@ -103,7 +103,7 @@ namespace synthese
 			{
 				shared_ptr<Point> point(
 					static_pointer_cast<Point, Geometry>(
-						rows->getGeometry(StopPointTableSync::COL_GEOMETRY)
+						rows->getGeometryFromWKB(StopPointTableSync::COL_GEOMETRY)
 				)	);
 				if(point.get())
 				{
