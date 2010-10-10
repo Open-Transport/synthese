@@ -1735,7 +1735,7 @@ namespace synthese
 			os << "<b>SUCCESS : Data loaded</b><br />";
 		}
 		
-		void TridentFileFormat::save(std::ostream& os) const
+		SQLiteTransaction TridentFileFormat::save(std::ostream& os) const
 		{
 			SQLiteTransaction transaction;
 
@@ -1776,9 +1776,9 @@ namespace synthese
 				JunctionTableSync::Save(junction.second.get(), transaction);
 			}
 
-			transaction.run();					
-	
-			os << "<b>SUCCESS : Data saved.</b><br />";
+			os << "<b>SUCCESS : Data saved</b><br />";
+
+			return transaction;
 		}
 
 		//////////////////////////////////////////////////////////////////////////

@@ -220,6 +220,15 @@ namespace synthese
 			}
 
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Clears the environment : each registry is destroyed.
+			/// Thanks to the shared pointer, this method should destroy linked objects
+			/// too, except if they are linked by extern shared pointer instances.
+			void clear()
+			{
+				_map.clear();
+			}
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Official environment static getter.

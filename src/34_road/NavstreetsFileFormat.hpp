@@ -216,10 +216,11 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Saves all imported data.
 			/// @param os stream to write log messages on
+			/// @return SQL transaction to run
 			/// @author Hugues Romain
 			/// @since 3.2.0
 			/// @date 2010
-			virtual void save(std::ostream& os) const;
+			virtual db::SQLiteTransaction save(std::ostream& os) const;
 		};
 	}
 }
