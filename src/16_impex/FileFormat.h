@@ -36,6 +36,11 @@
 
 namespace synthese
 {
+	namespace db
+	{
+		class SQLiteTransaction;
+	}
+
 	namespace impex
 	{
 		class DataSource;
@@ -93,6 +98,13 @@ namespace synthese
 				const FilePathsMap& paths
 			);
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Interface for the parser corresponding to the format.
+			/// @param filePath path of the file to parse
+			/// @param os output stream for warning and error messages
+			/// @param key key of the file (use it if the file format needs multiple files)
 			virtual void _parse(
 				const boost::filesystem::path& filePath,
 				std::ostream& os,
@@ -133,17 +145,33 @@ namespace synthese
 				std::ostream& os
 			) = 0;
 			
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Parses each input file, with many files corresponding to a unique role.
+			/// @param paths List of the file paths
+			/// @param os output stream for warning and error messages
 			void parseFiles(
 				const FilePathsSet& paths,
 				std::ostream& os
 			);
 
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			/// Parses each input file, with one file per role.
+			/// @param paths Map of the file path of each role
+			/// @param os output stream for warning and error messages
 			void parseFiles(
 				const FilePathsMap& paths,
 				std::ostream& os
 			);
 			
-			virtual void save(
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Interface for the save method.
+			/// @param os output stream for warning and error messages
+			/// @return transaction to run
+			virtual db::SQLiteTransaction save(
 				std::ostream& os
 			) const = 0;
 			

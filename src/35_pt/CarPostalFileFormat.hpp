@@ -134,7 +134,7 @@ namespace synthese
 			 */
 			virtual void build(std::ostream& os);
 			
-			virtual void save(std::ostream& os) const;
+			virtual db::SQLiteTransaction save(std::ostream& os) const;
 
 		private:
 		    

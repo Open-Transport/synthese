@@ -25,7 +25,7 @@
 #include "DataSource.h"
 #include "DataSourceTableSync.h"
 #include "FileFormat.h"
-
+#include "SQLiteTransaction.h"
 #include "ImportFunction.h"
 
 #include <boost/tokenizer.hpp>
@@ -39,6 +39,8 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
+	using namespace db;
+	
 
 	template<> const string util::FactorableTemplate<Function,impex::ImportFunction>::FACTORY_KEY("ImportFunction");
 	
@@ -90,6 +92,7 @@ namespace synthese
 			// Input parsing
 			try
 			{
+				boost::shared_ptr<FileFormat>		_fileFormat;
 				stringstream output;
 				_fileFormat.reset(Factory<FileFormat>::create(_dataSource->getFormat()));
 
@@ -121,7 +124,15 @@ namespace synthese
 					_fileFormat->parseFiles(paths, output);
 				}
 
+				SQLiteTransaction transaction(_fileFormat->save(output));
 				_output = output.str();
+
+				_env->clear();
+
+				if(_doImport)
+				{
+					transaction.run();
+				}
 			}
 			catch(Exception e)
 			{
@@ -134,10 +145,6 @@ namespace synthese
 		void ImportFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			stream << _output;
-			if(_doImport)
-			{
-				_fileFormat->save(stream);
-			}
 		}
 		
 		

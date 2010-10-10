@@ -106,7 +106,7 @@ namespace synthese
 		void CarPostalFileFormat::build(std::ostream& os)
 		{}
 
-		void CarPostalFileFormat::save(std::ostream& os
+		SQLiteTransaction CarPostalFileFormat::save(std::ostream& os
 		) const {
 			SQLiteTransaction transaction;
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env->getRegistry<JourneyPattern>())
@@ -128,7 +128,10 @@ namespace synthese
 					ScheduledServiceTableSync::Save(service.second.get(), transaction);
 				}
 			}
-			transaction.run();
+
+			os << "<b>SUCCESS : Data saved</b><br />";
+
+			return transaction;
 		}
 
 
