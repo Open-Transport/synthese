@@ -87,10 +87,15 @@ do_import=0|1
 				@return Generated parameters map
 			*/
 			server::ParametersMap _getParametersMap() const;
-			
-			/** Conversion from generic parameters map to attributes.
-				@param map Parameters map to interpret
-			*/
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Reads each parameter and run the parsing of the input files.
+			/// At the end of the parsing, the temporary environment used by the function
+			/// is cleaned in order to avoid memory overload.
+			///	@param map Parameters map to interpret
+			/// @author Hugues Romain
 			void _setFromParametersMap(const server::ParametersMap& map);
 			
 		public:

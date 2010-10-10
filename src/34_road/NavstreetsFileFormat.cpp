@@ -507,11 +507,13 @@ namespace synthese
 //					}
 				}
 			}
+
+			os << "<b>SUCCESS : Data loaded</b><br />";
 		}
 
 
 
-		void NavstreetsFileFormat::save( std::ostream& os ) const
+		SQLiteTransaction NavstreetsFileFormat::save( std::ostream& os ) const
 		{
 			SQLiteTransaction transaction;
 			BOOST_FOREACH(Registry<Crossing>::value_type crossing, _env->getEditableRegistry<Crossing>())
@@ -530,7 +532,10 @@ namespace synthese
 			{
 				RoadChunkTableSync::Save(roadChunk.second.get(),transaction);
 			}
-			transaction.run();
+
+			os << "<b>SUCCESS : Data saved</b><br />";
+
+			return transaction;
 		}
 
 
