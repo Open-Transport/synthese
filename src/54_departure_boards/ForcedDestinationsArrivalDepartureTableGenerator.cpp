@@ -112,7 +112,7 @@ namespace synthese
 					const LineStop* ls = static_cast<const LineStop*>(edge.second);
 
 					// Selection of the line
-					if (!_allowedLineStop(ls))
+					if (!_allowedLineStop(ls) || !ls->getFollowingArrivalForFineSteppingOnly())
 						continue;
 
 					// Max time for forced destination

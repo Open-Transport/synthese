@@ -72,7 +72,7 @@ namespace synthese
 				{
 					const LineStop* ls = static_cast<const LineStop*>(edge.second);
 
-					if (!_allowedLineStop(ls))
+					if (!_allowedLineStop(ls) || !ls->getFollowingArrivalForFineSteppingOnly())
 						continue;
 
 					// Loop on services
