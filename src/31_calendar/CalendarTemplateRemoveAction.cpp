@@ -88,7 +88,7 @@ namespace synthese
 		void CalendarTemplateRemoveAction::run(
 			Request& request
 		){
-			CalendarTemplateElementTableSync::Remove(_calendar->getKey());
+			CalendarTemplateElementTableSync::Clean(_calendar->getKey());
 			CalendarTemplateTableSync::Remove(_calendar->getKey());
 //			::AddDeleteEntry(*_object, request.getUser().get());
 		}
