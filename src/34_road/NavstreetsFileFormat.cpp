@@ -233,7 +233,7 @@ namespace synthese
 				RecentlyCreatedRoadPlaces recentlyCreatedRoadPlaces;
 
 				stringstream query;
-				query << "SELECT *, AsBinary(" << _FIELD_GEOMETRY << ") AS " << _FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
+				query << "SELECT *, AsText(" << _FIELD_GEOMETRY << ") AS " << _FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
 				SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
 				while(rows->next())
 				{
@@ -250,7 +250,7 @@ namespace synthese
 					string rightAddressSchema(rows->getText(_FIELD_R_ADDRSCH));
 					shared_ptr<LineString> geometry(
 						dynamic_pointer_cast<LineString, Geometry>(
-						rows->getGeometryFromWKB(_FIELD_GEOMETRY+"_ASTEXT", geometryFactory)
+						rows->getGeometryFromWKT(_FIELD_GEOMETRY+"_ASTEXT", geometryFactory)
 					)	);
 
 					if(!geometry.get())
@@ -258,6 +258,7 @@ namespace synthese
 						os << "ERR : Empty geometry.<br />";
 						continue;
 					}
+
 
 
 ///	@todo Handle this case with aliases

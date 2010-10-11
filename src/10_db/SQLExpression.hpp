@@ -29,7 +29,7 @@
 #include <set>
 #include <vector>
 #include <string>
-#include <geos/io/WKBWriter.h>
+#include <geos/io/WKTWriter.h>
 #include <geos/geom/Geometry.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/foreach.hpp>
@@ -306,9 +306,9 @@ namespace synthese
 					}
 
 					std::stringstream str;
-					str << "GeomFromWKB(X'";
-					geos::io::WKBWriter writer;
-					writer.writeHEX(*projected, str);
+					str << "GeomFromText('";
+					geos::io::WKTWriter writer;
+					str << writer.write(projected.get());
 					str << "'," << DBModule::GetStorageCoordinatesSystem().getSRID() << ")";
 					_value = str.str();
 				}

@@ -118,7 +118,7 @@ namespace synthese
 			else
 			{
 				object->setGeometry(
-					dynamic_pointer_cast<LineString,Geometry>(rows->getGeometryFromWKB(RoadChunkTableSync::COL_GEOMETRY))
+					dynamic_pointer_cast<LineString,Geometry>(rows->getGeometryFromWKT(RoadChunkTableSync::COL_GEOMETRY))
 				);
 			}
 

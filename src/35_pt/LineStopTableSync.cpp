@@ -115,7 +115,7 @@ namespace synthese
 			else
 			{
 				ls->setGeometry(
-					dynamic_pointer_cast<LineString,Geometry>(rows->getGeometryFromWKB(LineStopTableSync::COL_GEOMETRY))
+					dynamic_pointer_cast<LineString,Geometry>(rows->getGeometryFromWKT(LineStopTableSync::COL_GEOMETRY))
 				);
 			}
 
