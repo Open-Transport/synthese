@@ -465,7 +465,7 @@ namespace synthese
 				}
 				if(_FIELDS[i].isGeometry())
 				{
-					fieldsGetter << "AsBinary(" << _FIELDS[i].name << ") AS " << _FIELDS[i].name;
+					fieldsGetter << "AsText(" << _FIELDS[i].name << ") AS " << _FIELDS[i].name;
 				}
 				else
 				{

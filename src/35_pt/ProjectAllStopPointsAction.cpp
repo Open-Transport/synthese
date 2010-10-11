@@ -95,34 +95,37 @@ namespace synthese
 
 			BOOST_FOREACH(shared_ptr<StopPoint> stopPoint, stopPoints)
 			{
-				if(!stopPoint->hasGeometry())
+				Address emptyAddress;
+				stopPoint->setProjectedPoint(emptyAddress);
+
+				if(stopPoint->hasGeometry())
 				{
-					continue;
+
+					EdgeProjector<RoadChunk>::From paths(
+						RoadChunkTableSync::SearchByMaxDistance(
+							*stopPoint->getGeometry(), _maxDistance
+					)	);
+
+					if(!paths.empty())
+					{
+
+						EdgeProjector<RoadChunk> projector(paths, _maxDistance);
+
+						try
+						{
+							EdgeProjector<RoadChunk>::PathNearby projection(projector.projectEdge(*stopPoint->getGeometry()->getCoordinate()));
+
+							Address projectedAddress(
+								*projection.get<1>(),
+								projection.get<2>()
+							);
+							stopPoint->setProjectedPoint(projectedAddress);
+						}
+						catch(EdgeProjector<RoadChunk>::NotFoundException)
+						{
+						}
+					}
 				}
-
-				EdgeProjector<RoadChunk>::From paths(
-					RoadChunkTableSync::SearchByMaxDistance(
-						*stopPoint->getGeometry(), _maxDistance
-				)	);
-
-				EdgeProjector<RoadChunk> projector(paths, _maxDistance);
-
-				try
-				{
-					EdgeProjector<RoadChunk>::PathNearby projection(projector.projectEdge(*stopPoint->getGeometry()->getCoordinate()));
-					
-					Address projectedAddress(
-						*projection.get<1>(),
-						projection.get<2>()
-					);
-					stopPoint->setProjectedPoint(projectedAddress);
-				}
-				catch(EdgeProjector<RoadChunk>::NotFoundException)
-				{
-					Address emptyAddress;
-					stopPoint->setProjectedPoint(emptyAddress);
-				}
-
 				StopPointTableSync::Save(stopPoint.get(), transaction);
 			}
 
