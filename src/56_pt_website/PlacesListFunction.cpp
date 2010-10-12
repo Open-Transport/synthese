@@ -30,7 +30,7 @@
 #include "RequestException.h"
 #include "RoadPlace.h"
 #include "PublicPlace.h"
-#include "Address.h"
+#include "House.hpp"
 #include "City.h"
 #include "PTModule.h"
 #include "StopArea.hpp"
@@ -130,29 +130,20 @@ namespace synthese
 		) const	{
 			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
 			if(!site) throw RequestException("Incorrect site");
+
+			RoadModule::ExtendedFetchPlacesResult places(
+				RoadModule::ExtendedFetchPlaces(site->getCitiesMatcher(), _cityText, _input, _n)
+			);
 		
-			GeographyModule::CitiesMatcher::MatchResult cities(
-				site->getCitiesMatcher().bestMatches(_cityText, 1)
-			);
-			if (cities.empty())
-			{
-				return;
-			}
-			City* city(cities.front().value.get());
-
-			City::PlacesMatcher::MatchResult places(
-				city->getAllPlacesMatcher().bestMatches(_input, _n)
-			);
-
 			if(_page.get())
 			{
 				PlacesList placesList;
-				BOOST_FOREACH(const City::PlacesMatcher::MatchHit it, places)
+				BOOST_FOREACH(const RoadModule::ExtendedFetchPlaceResult& place, places)
 				{
 					placesList.push_back(make_pair(
-						dynamic_cast<Registrable*>(it.value.get()) ? 
-						dynamic_cast<Registrable*>(it.value.get())->getKey() : 0,
-						it.key.getSource()
+						dynamic_cast<Registrable*>(place.placeResult.value.get()) ? 
+						dynamic_cast<Registrable*>(place.placeResult.value.get())->getKey() : 0,
+						place.placeResult.key.getSource()
 					)	);
 				}
 
@@ -163,7 +154,7 @@ namespace synthese
 					request,
 					placesList,
 					_isForOrigin,
-					city
+					places.front().cityResult.value.get()
 				);
 			}
 			else
@@ -172,27 +163,35 @@ namespace synthese
 					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 					"<options xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
 				;
-				BOOST_FOREACH(const City::PlacesMatcher::MatchHit it, places)
+				BOOST_FOREACH(const RoadModule::ExtendedFetchPlaceResult& it, places)
 				{
 					stream << "<option type=\"";
-					if(	dynamic_cast<StopArea*>(it.value.get()) ||
-						dynamic_cast<PlaceAlias*>(it.value.get())
+					if(	dynamic_cast<StopArea*>(it.placeResult.value.get()) ||
+						dynamic_cast<PlaceAlias*>(it.placeResult.value.get())
 					){
 						stream << "stop";
 					}
-					else if(dynamic_cast<const PublicPlace*>(it.value.get()))
+					else if(dynamic_cast<const PublicPlace*>(it.placeResult.value.get()))
 					{
 						stream << "publicPlace";
 					}
-					else if(dynamic_cast<const RoadPlace*>(it.value.get()))
+					else if(dynamic_cast<const RoadPlace*>(it.placeResult.value.get()))
 					{
 						stream << "street";
 					}
-					else if(dynamic_cast<const Address*>(it.value.get()))
+					else if(dynamic_cast<const House*>(it.placeResult.value.get()))
 					{
 						stream << "address";
 					}
-					stream << "\" score=\"" << it.score.phoneticScore << "\">" << it.key.getSource() << "</option>";
+					stream <<
+						"\" score=\"" << it.placeResult.score.phoneticScore << "\"" <<
+						" levenshtein=\"" << it.placeResult.score.levenshtein << "\">";
+					
+					if(dynamic_cast<const House*>(it.placeResult.value.get()) && dynamic_cast<const House*>(it.placeResult.value.get())->getHouseNumber())
+					{
+						stream << *dynamic_cast<const House*>(it.placeResult.value.get())->getHouseNumber() << " ";
+					}
+					stream << it.placeResult.key.getSource() << "</option>";
 				}
 				stream << "</options>";
 			}
