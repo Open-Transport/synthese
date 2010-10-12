@@ -85,6 +85,7 @@ namespace synthese
 			//@{
 				RoadChunk* getRoadChunk() const { return _roadChunk; }
 				double getMetricOffset() const { return _metricOffset; }
+				boost::optional<RoadChunk::HouseNumber> getHouseNumber() const { return _houseNumber; }
 			//@}
 
 			//! @name Setters

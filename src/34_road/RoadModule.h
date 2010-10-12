@@ -125,6 +125,8 @@ namespace synthese
 				lexical_matcher::LexicalMatcher<boost::shared_ptr<geography::Place> >::MatchResult::value_type placeResult;
 			};
 
+			typedef std::vector<ExtendedFetchPlaceResult> ExtendedFetchPlacesResult;
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Interprets text from two fields to determinate a place.
 			/// Scenarios :
@@ -135,11 +137,39 @@ namespace synthese
 			///	<tr><td>non empty</td><td>non empty, beginning by a number</td><td>first try to find a stop which begins by the numberm then try to generate an address</td></tr>
 			///	<tr><td>non empty</td><td>non empty, without number</td><td>try to find a stop or a road</td></tr>
 			///	</table>
+			//////////////////////////////////////////////////////////////////////////
+			/// @param citiesMatcher lexical matcher to find city
+			/// @param cityName name of the city to find
+			/// @param placeName name of the place to find
+			/// @return places in decreasing score order
+			/// @author Hugues Romain
+			/// @since 3.2.0
+			/// @date 2010
 			static ExtendedFetchPlaceResult ExtendedFetchPlace(
 				const geography::GeographyModule::CitiesMatcher& citiesMatcher,
 				const std::string& cityName,
 				const std::string& placeName
 			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// @param citiesMatcher lexical matcher to find city
+			/// @param cityName name of the city to find
+			/// @param placeName name of the place to find
+			/// @param resultsNumber number of results to return
+			/// @return places in decreasing score order
+			/// @author Hugues Romain
+			/// @since 3.2.0
+			/// @date 2010
+			static ExtendedFetchPlacesResult ExtendedFetchPlaces(
+				const geography::GeographyModule::CitiesMatcher& citiesMatcher,
+				const std::string& cityName,
+				const std::string& placeName,
+				std::size_t resultsNumber
+			);
+
+
 
 			static boost::shared_ptr<geography::Place> FetchPlace(
 				const geography::GeographyModule::CitiesMatcher& citiesMatcher,
@@ -147,9 +177,36 @@ namespace synthese
 				const std::string& placeName
 			);
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// @param citiesMatcher lexical matcher to find city
+			/// @param cityName name of the city to find
+			/// @param placeName name of the place to find
+			/// @return places in decreasing score order (default 1)
+			/// @author Hugues Romain
+			/// @since 3.2.0
+			/// @date 2010
 			static ExtendedFetchPlaceResult ExtendedFetchPlace(
 				const std::string& cityName,
 				const std::string& placeName
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// @param citiesMatcher lexical matcher to find city
+			/// @param cityName name of the city to find
+			/// @param placeName name of the place to find
+			/// @param resultsNumber number of results to return
+			/// @return places in decreasing score order (default 1)
+			/// @author Hugues Romain
+			/// @since 3.2.0
+			/// @date 2010
+			static ExtendedFetchPlacesResult ExtendedFetchPlaces(
+				const std::string& cityName,
+				const std::string& placeName,
+				std::size_t resultsNumber
 			);
 
 			static boost::shared_ptr<geography::Place> FetchPlace(

@@ -75,85 +75,15 @@ namespace synthese
 			const std::string& cityName,
 			const std::string& placeName
 		){
-
-			ExtendedFetchPlaceResult result;
-
-			if (cityName.empty())
-			{
-				throw UndeterminedPlaceException(cityName, placeName, UndeterminedPlaceException::EMPTY_CITY);
-			}
-
-			GeographyModule::CitiesMatcher::MatchResult cities(
-				citiesMatcher.bestMatches(cityName,1)
-			);
-			if(cities.empty())
-			{
-				throw UndeterminedPlaceException(cityName, placeName, UndeterminedPlaceException::NO_RESULT_FROM_CITY_SEARCH);
-			}
-			result.cityResult = cities.front();
-			result.placeResult.key = result.cityResult.key;
-			result.placeResult.score = result.cityResult.score;
-			result.placeResult.value = result.cityResult.value;
-
-			assert(result.placeResult.value != NULL);
-			
-			if (!placeName.empty())
-			{
-				vector<string> words;
-				split(words, placeName, is_any_of(", "));
-				if(words.size() > 1)
-				{
-					try
-					{
-						RoadChunk::HouseNumber number(lexical_cast<RoadChunk::HouseNumber>(words[0]));
-
-						string roadName(placeName.substr(words[0].size() + 1));
-
-						City::PlacesMatcher::MatchResult places(
-							result.cityResult.value->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(roadName, 1)
-						);
-
-						if (!places.empty())
-						{
-							const RoadPlace& roadPlace(
-								dynamic_cast<const RoadPlace&>(*places.front().value)
-							);
-
-							shared_ptr<House> house(roadPlace.getHouse(number));
-
-							result.placeResult.key = places.front().key;
-							result.placeResult.score = places.front().score;
-							result.placeResult.value = house;
-						}
-
-						return result;
-					}
-					catch (bad_lexical_cast)
-					{
-					}
-				}
-
-
-
-				City::PlacesMatcher::MatchResult places(
-					result.cityResult.value->getAllPlacesMatcher().bestMatches(placeName, 1)
-				);
-				if (!places.empty())
-				{
-					result.placeResult.key = places.front().key;
-					result.placeResult.score = places.front().score;
-					result.placeResult.value = places.front().value;
-				}
-			}
-
-			return result;
-
+			return ExtendedFetchPlaces(citiesMatcher, cityName, placeName, 1).front();
 		}
 
 
 
-		RoadModule::ExtendedFetchPlaceResult RoadModule::ExtendedFetchPlace( const std::string& cityName, const std::string& placeName )
-		{
+		RoadModule::ExtendedFetchPlaceResult RoadModule::ExtendedFetchPlace(
+			const std::string& cityName,
+			const std::string& placeName
+		){
 			return ExtendedFetchPlace(GeographyModule::GetCitiesMatcher(), cityName, placeName);
 		}
 
@@ -172,6 +102,108 @@ namespace synthese
 		boost::shared_ptr<geography::Place> RoadModule::FetchPlace( const std::string& cityName, const std::string& placeName )
 		{
 			return FetchPlace(GeographyModule::GetCitiesMatcher(), cityName, placeName);
+		}
+
+
+
+		RoadModule::ExtendedFetchPlacesResult RoadModule::ExtendedFetchPlaces( const std::string& cityName, const std::string& placeName, std::size_t resultsNumber )
+		{
+			return ExtendedFetchPlaces(GeographyModule::GetCitiesMatcher(), cityName, placeName, resultsNumber);
+		}
+
+
+
+		RoadModule::ExtendedFetchPlacesResult RoadModule::ExtendedFetchPlaces(
+			const geography::GeographyModule::CitiesMatcher& citiesMatcher,
+			const std::string& cityName,
+			const std::string& placeName,
+			std::size_t resultsNumber
+		){
+			ExtendedFetchPlacesResult result;
+
+			if (cityName.empty())
+			{
+				throw UndeterminedPlaceException(cityName, placeName, UndeterminedPlaceException::EMPTY_CITY);
+			}
+
+			GeographyModule::CitiesMatcher::MatchResult cities(
+				citiesMatcher.bestMatches(cityName,1)
+			);
+			if(cities.empty())
+			{
+				throw UndeterminedPlaceException(cityName, placeName, UndeterminedPlaceException::NO_RESULT_FROM_CITY_SEARCH);
+			}
+
+			if(placeName.empty())
+			{	// Default place of the city
+				ExtendedFetchPlaceResult defaultPlaceResult;
+				defaultPlaceResult.cityResult = cities.front();
+				defaultPlaceResult.placeResult.key = defaultPlaceResult.cityResult.key;
+				defaultPlaceResult.placeResult.score = defaultPlaceResult.cityResult.score;
+				defaultPlaceResult.placeResult.value = defaultPlaceResult.cityResult.value;
+				assert(defaultPlaceResult.placeResult.value != NULL);
+
+				result.push_back(defaultPlaceResult);
+
+				return result;
+			}
+
+			
+			vector<string> words;
+			split(words, placeName, is_any_of(", "));
+			if(words.size() > 1)
+			{	// Text points to an address
+				try
+				{
+					RoadChunk::HouseNumber number(lexical_cast<RoadChunk::HouseNumber>(words[0]));
+
+					string roadName(placeName.substr(words[0].size() + 1));
+
+					City::PlacesMatcher::MatchResult places(
+						cities.front().value->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(roadName, resultsNumber)
+					);
+
+					BOOST_FOREACH(const City::PlacesMatcher::MatchResult::value_type& place, places)
+					{
+						const RoadPlace& roadPlace(
+							dynamic_cast<const RoadPlace&>(*place.value)
+						);
+
+						shared_ptr<House> house(roadPlace.getHouse(number));
+
+						ExtendedFetchPlaceResult placeResult;
+						placeResult.cityResult = cities.front();
+						placeResult.placeResult.key = place.key;
+						placeResult.placeResult.score = place.score;
+						placeResult.placeResult.value = house.get() ? house : place.value;
+
+						result.push_back(placeResult);
+					}
+
+					return result;
+				}
+				catch (bad_lexical_cast)
+				{
+				}
+			}
+
+
+			// Text points to a stop or a street
+			City::PlacesMatcher::MatchResult places(
+				cities.front().value->getAllPlacesMatcher().bestMatches(placeName, resultsNumber)
+			);
+			BOOST_FOREACH(const City::PlacesMatcher::MatchResult::value_type& place, places)
+			{
+				ExtendedFetchPlaceResult placeResult;
+				placeResult.cityResult = cities.front();
+				placeResult.placeResult.key = place.key;
+				placeResult.placeResult.score = place.score;
+				placeResult.placeResult.value = place.value;
+
+				result.push_back(placeResult);
+			}
+
+			return result;
 		}
 
 		
