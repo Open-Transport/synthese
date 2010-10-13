@@ -34,22 +34,22 @@ namespace synthese
 		class User;
 		class Profile;
 
-		/** Journal de sécurité.
+		/** Journal de sÃ©curitÃ©.
 			@ingroup m12Logs refLogs
 
-			Enregistre tous les événements liés à la sécurité et à l'administration des utilisateurs.
+			Enregistre tous les Ã©vÃ©nements liÃ©s Ã  la sÃ©curitÃ© et Ã  l'administration des utilisateurs.
 
-			Les entrées du journal de sécurité sont :
+			Les entrÃ©es du journal de sÃ©curitÃ© sont :
 				- actions d'administration sur les utilisateurs
 				- actions d'administration sur les profils
 				- connexions d'utilisateurs
 
-			Les colonnes additionnelles du journal de sécurité sont :
-				- Action : décrit l'action effectuée (ex : création de profil)
-				- UID objet concerné : 
-					- lien vers l'utilisateur traité pour les actions d'administration sur les utilisateurs (différent de l'utilisateur connecté)
-					- lien vers le profil traité pour les actions d'administration sur les profils
-					- rien pour les entrées concernant les connexions d'utilisateurs
+			Les colonnes additionnelles du journal de sÃ©curitÃ© sont :
+				- Action : dÃ©crit l'action effectuÃ©e (ex : crÃ©ation de profil)
+				- UID objet concernÃ© : 
+					- lien vers l'utilisateur traitÃ© pour les actions d'administration sur les utilisateurs (diffÃ©rent de l'utilisateur connectÃ©)
+					- lien vers le profil traitÃ© pour les actions d'administration sur les profils
+					- rien pour les entrÃ©es concernant les connexions d'utilisateurs
 
 			@ingroup m12Logs refLogs
 		*/

@@ -142,7 +142,7 @@ namespace synthese
 			
 			HTMLForm testForm(testRequest.getHTMLForm("testForm"));
 			stream << testForm.open() << "<p>";
-			stream << "Type d'afficheur à tester : " <<
+			stream << "Type d'afficheur Ã  tester : " <<
 				testForm.getSelectInput(
 					AlarmTestOnDisplayScreenFunction::PARAMETER_DISPLAY_TYPE_ID,
 					DeparturesTableModule::getDisplayTypeLabels(),

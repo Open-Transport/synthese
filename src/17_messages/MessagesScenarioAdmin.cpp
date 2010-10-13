@@ -141,16 +141,16 @@ namespace synthese
 				AdminActionFunctionRequest<ScenarioUpdateDatesAction, MessagesScenarioAdmin> updateDatesRequest(_request);
 				updateDatesRequest.getAction()->setScenarioId(_scenario->getKey());
 
-				stream << "<h1>Paramètres</h1>";
+				stream << "<h1>ParamÃ¨tres</h1>";
 				PropertiesHTMLTable udt(updateDatesRequest.getHTMLForm("update_dates"));
 
 				stream << udt.open();
-				stream << udt.title("Propriétés");
+				stream << udt.title("PropriÃ©tÃ©s");
 				stream << udt.cell("Nom", udt.getForm().getTextInput(ScenarioUpdateDatesAction::PARAMETER_NAME, _scenario->getName()));
 				if (_templateScenario)
 				{
 					stream << udt.cell(
-						"Répertoire",
+						"RÃ©pertoire",
 						udt.getForm().getSelectInput(
 							ScenarioUpdateDatesAction::PARAMETER_FOLDER_ID,
 							MessagesModule::GetScenarioFoldersLabels(),
@@ -160,7 +160,7 @@ namespace synthese
 				if(_sentScenario.get())
 				{
 					stream << udt.title("Diffusion");
-					stream << udt.cell("Début diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_START_DATE, _sentScenario->getPeriodStart()));
+					stream << udt.cell("DÃ©but diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_START_DATE, _sentScenario->getPeriodStart()));
 					stream << udt.cell("Fin diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_END_DATE, _sentScenario->getPeriodEnd()));
 
 					stream << udt.cell("Actif", udt.getForm().getOuiNonRadioInput(ScenarioUpdateDatesAction::PARAMETER_ENABLED, _sentScenario->getIsEnabled()));
@@ -258,11 +258,11 @@ namespace synthese
 					stream << t.col() << alarm->getShortMessage();
 					stream << t.col() << ""; // Emplacement
 					stream << t.col() << HTMLModule::getLinkButton(messRequest.getURL(), "Ouvrir");
-					stream << t.col() << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le message du scénario ?");
+					stream << t.col() << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer le message du scÃ©nario ?");
 				}
 
 				stream << t.row();
-				stream << t.col(2) << "(sélectionnez un&nbsp;message existant pour créer une copie)";
+				stream << t.col(2) << "(sÃ©lectionnez un&nbsp;message existant pour crÃ©er une copie)";
 				stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 				stream << t.col();
 				stream << t.close();
@@ -272,13 +272,13 @@ namespace synthese
 			// TAB VARIABLES
 			if (openTabContent(stream, TAB_VARIABLES))
 			{
-				stream << "<h1>Récapitulatif des variables du scénario</h1>";
+				stream << "<h1>RÃ©capitulatif des variables du scÃ©nario</h1>";
 
 				const ScenarioTemplate::VariablesMap& variables(_templateScenario->getVariables());
 
 				if(variables.empty())
 				{
-					stream << "<p>Aucune variable définie.</p>";
+					stream << "<p>Aucune variable dÃ©finie.</p>";
 				}
 				else
 				{
@@ -386,7 +386,7 @@ namespace synthese
 		) const {
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, true, "table.png"));
+			_tabs.push_back(Tab("ParamÃ¨tres", TAB_PARAMETERS, true, "table.png"));
 			_tabs.push_back(Tab("Messages", TAB_MESSAGES, true, "note.png"));
 			
 			if(dynamic_cast<const ScenarioTemplate*>(_scenario.get()))

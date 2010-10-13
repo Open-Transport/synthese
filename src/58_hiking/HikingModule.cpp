@@ -38,7 +38,7 @@ namespace synthese
 	namespace server
 	{
 		template<>
-		const string ModuleClassTemplate<HikingModule>::NAME("Randonnées");
+		const string ModuleClassTemplate<HikingModule>::NAME("RandonnÃ©es");
 
 		template<> void ModuleClassTemplate<HikingModule>::PreInit()
 		{

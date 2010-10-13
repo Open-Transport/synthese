@@ -84,15 +84,15 @@ namespace synthese
 							{
 							ptime endRange(its->getDepartureDateTime());
 							endRange += journey->getContinuousServiceRange();
-							stream << " - Service continu jusqu'à " << endRange.;
+							stream << " - Service continu jusqu'Ã  " << endRange.;
 							}
 							if (journey->getReservationCompliance() == true)
 							{
-							stream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine();
+							stream << " - RÃ©servation obligatoire avant le " << journey->getReservationDeadLine();
 							}
 							if (journey->getReservationCompliance() == boost::logic::indeterminate)
 							{
-							stream << " - Réservation facultative avant le " << journey->getReservationDeadLine();
+							stream << " - RÃ©servation facultative avant le " << journey->getReservationDeadLine();
 							}
 							
 							stream << "<tr>";

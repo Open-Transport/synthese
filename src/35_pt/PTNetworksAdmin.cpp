@@ -60,7 +60,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<PTNetworksAdmin>::ICON("chart_organisation.png");
-		template<> const string AdminInterfaceElementTemplate<PTNetworksAdmin>::DEFAULT_TITLE("Réseaux de transport");
+		template<> const string AdminInterfaceElementTemplate<PTNetworksAdmin>::DEFAULT_TITLE("RÃ©seaux de transport");
 	}
 
 	namespace pt
@@ -120,7 +120,7 @@ namespace synthese
 			stream << s.close();
 
 			// Results display
-			stream << "<h1>Réseaux</h1>";
+			stream << "<h1>RÃ©seaux</h1>";
 
 			TransportNetworkTableSync::SearchResult networks(
 				TransportNetworkTableSync::Search(
@@ -157,7 +157,7 @@ namespace synthese
 			stream << t.col();
 			stream << t.getActionForm().getTextInput(TransportNetworkAddAction::PARAMETER_NAME, string());
 			stream << t.col();
-			stream << t.getActionForm().getSubmitButton("Créer");
+			stream << t.getActionForm().getSubmitButton("CrÃ©er");
 			stream << t.close();
 		}
 

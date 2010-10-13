@@ -63,9 +63,9 @@ namespace synthese
 		TransportWebsiteModule::UserClassNames TransportWebsiteModule::GetAccessibilityNames()
 		{
 			UserClassNames result;
-			result.push_back(make_pair(USER_PEDESTRIAN, "Piéton"));
+			result.push_back(make_pair(USER_PEDESTRIAN, "PiÃ©ton"));
 			result.push_back(make_pair(USER_HANDICAPPED, "PMR"));
-			result.push_back(make_pair(USER_BIKE, "Vélo"));
+			result.push_back(make_pair(USER_BIKE, "VÃ©lo"));
 			return result;
 		}
 	}

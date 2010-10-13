@@ -94,7 +94,7 @@ namespace synthese
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
-				"Retrait de l'arrêt de départ "+ _stop->getCodeBySource() +"/"+ _stop->getName(),
+				"Retrait de l'arrÃªt de dÃ©part "+ _stop->getCodeBySource() +"/"+ _stop->getName(),
 				*request.getUser()
 			);
 

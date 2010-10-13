@@ -154,10 +154,10 @@ namespace synthese
 				// Display
 				stream << "<h1>Liens</h1>";
 				stream << "<p>";
-				stream << HTMLModule::getLinkButton(routeplannerRequest.getURL(), "Recherche d'itinéraire", "", ReservationRoutePlannerAdmin::ICON);
+				stream << HTMLModule::getLinkButton(routeplannerRequest.getURL(), "Recherche d'itinÃ©raire", "", ReservationRoutePlannerAdmin::ICON);
 				stream << "</p>";
 				
-				stream << "<h1>Coordonnées</h1>";
+				stream << "<h1>CoordonnÃ©es</h1>";
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("upd"));
 				t.getForm().setUpdateRight(tabHasWritePermissions());
@@ -168,29 +168,29 @@ namespace synthese
 					t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_LOGIN, _user->getLogin())
 				);
 
-				stream << t.title("Coordonnées");
-				stream << t.cell("Prénom", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_SURNAME, _user->getSurname()));
+				stream << t.title("CoordonnÃ©es");
+				stream << t.cell("PrÃ©nom", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_SURNAME, _user->getSurname()));
 				stream << t.cell("Nom", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_NAME, _user->getName()));
 				stream << t.cell("Adresse", t.getForm().getTextAreaInput(ReservationUserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50));
 				stream << t.cell("Code postal", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_POSTAL_CODE, _user->getPostCode()));
 				stream << t.cell("Ville", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_CITY, _user->getCityText()));
-				stream << t.cell("Téléphone",t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
+				stream << t.cell("TÃ©lÃ©phone",t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
 				stream << t.cell("E-mail",t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
 
 				stream << t.title("Droits");
-				stream << t.cell("Accès site web",t.getForm().getOuiNonRadioInput(ReservationUserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
+				stream << t.cell("AccÃ¨s site web",t.getForm().getOuiNonRadioInput(ReservationUserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
 
 				if(_user->getProfile()->getKey() == ResaModule::GetBasicResaCustomerProfile()->getKey() ||
 					_user->getProfile()->getKey() == ResaModule::GetAutoResaResaCustomerProfile()->getKey()
 				){
 					stream << t.cell(
-						"Auto-réservation autorisée",
+						"Auto-rÃ©servation autorisÃ©e",
 						t.getForm().getOuiNonRadioInput(ReservationUserUpdateAction::PARAMETER_AUTORESA_ACTIVATED, _user->getProfile()->getKey() == ResaModule::GetAutoResaResaCustomerProfile()->getKey())
 					);
 				}
 				else
 				{
-					stream << t.cell("Droits","Cet utilisateur n'est pas un client. Son niveau de droits est défini par ailleurs et ne peut être visualisé ni modifié ici.");
+					stream << t.cell("Droits","Cet utilisateur n'est pas un client. Son niveau de droits est dÃ©fini par ailleurs et ne peut Ãªtre visualisÃ© ni modifiÃ© ici.");
 				}
 				stream << t.close();
 
@@ -209,7 +209,7 @@ namespace synthese
 			// LOG TAB
 			if (openTabContent(stream, TAB_LOG))
 			{
-				stream << "<h1>Historique / Réservations</h1>";
+				stream << "<h1>Historique / RÃ©servations</h1>";
 
 				// Results
 				_log.display(
@@ -246,8 +246,8 @@ namespace synthese
 			_tabs.clear();
 			bool writeRight(profile.isAuthorized<ResaRight>(WRITE, UNKNOWN_RIGHT_LEVEL));
 
-			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, writeRight, "user.png"));
-			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, writeRight, "cog.png"));
+			_tabs.push_back(Tab("PropriÃ©tÃ©s", TAB_PROPERTIES, writeRight, "user.png"));
+			_tabs.push_back(Tab("ParamÃ¨tres", TAB_PARAMETERS, writeRight, "cog.png"));
 			_tabs.push_back(Tab("Journal", TAB_LOG, writeRight, "book.png"));
 
 			_tabBuilded = true;

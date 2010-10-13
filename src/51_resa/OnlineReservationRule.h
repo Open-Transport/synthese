@@ -77,8 +77,8 @@ namespace synthese
 
 			//! \name Addresses for reports sending
 			//@{
-				std::string _eMail;		//!< Adresse e-mail du destinataire des mails d'états de réservations (ex: le transporteur)
-				std::string	_copyEMail;	//!< Adresse e-mail de copie des mails d'états de réservations (ex: l'organisme autoritaire)
+				std::string _eMail;		//!< Adresse e-mail du destinataire des mails d'Ã©tats de rÃ©servations (ex: le transporteur)
+				std::string	_copyEMail;	//!< Adresse e-mail de copie des mails d'Ã©tats de rÃ©servations (ex: l'organisme autoritaire)
 			//@}
 
 			//! \name Customer e-mail sending options
@@ -90,17 +90,17 @@ namespace synthese
 
 			//! \name Optional form fields
 			//@{
-				boost::logic::tribool	_needsSurname;			//!< Prénom du client (Indifferent = champ affiché, remplissage facultatif)
-				boost::logic::tribool	_needsAddress;			//!< Adresse du client (Indifferent = champ affiché, remplissage facultatif)
-				boost::logic::tribool	_needsPhone;			//!< Numéro de téléphone du client (Indifferent = champ affiché, remplissage facultatif)
-				boost::logic::tribool	_needsCustomerNumber;		//!< Numéro d'abonné du client (Indifferent = champ affiché, remplissage facultatif)
-				boost::logic::tribool	_needsEMail;			//!< Adresse e-mail du client (Indifferent = champ affiché, remplissage facultatif)
+				boost::logic::tribool	_needsSurname;			//!< PrÃ©nom du client (Indifferent = champ affichÃ©, remplissage facultatif)
+				boost::logic::tribool	_needsAddress;			//!< Adresse du client (Indifferent = champ affichÃ©, remplissage facultatif)
+				boost::logic::tribool	_needsPhone;			//!< NumÃ©ro de tÃ©lÃ©phone du client (Indifferent = champ affichÃ©, remplissage facultatif)
+				boost::logic::tribool	_needsCustomerNumber;		//!< NumÃ©ro d'abonnÃ© du client (Indifferent = champ affichÃ©, remplissage facultatif)
+				boost::logic::tribool	_needsEMail;			//!< Adresse e-mail du client (Indifferent = champ affichÃ©, remplissage facultatif)
 			//@}
 
 			//! \name Capacity
 			//@{
-				int					_maxSeats;				//!< Nombre maximal de réservations par service (UNKNOWN_VALUE = unlimited capacity)
-				CapacityThresholds	_thresholds;				//!< Paliers de nombre de réservations générant un envoi de mail d'alerte
+				int					_maxSeats;				//!< Nombre maximal de rÃ©servations par service (UNKNOWN_VALUE = unlimited capacity)
+				CapacityThresholds	_thresholds;				//!< Paliers de nombre de rÃ©servations gÃ©nÃ©rant un envoi de mail d'alerte
 			//@}
 
 		public:

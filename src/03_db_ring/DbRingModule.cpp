@@ -52,7 +52,7 @@ namespace synthese
 	
 	namespace server
 	{
-		template<> const string ModuleClassTemplate::NAME("Synchronisation base de données répartie");
+		template<> const string ModuleClassTemplate::NAME("Synchronisation base de donnÃ©es rÃ©partie");
 
 
 	    template<> void ModuleClassTemplate<DbRingModule>::PreInit()

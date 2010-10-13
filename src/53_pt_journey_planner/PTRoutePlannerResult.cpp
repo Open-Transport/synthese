@@ -83,11 +83,11 @@ namespace synthese
 
 			if(_journeys.empty())
 			{
-				stream << "Aucun résultat trouvé de " << (
+				stream << "Aucun rÃ©sultat trouvÃ© de " << (
 						dynamic_cast<const NamedPlace*>(_departurePlace) ?
 						dynamic_cast<const NamedPlace*>(_departurePlace)->getFullName() :
 						dynamic_cast<const City*>(_departurePlace)->getName()
-					) << " à " << (
+					) << " Ã  " << (
 						dynamic_cast<const NamedPlace*>(_arrivalPlace) ?
 						dynamic_cast<const NamedPlace*>(_arrivalPlace)->getFullName() :
 						dynamic_cast<const City*>(_arrivalPlace)->getName()
@@ -96,17 +96,17 @@ namespace synthese
 			}
 
 			HTMLTable::ColsVector v;
-			v.push_back("Départ<br />" + (
+			v.push_back("DÃ©part<br />" + (
 					dynamic_cast<const NamedPlace*>(_departurePlace) ?
 					dynamic_cast<const NamedPlace*>(_departurePlace)->getFullName() :
 					dynamic_cast<const City*>(_departurePlace)->getName()
 			)	);
 			v.push_back("Ligne");
-			v.push_back("Arrivée");
+			v.push_back("ArrivÃ©e");
 			v.push_back("Correspondance");
-			v.push_back("Départ");
+			v.push_back("DÃ©part");
 			v.push_back("Ligne");
-			v.push_back("Arrivée<br />" + (
+			v.push_back("ArrivÃ©e<br />" + (
 					dynamic_cast<const NamedPlace*>(_arrivalPlace) ?
 					dynamic_cast<const NamedPlace*>(_arrivalPlace)->getFullName() :
 					dynamic_cast<const City*>(_arrivalPlace)->getName()
@@ -147,7 +147,7 @@ namespace synthese
 				{
 					ptime endRange(its->getDepartureDateTime());
 					endRange += it->getContinuousServiceRange();
-					stream << " - Service continu jusqu'à " << endRange;
+					stream << " - Service continu jusqu'Ã  " << endRange;
 				}
 				if (it->getReservationCompliance() != false)
 				{
@@ -155,16 +155,16 @@ namespace synthese
 					
 					if(it->getReservationCompliance() == true)
 					{
-						stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire") << " Réservation obligatoire";
+						stream << HTMLModule::getHTMLImage("resa_compulsory.png", "RÃ©servation obligatoire") << " RÃ©servation obligatoire";
 					}
 					else
 					{
-						stream << HTMLModule::getHTMLImage("resa_optional.png", "Réservation facultative") << " Réservation facultative";
+						stream << HTMLModule::getHTMLImage("resa_optional.png", "RÃ©servation facultative") << " RÃ©servation facultative";
 					}
 
 					const ptime deadline(it->getReservationDeadLine());
 					stream << " avant le " << 
-						deadline.date().day() << "/" << deadline.date().month() << "/" << deadline.date().year() << " à " <<
+						deadline.date().day() << "/" << deadline.date().month() << "/" << deadline.date().year() << " Ã  " <<
 						deadline.time_of_day().hours() << ":" << deadline.time_of_day().minutes()
 					;
 				}
@@ -173,7 +173,7 @@ namespace synthese
 					stream << " (";
 					if(dynamic_cast<const City*>(_departurePlace))
 					{
-						stream << "départ de " << 
+						stream << "dÃ©part de " << 
 							static_cast<const StopArea*>(
 								its->getDepartureEdge()->getHub()
 							)->getFullName()
@@ -183,7 +183,7 @@ namespace synthese
 					{
 						if(dynamic_cast<const City*>(_departurePlace)) stream << " - ";
 						Journey::ServiceUses::const_iterator ite(it->getServiceUses().end() - 1);
-						stream << "arrivée à " << 
+						stream << "arrivÃ©e Ã  " << 
 							static_cast<const StopArea*>(
 								ite->getArrivalEdge()->getHub()
 							)->getFullName()

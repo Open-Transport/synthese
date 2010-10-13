@@ -77,16 +77,16 @@ namespace synthese
 			// Name
 			_name = map.get<string>(PARAMETER_NAME);
 			if (_name.empty())
-				throw ActionException("Le nom ne peut être vide.");
+				throw ActionException("Le nom ne peut Ãªtre vide.");
 			Env env;
 			DisplayTypeTableSync::Search(env, _name, optional<RegistryKeyType>(), 0, 1);
 			if (!env.getRegistry<DisplayType>().empty())
-				throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
+				throw ActionException("Un type portant le nom spÃ©cifiÃ© existe dÃ©jÃ . Veuillez utiliser un autre nom.");
 
 			// Rows number
 			_rows_number = map.get<int>(PARAMETER_ROWS_NUMBER);
 			if (_rows_number < 0)
-				throw ActionException("Un nombre positif de lignes doit être choisi");
+				throw ActionException("Un nombre positif de lignes doit Ãªtre choisi");
 
 			// Interface
 			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID));

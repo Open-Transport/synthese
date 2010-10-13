@@ -127,7 +127,7 @@ namespace synthese
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
-				"Ajout de destination avec correspondance : "+ _destinationPlace->getFullName() + " à "+ _transferPlace->getFullName(),
+				"Ajout de destination avec correspondance : "+ _destinationPlace->getFullName() + " Ã  "+ _transferPlace->getFullName(),
 				*request.getUser()
 			);
 		}

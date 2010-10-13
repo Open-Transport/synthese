@@ -37,8 +37,8 @@ namespace synthese
 	{
 		/** Time table row class.
 
-			caractérisée par:
-				- un point d'arrêt
+			caractÃ©risÃ©e par:
+				- un point d'arrÃªt
 				- un type de dessete (Depart/Arrivee/Passage)
 				- un caractere obligatoire ou facultatif (pour la selection des lignes du tableau)
 

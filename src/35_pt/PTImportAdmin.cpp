@@ -59,7 +59,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<PTImportAdmin>::ICON("database_copy.png");
-		template<> const string AdminInterfaceElementTemplate<PTImportAdmin>::DEFAULT_TITLE("Sources de données");
+		template<> const string AdminInterfaceElementTemplate<PTImportAdmin>::DEFAULT_TITLE("Sources de donnÃ©es");
 	}
 
 	namespace pt
@@ -111,7 +111,7 @@ namespace synthese
 			const AdminRequest& request
 		) const	{
 
-			stream << "<h1>Sources de données</h1>";
+			stream << "<h1>Sources de donnÃ©es</h1>";
 
 			DataSourceTableSync::SearchResult datasources(
 				DataSourceTableSync::Search(

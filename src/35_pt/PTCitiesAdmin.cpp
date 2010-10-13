@@ -59,7 +59,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<PTCitiesAdmin>::ICON("building.png");
-		template<> const string AdminInterfaceElementTemplate<PTCitiesAdmin>::DEFAULT_TITLE("Localités");
+		template<> const string AdminInterfaceElementTemplate<PTCitiesAdmin>::DEFAULT_TITLE("LocalitÃ©s");
 	}
 
 	namespace pt
@@ -131,11 +131,11 @@ namespace synthese
 
 					stream << "<h1>Resultat</h1>";
 
-					stream << "<p>Phonétique du texte recherché : " << FrenchSentence(_searchName).getPhoneticString() << "</p>";
+					stream << "<p>PhonÃ©tique du texte recherchÃ© : " << FrenchSentence(_searchName).getPhoneticString() << "</p>";
 
 					HTMLTable::ColsVector c;
-					c.push_back("Localité");
-					c.push_back("Phonétique");
+					c.push_back("LocalitÃ©");
+					c.push_back("PhonÃ©tique");
 					c.push_back("Score");
 					c.push_back("Levenshtein");
 					c.push_back("Actions");
@@ -160,7 +160,7 @@ namespace synthese
 					stream << t.close();
 				}
 
-				stream << "<h1>Création</h1>";
+				stream << "<h1>CrÃ©ation</h1>";
 
 				AdminActionFunctionRequest<CityAddAction,PTPlacesAdmin> creationRequest(request);
 				creationRequest.setActionWillCreateObject();
@@ -223,7 +223,7 @@ namespace synthese
 		) const	{
 			_tabs.clear();
 
-//			_tabs.push_back(Tab("Recherche phonétique", TAB_PHONETIC, true, "text_allcaps.png"));
+//			_tabs.push_back(Tab("Recherche phonÃ©tique", TAB_PHONETIC, true, "text_allcaps.png"));
 
 			_tabBuilded = true;
 		}

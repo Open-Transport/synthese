@@ -49,8 +49,8 @@ namespace synthese
 
 		private:
 
-			ForcedDestinationsSet	_forcedDestinations;	//!< Destinations à afficher absolument
-			const boost::posix_time::time_duration				_persistanceDuration;	//!< Durée pendant laquelle une destination est forcée
+			ForcedDestinationsSet	_forcedDestinations;	//!< Destinations Ã  afficher absolument
+			const boost::posix_time::time_duration				_persistanceDuration;	//!< DurÃ©e pendant laquelle une destination est forcÃ©e
 
 
 		public:

@@ -64,7 +64,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<TransportNetworkAdmin>::ICON("chart_organisation.png");
-		template<> const string AdminInterfaceElementTemplate<TransportNetworkAdmin>::DEFAULT_TITLE("Réseau inconnu");
+		template<> const string AdminInterfaceElementTemplate<TransportNetworkAdmin>::DEFAULT_TITLE("RÃ©seau inconnu");
 	}
 
 	namespace pt
@@ -121,7 +121,7 @@ namespace synthese
 
 
 			// Results display
-			stream << "<h1>Lignes du réseau</h1>";
+			stream << "<h1>Lignes du rÃ©seau</h1>";
 			
 			CommercialLineTableSync::SearchResult lines(
 				CommercialLineTableSync::Search(
@@ -137,7 +137,7 @@ namespace synthese
 			)	);
 
 			ResultHTMLTable::HeaderVector h;
-			h.push_back(make_pair(string(), "N°"));
+			h.push_back(make_pair(string(), "NÂ°"));
 			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(string(), "Actions"));
 			ResultHTMLTable t(h,sortedForm,_requestParameters, lines);
@@ -162,8 +162,8 @@ namespace synthese
 			creationRequest.getAction()->setNetwork(_network);
 
 			stream << t.row();
-			stream << t.col(2) << "Création de ligne";
-			stream << t.col() << HTMLModule::getLinkButton(creationRequest.getURL(), "Créer");
+			stream << t.col(2) << "CrÃ©ation de ligne";
+			stream << t.col() << HTMLModule::getLinkButton(creationRequest.getURL(), "CrÃ©er");
 			stream << t.close();
 		}
 

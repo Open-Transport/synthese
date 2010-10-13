@@ -148,7 +148,7 @@ namespace synthese
 				updateRequest.getAction()->setTimetable(const_pointer_cast<Timetable>(_timetable));
 
 				// Display
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 				PropertiesHTMLTable pt(updateRequest.getHTMLForm("update"));
 				stream << pt.open();
@@ -271,7 +271,7 @@ namespace synthese
 							HTMLModule::getLinkButton(
 								string(),
 								"Supprimer",
-								"Etes-vous sûr de vouloir supprimer la fiche horaire "+ tt->getTitle() +" ?", "table_delete.png"
+								"Etes-vous sÃ»r de vouloir supprimer la fiche horaire "+ tt->getTitle() +" ?", "table_delete.png"
 							);
 					}
 					stream << t3.row(lexical_cast<string>(++lastRank));
@@ -281,7 +281,7 @@ namespace synthese
 					stream << t3.col() << lastRank;
 					stream << t3.col(3) << t3.getActionForm().getRadioInputCollection(TimetableAddAction::PARAMETER_IS_BOOK, booknotbook, optional<bool>(false));
 					stream << t3.col() << t3.getActionForm().getTextInput(TimetableAddAction::PARAMETER_TITLE, string(), "(titre de la nouvelle fiche horaire)");
-					stream << t3.col() << t3.getActionForm().getSubmitButton("Créer");
+					stream << t3.col() << t3.getActionForm().getSubmitButton("CrÃ©er");
 
 					stream << t3.close();
 				}
@@ -306,7 +306,7 @@ namespace synthese
 
 					AdminFunctionRequest<TimetableAdmin> searchRequest(_request);
 
-					stream << "<h1>Arrêts</h1>";
+					stream << "<h1>ArrÃªts</h1>";
 
 					// Search
 					TimetableRowTableSync::SearchResult rows(
@@ -325,7 +325,7 @@ namespace synthese
 					h.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_down.png", "V")));
 					h.push_back(make_pair(PARAMETER_RANK, "Rang"));
 					h.push_back(make_pair(string(), "Commune"));
-					h.push_back(make_pair(string(), "Arrêt"));
+					h.push_back(make_pair(string(), "ArrÃªt"));
 					h.push_back(make_pair(string(), "Arr"));
 					h.push_back(make_pair(string(), "Dep"));
 					h.push_back(make_pair(string(), "Obl"));
@@ -375,15 +375,15 @@ namespace synthese
 						stream <<
 							t.col() <<
 							(	row->getIsArrival() ?
-								HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") :
-								HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible")
+								HTMLModule::getHTMLImage("bullet_green.png","ArrivÃ©e possible") :
+								HTMLModule::getHTMLImage("bullet_white.png", "ArrivÃ©e impossible")
 							)
 						;
 						stream <<
 							t.col() <<
 							(	row->getIsDeparture() ?
-								HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") :
-								HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible")
+								HTMLModule::getHTMLImage("bullet_green.png", "DÃ©part possible") :
+								HTMLModule::getHTMLImage("bullet_white.png", "DÃ©part impossible")
 							)
 						;
 						stream <<
@@ -403,18 +403,18 @@ namespace synthese
 						stream <<
 							t.col() <<
 							(	(false) ?
-								HTMLModule::getHTMLImage("bullet_green.png", "Affiché") :
-								HTMLModule::getHTMLImage("bullet_white.png", "Non affiché")
+								HTMLModule::getHTMLImage("bullet_green.png", "AffichÃ©") :
+								HTMLModule::getHTMLImage("bullet_white.png", "Non affichÃ©")
 							)
 						;
-						stream << t.col() << HTMLModule::getLinkButton(deleteRowRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
+						stream << t.col() << HTMLModule::getLinkButton(deleteRowRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer l'arrÃªt ?");
 					}
 					stream << t.row(string("0"));
 					stream << t.col();
 					stream << t.col();
 					stream << t.col() << ++lastRank;
 					stream << t.col() << t.getActionForm().getTextInput(TimetableRowAddAction::PARAMETER_CITY_NAME, string(), "(commune)");
-					stream << t.col() << t.getActionForm().getTextInput(TimetableRowAddAction::PARAMETER_PLACE_NAME, string(), "(arrêt)");
+					stream << t.col() << t.getActionForm().getTextInput(TimetableRowAddAction::PARAMETER_PLACE_NAME, string(), "(arrÃªt)");
 					stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_ARRIVAL, string(), true);
 					stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_DEPARTURE, string(), true);
 					stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_COMPULSORY, string(), false);
@@ -449,7 +449,7 @@ namespace synthese
 						stream << t3.col() <<
 							HTMLModule::getHTMLLink(
 								setLineRequest.getURL(),
-								_timetable->getAuthorizedLines().find(line) == _timetable->getAuthorizedLines().end() ? HTMLModule::getHTMLImage("cross.png", "Non sélectionnée") :  HTMLModule::getHTMLImage("tick.png", "Sélectionnée")
+								_timetable->getAuthorizedLines().find(line) == _timetable->getAuthorizedLines().end() ? HTMLModule::getHTMLImage("cross.png", "Non sÃ©lectionnÃ©e") :  HTMLModule::getHTMLImage("tick.png", "SÃ©lectionnÃ©e")
 							)
 						;
 
@@ -460,7 +460,7 @@ namespace synthese
 
 					if(!rows.empty())
 					{
-						stream << "<h1>Quais de départ</h1>";
+						stream << "<h1>Quais de dÃ©part</h1>";
 
 
 						HTMLTable::ColsVector c4;
@@ -486,7 +486,7 @@ namespace synthese
 							stream << t4.col() <<
 								HTMLModule::getHTMLLink(
 									setStopRequest.getURL(),
-									_timetable->getAuthorizedPhysicalStops().find(stop.get()) == _timetable->getAuthorizedPhysicalStops().end() ? HTMLModule::getHTMLImage("cross.png", "Non sélectionné") :  HTMLModule::getHTMLImage("tick.png", "Sélectionné")
+									_timetable->getAuthorizedPhysicalStops().find(stop.get()) == _timetable->getAuthorizedPhysicalStops().end() ? HTMLModule::getHTMLImage("cross.png", "Non sÃ©lectionnÃ©") :  HTMLModule::getHTMLImage("tick.png", "SÃ©lectionnÃ©")
 								)
 							;
 
@@ -618,9 +618,9 @@ namespace synthese
 		) const	{
 			_tabs.clear();
 
-			if(_timetable.get()) _tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
+			if(_timetable.get()) _tabs.push_back(Tab("PropriÃ©tÃ©s", TAB_PROPERTIES, true));
 			_tabs.push_back(Tab("Contenu", TAB_CONTENT, true));
-			if(_timetable.get() && _timetable->isGenerable()) _tabs.push_back(Tab("Résultat", TAB_RESULT, true));
+			if(_timetable.get() && _timetable->isGenerable()) _tabs.push_back(Tab("RÃ©sultat", TAB_RESULT, true));
 
 			_tabBuilded = true;
 		}

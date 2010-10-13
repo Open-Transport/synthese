@@ -92,7 +92,7 @@ TRIDENT : VertexAccess => AccesPoint
 			boost::posix_time::time_duration _minApproachTime;
 
 
-		// une fonction qui verifie pour une ligne donnée si elle passe par l'un des vertex
+		// une fonction qui verifie pour une ligne donnÃ©e si elle passe par l'un des vertex
 		// de la vam qui n'est pas de correspondance transport.
 		// VertexAccessMap vam, 
 

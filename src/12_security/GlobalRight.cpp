@@ -37,7 +37,7 @@ namespace synthese
 
 	namespace security
 	{
-		template<> const string RightTemplate<GlobalRight>::NAME("Général");
+		template<> const string RightTemplate<GlobalRight>::NAME("GÃ©nÃ©ral");
 		template<> const bool RightTemplate<GlobalRight>::USE_PRIVATE_RIGHTS(false);
 
 		template<>
@@ -57,7 +57,7 @@ namespace synthese
 		std::string GlobalRight::displayParameter(
 			util::Env& env
 		) const	{
-			return "par défaut";
+			return "par dÃ©faut";
 		}
 
 		bool GlobalRight::perimeterIncludes(

@@ -40,7 +40,7 @@ namespace synthese
 
 	namespace security
 	{
-		template<> const string RightTemplate<TransportNetworkRight>::NAME("Réseaux de transport public");
+		template<> const string RightTemplate<TransportNetworkRight>::NAME("RÃ©seaux de transport public");
 		template<> const bool RightTemplate<TransportNetworkRight>::USE_PRIVATE_RIGHTS(false);
 
 		template<>

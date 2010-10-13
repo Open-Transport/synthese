@@ -97,7 +97,7 @@ namespace synthese
 				if (resa->getReservationRuleId() != 0)
 				{
 					if (now > resa->getArrivalTime())
-						throw ActionException("Le statut de la réservation ne permet pas de l'annuler");
+						throw ActionException("Le statut de la rÃ©servation ne permet pas de l'annuler");
 					break;
 				}
 			}
@@ -105,7 +105,7 @@ namespace synthese
 			// Tests if the reservation is already cancelled
 			if(!_transaction->getCancellationTime().is_not_a_date_time())
 			{
-				throw ActionException("Cette réservation est déjà annulée.");
+				throw ActionException("Cette rÃ©servation est dÃ©jÃ  annulÃ©e.");
 			}
 		}
 		
@@ -151,7 +151,7 @@ namespace synthese
 			{
 				reservationContact->sendCustomerCancellationEMail(*_transaction);
 
-				ResaDBLog::AddEMailEntry(*request.getSession(), *customer, "Annulation de réservation");
+				ResaDBLog::AddEMailEntry(*request.getSession(), *customer, "Annulation de rÃ©servation");
 			}
 		}
 

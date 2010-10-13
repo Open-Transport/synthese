@@ -74,7 +74,7 @@ namespace synthese
 			);
 			if(!profiles.empty())
 			{
-				throw ActionException("Au moins un profil hérite du profil spécifié. La suppression est impossible.");
+				throw ActionException("Au moins un profil hÃ©rite du profil spÃ©cifiÃ©. La suppression est impossible.");
 			}
 
 			// Search of users
@@ -93,7 +93,7 @@ namespace synthese
 				FIELDS_ONLY_LOAD_LEVEL
 			);
 			if (!_env->getRegistry<User>().empty())
-				throw ActionException("Au moins un utilisateur appartient au profil spécifié. La suppression est impossible.");
+				throw ActionException("Au moins un utilisateur appartient au profil spÃ©cifiÃ©. La suppression est impossible.");
 		}
 
 		void DeleteProfileAction::run(Request& request)

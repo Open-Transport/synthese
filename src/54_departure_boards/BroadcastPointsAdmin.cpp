@@ -119,7 +119,7 @@ namespace synthese
 			const admin::AdminRequest& _request) const
 		{
 			vector<pair<optional<int>, string> > m;
-			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre désactivé)"));
+			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre dÃ©sactivÃ©)"));
 			m.push_back(make_pair((int) AT_LEAST_ONE_BROADCASTPOINT, "Au moins un"));
 			m.push_back(make_pair((int) NO_BROADCASTPOINT, "Aucun"));
 
@@ -149,7 +149,7 @@ namespace synthese
 			)	);
 			stream << st.close();
 
-			stream << "<h1>Résultats de la recherche</h1>";
+			stream << "<h1>RÃ©sultats de la recherche</h1>";
 
 			std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(
 				searchConnectionPlacesWithBroadcastPoints(
@@ -171,7 +171,7 @@ namespace synthese
 			
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(PARAMETER_CITY_NAME, "Commune"));
-			h.push_back(make_pair(PARAMETER_PLACE_NAME, "Nom zone d'arrêt"));
+			h.push_back(make_pair(PARAMETER_PLACE_NAME, "Nom zone d'arrÃªt"));
 			h.push_back(make_pair(PARAMETER_DEVICES_NUMBER, "Equipements"));
 			h.push_back(make_pair(PARAMETER_DEVICES_NUMBER, "Equipements"));
 			h.push_back(make_pair(string(), "Actions"));
@@ -203,7 +203,7 @@ namespace synthese
 						if(pl->cpuNumber > 0)
 						{
 							stream <<
-								HTMLModule::getHTMLImage(DisplayScreenCPUAdmin::ICON, "unité centrale") <<
+								HTMLModule::getHTMLImage(DisplayScreenCPUAdmin::ICON, "unitÃ© centrale") <<
 								"x" << pl->cpuNumber
 							;
 						}
@@ -211,7 +211,7 @@ namespace synthese
 						if(pl->broadCastPointsNumber > 0)
 						{
 							stream <<
-								HTMLModule::getHTMLImage(DisplayAdmin::ICON, "écran") <<
+								HTMLModule::getHTMLImage(DisplayAdmin::ICON, "Ã©cran") <<
 								"x" << pl->broadCastPointsNumber
 							;
 						}
@@ -223,7 +223,7 @@ namespace synthese
 				}
 				catch (...)
 				{
-					stream << t.col(3) << HTMLModule::getHTMLImage("exclamation.png", "Erreur de données") << " Erreur de données : arrêt inexistant";
+					stream << t.col(3) << HTMLModule::getHTMLImage("exclamation.png", "Erreur de donnÃ©es") << " Erreur de donnÃ©es : arrÃªt inexistant";
 				}
 			}
 			stream << t.close();

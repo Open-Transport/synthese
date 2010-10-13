@@ -186,7 +186,7 @@ namespace synthese
 				h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 				h.push_back(make_pair(string(), "Origne"));
 				h.push_back(make_pair(string(), "Destination"));
-				h.push_back(make_pair(string(), "Arrêts"));
+				h.push_back(make_pair(string(), "ArrÃªts"));
 				h.push_back(make_pair(string(), "Long."));
 				h.push_back(make_pair(string(), HTMLModule::getHTMLImage("car.png", "Services")));
 				h.push_back(make_pair(string(), "Source"));
@@ -215,7 +215,7 @@ namespace synthese
 
 					if(line->getEdges().size() < 2)
 					{
-						stream << t.col(4) << "Trajet non défini";
+						stream << t.col(4) << "Trajet non dÃ©fini";
 					}
 					else
 					{
@@ -244,7 +244,7 @@ namespace synthese
 							);
 						if(!line->getDataSource()->getFormat().empty())
 						{
-							stream << HTMLModule::getHTMLImage(PTImportAdmin::ICON, "Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire");
+							stream << HTMLModule::getHTMLImage(PTImportAdmin::ICON, "Source importÃ©e automatiquement, ne pas effectuer d'Ã©dition manuelle sur cet itinÃ©raire");
 						}
 					}
 
@@ -252,13 +252,13 @@ namespace synthese
 					stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
 
 					stream << t.col();
-					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le parcours ? Tous les services du parcours seront également supprimés.", "chart_line_delete.png");
+					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer le parcours ? Tous les services du parcours seront Ã©galement supprimÃ©s.", "chart_line_delete.png");
 				}
 
 				stream << t.row(string());
 				stream << t.col() << t.getActionForm().getTextInput(JourneyPatternAddAction::PARAMETER_NAME, string(), string(), AdminModule::CSS_2DIGIT_INPUT);
 				stream << t.col(5) << "Inversion : " << t.getActionForm().getOuiNonRadioInput(JourneyPatternAddAction::PARAMETER_REVERSE_COPY, false);
-				stream << t.col(2) << t.getActionForm().getSubmitButton("Créer un itinéraire");
+				stream << t.col(2) << t.getActionForm().getSubmitButton("CrÃ©er un itinÃ©raire");
 
 				stream << t.close();
 			}
@@ -266,7 +266,7 @@ namespace synthese
 			// TAB HOURS
 			if (openTabContent(stream, TAB_DATES))
 			{
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 				AdminActionFunctionRequest<CommercialLineCalendarTemplateUpdateAction,CommercialLineAdmin> updateCalendarRequest(_request);
 				updateCalendarRequest.getAction()->setLine(const_pointer_cast<CommercialLine>(_cline));
@@ -274,15 +274,15 @@ namespace synthese
 
 				stream << t.open();
 				stream << t.cell(
-					"Calendrier à respecter",
+					"Calendrier Ã  respecter",
 					t.getForm().getSelectInput(
 						CommercialLineCalendarTemplateUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID,
-						CalendarTemplateTableSync::GetCalendarTemplatesList("Pas de vérification"),
+						CalendarTemplateTableSync::GetCalendarTemplatesList("Pas de vÃ©rification"),
 						optional<RegistryKeyType>(_cline->getCalendarTemplate() ? _cline->getCalendarTemplate()->getKey() : 0)
 				)	);
 				stream << t.close();
 
-				stream << "<h1>Contrôles du calendrier</h1>";
+				stream << "<h1>ContrÃ´les du calendrier</h1>";
 
 				if(_controlCalendar)
 				{
@@ -348,8 +348,8 @@ namespace synthese
 					openRequest.getPage()->setControlCalendar(true);
 
 					stream <<
-						"<p class=\"info\">Les contrôle de dates sont désactivées par défaut.<br /><br />" <<
-						HTMLModule::getLinkButton(openRequest.getURL(), "Activer les contrôles de date", string(), ICON) <<
+						"<p class=\"info\">Les contrÃ´le de dates sont dÃ©sactivÃ©es par dÃ©faut.<br /><br />" <<
+						HTMLModule::getLinkButton(openRequest.getURL(), "Activer les contrÃ´les de date", string(), ICON) <<
 						"</p>"
 					;
 				}
@@ -368,9 +368,9 @@ namespace synthese
 
 				NonConcurrencyRuleTableSync::SearchResult rules(NonConcurrencyRuleTableSync::Search(_getEnv(), _cline->getKey()));
 				ActionResultHTMLTable::HeaderVector cols;
-				cols.push_back(make_pair(string(),"Réseau"));
+				cols.push_back(make_pair(string(),"RÃ©seau"));
 				cols.push_back(make_pair(string(),"Ligne"));
-				cols.push_back(make_pair(string(),"Délai"));
+				cols.push_back(make_pair(string(),"DÃ©lai"));
 				cols.push_back(make_pair(string(),"Action"));
 				
 				ActionResultHTMLTable t(
@@ -395,7 +395,7 @@ namespace synthese
 						HTMLModule::getLinkButton(
 							removeRequest.getURL(),
 							"Supprimer",
-							"Etes-vous sûr de vouloir supprimer la règle de non concurrence avec la ligne " + rule->getPriorityLine()->getShortName() + " ?",
+							"Etes-vous sÃ»r de vouloir supprimer la rÃ¨gle de non concurrence avec la ligne " + rule->getPriorityLine()->getShortName() + " ?",
 							"lock_delete.png"
 						)
 					;
@@ -428,16 +428,16 @@ namespace synthese
 			// TAB PROPERTIES
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 				AdminActionFunctionRequest<CommercialLineUpdateAction,CommercialLineAdmin> updateRequest(_request);
 				updateRequest.getAction()->setLine(const_pointer_cast<CommercialLine>(_cline));
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
-				stream << t.title("Réseau");
-				stream << t.cell("Réseau", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NETWORK_ID, _cline->getNetwork() ? lexical_cast<string>(_cline->getNetwork()->getKey()) : string()));
-				stream << t.cell("ID vu par le réseau", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_CREATOR_ID, _cline->getCreatorId()));
+				stream << t.title("RÃ©seau");
+				stream << t.cell("RÃ©seau", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NETWORK_ID, _cline->getNetwork() ? lexical_cast<string>(_cline->getNetwork()->getKey()) : string()));
+				stream << t.cell("ID vu par le rÃ©seau", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_CREATOR_ID, _cline->getCreatorId()));
 				stream << t.title("Nom");
 				stream << t.cell("Nom (menu)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NAME, _cline->getName()));
 				stream << t.cell("Nom long (feuille de route)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_LONG_NAME, _cline->getLongName()));
@@ -446,7 +446,7 @@ namespace synthese
 				stream << t.cell("Image", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_IMAGE, _cline->getImage()));
 				stream << t.cell("Style CSS", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_STYLE, _cline->getStyle()));
 				stream << t.cell("Couleur", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_COLOR, _cline->getColor() ? _cline->getColor()->toString() : string()));
-				stream << t.title("Réservation");
+				stream << t.title("RÃ©servation");
 				stream << t.cell("Centre de contact", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_RESERVATION_CONTACT_ID, _cline->getReservationContact() ? lexical_cast<string>(_cline->getReservationContact()->getKey()) : string()));
 				stream << t.close();
 
@@ -464,7 +464,7 @@ namespace synthese
 				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident standard", string(), "page_white_go.png");
 				stream << " ";
 				tridentExportFunction.getFunction()->setWithTisseoExtension(true);
-				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident Tisséo", string(), "page_white_go.png");
+				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident TissÃ©o", string(), "page_white_go.png");
 				stream << "</p>";
 			}
 
@@ -518,7 +518,7 @@ namespace synthese
 			_tabs.push_back(Tab("Parcours", TAB_ROUTES, true, JourneyPatternAdmin::ICON));
 			_tabs.push_back(Tab("Dates de fonctionnement", TAB_DATES, true, "calendar.png"));
 			_tabs.push_back(Tab("Non concurrence", TAB_NON_CONCURRENCY, true, "lock.png"));
-			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
+			_tabs.push_back(Tab("PropriÃ©tÃ©s", TAB_PROPERTIES, true));
 			_tabs.push_back(Tab("Export", TAB_EXPORT, true, "page_white_go.png"));
 
 			_tabBuilded = true;

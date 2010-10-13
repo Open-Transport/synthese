@@ -41,49 +41,49 @@ namespace synthese
 
 	namespace dblog
 	{
-		/** Visualisation de journal d'événements.
+		/** Visualisation de journal d'Ã©vÃ©nements.
 			@ingroup m13Admin refAdmin
 		
 			@image html cap_admin_logviewer.png
-			@image latex cap_admin_logviewer.png "Maquette de l'écran de visualisation de journal" width=14cm
+			@image latex cap_admin_logviewer.png "Maquette de l'Ã©cran de visualisation de journal" width=14cm
 
 			<i>Barre de navigation</i> :
 				- Lien vers synthese::interfaces::AdminInterfaceElement
 				- Lien vers synthese::interfaces::DBLogList
-				- Nom du journal affiché
+				- Nom du journal affichÃ©
 
 			<i>Zone de contenus</i> :
 				-# <b>Formulaire de recherche</b> :
-					-# <tt>Date début</tt> : champ texte qui permet de filtrer les entrées postérieures à la date saisie. Si aucune date valide n'est entrée, alors le filtre est désactivé.
-					-# <tt>Date fin</tt> : champ texte qui permet de filtrer les entrées antérieures à la date saisie. Si aucune date valide n'est entrée, alors le filtre est désactivé.
-					-# <tt>Utilisateur</tt> : liste de choix contenant l'ensemble des utilisateurs ayant généré au moins une entrée sur le journal affiché. 
-						- si un utilisateur est sélectionné, alors seules les entrées générées par l'utilisateurs sélectionné sont affichées
-						- si aucun utilisateur n'est sélectionné, alors le filtre est désactivé.
-					-# <tt>Type</tt> : liste de choix permettant de filtrer sur le type d'entrée :
-						- <tt>Toutes</tt> : filtre désactive
+					-# <tt>Date dÃ©but</tt> : champ texte qui permet de filtrer les entrÃ©es postÃ©rieures Ã  la date saisie. Si aucune date valide n'est entrÃ©e, alors le filtre est dÃ©sactivÃ©.
+					-# <tt>Date fin</tt> : champ texte qui permet de filtrer les entrÃ©es antÃ©rieures Ã  la date saisie. Si aucune date valide n'est entrÃ©e, alors le filtre est dÃ©sactivÃ©.
+					-# <tt>Utilisateur</tt> : liste de choix contenant l'ensemble des utilisateurs ayant gÃ©nÃ©rÃ© au moins une entrÃ©e sur le journal affichÃ©. 
+						- si un utilisateur est sÃ©lectionnÃ©, alors seules les entrÃ©es gÃ©nÃ©rÃ©es par l'utilisateurs sÃ©lectionnÃ© sont affichÃ©es
+						- si aucun utilisateur n'est sÃ©lectionnÃ©, alors le filtre est dÃ©sactivÃ©.
+					-# <tt>Type</tt> : liste de choix permettant de filtrer sur le type d'entrÃ©e :
+						- <tt>Toutes</tt> : filtre dÃ©sactive
 						- <tt>Info</tt>
 						- <tt>Warning</tt>
 						- <tt>Warning + Error</tt>
 						- <tt>Error</tt>
-					-# <tt>Texte</tt> : champ texte permettant de chercher dans le contenu des autres colonnes (regroupée sous le nom de <tt>Entrée</tt>).
+					-# <tt>Texte</tt> : champ texte permettant de chercher dans le contenu des autres colonnes (regroupÃ©e sous le nom de <tt>EntrÃ©e</tt>).
 					-# Bouton <tt>Rechercher</tt> : lance la recherche
-				-# <b>Tableau des résultats</b> : Les entrées du journal sont affichées dans les colonnes suivantes :
-					-# <tt>Type</tt> : la couleur de l'entrée est liée au type pour une visualisation rapide
-						- <tt>Info</tt> : l'entrée correspont à un fait qui est survenu dans le cadre d'une utilisation normale des fonctionnalités de SYNTHESE (Exemple : création d'utilisateur)
-						- <tt>Warning</tt> : l'entrée correspond à un événement susceptible de constituer une anomalie sans conséquence majeure sur la continuité de service en dehors de l'anomalie constatée elle-même (Exemple : erreur de cohérence sur un tableau d'affichage : l'arrêt physique de sélection des départs n'existe plus)
-						- <tt>Error</tt> : l'entrée correspond à un événement constituant une anomalie (Exemple : un terminal d'affichage ne fonctionne plus)
-					-# <tt>Date</tt> : Date de l'entrée
-					-# <tt>Utilisateur</tt> : Utilisateur ayant généré l'entrée. Attention, ne pas confondre cet utilisateur avec un éventuel utilisateur sur lequel porterait l'entrée (Exemple : utilisateur Paul créé par Jacques : l'utilisateur ayant généré l'entrée est Jacques). Un clic sur le nom de l'utilisateur conduit vers la page synthese::interfaces::UserAdmin si l'utilisateur dispose des habilitations nécessaires.
-					-# <tt>Entrée</tt> : Ensemble de colonnes définissant le contenu de l'entrée. La liste des colonnes dépend du journal affiché (voir documentation individuelle des classes dérivées)
-					-# Un clic sur les titres de colonne effectue un tri selon la colonne sélectionnée
-				-# Un maximum de 50 entrées est affiché à l'écran. En cas de dépassement de ce nombre d'après les critères de recherche, un lien <tt>Entrées suivantes</tt> apparait et permet de visualiser les entrées suivantes. A partir de la seconde page, un lien <tt>Entrées précédentes</tt> apparait également.
+				-# <b>Tableau des rÃ©sultats</b> : Les entrÃ©es du journal sont affichÃ©es dans les colonnes suivantes :
+					-# <tt>Type</tt> : la couleur de l'entrÃ©e est liÃ©e au type pour une visualisation rapide
+						- <tt>Info</tt> : l'entrÃ©e correspont Ã  un fait qui est survenu dans le cadre d'une utilisation normale des fonctionnalitÃ©s de SYNTHESE (Exemple : crÃ©ation d'utilisateur)
+						- <tt>Warning</tt> : l'entrÃ©e correspond Ã  un Ã©vÃ©nement susceptible de constituer une anomalie sans consÃ©quence majeure sur la continuitÃ© de service en dehors de l'anomalie constatÃ©e elle-mÃªme (Exemple : erreur de cohÃ©rence sur un tableau d'affichage : l'arrÃªt physique de sÃ©lection des dÃ©parts n'existe plus)
+						- <tt>Error</tt> : l'entrÃ©e correspond Ã  un Ã©vÃ©nement constituant une anomalie (Exemple : un terminal d'affichage ne fonctionne plus)
+					-# <tt>Date</tt> : Date de l'entrÃ©e
+					-# <tt>Utilisateur</tt> : Utilisateur ayant gÃ©nÃ©rÃ© l'entrÃ©e. Attention, ne pas confondre cet utilisateur avec un Ã©ventuel utilisateur sur lequel porterait l'entrÃ©e (Exemple : utilisateur Paul crÃ©Ã© par Jacques : l'utilisateur ayant gÃ©nÃ©rÃ© l'entrÃ©e est Jacques). Un clic sur le nom de l'utilisateur conduit vers la page synthese::interfaces::UserAdmin si l'utilisateur dispose des habilitations nÃ©cessaires.
+					-# <tt>EntrÃ©e</tt> : Ensemble de colonnes dÃ©finissant le contenu de l'entrÃ©e. La liste des colonnes dÃ©pend du journal affichÃ© (voir documentation individuelle des classes dÃ©rivÃ©es)
+					-# Un clic sur les titres de colonne effectue un tri selon la colonne sÃ©lectionnÃ©e
+				-# Un maximum de 50 entrÃ©es est affichÃ© Ã  l'Ã©cran. En cas de dÃ©passement de ce nombre d'aprÃ¨s les critÃ¨res de recherche, un lien <tt>EntrÃ©es suivantes</tt> apparait et permet de visualiser les entrÃ©es suivantes. A partir de la seconde page, un lien <tt>EntrÃ©es prÃ©cÃ©dentes</tt> apparait Ã©galement.
 
-			<i>Sécurité</i>
-				- Une habilitation privée DBLogRight de niveau READ, ainsi qu'un contrôle positif des habilitations par le journal visualisé sont nécessaire pour accéder à la page, et y visualiser les entrées générées par l'utilisateur courant.
-				- Une habilitation publique DBLogRight de niveau READ, ainsi qu'un contrôle positif des habilitations par le journal visualisé sont nécessaire pour accéder à la page, et y visualiser toutes les entrées.
+			<i>SÃ©curitÃ©</i>
+				- Une habilitation privÃ©e DBLogRight de niveau READ, ainsi qu'un contrÃ´le positif des habilitations par le journal visualisÃ© sont nÃ©cessaire pour accÃ©der Ã  la page, et y visualiser les entrÃ©es gÃ©nÃ©rÃ©es par l'utilisateur courant.
+				- Une habilitation publique DBLogRight de niveau READ, ainsi qu'un contrÃ´le positif des habilitations par le journal visualisÃ© sont nÃ©cessaire pour accÃ©der Ã  la page, et y visualiser toutes les entrÃ©es.
 
 			<i>Journaux</i>
-				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
+				- Aucune action issue de ce composant d'administration ne gÃ©nÃ¨re d'entrÃ©e dans un journal.
 		*/
 		class DBLogAdmin
 		:	public admin::AdminInterfaceElementTemplate<DBLogAdmin>

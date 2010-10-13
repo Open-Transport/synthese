@@ -53,12 +53,12 @@ namespace synthese
 			
 		private:
 
-			//!	\name Caractéristiques de la réservation
+			//!	\name CaractÃ©ristiques de la rÃ©servation
 			//@{
 				Reservations		_reservations;
-				util::RegistryKeyType		_lastReservation;		//!< Code de la réservation annulée en cas de modification
+				util::RegistryKeyType		_lastReservation;		//!< Code de la rÃ©servation annulÃ©e en cas de modification
 				int					_seats;			//!< Nombre de places
-				boost::posix_time::ptime		_bookingTime;		//!< Date de la réservation
+				boost::posix_time::ptime		_bookingTime;		//!< Date de la rÃ©servation
 				boost::posix_time::ptime	_cancellationTime;		//!< Date de l'annulation (unknown = not cancelled)
 			//@}
 

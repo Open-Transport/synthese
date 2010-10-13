@@ -133,9 +133,9 @@ namespace synthese
 			stringstream log;
 			DBLogModule::appendToLogIfChange(
 				log,
-				"Zone d'arrÍt affichÈe",
-				_screen->getDisplayedPlace() ? _screen->getDisplayedPlace()->getFullName() : "(non dÈfini)",
-				_place.get() ? _place->getFullName() : "(non dÈfini)"
+				"Zone d'arr√™t affich√©e",
+				_screen->getDisplayedPlace() ? _screen->getDisplayedPlace()->getFullName() : "(non d√©fini)",
+				_place.get() ? _place->getFullName() : "(non d√©fini)"
 			);
 
 			// Preparation of the action

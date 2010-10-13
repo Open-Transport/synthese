@@ -68,7 +68,7 @@ namespace synthese
 		{
 			_text = map.get<string>(PARAMETER_TEXT);
 			if (_text.empty())
-				throw ActionException("Le texte doit être non vide.");
+				throw ActionException("Le texte doit Ãªtre non vide.");
 		}
 		
 		

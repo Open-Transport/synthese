@@ -62,7 +62,7 @@ namespace synthese
 			_name = map.get<string>(PARAMETER_NAME);
 			if (_name.empty())
 			{
-				throw ActionException("Le nom du réseau ne peut pas être vide.");	
+				throw ActionException("Le nom du rÃ©seau ne peut pas Ãªtre vide.");	
 			}
 
 			TransportNetworkTableSync::SearchResult networks(
@@ -70,7 +70,7 @@ namespace synthese
 			);
 			if(!networks.empty())
 			{
-				throw ActionException("Un réseau nommé "+ _name +" existe déjà.");
+				throw ActionException("Un rÃ©seau nommÃ© "+ _name +" existe dÃ©jÃ .");
 			}
 		}
 		

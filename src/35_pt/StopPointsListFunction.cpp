@@ -102,7 +102,7 @@ namespace synthese
 			if(_commercialLineID)//destination of this line will be displayed
 			{
 				stream <<
-					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 					"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
 					"\" stopAreaName=\"" << _stopArea->getName() <<
 					"\" lineName=\""     << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getName() <<
@@ -113,7 +113,7 @@ namespace synthese
 			else
 			{
 				stream <<
-					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 					"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
 					"\" stopAreaName=\"" << _stopArea->getName() <<
 					"\">";

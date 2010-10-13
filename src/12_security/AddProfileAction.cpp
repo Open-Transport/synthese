@@ -74,7 +74,7 @@ namespace synthese
 				Env env;
 				ProfileTableSync::Search(env, _name, string(),0,1);
 				if (!env.getRegistry<Profile>().empty())
-					throw ActionException("Le nom choisi est dÈj‡ pris par un autre profil. Veuillez entrer un autre nom.");
+					throw ActionException("Le nom choisi est d√©j√† pris par un autre profil. Veuillez entrer un autre nom.");
 			}
 			catch(ObjectNotFoundException<Profile> e)
 			{
@@ -109,7 +109,7 @@ namespace synthese
 			request.setActionCreatedId(profile->getKey());
 
 			// DBLog
-			SecurityLog::addProfileAdmin(request.getUser().get(), profile.get(), "CrÈation du profil" + (_templateProfile.get() ? " ‡ partir de " + _templateProfile->getName() : string()));
+			SecurityLog::addProfileAdmin(request.getUser().get(), profile.get(), "Cr√©ation du profil" + (_templateProfile.get() ? " √† partir de " + _templateProfile->getName() : string()));
 		}
 
 

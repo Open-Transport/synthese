@@ -78,12 +78,12 @@ namespace synthese
 				// Name
 				_name = map.get<string>(PARAMETER_NAME);
 				if (_name.empty())
-					throw ActionException("Le nom ne peut Ítre vide");
+					throw ActionException("Le nom ne peut √™tre vide");
 
 				Env env;
 				TextTemplateTableSync::Search(env, _text->getParentId(), false, _name, _text.get(), 0, 1);
 				if (!env.getRegistry<TextTemplate>().empty())
-					throw ActionException("Un texte portant ce nom existe dÈj‡.");
+					throw ActionException("Un texte portant ce nom existe d√©j√†.");
 
 				// Short message
 				_shortMessage = map.get<string>(PARAMETER_SHORT_MESSAGE);
@@ -111,7 +111,7 @@ namespace synthese
 			_text->setShortMessage(_shortMessage);
 			DBLogModule::appendToLogIfChange(logChanges, "Message long", _text->getLongMessage(), _longMessage);
 			_text->setLongMessage(_longMessage);
-			//DBLogModule::appendToLogIfChange(logChanges, "DÈplacement", _text->getParentId(), _folder->getKey());
+			//DBLogModule::appendToLogIfChange(logChanges, "D√©placement", _text->getParentId(), _folder->getKey());
 			//_text->setParentId(_folder->getKey());
 
 			TextTemplateTableSync::Save(_text.get());

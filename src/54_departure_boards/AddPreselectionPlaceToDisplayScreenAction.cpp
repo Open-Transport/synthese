@@ -94,7 +94,7 @@ namespace synthese
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
-				"Ajout de l'arrêt de présélection "+ _place->getFullName(),
+				"Ajout de l'arrÃªt de prÃ©sÃ©lection "+ _place->getFullName(),
 				*request.getUser()
 			);
 		}

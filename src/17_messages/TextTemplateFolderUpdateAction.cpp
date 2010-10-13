@@ -97,7 +97,7 @@ namespace synthese
 			);
 
 			if (!env.getRegistry<TextTemplate>().empty())
-				throw ActionException("Un répertoire de même nom existe déjà à l'emplacement spécifié");
+				throw ActionException("Un rÃ©pertoire de mÃªme nom existe dÃ©jÃ  Ã  l'emplacement spÃ©cifiÃ©");
 		}
 		
 		
@@ -108,7 +108,7 @@ namespace synthese
 
 			DBLogModule::appendToLogIfChange(s, "Nom", _folder->getName(), _name);
 			_folder->setName(_name);
-			DBLogModule::appendToLogIfChange(s, "Répertoire parent", Conversion::ToString(_folder->getParentId()), Conversion::ToString(_parent->getKey()));
+			DBLogModule::appendToLogIfChange(s, "RÃ©pertoire parent", Conversion::ToString(_folder->getParentId()), Conversion::ToString(_parent->getKey()));
 			_folder->setParentId(_parent.get() ? _parent->getKey() : 0);
 
 			TextTemplateTableSync::Save(_folder.get());

@@ -48,12 +48,12 @@ namespace synthese
 		///	</ul>
 		///
 		/// <h2>Output</h2>
-		/// Le principe originel de Nagios (host/service) est légèrement détourné pour prendre en compte les spécificités de l'architecture :
+		/// Le principe originel de Nagios (host/service) est lÃ©gÃ¨rement dÃ©tournÃ© pour prendre en compte les spÃ©cificitÃ©s de l'architecture :
 		///	<ul>
-		///		<li>Les « hosts » correspondent aux afficheurs et aux unités centrales. Ils seront nommés COMMUNE_Arret_Nom pour bénéficier de tris automatiques à l'affichage par Centréon. Leur type sera rappelé dans le champ Alias.</li>
-		///		<li>Un service est déclaré par host, dépendant du type d'entrée : un service de supervision d'afficheur ou un service de supervision d'unité centrale</li>
-		///		<li>Les afficheurs dépendants d'une unité centrale sont déclarés comme tels : en cas de panne de l'unité centrale, aucune alerte n'est envoyée concernant les afficheurs branchés dessus.</li>
-		///		<li>Le champ IP des hosts est utilisé pour stocker l'ID</li>
+		///		<li>Les Â« hosts Â» correspondent aux afficheurs et aux unitÃ©s centrales. Ils seront nommÃ©s COMMUNE_Arret_Nom pour bÃ©nÃ©ficier de tris automatiques Ã  l'affichage par CentrÃ©on. Leur type sera rappelÃ© dans le champ Alias.</li>
+		///		<li>Un service est dÃ©clarÃ© par host, dÃ©pendant du type d'entrÃ©e : un service de supervision d'afficheur ou un service de supervision d'unitÃ© centrale</li>
+		///		<li>Les afficheurs dÃ©pendants d'une unitÃ© centrale sont dÃ©clarÃ©s comme tels : en cas de panne de l'unitÃ© centrale, aucune alerte n'est envoyÃ©e concernant les afficheurs branchÃ©s dessus.</li>
+		///		<li>Le champ IP des hosts est utilisÃ© pour stocker l'ID</li>
 		///	</ul>
 		class CentreonConfigExportFunction :
 			public util::FactorableTemplate<server::Function,CentreonConfigExportFunction>

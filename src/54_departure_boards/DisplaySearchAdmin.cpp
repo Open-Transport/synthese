@@ -82,7 +82,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::ICON("computer.png");
-		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::DEFAULT_TITLE("Recherche d'équipements");
+		template<> const string AdminInterfaceElementTemplate<DisplaySearchAdmin>::DEFAULT_TITLE("Recherche d'Ã©quipements");
 	}
 
 	namespace departure_boards
@@ -223,13 +223,13 @@ namespace synthese
 					stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchCity, _searchStop, _searchName,  _searchLineId, _searchTypeId, _searchState, _searchMessage);
 				}
 
-				stream << "<h1>" << (_place ? "Afficheurs" : "Résultats de la recherche") << "</h1>";
+				stream << "<h1>" << (_place ? "Afficheurs" : "RÃ©sultats de la recherche") << "</h1>";
 
 				ActionResultHTMLTable::HeaderVector v;
 				if (!_place)
 				{
 					v.push_back(make_pair(PARAMETER_SEARCH_CITY, "Commune"));
-					v.push_back(make_pair(PARAMETER_SEARCH_STOP, "Arrêt"));
+					v.push_back(make_pair(PARAMETER_SEARCH_STOP, "ArrÃªt"));
 				}
 				v.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 				v.push_back(make_pair(PARAMETER_SEARCH_TYPE_ID, "Type"));
@@ -278,14 +278,14 @@ namespace synthese
 							t.col() <<
 							(	screen->getLocation() ?
 								screen->getLocation()->getCity()->getName() :
-								"(indéterminé)"
+								"(indÃ©terminÃ©)"
 							)
 						;
 						stream <<
 							t.col() <<
 							(	screen->getLocation() ?
 								screen->getLocation()->getName() :
-								"(indéterminé)"
+								"(indÃ©terminÃ©)"
 							)
 						;
 					}
@@ -294,7 +294,7 @@ namespace synthese
 						t.col() <<
 						(	screen->getType() ?
 							screen->getType()->getName() :
-							HTMLModule::getHTMLImage("error.png", "Type non défini")
+							HTMLModule::getHTMLImage("error.png", "Type non dÃ©fini")
 						)
 					;
 
@@ -308,7 +308,7 @@ namespace synthese
 						stream <<
 							HTMLModule::getHTMLImage(
 								"error.png",
-								"Veuillez définir le type d'afficheur dans l'écran de configuration."
+								"Veuillez dÃ©finir le type d'afficheur dans l'Ã©cran de configuration."
 							)
 						;
 					}
@@ -317,7 +317,7 @@ namespace synthese
 						stream <<
 							HTMLModule::getHTMLImage(
 								"cross.png",
-								"Désactivé par la maintenance : "+ screen->getMaintenanceMessage()
+								"DÃ©sactivÃ© par la maintenance : "+ screen->getMaintenanceMessage()
 							)
 						;
 					}
@@ -325,7 +325,7 @@ namespace synthese
 					{
 						stream << HTMLModule::getHTMLImage(
 								"help.png",
-								"Ce type d'afficheur n'est pas supervisé. Voir la définition du type."
+								"Ce type d'afficheur n'est pas supervisÃ©. Voir la dÃ©finition du type."
 							)
 						;
 					}
@@ -338,13 +338,13 @@ namespace synthese
 						if(status.get() == NULL)
 						{
 							stream <<
-								HTMLModule::getHTMLImage("exclamation.png", "Cet afficheur n'est jamais entré en contact.")
+								HTMLModule::getHTMLImage("exclamation.png", "Cet afficheur n'est jamais entrÃ© en contact.")
 							;
 						}
 						else if(screen->isDown(*status)
 						){
 							stream <<
-								HTMLModule::getHTMLImage("exclamation.png", "Cet afficheur n'est plus en contact alors qu'il est déclaré online.")
+								HTMLModule::getHTMLImage("exclamation.png", "Cet afficheur n'est plus en contact alors qu'il est dÃ©clarÃ© online.")
 							;
 						}
 						else
@@ -365,7 +365,7 @@ namespace synthese
 						stream <<
 							HTMLModule::getHTMLImage(
 								"cross.png",
-								"Désactivé par la maintenance : "+ screen->getMaintenanceMessage()
+								"DÃ©sactivÃ© par la maintenance : "+ screen->getMaintenanceMessage()
 							)
 						;
 					}
@@ -394,7 +394,7 @@ namespace synthese
 							else
 							{
 								stream <<
-									HTMLModule::getHTMLImage("empty_display.png", "Aucune ligne affichée, écran vide")
+									HTMLModule::getHTMLImage("empty_display.png", "Aucune ligne affichÃ©e, Ã©cran vide")
 								;
 							}
 						}
@@ -406,8 +406,8 @@ namespace synthese
 				if (tabHasWritePermissions())
 				{
 					stream << t.row();
-					stream << t.col(_place.get() ? 4 : 6) << "(sélectionner un afficheur existant pour copier ses&nbsp;propriétés dans le nouvel élément)";
-					stream << t.col(3) << t.getActionForm().getSubmitButton("Créer un nouvel afficheur");
+					stream << t.col(_place.get() ? 4 : 6) << "(sÃ©lectionner un afficheur existant pour copier ses&nbsp;propriÃ©tÃ©s dans le nouvel Ã©lÃ©ment)";
+					stream << t.col(3) << t.getActionForm().getSubmitButton("CrÃ©er un nouvel afficheur");
 				}
 
 				stream << t.close();
@@ -439,13 +439,13 @@ namespace synthese
 					stream << getHtmlSearchForm(searchRequest.getHTMLForm(), _searchCity, _searchStop, _searchName,  _searchLineId, _searchTypeId, _searchState, _searchMessage);
 				}
 
-				stream << "<h1>" << (_place && _place->get() ? "Unités centrales" : "Résultats de la recherche") << "</h1>";
+				stream << "<h1>" << (_place && _place->get() ? "UnitÃ©s centrales" : "RÃ©sultats de la recherche") << "</h1>";
 
 				ActionResultHTMLTable::HeaderVector v;
 				if (!_place)
 				{
 					v.push_back(make_pair(PARAMETER_SEARCH_CITY, "Commune"));
-					v.push_back(make_pair(PARAMETER_SEARCH_STOP, "Arrêt"));
+					v.push_back(make_pair(PARAMETER_SEARCH_STOP, "ArrÃªt"));
 				}
 				v.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 				v.push_back(make_pair(PARAMETER_SEARCH_STATE, "Etat"));
@@ -475,14 +475,14 @@ namespace synthese
 							t.col() <<
 							(	cpu->getPlace() ?
 							cpu->getPlace()->getCity()->getName() :
-						"(indéterminé)"
+						"(indÃ©terminÃ©)"
 							)
 							;
 						stream <<
 							t.col() <<
 							(	cpu->getPlace() ?
 							cpu->getPlace()->getName() :
-						"(indéterminé)"
+						"(indÃ©terminÃ©)"
 							)
 							;
 					}
@@ -497,8 +497,8 @@ namespace synthese
 				if (tabHasWritePermissions())
 				{
 					stream << t.row();
-					stream << t.col(_place.get() ? 4 : 6) << "(sélectionner une unité centrale existante pour copier ses&nbsp;propriétés dans le nouvel élément)";
-					stream << t.col(3) << t.getActionForm().getSubmitButton("Créer une nouvelle unité centrale");
+					stream << t.col(_place.get() ? 4 : 6) << "(sÃ©lectionner une unitÃ© centrale existante pour copier ses&nbsp;propriÃ©tÃ©s dans le nouvel Ã©lÃ©ment)";
+					stream << t.col(3) << t.getActionForm().getSubmitButton("CrÃ©er une nouvelle unitÃ© centrale");
 				}
 
 				stream << t.close();
@@ -533,7 +533,7 @@ namespace synthese
 			SearchFormHTMLTable s(form);
 			stream << s.open();
 			stream << s.cell("Commune", s.getForm().getTextInput(PARAMETER_SEARCH_CITY, cityName));
-			stream << s.cell("Arrêt", s.getForm().getTextInput(PARAMETER_SEARCH_STOP, stopName));
+			stream << s.cell("ArrÃªt", s.getForm().getTextInput(PARAMETER_SEARCH_STOP, stopName));
 			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, displayName));
 			stream << s.cell("Ligne", s.getForm().getSelectInput(PARAMETER_SEARCH_LINE_ID, DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), lineUid));
 			stream << s.cell(
@@ -668,7 +668,7 @@ namespace synthese
 			);
 			_tabs.clear();
 			_tabs.push_back(Tab("Afficheurs", TAB_DISPLAY_SCREENS, writeRight, "monitor.png"));
-			_tabs.push_back(Tab("Unités centrales", TAB_CPU, writeRight, "server.png"));
+			_tabs.push_back(Tab("UnitÃ©s centrales", TAB_CPU, writeRight, "server.png"));
 			_tabBuilded = true;
 		}
 

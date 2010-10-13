@@ -33,10 +33,10 @@ namespace synthese
 		class DisplayType;
 		class DisplayScreenCPU;
 
-		/** Journal relatif à la gestion des paramètres du téléaffichage.
+		/** Journal relatif Ã  la gestion des paramÃ¨tres du tÃ©lÃ©affichage.
 
 			Colonnes :
-				- Action effectuée				
+				- Action effectuÃ©e				
 
 			@ingroup m54Log refLog
 		*/

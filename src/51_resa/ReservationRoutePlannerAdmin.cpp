@@ -90,7 +90,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>::ICON("arrow_switch.png");
-		template<> const string AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>::DEFAULT_TITLE("Recherche d'itinéraires");
+		template<> const string AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>::DEFAULT_TITLE("Recherche d'itinÃ©raires");
 	}
 
 	namespace resa
@@ -232,7 +232,7 @@ namespace synthese
 			// Confirmation
 			if (_confirmedTransaction.get())
 			{
-				stream << "<h1>Réservation confirmée</h1>";
+				stream << "<h1>RÃ©servation confirmÃ©e</h1>";
 
 				ResaModule::DisplayReservations(stream, *_confirmedTransaction);
 			}
@@ -252,25 +252,25 @@ namespace synthese
 			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request);
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
-			stream << st.cell("Commune départ", st.getForm().getTextInput(
+			stream << st.cell("Commune dÃ©part", st.getForm().getTextInput(
 						PARAMETER_START_CITY, 
 						startPlace ? 
 						(dynamic_cast<City*>(startPlace.get()) ? dynamic_cast<City*>(startPlace.get())->getName() : dynamic_cast<NamedPlace*>(startPlace.get())->getCity()->getName()) :
 						_startCity
 				)	);
-			stream << st.cell("Arrêt départ", st.getForm().getTextInput(
+			stream << st.cell("ArrÃªt dÃ©part", st.getForm().getTextInput(
 						PARAMETER_START_PLACE,
 						startPlace ? 
 						(dynamic_cast<City*>(startPlace.get()) ? string() : dynamic_cast<NamedPlace*>(startPlace.get())->getName()) :
 						_startPlace
 				)	);
-			stream << st.cell("Commune arrivée", st.getForm().getTextInput(
+			stream << st.cell("Commune arrivÃ©e", st.getForm().getTextInput(
 						PARAMETER_END_CITY,
 						endPlace ? 
 						(dynamic_cast<const City*>(endPlace.get()) ? dynamic_cast<City*>(endPlace.get())->getName() : dynamic_cast<NamedPlace*>(endPlace.get())->getCity()->getName()) :
 						_endCity
 				)	);	
-			stream << st.cell("Arrêt arrivée", st.getForm().getTextInput(
+			stream << st.cell("ArrÃªt arrivÃ©e", st.getForm().getTextInput(
 						PARAMETER_END_PLACE,
 						endPlace ? 
 						(dynamic_cast<const City*>(endPlace.get()) ? string() : dynamic_cast<NamedPlace*>(endPlace.get())->getName()) :
@@ -346,7 +346,7 @@ namespace synthese
 			ptime date(_dateTime);
 			date -= days(1);
 			searchRequest.getPage()->_dateTime = date;
-			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour précédent", string(), "rewind_blue.png") << " ";
+			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour prÃ©cÃ©dent", string(), "rewind_blue.png") << " ";
 			
 			if(!jv.getJourneys().empty())
 			{
@@ -356,7 +356,7 @@ namespace synthese
 				searchRequest.getPage()->_dateTime = date;
 				searchRequest.getPage()->_planningOrder = ARRIVAL_FIRST;
 
-				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions précédentes", string(), "resultset_previous.png") << " ";
+				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions prÃ©cÃ©dentes", string(), "resultset_previous.png") << " ";
 			}
 
 			searchRequest.getPage()->_planningOrder = DEPARTURE_FIRST;
@@ -390,7 +390,7 @@ namespace synthese
 
 			if(_confirmedTransaction.get()) return;
 
-			stream << "<h1>Résultats</h1>";
+			stream << "<h1>RÃ©sultats</h1>";
 
 			// Reservation
 			bool withReservation(false);
@@ -414,10 +414,10 @@ namespace synthese
 				return;
 			}
 
-			stream << "<h1>Réservation</h1>";
+			stream << "<h1>RÃ©servation</h1>";
 
 			if (!withReservation)
-				stream << "<p>Aucune solution proposée n'est ouverte à la réservation.</p>";
+				stream << "<p>Aucune solution proposÃ©e n'est ouverte Ã  la rÃ©servation.</p>";
 			else
 			{
 				stream << rf.setFocus(BookReservationAction::PARAMETER_DATE_TIME, 0);
@@ -437,7 +437,7 @@ namespace synthese
 					stream << rt.row();
 					stream << rt.col() << "Recherche client";
 					stream << rt.col() << "Nom : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_NAME, string());
-					stream << "	Prénom : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_SURNAME, string());
+					stream << "	PrÃ©nom : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_SURNAME, string());
 
 					stream << HTMLModule::GetHTMLJavascriptOpen();
 					stream
@@ -481,7 +481,7 @@ namespace synthese
 						optional<bool>(true),
 						"Nouveau client"
 					);
-					stream << " : Téléphone : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_PHONE, string());
+					stream << " : TÃ©lÃ©phone : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_PHONE, string());
 					stream << "	E-mail : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_EMAIL, string());
 					stream << "<br />" << rf.getRadioInput(
 						BookReservationAction::PARAMETER_CREATE_CUSTOMER,
@@ -499,7 +499,7 @@ namespace synthese
 				stream << rt.col() << rf.getTextInput(BookReservationAction::PARAMETER_SEATS_NUMBER, lexical_cast<string>(_seatsNumber));
 
 				stream << rt.row();
-				stream << rt.col(2, string(), true) << rf.getSubmitButton("Réserver");
+				stream << rt.col(2, string(), true) << rf.getSubmitButton("RÃ©server");
 
 				stream << rt.close() << rf.close();
 			}

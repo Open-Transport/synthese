@@ -126,7 +126,7 @@ namespace synthese
 			AdminFunctionRequest<ResaStatisticsAdmin> openRequest(request);
 
 			// Display
-			stream << "<h1>Statistiques de réservation par lignes</h1>";
+			stream << "<h1>Statistiques de rÃ©servation par lignes</h1>";
 
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(string(),"Ligne"));

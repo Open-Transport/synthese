@@ -47,7 +47,7 @@ namespace synthese
 		/// The response follows a light XML schema :
 		/// 
 		///	@code
-		/// <?xml version='1.0' encoding='ISO-8859-15'?>
+		/// <?xml version='1.0' encoding='UTF-8'?>
 		/// <displayScreens>
 		/// <displayscreen id="123412341234" comPort="3" />
 		/// </displayScreens>

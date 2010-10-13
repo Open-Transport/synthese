@@ -140,7 +140,7 @@ namespace synthese
 			{
 				DBLogModule::appendToLogIfChange(
 					t,
-					"Délai de préselection",
+					"DÃ©lai de prÃ©selection",
 					_screen->getForceDestinationDelay(),
 					*_preselectionDelay
 				);
@@ -155,12 +155,12 @@ namespace synthese
 			
 			// Cleaning delay
 			DBLogModule::appendToLogIfChange(
-				t, "Délai d'effacement", _screen->getClearingDelay(), _cleaningDelay
+				t, "DÃ©lai d'effacement", _screen->getClearingDelay(), _cleaningDelay
 			);
 			_screen->setClearingDelay(_cleaningDelay);
 			
 			// Max delay
-			DBLogModule::appendToLogIfChange(t, "Délai d'apparition", _screen->getMaxDelay(), _maxDelay);
+			DBLogModule::appendToLogIfChange(t, "DÃ©lai d'apparition", _screen->getMaxDelay(), _maxDelay);
 			_screen->setMaxDelay(_maxDelay);
 			
 			// Saving
@@ -173,12 +173,12 @@ namespace synthese
 		UpdateDisplayPreselectionParametersAction::DisplayFunctionNames UpdateDisplayPreselectionParametersAction::GetFunctionList(
 		){
 			DisplayFunctionNames directionMap;
-			directionMap.insert(make_pair(DEPARTURES_CHRONOLOGICAL, "Départs chronologiques"));
-			directionMap.insert(make_pair(DEPARTURES_PRESELECTION, "Départs avec présélection"));
-			directionMap.insert(make_pair(ARRIVAL_CHRONOLOGICAL, "Arrivées chronologiques"));
-			directionMap.insert(make_pair(ARRIVAL_PRESELECTION, "Arrivées avec présélection"));
-			directionMap.insert(make_pair(ROUTE_PLANNING_WITH_TRANSFER, "Calcul d'itinéraire avec correspondance"));
-			directionMap.insert(make_pair(ROUTE_PLANNING_WITHOUT_TRANSFER, "Calcul d'itinéraire sans correspondance"));
+			directionMap.insert(make_pair(DEPARTURES_CHRONOLOGICAL, "DÃ©parts chronologiques"));
+			directionMap.insert(make_pair(DEPARTURES_PRESELECTION, "DÃ©parts avec prÃ©sÃ©lection"));
+			directionMap.insert(make_pair(ARRIVAL_CHRONOLOGICAL, "ArrivÃ©es chronologiques"));
+			directionMap.insert(make_pair(ARRIVAL_PRESELECTION, "ArrivÃ©es avec prÃ©sÃ©lection"));
+			directionMap.insert(make_pair(ROUTE_PLANNING_WITH_TRANSFER, "Calcul d'itinÃ©raire avec correspondance"));
+			directionMap.insert(make_pair(ROUTE_PLANNING_WITHOUT_TRANSFER, "Calcul d'itinÃ©raire sans correspondance"));
 			directionMap.insert(make_pair(DISPLAY_CHILDREN_ONLY, "Affichage des fils uniquement"));
 			return directionMap;
 		}
@@ -190,14 +190,14 @@ namespace synthese
 			DelaysList clearDelayMap;
 			for (int i=-5; i<-1; ++i)
 			{
-				clearDelayMap.insert(make_pair(i, Conversion::ToString(-i) + " minutes avant le départ"));
+				clearDelayMap.insert(make_pair(i, Conversion::ToString(-i) + " minutes avant le dÃ©part"));
 			}
-			clearDelayMap.insert(make_pair(-1, "1 minute avant le départ"));
-			clearDelayMap.insert(make_pair(0, "heure du départ"));
-			clearDelayMap.insert(make_pair(1, "1 minute après le départ"));
+			clearDelayMap.insert(make_pair(-1, "1 minute avant le dÃ©part"));
+			clearDelayMap.insert(make_pair(0, "heure du dÃ©part"));
+			clearDelayMap.insert(make_pair(1, "1 minute aprÃ¨s le dÃ©part"));
 			for (int i=2; i<6; ++i)
 			{
-				clearDelayMap.insert(make_pair(i, Conversion::ToString(i) + " minutes après le départ"));
+				clearDelayMap.insert(make_pair(i, Conversion::ToString(i) + " minutes aprÃ¨s le dÃ©part"));
 			}
 			return clearDelayMap;
 		}

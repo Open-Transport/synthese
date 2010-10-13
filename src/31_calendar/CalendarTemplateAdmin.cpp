@@ -131,7 +131,7 @@ namespace synthese
 			// TAB SOURCE
 			if (openTabContent(stream, TAB_SOURCE))
 			{
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 				AdminActionFunctionRequest<CalendarTemplatePropertiesUpdateAction, CalendarTemplateAdmin> updateRequest(_request);
 				updateRequest.getAction()->setCalendar(const_pointer_cast<CalendarTemplate>(_calendar));
@@ -140,7 +140,7 @@ namespace synthese
 				stream << pt.open();
 				stream << pt.cell("Nom", pt.getForm().getTextInput(CalendarTemplatePropertiesUpdateAction::PARAMETER_NAME, _calendar->getText()));
 				stream << pt.cell(
-					"Catégorie",
+					"CatÃ©gorie",
 					pt.getForm().getSelectInput(
 						CalendarTemplatePropertiesUpdateAction::PARAMETER_CATEGORY,
 						CalendarTemplate::GetCategoriesList(),
@@ -168,7 +168,7 @@ namespace synthese
 				
 				stream <<
 					"<p>" <<
-					HTMLModule::getLinkButton(cleanRequest.getURL(), "Vider le calendrier", "Etes-vous sûr de vouloir vider le calendrier "+ _calendar->getText() +" ?")
+					HTMLModule::getLinkButton(cleanRequest.getURL(), "Vider le calendrier", "Etes-vous sÃ»r de vouloir vider le calendrier "+ _calendar->getText() +" ?")
 				;
 
 				CalendarTemplateElementTableSync::SearchResult result(
@@ -178,7 +178,7 @@ namespace synthese
 				if(result.empty())
 				{
 					stream << " " <<
-					HTMLModule::getLinkButton(removeCalendar.getURL(), "Supprimer le calendrier", "Etes-vous sûr de vouloir supprimer le calendrier "+ _calendar->getText() +" ?", "calendar_delete.png");
+					HTMLModule::getLinkButton(removeCalendar.getURL(), "Supprimer le calendrier", "Etes-vous sÃ»r de vouloir supprimer le calendrier "+ _calendar->getText() +" ?", "calendar_delete.png");
 				}
 				stream << "</p>";
 
@@ -191,7 +191,7 @@ namespace synthese
 				ActionResultHTMLTable::HeaderVector c;
 				c.push_back(make_pair(CalendarTemplateElementTableSync::COL_RANK, "Rang"));
 				c.push_back(make_pair(string(), "Sens"));
-				c.push_back(make_pair(string(), "Date début"));
+				c.push_back(make_pair(string(), "Date dÃ©but"));
 				c.push_back(make_pair(string(), "Date fin"));
 				c.push_back(make_pair(string(), "Intervale"));
 				c.push_back(make_pair(string(), "Inclusion"));
@@ -274,7 +274,7 @@ namespace synthese
 				stream << f.cell("Date max", f.getForm().getCalendarInput(PARAMETER_RESULT_END, _resultEndDate));
 				stream << f.close();
 
-				stream << "<h1>Résultat</h1>";
+				stream << "<h1>RÃ©sultat</h1>";
 				
 				Calendar mask(_resultStartDate, _resultEndDate);
 				Calendar result(_calendar->getResult(mask));
@@ -326,8 +326,8 @@ namespace synthese
 		) const {
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Données", TAB_SOURCE, true));
-			_tabs.push_back(Tab("Résultat", TAB_RESULT, true));
+			_tabs.push_back(Tab("DonnÃ©es", TAB_SOURCE, true));
+			_tabs.push_back(Tab("RÃ©sultat", TAB_RESULT, true));
 
 			_tabBuilded = true;
 		}

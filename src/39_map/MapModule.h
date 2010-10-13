@@ -56,22 +56,22 @@ namespace synthese
 		
 		(Module documentation)
 		
-		Le tracé de carte se fait à partir de quatre catégories d'éléments d'entrée  :
-			- données géographiques du serveur (chargées à l'initialisation) : voir @ref uc10 "liste des données"
-			- données géographiques propres à la carte, fournies avec la demande de carte, permettant de tracer sur la carte des éléments supplémentaires provenant par exemple de l'application cliente. Les données pouvant être transmises à la volée sont les mêmes que les @ref uc10 "données du serveur" à l'exception des fonds de carte bitmap
-			- définition du contenu de la carte
+		Le tracÃ© de carte se fait Ã  partir de quatre catÃ©gories d'Ã©lÃ©ments d'entrÃ©e  :
+			- donnÃ©es gÃ©ographiques du serveur (chargÃ©es Ã  l'initialisation) : voir @ref uc10 "liste des donnÃ©es"
+			- donnÃ©es gÃ©ographiques propres Ã  la carte, fournies avec la demande de carte, permettant de tracer sur la carte des Ã©lÃ©ments supplÃ©mentaires provenant par exemple de l'application cliente. Les donnÃ©es pouvant Ãªtre transmises Ã  la volÃ©e sont les mÃªmes que les @ref uc10 "donnÃ©es du serveur" Ã  l'exception des fonds de carte bitmap
+			- dÃ©finition du contenu de la carte
 			- zone de couverture
-			- échelle
-			- définition de la liste des éléments géographiques à tracer
-			- paramètres techniques
+			- Ã©chelle
+			- dÃ©finition de la liste des Ã©lÃ©ments gÃ©ographiques Ã  tracer
+			- paramÃ¨tres techniques
 			- format du fichier produit
-			- paramètres de compression
+			- paramÃ¨tres de compression
 
-		Le résultat produit est un résultat contenant l'un ou l'autre ou les deux éléments suivants :
-			- carte demandée au format bitmap
-			- données vectorielles associées à la carte
+		Le rÃ©sultat produit est un rÃ©sultat contenant l'un ou l'autre ou les deux Ã©lÃ©ments suivants :
+			- carte demandÃ©e au format bitmap
+			- donnÃ©es vectorielles associÃ©es Ã  la carte
 
-		Selon le format choisi, les tables de liens et la carte sont ou non fabriqués :
+		Selon le format choisi, les tables de liens et la carte sont ou non fabriquÃ©s :
 
 		<table class="tableau">
 		<tr><th>Format</th><th>Table de liens</th><th>Carte</th><th>Utilisation de Ghostscript</th></tr>

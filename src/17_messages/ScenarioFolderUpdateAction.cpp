@@ -112,7 +112,7 @@ namespace synthese
 				Env env;
 				ScenarioFolderTableSync::Search(env, _parentFolder.get() ? _parentFolder->getKey() : 0, _name, 0, 1);
 				if (!env.getRegistry<ScenarioFolder>().empty())
-					throw ActionException("Ce nom est déjà utilisé dans le répertoire courant.");
+					throw ActionException("Ce nom est dÃ©jÃ  utilisÃ© dans le rÃ©pertoire courant.");
 			}
 		}
 		

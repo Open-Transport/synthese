@@ -115,7 +115,7 @@ namespace synthese
 			case TIMES_IN_ROWS: return "Heures en lignes";
 			case CONTAINER: return "Container";
 			case CALENDAR: return "Calendrier";
-			case LINE_SCHEMA: return "Schéma de ligne";
+			case LINE_SCHEMA: return "SchÃ©ma de ligne";
 			}
 			return "Inconnu";
 		}

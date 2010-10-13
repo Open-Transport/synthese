@@ -198,7 +198,7 @@ namespace synthese
 				{
 					stream <<
 						st.cell(
-							"Date dÈbut",
+							"Date d√©but",
 							st.getForm().getCalendarInput(
 								_getParameterName(PARAMETER_START_DATE),
 								_searchStartDate
@@ -325,7 +325,7 @@ namespace synthese
 						t.col() <<
 						(	user.get() ?
 							user->getLogin() :
-							((dbe->getUserId() > 0) ? "(supprimÈ)" : "(robot)")
+							((dbe->getUserId() > 0) ? "(supprim√©)" : "(robot)")
 						)
 					;
 				}

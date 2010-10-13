@@ -127,7 +127,7 @@ namespace synthese
 				{
 					HTMLForm fc(templateRequest.getHTMLForm("template"));
 					stream << fc.open() << "<p>";
-					stream << "Modèle : ";
+					stream << "ModÃ¨le : ";
 					stream << fc.getSelectInput(UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID, tl, optional<RegistryKeyType>());
 					stream << fc.getSubmitButton("Copier contenu");
 					stream << "</p>" << fc.close();

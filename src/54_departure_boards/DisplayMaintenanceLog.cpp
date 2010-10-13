@@ -65,8 +65,8 @@ namespace synthese
 		{
 			ColumnsVector v;
 			v.push_back("Type");
-			v.push_back("Résumé");
-			v.push_back("Détail");
+			v.push_back("RÃ©sumÃ©");
+			v.push_back("DÃ©tail");
 			return v;
 		}
 
@@ -114,7 +114,7 @@ namespace synthese
 			// Type
 			switch (static_cast<EntryType>(Conversion::ToInt(c[_COL_TYPE])))
 			{
-			case DISPLAY_MONITORING_STATUS_CHANGE: v.push_back("Changement d'état"); break;
+			case DISPLAY_MONITORING_STATUS_CHANGE: v.push_back("Changement d'Ã©tat"); break;
 			case DISPLAY_MAINTENANCE_ADMIN: v.push_back("Administration"); break;
 			case DISPLAY_MONITORING_DOWN: v.push_back("Perte du contact"); break;
 			case DISPLAY_MONITORING_UP: v.push_back("Reprise du contact"); break;

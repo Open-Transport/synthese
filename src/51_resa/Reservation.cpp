@@ -213,10 +213,10 @@ namespace synthese
 			
 			switch(status)
 			{
-			case OPTION: return statusText + " pouvant être annulée avant le " + to_simple_string(_reservationDeadLine);
+			case OPTION: return statusText + " pouvant Ãªtre annulÃ©e avant le " + to_simple_string(_reservationDeadLine);
 			case CANCELLED: return statusText + " le " + to_simple_string(getTransaction()->getCancellationTime());
 			case CANCELLED_AFTER_DELAY: return statusText + " le " + to_simple_string(getTransaction()->getCancellationTime());
-			case NO_SHOW: return statusText + " constatée le " + to_simple_string(getTransaction()->getCancellationTime());
+			case NO_SHOW: return statusText + " constatÃ©e le " + to_simple_string(getTransaction()->getCancellationTime());
 			}
 
 			return statusText;

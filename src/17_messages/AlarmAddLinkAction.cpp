@@ -98,7 +98,7 @@ namespace synthese
 			else
 			{
 				shared_ptr<const SentAlarm> sentAlarm = dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm);
-				MessagesLog::addUpdateEntry(sentAlarm.get(), "Ajout de destinataire à message diffusé " + _recipientKey + " #" + Conversion::ToString(_objectId), request.getUser().get());
+				MessagesLog::addUpdateEntry(sentAlarm.get(), "Ajout de destinataire Ã  message diffusÃ© " + _recipientKey + " #" + Conversion::ToString(_objectId), request.getUser().get());
 			}
 		}
 

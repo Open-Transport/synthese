@@ -61,7 +61,7 @@ namespace synthese
 		{
 			ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(_sessionIdToControl);
 			stream <<
-				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 				"<validSession xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/xml_session_is_valid_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" <<
 				" id=\"" << _sessionIdToControl << "\" valid=\"";
 			if(sit != ServerModule::getSessions().end())

@@ -34,42 +34,42 @@ namespace synthese
 		class ScenarioTemplate;
 		class Scenario;
 
-		/** Ecran d'édition de scénario de diffusion de message.
+		/** Ecran d'Ã©dition de scÃ©nario de diffusion de message.
 			@ingroup m17
 
 			@image html cap_admin_scenario.png
-			@image latex cap_admin_scenario.png "Maquette de l'écran d'édition de scénario" width=14cm
+			@image latex cap_admin_scenario.png "Maquette de l'Ã©cran d'Ã©dition de scÃ©nario" width=14cm
 
-			<i>Titre de la fenêtre</i> :
-				- SYNTHESE Admin - Messages - Bibliothèque - Scénarios - Interruption métro
+			<i>Titre de la fenÃªtre</i> :
+				- SYNTHESE Admin - Messages - BibliothÃ¨que - ScÃ©narios - Interruption mÃ©tro
 
 			<i>Barre de navigation</i> :
 				- Lien vers synthese::interfaces::AdminHome
 				- Lien vers synthese::interfaces::MessagesAdmin
 				- Lien vers synthese::interfaces::MessagesLibraryAdmin
-				- Texte <tt>Scénario</tt>
+				- Texte <tt>ScÃ©nario</tt>
 				- Texte [Nom]
 
-			<i>Zone de contenu</i> : <b>Formulaire d'édition</b> :
+			<i>Zone de contenu</i> : <b>Formulaire d'Ã©dition</b> :
 				-# <b>Edition du nom</b>
-					-# <tt>Nom</tt> : Champ texte permettant la saisie du nom du scénario
-					-# Bouton <tt>Modifier</tt> : Enregistre le changement du nom du scénario après avoir contrôlé que le nom proposé n'est pas déjà pris par un autre scénario. En ce cas, une boîte de dialogue apparaît indiquant "Le nom entré est déjà utilisé. Veuillez utiliser un autre nom".
-				-# <b>Liste de messages du scénario</b>
-					-# <tt>Sel</tt> : Permet la sélection du message en vue d'une duplication
-					-# <tt>Message</tt> : Texte rappelant le contenu du message. Un clic sur le texte se rend sur l'écran d'édition du message.
-					-# <tt>Emplacement</tt> : Texte rappelant l'emplacement de diffusion au niveau logique. Un clic sur le texte se rend sur l'écran d'édition de l'emplacement.
-					-# Bouton <tt>Ouvrir</tt> : Se rend vers l'écran d'édition du message sélectionné
-					-# Bouton <tt>Supprimer</tt> : Supprime le message du scénario après une demande de confirmation
-				-# Le <b>bouton Ajouter</b> permet l'ajout d'un nouveau message au scénario :
-					- si aucun message n'est sélectionné alors un message vide est ajouté
-					- si un message existant est sélectionné alors son contenu est copié dans le nouveau
+					-# <tt>Nom</tt> : Champ texte permettant la saisie du nom du scÃ©nario
+					-# Bouton <tt>Modifier</tt> : Enregistre le changement du nom du scÃ©nario aprÃ¨s avoir contrÃ´lÃ© que le nom proposÃ© n'est pas dÃ©jÃ  pris par un autre scÃ©nario. En ce cas, une boÃ®te de dialogue apparaÃ®t indiquant "Le nom entrÃ© est dÃ©jÃ  utilisÃ©. Veuillez utiliser un autre nom".
+				-# <b>Liste de messages du scÃ©nario</b>
+					-# <tt>Sel</tt> : Permet la sÃ©lection du message en vue d'une duplication
+					-# <tt>Message</tt> : Texte rappelant le contenu du message. Un clic sur le texte se rend sur l'Ã©cran d'Ã©dition du message.
+					-# <tt>Emplacement</tt> : Texte rappelant l'emplacement de diffusion au niveau logique. Un clic sur le texte se rend sur l'Ã©cran d'Ã©dition de l'emplacement.
+					-# Bouton <tt>Ouvrir</tt> : Se rend vers l'Ã©cran d'Ã©dition du message sÃ©lectionnÃ©
+					-# Bouton <tt>Supprimer</tt> : Supprime le message du scÃ©nario aprÃ¨s une demande de confirmation
+				-# Le <b>bouton Ajouter</b> permet l'ajout d'un nouveau message au scÃ©nario :
+					- si aucun message n'est sÃ©lectionnÃ© alors un message vide est ajoutÃ©
+					- si un message existant est sÃ©lectionnÃ© alors son contenu est copiÃ© dans le nouveau
 
-			<i>Sécurité</i>
-				- Une habilitation publique MessagesLibraryRight de niveau WRITE est nécessaire pour accéder à la page et y effectuer toutes les opérations disponibles.
+			<i>SÃ©curitÃ©</i>
+				- Une habilitation publique MessagesLibraryRight de niveau WRITE est nÃ©cessaire pour accÃ©der Ã  la page et y effectuer toutes les opÃ©rations disponibles.
 
-			<i>Journaux</i> : Les événements suivants entrainent la création d'une entrée dans le journal des messages MessagesLibraryLog :
-				- INFO : Ajout de message au scénario
-				- INFO : Suppression de message du scénario
+			<i>Journaux</i> : Les Ã©vÃ©nements suivants entrainent la crÃ©ation d'une entrÃ©e dans le journal des messages MessagesLibraryLog :
+				- INFO : Ajout de message au scÃ©nario
+				- INFO : Suppression de message du scÃ©nario
 
 		*/
 		class MessagesScenarioAdmin : public admin::AdminInterfaceElementTemplate<MessagesScenarioAdmin>

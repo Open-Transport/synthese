@@ -94,7 +94,7 @@ namespace synthese
 					Env env;
 					ScenarioTemplateInheritedTableSync::Search(env, folderId, _name, dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(), 0, 1);
 					if (!env.getRegistry<ScenarioTemplate>().empty())
-						throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
+						throw ActionException("Le nom spÃ©cifiÃ© est dÃ©jÃ  utilisÃ© par un autre scÃ©nario.");
 				}
 
 				if(_sscenario.get())
@@ -144,8 +144,8 @@ namespace synthese
 			}
 			if(_sscenario.get())
 			{
-				DBLogModule::appendToLogIfChange(text, "Affichage ", _sscenario->getIsEnabled() ? "activé" : "désactivé", _enabled ? "activé" : "désactivé");
-				DBLogModule::appendToLogIfChange(text, "Date de début", to_simple_string(_sscenario->getPeriodStart()), to_simple_string(_startDate));
+				DBLogModule::appendToLogIfChange(text, "Affichage ", _sscenario->getIsEnabled() ? "activÃ©" : "dÃ©sactivÃ©", _enabled ? "activÃ©" : "dÃ©sactivÃ©");
+				DBLogModule::appendToLogIfChange(text, "Date de dÃ©but", to_simple_string(_sscenario->getPeriodStart()), to_simple_string(_startDate));
 				DBLogModule::appendToLogIfChange(text, "Date de fin", to_simple_string(_sscenario->getPeriodEnd()), to_simple_string(_endDate));
 			}
 

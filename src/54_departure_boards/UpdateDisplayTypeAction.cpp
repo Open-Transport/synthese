@@ -114,19 +114,19 @@ namespace synthese
 				if (_name != _dt->getName())
 				{
 					if (_name.empty())
-						throw ActionException("Le nom ne peut être vide.");
+						throw ActionException("Le nom ne peut Ãªtre vide.");
 
 					Env env;
 					DisplayTypeTableSync::Search(env, _name, optional<RegistryKeyType>(), 0, 1);
 					if (!env.getRegistry<DisplayType>().empty())
-						throw ActionException("Un type portant le nom spécifié existe déjà. Veuillez utiliser un autre nom.");
+						throw ActionException("Un type portant le nom spÃ©cifiÃ© existe dÃ©jÃ . Veuillez utiliser un autre nom.");
 				}
 
 				// Rows number
 				_rows_number = map.get<int>(PARAMETER_ROWS_NUMBER);
 				if (_rows_number < 0)
 				{
-					throw ActionException("Un nombre positif de rangées doit être choisi");
+					throw ActionException("Un nombre positif de rangÃ©es doit Ãªtre choisi");
 				}
 
 				// Interface
@@ -204,14 +204,14 @@ namespace synthese
 				_max_stops_number = map.get<int>(PARAMETER_MAX_STOPS_NUMBER);
 				if (_max_stops_number < 0)
 				{
-					throw ActionException("Un nombre positif d'arrêts intermédiaires doit être choisi");
+					throw ActionException("Un nombre positif d'arrÃªts intermÃ©diaires doit Ãªtre choisi");
 				}
 
 				// Time between checks
 				_timeBetweenChecks = minutes(map.get<int>(PARAMETER_TIME_BETWEEN_CHECKS));
 				if (_timeBetweenChecks.minutes() < 0)
 				{
-					throw ActionException("La durée entre les tests de supervision doit être positive.");
+					throw ActionException("La durÃ©e entre les tests de supervision doit Ãªtre positive.");
 				}
 			}
 			catch(ObjectNotFoundException<Interface>& e)
@@ -229,8 +229,8 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(log, "Interface de supervision", (_dt->getMonitoringInterface() != NULL) ? _dt->getMonitoringInterface()->getName() : "(aucune)", (_interface.get() != NULL) ? _interface->getName() : "(aucune)");
 			DBLogModule::appendToLogIfChange(log, "Interface audio", (_dt->getAudioInterface() != NULL) ? _dt->getAudioInterface()->getName() : "(aucune)", (_interface.get() != NULL) ? _interface->getName() : "(aucune)");
 			DBLogModule::appendToLogIfChange(log, "Nombre de lignes", _dt->getRowNumber(), _rows_number);
-			DBLogModule::appendToLogIfChange(log, "Nombre d'arrêts intermédiaires", _dt->getMaxStopsNumber(), _max_stops_number);
-			DBLogModule::appendToLogIfChange(log, "Temps entre les contrôles de supervision", to_simple_string(_dt->getTimeBetweenChecks()), to_simple_string(_timeBetweenChecks));
+			DBLogModule::appendToLogIfChange(log, "Nombre d'arrÃªts intermÃ©diaires", _dt->getMaxStopsNumber(), _max_stops_number);
+			DBLogModule::appendToLogIfChange(log, "Temps entre les contrÃ´les de supervision", to_simple_string(_dt->getTimeBetweenChecks()), to_simple_string(_timeBetweenChecks));
 			DBLogModule::appendToLogIfChange(
 				log,
 				"Page CMS principale",
@@ -239,7 +239,7 @@ namespace synthese
 			);
 			DBLogModule::appendToLogIfChange(
 				log,
-				"Page CMS pour rangée",
+				"Page CMS pour rangÃ©e",
 				(_dt->getDisplayRowPage() != NULL) ? _dt->getDisplayRowPage()->getFullName() : "(aucune)",
 				(_displayRowPage.get() != NULL) ? _displayRowPage->getFullName() : "(aucune)"
 			);

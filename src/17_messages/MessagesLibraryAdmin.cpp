@@ -72,7 +72,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<MessagesLibraryAdmin>::ICON("package.png");
-		template<> const string AdminInterfaceElementTemplate<MessagesLibraryAdmin>::DEFAULT_TITLE("Bibliothèque de scénarios");
+		template<> const string AdminInterfaceElementTemplate<MessagesLibraryAdmin>::DEFAULT_TITLE("BibliothÃ¨que de scÃ©narios");
 	}
 
 	namespace messages
@@ -124,7 +124,7 @@ namespace synthese
 		) const {
 			if (_folder.get())
 			{
-				stream << "<h1>Répertoire</h1>";
+				stream << "<h1>RÃ©pertoire</h1>";
 
 				if(	_getEnv().getRegistry<ScenarioTemplate>().empty() &&
 					_getEnv().getRegistry<ScenarioFolder>().empty()
@@ -145,7 +145,7 @@ namespace synthese
 						HTMLModule::getLinkButton(
 							removeFolderRequest.getURL(),
 							"Supprimer",
-							"Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?",
+							"Etes-vous sÃ»r de vouloir supprimer le rÃ©pertoire "+ _folder->getName() +" ?",
 							"folder_delete.png"
 						) << "</p>"
 					;
@@ -158,7 +158,7 @@ namespace synthese
 				stream << t.open();
 				stream << t.cell("Nom", t.getForm().getTextInput(ScenarioFolderUpdateAction::PARAMETER_NAME, _folder->getName()));
 				stream << t.cell(
-					"Répertoire parent",
+					"RÃ©pertoire parent",
 					t.getForm().getSelectInput(
 						ScenarioFolderUpdateAction::PARAMETER_PARENT_FOLDER_ID,
 						MessagesModule::GetScenarioFoldersLabels(0,string(),_folder->getKey()),
@@ -167,7 +167,7 @@ namespace synthese
 				stream << t.close();
 			}
 
-			stream << "<h1>Scénarios</h1>";
+			stream << "<h1>ScÃ©narios</h1>";
 
 			// Requests
 			AdminFunctionRequest<MessagesLibraryAdmin> searchRequest(_request);
@@ -216,7 +216,7 @@ namespace synthese
 				stream << t3.row(Conversion::ToString(scenario->getKey()));
 				stream << t3.col() << scenario->getName();
 				stream << t3.col() << HTMLModule::getLinkButton(updateScenarioRequest.getURL(), "Ouvrir", string(), "cog_edit.png");
-				stream << t3.col() << HTMLModule::getLinkButton(deleteScenarioRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le scénario " + scenario->getName() + " ?", "cog_delete.png");
+				stream << t3.col() << HTMLModule::getLinkButton(deleteScenarioRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer le scÃ©nario " + scenario->getName() + " ?", "cog_delete.png");
 			}
 
 			stream << t3.row(string());
@@ -224,7 +224,7 @@ namespace synthese
 			stream << t3.col(2) << t3.getActionForm().getSubmitButton("Ajouter");
 			stream << t3.close();
 
-			stream << "<h1>Sous-répertoires</h1>";
+			stream << "<h1>Sous-rÃ©pertoires</h1>";
 
 			ScenarioFolderTableSync::SearchResult folders(
 				ScenarioFolderTableSync::Search(
@@ -234,7 +234,7 @@ namespace synthese
 
 			if(folders.empty())
 			{
-				stream << "<p>Aucun sous-répertoire.</p>";
+				stream << "<p>Aucun sous-rÃ©pertoire.</p>";
 			}
 			
 			AdminFunctionRequest<MessagesLibraryAdmin> goFolderRequest(_request);
@@ -259,7 +259,7 @@ namespace synthese
 			
 			stream << l.element("folder");
 			stream << f.getImageSubmitButton("add.png", "Ajouter");
-			stream << f.getTextInput(ScenarioFolderAdd::PARAMETER_NAME,"","(Entrez le nom du répertoire ici)");
+			stream << f.getTextInput(ScenarioFolderAdd::PARAMETER_NAME,"","(Entrez le nom du rÃ©pertoire ici)");
 			stream << l.close() << f.close();
 
 		}

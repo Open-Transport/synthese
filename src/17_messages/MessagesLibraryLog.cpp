@@ -124,7 +124,7 @@ namespace synthese
 
 		std::string MessagesLibraryLog::getName() const
 		{
-			return "Bibliothèque de messages";
+			return "BibliothÃ¨que de messages";
 		}
 
 		void MessagesLibraryLog::addDeleteEntry(
@@ -133,7 +133,7 @@ namespace synthese
 		){
 			DBLogEntry::Content content;
 			content.push_back(string());
-			content.push_back("Suppression du scénario " + scenario->getName());
+			content.push_back("Suppression du scÃ©nario " + scenario->getName());
 
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario->getKey());
 		}
@@ -147,8 +147,8 @@ namespace synthese
 			content.push_back(string());
 			stringstream text;
 			text
-				<< "Création du scénario " << scenario.getName()
-				<< " par copie du scénario " << scenarioTemplate.getName();
+				<< "CrÃ©ation du scÃ©nario " << scenario.getName()
+				<< " par copie du scÃ©nario " << scenarioTemplate.getName();
 			content.push_back(text.str());
 
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario.getKey());
@@ -161,7 +161,7 @@ namespace synthese
 			DBLogEntry::Content content;
 			content.push_back(string());
 			stringstream text;
-			text << "Création du scénario " << scenario.getName();
+			text << "CrÃ©ation du scÃ©nario " << scenario.getName();
 			content.push_back(text.str());
 
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario.getKey());
@@ -175,7 +175,7 @@ namespace synthese
 			DBLogEntry::Content content;
 			content.push_back(string());
 			stringstream text;
-			text << "Déclenchement du scénario (id=" << scenario.getKey() << ")";
+			text << "DÃ©clenchement du scÃ©nario (id=" << scenario.getKey() << ")";
 			content.push_back(text.str());
 
 			_addEntry(
@@ -197,7 +197,7 @@ namespace synthese
 			stringstream text;
 			text
 				<< "Suppression du message " << alarm->getShortMessage()
-				<< " du scénario " << alarm->getScenario()->getName();
+				<< " du scÃ©nario " << alarm->getScenario()->getName();
 			content.push_back(text.str());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
 		}
@@ -207,7 +207,7 @@ namespace synthese
 		void MessagesLibraryLog::AddDeleteEntry( const ScenarioFolder& folder , const security::User* user )
 		{
 			DBLog::ColumnsVector content;
-			content.push_back("Répertoire de scénarios");
+			content.push_back("RÃ©pertoire de scÃ©narios");
 			content.push_back("Suppression de "+ folder.getFullName());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, folder.getKey());
 		}
@@ -216,7 +216,7 @@ namespace synthese
 		void MessagesLibraryLog::AddTemplateDeleteEntry( const TextTemplate& text , const security::User* user )
 		{
 			DBLog::ColumnsVector content;
-			content.push_back("Modèle de texte " + string((text.getAlarmLevel() == ALARM_LEVEL_WARNING) ? "prioritaire" : "complémentaire"));
+			content.push_back("ModÃ¨le de texte " + string((text.getAlarmLevel() == ALARM_LEVEL_WARNING) ? "prioritaire" : "complÃ©mentaire"));
 			content.push_back("Suppression");
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
 		}
@@ -226,7 +226,7 @@ namespace synthese
 		void MessagesLibraryLog::AddTemplateUpdateEntry( const TextTemplate& text , const std::string& changes , const security::User* user )
 		{
 			DBLog::ColumnsVector content;
-			content.push_back("Modèle de texte " + string((text.getAlarmLevel() == ALARM_LEVEL_WARNING) ? "prioritaire" : "complémentaire"));
+			content.push_back("ModÃ¨le de texte " + string((text.getAlarmLevel() == ALARM_LEVEL_WARNING) ? "prioritaire" : "complÃ©mentaire"));
 			content.push_back("Modification : " + changes);
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
 		}
@@ -236,8 +236,8 @@ namespace synthese
 		void MessagesLibraryLog::AddTemplateCreationEntry( const TextTemplate& text , const security::User* user )
 		{
 			DBLog::ColumnsVector content;
-			content.push_back("Modèle de texte " + string((text.getAlarmLevel() == ALARM_LEVEL_WARNING) ? "prioritaire" : "complémentaire"));
-			content.push_back("Création");
+			content.push_back("ModÃ¨le de texte " + string((text.getAlarmLevel() == ALARM_LEVEL_WARNING) ? "prioritaire" : "complÃ©mentaire"));
+			content.push_back("CrÃ©ation");
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
 		}
 
@@ -246,7 +246,7 @@ namespace synthese
 		void MessagesLibraryLog::AddTemplateFolderUpdateEntry( const TextTemplate& text , const std::string& changes , const security::User* user )
 		{
 			DBLog::ColumnsVector content;
-			content.push_back("Répertoire de modèles de textes" + text.getName());
+			content.push_back("RÃ©pertoire de modÃ¨les de textes" + text.getName());
 			content.push_back("Modification : " + changes);
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, text.getKey());
 		}
@@ -256,8 +256,8 @@ namespace synthese
 		void MessagesLibraryLog::AddCreateEntry( const ScenarioFolder& folder , const security::User* user )
 		{
 			DBLog::ColumnsVector content;
-			content.push_back("Répertoire de scénarios");
-			content.push_back("Création");
+			content.push_back("RÃ©pertoire de scÃ©narios");
+			content.push_back("CrÃ©ation");
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, folder.getKey());
 		}
 	}

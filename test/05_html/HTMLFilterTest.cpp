@@ -26,73 +26,73 @@ BOOST_AUTO_TEST_CASE (testFiltering)
       out.push (sout);
 
       {
-	  out << "áàâ�" << std::flush;
+	  out << "Ã¡Ã Ã¢Ã" << std::flush;
 	  std::string expected ("&aacute;&agrave;&acirc;&auml;");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "�ä��" << std::flush;
+	  out << "ÃÃ¤ÃÃ" << std::flush;
 	  std::string expected ("&Aacute;&Agrave;&Auml;&Acirc;");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "é�êë" << std::flush;
+	  out << "Ã©ÃÃªÃ«" << std::flush;
 	  std::string expected ("&eacute;&egrave;&ecirc;&euml;");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "��æ�" << std::flush;
+	  out << "ÃÃÃ¦Ã" << std::flush;
 	  std::string expected ("&Eacute;&Egrave;&Ecirc;&Euml;");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "íìïî" << std::flush;
+	  out << "Ã­Ã¬Ã¯Ã®" << std::flush;
 	  std::string expected ("&iacute;&igrave;&iuml;&icirc;");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "�ü�ô" << std::flush;
+	  out << "ÃÃ¼ÃÃ´" << std::flush;
 	  std::string expected ("&Iacute;&Igrave;&Iuml;&Icirc;");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "óòö�" << std::flush;
+	  out << "Ã³Ã²Ã¶Ã" << std::flush;
 	  std::string expected ("&oacute;&ograve;&ouml;&ocirc;");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "����" << std::flush;
+	  out << "ÃÃÃÃ" << std::flush;
 	  std::string expected ("&Oacute;&Ograve;&Ouml;&Ocirc;");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "úù�û" << std::flush;
+	  out << "ÃºÃ¹ÃÃ»" << std::flush;
 	  std::string expected ("&uacute;&ugrave;&uuml;&ucirc;");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "è�ý�" << std::flush;
+	  out << "Ã¨ÃÃ½Ã" << std::flush;
 	  std::string expected ("&Uacute;&Ugrave;&Uuml;&Ucirc;");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "ç" << std::flush;
+	  out << "Ã§" << std::flush;
 	  std::string expected ("&ccedil;");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
       sout.str ("");
       {
-	  out << "�" << std::flush;
+	  out << "Ã" << std::flush;
 	  std::string expected ("&Ccedil;");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }

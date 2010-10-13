@@ -78,7 +78,7 @@ namespace synthese
 			// Log
 			DisplayMaintenanceLog::AddAdminEntry(*_cpu, *request.getUser(), "Statut en service", _cpu->getIsOnline() ? "OUI" : "NON", _isOnline ? "OUI" : "NON");
 			DisplayMaintenanceLog::AddAdminEntry(*_cpu, *request.getUser(), "Message de maintenance", _cpu->getMaintenanceMessage(), _maintenanceMessage);
-			DisplayMaintenanceLog::AddAdminEntry(*_cpu, *request.getUser(), "Délai de contact", to_simple_string(_cpu->getMonitoringDelay()), to_simple_string(_monitoringDelay));
+			DisplayMaintenanceLog::AddAdminEntry(*_cpu, *request.getUser(), "DÃ©lai de contact", to_simple_string(_cpu->getMonitoringDelay()), to_simple_string(_monitoringDelay));
 
 			// Action
 			_cpu->setIsOnline(_isOnline);
