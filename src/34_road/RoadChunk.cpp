@@ -125,7 +125,7 @@ namespace synthese
 			double metricOffset
 		) const	{
 			shared_ptr<LineString> geometry(getRealGeometry());
-			if(!geometry.get())
+			if(!geometry.get() || geometry->isEmpty())
 			{
 				return getFromVertex()->getGeometry();
 			}
