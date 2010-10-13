@@ -85,7 +85,7 @@ namespace synthese
 			posix_time::time_duration duration(
 				_duration ?
 				*_duration :
-				posix_time::seconds(distance > 0 ? ceil(60 * distance / accessParameters.getApproachSpeed()) : 1)
+				posix_time::seconds(distance > 0 ? ceil(distance / accessParameters.getApproachSpeed()) : 1)
 			);
 			if(servicePointer.getArrivalEdge() == NULL)
 			{

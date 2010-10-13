@@ -47,7 +47,7 @@ namespace synthese
 			std::string separator
 		):	Address(
 				chunk,
-				chunk.getMetricOffset() + chunk.getHouseNumberMetricOffset(houseNumber),
+				chunk.getHouseNumberMetricOffset(houseNumber),
 				houseNumber
 			), Registrable(0)
 		{

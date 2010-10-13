@@ -148,7 +148,7 @@ namespace synthese
 				return false;
 			}
 
-			if(houseNumber < _houseNumberBounds->first && houseNumber > _houseNumberBounds->second)
+			if(houseNumber < _houseNumberBounds->first || houseNumber > _houseNumberBounds->second)
 			{
 				return false;
 			}
