@@ -72,25 +72,24 @@ namespace synthese
 		) const	{
 			if(whatToSearch.find(RoadModule::GRAPH_ID) != whatToSearch.end())
 			{
+				assert(_roadChunk->getReverseChunk());
+
 				// Chunk linked with the house
 				result.insert(
 					_roadChunk->getFromVertex(),
 					VertexAccess(
-						seconds(_metricOffset / accessParameters.getApproachSpeed()),
+						seconds((_metricOffset - _roadChunk->getMetricOffset()) / accessParameters.getApproachSpeed()),
 						_metricOffset
 				)	);
 
 				// Reverse chunk
-					if(_roadChunk->getReverseChunk())
-				{
-					double distance(_roadChunk->getReverseChunk()->getMetricOffset() - _roadChunk->getEndMetricOffset() - _metricOffset);
-					result.insert(
-						_roadChunk->getReverseChunk()->getFromVertex(),
-						VertexAccess(
-							seconds(distance / accessParameters.getApproachSpeed()),
-							distance
-					)	);
-				}
+				double distance(_roadChunk->getEndMetricOffset() - _metricOffset);
+				result.insert(
+					_roadChunk->getReverseChunk()->getFromVertex(),
+					VertexAccess(
+						seconds(distance / accessParameters.getApproachSpeed()),
+						distance
+				)	);
 			}
 		}
 }	}

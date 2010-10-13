@@ -119,20 +119,6 @@ namespace synthese
 			virtual std::string getRuleUserName() const;
 			virtual bool isActive(const boost::gregorian::date& date) const;
 
-
-			/** Find closest address of this road, before a given metric offset.
-				@param metricOffset The reference point.
-				@return Closest address before reference, or 0 if none.
-			*/
-			const Address* findClosestAddressBefore (double metricOffset) const;
-
-
-			/** Find closest address of this road, after a given metric offset.
-				@param metricOffset The reference point.
-				@return Closest address after reference, or 0 if none.
-			*/
-			const Address* findClosestAddressAfter (double metricOffset) const;
-
 			bool isReversed() const;
 		//@}
 

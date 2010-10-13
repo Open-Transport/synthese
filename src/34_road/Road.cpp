@@ -99,41 +99,6 @@ namespace synthese
 
 
 
-		const Address* 
-		Road::findClosestAddressBefore (double metricOffset) const
-		{
-			const Address* address = 0;
-/*			for (Addresses::const_iterator it = getAddresses ().begin ();
-			 it != getAddresses ().end (); ++it)
-			{
-			if ( ((*it)->getMetricOffset () <= metricOffset) &&
-				 ( (address == 0) || ((*it)->getMetricOffset () > address->getMetricOffset ()) ) )
-			{
-				address = (*it);
-			}
-			}
-*/			return address;
-		}
-
-
-		const Address* 
-		Road::findClosestAddressAfter (double metricOffset) const
-		{
-			const Address* address = 0;
-/*			for (Addresses::const_iterator it = getAddresses ().begin ();
-			 it != getAddresses ().end (); ++it)
-			{
-			if ( ((*it)->getMetricOffset () >= metricOffset) &&
-				 ( (address == 0) || ((*it)->getMetricOffset () < address->getMetricOffset ()) ) )
-			{
-				address = (*it);
-			}
-			}
-*/			return address;
-		}
-
-
-
 		void Road::addRoadChunk(
 			RoadChunk& chunk
 		){
@@ -159,6 +124,7 @@ namespace synthese
 					}
 					_reverseRoad->addEdge(*reverseChunk);
 					chunk.setReverseRoadChunk(reverseChunk);
+					reverseChunk->setReverseRoadChunk(&chunk);
 				}
 				else
 				{
@@ -179,6 +145,7 @@ namespace synthese
 							chunk.getRankInPath() - lastEdge.getRankInPath()
 						);
 						chunk.setReverseRoadChunk(reverseChunk);
+						reverseChunk->setReverseRoadChunk(&chunk);
 					}
 					else
 					{
@@ -194,6 +161,7 @@ namespace synthese
 							*reverseChunk							
 						);
 						chunk.setReverseRoadChunk(reverseChunk);
+						reverseChunk->setReverseRoadChunk(&chunk);
 					}
 				}
 			}

@@ -60,6 +60,7 @@
 #include "SiteCityAddAction.hpp"
 #include "SiteObjectLinkRemoveAction.hpp"
 #include "RoadJourneyPlanner.h"
+#include "RoadModule.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/foreach.hpp>
@@ -84,7 +85,7 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace geography;
-	using namespace pt;
+	using namespace road;
 	using namespace cms;
 	using namespace road_journey_planner;
 		
@@ -409,8 +410,8 @@ namespace synthese
 				endDate += days(1);
 
 				// Route planning
-				const Place* startPlace(_site->fetchPlace(_startCity, _startPlace).get());
-				const Place* endPlace(_site->fetchPlace(_endCity, _endPlace).get());
+				RoadModule::ExtendedFetchPlaceResult startPlace(RoadModule::ExtendedFetchPlace(_site->getCitiesMatcher(), _startCity, _startPlace));
+				RoadModule::ExtendedFetchPlaceResult endPlace(RoadModule::ExtendedFetchPlace(_site->getCitiesMatcher(), _endCity, _endPlace));
 
 				stream << "<h1>Résultats</h1>";
 
@@ -419,8 +420,8 @@ namespace synthese
 				if(_pt_journey_planning)
 				{
 					PTTimeSlotRoutePlanner r(
-						startPlace,
-						endPlace,
+						startPlace.placeResult.value.get(),
+						endPlace.placeResult.value.get(),
 						_dateTime,
 						endDate,
 						_dateTime,
@@ -443,8 +444,8 @@ namespace synthese
 						1000
 					);
 					RoadJourneyPlanner r(
-						startPlace,
-						endPlace,
+						startPlace.placeResult.value.get(),
+						endPlace.placeResult.value.get(),
 						_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
 						_planningOrder == DEPARTURE_FIRST ? endDate : _dateTime,
 						_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
