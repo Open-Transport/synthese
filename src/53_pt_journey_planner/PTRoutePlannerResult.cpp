@@ -297,7 +297,8 @@ namespace synthese
 						minPos = ++pos;
 					}
 
-					if(	!dynamic_cast<const Crossing*>(leg.getArrivalEdge()->getHub()) ||
+					if(	!leg.getService()->getPath()->isPedestrianMode() ||
+						!(itl+1)->getService()->getPath()->isPedestrianMode() ||
 						itl+1 == jl.end()
 					){
 						PlacesList::iterator pos(
