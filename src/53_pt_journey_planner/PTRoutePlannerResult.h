@@ -448,6 +448,14 @@ namespace synthese
 				boost::optional<html::HTMLForm&> resaForm,
 				const std::string& resaRadioFieldName
 			) const;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Reads the named place from one of the 
+			static const geography::NamedPlace* GetNamedPlaceFromLegs(
+				const graph::ServicePointer* arrivalLeg,
+				const graph::ServicePointer* departureLeg,
+				const geography::NamedPlace* defaultValue
+			);
 		};
 	}
 }

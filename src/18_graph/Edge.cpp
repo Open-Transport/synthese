@@ -446,12 +446,19 @@ namespace synthese
 
 		Edge::MetricOffset Edge::getEndMetricOffset() const
 		{
+			Edge* nextEdge(getNextEdge());
+			return nextEdge ? nextEdge->getMetricOffset() : getMetricOffset();
+		}
+
+
+
+		Edge* Edge::getNextEdge() const
+		{
 			if(	!_parentPath ||
-				_parentPath->getLastEdge() == this ||
-				!_parentPath->getEdge(_rankInPath + 1)
+				_parentPath->getLastEdge() == this
 			){
-				return getMetricOffset();
+				return NULL;
 			}
-			return _parentPath->getEdge(_rankInPath + 1)->getMetricOffset();
+			return const_cast<Edge*>(_parentPath->getEdge(_rankInPath + 1));
 		}
 }	}

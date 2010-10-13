@@ -83,13 +83,16 @@ namespace synthese
 				)	);
 
 				// Reverse chunk
-				double distance(_roadChunk->getEndMetricOffset() - _metricOffset);
-				result.insert(
-					_roadChunk->getReverseChunk()->getFromVertex(),
-					VertexAccess(
-						seconds(distance / accessParameters.getApproachSpeed()),
-						distance
-				)	);
+				if(_roadChunk->getNextEdge())
+				{
+					double distance(_roadChunk->getEndMetricOffset() - _metricOffset);
+					result.insert(
+						static_cast<RoadChunk*>(_roadChunk->getNextEdge())->getReverseChunk()->getFromVertex(),
+						VertexAccess(
+							seconds(distance / accessParameters.getApproachSpeed()),
+							distance
+					)	);
+				}
 			}
 		}
 }	}
