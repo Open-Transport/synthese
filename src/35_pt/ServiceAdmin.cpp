@@ -186,12 +186,12 @@ namespace synthese
 				stream << "<h1>Horaires</h1>";
 				
 				HTMLTable::ColsVector vs;
-				vs.push_back("Arrêt");
+				vs.push_back("ArrÃªt");
 				vs.push_back("Quai");
-				vs.push_back("Arrivée");
-				vs.push_back("Arrivée");
-				vs.push_back("Départ");
-				vs.push_back("Départ");
+				vs.push_back("ArrivÃ©e");
+				vs.push_back("ArrivÃ©e");
+				vs.push_back("DÃ©part");
+				vs.push_back("DÃ©part");
 				vs.push_back("Retard");
 				vs.push_back("Changement de quai");
 				
@@ -288,7 +288,7 @@ namespace synthese
 					stream << ts.col();
 					HTMLForm f(scheduleUpdateRequest.getHTMLForm("delay"+lexical_cast<string>(lineStop.getRankInPath())));
 					stream << f.open();
-					stream << "Durée : " << f.getSelectNumberInput(ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES, 0, 500);
+					stream << "DurÃ©e : " << f.getSelectNumberInput(ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES, 0, 500);
 					stream << "Propager : " << f.getOuiNonRadioInput(ScheduleRealTimeUpdateAction::PARAMETER_PROPAGATE_CONSTANTLY, true);
 					stream << f.getSubmitButton("OK");
 					stream << f.close();
@@ -307,8 +307,8 @@ namespace synthese
 
 				stream << ts.close();
 
-				stream << "<h1>Informations temps réel</h1>";
-				stream << "<p>Information temps réel valables jusqu'à : " << posix_time::to_simple_string(_service->getNextRTUpdate()) << "</p>";
+				stream << "<h1>Informations temps rÃ©el</h1>";
+				stream << "<p>Information temps rÃ©el valables jusqu'Ã  : " << posix_time::to_simple_string(_service->getNextRTUpdate()) << "</p>";
 
 				if(_continuousService.get())
 				{
@@ -320,7 +320,7 @@ namespace synthese
 					PropertiesHTMLTable t(updateRequest.getHTMLForm());
 					stream << t.open();
 					stream << t.cell("Attente maximale (minutes)", t.getForm().getTextInput(ContinuousServiceUpdateAction::PARAMETER_WAITING_DURATION, lexical_cast<string>(_continuousService->getMaxWaitingTime().total_seconds() / 60)));
-					stream << t.cell("Fin de période", t.getForm().getTextInput(ContinuousServiceUpdateAction::PARAMETER_END_TIME, lexical_cast<string>(_continuousService->getDepartureEndScheduleToIndex(false, 0))));
+					stream << t.cell("Fin de pÃ©riode", t.getForm().getTextInput(ContinuousServiceUpdateAction::PARAMETER_END_TIME, lexical_cast<string>(_continuousService->getDepartureEndScheduleToIndex(false, 0))));
 					stream << t.close();
 				}
 			}
@@ -336,10 +336,10 @@ namespace synthese
 				updateRequest.getAction()->setService(const_pointer_cast<SchedulesBasedService>(_service));
 				PropertiesHTMLTable p(updateRequest.getHTMLForm("applycalendar"));
 				stream << p.open();
-				stream << p.cell("Date début", p.getForm().getCalendarInput(ServiceApplyCalendarAction::PARAMETER_START_DATE, now));
+				stream << p.cell("Date dÃ©but", p.getForm().getCalendarInput(ServiceApplyCalendarAction::PARAMETER_START_DATE, now));
 				stream << p.cell("Date fin", p.getForm().getCalendarInput(ServiceApplyCalendarAction::PARAMETER_END_DATE, now));
-				stream << p.cell("Période", p.getForm().getTextInput(ServiceApplyCalendarAction::PARAMETER_PERIOD, "1", string(), AdminModule::CSS_2DIGIT_INPUT));
-				stream << p.cell("Modèle", p.getForm().getSelectInput(
+				stream << p.cell("PÃ©riode", p.getForm().getTextInput(ServiceApplyCalendarAction::PARAMETER_PERIOD, "1", string(), AdminModule::CSS_2DIGIT_INPUT));
+				stream << p.cell("ModÃ¨le", p.getForm().getSelectInput(
 						ServiceApplyCalendarAction::PARAMETER_CALENDAR_TEMPLATE_ID,
 						CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
 						optional<RegistryKeyType>(0)
@@ -347,7 +347,7 @@ namespace synthese
 				stream << p.cell("Ajout", p.getForm().getOuiNonRadioInput(ServiceApplyCalendarAction::PARAMETER_ADD, true));
 				stream << p.close();
 
-				stream << "<h1>Résultat</h1>";
+				stream << "<h1>RÃ©sultat</h1>";
 				AdminActionFunctionRequest<ServiceDateChangeAction,ServiceAdmin> updateDateRequest(request);
 				updateDateRequest.getAction()->setService(const_pointer_cast<SchedulesBasedService>(_service));
 				CalendarHTMLViewer<AdminActionFunctionRequest<ServiceDateChangeAction,ServiceAdmin> > cv(*_service, &updateDateRequest);
@@ -360,13 +360,13 @@ namespace synthese
 			// TAB PROPERTIES
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 				AdminActionFunctionRequest<ServiceUpdateAction,ServiceAdmin> updateRequest(request);
 				updateRequest.getAction()->setService(const_pointer_cast<Service>(static_pointer_cast<const Service>(_service)));
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
-				stream << t.cell("Numéro", t.getForm().getTextInput(ServiceUpdateAction::PARAMETER_SERVICE_NUMBER, _service->getServiceNumber()));
+				stream << t.cell("NumÃ©ro", t.getForm().getTextInput(ServiceUpdateAction::PARAMETER_SERVICE_NUMBER, _service->getServiceNumber()));
 				if(_scheduledService.get())
 				{
 					stream << t.cell("Equipe", t.getForm().getTextInput(ServiceUpdateAction::PARAMETER_TEAM_NUMBER, _scheduledService->getTeam()));
@@ -406,7 +406,7 @@ namespace synthese
 
 			_tabs.push_back(Tab("Calendrier", TAB_CALENDAR, true, "calendar.png"));
 
-			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true, "application_form.png"));
+			_tabs.push_back(Tab("PropriÃ©tÃ©s", TAB_PROPERTIES, true, "application_form.png"));
 			
 			_tabBuilded = true;
 		}

@@ -68,24 +68,24 @@ namespace synthese
 		/** Terminal d'affichage.
 			@ingroup m54
 
-			Un terminal d'affichage est un dispositif matériel dédié à l'affichage non interactif d'informations provenant de SYNTHESE (exemple: tableau de départs).
-			Un terminal d'affichage est relié à un emplacement (exemple : arrêt logique).
-			On considère par hypothèse que l'arrêt logique lié correspond à la fois à l'emplacement du panneau et à la définition première de ce qui y est affiché.
-			L'emplacement est précisé par un champ texte ("tableau de départ situé au-dessus de l'escalier nord") ainsi que des coordonnées géographiques permettant de le situer sur une carte (ces données sont facultatives et ne servent qu'à désigner le terminal dans le cadre d'un composant d'administration par exemple).
-			A un terminal d'affichage sont reliés des clauses visant à définir le contenu qui y est diffusé ainsi que le format du contenu (protocole, charte graphique, etc...) :
+			Un terminal d'affichage est un dispositif matÃ©riel dÃ©diÃ© Ã  l'affichage non interactif d'informations provenant de SYNTHESE (exemple: tableau de dÃ©parts).
+			Un terminal d'affichage est reliÃ© Ã  un emplacement (exemple : arrÃªt logique).
+			On considÃ¨re par hypothÃ¨se que l'arrÃªt logique liÃ© correspond Ã  la fois Ã  l'emplacement du panneau et Ã  la dÃ©finition premiÃ¨re de ce qui y est affichÃ©.
+			L'emplacement est prÃ©cisÃ© par un champ texte ("tableau de dÃ©part situÃ© au-dessus de l'escalier nord") ainsi que des coordonnÃ©es gÃ©ographiques permettant de le situer sur une carte (ces donnÃ©es sont facultatives et ne servent qu'Ã  dÃ©signer le terminal dans le cadre d'un composant d'administration par exemple).
+			A un terminal d'affichage sont reliÃ©s des clauses visant Ã  dÃ©finir le contenu qui y est diffusÃ© ainsi que le format du contenu (protocole, charte graphique, etc...) :
 				- Nature de l'affichage (fonction SYNTHESE) :
-						- Tableau de départ chronologique
-						- Tableau de départ à destination privilégiée
-						- Tableau d'arrivée chronologique
-						- Tableau d'arrivée à provenance privilégiée
-				- Format de sortie (défini par l'interface utilisée)
-				- Paramétrage du contenu généré par la fonction : 
+						- Tableau de dÃ©part chronologique
+						- Tableau de dÃ©part Ã  destination privilÃ©giÃ©e
+						- Tableau d'arrivÃ©e chronologique
+						- Tableau d'arrivÃ©e Ã  provenance privilÃ©giÃ©e
+				- Format de sortie (dÃ©fini par l'interface utilisÃ©e)
+				- ParamÃ©trage du contenu gÃ©nÃ©rÃ© par la fonction : 
 						- Titre
-						- Nombre de départs ou d'arrivées
-						- Filtre de terminus (sert à n'afficher que les lignes ayant pour origine le lieu affiché)
-						- Filtre d'arrêt(s) physique(s)
-						- Liste des points de passage à afficher
-						- Autres paramètres (liste complète : voir IHM)
+						- Nombre de dÃ©parts ou d'arrivÃ©es
+						- Filtre de terminus (sert Ã  n'afficher que les lignes ayant pour origine le lieu affichÃ©)
+						- Filtre d'arrÃªt(s) physique(s)
+						- Liste des points de passage Ã  afficher
+						- Autres paramÃ¨tres (liste complÃ¨te : voir IHM)
 
 		*/
 		class DisplayScreen:
@@ -134,7 +134,7 @@ namespace synthese
 			//! \name Content
 			//@{
 				const pt::StopArea*			_displayedPlace;		//!< Place where the services must depart or arrive
-				ArrivalDepartureTableGenerator::PhysicalStops	_physicalStops;				//!< Quai(s) affichés
+				ArrivalDepartureTableGenerator::PhysicalStops	_physicalStops;				//!< Quai(s) affichÃ©s
 				bool						_allPhysicalStopsDisplayed;
 				ForbiddenPlacesList			_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
 				LineFilter					_forbiddenLines;
@@ -149,8 +149,8 @@ namespace synthese
 			//!	\name Preselection
 			//@{
 				GenerationMethod			_generationMethod;
-				DisplayedPlacesList			_forcedDestinations;	//!< Destinations à afficher absolument
-				int							_destinationForceDelay;	//!< Durée pendant laquelle une destination est forcée
+				DisplayedPlacesList			_forcedDestinations;	//!< Destinations Ã  afficher absolument
+				int							_destinationForceDelay;	//!< DurÃ©e pendant laquelle une destination est forcÃ©e
 			
 			//@}
 

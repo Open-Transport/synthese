@@ -313,10 +313,10 @@ namespace synthese
 		{
 			switch(type)
 			{
-			case RESERVATION_RULE_FORBIDDEN: return "Réservation impossible";
-			case RESERVATION_RULE_COMPULSORY: return "Réservation obligatoire";
-			case RESERVATION_RULE_OPTIONAL: return "Réservation possible";
-			case RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE: return "Réservation possible, obligatoire au départ de certains arrêts";
+			case RESERVATION_RULE_FORBIDDEN: return "RÃ©servation impossible";
+			case RESERVATION_RULE_COMPULSORY: return "RÃ©servation obligatoire";
+			case RESERVATION_RULE_OPTIONAL: return "RÃ©servation possible";
+			case RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE: return "RÃ©servation possible, obligatoire au dÃ©part de certains arrÃªts";
 			}
 			assert(false);
 			return string();

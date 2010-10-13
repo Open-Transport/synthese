@@ -37,22 +37,22 @@ namespace synthese
 			@date 2009
 			@ingroup m15Functions refFunctions
 
-			<h3>Requête</h3>
+			<h3>RequÃªte</h3>
 
 			<pre>
 			fonction=XMLSessionIsValidFunction
-			si=<numéro de session>
+			si=<numÃ©ro de session>
 			</pre>
 			
-			<h3>Réponse</h3>
+			<h3>RÃ©ponse</h3>
 
 			@image html xml_valid_session.png
 
-			La réponse indique si le numéro de session correspond à une session valide ou non, sans donner plus d’informations.
-			Le retour XML est réduit au minimum.
+			La rÃ©ponse indique si le numÃ©ro de session correspond Ã  une session valide ou non, sans donner plus dâ€™informations.
+			Le retour XML est rÃ©duit au minimum.
 			<ul>
-			<li>id : identificateur de la session demandée pour contrôle</li>
-			<li>valid : indique si la session peut être utilisée dans un délai d’une minute après la requête</li>
+			<li>id : identificateur de la session demandÃ©e pour contrÃ´le</li>
+			<li>valid : indique si la session peut Ãªtre utilisÃ©e dans un dÃ©lai dâ€™une minute aprÃ¨s la requÃªte</li>
 			</ul>
 
 			<h3>Attachments</h3>

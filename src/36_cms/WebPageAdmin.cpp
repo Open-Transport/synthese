@@ -149,7 +149,7 @@ namespace synthese
 					stream << t.open();
 					stream << t.cell("Titre", t.getForm().getTextInput(WebPageContentUpdateAction::PARAMETER_TITLE, _page->getName()));
 					stream << t.cell("Contenu", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_CONTENT1, _page->getContent(), 15, 60));
-					stream << t.cell("Résumé", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_ABSTRACT, _page->getAbstract(), 5, 60));
+					stream << t.cell("RÃ©sumÃ©", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_ABSTRACT, _page->getAbstract(), 5, 60));
 					stream << t.cell("Image", t.getForm().getTextInput(WebPageContentUpdateAction::PARAMETER_IMAGE, _page->getImage()));
 					stream << t.close();
 				}
@@ -159,7 +159,7 @@ namespace synthese
 			// TAB TREE
 			if (openTabContent(stream, TAB_TREE))
 			{
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 				{
 					AdminActionFunctionRequest<WebPageUpdateAction, WebPageAdmin> updateRequest(request);
@@ -167,21 +167,21 @@ namespace synthese
 					PropertiesHTMLTable t(updateRequest.getHTMLForm());
 					stream << t.open();
 					stream << t.cell("ID", lexical_cast<string>(_page->getKey()));
-					stream << t.cell("Modèle (défaut : modèle du site)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TEMPLATE_ID, _page->_getTemplate() ? lexical_cast<string>(_page->_getTemplate()->getKey()) : "0"));
-					stream << t.cell("Ne pas utiliser le modèle", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE, _page->getDoNotUseTemplate()));
+					stream << t.cell("ModÃ¨le (dÃ©faut : modÃ¨le du site)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TEMPLATE_ID, _page->_getTemplate() ? lexical_cast<string>(_page->_getTemplate()->getKey()) : "0"));
+					stream << t.cell("Ne pas utiliser le modÃ¨le", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE, _page->getDoNotUseTemplate()));
 					stream << t.cell("Inclure forum", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_HAS_FORUM, _page->getHasForum()));
-					stream << t.cell("Type MIME (défaut : text/html)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->_getMimeType()));
-					stream << t.cell("Début publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_START_DATE, _page->getStartDate()));
+					stream << t.cell("Type MIME (dÃ©faut : text/html)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->_getMimeType()));
+					stream << t.cell("DÃ©but publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_START_DATE, _page->getStartDate()));
 					stream << t.cell("Fin publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_END_DATE, _page->getEndDate()));
 					stream << t.cell(
-						"Page supérieure",
+						"Page supÃ©rieure",
 						t.getForm().getSelectInput(
 							WebPageUpdateAction::PARAMETER_UP_ID,
 							WebPageTableSync::GetPagesList(_page->getRoot()->getKey(), "(racine)"),
 							optional<RegistryKeyType>(_page->getParent() ? _page->getParent()->getKey() : 0)
 					)	);
 					stream << t.cell("Chemin URL (facultatif)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_SMART_URL_PATH, _page->getSmartURLPath()));
-					stream << t.cell("Champ par défaut paramètre (facultatif)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_SMART_URL_DEFAULT_PARAMETER_NAME, _page->getSmartURLDefaultParameterName()));
+					stream << t.cell("Champ par dÃ©faut paramÃ¨tre (facultatif)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_SMART_URL_DEFAULT_PARAMETER_NAME, _page->getSmartURLDefaultParameterName()));
 					stream << t.close();
 				}
 
@@ -231,11 +231,11 @@ namespace synthese
 					stream << t.col() << link->getKey();
 					stream << t.col() << link->getName();
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), ICON);
-					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le lien ?", "page_delete.png");
+					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer le lien ?", "page_delete.png");
 				}
 
 				stream << t.row();
-				stream << t.col() << f.getTextInput(WebPageLinkAddAction::PARAMETER_DESTINATION_ID, string(), "(id page à lier)");
+				stream << t.col() << f.getTextInput(WebPageLinkAddAction::PARAMETER_DESTINATION_ID, string(), "(id page Ã  lier)");
 				stream << t.col();
 				stream << t.col(2) << f.getSubmitButton("Ajouter");
 
@@ -394,7 +394,7 @@ namespace synthese
 				stream << t.col();
 				if(result.empty())
 				{
-					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la page "+ page->getName() +" ?", "page_delete.png");
+					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer la page "+ page->getName() +" ?", "page_delete.png");
 				}
 
 				_displaySubPages(stream, result, deleteRequest, moveRequest, request, t, f, depth+1);
@@ -441,7 +441,7 @@ namespace synthese
 			stream << t.col() << f.getRadioInput(WebPageAddAction::PARAMETER_TEMPLATE_ID, optional<RegistryKeyType>(),optional<RegistryKeyType>(),string(), false);
 			stream << t.col(3) << result.size();
 			stream << t.col() << f.getTextInput(WebPageAddAction::PARAMETER_TITLE, string(), "(Entrez le titre ici)");
-			stream << t.col(3) << f.getSubmitButton("Créer");
+			stream << t.col(3) << f.getSubmitButton("CrÃ©er");
 			stream << t.close();
 			stream << f.close();
 		}

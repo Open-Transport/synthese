@@ -34,12 +34,12 @@ namespace synthese
 		/** Habilitation portant sur la gestion des journaux.
 			@ingroup m13Rights refRights
 
-			Les niveaux de droit utilisés sont les suivants :
+			Les niveaux de droit utilisÃ©s sont les suivants :
 				- READ : Permet de consulter un journal
 				- DELETE : Permet de purger un journal
 
-			Définition du périmètre :
-				- NB : Le périmètre n'est pas défini par l'habilitation DBLogRight qui porte sur le principe même d'accéder aux journaux. Chaque journal fait à son tour l'objet d'un contrôle de droits le plus souvent basé sur les habilitations du module auquel ils appartiennent. Voir la documentation de chaque journal.
+			DÃ©finition du pÃ©rimÃ¨tre :
+				- NB : Le pÃ©rimÃ¨tre n'est pas dÃ©fini par l'habilitation DBLogRight qui porte sur le principe mÃªme d'accÃ©der aux journaux. Chaque journal fait Ã  son tour l'objet d'un contrÃ´le de droits le plus souvent basÃ© sur les habilitations du module auquel ils appartiennent. Voir la documentation de chaque journal.
 		*/
 		class DBLogRight : public security::RightTemplate<DBLogRight>
 		{

@@ -54,13 +54,13 @@ namespace synthese
 		/// Composant d'administration.
 		///	@ingroup m14
 		///	
-		///	Un composant d'administration est un formulaire paramétrable, destiné à effectuer une écriture en temps réel dans la base SYNTHESE, dans un but de paramétrage de l'application (il ne s'agit pas du seul moyen d'écriture).
-		///	Une même donnée peut être mise à jour par autant de composants que nécessaire, défini avant tout sur la base d'une ergonomie de qualité.
-		///	Chaque composant est rattaché au module correspondant aux données à modifier sous forme d'une sous-classe de AdminInterfaceElement. 
-		///	Le comportement des composants d'administration est en général défini d'après les @ref defRight "habilitations" de l'utilisateur connecté.
+		///	Un composant d'administration est un formulaire paramÃ©trable, destinÃ© Ã  effectuer une Ã©criture en temps rÃ©el dans la base SYNTHESE, dans un but de paramÃ©trage de l'application (il ne s'agit pas du seul moyen d'Ã©criture).
+		///	Une mÃªme donnÃ©e peut Ãªtre mise Ã  jour par autant de composants que nÃ©cessaire, dÃ©fini avant tout sur la base d'une ergonomie de qualitÃ©.
+		///	Chaque composant est rattachÃ© au module correspondant aux donnÃ©es Ã  modifier sous forme d'une sous-classe de AdminInterfaceElement. 
+		///	Le comportement des composants d'administration est en gÃ©nÃ©ral dÃ©fini d'aprÃ¨s les @ref defRight "habilitations" de l'utilisateur connectÃ©.
 		///	Par exemple :
-		///		- un utilisateur anonyme n'a accès à aucun composant d'administration
-		///		- un administrateur a accès à tous les composants d'administration.
+		///		- un utilisateur anonyme n'a accÃ¨s Ã  aucun composant d'administration
+		///		- un administrateur a accÃ¨s Ã  tous les composants d'administration.
 		////////////////////////////////////////////////////////////////////
 		class AdminInterfaceElement:
 			public util::FactoryBase<AdminInterfaceElement>

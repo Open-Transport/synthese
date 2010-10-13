@@ -29,16 +29,16 @@ namespace synthese
 {
 	namespace messages
 	{
-		/** Habilitation portant sur la bibliothèque de messages et de scénarios de diffusion.
+		/** Habilitation portant sur la bibliothÃ¨que de messages et de scÃ©narios de diffusion.
 			@ingroup m17
 
-			Les niveaux de droit public utilisés sont les suivants :
-				- WRITE : Permet de créer, modifier des modèles de messages et des scénarios de diffusion
-				- DELETE : Permet de supprimer des modèles de messages et des scénarios de diffusion
+			Les niveaux de droit public utilisÃ©s sont les suivants :
+				- WRITE : Permet de crÃ©er, modifier des modÃ¨les de messages et des scÃ©narios de diffusion
+				- DELETE : Permet de supprimer des modÃ¨les de messages et des scÃ©narios de diffusion
 			
-			Aucun niveau de droit privé n'est utilisé pour cette habilitation.
+			Aucun niveau de droit privÃ© n'est utilisÃ© pour cette habilitation.
 
-			Cette habilitation ne peut être paramétrée
+			Cette habilitation ne peut Ãªtre paramÃ©trÃ©e
 
 		*/
 		class MessagesLibraryRight : public security::RightTemplate<MessagesLibraryRight>

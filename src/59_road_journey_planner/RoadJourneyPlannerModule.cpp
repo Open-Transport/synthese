@@ -42,7 +42,7 @@ namespace synthese
 
 	namespace server
 	{
-		template<> const string ModuleClassTemplate<RoadJourneyPlannerModule>::NAME("Calcul d'itinéraires routier");
+		template<> const string ModuleClassTemplate<RoadJourneyPlannerModule>::NAME("Calcul d'itinÃ©raires routier");
 
 		template<> void ModuleClassTemplate<RoadJourneyPlannerModule>::PreInit()
 		{

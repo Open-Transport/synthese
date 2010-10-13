@@ -32,12 +32,12 @@ namespace synthese
 	namespace timetables
 	{
 		/** TimetableWarning class.
-			Renvoi d'indicateur papier, caractérisée par:
-				- un numéro
-				- un libellé
+			Renvoi d'indicateur papier, caractÃ©risÃ©e par:
+				- un numÃ©ro
+				- un libellÃ©
 				- un code de jour de circulation
 
-			Le libellé est claculé en fonction du JC du renvoi, et de celui de la page d'indicateur (différence).
+			Le libellÃ© est claculÃ© en fonction du JC du renvoi, et de celui de la page d'indicateur (diffÃ©rence).
 			@author Hugues Romain
 			@date 2001
 			@ingroup m55

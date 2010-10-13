@@ -39,16 +39,16 @@ namespace synthese
 			@ingroup m54Admin refAdmin
 
 			@image html cap_admin_display_types.png
-			@image latex cap_admin_display_types.png "Ecran d'édition des types d'affichage" width=14cm
+			@image latex cap_admin_display_types.png "Ecran d'Ã©dition des types d'affichage" width=14cm
 
-			<i>Titre de la fenêtre</i> : SYNTHESE Admin - Benchmark
+			<i>Titre de la fenÃªtre</i> : SYNTHESE Admin - Benchmark
 
 			<i>Barre de navigation</i> :
 
 			<i>Zone de contenus</i> :
 						
-			<i>Sécurité</i> :
-				- Une habilitation publique ArrivalDepartureTableRight de niveau DELETE sur le périmètre "tout" est nécessaire pour accéder à la page.
+			<i>SÃ©curitÃ©</i> :
+				- Une habilitation publique ArrivalDepartureTableRight de niveau DELETE sur le pÃ©rimÃ¨tre "tout" est nÃ©cessaire pour accÃ©der Ã  la page.
 				
 			<i>Journal</i> : 
 		*/

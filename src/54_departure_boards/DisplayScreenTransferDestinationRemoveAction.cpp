@@ -105,7 +105,7 @@ namespace synthese
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
-				"Retrait de destination avec correspondance : "+ _destinationPlace->getFullName() + " à "+ _transferPlace->getFullName(),
+				"Retrait de destination avec correspondance : "+ _destinationPlace->getFullName() + " Ã  "+ _transferPlace->getFullName(),
 				*request.getUser()
 			);
 		}

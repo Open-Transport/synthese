@@ -110,8 +110,8 @@ namespace synthese
 		DBLog::ColumnsVector resa::ResaDBLog::getColumnNames() const
 		{
 			DBLog::ColumnsVector v;
-			v.push_back("Evénement");
-			v.push_back("Evénement");
+			v.push_back("EvÃ©nement");
+			v.push_back("EvÃ©nement");
 			v.push_back("Description");
 			v.push_back("Action");
 			return v;
@@ -126,7 +126,7 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(RESERVATION_ENTRY));
 			content.push_back(to_iso_extended_string(r1->getDepartureTime().date()) +" "+to_simple_string(r1->getDepartureTime().time_of_day()));
-			content.push_back("Réservation");
+			content.push_back("RÃ©servation");
 			content.push_back(lexical_cast<string>(transaction.getKey()));
 
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session->getUser().get(), transaction.getCustomerUserId(), callId);
@@ -141,7 +141,7 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(CALL_ENTRY));
 			content.push_back(string());
-			content.push_back("Réception d'appel");
+			content.push_back("RÃ©ception d'appel");
 			content.push_back(string());
 
 			return _addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, 0);
@@ -199,7 +199,7 @@ namespace synthese
 
 			case TO_BE_DONE:
 				type = ResaDBLog::DELAYED_CANCELLATION_ENTRY;
-				description = "Annulation hors délai";
+				description = "Annulation hors dÃ©lai";
 				level = DBLogEntry::DB_LOG_WARNING;
 				break;
 
@@ -236,7 +236,7 @@ namespace synthese
 			{
 				ColumnsVector cv;
 				cv.push_back(GetIcon(OTHER));
-				cv.push_back("Données incomplètes");
+				cv.push_back("DonnÃ©es incomplÃ¨tes");
 				stringstream s;
 				BOOST_FOREACH(const string& col, content)
 				{
@@ -284,7 +284,7 @@ namespace synthese
 						try
 						{
 							ptime d(time_from_string(content[ResaDBLog::COL_DATE2]));
-							stream << "Jusqu'à " << d << " (" << (d - entry.getDate()).total_seconds() << " s)";
+							stream << "Jusqu'Ã  " << d << " (" << (d - entry.getDate()).total_seconds() << " s)";
 						}
 						catch(...)
 						{
@@ -296,7 +296,7 @@ namespace synthese
 					if(tr.get())
 					{
 						ResaModule::DisplayReservations(stream, *tr);
-						stream << "<br />Statut actuel de la réservation : " << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), tr->getFullStatusText()) << " " << tr->getFullStatusText();
+						stream << "<br />Statut actuel de la rÃ©servation : " << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), tr->getFullStatusText()) << " " << tr->getFullStatusText();
 					}
 
 					break;
@@ -338,7 +338,7 @@ namespace synthese
 						stream << HTMLModule::getLinkButton(
 							cancelRequest.getURL(),
 							"Annuler",
-							"Etes-vous sûr de vouloir annuler la réservation ?",
+							"Etes-vous sÃ»r de vouloir annuler la rÃ©servation ?",
 							ResaModule::GetStatusIcon(CANCELLED)
 						);
 						break;
@@ -346,8 +346,8 @@ namespace synthese
 					case TO_BE_DONE:
 						stream << HTMLModule::getLinkButton(
 							cancelRequest.getURL(),
-							"Annuler hors délai",
-							"Etes-vous sûr de vouloir annuler la réservation (hors délai) ?",
+							"Annuler hors dÃ©lai",
+							"Etes-vous sÃ»r de vouloir annuler la rÃ©servation (hors dÃ©lai) ?",
 							ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY)
 						);
 						break;
@@ -356,7 +356,7 @@ namespace synthese
 						stream << HTMLModule::getLinkButton(
 							cancelRequest.getURL(),
 							"Noter absence",
-							"Etes-vous sûr de noter l'absence du client à l'arrêt ?",
+							"Etes-vous sÃ»r de noter l'absence du client Ã  l'arrÃªt ?",
 							ResaModule::GetStatusIcon(NO_SHOW)
 						);
 						break;
@@ -492,28 +492,28 @@ namespace synthese
 				return "Appel";
 
 			case ResaDBLog::RESERVATION_ENTRY:
-				return "Réservation";
+				return "RÃ©servation";
 
 			case ResaDBLog::CANCELLATION_ENTRY:
-				return "Annulation de réservation";
+				return "Annulation de rÃ©servation";
 
 			case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
-				return "Annulation de réservation hors délai";
+				return "Annulation de rÃ©servation hors dÃ©lai";
 
 			case ResaDBLog::NO_SHOW_ENTRY:
 				return "Absence";
 
 			case ResaDBLog::CUSTOMER_COMMENT_ENTRY:
-				return "Réclamation";
+				return "RÃ©clamation";
 
 			case ResaDBLog::INFORMATION_ENTRY:
 				return "Information";
 
 			case ResaDBLog::REDIRECTION_ENTRY:
-				return "Redirection vers ligne régulière";
+				return "Redirection vers ligne rÃ©guliÃ¨re";
 
 			case ResaDBLog::RESERVATIONS_READ_ENTRY:
-				return "Lecture liste de réservations";
+				return "Lecture liste de rÃ©servations";
 
 			case ResaDBLog::TECHNICAL_SUPPORT_ENTRY:
 				return "Support technique";
@@ -531,13 +531,13 @@ namespace synthese
 				return "Appel sortant";
 
 			case ResaDBLog::AUTORESA_ACTIVATION:
-				return "Activation auto réservation";
+				return "Activation auto rÃ©servation";
 
 			case ResaDBLog::AUTORESA_DEACTIVATION:
-				return "Desactivation auto réservation";
+				return "Desactivation auto rÃ©servation";
 
 			case ResaDBLog::CUSTOMER_CREATION_ENTRY:
-				return "Création du client";
+				return "CrÃ©ation du client";
 
 			case ResaDBLog::PASSWORD_UPDATE:
 				return "Changement de mot de passe";
@@ -640,7 +640,7 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(lexical_cast<string>(PASSWORD_UPDATE));
 			content.push_back(string());
-			content.push_back("Réinitialisation aléatoire");
+			content.push_back("RÃ©initialisation alÃ©atoire");
 			content.push_back(string());
 
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);

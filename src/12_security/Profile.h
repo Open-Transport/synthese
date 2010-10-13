@@ -44,17 +44,17 @@ namespace synthese
 		/** Profil utilisateur.
 			@ingroup m12
 		
-			Un profil utilisateur est un "modèle" de droits utilisateurs consistant en une liste d'@ref synthese::security::Right "habilitations" prédéfinies.
+			Un profil utilisateur est un "modÃ¨le" de droits utilisateurs consistant en une liste d'@ref synthese::security::Right "habilitations" prÃ©dÃ©finies.
 
-			Un profil utilisateur peut hériter d'un autre : l'ensemble des habilitations définies par le profil parent est inclus, à l'exception de celles qui sont redéfinies. Un profil peut ne pas avoir de parent.
+			Un profil utilisateur peut hÃ©riter d'un autre : l'ensemble des habilitations dÃ©finies par le profil parent est inclus, Ã  l'exception de celles qui sont redÃ©finies. Un profil peut ne pas avoir de parent.
 
 			Exemples de profils utilisateurs :
-				- Utilisateur non identifié : peut utiliser les services grand public
-				- Utilisateur classique : mêmes droits qu'Anonymous, ainsi que les fonctionnalités de paramétrage utilisateur
-				- Utilisateur identifié comme client du système, d'un réseau de transport : mêmes droits qu'User, et peut de plus utiliser la fonction de réservation
-				- Conducteur de ligne de transport : même droits qu'User, et peut en outre consulter les listes de réservations
-				- Opérateur système : peut gérer les utilisateurs, prendre les réservations, consulter les listes de réservations
-				- Responsable de ligne : peut prendre les réservations, consulter les listes de réservations, éditer des messages sur la ligne
+				- Utilisateur non identifiÃ© : peut utiliser les services grand public
+				- Utilisateur classique : mÃªmes droits qu'Anonymous, ainsi que les fonctionnalitÃ©s de paramÃ©trage utilisateur
+				- Utilisateur identifiÃ© comme client du systÃ¨me, d'un rÃ©seau de transport : mÃªmes droits qu'User, et peut de plus utiliser la fonction de rÃ©servation
+				- Conducteur de ligne de transport : mÃªme droits qu'User, et peut en outre consulter les listes de rÃ©servations
+				- OpÃ©rateur systÃ¨me : peut gÃ©rer les utilisateurs, prendre les rÃ©servations, consulter les listes de rÃ©servations
+				- Responsable de ligne : peut prendre les rÃ©servations, consulter les listes de rÃ©servations, Ã©diter des messages sur la ligne
 				- Administrateur : tous les droits
 
 		*/

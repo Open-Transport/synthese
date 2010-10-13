@@ -136,7 +136,7 @@ namespace synthese
 			);
 			stream << f.close();
 
-			stream << "<h1>Résultat de la recherche</h1>";
+			stream << "<h1>RÃ©sultat de la recherche</h1>";
 
 			DisplayTypeTableSync::SearchResult types(
 				DisplayTypeTableSync::Search(
@@ -155,7 +155,7 @@ namespace synthese
 			ResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(DisplayTypeTableSync::COL_NAME, "Nom"));
 			v.push_back(make_pair(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, "Interface d'affichage"));
-			v.push_back(make_pair(DisplayTypeTableSync::COL_ROWS_NUMBER, "Nombre de rangées"));
+			v.push_back(make_pair(DisplayTypeTableSync::COL_ROWS_NUMBER, "Nombre de rangÃ©es"));
 			v.push_back(make_pair(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, "Protocole supervision"));
 			v.push_back(make_pair(string(), "Actions"));
 			if (writeRight)
@@ -189,7 +189,7 @@ namespace synthese
 				){
 					stream << dt->getMonitoringInterface()->getName();
 				} else {
-					stream << "(non supervisé)";
+					stream << "(non supervisÃ©)";
 				}
 				
 				stream <<
@@ -203,7 +203,7 @@ namespace synthese
 						HTMLModule::getLinkButton(
 							deleteRequest.getURL(),
 							"Supprimer",
-							"Etes-vous sûr de vouloir supprimer le type " + dt->getName() + " ?",
+							"Etes-vous sÃ»r de vouloir supprimer le type " + dt->getName() + " ?",
 							"monitor_delete.png"
 						)
 					;

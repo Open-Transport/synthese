@@ -131,11 +131,11 @@ namespace synthese
 
 			stream << t.close();
 
-			stream << "<h1>Arrêt du serveur</h1>";
+			stream << "<h1>ArrÃªt du serveur</h1>";
 
 			StaticActionRequest<QuitAction> quitAction(request);
 			stream << "<p>";
-			stream << HTMLModule::getLinkButton(quitAction.getURL(), "Arrêter le serveur", "Etes-vous sûr de vouloir arrêter le serveur ?");
+			stream << HTMLModule::getLinkButton(quitAction.getURL(), "ArrÃªter le serveur", "Etes-vous sÃ»r de vouloir arrÃªter le serveur ?");
 			stream << "</p>";
 		}
 

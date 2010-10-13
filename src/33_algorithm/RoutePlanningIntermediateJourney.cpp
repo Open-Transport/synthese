@@ -304,7 +304,7 @@ namespace synthese
 				if (_transportConnectionCount != other._transportConnectionCount)
 					return _transportConnectionCount < other._transportConnectionCount;
 
-				//! <li>Un trajet où l'on circule moins longtemps est supérieur à celui-ci (plus de marge de fiabilité pour les correspondaces)</li>
+				//! <li>Un trajet oÃ¹ l'on circule moins longtemps est supÃ©rieur Ã  celui-ci (plus de marge de fiabilitÃ© pour les correspondaces)</li>
 				if (getEffectiveDuration () != other.getEffectiveDuration ())
 					return getEffectiveDuration () < other.getEffectiveDuration ();
 

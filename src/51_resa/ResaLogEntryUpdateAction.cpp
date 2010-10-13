@@ -82,7 +82,7 @@ namespace synthese
 				_type = static_cast<ResaDBLog::_EntryType>(*type);
 				_text = map.getDefault<string>(PARAMETER_TEXT);
 				if (_text.empty())
-					throw ActionException("Vous devez saisir un texte complémentaire");
+					throw ActionException("Vous devez saisir un texte complÃ©mentaire");
 			}
 			_callType = static_cast<ResaDBLog::_EntryType>(map.get<int>(PARAMETER_CALL_TYPE));
 		}

@@ -103,7 +103,7 @@ namespace synthese
 		{
 			stringstream log;
 			DBLogModule::appendToLogIfChange(log, "Droits publics", Right::getLevelLabel(_right->getPublicRightLevel()), Right::getLevelLabel(_publicLevel));
-			DBLogModule::appendToLogIfChange(log, "Droits privés", Right::getLevelLabel(_right->getPrivateRightLevel()), Right::getLevelLabel(_privateLevel));
+			DBLogModule::appendToLogIfChange(log, "Droits privÃ©s", Right::getLevelLabel(_right->getPrivateRightLevel()), Right::getLevelLabel(_privateLevel));
 
 			_right->setPrivateLevel(_privateLevel);
 			_right->setPublicLevel(_publicLevel);

@@ -51,7 +51,7 @@ namespace synthese
 	
 	namespace server
 	{
-		template<> const string ModuleClassTemplate<MessagesModule>::NAME("Gestion d'actualités");
+		template<> const string ModuleClassTemplate<MessagesModule>::NAME("Gestion d'actualitÃ©s");
 		
 		template<> void ModuleClassTemplate<MessagesModule>::PreInit()
 		{
@@ -162,7 +162,7 @@ namespace synthese
 			Labels s(MessagesModule::GetScenarioTemplatesLabels());
 			for(Labels::const_iterator it(s.begin()); it != s.end(); ++it)
 			{
-				m.push_back(make_pair(it->first, "Scénario " + it->second));
+				m.push_back(make_pair(it->first, "ScÃ©nario " + it->second));
 			}
 			return m;
 		}
@@ -201,9 +201,9 @@ namespace synthese
 		{
 			switch (level)
 			{
-			case ALARM_LEVEL_INFO : return "Complémentaire";
+			case ALARM_LEVEL_INFO : return "ComplÃ©mentaire";
 			case ALARM_LEVEL_WARNING : return "Prioritaire";
-			case ALARM_LEVEL_SCENARIO: return "Scénario";
+			case ALARM_LEVEL_SCENARIO: return "ScÃ©nario";
 			default: return "Inconnu";
 			}
 		}
@@ -215,8 +215,8 @@ namespace synthese
 			switch (conflict)
 			{
 			case ALARM_NO_CONFLICT: return "Sans conflit";
-			case ALARM_WARNING_ON_INFO: return "Annulé par un prioritaire";
-			case ALARM_INFO_UNDER_WARNING: return "Annule un complémentaire";
+			case ALARM_WARNING_ON_INFO: return "AnnulÃ© par un prioritaire";
+			case ALARM_INFO_UNDER_WARNING: return "Annule un complÃ©mentaire";
 			case ALARM_CONFLICT: return "En conflit";
 			default: return "Inconnu";
 			}

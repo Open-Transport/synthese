@@ -102,7 +102,7 @@ namespace synthese
 
 			stream << "<h1>Pages d'administration</h1>";
 
-			stream << "Les liens suivants donnent accès aux pages d'administration du module " << _moduleClass->getName() << ".</p>";
+			stream << "Les liens suivants donnent accÃ¨s aux pages d'administration du module " << _moduleClass->getName() << ".</p>";
 			
 			stream << "<ul>";
 

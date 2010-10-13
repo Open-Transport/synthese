@@ -61,7 +61,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<ResaStatisticsAdmin>::ICON("chart_pie.png");
-		template<> const string AdminInterfaceElementTemplate<ResaStatisticsAdmin>::DEFAULT_TITLE("Statistiques réservations");
+		template<> const string AdminInterfaceElementTemplate<ResaStatisticsAdmin>::DEFAULT_TITLE("Statistiques rÃ©servations");
 	}
 
 	namespace resa
@@ -157,13 +157,13 @@ namespace synthese
 			const AdminRequest& request
 		) const	{
 
-			stream << "<h1>Requête</h1>";
+			stream << "<h1>RequÃªte</h1>";
 
 			AdminFunctionRequest<ResaStatisticsAdmin> searchRequest(request);
 
 			SearchFormHTMLTable rt(searchRequest.getHTMLForm());
 			stream << rt.open();
-			stream << rt.cell("Date début", rt.getForm().getCalendarInput(PARAM_SEARCH_START_DATE, _searchPeriod.begin()));
+			stream << rt.cell("Date dÃ©but", rt.getForm().getCalendarInput(PARAM_SEARCH_START_DATE, _searchPeriod.begin()));
 			stream << rt.cell("Date fin", rt.getForm().getCalendarInput(PARAM_SEARCH_END_DATE, _searchPeriod.last()));
 			stream << rt.cell(
 				"Lignes",
@@ -175,7 +175,7 @@ namespace synthese
 			);
 			stream << rt.close();
 
-			stream << "<h1>Résultats</h1>";
+			stream << "<h1>RÃ©sultats</h1>";
 
 			ResaStatisticsTableSync::ResaCountSearchResult r(
 				ResaStatisticsTableSync::CountCalls(
@@ -298,15 +298,15 @@ namespace synthese
 			if(step == ResaStatisticsTableSync::HOUR_STEP) return "Heure";
 			if(step == ResaStatisticsTableSync::WEEK_DAY_STEP) return "Jour de la semaine";
 			if(step == ResaStatisticsTableSync::MONTH_STEP) return "Mois";
-			if(step == ResaStatisticsTableSync::YEAR_STEP) return "Année";
-			if(step == ResaStatisticsTableSync::DEPARTURE_STOP_STEP) return "Arrêt de départ";
-			if(step == ResaStatisticsTableSync::DEPARTURE_CITY_STEP) return "Commune de départ";
-			if(step == ResaStatisticsTableSync::ARRIVAL_STOP_STEP) return "Arrêt d'arrivée";
-			if(step == ResaStatisticsTableSync::ARRIVAL_CITY_STEP) return "Commune d'arrivée";
+			if(step == ResaStatisticsTableSync::YEAR_STEP) return "AnnÃ©e";
+			if(step == ResaStatisticsTableSync::DEPARTURE_STOP_STEP) return "ArrÃªt de dÃ©part";
+			if(step == ResaStatisticsTableSync::DEPARTURE_CITY_STEP) return "Commune de dÃ©part";
+			if(step == ResaStatisticsTableSync::ARRIVAL_STOP_STEP) return "ArrÃªt d'arrivÃ©e";
+			if(step == ResaStatisticsTableSync::ARRIVAL_CITY_STEP) return "Commune d'arrivÃ©e";
 			if(	step == ResaStatisticsTableSync::RESERVATION_DELAY_10_MIN_STEP ||
 				step == ResaStatisticsTableSync::RESERVATION_DELAY_30_MIN_STEP ||
 				step == ResaStatisticsTableSync::RESERVATION_DELAY_60_MIN_STEP
-				)	return "Délai de réservation";
+				)	return "DÃ©lai de rÃ©servation";
 			return string();
 		}
 
@@ -375,9 +375,9 @@ namespace synthese
 			v.push_back(make_pair(ResaStatisticsTableSync::DEPARTURE_CITY_STEP, GetColumnName(ResaStatisticsTableSync::DEPARTURE_CITY_STEP)));
 			v.push_back(make_pair(ResaStatisticsTableSync::ARRIVAL_STOP_STEP, GetColumnName(ResaStatisticsTableSync::ARRIVAL_STOP_STEP)));
 			v.push_back(make_pair(ResaStatisticsTableSync::ARRIVAL_CITY_STEP, GetColumnName(ResaStatisticsTableSync::ARRIVAL_CITY_STEP)));
-			v.push_back(make_pair(ResaStatisticsTableSync::RESERVATION_DELAY_10_MIN_STEP, "Délai de réservation par 10 minutes"));
-			v.push_back(make_pair(ResaStatisticsTableSync::RESERVATION_DELAY_30_MIN_STEP, "Délai de réservation par 30 minutes"));
-			v.push_back(make_pair(ResaStatisticsTableSync::RESERVATION_DELAY_60_MIN_STEP, "Délai de réservation par 60 minutes"));
+			v.push_back(make_pair(ResaStatisticsTableSync::RESERVATION_DELAY_10_MIN_STEP, "DÃ©lai de rÃ©servation par 10 minutes"));
+			v.push_back(make_pair(ResaStatisticsTableSync::RESERVATION_DELAY_30_MIN_STEP, "DÃ©lai de rÃ©servation par 30 minutes"));
+			v.push_back(make_pair(ResaStatisticsTableSync::RESERVATION_DELAY_60_MIN_STEP, "DÃ©lai de rÃ©servation par 60 minutes"));
 			return v;
 		}
 	}

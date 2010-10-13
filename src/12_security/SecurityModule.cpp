@@ -48,7 +48,7 @@ namespace synthese
 	
 	namespace server
 	{
-		template<> const string ModuleClassTemplate<SecurityModule>::NAME("Sécurité");
+		template<> const string ModuleClassTemplate<SecurityModule>::NAME("SÃ©curitÃ©");
 		
 		template<> void ModuleClassTemplate<SecurityModule>::PreInit()
 		{

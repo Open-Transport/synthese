@@ -32,45 +32,45 @@ namespace synthese
 	{
 		class ScenarioFolder;
 
-		/** Ecran d'édition des modèles de texte destinés aux messages.
+		/** Ecran d'Ã©dition des modÃ¨les de texte destinÃ©s aux messages.
 			@ingroup m17
 
 			@image html cap_admin_messages_library.png
-			@image latex cap_admin_messages_library.png "Maquette de l'écran d'édition des modèles de message" width=14cm
+			@image latex cap_admin_messages_library.png "Maquette de l'Ã©cran d'Ã©dition des modÃ¨les de message" width=14cm
 			
-			<i>Titre de la fenêtre</i> :
-				- SYNTHESE Admin - Messages - Bibliothèque
+			<i>Titre de la fenÃªtre</i> :
+				- SYNTHESE Admin - Messages - BibliothÃ¨que
 
 			<i>Barre de navigation</i> :
 				- Lien vers synthese::interfaces::AdminHome
 				- Lien vers synthese::interfaces::MessagesAdmin
-				- Texte <tt>Bibliothèque</tt>
+				- Texte <tt>BibliothÃ¨que</tt>
 
 			<i>Zone de contenu</i> :
-				-# <b>Tableau des textes destinés aux messages complémentaires</b>
-					-# <tt>Nom</tt> : Nom désignant le texte dans les menus. Ce nom n'est pas affiché en dehors du module d'administration. Champ obligatoire et unique.
-					-# <tt>Message court</tt> : Champ texte de 2x20 caractères. Champ obligatoire.
-					-# <tt>Message long</tt> : Champ texte de taille illimitée (pouvant par exemple recevoir du HTML). Champ obligatoire.
-					-# bouton <tt>Modifier</tt> : Enregistre les modifications effectuées dans les champs
-					-# bouton <tt>Supprimer</tt> : Supprime le modèle de texte
-					-# bouton <tt>Ajouter</tt> : Même comportement que <tt>Modifier</tt> sur un texte nouvellement créé
+				-# <b>Tableau des textes destinÃ©s aux messages complÃ©mentaires</b>
+					-# <tt>Nom</tt> : Nom dÃ©signant le texte dans les menus. Ce nom n'est pas affichÃ© en dehors du module d'administration. Champ obligatoire et unique.
+					-# <tt>Message court</tt> : Champ texte de 2x20 caractÃ¨res. Champ obligatoire.
+					-# <tt>Message long</tt> : Champ texte de taille illimitÃ©e (pouvant par exemple recevoir du HTML). Champ obligatoire.
+					-# bouton <tt>Modifier</tt> : Enregistre les modifications effectuÃ©es dans les champs
+					-# bouton <tt>Supprimer</tt> : Supprime le modÃ¨le de texte
+					-# bouton <tt>Ajouter</tt> : MÃªme comportement que <tt>Modifier</tt> sur un texte nouvellement crÃ©Ã©
 					
-				-# <b>Tableau des textes destinés aux messages prioritaires</b>
-					-# <tt>Nom</tt> : Nom désignant le texte dans les menus. Ce nom n'est pas affiché en dehors du module d'administration. Champ obligatoire et unique.
-					-# <tt>Message court</tt> : Champ texte de 4x20 caractères. Champ obligatoire.
-					-# <tt>Message long</tt> : Champ texte de 5x256 caractères. Champ obligatoire.
-					-# bouton <tt>Modifier</tt> : Enregistre les modifications effectuées dans les champs
-					-# bouton <tt>Supprimer</tt> : Supprime le modèle de message
-					-# bouton <tt>Ajouter</tt> : Même comportement que <tt>Modifier</tt> sur un message nouvellement créé
+				-# <b>Tableau des textes destinÃ©s aux messages prioritaires</b>
+					-# <tt>Nom</tt> : Nom dÃ©signant le texte dans les menus. Ce nom n'est pas affichÃ© en dehors du module d'administration. Champ obligatoire et unique.
+					-# <tt>Message court</tt> : Champ texte de 4x20 caractÃ¨res. Champ obligatoire.
+					-# <tt>Message long</tt> : Champ texte de 5x256 caractÃ¨res. Champ obligatoire.
+					-# bouton <tt>Modifier</tt> : Enregistre les modifications effectuÃ©es dans les champs
+					-# bouton <tt>Supprimer</tt> : Supprime le modÃ¨le de message
+					-# bouton <tt>Ajouter</tt> : MÃªme comportement que <tt>Modifier</tt> sur un message nouvellement crÃ©Ã©
 
-			<i>Sécurité</i>
-				- Une habilitation publique MessagesLibraryRight de niveau WRITE est nécessaire pour accéder à la page et y effectuer toutes les opérations disponibles à l'exception de la suppression de modèles.
-				- Une habilitation publique MessagesLibraryRight de niveau DELETE est nécessaire pour supprimer un modèle de texte.
+			<i>SÃ©curitÃ©</i>
+				- Une habilitation publique MessagesLibraryRight de niveau WRITE est nÃ©cessaire pour accÃ©der Ã  la page et y effectuer toutes les opÃ©rations disponibles Ã  l'exception de la suppression de modÃ¨les.
+				- Une habilitation publique MessagesLibraryRight de niveau DELETE est nÃ©cessaire pour supprimer un modÃ¨le de texte.
 
-			<i>Journaux</i> : Les actions suivantes génèrent des entrées dans le journal de la bibliothèque de textes MessagesLibraryLog :
-				- INFO : Création de modèle de texte
-				- INFO : Modification de modèle de texte
-				- INFO : Suppression de modèle de texte
+			<i>Journaux</i> : Les actions suivantes gÃ©nÃ¨rent des entrÃ©es dans le journal de la bibliothÃ¨que de textes MessagesLibraryLog :
+				- INFO : CrÃ©ation de modÃ¨le de texte
+				- INFO : Modification de modÃ¨le de texte
+				- INFO : Suppression de modÃ¨le de texte
 
 		*/
 		class MessagesLibraryAdmin : public admin::AdminInterfaceElementTemplate<MessagesLibraryAdmin>

@@ -214,7 +214,7 @@ namespace synthese
 				<tr><td>D</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
 				</table>
 
-				Pas 5 : Service AED (E insï¿rï¿ avant B pour ne pas rompre la continuitï¿ BC)
+				Pas 5 : Service AED (E insÃ¯Â¿rÃ¯Â¿ avant B pour ne pas rompre la continuitÃ¯Â¿ BC)
 
 				<table class="Tableau" cellspacing="0" cellpadding="5">
 				<tr><td>A</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
@@ -225,65 +225,65 @@ namespace synthese
 				<tr><td>D</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td><td>X</td></tr>
 				</table>
 
-				Pour chaque trajet, on procede donc par balayage dans l'ordre des gares existantes. Si la gare a relier nï¿est pas trouvï¿e entre la position de la gare prï¿cï¿dente et la fin, deux solutions :
-					- soit la gare nï¿est prï¿sente nulle part (balayage avant la position de la precedente) auquel cas elle est crï¿ï¿e et rajoutï¿e ï¿ la position de la gare prï¿cï¿dente + 1
-					- soit la gare est prï¿sente avant la gare prï¿cï¿dente. Dans ce cas, on tente de descendre la ligne de la gare recherchï¿e au niveau de la position de la gare prï¿cï¿dente + 1. On contrï¿le sur chacun des trajets prï¿cï¿dents que la chronologie n'en serait pas affectï¿e. Si elle ne l'est pas, alors la ligne est descendue. Sinon une nouvelle ligne est crï¿ï¿e.
+				Pour chaque trajet, on procede donc par balayage dans l'ordre des gares existantes. Si la gare a relier nÃ¯Â¿est pas trouvÃ¯Â¿e entre la position de la gare prÃ¯Â¿cÃ¯Â¿dente et la fin, deux solutions :
+					- soit la gare nÃ¯Â¿est prÃ¯Â¿sente nulle part (balayage avant la position de la precedente) auquel cas elle est crÃ¯Â¿Ã¯Â¿e et rajoutÃ¯Â¿e Ã¯Â¿ la position de la gare prÃ¯Â¿cÃ¯Â¿dente + 1
+					- soit la gare est prÃ¯Â¿sente avant la gare prÃ¯Â¿cÃ¯Â¿dente. Dans ce cas, on tente de descendre la ligne de la gare recherchÃ¯Â¿e au niveau de la position de la gare prÃ¯Â¿cÃ¯Â¿dente + 1. On contrÃ¯Â¿le sur chacun des trajets prÃ¯Â¿cÃ¯Â¿dents que la chronologie n'en serait pas affectÃ¯Â¿e. Si elle ne l'est pas, alors la ligne est descendue. Sinon une nouvelle ligne est crÃ¯Â¿Ã¯Â¿e.
 
-				Contrôle de l'échangeabilité :
+				ContrÃ´le de l'Ã©changeabilitÃ© :
 
 				Soit \f$ \delta_{l,c}:(l,c)\mapsto\{{1\mbox{~si~le~trajet~}c\mbox{~dessert~la~ligne~}l\atop 0~sinon} \f$
 
-				Deux lignes l et m sont échangeables si et seulement si l'ordre des lignes dont \f$ \delta_{l,c}=1 \f$ pour chaque colonne est respecté.
+				Deux lignes l et m sont Ã©changeables si et seulement si l'ordre des lignes dont \f$ \delta_{l,c}=1 \f$ pour chaque colonne est respectÃ©.
 
-				Cet ordre s'exprime par la propriété suivante : Si \f$ \Phi \f$ est la permutation pévue, alors
+				Cet ordre s'exprime par la propriÃ©tÃ© suivante : Si \f$ \Phi \f$ est la permutation pÃ©vue, alors
 
 				<img width=283 height=27 src="interface.doxygen_fichiers/image008.gif">
 
-				Il est donc nécessaire à la fois de contrôler la possibilité de permutation, et de la déterminer éventuellement.
+				Il est donc nÃ©cessaire Ã  la fois de contrÃ´ler la possibilitÃ© de permutation, et de la dÃ©terminer Ã©ventuellement.
 
 				Si <sub><img width=25 height=24
 				src="interface.doxygen_fichiers/image009.gif"></sub>est la ligne de la gare
-				précédemment trouvée, et <sub><img width=24 height=24
-				src="interface.doxygen_fichiers/image010.gif"></sub>ï¿lï¿emplacement de la gare
-				souhaitï¿e pour permuter, alors les permutations ï¿ opï¿rer ne peuvent concerner
+				prÃ©cÃ©demment trouvÃ©e, et <sub><img width=24 height=24
+				src="interface.doxygen_fichiers/image010.gif"></sub>Ã¯Â¿lÃ¯Â¿emplacement de la gare
+				souhaitÃ¯Â¿e pour permuter, alors les permutations Ã¯Â¿ opÃ¯Â¿rer ne peuvent concerner
 				que des lignes comprises entre <sub><img width=24 height=24
-				src="interface.doxygen_fichiers/image010.gif"></sub>ï¿et <sub><img width=25
+				src="interface.doxygen_fichiers/image010.gif"></sub>Ã¯Â¿et <sub><img width=25
 				height=24 src="interface.doxygen_fichiers/image009.gif"></sub>. En effet, les
-				autres lignes nï¿influent pas.</p>
+				autres lignes nÃ¯Â¿influent pas.</p>
 
-				En premier lieu il est nï¿cessaire de dï¿terminer lï¿ensemble
-				des lignes ï¿ permuter. Cet ensemble est construit en explorant chaque colonne.
-				Si <sub><img width=16 height=24 src="interface.doxygen_fichiers/image011.gif"></sub>ï¿est
-				lï¿ensemble des lignes ï¿ permuter pour assurer lï¿intï¿gritï¿ des colonnes <sub><img
+				En premier lieu il est nÃ¯Â¿cessaire de dÃ¯Â¿terminer lÃ¯Â¿ensemble
+				des lignes Ã¯Â¿ permuter. Cet ensemble est construit en explorant chaque colonne.
+				Si <sub><img width=16 height=24 src="interface.doxygen_fichiers/image011.gif"></sub>Ã¯Â¿est
+				lÃ¯Â¿ensemble des lignes Ã¯Â¿ permuter pour assurer lÃ¯Â¿intÃ¯Â¿gritÃ¯Â¿ des colonnes <sub><img
 				width=36 height=27 src="interface.doxygen_fichiers/image012.gif"></sub>, on
-				peut dï¿finir cet ensemble en fonction du prï¿cï¿dent <sub><img width=25
+				peut dÃ¯Â¿finir cet ensemble en fonction du prÃ¯Â¿cÃ¯Â¿dent <sub><img width=25
 				height=24 src="interface.doxygen_fichiers/image013.gif"></sub>&nbsp;: <sub><img
 				width=308 height=35 src="interface.doxygen_fichiers/image014.gif"></sub>
 
-				Le but ï¿tant de faire descendre la ligne <sub><img width=24
-				height=24 src="interface.doxygen_fichiers/image010.gif"></sub>ï¿vers <sub><img
+				Le but Ã¯Â¿tant de faire descendre la ligne <sub><img width=24
+				height=24 src="interface.doxygen_fichiers/image010.gif"></sub>Ã¯Â¿vers <sub><img
 				width=25 height=24 src="interface.doxygen_fichiers/image009.gif"></sub>, les
-				lignes appartenant ï¿ L doivent ï¿tre ï¿changeables avecï¿ les positions <sub><img
+				lignes appartenant Ã¯Â¿ L doivent Ã¯Â¿tre Ã¯Â¿changeables avecÃ¯Â¿ les positions <sub><img
 				width=216 height=27 src="interface.doxygen_fichiers/image015.gif"></sub>.
-				Lï¿ensemble de ces tests doit ï¿tre rï¿alisï¿. Au moindre ï¿chec, lï¿ensemble de la
+				LÃ¯Â¿ensemble de ces tests doit Ã¯Â¿tre rÃ¯Â¿alisÃ¯Â¿. Au moindre Ã¯Â¿chec, lÃ¯Â¿ensemble de la
 				permutation est rendu impossible.
 
-				Lï¿ï¿changeabilitï¿ binaire entre deux lignes l et m revient ï¿
-				contrï¿ler la propriï¿tï¿&nbsp;<sub><img width=89 height=28
+				LÃ¯Â¿Ã¯Â¿changeabilitÃ¯Â¿ binaire entre deux lignes l et m revient Ã¯Â¿
+				contrÃ¯Â¿ler la propriÃ¯Â¿tÃ¯Â¿&nbsp;<sub><img width=89 height=28
 				src="interface.doxygen_fichiers/image016.gif"></sub>.
 
-				Lï¿ï¿changeabilitï¿ totale sï¿ï¿crit donc <sub><img width=145
+				LÃ¯Â¿Ã¯Â¿changeabilitÃ¯Â¿ totale sÃ¯Â¿Ã¯Â¿crit donc <sub><img width=145
 				height=28 src="interface.doxygen_fichiers/image017.gif"></sub>
 
-				Lï¿algorithme est donc le suivant&nbsp;:
+				LÃ¯Â¿algorithme est donc le suivant&nbsp;:
 					- Construction de L
-					- Contrï¿le dï¿ï¿changeabilitï¿ binaire pour chaque ï¿lï¿ment de L avec
+					- ContrÃ¯Â¿le dÃ¯Â¿Ã¯Â¿changeabilitÃ¯Â¿ binaire pour chaque Ã¯Â¿lÃ¯Â¿ment de L avec
 					sa future position
 					- Permutation
 
 				<b>Echange</b>&nbsp;:
 
-				Exemple dï¿ï¿change&nbsp;:
+				Exemple dÃ¯Â¿Ã¯Â¿change&nbsp;:
 
 				<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0 width=340
 				style='width:254.95pt;margin-left:141.6pt;border-collapse:collapse;border:

@@ -1,29 +1,29 @@
-/** @page svn Contrôle du code sources sous Subversion
+/** @page svn ContrÃ´le du code sources sous Subversion
 
-Le système de contrôle de code sources utilisé pour héberger le dépôt de SYNTHESE est Subversion.
+Le systÃ¨me de contrÃ´le de code sources utilisÃ© pour hÃ©berger le dÃ©pÃ´t de SYNTHESE est Subversion.
 
 <h2>Politique de branches</h2>
 
 <ul>
-<li>Un trunk unique, censé comporter à tout moment une version fonctionnelle du logiciel. Les modifications d'utilisateurs ne se font généralement pas dans le trunk.</li>
-<li>Lors de chaque lancement de développement, une branche est créée par copie de l'ensemble du dépôt (afin de garder une cohérence entre le logiciel et ses dépendances). Le périmètre d'une branche correspond à un fil de développement pouvant comporter une ou plusieurs livraisons successives. Un cas de réparation urgente de bug visible en production pourra générer une branche à lui tout seul, afin de ne pas devoir attendre la mise en production de la branche de développement à plus long terme</li>
-<li>En cas d'essai technique à grande échelle (ex : tentative d'optimisation par refactoring), une branche est créée, et peut être détruite si l'essai n'est pas concluant.</li>
-<li>Les tests sont effectués au sein de la branche jusqu'à validation des modifications</li>
-<li>Une fois une branche validée, le trunk y est réintégré afin de tester la branche dans le contexte des modifications effectuées entre temps par d'autres branches. Pour éviter tout conflit, le trunk est alors bloqué en écriture pendant la période de réintégration.</li>
-<li>Si les tests sont concluants, la dernière version ainsi constituée est elle-même réintégrée dans le trunk, qui est alors à nouveau accessible en écriture. Si les tests ne sont pas concluants, l'accès en écriture du trunk est rétabli, sans toutefois y avoir réintégré la branche</li>
-<li>La nouvelle version présente dans le trunk est alors prête pour la pré-production, voire la production si la modification correspond à une correction urgente.</li>
-<li>Dès la mise en production, un tag est effectué afin de mémoriser l'image exacte du code en fonction du numéro de version du logiciel.</li>
+<li>Un trunk unique, censÃ© comporter Ã  tout moment une version fonctionnelle du logiciel. Les modifications d'utilisateurs ne se font gÃ©nÃ©ralement pas dans le trunk.</li>
+<li>Lors de chaque lancement de dÃ©veloppement, une branche est crÃ©Ã©e par copie de l'ensemble du dÃ©pÃ´t (afin de garder une cohÃ©rence entre le logiciel et ses dÃ©pendances). Le pÃ©rimÃ¨tre d'une branche correspond Ã  un fil de dÃ©veloppement pouvant comporter une ou plusieurs livraisons successives. Un cas de rÃ©paration urgente de bug visible en production pourra gÃ©nÃ©rer une branche Ã  lui tout seul, afin de ne pas devoir attendre la mise en production de la branche de dÃ©veloppement Ã  plus long terme</li>
+<li>En cas d'essai technique Ã  grande Ã©chelle (ex : tentative d'optimisation par refactoring), une branche est crÃ©Ã©e, et peut Ãªtre dÃ©truite si l'essai n'est pas concluant.</li>
+<li>Les tests sont effectuÃ©s au sein de la branche jusqu'Ã  validation des modifications</li>
+<li>Une fois une branche validÃ©e, le trunk y est rÃ©intÃ©grÃ© afin de tester la branche dans le contexte des modifications effectuÃ©es entre temps par d'autres branches. Pour Ã©viter tout conflit, le trunk est alors bloquÃ© en Ã©criture pendant la pÃ©riode de rÃ©intÃ©gration.</li>
+<li>Si les tests sont concluants, la derniÃ¨re version ainsi constituÃ©e est elle-mÃªme rÃ©intÃ©grÃ©e dans le trunk, qui est alors Ã  nouveau accessible en Ã©criture. Si les tests ne sont pas concluants, l'accÃ¨s en Ã©criture du trunk est rÃ©tabli, sans toutefois y avoir rÃ©intÃ©grÃ© la branche</li>
+<li>La nouvelle version prÃ©sente dans le trunk est alors prÃªte pour la prÃ©-production, voire la production si la modification correspond Ã  une correction urgente.</li>
+<li>DÃ¨s la mise en production, un tag est effectuÃ© afin de mÃ©moriser l'image exacte du code en fonction du numÃ©ro de version du logiciel.</li>
 </ul>
 
-Les releases sont effectuées par paquet auto-installable au format deb.
+Les releases sont effectuÃ©es par paquet auto-installable au format deb.
 
-Trois espaces sont proposés sur le dépôt de paquets :
+Trois espaces sont proposÃ©s sur le dÃ©pÃ´t de paquets :
 <ul>
-<li>Unstable : cet espace permet de publier une version correspondant à une réintégration du trunk dans une branche. Cet espace contient donc la dernière version connue qui a pu être fabriquée et qui est capable de s'exécuter (sans toutefois garantie de bon fonctionnement)</li>
-<li>Testing : cet espace permet de publier une version apte à la production (correspondant à une réintégration d'une branche dans le trunk)</li>
-<li>Stable : cet espace contient la dernière version apte à la production, correspondant à un tag du code sources</li>
+<li>Unstable : cet espace permet de publier une version correspondant Ã  une rÃ©intÃ©gration du trunk dans une branche. Cet espace contient donc la derniÃ¨re version connue qui a pu Ãªtre fabriquÃ©e et qui est capable de s'exÃ©cuter (sans toutefois garantie de bon fonctionnement)</li>
+<li>Testing : cet espace permet de publier une version apte Ã  la production (correspondant Ã  une rÃ©intÃ©gration d'une branche dans le trunk)</li>
+<li>Stable : cet espace contient la derniÃ¨re version apte Ã  la production, correspondant Ã  un tag du code sources</li>
 </ul>
 
-Le passage d'une version d'un dépôt à l'autre se fait par un script automatique de promotion.
+Le passage d'une version d'un dÃ©pÃ´t Ã  l'autre se fait par un script automatique de promotion.
 
 */

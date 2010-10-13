@@ -84,7 +84,7 @@ namespace synthese
 				}
 				catch(...)
 				{
-					throw ActionException("Le rÈpertoire parent dÈsignÈ n'existe pas.");
+					throw ActionException("Le r√©pertoire parent d√©sign√© n'existe pas.");
 				}
 			}
 			
@@ -97,7 +97,7 @@ namespace synthese
 				_name, 0, 1
 			);
 			if (!env.getRegistry<ScenarioFolder>().empty())
-				throw ActionException("Ce nom est dÈj‡ utilisÈ dans le rÈpertoire courant.");
+				throw ActionException("Ce nom est d√©j√† utilis√© dans le r√©pertoire courant.");
 		}
 		
 		

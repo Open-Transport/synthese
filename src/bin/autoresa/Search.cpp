@@ -62,7 +62,7 @@ int Search::start(SessionReturnType *_session)
 			for(int i=0;i<=session->solutionVector.size();i++) menuKey[i]=i;
 			if(session->solutionVector.size()==0)  // no solution
 			{
-				Functions::playbackText(agi,res,"désolé, aucune solution trouvée, veuiller verifier la validation des données entrées.");
+				Functions::playbackText(agi,res,"dÃ©solÃ©, aucune solution trouvÃ©e, veuiller verifier la validation des donnÃ©es entrÃ©es.");
 				return start(_session);
 			}
 			else
@@ -125,14 +125,14 @@ string Search::readDateTime(int prefix)
 	int menuKey[]={1,2,3};
 	if(prefix==4)
 	{
-		dtmfInput=Functions::readKey(agi,res,menuKey,3,1,"veuillez entrer, 1, pour une recherche en temps actuel. presser 2 pour modifier l\'heure du trajet cherché. presser 3 pour modifier la date et l\'heure du trajet cherché.");
+		dtmfInput=Functions::readKey(agi,res,menuKey,3,1,"veuillez entrer, 1, pour une recherche en temps actuel. presser 2 pour modifier l\'heure du trajet cherchÃ©. presser 3 pour modifier la date et l\'heure du trajet cherchÃ©.");
 	}
 	else dtmfInput=prefix;
 	
 	if(dtmfInput==1) return "A";
 	if(dtmfInput==2)
 	{
-		dtmfInput=Functions::readKey(agi,res,menuKey,0,2,"veuillez entrer l\'heure de recheche en 2 chiffres. par exemple: 0 8 , signifient 8 heure. ou presser 2 fois 0 pour revenir au menu supérieur.");
+		dtmfInput=Functions::readKey(agi,res,menuKey,0,2,"veuillez entrer l\'heure de recheche en 2 chiffres. par exemple: 0 8 , signifient 8 heure. ou presser 2 fois 0 pour revenir au menu supÃ©rieur.");
 		if(dtmfInput==0) return readDateTime(4);
 		//string dt="2007-10-20 18:50";
 		else
@@ -162,7 +162,7 @@ string Search::readDateTime(int prefix)
 	}
 	if(dtmfInput==3)
 	{
-		dtmfInput=Functions::readKey(agi,res,menuKey,0,4,"veuillez entrer la date de recheche en 4 chiffres. par exemple: 0 3 1 0, signifient le 3 octobre. ou presser 4 fois 0 pour revenir au menu supérieur.");
+		dtmfInput=Functions::readKey(agi,res,menuKey,0,4,"veuillez entrer la date de recheche en 4 chiffres. par exemple: 0 3 1 0, signifient le 3 octobre. ou presser 4 fois 0 pour revenir au menu supÃ©rieur.");
 		if(dtmfInput==0) return readDateTime(4);
 		//string dt="2007-10-20 18:50"; the input format 08350310 so hhmmDDMM
 		else
@@ -220,7 +220,7 @@ string Search::searchFromSynthese(int _favoris) throw (int)
 		string dt=readDateTime();
 		string req="fonction=rp&si=3&da="+dt+"&msn=3&dct="+session->favoris.at(_favoris).origin_city+"&dpt="+session->favoris.at(_favoris).origin_place+"&act="+session->favoris.at(_favoris).destination_city+"&apt="+session->favoris.at(_favoris).destination_place+"&ac=0";
 				
-		// valeur de retour à reflechir
+		// valeur de retour Ã  reflechir
 		string xml=Functions::makeRequest(req);
 		
 		/*

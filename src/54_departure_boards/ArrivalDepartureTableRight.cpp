@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace security
 	{
-		template<> const string RightTemplate<ArrivalDepartureTableRight>::NAME("Tableaux de départs");
+		template<> const string RightTemplate<ArrivalDepartureTableRight>::NAME("Tableaux de dÃ©parts");
 		template<> const bool RightTemplate<ArrivalDepartureTableRight>::USE_PRIVATE_RIGHTS(false);
 
 		template<>

@@ -105,7 +105,7 @@ namespace synthese
 					)	);
 					if(!users.empty())
 					{
-						throw ActionException("Ce login est déjà utilisé.");
+						throw ActionException("Ce login est dÃ©jÃ  utilisÃ©.");
 					}
 				}
 
@@ -113,7 +113,7 @@ namespace synthese
 
 				_name = map.getDefault<string>(PARAMETER_NAME);
 				if (_name.empty())
-					throw ActionException("Le nom de l'utilisateur ne peut être vide");
+					throw ActionException("Le nom de l'utilisateur ne peut Ãªtre vide");
 
 				_address = map.getDefault<string>(PARAMETER_ADDRESS);
 
@@ -131,10 +131,10 @@ namespace synthese
 
 				if(	_autoResaActivated && *_autoResaActivated)
 				{
-					if(_surname.empty()) throw ActionException("Le prénom du client doit être rempli pour activer l'auto-réservation");
-					if(_name.empty()) throw ActionException("Le nom du client doit être rempli pour activer l'auto-réservation");
-					if(_phone.empty()) throw ActionException("Le numéro de téléphone du client doit être rempli pour activer l'auto-réservation");
-					if(_email.empty()) throw ActionException("L'adresse e-mail du client doit être remplie pour activer l'auto-réservation");
+					if(_surname.empty()) throw ActionException("Le prÃ©nom du client doit Ãªtre rempli pour activer l'auto-rÃ©servation");
+					if(_name.empty()) throw ActionException("Le nom du client doit Ãªtre rempli pour activer l'auto-rÃ©servation");
+					if(_phone.empty()) throw ActionException("Le numÃ©ro de tÃ©lÃ©phone du client doit Ãªtre rempli pour activer l'auto-rÃ©servation");
+					if(_email.empty()) throw ActionException("L'adresse e-mail du client doit Ãªtre remplie pour activer l'auto-rÃ©servation");
 				}
 			}
 			catch (ObjectNotFoundException<User>& e)
@@ -153,13 +153,13 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(s, "E-mail", _user->getEMail(), _email);
 			DBLogModule::appendToLogIfChange(s, "Code postal", _user->getPostCode(), _postalCode);
 			DBLogModule::appendToLogIfChange(s, "Ville", _user->getCityText(), _city);
-			DBLogModule::appendToLogIfChange(s, "Téléphone", _user->getPhone(), _phone);
+			DBLogModule::appendToLogIfChange(s, "TÃ©lÃ©phone", _user->getPhone(), _phone);
 			if(_authorizedLogin)
 			{
 				DBLogModule::appendToLogIfChange(s, "Autorisation de connexion", lexical_cast<string>(_user->getConnectionAllowed()), lexical_cast<string>(*_authorizedLogin));
 			}
 			DBLogModule::appendToLogIfChange(s, "Nom", _user->getName(), _name);
-			DBLogModule::appendToLogIfChange(s, "Prénom", _user->getSurname(), _surname);
+			DBLogModule::appendToLogIfChange(s, "PrÃ©nom", _user->getSurname(), _surname);
 
 			_user->setLogin(_login);
 			_user->setAddress(_address);
@@ -188,7 +188,7 @@ namespace synthese
 				stringstream s2;
 				DBLogModule::appendToLogIfChange(
 					s2,
-					"Activation auto-réservation",
+					"Activation auto-rÃ©servation",
 					_user->getProfile()->getKey() == ResaModule::GetAutoResaResaCustomerProfile()->getKey() ? "OUI" : "NON",
 					*_autoResaActivated ? "OUI" : "NON"
 				);
@@ -244,7 +244,7 @@ namespace synthese
 						{
 							if(ResaModule::GetReservationContact()->sendCustomerEMail(*_user))
 							{
-								ResaDBLog::AddEMailEntry(*request.getSession(), *_user, "Message d'activation de réservation en ligne");
+								ResaDBLog::AddEMailEntry(*request.getSession(), *_user, "Message d'activation de rÃ©servation en ligne");
 							}
 						}
 					}

@@ -61,7 +61,7 @@ namespace synthese
 
 	namespace server
 	{
-		template<> const string ModuleClassTemplate<DBModule>::NAME("Base de données SQLite");
+		template<> const string ModuleClassTemplate<DBModule>::NAME("Base de donnÃ©es SQLite");
 		
 		
 		

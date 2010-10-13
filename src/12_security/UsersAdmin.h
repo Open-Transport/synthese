@@ -36,7 +36,7 @@ namespace synthese
 			@ingroup m12Admin refAdmin
 		
 			@image html cap_admin_users.png
-			@image latex cap_admin_users.png "Maquette de l'écran de recherche d'utilisateur" width=14cm
+			@image latex cap_admin_users.png "Maquette de l'Ã©cran de recherche d'utilisateur" width=14cm
 
 			<i>Barre de navigation</i> :
 				- Lien vers synthese::interfaces::HomeAdmin
@@ -44,42 +44,42 @@ namespace synthese
 
 			<i>Zone de contenus</i> :
 				-# <b>Formulaire de recherche</b> :
-					-# <tt>Login</tt> : champ texte : recherche des utilisateurs dont le login contient le texte saisi. Absence de texte : filtre désactivé
-					-# <tt>Nom</tt> : champ texte : recherche des utilisateurs dont le nom ou le prénom contient le texte saisi. Absence de texte : filtre désactivé
-					-# <tt>Profil</tt> : liste déroulante contenant tous les profils correspondant à au moins un utilisateur existant :
-						- si un profil est sélectionné, alors seuls s'affichent les utilisateurs ayant le profil sélectionné
-						- si aucun profil n'est sélectionné, alors le filtre est désactivé
+					-# <tt>Login</tt> : champ texte : recherche des utilisateurs dont le login contient le texte saisi. Absence de texte : filtre dÃ©sactivÃ©
+					-# <tt>Nom</tt> : champ texte : recherche des utilisateurs dont le nom ou le prÃ©nom contient le texte saisi. Absence de texte : filtre dÃ©sactivÃ©
+					-# <tt>Profil</tt> : liste dÃ©roulante contenant tous les profils correspondant Ã  au moins un utilisateur existant :
+						- si un profil est sÃ©lectionnÃ©, alors seuls s'affichent les utilisateurs ayant le profil sÃ©lectionnÃ©
+						- si aucun profil n'est sÃ©lectionnÃ©, alors le filtre est dÃ©sactivÃ©
 					-# Bouton <tt>Rechercher</tt> : lancement de la recherche
-				-# <b>Tableau des utilisateurs</b> : Les utilisateurs recherchés sont décrits par les colonnes suivantes :
-					-# <tt>Sel</tt> : case à cocher permettant une sélection d'un ou plusieurs utilisateurs en vue d'une suppression ou d'une copie
+				-# <b>Tableau des utilisateurs</b> : Les utilisateurs recherchÃ©s sont dÃ©crits par les colonnes suivantes :
+					-# <tt>Sel</tt> : case Ã  cocher permettant une sÃ©lection d'un ou plusieurs utilisateurs en vue d'une suppression ou d'une copie
 					-# <tt>Login</tt> : login de l'utilisateur
-					-# <tt>Nom</tt> : prénom et nom de l'utilisateur
+					-# <tt>Nom</tt> : prÃ©nom et nom de l'utilisateur
 					-# <tt>Profil</tt> : profil de l'utilisateur
-					-# Bouton <tt>Editer</tt> : conduit vers la page synthese::interfaces::UserAdmin pour l'utilisateur affiché sur la ligne
+					-# Bouton <tt>Editer</tt> : conduit vers la page synthese::interfaces::UserAdmin pour l'utilisateur affichÃ© sur la ligne
 				-# <b>Ligne d'ajout d'utilisateur</b> :
-					-# Champ <tt>Login</tt> : champ texte. Entrer ici le login de l'utilisateur. Celui-ci doit être unique. En cas de tentative de création d'utilisateur avec un login déjà pris, la création est abandonnée et un message d'erreur apparait :
-						@code L'utilisateur ne peut être créé car le login entré est déjà pris. Veuillez choisir un autre login @endcode
-						Ce champ est en outre obligatoire. S'il n'est pas rempli la création est abandonnée et un message d'erreur apparait :
-						@code L'utilisateur ne peut être créé car le login n'est pas renseigné. Veuillez renseigner le champ login. @endcode
-					-# Champ <tt>Nom</tt> : champ texte. Entrer ici le nom de famille de l'utilisateur. Ce champ est obligatoire. S'il n'est pas rempli la création est abandonnée et un message d'erreur apparait :
-						@code L'utilisateur ne peut être créé car le nom n'est pas renseigné. Veuillez renseigner le champ nom. @endcode
-                    -# Champ <tt>Profil</tt> : liste de choix. Sélectionner ici un profil d'habilitations. Champ obligatoire.
-					-# Bouton <tt>Ajouter</tt> : crée l'utilisateur en fonction des valeur saisies. La saisie des informations personnelles de l'utilisateur se poursuit sur l'écran synthese::interfaces::UserAdmin.
-				-# Un maximum de 50 entrées est affiché à l'écran. En cas de dépassement de ce nombre d'après les critères de recherche, un lien <tt>Entrées suivantes</tt> apparait et permet de visualiser les entrées suivantes. A partir de la seconde page, un lien <tt>Entrées précédentes</tt> apparait également.
-				-# Un <b>Bouton de suppression</b> permet de supprimer les utilisateurs sélectionnés grâce aux cases à cocher. Après confirmation par une boite de dialogue, la suppression est effectuée pour chaque utilisateur :
-					- l'utilisateur est réellement supprimé si il n'est à l'origine d'aucune entrée de journal
-					- l'utilisateur est désactivé si il est à l'origine d'au moins une entrée de journal, afin de permettre d'accéder à ses informations dans le cadre de la consultation ultérieure du journal. En ce cas, son login est tout de même remis à disposition.
+					-# Champ <tt>Login</tt> : champ texte. Entrer ici le login de l'utilisateur. Celui-ci doit Ãªtre unique. En cas de tentative de crÃ©ation d'utilisateur avec un login dÃ©jÃ  pris, la crÃ©ation est abandonnÃ©e et un message d'erreur apparait :
+						@code L'utilisateur ne peut Ãªtre crÃ©Ã© car le login entrÃ© est dÃ©jÃ  pris. Veuillez choisir un autre login @endcode
+						Ce champ est en outre obligatoire. S'il n'est pas rempli la crÃ©ation est abandonnÃ©e et un message d'erreur apparait :
+						@code L'utilisateur ne peut Ãªtre crÃ©Ã© car le login n'est pas renseignÃ©. Veuillez renseigner le champ login. @endcode
+					-# Champ <tt>Nom</tt> : champ texte. Entrer ici le nom de famille de l'utilisateur. Ce champ est obligatoire. S'il n'est pas rempli la crÃ©ation est abandonnÃ©e et un message d'erreur apparait :
+						@code L'utilisateur ne peut Ãªtre crÃ©Ã© car le nom n'est pas renseignÃ©. Veuillez renseigner le champ nom. @endcode
+                    -# Champ <tt>Profil</tt> : liste de choix. SÃ©lectionner ici un profil d'habilitations. Champ obligatoire.
+					-# Bouton <tt>Ajouter</tt> : crÃ©e l'utilisateur en fonction des valeur saisies. La saisie des informations personnelles de l'utilisateur se poursuit sur l'Ã©cran synthese::interfaces::UserAdmin.
+				-# Un maximum de 50 entrÃ©es est affichÃ© Ã  l'Ã©cran. En cas de dÃ©passement de ce nombre d'aprÃ¨s les critÃ¨res de recherche, un lien <tt>EntrÃ©es suivantes</tt> apparait et permet de visualiser les entrÃ©es suivantes. A partir de la seconde page, un lien <tt>EntrÃ©es prÃ©cÃ©dentes</tt> apparait Ã©galement.
+				-# Un <b>Bouton de suppression</b> permet de supprimer les utilisateurs sÃ©lectionnÃ©s grÃ¢ce aux cases Ã  cocher. AprÃ¨s confirmation par une boite de dialogue, la suppression est effectuÃ©e pour chaque utilisateur :
+					- l'utilisateur est rÃ©ellement supprimÃ© si il n'est Ã  l'origine d'aucune entrÃ©e de journal
+					- l'utilisateur est dÃ©sactivÃ© si il est Ã  l'origine d'au moins une entrÃ©e de journal, afin de permettre d'accÃ©der Ã  ses informations dans le cadre de la consultation ultÃ©rieure du journal. En ce cas, son login est tout de mÃªme remis Ã  disposition.
 			
-			<i>Sécurité</i>
-				- Une habilitation publique SecurityRight de niveau READ est nécessaire pour accéder à la page en consultation. NB : Les résultats de la recherche d'utilisateur <b>ne dépendent pas</b> du périmètre de l'habilitation de l'utilisateur courant (la page accédée en lecture seule est considérée comme un annuaire)
-				- Une habilitation publique SecurityRight de niveau WRITE est nécessaire pour disposer du bouton de création d'utilisateur. La liste des profils pouvant être utilisés est la liste des profils inférieurs ou égaux à celui de l'habilitation.
-				- Une habilitation publique SecurityRight de niveau WRITE est nécessaire pour disposer du bouton d'édition d'un utilisateur différent de l'utilisateur courant : seuls les utilisateurs d'un profil inférieur ou égal à celui de l'habilitation sont éditables.
-				- Une habilitation privée SecurityRight de niveau WRITE est nécessaire pour disposer du bouton d'édition sur l'utilisateur courant.
-				- Une habilitation publique SecurityRight de niveau DELETE est nécessaire pour disposer du bouton de suppression d'utilisateur.
+			<i>SÃ©curitÃ©</i>
+				- Une habilitation publique SecurityRight de niveau READ est nÃ©cessaire pour accÃ©der Ã  la page en consultation. NB : Les rÃ©sultats de la recherche d'utilisateur <b>ne dÃ©pendent pas</b> du pÃ©rimÃ¨tre de l'habilitation de l'utilisateur courant (la page accÃ©dÃ©e en lecture seule est considÃ©rÃ©e comme un annuaire)
+				- Une habilitation publique SecurityRight de niveau WRITE est nÃ©cessaire pour disposer du bouton de crÃ©ation d'utilisateur. La liste des profils pouvant Ãªtre utilisÃ©s est la liste des profils infÃ©rieurs ou Ã©gaux Ã  celui de l'habilitation.
+				- Une habilitation publique SecurityRight de niveau WRITE est nÃ©cessaire pour disposer du bouton d'Ã©dition d'un utilisateur diffÃ©rent de l'utilisateur courant : seuls les utilisateurs d'un profil infÃ©rieur ou Ã©gal Ã  celui de l'habilitation sont Ã©ditables.
+				- Une habilitation privÃ©e SecurityRight de niveau WRITE est nÃ©cessaire pour disposer du bouton d'Ã©dition sur l'utilisateur courant.
+				- Une habilitation publique SecurityRight de niveau DELETE est nÃ©cessaire pour disposer du bouton de suppression d'utilisateur.
 
-			<i>Journaux</i> : Les opérations suivantes sont consignées dans le journal de sécurité :
-				- INFO : Création d'utilisateur
-				- INFO : Suppression d'utilisateur : le choix "suppression ou désactivation" est notifié dans l'entrée
+			<i>Journaux</i> : Les opÃ©rations suivantes sont consignÃ©es dans le journal de sÃ©curitÃ© :
+				- INFO : CrÃ©ation d'utilisateur
+				- INFO : Suppression d'utilisateur : le choix "suppression ou dÃ©sactivation" est notifiÃ© dans l'entrÃ©e
 		*/
 		class UsersAdmin: public admin::AdminInterfaceElementTemplate<UsersAdmin>
 		{

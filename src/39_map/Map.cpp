@@ -458,7 +458,7 @@ Map::assignShiftFactors (const DrawableLine* reference,
 		}
 		
 	    }
-	    // On peut passer au point suivant si la ligne a été groupée
+	    // On peut passer au point suivant si la ligne a Ã©tÃ© groupÃ©e
 	    // par sa couleur
 	    if (isGrouped) continue;
 	}

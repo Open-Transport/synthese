@@ -45,7 +45,7 @@ namespace synthese
 
 	namespace security
 	{
-		template<> const string RightTemplate<SecurityRight>::NAME("Gestion de la sécurité");
+		template<> const string RightTemplate<SecurityRight>::NAME("Gestion de la sÃ©curitÃ©");
 		template<> const bool RightTemplate<SecurityRight>::USE_PRIVATE_RIGHTS(true);
 
 		template<> ParameterLabelsVector RightTemplate<SecurityRight>::getStaticParametersLabels()

@@ -47,7 +47,7 @@ namespace synthese
 		):	_source(source)
 		{
 			typedef tokenizer<char_separator<char> > tokenizer;
-			char_separator<char> sep(" :,;.-_|/\¦'");
+			char_separator<char> sep(" :,;.-_|/\Â¦'");
 			tokenizer words(source, sep);
 			BOOST_FOREACH(string word, words)
 			{
@@ -137,7 +137,7 @@ namespace synthese
 				source == "chr" ||
 				source == "clinique"
 			){
-				return "hôpital";
+				return "hÃ´pital";
 			}
 			
 			if(	source == "a" ||
@@ -157,11 +157,11 @@ namespace synthese
 				return string();
 			}
 			
-			if(	source == "faculté" ||
+			if(	source == "facultÃ©" ||
 				source == "fac" ||
 				source == "faculte"
 			){
-				return "université";
+				return "universitÃ©";
 			}
 				
 			return source;

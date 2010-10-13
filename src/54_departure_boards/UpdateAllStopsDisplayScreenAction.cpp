@@ -79,7 +79,7 @@ namespace synthese
 			stringstream log;
 			DBLogModule::appendToLogIfChange(
 				log,
-				"Affichage tous arrêts",
+				"Affichage tous arrÃªts",
 				_screen->getAllPhysicalStopsDisplayed() ? "OUI" : "NON",
 				_value ? "OUI" : "NON"
 			);

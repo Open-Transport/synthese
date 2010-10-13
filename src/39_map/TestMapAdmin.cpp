@@ -129,23 +129,23 @@ namespace synthese
 			
 			// Form
 			PropertiesHTMLTable  st(testMapRequest.getHTMLForm("test"));
-			stream << "<h1>Données XML à tester</h1>";
+			stream << "<h1>DonnÃ©es XML Ã  tester</h1>";
 			stream << st.open();
-			stream << st.cell("Tracer environnement partagé", st.getForm().getOuiNonRadioInput(PARAMETER_USE_ENVIRONMENT, _useEnvironment));
-			stream << st.cell("Données temporaires (XML)", st.getForm().getTextAreaInput(PARAMETER_DATA_XML, _dataXml, 5, 50));
-			stream << st.cell("Requète (XML)", st.getForm().getTextAreaInput(PARAMETER_QUERY_XML, _queryXml, 5, 50));
+			stream << st.cell("Tracer environnement partagÃ©", st.getForm().getOuiNonRadioInput(PARAMETER_USE_ENVIRONMENT, _useEnvironment));
+			stream << st.cell("DonnÃ©es temporaires (XML)", st.getForm().getTextAreaInput(PARAMETER_DATA_XML, _dataXml, 5, 50));
+			stream << st.cell("RequÃ¨te (XML)", st.getForm().getTextAreaInput(PARAMETER_QUERY_XML, _queryXml, 5, 50));
 			stream << st.close();
 
 			// Display
-			stream << "<h1>Carte résultat</h1>";
+			stream << "<h1>Carte rÃ©sultat</h1>";
 			if (_error)
 				stream << "Erreur postscript";
 			else if (_tempFileUrl.empty())
 				stream << "Carte vide";
 			else
-				stream << HTMLModule::getHTMLImage(_tempFileUrl, "Carte résultat");
+				stream << HTMLModule::getHTMLImage(_tempFileUrl, "Carte rÃ©sultat");
 
-			stream << "<h1>Postscript résultat</h1>";
+			stream << "<h1>Postscript rÃ©sultat</h1>";
 			stream << _postScript;
 		}
 

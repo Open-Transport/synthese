@@ -154,29 +154,29 @@ namespace synthese
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
 				AdminFunctionRequest<PTRoadsAdmin> openRoadRequest(request);
 
-				stream << "<h1>Recherche phonétique</h1>";
+				stream << "<h1>Recherche phonÃ©tique</h1>";
 
 				SearchFormHTMLTable t(searchRequest.getHTMLForm());
 				stream << t.open();
 				if(!_city.get())
 				{
-					stream << t.cell("Localité", t.getForm().getTextInput(PARAM_SEARCH_CITY, _searchCity));
+					stream << t.cell("LocalitÃ©", t.getForm().getTextInput(PARAM_SEARCH_CITY, _searchCity));
 				}
 				stream << t.cell("Nom", t.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
 				stream << t.close();
 
 				if(!_searchName.empty())
 				{
-					stream << "<h1>Résultats</h1>";
+					stream << "<h1>RÃ©sultats</h1>";
 
-					stream << "<p>Phonétique du texte recherché : " << FrenchSentence(_searchName).getPhoneticString() << "</p>";
+					stream << "<p>PhonÃ©tique du texte recherchÃ© : " << FrenchSentence(_searchName).getPhoneticString() << "</p>";
 
 					HTMLTable::ColsVector c;
 					c.push_back("Type");
 					c.push_back("Type");
 					c.push_back("Lieu");
-					c.push_back("Clé");
-					c.push_back("Phonétique");
+					c.push_back("ClÃ©");
+					c.push_back("PhonÃ©tique");
 					c.push_back("Score");
 					c.push_back("Levenshtein");
 					c.push_back("Actions");
@@ -210,7 +210,7 @@ namespace synthese
 							openPlaceRequest.getPage()->setConnectionPlace(connectionPlace);
 
 							stream << t.col();
-							stream << t.col() << "Zone d'arrêt";
+							stream << t.col() << "Zone d'arrÃªt";
 							stream << t.col() << connectionPlace->getName();
 							stream << t.col() << it.key.getSource();
 							stream << t.col() << it.key.getPhoneticString();
@@ -280,7 +280,7 @@ namespace synthese
 							openPlaceRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr(connectionPlace));
 
 							stream << t.col();
-							stream << t.col() << "Zone d'arrêt";
+							stream << t.col() << "Zone d'arrÃªt";
 							stream << t.col() << connectionPlace->getName();
 							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
@@ -317,12 +317,12 @@ namespace synthese
 				stream << st.open();
 				if(!_city.get())
 				{
-					stream << st.cell("Localité", st.getForm().getTextInput(PARAM_SEARCH_CITY, _searchCity));
+					stream << st.cell("LocalitÃ©", st.getForm().getTextInput(PARAM_SEARCH_CITY, _searchCity));
 				}
 				stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
 				stream << st.close();
 
-				stream << "<h1>Résultats</h1>";
+				stream << "<h1>RÃ©sultats</h1>";
 
 				StopAreaTableSync::SearchResult places(
 					StopAreaTableSync::Search(
@@ -354,7 +354,7 @@ namespace synthese
 				c.push_back("id");
 				if(!_city.get())
 				{
-					c.push_back("Localité");
+					c.push_back("LocalitÃ©");
 				}
 				c.push_back("Nom");
 				c.push_back("X");
@@ -379,7 +379,7 @@ namespace synthese
 					}
 					else
 					{
-						stream << t.col(2) << "Non localisé";
+						stream << t.col(2) << "Non localisÃ©";
 					}
 
 					openRequest.getPage()->setConnectionPlace(const_pointer_cast<const StopArea>(place));
@@ -495,13 +495,13 @@ namespace synthese
 			{
 				_tabs.push_back(Tab("Lieux", TAB_PHONETIC, true, "text_allcaps.png"));
 			}
-			_tabs.push_back(Tab("Zones d'arrêt", TAB_CONNECTION_PLACES, true, "building.png"));
+			_tabs.push_back(Tab("Zones d'arrÃªt", TAB_CONNECTION_PLACES, true, "building.png"));
 			_tabs.push_back(Tab("Routes", TAB_ROAD_PLACES, true, "building.png"));
 			_tabs.push_back(Tab("Lieux publics", TAB_PUBLIC_PLACES, true, "building.png"));
 			_tabs.push_back(Tab("Alias", TAB_ALIASES, true, "building.png"));
 			if(_city.get())
 			{
-				_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true, "building.png"));
+				_tabs.push_back(Tab("PropriÃ©tÃ©s", TAB_PROPERTIES, true, "building.png"));
 			}
 			_tabBuilded = true;
 		}

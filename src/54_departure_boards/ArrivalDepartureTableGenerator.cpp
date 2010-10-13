@@ -67,11 +67,11 @@ namespace synthese
 		{}
 
 
-		/** Les tests effectués sont les suivants. Ils doivent tous être positifs :
-				- Ligne non explicitement interdite d'affichage sur tout tableau de départs
-				- Ligne non explicitement interdite d'affichage sur le tableau de départ courant
-				- Si tableau des origines seulement, ligne originaire de l'arrêt affiché sur le tableau courant
-				- L'arrêt d'arrivée suivant ou la destination doivent être différent de l'arrêt courant (?? -> removed currently)
+		/** Les tests effectuÃ©s sont les suivants. Ils doivent tous Ãªtre positifs :
+				- Ligne non explicitement interdite d'affichage sur tout tableau de dÃ©parts
+				- Ligne non explicitement interdite d'affichage sur le tableau de dÃ©part courant
+				- Si tableau des origines seulement, ligne originaire de l'arrÃªt affichÃ© sur le tableau courant
+				- L'arrÃªt d'arrivÃ©e suivant ou la destination doivent Ãªtre diffÃ©rent de l'arrÃªt courant (?? -> removed currently)
 		*/
 		bool ArrivalDepartureTableGenerator::_allowedLineStop(const LineStop* linestop) const
 		{

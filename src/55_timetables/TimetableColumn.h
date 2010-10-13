@@ -50,8 +50,8 @@ namespace synthese
 		/** TimetableColumn class.
 			Colonne de tableau d'indicateur papier
 
-			 caractérisée par:
-			   - des pointeurs vers les cArrets décrits
+			 caractÃ©risÃ©e par:
+			   - des pointeurs vers les cArrets dÃ©crits
 			   - le code Postscript de la colonne
 			   - le nombre de lignes de la colonne
 			@author Hugues Romain

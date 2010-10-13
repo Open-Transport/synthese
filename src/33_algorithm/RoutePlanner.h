@@ -63,16 +63,16 @@ namespace synthese
 
 			Les vitesses maximales interviennent dans l'optimisaion.
 
-			Les vitesses maximales sont fabriquées automatiquement dans le programme d'administration. Lancer la procédure et patienter quelques minutes&nbsp;: le fichier <b>.vmax.per</b> est alors écrit. Vérifier à l'intérieur de ce fichier les dépassements de 200 km/h qui sont tous signalés par un message adéquat (<i>Attention, V&gt;200 km/h</i>).
+			Les vitesses maximales sont fabriquÃ©es automatiquement dans le programme d'administration. Lancer la procÃ©dure et patienter quelques minutes&nbsp;: le fichier <b>.vmax.per</b> est alors Ã©crit. VÃ©rifier Ã  l'intÃ©rieur de ce fichier les dÃ©passements de 200 km/h qui sont tous signalÃ©s par un message adÃ©quat (<i>Attention, V&gt;200 km/h</i>).
 
-			Corriger éventuellement les données correspondant à ces dépassements s'ils sont anormaux.
+			Corriger Ã©ventuellement les donnÃ©es correspondant Ã  ces dÃ©passements s'ils sont anormaux.
 
-			Les sources d'erreurs les plus fréquentes sont&nbsp;:
-			- Erreur de géolocalisation d'un point d'arrêt (se voit lorsque beaucoup de vitesses supérieures à 200 sont signalées sur un même point d'arrêt)
-			- Erreur d'horaires. (voir le fichier <b>log.txt</b> pour d'éventuelles correspondances avec des dépassements de vitesse de matériel, remarqués au stade du chargement des lignes)
-			- Erreur de code point d'arrêt dans un fichier d'horaires
+			Les sources d'erreurs les plus frÃ©quentes sont&nbsp;:
+			- Erreur de gÃ©olocalisation d'un point d'arrÃªt (se voit lorsque beaucoup de vitesses supÃ©rieures Ã  200 sont signalÃ©es sur un mÃªme point d'arrÃªt)
+			- Erreur d'horaires. (voir le fichier <b>log.txt</b> pour d'Ã©ventuelles correspondances avec des dÃ©passements de vitesse de matÃ©riel, remarquÃ©s au stade du chargement des lignes)
+			- Erreur de code point d'arrÃªt dans un fichier d'horaires
 
-			Une fois validé le fichier <b>.vmax.per</b>, lancer l'importation dans l'assistant de saisie des données. Les Vmax sont saisies automatiquement dans le fichier des points d'arret, remplaçant ainsi les anciens.
+			Une fois validÃ© le fichier <b>.vmax.per</b>, lancer l'importation dans l'assistant de saisie des donnÃ©es. Les Vmax sont saisies automatiquement dans le fichier des points d'arret, remplaÃ§ant ainsi les anciens.
 
 			@ingroup m33
 		*/

@@ -79,7 +79,7 @@ namespace synthese
 			Env env;
 			ProfileTableSync::Search(env, _name, string(), 0,1);
 			if (!env.getRegistry<Profile>().empty())
-				throw ActionException("Le nom choisi est dÈj‡ pris par un autre profil. Veuillez entrer un autre nom.");
+				throw ActionException("Le nom choisi est d√©j√† pris par un autre profil. Veuillez entrer un autre nom.");
 		}
 
 		void UpdateProfileAction::run(Request& request)

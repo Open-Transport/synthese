@@ -182,7 +182,7 @@ namespace synthese
 			static const string peerid ("SYNTHESE");
 
 			//os.imbue (locale("POSIX"));
-			// os.imbue (locale("en_US.ISO-8859-15"));
+			// os.imbue (locale("en_US.UTF-8"));
 			//cerr << "locale = " << os.getloc ().name () << "\n";
 
 			// Collect all data related to selected commercial line
@@ -242,7 +242,7 @@ namespace synthese
 
 
 			// Writing of the header
-			os << "<?xml version='1.0' encoding='ISO-8859-15'?>" << "\n" << "\n";
+			os << "<?xml version='1.0' encoding='UTF-8'?>" << "\n" << "\n";
 		    if (_withTisseoExtension)
 				os << "<TisseoPTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident  http://www.rcsmobility.com/synthese/include/35_pt/trident2-tisseo/tisseo-chouette-extension.xsd'>" << "\n";
 			else
@@ -1903,7 +1903,7 @@ namespace synthese
 			if(_SRIDConversionMap.left.empty())
 			{
 				_SRIDConversionMap.left.insert(SRIDConversionMap::left_value_type(4326, "WGS84"));
-				_SRIDConversionMap.left.insert(SRIDConversionMap::left_value_type(27572, "Lambert II étendu"));
+				_SRIDConversionMap.left.insert(SRIDConversionMap::left_value_type(27572, "Lambert II Ã©tendu"));
 			}
 		}
 

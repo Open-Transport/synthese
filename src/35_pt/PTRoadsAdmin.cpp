@@ -117,7 +117,7 @@ namespace synthese
 			AdminFunctionRequest<PTRoadAdmin> openRoadRequest(request);
 
 			HTMLTable::ColsVector c;
-			c.push_back("Début");
+			c.push_back("DÃ©but");
 			c.push_back("Fin");
 			c.push_back("Longueur");
 			c.push_back("Actions");

@@ -113,7 +113,7 @@ namespace synthese
 
 			// Output generation
 			stream <<
-				"<?xml version='1.0' encoding='ISO-8859-15'?>\n" <<
+				"<?xml version='1.0' encoding='UTF-8'?>\n" <<
 				"<" << DISPLAY_SCREENS_XML_TAG << ">\n";
 
 			BOOST_FOREACH(const DisplayScreen* screen, _cpu->getWiredScreens())

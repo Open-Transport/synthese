@@ -100,10 +100,10 @@ namespace synthese
 		{
 			// Log
 			stringstream log;
-			DBLogModule::appendToLogIfChange(log, "Délai de clignotement", _screen->getBlinkingDelay(), _blinkingDelay);
-			DBLogModule::appendToLogIfChange(log, "Affichage du numéro de quai", _screen->getTrackNumberDisplay(), _displayPlatform);
-			DBLogModule::appendToLogIfChange(log, "Affichage du numéro de service", _screen->getServiceNumberDisplay(), _displayServiceNumber);
-			DBLogModule::appendToLogIfChange(log, "Affichage du numéro d'équipe", _screen->getDisplayTeam(), _displayTeam);
+			DBLogModule::appendToLogIfChange(log, "DÃ©lai de clignotement", _screen->getBlinkingDelay(), _blinkingDelay);
+			DBLogModule::appendToLogIfChange(log, "Affichage du numÃ©ro de quai", _screen->getTrackNumberDisplay(), _displayPlatform);
+			DBLogModule::appendToLogIfChange(log, "Affichage du numÃ©ro de service", _screen->getServiceNumberDisplay(), _displayServiceNumber);
+			DBLogModule::appendToLogIfChange(log, "Affichage du numÃ©ro d'Ã©quipe", _screen->getDisplayTeam(), _displayTeam);
 			DBLogModule::appendToLogIfChange(log, "Affichage de l'horloge", _screen->getDisplayClock(), _displayClock);
 			DBLogModule::appendToLogIfChange(log, "Titre", _screen->getTitle(), _title);
 

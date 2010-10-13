@@ -121,7 +121,7 @@ namespace synthese
 			stream << s.close();
 			stream << s.getForm().setFocus(PARAMETER_SEARCH_NAME);
 				
-			stream << "<h1>Résultats de la recherche</h1>";
+			stream << "<h1>RÃ©sultats de la recherche</h1>";
 
 			// Search
 			ProfileTableSync::SearchResult profiles(
@@ -140,7 +140,7 @@ namespace synthese
 			);
 			ActionResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAMETER_SEARCH_NAME, string("Nom")));
-			v.push_back(make_pair(string(), string("Résumé")));
+			v.push_back(make_pair(string(), string("RÃ©sumÃ©")));
 			v.push_back(make_pair(string(), string("Actions")));
 			if(generalDeleteRight)
 			{
@@ -181,7 +181,7 @@ namespace synthese
 				for(RightsVector::const_iterator it(profile->getRights().begin()); it != profile->getRights().end(); ++it)
 				{
 					shared_ptr<Right> r(it->second);
-					stream << l.element() << "Accès " << Right::getLevelLabel(r->getPublicRightLevel()) << " public et " << Right::getLevelLabel(r->getPrivateRightLevel()) << " privé pour " << r->getName();
+					stream << l.element() << "AccÃ¨s " << Right::getLevelLabel(r->getPublicRightLevel()) << " public et " << Right::getLevelLabel(r->getPrivateRightLevel()) << " privÃ© pour " << r->getName();
 					if (r->getParameter() != GLOBAL_PERIMETER)
 						stream << "/" << r->displayParameter();
 				}
@@ -195,12 +195,12 @@ namespace synthese
 					stream << t.col();
 					if(_request.isAuthorized<SecurityRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(profile->getKey())))
 					{
-						stream << deleteProfileRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?", "group_delete.png");
+						stream << deleteProfileRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sÃ»r de vouloir supprimer le profil " + profile->getName() + " ?", "group_delete.png");
 			}	}	}
 
 			stream << t.row(string());
 			stream << t.col() << t.getActionForm().getTextInput(AddProfileAction::PARAMETER_NAME, "", "Entrez le nom du profil ici");
-			stream << t.col() << "(sélectionner un profil existant duquel héritera le nouveau profil)";
+			stream << t.col() << "(sÃ©lectionner un profil existant duquel hÃ©ritera le nouveau profil)";
 			stream << t.col(2) << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.close();
 		}

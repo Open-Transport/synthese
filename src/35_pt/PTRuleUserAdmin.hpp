@@ -65,9 +65,9 @@ namespace synthese
 
 			html::HTMLTable::ColsVector c;
 			c.push_back(std::string());
-			c.push_back("Piétons");
-			c.push_back("Handicapés");
-			c.push_back("Vélos");
+			c.push_back("PiÃ©tons");
+			c.push_back("HandicapÃ©s");
+			c.push_back("VÃ©los");
 
 			admin::AdminActionFunctionRequest<graph::RuleUserUpdateAction,AdminPage> updateRequest(request);
 			updateRequest.getAction()->setId(object->getKey());
@@ -88,9 +88,9 @@ namespace synthese
 			{
 				stream << t.row();
 				stream << t.col(1, std::string(), true) << user->getRuleUserName();
-				stream << t.col() << (user->getRule(graph::USER_PEDESTRIAN) ? user->getRule(graph::USER_PEDESTRIAN)->getUseRuleName() : "(non défini)");
-				stream << t.col() << (user->getRule(graph::USER_HANDICAPPED) ? user->getRule(graph::USER_HANDICAPPED)->getUseRuleName() : "(non défini)");
-				stream << t.col() << (user->getRule(graph::USER_BIKE) ? user->getRule(graph::USER_BIKE)->getUseRuleName() : "(non défini)");
+				stream << t.col() << (user->getRule(graph::USER_PEDESTRIAN) ? user->getRule(graph::USER_PEDESTRIAN)->getUseRuleName() : "(non dÃ©fini)");
+				stream << t.col() << (user->getRule(graph::USER_HANDICAPPED) ? user->getRule(graph::USER_HANDICAPPED)->getUseRuleName() : "(non dÃ©fini)");
+				stream << t.col() << (user->getRule(graph::USER_BIKE) ? user->getRule(graph::USER_BIKE)->getUseRuleName() : "(non dÃ©fini)");
 			}
 
 			stream << t.row();
@@ -112,7 +112,7 @@ namespace synthese
 			);
 
 			stream << t.row();
-			stream << t.col(1, std::string(), true) << "Résultat";
+			stream << t.col(1, std::string(), true) << "RÃ©sultat";
 			stream << t.col() << (object->getUseRule(graph::USER_PEDESTRIAN - graph::USER_CLASS_CODE_OFFSET).getUseRuleName());
 			stream << t.col() << (object->getUseRule(graph::USER_HANDICAPPED - graph::USER_CLASS_CODE_OFFSET).getUseRuleName());
 			stream << t.col() << (object->getUseRule(graph::USER_BIKE - graph::USER_CLASS_CODE_OFFSET).getUseRuleName());

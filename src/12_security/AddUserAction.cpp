@@ -60,13 +60,13 @@ namespace synthese
 		{
 			_name = map.get<string>(PARAMETER_NAME);
 			if (_name.empty())
-				throw ActionException("L'utilisateur ne peut être créé car le nom n'est pas renseigné. Veuillez renseigner le champ nom.");
+				throw ActionException("L'utilisateur ne peut Ãªtre crÃ©Ã© car le nom n'est pas renseignÃ©. Veuillez renseigner le champ nom.");
 			
 			_login = map.get<string>(PARAMETER_LOGIN);
 			if (_login.empty())
-				throw ActionException("L'utilisateur ne peut être créé car le login n'est pas renseigné. Veuillez renseigner le champ login.");
+				throw ActionException("L'utilisateur ne peut Ãªtre crÃ©Ã© car le login n'est pas renseignÃ©. Veuillez renseigner le champ login.");
 			if (UserTableSync::loginExists(_login))
-				throw ActionException("L'utilisateur ne peut être créé car le login entré est déjà utilisé. Veuillez choisir un autre login.");
+				throw ActionException("L'utilisateur ne peut Ãªtre crÃ©Ã© car le login entrÃ© est dÃ©jÃ  utilisÃ©. Veuillez choisir un autre login.");
 			
 			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_PROFILE_ID));
 			try
@@ -93,7 +93,7 @@ namespace synthese
 			SecurityLog::addUserAdmin(
 				request.getUser().get(),
 				&user,
-				"Création de l'utilisateur " + user.getLogin()
+				"CrÃ©ation de l'utilisateur " + user.getLogin()
 			);
 		}
 

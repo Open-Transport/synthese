@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 	Functions::setLanguage(1);
 	
 	// menu bienvenu, time to creat the objects
-	Functions::playbackText(&agi,&res,"Bienvenu au système de reservation.");
+	Functions::playbackText(&agi,&res,"Bienvenu au systÃ¨me de reservation.");
 	
 	// prepare objects during the language
 	Login *login=new Login(&agi,&res);
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 			break;
 			
 		case -1:
-			Functions::playbackText(&agi,&res,"Identification échuée. Veuillez renouveler votre appel.");
+			Functions::playbackText(&agi,&res,"Identification Ã©chuÃ©e. Veuillez renouveler votre appel.");
 			cerr<<"interuption, system stopped"<<endl;
 			break;
 		default:

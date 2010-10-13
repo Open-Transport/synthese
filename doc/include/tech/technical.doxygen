@@ -1,95 +1,95 @@
-/** @page archi-externe Intégration dans une architecture type ITS
+/** @page archi-externe IntÃ©gration dans une architecture type ITS
 
-SYNTHESE est un système d'information-voyageurs (SIV) qui s'inscrit  dans une architecture de système de transports intelligents (ITS) à plusieurs composants, chacun ayant un périmètre d'intervention qui lui est propre :
+SYNTHESE est un systÃ¨me d'information-voyageurs (SIV) qui s'inscrit  dans une architecture de systÃ¨me de transports intelligents (ITS) Ã  plusieurs composants, chacun ayant un pÃ©rimÃ¨tre d'intervention qui lui est propre :
 
 <ul>
-<li>les <b>données théoriques</b> proviennent des <a href="http://fr.wikipedia.org/wiki/Graphicage_et_habillage" terget="_blank">serveurs de graphicage</a> et/ou sont saisies par un opérateur. Dans tous les cas, celui-ci reste en général obligatoire pour effectuer la fusion des données issues de plusieurs réseaux et pour convertir ces données en données d'information. Les données importées respectent aujourd'hui le format français Trident, et seront demain remplacées par des données au format européen Netex.</li>
-<li>les <b>données temps réel</b> proviennent des serveurs d'aide à l'exploiation (SAE) et sont transmises à SYNTHESE sous le format européen SIRI.</li>
-<li>SYNTHESE constitue alors un référentiel d'information-voyageurs, sur lequel s'appuient des algorithmes avancés, réalisant le <b>métier de l'information-voyageurs</b>.</li>
+<li>les <b>donnÃ©es thÃ©oriques</b> proviennent des <a href="http://fr.wikipedia.org/wiki/Graphicage_et_habillage" terget="_blank">serveurs de graphicage</a> et/ou sont saisies par un opÃ©rateur. Dans tous les cas, celui-ci reste en gÃ©nÃ©ral obligatoire pour effectuer la fusion des donnÃ©es issues de plusieurs rÃ©seaux et pour convertir ces donnÃ©es en donnÃ©es d'information. Les donnÃ©es importÃ©es respectent aujourd'hui le format franÃ§ais Trident, et seront demain remplacÃ©es par des donnÃ©es au format europÃ©en Netex.</li>
+<li>les <b>donnÃ©es temps rÃ©el</b> proviennent des serveurs d'aide Ã  l'exploiation (SAE) et sont transmises Ã  SYNTHESE sous le format europÃ©en SIRI.</li>
+<li>SYNTHESE constitue alors un rÃ©fÃ©rentiel d'information-voyageurs, sur lequel s'appuient des algorithmes avancÃ©s, rÃ©alisant le <b>mÃ©tier de l'information-voyageurs</b>.</li>
 </ul>
 
-SYNTHESE est dédié à l'information-voyageurs : il est alimenté à partir de données d'exploitation transformées ou remplacées par des données d'information. Cette conversion est loin d'être triviale et porte en elle la richesse fonctionnelle du SIV. Ceci est l'une des principales raisons qui poussent aujourd'hui les exploitatnts de réseaux à découpler les SAE et les SIV.
+SYNTHESE est dÃ©diÃ© Ã  l'information-voyageurs : il est alimentÃ© Ã  partir de donnÃ©es d'exploitation transformÃ©es ou remplacÃ©es par des donnÃ©es d'information. Cette conversion est loin d'Ãªtre triviale et porte en elle la richesse fonctionnelle du SIV. Ceci est l'une des principales raisons qui poussent aujourd'hui les exploitatnts de rÃ©seaux Ã  dÃ©coupler les SAE et les SIV.
 
-Le diagramme suivant représente une architecture ITS standard intégrant le SIV SYNTHESE :
+Le diagramme suivant reprÃ©sente une architecture ITS standard intÃ©grant le SIV SYNTHESE :
 
 @image html archi-externe.png
 @image latex archi-externe.png width=10cm
 
 
-@page archi-monitoring Intégration dans une architecture de supervision basée sur Nagios
+@page archi-monitoring IntÃ©gration dans une architecture de supervision basÃ©e sur Nagios
 
-<h2>Présentation</h2>
-SYNTHESE peut être intégré à une centrale de supervision basée sur le serveur Nagios. Cette architecture repose sur un mécanisme à plusieurs rôles, qui échangent des informations de manière asynchrone.
+<h2>PrÃ©sentation</h2>
+SYNTHESE peut Ãªtre intÃ©grÃ© Ã  une centrale de supervision basÃ©e sur le serveur Nagios. Cette architecture repose sur un mÃ©canisme Ã  plusieurs rÃ´les, qui Ã©changent des informations de maniÃ¨re asynchrone.
 
 @image html archi-monitoring.png
 @image latex archi-monitoring.png width=10cm
 
-Les points pouvant être supervisés sont :
+Les points pouvant Ãªtre supervisÃ©s sont :
 <ul>
-<li>Etat du matériel de téléaffichage (fonction DisplayScreenSupervisionFunction)</li>
-<li>Cohérence des données (fonction pt::CheckLineCalendarFunction)</li>
+<li>Etat du matÃ©riel de tÃ©lÃ©affichage (fonction DisplayScreenSupervisionFunction)</li>
+<li>CohÃ©rence des donnÃ©es (fonction pt::CheckLineCalendarFunction)</li>
 </ul>
 
 <h2>Services</h2>
 
-Les quatre rôles clés sont les suivants :
+Les quatre rÃ´les clÃ©s sont les suivants :
 <ul>
-<li>A :	Le service <b>SYNTHESE</b> est chargé de collecter les différents messages de supervision envoyés aléatoirement par les différents matériels, selon différents protocoles, et les stocker pour rediffusion sur demande sous un format unique. SYNTHESE est également chargé d'exporter la liste des éléments à superviser d'après sa base de données interne. SYNTHESE est donc en charge de la <i>traduction métier > informatique</i>.</li>
-<li>B : Le service <b>Nagios</b> est chargé d'interroger le serveur SYNTHESE à intervalle régulier pour collecter le statut de chaque matériel et les données associées. En cas de problème, Nagios diffuse les alertes immédiatement. Nagios est donc en charge de la fonction <i>ordonnancement et contact</i>.</li>
-<li>C : Le service <b>MySQL</b> accompagné du démon NDO est chargé d'historiser en continu les données collectées par Nagios et les mettre à disposition sur un serveur de base de données interrogeable par toute application apte à produire des états. Le seveur MySQL stocke également la configuration de Nagios. NDO et MySQL ont donc en charge la fonction de <i>stockage</i>.</li>
-<li>D : Le service <b>Centréon</b> est chargé d'afficher les données de supervision en temps réel sur une interface web, et de proposer des fonctions d'analyse de l'historique (graphes, taux de fonctionnement, etc.) Centréon permet également d'effectuer les opérations de configuration de la partie alertes. Centréon a donc en charge la fonction de <i>présentation</i>.</li>
+<li>A :	Le service <b>SYNTHESE</b> est chargÃ© de collecter les diffÃ©rents messages de supervision envoyÃ©s alÃ©atoirement par les diffÃ©rents matÃ©riels, selon diffÃ©rents protocoles, et les stocker pour rediffusion sur demande sous un format unique. SYNTHESE est Ã©galement chargÃ© d'exporter la liste des Ã©lÃ©ments Ã  superviser d'aprÃ¨s sa base de donnÃ©es interne. SYNTHESE est donc en charge de la <i>traduction mÃ©tier > informatique</i>.</li>
+<li>B : Le service <b>Nagios</b> est chargÃ© d'interroger le serveur SYNTHESE Ã  intervalle rÃ©gulier pour collecter le statut de chaque matÃ©riel et les donnÃ©es associÃ©es. En cas de problÃ¨me, Nagios diffuse les alertes immÃ©diatement. Nagios est donc en charge de la fonction <i>ordonnancement et contact</i>.</li>
+<li>C : Le service <b>MySQL</b> accompagnÃ© du dÃ©mon NDO est chargÃ© d'historiser en continu les donnÃ©es collectÃ©es par Nagios et les mettre Ã  disposition sur un serveur de base de donnÃ©es interrogeable par toute application apte Ã  produire des Ã©tats. Le seveur MySQL stocke Ã©galement la configuration de Nagios. NDO et MySQL ont donc en charge la fonction de <i>stockage</i>.</li>
+<li>D : Le service <b>CentrÃ©on</b> est chargÃ© d'afficher les donnÃ©es de supervision en temps rÃ©el sur une interface web, et de proposer des fonctions d'analyse de l'historique (graphes, taux de fonctionnement, etc.) CentrÃ©on permet Ã©galement d'effectuer les opÃ©rations de configuration de la partie alertes. CentrÃ©on a donc en charge la fonction de <i>prÃ©sentation</i>.</li>
 </ul>
 
-<h2>Flux pour le contrôle des afficheurs</h2>
+<h2>Flux pour le contrÃ´le des afficheurs</h2>
 
-Les flux entre les rôles sont les suivants :
+Les flux entre les rÃ´les sont les suivants :
 <ol>
-<li>Transmission de l'état de l'afficheur à l'unité centrale de contrôle par le matériel d'affichage</li>
-<li>Transmission de l'état de l'afficheur de l'unité centrale vers le service SYNTHESE par le client de téléaffichage par appel à la fonction DisplayScreenSupervisionFunction</li>
-<li>Saisie de la configuration des panneaux dans SYNTHESE par l'administrateur (utilisation des écrans d'administration DisplayAdmin et DisplayScreenCPUAdmin)</li>
-<li>Sondages sur l'état des panneaux ou des données par l'ordonnanceur de Nagios par un plug-in Nagios dédié (check_synthese.sh) faisant appel à SYNTHESE par la fonction DisplayGetNagiosStatusFunction</li>
-<li>Génération automatique de la configuration de Nagios liée aux panneaux par le service SYNTHESE (utilisation de la fonction CentreonConfigExportFunction)</li>
-<li>Génération des fichiers de configuration de Nagios à partir des tables de stockage de MySQL, par l'environnement de Centréon</li>
-<li>Stockage des états des panneaux collectés dans la base d'historisation MySQL, par un démon NDO</li>
-<li>Sauvegarde de la configuration des alertes automatiques dans la base MySQL par Centréon</li>
-<li>Affichage des données temps réel et historiques par Centréon</li>
-<li>Envoi d'alerte e-mail en cas d'incident, selon paramétrage, par Nagios</li>
-<li>Consultation des données et configuration des alertes sur Centréon par l'administrateur</li>
+<li>Transmission de l'Ã©tat de l'afficheur Ã  l'unitÃ© centrale de contrÃ´le par le matÃ©riel d'affichage</li>
+<li>Transmission de l'Ã©tat de l'afficheur de l'unitÃ© centrale vers le service SYNTHESE par le client de tÃ©lÃ©affichage par appel Ã  la fonction DisplayScreenSupervisionFunction</li>
+<li>Saisie de la configuration des panneaux dans SYNTHESE par l'administrateur (utilisation des Ã©crans d'administration DisplayAdmin et DisplayScreenCPUAdmin)</li>
+<li>Sondages sur l'Ã©tat des panneaux ou des donnÃ©es par l'ordonnanceur de Nagios par un plug-in Nagios dÃ©diÃ© (check_synthese.sh) faisant appel Ã  SYNTHESE par la fonction DisplayGetNagiosStatusFunction</li>
+<li>GÃ©nÃ©ration automatique de la configuration de Nagios liÃ©e aux panneaux par le service SYNTHESE (utilisation de la fonction CentreonConfigExportFunction)</li>
+<li>GÃ©nÃ©ration des fichiers de configuration de Nagios Ã  partir des tables de stockage de MySQL, par l'environnement de CentrÃ©on</li>
+<li>Stockage des Ã©tats des panneaux collectÃ©s dans la base d'historisation MySQL, par un dÃ©mon NDO</li>
+<li>Sauvegarde de la configuration des alertes automatiques dans la base MySQL par CentrÃ©on</li>
+<li>Affichage des donnÃ©es temps rÃ©el et historiques par CentrÃ©on</li>
+<li>Envoi d'alerte e-mail en cas d'incident, selon paramÃ©trage, par Nagios</li>
+<li>Consultation des donnÃ©es et configuration des alertes sur CentrÃ©on par l'administrateur</li>
 </ol>
 
 @page archi-interne Architecture interne
 
-SYNTHESE est développé dans une optique de haute performance.
+SYNTHESE est dÃ©veloppÃ© dans une optique de haute performance.
 
-A ce titre, il utilise les technologies libres suivantes, dont l'efficacité reste inégalée à ce jour :
+A ce titre, il utilise les technologies libres suivantes, dont l'efficacitÃ© reste inÃ©galÃ©e Ã  ce jour :
 <ul>
-<li><b>Code 100% C++</b> : optimisation de la mémoire et rapidité proche du maximum grâce au positionnement bas-niveau du C++</li>
-<li><b>Chargement de toutes les données utiles en mémoire vive</b> selon un modèle objet orienté performances de calcul</li>
-<li><b>Bibliothèques STL et Boost</b> : basées essentiellement sur des templates, évitent bon nombre de calculs à l'exécution et donc augmentation de la performance. Ces bibliothèques sont standard et sont donc connues de la grande majorité des développeurs C++.</li>
-<li><b>Base de données fichier SQLite</b> : l'une des plus rapides du marché, grâce à l'économie du passage par une socket. Permet en outre une synchronisation automatique avec la mémoire vive par l'usage des triggers C.</li>
-<li><b>Algorithmes optimisés</b> utilisant les données directement en mémoire vive pour maximiser les performances.</li>
-<li><b>Une API XML</b> est disponible pour un contrôle externe de l'application par d'autres serveurs, notamment gérant la couche média de manière déportée</li>
+<li><b>Code 100% C++</b> : optimisation de la mÃ©moire et rapiditÃ© proche du maximum grÃ¢ce au positionnement bas-niveau du C++</li>
+<li><b>Chargement de toutes les donnÃ©es utiles en mÃ©moire vive</b> selon un modÃ¨le objet orientÃ© performances de calcul</li>
+<li><b>BibliothÃ¨ques STL et Boost</b> : basÃ©es essentiellement sur des templates, Ã©vitent bon nombre de calculs Ã  l'exÃ©cution et donc augmentation de la performance. Ces bibliothÃ¨ques sont standard et sont donc connues de la grande majoritÃ© des dÃ©veloppeurs C++.</li>
+<li><b>Base de donnÃ©es fichier SQLite</b> : l'une des plus rapides du marchÃ©, grÃ¢ce Ã  l'Ã©conomie du passage par une socket. Permet en outre une synchronisation automatique avec la mÃ©moire vive par l'usage des triggers C.</li>
+<li><b>Algorithmes optimisÃ©s</b> utilisant les donnÃ©es directement en mÃ©moire vive pour maximiser les performances.</li>
+<li><b>Une API XML</b> est disponible pour un contrÃ´le externe de l'application par d'autres serveurs, notamment gÃ©rant la couche mÃ©dia de maniÃ¨re dÃ©portÃ©e</li>
 </ul>
 
-Le diagramme suivant indique le fonctionnement général interne du serveur :
+Le diagramme suivant indique le fonctionnement gÃ©nÃ©ral interne du serveur :
 
 @image html archi-interne.png
 @image latex archi-interne.png width=10cm
  
-SYNTHESE est développé en C++ dans le respect des normes ANSI, ce qui lui permet d'être compilé et de fonctionner sur les plateformes suivantes :
+SYNTHESE est dÃ©veloppÃ© en C++ dans le respect des normes ANSI, ce qui lui permet d'Ãªtre compilÃ© et de fonctionner sur les plateformes suivantes :
 <ul>
 <li>Windows</li>
 <li>Linux</li>
 <li>Mac</li>
 </ul>
 
-Quelques points clé à propos de SYNTHESE :
+Quelques points clÃ© Ã  propos de SYNTHESE :
 <ul>
-<li>Aucune dépendance à bibliothèque non libre</li>
-<li>Modularité totale, utilisation d'un framework basé sur des factories permettant le dialogue entre modules ne se « connaissant pas »</li>
-<li>Codage respectueux des standards ANSI C++, totalement cross-plateforme (Linux, Windows, Mac) en faisant appel le moins possible à des doubles implémentations</li>
-<li>Documentation en ligne et complétée par des pages métier exploitées par Doxygen</li>
-<li>Livraison des binaires par packaging deb (sous Linux uniquement) avec installation automatique des dépendances</li>
+<li>Aucune dÃ©pendance Ã  bibliothÃ¨que non libre</li>
+<li>ModularitÃ© totale, utilisation d'un framework basÃ© sur des factories permettant le dialogue entre modules ne se Â« connaissant pas Â»</li>
+<li>Codage respectueux des standards ANSI C++, totalement cross-plateforme (Linux, Windows, Mac) en faisant appel le moins possible Ã  des doubles implÃ©mentations</li>
+<li>Documentation en ligne et complÃ©tÃ©e par des pages mÃ©tier exploitÃ©es par Doxygen</li>
+<li>Livraison des binaires par packaging deb (sous Linux uniquement) avec installation automatique des dÃ©pendances</li>
 <li>Compilation par SCons</li>
 </ul>
 

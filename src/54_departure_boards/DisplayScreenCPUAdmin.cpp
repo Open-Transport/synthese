@@ -75,7 +75,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<DisplayScreenCPUAdmin>::ICON("server.png");
-		template<> const string AdminInterfaceElementTemplate<DisplayScreenCPUAdmin>::DEFAULT_TITLE("Unité centrale");
+		template<> const string AdminInterfaceElementTemplate<DisplayScreenCPUAdmin>::DEFAULT_TITLE("UnitÃ© centrale");
 	}
 
 	namespace departure_boards
@@ -136,7 +136,7 @@ namespace synthese
 				AdminActionFunctionRequest<DisplayScreenCPUUpdateAction, DisplayScreenCPUAdmin> updateRequest(_request);
 				updateRequest.getAction()->setCPU(_cpu->getKey());
 
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
 				stream << t.open();
@@ -159,7 +159,7 @@ namespace synthese
 				// Log search
 				AdminFunctionRequest<DisplayScreenCPUAdmin> searchRequest(_request);
 
-				stream << "<h1>Paramètres de maintenance</h1>";
+				stream << "<h1>ParamÃ¨tres de maintenance</h1>";
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
 				t.getForm().setUpdateRight(tabHasWritePermissions());
@@ -167,7 +167,7 @@ namespace synthese
 				stream << t.open();
 				stream <<
 					t.cell(
-						"Unité centrale déclarée en service",
+						"UnitÃ© centrale dÃ©clarÃ©e en service",
 						t.getForm().getOuiNonRadioInput(
 							DisplayScreenCPUMaintenanceUpdateAction::PARAMETER_IS_ONLINE,
 							_cpu->getIsOnline()
@@ -184,7 +184,7 @@ namespace synthese
 				;
 				stream <<
 					t.cell(
-						"Durée entre les requêtes",
+						"DurÃ©e entre les requÃªtes",
 						t.getForm().getSelectNumberInput(
 							DisplayScreenCPUMaintenanceUpdateAction::PARAMETER_MONITORING_DELAY,
 							1, 120,
@@ -208,7 +208,7 @@ namespace synthese
 					stream <<
 						l.element() <<
 						HTMLModule::getHTMLImage("help.png", "Information") <<
-						" Cette unité centrale n'est pas supervisée."
+						" Cette unitÃ© centrale n'est pas supervisÃ©e."
 						;
 				} else {
 					
@@ -218,7 +218,7 @@ namespace synthese
 
 					stream <<
 						l.element() <<
-						"Durée théorique entre les contacts : " <<
+						"DurÃ©e thÃ©orique entre les contacts : " <<
 						_cpu->getMonitoringDelay().minutes() << " min"
 					;
 
@@ -228,7 +228,7 @@ namespace synthese
 						stream <<
 							l.element() <<
 							HTMLModule::getHTMLImage("exclamation.png", "Statut KO") <<
-							" KO : Cette unité centrale n'est jamais entré en contact.";
+							" KO : Cette unitÃ© centrale n'est jamais entrÃ© en contact.";
 					}
 					else
 					{
@@ -237,7 +237,7 @@ namespace synthese
 							stream <<
 								l.element() <<
 								HTMLModule::getHTMLImage("exclamation.png", "Statut KO") <<
-								" KO : Cette unité centrale n'est plus en contact alors qu'elle est déclarée online."
+								" KO : Cette unitÃ© centrale n'est plus en contact alors qu'elle est dÃ©clarÃ©e online."
 							;
 						}
 					}
@@ -297,7 +297,7 @@ namespace synthese
 
 				stream << t.close();
 
-				stream << createDisplayRequest.getHTMLForm().getLinkButton("Créer un nouvel afficheur sur l'unité centrale", string(), "monitor_add.png");
+				stream << createDisplayRequest.getHTMLForm().getLinkButton("CrÃ©er un nouvel afficheur sur l'unitÃ© centrale", string(), "monitor_add.png");
 			}
 
 			////////////////////////////////////////////////////////////////////

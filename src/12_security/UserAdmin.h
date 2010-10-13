@@ -31,52 +31,52 @@ namespace synthese
 	{
 		class User;
 
-		/** Ecran d'édition d'utilisateur.
+		/** Ecran d'Ã©dition d'utilisateur.
 			@ingroup m12Admin refAdmin
 		
 			@image html cap_admin_user.png
-			@image latex cap_admin_user.png "Maquette de l'écran d'édition d'utilisateur" width=14cm
+			@image latex cap_admin_user.png "Maquette de l'Ã©cran d'Ã©dition d'utilisateur" width=14cm
 
-			<i>Titre de la fenêtre</i> :
-				- SYNTHESE Admin - Utilisateurs - [Prénom] [Nom]
+			<i>Titre de la fenÃªtre</i> :
+				- SYNTHESE Admin - Utilisateurs - [PrÃ©nom] [Nom]
 
 			<i>Barre de navigation</i> :
 				- Lien vers synthese::interfaces::HomeAdmin
 				- Lien vers synthese::interfaces::UsersAdmin
-				- Prénom et Nom de l'utilisateur
+				- PrÃ©nom et Nom de l'utilisateur
 
-			<i>Zone de contenus</i> : Il s'agit d'un <b>Formulaire d'édition</b>.
+			<i>Zone de contenus</i> : Il s'agit d'un <b>Formulaire d'Ã©dition</b>.
 				-# <b>Connexion</b>
-					-# <tt>Login</tt> : Champ texte contenant le nom entré pour se connecter sur SYNTHESE. Champ obligatoire. Le login doit être unique. En cas de tentative de création d'utilisateur avec un login déjà pris, la modification est abandonnée et un message d'erreur apparait :
-						@code L'utilisateur ne peut modifié car le login entré est déjà pris. Veuillez choisir un autre login @endcode
-						Ce champ est en outre obligatoire. S'il n'est pas rempli la modification est abandonnée et un message d'erreur apparait :
-						@code L'utilisateur doit posséder un login. Veuillez renseigner le champ login. @endcode
-					-# <tt>Mot de passe</tt> et <tt>Mot de passe (vérification)</tt> : Champs texte cachés contenant le mot de passe utilisé pour se connecter sur SYNTHESE. Lors de l'affichage de la page ces champs ne sont pas remplis. Lors de la modification, trois scénarios peuvent se produire :
-						- Les champs sont laissés vides, auquel cas le mot de passe n'est pas modifié
-						- Les champs sont remplis à l'identique par un nouveau mot de passe, auquel cas le mot de passe est modifié comme spécifié
-						- Les champs sont remplis différemment, auquel cas la modification est interrompue, et un message d'erreur apparait :
-							@code Les mots de passe saisis ne sont pas identiques. Veuillez vérifier les mots de passe entrés. @endcode
-				-# <b>Coordonnées</b>
-					-# <tt>Prénom</tt> : Champ texte facultatif
+					-# <tt>Login</tt> : Champ texte contenant le nom entrÃ© pour se connecter sur SYNTHESE. Champ obligatoire. Le login doit Ãªtre unique. En cas de tentative de crÃ©ation d'utilisateur avec un login dÃ©jÃ  pris, la modification est abandonnÃ©e et un message d'erreur apparait :
+						@code L'utilisateur ne peut modifiÃ© car le login entrÃ© est dÃ©jÃ  pris. Veuillez choisir un autre login @endcode
+						Ce champ est en outre obligatoire. S'il n'est pas rempli la modification est abandonnÃ©e et un message d'erreur apparait :
+						@code L'utilisateur doit possÃ©der un login. Veuillez renseigner le champ login. @endcode
+					-# <tt>Mot de passe</tt> et <tt>Mot de passe (vÃ©rification)</tt> : Champs texte cachÃ©s contenant le mot de passe utilisÃ© pour se connecter sur SYNTHESE. Lors de l'affichage de la page ces champs ne sont pas remplis. Lors de la modification, trois scÃ©narios peuvent se produire :
+						- Les champs sont laissÃ©s vides, auquel cas le mot de passe n'est pas modifiÃ©
+						- Les champs sont remplis Ã  l'identique par un nouveau mot de passe, auquel cas le mot de passe est modifiÃ© comme spÃ©cifiÃ©
+						- Les champs sont remplis diffÃ©remment, auquel cas la modification est interrompue, et un message d'erreur apparait :
+							@code Les mots de passe saisis ne sont pas identiques. Veuillez vÃ©rifier les mots de passe entrÃ©s. @endcode
+				-# <b>CoordonnÃ©es</b>
+					-# <tt>PrÃ©nom</tt> : Champ texte facultatif
 					-# <tt>Nom</tt> : Champ texte obligatoire. S'il n'est pas rempli la modification est interrompue et un message d'erreur apparait :
 						@code L'utilisateur doit avoir un nom. @endcode
 					-# <tt>Adresse</tt> : Champ texte long, facultatif
 					-# <tt>Code postal</tt> : Champ texte long, facultatif
 					-# <tt>Ville</tt> : Champ texte, facultatif
 					-# <tt>E-mail</tt> : Champ texte, facultatif
-				-# <b>Droits</b> : cette section n'est disponible que pour les utilisateurs disposant d'une habilitation sur le module sécurité en entier.
-					-# <tt>Connexion autorisée</tt> : Champ OUI/NON. Si le choix est sur NON, l'utilisateur est temporairement désactivé. Cela permet à l'administrateur de suspendre un droit d'accès sans toutefois supprimer l'utilisateur.
-					-# <tt>Profil</tt> : Liste de choix permettant de sélectionner le profil d'habilitations de l'utilisateur.
+				-# <b>Droits</b> : cette section n'est disponible que pour les utilisateurs disposant d'une habilitation sur le module sÃ©curitÃ© en entier.
+					-# <tt>Connexion autorisÃ©e</tt> : Champ OUI/NON. Si le choix est sur NON, l'utilisateur est temporairement dÃ©sactivÃ©. Cela permet Ã  l'administrateur de suspendre un droit d'accÃ¨s sans toutefois supprimer l'utilisateur.
+					-# <tt>Profil</tt> : Liste de choix permettant de sÃ©lectionner le profil d'habilitations de l'utilisateur.
 								
-			<i>Sécurité</i>
-				- Une habilitation privée SecurityRight de niveau READ est nécessaire pour accéder à la page en consultation sur l'utilisateur courant. Dans ce cas la partie "droits" n'est pas affichée.
-				- Une habilitation privée SecurityRight de niveau WRITE est nécessaire pour accéder à la page en modification sur l'utilisateur courant. Dans ce cas la partie "droits" n'est pas affichée.
-				- Une habilitation publique SecurityRight de niveau READ est nécessaire pour accéder à la page en consultation sur un utilisateur quelconque. Dans ce cas la partie "droits" n'est pas affichée.
-				- Une habilitation publique SecurityRight de niveau WRITE est nécessaire pour accéder à la page en modification sur un utilisateur quelconque, à condition que le profil de l'utilisateur édité soit inférieur ou égal au profil de l'habilitation. Dans ce cas la partie "droits" est affichée et modifiable".
+			<i>SÃ©curitÃ©</i>
+				- Une habilitation privÃ©e SecurityRight de niveau READ est nÃ©cessaire pour accÃ©der Ã  la page en consultation sur l'utilisateur courant. Dans ce cas la partie "droits" n'est pas affichÃ©e.
+				- Une habilitation privÃ©e SecurityRight de niveau WRITE est nÃ©cessaire pour accÃ©der Ã  la page en modification sur l'utilisateur courant. Dans ce cas la partie "droits" n'est pas affichÃ©e.
+				- Une habilitation publique SecurityRight de niveau READ est nÃ©cessaire pour accÃ©der Ã  la page en consultation sur un utilisateur quelconque. Dans ce cas la partie "droits" n'est pas affichÃ©e.
+				- Une habilitation publique SecurityRight de niveau WRITE est nÃ©cessaire pour accÃ©der Ã  la page en modification sur un utilisateur quelconque, Ã  condition que le profil de l'utilisateur Ã©ditÃ© soit infÃ©rieur ou Ã©gal au profil de l'habilitation. Dans ce cas la partie "droits" est affichÃ©e et modifiable".
 
 
-			<i>Journaux</i> : Les opérations suivantes sont consignées dans le journal de sécurité SecurityLog :
-				- INFO : Chaque modification effectuée avec succès
+			<i>Journaux</i> : Les opÃ©rations suivantes sont consignÃ©es dans le journal de sÃ©curitÃ© SecurityLog :
+				- INFO : Chaque modification effectuÃ©e avec succÃ¨s
 
 		*/
 		class UserAdmin: public admin::AdminInterfaceElementTemplate<UserAdmin>

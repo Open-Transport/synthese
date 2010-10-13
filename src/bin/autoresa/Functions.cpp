@@ -159,12 +159,12 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 {
 	if(tryTime>2)
 	{
-		playbackText(_agi,_res,"désolé, veuillez renouveler votre appel. Au revoir.");
+		playbackText(_agi,_res,"dÃ©solÃ©, veuillez renouveler votre appel. Au revoir.");
 		return -1;
 	}
 	else if(tryTime>0)
 	{
-		playbackText(_agi,_res,"l\'entrée invalide, veuillez reessayer.");
+		playbackText(_agi,_res,"l\'entrÃ©e invalide, veuillez reessayer.");
 	}
 	
 	cerr<<"MenuKey autorised: ";
@@ -345,7 +345,7 @@ int Functions::passToManuel(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, string callId
 {
 	cerr<<"pass to manuel called"<<endl;
 	// no need to listen the promo one more time, so jump to 4
-	playbackText(_agi,_res,"Veuillez patienter, Le système vous transfert au centre de reservation.");
+	playbackText(_agi,_res,"Veuillez patienter, Le systÃ¨me vous transfert au centre de reservation.");
 	char *ext="75";
 	char *pri="4";
 	AGITool_exec_goto(_agi, _res, "tad", ext, pri);

@@ -67,7 +67,7 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				virtual std::string getRuleUserName() const { return "Réseau " + getName(); }
+				virtual std::string getRuleUserName() const { return "RÃ©seau " + getName(); }
 			//@}
 		};
 	}

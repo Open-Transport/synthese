@@ -112,16 +112,16 @@ namespace synthese
 			AdminActionFunctionRequest<PTUseRuleUpdateAction,PTUseRuleAdmin> updateRequest(_request);
 			updateRequest.getAction()->setRule(const_pointer_cast<PTUseRule>(_rule));
 
-			stream << "<h1>Propriétés</h1>";
+			stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 			PropertiesHTMLTable t(updateRequest.getHTMLForm());
 			stream << t.open();
-			stream << t.title("Dénomination");
+			stream << t.title("DÃ©nomination");
 			stream << t.cell("ID", lexical_cast<string>(_rule->getKey()));
 			stream << t.cell("Nom", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_NAME, _rule->getName()));
-			stream << t.title("Réservation");
+			stream << t.title("RÃ©servation");
 			stream << t.cell(
-				"Type de réservation",
+				"Type de rÃ©servation",
 				t.getForm().getSelectInput(
 					PTUseRuleUpdateAction::PARAMETER_TYPE,
 					PTUseRule::GetTypesList(), 
@@ -129,14 +129,14 @@ namespace synthese
 			)	);
 			if(_rule->getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN)
 			{
-				stream << t.cell("Heure limite de réservation", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_HOUR_DEADLINE, _rule->getHourDeadLine().is_not_a_date_time() ? string() : to_simple_string(_rule->getHourDeadLine())));
-				stream << t.cell("Délai maximal en jours", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_MAX_DELAY_DAYS, _rule->getMaxDelayDays() ? lexical_cast<string>(_rule->getMaxDelayDays()->days()) : string()));
-				stream << t.cell("Délai minimal en jours", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_DAYS, lexical_cast<string>(_rule->getMinDelayDays().days())));
-				stream << t.cell("Délai minimal en minutes", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_MINUTES, lexical_cast<string>(_rule->getMinDelayMinutes().total_seconds() / 60)));
-				stream << t.cell("Heure au départ est la référence", t.getForm().getOuiNonRadioInput(PTUseRuleUpdateAction::PARAMETER_ORIGIN_IS_REFERENCE, _rule->getOriginIsReference()));
+				stream << t.cell("Heure limite de rÃ©servation", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_HOUR_DEADLINE, _rule->getHourDeadLine().is_not_a_date_time() ? string() : to_simple_string(_rule->getHourDeadLine())));
+				stream << t.cell("DÃ©lai maximal en jours", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_MAX_DELAY_DAYS, _rule->getMaxDelayDays() ? lexical_cast<string>(_rule->getMaxDelayDays()->days()) : string()));
+				stream << t.cell("DÃ©lai minimal en jours", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_DAYS, lexical_cast<string>(_rule->getMinDelayDays().days())));
+				stream << t.cell("DÃ©lai minimal en minutes", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_MINUTES, lexical_cast<string>(_rule->getMinDelayMinutes().total_seconds() / 60)));
+				stream << t.cell("Heure au dÃ©part est la rÃ©fÃ©rence", t.getForm().getOuiNonRadioInput(PTUseRuleUpdateAction::PARAMETER_ORIGIN_IS_REFERENCE, _rule->getOriginIsReference()));
 			}
-			stream << t.title("Autres propriétés");
-			stream << t.cell("Capacité maximale (vide=illimité)", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_CAPACITY, _rule->getAccessCapacity() ? lexical_cast<string>(*_rule->getAccessCapacity()) : string()));
+			stream << t.title("Autres propriÃ©tÃ©s");
+			stream << t.cell("CapacitÃ© maximale (vide=illimitÃ©)", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_CAPACITY, _rule->getAccessCapacity() ? lexical_cast<string>(*_rule->getAccessCapacity()) : string()));
 			stream << t.cell("Tarification principale", t.getForm().getSelectInput(PTUseRuleUpdateAction::PARAMETER_FARE_ID, FareTableSync::GetList(_getEnv()), optional<RegistryKeyType>(_rule->getDefaultFare() ? _rule->getDefaultFare()->getKey() : 0)));
 			stream << t.close();
 		}

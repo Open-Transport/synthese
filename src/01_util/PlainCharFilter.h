@@ -64,57 +64,57 @@ namespace synthese
 				char c = s[i];
 					
 				if ( 
-					(c == '·') || 
-					(c == '‡') || 
-					(c == '‚') || 
-					(c == '‰')    
+					(c == '√°') || 
+					(c == '√†') || 
+					(c == '√¢') || 
+					(c == '√§')    
 					)
 				{ 
 					boost::iostreams::put(dest, 'a') ;
 				}
 				else if ( 
-					(c == '¡') || 
-					(c == '¿') || 
-					(c == 'ƒ') || 
-					(c == '¬')    
+					(c == '√Å') || 
+					(c == '√Ä') || 
+					(c == '√Ñ') || 
+					(c == '√Ç')    
 					)
 				{ 
 					boost::iostreams::put(dest, 'A') ;
 				}
 				
 				else if ( 
-					(c == 'È') || 
-					(c == 'Ë') || 
-					(c == 'Í') || 
-					(c == 'Î')    
+					(c == '√©') || 
+					(c == '√®') || 
+					(c == '√™') || 
+					(c == '√´')    
 					)
 				{ 
 					boost::iostreams::put(dest, 'e') ;
 				} 
 				else if ( 
-					(c == '…') || 
-					(c == '»') || 
-					(c == ' ') || 
-					(c == 'À')    
+					(c == '√â') || 
+					(c == '√à') || 
+					(c == '√ä') || 
+					(c == '√ã')    
 					)
 				{ 
 					boost::iostreams::put(dest, 'E') ;
 				} 
 				
 				else if (
-					(c == 'Ì') || 
-					(c == 'Ï') || 
-					(c == 'Ô') || 
-					(c == 'Ó')    
+					(c == '√≠') || 
+					(c == '√¨') || 
+					(c == '√Ø') || 
+					(c == '√Æ')    
 					)
 				{ 
 					boost::iostreams::put(dest, 'i') ;
 				} 
 				else if (
-					(c == 'Õ') || 
-					(c == 'Ã') || 
-					(c == 'œ') || 
-					(c == 'Œ')    
+					(c == '√ç') || 
+					(c == '√å') || 
+					(c == '√è') || 
+					(c == '√é')    
 					)
 				{ 
 					boost::iostreams::put(dest, 'I') ;
@@ -122,19 +122,19 @@ namespace synthese
 				
 			    
 				else if (
-					(c == 'Û') || 
-					(c == 'Ú') || 
-					(c == 'ˆ') || 
-					(c == 'Ù')    
+					(c == '√≥') || 
+					(c == '√≤') || 
+					(c == '√∂') || 
+					(c == '√¥')    
 					)
 				{ 
 					boost::iostreams::put(dest, 'o') ;
 				} 
 				else if (
-					(c == '”') || 
-					(c == '“') || 
-					(c == '÷') || 
-					(c == '‘')    
+					(c == '√ì') || 
+					(c == '√í') || 
+					(c == '√ñ') || 
+					(c == '√î')    
 					)
 				{ 
 					boost::iostreams::put(dest, 'O') ;
@@ -142,38 +142,38 @@ namespace synthese
 			    
 			    
 				else if (
-					(c == '˙') || 
-					(c == '˘') || 
-					(c == '¸') || 
-					(c == '˚')    
+					(c == '√∫') || 
+					(c == '√π') || 
+					(c == '√º') || 
+					(c == '√ª')    
 					)
 				{ 
 					boost::iostreams::put(dest, 'u') ;
 				} 
 				else if ( 
-					(c == '⁄') || 
-					(c == 'Ÿ') || 
-					(c == '‹') || 
-					(c == '€')    
+					(c == '√ö') || 
+					(c == '√ô') || 
+					(c == '√ú') || 
+					(c == '√õ')    
 					)
 				{ 
 					boost::iostreams::put(dest, 'U') ;
 				} 
 			    
 				else if ( 
-					(c == 'Á')
+					(c == '√ß')
 					)
 				{ 
 					boost::iostreams::put(dest, 'c') ;
 				} 
 				else if (
-					(c == '«')
+					(c == '√á')
 					)
 				{ 
 					boost::iostreams::put(dest, 'C') ;
 				}
 				else if (
-					(c == '∞')
+					(c == '¬∞')
 				){
 					boost::iostreams::put(dest, 'o');
 				}

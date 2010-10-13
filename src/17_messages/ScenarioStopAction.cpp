@@ -80,7 +80,7 @@ namespace synthese
 			ScenarioTableSync::Save(_scenario.get());
 
 			// Log
-			MessagesLog::addUpdateEntry(_scenario.get(), "Diffusion arrêtée le " + to_simple_string(_stopDateTime), request.getUser().get());
+			MessagesLog::addUpdateEntry(_scenario.get(), "Diffusion arrÃªtÃ©e le " + to_simple_string(_stopDateTime), request.getUser().get());
 		}
 
 		ScenarioStopAction::ScenarioStopAction()

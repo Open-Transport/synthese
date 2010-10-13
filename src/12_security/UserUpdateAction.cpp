@@ -94,7 +94,7 @@ namespace synthese
 						)	);
 					if(!users.empty())
 					{
-						throw ActionException("Ce login est déjà utilisé.");
+						throw ActionException("Ce login est dÃ©jÃ  utilisÃ©.");
 					}
 				}
 
@@ -102,7 +102,7 @@ namespace synthese
 
 				_name = map.getDefault<string>(PARAMETER_NAME);
 				if (_name.empty())
-					throw ActionException("Le nom de l'utilisateur ne peut être vide");
+					throw ActionException("Le nom de l'utilisateur ne peut Ãªtre vide");
 
 				_address = map.getDefault<string>(PARAMETER_ADDRESS);
 
@@ -139,7 +139,7 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(s, "E-mail", _user->getEMail(), _email);
 			DBLogModule::appendToLogIfChange(s, "Code postal", _user->getPostCode(), _postalCode);
 			DBLogModule::appendToLogIfChange(s, "Ville", _user->getCityText(), _city);
-			DBLogModule::appendToLogIfChange(s, "Téléphone", _user->getPhone(), _phone);
+			DBLogModule::appendToLogIfChange(s, "TÃ©lÃ©phone", _user->getPhone(), _phone);
 			if(_profile)
 			{
 				DBLogModule::appendToLogIfChange(s, "Profil", (_user->getProfile() != NULL) ? _user->getProfile()->getName() : string(), (*_profile != NULL) ? (*_profile)->getName() : string());
@@ -149,7 +149,7 @@ namespace synthese
 				DBLogModule::appendToLogIfChange(s, "Autorisation de connexion", lexical_cast<string>(_user->getConnectionAllowed()), lexical_cast<string>(*_authorizedLogin));
 			}
 			DBLogModule::appendToLogIfChange(s, "Nom", _user->getName(), _name);
-			DBLogModule::appendToLogIfChange(s, "Prénom", _user->getSurname(), _surname);
+			DBLogModule::appendToLogIfChange(s, "PrÃ©nom", _user->getSurname(), _surname);
 
 			_user->setLogin(_login);
 			_user->setAddress(_address);

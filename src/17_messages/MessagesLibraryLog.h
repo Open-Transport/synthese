@@ -35,11 +35,11 @@ namespace synthese
 		class TextTemplate;
 		class ScenarioFolder;
 
-		/** Journal concernant la bibliothèque de messages.
+		/** Journal concernant la bibliothÃ¨que de messages.
 
-			Les colonnes additionnelles du journal de sécurité sont :
-				- Action : décrit l'action effectuée (ex : création de modèle de message prioritaire)
-				- UID objet concerné : lien vers le message
+			Les colonnes additionnelles du journal de sÃ©curitÃ© sont :
+				- Action : dÃ©crit l'action effectuÃ©e (ex : crÃ©ation de modÃ¨le de message prioritaire)
+				- UID objet concernÃ© : lien vers le message
 
 			@ingroup m17Logs refLogs
 		*/

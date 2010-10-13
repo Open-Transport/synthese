@@ -26,15 +26,15 @@
 
 @subsubsection defLigneCommerciale Ligne commerciale
 
-Une ligne commerciale est un ensemble de circulations regroupées selon des critères de similitude géographique en général. La ligne commerciale porte l'identification client des services (ex : Ligne 2).
+Une ligne commerciale est un ensemble de circulations regroupÃ©es selon des critÃ¨res de similitude gÃ©ographique en gÃ©nÃ©ral. La ligne commerciale porte l'identification client des services (ex : Ligne 2).
 
 @subsubsection defCirculation Circulation
 
-Les circulations sont identifiées au sein de leur @ref defLigneCommerciale par un code alphanumérique unique de 6 cractères maximum.
+Les circulations sont identifiÃ©es au sein de leur @ref defLigneCommerciale par un code alphanumÃ©rique unique de 6 cractÃ¨res maximum.
 
-@subsubsection defMateriel Matériel roulant
+@subsubsection defMateriel MatÃ©riel roulant
 
-Type de véhicules utilisés par les circulations, faisant intervenir certaines propriétés communes.
+Type de vÃ©hicules utilisÃ©s par les circulations, faisant intervenir certaines propriÃ©tÃ©s communes.
 
 
 
@@ -47,11 +47,11 @@ Type de véhicules utilisés par les circulations, faisant intervenir certaines pr
 
 @subsubsection defLigne Ligne technique
 @copydoc synthese::env::Line
-Les lignes techniques sont implémentées par la classe @ref synthese::15_env::Line.
+Les lignes techniques sont implÃ©mentÃ©es par la classe @ref synthese::15_env::Line.
 
 @subsubsection defAxe Axe
 @copydoc synthese::env::Axis
-Les axes sont implémentés par la classe @ref synthese::15_env::Axis.
+Les axes sont implÃ©mentÃ©s par la classe @ref synthese::15_env::Axis.
 
 @subsubsection defCalendrier Calendrier de circulation
 @copydoc synthese::env::Calendar
@@ -64,15 +64,15 @@ The calendars are implemented by the @ref synthese::15_env::Calendar class.
 
 @subsubsection defRight Habilitation
 @copydoc synthese::security::Right
-La notion d'habilitation est implémentée par la classe @ref synthese::security::Right .
+La notion d'habilitation est implÃ©mentÃ©e par la classe @ref synthese::security::Right .
 
 @subsubsection defUserProfile Profil utilisateur
 @copydoc synthese::security::Profile
-La notion de profil utilisateur est implémentée par la classe @ref synthese::security::Profile .
+La notion de profil utilisateur est implÃ©mentÃ©e par la classe @ref synthese::security::Profile .
 
 @subsubsection defUser Utilisateur
 @copydoc synthese::security::User
-La notion d'utilisateur est implémentée par la classe @ref synthese::security::User .
+La notion d'utilisateur est implÃ©mentÃ©e par la classe @ref synthese::security::User .
 
 
 
@@ -80,7 +80,7 @@ La notion d'utilisateur est implémentée par la classe @ref synthese::security::U
 
 @subsubsection defAdmin Composants d'administration
 @copydoc synthese::interfaces::AdminInterfaceElement
-La notion de composant d'administration est implémentée par des sous-classes de @ref synthese::interfaces::AdminInterfaceElement.
+La notion de composant d'administration est implÃ©mentÃ©e par des sous-classes de @ref synthese::interfaces::AdminInterfaceElement.
 
 @subsubsection defLog Journaux
 @copydoc synthese::interfaces::DBLogAdmin

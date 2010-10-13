@@ -148,7 +148,7 @@ namespace synthese
 						HTMLModule::getLinkButton(
 							removeCalendar.getURL(),
 							"Supprimer",
-							"Etes-vous sûr de vouloir supprimer le calendrier "+ ct->getText() +" ?",
+							"Etes-vous sÃ»r de vouloir supprimer le calendrier "+ ct->getText() +" ?",
 							"calendar_delete.png"
 						)
 					;

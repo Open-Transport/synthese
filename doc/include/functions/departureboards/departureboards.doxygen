@@ -1,24 +1,24 @@
-/** @page departureboards Téléaffichage intellligent
+/** @page departureboards TÃ©lÃ©affichage intellligent
 
-Les + de RCST : SYNTHESE propose en standard un module de téléaffichage dynamique, qui permet d’alimenter des écrans TFT ou spécifiques (LED, etc.) en se basant sur les données multimodales.
-L’approche de ce module est novatrice : il ne se contente pas d’afficher des listes chronologiques de départ, mais propose l’ensemble des outils nécessaires pour la mise en place d’un plan de signalétique managée.
-Les fonctions préférées du module de téléaffichage de SYNTHESE sont l’affichage des correspondances en ligne sur un écran de quai (utile lorsqu’une ligne se dédouble par exemple), ainsi que l’écran général par destination utilisant le calcul d’itinéraires pour construire l’affichage.
-Le module de téléaffichage prend également en charge la supervision du matériel.
+Les + de RCST : SYNTHESE propose en standard un module de tÃ©lÃ©affichage dynamique, qui permet dâ€™alimenter des Ã©crans TFT ou spÃ©cifiques (LED, etc.) en se basant sur les donnÃ©es multimodales.
+Lâ€™approche de ce module est novatrice : il ne se contente pas dâ€™afficher des listes chronologiques de dÃ©part, mais propose lâ€™ensemble des outils nÃ©cessaires pour la mise en place dâ€™un plan de signalÃ©tique managÃ©e.
+Les fonctions prÃ©fÃ©rÃ©es du module de tÃ©lÃ©affichage de SYNTHESE sont lâ€™affichage des correspondances en ligne sur un Ã©cran de quai (utile lorsquâ€™une ligne se dÃ©double par exemple), ainsi que lâ€™Ã©cran gÃ©nÃ©ral par destination utilisant le calcul dâ€™itinÃ©raires pour construire lâ€™affichage.
+Le module de tÃ©lÃ©affichage prend Ã©galement en charge la supervision du matÃ©riel.
 
-<h2>Ecran général par destination</h2>
-
-
+<h2>Ecran gÃ©nÃ©ral par destination</h2>
 
 
-Ecran de quai affichant des correspondances bus aux arrêts desservis par le train
+
+
+Ecran de quai affichant des correspondances bus aux arrÃªts desservis par le train
  
-Ecrans généraux par destination en ordre alphabétique avec correspondance si pas de solution directe.
+Ecrans gÃ©nÃ©raux par destination en ordre alphabÃ©tique avec correspondance si pas de solution directe.
  
-Ecran vertical intégré à un arrêt de bus.
+Ecran vertical intÃ©grÃ© Ã  un arrÃªt de bus.
 
-Le module de téléaffichage est intégré à SYNTHESE : il peut donc bénéficier des messages d’information temps réel diffusés par le SAE.
+Le module de tÃ©lÃ©affichage est intÃ©grÃ© Ã  SYNTHESE : il peut donc bÃ©nÃ©ficier des messages dâ€™information temps rÃ©el diffusÃ©s par le SAE.
 
  
-Ecran d’administration d’un dispositif de téléaffichage
+Ecran dâ€™administration dâ€™un dispositif de tÃ©lÃ©affichage
  
 */

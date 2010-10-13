@@ -11,20 +11,20 @@ namespace synthese
 	/** @defgroup m92 92 RS485 Client
 		@ingroup m9
 
-		Le client RS485 assure en service continu les opérations suivantes :
-			- demande du contenu au serveur, en spécifiant la clé de l'afficheur, ce qui détermine à la fois le protocole et le contenu
-			- stockage du contenu reçu
+		Le client RS485 assure en service continu les opÃ©rations suivantes :
+			- demande du contenu au serveur, en spÃ©cifiant la clÃ© de l'afficheur, ce qui dÃ©termine Ã  la fois le protocole et le contenu
+			- stockage du contenu reÃ§u
 			- transmission du contenu au port RS485
 			- attente minute suivante
 
-		Lorsque l'architecture matérielle le nécessite, le client RS485 doit gérer l'alimentation de plusieurs dispositifs branchés en parallèle sur le même port. La boucle de fonctionnement est alors la suivante :
-			- demande des contenus au serveur, en spécifiant la clé de chaque afficheur
-			- stockage des contenus reçus
+		Lorsque l'architecture matÃ©rielle le nÃ©cessite, le client RS485 doit gÃ©rer l'alimentation de plusieurs dispositifs branchÃ©s en parallÃ¨le sur le mÃªme port. La boucle de fonctionnement est alors la suivante :
+			- demande des contenus au serveur, en spÃ©cifiant la clÃ© de chaque afficheur
+			- stockage des contenus reÃ§us
 			- transmission des contenus au port RS485, afficheur par afficheur
 			- attente minute suivante
 
 		@image html 1195572.2.000.png
-		@image latex 1195572_1_000.eps "Schéma d'architecture cible d'une installation RS485" height=10cm
+		@image latex 1195572_1_000.eps "SchÃ©ma d'architecture cible d'une installation RS485" height=10cm
 
 		@{
 	*/

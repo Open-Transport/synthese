@@ -148,14 +148,14 @@ namespace synthese
 		void ArrivalDepartureTableLog::addUpdateTypeEntry(const DisplayType* type , const security::User* user , const std::string& text )
 		{
 			DBLogEntry::Content content;
-			content.push_back("Mise à jour type d'afficheur " + type->getName() + text);
+			content.push_back("Mise Ã  jour type d'afficheur " + type->getName() + text);
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, type->getKey());
 		}
 
 		void ArrivalDepartureTableLog::addCreateEntry(const DisplayType& type , const security::User& user )
 		{
 			DBLogEntry::Content content;
-			content.push_back("Création type d'afficheur " + type.getName());
+			content.push_back("CrÃ©ation type d'afficheur " + type.getName());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, type.getKey());
 		}
 
@@ -169,14 +169,14 @@ namespace synthese
 		void ArrivalDepartureTableLog::addCreateEntry( const DisplayScreenCPU& cpu , const security::User& user )
 		{
 			DBLogEntry::Content content;
-			content.push_back("Création");
+			content.push_back("CrÃ©ation");
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, cpu.getKey());
 		}
 
 		void ArrivalDepartureTableLog::addCreateEntry( const DisplayScreen& cpu , const security::User& user )
 		{
 			DBLogEntry::Content content;
-			content.push_back("Création");
+			content.push_back("CrÃ©ation");
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, cpu.getKey());
 		}
 	}

@@ -1,6 +1,6 @@
-/** @page userdocSecurity 12 Documentation utilisateur module de sécurité
+/** @page userdocSecurity 12 Documentation utilisateur module de sÃ©curitÃ©
 
-<h2>Table des matières</h2>
+<h2>Table des matiÃ¨res</h2>
 
 <ul>
 	<li>@ref userdocSecurityProfiles</li>
@@ -9,70 +9,70 @@
 
 @section userdocSecurityProfiles Gestion des profils
 
-Les profils contiennent les informations de sécurité des utilisateurs. Chaque profil définit les écrans accessibles par les utilisateurs, ainsi que l'étendue du contenu pouvant être édité par les utilisateurs
+Les profils contiennent les informations de sÃ©curitÃ© des utilisateurs. Chaque profil dÃ©finit les Ã©crans accessibles par les utilisateurs, ainsi que l'Ã©tendue du contenu pouvant Ãªtre Ã©ditÃ© par les utilisateurs
 
-Pour éditer les profils, suivre la procédure suivante :
+Pour Ã©diter les profils, suivre la procÃ©dure suivante :
 <ol>
-	<li>Accéder à l'écran « Profils »</li>
-	<li>La liste des profils apparaît  </li>
+	<li>AccÃ©der Ã  l'Ã©cran Â« Profils Â»</li>
+	<li>La liste des profils apparaÃ®t  </li>
 	<li>Effectuer l'une des actions suivantes :</li>
 	<ul>
-		<li>Pour créer un nouveau profil, remplir le champ Nom en bas de l'écran et cliquer sur Ajouter.</li>
-		<li>Pour éditer un profil existant, cliquer sur Modifier</li>
-		<li>Pour supprimer un profil existant et inutilisé, cliquer sur Supprimer. Si un profil utilisé tente d'être supprimé, un message d'erreur apparaît.</li>
+		<li>Pour crÃ©er un nouveau profil, remplir le champ Nom en bas de l'Ã©cran et cliquer sur Ajouter.</li>
+		<li>Pour Ã©diter un profil existant, cliquer sur Modifier</li>
+		<li>Pour supprimer un profil existant et inutilisÃ©, cliquer sur Supprimer. Si un profil utilisÃ© tente d'Ãªtre supprimÃ©, un message d'erreur apparaÃ®t.</li>
 	</ul>
-	<li>L'écran d'édition de profil apparaît. Il est composé de trois sections : Propriétés, Habilitations du profil, et ajout d'habilitation  au profil :  </li>
-	<li>Dans la section Propriétés, le champ Nom permet de modifier le nom du profil. Celui-ci doit être unique. Cliquer sur Modifier pour enregistrer la modification du nom</li>
-	<li>Dans la section Habilitations, apparaît chaque règle définissant les droits rattachés au profil :</li>
+	<li>L'Ã©cran d'Ã©dition de profil apparaÃ®t. Il est composÃ© de trois sections : PropriÃ©tÃ©s, Habilitations du profil, et ajout d'habilitation  au profil :  </li>
+	<li>Dans la section PropriÃ©tÃ©s, le champ Nom permet de modifier le nom du profil. Celui-ci doit Ãªtre unique. Cliquer sur Modifier pour enregistrer la modification du nom</li>
+	<li>Dans la section Habilitations, apparaÃ®t chaque rÃ¨gle dÃ©finissant les droits rattachÃ©s au profil :</li>
 	<ul>
-		<li>La colonne « Nature » définit le champ d'application de la règle :</li>
+		<li>La colonne Â« Nature Â» dÃ©finit le champ d'application de la rÃ¨gle :</li>
 		<ul>
-			<li>Général : décrit les droits d'accès à l'application dans son ensemble</li>
-			<li>Tableaux de départs : décrit les droits d'accès liés à la gestion des afficheurs</li>
-			<li>Maintenance des afficheurs : décrit les droits d'accès aux fonctions de maintenance des afficheurs</li>
-			<li>Journaux : décrit les droits d'accès aux historiques de l'application</li>
-			<li>Gestion des messages : décrit les droits d'accès aux fonctions de diffusion de messages commerciaux sur les afficheurs</li>
-			<li>Bibliothèque de messages : décrit les droits d'accès aux fonctions d'administration des fonctions de diffusion de messages commerciaux</li>
-			<li>Gestion de la sécurité : décrit les droits d'accès à la gestion des utilisateurs et des profils</li>
+			<li>GÃ©nÃ©ral : dÃ©crit les droits d'accÃ¨s Ã  l'application dans son ensemble</li>
+			<li>Tableaux de dÃ©parts : dÃ©crit les droits d'accÃ¨s liÃ©s Ã  la gestion des afficheurs</li>
+			<li>Maintenance des afficheurs : dÃ©crit les droits d'accÃ¨s aux fonctions de maintenance des afficheurs</li>
+			<li>Journaux : dÃ©crit les droits d'accÃ¨s aux historiques de l'application</li>
+			<li>Gestion des messages : dÃ©crit les droits d'accÃ¨s aux fonctions de diffusion de messages commerciaux sur les afficheurs</li>
+			<li>BibliothÃ¨que de messages : dÃ©crit les droits d'accÃ¨s aux fonctions d'administration des fonctions de diffusion de messages commerciaux</li>
+			<li>Gestion de la sÃ©curitÃ© : dÃ©crit les droits d'accÃ¨s Ã  la gestion des utilisateurs et des profils</li>
 		</ul>
-		<li>La colonne « Périmètre » définit l'étendue d'application de la règle parmi les « objets » concernés par celle-ci :</li>
+		<li>La colonne Â« PÃ©rimÃ¨tre Â» dÃ©finit l'Ã©tendue d'application de la rÃ¨gle parmi les Â« objets Â» concernÃ©s par celle-ci :</li>
 		<ul>
-			<li>Journaux : le périmètre définit sur quel journal s'applique la règle</li>
-			<li>Sécurité : le périmètre définit sur quel profil s'applique la règle</li>
-			<li>Général, Bibliothèque : le périmètre n'est pas modifiable</li>
-			<li>Autres : le périmètre correspond à un réseau ou à une ligne de transport définissant un périmètre géographique</li>
+			<li>Journaux : le pÃ©rimÃ¨tre dÃ©finit sur quel journal s'applique la rÃ¨gle</li>
+			<li>SÃ©curitÃ© : le pÃ©rimÃ¨tre dÃ©finit sur quel profil s'applique la rÃ¨gle</li>
+			<li>GÃ©nÃ©ral, BibliothÃ¨que : le pÃ©rimÃ¨tre n'est pas modifiable</li>
+			<li>Autres : le pÃ©rimÃ¨tre correspond Ã  un rÃ©seau ou Ã  une ligne de transport dÃ©finissant un pÃ©rimÃ¨tre gÃ©ographique</li>
 		</ul>
-		<li>La colonne « Droits » est composée d'une ou deux listes :</li>
+		<li>La colonne Â« Droits Â» est composÃ©e d'une ou deux listes :</li>
 		<ul>
 			<li>Droit public : niveau de droit s'appliquant en toutes circonstances</li>
-			<li>Droit privé : niveau de droit s'appliquant aux objets concernant l'utilisateur lui-même</li>
+			<li>Droit privÃ© : niveau de droit s'appliquant aux objets concernant l'utilisateur lui-mÃªme</li>
 		</ul>
 		<li>Les niveaux de droit sont les suivants :
 		<ul>
-			<li>Interdit : aucune opération autorisée. Les fonctionnalités interdites disparaissent des menus</li>
-			<li>Utilisation : aucune opération d'administration autorisée. Seule l'utilisation finale de la fonctionnalité est autorisée. Exemple : autorisation d'affichage du résultat d'un tableau de départs uniquement</li>
-			<li>Lecture : consultation des données d'administration autorisée, écriture interdite</li>
-			<li>Modification : création et modification de données d'administration autorisée</li>
-			<li>Contrôle total : toute opération autorisée</li>
-			<li>Le niveau de droit des règles peut être modifié directement en changeant la valeur dans la colonne « Droits » puis en cliquant sur le bouton Modifier</li>
-			<li>Une règle d'habilitation peut être supprimée en cliquant sur le bouton Supprimer sur la ligne du tableau correspondant à la règle à supprimer</li>
+			<li>Interdit : aucune opÃ©ration autorisÃ©e. Les fonctionnalitÃ©s interdites disparaissent des menus</li>
+			<li>Utilisation : aucune opÃ©ration d'administration autorisÃ©e. Seule l'utilisation finale de la fonctionnalitÃ© est autorisÃ©e. Exemple : autorisation d'affichage du rÃ©sultat d'un tableau de dÃ©parts uniquement</li>
+			<li>Lecture : consultation des donnÃ©es d'administration autorisÃ©e, Ã©criture interdite</li>
+			<li>Modification : crÃ©ation et modification de donnÃ©es d'administration autorisÃ©e</li>
+			<li>ContrÃ´le total : toute opÃ©ration autorisÃ©e</li>
+			<li>Le niveau de droit des rÃ¨gles peut Ãªtre modifiÃ© directement en changeant la valeur dans la colonne Â« Droits Â» puis en cliquant sur le bouton Modifier</li>
+			<li>Une rÃ¨gle d'habilitation peut Ãªtre supprimÃ©e en cliquant sur le bouton Supprimer sur la ligne du tableau correspondant Ã  la rÃ¨gle Ã  supprimer</li>
 		</ul>
-		<li>La section d'ajout d'habilitations au profil permet selon le même principe de créer une nouvelle règle, en pouvant à ce stade préciser le périmètre. </li>
-		<li>NB : une fois le périmètre précisé pour une règle, il ne peut être directement modifié. Pour modifier le périmètre d'une règle, supprimer celle-ci puis créer une nouvelle règle avec le bon périmètre</li>
+		<li>La section d'ajout d'habilitations au profil permet selon le mÃªme principe de crÃ©er une nouvelle rÃ¨gle, en pouvant Ã  ce stade prÃ©ciser le pÃ©rimÃ¨tre. </li>
+		<li>NB : une fois le pÃ©rimÃ¨tre prÃ©cisÃ© pour une rÃ¨gle, il ne peut Ãªtre directement modifiÃ©. Pour modifier le pÃ©rimÃ¨tre d'une rÃ¨gle, supprimer celle-ci puis crÃ©er une nouvelle rÃ¨gle avec le bon pÃ©rimÃ¨tre</li>
 	</ul>
 </ol>
 
 @section userdocSecurityUsers Gestion des utilisateurs
 
 <ol>
-	<li>Accéder à l'écran « Utilisateurs »</li>
-	<li>La fenêtre de gestion des utilisateurs apparaît. Elle est composée de deux sections : Recherche et Résultat de la recherche  </li>
-	<li>Le formulaire de recherche permet d'afficher les utilisateurs selon une recherche par login, nom, et profil. Le texte entré peut correspondre à une partie du nom cherché. Exemple : DU donne Dupont et Durant.</li>
-	<li>Pour créer un utilisateur, entrer son login et son nom en bas du tableau de résultats, sélectionner son profil, puis cliquer sur Ajouter</li>
+	<li>AccÃ©der Ã  l'Ã©cran Â« Utilisateurs Â»</li>
+	<li>La fenÃªtre de gestion des utilisateurs apparaÃ®t. Elle est composÃ©e de deux sections : Recherche et RÃ©sultat de la recherche  </li>
+	<li>Le formulaire de recherche permet d'afficher les utilisateurs selon une recherche par login, nom, et profil. Le texte entrÃ© peut correspondre Ã  une partie du nom cherchÃ©. Exemple : DU donne Dupont et Durant.</li>
+	<li>Pour crÃ©er un utilisateur, entrer son login et son nom en bas du tableau de rÃ©sultats, sÃ©lectionner son profil, puis cliquer sur Ajouter</li>
 	<li>Pour modifier un utilisateur existant, cliquer sur le bouton Modifier correspondant</li>
 	<li>Pour supprimer un utilisateur existant, cliquer sur Supprimer puis confirmer la suppression</li>
-	<li>La fiche d'édition d'utilisateur apparaît. Elle est composée de deux sections à éditer et enregistrer séparément :  </li>
-	<li>Pour modifier les coordonnées de l'utilisateur, éditer les champs les uns après les autres puis cliquer sur Enregitrer les modifications. Le champ Connexion autorisée à valeur Non permet de désactiver temporairement l'utilisateur.</li>
-	<li>Pour modifier le mot de passe de l'utilisateur, saisir celui-ci strictement à l'identique dans le s deux champs prévus à cet effet</li>
+	<li>La fiche d'Ã©dition d'utilisateur apparaÃ®t. Elle est composÃ©e de deux sections Ã  Ã©diter et enregistrer sÃ©parÃ©ment :  </li>
+	<li>Pour modifier les coordonnÃ©es de l'utilisateur, Ã©diter les champs les uns aprÃ¨s les autres puis cliquer sur Enregitrer les modifications. Le champ Connexion autorisÃ©e Ã  valeur Non permet de dÃ©sactiver temporairement l'utilisateur.</li>
+	<li>Pour modifier le mot de passe de l'utilisateur, saisir celui-ci strictement Ã  l'identique dans le s deux champs prÃ©vus Ã  cet effet</li>
 </ol>
 */

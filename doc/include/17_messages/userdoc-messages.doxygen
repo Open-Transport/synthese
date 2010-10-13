@@ -1,6 +1,6 @@
-/** @page userdocMessages 17 Documentation utilisateur module d'actualités
+/** @page userdocMessages 17 Documentation utilisateur module d'actualitÃ©s
 
-<h1>Table des matières</h1>
+<h1>Table des matiÃ¨res</h1>
 
 <ul>
 <li>@ref actuSend</li>
@@ -11,82 +11,82 @@
 
 <h2>Messages uniques</h2>
 
-L'envoi de message unique s'effectue de la manière suivante :
+L'envoi de message unique s'effectue de la maniÃ¨re suivante :
 <ol>
-1.	Accéder à l'écran « Messages »
-2.	La fenêtre de gestion des messages apparaît. Elle comporte trois sections : Recherche, Messages selon scénario, et messages seuls. 
-3.	Défiler l'écran jusqu'à la section messages seuls  
-4.	Cliquer sur « Nouvelle diffusion de message »
-5.	L'écran d'édition de message apparaît  
-6.	Sélectionner la nature du message : 
-a.	complémentaire indique un message affiché en bas des dispositifs d'affichage, à coté des horaires.
-b.	Prioritaire indique un message affiché en plein écran ayant pour but de masquer les horaires
-7.	Entrer les dates et heures de début et de fin de diffusion à l'aide du contrôle calendrier (cliquer sur l'icône calendrier). Pour changer la date, sélectionner le jour dans le calendrier. Pour augmenter l'heure, cliquer dessus à la souris. Pour la diminuer, cliquer sur l'heure à la souris en maintenant la touche Majuscules du clavier.
-8.	Cliquer sur Enregistrer pour sauvegarder les modifications effectuées. Le champ Actif est laissé à NON afin de ne pas encore diffuser le message
-9.	Dans la section Contenu, le texte diffusé est saisi. Deux méthodes sont possibles :
-a.	La sélection d'un contenu préenregistré puis le clic sur Copier Contenu
-b.	La saisie directe d'un contenu court et d'un contenu long, sauvegardé ensuite par l'appui sur Enregistrer. Le contenu court correspond à ce qui est diffusé sur les panneaux Oscar. Le contenu long est diffusé sur les écrans TFT des gares d'échange.
-10.	Dans la section Diffusion, les afficheurs destinataires du message sont sélectionnés. Pour cela, effectuer une recherche d'afficheur à l'aide des divers champs de recherche (cliquer sur Rechercher pour lancer la recherche), puis une fois l'afficheur désiré apparu, cliquer sur le bouton Ajouter pour diffuser le message sur l'afficheur.
-11.	Recommencer l'étape précédente jusqu'à obtention de la liste d'afficheurs destinataires souhaitée. En cas d'afficheur sélectionné par erreur, cliquer sur Supprimer pour le retirer.
-12.	Une fois la liste d'afficheurs remlie, retourner à la section Paramètres et cliquer sur OUI en face du champ « Actif ». Cliquer ensuite sur Enregistrer : le message est à présent diffusé.
+1.	AccÃ©der Ã  l'Ã©cran Â« Messages Â»
+2.	La fenÃªtre de gestion des messages apparaÃ®t. Elle comporte trois sections : Recherche, Messages selon scÃ©nario, et messages seuls. 
+3.	DÃ©filer l'Ã©cran jusqu'Ã  la section messages seuls  
+4.	Cliquer sur Â« Nouvelle diffusion de message Â»
+5.	L'Ã©cran d'Ã©dition de message apparaÃ®t  
+6.	SÃ©lectionner la nature du message : 
+a.	complÃ©mentaire indique un message affichÃ© en bas des dispositifs d'affichage, Ã  cotÃ© des horaires.
+b.	Prioritaire indique un message affichÃ© en plein Ã©cran ayant pour but de masquer les horaires
+7.	Entrer les dates et heures de dÃ©but et de fin de diffusion Ã  l'aide du contrÃ´le calendrier (cliquer sur l'icÃ´ne calendrier). Pour changer la date, sÃ©lectionner le jour dans le calendrier. Pour augmenter l'heure, cliquer dessus Ã  la souris. Pour la diminuer, cliquer sur l'heure Ã  la souris en maintenant la touche Majuscules du clavier.
+8.	Cliquer sur Enregistrer pour sauvegarder les modifications effectuÃ©es. Le champ Actif est laissÃ© Ã  NON afin de ne pas encore diffuser le message
+9.	Dans la section Contenu, le texte diffusÃ© est saisi. Deux mÃ©thodes sont possibles :
+a.	La sÃ©lection d'un contenu prÃ©enregistrÃ© puis le clic sur Copier Contenu
+b.	La saisie directe d'un contenu court et d'un contenu long, sauvegardÃ© ensuite par l'appui sur Enregistrer. Le contenu court correspond Ã  ce qui est diffusÃ© sur les panneaux Oscar. Le contenu long est diffusÃ© sur les Ã©crans TFT des gares d'Ã©change.
+10.	Dans la section Diffusion, les afficheurs destinataires du message sont sÃ©lectionnÃ©s. Pour cela, effectuer une recherche d'afficheur Ã  l'aide des divers champs de recherche (cliquer sur Rechercher pour lancer la recherche), puis une fois l'afficheur dÃ©sirÃ© apparu, cliquer sur le bouton Ajouter pour diffuser le message sur l'afficheur.
+11.	Recommencer l'Ã©tape prÃ©cÃ©dente jusqu'Ã  obtention de la liste d'afficheurs destinataires souhaitÃ©e. En cas d'afficheur sÃ©lectionnÃ© par erreur, cliquer sur Supprimer pour le retirer.
+12.	Une fois la liste d'afficheurs remlie, retourner Ã  la section ParamÃ¨tres et cliquer sur OUI en face du champ Â« Actif Â». Cliquer ensuite sur Enregistrer : le message est Ã  prÃ©sent diffusÃ©.
 </ol>
 
-<h2>Envoi selon scénario</h2>
+<h2>Envoi selon scÃ©nario</h2>
 <ol>
-<li>Accéder à la section « Messages »</li>
-<li>La fenêtre de gestion des messages apparaît. Se rendre dans la section Messages selon scénario</li>
-<li>Sélectionner en bas du tableau le scénario à diffuser puis cliquer sur Nouvelle diffusion de scénario. L'écran de paramétrage d'envoi de scénario apparaît. Il reprend la liste des messages préparés par le scénario.</li>
-<li>Choisir la date et l'heure de début et de fin de diffusion à l'aide du contrôle calendrier. (cliquer sur l'icône calendrier). Pour changer la date, sélectionner le jour dans le calendrier. Pour augmenter l'heure, cliquer dessus à la souris. Pour la diminuer, cliquer sur l'heure à la souris en maintenant la touche Majuscules du clavier.</li>
+<li>AccÃ©der Ã  la section Â« Messages Â»</li>
+<li>La fenÃªtre de gestion des messages apparaÃ®t. Se rendre dans la section Messages selon scÃ©nario</li>
+<li>SÃ©lectionner en bas du tableau le scÃ©nario Ã  diffuser puis cliquer sur Nouvelle diffusion de scÃ©nario. L'Ã©cran de paramÃ©trage d'envoi de scÃ©nario apparaÃ®t. Il reprend la liste des messages prÃ©parÃ©s par le scÃ©nario.</li>
+<li>Choisir la date et l'heure de dÃ©but et de fin de diffusion Ã  l'aide du contrÃ´le calendrier. (cliquer sur l'icÃ´ne calendrier). Pour changer la date, sÃ©lectionner le jour dans le calendrier. Pour augmenter l'heure, cliquer dessus Ã  la souris. Pour la diminuer, cliquer sur l'heure Ã  la souris en maintenant la touche Majuscules du clavier.</li>
 <li>Cliquer sur OUI en face du champ Actif</li>
 <li>Cliquer sur Enregistrer pour commencer la diffusion</li>
 </ol>
 
-<h2>Arrêt de la diffusion d'un message</h2>
+<h2>ArrÃªt de la diffusion d'un message</h2>
 <ol>
-<li>Se rendre à l'écran Messages</li>
-<li>Si un message est en cours de diffusion, il comporte un bouton Arrêter</li>
-<li>Cliquer sur le bouton arrêter puis confirmer sur la boite de dialogue suivante</li>
-<li>Pour rediffuser un message arrêté, il est possible de l'éditer à nouveau en cliquant sur le bouton Modifier, puis de lui donner une date de fin ultérieure et enfin de sélectionner OUI dans le champ Actif.</li>
+<li>Se rendre Ã  l'Ã©cran Messages</li>
+<li>Si un message est en cours de diffusion, il comporte un bouton ArrÃªter</li>
+<li>Cliquer sur le bouton arrÃªter puis confirmer sur la boite de dialogue suivante</li>
+<li>Pour rediffuser un message arrÃªtÃ©, il est possible de l'Ã©diter Ã  nouveau en cliquant sur le bouton Modifier, puis de lui donner une date de fin ultÃ©rieure et enfin de sÃ©lectionner OUI dans le champ Actif.</li>
 </ol>
 
 <h2>Conflits</h2>
 
-Les conflits entre messages correspondent à des situations où deux messages de niveau d'importance équivalent sont envoyés sur le même panneau. Ces situations sont représentées par une icône rouge dans la colonne Conflit.
-Pour résoudre un conflit, stopper la diffusion de l'un des messages portant ce statut. Dans tous les cas seul un message est diffusé sur le panneau : il s'agit du plus récent.
+Les conflits entre messages correspondent Ã  des situations oÃ¹ deux messages de niveau d'importance Ã©quivalent sont envoyÃ©s sur le mÃªme panneau. Ces situations sont reprÃ©sentÃ©es par une icÃ´ne rouge dans la colonne Conflit.
+Pour rÃ©soudre un conflit, stopper la diffusion de l'un des messages portant ce statut. Dans tous les cas seul un message est diffusÃ© sur le panneau : il s'agit du plus rÃ©cent.
 
-@section actuLib Bibliothèque de messages
+@section actuLib BibliothÃ¨que de messages
 
-La bibliothèque de messages contient des scénarios de diffusion prêts à être déclenchés. Ils sont eux-même organisés dans une structure de répertoires.
+La bibliothÃ¨que de messages contient des scÃ©narios de diffusion prÃªts Ã  Ãªtre dÃ©clenchÃ©s. Ils sont eux-mÃªme organisÃ©s dans une structure de rÃ©pertoires.
 
-Un scénario définit :
+Un scÃ©nario dÃ©finit :
 <ul>
-	<li>Un nom de scénario</li>
-	<li>Une série de messages pouvant faire appel à des variables</li>
-	<li>Pour chaque message une série de destinataires</li>
+	<li>Un nom de scÃ©nario</li>
+	<li>Une sÃ©rie de messages pouvant faire appel Ã  des variables</li>
+	<li>Pour chaque message une sÃ©rie de destinataires</li>
 </ul>
 
 <h2>Fonctionnement des variables</h2>
 
-Les scénarios sont créés avec des variables déclarées directement dans le texte des messages, comme suit :
+Les scÃ©narios sont crÃ©Ã©s avec des variables dÃ©clarÃ©es directement dans le texte des messages, comme suit :
 <ul>
-<li>$$VARIABLE$$ = variable obligatoire (le scénario ne peut etre déclenché si non remplie)</li>
+<li>$$VARIABLE$$ = variable obligatoire (le scÃ©nario ne peut etre dÃ©clenchÃ© si non remplie)</li>
 <li>$VARIABLE$ = variable optionnelle</li>
-<li>$$$ = caractère $</li>
-<li>$VARIABLE|AIDE$ : le caractère | dans le nom de la variable permet de déclarer une aide à l’utilisateur à droite de celui-ci. Le nom de la variable est VARIABLE</li>
+<li>$$$ = caractÃ¨re $</li>
+<li>$VARIABLE|AIDE$ : le caractÃ¨re | dans le nom de la variable permet de dÃ©clarer une aide Ã  lâ€™utilisateur Ã  droite de celui-ci. Le nom de la variable est VARIABLE</li>
 </ul>
 
 Remarques :
 <ul>
-<li>Si le nom d’une variable est modifié dans un scénario, alors la variable est modifiée, et le lien entre le texte des scénarios déclenchés et le modèle d’origine est rompu (sans toutefois modifier le message lui-même).</li>
-<li>Si la partie Aide est modifiée, cela n’a aucun impact sur les scénarios déclenchés.</li>
+<li>Si le nom dâ€™une variable est modifiÃ© dans un scÃ©nario, alors la variable est modifiÃ©e, et le lien entre le texte des scÃ©narios dÃ©clenchÃ©s et le modÃ¨le dâ€™origine est rompu (sans toutefois modifier le message lui-mÃªme).</li>
+<li>Si la partie Aide est modifiÃ©e, cela nâ€™a aucun impact sur les scÃ©narios dÃ©clenchÃ©s.</li>
 </ul>
 
 Fonctionnement pour l'utilisateur :
 <ol>
-<li>Lors du déclenchement d’un scénario comportant au moins une variable, l’écran de saisie propose la liste des variables, affichant également l’aide inscrite</li>
-<li>L’utilisateur remplit les champs donnant les valeurs aux variables</li>
-<li>L’utilisateur déclenche le scénario</li>
-<li>En cas de besoin l’utilisateur peut modifier la valeur des variables pendant l’exécution du scénario</li>
+<li>Lors du dÃ©clenchement dâ€™un scÃ©nario comportant au moins une variable, lâ€™Ã©cran de saisie propose la liste des variables, affichant Ã©galement lâ€™aide inscrite</li>
+<li>Lâ€™utilisateur remplit les champs donnant les valeurs aux variables</li>
+<li>Lâ€™utilisateur dÃ©clenche le scÃ©nario</li>
+<li>En cas de besoin lâ€™utilisateur peut modifier la valeur des variables pendant lâ€™exÃ©cution du scÃ©nario</li>
 </ol>
 
 */

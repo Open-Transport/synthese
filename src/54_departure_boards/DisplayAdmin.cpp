@@ -185,7 +185,7 @@ namespace synthese
 				AdminActionFunctionRequest<DisplayScreenRemoveAction, DisplaySearchAdmin> deleteRequest(_request);
 				deleteRequest.getAction()->setDisplayScreen(_displayScreen);
 
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 				PropertiesHTMLTable t(updateDisplayRequest.getHTMLForm("updateprops"));
 				t.getForm().setUpdateRight(tabHasWritePermissions());
@@ -206,7 +206,7 @@ namespace synthese
 				}
 				stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_NAME, _displayScreen->getName()));
 
-				stream << t.title("Données techniques");
+				stream << t.title("DonnÃ©es techniques");
 				stream << t.cell("UID", Conversion::ToString(_displayScreen->getKey()));
 				stream <<
 					t.cell(
@@ -238,7 +238,7 @@ namespace synthese
 						);
 						
 						stream << t.cell(
-							"Unité centrale",
+							"UnitÃ© centrale",
 							t.getForm().getSelectInput(
 								UpdateDisplayScreenAction::PARAMETER_CPU,
 								cpus,
@@ -246,7 +246,7 @@ namespace synthese
 									_getEnv().getEditableSPtr(
 										const_cast<DisplayScreenCPU*>(_displayScreen->getRoot<DisplayScreenCPU>())
 								)	),
-								"(pas d'unité centrale)"
+								"(pas d'unitÃ© centrale)"
 							) + " " +(
 								_displayScreen->getRoot<DisplayScreenCPU>() ?
 								goCPURequest.getHTMLForm().getLinkButton(
@@ -267,20 +267,20 @@ namespace synthese
 							0, 99,
 							_displayScreen->getComPort(),
 							1,
-							"(inutilisé)"
+							"(inutilisÃ©)"
 					)	)
 				;
 				stream << t.cell("Code de branchement bus RS485", t.getForm().getSelectNumberInput(UpdateDisplayScreenAction::PARAMETER_WIRING_CODE, 0, 99, _displayScreen->getWiringCode()));
 
 				stream << t.close();
 
-				stream << "<p class=\"info\">Certains types d'afficheurs ne prennent pas en charge toutes les fonctionnalités proposées. Selon le type de l'afficheur, certains champs peuvent donc être sans effet sur l'affichage.</p>";
+				stream << "<p class=\"info\">Certains types d'afficheurs ne prennent pas en charge toutes les fonctionnalitÃ©s proposÃ©es. Selon le type de l'afficheur, certains champs peuvent donc Ãªtre sans effet sur l'affichage.</p>";
 
 				if (deleteRequest.isActionFunctionAuthorized())
 				{
 					stream << "<h1>Suppression</h1>";
 					stream << "<p>";
-					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'afficheur " + _displayScreen->getFullName() + " ?", "monitor_delete.png") << " ";
+					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer l'afficheur " + _displayScreen->getFullName() + " ?", "monitor_delete.png") << " ";
 					stream << "</p>";
 				}
 			}
@@ -302,7 +302,7 @@ namespace synthese
 				// Log search
 				AdminFunctionRequest<DisplayAdmin> searchRequest(_request);
 
-				stream << "<h1>Paramètres de maintenance</h1>";
+				stream << "<h1>ParamÃ¨tres de maintenance</h1>";
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
 				t.getForm().setUpdateRight(tabHasWritePermissions());
@@ -310,7 +310,7 @@ namespace synthese
 				stream << t.open();
 				stream <<
 					t.cell(
-						"Afficheur déclaré en service",
+						"Afficheur dÃ©clarÃ© en service",
 						t.getForm().getOuiNonRadioInput(
 							UpdateDisplayMaintenanceAction::PARAMETER_ONLINE,
 							_displayScreen->getIsOnline()
@@ -340,7 +340,7 @@ namespace synthese
 				{
 					stream <<
 						HTMLModule::getHTMLImage("error.png", "Erreur") <<
-						" KO : Veuillez définir le type d'afficheur dans l'écran de configuration."
+						" KO : Veuillez dÃ©finir le type d'afficheur dans l'Ã©cran de configuration."
 					;
 				}
 				else
@@ -361,12 +361,12 @@ namespace synthese
 					stream <<
 						l.element() <<
 						HTMLModule::getHTMLImage("help.png", "Information") <<
-						" Ce type d'afficheur n'est pas supervisé."
+						" Ce type d'afficheur n'est pas supervisÃ©."
 					;
 				} else {
 					stream <<
 						l.element() <<
-						"Durée théorique entre les contacts de supervision : " <<
+						"DurÃ©e thÃ©orique entre les contacts de supervision : " <<
 						_displayScreen->getType()->getTimeBetweenChecks() << " min"
 					;
 
@@ -375,7 +375,7 @@ namespace synthese
 						stream <<
 							l.element() <<
 							HTMLModule::getHTMLImage("exclamation.png", "Statut KO") <<
-							" KO : Cet afficheur n'est jamais entré en contact.";
+							" KO : Cet afficheur n'est jamais entrÃ© en contact.";
 					}
 					else
 					{
@@ -384,7 +384,7 @@ namespace synthese
 							stream <<
 								l.element() <<
 								HTMLModule::getHTMLImage("exclamation.png", "Statut KO") <<
-								" KO : Cet afficheur n'est plus en contact alors qu'il est déclaré online."
+								" KO : Cet afficheur n'est plus en contact alors qu'il est dÃ©clarÃ© online."
 							;
 						}
 					}
@@ -393,8 +393,8 @@ namespace synthese
 				if(_status.get() != NULL)
 				{
 					DisplayMonitoringStatus::Status globalStatus(_status->getGlobalStatus());
-					stream << l.element() << "Dernière mesure le " << to_simple_string(_status->getTime());
-					stream << l.element() << "Dernier état mesuré : " <<
+					stream << l.element() << "DerniÃ¨re mesure le " << to_simple_string(_status->getTime());
+					stream << l.element() << "Dernier Ã©tat mesurÃ© : " <<
 						HTMLModule::getHTMLImage(
 							DisplayMonitoringStatus::GetStatusIcon(globalStatus),
 							DisplayMonitoringStatus::GetStatusString(globalStatus)
@@ -402,9 +402,9 @@ namespace synthese
 						" " <<
 						DisplayMonitoringStatus::GetStatusString(globalStatus)
 					;
-					stream << l.element() << "Température : "
+					stream << l.element() << "TempÃ©rature : "
 						<< *_status->getTemperatureValue();
-					stream << l.element() << "Détail : "
+					stream << l.element() << "DÃ©tail : "
 						<< _status->getDetail();
 				}
 
@@ -471,7 +471,7 @@ namespace synthese
 				endFilterMap.push_back(make_pair(ENDS_ONLY, "Origines/Terminus seulement"));
 
 				{	// Properties
-					stream << "<h1>Propriétés</h1>";
+					stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 					PropertiesHTMLTable t(updPreselRequest.getHTMLForm("updpresel"));
 					t.getForm().setUpdateRight(tabHasWritePermissions());
@@ -490,8 +490,8 @@ namespace synthese
 						optional<EndFilter>(_displayScreen->getEndFilter()),
 						true
 						)	);
-					stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) + " minutes");
-					stream << t.cell("Délai d'effacement", t.getForm().getSelectInput(
+					stream << t.cell("DÃ©lai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) + " minutes");
+					stream << t.cell("DÃ©lai d'effacement", t.getForm().getSelectInput(
 						UpdateDisplayPreselectionParametersAction::PARAMETER_CLEANING_DELAY,
 						UpdateDisplayPreselectionParametersAction::GetClearDelaysList(),
 						optional<int>(_displayScreen->getClearingDelay())
@@ -499,10 +499,10 @@ namespace synthese
 
 					if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
 					{
-						stream << t.title("Présélection");
+						stream << t.title("PrÃ©sÃ©lection");
 						stream <<
 							t.cell(
-							"Délai maximum présélection",
+							"DÃ©lai maximum prÃ©sÃ©lection",
 							t.getForm().getTextInput(
 							UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY,
 							Conversion::ToString(_displayScreen->getForceDestinationDelay())
@@ -515,12 +515,12 @@ namespace synthese
 				}
 
 				{	// Displayed stop area
-					stream << "<h1>Arrêt de départ</h1>";
+					stream << "<h1>ArrÃªt de dÃ©part</h1>";
 					PropertiesHTMLTable t(updateDisplayedPlaceRequest.getHTMLForm("stopareachange"));
 					t.getForm().setUpdateRight(tabHasWritePermissions());
 					stream << t.open();
-					stream << t.cell("Localité", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_CITY_NAME, _displayScreen->getDisplayedPlace() ? _displayScreen->getDisplayedPlace()->getCity()->getName() : string()));
-					stream << t.cell("Arrêt", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_PLACE_NAME, _displayScreen->getDisplayedPlace() ? _displayScreen->getDisplayedPlace()->getName() : string()));
+					stream << t.cell("LocalitÃ©", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_CITY_NAME, _displayScreen->getDisplayedPlace() ? _displayScreen->getDisplayedPlace()->getCity()->getName() : string()));
+					stream << t.cell("ArrÃªt", t.getForm().getTextInput(DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_PLACE_NAME, _displayScreen->getDisplayedPlace() ? _displayScreen->getDisplayedPlace()->getName() : string()));
 					stream << t.close();
 				}
 
@@ -528,11 +528,11 @@ namespace synthese
 
 				if(_displayScreen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
 				{
-					stream << "<h1>Arrêts de destination</h1>";
+					stream << "<h1>ArrÃªts de destination</h1>";
 
 					if(_displayScreen->getDisplayedPlace() == NULL)
 					{
-						stream << "Arrêt de départ non spécifié, aucune destination ne peut être sélectionnée.";
+						stream << "ArrÃªt de dÃ©part non spÃ©cifiÃ©, aucune destination ne peut Ãªtre sÃ©lectionnÃ©e.";
 					}
 					else
 					{
@@ -540,7 +540,7 @@ namespace synthese
 
 						HTMLTable::ColsVector c;
 						c.push_back("Commune");
-						c.push_back("Arrêt");
+						c.push_back("ArrÃªt");
 						c.push_back("Actions");
 						HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 						stream << f.open() << t.open();
@@ -553,7 +553,7 @@ namespace synthese
 							stream << t.col() << it.second->getName();
 							stream << t.col() << rmDisplayedRequest.getHTMLForm().getLinkButton(
 								"Supprimer",
-								"Etes-vous sûr de vouloir supprimer la destination sélectionnée ?",
+								"Etes-vous sÃ»r de vouloir supprimer la destination sÃ©lectionnÃ©e ?",
 								"delete.png"
 							);
 
@@ -570,12 +570,12 @@ namespace synthese
 				else
 				{
 					// Used physical stops
-					stream << "<h1>Arrêts de desserte</h1>";
+					stream << "<h1>ArrÃªts de desserte</h1>";
 
 					HTMLForm uaf(updateAllDisplayRequest.getHTMLForm("updaall"));
 					uaf.addHiddenField(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, Conversion::ToString(!_displayScreen->getAllPhysicalStopsDisplayed()));
-					stream << "<p>Mode : "	<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts");
-					stream << " " << uaf.getLinkButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "Sélection d'arrêts" : "Tous arrêts"));
+					stream << "<p>Mode : "	<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrÃªts (y compris nouveaux)" : "SÃ©lection d'arrÃªts");
+					stream << " " << uaf.getLinkButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "SÃ©lection d'arrÃªts" : "Tous arrÃªts"));
 					stream << "</p>";
 					HTMLList l;
 
@@ -583,7 +583,7 @@ namespace synthese
 					{
 						if(_displayScreen->getDisplayedPlace() == NULL)
 						{
-							stream << "Arrêt de départ non spécifié, aucun arrêt à sélectionner.";
+							stream << "ArrÃªt de dÃ©part non spÃ©cifiÃ©, aucun arrÃªt Ã  sÃ©lectionner.";
 						}
 						else
 						{
@@ -593,7 +593,7 @@ namespace synthese
 							stream << t.col(1, string(), true) << "Nom";
 							stream << t.col(1, string(), true) << "Code exploitant";
 							stream << t.col(1, string(), true) << "Lignes";
-							stream << t.col(1, string(), true) << "Affiché";
+							stream << t.col(1, string(), true) << "AffichÃ©";
 							BOOST_FOREACH(
 								const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it,
 								_displayScreen->getDisplayedPlace()->getPhysicalStops()
@@ -631,7 +631,7 @@ namespace synthese
 											addPhysicalRequest.getHTMLForm().getURL(),
 											HTMLModule::getHTMLImage(
 												"cross.png",
-												"Arrêt non affiché, cliquer pour afficher"
+												"ArrÃªt non affichÃ©, cliquer pour afficher"
 										)	)
 									;
 								} else {
@@ -641,7 +641,7 @@ namespace synthese
 											rmPhysicalRequest.getHTMLForm().getURL(),
 											HTMLModule::getHTMLImage(
 												"tick.png",
-												"Arrêt affiché, cliquer pour enlever"
+												"ArrÃªt affichÃ©, cliquer pour enlever"
 										)	)
 									;
 								}
@@ -652,7 +652,7 @@ namespace synthese
 
 					// Forbidden places
 					stream <<
-						"<h1>Arrêts ne devant pas être desservis par les lignes sélectionnées pour l'affichage</h1>"
+						"<h1>ArrÃªts ne devant pas Ãªtre desservis par les lignes sÃ©lectionnÃ©es pour l'affichage</h1>"
 					;
 
 					HTMLForm ant(addNSRequest.getHTMLForm("addforb"));
@@ -694,7 +694,7 @@ namespace synthese
 				if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
 				{
 					// Additional preselection stops
-					stream << "<h1>Arrêts de présélection</h1>";
+					stream << "<h1>ArrÃªts de prÃ©sÃ©lection</h1>";
 
 					HTMLList l;
 					HTMLForm psaf(addPreselRequest.getHTMLForm("addpresel"));
@@ -734,7 +734,7 @@ namespace synthese
 					;
 					stream << l.close() << psaf.close();
 
-					stream << "<p class=\"info\">Les terminus de lignes sont automatiquement présélectionnés.</p>";
+					stream << "<p class=\"info\">Les terminus de lignes sont automatiquement prÃ©sÃ©lectionnÃ©s.</p>";
 				}
 
 				stream << "<h1>Contenus inclus</h1>";
@@ -768,12 +768,12 @@ namespace synthese
 					stream << td.col() << screen.getName();
 					stream << td.col() << screen.getKey();
 					stream << td.col() << displayRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "monitor.png");
-					stream << td.col() << removeDisplayRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le contenu "+ screen.getName() + " ?", "monitor_delete.png");
+					stream << td.col() << removeDisplayRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sÃ»r de vouloir supprimer le contenu "+ screen.getName() + " ?", "monitor_delete.png");
 				}
 
 				stream << td.close();
 
-				stream << createDisplayRequest.getHTMLForm().getLinkButton("Créer un nouveau contenu inclus", string(), "monitor_add.png");
+				stream << createDisplayRequest.getHTMLForm().getLinkButton("CrÃ©er un nouveau contenu inclus", string(), "monitor_add.png");
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -793,7 +793,7 @@ namespace synthese
 					blinkingDelaysMap.push_back(make_pair(i, lexical_cast<string>(i) + " minutes avant disparition"));
 				}
 
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				t.getForm().setUpdateRight(tabHasWritePermissions());
@@ -807,9 +807,9 @@ namespace synthese
 						blinkingDelaysMap,
 						optional<int>(_displayScreen->getBlinkingDelay())
 				)	);
-				stream << t.cell("Affichage numéro de quai", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_PLATFORM, _displayScreen->getTrackNumberDisplay()));
-				stream << t.cell("Affichage numéro de service", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->getServiceNumberDisplay()));
-				stream << t.cell("Affichage numéro d'équipe", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_TEAM, _displayScreen->getDisplayTeam()));
+				stream << t.cell("Affichage numÃ©ro de quai", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_PLATFORM, _displayScreen->getTrackNumberDisplay()));
+				stream << t.cell("Affichage numÃ©ro de service", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_SERVICE_NUMBER, _displayScreen->getServiceNumberDisplay()));
+				stream << t.cell("Affichage numÃ©ro d'Ã©quipe", t.getForm().getOuiNonRadioInput(DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_TEAM, _displayScreen->getDisplayTeam()));
 				stream <<
 					t.cell(
 						"Affichage horloge",
@@ -832,13 +832,13 @@ namespace synthese
 					AdminActionFunctionRequest<DisplayScreenRemoveDisplayedPlaceAction,DisplayAdmin> rmDisplayedRequest(_request);
 					rmDisplayedRequest.getAction()->setScreen(_displayScreen->getKey());
 
-					stream << "<h1>Affichage arrêts intermédiaires</h1>";
+					stream << "<h1>Affichage arrÃªts intermÃ©diaires</h1>";
 
 					HTMLForm f(addDisplayRequest.getHTMLForm("addplace"));
 
 					HTMLTable::ColsVector c;
 					c.push_back("Commune");
-					c.push_back("Arrêt");
+					c.push_back("ArrÃªt");
 					c.push_back("Actions");
 					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 					stream << f.open() << t.open();
@@ -851,7 +851,7 @@ namespace synthese
 						stream << t.col() << it.second->getName();
 						stream << t.col() << rmDisplayedRequest.getHTMLForm().getLinkButton(
 							"Supprimer",
-							"Etes-vous sûr de vouloir supprimer la destination sélectionnée ?",
+							"Etes-vous sÃ»r de vouloir supprimer la destination sÃ©lectionnÃ©e ?",
 							"delete.png"
 						);
 					}
@@ -880,8 +880,8 @@ namespace synthese
 					HTMLForm ft(addTransferRequest.getHTMLForm("addtransfer"));
 
 					HTMLTable::ColsVector ct;
-					ct.push_back("Arrêt de correspondance");
-					ct.push_back("Arrêt de correspondance");
+					ct.push_back("ArrÃªt de correspondance");
+					ct.push_back("ArrÃªt de correspondance");
 					ct.push_back("Destination");
 					ct.push_back("Destination");
 					ct.push_back("Actions");
@@ -903,7 +903,7 @@ namespace synthese
 							stream << tt.col() << it2->getName();
 							stream << tt.col() << rmTransferRequest.getHTMLForm().getLinkButton(
 								"Supprimer",
-								"Etes-vous sûr de vouloir supprimer la destination sélectionnée ?",
+								"Etes-vous sÃ»r de vouloir supprimer la destination sÃ©lectionnÃ©e ?",
 								"delete.png"
 							);
 					}	}
@@ -922,7 +922,7 @@ namespace synthese
 					stream << tt.col() << ft.getTextInput(
 						DisplayScreenTransferDestinationAddAction::PARAMETER_DESTINATION_PLACE_NAME,
 						string(),
-						"(arrêt)"
+						"(arrÃªt)"
 					);
 
 					stream << tt.col() << ft.getSubmitButton("Ajouter");
@@ -950,7 +950,7 @@ namespace synthese
 
 				int priority(1);
 				HTMLTable::ColsVector h;
-				h.push_back("Priorité");
+				h.push_back("PrioritÃ©");
 				h.push_back("Contenu");
 				h.push_back("Contenu");
 				h.push_back("Date fin");
@@ -962,8 +962,8 @@ namespace synthese
 				{
 					stream << t.row();
 					stream << t.col() << priority++;
-					stream << t.col() << HTMLModule::getHTMLImage("cross.png", "Afficheur désactivé pour maintenance");
-					stream << t.col() << "Afficheur désactivé pour maintenance";
+					stream << t.col() << HTMLModule::getHTMLImage("cross.png", "Afficheur dÃ©sactivÃ© pour maintenance");
+					stream << t.col() << "Afficheur dÃ©sactivÃ© pour maintenance";
 					stream << t.col() << "(inconnu)";
 					stream << t.col() << getTabLinkButton(TAB_MAINTENANCE);
 				}
@@ -980,7 +980,7 @@ namespace synthese
 					stream << t.col() << HTMLModule::getHTMLImage((alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
 					stream << t.col() << "Message : " + alarm->getShortMessage();
 					stream << t.col() <<
-						(alarm->getScenario()->getPeriodEnd().is_not_a_date_time() ? "(illimité)" : to_simple_string(alarm->getScenario()->getPeriodEnd()))
+						(alarm->getScenario()->getPeriodEnd().is_not_a_date_time() ? "(illimitÃ©)" : to_simple_string(alarm->getScenario()->getPeriodEnd()))
 					;
 					stream << t.col();
 
@@ -996,14 +996,14 @@ namespace synthese
 					stream << t.col();
 					if(_displayScreen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
 					{
-						stream << "Calcul d'itinéraires " << (_displayScreen->getRoutePlanningWithTransfer() ? "avec" : "sans") << " correspondances";
+						stream << "Calcul d'itinÃ©raires " << (_displayScreen->getRoutePlanningWithTransfer() ? "avec" : "sans") << " correspondances";
 					}
 					else
 					{
-						stream << "Horaires " << ((_displayScreen->getDirection() == DISPLAY_DEPARTURES) ? "de départ" : "d'arrivée")
-							<< ((_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD) ? " avec présélection" : " chronologiques");
+						stream << "Horaires " << ((_displayScreen->getDirection() == DISPLAY_DEPARTURES) ? "de dÃ©part" : "d'arrivÃ©e")
+							<< ((_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD) ? " avec prÃ©sÃ©lection" : " chronologiques");
 					}
-					stream << t.col() << "(illimité)";
+					stream << t.col() << "(illimitÃ©)";
 					stream << t.col() << getTabLinkButton(TAB_CONTENT);
 				}
 				stream << t.close();
@@ -1019,7 +1019,7 @@ namespace synthese
 					HTMLTable::ColsVector h2;
 					h2.push_back("Contenu");
 					h2.push_back("Contenu");
-					h2.push_back("Date début");
+					h2.push_back("Date dÃ©but");
 					h2.push_back("Date fin");
 					h2.push_back("Admin");
 					HTMLTable t2(h2, ResultHTMLTable::CSS_CLASS);
@@ -1030,7 +1030,7 @@ namespace synthese
 						stream << t2.col() << HTMLModule::getHTMLImage((alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());
 						stream << t2.col() << "Message : " + alarm->getShortMessage();
 						stream << t2.col() << alarm->getScenario()->getPeriodStart();
-						stream << t2.col() << (alarm->getScenario()->getPeriodEnd().is_not_a_date_time() ? "(illimité)" : to_simple_string(alarm->getScenario()->getPeriodEnd()));
+						stream << t2.col() << (alarm->getScenario()->getPeriodEnd().is_not_a_date_time() ? "(illimitÃ©)" : to_simple_string(alarm->getScenario()->getPeriodEnd()));
 						stream << t2.col();
 
 						viewMessageRequest.getPage()->setMessage(alarm);
@@ -1169,12 +1169,12 @@ namespace synthese
 					) :
 					profile.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL)
 				);
-				_tabs.push_back(Tab("Sélection", TAB_CONTENT, writeRight, "times_display.png"));
+				_tabs.push_back(Tab("SÃ©lection", TAB_CONTENT, writeRight, "times_display.png"));
 				if(_displayScreen->getGenerationMethod() != DisplayScreen::DISPLAY_CHILDREN_ONLY)
 				{
 					_tabs.push_back(Tab("Apparence", TAB_APPEARANCE, writeRight, "font.png"));
 				}
-				_tabs.push_back(Tab("Résultat", TAB_RESULT, writeRight, "zoom.png"));
+				_tabs.push_back(Tab("RÃ©sultat", TAB_RESULT, writeRight, "zoom.png"));
 
 				if (ArrivalDepartureTableLog::IsAuthorized(profile, READ))
 				{

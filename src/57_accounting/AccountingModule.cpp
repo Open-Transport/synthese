@@ -60,7 +60,7 @@ namespace synthese
 
 		std::string AccountingModule::getName() const
 		{
-			return "Modélisation comptabilité";
+			return "ModÃ©lisation comptabilitÃ©";
 		}
 	}
 }

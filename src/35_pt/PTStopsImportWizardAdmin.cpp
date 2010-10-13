@@ -76,7 +76,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<PTStopsImportWizardAdmin>::ICON("database_copy.png");
-		template<> const string AdminInterfaceElementTemplate<PTStopsImportWizardAdmin>::DEFAULT_TITLE("Import d'arrêts");
+		template<> const string AdminInterfaceElementTemplate<PTStopsImportWizardAdmin>::DEFAULT_TITLE("Import d'arrÃªts");
 	}
 
 	namespace pt
@@ -157,9 +157,9 @@ namespace synthese
 
 					PropertiesHTMLTable t(importRequest.getHTMLForm());
 					stream << t.open();
-					stream << t.title("Propriétés");
+					stream << t.title("PropriÃ©tÃ©s");
 					stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(ImportFunction::PARAMETER_DO_IMPORT, false));
-					stream << t.title("Données");
+					stream << t.title("DonnÃ©es");
 					stream << t.cell("Rues (streets)", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + NavteqWithProjectionFileFormat::FILE_STREETS, string()));
 					stream << t.cell("Noeuds (nodes)", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + NavteqWithProjectionFileFormat::FILE_NODES, string()));
 					stream << t.cell("Zones administratives (mtdarea)", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + NavteqWithProjectionFileFormat::FILE_MTDAREA, string()));
@@ -172,13 +172,13 @@ namespace synthese
 
 					PropertiesHTMLTable t(importRequest.getHTMLForm());
 					stream << t.open();
-					stream << t.title("Propriétés");
+					stream << t.title("PropriÃ©tÃ©s");
 					stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(ImportFunction::PARAMETER_DO_IMPORT, false));
-					stream << t.cell("Import arrêts", t.getForm().getOuiNonRadioInput(TridentFileFormat::PARAMETER_IMPORT_STOPS, false));
+					stream << t.cell("Import arrÃªts", t.getForm().getOuiNonRadioInput(TridentFileFormat::PARAMETER_IMPORT_STOPS, false));
 					stream << t.cell("Import transferts", t.getForm().getOuiNonRadioInput(TridentFileFormat::PARAMETER_IMPORT_JUNCTIONS, false));
-					stream << t.cell("Importer dates passées (nombre de jours)", t.getForm().getTextInput(TridentFileFormat::PARAMETER_WITH_OLD_DATES, "0"));
-					stream << t.cell("Temps de correspondance par défaut (minutes)", t.getForm().getTextInput(TridentFileFormat::PARAMETER_DEFAULT_TRANSFER_DURATION, "8"));
-					stream << t.title("Données");
+					stream << t.cell("Importer dates passÃ©es (nombre de jours)", t.getForm().getTextInput(TridentFileFormat::PARAMETER_WITH_OLD_DATES, "0"));
+					stream << t.cell("Temps de correspondance par dÃ©faut (minutes)", t.getForm().getTextInput(TridentFileFormat::PARAMETER_DEFAULT_TRANSFER_DURATION, "8"));
+					stream << t.title("DonnÃ©es");
 					stream << t.cell("Ligne", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH, string()));
 					stream << t.close();
 				}
@@ -189,9 +189,9 @@ namespace synthese
 
 					PropertiesHTMLTable t(importRequest.getHTMLForm());
 					stream << t.open();
-					stream << t.title("Propriétés");
+					stream << t.title("PropriÃ©tÃ©s");
 					stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(ImportFunction::PARAMETER_DO_IMPORT, false));
-					stream << t.title("Données");
+					stream << t.title("DonnÃ©es");
 					stream << t.cell("Eckdaten", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + CarPostalFileFormat::FILE_ECKDATEN, string()));
 					stream << t.cell("Bitfeld", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + CarPostalFileFormat::FILE_BITFELD, string()));
 					stream << t.cell("Zugdat", t.getForm().getTextInput(ImportFunction::PARAMETER_PATH + CarPostalFileFormat::FILE_ZUGUDAT, string()));
@@ -199,7 +199,7 @@ namespace synthese
 				}
 				else
 				{
-					stream << "<p class=\"info\">Format de données d'entrées inconnu.</p>";
+					stream << "<p class=\"info\">Format de donnÃ©es d'entrÃ©es inconnu.</p>";
 				}
 			}
 
@@ -235,7 +235,7 @@ namespace synthese
 							std::string times(line.substr(12));
 							boost::algorithm::split( cols, times, boost::algorithm::is_any_of(","));
 							bahnhof.cityName = cols[0];
-							bahnhof.name = (cols.size() == 1) ? "Arrêt" : cols[1];
+							bahnhof.name = (cols.size() == 1) ? "ArrÃªt" : cols[1];
 							
 							StopPointTableSync::SearchResult stops(
 								StopPointTableSync::Search(
@@ -292,11 +292,11 @@ namespace synthese
 					}
 
 					{
-						stream << "<h1>Arrêts non liés à SYNTHESE</h1>";
+						stream << "<h1>ArrÃªts non liÃ©s Ã  SYNTHESE</h1>";
 
 						HTMLTable::ColsVector c;
 						c.push_back("Code");
-						c.push_back("Localité");
+						c.push_back("LocalitÃ©");
 						c.push_back("Nom");
 						c.push_back("Coords fichier");
 						c.push_back("Coords fichier");
@@ -336,13 +336,13 @@ namespace synthese
 					}
 
 					{
-						stream << "<h1>Arrêts liés à SYNTHESE</h1>";
+						stream << "<h1>ArrÃªts liÃ©s Ã  SYNTHESE</h1>";
 
 						HTMLTable::ColsVector c;
 						c.push_back("Code");
-						c.push_back("Zone d'arrêt SYNTHESE");
-						c.push_back("Arrêt physique");
-						c.push_back("Localité");
+						c.push_back("Zone d'arrÃªt SYNTHESE");
+						c.push_back("ArrÃªt physique");
+						c.push_back("LocalitÃ©");
 						c.push_back("Nom");
 						c.push_back("Coords SYNTHESE");
 						c.push_back("Coords SYNTHESE");
@@ -388,7 +388,7 @@ namespace synthese
 							stream << bahnhof.second.coords->getY();
 
 							stream << t.col();
-							stream << "Mettre à jour coordonnées";
+							stream << "Mettre Ã  jour coordonnÃ©es";
 						}
 						stream << t.close();
 					}
@@ -419,7 +419,7 @@ namespace synthese
 		void PTStopsImportWizardAdmin::_buildTabs( const security::Profile& profile ) const
 		{
 			_tabs.clear();
-			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, profile.isAuthorized<TransportNetworkRight>(WRITE)));
+			_tabs.push_back(Tab("PropriÃ©tÃ©s", TAB_PROPERTIES, profile.isAuthorized<TransportNetworkRight>(WRITE)));
 			if(	_dataSource.get() &&
 				!_dataSource->getFormat().empty() &&
 				Factory<FileFormat>::contains(_dataSource->getFormat()) &&
@@ -429,7 +429,7 @@ namespace synthese
 			
 				if(_dataSource->getFormat() == CarPostalFileFormat::FACTORY_KEY)
 				{
-					_tabs.push_back(Tab("Import manuel arrêts", TAB_IMPORT_STOPS, true));
+					_tabs.push_back(Tab("Import manuel arrÃªts", TAB_IMPORT_STOPS, true));
 				}
 			}
 			_tabBuilded = true;

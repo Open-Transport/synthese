@@ -1,53 +1,53 @@
-/** @page drt Réservation de transport à la demande (TAD)
+/** @page drt RÃ©servation de transport Ã  la demande (TAD)
 
-SYNTHESE embarque en standard un module de gestion des réservations TAD utilisé sur l’agglomération toulousaine depuis 2004, et ayant pris en charge depuis cette date environ 1 200 000 réservations (par téléphone ou par Internet)
-Les + de SYNTHESE : fort de 5 ans d’expérience dans l’exploitation du plus important réseau TAD de France (2000 clients par jour), le module réservation de SYNTHESE est un outil parfaitement maitrisé, y compris en auto-réservation par Internet avec protection par mot de passe. Il est donc proposé d’ouvrir la fonction réservation au public également.
+SYNTHESE embarque en standard un module de gestion des rÃ©servations TAD utilisÃ© sur lâ€™agglomÃ©ration toulousaine depuis 2004, et ayant pris en charge depuis cette date environ 1 200 000 rÃ©servations (par tÃ©lÃ©phone ou par Internet)
+Les + de SYNTHESE : fort de 5 ans dâ€™expÃ©rience dans lâ€™exploitation du plus important rÃ©seau TAD de France (2000 clients par jour), le module rÃ©servation de SYNTHESE est un outil parfaitement maitrisÃ©, y compris en auto-rÃ©servation par Internet avec protection par mot de passe. Il est donc proposÃ© dâ€™ouvrir la fonction rÃ©servation au public Ã©galement.
 
 Il propose deux vues :
 <ul>
-<li>Une vue client, permettant après identification par mot de passe, de prendre une réservation, de la consulter, et de l’annuler</li>
-<li>Une vue opérateur, permettant d’accéder à toutes les fonctionnalités, dont les feuilles de route pour conducteurs</li>
+<li>Une vue client, permettant aprÃ¨s identification par mot de passe, de prendre une rÃ©servation, de la consulter, et de lâ€™annuler</li>
+<li>Une vue opÃ©rateur, permettant dâ€™accÃ©der Ã  toutes les fonctionnalitÃ©s, dont les feuilles de route pour conducteurs</li>
 </ul>
 
 <h2>Vue client</h2>
  
-La vue client est organisée comme suit :
+La vue client est organisÃ©e comme suit :
  
-La vue client consiste en l’utilisation du calculateur d’itinéraires, présentant un formulaire de prise de réservation dans la feuille de route si besoin :
+La vue client consiste en lâ€™utilisation du calculateur dâ€™itinÃ©raires, prÃ©sentant un formulaire de prise de rÃ©servation dans la feuille de route si besoin :
  
-Si le client n’est pas identifié, il doit tout d’abord renseigner un champ login et un champ mot de passe. Les login et mots de passe sont créés par téléphone par un opérateur humain, afin d’effectuer divers contrôles de routine et de dissuader d’éventuelles personnes mal intentionnées.
-Une fois la réservation prise, le client reçoit un e-mail de confirmation comportant un lien vers la page de consultation/annulation :
+Si le client nâ€™est pas identifiÃ©, il doit tout dâ€™abord renseigner un champ login et un champ mot de passe. Les login et mots de passe sont crÃ©Ã©s par tÃ©lÃ©phone par un opÃ©rateur humain, afin dâ€™effectuer divers contrÃ´les de routine et de dissuader dâ€™Ã©ventuelles personnes mal intentionnÃ©es.
+Une fois la rÃ©servation prise, le client reÃ§oit un e-mail de confirmation comportant un lien vers la page de consultation/annulation :
  
-L’annulation de réservation  donne lieu à un affichage de confirmation :
+Lâ€™annulation de rÃ©servation  donne lieu Ã  un affichage de confirmation :
 
-<h2>Vue opérateur</h2>
+<h2>Vue opÃ©rateur</h2>
  
-La vue opérateur se présente quant à elle dans la console d’administration :
+La vue opÃ©rateur se prÃ©sente quant Ã  elle dans la console dâ€™administration :
  
 Il comporte 5 rubriques :
 <ul>
-<li>Consultation des réservations</li>
+<li>Consultation des rÃ©servations</li>
 <li>Fichier clients</li>
-<li>Journal des événements (dont appels)</li>
+<li>Journal des Ã©vÃ©nements (dont appels)</li>
 <li>Statistiques</li>
-<li>Calcul d’itinéraire par interface professionnelle</li>
+<li>Calcul dâ€™itinÃ©raire par interface professionnelle</li>
 </ul>
 
-Quelques captures d’écran :
+Quelques captures dâ€™Ã©cran :
  
-Liste des réservations triées par ordre de desserte, à destination des conducteurs
+Liste des rÃ©servations triÃ©es par ordre de desserte, Ã  destination des conducteurs
 
  
-Fiche client (noter que ce client dispose d’un compte pour auto-réservation par internet). Un onglet donne accès au journal complet du client (appels et réservations)
+Fiche client (noter que ce client dispose dâ€™un compte pour auto-rÃ©servation par internet). Un onglet donne accÃ¨s au journal complet du client (appels et rÃ©servations)
 
  
-Journal chronologique Noter les envois d’e-mail lors de l’utilisation des fonctions d’auto-réservation par Internet
+Journal chronologique Noter les envois dâ€™e-mail lors de lâ€™utilisation des fonctions dâ€™auto-rÃ©servation par Internet
 
  
-Ecran de statistiques des événements
+Ecran de statistiques des Ã©vÃ©nements
 
  
-Calculateur d’itinéraires professionnel (pas de phrases explicatives, vue concise, et navigation 100% clavier pour augmenter le rendement d’utilisation)
+Calculateur dâ€™itinÃ©raires professionnel (pas de phrases explicatives, vue concise, et navigation 100% clavier pour augmenter le rendement dâ€™utilisation)
 
 
 <h2>Liens vers la documentation technique</h2>

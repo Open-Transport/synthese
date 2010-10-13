@@ -74,34 +74,34 @@ namespace synthese
 			
 			<h3>Road exploration : Transport public stops approach</h3>
 
-			Cette fonctionnalité consiste en la détermination de l'ensemble des points d'arrêt accessibles en un temps maximal fixé avec le descriptif du trajet d'approche à effectuer à pied, à partir des éléments suivants :
-			- voirie : on ne suit que des cheminements réels
-			- limites de communes : permet de déterminer la commune du point géographique, ainsi que le parcours le plus court pour pénétrer aux communes proches dans le but d'y trouver un éventuel arrêt tout lieux.
+			Cette fonctionnalitÃ© consiste en la dÃ©termination de l'ensemble des points d'arrÃªt accessibles en un temps maximal fixÃ© avec le descriptif du trajet d'approche Ã  effectuer Ã  pied, Ã  partir des Ã©lÃ©ments suivants :
+			- voirie : on ne suit que des cheminements rÃ©els
+			- limites de communes : permet de dÃ©terminer la commune du point gÃ©ographique, ainsi que le parcours le plus court pour pÃ©nÃ©trer aux communes proches dans le but d'y trouver un Ã©ventuel arrÃªt tout lieux.
 
 			@image html uc35-source.png
 			@image latex uc35-source.png "" width=14cm
 
 			Le processus complet est le suivant, avec application sur l'exemple ci-dessus :
-			- Etape 1 : Lecture de la commune du point géographique (module @ref m03), et extraction du « Tous lieux » de la commune s'il existe :
-			<center><table class="tableau"><tr><th>Point d'arrêt</th><th>Durée</th></tr>
+			- Etape 1 : Lecture de la commune du point gÃ©ographique (module @ref m03), et extraction du Â« Tous lieux Â» de la commune s'il existe :
+			<center><table class="tableau"><tr><th>Point d'arrÃªt</th><th>DurÃ©e</th></tr>
 			<tr><td>PA 6</td><td>0</td></tr>
 			</table></center>
 
-			- Etape 2 : Calcul d'approche vers des communes proches (module @ref m40), et extraction de « Tous lieux » des communes s'ils existent :
-			<center><table class="Tableau"><tr><th>Communes</th><th>Point d'arrêt</th><th>Durée</th></tr>
+			- Etape 2 : Calcul d'approche vers des communes proches (module @ref m40), et extraction de Â« Tous lieux Â» des communes s'ils existent :
+			<center><table class="Tableau"><tr><th>Communes</th><th>Point d'arrÃªt</th><th>DurÃ©e</th></tr>
 			<tr><td>A</td><td>PA 4</td><td>7</td></tr>	
 			<tr><td>B</td><td>PA 5</td><td>5</td></tr>
 			</table></center>
 
-			- Etape 3 : Calcul d'approche vers des points d'arrêt proches (module @ref m40) :
-			<center><table class="tableau"><tr><th>Point d'arrêt</th><th>Durée</th></tr>
+			- Etape 3 : Calcul d'approche vers des points d'arrÃªt proches (module @ref m40) :
+			<center><table class="tableau"><tr><th>Point d'arrÃªt</th><th>DurÃ©e</th></tr>
 			<tr><td>PA 1</td><td>8</td></tr>
 			<tr><td>PA 2</td><td>12</td></tr>
 			</table></center>
 
-			L'objet final construit est donc le suivant, incluant les descriptions de trajet représentées sur le schéma en suivant :
+			L'objet final construit est donc le suivant, incluant les descriptions de trajet reprÃ©sentÃ©es sur le schÃ©ma en suivant :
 
-			<center><table class="tableau"><tr><th>Point d'arrêt</th><th>Durée</th></tr>
+			<center><table class="tableau"><tr><th>Point d'arrÃªt</th><th>DurÃ©e</th></tr>
 			<tr><td>PA 1</td><td>8</td></tr>
 			<tr><td>PA 2</td><td>12</td></tr>
 			<tr><td>PA 4</td><td>7</td></tr>
@@ -113,8 +113,8 @@ namespace synthese
 			@image latex uc35-resultat.png "" width=14cm
 
 			Remarques :
-			Le point d'arrêt PA 3 a été ignoré car il n'est pas accessible malgré sa proximité à vol d'oiseau
-			Les désignations de référence des points d'arrêts PA 1 et PA 2 n'ont pas besoin d'être copiées, puisque la distance vers les communes A et B est forcément plus courte
+			Le point d'arrÃªt PA 3 a Ã©tÃ© ignorÃ© car il n'est pas accessible malgrÃ© sa proximitÃ© Ã  vol d'oiseau
+			Les dÃ©signations de rÃ©fÃ©rence des points d'arrÃªts PA 1 et PA 2 n'ont pas besoin d'Ãªtre copiÃ©es, puisque la distance vers les communes A et B est forcÃ©ment plus courte
 
 			Reference classes :
 			- algorithm::IntegralSearch

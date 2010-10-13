@@ -32,18 +32,18 @@ namespace synthese
 		/** Habilitation portant sur la maintenance des afficheurs.
 			@ingroup m54Rights refRights
 
-			Les niveaux de droit utilisés sont les suivants :
-				- READ : Permet de consulter les états de maintenance des afficheurs
-				- WRITE : Permet de modifier les états de maintenance des afficheurs
+			Les niveaux de droit utilisÃ©s sont les suivants :
+				- READ : Permet de consulter les Ã©tats de maintenance des afficheurs
+				- WRITE : Permet de modifier les Ã©tats de maintenance des afficheurs
 
-			Définition du périmètre :
-				- TransportNetwork : Autorisation portant sur les afficheurs situés sur un point de diffusion desservi par une ligne du réseau spécifié
-				- JourneyPattern : Autorisation portant sur les afficheurs situés sur un arrêt desservi par la ligne spécifiée
-				- Place : Autorisation portant sur les afficheurs situés sur un arrêt appartenant au lieu logique spécifié
-				- BroadcastPoint : Autorisation portant sur les afficheurs situés sur le point de diffusion spécifié
-				- NB : la notion de situation d'un afficheur est définie de deux manières :
-					- si le point de diffusion est un arrêt physique, alors il doit être desservi par la ligne
-					- si le point de diffusion n'est pas un arrêt physique, alors au moins un arrêt physique du lieu auquel appartient le point de diffusion doit être desservi par la ligne
+			DÃ©finition du pÃ©rimÃ¨tre :
+				- TransportNetwork : Autorisation portant sur les afficheurs situÃ©s sur un point de diffusion desservi par une ligne du rÃ©seau spÃ©cifiÃ©
+				- JourneyPattern : Autorisation portant sur les afficheurs situÃ©s sur un arrÃªt desservi par la ligne spÃ©cifiÃ©e
+				- Place : Autorisation portant sur les afficheurs situÃ©s sur un arrÃªt appartenant au lieu logique spÃ©cifiÃ©
+				- BroadcastPoint : Autorisation portant sur les afficheurs situÃ©s sur le point de diffusion spÃ©cifiÃ©
+				- NB : la notion de situation d'un afficheur est dÃ©finie de deux maniÃ¨res :
+					- si le point de diffusion est un arrÃªt physique, alors il doit Ãªtre desservi par la ligne
+					- si le point de diffusion n'est pas un arrÃªt physique, alors au moins un arrÃªt physique du lieu auquel appartient le point de diffusion doit Ãªtre desservi par la ligne
 		*/
 		class DisplayMaintenanceRight : public pt::NetworkLineBasedRight<DisplayMaintenanceRight>
 		{
