@@ -244,6 +244,15 @@ namespace synthese
 				MetricOffset getEndMetricOffset() const;
 				
 
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the next edge in the path.
+				/// @return the next edge in the path, null if the current edge is the last one.
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.2.0
+				Edge* getNextEdge() const;
+
 //				int getBestRunTime (const Edge& other ) const;
 			    
 				/** Checks consistency of input schedules.

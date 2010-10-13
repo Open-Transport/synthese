@@ -288,9 +288,7 @@ namespace synthese
 						PlacesList::iterator pos(
 							_putPlace(
 								PlacesList::value_type(
-									dynamic_cast<const Crossing*>(leg.getDepartureEdge()->getHub()) ?
-										dynamic_cast<const NamedPlace*>(_departurePlace) :
-										dynamic_cast<const NamedPlace*>(leg.getDepartureEdge()->getHub()),
+									GetNamedPlaceFromLegs(NULL, &leg, dynamic_cast<const NamedPlace*>(_departurePlace)),
 									true,
 									false
 								), minPos
@@ -305,9 +303,7 @@ namespace synthese
 						PlacesList::iterator pos(
 							_putPlace(
 								PlacesList::value_type(
-									dynamic_cast<const Crossing*>(leg.getArrivalEdge()->getHub()) ?
-										dynamic_cast<const NamedPlace*>(_arrivalPlace) :
-										dynamic_cast<const NamedPlace*>(leg.getArrivalEdge()->getHub()),
+									GetNamedPlaceFromLegs(&leg, itl+1 == jl.end() ? NULL : &(*(itl+1)), dynamic_cast<const NamedPlace*>(_arrivalPlace)),
 									false,
 									itl+1 == jl.end()
 								), minPos
@@ -472,6 +468,24 @@ namespace synthese
 				_swap(maxPos, target);
 				_orderedPlaces.splice(maxPos, _orderedPlaces, source);
 			}
+		}
+
+
+
+		const geography::NamedPlace* PTRoutePlannerResult::GetNamedPlaceFromLegs(
+			const graph::ServicePointer* arrivalLeg,
+			const graph::ServicePointer* departureLeg,
+			const geography::NamedPlace* defaultValue
+		){
+			if(arrivalLeg && dynamic_cast<const NamedPlace*>(arrivalLeg->getArrivalEdge()->getHub()))
+			{
+				return dynamic_cast<const NamedPlace*>(arrivalLeg->getArrivalEdge()->getHub());
+			}
+			if(departureLeg && dynamic_cast<const NamedPlace*>(departureLeg->getDepartureEdge()->getHub()))
+			{
+				return dynamic_cast<const NamedPlace*>(departureLeg->getDepartureEdge()->getHub());
+			}
+			return defaultValue;
 		}
 	}
 }
