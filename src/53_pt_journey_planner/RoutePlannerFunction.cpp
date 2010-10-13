@@ -781,12 +781,11 @@ namespace synthese
 							lastPedestrianMode != curET.getService()->getPath()->isPedestrianMode()
 						){
 							const NamedPlace* placeToSearch(
-								(	itl == jl.begin() &&
-									dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
-								)?
-								dynamic_cast<const NamedPlace*>(_departure_place.placeResult.value.get()) :
-								dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub())
-							);
+								PTRoutePlannerResult::GetNamedPlaceFromLegs(
+									itl == jl.begin() ? NULL : &(*(itl - 1)),
+									&curET,
+									dynamic_cast<const NamedPlace*>(_departure_place.placeResult.value.get())
+							)	);
 
 							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
 							{
@@ -825,10 +824,11 @@ namespace synthese
 						||	!curET.getService()->getPath()->isPedestrianMode()
 						){
 							const NamedPlace* placeToSearch(
-								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?
-								dynamic_cast<const NamedPlace*>(_arrival_place.placeResult.value.get()) :
-								dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub())
-							);
+								PTRoutePlannerResult::GetNamedPlaceFromLegs(
+									&curET,
+									itl == jl.end()-1 ? NULL : &(*(itl+1)),
+									dynamic_cast<const NamedPlace*>(_arrival_place.placeResult.value.get())
+							)	);
 							
 							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
 							{
@@ -1323,7 +1323,7 @@ namespace synthese
 						" level=\"interruption\"" <<
 						" startValidity=\"2000-01-01T00:00:07.0Z\"" <<
 						" endValidity=\"2099-12-31T23:59:00.0Z\"" <<
-					">SNCF en gr�ve</alert>"
+					">SNCF en greve</alert>"
 				;
 			}
 			stream << "</connectionPlace>";

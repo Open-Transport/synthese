@@ -151,6 +151,9 @@ namespace synthese
 
 		boost::shared_ptr<House> RoadPlace::getHouse( RoadChunk::HouseNumber houseNumber ) const
 		{
+			RoadChunk* nearestChunk(NULL);
+			RoadChunk::HouseNumber difference(0);
+			RoadChunk::HouseNumber bestNumber(0);
 			BOOST_FOREACH(Path* path, getPaths())
 			{
 				BOOST_FOREACH(Edge* edge, path->getEdges())
@@ -164,8 +167,43 @@ namespace synthese
 								houseNumber
 						)	);
 					}
+					if(!chunk.getHouseNumberBounds())
+					{
+						continue;
+					}
+					if(houseNumber > chunk.getHouseNumberBounds()->second)
+					{
+						if(!nearestChunk || houseNumber - chunk.getHouseNumberBounds()->second < difference)
+						{
+							bestNumber = chunk.getHouseNumberBounds()->second;
+							difference = houseNumber - bestNumber;
+							nearestChunk = static_cast<RoadChunk*>(chunk.getNextEdge());
+						}
+					}
+					else
+					{
+						if(!nearestChunk || chunk.getHouseNumberBounds()->first - houseNumber < difference)
+						{
+							bestNumber = chunk.getHouseNumberBounds()->first - houseNumber;
+							difference = bestNumber;
+							nearestChunk = &chunk;
+						}
+					}
 				}
 			}
+
+			// Nearest existing number
+			if(nearestChunk)
+			{
+				return boost::shared_ptr<House>(
+					new House(
+						*nearestChunk,
+						bestNumber
+				)	);
+			}
+
+
+			// No return
 			return shared_ptr<House>();
 		}
 	}
