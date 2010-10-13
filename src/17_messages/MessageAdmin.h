@@ -33,13 +33,13 @@ namespace synthese
 	{
 		class Alarm;
 
-		/** Ecran d'édition de message.
+		/** Ecran d'Ã©dition de message.
 			@ingroup m17Admin refAdmin
 
 			@image html cap_admin_message.png
-			@image latex cap_admin_message.png "Maquette de l'écran d'édition de message" width=14cm
+			@image latex cap_admin_message.png "Maquette de l'Ã©cran d'Ã©dition de message" width=14cm
 			
-			<i>Titre de la fenêtre</i> :
+			<i>Titre de la fenÃªtre</i> :
 				- SYNTHESE Admin - Message - [Nom]
 
 			<i>Barre de navigation</i> :
@@ -47,53 +47,53 @@ namespace synthese
 				- Lien vers synthese::interfaces::MessagesAdmin
 				- Texte [Nom]
 
-			<i>Zone de contenu</i> : <b>Formulaire d'édition</b> :
-				-# <b>Paramètres</b>
-					-# <tt>Type</tt> : Choix message complémentaire ou prioritaire. Le changement de choix lance un rafraichissement de la page pour redimensionner les zones de texte du contenu et pour charger la liste des modèles correspondants.
-					-# <tt>Début diffusion : Date</tt> : Champ texte obligatoire représentant le jour d'envoi du message. Un champ <tt>Début de diffusion : Date</tt> vide ou mal rempli entraîne un message d'erreur empêchant la diffusion :
-						@code Le message ne peut être diffusé car la date de début est incorrecte @endcode
-						Le champ <tt>Début diffusion : Date</tt> est par défaut rempli par la date courante.
-					-# <tt>Début diffusion : Heure</tt> : Champ texte facultatif représentant l'heure exacte d'envoi du message. En cas de non remplissage du champ, le message est envoyé dès minuit. Un champ <tt>Début de diffusion : Heure</tt> mal rempli entraîne un message d'erreur empêchant la diffusion :
-						@code Le message ne peut être diffusé car l'heure de début est incorrecte @endcode
-						Le champ <tt>Début diffusion : Heure</tt> est par défaut rempli par l'heure courante.
-					-# <tt>Fin diffusion</tt> : Champs textes facultatifs représentant la date et l'heure de fin de diffusion du message.
-						- si les champs sont saisis et correctement renseignés, la diffusion est possible
-						- si un des champs est saisi et mal renseigné, un message d'erreur empeche la diffusion :
-							@code Le message ne peut être diffusé car la date de fin est incorrecte @endcode
-							@code Le message ne peut être diffusé car l'heure de fin est incorrecte @endcode
-						- si le champ est renseigné par une date antérieure à la date de début, un message d'erreur empêche la diffusion :
-							@code Le message ne peut être diffusé car la date de fin est antérieure à la date de début. @endcode
-						- si le champ n'est pas renseigné, un message de confirmation est proposé lors de la diffusion, prévenant l'utilisateur que sans action de sa part ce message restera en vigueur indéfiniment
-						- si le seul champ <tt>Fin diffusion : Heure</tt> est seul rempli, un message d'erreur empêche la diffusion :
-							@code Le message ne peut être diffusé car la date de fin est incorrecte @endcode
+			<i>Zone de contenu</i> : <b>Formulaire d'Ã©dition</b> :
+				-# <b>ParamÃ¨tres</b>
+					-# <tt>Type</tt> : Choix message complÃ©mentaire ou prioritaire. Le changement de choix lance un rafraichissement de la page pour redimensionner les zones de texte du contenu et pour charger la liste des modÃ¨les correspondants.
+					-# <tt>DÃ©but diffusion : Date</tt> : Champ texte obligatoire reprÃ©sentant le jour d'envoi du message. Un champ <tt>DÃ©but de diffusion : Date</tt> vide ou mal rempli entraÃ®ne un message d'erreur empÃªchant la diffusion :
+						@code Le message ne peut Ãªtre diffusÃ© car la date de dÃ©but est incorrecte @endcode
+						Le champ <tt>DÃ©but diffusion : Date</tt> est par dÃ©faut rempli par la date courante.
+					-# <tt>DÃ©but diffusion : Heure</tt> : Champ texte facultatif reprÃ©sentant l'heure exacte d'envoi du message. En cas de non remplissage du champ, le message est envoyÃ© dÃ¨s minuit. Un champ <tt>DÃ©but de diffusion : Heure</tt> mal rempli entraÃ®ne un message d'erreur empÃªchant la diffusion :
+						@code Le message ne peut Ãªtre diffusÃ© car l'heure de dÃ©but est incorrecte @endcode
+						Le champ <tt>DÃ©but diffusion : Heure</tt> est par dÃ©faut rempli par l'heure courante.
+					-# <tt>Fin diffusion</tt> : Champs textes facultatifs reprÃ©sentant la date et l'heure de fin de diffusion du message.
+						- si les champs sont saisis et correctement renseignÃ©s, la diffusion est possible
+						- si un des champs est saisi et mal renseignÃ©, un message d'erreur empeche la diffusion :
+							@code Le message ne peut Ãªtre diffusÃ© car la date de fin est incorrecte @endcode
+							@code Le message ne peut Ãªtre diffusÃ© car l'heure de fin est incorrecte @endcode
+						- si le champ est renseignÃ© par une date antÃ©rieure Ã  la date de dÃ©but, un message d'erreur empÃªche la diffusion :
+							@code Le message ne peut Ãªtre diffusÃ© car la date de fin est antÃ©rieure Ã  la date de dÃ©but. @endcode
+						- si le champ n'est pas renseignÃ©, un message de confirmation est proposÃ© lors de la diffusion, prÃ©venant l'utilisateur que sans action de sa part ce message restera en vigueur indÃ©finiment
+						- si le seul champ <tt>Fin diffusion : Heure</tt> est seul rempli, un message d'erreur empÃªche la diffusion :
+							@code Le message ne peut Ãªtre diffusÃ© car la date de fin est incorrecte @endcode
 				-# <b>Contenu</b>
-					-# <tt>Modèle</tt> : Liste de choix permettant de sélectionner un modèle à recopier. Le choix du modèle n'est pas à proprement parler enregistré dans le message : seul le contenu du modèle sera éventuellement copié sans souvenance du modèle utilisé
-					-# bouton <tt>Copier contenu</tt> : effectue la copie du texte du modèle dans les champs de messages.
-					-# <tt>Message court</tt> : Zone de texte dimensionnée identiquement à l'afficheur cible, permettant de saisir le message à diffuser sur les afficheurs de petite dimension. Champ obligatoire.
-					-# <tt>Message long</tt> : Zone de texte dimensionnée identiquement à l'afficheur cible, permettant de saisir le message à diffuser sur les afficheurs de grande dimension. Champ obligatoire.
+					-# <tt>ModÃ¨le</tt> : Liste de choix permettant de sÃ©lectionner un modÃ¨le Ã  recopier. Le choix du modÃ¨le n'est pas Ã  proprement parler enregistrÃ© dans le message : seul le contenu du modÃ¨le sera Ã©ventuellement copiÃ© sans souvenance du modÃ¨le utilisÃ©
+					-# bouton <tt>Copier contenu</tt> : effectue la copie du texte du modÃ¨le dans les champs de messages.
+					-# <tt>Message court</tt> : Zone de texte dimensionnÃ©e identiquement Ã  l'afficheur cible, permettant de saisir le message Ã  diffuser sur les afficheurs de petite dimension. Champ obligatoire.
+					-# <tt>Message long</tt> : Zone de texte dimensionnÃ©e identiquement Ã  l'afficheur cible, permettant de saisir le message Ã  diffuser sur les afficheurs de grande dimension. Champ obligatoire.
 				-# <b>Diffusion</b>
-					-# <tt>Liste des afficheurs</tt> : Tableau rappelant les afficheurs qui recevront le message, désignés par leur emplacement précis. Chaque afficheur est complété par une pastille montrant son état matériel, afin d'éclairer l'utilisateur sur la réelle diffusion du messade qu'il peut attendre. Une infobulle précise la signification de la pastille, et apparait au contact du pointeur de souris.
+					-# <tt>Liste des afficheurs</tt> : Tableau rappelant les afficheurs qui recevront le message, dÃ©signÃ©s par leur emplacement prÃ©cis. Chaque afficheur est complÃ©tÃ© par une pastille montrant son Ã©tat matÃ©riel, afin d'Ã©clairer l'utilisateur sur la rÃ©elle diffusion du messade qu'il peut attendre. Une infobulle prÃ©cise la signification de la pastille, et apparait au contact du pointeur de souris.
 					-# Bouton <tt>Supprimer</tt> : permet de retirer un afficheur de la liste de diffusion
-					-# <tt>Ajout d'afficheur</tt> : le formulaire de recherche permet de sélectionner des afficheurs pouvant être ajoutés à la liste de diffusion à l'aide du bouton <tt>Ajouter les afficheurs sélectionnés</tt>. Cette zone est identique à l'écran de gestion des afficheurs.
-				-# Le <b>bouton OK</b> effectue l'envoi après effectuer les contrôles de validité des paramètres. Notamment :
-					- au moins un afficheur doit être sélectionné.
-					- si au moins un afficheur est en état de panne, un message de confirmation apparait
-					- les controles de dates doivent être positifs
-					- les messages doivent être non vides
+					-# <tt>Ajout d'afficheur</tt> : le formulaire de recherche permet de sÃ©lectionner des afficheurs pouvant Ãªtre ajoutÃ©s Ã  la liste de diffusion Ã  l'aide du bouton <tt>Ajouter les afficheurs sÃ©lectionnÃ©s</tt>. Cette zone est identique Ã  l'Ã©cran de gestion des afficheurs.
+				-# Le <b>bouton OK</b> effectue l'envoi aprÃ¨s effectuer les contrÃ´les de validitÃ© des paramÃ¨tres. Notamment :
+					- au moins un afficheur doit Ãªtre sÃ©lectionnÃ©.
+					- si au moins un afficheur est en Ã©tat de panne, un message de confirmation apparait
+					- les controles de dates doivent Ãªtre positifs
+					- les messages doivent Ãªtre non vides
 
 			
-			<i>Sécurité</i>
-				- Une habilitation MessagesRight de niveau READ est nécessaire pour visualiser les paramètres d'un message.
-				- Une habilitation MessagesRight de niveau WRITE est nécessaire pour pour éditer un message devant partir ou déjà partis.
-				- Les listes définissant les points de diffusion du message sont paramétrées par le périmètre des habilitations privées et publiques de niveau WRITE et supérieurs de l'utilisateur :
-					- Les arrêts logiques proposés sont les arrêts explicitement autorisés, les arrêts contenant au moins un point de diffusion explicitement autorisé, et les arrêts desservis par au moins une ligne autorisée (ou bien une ligne appartenant à un réseau autorisé)
-					- Les emplacements proposés sont les arrêts physiques explicitements autorisés, les arrêts physiques desservis par une ligne autorisée, et les points de diffusion de l'arrêt logique n'étant pas des arrêts physiques
-					- Les lignes proposées sont les lignes explicitement autorisées, ainsi que l'ensemble des lignes des réseaux explicitement autorisés.
+			<i>SÃ©curitÃ©</i>
+				- Une habilitation MessagesRight de niveau READ est nÃ©cessaire pour visualiser les paramÃ¨tres d'un message.
+				- Une habilitation MessagesRight de niveau WRITE est nÃ©cessaire pour pour Ã©diter un message devant partir ou dÃ©jÃ  partis.
+				- Les listes dÃ©finissant les points de diffusion du message sont paramÃ©trÃ©es par le pÃ©rimÃ¨tre des habilitations privÃ©es et publiques de niveau WRITE et supÃ©rieurs de l'utilisateur :
+					- Les arrÃªts logiques proposÃ©s sont les arrÃªts explicitement autorisÃ©s, les arrÃªts contenant au moins un point de diffusion explicitement autorisÃ©, et les arrÃªts desservis par au moins une ligne autorisÃ©e (ou bien une ligne appartenant Ã  un rÃ©seau autorisÃ©)
+					- Les emplacements proposÃ©s sont les arrÃªts physiques explicitements autorisÃ©s, les arrÃªts physiques desservis par une ligne autorisÃ©e, et les points de diffusion de l'arrÃªt logique n'Ã©tant pas des arrÃªts physiques
+					- Les lignes proposÃ©es sont les lignes explicitement autorisÃ©es, ainsi que l'ensemble des lignes des rÃ©seaux explicitement autorisÃ©s.
 				
-			<i>Journaux</i> : Les événements suivants entrainent la création d'une entrée dans le journal des messages MessagesLog :
+			<i>Journaux</i> : Les Ã©vÃ©nements suivants entrainent la crÃ©ation d'une entrÃ©e dans le journal des messages MessagesLog :
 				- INFO : Diffusion de message
 				- INFO : Modification de message en cours de diffusion
-				- WARNING : Diffusion de message sur un afficheur signalé hors service
+				- WARNING : Diffusion de message sur un afficheur signalÃ© hors service
 
 		*/
 		class MessageAdmin : public admin::AdminInterfaceElementTemplate<MessageAdmin>

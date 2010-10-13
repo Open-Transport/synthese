@@ -70,7 +70,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<ResaEditLogEntryAdmin>::ICON("book_open.png");
-		template<> const string AdminInterfaceElementTemplate<ResaEditLogEntryAdmin>::DEFAULT_TITLE("Evénement inconnu");
+		template<> const string AdminInterfaceElementTemplate<ResaEditLogEntryAdmin>::DEFAULT_TITLE("EvÃ©nement inconnu");
 	}
 
 	namespace resa
@@ -141,10 +141,10 @@ namespace synthese
 			addChoices.push_back(make_pair(ResaDBLog::OTHER,ResaDBLog::GetIcon(ResaDBLog::OTHER) +" "+ResaDBLog::GetText(ResaDBLog::OTHER)));
 
 			PropertiesHTMLTable t(updateRequest.getHTMLForm());
-			stream << "<h1>Propriétés</h1>";
+			stream << "<h1>PropriÃ©tÃ©s</h1>";
 			stream << t.open();
 			stream << t.title("Appel");
-			stream << t.cell("Date début", to_simple_string(_entry->getDate()));
+			stream << t.cell("Date dÃ©but", to_simple_string(_entry->getDate()));
 			ptime d(not_a_date_time);
 			try
 			{
@@ -158,7 +158,7 @@ namespace synthese
 			// Duration
 			if(!d.is_not_a_date_time())
 			{
-				stream << t.cell("Durée", lexical_cast<string>((d - _entry->getDate()).total_seconds()) + " s");
+				stream << t.cell("DurÃ©e", lexical_cast<string>((d - _entry->getDate()).total_seconds()) + " s");
 			}
 
 			// Customer
@@ -196,7 +196,7 @@ namespace synthese
 
 				}
 			}
-			stream << t.cell("Opérateur", op.get() ? op->getFullName() : "inconnu");
+			stream << t.cell("OpÃ©rateur", op.get() ? op->getFullName() : "inconnu");
 			stream << t.cell(
 				"Type d'appel",
 				t.getForm().getRadioInputCollection(
@@ -216,7 +216,7 @@ namespace synthese
 			stream << t.getForm().setFocus(ResaLogEntryUpdateAction::PARAMETER_TYPE);
 			stream << t.close();
 
-			stream << "<h1>Evénements liés à l'appel</h1>";
+			stream << "<h1>EvÃ©nements liÃ©s Ã  l'appel</h1>";
 			
 			_log.display(stream, searchRequest);
 		}

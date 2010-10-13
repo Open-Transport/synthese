@@ -139,7 +139,7 @@ namespace synthese
 				SearchFormHTMLTable t(searchRequest.getHTMLForm());
 				stream << "<h1>Recherche</h1>";
 				stream << t.open();
-				stream << t.cell("Date début", t.getForm().getCalendarInput(PARAM_SEARCH_START_DATE, _searchPeriod.begin()));
+				stream << t.cell("Date dÃ©but", t.getForm().getCalendarInput(PARAM_SEARCH_START_DATE, _searchPeriod.begin()));
 				stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAM_SEARCH_END_DATE, _searchPeriod.last()));
 				stream << t.cell(
 					"Pas",
@@ -240,7 +240,7 @@ namespace synthese
 				}
 				v.push_back("Total");
 				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
-				stream << "<h1>Statistiques auto-réservation</h1>";
+				stream << "<h1>Statistiques auto-rÃ©servation</h1>";
 				stream << t.open();
 
 				BOOST_FOREACH(const CallStatisticsTableSync::CallCountSearchResult::value_type& type, r)
@@ -285,7 +285,7 @@ namespace synthese
 			result.push_back(make_pair(CallStatisticsTableSync::WEEK_DAY_STEP, "Jour de semaine"));
 			result.push_back(make_pair(CallStatisticsTableSync::WEEK_STEP, "Semaine"));
 			result.push_back(make_pair(CallStatisticsTableSync::MONTH_STEP, "Mois"));
-			result.push_back(make_pair(CallStatisticsTableSync::YEAR_STEP, "Année"));
+			result.push_back(make_pair(CallStatisticsTableSync::YEAR_STEP, "AnnÃ©e"));
 			return result;
 		}
 	}

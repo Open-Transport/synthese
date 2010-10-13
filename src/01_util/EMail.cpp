@@ -175,7 +175,7 @@ namespace synthese
 			{
 				request_stream <<
 					"MIME-version: 1.0" << CRLF <<
-					"Content-type: text/html; charset= iso-8859-1" << CRLF
+					"Content-type: text/html; charset= UTF-8" << CRLF
 				;
 			}
 

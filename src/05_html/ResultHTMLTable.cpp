@@ -124,11 +124,11 @@ namespace synthese
 				}
 				if (size > 0)
 					s <<
-						"Résultats&nbsp;" << (_requestParameters.first + 1) <<
-						"&nbspà&nbsp;" << (_requestParameters.first + size)
+						"RÃ©sultats&nbsp;" << (_requestParameters.first + 1) <<
+						"&nbspÃ &nbsp;" << (_requestParameters.first + size)
 					;
 				else
-					s << "Aucun résultat";
+					s << "Aucun rÃ©sultat";
 				if (next)
 				{
 					HTMLForm::HiddenFieldsMap f;

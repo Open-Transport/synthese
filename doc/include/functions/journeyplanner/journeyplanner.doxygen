@@ -1,91 +1,91 @@
-/** @page journeyplanner Calcul d'itinéraires optimisé
+/** @page journeyplanner Calcul d'itinÃ©raires optimisÃ©
 
-<h2>Formulaire d'entrée</h2>
+<h2>Formulaire d'entrÃ©e</h2>
 
 <h3>Analyse lexico-syntaxique</h3>
 
-Le calcul d'itinéraires s'appuie en premier lieu sur un formulaire d'entrée « intelligent » : les champs sont des champs textes avec liste de choix apparaissant lors de la saisie de quelques lettres. Cette solution présente les avantages suivants :
+Le calcul d'itinÃ©raires s'appuie en premier lieu sur un formulaire d'entrÃ©e Â« intelligent Â» : les champs sont des champs textes avec liste de choix apparaissant lors de la saisie de quelques lettres. Cette solution prÃ©sente les avantages suivants :
 <ul>
-<li>Pas de perte de temps pour l'utilisateur connaissant d'avance ce qu'il recherche (la navigation dans les listes de choix rigides est très lente)<(li>
-<li>Possibilité de moduler les critères de tri des propositions en fonction du texte tapé (ex : tri par pertinence phonétique en lieu et place d'un ordre strictement alphabétique)</li>
-<li>Pas de contrainte de connaissance des noms exacts (ex : si fourniture d'un nom de personne, les arrêts portant aussi un prénom sont tout de même proposés)</li>
-<li>Possibilité de valider le formulaire par l'appui de la touche Entrée (bloquée par les navigateurs lorsque le curseur se trouve dans une liste d'options rigide)</li>
+<li>Pas de perte de temps pour l'utilisateur connaissant d'avance ce qu'il recherche (la navigation dans les listes de choix rigides est trÃ¨s lente)<(li>
+<li>PossibilitÃ© de moduler les critÃ¨res de tri des propositions en fonction du texte tapÃ© (ex : tri par pertinence phonÃ©tique en lieu et place d'un ordre strictement alphabÃ©tique)</li>
+<li>Pas de contrainte de connaissance des noms exacts (ex : si fourniture d'un nom de personne, les arrÃªts portant aussi un prÃ©nom sont tout de mÃªme proposÃ©s)</li>
+<li>PossibilitÃ© de valider le formulaire par l'appui de la touche EntrÃ©e (bloquÃ©e par les navigateurs lorsque le curseur se trouve dans une liste d'options rigide)</li>
 </ul>
-Ces critères sont d'autant plus importants si le site est amené à être utilisé par des professionnels qui ne doivent pas perdre de temps à des étapes de validation inutiles pour eux.
+Ces critÃ¨res sont d'autant plus importants si le site est amenÃ© Ã  Ãªtre utilisÃ© par des professionnels qui ne doivent pas perdre de temps Ã  des Ã©tapes de validation inutiles pour eux.
  
-Exemple de formulaires réalisés par SYNTHESE :
+Exemple de formulaires rÃ©alisÃ©s par SYNTHESE :
 
 @image html form-city.png
  
-Formulaire du site Tisséo, avec complétion automatique de texte sous forme de liste déroulante.
+Formulaire du site TissÃ©o, avec complÃ©tion automatique de texte sous forme de liste dÃ©roulante.
 
 @image html form-stop.png
  
-Le même formulaire présentant en premier l'arrêt « Basso Cambo » alors que l'utilisateur recherchait selon sa perception sur le mot « Cambo » (il aurait été perdu dans une liste déroulante alphabétique). Noter les deux dernier choix proposés, qui ressemblent oralement à la phonétique C-AN-B-O de Cambo (M-AN-S-O, C-AN-B-A-R).
+Le mÃªme formulaire prÃ©sentant en premier l'arrÃªt Â« Basso Cambo Â» alors que l'utilisateur recherchait selon sa perception sur le mot Â« Cambo Â» (il aurait Ã©tÃ© perdu dans une liste dÃ©roulante alphabÃ©tique). Noter les deux dernier choix proposÃ©s, qui ressemblent oralement Ã  la phonÃ©tique C-AN-B-O de Cambo (M-AN-S-O, C-AN-B-A-R).
 
-Les champs arrêts sont facultatifs dans SYNTHESE. En cas de non remplissage de ceux-ci, une sélection d'arrêts principaux est utilisée. Pour chaque commune, cette sélection est paramétrée dans la console d'administration. Il est conseillé de choisir comme arrêts par défaut à la fois le lieu le plus central de la commune et la gare SNCF si elle existe.
+Les champs arrÃªts sont facultatifs dans SYNTHESE. En cas de non remplissage de ceux-ci, une sÃ©lection d'arrÃªts principaux est utilisÃ©e. Pour chaque commune, cette sÃ©lection est paramÃ©trÃ©e dans la console d'administration. Il est conseillÃ© de choisir comme arrÃªts par dÃ©faut Ã  la fois le lieu le plus central de la commune et la gare SNCF si elle existe.
 
-<h3>Choix de période dans la journée</h3>
+<h3>Choix de pÃ©riode dans la journÃ©e</h3>
 
 @image html form-alternate.png
 
-Cette autre version du formulaire remplace le champ d'heure précise par des périodes de la journée, et produit des grilles horaires de grande amplitude. Cette option pourrait être intéressante pour un réseau comme celui de Belfort, où la majorité des lignes sont cadencées, ce qui serait alors mis en valeur.
+Cette autre version du formulaire remplace le champ d'heure prÃ©cise par des pÃ©riodes de la journÃ©e, et produit des grilles horaires de grande amplitude. Cette option pourrait Ãªtre intÃ©ressante pour un rÃ©seau comme celui de Belfort, oÃ¹ la majoritÃ© des lignes sont cadencÃ©es, ce qui serait alors mis en valeur.
 
 <h3>Choix de date</h3>
 
 @image html form-calendar.png
 
-La capture ci-dessus montre un exemple de contrôle calendrier. Il est cependant conseillé de garder une liste d'options HTML standard, car elle est utilisable au clavier (contrairement aux calendriers graphiques) et est donc accessible aux utilisateurs sur terminaux mobiles ainsi qu'aux personnes malvoyantes utilisant une lecture vocale.
+La capture ci-dessus montre un exemple de contrÃ´le calendrier. Il est cependant conseillÃ© de garder une liste d'options HTML standard, car elle est utilisable au clavier (contrairement aux calendriers graphiques) et est donc accessible aux utilisateurs sur terminaux mobiles ainsi qu'aux personnes malvoyantes utilisant une lecture vocale.
 
-<h2>Résultats produits</h2>
+<h2>RÃ©sultats produits</h2>
 
 <h3>La grille horaires</h3>
 
-Le résultat du calcul d'itinéraires est une suite de solutions, calculées selon un algorithme spécifique au transport public.
+Le rÃ©sultat du calcul d'itinÃ©raires est une suite de solutions, calculÃ©es selon un algorithme spÃ©cifique au transport public.
 
-Risque majeur : certains algorithmes utilisés par certains produits du marché présents y compris sur des centrales multimodales de grande importance, sont inadaptés à la problématique et produisent des résultats qui se révèlent inutilisables pour les voyageurs. Dans un tel cas, les utilisateurs se détournent du site dès lors qu'ils rencontrent un échec qui les a mis dans l'embarras.
-Solution : l'algorithme du module de calcul d'itinéraires de SYNTHESE a été qualifié pour les particularités du transport public, et s'appuie sur une logique de prise de rendez-vous (logique temporelle) et non sur des parcours de graphes (logique géographique). La confusion entre les deux logiques s'explique par le fait qu'en mode routier le temps et la distance sont proportionnels, alors qu'ils sont indépendants en transport public. Enfin, les algorithmes de prise de rendez-vous nécessitent une double passe afin de calculer séparément l'heure de meilleure arrivée et l'heure de meilleur départ. Certains produits omettent malheureusement cette nuance et produisent des résultats dégradant fortement l'offre perçue, notamment lorsque la fréquence des lignes n'est pas régulières toute la journée.
+Risque majeur : certains algorithmes utilisÃ©s par certains produits du marchÃ© prÃ©sents y compris sur des centrales multimodales de grande importance, sont inadaptÃ©s Ã  la problÃ©matique et produisent des rÃ©sultats qui se rÃ©vÃ¨lent inutilisables pour les voyageurs. Dans un tel cas, les utilisateurs se dÃ©tournent du site dÃ¨s lors qu'ils rencontrent un Ã©chec qui les a mis dans l'embarras.
+Solution : l'algorithme du module de calcul d'itinÃ©raires de SYNTHESE a Ã©tÃ© qualifiÃ© pour les particularitÃ©s du transport public, et s'appuie sur une logique de prise de rendez-vous (logique temporelle) et non sur des parcours de graphes (logique gÃ©ographique). La confusion entre les deux logiques s'explique par le fait qu'en mode routier le temps et la distance sont proportionnels, alors qu'ils sont indÃ©pendants en transport public. Enfin, les algorithmes de prise de rendez-vous nÃ©cessitent une double passe afin de calculer sÃ©parÃ©ment l'heure de meilleure arrivÃ©e et l'heure de meilleur dÃ©part. Certains produits omettent malheureusement cette nuance et produisent des rÃ©sultats dÃ©gradant fortement l'offre perÃ§ue, notamment lorsque la frÃ©quence des lignes n'est pas rÃ©guliÃ¨res toute la journÃ©e.
 
-Les + de SYNTHESE : historiquement, le fait de restreindre l'échelle temporelle des réponses du calculateur d'itinéraires s'explique par des contraintes de performance qui sont sans objet avec SYNTHESE.
-En effet, la qualité de l'optimisation de SYNTHESE ainsi que les choix technologiques orientés sur la performance (C++, modèle objet adapté, etc.) permettent de calculer quasiment aussi rapidement les solutions d'une journée entière (en moins d'une seconde dans quasiment tous les cas) (des informations issues des solutions précédentes sont utilisées pour le calcul des solutions suivantes).
-Il est donc recommandé de s'affranchir de la contrainte d'une échelle temporelle courte (d'où la proposition de formulaires par période large) et de proposer systématiquement plusieurs heures d'amplitude.
+Les + de SYNTHESE : historiquement, le fait de restreindre l'Ã©chelle temporelle des rÃ©ponses du calculateur d'itinÃ©raires s'explique par des contraintes de performance qui sont sans objet avec SYNTHESE.
+En effet, la qualitÃ© de l'optimisation de SYNTHESE ainsi que les choix technologiques orientÃ©s sur la performance (C++, modÃ¨le objet adaptÃ©, etc.) permettent de calculer quasiment aussi rapidement les solutions d'une journÃ©e entiÃ¨re (en moins d'une seconde dans quasiment tous les cas) (des informations issues des solutions prÃ©cÃ©dentes sont utilisÃ©es pour le calcul des solutions suivantes).
+Il est donc recommandÃ© de s'affranchir de la contrainte d'une Ã©chelle temporelle courte (d'oÃ¹ la proposition de formulaires par pÃ©riode large) et de proposer systÃ©matiquement plusieurs heures d'amplitude.
 Les avantages seraient les suivants :
 <ul>
-<li>Cela évite des messages d'erreurs successifs s'il n'existe effectivement pas d'offre dans la fenêtre temporelle demandée</li>
-<li>Si l'utilisateur n'a pas décidé a priori l'heure du départ, et est prêt à l'adapter en fonction de l'offre, une vue d'ensemble lui sera favorable. Elle lui sera proposée en une seule requête alors que ce même client aurait utilisé plusieurs fois les boutons Suivant/Précédent, générant à chaque fois une charge supplémentaire pour le serveur et un temps d'attente accru pour lui.</li>
-<li>Une vision élargie permet à l'utilisateur de prendre connaissance du niveau global de l'offre, et de le mémoriser, ce qui a un impact pédagogique fort sur l'appropriation du transport public</li>
-<li>Une présentation concise de l'offre sur une période élargie occupe moins d'espace à l'écran qu'une série de feuilles de route verticales détaillées, et fait donc office d'un point intermédiaire de présentation des résultats apprécié au niveau ergonomique.</li>
+<li>Cela Ã©vite des messages d'erreurs successifs s'il n'existe effectivement pas d'offre dans la fenÃªtre temporelle demandÃ©e</li>
+<li>Si l'utilisateur n'a pas dÃ©cidÃ© a priori l'heure du dÃ©part, et est prÃªt Ã  l'adapter en fonction de l'offre, une vue d'ensemble lui sera favorable. Elle lui sera proposÃ©e en une seule requÃªte alors que ce mÃªme client aurait utilisÃ© plusieurs fois les boutons Suivant/PrÃ©cÃ©dent, gÃ©nÃ©rant Ã  chaque fois une charge supplÃ©mentaire pour le serveur et un temps d'attente accru pour lui.</li>
+<li>Une vision Ã©largie permet Ã  l'utilisateur de prendre connaissance du niveau global de l'offre, et de le mÃ©moriser, ce qui a un impact pÃ©dagogique fort sur l'appropriation du transport public</li>
+<li>Une prÃ©sentation concise de l'offre sur une pÃ©riode Ã©largie occupe moins d'espace Ã  l'Ã©cran qu'une sÃ©rie de feuilles de route verticales dÃ©taillÃ©es, et fait donc office d'un point intermÃ©diaire de prÃ©sentation des rÃ©sultats apprÃ©ciÃ© au niveau ergonomique.</li>
 </ul>
 
-Exemples de captures d'écran :
+Exemples de captures d'Ã©cran :
 
 @image html result-table.png
 
 Noter sur cette capture :
 <ul>
-<li>Seuls deux champs ont dû être remplis pour obtenir le résultat</li>
-<li>Chaque colonne présente une solution, avec changement à l'arrêt BALMA Gramont</li>
-<li>La colonne surlignée en jaune est en cours de survol par la souris</li>
-<li>Les plans des lieux de départ et d'arrivée sont affichés par un module OpenLayers ergonomique sur la base de la cartographie OpenStreetMap . Il est possible de naviguer sur la carte à l'aide de la souris, et de changer le fond de carte par la photo aérienne Google.</li>
-<li>La présence des pictogrammes R sur certaines solutions indiquant que l'offre nécessite une réservation (transport à la demande) (sur certains sites, ce type d'offre ne peut être intégré au calcul d'itinéraires)<(li>
-<li>Le clic sur les colonnes affiche la feuille de route détaillée de chaque solution, sous forme d'un faux pop-up (respectant les normes d'accessibilité si lue par un système mobile ou  pour personne malvoyante)</li>
+<li>Seuls deux champs ont dÃ» Ãªtre remplis pour obtenir le rÃ©sultat</li>
+<li>Chaque colonne prÃ©sente une solution, avec changement Ã  l'arrÃªt BALMA Gramont</li>
+<li>La colonne surlignÃ©e en jaune est en cours de survol par la souris</li>
+<li>Les plans des lieux de dÃ©part et d'arrivÃ©e sont affichÃ©s par un module OpenLayers ergonomique sur la base de la cartographie OpenStreetMap . Il est possible de naviguer sur la carte Ã  l'aide de la souris, et de changer le fond de carte par la photo aÃ©rienne Google.</li>
+<li>La prÃ©sence des pictogrammes R sur certaines solutions indiquant que l'offre nÃ©cessite une rÃ©servation (transport Ã  la demande) (sur certains sites, ce type d'offre ne peut Ãªtre intÃ©grÃ© au calcul d'itinÃ©raires)<(li>
+<li>Le clic sur les colonnes affiche la feuille de route dÃ©taillÃ©e de chaque solution, sous forme d'un faux pop-up (respectant les normes d'accessibilitÃ© si lue par un systÃ¨me mobile ou  pour personne malvoyante)</li>
 </ul>
 
 
 
 <h3>Les feuilles de route</h3>
 
-La capture suivante présente une feuille de route détaillée obtenue en cliquant sur la colonne en surbrillance sur la capture précédente.
+La capture suivante prÃ©sente une feuille de route dÃ©taillÃ©e obtenue en cliquant sur la colonne en surbrillance sur la capture prÃ©cÃ©dente.
 
 @image html result-roadmap.png "Exemple de feuille de route avec cartographie"
 
-La feuille de route détaillée présente les éléments suivants :
+La feuille de route dÃ©taillÃ©e prÃ©sente les Ã©lÃ©ments suivants :
 <ul>
-<li>Rappel des critères de recherche</li>
-<li>Message d'information sur les conditions d'utilisation (ici les règles de réservation du transport à la demande)</li>
-<li>Un formulaire de réservation en ligne (ici pré-rempli avec des informations factices)</li>
-<li>Le détail du trajet, avec à chaque étape un lien permettant de zoomer sur le lieu de la correspondance</li>
-<li>La carte générale du trajet avec en rouge le point de correspondance</li>
+<li>Rappel des critÃ¨res de recherche</li>
+<li>Message d'information sur les conditions d'utilisation (ici les rÃ¨gles de rÃ©servation du transport Ã  la demande)</li>
+<li>Un formulaire de rÃ©servation en ligne (ici prÃ©-rempli avec des informations factices)</li>
+<li>Le dÃ©tail du trajet, avec Ã  chaque Ã©tape un lien permettant de zoomer sur le lieu de la correspondance</li>
+<li>La carte gÃ©nÃ©rale du trajet avec en rouge le point de correspondance</li>
 </ul>
 
 <h2>Liens vers la documentation technique</h2>

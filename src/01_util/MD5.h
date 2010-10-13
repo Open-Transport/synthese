@@ -5,7 +5,7 @@
  *	There is now warranty.
  *
  *	Feb. 12. 2005
- *	Benjamin Grüdelbach
+ *	Benjamin GrÃ¼delbach
  */
 
 /*

@@ -88,7 +88,7 @@ int Reservation::requestReservationToSynthese() throw (int)
 	
 		cerr<<"request: "<< req<<endl;
 		
-		// valeur de retour à reflechir
+		// valeur de retour Ã  reflechir
 		string xml=Functions::makeRequest(req);
 		
 		/*

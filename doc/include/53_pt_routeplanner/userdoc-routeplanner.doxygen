@@ -1,10 +1,10 @@
-/** @page userdocRoutePlanner 53 Manuel utilisateur calculateur d'itinéraires
+/** @page userdocRoutePlanner 53 Manuel utilisateur calculateur d'itinÃ©raires
 
-NB : L'ergonomie d'un site de calcul d'itinéraires dépend avant tout de l'interface, et donc du site Internet qui héberge cette fonction.
+NB : L'ergonomie d'un site de calcul d'itinÃ©raires dÃ©pend avant tout de l'interface, et donc du site Internet qui hÃ©berge cette fonction.
 
-Ce manuel utilisateur est issu d'un précédent site utilisant SYNTHESE et n'a valeur que de modèle.
+Ce manuel utilisateur est issu d'un prÃ©cÃ©dent site utilisant SYNTHESE et n'a valeur que de modÃ¨le.
 
-<h2>Table des matières</h2>
+<h2>Table des matiÃ¨res</h2>
 
 <ul>
 	<li>@ref userdocRouteplannerWhatIs</li>
@@ -25,96 +25,96 @@ Ce manuel utilisateur est issu d'un précédent site utilisant SYNTHESE et n'a val
 </ul>
 
 
-@section userdocRouteplannerWhatIs Qu'est-ce que la recherche d'itinéraires ?
+@section userdocRouteplannerWhatIs Qu'est-ce que la recherche d'itinÃ©raires ?
 
-<b>La recherche d'itinéraires est un service offert aux usagers du transport public pour les aider à préparer leurs déplacements.</b>
+<b>La recherche d'itinÃ©raires est un service offert aux usagers du transport public pour les aider Ã  prÃ©parer leurs dÃ©placements.</b>
 
-Entre deux lieux (communes, arrêts, lieux publics, adresses) et pour une date donnée, la recherche d'itinéraires permet de connaître en un temps record l'ensemble des possibilités offertes par les différents modes de tranport des réseaux présents dans la base de données, combinés entre eux de manière transparente par le calculateur.
+Entre deux lieux (communes, arrÃªts, lieux publics, adresses) et pour une date donnÃ©e, la recherche d'itinÃ©raires permet de connaÃ®tre en un temps record l'ensemble des possibilitÃ©s offertes par les diffÃ©rents modes de tranport des rÃ©seaux prÃ©sents dans la base de donnÃ©es, combinÃ©s entre eux de maniÃ¨re transparente par le calculateur.
 
-Selon le cas, plusieurs types de solutions sont offertes au passager : trajets directs, trajets avec correspondance, etc. Dans certains cas, les modes de transports proposés peuvent même changer en fonction de l'heure de la journée : grâce au brassage des information du réseau, il est possible d'allier avantageusement les qualités complémentaires de chacun d'entre eux : combiner une ligne de bus fréquente à une ligne de train rapide permet de bénéficier d'une offre de qualité tant en heures de pointe qu'en heures creuses, constituant ainsi une alternative crédible à l'automobile : l'intermodalité.
+Selon le cas, plusieurs types de solutions sont offertes au passager : trajets directs, trajets avec correspondance, etc. Dans certains cas, les modes de transports proposÃ©s peuvent mÃªme changer en fonction de l'heure de la journÃ©e : grÃ¢ce au brassage des information du rÃ©seau, il est possible d'allier avantageusement les qualitÃ©s complÃ©mentaires de chacun d'entre eux : combiner une ligne de bus frÃ©quente Ã  une ligne de train rapide permet de bÃ©nÃ©ficier d'une offre de qualitÃ© tant en heures de pointe qu'en heures creuses, constituant ainsi une alternative crÃ©dible Ã  l'automobile : l'intermodalitÃ©.
 
-L'intermodalité est l'action de combiner plusieurs modes de transport pour effectuer un trajet :
+L'intermodalitÃ© est l'action de combiner plusieurs modes de transport pour effectuer un trajet :
 <ul>
-	<li>par rabattement des lignes de bus sur les modes lourds (train, métro, tram, etc.) au niveau de "pôles d'échange" : les passagers peuvent combiner finesse de desserte et rapidité.</li>
-	<li>par superposition : une offre rapide peut par exemple être doublée par une offre fréquente moins connue : la recherche d'itinéraires permet de prendre connaissance de solutions alternatives certes plus lentes, mais permettant d'effectuer le trajet aux heures non desservies par la solution rapide. Par exemple, les personnes habituées à une ligne de train découvriront parfois des dessertes complémentaires par autocar.</li>
+	<li>par rabattement des lignes de bus sur les modes lourds (train, mÃ©tro, tram, etc.) au niveau de "pÃ´les d'Ã©change" : les passagers peuvent combiner finesse de desserte et rapiditÃ©.</li>
+	<li>par superposition : une offre rapide peut par exemple Ãªtre doublÃ©e par une offre frÃ©quente moins connue : la recherche d'itinÃ©raires permet de prendre connaissance de solutions alternatives certes plus lentes, mais permettant d'effectuer le trajet aux heures non desservies par la solution rapide. Par exemple, les personnes habituÃ©es Ã  une ligne de train dÃ©couvriront parfois des dessertes complÃ©mentaires par autocar.</li>
 </ul>
 
-La recherche d'itinéraires permet d'aider l'utilisateur à choisir quel réseau utiliser en fonction de l'heure de son départ : le calculateur effectue une sélection des meilleures solutions. 
+La recherche d'itinÃ©raires permet d'aider l'utilisateur Ã  choisir quel rÃ©seau utiliser en fonction de l'heure de son dÃ©part : le calculateur effectue une sÃ©lection des meilleures solutions. 
 
-Pour offrir de telles informations à l'usager, la recherche d'itinéraire s'appuie sur un système informatique puissant et innovant, exploitant une importante base de données, dont le contenu fait l'objet de règles strictes et d'une mise à jour quotidienne, afin de garantir la qualité et la fiabilité des résultats produits (horaires, durées de trajets, temps de correspondances, etc.).
+Pour offrir de telles informations Ã  l'usager, la recherche d'itinÃ©raire s'appuie sur un systÃ¨me informatique puissant et innovant, exploitant une importante base de donnÃ©es, dont le contenu fait l'objet de rÃ¨gles strictes et d'une mise Ã  jour quotidienne, afin de garantir la qualitÃ© et la fiabilitÃ© des rÃ©sultats produits (horaires, durÃ©es de trajets, temps de correspondances, etc.).
 
-@section userdocRoutePlannerForm Le formulaire d'entrée
+@section userdocRoutePlannerForm Le formulaire d'entrÃ©e
 
-<b>Lieux de départ et d'arrivée</b>
+<b>Lieux de dÃ©part et d'arrivÃ©e</b>
 
-Pour désigner un lieu de départ ou d'arrivée, tapez le nom de la commune dans laquelle se trouve le lieu. Pour valider la commune tapée, vous pouvez cliquer sur Guide pour faire apparaître une liste de propositions.
-Si vous disposez de cette information, taper le nom du lieu public ou du point d'arrêt désiré dans la case située en dessous, en utilisant éventuellement la fonction Guide pour valider le choix. Si vous ne spécifiez pas de lieu, le point d'arrêt central de la commune sera désigné automatiquement (ex : gare).
+Pour dÃ©signer un lieu de dÃ©part ou d'arrivÃ©e, tapez le nom de la commune dans laquelle se trouve le lieu. Pour valider la commune tapÃ©e, vous pouvez cliquer sur Guide pour faire apparaÃ®tre une liste de propositions.
+Si vous disposez de cette information, taper le nom du lieu public ou du point d'arrÃªt dÃ©sirÃ© dans la case situÃ©e en dessous, en utilisant Ã©ventuellement la fonction Guide pour valider le choix. Si vous ne spÃ©cifiez pas de lieu, le point d'arrÃªt central de la commune sera dÃ©signÃ© automatiquement (ex : gare).
 
 <b>Options</b>
-Choisissez la période de la journée sur laquelle s'effectuera la recherche.
-Activez l'option (fauteuil roulant) pour n'obtenir que des propositions accessibles aux personnes à mobilité réduite.
+Choisissez la pÃ©riode de la journÃ©e sur laquelle s'effectuera la recherche.
+Activez l'option (fauteuil roulant) pour n'obtenir que des propositions accessibles aux personnes Ã  mobilitÃ© rÃ©duite.
 
-@section userdocRoutePlannerResult La grille des résultats
+@section userdocRoutePlannerResult La grille des rÃ©sultats
 
-<b>Présentation</b>
+<b>PrÃ©sentation</b>
 
-La grille des résultats permet de voir d'un seul coup d'oeil les solutions proposées sur la période de la journée choisie. Cette grille est adaptée pour être emportée sur soi après avoir été imprimée.
-Chaque colonne représente une solution.
-En haut du tableau sont indiquées les numéros des lignes à utiliser. Les heures intermédiaires indiquent les heures des correspondances, en face du nom de l'arrêt de correspondance. Notez bien que les arrêts de correspondance peuvent différer d'une solution à l'autre.
-En bas du tableau sont indiquées les durées de parcours.
+La grille des rÃ©sultats permet de voir d'un seul coup d'oeil les solutions proposÃ©es sur la pÃ©riode de la journÃ©e choisie. Cette grille est adaptÃ©e pour Ãªtre emportÃ©e sur soi aprÃ¨s avoir Ã©tÃ© imprimÃ©e.
+Chaque colonne reprÃ©sente une solution.
+En haut du tableau sont indiquÃ©es les numÃ©ros des lignes Ã  utiliser. Les heures intermÃ©diaires indiquent les heures des correspondances, en face du nom de l'arrÃªt de correspondance. Notez bien que les arrÃªts de correspondance peuvent diffÃ©rer d'une solution Ã  l'autre.
+En bas du tableau sont indiquÃ©es les durÃ©es de parcours.
 
 <b>Services continus</b>
-Dans certains cas, des colonnes se présentent sous forme de plages horaires (Ex: 8:00 à 12:00). Ces colonnes indiquent que la solution proposée est valide en continu sur la plage horaire indiquée. Dans ce cas, les temps de parcours affichés incluent l'attente aux arrêts.
+Dans certains cas, des colonnes se prÃ©sentent sous forme de plages horaires (Ex: 8:00 Ã  12:00). Ces colonnes indiquent que la solution proposÃ©e est valide en continu sur la plage horaire indiquÃ©e. Dans ce cas, les temps de parcours affichÃ©s incluent l'attente aux arrÃªts.
 
 Voir @ref userdocRouteplannerFAQ301 pour plus d'informations.
 
 <b>Alertes</b>
 
-<img src="../img/alerte99.gif" /> Dans certains cas, des colonnes portent un panneau. Il indique que des informations complémentaires importantes sont présentes sur la feuille de route. En général, ce panneau s'affiche pour indiquer des lignes à réservation obligatoire ou pour communiquer des informations exceptionnelles (travaux, etc.).
+<img src="../img/alerte99.gif" /> Dans certains cas, des colonnes portent un panneau. Il indique que des informations complÃ©mentaires importantes sont prÃ©sentes sur la feuille de route. En gÃ©nÃ©ral, ce panneau s'affiche pour indiquer des lignes Ã  rÃ©servation obligatoire ou pour communiquer des informations exceptionnelles (travaux, etc.).
 
-<b>Marche à pied</b>
-Dans certains cas, il est proposé de rejoindre un arrêt à pied pour effectuer une correspondance. Les parties à effectuer à pied sont indiquées par le symbole <img src="../img/fl-pied.gif" />.
+<b>Marche Ã  pied</b>
+Dans certains cas, il est proposÃ© de rejoindre un arrÃªt Ã  pied pour effectuer une correspondance. Les parties Ã  effectuer Ã  pied sont indiquÃ©es par le symbole <img src="../img/fl-pied.gif" />.
 
-<b>Réservation</b>
+<b>RÃ©servation</b>
 
-Dans certains cas, un pictogramme indique que la solution est soumise à une modalité de réservation :
+Dans certains cas, un pictogramme indique que la solution est soumise Ã  une modalitÃ© de rÃ©servation :
 <table>
 <tr><td>
 @image html resa_compulsory.png
 @image latex resa_compulsory.png "" width=0.3cm
-</td><td>Réservation obligatoire : le client doit réserver pour emprunter ce service</td></tr>
+</td><td>RÃ©servation obligatoire : le client doit rÃ©server pour emprunter ce service</td></tr>
 <tr><td>
 @image html resa_optional.png
 @image latex resa_optional.png "" width=0.3cm
-</td><td>Réservation facultative : le client peut emprunter ce service sans réserver, et a la possibilité de réserver pour obtenir une place assise garantie</td></tr>
+</td><td>RÃ©servation facultative : le client peut emprunter ce service sans rÃ©server, et a la possibilitÃ© de rÃ©server pour obtenir une place assise garantie</td></tr>
 <tr><td>
 @image html resa-optional-expired.png
 @image latex resa-optional-expired.png "" width=0.3cm
-</td><td>Réservation facultative, mais délai de réservation expiré : le client peut emprunter ce service sans réserver, mais ne peut plus y réserver de place</td></tr>
+</td><td>RÃ©servation facultative, mais dÃ©lai de rÃ©servation expirÃ© : le client peut emprunter ce service sans rÃ©server, mais ne peut plus y rÃ©server de place</td></tr>
 </table>
 
-Si aucun pictogramme n'est affiché, alors la réservation est impossible.
+Si aucun pictogramme n'est affichÃ©, alors la rÃ©servation est impossible.
 
-<b>Détail d'une solution</b>
+<b>DÃ©tail d'une solution</b>
 
-Cliquez sur une colonne pour obtenir la feuille de route détaillée correspondante.
+Cliquez sur une colonne pour obtenir la feuille de route dÃ©taillÃ©e correspondante.
 
 @section userdocRoutePlannerRoadmap La feuille de route
 
-<b>Présentation</b>
-La feuille de route permet d'obtenir toutes les informations nécessaires pour effectuer un trajet sélectionné sur la grille des résultats. En outre, pour certaines lignes à réservation obligatoire (transports à la demande, etc.), elle permet de réserver sa place directement.
+<b>PrÃ©sentation</b>
+La feuille de route permet d'obtenir toutes les informations nÃ©cessaires pour effectuer un trajet sÃ©lectionnÃ© sur la grille des rÃ©sultats. En outre, pour certaines lignes Ã  rÃ©servation obligatoire (transports Ã  la demande, etc.), elle permet de rÃ©server sa place directement.
 
 <b>Descriptif du trajet</b>
-Le trajet y est décrit clairement, en faisant état des modes de transport et des lignes à emprunter, de la destination des véhicules, des points d'arrêt de descente, des portions de trajet à effectuer à pied, etc.
+Le trajet y est dÃ©crit clairement, en faisant Ã©tat des modes de transport et des lignes Ã  emprunter, de la destination des vÃ©hicules, des points d'arrÃªt de descente, des portions de trajet Ã  effectuer Ã  pied, etc.
 
 <b>Alertes</b>
-Toutes les informations de type alerte sont indiquées au fil de la description du trajet, pour notifier les informations de nature exceptionnelle, ou pour inviter à réserver une place lorsque cela est nécessaire. Sur certaines lignes, un lien direct vers la page de réservation est proposé en plus de la description des modalités de réservation.
+Toutes les informations de type alerte sont indiquÃ©es au fil de la description du trajet, pour notifier les informations de nature exceptionnelle, ou pour inviter Ã  rÃ©server une place lorsque cela est nÃ©cessaire. Sur certaines lignes, un lien direct vers la page de rÃ©servation est proposÃ© en plus de la description des modalitÃ©s de rÃ©servation.
 
 <b>Services continus</b>
-Dans certains cas, les heures sont remplacées par des plages horaires (Ex: 8:00 à 12:00). Ceci indique que la solution proposée est valide en continu sur la plage horaire mentionnée. Dans ce cas, les temps de parcours affichés incluent l'attente aux arrêts (@ref userdocRouteplannerFAQ pour plus d'infos)
+Dans certains cas, les heures sont remplacÃ©es par des plages horaires (Ex: 8:00 Ã  12:00). Ceci indique que la solution proposÃ©e est valide en continu sur la plage horaire mentionnÃ©e. Dans ce cas, les temps de parcours affichÃ©s incluent l'attente aux arrÃªts (@ref userdocRouteplannerFAQ pour plus d'infos)
 
 <b>Nota Bene</b>
-Dans tous les cas, les informations présentes sur une feuille de route ne sont valides qu'à l'horaire indiqué et ne peuvent en aucun cas être généralisées à d'autres heures. Se référer à la grille des résultats pour obtenir d'autres solutions.
+Dans tous les cas, les informations prÃ©sentes sur une feuille de route ne sont valides qu'Ã  l'horaire indiquÃ© et ne peuvent en aucun cas Ãªtre gÃ©nÃ©ralisÃ©es Ã  d'autres heures. Se rÃ©fÃ©rer Ã  la grille des rÃ©sultats pour obtenir d'autres solutions.
 
 
 
@@ -122,90 +122,90 @@ Dans tous les cas, les informations présentes sur une feuille de route ne sont v
 
 @section userdocRouteplannerFAQ FAQ
 
-@subsection userdocRouteplannerFAQ501 Quels navigateurs permettent d'utiliser la recherche d'itinéraire ?
+@subsection userdocRouteplannerFAQ501 Quels navigateurs permettent d'utiliser la recherche d'itinÃ©raire ?
 
-<b>Tous les navigateurs respectant la norme XHTML permettent d'utiliser la recherche d'itinéraire.</b>
+<b>Tous les navigateurs respectant la norme XHTML permettent d'utiliser la recherche d'itinÃ©raire.</b>
 
-Aucun plug-in n'est nécessaire pour utiliser la recherche d'itinéraires, y compris lors de l'affichage et de la manipulation de cartographies.
+Aucun plug-in n'est nÃ©cessaire pour utiliser la recherche d'itinÃ©raires, y compris lors de l'affichage et de la manipulation de cartographies.
 
 <b>Attention : l'activation de Javascript est obligatoire</b>
 
 
-@subsection userdocRouteplannerFAQ504 Peut-on sauvegarder les résultats ?
+@subsection userdocRouteplannerFAQ504 Peut-on sauvegarder les rÃ©sultats ?
 
-<b>La recherche d'itinéraire est optimisée pour la sauvegarde des résultats en vue d'une lecture hors ligne.</b>
+<b>La recherche d'itinÃ©raire est optimisÃ©e pour la sauvegarde des rÃ©sultats en vue d'une lecture hors ligne.</b>
 
-En effet, l'ensemble des feuilles de route est envoyé au navigateur, au moment du chargement de la grille des résultats.
+En effet, l'ensemble des feuilles de route est envoyÃ© au navigateur, au moment du chargement de la grille des rÃ©sultats.
 
-Il suffit donc de sauvegarder la page pour conserver à la fois la grille et les feuilles de route pour une lecture ultérieure hors connexion.
+Il suffit donc de sauvegarder la page pour conserver Ã  la fois la grille et les feuilles de route pour une lecture ultÃ©rieure hors connexion.
 
-Les pages de résultat faisant appel à un nombre important de graphiques, il est conseillé d'utiliser les fonctionnalités de sauvegarde totale de votre navigateur (au format Archive fichier unique de préférence). Consulter les pages d'aide de votre navigateur pour plus d'information sur cette commande.
+Les pages de rÃ©sultat faisant appel Ã  un nombre important de graphiques, il est conseillÃ© d'utiliser les fonctionnalitÃ©s de sauvegarde totale de votre navigateur (au format Archive fichier unique de prÃ©fÃ©rence). Consulter les pages d'aide de votre navigateur pour plus d'information sur cette commande.
 
-<b>Attention : S'il est techniquement possible de sauvegarder des pages de résultat, il est conseillé de vérifier que son contenu n'a pas changé lors de l'utilisation réelle du service de transport. En effet, une modification de nature événementielle est susceptible de se produire à tout moment, la mise à jour de la base de données étant permanente. Et dans tous les cas, ne jamais utiliser une grille horaire pour un autre jour que celui désigné sur celle-ci.</b>
+<b>Attention : S'il est techniquement possible de sauvegarder des pages de rÃ©sultat, il est conseillÃ© de vÃ©rifier que son contenu n'a pas changÃ© lors de l'utilisation rÃ©elle du service de transport. En effet, une modification de nature Ã©vÃ©nementielle est susceptible de se produire Ã  tout moment, la mise Ã  jour de la base de donnÃ©es Ã©tant permanente. Et dans tous les cas, ne jamais utiliser une grille horaire pour un autre jour que celui dÃ©signÃ© sur celle-ci.</b>
 
 
-@subsection userdocRouteplannerFAQ506 Le nom de mon arrêt dans le calculateur ne correspond pas exactement à celui affiché sur le poteau
+@subsection userdocRouteplannerFAQ506 Le nom de mon arrÃªt dans le calculateur ne correspond pas exactement Ã  celui affichÃ© sur le poteau
 
-Ce cas se produit lorsque plusieurs arrêts proches ont été groupés dans la base de données :
+Ce cas se produit lorsque plusieurs arrÃªts proches ont Ã©tÃ© groupÃ©s dans la base de donnÃ©es :
 <ul>
 	<li>soit pour y permettre des correspondances, </li>
-	<li>soit parce que la différenciation sur le terrain ne s'explique que par leur appartenance à des réseaux différents</li>
+	<li>soit parce que la diffÃ©renciation sur le terrain ne s'explique que par leur appartenance Ã  des rÃ©seaux diffÃ©rents</li>
 </ul>
 
-Les cas les plus fréquemments constatés sont les gares desservies par des arrêts routiers portant un autre nom, ou bien des cas localisés de superposition de réseaux non coordonnés.
+Les cas les plus frÃ©quemments constatÃ©s sont les gares desservies par des arrÃªts routiers portant un autre nom, ou bien des cas localisÃ©s de superposition de rÃ©seaux non coordonnÃ©s.
 
-L'affichage du nom de l'arrêt correspond alors à la juxtaposition des noms des arrêts du groupement.
-Dans certains cas le nom affiché correspond uniquement à la dénomination la plus connue dans un but d'allègement de l'affichage.
-Dans tous les cas, il est possible de trouver les arrêts par toutes leurs dénominations grâce à la présence d'alias dans la base de données.
-
-
-@subsection userdocRouteplannerFAQ507 La solution que j'utilise régulièrement n'est pas proposée
-
-Ce cas fréquent est une conséquence de la sélection opérée par la recherche d'itinéraires. S'il se produit, cela signifie que votre trajet régulier peut être effectué plus rapidement par une solution dont vous n'aviez pas connaissance auparavant, en général faisant intervenir des réseaux de transport moins connus.
-
-Si les solutions proposées sont plus rapides, elle peuvent également être plus chères à utiliser si elles font intervenir des réseaux non couverts par votre abonnement. Si ce point est déterminant dans votre choix d'itinéraires, activer le filtre de tarification proposé pour n'afficher que les lignes de votre réseau. Vous retrouverez alors probablement votre solution habituelle.
+L'affichage du nom de l'arrÃªt correspond alors Ã  la juxtaposition des noms des arrÃªts du groupement.
+Dans certains cas le nom affichÃ© correspond uniquement Ã  la dÃ©nomination la plus connue dans un but d'allÃ¨gement de l'affichage.
+Dans tous les cas, il est possible de trouver les arrÃªts par toutes leurs dÃ©nominations grÃ¢ce Ã  la prÃ©sence d'alias dans la base de donnÃ©es.
 
 
-@subsection userdocRouteplannerFAQ509 Pourquoi aucune solution n'est trouvée pour ma demande ?
+@subsection userdocRouteplannerFAQ507 La solution que j'utilise rÃ©guliÃ¨rement n'est pas proposÃ©e
 
-<b>Plusieurs raisons peuvent en être la cause :</b>
+Ce cas frÃ©quent est une consÃ©quence de la sÃ©lection opÃ©rÃ©e par la recherche d'itinÃ©raires. S'il se produit, cela signifie que votre trajet rÃ©gulier peut Ãªtre effectuÃ© plus rapidement par une solution dont vous n'aviez pas connaissance auparavant, en gÃ©nÃ©ral faisant intervenir des rÃ©seaux de transport moins connus.
+
+Si les solutions proposÃ©es sont plus rapides, elle peuvent Ã©galement Ãªtre plus chÃ¨res Ã  utiliser si elles font intervenir des rÃ©seaux non couverts par votre abonnement. Si ce point est dÃ©terminant dans votre choix d'itinÃ©raires, activer le filtre de tarification proposÃ© pour n'afficher que les lignes de votre rÃ©seau. Vous retrouverez alors probablement votre solution habituelle.
+
+
+@subsection userdocRouteplannerFAQ509 Pourquoi aucune solution n'est trouvÃ©e pour ma demande ?
+
+<b>Plusieurs raisons peuvent en Ãªtre la cause :</b>
 <ul>
-	<li>Les lignes desservant les secteurs demandés ne fonctionnent pas quotidiennement (cas le plus fréquent : lignes désactivées les dimanche et fêtes)</li>
-	<li>Certains arrêts ne sont pas desservis quotidiennement, car l'itinéraire de certaines lignes peut être différent selon les dates (cas le plus fréquent : itinéraire différent les dimanche et fêtes)</li>
-	<li>L'arrêt demandé ne peut être joint que par une ligne de transport à la demande, dont le délai de réservation serait dépassé (ne pouvant plus être réservées, les lignes disparaissent de la recherche d'itinéraires)</li>
-	<li>La desserte de l'arrêt a pu être abandonnée provisoirement à l'occasion de travaux par exemple, ou définitivement lors d'une réorganisation du réseau.</li>
-	<li>Si vous avez appliqué un filtre de tarification ou d'accessibilité, il est possible qu'aucune solution respectant le critère demandé ne soit trouvée : décocher les options pour voir l'ensemble des solutions proposées.</li>
-	<li>Si vous avez la certitude qu'aucune raison parmi celles citées ci-dessus n'est la cause d'un échec de recherche d'itinéraires, vous pouvez nous contacter pour nous signaler le problème</li>
+	<li>Les lignes desservant les secteurs demandÃ©s ne fonctionnent pas quotidiennement (cas le plus frÃ©quent : lignes dÃ©sactivÃ©es les dimanche et fÃªtes)</li>
+	<li>Certains arrÃªts ne sont pas desservis quotidiennement, car l'itinÃ©raire de certaines lignes peut Ãªtre diffÃ©rent selon les dates (cas le plus frÃ©quent : itinÃ©raire diffÃ©rent les dimanche et fÃªtes)</li>
+	<li>L'arrÃªt demandÃ© ne peut Ãªtre joint que par une ligne de transport Ã  la demande, dont le dÃ©lai de rÃ©servation serait dÃ©passÃ© (ne pouvant plus Ãªtre rÃ©servÃ©es, les lignes disparaissent de la recherche d'itinÃ©raires)</li>
+	<li>La desserte de l'arrÃªt a pu Ãªtre abandonnÃ©e provisoirement Ã  l'occasion de travaux par exemple, ou dÃ©finitivement lors d'une rÃ©organisation du rÃ©seau.</li>
+	<li>Si vous avez appliquÃ© un filtre de tarification ou d'accessibilitÃ©, il est possible qu'aucune solution respectant le critÃ¨re demandÃ© ne soit trouvÃ©e : dÃ©cocher les options pour voir l'ensemble des solutions proposÃ©es.</li>
+	<li>Si vous avez la certitude qu'aucune raison parmi celles citÃ©es ci-dessus n'est la cause d'un Ã©chec de recherche d'itinÃ©raires, vous pouvez nous contacter pour nous signaler le problÃ¨me</li>
 </ul>
 
 
-@subsection userdocRouteplannerFAQ510 Certains départs de transport à la demande ne sont pas proposés.
+@subsection userdocRouteplannerFAQ510 Certains dÃ©parts de transport Ã  la demande ne sont pas proposÃ©s.
 
-<b>Plusieurs raisons peuvent en être la cause :</b>
+<b>Plusieurs raisons peuvent en Ãªtre la cause :</b>
 <ul>
-	<li>Les services à la demande desservant le secteur demandé ne fonctionnent pas quotidiennement (cas le plus fréquent : lignes désactivées les dimanche et fêtes)</li>
-	<li>La majorité des lignes à réservation obligatoire ont un délai minimal de réservation, à partir duquel il n'est plus possible de déclencher le départ. Lorsque ce délai est écoulé, les départs ne sont plus proposés par la recherche d'itinéraires.</li>
-	<li>Certaines lignes à la demande sont définies en complément du réseau bus, en suivant des règles de non concurrence. Ainsi, certains départs peuvent ne pas être proposés par la recherche d'itinéraires si une ligne de bus effectue le même trajet à un horaire similaire</li>
-	<li>La desserte de l'arrêt a pu être abandonnée provisoirement à l'occasion de travaux par exemple, ou définitivement lors d'une réorganisation du réseau.</li>
-	<li>Si vous avez la certitude qu'aucune raison parmi celles citées ci-dessus n'est la cause d'un non affichage de certains départs de transport à la demande, vous pouvez nous contacter pour nous signaler le problème.</li>
+	<li>Les services Ã  la demande desservant le secteur demandÃ© ne fonctionnent pas quotidiennement (cas le plus frÃ©quent : lignes dÃ©sactivÃ©es les dimanche et fÃªtes)</li>
+	<li>La majoritÃ© des lignes Ã  rÃ©servation obligatoire ont un dÃ©lai minimal de rÃ©servation, Ã  partir duquel il n'est plus possible de dÃ©clencher le dÃ©part. Lorsque ce dÃ©lai est Ã©coulÃ©, les dÃ©parts ne sont plus proposÃ©s par la recherche d'itinÃ©raires.</li>
+	<li>Certaines lignes Ã  la demande sont dÃ©finies en complÃ©ment du rÃ©seau bus, en suivant des rÃ¨gles de non concurrence. Ainsi, certains dÃ©parts peuvent ne pas Ãªtre proposÃ©s par la recherche d'itinÃ©raires si une ligne de bus effectue le mÃªme trajet Ã  un horaire similaire</li>
+	<li>La desserte de l'arrÃªt a pu Ãªtre abandonnÃ©e provisoirement Ã  l'occasion de travaux par exemple, ou dÃ©finitivement lors d'une rÃ©organisation du rÃ©seau.</li>
+	<li>Si vous avez la certitude qu'aucune raison parmi celles citÃ©es ci-dessus n'est la cause d'un non affichage de certains dÃ©parts de transport Ã  la demande, vous pouvez nous contacter pour nous signaler le problÃ¨me.</li>
 </ul>
 
 
-@subsection userdocRouteplannerFAQ511 Comment sont calculées les correspondances ?
+@subsection userdocRouteplannerFAQ511 Comment sont calculÃ©es les correspondances ?
 
-<b>Les correspondances sont proposées selon des règles strictes, pour en garantir une meilleure fiabilité :</b>
+<b>Les correspondances sont proposÃ©es selon des rÃ¨gles strictes, pour en garantir une meilleure fiabilitÃ© :</b>
 
-Seuls certains arrêts peuvent être utilisés pour une correspondance : une expertise des réseaux a permis de les sélectionner selon plusieurs critères, dont le confort, la fiabilité, et l'optimisation de la durée des trajets.
-Le délai de correspondance est défini de manière très précise, afin de s'assurer que les solutions proposées sont fiables :
+Seuls certains arrÃªts peuvent Ãªtre utilisÃ©s pour une correspondance : une expertise des rÃ©seaux a permis de les sÃ©lectionner selon plusieurs critÃ¨res, dont le confort, la fiabilitÃ©, et l'optimisation de la durÃ©e des trajets.
+Le dÃ©lai de correspondance est dÃ©fini de maniÃ¨re trÃ¨s prÃ©cise, afin de s'assurer que les solutions proposÃ©es sont fiables :
 <ul>
-	<li>Il est calculé individuellement arrêt par arrêt, suite à des visites de terrain, notamment pour mesurer le temps à prévoir pour les trajets à pied</li>
-	<li>Il tient compte de la régularité des lignes en correspondance</li>
-	<li>Il tient compte de la facilité de repérage au niveau des points d'arrêts</li>
+	<li>Il est calculÃ© individuellement arrÃªt par arrÃªt, suite Ã  des visites de terrain, notamment pour mesurer le temps Ã  prÃ©voir pour les trajets Ã  pied</li>
+	<li>Il tient compte de la rÃ©gularitÃ© des lignes en correspondance</li>
+	<li>Il tient compte de la facilitÃ© de repÃ©rage au niveau des points d'arrÃªts</li>
 </ul>
 
-Les correspondances proposées sont fiables : les correspondances proposées avec 5 minutes de battement ou moins sont systématiquement organisées en amont (règles d'attente entre les lignes), ou bien font intervenir des lignes dont la fiabilité mesurée est suffisante (Ex : ligne de métro).
+Les correspondances proposÃ©es sont fiables : les correspondances proposÃ©es avec 5 minutes de battement ou moins sont systÃ©matiquement organisÃ©es en amont (rÃ¨gles d'attente entre les lignes), ou bien font intervenir des lignes dont la fiabilitÃ© mesurÃ©e est suffisante (Ex : ligne de mÃ©tro).
 
-Enfin, ces données sont régulièrement mises à jour pour en garantir la validité dans la durée. Par exemple, les délais tiennent compte d'éventuels allongement de temps de cheminement à pied suite à des travaux de voirie.
+Enfin, ces donnÃ©es sont rÃ©guliÃ¨rement mises Ã  jour pour en garantir la validitÃ© dans la durÃ©e. Par exemple, les dÃ©lais tiennent compte d'Ã©ventuels allongement de temps de cheminement Ã  pied suite Ã  des travaux de voirie.
 
 
 
@@ -213,13 +213,13 @@ Enfin, ces données sont régulièrement mises à jour pour en garantir la validité 
 
 @subsection userdocRouteplannerFAQ512 Pourquoi certaines colonnes affichent une plage horaire ? Pourquoi ne pas diffuser des horaires exacts ?
 
-S'il est presque systématiquement techniquement possible de diffuser des horaires de passage théoriques précis, cela n'aurait dans certains cas que peu d'intérêt. Ce serait même fréquemment une source de manque de fiabilité des résultats de la recherche :
+S'il est presque systÃ©matiquement techniquement possible de diffuser des horaires de passage thÃ©oriques prÃ©cis, cela n'aurait dans certains cas que peu d'intÃ©rÃªt. Ce serait mÃªme frÃ©quemment une source de manque de fiabilitÃ© des rÃ©sultats de la recherche :
 <ul>
-	<li>Certaines lignes ont une fréquence de passage trop importante pour que les horaires de passage présentent un intérêt à être connus : cela produirait des grilles de résultats peu lisibles car trop remplies, pour transmettre des informations peu utiles (fréquences inférieures à 5 minutes)</li>
-	<li>Certaines lignes n'observent pas une régularité suffisante pour s'engager sur des horaires de passage à la minute près (exemple : lignes de bus en centre ville)</li>
-	<li>Certaines lignes sont fortement fréquentées et peuvent en cas de surcharge contraindre le voyageur à emprunter le départ suivant (exemple : ligne de métro)</li>
+	<li>Certaines lignes ont une frÃ©quence de passage trop importante pour que les horaires de passage prÃ©sentent un intÃ©rÃªt Ã  Ãªtre connus : cela produirait des grilles de rÃ©sultats peu lisibles car trop remplies, pour transmettre des informations peu utiles (frÃ©quences infÃ©rieures Ã  5 minutes)</li>
+	<li>Certaines lignes n'observent pas une rÃ©gularitÃ© suffisante pour s'engager sur des horaires de passage Ã  la minute prÃ¨s (exemple : lignes de bus en centre ville)</li>
+	<li>Certaines lignes sont fortement frÃ©quentÃ©es et peuvent en cas de surcharge contraindre le voyageur Ã  emprunter le dÃ©part suivant (exemple : ligne de mÃ©tro)</li>
 </ul>
-L'ensemble de ces "risques" est intégré dans la méthode de calcul des durées de trajet, pour proposer un taux de fiabilité des résultats homogène sur tout le territoire.
+L'ensemble de ces "risques" est intÃ©grÃ© dans la mÃ©thode de calcul des durÃ©es de trajet, pour proposer un taux de fiabilitÃ© des rÃ©sultats homogÃ¨ne sur tout le territoire.
 
 
 

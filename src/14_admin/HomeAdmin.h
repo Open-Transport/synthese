@@ -35,16 +35,16 @@ namespace synthese
 			@image html cap_admin_home.png
 			@image latex cap_admin_home.png "Accueil de la console d'administration" width=14cm
 			
-			La console d'administration est divisée en 4 parties :
-				- la <i>zone utilisateur</i> située en haut à gauche indique :
-					- le nom de l'utilisateur connecté
+			La console d'administration est divisÃ©e en 4 parties :
+				- la <i>zone utilisateur</i> situÃ©e en haut Ã  gauche indique :
+					- le nom de l'utilisateur connectÃ©
 					- le nom de l'application "SYNTHESE Admin"
-					- un bouton @c Déconnexion qui déconnecte l'utilisateur
-				- la <i>barre de navigation</i> située en haut à droite indique l'emplacement de la page dans l'arborescence des pages de la console d'administration. Les pages situées àn niveau supérieur à la page courante font l'objet d'un lien qui permet ainsi une navigation aisée.
-				- le <i>volet d'arborescence</i> situé en bas à gauche présente de manière structurée l'ensemble des pages d'administration intégrées. La page en cours est marquée sur fond bleu, et les autres pages font l'objet d'un lien qui permet une navigation aisée.
-				- la <i>zone de contenus</i> située en bas à droite est utilisée par la page d'administration pour afficher son contenus (formulaires, tableaux, etc.)
+					- un bouton @c DÃ©connexion qui dÃ©connecte l'utilisateur
+				- la <i>barre de navigation</i> situÃ©e en haut Ã  droite indique l'emplacement de la page dans l'arborescence des pages de la console d'administration. Les pages situÃ©es Ã n niveau supÃ©rieur Ã  la page courante font l'objet d'un lien qui permet ainsi une navigation aisÃ©e.
+				- le <i>volet d'arborescence</i> situÃ© en bas Ã  gauche prÃ©sente de maniÃ¨re structurÃ©e l'ensemble des pages d'administration intÃ©grÃ©es. La page en cours est marquÃ©e sur fond bleu, et les autres pages font l'objet d'un lien qui permet une navigation aisÃ©e.
+				- la <i>zone de contenus</i> situÃ©e en bas Ã  droite est utilisÃ©e par la page d'administration pour afficher son contenus (formulaires, tableaux, etc.)
 
-			Une page d'administration est imprimable grace à une feuille de style dédiée à l'impression : seule la zone de contenus est alors imprimée. Si une page d'administration contient des formulaires, les boutons ne sont pas imprimés.
+			Une page d'administration est imprimable grace Ã  une feuille de style dÃ©diÃ©e Ã  l'impression : seule la zone de contenus est alors imprimÃ©e. Si une page d'administration contient des formulaires, les boutons ne sont pas imprimÃ©s.
 		*/
 		class HomeAdmin : public AdminInterfaceElementTemplate<HomeAdmin>
 		{

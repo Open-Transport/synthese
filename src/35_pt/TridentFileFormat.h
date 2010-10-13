@@ -60,7 +60,7 @@ namespace synthese
 		///		<li><a href="include/35_pt/chouette/chouette.zip">ZIP archive containing all Trident XSD files</a></li>
 		/// </ul>
 		///
-		/// The Trident file format has been extended by <a href="http://www.tisseo.fr/">Tisséo</a>, the local public transportation authority of Toulouse, France. See details @ref trident2tisseo "below".
+		/// The Trident file format has been extended by <a href="http://www.tisseo.fr/">TissÃ©o</a>, the local public transportation authority of Toulouse, France. See details @ref trident2tisseo "below".
 		///
 		/// In most cases, the Trident objects correspond exactly to the SYNTHESE objects :
 		///	<ul>
@@ -77,17 +77,17 @@ namespace synthese
 		///
 		/// Export parameters :
 		///		- roid : id of the CommercialLine object to export
-		///		- wte : If true, the generated file will contain "Tisséo Trident Extension". If false, the generated file will respect the pure Trident format.
+		///		- wte : If true, the generated file will contain "TissÃ©o Trident Extension". If false, the generated file will respect the pure Trident format.
 		///		- wod (PARAMETER_WITH_OLD_DATES / _startDate) : Number of past days to export (default 0).
 		///
 		/// For the details about what is imported or exported, see the documentation of @ref TridentFileFormat::_parse
 		///
 		/// @anchor trident2tisseo
-		/// <h3>Tisséo Trident Extension</h3>
+		/// <h3>TissÃ©o Trident Extension</h3>
 		///
-		/// The Tisséo extension adds some features to the original Trident format.
+		/// The TissÃ©o extension adds some features to the original Trident format.
 		///
-		/// The Tisséo extended Trident format is defined by several XSD schemes :
+		/// The TissÃ©o extended Trident format is defined by several XSD schemes :
 		///	<ul>
 		///		<li><a href="include/35_pt/trident2-tisseo/tisseo-chouette-extension.xsd">tisseo-chouette-extension.xsd</a></li>
 		///		<li><a href="include/35_pt/trident2-tisseo/Chouette.xsd">Chouette.xsd</a></li>
@@ -99,119 +99,119 @@ namespace synthese
 		///
 		/// <h4>Non concurrence entre lignes</h4>
 		///
-		/// Deux lignes peuvent donner lieu à une règle de non concurrence sur des origines-destinations desservies en commun :
+		/// Deux lignes peuvent donner lieu Ã  une rÃ¨gle de non concurrence sur des origines-destinations desservies en commun :
 		///	<ul>
-		///		<li>Ligne à utiliser</li>
-		///		<li>Ligne à ne pas utiliser</li>
-		///		<li>Délai min entre les heures de départ des services (vide = non concurrence permanente)</li>
+		///		<li>Ligne Ã  utiliser</li>
+		///		<li>Ligne Ã  ne pas utiliser</li>
+		///		<li>DÃ©lai min entre les heures de dÃ©part des services (vide = non concurrence permanente)</li>
 		///	</ul>
 		///
 		/// @image html line-conflict-type.png
 		/// 
-		/// <h4>Propriétés additionnelles du service</h4>
+		/// <h4>PropriÃ©tÃ©s additionnelles du service</h4>
 		///
 		/// <ul>
 		///		<li>PMR Oui/Non</li>
-		///		<li>Réservation obligatoire pour PMR uniquement (pointe vers une modalité de réservation)</li>
-		///		<li>Vélo Oui/Non</li>
-		///		<li>Réservation obligatoire pour vélo (pointe vers une modalité de réservation)</li>
-		///		<li>Renvoi : Le format Trident permet de préciser un commentaire au niveau de la course, mais ne fait pas référence à un renvoi. Il est donc nécessaire d'étendre le type de la course pour définir un ou plusieurs renvois.</li>
+		///		<li>RÃ©servation obligatoire pour PMR uniquement (pointe vers une modalitÃ© de rÃ©servation)</li>
+		///		<li>VÃ©lo Oui/Non</li>
+		///		<li>RÃ©servation obligatoire pour vÃ©lo (pointe vers une modalitÃ© de rÃ©servation)</li>
+		///		<li>Renvoi : Le format Trident permet de prÃ©ciser un commentaire au niveau de la course, mais ne fait pas rÃ©fÃ©rence Ã  un renvoi. Il est donc nÃ©cessaire d'Ã©tendre le type de la course pour dÃ©finir un ou plusieurs renvois.</li>
 		///	</ul>
 		///
 		/// @image html tisseo-vehicle-journey.png
 		///
 		/// <h4>Sens aller-retour</h4>
 		///
-		/// Le champ wayBack est utilisé différemment par rapport à Trident : 1 indique le sens aller, 2 indique le sens retour.
+		/// Le champ wayBack est utilisÃ© diffÃ©remment par rapport Ã  Trident : 1 indique le sens aller, 2 indique le sens retour.
 		///
-		/// <h4>Lignes de transport à la demande zonales</h4>
+		/// <h4>Lignes de transport Ã  la demande zonales</h4>
 		///
-		/// Les composants d'un itinéraire d'une ligne de transport à la demande zonale peuvent être de deux natures :
+		/// Les composants d'un itinÃ©raire d'une ligne de transport Ã  la demande zonale peuvent Ãªtre de deux natures :
 		///	<ul>
-		///		<li>Un arrêt classique (couvert par Trident actuel)</li>
-		///		<li>Une zone de transport à la demande, elle-même composée d'arrêts classiques</li>
+		///		<li>Un arrÃªt classique (couvert par Trident actuel)</li>
+		///		<li>Une zone de transport Ã  la demande, elle-mÃªme composÃ©e d'arrÃªts classiques</li>
 		/// </ul>
 		///
-		/// Les zones de transport à la demande sont définies comme suit :
+		/// Les zones de transport Ã  la demande sont dÃ©finies comme suit :
 		/// <ul>
-		///		<li>Composée de n arrêts</li>
-		///		<li>Desserte interne à la zone autorisée ou non</li>
-		///		<li>Durée de desserte interne</li>
+		///		<li>ComposÃ©e de n arrÃªts</li>
+		///		<li>Desserte interne Ã  la zone autorisÃ©e ou non</li>
+		///		<li>DurÃ©e de desserte interne</li>
 		///	</ul>
 		///
-		/// Les règles classiques de gestion des composants d'itinéraire sont valables sur les zones, dont notamment :
+		/// Les rÃ¨gles classiques de gestion des composants d'itinÃ©raire sont valables sur les zones, dont notamment :
 		/// <ul>
-		///		<li>Une heure d'arrivée par service</li>
-		///		<li>Une heure de départ par service</li>
-		///		<li>Possibilités d'ITL sur une série de zones</li>
+		///		<li>Une heure d'arrivÃ©e par service</li>
+		///		<li>Une heure de dÃ©part par service</li>
+		///		<li>PossibilitÃ©s d'ITL sur une sÃ©rie de zones</li>
 		///	</ul>
 		///
-		/// Il est proposé d'utiliser les objets PTLink, standard, en faisant pointer les liens startOfLink et endOfLink vers des ID de nouveaux objets DRTStopArea, définis comme suit :
+		/// Il est proposÃ© d'utiliser les objets PTLink, standard, en faisant pointer les liens startOfLink et endOfLink vers des ID de nouveaux objets DRTStopArea, dÃ©finis comme suit :
 		///	<ul>
-		///		<li>Les horaires sont stockés comme à l'accoutumée en faisant pointer les stopPointId vers les ID des DRTStopArea correspondants.</li>
-		///		<li>Pour modéliser la desserte interne, on place deux fois la zone à la suite dans le descriptif d'itinéraire.</li>
+		///		<li>Les horaires sont stockÃ©s comme Ã  l'accoutumÃ©e en faisant pointer les stopPointId vers les ID des DRTStopArea correspondants.</li>
+		///		<li>Pour modÃ©liser la desserte interne, on place deux fois la zone Ã  la suite dans le descriptif d'itinÃ©raire.</li>
 		///	</ul>
 		///
 		/// @image html drt-stop-area.png
 		///
-		/// <h4>Modalités de réservation</h4>
+		/// <h4>ModalitÃ©s de rÃ©servation</h4>
 		///
-		/// Les modalités de réservation permettent de définir la plage temporelle pendant laquelle un service à réservation obligatoire peut être réservé.
+		/// Les modalitÃ©s de rÃ©servation permettent de dÃ©finir la plage temporelle pendant laquelle un service Ã  rÃ©servation obligatoire peut Ãªtre rÃ©servÃ©.
 		///
-		/// Les caractéristiques des modalités de réservations sont les suivantes :
+		/// Les caractÃ©ristiques des modalitÃ©s de rÃ©servations sont les suivantes :
 		/// <ul>
-		///		<li>Caractère obligatoire de la réservation (Obligatoire, Facultatif au départ de certains arrêts et obligatoires aux autres, ou Facultatif)</li>
-		///		<li>Choix T0 = départ du client ou départ de l'origine</li>
-		///		<li>Durée minimale en minutes avant T0</li>
-		///		<li>Durée minimale en jours avant T0</li>
-		///		<li>Heure limite de réservation si la veille de T0</li>
-		///		<li>Durée maximale en jours avant T0</li>
-		///		<li>Numéro de téléphone à joindre (vide = pas de centre d'appels)</li>
+		///		<li>CaractÃ¨re obligatoire de la rÃ©servation (Obligatoire, Facultatif au dÃ©part de certains arrÃªts et obligatoires aux autres, ou Facultatif)</li>
+		///		<li>Choix T0 = dÃ©part du client ou dÃ©part de l'origine</li>
+		///		<li>DurÃ©e minimale en minutes avant T0</li>
+		///		<li>DurÃ©e minimale en jours avant T0</li>
+		///		<li>Heure limite de rÃ©servation si la veille de T0</li>
+		///		<li>DurÃ©e maximale en jours avant T0</li>
+		///		<li>NumÃ©ro de tÃ©lÃ©phone Ã  joindre (vide = pas de centre d'appels)</li>
 		///		<li>Horaires d'ouverture du centre d'appels (en texte)</li>
-		///		<li>URL du site Internet de réservation (vide = pas de site Internet de réservation)</li>
+		///		<li>URL du site Internet de rÃ©servation (vide = pas de site Internet de rÃ©servation)</li>
 		///	</ul>
 		///
 		/// @image html reservation-rule.png
 		///
-		/// <h4>Caractéristiques particulières des services à réservation</h4>
+		/// <h4>CaractÃ©ristiques particuliÃ¨res des services Ã  rÃ©servation</h4>
 		///
-		/// Les services à réservation nécessitent d'ajouter les caractéristiques suivantes :
+		/// Les services Ã  rÃ©servation nÃ©cessitent d'ajouter les caractÃ©ristiques suivantes :
 		/// <ul>
-		///		<li>Modalité de réservation</li>
-		///		<li>Liste des arrêts permettant la réservation facultative (cf modalités de réservation)</li>
-		///		<li>Nombre de places limité (Si oui, valeur = nombre de places maximal)</li>
+		///		<li>ModalitÃ© de rÃ©servation</li>
+		///		<li>Liste des arrÃªts permettant la rÃ©servation facultative (cf modalitÃ©s de rÃ©servation)</li>
+		///		<li>Nombre de places limitÃ© (Si oui, valeur = nombre de places maximal)</li>
 		/// </ul>
 		///
 		/// @image html drt-vehicle-journey.png
 		///
-		/// <h4>Arrêt principal de commune</h4>
+		/// <h4>ArrÃªt principal de commune</h4>
 		///
-		/// Pouvoir définir un ou plusieurs arrêts principaux par commune, qui sont choisis par défaut dans les systèmes d'information lorsque l'utilisateur ne saisit par d'arrêt
-		///	On définit pour chaque commune un objet de type Area incluant les arrêts considérés comme principaux.
+		/// Pouvoir dÃ©finir un ou plusieurs arrÃªts principaux par commune, qui sont choisis par dÃ©faut dans les systÃ¨mes d'information lorsque l'utilisateur ne saisit par d'arrÃªt
+		///	On dÃ©finit pour chaque commune un objet de type Area incluant les arrÃªts considÃ©rÃ©s comme principaux.
 		///
 		/// @image html city-main-stops.png
 		///
-		/// <h4>Accessibilité PMR</h4>
+		/// <h4>AccessibilitÃ© PMR</h4>
 		///
 		/// <ul>
 		///		<li>Oui/Non</li>
 		/// </ul>
 		///
-		/// Il est proposé d'ajouter un champ au StopPoint :
+		/// Il est proposÃ© d'ajouter un champ au StopPoint :
 		///
 		/// @image html tisseo-stop-point.png
 		///
 		/// <h4>Horaire d'exploitation</h4>
 		///
-		/// Les horaires fournis à chaque franchissement d'arrêt peuvent provenir de l'exploitation (source logiciel métier) ou être interpolées. Dans certains cas il peut être utile de savoir d'où provient l'horaire. 
+		/// Les horaires fournis Ã  chaque franchissement d'arrÃªt peuvent provenir de l'exploitation (source logiciel mÃ©tier) ou Ãªtre interpolÃ©es. Dans certains cas il peut Ãªtre utile de savoir d'oÃ¹ provient l'horaire. 
 		///
 		/// <ul>
 		///		<li>Oui/Non</li>
 		/// </ul>
 		///
-		/// Il est proposé d'ajouter deux champs à l'objet PTLink (un pour l'arrêt de départ, un pour l'arrêt d'arrivée). Les champs sont facultatifs : l'absence de valeur est à interpréter comme suit :
+		/// Il est proposÃ© d'ajouter deux champs Ã  l'objet PTLink (un pour l'arrÃªt de dÃ©part, un pour l'arrÃªt d'arrivÃ©e). Les champs sont facultatifs : l'absence de valeur est Ã  interprÃ©ter comme suit :
 		/// <ul>
-		///		<li>Oui si l'arrêt est une extrémité de l'itinéraire</li>
+		///		<li>Oui si l'arrÃªt est une extrÃ©mitÃ© de l'itinÃ©raire</li>
 		///		<li>Non sinon</li>
 		/// </ul>
 		///

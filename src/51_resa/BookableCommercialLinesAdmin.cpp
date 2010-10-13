@@ -61,7 +61,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<BookableCommercialLinesAdmin>::ICON("resa_compulsory.png");
-		template<> const string AdminInterfaceElementTemplate<BookableCommercialLinesAdmin>::DEFAULT_TITLE("Réservations par ligne");
+		template<> const string AdminInterfaceElementTemplate<BookableCommercialLinesAdmin>::DEFAULT_TITLE("RÃ©servations par ligne");
 	}
 
 	namespace resa

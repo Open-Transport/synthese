@@ -35,32 +35,32 @@ namespace synthese
 			@ingroup m54Admin refAdmin
 
 			@image html cap_admin_display_types.png
-			@image latex cap_admin_display_types.png "Ecran d'édition des types d'affichage" width=14cm
+			@image latex cap_admin_display_types.png "Ecran d'Ã©dition des types d'affichage" width=14cm
 
-			<i>Titre de la fenêtre</i> : SYNTHESE Admin - Afficheurs - Types
+			<i>Titre de la fenÃªtre</i> : SYNTHESE Admin - Afficheurs - Types
 
 			<i>Barre de navigation</i> :
  				- Lien vers @ref synthese::interface::HomeAdmin
 				- Lien vers @ref synthese::interface::DisplaySearchAdmin
 
 			<i>Zone de contenus</i> :
-				-# <b>Tableau liste des types</b> : Les colonnes suivantes sont présentes, et permettent d'éditer directement les types d'afficheurs :
-					- <tt>Nom</tt> : Texte devant être non vide
-					- <tt>Interface</tt> : Liste de choix présentant les interfaces installées (exemple : Lumiplan, HTML charte 1, HTML charte 2, etc.)
-					- <tt>Lignes</tt> : Nombre de départs affichés sous forme de liste de choix proposant les nombres de 1 à 50
+				-# <b>Tableau liste des types</b> : Les colonnes suivantes sont prÃ©sentes, et permettent d'Ã©diter directement les types d'afficheurs :
+					- <tt>Nom</tt> : Texte devant Ãªtre non vide
+					- <tt>Interface</tt> : Liste de choix prÃ©sentant les interfaces installÃ©es (exemple : Lumiplan, HTML charte 1, HTML charte 2, etc.)
+					- <tt>Lignes</tt> : Nombre de dÃ©parts affichÃ©s sous forme de liste de choix proposant les nombres de 1 Ã  50
 					- <tt>Actions</tt> : Boutons : 
-						- <tt>Ouvrir</tt> : enregistre les modifications effectuées sur la ligne du tableau correspondante. Si un champ ne respecte pas les règles énumérées, un message d'erreur empêche l'enregistrement des modifications :
-						@code Le type ne peut être modifié car un ou plusieurs champ n'est pas correctement renseigné @endcode
-						- <tt>Supprimer</tt> : supprime le type d'afficheur, seulement s'il n'est utilisé par aucun afficheur. Ce bouton n'apparaît que sur les types non utilisés. Un contrôle d'intégrité est réalisé à nouveau au moment de la suppression proprement dite. En cas d'existence d'afficheur au moment de la suppression, un message d'erreur apparaît :
-						@code Ce type d'afficheur ne peut être supprimé car il est utilisé par au moins un afficheur. @endcode
-					- La dernière ligne du tableau permet l'ajout de type d'afficheur : le bouton <tt>Ajouter</tt> permet d'ajouter un type d'afficheur directement. Un contrôle des donneés entrées est effectué : en cas de données manquante, l'afficheur n'est pas créé et un message d'erreur apparaît :
-						@code L'afficheur ne peut être créé car un ou plusieurs champs n'a pas été correctement renseigné. @endcode
+						- <tt>Ouvrir</tt> : enregistre les modifications effectuÃ©es sur la ligne du tableau correspondante. Si un champ ne respecte pas les rÃ¨gles Ã©numÃ©rÃ©es, un message d'erreur empÃªche l'enregistrement des modifications :
+						@code Le type ne peut Ãªtre modifiÃ© car un ou plusieurs champ n'est pas correctement renseignÃ© @endcode
+						- <tt>Supprimer</tt> : supprime le type d'afficheur, seulement s'il n'est utilisÃ© par aucun afficheur. Ce bouton n'apparaÃ®t que sur les types non utilisÃ©s. Un contrÃ´le d'intÃ©gritÃ© est rÃ©alisÃ© Ã  nouveau au moment de la suppression proprement dite. En cas d'existence d'afficheur au moment de la suppression, un message d'erreur apparaÃ®t :
+						@code Ce type d'afficheur ne peut Ãªtre supprimÃ© car il est utilisÃ© par au moins un afficheur. @endcode
+					- La derniÃ¨re ligne du tableau permet l'ajout de type d'afficheur : le bouton <tt>Ajouter</tt> permet d'ajouter un type d'afficheur directement. Un contrÃ´le des donneÃ©s entrÃ©es est effectuÃ© : en cas de donnÃ©es manquante, l'afficheur n'est pas crÃ©Ã© et un message d'erreur apparaÃ®t :
+						@code L'afficheur ne peut Ãªtre crÃ©Ã© car un ou plusieurs champs n'a pas Ã©tÃ© correctement renseignÃ©. @endcode
 						
-			<i>Sécurité</i> :
-				- Une habilitation publique ArrivalDepartureTableRight de niveau READ sur le périmètre "tout" est nécessaire pour accéder à la page.
-				- Une habilitation publique ArrivalDepartureTableRight de niveau WRITE sur le périmètre "tout" est nécessaire pour obtenir les boutons <tt>Modifier</tt> et <tt>Ajouter</tt>.
+			<i>SÃ©curitÃ©</i> :
+				- Une habilitation publique ArrivalDepartureTableRight de niveau READ sur le pÃ©rimÃ¨tre "tout" est nÃ©cessaire pour accÃ©der Ã  la page.
+				- Une habilitation publique ArrivalDepartureTableRight de niveau WRITE sur le pÃ©rimÃ¨tre "tout" est nÃ©cessaire pour obtenir les boutons <tt>Modifier</tt> et <tt>Ajouter</tt>.
 				
-			<i>Journal</i> : Les actions suivantes génèrent une entrée dans le journal ArrivalDepartureTableLog :
+			<i>Journal</i> : Les actions suivantes gÃ©nÃ¨rent une entrÃ©e dans le journal ArrivalDepartureTableLog :
 				- INFO : Ajout de type d'afficheur
 				- INFO : Modification de type d'afficheur
 				- INFO : Suppression de type d'afficheur

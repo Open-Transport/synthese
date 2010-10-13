@@ -11,9 +11,9 @@ namespace synthese
 		/** Default habilitation.
 			@ingroup m12
 
-			Les niveaux de droit utilisés sont les suivants :
+			Les niveaux de droit utilisÃ©s sont les suivants :
 
-			Habilitations privées :
+			Habilitations privÃ©es :
 			- USE : 
 			- READ : 
 			- WRITE : 
@@ -23,8 +23,8 @@ namespace synthese
 			- WRITE : 
 			- DELETE : 
 
-			Définition du périmètre :
-				- Aucun périmètre ne peut être défini
+			DÃ©finition du pÃ©rimÃ¨tre :
+				- Aucun pÃ©rimÃ¨tre ne peut Ãªtre dÃ©fini
 		*/
 		class DefaultRight : public Right
 		{

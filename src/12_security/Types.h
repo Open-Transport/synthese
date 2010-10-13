@@ -82,10 +82,10 @@ namespace synthese
 		typedef enum {
 			UNKNOWN_RIGHT_LEVEL = -1
 			, FORBIDDEN	= 0		//!< Interdiction
-			, USE		= 20	//!< Utilisation de fonction autorisée
-			, READ		= 40	//!< Lecture directe de données autorisée
-			, WRITE		= 60	//!< Ecriture directe de donnée autorisée
-			, DELETE_RIGHT	= 80	//!< Suppression de donnée autorisée
+			, USE		= 20	//!< Utilisation de fonction autorisÃ©e
+			, READ		= 40	//!< Lecture directe de donnÃ©es autorisÃ©e
+			, WRITE		= 60	//!< Ecriture directe de donnÃ©e autorisÃ©e
+			, DELETE_RIGHT	= 80	//!< Suppression de donnÃ©e autorisÃ©e
 		} RightLevel;
 
 		typedef std::vector<

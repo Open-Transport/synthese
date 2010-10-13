@@ -132,7 +132,7 @@ bool Login::identifyUser() throw (int)
 		req<<"ipaddr=0.0.0.0&a=login&fonction=page&page=login_response&i=4&actionParamlogin="<<usr<<"&actionParampwd="<<psw<<"&nr=1";
 		
 		
-		// valeur de retour à reflechir
+		// valeur de retour Ã  reflechir
 		string xml=Functions::makeRequest(req.str());
 		//cerr<<"xml return"<<xml<<endl; 
 

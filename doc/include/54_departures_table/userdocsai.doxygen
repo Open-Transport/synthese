@@ -1,6 +1,6 @@
-/** @page userdocDeparturesTable 54 Manuel utilisateur Téléaffichage SYNTHESE
+/** @page userdocDeparturesTable 54 Manuel utilisateur TÃ©lÃ©affichage SYNTHESE
 
-<h2>Table des matières</h2>
+<h2>Table des matiÃ¨res</h2>
 
 <ul>
 	<li>@ref userdocSAILogin</li>
@@ -9,9 +9,9 @@
 	<li>@ref userdocSAILogs</li>
 </ul>
 
-@section userdocSAILogin Connexion au système via la console d'administration
+@section userdocSAILogin Connexion au systÃ¨me via la console d'administration
 
-Le premier accès s'effectue via l'écran de connexion :
+Le premier accÃ¨s s'effectue via l'Ã©cran de connexion :
 
 @image html syntheseouverturesession.png
 @image latex syntheseouverturesession.png width=14cm
@@ -20,162 +20,162 @@ Entrer le login et le mot de passe pour se connecter.
 
 @section userdocSAITypes Gestion des types de panneaux
 
-La gestion des types de panneaux consiste en le maintien à jour de la liste des propriétés du matériel d'affichage. Chaque type de panneau est défini par :
+La gestion des types de panneaux consiste en le maintien Ã  jour de la liste des propriÃ©tÃ©s du matÃ©riel d'affichage. Chaque type de panneau est dÃ©fini par :
 <ul>
-	<li>Un nom, désignant le type de matériel utilisé, et permettant d'identifier le type dans toutes les listes déroulantes</li>
-	<li>Une interface d'affichage, définissant le protocole à utiliser pour l'affichage</li>
-	<li>Un nombre de lignes à afficher, dépendant de la taille du panneau. Pour les panneaux à diodes, il s'agit du nombre de verres disponibles. Pour les panneaux TFT, il s'agit du nombre de départs pouvant être affichés, à déterminer en fonction de la hauteur de la police utilisée et de la hauteur du panneau</li>
-	<li>Un nombre maximal d'arrêts intermédiaires à afficher, ici encore dépendant de la taille du panneau. Pour les panneaux à diodes utilisant le défilement, les arrêts intermédiaires consomment des espaces mémoires dits « pages ». Il convient donc de n'afficher en défilement que le nombre d'arrêts pouvant être stockés effectivement par le matériel.</li>
+	<li>Un nom, dÃ©signant le type de matÃ©riel utilisÃ©, et permettant d'identifier le type dans toutes les listes dÃ©roulantes</li>
+	<li>Une interface d'affichage, dÃ©finissant le protocole Ã  utiliser pour l'affichage</li>
+	<li>Un nombre de lignes Ã  afficher, dÃ©pendant de la taille du panneau. Pour les panneaux Ã  diodes, il s'agit du nombre de verres disponibles. Pour les panneaux TFT, il s'agit du nombre de dÃ©parts pouvant Ãªtre affichÃ©s, Ã  dÃ©terminer en fonction de la hauteur de la police utilisÃ©e et de la hauteur du panneau</li>
+	<li>Un nombre maximal d'arrÃªts intermÃ©diaires Ã  afficher, ici encore dÃ©pendant de la taille du panneau. Pour les panneaux Ã  diodes utilisant le dÃ©filement, les arrÃªts intermÃ©diaires consomment des espaces mÃ©moires dits Â« pages Â». Il convient donc de n'afficher en dÃ©filement que le nombre d'arrÃªts pouvant Ãªtre stockÃ©s effectivement par le matÃ©riel.</li>
 </ul>
 
-@subsection userdocSAITypesNew Création d'un type de panneau
+@subsection userdocSAITypesNew CrÃ©ation d'un type de panneau
 
 <ol>
-	<li>Accéder à l'écran « Types d'afficheurs »</li>
-	<li>La fenêtre de gestion des types d'afficheurs apparaît. Elle comporte un tableau reprenant l'ensemble des types d'afficheurs déclarés :</li>
-	<li>Rentrer le nom du type à ajouter dans le champ « Nom » de la dernière ligne du tableau</li>
-	<li>Sélectionner le protocole utilisé dans le champ « Interface » correspondant</li>
-	<li>Sélectionner le nombre de lignes à afficher sur l'écran dans le champ « Lignes » correspondant</li>
-	<li>Sélectionner le nombre maximal d'arrêts intermédiaires à afficher dans le champ « Max arrêts intermédiaires ». La valeur -1 indique que le nombre d'arrêts intermédiaires n'est pas limité.</li>
+	<li>AccÃ©der Ã  l'Ã©cran Â« Types d'afficheurs Â»</li>
+	<li>La fenÃªtre de gestion des types d'afficheurs apparaÃ®t. Elle comporte un tableau reprenant l'ensemble des types d'afficheurs dÃ©clarÃ©s :</li>
+	<li>Rentrer le nom du type Ã  ajouter dans le champ Â« Nom Â» de la derniÃ¨re ligne du tableau</li>
+	<li>SÃ©lectionner le protocole utilisÃ© dans le champ Â« Interface Â» correspondant</li>
+	<li>SÃ©lectionner le nombre de lignes Ã  afficher sur l'Ã©cran dans le champ Â« Lignes Â» correspondant</li>
+	<li>SÃ©lectionner le nombre maximal d'arrÃªts intermÃ©diaires Ã  afficher dans le champ Â« Max arrÃªts intermÃ©diaires Â». La valeur -1 indique que le nombre d'arrÃªts intermÃ©diaires n'est pas limitÃ©.</li>
 	<li>Cliquer sur Ajouter</li>
 </ol>
 
 @subsection userdocSAITypesUpdate Modifier un type de panneau
 
-Attention : la modification d'un type de panneau affecte l'ensemble des panneaux rattachés à ce type. Il peut donc dans certains cas être préférable de créer un nouveau type.
+Attention : la modification d'un type de panneau affecte l'ensemble des panneaux rattachÃ©s Ã  ce type. Il peut donc dans certains cas Ãªtre prÃ©fÃ©rable de crÃ©er un nouveau type.
 
 <ol>
-	<li>Accéder à l'écran « Types d'afficheurs »</li>
-	<li>La fenêtre de gestion des types d'afficheurs apparaît. Elle comporte un tableau reprenant l'ensemble des types d'afficheurs déclarés :</li>
-	<li>Repérer le type d'afficheur à modifier</li>
-	<li>Modifier si besoin le nom du type à modifier dans le champ « Nom » de la ligne du tableau correspondante</li>
-	<li>Modifier si besoin le protocole utilisé dans le champ « Interface » correspondant</li>
-	<li>Modifier si besoin le nombre de lignes à afficher sur l'écran dans le champ « Lignes » correspondant</li>
-	<li>Modifier si besoin le nombre maximal d'arrêts intermédiaires à afficher dans le champ « Max arrêts intermédiaires ». La valeur -1 indique que le nombre d'arrêts intermédiaires n'est pas limité.</li>
+	<li>AccÃ©der Ã  l'Ã©cran Â« Types d'afficheurs Â»</li>
+	<li>La fenÃªtre de gestion des types d'afficheurs apparaÃ®t. Elle comporte un tableau reprenant l'ensemble des types d'afficheurs dÃ©clarÃ©s :</li>
+	<li>RepÃ©rer le type d'afficheur Ã  modifier</li>
+	<li>Modifier si besoin le nom du type Ã  modifier dans le champ Â« Nom Â» de la ligne du tableau correspondante</li>
+	<li>Modifier si besoin le protocole utilisÃ© dans le champ Â« Interface Â» correspondant</li>
+	<li>Modifier si besoin le nombre de lignes Ã  afficher sur l'Ã©cran dans le champ Â« Lignes Â» correspondant</li>
+	<li>Modifier si besoin le nombre maximal d'arrÃªts intermÃ©diaires Ã  afficher dans le champ Â« Max arrÃªts intermÃ©diaires Â». La valeur -1 indique que le nombre d'arrÃªts intermÃ©diaires n'est pas limitÃ©.</li>
 	<li>Cliquer sur Modifier.</li>
 </ol>
 
 @subsection userdocSAITypesDelete Suppression de type de panneau
 
 <ol>
-	<li>Accéder à l'écran « Types d'afficheurs »</li>
-	<li>La fenêtre de gestion des types d'afficheurs apparaît. Elle comporte un tableau reprenant l'ensemble des types d'afficheurs déclarés :  </li>
-	<li>Repérer le type d'afficheur à supprimer</li>
+	<li>AccÃ©der Ã  l'Ã©cran Â« Types d'afficheurs Â»</li>
+	<li>La fenÃªtre de gestion des types d'afficheurs apparaÃ®t. Elle comporte un tableau reprenant l'ensemble des types d'afficheurs dÃ©clarÃ©s :  </li>
+	<li>RepÃ©rer le type d'afficheur Ã  supprimer</li>
 	<li>Cliquer sur Supprimer</li>
-	<li>Une boite de confirmation apparaît  </li>
-	<li>Si le type d'afficheur est utilisé par au moins un afficheur, il ne peut être supprimé. En ce cas un message d'erreur apparaît :  </li>
+	<li>Une boite de confirmation apparaÃ®t  </li>
+	<li>Si le type d'afficheur est utilisÃ© par au moins un afficheur, il ne peut Ãªtre supprimÃ©. En ce cas un message d'erreur apparaÃ®t :  </li>
 
-@section userdocSAIDisplayAdmin Paramétrage des panneaux
+@section userdocSAIDisplayAdmin ParamÃ©trage des panneaux
 
-Le paramétrage des panneaux consiste en la définition du contenu produit par le serveur pour l'affichage des panneaux. Il dépend d'un nombre important de paramètres, tous accessibles par l'outil d'administration.
+Le paramÃ©trage des panneaux consiste en la dÃ©finition du contenu produit par le serveur pour l'affichage des panneaux. Il dÃ©pend d'un nombre important de paramÃ¨tres, tous accessibles par l'outil d'administration.
 
-@subsection userdocSAIDisplayNew Création de panneau
+@subsection userdocSAIDisplayNew CrÃ©ation de panneau
 
 <ol>
-	<li>Accéder à l'écran « Points de diffusion »</li>
-	<li>La fenêtre de gestion des points de diffusion apparaît. Elle comporte deux sections : Recherche et Résultats de la recherche (liste d'arrêts) :  </li>
-	<li>Rechercher l'arrêt dans lequel l'afficheur doit être créé en remplissant les champs du formulaire de rechercher, puis en cliquant sur Rechercher :</li>
+	<li>AccÃ©der Ã  l'Ã©cran Â« Points de diffusion Â»</li>
+	<li>La fenÃªtre de gestion des points de diffusion apparaÃ®t. Elle comporte deux sections : Recherche et RÃ©sultats de la recherche (liste d'arrÃªts) :  </li>
+	<li>Rechercher l'arrÃªt dans lequel l'afficheur doit Ãªtre crÃ©Ã© en remplissant les champs du formulaire de rechercher, puis en cliquant sur Rechercher :</li>
 	<ul>
-		<li>Le champ Commune permet de filtrer les résultats sur une partie du nom de la commune de l'arrêt</li>
-		<li>Le champ nom permet de filtrer les résultats sur une partie du nom de l'arrêt au sein de la commune</li>
-		<li>Le champ Terminaux d'affichage permet de filtrer les résultats sur la présence ou non de panneaux existants</li>
-		<li>Le champ ligne permet de filtrer les résultats aux arrêts desservis par une ligne du réseau</li>
+		<li>Le champ Commune permet de filtrer les rÃ©sultats sur une partie du nom de la commune de l'arrÃªt</li>
+		<li>Le champ nom permet de filtrer les rÃ©sultats sur une partie du nom de l'arrÃªt au sein de la commune</li>
+		<li>Le champ Terminaux d'affichage permet de filtrer les rÃ©sultats sur la prÃ©sence ou non de panneaux existants</li>
+		<li>Le champ ligne permet de filtrer les rÃ©sultats aux arrÃªts desservis par une ligne du rÃ©seau</li>
 	</ul>
-	<li>Choisir l'arrêt dans le tableau en cliquant sur le bouton Editer.</li>
-	<li>L'écran d'édition de point de diffusion apparaît :  </li>
-	<li>Cliquer sur le bouton Créer un nouvel afficheur</li>
-	<li>Un nouvel afficheur est immédiatement créé, et l'écran d'édition d'afficheur apparaît. Il contient plusieurs sections qu'il convient de remplir et valider séparément :</li>
+	<li>Choisir l'arrÃªt dans le tableau en cliquant sur le bouton Editer.</li>
+	<li>L'Ã©cran d'Ã©dition de point de diffusion apparaÃ®t :  </li>
+	<li>Cliquer sur le bouton CrÃ©er un nouvel afficheur</li>
+	<li>Un nouvel afficheur est immÃ©diatement crÃ©Ã©, et l'Ã©cran d'Ã©dition d'afficheur apparaÃ®t. Il contient plusieurs sections qu'il convient de remplir et valider sÃ©parÃ©ment :</li>
 	<ul>
-		<li>Propriétés de l'afficheur</li>
-		<li>Arrêts de desserte</li>
-		<li>Arrêts intermédiaires à afficher</li>
-		<li>Arrêts ne devant pas être desservis par les lignes séléctionnées </li>
-		<li>Présélection</li>
+		<li>PropriÃ©tÃ©s de l'afficheur</li>
+		<li>ArrÃªts de desserte</li>
+		<li>ArrÃªts intermÃ©diaires Ã  afficher</li>
+		<li>ArrÃªts ne devant pas Ãªtre desservis par les lignes sÃ©lÃ©ctionnÃ©es </li>
+		<li>PrÃ©sÃ©lection</li>
 	</ul>
-	<li>Editer la section Propriétés  </li>
+	<li>Editer la section PropriÃ©tÃ©s  </li>
 	<ul>
-		<li>Champ Nom : permet d'identifier l'afficheur au sein de l'arrêt auquel il appartient</li>
-		<li>Champ type d'afficheur : la liste déroulante permettant de sélectionner le format de sortie des affichages et des paramètres liés au type de matériel (voir chapitre précédent)</li>
-		<li>Champ Code de branchement : permet d'identifier l'afficheur sur une connexion en bus (utilisée par les panneaux Oscar)</li>
-		<li>Champ Titre : permet de modifier le contenu de la barre de titre si disponible sur le matériel d'affichage</li>
-		<li>Champ Clignotement : permet de choisir la durée de clignotement de l'heure, relativement à l'heure de retrait des départs. Exemple : Si le clignotement 2 minutes avant effacement est sélectionné, et si l'effacement est effectué à l'heure exacte du départ, un bus partant à 8h30 verra son heure de départ clignoter dès 8h28</li>
-		<li>Champ Affichage du numéro de quai : permet d'activer ou désactiver une colonne affichant le numéro du quai de départ du service (si pris en charge par le matériel d'affichage)</li>
-		<li>Champ Affichage du numéro de service : permet d'activer ou désactiver une colonne affichant le numéro technique du service (si pris en charge par le matériel d'affichage)</li>
-		<li>Champ Affichage du numéro d'équipe: permet d'activer ou désactiver une colonne affichant le numéro de l'équipe de conduite prenant en charge le service (si pris en charge par le matériel d'affichage)</li>
-		<li>Champ Horaires : permet de sélectionner si l'afficheur affiche les départs ou les arrivées</li>
-		<li>Champ Sélection : permet de choisir si les services effectuant un simple passage à l'arrêt sont affichés</li>
-		<li>Champ délai maximum d'affichage : permet de choisir la durée à partir de laquelle un service est affiché sous réserve de place sur l'écran. Ex : avec un délai maximum d'affichage de 60 minutes, un service partant à 8h30 sera affiché au départ à partir de 7h30.</li>
-		<li>Champ délai d'effacement : permet de choisir quand un service disparaît de l'écran en fonction de son heure de départ. Exemple : avec un délai d'effacement 1 minute avant le départ, un service partant à 8h31 disparaît de l'écran à 8h30</li>
+		<li>Champ Nom : permet d'identifier l'afficheur au sein de l'arrÃªt auquel il appartient</li>
+		<li>Champ type d'afficheur : la liste dÃ©roulante permettant de sÃ©lectionner le format de sortie des affichages et des paramÃ¨tres liÃ©s au type de matÃ©riel (voir chapitre prÃ©cÃ©dent)</li>
+		<li>Champ Code de branchement : permet d'identifier l'afficheur sur une connexion en bus (utilisÃ©e par les panneaux Oscar)</li>
+		<li>Champ Titre : permet de modifier le contenu de la barre de titre si disponible sur le matÃ©riel d'affichage</li>
+		<li>Champ Clignotement : permet de choisir la durÃ©e de clignotement de l'heure, relativement Ã  l'heure de retrait des dÃ©parts. Exemple : Si le clignotement 2 minutes avant effacement est sÃ©lectionnÃ©, et si l'effacement est effectuÃ© Ã  l'heure exacte du dÃ©part, un bus partant Ã  8h30 verra son heure de dÃ©part clignoter dÃ¨s 8h28</li>
+		<li>Champ Affichage du numÃ©ro de quai : permet d'activer ou dÃ©sactiver une colonne affichant le numÃ©ro du quai de dÃ©part du service (si pris en charge par le matÃ©riel d'affichage)</li>
+		<li>Champ Affichage du numÃ©ro de service : permet d'activer ou dÃ©sactiver une colonne affichant le numÃ©ro technique du service (si pris en charge par le matÃ©riel d'affichage)</li>
+		<li>Champ Affichage du numÃ©ro d'Ã©quipe: permet d'activer ou dÃ©sactiver une colonne affichant le numÃ©ro de l'Ã©quipe de conduite prenant en charge le service (si pris en charge par le matÃ©riel d'affichage)</li>
+		<li>Champ Horaires : permet de sÃ©lectionner si l'afficheur affiche les dÃ©parts ou les arrivÃ©es</li>
+		<li>Champ SÃ©lection : permet de choisir si les services effectuant un simple passage Ã  l'arrÃªt sont affichÃ©s</li>
+		<li>Champ dÃ©lai maximum d'affichage : permet de choisir la durÃ©e Ã  partir de laquelle un service est affichÃ© sous rÃ©serve de place sur l'Ã©cran. Ex : avec un dÃ©lai maximum d'affichage de 60 minutes, un service partant Ã  8h30 sera affichÃ© au dÃ©part Ã  partir de 7h30.</li>
+		<li>Champ dÃ©lai d'effacement : permet de choisir quand un service disparaÃ®t de l'Ã©cran en fonction de son heure de dÃ©part. Exemple : avec un dÃ©lai d'effacement 1 minute avant le dÃ©part, un service partant Ã  8h31 disparaÃ®t de l'Ã©cran Ã  8h30</li>
 	</ul>
-	<li>Une fois modifiées toutes les propriétés avec les valeurs de votre choix, cliquer sur Enregistrer les modifications des propriétés</li>
-	<li>Editer les arrêts de desserte  </li>
+	<li>Une fois modifiÃ©es toutes les propriÃ©tÃ©s avec les valeurs de votre choix, cliquer sur Enregistrer les modifications des propriÃ©tÃ©s</li>
+	<li>Editer les arrÃªts de desserte  </li>
 	<ul>
-		<li>Le bouton Passer en mode Tous Arrêts permet d'afficher tous les départs de l'arrêt logique, y compris sur d'éventuels futurs arrêts physiques</li>
-		<li>En mode sélection d'arrêts, sélectionner l'arrêt physique à ajouter et cliquer sur Ajouter pour inclure les départs effectués à l'arrêt correspondant. L'arrêt est identifié par son code exploitant et son nom distinctif</li>
-		<li>Cliquer sur Supprimer en face d'un arrêt pour stopper l'affichage des départs de l'arrêt correspondant</li>
+		<li>Le bouton Passer en mode Tous ArrÃªts permet d'afficher tous les dÃ©parts de l'arrÃªt logique, y compris sur d'Ã©ventuels futurs arrÃªts physiques</li>
+		<li>En mode sÃ©lection d'arrÃªts, sÃ©lectionner l'arrÃªt physique Ã  ajouter et cliquer sur Ajouter pour inclure les dÃ©parts effectuÃ©s Ã  l'arrÃªt correspondant. L'arrÃªt est identifiÃ© par son code exploitant et son nom distinctif</li>
+		<li>Cliquer sur Supprimer en face d'un arrÃªt pour stopper l'affichage des dÃ©parts de l'arrÃªt correspondant</li>
 	</ul>
-	<li>Editer les arrêts intermédiaires à afficher : il s'agit des arrêts de passage qui sont affichés dès lors que le service les dessert, dans la limite de la place disponible à l'écran. La liste des arrêts pouvant être affichés dépend directement des arrêts de desserte sélectionnés. Sélectionner un arrêt de passage à afficher puis cliquer sur Ajouter pour l'inclure aux arrêts devant être affichés, cliquer sur Supprimer pour retirer un arrêt de passage.</li>
-	<li>Editer les arrêts ne devant pas être desservis : les arrêts sélectionnés dans cette section permettent de filtrer les lignes affichées en fonction de leur desserte. Par exemple, si une ligne dessert deux terminus, la présence de l'un deux dans cette section permet de n'afficher que les départs desservant l'autre terminus.</li>
-	<li>Editer la section Présélection : la présélection consiste à modifier l'ordre de tri des départs pour afficher en avances certains départs jugés plus utiles que d'autres en fonction de leur desserte. Les arrêts de présélection sont des arrêts pour lesquels l'affichage d'au moins un service les desservant est prioritaire.</li>
+	<li>Editer les arrÃªts intermÃ©diaires Ã  afficher : il s'agit des arrÃªts de passage qui sont affichÃ©s dÃ¨s lors que le service les dessert, dans la limite de la place disponible Ã  l'Ã©cran. La liste des arrÃªts pouvant Ãªtre affichÃ©s dÃ©pend directement des arrÃªts de desserte sÃ©lectionnÃ©s. SÃ©lectionner un arrÃªt de passage Ã  afficher puis cliquer sur Ajouter pour l'inclure aux arrÃªts devant Ãªtre affichÃ©s, cliquer sur Supprimer pour retirer un arrÃªt de passage.</li>
+	<li>Editer les arrÃªts ne devant pas Ãªtre desservis : les arrÃªts sÃ©lectionnÃ©s dans cette section permettent de filtrer les lignes affichÃ©es en fonction de leur desserte. Par exemple, si une ligne dessert deux terminus, la prÃ©sence de l'un deux dans cette section permet de n'afficher que les dÃ©parts desservant l'autre terminus.</li>
+	<li>Editer la section PrÃ©sÃ©lection : la prÃ©sÃ©lection consiste Ã  modifier l'ordre de tri des dÃ©parts pour afficher en avances certains dÃ©parts jugÃ©s plus utiles que d'autres en fonction de leur desserte. Les arrÃªts de prÃ©sÃ©lection sont des arrÃªts pour lesquels l'affichage d'au moins un service les desservant est prioritaire.</li>
 	<ul>
-		<li>Le champ Activer permet d'activer ou de désactiver l'algorithme de présélection</li>
-		<li>Le champ délai maximum de présélection indique à partir de quelle durée un départ jugé prioritaire est affiché prioritairement à un autre. Par exemple, pour une durée de 120 minutes, un départ présélectionné partant à 8h30 remplacera un départ ultérieur non prioritaire dès 6h30</li>
-		<li>Cliquer sur le bouton Enregistrer les paramètres de présélection pour sauvegarder les modifications effectuées sur les deux champs précédents</li>
-		<li>Editer la liste des arrêts de présélection à l'aide des boutons Ajouter et Supprimer</li>
+		<li>Le champ Activer permet d'activer ou de dÃ©sactiver l'algorithme de prÃ©sÃ©lection</li>
+		<li>Le champ dÃ©lai maximum de prÃ©sÃ©lection indique Ã  partir de quelle durÃ©e un dÃ©part jugÃ© prioritaire est affichÃ© prioritairement Ã  un autre. Par exemple, pour une durÃ©e de 120 minutes, un dÃ©part prÃ©sÃ©lectionnÃ© partant Ã  8h30 remplacera un dÃ©part ultÃ©rieur non prioritaire dÃ¨s 6h30</li>
+		<li>Cliquer sur le bouton Enregistrer les paramÃ¨tres de prÃ©sÃ©lection pour sauvegarder les modifications effectuÃ©es sur les deux champs prÃ©cÃ©dents</li>
+		<li>Editer la liste des arrÃªts de prÃ©sÃ©lection Ã  l'aide des boutons Ajouter et Supprimer</li>
 	</ul>
 </ul>
 
 @subsection userdocSAIDisplayUpdate Modification de panneaux
 
 <ol>
-	<li>Accéder à l'écran « Afficheurs »</li>
-	<li>La fenêtre de gestion des afficheurs apparaît. Elle comporte deux sections : Recherche et résultat de la recherche.  </li>
-	<li>Rechercher l'afficheur à modifier en remplissant les champs du formulaire de recherche :</li>
+	<li>AccÃ©der Ã  l'Ã©cran Â« Afficheurs Â»</li>
+	<li>La fenÃªtre de gestion des afficheurs apparaÃ®t. Elle comporte deux sections : Recherche et rÃ©sultat de la recherche.  </li>
+	<li>Rechercher l'afficheur Ã  modifier en remplissant les champs du formulaire de recherche :</li>
 	<ul>
-		<li>Le champ Commune permet de rechercher les afficheurs situés à un arrêt situé dans une commune dont le nom contient le texte entré</li>
-		<li>Le champ Arrêt permet de rechercher les afficheurs situés à un arrêt dont le nom contient le texte entré</li>
-		<li>Le champ Nom permet de rechercher les afficheurs dont le nom distinctif contient le texte entré. Ce champ est indépendant des deux précédent, ainsi il est possible de chercher tous les afficheurs se nommant « salle d'attente » et appartenant à un arrêt quelconque.</li>
-		<li>Le champ Ligne permet de rechercher les afficheurs situés à un arrêt desservi par la ligne sélectionnée</li>
-		<li>Le champ Type permet de rechercher les afficheurs par type de matériel</li>
-		<li>Le champ Etat permet de rechercher les afficheurs selon leur état de maintenance</li>
-		<li>Le champ message permet de rechercher les afficheurs en fonction du fait qu'un message commercial y soit diffusé ou non.</li>
+		<li>Le champ Commune permet de rechercher les afficheurs situÃ©s Ã  un arrÃªt situÃ© dans une commune dont le nom contient le texte entrÃ©</li>
+		<li>Le champ ArrÃªt permet de rechercher les afficheurs situÃ©s Ã  un arrÃªt dont le nom contient le texte entrÃ©</li>
+		<li>Le champ Nom permet de rechercher les afficheurs dont le nom distinctif contient le texte entrÃ©. Ce champ est indÃ©pendant des deux prÃ©cÃ©dent, ainsi il est possible de chercher tous les afficheurs se nommant Â« salle d'attente Â» et appartenant Ã  un arrÃªt quelconque.</li>
+		<li>Le champ Ligne permet de rechercher les afficheurs situÃ©s Ã  un arrÃªt desservi par la ligne sÃ©lectionnÃ©e</li>
+		<li>Le champ Type permet de rechercher les afficheurs par type de matÃ©riel</li>
+		<li>Le champ Etat permet de rechercher les afficheurs selon leur Ã©tat de maintenance</li>
+		<li>Le champ message permet de rechercher les afficheurs en fonction du fait qu'un message commercial y soit diffusÃ© ou non.</li>
 		<li>Cliquer sur Rechercher pour lancer la recherche</li>
 	</ul>
-	<li>Une fois l'afficheur identifié, cliquer sur le bouton Modifier</li>
-	<li>La fenêtre d'édition d'afficheur apparaît. Voir paragraphe « Création d'afficheur » pour l'utilisation de cette fonction </li>
+	<li>Une fois l'afficheur identifiÃ©, cliquer sur le bouton Modifier</li>
+	<li>La fenÃªtre d'Ã©dition d'afficheur apparaÃ®t. Voir paragraphe Â« CrÃ©ation d'afficheur Â» pour l'utilisation de cette fonction </li>
 </ol>
 
 @subsection userdocSAIDisplayDelete Suppression d'afficheur
 
-Pour supprimer un afficheur, le rechercher selon la même procédure que pour la modification, entrer dans la fenêtre de modification de l'afficheur et cliquer sur le bouton Supprimer.
+Pour supprimer un afficheur, le rechercher selon la mÃªme procÃ©dure que pour la modification, entrer dans la fenÃªtre de modification de l'afficheur et cliquer sur le bouton Supprimer.
 
 @subsection userdocSAIDisplaySimulate Simulation d'afficheur
 
-La simulation d'un afficheur permet d'afficher dans son navigateur le contenu diffusé sur l'afficheur selon les paramètres spécifiés.
-Pour accéder à la simulation d'un afficheur, un bouton Simuler est disponible au niveau de l'écran « Afficheurs » ainsi qu'au niveau de la fenêtre d'édition des afficheurs.
-Attention : la simulation d'afficheur affiche le code envoyé au matériel d'affichage. Dans le cas où le codage ne suit pas le format HTML, la lecture de la simulation peut être difficile, notamment lorsque le protocole utilisé utilise des caractères binaires (ex : caractères de contrôle du protocole Lumiplan)
+La simulation d'un afficheur permet d'afficher dans son navigateur le contenu diffusÃ© sur l'afficheur selon les paramÃ¨tres spÃ©cifiÃ©s.
+Pour accÃ©der Ã  la simulation d'un afficheur, un bouton Simuler est disponible au niveau de l'Ã©cran Â« Afficheurs Â» ainsi qu'au niveau de la fenÃªtre d'Ã©dition des afficheurs.
+Attention : la simulation d'afficheur affiche le code envoyÃ© au matÃ©riel d'affichage. Dans le cas oÃ¹ le codage ne suit pas le format HTML, la lecture de la simulation peut Ãªtre difficile, notamment lorsque le protocole utilisÃ© utilise des caractÃ¨res binaires (ex : caractÃ¨res de contrÃ´le du protocole Lumiplan)
 
 @section userdocSAIMessages Diffusion de messages sur afficheurs
 
-La diffusion de messages sur afficheurs s'effectue au travers du module d'actualités.
+La diffusion de messages sur afficheurs s'effectue au travers du module d'actualitÃ©s.
 
 Pour diffuser un message sur un afficheur, ajouter un afficheur dans la liste de diffusion du message.
 
-@section userdocSAILogs Journal d'activités
+@section userdocSAILogs Journal d'activitÃ©s
 
 Les journaux permettent de consulter l'historique du SAI SYNTHESE :
 
 <ol>
-	<li>Accéder à l'écran « Journaux »</li>
-	<li>La liste des journaux consultables apparaît :  </li>
+	<li>AccÃ©der Ã  l'Ã©cran Â« Journaux Â»</li>
+	<li>La liste des journaux consultables apparaÃ®t :  </li>
 	<li>Cliquer sur le bouton Consulter correspondant au journal de votre choix.</li>
-	<li>L'écran de consultation de journal apparaît :  </li>
-	<li>Pour filtrer les entrées de journal, des champs sont disponibles :</li>
+	<li>L'Ã©cran de consultation de journal apparaÃ®t :  </li>
+	<li>Pour filtrer les entrÃ©es de journal, des champs sont disponibles :</li>
 	<ul>
-		<li>Date début et Date fin : filtre sur la date des événements</li>
-		<li>Utilisateur : filtre sur les entrées générées par l'utilisateur sélectionné uniquement</li>
-		<li>Type : filtre sur la nature des entrées (information, alerte, critique)</li>
-		<li>Texte : filtre sur le contenu des colonnes « métier » (situées à droite de la colonne Objet)</li>
+		<li>Date dÃ©but et Date fin : filtre sur la date des Ã©vÃ©nements</li>
+		<li>Utilisateur : filtre sur les entrÃ©es gÃ©nÃ©rÃ©es par l'utilisateur sÃ©lectionnÃ© uniquement</li>
+		<li>Type : filtre sur la nature des entrÃ©es (information, alerte, critique)</li>
+		<li>Texte : filtre sur le contenu des colonnes Â« mÃ©tier Â» (situÃ©es Ã  droite de la colonne Objet)</li>
 	</ul>
 </ol>
 

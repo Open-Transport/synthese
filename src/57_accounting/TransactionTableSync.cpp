@@ -4,7 +4,7 @@
 
 	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
 	Copyright (C) 2006 Vinci Park 
-	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
+	Contact : RaphaÃ«l Murat - Vinci Park <rmurat@vincipark.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License

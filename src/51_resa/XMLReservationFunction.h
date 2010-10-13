@@ -39,13 +39,13 @@ namespace synthese
 			@date 2009
 			@ingroup m31Functions refFunctions
 
-			<h3>Prérequis</h3>
+			<h3>PrÃ©requis</h3>
 
 			<ul>
-			<li>Disposer d’une session valide dont l’ID est connu.</li>
-			<li>Disposer de l’ID de l’utilisateur courant</li>
-			<li>Disposer des paramètres de lancement du calculateur d’itinéraires ayant conduit à la proposition de la solution à réserver</li>
-			<li>Disposer de l’heure de départ de la solution à réserver</li>
+			<li>Disposer dâ€™une session valide dont lâ€™ID est connu.</li>
+			<li>Disposer de lâ€™ID de lâ€™utilisateur courant</li>
+			<li>Disposer des paramÃ¨tres de lancement du calculateur dâ€™itinÃ©raires ayant conduit Ã  la proposition de la solution Ã  rÃ©server</li>
+			<li>Disposer de lâ€™heure de dÃ©part de la solution Ã  rÃ©server</li>
 			</ul>
 
 			<h3>Request</h3>
@@ -56,36 +56,36 @@ namespace synthese
 			roid=<id reservation> : Reservation ID (can be the BookReservationAction created id)
 			</pre>
 			
-			<h3>Réponse</h3>
+			<h3>RÃ©ponse</h3>
 
 			Description
 
-			Une réservation est décrite comme suit :
+			Une rÃ©servation est dÃ©crite comme suit :
 
 			@image html reservation.png
 
-				- id : identificateur de la réservation dans la base de données de SYNTHESE (vide si
-			réservation non effectuée ou non trouvée)
-				- customerId : identificateur du client dans la base de données de SYNTHESE
-				- cancellationDeadLine : date/heure limite d’annulation de la réservation
-				- departureStop : nom complet (commune + nom) de l’arrêt de départ du trajet
-			réservé
-				- arrivalStop : nom complet (commune + nom) de l’arrêt d’arrivée du trajet réservé
-				- travelDate : date/heure du départ du trajet réservé
-				- customerName : nom complet (prénom + nom) du client ayant réservé
-				- customerPhone : numéro de téléphone du client ayant réservé
-				- status : statut de la réservation (texte)
-				- canBeCancelled (booléen) : indique si la réservation peut être annulée
-				- seats : nombre de places réservées
-				- cancellationDateTime (optionnel) : sa présence indique que la réservation a été
-			annulée. Sa valeur indique la date et l’heure de l’annulation
-				- le détail du trajet réservé est décrit par une succession d’objets chunk décrivant
-			chaque étape du trajet :
-					- departurePlaceName : nom complet de l’arrêt de départ du tronçon
-					- departureDateTime : date/heure de départ du tronçon
-					- arrivalPlaceName : nom complet de l’arrêt d’arrivée du tronçon
-					- arrivalDateTime : date/heure d’arrivée du tronçon
-					- lineNumber : numéro de la ligne empruntée
+				- id : identificateur de la rÃ©servation dans la base de donnÃ©es de SYNTHESE (vide si
+			rÃ©servation non effectuÃ©e ou non trouvÃ©e)
+				- customerId : identificateur du client dans la base de donnÃ©es de SYNTHESE
+				- cancellationDeadLine : date/heure limite dâ€™annulation de la rÃ©servation
+				- departureStop : nom complet (commune + nom) de lâ€™arrÃªt de dÃ©part du trajet
+			rÃ©servÃ©
+				- arrivalStop : nom complet (commune + nom) de lâ€™arrÃªt dâ€™arrivÃ©e du trajet rÃ©servÃ©
+				- travelDate : date/heure du dÃ©part du trajet rÃ©servÃ©
+				- customerName : nom complet (prÃ©nom + nom) du client ayant rÃ©servÃ©
+				- customerPhone : numÃ©ro de tÃ©lÃ©phone du client ayant rÃ©servÃ©
+				- status : statut de la rÃ©servation (texte)
+				- canBeCancelled (boolÃ©en) : indique si la rÃ©servation peut Ãªtre annulÃ©e
+				- seats : nombre de places rÃ©servÃ©es
+				- cancellationDateTime (optionnel) : sa prÃ©sence indique que la rÃ©servation a Ã©tÃ©
+			annulÃ©e. Sa valeur indique la date et lâ€™heure de lâ€™annulation
+				- le dÃ©tail du trajet rÃ©servÃ© est dÃ©crit par une succession dâ€™objets chunk dÃ©crivant
+			chaque Ã©tape du trajet :
+					- departurePlaceName : nom complet de lâ€™arrÃªt de dÃ©part du tronÃ§on
+					- departureDateTime : date/heure de dÃ©part du tronÃ§on
+					- arrivalPlaceName : nom complet de lâ€™arrÃªt dâ€™arrivÃ©e du tronÃ§on
+					- arrivalDateTime : date/heure dâ€™arrivÃ©e du tronÃ§on
+					- lineNumber : numÃ©ro de la ligne empruntÃ©e
 
 			<h3>Attachments</h3>
 

@@ -61,7 +61,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<HikingTrailAdmin>::ICON("map.png");
-		template<> const string AdminInterfaceElementTemplate<HikingTrailAdmin>::DEFAULT_TITLE("Randonnée");
+		template<> const string AdminInterfaceElementTemplate<HikingTrailAdmin>::DEFAULT_TITLE("RandonnÃ©e");
 	}
 
 	namespace hiking
@@ -112,7 +112,7 @@ namespace synthese
 			// PROPERTIES TAB
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 				{
 					AdminActionFunctionRequest<HikingTrailUpdateAction,HikingTrailAdmin> updateRequest(_request);
 					updateRequest.getAction()->setTrail(const_pointer_cast<HikingTrail>(_trail));
@@ -121,7 +121,7 @@ namespace synthese
 					stream << t.open();
 					stream << t.cell("ID", lexical_cast<string>(_trail->getKey()));
 					stream << t.cell("Nom", t.getForm().getTextInput(HikingTrailUpdateAction::PARAMETER_NAME, _trail->getName()));
-					stream << t.cell("URL durées", t.getForm().getTextInput(HikingTrailUpdateAction::PARAMETER_DURATION, _trail->getDuration()));
+					stream << t.cell("URL durÃ©es", t.getForm().getTextInput(HikingTrailUpdateAction::PARAMETER_DURATION, _trail->getDuration()));
 					stream << t.cell("URL carte", t.getForm().getTextInput(HikingTrailUpdateAction::PARAMETER_MAP, _trail->getMap()));
 					stream << t.cell("URL profil", t.getForm().getTextInput(HikingTrailUpdateAction::PARAMETER_PROFILE, _trail->getProfile()));
 					stream << t.cell("URL lien", t.getForm().getTextInput(HikingTrailUpdateAction::PARAMETER_URL, _trail->getURL()));
@@ -129,7 +129,7 @@ namespace synthese
 
 				}
 
-				stream << "<h1>Arrêts</h1>";
+				stream << "<h1>ArrÃªts</h1>";
 				{
 					AdminActionFunctionRequest<HikingTrailStopAddAction,HikingTrailAdmin> addRequest(_request);
 					addRequest.getAction()->setTrail(const_pointer_cast<HikingTrail>(_trail));
@@ -143,7 +143,7 @@ namespace synthese
 					HTMLTable::ColsVector c;
 					c.push_back("Rang");
 					c.push_back("Commune");
-					c.push_back("Arrêt");
+					c.push_back("ArrÃªt");
 					c.push_back("Action");
 					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 					stream << t.open();
@@ -157,7 +157,7 @@ namespace synthese
 						stream << t.col() << rank++;
 						stream << t.col() << stop->getCity()->getName();
 						stream << t.col() << stop->getName();
-						stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
+						stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer l'arrÃªt ?");
 					}
 					stream << t.row();
 					stream << t.col() << f.getRadioInput(HikingTrailStopAddAction::PARAMETER_RANK, optional<size_t>(rank), optional<size_t>(), string(), false);
@@ -195,7 +195,7 @@ namespace synthese
 		) const	{
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, profile.isAuthorized<HikingRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
+			_tabs.push_back(Tab("PropriÃ©tÃ©s", TAB_PROPERTIES, profile.isAuthorized<HikingRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
 
 			_tabBuilded = true;
 		}

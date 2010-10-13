@@ -206,7 +206,7 @@ namespace synthese
 			{
 				// XML header
 				stream <<
-					"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 					"<lines xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/LinesListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
 					;
 			}

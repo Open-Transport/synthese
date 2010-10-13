@@ -68,17 +68,17 @@ namespace synthese
 
 			<pre>
 			a=bra
-			sid=<id session> : ID de la session ouverte, issu du retour de la fonction de connexion d’utilisateur
-			actionParamcuid=<id utilisateur> : ID de l’utilisateur courant, issu du retour de la fonction de connexion d’utilisateur
+			sid=<id session> : ID de la session ouverte, issu du retour de la fonction de connexion dâ€™utilisateur
+			actionParamcuid=<id utilisateur> : ID de lâ€™utilisateur courant, issu du retour de la fonction de connexion dâ€™utilisateur
 			actionParamsit=<site id> : ID of the site used by the route planner
-			actionParamacc=35001|35002|35003 : type d’utilisateur pour filtrer sur les règles d’accessibilité et appliquer les règles de réservation adéquates. 35001 = piéton, 35002 = PMR, 35003 = vélo. Si non fourni, le calcul s’effectue pour un utilisateur piéton.
-			actionParamdct=<commune de départ> : commune de départ sous forme de texte
-			[actionParamdpt=<arrêt de départ>] : arrêt de départ sous forme de texte. Si non fourni, les arrêts principaux de la commune sont choisis.
-			actionParamact=<commune d’arrivée> : commune d’arrivée sous forme de texte
-			[actionParamapt=<arrêt d’arrivée>] : arrêt d’arrivée sous forme de texte. Si non fourni, les arrêts principaux de la commune sont choisis.
-			actionParamda=YYYY-MM-DD HH:II : date et heure exacte du depart de la solution à réserver
-			[actionParamtm =<id filtre mode de transport>] : identificateur de filtre sur les modes de transport (doit correspondre à un des filtres paramétrés sur le site)
-			actionParamsenu=<nombre de places> : nombre de places à réserver
+			actionParamacc=35001|35002|35003 : type dâ€™utilisateur pour filtrer sur les rÃ¨gles dâ€™accessibilitÃ© et appliquer les rÃ¨gles de rÃ©servation adÃ©quates. 35001 = piÃ©ton, 35002 = PMR, 35003 = vÃ©lo. Si non fourni, le calcul sâ€™effectue pour un utilisateur piÃ©ton.
+			actionParamdct=<commune de dÃ©part> : commune de dÃ©part sous forme de texte
+			[actionParamdpt=<arrÃªt de dÃ©part>] : arrÃªt de dÃ©part sous forme de texte. Si non fourni, les arrÃªts principaux de la commune sont choisis.
+			actionParamact=<commune dâ€™arrivÃ©e> : commune dâ€™arrivÃ©e sous forme de texte
+			[actionParamapt=<arrÃªt dâ€™arrivÃ©e>] : arrÃªt dâ€™arrivÃ©e sous forme de texte. Si non fourni, les arrÃªts principaux de la commune sont choisis.
+			actionParamda=YYYY-MM-DD HH:II : date et heure exacte du depart de la solution Ã  rÃ©server
+			[actionParamtm =<id filtre mode de transport>] : identificateur de filtre sur les modes de transport (doit correspondre Ã  un des filtres paramÃ©trÃ©s sur le site)
+			actionParamsenu=<nombre de places> : nombre de places Ã  rÃ©server
 			</pre>
 		*/
 		class BookReservationAction

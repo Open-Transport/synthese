@@ -160,7 +160,7 @@ namespace synthese
 			stream << searchTable.open();
 			stream << searchTable.cell("Login", searchTable.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin ? *_searchLogin : string()));
 			stream << searchTable.cell("Nom", searchTable.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName ? *_searchName : string()));
-			stream << searchTable.cell("Prénom", searchTable.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname ? *_searchSurname : string()));
+			stream << searchTable.cell("PrÃ©nom", searchTable.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname ? *_searchSurname : string()));
 			stream << searchTable.cell("Profil", searchTable.getForm().getSelectInput(
 					PARAM_SEARCH_PROFILE_ID,
 					SecurityModule::getProfileLabels(true),
@@ -168,7 +168,7 @@ namespace synthese
 			)	);
 			stream << searchTable.close();
 
-			stream << "<h1>Résultats de la recherche</h1>";
+			stream << "<h1>RÃ©sultats de la recherche</h1>";
 
 			// Search
 			UserTableSync::SearchResult users(
@@ -192,7 +192,7 @@ namespace synthese
 			)	);
 			
 			if (users.empty())
-				stream << "Aucun utilisateur trouvé";
+				stream << "Aucun utilisateur trouvÃ©";
 
 
 			ResultHTMLTable::HeaderVector v;
@@ -223,7 +223,7 @@ namespace synthese
 				stream << t.col() << HTMLModule::getHTMLLink(userRequest.getURL(), user->getName());
 				stream << t.col() << user->getProfile()->getName();
 				stream << t.col() << userRequest.getHTMLForm().getLinkButton("Ouvrir") << "&nbsp;"
-					<< deleteUserRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr(e) de vouloir supprimer l'utilisateur " + user->getLogin() + " ?");
+					<< deleteUserRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sÃ»r(e) de vouloir supprimer l'utilisateur " + user->getLogin() + " ?");
 			}
 
 			stream << t.row();

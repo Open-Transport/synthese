@@ -93,7 +93,7 @@ namespace synthese
 			// Send confirmation email
 			if(ResaModule::GetReservationContact()->sendCustomerEMail(*_user))
 			{
-				ResaDBLog::AddEMailEntry(*request.getSession(), *_user, "Message d'activation de réservation en ligne");
+				ResaDBLog::AddEMailEntry(*request.getSession(), *_user, "Message d'activation de rÃ©servation en ligne");
 			}
 		}
 		

@@ -67,9 +67,9 @@ namespace synthese
 			///	<tr><td>7</td><td colspan="6"></td><td>0</td></tr>
 			///	</table>
 			///
-			///	On obtient la classification de catégories suivante :
+			///	On obtient la classification de catÃ©gories suivante :
 			/// <table class="tableau">
-			///	<tr><th>Plage de dates</th><th>Influence periode scolaire</th><th>Tout/partiel</th><th>Code binaire</th><th>Code décimal</th></tr>
+			///	<tr><th>Plage de dates</th><th>Influence periode scolaire</th><th>Tout/partiel</th><th>Code binaire</th><th>Code dÃ©cimal</th></tr>
 			///	<tr><td rowspan="4">Service complet</td><td rowspan="2">Non</td><td>Totalite de la periode</td><td>00000000</td><td>0</td></tr>
 			///	<tr><td>Restriction</td><td>00000001</td><td>1</td></tr>
 			///	<tr><td rowspan="2">Oui</td><td>Totalite de la periode</td><td>00001000</td><td>0</td></tr>

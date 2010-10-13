@@ -66,10 +66,10 @@ namespace synthese
 
 				string pass2(map.getDefault<string>(PARAMETER_PASS2));
 				if (pass2 != _password)
-					throw ActionException("Les mots de passe entrés ne sont pas identiques");
+					throw ActionException("Les mots de passe entrÃ©s ne sont pas identiques");
 
 				if(_password.empty())
-					throw ActionException("Le mot de passe ne peut pas être vide");
+					throw ActionException("Le mot de passe ne peut pas Ãªtre vide");
 			}
 			catch (ObjectNotFoundException<User>)
 			{

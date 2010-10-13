@@ -164,10 +164,10 @@ namespace synthese
 
 			switch(status)
 			{
-			case OPTION: return statusText + " pouvant être annulée avant le " + to_simple_string(getReservationDeadLine());
+			case OPTION: return statusText + " pouvant Ãªtre annulÃ©e avant le " + to_simple_string(getReservationDeadLine());
 			case CANCELLED: return statusText + " le " + to_simple_string(_cancellationTime);
 			case CANCELLED_AFTER_DELAY: return statusText + " le " + to_simple_string(_cancellationTime);
-			case NO_SHOW: return statusText + " constatée le " + to_simple_string(_cancellationTime);
+			case NO_SHOW: return statusText + " constatÃ©e le " + to_simple_string(_cancellationTime);
 			}
 
 			return statusText;

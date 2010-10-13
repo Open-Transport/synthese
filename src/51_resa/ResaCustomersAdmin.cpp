@@ -121,12 +121,12 @@ namespace synthese
 			stream << "<h1>Recherche</h1>";
 			stream << st.open();
 			stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName ? *_searchName : string()));
-			stream << st.cell("Prénom", st.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname ? *_searchSurname : string()));
+			stream << st.cell("PrÃ©nom", st.getForm().getTextInput(PARAM_SEARCH_SURNAME, _searchSurname ? *_searchSurname : string()));
 			stream << st.cell("Login", st.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin ? *_searchLogin : string()));
 			stream << st.close();
 			stream << st.getForm().setFocus(PARAM_SEARCH_NAME);
 
-			stream << "<h1>Résultats</h1>";
+			stream << "<h1>RÃ©sultats</h1>";
 
 			// Search
 			UserTableSync::SearchResult users(
@@ -150,13 +150,13 @@ namespace synthese
 
 			// Results
 			if (users.empty())
-				stream << "<p>Aucun client trouvé.</p>";
+				stream << "<p>Aucun client trouvÃ©.</p>";
 			else
 			{
 				ResultHTMLTable::HeaderVector h;
 				h.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
-				h.push_back(make_pair(string(), "Prénom"));
-				h.push_back(make_pair(string(), "Téléphone"));
+				h.push_back(make_pair(string(), "PrÃ©nom"));
+				h.push_back(make_pair(string(), "TÃ©lÃ©phone"));
 				h.push_back(make_pair(PARAM_SEARCH_LOGIN, "Login"));
 				h.push_back(make_pair(string(), "Action"));
 				

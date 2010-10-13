@@ -86,7 +86,7 @@ namespace synthese
 			//@}
 
 			
-			/** Autorisation d'afficher une ligne sur le tableau de départs.
+			/** Autorisation d'afficher une ligne sur le tableau de dÃ©parts.
 				@param linestop linestop to test
 			*/
 				bool _allowedLineStop(const pt::LineStop*) const;

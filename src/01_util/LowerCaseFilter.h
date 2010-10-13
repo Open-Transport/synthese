@@ -46,14 +46,14 @@ LowerCaseFilter::put(Sink& dest, int c)
 		return boost::iostreams::put(dest, c - 'A' + 'a');
     }
 	else if(
-		c >= 'À' && c <= 'Þ'
+		c >= 'Ã€' && c <= 'Ãž'
 	){
-		return boost::iostreams::put(dest, c - 'À' + 'à');
+		return boost::iostreams::put(dest, c - 'Ã€' + 'Ã ');
 	}
 	else if(
-		c == 'Œ'
+		c == 'Å’'
 	){
-		return boost::iostreams::put(dest, 'œ');
+		return boost::iostreams::put(dest, 'Å“');
 	}
 	else
 	{

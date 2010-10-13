@@ -121,9 +121,9 @@ namespace synthese
 			PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
 			stream << "<h1>Modification du type d'affichage</h1>";
 			stream << t.open();
-			stream << t.title("Propriétés");
+			stream << t.title("PropriÃ©tÃ©s");
 			stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayTypeAction::PARAMETER_NAME, _type->getName()));
-			stream << t.title("Paramètres d'affichage");
+			stream << t.title("ParamÃ¨tres d'affichage");
 			stream <<
 				t.cell(
 					"Interface d'affichage",
@@ -143,7 +143,7 @@ namespace synthese
 			;
 			stream <<
 				t.cell(
-					"Page CMS pour rangée",
+					"Page CMS pour rangÃ©e",
 					t.getForm().getTextInput(
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_ROW_PAGE_ID,
 						_type->getDisplayRowPage() ? lexical_cast<string>(_type->getDisplayRowPage()->getKey()) : string()
@@ -167,7 +167,7 @@ namespace synthese
 			;
 			stream <<
 				t.cell(
-					"Rangées",
+					"RangÃ©es",
 					t.getForm().getSelectNumberInput(
 						UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER,
 						1, 99,
@@ -175,7 +175,7 @@ namespace synthese
 				)	)
 			;
 			stream << t.cell(
-				"Max arrêts intermédiaires",
+				"Max arrÃªts intermÃ©diaires",
 				t.getForm().getSelectNumberInput(
 					UpdateDisplayTypeAction::PARAMETER_MAX_STOPS_NUMBER,
 					0, 99,
@@ -183,13 +183,13 @@ namespace synthese
 					1,
 					"(pas de limite)"
 			)	);
-			stream << t.title("Paramètres sonores");
+			stream << t.title("ParamÃ¨tres sonores");
 			stream << t.cell("Interface vocale", t.getForm().getSelectInput(
 					UpdateDisplayTypeAction::PARAMETER_AUDIO_INTERFACE_ID,
 					InterfaceTableSync::_GetInterfaceLabels(optional<string>(), string("(aucune)"), string("undefined")),
 					optional<RegistryKeyType>(_type->getAudioInterface() ? _type->getAudioInterface()->getKey() : 0)
 			)	);
-			stream << t.title("Paramètres de supervision");
+			stream << t.title("ParamÃ¨tres de supervision");
 			stream <<
 				t.cell(
 					"Protocole de supervision",
@@ -201,7 +201,7 @@ namespace synthese
 			;
 			stream <<
 				t.cell(
-					"Durée entre les contrôles",
+					"DurÃ©e entre les contrÃ´les",
 					t.getForm().getSelectNumberInput(
 						UpdateDisplayTypeAction::PARAMETER_TIME_BETWEEN_CHECKS,
 						1, 120,

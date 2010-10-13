@@ -167,18 +167,18 @@ namespace synthese
 			{
 			case ALL_DAYS: return "Sans limite";
 			case ALL_DAYS_RESTRICTION: return "Sans limite avec jours restreints";
-			case ALL_DAYS_SCHOOL: return "Sans limite avec périodes scolaires";
-			case ALL_DAYS_SCHOOL_RESTRICTION: return "Sans limite avec périodes scolaires avec jours restreints";
+			case ALL_DAYS_SCHOOL: return "Sans limite avec pÃ©riodes scolaires";
+			case ALL_DAYS_SCHOOL_RESTRICTION: return "Sans limite avec pÃ©riodes scolaires avec jours restreints";
 			case TIMESTAMP: return "Plage de dates";
 			case TIMESTAMP_RESTRICTION: return "Plage de dates avec jours restreints";
-			case TIMESTAMP_SCHOOL: return "Plage de dates avec périodes scolaires";
-			case TIMESTAMP_SCHOOL_RESTRICTION: return "Plage de dates avec périodes scolaires avec jours restreints";
-			case RESTRICTED: return "Période particulière";
-			case RESTRICTED_RESTRICTION: return "Période particulière avec jours restreints";
-			case RESTRICTED_SCHOOL: return "Période particulière avec périodes scolaires";
-			case RESTRICTED_SCHOOL_RESTRICTION: return "Période particulière avec périodes scolaires avec jours restreints";
+			case TIMESTAMP_SCHOOL: return "Plage de dates avec pÃ©riodes scolaires";
+			case TIMESTAMP_SCHOOL_RESTRICTION: return "Plage de dates avec pÃ©riodes scolaires avec jours restreints";
+			case RESTRICTED: return "PÃ©riode particuliÃ¨re";
+			case RESTRICTED_RESTRICTION: return "PÃ©riode particuliÃ¨re avec jours restreints";
+			case RESTRICTED_SCHOOL: return "PÃ©riode particuliÃ¨re avec pÃ©riodes scolaires";
+			case RESTRICTED_SCHOOL_RESTRICTION: return "PÃ©riode particuliÃ¨re avec pÃ©riodes scolaires avec jours restreints";
 			}
-			return "Autre catégorie";
+			return "Autre catÃ©gorie";
 		}
 
 

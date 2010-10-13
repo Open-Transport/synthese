@@ -50,35 +50,35 @@ namespace synthese
 			<pre>
 			fonction=lp
 			si=<id website> : site id
-			t=<texte saisi> : texte entré par l’utilisateur
-			n=<nombre resultats> : nombre de résultats devant être fournis par le serveur
-			ct=<nom de commune> : texte de commune validé (issu du retour de la fonction de recherche de nom de commune CityListRequest) ou non
+			t=<texte saisi> : texte entrÃ© par lâ€™utilisateur
+			n=<nombre resultats> : nombre de rÃ©sultats devant Ãªtre fournis par le serveur
+			ct=<nom de commune> : texte de commune validÃ© (issu du retour de la fonction de recherche de nom de commune CityListRequest) ou non
 			p=<id> : id of web page to use for the display of the list, by PlacesListItemInterfacePage
 			ip=<id> : id of web page to use for the display of each returned item, by PlacesListItemInterfacePage
 			</pre>
 
-			<h3>Réponse</h3>
+			<h3>RÃ©ponse</h3>
 
-			La réponse propose, dans l’ordre décroissant de pertinence, les n communes dont le nom
-			est le plus proche possible du texte entré.
+			La rÃ©ponse propose, dans lâ€™ordre dÃ©croissant de pertinence, les n communes dont le nom
+			est le plus proche possible du texte entrÃ©.
 			
-			Si p est spécifié, la réponse est définie par la page PlacesListInterfacePage désignée.
-			Si p n'est pas spécifié, la réponse respecte le schéma XML suivant :
+			Si p est spÃ©cifiÃ©, la rÃ©ponse est dÃ©finie par la page PlacesListInterfacePage dÃ©signÃ©e.
+			Si p n'est pas spÃ©cifiÃ©, la rÃ©ponse respecte le schÃ©ma XML suivant :
 
 			@image html options.png
 
-			Les objets suivants sont définis :
+			Les objets suivants sont dÃ©finis :
 			<ul>
 				<li>options : balise racine</li>
-				<li>option : définit un élément retourné</li>
-				<li>score : taux de correspondance entre le texte proposé et le texte entré, entre 0
-				(limite basse théorique) et 1 (texte identique).</li>
-				<li>Type : type d’objet retourné :
+				<li>option : dÃ©finit un Ã©lÃ©ment retournÃ©</li>
+				<li>score : taux de correspondance entre le texte proposÃ© et le texte entrÃ©, entre 0
+				(limite basse thÃ©orique) et 1 (texte identique).</li>
+				<li>Type : type dâ€™objet retournÃ© :
 				<ul>
-					<li>stop : arrêt du réseau de transport</li>
+					<li>stop : arrÃªt du rÃ©seau de transport</li>
 					<li>publicPlace : lieu public</li>
-					<li>street : rue entière (tous points de la rue considérés équivalents)</li>
-					<li>address : adresse sur une rue (point précis sur la rue)</li>
+					<li>street : rue entiÃ¨re (tous points de la rue considÃ©rÃ©s Ã©quivalents)</li>
+					<li>address : adresse sur une rue (point prÃ©cis sur la rue)</li>
 			</ul></ul>
 
 			<h3>Attachments</h3>

@@ -35,24 +35,24 @@ namespace synthese
 	{
 		class Profile;
 
-		/** Habilitation portant sur la gestion de la sécurité.
+		/** Habilitation portant sur la gestion de la sÃ©curitÃ©.
 			@ingroup m12Rights refRights
 
-			Les niveaux de droit utilisés sont les suivants :
+			Les niveaux de droit utilisÃ©s sont les suivants :
 
-			Habilitations privées :
-				- USE : Autorise à l'utilisateur à se connecter
-				- READ : Permet à l'utilisateur de consulter les propriétés de son compte, sauf celles de la catégorie "Droits"
-				- WRITE : Permet à l'utilisateur de consulter les propriétés de son compte, sauf celles de la catégorie "Droits"
+			Habilitations privÃ©es :
+				- USE : Autorise Ã  l'utilisateur Ã  se connecter
+				- READ : Permet Ã  l'utilisateur de consulter les propriÃ©tÃ©s de son compte, sauf celles de la catÃ©gorie "Droits"
+				- WRITE : Permet Ã  l'utilisateur de consulter les propriÃ©tÃ©s de son compte, sauf celles de la catÃ©gorie "Droits"
 
 			Habilitations publiques :
-				- READ : Permet de consulter toutes les propriétés de tous les comptes
-				- WRITE : Permet de modifier toutes les propriétés de tous les comptes, d'administrer les profils utilisateurs
+				- READ : Permet de consulter toutes les propriÃ©tÃ©s de tous les comptes
+				- WRITE : Permet de modifier toutes les propriÃ©tÃ©s de tous les comptes, d'administrer les profils utilisateurs
 				- DELETE : Permet de supprimer un compte, un profil utilisateur
 
-			Définition du périmètre :
-				- Profile : Autorisation portant sur les utilisateurs du profil spécifié
-				- NB : Une habilitation sans périmètre reste restreinte à l'ensemble des profils inférieurs ou égaux, au sens de l'opérateur <= sur les profils.
+			DÃ©finition du pÃ©rimÃ¨tre :
+				- Profile : Autorisation portant sur les utilisateurs du profil spÃ©cifiÃ©
+				- NB : Une habilitation sans pÃ©rimÃ¨tre reste restreinte Ã  l'ensemble des profils infÃ©rieurs ou Ã©gaux, au sens de l'opÃ©rateur <= sur les profils.
 		*/
 		class SecurityRight : public RightTemplate<SecurityRight>
 		{

@@ -314,7 +314,7 @@ namespace synthese
 					{
 						distance = 0;
 
-						// LIGNE ARRET MONTEE Si premier point d'arrêt et si alerte
+						// LIGNE ARRET MONTEE Si premier point d'arrÃªt et si alerte
 						if (leg.getDepartureEdge()->getHub() != lastPlace)
 						{
 							/*					ptime debutPrem(leg.getDepartureDateTime());

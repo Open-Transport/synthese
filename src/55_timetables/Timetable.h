@@ -48,7 +48,7 @@ namespace synthese
 		class TimetableRow;
 		
 		/** Timetable class.
-			Tableau d'indicateur papier, caractérisée par:
+			Tableau d'indicateur papier, caractÃ©risÃ©e par:
 				- des gares (cGareIndicateurs)
 				- des colonnes (cColonneIndicateurs)
 				- un masque de circulation de base (JC)

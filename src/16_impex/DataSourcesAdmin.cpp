@@ -54,7 +54,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<DataSourcesAdmin>::ICON("database.png");
-		template<> const string AdminInterfaceElementTemplate<DataSourcesAdmin>::DEFAULT_TITLE("Sources de données");
+		template<> const string AdminInterfaceElementTemplate<DataSourcesAdmin>::DEFAULT_TITLE("Sources de donnÃ©es");
 	}
 
 	namespace impex

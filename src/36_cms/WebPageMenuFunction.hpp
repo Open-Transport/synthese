@@ -115,8 +115,8 @@ namespace synthese
 			
 
 			/** Recursive menu generator.
-				@param current_page Page déterminant la racine du menu (non affichée : produit la liste d'éléments inférieurs)
-				@param depth Profondeur en cours de tracé
+				@param current_page Page dÃ©terminant la racine du menu (non affichÃ©e : produit la liste d'Ã©lÃ©ments infÃ©rieurs)
+				@param depth Profondeur en cours de tracÃ©
 				@param page_in_branch Page is in current submenu : return the current page code
 				@return page_in_branch Page is in submenus from the current page
 			*/

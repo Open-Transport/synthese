@@ -201,15 +201,15 @@ namespace synthese
 					{
 						ptime endRange(its->getDepartureDateTime());
 						endRange += journey->getContinuousServiceRange();
-						*_logStream << " - Service continu jusqu'à " << endRange;
+						*_logStream << " - Service continu jusqu'Ã  " << endRange;
 					}
 					if (journey->getReservationCompliance() == true)
 					{
-						*_logStream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine();
+						*_logStream << " - RÃ©servation obligatoire avant le " << journey->getReservationDeadLine();
 					}
 					if (journey->getReservationCompliance() == boost::logic::indeterminate)
 					{
-						*_logStream << " - Réservation facultative avant le " << journey->getReservationDeadLine();
+						*_logStream << " - RÃ©servation facultative avant le " << journey->getReservationDeadLine();
 					}
 */
 					*_logStream << "<tr>";

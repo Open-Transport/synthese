@@ -57,7 +57,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<StopPointAdmin>::ICON("building.png");
-		template<> const string AdminInterfaceElementTemplate<StopPointAdmin>::DEFAULT_TITLE("Arrêt physique");
+		template<> const string AdminInterfaceElementTemplate<StopPointAdmin>::DEFAULT_TITLE("ArrÃªt physique");
 	}
 
 	namespace pt
@@ -127,7 +127,7 @@ namespace synthese
 				stream << t.cell("Nom", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_NAME, _stop->getName()));
 				stream << t.cell("X", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_X, lexical_cast<string>(_stop->getGeometry()->getX())));
 				stream << t.cell("Y", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_Y, lexical_cast<string>(_stop->getGeometry()->getY())));
-				stream << t.cell("Code opérateur", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_OPERATOR_CODE, _stop->getCodeBySource()));
+				stream << t.cell("Code opÃ©rateur", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_OPERATOR_CODE, _stop->getCodeBySource()));
 				stream << t.close();
 			}
 
@@ -170,7 +170,7 @@ namespace synthese
 		) const	{
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, profile.isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
+			_tabs.push_back(Tab("PropriÃ©tÃ©s", TAB_PROPERTIES, profile.isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
 
 			_tabBuilded = true;
 		}

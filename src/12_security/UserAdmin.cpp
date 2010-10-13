@@ -119,20 +119,20 @@ namespace synthese
 
 
 			{
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
 				t.getForm().setUpdateRight(writeRights);
 				stream << t.open();
 				stream << t.title("Connexion");
 				stream << t.cell("Login", t.getForm().getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin()));
 				
-				stream << t.title("Coordonnées");
-				stream << t.cell("Prénom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname()));
+				stream << t.title("CoordonnÃ©es");
+				stream << t.cell("PrÃ©nom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname()));
 				stream << t.cell("Nom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_NAME, _user->getName()));
 				stream << t.cell("Adresse", t.getForm().getTextAreaInput(UserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50));
 				stream << t.cell("Code postal", t.getForm().getTextInput(UserUpdateAction::PARAMETER_POSTAL_CODE, _user->getPostCode()));
 				stream << t.cell("Ville", t.getForm().getTextInput(UserUpdateAction::PARAMETER_CITY, _user->getCityText()));
-				stream << t.cell("Téléphone",t.getForm().getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
+				stream << t.cell("TÃ©lÃ©phone",t.getForm().getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
 				stream << t.cell("E-mail",t.getForm().getTextInput(UserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
 				
 				if(	_request.isAuthorized<SecurityRight>(
@@ -141,7 +141,7 @@ namespace synthese
 						_user->getProfile() ? lexical_cast<string>(_user->getProfile()->getKey()) : GLOBAL_PERIMETER
 				)	){
 					stream << t.title("Droits");
-					stream << t.cell("Connexion autorisée",t.getForm().getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
+					stream << t.cell("Connexion autorisÃ©e",t.getForm().getOuiNonRadioInput(UserUpdateAction::PARAMETER_AUTHORIZED_LOGIN, _user->getConnectionAllowed()));
 					stream << t.cell(
 						"Profil",
 						t.getForm().getSelectInput(
@@ -160,7 +160,7 @@ namespace synthese
 				PropertiesHTMLTable t(userPasswordUpdateRequest.getHTMLForm("pass"));
 				stream << t.open();
 				stream << t.cell("Mot de passe", t.getForm().getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS1, ""));
-				stream << t.cell("Mot de passe (vérification)", t.getForm().getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS2, ""));
+				stream << t.cell("Mot de passe (vÃ©rification)", t.getForm().getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS2, ""));
 				stream << t.close();
 			}
 		}

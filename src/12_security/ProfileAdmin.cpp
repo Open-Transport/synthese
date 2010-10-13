@@ -124,10 +124,10 @@ namespace synthese
 			privatePublicMap.push_back(make_pair((int) USE, "Utilisation"));
 			privatePublicMap.push_back(make_pair((int) READ, "Lecture"));
 			privatePublicMap.push_back(make_pair((int) WRITE, "Ecriture"));
-			privatePublicMap.push_back(make_pair((int) DELETE_RIGHT, "Contrôle total"));
+			privatePublicMap.push_back(make_pair((int) DELETE_RIGHT, "ContrÃ´le total"));
 			
 
-			stream	<< "<h1>Propriétés</h1>";
+			stream	<< "<h1>PropriÃ©tÃ©s</h1>";
 
 			PropertiesHTMLTable pt(updateRequest.getHTMLForm("update"));
 			stream << pt.open();
@@ -142,7 +142,7 @@ namespace synthese
 			{
 				HTMLTable::ColsVector v;
 				v.push_back("Nature");
-				v.push_back("Périmètre");
+				v.push_back("PÃ©rimÃ¨tre");
 				v.push_back("Droits");
 				v.push_back("Actions");
 				HTMLTable t(v, "adminresults");
@@ -168,7 +168,7 @@ namespace synthese
 								optional<int>((int) right->getPublicRightLevel())
 							);
 						if (right->getUsePrivateRights())
-							stream << " Privé : " <<
+							stream << " PrivÃ© : " <<
 							form.getSelectInput(
 								UpdateRightAction::PARAMETER_PRIVATE_VALUE,
 								privatePublicMap,
@@ -182,7 +182,7 @@ namespace synthese
 						HTMLForm form(deleteRightRequest.getHTMLForm("d" + right->getFactoryKey() + right->getParameter()));
 						form.addHiddenField(DeleteRightAction::PARAMETER_RIGHT, right->getFactoryKey());
 						form.addHiddenField(DeleteRightAction::PARAMETER_PARAMETER, right->getParameter());
-						stream << form.getLinkButton("Supprimer","Etes-vous sûr(e) de vouloir supprimer l'habilitation sélectionnée ?");
+						stream << form.getLinkButton("Supprimer","Etes-vous sÃ»r(e) de vouloir supprimer l'habilitation sÃ©lectionnÃ©e ?");
 					}
 				}
 				stream << t.close();
@@ -192,9 +192,9 @@ namespace synthese
 
 			HTMLTable::ColsVector v;
 			v.push_back("Nature");
-			v.push_back("Périmètre");
+			v.push_back("PÃ©rimÃ¨tre");
 			v.push_back("Droit public");
-			v.push_back("Droit privé");
+			v.push_back("Droit privÃ©");
 			v.push_back("Action");
 			HTMLTable t(v, "adminresults");
 

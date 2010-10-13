@@ -82,7 +82,7 @@ namespace synthese
 				, 1
 			);
 			if (!_env->getRegistry<DisplayScreen>().empty())
-				throw ActionException("Ce type d'afficheur ne peut être supprimé car il est utilisé par au moins un afficheur.");
+				throw ActionException("Ce type d'afficheur ne peut Ãªtre supprimÃ© car il est utilisÃ© par au moins un afficheur.");
 		}
 
 		void DisplayTypeRemoveAction::run(Request& request)

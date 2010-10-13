@@ -7,7 +7,7 @@
  *	what ever you want with it.
  *
  *	Feb. 2005
- *	Benjamin Grüdelbach
+ *	Benjamin GrÃ¼delbach
  */
 
 //include protection

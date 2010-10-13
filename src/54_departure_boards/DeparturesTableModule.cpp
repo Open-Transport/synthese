@@ -49,7 +49,7 @@ namespace synthese
 	
 	namespace server
 	{
-		template<> const string ModuleClassTemplate<DeparturesTableModule>::NAME("SAI Tableaux de départs");
+		template<> const string ModuleClassTemplate<DeparturesTableModule>::NAME("SAI Tableaux de dÃ©parts");
 		
 		template<> void ModuleClassTemplate<DeparturesTableModule>::PreInit()
 		{
@@ -77,7 +77,7 @@ namespace synthese
 			}
 			if (withNone)
 			{
-				m.push_back(make_pair(0, "(non défini)"));
+				m.push_back(make_pair(0, "(non dÃ©fini)"));
 			}
 			DisplayTypeTableSync::SearchResult types(
 				DisplayTypeTableSync::Search(Env::GetOfficialEnv())

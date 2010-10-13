@@ -118,7 +118,7 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(log, "Code de branchement bus RS485", _screen->getWiringCode(), _wiringCode);
 			DBLogModule::appendToLogIfChange(log, "Type de panneau", ((_screen->getType() != NULL) ? _screen->getType()->getName() : string()), ((_type.get() != NULL) ? _type->getName() : string()));
 			DBLogModule::appendToLogIfChange(log, "Port COM", _screen->getComPort(), _comPort);
-			DBLogModule::appendToLogIfChange(log, "Unité centrale hôte", ((_screen->getRoot<DisplayScreenCPU>() != NULL) ? _screen->getRoot<DisplayScreenCPU>()->getName() : string()), ((_cpu.get() != NULL) ? _cpu->getName() : string()));
+			DBLogModule::appendToLogIfChange(log, "UnitÃ© centrale hÃ´te", ((_screen->getRoot<DisplayScreenCPU>() != NULL) ? _screen->getRoot<DisplayScreenCPU>()->getName() : string()), ((_cpu.get() != NULL) ? _cpu->getName() : string()));
 			DBLogModule::appendToLogIfChange(log, "Adresse MAC", _screen->getMacAddress(), _macAddress);
 
 

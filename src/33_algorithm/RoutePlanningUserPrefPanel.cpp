@@ -38,7 +38,7 @@ namespace synthese
 	namespace security
 	{
 		template<>
-		const string UserPrefPanelTemplate<RoutePlanningUserPrefPanel>::NAME("Recherche d'itinéraires");
+		const string UserPrefPanelTemplate<RoutePlanningUserPrefPanel>::NAME("Recherche d'itinÃ©raires");
 	}
 
 	namespace routeplanner

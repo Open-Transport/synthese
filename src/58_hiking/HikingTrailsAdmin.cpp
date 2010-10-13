@@ -57,7 +57,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<HikingTrailsAdmin>::ICON("map.png");
-		template<> const string AdminInterfaceElementTemplate<HikingTrailsAdmin>::DEFAULT_TITLE("Randonnées");
+		template<> const string AdminInterfaceElementTemplate<HikingTrailsAdmin>::DEFAULT_TITLE("RandonnÃ©es");
 	}
 
 	namespace hiking
@@ -119,7 +119,7 @@ namespace synthese
 			stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName ? *_searchName : string()));
 			stream << st.close();
 
-			stream << "<h1>Résultats</h1>";
+			stream << "<h1>RÃ©sultats</h1>";
 
 			HikingTrailTableSync::SearchResult trails(HikingTrailTableSync::Search(_getEnv()));
 
@@ -146,12 +146,12 @@ namespace synthese
 				stream << t.row();
 				stream << t.col() << trail->getName();
 				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), HikingTrailAdmin::ICON);
-				stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la randonnée ?", HikingTrailAdmin::ICON);
+				stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer la randonnÃ©e ?", HikingTrailAdmin::ICON);
 			}
 
 			stream << t.row();
 			stream << t.col() << f.getTextInput(HikingTrailAddAction::PARAMETER_NAME, string(), "(entrez le nom ici)");
-			stream << t.col(2) << f.getSubmitButton("Créer");
+			stream << t.col(2) << f.getSubmitButton("CrÃ©er");
 			
 			stream << t.close();
 			stream << f.close();

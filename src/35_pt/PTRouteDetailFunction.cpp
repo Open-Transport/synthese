@@ -79,7 +79,7 @@ namespace synthese
 			const CommercialLine * commercialLine(_journeyPattern->getCommercialLine());
 			// XML header
 			stream <<
-				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 				"<route xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/PTRouteDetailFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance" <<
 				"\" id=\""            << _journeyPattern->getKey() <<
 				"\" name=\""          << _journeyPattern->getName()<<

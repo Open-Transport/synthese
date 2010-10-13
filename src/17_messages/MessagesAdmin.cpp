@@ -75,7 +75,7 @@ namespace synthese
 	namespace admin
 	{
 		template <> const string AdminInterfaceElementTemplate<MessagesAdmin>::ICON("note.png");
-		template <> const string AdminInterfaceElementTemplate<MessagesAdmin>::DEFAULT_TITLE("Messages diffusés");
+		template <> const string AdminInterfaceElementTemplate<MessagesAdmin>::DEFAULT_TITLE("Messages diffusÃ©s");
 	}
 
 	namespace messages
@@ -166,11 +166,11 @@ namespace synthese
 			AdminActionFunctionRequest<ScenarioStopAction,MessagesAdmin> scenarioStopRequest(_request);
 			
 			vector<pair<optional<SentScenarioInheritedTableSync::StatusSearch>, string> > statusMap;
-			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING, "En diffusion / prévu"));
+			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING, "En diffusion / prÃ©vu"));
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING_WITH_END, "&nbsp;&gt;&nbsp;En cours avec date de fin"));
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING_WITHOUT_END, "&nbsp;&gt;&nbsp;En cours sans date de fin"));
-			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::FUTURE_BROADCAST, "&nbsp;&gt;&nbsp;Diffusion ultérieure"));
-			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_OVER, "Archivés"));
+			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::FUTURE_BROADCAST, "&nbsp;&gt;&nbsp;Diffusion ultÃ©rieure"));
+			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_OVER, "ArchivÃ©s"));
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_DRAFT, "Brouillons"));
 			
 			ptime now(second_clock::local_time());
@@ -197,7 +197,7 @@ namespace synthese
 //				s.getForm().getSelectInput(PARAMETER_SEARCH_CONFLICT, MessagesModule::getConflictLabels(true), _searchConflict)
 //			);
 			stream << s.cell(
-				"Modèle",
+				"ModÃ¨le",
 				s.getForm().getSelectInput(
 					PARAMETER_SEARCH_LEVEL,
 					MessagesModule::GetScenarioTemplatesLabels(
@@ -211,7 +211,7 @@ namespace synthese
 
 			stream << s.close();
 
-			stream << "<h1>Résultats de la recherche</h1>";
+			stream << "<h1>RÃ©sultats de la recherche</h1>";
 
 			SentScenarioInheritedTableSync::SearchResult scenarios(
 				SentScenarioInheritedTableSync::Search(
@@ -233,7 +233,7 @@ namespace synthese
 			ActionResultHTMLTable::HeaderVector v1;
 			v1.push_back(make_pair(string(), string("Statut")));
 			v1.push_back(make_pair(PARAMETER_SEARCH_DATE, string("Dates")));
-			v1.push_back(make_pair(PARAMETER_SEARCH_LEVEL, string("Modèle")));
+			v1.push_back(make_pair(PARAMETER_SEARCH_LEVEL, string("ModÃ¨le")));
 			v1.push_back(make_pair(PARAMETER_SEARCH_NAME, string("Nom")));
 //			v1.push_back(make_pair(PARAMETER_SEARCH_CONFLICT, string("Conflit")));
 			v1.push_back(make_pair(string(), string("Actions")));
@@ -292,7 +292,7 @@ namespace synthese
 				{
 					if (!message->getPeriodEnd().is_not_a_date_time() && message->getPeriodEnd() < now)
 					{
-						stream << "Archivé";
+						stream << "ArchivÃ©";
 					}
 					else
 					{
@@ -303,7 +303,7 @@ namespace synthese
 				{
 					if (!message->getPeriodEnd().is_not_a_date_time() && message->getPeriodEnd() < now)
 					{
-						stream << "Archivé";
+						stream << "ArchivÃ©";
 					}
 					else if(message->getPeriodStart().is_not_a_date_time() || message->getPeriodStart() <= now)
 					{
@@ -311,7 +311,7 @@ namespace synthese
 					}
 					else
 					{
-						stream << "Prévu";
+						stream << "PrÃ©vu";
 					}
 				}
 				
@@ -348,7 +348,7 @@ namespace synthese
 				if (message->isApplicable(now))
 				{
 					scenarioStopRequest.getAction()->setScenario(message);
-					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "Arrêter", "Etes-vous sûr de vouloir arrêter la diffusion des messages ?", "stop.png");
+					stream << "&nbsp;" << HTMLModule::getLinkButton(scenarioStopRequest.getURL(), "ArrÃªter", "Etes-vous sÃ»r de vouloir arrÃªter la diffusion des messages ?", "stop.png");
 				}
 			}
 			stream << t1.row(string());
@@ -358,7 +358,7 @@ namespace synthese
 				t1.col() <<
 				t1.getActionForm().getSelectInput(
 					NewScenarioSendAction::PARAMETER_TEMPLATE,
-					MessagesModule::GetScenarioTemplatesLabels(string(),"(pas de modéle)"),
+					MessagesModule::GetScenarioTemplatesLabels(string(),"(pas de modÃ©le)"),
 					optional<RegistryKeyType>()
 				)
 			;

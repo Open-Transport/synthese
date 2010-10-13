@@ -151,14 +151,14 @@ namespace synthese
 				AdminFunctionRequest<DeparturesTableBenchmarkAdmin> reloadRequest(_request);
 				reloadRequest.getPage()->_doIt = true;
 
-				stream << "<h1>Résultats</h1>";
+				stream << "<h1>RÃ©sultats</h1>";
 
 				HTMLTable::ColsVector h;
-				h.push_back("N°");
+				h.push_back("NÂ°");
 				h.push_back("Nature");
 				h.push_back("Objet");
 				h.push_back("Temps calcul");
-				h.push_back("Taille générée");
+				h.push_back("Taille gÃ©nÃ©rÃ©e");
 				HTMLTable t(h, ResultHTMLTable::CSS_CLASS);
 				
 				int rank(1);
@@ -173,13 +173,13 @@ namespace synthese
 					stream << t.col();
 					if(testCase.method == DisplayScreenContentFunction::FACTORY_KEY)
 					{
-						stream << "Tableau de départs " << UpdateDisplayPreselectionParametersAction::GetFunctionList()[UpdateDisplayPreselectionParametersAction::GetFunction(*testCase.screen)];
+						stream << "Tableau de dÃ©parts " << UpdateDisplayPreselectionParametersAction::GetFunctionList()[UpdateDisplayPreselectionParametersAction::GetFunction(*testCase.screen)];
 						stream << t.col();
 						stream << testCase.screen->getFullName();
 					}
 					if(testCase.method == CPUGetWiredScreensFunction::FACTORY_KEY)
 					{
-						stream << "Unité centrale ";
+						stream << "UnitÃ© centrale ";
 						stream << t.col();
 						stream << testCase.cpu->getFullName();
 					}
@@ -204,14 +204,14 @@ namespace synthese
 					stream << t.col() << setprecision(2) << fixed << (static_cast<float>(total_size) / (1024 * (rank - 1))) << " ko";;
 				
 					stream << t.row();
-					stream << t.col(3) << "Taux d'utilisation du serveur si une requête par minute";
+					stream << t.col(3) << "Taux d'utilisation du serveur si une requÃªte par minute";
 					stream << t.col(2) << setprecision(2) << fixed << (static_cast<float>(total_duration.total_milliseconds()) / 600) << " %";
 
 					if(total_duration.total_milliseconds() > 0)
 					{
 						stream << t.row();
-						stream << t.col(3) << "Capacité du serveur si une requête par minute";
-						stream << t.col(2) << "Env. " << setprecision(0) << fixed << ((60000 * (rank - 1)) / total_duration.total_milliseconds()) << " équipements";
+						stream << t.col(3) << "CapacitÃ© du serveur si une requÃªte par minute";
+						stream << t.col(2) << "Env. " << setprecision(0) << fixed << ((60000 * (rank - 1)) / total_duration.total_milliseconds()) << " Ã©quipements";
 					}
 				}
 
@@ -220,14 +220,14 @@ namespace synthese
 				stream << "<p>" << reloadRequest.getHTMLForm().getLinkButton("Relancer le benchmark", string(), ICON) << "</p>";
 
 				stream << "<h1>Informations</h1>";
-				stream << "<p class=\"info\">Les temps mesurés s'entendent hors requêtes de supervision.</p>";
-				stream << "<p class=\"info\">Les tailles mesurées s'entendent hors fichiers joints éventuels (images, etc.)</p>";
+				stream << "<p class=\"info\">Les temps mesurÃ©s s'entendent hors requÃªtes de supervision.</p>";
+				stream << "<p class=\"info\">Les tailles mesurÃ©es s'entendent hors fichiers joints Ã©ventuels (images, etc.)</p>";
 			}
 			else
 			{
 				AdminRequest doRequest(_request,true);
 
-				stream << "<p class=\"info\">Le lancement du benchmark peut affecter les performances du système durant le test. Etes-vous sûr de vouloir lancer le benchmark ?</p>";
+				stream << "<p class=\"info\">Le lancement du benchmark peut affecter les performances du systÃ¨me durant le test. Etes-vous sÃ»r de vouloir lancer le benchmark ?</p>";
 				HTMLForm f(doRequest.getHTMLForm());
 				stream << f.open();
 				stream << "<p>" << f.getOuiNonRadioInput(PARAMETER_DOIT, false) << "</p>";

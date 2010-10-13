@@ -80,7 +80,7 @@ namespace synthese
 		){
 			DBLog::ColumnsVector content;
 			content.push_back(string());
-			content.push_back("Création d'après le modèle "+ scenarioTemplate.getName());
+			content.push_back("CrÃ©ation d'aprÃ¨s le modÃ¨le "+ scenarioTemplate.getName());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, sentScenario.getKey());
 		}
 
@@ -94,8 +94,8 @@ namespace synthese
 			DBLog::ColumnsVector content;
 			content.push_back(string());
 			content.push_back(
-				"Création par copie de "+ scenarioTemplate.getName() +
-				" (modèle "+ scenarioTemplate.getTemplate()->getName() +")"
+				"CrÃ©ation par copie de "+ scenarioTemplate.getName() +
+				" (modÃ¨le "+ scenarioTemplate.getTemplate()->getName() +")"
 			);
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, sentScenario.getKey());
 		}
@@ -104,7 +104,7 @@ namespace synthese
 		{
 			DBLog::ColumnsVector content;
 			content.push_back(string());
-			content.push_back("Création");
+			content.push_back("CrÃ©ation");
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, sentScenario.getKey());
 		}
 
@@ -171,7 +171,7 @@ namespace synthese
 			stringstream text;
 			text
 				<< "Suppression du message " << alarm->getShortMessage()
-				<< " du scénario " << alarm->getScenario()->getName();
+				<< " du scÃ©nario " << alarm->getScenario()->getName();
 			content.push_back(text.str());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
 		}

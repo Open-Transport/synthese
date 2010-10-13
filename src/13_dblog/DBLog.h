@@ -48,23 +48,23 @@ namespace synthese
 
 	namespace dblog
 	{
-		/** Journal d'événements stocké en base de données (abstraite).
+		/** Journal d'Ã©vÃ©nements stockÃ© en base de donnÃ©es (abstraite).
 			@ingroup m13
 		
-			Un journal est un compte-rendu d'activité de SYNTHESE. 
-			Plusieurs entrées sont consignées dans la base de données sous formes d'entrées de journal. 
-			Le journal lui-même est le composant d'administration dédié à leur consultation.
+			Un journal est un compte-rendu d'activitÃ© de SYNTHESE. 
+			Plusieurs entrÃ©es sont consignÃ©es dans la base de donnÃ©es sous formes d'entrÃ©es de journal. 
+			Le journal lui-mÃªme est le composant d'administration dÃ©diÃ© Ã  leur consultation.
 
-			Le stockage des entrées de journal s'effectue dans la base de données SQLite.
+			Le stockage des entrÃ©es de journal s'effectue dans la base de donnÃ©es SQLite.
 
-			Les éléments de journal contiennent les données suivantes :
-				- date de l'événement
-				- nom du journal (clé texte identique au nom d'enregistrement de la classe)
-				- utilisateur à l'origine de l'événement
-				- niveau de l'entrée (INFO, WARNING, ERROR)
-				- texte de l'entrée (formalisme selon module et rubrique, spécifié par les sous-classes)
+			Les Ã©lÃ©ments de journal contiennent les donnÃ©es suivantes :
+				- date de l'Ã©vÃ©nement
+				- nom du journal (clÃ© texte identique au nom d'enregistrement de la classe)
+				- utilisateur Ã  l'origine de l'Ã©vÃ©nement
+				- niveau de l'entrÃ©e (INFO, WARNING, ERROR)
+				- texte de l'entrÃ©e (formalisme selon module et rubrique, spÃ©cifiÃ© par les sous-classes)
 
-			Les différents journaux sont enregistrés dans l'instance de fabrique Factory<DBLog>.
+			Les diffÃ©rents journaux sont enregistrÃ©s dans l'instance de fabrique Factory<DBLog>.
 		*/
 		class DBLog
 		:	public util::FactoryBase<DBLog>

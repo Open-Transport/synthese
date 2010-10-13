@@ -43,9 +43,9 @@ namespace synthese
 			@ingroup m54Admin refAdmin
 
 			@image html cap_admin_places.png
-			@image latex cap_admin_places.png "Maquette de l'écran de recherche de lieux" width=14cm
+			@image latex cap_admin_places.png "Maquette de l'Ã©cran de recherche de lieux" width=14cm
 			
-			<i>Titre de la fenêtre</i> :
+			<i>Titre de la fenÃªtre</i> :
 				- SYNTHESE Admin - Emplacements
 
 			<i>Barre de navigation</i> :
@@ -54,23 +54,23 @@ namespace synthese
 
 			<i>Zone de contenu</i> :
 				-# <b>Formulaire de recherche</b>
-					-# <tt>Commune</tt> : Champ texte permettant de rechercher les emplacements dont le nom de la commune contient le texte saisi. Le champ vide désactive le filtre.
-					-# <tt>Nom</tt> : Champ texte permettant de rechercher les emplacements dont le nom contient le texte saisi. Le champ vide désactive le filtre.
-					-# <tt>Terminaux d'affichage</tt> : Liste déroulante permettant de sélectionner l'affichage des seuls emplacements disposant d'au moins un afficheur installé, l'affichage des seuls emplacement qui n'en dispose d'aucun, ou de désactiver le filtre
-					-# <tt>Ligne</tt> : Liste déroulante permettant de sélectionner une ligne de transport : seuls les emplacements desservis par la ligne sont sélectionnés. Si aucune ligne n'est sélectionné le filtre est désactivé.
+					-# <tt>Commune</tt> : Champ texte permettant de rechercher les emplacements dont le nom de la commune contient le texte saisi. Le champ vide dÃ©sactive le filtre.
+					-# <tt>Nom</tt> : Champ texte permettant de rechercher les emplacements dont le nom contient le texte saisi. Le champ vide dÃ©sactive le filtre.
+					-# <tt>Terminaux d'affichage</tt> : Liste dÃ©roulante permettant de sÃ©lectionner l'affichage des seuls emplacements disposant d'au moins un afficheur installÃ©, l'affichage des seuls emplacement qui n'en dispose d'aucun, ou de dÃ©sactiver le filtre
+					-# <tt>Ligne</tt> : Liste dÃ©roulante permettant de sÃ©lectionner une ligne de transport : seuls les emplacements desservis par la ligne sont sÃ©lectionnÃ©s. Si aucune ligne n'est sÃ©lectionnÃ© le filtre est dÃ©sactivÃ©.
 					-# bouton <tt>Rechercher</tt> : Lance la recherche
-				-# <b>Tableau des résultats</b> : les emplacements trouvés sont décrits dans les colonnes suivantes :
+				-# <b>Tableau des rÃ©sultats</b> : les emplacements trouvÃ©s sont dÃ©crits dans les colonnes suivantes :
 					-# <tt>Commune</tt> : Nom de la commune auquel appartient l'emplacement
 					-# <tt>Nom</tt> : Nom de l'emplacement
-					-# Bouton <tt>Editer</tt> : Conduit vers la page synthese::interfaces::PlaceAdmin sur l'emplacement sélectionné
-				-# Un maximum de 50 emplacements est affiché à l'écran. En cas de dépassement de ce nombre d'après les critères de recherche, un lien <tt>Emplacements suivants</tt> apparait et permet de visualiser les entrées suivantes. A partir de la seconde page, un lien <tt>Emplacements précédents</tt> apparait également.
+					-# Bouton <tt>Editer</tt> : Conduit vers la page synthese::interfaces::PlaceAdmin sur l'emplacement sÃ©lectionnÃ©
+				-# Un maximum de 50 emplacements est affichÃ© Ã  l'Ã©cran. En cas de dÃ©passement de ce nombre d'aprÃ¨s les critÃ¨res de recherche, un lien <tt>Emplacements suivants</tt> apparait et permet de visualiser les entrÃ©es suivantes. A partir de la seconde page, un lien <tt>Emplacements prÃ©cÃ©dents</tt> apparait Ã©galement.
 			
-			<i>Sécurité</i>
-				- Une habilitation publique PlacesRight de niveau READ est nécessaire pour accéder à la page et pour utiliser toutes les fonctionnalités.
-				- Le résultat des recherches dépend du périmètre des habilitations de niveau READ et supérieur
+			<i>SÃ©curitÃ©</i>
+				- Une habilitation publique PlacesRight de niveau READ est nÃ©cessaire pour accÃ©der Ã  la page et pour utiliser toutes les fonctionnalitÃ©s.
+				- Le rÃ©sultat des recherches dÃ©pend du pÃ©rimÃ¨tre des habilitations de niveau READ et supÃ©rieur
 
 			<i>Journaux</i>
-				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
+				- Aucune action issue de ce composant d'administration ne gÃ©nÃ¨re d'entrÃ©e dans un journal.
 
 		*/
 		class BroadcastPointsAdmin : public admin::AdminInterfaceElementTemplate<BroadcastPointsAdmin>

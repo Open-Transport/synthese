@@ -67,7 +67,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<MessagesTemplateLibraryAdmin>::ICON("folder.png");
-		template<> const string AdminInterfaceElementTemplate<MessagesTemplateLibraryAdmin>::DEFAULT_TITLE("Bibliothèque de textes");
+		template<> const string AdminInterfaceElementTemplate<MessagesTemplateLibraryAdmin>::DEFAULT_TITLE("BibliothÃ¨que de textes");
 	}
 
 	namespace messages
@@ -161,7 +161,7 @@ namespace synthese
 					, true
 			)	);
 
-/*			stream << "<h1>Répertoires</h1>";
+/*			stream << "<h1>RÃ©pertoires</h1>";
 			HTMLList l;
 			BOOST_FOREACH(shared_ptr<TextTemplate> folder, folders)
 			{
@@ -169,22 +169,22 @@ namespace synthese
 
 			if (_folder.get())
 			{
-				stream << "<h2>Propriétés</h2>";
+				stream << "<h2>PropriÃ©tÃ©s</h2>";
 
 				if (tenv.getRegistry<TextTemplate>().empty() && fenv.getRegistry<TextTemplate>().empty())
-					stream << "<p>" << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le répertoire "+ _folder->getName() +" ?", "folder_delete.png") << "</p>";
+					stream << "<p>" << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer le rÃ©pertoire "+ _folder->getName() +" ?", "folder_delete.png") << "</p>";
 
 				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
 				stream << t.open();
 				stream << t.cell("Nom", t.getForm().getTextInput(UpdateTextTemplateAction::PARAMETER_NAME, _folder->getName()));
-				stream << t.cell("Répertoire parent", t.getForm().getSelectInput(UpdateTextTemplateAction::PARAMETER_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(0,string(),_folder->getKey()), _folder->getParentId()));
+				stream << t.cell("RÃ©pertoire parent", t.getForm().getSelectInput(UpdateTextTemplateAction::PARAMETER_FOLDER_ID, MessagesModule::GetScenarioFoldersLabels(0,string(),_folder->getKey()), _folder->getParentId()));
 				stream << t.close();
 			}
 */
 
 			if(!templates.empty())
 			{
-				stream << "<h1>Modèles de texte</h1>";
+				stream << "<h1>ModÃ¨les de texte</h1>";
 				BOOST_FOREACH(shared_ptr<TextTemplate> tt, templates)
 				{
 					// Variables
@@ -194,7 +194,7 @@ namespace synthese
 					// Display
 					stream << "<h2>";
 					if (deleteRight)
-						stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le modèle "+ tt->getName()+" ?", "page_delete.png") << " ";
+						stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer le modÃ¨le "+ tt->getName()+" ?", "page_delete.png") << " ";
 					stream << tt->getName() << "</h2>";
 
 					PropertiesHTMLTable t(updateRequest.getHTMLForm("up"+Conversion::ToString(tt->getKey())));
@@ -209,7 +209,7 @@ namespace synthese
 
 			if (updateRight)
 			{
-				stream << "<h1>Nouveau modèle de textes</h1>"; 
+				stream << "<h1>Nouveau modÃ¨le de textes</h1>"; 
 				addRequest.getAction()->setIsFolder(false);
 				PropertiesHTMLTable ta(addRequest.getHTMLForm("add"));
 				stream << ta.open();

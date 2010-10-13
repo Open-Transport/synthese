@@ -493,7 +493,7 @@ namespace synthese
 				s << " / Temp: ";
 				if(getTemperatureValue())
 				{
-					s << *getTemperatureValue() << "°";
+					s << *getTemperatureValue() << "Â°";
 				}
 				else
 				{

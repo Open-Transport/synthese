@@ -38,15 +38,15 @@ namespace synthese
 
 		/** Journal des envois de messages.
 
-			Les entrées du journal de messages sont :
+			Les entrÃ©es du journal de messages sont :
 				- envois de messages
-				- envois selon scénarios de diffusion
+				- envois selon scÃ©narios de diffusion
 				
-			Les colonnes additionnelles du journal de sécurité sont :
-				- Action : décrit l'action effectuée (ex : création de profil)
-				- UID objet concerné : 
+			Les colonnes additionnelles du journal de sÃ©curitÃ© sont :
+				- Action : dÃ©crit l'action effectuÃ©e (ex : crÃ©ation de profil)
+				- UID objet concernÃ© : 
 					- lien vers le message si envoi de message unique
-					- lien vers le scénario si envoi selon un scénario de diffusion
+					- lien vers le scÃ©nario si envoi selon un scÃ©nario de diffusion
 			
 			@ingroup m17Logs refLogs
 		*/

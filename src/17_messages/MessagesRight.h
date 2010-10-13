@@ -32,29 +32,29 @@ namespace synthese
 		/** Habilitation portant sur la gestion de messages.
 			@ingroup m17
 
-			Les niveaux de droit privés utilisés sont les suivants :
-				- READ : Utilisation de la console d'administration des messages en mode lecture, recherche possible. Seuls les messages créés par l'utilisateur sont affichés
-				- WRITE : Permet de déclarer de nouveaux messages et de les modifier par la suite. La modification ainsi que la lecture des messages existants n'est permise que pour les messages créés par l'utilisateur.
+			Les niveaux de droit privÃ©s utilisÃ©s sont les suivants :
+				- READ : Utilisation de la console d'administration des messages en mode lecture, recherche possible. Seuls les messages crÃ©Ã©s par l'utilisateur sont affichÃ©s
+				- WRITE : Permet de dÃ©clarer de nouveaux messages et de les modifier par la suite. La modification ainsi que la lecture des messages existants n'est permise que pour les messages crÃ©Ã©s par l'utilisateur.
 
-			Les niveaux de droit public utilisés sont les suivants :
+			Les niveaux de droit public utilisÃ©s sont les suivants :
 				- READ : Utilisation de la console d'administration des messages en mode lecture, recherche possible.
-				- WRITE : Permet d'éditer des messages
+				- WRITE : Permet d'Ã©diter des messages
 				
 
-			Définition du périmètre :
-				- TransportNetwork : Autorisation portant sur les messages diffusés sur un point de diffusion desservi par une ligne du réseau spécifié
-				- JourneyPattern : Autorisation portant sur les messages diffusés sur un arrêt desservi par la ligne spécifiée
-				- Place : Autorisation portant sur les messages diffusés sur un arrêt appartenant au lieu logique spécifié
-				- BroadcastPoint : Autorisation portant sur les messages diffusés sur le point de diffusion spécifié
-				- NB : le périmètre est construit par ajout : si un message est diffusé par un arrêt desservi par une ligne autorisée alors il entre dans le champ de l'habilitation, même s'il est diffusé sur un autre arrêt dont la ligne n'y figure pas.
-				- NB : la notion de desserte d'un point de diffusion par une ligne est définie de deux manières :
-					- si le point de diffusion est un arrêt physique, alors il doit être desservi par la ligne
-					- si le point de diffusion n'est pas un arrêt physique, alors au moins un arrêt physique du lieu auquel appartient le point de diffusion doit être desservi par la ligne
+			DÃ©finition du pÃ©rimÃ¨tre :
+				- TransportNetwork : Autorisation portant sur les messages diffusÃ©s sur un point de diffusion desservi par une ligne du rÃ©seau spÃ©cifiÃ©
+				- JourneyPattern : Autorisation portant sur les messages diffusÃ©s sur un arrÃªt desservi par la ligne spÃ©cifiÃ©e
+				- Place : Autorisation portant sur les messages diffusÃ©s sur un arrÃªt appartenant au lieu logique spÃ©cifiÃ©
+				- BroadcastPoint : Autorisation portant sur les messages diffusÃ©s sur le point de diffusion spÃ©cifiÃ©
+				- NB : le pÃ©rimÃ¨tre est construit par ajout : si un message est diffusÃ© par un arrÃªt desservi par une ligne autorisÃ©e alors il entre dans le champ de l'habilitation, mÃªme s'il est diffusÃ© sur un autre arrÃªt dont la ligne n'y figure pas.
+				- NB : la notion de desserte d'un point de diffusion par une ligne est dÃ©finie de deux maniÃ¨res :
+					- si le point de diffusion est un arrÃªt physique, alors il doit Ãªtre desservi par la ligne
+					- si le point de diffusion n'est pas un arrÃªt physique, alors au moins un arrÃªt physique du lieu auquel appartient le point de diffusion doit Ãªtre desservi par la ligne
 
 			Cas d'utilisation :
-				- Permission de lire tous les messages, d'en créer, mais interdiction de modifier ceux créés par les autres utilisateurs : créer une READ et une WRITE/belong
-				- Permission de lire tous les messages diffusés sur un arrêt desservi par les lignes 12 et 14, permission de créer un message sur la 12 uniquement : créer une WRITE/belong sur la ligne 12, READ sur la ligne 12, READ sur la ligne 14
-				- Permission de lire tous les messages diffusés sur un réseau, permission de créer un message sur la ligne 2, permission de créer un message et d'éditer ceux des autres utilisateurs sur la ligne 8 : créer un READ sur le réseau, un WRITE/belong sur la ligne 2, et un WRITE sur la ligne 8
+				- Permission de lire tous les messages, d'en crÃ©er, mais interdiction de modifier ceux crÃ©Ã©s par les autres utilisateurs : crÃ©er une READ et une WRITE/belong
+				- Permission de lire tous les messages diffusÃ©s sur un arrÃªt desservi par les lignes 12 et 14, permission de crÃ©er un message sur la 12 uniquement : crÃ©er une WRITE/belong sur la ligne 12, READ sur la ligne 12, READ sur la ligne 14
+				- Permission de lire tous les messages diffusÃ©s sur un rÃ©seau, permission de crÃ©er un message sur la ligne 2, permission de crÃ©er un message et d'Ã©diter ceux des autres utilisateurs sur la ligne 8 : crÃ©er un READ sur le rÃ©seau, un WRITE/belong sur la ligne 2, et un WRITE sur la ligne 8
 		*/
 		class MessagesRight : public security::RightTemplate<MessagesRight>
 		{

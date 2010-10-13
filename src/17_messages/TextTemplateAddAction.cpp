@@ -90,7 +90,7 @@ namespace synthese
 			Env env;
 			TextTemplateTableSync::Search(env, _parentId, _isFolder, _name, NULL, 0, 1);
 			if (!env.getRegistry<TextTemplate>().empty())
-				throw ActionException("Un texte portant ce nom existe dÈj‡.");
+				throw ActionException("Un texte portant ce nom existe d√©j√†.");
 
 			_longMessage = map.get<string>(PARAMETER_LONG_MESSAGE);
 			_shortMessage = map.get<string>(PARAMETER_SHORT_MESSAGE);

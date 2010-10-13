@@ -58,7 +58,7 @@ namespace synthese
 
 			const ReservationTransaction*		_transaction;
 
-			//!	\name Service réservé
+			//!	\name Service rÃ©servÃ©
 			//@{
 				util::RegistryKeyType _lineId;				//!< ID of the booked CommercialLine
 				std::string						_lineCode;				//!< Comprehensive line code
@@ -69,10 +69,10 @@ namespace synthese
 				util::RegistryKeyType			_arrivalPlaceId;		//!< ID of the arrival Place
 				std::string						_arrivalPlaceName;
 				util::RegistryKeyType			_reservationRuleId;		//!< ID of the used OnlineReservationRule
-				std::string						_departureAddress;		//!< Adresse du départ
-				std::string						_arrivalAddress;		//!< Adresse d'arrivée
-				boost::posix_time::ptime		_departureTime;			//!< Moment de montée prévu
-				boost::posix_time::ptime		_arrivalTime;			//!< Moment d'arrivée prévue
+				std::string						_departureAddress;		//!< Adresse du dÃ©part
+				std::string						_arrivalAddress;		//!< Adresse d'arrivÃ©e
+				boost::posix_time::ptime		_departureTime;			//!< Moment de montÃ©e prÃ©vu
+				boost::posix_time::ptime		_arrivalTime;			//!< Moment d'arrivÃ©e prÃ©vue
 				boost::posix_time::ptime		_originDateTime;
 				boost::posix_time::ptime		_reservationDeadLine;
 			//@}

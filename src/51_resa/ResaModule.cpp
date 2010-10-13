@@ -80,7 +80,7 @@ namespace synthese
 
 	namespace server
 	{
-		template<> const string ModuleClassTemplate<ResaModule>::NAME("TAD Réservation");
+		template<> const string ModuleClassTemplate<ResaModule>::NAME("TAD RÃ©servation");
 		
 		template<> void ModuleClassTemplate<ResaModule>::PreInit()
 		{
@@ -162,11 +162,11 @@ namespace synthese
 				}
 				if ((*itrs)->getReservationRuleId() != 0)
 				{
-					stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Place réservée sur ce tronçon");
+					stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Place rÃ©servÃ©e sur ce tronÃ§on");
 				}
 				stream << " de " << (*itrs)->getDeparturePlaceName();
 				stream << " le " << (*itrs)->getDepartureTime().date().day_of_week() << " " << (*itrs)->getDepartureTime();
-				stream << " jusqu'à " << (*itrs)->getArrivalPlaceName();
+				stream << " jusqu'Ã  " << (*itrs)->getArrivalPlaceName();
 				if(!(*itrs)->getArrivalTime().is_not_a_date_time())
 				{
 					stream << " le " << (*itrs)->getArrivalTime().date().day_of_week() << " " << (*itrs)->getArrivalTime();
@@ -240,12 +240,12 @@ namespace synthese
 			switch(status)
 			{
 			case OPTION: return "option";
-			case TO_BE_DONE: return "confirmé";
-			case CANCELLED: return "annulé";
-			case CANCELLED_AFTER_DELAY: return "annulé hors délai";
+			case TO_BE_DONE: return "confirmÃ©";
+			case CANCELLED: return "annulÃ©";
+			case CANCELLED_AFTER_DELAY: return "annulÃ© hors dÃ©lai";
 			case AT_WORK: return "en cours";
 			case NO_SHOW: return "absence";
-			case DONE: return "terminé";
+			case DONE: return "terminÃ©";
 			}
 			return string();
 		}

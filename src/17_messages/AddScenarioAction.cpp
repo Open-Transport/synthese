@@ -100,11 +100,11 @@ namespace synthese
 			// Name
 			_name = map.get<string>(PARAMETER_NAME);
 			if(_name.empty())
-				throw ActionException("Le scénario doit avoir un nom.");
+				throw ActionException("Le scÃ©nario doit avoir un nom.");
 			Env env;
 			ScenarioTemplateInheritedTableSync::Search(env, _folder.get() ? _folder->getKey() : 0, _name, NULL, 0, 1);
 			if (!env.getRegistry<ScenarioTemplate>().empty())
-				throw ActionException("Un scénario de même nom existe déjà");
+				throw ActionException("Un scÃ©nario de mÃªme nom existe dÃ©jÃ ");
 		}
 
 

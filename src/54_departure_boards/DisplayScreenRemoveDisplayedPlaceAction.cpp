@@ -81,7 +81,7 @@ namespace synthese
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
-				"Retrait de l'arrêt de sélection "+ _place->getFullName(),
+				"Retrait de l'arrÃªt de sÃ©lection "+ _place->getFullName(),
 				*request.getUser()
 			);
 		}

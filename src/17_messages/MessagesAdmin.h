@@ -41,9 +41,9 @@ namespace synthese
 			@ingroup m17Admin refAdmin
 
 			@image html cap_admin_messages.png
-			@image latex cap_admin_messages.png "Maquette de l'écran de liste de messages" width=14cm
+			@image latex cap_admin_messages.png "Maquette de l'Ã©cran de liste de messages" width=14cm
 			
-			<i>Titre de la fenêtre</i> :
+			<i>Titre de la fenÃªtre</i> :
 				- SYNTHESE Admin - Messages
 
 			<i>Barre de navigation</i> :
@@ -52,66 +52,66 @@ namespace synthese
 
 			<i>Zone de contenu</i> :
 				-# <b>Formulaire de recherche</b>
-					-# <tt>Date début</tt> : champ texte permettant de chercher un message dont la fin de diffusion est postérieure à la date entrée.
-					-# <tt>Date fin</tt> : champ texte permettant de chercher un message dont le début de diffusion est antérieur à la date entrée.
-					-# <tt>Arrêt logique</tt> : liste déroulante consituée de tous les arrêts logiques comportant au moins un afficheur, permettant de chercher un message diffusé sur au moins un afficheur de l'arrêt sélectionné
-					-# <tt>Ligne</tt> : Liste déroulante constituée de toutes les lignes desservant au moins un arrêt muni d'afficheur, permettant de chercher un message diffusé sur l'un des afficheurs desservis par la ligne
-					-# <tt>Statut</tt> : Liste déroulante proposant les statuts possibles pouvant faire l'objet d'un filtrage des résultats de recherche :
-						- Tous les états
-						- Messages dont la diffusion est terminée
+					-# <tt>Date dÃ©but</tt> : champ texte permettant de chercher un message dont la fin de diffusion est postÃ©rieure Ã  la date entrÃ©e.
+					-# <tt>Date fin</tt> : champ texte permettant de chercher un message dont le dÃ©but de diffusion est antÃ©rieur Ã  la date entrÃ©e.
+					-# <tt>ArrÃªt logique</tt> : liste dÃ©roulante consituÃ©e de tous les arrÃªts logiques comportant au moins un afficheur, permettant de chercher un message diffusÃ© sur au moins un afficheur de l'arrÃªt sÃ©lectionnÃ©
+					-# <tt>Ligne</tt> : Liste dÃ©roulante constituÃ©e de toutes les lignes desservant au moins un arrÃªt muni d'afficheur, permettant de chercher un message diffusÃ© sur l'un des afficheurs desservis par la ligne
+					-# <tt>Statut</tt> : Liste dÃ©roulante proposant les statuts possibles pouvant faire l'objet d'un filtrage des rÃ©sultats de recherche :
+						- Tous les Ã©tats
+						- Messages dont la diffusion est terminÃ©e
 						- Messages en cours de diffusion
 						- Messages en cours de diffusion avec date de fin
 						- Messages en cours de diffusion sans date de fin
-						- Messages à diffuser ultérieurement
-					-# <tt>Conflit</tt> : Liste déroulante proposant les types de conflit possibles pouvant faire l'objet d'un filtrage des résultats de recherche :
+						- Messages Ã  diffuser ultÃ©rieurement
+					-# <tt>Conflit</tt> : Liste dÃ©roulante proposant les types de conflit possibles pouvant faire l'objet d'un filtrage des rÃ©sultats de recherche :
 						- Toutes les situations
 						- Messages sans conflit
-						- Messages prioritaires sur complémentaires
-						- Conflits de messages de même niveaux
-					-# <tt>Type</tt> : Liste déroulante proposant les types de messages possibles pouvant faire l'objet d'un filtrage des résultats de recherche :
+						- Messages prioritaires sur complÃ©mentaires
+						- Conflits de messages de mÃªme niveaux
+					-# <tt>Type</tt> : Liste dÃ©roulante proposant les types de messages possibles pouvant faire l'objet d'un filtrage des rÃ©sultats de recherche :
 						- Tous les types de messages
-						- Messages complémentaires
+						- Messages complÃ©mentaires
 						- Messages prioritaires
-						- Scénarios
+						- ScÃ©narios
 					-# Bouton <tt>Rechercher</tt> lance la recherche
-				-# <b>Tableau de messages</b> : Les messages sélectionnés sont décrits par les colonnes suivantes :
-					-# <tt>Sel</tt> : permet la sélection du message en vue d'une copie
-					-# <tt>Dates</tt> : affiche les dates de diffusion du message, définissant son statut, et en suivant la couleur de fond de la ligne :
-						- Message dont la diffusion est terminée : fond blanc
+				-# <b>Tableau de messages</b> : Les messages sÃ©lectionnÃ©s sont dÃ©crits par les colonnes suivantes :
+					-# <tt>Sel</tt> : permet la sÃ©lection du message en vue d'une copie
+					-# <tt>Dates</tt> : affiche les dates de diffusion du message, dÃ©finissant son statut, et en suivant la couleur de fond de la ligne :
+						- Message dont la diffusion est terminÃ©e : fond blanc
 						- Message en cours de diffusion avec date de fin : fond vert clair
 						- Message en cours de diffusion sans date de fin : fond rose
-						- Message à diffuser ultérieurement : fond bleu clair
-					-# <tt>Message</tt> : extrait des messages diffusés. Un clic sur l'extrait conduit à la page synthese::interfaces::MessageAdmin sur le message sélectionné
-					-# <tt>Type</tt> : type de message diffusé
-						- <tt>Complémentaire</tt> : Message complémentaire
+						- Message Ã  diffuser ultÃ©rieurement : fond bleu clair
+					-# <tt>Message</tt> : extrait des messages diffusÃ©s. Un clic sur l'extrait conduit Ã  la page synthese::interfaces::MessageAdmin sur le message sÃ©lectionnÃ©
+					-# <tt>Type</tt> : type de message diffusÃ©
+						- <tt>ComplÃ©mentaire</tt> : Message complÃ©mentaire
 						- <tt>Prioritaire</tt> : Message prioritaire
-						- <tt>Scénario</tt> : L'entrée du tableau correspond à l'envoi d'une série de messages selon un scénario préparé à l'avance
-					-# <tt>Etat</tt> : état matériel courant des afficheurs de la liste de diffusion. Une infobulle précise l'état représenté, apparaissant au contact avec le pointeur de souris
+						- <tt>ScÃ©nario</tt> : L'entrÃ©e du tableau correspond Ã  l'envoi d'une sÃ©rie de messages selon un scÃ©nario prÃ©parÃ© Ã  l'avance
+					-# <tt>Etat</tt> : Ã©tat matÃ©riel courant des afficheurs de la liste de diffusion. Une infobulle prÃ©cise l'Ã©tat reprÃ©sentÃ©, apparaissant au contact avec le pointeur de souris
 						- Pastille verte : tous les afficheurs sont en fonctionnement normal
-						- Pastille orange : au moins un afficheur est en état WARNING, aucun n'est en état ERROR
-						- Pastille rouge : au moins un afficheur est en état ERROR
-					-# <tt>Conflit</tt> : indique si le message est en conflit avec un autre sur au moins un des afficheurs. Une pastille colorée donne l'information et affiche une infobulle lorsque le pointeur de souris est positionné au dessus de celle-ci :
+						- Pastille orange : au moins un afficheur est en Ã©tat WARNING, aucun n'est en Ã©tat ERROR
+						- Pastille rouge : au moins un afficheur est en Ã©tat ERROR
+					-# <tt>Conflit</tt> : indique si le message est en conflit avec un autre sur au moins un des afficheurs. Une pastille colorÃ©e donne l'information et affiche une infobulle lorsque le pointeur de souris est positionnÃ© au dessus de celle-ci :
 						- Pastille verte : le message est en conflit sur aucun afficheur
-						- Pastille orange : le message prioritaire "écrase" un message complémentaire
-						- Pastille rouge : le message entre en conflit avec un message de même niveau
-					-# Bouton <tt>Editer</tt> : conduit à la page synthese::interfaces::MessageAdmin sur le message correspondant à la ligne où est présent le bouton
-					-# Bouton <tt>Arrêter</tt> : stoppe la diffusion du message sélectionné (disponible pour les messages dont la date de fin de diffusion n'est pas atteinte, ou pour les messages sans date de fin de diffusion)
-					-# Un clic sur les titres de colonnes effectue un tri croissant puis décroissant sur la colonne sélectionnée
+						- Pastille orange : le message prioritaire "Ã©crase" un message complÃ©mentaire
+						- Pastille rouge : le message entre en conflit avec un message de mÃªme niveau
+					-# Bouton <tt>Editer</tt> : conduit Ã  la page synthese::interfaces::MessageAdmin sur le message correspondant Ã  la ligne oÃ¹ est prÃ©sent le bouton
+					-# Bouton <tt>ArrÃªter</tt> : stoppe la diffusion du message sÃ©lectionnÃ© (disponible pour les messages dont la date de fin de diffusion n'est pas atteinte, ou pour les messages sans date de fin de diffusion)
+					-# Un clic sur les titres de colonnes effectue un tri croissant puis dÃ©croissant sur la colonne sÃ©lectionnÃ©e
 				-# Bouton <b>Nouvelle diffusion de message</b> : ouvre la page synthese::interfaces::MessageAdmin :
-					- sur un message vierge si aucun message n'est sélectionné dans la colonne <tt>Sel</tt>
-					- sur un message recopié sur un autre, sélectionné dans la colonne <tt>Sel</tt>
-				-# Bouton <b>Nouvelle diffusion de scénario</b> : ouvre la page synthese::interfaces::MessagesScenarioSendAdmin sur le scénario sélectionné dans la liste déroulante. Le contenu du scénario est recopié pour être diffusé après possible modification
-				-# Un maximum de 50 messages est affiché à l'écran. En cas de dépassement de ce nombre d'après les critères de recherche, un lien <tt>Messages suivants</tt> apparait et permet de visualiser les entrées suivantes. A partir de la seconde page, un lien <tt>Messages précédents</tt> apparait également.
+					- sur un message vierge si aucun message n'est sÃ©lectionnÃ© dans la colonne <tt>Sel</tt>
+					- sur un message recopiÃ© sur un autre, sÃ©lectionnÃ© dans la colonne <tt>Sel</tt>
+				-# Bouton <b>Nouvelle diffusion de scÃ©nario</b> : ouvre la page synthese::interfaces::MessagesScenarioSendAdmin sur le scÃ©nario sÃ©lectionnÃ© dans la liste dÃ©roulante. Le contenu du scÃ©nario est recopiÃ© pour Ãªtre diffusÃ© aprÃ¨s possible modification
+				-# Un maximum de 50 messages est affichÃ© Ã  l'Ã©cran. En cas de dÃ©passement de ce nombre d'aprÃ¨s les critÃ¨res de recherche, un lien <tt>Messages suivants</tt> apparait et permet de visualiser les entrÃ©es suivantes. A partir de la seconde page, un lien <tt>Messages prÃ©cÃ©dents</tt> apparait Ã©galement.
 			
 			
-			<i>Sécurité</i>
-				- Une habilitation privée ou publique MessagesRight de niveau READ est nécessaire pour accéder à la page. Le résultat d'une recherche dépend du périmètre des habilitations MessagesRight de l'utilisateur.
-				- Une habilitation privée MessagesRight de niveau WRITE est nécessaire pour créer un nouveau message ou une nouvelle diffusion de scénario. Le contenu de la liste des scénarios dépend du périmètre des habilitations MessagesRight de l'utilisateur.
-				- Une habilitation privée MessagesRight de niveau WRITE est nécessaire pour éditer un message créé par l'utilisateur courant.
-				- Une habilitation publique MessagesRight de niveau WRITE est nécessaire pour éditer un message n'appartenant pas à l'utilisateur courant.
+			<i>SÃ©curitÃ©</i>
+				- Une habilitation privÃ©e ou publique MessagesRight de niveau READ est nÃ©cessaire pour accÃ©der Ã  la page. Le rÃ©sultat d'une recherche dÃ©pend du pÃ©rimÃ¨tre des habilitations MessagesRight de l'utilisateur.
+				- Une habilitation privÃ©e MessagesRight de niveau WRITE est nÃ©cessaire pour crÃ©er un nouveau message ou une nouvelle diffusion de scÃ©nario. Le contenu de la liste des scÃ©narios dÃ©pend du pÃ©rimÃ¨tre des habilitations MessagesRight de l'utilisateur.
+				- Une habilitation privÃ©e MessagesRight de niveau WRITE est nÃ©cessaire pour Ã©diter un message crÃ©Ã© par l'utilisateur courant.
+				- Une habilitation publique MessagesRight de niveau WRITE est nÃ©cessaire pour Ã©diter un message n'appartenant pas Ã  l'utilisateur courant.
 				
 			<i>Journaux</i>
-				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
+				- Aucune action issue de ce composant d'administration ne gÃ©nÃ¨re d'entrÃ©e dans un journal.
 		*/
 		class MessagesAdmin : public admin::AdminInterfaceElementTemplate<MessagesAdmin>
 		{

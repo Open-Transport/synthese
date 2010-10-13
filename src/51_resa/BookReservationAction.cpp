@@ -168,15 +168,15 @@ namespace synthese
 				_customer.reset(new User);
 				_customer->setName(map.get<string>(PARAMETER_CUSTOMER_NAME));
 				if (_customer->getName().empty())
-					throw ActionException("Le nom du client doit être rempli");
+					throw ActionException("Le nom du client doit Ãªtre rempli");
 
 				_customer->setSurname(map.get<string>(PARAMETER_CUSTOMER_SURNAME));
 				if (_customer->getSurname().empty())
-					throw ActionException("Le prénom du client doit être rempli");
+					throw ActionException("Le prÃ©nom du client doit Ãªtre rempli");
 
 				_customer->setPhone(map.get<string>(PARAMETER_CUSTOMER_PHONE));
 				if (_customer->getPhone().empty())
-					throw ActionException("Le numéro de téléphone doit être rempli");
+					throw ActionException("Le numÃ©ro de tÃ©lÃ©phone doit Ãªtre rempli");
 
 				// Integrity test : the key is name + surname + phone
 				Env env;
@@ -193,7 +193,7 @@ namespace synthese
 					0, 1
 				);
 				if (!env.getRegistry<User>().empty())
-					throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
+					throw ActionException("Un utilisateur avec les mÃªmes nom, prÃ©nom, tÃ©lÃ©phone existe dÃ©jÃ .");
 				
 				_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
 				_customer->setProfile(ResaModule::GetBasicResaCustomerProfile().get());
@@ -212,10 +212,10 @@ namespace synthese
 
 			// Deduce naming fields from the customer if already recognized
 			if (_customer->getName().empty())
-				throw ActionException("Client sans nom. Réservation impossible");
+				throw ActionException("Client sans nom. RÃ©servation impossible");
 
 			if (_customer->getPhone().empty())
-				throw ActionException("Client sans numéro de téléphone. Veuillez renseigner ce champ dans la fiche client et recommencer la réservation.");
+				throw ActionException("Client sans numÃ©ro de tÃ©lÃ©phone. Veuillez renseigner ce champ dans la fiche client et recommencer la rÃ©servation.");
 
 			// Website
 			RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_SITE, 0));
@@ -423,7 +423,7 @@ namespace synthese
  			{
 				reservationContact->sendCustomerEMail(rt);
 
-				ResaDBLog::AddEMailEntry(*request.getSession(), *_customer, "Récapitulatif de réservation");
+				ResaDBLog::AddEMailEntry(*request.getSession(), *_customer, "RÃ©capitulatif de rÃ©servation");
  			}
  
 

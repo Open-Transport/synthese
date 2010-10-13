@@ -126,8 +126,8 @@ int Confirmation::start(SessionReturnType *_session)
 int Confirmation::requestResaConfirmedHistory(bool _driverWantSelfConfirm) throw (int)
 {
 	// update history
-	history.push_back("la reservation effectué: 1,aujourd\'hui, depuis l'aigle pour Toulouse à 19h35.");
-	history.push_back("la reservation effectué: 2, le jeudi 6 décemdre, depuis Morteau pour Paris à 4h23.");
+	history.push_back("la reservation effectuÃ©: 1,aujourd\'hui, depuis l'aigle pour Toulouse Ã  19h35.");
+	history.push_back("la reservation effectuÃ©: 2, le jeudi 6 dÃ©cemdre, depuis Morteau pour Paris Ã  4h23.");
 	return 0;
 }
 /*

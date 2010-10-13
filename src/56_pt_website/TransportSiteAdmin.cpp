@@ -242,35 +242,35 @@ namespace synthese
 				// Display
 				stream << "<h1>Liens</h1>";
 				stream << "<p>";
-				stream << HTMLModule::getLinkButton(rpHomeRequest.getURL(), "Calcul d'itinéraires (home client)", string(), "arrow_switch.png");
+				stream << HTMLModule::getLinkButton(rpHomeRequest.getURL(), "Calcul d'itinÃ©raires (home client)", string(), "arrow_switch.png");
 				stream << "</p>";
 
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 				PropertiesHTMLTable pt(updateRequest.getHTMLForm());
 				stream << pt.open();
 				stream << pt.title("Identification");
 				stream << pt.cell("Nom", pt.getForm().getTextInput(SiteUpdateAction::PARAMETER_NAME, _site->getName()));
-				stream << pt.cell("Début validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_START_DATE, _site->getStartDate()));
-				stream << pt.cell("Fin validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_END_DATE, _site->getEndDate()));
+				stream << pt.cell("DÃ©but validitÃ©", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_START_DATE, _site->getStartDate()));
+				stream << pt.cell("Fin validitÃ©", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_END_DATE, _site->getEndDate()));
 				stream << pt.cell("URL", pt.getForm().getTextInput(SiteUpdateAction::PARAMETER_CLIENT_URL, _site->getClientURL()));
 				stream << pt.cell(
-					"Modèle de page par défaut",
+					"ModÃ¨le de page par dÃ©faut",
 					pt.getForm().getTextInput(
 						SiteUpdateAction::PARAMETER_DEFAULT_PAGE_TEMPLATE_ID,
 						lexical_cast<string>(_site->getDefaultTemplate() ? _site->getDefaultTemplate()->getKey() : RegistryKeyType(0))
 				)	);
-				stream << pt.title("Recherche d'itinéraires");
-				stream << pt.cell("Max correspondances", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_MAX_CONNECTIONS, 0, 99, _site->getMaxTransportConnectionsCount(), 1, "illimité"));
-				stream << pt.cell("Réservation en ligne", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_ONLINE_BOOKING, _site->getOnlineBookingAllowed()));
-				stream << pt.cell("Affichage données passées", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_USE_OLD_DATA, _site->getPastSolutionsDisplayed()));
-				stream << pt.cell("Nombre de jours chargés", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_USE_DATES_RANGE, 0, 365, _site->getUseDatesRange().days(), 1, "illimité"));
-				stream << pt.cell("Affichage détail approche routière", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL, _site->getDisplayRoadApproachDetail()));
+				stream << pt.title("Recherche d'itinÃ©raires");
+				stream << pt.cell("Max correspondances", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_MAX_CONNECTIONS, 0, 99, _site->getMaxTransportConnectionsCount(), 1, "illimitÃ©"));
+				stream << pt.cell("RÃ©servation en ligne", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_ONLINE_BOOKING, _site->getOnlineBookingAllowed()));
+				stream << pt.cell("Affichage donnÃ©es passÃ©es", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_USE_OLD_DATA, _site->getPastSolutionsDisplayed()));
+				stream << pt.cell("Nombre de jours chargÃ©s", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_USE_DATES_RANGE, 0, 365, _site->getUseDatesRange().days(), 1, "illimitÃ©"));
+				stream << pt.cell("Affichage dÃ©tail approche routiÃ¨re", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL, _site->getDisplayRoadApproachDetail()));
 				stream << pt.close();
 
-				stream << "<h1>Périodes de recherche d'itinéraire</h1>";
+				stream << "<h1>PÃ©riodes de recherche d'itinÃ©raire</h1>";
 				HTMLTable::ColsVector cv;
 				cv.push_back("Nom");
-				cv.push_back("Heure début");
+				cv.push_back("Heure dÃ©but");
 				cv.push_back("Heure fin");
 				HTMLTable ct(cv, ResultHTMLTable::CSS_CLASS);
 				stream << ct.open();
@@ -289,7 +289,7 @@ namespace synthese
 			// TAB PERIMETER
 			if (openTabContent(stream, TAB_PERIMETER))
 			{
-				stream << "<h1>Communes autorisées</h1>";
+				stream << "<h1>Communes autorisÃ©es</h1>";
 
 				ObjectSiteLinkTableSync::SearchResult cities(
 					ObjectSiteLinkTableSync::Search(
@@ -308,7 +308,7 @@ namespace synthese
 
 				HTMLForm f(cityAddRequest.getHTMLForm("add_city"));
 				HTMLTable::ColsVector v;
-				v.push_back("Localité");
+				v.push_back("LocalitÃ©");
 				v.push_back("Actions");
 				v.push_back("Actions");
 				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
@@ -332,7 +332,7 @@ namespace synthese
 						stream << t.col() << "Unconsistent city " << link->getObjectId();
 						stream << t.col();
 					}
-					stream << t.col() << HTMLModule::getLinkButton(cityRemoveRequest.getHTMLForm().getURL(), "Supprimer", "Etes-vous sûe de vouloir supprimer le lien ?");
+					stream << t.col() << HTMLModule::getLinkButton(cityRemoveRequest.getHTMLForm().getURL(), "Supprimer", "Etes-vous sÃ»e de vouloir supprimer le lien ?");
 				}
 				stream << t.row();
 				stream << t.col(2) << f.getTextInput(SiteCityAddAction::PARAMETER_CITY_NAME, string());
@@ -368,22 +368,22 @@ namespace synthese
 
 				SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 				stream << st.open();
-				stream << st.cell("Commune départ", st.getForm().getTextInput(PARAMETER_START_CITY, _startCity));
-				stream << st.cell("Arrêt départ", st.getForm().getTextInput(PARAMETER_START_PLACE, _startPlace));
-				stream << st.cell("Commune arrivée", st.getForm().getTextInput(PARAMETER_END_CITY, _endCity));
-				stream << st.cell("Arrêt arrivée", st.getForm().getTextInput(PARAMETER_END_PLACE, _endPlace));
+				stream << st.cell("Commune dÃ©part", st.getForm().getTextInput(PARAMETER_START_CITY, _startCity));
+				stream << st.cell("ArrÃªt dÃ©part", st.getForm().getTextInput(PARAMETER_START_PLACE, _startPlace));
+				stream << st.cell("Commune arrivÃ©e", st.getForm().getTextInput(PARAMETER_END_CITY, _endCity));
+				stream << st.cell("ArrÃªt arrivÃ©e", st.getForm().getTextInput(PARAMETER_END_PLACE, _endPlace));
 				stream << st.cell("Date/Heure", st.getForm().getCalendarInput(PARAMETER_DATE_TIME, _dateTime));
 				stream << st.cell(
-					"Nombre réponses",
+					"Nombre rÃ©ponses",
 					st.getForm().getSelectNumberInput(
 						PARAMETER_RESULTS_NUMBER,
 						1, 99,
 						_resultsNumber ? *_resultsNumber : UNKNOWN_VALUE,
 						1,
-						"(illimité)"
+						"(illimitÃ©)"
 				)	);
 				stream << st.cell(
-					"Accessibilité",
+					"AccessibilitÃ©",
 					st.getForm().getSelectInput(PARAMETER_ACCESSIBILITY, TransportWebsiteModule::GetAccessibilityNames(), optional<UserClassCode>(_accessibility)));
 				stream << st.cell("Trace", st.getForm().getOuiNonRadioInput(PARAMETER_LOG, _log));
 				if(!_site->getRollingStockFilters().empty())
@@ -413,7 +413,7 @@ namespace synthese
 				RoadModule::ExtendedFetchPlaceResult startPlace(RoadModule::ExtendedFetchPlace(_site->getCitiesMatcher(), _startCity, _startPlace));
 				RoadModule::ExtendedFetchPlaceResult endPlace(RoadModule::ExtendedFetchPlace(_site->getCitiesMatcher(), _endCity, _endPlace));
 
-				stream << "<h1>Résultats</h1>";
+				stream << "<h1>RÃ©sultats</h1>";
 
 				algorithm::PlanningOrder _planningOrder(DEPARTURE_FIRST);
 
@@ -560,10 +560,10 @@ namespace synthese
 		{
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
-			_tabs.push_back(Tab("Périmètre base transport", TAB_PERIMETER, true));
+			_tabs.push_back(Tab("PropriÃ©tÃ©s", TAB_PROPERTIES, true));
+			_tabs.push_back(Tab("PÃ©rimÃ¨tre base transport", TAB_PERIMETER, true));
 			_tabs.push_back(Tab("Pages web", TAB_WEB_PAGES, true));
-			_tabs.push_back(Tab("Calcul d'itinéraires", TAB_ROUTE_PLANNING, true));
+			_tabs.push_back(Tab("Calcul d'itinÃ©raires", TAB_ROUTE_PLANNING, true));
 
 			_tabBuilded = true;
 		}

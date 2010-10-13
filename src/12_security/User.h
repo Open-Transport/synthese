@@ -38,13 +38,13 @@ namespace synthese
 		/** Utilisateur.
 			@ingroup m12
 		
-			Un utilisateur correspond à un identifiant de connexion rattaché à une personne. 
-			Les données suivantes lui sont reliées :
+			Un utilisateur correspond Ã  un identifiant de connexion rattachÃ© Ã  une personne. 
+			Les donnÃ©es suivantes lui sont reliÃ©es :
 				- un nom d'utilisateur
 				- un mot de passe
-				- des coordonnées (mail, etc)
+				- des coordonnÃ©es (mail, etc)
 				- un @ref synthese::security::Profile "profil"
-				- des paramètres de personnalisation (demandes favorites...)
+				- des paramÃ¨tres de personnalisation (demandes favorites...)
 
 		*/
 		class User

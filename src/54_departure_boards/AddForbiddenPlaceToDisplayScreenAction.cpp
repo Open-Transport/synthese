@@ -88,7 +88,7 @@ namespace synthese
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
-				"Ajout de l'arrêt à ne pas desservir "+ _place->getFullName(),
+				"Ajout de l'arrÃªt Ã  ne pas desservir "+ _place->getFullName(),
 				*request.getUser()
 			);
 		}

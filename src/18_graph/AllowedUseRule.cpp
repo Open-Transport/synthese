@@ -73,7 +73,7 @@ namespace synthese
 
 		std::string AllowedUseRule::getUseRuleName() const
 		{
-			return "Autorisé sans condition";
+			return "AutorisÃ© sans condition";
 		}
 	}
 }

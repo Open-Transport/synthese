@@ -122,7 +122,7 @@ namespace synthese
 
 		std::string SecurityLog::getName() const
 		{
-			return "Journal général de sécurité";
+			return "Journal gÃ©nÃ©ral de sÃ©curitÃ©";
 		}
 
 

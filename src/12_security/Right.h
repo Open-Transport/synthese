@@ -46,29 +46,29 @@ namespace synthese
 		///	@ingroup m12
 		///
 		///	Une habilitation est un droit d'effectuer une ou plusieurs
-		///	opération(s) sur un périmètre donné.
+		///	opÃ©ration(s) sur un pÃ©rimÃ¨tre donnÃ©.
 		///
-		///	Une habilitation est définie par :
-		///		-# un périmètre d'application dont l'usage est précisé par les sous classes. 
+		///	Une habilitation est dÃ©finie par :
+		///		-# un pÃ©rimÃ¨tre d'application dont l'usage est prÃ©cisÃ© par les sous classes. 
 		///			Exemple d'utilisations possibles :
 		///			- Masque de code SYNTHESE d'objet (MP/TLS/*, MP/TLS/14/*...)
 		///			- Liste d'objet(s) (MP/TLS/14;MP/TLS/41)
-		///			- @c * = Pas de restriction de périmètre
-		///			- vide = Au moins un périmètre (utilisé uniquement pour la validation d'habilitation)
-		///		-# un niveau de droit sur les objets appartenant à l'utilisateur (droits privés)
-		///		-# un niveau de droit sur les objets n'appartenant pas à l'utilisateur (droits publics)
+		///			- @c * = Pas de restriction de pÃ©rimÃ¨tre
+		///			- vide = Au moins un pÃ©rimÃ¨tre (utilisÃ© uniquement pour la validation d'habilitation)
+		///		-# un niveau de droit sur les objets appartenant Ã Â l'utilisateur (droits privÃ©s)
+		///		-# un niveau de droit sur les objets n'appartenant pas Ã  l'utilisateur (droits publics)
 		///
 		///	Les niveaux de droits sont les suivants :
-		///		- FORBIDDEN : interdiction (utile pour annuler une habilitation héritée)
+		///		- FORBIDDEN : interdiction (utile pour annuler une habilitation hÃ©ritÃ©e)
 		///		- USE : droit d'utiliser une fonction
-		///		- READ : accès en lecture
-		///		- WRITE : accès en écriture, effacement non permis
-		///		- DELETE : accès en écriture, effacement permis
-		///		- NB : Chaque niveau de droit inclut les niveaux précédents.
+		///		- READ : accÃ¨s en lecture
+		///		- WRITE : accÃ¨s en Ã©criture, effacement non permis
+		///		- DELETE : accÃ¨s en Ã©criture, effacement permis
+		///		- NB : Chaque niveau de droit inclut les niveaux prÃ©cÃ©dents.
 		///
-		///	Chaque module contient des définitions d'habilitations (sous-classes enregistrées 
+		///	Chaque module contient des dÃ©finitions d'habilitations (sous-classes enregistrÃ©es 
 		///	dans Factory<Right>) 
-		/// qui implémentent le contrôe des droits et la génération d'une liste de paramètres possibles.
+		/// qui implÃ©mentent le contrÃ´e des droits et la gÃ©nÃ©ration d'une liste de paramÃ¨tres possibles.
 		class Right
 		:	public util::FactoryBase<Right>
 		{
