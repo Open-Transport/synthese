@@ -2,7 +2,7 @@
 ///	DataSource class header.
 ///	@file DataSource.h
 ///	@author Hugues Romain (RCS)
-///	@date sam fÃ©v 21 2009
+///	@date sam fév 21 2009
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
 ///	software)

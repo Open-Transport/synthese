@@ -59,7 +59,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Category of calendar template.
-			/// Pour choisir le calendrier le plus simple d'affichage, pour l'edition des renvois d'indicateur par exemple, les calendriers sont ranges par categorie, selon le format binaire suivant&nbsp;:</p>
+			/// Pour choisir le calendrier le plus simple d'affichage, pour l'édition des renvois d'indicateur par exemple, les calendriers sont rangés par categorie, selon le format binaire suivant&nbsp;:</p>
 			///
 			///	<table class="tableau">
 			///	<tr><td colspan="2">Plage de dates</td><td></td><td></td><td>Influence periode scolaire</td><td></td><td></td><td>Tout/partiel</td></tr>
@@ -67,14 +67,14 @@ namespace synthese
 			///	<tr><td>7</td><td colspan="6"></td><td>0</td></tr>
 			///	</table>
 			///
-			///	On obtient la classification de catÃ©gories suivante :
+			///	On obtient la classification de catégories suivante :
 			/// <table class="tableau">
-			///	<tr><th>Plage de dates</th><th>Influence periode scolaire</th><th>Tout/partiel</th><th>Code binaire</th><th>Code dÃ©cimal</th></tr>
+			///	<tr><th>Plage de dates</th><th>Influence periode scolaire</th><th>Tout/partiel</th><th>Code binaire</th><th>Code décimal</th></tr>
 			///	<tr><td rowspan="4">Service complet</td><td rowspan="2">Non</td><td>Totalite de la periode</td><td>00000000</td><td>0</td></tr>
 			///	<tr><td>Restriction</td><td>00000001</td><td>1</td></tr>
 			///	<tr><td rowspan="2">Oui</td><td>Totalite de la periode</td><td>00001000</td><td>0</td></tr>
 			///	<tr><td>Restriction</td><td>00001001</td><td>1</td></tr>
-			///	<tr><td rowspan="4">Service de transporteur (ete, hiver, SNCF, etc.)</td><td rowspan="2">Non</td><td>Totalite de la periode</td><td>01000000</td><td>0</td></tr>
+			///	<tr><td rowspan="4">Service de transporteur (ete, hiver, SNCF, etc.)</td><td rowspan="2">Non</td><td>Totalité de la période</td><td>01000000</td><td>0</td></tr>
 			///	<tr><td>Restriction</td><td>01000001</td><td>1</td></tr>
 			///	<tr><td rowspan="2">Oui</td><td>Totalite de la periode</td><td>01001000</td><td>0</td></tr>
 			///	<tr><td>Restriction</td><td>01001001</td><td>1</td></tr>

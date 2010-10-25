@@ -44,11 +44,11 @@ namespace synthese
 			@date 2001-2006
 			@ingroup m11
 		 
-			Cette classe dÃ©finit les diffÃ©rentes interfaces pour l'affichage de rÃ©sultats issus de calculs SYNTHESE. Une interface est constituÃ©e de modÃÅ¡les d'affichage, permettant la d?finition du graphisme en sortie, fournis ? SYNTHESE en tant que donn?es. Des mod?les de fichiers de sortie doivent ?tre fournis au chargement d'apr?s un format de codage d?fini pour l'occasion.</p>
+			Cette classe définit les différentes interfaces pour l'affichage de résultats issus de calculs SYNTHESE. Une interface est constituée de modèles d'affichage, permettant la définition du graphisme en sortie, fournis à SYNTHESE en tant que données. Des modèles de fichiers de sortie doivent être fournis au chargement d'après un format de codage défini pour l'occasion.</p>
 		 
-			La liste des \ref InterfaceObjetsStandard d?finit les objets qui peuvent ?tre d?crits par un mod?le. La fourniture d'un mod?le pour chacun de ces objets est facultative. En cas de demande d'affichage d'un objet pour lequel aucun mod?le n'a ?t? fourni, une page vide sera retourn?e.
+			La liste des \ref InterfaceObjetsStandard définit les objets qui peuvent être décrits par un modèle. La fourniture d'un modèle pour chacun de ces objets est facultative. En cas de demande d'affichage d'un objet pour lequel aucun modèle n'a été fourni, une page vide sera retournée.
 			 
-			Les mod?les sont d?finis par la classe cElementInterface et ses d?riv?s, et sont ind?x?s dans le tableau de pointeurs vElement, selon une indexation par num?ro d'objet standard, selon la nomenclature des \ref InterfaceObjetsStandard .
+			Les modèles sont définis par la classe cElementInterface et ses dérivés, et sont indéxés dans le tableau de pointeurs vElement, selon une indexation par numéro d'objet standard, selon la nomenclature des \ref InterfaceObjetsStandard .
 			 
 		*/
 		class Interface
