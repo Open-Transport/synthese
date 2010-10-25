@@ -11,7 +11,7 @@ $dbo = new PDO('sqlite:'. $argv[2]);
 
 // New stops
 
-print "<?xml version='1.0' encoding='ISO-8859-15'?>";
+print "<?xml version='1.0' encoding='UTF-8'?>";
 print '<syntheseDelta xsi:noNamespaceSchemaLocation="http://www.reseaux-conseil.com/trident/synthese-deltas.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">';
 
 $nstops = $db->query('SELECT l.id, p.name, p.x, p.y FROM t010_line_stops AS l INNER JOIN t012_physical_stops AS p ON p.id = l.physical_stop_id ');
