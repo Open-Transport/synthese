@@ -1,18 +1,18 @@
 /** @page history Historique de SYNTHESE
-
 Principales versions :
 <ul>
-<li>2000 : lancement du dÃ©veloppement, mise au point de l'algorithme principal du calculateur d'itinÃ©raires et maquette en visual basic</li>
-<li>2001 : version ÃŸ1 : calcul d'itinÃ©raires,  tableaux de dÃ©parts. AccÃ¨s par interface ISAPI (Windows/IIS), choix du C++. DonnÃ©es sous forme de fichiers texte.</li>
-<li>2002 : version ÃŸ2 : fiche arrÃªt (visites photo), indicateurs papier, module d'interfaces simplifiÃ©.</li>
-<li>2003 : Version 1 : module d'interface complet, mise en place de la procÃ©dure d'alimentation semi-automatique des donnÃ©es bus (Hastus) et des procÃ©dures manuelles d'alimentation en donnÃ©es via l'outil PHP/MySQL Enterprise, portage en technologie FastCGI (version Linux). Version mise en ligne sur le site Internet semvat.com</li>
-<li>2004 : version 1.1 : module de rÃ©servation de transport Ã  la demande (TAD). Version mise en ligne Ã  la centrale de rÃ©servation RCS.</li>
-<li>2005 : version 2.0 : serveur TCP autonome identique sur Linux et Windows, avec client CGI pour intÃ©gration Ã  un serveur Web., amÃ©lioration des performances. Clients pour matÃ©riels d'affichage de tableaux de dÃ©parts propriÃ©taires. Version mise en ligne sur le site <a href="http://www.tisseo.fr/">tisseo.fr</a>.</li>
-<li>2006 : version 2.1 : module cartographique, module de recherche d'adresses Ã  adresses, gestion de profils utilisateur
-<li>2007 : version 3.0 : base de donnÃ©es <a href="http://www.sqlite.org/">SQLite</a>, modifiable Ã  chaud (systÃ¨me de triggers dÃ©tectant les mises Ã  jour et modifiant la RAM), refactoring important (modularisation, factories), interface d'administration web, module d'actualitÃ©s. Utilisation gÃ©nÃ©ralisÃ©e de la librairie <a href="http://www.boost.org/">Boost</a></li>
-<li>2008 : version 3.1 : serveur HTTP via Boost ASIO en remplacement du serveur TCP autonome, environnements et registres, import Trident, refactoring implÃ©mentant un graphe gÃ©nÃ©rique rail/route (modules graph, algorithm, road, pt)</li>
+<li>2000 : lancement du développement, mise au point de l'algorithme principal du calculateur d'itinéraires et maquette en visual basic</li>
+<li>2001 : version 0.1 : calcul d'itinéraires,  tableaux de départs. Accès par interface ISAPI (Windows/IIS), choix du C++. Données sous forme de fichiers texte.</li>
+<li>2002 : version 0.2 : fiche arràt (visites photo), indicateurs papier, module d'interfaces simplifié.</li>
+<li>2003 : Version 1 : module d'interface complet, mise en place de la procédure d'alimentation semi-automatique des données bus (Hastus) et des procédures manuelles d'alimentation en données via l'outil PHP/MySQL Enterprise, portage en technologie FastCGI (version Linux). Version mise en ligne sur le site Internet semvat.com</li>
+<li>2004 : version 1.1 : module de réservation de transport à la demande (TAD). Version mise en ligne à la centrale de réservation RCS.</li>
+<li>2005 : version 2.0 : serveur TCP autonome identique sur Linux et Windows, avec client CGI pour intégration à un serveur Web., amélioration des performances. Clients pour matériels d'affichage de tableaux de départs propriétaires. Version mise en ligne sur le site <a href="http://www.tisseo.fr/">tisseo.fr</a>.</li>
+<li>2006 : version 2.1 : module cartographique, module de recherche d'adresses à adresses, gestion de profils utilisateur
+<li>2007 : version 3.0 : base de données <a href="http://www.sqlite.org/">SQLite</a>, modifiable à chaud (système de triggers détectant les mises à jour et modifiant la RAM), refactoring important (modularisation, factories), interface d'administration web, module d'actualités. Utilisation généralisée de la librairie <a href="http://www.boost.org/">Boost</a></li>
+<li>2008 : version 3.1 : serveur HTTP via Boost ASIO en remplacement du serveur TCP autonome, environnements et registres, import Trident, refactoring implémentant un graphe générique rail/route (modules graph, algorithm, road, pt)</li>
 <li>2009 : version 3.1.3 : interconnexion avec <a href="http://www.nagios.org/">Nagios</a></li>
-<li>2010 : version 3.2 : modules forum, cms, remplacement du module geometry par la bibliothÃ¨que <a href="http://trac.osgeo.org/geos/">GEOS</a>. Refactoring modules route et pt pour gÃ©rer dynamiquement la projection permettant de passer de l'un Ã  l'autre.</li>
+<li>2010 : version 3.2 : modules forum, cms, remplacement du module geometry par la bibliothèque <a href="http://trac.osgeo.org/geos/">GEOS</a>. Refactoring modules route et pt pour gérer dynamiquement la projection permettant de passer de l'un à l'autre.</li>
 </ul>
+
 
 */

@@ -61,17 +61,17 @@ namespace synthese
 			 inherits from Route
 			@ingroup m35
 
-			Une ligne technique est un regroupement de services, constituÃ© dans un but d'amÃ©lioration des performances de la recherche d'itinÃ©raires. En effet, plusieurs services groupÃ©s dans une ligne ne comptent que pour un dans leur participation au temps de calcul, ce qui rend tout son intÃ©rÃÂªt au regroupement des services en lignes.
-			Le regroupement en lignes techniques s'effectue cependant, par convention, uniquement ÃÂ  l'intÃ©rieur des \ref defLigneCommerciale "lignes commerciales". Ainsi deux services pouvant ÃÂªtre groupÃ©s selon les critÃÅ¡res ci-dessous, mais n'appartenant pas ÃÂ  la mÃÂªme ligne commerciale, ne seront pas groupÃ©s dans une ligne technique. De ce fait, les lignes techniques sont considÃ©rÃ©s comme des subdivisions de lignes commerciales.
+			Une ligne technique est un regroupement de services, constitué dans un but d'amélioration des performances de la recherche d'itinéraires. En effet, plusieurs services groupés dans une ligne ne comptent que pour un dans leur participation au temps de calcul, ce qui rend tout son intérêt au regroupement des services en lignes.
+			Le regroupement en lignes techniques s'effectue cependant, par convention, uniquement à  l'intérieur des \ref defLigneCommerciale "lignes commerciales". Ainsi deux services pouvant être groupés selon les critères ci-dessous, mais n'appartenant pas à  la même ligne commerciale, ne seront pas groupés dans une ligne technique. De ce fait, les lignes techniques sont considérés comme des subdivisions de lignes commerciales.
 
-			Cependant, pour assurer la justesse des calculs, les regroupements en ligne doivent respecter des conditions strictes, constituant ainsi la thÃ©orie des lignes&nbsp;:
-				- Les services d'une mÃÂªme ligne doivent desservir exactement les mÃÂªmes points d'arrÃÂªt, dans le mÃÂªme ordre
-				- Les conditions de desserte de chaque point d'arrÃÂªt (dÃ©part/passage/arrivÃ©e et horaires saisis/non saisis) sont les mÃÂªmes pour tous les services d'une ligne
-				- Les services d'une mÃÂªme ligne sont assurÃ©s par le mÃÂªme matÃ©riel roulant, observent les mÃÂªmes conditions de rÃ©servation, appartiennent au mÃÂªme rÃ©seau de transport, et suivent la mÃÂªme tarification
-				- Un service d'une ligne ne doit pas desservir un point d'arrÃÂªt ÃÂ  la mÃÂªme heure qu'un autre service de la mÃÂªme ligne
-				- Un service d'une ligne desservant un point d'arrÃÂªt avant un autre de la mÃÂªme ligne ne doit pas desservir un autre point d'arrÃÂªt aprÃÅ¡s ce dernier&nbsp;: deux services ne doivent pas se ÃÂ«&nbsp;doubler&nbsp;ÃÂ»
+			Cependant, pour assurer la justesse des calculs, les regroupements en ligne doivent respecter des conditions strictes, constituant ainsi la théorie des lignes&nbsp;:
+				- Les services d'une même ligne doivent desservir exactement les mêmes points d'arrêt, dans le même ordre
+				- Les conditions de desserte de chaque point d'arrêt (départ/passage/arrivée et horaires saisis/non saisis) sont les mêmes pour tous les services d'une ligne
+				- Les services d'une même ligne sont assurés par le même matériel roulant, observent les mêmes conditions de réservation, appartiennent au même réseau de transport, et suivent la même tarification
+				- Un service d'une ligne ne doit pas desservir un point d'arrêt à la même heure qu'un autre service de la même ligne
+				- Un service d'une ligne desservant un point d'arrêt avant un autre de la même ligne ne doit pas desservir un autre point d'arrêt après ce dernier&nbsp;: deux services ne doivent pas se doubler
 
-			NB : la correspondance entre deux services d'une mÃÂªme ligne est interdite, sauf dans les axes libres.
+			NB : la correspondance entre deux services d'une même ligne est interdite, sauf dans les axes libres.
 
 			If a service is responsible of a break of the preceding rules, then the line is copied as a JourneyPatternCopy, and the service is linked to the new line. The _sublines container keeps a pointer on each JourneyPatternCopy.
 		*/
