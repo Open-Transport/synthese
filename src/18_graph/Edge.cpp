@@ -426,16 +426,15 @@ namespace synthese
 				CoordinatesSystem::GetDefaultGeometryFactory()
 			);
 
-			const Edge* nextEdge(getParentPath()->getEdge(getRankInPath() + 1));
 			if(	getParentPath() &&
 				getParentPath()->getEdge(getRankInPath()) == this &&
 				getParentPath()->getEdges().size() != getRankInPath()+1 &&
 				getFromVertex()->hasGeometry() &&
-				nextEdge->getFromVertex()->hasGeometry()
+				getParentPath()->getEdge(getRankInPath() + 1)->getFromVertex()->hasGeometry()
 			){
 				CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 				cs->add(*getFromVertex()->getGeometry()->getCoordinate(), false);
-				cs->add(*nextEdge->getFromVertex()->getGeometry()->getCoordinate(), false);
+				cs->add(*getParentPath()->getEdge(getRankInPath() + 1)->getFromVertex()->getGeometry()->getCoordinate(), false);
 				return shared_ptr<LineString>(geometryFactory.createLineString(cs));
 			}
 
