@@ -202,7 +202,11 @@ namespace synthese
 				_BitSets::const_iterator it2(op2._markedDates.find(it.first));
 				if(it2 == op2._markedDates.end()) continue;
 
-				dest._markedDates[it.first] = it.second & it2->second;
+				_BitSets::mapped_type mask(it.second & it2->second);
+				if(!mask.none())
+				{
+					dest._markedDates[it.first] = mask;
+				}
 			}
 			return dest;
 		}
