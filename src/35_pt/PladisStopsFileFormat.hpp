@@ -1,6 +1,5 @@
-
-/** CarPostalFileFormat class header.
-	@file CarPostalFileFormat.h
+/** PladisStopsFileFormat class header.
+	@file PladisStopsFileFormat.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,8 +19,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_CarPostalFileFormat_H__
-#define SYNTHESE_CarPostalFileFormat_H__
+#ifndef SYNTHESE_PladisStopsFileFormat_H__
+#define SYNTHESE_PladisStopsFileFormat_H__
 
 #include "FileFormatTemplate.h"
 #include "Calendar.h"
@@ -33,6 +32,14 @@
 #include <string>
 #include <vector>
 #include <boost/date_time/gregorian/gregorian.hpp>
+
+namespace geos
+{
+	namespace geom
+	{
+		class Point;
+	}
+}
 
 namespace synthese
 {
@@ -48,76 +55,54 @@ namespace synthese
 	
 	namespace pt
 	{
+		class StopPoint;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// CarPostal file format.
+		/// Pladis (CarPostal) file format for stops integration.
 		/// @ingroup m35File refFile
 		//////////////////////////////////////////////////////////////////////////
-		/// The CarPostal export uses 5 files :
+		/// The stops part of Pladis export uses 2 files :
 		///	<ul>
 		///		<li>BAHNHOF.DAT : Names of commercial stops</li>
 		///		<li>KOORD.DAT : Coordinates of commercial stops</li>
-		///		<li>ECKDATEN.DAT : Date range of the data</li>
-		///		<li>BITFELD.DAT : Calendars</li>
-		///		<li>ZUGUDAT.DAT : Routes and service schedules</li>
 		///	</ul>
 		///
 		/// <h2>Import</h2>
 		///
-		/// The import is separated into two parts :
-		///	<ul>
-		///		<li>Import of the stops : there is no automated import, because of the need of merging
-		///		the data with other sources. This work can only be done manually. A @ref PTStopsImportWizardAdmin "special admin page"
-		///		can read such BAHNHOF.DAT and KOORD.DAT and show differences with SYNTHESE.</li>
-		///		<li>Import of the services : the import is automated, and is possible only if all stops
-		///		are referenced in the SYNTHESE database, and if the line has been manually created in
-		///		the SYNTHESE database and linked to the CarPostal database by the operator_code field</li>
-		///	</ul>
-		///
-		///	<h3>Import of the stops</h3>
+		///	Import of the stops : there is no automated import, because of the need of merging
+		///	the data with other sources. This work can only be done manually. A @ref PTStopsImportWizardAdmin "special admin page"
+		///	can read such BAHNHOF.DAT and KOORD.DAT and show differences with SYNTHESE.</li>
 		///
 		/// The physical stops must be linked with the items of BAHNHOF.DAT.
 		/// More than one physical stop can be linked with the same CarPostal stop. In this case, 
 		/// the import will select automatically the actual stop regarding the whole itinerary.
-		///
-		/// <h3>Import of the services</h3>
-		///
-		/// The import follows these steps :
-		///	<ol>
-		///		<li>Load of the date ranges from ECKDATEN.DAT</li>
-		///		<li>Load of the bits from BITFELD.DAT</li>
-		///		<li>Load of the services from ZUGDAT.DAT. For each service :</li>
-		///		<ul>
-		///			<li>Fetch of the line by its creator code</li>
-		///			<li>Load of the route</li>
-		///			<li>Comparison with all existing routes</li>
-		///			<li>Creation of a route if necessary</li>
-		///			<li>Comparison with all existing services</li>
-		///			<li>Creation of a service if ncessary</li>
-		///		</ul>
-		///	</ol>
-		class CarPostalFileFormat:
-			public impex::FileFormatTemplate<CarPostalFileFormat>
+		class PladisStopsFileFormat:
+			public impex::FileFormatTemplate<PladisStopsFileFormat>
 		{
 		public:
 
-			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
-				public impex::MultipleFileTypesImporter<CarPostalFileFormat>
+				public impex::MultipleFileTypesImporter<PladisStopsFileFormat>
 			{
-
 			public:
-				static const std::string FILE_ECKDATEN;
-				static const std::string FILE_BITFELD;
-				static const std::string FILE_ZUGUDAT;
+				static const std::string FILE_BAHNHOFS;
+				static const std::string FILE_KOORDS;
 
 			private:
-				typedef std::map<int, calendar::Calendar> CalendarMap;
-				
-				mutable boost::gregorian::date _startDate;
-				mutable boost::gregorian::date _endDate;
-				mutable CalendarMap _calendarMap;
+				struct Bahnhof 
+				{
+					std::string operatorCode;
+					std::string cityName;
+					std::string name;
+					boost::shared_ptr<geos::geom::Point> coords;
+					boost::shared_ptr<geos::geom::Point> projected;
+					boost::shared_ptr<StopPoint> stop;
+				};
 
+				typedef std::map<std::string, Bahnhof> Bahnhofs;
+
+				mutable Bahnhofs _nonLinkedBahnhofs;
+				mutable Bahnhofs _linkedBahnhofs;
 
 			protected:
 
@@ -130,11 +115,9 @@ namespace synthese
 					boost::optional<const admin::AdminRequest&> adminRequest
 				) const;
 
-		
-			
 			public:
 				Importer_(const impex::DataSource& dataSource):
-					MultipleFileTypesImporter<CarPostalFileFormat>(dataSource)
+					MultipleFileTypesImporter<PladisStopsFileFormat>(dataSource)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////
@@ -151,9 +134,8 @@ namespace synthese
 				virtual db::SQLiteTransaction _save() const;
 			};
 
-			typedef impex::NoExportPolicy<CarPostalFileFormat> Exporter_;
+			typedef impex::NoExportPolicy<PladisStopsFileFormat> Exporter_;
 		};
-	}
-}
+}	}
 
 #endif

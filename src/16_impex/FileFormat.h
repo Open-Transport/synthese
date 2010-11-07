@@ -23,8 +23,6 @@
 #define SYNTHESE_impex_FileFormat_h__
 
 #include "FactoryBase.h"
-#include "Env.h"
-#include "ParametersMap.h"
 
 #include <boost/filesystem/path.hpp>
 #include <set>
@@ -44,6 +42,8 @@ namespace synthese
 	namespace impex
 	{
 		class DataSource;
+		class Importer;
+		class Exporter;
 		
 		/** Import/export file format factorable base class.
 			
@@ -62,121 +62,20 @@ namespace synthese
 					The key is also the parameter code Request field containing the file path.
 					The files are loaded respecting the key alphabetical order.
 		*/
-		class FileFormat : public util::FactoryBase<FileFormat>
+		class FileFormat:
+			public util::FactoryBase<FileFormat>
 		{
 		public:
-			typedef std::string FileKey;
-			typedef std::set<boost::filesystem::path> FilePathsSet;
-			typedef std::map<FileKey, boost::filesystem::path> FilePathsMap;
+			virtual bool canImport() const = 0;
+			virtual bool canExport() const = 0;
 
-			class Files
-			{
-			public:
-				typedef std::vector<FileKey> FilesVector;
-
-			private:
-				FilesVector _files;
-
-			public:
-				Files(
-					const char* value,
-					...
-				);
-
-				const FilesVector& getFiles() const;
-			};
-
-		protected:
-			FileFormat(
-				util::Env* env = NULL
-			);
-			
-			util::Env*				_env;
-			const DataSource*		_dataSource;
-			
-			virtual bool _controlPathsMap(
-				const FilePathsMap& paths
-			);
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Interface for the parser corresponding to the format.
-			/// @param filePath path of the file to parse
-			/// @param os output stream for warning and error messages
-			/// @param key key of the file (use it if the file format needs multiple files)
-			virtual void _parse(
-				const boost::filesystem::path& filePath,
-				std::ostream& os,
-				std::string key = std::string()
-			) = 0;
-
-
-		public:
-			//////////////////////////////////////////////////////////////////////////
-			/// Conversion from attributes to generic parameter maps.
-			///	@param import true if the parameters must be generated for an import, false for an export
-			/// @return Generated parameters map
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.1.16
-			virtual server::ParametersMap _getParametersMap(bool import) const;
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Conversion from generic parameters map to attributes.
-			/// @param map Parameters map to interpret
-			///	@param import true if the parameters must be read for an import, false for an export
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.1.16
-			virtual void _setFromParametersMap(const server::ParametersMap& map, bool import);
-
-
-			virtual const Files::FilesVector& getFiles() const = 0;
-
-			/** Generic export method.
-				The generic export consists in the export of each registered exportable class
-				@author Hugues Romain
-				@date 2008
-			*/
-			virtual void build(
-				std::ostream& os
-			) = 0;
-			
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Parses each input file, with many files corresponding to a unique role.
-			/// @param paths List of the file paths
-			/// @param os output stream for warning and error messages
-			void parseFiles(
-				const FilePathsSet& paths,
-				std::ostream& os
-			);
-
-			
-			
-			//////////////////////////////////////////////////////////////////////////
-			/// Parses each input file, with one file per role.
-			/// @param paths Map of the file path of each role
-			/// @param os output stream for warning and error messages
-			void parseFiles(
-				const FilePathsMap& paths,
-				std::ostream& os
-			);
-			
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Interface for the save method.
-			/// @param os output stream for warning and error messages
-			/// @return transaction to run
-			virtual db::SQLiteTransaction save(
-				std::ostream& os
+			virtual boost::shared_ptr<Importer> getImporter(
+				const DataSource& dataSource
 			) const = 0;
 			
-			void setDataSource(const DataSource* value);
-			void setEnv(util::Env* value);
+			virtual boost::shared_ptr<Exporter> getExporter(
+			) const	= 0;
+
 		};
 	}
 }

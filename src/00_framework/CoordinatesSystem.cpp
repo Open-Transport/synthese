@@ -51,7 +51,7 @@ namespace synthese
 
 	boost::shared_ptr<geos::geom::Geometry> CoordinatesSystem::convertGeometry( const geos::geom::Geometry& source ) const
 	{
-		shared_ptr<geos::geom::Geometry> result(source.clone());
+		shared_ptr<geos::geom::Geometry> result(_geometryFactory.createGeometry(&source));
 
 		CoordinatesSystem::ConversionFilter filter(
 			GetCoordinatesSystem(source.getSRID()),

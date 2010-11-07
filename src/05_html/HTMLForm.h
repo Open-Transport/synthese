@@ -778,10 +778,7 @@ namespace synthese
 		){
 			if (!_updateRight)
 			{
-				return
-					(valueIfSelected == valueToSelect) ?
-					HTMLModule::HTMLEncode(label) :
-					std::string();
+				return (valueIfSelected == valueToSelect) ? label :	std::string();
 			}
 
 			std::stringstream s;
@@ -800,7 +797,7 @@ namespace synthese
 			{
 				s << " disabled=\"disabled\"";
 			}
-			s << " /><label for=\"" << id << "\">" << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(label)) << "</label>";
+			s << " /><label for=\"" << id << "\">" << label << "</label>";
 			removeHiddenFieldIfExists(name, valueToSelect ? boost::lexical_cast<std::string>(*valueToSelect) : std::string());
 			return s.str();
 		}

@@ -24,6 +24,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "ImpExModule.h"
+#include "Exception.h"
+
+#include <iconv.h>
 
 using namespace std;
 
@@ -57,5 +60,39 @@ namespace synthese
 
 	namespace impex
 	{
+		std::string ImpExModule::ConvertChar(
+			const std::string& text,
+			const std::string& from,
+			const std::string& to
+		){
+#if defined(__MINGW32__) || defined(_WIN32)
+			const char *pBuf;
+#else /* not MINGW32 - WIN32 */
+			char *pBuf;
+#endif
+			size_t len;
+			size_t utf8len;
+			iconv_t cvt = iconv_open (to.c_str(), from.c_str());
+			if (cvt == (iconv_t) (-1))
+			{
+				throw Exception("Bad charset");
+			}
+			len = text.length();
+			utf8len = 4*text.size();
+			pBuf = text.c_str();
+			char* utf8buf = (char*) malloc(sizeof(char) * utf8len);
+			char* pUtfbuf(utf8buf);
+			if (iconv (cvt, &pBuf, &len, &pUtfbuf, &utf8len) == (size_t) (-1))
+			{
+				delete utf8buf;
+				iconv_close (cvt);
+				throw Exception("iconv error");
+			}
+			*pUtfbuf = 0;
+			string result(utf8buf);
+			delete utf8buf;
+			iconv_close (cvt);
+			return result;
+		}
 	}
 }

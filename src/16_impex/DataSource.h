@@ -33,6 +33,8 @@ namespace synthese
 {
 	namespace impex
 	{
+		class Importer;
+
 		////////////////////////////////////////////////////////////////////////
 		/// DataSource class.
 		/// @ingroup m16
@@ -62,6 +64,7 @@ namespace synthese
 			std::string	_name;
 			std::string _format;
 			std::string _icon;
+			std::string	_charset;
 			
 		public:
 			/////////////////////////////////////////////////////////////////////
@@ -75,6 +78,7 @@ namespace synthese
 				const std::string& getName() const { return _name; }
 				const std::string& getFormat() const { return _format; }
 				const std::string& getIcon() const { return _icon; }
+				const std::string& getCharset() const { return _charset; }
 			//@}
 		
 			//! @name Setters
@@ -82,6 +86,7 @@ namespace synthese
 				void setName(const std::string& value) { _name = value;	}
 				void setFormat(const std::string& value) { _format = value; }
 				void setIcon(const std::string& value) { _icon = value; }
+				void setCharset(const std::string& value) { _charset = value; }
 			//@}
 
 			//! @name Modifiers
@@ -90,6 +95,8 @@ namespace synthese
 
 			//! @name Queries
 			//@{
+				boost::shared_ptr<Importer> getImporter() const;
+				bool canImport() const;
 			//@}
 		
 			//! @name Static algorithms

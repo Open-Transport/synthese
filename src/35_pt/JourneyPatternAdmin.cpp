@@ -238,6 +238,7 @@ namespace synthese
 						lineStop->getPhysicalStop()->getConnectionPlace()->getName()
 					);
 
+					// Physical stop
 					stream << t.col();
 /*					HTMLForm f2(lineStopUpdateAction.getHTMLForm("quay"+lexical_cast<string>(lineStop->getRankInPath())));
 					stream << f2.open();
@@ -249,8 +250,47 @@ namespace synthese
 					stream << f2.getSubmitButton("OK");
 					stream << f2.close();
 */
-					stream << t.col() << (lineStop->isArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"));
-					stream << t.col() << (lineStop->isDeparture() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"));
+					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& ps, lineStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStops())
+					{
+						if(ps.second == lineStop->getPhysicalStop())
+						{
+							stream << "[";
+						}
+						lineStopUpdateAction.getAction()->setPhysicalStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<StopPoint*>(ps.second)));
+						stream << HTMLModule::getHTMLLink(
+							lineStopUpdateAction.getHTMLForm().getURL(),
+							ps.second->getName().empty() ? lexical_cast<string>(ps.second->getKey()) : ps.second->getName()
+						);
+						lineStopUpdateAction.getAction()->setPhysicalStop(shared_ptr<StopPoint>());
+
+						if(ps.second == lineStop->getPhysicalStop())
+						{
+							stream << "]";
+						}
+						stream << " ";
+					}
+
+
+					// Allowed arrival
+					lineStopUpdateAction.getAction()->setAllowedArrival(optional<bool>(!lineStop->isArrival()));
+					stream <<
+						t.col() <<
+						HTMLModule::getHTMLLink(
+							lineStopUpdateAction.getHTMLForm().getURL(),
+							(lineStop->isArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"))
+						);
+					lineStopUpdateAction.getAction()->setAllowedArrival(optional<bool>());
+
+					// Allowed departure
+					lineStopUpdateAction.getAction()->setAllowedDeparture(optional<bool>(!lineStop->isDeparture()));
+					stream <<
+						t.col() <<
+						HTMLModule::getHTMLLink(
+							lineStopUpdateAction.getHTMLForm().getURL(),
+							(lineStop->isDeparture() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"))
+						);
+					lineStopUpdateAction.getAction()->setAllowedDeparture(optional<bool>());
+
 					stream << t.col() << (lineStop->getScheduleInput() ? HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") : HTMLModule::getHTMLImage("tree_vert.png", "Houraire non fourni à cet arrêt"));
 // 					if (reservation)
 // 						stream << t.col() << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire au départ de cet arrêt");

@@ -99,6 +99,9 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setLineStop(boost::shared_ptr<LineStop> value) { _lineStop = value; }
+				void setAllowedDeparture(boost::optional<bool>(value)){ _allowedDeparture = value; }
+				void setAllowedArrival(boost::optional<bool>(value)){ _allowedArrival = value; }
+				void setPhysicalStop(boost::shared_ptr<StopPoint> value){ _physicalStop = value; }
 			//@}
 		};
 	}
