@@ -52,18 +52,20 @@ namespace synthese
 			Importable(
 				const std::string codeBySource = std::string(),
 				const DataSource* const source = NULL
-			);
+			):	_codeBySource(codeBySource),
+				_dataSource(source)
+			{}
 			
 			//! @name Getters
 			//@{
-				const std::string& getCodeBySource() const;
-				const DataSource* getDataSource() const;
+				const std::string& getCodeBySource() const { return _codeBySource; }
+				const DataSource* getDataSource() const { return _dataSource; }
 			//@}
 		
 			//! @name Setters
 			//@{
-				void setCodeBySource(const std::string& value);
-				void setDataSource(const DataSource* value);
+				void setCodeBySource(const std::string& value) { _codeBySource = value; }
+				void setDataSource(const DataSource* value) { _dataSource = value; }
 			//@}
 
 			//! @name Modifiers

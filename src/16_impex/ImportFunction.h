@@ -27,6 +27,7 @@
 
 #include "Function.h"
 #include "FactorableTemplate.h"
+#include "Importer.hpp"
 
 namespace synthese
 {
@@ -63,7 +64,6 @@ do_import=0|1
 			public util::FactorableTemplate<server::Function, ImportFunction>
 		{
 		public:
-			static const std::string PARAMETER_PATH;	//!< Path of the files to import
 			static const std::string PARAMETER_DO_IMPORT;	//!< do_import parameter
 			static const std::string PARAMETER_DATA_SOURCE;	//!< clear_network parameter
 
@@ -76,9 +76,8 @@ do_import=0|1
 		protected:
 			//! \name Page parameters
 			//@{
-				bool								_doImport;
-				boost::shared_ptr<const DataSource>	_dataSource;
-				boost::shared_ptr<FileFormat>		_fileFormat;
+				bool							_doImport;
+				boost::shared_ptr<Importer>		_importer;
 			//@}
 			
 			std::string							_output;
@@ -106,10 +105,7 @@ do_import=0|1
 			virtual bool isAuthorized(const server::Session* session) const;
 
 			virtual std::string getOutputMimeType() const;
-
-			void setDataSource(boost::shared_ptr<const DataSource> value){ _dataSource = value; }
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_TridentExportFunction_H__

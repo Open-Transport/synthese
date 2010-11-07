@@ -47,6 +47,7 @@ namespace synthese
 		const string DataSourceTableSync::COL_NAME("name");
 		const string DataSourceTableSync::COL_FORMAT("format");
 		const string DataSourceTableSync::COL_ICON("icon");
+		const string DataSourceTableSync::COL_CHARSET("charset");
 	}
 
 	namespace db
@@ -61,6 +62,7 @@ namespace synthese
 			SQLiteTableSync::Field(DataSourceTableSync::COL_NAME, SQL_TEXT),
 			SQLiteTableSync::Field(DataSourceTableSync::COL_FORMAT, SQL_TEXT),
 			SQLiteTableSync::Field(DataSourceTableSync::COL_ICON, SQL_TEXT),
+			SQLiteTableSync::Field(DataSourceTableSync::COL_CHARSET, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -81,6 +83,7 @@ namespace synthese
 			object->setName(name);
 			object->setFormat(format);
 			object->setIcon(rows->getText(DataSourceTableSync::COL_ICON));
+			object->setCharset(rows->getText(DataSourceTableSync::COL_CHARSET));
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Save(
@@ -91,6 +94,7 @@ namespace synthese
 			query.addField(object->getName());
 			query.addField(object->getFormat());
 			query.addField(object->getIcon());
+			query.addField(object->getCharset());
 			query.execute(transaction);
 		}
 
@@ -103,7 +107,7 @@ namespace synthese
 	namespace impex
 	{
 		DataSourceTableSync::DataSourceTableSync ()
-		:	SQLiteNoSyncTableSyncTemplate<DataSourceTableSync,DataSource>()
+		:	SQLiteRegistryTableSyncTemplate<DataSourceTableSync,DataSource>()
 		{
 		}
 

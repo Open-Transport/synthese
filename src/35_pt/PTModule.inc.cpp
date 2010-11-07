@@ -5,7 +5,6 @@
 
 #include "PTModule.h"
 
-#include "TridentExportFunction.h"
 #include "LinesListFunction.h"
 #include "StopAreasListFunction.hpp"
 #include "StopPointsListFunction.hpp"
@@ -19,6 +18,7 @@
 
 #include "TridentFileFormat.h"
 #include "CarPostalFileFormat.hpp"
+#include "PladisStopsFileFormat.hpp"
 
 #include "PTUseRuleTableSync.h"
 #include "ContinuousServiceTableSync.h"
@@ -39,8 +39,6 @@
 #include "CommercialLineAdmin.h"
 #include "JourneyPatternAdmin.hpp"
 #include "ServiceAdmin.h"
-#include "PTImportAdmin.h"
-#include "PTStopsImportWizardAdmin.hpp"
 #include "PTCitiesAdmin.h"
 #include "PTPlacesAdmin.h"
 #include "PTRoadsAdmin.h"

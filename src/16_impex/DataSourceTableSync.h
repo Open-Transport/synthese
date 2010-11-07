@@ -31,7 +31,7 @@
 
 #include "DataSource.h"
 
-#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -42,12 +42,13 @@ namespace synthese
 			@ingroup m16LS refLS
 		*/
 		class DataSourceTableSync
-		:	public db::SQLiteNoSyncTableSyncTemplate<DataSourceTableSync,DataSource>
+		:	public db::SQLiteRegistryTableSyncTemplate<DataSourceTableSync,DataSource>
 		{
 		 public:
 			 static const std::string COL_NAME;
 			 static const std::string COL_FORMAT;
 			 static const std::string COL_ICON;
+			 static const std::string COL_CHARSET;
 
 			DataSourceTableSync ();
 

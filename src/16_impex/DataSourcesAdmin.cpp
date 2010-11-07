@@ -30,6 +30,8 @@
 #include "DataSource.h"
 #include "DataSourceTableSync.h"
 #include "AdminFunctionRequest.hpp"
+#include "DataSourceAdmin.h"
+#include "HTMLModule.h"
 
 #include <boost/foreach.hpp>
 
@@ -107,6 +109,8 @@ namespace synthese
 
 			AdminFunctionRequest<DataSourcesAdmin> searchRequest(request);
 
+			AdminFunctionRequest<DataSourceAdmin> openRequest(request);
+
 			DataSourceTableSync::SearchResult dataSources(
 				DataSourceTableSync::Search(
 					*_env,
@@ -129,11 +133,13 @@ namespace synthese
 
 			BOOST_FOREACH(shared_ptr<DataSource> dataSource, dataSources)
 			{
+				openRequest.getPage()->setDataSource(const_pointer_cast<const DataSource>(dataSource));
+
 				stream << t.row();
 				stream << t.col() << dataSource->getKey();
 				stream << t.col() << dataSource->getName();
 				stream << t.col() << dataSource->getFormat();
-				stream << t.col();
+				stream << t.col() << HTMLModule::getLinkButton(openRequest.getHTMLForm().getURL(), "Ouvrir", string(), "database_edit.png");
 			}
 
 			stream << t.close();
@@ -175,9 +181,9 @@ namespace synthese
 			);
 			BOOST_FOREACH(shared_ptr<DataSource> dataSource, dataSources)
 			{
-//				shared_ptr<DataSourceAdmin> p(getNewOtherPage<DataSourceAdmin>());
-//				p->setDataSource(dataSource);
-//				links.push_back(p);
+				shared_ptr<DataSourceAdmin> p(getNewOtherPage<DataSourceAdmin>());
+				p->setDataSource(dataSource);
+				links.push_back(p);
 			}
 
 			return links;

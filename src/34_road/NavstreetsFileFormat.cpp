@@ -31,6 +31,10 @@
 #include "CoordinatesSystem.hpp"
 #include "SQLiteTransaction.h"
 #include "VirtualShapeVirtualTable.hpp"
+#include "AdminFunctionRequest.hpp"
+#include "DataSourceAdmin.h"
+#include "ImportFunction.h"
+#include "PropertiesHTMLTable.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -53,6 +57,9 @@ namespace synthese
 	using namespace geography;
 	using namespace graph;
 	using namespace db;
+	using namespace admin;
+	using namespace server;
+	using namespace html;
 
 	namespace util
 	{
@@ -61,8 +68,8 @@ namespace synthese
 
 	namespace road
 	{
-		const string NavstreetsFileFormat::FILE_MTDAREA("1mtdarea");
-		const string NavstreetsFileFormat::FILE_STREETS("2streets");
+		const string NavstreetsFileFormat::Importer_::FILE_MTDAREA("1mtdarea");
+		const string NavstreetsFileFormat::Importer_::FILE_STREETS("2streets");
 		
 		const string NavstreetsFileFormat::_FIELD_LINK_ID("LINK_ID");
 		const string NavstreetsFileFormat::_FIELD_ST_NAME("ST_NAME");
@@ -87,34 +94,26 @@ namespace synthese
 
 	namespace impex
 	{
-		template<> const FileFormat::Files FileFormatTemplate<NavstreetsFileFormat>::FILES(
-			NavstreetsFileFormat::FILE_MTDAREA.c_str(),
-			NavstreetsFileFormat::FILE_STREETS.c_str(),
+		template<> const MultipleFileTypesImporter<NavstreetsFileFormat>::Files MultipleFileTypesImporter<NavstreetsFileFormat>::FILES(
+			NavstreetsFileFormat::Importer_::FILE_MTDAREA.c_str(),
+			NavstreetsFileFormat::Importer_::FILE_STREETS.c_str(),
 		"");
 	}
 
 	namespace road
 	{
-		NavstreetsFileFormat::NavstreetsFileFormat(
-			Env* env /* = NULL */
-		){
-			_env = env;
-		}
-
-
-
-		bool NavstreetsFileFormat::_controlPathsMap( const FilePathsMap& paths )
+		bool NavstreetsFileFormat::Importer_::_controlPathsMap() const
 		{
 			// MTDAREA
-			FilePathsMap::const_iterator it(paths.find(FILE_MTDAREA));
-			if(it == paths.end() || it->second.empty() || !exists(it->second))
+			FilePathsMap::const_iterator it(_pathsMap.find(FILE_MTDAREA));
+			if(it == _pathsMap.end() || it->second.empty() || !exists(it->second))
 			{
 				return false;
 			}
 
 			// STREETS
-			it = paths.find(FILE_STREETS);
-			if(it == paths.end() || it->second.empty() || !exists(it->second))
+			it = _pathsMap.find(FILE_STREETS);
+			if(it == _pathsMap.end() || it->second.empty() || !exists(it->second))
 			{
 				return false;
 			}
@@ -125,20 +124,12 @@ namespace synthese
 
 
 
-		NavstreetsFileFormat::~NavstreetsFileFormat()
-		{
-		}
-
-
-
-		void NavstreetsFileFormat::build( std::ostream& os )
-		{
-		}
-
-
-
-		void NavstreetsFileFormat::_parse( const boost::filesystem::path& filePath, std::ostream& os, std::string key )
-		{
+		bool NavstreetsFileFormat::Importer_::_parse(
+			const boost::filesystem::path& filePath,
+			std::ostream& os,
+			const std::string& key,
+			boost::optional<const admin::AdminRequest&> adminRequest
+		) const {
 			// 1 : Administrative areas
 			if(key == FILE_MTDAREA)
 			{
@@ -151,37 +142,37 @@ namespace synthese
 			
 				{	// 1.1 Departements
 					stringstream query;
-					query << "SELECT * FROM " << table.getName() << " WHERE " << _FIELD_ADMIN_LVL << "=3";
+					query << "SELECT * FROM " << table.getName() << " WHERE " << NavstreetsFileFormat::_FIELD_ADMIN_LVL << "=3";
 					SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
 					while(rows->next())
 					{
-						string item(rows->getText(_FIELD_AREACODE_3));
+						string item(rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3));
 
 						if(departementCodes.find(item) != departementCodes.end())
 						{
 							continue;
 						}
 						departementCodes.insert(
-							make_pair(item, rows->getText(_FIELD_GOVT_CODE))
+							make_pair(item, rows->getText(NavstreetsFileFormat::_FIELD_GOVT_CODE))
 						);
 				}	}
 
 				{	// 1.2 Cities
 					stringstream query;
-					query << "SELECT * FROM " << table.getName() << " WHERE " << _FIELD_ADMIN_LVL << "=4";
+					query << "SELECT * FROM " << table.getName() << " WHERE " << NavstreetsFileFormat::_FIELD_ADMIN_LVL << "=4";
 					SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
 					while(rows->next())
 					{
 						stringstream code;
-						int cityID(rows->getInt(_FIELD_AREA_ID));
-						code << departementCodes[rows->getText(_FIELD_AREACODE_3)];
-						code << setw(3) << setfill('0') << rows->getInt(_FIELD_GOVT_CODE);
+						int cityID(rows->getInt(NavstreetsFileFormat::_FIELD_AREA_ID));
+						code << departementCodes[rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3)];
+						code << setw(3) << setfill('0') << rows->getInt(NavstreetsFileFormat::_FIELD_GOVT_CODE);
 						if(_citiesMap.find(cityID) != _citiesMap.end())
 						{
 							continue;
 						}
 
-						shared_ptr<City> city(CityTableSync::GetEditableFromCode(code.str(), *_env));
+						shared_ptr<City> city(CityTableSync::GetEditableFromCode(code.str(), _env));
 
 						if(!city.get())
 						{
@@ -194,25 +185,30 @@ namespace synthese
 								city.get()
 						)	);
 						cityCodes.insert(make_pair(
-								make_pair(rows->getText(_FIELD_AREACODE_3), rows->getText(_FIELD_AREACODE_4)),
+								make_pair(rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3), rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_4)),
 								city.get()
 						)	);
 				}	}
 
 				{
 					// 1.3 Settlements
-					stringstream query;					query << "SELECT * FROM " << table.getName() << " WHERE " << _FIELD_ADMIN_LVL << "=5";					SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));					while(rows->next())					{						CityCodes::const_iterator it(cityCodes.find(
-								make_pair(rows->getText(_FIELD_AREACODE_3), rows->getText(_FIELD_AREACODE_4))
+					stringstream query;
+					query << "SELECT * FROM " << table.getName() << " WHERE " << NavstreetsFileFormat::_FIELD_ADMIN_LVL << "=5";
+					SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
+					while(rows->next())
+					{
+						CityCodes::const_iterator it(cityCodes.find(
+								make_pair(rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3), rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_4))
 						)	);
 
 						if(it == cityCodes.end())
 						{
-							os << "WARN : City " << rows->getText(_FIELD_AREACODE_3) << "/" << rows->getText(_FIELD_AREACODE_4) << " not found.<br />";
+							os << "WARN : City " << rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3) << "/" << rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_4) << " not found.<br />";
 							continue;
 						}
 
 						_citiesMap.insert(make_pair(
-								rows->getInt(_FIELD_AREA_ID),
+								rows->getInt(NavstreetsFileFormat::_FIELD_AREA_ID),
 								it->second
 						)	);
 				}	}
@@ -233,24 +229,24 @@ namespace synthese
 				RecentlyCreatedRoadPlaces recentlyCreatedRoadPlaces;
 
 				stringstream query;
-				query << "SELECT *, AsText(" << _FIELD_GEOMETRY << ") AS " << _FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
+				query << "SELECT *, AsText(" << NavstreetsFileFormat::_FIELD_GEOMETRY << ") AS " << NavstreetsFileFormat::_FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
 				SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
 				while(rows->next())
 				{
 					// Fields to test if the record can be imported
-					string leftId(rows->getText(_FIELD_REF_IN_ID));
-					string rightId(rows->getText(_FIELD_NREF_IN_ID));
-					int lAreaId(rows->getInt(_FIELD_L_AREA_ID));
-					int rAreaId(rows->getInt(_FIELD_R_AREA_ID));
-					string leftMinHouseNumber(rows->getText(_FIELD_L_REFADDR));
-					string leftMaxHouseNumber(rows->getText(_FIELD_L_NREFADDR));
-					string rightMinHouseNumber(rows->getText(_FIELD_R_REFADDR));
-					string rightMaxHouseNumber(rows->getText(_FIELD_R_NREFADDR));
-					string leftAddressSchema(rows->getText(_FIELD_L_ADDRSCH));
-					string rightAddressSchema(rows->getText(_FIELD_R_ADDRSCH));
+					string leftId(rows->getText(NavstreetsFileFormat::_FIELD_REF_IN_ID));
+					string rightId(rows->getText(NavstreetsFileFormat::_FIELD_NREF_IN_ID));
+					int lAreaId(rows->getInt(NavstreetsFileFormat::_FIELD_L_AREA_ID));
+					int rAreaId(rows->getInt(NavstreetsFileFormat::_FIELD_R_AREA_ID));
+					string leftMinHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_L_REFADDR));
+					string leftMaxHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_L_NREFADDR));
+					string rightMinHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_R_REFADDR));
+					string rightMaxHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_R_NREFADDR));
+					string leftAddressSchema(rows->getText(NavstreetsFileFormat::_FIELD_L_ADDRSCH));
+					string rightAddressSchema(rows->getText(NavstreetsFileFormat::_FIELD_R_ADDRSCH));
 					shared_ptr<LineString> geometry(
 						dynamic_pointer_cast<LineString, Geometry>(
-						rows->getGeometryFromWKT(_FIELD_GEOMETRY+"_ASTEXT", geometryFactory)
+						rows->getGeometryFromWKT(NavstreetsFileFormat::_FIELD_GEOMETRY+"_ASTEXT", geometryFactory)
 					)	);
 
 					if(!geometry.get())
@@ -275,7 +271,7 @@ namespace synthese
 						double length(geometry->getLength());
 
 						// Name
-						string roadName(rows->getText(_FIELD_ST_NAME));
+						string roadName(rows->getText(NavstreetsFileFormat::_FIELD_ST_NAME));
 
 						// City
 						City* city(itc->second);
@@ -299,11 +295,11 @@ namespace synthese
 									CrossingTableSync::getId(),
 									shared_ptr<Point>(geometry->getStartPoint()),
 									leftId,
-									_dataSource
+									&_dataSource
 							)	);
 
 							_navteqCrossings.insert(make_pair(leftId, leftNode));
-							_env->getEditableRegistry<Crossing>().add(leftNode);
+							_env.getEditableRegistry<Crossing>().add(leftNode);
 						}
 						else
 						{
@@ -321,11 +317,11 @@ namespace synthese
 									CrossingTableSync::getId(),
 									shared_ptr<Point>(geometry->getEndPoint()),
 									rightId,
-									_dataSource
+									&_dataSource
 							)	);
 							
 							_navteqCrossings.insert(make_pair(rightId, rightNode));
-							_env->getEditableRegistry<Crossing>().add(rightNode);
+							_env.getEditableRegistry<Crossing>().add(rightNode);
 						}
 						else
 						{
@@ -337,7 +333,7 @@ namespace synthese
 						shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditableFromCityAndName(
 								city->getKey(),
 								roadName,
-								*_env
+								_env
 						)	);
 
 						// Search for a recently created road place
@@ -359,7 +355,7 @@ namespace synthese
 							roadPlace->setCity(city);
 							roadPlace->setKey(RoadPlaceTableSync::getId());
 							roadPlace->setName(roadName);
-							_env->getEditableRegistry<RoadPlace>().add(roadPlace);
+							_env.getEditableRegistry<RoadPlace>().add(roadPlace);
 							recentlyCreatedRoadPlaces.insert(
 								make_pair(
 									make_pair(
@@ -405,7 +401,7 @@ namespace synthese
 							secondRoadChunk->setMetricOffset(startMetricOffset + length);
 							secondRoadChunk->setKey(RoadChunkTableSync::getId());
 							road->addRoadChunk(*secondRoadChunk);
-							_env->getEditableRegistry<RoadChunk>().add(secondRoadChunk);
+							_env.getEditableRegistry<RoadChunk>().add(secondRoadChunk);
 
 							// Search for a second existing road which starts at the right node
 							Road* road2 = NULL;
@@ -426,8 +422,8 @@ namespace synthese
 							{
 								RegistryKeyType lastEdgeId(road->getLastEdge()->getKey());
 								road->merge(*road2);
-								_env->getEditableRegistry<RoadChunk>().remove(lastEdgeId);
-								_env->getEditableRegistry<Road>().remove(road2->getKey());
+								_env.getEditableRegistry<RoadChunk>().remove(lastEdgeId);
+								_env.getEditableRegistry<Road>().remove(road2->getKey());
 							}
 
 						}
@@ -466,14 +462,14 @@ namespace synthese
 									leftHouseNumberBounds
 								);
 
-								_env->getEditableRegistry<RoadChunk>().add(firstRoadChunk);
+								_env.getEditableRegistry<RoadChunk>().add(firstRoadChunk);
 							}
 							else
 							{
 								shared_ptr<Road> road(new Road(0, Road::ROAD_TYPE_UNKNOWN));
 								road->setRoadPlace(*roadPlace);
 								road->setKey(RoadTableSync::getId());
-								_env->getEditableRegistry<Road>().add(road);
+								_env.getEditableRegistry<Road>().add(road);
 
 								// First road chunk
 								shared_ptr<RoadChunk> firstRoadChunk(new RoadChunk);
@@ -492,7 +488,7 @@ namespace synthese
 									leftHouseNumberBounds
 								);
 
-								_env->getEditableRegistry<RoadChunk>().add(firstRoadChunk);
+								_env.getEditableRegistry<RoadChunk>().add(firstRoadChunk);
 
 								// Second road chunk
 								shared_ptr<RoadChunk> secondRoadChunk(new RoadChunk);
@@ -502,7 +498,7 @@ namespace synthese
 								secondRoadChunk->setMetricOffset(length);
 								secondRoadChunk->setKey(RoadChunkTableSync::getId());
 								road->addRoadChunk(*secondRoadChunk);
-								_env->getEditableRegistry<RoadChunk>().add(secondRoadChunk);
+								_env.getEditableRegistry<RoadChunk>().add(secondRoadChunk);
 							}
 						}
 //					}
@@ -510,38 +506,37 @@ namespace synthese
 			}
 
 			os << "<b>SUCCESS : Data loaded</b><br />";
+
+			return true;
 		}
 
 
 
-		SQLiteTransaction NavstreetsFileFormat::save( std::ostream& os ) const
+		SQLiteTransaction NavstreetsFileFormat::Importer_::_save() const
 		{
 			SQLiteTransaction transaction;
-			BOOST_FOREACH(Registry<Crossing>::value_type crossing, _env->getEditableRegistry<Crossing>())
+			BOOST_FOREACH(Registry<Crossing>::value_type crossing, _env.getEditableRegistry<Crossing>())
 			{
 				CrossingTableSync::Save(crossing.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<RoadPlace>::value_type roadplace, _env->getEditableRegistry<RoadPlace>())
+			BOOST_FOREACH(Registry<RoadPlace>::value_type roadplace, _env.getEditableRegistry<RoadPlace>())
 			{
 				RoadPlaceTableSync::Save(roadplace.second.get(),transaction);
 			}
-			BOOST_FOREACH(Registry<Road>::value_type road, _env->getEditableRegistry<Road>())
+			BOOST_FOREACH(Registry<Road>::value_type road, _env.getEditableRegistry<Road>())
 			{
 				RoadTableSync::Save(road.second.get(),transaction);
 			}
-			BOOST_FOREACH(Registry<RoadChunk>::value_type roadChunk, _env->getEditableRegistry<RoadChunk>())
+			BOOST_FOREACH(Registry<RoadChunk>::value_type roadChunk, _env.getEditableRegistry<RoadChunk>())
 			{
 				RoadChunkTableSync::Save(roadChunk.second.get(),transaction);
 			}
-
-			os << "<b>SUCCESS : Data saved</b><br />";
-
 			return transaction;
 		}
 
 
 
-		RoadChunk::HouseNumberingPolicy NavstreetsFileFormat::_getHouseNumberingPolicyFromAddressSchema(
+		RoadChunk::HouseNumberingPolicy NavstreetsFileFormat::Importer_::_getHouseNumberingPolicyFromAddressSchema(
 			const std::string& addressSchema
 		){
 			if(addressSchema == "E") return RoadChunk::EVEN;
@@ -551,22 +546,30 @@ namespace synthese
 
 
 
-		RoadChunk::HouseNumberBounds NavstreetsFileFormat::_getHouseNumberBoundsFromAddresses( const std::string& minAddress, const std::string maxAddress )
-		{
+		RoadChunk::HouseNumberBounds NavstreetsFileFormat::Importer_::_getHouseNumberBoundsFromAddresses(
+			const std::string& minAddress,
+			const std::string maxAddress
+		){
 			if(!minAddress.empty() && !maxAddress.empty())
 			{
 				try
-				{					return RoadChunk::HouseNumberBounds(
+				{
+					return RoadChunk::HouseNumberBounds(
 						pair<RoadChunk::HouseNumber,RoadChunk::HouseNumber>(
 							lexical_cast<RoadChunk::HouseNumber>(minAddress),
 							lexical_cast<RoadChunk::HouseNumber>(maxAddress)
 					)	);
-				}				catch(bad_lexical_cast)				{				}			}
-			return RoadChunk::HouseNumberBounds();		}
+				}
+				catch(bad_lexical_cast)
+				{
+				}
+			}
+			return RoadChunk::HouseNumberBounds();
+		}
 
 
 
-		void NavstreetsFileFormat::_setGeometryAndHouses(
+		void NavstreetsFileFormat::Importer_::_setGeometryAndHouses(
 			road::RoadChunk& chunk,
 			boost::shared_ptr<geos::geom::LineString> geometry,
 			road::RoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
@@ -580,5 +583,21 @@ namespace synthese
 			chunk.getReverseChunk()->setHouseNumberBounds(leftHouseNumberBounds);
 			chunk.getReverseChunk()->setHouseNumberingPolicy(leftHouseNumberingPolicy);
 		}
-	}
-}
+
+
+
+		void NavstreetsFileFormat::Importer_::displayAdmin(
+			std::ostream& stream,
+			const admin::AdminRequest& request
+		) const	{
+			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
+			PropertiesHTMLTable t(importRequest.getHTMLForm());
+			stream << t.open();
+			stream << t.title("Propriétés");
+			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.title("Données");
+			stream << t.cell("Rues (streets)", t.getForm().getTextInput(PARAMETER_PATH + FILE_STREETS, string()));
+			stream << t.cell("Zones administratives (mtdarea)", t.getForm().getTextInput(PARAMETER_PATH + FILE_MTDAREA, string()));
+			stream << t.close();
+		}
+}	}

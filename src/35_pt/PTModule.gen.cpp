@@ -29,10 +29,9 @@ synthese::pt::PTModule::integrate();
 
 synthese::pt::TridentFileFormat::integrate ();
 synthese::pt::CarPostalFileFormat::integrate();
+synthese::pt::PladisStopsFileFormat::integrate();
 
-synthese::pt::PTStopsImportWizardAdmin::integrate();
 synthese::pt::ServiceAdmin::integrate();
-synthese::pt::PTImportAdmin::integrate();
 synthese::pt::TransportNetworkAdmin::integrate();
 synthese::pt::CommercialLineAdmin::integrate();
 synthese::pt::JourneyPatternAdmin::integrate();
@@ -51,7 +50,6 @@ synthese::pt::PhysicalStopsCSVExportFunction::integrate();
 synthese::pt::LinesListFunction::integrate();
 synthese::pt::StopPointsListFunction::integrate();
 synthese::pt::StopAreasListFunction::integrate();
-synthese::pt::TridentExportFunction::integrate ();
 synthese::pt::PTNetworksListFunction::integrate();
 synthese::pt::PTRoutesListFunction::integrate();
 synthese::pt::PTRouteDetailFunction::integrate();

@@ -40,6 +40,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace db;
+	using namespace admin;
 	
 
 	template<> const string util::FactorableTemplate<Function,impex::ImportFunction>::FACTORY_KEY("ImportFunction");
@@ -47,31 +48,31 @@ namespace synthese
 	namespace impex
 	{
 		/// Parameter names declarations
-		const string ImportFunction::PARAMETER_PATH("pa");
 		const string ImportFunction::PARAMETER_DATA_SOURCE("ds");
 		const string ImportFunction::PARAMETER_DO_IMPORT("di");
 
 
 
-		ImportFunction::ImportFunction()
-			: FactorableTemplate<Function, ImportFunction>(),
+		ImportFunction::ImportFunction():
+			FactorableTemplate<Function, ImportFunction>(),
 			_doImport(false)
 		{
-			setEnv(shared_ptr<Env>(new Env));
 		}
 
 
 
 		ParametersMap ImportFunction::_getParametersMap() const
 		{
-			ParametersMap map(_fileFormat.get() ? _fileFormat->_getParametersMap(true) : ParametersMap());
-			if(_dataSource.get())
+			ParametersMap map(_importer.get() ? _importer->getParametersMap() : ParametersMap());
+			if(_importer.get())
 			{
-				map.insert(PARAMETER_DATA_SOURCE, _dataSource->getKey());
+				map.insert(PARAMETER_DATA_SOURCE, _importer->getDataSource().getKey());
 			}
 			map.insert(PARAMETER_DO_IMPORT, _doImport);
 			return map;
 		}
+
+
 
 		void ImportFunction::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -79,60 +80,17 @@ namespace synthese
 			RegistryKeyType dataSourceId(map.get<RegistryKeyType>(PARAMETER_DATA_SOURCE));
 			try
 			{
-				_dataSource = DataSourceTableSync::Get(dataSourceId, *_env);
+				shared_ptr<const DataSource> dataSource(Env::GetOfficialEnv().get<DataSource>(dataSourceId));
+				_importer = dataSource->getImporter();
+				_importer->setFromParametersMap(map, true);
+				
+				stringstream output;
+				_doImport = _importer->parseFiles(output, optional<const AdminRequest&>()) && map.getDefault<bool>(PARAMETER_DO_IMPORT, false);
+				_output = output.str();
 			}
 			catch(ObjectNotFoundException<DataSource> e)
 			{
 				throw RequestException("Datasource not found");
-			}
-			
-			// Do import ?
-			_doImport = map.getDefault<bool>(PARAMETER_DO_IMPORT, false);
-			
-			// Input parsing
-			try
-			{
-				boost::shared_ptr<FileFormat>		_fileFormat;
-				stringstream output;
-				_fileFormat.reset(Factory<FileFormat>::create(_dataSource->getFormat()));
-
-				// Paths
-				FileFormat::Files::FilesVector files(_fileFormat->getFiles());
-				_fileFormat->setEnv(_env.get());
-				_fileFormat->setDataSource(_dataSource.get());
-				_fileFormat->_setFromParametersMap(map, true);
-
-				if(files.empty())
-				{
-					FileFormat::FilePathsSet paths;
-					string text(map.get<string>(PARAMETER_PATH));
-					tokenizer<char_separator<char> > pathsTokens(text, char_separator<char>(","));
-					BOOST_FOREACH(const string& token, pathsTokens)
-					{
-						if(token.empty()) continue;
-						paths.insert(token);
-					}
-					_fileFormat->parseFiles(paths, output);
-				}
-				else
-				{
-					FileFormat::FilePathsMap paths;
-					BOOST_FOREACH(const string& key, files)
-					{
-						paths.insert(make_pair(key, map.getDefault<string>(PARAMETER_PATH + key)));
-					}
-					_fileFormat->parseFiles(paths, output);
-				}
-
-				SQLiteTransaction transaction(_fileFormat->save(output));
-				_output = output.str();
-
-				_env->clear();
-
-				if(_doImport)
-				{
-					transaction.run();
-				}
 			}
 			catch(Exception e)
 			{
@@ -144,6 +102,11 @@ namespace synthese
 
 		void ImportFunction::run( std::ostream& stream, const Request& request ) const
 		{
+			if(_doImport)
+			{
+				_importer->save().run();
+			}
+
 			stream << _output;
 		}
 		
@@ -154,9 +117,10 @@ namespace synthese
 			return true;
 		}
 
+
+
 		std::string ImportFunction::getOutputMimeType() const
 		{
 			return "text/html";
 		}
-	}
-}
+}	}
