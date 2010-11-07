@@ -43,18 +43,18 @@ namespace synthese
 				const DataSource& dataSource
 			) const	{
 				return
-					boost::static_pointer_cast<Importer, FF::Importer_>(
-						boost::shared_ptr<FF::Importer_>(
-							new FF::Importer_(dataSource)
+					boost::static_pointer_cast<Importer, typename FF::Importer_>(
+						boost::shared_ptr<typename FF::Importer_>(
+							new typename FF::Importer_(dataSource)
 					)	);
 			}
 
 			virtual boost::shared_ptr<Exporter> getExporter(
 			) const	{
 				return
-					boost::static_pointer_cast<Exporter, FF::Exporter_>(
-						boost::shared_ptr<FF::Exporter_>(
-							new FF::Exporter_()
+					boost::static_pointer_cast<Exporter, typename FF::Exporter_>(
+						boost::shared_ptr<typename FF::Exporter_>(
+							new typename FF::Exporter_()
 					)	);
 			}
 		};

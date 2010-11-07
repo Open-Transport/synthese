@@ -117,7 +117,7 @@ namespace synthese
 
 			public:
 				Importer_(const impex::DataSource& dataSource):
-					MultipleFileTypesImporter<PladisStopsFileFormat>(dataSource)
+					impex::MultipleFileTypesImporter<PladisStopsFileFormat>(dataSource)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////

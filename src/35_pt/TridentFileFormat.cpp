@@ -121,7 +121,7 @@ namespace synthese
 		// CONSTRUCTOR
 		TridentFileFormat::Importer_::Importer_(
 			const impex::DataSource& dataSource
-		):	OneFileTypeImporter(dataSource),
+		):	OneFileTypeImporter<Importer_>(dataSource),
 			_importStops(false),
 			_importJunctions(false),
 			_defaultTransferDuration(minutes(8)),
