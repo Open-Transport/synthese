@@ -134,25 +134,24 @@ namespace synthese
 							try
 							{
 								auto_ptr<TimetableGenerator> g(tt->getGenerator(Env::GetOfficialEnv()));
+								Display(
+									content,
+									pageForSubTimetable,
+									notePage,
+									noteCalendarPage,
+									pageForSubTimetable,
+									rowPage,
+									cellPage,
+									request,
+									*tt,
+									*g,
+									result
+								);
 							}
 							catch(Timetable::ImpossibleGenerationException&)
 							{
 								continue;
 							}
-
-							Display(
-								content,
-								pageForSubTimetable,
-								notePage,
-								noteCalendarPage,
-								pageForSubTimetable,
-								rowPage,
-								cellPage,
-								request,
-								*tt,
-								*g,
-								result
-							);
 						}
 						pm.insert(DATA_CONTENT, content.str()); //4
 					}

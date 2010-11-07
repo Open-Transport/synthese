@@ -121,7 +121,9 @@ namespace synthese
 			object->setRank(rows->getInt(TimetableTableSync::COL_RANK));
 			object->setTitle(rows->getText(TimetableTableSync::COL_TITLE));
 			object->setContentType(static_cast<Timetable::ContentType>(rows->getInt(TimetableTableSync::COL_FORMAT)));
-			
+			object->setTransferTimetableBefore(rows->getLongLong(TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE));
+			object->setTransferTimetableAfter(rows->getLongLong(TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER));
+
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				vector<string> lines = Conversion::ToStringVector(rows->getText (TimetableTableSync::COL_AUTHORIZED_LINES));
@@ -219,6 +221,8 @@ namespace synthese
 			query.addField(static_cast<int>(object->getContentType()));
 			query.addField(authorizedLines.str());
 			query.addField(authorizedPhysicalStops.str());
+			query.addField(object->getTransferTimetableBefore());
+			query.addField(object->getTransferTimetableAfter());
 			query.execute(transaction);
 		}
 
