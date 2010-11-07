@@ -26,6 +26,8 @@
 
 #include "FileFormatTemplate.h"
 #include "CoordinatesSystem.hpp"
+#include "OneFileTypeImporter.hpp"
+#include "OneFileExporter.hpp"
 
 #include <iostream>
 #include <vector>
@@ -41,6 +43,8 @@ namespace synthese
 	
 	namespace pt
 	{
+		class CommercialLine;
+			
 		//////////////////////////////////////////////////////////////////////////
 		/// Trident/Chouette file format.
 		/// @ingroup m35File refFile
@@ -217,117 +221,152 @@ namespace synthese
 		///
 		/// @image html tisseo-ptlink.png
 		///
-		class TridentFileFormat
-		:	public impex::FileFormatTemplate<TridentFileFormat>
+		class TridentFileFormat:
+			public impex::FileFormatTemplate<TridentFileFormat>
 		{
-		public:
-			static const std::string PARAMETER_IMPORT_STOPS;
-			static const std::string PARAMETER_IMPORT_JUNCTIONS;
-			static const std::string PARAMETER_WITH_OLD_DATES;
-			static const std::string PARAMETER_DEFAULT_TRANSFER_DURATION;
-		    
 		private:
-			//! @name Import parameters
-			//@{
-				bool		_importStops;
-				bool		_importJunctions;
-				boost::posix_time::time_duration	_defaultTransferDuration;
-			//@}
-
-			//! @name Import/Export parameters
-			//@{
-				boost::gregorian::date	_startDate;
-			//@}
-
-			//! @name Export parameters
-			//@{
-				boost::optional<util::RegistryKeyType>	_commercialLineId;
-				const bool				_withTisseoExtension;
-			//@}
-
 			typedef boost::bimap<CoordinatesSystem::SRID, std::string> SRIDConversionMap;
 			static SRIDConversionMap _SRIDConversionMap;
 
-		protected:
-				
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Trident file import.
-			/// @param filePath path of the file to import
-			/// @param os stream to write information messages on
-			/// @param key unused parameter
-			/// @author Hugues Romain
-			///
-			/// The Trident file import loads the following objects :
-			///	<ul>
-			///		<li>Commercial stop points (StopArea) : city, name, specific transfer delays (only if stop import mode)</li>
-			///		<li>Physical stop points (StopPoint) : commercial stop point (only at physical stop creation), x, y, name (only if stop import mode)</li>
-			///		<li>Scheduled services (ScheduledService) : all. Not imported if the service runs never.
-			/// </ul>
-			virtual void _parse(
-				const boost::filesystem::path& filePath,
-				std::ostream& os,
-				std::string key = std::string()
-			);
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Conversion from attributes to generic parameter maps.
-			///	@param import true if the parameters must be generated for an import, false for an export
-			/// @return Generated parameters map
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.1.16
-			virtual server::ParametersMap _getParametersMap(bool import) const;
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Conversion from generic parameters map to attributes.
-			/// @param map Parameters map to interpret
-			///	@param import true if the parameters must be read for an import, false for an export
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.1.16
-			virtual void _setFromParametersMap(const server::ParametersMap& map, bool import);
-		
-		public:
-
-			TridentFileFormat(
-				util::Env* env = NULL,
-				boost::optional<util::RegistryKeyType> lineId = boost::optional<util::RegistryKeyType>(),
-				bool withTisseoExtension = false
-			);
-			~TridentFileFormat();
-
-			/** -> ChouettePTNetwork
-			 */
-			virtual void build(std::ostream& os);
-			
-			virtual db::SQLiteTransaction save(std::ostream& os) const;
-
-			//! @name Setters
-			//@{
-				void setImportStops(bool value);
-			//@}
-
-			//! @name Getters
-			//@{
-				bool getImportStops() const;
-			//@}
-
-		private:
-		    
-			static std::string TridentId (const std::string& peer, const std::string clazz, const util::RegistryKeyType& id);
-			static std::string TridentId (const std::string& peer, const std::string clazz, const std::string& s);
-			static std::string TridentId (const std::string& peer, const std::string clazz, const util::Registrable& obj);
-			static std::string GetCoordinate(const double value);
-			
 			static void _populateSRIDTridentConversionMap();
 			static CoordinatesSystem::SRID _getSRIDFromTrident(const std::string& value);
 			static const std::string& _getTridentFromSRID(const CoordinatesSystem::SRID value);
+
+		public:
+
+			class Importer_:
+				public impex::OneFileTypeImporter<Importer_>
+			{
+			private:
+				//! @name Import parameters
+				//@{
+					bool		_importStops;
+					bool		_importJunctions;
+					boost::posix_time::time_duration	_defaultTransferDuration;
+					boost::gregorian::date	_startDate;
+				//@}
+
+				static std::string GetCoordinate(const double value);
+
+				
+			public:
+				static const std::string PARAMETER_IMPORT_STOPS;
+				static const std::string PARAMETER_IMPORT_JUNCTIONS;
+				static const std::string PARAMETER_DEFAULT_TRANSFER_DURATION;
+				static const std::string PARAMETER_WITH_OLD_DATES;
+
+				Importer_(const impex::DataSource& dataSource);
+			
+
+				//! @name Setters
+				//@{
+					void setImportStops(bool value);
+				//@}
+
+				//! @name Getters
+				//@{
+					bool getImportStops() const;
+				//@}
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from attributes to generic parameter maps.
+				/// @return Generated parameters map
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				virtual server::ParametersMap _getParametersMap() const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from generic parameters map to attributes.
+				/// @param map Parameters map to interpret
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				virtual void _setFromParametersMap(const server::ParametersMap& map);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Trident file import.
+				/// @param filePath path of the file to import
+				/// @param os stream to write information messages on
+				/// @author Hugues Romain
+				///
+				/// The Trident file import loads the following objects :
+				///	<ul>
+				///		<li>Commercial stop points (StopArea) : city, name, specific transfer delays (only if stop import mode)</li>
+				///		<li>Physical stop points (StopPoint) : commercial stop point (only at physical stop creation), x, y, name (only if stop import mode)</li>
+				///		<li>Scheduled services (ScheduledService) : all. Not imported if the service runs never.
+				/// </ul>
+				virtual bool _parse(
+					const boost::filesystem::path& filePath,
+					std::ostream& os,
+					boost::optional<const admin::AdminRequest&> adminRequest
+				) const;
+
+				virtual db::SQLiteTransaction _save() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Import screen to include in the administration console.
+				/// @param os stream to write the result on
+				/// @param request request for display of the administration console
+				/// @author Hugues Romain
+				/// @since 3.2.0
+				/// @date 2010
+				virtual void displayAdmin(
+					std::ostream& os,
+					const admin::AdminRequest& request
+				) const;
+
+			};
+
+			class Exporter_:
+				public impex::OneFileExporter<TridentFileFormat>
+			{
+			public:
+				static const std::string PARAMETER_LINE_ID;	//!< Commercial line id parameter
+				static const std::string PARAMETER_WITH_TISSEO_EXTENSION;	//!< With tisseo extension parameter
+				static const std::string PARAMETER_WITH_OLD_DATES;
+			
+			private:
+				//! @name Export parameters
+				//@{
+					boost::gregorian::date	_startDate;
+					boost::shared_ptr<const pt::CommercialLine> _line; //!< Commercial line to export
+					bool										_withTisseoExtension;
+				//@}
+
+				static std::string TridentId (const std::string& peer, const std::string clazz, const util::RegistryKeyType& id);
+				static std::string TridentId (const std::string& peer, const std::string clazz, const std::string& s);
+				static std::string TridentId (const std::string& peer, const std::string clazz, const util::Registrable& obj);
+
+			public:
+				Exporter_():
+					_withTisseoExtension(false)
+				{}
+
+				//! @name Setters
+				//@{
+					void setLine(boost::shared_ptr<const CommercialLine> value){ _line = value; }
+					void setWithTisseoExtension(bool value){ _withTisseoExtension = value; }
+				//@}
+
+				virtual server::ParametersMap getParametersMap() const;
+
+				virtual void setFromParametersMap(const server::ParametersMap& map);
+
+				/** -> ChouettePTNetwork
+				 */
+				virtual void build(std::ostream& os) const;
+
+				virtual std::string getOutputMimeType() const { return "text/xml"; }
+			};
+
+			friend class Importer_;
+			friend class Exporter_;
 		};
 	}
 }

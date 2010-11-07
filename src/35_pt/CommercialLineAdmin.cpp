@@ -34,7 +34,6 @@
 #include "JourneyPatternAdmin.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "TransportNetworkRight.h"
-#include "TridentExportFunction.h"
 #include "AdminInterfaceElement.h"
 #include "AdminFunctionRequest.hpp"
 #include "NonConcurrencyRuleAddAction.h"
@@ -57,8 +56,10 @@
 #include "ActionResultHTMLTable.h"
 #include "AdminModule.h"
 #include "DataSource.h"
-#include "PTImportAdmin.h"
+#include "DataSourceAdmin.h"
 #include "JourneyPatternRemoveAction.hpp"
+#include "TridentFileFormat.h"
+#include "ExportFunction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -75,6 +76,8 @@ namespace synthese
 	using namespace html;
 	using namespace pt;
 	using namespace calendar;
+	using namespace impex;
+	
 	
 
 	namespace util
@@ -244,7 +247,7 @@ namespace synthese
 							);
 						if(!line->getDataSource()->getFormat().empty())
 						{
-							stream << HTMLModule::getHTMLImage(PTImportAdmin::ICON, "Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire");
+							stream << HTMLModule::getHTMLImage(DataSourceAdmin::ICON, "Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire");
 						}
 					}
 
@@ -457,13 +460,17 @@ namespace synthese
 			// TAB EXPORT
 			if (openTabContent(stream, TAB_EXPORT))
 			{
-				StaticFunctionRequest<TridentExportFunction> tridentExportFunction(_request, true);
-				tridentExportFunction.getFunction()->setCommercialLine(_cline);
+				shared_ptr<TridentFileFormat::Exporter_> exporter(new TridentFileFormat::Exporter_);
+				exporter->setLine(_cline);
+				
+				StaticFunctionRequest<ExportFunction> tridentExportFunction(_request, true);
+				tridentExportFunction.getFunction()->setExporter(static_pointer_cast<Exporter, TridentFileFormat::Exporter_>(exporter));
+
 				stream << "<h1>Formats Trident</h1>";
 				stream << "<p>";
 				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident standard", string(), "page_white_go.png");
 				stream << " ";
-				tridentExportFunction.getFunction()->setWithTisseoExtension(true);
+				exporter->setWithTisseoExtension(true);
 				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident Tisséo", string(), "page_white_go.png");
 				stream << "</p>";
 			}

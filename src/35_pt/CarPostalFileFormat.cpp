@@ -34,6 +34,10 @@
 #include "CommercialLineTableSync.h"
 #include "LineStopTableSync.h"
 #include "Calendar.h"
+#include "ImportFunction.h"
+#include "AdminFunctionRequest.hpp"
+#include "PropertiesHTMLTable.h"
+#include "DataSourceAdmin.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -53,11 +57,13 @@ namespace synthese
 	using namespace impex;
 	using namespace pt;
 	using namespace road;
-	using namespace pt;
+	using namespace admin;
 	using namespace geography;
 	using namespace db;
 	using namespace graph;
 	using namespace calendar;
+	using namespace server;
+	using namespace html;
 	
 	
 
@@ -68,56 +74,47 @@ namespace synthese
 
 	namespace pt
 	{
-		const std::string CarPostalFileFormat::FILE_BITFELD("2bitfeld"); 
-		const std::string CarPostalFileFormat::FILE_ECKDATEN("1eckdaten");
-		const std::string CarPostalFileFormat::FILE_ZUGUDAT("1zugudat");
+		const std::string CarPostalFileFormat::Importer_::FILE_BITFELD("2bitfeld"); 
+		const std::string CarPostalFileFormat::Importer_::FILE_ECKDATEN("1eckdaten");
+		const std::string CarPostalFileFormat::Importer_::FILE_ZUGUDAT("1zugudat");
 	}
 
 	namespace impex
 	{
-		template<> const FileFormat::Files FileFormatTemplate<CarPostalFileFormat>::FILES(
-			CarPostalFileFormat::FILE_ECKDATEN.c_str(),
-			CarPostalFileFormat::FILE_BITFELD.c_str(),
-			CarPostalFileFormat::FILE_ZUGUDAT.c_str(),
+		template<> const MultipleFileTypesImporter<CarPostalFileFormat>::Files MultipleFileTypesImporter<CarPostalFileFormat>::FILES(
+			CarPostalFileFormat::Importer_::FILE_ECKDATEN.c_str(),
+			CarPostalFileFormat::Importer_::FILE_BITFELD.c_str(),
+			CarPostalFileFormat::Importer_::FILE_ZUGUDAT.c_str(),
 		"");
 	}
 
 	namespace pt
 	{
-		CarPostalFileFormat::CarPostalFileFormat( util::Env* env /* = NULL */)
+		bool CarPostalFileFormat::Importer_::_controlPathsMap() const
 		{
-			_env = env;
-		}
-
-		bool CarPostalFileFormat::_controlPathsMap( const FilePathsMap& paths )
-		{
-			FilePathsMap::const_iterator it(paths.find(FILE_ECKDATEN));
-			if(it == paths.end() || it->second.empty()) return false;
-			it = paths.find(FILE_BITFELD);
-			if(it == paths.end() || it->second.empty()) return false;
-			it = paths.find(FILE_ZUGUDAT);
-			if(it == paths.end() || it->second.empty()) return false;
+			FilePathsMap::const_iterator it(_pathsMap.find(FILE_ECKDATEN));
+			if(it == _pathsMap.end() || it->second.empty()) return false;
+			it = _pathsMap.find(FILE_BITFELD);
+			if(it == _pathsMap.end() || it->second.empty()) return false;
+			it = _pathsMap.find(FILE_ZUGUDAT);
+			if(it == _pathsMap.end() || it->second.empty()) return false;
 			return true;
 		}
 
-		CarPostalFileFormat::~CarPostalFileFormat()
-		{}
-
-		void CarPostalFileFormat::build(std::ostream& os)
-		{}
-
-		SQLiteTransaction CarPostalFileFormat::save(std::ostream& os
-		) const {
+		
+		
+		SQLiteTransaction CarPostalFileFormat::Importer_::_save() const
+		{
 			SQLiteTransaction transaction;
-			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env->getRegistry<JourneyPattern>())
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env.getRegistry<JourneyPattern>())
 			{
 				JourneyPatternTableSync::Save(line.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env->getRegistry<LineStop>())
+			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getRegistry<LineStop>())
 			{
 				LineStopTableSync::Save(lineStop.second.get(), transaction);
 			}
-			BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env->getRegistry<ScheduledService>())
+			BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env.getRegistry<ScheduledService>())
 			{
 				if(service.second->empty())
 				{
@@ -128,24 +125,23 @@ namespace synthese
 					ScheduledServiceTableSync::Save(service.second.get(), transaction);
 				}
 			}
-
-			os << "<b>SUCCESS : Data saved</b><br />";
-
 			return transaction;
 		}
 
 
-		void CarPostalFileFormat::_parse(
+		bool CarPostalFileFormat::Importer_::_parse(
 			const path& filePath,
 			std::ostream& os,
-			std::string key
-		){
+			const std::string& key,
+			boost::optional<const admin::AdminRequest&> adminRequest
+		) const {
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
 			if(!inFile)
 			{
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
+
 
 			// 1 : Time period
 			if(key == FILE_ECKDATEN)
@@ -222,10 +218,10 @@ namespace synthese
 				// Cleaning of each service handled by the datasource
 				ScheduledServiceTableSync::SearchResult originalServices(
 					ScheduledServiceTableSync::Search(
-						*_env,
+						_env,
 						optional<RegistryKeyType>(),
 						optional<RegistryKeyType>(),
-						_dataSource->getKey()
+						_dataSource.getKey()
 				)	);
 				BOOST_FOREACH(shared_ptr<ScheduledService> service, originalServices)
 				{
@@ -270,7 +266,7 @@ namespace synthese
 					{
 						StopPointTableSync::SearchResult searchStop(
 							StopPointTableSync::Search(
-								*_env, optional<RegistryKeyType>(), line.substr(0,7)
+								_env, optional<RegistryKeyType>(), line.substr(0,7)
 						)	);
 						if(searchStop.empty())
 						{
@@ -314,7 +310,7 @@ namespace synthese
 						else
 						{
 							CommercialLineTableSync::SearchResult lines(
-								CommercialLineTableSync::Search(*_env, optional<RegistryKeyType>(),optional<string>(), lineNumber)
+								CommercialLineTableSync::Search(_env, optional<RegistryKeyType>(),optional<string>(), lineNumber)
 							);
 							if(lines.empty())
 							{
@@ -327,7 +323,7 @@ namespace synthese
 							}
 							cline = CommercialLineTableSync::GetEditable(
 								lines.front()->getKey(),
-								*_env,
+								_env,
 								UP_LINKS_LOAD_LEVEL
 							);
 
@@ -335,12 +331,12 @@ namespace synthese
 
 							// Load of existing routes
 							JourneyPatternTableSync::SearchResult sroutes(
-								JourneyPatternTableSync::Search(*_env, cline->getKey(), _dataSource->getKey())
+								JourneyPatternTableSync::Search(_env, cline->getKey(), _dataSource.getKey())
 							);
 							BOOST_FOREACH(shared_ptr<JourneyPattern> sroute, sroutes)
 							{
 								LineStopTableSync::Search(
-									*_env,
+									_env,
 									sroute->getKey(),
 									optional<RegistryKeyType>(),
 									0,
@@ -349,7 +345,7 @@ namespace synthese
 									UP_LINKS_LOAD_LEVEL
 								);
 								ScheduledServiceTableSync::Search(
-									*_env,
+									_env,
 									sroute->getKey(),
 									optional<RegistryKeyType>(),
 									optional<RegistryKeyType>(),
@@ -368,7 +364,7 @@ namespace synthese
 							const JourneyPattern* lroute(static_cast<const JourneyPattern*>(sroute));
 							if(	*lroute == stops
 							){
-								route = const_pointer_cast<JourneyPattern>(_env->getSPtr(lroute));
+								route = const_pointer_cast<JourneyPattern>(_env.getSPtr(lroute));
 								continue;
 							}
 						}
@@ -379,9 +375,9 @@ namespace synthese
 							os << "CREA : Creation of route for " << cline->getName() << "<br />";
 							route.reset(new JourneyPattern);
 							route->setCommercialLine(cline.get());
-							route->setDataSource(_dataSource);
+							route->setDataSource(&_dataSource);
 							route->setKey(JourneyPatternTableSync::getId());
-							_env->getEditableRegistry<JourneyPattern>().add(route);
+							_env.getEditableRegistry<JourneyPattern>().add(route);
 							cline->addPath(route.get());
 							
 							size_t rank(0);
@@ -396,7 +392,7 @@ namespace synthese
 								ls->setMetricOffset(0);
 								ls->setKey(LineStopTableSync::getId());
 								route->addEdge(*ls);
-								_env->getEditableRegistry<LineStop>().add(ls);
+								_env.getEditableRegistry<LineStop>().add(ls);
 
 								++rank;
 							}
@@ -437,7 +433,7 @@ namespace synthese
 						{
 							service->setKey(ScheduledServiceTableSync::getId());
 							route->addService(service.get(), false);
-							_env->getEditableRegistry<ScheduledService>().add(service);
+							_env.getEditableRegistry<ScheduledService>().add(service);
 							existingService = service.get();
 							
 							os << "CREA : Creation of service " << service->getServiceNumber() << " for " << serviceNumber << " (" << departures[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
@@ -450,7 +446,27 @@ namespace synthese
 				}
 			}
 			inFile.close();
-		}
-	}
-}
 
+			return true;
+		}
+
+
+
+		void CarPostalFileFormat::Importer_::displayAdmin(
+			std::ostream& stream,
+			const AdminRequest& request
+		) const {
+
+			stream << "<h1>Horaires</h1>";
+			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
+			PropertiesHTMLTable t(importRequest.getHTMLForm());
+			stream << t.open();
+			stream << t.title("Propriétés");
+			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.title("Données");
+			stream << t.cell("Eckdaten", t.getForm().getTextInput(PARAMETER_PATH + FILE_ECKDATEN, _pathsMap[FILE_ECKDATEN].file_string()));
+			stream << t.cell("Bitfeld", t.getForm().getTextInput(PARAMETER_PATH + FILE_BITFELD, _pathsMap[FILE_BITFELD].file_string()));
+			stream << t.cell("Zugdat", t.getForm().getTextInput(PARAMETER_PATH + FILE_ZUGUDAT, _pathsMap[FILE_ZUGUDAT].file_string()));
+			stream << t.close();
+		}
+}	}

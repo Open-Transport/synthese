@@ -103,6 +103,12 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setStop(boost::shared_ptr<StopPoint> value) { _stop = value; }
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Point setter.
+				/// @param value point where the stop must be moved.
+				/// @warning the point coordinate must be at WGS84 system.
+				void setPoint(boost::shared_ptr<geos::geom::Point> value) { _point = value; }
 			//@}
 		};
 	}

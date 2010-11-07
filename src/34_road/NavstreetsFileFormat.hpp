@@ -25,6 +25,8 @@
 
 #include "FileFormatTemplate.h"
 #include "RoadChunk.h"
+#include "MultipleFileTypesImporter.hpp"
+#include "NoExportPolicy.hpp"
 
 #include <map>
 #include <ostream>
@@ -112,14 +114,7 @@ namespace synthese
 		class NavstreetsFileFormat:
 			public impex::FileFormatTemplate<NavstreetsFileFormat>
 		{
-		public:
-			//! @name Tables
-			//@{
-				static const std::string FILE_MTDAREA;
-				static const std::string FILE_STREETS;
-			//@}
-
-		private:
+		protected:
 			//! @name Fields of streets table
 			//@{
 				static const std::string _FIELD_LINK_ID;
@@ -146,83 +141,98 @@ namespace synthese
 				static const std::string _FIELD_ADMIN_LVL;
 			//@}
 
-			typedef std::map<int, geography::City*> _CitiesMap;
-
-			_CitiesMap _citiesMap;	//!< Correspondence table between Navstreets and SYNTHESE id for streets
-
-			static road::RoadChunk::HouseNumberingPolicy _getHouseNumberingPolicyFromAddressSchema(
-				const std::string& addressSchema
-			);
-			static road::RoadChunk::HouseNumberBounds _getHouseNumberBoundsFromAddresses(
-				const std::string& minAddress,
-				const std::string maxAddress
-			);
-			static void _setGeometryAndHouses(
-				road::RoadChunk& chunk,
-				boost::shared_ptr<geos::geom::LineString> geometry,
-				road::RoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
-				road::RoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
-				road::RoadChunk::HouseNumberBounds rightHouseNumberBounds,
-				road::RoadChunk::HouseNumberBounds leftHouseNumberBounds
-			);
-
-
-		protected:
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Controls that all necessary input files are available.
-			/// @param paths available files
-			/// @result true if all necessary files are present
-			virtual bool _controlPathsMap(
-				const FilePathsMap& paths
-			);
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Reads an input files and load its content to the memory.
-			/// @param filePath file to read
-			/// @param os stream to write log messages on
-			/// @param key type of the file
-			/// @author Hugues Romain
-			/// @since 3.2.0
-			/// @date 2010
-			virtual void _parse(
-				const boost::filesystem::path& filePath,
-				std::ostream& os,
-				std::string key
-			);
-
-
-
 		public:
-			NavstreetsFileFormat(
-				util::Env* env = NULL
-			);
-			~NavstreetsFileFormat();
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Export of SYNTHESE data into Navstreets format : not implemented.
-			/// @param os stream to write log messages on
-			/// @author Hugues Romain
-			/// @since 3.2.0
-			/// @date 2010
-			//////////////////////////////////////////////////////////////////////////
-			/// This method does nothing.
-			virtual void build(std::ostream& os);
+			class Importer_:
+				public impex::MultipleFileTypesImporter<NavstreetsFileFormat>
+			{
+				friend class impex::MultipleFileTypesImporter<NavstreetsFileFormat>;
+
+			protected:
+				//! @name Tables
+				//@{
+					static const std::string FILE_MTDAREA;
+					static const std::string FILE_STREETS;
+				//@}
+
+			private:
+				typedef std::map<int, geography::City*> _CitiesMap;
+
+				mutable _CitiesMap _citiesMap;	//!< Correspondence table between Navstreets and SYNTHESE id for streets
+
+				static road::RoadChunk::HouseNumberingPolicy _getHouseNumberingPolicyFromAddressSchema(
+					const std::string& addressSchema
+				);
+				static road::RoadChunk::HouseNumberBounds _getHouseNumberBoundsFromAddresses(
+					const std::string& minAddress,
+					const std::string maxAddress
+				);
+				static void _setGeometryAndHouses(
+					road::RoadChunk& chunk,
+					boost::shared_ptr<geos::geom::LineString> geometry,
+					road::RoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
+					road::RoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
+					road::RoadChunk::HouseNumberBounds rightHouseNumberBounds,
+					road::RoadChunk::HouseNumberBounds leftHouseNumberBounds
+				);
+
+
+			protected:
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Controls that all necessary input files are available.
+				/// @result true if all necessary files are present
+				virtual bool _controlPathsMap() const;
 
 
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Saves all imported data.
-			/// @param os stream to write log messages on
-			/// @return SQL transaction to run
-			/// @author Hugues Romain
-			/// @since 3.2.0
-			/// @date 2010
-			virtual db::SQLiteTransaction save(std::ostream& os) const;
+				//////////////////////////////////////////////////////////////////////////
+				/// Reads an input files and load its content to the memory.
+				/// @param filePath file to read
+				/// @param os stream to write log messages on
+				/// @param key type of the file
+				/// @author Hugues Romain
+				/// @since 3.2.0
+				/// @date 2010
+				virtual bool _parse(
+					const boost::filesystem::path& filePath,
+					std::ostream& os,
+					const std::string& key,
+					boost::optional<const admin::AdminRequest&> request
+				) const;
+
+
+			public:
+				Importer_(const impex::DataSource& dataSource):
+					MultipleFileTypesImporter<NavstreetsFileFormat>(dataSource)
+				{}
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Import screen to include in the administration console.
+				/// @param os stream to write the result on
+				/// @param request request for display of the administration console
+				/// @since 3.2.0
+				/// @date 2010
+				virtual void displayAdmin(
+					std::ostream& os,
+					const admin::AdminRequest& request
+				) const;
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Saves all imported data.
+				/// @return SQL transaction to run
+				/// @author Hugues Romain
+				/// @since 3.2.0
+				/// @date 2010
+				virtual db::SQLiteTransaction _save() const;
+			};
+
+			typedef impex::NoExportPolicy<NavstreetsFileFormat> Exporter_;
+
+			friend class Importer_;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_road_NavstreetFileFormat_hpp__

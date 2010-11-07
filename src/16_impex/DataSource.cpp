@@ -27,8 +27,10 @@
 #include "Exception.h"
 #include "FileFormat.h"
 #include "Factory.h"
+#include "Importer.hpp"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -44,7 +46,27 @@ namespace synthese
 		DataSource::DataSource(
 			RegistryKeyType id
 		):	Registrable(id)
+		{}
+
+
+
+		boost::shared_ptr<Importer> DataSource::getImporter() const
 		{
+			shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(_format));
+			return fileFormat->getImporter(*this);
+		}
+
+
+
+		bool DataSource::canImport() const
+		{
+			if(!Factory<FileFormat>::contains(_format))
+			{
+				return false;
+			}
+
+			shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(_format));
+			return fileFormat->canImport();
 		}
 	}
 }

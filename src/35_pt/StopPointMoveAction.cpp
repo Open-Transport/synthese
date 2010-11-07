@@ -61,6 +61,11 @@ namespace synthese
 			{
 				map.insert(PARAMETER_STOP_ID, _stop->getKey());
 			}
+			if(_point.get())
+			{
+				map.insert(PARAMETER_LONGITUDE, _point->getX());
+				map.insert(PARAMETER_LATITUDE, _point->getY());
+			}
 			return map;
 		}
 		

@@ -31,14 +31,32 @@ namespace synthese
 	{
 		/*	File format template.
 		*/
-		template<class T>
+		template<class FF>
 		class FileFormatTemplate:
-			public util::FactorableTemplate<FileFormat,T>
+			public util::FactorableTemplate<FileFormat,FF>
 		{
 		public:
-			static const FileFormat::Files FILES;
+			virtual bool canImport() const { return FF::Importer_::IMPORTABLE; }
+			virtual bool canExport() const { return FF::Exporter_::EXPORTABLE; }
 
-			virtual const FileFormat::Files::FilesVector& getFiles() const { return FILES.getFiles(); }
+			virtual boost::shared_ptr<Importer> getImporter(
+				const DataSource& dataSource
+			) const	{
+				return
+					boost::static_pointer_cast<Importer, FF::Importer_>(
+						boost::shared_ptr<FF::Importer_>(
+							new FF::Importer_(dataSource)
+					)	);
+			}
+
+			virtual boost::shared_ptr<Exporter> getExporter(
+			) const	{
+				return
+					boost::static_pointer_cast<Exporter, FF::Exporter_>(
+						boost::shared_ptr<FF::Exporter_>(
+							new FF::Exporter_()
+					)	);
+			}
 		};
 	}
 }
