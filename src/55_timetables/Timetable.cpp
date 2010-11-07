@@ -43,7 +43,9 @@ namespace synthese
 		Timetable::Timetable(RegistryKeyType id)
 		:	Registrable(id),
 			_bookId(0),
-			_baseCalendar(NULL)
+			_baseCalendar(NULL),
+			_transferTimetableBefore(0),
+			_transferTimetableAfter(0)
 		{
 		}
 

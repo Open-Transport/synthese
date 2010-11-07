@@ -134,12 +134,15 @@ namespace synthese
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			Calendar result(*_service);
+			Calendar result;
 			for (date d = _startDate; d <= _endDate; d += _period)
 			{
 				result.setActive(d);
 			}
-			result = _calendarTemplate->getResult(result);
+			if(_calendarTemplate.get())
+			{
+				result = _calendarTemplate->getResult(result);
+			}
 
 			if(_add)
 			{
