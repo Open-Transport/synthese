@@ -134,7 +134,7 @@ namespace synthese
 			
 			public:
 				Importer_(const impex::DataSource& dataSource):
-					MultipleFileTypesImporter<CarPostalFileFormat>(dataSource)
+					impex::MultipleFileTypesImporter<CarPostalFileFormat>(dataSource)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////

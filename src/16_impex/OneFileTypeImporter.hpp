@@ -65,11 +65,11 @@ namespace synthese
 				const server::ParametersMap& map,
 				bool doImport
 			){
-				tokenizer<char_separator<char> > pathsTokens(
-					map.get<string>(PARAMETER_PATH),
-					char_separator<char>(",")
+				boost::tokenizer<boost::char_separator<char> > pathsTokens(
+					map.get<std::string>(PARAMETER_PATH),
+					boost::char_separator<char>(",")
 				);
-				BOOST_FOREACH(const string& token, pathsTokens)
+				BOOST_FOREACH(const std::string& token, pathsTokens)
 				{
 					if(token.empty()) continue;
 					_pathsSet.insert(token);
