@@ -131,7 +131,15 @@ namespace synthese
 						)	);
 						BOOST_FOREACH(shared_ptr<Timetable> tt, contents)
 						{
-							auto_ptr<TimetableGenerator> g(tt->getGenerator(Env::GetOfficialEnv()));
+							try
+							{
+								auto_ptr<TimetableGenerator> g(tt->getGenerator(Env::GetOfficialEnv()));
+							}
+							catch(Timetable::ImpossibleGenerationException&)
+							{
+								continue;
+							}
+
 							Display(
 								content,
 								pageForSubTimetable,

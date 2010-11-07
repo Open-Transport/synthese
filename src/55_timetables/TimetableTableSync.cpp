@@ -68,6 +68,8 @@ namespace synthese
 		const std::string TimetableTableSync::COL_FORMAT("format");
 		const std::string TimetableTableSync::COL_AUTHORIZED_LINES("authorized_lines");
 		const std::string TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS("authorized_physical_stops");
+		const std::string TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE("transfer_timetable_before");
+		const std::string TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER("transfer_timetable_after");
 	}
 	
 	namespace db
@@ -89,6 +91,8 @@ namespace synthese
 			SQLiteTableSync::Field(TimetableTableSync::COL_FORMAT, SQL_INTEGER),
 			SQLiteTableSync::Field(TimetableTableSync::COL_AUTHORIZED_LINES, SQL_TEXT),
 			SQLiteTableSync::Field(TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS, SQL_TEXT),
+			SQLiteTableSync::Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE, SQL_INTEGER),
+			SQLiteTableSync::Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 

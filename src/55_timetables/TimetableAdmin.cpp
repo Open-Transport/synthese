@@ -208,6 +208,9 @@ namespace synthese
 					addTimetableRequest.getAction()->setBook(_timetable);
 					addTimetableRequest.setActionWillCreateObject();
 
+					AdminActionFunctionRequest<TimetableAddAction,TimetableAdmin> copyTimetableRequest(_request);
+					copyTimetableRequest.setActionWillCreateObject();
+
 					ActionResultHTMLTable::HeaderVector h3;
 					h3.push_back(make_pair(PARAMETER_RANK, "Rang"));
 					h3.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_up.png", "^")));
@@ -234,6 +237,7 @@ namespace synthese
 					BOOST_FOREACH(shared_ptr<Timetable> tt, timetables)
 					{
 						editTimetableRequest.getPage()->setTimetable(tt);
+						copyTimetableRequest.getAction()->setTemplate(const_pointer_cast<const Timetable>(tt));
 
 						lastRank = tt->getRank();
 
@@ -265,7 +269,13 @@ namespace synthese
 								"table_edit.png"
 							);
 						stream << t3.col();
-							stream << HTMLModule::getLinkButton(string(), "Dupliquer", string(), "table_add.png");
+							copyTimetableRequest.getAction()->setReverse(false);
+							stream << HTMLModule::getLinkButton(copyTimetableRequest.getURL(), "Dupliquer", string(), "table_add.png");
+
+						stream << t3.col();
+							copyTimetableRequest.getAction()->setReverse(true);
+							stream << HTMLModule::getLinkButton(copyTimetableRequest.getURL(), "Copie inversée", string(), "table_add.png");
+
 						stream <<
 							t3.col() <<
 							HTMLModule::getLinkButton(
@@ -547,9 +557,9 @@ namespace synthese
 					BOOST_FOREACH(const TimetableResult::RowNotesVector::value_type& warn, result.getRowNotes())
 					{
 						stream << tf.col();
-						if(warn != 0)
+						if(warn.get())
 						{
-							stream << warn;
+							stream << warn->getNumber();
 						}
 					}
 

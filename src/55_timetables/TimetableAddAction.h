@@ -34,9 +34,19 @@ namespace synthese
 	{
 		class Timetable;
 
-		/** Timetable creation action class.
-			@ingroup m55Actions refActions
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Timetable creation action.
+		/// @author Hugues Romain
+		///	@ingroup m55Actions refActions
+		/// From scratch creation :
+		///	 - bi : id of the book which the new object must belong to
+		///  - rk : rank of the new object
+		///  - ti : name of the new object
+		///  - ib : the new object is a book (true) or a timetable (false)
+		///
+		/// Creation from a template :
+		///  - te : id of the object to copy
+		///  - re : reverse the content when copying
 		class TimetableAddAction
 			: public util::FactorableTemplate<server::Action, TimetableAddAction>
 		{
@@ -45,12 +55,16 @@ namespace synthese
 			static const std::string PARAMETER_RANK;
 			static const std::string PARAMETER_TITLE;
 			static const std::string PARAMETER_IS_BOOK;
+			static const std::string PARAMETER_TEMPLATE_ID;
+			static const std::string PARAMETER_REVERSE;
 
 		private:
 			boost::shared_ptr<const Timetable>	_book;
 			int									_rank;
 			std::string							_title;
 			bool								_isBook;
+			boost::shared_ptr<const Timetable>	_template;
+			bool								_reverse;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -70,7 +84,12 @@ namespace synthese
 			*/
 			void run(server::Request& request);
 
-			void setBook(boost::shared_ptr<const Timetable> book);
+			//! @name Setters
+			//@{
+				void setBook(boost::shared_ptr<const Timetable> value);
+				void setTemplate(boost::shared_ptr<const Timetable> value){ _template = value; }
+				void setReverse(bool value){ _reverse = value; }
+			//@}
 			
 			TimetableAddAction();
 			

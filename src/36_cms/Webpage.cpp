@@ -233,6 +233,7 @@ namespace synthese
 							ParametersMap()
 						);
 						requestParametersMap.remove(Request::PARAMETER_FUNCTION);
+						requestParametersMap.remove(WebPageDisplayFunction::PARAMETER_PAGE_ID);
 						parametersMap.merge(requestParametersMap);
 						if(getRoot())
 						{
