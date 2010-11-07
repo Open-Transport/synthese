@@ -106,6 +106,8 @@ namespace synthese
 				Rows					_rows;
 				const calendar::CalendarTemplate*			_baseCalendar;
 				std::string				_title;
+				util::RegistryKeyType	_transferTimetableBefore;
+				util::RegistryKeyType	_transferTimetableAfter;
 			//@}
 
 		public:
@@ -127,6 +129,8 @@ namespace synthese
 				void setBaseCalendar(const calendar::CalendarTemplate* value){ _baseCalendar = value; }
 				void setRank(std::size_t value){ _rank = value; }
 				void setContentType(ContentType value){ _contentType = value; }
+				void setTransferTimetableBefore(util::RegistryKeyType value){ _transferTimetableBefore = value; }
+				void setTransferTimetableAfter(util::RegistryKeyType value){ _transferTimetableAfter = value; }
 			//@}
 
 			//! @name Modifiers
@@ -144,6 +148,8 @@ namespace synthese
 				util::RegistryKeyType	getBookId()				const { return _bookId; }
 				std::size_t				getRank()				const { return _rank; }
 				ContentType				getContentType()		const { return _contentType; }
+				util::RegistryKeyType	getTransferTimetableBefore() const { return _transferTimetableBefore; }
+				util::RegistryKeyType	getTransferTimetableAfter() const { return _transferTimetableAfter; }
 			//@}
 
 			//! @name Queries
