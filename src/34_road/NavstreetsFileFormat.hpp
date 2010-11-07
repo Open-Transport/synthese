@@ -204,7 +204,7 @@ namespace synthese
 
 			public:
 				Importer_(const impex::DataSource& dataSource):
-					MultipleFileTypesImporter<NavstreetsFileFormat>(dataSource)
+					impex::MultipleFileTypesImporter<NavstreetsFileFormat>(dataSource)
 				{}
 
 
