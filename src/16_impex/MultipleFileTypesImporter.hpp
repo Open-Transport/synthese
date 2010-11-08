@@ -143,7 +143,7 @@ namespace synthese
 				BOOST_FOREACH(const std::string& key, FILES.getFiles())
 				{
 					FilePathsMap::const_iterator it(_pathsMap.find(key));
-					if(it == _pathsMap.end())
+					if(it == _pathsMap.end() || it->second.file_string().empty())
 					{
 						continue;
 					}
