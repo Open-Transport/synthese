@@ -220,6 +220,7 @@ namespace synthese
 					h3.push_back(make_pair(string(), "Actions"));
 					h3.push_back(make_pair(string(), "Actions"));
 					h3.push_back(make_pair(string(), "Actions"));
+					h3.push_back(make_pair(string(), "Actions"));
 					ActionResultHTMLTable t3(
 						h3,
 						searchRequest.getHTMLForm(),
@@ -291,7 +292,7 @@ namespace synthese
 					stream << t3.col() << lastRank;
 					stream << t3.col(3) << t3.getActionForm().getRadioInputCollection(TimetableAddAction::PARAMETER_IS_BOOK, booknotbook, optional<bool>(false));
 					stream << t3.col() << t3.getActionForm().getTextInput(TimetableAddAction::PARAMETER_TITLE, string(), "(titre de la nouvelle fiche horaire)");
-					stream << t3.col() << t3.getActionForm().getSubmitButton("Créer");
+					stream << t3.col(4) << t3.getActionForm().getSubmitButton("Créer");
 
 					stream << t3.close();
 				}
