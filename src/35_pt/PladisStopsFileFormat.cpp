@@ -215,27 +215,45 @@ namespace synthese
 						stream << t.col();
 						stream << bahnhof.second.name;
 
-						stream << t.col();
-						stream << fixed << bahnhof.second.projected->getX();
+						if(bahnhof.second.projected.get())
+						{
+						    stream << t.col();
+						    stream << fixed << bahnhof.second.projected->getX();
 
-						stream << t.col();
-						stream << fixed << bahnhof.second.projected->getY();
+						    stream << t.col();
+						    stream << fixed << bahnhof.second.projected->getY();
+						}
+						else
+						{
+						    stream << t.col();
+						    stream << t.col();
+						}
 
-						stream << t.col();
-						stream << fixed << bahnhof.second.coords->getX();
+						if(bahnhof.second.coords.get())
+						{
+							stream << t.col();
+							stream << fixed << bahnhof.second.coords->getX();
+					
+							stream << t.col();
+							stream << fixed << bahnhof.second.coords->getY();
 
-						stream << t.col();
-						stream << fixed << bahnhof.second.coords->getY();
-
-						stream << t.col();
-						AdminActionFunctionRequest<StopAreaAddAction, DataSourceAdmin> addRequest(*request);
-						addRequest.getAction()->setCreateCityIfNecessary(true);
-						addRequest.getAction()->setCreatePhysicalStop(true);
-						addRequest.getAction()->setName(bahnhof.second.name);
-						addRequest.getAction()->setCityName(bahnhof.second.cityName);
-						addRequest.getAction()->setOperatorCode(bahnhof.first);
-						addRequest.getAction()->setPoint(DBModule::GetStorageCoordinatesSystem().convertPoint(*bahnhof.second.coords));
-						stream << HTMLModule::getLinkButton(addRequest.getURL(), "Ajouter");
+							stream << t.col();
+							AdminActionFunctionRequest<StopAreaAddAction, DataSourceAdmin> addRequest(*request);
+							addRequest.getAction()->setCreateCityIfNecessary(true);
+							addRequest.getAction()->setCreatePhysicalStop(true);
+							addRequest.getAction()->setName(bahnhof.second.name);
+							addRequest.getAction()->setCityName(bahnhof.second.cityName);
+							addRequest.getAction()->setOperatorCode(bahnhof.first);
+							addRequest.getAction()->setPoint(DBModule::GetStorageCoordinatesSystem().convertPoint(*bahnhof.second.coords));
+							stream << HTMLModule::getLinkButton(addRequest.getURL(), "Ajouter");
+						}
+						else
+						{
+							stream << t.col();
+							stream << t.col();
+							stream << t.col();
+						}
+						
 					}
 					stream << t.close();
 				}
@@ -304,17 +322,33 @@ namespace synthese
 								distance = geos::operation::distance::DistanceOp::distance(*bahnhof.second.projected, *bahnhof.second.stop->getGeometry());
 							}
 
-							stream << t.col();
-							stream << std::fixed << bahnhof.second.projected->getX();
+							if(bahnhof.second.projected.get())
+							{
+								stream << t.col();
+								stream << fixed << bahnhof.second.projected->getX();
 
-							stream << t.col();
-							stream << std::fixed << bahnhof.second.projected->getY();
+								stream << t.col();
+								stream << fixed << bahnhof.second.projected->getY();
+							}
+							else
+							{
+								stream << t.col();
+								stream << t.col();
+							}
 
-							stream << t.col();
-							stream << std::fixed << bahnhof.second.coords->getX();
-
-							stream << t.col();
-							stream << std::fixed << bahnhof.second.coords->getY();
+							if(bahnhof.second.coords.get())
+							{
+								stream << t.col();
+								stream << fixed << bahnhof.second.coords->getX();
+						
+								stream << t.col();
+								stream << fixed << bahnhof.second.coords->getY();
+							}
+							else
+							{
+								stream << t.col();
+								stream << t.col();
+							}
 
 							stream << t.col();
 							if(distance == 0)
