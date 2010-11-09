@@ -56,6 +56,7 @@
 #include "TimetableSetPhysicalStopAction.h"
 #include "StopPointTableSync.hpp"
 #include "TimetableResult.hpp"
+#include "TimetableTransferUpdateAction.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -77,7 +78,6 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace graph;
-	using namespace pt;
 
 	namespace util
 	{
@@ -317,7 +317,29 @@ namespace synthese
 
 					AdminFunctionRequest<TimetableAdmin> searchRequest(_request);
 
+					AdminActionFunctionRequest<TimetableTransferUpdateAction, TimetableAdmin> transferRequest(_request);
+					transferRequest.getAction()->setTimetable(const_pointer_cast<Timetable>(_timetable));
+
 					stream << "<h1>Arrêts</h1>";
+
+					// Transfer before
+					transferRequest.getAction()->setBefore(true);
+					PropertiesHTMLTable p1(transferRequest.getHTMLForm("t1"));
+					stream << p1.open();
+					stream << p1.cell("Correspondance avant :", p1.getForm().getTextInput(TimetableTransferUpdateAction::PARAMETER_TRANSFER_TIMETABLE_ID, lexical_cast<string>(_timetable->getTransferTimetableBefore())));
+					if(_timetable->getTransferTimetableBefore())
+					{
+						shared_ptr<const Timetable> t1(Env::GetOfficialEnv().get<Timetable>(_timetable->getTransferTimetableBefore()));
+						try
+						{
+							stream << p1.cell("Libellé tableau :", t1->getTitle());
+						}
+						catch(ObjectNotFoundException<Timetable>&)
+						{
+							stream << p1.cell("Libellé tableau :", "(tableau invalide)");
+						}
+					}
+					stream << p1.close();
 
 					// Search
 					TimetableRowTableSync::SearchResult rows(
@@ -434,6 +456,25 @@ namespace synthese
 					stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 
 					stream << t.close();
+
+					// Transfer after
+					transferRequest.getAction()->setBefore(false);
+					PropertiesHTMLTable p2(transferRequest.getHTMLForm("t2"));
+					stream << p2.open();
+					stream << p2.cell("Correspondance après :", p2.getForm().getTextInput(TimetableTransferUpdateAction::PARAMETER_TRANSFER_TIMETABLE_ID, lexical_cast<string>(_timetable->getTransferTimetableAfter())));
+					if(_timetable->getTransferTimetableAfter())
+					{
+						shared_ptr<const Timetable> t2(Env::GetOfficialEnv().get<Timetable>(_timetable->getTransferTimetableAfter()));
+						try
+						{
+							stream << p2.cell("Libellé tableau :", t2->getTitle());
+						}
+						catch(ObjectNotFoundException<Timetable>&)
+						{
+							stream << p2.cell("Libellé tableau :", "(tableau invalide)");
+						}
+					}
+					stream << p2.close();
 
 					stream << "<h1>Lignes</h1>";
 
