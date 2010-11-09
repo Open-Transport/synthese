@@ -50,6 +50,14 @@ namespace synthese
 		/// A physical road part is modeled by two Road objects, one per direction.
 		/// The _side attribute tells if the direction corresponds to the right or
 		///	left side of the road.
+		///
+		/// A physical road is modeled by two Road objects : one for each direction.
+		/// A Road objects corresponds to a side of the road too.
+		/// The side attribute indicates which side is modeled by the instance.
+		/// The relation between side and direction must correspond to the driving
+		/// side of the country which the road belongs to.
+		/// By default, the side of the road is right, and its reversed road is on
+		/// left.
 		class Road:
 			public graph::Path
 		{

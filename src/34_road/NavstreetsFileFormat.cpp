@@ -70,6 +70,8 @@ namespace synthese
 	{
 		const string NavstreetsFileFormat::Importer_::FILE_MTDAREA("1mtdarea");
 		const string NavstreetsFileFormat::Importer_::FILE_STREETS("2streets");
+
+		const string NavstreetsFileFormat::Importer_::PARAMETER_DRIVING_ON_RIGHT_SIDE("dr");
 		
 		const string NavstreetsFileFormat::_FIELD_LINK_ID("LINK_ID");
 		const string NavstreetsFileFormat::_FIELD_ST_NAME("ST_NAME");
@@ -467,6 +469,7 @@ namespace synthese
 							else
 							{
 								shared_ptr<Road> road(new Road(0, Road::ROAD_TYPE_UNKNOWN));
+								road->setSide(_drivingOnRightSide ? Road::RIGHT_SIDE : Road::LEFT_SIDE);
 								road->setRoadPlace(*roadPlace);
 								road->setKey(RoadTableSync::getId());
 								_env.getEditableRegistry<Road>().add(road);
@@ -595,9 +598,26 @@ namespace synthese
 			stream << t.open();
 			stream << t.title("Propriétés");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.cell("Sens de circulation à droite", t.getForm().getOuiNonRadioInput(PARAMETER_DRIVING_ON_RIGHT_SIDE, _drivingOnRightSide));
 			stream << t.title("Données");
-			stream << t.cell("Rues (streets)", t.getForm().getTextInput(PARAMETER_PATH + FILE_STREETS, string()));
-			stream << t.cell("Zones administratives (mtdarea)", t.getForm().getTextInput(PARAMETER_PATH + FILE_MTDAREA, string()));
+			stream << t.cell("Rues (streets)", t.getForm().getTextInput(_getFileParameterName(FILE_STREETS), _pathsMap[FILE_STREETS].file_string()));
+			stream << t.cell("Zones administratives (mtdarea)", t.getForm().getTextInput(_getFileParameterName(FILE_MTDAREA), _pathsMap[FILE_MTDAREA].file_string()));
 			stream << t.close();
+		}
+
+
+
+		server::ParametersMap NavstreetsFileFormat::Importer_::_getParametersMap() const
+		{
+			ParametersMap result;
+			result.insert(PARAMETER_DRIVING_ON_RIGHT_SIDE, _drivingOnRightSide);
+			return result;
+		}
+
+
+
+		void NavstreetsFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
+		{
+			_drivingOnRightSide = map.getDefault<bool>(PARAMETER_DRIVING_ON_RIGHT_SIDE, true);
 		}
 }	}
