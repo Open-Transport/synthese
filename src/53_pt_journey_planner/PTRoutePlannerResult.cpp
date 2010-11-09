@@ -298,8 +298,8 @@ namespace synthese
 					}
 
 					if(	!leg.getService()->getPath()->isPedestrianMode() ||
-						!(itl+1)->getService()->getPath()->isPedestrianMode() ||
-						itl+1 == jl.end()
+						itl+1 == jl.end() ||
+						!(itl+1)->getService()->getPath()->isPedestrianMode()
 					){
 						PlacesList::iterator pos(
 							_putPlace(
