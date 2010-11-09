@@ -399,8 +399,8 @@ namespace synthese
 			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
 			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
 			stream << t.open();
-			stream << t.cell("Fichier bahnhof", t.getForm().getTextInput(PARAMETER_PATH + FILE_BAHNHOFS, _pathsMap[FILE_BAHNHOFS].file_string()));
-			stream << t.cell("Fichier koords", t.getForm().getTextInput(PARAMETER_PATH + FILE_KOORDS, _pathsMap[FILE_KOORDS].file_string()));
+			stream << t.cell("Fichier bahnhof", t.getForm().getTextInput(_getFileParameterName(FILE_BAHNHOFS), _pathsMap[FILE_BAHNHOFS].file_string()));
+			stream << t.cell("Fichier koord", t.getForm().getTextInput(_getFileParameterName(FILE_KOORDS), _pathsMap[FILE_KOORDS].file_string()));
 			stream << t.close();
 		}
 

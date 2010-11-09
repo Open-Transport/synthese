@@ -35,9 +35,18 @@ namespace synthese
 {
 	namespace road
 	{
-		/** Road table synchronizer.
-			@ingroup m34LS refLS
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Road part table synchronizer.
+		///	@ingroup m34LS refLS
+		/// @author Marc Jambert, Hugues Romain
+		/// Fields :
+		///		- road_type : see RoadType
+		///		-
+		///		-
+		///		-
+		///		- road_place_id : named road which the road part belongs to
+		///		- right_side : (1|0) : true = the main Road object is on right side,
+		///			false = the main Road object is on left side
 		class RoadTableSync
 		:	public db::SQLiteRegistryTableSyncTemplate<RoadTableSync,Road>
 		{
@@ -48,6 +57,7 @@ namespace synthese
 			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
 			static const std::string COL_ROAD_PLACE_ID;
+			static const std::string COL_RIGHT_SIDE;
 			
 
 

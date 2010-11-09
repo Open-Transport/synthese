@@ -148,15 +148,21 @@ namespace synthese
 			{
 				friend class impex::MultipleFileTypesImporter<NavstreetsFileFormat>;
 
-			protected:
+			private:
 				//! @name Tables
 				//@{
 					static const std::string FILE_MTDAREA;
 					static const std::string FILE_STREETS;
 				//@}
 
-			private:
+				//! @name Parameters
+				//@{
+					static const std::string PARAMETER_DRIVING_ON_RIGHT_SIDE;
+				//@}
+
 				typedef std::map<int, geography::City*> _CitiesMap;
+
+				bool _drivingOnRightSide;
 
 				mutable _CitiesMap _citiesMap;	//!< Correspondence table between Navstreets and SYNTHESE id for streets
 
@@ -204,9 +210,25 @@ namespace synthese
 
 			public:
 				Importer_(const impex::DataSource& dataSource):
-					impex::MultipleFileTypesImporter<NavstreetsFileFormat>(dataSource)
+					impex::MultipleFileTypesImporter<NavstreetsFileFormat>(dataSource),
+					_drivingOnRightSide(true)
 				{}
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from attributes to generic parameter maps.
+				/// @return Generated parameters map
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				virtual server::ParametersMap _getParametersMap() const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from generic parameters map to attributes.
+				/// @param map Parameters map to interpret
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				virtual void _setFromParametersMap(const server::ParametersMap& map);
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Import screen to include in the administration console.

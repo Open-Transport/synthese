@@ -464,9 +464,9 @@ namespace synthese
 			stream << t.title("Propriétés");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
 			stream << t.title("Données");
-			stream << t.cell("Eckdaten", t.getForm().getTextInput(PARAMETER_PATH + FILE_ECKDATEN, _pathsMap[FILE_ECKDATEN].file_string()));
-			stream << t.cell("Bitfeld", t.getForm().getTextInput(PARAMETER_PATH + FILE_BITFELD, _pathsMap[FILE_BITFELD].file_string()));
-			stream << t.cell("Zugdat", t.getForm().getTextInput(PARAMETER_PATH + FILE_ZUGUDAT, _pathsMap[FILE_ZUGUDAT].file_string()));
+			stream << t.cell("Eckdaten", t.getForm().getTextInput(_getFileParameterName(FILE_ECKDATEN), _pathsMap[FILE_ECKDATEN].file_string()));
+			stream << t.cell("Bitfeld", t.getForm().getTextInput(_getFileParameterName(FILE_BITFELD), _pathsMap[FILE_BITFELD].file_string()));
+			stream << t.cell("Zugdat", t.getForm().getTextInput(_getFileParameterName(FILE_ZUGUDAT), _pathsMap[FILE_ZUGUDAT].file_string()));
 			stream << t.close();
 		}
 }	}
