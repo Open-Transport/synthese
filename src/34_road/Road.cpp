@@ -50,7 +50,8 @@ namespace synthese
 			RoadType type,
 			bool autoCreateReverseRoad
 		):	Registrable(id),
-			_type (type)
+			_type (type),
+			_side(RIGHT_SIDE)
 		{
 			// Creation of the permanent service
 			addService(new PermanentService(id, this), false);
@@ -62,7 +63,8 @@ namespace synthese
 		Road::Road(const Road& reverseRoad
 		):	Registrable(0),
 			_type(reverseRoad.getType()),
-			_reverseRoad(NULL)
+			_reverseRoad(NULL),
+			_side(reverseRoad.getSide() == RIGHT_SIDE ? LEFT_SIDE : RIGHT_SIDE)
 		{
 			addService(new PermanentService(0, this), false);
 		}

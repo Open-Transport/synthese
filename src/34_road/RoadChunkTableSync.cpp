@@ -153,7 +153,7 @@ namespace synthese
 					((object->getRoad()->getSide() == Road::LEFT_SIDE) ? object : object->getReverseChunk())->setHouseNumberBounds(
 						RoadChunk::HouseNumberBounds(RoadChunk::HouseNumberBounds::value_type(
 							rows->getInt(RoadChunkTableSync::COL_LEFT_MIN_HOUSE_NUMBER),
-							rows->getInt(RoadChunkTableSync::COL_LEFT_MIN_HOUSE_NUMBER)
+							rows->getInt(RoadChunkTableSync::COL_LEFT_MAX_HOUSE_NUMBER)
 					)	));
 
 					// Left House numbering policy
@@ -170,7 +170,7 @@ namespace synthese
 					((object->getRoad()->getSide() == Road::RIGHT_SIDE) ? object : object->getReverseChunk())->setHouseNumberBounds(
 						RoadChunk::HouseNumberBounds(RoadChunk::HouseNumberBounds::value_type(
 							rows->getInt(RoadChunkTableSync::COL_RIGHT_MIN_HOUSE_NUMBER),
-							rows->getInt(RoadChunkTableSync::COL_RIGHT_MIN_HOUSE_NUMBER)
+							rows->getInt(RoadChunkTableSync::COL_RIGHT_MAX_HOUSE_NUMBER)
 					)	));
 
 					// Right House numbering policy

@@ -40,15 +40,19 @@ namespace synthese
 		class MultipleFileTypesImporter:
 			public Importer
 		{
-		public:
-			static const bool IMPORTABLE;
+		private:
 			static const std::string PARAMETER_PATH;	//!< Path of the files to import
 
+		public:
+			static const bool IMPORTABLE;
+			
 			typedef std::string FileKey;
 			typedef std::map<FileKey, boost::filesystem::path> FilePathsMap;
 
 		protected:
 			mutable FilePathsMap			_pathsMap;
+
+			static std::string _getFileParameterName(const FileKey& file){ return PARAMETER_PATH + file; }
 
 		public:
 			class Files
@@ -109,7 +113,7 @@ namespace synthese
 			){
 				BOOST_FOREACH(const std::string& key, FILES.getFiles())
 				{
-					std::string filePath(map.getDefault<std::string>(PARAMETER_PATH + key));
+					std::string filePath(map.getDefault<std::string>(_getFileParameterName(key)));
 					if(filePath.empty())
 					{
 						continue;
@@ -129,7 +133,7 @@ namespace synthese
 				server::ParametersMap result(_getFromParametersMap());
 				BOOST_FOREACH(const FilePathsMap::value_type& it, _pathsMap)
 				{
-					result.insert(PARAMETER_PATH + it.first, it.second.file_string());
+					result.insert(_getFileParameterName(it.first), it.second.file_string());
 				}
 				return result;
 			}
