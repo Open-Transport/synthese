@@ -12,6 +12,7 @@
 #include "TimetableRowDeleteAction.h"
 #include "TimetableSetLineAction.h"
 #include "TimetableSetPhysicalStopAction.h"
+#include "TimetableTransferUpdateAction.hpp"
 
 #include "TimetableGenerateFunction.h"
 
