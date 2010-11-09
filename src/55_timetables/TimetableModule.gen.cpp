@@ -16,6 +16,7 @@ synthese::timetables::TimetableUpdateAction::integrate();
 synthese::timetables::TimetableRowDeleteAction::integrate();
 synthese::timetables::TimetableSetLineAction::integrate();
 synthese::timetables::TimetableSetPhysicalStopAction::integrate();
+synthese::timetables::TimetableTransferUpdateAction::integrate();
 
 synthese::timetables::TimetableRight::integrate();
 
