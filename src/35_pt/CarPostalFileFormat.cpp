@@ -279,7 +279,10 @@ namespace synthese
 							string arrivalTime(line.substr(29,4));
 
 							JourneyPattern::StopWithDepartureArrivalAuthorization stop;
-							stop.stop = searchStop.front().get();
+							BOOST_FOREACH(const StopPointTableSync::SearchResult::value_type& itstop, searchStop)
+							{
+								stop.stop.insert(itstop.get());
+							}
 							stop.departure = (departureTime != "9999" && departureTime != "    ");
 							stop.arrival = (arrivalTime != "9999" && arrivalTime != "    ");
 							stops.push_back(stop);
@@ -385,7 +388,7 @@ namespace synthese
 							{
 								shared_ptr<LineStop> ls(new LineStop);
 								ls->setLine(route.get());
-								ls->setPhysicalStop(stop.stop);
+								ls->setPhysicalStop(*stop.stop.begin());
 								ls->setRankInPath(rank);
 								ls->setIsArrival(rank > 0 && stop.arrival);
 								ls->setIsDeparture(rank+1 < stops.size() && stop.departure);
