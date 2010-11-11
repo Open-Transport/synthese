@@ -205,7 +205,7 @@ namespace synthese
 
 				struct StopWithDepartureArrivalAuthorization
 				{
-					StopPoint* stop;
+					std::set<StopPoint*> stop;
 					bool departure;
 					bool arrival;
 				};

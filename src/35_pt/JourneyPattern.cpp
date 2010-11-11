@@ -309,7 +309,7 @@ namespace synthese
 			BOOST_FOREACH(const Edge* edge, getEdges())
 			{
 				const StopsWithDepartureArrivalAuthorization::value_type& stop(stops[rank]);
-				if(	static_cast<const LineStop*>(edge)->getFromVertex() != stop.stop ||
+				if( stop.stop.find(static_cast<StopPoint*>(edge->getFromVertex())) == stop.stop.end() ||
 					edge->isDeparture() != stop.departure ||
 					edge->isArrival() != stop.arrival
 				){

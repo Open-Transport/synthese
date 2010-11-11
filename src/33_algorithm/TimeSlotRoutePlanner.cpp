@@ -283,7 +283,7 @@ namespace synthese
 			{
 				// Insertion of a journey of the parent continuous service before
 				ptime precedingLastDepartureTime(subJourney.getFirstArrivalTime());
-				precedingLastDepartureTime -= days(1);
+				precedingLastDepartureTime -= minutes(1);
 				precedingLastDepartureTime -= parentContinuousService.getDuration();
 				if(precedingLastDepartureTime > departureTime)
 				{
@@ -301,8 +301,8 @@ namespace synthese
 
 				result.push_back(subJourney);
 
-				departureTime = subJourney.getFirstDepartureTime();
-				departureTime += days(1);
+				departureTime = subJourney.getLastDepartureTime();
+				departureTime += minutes(1);
 			}
 
 			ptime lastDepartureTime(parentContinuousService.getLastDepartureTime());
