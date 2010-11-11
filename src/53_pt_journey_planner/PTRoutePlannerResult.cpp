@@ -171,7 +171,7 @@ namespace synthese
 				if(dynamic_cast<const City*>(_departurePlace) || dynamic_cast<const City*>(_arrivalPlace))
 				{
 					stream << " (";
-					if(dynamic_cast<const City*>(_departurePlace))
+					if(dynamic_cast<const City*>(_departurePlace) && dynamic_cast<const StopArea*>(its->getDepartureEdge()->getHub()))
 					{
 						stream << "départ de " << 
 							static_cast<const StopArea*>(
@@ -179,7 +179,7 @@ namespace synthese
 							)->getFullName()
 						;
 					}
-					if(dynamic_cast<const City*>(_arrivalPlace))
+					if(dynamic_cast<const City*>(_arrivalPlace) && dynamic_cast<const StopArea*>((it->getServiceUses().end() - 1)->getArrivalEdge()->getHub()))
 					{
 						if(dynamic_cast<const City*>(_departurePlace)) stream << " - ";
 						Journey::ServiceUses::const_iterator ite(it->getServiceUses().end() - 1);

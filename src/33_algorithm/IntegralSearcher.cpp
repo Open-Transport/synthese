@@ -603,8 +603,8 @@ namespace synthese
 
 			/// <h2>Control of the compliance with the maximal duration</h2>
 			if(_maxDuration && journey.getDuration() > *_maxDuration)
-			{
-				return _JourneyUsefulness(false, false);
+			{ /// TODO do the same think to all false,false returns
+				return _JourneyUsefulness(false, journey.getDuration() - (_accessDirection == DEPARTURE_TO_ARRIVAL ? journey.getEndApproachDuration() : journey.getStartApproachDuration()) <= *_maxDuration );
 			}
 
 			/// <h2>Control of the compliance with the current filters</h2>
@@ -638,7 +638,7 @@ namespace synthese
 			||	(	(_accessDirection == DEPARTURE_TO_ARRIVAL)
 				&&	(reachDateTime > _minMaxDateTimeAtDestination)
 				)
-			)	return _JourneyUsefulness(false,false);
+			)	return _JourneyUsefulness(false, false);
 
 			/** - If the reached vertex does not belong to the goal, comparison with the known best time at the goal, to determinate 
 				if there is any chance to reach the goal more efficiently by using this path
