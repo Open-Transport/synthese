@@ -54,7 +54,7 @@ namespace synthese
 			boost::shared_ptr<const Timetable>			_timetable;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
-			void TimetableAdmin::_drawTable(
+			void _drawTable(
 				std::ostream& stream,
 				html::HTMLTable& tf,
 				const TimetableResult& result,
