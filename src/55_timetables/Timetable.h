@@ -106,8 +106,8 @@ namespace synthese
 				Rows					_rows;
 				const calendar::CalendarTemplate*			_baseCalendar;
 				std::string				_title;
-				util::RegistryKeyType	_transferTimetableBefore;
-				util::RegistryKeyType	_transferTimetableAfter;
+				Timetable* 	_transferTimetableBefore;
+				Timetable*	_transferTimetableAfter;
 			//@}
 
 		public:
@@ -129,8 +129,8 @@ namespace synthese
 				void setBaseCalendar(const calendar::CalendarTemplate* value){ _baseCalendar = value; }
 				void setRank(std::size_t value){ _rank = value; }
 				void setContentType(ContentType value){ _contentType = value; }
-				void setTransferTimetableBefore(util::RegistryKeyType value){ _transferTimetableBefore = value; }
-				void setTransferTimetableAfter(util::RegistryKeyType value){ _transferTimetableAfter = value; }
+				void setTransferTimetableBefore(Timetable* value){ _transferTimetableBefore = value; }
+				void setTransferTimetableAfter(Timetable* value){ _transferTimetableAfter = value; }
 			//@}
 
 			//! @name Modifiers
@@ -148,11 +148,9 @@ namespace synthese
 				util::RegistryKeyType	getBookId()				const { return _bookId; }
 				std::size_t				getRank()				const { return _rank; }
 				ContentType				getContentType()		const { return _contentType; }
-				util::RegistryKeyType	getTransferTimetableBefore() const { return _transferTimetableBefore; }
-				util::RegistryKeyType	getTransferTimetableAfter() const { return _transferTimetableAfter; }
 			//@}
 
-			//! @name Queries
+			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
 				/// Tests if the generator can be built.
@@ -173,9 +171,15 @@ namespace synthese
 					const util::Env& env
 				)	const;
 
-				void generate(
-					std::ostream& stream
-				);
+
+
+				Timetable* getTransferTimetableBefore(std::size_t depth);
+				Timetable* getTransferTimetableAfter(std::size_t depth);
+				const Timetable* getTransferTimetableBefore(std::size_t depth) const;
+				const Timetable* getTransferTimetableAfter(std::size_t depth) const;
+				std::size_t getBeforeTransferTimetablesNumber() const;
+				std::size_t getAfterTransferTimetablesNumber() const;
+
 			//@}
 		};
 	}

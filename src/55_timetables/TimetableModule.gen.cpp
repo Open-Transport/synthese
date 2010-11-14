@@ -21,7 +21,9 @@ synthese::timetables::TimetableTransferUpdateAction::integrate();
 synthese::timetables::TimetableRight::integrate();
 
 synthese::timetables::TimetableGenerateFunction::integrate();
+synthese::timetables::MultipleTimetableGenerateFunction::integrate();
 
 // Registries
 synthese::util::Env::Integrate<synthese::timetables::TimetableRow>();
 synthese::util::Env::Integrate<synthese::timetables::Timetable>();
+

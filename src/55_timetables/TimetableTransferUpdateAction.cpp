@@ -90,7 +90,7 @@ namespace synthese
 
 			try
 			{
-				_transferTimetable = TimetableTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TRANSFER_TIMETABLE_ID), *_env);
+				_transferTimetable = TimetableTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_TRANSFER_TIMETABLE_ID), *_env);
 			}
 			catch(ObjectNotFoundException<Timetable>&)
 			{
@@ -108,11 +108,11 @@ namespace synthese
 
 			if(_before)
 			{
-				_timetable->setTransferTimetableBefore(_transferTimetable.get() ? _transferTimetable->getKey() : 0);
+				_timetable->setTransferTimetableBefore(_transferTimetable.get());
 			}
 			else
 			{
-				_timetable->setTransferTimetableAfter(_transferTimetable.get() ? _transferTimetable->getKey() : 0);
+				_timetable->setTransferTimetableAfter(_transferTimetable.get());
 			}
 
 			TimetableTableSync::Save(_timetable.get());

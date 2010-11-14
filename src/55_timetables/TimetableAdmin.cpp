@@ -326,18 +326,15 @@ namespace synthese
 					transferRequest.getAction()->setBefore(true);
 					PropertiesHTMLTable p1(transferRequest.getHTMLForm("t1"));
 					stream << p1.open();
-					stream << p1.cell("Correspondance avant :", p1.getForm().getTextInput(TimetableTransferUpdateAction::PARAMETER_TRANSFER_TIMETABLE_ID, lexical_cast<string>(_timetable->getTransferTimetableBefore())));
-					if(_timetable->getTransferTimetableBefore())
+					stream << p1.cell(
+						"Correspondance avant :",
+						p1.getForm().getTextInput(
+							TimetableTransferUpdateAction::PARAMETER_TRANSFER_TIMETABLE_ID,
+							_timetable->getTransferTimetableBefore(1) ? lexical_cast<string>(_timetable->getTransferTimetableBefore(1)->getKey()) : string()
+					)	);
+					if(_timetable->getTransferTimetableBefore(1))
 					{
-						shared_ptr<const Timetable> t1(Env::GetOfficialEnv().get<Timetable>(_timetable->getTransferTimetableBefore()));
-						try
-						{
-							stream << p1.cell("Libellé tableau :", t1->getTitle());
-						}
-						catch(ObjectNotFoundException<Timetable>&)
-						{
-							stream << p1.cell("Libellé tableau :", "(tableau invalide)");
-						}
+						stream << p1.cell("Libellé tableau :", _timetable->getTransferTimetableBefore(1)->getTitle());
 					}
 					stream << p1.close();
 
@@ -461,18 +458,15 @@ namespace synthese
 					transferRequest.getAction()->setBefore(false);
 					PropertiesHTMLTable p2(transferRequest.getHTMLForm("t2"));
 					stream << p2.open();
-					stream << p2.cell("Correspondance après :", p2.getForm().getTextInput(TimetableTransferUpdateAction::PARAMETER_TRANSFER_TIMETABLE_ID, lexical_cast<string>(_timetable->getTransferTimetableAfter())));
-					if(_timetable->getTransferTimetableAfter())
+					stream << p2.cell(
+						"Correspondance après :",
+						p2.getForm().getTextInput(
+							TimetableTransferUpdateAction::PARAMETER_TRANSFER_TIMETABLE_ID,
+							_timetable->getTransferTimetableAfter(1) ? lexical_cast<string>(_timetable->getTransferTimetableAfter(1)->getKey()) : string()
+					)	);
+					if(_timetable->getTransferTimetableAfter(1))
 					{
-						shared_ptr<const Timetable> t2(Env::GetOfficialEnv().get<Timetable>(_timetable->getTransferTimetableAfter()));
-						try
-						{
-							stream << p2.cell("Libellé tableau :", t2->getTitle());
-						}
-						catch(ObjectNotFoundException<Timetable>&)
-						{
-							stream << p2.cell("Libellé tableau :", "(tableau invalide)");
-						}
+						stream << p2.cell("Libellé tableau :", _timetable->getTransferTimetableAfter(1)->getTitle());
 					}
 					stream << p2.close();
 
@@ -560,53 +554,26 @@ namespace synthese
 					_timetable->getContentType() == Timetable::TIMES_IN_COLS ||
 					_timetable->getContentType() == Timetable::TIMES_IN_ROWS
 				){
-					stream << "<h1>Tableau</h1>";
-
+					// Building the result
 					auto_ptr<TimetableGenerator> g(_timetable->getGenerator(Env::GetOfficialEnv()));
-					const TimetableResult result(g->build());
+					const TimetableResult result(g->build(true, shared_ptr<TimetableResult::Warnings>()));
 
+					// Drawing the result
+					stream << "<h1>Tableau</h1>";
 					HTMLTable tf(0, ResultHTMLTable::CSS_CLASS);
 					stream << tf.open();
-					stream << tf.row();
-					stream << tf.col(1, string(), true) << "Lignes";
-
-					BOOST_FOREACH(const CommercialLine* line, result.getRowLines())
+					for(size_t depth(_timetable->getBeforeTransferTimetablesNumber()); depth > 0; --depth)
 					{
-						stream <<
-							tf.col(1, line->getStyle()) <<
-							line->getShortName()
-						;
+						_drawTable(stream, tf, result.getBeforeTransferTimetable(depth), depth, true);
 					}
-
-					BOOST_FOREACH(const Timetable::Rows::value_type& row, _timetable->getRows())
+					_drawTable(stream, tf, result);
+					for(size_t depth(1); depth <= _timetable->getAfterTransferTimetablesNumber(); ++depth)
 					{
-						stream << tf.row();
-						stream << tf.col(1, string(), true) << row.getPlace()->getFullName();
-						const TimetableResult::RowTimesVector cols(result.getRowSchedules(row.getRank()));
-						BOOST_FOREACH(const TimetableResult::RowTimesVector::value_type& col, cols)
-						{
-							stream << tf.col();
-							if (!col.is_not_a_date_time())
-							{
-								stream << col.hours() << ":" << col.minutes();
-							}
-						}
+						_drawTable(stream, tf, result.getAfterTransferTimetable(depth), depth, false);
 					}
-
-					// Notes
-					stream << tf.row();
-					stream << tf.col(1, string(), true) << "Renvois";
-					BOOST_FOREACH(const TimetableResult::RowNotesVector::value_type& warn, result.getRowNotes())
-					{
-						stream << tf.col();
-						if(warn.get())
-						{
-							stream << warn->getNumber();
-						}
-					}
-
 					stream << tf.close();
 
+					// Drawing the warnings
 					if(	!result.getWarnings().empty()
 					){
 						stream << "<h1>Renvois</h1>";
@@ -716,6 +683,82 @@ namespace synthese
 			}
 
 			return links;
+		}
+
+
+
+		void TimetableAdmin::_drawTable(
+			ostream& stream,
+			HTMLTable& tf,
+			const TimetableResult& result,
+			size_t depth,
+			bool isBefore
+		) const {
+			// Title
+			stream << tf.row();
+			stream << tf.col(result.getColumns().size() + 1, string(), true);
+			if(depth == 0)
+			{
+				stream << "Tableau principal";
+			}
+			else
+			{
+				stream << "Tableau de correspondance " << (isBefore ? "avant" : "après") << " #" << depth;
+			}
+
+			// Table
+			stream << tf.row();
+			stream << tf.col(1, string(), true) << "Lignes";
+
+			BOOST_FOREACH(const CommercialLine* line, result.getRowLines())
+			{
+				if(line == NULL)
+				{
+					stream << tf.col();
+				}
+				else
+				{
+					stream <<
+						tf.col(1, line->getStyle()) <<
+						line->getShortName()
+						;
+				}
+			}
+
+			const Timetable* timetable(_timetable.get());
+			if(depth != 0)
+			{
+				timetable = isBefore ? timetable->getTransferTimetableBefore(depth) : timetable->getTransferTimetableAfter(depth);
+			}
+			BOOST_FOREACH(const Timetable::Rows::value_type& row, timetable->getRows())
+			{
+				stream << tf.row();
+				stream << tf.col(1, string(), true) << row.getPlace()->getFullName();
+				const TimetableResult::RowTimesVector cols(result.getRowSchedules(row.getRank()));
+				BOOST_FOREACH(const TimetableResult::RowTimesVector::value_type& col, cols)
+				{
+					stream << tf.col();
+					if (!col.is_not_a_date_time())
+					{
+						stream << col.hours() << ":" << col.minutes();
+					}
+				}
+			}
+
+			// Notes
+			if(depth==0)
+			{
+				stream << tf.row();
+				stream << tf.col(1, string(), true) << "Renvois";
+				BOOST_FOREACH(const TimetableResult::RowNotesVector::value_type& warn, result.getRowNotes())
+				{
+					stream << tf.col();
+					if(warn.get())
+					{
+						stream << warn->getNumber();
+					}
+				}
+			}
 		}
 	}
 }

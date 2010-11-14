@@ -96,6 +96,21 @@ namespace synthese
 
 
 
+		TimetableColumn::TimetableColumn(
+			const TimetableGenerator& generator
+		):	_line(NULL),
+			_originType(Indetermine),
+			_destinationType(Indetermine)
+		{
+			const TimetableGenerator::Rows& rows(generator.getRows());
+			for(TimetableGenerator::Rows::const_iterator itRow(rows.begin()); itRow != rows.end(); ++itRow)
+			{
+				_content.push_back(make_pair<const StopPoint*, time_duration>(NULL, time_duration(not_a_date_time)));
+			}
+		}
+
+
+
 		int TimetableColumn::operator<=( const TimetableColumn& other) const
 		{
 			assert(_content.size() == other._content.size());

@@ -23,6 +23,8 @@
 #include "TimetableResult.hpp"
 #include "JourneyPattern.hpp"
 
+using namespace boost;
+
 namespace synthese
 {
 	namespace timetables
@@ -45,7 +47,7 @@ namespace synthese
 		{
 			RowLinesVector result;
 			for (Columns::const_iterator it(_columns.begin()); it != _columns.end(); ++it)
-				result.push_back(it->getLine()->getCommercialLine());
+				result.push_back(it->getLine() ? it->getLine()->getCommercialLine() : NULL);
 			return result;
 		}
 
@@ -88,5 +90,76 @@ namespace synthese
 				result.push_back(it->getDestinationType());
 			return result;
 		}
-	}
-}
+
+
+
+		const TimetableResult& TimetableResult::getBeforeTransferTimetable( std::size_t depth ) const
+		{
+			if(depth == 0)
+			{
+				return *this;
+			}
+			else
+			{
+				return _beforeTransfers->getBeforeTransferTimetable(depth - 1);
+			}
+		}
+
+		TimetableResult& TimetableResult::getBeforeTransferTimetable( std::size_t depth )
+		{
+			if(depth == 0)
+			{
+				return *this;
+			}
+			else
+			{
+				return _beforeTransfers->getBeforeTransferTimetable(depth - 1);
+			}
+		}
+
+
+		const TimetableResult& TimetableResult::getAfterTransferTimetable( std::size_t depth ) const
+		{
+			if(depth == 0)
+			{
+				return *this;
+			}
+			else
+			{
+				return _afterTransfers->getAfterTransferTimetable(depth - 1);
+			}
+		}
+
+		TimetableResult& TimetableResult::getAfterTransferTimetable( std::size_t depth )
+		{
+			if(depth == 0)
+			{
+				return *this;
+			}
+			else
+			{
+				return _afterTransfers->getAfterTransferTimetable(depth - 1);
+			}
+		}
+
+
+
+		void TimetableResult::createBeforeTransfer()
+		{
+			_beforeTransfers.reset(new TimetableResult(_warnings));
+		}
+
+
+
+		void TimetableResult::createAfterTransfer()
+		{
+			_afterTransfers.reset(new TimetableResult(_warnings));
+		}
+
+
+
+		TimetableResult::TimetableResult(
+			boost::shared_ptr<Warnings> warnings
+		):	_warnings(warnings.get() ? warnings : shared_ptr<Warnings>(new Warnings))
+		{}
+}	}

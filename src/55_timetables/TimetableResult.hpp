@@ -65,16 +65,26 @@ namespace synthese
 
 
 		private:
+			boost::shared_ptr<TimetableResult>	_beforeTransfers;
+			boost::shared_ptr<TimetableResult>	_afterTransfers;
 			Columns			_columns;
-			Warnings		_warnings;
+			boost::shared_ptr<Warnings>		_warnings;
 
 		public:
+			TimetableResult(boost::shared_ptr<Warnings> warnings);
+
 			//! @name Getters
 			//@{
-				const Warnings&	getWarnings()	const { return _warnings; }
-				Warnings&	getWarnings()	{ return _warnings; }
+				const Warnings&	getWarnings()	const { return *_warnings; }
+				Warnings&	getWarnings()	{ return *_warnings; }
 				const Columns&	getColumns()	const { return _columns; }
 				Columns&	getColumns()	{ return _columns; }
+			//@}
+
+			//! @name Modifiers
+			//@{
+				void createBeforeTransfer();
+				void createAfterTransfer();
 			//@}
 
 			//! @name Services
@@ -85,6 +95,12 @@ namespace synthese
 				RowRollingStockVector	getRowRollingStock()						const;
 				RowTypeODVector			getOriginTypes()							const;
 				RowTypeODVector			getDestinationTypes()						const;
+
+				///
+				const TimetableResult&	getBeforeTransferTimetable(std::size_t depth) const;
+				TimetableResult&	getBeforeTransferTimetable(std::size_t depth);
+				const TimetableResult&	getAfterTransferTimetable(std::size_t depth) const;
+				TimetableResult&	getAfterTransferTimetable(std::size_t depth);
 			//@}
 
 		};
