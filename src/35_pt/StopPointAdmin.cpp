@@ -124,6 +124,17 @@ namespace synthese
 				
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
+				if(_stop->getConnectionPlace())
+				{
+					stream << t.cell(
+						"Zone d'arrêt",
+						_stop->getConnectionPlace()->getFullName()
+					);
+				}
+				stream << t.cell(
+					"Zone d'arrêt",
+					t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_STOP_AREA, _stop->getConnectionPlace() ? lexical_cast<string>(_stop->getConnectionPlace()->getKey()) : string())
+				);
 				stream << t.cell("Nom", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_NAME, _stop->getName()));
 				stream << t.cell("X", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_X, lexical_cast<string>(_stop->getGeometry()->getX())));
 				stream << t.cell("Y", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_Y, lexical_cast<string>(_stop->getGeometry()->getY())));
