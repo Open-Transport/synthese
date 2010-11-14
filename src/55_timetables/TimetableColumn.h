@@ -85,6 +85,12 @@ namespace synthese
 				const pt::SchedulesBasedService& service
 			);
 
+			// Empty column
+			TimetableColumn(
+				const TimetableGenerator& generator
+			);
+
+
 			//! @name Queries
 			//@{
 				int		operator <= (const TimetableColumn& op) const;

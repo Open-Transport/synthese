@@ -15,6 +15,7 @@
 #include "TimetableTransferUpdateAction.hpp"
 
 #include "TimetableGenerateFunction.h"
+#include "MultipleTimetableGenerateFunction.hpp"
 
 #include "TimetableRight.h"
 

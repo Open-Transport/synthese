@@ -65,6 +65,8 @@ namespace synthese
 
 			//! @name Content definition
 			//@{
+				std::auto_ptr<TimetableGenerator>	_transferTimetableBefore;
+				std::auto_ptr<TimetableGenerator>	_transferTimetableAfter;
 				Rows						_rows;
 				calendar::Calendar			_baseCalendar;
 				AuthorizedLines				_authorizedLines;
@@ -81,9 +83,9 @@ namespace synthese
 			//! @name Algorithms
 			//@{
 				bool	_isLineSelected(const pt::JourneyPattern& line)	const;
-				void	_insert(TimetableResult& result, const TimetableColumn& col);
-				void	_buildWarnings(TimetableResult& result);
-				void	_scanServices(TimetableResult& result, const pt::JourneyPattern& line);
+				void	_insert(TimetableResult& result, const TimetableColumn& col) const;
+				void	_buildWarnings(TimetableResult& result) const;
+				void	_scanServices(TimetableResult& result, const pt::JourneyPattern& line) const;
 			//@}
 
 		public:
@@ -98,9 +100,18 @@ namespace synthese
 				const AuthorizedPhysicalStops& getAuthorizedPhysicalStops() const { return _authorizedPhysicalStops; }
 			//@}
 
+			//! @name Services
+			//@{
+				const TimetableGenerator& getBeforeTransferTimetable(std::size_t depth) const;
+				const TimetableGenerator& getAfterTransferTimetable(std::size_t depth) const;
+			//@}
+
 			//! @name Actions
 			//@{
-				TimetableResult build();
+				TimetableResult build(
+					bool withWarnings,
+					boost::shared_ptr<TimetableResult::Warnings> warnings
+				) const;
 			//@}
 
 			//! @name Setters
@@ -109,6 +120,8 @@ namespace synthese
 				void setBaseCalendar(const calendar::Calendar& value) { _baseCalendar = value; }
 				void setAuthorizedLines(const AuthorizedLines& value) { _authorizedLines = value; }
 				void setAuthorizedPhysicalStops(const AuthorizedPhysicalStops& value) { _authorizedPhysicalStops = value; }
+				void setBeforeTransferTimetable(std::auto_ptr<TimetableGenerator> value){ _transferTimetableBefore = value; }
+				void setAfterTransferTimetable(std::auto_ptr<TimetableGenerator> value){ _transferTimetableAfter = value; }
 			//@}
 		};
 	}

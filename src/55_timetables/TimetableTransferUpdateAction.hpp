@@ -59,7 +59,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<Timetable> _timetable;
-			boost::shared_ptr<const Timetable> _transferTimetable;
+			boost::shared_ptr<Timetable> _transferTimetable;
 			bool _before;
 
 		protected:

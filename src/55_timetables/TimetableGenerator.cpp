@@ -48,17 +48,20 @@ namespace synthese
 	{
 		TimetableGenerator::TimetableGenerator(
 			const Env& env
-		):	_withContinuousServices(true),
+		):	_transferTimetableBefore(NULL),
+			_transferTimetableAfter(NULL),
+			_withContinuousServices(true),
 			_env(env)
 			, _maxColumnsNumber(UNKNOWN_VALUE)
-		{
-		}
+		{}
 
 
 
-		TimetableResult TimetableGenerator::build()
-		{
-			TimetableResult result;
+		TimetableResult TimetableGenerator::build(
+			bool withWarnings,
+			boost::shared_ptr<TimetableResult::Warnings> warnings
+		) const	{
+			TimetableResult result(warnings);
 
 			if(!_rows.empty())
 			{
@@ -67,18 +70,150 @@ namespace synthese
 				{
 					// JourneyPattern selection
 					const JourneyPattern& line(*it.second);
-					if (!_isLineSelected(line))
+					if(!_isLineSelected(line))
+					{
 						continue;
-
-					_scanServices(result, line);
+					}
+					
+					// A0: JourneyPattern selection upon calendar
+					if (_baseCalendar.hasAtLeastOneCommonDateWith(line))
+					{
+						_scanServices(result, line);
+					}
 
 					BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, line.getSubLines())
 					{
+						if (!_baseCalendar.hasAtLeastOneCommonDateWith(*subline))
+						{
+							continue;
+						}
 						_scanServices(result, *subline);
 					}
 				}
 
-				_buildWarnings(result);
+				if(withWarnings)
+				{
+					_buildWarnings(result);
+				}
+
+				// Before transfers
+				if(_transferTimetableBefore.get())
+				{
+					result.createBeforeTransfer();
+					TimetableResult beforeResult(_transferTimetableBefore->build(false, shared_ptr<TimetableResult::Warnings>()));
+
+					for(TimetableResult::Columns::const_iterator col(result.getColumns().begin()); col != result.getColumns().end(); ++col)
+					{
+						// Tests if the columns service begins actually at the first row
+						if(!col->getContent().begin()->first)
+						{
+							result.getBeforeTransferTimetable(1).getColumns().push_back(TimetableColumn(*_transferTimetableBefore));
+							continue;
+						}
+
+						// Search of the best transfer col in the transfer generated result
+						optional<TimetableColumn> lastOKCol;
+						BOOST_REVERSE_FOREACH(const TimetableResult::Columns::value_type& beforeCol, beforeResult.getColumns())
+						{
+							// Tests if the column is compatible for a transfer
+							if(	!beforeCol.getCalendar().includesDates(col->getCalendar()) || // Calendar compatibility
+								!beforeCol.getContent().rbegin()->first // Transfer available in the same stop area
+							){
+								continue;
+							}
+
+							// Tests if the arrival time is compatible, considering transfer time
+							time_duration maxTime(col->getContent().begin()->second);
+							maxTime -= _rows.begin()->getPlace()->getTransferDelay(
+								*beforeCol.getContent().rbegin()->first,
+								*col->getContent().begin()->first
+							);
+							if(beforeCol.getContent().rbegin()->second <= maxTime)
+							{
+								// Record the column as best transfer
+								lastOKCol = beforeCol;
+								break;
+							}
+						}
+
+						if(!lastOKCol)
+						{
+							// Test if the column was not already used
+							for(TimetableResult::Columns::const_iterator prec(result.getColumns().begin()); prec != col; ++prec)
+							{
+								if(prec->getCalendar() == col->getCalendar() &&
+									result.getBeforeTransferTimetable(1).getColumns().at(prec - result.getColumns().begin()) == lastOKCol
+								){
+									lastOKCol = optional<TimetableColumn>();
+								}
+							}
+						}
+
+						// Store the transfer column
+						result.getBeforeTransferTimetable(1).getColumns().push_back(lastOKCol ? *lastOKCol : TimetableColumn(*_transferTimetableBefore));
+					}
+				}
+
+				// After transfers
+				if(_transferTimetableAfter.get())
+				{
+					result.createAfterTransfer();
+					TimetableResult afterResult(_transferTimetableAfter->build(false, shared_ptr<TimetableResult::Warnings>()));
+
+					for(TimetableResult::Columns::const_reverse_iterator col(result.getColumns().rbegin()); col != result.getColumns().rend(); ++col)
+					{
+						// Tests if the columns service begins actually at the first row
+						if(!col->getContent().rbegin()->first)
+						{
+							result.getAfterTransferTimetable(1).getColumns().push_back(TimetableColumn(*_transferTimetableAfter));
+							continue;
+						}
+
+						// Search of the best transfer col in the transfer generated result
+						optional<TimetableColumn> lastOKCol;
+						BOOST_FOREACH(const TimetableResult::Columns::value_type& afterCol, afterResult.getColumns())
+						{
+							// Tests if the column is compatible for a transfer
+							if(	!afterCol.getCalendar().includesDates(col->getCalendar()) || // Calendar compatibility
+								!afterCol.getContent().begin()->first // Transfer available in the same stop area
+							){
+								continue;
+							}
+
+							// Tests if the arrival time is compatible, considering transfer time
+							time_duration minTime(col->getContent().rbegin()->second);
+							minTime += _rows.rbegin()->getPlace()->getTransferDelay(
+								*col->getContent().rbegin()->first,
+								*afterCol.getContent().begin()->first
+							);
+							if(afterCol.getContent().begin()->second >= minTime)
+							{
+								// Record the column as best transfer
+								lastOKCol = afterCol;
+								break;
+							}
+						}
+
+						if(!lastOKCol)
+						{
+							// Test if the column was not already used
+							for(TimetableResult::Columns::const_reverse_iterator prec(result.getColumns().rbegin()); prec != col; ++prec)
+							{
+								if(prec->getCalendar() == col->getCalendar() &&
+									result.getAfterTransferTimetable(1).getColumns().at(prec - result.getColumns().rend()) == lastOKCol
+								){
+									lastOKCol = optional<TimetableColumn>();
+								}
+							}
+						}
+
+						// Store the transfer column
+						result.getAfterTransferTimetable(1).getColumns().insert(
+							result.getAfterTransferTimetable(1).getColumns().begin(),
+							lastOKCol ? *lastOKCol : TimetableColumn(*_transferTimetableAfter)
+						);
+					}
+				}
 
 			}
 			return result;
@@ -86,8 +221,10 @@ namespace synthese
 
 
 
-		void TimetableGenerator::_scanServices(TimetableResult& result, const pt::JourneyPattern& line )
-		{
+		void TimetableGenerator::_scanServices(
+			TimetableResult& result,
+			const pt::JourneyPattern& line
+		) const	{
 			// Loop on each service
 			BOOST_FOREACH(const Service* servicePtr, line.getServices())
 			{
@@ -111,8 +248,10 @@ namespace synthese
 
 
 
-		void TimetableGenerator::_insert(TimetableResult& result, const TimetableColumn& col )
-		{
+		void TimetableGenerator::_insert(
+			TimetableResult& result,
+			const TimetableColumn& col
+		) const {
 			TimetableResult::Columns::iterator itCol;
 			for (itCol = result.getColumns().begin(); itCol != result.getColumns().end(); ++itCol)
 			{
@@ -133,8 +272,9 @@ namespace synthese
 
 
 
-		void TimetableGenerator::_buildWarnings(TimetableResult& result)
-		{
+		void TimetableGenerator::_buildWarnings(
+			TimetableResult& result
+		) const	{
 			int nextNumber(1);
 			for(TimetableResult::Columns::iterator itCol(result.getColumns().begin()); itCol != result.getColumns().end(); ++itCol)
 			{
@@ -184,11 +324,6 @@ namespace synthese
 			{
 				return false;
 			}
-
-			// A0: JourneyPattern selection upon calendar
-			if (!_baseCalendar.hasAtLeastOneCommonDateWith(line))
-				return false;
-
 
 			// A1: JourneyPattern selection : there must be at least a departure stop of the line in the departures rows
 			Rows::const_iterator itRow;
@@ -253,6 +388,34 @@ namespace synthese
 			}
 
 			return lineIsSelected;
+		}
+
+
+
+		const TimetableGenerator& TimetableGenerator::getBeforeTransferTimetable( std::size_t depth ) const
+		{
+			if(depth == 0 || !_transferTimetableBefore.get())
+			{
+				return *this;
+			}
+			else
+			{
+				return _transferTimetableBefore->getBeforeTransferTimetable(depth - 1);
+			}
+		}
+
+
+
+		const TimetableGenerator& TimetableGenerator::getAfterTransferTimetable( std::size_t depth ) const
+		{
+			if(depth == 0 || !_transferTimetableAfter.get())
+			{
+				return *this;
+			}
+			else
+			{
+				return _transferTimetableAfter->getAfterTransferTimetable(depth - 1);
+			}
 		}
 	}
 }
