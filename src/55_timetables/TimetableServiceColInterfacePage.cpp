@@ -75,6 +75,10 @@ namespace synthese
 		const string TimetableServiceColInterfacePage::DATA_NOTE_TEXT("note_text");
 		const string TimetableServiceColInterfacePage::DATA_ROLLING_STOCK_NAME("rolling_stock_name");
 		const string TimetableServiceColInterfacePage::DATA_ROLLING_STOCK_ALIAS("rolling_stock_alias");
+		const string TimetableServiceColInterfacePage::DATA_IS_BEFORE_TRANSFER("is_before_transfer");
+		const string TimetableServiceColInterfacePage::DATA_TRANSFER_DEPTH("transfer_depth");
+		const string TimetableServiceColInterfacePage::DATA_GLOBAL_RANK("global_rank");
+		const string TimetableServiceColInterfacePage::DATA_BLOCK_MAX_RANK("block_max_rank");
 
 
 
@@ -102,7 +106,14 @@ namespace synthese
 				size_t colRank(0);
 				BOOST_FOREACH(const CommercialLine* line, lines)
 				{
-					DisplayLineCell(content, cellPage, request, *line, colRank++);
+					if(line)
+					{
+						DisplayLineCell(content, cellPage, request, *line, colRank++);
+					}
+					else
+					{
+						DisplayEmptyLineCell(content, cellPage, request, colRank++);
+					}
 				}
 				pm.insert(DATA_CELLS_CONTENT, content.str()); //1
 			}
@@ -147,13 +158,41 @@ namespace synthese
 
 
 
+		void TimetableServiceColInterfacePage::DisplayEmptyLineCell(
+			std::ostream& stream,
+			boost::shared_ptr<const cms::Webpage> page,
+			const server::Request& request,
+			std::size_t colRank
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
+
+			pm.insert(DATA_TYPE, TYPE_LINE); //0
+			pm.insert(DATA_CELL_RANK, colRank); //1
+			pm.insert(DATA_ROW_RANK, 0); //2
+			
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+
+
+
 		void TimetableServiceColInterfacePage::DisplaySchedulesRow(
 			std::ostream& stream,
 			boost::shared_ptr<const cms::Webpage> page,
 			boost::shared_ptr<const cms::Webpage> cellPage,
 			const server::Request& request,
 			const TimetableRow& place,
-			const TimetableResult::RowTimesVector& times
+			const TimetableResult::RowTimesVector& times,
+			std::size_t globalRank,
+			bool isBeforeTransfer,
+			std::size_t depth
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
@@ -166,6 +205,9 @@ namespace synthese
 
 
 			pm.insert(DATA_TYPE, TYPE_TIME); //0
+			pm.insert(DATA_GLOBAL_RANK, globalRank);
+			pm.insert(DATA_IS_BEFORE_TRANSFER, isBeforeTransfer);
+			pm.insert(DATA_TRANSFER_DEPTH, depth);
 		
 			if(cellPage.get())
 			{
@@ -359,5 +401,4 @@ namespace synthese
 			displayRequest.getFunction()->setAditionnalParametersMap(pm);
 			displayRequest.run(stream);
 		}
-	}
-}
+}	}

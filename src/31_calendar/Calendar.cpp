@@ -383,5 +383,12 @@ namespace synthese
 			obj <<= i;
 			return obj;
 		}
+
+
+
+		bool Calendar::includesDates( const Calendar& other ) const
+		{
+			return (*this & other) == other;
+		}
 	}
 }

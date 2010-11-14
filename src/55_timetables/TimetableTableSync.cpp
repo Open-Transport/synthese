@@ -121,9 +121,7 @@ namespace synthese
 			object->setRank(rows->getInt(TimetableTableSync::COL_RANK));
 			object->setTitle(rows->getText(TimetableTableSync::COL_TITLE));
 			object->setContentType(static_cast<Timetable::ContentType>(rows->getInt(TimetableTableSync::COL_FORMAT)));
-			object->setTransferTimetableBefore(rows->getLongLong(TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE));
-			object->setTransferTimetableAfter(rows->getLongLong(TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER));
-
+			
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				vector<string> lines = Conversion::ToStringVector(rows->getText (TimetableTableSync::COL_AUTHORIZED_LINES));
@@ -181,6 +179,44 @@ namespace synthese
 						Log::GetInstance().warn("Error in timetable definition : no such calendar template");
 					}
 				}
+
+				// Transfer timetable before
+				if(rows->getLongLong(TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE) > 0)
+				{
+					try
+					{
+						object->setTransferTimetableBefore(
+							TimetableTableSync::GetEditable(
+								rows->getLongLong(TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE),
+								env,
+								linkLevel
+							).get()
+						);
+					}
+					catch(ObjectNotFoundException<Timetable>)
+					{
+						Log::GetInstance().warn("Error in timetable definition : no such before transfer timetable");
+					}
+				}
+
+				// Transfer timetable after
+				if(rows->getLongLong(TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER) > 0)
+				{
+					try
+					{
+						object->setTransferTimetableAfter(
+							TimetableTableSync::GetEditable(
+								rows->getLongLong(TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER),
+								env,
+								linkLevel
+							).get()
+						);
+					}
+					catch(ObjectNotFoundException<Timetable>)
+					{
+						Log::GetInstance().warn("Error in timetable definition : no such after transfer timetable");
+					}
+				}
 			}
 		}
 
@@ -221,8 +257,8 @@ namespace synthese
 			query.addField(static_cast<int>(object->getContentType()));
 			query.addField(authorizedLines.str());
 			query.addField(authorizedPhysicalStops.str());
-			query.addField(object->getTransferTimetableBefore());
-			query.addField(object->getTransferTimetableAfter());
+			query.addField(object->getTransferTimetableBefore(1) ? object->getTransferTimetableBefore(1)->getKey() : RegistryKeyType(0));
+			query.addField(object->getTransferTimetableAfter(1) ? object->getTransferTimetableAfter(1)->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}
 

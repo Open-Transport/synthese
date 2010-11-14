@@ -27,6 +27,7 @@
 
 #include "FactorableTemplate.h"
 #include "Function.h"
+#include "Timetable.h"
 
 namespace synthese
 {
@@ -47,7 +48,9 @@ namespace synthese
 
 	namespace timetables
 	{
-		class Timetable;
+		class TimetableGenerator;
+		class TimetableResult;
+		class TimetableWarning;
 
 		/** 55.15 Function : Display timetable generation result.
 			@author Hugues Romain
@@ -137,6 +140,33 @@ namespace synthese
 			static const std::string PARAMETER_CELL_PAGE_ID;
 			static const std::string PARAMETER_PAGE_FOR_SUB_TIMETABLE_ID;
 
+			static const std::string DATA_GENERATOR_TYPE;
+			static const std::string DATA_TITLE;
+			static const std::string DATA_NOTES;
+			static const std::string DATA_CALENDAR_NAME;
+			static const std::string DATA_AT_LEAST_A_NOTE;
+			static const std::string DATA_CONTENT;
+			static const std::string DATA_TIMETABLE_RANK;
+
+			static const std::string DATA_SERVICES_IN_COLS_LINES_ROW;
+			static const std::string DATA_SERVICES_IN_COLS_SCHEDULES_ROWS;
+			static const std::string DATA_SERVICES_IN_COLS_ROLLING_STOCK_ROW;
+			static const std::string DATA_SERVICES_IN_COLS_RESERVATIONS_ROW;
+			static const std::string DATA_SERVICES_IN_COLS_NOTES_ROW;
+
+			static const std::string DATA_SERVICES_IN_ROWS_SCHEDULES_ROWS;
+
+			static const std::string DATA_NUMBER;
+			static const std::string DATA_TEXT;
+			static const std::string DATA_CALENDAR;
+			static const std::string DATA_FIRST_YEAR;
+			static const std::string DATA_FIRST_MONTH;
+			static const std::string DATA_FIRST_DAY;
+			static const std::string DATA_LAST_YEAR;
+			static const std::string DATA_LAST_MONTH;
+			static const std::string DATA_LAST_DAY;
+
+
 		protected:
 			//! \name Page parameters
 			//@{
@@ -201,6 +231,138 @@ namespace synthese
 			/// @author Hugues
 			/// @date 2009
 			virtual std::string getOutputMimeType() const;
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Timetable display.
+			///	@param stream Stream to write on
+			///	@param object Timetable parameters
+			///	@param generator Used timetable generator
+			/// @param result Timetable result
+			///	@param variables Execution variables
+			///	@param request Source request
+			///	@author Hugues Romain
+			///	@date 2009
+			//////////////////////////////////////////////////////////////////////////
+			/// <h3>Parameters sent to the display template</h3>
+			/// The parameters structure depends on the type of the timetable generator,
+			/// specified by the generator_type parameter :
+			///	<ul>
+			///		<li>container : the object is a fake timetable which "includes" other timetables</li>
+			///		<li>calendar : a calendar showing each day of validity of each included timetable</li>
+			///		<li>line_schema : the "thermometer" schema of the line(s) displayed in the timetable</li>
+			///		<li>services_in_cols : real timetable with services in cols, places in rows</li>
+			///		<li>services_in_rows : real timetable with services in rows, places in cols</li>
+			///		<li>times_in_cols : real timetable with times in cols (can only display times from a specific place)</li>
+			///		<li>times_in_rows : real timetable with times in rows (can only display times from a specific place)</li>
+			///	</ul>
+			///
+			/// <h4>Parameters for container generator</h4>
+			///	<ul>
+			///		<li>title : Timetable title</li>
+			///		<li>roid : Timetable id</li>
+			///		<li>timetable_rank : Rank of the timetable</li>
+			///	</ul>
+			///
+			/// <h4>Parameters for calendar generator</h4>
+			/// Not yet implemented
+			///	<ul>
+			///		<li>title : Timetable title</li>
+			///		<li>timetable_rank : Rank of the timetable</li>
+			///	</ul>
+			///
+			/// <h4>Parameters for line schema generator</h4>
+			/// Not yet implemented
+			///	<ul>
+			///		<li>title : Timetable title</li>
+			///		<li>timetable_rank : Rank of the timetable</li>
+			///	</ul>
+			///
+			/// <h4>Parameters for service schedules in columns</h4>
+			///	<ul>
+			///		<li>title : Timetable title</li>
+			///		<li>notes : Timetable notes</li>
+			///		<li>calendar_name : Calendar name</li>
+			///		<li>lines_row : lines row content</li>
+			///		<li>schedules_rows : time rows content</li>
+			///		<li>rolling_stock_row : rolling stock row content</li>
+			///		<li>reservation_row : booking row content</li>
+			///		<li>notes_row : note row content</li>
+			///		<li>at_least_a_note : at least a note</li>
+			///		<li>timetable_rank : Rank of the timetable</li>
+			///	</ul>
+			///
+			/// <h4>Parameters for service schedules in rows</h4>
+			///	<ul>
+			///		<li>title : Timetable title</li>
+			///		<li>notes : Timetable notes</li>
+			///		<li>calendar_name : Calendar name</li>
+			///		<li>schedules_rows : time rows content</li>
+			///		<li>timetable_rank : Rank of the timetable</li>
+			///	</ul>
+			///
+			/// <h4>Parameters for departure schedules in rows</h4>
+			///	Not yet implemented
+			///
+			/// <h4>Parameters for departure schedules in rows</h4>
+			/// Not yet implemented
+			static void Display(
+				std::ostream& stream,
+				boost::shared_ptr<const cms::Webpage> page,
+				boost::shared_ptr<const cms::Webpage> notePage,
+				boost::shared_ptr<const cms::Webpage> noteCalendarPage,
+				boost::shared_ptr<const cms::Webpage> pageForSubTimetable,
+				boost::shared_ptr<const cms::Webpage> rowPage,
+				boost::shared_ptr<const cms::Webpage> cellPage,
+				const server::Request& request,
+				const timetables::Timetable& object,
+				const timetables::TimetableGenerator& generator,
+				const timetables::TimetableResult& result,
+				std::size_t rank
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Timetable note display.
+			///	@param stream Stream to write on
+			///	@param page display template to use for the display of the note
+			///	@param calendarDatePage page to use to generate the display of each date of the calendar. If not defined, the calendar will be empty.
+			///	@param request Source request
+			///	@param object the note
+			/// @author Hugues Romain
+			//////////////////////////////////////////////////////////////////////////
+			///	<h3>Parameters sent to the display template</h3>
+			///	<ul>
+			///		<li>number : Note number</li>
+			///		<li>text : Text</li>
+			///		<li>calendar : Calendar representing the active days of the calendar, generated by a call to calendar::CalendarDateInterfacePage for each day between the first day of the first month containing an active date and the last day of the last month containing an active date.</li>
+			///		<li>first-year : Year of the first day when the service runs</li>
+			///		<li>first-month : Month of the first day when the service runs</li>
+			///		<li>first-day : Number of the first day when the service runs</li>
+			///		<li>last-year : Year of the last day when the service runs</li>
+			///		<li>last-month : Month of the last day when the service runs</li>
+			///		<li>last-day : Number of the last day when the service runs</li>
+			///	</li>
+			static void DisplayNote(
+				std::ostream& stream,
+				boost::shared_ptr<const cms::Webpage> page,
+				boost::shared_ptr<const cms::Webpage> calendarDatePage,
+				const server::Request& request,
+				const timetables::TimetableWarning& object
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Converts timetable type into text code.
+			/// @param value timetable type
+			/// @return text code (empty if the content type is not valid)
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			static std::string GetTimetableTypeCode(Timetable::ContentType value);
+
 		};
 	}
 }

@@ -33,13 +33,15 @@ namespace synthese
 	namespace timetables
 	{
 		class Timetable;
+		class TimetableResult;
 
-		/** TimetableAdmin Class.
-			@ingroup m55Admin refAdmin
-			@author Hugues Romain
-			@date 2008
-		*/
-		class TimetableAdmin : public admin::AdminInterfaceElementTemplate<TimetableAdmin>
+		//////////////////////////////////////////////////////////////////////////
+		/// Timetable edition screen.
+		///	@ingroup m55Admin refAdmin
+		///	@author Hugues Romain
+		///	@date 2008
+		class TimetableAdmin:
+			public admin::AdminInterfaceElementTemplate<TimetableAdmin>
 		{
 		public:
 			static const std::string PARAMETER_RANK;
@@ -51,6 +53,14 @@ namespace synthese
 		private:
 			boost::shared_ptr<const Timetable>			_timetable;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
+
+			void TimetableAdmin::_drawTable(
+				std::ostream& stream,
+				html::HTMLTable& tf,
+				const TimetableResult& result,
+				std::size_t depth = 0,
+				bool isBefore = true
+			) const;
 
 		public:
 			TimetableAdmin();

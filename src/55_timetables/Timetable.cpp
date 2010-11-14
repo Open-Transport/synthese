@@ -44,8 +44,8 @@ namespace synthese
 		:	Registrable(id),
 			_bookId(0),
 			_baseCalendar(NULL),
-			_transferTimetableBefore(0),
-			_transferTimetableAfter(0)
+			_transferTimetableBefore(NULL),
+			_transferTimetableAfter(NULL)
 		{
 		}
 
@@ -81,6 +81,14 @@ namespace synthese
 				g->setBaseCalendar(_baseCalendar->getResult());
 				g->setAuthorizedLines(_authorizedLines);
 				g->setAuthorizedPhysicalStops(_authorizedPhysicalStops);
+				if(_transferTimetableBefore)
+				{
+					g->setBeforeTransferTimetable(_transferTimetableBefore->getGenerator(env));
+				}
+				if(_transferTimetableAfter)
+				{
+					g->setAfterTransferTimetable(_transferTimetableAfter->getGenerator(env));
+				}
 			}
 			return g;
 		}
@@ -94,14 +102,6 @@ namespace synthese
 				getBaseCalendar() != NULL &&
 				getBaseCalendar()->isLimited()
 			;
-		}
-
-
-
-		void Timetable::generate( std::ostream& stream )
-		{
-			auto_ptr<TimetableGenerator> g(getGenerator(Env::GetOfficialEnv()));
-			g->build();
 		}
 
 
@@ -207,6 +207,80 @@ namespace synthese
 		{
 			return _authorizedPhysicalStops;
 		}
+
+
+
+		Timetable* Timetable::getTransferTimetableBefore( std::size_t depth /*= 0*/ )
+		{
+			if(depth == 0)
+			{
+				return this;
+			}
+			if(_transferTimetableBefore == NULL)
+			{
+				return NULL;
+			}
+			return _transferTimetableBefore->getTransferTimetableBefore(depth - 1);
+		}
+
+
+
+		Timetable* Timetable::getTransferTimetableAfter( std::size_t depth /*= 0*/ )
+		{
+			if(depth == 0)
+			{
+				return this;
+			}
+			if(_transferTimetableAfter == NULL)
+			{
+				return NULL;
+			}
+			return _transferTimetableAfter->getTransferTimetableAfter(depth - 1);
+		}
+
+
+		const Timetable* Timetable::getTransferTimetableBefore( std::size_t depth /*= 0*/ ) const
+		{
+			if(depth == 0)
+			{
+				return this;
+			}
+			if(_transferTimetableBefore == NULL)
+			{
+				return NULL;
+			}
+			return _transferTimetableBefore->getTransferTimetableBefore(depth - 1);
+		}
+
+
+
+		const Timetable* Timetable::getTransferTimetableAfter( std::size_t depth /*= 0*/ ) const
+		{
+			if(depth == 0)
+			{
+				return this;
+			}
+			if(_transferTimetableAfter == NULL)
+			{
+				return NULL;
+			}
+			return _transferTimetableAfter->getTransferTimetableAfter(depth - 1);
+		}
+
+
+		std::size_t Timetable::getBeforeTransferTimetablesNumber() const
+		{
+			return _transferTimetableBefore == NULL ? 0 : (_transferTimetableBefore->getBeforeTransferTimetablesNumber() + 1);
+		}
+
+
+
+		std::size_t Timetable::getAfterTransferTimetablesNumber() const
+		{
+			return _transferTimetableAfter == NULL ? 0 : (_transferTimetableAfter->getAfterTransferTimetablesNumber() + 1);
+		}
+
+
 
 		Timetable::ImpossibleGenerationException::ImpossibleGenerationException():
 		synthese::Exception("Timetable generation is impossible.")

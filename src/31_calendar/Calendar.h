@@ -116,6 +116,19 @@ namespace synthese
 				*/
 				bool hasAtLeastOneCommonDateWith(const Calendar& op) const;
 
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the current calendar is active on each day of activity of an
+				/// other one.
+				/// @param other the other calendar
+				/// @return true if the current calendar includes the other one
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.2.0
+				bool includesDates(const Calendar& other) const;
+
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Tests if the calendar has no activated date.
 				/// @return true if the calendar has no activated date.
