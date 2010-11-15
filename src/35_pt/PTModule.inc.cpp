@@ -82,6 +82,7 @@
 #include "ServiceRemoveAction.h"
 #include "JourneyPatternRemoveAction.hpp"
 #include "ProjectAllStopPointsAction.hpp"
+#include "StopAreaTransferAddAction.h"
 
 #include "TransportNetworkRight.h"
 

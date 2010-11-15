@@ -136,8 +136,18 @@ namespace synthese
 					t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_STOP_AREA, _stop->getConnectionPlace() ? lexical_cast<string>(_stop->getConnectionPlace()->getKey()) : string())
 				);
 				stream << t.cell("Nom", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_NAME, _stop->getName()));
-				stream << t.cell("X", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_X, lexical_cast<string>(_stop->getGeometry()->getX())));
-				stream << t.cell("Y", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_Y, lexical_cast<string>(_stop->getGeometry()->getY())));
+				stream << t.cell(
+					"X",
+					t.getForm().getTextInput(
+						StopPointUpdateAction::PARAMETER_X,
+						_stop->getGeometry().get() ? lexical_cast<string>(_stop->getGeometry()->getX()) : string()
+				)	);
+				stream << t.cell(
+					"Y",
+					t.getForm().getTextInput(
+						StopPointUpdateAction::PARAMETER_Y,
+						_stop->getGeometry().get() ? lexical_cast<string>(_stop->getGeometry()->getY()) : string()
+				)	);
 				stream << t.cell("Code opérateur", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_OPERATOR_CODE, _stop->getCodeBySource()));
 				stream << t.close();
 			}
