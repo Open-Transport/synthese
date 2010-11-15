@@ -575,6 +575,32 @@ namespace synthese
 				// Creation of the index
 				sqlite->execUpdate(_GetSQLIndexSchema(_INDEXES[i]));
 			}
+
+			// Fix of the Spatialite bug
+			bool thereIsAGeometryCol(false);
+			for(i=0; !_FIELDS[i].empty(); ++i)
+			{
+				if(_FIELDS[i].isGeometry())
+				{
+					thereIsAGeometryCol = true;
+				}
+			}
+			if(thereIsAGeometryCol)
+			{
+				std::stringstream sql;
+
+				// Remove Spatialite default trigger & create a custom one which allow REPLACE command
+				sql << " BEGIN; DROP TRIGGER gii_" << TABLE.NAME << "_geometry;" << std::endl;
+
+				sql << " CREATE TRIGGER gii_" << TABLE.NAME << "_geometry" << std::endl
+					<< " AFTER INSERT ON " << TABLE.NAME << std::endl
+					<< " FOR EACH ROW BEGIN" << std::endl
+					<< " DELETE FROM idx_" << TABLE.NAME << "_geometry WHERE pkid=NEW.ROWID;" << std::endl
+					<< " INSERT INTO idx_" << TABLE.NAME << "_geometry (pkid, xmin, xmax, ymin, ymax)" << std::endl
+					<< " VALUES (NEW.ROWID,MbrMinX(NEW.geometry), MbrMaxX(NEW.geometry), MbrMinY(NEW.geometry), MbrMaxY(NEW.geometry));" << std::endl
+					<< " END; COMMIT;"<< std::endl;
+				sqlite->execUpdate (str.str ());
+			}
 		}
 
 
@@ -628,7 +654,6 @@ namespace synthese
 			sql << ");";
 
 			// Geometry columns
-			bool thereIsAGeometryCol = false;
 			for(; !_FIELDS[i].empty() && _FIELDS[i].isGeometry(); ++i)
 			{
 				sql << "SELECT AddGeometryColumn('" << TABLE.NAME << "','" <<
@@ -637,21 +662,6 @@ namespace synthese
 					"SELECT CreateSpatialIndex('" << TABLE.NAME << "','" <<
 					_FIELDS[i].name << "');"
 				;
-				thereIsAGeometryCol = true;
-			}
-
-			if(thereIsAGeometryCol)
-			{
-				// Remove Spatialite default trigger & create a custom one which allow REPLACE command
-				sql << " DROP TRIGGER gii_" << TABLE.NAME << "_geometry;" << std::endl;
-
-				sql << " CREATE TRIGGER gii_" << TABLE.NAME << "_geometry" << std::endl
-					<< " AFTER INSERT ON " << TABLE.NAME << std::endl
-					<< " FOR EACH ROW BEGIN" << std::endl
-					<< " DELETE FROM idx_" << TABLE.NAME << "_geometry WHERE pkid=NEW.ROWID;" << std::endl
-					<< " INSERT INTO idx_" << TABLE.NAME << "_geometry (pkid, xmin, xmax, ymin, ymax)" << std::endl
-					<< " VALUES (NEW.ROWID,MbrMinX(NEW.geometry), MbrMaxX(NEW.geometry), MbrMinY(NEW.geometry), MbrMaxY(NEW.geometry));" << std::endl
-					<< " END;"<< std::endl;
 			}
 
 			// Control
