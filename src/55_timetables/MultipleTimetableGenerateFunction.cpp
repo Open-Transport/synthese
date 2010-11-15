@@ -75,8 +75,7 @@ namespace synthese
 
 		void MultipleTimetableGenerateFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			size_t rank(0);
-			while(map.getOptional<RegistryKeyType>(PARAMETER_OBJECT_ID + lexical_cast<string>(rank)))
+			for(size_t rank(0); map.getOptional<RegistryKeyType>(PARAMETER_OBJECT_ID + lexical_cast<string>(rank)); ++rank)
 			{
 				try
 				{
@@ -92,6 +91,7 @@ namespace synthese
 							Env::GetOfficialEnv()
 						);
 					}
+					_timetables.push_back(tt);
 				}
 				catch (ObjectNotFoundException<Timetable>&)
 				{
@@ -205,6 +205,10 @@ namespace synthese
 
 				stringstream content;
 				auto_ptr<TimetableGenerator> generator(tt.first->getGenerator(Env::GetOfficialEnv()));
+				if(tt.second.get())
+				{
+					generator->setBaseCalendar(tt.second->getResult(generator->getBaseCalendar()));
+				}
 				TimetableResult result(generator->build(true, warnings));
 				TimetableGenerateFunction::Display(
 					content,
@@ -221,6 +225,7 @@ namespace synthese
 					timetableRank
 				);
 				pm.insert(DATA_CONTENT + lexical_cast<string>(timetableRank), content.str());
+				timetableRank++;
 			}
 
 			// Notes

@@ -105,6 +105,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_TRANSPORT_MODE("transport_mode");
 		const string DisplayScreenContentFunction::DATA_RANK_IN_PATH("rank_in_path");
 		const string DisplayScreenContentFunction::DATA_DESTINATIONS("destinations");
+		const string DisplayScreenContentFunction::DATA_DIRECTION("direction");
 		
 		const string DisplayScreenContentFunction::DATA_STOP_ID("stop_id");
 		const string DisplayScreenContentFunction::DATA_CITY_NAME("city_name");
@@ -766,6 +767,8 @@ namespace synthese
 				pm.insert(DATA_SERVICE_ID, row.first.getService()->getKey());
 				pm.insert(DATA_SERVICE_NUMBER, row.first.getService()->getServiceNumber());
 
+				pm.insert(DATA_DIRECTION, dynamic_cast<const JourneyPattern*>(row.first.getService()->getPath())->getDirection());
+
 				pm.insert(
 					DATA_TRACK,
 					static_cast<const StopPoint*>(row.first.getRealTimeDepartureVertex())->getName()
@@ -855,6 +858,7 @@ namespace synthese
 			pm.insert(DATA_TIME, to_iso_extended_string(object.getArrivalDateTime().date()) +" "+ to_simple_string(object.getArrivalDateTime().time_of_day()));
 			pm.insert(DATA_IS_END_STATION, isTheEndStation);
 			pm.insert(DATA_DESTINATION_RANK, rank);
+			pm.insert(DATA_DIRECTION, dynamic_cast<const JourneyPattern*>(object.getService()->getPath())->getDirection());
 
 			// Transfers
 			if(transferPage.get())
