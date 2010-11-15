@@ -56,8 +56,8 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				long _left;
-				long _right;
+				double _left;
+				double _right;
 			//@}
 			
 			
