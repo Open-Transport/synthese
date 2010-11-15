@@ -578,7 +578,7 @@ namespace synthese
 
 			// Fix of the Spatialite bug
 			bool thereIsAGeometryCol(false);
-			for(i=0; !_FIELDS[i].empty(); ++i)
+			for(std::size_t i(0); !_FIELDS[i].empty(); ++i)
 			{
 				if(_FIELDS[i].isGeometry())
 				{
