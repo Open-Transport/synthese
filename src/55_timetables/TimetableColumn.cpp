@@ -75,6 +75,7 @@ namespace synthese
 							dynamic_cast<const StopPoint*>((*(itEdge-1))->getFromVertex()),
 							service.getDepartureBeginScheduleToIndex(false, (itEdge-1) - edges.begin())
 					)	);
+					continue;
 				}
 
 				for (itEdge2 = itEdge; itEdge2 != edges.end(); ++itEdge2)
