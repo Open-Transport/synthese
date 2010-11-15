@@ -590,7 +590,7 @@ namespace synthese
 				std::stringstream sql;
 
 				// Remove Spatialite default trigger & create a custom one which allow REPLACE command
-				sql << " BEGIN; DROP TRIGGER gii_" << TABLE.NAME << "_geometry;" << std::endl;
+				sql << " BEGIN; DROP TRIGGER IF EXISTS gii_" << TABLE.NAME << "_geometry;" << std::endl;
 
 				sql << " CREATE TRIGGER gii_" << TABLE.NAME << "_geometry" << std::endl
 					<< " AFTER INSERT ON " << TABLE.NAME << std::endl
