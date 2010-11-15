@@ -50,6 +50,7 @@
 #include "StopPointMoveAction.hpp"
 #include "StaticActionRequest.h"
 #include "DBModule.h"
+#include "StopAreaTransferAddAction.h"
 
 using namespace std;
 using namespace boost;
@@ -255,16 +256,26 @@ namespace synthese
 					const StopPoint* stop(it.second);
 					openRequest.getPage()->setStop(Env::GetOfficialEnv().getSPtr(stop));
 
-					shared_ptr<Point> pt(DBModule::GetStorageCoordinatesSystem().convertPoint(*stop->getGeometry()));
-
 					stream << fixed;
 					stream << t.row();
 					stream << t.col() << stop->getName();
 					stream << t.col() << stop->getCodeBySource();
-					stream << t.col() << pt->getX();
-					stream << t.col() << pt->getY();
-					stream << t.col() << stop->getGeometry()->getX();
-					stream << t.col() << stop->getGeometry()->getY();
+
+					if(stop->getGeometry().get())
+					{
+						shared_ptr<Point> pt(DBModule::GetStorageCoordinatesSystem().convertPoint(*stop->getGeometry()));
+						stream << t.col() << pt->getX();
+						stream << t.col() << pt->getY();
+						stream << t.col() << stop->getGeometry()->getX();
+						stream << t.col() << stop->getGeometry()->getY();
+					}
+					else
+					{
+						stream << t.col();
+						stream << t.col();
+						stream << t.col();
+						stream << t.col();
+					}
 
 					// Lines cell
 					stream << t.col();
@@ -341,6 +352,11 @@ namespace synthese
 
 				stream << "<h1>Transferts internes (correspondances)</h1>";
 				{
+					AdminActionFunctionRequest<StopAreaTransferAddAction,PTPlaceAdmin> addTransferRequest(request);
+
+					HTMLForm f(addTransferRequest.getHTMLForm("addtransfer"));
+					stream << f.open();
+
 					HTMLTable::ColsVector c;
 					c.push_back("Quai départ");
 					c.push_back("Quai arrivée");
@@ -363,13 +379,13 @@ namespace synthese
 					}
 
 					stream << t.row();
-					stream << t.col();
-					stream << t.col();
-					stream << t.col();
-					stream << t.col() << "Ajouter";
+					stream << t.col() << f.getTextInput(StopAreaTransferAddAction::PARAMETER_FROM_ID,string(),"(id arrêt début)");
+					stream << t.col() << f.getTextInput(StopAreaTransferAddAction::PARAMETER_TO_ID,string(),"(id arrêt fin)");
+					stream << t.col() << f.getTextInput(StopAreaTransferAddAction::PARAMETER_DURATION,string(),"(minutes ou F)");
+					stream << t.col() << f.getSubmitButton("Ajouter");
 					
 					stream << t.close();
-
+					stream << f.close();
 				}
 
 				if(_connectionPlace.get())

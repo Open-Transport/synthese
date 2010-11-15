@@ -89,6 +89,7 @@ synthese::pt::StopPointMoveAction::integrate();
 synthese::pt::ServiceRemoveAction::integrate();
 synthese::pt::JourneyPatternRemoveAction::integrate();
 synthese::pt::ProjectAllStopPointsAction::integrate();
+synthese::pt::StopAreaTransferAddAction::integrate();
 
 synthese::pt::TransportNetworkRight::integrate();
 
