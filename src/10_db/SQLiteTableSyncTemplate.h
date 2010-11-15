@@ -599,7 +599,7 @@ namespace synthese
 					<< " INSERT INTO idx_" << TABLE.NAME << "_geometry (pkid, xmin, xmax, ymin, ymax)" << std::endl
 					<< " VALUES (NEW.ROWID,MbrMinX(NEW.geometry), MbrMaxX(NEW.geometry), MbrMinY(NEW.geometry), MbrMaxY(NEW.geometry));" << std::endl
 					<< " END; COMMIT;"<< std::endl;
-				sqlite->execUpdate (str.str ());
+				sqlite->execUpdate (sql.str());
 			}
 		}
 
