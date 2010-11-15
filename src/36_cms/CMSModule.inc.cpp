@@ -27,6 +27,7 @@
 #include "WebPageFormFunction.hpp"
 #include "WebpageNextFunction.hpp"
 #include "WebpagePreviousFunction.hpp"
+#include "SubstractFunction.hpp"
 
 #include "WebPageAdmin.h"
 

@@ -60,6 +60,23 @@ namespace synthese
 			for(TimetableGenerator::Rows::const_iterator itRow(rows.begin()); itRow != rows.end(); ++itRow)
 			{
 				Path::Edges::const_iterator itEdge2;
+
+				// Arr / Dep in the same place
+				if(	itRow != rows.begin() &&
+					itRow->getPlace() == (itRow-1)->getPlace() &&
+					itRow->getIsDeparture() &&
+					!(itRow-1)->getIsDeparture() &&
+					itEdge != edges.begin() &&
+					(*(itEdge-1))->isDeparture() &&
+					dynamic_cast<const StopArea*>((*(itEdge-1))->getFromVertex()->getHub())->getKey() == (itRow-1)->getPlace()->getKey()
+				){
+					_content.push_back(
+						make_pair(
+							dynamic_cast<const StopPoint*>((*(itEdge-1))->getFromVertex()),
+							service.getDepartureBeginScheduleToIndex(false, (itEdge-1) - edges.begin())
+					)	);
+				}
+
 				for (itEdge2 = itEdge; itEdge2 != edges.end(); ++itEdge2)
 				{
 					if(	dynamic_cast<const StopArea*>((*itEdge2)->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()

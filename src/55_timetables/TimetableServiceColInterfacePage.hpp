@@ -116,6 +116,8 @@ namespace synthese
 			static const std::string DATA_TRANSFER_DEPTH;
 			static const std::string DATA_GLOBAL_RANK;
 			static const std::string DATA_BLOCK_MAX_RANK;
+			static const std::string DATA_IS_ARRIVAL;
+			static const std::string DATA_IS_DEPARTURE;
 
 		public:
 			static const std::string TYPE_LINE;
@@ -200,6 +202,8 @@ namespace synthese
 					- global_rank : rank of the row in the whole table
 					- is_before_transfer : 1 if the current block is a transfer before the main block
 					- transfer_depth : 0 if the current block is the main block, depth of the transfer block else
+					- is_arrival : 1|0
+					- is_departure : 1|0
 			*/
 			static void DisplaySchedulesRow(
 				std::ostream& stream,

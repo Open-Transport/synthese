@@ -23,6 +23,7 @@ synthese::cms::WebPageLinkFunction::integrate();
 synthese::cms::WebPageFormFunction::integrate();
 synthese::cms::WebpageNextFunction::integrate();
 synthese::cms::WebpagePreviousFunction::integrate();
+synthese::cms::SubstractFunction::integrate();
 
 synthese::cms::WebPageAddAction::integrate();
 synthese::cms::WebPageUpdateAction::integrate();
