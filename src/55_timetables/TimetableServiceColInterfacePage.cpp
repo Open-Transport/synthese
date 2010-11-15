@@ -79,6 +79,8 @@ namespace synthese
 		const string TimetableServiceColInterfacePage::DATA_TRANSFER_DEPTH("transfer_depth");
 		const string TimetableServiceColInterfacePage::DATA_GLOBAL_RANK("global_rank");
 		const string TimetableServiceColInterfacePage::DATA_BLOCK_MAX_RANK("block_max_rank");
+		const string TimetableServiceColInterfacePage::DATA_IS_ARRIVAL("is_arrival");
+		const string TimetableServiceColInterfacePage::DATA_IS_DEPARTURE("is_departure");
 
 
 
@@ -230,6 +232,8 @@ namespace synthese
 			pm.insert(DATA_ROW_RANK, place.getRank()); //2
 
 			pm.insert(DATA_ROW_RANK_IS_ODD, place.getRank() % 2); //3
+			pm.insert(DATA_IS_ARRIVAL, place.getIsArrival());
+			pm.insert(DATA_IS_DEPARTURE, place.getIsDeparture());
 
 			pm.insert(DATA_CITY_ID, place.getPlace()->getCity()->getKey()); //4
 			pm.insert(DATA_PLACE_ID, place.getPlace()->getKey()); //5
