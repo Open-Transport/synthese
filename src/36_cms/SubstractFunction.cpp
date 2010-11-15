@@ -51,8 +51,8 @@ namespace synthese
 
 		void SubstractFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = map.getDefault<long>(PARAMETER_LEFT, 0);
-			_right = map.getDefault<long>(PARAMETER_RIGHT, 0);
+			_left = map.getDefault<double>(PARAMETER_LEFT, 0);
+			_right = map.getDefault<double>(PARAMETER_RIGHT, 0);
 		}
 
 		void SubstractFunction::run(
