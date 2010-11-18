@@ -118,6 +118,8 @@ namespace synthese
 			static const std::string DATA_BLOCK_MAX_RANK;
 			static const std::string DATA_IS_ARRIVAL;
 			static const std::string DATA_IS_DEPARTURE;
+			static const std::string DATA_STOP_NAME_26;
+			static const std::string DATA_TRANSPORT_MODE_ID;
 
 		public:
 			static const std::string TYPE_LINE;
@@ -199,6 +201,7 @@ namespace synthese
 					- place_id : place id
 					- city_name : city name
 					- place_name : place name
+					- stop_name_26 : place name alias (middle size)
 					- global_rank : rank of the row in the whole table
 					- is_before_transfer : 1 if the current block is a transfer before the main block
 					- transfer_depth : 0 if the current block is the main block, depth of the transfer block else
@@ -261,7 +264,8 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> page,
 				boost::shared_ptr<const cms::Webpage> cellPage,
 				const server::Request& request,
-				const TimetableResult::RowNotesVector& notes
+				const TimetableResult::RowNotesVector& notes,
+				const TimetableResult::Columns& columns
 			);
 
 			
@@ -270,21 +274,22 @@ namespace synthese
 				@param stream Stream to write on
 				@param page Page to use for the display
 				@param request Source request
-				@param object Note to display (NULL = no note)
 				@param rowRank Row number
+				@param column column object
 
 				Parameters sent to the display template :
 					- type : note
 					- cell_rank : column number
 					- note_number : note number (empty = no note)
 					- note_text : note text
+					- transport_mode : id of transport mode
 			*/
 			static void DisplayNoteCell(
 				std::ostream& stream,
 				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
-				const TimetableWarning* object,
-				std::size_t rowRank
+				std::size_t rowRank,
+				const TimetableColumn& column
 			);
 
 

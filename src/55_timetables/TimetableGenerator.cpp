@@ -136,11 +136,15 @@ namespace synthese
 							}
 						}
 
-						if(!lastOKCol)
+						if(lastOKCol)
 						{
 							// Test if the column was not already used
 							for(TimetableResult::Columns::const_iterator prec(result.getColumns().begin()); prec != col; ++prec)
 							{
+								if(!prec->getLine())
+								{
+									continue;
+								}
 								if(prec->getCalendar() == col->getCalendar() &&
 									result.getBeforeTransferTimetable(1).getColumns().at(prec - result.getColumns().begin()) == lastOKCol
 								){
@@ -165,7 +169,10 @@ namespace synthese
 						// Tests if the columns service begins actually at the first row
 						if(!col->getContent().rbegin()->first)
 						{
-							result.getAfterTransferTimetable(1).getColumns().push_back(TimetableColumn(*_transferTimetableAfter));
+							result.getAfterTransferTimetable(1).getColumns().insert(
+								result.getAfterTransferTimetable(1).getColumns().begin(),
+								TimetableColumn(*_transferTimetableAfter)
+							);
 							continue;
 						}
 
@@ -194,13 +201,17 @@ namespace synthese
 							}
 						}
 
-						if(!lastOKCol)
+						if(lastOKCol)
 						{
 							// Test if the column was not already used
 							for(TimetableResult::Columns::const_reverse_iterator prec(result.getColumns().rbegin()); prec != col; ++prec)
 							{
+								if(!prec->getLine())
+								{
+									continue;
+								}
 								if(prec->getCalendar() == col->getCalendar() &&
-									result.getAfterTransferTimetable(1).getColumns().at(prec - result.getColumns().rend()) == lastOKCol
+									result.getAfterTransferTimetable(1).getColumns().at(result.getColumns().size() - (result.getColumns().rend() - prec)) == lastOKCol
 								){
 									lastOKCol = optional<TimetableColumn>();
 								}
@@ -255,9 +266,20 @@ namespace synthese
 			TimetableResult::Columns::iterator itCol;
 			for (itCol = result.getColumns().begin(); itCol != result.getColumns().end(); ++itCol)
 			{
-				if (*itCol == col)
-				{
-					itCol->merge(col);
+				if (*itCol == col ||
+					(col.includes(*itCol) || itCol->includes(col)) && col.getCalendar() == itCol->getCalendar()
+				){
+					if(itCol->includes(col))
+					{
+						itCol->merge(col);
+					}
+					else
+					{
+						TimetableColumn newCol(col);
+						newCol.merge(*itCol);
+						*itCol = newCol;
+						// todo handle transfers too
+					}
 					return;
 				}
 
@@ -275,7 +297,8 @@ namespace synthese
 		void TimetableGenerator::_buildWarnings(
 			TimetableResult& result
 		) const	{
-			int nextNumber(1);
+			int nextNumber(result.getWarnings().size() + 1);
+			CalendarModule::CalendarTitlesGenerator calendarTitlesGenerator(_baseCalendar);
 			for(TimetableResult::Columns::iterator itCol(result.getColumns().begin()); itCol != result.getColumns().end(); ++itCol)
 			{
 				if(itCol->getCalendar() == _baseCalendar) continue;
@@ -298,7 +321,7 @@ namespace synthese
 							shared_ptr<TimetableWarning>(new TimetableWarning(
 								itCol->getCalendar(),
 								nextNumber,
-								CalendarModule::GetBestCalendarTitle(itCol->getCalendar(), _baseCalendar)
+								calendarTitlesGenerator.getBestCalendarTitle(itCol->getCalendar())
 					)	)	)	).first->second;
 					++nextNumber;
 				}

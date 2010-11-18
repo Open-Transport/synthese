@@ -626,7 +626,8 @@ namespace synthese
 						rowPage,
 						cellPage,
 						request,
-						notes
+						notes,
+						result.getColumns()
 					);
 					pm.insert(DATA_SERVICES_IN_COLS_NOTES_ROW, notesContent.str()); //8
 
