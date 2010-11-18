@@ -26,6 +26,7 @@
 #define SYNTHESE_CalendarModule_H__
 
 #include "ModuleClassTemplate.hpp"
+#include "Calendar.h"
 
 namespace synthese
 {
@@ -70,7 +71,7 @@ namespace synthese
 	*/
 	namespace calendar
 	{
-		class Calendar;
+		class CalendarTemplate;
 
 		/** 19 calendar Module class.
 			@author Hugues
@@ -80,6 +81,22 @@ namespace synthese
 			public server::ModuleClassTemplate<CalendarModule>
 		{
 		public:
+			class CalendarTitlesGenerator
+			{
+			private:
+				typedef std::vector<std::pair<Calendar, CalendarTemplate*> > Value;
+
+				Value _value;
+
+			public:
+				CalendarTitlesGenerator(const Calendar& mask);
+
+				//////////////////////////////////////////////////////////////////////////
+				/// @param calendar calendar to name (is supposed to be included by the mask)
+				std::string getBestCalendarTitle(const Calendar& calendar);
+			};
+
+
 			static std::string GetBestCalendarTitle(
 				const Calendar& calendar,
 				const Calendar& mask

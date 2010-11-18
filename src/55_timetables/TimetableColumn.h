@@ -91,10 +91,11 @@ namespace synthese
 			);
 
 
-			//! @name Queries
+			//! @name Services
 			//@{
 				int		operator <= (const TimetableColumn& op) const;
 				bool	operator == (const TimetableColumn& op) const;
+				bool	includes(const TimetableColumn& op) const;
 			//@}
 
 			//! @name Modifiers

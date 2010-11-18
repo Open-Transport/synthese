@@ -189,8 +189,6 @@ namespace synthese
 
 		void TimetableColumn::merge( const TimetableColumn& col )
 		{
-			assert(col == *this);
-
 			if( _line->getOrigin()->getHub() != col._line->getOrigin()->getHub()
 			){
 				_originType = Indetermine;
@@ -209,8 +207,32 @@ namespace synthese
 		{
 			assert(op._content.size() == _content.size());
 
-			return _line->getCommercialLine() == op._line->getCommercialLine()
-				&& _content == op._content;
+			return 
+				(_line == NULL && op._line == NULL) ||
+				(_line != NULL && op._line != NULL && _line->getCommercialLine() == op._line->getCommercialLine() && _content == op._content)
+			;
 		}
-	}
-}
+
+
+
+		bool TimetableColumn::includes( const TimetableColumn& op ) const
+		{
+			assert(op._content.size() == _content.size());
+
+			if (_line == NULL || op._line == NULL || _line->getCommercialLine() != op._line->getCommercialLine())
+			{
+				return false;
+			}
+			for(Content::const_iterator it1(_content.begin()), it2(op._content.begin());
+				it1 != _content.end();
+				++it1, ++it2
+			){
+				if(	it1->first == NULL && it2->first != NULL ||
+					it1->first != NULL && it2->first != NULL && it1->second != it2->second
+				){
+					return false;
+				}
+			}
+			return true;
+		}
+}	}
