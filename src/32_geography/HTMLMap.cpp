@@ -90,7 +90,7 @@ namespace synthese
 				stream <<
 					"vectorLayer.addFeatures(" <<
 						"new OpenLayers.Feature.Vector(" <<
-							"new OpenLayers.Geometry.Point(" << wgs84Point->getX() << "," << wgs84Point->getY() << ").transform(" <<
+							"new OpenLayers.Geometry.Point(" << fixed << wgs84Point->getX() << "," << fixed << wgs84Point->getY() << ").transform(" <<
 								"new OpenLayers.Projection(\"EPSG:4326\")," << // transform from WGS 1984
 								"new OpenLayers.Projection(\"EPSG:900913\")" << // to Spherical Mercator Projection
 							"),{ graphic:\"" << HTMLModule::EscapeDoubleQuotes(point.icon) << "\"," <<
@@ -183,7 +183,7 @@ namespace synthese
 					*_center
 			)	);
 			stream <<
-				"map.setCenter(new OpenLayers.LonLat(" << wgs84Center->getX() << "," << wgs84Center->getY() << ")" <<
+				"map.setCenter(new OpenLayers.LonLat(" << fixed << wgs84Center->getX() << "," << fixed << wgs84Center->getY() << ")" <<
 				".transform(" <<
 					"new OpenLayers.Projection(\"EPSG:4326\"), new OpenLayers.Projection(\"EPSG:900913\")" << // WGS84 to Spherical Mercator Projection
 				")," << _zoom << // Zoom level

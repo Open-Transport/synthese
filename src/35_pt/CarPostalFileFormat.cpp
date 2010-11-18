@@ -221,7 +221,14 @@ namespace synthese
 						_env,
 						optional<RegistryKeyType>(),
 						optional<RegistryKeyType>(),
-						_dataSource.getKey()
+						_dataSource.getKey(),
+						optional<string>(),
+						false,
+						0,
+						optional<size_t>(),
+						false,
+						false,
+						UP_LINKS_LOAD_LEVEL
 				)	);
 				BOOST_FOREACH(shared_ptr<ScheduledService> service, originalServices)
 				{

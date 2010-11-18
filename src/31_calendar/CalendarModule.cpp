@@ -67,41 +67,53 @@ namespace synthese
 			const Calendar& calendar,
 			const Calendar& mask
 		){
+			CalendarTitlesGenerator generator(mask);
+			return generator.getBestCalendarTitle(calendar);
+		}
 
 
-			shared_ptr<const CalendarTemplate> result;
-			Calendar maskedResult;
 
+		CalendarModule::CalendarTitlesGenerator::CalendarTitlesGenerator( const Calendar& mask )
+		{
+			_value.clear();
 			BOOST_FOREACH(const Registry<CalendarTemplate>::value_type& calendarTpl, Env::GetOfficialEnv().getRegistry<CalendarTemplate>())
 			{
 				Calendar maskedCandidate(calendarTpl.second->getResult(mask));
-				if(maskedCandidate != calendar) continue;
-
-				if(!result.get())
+				if(maskedCandidate.empty())
 				{
-					result = calendarTpl.second;
-					maskedResult = maskedCandidate;
+					continue;
 				}
-				else
-				{
-					if(	calendarTpl.second->getCategory() < result->getCategory() ||
-						calendarTpl.second->getCategory() == result->getCategory() &&
-						maskedCandidate.size() < maskedResult.size()
-					){
-						result = calendarTpl.second;
-						maskedResult = maskedCandidate;
-					}
+				_value.push_back(make_pair(maskedCandidate, calendarTpl.second.get()));
+			}
+		}
+
+
+
+		std::string CalendarModule::CalendarTitlesGenerator::getBestCalendarTitle( const Calendar& calendar )
+		{
+			Value::const_iterator result(_value.end());
+			for(Value::const_iterator itCal(_value.begin()); itCal != _value.end(); ++itCal)
+			{
+				if(itCal->first != calendar) continue;
+
+				if(	result == _value.end() ||
+					itCal->second->getCategory() < result->second->getCategory() ||
+					itCal->second->getCategory() == result->second->getCategory() &&
+					itCal->first.size() < result->first.size()
+				){
+					result = itCal;
 				}
 			}
 
-			if(result.get()) return result->getText();
+			if(result != _value.end())
+			{
+				return result->second->getText();
+			}
 
 			// If not template found, generation of a generic description text
 			stringstream strresult;
 			bool first(true);
-			Calendar maskedCalendar(calendar);
-			maskedCalendar &= mask;
-			Calendar::DatesVector dates(maskedCalendar.getActiveDates());
+			Calendar::DatesVector dates(calendar.getActiveDates());
 			BOOST_FOREACH(const Calendar::DatesVector::value_type& date, dates)
 			{
 				strresult << (first ? string() : ",") << to_simple_string(date);
@@ -109,5 +121,4 @@ namespace synthese
 			}
 			return strresult.str();
 		}
-	}
-}
+}	}

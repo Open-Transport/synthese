@@ -33,6 +33,7 @@
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
 #include "RollingStock.h"
+#include "JourneyPattern.hpp"
 
 #include <boost/date_time/time_duration.hpp>
 
@@ -81,6 +82,8 @@ namespace synthese
 		const string TimetableServiceColInterfacePage::DATA_BLOCK_MAX_RANK("block_max_rank");
 		const string TimetableServiceColInterfacePage::DATA_IS_ARRIVAL("is_arrival");
 		const string TimetableServiceColInterfacePage::DATA_IS_DEPARTURE("is_departure");
+		const string TimetableServiceColInterfacePage::DATA_STOP_NAME_26("stop_name_26");
+		const string TimetableServiceColInterfacePage::DATA_TRANSPORT_MODE_ID("transport_mode_id");
 
 
 
@@ -239,6 +242,10 @@ namespace synthese
 			pm.insert(DATA_PLACE_ID, place.getPlace()->getKey()); //5
 			pm.insert(DATA_CITY_NAME, place.getPlace()->getCity()->getName()); //6
 			pm.insert(DATA_PLACE_NAME, place.getPlace()->getName()); //7
+			if(dynamic_cast<const StopArea*>(place.getPlace()))
+			{
+				pm.insert(DATA_STOP_NAME_26, static_cast<const StopArea*>(place.getPlace())->getName26());
+			}
 
 			displayRequest.getFunction()->setAditionnalParametersMap(pm);
 			displayRequest.run(stream);
@@ -283,7 +290,8 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			boost::shared_ptr<const cms::Webpage> cellPage,
 			const server::Request& request,
-			const TimetableResult::RowNotesVector& notes
+			const TimetableResult::RowNotesVector& notes,
+			const TimetableResult::Columns& columns
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
@@ -300,9 +308,9 @@ namespace synthese
 			{
 				stringstream content;
 				size_t colRank(0);
-				BOOST_FOREACH(const TimetableResult::RowNotesVector::value_type& note, notes)
+				BOOST_FOREACH(const TimetableResult::Columns::value_type& col, columns)
 				{
-					DisplayNoteCell(content, cellPage, request, note.get(), colRank++);
+					DisplayNoteCell(content, cellPage, request, colRank++, col);
 				}
 				pm.insert(DATA_CELLS_CONTENT, content.str()); //1
 			}
@@ -317,8 +325,8 @@ namespace synthese
 			std::ostream& stream,
 			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
-			const TimetableWarning* object,
-			std::size_t colRank
+			std::size_t colRank,
+			const TimetableColumn& column
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
@@ -331,10 +339,14 @@ namespace synthese
 
 			pm.insert(DATA_TYPE, TYPE_NOTE); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
-			if(object)
+			if(column.getWarning().get())
 			{
-				pm.insert(DATA_NOTE_NUMBER, object->getNumber()); //3
-				pm.insert(DATA_NOTE_TEXT, object->getText()); //4
+				pm.insert(DATA_NOTE_NUMBER, column.getWarning()->getNumber()); //3
+				pm.insert(DATA_NOTE_TEXT, column.getWarning()->getText()); //4
+			}
+			if(column.getLine())
+			{
+				pm.insert(DATA_TRANSPORT_MODE_ID, column.getLine()->getRollingStock()->getKey());
 			}
 
 			displayRequest.getFunction()->setAditionnalParametersMap(pm);
