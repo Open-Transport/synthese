@@ -170,7 +170,8 @@ namespace synthese
 
 			//! @name Content
 			//@{
-				PhysicalStops			_physicalStops; 
+				PhysicalStops			_physicalStops;
+				std::string				_timetableName;
 //				Addresses _addresses; //<! Station entrances
 			//@}
 
@@ -202,6 +203,7 @@ namespace synthese
 				bool getAllowedConnection() const { return _allowedConnection; }
 				boost::posix_time::time_duration	getDefaultTransferDelay() const { return _defaultTransferDelay; }
 				const TransferDelaysMap& getTransferDelays() const { return _transferDelays; }
+				const std::string& getTimetableName() const { return _timetableName; }
 			//@}
 
 			//! @name Setters
@@ -209,7 +211,7 @@ namespace synthese
 				void setDefaultTransferDelay(
 					boost::posix_time::time_duration defaultTransferDelay
 				);
-
+				void setTimetableName(const std::string& value){ _timetableName = value; }
 				void setAllowedConnection(bool value) { _allowedConnection = value; }
 			//@}
 

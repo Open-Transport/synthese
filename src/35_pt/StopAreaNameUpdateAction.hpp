@@ -55,6 +55,7 @@ namespace synthese
 		///		<li>actionParamna : name</li>
 		///		<li>actionParamsn : name for display on 13 characters wide screens</li>
 		///		<li>actionParamln : name for display on 26 characters wide screens</li>
+		///		<li>actionParamtn : timetable name</li>
 		///		<li>actionParamci : city id</li>
 		///		<li>actionParamco : code of the place in the source database (if imported)</li>
 		///		<li>actionParamma : wether the stop is selected as default in the city when no stop is specified</li>
@@ -65,6 +66,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_PLACE_ID;
 			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_TIMETABLE_NAME;
 			static const std::string PARAMETER_SHORT_NAME;
 			static const std::string PARAMETER_LONG_NAME;
 			static const std::string PARAMETER_CITY_ID;
@@ -79,6 +81,7 @@ namespace synthese
 			std::string _code;
 			boost::shared_ptr<geography::City> _city;
 			bool _isMain;
+			std::string _timetableName;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
