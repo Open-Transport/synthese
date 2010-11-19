@@ -56,6 +56,7 @@ namespace synthese
 		const string StopAreaTableSync::COL_NAME13("short_display_name");
 		const string StopAreaTableSync::COL_NAME26("long_display_name");
 		const string StopAreaTableSync::COL_CODE_BY_SOURCE("code_by_source");
+		const string StopAreaTableSync::COL_TIMETABLE_NAME("timetable_name");
 		
 		const string StopAreaTableSync::FORBIDDEN_DELAY_SYMBOL("F");
 	}
@@ -78,6 +79,7 @@ namespace synthese
 			SQLiteTableSync::Field(StopAreaTableSync::COL_NAME13, SQL_TEXT),
 			SQLiteTableSync::Field(StopAreaTableSync::COL_NAME26, SQL_TEXT),
 			SQLiteTableSync::Field(StopAreaTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
+			SQLiteTableSync::Field(StopAreaTableSync::COL_TIMETABLE_NAME, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -110,6 +112,8 @@ namespace synthese
 				cp->setName13(name13);
 			if (!name26.empty())
 				cp->setName26(name26);
+			cp->setTimetableName(rows->getText(StopAreaTableSync::COL_TIMETABLE_NAME));
+
 			cp->setAllowedConnection(connectionType);
 			
 			cp->clearTransferDelays ();    
@@ -206,6 +210,7 @@ namespace synthese
 			query.addField(object->getName13());
 			query.addField(object->getName26());
 			query.addField(object->getCodeBySource());
+			query.addField(object->getTimetableName());
 			query.execute(transaction);
 		}
 

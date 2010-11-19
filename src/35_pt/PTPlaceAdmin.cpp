@@ -224,6 +224,7 @@ namespace synthese
 					stream << t.title("Destination sur afficheur");
 					stream << t.cell("Nom court", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_SHORT_NAME, _connectionPlace->getName13()));
 					stream << t.cell("Nom moyen", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_LONG_NAME, _connectionPlace->getName26()));
+					stream << t.cell("Nom pour fiche horaire", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_TIMETABLE_NAME, _connectionPlace->getTimetableName()));
 					stream << t.close();
 				}
 			}
