@@ -185,7 +185,7 @@ namespace synthese
 				pm.insert(DATA_MINUTES, Service::GetTimeOfDay(object.second).minutes()); //1
 				pm.insert(DATA_STOP_NAME, object.first->getConnectionPlace()->getName()); //2
 				pm.insert(DATA_CITY_NAME, object.first->getConnectionPlace()->getCity()->getName()); //3
-				pm.insert(DATA_STOP_ALIAS, object.first->getConnectionPlace()->getName26()); //4
+				pm.insert(DATA_STOP_ALIAS, object.first->getConnectionPlace()->getTimetableName()); //4
 			}
 			pm.insert(DATA_RANK, rank); //5
 			if(rollingStock)
