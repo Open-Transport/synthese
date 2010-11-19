@@ -244,7 +244,7 @@ namespace synthese
 			pm.insert(DATA_PLACE_NAME, place.getPlace()->getName()); //7
 			if(dynamic_cast<const StopArea*>(place.getPlace()))
 			{
-				pm.insert(DATA_STOP_NAME_26, static_cast<const StopArea*>(place.getPlace())->getName26());
+				pm.insert(DATA_STOP_NAME_26, static_cast<const StopArea*>(place.getPlace())->getTimetableName());
 			}
 
 			displayRequest.getFunction()->setAditionnalParametersMap(pm);
