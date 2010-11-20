@@ -9,11 +9,10 @@ test ! -x /etc/init.d/s3-server || /etc/init.d/s3-server stop
 
 test ! -x /etc/init.d/s3-server || /etc/init.d/s3-server start
 
-if [ -e /etc/apache2/mods-enabled/rewrite.load ]; then echo "Mod rewrite already installed"; else ln -s ../mods-available/rewrite.load /etc/apache2/mods-enabled/rewrite.load; fi
 if [ -e /etc/apache2/mods-enabled/proxy.load ]; then echo "Mod proxy already installed"; else ln -s ../mods-available/proxy.load /etc/apache2/mods-enabled/proxy.load; fi
 if [ -e /etc/apache2/mods-enabled/proxy_http.load ]; then echo "Mod proxy_http already installed"; else ln -s ../mods-available/proxy_http.load /etc/apache2/mods-enabled/proxy_http.load; fi
 
-/etc/init.d/apache2 reload 
+/etc/init.d/apache2 restart
 
 exit 0
 
