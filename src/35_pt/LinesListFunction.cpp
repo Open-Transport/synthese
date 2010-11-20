@@ -239,8 +239,13 @@ namespace synthese
 					set<RollingStock *> rollingStocks;
 					BOOST_FOREACH(Path* path, line->getPaths())
 					{
+						if(
+							!static_cast<const JourneyPattern*>(path)->getRollingStock()
+						){
+							continue;
+						}
 						rollingStocks.insert(
-								static_cast<const JourneyPattern*>(path)->getRollingStock()
+							static_cast<const JourneyPattern*>(path)->getRollingStock()
 						);
 					}
 					BOOST_FOREACH(RollingStock * rs, rollingStocks)
