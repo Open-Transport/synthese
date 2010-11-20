@@ -27,8 +27,7 @@
 #include "Service.h"
 #include "ArrivalDepartureTableGenerator.h"
 #include "GraphConstants.h"
-#include "PTTimeSlotRoutePlanner.h"
-#include "PTRoutePlannerResult.h"
+#include "AccessParameters.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -42,7 +41,6 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace algorithm;
-	using namespace pt_journey_planner;
 		
 
 	namespace departure_boards
@@ -50,20 +48,18 @@ namespace synthese
 
 		ArrivalDepartureTableGenerator::ArrivalDepartureTableGenerator(
 			const ArrivalDepartureTableGenerator::PhysicalStops& physicalStops,
-			const DeparturesTableDirection&			direction
-				, const EndFilter&			endfilter
-				, const LineFilter&			lineFilter
-				, const DisplayedPlacesList&	displayedPlacesList
-				, const ForbiddenPlacesList&	forbiddenPlaces,
-				const TransferDestinationsList& transferDestinations
-				, const ptime& startDateTime
-				, const ptime& endDateTime
-				, size_t maxSize
-		) : _physicalStops(physicalStops), _direction(direction), _endFilter(endfilter)
-			, _lineFilter(lineFilter), _displayedPlaces(displayedPlacesList), _forbiddenPlaces(forbiddenPlaces),
-			_transferDestinations(transferDestinations),
-			_startDateTime(startDateTime)
-			, _endDateTime(endDateTime), _maxSize(maxSize)
+			const DeparturesTableDirection&			direction,
+			const EndFilter&			endfilter,
+			const LineFilter&			lineFilter,
+			const DisplayedPlacesList&	displayedPlacesList,
+			const ForbiddenPlacesList&	forbiddenPlaces,
+			const ptime& startDateTime,
+			const ptime& endDateTime,
+			size_t maxSize
+		) : _physicalStops(physicalStops), _direction(direction), _endFilter(endfilter),
+			_lineFilter(lineFilter), _displayedPlaces(displayedPlacesList), _forbiddenPlaces(forbiddenPlaces),
+			_startDateTime(startDateTime),
+			_endDateTime(endDateTime), _maxSize(maxSize)
 		{}
 
 
@@ -167,56 +163,9 @@ namespace synthese
 			ActualDisplayedArrivalsList& list,
 			const graph::ServicePointer& serviceUse
 		){
-			IntermediateStop::TransferDestinations transfers;
-
-			TransferDestinationsList::const_iterator it(
-				_transferDestinations.find(
-					dynamic_cast<const StopArea*>(serviceUse.getArrivalEdge()->getFromVertex()->getHub())
-			)	);
-			if(it != _transferDestinations.end())
-			{
-				ptime routePlanningEndTime(_startDateTime);
-				routePlanningEndTime += days(1);
-				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
-				{
-					PTTimeSlotRoutePlanner rp(
-						dynamic_cast<const StopArea*>(serviceUse.getDepartureEdge()->getFromVertex()->getHub()),
-						it2,
-						_startDateTime,
-						_endDateTime,
-						_startDateTime,
-						routePlanningEndTime,
-						1,
-						AccessParameters(
-							USER_PEDESTRIAN,
-							false,
-							false,
-							0,
-							posix_time::minutes(0),
-							67,
-							2
-						),
-						DEPARTURE_FIRST
-					);
-					
-					const PTRoutePlannerResult solution(rp.run());
-
-					if(solution.getJourneys().empty()) continue;
-
-					const Journey& journey(solution.getJourneys().front());
-
-					if(	journey.size() == 2 &&
-						journey.getJourneyLeg(0).getArrivalEdge()->getFromVertex()->getHub() == serviceUse.getArrivalEdge()->getFromVertex()->getHub() &&
-						journey.getJourneyLeg(0).getService() == serviceUse.getService()
-					){
-						transfers.insert(journey.getJourneyLeg(1));
-					}
-				}
-			}
 			list.push_back(IntermediateStop(
 				dynamic_cast<const StopArea*>(serviceUse.getArrivalEdge()->getFromVertex()->getHub()),
-				serviceUse,
-				transfers
+				serviceUse
 			)	);
 		}
 	}

@@ -54,8 +54,7 @@ namespace synthese
 				, const EndFilter&
 				, const LineFilter&
 				, const DisplayedPlacesList&
-				, const ForbiddenPlacesList&,
-				const TransferDestinationsList&
+				, const ForbiddenPlacesList&
 				, const boost::posix_time::ptime& startDateTime
 				, const boost::posix_time::ptime& endDateTime
 				, size_t maxSize

@@ -30,24 +30,25 @@ namespace synthese
 {
 	namespace departure_boards
 	{
-
-		class StandardArrivalDepartureTableGenerator : public ArrivalDepartureTableGenerator
+		//////////////////////////////////////////////////////////////////////////
+		/// @ingroup m54
+		class StandardArrivalDepartureTableGenerator:
+			public ArrivalDepartureTableGenerator
 		{
 		private:
 
 		public:
 			StandardArrivalDepartureTableGenerator(
-				const PhysicalStops&
-				, const DeparturesTableDirection&
-				, const EndFilter&
-				, const LineFilter&
-				, const DisplayedPlacesList&
-				, const ForbiddenPlacesList&,
-				const TransferDestinationsList&,
-				const boost::posix_time::ptime& startDateTime
-				, const boost::posix_time::ptime& endDateTime
-				, size_t maxSize = UNLIMITED_SIZE
-				);
+				const PhysicalStops&,
+				const DeparturesTableDirection&,
+				const EndFilter&,
+				const LineFilter&,
+				const DisplayedPlacesList&,
+				const ForbiddenPlacesList&,
+				const boost::posix_time::ptime& startDateTime,
+				const boost::posix_time::ptime& endDateTime,
+				size_t maxSize = UNLIMITED_SIZE
+			);
 
 			const ArrivalDepartureList& generate();
 		};

@@ -66,6 +66,7 @@ namespace synthese
 		const string UpdateDisplayScreenAction::PARAMETER_COM_PORT(Action_PARAMETER_PREFIX + "cp");
 		const string UpdateDisplayScreenAction::PARAMETER_CPU(Action_PARAMETER_PREFIX + "cu");
 		const string UpdateDisplayScreenAction::PARAMETER_MAC_ADDRESS(Action_PARAMETER_PREFIX + "ma");
+		const string UpdateDisplayScreenAction::PARAMETER_SUB_SCREEN_TYPE(Action_PARAMETER_PREFIX + "st");
 		
 
 		ParametersMap UpdateDisplayScreenAction::getParametersMap() const
@@ -95,6 +96,11 @@ namespace synthese
 				{
 					_cpu = DisplayScreenCPUTableSync::Get(*id, *_env);
 				}
+
+				if(_screen->getParent())
+				{
+					_subScreenType = static_cast<DisplayScreen::SubScreenType>(map.get<int>(PARAMETER_SUB_SCREEN_TYPE));
+				}
 			}
 			catch (ObjectNotFoundException<DisplayType>& e)
 			{
@@ -120,6 +126,10 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(log, "Port COM", _screen->getComPort(), _comPort);
 			DBLogModule::appendToLogIfChange(log, "Unité centrale hôte", ((_screen->getRoot<DisplayScreenCPU>() != NULL) ? _screen->getRoot<DisplayScreenCPU>()->getName() : string()), ((_cpu.get() != NULL) ? _cpu->getName() : string()));
 			DBLogModule::appendToLogIfChange(log, "Adresse MAC", _screen->getMacAddress(), _macAddress);
+			if(_screen->getParent())
+			{
+				DBLogModule::appendToLogIfChange(log, "Rôle vis à vis du parent", DisplayScreen::GetSubScreenTypeLabel(_screen->getSubScreenType()), DisplayScreen::GetSubScreenTypeLabel(_subScreenType));
+			}
 
 
 			// Preparation of the action
@@ -129,6 +139,10 @@ namespace synthese
 			_screen->setComPort(_comPort);
 			_screen->setRoot(const_cast<DisplayScreenCPU*>(_cpu.get()));
 			_screen->setMacAddress(_macAddress);
+			if(_screen->getParent())
+			{
+				_screen->setSubScreenType(_subScreenType);
+			}
 
 			// The action
 			DisplayScreenTableSync::Save(_screen.get());

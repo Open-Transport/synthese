@@ -56,6 +56,8 @@ namespace synthese
 		const string CreateDisplayScreenAction::PARAMETER_LOCALIZATION_ID(Action_PARAMETER_PREFIX + "pli");
 		const string CreateDisplayScreenAction::PARAMETER_CPU_ID(Action_PARAMETER_PREFIX + "cp");
 		const string CreateDisplayScreenAction::PARAMETER_UP_ID(Action_PARAMETER_PREFIX + "up");
+		const string CreateDisplayScreenAction::PARAMETER_SUB_SCREEN_TYPE(Action_PARAMETER_PREFIX + "st");
+		const string CreateDisplayScreenAction::PARAMETER_NAME(Action_PARAMETER_PREFIX + "na");
 
 		ParametersMap CreateDisplayScreenAction::getParametersMap() const
 		{
@@ -78,6 +80,8 @@ namespace synthese
 
 		void CreateDisplayScreenAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			_name = map.getDefault<string>(PARAMETER_NAME);
+
 			// Template
 			try
 			{
@@ -85,6 +89,10 @@ namespace synthese
 				if (id > 0)
 				{
 					_template = DisplayScreenTableSync::Get(id, *_env);
+					if(_name.empty())
+					{
+						_name = "Copie de "+ _template->getName();
+					}
 				}
 			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
@@ -99,6 +107,7 @@ namespace synthese
 				if(id > 0)
 				{
 					_up = DisplayScreenTableSync::Get(id, *_env);
+					_subScreenType = static_cast<DisplayScreen::SubScreenType>(map.getDefault<int>(PARAMETER_SUB_SCREEN_TYPE));
 				}
 				else
 				{
@@ -143,6 +152,7 @@ namespace synthese
 			if(_up.get())
 			{
 				DisplayScreen::SetParent(screen, const_cast<DisplayScreen*>(_up.get()));
+				screen.setSubScreenType(_subScreenType);
 			}
 			else if(_cpu.get())
 			{
@@ -157,7 +167,7 @@ namespace synthese
 			{
 				screen.setDisplayedPlace(static_cast<StopArea*>(const_cast<NamedPlace*>(screen.getLocation())));
 			}
-			
+			screen.setName(_name);
 			screen.setMaintenanceIsOnline(true);
 
 			// Action

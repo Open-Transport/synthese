@@ -107,6 +107,7 @@ namespace synthese
 		const string DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER("route_planning_with_transfer");
 		const string DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS("transfer_destinations");
 		const string DisplayScreenTableSync::COL_UP_ID("up_id");
+		const string DisplayScreenTableSync::COL_SUB_SCREEN_TYPE("sub_screen_type");
 	}
 
 	namespace db
@@ -150,6 +151,7 @@ namespace synthese
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER, SQL_BOOLEAN),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS, SQL_TEXT),
 			SQLiteTableSync::Field(DisplayScreenTableSync::COL_UP_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayScreenTableSync::COL_SUB_SCREEN_TYPE, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 		
@@ -187,6 +189,7 @@ namespace synthese
 			object->setComPort(rows->getInt(DisplayScreenTableSync::COL_COM_PORT));
 			object->setMacAddress(rows->getText(DisplayScreenTableSync::COL_MAC_ADDRESS));
 			object->setRoutePlanningWithTransfer(rows->getBool(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER));
+			object->setSubScreenType(static_cast<DisplayScreen::SubScreenType>(rows->getInt(DisplayScreenTableSync::COL_SUB_SCREEN_TYPE)));
 			object->setNullRoot();
 			object->setDisplayedPlace(NULL);
 			object->setType(NULL);
@@ -483,6 +486,7 @@ namespace synthese
 			query.addField(object->getRoutePlanningWithTransfer());
 			query.addField(tdstream.str());
 			query.addField(object->getParent() ? object->getParent()->getKey() : RegistryKeyType(0));
+			query.addField(static_cast<int>(object->getSubScreenType()));
 			query.execute(transaction);
 	}	}
 

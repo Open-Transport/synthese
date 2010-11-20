@@ -42,19 +42,18 @@ namespace synthese
 	{
 
 		StandardArrivalDepartureTableGenerator::StandardArrivalDepartureTableGenerator(
-			const PhysicalStops& physicalStops
-			, const DeparturesTableDirection& direction
-			, const EndFilter& endfilter
-			, const LineFilter& lineFilter
-			, const DisplayedPlacesList& displayedPlacesList
-			, const ForbiddenPlacesList& forbiddenPlaces,
-			const TransferDestinationsList& transfers
-			, const ptime& startTime
-			, const ptime& endDateTime
-			, size_t maxSize
+			const PhysicalStops& physicalStops,
+			const DeparturesTableDirection& direction,
+			const EndFilter& endfilter,
+			const LineFilter& lineFilter,
+			const DisplayedPlacesList& displayedPlacesList,
+			const ForbiddenPlacesList& forbiddenPlaces,
+			const ptime& startTime,
+			const ptime& endDateTime,
+			size_t maxSize
 		):	ArrivalDepartureTableGenerator(
 			physicalStops, direction, endfilter, lineFilter,
-			displayedPlacesList, forbiddenPlaces, transfers, startTime, endDateTime, maxSize
+			displayedPlacesList, forbiddenPlaces, startTime, endDateTime, maxSize
 		){
 		}
 

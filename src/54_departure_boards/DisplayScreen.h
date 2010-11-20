@@ -53,6 +53,11 @@ namespace synthese
 		class NamedPlace;
 	}
 
+	namespace graph
+	{
+		class Journey;
+	}
+
 	namespace pt
 	{
 		class StopArea;
@@ -109,6 +114,11 @@ namespace synthese
 				DISPLAY_CHILDREN_ONLY = 3
 			} GenerationMethod;
 
+			typedef enum {
+				SUB_CONTENT = 0,
+				CONTINUATION_TRANSFER = 1
+			} SubScreenType;
+
 
 		protected:
 			//! \name Technical data
@@ -133,8 +143,9 @@ namespace synthese
 
 			//! \name Content
 			//@{
+				SubScreenType				_subScreenType;
 				const pt::StopArea*			_displayedPlace;		//!< Place where the services must depart or arrive
-				ArrivalDepartureTableGenerator::PhysicalStops	_physicalStops;				//!< Quai(s) affichés
+				ArrivalDepartureTableGenerator::PhysicalStops	_physicalStops;				//!< Filter on departure stop point
 				bool						_allPhysicalStopsDisplayed;
 				ForbiddenPlacesList			_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
 				LineFilter					_forbiddenLines;
@@ -149,7 +160,7 @@ namespace synthese
 			//!	\name Preselection
 			//@{
 				GenerationMethod			_generationMethod;
-				DisplayedPlacesList			_forcedDestinations;	//!< Destinations à afficher absolument
+				DisplayedPlacesList			_forcedDestinations;	//!< Destinations to display absolutely
 				int							_destinationForceDelay;	//!< Durée pendant laquelle une destination est forcée
 			
 			//@}
@@ -164,6 +175,39 @@ namespace synthese
 			//!	\name Protected
 			//@{
 				boost::posix_time::ptime	_MomentFin(const boost::posix_time::ptime& __MomentDebut)			const;
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Generation of the content of the screen for standard screens only (and derivated types).
+				/// @param startTime start time
+				/// @param endTime end time
+				/// @param rootCall true if the call of this method is not recursive
+				/// @result the result of generation
+				/// @author Hugues Romain
+				/// @since 3.2.0
+				ArrivalDepartureList _generateStandardScreen(
+					const boost::posix_time::ptime& startTime,
+					const boost::posix_time::ptime& endTime,
+					bool rootCall = true
+				) const;
+
+
+				IntermediateStop::TransferDestinations _generateTransferDestinations(
+					const graph::Journey& approachJourney,
+					const pt::StopArea& stopArea,
+					const boost::posix_time::ptime& startTime,
+					const boost::posix_time::ptime& endTime
+				) const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Search a continuation transfer at a place in the sub screens.
+				/// @param stop departure stop to search
+				/// @result pointer to such a sub screen, NULL if no screen has been found
+				/// @author Hugues Romain
+				/// @since 3.2.0
+				DisplayScreen*	_getContinuationTransferScreen(
+					const pt::StopArea& stop
+				) const;
 			//@}
 
 		public:
@@ -197,6 +241,7 @@ namespace synthese
 				void	setComPort(int value);
 				void	setMacAddress(const std::string& value);
 				void	setRoutePlanningWithTransfer(bool value);
+				void	setSubScreenType(SubScreenType value){ _subScreenType = value; }
 			//@}
 
 			//! \name Modifiers
@@ -243,7 +288,7 @@ namespace synthese
 			//!	\name Getters
 			//@{
 				const pt::StopArea*				getDisplayedPlace()				const { return _displayedPlace; }
-				const DisplayType*				getType()						const;				
+				const DisplayType*				getType()						const { return _displayType; }
 				int								getWiringCode()					const;
 				const std::string&				getTitle()						const;
 				int								getBlinkingDelay()				const;
@@ -268,7 +313,8 @@ namespace synthese
 				bool							getDisplayClock()				const;
 				std::string						getMacAddress()					const;
 				bool							getRoutePlanningWithTransfer()	const;
-				const TransferDestinationsList&	getTransferdestinations()		const;
+				const TransferDestinationsList&	getTransferdestinations()		const { return _transfers; }
+				SubScreenType					getSubScreenType()				const { return _subScreenType; }
 			//@}
 
 			//! \name Services
@@ -276,7 +322,7 @@ namespace synthese
 				boost::shared_ptr<ArrivalDepartureTableGenerator>	getGenerator(const boost::posix_time::ptime& startTime)		const;
 
 				const geography::NamedPlace* getLocation() const;
-				
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Display the content generated for the screen
 				void display(
@@ -312,9 +358,11 @@ namespace synthese
 				bool isMonitored() const;
 			//@}
 
+			//! @name Static output methods
+			//@{
+				static const std::string GetSubScreenTypeLabel(SubScreenType value);
+			//@}
 		};
-
-	}
-}
+}	}
 
 #endif
