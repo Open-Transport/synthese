@@ -13,9 +13,6 @@ if [ -e /etc/apache2/mods-enabled/rewrite.load ]; then echo "Mod rewrite already
 if [ -e /etc/apache2/mods-enabled/proxy.load ]; then echo "Mod proxy already installed"; else ln -s ../mods-available/proxy.load /etc/apache2/mods-enabled/proxy.load; fi
 if [ -e /etc/apache2/mods-enabled/proxy_http.load ]; then echo "Mod proxy_http already installed"; else ln -s ../mods-available/proxy_http.load /etc/apache2/mods-enabled/proxy_http.load; fi
 
-VHOST_FILE=/etc/apache2/sites-available/default
-grep -q "/opt/rcs/s3-admin/apache2.conf" $VHOST_FILE || ( sed --in-place=.orig "s/<\/VirtualHost>/Include \/opt\/rcs\/s3-admin\/apache2.conf\n<\/VirtualHost>/" $VHOST_FILE )
-
 /etc/init.d/apache2 reload 
 
 exit 0
