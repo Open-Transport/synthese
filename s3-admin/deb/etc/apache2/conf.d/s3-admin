@@ -1,8 +1,8 @@
-RewriteEngine On
 
 <Location /synthese3/admin>
-        Order allow,deny
-        Allow from all
+	Redirect /synthese3/admin/ /synthese3/admin?fonction=admin&i=6755399441055745
+	Order allow,deny
+ 	Allow from all
 	ProxyPass http://localhost:8080/synthese3/admin
 	SetEnv proxy-nokeepalive 1
 </Location>
@@ -13,6 +13,5 @@ Alias /synthese3 "/opt/rcs/s3-admin/files/"
     Order allow,deny
     Allow from all
 </Directory>
-RewriteRule ^/synthese3/admin/$ /synthese3/admin?fonction=admin&i=6755399441055745 [L,R]
 
 
