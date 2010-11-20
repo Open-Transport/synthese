@@ -1,5 +1,6 @@
 
 <Location /synthese3/admin>
+	AddDefaultCharset UTF-8
 	Redirect /synthese3/admin/ /synthese3/admin?fonction=admin&i=6755399441055745
 	Order allow,deny
  	Allow from all
@@ -8,6 +9,7 @@
 </Location>
 Alias /synthese3 "/opt/rcs/s3-admin/files/"
 <Directory "/opt/rcs/s3-admin/files/">
+    AddDefaultCharset UTF-8
     AllowOverride None
     Options None
     Order allow,deny
