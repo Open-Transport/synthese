@@ -17,12 +17,17 @@ class GeosProject (CppLibProject):
 		CppLibProject.declare(self)
 
 
+sources = senv.Glob ('*.cpp', ['examples'], senv.SrcDir('src'), prefix='src/', recursive=True)
+sources.remove('src/geom/GeometryFactory.cpp')
+sources.append(env.SrcFile('patch/geom/GeometryFactory.cpp'))
+sources.remove('src/io/WKBReader.cpp')
+sources.append(env.SrcFile('patch/io/WKBReader.cpp'))
 
 GeosProject(
 	env
 	, 'geos'
-	, '3.2'
-	, source_files = senv.Glob ('*.cpp', ['examples'], senv.SrcDir('src'), prefix='src/', recursive=True)
+	, '3.2.patch1'
+	, source_files = sources
 	, include_dir = senv.SrcDir('src/headers')
 	, filesrootdir = senv.SrcDir('src')
 )
@@ -37,7 +42,7 @@ class GeosCProject (CppLibProject):
 GeosCProject(
 	env,
 	'geosc',
-	'3.2',
+	'3.2.patch1',
 	source_files = senv.Glob ('*.cpp', [], senv.SrcDir('capi'), prefix='capi/', recursive=True),
 	include_dir = senv.SrcDir('capi'),
 	filesrootdir = senv.SrcDir('capi'),
