@@ -40,14 +40,20 @@
 #include "RoutePlanningTableGenerator.h"
 #include "Webpage.h"
 #include "DisplayScreenContentFunction.h"
+#include "PTTimeSlotRoutePlanner.h"
+#include "PTRoutePlannerResult.h"
+
 
 #include <sstream>
 #include <boost/foreach.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/gregorian_calendar.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
+using namespace boost::gregorian;
+
 
 namespace synthese
 {
@@ -59,6 +65,9 @@ namespace synthese
 	using namespace road;
 	using namespace geography;
 	using namespace pt;
+	using namespace pt_journey_planner;
+	using namespace algorithm;
+		
 	
 
 	namespace util
@@ -200,6 +209,184 @@ namespace synthese
 			_maintenanceMessage = message;
 		}
 
+
+
+		ArrivalDepartureList DisplayScreen::_generateStandardScreen(
+			const boost::posix_time::ptime& startTime,
+			const boost::posix_time::ptime& endTime,
+			bool rootCall
+		) const	{
+			shared_ptr<ArrivalDepartureTableGenerator> generator;
+			switch (_generationMethod)
+			{
+			case STANDARD_METHOD:
+				generator.reset(
+					static_cast<ArrivalDepartureTableGenerator*>(
+						new StandardArrivalDepartureTableGenerator(
+							getPhysicalStops(),
+							_direction,
+							_originsOnly,
+							_forbiddenLines,
+							_displayedPlaces,
+							_forbiddenArrivalPlaces,
+							startTime,
+							endTime,
+							_displayType->getRowNumber()
+				)	)	);
+				break;
+
+			case WITH_FORCED_DESTINATIONS_METHOD:
+				generator.reset(
+					static_cast<ArrivalDepartureTableGenerator*>(
+						new ForcedDestinationsArrivalDepartureTableGenerator(
+							getPhysicalStops(),
+							_direction,
+							_originsOnly,
+							_forbiddenLines,
+							_displayedPlaces,
+							_forbiddenArrivalPlaces,
+							startTime,
+							endTime,
+							_displayType->getRowNumber(),
+							_forcedDestinations,
+							minutes(_destinationForceDelay)
+				)	)	);
+			default:
+				throw Exception("This method cannot apply to this screen type");
+			}
+
+			ArrivalDepartureList result(generator->generate());
+
+			// Find continuations
+			BOOST_FOREACH(ArrivalDepartureList::value_type& row, result)
+			{
+				for(ArrivalDepartureList::mapped_type::iterator itDest(row.second.begin()); itDest != row.second.end(); ++itDest)
+				{
+					// Avoid departure place
+					if(itDest == row.second.begin())
+					{
+						continue;
+					}
+
+					// Transfers at destinations
+					if(rootCall)
+					{
+						Journey approachJourney;
+						itDest->transferDestinations = _generateTransferDestinations(
+							approachJourney,
+							*itDest->place,
+							startTime,
+							endTime
+						);
+					}
+
+					const DisplayScreen* continuationScreen(_getContinuationTransferScreen(*itDest->place));
+					if(continuationScreen)
+					{
+						ptime transferStartTime(
+							itDest->serviceUse.getArrivalDateTime() - minutes(continuationScreen->getClearingDelay())
+						);
+						ptime transferEndTime(
+							itDest->serviceUse.getArrivalDateTime() + minutes(continuationScreen->getMaxDelay())
+						);
+						ArrivalDepartureList subResult(
+							continuationScreen->_generateStandardScreen(transferStartTime, transferEndTime, false)
+						);
+						if(!subResult.empty())
+						{
+							itDest->continuationService = subResult.begin()->first;
+							itDest->destinationsReachedByContinuationService = subResult.begin()->second;
+
+							if(rootCall)
+							{
+								BOOST_FOREACH(ActualDisplayedArrivalsList::value_type& item, itDest->destinationsReachedByContinuationService)
+								{
+									Journey approachJourney(Journey(), itDest->serviceUse);
+									item.transferDestinations = _generateTransferDestinations(
+										approachJourney,
+										*item.place,
+										startTime,
+										endTime
+									);
+								}
+							}
+						}
+					}
+			}	}
+
+			return result;
+		}
+
+
+		IntermediateStop::TransferDestinations DisplayScreen::_generateTransferDestinations(
+			const Journey& approachJourney,
+			const StopArea& stopArea,
+			const ptime& startTime,
+			const ptime& endTime
+		) const	{
+			IntermediateStop::TransferDestinations result;
+
+			TransferDestinationsList::const_iterator it(
+				_transfers.find(&stopArea)
+			);
+			if(it != _transfers.end())
+			{
+				ptime routePlanningEndTime(startTime);
+				routePlanningEndTime += days(1);
+				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
+				{
+					PTTimeSlotRoutePlanner rp(
+						_displayedPlace,
+						it2,
+						startTime,
+						endTime,
+						startTime,
+						routePlanningEndTime,
+						1,
+						AccessParameters(
+							USER_PEDESTRIAN,
+							false,
+							false,
+							0,
+							posix_time::minutes(0),
+							67,
+							approachJourney.size()+1
+						),
+						DEPARTURE_FIRST
+					);
+					
+					const PTRoutePlannerResult solution(rp.run());
+
+					if(solution.getJourneys().empty()) continue;
+
+					const Journey& journey(solution.getJourneys().front());
+
+					if(	journey.size() == approachJourney.size() + 1)
+					{
+						bool ok(true);
+						for(size_t i(0); i<approachJourney.size(); ++i)
+						{
+							if(	journey.getJourneyLeg(i).getArrivalEdge()->getFromVertex()->getHub() != approachJourney.getJourneyLeg(i).getArrivalEdge()->getFromVertex()->getHub() ||
+								journey.getJourneyLeg(i).getDepartureEdge()->getFromVertex()->getHub() != approachJourney.getJourneyLeg(i).getDepartureEdge()->getFromVertex()->getHub() ||
+								journey.getJourneyLeg(i).getService() != approachJourney.getJourneyLeg(i).getService()
+							){
+								ok = false;
+								break;
+							}
+						}
+						if(ok)
+						{
+							result.insert(journey.getJourneyLeg(journey.size() - 1));
+						}
+					}
+				}
+			}
+
+			return result;
+		}
+
+
+
 		void DisplayScreen::display(
 			std::ostream& stream,
 			const ptime& date,
@@ -215,8 +402,6 @@ namespace synthese
 
 			try
 			{
-				shared_ptr<ArrivalDepartureTableGenerator> generator;
-
 				// End time
 				ptime realStartDateTime(date);
 				realStartDateTime -= minutes(_clearingDelay);
@@ -286,44 +471,8 @@ namespace synthese
 				}
 				else
 				{
-					switch (_generationMethod)
-					{
-					case STANDARD_METHOD:
-						generator.reset(static_cast<ArrivalDepartureTableGenerator*>(
-							new StandardArrivalDepartureTableGenerator(
-								getPhysicalStops()
-								, _direction
-								, _originsOnly
-								, _forbiddenLines
-								, _displayedPlaces
-								, _forbiddenArrivalPlaces,
-								_transfers
-								, realStartDateTime
-								, endDateTime
-								, _displayType->getRowNumber()
-						)	)	);
-						break;
-
-					case WITH_FORCED_DESTINATIONS_METHOD:
-						generator.reset(static_cast<ArrivalDepartureTableGenerator*>(
-							new ForcedDestinationsArrivalDepartureTableGenerator(
-								getPhysicalStops()
-								, _direction
-								, _originsOnly
-								, _forbiddenLines
-								, _displayedPlaces
-								, _forbiddenArrivalPlaces,
-								_transfers
-								, realStartDateTime
-								, endDateTime
-								, _displayType->getRowNumber()
-								, _forcedDestinations
-								, minutes(_destinationForceDelay)
-						)	)	);
-					}
-
 					ArrivalDepartureListWithAlarm displayedObject;
-					displayedObject.map = generator->generate();
+					displayedObject.map = _generateStandardScreen(realStartDateTime, endDateTime);
 					displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this, date);
 
 					if(	_displayType->getDisplayInterface() &&
@@ -357,17 +506,8 @@ namespace synthese
 							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayDestinationPage()),
 							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayTransferDestinationPage()),
 							realStartDateTime,
-							getTitle(),
-							getWiringCode(),
-							getServiceNumberDisplay(),
-							getTrackNumberDisplay(),
-							getDisplayTeam(),
-							getType()->getMaxStopsNumber(),
-							posix_time::minutes(getBlinkingDelay()),
-							getDisplayClock(),
-							*getDisplayedPlace(),
 							displayedObject,
-							getChildren()
+							*this
 						);
 					}
 				}
@@ -473,11 +613,7 @@ namespace synthese
 			return _maintenanceMessage;
 		}
 
-		const DisplayType* DisplayScreen::getType() const
-		{
-			return _displayType;
-		}
-
+		
 
 		void DisplayScreen::setAllPhysicalStopsDisplayed( bool value )
 		{
@@ -747,13 +883,6 @@ namespace synthese
 
 
 
-		const TransferDestinationsList& DisplayScreen::getTransferdestinations() const
-		{
-			return _transfers;
-		}
-
-
-
 		void DisplayScreen::clearTransferDestinations()
 		{
 			_transfers.clear();
@@ -773,5 +902,31 @@ namespace synthese
 			}
 			return NULL;
 		}
-	}
-}
+
+
+
+		DisplayScreen* DisplayScreen::_getContinuationTransferScreen( const pt::StopArea& stop ) const
+		{
+			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, getChildren())
+			{
+				if(	it.second->getSubScreenType() == CONTINUATION_TRANSFER &&
+					it.second->getDisplayedPlace() == &stop
+				){
+					return it.second;
+				}
+			}
+			return NULL;
+		}
+
+
+
+		const std::string DisplayScreen::GetSubScreenTypeLabel( SubScreenType value )
+		{
+			switch(value)
+			{
+			case SUB_CONTENT: return "Elément de contenu";
+			case CONTINUATION_TRANSFER: return "Correspondance continue";
+			}
+			return string();
+		}
+}	}

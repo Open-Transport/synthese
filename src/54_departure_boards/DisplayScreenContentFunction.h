@@ -214,6 +214,7 @@ namespace synthese
 				void setScreen(boost::shared_ptr<const DisplayScreen> value);
 			//@}
 
+		private:
 			//! @name Static methods to set CMS page variables for departure board
 			//@{
 				static const std::string DATA_TITLE;
@@ -230,6 +231,7 @@ namespace synthese
 				static const std::string DATA_DATE;
 				static const std::string DATA_SUBSCREEN_;
 
+		public:
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of a departure board.
 				///	Variables sent to the cms :
@@ -251,7 +253,16 @@ namespace synthese
 				///
 				//////////////////////////////////////////////////////////////////////////
 				/// @param stream stream to write the result on
-				/// @param page page to use to display the departure board
+				/// @param request request which has called the display
+				/// @param page CMS template to use to display the departure board
+				/// @param rowPage CMS template to use to display each service present on the board
+				/// @param destinationPage CMS template to use to display each destination of each destination of each service
+				/// @param transferPage CMS template to use to display each transfer destination reachable from each destination of each service
+				/// @param date departure date
+				/// @param rows result to display
+				/// @param screen display screen source object
+				/// @author Hugues Romain
+				/// @since 3.2.0
 				static void DisplayDepartureBoard(
 					std::ostream& stream,
 					const server::Request& request,
@@ -260,18 +271,10 @@ namespace synthese
 					boost::shared_ptr<const cms::Webpage> destinationPage,
 					boost::shared_ptr<const cms::Webpage> transferPage,
 					const boost::posix_time::ptime&  date,
-					const std::string& title,
-					int wiringCode,
-					bool displayServiceNumber,
-					bool displayTrackNumber,
-					bool displayTeam,
-					int intermediatesStopsToDisplay,
-					boost::posix_time::time_duration blinkingDelay,
-					bool displayClock,
-					const pt::StopArea& place,
 					const ArrivalDepartureListWithAlarm& rows,
-					const DisplayScreen::ChildrenType& subscreens
+					const DisplayScreen& screen
 				);
+			private:
 
 
 
@@ -292,7 +295,7 @@ namespace synthese
 				
 				//////////////////////////////////////////////////////////////////////////
 				/// Displays a row of a departure board.
-				///	Variables sent to the cms :
+				///	Variables sent to the CMS template :
 				/// <dl>
 				///	<dt>row_rank</dt><dd>Rank of the row in the departure table</dd>
 				///	<dt>page_number</dt><dd>Number of the page to display for multiple page protocol (eg Lumiplan)</dd>
@@ -314,21 +317,28 @@ namespace synthese
 				/// <dt>subscreen_x</dt><dd>id of the xth sub screen (x replaced by numeric value 0, 1, 2, ... The cms must lauch itself the display for each subscreen.</dd>
 				/// <dt>direction</dt><dd>Direction shown in front of the vehicle</dd>
 				/// </dl>
+				//////////////////////////////////////////////////////////////////////////
+				/// @param stream stream to write the result on
+				/// @param request request which has called the display
+				/// @param page CMS template to use to display the service
+				/// @param destinationPage CMS template to use to display each destination of each destination of each service
+				/// @param transferPage CMS template to use to display each transfer destination reachable from each destination of each service
+				/// @param rowRank rank of the row
+				/// @param pageNumber page of memory to display on (for protocoles with separated pages)
+				/// @param row result to display
+				/// @param screen display screen source object
+				/// @author Hugues Romain
+				/// @since 3.2.0
 				static void DisplayDepartureBoardRow(
 					std::ostream& stream,
 					const server::Request& request,
 					boost::shared_ptr<const cms::Webpage> page,
 					boost::shared_ptr<const cms::Webpage> destinationPage,
 					boost::shared_ptr<const cms::Webpage> transferPage,
-					int rowId,
+					std::size_t rowRank,
 					int pageNumber,
-					bool displayQuaiNumber,
-					bool displayServiceNumber,
-					bool displayTeam,
-					int intermediatesStopsToDisplay,
-					boost::posix_time::time_duration blinkingDelay,
 					const ArrivalDepartureRow& row,
-					const DisplayScreen::ChildrenType& subscreens
+					const DisplayScreen& screen
 				);
 
 
@@ -340,7 +350,10 @@ namespace synthese
 				static const std::string DATA_IS_SAME_CITY;
 				static const std::string DATA_IS_END_STATION;
 				static const std::string DATA_DESTINATION_RANK;
+				static const std::string DATA_DESTINATION_GLOBAL_RANK;
 				static const std::string DATA_TRANSFERS;
+				static const std::string DATA_IS_CONTINUATION;
+				static const std::string DATA_CONTINUATION_STARTS_AT_END;
 				
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of an intermediate or ending destination of a departure board.
@@ -355,11 +368,29 @@ namespace synthese
 				///	<dt>is_same_city</dt><dd>last displayed stop was in the same city ? (1|0)</dd>
 				///	<dt>time</dt><dd>arrival date time</dd>
 				///	<dt>is_end_station</dt><dd>is the end station</dd>
-				///	<dt>destination_rank</dt><dd>rank of the destination in the board (not rank in path)</dd>
+				///	<dt>destination_rank</dt><dd>rank of the destination in the service (not rank in path)</dd>
+				/// <dt>destination_global_rank</dt><dd>rank of the destination in the board (includes continuation transfer reached destinations)</dd>
 				/// <dt>transfers</dt><dd>Transfers (content generated by the cms if a transferPage is defined)</dd>
 				/// <dt>subscreen_x</dt><dd>id of the xth sub screen (x replaced by numeric value 0, 1, 2, ... The cms must lauch itself the display for each subscreen.</dd>
 				/// <dt>direction</dt><dd>Direction shown in front of the vehicle</dd>
+				/// <dt>is_continuation</dt><dd>1|0 : 1 if the destination is reached by a continuation transfer</dd>
+				/// <dt>continuation_starts_at_end</dt><dd>1|0 : 1 if the continuation has started where the main service ends</dd>
 				/// </dl>
+				//////////////////////////////////////////////////////////////////////////
+				/// @param stream stream to write the result on
+				/// @param request request which has called the display
+				/// @param page CMS template to use to display each destination of each destination of each service
+				/// @param transferPage CMS template to use to display each transfer destination reachable from each destination of each service
+				/// @param object service pointer representing the link between the start of the service and the destination to display
+				/// @param rank rank of the destination in the service
+				/// @param globalRank rank of the destination in the whole board
+				/// @param transferDestinations transfers reachable by the destination
+				/// @param screen the source object
+				/// @param isContinuation true if the destination is reached by a continuation transfer
+				/// @param continuationStartsAtEnd true if the continuation has started where the main service ends
+				/// @param screen display screen source object
+				/// @author Hugues Romain
+				/// @since 3.2.0
 				static void DisplayDepartureBoardDestination(
 					std::ostream& stream,
 					const server::Request& request,
@@ -369,8 +400,11 @@ namespace synthese
 					bool lastDisplayedStopWasInTheSameCity,
 					bool isTheEndStation,
 					std::size_t rank,
+					std::size_t globalRank,
 					const IntermediateStop::TransferDestinations& transferDestinations,
-					const DisplayScreen::ChildrenType& subscreens
+					const DisplayScreen& screen,
+					bool isContinuation,
+					bool continuationStartsAtEnd
 				);
 
 
@@ -407,7 +441,7 @@ namespace synthese
 					boost::shared_ptr<const cms::Webpage> page,
 					const graph::ServicePointer& object,
 					std::size_t localTransferRank,
-					const DisplayScreen::ChildrenType& subscreens
+					const DisplayScreen& screen
 				);
 
 			//@}
@@ -415,7 +449,7 @@ namespace synthese
 			//! @name Static methods to set CMS page variables for route planning board
 			//@{
 				static const std::string DATA_WITH_TRANSFER;
-
+			public:
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of a route planning board.
 				/// Variables sent to the cms :
@@ -450,6 +484,7 @@ namespace synthese
 					const RoutePlanningListWithAlarm& rows,
 					const DisplayScreen::ChildrenType& subscreens
 				);
+			private:
 
 
 				static const std::string DATA_SECOND_TRACK;

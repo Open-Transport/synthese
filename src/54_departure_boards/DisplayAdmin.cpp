@@ -81,6 +81,7 @@
 #include "Profile.h"
 #include "CreateDisplayScreenAction.h"
 #include "DisplayScreenUpdateDisplayedStopAreaAction.hpp"
+#include "PTPlaceAdmin.h"
 
 #include <utility>
 #include <sstream>
@@ -173,6 +174,11 @@ namespace synthese
 			interfaces::VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
+
+			vector<pair<optional<DisplayScreen::SubScreenType>, string> > subscreenTypeFilterMap;
+			subscreenTypeFilterMap.push_back(make_pair(DisplayScreen::SUB_CONTENT, DisplayScreen::GetSubScreenTypeLabel(DisplayScreen::SUB_CONTENT)));
+			subscreenTypeFilterMap.push_back(make_pair(DisplayScreen::CONTINUATION_TRANSFER, DisplayScreen::GetSubScreenTypeLabel(DisplayScreen::CONTINUATION_TRANSFER)));
+
 			////////////////////////////////////////////////////////////////////
 			// TECHNICAL TAB
 			if (openTabContent(stream, TAB_TECHNICAL))
@@ -203,6 +209,16 @@ namespace synthese
 				if(_displayScreen->getParent())
 				{
 					stream << t.cell("Fils de", _displayScreen->getParent()->getFullName());
+
+					stream <<
+						t.cell(
+							"Rôle",
+							t.getForm().getSelectInput(
+								UpdateDisplayScreenAction::PARAMETER_SUB_SCREEN_TYPE,
+								subscreenTypeFilterMap,
+								optional<DisplayScreen::SubScreenType>(_displayScreen->getSubScreenType())
+						)	)
+					;
 				}
 				stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_NAME, _displayScreen->getName()));
 
@@ -741,6 +757,8 @@ namespace synthese
 
 				AdminFunctionRequest<DisplayAdmin> displayRequest(_request);
 
+				AdminFunctionRequest<PTPlaceAdmin> displayPlaceRequest(_request);
+
 				AdminActionFunctionRequest<CreateDisplayScreenAction,DisplayAdmin> createDisplayRequest(
 					_request
 				);
@@ -753,11 +771,14 @@ namespace synthese
 
 				HTMLTable::ColsVector c;
 				c.push_back("Nom");
+				c.push_back("Rôle");
+				c.push_back("Lieu");
 				c.push_back("ID");
 				c.push_back("Actions");
 				c.push_back("Actions");
 				HTMLTable td(c, ResultHTMLTable::CSS_CLASS);
-				stream << td.open();
+				HTMLForm f(createDisplayRequest.getHTMLForm("create_sub_string"));
+				stream << f.open() << td.open();
 				BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, _displayScreen->getChildren())
 				{
 					const DisplayScreen& screen(*it.second);
@@ -765,15 +786,32 @@ namespace synthese
 					removeDisplayRequest.getAction()->setDisplayScreen(Env::GetOfficialEnv().getSPtr(&screen));
 
 					stream << td.row();
-					stream << td.col() << screen.getName();
+					stream << td.col() << HTMLModule::getHTMLLink(displayRequest.getHTMLForm().getURL(), screen.getName());
+					stream << td.col() << DisplayScreen::GetSubScreenTypeLabel(screen.getSubScreenType());
+					
+					// Displayed place
+					stream << td.col();
+					if(screen.getDisplayedPlace())
+					{
+						displayPlaceRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr(screen.getDisplayedPlace()));
+						stream << HTMLModule::getHTMLLink(displayRequest.getHTMLForm().getURL(), screen.getDisplayedPlace()->getFullName());
+					}
 					stream << td.col() << screen.getKey();
 					stream << td.col() << displayRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "monitor.png");
 					stream << td.col() << removeDisplayRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le contenu "+ screen.getName() + " ?", "monitor_delete.png");
 				}
 
-				stream << td.close();
-
-				stream << createDisplayRequest.getHTMLForm().getLinkButton("Créer un nouveau contenu inclus", string(), "monitor_add.png");
+				// Creation form
+				stream << td.row();
+				stream << td.col() << f.getTextInput(CreateDisplayScreenAction::PARAMETER_NAME, string(), "(nom)");
+				stream << td.col() << f.getSelectInput(
+					CreateDisplayScreenAction::PARAMETER_SUB_SCREEN_TYPE,
+					subscreenTypeFilterMap,
+					optional<DisplayScreen::SubScreenType>(DisplayScreen::SUB_CONTENT)
+				);
+				stream << td.col(2);
+				stream << td.col() << f.getSubmitButton("Ajouter");
+				stream << td.close() << f.close();
 			}
 
 			////////////////////////////////////////////////////////////////////

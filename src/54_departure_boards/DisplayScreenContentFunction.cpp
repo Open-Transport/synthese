@@ -114,7 +114,10 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_IS_SAME_CITY("is_same_city");
 		const string DisplayScreenContentFunction::DATA_IS_END_STATION("is_end_station");
 		const string DisplayScreenContentFunction::DATA_DESTINATION_RANK("destination_rank");
+		const string DisplayScreenContentFunction::DATA_DESTINATION_GLOBAL_RANK("destination_global_rank");
 		const string DisplayScreenContentFunction::DATA_TRANSFERS("transfers");
+		const string DisplayScreenContentFunction::DATA_IS_CONTINUATION("is_continuation");
+		const string DisplayScreenContentFunction::DATA_CONTINUATION_STARTS_AT_END("continuation_starts_at_end");
 
 		const string DisplayScreenContentFunction::DATA_LINE_ID("line_id");
 		const string DisplayScreenContentFunction::DATA_LINE_SHORT_NAME("line_short_name");
@@ -596,28 +599,22 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> destinationPage,
 			boost::shared_ptr<const cms::Webpage> transferPage,
 			const boost::posix_time::ptime& date,
-			const std::string& title,
-			int wiringCode,
-			bool displayServiceNumber,
-			bool displayTrackNumber,
-			bool displayTeam,
-			int intermediatesStopsToDisplay,
-			time_duration blinkingDelay,
-			bool displayClock,
-			const pt::StopArea& place,
 			const ArrivalDepartureListWithAlarm& rows,
-			const DisplayScreen::ChildrenType& subscreens
+			const DisplayScreen& screen
 		){
 			ParametersMap pm;
 			pm.insert(DATA_DATE, to_iso_extended_string(date.date()) + " " + to_simple_string(date.time_of_day()));
-			pm.insert(DATA_TITLE, title);
-			pm.insert(DATA_WIRING_CODE, wiringCode);
-			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, displayServiceNumber);
-			pm.insert(DATA_DISPLAY_TRACK_NUMBER, displayTrackNumber);
-			pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, intermediatesStopsToDisplay);
-			pm.insert(DATA_DISPLAY_TEAM, displayTeam);
-			pm.insert(DATA_STOP_NAME, place.getFullName());
-			pm.insert(DATA_DISPLAY_CLOCK, displayClock);
+			pm.insert(DATA_TITLE, screen.getTitle());
+			pm.insert(DATA_WIRING_CODE, screen.getWiringCode());
+			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.getServiceNumberDisplay());
+			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.getTrackNumberDisplay());
+			if(screen.getType())
+			{
+				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.getType()->getMaxStopsNumber());
+			}
+			pm.insert(DATA_DISPLAY_TEAM, screen.getDisplayTeam());
+			pm.insert(DATA_STOP_NAME, screen.getDisplayedPlace() ? screen.getDisplayedPlace()->getFullName() : string());
+			pm.insert(DATA_DISPLAY_CLOCK, screen.getDisplayClock());
 
 			// Rows
 			if(rowPage.get())
@@ -680,13 +677,8 @@ namespace synthese
 							transferPage,
 							__Rangee,
 							pageNumber,
-							displayTrackNumber,
-							displayServiceNumber,
-							displayTeam,
-							intermediatesStopsToDisplay,
-							blinkingDelay,
 							row,
-							subscreens
+							screen
 						);
 
 						// Incrementation du numero de rangee
@@ -706,9 +698,12 @@ namespace synthese
 
 			// Subscreens
 			size_t subScreenRank(0);
-			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, subscreens)
+			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, screen.getChildren())
 			{
-				pm.insert(DATA_SUBSCREEN_ + lexical_cast<string>(subScreenRank++), it.second->getKey());
+				if(it.second->getSubScreenType() == DisplayScreen::SUB_CONTENT)
+				{
+					pm.insert(DATA_SUBSCREEN_ + lexical_cast<string>(subScreenRank++), it.second->getKey());
+				}
 			}
 
 			// Launch of the display
@@ -727,26 +722,25 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			boost::shared_ptr<const cms::Webpage> destinationPage,
 			boost::shared_ptr<const cms::Webpage> transferPage,
-			int rowId,
+			size_t rowRank,
 			int pageNumber,
-			bool displayQuaiNumber,
-			bool displayServiceNumber,
-			bool displayTeam,
-			int intermediatesStopsToDisplay,
-			time_duration blinkingDelay,
 			const ArrivalDepartureRow& row,
-			const DisplayScreen::ChildrenType& subscreens
+			const DisplayScreen& screen
 		){
 
 			ParametersMap pm;
-			pm.insert(DATA_ROW_RANK, rowId);
+			pm.insert(DATA_ROW_RANK, rowRank);
 			pm.insert(DATA_PAGE_NUMBER, pageNumber);
-			pm.insert(DATA_DISPLAY_TRACK_NUMBER, displayQuaiNumber);
-			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, displayServiceNumber);
-			pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, intermediatesStopsToDisplay);
-			pm.insert(DATA_DISPLAY_TEAM, displayTeam);
+			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.getTrackNumberDisplay());
+			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.getServiceNumberDisplay());
+			if(screen.getType())
+			{
+				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.getType());
+			}
+			pm.insert(DATA_DISPLAY_TEAM, screen.getDisplayTeam());
 			if(row.first.getService())
 			{
+				time_duration blinkingDelay(minutes(screen.getBlinkingDelay()));
 				if(	blinkingDelay.total_seconds() > 0 &&
 					row.first.getDepartureDateTime() - second_clock::local_time() <= blinkingDelay
 				){
@@ -807,11 +801,59 @@ namespace synthese
 							stop.place->getCity() == lastCity,
 							rank + 1 == row.second.size(),
 							rank,
-							row.second.at(rank).transferDestinations,
-							subscreens
+							totalTransferRank,
+							stop.transferDestinations,
+							screen,
+							false,
+							false
 						);
 
 						lastCity = stop.place->getCity();
+
+						if(stop.continuationService.getService())
+						{
+							// Introduction row (is associated with the preceding one : rank does not increment)
+							const IntermediateStop& substop(stop.destinationsReachedByContinuationService.at(0));
+							DisplayDepartureBoardDestination(
+								destinationsStream,
+								request,
+								destinationPage,
+								transferPage,
+								substop.serviceUse,
+								true,
+								false,
+								0,
+								totalTransferRank,
+								substop.transferDestinations,
+								screen,
+								true,
+								rank + 1 == row.second.size()
+							);
+
+							for(size_t subrank(1); subrank < stop.destinationsReachedByContinuationService.size(); ++subrank)
+							{
+								const IntermediateStop& substop(stop.destinationsReachedByContinuationService.at(rank));
+
+								DisplayDepartureBoardDestination(
+									destinationsStream,
+									request,
+									destinationPage,
+									transferPage,
+									substop.serviceUse,
+									substop.place->getCity() == lastCity,
+									subrank + 1 == stop.destinationsReachedByContinuationService.size(),
+									subrank,
+									totalTransferRank,
+									substop.transferDestinations,
+									screen,
+									true,
+									rank + 1 == row.second.size()
+								);
+
+								lastCity = substop.place->getCity();
+							}
+						}
+
 					}
 					pm.insert(DATA_DESTINATIONS, destinationsStream.str());
 				}
@@ -819,9 +861,12 @@ namespace synthese
 
 			// Subscreens
 			size_t subScreenRank(0);
-			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, subscreens)
+			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, screen.getChildren())
 			{
-				pm.insert(DATA_SUBSCREEN_ + lexical_cast<string>(subScreenRank++), it.second->getKey());
+				if(it.second->getSubScreenType() == DisplayScreen::SUB_CONTENT)
+				{
+					pm.insert(DATA_SUBSCREEN_ + lexical_cast<string>(subScreenRank++), it.second->getKey());
+				}
 			}
 
 			// Launch of the display
@@ -843,8 +888,11 @@ namespace synthese
 			bool lastDisplayedStopWasInTheSameCity,
 			bool isTheEndStation,
 			std::size_t rank,
+			std::size_t globalRank,
 			const IntermediateStop::TransferDestinations& transferDestinations,
-			const DisplayScreen::ChildrenType& subscreens
+			const DisplayScreen& screen,
+			bool isContinuation,
+			bool continuationStartsAtEnd
 		){
 			const StopArea* place(dynamic_cast<const StopArea*>(object.getArrivalEdge()->getHub()));
 
@@ -858,7 +906,15 @@ namespace synthese
 			pm.insert(DATA_TIME, to_iso_extended_string(object.getArrivalDateTime().date()) +" "+ to_simple_string(object.getArrivalDateTime().time_of_day()));
 			pm.insert(DATA_IS_END_STATION, isTheEndStation);
 			pm.insert(DATA_DESTINATION_RANK, rank);
+			pm.insert(DATA_DESTINATION_GLOBAL_RANK, globalRank);
 			pm.insert(DATA_DIRECTION, dynamic_cast<const JourneyPattern*>(object.getService()->getPath())->getDirection());
+
+			// Continuation
+			pm.insert(DATA_IS_CONTINUATION, isContinuation);
+			if(isContinuation)
+			{
+				pm.insert(DATA_CONTINUATION_STARTS_AT_END, continuationStartsAtEnd);
+			}
 
 			// Transfers
 			if(transferPage.get())
@@ -875,7 +931,7 @@ namespace synthese
 						transferPage,
 						transferServiceUse,
 						localTransferRank++,
-						subscreens
+						screen
 					);
 				}
 
@@ -884,9 +940,12 @@ namespace synthese
 
 			// Subscreens
 			size_t subScreenRank(0);
-			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, subscreens)
+			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, screen.getChildren())
 			{
-				pm.insert(DATA_SUBSCREEN_ + lexical_cast<string>(subScreenRank++), it.second->getKey());
+				if(it.second->getSubScreenType() == DisplayScreen::SUB_CONTENT)
+				{
+					pm.insert(DATA_SUBSCREEN_ + lexical_cast<string>(subScreenRank++), it.second->getKey());
+				}
 			}
 
 			// Launch of the display
@@ -905,7 +964,7 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			const graph::ServicePointer& object,
 			std::size_t localTransferRank,
-			const DisplayScreen::ChildrenType& subscreens
+			const DisplayScreen& screen
 		){
 			ParametersMap pm;
 
@@ -955,9 +1014,12 @@ namespace synthese
 
 			// Subscreens
 			size_t subScreenRank(0);
-			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, subscreens)
+			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, screen.getChildren())
 			{
-				pm.insert(DATA_SUBSCREEN_ + lexical_cast<string>(subScreenRank++), it.second->getKey());
+				if(it.second->getSubScreenType() == DisplayScreen::SUB_CONTENT)
+				{
+					pm.insert(DATA_SUBSCREEN_ + lexical_cast<string>(subScreenRank++), it.second->getKey());
+				}
 			}
 
 			// Launch of the display
@@ -1059,7 +1121,10 @@ namespace synthese
 			size_t subScreenRank(0);
 			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, subscreens)
 			{
-				pm.insert(DATA_SUBSCREEN_ + lexical_cast<string>(subScreenRank++), it.second->getKey());
+				if(it.second->getSubScreenType() == DisplayScreen::SUB_CONTENT)
+				{
+					pm.insert(DATA_SUBSCREEN_ + lexical_cast<string>(subScreenRank++), it.second->getKey());
+				}
 			}
 
 			// Launch of the display
@@ -1190,7 +1255,10 @@ namespace synthese
 			size_t subScreenRank(0);
 			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, subscreens)
 			{
-				pm.insert(DATA_SUBSCREEN_ + lexical_cast<string>(subScreenRank++), it.second->getKey());
+				if(it.second->getSubScreenType() == DisplayScreen::SUB_CONTENT)
+				{
+					pm.insert(DATA_SUBSCREEN_ + lexical_cast<string>(subScreenRank++), it.second->getKey());
+				}
 			}
 
 			// Launch of the display

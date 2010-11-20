@@ -93,18 +93,25 @@ namespace synthese
 		const pt::StopArea*,
 		std::set<const pt::StopArea*>
 	> TransferDestinationsList;
-	
+
+
+	struct IntermediateStop;
+
+	typedef std::vector<IntermediateStop> ActualDisplayedArrivalsList;
+
 	struct IntermediateStop
 	{
 		typedef std::set<graph::ServicePointer, DeparturesTableServiceUseElementLess> TransferDestinations;
 		const pt::StopArea* place;
 		graph::ServicePointer serviceUse;
 		TransferDestinations transferDestinations;
+		graph::ServicePointer continuationService;
+		ActualDisplayedArrivalsList destinationsReachedByContinuationService;
+
 		IntermediateStop(const pt::StopArea* _place) : place(_place), serviceUse(), transferDestinations() {}
-		IntermediateStop(const pt::StopArea* _place, const graph::ServicePointer& _serviceUse, const TransferDestinations& _transferDestinations) : place(_place), serviceUse(_serviceUse), transferDestinations(_transferDestinations) {}
+		IntermediateStop(const pt::StopArea* _place, const graph::ServicePointer& _serviceUse) : place(_place), serviceUse(_serviceUse) {}
 	};
 
-	typedef std::vector<IntermediateStop> ActualDisplayedArrivalsList;
 	
 	typedef std::map<
 		graph::ServicePointer,

@@ -50,8 +50,7 @@ namespace synthese
 			, const EndFilter& endfilter
 			, const LineFilter& lineFilter
 			, const DisplayedPlacesList& displayedPlacesList
-			, const ForbiddenPlacesList& forbiddenPlaces,
-			const TransferDestinationsList& transferDestinations
+			, const ForbiddenPlacesList& forbiddenPlaces
 			, const ptime& startTime
 			, const ptime& endDateTime
 			, size_t maxSize
@@ -62,7 +61,6 @@ namespace synthese
 			lineFilter,
 			displayedPlacesList,
 			forbiddenPlaces,
-			transferDestinations,
 			startTime,
 			endDateTime,
 			maxSize
@@ -88,7 +86,6 @@ namespace synthese
 					_lineFilter,
 					DisplayedPlacesList(),
 					_forbiddenPlaces,
-					_transferDestinations,
 					_startDateTime,
 					_endDateTime,
 					1

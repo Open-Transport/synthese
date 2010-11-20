@@ -55,19 +55,18 @@ namespace synthese
 
 		public:
 			ForcedDestinationsArrivalDepartureTableGenerator(
-				const PhysicalStops&
-				, const DeparturesTableDirection&
-				, const EndFilter&
-				, const LineFilter&
-				, const DisplayedPlacesList&
-				, const ForbiddenPlacesList&,
-				const TransferDestinationsList&
-				, const boost::posix_time::ptime& startDateTime
-				, const boost::posix_time::ptime& endDateTime
-				, size_t maxSize
-				, const ForcedDestinationsSet&
-				, boost::posix_time::time_duration persistanceDuration
-				);
+				const PhysicalStops&,
+				const DeparturesTableDirection&,
+				const EndFilter&,
+				const LineFilter&,
+				const DisplayedPlacesList&,
+				const ForbiddenPlacesList&,
+				const boost::posix_time::ptime& startDateTime,
+				const boost::posix_time::ptime& endDateTime,
+				size_t maxSize,
+				const ForcedDestinationsSet&,
+				boost::posix_time::time_duration persistanceDuration
+			);
 
 
 			const ArrivalDepartureList& generate();

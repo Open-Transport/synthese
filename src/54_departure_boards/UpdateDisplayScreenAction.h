@@ -27,6 +27,7 @@
 
 #include "Action.h"
 #include "DeparturesTableTypes.h"
+#include "DisplayScreen.h"
 
 namespace synthese
 {
@@ -37,13 +38,22 @@ namespace synthese
 
 	namespace departure_boards
 	{
-		class DisplayScreen;
 		class DisplayType;
 		class DisplayScreenCPU;
 		
-		/** Display screen technical properties update action class.
-			@ingroup m54Actions refActions
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Display screen technical properties update.
+		///	@ingroup m54Actions refActions
+		/// @author Hugues Romain
+		/// Parameters :
+		///		- id : id of the screen to update
+		///		- na : new value for name
+		///		- wc : new value for wiring code
+		///		- ty : new value for display type id
+		///		- cp : new value for com port (number)
+		///		- cu : new value for connected CPU id (optional)
+		///		- ma : new value for mac address (optional)
+		///		- st : new value for type of sub screen (only for screens with parents)
 		class UpdateDisplayScreenAction : public util::FactorableTemplate<server::Action, UpdateDisplayScreenAction>
 		{
 		public:
@@ -54,6 +64,7 @@ namespace synthese
 			static const std::string PARAMETER_COM_PORT;
 			static const std::string PARAMETER_CPU;
 			static const std::string PARAMETER_MAC_ADDRESS;
+			static const std::string PARAMETER_SUB_SCREEN_TYPE;
 
 		private:
 			std::string									_name;
@@ -63,6 +74,7 @@ namespace synthese
 			boost::shared_ptr<const DisplayScreenCPU>	_cpu;
 			int											_comPort;
 			std::string									_macAddress;
+			DisplayScreen::SubScreenType				_subScreenType;
 
 			
 		protected:

@@ -35,10 +35,6 @@ namespace synthese
 	namespace pt
 	{
 		class JourneyPattern;
-	}
-
-	namespace pt
-	{
 		class StopPoint;
 	}
 
@@ -74,7 +70,6 @@ namespace synthese
 				const EndFilter					_endFilter;
 				const LineFilter				_lineFilter;
 				const ForbiddenPlacesList		_forbiddenPlaces;
-				const TransferDestinationsList	_transferDestinations;
 				const boost::posix_time::ptime	_startDateTime;
 				const boost::posix_time::ptime	_endDateTime;
 				const size_t					_maxSize;	//!< Maximal size of the departure table according to the demand rules.
@@ -103,16 +98,15 @@ namespace synthese
 				@param maxSize Maximal size of the departure table (default = unlimited).
 			*/
 			ArrivalDepartureTableGenerator(
-				const PhysicalStops&
-				, const DeparturesTableDirection&
-				, const EndFilter&
-				, const LineFilter&
-				, const DisplayedPlacesList&
-				, const ForbiddenPlacesList&,
-				const TransferDestinationsList&
-				, const boost::posix_time::ptime& startDateTime
-				, const boost::posix_time::ptime& endDateTime
-				, size_t maxSize = UNLIMITED_SIZE
+				const PhysicalStops&,
+				const DeparturesTableDirection&,
+				const EndFilter&,
+				const LineFilter&,
+				const DisplayedPlacesList&,
+				const ForbiddenPlacesList&,
+				const boost::posix_time::ptime& startDateTime,
+				const boost::posix_time::ptime& endDateTime,
+				size_t maxSize = UNLIMITED_SIZE
 			);
 
 		public:
