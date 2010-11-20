@@ -10,6 +10,8 @@ test ! -x /etc/init.d/s3-server || /etc/init.d/s3-server stop
 
 test ! -x /etc/init.d/s3-server || /etc/init.d/s3-server start
 
+/etc/init.d/apache2 reload 
+
 exit 0
 
 
