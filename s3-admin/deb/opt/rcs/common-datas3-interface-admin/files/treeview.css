@@ -1,0 +1,31 @@
+img.node 
+{
+	cursor:pointer;
+}
+
+div.hiddensubnode
+{
+	display:none;
+}
+
+div.visiblesubnode
+{
+	display:block;
+}
+
+div.libelle
+{
+	display:inline-block;
+	float:left;
+}
+
+div.row
+{
+	float:left;
+}
+
+a.link
+{
+	display:inline-block;
+	overflow:auto;
+}

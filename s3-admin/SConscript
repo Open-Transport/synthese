@@ -1,0 +1,10 @@
+Import ('env')
+
+DebianPaquetProject(
+	env,
+	'common-datas3-interface-admin',
+	'3.1.10',
+	dependencies = ['s3-server.cppbin'],
+	extra_dependencies = [('apache2', '2.2.3-4'), ('sqlite3','3.4.2')],
+	architecture = 'all'
+)

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+source /etc/opt/rcs/s3-server.conf
+
+test ! -x /etc/init.d/s3-server || /etc/init.d/s3-server stop
+
+/usr/bin/sqlite3 $S3_SERVER_DB_FILE < /opt/rcs/common-datas3-interface-admin/remove.sql
+
+
+test ! -x /etc/init.d/s3-server || /etc/init.d/s3-server start
+
+VHOST_FILE=/etc/apache2/sites-available/default
+grep -q "common-datas3-interface-admin/apache2.conf" $VHOST_FILE && ( sed --in-place "s/Include \/opt\/rcs\/common-datas3-interface-admin\/apache2.conf//" $VHOST_FILE && /etc/init.d/apache2 reload )
+exit 0
+
+
+
+
+
+
+
+
