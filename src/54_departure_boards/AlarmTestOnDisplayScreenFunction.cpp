@@ -136,7 +136,6 @@ namespace synthese
 				lineStop.setPhysicalStop(&ps);
 				ptime d(second_clock::local_time());
 
-				IntermediateStop::TransferDestinations emptyTransferDestinations;
 				for (int i(0); i<_type->getRowNumber(); ++i)
 				{
 					ServicePointer sp(false, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET, s, d);
@@ -144,8 +143,8 @@ namespace synthese
 					sp.setArrivalInformations(lineStop, d, d, ps);
 					ActualDisplayedArrivalsList destinations;
 
-					destinations.push_back(IntermediateStop(&place, sp, emptyTransferDestinations));
-					destinations.push_back(IntermediateStop(&place, sp, emptyTransferDestinations));
+					destinations.push_back(IntermediateStop(&place, sp));
+					destinations.push_back(IntermediateStop(&place, sp));
 
 					displayedObject.map.insert(
 						make_pair(
