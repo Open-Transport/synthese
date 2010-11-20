@@ -10,8 +10,6 @@ test ! -x /etc/init.d/s3-server || /etc/init.d/s3-server stop
 
 test ! -x /etc/init.d/s3-server || /etc/init.d/s3-server start
 
-VHOST_FILE=/etc/apache2/sites-available/default
-grep -q "s3-admin/apache2.conf" $VHOST_FILE && ( sed --in-place "s/Include \/opt\/rcs\/s3-admin\/apache2.conf//" $VHOST_FILE && /etc/init.d/apache2 reload )
 exit 0
 
 
