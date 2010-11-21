@@ -369,7 +369,7 @@ namespace synthese
 					if(	journey.size() == approachJourney.size() + 1)
 					{
 						bool ok(true);
-						for(size_t i(0); i+1<approachJourney.size(); ++i)
+						for(size_t i(0); i<approachJourney.size(); ++i)
 						{
 							if(	journey.getJourneyLeg(i).getArrivalEdge()->getFromVertex()->getHub() != approachJourney.getJourneyLeg(i).getArrivalEdge()->getFromVertex()->getHub() ||
 								journey.getJourneyLeg(i).getDepartureEdge()->getFromVertex()->getHub() != approachJourney.getJourneyLeg(i).getDepartureEdge()->getFromVertex()->getHub() ||
@@ -656,27 +656,37 @@ namespace synthese
 		DisplayScreen::Labels DisplayScreen::getSortedAvaliableDestinationsLabels(
 			const DisplayedPlacesList& placesToAvoid
 		) const {
-			map<std::string, std::pair<RegistryKeyType, string> > m;
-			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, getPhysicalStops())
+			set<const DisplayScreen*> screens;
+			screens.insert(this);
+			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, getChildren())
 			{
-				const StopPoint* p(it.second);
-				const Vertex::Edges& edges = p->getDepartureEdges();
-				BOOST_FOREACH(const Vertex::Edges::value_type& e, edges)
+				if(it.second->getSubScreenType() == DisplayScreen::CONTINUATION_TRANSFER)
 				{
-					for(const Edge* edge= e.second->getFollowingArrivalForFineSteppingOnly();
-						edge != NULL;
-						edge = edge->getFollowingArrivalForFineSteppingOnly()
-					){
-						m.insert(
-							make_pair(
-								dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName(),
-								make_pair(
-									dynamic_cast<const pt::StopArea*>(edge->getHub())->getKey(),
-									dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName()
-						)	)	);
-					}
+					screens.insert(it.second);
 				}
 			}
+
+			map<std::string, std::pair<RegistryKeyType, string> > m;
+			BOOST_FOREACH(const DisplayScreen* screen, screens)
+			{
+				BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, getPhysicalStops())
+				{
+					const StopPoint* p(it.second);
+					const Vertex::Edges& edges = p->getDepartureEdges();
+					BOOST_FOREACH(const Vertex::Edges::value_type& e, edges)
+					{
+						for(const Edge* edge= e.second->getFollowingArrivalForFineSteppingOnly();
+							edge != NULL;
+							edge = edge->getFollowingArrivalForFineSteppingOnly()
+						){
+							m.insert(
+								make_pair(
+									dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName(),
+									make_pair(
+										dynamic_cast<const pt::StopArea*>(edge->getHub())->getKey(),
+										dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName()
+							)	)	);
+			}	}	}	}
 			Labels v;
 			for (map<string, pair<RegistryKeyType, string> >::const_iterator it2 = m.begin(); it2 != m.end(); ++it2)
 			{
