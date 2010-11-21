@@ -75,7 +75,12 @@ namespace synthese
 			const std::string& cityName,
 			const std::string& placeName
 		){
-			return ExtendedFetchPlaces(citiesMatcher, cityName, placeName, 1).front();
+			RoadModule::ExtendedFetchPlacesResult result(ExtendedFetchPlaces(citiesMatcher, cityName, placeName, 1));
+			if(result.empty())
+			{
+				throw Exception("No place was found");
+			}
+			return result.front();
 		}
 
 

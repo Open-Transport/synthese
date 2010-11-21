@@ -44,6 +44,7 @@
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
 #include "Webpage.h"
+#include "PTObjectsCMSExporters.hpp"
 
 #include <sstream>
 
@@ -107,10 +108,6 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_DESTINATIONS("destinations");
 		const string DisplayScreenContentFunction::DATA_DIRECTION("direction");
 		
-		const string DisplayScreenContentFunction::DATA_STOP_ID("stop_id");
-		const string DisplayScreenContentFunction::DATA_CITY_NAME("city_name");
-		const string DisplayScreenContentFunction::DATA_STOP_NAME_26("stop_name_26");
-		const string DisplayScreenContentFunction::DATA_STOP_NAME_13("stop_name_13");
 		const string DisplayScreenContentFunction::DATA_IS_SAME_CITY("is_same_city");
 		const string DisplayScreenContentFunction::DATA_IS_END_STATION("is_end_station");
 		const string DisplayScreenContentFunction::DATA_DESTINATION_RANK("destination_rank");
@@ -119,10 +116,6 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_IS_CONTINUATION("is_continuation");
 		const string DisplayScreenContentFunction::DATA_CONTINUATION_STARTS_AT_END("continuation_starts_at_end");
 
-		const string DisplayScreenContentFunction::DATA_LINE_ID("line_id");
-		const string DisplayScreenContentFunction::DATA_LINE_SHORT_NAME("line_short_name");
-		const string DisplayScreenContentFunction::DATA_LINE_CSS("line_css");
-		const string DisplayScreenContentFunction::DATA_LINE_IMG("line_img");
 		const string DisplayScreenContentFunction::DATA_DEPARTURE_TIME("departure_time");
 		const string DisplayScreenContentFunction::DATA_ARRIVAL_TIME("arrival_time");
 		const string DisplayScreenContentFunction::DATA_TRANSFER_RANK("transfer_rank");
@@ -132,9 +125,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_SECOND_TRACK("second_track");
 		const string DisplayScreenContentFunction::DATA_SECOND_SERVICE_NUMBER("second_service_number");
 		const string DisplayScreenContentFunction::DATA_SECOND_TIME("second_time");
-		const string DisplayScreenContentFunction::DATA_SECOND_LINE_SHORT_NAME("second_line_short_name");
-		const string DisplayScreenContentFunction::DATA_SECOND_LINE_IMG("second_line_img");
-		const string DisplayScreenContentFunction::DATA_SECOND_LINE_CSS("second_line_css");
+		const string DisplayScreenContentFunction::DATA_SECOND_("second_");
 		const string DisplayScreenContentFunction::DATA_SECOND_TRANSPORT_MODE("second_transport_mode");
 		const string DisplayScreenContentFunction::DATA_TRANSFER_STOP_NAME("transfer_stop_name");
 
@@ -772,6 +763,9 @@ namespace synthese
 					row.first.getService()->getTeam()
 				);
 
+				// Line
+				PTObjectsCMSExporters::ExportLine(pm, dynamic_cast<const CommercialLine&>(*row.first.getService()->getPath()->getPathGroup()));
+
 				// Transport mode
 				const JourneyPattern* line(static_cast<const JourneyPattern*>(row.first.getService()->getPath()));
 				if(line->getRollingStock())
@@ -832,7 +826,7 @@ namespace synthese
 
 							for(size_t subrank(1); subrank < stop.destinationsReachedByContinuationService.size(); ++subrank)
 							{
-								const IntermediateStop& substop(stop.destinationsReachedByContinuationService.at(rank));
+								const IntermediateStop& substop(stop.destinationsReachedByContinuationService.at(subrank));
 
 								DisplayDepartureBoardDestination(
 									destinationsStream,
@@ -849,11 +843,12 @@ namespace synthese
 									true,
 									rank + 1 == row.second.size()
 								);
+								++totalTransferRank;
 
 								lastCity = substop.place->getCity();
 							}
 						}
-
+						++totalTransferRank;
 					}
 					pm.insert(DATA_DESTINATIONS, destinationsStream.str());
 				}
@@ -894,16 +889,15 @@ namespace synthese
 			bool isContinuation,
 			bool continuationStartsAtEnd
 		){
-			const StopArea* place(dynamic_cast<const StopArea*>(object.getArrivalEdge()->getHub()));
+			const StopArea* place(
+				dynamic_cast<const StopArea*>(
+					(rank ? object.getArrivalEdge() : object.getDepartureEdge())->getHub()
+			)	);
 
 			ParametersMap pm;
-			pm.insert(DATA_STOP_ID, place->getKey());
-			pm.insert(DATA_CITY_NAME, place->getCity()->getName());
-			pm.insert(DATA_STOP_NAME, place->getName());
-			pm.insert(DATA_STOP_NAME_26, place->getName26());
-			pm.insert(DATA_STOP_NAME_13, place->getName13());
+			PTObjectsCMSExporters::ExportStopArea(pm, *place);
 			pm.insert(DATA_IS_SAME_CITY, lastDisplayedStopWasInTheSameCity);
-			pm.insert(DATA_TIME, to_iso_extended_string(object.getArrivalDateTime().date()) +" "+ to_simple_string(object.getArrivalDateTime().time_of_day()));
+			pm.insert(DATA_TIME, to_iso_extended_string((rank ? object.getArrivalDateTime() : object.getDepartureDateTime()).date()) +" "+ to_simple_string((rank ? object.getArrivalDateTime() : object.getDepartureDateTime()).time_of_day()));
 			pm.insert(DATA_IS_END_STATION, isTheEndStation);
 			pm.insert(DATA_DESTINATION_RANK, rank);
 			pm.insert(DATA_DESTINATION_GLOBAL_RANK, globalRank);
@@ -977,18 +971,8 @@ namespace synthese
 				pm.insert(DATA_TRANSPORT_MODE, line->getRollingStock()->getKey());
 			}
 
-			pm.insert(DATA_LINE_ID, line->getCommercialLine()->getKey());
-			pm.insert(DATA_LINE_SHORT_NAME, line->getCommercialLine()->getShortName());
-			pm.insert(DATA_LINE_CSS, line->getCommercialLine()->getStyle());
-			pm.insert(DATA_LINE_IMG, line->getCommercialLine()->getImage());
-			pm.insert(DATA_STOP_ID, place->getKey());
-			if(place->getCity())
-			{
-				pm.insert(DATA_CITY_NAME, place->getCity()->getName());
-			}
-			pm.insert(DATA_STOP_NAME, place->getName());
-			pm.insert(DATA_STOP_NAME_26, place->getName26());
-			pm.insert(DATA_STOP_NAME_13, place->getName13());
+			PTObjectsCMSExporters::ExportLine(pm, *line->getCommercialLine());
+			PTObjectsCMSExporters::ExportStopArea(pm, *place);
 			
 			{ // Departure time
 				stringstream s;
@@ -1055,8 +1039,7 @@ namespace synthese
 			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, displayServiceNumber);
 			pm.insert(DATA_DISPLAY_TRACK_NUMBER, displayTrackNumber);
 			pm.insert(DATA_WITH_TRANSFER, withTransfer);
-			pm.insert(DATA_STOP_ID, place.getKey());
-			pm.insert(DATA_STOP_NAME, place.getFullName());
+			PTObjectsCMSExporters::ExportStopArea(pm, place);
 			pm.insert(DATA_DISPLAY_CLOCK, displayClock);
 
 			// Rows
@@ -1197,10 +1180,7 @@ namespace synthese
 				}
 
 				// Line
-				const CommercialLine* line(static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine());
-				pm.insert(DATA_LINE_SHORT_NAME, line->getShortName());
-				pm.insert(DATA_LINE_IMG, line->getImage());
-				pm.insert(DATA_LINE_CSS, line->getStyle());
+				PTObjectsCMSExporters::ExportLine(pm, *static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine());
 
 				// Transport mode
 				const JourneyPattern* jp(static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath()));
@@ -1219,10 +1199,11 @@ namespace synthese
 					str << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().minutes();
 					pm.insert(DATA_SECOND_TIME, str.str());
 
-					const CommercialLine* line(static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine());
-					pm.insert(DATA_SECOND_LINE_SHORT_NAME, line->getShortName());
-					pm.insert(DATA_SECOND_LINE_IMG, line->getImage());
-					pm.insert(DATA_SECOND_LINE_CSS, line->getStyle());
+					PTObjectsCMSExporters::ExportLine(
+						pm,
+						*static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine(),
+						DATA_SECOND_
+					);
 
 					const JourneyPattern* jp(static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath()));
 					if(jp->getRollingStock())
@@ -1278,10 +1259,7 @@ namespace synthese
 			const pt::StopArea& place
 		){
 			ParametersMap pm;
-			pm.insert(DATA_CITY_NAME, place.getCity()->getName());
-			pm.insert(DATA_STOP_NAME, place.getName());
-			pm.insert(DATA_STOP_NAME_13, place.getName13());
-			pm.insert(DATA_STOP_NAME_26, place.getName26());
+			PTObjectsCMSExporters::ExportStopArea(pm, place);
 
 			// Launch of the display
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);

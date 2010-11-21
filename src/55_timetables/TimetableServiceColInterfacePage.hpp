@@ -98,10 +98,6 @@ namespace synthese
 			static const std::string DATA_ROW_RANK;
 			static const std::string DATA_ROW_RANK_IS_ODD;
 			static const std::string DATA_CELL_RANK;
-			static const std::string DATA_LINE_SHORT_NAME;
-			static const std::string DATA_LINE_COLOR;
-			static const std::string DATA_LINE_STYLE;
-			static const std::string DATA_LINE_IMAGE;
 			static const std::string DATA_CITY_ID;
 			static const std::string DATA_CITY_NAME;
 			static const std::string DATA_PLACE_ID;

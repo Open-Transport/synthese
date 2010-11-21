@@ -41,6 +41,7 @@
 #include "RollingStock.h"
 #include "StopArea.hpp"
 #include "RoadPlace.h"
+#include "PTObjectsCMSExporters.hpp"
 
 #include <sstream>
 #include <set>
@@ -126,11 +127,6 @@ namespace synthese
 		const string JourneyBoardInterfacePage::DATA_HANDICAPPED_PLACES_NUMBER("handicapped_places_number");
 		const string JourneyBoardInterfacePage::DATA_BIKE_FILTER_STATUS("bike_filter_status");
 		const string JourneyBoardInterfacePage::DATA_BIKE_PLACES_NUMBER("bike_places_number");
-		const string JourneyBoardInterfacePage::DATA_LINE_SHORT_NAME("line_short_name");
-		const string JourneyBoardInterfacePage::DATA_LINE_LONG_NAME("line_long_name");
-		const string JourneyBoardInterfacePage::DATA_LINE_IMAGE("line_image");
-		const string JourneyBoardInterfacePage::DATA_LINE_ID("line_id");
-		const string JourneyBoardInterfacePage::DATA_LINE_STYLE("line_style");
 
 
 		void JourneyBoardInterfacePage::Display(
@@ -142,13 +138,13 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> serviceCellPage,
 			boost::shared_ptr<const cms::Webpage> junctionPage,
 			const server::Request& request,
-			size_t n
-			, const Journey& journey
-			, const Place& departurePlace
-			, const Place& arrivalPlace
-			, logic::tribool handicappedFilter
-			, logic::tribool bikeFilter
-			, bool isTheLast
+			size_t n,
+			const Journey& journey,
+			const Place& departurePlace,
+			const Place& arrivalPlace,
+			logic::tribool handicappedFilter,
+			logic::tribool bikeFilter,
+			bool isTheLast
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
@@ -620,15 +616,11 @@ namespace synthese
 					lexical_cast<string>(*serviceUse.getUseRule().getAccessCapacity ()) :
 				"9999"
 			); // 11
-			pm.insert(DATA_LINE_SHORT_NAME, commercialLine->getShortName() ); // 12
-			pm.insert(DATA_LINE_LONG_NAME, commercialLine->getLongName() ); // 13
+			PTObjectsCMSExporters::ExportLine(pm, *commercialLine);
 			if(continuousService)
 			{
 				pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, continuousService->getMaxWaitingTime().total_seconds() / 60);
 			}
-			pm.insert(DATA_LINE_STYLE, commercialLine->getStyle() ); //15
-			pm.insert(DATA_LINE_IMAGE, commercialLine->getImage() );
-			pm.insert(DATA_LINE_ID, commercialLine->getKey()); // 17
 			if(alarm)
 			{
 				pm.insert(DATA_ALARM_MESSAGE, alarm->getLongMessage());
