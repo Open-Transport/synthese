@@ -167,6 +167,14 @@ namespace synthese
 			;
 			stream <<
 				t.cell(
+					"Page CMS pour parser les résultats de monitoring",
+					t.getForm().getTextInput(
+						UpdateDisplayTypeAction::PARAMETER_MONITORING_PARSER_PAGE_ID,
+						_type->getMonitoringParserPage() ? lexical_cast<string>(_type->getMonitoringParserPage()->getKey()) : string()
+				)	)
+			;
+			stream <<
+				t.cell(
 					"Rangées",
 					t.getForm().getSelectNumberInput(
 						UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER,

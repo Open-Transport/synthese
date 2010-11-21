@@ -231,7 +231,7 @@ namespace synthese
 							_forbiddenArrivalPlaces,
 							startTime,
 							endTime,
-							_displayType->getRowNumber()
+							rootCall ? _displayType->getRowNumber() : 1
 				)	)	);
 				break;
 
@@ -247,7 +247,7 @@ namespace synthese
 							_forbiddenArrivalPlaces,
 							startTime,
 							endTime,
-							_displayType->getRowNumber(),
+							rootCall ? _displayType->getRowNumber() : 1,
 							_forcedDestinations,
 							minutes(_destinationForceDelay)
 				)	)	);
@@ -268,12 +268,13 @@ namespace synthese
 						continue;
 					}
 
+					Journey rootJourney(Journey(), itDest->serviceUse);
+
 					// Transfers at destinations
 					if(rootCall)
 					{
-						Journey approachJourney;
 						itDest->transferDestinations = _generateTransferDestinations(
-							approachJourney,
+							rootJourney,
 							*itDest->place,
 							startTime,
 							endTime
@@ -299,17 +300,21 @@ namespace synthese
 
 							if(rootCall)
 							{
-								BOOST_FOREACH(ActualDisplayedArrivalsList::value_type& item, itDest->destinationsReachedByContinuationService)
+								for(ArrivalDepartureList::mapped_type::iterator item(itDest->destinationsReachedByContinuationService.begin()); item != itDest->destinationsReachedByContinuationService.end(); ++item)
 								{
-									Journey approachJourney(Journey(), itDest->serviceUse);
-									item.transferDestinations = _generateTransferDestinations(
+									if(item == itDest->destinationsReachedByContinuationService.begin())
+									{
+										continue;
+									}
+
+									Journey approachJourney(rootJourney, item->serviceUse);
+									item->transferDestinations = _generateTransferDestinations(
 										approachJourney,
-										*item.place,
+										*item->place,
 										startTime,
 										endTime
 									);
-								}
-							}
+							}	}
 						}
 					}
 			}	}
@@ -364,7 +369,7 @@ namespace synthese
 					if(	journey.size() == approachJourney.size() + 1)
 					{
 						bool ok(true);
-						for(size_t i(0); i<approachJourney.size(); ++i)
+						for(size_t i(0); i+1<approachJourney.size(); ++i)
 						{
 							if(	journey.getJourneyLeg(i).getArrivalEdge()->getFromVertex()->getHub() != approachJourney.getJourneyLeg(i).getArrivalEdge()->getFromVertex()->getHub() ||
 								journey.getJourneyLeg(i).getDepartureEdge()->getFromVertex()->getHub() != approachJourney.getJourneyLeg(i).getDepartureEdge()->getFromVertex()->getHub() ||
@@ -924,7 +929,7 @@ namespace synthese
 		{
 			switch(value)
 			{
-			case SUB_CONTENT: return "Elément de contenu";
+			case SUB_CONTENT: return "ElÃ©ment de contenu";
 			case CONTINUATION_TRANSFER: return "Correspondance continue";
 			}
 			return string();

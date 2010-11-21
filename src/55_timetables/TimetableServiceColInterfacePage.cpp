@@ -34,6 +34,7 @@
 #include "WebPageDisplayFunction.h"
 #include "RollingStock.h"
 #include "JourneyPattern.hpp"
+#include "PTObjectsCMSExporters.hpp"
 
 #include <boost/date_time/time_duration.hpp>
 
@@ -62,10 +63,6 @@ namespace synthese
 		const string TimetableServiceColInterfacePage::DATA_ROW_RANK("row_rank");
 		const string TimetableServiceColInterfacePage::DATA_ROW_RANK_IS_ODD("row_rank_is_odd");
 		const string TimetableServiceColInterfacePage::DATA_CELL_RANK("cell_rank");
-		const string TimetableServiceColInterfacePage::DATA_LINE_SHORT_NAME("line_short_name");
-		const string TimetableServiceColInterfacePage::DATA_LINE_COLOR("line_color");
-		const string TimetableServiceColInterfacePage::DATA_LINE_STYLE("line_style");
-		const string TimetableServiceColInterfacePage::DATA_LINE_IMAGE("line_image");
 		const string TimetableServiceColInterfacePage::DATA_CITY_ID("city_id");
 		const string TimetableServiceColInterfacePage::DATA_CITY_NAME("city_name");
 		const string TimetableServiceColInterfacePage::DATA_PLACE_ID("place_id");
@@ -149,13 +146,7 @@ namespace synthese
 			pm.insert(DATA_CELL_RANK, colRank); //1
 			pm.insert(DATA_ROW_RANK, 0); //2
 			pm.insert(Request::PARAMETER_OBJECT_ID, object.getKey()); //3
-			pm.insert(DATA_LINE_SHORT_NAME, object.getShortName()); //4
-			if(object.getColor())
-			{
-				pm.insert(DATA_LINE_COLOR, object.getColor()->toString()); //5
-			}
-			pm.insert(DATA_LINE_STYLE, object.getStyle()); //6
-			pm.insert(DATA_LINE_IMAGE, object.getImage()); //7
+			PTObjectsCMSExporters::ExportLine(pm, object);
 
 			displayRequest.getFunction()->setAditionnalParametersMap(pm);
 			displayRequest.run(stream);
@@ -344,7 +335,7 @@ namespace synthese
 				pm.insert(DATA_NOTE_NUMBER, column.getWarning()->getNumber()); //3
 				pm.insert(DATA_NOTE_TEXT, column.getWarning()->getText()); //4
 			}
-			if(column.getLine())
+			if(column.getLine() && column.getLine()->getRollingStock())
 			{
 				pm.insert(DATA_TRANSPORT_MODE_ID, column.getLine()->getRollingStock()->getKey());
 			}

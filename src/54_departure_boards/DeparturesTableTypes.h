@@ -108,7 +108,6 @@ namespace synthese
 		graph::ServicePointer continuationService;
 		ActualDisplayedArrivalsList destinationsReachedByContinuationService;
 
-		IntermediateStop(const pt::StopArea* _place) : place(_place), serviceUse(), transferDestinations() {}
 		IntermediateStop(const pt::StopArea* _place, const graph::ServicePointer& _serviceUse) : place(_place), serviceUse(_serviceUse) {}
 	};
 

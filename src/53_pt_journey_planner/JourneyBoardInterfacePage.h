@@ -231,11 +231,6 @@ namespace synthese
 				static const std::string DATA_HANDICAPPED_PLACES_NUMBER;
 				static const std::string DATA_BIKE_FILTER_STATUS;
 				static const std::string DATA_BIKE_PLACES_NUMBER;
-				static const std::string DATA_LINE_SHORT_NAME;
-				static const std::string DATA_LINE_LONG_NAME;
-				static const std::string DATA_LINE_STYLE;
-				static const std::string DATA_LINE_IMAGE;
-				static const std::string DATA_LINE_ID;
 				static const std::string DATA_CONTINUOUS_SERVICE_WAITING;
 			//@}
 

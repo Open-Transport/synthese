@@ -64,6 +64,7 @@ namespace synthese
 		const string DisplayTypeTableSync::COL_DISPLAY_ROW_PAGE_ID("display_row_page_id");
 		const string DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID("display_destination_page_id");
 		const string DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID("display_transfer_destination_page_id");
+		const string DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID("monitoring_parser_page_id");
 	}
 
 	namespace db
@@ -86,6 +87,7 @@ namespace synthese
 			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_ROW_PAGE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
@@ -204,6 +206,20 @@ namespace synthese
 				{
 					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, e);
 				}
+
+				try
+				{
+					object->setMonitoringParserPage(NULL);
+					util::RegistryKeyType id(rows->getLongLong(DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID));
+					if (id > 0)
+					{
+						object->setMonitoringParserPage(WebPageTableSync::Get(id, env, linkLevel).get());
+					}
+				}
+				catch (ObjectNotFoundException<Webpage>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID, e);
+				}
 			}
 		}
 
@@ -230,6 +246,7 @@ namespace synthese
 			query.addField(object->getDisplayRowPage() ? object->getDisplayRowPage()->getKey() : RegistryKeyType(0));
 			query.addField(object->getDisplayDestinationPage() ? object->getDisplayDestinationPage()->getKey() : RegistryKeyType(0));
 			query.addField(object->getDisplayTransferDestinationPage() ? object->getDisplayTransferDestinationPage()->getKey() : RegistryKeyType(0));
+			query.addField(object->getMonitoringParserPage() ? object->getMonitoringParserPage()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}
 

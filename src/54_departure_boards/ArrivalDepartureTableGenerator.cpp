@@ -111,7 +111,7 @@ namespace synthese
 			const StopArea* place(curLinestop->getPhysicalStop()->getConnectionPlace());
 
 			// Adding of the beginning place
-			arrivals.push_back(IntermediateStop(place));
+			arrivals.push_back(IntermediateStop(place, servicePointer));
 			encounteredPlaces.insert(place);
 			AccessParameters ap;
 

@@ -76,6 +76,7 @@ namespace synthese
 			const cms::Webpage* _displayRowPage;
 			const cms::Webpage* _displayDestinationPage;
 			const cms::Webpage* _displayTransferDestinationPage;
+			const cms::Webpage* _monitoringParserPage;
 
 		public:
 			
@@ -103,6 +104,7 @@ namespace synthese
 				const cms::Webpage* getDisplayRowPage() const { return _displayRowPage; }
 				const cms::Webpage* getDisplayDestinationPage() const { return _displayDestinationPage; }
 				const cms::Webpage* getDisplayTransferDestinationPage() const { return _displayTransferDestinationPage; }
+				const cms::Webpage* getMonitoringParserPage() const { return _monitoringParserPage; }
 			//@}
 
 			//! @name Setters
@@ -118,6 +120,7 @@ namespace synthese
 				void setDisplayRowPage(const cms::Webpage* value){ _displayRowPage = value; }
 				void setDisplayDestinationPage(const cms::Webpage* value){ _displayDestinationPage = value; }
 				void setDisplayTransferDestinationPage(const cms::Webpage* value){ _displayTransferDestinationPage = value; }
+				void setMonitoringParserPage(const cms::Webpage* value){ _monitoringParserPage = value; }
 			//@}
 		};
 	}

@@ -57,6 +57,7 @@ namespace synthese
 			static const std::string COL_DISPLAY_ROW_PAGE_ID;
 			static const std::string COL_DISPLAY_DESTINATION_PAGE_ID;
 			static const std::string COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID;
+			static const std::string COL_MONITORING_PARSER_PAGE_ID;
 
 
 			////////////////////////////////////////////////////////////////////
