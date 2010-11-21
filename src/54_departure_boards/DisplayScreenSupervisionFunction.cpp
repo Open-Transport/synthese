@@ -30,6 +30,8 @@
 #include "DisplayMonitoringStatus.h"
 #include "DisplayMonitoringStatusTableSync.h"
 #include "Interface.h"
+#include "StaticFunctionRequest.h"
+#include "WebPageDisplayFunction.h"
 
 #include <assert.h>
 #include <sstream>
@@ -43,6 +45,7 @@ namespace synthese
 	using namespace server;
 	using namespace dblog;
 	using namespace interfaces;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,departure_boards::DisplayScreenSupervisionFunction>::FACTORY_KEY("tds");
 
@@ -50,6 +53,8 @@ namespace synthese
 	{
 		const std::string DisplayScreenSupervisionFunction::PARAMETER_DISPLAY_SCREEN_ID = "tb";
 		const std::string DisplayScreenSupervisionFunction::PARAMETER_STATUS = "status";
+		
+		const std::string DisplayScreenSupervisionFunction::DATA_TEXT = "text";
 		
 
 
@@ -157,5 +162,27 @@ namespace synthese
 		{
 			return "text/plain";
 		}
-	}
-}
+
+
+
+		void DisplayScreenSupervisionFunction::Display(
+			std::ostream& stream,
+			const server::Request& request,
+			boost::shared_ptr<const cms::Webpage> page,
+			const std::string& textToParse
+		){
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
+
+			pm.insert(DATA_TEXT, textToParse);
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+}	}

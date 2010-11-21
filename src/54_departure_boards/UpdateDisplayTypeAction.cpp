@@ -73,6 +73,7 @@ namespace synthese
 		const string UpdateDisplayTypeAction::PARAMETER_DISPLAY_ROW_PAGE_ID(Action_PARAMETER_PREFIX + "rp");
 		const string UpdateDisplayTypeAction::PARAMETER_DISPLAY_DESTINATION_PAGE_ID(Action_PARAMETER_PREFIX + "dp");
 		const string UpdateDisplayTypeAction::PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID(Action_PARAMETER_PREFIX + "tp");
+		const string UpdateDisplayTypeAction::PARAMETER_MONITORING_PARSER_PAGE_ID(Action_PARAMETER_PREFIX + "pp");
 
 
 		ParametersMap UpdateDisplayTypeAction::getParametersMap() const
@@ -100,6 +101,10 @@ namespace synthese
 			if(_displayTransferDestinationPage.get())
 			{
 				map.insert(PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, _displayTransferDestinationPage->getKey());
+			}
+			if(_monitoringParserPage.get())
+			{
+				map.insert(PARAMETER_MONITORING_PARSER_PAGE_ID, _monitoringParserPage->getKey());
 			}
 			return map;
 		}
@@ -186,6 +191,18 @@ namespace synthese
 									throw ActionException("No such destination sorting page");
 								}
 							}
+							RegistryKeyType pid(map.getDefault<RegistryKeyType>(PARAMETER_MONITORING_PARSER_PAGE_ID, 0));
+							if(pid)
+							{
+								try
+								{
+									_monitoringParserPage = WebPageTableSync::Get(pid, *_env);
+								}
+								catch (ObjectNotFoundException<Webpage>&)
+								{
+									throw ActionException("No such monitoring parser page");
+								}
+							}
 						}
 					}
 				}
@@ -255,6 +272,12 @@ namespace synthese
 				(_dt->getDisplayTransferDestinationPage() != NULL) ? _dt->getDisplayTransferDestinationPage()->getFullName() : "(aucune)",
 				(_displayTransferDestinationPage.get() != NULL) ? _displayTransferDestinationPage->getFullName() : "(aucune)"
 			);
+			DBLogModule::appendToLogIfChange(
+				log,
+				"Page CMS pour parser les résultats de supervision",
+				(_dt->getMonitoringParserPage() != NULL) ? _dt->getMonitoringParserPage()->getFullName() : "(aucune)",
+				(_monitoringParserPage.get() != NULL) ? _monitoringParserPage->getFullName() : "(aucune)"
+			);
 
 			// Update
 			_dt->setName(_name);
@@ -268,6 +291,7 @@ namespace synthese
 			_dt->setDisplayRowPage(_displayRowPage.get());
 			_dt->setDisplayDestinationPage(_displayDestinationPage.get());
 			_dt->setDisplayTransferDestinationPage(_displayTransferDestinationPage.get());
+			_dt->setMonitoringParserPage(_monitoringParserPage.get());
 			DisplayTypeTableSync::Save(_dt.get());
 
 			// Log

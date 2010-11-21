@@ -61,6 +61,7 @@ namespace synthese
 			static const std::string PARAMETER_DISPLAY_ROW_PAGE_ID;
 			static const std::string PARAMETER_DISPLAY_DESTINATION_PAGE_ID;
 			static const std::string PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID;
+			static const std::string PARAMETER_MONITORING_PARSER_PAGE_ID;
 
 		private:
 			boost::shared_ptr<DisplayType> _dt;
@@ -75,6 +76,7 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> _displayRowPage;
 			boost::shared_ptr<const cms::Webpage> _displayDestinationPage;
 			boost::shared_ptr<const cms::Webpage> _displayTransferDestinationPage;
+			boost::shared_ptr<const cms::Webpage> _monitoringParserPage;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
