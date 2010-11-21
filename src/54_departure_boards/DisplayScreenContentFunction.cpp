@@ -848,7 +848,10 @@ namespace synthese
 								lastCity = substop.place->getCity();
 							}
 						}
-						++totalTransferRank;
+						else
+						{
+							++totalTransferRank;
+						}
 					}
 					pm.insert(DATA_DESTINATIONS, destinationsStream.str());
 				}
