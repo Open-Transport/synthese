@@ -1297,8 +1297,8 @@ namespace synthese
 			{
 				stream <<
 					"<connectionPlace" <<
-					" latitude=\"" << gp->getX() << "\"" <<
-					" longitude=\"" << gp->getY() << "\"" <<
+					" latitude=\"" << gp->getY() << "\"" <<
+					" longitude=\"" << gp->getX() << "\"" <<
 					" id=\"" << np.getKey() << "\"" <<
 					" city=\"" << np.getCity()->getName() << "\"" <<
 					" x=\"" << static_cast<int>(np.getPoint()->getX()) << "\"" <<
@@ -1346,8 +1346,8 @@ namespace synthese
 			{
 				stream <<
 					"<" << tag <<
-					" latitude=\"" << gp->getX() << "\"" <<
-					" longitude=\"" << gp->getY() << "\"" <<
+					" latitude=\"" << gp->getY() << "\"" <<
+					" longitude=\"" << gp->getX() << "\"" <<
 					" id=\"" << stop.getKey() << "\"" <<
 					" x=\"" << static_cast<int>(stop.getGeometry()->getX()) << "\"" <<
 					" y=\"" << static_cast<int>(stop.getGeometry()->getY()) << "\"" <<
@@ -1383,8 +1383,8 @@ namespace synthese
 			{
 				stream <<
 					"<address" <<
-					" latitude=\"" << gp->getX() << "\"" <<
-					" longitude=\"" << gp->getY() << "\"" <<
+					" latitude=\"" << gp->getY() << "\"" <<
+					" longitude=\"" << gp->getX() << "\"" <<
 					" id=\"" << address.getKey() << "\"" <<
 					" x=\"" << static_cast<int>(address.getGeometry()->getX()) << "\"" <<
 					" y=\"" << static_cast<int>(address.getGeometry()->getY()) << "\"" <<
@@ -1419,8 +1419,8 @@ namespace synthese
 			{
 				stream <<
 					"<address" <<
-					" latitude=\"" << gp->getX() << "\"" <<
-					" longitude=\"" << gp->getY() << "\"" <<
+					" latitude=\"" << gp->getY() << "\"" <<
+					" longitude=\"" << gp->getX() << "\"" <<
 					" id=\"" << roadPlace.getKey() << "\"" <<
 					" x=\"" << static_cast<int>(roadPlace.getPoint()->getX()) << "\"" <<
 					" y=\"" << static_cast<int>(roadPlace.getPoint()->getY()) << "\"" <<
