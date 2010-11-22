@@ -140,10 +140,10 @@ Map::Map(const std::set<DrawableLine*>& selectedLines,
 		for(size_t i(0); i<points->getCoordinatesRO()->getSize(); ++i)
 		{
 			const Coordinate& p(points->getCoordinatesRO()->getAt(i));
-			if (p.x < lowerLeftLatitude) lowerLeftLatitude = p.x;
-			if (p.y < lowerLeftLongitude) lowerLeftLongitude = p.y;
-			if (p.x > upperRightLatitude) upperRightLatitude = p.x;
-			if (p.y > upperRightLongitude) upperRightLongitude = p.y;
+			if (p.x < lowerLeftLatitude) lowerLeftLatitude = p.y;
+			if (p.y < lowerLeftLongitude) lowerLeftLongitude = p.x;
+			if (p.x > upperRightLatitude) upperRightLatitude = p.y;
+			if (p.y > upperRightLongitude) upperRightLongitude = p.x;
 		}
     }
 

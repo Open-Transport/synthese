@@ -251,6 +251,8 @@ namespace synthese
 							_forcedDestinations,
 							minutes(_destinationForceDelay)
 				)	)	);
+				break;
+
 			default:
 				throw Exception("This method cannot apply to this screen type");
 			}
