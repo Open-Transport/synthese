@@ -99,7 +99,7 @@ namespace synthese
 				if(	result == _value.end() ||
 					itCal->second->getCategory() < result->second->getCategory() ||
 					itCal->second->getCategory() == result->second->getCategory() &&
-					itCal->first.size() < result->first.size()
+					itCal->second->getText().size() < result->second->getText().size()
 				){
 					result = itCal;
 				}
