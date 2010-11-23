@@ -159,6 +159,10 @@ namespace synthese
 				BOOST_FOREACH(Edge* edge, path->getEdges())
 				{
 					RoadChunk& chunk(static_cast<RoadChunk&>(*edge));
+					if(!chunk.getHouseNumberBounds())
+					{
+						continue;
+					}
 					if(chunk.testIfHouseNumberBelongsToChunk(houseNumber))
 					{
 						return shared_ptr<House>(
@@ -166,10 +170,6 @@ namespace synthese
 								chunk,
 								houseNumber
 						)	);
-					}
-					if(!chunk.getHouseNumberBounds())
-					{
-						continue;
 					}
 					if(houseNumber > chunk.getHouseNumberBounds()->second)
 					{
