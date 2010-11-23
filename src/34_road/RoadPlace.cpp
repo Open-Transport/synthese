@@ -184,8 +184,8 @@ namespace synthese
 					{
 						if(!nearestChunk || chunk.getHouseNumberBounds()->first - houseNumber < difference)
 						{
-							bestNumber = chunk.getHouseNumberBounds()->first - houseNumber;
-							difference = bestNumber;
+							bestNumber = chunk.getHouseNumberBounds()->first;
+							difference = bestNumber - houseNumber;
 							nearestChunk = &chunk;
 						}
 					}
