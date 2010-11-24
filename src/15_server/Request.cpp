@@ -22,9 +22,9 @@
 
 // At first to avoid the Windows bug "WinSock.h has already been included"
 #include "ServerModule.h"
-
 #include "Request.h"
-
+#include "RequestException.h"
+#include "ActionException.h"
 #include "ActionException.h"
 #include "Session.h"
 #include "SessionException.h"
@@ -128,7 +128,14 @@ namespace synthese
 			{
 				try
 				{
-					_loadAction();
+					try
+					{
+						_loadAction();
+					}
+					catch(ParametersMap::MissingParameterException& e)
+					{
+						throw RequestException("Missing parameter in function call :"+ e.getField());
+					}
 
 					if(	!_action->isAuthorized(_session)
 					){
@@ -150,7 +157,14 @@ namespace synthese
 
 			if(_function.get())
 			{
-				_loadFunction(_actionErrorMessage, _actionCreatedId);
+				try
+				{
+					_loadFunction(_actionErrorMessage, _actionCreatedId);
+				}
+				catch(ParametersMap::MissingParameterException& e)
+				{
+					throw ActionException("Missing parameter in action call :"+ e.getField());
+				}
 
 				// Run after the action
 				if (_action.get() && _redirectAfterAction)
