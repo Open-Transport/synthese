@@ -380,10 +380,15 @@ namespace synthese
 			stream << "</journey>";
 		}
 
+
+
 		void DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			if(	_screen->getType() &&
-				(_screen->getType()->getDisplayInterface() || _screen->getType()->getDisplayMainPage())
+			if(!_screen->getType())
+			{
+				return;
+			}
+			if(	_screen->getType()->getDisplayInterface() || _screen->getType()->getDisplayMainPage()
 			){
 				_screen->display(stream, _date ? *_date : second_clock::local_time(), &request);
 			}
