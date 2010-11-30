@@ -457,6 +457,10 @@ namespace synthese
 				{
 					function->run(stream, request);
 				}
+				catch(Request::RedirectException& e)
+				{
+					throw e;
+				}
 				catch(...)
 				{
 
