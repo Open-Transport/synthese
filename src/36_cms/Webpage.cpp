@@ -450,21 +450,25 @@ namespace synthese
 			{
 				pm.insert(FunctionWithSiteBase::PARAMETER_SITE, CMSModule::GetSite(request)->getKey());
 			}
-			function->_setFromParametersMap(pm);
-			if (function->isAuthorized(request.getSession()))
+			try
 			{
-				try
+				function->_setFromParametersMap(pm);
+				if (function->isAuthorized(request.getSession()))
 				{
 					function->run(stream, request);
 				}
-				catch(Request::RedirectException& e)
-				{
-					throw e;
-				}
-				catch(...)
-				{
+			}
+			catch(RequestException& e)
+			{
+				
+			}
+			catch(Request::RedirectException& e)
+			{
+				throw e;
+			}
+			catch(...)
+			{
 
-				}
 			}
 		}
 
