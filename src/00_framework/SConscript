@@ -11,7 +11,7 @@ CppLibProject(
 		('boost-date-time.cpplib',s3env['BOOSTVERSION']),
 		('boost-filesystem.cpplib',s3env['BOOSTVERSION']),
 		('boost-regex.cpplib',s3env['BOOSTVERSION']),
-		'geos.cpplib',
+		('geos.cpplib','3.2.patch1a'),
 		'proj.cpplib'
 	],
 )
