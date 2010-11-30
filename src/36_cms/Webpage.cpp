@@ -453,7 +453,14 @@ namespace synthese
 			function->_setFromParametersMap(pm);
 			if (function->isAuthorized(request.getSession()))
 			{
-				function->run(stream, request);
+				try
+				{
+					function->run(stream, request);
+				}
+				catch(...)
+				{
+
+				}
 			}
 		}
 
