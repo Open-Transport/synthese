@@ -164,7 +164,7 @@ namespace synthese
 			class GotoNode : public Node
 			{
 			public:
-				std::string direction;
+				Nodes direction;
 
 				virtual void display(
 					std::ostream& stream,
