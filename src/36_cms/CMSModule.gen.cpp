@@ -9,7 +9,6 @@ synthese::cms::CMSModule::integrate();
 synthese::cms::BitAndFunction::integrate();
 synthese::cms::WebPageDisplayFunction::integrate();
 synthese::cms::WebPageLastNewsFunction::integrate();
-synthese::cms::GetValueFunction::integrate();
 synthese::cms::IfFunction::integrate();
 synthese::cms::EqualFunction::integrate();
 synthese::cms::SuperiorFunction::integrate();
@@ -24,6 +23,7 @@ synthese::cms::WebPageFormFunction::integrate();
 synthese::cms::WebpageNextFunction::integrate();
 synthese::cms::WebpagePreviousFunction::integrate();
 synthese::cms::SubstractFunction::integrate();
+synthese::cms::ChrFunction::integrate();
 
 synthese::cms::WebPageAddAction::integrate();
 synthese::cms::WebPageUpdateAction::integrate();

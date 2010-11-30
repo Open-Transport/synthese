@@ -13,7 +13,6 @@
 #include "BitAndFunction.hpp"
 #include "WebPageDisplayFunction.h"
 #include "WebPageLastNewsFunction.hpp"
-#include "GetValueFunction.hpp"
 #include "IfFunction.hpp"
 #include "EqualFunction.hpp"
 #include "SuperiorFunction.hpp"
@@ -28,6 +27,7 @@
 #include "WebpageNextFunction.hpp"
 #include "WebpagePreviousFunction.hpp"
 #include "SubstractFunction.hpp"
+#include "ChrFunction.hpp"
 
 #include "WebPageAdmin.h"
 

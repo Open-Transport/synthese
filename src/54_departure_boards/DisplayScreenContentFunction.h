@@ -320,6 +320,13 @@ namespace synthese
 				///	<dt>line_color</dt><dd>line RGB color</dd>
 				///	<dt>line_style</dt><dd>line CSS class</dd>
 				/// <dt>line_image</dt><dd>line image url</dd>
+				/// <dt>stop_id</dt><dd>departure stop area id</dd>
+				///	<dt>stop_name</dt><dd>departure stop area name in the city</dd>
+				///	<dt>city_id</dt><dd>id of the departure city where the stop area is located</dd>
+				///	<dt>city name</dt><dd>name of the departure city where the stop area is located</dd>
+				///	<dt>stop_name_13</dt><dd>departure stop area short alias (13 characters max) designed for departure boards</dd>
+				///	<dt>stop_name_26</dt><dd>departure stop area middle sized alias (26 characters max) designed for departure boards</dd>
+				///	<dt>stop_name_for_timetables</dt><dd>departure stop area alias designed for timetables</dd>
 				/// </dl>
 				//////////////////////////////////////////////////////////////////////////
 				/// @param stream stream to write the result on

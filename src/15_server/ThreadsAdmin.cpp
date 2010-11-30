@@ -64,8 +64,11 @@ namespace synthese
 		{
 		}
 		
-		void ThreadsAdmin::display(ostream& stream, VariablesMap& variables, const AdminRequest& request) const
-		{
+		void ThreadsAdmin::display(
+			ostream& stream,
+			const AdminRequest& request
+		) const	{
+
 			bool killRight(request.isAuthorized<ServerAdminRight>(DELETE_RIGHT));
 			AdminActionFunctionRequest<ThreadKillAction,ThreadsAdmin> killRequest(request);
 

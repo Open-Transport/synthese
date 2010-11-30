@@ -108,7 +108,6 @@ namespace synthese
 
 		void InterfaceAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
 

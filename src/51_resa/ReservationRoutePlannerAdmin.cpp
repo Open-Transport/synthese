@@ -69,7 +69,6 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace resa;
@@ -200,7 +199,6 @@ namespace synthese
 		
 		void ReservationRoutePlannerAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const {
 

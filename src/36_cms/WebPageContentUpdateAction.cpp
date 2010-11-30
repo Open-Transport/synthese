@@ -49,6 +49,7 @@ namespace synthese
 		const string WebPageContentUpdateAction::PARAMETER_ABSTRACT = Action_PARAMETER_PREFIX + "ab";
 		const string WebPageContentUpdateAction::PARAMETER_IMAGE = Action_PARAMETER_PREFIX + "im";
 		const string WebPageContentUpdateAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "ti";
+		const string WebPageContentUpdateAction::PARAMETER_IGNORE_WHITE_CHARS = Action_PARAMETER_PREFIX + "iw";
 		
 		
 		
@@ -63,6 +64,7 @@ namespace synthese
 			map.insert(PARAMETER_ABSTRACT, _abstract);
 			map.insert(PARAMETER_IMAGE, _image);
 			map.insert(PARAMETER_TITLE, _title);
+			map.insert(PARAMETER_IGNORE_WHITE_CHARS, _ignoreWhiteChars);
 			return map;
 		}
 		
@@ -83,6 +85,7 @@ namespace synthese
 			_abstract = map.getDefault<string>(PARAMETER_ABSTRACT);
 			_image = map.getDefault<string>(PARAMETER_IMAGE);
 			_title = map.getDefault<string>(PARAMETER_TITLE);
+			_ignoreWhiteChars = map.getDefault<bool>(PARAMETER_IGNORE_WHITE_CHARS, false);
 		}
 		
 		
@@ -96,6 +99,7 @@ namespace synthese
 			_page->setAbstract(_abstract);
 			_page->setImage(_image);
 			_page->setName(_title);
+			_page->setIgnoreWhiteChars(_ignoreWhiteChars);
 
 			WebPageTableSync::Save(_page.get());
 
@@ -115,6 +119,14 @@ namespace synthese
 		void WebPageContentUpdateAction::setWebPage( boost::shared_ptr<Webpage> value )
 		{
 			_page = value;
+		}
+
+
+
+		WebPageContentUpdateAction::WebPageContentUpdateAction()
+			: _ignoreWhiteChars(false)
+		{
+
 		}
 	}
 }

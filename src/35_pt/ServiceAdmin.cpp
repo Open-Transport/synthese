@@ -63,7 +63,6 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -148,7 +147,6 @@ namespace synthese
 
 		void ServiceAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const AdminRequest& request
 		) const	{
 		

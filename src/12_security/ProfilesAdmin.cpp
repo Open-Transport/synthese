@@ -24,7 +24,6 @@
 #include "ActionResultHTMLTable.h"
 #include "SearchFormHTMLTable.h"
 #include "HTMLList.h"
-#include "InterfaceModule.h"
 #include "ProfilesAdmin.h"
 #include "ProfileAdmin.h"
 #include "ProfileTableSync.h"
@@ -52,7 +51,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace html;
@@ -97,9 +95,11 @@ namespace synthese
 		}
 
 
-		void ProfilesAdmin::display(ostream& stream, interfaces::VariablesMap& variables,
-					const admin::AdminRequest& _request) const
-		{
+		void ProfilesAdmin::display(
+			ostream& stream,
+			const admin::AdminRequest& _request
+		) const	{
+
 			// Requests
 			AdminFunctionRequest<ProfilesAdmin> searchRequest(_request);
 
@@ -152,8 +152,7 @@ namespace synthese
 				_requestParameters,
 				profiles,
 				addProfileRequest.getHTMLForm("add"),
-				AddProfileAction::PARAMETER_TEMPLATE_ID,
-				InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
+				AddProfileAction::PARAMETER_TEMPLATE_ID
 			);
 			t.getActionForm().addHiddenField(
 				AddProfileAction::PARAMETER_TEMPLATE_ID,

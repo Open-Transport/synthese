@@ -1,10 +1,7 @@
-
-// 32 ADMIN
-#include "AdminInterfacePage.h"
+// 14 Admin
 
 #include "HomeAdmin.h"
+#include "LoginAdmin.hpp"
 #include "ModuleAdmin.h"
+
 #include "AdminFunction.h"
-#include "AdminInterfaceElement.h"
-#include "AdminPagesTreeInterfaceElement.h"
-#include "AdminPagePositionInterfaceElement.h"

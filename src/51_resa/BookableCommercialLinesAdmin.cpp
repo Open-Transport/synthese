@@ -45,7 +45,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace resa;
@@ -87,7 +86,6 @@ namespace synthese
 		
 		void BookableCommercialLinesAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const AdminRequest& _request
 		) const {
 			// Search

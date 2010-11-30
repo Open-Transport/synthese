@@ -132,7 +132,7 @@ namespace synthese
 		ParametersMap DisplayScreenContentFunction::_getParametersMap() const
 		{
 			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
-			if(_date && _date->is_not_a_date_time()) map.insert(PARAMETER_DATE, *_date);
+			if(_date && !_date->is_not_a_date_time()) map.insert(PARAMETER_DATE, *_date);
 			if(_screen.get()) map.insert(Request::PARAMETER_OBJECT_ID, _screen->getKey());
 			return map;
 		}
@@ -736,6 +736,8 @@ namespace synthese
 			pm.insert(DATA_DISPLAY_TEAM, screen.getDisplayTeam());
 			if(row.first.getService())
 			{
+				PTObjectsCMSExporters::ExportStopArea(pm, *static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace());
+
 				time_duration blinkingDelay(minutes(screen.getBlinkingDelay()));
 				if(	blinkingDelay.total_seconds() > 0 &&
 					row.first.getDepartureDateTime() - second_clock::local_time() <= blinkingDelay

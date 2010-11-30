@@ -160,7 +160,8 @@ namespace synthese
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables,
+			void display(
+				std::ostream& stream,
 				const admin::AdminRequest& _request
 			) const;
 

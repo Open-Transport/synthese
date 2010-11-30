@@ -95,9 +95,11 @@ namespace synthese
 
 
 
-		void UserAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables,
-					const admin::AdminRequest& _request) const
-		{
+		void UserAdmin::display(
+			std::ostream& stream,
+			const admin::AdminRequest& _request
+		) const	{
+
 			AdminActionFunctionRequest<UserUpdateAction, UserAdmin> updateRequest(_request);
 			updateRequest.getAction()->setUser(_user);
 			

@@ -61,7 +61,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace html;
@@ -126,8 +125,7 @@ namespace synthese
 
 		void MessagesScenarioAdmin::display(
 			ostream& stream,
-			interfaces::VariablesMap& variables,
-					const admin::AdminRequest& _request
+			const admin::AdminRequest& _request
 		) const	{
 
 			shared_ptr<const SentScenario> _sentScenario = dynamic_pointer_cast<const SentScenario>(_scenario);

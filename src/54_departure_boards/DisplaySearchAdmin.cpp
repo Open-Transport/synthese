@@ -33,7 +33,6 @@
 #include "BroadcastPointsAdmin.h"
 #include "DisplayMonitoringStatus.h"
 #include "DisplayMonitoringStatusTableSync.h"
-#include "InterfaceModule.h"
 #include "Conversion.h"
 #include "ActionResultHTMLTable.h"
 #include "SearchFormHTMLTable.h"
@@ -63,7 +62,6 @@ using namespace std;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace pt;
@@ -152,7 +150,6 @@ namespace synthese
 
 		void DisplaySearchAdmin::display(
 			ostream& stream,
-			interfaces::VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
 			
@@ -245,7 +242,6 @@ namespace synthese
 					, screens
 					, createDisplayRequest.getHTMLForm("create")
 					, CreateDisplayScreenAction::PARAMETER_TEMPLATE_ID
-					, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
 				);
 				t.getActionForm().setUpdateRight(tabHasWritePermissions());
 
@@ -458,7 +454,6 @@ namespace synthese
 					, cpus
 					, createCPURequest.getHTMLForm("createCPU")
 					, DisplayScreenCPUCreateAction::PARAMETER_TEMPLATE_ID
-					, InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
 				);
 				t.getActionForm().setUpdateRight(tabHasWritePermissions());
 

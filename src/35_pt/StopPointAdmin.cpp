@@ -43,7 +43,6 @@ namespace synthese
 {
 	using namespace html;
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -111,7 +110,6 @@ namespace synthese
 
 		void StopPointAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const admin::AdminRequest& request
 		) const	{
 

@@ -37,7 +37,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace admin;
@@ -90,7 +89,6 @@ namespace synthese
 		
 		void ModuleAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
 			stream << "<h1>Informations sur le module</h1>";

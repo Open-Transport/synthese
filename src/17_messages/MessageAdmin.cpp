@@ -56,7 +56,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace html;
@@ -110,9 +109,11 @@ namespace synthese
 
 
 
-		void MessageAdmin::display(ostream& stream, interfaces::VariablesMap& variables,
-					const admin::AdminRequest& _request) const
-		{
+		void MessageAdmin::display(
+			ostream& stream,
+			const admin::AdminRequest& _request
+		) const	{
+
 			////////////////////////////////////////////////////////////////////
 			// TAB PARAMETERS
 			if (openTabContent(stream, TAB_PARAMS))
@@ -145,8 +146,8 @@ namespace synthese
 						MessagesModule::getLevelLabels(),
 						optional<AlarmLevel>(_alarm->getLevel())
 				)	);
-				stream << tu.cell("Message court", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage(), 2, 60));
-				stream << tu.cell("Message long", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 6, 60));
+				stream << tu.cell("Titre", tu.getForm().getTextInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage()));
+				stream << tu.cell("Contenu", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 6, 60));
 				stream << tu.close();
 			}
 
