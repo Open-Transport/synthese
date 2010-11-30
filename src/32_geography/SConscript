@@ -7,7 +7,6 @@ CppSynthese3LibProject(
 		's3-lexical-matcher.cpplib',
 		's3-graph.cpplib',
 		's3-interfaces.cpplib',
-		'proj.cpplib',
-		'geos.cpplib'
+		'proj.cpplib'
 	]
 )
