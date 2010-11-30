@@ -48,8 +48,8 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace admin;
 	using namespace interfaces;
+	using namespace admin;
 	using namespace server;
 	using namespace util;
 	using namespace departure_boards;
@@ -103,9 +103,11 @@ namespace synthese
 		
 		
 		
-		void DisplayTypeAdmin::display(ostream& stream, VariablesMap& variables,
-					const admin::AdminRequest& _request) const
-		{
+		void DisplayTypeAdmin::display(
+			ostream& stream,
+			const admin::AdminRequest& _request
+		) const	{
+
 			// Requests
 			AdminActionFunctionRequest<UpdateDisplayTypeAction,DisplayTypeAdmin> updateRequest(
 				_request

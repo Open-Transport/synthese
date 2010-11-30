@@ -49,7 +49,8 @@ namespace synthese
 				- PARAMETER_DATE / da : if route planning order is departure first : min date of departure, else max date arrival
 				- PARAMETER_DATE / ti : if route planning order is departure first : min hour of departure, else max date arrival
 		*/
-		class ReservationRoutePlannerAdmin : public admin::AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>
+		class ReservationRoutePlannerAdmin:
+			public admin::AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>
 		{
 			std::string						_startCity;
 			std::string						_startPlace;
@@ -107,8 +108,12 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables,
-					const admin::AdminRequest& _request) const;
+			void display(
+				std::ostream& stream,
+				const admin::AdminRequest& _request
+			) const;
+
+
 			
 			/** Authorization control.
 				@return bool True if the displayed page can be displayed

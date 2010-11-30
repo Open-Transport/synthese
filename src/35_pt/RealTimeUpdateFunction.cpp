@@ -32,8 +32,18 @@
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "Interface.h"
 #include "JourneyPattern.hpp"
+#include "Webpage.h"
+#include "WebPageDisplayFunction.h"
+#include "StaticFunctionRequest.h"
+#include "ScheduleRealTimeUpdateAction.h"
+#include "ServiceVertexRealTimeUpdateAction.h"
+#include "PTObjectsCMSExporters.hpp"
+#include "StopPoint.hpp"
+#include "RollingStock.h"
+#include "StaticActionFunctionRequest.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -42,6 +52,10 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace interfaces;
+	using namespace cms;
+	using namespace graph;
+
+	
 
 	template<> const string util::FactorableTemplate<RequestWithInterface,pt::RealTimeUpdateFunction>::FACTORY_KEY("rtu");
 	
@@ -49,12 +63,24 @@ namespace synthese
 	{
 		const string RealTimeUpdateFunction::PARAMETER_LINE_STOP_RANK("ls");
 		const string RealTimeUpdateFunction::PARAMETER_SERVICE_ID("se");
+		const string RealTimeUpdateFunction::PARAMETER_CMS_TEMPLATE_ID("t");
+
+		const std::string RealTimeUpdateFunction::DATA_LOCATION_("location_");
+		const std::string RealTimeUpdateFunction::DATA_DESTINATION_("destination_");
+		const std::string RealTimeUpdateFunction::DATA_SERVICE_NUMBER("service_number");
+		const std::string RealTimeUpdateFunction::DATA_REALTIME_QUAY("realtime_quay");
+		const std::string RealTimeUpdateFunction::DATA_TRANSPORT_MODE_ID("transport_mode_id");
+		const std::string RealTimeUpdateFunction::DATA_PLANNED_SCHEDULE("planned_schedule");
+		const std::string RealTimeUpdateFunction::DATA_REALTIME_SCHEDULE("realtime_schedule");
+		const std::string RealTimeUpdateFunction::DATA_DELAY("delay");
+		const std::string RealTimeUpdateFunction::DATA_DELAY_UPDATE_URL("delay_update_url");
+		const std::string RealTimeUpdateFunction::DATA_QUAY_UPDATE_URL("quay_update_url");
+
+
 
 		RealTimeUpdateFunction::RealTimeUpdateFunction():
 			FactorableTemplate<RequestWithInterface, RealTimeUpdateFunction>()
-		{
-
-		}
+		{}
 
 		ParametersMap RealTimeUpdateFunction::_getParametersMap() const
 		{
@@ -75,16 +101,27 @@ namespace synthese
 				RequestWithInterface::_setFromParametersMap(map);
 				if(getInterface() == NULL)
 				{
-					throw RequestException("An interface must be specified");
+					try
+					{
+						optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_CMS_TEMPLATE_ID));
+						if(id)
+						{
+							_cmsTemplate = Env::GetOfficialEnv().get<Webpage>(*id);
+						}
+					}
+					catch (ObjectNotFoundException<Webpage>& e)
+					{
+						throw RequestException("No such CMS template : "+ e.getMessage());
+					}
 				}
-				if(!getInterface()->hasPage<RealTimeUpdateScreenServiceInterfacePage>())
+				else if(!getInterface()->hasPage<RealTimeUpdateScreenServiceInterfacePage>())
 				{
 					throw RequestException("The interface does not implement the Real Time Update Screen");
 				}
 
 				_service = Env::GetOfficialEnv().getRegistry<ScheduledService>().get(
 					map.get<RegistryKeyType>(PARAMETER_SERVICE_ID)
-					);
+				);
 				_lineStopRank = map.get<RegistryKeyType>(PARAMETER_LINE_STOP_RANK);
 
 				if(_lineStopRank >= _service->getArrivalSchedules(false).size())
@@ -100,17 +137,24 @@ namespace synthese
 
 		void RealTimeUpdateFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			VariablesMap vm;
-			const RealTimeUpdateScreenServiceInterfacePage* page(
-				getInterface()->getPage<RealTimeUpdateScreenServiceInterfacePage>()
-			);
-			page->display(
-				stream,
-				*_service,
-				*_service->getRoute()->getLineStop(_lineStopRank),
-				vm,
-				&request
-			);
+			if(getInterface())
+			{
+				VariablesMap vm;
+				const RealTimeUpdateScreenServiceInterfacePage* page(
+					getInterface()->getPage<RealTimeUpdateScreenServiceInterfacePage>()
+				);
+				page->display(
+					stream,
+					*_service,
+					*_service->getRoute()->getLineStop(_lineStopRank),
+					vm,
+					&request
+				);
+			}
+			else if(_cmsTemplate.get())
+			{
+				_display(stream, request, *_service, *_service->getRoute()->getLineStop(_lineStopRank));
+			}
 		}
 		
 		
@@ -143,5 +187,90 @@ namespace synthese
 		{
 			_lineStopRank = value;
 		}
-	}
-}
+
+
+
+		void RealTimeUpdateFunction::_display(
+			std::ostream& stream,
+			const server::Request& request,
+			const ScheduledService& service,
+			const LineStop& lineStop
+		) const	{
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(_cmsTemplate);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm(
+				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
+				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
+				ParametersMap()
+			);
+
+			// Current location
+			PTObjectsCMSExporters::ExportStopArea(pm, *lineStop.getPhysicalStop()->getConnectionPlace(), DATA_LOCATION_);
+
+			// Destination
+			PTObjectsCMSExporters::ExportStopArea(pm, *lineStop.getLine()->getDestination()->getConnectionPlace(), DATA_DESTINATION_);
+			
+			// Line
+			PTObjectsCMSExporters::ExportLine(pm, *lineStop.getLine()->getCommercialLine());
+
+			// service_number
+			pm.insert(DATA_SERVICE_NUMBER, service.getServiceNumber());
+
+			// realtime_quay_name
+			pm.insert(DATA_REALTIME_QUAY, static_cast<const StopPoint*>(service.getRealTimeVertex(lineStop.getRankInPath()))->getName());
+
+			// transport_mode_id
+			if(lineStop.getLine()->getRollingStock())
+			{
+				pm.insert(DATA_TRANSPORT_MODE_ID, lineStop.getLine()->getRollingStock()->getKey());
+			}
+
+			// planned_schedule
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(false, lineStop.getRankInPath())).hours() << ":" << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(false, lineStop.getRankInPath())).minutes();
+				pm.insert(DATA_PLANNED_SCHEDULE, s.str());
+			}
+
+			// realtime_schedule
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(true, lineStop.getRankInPath())).hours() << ":" << setw(2) << setfill('0') << Service::GetTimeOfDay(service.getDepartureSchedule(true, lineStop.getRankInPath())).minutes();
+				pm.insert(DATA_REALTIME_SCHEDULE, s.str());
+			}
+
+			// delay
+			pm.insert(
+				DATA_DELAY,
+				(service.getDepartureSchedule(true, lineStop.getRankInPath()) - service.getDepartureSchedule(false, lineStop.getRankInPath())).total_seconds() / 60
+			);
+
+			// delay_update_url
+			StaticActionFunctionRequest<ScheduleRealTimeUpdateAction,WebPageDisplayFunction> scheduleUpdateRequest(request, true);
+			scheduleUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
+			scheduleUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
+			scheduleUpdateRequest.getAction()->setAtArrival(false);
+			scheduleUpdateRequest.getAction()->setAtDeparture(true);
+			scheduleUpdateRequest.getAction()->setPropagateConstantly(true);
+			scheduleUpdateRequest.getAction()->setDelay(posix_time::not_a_date_time);
+			scheduleUpdateRequest.getFunction()->setAditionnalParametersMap(_getParametersMap());
+			pm.insert(
+				DATA_DELAY_UPDATE_URL,
+				scheduleUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES + Request::PARAMETER_ASSIGNMENT
+			);
+
+			// quay_update_url
+			StaticActionFunctionRequest<ServiceVertexRealTimeUpdateAction,WebPageDisplayFunction> vertexUpdateRequest(request, true);
+			vertexUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
+			vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
+			vertexUpdateRequest.getFunction()->setAditionnalParametersMap(_getParametersMap());
+			pm.insert(
+				DATA_QUAY_UPDATE_URL,
+				vertexUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID + Request::PARAMETER_ASSIGNMENT
+			);
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+}	}

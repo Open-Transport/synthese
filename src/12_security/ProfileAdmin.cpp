@@ -104,9 +104,11 @@ namespace synthese
 
 
 
-		void ProfileAdmin::display(std::ostream& stream, interfaces::VariablesMap& variables,
-					const admin::AdminRequest& _request) const
-		{
+		void ProfileAdmin::display(
+			std::ostream& stream,
+			const admin::AdminRequest& _request
+		) const	{
+
 			AdminActionFunctionRequest<UpdateProfileAction, ProfileAdmin> updateRequest(_request);
 			updateRequest.getAction()->setProfile(_profile);
 			

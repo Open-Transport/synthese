@@ -24,9 +24,9 @@
 #include "ParametersMap.h"
 #include "DynamicRequest.h"
 #include "FunctionWithSite.h"
-#include "GetValueFunction.hpp"
 #include "ServerModule.h"
 #include "WebPageDisplayFunction.h"
+#include "CMSModule.hpp"
 
 using namespace std;
 using namespace boost;
@@ -49,7 +49,8 @@ namespace synthese
 			_endDate(posix_time::not_a_date_time),
 			_template(NULL),
 			_doNotUseTemplate(false),
-			_hasForum(false)
+			_hasForum(false),
+			_ignoreWhiteChars(false)
 		{
 		}
 
@@ -66,219 +67,224 @@ namespace synthese
 
 
 		std::string::const_iterator Webpage::_parse(
-			std::ostream& stream,
+			Webpage::Nodes& nodes,
 			std::string::const_iterator it,
 			std::string::const_iterator end,
-			std::string termination,
-			const server::Request& request,
-			bool encodeSubResults,
-			const server::ParametersMap& aditionalParametersMap
+			std::set<std::string> termination
 		) const {
-			string labelToReach;
+			
+			shared_ptr<TextNode> currentTextNode;
+
 			while(it != end)
 			{
+				// Ignore white chars
+				if(	_ignoreWhiteChars &&
+					(*it == ' ' || *it == '\r' || *it == '\n')
+				){
+					++it;
+					continue;
+				}
+
 				// Special characters
 				if(*it == '\\' && it+1 != end)
 				{
+					if(!currentTextNode.get())
+					{
+						currentTextNode.reset(new TextNode);
+					}
 					++it;
-					if(*it == 'n')
-					{
-						if(labelToReach.empty())
-						{
-							stream << endl;
-						}
-					}
-					else if(*it == '\\')
-					{
-						if(labelToReach.empty())
-						{
-							stream << '\\';
-						}
-					}
-					else if(*it == '<' && it+1 != end && *(it+1)=='@')
-					{
-						if(labelToReach.empty())
-						{
-							++it;
-							stream << "<@";
-						}
-					}
-					else if(*it == '<' && it+1 != end && *(it+1)=='?')
-					{
-						if(labelToReach.empty())
-						{
-							++it;
-							stream << "<?";
-						}
-					}
-					else if(*it == '<' && it+1 != end && *(it+1)=='#')
-					{
-						if(labelToReach.empty())
-						{
-							++it;
-							stream << "<#";
-						}
-					}
-					else if(*it == '@' && it+1 != end && *(it+1)=='>')
-					{
-						if(labelToReach.empty())
-						{
-							++it;
-							stream << "@>";
-						}
-					}
-					else if(*it == '%' && it+1 != end && *(it+1)=='>')
-					{
-						if(labelToReach.empty())
-						{
-							++it;
-							stream << "%>";
-						}
-					}
-					else if(*it == '<' && it+1 != end && *(it+1)=='>')
-					{
-						if(labelToReach.empty())
-						{
-							++it;
-							stream << ">>";
-						}
-					}
-					else if(*it == '?' && it+1 != end && *(it+1)=='>')
-					{
-						if(labelToReach.empty())
-						{
-							++it;
-							stream << "?>";
-						}
-					}
-					else if(*it == '#' && it+1 != end && *(it+1)=='>')
-					{
-						if(labelToReach.empty())
-						{
-							++it;
-							stream << "#>";
-						}
-					}
+					currentTextNode->text.push_back(*it);
 					++it;
 				} // Call to a public function
 				else if(*it == '<' && it+1 != end && *(it+1)=='?' && it+2 != end)
 				{
-					stringstream query;
-					query << Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT;
-					it = _parse(query, it+2, end, "?>", request, true, aditionalParametersMap);
-					if(labelToReach.empty())
+					++it;
+					++it;
+
+					// Handle current text node
+					if(currentTextNode.get())
 					{
-						ParametersMap parametersMap(query.str());
-						ParametersMap requestParametersMap(
-							dynamic_cast<const DynamicRequest*>(&request) ?
-							dynamic_cast<const DynamicRequest&>(request).getParametersMap() :
-							ParametersMap()
-						);
-						requestParametersMap.remove(Request::PARAMETER_FUNCTION);
-						parametersMap.merge(requestParametersMap);
-						if(getRoot())
+						nodes.push_back(currentTextNode);
+						currentTextNode.reset();
+					}
+
+					// Function node
+					shared_ptr<FunctionNode> node(new FunctionNode);
+
+					// function name
+					string functionName;
+					for(;it != end && *it != '&' && *it != '?'; ++it)
+					{
+						functionName.push_back(*it);
+					}
+					try
+					{
+						node->functionCreator = Factory<Function>::GetCreator(functionName);
+
+						// parameters
+						if(it != end && *it == '?')
 						{
-							parametersMap.insert(FunctionWithSiteBase::PARAMETER_SITE, getRoot()->getKey());
+							it += 2;
 						}
-						string functionName(parametersMap.getDefault<string>(Request::PARAMETER_FUNCTION));
-						if(!functionName.empty() && Factory<Function>::contains(functionName))
+						else
 						{
-							shared_ptr<Function> _function(Factory<Function>::create(functionName));
-							if(_function.get())
+							set<string> functionTermination;
+							functionTermination.insert("&");
+							functionTermination.insert("?>");
+							while(it != end && *it == '&')
 							{
-								try
+								stringstream parameterName;
+								it = _parseText(parameterName, it+1, end, "=");
+
+								if(it != end)
 								{
-									_function->_setFromParametersMap(parametersMap);
-									if (_function->isAuthorized(request.getSession()))
+									Nodes parameterNodes;
+									it = _parse(parameterNodes, it, end, functionTermination);
+									node->parameters.push_back(make_pair(parameterName.str(), parameterNodes));
+									if(*(it-1) != '&')
 									{
-										stringstream subresult;
-										_function->run(subresult, request);
-										stream << (encodeSubResults ? ServerModule::URLEncode(subresult.str()) : subresult.str());
+										break;
 									}
+									--it;
 								}
-								catch(...)
-								{
+						}	}
 
-								}
-							}
-
-						}
+						nodes.push_back(static_pointer_cast<Node,FunctionNode>(node));
+					}
+					catch(FactoryException<Function>&)
+					{
+						for(; it != end && it+1 != end && *it != '?' && *(it+1) != '>' ; ++it) ;
 					}
 				} // Shortcut to GetValueFunction
 				else if(*it == '<' && it+1 != end && *(it+1)=='@' && it+2 != end)
 				{
-					stringstream parameter;
-					it = _parse(parameter, it+2, end, "@>", request, true, aditionalParametersMap);
-					if(labelToReach.empty())
+					if(currentTextNode.get())
 					{
-						stringstream subresult;
-						GetValueFunction function;
-						function.setParameter(parameter.str());
-						function.setAditionnalParametersMap(aditionalParametersMap);
-						function.run(subresult, request);
-						stream << (encodeSubResults ? ServerModule::URLEncode(subresult.str()) : subresult.str());
+						nodes.push_back(currentTextNode);
+						currentTextNode.reset();
 					}
+
+					stringstream parameter;
+					it = _parseText(parameter, it+2, end, "@>");
+					shared_ptr<ValueNode> valueNode(new ValueNode);
+					valueNode->name = parameter.str();
+
+					nodes.push_back(static_pointer_cast<Node,ValueNode>(valueNode));
+
 				} // Shortcut to WebPageDisplayFunction
 				else if(*it == '<' && it+1 != end && *(it+1)=='#' && it+2 != end)
 				{
-					stringstream query;
-					query << WebPageDisplayFunction::PARAMETER_SMART_URL << Request::PARAMETER_ASSIGNMENT << "!";
-					it = _parse(query, it+2, end, "#>", request, true, aditionalParametersMap);
-					if(labelToReach.empty())
+					++it;
+					++it;
+
+					// Handle current text node
+					if(currentTextNode.get())
 					{
-						ParametersMap parametersMap(query.str());
-						ParametersMap requestParametersMap(
-							dynamic_cast<const DynamicRequest*>(&request) ?
-							dynamic_cast<const DynamicRequest&>(request).getParametersMap() :
-							ParametersMap()
-						);
-						requestParametersMap.remove(Request::PARAMETER_FUNCTION);
-						requestParametersMap.remove(WebPageDisplayFunction::PARAMETER_PAGE_ID);
-						parametersMap.merge(requestParametersMap);
-						if(getRoot())
+						nodes.push_back(currentTextNode);
+						currentTextNode.reset();
+					}
+
+					// Page node
+					shared_ptr<IncludeNode> node(new IncludeNode);
+
+					// page name
+					node->pageName = "!";
+					for(;it != end && *it != '&' && *it != '#'; ++it)
+					{
+						node->pageName.push_back(*it);
+					}
+					// parameters
+					if(it != end && *it == '#')
+					{
+						it += 2;
+					}
+					else
+					{
+						set<string> functionTermination;
+						functionTermination.insert("&");
+						functionTermination.insert("#>");
+						while(it != end && *it == '&')
 						{
-							parametersMap.insert(FunctionWithSiteBase::PARAMETER_SITE, getRoot()->getKey());
-						}
-						WebPageDisplayFunction function;
-						function._setFromParametersMap(parametersMap);
-						if (function.isAuthorized(request.getSession()))
-						{
-							stringstream subresult;
-							function.run(subresult, request);
-							stream << (encodeSubResults ? ServerModule::URLEncode(subresult.str()) : subresult.str());
+							stringstream parameterName;
+							it = _parseText(parameterName, it+1, end, "=");
+
+							if(it != end)
+							{
+								Nodes parameterNodes;
+								it = _parse(parameterNodes, it, end, functionTermination);
+								node->parameters.push_back(make_pair(parameterName.str(), parameterNodes));
+								if(*(it-1) != '&')
+								{
+									break;
+								}
+								--it;
+							}
 						}
 					}
+
+					nodes.push_back(static_pointer_cast<Node,IncludeNode>(node));
 				} // Goto
 				else if(*it == '<' && it+1 != end && *(it+1)=='%' && it+2 != end)
 				{
-					stringstream label;
-					it = _parse(label, it+2, end, "%>", request, false, aditionalParametersMap);
-					if(labelToReach.empty() && !label.str().empty())
+					if(currentTextNode.get())
 					{
-						labelToReach = label.str();
+						nodes.push_back(currentTextNode);
+						currentTextNode.reset();
 					}
+					shared_ptr<GotoNode> node(new GotoNode);
+					stringstream s;
+					it = _parseText(s, it+2, end, "%>");
+					node->direction = s.str();
+					nodes.push_back(static_pointer_cast<Node,GotoNode>(node));
+
 				} // Label
 				else if(*it == '<' && it+1 != end && *(it+1)=='<' && it+2 != end)
 				{
-					stringstream label;
-					it = _parse(label, it+2, end, ">>", request, false, aditionalParametersMap);
-					if(labelToReach == label.str())
+					if(currentTextNode.get())
 					{
-						labelToReach.clear();
+						nodes.push_back(currentTextNode);
+						currentTextNode.reset();
 					}
+					shared_ptr<LabelNode> node(new LabelNode);
+					stringstream s;
+					it = _parseText(s, it+2, end, ">>");
+					node->label = s.str();
+
+					nodes.push_back(static_pointer_cast<Node,LabelNode>(node));
 				} // Reached the end of a recursion level
-				else if(termination.size() == 2 && *it == termination[0] && it+1 != end && *(it+1)==termination[1])
+				else 
 				{
-					return it+2;
-				}
-				else
-				{
-					if(labelToReach.empty())
+					BOOST_FOREACH(const string& test, termination)
 					{
-						stream << *it;
+						if(end - it >= test.size())
+						{
+							string testIt;
+							for(size_t i(0); i< test.size(); ++i)
+							{
+								testIt.push_back(*(it+i));
+							}
+							if(testIt == test)
+							{
+								if(currentTextNode.get())
+								{
+									nodes.push_back(static_pointer_cast<Node,TextNode>(currentTextNode));
+								}
+								return it+test.size();
+							}
+						}
 					}
+					if(!currentTextNode.get())
+					{
+						currentTextNode.reset(new TextNode);
+					}
+					currentTextNode->text.push_back(*it);
 					++it;
 				}
+			}
+
+			if(currentTextNode.get())
+			{
+				nodes.push_back(static_pointer_cast<Node,TextNode>(currentTextNode));
 			}
 			return it;
 		}
@@ -290,7 +296,42 @@ namespace synthese
 			const server::Request& request,
 			const server::ParametersMap& aditionalParametersMap
 		) const	{
-			_parse(stream, _content.begin(), _content.end(), string(), request, false, aditionalParametersMap);
+
+			Nodes::const_iterator itNode(_nodes.begin());
+			while(itNode != _nodes.end())
+			{
+				// Goto
+				if(dynamic_cast<GotoNode*>(itNode->get()))
+				{
+					// Search of label
+					string label(static_cast<GotoNode*>(itNode->get())->direction);
+					if(!label.empty())
+					{
+						Nodes::const_iterator itGotoNode(itNode+1);
+						for(; itGotoNode != _nodes.end(); ++itGotoNode)
+						{
+							if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->label == label)
+							{
+								itNode = itGotoNode;
+								continue;
+							}
+						}
+						for(itGotoNode = _nodes.begin(); itGotoNode != itNode; ++itGotoNode)
+						{
+							if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->label == label)
+							{
+								itNode = itGotoNode;
+								continue;
+							}
+						}
+					}
+				}
+				else
+				{
+					(*itNode)->display(stream, request, aditionalParametersMap);
+				}
+				++itNode;
+			}
 		}
 
 
@@ -346,5 +387,161 @@ namespace synthese
 			}
 			return result;
 		}
-	}
-}
+
+
+
+		void Webpage::setContent( const std::string& value )
+		{
+			if(value != _content)
+			{
+				_nodes.clear();
+				_parse(_nodes, value.begin(), value.end(), set<string>());
+			}
+			_content = value;
+		}
+
+
+
+		std::string::const_iterator Webpage::_parseText(
+			std::ostream& stream,
+			std::string::const_iterator it,
+			std::string::const_iterator end,
+			std::string termination
+		) const	{
+			std::string::const_iterator newEnd(search(it, end, termination.begin(), termination.end()));
+			for(; it != newEnd; ++it)
+			{
+				stream.put(*it);
+			}
+			return it == end ? end : newEnd + termination.size();
+		}
+
+
+
+		void Webpage::FunctionNode::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const server::ParametersMap& aditionalParametersMap
+		) const	{
+
+			// Parameters
+			ParametersMap pm;
+			BOOST_FOREACH(const Parameters::value_type& param, parameters)
+			{
+				stringstream s;
+				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
+				{
+					node->display(s, request, aditionalParametersMap);
+				}
+				pm.insert(param.first, s.str());
+			}
+			pm.merge(aditionalParametersMap);
+
+			// Function
+			shared_ptr<Function> function(functionCreator->create());
+			ParametersMap requestParametersMap(
+				dynamic_cast<const DynamicRequest*>(&request) ?
+				dynamic_cast<const DynamicRequest&>(request).getParametersMap() :
+				ParametersMap()
+			);
+			requestParametersMap.remove(Request::PARAMETER_FUNCTION);
+			pm.merge(requestParametersMap);
+			if(CMSModule::GetSite(request).get())
+			{
+				pm.insert(FunctionWithSiteBase::PARAMETER_SITE, CMSModule::GetSite(request)->getKey());
+			}
+			function->_setFromParametersMap(pm);
+			if (function->isAuthorized(request.getSession()))
+			{
+				function->run(stream, request);
+			}
+		}
+
+
+
+		void Webpage::LabelNode::display( std::ostream& stream, const server::Request& request, const server::ParametersMap& aditionalParametersMap ) const
+		{
+
+		}
+
+
+
+		void Webpage::GotoNode::display( std::ostream& stream, const server::Request& request, const server::ParametersMap& aditionalParametersMap ) const
+		{
+
+		}
+
+
+
+		void Webpage::ValueNode::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const server::ParametersMap& aditionalParametersMap
+		) const	{
+
+			if(name == "client_url")
+			{
+				stream << request.getClientURL();
+			}
+			else if(name == "host_name")
+			{
+				stream << request.getHostName();
+			}
+			else if(name == "site")
+			{
+				if(CMSModule::GetSite(request))
+				{
+					stream << CMSModule::GetSite(request)->getKey();
+				}
+			}
+			else
+			{
+				string value(aditionalParametersMap.getDefault<string>(name));
+				if(value.empty())
+				{
+					value = request.getParametersMap().getDefault<string>(name);
+				}
+				else
+				{
+					stream << value;
+				}
+			}
+
+		}
+
+
+
+		void Webpage::IncludeNode::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const server::ParametersMap& aditionalParametersMap
+		) const	{
+
+			// Parameters
+			ParametersMap pm;
+			BOOST_FOREACH(const Parameters::value_type& param, parameters)
+			{
+				stringstream s;
+				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
+				{
+					node->display(s, request, aditionalParametersMap);
+				}
+				pm.insert(param.first, s.str());
+			}
+			pm.merge(aditionalParametersMap);
+
+			Webpage* page(CMSModule::GetSite(request)->getPageBySmartURL(pageName));
+			if(page)
+			{
+				page->display(stream, request, pm);
+			}
+
+		}
+
+
+
+		void Webpage::TextNode::display( std::ostream& stream, const server::Request& request, const server::ParametersMap& aditionalParametersMap ) const
+		{
+			stream << text;
+		}
+}	}

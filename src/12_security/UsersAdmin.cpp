@@ -25,8 +25,6 @@
 
 #include "SearchFormHTMLTable.h"
 #include "HTMLModule.h"
-#include "InterfaceModule.h"
-
 #include "SecurityModule.h"
 #include "UserAdmin.h"
 #include "AddUserAction.h"
@@ -53,7 +51,6 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
-	using namespace interfaces;
 	using namespace admin;
 	using namespace html;
 	using namespace security;
@@ -136,7 +133,6 @@ namespace synthese
 
 		void UsersAdmin::display(
 			std::ostream& stream,
-			interfaces::VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
 			// Request for search form
@@ -207,8 +203,7 @@ namespace synthese
 				v,
 				searchRequest.getHTMLForm(),
 				_requestParameters,
-				users,
-				InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
+				users
 			);
 
 			stream << f.open();

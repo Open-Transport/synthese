@@ -123,7 +123,6 @@ namespace synthese
 		
 		void CalendarTemplateAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const {
 

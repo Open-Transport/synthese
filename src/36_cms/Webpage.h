@@ -30,6 +30,8 @@
 #include "TreeOtherClassRootPolicy.hpp"
 #include "Named.h"
 #include "Website.hpp"
+#include "Function.h"
+#include "Factory.h"
 
 #include <ostream>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -105,6 +107,98 @@ namespace synthese
 			>,
 			public util::Named
 		{
+		private:
+
+			// Precompiled webpage
+
+			class Node
+			{
+			public:
+				virtual void display(
+					std::ostream& stream,
+					const server::Request& request,
+					const server::ParametersMap& aditionalParametersMap
+				) const = 0;
+			};
+
+			typedef std::vector<boost::shared_ptr<Node> > Nodes;
+
+			class TextNode : public Node
+			{
+			public:
+				std::string text;
+
+				virtual void display(
+					std::ostream& stream,
+					const server::Request& request,
+					const server::ParametersMap& aditionalParametersMap
+				) const;
+			};
+
+			class FunctionNode : public Node
+			{
+			public:
+				const util::Factory<server::Function>::CreatorInterface* functionCreator;
+				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
+				Parameters parameters;
+
+				virtual void display(
+					std::ostream& stream,
+					const server::Request& request,
+					const server::ParametersMap& aditionalParametersMap
+				) const;
+			};
+
+			class LabelNode : public Node
+			{
+			public:
+				std::string label;
+
+				virtual void display(
+					std::ostream& stream,
+					const server::Request& request,
+					const server::ParametersMap& aditionalParametersMap
+				) const;
+			};
+
+			class GotoNode : public Node
+			{
+			public:
+				std::string direction;
+
+				virtual void display(
+					std::ostream& stream,
+					const server::Request& request,
+					const server::ParametersMap& aditionalParametersMap
+				) const;
+			};
+
+			class ValueNode : public Node
+			{
+			public:
+				std::string name;
+
+				virtual void display(
+					std::ostream& stream,
+					const server::Request& request,
+					const server::ParametersMap& aditionalParametersMap
+				) const;
+			};
+
+			class IncludeNode : public Node
+			{
+			public:
+				std::string pageName;
+				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
+				Parameters parameters;
+
+				virtual void display(
+					std::ostream& stream,
+					const server::Request& request,
+					const server::ParametersMap& aditionalParametersMap
+				) const;
+			};
+
 		public:
 			/// Chosen registry class.
 			typedef util::Registry<Webpage>	Registry;
@@ -112,6 +206,8 @@ namespace synthese
 			typedef std::vector<Webpage*> Links;
 
 		private:
+			mutable Nodes _nodes;
+
 			std::string _smartURLPath;
 			std::string _smartURLDefaultParameterName;
 
@@ -125,16 +221,16 @@ namespace synthese
 			Links _links;
 			bool _doNotUseTemplate;
 			bool _hasForum;
+			bool _ignoreWhiteChars;
 
 
 
 			//////////////////////////////////////////////////////////////////////////
-			/// Parses a string and displays the output on a stream
-			/// @param stream stream to write the result on
+			/// Parses the content and put it in the nodes cache.
+			/// @retval nodes object to write the result on
 			/// @param it iterator on the beginning of the string to parse
 			/// @param end iterator on the end of the string to parse
-			/// @param request request which has launched the display of the webpage
-			/// @param recursionLevel level of recursion (default = 0).
+			/// @param termination termination string to detect to interrupt the parsing
 			/// @return iterator on the end of the parsing
 			/// @author Hugues Romain
 			/// @date 2010
@@ -145,13 +241,32 @@ namespace synthese
 			/// as an url to avoid mistake when the result of parsing is considered as
 			/// a single parameter of a function call.
 			std::string::const_iterator _parse(
+				Nodes& nodes,
+				std::string::const_iterator it,
+				std::string::const_iterator end,
+				std::set<std::string> termination
+			) const;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Parses the content and put it in a stream.
+			/// @retval stream stream to write the result on
+			/// @param it iterator on the beginning of the string to parse
+			/// @param end iterator on the end of the string to parse
+			/// @param termination termination string to detect to interrupt the parsing
+			/// @return iterator on the end of the parsing
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			/// The parsing stops when the iterator has reached the end of the string, or if the ?> sequence has been found, indicating that the following text belongs to
+			///	a lower level of recursion.
+			/// If the level of recursion is superior than 0, then the output is encoded
+			/// as an url to avoid mistake when the result of parsing is considered as
+			/// a single parameter of a function call.
+			std::string::const_iterator _parseText(
 				std::ostream& stream,
 				std::string::const_iterator it,
 				std::string::const_iterator end,
-				std::string termination,
-				const server::Request& request,
-				bool encodeSubResults,
-				const server::ParametersMap& aditionalParametersMap
+				std::string termination
 			) const;
 
 		public:
@@ -171,11 +286,19 @@ namespace synthese
 				bool getHasForum() const { return _hasForum; }
 				const std::string& getSmartURLPath() const { return _smartURLPath; }
 				const std::string& getSmartURLDefaultParameterName() const { return _smartURLDefaultParameterName; }
+				bool getIgnoreWhiteChars() const { return _ignoreWhiteChars; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setContent(const std::string& value) { _content = value; }
+				//////////////////////////////////////////////////////////////////////////
+				/// Content setter with nodes cache update.
+				/// The parsing is done only if the content has changed.
+				/// @param value new value for the content
+				/// @param noUpdate avoid the nodes cache to be updated (optional, default is not to avoid)
+				/// @author Hugues Romain
+				void setContent(const std::string& value);
+
 				void setStartDate(const boost::posix_time::ptime& value) { _startDate = value; }
 				void setEndDate(const boost::posix_time::ptime& value) { _endDate = value; }
 				void setMimeType(const std::string& value){ _mimeType = value; }
@@ -187,6 +310,7 @@ namespace synthese
 				void setHasForum(bool value){ _hasForum = value; }
 				void setSmartURLPath(const std::string& value){ _smartURLPath = value; }
 				void setSmartURLDefaultParameterName(const std::string& value){ _smartURLDefaultParameterName = value; }
+				void setIgnoreWhiteChars(bool value){ _ignoreWhiteChars = value; }
 			//@}
 
 			//! @name Services

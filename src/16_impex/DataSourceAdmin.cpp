@@ -120,7 +120,6 @@ namespace synthese
 
 		void DataSourceAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const admin::AdminRequest& request
 		) const	{
 

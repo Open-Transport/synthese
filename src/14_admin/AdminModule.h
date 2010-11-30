@@ -68,7 +68,6 @@ namespace synthese
 
 		public:
 			static const std::string TABLE_COL_ID;
-			static const std::string ICON_PATH_INTERFACE_VARIABLE;
 			static const std::string CSS_TIME_INPUT;
 			static const std::string CSS_2DIGIT_INPUT;
 

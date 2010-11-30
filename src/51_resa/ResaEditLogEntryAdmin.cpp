@@ -54,7 +54,6 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace resa;
@@ -114,9 +113,11 @@ namespace synthese
 
 
 
-		void ResaEditLogEntryAdmin::display(ostream& stream, VariablesMap& variables,
-					const admin::AdminRequest& _request
+		void ResaEditLogEntryAdmin::display(
+			ostream& stream,
+			const admin::AdminRequest& _request
 		) const	{
+
 			// Requests
 			AdminActionFunctionRequest<ResaLogEntryUpdateAction,ResaEditLogEntryAdmin> updateRequest(_request);
 			updateRequest.getAction()->setEntryId(_entry->getKey());

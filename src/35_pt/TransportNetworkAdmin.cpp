@@ -48,7 +48,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace pt;
@@ -104,9 +103,11 @@ namespace synthese
 
 
 		
-		void TransportNetworkAdmin::display(ostream& stream, VariablesMap& variables,
-					const admin::AdminRequest& _request) const
-		{
+		void TransportNetworkAdmin::display(
+			ostream& stream,
+			const admin::AdminRequest& _request
+		) const	{
+
 			// Requests
 			
 			// Search form

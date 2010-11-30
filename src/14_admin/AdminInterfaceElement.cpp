@@ -189,7 +189,6 @@ namespace synthese
 
 		void AdminInterfaceElement::displayTabs(
 			std::ostream& stream,
-			interfaces::VariablesMap& variables,
 			const admin::AdminRequest& request
 		) const {
 			if (_tabs.empty()) return;

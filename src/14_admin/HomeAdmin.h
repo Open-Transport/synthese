@@ -46,7 +46,8 @@ namespace synthese
 
 			Une page d'administration est imprimable grace à une feuille de style dédiée à l'impression : seule la zone de contenus est alors imprimée. Si une page d'administration contient des formulaires, les boutons ne sont pas imprimés.
 		*/
-		class HomeAdmin : public AdminInterfaceElementTemplate<HomeAdmin>
+		class HomeAdmin:
+			public AdminInterfaceElementTemplate<HomeAdmin>
 		{
 		public:
 			HomeAdmin();
@@ -74,7 +75,6 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				interfaces::VariablesMap& variables,
 				const admin::AdminRequest& request
 			) const;
 

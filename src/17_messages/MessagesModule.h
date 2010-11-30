@@ -66,12 +66,35 @@ namespace synthese
 	*/
 	namespace messages
 	{
+		class SentAlarm;
+
 		/** 17 Messages module class.
 		*/
 		class MessagesModule:
 			public server::ModuleClassTemplate<MessagesModule>
 		{
 		public:
+			struct SentAlarmLess : public std::binary_function<SentAlarm*, SentAlarm*, bool>
+			{
+				//////////////////////////////////////////////////////////////////////////
+				/// Order by decreasing priority level, then by start date, then by address
+				/// NULL addresses are forbidden
+				bool operator()(SentAlarm* left, SentAlarm* right) const;
+			};
+
+			typedef std::map<util::RegistryKeyType, std::set<SentAlarm*, SentAlarmLess> > MessagesByRecipientId;
+
+		private:
+			static MessagesByRecipientId _messagesByRecipientId;
+
+		public:
+
+			static MessagesByRecipientId::mapped_type GetMessages(util::RegistryKeyType recipientId);
+			
+			static void AddMessage(util::RegistryKeyType recipientId, SentAlarm* value);
+			
+			static void RemoveMessage(util::RegistryKeyType recipientId, SentAlarm* value);
+
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
 
 			/** Labels list containing each scenario template ordered by folder, indicating the full path in the folder tree.

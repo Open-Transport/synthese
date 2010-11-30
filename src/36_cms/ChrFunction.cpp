@@ -1,6 +1,6 @@
 
-/** GetValueFunction class implementation.
-	@file GetValueFunction.cpp
+/** ChrFunction class implementation.
+	@file ChrFunction.cpp
 	@author Hugues Romain
 	@date 2010
 
@@ -24,75 +24,44 @@
 
 #include "RequestException.h"
 #include "Request.h"
-#include "GetValueFunction.hpp"
-#include "FunctionWithSite.h"
-#include "CMSModule.hpp"
+#include "ChrFunction.hpp"
 
 using namespace std;
-using namespace boost;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace cms;
 
-	template<> const string util::FactorableTemplate<Function, GetValueFunction>::FACTORY_KEY("@");
+	template<> const string util::FactorableTemplate<Function,cms::ChrFunction>::FACTORY_KEY("char");
 	
 	namespace cms
 	{
-		const string GetValueFunction::PARAMETER_PARAMETER("p");
+		const string ChrFunction::PARAMETER_CODE("code");
 		
-		ParametersMap GetValueFunction::_getParametersMap() const
+		ParametersMap ChrFunction::_getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_PARAMETER, _parameter);
+			map.insert(PARAMETER_CODE, _code);
 			return map;
 		}
 
-		void GetValueFunction::_setFromParametersMap(const ParametersMap& map)
+		void ChrFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_parameter = map.getDefault<string>(PARAMETER_PARAMETER);
+			_code = map.get<string>(PARAMETER_CODE);
 		}
 
-		void GetValueFunction::run(
+		void ChrFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
-			if(_parameter == "client_url")
-			{
-				stream << request.getClientURL();
-			}
-			else if(_parameter == "host_name")
-			{
-				stream << request.getHostName();
-			}
-			else if(_parameter == "site")
-			{
-				shared_ptr<const Website> site(CMSModule::GetSite(request));
-				if(site.get())
-				{
-					stream << site->getKey();
-				}
-			}
-			else
-			{
-				string value(_aditionnalParameters.getDefault<string>(_parameter));
-				if(value.empty())
-				{
-					value = request.getParametersMap().getDefault<string>(_parameter);
-				}
-				else
-				{
-					stream << value;
-				}
-			}
+			stream << atoi(_code.c_str());
 		}
 		
 		
 		
-		bool GetValueFunction::isAuthorized(
+		bool ChrFunction::isAuthorized(
 			const Session* session
 		) const {
 			return true;
@@ -100,7 +69,7 @@ namespace synthese
 
 
 
-		std::string GetValueFunction::getOutputMimeType() const
+		std::string ChrFunction::getOutputMimeType() const
 		{
 			return "text/plain";
 		}

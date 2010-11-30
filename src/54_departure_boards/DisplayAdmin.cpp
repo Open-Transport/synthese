@@ -99,7 +99,6 @@ namespace synthese
 	using namespace server;
 	using namespace admin;
 	using namespace util;
-	using namespace pt;
 	using namespace html;
 	using namespace db;
 	using namespace departure_boards;
@@ -171,7 +170,6 @@ namespace synthese
 
 		void DisplayAdmin::display(
 			std::ostream& stream,
-			interfaces::VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
 

@@ -25,7 +25,6 @@
 #include "SearchFormHTMLTable.h"
 #include "ActionResultHTMLTable.h"
 #include "05_html/Constants.h"
-#include "InterfaceModule.h"
 #include "StaticActionFunctionRequest.h"
 #include "SentScenario.h"
 #include "AlarmRecipient.h"
@@ -60,7 +59,6 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace html;
@@ -151,9 +149,11 @@ namespace synthese
 
 
 
-		void MessagesAdmin::display(ostream& stream, interfaces::VariablesMap& variables,
-					const admin::AdminRequest& _request) const
-		{
+		void MessagesAdmin::display(
+			ostream& stream,
+			const admin::AdminRequest& _request
+		) const	{
+
 			// Requests
 			AdminFunctionRequest<MessagesAdmin> searchRequest(_request);
 
@@ -243,8 +243,7 @@ namespace synthese
 				_requestParameters,
 				scenarios,
 				newScenarioRequest.getHTMLForm("newscen"),
-				NewScenarioSendAction::PARAMETER_MESSAGE_TO_COPY,
-				InterfaceModule::getVariableFromMap(variables, AdminModule::ICON_PATH_INTERFACE_VARIABLE)
+				NewScenarioSendAction::PARAMETER_MESSAGE_TO_COPY
 			);
 			
 			stream << t1.open();

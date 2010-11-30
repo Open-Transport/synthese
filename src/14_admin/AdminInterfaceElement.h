@@ -24,7 +24,6 @@
 #define SYNTHESE_INTERFACES_ADMIN_INTERFACE_ELEMENT_H
 
 #include "FactoryBase.h"
-#include "11_interfaces/Types.h"
 #include "StaticFunctionRequest.h"
 
 #include <string>
@@ -408,15 +407,12 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			///	displayTabs.
 			///	@param stream
-			///	@param variables
 			///	@param request
-			///	@return void
 			///	@author Hugues Romain
 			///	@date 2008
 			////////////////////////////////////////////////////////////////////
 			void displayTabs(
 				std::ostream& stream,
-				interfaces::VariablesMap& variables,
 				const AdminRequest& request
 			) const;
 
@@ -457,13 +453,11 @@ namespace synthese
 
 				/** Display of the content of the admin element.
 					@param stream Stream to write on.
-					@param variables Execution variables
 					@param request Current request
 				*/
 				virtual void display(
 					std::ostream& stream,
-					interfaces::VariablesMap& variables,
-					const AdminRequest& _request
+					const AdminRequest& request
 				) const = 0;
 
 				virtual std::string getIcon() const = 0;

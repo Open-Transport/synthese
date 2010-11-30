@@ -25,6 +25,9 @@
 #include "ModuleClass.h"
 #include "UserAdmin.h"
 #include "SecurityRight.h"
+#include "HTMLModule.h"
+#include "ServerModule.h"
+#include "AdminFunction.h"
 
 #include <boost/foreach.hpp>
 
@@ -37,7 +40,7 @@ namespace synthese
 	using namespace admin;
 	using namespace util;
 	using namespace security;
-	
+	using namespace html;	
 	
 	namespace util
 	{
@@ -49,13 +52,30 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<HomeAdmin>::ICON = "house.png";
 		template<> const string AdminInterfaceElementTemplate<HomeAdmin>::DEFAULT_TITLE = "Accueil";
 
+
+
 		void HomeAdmin::display(
 			std::ostream& stream,
-			interfaces::VariablesMap& variables,
 			const AdminRequest& request
 		) const	{
-			stream << "Bienvenue sur le panneau de configuration de SYNTHESE";
+			stream << "<p>Bienvenue sur le module d'administration de SYNTHESE " << ServerModule::VERSION << ".</p>";
+
+			stream << "<h1>Accès directs</h1>";
+
+			stream << "<ul>";
+
+			BOOST_FOREACH(boost::shared_ptr<const AdminInterfaceElement> link, getSubPages(*this, request))
+			{
+				AdminRequest r(request, true);
+				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(link));
+				
+				stream << "<li>" << HTMLModule::getHTMLLink(r.getURL(), link->getTitle()) << "</li>";
+			}
+
+			stream << "</ul>";
 		}
+
+
 
 		void HomeAdmin::setFromParametersMap(
 			const ParametersMap& map
@@ -78,11 +98,12 @@ namespace synthese
 			return true;
 		}
 
+
+
 		HomeAdmin::HomeAdmin()
 			: AdminInterfaceElementTemplate<HomeAdmin>()
-		{
-	
-		}
+		{}
+
 
 
 		AdminInterfaceElement::PageLinks HomeAdmin::getSubPages(
@@ -117,5 +138,4 @@ namespace synthese
 			
 			return links;
 		}
-	}
-}
+}	}

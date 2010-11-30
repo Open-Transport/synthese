@@ -68,6 +68,8 @@ namespace synthese
 
 	namespace messages
 	{
+		MessagesModule::MessagesByRecipientId MessagesModule::_messagesByRecipientId;
+
 		MessagesModule::Labels MessagesModule::GetScenarioTemplatesLabels(
 			string withAllLabel,
 			string withNoLabel
@@ -220,6 +222,88 @@ namespace synthese
 			case ALARM_CONFLICT: return "En conflit";
 			default: return "Inconnu";
 			}
+		}
+
+
+
+		MessagesModule::MessagesByRecipientId::mapped_type MessagesModule::GetMessages(
+			util::RegistryKeyType recipientId
+		){
+			MessagesByRecipientId::const_iterator it(_messagesByRecipientId.find(recipientId));
+			if(it == _messagesByRecipientId.end())
+			{
+				return MessagesByRecipientId::mapped_type();
+			}
+			return it->second;
+		}
+
+
+
+		void MessagesModule::AddMessage(
+			RegistryKeyType recipientId,
+			SentAlarm* value
+		){
+			MessagesByRecipientId::iterator it(_messagesByRecipientId.find(recipientId));
+			if(it == _messagesByRecipientId.end())
+			{
+				MessagesByRecipientId::mapped_type messages;
+				messages.insert(value);
+				_messagesByRecipientId.insert(make_pair(recipientId, messages));
+			}
+			else
+			{
+				it->second.insert(value);
+			}
+		}
+
+
+
+		void MessagesModule::RemoveMessage(
+			util::RegistryKeyType recipientId,
+			SentAlarm* value
+		){
+			MessagesByRecipientId::iterator it(_messagesByRecipientId.find(recipientId));
+			if(it != _messagesByRecipientId.end())
+			{
+				it->second.erase(value);
+				if(it->second.empty())
+				{
+					_messagesByRecipientId.erase(it);
+				}
+			}
+		}
+
+
+
+		bool MessagesModule::SentAlarmLess::operator()( SentAlarm* left, SentAlarm* right) const
+		{
+			assert(left && right);
+
+			if(left->getLevel() != right->getLevel())
+			{
+				return left->getLevel() > right->getLevel();
+			}
+
+			if(!left->getScenario()->getPeriodStart().is_not_a_date_time())
+			{
+				if(right->getScenario()->getPeriodStart().is_not_a_date_time())
+				{
+					return true;
+				}
+				if(left->getScenario()->getPeriodStart() != right->getScenario()->getPeriodStart())
+				{
+					return left->getScenario()->getPeriodStart() > right->getScenario()->getPeriodStart();
+				}
+			}
+			else
+			{
+				if(!right->getScenario()->getPeriodStart().is_not_a_date_time())
+				{
+					return false;
+				}
+			}
+
+			return left < right;
 		}
 	}
 }

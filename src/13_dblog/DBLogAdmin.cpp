@@ -25,7 +25,6 @@
 #include "UtilConstants.h"
 #include "ResultHTMLTable.h"
 #include "SearchFormHTMLTable.h"
-#include "InterfaceModule.h"
 #include "SecurityModule.h"
 #include "User.h"
 #include "UserTableSync.h"
@@ -54,7 +53,6 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -104,7 +102,6 @@ namespace synthese
 
 		void DBLogAdmin::display(
 			ostream& stream,
-			interfaces::VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const {
 			stream << "<h1>Journal</h1>";

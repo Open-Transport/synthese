@@ -92,8 +92,7 @@ namespace synthese
 		
 		void CalendarTemplatesAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
-					const admin::AdminRequest& _request
+			const admin::AdminRequest& _request
 		) const {
 			// Requests
 
