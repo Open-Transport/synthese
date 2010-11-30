@@ -40,7 +40,6 @@ using namespace std;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace map;
@@ -92,7 +91,6 @@ namespace synthese
 		
 		void TestMapAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const AdminRequest& _request
 		) const	{
 			// Requests

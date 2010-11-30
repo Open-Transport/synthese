@@ -56,20 +56,18 @@ namespace synthese
 		template <class RootObject>
 		class Factory
 		{
+		public:
 			////////////////////////////////////////////////////////////////////
 			/// Interface for auto-generated creators.
 			class CreatorInterface
 			{
-			private:
-				virtual RootObject* create() = 0;
-				friend class Factory;
-
 			public:
+				virtual RootObject* create() const = 0;
+				
 				virtual ~CreatorInterface() {}
 			};
 
-
-
+		private:
 			////////////////////////////////////////////////////////////////////
 			/// Auto-generated creator for each registered subclass.
 			template <class T>
@@ -84,7 +82,7 @@ namespace synthese
 				/// Creation of a child object without arguments.
 				/// @return a RootObject pointer to the created object.
 				//////////////////////////////////////////////////////////////////////////
-				RootObject* create ()
+				RootObject* create () const
 				{
 					return static_cast<RootObject*>(new T);
 				}
@@ -151,6 +149,27 @@ namespace synthese
 			}
 
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets a creator to avoid future search in the map operations.
+			/// @param key key to search
+			/// @return creator
+			/// @throws FactoryException<RootObject> if the key wss not found in the map
+			/// @author Hugues Romain
+			/// @since 3.2.0
+			/// @date 2010
+			static const CreatorInterface* GetCreator(
+				const typename Map::key_type& key
+			){
+				// Search of the key of the wished class in the map
+				typename Map::iterator it = _registeredCreator.find(key);
+
+				// The key is not found
+				if(it == _registeredCreator.end())
+					throw FactoryException<RootObject>("Unable to factor "+ key +" object (class not found)");
+
+				// The key is found : return of an instance of the object
+				return it->second.get();
+			}
 
 			////////////////////////////////////////////////////////////////////
 			/// Creation of an object from the key of its class, with arguments, returned as a pointer to an instantiation of the factory root class.

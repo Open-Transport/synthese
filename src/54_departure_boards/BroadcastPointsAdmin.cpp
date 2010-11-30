@@ -115,7 +115,6 @@ namespace synthese
 
 		void BroadcastPointsAdmin::display(
 			ostream& stream,
-			interfaces::VariablesMap& variables,
 			const admin::AdminRequest& _request) const
 		{
 			vector<pair<optional<int>, string> > m;

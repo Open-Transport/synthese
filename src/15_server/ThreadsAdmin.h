@@ -56,7 +56,12 @@ namespace synthese
 				@author Hugues
 				@date 2009
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables, const admin::AdminRequest& request) const;
+			void display(
+				std::ostream& stream,
+				const admin::AdminRequest& request
+			) const;
+
+
 			
 			/** Authorization control.
 				@param request The current request

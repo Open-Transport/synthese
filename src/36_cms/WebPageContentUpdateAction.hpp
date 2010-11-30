@@ -42,11 +42,13 @@ namespace synthese
 		/// Key : WebPageContentUpdateAction
 		///
 		/// Parameters :
-		/// <ul>
-		///		<li>wp : id of the page to update</li>
-		///		<li>c1 : new main content</li>
-		///		<li>ab : new abstract</li>
-		///		<li>im : new image</li>
+		/// <dl>
+		///	<dt>actionParamwp</dt><dd>id of the page to update</dd>
+		///	<dt>actionParamc1</dt><dd>new main content</dd>
+		///	<dt>actionParamab</dt><dd>new abstract</dd>
+		///	<dt>actionParamim</dt><dd>new image</dd>
+		///	<dt>actionParamti</dt><dd>new title</dd>
+		///	<dt>actionParamiw</dt><dd>the page output must ignore white chars</dd>
 		///	</ul>
 		class WebPageContentUpdateAction:
 			public util::FactorableTemplate<server::Action, WebPageContentUpdateAction>
@@ -57,6 +59,7 @@ namespace synthese
 			static const std::string PARAMETER_ABSTRACT;
 			static const std::string PARAMETER_IMAGE;
 			static const std::string PARAMETER_TITLE;
+			static const std::string PARAMETER_IGNORE_WHITE_CHARS;
 
 		private:
 			boost::shared_ptr<Webpage> _page;
@@ -64,6 +67,7 @@ namespace synthese
 			std::string _abstract;
 			std::string _image;
 			std::string _title;
+			bool _ignoreWhiteChars;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -80,6 +84,8 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			WebPageContentUpdateAction();
+
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action

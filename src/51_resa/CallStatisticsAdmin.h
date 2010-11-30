@@ -98,13 +98,11 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of the content of the admin element.
 			///	@param stream Stream to write the page content on.
-			///	@param variables Environment variables defined by the interface
 			///	@param request The current request
 			///	@author Hugues
 			///	@date 2009
 			void display(
 				std::ostream& stream,
-				interfaces::VariablesMap& variables,
 				const admin::AdminRequest& request
 			) const;
 

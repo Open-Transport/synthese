@@ -29,6 +29,7 @@
 #include "AlarmTableSync.h"
 #include "LoadException.h"
 #include "LinkException.h"
+#include "MessagesModule.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -96,10 +97,13 @@ namespace synthese
 				)	);
 				object->setAlarm(alarm.get());
 
-				if(linkLevel >= RECURSIVE_LINKS_LOAD_LEVEL && dynamic_cast<SentAlarm*>(alarm.get()))
-				{
+				if(	linkLevel >= RECURSIVE_LINKS_LOAD_LEVEL &&
+					dynamic_cast<SentAlarm*>(alarm.get()) &&
+					static_cast<SentAlarm&>(*alarm).getScenario()
+				){
 					shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
 					ar->addObject(static_cast<SentAlarm*>(alarm.get()), object->getObjectId());
+					MessagesModule::AddMessage(object->getObjectId(), static_cast<SentAlarm*>(alarm.get()));
 				}
 			}
 			catch(FactoryException<AlarmRecipient> e)
@@ -127,6 +131,7 @@ namespace synthese
 				{
 					shared_ptr<AlarmRecipient> ar(Factory<AlarmRecipient>::create(object->getRecipientKey()));
 					ar->removeObject(static_cast<SentAlarm*>(object->getAlarm()), object->getObjectId());
+					MessagesModule::RemoveMessage(object->getObjectId(), static_cast<SentAlarm*>(object->getAlarm()));
 				}
 				catch(FactoryException<AlarmRecipient> e)
 				{

@@ -91,9 +91,10 @@ namespace synthese
 
 
 				virtual void _save(
-					T* obj
+					T* obj,
+					boost::optional<SQLiteTransaction&> transaction = boost::optional<SQLiteTransaction&>()
 				){
-						assert(false);
+					assert(false);
 				}
 
 
@@ -197,10 +198,12 @@ namespace synthese
 				- if the object has already a key, then the corresponding record is replaced
 				- if the object does not have any key, then the autoincrement function generates one for it.
 			*/
-			static void Save(T* obj)
-			{
+			static void Save(
+				T* obj,
+				boost::optional<SQLiteTransaction&> transaction = boost::optional<SQLiteTransaction&>()
+			){
 				boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(obj)));
-				tablesync->_save(obj);
+				tablesync->_save(obj, transaction);
 			}
 
 

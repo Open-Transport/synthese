@@ -104,9 +104,12 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			void display(std::ostream& stream, interfaces::VariablesMap& variables,
+			void display(
+				std::ostream& stream,
 				const admin::AdminRequest& _request
 			) const;
+
+
 			
 			/** Authorization control.
 				@return bool True if the displayed page can be displayed

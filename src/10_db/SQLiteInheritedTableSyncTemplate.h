@@ -243,9 +243,10 @@ namespace synthese
 
 			
 			virtual void _save(
-				typename ParentTableSyncClass::ObjectType* obj
+				typename ParentTableSyncClass::ObjectType* obj,
+				boost::optional<SQLiteTransaction&> transaction = boost::optional<SQLiteTransaction&>()
 			){
-				Save(static_cast<ObjectClass*>(obj));
+				Save(static_cast<ObjectClass*>(obj), transaction);
 			}
 		};
 	}

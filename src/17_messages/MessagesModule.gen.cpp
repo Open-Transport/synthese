@@ -24,7 +24,10 @@ synthese::messages::MessagesLibraryRight::integrate();
 synthese::messages::MessagesLog::integrate();
 synthese::messages::MessagesLibraryLog::integrate();
 
+synthese::messages::GetMessagesFunction::integrate();
+
 synthese::messages::ScenarioUpdateDatesAction::integrate();
+synthese::messages::SimpleMessageCreationAction::integrate();
 synthese::messages::ScenarioStopAction::integrate();
 synthese::messages::DeleteAlarmAction::integrate();
 synthese::messages::UpdateAlarmMessagesFromTemplateAction::integrate();

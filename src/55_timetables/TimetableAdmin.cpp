@@ -135,7 +135,6 @@ namespace synthese
 		
 		void TimetableAdmin::display(
 			ostream& stream,
-			interfaces::VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
 

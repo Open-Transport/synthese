@@ -65,11 +65,9 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace resa;
-	using namespace pt;
 	using namespace html;
 	using namespace security;
 	using namespace graph;
@@ -177,7 +175,6 @@ namespace synthese
 
 		void BookableCommercialLineAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
 			// Rights

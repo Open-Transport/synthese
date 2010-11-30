@@ -48,7 +48,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -122,7 +121,6 @@ namespace synthese
 
 		void WebPageAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const admin::AdminRequest& request
 		) const	{
 
@@ -151,6 +149,7 @@ namespace synthese
 					stream << t.cell("Contenu", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_CONTENT1, _page->getContent(), 15, 60));
 					stream << t.cell("Résumé", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_ABSTRACT, _page->getAbstract(), 5, 60));
 					stream << t.cell("Image", t.getForm().getTextInput(WebPageContentUpdateAction::PARAMETER_IMAGE, _page->getImage()));
+					stream << t.cell("Ignorer caractères invisibles", t.getForm().getOuiNonRadioInput(WebPageContentUpdateAction::PARAMETER_IGNORE_WHITE_CHARS, _page->getIgnoreWhiteChars()));
 					stream << t.close();
 				}
 			}

@@ -221,7 +221,6 @@ namespace synthese
 		
 		void TransportSiteAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
 

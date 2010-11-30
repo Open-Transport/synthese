@@ -59,7 +59,6 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace departure_boards;
 	using namespace security;
@@ -125,8 +124,7 @@ namespace synthese
 		
 		void DisplayScreenCPUAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
-					const admin::AdminRequest& _request
+			const admin::AdminRequest& _request
 		) const	{
 			
 			////////////////////////////////////////////////////////////////////

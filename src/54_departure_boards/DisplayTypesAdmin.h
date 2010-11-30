@@ -65,7 +65,8 @@ namespace synthese
 				- INFO : Modification de type d'afficheur
 				- INFO : Suppression de type d'afficheur
 		*/
-		class DisplayTypesAdmin : public admin::AdminInterfaceElementTemplate<DisplayTypesAdmin>
+		class DisplayTypesAdmin:
+			public admin::AdminInterfaceElementTemplate<DisplayTypesAdmin>
 		{
 			boost::optional<std::string>				_searchName;
 			boost::optional<util::RegistryKeyType>		_searchInterfaceId;
@@ -97,9 +98,10 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				interfaces::VariablesMap& variables,
 				const admin::AdminRequest& _request
 			) const;
+
+
 
 			bool isAuthorized(
 				const security::User& user

@@ -111,7 +111,6 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				interfaces::VariablesMap& variables,
 				const admin::AdminRequest& _request
 			) const;
 			

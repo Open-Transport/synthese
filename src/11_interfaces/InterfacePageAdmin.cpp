@@ -25,7 +25,6 @@
 #include "InterfacePageAdmin.h"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
-#include "InterfaceModule.h"
 #include "InterfaceRight.h"
 #include "InterfacePage.h"
 #include "Interface.h"
@@ -108,7 +107,6 @@ namespace synthese
 
 		void InterfacePageAdmin::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
 

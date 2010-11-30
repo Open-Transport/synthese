@@ -1,11 +1,7 @@
-
-synthese::admin::AdminInterfacePage::integrate();
+// 14 Admin
 
 synthese::admin::HomeAdmin::integrate();
 synthese::admin::ModuleAdmin::integrate();
+synthese::admin::LoginAdmin::integrate();
 
 synthese::admin::AdminFunction::integrate();
-
-synthese::admin::AdminPagesTreeInterfaceElement::integrate();
-synthese::admin::AdminPagePositionInterfaceElement::integrate();
-

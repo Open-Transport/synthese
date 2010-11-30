@@ -129,10 +129,11 @@ namespace synthese
 			*/
 			void display(
 				std::ostream& stream,
-				interfaces::VariablesMap& variables,
 				const admin::AdminRequest& _request
 			) const;
 			
+
+
 			/** Authorization control.
 				@return bool True if the displayed page can be displayed
 				@author Hugues Romain

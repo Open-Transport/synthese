@@ -50,8 +50,8 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace admin;
 	using namespace interfaces;
+	using namespace admin;
 	using namespace server;
 	using namespace util;
 	using namespace html;
@@ -101,9 +101,9 @@ namespace synthese
 			
 		void DisplayTypesAdmin::display(
 			ostream& stream,
-			interfaces::VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
+
 			// Right
 			bool writeRight(_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
 			
