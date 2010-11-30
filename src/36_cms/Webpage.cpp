@@ -317,7 +317,7 @@ namespace synthese
 							if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->label == label.str())
 							{
 								itNode = itGotoNode;
-								continue;
+								break;
 							}
 						}
 						for(itGotoNode = _nodes.begin(); itGotoNode != itNode; ++itGotoNode)
@@ -325,7 +325,7 @@ namespace synthese
 							if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->label == label.str())
 							{
 								itNode = itGotoNode;
-								continue;
+								break;
 							}
 						}
 					}
