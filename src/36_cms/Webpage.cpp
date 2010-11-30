@@ -232,9 +232,9 @@ namespace synthese
 						currentTextNode.reset();
 					}
 					shared_ptr<GotoNode> node(new GotoNode);
-					stringstream s;
-					it = _parseText(s, it+2, end, "%>");
-					node->direction = s.str();
+					set<string> gotoEnding;
+					gotoEnding.insert("%>");
+					it = _parse(node->direction, it+2, end, gotoEnding);
 					nodes.push_back(static_pointer_cast<Node,GotoNode>(node));
 
 				} // Label
@@ -304,13 +304,17 @@ namespace synthese
 				if(dynamic_cast<GotoNode*>(itNode->get()))
 				{
 					// Search of label
-					string label(static_cast<GotoNode*>(itNode->get())->direction);
-					if(!label.empty())
+					stringstream label;
+					BOOST_FOREACH(boost::shared_ptr<Node> node, static_cast<GotoNode*>(itNode->get())->direction)
+					{
+						node->display(label, request, aditionalParametersMap);
+					}
+					if(!label.str().empty())
 					{
 						Nodes::const_iterator itGotoNode(itNode+1);
 						for(; itGotoNode != _nodes.end(); ++itGotoNode)
 						{
-							if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->label == label)
+							if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->label == label.str())
 							{
 								itNode = itGotoNode;
 								continue;
@@ -318,7 +322,7 @@ namespace synthese
 						}
 						for(itGotoNode = _nodes.begin(); itGotoNode != itNode; ++itGotoNode)
 						{
-							if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->label == label)
+							if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->label == label.str())
 							{
 								itNode = itGotoNode;
 								continue;
