@@ -71,7 +71,7 @@ namespace synthese
 			{
 				stream << _text.substr(_first, *_size);
 			}
-			else
+			else if(_first < _text.size())
 			{
 				stream << _text.substr(_first);
 			}
