@@ -320,12 +320,15 @@ namespace synthese
 								break;
 							}
 						}
-						for(itGotoNode = _nodes.begin(); itGotoNode != itNode; ++itGotoNode)
+						if(itGotoNode == _nodes.end())
 						{
-							if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->label == label.str())
+							for(itGotoNode = _nodes.begin(); itGotoNode != itNode; ++itGotoNode)
 							{
-								itNode = itGotoNode;
-								break;
+								if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->label == label.str())
+								{
+									itNode = itGotoNode;
+									break;
+								}
 							}
 						}
 					}
