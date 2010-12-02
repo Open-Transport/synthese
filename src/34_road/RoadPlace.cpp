@@ -23,7 +23,7 @@
 #include <boost/foreach.hpp>
 
 #include "RoadPlace.h"
-#include "Road.h"
+#include "MainRoadPart.hpp"
 #include "RoadModule.h"
 #include "RoadChunk.h"
 #include "Registry.h"
@@ -149,17 +149,24 @@ namespace synthese
 
 
 
-		boost::shared_ptr<House> RoadPlace::getHouse( RoadChunk::HouseNumber houseNumber ) const
-		{
-			RoadChunk* nearestChunk(NULL);
-			RoadChunk::HouseNumber difference(0);
-			RoadChunk::HouseNumber bestNumber(0);
+		boost::shared_ptr<House> RoadPlace::getHouse(
+			MainRoadChunk::HouseNumber houseNumber
+		) const	{
+			MainRoadChunk* nearestChunk(NULL);
+			MainRoadChunk::HouseNumber difference(0);
+			MainRoadChunk::HouseNumber bestNumber(0);
 			BOOST_FOREACH(Path* path, getPaths())
 			{
+				MainRoadPart* roadPart(dynamic_cast<MainRoadPart*>(path));
+				if(!roadPart)
+				{
+					continue;
+				}
+
 				BOOST_FOREACH(Edge* edge, path->getEdges())
 				{
-					RoadChunk& chunk(static_cast<RoadChunk&>(*edge));
-					if(!chunk.getHouseNumberBounds())
+					MainRoadChunk& chunk(static_cast<MainRoadChunk&>(*edge));
+					if(!chunk.getLeftHouseNumberBounds() && !chunk.getRightHouseNumberBounds())
 					{
 						continue;
 					}
@@ -171,7 +178,8 @@ namespace synthese
 								houseNumber
 						)	);
 					}
-					if(houseNumber > chunk.getHouseNumberBounds()->second)
+/* todo
+					if(houseNumber > chunk.getLeftHouseNumberBounds()->second)
 					{
 						if(!nearestChunk || houseNumber - chunk.getHouseNumberBounds()->second < difference)
 						{
@@ -189,7 +197,7 @@ namespace synthese
 							nearestChunk = &chunk;
 						}
 					}
-				}
+*/				}
 			}
 
 			// Nearest existing number

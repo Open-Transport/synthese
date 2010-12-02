@@ -56,8 +56,7 @@ namespace synthese
 				rankInRoad,
 				fromCrossing,
 				metricOffset
-			),
-			_reverseRoadChunk(NULL)
+			)
 		{
 			if(fromCrossing)
 			{
@@ -138,50 +137,4 @@ namespace synthese
 					LengthIndexedLine(geometry.get()).extractPoint(metricOffset)
 			)	);
 		}
-
-
-
-		bool RoadChunk::testIfHouseNumberBelongsToChunk( HouseNumber houseNumber ) const
-		{
-			if(!_houseNumberBounds)
-			{
-				return false;
-			}
-
-			if(houseNumber < _houseNumberBounds->first || houseNumber > _houseNumberBounds->second)
-			{
-				return false;
-			}
-
-			switch(_houseNumberingPolicy)
-			{
-			case ALL: return true;
-			case ODD: return houseNumber % 2;
-			case EVEN: return !(houseNumber % 2); 
-			}
-
-			// Never execute
-			return false;
-		}
-
-
-
-		RoadChunk::MetricOffset RoadChunk::getHouseNumberMetricOffset( HouseNumber houseNumber ) const
-		{
-			RoadChunk::MetricOffset res;
-
-			res = getMetricOffset();
-
-			//WARNING : sometimes current function is called even on an edge without _houseNumberBounds
-			if(_houseNumberBounds)
-			{
-				res += (_houseNumberBounds->second == _houseNumberBounds->first ? 0 :
-
-				((houseNumber - _houseNumberBounds->first) / (_houseNumberBounds->second - _houseNumberBounds->first)) *
-				( getEndMetricOffset() - getMetricOffset()));
-			}
-
-			return res;
-		}
-	}
-}
+}	}

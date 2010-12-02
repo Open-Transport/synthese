@@ -31,7 +31,7 @@
 #include "PathGroup.h"
 #include "Registrable.h"
 #include "Registry.h"
-#include "RoadChunk.h"
+#include "MainRoadChunk.hpp"
 
 namespace synthese
 {
@@ -113,7 +113,7 @@ namespace synthese
 				/// @date 2010
 				/// @since 3.2.0
 				boost::shared_ptr<House> getHouse(
-					RoadChunk::HouseNumber houseNumber
+					MainRoadChunk::HouseNumber houseNumber
 				) const;
 			//@}
 		

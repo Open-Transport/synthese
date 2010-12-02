@@ -60,8 +60,8 @@ namespace synthese
 			/// @since 3.2.0
 			/// @date 2010
 			House(
-				RoadChunk& chunk,
-				RoadChunk::HouseNumber houseNumber,
+				MainRoadChunk& chunk,
+				MainRoadChunk::HouseNumber houseNumber,
 				bool numberAtBeginning = true,
 				std::string separator = std::string(" ")
 			);
