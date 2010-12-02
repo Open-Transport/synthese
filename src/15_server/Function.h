@@ -129,7 +129,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			virtual void _copy(boost::shared_ptr<const Function> function) {}
+			virtual void _copy(boost::shared_ptr<const Function> function) { _setFromParametersMap(function->_getParametersMap()); }
 
 
 			/** Conversion from generic parameters map to attributes.

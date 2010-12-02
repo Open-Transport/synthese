@@ -442,7 +442,7 @@ namespace synthese
 				}
 				pm.insert(param.first, s.str());
 			}
-			pm.merge(aditionalParametersMap);
+//			pm.merge(aditionalParametersMap);
 
 			// Function
 			shared_ptr<Function> function(functionCreator->create());
