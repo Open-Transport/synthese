@@ -58,25 +58,8 @@ namespace synthese
 		{
 		public:
 
-			/// Chosen registry class.
-			typedef util::Registry<RoadChunk>	Registry;
 
-			typedef unsigned int HouseNumber;
-
-			typedef boost::optional<std::pair<HouseNumber, HouseNumber> > HouseNumberBounds;
-
-			typedef enum {
-				ODD = 'O',
-				EVEN = 'E',
-				ALL = 'A'
-			} HouseNumberingPolicy;
-
-		private:
-			HouseNumberBounds _houseNumberBounds;
-			HouseNumberingPolicy	_houseNumberingPolicy;
-			RoadChunk* _reverseRoadChunk;
-
-		public:
+		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			/// @param id identifier (default 0)
@@ -94,13 +77,10 @@ namespace synthese
 
 			virtual ~RoadChunk ();
 
-
+		public:
 			//! @name Getters
 			//@{
 				Crossing* getFromCrossing() const;
-				HouseNumberBounds getHouseNumberBounds() const { return _houseNumberBounds; }
-				HouseNumberingPolicy getHouseNumberingPolicy() const { return _houseNumberingPolicy; }
-				RoadChunk* getReverseChunk() const { return _reverseRoadChunk; }
 			//@}
 
 
@@ -109,9 +89,6 @@ namespace synthese
 			//@{
 				void setFromCrossing(Crossing* value);
 				void setRoad(Road* road);
-				void setHouseNumberBounds(HouseNumberBounds value){ _houseNumberBounds = value; }
-				void setHouseNumberingPolicy(HouseNumberingPolicy value){ _houseNumberingPolicy = value; }
-				void setReverseRoadChunk(RoadChunk* value){ _reverseRoadChunk = value; }
 			//@}
 
 			
@@ -132,38 +109,8 @@ namespace synthese
 				boost::shared_ptr<geos::geom::Point> getPointFromOffset(
 					MetricOffset metricOffset
 				) const;
-
-
-				
-				//////////////////////////////////////////////////////////////////////////
-				/// Tests if a numeric house number belongs to the chunk
-				/// @param houseNumber the house number to test
-				/// @return true if the house number belongs to the chunk
-				/// @author Hugues Romain
-				/// @since 3.2.0
-				bool testIfHouseNumberBelongsToChunk(
-					HouseNumber houseNumber
-				) const;
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Computes metric offset of a valid house number
-				/// @param houseNumber the house number
-				/// @return the metric offset of the house in the path
-				/// @pre houseNumber must be valid, the house number bounds of the chunk must be
-				/// defined. Use testIfHouseNumberBelongsToChunk to check this pre-condition.
-				/// @author Hugues Romain
-				/// @since 3.2.0
-				MetricOffset getHouseNumberMetricOffset(
-					HouseNumber houseNumber
-				) const;
 			//@}
-
-
 		};
-
-
-	}
-}
+}	}
 
 #endif 

@@ -22,10 +22,10 @@
 
 #include "Address.h"
 #include "Road.h"
-#include "RoadChunk.h"
 #include "AccessParameters.h"
 #include "RoadModule.h"
 #include "VertexAccessMap.h"
+#include "ReverseRoadChunk.hpp"
 
 using namespace std;
 using namespace boost;
@@ -40,9 +40,9 @@ namespace synthese
 	namespace road
 	{
 		Address::Address (
-			RoadChunk& roadChunk,
+			MainRoadChunk& roadChunk,
 			double metricOffset,
-			optional<RoadChunk::HouseNumber> houseNumber
+			optional<MainRoadChunk::HouseNumber> houseNumber
 		):	WithGeometry<Point>(roadChunk.getPointFromOffset(metricOffset)),
 			_roadChunk(&roadChunk),
 			_metricOffset(metricOffset),
@@ -72,8 +72,6 @@ namespace synthese
 		) const	{
 			if(whatToSearch.find(RoadModule::GRAPH_ID) != whatToSearch.end())
 			{
-				assert(_roadChunk->getReverseChunk());
-
 				// Chunk linked with the house
 				result.insert(
 					_roadChunk->getFromVertex(),
@@ -85,9 +83,11 @@ namespace synthese
 				// Reverse chunk
 				if(_roadChunk->getNextEdge())
 				{
+					assert(static_cast<MainRoadChunk*>(_roadChunk->getNextEdge())->getReverseRoadChunk());
+
 					double distance(_roadChunk->getEndMetricOffset() - _metricOffset);
 					result.insert(
-						static_cast<RoadChunk*>(_roadChunk->getNextEdge())->getReverseChunk()->getFromVertex(),
+						static_cast<MainRoadChunk*>(_roadChunk->getNextEdge())->getReverseRoadChunk()->getFromVertex(),
 						VertexAccess(
 							seconds(distance / accessParameters.getApproachSpeed()),
 							distance

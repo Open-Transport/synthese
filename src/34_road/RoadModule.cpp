@@ -22,7 +22,7 @@
 
 #include "RoadModule.h"
 #include "GeographyModule.h"
-#include "RoadChunk.h"
+#include "MainRoadChunk.hpp"
 #include "House.hpp"
 #include "RoadPlace.h"
 
@@ -160,7 +160,7 @@ namespace synthese
 			{	// Text points to an address
 				try
 				{
-					RoadChunk::HouseNumber number(lexical_cast<RoadChunk::HouseNumber>(words[0]));
+					MainRoadChunk::HouseNumber number(lexical_cast<MainRoadChunk::HouseNumber>(words[0]));
 
 					string roadName(placeName.substr(words[0].size() + 1));
 

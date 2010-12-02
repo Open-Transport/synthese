@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "Road.h"
+#include "MainRoadPart.hpp"
 #include "SQLiteRegistryTableSyncTemplate.h"
 
 namespace synthese
@@ -48,7 +48,7 @@ namespace synthese
 		///		- right_side : (1|0) : true = the main Road object is on right side,
 		///			false = the main Road object is on left side
 		class RoadTableSync
-		:	public db::SQLiteRegistryTableSyncTemplate<RoadTableSync,Road>
+		:	public db::SQLiteRegistryTableSyncTemplate<RoadTableSync, MainRoadPart>
 		{
 		public:
 			
@@ -57,7 +57,6 @@ namespace synthese
 			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
 			static const std::string COL_ROAD_PLACE_ID;
-			static const std::string COL_RIGHT_SIDE;
 			
 
 

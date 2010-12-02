@@ -27,7 +27,7 @@
 #include "ParametersMap.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
-#include "Road.h"
+#include "MainRoadPart.hpp"
 #include "RoadPlace.h"
 #include "ResultHTMLTable.h"
 #include "Crossing.h"
@@ -86,9 +86,9 @@ namespace synthese
 		){
 			try
 			{
-				_road = Env::GetOfficialEnv().get<Road>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+				_road = Env::GetOfficialEnv().get<MainRoadPart>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 			}
-			catch(ObjectNotFoundException<Road> e)
+			catch(ObjectNotFoundException<MainRoadPart> e)
 			{
 				throw AdminParametersException("No such road");
 			}
