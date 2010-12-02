@@ -135,7 +135,7 @@ namespace synthese
 				ptr.setDepartureInformations(
 					edge,
 					actualTime,
-					ptime(presenceDateTime.date(), GetTimeOfDay(schedule)),
+					ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)),
 					*(RTData ? _RTVertices[edgeIndex] : edge.getFromVertex())
 				);
 			}
@@ -144,7 +144,7 @@ namespace synthese
 				ptr.setArrivalInformations(
 					edge,
 					actualTime,
-					ptime(presenceDateTime.date(), GetTimeOfDay(schedule)),
+					ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)),
 					*(RTData ? _RTVertices[edgeIndex] : edge.getFromVertex())
 				);
 			}

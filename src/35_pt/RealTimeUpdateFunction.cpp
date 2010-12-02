@@ -254,7 +254,6 @@ namespace synthese
 			scheduleUpdateRequest.getAction()->setAtDeparture(true);
 			scheduleUpdateRequest.getAction()->setPropagateConstantly(true);
 			scheduleUpdateRequest.getAction()->setDelay(posix_time::not_a_date_time);
-			scheduleUpdateRequest.getFunction()->setAditionnalParametersMap(_getParametersMap());
 			pm.insert(
 				DATA_DELAY_UPDATE_URL,
 				scheduleUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES + Request::PARAMETER_ASSIGNMENT
@@ -264,7 +263,6 @@ namespace synthese
 			StaticActionFunctionRequest<ServiceVertexRealTimeUpdateAction,WebPageDisplayFunction> vertexUpdateRequest(request, true);
 			vertexUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
 			vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
-			vertexUpdateRequest.getFunction()->setAditionnalParametersMap(_getParametersMap());
 			pm.insert(
 				DATA_QUAY_UPDATE_URL,
 				vertexUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID + Request::PARAMETER_ASSIGNMENT
