@@ -26,7 +26,7 @@
 #include "Request.h"
 #include "GetMessagesFunction.hpp"
 #include "Webpage.h"
-#include "WebpageDisplayFunction.h"
+#include "WebPageDisplayFunction.h"
 #include "SentAlarm.h"
 #include "MessagesModule.h"
 #include "StaticFunctionRequest.h"
