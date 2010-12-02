@@ -66,7 +66,8 @@ namespace synthese
 			_displayMainPage(NULL),
 			_displayRowPage(NULL),
 			_displayDestinationPage(NULL),
-			_displayTransferDestinationPage(NULL)
+			_displayTransferDestinationPage(NULL),
+			_monitoringParserPage(NULL)
 		{}
 
 
