@@ -55,7 +55,6 @@ namespace synthese
 		const string RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
 		const string RoadTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
 		const string RoadTableSync::COL_ROAD_PLACE_ID("road_place_id");
-		const string RoadTableSync::COL_RIGHT_SIDE("right_side");
 	}
 
 	namespace db
@@ -74,7 +73,6 @@ namespace synthese
 			SQLiteTableSync::Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadTableSync::COL_ROAD_PLACE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadTableSync::COL_RIGHT_SIDE, SQL_INTEGER),
 			SQLiteTableSync::Field()
 		};
 
@@ -87,8 +85,8 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Load(
-			Road* object,
+		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,MainRoadPart>::Load(
+			MainRoadPart* object,
 			const db::SQLiteResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
@@ -96,7 +94,6 @@ namespace synthese
 			// Type
 			Road::RoadType roadType = (Road::RoadType) rows->getInt (RoadTableSync::COL_ROADTYPE);
 			object->setType(roadType);
-			object->setSide(rows->getBool(RoadTableSync::COL_RIGHT_SIDE) ? Road::RIGHT_SIDE : Road::LEFT_SIDE);
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -114,15 +111,15 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Unlink(
-			Road* obj
+		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,MainRoadPart>::Unlink(
+			MainRoadPart* obj
 		){
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,Road>::Save(
-			Road* object,
+		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,MainRoadPart>::Save(
+			MainRoadPart* object,
 			optional<SQLiteTransaction&> transaction
 		){
 			ReplaceQuery<RoadTableSync> query(*object);
@@ -131,7 +128,6 @@ namespace synthese
 			query.addField(0);
 			query.addField(0);
 			query.addField(object->getRoadPlace() ? object->getRoadPlace()->getKey() : RegistryKeyType(0));
-			query.addField(object->getSide() == Road::RIGHT_SIDE);
 			query.execute(transaction);
 		}
 	}

@@ -24,7 +24,7 @@
 #define SYNTHESE_ENV_ADDRESS_H
 
 #include "UtilConstants.h"
-#include "RoadChunk.h"
+#include "MainRoadChunk.hpp"
 #include "Place.h"
 
 #include <vector>
@@ -53,9 +53,9 @@ namespace synthese
 
 
 		private:
-			RoadChunk* _roadChunk;
+			MainRoadChunk* _roadChunk;
 			double	_metricOffset;
-			boost::optional<RoadChunk::HouseNumber> _houseNumber;
+			boost::optional<MainRoadChunk::HouseNumber> _houseNumber;
 
 
 		public:
@@ -71,9 +71,9 @@ namespace synthese
 			/// @param metricOffset offset after the beginning of the chunk (and not the road)
 			/// @param houseNumber registered number of the point in the street
 			Address(
-				RoadChunk& roadChunk,
+				MainRoadChunk& roadChunk,
 				RoadChunk::MetricOffset metricOffset,
-				boost::optional<RoadChunk::HouseNumber> houseNumber = boost::optional<RoadChunk::HouseNumber>()
+				boost::optional<MainRoadChunk::HouseNumber> houseNumber = boost::optional<MainRoadChunk::HouseNumber>()
 			);
 
 
@@ -85,7 +85,7 @@ namespace synthese
 			//@{
 				RoadChunk* getRoadChunk() const { return _roadChunk; }
 				double getMetricOffset() const { return _metricOffset; }
-				boost::optional<RoadChunk::HouseNumber> getHouseNumber() const { return _houseNumber; }
+				boost::optional<MainRoadChunk::HouseNumber> getHouseNumber() const { return _houseNumber; }
 			//@}
 
 			//! @name Setters
@@ -106,6 +106,7 @@ namespace synthese
 				/// @retval result the two vertices
 				/// @param accessParameters parameters of access
 				/// @param whatToSearch graph of the returned vertices
+				/// @pre Reverse road chunks have been generated
 				void getVertexAccessMap(
 					graph::VertexAccessMap& result,
 					const graph::AccessParameters& accessParameters,

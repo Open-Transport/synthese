@@ -41,8 +41,8 @@ namespace synthese
 	namespace road
 	{
 		House::House(
-			RoadChunk& chunk,
-			RoadChunk::HouseNumber houseNumber,
+			MainRoadChunk& chunk,
+			MainRoadChunk::HouseNumber houseNumber,
 			bool numberAtBeginning,
 			std::string separator
 		):	Address(

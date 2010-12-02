@@ -47,26 +47,12 @@ namespace synthese
 	{
 		Road::Road (
 			RegistryKeyType id,
-			RoadType type,
-			bool autoCreateReverseRoad
+			RoadType type			
 		):	Registrable(id),
-			_type (type),
-			_side(RIGHT_SIDE)
+			_type (type)
 		{
 			// Creation of the permanent service
 			addService(new PermanentService(id, this), false);
-			_reverseRoad = (autoCreateReverseRoad ? new Road(*this) : NULL);
-		}
-
-
-
-		Road::Road(const Road& reverseRoad
-		):	Registrable(0),
-			_type(reverseRoad.getType()),
-			_reverseRoad(NULL),
-			_side(reverseRoad.getSide() == RIGHT_SIDE ? LEFT_SIDE : RIGHT_SIDE)
-		{
-			addService(new PermanentService(0, this), false);
 		}
 
 
@@ -77,14 +63,6 @@ namespace synthese
 			{
 				delete service;
 			}
-			if(_reverseRoad)
-			{
-				BOOST_FOREACH(Edges::value_type edge, _reverseRoad->_edges)
-				{
-					delete edge;
-				}
-				delete _reverseRoad;
-			}
 		}
 
 		
@@ -93,129 +71,6 @@ namespace synthese
 			const RoadType& type
 		){
 			_type = type;
-			if(_reverseRoad)
-			{
-				_reverseRoad->setType(type);
-			}
-		}
-
-
-
-		void Road::addRoadChunk(
-			RoadChunk& chunk
-		){
-			if(_reverseRoad)
-			{
-				if(getEdges().empty())
-				{
-					RoadChunk* reverseChunk(
-						new RoadChunk(
-							0,
-							chunk.getFromCrossing(),
-							0,
-							_reverseRoad,
-							-chunk.getMetricOffset()
-					)	);
-					shared_ptr<LineString> geometry(chunk.getGeometry());
-					if(geometry.get())
-					{
-						reverseChunk->setGeometry(
-							shared_ptr<LineString>(
-								dynamic_cast<LineString*>(chunk.getGeometry()->reverse())
-						)	);
-					}
-					_reverseRoad->addEdge(*reverseChunk);
-					chunk.setReverseRoadChunk(reverseChunk);
-					reverseChunk->setReverseRoadChunk(&chunk);
-				}
-				else
-				{
-					const Edge& lastEdge(**(getEdges().end() - 1));
-					if(chunk.getRankInPath() > lastEdge.getRankInPath())
-					{
-						RoadChunk* reverseChunk(
-							new RoadChunk(
-								0,
-								chunk.getFromCrossing(),
-								0,
-								_reverseRoad,
-								-chunk.getMetricOffset()
-						)	);
-						_reverseRoad->insertRoadChunk(
-							*reverseChunk,
-							0,
-							chunk.getRankInPath() - lastEdge.getRankInPath()
-						);
-						chunk.setReverseRoadChunk(reverseChunk);
-						reverseChunk->setReverseRoadChunk(&chunk);
-					}
-					else
-					{
-						RoadChunk* reverseChunk(
-							new RoadChunk(
-								0,
-								chunk.getFromCrossing(),
-								lastEdge.getRankInPath() - chunk.getRankInPath(),
-								_reverseRoad,
-								-chunk.getMetricOffset()
-						)	);
-						_reverseRoad->addEdge(
-							*reverseChunk							
-						);
-						chunk.setReverseRoadChunk(reverseChunk);
-						reverseChunk->setReverseRoadChunk(&chunk);
-					}
-				}
-			}
-
-			addEdge(static_cast<Edge&>(chunk));
-		}
-
-
-
-		void Road::insertRoadChunk(
-			RoadChunk& chunk,
-			double length,
-			size_t rankShift
-		){
-			assert(!_edges.empty());
-			assert(chunk.getMetricOffset() <= (*_edges.begin())->getMetricOffset() + length);
-			assert(chunk.getMetricOffset() <= (*_edges.begin())->getRankInPath() + rankShift);
-
-			// Shifting the whole road to right
-			for(Edges::const_iterator it(_edges.begin()); it != _edges.end(); ++it)
-			{
-				(*it)->setRankInPath((*it)->getRankInPath() + rankShift);
-				(*it)->setMetricOffset((*it)->getMetricOffset() + length);
-			}
-
-			// Insertion of the chunk
-			addEdge(chunk);
-
-			if(_reverseRoad)
-			{
-				// Shifting the whole reverse road to left
-				for(Edges::const_iterator it(_reverseRoad->_edges.begin()); it != _reverseRoad->_edges.end(); ++it)
-				{
-					(*it)->setMetricOffset((*it)->getMetricOffset() - length);
-				}
-
-				// Insertion of the chunk
-				const Edge& lastEdge(**(_reverseRoad->getEdges().end() - 1));
-
-				RoadChunk* reverseChunk(
-					new RoadChunk(
-						0,
-						chunk.getFromCrossing(),
-						lastEdge.getRankInPath() + rankShift,
-						_reverseRoad,
-						0
-				)	);
-				_reverseRoad->addEdge(
-					*reverseChunk							
-				);
-				chunk.setReverseRoadChunk(reverseChunk);
-			}
 		}
 
 
@@ -231,40 +86,6 @@ namespace synthese
 		) const {
 			return static_cast<RoadPlace*>(_pathGroup);
 		}
-		
-		
-
-		void Road::setRoadPlace(
-			RoadPlace& value
-		){
-			// Break of existing link if exists
-			if(_pathGroup)
-			{
-				value.removeRoad(*this);
-			}
-			
-			// New links
-			_pathGroup = &value;
-			value.addRoad(*this);
-			
-			// Links the reverse road too
-			if(_reverseRoad)
-			{
-				_reverseRoad->setRoadPlace(value);
-			}
-		}
-
-
-
-		void Road::merge( Road& other )
-		{
-			Path::merge(static_cast<Path&>(other));
-			if(_reverseRoad && other._reverseRoad)
-			{
-				other._reverseRoad->merge(*_reverseRoad);
-				swap(other._reverseRoad, _reverseRoad);
-			}
-		}
 
 
 
@@ -277,7 +98,7 @@ namespace synthese
 
 		std::string Road::getRuleUserName() const
 		{
-			return "Route " + getRoadPlace()->getFullName() + " sens "+ (_reverseRoad ? "direct" : "opposé");
+			return "Route " + getRoadPlace()->getFullName();
 		}
 
 
@@ -287,19 +108,38 @@ namespace synthese
 			return true;
 		}
 
-		bool Road::isReversed() const
+
+
+		void Road::_setRoadPlace( RoadPlace& value )
 		{
-			return (_reverseRoad == NULL);
+			// Break of existing link if exists
+			if(_pathGroup)
+			{
+				value.removeRoad(*this);
+			}
+
+			// New links
+			_pathGroup = &value;
+			value.addRoad(*this);
 		}
 
 
 
-		void Road::setSide( Side value )
-		{
-			_side = value;
-			if(_reverseRoad)
+		void Road::_insertRoadChunk(
+			RoadChunk& chunk, double length, std::size_t rankShift
+		){
+			assert(!_edges.empty());
+			assert(chunk.getMetricOffset() <= (*_edges.begin())->getMetricOffset() + length);
+			assert(chunk.getMetricOffset() <= (*_edges.begin())->getRankInPath() + rankShift);
+
+			// Shifting the whole road to right
+			for(Edges::const_iterator it(_edges.begin()); it != _edges.end(); ++it)
 			{
-				_reverseRoad->setSide(value == LEFT_SIDE ? RIGHT_SIDE : LEFT_SIDE);
+				(*it)->setRankInPath((*it)->getRankInPath() + rankShift);
+				(*it)->setMetricOffset((*it)->getMetricOffset() + length);
 			}
+
+			// Insertion of the chunk
+			addEdge(chunk);
 		}
 }	}

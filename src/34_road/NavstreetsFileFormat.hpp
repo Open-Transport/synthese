@@ -24,7 +24,7 @@
 #define SYNTHESE_road_NavstreetFileFormat_hpp__
 
 #include "FileFormatTemplate.h"
-#include "RoadChunk.h"
+#include "MainRoadChunk.hpp"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
 
@@ -157,29 +157,29 @@ namespace synthese
 
 				//! @name Parameters
 				//@{
-					static const std::string PARAMETER_DRIVING_ON_RIGHT_SIDE;
 				//@}
 
 				typedef std::map<int, geography::City*> _CitiesMap;
 
-				bool _drivingOnRightSide;
-
 				mutable _CitiesMap _citiesMap;	//!< Correspondence table between Navstreets and SYNTHESE id for streets
 
-				static road::RoadChunk::HouseNumberingPolicy _getHouseNumberingPolicyFromAddressSchema(
+				static MainRoadChunk::HouseNumberingPolicy _getHouseNumberingPolicyFromAddressSchema(
 					const std::string& addressSchema
 				);
-				static road::RoadChunk::HouseNumberBounds _getHouseNumberBoundsFromAddresses(
+				static MainRoadChunk::HouseNumberBounds _getHouseNumberBoundsFromAddresses(
 					const std::string& minAddress,
-					const std::string maxAddress
+					const std::string& maxAddress
 				);
+
+
+
 				static void _setGeometryAndHouses(
-					road::RoadChunk& chunk,
+					MainRoadChunk& chunk,
 					boost::shared_ptr<geos::geom::LineString> geometry,
-					road::RoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
-					road::RoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
-					road::RoadChunk::HouseNumberBounds rightHouseNumberBounds,
-					road::RoadChunk::HouseNumberBounds leftHouseNumberBounds
+					MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
+					MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
+					MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
+					MainRoadChunk::HouseNumberBounds leftHouseNumberBounds
 				);
 
 
@@ -210,8 +210,7 @@ namespace synthese
 
 			public:
 				Importer_(const impex::DataSource& dataSource):
-					impex::MultipleFileTypesImporter<NavstreetsFileFormat>(dataSource),
-					_drivingOnRightSide(true)
+					impex::MultipleFileTypesImporter<NavstreetsFileFormat>(dataSource)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////

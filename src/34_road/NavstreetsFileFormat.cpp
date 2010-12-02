@@ -71,8 +71,6 @@ namespace synthese
 		const string NavstreetsFileFormat::Importer_::FILE_MTDAREA("1mtdarea");
 		const string NavstreetsFileFormat::Importer_::FILE_STREETS("2streets");
 
-		const string NavstreetsFileFormat::Importer_::PARAMETER_DRIVING_ON_RIGHT_SIDE("dr");
-		
 		const string NavstreetsFileFormat::_FIELD_LINK_ID("LINK_ID");
 		const string NavstreetsFileFormat::_FIELD_ST_NAME("ST_NAME");
 		const string NavstreetsFileFormat::_FIELD_REF_IN_ID("REF_IN_ID");
@@ -279,12 +277,12 @@ namespace synthese
 						City* city(itc->second);
 
 						// House number bounds
-						RoadChunk::HouseNumberBounds rightHouseNumberBounds(_getHouseNumberBoundsFromAddresses(rightMinHouseNumber, rightMaxHouseNumber));
-						RoadChunk::HouseNumberBounds leftHouseNumberBounds(_getHouseNumberBoundsFromAddresses(leftMinHouseNumber, leftMaxHouseNumber));
+						MainRoadChunk::HouseNumberBounds rightHouseNumberBounds(_getHouseNumberBoundsFromAddresses(rightMinHouseNumber, rightMaxHouseNumber));
+						MainRoadChunk::HouseNumberBounds leftHouseNumberBounds(_getHouseNumberBoundsFromAddresses(leftMinHouseNumber, leftMaxHouseNumber));
 
 						// House numbering policy
-						RoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy(_getHouseNumberingPolicyFromAddressSchema(rightAddressSchema));
-						RoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy(_getHouseNumberingPolicyFromAddressSchema(leftAddressSchema));
+						MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy(_getHouseNumberingPolicyFromAddressSchema(rightAddressSchema));
+						MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy(_getHouseNumberingPolicyFromAddressSchema(leftAddressSchema));
 
 
 						// Left node
@@ -368,17 +366,17 @@ namespace synthese
 						}
 
 						// Search for an existing road which ends at the left node
-						Road* road(NULL);
+						MainRoadPart* road(NULL);
 						double startMetricOffset(0);
 						BOOST_FOREACH(Path* croad, roadPlace->getPaths())
 						{
-							if(!static_cast<Road*>(croad)->getReverseRoad())
+							if(!dynamic_cast<MainRoadPart*>(croad))
 							{
 								continue;
 							}
 							if(croad->getLastEdge()->getFromVertex() == leftNode.get())
 							{
-								road = static_cast<Road*>(croad);
+								road = static_cast<MainRoadPart*>(croad);
 								startMetricOffset = croad->getLastEdge()->getMetricOffset();
 								break;
 							}
@@ -387,7 +385,7 @@ namespace synthese
 						{
 							// Adding geometry to the last chunk
 							_setGeometryAndHouses(
-								static_cast<RoadChunk&>(*road->getLastEdge()),
+								static_cast<MainRoadChunk&>(*road->getLastEdge()),
 								geometry,
 								rightHouseNumberingPolicy,
 								leftHouseNumberingPolicy,
@@ -396,7 +394,7 @@ namespace synthese
 							);
 
 							// Second road chunk creation
-							shared_ptr<RoadChunk> secondRoadChunk(new RoadChunk);
+							shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
 							secondRoadChunk->setRoad(road);
 							secondRoadChunk->setFromCrossing(rightNode.get());
 							secondRoadChunk->setRankInPath((*(road->getEdges().end()-1))->getRankInPath() + 1);
@@ -406,16 +404,16 @@ namespace synthese
 							_env.getEditableRegistry<RoadChunk>().add(secondRoadChunk);
 
 							// Search for a second existing road which starts at the right node
-							Road* road2 = NULL;
+							MainRoadPart* road2 = NULL;
 							BOOST_FOREACH(Path* croad, roadPlace->getPaths())
 							{
-								if(!static_cast<Road*>(croad)->getReverseRoad())
+								if(!dynamic_cast<MainRoadPart*>(croad))
 								{
 									continue;
 								}
 								if(croad->getEdge(0)->getFromVertex() == rightNode.get())
 								{
-									road2 = static_cast<Road*>(croad);
+									road2 = static_cast<MainRoadPart*>(croad);
 									break;
 								}
 							}
@@ -434,13 +432,13 @@ namespace synthese
 							// If not found search for an existing road which begins at the right node
 							BOOST_FOREACH(Path* croad, roadPlace->getPaths())
 							{
-								if(!static_cast<Road*>(croad)->getReverseRoad())
+								if(!dynamic_cast<MainRoadPart*>(croad))
 								{
 									continue;
 								}
 								if(croad->getEdge(0)->getFromVertex() == rightNode.get())
 								{
-									road = static_cast<Road*>(croad);
+									road = static_cast<MainRoadPart*>(croad);
 									break;
 								}
 							}
@@ -448,7 +446,7 @@ namespace synthese
 							if(road)
 							{
 								// First road chunk creation
-								shared_ptr<RoadChunk> firstRoadChunk(new RoadChunk);
+								shared_ptr<MainRoadChunk> firstRoadChunk(new MainRoadChunk);
 								firstRoadChunk->setRoad(road);
 								firstRoadChunk->setFromCrossing(leftNode.get());
 								firstRoadChunk->setRankInPath(0);
@@ -468,14 +466,13 @@ namespace synthese
 							}
 							else
 							{
-								shared_ptr<Road> road(new Road(0, Road::ROAD_TYPE_UNKNOWN));
-								road->setSide(_drivingOnRightSide ? Road::RIGHT_SIDE : Road::LEFT_SIDE);
+								shared_ptr<MainRoadPart> road(new MainRoadPart(0, Road::ROAD_TYPE_UNKNOWN));
 								road->setRoadPlace(*roadPlace);
 								road->setKey(RoadTableSync::getId());
-								_env.getEditableRegistry<Road>().add(road);
+								_env.getEditableRegistry<MainRoadPart>().add(road);
 
 								// First road chunk
-								shared_ptr<RoadChunk> firstRoadChunk(new RoadChunk);
+								shared_ptr<MainRoadChunk> firstRoadChunk(new MainRoadChunk);
 								firstRoadChunk->setRoad(road.get());
 								firstRoadChunk->setFromCrossing(leftNode.get());
 								firstRoadChunk->setRankInPath(0);
@@ -491,17 +488,17 @@ namespace synthese
 									leftHouseNumberBounds
 								);
 
-								_env.getEditableRegistry<RoadChunk>().add(firstRoadChunk);
+								_env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
 
 								// Second road chunk
-								shared_ptr<RoadChunk> secondRoadChunk(new RoadChunk);
+								shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
 								secondRoadChunk->setRoad(road.get());
 								secondRoadChunk->setFromCrossing(rightNode.get());
 								secondRoadChunk->setRankInPath(1);
 								secondRoadChunk->setMetricOffset(length);
 								secondRoadChunk->setKey(RoadChunkTableSync::getId());
 								road->addRoadChunk(*secondRoadChunk);
-								_env.getEditableRegistry<RoadChunk>().add(secondRoadChunk);
+								_env.getEditableRegistry<MainRoadChunk>().add(secondRoadChunk);
 							}
 						}
 //					}
@@ -526,11 +523,11 @@ namespace synthese
 			{
 				RoadPlaceTableSync::Save(roadplace.second.get(),transaction);
 			}
-			BOOST_FOREACH(Registry<Road>::value_type road, _env.getEditableRegistry<Road>())
+			BOOST_FOREACH(Registry<MainRoadPart>::value_type road, _env.getEditableRegistry<MainRoadPart>())
 			{
 				RoadTableSync::Save(road.second.get(),transaction);
 			}
-			BOOST_FOREACH(Registry<RoadChunk>::value_type roadChunk, _env.getEditableRegistry<RoadChunk>())
+			BOOST_FOREACH(Registry<MainRoadChunk>::value_type roadChunk, _env.getEditableRegistry<MainRoadChunk>())
 			{
 				RoadChunkTableSync::Save(roadChunk.second.get(),transaction);
 			}
@@ -539,52 +536,52 @@ namespace synthese
 
 
 
-		RoadChunk::HouseNumberingPolicy NavstreetsFileFormat::Importer_::_getHouseNumberingPolicyFromAddressSchema(
+		MainRoadChunk::HouseNumberingPolicy NavstreetsFileFormat::Importer_::_getHouseNumberingPolicyFromAddressSchema(
 			const std::string& addressSchema
 		){
-			if(addressSchema == "E") return RoadChunk::EVEN;
-			if(addressSchema == "O") return RoadChunk::ODD;
-			return RoadChunk::ALL;
+			if(addressSchema == "E") return MainRoadChunk::EVEN;
+			if(addressSchema == "O") return MainRoadChunk::ODD;
+			return MainRoadChunk::ALL;
 		}
 
 
 
-		RoadChunk::HouseNumberBounds NavstreetsFileFormat::Importer_::_getHouseNumberBoundsFromAddresses(
+		MainRoadChunk::HouseNumberBounds NavstreetsFileFormat::Importer_::_getHouseNumberBoundsFromAddresses(
 			const std::string& minAddress,
-			const std::string maxAddress
+			const std::string& maxAddress
 		){
 			if(!minAddress.empty() && !maxAddress.empty())
 			{
 				try
 				{
-					return RoadChunk::HouseNumberBounds(
-						pair<RoadChunk::HouseNumber,RoadChunk::HouseNumber>(
-							lexical_cast<RoadChunk::HouseNumber>(minAddress),
-							lexical_cast<RoadChunk::HouseNumber>(maxAddress)
+					return MainRoadChunk::HouseNumberBounds(
+						pair<MainRoadChunk::HouseNumber, MainRoadChunk::HouseNumber>(
+							lexical_cast<MainRoadChunk::HouseNumber>(minAddress),
+							lexical_cast<MainRoadChunk::HouseNumber>(maxAddress)
 					)	);
 				}
 				catch(bad_lexical_cast)
 				{
 				}
 			}
-			return RoadChunk::HouseNumberBounds();
+			return MainRoadChunk::HouseNumberBounds();
 		}
 
 
 
 		void NavstreetsFileFormat::Importer_::_setGeometryAndHouses(
-			road::RoadChunk& chunk,
-			boost::shared_ptr<geos::geom::LineString> geometry,
-			road::RoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
-			road::RoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
-			road::RoadChunk::HouseNumberBounds rightHouseNumberBounds,
-			road::RoadChunk::HouseNumberBounds leftHouseNumberBounds
+			MainRoadChunk& chunk,
+			shared_ptr<geos::geom::LineString> geometry,
+			MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
+			MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
+			MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
+			MainRoadChunk::HouseNumberBounds leftHouseNumberBounds
 		){
 			chunk.setGeometry(geometry);
-			chunk.setHouseNumberBounds(rightHouseNumberBounds);
-			chunk.setHouseNumberingPolicy(rightHouseNumberingPolicy);
-			chunk.getReverseChunk()->setHouseNumberBounds(leftHouseNumberBounds);
-			chunk.getReverseChunk()->setHouseNumberingPolicy(leftHouseNumberingPolicy);
+			chunk.setRightHouseNumberBounds(rightHouseNumberBounds);
+			chunk.setRightHouseNumberingPolicy(rightHouseNumberingPolicy);
+			chunk.setLeftHouseNumberBounds(leftHouseNumberBounds);
+			chunk.setLeftHouseNumberingPolicy(leftHouseNumberingPolicy);
 		}
 
 
@@ -598,7 +595,6 @@ namespace synthese
 			stream << t.open();
 			stream << t.title("Propriétés");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.cell("Sens de circulation à droite", t.getForm().getOuiNonRadioInput(PARAMETER_DRIVING_ON_RIGHT_SIDE, _drivingOnRightSide));
 			stream << t.title("Données");
 			stream << t.cell("Rues (streets)", t.getForm().getTextInput(_getFileParameterName(FILE_STREETS), _pathsMap[FILE_STREETS].file_string()));
 			stream << t.cell("Zones administratives (mtdarea)", t.getForm().getTextInput(_getFileParameterName(FILE_MTDAREA), _pathsMap[FILE_MTDAREA].file_string()));
@@ -610,7 +606,6 @@ namespace synthese
 		server::ParametersMap NavstreetsFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap result;
-			result.insert(PARAMETER_DRIVING_ON_RIGHT_SIDE, _drivingOnRightSide);
 			return result;
 		}
 
@@ -618,6 +613,5 @@ namespace synthese
 
 		void NavstreetsFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
 		{
-			_drivingOnRightSide = map.getDefault<bool>(PARAMETER_DRIVING_ON_RIGHT_SIDE, true);
 		}
 }	}
