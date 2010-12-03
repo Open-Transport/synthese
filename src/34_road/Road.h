@@ -26,7 +26,6 @@
 #include <string>
 
 #include "Path.h"
-#include "Registry.h"
 
 namespace synthese
 {
@@ -117,6 +116,7 @@ namespace synthese
 			virtual bool isRoad() const;
 			virtual std::string getRuleUserName() const;
 			virtual bool isActive(const boost::gregorian::date& date) const;
+			virtual bool isReversed() const = 0;
 		//@}
 		};
 	}

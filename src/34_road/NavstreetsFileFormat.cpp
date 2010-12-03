@@ -238,10 +238,10 @@ namespace synthese
 					string rightId(rows->getText(NavstreetsFileFormat::_FIELD_NREF_IN_ID));
 					int lAreaId(rows->getInt(NavstreetsFileFormat::_FIELD_L_AREA_ID));
 					int rAreaId(rows->getInt(NavstreetsFileFormat::_FIELD_R_AREA_ID));
-					string leftMinHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_L_REFADDR));
-					string leftMaxHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_L_NREFADDR));
-					string rightMinHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_R_REFADDR));
-					string rightMaxHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_R_NREFADDR));
+					string leftRefHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_L_REFADDR));
+					string leftNRefHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_L_NREFADDR));
+					string rightRefHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_R_REFADDR));
+					string rightNRefHouseNumber(rows->getText(NavstreetsFileFormat::_FIELD_R_NREFADDR));
 					string leftAddressSchema(rows->getText(NavstreetsFileFormat::_FIELD_L_ADDRSCH));
 					string rightAddressSchema(rows->getText(NavstreetsFileFormat::_FIELD_R_ADDRSCH));
 					shared_ptr<LineString> geometry(
@@ -277,8 +277,8 @@ namespace synthese
 						City* city(itc->second);
 
 						// House number bounds
-						MainRoadChunk::HouseNumberBounds rightHouseNumberBounds(_getHouseNumberBoundsFromAddresses(rightMinHouseNumber, rightMaxHouseNumber));
-						MainRoadChunk::HouseNumberBounds leftHouseNumberBounds(_getHouseNumberBoundsFromAddresses(leftMinHouseNumber, leftMaxHouseNumber));
+						MainRoadChunk::HouseNumberBounds rightHouseNumberBounds(_getHouseNumberBoundsFromAddresses(rightRefHouseNumber, rightNRefHouseNumber));
+						MainRoadChunk::HouseNumberBounds leftHouseNumberBounds(_getHouseNumberBoundsFromAddresses(leftRefHouseNumber, leftNRefHouseNumber));
 
 						// House numbering policy
 						MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy(_getHouseNumberingPolicyFromAddressSchema(rightAddressSchema));

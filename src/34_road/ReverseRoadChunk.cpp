@@ -23,8 +23,15 @@
 #include "ReverseRoadChunk.hpp"
 #include "ReverseRoadPart.hpp"
 
+using namespace std;
+
 namespace synthese
 {
+	namespace util
+	{
+		template<> const string Registry<road::ReverseRoadChunk>::KEY("ReverseRoadChunk");
+	}
+
 	namespace road
 	{
 		ReverseRoadChunk::ReverseRoadChunk(

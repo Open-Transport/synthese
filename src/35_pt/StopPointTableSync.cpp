@@ -149,7 +149,7 @@ namespace synthese
 				{
 					try
 					{
-						RoadChunk& chunk(*RoadChunkTableSync::GetEditable(chunkId, env, linkLevel));
+						MainRoadChunk& chunk(*RoadChunkTableSync::GetEditable(chunkId, env, linkLevel));
 						RoadChunk::MetricOffset metricOffset(rows->getDouble(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET));
 
 						object->setProjectedPoint(Address(chunk, metricOffset));

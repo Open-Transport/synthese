@@ -24,6 +24,7 @@
 #include "Registry.h"
 #include "PTModule.h"
 #include "StopArea.hpp"
+#include "ReverseRoadChunk.hpp"
 
 #include <boost/date_time/time_duration.hpp>
 
@@ -89,8 +90,8 @@ namespace synthese
 				{
 					return VertexAccess(minutes(_projectedPoint.getMetricOffset() / 50), _projectedPoint.getMetricOffset());
 				}
-				if(	_projectedPoint.getRoadChunk()->getReverseChunk() &&
-					_projectedPoint.getRoadChunk()->getReverseChunk()->getFromCrossing() == &crossing
+				if(	_projectedPoint.getRoadChunk()->getReverseRoadChunk() &&
+					_projectedPoint.getRoadChunk()->getReverseRoadChunk()->getFromCrossing() == &crossing
 				){
 					return VertexAccess(
 						minutes((_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getRoadChunk()->getMetricOffset() - _projectedPoint.getMetricOffset()) / 50),

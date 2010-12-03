@@ -28,11 +28,18 @@
 
 #include <geos/geom/LineString.h>
 
+using namespace std;
 using namespace geos::geom;
 using namespace boost;
 
 namespace synthese
 {
+
+	namespace util
+	{
+		template<> const string Registry<road::MainRoadPart>::KEY("MainRoadPart");
+	}
+
 	using namespace graph;
 
 	namespace road

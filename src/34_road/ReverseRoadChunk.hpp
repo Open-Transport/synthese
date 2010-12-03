@@ -24,6 +24,7 @@
 #define SYNTHESE_road_ReverseRoadChunk_hpp__
 
 #include "RoadChunk.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -55,6 +56,10 @@ namespace synthese
 				ReverseRoadPart* road = NULL,
 				double metricOffset = UNKNOWN_VALUE
 			);
+
+
+			/// Chosen registry class.
+			typedef util::Registry<ReverseRoadChunk>	Registry;
 
 		private:
 		};

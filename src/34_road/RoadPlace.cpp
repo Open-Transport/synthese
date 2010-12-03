@@ -26,7 +26,6 @@
 #include "MainRoadPart.hpp"
 #include "RoadModule.h"
 #include "RoadChunk.h"
-#include "Registry.h"
 #include "VertexAccessMap.h"
 #include "AllowedUseRule.h"
 #include "GraphConstants.h"
@@ -153,7 +152,7 @@ namespace synthese
 			MainRoadChunk::HouseNumber houseNumber
 		) const	{
 			MainRoadChunk* nearestChunk(NULL);
-			MainRoadChunk::HouseNumber difference(0);
+			MainRoadChunk::HouseNumber difference(MainRoadChunk::HouseNumber_MAX);
 			MainRoadChunk::HouseNumber bestNumber(0);
 			BOOST_FOREACH(Path* path, getPaths())
 			{
@@ -178,26 +177,105 @@ namespace synthese
 								houseNumber
 						)	);
 					}
-/* todo
-					if(houseNumber > chunk.getLeftHouseNumberBounds()->second)
-					{
-						if(!nearestChunk || houseNumber - chunk.getHouseNumberBounds()->second < difference)
-						{
-							bestNumber = chunk.getHouseNumberBounds()->second;
-							difference = houseNumber - bestNumber;
-							nearestChunk = static_cast<RoadChunk*>(chunk.getNextEdge());
-						}
-					}
 					else
 					{
-						if(!nearestChunk || chunk.getHouseNumberBounds()->first - houseNumber < difference)
+						MainRoadChunk::HouseNumber currentDifference(MainRoadChunk::HouseNumber_MAX);
+						MainRoadChunk::HouseNumber currentBestNumber(0);
+
+						if(chunk.getLeftHouseNumberBounds())
 						{
-							bestNumber = chunk.getHouseNumberBounds()->first;
-							difference = bestNumber - houseNumber;
+							if( (  (   chunk.getLeftHouseNumberingPolicy() == MainRoadChunk::ODD)  && (houseNumber % 2)    )
+									||
+								(  (   chunk.getLeftHouseNumberingPolicy() == MainRoadChunk::EVEN) && (!(houseNumber % 2)) )
+									||
+								(  chunk.getLeftHouseNumberingPolicy() == MainRoadChunk::ALL )
+							  )
+							{
+								//Left distance calculation
+								if( chunk.getLeftHouseNumberBounds()->first < houseNumber )
+								{
+									currentDifference = houseNumber - chunk.getLeftHouseNumberBounds()->first;
+									currentBestNumber = chunk.getLeftHouseNumberBounds()->first;
+								}
+								else
+								{
+									currentDifference = chunk.getLeftHouseNumberBounds()->first - houseNumber;
+									currentBestNumber = chunk.getLeftHouseNumberBounds()->first;
+								}
+
+								if( chunk.getLeftHouseNumberBounds()->second < houseNumber )
+								{
+									if(currentDifference > houseNumber - chunk.getLeftHouseNumberBounds()->second)
+									{
+										currentDifference = houseNumber - chunk.getLeftHouseNumberBounds()->second;
+										currentBestNumber = chunk.getLeftHouseNumberBounds()->second;
+									}
+								}
+								else
+								{
+									if(currentDifference > chunk.getLeftHouseNumberBounds()->second - houseNumber)
+									{
+										currentDifference = chunk.getLeftHouseNumberBounds()->second - houseNumber;
+										currentBestNumber = chunk.getLeftHouseNumberBounds()->second;
+									}
+								}
+							}
+						}
+
+						if(chunk.getRightHouseNumberBounds())
+						{
+							if( (  (   chunk.getRightHouseNumberingPolicy() == MainRoadChunk::ODD)  && (houseNumber % 2)    )
+									||
+								(  (   chunk.getRightHouseNumberingPolicy() == MainRoadChunk::EVEN) && (!(houseNumber % 2)) )
+									||
+								(  chunk.getRightHouseNumberingPolicy() == MainRoadChunk::ALL )
+							  )
+							{
+								//Right distance calculation
+								if( chunk.getRightHouseNumberBounds()->first < houseNumber )
+								{
+									if(currentDifference > houseNumber - chunk.getRightHouseNumberBounds()->first)
+									{
+										currentDifference = houseNumber - chunk.getRightHouseNumberBounds()->first;
+										currentBestNumber = chunk.getRightHouseNumberBounds()->first;
+									}
+								}
+								else
+								{
+									if(currentDifference > chunk.getRightHouseNumberBounds()->first - houseNumber)
+									{
+										currentDifference = chunk.getRightHouseNumberBounds()->first - houseNumber;
+										currentBestNumber = chunk.getRightHouseNumberBounds()->first;
+									}
+								}
+
+								if( chunk.getRightHouseNumberBounds()->second < houseNumber )
+								{
+									if(currentDifference > houseNumber - chunk.getRightHouseNumberBounds()->second)
+									{
+										currentDifference = houseNumber - chunk.getRightHouseNumberBounds()->second;
+										currentBestNumber = chunk.getRightHouseNumberBounds()->second;
+									}
+								}
+								else
+								{
+									if(currentDifference > chunk.getRightHouseNumberBounds()->second - houseNumber)
+									{
+										currentDifference = chunk.getRightHouseNumberBounds()->second - houseNumber;
+										currentBestNumber = chunk.getRightHouseNumberBounds()->second;
+									}
+								}
+							}
+						}
+
+						if(difference > currentDifference )
+						{
+							difference = currentDifference;
+							bestNumber = currentBestNumber;
 							nearestChunk = &chunk;
 						}
 					}
-*/				}
+				}
 			}
 
 			// Nearest existing number
