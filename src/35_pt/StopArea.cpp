@@ -29,6 +29,7 @@
 #include "JourneyPattern.hpp"
 #include "VertexAccessMap.h"
 #include "RoadModule.h"
+#include "ReverseRoadChunk.hpp"
 #include "Crossing.h"
 
 #include <boost/foreach.hpp>
@@ -218,7 +219,7 @@ namespace synthese
 						VertexAccess(minutes(it.second->getProjectedPoint().getMetricOffset() / 50), it.second->getProjectedPoint().getMetricOffset())
 					);
 					result.insert(
-						it.second->getProjectedPoint().getRoadChunk()->getReverseChunk()->getFromCrossing(),
+						it.second->getProjectedPoint().getRoadChunk()->getReverseRoadChunk()->getFromCrossing(),
 						VertexAccess(
 							minutes((it.second->getProjectedPoint().getRoadChunk()->getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()) / 50),
 							it.second->getProjectedPoint().getRoadChunk()->getEndMetricOffset() - it.second->getProjectedPoint().getRoadChunk()->getMetricOffset() - it.second->getProjectedPoint().getMetricOffset()

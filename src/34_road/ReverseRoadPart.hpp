@@ -24,6 +24,7 @@
 #define SYNTHESE_road_ReverseRoadPart_hpp__
 
 #include "Road.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -43,6 +44,10 @@ namespace synthese
 			ReverseRoadPart(const MainRoadPart& mainRoadPart);
 
 			virtual ~ReverseRoadPart();
+
+			bool isReversed() const {return true;};
+
+			typedef util::Registry<ReverseRoadPart>	Registry;
 		};
 	}
 }

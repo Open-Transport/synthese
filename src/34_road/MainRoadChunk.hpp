@@ -24,6 +24,7 @@
 #define SYNTHESE_road_MainRoadChunk_hpp__
 
 #include "RoadChunk.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -43,6 +44,7 @@ namespace synthese
 		{
 		public:
 			typedef unsigned int HouseNumber;
+			static const HouseNumber HouseNumber_MAX;
 
 			typedef boost::optional<std::pair<HouseNumber, HouseNumber> > HouseNumberBounds;
 
@@ -53,7 +55,7 @@ namespace synthese
 			} HouseNumberingPolicy;
 
 			/// Chosen registry class.
-			typedef util::Registry<RoadChunk>	Registry;
+			typedef util::Registry<MainRoadChunk>	Registry;
 
 
 		private:
@@ -125,7 +127,6 @@ namespace synthese
 				bool testIfHouseNumberBelongsToChunk(
 					HouseNumber houseNumber
 				) const;
-
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Computes metric offset of a valid house number
