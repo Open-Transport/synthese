@@ -26,8 +26,16 @@
 
 #include <boost/foreach.hpp>
 
+using namespace std;
+
 namespace synthese
 {
+
+	namespace util
+	{
+		template<> const string Registry<road::ReverseRoadPart>::KEY("ReverseRoadPart");
+	}
+
 	using namespace graph;
 
 	namespace road

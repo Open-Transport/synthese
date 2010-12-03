@@ -24,10 +24,20 @@
 #include "ReverseRoadChunk.hpp"
 #include "MainRoadPart.hpp"
 
+using namespace std;
+
 namespace synthese
 {
+	namespace util
+	{
+		template<> const string Registry<road::MainRoadChunk>::KEY("MainRoadChunk");
+	}
+
 	namespace road
 	{
+
+	    const MainRoadChunk::HouseNumber MainRoadChunk::HouseNumber_MAX(UINT_MAX);
+
 		MainRoadChunk::MainRoadChunk(
 			util::RegistryKeyType id /*= 0*/,
 			Crossing* fromCrossing /*= NULL*/,
@@ -76,7 +86,6 @@ namespace synthese
 		}
 
 
-
 		bool MainRoadChunk::testIfHouseNumberBelongsToChunk(
 			HouseNumber houseNumber
 		) const	{
@@ -85,7 +94,6 @@ namespace synthese
 				_testIfHouseNumberBelongsToBounds(_rightHouseNumberBounds, _rightHouseNumberingPolicy, houseNumber)
 			;
 		}
-
 
 
 		RoadChunk::MetricOffset MainRoadChunk::_computeMetricOffset(

@@ -24,6 +24,7 @@
 #define SYNTHESE_road_MainRoadPart_hpp__
 
 #include "Road.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -49,7 +50,7 @@ namespace synthese
 				RoadType type = ROAD_TYPE_UNKNOWN
 			);
 
-
+			bool isReversed() const {return false;};
 
 			//! @name Getters
 			//@{

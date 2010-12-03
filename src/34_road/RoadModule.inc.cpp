@@ -14,8 +14,10 @@
 
 // Registries
 
-#include "Road.h"
+#include "MainRoadPart.hpp"
+#include "ReverseRoadPart.hpp"
 #include "Crossing.h"
 #include "RoadPlace.h"
 #include "PublicPlace.h"
-#include "RoadChunk.h"
+#include "ReverseRoadChunk.hpp"
+#include "MainRoadChunk.hpp"

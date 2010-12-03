@@ -24,7 +24,6 @@
 #define SYNTHESE_ENV_ROADCHUNK_H
 
 #include "Edge.h"
-#include "Registry.h"
 
 #include <utility>
 
@@ -56,9 +55,6 @@ namespace synthese
 		class RoadChunk:
 			public graph::Edge
 		{
-		public:
-
-
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
