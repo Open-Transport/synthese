@@ -48,7 +48,7 @@ namespace synthese
 	using namespace security;
 	using namespace cms;
 
-	template<> const string util::FactorableTemplate<Function,messages::ScenarioDisplayFunction>::FACTORY_KEY("ScenarioDisplayFunction");
+	template<> const string util::FactorableTemplate<Function,messages::ScenarioDisplayFunction>::FACTORY_KEY("scenario");
 	
 	namespace messages
 	{
