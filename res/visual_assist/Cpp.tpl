@@ -1550,13 +1550,11 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of the content of the admin element.
 			///	@param stream Stream to write the page content on.
-			///	@param variables Environment variables defined by the interface
 			///	@param request The current request
 			///	@author %USERNAME%
 			///	@date $YEAR$
 			void display(
 				std::ostream& stream,
-				interfaces::VariablesMap& variables,
 				const admin::AdminRequest& _request
 			) const;
 
@@ -1663,7 +1661,6 @@ using namespace std;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -1729,7 +1726,6 @@ namespace synthese
 
 		void $FILE_BASE$::display(
 			ostream& stream,
-			VariablesMap& variables,
 			const admin::AdminRequest& _request
 		) const	{
 
@@ -1863,9 +1859,9 @@ namespace synthese
 		/// Key : $FILE_BASE$
 		///
 		/// Parameters :
-		///	<ul>
-		///		<li>actionParamid : id of the object to update</li>
-		///	</ul>
+		///	<dl>
+		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
+		///	</dl>
 		class $FILE_BASE$:
 			public util::FactorableTemplate<server::Action, $FILE_BASE$>
 		{
@@ -2013,13 +2009,13 @@ namespace synthese
 			Object object;
 			object.setAttribute(_value);
 			ObjectTableSync::Save(&object);
-			$LogClass$::AddCreationEntry(object, request.getUser().get());
+			$LogClass$::AddCreationEntry(object, *request.getUser());
 			request.setActionCreatedId(object.getKey());
 */
 
 /*			DELETION EXAMPLE
 			ObjectTableSync::Remove(_object->getKey());
-			$LogClass$::AddDeleteEntry(*_object, request.getUser().get());
+			$LogClass$::AddDeleteEntry(*_object, *request.getUser());
 */
 		}
 		
@@ -2434,9 +2430,9 @@ namespace synthese
 		/// Key : $FILE_BASE$
 		///
 		/// Parameters :
-		///	<ul>
-		///		<li>roid : id of the object to display</li>
-		///	</ul>
+		///	<dl>
+		///	<dt>roid</dt><dd>id of the object to display</dd>
+		///	</dl>
 		class $FILE_BASE$:
 			public util::FactorableTemplate<server::Function,$FILE_BASE$>
 		{
