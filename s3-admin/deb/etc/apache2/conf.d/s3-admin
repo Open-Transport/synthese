@@ -1,7 +1,7 @@
 
 <Location /synthese3/admin>
 	AddDefaultCharset UTF-8
-	Redirect /synthese3/admin/ /synthese3/admin?fonction=admin&i=6755399441055745
+	Redirect /synthese3/admin/ /synthese3/admin?fonction=admin&mt=177329235327713281&tt=177329235327713282&pt=177329235327713283
 	Order allow,deny
  	Allow from all
 	ProxyPass http://localhost:8080/synthese3/admin
