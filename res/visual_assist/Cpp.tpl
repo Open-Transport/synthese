@@ -2422,17 +2422,12 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///	$Module_number$.15 Function : $FILE_BASE$.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/$Wiki_page$
+		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m$Module_number$Functions refFunctions
 		///	@author %USERNAME%
 		///	@date $YEAR$
 		/// @since $Version$
-		//////////////////////////////////////////////////////////////////////////
-		/// Key : $FILE_BASE$
-		///
-		/// Parameters :
-		///	<dl>
-		///	<dt>roid</dt><dd>id of the object to display</dd>
-		///	</dl>
 		class $FILE_BASE$:
 			public util::FactorableTemplate<server::Function,$FILE_BASE$>
 		{
@@ -2451,18 +2446,24 @@ namespace synthese
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/$Wiki_page$#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author %USERNAME%
 			/// @date $YEAR$
+			/// @since $Version$
 			server::ParametersMap _getParametersMap() const;
 			
 			
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/$Wiki_page$#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author %USERNAME%
 			/// @date $YEAR$
+			/// @since $Version$
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
