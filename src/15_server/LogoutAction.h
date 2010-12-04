@@ -30,19 +30,24 @@ namespace synthese
 {
 	namespace server
 	{
-		/** Logs the current user out of the system.
-			@ingroup m15Actions refActions
-		*/
-		class LogoutAction : public util::FactorableTemplate<server::Action, LogoutAction>
+		//////////////////////////////////////////////////////////////////////////
+		/// Logs the current user out of the system.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Logout
+		//////////////////////////////////////////////////////////////////////////
+		///	@ingroup m15Actions refActions
+		/// @author Hugues Romain
+		class LogoutAction:
+			public util::FactorableTemplate<server::Action, LogoutAction>
 		{
 		protected:
-			/** Conversion from attributes to generic parameter maps.
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from attributes to generic parameter maps.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Logout#Request
 			server::ParametersMap getParametersMap() const;
 
-			/** Conversion from generic parameters map to attributes.
-			Removes the used parameters from the map.
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from generic parameters map to attributes.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Logout#Request
 			void _setFromParametersMap(const server::ParametersMap& map);
 		
 		public:

@@ -1,57 +1,7 @@
 /**
-@mainpage Project Home Page
+@mainpage Technical documentation
 
-<h2>Qu'est-ce que SYNTHESE ?</h2>
-
-SYNTHESE est une suite logicielle libre, serveur d'information-voyageurs multimodale, véritable trousse à outil du réseau de transport.
-Son statut sous licence GPL lui a permis une évolution très rapide, et quelques exclusivités fonctionnelles encore inégalées par les produits commerciaux.
-En tout état de cause, SYNTHESE est la solution métier transport public libre la plus avancée.
-
-<h3>Fonctionnalités</h3>
-
-Exploité par les opérateurs de transport public, SYNTHESE offre toutes les fonctions nécessaires à leurs utilisateurs :
-<ul>
-<li><b>Référentiel de données multimodal</b> : modèle de données enrichi (route et transport public) et modifiable en temps réel si connexion à des SAE ou des écrans de gestion sur site</li>
-<li>@subpage journeyplanner : algorithme exact et performant de recherche d'itinéraires tous modes de transport (y compris si pas d'horaire défini)</li>
-<li><b>Téléaffichage intelligent</b> : génération de tableaux de départ multimodaux en approche chronologique classique, et également en approche par destination (innovation) : affichage de correspondances en lignes sur les écrans de quai, écrans généraux par destination en ordre alphabétique avec calcul temps réel de correspondances. Gestion du matériel et supervision</li>
-<li><b>Réservation de transport à la demande</b> : par opérateur professionnel ou directement par le client par compte sécurisé. Comporte toutes les fonctions nécessaires à la gestion du service (feuille de route conducteur, journal d'activité, statistiques, fichier clients, etc.)</li>
-<li><b>Génération de fiches horaires</b> : fabrication automatisée des classiques documents clientèle essentiellement destinés à être imprimés, avec approche classique par ligne, mais aussi par géographie (innovation) : fiches horaires multimodales par axes, extraction de troncs communs, génération de renvois, fusion de variantes, etc. En sortie, présentation en tableau horizontal ou vertical, ou en listing horizontal ou vertical</li>
-<li><b>Gestion d'actualités</b> : saisie de messages événementiels diffusés sur un ensemble de destinataires (lignes, arrêts, écrans, e-mail, RSS, etc.), basés ou non sur des scénarios préparés à l'avance et paramétrables par un système de variables</li>
-<li><b>Gestion des utilisateurs</b> : par profil, habilitations définies par périmètre géographique ou réseau, journaux d'activité, statistiques d'utilisation</li>
-<li><b>Module d'interface indépendant (CMS interne)</b> : séparation de la couche média permettant à partir d'une même instance du serveur d'alimenter plusieurs sites Internet (chartes graphiques programmables en toute liberté) et plusieurs types de matériel à protocole spécifique (ex : terminal à LED). Le module d'interface est intégralement programmé par configuration des données et ne nécessite aucune programmation lourde.</li>
-<li><b>Web 2.0</b> : intégration de forums de discussions dans les résultats produits par les services</li>
-<li><b>Module de randonnées</b> : fabrication de fiche de randonnées avec tous les accès en transport public disponibles</li>
-</ul>
-
-<h3>Architectures système</h3>
-
-SYNTHESE est un système d'information aux voyageurs (SIV) qui s'intègre dans une infrastructure de transport intelligent (Intelligent Transport System - ITS) :
-<ul>
-<li>@subpage archi-externe</li>
-<li>@subpage archi-monitoring</li>
-</ul>
-
-<h2>Le projet</h2>
-
-<ul>
-<li>@subpage history</li>
-<li>@subpage archi-interne</li>
-<li>@subpage roadmap</li>
-<li>@subpage participate</li>
-<li>@subpage svn</li>
-<li><a href="cccc/cccc.html">Metrics</a></li>
-</ul>
-
-<h2>Documentation utilisateur / administrateur</h2>
-
-<ul>
-	<li>@subpage userdoc</li>
-	<li>@subpage admindoc</li>
-</ul>
-
-<h2>Documentation développeur (en anglais)</h2>
-
-<h3>Developer documentation</h3>
+<h2>Code reference</h2>
 
 <ul>
 	<li>@ref ref</li>
@@ -61,12 +11,19 @@ SYNTHESE est un système d'information aux voyageurs (SIV) qui s'intègre dans u
 	<li>@subpage build</li>
 </ul>
 
+<h2>Howto</h2>
+
+<h2>Thematic documentation</h2>
+
+<ul>
+<li>@subpage xmlapi</li>
+<li>@subpage customer_specs</li>
+<li>@subpage annexes</li>
+</li>
+
 <h2>License</h2>
 
 All SYNTHESE modules and each corresponding documentation are under the @subpage gpl .
-
-@page overview Overview
- - @subpage
 
 @page customer_specs Functional specifications
 	- @subpage customer_spec_sai_tisseo
