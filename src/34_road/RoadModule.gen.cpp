@@ -18,8 +18,8 @@ synthese::road::House::integrate();
 
 // Registries
 
-synthese::util::Env::Integrate<synthese::road::Road>();
+synthese::util::Env::Integrate<synthese::road::MainRoadPart>();
 synthese::util::Env::Integrate<synthese::road::Crossing>();
 synthese::util::Env::Integrate<synthese::road::RoadPlace>();
-synthese::util::Env::Integrate<synthese::road::RoadChunk>();
+synthese::util::Env::Integrate<synthese::road::MainRoadChunk>();
 synthese::util::Env::Integrate<synthese::road::PublicPlace>();
