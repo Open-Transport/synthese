@@ -28,7 +28,7 @@
 #include "Registrable.h"
 #include "Registry.h"
 
-#include "17_messages/Types.h"
+#include "MessagesTypes.h"
 
 namespace synthese
 {

@@ -25,7 +25,7 @@
 
 #include <string>
 
-#include "17_messages/Types.h"
+#include "MessagesTypes.h"
 #include "Registrable.h"
 
 #include <boost/shared_ptr.hpp>

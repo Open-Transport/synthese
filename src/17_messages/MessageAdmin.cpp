@@ -26,7 +26,7 @@
 #include "HTMLTable.h"
 #include "MessageAdmin.h"
 #include "MessagesModule.h"
-#include "17_messages/Types.h"
+#include "MessagesTypes.h"
 #include "AlarmRecipient.h"
 #include "UpdateAlarmMessagesFromTemplateAction.h"
 #include "UpdateAlarmMessagesAction.h"

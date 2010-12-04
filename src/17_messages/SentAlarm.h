@@ -24,7 +24,7 @@
 #define SYNTHESE_SentAlarm_h__
 
 #include "Alarm.h"
-#include "17_messages/Types.h"
+#include "MessagesTypes.h"
 #include "Registry.h"
 
 namespace synthese

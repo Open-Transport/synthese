@@ -32,7 +32,6 @@
 #include "Webpage.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "StopArea.hpp"
-#include "RoutePlannerInterfacePage.h"
 
 using namespace std;
 using namespace boost;
@@ -444,7 +443,7 @@ namespace synthese
 				PTRoutePlannerResult result = r.run();
 
 				// Display
-				RoutePlannerInterfacePage::Display(
+/*				RoutePlannerInterfacePage::Display(
 					stream,
 					_page,
 					_schedulesRowPage,
@@ -474,7 +473,7 @@ namespace synthese
 					_beginningPeriod,
 					accessParameters
 				);
-			}
+*/			}
 
 			// Ending journeys
 			BOOST_FOREACH(size_t rank, _endingRanks)
@@ -505,7 +504,7 @@ namespace synthese
 				PTRoutePlannerResult result = r.run();
 
 				// Display
-				RoutePlannerInterfacePage::Display(
+/*				RoutePlannerInterfacePage::Display(
 					stream,
 					_page,
 					_schedulesRowPage,
@@ -535,7 +534,7 @@ namespace synthese
 					_endingPeriod,
 					accessParameters
 				);
-			}
+*/			}
 		}
 		
 		
