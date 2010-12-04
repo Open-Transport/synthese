@@ -25,7 +25,6 @@
 #include "UserFavoriteJourney.h"
 #include "TransportWebsite.h"
 #include "HourPeriod.h"
-#include "RoutePlannerInterfacePage.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "RequestException.h"
 #include "Request.h"
@@ -50,9 +49,27 @@
 #include "ContinuousService.h"
 #include "Webpage.h"
 #include "CoordinatesSystem.hpp"
+#include "User.h"
+#include "City.h"
+#include "Place.h"
+#include "AccessParameters.h"
+#include "PTConstants.h"
+#include "DateTimeInterfacePage.h"
+#include "PTRoutePlannerResult.h"
+#include "NamedPlace.h"
+#include "Webpage.h"
+#include "StopArea.hpp"
+#include "StaticFunctionRequest.h"
+#include "PTObjectsCMSExporters.hpp"
+#include "WebPageDisplayFunction.h"
+#include "RoutePlannerFunction.h"
+#include "ReservationRuleInterfacePage.h"
+#include "LineMarkerInterfacePage.h"
+#include "SentAlarm.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -121,6 +138,107 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_SHOW_RESULT_TABLE("showResTab");
 		const string RoutePlannerFunction::PARAMETER_SHOW_COORDINATES("showCoords");
 
+		const string RoutePlannerFunction::DATA_SOLUTIONS_NUMBER("solutions_number");
+		const string RoutePlannerFunction::DATA_LINES("lines");
+		const string RoutePlannerFunction::DATA_SCHEDULES("schedules");
+		const string RoutePlannerFunction::DATA_WARNINGS("warnings");
+		const string RoutePlannerFunction::DATA_DURATIONS("durations");
+		const string RoutePlannerFunction::DATA_RESERVATIONS("reservations");
+		const string RoutePlannerFunction::DATA_BOARDS("boards");
+		const string RoutePlannerFunction::DATA_MAPS_LINES("maps_lines");
+		const string RoutePlannerFunction::DATA_MAPS("maps");
+
+		const string RoutePlannerFunction::DATA_INTERNAL_DATE("internal_date");
+		const string RoutePlannerFunction::DATA_ORIGIN_CITY_TEXT("origin_city_text");
+		const string RoutePlannerFunction::DATA_HANDICAPPED_FILTER("handicapped_filter");
+		const string RoutePlannerFunction::DATA_ORIGIN_PLACE_TEXT("origin_place_text");
+		const string RoutePlannerFunction::DATA_BIKE_FILTER("bike_filter");
+		const string RoutePlannerFunction::DATA_DESTINATION_CITY_TEXT("destination_city_text");
+		const string RoutePlannerFunction::DATA_DESTINATION_PLACE_ID("destination_place_id");
+		const string RoutePlannerFunction::DATA_DESTINATION_PLACE_TEXT("destination_place_text");
+		const string RoutePlannerFunction::DATA_PERIOD_ID("period_id");
+		const string RoutePlannerFunction::DATA_DATE("date");
+		const string RoutePlannerFunction::DATA_PERIOD("period");
+		const string RoutePlannerFunction::DATA_ACCESSIBILITY_CODE("accessibility_code");
+		const string RoutePlannerFunction::DATA_SITE_ID("site_id");
+		const string RoutePlannerFunction::DATA_IS_SAME_PLACES("is_same_places");
+		const string RoutePlannerFunction::DATA_USER_FULL_NAME("user_full_name");
+		const string RoutePlannerFunction::DATA_USER_PHONE("user_phone");
+		const string RoutePlannerFunction::DATA_USER_ID("user_id");
+
+		const string RoutePlannerFunction::DATA_CELLS("cells");
+		const string RoutePlannerFunction::DATA_IS_ODD_ROW("is_odd_row");
+		const string RoutePlannerFunction::DATA_IS_ORIGIN_ROW("is_origin_row");
+		const string RoutePlannerFunction::DATA_IS_DESTINATION_ROW("is_destination_row");
+		const string RoutePlannerFunction::DATA_PLACE_NAME("place_name");
+
+		const string RoutePlannerFunction::DATA_IS_FIRST_ROW("is_first_row");
+		const string RoutePlannerFunction::DATA_IS_LAST_ROW("is_last_row");
+		const string RoutePlannerFunction::DATA_COLUMN_NUMBER("column_number");
+		const string RoutePlannerFunction::DATA_IS_FOOT("is_foot");
+		const string RoutePlannerFunction::DATA_FIRST_TIME("first_time");
+		const string RoutePlannerFunction::DATA_LAST_TIME("last_time");
+		const string RoutePlannerFunction::DATA_IS_CONTINUOUS_SERVICE("is_continuous_service");
+		const string RoutePlannerFunction::DATA_IS_FIRST_WRITING("is_first_writing");
+		const string RoutePlannerFunction::DATA_IS_LAST_WRITING("is_last_writing");
+		const string RoutePlannerFunction::DATA_IS_FIRST_FOOT("is_first_foot");
+
+		const string RoutePlannerFunction::DATA_CONTENT("content");
+		const string RoutePlannerFunction::DATA_RANK("rank");
+
+		const string RoutePlannerFunction::DATA_IS_THE_LAST_JOURNEY_BOARD("is_the_last_journey_board");
+		const string RoutePlannerFunction::DATA_DEPARTURE_TIME("departure_time");
+		const string RoutePlannerFunction::DATA_DEPARTURE_DATE("departure_date");
+		const string RoutePlannerFunction::DATA_DEPARTURE_TIME_INTERNAL_FORMAT("internal_departure_time");
+		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME("continuous_service_last_departure_time");
+		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
+		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_LONGITUDE("departure_longitude");
+		const string RoutePlannerFunction::DATA_DEPARTURE_PLACE_LATITUDE("departure_latitude");
+		const string RoutePlannerFunction::DATA_ARRIVAL_TIME("arrival_time");
+		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME("continuous_service_last_arrival_time");
+		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
+		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_LONGITUDE("arrival_longitude");
+		const string RoutePlannerFunction::DATA_ARRIVAL_PLACE_LATITUDE("arrival_latitude");
+		const string RoutePlannerFunction::DATA_DURATION("duration");
+		const string RoutePlannerFunction::DATA_RESERVATION_AVAILABLE("reservation_available");
+		const string RoutePlannerFunction::DATA_RESERVATION_COMPULSORY("reservation_compulsory");
+		const string RoutePlannerFunction::DATA_RESERVATION_DELAY("reservation_delay");
+		const string RoutePlannerFunction::DATA_RESERVATION_DEADLINE("reservation_deadline");
+		const string RoutePlannerFunction::DATA_RESERVATION_PHONE_NUMBER("reservation_phone_number");
+		const string RoutePlannerFunction::DATA_ONLINE_RESERVATION("online_reservation");
+		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_WAITING("continuous_service_waiting");
+
+		// Cells
+		const string RoutePlannerFunction::DATA_ODD_ROW("is_odd_row");
+		const string RoutePlannerFunction::DATA_ALARM_LEVEL("alarm_level");
+		const string RoutePlannerFunction::DATA_ALARM_MESSAGE("alarm_message");
+
+		// Stop cells
+		const string RoutePlannerFunction::DATA_IS_ARRIVAL("is_arrival");
+		const string RoutePlannerFunction::DATA_IS_TERMINUS("is_terminus");
+		const string RoutePlannerFunction::DATA_STOP_NAME("stop_name");
+		const string RoutePlannerFunction::DATA_LONGITUDE("longitude");
+		const string RoutePlannerFunction::DATA_LATITUDE("latitude");
+		const string RoutePlannerFunction::DATA_IS_LAST_LEG("is_last_leg");
+
+		// Junction cells
+		const string RoutePlannerFunction::DATA_REACHED_PLACE_IS_NAMED("reached_place_is_named");
+		const string RoutePlannerFunction::DATA_ROAD_NAME("road_name");
+		const string RoutePlannerFunction::DATA_LENGTH("length");
+
+		// Service cells
+		const string RoutePlannerFunction::DATA_FIRST_DEPARTURE_TIME("first_departure_time");
+		const string RoutePlannerFunction::DATA_LAST_DEPARTURE_TIME("last_departure_time");
+		const string RoutePlannerFunction::DATA_FIRST_ARRIVAL_TIME("first_arrival_time");
+		const string RoutePlannerFunction::DATA_LAST_ARRIVAL_TIME("last_arrival_time");
+		const string RoutePlannerFunction::DATA_ROLLINGSTOCK_ID("rolling_stock_id");
+		const string RoutePlannerFunction::DATA_ROLLINGSTOCK_NAME("rolling_stock_name");
+		const string RoutePlannerFunction::DATA_ROLLINGSTOCK_ARTICLE("rolling_stock_article");
+		const string RoutePlannerFunction::DATA_DESTINATION_NAME("destination_name");
+		const string RoutePlannerFunction::DATA_HANDICAPPED_FILTER_STATUS("handicapped_filter_status");
+		const string RoutePlannerFunction::DATA_HANDICAPPED_PLACES_NUMBER("handicapped_places_number");
+		const string RoutePlannerFunction::DATA_BIKE_FILTER_STATUS("bike_filter_status");
+		const string RoutePlannerFunction::DATA_BIKE_PLACES_NUMBER("bike_places_number");
 
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
@@ -597,27 +715,8 @@ namespace synthese
 			// Display
 			if(_page.get())
 			{
-				RoutePlannerInterfacePage::Display(
+				display(
 					stream,
-					_page,
-					_schedulesRowPage,
-					_schedulesCellPage,
-					_linesRowPage,
-					_lineMarkerPage,
-					_boardPage,
-					_warningPage,
-					_reservationPage,
-					_durationPage,
-					_textDurationPage,
-					_mapPage,
-					_mapLinePage,
-					_dateTimePage,
-					_stopCellPage,
-					_serviceCellPage,
-					_junctionPage,
-					_mapStopCellPage,
-					_mapServiceCellPage,
-					_mapJunctionPage,
 					request,
 					result,
 					_startDate.date(),
@@ -1438,5 +1537,1025 @@ namespace synthese
 					" />";
 			}
 		}
-	}
-}
+
+
+
+		void RoutePlannerFunction::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const pt_journey_planner::PTRoutePlannerResult& object,
+			const boost::gregorian::date& date,
+			size_t periodId,
+			const geography::Place* originPlace,
+			const geography::Place* destinationPlace,
+			const pt_website::HourPeriod* period,
+			const graph::AccessParameters& accessParameters
+		) const	{
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(_page);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm;
+
+			const City* originCity(dynamic_cast<const City*>(originPlace));
+			string originPlaceName;
+			if (originCity == NULL)
+			{
+				originCity = dynamic_cast<const NamedPlace*>(originPlace)->getCity();
+				originPlaceName = dynamic_cast<const NamedPlace*>(originPlace)->getName();
+			}
+			const City* destinationCity(dynamic_cast<const City*>(destinationPlace));
+			string destinationPlaceName;
+			if (destinationCity == NULL)
+			{
+				destinationCity = dynamic_cast<const NamedPlace*>(destinationPlace)->getCity();
+				destinationPlaceName = dynamic_cast<const NamedPlace*>(destinationPlace)->getName();
+			}
+			
+			pm.insert(DATA_INTERNAL_DATE, to_iso_extended_string(date));
+			pm.insert(DATA_ORIGIN_CITY_TEXT, originCity->getName());
+			pm.insert(DATA_HANDICAPPED_FILTER, accessParameters.getUserClass() == USER_HANDICAPPED);
+			pm.insert(DATA_ORIGIN_PLACE_TEXT, originPlaceName);
+			pm.insert(DATA_BIKE_FILTER, accessParameters.getUserClass() == USER_BIKE);
+			pm.insert(DATA_DESTINATION_CITY_TEXT, destinationCity->getName());
+			//pm.insert("" /*lexical_cast<string>(destinationPlace->getKey())*/);
+			pm.insert(DATA_DESTINATION_PLACE_TEXT, destinationPlaceName);
+			pm.insert(DATA_PERIOD_ID, periodId);
+
+			// Text formatted date
+			if(_dateTimePage.get())
+			{
+				stringstream sDate;
+				DateTimeInterfacePage::Display(sDate, _dateTimePage, request, date);
+				pm.insert(DATA_DATE, sDate.str());
+			}
+
+			if(period)
+			{
+				pm.insert(DATA_PERIOD, period->getCaption());
+			}
+			pm.insert(DATA_SOLUTIONS_NUMBER, object.getJourneys().size());
+			pm.insert(DATA_ACCESSIBILITY_CODE, static_cast<int>(accessParameters.getUserClass()));
+			pm.insert(DATA_SITE_ID, _page->getRoot()->getKey());
+			pm.insert(DATA_IS_SAME_PLACES, object.getSamePlaces());
+			if(request.getUser().get())
+			{
+				pm.insert(DATA_USER_FULL_NAME, request.getUser()->getFullName());
+				pm.insert(DATA_USER_PHONE, request.getUser()->getPhone());
+				pm.insert(DATA_USER_ID, request.getUser()->getKey());
+			}
+
+
+
+			// Schedule rows
+			if(_schedulesRowPage.get() && _schedulesCellPage.get())
+			{
+				stringstream rows;
+				const PTRoutePlannerResult::PlacesList& placesList(
+					object.getOrderedPlaces()
+				);
+				typedef vector<shared_ptr<ostringstream> > PlacesContentVector;
+				PlacesContentVector sheetRows(placesList.size());
+				BOOST_FOREACH(PlacesContentVector::value_type& stream, sheetRows)
+				{
+					stream.reset(new ostringstream);
+				}
+
+				// Cells
+
+				// Loop on each journey
+				int i=1;
+				for(PTRoutePlannerResult::Journeys::const_iterator it(object.getJourneys().begin());
+					it != object.getJourneys().end();
+					++it, ++i
+				){
+					bool pedestrianMode = false;
+					bool lastPedestrianMode = false;
+
+					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
+					PTRoutePlannerResult::PlacesList::const_iterator itPlaces(placesList.begin());
+
+					// Loop on each leg
+					const Journey::ServiceUses& jl(it->getServiceUses());
+					for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
+					{
+						const ServicePointer& curET(*itl);
+
+						if(	itl == jl.begin() ||
+							!curET.getService()->getPath()->isPedestrianMode() ||
+							lastPedestrianMode != curET.getService()->getPath()->isPedestrianMode()
+						){
+							const NamedPlace* placeToSearch(
+								(	itl == jl.begin() &&
+									dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
+								) ?
+								dynamic_cast<const NamedPlace*>(object.getDeparturePlace()) :
+								dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub())
+							);
+							assert(placeToSearch != NULL);
+
+							ptime lastDateTime(curET.getDepartureDateTime());
+							lastDateTime += it->getContinuousServiceRange();
+
+							for (; itPlaces != placesList.end() && itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
+							{
+								_displayScheduleCell(
+									**itSheetRow,
+									request,
+									itPlaces == object.getOrderedPlaces().begin(),
+									(itl + 1) == jl.end(),
+									i,
+									pedestrianMode,
+									time_duration(not_a_date_time),
+									time_duration(not_a_date_time),
+									false,
+									true,
+									true,
+									false
+								);
+							}
+
+							pedestrianMode = curET.getService()->getPath()->isPedestrianMode();
+
+							// Saving of the columns on each lines
+							_displayScheduleCell(
+								**itSheetRow,
+								request,
+								itPlaces == object.getOrderedPlaces().begin()
+								, true
+								, i
+								, pedestrianMode
+								, curET.getDepartureDateTime().time_of_day()
+								, lastDateTime.time_of_day()
+								, it->getContinuousServiceRange().total_seconds() > 0
+								, itl == jl.begin()
+								, true
+								, pedestrianMode && !lastPedestrianMode
+							);
+							++itPlaces; ++itSheetRow;
+							lastPedestrianMode = pedestrianMode;
+						}
+
+						if(	itl == jl.end()-1
+							||	!(itl+1)->getService()->getPath()->isPedestrianMode()
+							||	!curET.getService()->getPath()->isPedestrianMode()
+						){
+							const NamedPlace* placeToSearch(
+								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?
+								dynamic_cast<const NamedPlace*>(object.getArrivalPlace()) :
+								dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub())
+							);
+							assert(placeToSearch != NULL);
+
+							for (; itPlaces != placesList.end() && itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
+							{
+								_displayScheduleCell(
+									**itSheetRow,
+									request,
+									true
+									, true
+									, i
+									, pedestrianMode
+									, time_duration(not_a_date_time)
+									, time_duration(not_a_date_time)
+									, false
+									, true
+									, true
+									, false
+								);
+							}
+
+							ptime lastDateTime(curET.getArrivalDateTime());
+							lastDateTime += it->getContinuousServiceRange();
+
+							_displayScheduleCell(
+								**itSheetRow,
+								request,
+								true
+								, (itl + 1) == jl.end()
+								, i
+								, pedestrianMode
+								, curET.getArrivalDateTime().time_of_day()
+								, lastDateTime.time_of_day()
+								, it->getContinuousServiceRange().total_seconds() > 0
+								, true
+								, (itl + 1) == jl.end()
+								, false
+							);
+						}
+					}
+
+					for (++itPlaces, ++itSheetRow; itPlaces != placesList.end(); ++itPlaces, ++itSheetRow)
+					{
+						_displayScheduleCell(
+							**itSheetRow,
+							request,
+							true
+							, true
+							, i
+							, false
+							, time_duration(not_a_date_time)
+							, time_duration(not_a_date_time)
+							, false
+							, true
+							, true
+							, false
+						);
+					}
+				}
+
+				// Initialization of text lines
+				bool color(false);
+				PlacesContentVector::const_iterator it(sheetRows.begin());
+				BOOST_FOREACH(const PTRoutePlannerResult::PlacesList::value_type& pi, placesList)
+				{
+					assert(dynamic_cast<const NamedPlace*>(pi.place));
+
+					_displayRow(
+						rows,
+						request,
+						*dynamic_cast<const NamedPlace*>(pi.place),
+						(*it)->str(),
+						color,
+						pi.isOrigin,
+						pi.isDestination
+					);
+					color = !color;
+					++it;
+				}
+
+				pm.insert(DATA_SCHEDULES, rows.str());
+			}
+
+			// Lines row
+			if(_linesRowPage.get())
+			{
+				stringstream linesRow;
+				size_t n = 1;
+				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, object.getJourneys())
+				{
+					_displayLinesCell(
+						linesRow,
+						request,
+						n,
+						journey
+					);
+					++n;
+				}
+				pm.insert(DATA_LINES, linesRow.str());
+			}
+
+
+			// Boards
+			if(_boardPage.get())
+			{
+				stringstream boards;
+
+				logic::tribool hFilter(
+					false
+					//Conversion::ToTribool(_handicappedFilter->getValue(parameters, variables, object, request))
+				);
+				logic::tribool bFilter(
+					false
+					//Conversion::ToTribool(_bikeFilter->getValue(parameters, variables, object, request))
+				);
+
+				size_t i=1;
+				for(PTRoutePlannerResult::Journeys::const_iterator it(object.getJourneys().begin());
+					it != object.getJourneys().end();
+					++it, ++i
+				){
+					_displayJourney(
+						boards,
+						_boardPage,
+						_stopCellPage,
+						_serviceCellPage,
+						_junctionPage,
+						request,
+						i,
+						*it,
+						*object.getDeparturePlace(),
+						*object.getArrivalPlace(),
+						hFilter,
+						bFilter,
+						it+1 != object.getJourneys().end()
+					);
+				}
+
+				pm.insert(DATA_BOARDS, boards.str());
+			}
+
+			// Warnings row
+			if(_warningPage.get())
+			{
+				stringstream warnings;
+
+				/// @todo warnings
+
+				pm.insert(DATA_WARNINGS, warnings.str());
+			}
+
+
+			// Durations row
+			if(_durationPage.get())
+			{
+				stringstream durations;
+				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, object.getJourneys())
+				{
+					DateTimeInterfacePage::Display(
+						durations,
+						_durationPage,
+						request,
+						journey.getDuration()
+					);
+				}
+				pm.insert(DATA_DURATIONS, durations.str());
+			}
+
+
+			// Reservations row
+			if(_reservationPage.get())
+			{
+				stringstream reservations;
+				BOOST_FOREACH(PTRoutePlannerResult::Journeys::value_type journey, object.getJourneys())
+				{
+					ReservationRuleInterfacePage::Display(
+						reservations,
+						_reservationPage,
+						_dateTimePage,
+						request,
+						journey
+					);
+				}
+				pm.insert(DATA_RESERVATIONS, reservations.str());
+			}
+
+
+			// Maps lines
+			if(_mapLinePage.get())
+			{
+				stringstream mapsLines;
+
+				// Selection of the lines to display
+				set<const CommercialLine*> lines;
+				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, object.getJourneys())
+				{
+					BOOST_FOREACH(const ServicePointer& service, journey.getServiceUses())
+					{
+						if(dynamic_cast<const JourneyPattern*>(service.getService()->getPath()))
+						{
+							lines.insert(static_cast<const JourneyPattern*>(service.getService()->getPath())->getCommercialLine());
+						}
+					}
+				}
+
+				// Display of each line
+				BOOST_FOREACH(const CommercialLine* line, lines)
+				{
+					LineMarkerInterfacePage::Display(
+						mapsLines,
+						_mapLinePage,
+						request,
+						*line
+					);
+				}
+				pm.insert(DATA_MAPS_LINES, mapsLines.str());
+			}
+
+
+			// Maps
+			if(_mapPage.get())
+			{
+				stringstream maps;
+
+				logic::tribool hFilter(
+					false
+					//Conversion::ToTribool(_handicappedFilter->getValue(parameters, variables, object, request))
+				);
+				logic::tribool bFilter(
+					false
+					//Conversion::ToTribool(_bikeFilter->getValue(parameters, variables, object, request))
+				);
+
+				size_t i=1;
+				for(PTRoutePlannerResult::Journeys::const_iterator it(object.getJourneys().begin());
+					it != object.getJourneys().end();
+					++it, ++i
+				){
+					_displayJourney(
+						maps,
+						_mapPage,
+						_mapStopCellPage,
+						_mapServiceCellPage,
+						_mapJunctionPage,
+						request,
+						i,
+						*it,
+						*object.getDeparturePlace(),
+						*object.getArrivalPlace(),
+						hFilter,
+						bFilter,
+						it+1 != object.getJourneys().end()
+					);
+				}
+
+				pm.insert(DATA_MAPS, maps.str());
+			}
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+
+
+
+		void RoutePlannerFunction::_displayRow(
+			std::ostream& stream,
+			const server::Request& request,
+			const geography::NamedPlace& place,
+			const std::string& cells,
+			bool alternateColor,
+			bool isOrigin,
+			bool isDestination
+		) const	{
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(_schedulesRowPage);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm;
+
+			pm.insert(Request::PARAMETER_OBJECT_ID, place.getKey());
+			pm.insert(DATA_CELLS, cells);
+			pm.insert(DATA_IS_DESTINATION_ROW, isDestination);
+			pm.insert(DATA_IS_ODD_ROW, alternateColor);
+			pm.insert(DATA_IS_ORIGIN_ROW, isOrigin);
+			pm.insert(DATA_PLACE_NAME, place.getFullName());
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+
+
+
+		void RoutePlannerFunction::_displayScheduleCell(
+			std::ostream& stream,
+			const server::Request& request,
+			bool isItFirstRow,
+			bool isItLastRow,
+			size_t columnNumber,
+			bool isItFootLine,
+			const boost::posix_time::time_duration& firstTime,
+			const boost::posix_time::time_duration& lastTime,
+			bool isItContinuousService,
+			bool isFirstWriting,
+			bool isLastWriting,
+			bool isFirstFoot
+		) const {
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(_schedulesCellPage);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm;
+
+			pm.insert(DATA_IS_FIRST_ROW, isItFirstRow);
+			pm.insert(DATA_IS_LAST_ROW, isItLastRow);
+			pm.insert(DATA_COLUMN_NUMBER, columnNumber);
+			pm.insert(DATA_IS_FOOT, isItFootLine);
+			{
+				stringstream s;
+				if(!firstTime.is_not_a_date_time())
+				{
+					s << setfill('0') << setw(2) << firstTime.hours() << ":" << setfill('0') << setw(2) << firstTime.minutes();
+				}
+				pm.insert(DATA_FIRST_TIME, s.str());
+			}{
+				stringstream s;
+				if(!lastTime.is_not_a_date_time())
+				{
+					s << setfill('0') << setw(2) << lastTime.hours() << ":" << setfill('0') << setw(2) << lastTime.minutes();
+				}
+				pm.insert(DATA_LAST_TIME, s.str());
+			}
+			pm.insert(DATA_IS_CONTINUOUS_SERVICE, isItContinuousService);
+			pm.insert(DATA_IS_FIRST_WRITING, isFirstWriting);
+			pm.insert(DATA_IS_LAST_WRITING, isLastWriting);
+			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+
+
+
+		void RoutePlannerFunction::_displayLinesCell(
+			std::ostream& stream,
+			const server::Request& request,
+			std::size_t columnNumber,
+			const graph::Journey& journey
+		) const	{
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(_linesRowPage);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm;
+
+			pm.insert(DATA_COLUMN_NUMBER, columnNumber);
+
+			// Content
+			if(_lineMarkerPage.get())
+			{
+				stringstream content;
+				bool __AfficherLignesPied = false;
+				//	Conversion::ToBool(
+				//	_displayPedestrianLines->getValue(parameters, variables, object, request)
+				//	);
+
+				BOOST_FOREACH(const ServicePointer& leg, journey.getServiceUses())
+				{
+					if ( __AfficherLignesPied || !dynamic_cast<const Road*> (leg.getService()->getPath ()) )
+					{
+						LineMarkerInterfacePage::Display(
+							content,
+							_lineMarkerPage,
+							request,
+							*static_cast<const JourneyPattern*>(leg.getService()->getPath ())->getCommercialLine()
+						);
+					}
+				}
+
+				pm.insert(DATA_CONTENT, content.str());
+			}
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+
+
+
+		void RoutePlannerFunction::_displayJourney(
+			std::ostream& stream,
+			boost::shared_ptr<const cms::Webpage> page,
+			boost::shared_ptr<const cms::Webpage> stopCellPage,
+			boost::shared_ptr<const cms::Webpage> serviceCellPage,
+			boost::shared_ptr<const cms::Webpage> junctionPage,
+			const server::Request& request,
+			std::size_t n,
+			const graph::Journey& journey,
+			const geography::Place& departurePlace,
+			const geography::Place& arrivalPlace,
+			boost::logic::tribool handicappedFilter,
+			boost::logic::tribool bikeFilter,
+			bool isTheLast
+		) const	{
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm;
+
+			// Rank
+			pm.insert(DATA_RANK, n);
+			pm.insert(DATA_IS_THE_LAST_JOURNEY_BOARD, isTheLast);
+
+			// Filters
+			pm.insert(DATA_HANDICAPPED_FILTER, handicappedFilter);
+			pm.insert(DATA_BIKE_FILTER, bikeFilter);
+
+			// Departure time
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << journey.getFirstDepartureTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << journey.getFirstDepartureTime().time_of_day().minutes();
+				pm.insert(DATA_DEPARTURE_TIME, s.str());
+			}
+			if(_dateTimePage.get())
+			{
+				stringstream sDate;
+				DateTimeInterfacePage::Display(sDate, _dateTimePage, request, journey.getFirstDepartureTime());
+				pm.insert(DATA_DEPARTURE_DATE, sDate.str());
+			}
+			else
+			{
+				pm.insert(DATA_DEPARTURE_DATE, journey.getFirstDepartureTime());
+			}
+			pm.insert(DATA_DEPARTURE_TIME_INTERNAL_FORMAT, to_iso_extended_string(journey.getFirstDepartureTime()));
+
+			if(journey.getContinuousServiceRange().total_seconds())
+			{
+				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_DEPARTURE_TIME, to_simple_string(journey.getLastDepartureTime().time_of_day()));
+			}
+
+			// Departure place
+			string displayedDeparturePlace(
+				(	dynamic_cast<const Crossing*>(journey.getOrigin()->getHub()) ?
+					dynamic_cast<const NamedPlace&>(departurePlace) :
+					dynamic_cast<const NamedPlace&>(*journey.getOrigin()->getHub())
+				).getFullName()
+			);
+			pm.insert(DATA_DEPARTURE_PLACE_NAME, displayedDeparturePlace);
+			
+			shared_ptr<Point> departurePoint(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*departurePlace.getPoint()
+			)	);
+			pm.insert(DATA_DEPARTURE_PLACE_LONGITUDE, departurePoint->getX());
+			pm.insert(DATA_DEPARTURE_PLACE_LATITUDE, departurePoint->getY());
+			
+			// Arrival time
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << journey.getFirstArrivalTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << journey.getFirstArrivalTime().time_of_day().minutes();
+				pm.insert(DATA_ARRIVAL_TIME, s.str());
+			}
+
+			if(journey.getContinuousServiceRange().total_seconds())
+			{
+				pm.insert(DATA_CONTINUOUS_SERVICE_LAST_ARRIVAL_TIME, to_simple_string(journey.getLastArrivalTime().time_of_day()));
+			}
+
+			// Arrival place
+			string displayedArrivalPlace(
+				(	dynamic_cast<const Crossing*>(journey.getDestination()->getHub()) ?
+					dynamic_cast<const NamedPlace&>(arrivalPlace) :
+					dynamic_cast<const NamedPlace&>(*journey.getDestination()->getHub())
+				).getFullName()
+			);
+			pm.insert(DATA_ARRIVAL_PLACE_NAME, displayedArrivalPlace);
+			
+			shared_ptr<Point> arrivalPoint(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*arrivalPlace.getPoint()
+			)	);
+			pm.insert(DATA_ARRIVAL_PLACE_LONGITUDE, arrivalPoint->getX());
+			pm.insert(DATA_ARRIVAL_PLACE_LATITUDE, arrivalPoint->getY());
+
+			// Duration
+			if(_textDurationPage.get())
+			{
+				stringstream sDuration;
+				DateTimeInterfacePage::Display(sDuration, _textDurationPage, request, journey.getDuration());
+				pm.insert(DATA_DURATION, sDuration.str());
+			}
+			else
+			{
+				pm.insert(DATA_DURATION, journey.getDuration());
+			}
+
+			// Reservation
+			ptime now(second_clock::local_time());
+			ptime resaDeadLine(journey.getReservationDeadLine());
+			logic::tribool resaCompliance(journey.getReservationCompliance());
+			pm.insert(DATA_RESERVATION_AVAILABLE, resaCompliance && resaDeadLine > now);
+			pm.insert(DATA_RESERVATION_COMPULSORY, resaCompliance == true);
+			pm.insert(DATA_RESERVATION_DELAY, resaDeadLine.is_not_a_date_time() ? 0 : (resaDeadLine - now).total_seconds() / 60);
+
+			if(!journey.getReservationDeadLine().is_not_a_date_time())
+			{
+				if(_dateTimePage.get())
+				{
+					stringstream sResa;
+					DateTimeInterfacePage::Display(sResa, _dateTimePage, request, journey.getReservationDeadLine());
+					pm.insert(DATA_RESERVATION_DEADLINE, sResa.str());
+				}
+				else
+				{
+					pm.insert(DATA_RESERVATION_DEADLINE, journey.getReservationDeadLine());
+				}
+			}
+
+			// Reservation contact
+			set<const ReservationContact*> resaRules;
+			BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
+			{
+				const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
+				if(line == NULL) continue;
+
+				if(	line->getCommercialLine()->getReservationContact() &&
+					UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su))
+					){
+						resaRules.insert(line->getCommercialLine()->getReservationContact());
+				}
+			}
+			stringstream sPhones;
+			bool onlineBooking(!resaRules.empty());
+			BOOST_FOREACH(const ReservationContact* rc, resaRules)
+			{
+				sPhones <<
+					rc->getPhoneExchangeNumber() <<
+					" (" << rc->getPhoneExchangeOpeningHours() << ") "
+					;
+				if (!OnlineReservationRule::GetOnlineReservationRule(rc))
+				{
+					onlineBooking = false;
+				}
+			}
+			pm.insert(DATA_RESERVATION_PHONE_NUMBER, sPhones.str());
+			pm.insert(DATA_ONLINE_RESERVATION, onlineBooking);
+
+			// Content
+			if(stopCellPage.get() && serviceCellPage.get() && junctionPage.get())
+			{
+				stringstream content;
+
+				// Loop on lines of the board
+				bool __Couleur = false;
+
+				const Hub* lastPlace(journey.getOrigin()->getHub());
+				double distance(0);
+
+				const Journey::ServiceUses& services(journey.getServiceUses());
+				for (Journey::ServiceUses::const_iterator it = services.begin(); it != services.end(); ++it)
+				{
+					const ServicePointer& leg(*it);
+
+					const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath ()));
+					if (road == NULL)
+					{
+						distance = 0;
+
+						// LIGNE ARRET MONTEE Si premier point d'arrêt et si alerte
+						if (leg.getDepartureEdge()->getHub() != lastPlace)
+						{
+							/*					ptime debutPrem(leg.getDepartureDateTime());
+							ptime finPrem(debutPrem);
+							if (journey.getContinuousServiceRange () )
+							finPrem += journey.getContinuousServiceRange ();
+							*/
+
+							DisplayStopCell(
+								content,
+								stopCellPage,
+								request,
+								false
+								, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
+								, false
+								, *static_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex())
+								, __Couleur
+								, leg.getDepartureDateTime()
+								, journey.getContinuousServiceRange(),
+								false
+							);
+
+							lastPlace = leg.getDepartureEdge()->getHub();
+							__Couleur = !__Couleur;
+						}
+
+						// LIGNE CIRCULATIONS
+						/*					ptime debutLigne(leg.getDepartureDateTime());
+						ptime finLigne(leg.getArrivalDateTime());
+
+						if ( journey.getContinuousServiceRange () )
+						{
+						finLigne = lastArrivalTime;
+						}
+						*/
+
+						DisplayServiceCell(
+							content,
+							serviceCellPage,
+							request,
+							leg,
+							journey.getContinuousServiceRange(),
+							handicappedFilter,
+							bikeFilter,
+							NULL, // leg->getService ()->getPath ()->hasApplicableAlarm ( debutLigne, finLigne ) ? __ET->getService()->getPath ()->getAlarm() : NULL
+							__Couleur
+						);
+
+						__Couleur = !__Couleur;
+
+						// LIGNE ARRET DE DESCENTE
+
+						/*					ptime debutArret(leg.getArrivalDateTime ());
+						ptime finArret(debutArret);
+						if ( (it + 1) < journey.getServiceUses().end())
+						finArret = (it + 1)->getDepartureDateTime();
+						if ( journey.getContinuousServiceRange () )
+						finArret += journey.getContinuousServiceRange ();
+						*/
+
+						DisplayStopCell(
+							content,
+							stopCellPage,
+							request,
+							true
+							, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
+							, leg.getArrivalEdge()->getHub() == leg.getService()->getPath()->getEdges().back()->getHub()
+							, *static_cast<const StopPoint*>(leg.getArrivalEdge()->getFromVertex())
+							, __Couleur
+							, leg.getArrivalDateTime()
+							, journey.getContinuousServiceRange(),
+							it+1 == services.end()
+						);
+
+						lastPlace = leg.getArrivalEdge()->getHub();
+						__Couleur = !__Couleur;
+
+					}
+					else
+					{
+						// 1/2 Alerte
+						/*					ptime debutArret(leg.getArrivalDateTime ());
+						ptime finArret(debutArret);
+						if ((it+1) < journey.getServiceUses().end())
+						finArret = (it + 1)->getDepartureDateTime();
+						if ( journey.getContinuousServiceRange () )
+						finArret += journey.getContinuousServiceRange ();
+						*/
+						distance += leg.getDistance();
+
+						if (it + 1 != services.end())
+						{
+							const ServicePointer& nextLeg(*(it+1));
+							const Road* nextRoad(dynamic_cast<const Road*> (nextLeg.getService()->getPath ()));
+
+							if (nextRoad && nextRoad->getRoadPlace() == road->getRoadPlace())
+								continue;
+						}
+
+						DisplayJunctionCell(
+							content,
+							junctionPage,
+							request,
+							*leg.getArrivalEdge()->getFromVertex()
+							, NULL // leg->getDestination()->getConnectionPlace()->hasApplicableAlarm(debutArret, finArret) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
+							, __Couleur
+							, road
+							, distance
+						);
+
+						distance = 0;				
+						__Couleur = !__Couleur;
+					}
+				}
+				pm.insert(DATA_CONTENT, content.str());
+			}
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+
+
+
+		void RoutePlannerFunction::DisplayStopCell( std::ostream& stream, boost::shared_ptr<const cms::Webpage> page, const server::Request& request, bool isItArrival, const messages::SentAlarm* alarm, bool isItTerminus, const pt::StopPoint& physicalStop, bool color, const boost::posix_time::ptime& time, boost::posix_time::time_duration continuousServiceRange, bool isLastLeg )
+		{
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm;
+
+			ptime endRangeTime(time);
+			if (continuousServiceRange.total_seconds() > 0)
+				endRangeTime += continuousServiceRange;
+
+			pm.insert(DATA_IS_ARRIVAL, isItArrival);
+			
+			// Alarm
+			if(alarm)
+			{
+				pm.insert(DATA_ALARM_LEVEL, alarm->getLongMessage());
+				pm.insert(DATA_ALARM_MESSAGE, alarm->getLevel());
+			}
+
+			pm.insert(DATA_IS_TERMINUS, isItTerminus);
+			pm.insert(DATA_STOP_NAME, dynamic_cast<const NamedPlace&>(*physicalStop.getHub()).getFullName());
+			pm.insert(DATA_ODD_ROW, color);
+			{
+				stringstream s;
+				if(!time.is_not_a_date_time())
+				{
+					s << setw(2) << setfill('0') << time.time_of_day().hours() << ":" << setw(2) << setfill('0') << time.time_of_day().minutes();
+				}
+				pm.insert(DATA_FIRST_TIME, s.str()); // 6
+			}
+			{
+				stringstream s;
+				if(continuousServiceRange.total_seconds() > 0)
+				{
+					s << setw(2) << setfill('0') << endRangeTime.time_of_day().hours() << ":" << setw(2) << setfill('0') << endRangeTime.time_of_day().minutes();
+				}
+				pm.insert(DATA_LAST_TIME, s.str()); // 7
+			}
+
+			// Point
+			shared_ptr<Point> point(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*physicalStop.getGeometry()
+			)	);
+			pm.insert(DATA_LONGITUDE, point->getX());
+			pm.insert(DATA_LATITUDE, point->getY());
+			
+			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+
+
+
+		void RoutePlannerFunction::DisplayJunctionCell( std::ostream& stream, boost::shared_ptr<const cms::Webpage> page, const server::Request& request, const graph::Vertex& vertex, const messages::SentAlarm* alarm, bool color, const road::Road* road, double distance )
+		{
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm;
+
+			// Point
+			shared_ptr<Point> point(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+				*vertex.getGeometry()
+				)	);
+			pm.insert(DATA_LONGITUDE, point->getX());
+			pm.insert(DATA_LATITUDE, point->getY());
+			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(vertex.getHub()) != NULL);
+			pm.insert(DATA_ODD_ROW, color);
+			if(road && road->getRoadPlace())
+			{
+				pm.insert(DATA_ROAD_NAME, road->getRoadPlace()->getName());
+			}
+			pm.insert(DATA_LENGTH, distance);
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+
+
+
+		void RoutePlannerFunction::DisplayServiceCell( std::ostream& stream, boost::shared_ptr<const cms::Webpage> page, const server::Request& request, const graph::ServicePointer& serviceUse, boost::posix_time::time_duration continuousServiceRange, boost::logic::tribool handicappedFilterStatus, boost::logic::tribool bikeFilterStatus, const messages::SentAlarm* alarm, bool color )
+		{
+			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
+			displayRequest.getFunction()->setPage(page);
+			displayRequest.getFunction()->setUseTemplate(false);
+			ParametersMap pm;
+
+			// Continuous service
+			ptime lastDepartureDateTime(serviceUse.getDepartureDateTime());
+			ptime lastArrivalDateTime(serviceUse.getArrivalDateTime());
+			if (continuousServiceRange.total_seconds())
+			{
+				lastArrivalDateTime += continuousServiceRange;
+				lastDepartureDateTime += continuousServiceRange;
+			}
+
+			// JourneyPattern extraction
+			const JourneyPattern* line(static_cast<const JourneyPattern*>(serviceUse.getService()->getPath()));
+			const CommercialLine* commercialLine(line->getCommercialLine());
+			const ContinuousService* continuousService(dynamic_cast<const ContinuousService*>(serviceUse.getService()));
+
+			// Build of the parameters vector
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << serviceUse.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << serviceUse.getDepartureDateTime().time_of_day().minutes();
+				pm.insert(DATA_FIRST_DEPARTURE_TIME, s.str()); // 0
+			}
+			{
+				stringstream s;
+				if(continuousServiceRange.total_seconds() > 0)
+				{
+					s << setw(2) << setfill('0') << lastDepartureDateTime.time_of_day().hours() << ":" << setw(2) << setfill('0') << lastDepartureDateTime.time_of_day().minutes();
+				}
+				pm.insert(DATA_LAST_DEPARTURE_TIME, s.str()); // 1
+			}
+			{
+				stringstream s;
+				s << setw(2) << setfill('0') << serviceUse.getArrivalDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << serviceUse.getArrivalDateTime().time_of_day().minutes();
+				pm.insert(DATA_FIRST_ARRIVAL_TIME, s.str()); // 2
+			}
+			{
+				stringstream s;
+				if(continuousServiceRange.total_seconds() > 0)
+				{
+					s << setw(2) << setfill('0') << lastArrivalDateTime.time_of_day().hours() << ":" << setw(2) << setfill('0') << lastArrivalDateTime.time_of_day().minutes();
+				}
+				pm.insert(DATA_LAST_ARRIVAL_TIME, s.str()); // 3
+			}
+			if(line->getRollingStock())
+			{
+				pm.insert(DATA_ROLLINGSTOCK_ID, line->getRollingStock()->getKey()); // 4
+				pm.insert(DATA_ROLLINGSTOCK_NAME, line->getRollingStock()->getName()); // 5
+				pm.insert(DATA_ROLLINGSTOCK_ARTICLE, line->getRollingStock()->getArticle()); // 6
+			}
+			pm.insert(DATA_DESTINATION_NAME, line->getDirection().empty() ? line->getDestination()->getConnectionPlace()->getFullName() : line->getDirection() ); // 7
+			pm.insert(DATA_HANDICAPPED_FILTER_STATUS, handicappedFilterStatus);
+			pm.insert(
+				DATA_HANDICAPPED_PLACES_NUMBER,
+				serviceUse.getUseRule().getAccessCapacity () ?
+					lexical_cast<string>(*serviceUse.getUseRule().getAccessCapacity ()) :
+					"9999"
+			);
+			pm.insert(DATA_BIKE_FILTER_STATUS, bikeFilterStatus);
+			pm.insert(
+				DATA_BIKE_PLACES_NUMBER,
+				serviceUse.getUseRule().getAccessCapacity () ?
+					lexical_cast<string>(*serviceUse.getUseRule().getAccessCapacity ()) :
+				"9999"
+			); // 11
+			PTObjectsCMSExporters::ExportLine(pm, *commercialLine);
+			if(continuousService)
+			{
+				pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, continuousService->getMaxWaitingTime().total_seconds() / 60);
+			}
+			if(alarm)
+			{
+				pm.insert(DATA_ALARM_MESSAGE, alarm->getLongMessage());
+				pm.insert(DATA_ALARM_LEVEL, alarm->getLevel());
+			}
+			pm.insert(DATA_ODD_ROW, color); // 21
+
+			displayRequest.getFunction()->setAditionnalParametersMap(pm);
+			displayRequest.run(stream);
+		}
+}	}

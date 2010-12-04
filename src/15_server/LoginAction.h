@@ -32,12 +32,14 @@ namespace synthese
 {
 	namespace server
 	{
-		/** Logs a user in the system.
-			@ingroup m15Actions refActions
-
-			Tip : XMLSessionFunction can be used after the action to get the result of the action.
-		*/
-		class LoginAction : public util::FactorableTemplate<server::Action, LoginAction>
+		//////////////////////////////////////////////////////////////////////////
+		/// Logs a user in the system.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Login
+		//////////////////////////////////////////////////////////////////////////
+		///	@ingroup m15Actions refActions
+		/// @author Hugues Romain
+		class LoginAction:
+			public util::FactorableTemplate<server::Action, LoginAction>
 		{
 		public:
 			static const std::string PARAMETER_LOGIN;
@@ -48,13 +50,16 @@ namespace synthese
 			std::string _password;
 
 		protected:
-			/** Conversion from attributes to generic parameter maps.
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from attributes to generic parameter maps.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Login#Request
 			server::ParametersMap getParametersMap() const;
 
-			/** Conversion from generic parameters map to attributes.
-			Removes the used parameters from the map.
-			*/
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from generic parameters map to attributes.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Login#Request
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
