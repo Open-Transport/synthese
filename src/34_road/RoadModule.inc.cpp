@@ -15,9 +15,7 @@
 // Registries
 
 #include "MainRoadPart.hpp"
-#include "ReverseRoadPart.hpp"
 #include "Crossing.h"
 #include "RoadPlace.h"
 #include "PublicPlace.h"
-#include "ReverseRoadChunk.hpp"
 #include "MainRoadChunk.hpp"
