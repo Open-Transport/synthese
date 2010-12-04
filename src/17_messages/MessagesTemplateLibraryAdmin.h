@@ -26,7 +26,7 @@
 #define SYNTHESE_MessagesTemplateLibraryAdmin_H__
 
 #include "AdminInterfaceElementTemplate.h"
-#include "17_messages/Types.h"
+#include "MessagesTypes.h"
 
 namespace synthese
 {

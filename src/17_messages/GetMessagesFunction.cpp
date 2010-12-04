@@ -26,11 +26,11 @@
 #include "Request.h"
 #include "GetMessagesFunction.hpp"
 #include "Webpage.h"
-#include "WebPageDisplayFunction.h"
 #include "SentAlarm.h"
 #include "MessagesModule.h"
 #include "StaticFunctionRequest.h"
 #include "SentScenario.h"
+#include "MessagesObjectsCMSExporters.hpp"
 
 using namespace std;
 using namespace boost;
@@ -54,11 +54,6 @@ namespace synthese
 		const string GetMessagesFunction::PARAMETER_DATE("d");
 		const string GetMessagesFunction::PARAMETER_CMS_TEMPLATE_ID("t");
 		
-		const string GetMessagesFunction::DATA_CONTENT("content");
-		const string GetMessagesFunction::DATA_PRIORITY("priority");
-		const string GetMessagesFunction::DATA_SCENARIO_ID("scenario_id");
-		const string GetMessagesFunction::DATA_SCENARIO_NAME("scenario_name");
-		const string GetMessagesFunction::DATA_TITLE("title");
 
 
 		ParametersMap GetMessagesFunction::_getParametersMap() const
@@ -140,7 +135,14 @@ namespace synthese
 					{
 						break;
 					}
-					_display(stream, request, *it);
+					if(_cmsTemplate.get())
+					{
+						MessagesObjectsCMSExporters::DisplayMessage(stream, request, _cmsTemplate, *it);
+					}
+					else
+					{
+						stream << it->getLongMessage();
+					}
 					++number;
 				}
 			}
@@ -160,7 +162,14 @@ namespace synthese
 					{
 						continue;
 					}
-					_display(stream, request, *it);
+					if(_cmsTemplate.get())
+					{
+						MessagesObjectsCMSExporters::DisplayMessage(stream, request, _cmsTemplate, *it);
+					}
+					else
+					{
+						stream << it->getLongMessage();
+					}
 					++number;
 				}
 			}
@@ -178,41 +187,7 @@ namespace synthese
 
 		std::string GetMessagesFunction::getOutputMimeType() const
 		{
-			return "text/plain";
-		}
-
-
-
-		void GetMessagesFunction::_display(
-			std::ostream& stream,
-			const server::Request& request,
-			const SentAlarm& message
-		) const {
-			if(_cmsTemplate.get())
-			{
-				StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-				displayRequest.getFunction()->setPage(_cmsTemplate);
-				displayRequest.getFunction()->setUseTemplate(false);
-				ParametersMap pm(
-					dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-					dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-					ParametersMap()
-				);
-
-				pm.insert(Request::PARAMETER_OBJECT_ID, message.getKey());
-				pm.insert(DATA_TITLE, message.getShortMessage());
-				pm.insert(DATA_CONTENT, message.getLongMessage());
-				pm.insert(DATA_PRIORITY, message.getLevel());
-				pm.insert(DATA_SCENARIO_ID, message.getScenario()->getKey());
-				pm.insert(DATA_SCENARIO_NAME, message.getScenario()->getName());
-
-				displayRequest.getFunction()->setAditionnalParametersMap(pm);
-				displayRequest.run(stream);
-			}
-			else
-			{
-				stream << message.getLongMessage();
-			}
+			return _cmsTemplate.get() ? _cmsTemplate->getMimeType() : "text/plain";
 		}
 
 

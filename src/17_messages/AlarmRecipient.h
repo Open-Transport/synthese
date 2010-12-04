@@ -27,7 +27,7 @@
 
 #include "FactoryBase.h"
 #include "12_security/Types.h"
-#include "17_messages/Types.h"
+#include "MessagesTypes.h"
 #include "StaticActionRequest.h"
 
 namespace synthese

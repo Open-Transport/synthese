@@ -25,7 +25,7 @@
 #include "Interface.h"
 #include "ValueElementList.h"
 #include "Alarm.h"
-#include "17_messages/Types.h"
+#include "MessagesTypes.h"
 #include "DisplayScreenHasAlarmValueInterfaceElement.h"
 #include "DisplayScreenAlarmRecipient.h"
 #include "DeparturesTableTypes.h"

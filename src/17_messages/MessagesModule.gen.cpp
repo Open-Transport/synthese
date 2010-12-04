@@ -25,6 +25,8 @@ synthese::messages::MessagesLog::integrate();
 synthese::messages::MessagesLibraryLog::integrate();
 
 synthese::messages::GetMessagesFunction::integrate();
+synthese::messages::ScenariosListFunction::integrate();
+synthese::messages::ScenarioDisplayFunction::integrate();
 
 synthese::messages::ScenarioUpdateDatesAction::integrate();
 synthese::messages::SimpleMessageCreationAction::integrate();

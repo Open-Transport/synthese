@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_SentScenario_h__
 #define SYNTHESE_SentScenario_h__
 
-#include "17_messages/Types.h"
+#include "MessagesTypes.h"
 #include "Registry.h"
 #include "Scenario.h"
 

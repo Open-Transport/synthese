@@ -25,7 +25,7 @@
 
 #include "ActionResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
-#include "17_messages/Types.h"
+#include "MessagesTypes.h"
 #include "SentScenarioInheritedTableSync.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>

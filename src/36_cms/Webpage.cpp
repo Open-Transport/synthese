@@ -154,6 +154,13 @@ namespace synthese
 					catch(FactoryException<Function>&)
 					{
 						for(; it != end && it+1 != end && *it != '?' && *(it+1) != '>' ; ++it) ;
+						if(it != end && *it == '?')
+						{
+							++it;
+							if(it != end && *it == '>')
+							{
+								++it;
+						}	}
 					}
 				} // Shortcut to GetValueFunction
 				else if(*it == '<' && it+1 != end && *(it+1)=='@' && it+2 != end)

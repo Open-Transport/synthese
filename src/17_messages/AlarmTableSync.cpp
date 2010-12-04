@@ -28,7 +28,7 @@
 #include "SentScenarioInheritedTableSync.h"
 #include "ScenarioTemplate.h"
 #include "ScenarioTemplateInheritedTableSync.h"
-#include "17_messages/Types.h"
+#include "MessagesTypes.h"
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"

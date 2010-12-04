@@ -27,7 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "17_messages/Types.h"
+#include "MessagesTypes.h"
 
 namespace synthese
 {
