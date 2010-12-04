@@ -1,16 +1,16 @@
 
-#include "17_messages/MessagesModule.h"
+#include "MessagesModule.h"
 
-#include "17_messages/AlarmTableSync.h"
-#include "17_messages/TextTemplateTableSync.h"
-#include "17_messages/ScenarioTableSync.h"
-#include "17_messages/AlarmObjectLinkTableSync.h"
-#include "17_messages/ScenarioFolderTableSync.h"
+#include "AlarmTableSync.h"
+#include "TextTemplateTableSync.h"
+#include "ScenarioTableSync.h"
+#include "AlarmObjectLinkTableSync.h"
+#include "ScenarioFolderTableSync.h"
 
-#include "17_messages/SentScenarioInheritedTableSync.h"
-#include "17_messages/ScenarioTemplateInheritedTableSync.h"
-#include "17_messages/AlarmTemplateInheritedTableSync.h"
-#include "17_messages/ScenarioSentAlarmInheritedTableSync.h"
+#include "SentScenarioInheritedTableSync.h"
+#include "ScenarioTemplateInheritedTableSync.h"
+#include "AlarmTemplateInheritedTableSync.h"
+#include "ScenarioSentAlarmInheritedTableSync.h"
 
 #include "MessagesAdmin.h"
 #include "MessageAdmin.h"
@@ -25,6 +25,8 @@
 #include "MessagesLibraryLog.h"
 
 #include "GetMessagesFunction.hpp"
+#include "ScenariosListFunction.hpp"
+#include "ScenarioDisplayFunction.hpp"
 
 #include "ScenarioUpdateDatesAction.h"
 #include "SimpleMessageCreationAction.hpp"
