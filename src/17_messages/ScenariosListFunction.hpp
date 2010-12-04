@@ -43,20 +43,12 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		///	17.15 Function : ScenariosListFunction.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenarii_list
+		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m17Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.2.0
-		//////////////////////////////////////////////////////////////////////////
-		/// Key : scenarios
-		///
-		/// Parameters :
-		///	<dl>
-		///	<dt>t</dt><dd>1|0 : 1 : show templates, 0 : show sent scenarios</dd>
-		///	<dt>f</dt><dd>id of the folder (0 = root) (applicable for templates only)</dd>
-		/// <dt>p</dt><dd>id of the CMS template to use for the display of each scenario. The template will become the parameters produced by ScenariosListFunction::_displayScenario.</dd>
-		/// <dt>c</dt><dd>1|0 : 1=show currently displayed scenarios only, 0=show future displays only</dd>
-		///	</dl>
 		class ScenariosListFunction:
 			public util::FactorableTemplate<server::Function,ScenariosListFunction>
 		{
@@ -78,6 +70,8 @@ namespace synthese
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenarii_list#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
 			/// @date 2010
@@ -87,6 +81,8 @@ namespace synthese
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenarii_list#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain
 			/// @date 2010
@@ -102,13 +98,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of a sent scenario.
-			/// Values sent to the CMS template :
-			/// <dl>
-			/// <dt>roid</dt><dd>id of the scenario</dd>
-			/// <dt>name</dt><dd>name of the scenario</dd>
-			/// <dt>start_date</dt><dd>beginning of the broadcast</dd>
-			/// <dt>end_date</dt><dd>ending of the broadcast (empty = no time limit)</dd>
-			/// </dl>
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenarii_list#Sent-scenario
 			void _displaySentScenario(
 				std::ostream& stream,
 				const server::Request& request,
@@ -120,12 +110,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of a sent scenario.
-			/// Values sent to the CMS template :
-			/// <dl>
-			/// <dt>roid</dt><dd>id of the scenario</dd>
-			/// <dt>name</dt><dd>name of the scenario</dd>
-			/// <dt>folder_id</dt><dd>id of the parent folder (undefined if the scenario is located in the root folder)</dd>
-			/// </dl>
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenarii_list#Scenario-template
 			void _displayScenarioTemplate(
 				std::ostream& stream,
 				const server::Request& request,
@@ -134,11 +119,6 @@ namespace synthese
 			
 		public:
 			ScenariosListFunction();
-
-			//! @name Setters
-			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
-			//@}
 
 
 
