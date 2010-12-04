@@ -7,100 +7,85 @@
 		- html redirection page
 
 	Used IDs :
-		- interface : 6755399441055745 (1)
-		- interface pages : 184464073709551519 à 184464073709551521
+		- site : 7036874417766401 (1)
+		- pages : 177329235327713281 (1) to 177329235327713283 (3)
 */
 
-/* Clean */
+/* Site */
 
-DELETE FROM t023_interface_pages WHERE interface_id=6755399441055745;
-DELETE FROM t024_interfaces WHERE id=6755399441055745;
+REPLACE INTO t025_sites(id,name,start_date,end_date,cient_url) VALUES(7036874417766401, 'SYNTHESE3 Administration',NULL,NULL, '/synthese3/admin');
 
-/* Interface */
+/* Pages */
 
-REPLACE INTO t024_interfaces VALUES(6755399441055745, '', 'SYNTHESE3 Administration','/synthese3/admin');
+REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime_type,do_not_use_template,content1) VALUES(177329235327713281, 7036874417766401, 0, 0, 'Admin',NULL,NULL,'text/html',1,'
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
+<head>
+<title><@title@> - SYNTHESE3 Admin</title>
+<link rel="icon" type="image/png" href="<@icon@>" />
+<style type="text/css">@import url(colors.css); @import url(admin.css); @import url(calendar-win2k-1.css);</style>
+<script type="text/javascript" src="calendar.js"></script><script type="text/javascript" src="lang/calendar-fr.js"></script><script type="text/javascript" src="calendar-setup.js"></script>
+<script type="text/javascript" src="treeview.js"></script>
+</head>
+<body>
+<div id="wrapall">
+<div id="title">
 
-/* Interface pages */
-
-REPLACE INTO "t023_interface_pages" VALUES(6473924464345188, 6755399441055745, 'admin','',0,'text/html','
-print {<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">}
-print {<html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">}
-print {<head>}
-print {<title>SYNTHESE3 Admin - } {{adminpos {/} {/} 0 0 0 0}} {</title>}
-print {<style type="text/css">@import url(colors.css); @import url(admin.css); @import url(calendar-win2k-1.css); @import url(treeview.css);</style>}
-print {<script type="text/javascript" src="calendar.js"></script><script type="text/javascript" src="lang/calendar-fr.js"></script><script type="text/javascript" src="calendar-setup.js"></script>}
-print {<script type="text/javascript" src="treeview.js"></script>}
-print {</head>}
-print {<body>}
-print {<div id="wrapall">}
-print {<div id="title">}
-
-print {<div id="logo">}
-print {<img src="synthese.png" alt="SYNTHESE" />}
-print {<div id="calls"><div id="call"}
-if {{callduration}} { class="incall"}
+<div id="logo">
+<img src="synthese.png" alt="SYNTHESE" />
+<!--
+<div id="calls"><div id="call" if {{callduration}} { class="incall"}
 print {>}
 if {{callduration}} {EN APPEL}
 if {{callcustomer}} {{print { avec } {{callcustomer}}}}
 if {{callduration}} {{print {<span id="calldurationspan"></span><script type="text/javascript>durationSinceCallStart=} {{callduration}} {; updateCallStopwatch()</script>}}}
 print {</div>}
+-->
+<!--
 callbutton {phone.png} {Prendre appel} {phone_delete.png} {Stopper appel}
-print {</div>}
+-->
+</div>
 
-print {</div>}
+<div id="adminpos">&nbsp;<@position@></div>
 
-print {<div id="adminpos">&nbsp;}
-if @0 {{adminpos {&nbsp;/&nbsp;} {<div id="pagename">} 1 1 1 1}} {<div id="pagename"><img src="key.png" alt="Login" />Login}
-print {</div>}
-print {</div>}
+<div id="user">
+<?if&cond=<@user_full_name@>&then=<div id="username"><img src="user.png" alt="Utilisateur" /><@user_full_name@></div>?>
+<div id="logout"><?if&cond=<@user_full_name@>&then=<a class="linkbutton" href="<@logout_url@>"><img src="disconnect.png" alt="Déconnecter" title="Déconnecter">\&nbsp;Déconnecter</a>?>
+</div></div>
 
-print {<div id="user">}
-print {<div id="username"><img src="user.png" alt="Utilisateur" />} @0 {</div>}
-print {<div id="logout">}
-if @0 {{print {<a class="linkbutton" href="} @10 {"><img src="disconnect.png" alt="Déconnecter" title="Déconnecter">&nbsp;Déconnecter</a>}}}
-print {</div></div>}
+<div id="pagename"><img src="<@icon@>" /><@title@></div>
 
-// end title
-print {</div>}
+</div>
 
-print {<div id="content">}
+<div id="content">
+  <div id="admintree"><div id="admintree2"><?if&cond=<@user_full_name@>&then=<@tree@>?></div></div>
+  <div id="admincontent"><div id="admincontent2"><@tabs@><@content@></div></div>
+</div>
 
-goto {{if @0 logged not_logged}}
+<div id="footer">
+SYNTHESE v<@version@> - &copy; 2003-2010 - SYNTHESE est un produit sous <a href="http://www.gnu.org/licenses/gpl.html">licence GPL</a> - Plus d''informations sur <a href="http://synthese.rcsmobility.com/">synthese.rcsmobility.com</a>
+</div>
 
-label logged
+</div>
 
-print {<div id="admintree"><div id="admintree2">}
-admintree {<img src="ftv2node.png" />} {<img src="ftv2lastnode.png" />} {<img src="ftv2vertline.png" />} {<img src="empty.png" />} {<div class="visiblesubnode">} {<div class="hiddensubnode">} {<div>} {</div></div>} {<img src="ftv2mnode.png" class="node" />} {<img src="ftv2pnode.png" class="node" />} {<img src="ftv2mlastnode.png" class="node" />} {<img src="ftv2plastnode.png" class="node" />}
-print {</div></div>}
+<?if&cond=<@error_message@>&then=<script type="text/javascript">alert("<@error_message@>");</script>?>
 
-print {<div id="admincontent"><div id="admincontent2">} @4 @5 {</div></div>}
+</body></html>
+');
 
-goto endif
-label not_logged
 
-print {<div id="admintree"><div id="admintree2">}
-print {</div></div>}
 
-print {<div id="admincontent"><div id="admincontent2">}
+REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime_type,do_not_use_template,content1) VALUES(177329235327713282, 7036874417766401, 177329235327713281, 0, 'Tree node',NULL,NULL,'text/html',1,'
+<div class="<?if&cond=<@is_last@>&then=lastblock&else=notlastblock?>">
+<div class="tree_icon<?if&cond=<@depth@>&then=s?>"><?if&cond=<@depth@>&then=<?if&cond=<@subtree@>&then=<img class="node" src="<?if&cond=<@is_opened@>&then=ftv2mlastnode&else=ftv2plastnode?>.png" />&else=<img src="ftv2lastnode.png" />?>?><img src="<@icon@>" class="icon" /></div>
 
-print @6 {<p style="font-size:10pt;"><table style="border:none; margin:50px;"><tr><td>Login</td><td>Mot de passe</td></tr><tr>}
-print {<td>} @7 {</td>}
-print {<td>} @8 {</td>}
-print {<td><input type="submit" value="ok" /></td>}
-print {</tr></table></p>} @9
+<div class="text level<@depth@>"><?if&cond=<@is_current@>&else=<a href="<@url@>">?><@title@><?if&cond=<@is_current@>&else=</a>?></div>
+<div <?if&cond=<@is_opened@>&else=style="display:none" ?> class="subtree subtree<@depth@>"><@subtree@></div>
+</div>
+');
 
-print {</div></div>}
 
-label endif
 
-print {</div>}
-
-print {<div id="footer">}
-print {SYNTHESE v} {{version}} { - &copy; 2003-2009 - SYNTHESE est un produit sous <a href="http://www.gnu.org/licenses/gpl.html">licence GPL</a> - Plus d''informations sur <a href="http://synthese.rcsmobility.com/">synthese.rcsmobility.com</a>}
-print {</div>}
-
-print {</div>}
-
-if @1 {{print {<script type="text/javascript">alert("} @1 {");</script>}}}
-print {</body></html>}
+REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime_type,do_not_use_template,content1) VALUES(177329235327713283, 7036874417766401, 177329235327713281, 1, 'Position element',NULL,NULL,'text/html',1,'
+<?if&cond=<@is_last@>&else=<?if&cond=<@depth@>&then=\&nbsp;/\&nbsp;?><a href="<@url@>"><img src="<@icon@>" /> <@title@></a>?>
 ');

@@ -3,8 +3,11 @@
 
 function getDiv(image)
 {
-    var div;
-    for (div=image.nextSibling; div && div.tagName !='DIV'; div=div.nextSibling);
+    var div=image.parentNode;
+    div=div.nextSibling;
+    div=div.nextSibling;
+    div=div.nextSibling;
+    div=div.nextSibling;
     return div;
 }
 
@@ -13,7 +16,7 @@ function showHideNode(image)
     var div = getDiv(image);
     if (!div)
         return;
-    if (div.className=='hiddensubnode')
+    if (div.style.display=='none')
         show(image, div);
     else
         hide(image, div);
@@ -22,14 +25,14 @@ function showHideNode(image)
 
 function show(image, div)
 {
-    image.src = (image.src.substring(image.src.length-17) == 'ftv2plastnode.png') ? "ftv2mlastnode.png" : 'ftv2mnode.png';
-    div.className= 'visiblesubnode';
+    image.src = "ftv2mlastnode.png";
+    div.style.display = 'block';
 }
 
 function hide(image, div)
 {
-    image.src = (image.src.substring(image.src.length-17) == 'ftv2mlastnode.png') ? "ftv2plastnode.png" : 'ftv2pnode.png';
-    div.className= 'hiddensubnode';
+    image.src = "ftv2plastnode.png";
+    div.style.display = 'none';
 }
 
 function showHide()
