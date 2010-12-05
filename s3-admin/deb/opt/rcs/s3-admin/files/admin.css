@@ -108,7 +108,7 @@ table {margin-bottom:1.5em;border-collapse:collapse;}
 input[type=submit], a.linkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#333333; background-color:#c0d077; border:solid #949948 1px; padding:2px; cursor:pointer;} 
 a.activatedlinkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#ffffff; background-color:#c0d077; border:solid #949948 1px; padding:2px; cursor:pointer;} 
 a.clickedlinkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#333333; background-color:#c0d077; border:solid #949948 1px; padding:0.15em; cursor:pointer; } 
-a.linkbutton img, a.activatedlinkbutton img, a.clickedlinkbutton img { border:none; vertical-align:bottom; cursor:pointer;} 
+a.linkbutton img, a.activatedlinkbutton img, a.clickedlinkbutton img { border:none; vertical-align:bottom; cursor:pointer; } 
 
 input[type=submit]:hover { color:#ffffff; cursor:pointer;} 
 input[type=radio] {vertical-align:middle;} 
@@ -156,8 +156,8 @@ li.log { background-image:url(book_open.png); }
 /* TABS */
 .tabdiv { display:none; }
 .active_tab_content { display:block; }
-#admin_tabs { border-bottom: solid 2px #999999; padding:3px 5px 2px 5px; margin:15px -10px 0 -10px;}
-#admin_tabs span { background-color:#d1e76e; border-style:solid solid none solid; border-width:1px; border-color:#999999; color:black; padding:2pt 5pt 2pt 5pt; margin:0 5px 0 5px; font-size:11pt;}
+#admin_tabs { border-bottom: solid 2px #999999; padding:3px 5px 0 5px; margin:15px 0 0 0; }
+#admin_tabs span { display:inline-block; background-color:#d1e76e; border-style:solid; border-width:1px 1px 0 1px; border-color:#999999; color:black; padding:2pt 5pt 2pt 5pt; margin:0 5px 0 5px; font-size:11pt;}
 #admin_tabs span img { vertical-align:text-bottom;}
 #admin_tabs span:hover { cursor:pointer; color:white; }
 #admin_tabs .active_tab { background-color:#999999; color:white; }
