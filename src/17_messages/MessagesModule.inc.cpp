@@ -47,7 +47,6 @@
 #include "ScenarioFolderAdd.h"
 #include "ScenarioFolderRemoveAction.h"
 #include "ScenarioFolderUpdateAction.h"
-#include "ScenarioVariablesUpdateAction.h"
 
 // Registries
 #include "AlarmObjectLink.h"

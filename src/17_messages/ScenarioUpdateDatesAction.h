@@ -41,24 +41,15 @@ namespace synthese
 
 	namespace messages
 	{
-		class Scenario;
 		class ScenarioFolder;
 		class ScenarioTemplate;
 
 		////////////////////////////////////////////////////////////////////
 		/// Scenario parameters update action class.
-		///
-		/// This action updates :
-		///  - for a scenario template :
-		///    - the scenario name
-		///    - the scenario folder
-		///  - for a sent scenario :
-		///    - the scenario name
-		///    - the broadcast dates
-		///    - the activation status
-		///    - the content of the variables
-		///
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Updating_a_scenario
+		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m17Actions refActions
+		/// @author Hugues Romain
 		class ScenarioUpdateDatesAction:
 			public util::FactorableTemplate<server::Action, ScenarioUpdateDatesAction>
 		{
@@ -69,26 +60,42 @@ namespace synthese
 			static const std::string PARAMETER_SCENARIO_ID;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_FOLDER_ID;
+			static const std::string PARAMETER_VARIABLE;
 
 		private:
-			std::string								_name;
-			boost::shared_ptr<ScenarioFolder>		_folder;
-			bool									_enabled;
-			boost::posix_time::ptime				_startDate;
-			boost::posix_time::ptime				_endDate;
-			boost::shared_ptr<Scenario>				_scenario;
-			boost::shared_ptr<SentScenario>			_sscenario;
-			boost::shared_ptr<ScenarioTemplate>		_tscenario;
+			//! @name Scenario to update
+			//@{
+				boost::shared_ptr<Scenario>				_scenario;
+				boost::shared_ptr<SentScenario>			_sscenario;
+				boost::shared_ptr<ScenarioTemplate>		_tscenario;
+			//@}
+
+			//! @name New values
+			//@{
+				boost::optional<std::string>						_name;
+				boost::optional<boost::shared_ptr<ScenarioFolder> >	_folder;
+				boost::optional<bool>								_enabled;
+				boost::optional<boost::posix_time::ptime>			_startDate;
+				boost::optional<boost::posix_time::ptime>			_endDate;
+				SentScenario::VariablesMap							_variables;
+			//@}
 
 		protected:
-			/** Conversion from attributes to generic parameter maps.
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from attributes to generic parameter maps.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Updating_a_scenario#Request
+			//////////////////////////////////////////////////////////////////////////
+			/// @author Hugues Romain
 			server::ParametersMap getParametersMap() const;
 
-			/** Conversion from generic parameters map to attributes.
-				Removes the used parameters from the map.
-				@exception ActionException Occurs when some parameters are missing or incorrect.
-			*/
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from generic parameters map to attributes.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Updating_a_scenario#Request
+			//////////////////////////////////////////////////////////////////////////
+			/// @author Hugues Romain
+			///	@exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:

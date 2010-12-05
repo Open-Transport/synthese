@@ -58,6 +58,7 @@ namespace synthese
 		
 	namespace messages
 	{
+		const string ScenarioUpdateDatesAction::PARAMETER_VARIABLE(Action_PARAMETER_PREFIX + "var");
 		const string ScenarioUpdateDatesAction::PARAMETER_ENABLED(Action_PARAMETER_PREFIX + "ena");
 		const string ScenarioUpdateDatesAction::PARAMETER_START_DATE(Action_PARAMETER_PREFIX + "sda");
 		const string ScenarioUpdateDatesAction::PARAMETER_END_DATE(Action_PARAMETER_PREFIX + "eda");
@@ -79,37 +80,120 @@ namespace synthese
 				setScenarioId(map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID));
 
 				// Name
-				_name = map.get<string>(PARAMETER_NAME);
-
-				if(_tscenario.get())
+				if(map.isDefined(PARAMETER_NAME))
 				{
-					RegistryKeyType folderId(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID));
-
-					if (folderId != 0)
-					{
-						_folder = ScenarioFolderTableSync::GetEditable(folderId, *_env);
-					}
-
-					// Uniqueness control
-					Env env;
-					ScenarioTemplateInheritedTableSync::Search(env, folderId, _name, dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(), 0, 1);
-					if (!env.getRegistry<ScenarioTemplate>().empty())
-						throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
+					_name = map.get<string>(PARAMETER_NAME);
 				}
 
+				// Template scenario only
+				if(_tscenario.get())
+				{
+					// Folder
+					if(map.isDefined(PARAMETER_FOLDER_ID))
+					{
+						RegistryKeyType folderId(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID));
+						if (folderId == 0)
+						{
+							_folder = shared_ptr<ScenarioFolder>();
+						}
+						else
+						{
+							_folder = ScenarioFolderTableSync::GetEditable(folderId, *_env);
+						}
+
+						// Uniqueness control
+						Env env;
+						ScenarioTemplateInheritedTableSync::Search(
+							env,
+							folderId,
+							_name ? *_name : _scenario->getName(),
+							dynamic_pointer_cast<ScenarioTemplate, Scenario>(_scenario).get(),
+							0,
+							1
+						);
+						if (!env.getRegistry<ScenarioTemplate>().empty())
+						{
+							throw ActionException("Le nom spécifié est déjà utilisé par un autre scénario.");
+						}
+					}
+				}
+				
+				// Sent scenario only
 				if(_sscenario.get())
 				{
-					_enabled = map.get<bool>(PARAMETER_ENABLED);
-
-					if(!map.get<string>(PARAMETER_START_DATE).empty())
+					// Enabled
+					if(map.isDefined(PARAMETER_ENABLED))
 					{
-						_startDate = time_from_string(map.get<string>(PARAMETER_START_DATE));
+						_enabled = map.get<bool>(PARAMETER_ENABLED);
 					}
 
-					if(!map.get<string>(PARAMETER_END_DATE).empty())
+					// Start date
+					if(map.isDefined(PARAMETER_START_DATE))
 					{
-						_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
+						if(map.get<string>(PARAMETER_START_DATE).empty())
+						{
+							_startDate = ptime();
+						}
+						else
+						{
+							_startDate = time_from_string(map.get<string>(PARAMETER_START_DATE));
+						}
 					}
+
+					// End date
+					if(map.isDefined(PARAMETER_END_DATE))
+					{
+						if(map.get<string>(PARAMETER_END_DATE).empty())
+						{
+							_endDate = ptime();
+						}
+						else
+						{
+							_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
+						}
+					}
+
+					// Variables
+					if(_sscenario->getTemplate())
+					{
+						const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
+						BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+						{
+							if(!map.isDefined(PARAMETER_VARIABLE + variable.second.code))
+							{
+								if(	variable.second.compulsory &&
+									(	_enabled && *_enabled ||
+										!_enabled && _sscenario->getIsEnabled()
+									)
+								){
+									SentScenario::VariablesMap::const_iterator it(
+										_sscenario->getVariables().find(variable.second.code)
+									);
+									if(it == _sscenario->getVariables().end() || it->second.empty())
+									{
+										throw ActionException("The variable "+ variable.first +" is still undefined : the scenario cannot be active");
+									}
+								}
+								continue;
+							}
+							string value(
+								map.get<string>(PARAMETER_VARIABLE + variable.second.code)
+							);
+							if(	variable.second.compulsory &&
+								(	_enabled && *_enabled ||
+									!_enabled && _sscenario->getIsEnabled()
+								) &&
+								value.empty()
+							){
+								throw ActionException("Variable "+ variable.first +" must be defined to activate the scenario.");
+							}
+							_variables.insert(make_pair(
+									variable.second.code,
+									value
+							)	);
+						}
+					}
+
 				}
 			}
 			catch(ParametersMap::MissingParameterException& e)
@@ -122,8 +206,6 @@ namespace synthese
 
 		ScenarioUpdateDatesAction::ScenarioUpdateDatesAction()
 			: FactorableTemplate<Action, ScenarioUpdateDatesAction>()
-			, _startDate(not_a_date_time)
-			, _endDate(not_a_date_time)
 		{}
 
 
@@ -132,48 +214,108 @@ namespace synthese
 		{
 			// Log message
 			stringstream text;
-			DBLogModule::appendToLogIfChange(text, "Nom", _scenario->getName(), _name);
-			if(_tscenario.get())
+
+			// Name
+			if(_name)
 			{
-				DBLogModule::appendToLogIfChange(
-					text,
-					"Dossier",
-					_tscenario->getFolder() ? "/" : _tscenario->getFolder()->getFullName(),
-					_folder.get() ? _folder->getFullName() : "/"
-				);
-			}
-			if(_sscenario.get())
-			{
-				DBLogModule::appendToLogIfChange(text, "Affichage ", _sscenario->getIsEnabled() ? "activé" : "désactivé", _enabled ? "activé" : "désactivé");
-				DBLogModule::appendToLogIfChange(text, "Date de début", to_simple_string(_sscenario->getPeriodStart()), to_simple_string(_startDate));
-				DBLogModule::appendToLogIfChange(text, "Date de fin", to_simple_string(_sscenario->getPeriodEnd()), to_simple_string(_endDate));
+				DBLogModule::appendToLogIfChange(text, "Nom", _scenario->getName(), *_name);
+				_scenario->setName(*_name);
 			}
 
-
-			// Action
-			_scenario->setName(_name);
 			if(_tscenario.get())
 			{
-				_tscenario->setFolder(_folder.get());
-			}
-			if(_sscenario.get())
-			{
-				if(	_sscenario->getTemplate() &&
-					!ScenarioTemplate::ControlCompulsoryVariables(_sscenario->getTemplate()->getVariables(), _sscenario->getVariables())
-				){
-					_sscenario->setIsEnabled(false);
-				}
-				else
+				// Folder
+				if(_folder)
 				{
-					_sscenario->setIsEnabled(_enabled);
+					DBLogModule::appendToLogIfChange(
+						text,
+						"Dossier",
+						_tscenario->getFolder() ? "/" : _tscenario->getFolder()->getFullName(),
+						_folder->get() ? (*_folder)->getFullName() : "/"
+					);
+					_tscenario->setFolder(_folder->get());
 				}
-				_sscenario->setPeriodStart(_startDate);
-				_sscenario->setPeriodEnd(_endDate);
 			}
-			ScenarioTableSync::Save(_scenario.get());
-			if(_sscenario.get() &&	_sscenario->getTemplate())
+			if(_sscenario.get())
 			{
+				// Enabled
+				if(_enabled)
+				{
+					DBLogModule::appendToLogIfChange(
+						text,
+						"Affichage ",
+						_sscenario->getIsEnabled() ? "activé" : "désactivé",
+						*_enabled ? "activé" : "désactivé"
+					);
+					_sscenario->setIsEnabled(*_enabled);
+				}
+
+				// Start date
+				if(_startDate)
+				{
+					DBLogModule::appendToLogIfChange(
+						text,
+						"Date de début",
+						to_simple_string(_sscenario->getPeriodStart()),
+						to_simple_string(*_startDate)
+					);
+					_sscenario->setPeriodStart(*_startDate);
+				}
+
+				// End date
+				if(_endDate)
+				{
+					DBLogModule::appendToLogIfChange(
+						text,
+						"Date de fin",
+						to_simple_string(_sscenario->getPeriodEnd()),
+						to_simple_string(*_endDate)
+					);
+					_sscenario->setPeriodEnd(*_endDate);
+				}
+
+				// Variables
+				if(_sscenario->getTemplate())
+				{
+					const ScenarioTemplate::VariablesMap& variables(_sscenario->getTemplate()->getVariables());
+					stringstream text;
+					SentScenario::VariablesMap values;
+					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
+					{
+						SentScenario::VariablesMap::const_iterator itNew(
+							_variables.find(variable.first)
+						);
+						SentScenario::VariablesMap::const_iterator itExist(
+							_sscenario->getVariables().find(variable.first)
+						);
+						string oldValue(
+							itExist == _sscenario->getVariables().end() ?
+							string() :
+							itExist->second
+						);
+						string newValue(
+							itNew == _variables.end() ?
+							oldValue :
+							itNew->second
+						);
+						DBLogModule::appendToLogIfChange(
+							text,
+							variable.first,
+							oldValue,
+							newValue
+						);
+						values.insert(make_pair(
+								variable.first,
+								newValue
+						)	);
+					}
+					_sscenario->setVariables(values);
+				}
+
 			}
+
+			// Save
+			ScenarioTableSync::Save(_scenario.get());
 
 			// Log
 			if(_sscenario.get())

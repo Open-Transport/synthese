@@ -39,7 +39,6 @@
 #include "MessagesModule.h"
 #include "MessagesRight.h"
 #include "MessagesLibraryRight.h"
-#include "ScenarioVariablesUpdateAction.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "StaticActionFunctionRequest.h"
@@ -162,39 +161,29 @@ namespace synthese
 					stream << udt.cell("Fin diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_END_DATE, _sentScenario->getPeriodEnd()));
 
 					stream << udt.cell("Actif", udt.getForm().getOuiNonRadioInput(ScenarioUpdateDatesAction::PARAMETER_ENABLED, _sentScenario->getIsEnabled()));
+
+					// Variables
+					if(	_sentScenario->getTemplate() &&
+						!_sentScenario->getTemplate()->getVariables().empty()
+					){
+						stream << udt.title("Variables (* = champ obligatoire)");
+						const ScenarioTemplate::VariablesMap& variables(_sentScenario->getTemplate()->getVariables());
+						BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type variable, variables)
+						{
+							string value;
+							SentScenario::VariablesMap::const_iterator it(_sentScenario->getVariables().find(variable.second.code));
+							if (it != _sentScenario->getVariables().end()) value = it->second;
+
+							stream << udt.cell(
+								variable.second.code + (variable.second.compulsory ? "*" : "") + (variable.second.helpMessage.empty() ? string() : (" ("+ HTMLModule::getHTMLImage("information.png", "Info : ") + variable.second.helpMessage + ")")),
+								udt.getForm().getTextInput(ScenarioUpdateDatesAction::PARAMETER_VARIABLE + variable.second.code, value)
+							);
+						}
+					}
 				}
 				stream << udt.close();
-
-
-
-				if(	_sentScenario &&
-					_sentScenario->getTemplate() &&
-					!_sentScenario->getTemplate()->getVariables().empty()
-				){
-					stream << "<h1>Variables</h1>";
-
-					AdminActionFunctionRequest<ScenarioVariablesUpdateAction, MessagesScenarioAdmin> updateVariablesRequest(_request);
-					updateVariablesRequest.getAction()->setScenario(const_pointer_cast<SentScenario>(_sentScenario));
-					PropertiesHTMLTable uvt(updateVariablesRequest.getHTMLForm("update_var"));
-
-					stream << uvt.open();
-					stream << uvt.title("* = champ obligatoire");
-					const ScenarioTemplate::VariablesMap& variables(_sentScenario->getTemplate()->getVariables());
-					BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type variable, variables)
-					{
-						string value;
-						SentScenario::VariablesMap::const_iterator it(_sentScenario->getVariables().find(variable.second.code));
-						if (it != _sentScenario->getVariables().end()) value = it->second;
-
-						stream << uvt.cell(
-							variable.second.code + (variable.second.compulsory ? "*" : "") + (variable.second.helpMessage.empty() ? string() : (" ("+ HTMLModule::getHTMLImage("information.png", "Info : ") + variable.second.helpMessage + ")")),
-							uvt.getForm().getTextInput(ScenarioVariablesUpdateAction::PARAMETER_VARIABLE + variable.second.code, value)
-						);
-					}
-					stream << uvt.close();
-				}
-
 			}
+
 
 			////////////////////////////////////////////////////////////////////
 			// TAB MESSAGES
