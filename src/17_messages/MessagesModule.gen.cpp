@@ -46,7 +46,6 @@ synthese::messages::AlarmAddLinkAction::integrate();
 synthese::messages::ScenarioFolderAdd::integrate();
 synthese::messages::ScenarioFolderRemoveAction::integrate();
 synthese::messages::ScenarioFolderUpdateAction::integrate();
-synthese::messages::ScenarioVariablesUpdateAction::integrate();
 
 // Registries
 synthese::util::Env::Integrate<synthese::messages::AlarmObjectLink>();

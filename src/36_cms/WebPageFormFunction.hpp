@@ -36,20 +36,12 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : WebPageFormFunction.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Form
+		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m56Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.1.16
-		//////////////////////////////////////////////////////////////////////////
-		/// Key : form
-		///
-		/// Parameters :
-		///	<ul>
-		///		<li>name : name of the form</li>
-		///		<li>page_id : id of the page to display when the form is submitted</li>
-		///		<li>script : javascript function to run before submitting the form</li>
-		///		<li>idem : 0|1 : if true, the form will display the same page. In this case, the page_id parameter is ignored.</li>
-		///	</ul>
 		class WebPageFormFunction:
 			public util::FactorableTemplate<server::Function,WebPageFormFunction>
 		{
@@ -58,7 +50,8 @@ namespace synthese
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_SCRIPT;
 			static const std::string PARAMETER_IDEM;
-			
+			static const std::string PARAMETER_USE_SMART_URL;
+
 		protected:
 			//! \name Page parameters
 			//@{
@@ -66,11 +59,15 @@ namespace synthese
 				boost::shared_ptr<const Webpage> _page;
 				std::string _script;
 				bool _idem;
+				server::ParametersMap _otherParameters;
+				bool _useSmartURL;
 			//@}
 			
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Form#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
 			/// @date 2010
@@ -80,6 +77,8 @@ namespace synthese
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Form#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain
 			/// @date 2010
@@ -91,11 +90,6 @@ namespace synthese
 		public:
 			WebPageFormFunction():
 			  _idem(false){}
-
-			//! @name Setters
-			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
-			//@}
 
 
 

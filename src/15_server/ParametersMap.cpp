@@ -44,8 +44,6 @@ namespace synthese
 
 	namespace server
 	{
-
-
 		ParametersMap::ParametersMap( const std::string& text )
 		{
 			typedef tokenizer<char_separator<char> > _tokenizer;
@@ -67,10 +65,14 @@ namespace synthese
 			}
 		}
 
+
+
 		ParametersMap::ParametersMap()
 		{
 
 		}
+
+
 
 		ParametersMap::ParametersMap( const Map& source )
 			: _map(source)
@@ -85,25 +87,35 @@ namespace synthese
 			_map[parameterName] = value;
 		}
 
+
+
 		void ParametersMap::insert( const std::string& parameterName, int value )
 		{
 			insert(parameterName, lexical_cast<string>(value));
 		}
+
+
 
 		void ParametersMap::insert( const std::string& parameterName, double value )
 		{
 			insert(parameterName, lexical_cast<string>(value));
 		}
 
+
+
 		void ParametersMap::insert( const std::string& parameterName, RegistryKeyType value )
 		{
 			insert(parameterName, lexical_cast<string>(value));
 		}
 
+
+
 		void ParametersMap::insert( const std::string& parameterName, bool value )
 		{
 			insert(parameterName, lexical_cast<string>(value));
 		}
+
+
 
 		void ParametersMap::insert(
 			const std::string& parameterName,
@@ -112,12 +124,16 @@ namespace synthese
 			insert(parameterName, value.is_not_a_date_time() ? string() : to_iso_extended_string(value.date()) + " " + to_simple_string(value.time_of_day()));
 		}
 
+
+
 		void ParametersMap::insert(
 			const std::string& parameterName,
 			const time_duration& value
 		){
 			insert(parameterName, value.is_not_a_date_time() ? string() : to_simple_string(value));
 		}
+
+
 
 		void ParametersMap::insert(
 			const std::string& parameterName,
@@ -163,8 +179,6 @@ namespace synthese
 
 
 
-
-
 		void ParametersMap::remove( const std::string& parameterName )
 		{
 			Map::iterator it(_map.find(parameterName));
@@ -186,6 +200,14 @@ namespace synthese
 			return result;
 		}
 
+
+
+		bool ParametersMap::isDefined( const std::string& parameterName ) const
+		{
+			return _map.find(parameterName) != _map.end();
+		}
+
+
 		
 		ParametersMap::MissingParameterException::MissingParameterException( const std::string& field ):
 			_field(field),
@@ -193,14 +215,20 @@ namespace synthese
 		{
 		}
 
+
+
 		ParametersMap::MissingParameterException::~MissingParameterException() throw()
 		{
 		}
+
+
 
 		const char* ParametersMap::MissingParameterException::what() const throw()
 		{
 			return _message.c_str();
 		}
+
+
 
 		const std::string& ParametersMap::MissingParameterException::getField() const
 		{
