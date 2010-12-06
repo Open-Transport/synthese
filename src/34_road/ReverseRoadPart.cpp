@@ -45,7 +45,6 @@ namespace synthese
 		):	Registrable(0),
 			Road(0, mainRoadPart.getType())
 		{
-			addService(new PermanentService(0, this), false);
 		}
 
 
