@@ -28,12 +28,11 @@
 #include "ScenariosListFunction.hpp"
 #include "ScenarioDisplayFunction.hpp"
 
-#include "ScenarioUpdateDatesAction.h"
+#include "ScenarioSaveAction.h"
 #include "SimpleMessageCreationAction.hpp"
 #include "DeleteAlarmAction.h"
 #include "UpdateAlarmMessagesFromTemplateAction.h"
 #include "NewMessageAction.h"
-#include "NewScenarioSendAction.h"
 #include "DeleteTextTemplateAction.h"
 #include "UpdateTextTemplateAction.h"
 #include "ScenarioStopAction.h"

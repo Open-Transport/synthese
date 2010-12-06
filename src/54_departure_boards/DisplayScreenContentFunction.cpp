@@ -725,6 +725,7 @@ namespace synthese
 		){
 
 			ParametersMap pm;
+			pm.insert(Request::PARAMETER_OBJECT_ID, screen.getKey());
 			pm.insert(DATA_ROW_RANK, rowRank);
 			pm.insert(DATA_PAGE_NUMBER, pageNumber);
 			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.getTrackNumberDisplay());

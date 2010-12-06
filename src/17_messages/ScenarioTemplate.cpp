@@ -135,6 +135,11 @@ namespace synthese
 				// this is a variable definition
 				ScenarioTemplate::Variable v;
 
+				if(it == text.end())
+				{
+					break;
+				}
+
 				// compulsory variable
 				if (*it == '$')
 				{

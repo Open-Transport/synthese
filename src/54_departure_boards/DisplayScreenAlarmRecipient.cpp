@@ -89,17 +89,17 @@ namespace synthese
 	       This should be investigate further.
 	    */
 
-	    template<> AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::AlarmLinks
-	    AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::_linksAlarm =
+	    template<> AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::AlarmLinks
+	    AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::_linksAlarm =
 			std::map<const SentAlarm*, std::set<const DisplayScreen*> > ();
 
-	    template<> AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::ObjectLinks
-	    AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::_linksObject = 
+	    template<> AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::ObjectLinks
+	    AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::_linksObject = 
 			std::map<const DisplayScreen*, std::set<const SentAlarm*> > ();
 
-		template<> const string AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::TITLE("Afficheurs");
+		template<> const string AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::TITLE("Afficheurs");
 
-		template<> void AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>::getStaticParametersLabels(ParameterLabelsVector& m)
+		template<> void AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::getStaticParametersLabels(ParameterLabelsVector& m)
 		{
 			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les afficheurs)"));
 			PTModule::getNetworkLinePlaceRightParameterList(m);

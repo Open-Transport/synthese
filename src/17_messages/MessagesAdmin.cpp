@@ -33,7 +33,6 @@
 #include "MessagesAdmin.h"
 #include "MessagesScenarioAdmin.h"
 #include "MessagesModule.h"
-#include "NewScenarioSendAction.h"
 #include "ScenarioStopAction.h"
 #include "MessagesRight.h"
 #include "MessagesModule.h"
@@ -48,6 +47,7 @@
 #include "AdminFunctionRequest.hpp"
 #include "MessageAdmin.h"
 #include "Profile.h"
+#include "ScenarioSaveAction.h"
 
 #include <boost/foreach.hpp>
 
@@ -157,7 +157,7 @@ namespace synthese
 			// Requests
 			AdminFunctionRequest<MessagesAdmin> searchRequest(_request);
 
-			AdminActionFunctionRequest<NewScenarioSendAction,MessagesScenarioAdmin> newScenarioRequest(_request);
+			AdminActionFunctionRequest<ScenarioSaveAction,MessagesScenarioAdmin> newScenarioRequest(_request);
 			newScenarioRequest.getFunction()->setActionFailedPage<MessagesAdmin>();
 			newScenarioRequest.setActionWillCreateObject();
 			
@@ -243,7 +243,7 @@ namespace synthese
 				_requestParameters,
 				scenarios,
 				newScenarioRequest.getHTMLForm("newscen"),
-				NewScenarioSendAction::PARAMETER_MESSAGE_TO_COPY
+				ScenarioSaveAction::PARAMETER_MESSAGE_TO_COPY
 			);
 			
 			stream << t1.open();
@@ -356,7 +356,7 @@ namespace synthese
 			stream <<
 				t1.col() <<
 				t1.getActionForm().getSelectInput(
-					NewScenarioSendAction::PARAMETER_TEMPLATE,
+					ScenarioSaveAction::PARAMETER_TEMPLATE,
 					MessagesModule::GetScenarioTemplatesLabels(string(),"(pas de modéle)"),
 					optional<RegistryKeyType>()
 				)

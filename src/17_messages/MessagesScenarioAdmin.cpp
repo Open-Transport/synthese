@@ -32,7 +32,7 @@
 #include "SentScenario.h"
 #include "ScenarioTableSync.h"
 #include "AlarmTableSync.h"
-#include "ScenarioUpdateDatesAction.h"
+#include "ScenarioSaveAction.h"
 #include "DeleteAlarmAction.h"
 #include "NewMessageAction.h"
 #include "MessagesLibraryAdmin.h"
@@ -135,7 +135,7 @@ namespace synthese
 			// TAB PARAMETERS
 			if (openTabContent(stream, TAB_PARAMETERS))
 			{
-				AdminActionFunctionRequest<ScenarioUpdateDatesAction, MessagesScenarioAdmin> updateDatesRequest(_request);
+				AdminActionFunctionRequest<ScenarioSaveAction, MessagesScenarioAdmin> updateDatesRequest(_request);
 				updateDatesRequest.getAction()->setScenarioId(_scenario->getKey());
 
 				stream << "<h1>Paramètres</h1>";
@@ -143,13 +143,13 @@ namespace synthese
 
 				stream << udt.open();
 				stream << udt.title("Propriétés");
-				stream << udt.cell("Nom", udt.getForm().getTextInput(ScenarioUpdateDatesAction::PARAMETER_NAME, _scenario->getName()));
+				stream << udt.cell("Nom", udt.getForm().getTextInput(ScenarioSaveAction::PARAMETER_NAME, _scenario->getName()));
 				if (_templateScenario)
 				{
 					stream << udt.cell(
 						"Répertoire",
 						udt.getForm().getSelectInput(
-							ScenarioUpdateDatesAction::PARAMETER_FOLDER_ID,
+							ScenarioSaveAction::PARAMETER_FOLDER_ID,
 							MessagesModule::GetScenarioFoldersLabels(),
 							optional<RegistryKeyType>(_templateScenario->getFolder() ? _templateScenario->getFolder()->getKey() : 0)
 					)	);
@@ -157,10 +157,10 @@ namespace synthese
 				if(_sentScenario.get())
 				{
 					stream << udt.title("Diffusion");
-					stream << udt.cell("Début diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_START_DATE, _sentScenario->getPeriodStart()));
-					stream << udt.cell("Fin diffusion", udt.getForm().getCalendarInput(ScenarioUpdateDatesAction::PARAMETER_END_DATE, _sentScenario->getPeriodEnd()));
+					stream << udt.cell("Début diffusion", udt.getForm().getCalendarInput(ScenarioSaveAction::PARAMETER_START_DATE, _sentScenario->getPeriodStart()));
+					stream << udt.cell("Fin diffusion", udt.getForm().getCalendarInput(ScenarioSaveAction::PARAMETER_END_DATE, _sentScenario->getPeriodEnd()));
 
-					stream << udt.cell("Actif", udt.getForm().getOuiNonRadioInput(ScenarioUpdateDatesAction::PARAMETER_ENABLED, _sentScenario->getIsEnabled()));
+					stream << udt.cell("Actif", udt.getForm().getOuiNonRadioInput(ScenarioSaveAction::PARAMETER_ENABLED, _sentScenario->getIsEnabled()));
 
 					// Variables
 					if(	_sentScenario->getTemplate() &&
@@ -175,8 +175,8 @@ namespace synthese
 							if (it != _sentScenario->getVariables().end()) value = it->second;
 
 							stream << udt.cell(
-								variable.second.code + (variable.second.compulsory ? "*" : "") + (variable.second.helpMessage.empty() ? string() : (" ("+ HTMLModule::getHTMLImage("information.png", "Info : ") + variable.second.helpMessage + ")")),
-								udt.getForm().getTextInput(ScenarioUpdateDatesAction::PARAMETER_VARIABLE + variable.second.code, value)
+								variable.second.code + (variable.second.compulsory ? "*" : "") + (variable.second.helpMessage.empty() ? string() : (" "+ HTMLModule::getHTMLImage("information.png", "Info : " + variable.second.helpMessage))),
+								udt.getForm().getTextInput(ScenarioSaveAction::PARAMETER_VARIABLE + variable.second.code, value)
 							);
 						}
 					}
