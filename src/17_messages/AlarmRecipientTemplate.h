@@ -47,29 +47,32 @@ namespace synthese
 	class AlarmRecipientTemplate : public util::FactorableTemplate<AlarmRecipient, C>
 	{
 	public:
-		typedef std::set<const T*>										LinkedObjectsSet;
+		typedef typename T::ObjectType									ObjectType;
+		typedef std::set<const ObjectType*>								LinkedObjectsSet;
 		typedef std::set<const SentAlarm*>								LinkedAlarmsSet;
 	    typedef typename std::map<const SentAlarm*, LinkedObjectsSet>	AlarmLinks;
-	    typedef typename std::map<const T*, LinkedAlarmsSet>			ObjectLinks;
+		typedef typename std::map<const ObjectType*, LinkedAlarmsSet>	ObjectLinks;
 
 	private:
 	    static AlarmLinks	_linksAlarm;
 	    static ObjectLinks	_linksObject;
 		
 	protected:
-	    static void add(const T* object, const SentAlarm* alarm);
-	    static void remove(const T* object, const SentAlarm* alarm);
+	    static void add(const ObjectType* object, const SentAlarm* alarm);
+	    static void remove(const ObjectType* object, const SentAlarm* alarm);
 		
-		const std::string& getTitle() const;
+		virtual const std::string& getTitle() const;
+
+		virtual const util::RegistryTableType getTableId() const;
 	
 	public:
 		static const std::string TITLE;
 
-	    static LinkedAlarmsSet	getLinkedAlarms(const T* object);
+	    static LinkedAlarmsSet	getLinkedAlarms(const ObjectType* object);
 	    static LinkedObjectsSet	getLinkedObjects(const SentAlarm* alarm);
 
-	    static const SentAlarm* getAlarm(const T* object);
-		static const SentAlarm* getAlarm(const T* object, const boost::posix_time::ptime& date);
+	    static const SentAlarm* getAlarm(const ObjectType* object);
+		static const SentAlarm* getAlarm(const ObjectType* object, const boost::posix_time::ptime& date);
 
 		static void getStaticParametersLabels(security::ParameterLabelsVector& m);
 
@@ -92,6 +95,12 @@ namespace synthese
 
 		virtual void getStaticParametersLabelsVirtual(security::ParameterLabelsVector& m);
 	};
+
+	template<class T, class C>
+	const util::RegistryTableType synthese::messages::AlarmRecipientTemplate<T, C>::getTableId() const
+	{
+		return T::TABLE.ID;
+	}
 
 	template<class T, class C>
 	void synthese::messages::AlarmRecipientTemplate<T, C>::getStaticParametersLabelsVirtual( security::ParameterLabelsVector& m )
@@ -157,7 +166,7 @@ namespace synthese
 	}
 
 	template<class T, class C>
-	const SentAlarm* AlarmRecipientTemplate<T, C>::getAlarm( const T* object, const boost::posix_time::ptime& date )
+	const SentAlarm* AlarmRecipientTemplate<T, C>::getAlarm( const ObjectType* object, const boost::posix_time::ptime& date )
 	{
 	    typename ObjectLinks::const_iterator it = _linksObject.find(object);
 	    if (it == _linksObject.end())
@@ -182,14 +191,14 @@ namespace synthese
 	}
 
 	template<class T, class C>
-	    const SentAlarm* AlarmRecipientTemplate<T, C>::getAlarm( const T* object )
+	    const SentAlarm* AlarmRecipientTemplate<T, C>::getAlarm( const ObjectType* object )
 	{
 		boost::posix_time::ptime now(boost::posix_time::second_clock::local_time());
 	    return AlarmRecipientTemplate<T, C>::getAlarm(object, now);
 	}
 
 	template<class T, class C>
-	    typename AlarmRecipientTemplate<T, C>::LinkedAlarmsSet AlarmRecipientTemplate<T,C>::getLinkedAlarms(const T* object)
+	    typename AlarmRecipientTemplate<T, C>::LinkedAlarmsSet AlarmRecipientTemplate<T,C>::getLinkedAlarms(const ObjectType* object)
 	{
 	    typename ObjectLinks::const_iterator it = _linksObject.find(object);
 	    return (it == _linksObject.end()) ? LinkedAlarmsSet() : it->second;
@@ -203,7 +212,7 @@ namespace synthese
 	}
 
 	template<class T, class C>
-	    void AlarmRecipientTemplate<T, C>::remove(const T* object, const SentAlarm* alarm)
+	    void AlarmRecipientTemplate<T, C>::remove(const ObjectType* object, const SentAlarm* alarm)
 	{
 	    typename ObjectLinks::iterator it = 
 		_linksObject.find(object);
@@ -225,7 +234,7 @@ namespace synthese
 	}
 
 	template<class T, class C>
-	    void AlarmRecipientTemplate<T, C>::add(const T* object, const SentAlarm* alarm)
+	    void AlarmRecipientTemplate<T, C>::add(const ObjectType* object, const SentAlarm* alarm)
 	{
 	    typename ObjectLinks::iterator it = _linksObject.find(object);
 	    if (it == _linksObject.end())

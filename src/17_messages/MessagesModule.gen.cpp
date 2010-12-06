@@ -28,13 +28,12 @@ synthese::messages::GetMessagesFunction::integrate();
 synthese::messages::ScenariosListFunction::integrate();
 synthese::messages::ScenarioDisplayFunction::integrate();
 
-synthese::messages::ScenarioUpdateDatesAction::integrate();
+synthese::messages::ScenarioSaveAction::integrate();
 synthese::messages::SimpleMessageCreationAction::integrate();
 synthese::messages::ScenarioStopAction::integrate();
 synthese::messages::DeleteAlarmAction::integrate();
 synthese::messages::UpdateAlarmMessagesFromTemplateAction::integrate();
 synthese::messages::NewMessageAction::integrate();
-synthese::messages::NewScenarioSendAction::integrate();
 synthese::messages::DeleteTextTemplateAction::integrate();
 synthese::messages::UpdateTextTemplateAction::integrate();
 synthese::messages::AddScenarioAction::integrate();
