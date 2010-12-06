@@ -134,7 +134,7 @@ namespace synthese
 			if(key == FILE_MTDAREA)
 			{
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, "CP1252", 27572);
+				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset() , 27572);
 
 				map<string, string> departementCodes;
 				typedef map<pair<string, string>, City*> CityCodes;

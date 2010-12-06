@@ -40,7 +40,8 @@ namespace synthese
 			int rankInRoad /*= UNKNOWN_VALUE*/,
 			ReverseRoadPart* road /*= NULL*/,
 			double metricOffset /*= UNKNOWN_VALUE */
-		): RoadChunk(
+		): Registrable(0),
+		   RoadChunk(
 			id,
 			fromCrossing,
 			rankInRoad,

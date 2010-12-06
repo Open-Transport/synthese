@@ -44,7 +44,8 @@ namespace synthese
 			int rankInRoad /*= UNKNOWN_VALUE*/,
 			MainRoadPart* road /*= NULL*/,
 			double metricOffset /*= UNKNOWN_VALUE */
-		): RoadChunk(
+		): Registrable(id),
+		   RoadChunk(
 			id,
 			fromCrossing,
 			rankInRoad,
@@ -138,5 +139,10 @@ namespace synthese
 
 			assert(false);
 			return getMetricOffset();
+		}
+
+		MainRoadPart* MainRoadChunk::getMainRoadPart() const
+		{
+			return static_cast<MainRoadPart*>(getRoad());
 		}
 }	}
