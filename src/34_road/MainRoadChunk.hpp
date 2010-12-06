@@ -114,6 +114,8 @@ namespace synthese
 				const HouseNumberingPolicy& getLeftHouseNumberingPolicy() const { return _leftHouseNumberingPolicy; }
 				const HouseNumberingPolicy& getRightHouseNumberingPolicy() const { return _rightHouseNumberingPolicy; }
 				const ReverseRoadChunk* getReverseRoadChunk() const { return _reverseRoadChunk.get(); }
+				MainRoadPart* getMainRoadPart() const;
+
 			//@}
 
 			//! @name Services
