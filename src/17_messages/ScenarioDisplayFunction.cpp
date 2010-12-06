@@ -205,6 +205,7 @@ namespace synthese
 			if(_messageTemplate.get())
 			{
 				vector<shared_ptr<Alarm> > v;
+				stringstream s;
 
 				if (isTemplate)
 				{
@@ -230,12 +231,13 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<Alarm> alarm, v)
 				{
 					MessagesObjectsCMSExporters::DisplayMessage(
-						stream,
+						s,
 						request,
 						_messageTemplate,
 						*alarm
 					);
 				}
+				pm.insert(DATA_MESSAGES, s.str());
 			}
 
 			if(isTemplate)
@@ -266,6 +268,9 @@ namespace synthese
 				{
 					pm.insert(DATA_END_DATE, scenario.getPeriodEnd());
 				}
+
+				// active
+				pm.insert(DATA_ACTIVE, scenario.getIsEnabled());
 			}
 
 			displayRequest.getFunction()->setAditionnalParametersMap(pm);
