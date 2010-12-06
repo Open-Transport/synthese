@@ -196,7 +196,7 @@ namespace synthese
 							){
 								_messageToCreate = map.get<string>(PARAMETER_MESSAGE_TO_CREATE);
 								_recipientId = map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID);
-								_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(AlarmLevel::ALARM_LEVEL_WARNING)));
+								_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
 							}
 						}
 					}
