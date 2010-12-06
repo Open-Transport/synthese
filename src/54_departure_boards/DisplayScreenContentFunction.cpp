@@ -599,6 +599,7 @@ namespace synthese
 			const DisplayScreen& screen
 		){
 			ParametersMap pm;
+			pm.insert(Request::PARAMETER_OBJECT_ID, screen.getKey());
 			pm.insert(DATA_DATE, to_iso_extended_string(date.date()) + " " + to_simple_string(date.time_of_day()));
 			pm.insert(DATA_TITLE, screen.getTitle());
 			pm.insert(DATA_WIRING_CODE, screen.getWiringCode());
