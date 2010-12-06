@@ -59,7 +59,7 @@ namespace synthese
 			Alarm* getAlarm() const;
 			std::string getRecipientKey() const;
 
-			void setObjectId(util::RegistryKeyType key) { _objectId = key; }
+			void setObjectId(util::RegistryKeyType key);
 			void setAlarm(Alarm* value);
 			void setRecipientKey(const std::string& key);
 		};

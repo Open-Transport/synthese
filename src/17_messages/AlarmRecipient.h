@@ -53,8 +53,16 @@ namespace synthese
 		:	public util::FactoryBase<AlarmRecipient>
 		{
 		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// Name of the recipient.
 			virtual const std::string& getTitle() const = 0;
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Table which the objects to link belongs to.
+			virtual const util::RegistryTableType getTableId() const = 0;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Interface to administrate links to objects.
 			virtual void displayBroadcastListEditor(
 				std::ostream& stream
 				, const messages::Alarm* alarm

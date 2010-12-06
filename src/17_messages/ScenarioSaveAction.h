@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-/// ScenarioUpdateDatesAction class header.
-///	@file ScenarioUpdateDatesAction.h
+/// ScenarioSaveAction class header.
+///	@file ScenarioSaveAction.h
 ///	@author Hugues Romain
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
@@ -22,13 +22,14 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef SYNTHESE_ScenarioUpdateDatesAction_H__
-#define SYNTHESE_ScenarioUpdateDatesAction_H__
+#ifndef SYNTHESE_ScenarioSaveAction_H__
+#define SYNTHESE_ScenarioSaveAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include "SentScenario.h"
 #include "ActionException.h"
+#include "MessagesTypes.h"
 
 #include <string>
 
@@ -50,10 +51,11 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m17Actions refActions
 		/// @author Hugues Romain
-		class ScenarioUpdateDatesAction:
-			public util::FactorableTemplate<server::Action, ScenarioUpdateDatesAction>
+		class ScenarioSaveAction:
+			public util::FactorableTemplate<server::Action, ScenarioSaveAction>
 		{
 		public:
+			static const std::string PARAMETER_CREATE_TEMPLATE;
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
 			static const std::string PARAMETER_ENABLED;
@@ -61,6 +63,11 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_FOLDER_ID;
 			static const std::string PARAMETER_VARIABLE;
+			static const std::string PARAMETER_TEMPLATE;
+			static const std::string PARAMETER_MESSAGE_TO_COPY;
+			static const std::string PARAMETER_MESSAGE_TO_CREATE;
+			static const std::string PARAMETER_RECIPIENT_ID;
+			static const std::string PARAMETER_LEVEL;
 
 		private:
 			//! @name Scenario to update
@@ -78,6 +85,16 @@ namespace synthese
 				boost::optional<boost::posix_time::ptime>			_startDate;
 				boost::optional<boost::posix_time::ptime>			_endDate;
 				SentScenario::VariablesMap							_variables;
+				boost::optional<std::string>						_messageToCreate;
+				boost::optional<util::RegistryKeyType>				_recipientId;
+				boost::optional<AlarmLevel>							_level;
+			//@}
+
+			//! @name Action to do
+			//@{
+				bool _creation;
+				boost::shared_ptr<const ScenarioTemplate>	_template;
+				boost::shared_ptr<const SentScenario>		_source;
 			//@}
 
 		protected:
@@ -101,7 +118,7 @@ namespace synthese
 		public:
 			/** Constructor.
 			*/
-			ScenarioUpdateDatesAction();
+			ScenarioSaveAction();
 
 			/** Action to run, defined by each subclass.
 			*/
@@ -109,7 +126,7 @@ namespace synthese
 
 			virtual bool isAuthorized(const server::Session* session) const;
 
-			
+
 			
 			////////////////////////////////////////////////////////////////////
 			///	Scenario setter.
@@ -123,4 +140,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_ScenarioUpdateDatesAction_H__
+#endif // SYNTHESE_ScenarioSaveAction_H__

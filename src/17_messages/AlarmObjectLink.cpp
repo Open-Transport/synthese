@@ -22,6 +22,10 @@
 
 #include "AlarmObjectLink.h"
 #include "Registry.h"
+#include "Factory.h"
+#include "AlarmRecipient.h"
+
+#include <boost/foreach.hpp>
 
 namespace synthese
 {
@@ -64,6 +68,24 @@ namespace synthese
 			_alarm(NULL)
 		{
 		
+		}
+
+
+
+		void AlarmObjectLink::setObjectId( util::RegistryKeyType key )
+		{
+			_objectId = key;
+
+			RegistryTableType tableId(decodeTableId(_objectId));
+			BOOST_FOREACH(const Factory<AlarmRecipient>::ObjectsCollection::value_type& obj, Factory<AlarmRecipient>::GetNewCollection())
+			{
+				if(obj->getTableId() == tableId)
+				{
+					_recipientKey = obj->getFactoryKey();
+					return;
+				}
+			}
+			assert(false);
 		}
 	}
 }

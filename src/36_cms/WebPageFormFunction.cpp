@@ -29,6 +29,7 @@
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
 #include "HTMLForm.h"
+#include "Action.h"
 
 using namespace std;
 using namespace boost;
@@ -51,7 +52,7 @@ namespace synthese
 
 		ParametersMap WebPageFormFunction::_getParametersMap() const
 		{
-			ParametersMap map;
+			ParametersMap map(_aditionnalParameters);
 			map.insert(PARAMETER_NAME, _name);
 			map.insert(PARAMETER_SCRIPT, _script);
 			if(_page.get())
@@ -66,6 +67,16 @@ namespace synthese
 
 		void WebPageFormFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			BOOST_FOREACH(const ParametersMap::Map::value_type& it, map.getMap())
+			{
+				if(	it.first != Request::PARAMETER_FUNCTION &&
+					it.first != Request::PARAMETER_ACTION &&
+					(it.first.size() < Action_PARAMETER_PREFIX.size() || it.first.substr(0, Action_PARAMETER_PREFIX.size()) != Action_PARAMETER_PREFIX)
+				){
+					_aditionnalParameters.insert(it.first, it.second);
+				}
+			}
+
 			_name = map.get<string>(PARAMETER_NAME);
 			_script = map.getDefault<string>(PARAMETER_SCRIPT);
 			_idem = map.getDefault<bool>(PARAMETER_IDEM, false);

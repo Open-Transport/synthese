@@ -236,6 +236,7 @@ namespace synthese
 				/// Display of a departure board.
 				///	Variables sent to the cms :
 				/// <dl>
+				/// <dt>roid</dt><dd>id of the screen</dd>
 				///	<dt>title</dt><dd>title of the screen</dd>
 				/// <dt>date</dt><dd>date of the display</dd>
 				///	<dt>wiring_code</dt><dd>wiring code of the screen</dd>

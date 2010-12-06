@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_DisplayScreenAlarmRecipient_h__
 #define SYNTHESE_DisplayScreenAlarmRecipient_h__
 
-#include "DisplayScreen.h"
+#include "DisplayScreenTableSync.h"
 #include "AlarmRecipientTemplate.h"
 
 namespace synthese
@@ -35,7 +35,7 @@ namespace synthese
 		///	@ingroup m54Messages refAlarmrecipients
 		/// @author Hugues Romain
 		class DisplayScreenAlarmRecipient:
-			public messages::AlarmRecipientTemplate<DisplayScreen, DisplayScreenAlarmRecipient>
+			public messages::AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>
 		{
 		public:
 			static const std::string PARAMETER_SEARCH_CITY_NAME;
