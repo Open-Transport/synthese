@@ -547,13 +547,26 @@ namespace synthese
 
 
 		MainRoadChunk::HouseNumberBounds NavstreetsFileFormat::Importer_::_getHouseNumberBoundsFromAddresses(
-			const std::string& minAddress,
-			const std::string& maxAddress
+			const std::string& minAddressConst,
+			const std::string& maxAddressConst
 		){
-			if(!minAddress.empty() && !maxAddress.empty())
+			if(!minAddressConst.empty() && !maxAddressConst.empty())
 			{
 				try
 				{
+					//Remove whitespace because of a bad_lexical_cast on "2 " !!!
+					string minAddress = minAddressConst;
+					string maxAddress = maxAddressConst;
+
+					string::size_type k = 0;
+					while((k=minAddress.find(' ',k))!=minAddress.npos) {
+						minAddress.erase(k, 1);
+					}
+					k = 0;
+					while((k=maxAddress.find(' ',k))!=maxAddress.npos) {
+						maxAddress.erase(k, 1);
+					}
+
 					return MainRoadChunk::HouseNumberBounds(
 						pair<MainRoadChunk::HouseNumber, MainRoadChunk::HouseNumber>(
 							lexical_cast<MainRoadChunk::HouseNumber>(minAddress),
@@ -562,7 +575,7 @@ namespace synthese
 				}
 				catch(bad_lexical_cast)
 				{
-				}
+ 				}
 			}
 			return MainRoadChunk::HouseNumberBounds();
 		}
