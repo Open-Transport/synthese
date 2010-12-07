@@ -36,11 +36,6 @@ using namespace geos::linearref;
 namespace synthese
 {
 	using namespace graph;
-	
-	namespace util
-	{
-		template<> const string Registry<road::RoadChunk>::KEY("RoadChunk");
-	}
 
 	namespace road
 	{

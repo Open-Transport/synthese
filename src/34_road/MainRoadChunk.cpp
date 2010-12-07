@@ -60,7 +60,7 @@ namespace synthese
 			const HouseNumberingPolicy& policy,
 			HouseNumber houseNumber
 		){
-			if(bounds)
+			if(!bounds)
 			{
 				return false;
 			}
@@ -134,10 +134,9 @@ namespace synthese
 			// Right side
 			if(	_testIfHouseNumberBelongsToBounds(_rightHouseNumberBounds, _rightHouseNumberingPolicy, houseNumber))
 			{
-				return _computeMetricOffset(_leftHouseNumberBounds, houseNumber, getMetricOffset(), getEndMetricOffset());
+				return _computeMetricOffset(_rightHouseNumberBounds, houseNumber, getMetricOffset(), getEndMetricOffset());
 			}
 
-			assert(false);
 			return getMetricOffset();
 		}
 
