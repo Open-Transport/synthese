@@ -156,7 +156,7 @@ namespace synthese
 
 						chunk.getFromCrossing()->addReachableVertex(object);
 					}
-					catch (ObjectNotFoundException<RoadChunk>& e)
+					catch (ObjectNotFoundException<MainRoadChunk>& e)
 					{
 						throw LinkException<RoadChunkTableSync>(rows, StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, e);
 					}

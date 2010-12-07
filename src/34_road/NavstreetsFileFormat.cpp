@@ -217,7 +217,7 @@ namespace synthese
 			else if(key == FILE_STREETS)
 			{
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, "CP1252", 27572);
+				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), 27572);
 				
 				typedef map<string, shared_ptr<Crossing> > _CrossingsMap;
 				_CrossingsMap _navteqCrossings;	
@@ -401,7 +401,7 @@ namespace synthese
 							secondRoadChunk->setMetricOffset(startMetricOffset + length);
 							secondRoadChunk->setKey(RoadChunkTableSync::getId());
 							road->addRoadChunk(*secondRoadChunk);
-							_env.getEditableRegistry<RoadChunk>().add(secondRoadChunk);
+							_env.getEditableRegistry<MainRoadChunk>().add(secondRoadChunk);
 
 							// Search for a second existing road which starts at the right node
 							MainRoadPart* road2 = NULL;
@@ -422,8 +422,8 @@ namespace synthese
 							{
 								RegistryKeyType lastEdgeId(road->getLastEdge()->getKey());
 								road->merge(*road2);
-								_env.getEditableRegistry<RoadChunk>().remove(lastEdgeId);
-								_env.getEditableRegistry<Road>().remove(road2->getKey());
+								_env.getEditableRegistry<MainRoadChunk>().remove(lastEdgeId);
+								_env.getEditableRegistry<MainRoadPart>().remove(road2->getKey());
 							}
 
 						}
@@ -462,7 +462,7 @@ namespace synthese
 									leftHouseNumberBounds
 								);
 
-								_env.getEditableRegistry<RoadChunk>().add(firstRoadChunk);
+								_env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
 							}
 							else
 							{

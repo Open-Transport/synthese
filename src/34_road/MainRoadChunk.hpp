@@ -64,7 +64,7 @@ namespace synthese
 			HouseNumberingPolicy	_leftHouseNumberingPolicy;
 			HouseNumberingPolicy	_rightHouseNumberingPolicy;
 
-			boost::shared_ptr<ReverseRoadChunk> _reverseRoadChunk;
+			ReverseRoadChunk* _reverseRoadChunk;
 
 			static bool _testIfHouseNumberBelongsToBounds(
 				const HouseNumberBounds& bounds,
@@ -104,7 +104,7 @@ namespace synthese
 				void setRightHouseNumberBounds(const HouseNumberBounds& value){ _rightHouseNumberBounds = value; }
 				void setLeftHouseNumberingPolicy(const HouseNumberingPolicy& value){ _leftHouseNumberingPolicy = value; }
 				void setRightHouseNumberingPolicy(const HouseNumberingPolicy& value){ _rightHouseNumberingPolicy = value; }
-				void setReverseRoadChunk(boost::shared_ptr<ReverseRoadChunk> value){ _reverseRoadChunk = value; }
+				void setReverseRoadChunk(ReverseRoadChunk * value){ _reverseRoadChunk = value; }
 			//@}
 
 			//! @name Getters
@@ -113,7 +113,7 @@ namespace synthese
 				const HouseNumberBounds& getRightHouseNumberBounds() const { return _rightHouseNumberBounds; }
 				const HouseNumberingPolicy& getLeftHouseNumberingPolicy() const { return _leftHouseNumberingPolicy; }
 				const HouseNumberingPolicy& getRightHouseNumberingPolicy() const { return _rightHouseNumberingPolicy; }
-				const ReverseRoadChunk* getReverseRoadChunk() const { return _reverseRoadChunk.get(); }
+				const ReverseRoadChunk* getReverseRoadChunk() const { return _reverseRoadChunk; }
 				MainRoadPart* getMainRoadPart() const;
 
 			//@}
