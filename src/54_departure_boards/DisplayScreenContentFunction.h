@@ -229,6 +229,7 @@ namespace synthese
 				static const std::string DATA_MESSAGE_LEVEL;
 				static const std::string DATA_MESSAGE_CONTENT;
 				static const std::string DATA_DATE;
+				static const std::string DATA_MAC;
 				static const std::string DATA_SUBSCREEN_;
 
 		public:
