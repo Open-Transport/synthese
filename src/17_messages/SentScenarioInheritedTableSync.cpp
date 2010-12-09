@@ -278,12 +278,12 @@ namespace synthese
 			if(orderByDate)
 			{
 				query <<
-					" ORDER BY" <<
-					" start IS NULL " << (raisingOrder ? "DESC" : "ASC") << "," <<
-					" start " << (raisingOrder ? "ASC" : "DESC") << "," <<
-					" end IS NULL " << (raisingOrder ? "ASC" : "DESC") << "," <<
-					" end " << (raisingOrder ? "ASC" : "DESC")
-					;
+					" ORDER BY " <<
+					ScenarioTableSync::COL_PERIODSTART << " IS NULL " << (raisingOrder ? "DESC" : "ASC") << "," <<
+					ScenarioTableSync::COL_PERIODSTART << (raisingOrder ? " ASC" : " DESC") << "," <<
+					ScenarioTableSync::COL_PERIODEND << " IS NULL " << (raisingOrder ? "ASC" : "DESC") << "," <<
+					ScenarioTableSync::COL_PERIODEND << (raisingOrder ? "ASC" : "DESC")
+				;
 			}
 
 			if (orderByName)

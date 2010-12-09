@@ -79,6 +79,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_STOP_NAME("sn");
 		const string DisplayScreenContentFunction::PARAMETER_LINE_ID("lineid");
 		
+		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_TEAM("display_team");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_TRACK_NUMBER("display_track_number");
@@ -600,6 +601,7 @@ namespace synthese
 		){
 			ParametersMap pm;
 			pm.insert(Request::PARAMETER_OBJECT_ID, screen.getKey());
+			pm.insert(DATA_MAC, screen.getMacAddress());
 			pm.insert(DATA_DATE, to_iso_extended_string(date.date()) + " " + to_simple_string(date.time_of_day()));
 			pm.insert(DATA_TITLE, screen.getTitle());
 			pm.insert(DATA_WIRING_CODE, screen.getWiringCode());
