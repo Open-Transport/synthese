@@ -128,6 +128,15 @@ namespace synthese
 				std::size_t rank,
 				bool add
 			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Removes all links to the specified page.
+			/// @param destination the destination of the links to remove
+			static void RemoveLinks(
+				const Webpage& destination
+			);
 		};
 	}
 }

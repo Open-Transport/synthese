@@ -77,6 +77,8 @@ namespace synthese
 		void WebPageRemoveAction::run(
 			Request& request
 		){
+			WebPageTableSync::RemoveLinks(*_page);
+
 			WebPageTableSync::Remove(_page->getKey());
 			
 			WebPageTableSync::ShiftRank(
@@ -85,6 +87,7 @@ namespace synthese
 				_page->getRank(),
 				false
 			);
+
 
 //			::AddDeleteEntry(*_object, request.getUser().get());
 
