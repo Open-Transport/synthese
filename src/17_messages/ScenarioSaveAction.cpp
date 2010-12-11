@@ -40,6 +40,7 @@
 #include "ScenarioTemplateInheritedTableSync.h"
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
+#include "MessagesTypes.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
