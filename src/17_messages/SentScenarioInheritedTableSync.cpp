@@ -282,7 +282,7 @@ namespace synthese
 					ScenarioTableSync::COL_PERIODSTART << " IS NULL " << (raisingOrder ? "DESC" : "ASC") << "," <<
 					ScenarioTableSync::COL_PERIODSTART << (raisingOrder ? " ASC" : " DESC") << "," <<
 					ScenarioTableSync::COL_PERIODEND << " IS NULL " << (raisingOrder ? "ASC" : "DESC") << "," <<
-					ScenarioTableSync::COL_PERIODEND << (raisingOrder ? "ASC" : "DESC")
+					ScenarioTableSync::COL_PERIODEND << (raisingOrder ? " ASC" : " DESC")
 				;
 			}
 
