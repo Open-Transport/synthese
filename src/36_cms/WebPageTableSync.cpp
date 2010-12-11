@@ -106,8 +106,7 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			string smartURLPath(webpage->getSmartURLPath());
-			Webpage::SetParent(*webpage, NULL);
+			webpage->setParent(NULL);
 			webpage->setNullRoot();
 			webpage->setName(rows->getText(WebPageTableSync::COL_TITLE));
 			webpage->setContent(rows->getText(WebPageTableSync::COL_CONTENT1));
@@ -138,7 +137,6 @@ namespace synthese
 					try
 					{
 						webpage->setRoot(Fetcher<Website>::FetchEditable(id, env, linkLevel).get());
-						webpage->getRoot()->removePage(smartURLPath);
 						webpage->getRoot()->addPage(*webpage);
 					}
 					catch(ObjectNotFoundException<Website>& e)
@@ -200,7 +198,11 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,Webpage>::Unlink(
 			Webpage* obj
 		){
-			obj->setParent(NULL);
+			if(obj->getRoot())
+			{
+				obj->getRoot()->removePage(obj->getSmartURLPath());
+			}
+			Webpage::SetParent(*obj, NULL);
 		}
 
 
@@ -345,6 +347,31 @@ namespace synthese
 					COL_RANK << ">=" << rank
 			;
 			DBModule::GetSQLite()->execUpdate(query.str());
+		}
+
+
+
+		void WebPageTableSync::RemoveLinks( const Webpage& destination )
+		{
+			SelectQuery<WebPageTableSync> query;
+			Env env;
+			SQLiteTransaction transaction;
+			query.addWhereField(COL_LINKS, "%"+ lexical_cast<string>(destination.getKey()) +"%", ComposedExpression::OP_LIKE);
+			SearchResult pages(LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
+			BOOST_FOREACH(shared_ptr<Webpage> page, pages)
+			{
+				Webpage::Links newLinks;
+				BOOST_FOREACH(Webpage* linkedPage, page->getLinks())
+				{
+					if(linkedPage->getKey() != destination.getKey())
+					{
+						newLinks.push_back(linkedPage);
+					}
+				}
+				page->setLinks(newLinks);
+				Save(page.get(), transaction);
+			}
+			transaction.run();
 		}
 	}
 }
