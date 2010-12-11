@@ -44,15 +44,16 @@ namespace synthese
 			int rankInRoad /*= UNKNOWN_VALUE*/,
 			MainRoadPart* road /*= NULL*/,
 			double metricOffset /*= UNKNOWN_VALUE */
-		): Registrable(id),
-		   RoadChunk(
-			id,
-			fromCrossing,
-			rankInRoad,
-			road,
-			metricOffset
-		){
-		}
+		):	Registrable(id),
+			RoadChunk(
+				id,
+				fromCrossing,
+				rankInRoad,
+				road,
+				metricOffset
+			)
+		{}
+
 
 
 		bool MainRoadChunk::_testIfHouseNumberBelongsToBounds(

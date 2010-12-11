@@ -47,7 +47,8 @@ namespace synthese
 		MainRoadPart::MainRoadPart(
 			util::RegistryKeyType key /*= 0*/,
 			RoadType type /*= ROAD_TYPE_UNKNOWN */
-		): Registrable(key), Road(key, type)
+		):	Registrable(key),
+			Road(key, type)
 		{
 			_reverseRoad.reset(new ReverseRoadPart(*this));
 		}
@@ -77,7 +78,7 @@ namespace synthese
 		{
 			if(getEdges().empty())
 			{
-				ReverseRoadChunk* reverseChunk(
+				shared_ptr<ReverseRoadChunk> reverseChunk(
 					new ReverseRoadChunk(
 						0,
 						chunk.getFromCrossing(),
@@ -101,7 +102,7 @@ namespace synthese
 				const Edge& lastEdge(**(getEdges().end() - 1));
 				if(chunk.getRankInPath() > lastEdge.getRankInPath())
 				{
-					ReverseRoadChunk* reverseChunk(
+					shared_ptr<ReverseRoadChunk> reverseChunk(
 						new ReverseRoadChunk(
 							0,
 							chunk.getFromCrossing(),
@@ -118,7 +119,7 @@ namespace synthese
 				}
 				else
 				{
-					ReverseRoadChunk* reverseChunk(
+					shared_ptr<ReverseRoadChunk> reverseChunk(
 						new ReverseRoadChunk(
 							0,
 							chunk.getFromCrossing(),
@@ -154,7 +155,7 @@ namespace synthese
 			// Insertion of the chunk
 			const Edge& lastEdge(**(_reverseRoad->getEdges().end() - 1));
 
-			ReverseRoadChunk* reverseChunk(
+			shared_ptr<ReverseRoadChunk> reverseChunk(
 				new ReverseRoadChunk(
 					0,
 					chunk.getFromCrossing(),

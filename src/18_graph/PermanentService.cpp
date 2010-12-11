@@ -130,7 +130,6 @@ namespace synthese
 
 		time_duration PermanentService::getDepartureSchedule(bool RTData, size_t rank) const
 		{
-			assert(rank != 0);
 			return time_duration(0,0,0);
 		}
 
