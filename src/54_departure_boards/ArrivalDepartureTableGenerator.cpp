@@ -139,6 +139,12 @@ namespace synthese
 					encounteredPlaces.insert(place);
 				}
 			}
+
+			if(!lastLineStop)
+			{
+				return _result.end();
+			}
+
 			// Add the ending stop
 			if((arrivals.end()-1)->place != place || arrivals.size() <= 1)
 			{

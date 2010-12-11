@@ -240,16 +240,19 @@ namespace synthese
 					// CPU search
 					DisplayScreenCPUTableSync::SearchResult cpus(
 						DisplayScreenCPUTableSync::Search(
-							_getEnv(),
+							Env::GetOfficialEnv(),
 							_displayScreen->getLocation()->getKey()
 					)	);
 					
 					if(!cpus.empty())
 					{
 						AdminFunctionRequest<DisplayScreenCPUAdmin> goCPURequest(_request);
-						goCPURequest.getPage()->setCPU(
-							_getEnv().getSPtr(_displayScreen->getRoot<DisplayScreenCPU>())
-						);
+						if(_displayScreen->getRoot<DisplayScreenCPU>())
+						{
+							goCPURequest.getPage()->setCPU(
+								Env::GetOfficialEnv().getSPtr(_displayScreen->getRoot<DisplayScreenCPU>())
+							);
+						}
 						
 						stream << t.cell(
 							"Unité centrale",
@@ -257,7 +260,7 @@ namespace synthese
 								UpdateDisplayScreenAction::PARAMETER_CPU,
 								cpus,
 								optional<shared_ptr<DisplayScreenCPU> >(
-									_getEnv().getEditableSPtr(
+									Env::GetOfficialEnv().getEditableSPtr(
 										const_cast<DisplayScreenCPU*>(_displayScreen->getRoot<DisplayScreenCPU>())
 								)	),
 								"(pas d'unité centrale)"
@@ -926,11 +929,11 @@ namespace synthese
 
 					BOOST_FOREACH(const TransferDestinationsList::value_type& it, _displayScreen->getTransferdestinations())
 					{
-						rmTransferRequest.getAction()->setTransferPlace(StopAreaTableSync::Get(it.first->getKey(), _getEnv()));
+						rmTransferRequest.getAction()->setTransferPlace(StopAreaTableSync::Get(it.first->getKey(), Env::GetOfficialEnv()));
 
 						BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it.second)
 						{
-							rmTransferRequest.getAction()->setDestinationPlace(StopAreaTableSync::Get(it2->getKey(), _getEnv()));
+							rmTransferRequest.getAction()->setDestinationPlace(StopAreaTableSync::Get(it2->getKey(), Env::GetOfficialEnv()));
 
 							stream << tt.row();
 							stream << tt.col() << it.first->getCity()->getName();
@@ -1004,7 +1007,7 @@ namespace synthese
 					stream << t.col() << getTabLinkButton(TAB_MAINTENANCE);
 				}
 
-				vector<shared_ptr<SentAlarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(_getEnv(), _displayScreen->getKey()));
+				vector<shared_ptr<SentAlarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(Env::GetOfficialEnv(), _displayScreen->getKey()));
 				AdminFunctionRequest<MessageAdmin> viewMessageRequest(_request);
 				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
 				{
@@ -1047,7 +1050,7 @@ namespace synthese
 				stream << "<h1>Contenus en attente</h1>";
 
 				vector<shared_ptr<SentAlarm> > futures(DisplayScreenTableSync::GetFutureDisplayedMessages(
-					_getEnv(),
+					Env::GetOfficialEnv(),
 					_displayScreen->getKey()
 				)	);
 				if(!futures.empty())
