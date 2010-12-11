@@ -112,6 +112,20 @@ namespace synthese
 			);
 
 
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Removes links between alarms and a specified object.
+			/// @param objectId id of the target of the alarms to remove
+			/// @param transaction optional transaction
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.2.0
+			static void RemoveByTarget(
+				util::RegistryKeyType objectId,
+				boost::optional<db::SQLiteTransaction&> transaction = boost::optional<db::SQLiteTransaction&>()
+			);
+
+
 			static void CopyRecipients(
 				const Alarm& sourceAlarm,
 				Alarm& destAlarm

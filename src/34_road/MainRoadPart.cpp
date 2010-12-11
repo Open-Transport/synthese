@@ -78,7 +78,7 @@ namespace synthese
 		{
 			if(getEdges().empty())
 			{
-				shared_ptr<ReverseRoadChunk> reverseChunk(
+				ReverseRoadChunk* reverseChunk(
 					new ReverseRoadChunk(
 						0,
 						chunk.getFromCrossing(),
@@ -102,7 +102,7 @@ namespace synthese
 				const Edge& lastEdge(**(getEdges().end() - 1));
 				if(chunk.getRankInPath() > lastEdge.getRankInPath())
 				{
-					shared_ptr<ReverseRoadChunk> reverseChunk(
+					ReverseRoadChunk* reverseChunk(
 						new ReverseRoadChunk(
 							0,
 							chunk.getFromCrossing(),
@@ -119,7 +119,7 @@ namespace synthese
 				}
 				else
 				{
-					shared_ptr<ReverseRoadChunk> reverseChunk(
+					ReverseRoadChunk* reverseChunk(
 						new ReverseRoadChunk(
 							0,
 							chunk.getFromCrossing(),
@@ -155,7 +155,7 @@ namespace synthese
 			// Insertion of the chunk
 			const Edge& lastEdge(**(_reverseRoad->getEdges().end() - 1));
 
-			shared_ptr<ReverseRoadChunk> reverseChunk(
+			ReverseRoadChunk* reverseChunk(
 				new ReverseRoadChunk(
 					0,
 					chunk.getFromCrossing(),

@@ -30,6 +30,7 @@
 #include "LoadException.h"
 #include "LinkException.h"
 #include "MessagesModule.h"
+#include "DeleteQuery.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -231,6 +232,17 @@ namespace synthese
 				query << " OFFSET " << first;
 
 			return LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+
+
+		void AlarmObjectLinkTableSync::RemoveByTarget(
+			util::RegistryKeyType objectId,
+			optional<SQLiteTransaction&> transaction
+		){
+			DeleteQuery<AlarmObjectLinkTableSync> query;
+			query.addWhereField(COL_OBJECT_ID, objectId);
+			query.execute(transaction);
 		}
 	}
 }

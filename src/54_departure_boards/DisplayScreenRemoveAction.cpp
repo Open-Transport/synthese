@@ -28,6 +28,8 @@
 #include "Request.h"
 #include "ParametersMap.h"
 #include "Right.h"
+#include "SQLiteTransaction.h"
+#include "AlarmObjectLinkTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -37,6 +39,10 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
+	using namespace db;
+	using namespace messages;
+	
+	
 
 	template<> const string util::FactorableTemplate<Action, departure_boards::DisplayScreenRemoveAction>::FACTORY_KEY("dsra");
 
@@ -51,6 +57,8 @@ namespace synthese
 			map.insert(PARAMETER_DISPLAY_SCREEN_ID, _displayScreen->getKey());
 			return map;
 		}
+
+
 
 		void DisplayScreenRemoveAction::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
 		{
@@ -67,15 +75,22 @@ namespace synthese
 			}
 		}
 
+
+
 		void DisplayScreenRemoveAction::run(
 			Request& request
 		) throw(ActionException) {
 
-			DisplayScreenTableSync::Remove(_displayScreen->getKey());
+			SQLiteTransaction transaction;
+			AlarmObjectLinkTableSync::RemoveByTarget(_displayScreen->getKey(), transaction);
+			DisplayScreenTableSync::Remove(_displayScreen->getKey(), transaction);
+			transaction.run();
 
+			// Log
 			ArrivalDepartureTableLog::addRemoveEntry(_displayScreen.get(), request.getUser().get());
-
 		}
+
+
 
 		bool DisplayScreenRemoveAction::isAuthorized(const server::Session* session) const
 		{
@@ -90,9 +105,10 @@ namespace synthese
 			}
 		}
 
+
+
 		void DisplayScreenRemoveAction::setDisplayScreen( boost::shared_ptr<const DisplayScreen> screen )
 		{
 			_displayScreen = screen;
 		}
-	}
-}
+}	}
