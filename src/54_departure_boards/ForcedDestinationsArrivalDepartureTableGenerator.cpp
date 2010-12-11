@@ -167,15 +167,25 @@ namespace synthese
 							// Allocation
 							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
 
+							if(itr == _result.end())
+							{
+								continue;
+							}
+
 							// Links
 							reachedDestination[curGLA->getPhysicalStop()->getConnectionPlace()] = itr;
 						}
-						// Else optimizing a previously founded ptd
+						// Else optimizing a previously found ptd
 						else if(serviceInstance.getDepartureDateTime() <
 							reachedDestination[connectionPlace]->first.getDepartureDateTime()
 						){
 							// Allocation
 							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
+							if(itr == _result.end())
+							{
+								continue;
+							}
+
 							ArrivalDepartureList::iterator oldIt = reachedDestination[connectionPlace];
 
 							reachedDestination[curGLA->getPhysicalStop()->getConnectionPlace()] = itr;
