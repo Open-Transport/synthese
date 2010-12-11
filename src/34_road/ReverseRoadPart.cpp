@@ -51,5 +51,9 @@ namespace synthese
 
 		ReverseRoadPart::~ReverseRoadPart()
 		{
+			BOOST_FOREACH(Edges::value_type edge, _edges)
+			{
+				delete edge;
+			}
 		}
 }	}
