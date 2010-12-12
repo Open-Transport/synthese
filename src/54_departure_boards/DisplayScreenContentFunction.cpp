@@ -1071,7 +1071,7 @@ namespace synthese
 					if(destinationPage.get())
 					{
 						DisplayRoutePlanningBoardDestination(
-							stream,
+							s,
 							request,
 							destinationPage,
 							*it->first // place
