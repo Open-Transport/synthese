@@ -87,16 +87,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Line CMS exporter.
-			/// Values sent to the CMS template :
-			/// <dl>
-			/// <dt>stop_id</dt><dd>stop area id</dd>
-			///	<dt>stop_name</dt><dd>stop area name in the city</dd>
-			///	<dt>city_id</dt><dd>id of the city where the stop area is located</dd>
-			///	<dt>city name</dt><dd>name of the city where the stop area is located</dd>
-			///	<dt>stop_name_13</dt><dd>stop area short alias (13 characters max) designed for departure boards</dd>
-			///	<dt>stop_name_26</dt><dd>stop area middle sized alias (26 characters max) designed for departure boards</dd>
-			///	<dt>stop_name_for_timetables</dt><dd>stop area alias designed for timetables</dd>
-			/// </dl>
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_Areas_in_CMS
 			//////////////////////////////////////////////////////////////////////////
 			/// @param pm parameters map to populate
 			/// @param stopArea stop area to export
