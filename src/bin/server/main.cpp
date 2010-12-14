@@ -40,7 +40,8 @@
 #include <map>
 #include <iostream>
 #include <fstream>
-#include <fcntl.h> // umask...
+#include <sys/types.h> // umask
+#include <sys/stat.h> // umask
 #include <boost/program_options.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
