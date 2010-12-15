@@ -59,128 +59,103 @@ namespace synthese
 		std::streamsize PlainCharFilter::write(Sink& dest, const char* s, std::streamsize n)
 		{
 			int i = 0;
+
 			while (i != n)
 			{
 				char c = s[i];
 					
-				if ( 
-					(c == 'á') || 
-					(c == 'à') || 
-					(c == 'â') || 
-					(c == 'ä')    
-					)
-				{ 
-					boost::iostreams::put(dest, 'a') ;
+				if (c == 0xFFFFFFc3 )
+				{
+					i++;
+					if(i == n)
+					{
+						boost::iostreams::put(dest, c) ;
+						break;
+					}
+					c = s[i];
+					switch((unsigned int)c)
+					{
+						case 0xFFFFFFa8 : //'è' = c3a8
+						case 0xFFFFFFa9 : //'é' = c3a9
+						case 0xFFFFFFaa : //'ê' = c3aa
+						case 0xFFFFFFab : //'ë' = c3ab
+							boost::iostreams::put(dest, 'e');
+							break;
+						case 0xFFFFFFa7 : //'ç' = c3a7
+							boost::iostreams::put(dest, 'c');
+							break;
+						case 0xFFFFFFa0 : //'à' = c3a0á
+						case 0xFFFFFFa1 : //'á' = c3a1
+						case 0xFFFFFFa2 : //'â' = c3a2
+						case 0xFFFFFFa4 : //'ä' = c3a4
+							boost::iostreams::put(dest, 'a');
+							break;
+						case 0xFFFFFFb9 : //'ù' = c3b9
+						case 0xFFFFFFba : //'ú' = c3ba
+						case 0xFFFFFFbb : //'û' = c3bb
+						case 0xFFFFFFbc : //'ü' = c3bc
+							boost::iostreams::put(dest, 'u');
+							break;
+						case 0xFFFFFFb4 : //'ô' = c3b4
+						case 0xFFFFFFb6 : //'ö' = c3b6
+							boost::iostreams::put(dest, 'o');
+							break;
+						case 0xFFFFFFae : //'î' = c3ae
+						case 0xFFFFFFaf : //'ï' = c3af
+							boost::iostreams::put(dest, 'i');
+							break;
+						default : //Put last two chars
+							boost::iostreams::put(dest, s[i-1]) ;
+							boost::iostreams::put(dest, c);
+							break;
+					}
 				}
-				else if ( 
-					(c == 'Á') || 
-					(c == 'À') || 
-					(c == 'Ä') || 
-					(c == 'Â')    
-					)
-				{ 
-					boost::iostreams::put(dest, 'A') ;
+				else if (((unsigned int)c) == 0xFFFFFFc2 )
+				{
+					i++;
+					if(i == n)
+					{
+						boost::iostreams::put(dest, c) ;
+						break;
+					}
+					c = s[i];
+					switch((unsigned int)c)
+					{
+						case 0xFFFFFFb0 : //'°' = c2b0
+							boost::iostreams::put(dest, 'o');
+							break;
+						default ://Put last two chars
+							boost::iostreams::put(dest, s[i-1]) ;
+							boost::iostreams::put(dest, c);
+							break;
+					}
 				}
-				
-				else if ( 
-					(c == 'é') || 
-					(c == 'è') || 
-					(c == 'ê') || 
-					(c == 'ë')    
-					)
-				{ 
-					boost::iostreams::put(dest, 'e') ;
-				} 
-				else if ( 
-					(c == 'É') || 
-					(c == 'È') || 
-					(c == 'Ê') || 
-					(c == 'Ë')    
-					)
-				{ 
-					boost::iostreams::put(dest, 'E') ;
-				} 
-				
-				else if (
-					(c == 'í') || 
-					(c == 'ì') || 
-					(c == 'ï') || 
-					(c == 'î')    
-					)
-				{ 
-					boost::iostreams::put(dest, 'i') ;
-				} 
-				else if (
-					(c == 'Í') || 
-					(c == 'Ì') || 
-					(c == 'Ï') || 
-					(c == 'Î')    
-					)
-				{ 
-					boost::iostreams::put(dest, 'I') ;
-				} 
-				
-			    
-				else if (
-					(c == 'ó') || 
-					(c == 'ò') || 
-					(c == 'ö') || 
-					(c == 'ô')    
-					)
-				{ 
-					boost::iostreams::put(dest, 'o') ;
-				} 
-				else if (
-					(c == 'Ó') || 
-					(c == 'Ò') || 
-					(c == 'Ö') || 
-					(c == 'Ô')    
-					)
-				{ 
-					boost::iostreams::put(dest, 'O') ;
-				} 
-			    
-			    
-				else if (
-					(c == 'ú') || 
-					(c == 'ù') || 
-					(c == 'ü') || 
-					(c == 'û')    
-					)
-				{ 
-					boost::iostreams::put(dest, 'u') ;
-				} 
-				else if ( 
-					(c == 'Ú') || 
-					(c == 'Ù') || 
-					(c == 'Ü') || 
-					(c == 'Û')    
-					)
-				{ 
-					boost::iostreams::put(dest, 'U') ;
-				} 
-			    
-				else if ( 
-					(c == 'ç')
-					)
-				{ 
-					boost::iostreams::put(dest, 'c') ;
-				} 
-				else if (
-					(c == 'Ç')
-					)
-				{ 
-					boost::iostreams::put(dest, 'C') ;
+				else if (((unsigned int)c) == 0xFFFFFFc5 )
+				{
+					i++;
+					if(i == n)
+					{
+						boost::iostreams::put(dest, c) ;
+						break;
+					}
+					c = s[i];
+					switch((unsigned int)c)
+					{
+						case 0xFFFFFF93 : //'œ' = c593
+							boost::iostreams::put(dest, 'o');
+							boost::iostreams::put(dest, 'e');
+							break;
+						default ://Put last two chars
+							boost::iostreams::put(dest, s[i-1]) ;
+							boost::iostreams::put(dest, c);
+							break;
+					}
 				}
-				else if (
-					(c == '°')
-				){
-					boost::iostreams::put(dest, 'o');
-				}
-				else 
+				else
 				{
 					boost::iostreams::put(dest, c) ;
 				}
+				
 				++i;
 			}
 		    
