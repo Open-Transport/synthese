@@ -236,7 +236,7 @@ namespace synthese
 			if(penalties) totalScores /= penalties;
 
 			ComparisonScore score;
-			score.levenshtein = FrenchPhoneticString::Levenshtein(_source, s._source);
+			score.levenshtein = FrenchPhoneticString::Levenshtein(to_lower_copy(_source), to_lower_copy(s._source));
 			score.phoneticScore = totalScores;
 			return score;
 		}
