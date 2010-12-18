@@ -131,13 +131,13 @@ namespace synthese
 			// Search form
 			stream << "<h1>Recherche</h1>";
 
-			const Place* startPlace(NULL);
-			const Place* endPlace(NULL);
+			shared_ptr<const Place> startPlace;
+			shared_ptr<const Place> endPlace;
 
 			if (!_startCity.empty() && !_endCity.empty())
 			{
-				startPlace = RoadModule::FetchPlace(_startCity, _startPlace).get();
-				endPlace = RoadModule::FetchPlace(_endCity, _endPlace).get();
+				startPlace = RoadModule::FetchPlace(_startCity, _startPlace);
+				endPlace = RoadModule::FetchPlace(_endCity, _endPlace);
 			}
 
 			AdminFunctionRequest<RoadJourneyPlannerAdmin> searchRequest(_request);
@@ -145,27 +145,27 @@ namespace synthese
 			stream << st.open();
 			stream << st.cell("Commune d&eacute;part", st.getForm().getTextInput(
 						PARAMETER_START_CITY, 
-						startPlace ? 
-						(dynamic_cast<const City*>(startPlace) ? dynamic_cast<const City*>(startPlace)->getName() : dynamic_cast<const NamedPlace*>(startPlace)->getCity()->getName()) :
+						startPlace.get() ? 
+						(dynamic_cast<const City*>(startPlace.get()) ? dynamic_cast<const City*>(startPlace.get())->getName() : dynamic_cast<const NamedPlace*>(startPlace.get())->getCity()->getName()) :
 						_startCity
 				)	);
 			stream << st.cell("Lieu d&eacute;part", st.getForm().getTextInput(
 						PARAMETER_START_PLACE,
-						startPlace ? 
-						(dynamic_cast<const City*>(startPlace) ? string() : dynamic_cast<const NamedPlace*>(startPlace)->getName()) :
+						startPlace.get() ? 
+						(dynamic_cast<const City*>(startPlace.get()) ? string() : dynamic_cast<const NamedPlace*>(startPlace.get())->getName()) :
 						_startPlace
 				)	);
 			stream << st.row();
 			stream << st.cell("Commune arriv&eacute;e", st.getForm().getTextInput(
 						PARAMETER_END_CITY,
-						endPlace ? 
-						(dynamic_cast<const City*>(endPlace) ? dynamic_cast<const City*>(endPlace)->getName() : dynamic_cast<const NamedPlace*>(endPlace)->getCity()->getName()) :
+						endPlace.get() ? 
+						(dynamic_cast<const City*>(endPlace.get()) ? dynamic_cast<const City*>(endPlace.get())->getName() : dynamic_cast<const NamedPlace*>(endPlace.get())->getCity()->getName()) :
 						_endCity
 				)	);	
 			stream << st.cell("Lieu arriv&eacute;e", st.getForm().getTextInput(
 						PARAMETER_END_PLACE,
-						endPlace ? 
-						(dynamic_cast<const City*>(endPlace) ? string() : dynamic_cast<const NamedPlace*>(endPlace)->getName()) :
+						endPlace.get() ? 
+						(dynamic_cast<const City*>(endPlace.get()) ? string() : dynamic_cast<const NamedPlace*>(endPlace.get())->getName()) :
 						_endPlace
 				)	);
 			stream << st.close();
@@ -195,8 +195,8 @@ namespace synthese
 				1000
 			);
 			RoadJourneyPlanner r(
-				startPlace,
-				endPlace,
+				startPlace.get(),
+				endPlace.get(),
 				_planningOrder == DEPARTURE_FIRST ? now : endDate,
 				_planningOrder == DEPARTURE_FIRST ? endDate : now,
 				_planningOrder == DEPARTURE_FIRST ? now : endDate,
