@@ -23,7 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "LineStopTableSync.h"
-
+#include "JourneyPatternCopy.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "StopPointTableSync.hpp"
 
@@ -47,6 +47,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace geography;
+	using namespace graph;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,LineStopTableSync>::FACTORY_KEY("35.57.01 JourneyPattern stops");
 
@@ -141,6 +142,21 @@ namespace synthese
 				ls->setPhysicalStop(StopPointTableSync::GetEditable(fromPhysicalStopId, env, linkLevel).get());
 				
 				line->addEdge(*ls);
+
+				// Sublines update
+				BOOST_FOREACH(JourneyPatternCopy* copy, line->getSubLines())
+				{
+					Edge* newEdge(new LineStop(
+							0,
+							copy,
+							ls->getRankInPath(),
+							ls->isDeparture(),
+							ls->isArrival(),
+							ls->getMetricOffset(),
+							const_cast<StopPoint*>(ls->getPhysicalStop())
+					)	);
+					copy->addEdge(*newEdge);
+				}
 			}
 		}
 
@@ -149,19 +165,39 @@ namespace synthese
 		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Unlink(
 			LineStop* obj
 		){
-			// Removing edge from journey pattern
-			JourneyPattern* journeyPattern(obj->getLine());
-			journeyPattern->removeEdge(*obj);
-
-			// Removing edge from stop point
 			StopPoint* stop(obj->getPhysicalStop());
-			if(obj->getIsArrival())
+
+			// Collecting all line stops to unlink including journey pattern copies
+			typedef vector<pair<JourneyPattern*, LineStop*> > ToClean;
+			ToClean toClean;
+			toClean.push_back(make_pair(obj->getLine(), obj));
+			BOOST_FOREACH(JourneyPatternCopy* copy, obj->getLine()->getSubLines())
 			{
-				stop->removeArrivalEdge(obj);
+				toClean.push_back(make_pair(
+						copy,
+						const_cast<LineStop*>(static_cast<const LineStop*>(copy->getEdge(obj->getRankInPath())))
+				)	);
 			}
-			if(obj->getIsDeparture())
+
+			BOOST_FOREACH(const ToClean::value_type& it, toClean)
 			{
-				stop->removeDepartureEdge(obj);
+				// Removing edge from journey pattern
+				it.first->removeEdge(*it.second);
+
+				// Removing edge from stop point
+				if(it.second->getIsArrival())
+				{
+					stop->removeArrivalEdge(it.second);
+				}
+				if(it.second->getIsDeparture())
+				{
+					stop->removeDepartureEdge(it.second);
+				}
+
+				if(it.second != obj)
+				{
+					delete it.second;
+				}
 			}
 		}
 
