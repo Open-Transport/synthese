@@ -498,12 +498,29 @@ namespace synthese
 					@param value default text present in the text area at the page load
 					@param rows number of rows to be displayed (vertical size)
 					@param cols number of columns to be displayed (horizontal size)
+					@param tinyMCE activation or not of TinyMCE on this input field
 					@return std::string the HTML generated code
 					@author Hugues Romain
 					@date 2008-2010
 					@pre the value must not be already encoded with HTML entities
 				*/
-				std::string getTextAreaInput(const std::string& name, const std::string& value, int rows, int cols);
+				std::string getTextAreaInput(
+					const std::string& name,
+					const std::string& value,
+					std::size_t rows,
+					std::size_t cols,
+					bool tinyMCE
+				);
+
+
+				static std::string GetTextAreaInput(
+					const std::string& name,
+					const std::string& value,
+					std::size_t rows,
+					std::size_t cols,
+					bool tinyMCE,
+					std::string id = std::string()
+				);
 
 
 

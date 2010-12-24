@@ -222,6 +222,7 @@ namespace synthese
 			bool _doNotUseTemplate;
 			bool _hasForum;
 			bool _ignoreWhiteChars;
+			bool _rawEditor; //!< if false the editor is WYSIWYG editor
 
 
 
@@ -287,6 +288,7 @@ namespace synthese
 				const std::string& getSmartURLPath() const { return _smartURLPath; }
 				const std::string& getSmartURLDefaultParameterName() const { return _smartURLDefaultParameterName; }
 				bool getIgnoreWhiteChars() const { return _ignoreWhiteChars; }
+				bool getRawEditor() const { return _rawEditor; }
 			//@}
 
 			//! @name Setters
@@ -311,6 +313,7 @@ namespace synthese
 				void setSmartURLPath(const std::string& value){ _smartURLPath = value; }
 				void setSmartURLDefaultParameterName(const std::string& value){ _smartURLDefaultParameterName = value; }
 				void setIgnoreWhiteChars(bool value){ _ignoreWhiteChars = value; }
+				void setRawEditor(bool value){ _rawEditor = value; }
 			//@}
 
 			//! @name Services

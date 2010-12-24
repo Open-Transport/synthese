@@ -282,5 +282,20 @@ namespace synthese
 		{
 			_session = session;
 		}
+
+
+
+		html::AjaxForm Request::getAjaxForm( const std::string& name ) const
+		{
+			html::AjaxForm form(name, _clientURL);
+			ParametersMap map(_getParametersMap());
+			map.insert(PARAMETER_NO_REDIRECT_AFTER_ACTION, true);
+			map.remove(PARAMETER_FUNCTION);
+			BOOST_FOREACH(const ParametersMap::Map::value_type& it, map.getMap())
+			{
+				form.addHiddenField(it.first, it.second);
+			}
+			return form;
+		}
 	}
 }

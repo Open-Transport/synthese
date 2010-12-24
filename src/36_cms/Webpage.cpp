@@ -50,7 +50,8 @@ namespace synthese
 			_template(NULL),
 			_doNotUseTemplate(false),
 			_hasForum(false),
-			_ignoreWhiteChars(false)
+			_ignoreWhiteChars(false),
+			_rawEditor(false)
 		{
 		}
 

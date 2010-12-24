@@ -6,10 +6,10 @@
 #include "WebPageAddAction.h"
 #include "WebPageUpdateAction.h"
 #include "WebPageRemoveAction.h"
-#include "WebPageContentUpdateAction.hpp"
 #include "WebPageLinkAddAction.hpp"
 #include "WebPageLinkRemoveAction.hpp"
 #include "WebPageMoveAction.hpp"
+
 #include "BitAndFunction.hpp"
 #include "WebPageDisplayFunction.h"
 #include "WebPageLastNewsFunction.hpp"

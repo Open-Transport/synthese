@@ -169,7 +169,7 @@ namespace synthese
 				stream << t.title("Coordonnées");
 				stream << t.cell("Prénom", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_SURNAME, _user->getSurname()));
 				stream << t.cell("Nom", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_NAME, _user->getName()));
-				stream << t.cell("Adresse", t.getForm().getTextAreaInput(ReservationUserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50));
+				stream << t.cell("Adresse", t.getForm().getTextAreaInput(ReservationUserUpdateAction::PARAMETER_ADDRESS, _user->getAddress(), 4, 50, false));
 				stream << t.cell("Code postal", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_POSTAL_CODE, _user->getPostCode()));
 				stream << t.cell("Ville", t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_CITY, _user->getCityText()));
 				stream << t.cell("Téléphone",t.getForm().getTextInput(ReservationUserUpdateAction::PARAMETER_PHONE, _user->getPhone()));

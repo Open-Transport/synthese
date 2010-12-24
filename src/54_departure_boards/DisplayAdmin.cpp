@@ -339,7 +339,7 @@ namespace synthese
 						t.getForm().getTextAreaInput(
 							UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE,
 							_displayScreen->getMaintenanceMessage(),
-							3, 60
+							3, 60, false
 					)	)
 				;
 				stream << t.close();

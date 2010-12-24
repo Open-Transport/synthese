@@ -130,8 +130,8 @@ namespace synthese
 			stream << "<h1>Données XML à tester</h1>";
 			stream << st.open();
 			stream << st.cell("Tracer environnement partagé", st.getForm().getOuiNonRadioInput(PARAMETER_USE_ENVIRONMENT, _useEnvironment));
-			stream << st.cell("Données temporaires (XML)", st.getForm().getTextAreaInput(PARAMETER_DATA_XML, _dataXml, 5, 50));
-			stream << st.cell("Requète (XML)", st.getForm().getTextAreaInput(PARAMETER_QUERY_XML, _queryXml, 5, 50));
+			stream << st.cell("Données temporaires (XML)", st.getForm().getTextAreaInput(PARAMETER_DATA_XML, _dataXml, 5, 50, false));
+			stream << st.cell("Requète (XML)", st.getForm().getTextAreaInput(PARAMETER_QUERY_XML, _queryXml, 5, 50, false));
 			stream << st.close();
 
 			// Display

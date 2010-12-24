@@ -31,7 +31,7 @@
 #include "12_security/Types.h"
 #include "12_security/Constants.h"
 #include "ParametersMap.h"
-#include "HTMLForm.h"
+#include "AjaxForm.hpp"
 
 namespace synthese
 {
@@ -266,6 +266,8 @@ namespace synthese
 					@date 2007					
 				*/
 				html::HTMLForm getHTMLForm(std::string name=std::string()) const;
+
+				html::AjaxForm getAjaxForm(const std::string& name) const;
 
 				/** Query string getter for building links.
 					@return The query string corresponding to the request.

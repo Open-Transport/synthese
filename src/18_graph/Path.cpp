@@ -115,9 +115,26 @@ namespace synthese
 
 
 
-		const Edge* Path::getEdge (int index) const
+		const Edge* Path::getEdge(size_t index) const
 		{
-			return _edges[index];
+			if(_edges.empty())
+			{
+				throw Exception("Edge not found");
+			}
+
+			size_t rank(index);
+			if(rank >= _edges.size())
+			{
+				rank = _edges.size() - 1;
+			}
+			for(;rank > 0 && _edges[rank]->getRankInPath() > index; --rank) ;
+			
+			if(_edges[rank]->getRankInPath() == index)
+			{
+				return _edges[rank];
+			}
+
+			throw Exception("Edge not found");
 		}
 
 

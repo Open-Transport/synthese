@@ -113,7 +113,12 @@ namespace synthese
 			//@{
 				virtual const RuleUser* _getParentRuleUser() const;
 
-				const Edge*					getEdge (int index) const;
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the edge at the specified rank.
+				/// @param index the rank of the edge (which is not necessarily equal to the index of the object in the _edges vector)
+				/// @return the specified edge
+				/// @throws Exception if the edge was not found
+				const Edge*	getEdge (std::size_t index) const;
 
 				Edge*	getLastEdge()	const;
 

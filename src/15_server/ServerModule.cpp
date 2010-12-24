@@ -276,7 +276,12 @@ namespace synthese
 		  {
 			if (in[i] == '%')
 			{
-			  if (i + 3 <= in.size())
+				if(i+2 <= in.size() && in[i+1] == 'u')
+				{
+					// Non standard unicode character is rejected
+					i+=5;
+				}
+				else if (i + 3 <= in.size())
 			  {
 				int value;
 				std::istringstream is(in.substr(i + 1, 2));

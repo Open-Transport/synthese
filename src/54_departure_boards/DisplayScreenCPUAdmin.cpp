@@ -177,7 +177,7 @@ namespace synthese
 						t.getForm().getTextAreaInput(
 							DisplayScreenCPUMaintenanceUpdateAction::PARAMETER_MAINTENANCE_MESSAGE,
 							_cpu->getMaintenanceMessage(),
-							3, 60
+							3, 60, false
 					)	)
 				;
 				stream <<

@@ -28,7 +28,6 @@ synthese::cms::ChrFunction::integrate();
 synthese::cms::WebPageAddAction::integrate();
 synthese::cms::WebPageUpdateAction::integrate();
 synthese::cms::WebPageRemoveAction::integrate();
-synthese::cms::WebPageContentUpdateAction::integrate();
 synthese::cms::WebPageLinkAddAction::integrate();
 synthese::cms::WebPageLinkRemoveAction::integrate();
 synthese::cms::WebPageMoveAction::integrate();

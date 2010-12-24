@@ -63,6 +63,7 @@ namespace synthese
 		{
 		public:
 			static const std::string TAB_CONTENT;
+			static const std::string TAB_PROPERTIES;
 			static const std::string TAB_TREE;
 			static const std::string TAB_LINKS;
 			
@@ -195,6 +196,7 @@ namespace synthese
 			/// The following tabs are created :
 			///	<ul>
 			///		<li>co : Contenu : edition of the content of the page</li>
+			///		<li>pr : Properties : edition of the properties of the page</li>
 			///		<li>tr : Arborescence : edition of the position of the page in the site, handling of sub-pages</li>
 			///		<li>li : Liens : edition of the links starting from the page</li>
 			///	</ul>
