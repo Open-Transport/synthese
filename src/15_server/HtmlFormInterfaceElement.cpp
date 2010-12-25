@@ -108,7 +108,7 @@ namespace synthese
 				stringstream s;
 				s	<<
 					request->getClientURL() << Request::PARAMETER_STARTER <<
-					Request::PARAMETER_FUNCTION << Request::PARAMETER_ASSIGNMENT << functionKey
+					Request::PARAMETER_SERVICE << Request::PARAMETER_ASSIGNMENT << functionKey
 					<< Request::PARAMETER_SEPARATOR << RequestWithInterface::PARAMETER_INTERFACE << Request::PARAMETER_ASSIGNMENT << _page->getInterface()->getKey()
 					;
 					

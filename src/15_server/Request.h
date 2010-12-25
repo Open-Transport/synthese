@@ -148,6 +148,7 @@ namespace synthese
 
 			static const std::string PARAMETER_STARTER;
 			static const std::string PARAMETER_FUNCTION;
+			static const std::string PARAMETER_SERVICE;
 			static const std::string PARAMETER_SESSION;
 			static const std::string PARAMETER_OBJECT_ID;
 			static const std::string PARAMETER_ACTION;

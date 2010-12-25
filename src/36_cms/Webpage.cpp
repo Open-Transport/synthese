@@ -460,6 +460,7 @@ namespace synthese
 				ParametersMap()
 			);
 			requestParametersMap.remove(Request::PARAMETER_FUNCTION);
+			requestParametersMap.remove(Request::PARAMETER_SERVICE);
 			pm.merge(requestParametersMap);
 			if(CMSModule::GetSite(request).get())
 			{

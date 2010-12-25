@@ -78,6 +78,7 @@ namespace synthese
 			_otherParameters.remove(PARAMETER_TARGET);
 			_otherParameters.remove(PARAMETER_TEXT);
 			_otherParameters.remove(Request::PARAMETER_FUNCTION);
+			_otherParameters.remove(Request::PARAMETER_SERVICE);
 			_useSmartURL = map.getDefault<bool>(PARAMETER_USE_SMART_URL, true);
 		}
 

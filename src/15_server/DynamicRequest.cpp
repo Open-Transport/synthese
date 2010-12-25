@@ -172,7 +172,11 @@ namespace synthese
 			}
 
 			// Function name
-			std::string functionName(_parametersMap.getDefault<std::string>(Request::PARAMETER_FUNCTION));
+			std::string functionName(_parametersMap.getDefault<std::string>(Request::PARAMETER_SERVICE));
+			if(functionName.empty())
+			{
+				functionName = _parametersMap.getDefault<std::string>(Request::PARAMETER_FUNCTION);
+			}
 			if(!functionName.empty())
 			{
 				if(	!util::Factory<Function>::contains(functionName))
