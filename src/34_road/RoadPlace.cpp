@@ -182,6 +182,8 @@ namespace synthese
 						MainRoadChunk::HouseNumber currentDifference(MainRoadChunk::HouseNumber_MAX);
 						MainRoadChunk::HouseNumber currentBestNumber(0);
 
+						bool closestIsFirst = true;
+
 						if(chunk.getLeftHouseNumberBounds())
 						{
 							if( (  (   chunk.getLeftHouseNumberingPolicy() == MainRoadChunk::ODD)  && (houseNumber % 2)    )
@@ -209,6 +211,7 @@ namespace synthese
 									{
 										currentDifference = houseNumber - chunk.getLeftHouseNumberBounds()->second;
 										currentBestNumber = chunk.getLeftHouseNumberBounds()->second;
+										closestIsFirst = false;
 									}
 								}
 								else
@@ -217,6 +220,7 @@ namespace synthese
 									{
 										currentDifference = chunk.getLeftHouseNumberBounds()->second - houseNumber;
 										currentBestNumber = chunk.getLeftHouseNumberBounds()->second;
+										closestIsFirst = false;
 									}
 								}
 							}
@@ -238,6 +242,7 @@ namespace synthese
 									{
 										currentDifference = houseNumber - chunk.getRightHouseNumberBounds()->first;
 										currentBestNumber = chunk.getRightHouseNumberBounds()->first;
+										closestIsFirst = true;
 									}
 								}
 								else
@@ -246,6 +251,7 @@ namespace synthese
 									{
 										currentDifference = chunk.getRightHouseNumberBounds()->first - houseNumber;
 										currentBestNumber = chunk.getRightHouseNumberBounds()->first;
+										closestIsFirst = true;
 									}
 								}
 
@@ -255,6 +261,7 @@ namespace synthese
 									{
 										currentDifference = houseNumber - chunk.getRightHouseNumberBounds()->second;
 										currentBestNumber = chunk.getRightHouseNumberBounds()->second;
+										closestIsFirst = false;
 									}
 								}
 								else
@@ -263,6 +270,7 @@ namespace synthese
 									{
 										currentDifference = chunk.getRightHouseNumberBounds()->second - houseNumber;
 										currentBestNumber = chunk.getRightHouseNumberBounds()->second;
+										closestIsFirst = false;
 									}
 								}
 							}
@@ -272,7 +280,10 @@ namespace synthese
 						{
 							difference = currentDifference;
 							bestNumber = currentBestNumber;
-							nearestChunk = &chunk;
+							if(closestIsFirst)
+								nearestChunk = &chunk;
+							else
+								nearestChunk = static_cast<RoadChunk*>(chunk.getNextEdge());
 						}
 					}
 				}
