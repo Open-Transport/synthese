@@ -283,7 +283,7 @@ namespace synthese
 							if(closestIsFirst)
 								nearestChunk = &chunk;
 							else
-								nearestChunk = static_cast<RoadChunk*>(chunk.getNextEdge());
+								nearestChunk = static_cast<MainRoadChunk*>(chunk.getNextEdge());
 						}
 					}
 				}
