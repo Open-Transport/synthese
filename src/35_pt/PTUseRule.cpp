@@ -52,6 +52,7 @@ namespace synthese
 		):	Registrable(key),
 			_accessCapacity(0),
 			_reservationType(RESERVATION_RULE_FORBIDDEN),
+			_originIsReference(false),
 			_minDelayMinutes(minutes(0)),
 			_minDelayDays(days(0)),
 			_maxDelayDays(not_a_date_time),
@@ -151,7 +152,7 @@ namespace synthese
 					RUN_NOT_POSSIBLE
 				;
 			}
-			
+
 			return RUN_NOT_POSSIBLE;
 		}
 
@@ -259,7 +260,7 @@ namespace synthese
 					}
 				}
 			}
-			
+
 			return RESERVATION_FORBIDDEN;
 		}
 
