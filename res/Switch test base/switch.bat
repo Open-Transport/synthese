@@ -1,5 +1,6 @@
 @echo off
-CD
+IF EXIST basename.bat ECHO Base en cours :
+IF EXIST basename.bat TYPE basename.bat
 DIR /B config-*.db3
 SET /P BASE=[Select the database to activate]
 IF NOT EXIST config-%BASE%.db3 GOTO err
