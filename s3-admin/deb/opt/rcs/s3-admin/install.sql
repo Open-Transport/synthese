@@ -26,6 +26,8 @@ REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime
 <style type="text/css">@import url(colors.css); @import url(admin.css); @import url(calendar-win2k-1.css);</style>
 <script type="text/javascript" src="calendar.js"></script><script type="text/javascript" src="lang/calendar-fr.js"></script><script type="text/javascript" src="calendar-setup.js"></script>
 <script type="text/javascript" src="treeview.js"></script>
+<script type="text/javascript" src="tiny_mce/tiny_mce_src.js"></script>
+<script type="text/javascript" src="ajax_forms.js"></script>
 </head>
 <body>
 <div id="wrapall">

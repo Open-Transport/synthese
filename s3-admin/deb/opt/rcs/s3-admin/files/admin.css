@@ -120,6 +120,7 @@ table.searchform td.submitcell { text-align:right; cursor:pointer; }
 
 
 .adminresults img { border:none; vertical-align:middle; } 
+table.adminresults th, table.propertysheet th, table.adminresults tfoot td, table.propertysheet tfoot td { background-color:#999999; color:#ffffff; border:solid #dcdddd 1px; }
 table.adminresults th, table.propertysheet th { background-color:#999999; vertical-align:middle; padding:0.2em 1em; color:#ffffff; border:solid #dcdddd 1px; }
 table.adminresults a { color:#333333; text-decoration:none; }
 table.adminresults a:hover { color:#ffffff; }  
@@ -163,7 +164,11 @@ li.log { background-image:url(book_open.png); }
 #admin_tabs .active_tab { background-color:#999999; color:white; }
 #admin_tabs .active_tab:hover { cursor:default; }
 
+.up_down_button { width:16px; display:inline-block;}
+
 span.line { padding: 0 5px 0 5px; font-weight:bold; margin: 0 1px 0 1px; }
+
+.waiting textarea, .waiting input { opacity:0.3;  filter : alpha(opacity=30); }
 
 @media print
 {
