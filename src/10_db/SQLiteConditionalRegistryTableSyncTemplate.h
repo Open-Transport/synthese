@@ -50,7 +50,7 @@ namespace synthese
 
 
 			//////////////////////////////////////////////////////////////////////////
-			/// Static method to be implemented by template instanciation 
+			/// Static method to be implemented by template instantiation
 			/// determinating if a row corresponds to an object that must be
 			/// loaded into phyisical memory or not.
 			/// @param row row to read
