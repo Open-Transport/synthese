@@ -69,7 +69,7 @@ namespace synthese
 			 */
 			SentScenario(util::RegistryKeyType key = 0);
 			
-			/** Template instanciation constructor.
+			/** Template instantiation constructor.
 			 * 
 			 * @param source the template
 			 */

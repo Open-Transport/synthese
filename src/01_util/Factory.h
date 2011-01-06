@@ -153,7 +153,7 @@ namespace synthese
 			/// Gets a creator to avoid future search in the map operations.
 			/// @param key key to search
 			/// @return creator
-			/// @throws FactoryException<RootObject> if the key wss not found in the map
+			/// @throws FactoryException<RootObject> if the key was not found in the map
 			/// @author Hugues Romain
 			/// @since 3.2.0
 			/// @date 2010
