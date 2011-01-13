@@ -106,5 +106,12 @@ namespace synthese
 				SetParameter (name, defv);
 			}
 	    }
-	}
-}
+
+
+
+		void ModuleClass::addAdminPageParameters(
+			ParametersMap& map,
+			const admin::AdminRequest& request
+		) const	{
+		}
+}	}

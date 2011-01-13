@@ -356,6 +356,11 @@ namespace synthese
 			);
 			pm.insert(DATA_CONTENT, contentStream.str());
 
+			BOOST_FOREACH(shared_ptr<ModuleClass> module, Factory<ModuleClass>::GetNewCollection())
+			{
+				module->addAdminPageParameters(pm, adminRequest);
+			}
+
 			// logout_url
 			StaticActionFunctionRequest<LogoutAction,AdminFunction> logoutRequest(request, true);
 			pm.insert(DATA_LOGOUT_URL, logoutRequest.getURL());

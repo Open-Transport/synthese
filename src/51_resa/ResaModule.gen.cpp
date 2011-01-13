@@ -26,8 +26,6 @@ synthese::resa::ReservationEditInterfacePage::integrate();
 synthese::resa::ReservationCancellationEMailSubjectInterfacePage::integrate();
 synthese::resa::ReservationCancellationEMailContentInterfacePage::integrate();
 
-synthese::resa::ResaCallButtonInterfaceElement::integrate();
-
 synthese::resa::ReservationTableSync::integrate();
 synthese::resa::ReservationTransactionTableSync::integrate();
 synthese::resa::OnlineReservationRuleTableSync::integrate();
