@@ -160,6 +160,10 @@ namespace synthese
 			static const std::string _ADMIN_PROFILE_NAME;
 			static const std::string _RESERVATION_CONTACT_PARAMETER;
 
+			static const std::string DATA_SWITCH_CALL_URL;
+			static const std::string DATA_CURRENT_CALL_ID;
+			static const std::string DATA_CURRENT_CALL_TIMESTAMP;
+
 			static boost::shared_ptr<security::Profile>	_basicProfile;
 			static boost::shared_ptr<security::Profile>	_autoresaProfile;
 			static boost::shared_ptr<security::Profile>	_adminProfile;
@@ -189,6 +193,20 @@ namespace synthese
 			static std::string GetStatusText(ReservationStatus status);
 
 			static OnlineReservationRule* GetReservationContact();
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Adds parameters to send to the display template for admin pages.
+			/// The default implementation does nothing. Overload the method to
+			/// add such a feature.
+			/// @param map the map to update
+			/// @param request the current admin request
+			/// @author Hugues Romain
+			/// @date 2011
+			/// @since 3.2.0
+			virtual void addAdminPageParameters(
+				server::ParametersMap& map,
+				const admin::AdminRequest& request
+			) const;
 		};
 	}
 	/** @} */

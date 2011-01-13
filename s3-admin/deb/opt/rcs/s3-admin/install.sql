@@ -41,9 +41,9 @@ if {{callcustomer}} {{print { avec } {{callcustomer}}}}
 if {{callduration}} {{print {<span id="calldurationspan"></span><script type="text/javascript>durationSinceCallStart=} {{callduration}} {; updateCallStopwatch()</script>}}}
 print {</div>}
 -->
-<!--
-callbutton {phone.png} {Prendre appel} {phone_delete.png} {Stopper appel}
--->
+
+<?if&cond=<@switch_call_url@>&then=<a class="linkbutton" onmouseover="this.className=''activatedlinkbutton'';" onmouseout="this.className=''linkbutton'';" onmousedown="this.className=''clickedlinkbutton'';" onmouseup="this.className=''activatedlinkbutton'';" href="<@switch_call_url@>"><img src="phone.png" alt="P" /> <?if&cond=<@current_call_id@>&then=Stopper l''appel&else=Prendre un appel?></a>?>
+
 </div>
 
 <div id="adminpos">&nbsp;<@position@></div>
