@@ -243,7 +243,9 @@ namespace synthese
 							addRequest.getAction()->setCreatePhysicalStop(true);
 							addRequest.getAction()->setName(bahnhof.second.name);
 							addRequest.getAction()->setCityName(bahnhof.second.cityName);
-							addRequest.getAction()->setOperatorCode(bahnhof.first);
+							Importable::DataSourceLinks links;
+							links.insert(make_pair(&_dataSource, bahnhof.first));
+							addRequest.getAction()->setDataSourceLinks(links);
 							addRequest.getAction()->setPoint(DBModule::GetStorageCoordinatesSystem().convertPoint(*bahnhof.second.coords));
 							stream << HTMLModule::getLinkButton(addRequest.getURL(), "Ajouter");
 						}

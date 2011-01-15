@@ -218,7 +218,6 @@ namespace synthese
 					stream << t.cell("Localité", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_CITY_ID, lexical_cast<string>(_connectionPlace->getCity()->getKey())));
 					stream << t.cell("Arrêt principal", t.getForm().getOuiNonRadioInput(StopAreaNameUpdateAction::PARAMETER_IS_MAIN, _connectionPlace->getCity()->includes(_connectionPlace.get())));
 					stream << t.cell("Nom", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_NAME, _connectionPlace->getName()));
-					stream << t.cell("Code import", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_CODE, _connectionPlace->getCodeBySource()));
 					stream << t.title("Destination sur afficheur");
 					stream << t.cell("Nom court", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_SHORT_NAME, _connectionPlace->getName13()));
 					stream << t.cell("Nom moyen", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_LONG_NAME, _connectionPlace->getName26()));

@@ -52,7 +52,6 @@ namespace synthese
 		const string StopAreaNameUpdateAction::PARAMETER_SHORT_NAME = Action_PARAMETER_PREFIX + "sn";
 		const string StopAreaNameUpdateAction::PARAMETER_LONG_NAME = Action_PARAMETER_PREFIX + "ln";
 		const string StopAreaNameUpdateAction::PARAMETER_CITY_ID = Action_PARAMETER_PREFIX + "ci";
-		const string StopAreaNameUpdateAction::PARAMETER_CODE = Action_PARAMETER_PREFIX + "co";
 		const string StopAreaNameUpdateAction::PARAMETER_IS_MAIN = Action_PARAMETER_PREFIX + "ma";
 		const string StopAreaNameUpdateAction::PARAMETER_TIMETABLE_NAME = Action_PARAMETER_PREFIX + "tn";
 
@@ -72,7 +71,6 @@ namespace synthese
 			map.insert(PARAMETER_LONG_NAME, _longName);
 			map.insert(PARAMETER_SHORT_NAME, _shortName);
 			map.insert(PARAMETER_NAME, _name);
-			map.insert(PARAMETER_CODE, _code);
 			map.insert(PARAMETER_IS_MAIN, _isMain);
 			map.insert(PARAMETER_TIMETABLE_NAME, _timetableName);
 			return map;
@@ -99,7 +97,6 @@ namespace synthese
 			_name = map.get<string>(PARAMETER_NAME);
 			_shortName = map.get<string>(PARAMETER_SHORT_NAME);
 			_longName = map.get<string>(PARAMETER_LONG_NAME);
-			_code = map.get<string>(PARAMETER_CODE);
 			_isMain = map.get<bool>(PARAMETER_IS_MAIN);
 			_timetableName = map.get<string>(PARAMETER_TIMETABLE_NAME);
 		}
@@ -116,7 +113,6 @@ namespace synthese
 			_place->setName(_name);
 			_place->setName13(_shortName);
 			_place->setName26(_longName);
-			_place->setCodeBySource(_code);
 			_place->setTimetableName(_timetableName);
 			if(_isMain && !_city->includes(_place.get()))
 			{

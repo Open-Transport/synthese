@@ -1101,7 +1101,9 @@ namespace synthese
 				
 				cline->setNetwork(network.get());
 				cline->setName(clineNameNode.getText());
-				cline->setCreatorId(ckey);
+				Importable::DataSourceLinks links;
+				links.insert(make_pair(&_dataSource, ckey));
+				cline->setDataSourceLinks(links);
 				if(!clineShortNameNode.isEmpty())
 				{
 					cline->setShortName(clineShortNameNode.getText());
@@ -1247,7 +1249,9 @@ namespace synthese
 						{
 							// Commercial stop point creation with some default values
 							curStop.reset(new StopArea);
-							curStop->setCodeBySource(stopKey);
+							Importable::DataSourceLinks links;
+							links.insert(make_pair(&_dataSource, stopKey));
+							curStop->setDataSourceLinks(links);
 							curStop->setAllowedConnection(true);
 							curStop->setDefaultTransferDelay(_defaultTransferDuration);
 							curStop->setKey(StopAreaTableSync::getId());
@@ -1322,7 +1326,9 @@ namespace synthese
 					}
 					curStop.reset(new StopPoint);
 					curStop->setHub(itcstop->second);
-					curStop->setCodeBySource(stopKey);
+					Importable::DataSourceLinks links;
+					links.insert(make_pair(&_dataSource, stopKey));
+					curStop->setDataSourceLinks(links);
 					curStop->setKey(StopPointTableSync::getId());
 					_env.getEditableRegistry<StopPoint>().add(curStop);
 
@@ -1496,9 +1502,10 @@ namespace synthese
 					route.reset(new JourneyPattern);
 					route->setCommercialLine(cline.get());
 					route->setName(routeNames[routeIdNode.getText()]);
-					route->setCodeBySource(routeNames[routeIdNode.getText()]);
+					Importable::DataSourceLinks links;
+					links.insert(make_pair(&_dataSource, routeNames[routeIdNode.getText()]));
+					route->setDataSourceLinks(links);
 					route->setWayBack(routeWaybacks[routeIdNode.getText()]);
-					route->setDataSource(&_dataSource);
 					route->setKey(JourneyPatternTableSync::getId());
 					_env.getEditableRegistry<JourneyPattern>().add(route);
 					createdObjects.insert(route->getKey());

@@ -32,6 +32,7 @@
 #include "DataSourceTableSync.h"
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"
+#include "ImportableTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -127,7 +128,7 @@ namespace synthese
 			line->setWayBack(rows->getBool(JourneyPatternTableSync::COL_WAYBACK));
 			line->setRollingStock(NULL);
 			line->setCommercialLine(NULL);
-			line->setDataSource(NULL);
+			line->cleanDataSourceLinks();
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
@@ -144,21 +145,12 @@ namespace synthese
 					Log::GetInstance().warn("Bad value " + lexical_cast<string>(commercialLineId) + " for fare in line " + lexical_cast<string>(line->getKey()));
 				}
 
-				RegistryKeyType dataSourceId(rows->getLongLong(JourneyPatternTableSync::COL_DATASOURCE_ID));
-				if(dataSourceId > 0)
-				{
-					try
-					{
-						line->setDataSource(
-							DataSourceTableSync::Get(dataSourceId, env, linkLevel).get()
-						);
-					}
-					catch(ObjectNotFoundException<DataSource>)
-					{
-						Log::GetInstance().warn("Bad value " + lexical_cast<string>(dataSourceId) + " for data source in line " + lexical_cast<string>(line->getKey()));
-					}
-				}
-
+				// Data sources and operator codes
+				line->setDataSourceLinks(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(JourneyPatternTableSync::COL_DATASOURCE_ID),
+						env
+				)	);
 
 				RegistryKeyType rollingStockId (rows->getLongLong (JourneyPatternTableSync::COL_ROLLINGSTOCKID));
 				if(rollingStockId > 0)
@@ -242,7 +234,10 @@ namespace synthese
 				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() : RegistryKeyType(0)
 			);
 			query.addField(object->getWayBack());
-			query.addField(object->getDataSource() ? object->getDataSource()->getKey() : RegistryKeyType(0));
+			query.addField(
+				ImportableTableSync::SerializeDataSourceLinks(
+					object->getDataSourceLinks()
+			)	);
 			query.execute(transaction);
 		}
 

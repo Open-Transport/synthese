@@ -54,8 +54,15 @@ namespace synthese
 		):	Hub(),
 			Vertex(this, geometry),
 			Registrable(key),
-			Importable(codeBySource, source)
-		{}
+			Importable()
+		{
+			if(source)
+			{
+				DataSourceLinks links;
+				links.insert(make_pair(source, codeBySource));
+				setDataSourceLinks(links);
+			}
+		}
 		
 		
 		

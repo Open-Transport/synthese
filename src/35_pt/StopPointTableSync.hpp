@@ -73,8 +73,7 @@ namespace synthese
 			static const std::string COL_OPERATOR_CODE;
 			static const std::string COL_PROJECTED_ROAD_CHUNK_ID;
 			static const std::string COL_PROJECTED_METRIC_OFFSET;
-			static const std::string COL_GEOMETRY;
-
+			
 
 
 			//////////////////////////////////////////////////////////////////////////

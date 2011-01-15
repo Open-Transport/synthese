@@ -27,6 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "Importable.h"
 
 namespace synthese
 {
@@ -57,7 +58,6 @@ namespace synthese
 		///		<li>actionParamln : name for display on 26 characters wide screens</li>
 		///		<li>actionParamtn : timetable name</li>
 		///		<li>actionParamci : city id</li>
-		///		<li>actionParamco : code of the place in the source database (if imported)</li>
 		///		<li>actionParamma : wether the stop is selected as default in the city when no stop is specified</li>
 		///	</ul>
 		class StopAreaNameUpdateAction:
@@ -70,7 +70,6 @@ namespace synthese
 			static const std::string PARAMETER_SHORT_NAME;
 			static const std::string PARAMETER_LONG_NAME;
 			static const std::string PARAMETER_CITY_ID;
-			static const std::string PARAMETER_CODE;
 			static const std::string PARAMETER_IS_MAIN;
 
 		private:
@@ -78,7 +77,6 @@ namespace synthese
 			std::string _name;
 			std::string _shortName;
 			std::string _longName;
-			std::string _code;
 			boost::shared_ptr<geography::City> _city;
 			bool _isMain;
 			std::string _timetableName;

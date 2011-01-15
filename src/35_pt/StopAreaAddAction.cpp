@@ -32,6 +32,8 @@
 #include "SQLiteTransaction.h"
 #include "CityTableSync.h"
 #include "CoordinatesSystem.hpp"
+#include "DataSourceTableSync.h"
+#include "ImportableTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -45,6 +47,7 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace geography;
+	using namespace impex;
 	
 	namespace util
 	{
@@ -58,6 +61,7 @@ namespace synthese
 		const string StopAreaAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "sn";
 		const string StopAreaAddAction::PARAMETER_CREATE_CITY_IF_NECESSARY = Action_PARAMETER_PREFIX + "cc";
 		const string StopAreaAddAction::PARAMETER_PHYSICAL_STOP_OPERATOR_CODE = Action_PARAMETER_PREFIX + "sc";
+		const string StopAreaAddAction::PARAMETER_PHYSICAL_STOP_DATA_SOURCE_ID = Action_PARAMETER_PREFIX + "ds";
 		const string StopAreaAddAction::PARAMETER_CREATE_PHYSICAL_STOP = Action_PARAMETER_PREFIX + "cp";
 		const string StopAreaAddAction::PARAMETER_PHYSICAL_STOP_X = Action_PARAMETER_PREFIX + "xx";
 		const string StopAreaAddAction::PARAMETER_PHYSICAL_STOP_Y = Action_PARAMETER_PREFIX + "yy";
@@ -78,12 +82,21 @@ namespace synthese
 			map.insert(PARAMETER_NAME, _name);
 			map.insert(PARAMETER_CREATE_PHYSICAL_STOP, _createPhysicalStop);
 			map.insert(PARAMETER_CREATE_CITY_IF_NECESSARY, _createCityIfNecessary);
-			map.insert(PARAMETER_PHYSICAL_STOP_OPERATOR_CODE, _physicalStopOperatorCode);
 			if(_point.get() && !_point->isEmpty())
 			{
 				map.insert(PARAMETER_PHYSICAL_STOP_X, _point->getX());
 				map.insert(PARAMETER_PHYSICAL_STOP_Y, _point->getY());
 			}
+			if(_dataSourceLinks.size() == 1)
+			{
+				if(_dataSourceLinks.begin()->first)
+				{
+					map.insert(PARAMETER_PHYSICAL_STOP_DATA_SOURCE_ID, _dataSourceLinks.begin()->first->getKey());
+				}
+				if(!_dataSourceLinks.begin()->second.empty())
+				{
+					map.insert(PARAMETER_PHYSICAL_STOP_OPERATOR_CODE, _dataSourceLinks.begin()->second);
+			}	}
 			return map;
 		}
 		
@@ -111,8 +124,26 @@ namespace synthese
 			}
 
 			_name = map.get<string>(PARAMETER_NAME);
-			_physicalStopOperatorCode = map.getDefault<string>(PARAMETER_PHYSICAL_STOP_OPERATOR_CODE);
 			_createPhysicalStop = map.getDefault<bool>(PARAMETER_CREATE_PHYSICAL_STOP, false);
+			string operatorCode(map.getDefault<string>(PARAMETER_PHYSICAL_STOP_OPERATOR_CODE));
+			DataSource* source(NULL);
+			try
+			{
+				RegistryKeyType sourceId(map.getDefault<RegistryKeyType>(PARAMETER_PHYSICAL_STOP_DATA_SOURCE_ID));
+				if(sourceId)
+				{
+					source = DataSourceTableSync::GetEditable(sourceId, *_env).get();
+				}
+			}
+			catch(ObjectNotFoundException<DataSource>)
+			{
+				throw ActionException("Data source not found");
+			}
+			if(source || !operatorCode.empty())
+			{
+				_dataSourceLinks.insert(make_pair(source, operatorCode));
+			}
+
 			optional<double> x(map.getOptional<double>(PARAMETER_PHYSICAL_STOP_X));
 			optional<double> y(map.getOptional<double>(PARAMETER_PHYSICAL_STOP_Y));
 			if(x && y)
@@ -145,7 +176,6 @@ namespace synthese
 			stopArea.setCity(_city.get());
 			stopArea.setKey(StopAreaTableSync::getId());
 			stopArea.setDefaultTransferDelay(minutes(2));
-
 			stopArea.setName(_name);
 			StopAreaTableSync::Save(&stopArea, transaction);
 
@@ -154,7 +184,7 @@ namespace synthese
 				StopPoint stop;
 				stop.setName(_name);
 				stop.setHub(&stopArea);
-				stop.setCodeBySource(_physicalStopOperatorCode);
+				stop.setDataSourceLinks(_dataSourceLinks);
 				stop.setGeometry(_point);
 				StopPointTableSync::Save(&stop, transaction);
 			}

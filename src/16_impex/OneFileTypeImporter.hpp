@@ -24,6 +24,7 @@
 #define SYNTHESE_impex_OneFileTypeImporter_hpp__
 
 #include "Importer.hpp"
+#include <boost/algorithm/string/split.hpp>
 
 namespace synthese
 {
@@ -65,14 +66,15 @@ namespace synthese
 				const server::ParametersMap& map,
 				bool doImport
 			){
-				boost::tokenizer<boost::char_separator<char> > pathsTokens(
-					map.get<std::string>(PARAMETER_PATH),
-					boost::char_separator<char>(",")
-				);
-				BOOST_FOREACH(const std::string& token, pathsTokens)
+				if(map.getOptional<string>(PARAMETER_PATH))
 				{
-					if(token.empty()) continue;
-					_pathsSet.insert(token);
+					vector<string> pathsVector;
+					boost::algorithm::split(pathsVector, map.get<std::string>(PARAMETER_PATH), boost::is_any_of(","));
+					BOOST_FOREACH(const std::string& token, pathsVector)
+					{
+						if(token.empty()) continue;
+						_pathsSet.insert(token);
+					}
 				}
 				_setFromParametersMap(map);
 			}

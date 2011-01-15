@@ -26,7 +26,11 @@
 #ifndef SYNTHESE_Importable_h__
 #define SYNTHESE_Importable_h__
 
+#include "Registrable.h"
+#include "Exception.h"
+
 #include <string>
+#include <map>
 
 namespace synthese
 {
@@ -36,44 +40,77 @@ namespace synthese
 
 		////////////////////////////////////////////////////////////////////////
 		/// Importable class.
+		/// Defines links between data sources and an object.
+		/// A link can contain the id of the object in the source database. Such
+		/// an id can follow any pattern The only one limitation is not to
+		/// contain the | or , characters.
+		/// For historical reasons, an importable object can know its code in
+		/// the database of its owner, without knowing its datasource.
+		//////////////////////////////////////////////////////////////////////////
+		/// @author Hugues Romain
 		/// @ingroup m16
-		class Importable
+		class Importable:
+			virtual public util::Registrable
 		{
 		public:
+			typedef std::map<const DataSource*, std::string> DataSourceLinks;
+
+			class NotLinkedWithSourceException : public synthese::Exception
+			{
+			public:
+				NotLinkedWithSourceException(
+					const Importable& object,
+					const DataSource& source
+				);
+			};
+
+			class NotHaveUnknownDataSource : public Exception
+			{
+			public:
+				NotHaveUnknownDataSource(
+					const Importable& object
+				);
+			};
 			
 		private:
 			// Attributes
-			std::string			_codeBySource;
-			const DataSource*	_dataSource;
+			DataSourceLinks _dataSourceLinks;
 
 		public:
 			/////////////////////////////////////////////////////////////////////
 			/// DataSource Constructor.
-			Importable(
-				const std::string codeBySource = std::string(),
-				const DataSource* const source = NULL
-			):	_codeBySource(codeBySource),
-				_dataSource(source)
-			{}
+			Importable();
 			
 			//! @name Getters
 			//@{
-				const std::string& getCodeBySource() const { return _codeBySource; }
-				const DataSource* getDataSource() const { return _dataSource; }
+				const DataSourceLinks& getDataSourceLinks() const { return _dataSourceLinks; }
 			//@}
 		
 			//! @name Setters
 			//@{
-				void setCodeBySource(const std::string& value) { _codeBySource = value; }
-				void setDataSource(const DataSource* value) { _dataSource = value; }
+				void setDataSourceLinks(const DataSourceLinks& value){ _dataSourceLinks = value; }
 			//@}
 
 			//! @name Modifiers
 			//@{
+				void setCodeBySource(const DataSource& source, const std::string& code);
+
+				void cleanDataSourceLinks();
 			//@}
 
-			//! @name Queries
+			//! @name Services
 			//@{
+				bool hasLinkWithSource(const DataSource& source) const;
+
+				bool hasUnknownOwner() const;
+
+				const std::string& getCodeBySource(const DataSource& source) const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the code in the object owner database.
+				/// @throws NotLinkedWithSourceException if the object does not have an
+				/// anonymous owner.
+				const std::string& getCodeBySource() const;
 			//@}
 		
 			//! @name Static algorithms

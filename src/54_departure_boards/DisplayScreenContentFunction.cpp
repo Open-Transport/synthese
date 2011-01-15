@@ -344,7 +344,12 @@ namespace synthese
 			const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
 
 			stream <<"<line id=\""<< commercialLine->getKey() <<
-				"\" creatorId=\"" << commercialLine->getCreatorId() <<
+				"\" creatorId=\"";
+			if(!commercialLine->getDataSourceLinks().empty())
+			{
+				stream << commercialLine->getDataSourceLinks().begin()->second;
+			}
+			stream <<
 				"\" name=\""      << commercialLine->getName() <<
 				"\" shortName=\"" << commercialLine->getShortName() <<
 				"\" longName=\""  << commercialLine->getLongName() <<

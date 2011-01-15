@@ -29,6 +29,7 @@
 #include "Request.h"
 #include "StopPointTableSync.hpp"
 #include "StopAreaTableSync.hpp"
+#include "ImportableTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -40,6 +41,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace geography;
+	using namespace impex;
 	
 	namespace util
 	{
@@ -64,16 +66,24 @@ namespace synthese
 			{
 				map.insert(PARAMETER_STOP_ID, _stop->getKey());
 			}
+
 			if(_point.get() && !_point->isEmpty())
 			{
 				map.insert(PARAMETER_X, _point->getX());
 				map.insert(PARAMETER_Y, _point->getY());
 			}
-			map.insert(PARAMETER_OPERATOR_CODE, _operatorCode);
-			map.insert(PARAMETER_NAME, _name);
-			if(_stopArea.get())
+
+			if(_dataSourceLinks)
 			{
-				map.insert(PARAMETER_STOP_AREA, _stopArea->getKey());
+				map.insert(PARAMETER_OPERATOR_CODE, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
+			}
+			if(_name)
+			{
+				map.insert(PARAMETER_NAME, *_name);
+			}
+			if(_stopArea)
+			{
+				map.insert(PARAMETER_STOP_AREA, _stopArea->get() ? (*_stopArea)->getKey() : RegistryKeyType(0));
 			}
 			return map;
 		}
@@ -91,21 +101,43 @@ namespace synthese
 				throw ActionException("No such physical stop");
 			}
 
-			try
+			if(map.isDefined(PARAMETER_STOP_AREA)) try
 			{
-				_stopArea = StopAreaTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA), *_env);
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_STOP_AREA));
+				if(id)
+				{
+					_stopArea = StopAreaTableSync::Get(id, *_env);
+				}
+				else
+				{
+					_stopArea = shared_ptr<StopArea>();
+				}
 			}
 			catch(ObjectNotFoundException<StopArea>&)
 			{
 				throw ActionException("No such stop area");
 			}
 
-			_point = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
-				map.get<double>(PARAMETER_X),
-				map.get<double>(PARAMETER_Y)
-			);
-			_operatorCode = map.get<string>(PARAMETER_OPERATOR_CODE);
-			_name = map.get<string>(PARAMETER_NAME);
+			if(map.isDefined(PARAMETER_X) && map.isDefined(PARAMETER_Y))
+			{
+				_point = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+					map.get<double>(PARAMETER_X),
+					map.get<double>(PARAMETER_Y)
+				);
+			}
+
+			if(map.isDefined(PARAMETER_OPERATOR_CODE))
+			{
+				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(
+					map.get<string>(PARAMETER_OPERATOR_CODE),
+					*_env
+				);
+			}
+
+			if(map.isDefined(PARAMETER_NAME))
+			{
+				_name = map.get<string>(PARAMETER_NAME);
+			}
 		}
 		
 		
@@ -116,10 +148,22 @@ namespace synthese
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			_stop->setGeometry(_point);
-			_stop->setCodeBySource(_operatorCode);
-			_stop->setName(_name);
-			_stop->setHub(_stopArea.get());
+			if(_point)
+			{
+				_stop->setGeometry(_point);
+			}
+			if(_dataSourceLinks)
+			{
+				_stop->setDataSourceLinks(*_dataSourceLinks);
+			}
+			if(_name)
+			{
+				_stop->setName(*_name);
+			}
+			if(_stopArea)
+			{
+				_stop->setHub(_stopArea->get());
+			}
 
 			StopPointTableSync::Save(_stop.get());
 

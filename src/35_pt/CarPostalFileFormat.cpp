@@ -385,7 +385,7 @@ namespace synthese
 							os << "CREA : Creation of route for " << cline->getName() << "<br />";
 							route.reset(new JourneyPattern);
 							route->setCommercialLine(cline.get());
-							route->setDataSource(&_dataSource);
+							route->setCodeBySource(_dataSource, string());
 							route->setKey(JourneyPatternTableSync::getId());
 							_env.getEditableRegistry<JourneyPattern>().add(route);
 							cline->addPath(route.get());

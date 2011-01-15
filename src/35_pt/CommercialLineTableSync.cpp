@@ -42,6 +42,7 @@
 #include "SQLiteException.h"
 #include "CalendarTemplateTableSync.h"
 #include "ReplaceQuery.h"
+#include "ImportableTableSync.hpp"
 
 // Util
 #include "Conversion.h"
@@ -70,6 +71,7 @@ namespace synthese
 	using namespace geography;
 	using namespace graph;
 	using namespace calendar;
+	using namespace impex;
 
 	namespace util
 	{
@@ -154,7 +156,13 @@ namespace synthese
 			}
 			object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
 		    object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
-		    object->setCreatorId(rows->getText ( CommercialLineTableSync::COL_CREATOR_ID));
+
+			object->setDataSourceLinks(
+				ImportableTableSync::GetDataSourceLinksFromSerializedString(
+					rows->getText ( CommercialLineTableSync::COL_CREATOR_ID),
+					env
+			)	);
+
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 			
@@ -298,7 +306,7 @@ namespace synthese
 			query.addField(object->getStyle());
 			query.addField(object->getImage());
 			query.addField(optionalReservationPlaces.str());
-			query.addField(object->getCreatorId());
+			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
 			query.addField(
 				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
 				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :

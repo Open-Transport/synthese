@@ -31,6 +31,7 @@
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
 #include "DBModule.h"
+#include "ImportableTableSync.hpp"
 
 #include <geos/geom/Point.h>
 
@@ -45,6 +46,7 @@ namespace synthese
 	using namespace util;
 	using namespace geography;
 	using namespace db;
+	using namespace impex;
 	
 	namespace util
 	{
@@ -70,7 +72,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_PLACE_ID, _place->getKey());
 			}
-			map.insert(PARAMETER_OPERATOR_CODE, _operatorCode);
+			map.insert(
+				PARAMETER_OPERATOR_CODE,
+				ImportableTableSync::SerializeDataSourceLinks(_operatorCode)
+			);
 			if(_point.get() && !_point->isEmpty())
 			{
 				map.insert(PARAMETER_X, _point->getX());
@@ -94,7 +99,10 @@ namespace synthese
 			}
 
 			_name = map.getDefault<string>(PARAMETER_NAME);
-			_operatorCode = map.getDefault<string>(PARAMETER_OPERATOR_CODE);
+			_operatorCode = ImportableTableSync::GetDataSourceLinksFromSerializedString(
+				map.getDefault<string>(PARAMETER_OPERATOR_CODE),
+				*_env
+			);
 			if(map.getDefault<double>(PARAMETER_X, 0) && map.getDefault<double>(PARAMETER_Y, 0))
 			{
 				_point = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
@@ -120,7 +128,7 @@ namespace synthese
 			StopPoint object;
 			object.setHub(_place.get());
 			object.setName(_name);
-			object.setCodeBySource(_operatorCode);
+			object.setDataSourceLinks(_operatorCode);
 			object.setGeometry(_point);
 
 			StopPointTableSync::Save(&object);
