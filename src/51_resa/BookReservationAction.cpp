@@ -121,6 +121,7 @@ namespace synthese
 
 
 
+
 		ParametersMap BookReservationAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -128,15 +129,29 @@ namespace synthese
 			{
 				if (_journey.getOrigin())
 				{
-					const NamedPlace* place(dynamic_cast<const NamedPlace*>(_journey.getOrigin()->getHub()));
-					map.insert(PARAMETER_ORIGIN_CITY, place->getCity()->getName());
-					map.insert(PARAMETER_ORIGIN_PLACE, place->getName());
+					const NamedPlace* place(GetPlaceFromOrigin(_journey, _originPlace));
+					if(place)
+					{
+						map.insert(PARAMETER_ORIGIN_CITY, place->getCity()->getName());
+						map.insert(PARAMETER_ORIGIN_PLACE, place->getName());
+					}
+					else if(dynamic_cast<City*>(_originPlace.get()))
+					{
+						map.insert(PARAMETER_ORIGIN_CITY, dynamic_cast<City*>(_originPlace.get())->getName());
+					}
 				}
 				if (_journey.getDestination())
 				{
-					const NamedPlace* place(dynamic_cast<const NamedPlace*>(_journey.getDestination()->getHub()));
-					map.insert(PARAMETER_DESTINATION_CITY, place->getCity()->getName());
-					map.insert(PARAMETER_DESTINATION_PLACE, place->getName());
+					const NamedPlace* place(GetPlaceFromDestination(_journey, _destinationPlace));
+					if(place)
+					{
+						map.insert(PARAMETER_DESTINATION_CITY, place->getCity()->getName());
+						map.insert(PARAMETER_DESTINATION_PLACE, place->getName());
+					}
+					else if(dynamic_cast<City*>(_destinationPlace.get()))
+					{
+						map.insert(PARAMETER_DESTINATION_CITY, dynamic_cast<City*>(_destinationPlace.get())->getName());
+					}
 				}
 				if (!_journey.getFirstDepartureTime().is_not_a_date_time())
 				{
@@ -158,6 +173,8 @@ namespace synthese
 			}
 			return map;
 		}
+
+
 
 		void BookReservationAction::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -230,24 +247,22 @@ namespace synthese
 				throw ActionException("Invalid seats number");
 
 			// Journey
-			shared_ptr<Place> originPlace(
-				RoadModule::FetchPlace(
-					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
-					map.get<string>(PARAMETER_ORIGIN_CITY),
-					map.get<string>(PARAMETER_ORIGIN_PLACE)
-			)	);
-			if(!originPlace.get())
+			_originPlace = RoadModule::FetchPlace(
+				_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+				map.get<string>(PARAMETER_ORIGIN_CITY),
+				map.get<string>(PARAMETER_ORIGIN_PLACE)
+			);
+			if(!_originPlace.get())
 			{
 				throw ActionException("Invalid origin place");
 			}
 
-			shared_ptr<Place> destinationPlace(
-				RoadModule::FetchPlace(
-					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
-					map.get<string>(PARAMETER_DESTINATION_CITY),
-					map.get<string>(PARAMETER_DESTINATION_PLACE)
-			)	);
-			if(!destinationPlace.get())
+			_destinationPlace = RoadModule::FetchPlace(
+				_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+				map.get<string>(PARAMETER_DESTINATION_CITY),
+				map.get<string>(PARAMETER_DESTINATION_PLACE)
+			);
+			if(!_destinationPlace.get())
 			{
 				throw ActionException("Invalid destination place");
 			}
@@ -256,12 +271,12 @@ namespace synthese
 			ptime departureDateTime(time_from_string(map.get<string>(PARAMETER_DATE_TIME)));
 			ptime arrivalDateTime(departureDateTime);
 			arrivalDateTime += days(1);
-			if(	originPlace->getPoint().get() &&
-				!originPlace->getPoint()->isEmpty() &&
-				destinationPlace->getPoint().get() &&
-				!destinationPlace->getPoint()->isEmpty()
+			if(	_originPlace->getPoint().get() &&
+				!_originPlace->getPoint()->isEmpty() &&
+				_destinationPlace->getPoint().get() &&
+				!_destinationPlace->getPoint()->isEmpty()
 			){
-				arrivalDateTime += minutes(2 * static_cast<int>(originPlace->getPoint()->distance(destinationPlace->getPoint().get()) / 1000));
+				arrivalDateTime += minutes(2 * static_cast<int>(_originPlace->getPoint()->distance(_destinationPlace->getPoint().get()) / 1000));
 			}
 
 			// Accessibility
@@ -295,10 +310,10 @@ namespace synthese
 			}
 
 			PTTimeSlotRoutePlanner rp(
-				originPlace.get()
-				, destinationPlace.get()
-				, departureDateTime
-				, departureDateTime,
+				_originPlace.get(),
+				_destinationPlace.get(),
+				departureDateTime,
+				departureDateTime,
 				arrivalDateTime,
 				arrivalDateTime,
 				1,
@@ -348,28 +363,33 @@ namespace synthese
 				shared_ptr<Reservation> r(rt.newReservation());
 				r->setKey(ReservationTableSync::getId());
 				_env->getEditableRegistry<Reservation>().add(r);
+
 				r->setDeparturePlaceId(
-					dynamic_cast<const StopArea*>(
-						su.getDepartureEdge()->getHub()
-					)->getKey()
+					dynamic_cast<const Registrable*>(su.getDepartureEdge()->getHub()) ?
+					dynamic_cast<const Registrable*>(su.getDepartureEdge()->getHub())->getKey() :
+					RegistryKeyType(0)
 				);
-				r->setDeparturePlaceName(
-					dynamic_cast<const NamedPlace*>(
-						su.getDepartureEdge()->getHub()
-					)->getFullName()
-				);
+				if(dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub()))
+				{
+					r->setDeparturePlaceName(
+						dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub())->getFullName()
+					);
+				}
 				r->setDepartureTime(su.getDepartureDateTime());
 				r->setOriginDateTime(su.getOriginDateTime());
 				r->setArrivalPlaceId(
-					dynamic_cast<const StopArea*>(
-						su.getArrivalEdge()->getHub()
-					)->getKey()
+					dynamic_cast<const Registrable*>(su.getArrivalEdge()->getHub()) ?
+					dynamic_cast<const Registrable*>(su.getArrivalEdge()->getHub())->getKey() :
+					RegistryKeyType(0)
 				);
-				r->setArrivalPlaceName(
-					dynamic_cast<const NamedPlace*>(
-						su.getArrivalEdge()->getHub()
-					)->getFullName()
-				);
+				if(dynamic_cast<const NamedPlace*>(su.getArrivalEdge()->getHub()))
+				{
+					r->setArrivalPlaceName(
+						dynamic_cast<const NamedPlace*>(
+							su.getArrivalEdge()->getHub()
+						)->getFullName()
+					);
+				}
 				r->setArrivalTime(su.getArrivalDateTime());
 				
 				const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
@@ -458,6 +478,40 @@ namespace synthese
 		void BookReservationAction::setAccessParameters( const AccessParameters& value )
 		{
 			_accessParameters = value;
+		}
+
+
+
+		const geography::NamedPlace* BookReservationAction::GetPlaceFromOrigin( const graph::Journey& journey, boost::shared_ptr<Place> originPlace )
+		{
+			const NamedPlace* place(dynamic_cast<const NamedPlace*>(journey.getOrigin()->getHub()));
+			if(place)
+			{
+				return place;
+			}
+			place = dynamic_cast<const NamedPlace*>(originPlace.get());
+			if(place)
+			{
+				return place;
+			}
+			return NULL;
+		}
+
+
+
+		const geography::NamedPlace* BookReservationAction::GetPlaceFromDestination( const graph::Journey& journey, boost::shared_ptr<Place> destinationPlace )
+		{
+			const NamedPlace* place(dynamic_cast<const NamedPlace*>(journey.getDestination()->getHub()));
+			if(place)
+			{
+				return place;
+			}
+			place = dynamic_cast<const NamedPlace*>(destinationPlace.get());
+			if(place)
+			{
+				return place;
+			}
+			return NULL;
 		}
 	}
 }

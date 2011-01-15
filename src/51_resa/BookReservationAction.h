@@ -46,6 +46,11 @@ namespace synthese
 		class RollingStockFilter;
 	}
 
+	namespace geography
+	{
+		class Place;
+		class NamedPlace;
+	}
 
 	namespace resa
 	{
@@ -123,6 +128,9 @@ namespace synthese
 			int									_seatsNumber;
 			boost::shared_ptr<const pt_website::TransportWebsite>	_site;
 			boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
+			boost::shared_ptr<geography::Place>			_originPlace;
+			boost::shared_ptr<geography::Place>			_destinationPlace;
+
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -149,6 +157,16 @@ namespace synthese
 			void setAccessParameters(const graph::AccessParameters& value);
 
 			virtual bool isAuthorized(const server::Session* session) const;
+
+			static const geography::NamedPlace* GetPlaceFromOrigin(
+				const graph::Journey& journey,
+				boost::shared_ptr<geography::Place> originPlace
+			);
+
+			static const geography::NamedPlace* GetPlaceFromDestination(
+				const graph::Journey& journey,
+				boost::shared_ptr<geography::Place> destinationPlace
+			);
 		};
 	}
 }

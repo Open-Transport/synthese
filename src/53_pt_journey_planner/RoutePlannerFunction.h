@@ -338,6 +338,11 @@ namespace synthese
 			);
 			static void _XMLDisplayAddress(
 				std::ostream& stream,
+				const geography::NamedPlace& place,
+				bool showCoords
+			);
+			static void _XMLDisplayAddress(
+				std::ostream& stream,
 				const road::Crossing& place,
 				const road::RoadPlace& roadPlace,
 				bool showCoords

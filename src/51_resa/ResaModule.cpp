@@ -41,7 +41,11 @@
 #include "ResaEditLogEntryAdmin.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
-
+#include "CallBeginAction.h"
+#include "CallEndAction.h"
+#include "ReservationRoutePlannerAdmin.h"
+#include "ResaEditLogEntryAdmin.h"
+#include "AdminActionFunctionRequest.hpp"
 #include "OnlineReservationRule.h"
 #include "OnlineReservationRuleTableSync.h"
 
@@ -69,6 +73,10 @@ namespace synthese
 		const string ResaModule::_AUTORESA_PROFILE_NAME("Autoresa Resa Customer");	// Never change this or the database will be corrupted
 		const string ResaModule::_ADMIN_PROFILE_NAME("Resa admin user");	// Never change this or the database will be corrupted
 		const string ResaModule::_RESERVATION_CONTACT_PARAMETER("reservation_contact");
+
+		const std::string ResaModule::DATA_SWITCH_CALL_URL("switch_call_url");
+		const std::string ResaModule::DATA_CURRENT_CALL_ID("current_call_id");
+		const std::string ResaModule::DATA_CURRENT_CALL_TIMESTAMP("current_call_timestamp");
 
 		ResaModule::_SessionsCallIdMap ResaModule::_sessionsCallIds;
 		shared_ptr<Profile> ResaModule::_basicProfile;
@@ -278,5 +286,50 @@ namespace synthese
 				}
 			}
 		}
-	}
-}
+
+
+
+		void ResaModule::addAdminPageParameters(
+			ParametersMap& map,
+			const admin::AdminRequest& request
+		) const	{
+
+			bool buttonIsAllowed(
+				request.getSession() &&
+				request.getSession()->hasProfile() &&
+				request.getSession()->getUser()->getProfile()->isAuthorized<ResaRight>(READ)
+			);
+
+			if(buttonIsAllowed)
+			{
+				RegistryKeyType callId(ResaModule::GetCurrentCallId(request.getSession()));
+
+				if (callId == 0)
+				{ // Case call start
+
+					AdminActionFunctionRequest<CallBeginAction,ReservationRoutePlannerAdmin> callRequest(
+						request
+						);
+					map.insert(DATA_SWITCH_CALL_URL, callRequest.getURL());
+				}
+				else
+				{
+					map.insert(DATA_CURRENT_CALL_ID, callId);
+
+					AdminActionFunctionRequest<CallEndAction,ResaEditLogEntryAdmin> callRequest(
+						request
+						);
+					callRequest.getPage()->setEntry(
+						DBLogEntryTableSync::Get(
+						callId,
+						*request.getFunction()->getEnv()
+						)	);
+					map.insert(DATA_SWITCH_CALL_URL, callRequest.getURL());
+
+					Env env;
+					shared_ptr<DBLogEntry> entry(DBLogEntryTableSync::GetEditable(callId, env));
+					map.insert(DATA_CURRENT_CALL_TIMESTAMP, to_iso_string(entry->getDate()));
+				}
+			}
+		}
+}	}

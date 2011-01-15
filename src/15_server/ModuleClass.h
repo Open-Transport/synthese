@@ -29,11 +29,14 @@
 #include <string>
 
 #include "FactoryBase.h"
+#include "AdminInterfaceElement.h"
 
 namespace synthese
 {
 	namespace server
 	{
+		class ParametersMap;
+
 		////////////////////////////////////////////////////////////////////
 		/// Module class.
 		///	@ingroup m15
@@ -87,6 +90,21 @@ namespace synthese
 			virtual void init() const = 0;
 			virtual void end() const = 0;
 			virtual const std::string& getName() const = 0;
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Adds parameters to send to the display template for admin pages.
+			/// The default implementation does nothing. Overload the method to
+			/// add such a feature.
+			/// @param map the map to update
+			/// @param request current admin request
+			/// @author Hugues Romain
+			/// @date 2011
+			/// @since 3.2.0
+			virtual void addAdminPageParameters(
+				server::ParametersMap& map,
+				const admin::AdminRequest& request
+			) const;
 		};
 	}
 }
