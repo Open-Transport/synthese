@@ -113,12 +113,12 @@ namespace synthese
 
 
 
-		BookReservationAction::BookReservationAction():
-			util::FactorableTemplate<server::Action, BookReservationAction>(),
-			_createCustomer(false)
-		{
+		BookReservationAction::BookReservationAction(
+		):	util::FactorableTemplate<server::Action, BookReservationAction>(),
+			_createCustomer(false),
+			_seatsNumber(1)
+		{}
 
-		}
 
 
 		ParametersMap BookReservationAction::getParametersMap() const
