@@ -1444,20 +1444,31 @@ namespace synthese
 			const pt::StopPoint& stop,
 			bool showCoords
 		){
-			shared_ptr<Point> gp(
-				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-					*stop.getGeometry()
-			)	);
-
-			if(showCoords)
+			shared_ptr<Point> gp;
+			if(stop.getGeometry().get() && !stop.getGeometry()->isEmpty())
 			{
+				gp = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*stop.getGeometry()
+				);
+			}
+			else if(stop.getConnectionPlace()->getPoint().get() && !stop.getConnectionPlace()->getPoint()->isEmpty())
+			{
+				gp = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*stop.getConnectionPlace()->getPoint()
+				);
+			}
+
+			if(showCoords && gp.get())
+			{
+				shared_ptr<Point> pt(stop.getGeometry().get() ? stop.getGeometry() : stop.getConnectionPlace()->getPoint());
+
 				stream <<
 					"<" << tag <<
 					" latitude=\"" << gp->getY() << "\"" <<
 					" longitude=\"" << gp->getX() << "\"" <<
 					" id=\"" << stop.getKey() << "\"" <<
-					" x=\"" << static_cast<int>(stop.getGeometry()->getX()) << "\"" <<
-					" y=\"" << static_cast<int>(stop.getGeometry()->getY()) << "\"" <<
+					" x=\"" << static_cast<int>(pt->getX()) << "\"" <<
+					" y=\"" << static_cast<int>(pt->getY()) << "\"" <<
 					" name=\"" << stop.getName() << "\"" <<
 					">";
 			}
@@ -1473,17 +1484,24 @@ namespace synthese
 			stream << "</" << tag << ">";
 		}
 
+
+
 		void RoutePlannerFunction::_XMLDisplayAddress(
 					std::ostream& stream,
 					const NamedPlace& np,
 					bool showCoords
 		){
-			shared_ptr<Point> gp(
-				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+			shared_ptr<Point> gp;
+			
+			if(	np.getPoint().get() &&
+				!np.getPoint()->isEmpty()
+			){
+				gp = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 					*np.getPoint()
-				)	);
+				);
+			}
 
-			if(showCoords)
+			if(showCoords && gp.get())
 			{
 				stream <<
 					"<address" <<
@@ -1507,18 +1525,25 @@ namespace synthese
 			}
 		}
 
+
+
 		void RoutePlannerFunction::_XMLDisplayAddress(
 			std::ostream& stream,
 			const road::Crossing& address,
 			const road::RoadPlace& roadPlace,
 			bool showCoords
 		){
-			shared_ptr<Point> gp(
-				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+			shared_ptr<Point> gp;
+			
+			if(	address.getGeometry().get() &&
+				!address.getGeometry()->isEmpty()
+			){
+				gp = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 					*address.getGeometry()
-			)	);
+				);
+			}
 
-			if(showCoords)
+			if(showCoords && gp.get())
 			{
 				stream <<
 					"<address" <<
@@ -1549,12 +1574,17 @@ namespace synthese
 			const road::RoadPlace& roadPlace,
 			bool showCoords
 		){
-			shared_ptr<Point> gp(
-				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+			shared_ptr<Point> gp;
+			
+			if(	roadPlace.getPoint().get() &&
+				!roadPlace.getPoint()->isEmpty()
+			){
+				gp = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 					*roadPlace.getPoint()
-			)	);
+				);
+			}
 
-			if(showCoords)
+			if(showCoords && gp.get())
 			{
 				stream <<
 					"<address" <<
@@ -2306,7 +2336,7 @@ namespace synthese
 					{
 						distance = 0;
 
-						// LIGNE ARRET MONTEE Si premier point d'arr�t et si alerte
+						// LIGNE ARRET MONTEE Si premier point d'arret et si alerte
 						if (leg.getDepartureEdge()->getHub() != lastPlace)
 						{
 							/*					ptime debutPrem(leg.getDepartureDateTime());
@@ -2471,12 +2501,16 @@ namespace synthese
 			}
 
 			// Point
-			shared_ptr<Point> point(
-				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-					*physicalStop.getGeometry()
-			)	);
-			pm.insert(DATA_LONGITUDE, point->getX());
-			pm.insert(DATA_LATITUDE, point->getY());
+			if(	physicalStop.getGeometry().get() &&
+				!physicalStop.getGeometry()->isEmpty()
+			){
+				shared_ptr<Point> point(
+					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+						*physicalStop.getGeometry()
+				)	);
+				pm.insert(DATA_LONGITUDE, point->getX());
+				pm.insert(DATA_LATITUDE, point->getY());
+			}
 			
 			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
 
@@ -2494,12 +2528,16 @@ namespace synthese
 			ParametersMap pm;
 
 			// Point
-			shared_ptr<Point> point(
-				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-				*vertex.getGeometry()
+			if(	vertex.getGeometry().get() &&
+				!vertex.getGeometry()->isEmpty()
+			){
+				shared_ptr<Point> point(
+					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+						*vertex.getGeometry()
 				)	);
-			pm.insert(DATA_LONGITUDE, point->getX());
-			pm.insert(DATA_LATITUDE, point->getY());
+				pm.insert(DATA_LONGITUDE, point->getX());
+				pm.insert(DATA_LATITUDE, point->getY());
+			}
 			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(vertex.getHub()) != NULL);
 			pm.insert(DATA_ODD_ROW, color);
 			if(road && road->getRoadPlace())
