@@ -37,8 +37,18 @@ namespace synthese
 
 
 
-		std::string AjaxForm::open( const std::string htmlComplement /*= std::string()*/ )
-		{
+		string AjaxForm::open(
+			string htmlComplement /*= std::string()*/
+		) const {
+			return openWithJSComplement(string(), htmlComplement);
+		}
+
+
+		std::string AjaxForm::openWithJSComplement(
+			const string& sendJSComplement,
+			string htmlComplement, /*= std::string()*/
+			bool closeJSTag
+		) const {
 			if (!_updateRight)
 				return string();
 
@@ -56,9 +66,11 @@ namespace synthese
 				<< "var elems=document.forms['" << _name << "'].elements;"
 				<< "document.forms['" << _name << "'].className='waiting';"
 				<< "for(var i=0; i<elems.length; ++i){"
-				<< "if(i>0) content+= '&';"
+				<< "if(elems[i].name.length == 0) continue;"
+				<< "if(content.length > 0) content+= '&';"
 				<< "content += elems[i].name +'='+ escape(elems[i].value);"
 				<< "}"
+				<< sendJSComplement
 				<< "if(window.XMLHttpRequest) xajax = new XMLHttpRequest();"
 				<< "else if(window.ActiveXObject) xajax = new ActiveXObject('Microsoft.XMLHTTP');" 
 				<< "else return false;"
@@ -70,7 +82,11 @@ namespace synthese
 				<< "document.forms['" << _name << "'].className='';"
 				<< "if(xajax.responseText) alert(xajax.responseText);" 
 				<< "}};}" 
-				<< HTMLModule::GetHTMLJavascriptClose();
+			;
+			if(closeJSTag)
+			{
+				s << HTMLModule::GetHTMLJavascriptClose();
+			}
 			
 			return s.str();
 		}

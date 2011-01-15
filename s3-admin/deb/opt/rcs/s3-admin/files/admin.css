@@ -105,9 +105,9 @@ table {margin-bottom:1.5em;border-collapse:collapse;}
 .alarmwillbedisplayed { background-color:#0080FF;} 
 .alarmdisplayedwithenddate { background-color:#00FF80;} 
 
-input[type=submit], a.linkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#333333; background-color:#c0d077; border:solid #949948 1px; padding:2px; cursor:pointer;} 
-a.activatedlinkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#ffffff; background-color:#c0d077; border:solid #949948 1px; padding:2px; cursor:pointer;} 
-a.clickedlinkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#333333; background-color:#c0d077; border:solid #949948 1px; padding:0.15em; cursor:pointer; } 
+input[type=submit], a.linkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#333333; background-color:#c0d077; border:solid #949948 1px; padding:2px; cursor:pointer; display:inline-block; margin:0; } 
+a.activatedlinkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#ffffff; background-color:#c0d077; border:solid #949948 1px; padding:2px; cursor:pointer; display:inline-block; margin:0;} 
+a.clickedlinkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#333333; background-color:#c0d077; border:solid #949948 1px; padding:0.15em; cursor:pointer; display:inline-block; margin:0.05em; } 
 a.linkbutton img, a.activatedlinkbutton img, a.clickedlinkbutton img { border:none; vertical-align:bottom; cursor:pointer; } 
 
 input[type=submit]:hover { color:#ffffff; cursor:pointer;} 

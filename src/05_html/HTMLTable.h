@@ -45,17 +45,30 @@ namespace synthese
 
 		protected:
 			std::string			_headers;	//<! First row composed by th columns. Will be displayed between tr tags
+			std::string	_id;
 			int					_cols;
 
 			int					_getColsNumber() const;
+
+			typedef enum
+			{
+				UNKNOWN_SECTION,
+				HEAD,
+				BODY,
+				FOOT
+			} Section;
+
+			Section _section;
 
 		private:
 			int					_curCol;
 			int					_curRow;
 			const std::string	_className;
 			bool				_lastColWasH;
+			bool				_rowOpen;
 			
-			std::string			_closeRow();
+			void _closeRow(std::ostream& stream);
+			void _closeSection(std::ostream& stream);
 
 		public:
 			
@@ -65,7 +78,11 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			HTMLTable(int cols=0, std::string className = "");
+			HTMLTable(
+				int cols=0,
+				std::string className = std::string(),
+				std::string id = std::string()
+			);
 
 
 			/** Constructor with vector of header contents.
@@ -75,7 +92,11 @@ namespace synthese
 				
 				A colspan header is available : put the same column name twice (or more) in two following cells.
 			*/
-			HTMLTable(const ColsVector& header, std::string className = "");
+			HTMLTable(
+				const ColsVector& header,
+				std::string className = "",
+				std::string id = std::string()
+			);
 			
 			virtual ~HTMLTable();
 
@@ -115,6 +136,20 @@ namespace synthese
 			*/
 			std::string goCol(int colNumber, int colSpan=1, std::string className="");
 
+			void head(
+				std::ostream& stream,
+				std::string className = std::string()
+			);
+			void body(
+				std::ostream& stream,
+				std::string className = std::string()
+			);
+			void foot(
+				std::ostream& stream,
+				std::string className = std::string()
+			);
+
+			const std::string& getId() const { return _id; }
 		};
 	}
 }

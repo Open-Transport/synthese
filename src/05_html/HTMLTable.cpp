@@ -21,8 +21,9 @@
 */
 
 #include <sstream>
+#include <assert.h>
 
-#include "05_html/HTMLTable.h"
+#include "HTMLTable.h"
 
 using namespace std;
 
@@ -30,16 +31,22 @@ namespace synthese
 {
 	namespace html
 	{
-
-
-		HTMLTable::HTMLTable(const HTMLTable::ColsVector& header, std::string className /*= ""*/ )
-			: _cols(header.size())
-			, _className(className)
-			, _curCol(-1)
-			, _curRow(-1)
+		HTMLTable::HTMLTable(
+			const HTMLTable::ColsVector& header,
+			std::string className,
+			std::string id
+		):	_id(id),
+			_cols(header.size()),
+			_className(className),
+			_curCol(-1),
+			_curRow(-1),
+			_section(UNKNOWN_SECTION),
+			_rowOpen(false)
 		{
 			if (header.empty())
+			{
 				return;
+			}
 
 			string lastHeader;
 			stringstream s;
@@ -56,7 +63,9 @@ namespace synthese
 					{
 						s << "<th";
 						if (colspan > 1)
+						{
 							s << " colspan=\"" << colspan << "\"";
+						}
 						s << ">" << lastHeader << "</th>";
 						colspan=1;
 					}
@@ -65,52 +74,76 @@ namespace synthese
 			}
 			s << "<th";
 			if (colspan > 1)
+			{
 				s << " colspan=\"" << colspan << "\"";
+			}
 			s << ">" << lastHeader << "</th>";
 			_headers = s.str();			
 		}
 
-		HTMLTable::HTMLTable(int cols/*=0*/, std::string className /*= ""*/ )
-			: _cols(cols)
+
+
+		HTMLTable::HTMLTable(
+			int cols/*=0*/,
+			std::string className,
+			std::string id
+		):	_id(id),
+			_cols(cols)
 			, _className(className)
 			, _curCol(-1)
-			, _curRow(-1)
-		{
+			, _curRow(-1),
+			_section(UNKNOWN_SECTION),
+			_rowOpen(false)
+		{}
 
-		}
+
 
 		std::string HTMLTable::open()
 		{
 			stringstream s;
 			s << "<table";
-			if (!_className.empty())
+			if(!_className.empty())
+			{
 				s << " class=\"" << _className << "\"";
+			}
+			if(!_id.empty())
+			{
+				s << " id=\"" << _id << "\"";
+			}
 			s << ">";
-			if (!_headers.empty())
+			if(!_headers.empty())
+			{
+				head(s);
 				s << "<tr>" << _headers << "</tr>";
+			}
 			return s.str();
 		}
+
+
 
 		std::string HTMLTable::close()
 		{
 			stringstream s;
-			if (_curRow > -1)
-				s << _closeRow();
+			_closeSection(s);
 			s << "</table>";
 			return s.str();
 		}
 
-		std::string HTMLTable::_closeRow()
-		{
-			if (_curCol == -1)
-				return "";
 
-			stringstream s;
+
+		void HTMLTable::_closeRow(std::ostream& stream)
+		{
+			if (_curCol == -1 || !_rowOpen)
+			{
+				return;
+			}
 			for (; _curCol < _cols-1; ++_curCol)
-				s << col() << "&nbsp;";
-			s << (_lastColWasH ? "</th>" : "</td>");
-			s << "</tr>";
-			return s.str();
+			{
+				stream << col() << "&nbsp;";
+			}
+			stream << (_lastColWasH ? "</th>" : "</td>");
+			stream << "</tr>";
+			_rowOpen = false;
 		}
 
 
@@ -122,15 +155,23 @@ namespace synthese
 			string style
 		){
 			stringstream s;
-			if (_cols && (_curCol > _cols) || _curRow == -1)
+			if (_cols && (_curCol > _cols) || _curRow == -1 || !_rowOpen)
+			{
 				s << row();
+			}
 			else if (_curCol != -1)
+			{
 				s << (_lastColWasH ? "</th>" : "</td>");
+			}
 			s << (isHeader ? "<th" : "<td");
 			if (colSpan > 1)
+			{
 				s << " colspan=\"" << colSpan << "\"";
+			}
 			if (!className.empty())
+			{
 				s << " class=\"" << className << "\"";
+			}
 			if(!style.empty())
 			{
 				s << " style=\"" << style << "\"";
@@ -141,32 +182,46 @@ namespace synthese
 			return s.str();
 		}
 
+
+
 		std::string HTMLTable::row(string className)
 		{
 			stringstream s;
-			if (_curRow > -1)
-				s << _closeRow();
+			_closeRow(s);
 			s << "<tr class=\"";
 			if (!className.empty())
+			{
 				s << className;
+			}
 			else
+			{
 				s << "r" << ((_curRow % 2) ? "1" : "2");
+			}
 			s << "\">";
 			++_curRow;
 			_curCol = -1;
+			_rowOpen = true;
 			return s.str();
 		}
+
+
 
 		std::string HTMLTable::goCol( int colNumber, int colSpan /*=1*/, std::string className/*=""*/ )
 		{
 			stringstream s;
 			if (_curCol >= colNumber)
+			{
 				s << row();
+			}
 			for (; _curCol+1 < colNumber;)
+			{
 				s << col();
+			}
 			s << col(colSpan, className);
 			return s.str();
 		}
+
+
 
 		int HTMLTable::_getColsNumber() const
 		{
@@ -176,8 +231,88 @@ namespace synthese
 
 
 		HTMLTable::~HTMLTable(
-		) {
-
+		){
 		}
-	}
-}
+
+
+
+		void HTMLTable::head(
+			ostream& stream,
+			std::string className
+		){
+			if(_section == UNKNOWN_SECTION)
+			{
+				_closeRow(stream);
+				stream  << "<thead";
+				if(!className.empty())
+				{
+					stream << " class=\"" << className << "\"";
+				}
+				stream << ">";
+				_section = HEAD;
+			}
+			assert(_section == HEAD);
+		}
+
+
+
+		void HTMLTable::body(
+			ostream& stream,
+			std::string className
+		){
+			if(	_section == UNKNOWN_SECTION ||
+				_section == HEAD
+			){
+				_closeSection(stream);
+				stream << "<tbody";
+				if(!className.empty())
+				{
+					stream << " class=\"" << className << "\"";
+				}
+				stream << ">";
+				_section = BODY;
+			}
+			assert(_section == BODY);
+		}
+
+
+
+		void HTMLTable::foot(
+			ostream& stream,
+			std::string className
+		){
+			if(	_section == UNKNOWN_SECTION ||
+				_section == HEAD ||
+				_section == BODY
+			){
+				_closeSection(stream);
+				stream << "<tfoot";
+				if(!className.empty())
+				{
+					stream << " class=\"" << className << "\"";
+				}
+				stream << ">";
+				_section = FOOT;
+			}
+			assert(_section == FOOT);
+		}
+
+
+
+		void HTMLTable::_closeSection( std::ostream& stream )
+		{
+			_closeRow(stream);
+			if(_section == HEAD)
+			{
+				stream << "</thead>";
+			}
+			else if(_section == BODY)
+			{
+				stream << "</tbody>";
+			}
+			else if(_section == FOOT)
+			{
+				stream << "</tfoot>";
+			}
+		}
+}	}

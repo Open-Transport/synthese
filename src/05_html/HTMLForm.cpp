@@ -38,8 +38,9 @@ namespace synthese
 	namespace html
 	{
 
-		std::string HTMLForm::open(const std::string htmlComplement)
-		{
+		std::string HTMLForm::open(
+			std::string htmlComplement
+		) const {
 			if (!_updateRight)
 				return string();
 

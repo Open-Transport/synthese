@@ -226,7 +226,9 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007
 				*/
-				std::string open(const std::string htmlComplement = std::string());
+				virtual std::string open(
+					std::string htmlComplement = std::string()
+				) const;
 
 
 
@@ -236,7 +238,7 @@ namespace synthese
 					@date 2007
 					
 				*/
-				std::string close();
+				virtual std::string close();
 
 
 
@@ -530,7 +532,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008					
 				*/
-				std::string getSubmitButton(const std::string& caption);
+				virtual std::string getSubmitButton(const std::string& caption);
 
 
 
@@ -542,7 +544,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008				
 				*/
-				std::string getImageSubmitButton(const std::string& imageURL, const std::string& alt, std::string name="im");
+				virtual std::string getImageSubmitButton(const std::string& imageURL, const std::string& alt, std::string name="im");
 
 
 

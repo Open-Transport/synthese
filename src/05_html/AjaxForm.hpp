@@ -29,9 +29,14 @@ namespace synthese
 {
 	namespace html
 	{
-		/** AjaxForm class.
-			@ingroup m05
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// AJAX HTML form.
+		/// Input fields without name are ignored.
+		//////////////////////////////////////////////////////////////////////////
+		/// @author Hugues Romain
+		/// @since 3.2.1
+		/// @date 2010
+		///	@ingroup m05
 		class AjaxForm:
 			public HTMLForm
 		{
@@ -45,7 +50,24 @@ namespace synthese
 			AjaxForm(const std::string& name, const std::string& action);
 
 
-			std::string open(const std::string htmlComplement = std::string());
+
+			virtual std::string open(
+				std::string htmlComplement = std::string()
+			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Generates the opening tag of the form.
+			/// @param sendJSComplement Javascript code to add to the JS send_ajax
+			/// function. The code can operate on the content which will be sent to
+			/// the server by accessing to the content variable.
+			/// @param htmlComplement HTML code to add inside the <form> tag.
+			std::string openWithJSComplement(
+				const std::string& sendJSComplement,
+				std::string htmlComplement = std::string(),
+				bool closeJSTag = true
+			) const;
 
 
 
@@ -55,7 +77,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008					
 			*/
-			std::string getSubmitButton(
+			virtual std::string getSubmitButton(
 				const std::string& caption,
 				std::string confirm = std::string(),
 				std::string icon = std::string()
