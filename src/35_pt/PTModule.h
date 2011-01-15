@@ -73,6 +73,9 @@ namespace synthese
 			@defgroup m35File 35.16 File formats
 			@ingroup m35
 
+			@defgroup m35WFS 35.39 WFS types
+			@ingroup m35
+
 			@defgroup m35 35 Transport
 			@ingroup m3
 

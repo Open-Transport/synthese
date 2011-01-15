@@ -61,7 +61,6 @@ namespace synthese
 			static const std::string COL_ISARRIVAL;
 			static const std::string COL_METRICOFFSET;
 			static const std::string COL_SCHEDULEINPUT;
-			static const std::string COL_GEOMETRY;
 
 			/** LineStop search.
 				(other search parameters)

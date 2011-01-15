@@ -30,6 +30,7 @@ synthese::pt::PTModule::integrate();
 synthese::pt::TridentFileFormat::integrate ();
 synthese::pt::CarPostalFileFormat::integrate();
 synthese::pt::PladisStopsFileFormat::integrate();
+synthese::pt::HeuresStopsFileFormat::integrate();
 
 synthese::pt::ServiceAdmin::integrate();
 synthese::pt::TransportNetworkAdmin::integrate();
@@ -95,6 +96,7 @@ synthese::pt::TransportNetworkRight::integrate();
 
 synthese::pt::StopArea::integrate();
 
+synthese::pt::StopPointWFSType::integrate();
 
 // Registries
 synthese::util::Env::Integrate<synthese::pt::JourneyPattern>();

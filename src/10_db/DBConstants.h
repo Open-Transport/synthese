@@ -37,6 +37,7 @@ namespace synthese
 		*/
 
 		static const std::string TABLE_COL_ID("id");
+		static const std::string TABLE_COL_GEOMETRY("geometry");
 
 		static const std::string CONFIG_TABLE_NAME ("t999_config");
 		static const std::string CONFIG_TABLE_COL_PARAMNAME ("param_name");

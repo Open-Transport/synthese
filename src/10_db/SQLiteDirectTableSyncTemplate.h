@@ -41,6 +41,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/optional/optional.hpp>
 
+#include <geos/geom/Point.h>
+#include <geos/geom/Envelope.h>
+
 #include "FactorableTemplate.h"
 #include "Constants.h"
 #include "Conversion.h"
@@ -248,6 +251,81 @@ namespace synthese
 						util::Log::GetInstance().warn("Skipped object in results load of " + query, e);
 				}	}
 				return result;
+			}
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Search of objects by maximal distance from a point.
+			/// @pre the envelope must be at the default SRID
+			/// @param envelope the envelope which the objects must belong to
+			/// @param env the environment to populate
+			/// @param linkLevel level of link
+			///	@return Found objects
+			///	@author Hugues Romain
+			///	@date 2010
+			/// @since 3.2.1
+			static SearchResult SearchByEnvelope(
+				const geos::geom::Envelope& envelope,
+				util::Env& env,
+				util::LinkLevel linkLevel
+			){
+				stringstream subQuery;
+				subQuery << "SELECT pkid FROM idx_" << K::TABLE.NAME << "_" << TABLE_COL_GEOMETRY << " WHERE " <<
+					"xmin > " << envelope.getMinX() << " AND xmax < " << envelope.getMaxX() <<
+					" AND ymin > " << envelope.getMinY() << " AND ymax < " << envelope.getMaxY()
+				;
+
+				SelectQuery<K> query;
+				query.addTableField(TABLE_COL_ID);
+				query.addWhere(
+					ComposedExpression::Get(
+						FieldExpression::Get(K::TABLE.NAME, TABLE_COL_ID),
+						ComposedExpression::OP_IN,
+						SubQueryExpression::Get(subQuery.str())
+				)	);
+
+				return LoadFromQuery(query, env, linkLevel);
+			}
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Search of objects by maximal distance from a point.
+			/// @pre the table must have a geometry
+			/// @param point point from where calculate the distance
+			/// @param distanceLimit maximal distance
+			/// @param env the environment to populate
+			/// @param linkLevel level of link
+			///	@return Found objects
+			///	@author Hugues Romain
+			///	@date 2010
+			/// @since 3.2.1
+			static SearchResult SearchByMaxDistance(
+				const geos::geom::Point& point,
+				double distanceLimit,
+				util::Env& env,
+				util::LinkLevel linkLevel
+			){
+				if(point.isEmpty())
+				{
+					return SearchResult();
+				}
+
+				boost::shared_ptr<geos::geom::Point> minPoint(
+					DBModule::GetStorageCoordinatesSystem().convertPoint(
+						*CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+							point.getX() - distanceLimit,
+							point.getY() - distanceLimit
+				)	)	);
+				boost::shared_ptr<geos::geom::Point> maxPoint(
+					DBModule::GetStorageCoordinatesSystem().convertPoint(
+						*CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+							point.getX() + distanceLimit,
+							point.getY() + distanceLimit
+				)	)	);
+
+				geos::geom::Envelope envelope(*minPoint->getCoordinate(), *maxPoint->getCoordinate());
+				
+				return SearchByEnvelope(envelope, env, linkLevel);
 			}
 		};
 	}

@@ -60,7 +60,6 @@ namespace synthese
 		const std::string LineStopTableSync::COL_ISARRIVAL ("is_arrival");
 		const std::string LineStopTableSync::COL_METRICOFFSET ("metric_offset");
 		const std::string LineStopTableSync::COL_SCHEDULEINPUT ("schedule_input");
-		const std::string LineStopTableSync::COL_GEOMETRY("geometry");
 	}
 
 	namespace db
@@ -80,7 +79,7 @@ namespace synthese
 			SQLiteTableSync::Field(LineStopTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
 			SQLiteTableSync::Field(LineStopTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
 			SQLiteTableSync::Field(LineStopTableSync::COL_METRICOFFSET, SQL_DOUBLE),
-			SQLiteTableSync::Field(LineStopTableSync::COL_GEOMETRY, SQL_GEOM_LINESTRING),
+			SQLiteTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
 			SQLiteTableSync::Field()
 		};
 
@@ -108,7 +107,7 @@ namespace synthese
 			double metricOffset (rows->getDouble (LineStopTableSync::COL_METRICOFFSET));
 			
 		    // Geometry
-			string viaPointsStr(rows->getText(LineStopTableSync::COL_GEOMETRY));
+			string viaPointsStr(rows->getText(TABLE_COL_GEOMETRY));
 			if(viaPointsStr.empty())
 			{
 				ls->setGeometry(shared_ptr<LineString>());
@@ -116,7 +115,7 @@ namespace synthese
 			else
 			{
 				ls->setGeometry(
-					dynamic_pointer_cast<LineString,Geometry>(rows->getGeometryFromWKT(LineStopTableSync::COL_GEOMETRY))
+					dynamic_pointer_cast<LineString,Geometry>(rows->getGeometryFromWKT(TABLE_COL_GEOMETRY))
 				);
 			}
 

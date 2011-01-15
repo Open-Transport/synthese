@@ -4,6 +4,7 @@ CppSynthese3LibProject(
 	s3env, 's3-pt', s3env['S3VERSION'], 
 	source_files = s3env.Glob ('*.cpp'),
 	dependencies = [
+		's3-framework.cpplib',
 		's3-graph.cpplib',
 		's3-db.cpplib',
 		's3-impex.cpplib',
@@ -15,6 +16,7 @@ CppSynthese3LibProject(
 		's3-calendar.cpplib',
 		's3-messages.cpplib',
 		's3-road.cpplib',
-		's3-algorithm.cpplib'
+		's3-algorithm.cpplib',
+		's3-map.cpplib'
 	]
 )

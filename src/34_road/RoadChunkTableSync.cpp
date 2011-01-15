@@ -52,7 +52,6 @@ namespace synthese
 	{
 		const string RoadChunkTableSync::COL_CROSSING_ID("address_id");
 		const string RoadChunkTableSync::COL_RANKINPATH ("rank_in_path");
-		const string RoadChunkTableSync::COL_GEOMETRY("geometry");  // list of ids
 		const string RoadChunkTableSync::COL_ROADID ("road_id");  // NU
 		const string RoadChunkTableSync::COL_METRICOFFSET ("metric_offset");  // U ??
 		const string RoadChunkTableSync::COL_LEFT_START_HOUSE_NUMBER("left_start_house_number");
@@ -82,7 +81,7 @@ namespace synthese
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_RIGHT_END_HOUSE_NUMBER, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_LEFT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
 			SQLiteTableSync::Field(RoadChunkTableSync::COL_RIGHT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_GEOMETRY, SQL_GEOM_LINESTRING),
+			SQLiteTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
 			SQLiteTableSync::Field()
 		};
 
@@ -110,7 +109,7 @@ namespace synthese
 			object->setMetricOffset(rows->getDouble (RoadChunkTableSync::COL_METRICOFFSET));
 
 		    // Geometry
-			string viaPointsStr(rows->getText (RoadChunkTableSync::COL_GEOMETRY));
+			string viaPointsStr(rows->getText (TABLE_COL_GEOMETRY));
 			if(viaPointsStr.empty())
 			{
 				object->setGeometry(shared_ptr<LineString>());
@@ -118,7 +117,7 @@ namespace synthese
 			else
 			{
 				object->setGeometry(
-					dynamic_pointer_cast<LineString,Geometry>(rows->getGeometryFromWKT(RoadChunkTableSync::COL_GEOMETRY))
+					dynamic_pointer_cast<LineString,Geometry>(rows->getGeometryFromWKT(TABLE_COL_GEOMETRY))
 				);
 			}
 
@@ -228,47 +227,4 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 	    }
-
-
-
-		RoadChunkTableSync::SearchResult RoadChunkTableSync::SearchByMaxDistance(
-			const geos::geom::Point& point,
-			double distanceLimit,
-			util::LinkLevel linkLevel
-		){
-			if(point.isEmpty())
-			{
-				return SearchResult();
-			}
-
-			shared_ptr<Point> minPoint(
-				DBModule::GetStorageCoordinatesSystem().convertPoint(
-					*CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
-						point.getX() - distanceLimit,
-						point.getY() - distanceLimit
-			)	)	);
-			shared_ptr<Point> maxPoint(
-				DBModule::GetStorageCoordinatesSystem().convertPoint(
-					*CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
-						point.getX() + distanceLimit,
-						point.getY() + distanceLimit
-			)	)	);
-			
-			stringstream subQuery;
-			subQuery << "SELECT pkid FROM idx_" << RoadChunkTableSync::TABLE.NAME << "_" << RoadChunkTableSync::COL_GEOMETRY << " WHERE " <<
-				"xmin > " << minPoint->getX() << " AND xmax < " << maxPoint->getX() <<
-				" AND ymin > " << minPoint->getY() << " AND ymax < " << maxPoint->getY()
-			;
-
-			SelectQuery<RoadChunkTableSync> query;
-			query.addTableField(TABLE_COL_ID);
-			query.addWhere(
-				ComposedExpression::Get(
-					FieldExpression::Get(RoadChunkTableSync::TABLE.NAME, TABLE_COL_ID),
-					ComposedExpression::OP_IN,
-					SubQueryExpression::Get(subQuery.str())
-			)	);
-
-			return LoadFromQuery(query, Env::GetOfficialEnv(), linkLevel);
-		}
 }	}
