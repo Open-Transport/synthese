@@ -6,8 +6,11 @@ function getDiv(image)
     var div=image.parentNode;
     div=div.nextSibling;
     div=div.nextSibling;
-    div=div.nextSibling;
-    div=div.nextSibling;
+    if(div.nextSibling != null)
+    {
+       div=div.nextSibling;
+       div=div.nextSibling;
+    }
     return div;
 }
 
