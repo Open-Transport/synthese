@@ -266,7 +266,8 @@ namespace synthese
 			
 			if(	sa ||
 				dynamic_cast<const DisplayScreenCPUAdmin*>(&currentPage) ||
-				dynamic_cast<const BroadcastPointsAdmin*>(&currentPage)
+				dynamic_cast<const BroadcastPointsAdmin*>(&currentPage) ||
+				dynamic_cast<const DisplayAdmin*>(&currentPage)
 			){
 				vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(
 					searchConnectionPlacesWithBroadcastPoints(
