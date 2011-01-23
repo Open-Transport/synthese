@@ -152,9 +152,12 @@ namespace synthese
 			*/
 			void run(server::Request& request);
 
-			
-			void setJourney(const graph::Journey& journey);
-			void setAccessParameters(const graph::AccessParameters& value);
+			//! @name Setters
+			//@{
+				void setJourney(const graph::Journey& journey){ _journey = journey;	}
+				void setAccessParameters(const graph::AccessParameters& value){ _accessParameters = value; }
+				void setSite(boost::shared_ptr<const pt_website::TransportWebsite> value){ _site = value; }
+			//@}
 
 			virtual bool isAuthorized(const server::Session* session) const;
 
