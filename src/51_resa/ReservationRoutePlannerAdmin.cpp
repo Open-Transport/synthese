@@ -42,7 +42,7 @@
 #include "RoadModule.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "PTRoutePlannerResult.h"
-
+#include "TransportWebsite.h"
 #include "SearchFormHTMLTable.h"
 #include "PTConstants.h"
 #include "Journey.h"
@@ -243,8 +243,16 @@ namespace synthese
 
 			if (!_startCity.empty() && !_endCity.empty())
 			{
-				startPlace = RoadModule::FetchPlace(_startCity, _startPlace);
-				endPlace = RoadModule::FetchPlace(_endCity, _endPlace);
+				if(ResaModule::GetJourneyPlannerWebsite())
+				{
+					startPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(_startCity, _startPlace);
+					startPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(_endCity, _endPlace);
+				}
+				else
+				{
+					startPlace = RoadModule::FetchPlace(_startCity, _startPlace);
+					endPlace = RoadModule::FetchPlace(_endCity, _endPlace);
+				}
 			}
 
 			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request);
@@ -321,7 +329,16 @@ namespace synthese
 				// Route planning
 				AccessParameters ap(
 					_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
-					false, false, 1000, posix_time::minutes(23), 1.111,
+					false, false, 1000, posix_time::minutes(23), 1.111)
+				;
+				if(ResaModule::GetJourneyPlannerWebsite())
+				{
+					ap = ResaModule::GetJourneyPlannerWebsite()->getAccessParameters(
+						_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
+						AccessParameters::AllowedPathClasses()
+					);
+				}
+				ap.setMaxtransportConnectionsCount(
 					_withoutTransfer ? 1 : optional<size_t>()
 				);
 				resaRequest.getAction()->setAccessParameters(ap);
@@ -415,7 +432,9 @@ namespace synthese
 			stream << "<h1>Réservation</h1>";
 
 			if (!withReservation)
+			{
 				stream << "<p>Aucune solution proposée n'est ouverte à la réservation.</p>";
+			}
 			else
 			{
 				stream << rf.setFocus(BookReservationAction::PARAMETER_DATE_TIME, 0);

@@ -115,7 +115,8 @@ namespace synthese
 
 		BookReservationAction::BookReservationAction():
 			util::FactorableTemplate<server::Action, BookReservationAction>(),
-			_createCustomer(false)
+			_createCustomer(false),
+			_seatsNumber(1)
 		{
 
 		}
@@ -166,10 +167,7 @@ namespace synthese
 						map.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, static_cast<int>(_rollingStockFilter->getRank()));
 					}
 				}
-				else
-				{
-					map.insert(PARAMETER_ACCESS_PARAMETERS, _accessParameters.serialize());
-				}
+				map.insert(PARAMETER_ACCESS_PARAMETERS, _accessParameters.serialize());
 			}
 			return map;
 		}
@@ -210,7 +208,9 @@ namespace synthese
 					0, 1
 				);
 				if (!env.getRegistry<User>().empty())
+				{
 					throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
+				}
 				
 				_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
 				_customer->setProfile(ResaModule::GetBasicResaCustomerProfile().get());
@@ -303,6 +303,13 @@ namespace synthese
 					map.getDefault<UserClassCode>(PARAMETER_USER_CLASS_ID, USER_PEDESTRIAN),
 					_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
 				);
+
+				if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
+				{
+					AccessParameters accessParameters;
+					accessParameters = map.get<string>(PARAMETER_ACCESS_PARAMETERS);
+					_accessParameters.setMaxtransportConnectionsCount(accessParameters.getMaxtransportConnectionsCount());
+				}
 			}
 			else if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
 			{
@@ -452,12 +459,6 @@ namespace synthese
 		}
 
 
-		void BookReservationAction::setJourney( const Journey& journey )
-		{
-			_journey = journey;
-		}
-
-
 
 		bool BookReservationAction::isAuthorized(const Session* session
 		) const {
@@ -471,13 +472,6 @@ namespace synthese
 				_customer->getKey() == session->getUser()->getKey() &&
 				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE)
 			;
-		}
-
-
-
-		void BookReservationAction::setAccessParameters( const AccessParameters& value )
-		{
-			_accessParameters = value;
 		}
 
 
