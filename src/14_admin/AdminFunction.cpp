@@ -489,7 +489,7 @@ namespace synthese
 				stream << "</a>";
 			}
 			stream << "</div>"
-				<< "<div ";
+				<< " <div ";
 			if(!tree.isNodeOpened)
 			{
 				stream << "style=\"display:none\" ";
