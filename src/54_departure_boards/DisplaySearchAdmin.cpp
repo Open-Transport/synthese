@@ -667,6 +667,8 @@ namespace synthese
 			_tabBuilded = true;
 		}
 
+
+
 		void DisplaySearchAdmin::setPlace(
 			optional<util::RegistryKeyType> id
 		){
@@ -697,6 +699,4 @@ namespace synthese
 		{
 			return _place == static_cast<const DisplaySearchAdmin&>(other)._place;
 		}
-
-	}
-}
+}	}
