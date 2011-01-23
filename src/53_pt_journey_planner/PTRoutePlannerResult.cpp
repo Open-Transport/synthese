@@ -346,9 +346,9 @@ namespace synthese
 						--testPos) ;
 
 					// If found, try to swap items
-					if(testPos != _orderedPlaces.begin() && _canBeSwapped(testPos, minPos))
+					if(testPos != _orderedPlaces.begin() && _canBeSwapped(minPos, testPos))
 					{
-						_swap(testPos, minPos);
+						_swap(minPos, testPos);
 						return testPos;
 					}
 				}
