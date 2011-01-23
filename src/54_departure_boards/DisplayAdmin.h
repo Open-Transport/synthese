@@ -217,7 +217,6 @@ namespace synthese
 				const admin::AdminRequest& request
 			) const;
 		};
-	}
-}
+}	}
 
 #endif
