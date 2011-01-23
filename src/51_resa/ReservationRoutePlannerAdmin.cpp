@@ -246,7 +246,7 @@ namespace synthese
 				if(ResaModule::GetJourneyPlannerWebsite())
 				{
 					startPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(_startCity, _startPlace);
-					startPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(_endCity, _endPlace);
+					endPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(_endCity, _endPlace);
 				}
 				else
 				{
