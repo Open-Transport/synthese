@@ -221,6 +221,10 @@ namespace synthese
 				_request
 			);
 			resaRequest.setActionWillCreateObject();
+			if(ResaModule::GetJourneyPlannerWebsite())
+			{
+				resaRequest.getAction()->setSite(Env::GetOfficialEnv().getSPtr(ResaModule::GetJourneyPlannerWebsite()));
+			}
 
 			StaticFunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request, true);
 			customerSearchRequest.getFunction()->setNumber(20);
