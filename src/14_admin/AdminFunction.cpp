@@ -421,14 +421,82 @@ namespace synthese
 			bool isLast
 		) const {
 
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_treeNodeTemplate);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			// subtree
+			stringstream subtreeStream;
+			for(vector<AdminInterfaceElement::PageLinksTree>::const_iterator it(tree.subPages.begin());
+				it != tree.subPages.end();
+				++it
+			){
+				_displayAdminTreeNode(
+					subtreeStream,
+					request,
+					*it,
+					currentCompound,
+					depth+1,
+					it+1==tree.subPages.end()
+				);
+			}
+			string subtree(subtreeStream.str());
+
+		
+			stream << "<div class=\"";
+			if(isLast)
+			{
+				stream << "lastblock";
+			}
+			else
+			{
+				stream << "notlastblock";
+			}
+			stream << "\"><div class=\"tree_icon";
+			if(depth > 0)
+			{
+				stream << "s";
+			}
+			stream << "\">";
+			if(depth > 0)
+			{
+				if(!subtree.empty())
+				{
+					stream << "<img class=\"node\" src=\"";
+					if(tree.isNodeOpened)
+					{
+						stream << "ftv2mlastnode";
+					}
+					else
+					{
+						stream << "ftv2plastnode";
+					}
+					stream << ".png\" />";
+				}
+				else
+				{
+					stream << "<img src=\"ftv2lastnode.png\" />";
+				}
+			}
+			stream << "<img src=\"" << tree.page->getIcon() << "\" class=\"icon\" /></div>"
+				<< " <div class=\"text level" << depth << "\">";
+			bool isCurrent(*tree.page == *currentCompound);
+			if(!isCurrent)
+			{
+				AdminRequest r(request, true);
+				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(tree.page));
+				stream << "<a href=\"" << r.getURL() << "\">";
+			}
+			stream << tree.page->getTitle();
+			if(!isCurrent)
+			{
+				stream << "</a>";
+			}
+			stream << "</div>"
+				<< "<div ";
+			if(!tree.isNodeOpened)
+			{
+				stream << "style=\"display:none\" ";
+			}
+			stream << "class=\"subtree subtree" << depth << "\">" << subtree << "</div></div>";
+
+/*			ParametersMap pm;
 
 			// icon, title, url
 			ExportAdminCompound(pm, request, tree.page);
@@ -462,9 +530,8 @@ namespace synthese
 			// is_current
 			pm.insert(DATA_IS_CURRENT, *tree.page == *currentCompound);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
-		}
+			_treeNodeTemplate->display(stream, request, pm);
+*/		}
 
 
 
