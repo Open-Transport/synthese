@@ -35,7 +35,7 @@
 #include "FactoryBase.h"
 #include "Env.h"
 
-#include "12_security/Types.h"
+#include "SecurityTypes.hpp"
 
 namespace synthese
 {

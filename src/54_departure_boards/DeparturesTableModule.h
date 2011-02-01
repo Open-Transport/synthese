@@ -28,7 +28,7 @@
 
 #include "ModuleClassTemplate.hpp"
 
-#include "12_security/Types.h"
+#include "SecurityTypes.hpp"
 
 namespace synthese
 {

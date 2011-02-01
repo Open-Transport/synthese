@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ENV_LINE_H
-#define SYNTHESE_ENV_LINE_H
+#ifndef SYNTHESE_ENV_JOURNEY_PATTERN_H
+#define SYNTHESE_ENV_JOURNEY_PATTERN_H
 
 #include <vector>
 #include <string>
@@ -33,6 +33,7 @@
 #include "Registry.h"
 #include "Named.h"
 #include "Calendar.h"
+#include "Edge.h"
 
 namespace synthese
 {
@@ -185,6 +186,8 @@ namespace synthese
 				const pt::StopPoint* getOrigin () const;
 				const LineStop* getLineStop(std::size_t rank) const;
 
+				std::size_t getScheduledStopsNumber() const;
+
 				/** Tests if the line theory would be respected if the service were inserted into the line.
 					@param service service to test
 					@return bool true if the line theory would be respected
@@ -205,9 +208,21 @@ namespace synthese
 
 				struct StopWithDepartureArrivalAuthorization
 				{
-					std::set<StopPoint*> stop;
-					bool departure;
-					bool arrival;
+					typedef std::set<StopPoint*> StopsSet;
+
+					boost::optional<graph::Edge::MetricOffset> _metricOffset;
+					StopsSet _stop;
+					bool _departure;
+					bool _arrival;
+					bool _withTimes;
+
+					StopWithDepartureArrivalAuthorization(
+						const std::set<StopPoint*>& stop,
+						boost::optional<graph::Edge::MetricOffset> metricOffset = boost::optional<graph::Edge::MetricOffset>(),
+						bool departure = true,
+						bool arrival = true,
+						bool withTimes = true
+					);
 				};
 				typedef std::vector<StopWithDepartureArrivalAuthorization> StopsWithDepartureArrivalAuthorization;
 

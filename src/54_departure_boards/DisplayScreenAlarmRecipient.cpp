@@ -38,7 +38,7 @@
 #include "HTMLList.h"
 
 // security
-#include "12_security/Constants.h"
+#include "SecurityConstants.hpp"
 #include "User.h"
 #include "Profile.h"
 

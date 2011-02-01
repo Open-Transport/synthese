@@ -126,6 +126,7 @@ namespace synthese
 			}
 			_displayCancelled = map.getDefault<bool>(PARAMETER_DISPLAY_CANCELLED, false);
 
+			// Line
 			RegistryKeyType id(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 			try
 			{

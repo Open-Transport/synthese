@@ -38,6 +38,8 @@
 #include "AdminFunctionRequest.hpp"
 #include "PropertiesHTMLTable.h"
 #include "DataSourceAdmin.h"
+#include "ImportableTableSync.hpp"
+#include "PTFileFormat.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -49,6 +51,8 @@ using namespace boost;
 using namespace boost::filesystem;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
+using namespace boost::algorithm;
+
 
 
 namespace synthese
@@ -147,253 +151,327 @@ namespace synthese
 			// 1 : Routes
 			if(key == FILE_ITINERAI)
 			{
+				// Load of the stops
+				ImportableTableSync::ObjectBySource<StopPointTableSync> stops(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
 
+				// Parsing the file
+				string line;
+				CommercialLine* cline(NULL);
+				while(getline(inFile, line))
+				{
+					// Length control
+					if(line.length() < 30)
+					{
+						continue;
+					}
+
+					// Route type
+					int routeType(lexical_cast<int>(line.substr(7,1)));
+					if(routeType != 0 || routeType != 1)
+					{
+						continue;
+					}
+					
+					// Commercial line number
+					int commercialLineNumber(lexical_cast<int>(trim_copy(line.substr(0, 4))));
+					if(!lines.contains(lexical_cast<string>(commercialLineNumber)))
+					{
+						os << "WARN : commercial line with key " << commercialLineNumber << "not found<br />";
+						continue;
+					}
+					if(lines.get(lexical_cast<string>(commercialLineNumber)).size() > 1)
+					{
+						os << "WARN : more than one commercial line with key " << commercialLineNumber << "<br />";
+					}
+					cline = *lines.get(lexical_cast<string>(commercialLineNumber)).begin();
+
+					os << "LOAD : use of existing commercial line" << cline->getKey() << " (" << cline->getName() << ")<br />";
+
+					// Load of existing routes
+					JourneyPatternTableSync::SearchResult sroutes(
+						JourneyPatternTableSync::Search(_env, cline->getKey(), _dataSource.getKey())
+					);
+					BOOST_FOREACH(shared_ptr<JourneyPattern> sroute, sroutes)
+					{
+						LineStopTableSync::Search(
+							_env,
+							sroute->getKey(),
+							optional<RegistryKeyType>(),
+							0,
+							optional<size_t>(),
+							true, true,
+							UP_LINKS_LOAD_LEVEL
+						);
+						ScheduledServiceTableSync::Search(
+							_env,
+							sroute->getKey(),
+							optional<RegistryKeyType>(),
+							optional<RegistryKeyType>(),
+							optional<string>(),
+							false,
+							0, optional<size_t>(), true, true,
+							UP_LINKS_LOAD_LEVEL
+						);
+					}
+				
+					// Stops
+					JourneyPattern::StopsWithDepartureArrivalAuthorization servedStops;
+					Edge::MetricOffset distance(0);
+					bool ignoreRoute(false);
+					for(size_t i(11); i<line.size(); i += 10)
+					{
+						if(line.length() < i+10)
+						{
+							os << "WARN : inconsistent line size " << line << "<br />";
+							ignoreRoute = true;
+							break;
+						}
+
+						// Stop search
+						string stopNumber(trim_copy(line.substr(i,4)));
+						
+						// Fake stop : girouette
+						if(lexical_cast<int>(stopNumber) > 9000)
+						{
+							*servedStops.rbegin()->_metricOffset += lexical_cast<Edge::MetricOffset>(trim_copy(line.substr(i+5,5)));
+							continue;
+						}
+
+						bool regul(lexical_cast<bool>(line.substr(i+4,1)));
+						distance += lexical_cast<Edge::MetricOffset>(trim_copy(line.substr(i+5,5)));
+
+						if(!stops.contains(stopNumber))
+						{
+							os << "WARN : stop " << stopNumber << " not found<br />";
+							ignoreRoute = true;
+						}
+
+						servedStops.push_back(
+							JourneyPattern::StopWithDepartureArrivalAuthorization(
+								stops.get(stopNumber),
+								distance,
+								true,
+								true,
+								regul
+						)	);
+					}
+
+					if(ignoreRoute)
+					{
+						continue;
+					}
+
+					// Route number
+					string routeNumber(trim_copy(line.substr(6,2)));
+					
+					// Route identification
+					shared_ptr<JourneyPattern> route;
+					BOOST_FOREACH(const Path* sroute, cline->getPaths())
+					{
+						const JourneyPattern* lroute(static_cast<const JourneyPattern*>(sroute));
+						if(	*lroute == servedStops
+						){
+							route = const_pointer_cast<JourneyPattern>(_env.getSPtr(lroute));
+							continue;
+						}
+					}
+
+					// Create a new route if necessary
+					if(!route.get())
+					{
+						os << "CREA : Creation of route for " << cline->getName() << "<br />";
+						route = PTFileFormat::CreateJourneyPattern(
+							servedStops,
+							*cline,
+							_dataSource,
+							_env,
+							os
+						);
+					}
+					else
+					{
+						os << "LOAD : Use of route " << route->getKey() << " (" << route->getName() << ")<br />";
+					}
+					route->setRollingStock(Env::GetOfficialEnv().getEditable<RollingStock>(13792273858822585).get());
+
+					_routes.insert(
+						make_pair(
+							make_pair(commercialLineNumber, routeNumber),
+							route.get()
+					)	);
+				}
 			} // 2 : Nodes
 			else if(key == FILE_TRONCONS)
 			{
-				// Cleaning of each service handled by the datasource
-				ScheduledServiceTableSync::SearchResult originalServices(
-					ScheduledServiceTableSync::Search(
-					_env,
-					optional<RegistryKeyType>(),
-					optional<RegistryKeyType>(),
-					_dataSource.getKey(),
-					optional<string>(),
-					false,
-					0,
-					optional<size_t>(),
-					false,
-					false,
-					UP_LINKS_LOAD_LEVEL
-					)	);
-				BOOST_FOREACH(shared_ptr<ScheduledService> service, originalServices)
-				{
-					for(date d(_startDate); d<=_endDate; d=d+days(1))
-					{
-						service->setInactive(d);
-					}
-				}
-
 				string line;
-				shared_ptr<ScheduledService> service;
-				string serviceNumber;
-				string lineNumber;
-				int calendarNumber;
-				JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
-				vector<time_duration> departures;
-				vector<time_duration> arrivals;
-				Calendar mask;
-				for(date curDate(_startDate); curDate <= _endDate; curDate += days(1))
-				{
-					mask.setActive(curDate);
-				}
-				bool serviceMustBeAvoided(false);
-				map<string, shared_ptr<CommercialLine> > lines;
+				typedef map<
+					pair<JourneyPattern*, string>, // string is service number
+					pair<ScheduledService::Schedules, ScheduledService::Schedules> // departure / arrival schedules
+				> SchedulesMap;
+				SchedulesMap services;
+				vector<shared_ptr<ScheduledService> > createdServices;
 
+				// Reading of the file
 				while(getline(inFile, line))
 				{
-					if(line.substr(0,2) == "*Z")
+					for(size_t i(29); i<line.size(); ++i)
 					{
-						serviceNumber = line.substr(3,5);
-						lineNumber = line.substr(9,6);
-						stops.clear();
-						departures.clear();
-						arrivals.clear();
-						serviceMustBeAvoided = false;
-					}
-					else if(line.substr(0,5) == "*A VE")
-					{
-						calendarNumber = lexical_cast<int>(line.substr(22,6));
-					}
-					else if(line.substr(0,1) != "*")
-					{
-						StopPointTableSync::SearchResult searchStop(
-							StopPointTableSync::Search(
-							_env, optional<RegistryKeyType>(), line.substr(0,7)
-							)	);
-						if(searchStop.empty())
+						string routeNumber(trim_copy(line.substr(i,2)));
+						int lineNumber(lexical_cast<int>(trim_copy(line.substr(i+2,4))));
+						RoutesMap::iterator it(_routes.find(make_pair(lineNumber, routeNumber)));
+						if(it == _routes.end())
 						{
-							os << "WARN : stop " << line << " not found<br />";
-							serviceMustBeAvoided = true;
+							os << "WARN : route not found in service file " << lineNumber << "/" << routeNumber << "<br />";
+							for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
+							continue;
 						}
-						else
-						{
-							string departureTime(line.substr(34,4));
-							string arrivalTime(line.substr(29,4));
+						JourneyPattern* route(it->second);
 
-							JourneyPattern::StopWithDepartureArrivalAuthorization stop;
-							BOOST_FOREACH(const StopPointTableSync::SearchResult::value_type& itstop, searchStop)
+						string serviceNumber(trim_copy(line.substr(i+8,3)));
+						SchedulesMap::iterator itS(services.find(make_pair(route, serviceNumber)));
+						if(itS != services.end())
+						{
+							if(itS->first.first != route)
 							{
-								stop.stop.insert(itstop.get());
-							}
-							stop.departure = (departureTime != "9999" && departureTime != "    ");
-							stop.arrival = (arrivalTime != "9999" && arrivalTime != "    ");
-							stops.push_back(stop);
-
-							arrivals.push_back(
-								stop.arrival ?
-								hours(lexical_cast<int>(line.substr(29,2))) + minutes(lexical_cast<int>(line.substr(31,2))) :
-							minutes(0)
-								);
-							departures.push_back(
-								stop.departure ?
-								hours(lexical_cast<int>(line.substr(34,2))) + minutes(lexical_cast<int>(line.substr(36,2))) :
-							minutes(0)
-								);
-						}
-					}
-
-					// End of service
-					if(line.size() < 54 && !serviceMustBeAvoided)
-					{
-						// JourneyPattern
-						map<string, shared_ptr<CommercialLine> >::const_iterator itLine(lines.find(lineNumber));
-						shared_ptr<CommercialLine> cline;
-						if(itLine != lines.end())
-						{
-							cline = itLine->second;
-						}
-						else
-						{
-							CommercialLineTableSync::SearchResult lines(
-								CommercialLineTableSync::Search(_env, optional<RegistryKeyType>(),optional<string>(), lineNumber)
-								);
-							if(lines.empty())
-							{
-								os << "WARN : commercial line with key " << lineNumber << "not found<br />";
+								os << "WARN : inconsistent route in service file " << serviceNumber << "/" << lineNumber << "/" << routeNumber << "<br />";
+								for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 								continue;
 							}
-							if(lines.size() > 1)
-							{
-								os << "WARN : more than one commercial line with key " << lineNumber << "<br />";
-							}
-							cline = CommercialLineTableSync::GetEditable(
-								lines.front()->getKey(),
-								_env,
-								UP_LINKS_LOAD_LEVEL
-								);
-
-							os << "LOAD : use of existing commercial line" << cline->getKey() << " (" << cline->getName() << ")<br />";
-
-							// Load of existing routes
-							JourneyPatternTableSync::SearchResult sroutes(
-								JourneyPatternTableSync::Search(_env, cline->getKey(), _dataSource.getKey())
-								);
-							BOOST_FOREACH(shared_ptr<JourneyPattern> sroute, sroutes)
-							{
-								LineStopTableSync::Search(
-									_env,
-									sroute->getKey(),
-									optional<RegistryKeyType>(),
-									0,
-									optional<size_t>(),
-									true, true,
-									UP_LINKS_LOAD_LEVEL
-									);
-								ScheduledServiceTableSync::Search(
-									_env,
-									sroute->getKey(),
-									optional<RegistryKeyType>(),
-									optional<RegistryKeyType>(),
-									optional<string>(),
-									false,
-									0, optional<size_t>(), true, true,
-									UP_LINKS_LOAD_LEVEL
-									);
-							}
-						}
-
-						// Attempting to find an existing route
-						shared_ptr<JourneyPattern> route;
-						BOOST_FOREACH(const Path* sroute, cline->getPaths())
-						{
-							const JourneyPattern* lroute(static_cast<const JourneyPattern*>(sroute));
-							if(	*lroute == stops
-								){
-									route = const_pointer_cast<JourneyPattern>(_env.getSPtr(lroute));
-									continue;
-							}
-						}
-
-						// Create a new route if necessary
-						if(!route.get())
-						{
-							string key;
-							os << "CREA : Creation of route for " << cline->getName() << "<br />";
-							route.reset(new JourneyPattern);
-							route->setCommercialLine(cline.get());
-							Importable::DataSourceLinks links;
-							links.insert(make_pair(&_dataSource, key));
-							route->setKey(JourneyPatternTableSync::getId());
-							_env.getEditableRegistry<JourneyPattern>().add(route);
-							cline->addPath(route.get());
-
-							size_t rank(0);
-							BOOST_FOREACH(const JourneyPattern::StopsWithDepartureArrivalAuthorization::value_type& stop, stops)
-							{
-								shared_ptr<LineStop> ls(new LineStop);
-								ls->setLine(route.get());
-								ls->setPhysicalStop(*stop.stop.begin());
-								ls->setRankInPath(rank);
-								ls->setIsArrival(rank > 0 && stop.arrival);
-								ls->setIsDeparture(rank+1 < stops.size() && stop.departure);
-								ls->setMetricOffset(0);
-								ls->setKey(LineStopTableSync::getId());
-								route->addEdge(*ls);
-								_env.getEditableRegistry<LineStop>().add(ls);
-
-								++rank;
-							}
 						}
 						else
 						{
-							os << "LOAD : Use of route " << route->getKey() << " (" << route->getName() << ")<br />";
-						}
-						route->setRollingStock(Env::GetOfficialEnv().getEditable<RollingStock>(13792273858822585).get());
-
-						// Services
-						// Creation of the service
-						shared_ptr<ScheduledService> service(new ScheduledService);
-						service->setPath(route.get());
-						service->setPathId(route->getKey());
-						service->setServiceNumber(serviceNumber);
-						service->setDepartureSchedules(departures);
-						service->setArrivalSchedules(arrivals);
-
-						// Search for a corresponding service
-						ScheduledService* existingService(NULL);
-						BOOST_FOREACH(Service* tservice, route->getServices())
-						{
-							ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
-
-							if(!curService) continue;
-
-							if (*curService == *service)
+							itS = services.insert(
+								make_pair(
+									make_pair(route, serviceNumber),
+									SchedulesMap::mapped_type()
+							)	).first;
+							size_t schedulesNumber(route->getScheduledStopsNumber());
+							for(size_t s(0); s<schedulesNumber; ++s)
 							{
-								os << "LOAD : Use of service " << curService->getKey() << " for " << serviceNumber << " (" << departures[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
-								existingService = curService;
-								break;
+								itS->second.first.push_back(time_duration(not_a_date_time));
+								itS->second.second.push_back(time_duration(not_a_date_time));
 							}
 						}
 
-						// If not found creation
-						if(!existingService)
+						// Read the available schedules
+						size_t rank(0);
+						for(i+=11; i<line.size() && line[i]!=';'; i+=8, ++rank)
 						{
-							service->setKey(ScheduledServiceTableSync::getId());
-							route->addService(service.get(), false);
-							_env.getEditableRegistry<ScheduledService>().add(service);
-							existingService = service.get();
+							string arrivalSchedule(line.substr(i, 4));
+							string departureSchedule(line.substr(i+4, 4));
 
-							os << "CREA : Creation of service " << service->getServiceNumber() << " for " << serviceNumber << " (" << departures[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
+							if(departureSchedule != "9999")
+							{
+								itS->second.first[rank] = time_duration(
+									lexical_cast<int>(departureSchedule.substr(0,2)), 
+									lexical_cast<int>(departureSchedule.substr(2,2)),
+									0
+								);
+							}
+							if(arrivalSchedule != "9999")
+							{
+								itS->second.second[rank] = time_duration(
+									lexical_cast<int>(arrivalSchedule.substr(0,2)),
+									lexical_cast<int>(arrivalSchedule.substr(2,2)),
+									0
+								);
+							}
 						}
+				}	}
 
-						// Calendar
-						existingService->subDates(mask);
+				// Storage as ScheduledService
+				BOOST_FOREACH(const SchedulesMap::value_type& it, services)
+				{
+					typedef map<
+						pair<JourneyPattern*, string>, // string is service number
+						pair<ScheduledService::Schedules, ScheduledService::Schedules> // departure / arrival schedules
+					> SchedulesMap;
+
+					JourneyPattern* route(it.first.first);
+					shared_ptr<ScheduledService> service(new ScheduledService);
+					service->setPath(route);
+					service->setPathId(route->getKey());
+					service->setServiceNumber(it.first.second);
+					service->setSchedules(it.second.first, it.second.second);
+
+					// Search for a corresponding service
+					ScheduledService* existingService(NULL);
+					BOOST_FOREACH(Service* tservice, route->getServices())
+					{
+						ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
+
+						if(!curService) continue;
+
+						if (*curService == *service)
+						{
+							os << "LOAD : Use of service " << curService->getKey() << " for " << service->getServiceNumber() << " (" << service->getDepartureSchedules(false).operator[](0) << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
+							existingService = curService;
+							break;
+						}
 					}
+
+					// If not found creation
+					if(!existingService)
+					{
+						service->setKey(ScheduledServiceTableSync::getId());
+						route->addService(service.get(), false);
+						_env.getEditableRegistry<ScheduledService>().add(service);
+						existingService = service.get();
+
+						os << "CREA : Creation of service " << service->getServiceNumber() << " for " << it.first.second << " (" << it.second.first[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
+					}
+
+					_services.insert(
+						make_pair(
+							make_pair(
+								lexical_cast<int>(route->getCodeBySource(_dataSource)),
+								service->getServiceNumber()
+							),
+							existingService
+					)	);
 				}
 			} // 3 : Services
 			else if (key == FILE_SERVICES)
 			{
+				string line;
+				while(getline(inFile, line))
+				{
+					// Read of calendar
+					vector<bool> days;
+					for(size_t i(0); i<7; ++i)
+					{
+						days[i] = (line[i==0 ? 12 : i+5] == '1');
+					}
+					Calendar cal;
+					for(gregorian::date d(_startDate); d<=_endDate; d += gregorian::days(1))
+					{
+						if(days[d.day_of_week()])
+						{
+							cal.setActive(d);
+						}
+					}
+					
+					// Services list
+					for(size_t i(13); i<line.size(); i+=29)
+					{
+						int lineNumber(lexical_cast<int>(trim_copy(line.substr(i,3))));
+						string serviceNumber(trim_copy(line.substr(i+3,3)));
+
+						ServicesMap::iterator itS(_services.find(
+							make_pair(lineNumber, serviceNumber)
+						)	);
+						if(itS == _services.end())
+						{
+							os << "WARN : inconsistent service number " << line << "<br />";
+							continue;
+						}
+
+						ScheduledService* service(itS->second);
+
+						service->copyDates(cal);
+					}
+				}
 			}
 			inFile.close();
 

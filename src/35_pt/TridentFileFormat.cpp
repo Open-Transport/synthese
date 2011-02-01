@@ -63,6 +63,7 @@
 #include "RequestException.h"
 #include "AdminFunctionRequest.hpp"
 #include "DataSourceAdmin.h"
+#include "PTFileFormat.hpp"
 
 #include <algorithm>
 #include <iomanip>
@@ -1023,96 +1024,41 @@ namespace synthese
 			// Title
 			XMLNode chouetteLineDescriptionNode(allNode.getChildNode("ChouetteLineDescription"));
 			XMLNode lineNode(chouetteLineDescriptionNode.getChildNode("Line"));
+			XMLNode lineKeyNode(lineNode.getChildNode("objectId"));
+			XMLNode clineShortNameNode = lineNode.getChildNode("number", 0);
 			XMLNode clineNameNode = lineNode.getChildNode("name");
-				
 			os << "<h2>Trident import of " << clineNameNode.getText() << "</h2>";
 			
-			// Memory of objects created by the import
-			set<RegistryKeyType> createdObjects;
-
 			// Network
 			XMLNode networkNode =  allNode.getChildNode("PTNetwork", 0);
 			XMLNode networkIdNode = networkNode.getChildNode("objectId", 0);
-			string key(networkIdNode.getText());
+			XMLNode networkNameNode = networkNode.getChildNode("name", 0);
 			
-			
-			shared_ptr<TransportNetwork> network;
-			TransportNetworkTableSync::SearchResult networks(
-				TransportNetworkTableSync::Search(_env, string(), key)
-			);
-			if(!networks.empty())
-			{
-				if(networks.size() > 1)
-				{
-					os << "WARN : more than one network with key " << key << "<br />";
-				}
-				network = TransportNetworkTableSync::GetEditable(
-					networks.front()->getKey(),
+			ImportableTableSync::ObjectBySource<TransportNetworkTableSync> networks(_dataSource, _env);
+			TransportNetwork* network(
+				PTFileFormat::CreateOrUpdateNetwork(
+					networks,
+					networkIdNode.getText(),
+					networkNameNode.getText(),
+					_dataSource,
 					_env,
-					UP_LINKS_LOAD_LEVEL
-				);
-				
-				os << "LOAD : use of existing network " << network->getKey() << " (" << network->getName() << ")<br />";
-			}
-			else
-			{
-				XMLNode networkNameNode = networkNode.getChildNode("name", 0);
-				os << "CREA : Creation of the network with key " << key << " (" << networkNameNode.getText() <<  ")<br />";
+					os
+			)	);
 
-				network.reset(new TransportNetwork);
-				network->setName(networkNameNode.getText());
-				network->setCreatorId(key);
-				network->setKey(TransportNetworkTableSync::getId());
-				_env.getEditableRegistry<TransportNetwork>().add(network);
-
-				createdObjects.insert(network->getKey());
-			}
-			
 			// Commercial lines
-			XMLNode lineKeyNode(lineNode.getChildNode("objectId"));
-			
-			string ckey(lineKeyNode.getText());
-			
-			shared_ptr<CommercialLine> cline;
-			CommercialLineTableSync::SearchResult lines(
-				CommercialLineTableSync::Search(_env, network->getKey(), optional<string>(), ckey)
-			);
-			if(!lines.empty())
-			{
-				if(lines.size() > 1)
-				{
-					os << "WARN : more than one commercial line with key " << ckey << "<br />";
-				}
-				cline = CommercialLineTableSync::GetEditable(
-					lines.front()->getKey(),
+			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
+			CommercialLine* cline(
+				PTFileFormat::CreateOrUpdateLine(
+					lines,
+					lineKeyNode.getText(),
+					clineNameNode.getText(),
+					clineShortNameNode.getText(),
+					optional<RGBColor>(),
+					*network,
+					_dataSource,
 					_env,
-					UP_LINKS_LOAD_LEVEL
-				);
-				
-				os << "LOAD : use of existing commercial line" << cline->getKey() << " (" << cline->getName() << ")<br />";
-
-			}
-			else
-			{
-				cline.reset(new CommercialLine);
-				XMLNode clineShortNameNode = lineNode.getChildNode("number", 0);
-				
-				os << "CREA : Creation of the commercial line with key " << ckey << " (" << clineNameNode.getText() <<  ")<br />";
-				
-				cline->setNetwork(network.get());
-				cline->setName(clineNameNode.getText());
-				Importable::DataSourceLinks links;
-				links.insert(make_pair(&_dataSource, ckey));
-				cline->setDataSourceLinks(links);
-				if(!clineShortNameNode.isEmpty())
-				{
-					cline->setShortName(clineShortNameNode.getText());
-				}
-				cline->setKey(CommercialLineTableSync::getId());
-				_env.getEditableRegistry<CommercialLine>().add(cline);
-
-				createdObjects.insert(cline->getKey());
-			}
+					os
+			)	);
 			
 			// Transport mode
 			shared_ptr<RollingStock> rollingStock;
@@ -1258,8 +1204,6 @@ namespace synthese
 							_env.getEditableRegistry<StopArea>().add(curStop);
 
 							os << "CREA : Creation of the commercial stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
-
-							createdObjects.insert(curStop->getKey());
 						}
 					}
 
@@ -1333,8 +1277,6 @@ namespace synthese
 					_env.getEditableRegistry<StopPoint>().add(curStop);
 
 					os << "CREA : Creation of the physical stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
-
-					createdObjects.insert(curStop->getKey());
 				}
 				else
 				{
@@ -1500,7 +1442,7 @@ namespace synthese
 				{
 					os << "CREA : Creation of route " << routeNames[routeIdNode.getText()] << " for " << jpKeyNode.getText() << "<br />";
 					route.reset(new JourneyPattern);
-					route->setCommercialLine(cline.get());
+					route->setCommercialLine(cline);
 					route->setName(routeNames[routeIdNode.getText()]);
 					Importable::DataSourceLinks links;
 					links.insert(make_pair(&_dataSource, routeNames[routeIdNode.getText()]));
@@ -1508,7 +1450,6 @@ namespace synthese
 					route->setWayBack(routeWaybacks[routeIdNode.getText()]);
 					route->setKey(JourneyPatternTableSync::getId());
 					_env.getEditableRegistry<JourneyPattern>().add(route);
-					createdObjects.insert(route->getKey());
 					
 					size_t rank(0);
 					BOOST_FOREACH(StopPoint* stop, routeStops)
@@ -1577,8 +1518,7 @@ namespace synthese
 					deps.push_back(depSchedule);
 					arrs.push_back(arrSchedule);
 				}
-				service->setDepartureSchedules(deps);
-				service->setArrivalSchedules(arrs);
+				service->setSchedules(deps, arrs);
 				
 				// Search for a corresponding service
 				ScheduledService* existingService(NULL);
@@ -1604,8 +1544,6 @@ namespace synthese
 					services[keyNode.getText()] = service.get();
 					
 					os << "CREA : Creation of service " << service->getServiceNumber() << " for " << keyNode.getText() << " (" << deps[0] << ") on route " << line->getKey() << " (" << line->getName() << ")<br />";
-
-					createdObjects.insert(service->getKey());
 				}
 				else
 				{

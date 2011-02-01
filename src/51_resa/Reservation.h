@@ -33,6 +33,11 @@
 
 namespace synthese
 {
+	namespace pt_operation
+	{
+		class Vehicle;
+	}
+
 	namespace resa
 	{
 		class ReservationTransaction;
@@ -75,25 +80,30 @@ namespace synthese
 				boost::posix_time::ptime		_arrivalTime;			//!< Moment d'arrivée prévue
 				boost::posix_time::ptime		_originDateTime;
 				boost::posix_time::ptime		_reservationDeadLine;
+				pt_operation::Vehicle*			_vehicle;
+				std::string						_seatNumber;
 			//@}
 
 		public:
 			//!	\name Setters
 			//@{
-				void setLineId				(util::RegistryKeyType id) { _lineId = id; }
-				void setLineCode			(const std::string& code);
-				void setServiceId			(util::RegistryKeyType id) { _serviceId = id; }
-				void setServiceCode			(const std::string& code);
-				void setDeparturePlaceId	(util::RegistryKeyType id) { _departurePlaceId = id; }
-				void setDeparturePlaceName	(const std::string& name);
-				void setArrivalPlaceId		(util::RegistryKeyType id) { _arrivalPlaceId = id; }
-				void setArrivalPlaceName	(const std::string& name);
-				void setReservationRuleId	(util::RegistryKeyType id) { _reservationRuleId = id; }
-				void setDepartureAddress	(const std::string& address);
-				void setArrivalAddress		(const std::string& address);
-				void setDepartureTime		(const boost::posix_time::ptime& time);
-				void setArrivalTime			(const boost::posix_time::ptime& time);
-		
+				void setLineId				(util::RegistryKeyType id){ _lineId = id; }
+				void setLineCode			(const std::string& code){ _lineCode = code; }
+				void setServiceId			(util::RegistryKeyType id){ _serviceId = id; }
+				void setServiceCode			(const std::string& code){ _serviceCode = code; }
+				void setDeparturePlaceId	(util::RegistryKeyType id){ _departurePlaceId = id; }
+				void setDeparturePlaceName	(const std::string& name){ _departurePlaceName = name; }
+				void setArrivalPlaceId		(util::RegistryKeyType id){ _arrivalPlaceId = id; }
+				void setArrivalPlaceName	(const std::string& name){ _arrivalPlaceName = name; }
+				void setReservationRuleId	(util::RegistryKeyType id){ _reservationRuleId = id; }
+				void setDepartureAddress	(const std::string& address){ _departureAddress = address; }
+				void setArrivalAddress		(const std::string& address){ _arrivalAddress = address; }
+				void setDepartureTime		(const boost::posix_time::ptime& time){ _departureTime = time; }
+				void setArrivalTime			(const boost::posix_time::ptime& time){ _arrivalTime = time; }
+				void setVehicle				(pt_operation::Vehicle* value){ _vehicle = value; }
+				void setSeatNumber			(const std::string& value){ _seatNumber = value; }
+				void setOriginDateTime		(const boost::posix_time::ptime& time){ _originDateTime = time; }
+				void setReservationDeadLine	(const boost::posix_time::ptime& time){ _reservationDeadLine = time; }
 
 
 				/** Transaction setter.
@@ -103,28 +113,28 @@ namespace synthese
 					The reservation is also added to the transaction.
 				*/
 				void setTransaction			(ReservationTransaction* transaction);
-				void setOriginDateTime		(const boost::posix_time::ptime& time);
-				void setReservationDeadLine	(const boost::posix_time::ptime& time);
 			//@}
 
 			//!	\name Getters
 			//@{
 				util::RegistryKeyType			getLineId()					const { return _lineId; }
-				const std::string&				getLineCode()				const;
+				const std::string&				getLineCode()				const { return _lineCode; }
 				util::RegistryKeyType			getServiceId()				const { return _serviceId; }
-				const std::string&				getServiceCode()			const;
+				const std::string&				getServiceCode()			const { return _serviceCode; }
 				util::RegistryKeyType			getDeparturePlaceId()		const { return _departurePlaceId; }
-				const std::string&				getDeparturePlaceName()		const;
+				const std::string&				getDeparturePlaceName()		const { return _departurePlaceName; }
 				util::RegistryKeyType			getArrivalPlaceId()			const { return _arrivalPlaceId; }
-				const std::string&				getArrivalPlaceName()		const;
+				const std::string&				getArrivalPlaceName()		const { return _arrivalPlaceName; }
 				util::RegistryKeyType			getReservationRuleId()		const { return _reservationRuleId; }
-				const std::string&				getDepartureAddress()		const;
-				const std::string&				getArrivalAddress()			const;
-				const boost::posix_time::ptime&	getDepartureTime()			const;
-				const boost::posix_time::ptime&	getArrivalTime()			const;
-				const ReservationTransaction*	getTransaction()			const;
-				const boost::posix_time::ptime&	getOriginDateTime()			const;
-				const boost::posix_time::ptime&	getReservationDeadLine()	const;
+				const std::string&				getDepartureAddress()		const { return _departureAddress; }
+				const std::string&				getArrivalAddress()			const { return _arrivalAddress; }
+				const boost::posix_time::ptime&	getDepartureTime()			const { return _departureTime; }
+				const boost::posix_time::ptime&	getArrivalTime()			const { return _arrivalTime; }
+				const ReservationTransaction*	getTransaction()			const { return _transaction; }
+				const boost::posix_time::ptime&	getOriginDateTime()			const { return _originDateTime; }
+				const boost::posix_time::ptime&	getReservationDeadLine()	const { return _reservationDeadLine; }
+				pt_operation::Vehicle*			getVehicle()				const { return _vehicle; }
+				const std::string&				getSeatNumber()				const { return _seatNumber; }
 			//@}
 
 

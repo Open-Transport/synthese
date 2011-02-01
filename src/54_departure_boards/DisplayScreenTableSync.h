@@ -28,7 +28,7 @@
 
 #include "DisplayScreen.h"
 #include "SQLiteRegistryTableSyncTemplate.h"
-#include "12_security/Types.h"
+#include "SecurityTypes.hpp"
 
 #include <boost/optional.hpp>
 

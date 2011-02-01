@@ -68,7 +68,8 @@ namespace synthese
 				bool isDeparture = true,
 				bool isArrival = true,
 				double metricOffset = 0,
-				pt::StopPoint* physicalStop = NULL
+				pt::StopPoint* physicalStop = NULL,
+				bool scheduleInput = true
 			);
 			
 			~LineStop();

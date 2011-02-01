@@ -26,6 +26,7 @@
 #include "Registrable.h"
 #include "Registry.h"
 #include "Named.h"
+#include "Importable.h"
 
 namespace synthese
 {
@@ -37,15 +38,15 @@ namespace synthese
 		///	@ingroup m35
 		//////////////////////////////////////////////////////////////////////////
 		class TransportNetwork:
-			public util::Registrable,
-			public util::Named
+			virtual public util::Registrable,
+			public util::Named,
+			public impex::Importable
 		{
 		public:
 			/// Chosen registry class.
-			typedef util::Registry<TransportNetwork>	Registry;
+			typedef util::Registry<TransportNetwork> Registry;
 
 		protected:
-			std::string _creatorId;
 
 		 public:
 
@@ -57,12 +58,10 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const std::string& getCreatorId() const { return _creatorId; }
 			//@}
 				
 			//! @name Setters
 			//@{
-				void setCreatorId( const std::string& value) { _creatorId = value; }
 			//@}
 
 			//! @name Services

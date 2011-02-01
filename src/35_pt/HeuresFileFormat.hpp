@@ -48,6 +48,9 @@ namespace synthese
 	
 	namespace pt
 	{
+		class JourneyPattern;
+		class CommercialLine;
+		class ScheduledService;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Heures file format.
@@ -83,7 +86,11 @@ namespace synthese
 				boost::gregorian::date _startDate;
 				boost::gregorian::date _endDate;
 				
-				
+				typedef std::map<std::pair<int, std::string>, pt::JourneyPattern*> RoutesMap;
+				mutable RoutesMap _routes;
+
+				typedef std::map<std::pair<int, std::string>, ScheduledService*> ServicesMap;
+				mutable ServicesMap _services;
 
 			protected:
 

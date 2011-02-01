@@ -22,12 +22,13 @@
 
 #include "SchedulesBasedService.h"
 #include "Path.h"
-#include "Edge.h"
+#include "LineStop.h"
 
 #include <sstream>
 #include <iomanip>
 #include <boost/tokenizer.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -70,18 +71,71 @@ namespace synthese
 
 
 
-		void SchedulesBasedService::setDepartureSchedules( const Schedules& schedules )
-		{
-			_departureSchedules = schedules;
-			_RTDepartureSchedules = schedules;
-		}
+		void SchedulesBasedService::setSchedules(
+			const Schedules& departureSchedules,
+			const Schedules& arrivalSchedules
+		){
+			if(!_path)
+			{
+				throw BadSchedulesException();
+			}
 
+			_departureSchedules.clear();
+			_arrivalSchedules.clear();
+			Schedules::const_iterator itDeparture(departureSchedules.begin());
+			Schedules::const_iterator itArrival(arrivalSchedules.begin());
+			Path::Edges::const_iterator firstUnScheduledEdge(_path->getEdges().end());
+			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
+			{
+				const LineStop& lineStop(static_cast<const LineStop&>(**itEdge));
+				if(lineStop.getScheduleInput())
+				{
+					// Interpolation of preceding schedules
+					if(firstUnScheduledEdge != _path->getEdges().end())
+					{
+						Edge::MetricOffset totalDistance(lineStop.getMetricOffset() - (*firstUnScheduledEdge)->getMetricOffset());
+						time_duration originDepartureSchedule(*_departureSchedules.rbegin());
+						time_duration totalTime(*itArrival - originDepartureSchedule);
+						for(Path::Edges::const_iterator it(firstUnScheduledEdge); it != itEdge && it != _path->getEdges().end(); ++it)
+						{
+							Edge::MetricOffset distance((*it)->getMetricOffset() - (*firstUnScheduledEdge)->getMetricOffset());
 
+							time_duration departureSchedule(originDepartureSchedule);
+							time_duration arrivalSchedule(originDepartureSchedule);
+							departureSchedule += minutes(
+								floor( (totalTime.total_seconds() / 60) * (distance / totalDistance))
+							);
+							arrivalSchedule += minutes(
+								ceil( (totalTime.total_seconds() / 60) * (distance / totalDistance))
+							);
 
-		void SchedulesBasedService::setArrivalSchedules( const Schedules& schedules )
-		{
-			_arrivalSchedules = schedules;
-			_RTArrivalSchedules = schedules;
+							_departureSchedules.push_back(departureSchedule);
+							_arrivalSchedules.push_back(arrivalSchedule);
+						}
+					}
+
+					// Store the schedules
+					_departureSchedules.push_back(*itDeparture);
+					_arrivalSchedules.push_back(*itArrival);
+
+					// Store the last scheduled edge
+					firstUnScheduledEdge = _path->getEdges().end();
+
+					// Increment iterators
+					++itDeparture;
+					++itArrival;
+				}
+				else
+				{
+					if(firstUnScheduledEdge == _path->getEdges().end())
+					{
+						firstUnScheduledEdge = itEdge;
+					}
+				}
+			}
+
+			_RTDepartureSchedules = departureSchedules;
+			_RTArrivalSchedules = arrivalSchedules;
 			_computeNextRTUpdate();
 		}
 
@@ -206,13 +260,20 @@ namespace synthese
 			boost::posix_time::time_duration shiftArrivals
 		) const {
 			stringstream str;
-			for(size_t i(0); i<_departureSchedules.size(); ++i)
+			size_t i(0);
+			BOOST_FOREACH(const Edge* edge, _path->getEdges())
 			{
+				if(!static_cast<const LineStop*>(edge)->getScheduleInput())
+				{
+					++i;
+					continue;
+				}
 				if(i)
 				{
 					str << ",";
 				}
 				str << EncodeSchedule(_arrivalSchedules[i] + shiftArrivals) << "#" << EncodeSchedule(_departureSchedules[i]);
+				++i;
 			}
 			return str.str();
 		}

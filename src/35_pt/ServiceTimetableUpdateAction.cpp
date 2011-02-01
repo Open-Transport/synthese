@@ -142,8 +142,7 @@ namespace synthese
 				}
 			}
 
-			_service->setDepartureSchedules(departureSchedules);
-			_service->setArrivalSchedules(arrivalSchedules);
+			_service->setSchedules(departureSchedules, arrivalSchedules);
 
 			Fetcher<SchedulesBasedService>::FetchSave(*_service);
 

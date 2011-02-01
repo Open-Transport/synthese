@@ -49,115 +49,14 @@ namespace synthese
 			, _originDateTime(not_a_date_time)
 			, _reservationDeadLine(not_a_date_time)
 			, _reservationRuleId(0)
-		{
-
-		}
+		{}
 
 
-
-		void Reservation::setLineCode( const std::string& code )
-		{
-			_lineCode = code;
-		}
-
-		const std::string& Reservation::getLineCode() const
-		{
-			return _lineCode;
-		}
-
-		void Reservation::setServiceCode( const std::string& code )
-		{
-			_serviceCode = code;
-		}
-
-
-		void Reservation::setDeparturePlaceName( const std::string& name )
-		{
-			_departurePlaceName = name;
-		}
-
-		
-		void Reservation::setArrivalPlaceName( const std::string& name )
-		{
-			_arrivalPlaceName = name;
-		}
-
-		
-		void Reservation::setArrivalAddress( const std::string& address )
-		{
-			_arrivalAddress = address;
-		}
-
-		void Reservation::setDepartureAddress( const std::string& address )
-		{
-			_departureAddress = address;
-		}
-
-		void Reservation::setDepartureTime( const ptime& time )
-		{
-			_departureTime = time;
-		}
-
-		void Reservation::setArrivalTime( const ptime& time )
-		{
-			_arrivalTime = time;
-		}
-
-
-		const std::string& Reservation::getServiceCode() const
-		{
-			return _serviceCode;
-		}
-
-		const std::string& Reservation::getDeparturePlaceName() const
-		{
-			return _departurePlaceName;
-		}
-
-		const std::string& Reservation::getArrivalPlaceName() const
-		{
-			return _arrivalPlaceName;
-		}
-
-		const std::string& Reservation::getDepartureAddress() const
-		{
-			return _departureAddress;
-		}
-
-		const std::string& Reservation::getArrivalAddress() const
-		{
-			return _arrivalAddress;
-		}
-
-		const ptime& Reservation::getDepartureTime() const
-		{
-			return _departureTime;
-		}
-
-		const ptime& Reservation::getArrivalTime() const
-		{
-			return _arrivalTime;
-		}
-
-		const ReservationTransaction* Reservation::getTransaction() const
-		{
-			return _transaction;
-		}
 
 		void Reservation::setTransaction(ReservationTransaction* transaction )
 		{
 			_transaction = transaction;
 			transaction->addReservation(this);
-		}
-
-		const ptime& Reservation::getOriginDateTime() const
-		{
-			return _originDateTime;
-		}
-
-		void Reservation::setOriginDateTime( const ptime& time )
-		{
-			_originDateTime = time;
 		}
 
 		
@@ -192,20 +91,6 @@ namespace synthese
 
 
 
-		void Reservation::setReservationDeadLine( const ptime& time )
-		{
-			_reservationDeadLine = time;
-		}
-
-
-
-		const ptime& Reservation::getReservationDeadLine() const
-		{
-			return _reservationDeadLine;
-		}
-
-
-
 		std::string Reservation::getFullStatusText() const
 		{
 			ReservationStatus status(getStatus());
@@ -221,5 +106,4 @@ namespace synthese
 
 			return statusText;
 		}
-	}
-}
+}	}

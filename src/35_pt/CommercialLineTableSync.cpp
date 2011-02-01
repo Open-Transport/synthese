@@ -48,7 +48,7 @@
 #include "Conversion.h"
 
 // Security
-#include "12_security/Constants.h"
+#include "SecurityConstants.hpp"
 #include "Right.h"
 
 // Std

@@ -30,7 +30,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/optional.hpp>
 
-#include "12_security/Types.h"
+#include "SecurityTypes.hpp"
 #include "UtilConstants.h"
 
 namespace synthese

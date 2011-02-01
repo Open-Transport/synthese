@@ -70,6 +70,7 @@ namespace synthese
 			std::string		_phone;
 			bool			_isConnectionAllowed;
 			boost::gregorian::date	_birthDate;
+			std::string		_language;
 			
 		public:
 			User(util::RegistryKeyType id = 0);
@@ -95,6 +96,7 @@ namespace synthese
 				void setConnectionAllowed(bool value);
 				void setBirthDate(const boost::gregorian::date& date);
 				void setRandomPassword();
+				void setLanguage(const std::string& value){ _language = value; }
 			//@}
 
 			//! \name Getters
@@ -117,6 +119,7 @@ namespace synthese
 				const std::string&	getPhone()				const;
 				bool				getConnectionAllowed()	const;
 				const boost::gregorian::date&	getBirthDate()			const;
+				const std::string&	getLanguage() const { return _language; }
 			//@}
 
 			//! \name Services

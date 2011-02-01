@@ -298,8 +298,9 @@ namespace synthese
 
 
 
-		bool JourneyPattern::operator==( const StopsWithDepartureArrivalAuthorization& stops ) const
-		{
+		bool JourneyPattern::operator==(
+			const StopsWithDepartureArrivalAuthorization& stops
+		) const	{
 			if(getEdges().size() != stops.size())
 			{
 				return false;
@@ -309,9 +310,11 @@ namespace synthese
 			BOOST_FOREACH(const Edge* edge, getEdges())
 			{
 				const StopsWithDepartureArrivalAuthorization::value_type& stop(stops[rank]);
-				if( stop.stop.find(static_cast<StopPoint*>(edge->getFromVertex())) == stop.stop.end() ||
-					edge->isDeparture() != stop.departure ||
-					edge->isArrival() != stop.arrival
+				if( stop._stop.find(static_cast<StopPoint*>(edge->getFromVertex())) == stop._stop.end() ||
+					(rank > 0 && edge->isDeparture() != stop._departure) ||
+					(rank+1 < stops.size() && edge->isArrival() != stop._arrival) ||
+					(stop._metricOffset && edge->getMetricOffset() != *stop._metricOffset) ||
+					(stop._withTimes != static_cast<const LineStop*>(edge)->getScheduleInput())
 				){
 					return false;
 				}
@@ -333,5 +336,33 @@ namespace synthese
 		{
 			return Calendar::isActive(date);
 		}
-	}
-}
+
+
+
+		std::size_t JourneyPattern::getScheduledStopsNumber() const
+		{
+			size_t result(0);
+			BOOST_FOREACH(const Edge* edge, _edges)
+			{
+				if(static_cast<const LineStop*>(edge)->getScheduleInput())
+				{
+					++result;
+				}
+			}
+			return result;
+		}
+
+
+		JourneyPattern::StopWithDepartureArrivalAuthorization::StopWithDepartureArrivalAuthorization(
+			const std::set<StopPoint*>& stop,
+			boost::optional<Edge::MetricOffset> metricOffset /*= boost::optional<MetricOffset>()*/,
+			bool departure /*= true*/,
+			bool arrival /*= true */,
+			bool withTimes
+		):	_stop(stop),
+			_metricOffset(metricOffset),
+			_departure(departure),
+			_arrival(arrival),
+			_withTimes(withTimes)
+		{}
+}	}

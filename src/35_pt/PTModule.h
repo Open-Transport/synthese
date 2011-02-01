@@ -25,7 +25,7 @@
 
 
 #include "GraphModuleTemplate.h"
-#include "12_security/Types.h"
+#include "SecurityTypes.hpp"
 #include "Registry.h"
 
 #include <vector>

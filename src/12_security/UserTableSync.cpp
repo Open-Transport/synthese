@@ -64,6 +64,7 @@ namespace synthese
 		const string UserTableSync::TABLE_COL_PHONE = "phone";
 		const string UserTableSync::COL_LOGIN_AUTHORIZED = "auth";
 		const string UserTableSync::COL_BIRTH_DATE = "birth_date";
+		const string UserTableSync::COL_LANGUAGE = "language";
 	}
 
 	namespace db
@@ -89,6 +90,7 @@ namespace synthese
 			SQLiteTableSync::Field(UserTableSync::TABLE_COL_PHONE, SQL_TEXT),
 			SQLiteTableSync::Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_INTEGER),
 			SQLiteTableSync::Field(UserTableSync::COL_BIRTH_DATE, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(UserTableSync::COL_LANGUAGE, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -119,6 +121,7 @@ namespace synthese
 			user->setPhone(rows->getText ( UserTableSync::TABLE_COL_PHONE));
 			user->setConnectionAllowed(rows->getBool ( UserTableSync::COL_LOGIN_AUTHORIZED));
 			user->setBirthDate(rows->getDate(UserTableSync::COL_BIRTH_DATE));
+			user->setLanguage(rows->getText(UserTableSync::COL_LANGUAGE));
 	
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -158,6 +161,7 @@ namespace synthese
 			query.addField(user->getPhone());
 			query.addField(user->getConnectionAllowed());
 			query.addField(user->getBirthDate());
+			query.addField(user->getLanguage());
 			query.execute(transaction);
 		}
 	}

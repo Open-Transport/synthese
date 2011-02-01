@@ -1,6 +1,6 @@
 
 /** Security module related constants definitions file.
-	@file 12_security/Constants.h
+	@file SecurityConstants.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>

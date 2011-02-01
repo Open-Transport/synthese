@@ -28,8 +28,8 @@
 #include "Session.h"
 #include "User.h"
 #include "Profile.h"
-#include "12_security/Types.h"
-#include "12_security/Constants.h"
+#include "SecurityTypes.hpp"
+#include "SecurityConstants.hpp"
 #include "ParametersMap.h"
 #include "AjaxForm.hpp"
 

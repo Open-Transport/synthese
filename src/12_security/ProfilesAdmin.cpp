@@ -32,7 +32,7 @@
 #include "Right.h"
 #include "SecurityRight.h"
 #include "SecurityModule.h"
-#include "12_security/Constants.h"
+#include "SecurityConstants.hpp"
 #include "StaticActionFunctionRequest.h"
 #include "AdminModule.h"
 #include "AdminInterfaceElement.h"

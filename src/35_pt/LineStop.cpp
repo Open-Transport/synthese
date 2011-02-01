@@ -51,7 +51,8 @@ namespace synthese
 			bool isDeparture,
 			bool isArrival,		
 			double metricOffset,
-			StopPoint* physicalStop
+			StopPoint* physicalStop,
+			bool scheduleInput
 		):	Registrable(id),
 			_isDeparture(isDeparture),
 			_isArrival(isArrival),
