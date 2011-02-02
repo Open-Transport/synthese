@@ -269,7 +269,7 @@ namespace synthese
 				util::Env& env,
 				util::LinkLevel linkLevel
 			){
-				stringstream subQuery;
+				std::stringstream subQuery;
 				subQuery << "SELECT pkid FROM idx_" << K::TABLE.NAME << "_" << TABLE_COL_GEOMETRY << " WHERE " <<
 					"xmin > " << envelope.getMinX() << " AND xmax < " << envelope.getMaxX() <<
 					" AND ymin > " << envelope.getMinY() << " AND ymax < " << envelope.getMaxY()

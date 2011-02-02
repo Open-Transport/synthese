@@ -82,13 +82,6 @@ namespace synthese
 
 			string line;
 
-			struct PointArret
-			{
-				std::string operatorCode;
-				std::string name;
-				boost::shared_ptr<StopPoint> stop;
-			};
-
 			typedef std::map<std::string, PointArret> PointsArrets;
 
 			PointsArrets _nonLinkedPointsArrets;

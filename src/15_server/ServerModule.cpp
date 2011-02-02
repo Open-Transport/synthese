@@ -76,7 +76,7 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_SMTP_SERVER ("smtp_server");
 		const string ServerModule::MODULE_PARAM_SESSION_MAX_DURATION("session_max_duration");
 
-		const std::string ServerModule::VERSION("3.2.0");
+		const std::string ServerModule::VERSION("3.2.1");
 
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 

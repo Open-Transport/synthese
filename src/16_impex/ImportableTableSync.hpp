@@ -122,8 +122,8 @@ namespace synthese
 		):	_source(source)
 		{
 			_map.clear();
-			T::SearchResult result(T::Search(env));
-			BOOST_FOREACH(T::SearchResult::value_type& v, result)
+			typename T::SearchResult result(T::Search(env));
+			BOOST_FOREACH(typename T::SearchResult::value_type& v, result)
 			{
 				if(!v->hasLinkWithSource(source))
 				{
@@ -148,12 +148,12 @@ namespace synthese
 		typename ImportableTableSync::ObjectBySource<T>::Set ImportableTableSync::ObjectBySource<T>::get(
 			const std::string& code
 		) const	{
-			Map::const_iterator it(_map.find(code));
+			typename Map::const_iterator it(_map.find(code));
 			if(it != _map.end())
 			{
 				return it->second;
 			}
-			return ImportableTableSync::ObjectBySource<T>::Set();
+			return typename ImportableTableSync::ObjectBySource<T>::Set();
 		}
 
 
@@ -163,7 +163,7 @@ namespace synthese
 			typename T::ObjectType& object
 		){
 			const std::string& code(object.getCodeBySource(_source));
-			Map::iterator it(_map.find(code));
+			typename Map::iterator it(_map.find(code));
 			if(it != _map.end())
 			{
 				it->second.insert(&object);

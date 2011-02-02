@@ -66,10 +66,11 @@ namespace synthese
 				const server::ParametersMap& map,
 				bool doImport
 			){
-				if(map.getOptional<string>(PARAMETER_PATH))
+				if(map.getOptional<std::string>(PARAMETER_PATH))
 				{
-					vector<string> pathsVector;
-					boost::algorithm::split(pathsVector, map.get<std::string>(PARAMETER_PATH), boost::is_any_of(","));
+					std::vector<std::string> pathsVector;
+					std::string path(map.get<std::string>(PARAMETER_PATH));
+					boost::algorithm::split(pathsVector, path, boost::is_any_of(","));
 					BOOST_FOREACH(const std::string& token, pathsVector)
 					{
 						if(token.empty()) continue;

@@ -81,6 +81,8 @@ namespace synthese
 		const std::string HeuresFileFormat::Importer_::FILE_ITINERAI("1itinerai"); 
 		const std::string HeuresFileFormat::Importer_::FILE_TRONCONS("2troncons");
 		const std::string HeuresFileFormat::Importer_::FILE_SERVICES("3services");
+		const std::string HeuresFileFormat::Importer_::PARAMETER_END_DATE("ed"); 
+		const std::string HeuresFileFormat::Importer_::PARAMETER_START_DATE("sd");
 	}
 
 	namespace impex

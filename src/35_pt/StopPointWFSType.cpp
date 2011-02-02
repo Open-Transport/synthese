@@ -47,6 +47,7 @@ namespace synthese
 
 	namespace map
 	{
+		template<>
 		void WFSTypeTemplate<StopPointWFSType>::GetSchema(
 			std::ostream& stream
 		){
@@ -55,7 +56,7 @@ namespace synthese
 				"<complexType name=\"" << FACTORY_KEY << "Type\">" <<
 				"<complexContent>" <<
 				"<extension base=\"gml:AbstractFeatureType\">" <<
-				"<sequence>"
+				"<sequence>" <<
 				"<element name=\"msGeometry\" type=\"gml:GeometryPropertyType\" minOccurs=\"0\" maxOccurs=\"1\"/>" <<
 				"<element name=\"" << TABLE_COL_ID << "\" type=\"string\"/>" <<
 				"<element name=\"" << StopPointTableSync::COL_OPERATOR_CODE << "\" type=\"string\"/>" <<
@@ -69,6 +70,7 @@ namespace synthese
 		}
 
 
+		template<>
 		void WFSTypeTemplate<StopPointWFSType>::GetFeatures(
 			std::ostream& stream,
 			const geos::geom::Envelope& envelope,

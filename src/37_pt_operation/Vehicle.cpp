@@ -28,6 +28,7 @@ namespace synthese
 	
 	namespace util
 	{
+		template<>
 		const std::string Registry<pt_operation::Vehicle>::KEY("Vehicle");
 	}
 

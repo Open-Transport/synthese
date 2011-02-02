@@ -73,7 +73,7 @@ namespace synthese
 			StaticActionRequest<A>(request),
 			StaticFunctionRequest<F>(request, copyFunction)
 		{
-			_redirectAfterAction = true;
+			this->_redirectAfterAction = true;
 		}
 
 
@@ -84,7 +84,7 @@ namespace synthese
 			StaticActionRequest<A>(),
 			StaticFunctionRequest<F>()
 		{
-			_redirectAfterAction = true;
+			this->redirectAfterAction = true;
 		}
 	}
 }

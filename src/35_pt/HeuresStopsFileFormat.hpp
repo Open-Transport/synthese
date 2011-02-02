@@ -77,6 +77,16 @@ namespace synthese
 			class Importer_:
 				public impex::OneFileTypeImporter<HeuresStopsFileFormat>
 			{
+				struct PointArret
+				{
+					std::string operatorCode;
+					std::string name;
+					boost::shared_ptr<StopPoint> stop;
+
+					PointArret() {}
+				};
+
+
 			protected:
 
 				virtual bool _parse(

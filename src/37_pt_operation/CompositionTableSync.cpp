@@ -126,7 +126,8 @@ namespace synthese
 				// Vehicles
 				vector<string> vehicleLinksTexts;
 				Composition::VehicleLinks vehicleLinks;
-				split(vehicleLinksTexts, rows->getText(CompositionTableSync::COL_VEHICLES), is_any_of(","));
+				string text(rows->getText(CompositionTableSync::COL_VEHICLES));
+				split(vehicleLinksTexts, text, is_any_of(","));
 				BOOST_FOREACH(const string& vehicleLink, vehicleLinksTexts)
 				{
 					vector<string> values;
