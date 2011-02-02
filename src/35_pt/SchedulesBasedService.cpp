@@ -84,21 +84,22 @@ namespace synthese
 			_arrivalSchedules.clear();
 			Schedules::const_iterator itDeparture(departureSchedules.begin());
 			Schedules::const_iterator itArrival(arrivalSchedules.begin());
-			Path::Edges::const_iterator firstUnScheduledEdge(_path->getEdges().end());
+			Path::Edges::const_iterator lastScheduledEdge(_path->getEdges().end());
+			bool atLeastOneUnscheduledEdge(false);
 			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
 			{
 				const LineStop& lineStop(static_cast<const LineStop&>(**itEdge));
 				if(lineStop.getScheduleInput())
 				{
 					// Interpolation of preceding schedules
-					if(firstUnScheduledEdge != _path->getEdges().end())
+					if(atLeastOneUnscheduledEdge)
 					{
-						Edge::MetricOffset totalDistance(lineStop.getMetricOffset() - (*firstUnScheduledEdge)->getMetricOffset());
+						Edge::MetricOffset totalDistance(lineStop.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
 						time_duration originDepartureSchedule(*_departureSchedules.rbegin());
 						time_duration totalTime(*itArrival - originDepartureSchedule);
-						for(Path::Edges::const_iterator it(firstUnScheduledEdge); it != itEdge && it != _path->getEdges().end(); ++it)
+						for(Path::Edges::const_iterator it(lastScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
 						{
-							Edge::MetricOffset distance((*it)->getMetricOffset() - (*firstUnScheduledEdge)->getMetricOffset());
+							Edge::MetricOffset distance((*it)->getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
 
 							time_duration departureSchedule(originDepartureSchedule);
 							time_duration arrivalSchedule(originDepartureSchedule);
@@ -119,7 +120,8 @@ namespace synthese
 					_arrivalSchedules.push_back(*itArrival);
 
 					// Store the last scheduled edge
-					firstUnScheduledEdge = _path->getEdges().end();
+					lastScheduledEdge = itEdge;
+					atLeastOneUnscheduledEdge = false;
 
 					// Increment iterators
 					++itDeparture;
@@ -127,10 +129,7 @@ namespace synthese
 				}
 				else
 				{
-					if(firstUnScheduledEdge == _path->getEdges().end())
-					{
-						firstUnScheduledEdge = itEdge;
-					}
+					atLeastOneUnscheduledEdge = true;
 				}
 			}
 

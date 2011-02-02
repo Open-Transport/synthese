@@ -57,7 +57,7 @@ namespace synthese
 			_isDeparture(isDeparture),
 			_isArrival(isArrival),
 			Edge(line, rankInPath, physicalStop, metricOffset),
-			_scheduleInput(true)
+			_scheduleInput(scheduleInput)
 		{
 			if (physicalStop)
 				setPhysicalStop(physicalStop);
