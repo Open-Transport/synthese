@@ -143,7 +143,7 @@ namespace synthese
 	{
 		VehicleTableSync::SearchResult VehicleTableSync::Search(
 			util::Env& env,
-			// boost::optional<util::RegistryKeyType> parameterId /*= boost::optional<util::RegistryKeyType>()*/,
+			boost::optional<std::string> name,
 			size_t first /*= 0*/,
 			optional<size_t> number /*= boost::optional<std::size_t>()*/,
 			bool orderByName,
@@ -151,14 +151,14 @@ namespace synthese
 			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
 		){
 			SelectQuery<VehicleTableSync> query;
-			// if(parameterId)
-			// {
-			// 	query.addWhereField(COL_PARENT_ID, *parentFolderId);
-			// }
-			// if(orderByName)
-			// {
-			// 	query.addOrderField(COL_NAME, raisingOrder);
-			// }
+			if(name)
+			{
+				query.addWhereField(COL_NAME, "%"+ *name +"%", ComposedExpression::OP_LIKE);
+			}
+			if(orderByName)
+			{
+				query.addOrderField(COL_NAME, raisingOrder);
+			}
 			if (number)
 			{
 				query.setNumber(*number + 1);

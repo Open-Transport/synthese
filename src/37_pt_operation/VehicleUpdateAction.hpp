@@ -97,7 +97,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				// void setObject(boost::shared_ptr<Object> value) { _object = value; }
+				void setVehicle(boost::shared_ptr<Vehicle> value) { _vehicle = value; }
 			//@}
 		};
 	}

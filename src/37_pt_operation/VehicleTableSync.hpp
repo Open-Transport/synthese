@@ -69,7 +69,7 @@ namespace synthese
 				/// @since 3.2.1
 				static SearchResult Search(
 					util::Env& env,
-					// boost::optional<util::RegistryKeyType> parameterId = boost::optional<util::RegistryKeyType>(),
+					boost::optional<std::string> name = boost::optional<std::string>(),
 					std::size_t first = 0,
 					boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 					bool orderByName = true,

@@ -14,6 +14,9 @@ synthese::pt_operation::CompositionUpdateAction::integrate();
 synthese::pt_operation::VehicleUpdateAction::integrate();
 synthese::pt_operation::VehicleRemoveAction::integrate();
 
+synthese::pt_operation::VehicleAdmin::integrate();
+synthese::pt_operation::VehiclesAdmin::integrate();
+
 synthese::util::Env::Integrate<synthese::pt_operation::Composition>();
 synthese::util::Env::Integrate<synthese::pt_operation::Vehicle>();
 
