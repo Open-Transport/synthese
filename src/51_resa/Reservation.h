@@ -80,7 +80,7 @@ namespace synthese
 				boost::posix_time::ptime		_arrivalTime;			//!< Moment d'arrivée prévue
 				boost::posix_time::ptime		_originDateTime;
 				boost::posix_time::ptime		_reservationDeadLine;
-				pt_operation::Vehicle*			_vehicle;
+				const pt_operation::Vehicle*	_vehicle;
 				std::string						_seatNumber;
 			//@}
 
@@ -100,7 +100,7 @@ namespace synthese
 				void setArrivalAddress		(const std::string& address){ _arrivalAddress = address; }
 				void setDepartureTime		(const boost::posix_time::ptime& time){ _departureTime = time; }
 				void setArrivalTime			(const boost::posix_time::ptime& time){ _arrivalTime = time; }
-				void setVehicle				(pt_operation::Vehicle* value){ _vehicle = value; }
+				void setVehicle				(const pt_operation::Vehicle* value){ _vehicle = value; }
 				void setSeatNumber			(const std::string& value){ _seatNumber = value; }
 				void setOriginDateTime		(const boost::posix_time::ptime& time){ _originDateTime = time; }
 				void setReservationDeadLine	(const boost::posix_time::ptime& time){ _reservationDeadLine = time; }
@@ -133,7 +133,7 @@ namespace synthese
 				const ReservationTransaction*	getTransaction()			const { return _transaction; }
 				const boost::posix_time::ptime&	getOriginDateTime()			const { return _originDateTime; }
 				const boost::posix_time::ptime&	getReservationDeadLine()	const { return _reservationDeadLine; }
-				pt_operation::Vehicle*			getVehicle()				const { return _vehicle; }
+				const pt_operation::Vehicle*	getVehicle()				const { return _vehicle; }
 				const std::string&				getSeatNumber()				const { return _seatNumber; }
 			//@}
 

@@ -43,12 +43,14 @@ namespace synthese
 	{
 		Reservation::Reservation(
 			RegistryKeyType key
-		):	Registrable(key)
+		):	Registrable(key),
+			_transaction(NULL)
 			, _departureTime(not_a_date_time)
 			, _arrivalTime(not_a_date_time)
 			, _originDateTime(not_a_date_time)
 			, _reservationDeadLine(not_a_date_time)
-			, _reservationRuleId(0)
+			, _reservationRuleId(0),
+			_vehicle(NULL)
 		{}
 
 
@@ -56,7 +58,10 @@ namespace synthese
 		void Reservation::setTransaction(ReservationTransaction* transaction )
 		{
 			_transaction = transaction;
-			transaction->addReservation(this);
+			if(transaction)
+			{
+				transaction->addReservation(this);
+			}
 		}
 
 		

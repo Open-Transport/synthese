@@ -461,7 +461,8 @@ namespace synthese
 
 		bool BookReservationAction::isAuthorized(const Session* session
 		) const {
-			if( !session || !session->hasProfile())
+			return true; // Temporary
+/*			if( !session || !session->hasProfile())
 			{
 				return false;
 			}
@@ -471,7 +472,7 @@ namespace synthese
 				_customer->getKey() == session->getUser()->getKey() &&
 				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE)
 			;
-		}
+*/		}
 
 
 

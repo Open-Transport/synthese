@@ -43,6 +43,7 @@ namespace synthese
 	namespace resa
 	{
 		class ReservationTransaction;
+		class Reservation;
 
 		/** Reservation Log.
 			@ingroup m51Logs refLogs
@@ -87,6 +88,7 @@ namespace synthese
 				FAKE_CALL = 15,
 				OUTGOING_CALL = 16,
 				RESERVATION_ENTRY = 20,
+				RESERVATION_UPDATE = 25,
 				CANCELLATION_ENTRY = 30,
 				DELAYED_CANCELLATION_ENTRY = 35,
 				CUSTOMER_COMMENT_ENTRY = 40,
@@ -175,6 +177,12 @@ namespace synthese
 			static void AddPasswordInitEntry(
 				const server::Session& session,
 				const security::User& subject
+			);
+
+			static void AddReservationUpdateEntry(
+				const server::Session& session,
+				const Reservation& reservation,
+				const std::string& detail
 			);
 
 

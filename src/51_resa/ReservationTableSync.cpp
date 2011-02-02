@@ -32,6 +32,7 @@
 #include "ReservationTransactionTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "JourneyPatternTableSync.hpp"
+#include "VehicleTableSync.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -47,7 +48,7 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace pt;
-	using namespace pt;
+	using namespace pt_operation;
 
 	namespace util
 	{
@@ -70,6 +71,8 @@ namespace synthese
 		const string ReservationTableSync::COL_RESERVATION_RULE_ID = "reservation_rule_id";
 		const string ReservationTableSync::COL_ORIGIN_DATE_TIME = "origin_date_time";
 		const string ReservationTableSync::COL_RESERVATION_DEAD_LINE("reservation_dead_line");
+		const string ReservationTableSync::COL_VEHICLE_ID("vehicle_id");
+		const string ReservationTableSync::COL_SEAT_NUMBER("seat_number");
 	}
 
 	namespace db
@@ -95,6 +98,8 @@ namespace synthese
 			SQLiteTableSync::Field(ReservationTableSync::COL_RESERVATION_RULE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(ReservationTableSync::COL_ORIGIN_DATE_TIME, SQL_TIMESTAMP),
 			SQLiteTableSync::Field(ReservationTableSync::COL_RESERVATION_DEAD_LINE, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(ReservationTableSync::COL_VEHICLE_ID, SQL_INTEGER),
+			SQLiteTableSync::Field(ReservationTableSync::COL_SEAT_NUMBER, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -130,6 +135,7 @@ namespace synthese
 			object->setReservationRuleId(rows->getLongLong ( ReservationTableSync::COL_RESERVATION_RULE_ID));
 			object->setOriginDateTime(rows->getDateTime( ReservationTableSync::COL_ORIGIN_DATE_TIME));
 			object->setReservationDeadLine(rows->getDateTime( ReservationTableSync::COL_RESERVATION_DEAD_LINE));
+			object->setSeatNumber(rows->getText(ReservationTableSync::COL_SEAT_NUMBER));
 
 			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
 			{
@@ -139,12 +145,26 @@ namespace synthese
 						env, linkLevel
 					).get()
 				);
+
+				RegistryKeyType vehicleId(rows->getLongLong(ReservationTableSync::COL_VEHICLE_ID));
+				if(vehicleId > 0)
+				{
+					object->setVehicle(
+						VehicleTableSync::Get(vehicleId, env, linkLevel).get()
+					);
+				}
 			}
 		}
 
+
+
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Unlink(Reservation* object)
 		{
+			object->setTransaction(NULL);
+			object->setVehicle(NULL);
 		}
+
+
 
 		template<> void SQLiteDirectTableSyncTemplate<ReservationTableSync,Reservation>::Save(
 			Reservation* object,
@@ -165,6 +185,8 @@ namespace synthese
 			query.addField(object->getReservationRuleId());
 			query.addField(object->getOriginDateTime());
 			query.addField(object->getReservationDeadLine());
+			query.addField(object->getVehicle() ? object->getVehicle()->getKey() : RegistryKeyType(0));
+			query.addField(object->getSeatNumber());
 			query.execute(transaction);
 		}
 
