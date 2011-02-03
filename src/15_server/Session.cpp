@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <boost/lexical_cast.hpp>
+#include <boost/nondet_random.hpp>
 
 #include "Session.h"
 #include "SessionException.h"
@@ -68,11 +69,17 @@ namespace synthese
 
 		std::string Session::generateKey()
 		{
+			boost::random_device rng;
+
+			static const char alphanum[] =
+				"0123456789"
+				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+				"abcdefghijklmnopqrstuvwxyz";
+
 			std::string key;
-			srand( (unsigned) ::time( NULL ) );
-			for (size_t i=0; i< Session::KEY_LENGTH; ++i)
+			for(size_t i = 0; i < Session::KEY_LENGTH; ++i)
 			{
-				key += lexical_cast<string>(rand());
+				key += alphanum[rng() % (sizeof(alphanum) - 1)];
 			}
 			return key;
 		}
