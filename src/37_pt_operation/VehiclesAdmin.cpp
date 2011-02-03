@@ -35,6 +35,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "VehicleUpdateAction.hpp"
 #include "VehicleTableSync.hpp"
+#include "VehicleRemoveAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -112,6 +113,8 @@ namespace synthese
 			createRequest.setActionFailedPage<VehiclesAdmin>();
 			createRequest.setActionWillCreateObject();
 
+			AdminActionFunctionRequest<VehicleRemoveAction, VehiclesAdmin> removeRequest(request);
+
 			// Search
 			VehicleTableSync::SearchResult vehicles(
 				VehicleTableSync::Search(
@@ -125,7 +128,8 @@ namespace synthese
 
 			ActionResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
-			h.push_back(make_pair(string(), "Numéro"));
+			h.push_back(make_pair(string(), "NumÃ©ro"));
+			h.push_back(make_pair(string(), "Actions"));
 			h.push_back(make_pair(string(), "Actions"));
 			
 			ActionResultHTMLTable t(
@@ -148,11 +152,14 @@ namespace synthese
 				openRequest.getPage()->setVehicle(const_pointer_cast<const Vehicle>(vehicle));
 				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), VehicleAdmin::ICON);
 				
+				stream << t.col();
+				removeRequest.getAction()->setVehicle(const_pointer_cast<const Vehicle>(vehicle));
+				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer le vÃ©hicule "+ vehicle->getName() + " ?");
 			}
 
 			stream << t.row(string());
-			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_NAME, "", "Entrez le nom du véhicule ici");
-			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_NUMBER, "", "Entrez le numéro du véhicule ici");
+			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_NAME, "", "Entrez le nom du vÃ©hicule ici");
+			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_NUMBER, "", "Entrez le numÃ©ro du vÃ©hicule ici");
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.close();
 		}

@@ -107,7 +107,7 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 
-			stream << "<h2>Propriétés</h2>";
+			stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 			AdminActionFunctionRequest<VehicleUpdateAction, VehicleAdmin> updateRequest(request);
 			updateRequest.getAction()->setVehicle(const_pointer_cast<Vehicle>(_vehicle));
@@ -115,10 +115,10 @@ namespace synthese
 			PropertiesHTMLTable t(updateRequest.getHTMLForm("update_form"));
 			stream << t.open();
 			stream << t.cell("Nom", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_NAME, _vehicle->getName()));
-			stream << t.cell("Numéro", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_NUMBER, _vehicle->getNumber()));
+			stream << t.cell("NumÃ©ro", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_NUMBER, _vehicle->getNumber()));
 			stream << t.cell("Image", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_PICTURE, _vehicle->getPicture()));
 			stream << t.cell("Places", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_SEATS, VehicleTableSync::SerializeSeats(_vehicle->getSeats())));
-			stream << t.cell("Lignes autorisées", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_ALLOWED_LINES, VehicleTableSync::SerializeAllowedLines(_vehicle->getAllowedLines())));
+			stream << t.cell("Lignes autorisÃ©es", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_ALLOWED_LINES, VehicleTableSync::SerializeAllowedLines(_vehicle->getAllowedLines())));
 			stream << t.close();
 		}
 

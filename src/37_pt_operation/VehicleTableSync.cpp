@@ -221,7 +221,10 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			vector<string> allowedLinesStrs;
-			split(allowedLinesStrs, value, is_any_of(","));
+			if(!value.empty())
+			{
+				split(allowedLinesStrs, value, is_any_of(","));
+			}
 
 			Vehicle::AllowedLines allowedLinesValue;
 
@@ -247,7 +250,10 @@ namespace synthese
 		Vehicle::Seats VehicleTableSync::UnserializeSeats( const std::string& value )
 		{
 			Vehicle::Seats seatsValue;
-			split(seatsValue, value, is_any_of(","));
+			if(!value.empty())
+			{
+				split(seatsValue, value, is_any_of(","));
+			}
 			return seatsValue;
 		}
 }	}
