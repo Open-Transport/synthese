@@ -67,7 +67,7 @@ namespace synthese
 
 					The controls are :
 						- expiration of the session
-						- ip must not have change
+						- ip must not have changed
 
 					If a control fails, then a SessionException is thrown
 				*/
