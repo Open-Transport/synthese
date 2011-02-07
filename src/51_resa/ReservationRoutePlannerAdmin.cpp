@@ -105,6 +105,7 @@ namespace synthese
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_CUSTOMER_ID("cu");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_SEATS_NUMBER("sn");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_PLANNING_ORDER("po");
+		const std::string ReservationRoutePlannerAdmin::PARAMETER_APPROACH_SPEED("apsp");
 
 
 
@@ -114,7 +115,8 @@ namespace synthese
 			_withoutTransfer(false),
 			_dateTime(second_clock::local_time()),
 			_seatsNumber(1),
-			_planningOrder(DEPARTURE_FIRST)
+			_planningOrder(DEPARTURE_FIRST),
+			_approachSpeed(0.833)
 		{ }
 		
 
@@ -139,6 +141,11 @@ namespace synthese
 			_disabledPassenger = map.getDefault<bool>(PARAMETER_DISABLED_PASSENGER, false);
 			_withoutTransfer = map.getDefault<bool>(PARAMETER_WITHOUT_TRANSFER, false);
 
+			if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
+			{
+				_approachSpeed = map.get<double>(PARAMETER_APPROACH_SPEED);
+			}
+
 			if(map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
 			{
 				try
@@ -156,7 +163,7 @@ namespace synthese
 					throw AdminParametersException("Reservation load error");
 				}
 			}
-			
+
 			if(map.getOptional<RegistryKeyType>(PARAMETER_CUSTOMER_ID))
 			{
 				try
@@ -188,6 +195,7 @@ namespace synthese
 			m.insert(PARAMETER_WITHOUT_TRANSFER, _withoutTransfer);
 			m.insert(PARAMETER_SEATS_NUMBER, _seatsNumber);
 			m.insert(PARAMETER_PLANNING_ORDER, static_cast<int>(_planningOrder));
+			m.insert(PARAMETER_APPROACH_SPEED, _approachSpeed);
 			if(_customer.get())
 			{
 				m.insert(PARAMETER_CUSTOMER_ID, _customer->getKey());
@@ -342,6 +350,8 @@ namespace synthese
 						AccessParameters::AllowedPathClasses()
 					);
 				}
+				ap.setApproachSpeed(_approachSpeed);
+
 				ap.setMaxtransportConnectionsCount(
 					_withoutTransfer ? 1 : optional<size_t>()
 				);

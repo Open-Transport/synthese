@@ -112,7 +112,6 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_SEATS_NUMBER = Action_PARAMETER_PREFIX + "senu";
 
 
-
 		BookReservationAction::BookReservationAction():
 			util::FactorableTemplate<server::Action, BookReservationAction>(),
 			_createCustomer(false),
@@ -309,6 +308,7 @@ namespace synthese
 					AccessParameters accessParameters;
 					accessParameters = map.get<string>(PARAMETER_ACCESS_PARAMETERS);
 					_accessParameters.setMaxtransportConnectionsCount(accessParameters.getMaxtransportConnectionsCount());
+					_accessParameters.setApproachSpeed(accessParameters.getApproachSpeed());
 				}
 			}
 			else if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
