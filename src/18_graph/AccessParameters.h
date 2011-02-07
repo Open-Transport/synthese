@@ -225,6 +225,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
+				void setApproachSpeed(double value){ _approachSpeed = value; }
 				void setMaxtransportConnectionsCount(boost::optional<size_t> value){ _maxTransportConnectionCount = value;}
 			//@}
 		};
