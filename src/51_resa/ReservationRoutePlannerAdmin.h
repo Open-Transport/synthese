@@ -63,6 +63,7 @@ namespace synthese
 			boost::shared_ptr<const security::User>		_customer;
 			int											_seatsNumber;
 			algorithm::PlanningOrder					_planningOrder;
+			double										_approachSpeed;
 
 		public:
 			static const std::string PARAMETER_START_CITY;
@@ -76,6 +77,7 @@ namespace synthese
 			static const std::string PARAMETER_CUSTOMER_ID;
 			static const std::string PARAMETER_SEATS_NUMBER;
 			static const std::string PARAMETER_PLANNING_ORDER;
+			static const std::string PARAMETER_APPROACH_SPEED;
 
 			ReservationRoutePlannerAdmin();
 			
