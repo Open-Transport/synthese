@@ -171,7 +171,24 @@ namespace synthese
 			return map;
 		}
 
-
+	    void BookReservationAction::setOriginDestinationPlace(
+	    		string origcity,
+	    		string origplace,
+	    		string destcity,
+	    		string destplace
+	    	)
+	    {
+	    	_originPlace = RoadModule::FetchPlace(
+	    		_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+	    			origcity,
+	    			origplace
+	    	);
+	    	_destinationPlace = RoadModule::FetchPlace(
+	    		_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+	    			destcity,
+	    			destplace
+	    	);
+	    }
 
 		void BookReservationAction::_setFromParametersMap(const ParametersMap& map)
 		{

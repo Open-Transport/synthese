@@ -116,7 +116,7 @@ namespace synthese
 			_dateTime(second_clock::local_time()),
 			_seatsNumber(1),
 			_planningOrder(DEPARTURE_FIRST),
-			_approachSpeed(0.833)
+			_approachSpeed(0.833)//0.833 = 3km/h, 1.111 = 4km/h
 		{ }
 		
 
@@ -429,6 +429,11 @@ namespace synthese
 				{
 					withReservation = true;
 					resaRequest.getAction()->setJourney(*it);
+					resaRequest.getAction()->setOriginDestinationPlace(
+							_startCity,
+							_startPlace,
+							_endCity,
+							_endPlace);
 					break;
 				}
 			}
