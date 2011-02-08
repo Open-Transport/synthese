@@ -154,6 +154,11 @@ namespace synthese
 
 			//! @name Setters
 			//@{
+			    void setOriginDestinationPlace(
+			    		std::string origcity,
+			    		std::string origplace,
+			    		std::string destcity,
+			    		std::string destplace);
 				void setJourney(const graph::Journey& journey){ _journey = journey;	}
 				void setAccessParameters(const graph::AccessParameters& value){ _accessParameters = value; }
 				void setSite(boost::shared_ptr<const pt_website::TransportWebsite> value){ _site = value; }
