@@ -64,6 +64,8 @@ namespace synthese
 			int											_seatsNumber;
 			algorithm::PlanningOrder					_planningOrder;
 			double										_approachSpeed;
+			double										_effectiveApproachSpeed;
+			bool										_enabledPedestrian;
 
 		public:
 			static const std::string PARAMETER_START_CITY;
@@ -78,6 +80,7 @@ namespace synthese
 			static const std::string PARAMETER_SEATS_NUMBER;
 			static const std::string PARAMETER_PLANNING_ORDER;
 			static const std::string PARAMETER_APPROACH_SPEED;
+			static const std::string PARAMETER_ENABLED_PEDESTRIAN;
 
 			ReservationRoutePlannerAdmin();
 			
