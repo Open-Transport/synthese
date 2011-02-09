@@ -288,7 +288,7 @@ namespace synthese
 						PlacesList::iterator pos(
 							_putPlace(
 								PlacesList::value_type(
-									GetNamedPlaceFromLegs(NULL, &leg, dynamic_cast<const NamedPlace*>(_departurePlace)),
+									GetNamedPlaceFromLegs(NULL, &leg, getNamedPlace(_departurePlace)),
 									true,
 									false
 								), minPos
@@ -304,7 +304,7 @@ namespace synthese
 						PlacesList::iterator pos(
 							_putPlace(
 								PlacesList::value_type(
-									GetNamedPlaceFromLegs(&leg, itl+1 == jl.end() ? NULL : &(*(itl+1)), dynamic_cast<const NamedPlace*>(_arrivalPlace)),
+									GetNamedPlaceFromLegs(&leg, itl+1 == jl.end() ? NULL : &(*(itl+1)), getNamedPlace(_arrivalPlace)),
 									false,
 									itl+1 == jl.end()
 								), minPos
@@ -317,7 +317,31 @@ namespace synthese
 			}
 		}
 
+		const NamedPlace* PTRoutePlannerResult::getNamedPlace(const Place* place)
+		{
+			const NamedPlace* res = dynamic_cast<const NamedPlace*>(place);
+			if(res)
+				return res;
 
+			//If NULL this is maybe a city, so we need to return mainCityPlace
+			const City * city = dynamic_cast<const City*>(place);
+			if(city)
+			{
+				const NamedPlace* mainCityPlace = NULL;
+
+				BOOST_FOREACH(const Place* cityPlace, city->getIncludedPlaces())
+				{
+					mainCityPlace = dynamic_cast<const NamedPlace*>(cityPlace);
+					//Stop on first place
+					if(mainCityPlace)
+						break;
+				}
+
+				if(mainCityPlace)
+					return mainCityPlace;
+			}
+			return NULL;
+		}
 
 		PTRoutePlannerResult::PlacesList::iterator PTRoutePlannerResult::_putPlace(
 			PlacesList::value_type value,

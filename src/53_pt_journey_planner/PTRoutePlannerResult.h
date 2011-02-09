@@ -146,6 +146,9 @@ namespace synthese
 				PlacesList::iterator target
 			);
 
+			const geography::NamedPlace* getNamedPlace(
+				const geography::Place* place
+			);
 
 		
 		public:
