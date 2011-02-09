@@ -178,16 +178,24 @@ namespace synthese
 	    		string destplace
 	    	)
 	    {
-	    	_originPlace = RoadModule::FetchPlace(
-	    		_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
-	    			origcity,
-	    			origplace
-	    	);
-	    	_destinationPlace = RoadModule::FetchPlace(
-	    		_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
-	    			destcity,
-	    			destplace
-	    	);
+			if(ResaModule::GetJourneyPlannerWebsite())
+			{
+				_originPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(origcity,origplace);
+				_destinationPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(destcity,destplace);
+			}
+			else
+			{
+				_originPlace = RoadModule::FetchPlace(
+					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+						origcity,
+						origplace
+				);
+				_destinationPlace = RoadModule::FetchPlace(
+					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+						destcity,
+						destplace
+				);
+			}
 	    }
 
 		void BookReservationAction::_setFromParametersMap(const ParametersMap& map)
@@ -263,18 +271,9 @@ namespace synthese
 				throw ActionException("Invalid seats number");
 
 			// Journey
-			_originPlace = RoadModule::FetchPlace(
-				_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+			setOriginDestinationPlace(
 				map.get<string>(PARAMETER_ORIGIN_CITY),
-				map.get<string>(PARAMETER_ORIGIN_PLACE)
-			);
-			if(!_originPlace.get())
-			{
-				throw ActionException("Invalid origin place");
-			}
-
-			_destinationPlace = RoadModule::FetchPlace(
-				_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+				map.get<string>(PARAMETER_ORIGIN_PLACE),
 				map.get<string>(PARAMETER_DESTINATION_CITY),
 				map.get<string>(PARAMETER_DESTINATION_PLACE)
 			);
@@ -282,18 +281,28 @@ namespace synthese
 			{
 				throw ActionException("Invalid destination place");
 			}
+			if(!_originPlace.get())
+			{
+				throw ActionException("Invalid origin place");
+			}
+
 			
 			// Departure date time
-			ptime departureDateTime(time_from_string(map.get<string>(PARAMETER_DATE_TIME)));
-			ptime arrivalDateTime(departureDateTime);
-			arrivalDateTime += days(1);
-			if(	_originPlace->getPoint().get() &&
+			string date_str = map.get<string>(PARAMETER_DATE_TIME);
+			string::size_type str_pos = date_str.find_first_of("|");
+			string departureDateTime_str = date_str.substr(0, str_pos);
+			string arrivalDateTime_str = date_str.substr(str_pos+1);
+
+			ptime departureDateTime(time_from_string(departureDateTime_str));
+			ptime arrivalDateTime(time_from_string(arrivalDateTime_str));
+			//arrivalDateTime += days(1);
+			/*if(	_originPlace->getPoint().get() &&
 				!_originPlace->getPoint()->isEmpty() &&
 				_destinationPlace->getPoint().get() &&
 				!_destinationPlace->getPoint()->isEmpty()
 			){
 				arrivalDateTime += minutes(2 * static_cast<int>(_originPlace->getPoint()->distance(_destinationPlace->getPoint().get()) / 1000));
-			}
+			}*/
 
 			// Accessibility
 			if(_site.get())
@@ -336,14 +345,16 @@ namespace synthese
 			PTTimeSlotRoutePlanner rp(
 				_originPlace.get(),
 				_destinationPlace.get(),
-				departureDateTime,
-				departureDateTime,
-				arrivalDateTime,
-				arrivalDateTime,
+				departureDateTime - minutes(5),
+				departureDateTime + minutes(5),
+				arrivalDateTime - minutes(5),
+				arrivalDateTime + minutes(5),
 				1,
 				_accessParameters,
 				DEPARTURE_FIRST
 			);
+
+
 			PTRoutePlannerResult jr(rp.run());
 
 			if (jr.getJourneys().empty())
