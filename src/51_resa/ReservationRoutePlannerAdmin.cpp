@@ -106,6 +106,7 @@ namespace synthese
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_SEATS_NUMBER("sn");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_PLANNING_ORDER("po");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_APPROACH_SPEED("apsp");
+		const std::string ReservationRoutePlannerAdmin::PARAMETER_ENABLED_PEDESTRIAN("epe");
 
 
 
@@ -116,8 +117,11 @@ namespace synthese
 			_dateTime(second_clock::local_time()),
 			_seatsNumber(1),
 			_planningOrder(DEPARTURE_FIRST),
+			_enabledPedestrian(true),
 			_approachSpeed(0.833)//0.833 = 3km/h, 1.111 = 4km/h
-		{ }
+		{
+			_effectiveApproachSpeed = _approachSpeed;
+		}
 		
 
 
@@ -140,10 +144,19 @@ namespace synthese
 			}
 			_disabledPassenger = map.getDefault<bool>(PARAMETER_DISABLED_PASSENGER, false);
 			_withoutTransfer = map.getDefault<bool>(PARAMETER_WITHOUT_TRANSFER, false);
+			_enabledPedestrian = map.getDefault<bool>(PARAMETER_ENABLED_PEDESTRIAN, true);
 
 			if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
 			{
 				_approachSpeed = map.get<double>(PARAMETER_APPROACH_SPEED);
+			}
+			if(_enabledPedestrian)
+			{
+				_effectiveApproachSpeed = _approachSpeed;
+			}
+			else //If pedestrian disabled, then set pedestrian speed to 0 to avoid using roads
+			{
+				_effectiveApproachSpeed = 0;
 			}
 
 			if(map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
@@ -310,6 +323,7 @@ namespace synthese
 			)	);
 			stream << st.cell("PMR", st.getForm().getOuiNonRadioInput(PARAMETER_DISABLED_PASSENGER, _disabledPassenger));
 			stream << st.cell("Sans correspondance", st.getForm().getOuiNonRadioInput(PARAMETER_WITHOUT_TRANSFER, _withoutTransfer));
+			stream << st.cell("Avec trajet piéton", st.getForm().getOuiNonRadioInput(PARAMETER_ENABLED_PEDESTRIAN, _enabledPedestrian));
 			stream << st.close();
 			stream << st.getForm().setFocus(PARAMETER_START_CITY);
 
@@ -350,7 +364,7 @@ namespace synthese
 						AccessParameters::AllowedPathClasses()
 					);
 				}
-				ap.setApproachSpeed(_approachSpeed);
+				ap.setApproachSpeed(_effectiveApproachSpeed);
 
 				ap.setMaxtransportConnectionsCount(
 					_withoutTransfer ? 1 : optional<size_t>()
