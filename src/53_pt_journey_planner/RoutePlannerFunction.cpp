@@ -889,7 +889,7 @@ namespace synthese
 								PTRoutePlannerResult::GetNamedPlaceFromLegs(
 									itl == jl.begin() ? NULL : &(*(itl - 1)),
 									&curET,
-									dynamic_cast<const NamedPlace*>(_departure_place.placeResult.value.get())
+									PTRoutePlannerResult::getNamedPlace(_departure_place.placeResult.value.get())
 							)	);
 
 							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
@@ -932,7 +932,7 @@ namespace synthese
 								PTRoutePlannerResult::GetNamedPlaceFromLegs(
 									&curET,
 									itl == jl.end()-1 ? NULL : &(*(itl+1)),
-									dynamic_cast<const NamedPlace*>(_arrival_place.placeResult.value.get())
+									PTRoutePlannerResult::getNamedPlace(_arrival_place.placeResult.value.get())
 							)	);
 							
 							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )

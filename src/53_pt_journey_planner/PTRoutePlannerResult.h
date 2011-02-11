@@ -145,11 +145,6 @@ namespace synthese
 				PlacesList::iterator source,
 				PlacesList::iterator target
 			);
-
-			const geography::NamedPlace* getNamedPlace(
-				const geography::Place* place
-			);
-
 		
 		public:
 			void operator=(const PTRoutePlannerResult& other);
@@ -458,6 +453,10 @@ namespace synthese
 				const graph::ServicePointer* arrivalLeg,
 				const graph::ServicePointer* departureLeg,
 				const geography::NamedPlace* defaultValue
+			);
+
+			static const geography::NamedPlace* getNamedPlace(
+				const geography::Place* place
 			);
 		};
 	}
