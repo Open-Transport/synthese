@@ -141,13 +141,13 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks DBLogAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == DBLogModule::FACTORY_KEY &&
+			if(	dynamic_cast<const DBLogModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile()
 			){
@@ -157,7 +157,7 @@ namespace synthese
 					if(!loge->isAuthorized(*request.getUser()->getProfile(), READ) || loge->getName().empty()) continue;
 
 					shared_ptr<DBLogAdmin> p(
-						getNewOtherPage<DBLogAdmin>(false)
+						getNewPage<DBLogAdmin>()
 					);
 					p->_viewer.setLogKey(
 						loge->getFactoryKey()

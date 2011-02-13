@@ -1,5 +1,5 @@
-/** PladisStopsFileFormat class header.
-	@file PladisStopsFileFormat.hpp
+/** GTFSStopsFileFormat class header.
+	@file GTFSStopsFileFormat.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -19,12 +19,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_PladisStopsFileFormat_H__
-#define SYNTHESE_PladisStopsFileFormat_H__
+#ifndef SYNTHESE_GTFSStopsFileFormat_H__
+#define SYNTHESE_GTFSStopsFileFormat_H__
 
 #include "FileFormatTemplate.h"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
+#include "ImportableTableSync.hpp"
+#include "StopPointTableSync.hpp"
 
 #include <iostream>
 #include <map>
@@ -57,51 +59,45 @@ namespace synthese
 		class StopPoint;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// Pladis (CarPostal) file format for stops integration.
-		/// @ingroup m35File refFile
+		/// GTFS file format for stops integration.
+		/// See http://code.google.com/intl/fr/transit/spec/transit_feed_specification.html
 		//////////////////////////////////////////////////////////////////////////
-		/// The stops part of Pladis export uses 2 files :
-		///	<ul>
-		///		<li>BAHNHOF.DAT : Names of commercial stops</li>
-		///		<li>KOORD.DAT : Coordinates of commercial stops</li>
-		///	</ul>
-		///
-		/// <h2>Import</h2>
-		///
-		///	Import of the stops : there is no automated import, because of the need of merging
-		///	the data with other sources. This work can only be done manually. A @ref PTStopsImportWizardAdmin "special admin page"
-		///	can read such BAHNHOF.DAT and KOORD.DAT and show differences with SYNTHESE.</li>
-		///
-		/// The physical stops must be linked with the items of BAHNHOF.DAT.
-		/// More than one physical stop can be linked with the same CarPostal stop. In this case, 
-		/// the import will select automatically the actual stop regarding the whole itinerary.
-		class PladisStopsFileFormat:
-			public impex::FileFormatTemplate<PladisStopsFileFormat>
+		/// @ingroup m35File refFile
+		/// @since 3.2.1
+		/// @date 2011
+		class GTFSStopsFileFormat:
+			public impex::FileFormatTemplate<GTFSStopsFileFormat>
 		{
 		public:
 
 			class Importer_:
-				public impex::MultipleFileTypesImporter<PladisStopsFileFormat>
+				public impex::MultipleFileTypesImporter<GTFSStopsFileFormat>
 			{
 			public:
-				static const std::string FILE_BAHNHOFS;
-				static const std::string FILE_KOORDS;
+				static const std::string FILE_STOPS;
+				static const std::string FILE_TRANSFERS;
+
+				static const std::string PARAMETER_IMPORT_STOP_AREA;
+				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
+				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 
 			private:
-				struct Bahnhof 
-				{
-					std::string operatorCode;
-					std::string cityName;
-					std::string name;
-					boost::shared_ptr<geos::geom::Point> coords;
-					boost::shared_ptr<geos::geom::Point> projected;
-					boost::shared_ptr<StopPoint> stop;
-				};
+				static const std::string SEP;
 
-				typedef std::map<std::string, Bahnhof> Bahnhofs;
+				bool _importStopArea;
+				bool _interactive;
+				boost::shared_ptr<const geography::City> _defaultCity;
+				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 
-				mutable Bahnhofs _nonLinkedBahnhofs;
-				mutable Bahnhofs _linkedBahnhofs;
+				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
+
+				typedef std::map<std::string, std::size_t> FieldsMap;
+				mutable FieldsMap _fieldsMap;
+				mutable std::vector<std::string> _line;
+
+				void _loadFieldsMap(const std::string& line) const;
+				std::string _getValue(const std::string& field) const;
+				void _loadLine(const std::string& line) const;
 
 			protected:
 
@@ -118,24 +114,40 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::DataSource& dataSource
-				):	impex::MultipleFileTypesImporter<PladisStopsFileFormat>(env, dataSource)
-				{}
+				);
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Import screen to include in the administration console.
 				/// @param os stream to write the result on
 				/// @param request request for display of the administration console
-				/// @since 3.2.0
+				/// @since 3.2.1
 				/// @date 2010
 				virtual void displayAdmin(
 					std::ostream& os,
 					const admin::AdminRequest& request
 				) const;
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from attributes to generic parameter maps.
+				/// @return Generated parameters map
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.2.1
+				virtual server::ParametersMap _getParametersMap() const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from generic parameters map to attributes.
+				/// @param map Parameters map to interpret
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.2.1
+				virtual void _setFromParametersMap(const server::ParametersMap& map);
+
+
 				virtual db::SQLiteTransaction _save() const;
 			};
 
-			typedef impex::NoExportPolicy<PladisStopsFileFormat> Exporter_;
+			typedef impex::NoExportPolicy<GTFSStopsFileFormat> Exporter_;
 		};
 }	}
 

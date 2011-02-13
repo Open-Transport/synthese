@@ -116,6 +116,7 @@ namespace synthese
 			static const std::string DATA_IS_DEPARTURE;
 			static const std::string DATA_STOP_NAME_26;
 			static const std::string DATA_TRANSPORT_MODE_ID;
+			static const std::string DATA_SERVICE_ID;
 
 		public:
 			static const std::string TYPE_LINE;
@@ -211,6 +212,7 @@ namespace synthese
 				const server::Request& request,
 				const TimetableRow& place,
 				const TimetableResult::RowTimesVector& times,
+				const TimetableResult::RowServicesVector& services,
 				std::size_t globalRank,
 				bool isBeforeTransfer,
 				std::size_t depth
@@ -239,7 +241,8 @@ namespace synthese
 				const server::Request& request,
 				boost::posix_time::time_duration object,
 				std::size_t rowRank,
-				std::size_t colRank
+				std::size_t colRank,
+				const pt::SchedulesBasedService* service
 			);
 
 

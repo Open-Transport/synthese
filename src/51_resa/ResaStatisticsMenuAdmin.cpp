@@ -150,19 +150,19 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks ResaStatisticsMenuAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == ResaModule::FACTORY_KEY &&
+			if(	dynamic_cast<const ResaModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			
 			return links;
@@ -177,7 +177,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 			shared_ptr<CallStatisticsAdmin> p(
-				getNewOtherPage<CallStatisticsAdmin>()
+				getNewPage<CallStatisticsAdmin>()
 			);
 			if(p->isAuthorized(*request.getUser()))
 			{
@@ -197,7 +197,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 			{
 				shared_ptr<ResaStatisticsAdmin> p(
-					getNewOtherPage<ResaStatisticsAdmin>()
+					getNewPage<ResaStatisticsAdmin>()
 				);
 				p->setCommercialLine(line);
 				links.push_back(p);

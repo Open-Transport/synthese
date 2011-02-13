@@ -29,8 +29,6 @@
 #include "FactorableTemplate.h"
 #include "Importable.h"
 
-#include <geos/geom/Point.h>
-
 namespace synthese
 {
 	namespace geography
@@ -54,20 +52,14 @@ namespace synthese
 			static const std::string PARAMETER_CITY_NAME;
 			static const std::string PARAMETER_CREATE_CITY_IF_NECESSARY;
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_CREATE_PHYSICAL_STOP;
-			static const std::string PARAMETER_PHYSICAL_STOP_OPERATOR_CODE;
-			static const std::string PARAMETER_PHYSICAL_STOP_DATA_SOURCE_ID;
-			static const std::string PARAMETER_PHYSICAL_STOP_X;
-			static const std::string PARAMETER_PHYSICAL_STOP_Y;
+			static const std::string PARAMETER_DATA_SOURCE_LINKS;
 
 		private:
 			boost::shared_ptr<geography::City> _city;
 			std::string _cityName;
 			bool _createCityIfNecessary;
 			std::string _name;
-			bool _createPhysicalStop;
 			impex::Importable::DataSourceLinks _dataSourceLinks;
-			boost::shared_ptr<geos::geom::Point> _point;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -89,8 +81,7 @@ namespace synthese
 
 		public:
 			StopAreaAddAction():
-				_createCityIfNecessary(false),
-				_createPhysicalStop(false)
+				_createCityIfNecessary(false)
 			{}
 
 
@@ -113,8 +104,6 @@ namespace synthese
 			//@{
 				void setCity(boost::shared_ptr<geography::City> value){ _city = value; }
 				void setCreateCityIfNecessary(bool value) { _createCityIfNecessary = value; }
-				void setCreatePhysicalStop(bool value) { _createPhysicalStop = value; }
-				void setPoint(boost::shared_ptr<geos::geom::Point> value) { _point = value; }
 				void setCityName(const std::string& value) { _cityName = value; }
 				void setName(const std::string& value) { _name = value; }
 				void setDataSourceLinks(const impex::Importable::DataSourceLinks value){ _dataSourceLinks = value; }

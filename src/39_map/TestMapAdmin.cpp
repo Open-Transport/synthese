@@ -156,16 +156,17 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(moduleKey == MapModule::FACTORY_KEY && request.getUser() &&
+			if(	dynamic_cast<const MapModule*>(&module) &&
+				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser()))
 			{
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}

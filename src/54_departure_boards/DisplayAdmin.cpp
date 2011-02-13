@@ -1254,7 +1254,7 @@ namespace synthese
 				BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, _displayScreen->getChildren())
 				{
 					shared_ptr<DisplayAdmin> p(
-						getNewOtherPage<DisplayAdmin>(false)
+						getNewPage<DisplayAdmin>()
 					);
 					p->setScreen(Env::GetOfficialEnv().getSPtr(it.second));
 					links.push_back(p);

@@ -43,18 +43,29 @@ namespace synthese
 			):	server::Request(request),
 				server::StaticActionFunctionRequest<A, AdminFunction>(request, true)
 			{
-				boost::shared_ptr<P> p(
-					request.getFunction()->getPage() ?
-					request.getFunction()->getPage()->template getNewOtherPage<P>() :
-					boost::shared_ptr<P>(new P)
-				);
-				this->getFunction()->setPage(p);
-				if(request.getFunction()->getPage() && P::FACTORY_KEY == request.getFunction()->getPage()->getFactoryKey())
+				boost::shared_ptr<AdminInterfaceElement> page(request.getFunction()->getPage());
+				boost::shared_ptr<P> p;
+				if(page)
 				{
-					this->getFunction()->getPage()->setActiveTab(request.getFunction()->getPage()->getCurrentTab());
+					P* ppage(dynamic_cast<P*>(page.get()));
+					if(ppage)
+					{
+						p = ppage->getNewCopiedPage();
+					}
+					else
+					{
+						p = page->getNewPage<P>();
+					}
 				}
+				else
+				{
+					p.reset(new P);
+				}
+				this->getFunction()->setPage(p);
 			}
-			
+
+
+
 			boost::shared_ptr<P> getPage() const
 			{
 				return boost::static_pointer_cast<P, AdminInterfaceElement>(

@@ -76,10 +76,13 @@ namespace synthese
 			return map;
 		}
 
-		void RequestWithInterface::_copy(shared_ptr<const Function> function)
+		void RequestWithInterface::_copy(const Function& function)
 		{
-			shared_ptr<const RequestWithInterface> rwi = static_pointer_cast<const RequestWithInterface, const Function>(function);
-			_interface = rwi->_interface;
+			const RequestWithInterface* rwi(dynamic_cast<const RequestWithInterface*>(&function));
+			if(rwi)
+			{
+				_interface = rwi->_interface;
+			}
 		}
 
 		shared_ptr<const Interface> RequestWithInterface::getInterface() const

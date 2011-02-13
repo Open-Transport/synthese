@@ -32,12 +32,15 @@
 #include "StopAreaTableSync.hpp"
 #include "DBModule.h"
 #include "ImportableTableSync.hpp"
+#include "CityTableSync.h"
+#include "GeographyModule.h"
 
 #include <geos/geom/Point.h>
 
 using namespace std;
 using namespace geos::geom;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -62,6 +65,9 @@ namespace synthese
 		const string StopPointAddAction::PARAMETER_Y = Action_PARAMETER_PREFIX + "y";
 		const string StopPointAddAction::PARAMETER_LONGITUDE = Action_PARAMETER_PREFIX + "lon";
 		const string StopPointAddAction::PARAMETER_LATITUDE = Action_PARAMETER_PREFIX + "lat";
+		const string StopPointAddAction::PARAMETER_CITY_NAME = Action_PARAMETER_PREFIX + "cn";
+		const string StopPointAddAction::PARAMETER_CITY_ID = Action_PARAMETER_PREFIX + "ci";
+		const string StopPointAddAction::PARAMETER_CREATE_CITY_IF_NECESSARY = Action_PARAMETER_PREFIX + "cc";
 
 		
 		
@@ -82,6 +88,16 @@ namespace synthese
 				map.insert(PARAMETER_Y, _point->getY());
 			}
 			map.insert(PARAMETER_NAME, _name);
+			if(_city.get())
+			{
+				map.insert(PARAMETER_CITY_ID, _city->getKey());
+			}
+			else if(_cityName)
+			{
+				map.insert(PARAMETER_CITY_NAME, *_cityName);
+			}
+			map.insert(PARAMETER_CREATE_CITY_IF_NECESSARY, _createCityIfNecessary);
+
 			return map;
 		}
 		
@@ -89,13 +105,48 @@ namespace synthese
 		
 		void StopPointAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
+			if(map.isDefined(PARAMETER_PLACE_ID)) try
 			{
-				_place = StopAreaTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
+				_place = StopAreaTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
 			}
 			catch(ObjectNotFoundException<StopArea>&)
 			{
 				throw ActionException("No such connection place");
+			}
+			else
+			{
+				if(map.isDefined(PARAMETER_CITY_ID)) try
+				{
+					_city = CityTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_CITY_ID), *_env);
+				}
+				catch(ObjectNotFoundException<City>&)
+				{
+					throw ActionException("No such city");
+				}
+				else
+				{
+					_createCityIfNecessary = map.getDefault<bool>(PARAMETER_CREATE_CITY_IF_NECESSARY, false);
+					_cityName = map.get<string>(PARAMETER_CITY_NAME);
+					if(_cityName->empty())
+					{
+						throw ActionException("Empty city name");
+					}
+					
+
+					GeographyModule::CitiesMatcher::MatchResult cities(
+						GeographyModule::GetCitiesMatcher().bestMatches(*_cityName,1)
+					);
+					if(cities.empty())
+					{
+						throw ActionException("City not found");
+					}
+					if(	!cities.empty() &&
+						(	to_lower_copy(*_cityName) == to_lower_copy(cities.front().value->getName()) ||
+							_createCityIfNecessary
+					)	){
+						_city = cities.front().value;
+					}
+				}
 			}
 
 			_name = map.getDefault<string>(PARAMETER_NAME);
@@ -125,6 +176,27 @@ namespace synthese
 		void StopPointAddAction::run(
 			Request& request
 		){
+			SQLiteTransaction transaction;
+
+			// Place creation
+			if(!_place.get())
+			{
+				// City creation
+				if(_city.get())
+				{
+					_city.reset(new City);
+					_city->setName(*_cityName);
+					CityTableSync::Save(_city.get(), transaction);
+				}
+
+				_place.reset(new StopArea);
+				_place->setAllowedConnection(true);
+				_place->setCity(_city.get());
+				_place->setDefaultTransferDelay(minutes(2));
+				_place->setName(_name);
+				StopAreaTableSync::Save(_place.get(), transaction);
+			}
+
 			StopPoint object;
 			object.setHub(_place.get());
 			object.setName(_name);
@@ -144,5 +216,10 @@ namespace synthese
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
 		}
-	}
-}
+
+
+
+		StopPointAddAction::StopPointAddAction():
+			_createCityIfNecessary(false)
+		{}
+}	}

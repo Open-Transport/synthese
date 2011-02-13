@@ -313,7 +313,6 @@ namespace synthese
 				if( stop._stop.find(static_cast<StopPoint*>(edge->getFromVertex())) == stop._stop.end() ||
 					(rank > 0 && edge->isDeparture() != stop._departure) ||
 					(rank+1 < stops.size() && edge->isArrival() != stop._arrival) ||
-					(stop._metricOffset && edge->getMetricOffset() != *stop._metricOffset) ||
 					(stop._withTimes != static_cast<const LineStop*>(edge)->getScheduleInput())
 				){
 					return false;

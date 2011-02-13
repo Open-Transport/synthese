@@ -232,18 +232,18 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == MessagesModule::FACTORY_KEY &&
+			if(	dynamic_cast<const MessagesModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewOtherPage<MessagesTemplateLibraryAdmin>());
+				links.push_back(getNewPage<MessagesTemplateLibraryAdmin>());
 			}
 			return links;
 		}

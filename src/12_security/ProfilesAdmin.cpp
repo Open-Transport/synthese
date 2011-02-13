@@ -213,18 +213,18 @@ namespace synthese
 		
 		
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfModule(
-			const string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == SecurityModule::FACTORY_KEY &&
+			if(	dynamic_cast<const SecurityModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}
@@ -243,7 +243,7 @@ namespace synthese
 			)	);
 			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
 			{
-				shared_ptr<ProfileAdmin> p(getNewOtherPage<ProfileAdmin>());
+				shared_ptr<ProfileAdmin> p(getNewPage<ProfileAdmin>());
 				p->setProfile(profile);
 				links.push_back(p);
 			}

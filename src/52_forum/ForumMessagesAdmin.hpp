@@ -130,14 +130,14 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds links to the pages of the current class to put directly under
 			/// a module admin page in the pages tree.
-			///	@param moduleKey Key of the module
+			///	@param module the module
 			///	@param currentPage Currently displayed page
 			/// @param request Current request
 			///	@return PageLinks each page to put under the module page in the page
 			///	@author Hugues Romain
 			///	@date 2010
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
-				const std::string& moduleKey,
+				const server::ModuleClass& module,
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;

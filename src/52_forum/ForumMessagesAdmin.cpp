@@ -125,19 +125,19 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks ForumMessagesAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == ForumModule::FACTORY_KEY &&
+			if(	dynamic_cast<const ForumModule*>(&module) &&
 				_request.getUser() &&
 				_request.getUser()->getProfile() &&
 				isAuthorized(*_request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			
 			return links;

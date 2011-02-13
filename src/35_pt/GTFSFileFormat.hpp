@@ -1,6 +1,6 @@
 
-/** HeuresFileFormat class header.
-	@file HeuresFileFormat.h
+/** GTFSFileFormat class header.
+	@file GTFSFileFormat.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,13 +20,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_HeuresFileFormat_H__
-#define SYNTHESE_HeuresFileFormat_H__
+#ifndef SYNTHESE_GTFSFileFormat_H__
+#define SYNTHESE_GTFSFileFormat_H__
 
 #include "FileFormatTemplate.h"
 #include "Calendar.h"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
+#include "ImportableTableSync.hpp"
+#include "StopPointTableSync.hpp"
+#include "TransportNetworkTableSync.h"
+#include "CommercialLineTableSync.h"
+#include "Calendar.h"
 
 #include <iostream>
 #include <map>
@@ -53,44 +58,78 @@ namespace synthese
 		class ScheduledService;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// Heures file format.
-		/// @ingroup m35File refFile
+		/// GTFS file format.
+		/// See http://code.google.com/intl/fr/transit/spec/transit_feed_specification.html
 		//////////////////////////////////////////////////////////////////////////
-		/// The Heures schedules import uses 3 files :
-		///	<ul>
-		///		<li>itinerai.tmp : Routes</li>
-		///		<li>troncons.tmp : Schedules</li>
-		///		<li>services.tmp : Calendars</li>
-		///	</ul>
-		///
-		class HeuresFileFormat:
-			public impex::FileFormatTemplate<HeuresFileFormat>
+		/// @ingroup m35File refFile
+		class GTFSFileFormat:
+			public impex::FileFormatTemplate<GTFSFileFormat>
 		{
 		public:
 
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
-				public impex::MultipleFileTypesImporter<HeuresFileFormat>
+				public impex::MultipleFileTypesImporter<GTFSFileFormat>
 			{
-
 			public:
-				static const std::string FILE_ITINERAI;
-				static const std::string FILE_TRONCONS;
-				static const std::string FILE_SERVICES;
+				static const std::string FILE_AGENCY;
+				static const std::string FILE_ROUTES;
+				static const std::string FILE_CALENDAR;
+				static const std::string FILE_CALENDAR_DATES;
+				static const std::string FILE_TRIPS;
+				static const std::string FILE_STOP_TIMES;
+				static const std::string FILE_FARE_ATTRIBUTES;
+				static const std::string FILE_FARE_RULES;
+				static const std::string FILE_SHAPES;
+				static const std::string FILE_FREQUENCIES;
 
 				static const std::string PARAMETER_START_DATE;
 				static const std::string PARAMETER_END_DATE;
 
 			private:
-				
-				boost::gregorian::date _startDate;
-				boost::gregorian::date _endDate;
-				
-				typedef std::map<std::pair<int, std::string>, pt::JourneyPattern*> RoutesMap;
-				mutable RoutesMap _routes;
+				static const std::string SEP;
 
-				typedef std::map<std::pair<int, std::string>, ScheduledService*> ServicesMap;
-				mutable ServicesMap _services;
+				typedef std::map<std::string, std::size_t> FieldsMap;
+				mutable FieldsMap _fieldsMap;
+
+				mutable std::vector<std::string> _line;
+
+				void _loadFieldsMap(const std::string& line) const;
+				std::string _getValue(const std::string& field) const;
+				void _loadLine(const std::string& line) const;
+				
+				//! @name Parameters
+				//@{
+					boost::gregorian::date _startDate;
+					boost::gregorian::date _endDate;
+				//@}
+
+				typedef std::map<std::string, calendar::Calendar> Calendars;
+				mutable Calendars _calendars;
+
+				mutable impex::ImportableTableSync::ObjectBySource<TransportNetworkTableSync> _networks;
+				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
+				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
+
+				struct Trip
+				{
+					pt::CommercialLine* line;
+					calendar::Calendar calendar;
+					std::string destination;
+					bool direction;
+				};
+				typedef std::map<std::string, Trip> TripsMap;
+				mutable TripsMap _trips;
+
+				struct TripDetail
+				{
+					boost::posix_time::time_duration arrivalTime;
+					boost::posix_time::time_duration departureTime;
+					std::set<pt::StopPoint*> stop;
+					graph::Edge::MetricOffset offsetFromLast;
+				};
+				typedef std::vector<TripDetail> TripDetailVector;
+
 
 			protected:
 
@@ -102,15 +141,13 @@ namespace synthese
 					const std::string& key,
 					boost::optional<const admin::AdminRequest&> adminRequest
 				) const;
-
 		
 			
 			public:
 				Importer_(
 					util::Env& env,
 					const impex::DataSource& dataSource
-				):	impex::MultipleFileTypesImporter<HeuresFileFormat>(env, dataSource)
-				{}
+				);
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Import screen to include in the administration console.
@@ -126,7 +163,7 @@ namespace synthese
 				virtual db::SQLiteTransaction _save() const;
 			};
 
-			typedef impex::NoExportPolicy<HeuresFileFormat> Exporter_;
+			typedef impex::NoExportPolicy<GTFSFileFormat> Exporter_;
 		};
 	}
 }

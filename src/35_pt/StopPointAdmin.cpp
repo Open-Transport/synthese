@@ -200,12 +200,12 @@ namespace synthese
 		{
 			PageLinks links;
 
-			shared_ptr<PTPlaceAdmin> p(getNewOtherPage<PTPlaceAdmin>(false));
+			shared_ptr<PTPlaceAdmin> p(getNewPage<PTPlaceAdmin>());
 			p->setConnectionPlace(Env::GetOfficialEnv().getSPtr(
 					_stop->getConnectionPlace()
 			)	);
 			links = p->_getCurrentTreeBranch();
-			links.push_back(getNewPage());
+			links.push_back(getNewCopiedPage());
 
 			return links;
 

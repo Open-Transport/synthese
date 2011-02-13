@@ -77,6 +77,20 @@ namespace synthese
 			: _useEnvironment(true)
 		{}
 
+
+
+		MapRequest::MapRequest(
+			const MapRequest& value
+		):	util::FactorableTemplate<server::Function, MapRequest>(value),
+			_output(value._output),
+			_query(value._query),
+			_data(value._data),
+			_useEnvironment(value._useEnvironment),
+			_temporaryEnvironment(value._temporaryEnvironment)
+		{}
+
+
+
 		ParametersMap MapRequest::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -140,12 +154,6 @@ namespace synthese
 			
 			Log::GetInstance ().debug ("Sent result url " + resultURL);
 
-		}
-
-
-
-		MapRequest::~MapRequest()
-		{
 		}
 
 

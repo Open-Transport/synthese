@@ -63,7 +63,7 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const server::ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const {
@@ -80,7 +80,7 @@ namespace synthese
 			
 			// Initialisation
 			shared_ptr<HomeAdmin> homeAdmin(
-				getNewOtherPage<HomeAdmin>()
+				getNewPage<HomeAdmin>()
 			);
 			
 			PageLinks position;
@@ -374,19 +374,6 @@ namespace synthese
 		{
 			assert(_env.get());
 			return *_env;
-		}
-		
-		boost::shared_ptr<AdminInterfaceElement> AdminInterfaceElement::getNewPage() const
-		{
-			shared_ptr<AdminInterfaceElement> page(
-				Factory<AdminInterfaceElement>::create(getFactoryKey())
-			);
-			page->setEnv(_env);
-			page->setActiveTab(getCurrentTab());
-			page->setFromParametersMap(
-				getParametersMap()
-			);
-			return page;
 		}
 
 

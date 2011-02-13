@@ -39,31 +39,24 @@ namespace geos
 
 namespace synthese
 {
+	namespace geography
+	{
+		class City;
+	}
+
 	namespace pt
 	{
 		class StopArea;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : Physical stop creation.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_creation
+		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m35Actions refActions
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.1.17
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : StopPointAddAction
-		///
-		/// Parameters :
-		///	<ul>
-		///		<li>actionParampl : place</li>
-		///		<li>actionParamna (optional) : name</li>
-		///		<li>actionParamoc (optional) : operator code</li>
-		///		<li>actionParamx (optional) : x</li>
-		///		<li>actionParamy (optional) : y</li>
-		///		<li>actionParamlon (optional) : longitude</li>
-		///		<li>actionParamlat (optional) : latitude</li>
-		///	</ul>
-		///
-		/// If both lon/lat and x/y coordinates are specified, then x/y has priority.
 		class StopPointAddAction:
 			public util::FactorableTemplate<server::Action, StopPointAddAction>
 		{
@@ -75,17 +68,24 @@ namespace synthese
 			static const std::string PARAMETER_PLACE_ID;
 			static const std::string PARAMETER_LONGITUDE;
 			static const std::string PARAMETER_LATITUDE;
-
+			static const std::string PARAMETER_CITY_ID;
+			static const std::string PARAMETER_CITY_NAME;
+			static const std::string PARAMETER_CREATE_CITY_IF_NECESSARY;
 
 		private:
-			boost::shared_ptr<const StopArea> _place;
+			boost::shared_ptr<StopArea> _place;
 			impex::Importable::DataSourceLinks _operatorCode;
 			std::string _name;
 			boost::shared_ptr<geos::geom::Point> _point;
+			boost::shared_ptr<geography::City> _city;
+			boost::optional<std::string> _cityName;
+			bool _createCityIfNecessary;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a generic parameters map from the action parameters.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_creation
+			//////////////////////////////////////////////////////////////////////////
 			/// @return The generated parameters map
 			server::ParametersMap getParametersMap() const;
 
@@ -93,14 +93,19 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads the parameters of the action on a generic parameters map.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_creation
+			//////////////////////////////////////////////////////////////////////////
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			StopPointAddAction();
 
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_creation
+			//////////////////////////////////////////////////////////////////////////
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
 
@@ -112,9 +117,16 @@ namespace synthese
 			/// @return true if the action can be launched in the current session
 			virtual bool isAuthorized(const server::Session* session) const;
 
-			void setPlace(boost::shared_ptr<const StopArea> value){ _place = value; }
+			//! @name Setters
+			//@{
+				void setPlace(boost::shared_ptr<StopArea> value){ _place = value; }
+				void setPoint(boost::shared_ptr<geos::geom::Point> value){ _point = value; }
+				void setDataSourceLinks(const impex::Importable::DataSourceLinks& value){ _operatorCode = value; }
+				void setName(const std::string& value){ _name = value; }
+				void setCityName(const std::string& value){ _cityName = value; }
+				void setCreateCityIfNecessary(bool value){ _createCityIfNecessary = value; }
+			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_PhysicalStopOperatorCodeAddAction_H__

@@ -548,6 +548,9 @@ namespace synthese
 					size_t globalRank(0);
 					for(size_t depth(object.getBeforeTransferTimetablesNumber()); depth > 0; --depth)
 					{
+						const TimetableResult::RowServicesVector services(
+							result.getBeforeTransferTimetable(depth).getRowServices()
+						);
 						BOOST_FOREACH(const TimetableGenerator::Rows::value_type& row, generator.getBeforeTransferTimetable(depth).getRows())
 						{
 							const TimetableResult::RowTimesVector times(
@@ -560,12 +563,14 @@ namespace synthese
 								request,
 								row,
 								times,
+								services,
 								globalRank++,
 								true,
 								depth
 							);
 						}
 					}
+					const TimetableResult::RowServicesVector services(result.getRowServices());
 					BOOST_FOREACH(const TimetableGenerator::Rows::value_type& row, generator.getRows())
 					{
 						const TimetableResult::RowTimesVector times(result.getRowSchedules(row.getRank()));
@@ -576,6 +581,7 @@ namespace synthese
 							request,
 							row,
 							times,
+							services,
 							globalRank++,
 							false,
 							0
@@ -583,6 +589,9 @@ namespace synthese
 					}
 					for(size_t depth(1); depth <= object.getAfterTransferTimetablesNumber(); ++depth)
 					{
+						const TimetableResult::RowServicesVector services(
+							result.getAfterTransferTimetable(depth).getRowServices()
+						);
 						BOOST_FOREACH(const TimetableGenerator::Rows::value_type& row, generator.getAfterTransferTimetable(depth).getRows())
 						{
 							const TimetableResult::RowTimesVector times(
@@ -595,6 +604,7 @@ namespace synthese
 								request,
 								row,
 								times,
+								services,
 								globalRank++,
 								false,
 								depth

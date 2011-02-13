@@ -33,6 +33,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "FileFormat.h"
 #include "Importer.hpp"
+#include "DataSourceTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -80,7 +81,7 @@ namespace synthese
 		){
 			try
 			{
-				_dataSource = Env::GetOfficialEnv().get<DataSource>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+				_dataSource = DataSourceTableSync::Get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID), *_env);
 			}
 			catch (ObjectNotFoundException<DataSource>&)
 			{
@@ -90,7 +91,7 @@ namespace synthese
 			if(Factory<FileFormat>::contains(_dataSource->getFormat()))
 			{
 				_doImport = map.getDefault<bool>(PARAMETER_DO_IMPORT, false);
-				_importer = _dataSource->getImporter();
+				_importer = _dataSource->getImporter(*_env);
 				_importer->setFromParametersMap(map, _doImport);
 			}
 		}

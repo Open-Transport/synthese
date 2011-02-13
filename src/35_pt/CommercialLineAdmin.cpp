@@ -185,7 +185,7 @@ namespace synthese
 				)	);
 				
 				AdminActionFunctionRequest<JourneyPatternAddAction,JourneyPatternAdmin> creationRequest(_request);
-				creationRequest.getFunction()->setActionFailedPage(getNewPage());
+				creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
 				creationRequest.setActionWillCreateObject();
 				creationRequest.getAction()->setCommercialLine(const_pointer_cast<CommercialLine>(_cline));
 
@@ -527,7 +527,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 				{
 					shared_ptr<JourneyPatternAdmin> p(
-						getNewOtherPage<JourneyPatternAdmin>()
+						getNewPage<JourneyPatternAdmin>()
 					);
 					p->setLine(line);
 					links.push_back(p);
@@ -564,7 +564,7 @@ namespace synthese
 			PageLinks links;
 
 			shared_ptr<TransportNetworkAdmin> p(
-				getNewOtherPage<TransportNetworkAdmin>()
+				getNewPage<TransportNetworkAdmin>()
 			);
 			p->setNetwork(Env::GetOfficialEnv().getSPtr(_cline->getNetwork()));
 

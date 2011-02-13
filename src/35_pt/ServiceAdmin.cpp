@@ -437,7 +437,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ServiceAdmin::_getCurrentTreeBranch() const
 		{
 			shared_ptr<JourneyPatternAdmin> p(
-				getNewOtherPage<JourneyPatternAdmin>()
+				getNewPage<JourneyPatternAdmin>()
 			);
 			p->setLine(Env::GetOfficialEnv().get<JourneyPattern>(_service->getPathId()));
 

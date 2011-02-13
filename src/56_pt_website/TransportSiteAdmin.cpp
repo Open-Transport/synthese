@@ -486,28 +486,26 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfModule(
-			const string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(moduleKey == TransportWebsiteModule::FACTORY_KEY && request.getUser() &&
+			if(	dynamic_cast<const TransportWebsiteModule*>(&module) &&
+				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser()))
 			{
 				TransportWebsiteTableSync::SearchResult sites(
-					TransportWebsiteTableSync::Search(*_env)
+					TransportWebsiteTableSync::Search(Env::GetOfficialEnv())
 				);
 				BOOST_FOREACH(shared_ptr<TransportWebsite> site, sites)
 				{
 					shared_ptr<TransportSiteAdmin> p(
-						getNewOtherPage<TransportSiteAdmin>(false)
+						getNewPage<TransportSiteAdmin>()
 					);
-					p->_site = 
-					    const_pointer_cast<const TransportWebsite>(
-						site
-					    );
+					p->_site = const_pointer_cast<const TransportWebsite>(site);
 					links.push_back(p);
 				}
 			}
@@ -528,7 +526,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<Webpage> page, pages)
 				{
 					shared_ptr<WebPageAdmin> p(
-						getNewOtherPage<WebPageAdmin>(false)
+						getNewPage<WebPageAdmin>()
 					);
 					p->setPage(const_pointer_cast<const Webpage>(page));
 					links.push_back(p);

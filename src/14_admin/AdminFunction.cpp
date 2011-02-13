@@ -1,6 +1,6 @@
 
-/** AdminRequest class implementation.
-	@file AdminRequest.cpp
+/** AdminFunction class implementation.
+	@file AdminFunction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -86,7 +86,14 @@ namespace synthese
 			if (_page.get())
 			{
 				result.insert(PARAMETER_PAGE, _page->getFactoryKey());
-				result.insert(PARAMETER_TAB, _page->getActiveTab());
+				if(_page->getCurrentTab().empty())
+				{
+					result.insert(PARAMETER_TAB, _page->getActiveTab());
+				}
+				else
+				{
+					result.insert(PARAMETER_TAB, _page->getCurrentTab());
+				}
 				const map<string,string> adminMap(_page->getParametersMap().getMap());
 				for (map<string,string>::const_iterator it(adminMap.begin()); it != adminMap.end(); ++it)
 				{
@@ -272,17 +279,6 @@ namespace synthese
 		std::string AdminFunction::getOutputMimeType() const
 		{
 			return "text/html";
-		}
-
-
-
-		void AdminFunction::_copy( boost::shared_ptr<const Function> function )
-		{
-			const AdminFunction& adminFunction(static_cast<const AdminFunction&>(*function));
-			_page = adminFunction._page;
-			_mainTemplate = adminFunction._mainTemplate;
-			_positionElementTemplate = adminFunction._positionElementTemplate;
-			_treeNodeTemplate = adminFunction._treeNodeTemplate;
 		}
 
 

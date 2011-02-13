@@ -93,7 +93,7 @@ namespace synthese
 				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
-				const std::string& moduleKey,
+				const server::ModuleClass& moduleKey,
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;

@@ -118,7 +118,7 @@ namespace synthese
 			for(vector<shared_ptr<ModuleClass> >::const_reverse_iterator it(modules.rbegin()); it != modules.rend(); ++it)
 			{
 				shared_ptr<ModuleAdmin> link(
-					getNewOtherPage<ModuleAdmin>()
+					getNewPage<ModuleAdmin>()
 				);
 				link->setModuleClass(
 					const_pointer_cast<const ModuleClass, ModuleClass>(*it)
@@ -131,7 +131,7 @@ namespace synthese
 
 			if(request.isAuthorized<SecurityRight>(UNKNOWN_RIGHT_LEVEL, READ, string()))
 			{
-				shared_ptr<UserAdmin> userPage(getNewOtherPage<UserAdmin>());
+				shared_ptr<UserAdmin> userPage(getNewPage<UserAdmin>());
 				userPage->setUserC(request.getUser());
 				links.push_back(userPage);
 			}

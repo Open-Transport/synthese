@@ -273,7 +273,7 @@ namespace synthese
 			)	);
 			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
 			{
-				shared_ptr<ProfileAdmin> p(getNewOtherPage<ProfileAdmin>());
+				shared_ptr<ProfileAdmin> p(getNewPage<ProfileAdmin>());
 				p->setProfile(profile);
 				links.push_back(p);
 			}

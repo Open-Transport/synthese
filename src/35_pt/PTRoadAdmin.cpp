@@ -228,12 +228,12 @@ namespace synthese
 		{
 			PageLinks links;
 
-			shared_ptr<PTRoadsAdmin> p(getNewOtherPage<PTRoadsAdmin>(false));
+			shared_ptr<PTRoadsAdmin> p(getNewPage<PTRoadsAdmin>());
 			p->setRoadPlace(Env::GetOfficialEnv().getSPtr(
 				_road->getRoadPlace()
 			)	);
 			links = p->_getCurrentTreeBranch();
-			links.push_back(getNewPage());
+			links.push_back(getNewCopiedPage());
 
 			return links;
 		}

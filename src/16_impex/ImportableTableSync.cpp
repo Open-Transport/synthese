@@ -85,58 +85,60 @@ namespace synthese
 			Env& env
 		){
 			Importable::DataSourceLinks result;
-			vector<string> sources;
-			split(sources, serializedString, is_any_of(SOURCES_SEPARATOR));
-			BOOST_FOREACH(const string& source, sources)
+			if(!serializedString.empty())
 			{
-				try
+				vector<string> sources;
+				split(sources, serializedString, is_any_of(SOURCES_SEPARATOR));
+				BOOST_FOREACH(const string& source, sources)
 				{
-					// Parsing of the string
-					RegistryKeyType sourceId(0);
-					string code;
-					if(!find_first(source, FIELDS_SEPARATOR))
-					{ // Only datasource
-						try
-						{
-							sourceId = lexical_cast<RegistryKeyType>(source);
-						}
-						catch(bad_lexical_cast)
-						{
-							code = source;
-						}
-						if(decodeTableId(sourceId) != DataSourceTableSync::TABLE.ID)
-						{
-							sourceId = 0;
-							code = source;
-						}
-					}
-					else
+					try
 					{
-						vector<string> fields;
-						split(fields, source, is_any_of(FIELDS_SEPARATOR));
-						sourceId = lexical_cast<RegistryKeyType>(fields[0]);
-						code = fields[1];
-					}
+						// Parsing of the string
+						RegistryKeyType sourceId(0);
+						string code;
+						if(!find_first(source, FIELDS_SEPARATOR))
+						{ // Only datasource
+							try
+							{
+								sourceId = lexical_cast<RegistryKeyType>(source);
+							}
+							catch(bad_lexical_cast)
+							{
+								code = source;
+							}
+							if(decodeTableId(sourceId) != DataSourceTableSync::TABLE.ID)
+							{
+								sourceId = 0;
+								code = source;
+							}
+						}
+						else
+						{
+							vector<string> fields;
+							split(fields, source, is_any_of(FIELDS_SEPARATOR));
+							sourceId = lexical_cast<RegistryKeyType>(fields[0]);
+							code = fields[1];
+						}
 
-					// Source loading
-					shared_ptr<DataSource> source;
-					if(sourceId)
-					{
-						source = DataSourceTableSync::GetEditable(sourceId, env);
-					}
+						// Source loading
+						shared_ptr<DataSource> source;
+						if(sourceId)
+						{
+							source = DataSourceTableSync::GetEditable(sourceId, env);
+						}
 
-					// Storage
-					result[source.get()] = code;
-				}
-				catch(bad_lexical_cast)
-				{ // If bad cast, the source is ignored
-					continue;
-				}
-				catch(ObjectNotFoundException<DataSource>)
-				{ // If data source is not found, it is ignored
-					continue;
-				}
-			}
+						// Storage
+						result[source.get()] = code;
+					}
+					catch(bad_lexical_cast)
+					{ // If bad cast, the source is ignored
+						continue;
+					}
+					catch(ObjectNotFoundException<DataSource>)
+					{ // If data source is not found, it is ignored
+						continue;
+					}
+			}	}
 			return result;
 		}
 }	}

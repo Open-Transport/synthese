@@ -24,6 +24,7 @@
 #define SYNTHESE_impex_ImportableTableSync_hpp__
 
 #include "Importable.h"
+#include "DataSource.h"
 
 #include <string>
 #include <map>
@@ -75,6 +76,8 @@ namespace synthese
 				Set get(const std::string& code) const;
 
 				void add(typename T::ObjectType& object);
+
+				const Map& getMap() const { return _map; }
 			};
 
 			static const std::string COL_DATA_SOURCE_LINKS;
@@ -122,14 +125,15 @@ namespace synthese
 		):	_source(source)
 		{
 			_map.clear();
-			typename T::SearchResult result(T::Search(env));
-			BOOST_FOREACH(typename T::SearchResult::value_type& v, result)
+			boost::shared_ptr<const DataSource> psource(Env::GetOfficialEnv().get<DataSource>(source.getKey()));
+			const Registry<typename T::ObjectType>& registry(Env::GetOfficialEnv().getRegistry<typename T::ObjectType>());
+			BOOST_FOREACH(const Registry<typename T::ObjectType>::value_type& v, registry)
 			{
-				if(!v->hasLinkWithSource(source))
+				if(!v.second->hasLinkWithSource(*psource))
 				{
 					continue;
 				}
-				add(*v);
+				add(*T::GetEditable(v.first, env));
 		}	}
 
 

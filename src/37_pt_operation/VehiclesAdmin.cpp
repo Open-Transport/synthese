@@ -167,19 +167,19 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks VehiclesAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == PTOperationModule::FACTORY_KEY &&
+			if(	dynamic_cast<const PTOperationModule*>(&module) &&
 				_request.getUser() &&
 				_request.getUser()->getProfile() &&
 				isAuthorized(*_request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			
 			return links;
@@ -200,7 +200,7 @@ namespace synthese
 
 				BOOST_FOREACH(const Vehicle::Registry::value_type& vehicle, Env::GetOfficialEnv().getRegistry<Vehicle>())
 				{
-					shared_ptr<VehicleAdmin> p(getNewOtherPage<VehicleAdmin>());
+					shared_ptr<VehicleAdmin> p(getNewPage<VehicleAdmin>());
 					p->setVehicle(vehicle.second);
 					links.push_back(p);
 				}

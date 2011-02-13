@@ -51,7 +51,6 @@ namespace synthese
 
 
 
-
 		void SchedulesBasedService::_computeNextRTUpdate()
 		{
 			if(!_arrivalSchedules.empty())

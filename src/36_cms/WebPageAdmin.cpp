@@ -334,7 +334,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<Webpage> page, pages)
 			{
 				shared_ptr<WebPageAdmin> p(
-					getNewOtherPage<WebPageAdmin>(false)
+					getNewPage<WebPageAdmin>()
 				);
 				p->setPage(const_pointer_cast<const Webpage>(page));
 				links.push_back(p);
@@ -350,7 +350,7 @@ namespace synthese
 			if(_page->getParent())
 			{
 				shared_ptr<WebPageAdmin> p(
-					getNewOtherPage<WebPageAdmin>()
+					getNewPage<WebPageAdmin>()
 				);
 				p->setPage(Env::GetOfficialEnv().getSPtr(_page->getParent()));
 				PageLinks links(p->getCurrentTreeBranch());
@@ -360,7 +360,7 @@ namespace synthese
 			else
 			{
 				shared_ptr<WebsiteAdmin> p(
-					getNewOtherPage<WebsiteAdmin>()
+					getNewPage<WebsiteAdmin>()
 				);
 				p->setSite(Env::GetOfficialEnv().getSPtr(_page->getRoot()));
 				PageLinks links(p->getCurrentTreeBranch());

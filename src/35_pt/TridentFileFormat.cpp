@@ -121,8 +121,9 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		// CONSTRUCTOR
 		TridentFileFormat::Importer_::Importer_(
-			const impex::DataSource& dataSource
-		):	OneFileTypeImporter<Importer_>(dataSource),
+			Env& env,
+			const DataSource& dataSource
+		):	OneFileTypeImporter<Importer_>(env, dataSource),
 			_importStops(false),
 			_importJunctions(false),
 			_defaultTransferDuration(minutes(8)),
@@ -1220,7 +1221,7 @@ namespace synthese
 			}
 
 			// Stops
-			map<string, StopPoint*> stops;
+			ImportableTableSync::ObjectBySource<StopPointTableSync> stops(_dataSource, _env);
 			XMLNode chouetteAreaNode(allNode.getChildNode("ChouetteArea"));
 			int stopsNumber(chouetteAreaNode.nChildNode("StopArea"));
 			for(int stopRank(0); stopRank < stopsNumber; ++stopRank)
@@ -1235,65 +1236,30 @@ namespace synthese
 				}
 				XMLNode areaCentroidNode(stopAreaNode.getChildNode("centroidOfArea", 0));
 
-				XMLNode keyNode(stopAreaNode.getChildNode("objectId", 0));
-				XMLNode nameNode(stopAreaNode.getChildNode("name", 0));
-				string stopKey(keyNode.getText());
-			
-				StopPointTableSync::SearchResult pstops(
-					StopPointTableSync::Search(
-						_env,
-						optional<RegistryKeyType>(),
-						stopKey
-				)	);
-				if(pstops.empty() && !_importStops)
-				{
-					os << "ERR  : stop not found " << stopKey << " (" << nameNode.getText() << ")<br />";
-					failure = true;
-					continue;
-				}
-				
-				if(pstops.size() > 1)
-				{
-					os << "WARN : more than one stop with key" << stopKey << "<br />";
-				}
-				
-				shared_ptr<StopPoint> curStop;
-				if(pstops.empty())
-				{
-					// Stop creation
-					map<string,StopArea*>::const_iterator itcstop(commercialStopsByPhysicalStop.find(stopKey));
-					if(itcstop == commercialStopsByPhysicalStop.end())
-					{
-						os << "ERR  : stop " << stopKey << " not found in any commercia stop (" << nameNode.getText() << ")<br />";
-						failure = true;
-						continue;
-					}
-					curStop.reset(new StopPoint);
-					curStop->setHub(itcstop->second);
-					Importable::DataSourceLinks links;
-					links.insert(make_pair(&_dataSource, stopKey));
-					curStop->setDataSourceLinks(links);
-					curStop->setKey(StopPointTableSync::getId());
-					_env.getEditableRegistry<StopPoint>().add(curStop);
+				// ID
+				string stopKey(stopAreaNode.getChildNode("objectId", 0).getText());
 
-					os << "CREA : Creation of the physical stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
-				}
-				else
-				{
-					RegistryKeyType stopId(pstops.front()->getKey());
-					curStop = StopPointTableSync::GetEditable(stopId, _env, UP_LINKS_LOAD_LEVEL);
-
-					os << "LOAD : link between stops " << stopKey << " (" << nameNode.getText() << ") and "
-						<< curStop->getKey() << " (" << curStop->getConnectionPlace()->getName() << ")<br />";
-				}
+				// Name
+				string name(stopAreaNode.getChildNode("name", 0).getText());
 
 				if(_importStops)
 				{
-					curStop->setName(nameNode.getText());
+					// Stop area
+					map<string,StopArea*>::const_iterator itcstop(commercialStopsByPhysicalStop.find(stopKey));
+					if(itcstop == commercialStopsByPhysicalStop.end())
+					{
+						os << "ERR  : stop " << stopKey << " not found in any commercia stop (" << name << ")<br />";
+						failure = true;
+						continue;
+					}
+					StopArea& stopArea(*itcstop->second);
+				
+					// Geometry
+					shared_ptr<StopPoint::Geometry> geometry;
 					map<string, XMLNode>::iterator itPlace(areaCentroids.find(areaCentroidNode.getText()));
 					if(itPlace == areaCentroids.end())
 					{
-						os << "WARN : Physical stop with key " << stopKey << " links to a not found area centroid " << areaCentroidNode.getText() << " (" << nameNode.getText() <<  ")<br />";
+						os << "WARN : Physical stop with key " << stopKey << " links to a not found area centroid " << areaCentroidNode.getText() << " (" << name <<  ")<br />";
 					}
 					else
 					{
@@ -1302,32 +1268,50 @@ namespace synthese
 						XMLNode latitudeNode(areaCentroid.getChildNode("latitude", 0));
 						if(!longitudeNode.isEmpty() && !latitudeNode.isEmpty())
 						{
-							curStop->setGeometry(
-								CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-									*CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
-										lexical_cast<double>(longitudeNode.getText()),
-										lexical_cast<double>(latitudeNode.getText())
-							)	)	);
+							geometry = CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
+								lexical_cast<double>(longitudeNode.getText()),
+								lexical_cast<double>(latitudeNode.getText())
+							);
 						}
 						else
 						{
 							XMLNode projectedPointNode(areaCentroid.getChildNode("projectedPoint", 0));
 							if(!projectedPointNode.isEmpty())
 							{
-								curStop->setGeometry(
-									CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-										*CoordinatesSystem::GetCoordinatesSystem(
-											_getSRIDFromTrident(projectedPointNode.getChildNode("projectionType", 0).getText())
-										).createPoint(
-											lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
-											lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
-								)	)	);
+								geometry = CoordinatesSystem::GetCoordinatesSystem(
+										_getSRIDFromTrident(projectedPointNode.getChildNode("projectionType", 0).getText())
+								).createPoint(
+									lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
+									lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
+								);
 							}
 						}
 					}
+
+					PTFileFormat::CreateOrUpdateStopPoints(
+						stops,
+						stopKey,
+						name,
+						stopArea,
+						geometry.get(),
+						_dataSource,
+						_env,
+						os
+					);
 				}
-	
-				stops[stopKey] = curStop.get();
+				else
+				{
+					if(	PTFileFormat::GetStopPoints(
+							stops,
+							stopKey,
+							name,
+							os
+						).empty()
+					){
+						failure = true;
+						continue;
+					}
+				}
 			}
 			
 		
@@ -1339,20 +1323,20 @@ namespace synthese
 
 			// JourneyPattern stops
 			int stopPointsNumber(chouetteLineDescriptionNode.nChildNode("StopPoint"));
-			map<string,StopPoint*> stopPoints;
+			map<string,set<StopPoint*> > stopPoints;
 			for(int stopPointRank(0); stopPointRank < stopPointsNumber; ++stopPointRank)
 			{
 				XMLNode stopPointNode(chouetteLineDescriptionNode.getChildNode("StopPoint", stopPointRank));
 				XMLNode spKeyNode(stopPointNode.getChildNode("objectId"));
 				XMLNode containedNode(stopPointNode.getChildNode("containedIn"));
-				map<string, StopPoint*>::iterator it(stops.find(containedNode.getText()));
-				if(it == stops.end())
+				set<StopPoint*> linkableStops(stops.get(containedNode.getText()));
+				if(linkableStops.empty())
 				{
 					os << "ERR  : stop " << containedNode.getText() << " not found by stop point " << spKeyNode.getText() << ")<br />";
 					failure = true;
 					continue;
 				}
-				stopPoints[spKeyNode.getText()] = stops[containedNode.getText()];
+				stopPoints[spKeyNode.getText()] = linkableStops;
 			}
 
 			if(failure)
@@ -1417,65 +1401,29 @@ namespace synthese
 				XMLNode routeIdNode(routeNode.getChildNode("routeId"));
 				
 				// Reading stops list
-				vector<StopPoint*> routeStops;
+				JourneyPattern::StopsWithDepartureArrivalAuthorization routeStops;
 				int lineStopsNumber(routeNode.nChildNode("stopPointList"));
 				for(int lineStopRank(0); lineStopRank < lineStopsNumber; ++lineStopRank)
 				{
 					XMLNode lineStopNode(routeNode.getChildNode("stopPointList", lineStopRank));
-					routeStops.push_back(stopPoints[lineStopNode.getText()]);
+					routeStops.push_back(
+						JourneyPattern::StopWithDepartureArrivalAuthorization(
+							stopPoints[lineStopNode.getText()]
+					)	);
 				}
-				
-				// Attempting to find an existing route
-				shared_ptr<JourneyPattern> route;
-				BOOST_FOREACH(shared_ptr<JourneyPattern> line, sroutes)
-				{
-					if(	(!line->getRollingStock() || line->getRollingStock() == rollingStock.get()) &&
-						*line == routeStops
-					){
-						route = line;
-						continue;
-					}
-				}
-				
-				// Create a new route if necessary
-				if(!route.get())
-				{
-					os << "CREA : Creation of route " << routeNames[routeIdNode.getText()] << " for " << jpKeyNode.getText() << "<br />";
-					route.reset(new JourneyPattern);
-					route->setCommercialLine(cline);
-					route->setName(routeNames[routeIdNode.getText()]);
-					Importable::DataSourceLinks links;
-					links.insert(make_pair(&_dataSource, routeNames[routeIdNode.getText()]));
-					route->setDataSourceLinks(links);
-					route->setWayBack(routeWaybacks[routeIdNode.getText()]);
-					route->setKey(JourneyPatternTableSync::getId());
-					_env.getEditableRegistry<JourneyPattern>().add(route);
-					
-					size_t rank(0);
-					BOOST_FOREACH(StopPoint* stop, routeStops)
-					{
-						shared_ptr<LineStop> ls(new LineStop);
-						ls->setLine(route.get());
-						ls->setPhysicalStop(stop);
-						ls->setRankInPath(rank);
-						ls->setIsArrival(rank > 0);
-						ls->setIsDeparture(rank+1 < routeStops.size());
-						ls->setMetricOffset(0);
-						ls->setKey(LineStopTableSync::getId());
-						route->addEdge(*ls);
-						_env.getEditableRegistry<LineStop>().add(ls);
-						
-						++rank;
-					}
-				}
-				else
-				{
-					os << "LOAD : Use of route " << route->getKey() << " (" << route->getName() << ") for " << jpKeyNode.getText() << " (" << routeNames[routeIdNode.getText()] << ")<br />";
-				}
-				route->setRollingStock(rollingStock.get());
-				
-				// Link with the route
-				routes[jpKeyNode.getText()] = route.get();
+
+				routes[jpKeyNode.getText()] = PTFileFormat::CreateOrUpdateRoute(
+					*cline,
+					optional<const string&>(jpKeyNode.getText()),
+					optional<const string&>(routeNames[routeIdNode.getText()]),
+					optional<const string&>(),
+					routeWaybacks[routeIdNode.getText()],
+					rollingStock.get(),
+					routeStops,
+					_dataSource,
+					_env,
+					os
+				);
 			}
 			
 			// Services
@@ -1496,10 +1444,7 @@ namespace synthese
 					os << "WARN : Service " << numberNode.getText() << " / " << keyNode.getText() << " ignored due to bad stops number<br />";
 					continue;
 				}
-				shared_ptr<ScheduledService> service(new ScheduledService);
-				service->setPath(line);
-				service->setPathId(line->getKey());
-				service->setServiceNumber(numberNode.getText());
+
 				ScheduledService::Schedules deps;
 				ScheduledService::Schedules arrs;
 				time_duration lastDep(0,0,0);
@@ -1518,40 +1463,16 @@ namespace synthese
 					deps.push_back(depSchedule);
 					arrs.push_back(arrSchedule);
 				}
-				service->setSchedules(deps, arrs);
-				
-				// Search for a corresponding service
-				ScheduledService* existingService(NULL);
-				BOOST_FOREACH(Service* tservice, line->getServices())
-				{
-					ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
-					
-					if(!curService) continue;
-					
-					if (*curService == *service)
-					{
-						existingService = curService;
-						break;
-					}
-				}
-				
-				// If not found creation
-				if(!existingService)
-				{
-					service->setKey(ScheduledServiceTableSync::getId());
-					line->addService(service.get(), false);
-					_env.getEditableRegistry<ScheduledService>().add(service);
-					services[keyNode.getText()] = service.get();
-					
-					os << "CREA : Creation of service " << service->getServiceNumber() << " for " << keyNode.getText() << " (" << deps[0] << ") on route " << line->getKey() << " (" << line->getName() << ")<br />";
-				}
-				else
-				{
-					services[keyNode.getText()] = existingService;
-					
-					os << "LOAD : Use of service " << existingService->getKey() << " (" << existingService->getServiceNumber() << ") for " << keyNode.getText() << " (" << deps[0] << ") on route " << line->getKey() << " (" << line->getName() << ")<br />";
 
-				}
+				services[keyNode.getText()] = PTFileFormat::CreateOrUpdateService(
+					*line,
+					deps,
+					arrs,
+					numberNode.getText(),
+					_dataSource,
+					_env,
+					os
+				);
 			}
 			
 			// Calendars

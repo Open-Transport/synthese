@@ -81,7 +81,7 @@ namespace synthese
 			{
 				_network = TransportNetworkTableSync::Get(
 					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					_getEnv(),
+					Env::GetOfficialEnv(),
 					UP_LINKS_LOAD_LEVEL
 				);
 			}
@@ -126,7 +126,7 @@ namespace synthese
 			
 			CommercialLineTableSync::SearchResult lines(
 				CommercialLineTableSync::Search(
-					_getEnv(),
+					Env::GetOfficialEnv(),
 					_network->getKey()
 					, string("%"+_searchName+"%"),
 					optional<string>(),
@@ -158,7 +158,7 @@ namespace synthese
 			}
 
 			AdminActionFunctionRequest<CommercialLineAddAction,CommercialLineAdmin> creationRequest(_request);
-			creationRequest.getFunction()->setActionFailedPage(getNewPage());
+			creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
 			creationRequest.setActionWillCreateObject();
 			creationRequest.getAction()->setNetwork(_network);
 
@@ -193,7 +193,7 @@ namespace synthese
 			){
 				CommercialLineTableSync::SearchResult lines(
 					CommercialLineTableSync::Search(
-						*_env,
+						Env::GetOfficialEnv(),
 						_network->getKey(),
 						optional<string>(),
 						optional<string>(),
@@ -205,7 +205,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 				{
 					shared_ptr<CommercialLineAdmin> p(
-						getNewOtherPage<CommercialLineAdmin>()
+						getNewPage<CommercialLineAdmin>()
 					);
 					p->setCommercialLine(line);
 					links.push_back(p);

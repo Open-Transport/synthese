@@ -57,8 +57,10 @@ namespace synthese
 			virtual server::ParametersMap _getParametersMap() const { return server::ParametersMap(); }
 
 		public:
-			OneFileTypeImporter(const DataSource& dataSource):
-				Importer(dataSource)
+			OneFileTypeImporter(
+				util::Env& env,
+				const DataSource& dataSource
+			):	Importer(env, dataSource)
 			{}
 			
 

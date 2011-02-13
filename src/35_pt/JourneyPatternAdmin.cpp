@@ -660,7 +660,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<const ScheduledService> service, services)
 				{
 					shared_ptr<ServiceAdmin> p(
-						getNewOtherPage<ServiceAdmin>()
+						getNewPage<ServiceAdmin>()
 					);
 					p->setService(service);
 					links.push_back(p);
@@ -671,7 +671,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<const ContinuousService> service, cservices)
 				{
 					shared_ptr<ServiceAdmin> p(
-						getNewOtherPage<ServiceAdmin>()
+						getNewPage<ServiceAdmin>()
 					);
 					p->setService(service);
 					links.push_back(p);
@@ -686,7 +686,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks JourneyPatternAdmin::_getCurrentTreeBranch() const
 		{
 			shared_ptr<CommercialLineAdmin> p(
-				getNewOtherPage<CommercialLineAdmin>()
+				getNewPage<CommercialLineAdmin>()
 			);
 			p->setCommercialLine(Env::GetOfficialEnv().getSPtr(_line->getCommercialLine()));
 

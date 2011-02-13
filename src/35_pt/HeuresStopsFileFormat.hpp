@@ -96,8 +96,10 @@ namespace synthese
 				) const;
 
 			public:
-				Importer_(const impex::DataSource& dataSource):
-					impex::OneFileTypeImporter<HeuresStopsFileFormat>(dataSource)
+				Importer_(
+					util::Env& env,
+					const impex::DataSource& dataSource
+				):	impex::OneFileTypeImporter<HeuresStopsFileFormat>(env, dataSource)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////

@@ -53,7 +53,7 @@ namespace synthese
 
 		public:
 
-			virtual void _copy(boost::shared_ptr<const Function> function);
+			virtual void _copy(const Function& function);
 
 			virtual server::ParametersMap getFixedParametersMap() const;
 

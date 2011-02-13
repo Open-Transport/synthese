@@ -332,7 +332,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
 				{
 					shared_ptr<MessageAdmin> p(
-						getNewOtherPage<MessageAdmin>()
+						getNewPage<MessageAdmin>()
 					);
 					p->setMessage(alarm);
 					links.push_back(p);
@@ -348,7 +348,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, alarms)
 				{
 					shared_ptr<MessageAdmin> p(
-						getNewOtherPage<MessageAdmin>()
+						getNewPage<MessageAdmin>()
 					);
 					p->setMessage(alarm);
 					links.push_back(p);

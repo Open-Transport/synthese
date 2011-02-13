@@ -40,12 +40,13 @@ namespace synthese
 			virtual bool canExport() const { return FF::Exporter_::EXPORTABLE; }
 
 			virtual boost::shared_ptr<Importer> getImporter(
+				util::Env& env,
 				const DataSource& dataSource
 			) const	{
 				return
 					boost::static_pointer_cast<Importer, typename FF::Importer_>(
 						boost::shared_ptr<typename FF::Importer_>(
-							new typename FF::Importer_(dataSource)
+							new typename FF::Importer_(env, dataSource)
 					)	);
 			}
 

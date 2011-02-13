@@ -152,10 +152,11 @@ namespace synthese
 			size_t colSpan/*=1*/,
 			string className,
 			bool isHeader,
-			string style
+			string style,
+			size_t rowSpan
 		){
 			stringstream s;
-			if (_cols && (_curCol > _cols) || _curRow == -1 || !_rowOpen)
+			if(_cols && (_curCol > _cols) || _curRow == -1 || !_rowOpen)
 			{
 				s << row();
 			}
@@ -164,11 +165,15 @@ namespace synthese
 				s << (_lastColWasH ? "</th>" : "</td>");
 			}
 			s << (isHeader ? "<th" : "<td");
-			if (colSpan > 1)
+			if(colSpan > 1)
 			{
 				s << " colspan=\"" << colSpan << "\"";
 			}
-			if (!className.empty())
+			if(rowSpan > 1)
+			{
+				s << " rowspan=\"" << rowSpan << "\"";
+			}
+			if(!className.empty())
 			{
 				s << " class=\"" << className << "\"";
 			}

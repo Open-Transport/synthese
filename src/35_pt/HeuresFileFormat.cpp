@@ -268,39 +268,24 @@ namespace synthese
 					string routeNumber(trim_copy(line.substr(6,2)));
 					
 					// Route identification
-					shared_ptr<JourneyPattern> route;
-					BOOST_FOREACH(const Path* sroute, cline->getPaths())
-					{
-						const JourneyPattern* lroute(static_cast<const JourneyPattern*>(sroute));
-						if(	*lroute == servedStops
-						){
-							route = const_pointer_cast<JourneyPattern>(_env.getSPtr(lroute));
-							continue;
-						}
-					}
-
-					// Create a new route if necessary
-					if(!route.get())
-					{
-						os << "CREA : Creation of route for " << cline->getName() << "<br />";
-						route = PTFileFormat::CreateJourneyPattern(
-							servedStops,
+					JourneyPattern* route(
+						PTFileFormat::CreateOrUpdateRoute(
 							*cline,
+							optional<const string&>(routeNumber),
+							optional<const string&>(),
+							optional<const string&>(),
+							true,
+							Env::GetOfficialEnv().getEditable<RollingStock>(13792273858822585).get(),
+							servedStops,
 							_dataSource,
 							_env,
 							os
-						);
-					}
-					else
-					{
-						os << "LOAD : Use of route " << route->getKey() << " (" << route->getName() << ")<br />";
-					}
-					route->setRollingStock(Env::GetOfficialEnv().getEditable<RollingStock>(13792273858822585).get());
+					)	);
 
 					_routes.insert(
 						make_pair(
 							make_pair(commercialLineNumber, routeNumber),
-							route.get()
+							route
 					)	);
 				}
 			} // 2 : Nodes
@@ -391,38 +376,17 @@ namespace synthese
 					> SchedulesMap;
 
 					JourneyPattern* route(it.first.first);
-					shared_ptr<ScheduledService> service(new ScheduledService);
-					service->setPath(route);
-					service->setPathId(route->getKey());
-					service->setServiceNumber(it.first.second);
-					service->setSchedules(it.second.first, it.second.second);
 
-					// Search for a corresponding service
-					ScheduledService* existingService(NULL);
-					BOOST_FOREACH(Service* tservice, route->getServices())
-					{
-						ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
-
-						if(!curService) continue;
-
-						if (*curService == *service)
-						{
-							os << "LOAD : Use of service " << curService->getKey() << " for " << service->getServiceNumber() << " (" << service->getDepartureSchedules(false).operator[](0) << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
-							existingService = curService;
-							break;
-						}
-					}
-
-					// If not found creation
-					if(!existingService)
-					{
-						service->setKey(ScheduledServiceTableSync::getId());
-						route->addService(service.get(), false);
-						_env.getEditableRegistry<ScheduledService>().add(service);
-						existingService = service.get();
-
-						os << "CREA : Creation of service " << service->getServiceNumber() << " for " << it.first.second << " (" << it.second.first[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
-					}
+					ScheduledService* service(
+						PTFileFormat::CreateOrUpdateService(
+							*route,
+							it.second.first,
+							it.second.second,
+							it.first.second,
+							_dataSource,
+							_env,
+							os
+					)	);
 
 					_services.insert(
 						make_pair(
@@ -430,7 +394,7 @@ namespace synthese
 								lexical_cast<int>(route->getCodeBySource(_dataSource)),
 								service->getServiceNumber()
 							),
-							existingService
+							service
 					)	);
 				}
 			} // 3 : Services

@@ -49,6 +49,7 @@ namespace synthese
 			const TimetableGenerator& timetablegenerator,
 			const SchedulesBasedService& service
 		):	_line(static_cast<const JourneyPattern*>(service.getPath())),
+			_service(&service),
 			_calendar(service)
 		{
 			_calendar &= timetablegenerator.getBaseCalendar();
@@ -117,6 +118,7 @@ namespace synthese
 		TimetableColumn::TimetableColumn(
 			const TimetableGenerator& generator
 		):	_line(NULL),
+			_service(NULL),
 			_originType(Indetermine),
 			_destinationType(Indetermine)
 		{
@@ -189,15 +191,19 @@ namespace synthese
 
 		void TimetableColumn::merge( const TimetableColumn& col )
 		{
-			if( _line->getOrigin()->getHub() != col._line->getOrigin()->getHub()
-			){
-				_originType = Indetermine;
-			}
-			if(	_line->getDestination()->getHub() != col._line->getDestination()->getHub()
-			){
-				_destinationType = Indetermine;
+			if(_line && col._line)
+			{
+				if( _line->getOrigin()->getHub() != col._line->getOrigin()->getHub()
+					){
+						_originType = Indetermine;
+				}
+				if(	_line->getDestination()->getHub() != col._line->getDestination()->getHub()
+					){
+						_destinationType = Indetermine;
+				}
 			}
 			
+			_service = NULL;
 			_calendar |= col._calendar;
 		}
 

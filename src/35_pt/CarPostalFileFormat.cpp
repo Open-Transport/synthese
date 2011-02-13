@@ -404,44 +404,21 @@ namespace synthese
 						}
 						route->setRollingStock(Env::GetOfficialEnv().getEditable<RollingStock>(13792273858822585).get());
 
-						// Services
-						// Creation of the service
-						shared_ptr<ScheduledService> service(new ScheduledService);
-						service->setPath(route.get());
-						service->setPathId(route->getKey());
-						service->setServiceNumber(serviceNumber);
-						service->setSchedules(departures, arrivals);
-
-						// Search for a corresponding service
-						ScheduledService* existingService(NULL);
-						BOOST_FOREACH(Service* tservice, route->getServices())
-						{
-							ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
-
-							if(!curService) continue;
-
-							if (*curService == *service)
-							{
-								os << "LOAD : Use of service " << curService->getKey() << " for " << serviceNumber << " (" << departures[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
-								existingService = curService;
-								break;
-							}
-						}
-
-						// If not found creation
-						if(!existingService)
-						{
-							service->setKey(ScheduledServiceTableSync::getId());
-							route->addService(service.get(), false);
-							_env.getEditableRegistry<ScheduledService>().add(service);
-							existingService = service.get();
-							
-							os << "CREA : Creation of service " << service->getServiceNumber() << " for " << serviceNumber << " (" << departures[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
-						}
+						// Service
+						ScheduledService* service(
+							PTFileFormat::CreateOrUpdateService(
+								*route,
+								departures,
+								arrivals,
+								serviceNumber,
+								_dataSource,
+								_env,
+								os
+						)	);
 
 						// Calendar
-						existingService->subDates(mask);
-						*existingService |= _calendarMap[calendarNumber];
+						service->subDates(mask);
+						*service |= _calendarMap[calendarNumber];
 					}
 				}
 			}

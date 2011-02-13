@@ -26,6 +26,8 @@
 #include "JourneyPattern.hpp"
 #include "ImportableTableSync.hpp"
 #include "StopPoint.hpp"
+#include "ScheduledService.h"
+#include "AdminInterfaceElement.h"
 
 namespace synthese
 {
@@ -49,6 +51,7 @@ namespace synthese
 		class CommercialLine;
 		class CommercialLineTableSync;
 		class StopPointTableSync;
+		class RollingStock;
 
 
 		/** PTFileFormat class.
@@ -101,7 +104,7 @@ namespace synthese
 
 
 
-			static StopArea* CreateOrUpdateStopArea(
+			static std::set<StopArea*> CreateOrUpdateStopAreas(
 				impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
 				const std::string& id,
 				const std::string& name,
@@ -114,12 +117,111 @@ namespace synthese
 
 
 
-			static StopPoint* CreateOrUpdateStopPoint(
+			static std::set<StopArea*> GetStopAreas(
+				const impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
+				const std::string& id,
+				boost::optional<const std::string&> name,
+				std::ostream& logStream,
+				bool errorIfNotFound = true
+			);
+
+
+
+			struct ImportableStopArea
+			{
+				std::string operatorCode;
+				std::string cityName;
+				std::string name;
+				boost::shared_ptr<geos::geom::Point> coords;
+				std::set<StopArea*> linkedStopAreas;
+			};
+			typedef std::vector<ImportableStopArea> ImportableStopAreas;
+
+
+			struct ImportableStopPoint
+			{
+				std::string operatorCode;
+				std::string cityName;
+				std::string name;
+				boost::shared_ptr<geos::geom::Point> coords;
+				const StopArea* stopArea;
+				std::set<StopPoint*> linkedStopPoints;
+
+				ImportableStopPoint(): stopArea(NULL) {}
+			};
+			typedef std::vector<ImportableStopPoint> ImportableStopPoints;
+
+
+			static void DisplayStopAreaImportScreen(
+				const ImportableStopAreas& objects,
+				const admin::AdminRequest& request,
+				bool createCityIfNecessary,
+				bool createPhysicalStop,
+				boost::shared_ptr<const geography::City> defaultCity,
+				util::Env& env,
+				const impex::DataSource& source,
+				std::ostream& stream
+			);
+
+			static void DisplayStopPointImportScreen(
+				const ImportableStopPoints& objects,
+				const admin::AdminRequest& request,
+				util::Env& env,
+				const impex::DataSource& source,
+				std::ostream& stream
+			);
+
+
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			///	Gets a stop point.
+			///		- search stop points with link to the datasource whit the correct id
+			///		- if not found and if stop area is specified creates a new stop point in the stop area
+			static std::set<StopPoint*> CreateOrUpdateStopPoints(
 				impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stopPoints,
 				const std::string& id,
 				const std::string& name,
 				const StopArea& stopArea,
-				const StopPoint::Geometry& geometry,
+				const StopPoint::Geometry* geometry,
+				const impex::DataSource& source,
+				util::Env& env,
+				std::ostream& logStream
+			);
+
+
+
+			static std::set<StopPoint*> GetStopPoints(
+				const impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stopPoints,
+				const std::string& id,
+				boost::optional<const std::string&> name,
+				std::ostream& logStream,
+				bool errorIfNotFound = true
+			);
+
+
+
+			static JourneyPattern* CreateOrUpdateRoute(
+				pt::CommercialLine& line,
+				boost::optional<const std::string&> id,
+				boost::optional<const std::string&> name,
+				boost::optional<const std::string&> destination,
+				bool direction,
+				pt::RollingStock* rollingStock,
+				const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
+				const impex::DataSource& source,
+				util::Env& env,
+				std::ostream& logStream
+			);
+
+
+
+			static ScheduledService* CreateOrUpdateService(
+				JourneyPattern& route,
+				const ScheduledService::Schedules& departureSchedules,
+				const ScheduledService::Schedules& arrivalSchedules,
+				const std::string& number,
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream

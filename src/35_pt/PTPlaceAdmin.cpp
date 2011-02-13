@@ -502,7 +502,7 @@ namespace synthese
 
 			BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 			{
-				shared_ptr<StopPointAdmin> p(getNewOtherPage<StopPointAdmin>());
+				shared_ptr<StopPointAdmin> p(getNewPage<StopPointAdmin>());
 				p->setStop(Env::GetOfficialEnv().getSPtr(it.second));
 				links.push_back(p);
 			}
@@ -551,12 +551,12 @@ namespace synthese
 		{
 			PageLinks links;
 
-			shared_ptr<PTPlacesAdmin> p(getNewOtherPage<PTPlacesAdmin>(false));
+			shared_ptr<PTPlacesAdmin> p(getNewPage<PTPlacesAdmin>());
 			p->setCity(Env::GetOfficialEnv().getSPtr(
 					_connectionPlace->getCity()
 			)	);
 			links = p->_getCurrentTreeBranch();
-			links.push_back(getNewPage());
+			links.push_back(getNewCopiedPage());
 
 			return links;
 		}

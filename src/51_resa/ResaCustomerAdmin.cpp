@@ -278,12 +278,12 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks ResaCustomerAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			PageLinks result;
-			if(moduleKey == ResaModule::FACTORY_KEY)
+			if(	dynamic_cast<const ResaModule*>(&module))
 			{
 				util::RegistryKeyType callId(ResaModule::GetCurrentCallId(request.getSession()));
 

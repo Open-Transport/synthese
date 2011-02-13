@@ -664,7 +664,7 @@ namespace synthese
 				ba->_serviceNumber
 			){
 				shared_ptr<BookableCommercialLineAdmin> p(
-					getNewOtherPage<BookableCommercialLineAdmin>()
+					getNewPage<BookableCommercialLineAdmin>()
 				);
 				p->setCommercialLineC(_line);
 				p->_serviceNumber = ba->_serviceNumber;

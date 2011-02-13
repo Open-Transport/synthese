@@ -378,7 +378,7 @@ namespace synthese
 			);
 			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
 			{
-				shared_ptr<DisplayAdmin> p(getNewOtherPage<DisplayAdmin>());
+				shared_ptr<DisplayAdmin> p(getNewPage<DisplayAdmin>());
 				p->setScreen(screen);
 				links.push_back(p);
 			}

@@ -255,7 +255,10 @@ namespace synthese
 				static const std::string PARAMETER_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_WITH_OLD_DATES;
 
-				Importer_(const impex::DataSource& dataSource);
+				Importer_(
+					util::Env& env,
+					const impex::DataSource& dataSource
+				);
 			
 
 				//! @name Setters

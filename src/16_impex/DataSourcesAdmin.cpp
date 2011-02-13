@@ -148,19 +148,19 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks DataSourcesAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == ImpExModule::FACTORY_KEY &&
+			if(	dynamic_cast<const ImpExModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			
 			return links;
@@ -180,7 +180,7 @@ namespace synthese
 			);
 			BOOST_FOREACH(shared_ptr<DataSource> dataSource, dataSources)
 			{
-				shared_ptr<DataSourceAdmin> p(getNewOtherPage<DataSourceAdmin>());
+				shared_ptr<DataSourceAdmin> p(getNewPage<DataSourceAdmin>());
 				p->setDataSource(dataSource);
 				links.push_back(p);
 			}

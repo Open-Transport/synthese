@@ -35,6 +35,7 @@
 #include "RollingStock.h"
 #include "JourneyPattern.hpp"
 #include "PTObjectsCMSExporters.hpp"
+#include "SchedulesBasedService.h"
 
 #include <boost/date_time/time_duration.hpp>
 
@@ -81,6 +82,7 @@ namespace synthese
 		const string TimetableServiceColInterfacePage::DATA_IS_DEPARTURE("is_departure");
 		const string TimetableServiceColInterfacePage::DATA_STOP_NAME_26("stop_name_26");
 		const string TimetableServiceColInterfacePage::DATA_TRANSPORT_MODE_ID("transport_mode_id");
+		const string TimetableServiceColInterfacePage::DATA_SERVICE_ID("service_id");
 
 
 
@@ -186,6 +188,7 @@ namespace synthese
 			const server::Request& request,
 			const TimetableRow& place,
 			const TimetableResult::RowTimesVector& times,
+			const TimetableResult::RowServicesVector& services,
 			std::size_t globalRank,
 			bool isBeforeTransfer,
 			std::size_t depth
@@ -217,8 +220,10 @@ namespace synthese
 						request,
 						duration,
 						place.getRank(),
-						colRank++
+						colRank,
+						services[colRank]
 					);
+					++colRank;
 				}
 				pm.insert(DATA_CELLS_CONTENT, content.str()); //1
 			}
@@ -250,7 +255,8 @@ namespace synthese
 			const server::Request& request,
 			boost::posix_time::time_duration object,
 			std::size_t rowRank,
-			std::size_t colRank
+			std::size_t colRank,
+			const pt::SchedulesBasedService* service
 		){
 			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
 			displayRequest.getFunction()->setPage(page);
@@ -268,6 +274,11 @@ namespace synthese
 			{
 				pm.insert(DATA_HOURS, object.hours()); //3
 				pm.insert(DATA_MINUTES, object.minutes()); //4
+			}
+
+			if(service)
+			{
+				pm.insert(DATA_SERVICE_ID, service->getKey());
 			}
 
 			displayRequest.getFunction()->setAditionnalParametersMap(pm);
