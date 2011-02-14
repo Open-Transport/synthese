@@ -28,6 +28,9 @@
 #include "LineStopTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "ImpExModule.h"
+#include "PropertiesHTMLTable.h"
+#include "DataSourceAdmin.h"
+#include "AdminFunctionRequest.hpp"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
@@ -47,6 +50,10 @@ namespace synthese
 	using namespace db;
 	using namespace calendar;
 	using namespace graph;
+	using namespace html;
+	using namespace admin;
+	
+	
 	
 	namespace util
 	{
@@ -55,16 +62,16 @@ namespace synthese
 	
 	namespace pt
 	{
-		const std::string GTFSFileFormat::Importer_::FILE_AGENCY("0agency");
-		const std::string GTFSFileFormat::Importer_::FILE_ROUTES("1routes");
-		const std::string GTFSFileFormat::Importer_::FILE_CALENDAR("2calendar");
-		const std::string GTFSFileFormat::Importer_::FILE_CALENDAR_DATES("3calendar_dates");
-		const std::string GTFSFileFormat::Importer_::FILE_TRIPS("4trips");
-		const std::string GTFSFileFormat::Importer_::FILE_STOP_TIMES("5stop_times");
-		const std::string GTFSFileFormat::Importer_::FILE_FARE_ATTRIBUTES("6fare_attributes");
-		const std::string GTFSFileFormat::Importer_::FILE_FARE_RULES("7fare_rules");
-		const std::string GTFSFileFormat::Importer_::FILE_SHAPES("8shapes");
-		const std::string GTFSFileFormat::Importer_::FILE_FREQUENCIES("9frequencies");
+		const std::string GTFSFileFormat::Importer_::FILE_AGENCY("agency");
+		const std::string GTFSFileFormat::Importer_::FILE_ROUTES("routes");
+		const std::string GTFSFileFormat::Importer_::FILE_CALENDAR("calendar");
+		const std::string GTFSFileFormat::Importer_::FILE_CALENDAR_DATES("calendar_dates");
+		const std::string GTFSFileFormat::Importer_::FILE_TRIPS("trips");
+		const std::string GTFSFileFormat::Importer_::FILE_STOP_TIMES("stop_times");
+		const std::string GTFSFileFormat::Importer_::FILE_FARE_ATTRIBUTES("fare_attributes");
+		const std::string GTFSFileFormat::Importer_::FILE_FARE_RULES("fare_rules");
+		const std::string GTFSFileFormat::Importer_::FILE_SHAPES("shapes");
+		const std::string GTFSFileFormat::Importer_::FILE_FREQUENCIES("frequencies");
 		const std::string GTFSFileFormat::Importer_::SEP(",");
 	}
 
@@ -73,10 +80,10 @@ namespace synthese
 		template<> const MultipleFileTypesImporter<GTFSFileFormat>::Files MultipleFileTypesImporter<GTFSFileFormat>::FILES(
 			GTFSFileFormat::Importer_::FILE_AGENCY.c_str(),
 			GTFSFileFormat::Importer_::FILE_ROUTES.c_str(),
-			GTFSFileFormat::Importer_::FILE_TRIPS.c_str(),
-			GTFSFileFormat::Importer_::FILE_STOP_TIMES.c_str(),
 			GTFSFileFormat::Importer_::FILE_CALENDAR.c_str(),
 			GTFSFileFormat::Importer_::FILE_CALENDAR_DATES.c_str(),
+			GTFSFileFormat::Importer_::FILE_TRIPS.c_str(),
+			GTFSFileFormat::Importer_::FILE_STOP_TIMES.c_str(),
 			GTFSFileFormat::Importer_::FILE_FARE_ATTRIBUTES.c_str(),
 			GTFSFileFormat::Importer_::FILE_FARE_RULES.c_str(),
 			GTFSFileFormat::Importer_::FILE_SHAPES.c_str(),
@@ -410,9 +417,29 @@ namespace synthese
 
 
 
-		void GTFSFileFormat::Importer_::displayAdmin( std::ostream& os, const admin::AdminRequest& request ) const
-		{
+		void GTFSFileFormat::Importer_::displayAdmin(
+			std::ostream& stream,
+			const admin::AdminRequest& request
+		) const	{
+			stream << "<h1>Fichiers</h1>";
 
+			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
+			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
+			stream << t.open();
+			stream << t.title("Propriétés");
+			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.title("Fichiers");
+			stream << t.cell("Fichier réseaux", t.getForm().getTextInput(_getFileParameterName(FILE_AGENCY), _pathsMap[FILE_AGENCY].file_string()));
+			stream << t.cell("Fichier routes", t.getForm().getTextInput(_getFileParameterName(FILE_ROUTES), _pathsMap[FILE_ROUTES].file_string()));
+			stream << t.cell("Fichier calendriers", t.getForm().getTextInput(_getFileParameterName(FILE_CALENDAR), _pathsMap[FILE_CALENDAR].file_string()));
+			stream << t.cell("Fichier dates", t.getForm().getTextInput(_getFileParameterName(FILE_CALENDAR_DATES), _pathsMap[FILE_CALENDAR_DATES].file_string()));
+			stream << t.cell("Fichier voyages", t.getForm().getTextInput(_getFileParameterName(FILE_TRIPS), _pathsMap[FILE_TRIPS].file_string()));
+			stream << t.cell("Fichier horaires", t.getForm().getTextInput(_getFileParameterName(FILE_STOP_TIMES), _pathsMap[FILE_STOP_TIMES].file_string()));
+			stream << t.cell("Fichier attributs tarification", t.getForm().getTextInput(_getFileParameterName(FILE_FARE_ATTRIBUTES), _pathsMap[FILE_FARE_ATTRIBUTES].file_string()));
+			stream << t.cell("Fichier règles tarification", t.getForm().getTextInput(_getFileParameterName(FILE_FARE_RULES), _pathsMap[FILE_FARE_RULES].file_string()));
+			stream << t.cell("Fichier géométries", t.getForm().getTextInput(_getFileParameterName(FILE_SHAPES), _pathsMap[FILE_SHAPES].file_string()));
+			stream << t.cell("Fichier services continus", t.getForm().getTextInput(_getFileParameterName(FILE_FREQUENCIES), _pathsMap[FILE_FREQUENCIES].file_string()));
+			stream << t.close();
 		}
 
 
