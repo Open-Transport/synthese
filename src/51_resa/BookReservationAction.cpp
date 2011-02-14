@@ -288,21 +288,52 @@ namespace synthese
 
 			
 			// Departure date time
+			ptime maxArrivalDateTime;
+			ptime maxDepartureDateTime;
+			ptime departureDateTime;
+			ptime arrivalDateTime;
+
 			string date_str = map.get<string>(PARAMETER_DATE_TIME);
 			string::size_type str_pos = date_str.find_first_of("|");
-			string departureDateTime_str = date_str.substr(0, str_pos);
-			string arrivalDateTime_str = date_str.substr(str_pos+1);
 
-			ptime departureDateTime(time_from_string(departureDateTime_str));
-			ptime arrivalDateTime(time_from_string(arrivalDateTime_str));
-			//arrivalDateTime += days(1);
-			/*if(	_originPlace->getPoint().get() &&
-				!_originPlace->getPoint()->isEmpty() &&
-				_destinationPlace->getPoint().get() &&
-				!_destinationPlace->getPoint()->isEmpty()
-			){
-				arrivalDateTime += minutes(2 * static_cast<int>(_originPlace->getPoint()->distance(_destinationPlace->getPoint().get()) / 1000));
-			}*/
+			//cerr << "date_str = " << date_str << endl;
+
+			if(str_pos==string::npos)//not found
+			{
+				//cerr << "| NOT FOUND" << endl;
+				ptime paramDate(time_from_string(date_str));
+				departureDateTime = paramDate;
+
+				maxDepartureDateTime = departureDateTime + minutes(2);
+				departureDateTime    = departureDateTime - minutes(2);
+				arrivalDateTime      = departureDateTime;
+				maxArrivalDateTime   = arrivalDateTime + days(1);
+			}
+			else
+			{
+				//cerr << "| FOUND" << endl;
+				string departureDateTime_str,arrivalDateTime_str;
+
+				departureDateTime_str = date_str.substr(0, str_pos);
+				arrivalDateTime_str   = date_str.substr(str_pos+1);
+
+				ptime paramDateDeparture(time_from_string(departureDateTime_str));
+				ptime paramDateArrival(time_from_string(arrivalDateTime_str));
+
+				departureDateTime = paramDateDeparture;
+				arrivalDateTime = paramDateArrival;
+
+				maxDepartureDateTime = departureDateTime + minutes(2);
+				departureDateTime    = departureDateTime - minutes(2);
+				maxArrivalDateTime   = arrivalDateTime + minutes(2);
+				arrivalDateTime      = arrivalDateTime - minutes(2);
+			}
+
+			/*cerr << "maxDepartureDateTime = " << maxDepartureDateTime << endl;
+			cerr << "departureDateTime = " << departureDateTime << endl;
+			cerr << "maxArrivalDateTime = " << maxArrivalDateTime << endl;
+			cerr << "arrivalDateTime = " << arrivalDateTime << endl;*/
+
 
 			// Accessibility
 			if(_site.get())
@@ -345,10 +376,10 @@ namespace synthese
 			PTTimeSlotRoutePlanner rp(
 				_originPlace.get(),
 				_destinationPlace.get(),
-				departureDateTime - minutes(5),
-				departureDateTime + minutes(5),
-				arrivalDateTime - minutes(5),
-				arrivalDateTime + minutes(5),
+				departureDateTime,
+				maxDepartureDateTime,
+				arrivalDateTime,
+				maxArrivalDateTime,
 				1,
 				_accessParameters,
 				DEPARTURE_FIRST
