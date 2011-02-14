@@ -23,6 +23,8 @@
 #include "Importable.h"
 #include "DataSource.h"
 
+#include <boost/foreach.hpp>
+
 using namespace std;
 
 namespace synthese
@@ -103,5 +105,25 @@ namespace synthese
 		void Importable::cleanDataSourceLinks()
 		{
 			_dataSourceLinks.clear();
+		}
+
+
+
+		std::string Importable::getCodeBySources() const
+		{
+			string result;
+			BOOST_FOREACH(const DataSourceLinks::value_type& l, _dataSourceLinks)
+			{
+				if(l.second.empty())
+				{
+					continue;
+				}
+				if(!result.empty())
+				{
+					result += ",";
+				}
+				result += l.second;
+			}
+			return result;
 		}
 }	}

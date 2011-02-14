@@ -105,7 +105,7 @@ namespace synthese
 		
 		void StopPointAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			if(map.isDefined(PARAMETER_PLACE_ID)) try
+			if(map.getDefault<RegistryKeyType>(PARAMETER_PLACE_ID, 0)) try
 			{
 				_place = StopAreaTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
 			}

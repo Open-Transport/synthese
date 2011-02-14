@@ -323,12 +323,15 @@ namespace synthese
 			try
 			{
 				string text(getText(name));
-				return from_string(text);
+				if(!text.empty())
+				{
+					return from_string(text);
+				}
 			}
 			catch(...)
 			{
-				return date(not_a_date_time);
 			}
+			return date(not_a_date_time);
 		}
 
 
@@ -338,12 +341,15 @@ namespace synthese
 			try
 			{
 				string text(getText(name));
-				return duration_from_string(text);
+				if(!text.empty())
+				{
+					return duration_from_string(text);
+				}
 			}
 			catch(...)
 			{
-				return time_duration(not_a_date_time);
 			}
+			return time_duration(not_a_date_time);
 		}
 
 

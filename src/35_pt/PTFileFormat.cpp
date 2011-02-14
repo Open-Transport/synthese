@@ -648,6 +648,7 @@ namespace synthese
 			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 			stream << t.open();
 			stream.precision(0);
+			AdminActionFunctionRequest<StopPointAddAction, DataSourceAdmin> addRequest(request);
 			BOOST_FOREACH(const ImportableStopPoints::value_type& object, objects)
 			{
 				stream << t.row();
@@ -769,23 +770,29 @@ namespace synthese
 				{
 					stream << t.col();
 
+					Importable::DataSourceLinks links;
+					links.insert(make_pair(&source, object.operatorCode));
+					addRequest.getAction()->setDataSourceLinks(links);
+					addRequest.getAction()->setName(object.name);
+					if(object.coords)
+					{
+						addRequest.getAction()->setPoint(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*object.coords));
+					}
 					if(object.stopArea)
 					{
-						AdminActionFunctionRequest<StopPointAddAction, DataSourceAdmin> addRequest(request);
-						Importable::DataSourceLinks links;
-						links.insert(make_pair(&source, object.operatorCode));
-						addRequest.getAction()->setDataSourceLinks(links);
-						if(object.coords)
-						{
-							addRequest.getAction()->setPoint(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*object.coords));
-						}
 						addRequest.getAction()->setPlace(env.getEditableSPtr(const_cast<StopArea*>(object.stopArea)));
-						addRequest.getAction()->setName(object.name);
 						stream << HTMLModule::getLinkButton(addRequest.getURL(), "Ajouter");
 					}
 					else
 					{
-						stream << "Lien auto impossible";
+						addRequest.getAction()->setCreateCityIfNecessary(true);
+						HTMLForm f(addRequest.getHTMLForm("create"+lexical_cast<string>(object.operatorCode)));
+						stream << f.open();
+						stream << "ID zone arrêt : " << f.getTextInput(StopPointAddAction::PARAMETER_PLACE_ID, string());
+						stream << " ou création : commune zone d'arrêt : " << f.getTextInput(StopPointAddAction::PARAMETER_CITY_NAME, string());
+						stream << " " << f.getSubmitButton("Créer");
+						stream << f.close();
+						addRequest.getAction()->setCreateCityIfNecessary(false);
 					}
 				}
 			}

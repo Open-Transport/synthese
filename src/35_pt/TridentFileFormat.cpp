@@ -64,6 +64,7 @@
 #include "AdminFunctionRequest.hpp"
 #include "DataSourceAdmin.h"
 #include "PTFileFormat.hpp"
+#include "ImpExModule.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -75,12 +76,14 @@
 #include <fstream>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::gregorian;
 using namespace boost::filesystem;
 using namespace boost::posix_time;
+using namespace boost::algorithm;
 using namespace geos::geom;
 
 namespace synthese
@@ -107,10 +110,11 @@ namespace synthese
 		const string TridentFileFormat::Importer_::PARAMETER_IMPORT_JUNCTIONS("impjun");
 		const string TridentFileFormat::Importer_::PARAMETER_WITH_OLD_DATES("wod");
 		const string TridentFileFormat::Importer_::PARAMETER_DEFAULT_TRANSFER_DURATION("dtd");
+		const string TridentFileFormat::Importer_::PARAMETER_AUTOGENERATE_STOP_AREAS("asa");
 		const string TridentFileFormat::Exporter_::PARAMETER_LINE_ID("li");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_TISSEO_EXTENSION("wt");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_OLD_DATES("wod");
-
+		
 		TridentFileFormat::SRIDConversionMap TridentFileFormat::_SRIDConversionMap;
 
 		string ToXsdDaysDuration (date_duration daysDelay);
@@ -126,6 +130,7 @@ namespace synthese
 		):	OneFileTypeImporter<Importer_>(env, dataSource),
 			_importStops(false),
 			_importJunctions(false),
+			_autoGenerateStopAreas(false),
 			_defaultTransferDuration(minutes(8)),
 			_startDate(day_clock::local_day())
 		{}
@@ -138,6 +143,7 @@ namespace synthese
 			ParametersMap result;
 			result.insert(PARAMETER_IMPORT_STOPS, _importStops);
 			result.insert(PARAMETER_IMPORT_JUNCTIONS, _importJunctions);
+			result.insert(PARAMETER_AUTOGENERATE_STOP_AREAS, _autoGenerateStopAreas);
 			if(!_defaultTransferDuration.is_not_a_date_time())
 			{
 				result.insert(PARAMETER_DEFAULT_TRANSFER_DURATION, _defaultTransferDuration.total_seconds() / 60);
@@ -170,6 +176,7 @@ namespace synthese
 		void TridentFileFormat::Importer_::_setFromParametersMap(const ParametersMap& map)
 		{
 			_importStops = map.getDefault<bool>(PARAMETER_IMPORT_STOPS, false);
+			_autoGenerateStopAreas = map.getDefault<bool>(PARAMETER_AUTOGENERATE_STOP_AREAS, false);
 			_importJunctions = map.getDefault<bool>(PARAMETER_IMPORT_JUNCTIONS, false);
 			if(map.getDefault<int>(PARAMETER_DEFAULT_TRANSFER_DURATION, 0))
 			{
@@ -1040,7 +1047,7 @@ namespace synthese
 				PTFileFormat::CreateOrUpdateNetwork(
 					networks,
 					networkIdNode.getText(),
-					networkNameNode.getText(),
+					ImpExModule::ConvertChar(networkNameNode.getText(), _dataSource.getCharset(), "UTF-8"),
 					_dataSource,
 					_env,
 					os
@@ -1052,8 +1059,8 @@ namespace synthese
 				PTFileFormat::CreateOrUpdateLine(
 					lines,
 					lineKeyNode.getText(),
-					clineNameNode.getText(),
-					clineShortNameNode.getText(),
+					ImpExModule::ConvertChar(clineNameNode.getText(), _dataSource.getCharset(), "UTF-8"),
+					ImpExModule::ConvertChar(clineShortNameNode.getText(), _dataSource.getCharset(), "UTF-8"),
 					optional<RGBColor>(),
 					*network,
 					_dataSource,
@@ -1208,7 +1215,9 @@ namespace synthese
 						}
 					}
 
-					curStop->setName(nameNode.getText());
+					curStop->setName(
+						ImpExModule::ConvertChar(nameNode.getText(), _dataSource.getCharset(), "UTF-8")
+					);
 					curStop->setCity(city.get());
 
 					// Link from physical stops
@@ -1240,22 +1249,18 @@ namespace synthese
 				string stopKey(stopAreaNode.getChildNode("objectId", 0).getText());
 
 				// Name
-				string name(stopAreaNode.getChildNode("name", 0).getText());
+				string name(
+					ImpExModule::ConvertChar(
+						stopAreaNode.getChildNode("name", 0).getText(),
+						_dataSource.getCharset(),
+						"UTF-8"
+				)	);
 
 				if(_importStops)
 				{
-					// Stop area
-					map<string,StopArea*>::const_iterator itcstop(commercialStopsByPhysicalStop.find(stopKey));
-					if(itcstop == commercialStopsByPhysicalStop.end())
-					{
-						os << "ERR  : stop " << stopKey << " not found in any commercia stop (" << name << ")<br />";
-						failure = true;
-						continue;
-					}
-					StopArea& stopArea(*itcstop->second);
-				
 					// Geometry
 					shared_ptr<StopPoint::Geometry> geometry;
+					shared_ptr<const City> city;
 					map<string, XMLNode>::iterator itPlace(areaCentroids.find(areaCentroidNode.getText()));
 					if(itPlace == areaCentroids.end())
 					{
@@ -1268,7 +1273,9 @@ namespace synthese
 						XMLNode latitudeNode(areaCentroid.getChildNode("latitude", 0));
 						if(!longitudeNode.isEmpty() && !latitudeNode.isEmpty())
 						{
-							geometry = CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
+							geometry = CoordinatesSystem::GetCoordinatesSystem(
+								_getSRIDFromTrident(areaCentroid.getChildNode("longLatType", 0).getText())
+							).createPoint(
 								lexical_cast<double>(longitudeNode.getText()),
 								lexical_cast<double>(latitudeNode.getText())
 							);
@@ -1279,20 +1286,85 @@ namespace synthese
 							if(!projectedPointNode.isEmpty())
 							{
 								geometry = CoordinatesSystem::GetCoordinatesSystem(
-										_getSRIDFromTrident(projectedPointNode.getChildNode("projectionType", 0).getText())
+									_getSRIDFromTrident(projectedPointNode.getChildNode("projectionType", 0).getText())
 								).createPoint(
 									lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
 									lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
 								);
 							}
 						}
+
+						XMLNode addressNode(areaCentroid.getChildNode("address", 0));
+						string cityCode(
+							addressNode.isEmpty() ? string() : addressNode.getChildNode("countryCode", 0).getText()
+						);
+
+						// Search of the city
+						if(!cityCode.empty())
+						{
+							CityTableSync::SearchResult cityResult(
+								CityTableSync::Search(_env, optional<string>(), optional<string>(), cityCode)
+								);
+							if(!cityResult.empty())
+							{
+								city = cityResult.front();
+							}
+							else
+							{
+								// If no city was found, attempting to find an alias with the right code
+								CityAliasTableSync::SearchResult cityAliasResult(
+									CityAliasTableSync::Search(_env, optional<RegistryKeyType>(), cityCode)
+									);
+
+								if(cityAliasResult.empty())
+								{
+									os << "ERR  : stop point " << stopKey << " with area centroid " << areaCentroid.getText() << " does not link to a valid city (" << addressNode.getChildNode("countryCode", 0).getText() << ")<br />";
+									failure = true;
+									continue;
+								}
+
+								city = _env.getSPtr(cityAliasResult.front()->getCity());
+							}
+						}
 					}
 
+					// Stop area
+					map<string,StopArea*>::const_iterator itcstop(commercialStopsByPhysicalStop.find(stopKey));
+					StopArea* curStop(NULL);
+					if(itcstop != commercialStopsByPhysicalStop.end())
+					{
+						curStop = itcstop->second;
+					}
+					else
+					{
+						if(_autoGenerateStopAreas && city.get())
+						{
+							curStop = new StopArea;
+							Importable::DataSourceLinks links;
+							links.insert(make_pair(&_dataSource, string()));
+							curStop->setDataSourceLinks(links);
+							curStop->setAllowedConnection(true);
+							curStop->setDefaultTransferDelay(_defaultTransferDuration);
+							curStop->setKey(StopAreaTableSync::getId());
+							curStop->setName(name);
+							curStop->setCity(city.get());
+							_env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(curStop));
+
+							os << "CREA : Auto generation of the commercial stop for stop " << stopKey << " (" << name <<  ")<br />";
+						}
+						else
+						{
+							os << "ERR  : stop " << stopKey << " not found in any commercial stop (" << name << ")<br />";
+							failure = true;
+							continue;
+						}
+					}
+				
 					PTFileFormat::CreateOrUpdateStopPoints(
 						stops,
 						stopKey,
 						name,
-						stopArea,
+						*curStop,
 						geometry.get(),
 						_dataSource,
 						_env,
@@ -1383,7 +1455,7 @@ namespace synthese
 				XMLNode extNode(routeNode.getChildNode("RouteExtension"));
 				XMLNode waybackNode(extNode.getChildNode("wayBack"));
 				XMLNode nameNode(routeNode.getChildNode("name"));
-				routeNames[crouteKeyNode.getText()] = nameNode.getText();
+				routeNames[crouteKeyNode.getText()] = ImpExModule::ConvertChar(nameNode.getText(), _dataSource.getCharset(), "UTF-8");
 				routeWaybacks[crouteKeyNode.getText()] = (
 					waybackNode.getText() == string("R") ||
 					waybackNode.getText() == string("1")
@@ -1397,27 +1469,36 @@ namespace synthese
 			for(int routeRank(0); routeRank < routesNumber; ++routeRank)
 			{
 				XMLNode routeNode(chouetteLineDescriptionNode.getChildNode("JourneyPattern",routeRank));
-				XMLNode jpKeyNode(routeNode.getChildNode("objectId"));
-				XMLNode routeIdNode(routeNode.getChildNode("routeId"));
+				string objectId(routeNode.getChildNode("objectId").getText());
+				string routeId(routeNode.getChildNode("routeId").getText());
 				
 				// Reading stops list
 				JourneyPattern::StopsWithDepartureArrivalAuthorization routeStops;
 				int lineStopsNumber(routeNode.nChildNode("stopPointList"));
+				string lastStopPoint;
 				for(int lineStopRank(0); lineStopRank < lineStopsNumber; ++lineStopRank)
 				{
-					XMLNode lineStopNode(routeNode.getChildNode("stopPointList", lineStopRank));
+					string stopPointCode(
+						routeNode.getChildNode("stopPointList", lineStopRank).getText()
+					);
+					if(stopPointCode == lastStopPoint)
+					{
+						os << "WARN : StopPoint " << lastStopPoint << " is repeated in journey pattern " << objectId << "<br />";
+						continue;
+					}
+					lastStopPoint = stopPointCode;
 					routeStops.push_back(
 						JourneyPattern::StopWithDepartureArrivalAuthorization(
-							stopPoints[lineStopNode.getText()]
+							stopPoints[stopPointCode]
 					)	);
 				}
 
-				routes[jpKeyNode.getText()] = PTFileFormat::CreateOrUpdateRoute(
+				routes[objectId] = PTFileFormat::CreateOrUpdateRoute(
 					*cline,
-					optional<const string&>(jpKeyNode.getText()),
-					optional<const string&>(routeNames[routeIdNode.getText()]),
+					optional<const string&>(objectId),
+					optional<const string&>(routeNames[routeId]),
 					optional<const string&>(),
-					routeWaybacks[routeIdNode.getText()],
+					routeWaybacks[routeId],
 					rollingStock.get(),
 					routeStops,
 					_dataSource,
@@ -1435,13 +1516,14 @@ namespace synthese
 				XMLNode keyNode(serviceNode.getChildNode("objectId"));
 				XMLNode jpKeyNode(serviceNode.getChildNode("journeyPatternId"));
 				XMLNode numberNode(serviceNode.getChildNode("publishedJourneyName"));
+				string serviceNumber(numberNode.isEmpty() ? string() : ImpExModule::ConvertChar(numberNode.getText(), _dataSource.getCharset(), "UTF-8"));
 				
 				// Creation of the service
 				JourneyPattern* line(routes[jpKeyNode.getText()]);
 				size_t stopsNumber(serviceNode.nChildNode("VehicleJourneyAtStop"));
 				if(stopsNumber != line->getEdges().size())
 				{
-					os << "WARN : Service " << numberNode.getText() << " / " << keyNode.getText() << " ignored due to bad stops number<br />";
+					os << "WARN : Service " << serviceNumber << " / " << keyNode.getText() << " ignored due to bad stops number<br />";
 					continue;
 				}
 
@@ -1468,7 +1550,7 @@ namespace synthese
 					*line,
 					deps,
 					arrs,
-					numberNode.getText(),
+					serviceNumber,
 					_dataSource,
 					_env,
 					os
@@ -1794,7 +1876,7 @@ namespace synthese
 			if(_SRIDConversionMap.left.empty())
 			{
 				_SRIDConversionMap.left.insert(SRIDConversionMap::left_value_type(4326, "WGS84"));
-				_SRIDConversionMap.left.insert(SRIDConversionMap::left_value_type(27572, "Lambert II Ã©tendu"));
+				_SRIDConversionMap.left.insert(SRIDConversionMap::left_value_type(27572, "LAMBERT II ETENDU"));
 			}
 		}
 
@@ -1803,7 +1885,7 @@ namespace synthese
 		CoordinatesSystem::SRID TridentFileFormat::_getSRIDFromTrident( const std::string& value )
 		{
 			_populateSRIDTridentConversionMap();
-			SRIDConversionMap::right_const_iterator it(_SRIDConversionMap.right.find(value));
+			SRIDConversionMap::right_const_iterator it(_SRIDConversionMap.right.find(to_upper_copy(value)));
 			if(it == _SRIDConversionMap.right.end())
 			{
 				throw Exception("Trident SRID not found");
@@ -1833,14 +1915,15 @@ namespace synthese
 			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
 			PropertiesHTMLTable t(importRequest.getHTMLForm());
 			stream << t.open();
-			stream << t.title("Propriétés");
+			stream << t.title("PropriÃ©tÃ©s");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.cell("Import arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOPS, false));
-			stream << t.cell("Import transferts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_JUNCTIONS, false));
-			stream << t.cell("Importer dates passées (nombre de jours)", t.getForm().getTextInput(PARAMETER_WITH_OLD_DATES, "0"));
-			stream << t.cell("Temps de correspondance par défaut (minutes)", t.getForm().getTextInput(PARAMETER_DEFAULT_TRANSFER_DURATION, "8"));
-			stream << t.title("Données");
-			stream << t.cell("Ligne", t.getForm().getTextInput(PARAMETER_PATH, string()));
+			stream << t.cell("Import arrÃªts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOPS, _importStops));
+			stream << t.cell("AutogÃ©nÃ©rer arrÃªts commerciaux", t.getForm().getOuiNonRadioInput(PARAMETER_AUTOGENERATE_STOP_AREAS, _autoGenerateStopAreas));
+			stream << t.cell("Import transferts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_JUNCTIONS, _importJunctions));
+			stream << t.cell("Importer dates passÃ©es (nombre de jours)", t.getForm().getTextInput(PARAMETER_WITH_OLD_DATES, "0"));
+			stream << t.cell("Temps de correspondance par dÃ©faut (minutes)", t.getForm().getTextInput(PARAMETER_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_defaultTransferDuration.total_seconds() / 60)));
+			stream << t.title("DonnÃ©es");
+			stream << t.cell("Ligne", t.getForm().getTextInput(PARAMETER_PATH, _pathsSet.empty() ? string() : _pathsSet.begin()->file_string()));
 			stream << t.close();
 		}
 }	}

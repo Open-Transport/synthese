@@ -27,17 +27,15 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "StopPointTableSync.hpp"
 #include "PTPlaceAdmin.h"
-#include "StopPointAdmin.hpp"
-#include "StopAreaAddAction.h"
 #include "StopArea.hpp"
 #include "DataSource.h"
 #include "ImpExModule.h"
 #include "Importer.hpp"
-#include "StopPointMoveAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "HTMLModule.h"
 #include "HTMLForm.h"
 #include "DBModule.h"
+#include "PTFileFormat.hpp"
 
 #include <geos/geom/Point.h>
 #include <geos/opDistance.h>
@@ -82,10 +80,9 @@ namespace synthese
 
 			string line;
 
-			typedef std::map<std::string, PointArret> PointsArrets;
-
-			PointsArrets _nonLinkedPointsArrets;
-			PointsArrets _linkedPointsArrets;
+			PTFileFormat::ImportableStopPoints linkedStopPoints;
+			PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
+			ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(_dataSource, _env);
 
 			while(getline(inFile, line))
 			{
@@ -94,102 +91,39 @@ namespace synthese
 					line = ImpExModule::ConvertChar(line, _dataSource.getCharset(), "UTF-8");
 				}
 
-				PointArret pointArret;
-				pointArret.operatorCode = line.substr(0, 4);
-				pointArret.name = boost::algorithm::trim_copy(line.substr(5, 50));
+				string id(line.substr(0, 4));
+				string name(boost::algorithm::trim_copy(line.substr(5, 50)));
 
-				StopPointTableSync::SearchResult stops(
-					StopPointTableSync::Search(
-						Env::GetOfficialEnv(),
-						optional<RegistryKeyType>(),
-						pointArret.operatorCode,
-						false,
-						true,
-						0,
-						1
-				)	);
-				if(!stops.empty())
+				PTFileFormat::ImportableStopPoint isp;
+				isp.operatorCode = id;
+				isp.name = name;
+				isp.linkedStopPoints = stopPoints.get(id);
+				
+				if(isp.linkedStopPoints.empty())
 				{
-					pointArret.stop = stops.front();
-					_linkedPointsArrets[pointArret.operatorCode] = pointArret;
+					nonLinkedStopPoints.push_back(isp);
 				}
 				else
 				{
-					_nonLinkedPointsArrets[pointArret.operatorCode] = pointArret;
+					linkedStopPoints.push_back(isp);
 				}
 			}
 			inFile.close();
 
-			if(!_nonLinkedPointsArrets.empty())
-			{
-				stream << "<h1>Arrêts non liés à SYNTHESE</h1>";
-
-				HTMLTable::ColsVector c;
-				c.push_back("Code");
-				c.push_back("Nom");
-
-				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
-				stream << t.open();
-				BOOST_FOREACH(const PointsArrets::value_type& pointArret, _nonLinkedPointsArrets)
-				{
-					stream << t.row();
-					stream << t.col();
-					stream << pointArret.first;
-
-					stream << t.col();
-					stream << pointArret.second.name;
-				}
-				stream << t.close();
-			}
-
-			if(!_linkedPointsArrets.empty())
-			{
-				stream << "<h1>Arrêts liés à SYNTHESE</h1>";
-
-				HTMLTable::ColsVector c;
-				c.push_back("Code source");
-				c.push_back("Zone d'arrêt SYNTHESE");
-				c.push_back("Arrêt physique SYNTHESE");
-				c.push_back("Nom source");
-				c.push_back("Coords SYNTHESE");
-				c.push_back("Coords SYNTHESE");
-
-				AdminFunctionRequest<PTPlaceAdmin> openRequest(*request);
-				AdminFunctionRequest<StopPointAdmin> openPhysicalRequest(*request);
-
-				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
-				stream << t.open();
-				stream.precision(0);
-				BOOST_FOREACH(const PointsArrets::value_type& pointArret, _linkedPointsArrets)
-				{
-					stream << t.row();
-					stream << t.col();
-					stream << pointArret.first;
-
-					stream << t.col();
-					openRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr(pointArret.second.stop->getConnectionPlace()));
-					stream << HTMLModule::getHTMLLink(openRequest.getURL(), pointArret.second.stop->getConnectionPlace()->getFullName());
-
-					stream << t.col();
-					openPhysicalRequest.getPage()->setStop(pointArret.second.stop);
-					stream << HTMLModule::getHTMLLink(openPhysicalRequest.getURL(), pointArret.second.stop->getName());
-
-					stream << t.col();
-					stream << pointArret.second.name;
-
-					if(pointArret.second.stop->getGeometry().get())
-					{
-						stream << t.col() << std::fixed << pointArret.second.stop->getGeometry()->getX();
-						stream << t.col() << std::fixed << pointArret.second.stop->getGeometry()->getY();
-					}
-					else
-					{
-						stream << t.col() << "(non localisé)";
-						stream << t.col() << "(non localisé)";
-					}
-				}
-				stream << t.close();
-			}
+			PTFileFormat::DisplayStopPointImportScreen(
+				linkedStopPoints,
+				*request,
+				_env,
+				_dataSource,
+				stream
+			);
+			PTFileFormat::DisplayStopPointImportScreen(
+				nonLinkedStopPoints,
+				*request,
+				_env,
+				_dataSource,
+				stream
+			);
 		
 			return false;
 		}

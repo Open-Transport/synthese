@@ -32,6 +32,10 @@
 #include "AdminFunctionRequest.hpp"
 #include "DataSourceAdmin.h"
 #include "HTMLModule.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "DataSourceUpdateAction.hpp"
+#include "HTMLForm.h"
+#include "ImpExModule.h"
 
 #include <boost/foreach.hpp>
 
@@ -106,9 +110,15 @@ namespace synthese
 			const AdminRequest& request
 		) const	{
 
+			stream << "<h1>Sources de données</h1>";
+
 			AdminFunctionRequest<DataSourcesAdmin> searchRequest(request);
 
 			AdminFunctionRequest<DataSourceAdmin> openRequest(request);
+
+			AdminActionFunctionRequest<DataSourceUpdateAction, DataSourceAdmin> addRequest(request);
+			addRequest.setActionWillCreateObject();
+			addRequest.setActionFailedPage<DataSourcesAdmin>();
 
 			DataSourceTableSync::SearchResult dataSources(
 				DataSourceTableSync::Search(
@@ -120,6 +130,9 @@ namespace synthese
 					_requestParameters.orderField == PARAM_SEARCH_NAME,
 					_requestParameters.raisingOrder
 			)	);
+
+			HTMLForm f(addRequest.getHTMLForm("add"));
+			stream << f.open();
 
 			ResultHTMLTable::HeaderVector c;
 			c.push_back(make_pair(string(), "ID"));
@@ -141,8 +154,13 @@ namespace synthese
 				stream << t.col() << HTMLModule::getLinkButton(openRequest.getHTMLForm().getURL(), "Ouvrir", string(), "database_edit.png");
 			}
 
+			stream << t.row();
+			stream << t.col() << "Création :";
+			stream << t.col() << f.getTextInput(DataSourceUpdateAction::PARAMETER_NAME, string(), "(nom)");
+			stream << t.col() << f.getSelectInput(DataSourceUpdateAction::PARAMETER_FORMAT, ImpExModule::GetFileFormatsList(), optional<string>());
+			stream << t.col() << f.getSubmitButton("Ajouter");
 			stream << t.close();
-		
+			stream << f.close();
 		}
 
 

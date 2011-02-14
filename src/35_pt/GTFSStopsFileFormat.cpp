@@ -285,8 +285,8 @@ namespace synthese
 						// Creation or update
 						PTFileFormat::CreateOrUpdateStopPoints(
 							_stopPoints,
-							_getValue("stop_id"),
-							_getValue("stop_name"),
+							id,
+							name,
 							*stopArea,
 							point.get(),
 							_dataSource,

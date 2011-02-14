@@ -213,6 +213,7 @@ namespace synthese
 
 					PropertiesHTMLTable t(updateRequest.getHTMLForm());
 					stream << t.open();
+					stream << t.cell("ID", lexical_cast<string>(_connectionPlace->getKey()));
 					stream << t.title("Localisation");
 					stream << t.cell("Localité", _connectionPlace->getCity()->getName());
 					stream << t.cell("Localité", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_CITY_ID, lexical_cast<string>(_connectionPlace->getCity()->getKey())));

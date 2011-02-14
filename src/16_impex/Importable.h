@@ -111,6 +111,8 @@ namespace synthese
 				/// @throws NotLinkedWithSourceException if the object does not have an
 				/// anonymous owner.
 				const std::string& getCodeBySource() const;
+
+				std::string getCodeBySources() const;
 			//@}
 		
 			//! @name Static algorithms
