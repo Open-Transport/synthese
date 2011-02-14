@@ -221,7 +221,7 @@ namespace synthese
 							const ArrivalDepartureTableGenerator::PhysicalStops& stops(place->getPhysicalStops());
 							BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, stops)
 							{
-								if(it.second->getCodeBySource() == oc)
+								if(it.second->getCodeBySources() == oc)
 									screen->addPhysicalStop(it.second);
 							}
 						}
@@ -260,7 +260,7 @@ namespace synthese
 							typedef const pair<const RegistryKeyType, shared_ptr<StopPoint> > myType;
 							BOOST_FOREACH(myType&  myStop,Env::GetOfficialEnv().getRegistry<StopPoint>())
 							{
-								if(myStop.second->getCodeBySource() == oc)
+								if(myStop.second->getCodeBySources() == oc)
 								{
 									screen->addPhysicalStop(myStop.second.get());
 									break;
@@ -332,7 +332,7 @@ namespace synthese
 			RollingStock * rs = journeyPattern->getRollingStock();
 
 			stream << "<stop id=\"" << stop->getKey() <<
-				"\" operatorCode=\""<< stop->getCodeBySource() <<
+				"\" operatorCode=\""<< stop->getCodeBySources() <<
 				"\" name=\""        << stop->getName() <<
 				"\" />";
 

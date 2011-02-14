@@ -33,6 +33,7 @@
 #include "StopPointUpdateAction.hpp"
 #include "StopArea.hpp"
 #include "PTPlaceAdmin.h"
+#include "ImportableAdmin.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -47,6 +48,7 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace pt;
+	using namespace impex;
 
 	namespace util
 	{
@@ -62,7 +64,6 @@ namespace synthese
 	namespace pt
 	{
 		const string StopPointAdmin::TAB_LINKS("li");
-		const string StopPointAdmin::TAB_OPERATOR_CODES("oc");
 		const string StopPointAdmin::TAB_PROPERTIES("pr");
 
 
@@ -146,15 +147,17 @@ namespace synthese
 						StopPointUpdateAction::PARAMETER_Y,
 						_stop->getGeometry().get() ? lexical_cast<string>(_stop->getGeometry()->getY()) : string()
 				)	);
-				stream << t.cell("Code opérateur", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_OPERATOR_CODE, _stop->getCodeBySource()));
 				stream << t.close();
 			}
 
 
 			////////////////////////////////////////////////////////////////////
 			// OPERATOR CODES TAB
-			if (openTabContent(stream, TAB_OPERATOR_CODES))
+			if (openTabContent(stream, ImportableAdmin::TAB_DATA_SOURCES))
 			{
+				StaticActionRequest<StopPointUpdateAction> updateOnlyRequest(request);
+				updateOnlyRequest.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
+				ImportableAdmin::DisplayDataSourcesTab(stream, *_stop, updateOnlyRequest);
 			}
 		
 			////////////////////////////////////////////////////////////////////
@@ -190,6 +193,7 @@ namespace synthese
 			_tabs.clear();
 
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, profile.isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
+			_tabs.push_back(Tab("Sources de données", ImportableAdmin::TAB_DATA_SOURCES, profile.isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
 
 			_tabBuilded = true;
 		}

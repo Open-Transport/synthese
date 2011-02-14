@@ -30,6 +30,7 @@
 #include "StopPointTableSync.hpp"
 #include "StopAreaTableSync.hpp"
 #include "ImportableTableSync.hpp"
+#include "ImportableAdmin.hpp"
 
 using namespace std;
 using namespace boost;
@@ -85,6 +86,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_STOP_AREA, _stopArea->get() ? (*_stopArea)->getKey() : RegistryKeyType(0));
 			}
+			if(_dataSourceLinks)
+			{
+				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
+			}
 			return map;
 		}
 		
@@ -137,6 +142,11 @@ namespace synthese
 			if(map.isDefined(PARAMETER_NAME))
 			{
 				_name = map.get<string>(PARAMETER_NAME);
+			}
+
+			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
+			{
+				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
 			}
 		}
 		

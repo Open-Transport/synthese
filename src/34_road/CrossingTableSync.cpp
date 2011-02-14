@@ -117,8 +117,8 @@ namespace synthese
 			optional<SQLiteTransaction&> transaction
 		){
 			ReplaceQuery<CrossingTableSync> query(*object);
-			query.addField(object->getCodeBySource());
 			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addFieldNull();
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
 			query.execute(transaction);
 		}

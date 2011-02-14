@@ -39,6 +39,9 @@
 #include "SearchFormHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "CommercialLineAddAction.h"
+#include "ImportableAdmin.hpp"
+#include "TransportNetworkUpdateAction.hpp"
+#include "PropertiesHTMLTable.h"
 
 #include <boost/foreach.hpp>
 
@@ -53,7 +56,7 @@ namespace synthese
 	using namespace pt;
 	using namespace security;
 	using namespace html;
-	using namespace pt;
+	using namespace impex;
 
 	namespace util
 	{
@@ -166,6 +169,20 @@ namespace synthese
 			stream << t.col(2) << "Création de ligne";
 			stream << t.col() << HTMLModule::getLinkButton(creationRequest.getURL(), "Créer");
 			stream << t.close();
+
+			// Properties
+			stream << "<h1>Propriétés</h1>";
+			AdminActionFunctionRequest<TransportNetworkUpdateAction,TransportNetworkAdmin> updateRequest(_request);
+			updateRequest.getAction()->setNetwork(const_pointer_cast<TransportNetwork>(_network));
+			PropertiesHTMLTable p(updateRequest.getHTMLForm("update"));
+			stream << p.open();
+			stream << p.cell("Nom", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_NAME, _network->getName()));
+			stream << p.close();
+
+			// Source id
+			StaticActionRequest<TransportNetworkUpdateAction> updateOnlyRequest(_request);
+			updateOnlyRequest.getAction()->setNetwork(const_pointer_cast<TransportNetwork>(_network));
+			ImportableAdmin::DisplayDataSourcesTab(stream, *_network, updateOnlyRequest);
 		}
 
 		bool TransportNetworkAdmin::isAuthorized(

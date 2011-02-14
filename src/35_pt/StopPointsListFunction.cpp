@@ -168,7 +168,7 @@ namespace synthese
 						continue;
 
 					stream << "<physicalStop id=\"" << it.second->getKey() <<
-						"\" operatorCode=\""    << it.second->getCodeBySource() <<
+						"\" operatorCode=\""    << it.second->getCodeBySources() <<
 						"\">";
 
 					BOOST_FOREACH(const stopAreaMapType::value_type& destination, stopAreaMap)
@@ -184,7 +184,7 @@ namespace synthese
 				else//all physical stop will be displayed, without lines destination information
 				{
 					stream << "<physicalStop id=\"" << it.second->getKey() <<
-						"\" operatorCode=\""    << it.second->getCodeBySource() <<
+						"\" operatorCode=\""    << it.second->getCodeBySources() <<
 						"\" />";
 				}
 			}

@@ -36,7 +36,7 @@
 #include "TransportNetworkTableSync.h"
 #include "HTMLModule.h"
 #include "SearchFormHTMLTable.h"
-#include "TransportNetworkAddAction.h"
+#include "TransportNetworkUpdateAction.hpp"
 #include "ActionResultHTMLTable.h"
 
 using namespace std;
@@ -131,7 +131,7 @@ namespace synthese
 					_requestParameters.raisingOrder
 			)	);
 
-			AdminActionFunctionRequest<TransportNetworkAddAction,TransportNetworkAdmin> newRequest(request);
+			AdminActionFunctionRequest<TransportNetworkUpdateAction,TransportNetworkAdmin> newRequest(request);
 			newRequest.getFunction()->setActionFailedPage<PTNetworksAdmin>();
 			newRequest.setActionWillCreateObject();
 
@@ -153,7 +153,7 @@ namespace synthese
 			}
 			stream << t.row();
 			stream << t.col();
-			stream << t.getActionForm().getTextInput(TransportNetworkAddAction::PARAMETER_NAME, string());
+			stream << t.getActionForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_NAME, string());
 			stream << t.col();
 			stream << t.getActionForm().getSubmitButton("Créer");
 			stream << t.close();

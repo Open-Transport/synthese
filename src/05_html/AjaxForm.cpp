@@ -62,6 +62,7 @@ namespace synthese
 				<< HTMLModule::GetHTMLJavascriptOpen()
 				<< "var xajax = null;"
 				<< "function send_ajax_" << _name << "(){"
+				<< sendJSComplement
 				<< "var content = '';"
 				<< "var elems=document.forms['" << _name << "'].elements;"
 				<< "document.forms['" << _name << "'].className='waiting';"
@@ -70,7 +71,6 @@ namespace synthese
 				<< "if(content.length > 0) content+= '&';"
 				<< "content += elems[i].name +'='+ escape(elems[i].value);"
 				<< "}"
-				<< sendJSComplement
 				<< "if(window.XMLHttpRequest) xajax = new XMLHttpRequest();"
 				<< "else if(window.ActiveXObject) xajax = new ActiveXObject('Microsoft.XMLHTTP');" 
 				<< "else return false;"

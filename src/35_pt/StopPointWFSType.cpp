@@ -103,7 +103,7 @@ namespace synthese
 					"</gml:coordinates></gml:Point></synthese:msGeometry>"
 
 					"<synthese:" << TABLE_COL_ID << ">" << ps->getKey() << "</synthese:" << TABLE_COL_ID << ">" <<
-					"<synthese:" << StopPointTableSync::COL_OPERATOR_CODE << ">" << ps->getCodeBySource() << "</synthese:" << StopPointTableSync::COL_OPERATOR_CODE << ">" <<
+					"<synthese:" << StopPointTableSync::COL_OPERATOR_CODE << ">" << ps->getCodeBySources() << "</synthese:" << StopPointTableSync::COL_OPERATOR_CODE << ">" <<
 					"<synthese:CITY_NAME>" << ps->getConnectionPlace()->getCity()->getName() << "</synthese:CITY_NAME>" <<
 					"<synthese:STOP_AREA_NAME>" << ps->getConnectionPlace()->getName() << "</synthese:STOP_AREA_NAME>" <<
 					"<synthese:" << StopPointTableSync::COL_NAME << ">" << ps->getName() << "</synthese:" << StopPointTableSync::COL_NAME << ">" <<

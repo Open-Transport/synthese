@@ -100,7 +100,7 @@ namespace synthese
 
 				stream << "<stop id=\""   << stopPoint->getKey() <<
 					"\" name=\""          << stopPoint->getName() <<
-					"\" operatorCode=\""  << stopPoint->getCodeBySource() <<
+					"\" operatorCode=\""  << stopPoint->getCodeBySources() <<
 					"\" cityId=\""        << connPlace->getCity()->getKey() <<
 					"\" cityName=\""      << connPlace->getCity()->getName() <<
 					"\" directionAlias=\""<< connPlace->getName26() <<

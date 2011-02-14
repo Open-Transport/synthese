@@ -330,7 +330,7 @@ namespace synthese
 				os << "<StopArea>" << "\n";
 
 				os << "<objectId>" << TridentId (peerid, "StopArea", *ps) << "</objectId>" << "\n";
-				os << "<creatorId>" << ps->getCodeBySource() << "</creatorId>" << "\n";
+				os << "<creatorId>" << ps->getCodeBySources() << "</creatorId>" << "\n";
 
 				os << "<name>" << ps->getConnectionPlace ()->getName ();
 				if (!ps->getName().empty()) os << " (" + ps->getName () + ")";
@@ -353,7 +353,7 @@ namespace synthese
 				os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", *ps) << "</centroidOfArea>" << "\n";
 				os << "<StopAreaExtension>" << "\n";
 				os << "<areaType>" << "Quay" << "</areaType>" << "\n";
-				string rn = ps->getCodeBySource();
+				string rn = ps->getCodeBySources();
 				if (rn.empty ()) rn = "0";
 				os << "<registration><registrationNumber>" << rn << "</registrationNumber></registration>" << "\n";
 				os << "</StopAreaExtension>" << "\n";
@@ -612,7 +612,7 @@ namespace synthese
 				os << fixed;
 				os << "<StopPoint" << (_withTisseoExtension ? " xsi:type=\"TisseoStopPointType\"" : "") << ">" << "\n";
 				os << "<objectId>" << TridentId (peerid, "StopPoint", *ls) << "</objectId>" << "\n";
-				os << "<creatorId>" << ps->getCodeBySource() << "</creatorId>" << "\n";
+				os << "<creatorId>" << ps->getCodeBySources() << "</creatorId>" << "\n";
 				os << "<longitude>" << (ps->hasGeometry() ? 0 : wgs84ps->getX()) << "</longitude>" << "\n";
 				os << "<latitude>" << (ps->hasGeometry() ? 0 : wgs84ps->getY()) << "</latitude>" << "\n";
 				os << "<longLatType>" << _getTridentFromSRID(wgs84ps->getSRID()) << "</longLatType>" << "\n";

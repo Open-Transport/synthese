@@ -40,7 +40,6 @@
 #include "JunctionTableSync.hpp"
 #include "StopAreaUpdateAction.h"
 #include "AdminActionFunctionRequest.hpp"
-#include "StopAreaNameUpdateAction.hpp"
 #include "StopPointAdmin.hpp"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
@@ -51,6 +50,7 @@
 #include "StaticActionRequest.h"
 #include "DBModule.h"
 #include "StopAreaTransferAddAction.h"
+#include "ImportableAdmin.hpp"
 
 using namespace std;
 using namespace boost;
@@ -68,6 +68,7 @@ namespace synthese
 	using namespace road;
 	using namespace html;
 	using namespace db;
+	using namespace impex;
 
 	namespace util
 	{
@@ -206,7 +207,7 @@ namespace synthese
 					stream << map.getAddPointLink(stopPointAddRequest.getURL(), "Ajouter arrêt");
 
 
-					AdminActionFunctionRequest<StopAreaNameUpdateAction,PTPlaceAdmin> updateRequest(request);
+					AdminActionFunctionRequest<StopAreaUpdateAction,PTPlaceAdmin> updateRequest(request);
 					updateRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
 
 					stream << "<h1>Propriétés</h1>";
@@ -216,15 +217,20 @@ namespace synthese
 					stream << t.cell("ID", lexical_cast<string>(_connectionPlace->getKey()));
 					stream << t.title("Localisation");
 					stream << t.cell("Localité", _connectionPlace->getCity()->getName());
-					stream << t.cell("Localité", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_CITY_ID, lexical_cast<string>(_connectionPlace->getCity()->getKey())));
-					stream << t.cell("Arrêt principal", t.getForm().getOuiNonRadioInput(StopAreaNameUpdateAction::PARAMETER_IS_MAIN, _connectionPlace->getCity()->includes(_connectionPlace.get())));
-					stream << t.cell("Nom", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_NAME, _connectionPlace->getName()));
+					stream << t.cell("Localité", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_CITY_ID, lexical_cast<string>(_connectionPlace->getCity()->getKey())));
+					stream << t.cell("Arrêt principal", t.getForm().getOuiNonRadioInput(StopAreaUpdateAction::PARAMETER_IS_MAIN, _connectionPlace->getCity()->includes(_connectionPlace.get())));
+					stream << t.cell("Nom", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_NAME, _connectionPlace->getName()));
 					stream << t.title("Destination sur afficheur");
-					stream << t.cell("Nom court", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_SHORT_NAME, _connectionPlace->getName13()));
-					stream << t.cell("Nom moyen", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_LONG_NAME, _connectionPlace->getName26()));
-					stream << t.cell("Nom pour fiche horaire", t.getForm().getTextInput(StopAreaNameUpdateAction::PARAMETER_TIMETABLE_NAME, _connectionPlace->getTimetableName()));
+					stream << t.cell("Nom court", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_SHORT_NAME, _connectionPlace->getName13()));
+					stream << t.cell("Nom moyen", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_LONG_NAME, _connectionPlace->getName26()));
+					stream << t.cell("Nom pour fiche horaire", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_TIMETABLE_NAME, _connectionPlace->getTimetableName()));
 					stream << t.close();
 				}
+
+
+				StaticActionRequest<StopAreaUpdateAction> updateOnlyRequest(request);
+				updateOnlyRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
+				ImportableAdmin::DisplayDataSourcesTab(stream, *_connectionPlace, updateOnlyRequest);
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -258,7 +264,7 @@ namespace synthese
 					stream << fixed;
 					stream << t.row();
 					stream << t.col() << stop->getName();
-					stream << t.col() << stop->getCodeBySource();
+					stream << t.col() << stop->getCodeBySources();
 
 					if(stop->getGeometry().get())
 					{
