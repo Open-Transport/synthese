@@ -25,6 +25,7 @@
 
 #include "Importable.h"
 #include "DataSource.h"
+#include "Env.h"
 
 #include <string>
 #include <map>
@@ -33,11 +34,6 @@
 
 namespace synthese
 {
-	namespace util
-	{
-		class Env;
-	}
-
 	namespace impex
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -125,9 +121,10 @@ namespace synthese
 		):	_source(source)
 		{
 			_map.clear();
-			boost::shared_ptr<const DataSource> psource(Env::GetOfficialEnv().get<DataSource>(source.getKey()));
-			const Registry<typename T::ObjectType>& registry(Env::GetOfficialEnv().getRegistry<typename T::ObjectType>());
-			BOOST_FOREACH(const Registry<typename T::ObjectType>::value_type& v, registry)
+			boost::shared_ptr<const DataSource> psource(util::Env::GetOfficialEnv().get<DataSource>(source.getKey()));
+			const util::Registry<typename T::ObjectType>& registry(util::Env::GetOfficialEnv().getRegistry<typename T::ObjectType>());
+			typedef typename util::Registry<typename T::ObjectType>::value_type RegistryPair;
+			BOOST_FOREACH(const RegistryPair& v, registry)
 			{
 				if(!v.second->hasLinkWithSource(*psource))
 				{
