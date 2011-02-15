@@ -111,14 +111,14 @@ namespace synthese
 			inFile.close();
 
 			PTFileFormat::DisplayStopPointImportScreen(
-				linkedStopPoints,
+				nonLinkedStopPoints,
 				*request,
 				_env,
 				_dataSource,
 				stream
 			);
 			PTFileFormat::DisplayStopPointImportScreen(
-				nonLinkedStopPoints,
+				linkedStopPoints,
 				*request,
 				_env,
 				_dataSource,
