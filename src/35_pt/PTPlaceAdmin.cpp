@@ -165,6 +165,10 @@ namespace synthese
 							}
 						}
 					}
+					if(!mapCenter.get() || mapCenter->isEmpty())
+					{
+						mapCenter = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(0,0);
+					}
 					HTMLMap map(*mapCenter, 18, true, true);
 					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 					{

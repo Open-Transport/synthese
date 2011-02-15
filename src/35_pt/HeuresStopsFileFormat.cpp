@@ -91,7 +91,7 @@ namespace synthese
 					line = ImpExModule::ConvertChar(line, _dataSource.getCharset(), "UTF-8");
 				}
 
-				string id(line.substr(0, 4));
+				string id(boost::algorithm::trim_copy(line.substr(0, 4)));
 				string name(boost::algorithm::trim_copy(line.substr(5, 50)));
 
 				PTFileFormat::ImportableStopPoint isp;

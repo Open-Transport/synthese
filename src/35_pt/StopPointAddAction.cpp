@@ -105,6 +105,8 @@ namespace synthese
 		
 		void StopPointAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			_name = map.getDefault<string>(PARAMETER_NAME);
+
 			if(map.getDefault<RegistryKeyType>(PARAMETER_PLACE_ID, 0)) try
 			{
 				_place = StopAreaTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
@@ -147,9 +149,16 @@ namespace synthese
 						_city = cities.front().value;
 					}
 				}
+				if(_city.get())
+				{
+					vector<shared_ptr<StopArea> > places(_city->search<StopArea>(_name, 1));
+					if(!places.empty() && (*places.begin())->getName() == _name)
+					{
+						_place = *places.begin();
+					}
+				}
 			}
 
-			_name = map.getDefault<string>(PARAMETER_NAME);
 			_operatorCode = ImportableTableSync::GetDataSourceLinksFromSerializedString(
 				map.getDefault<string>(PARAMETER_OPERATOR_CODE),
 				*_env
@@ -182,7 +191,7 @@ namespace synthese
 			if(!_place.get())
 			{
 				// City creation
-				if(_city.get())
+				if(!_city.get())
 				{
 					_city.reset(new City);
 					_city->setName(*_cityName);
@@ -193,6 +202,15 @@ namespace synthese
 				_place->setAllowedConnection(true);
 				_place->setCity(_city.get());
 				_place->setDefaultTransferDelay(minutes(2));
+				Importable::DataSourceLinks links;
+				BOOST_FOREACH(impex::Importable::DataSourceLinks::value_type& link, _operatorCode)
+				{
+					if(link.first)
+					{
+						links.insert(make_pair(link.first, string()));
+					}
+				}
+				_place->setDataSourceLinks(links);
 				_place->setName(_name);
 				StopAreaTableSync::Save(_place.get(), transaction);
 			}
@@ -203,10 +221,16 @@ namespace synthese
 			object.setDataSourceLinks(_operatorCode);
 			object.setGeometry(_point);
 
-			StopPointTableSync::Save(&object);
+			StopPointTableSync::Save(&object, transaction);
+
+			transaction.run();
 
 //			::AddCreationEntry(object, request.getUser().get());
-			request.setActionCreatedId(object.getKey());
+
+			if(request.getActionWillCreateObject())
+			{
+				request.setActionCreatedId(object.getKey());
+			}
 		}
 		
 		
