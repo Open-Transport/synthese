@@ -283,7 +283,7 @@ namespace synthese
 				{
 					stopPoint->setHub(stopArea);
 
-					os << "LOAD : Link with existing commercial stop " << stopArea->getFullName() << " for stop " << id << " (" << name <<  ")<br />";
+					logStream << "LOAD : Link with existing commercial stop " << stopArea->getFullName() << " for stop " << id << " (" << name <<  ")<br />";
 				}
 				else
 				{
@@ -302,7 +302,7 @@ namespace synthese
 					env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(curStop));
 					stopPoint->setHub(curStop);
 
-					os << "CREA : Auto generation of the commercial stop for stop " << id << " (" << name <<  ")<br />";
+					logStream << "CREA : Auto generation of the commercial stop for stop " << id << " (" << name <<  ")<br />";
 				}
 
 				Importable::DataSourceLinks links;
@@ -316,7 +316,7 @@ namespace synthese
 			}
 			else
 			{
-				os << "LOAD : Link with existing stop " << result.front()->getFullName() << " for stop " << id << " (" << name <<  ")<br />";
+				logStream << "LOAD : Link with existing stop " << (*result.begin())->getName() << " for stop " << id << " (" << name <<  ")<br />";
 			}
 
 			// Update
