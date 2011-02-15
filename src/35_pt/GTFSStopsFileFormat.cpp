@@ -287,8 +287,10 @@ namespace synthese
 							_stopPoints,
 							id,
 							name,
-							*stopArea,
+							stopArea,
 							point.get(),
+							NULL,
+							optional<time_duration>(),
 							_dataSource,
 							_env,
 							stream

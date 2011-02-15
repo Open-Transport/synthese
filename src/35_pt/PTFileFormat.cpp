@@ -259,8 +259,10 @@ namespace synthese
 			impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stopPoints,
 			const std::string& id,
 			const std::string& name,
-			const StopArea& stopArea,
+			const StopArea* stopArea,
 			const StopPoint::Geometry* geometry,
+			const geography::City* cityForStopAreaAutoGeneration,
+			boost::optional<boost::posix_time::time_duration> defaultTransferDuration,
 			const impex::DataSource& source,
 			util::Env& env,
 			std::ostream& logStream
@@ -271,8 +273,38 @@ namespace synthese
 			// Creation if necessary
 			if(result.empty())
 			{
+				if(!stopArea && !cityForStopAreaAutoGeneration)
+				{
+					return result;
+				}
+
 				StopPoint* stopPoint(new StopPoint(StopPointTableSync::getId()));
-				stopPoint->setHub(&stopArea);
+				if(stopArea)
+				{
+					stopPoint->setHub(stopArea);
+
+					os << "LOAD : Link with existing commercial stop " << stopArea->getFullName() << " for stop " << id << " (" << name <<  ")<br />";
+				}
+				else
+				{
+					StopArea* curStop(new StopArea);
+					Importable::DataSourceLinks links;
+					links.insert(make_pair(&source, string()));
+					curStop->setDataSourceLinks(links);
+					curStop->setAllowedConnection(true);
+					if(defaultTransferDuration)
+					{
+						curStop->setDefaultTransferDelay(*defaultTransferDuration);
+					}
+					curStop->setKey(StopAreaTableSync::getId());
+					curStop->setName(name);
+					curStop->setCity(cityForStopAreaAutoGeneration);
+					env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(curStop));
+					stopPoint->setHub(curStop);
+
+					os << "CREA : Auto generation of the commercial stop for stop " << id << " (" << name <<  ")<br />";
+				}
+
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
 				stopPoint->setDataSourceLinks(links);
@@ -281,6 +313,10 @@ namespace synthese
 				result.insert(stopPoint);
 
 				logStream << "CREA : Creation of the physical stop with key " << id << " (" << name <<  ")<br />";
+			}
+			else
+			{
+				os << "LOAD : Link with existing stop " << result.front()->getFullName() << " for stop " << id << " (" << name <<  ")<br />";
 			}
 
 			// Update

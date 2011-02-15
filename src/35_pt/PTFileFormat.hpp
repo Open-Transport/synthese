@@ -179,12 +179,15 @@ namespace synthese
 			///	Gets a stop point.
 			///		- search stop points with link to the datasource whit the correct id
 			///		- if not found and if stop area is specified creates a new stop point in the stop area
+			/// @param cityForStopAreaAutoGeneration if NULL no stop area is generated if stopArea is null
 			static std::set<StopPoint*> CreateOrUpdateStopPoints(
 				impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stopPoints,
 				const std::string& id,
 				const std::string& name,
-				const StopArea& stopArea,
+				const StopArea* stopArea,
 				const StopPoint::Geometry* geometry,
+				const geography::City* cityForStopAreaAutoGeneration,
+				boost::optional<boost::posix_time::time_duration> defaultTransferDuration,
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream
