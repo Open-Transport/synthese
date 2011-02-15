@@ -1337,22 +1337,7 @@ namespace synthese
 					}
 					else
 					{
-						if(_autoGenerateStopAreas && city.get())
-						{
-							curStop = new StopArea;
-							Importable::DataSourceLinks links;
-							links.insert(make_pair(&_dataSource, string()));
-							curStop->setDataSourceLinks(links);
-							curStop->setAllowedConnection(true);
-							curStop->setDefaultTransferDelay(_defaultTransferDuration);
-							curStop->setKey(StopAreaTableSync::getId());
-							curStop->setName(name);
-							curStop->setCity(city.get());
-							_env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(curStop));
-
-							os << "CREA : Auto generation of the commercial stop for stop " << stopKey << " (" << name <<  ")<br />";
-						}
-						else
+						if(!_autoGenerateStopAreas || !city.get())
 						{
 							os << "ERR  : stop " << stopKey << " not found in any commercial stop (" << name << ")<br />";
 							failure = true;
@@ -1364,8 +1349,10 @@ namespace synthese
 						stops,
 						stopKey,
 						name,
-						*curStop,
+						curStop,
 						geometry.get(),
+						_autoGenerateStopAreas ? city.get() : NULL,
+						_defaultTransferDuration,
 						_dataSource,
 						_env,
 						os
