@@ -69,7 +69,7 @@ namespace synthese
 				<< "for(var i=0; i<elems.length; ++i){"
 				<< "if(elems[i].name.length == 0) continue;"
 				<< "if(content.length > 0) content+= '&';"
-				<< "content += elems[i].name +'='+ escape(elems[i].value);"
+				<< "content += elems[i].name +'='+ encodeURIComponent(elems[i].value);"
 				<< "}"
 				<< "if(window.XMLHttpRequest) xajax = new XMLHttpRequest();"
 				<< "else if(window.ActiveXObject) xajax = new ActiveXObject('Microsoft.XMLHTTP');" 
