@@ -120,7 +120,7 @@ namespace synthese
 				if(dateStr.size() == 10)
 				{
 					_date = ptime(
-						date_from_iso_string(dateStr)
+						from_string(dateStr)
 					);
 				}
 				else

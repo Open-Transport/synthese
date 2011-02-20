@@ -177,7 +177,7 @@ namespace synthese
 
 				if(!_stop->getGeometry().get())
 				{
-					stream << map.getAddPointLink(moveAction.getURL(), "Ajouter arrêt");
+					stream << map.getAddPointLink(moveAction.getURL(), "Placer l'arrêt");
 				}
 
 				stream << "<h1>Propriétés</h1>";
