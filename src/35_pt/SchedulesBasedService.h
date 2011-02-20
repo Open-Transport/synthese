@@ -95,6 +95,8 @@ namespace synthese
 
 				const boost::posix_time::time_duration& getLastDepartureSchedule(bool RTData) const;
 
+				virtual boost::posix_time::time_duration getArrivalSchedule (bool RTData, std::size_t rank) const;
+
 				virtual const boost::posix_time::time_duration& getLastArrivalSchedule(bool RTData) const;
 
 			//! @name Update methods

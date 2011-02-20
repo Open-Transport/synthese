@@ -28,8 +28,6 @@
 #include "Webpage.h"
 #include "CommercialLine.h"
 #include "Vehicle.hpp"
-#include "WebPageDisplayFunction.h"
-#include "StaticFunctionRequest.h"
 
 using namespace std;
 
@@ -140,7 +138,7 @@ namespace synthese
 
 		std::string GetVehiclesService::getOutputMimeType() const
 		{
-			return "text/html";
+			return _vehiclePage.get() ? _vehiclePage->getMimeType() : "text/html";
 		}
 
 
@@ -152,7 +150,7 @@ namespace synthese
 			std::size_t rank
 		) const {
 
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_NAME, vehicle.getName());
 			pm.insert(DATA_NUMBER, vehicle.getNumber());
@@ -161,11 +159,6 @@ namespace synthese
 			pm.insert(Request::PARAMETER_OBJECT_ID, vehicle.getKey());
 
 			// Launch of the display
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_vehiclePage);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_vehiclePage->display(stream, request, pm);
 		}
-	}
-}
+}	}

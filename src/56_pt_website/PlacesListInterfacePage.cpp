@@ -22,8 +22,9 @@
 
 #include "PlacesListInterfacePage.h"
 #include "City.h"
-#include "StaticFunctionRequest.h"
-#include "WebPageDisplayFunction.h"
+#include "Request.h"
+#include "Function.h"
+#include "Webpage.h"
 
 using namespace std;
 using namespace boost;
@@ -57,10 +58,7 @@ namespace synthese
 			bool isForOrigin,
 			const geography::City* city
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(PARAMETER_IS_CITY_LIST, false);
 			pm.insert(PARAMETER_IS_FOR_ORIGIN, isForOrigin);
@@ -89,8 +87,7 @@ namespace synthese
 				pm.insert(DATA_CONTENT, content.str());
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -103,10 +100,7 @@ namespace synthese
 			const PlacesList& results,
 			bool isForOrigin
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(PARAMETER_IS_CITY_LIST, true);
 			pm.insert(PARAMETER_IS_FOR_ORIGIN, isForOrigin);
@@ -130,8 +124,7 @@ namespace synthese
 				pm.insert(DATA_CONTENT, content.str());
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -144,17 +137,12 @@ namespace synthese
 			const std::string& name,
 			util::RegistryKeyType id
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_RANK, n);
 			pm.insert(DATA_NAME, name);
 			pm.insert(Request::PARAMETER_OBJECT_ID, id);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
-	}
-}
+}	}

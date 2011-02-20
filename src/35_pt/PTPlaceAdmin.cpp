@@ -206,7 +206,7 @@ namespace synthese
 					/// @todo Station entrances
 					map.draw(stream);
 
-					AdminActionFunctionRequest<StopPointAddAction,PTPlaceAdmin> stopPointAddRequest(request);
+					StaticActionRequest<StopPointAddAction> stopPointAddRequest(request);
 					stopPointAddRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
 					stream << map.getAddPointLink(stopPointAddRequest.getURL(), "Ajouter arrêt");
 

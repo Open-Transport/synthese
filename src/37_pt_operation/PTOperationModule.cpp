@@ -52,7 +52,7 @@ namespace synthese
 
 	namespace server
 	{
-		template<> const string ModuleClassTemplate<PTOperationModule>::NAME("pt_operation");
+		template<> const string ModuleClassTemplate<PTOperationModule>::NAME("Exploitation transport public");
 
 		template<> void ModuleClassTemplate<PTOperationModule>::PreInit()
 		{

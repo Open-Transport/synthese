@@ -24,8 +24,8 @@
 
 #include "CalendarDateInterfacePage.hpp"
 #include "Webpage.h"
-#include "StaticFunctionRequest.h"
-#include "WebPageDisplayFunction.h"
+#include "Request.h"
+#include "Function.h"
 
 using namespace std;
 using namespace boost;
@@ -53,23 +53,14 @@ namespace synthese
 			boost::gregorian::date value,
 			bool isActive
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_DAY, value.day());
 			pm.insert(DATA_MONTH, value.month());
 			pm.insert(DATA_YEAR, value.year());
 			pm.insert(DATA_WEEK_DAY, value.day_of_week());
 			pm.insert(DATA_IS_ACTIVE, isActive);
-		
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+
+			page->display(stream, request, pm);
 		}
-	}
-}
+}	}

@@ -29,7 +29,6 @@
 #include "TransportWebsite.h"
 #include "RoutePlannerFunction.h"
 #include "CMSModule.hpp"
-#include "WebPageDisplayFunction.h"
 #include "Webpage.h"
 #include "DateTimeInterfacePage.h"
 
@@ -104,11 +103,7 @@ namespace synthese
 			const Request& request
 		) const {
 
-			ParametersMap requestParametersMap(
-				dynamic_pointer_cast<const WebPageDisplayFunction>(request.getFunction()) ?
-				dynamic_pointer_cast<const WebPageDisplayFunction>(request.getFunction())->getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap requestParametersMap(request.getFunction()->getSavedParameters());
 
 			shared_ptr<const TransportWebsite> site(
 				dynamic_pointer_cast<const TransportWebsite, const Website>(
@@ -202,8 +197,6 @@ namespace synthese
 					"\" value=\"" << (_value.empty() ? requestParametersMap.getDefault<string>(inputName) : _value) << "\" id=\"" << _field << "_txt\" " << _html << " />"
 				;
 			}
-
-
 		}
 		
 		
@@ -220,5 +213,4 @@ namespace synthese
 		{
 			return "text/html";
 		}
-	}
-}
+}	}

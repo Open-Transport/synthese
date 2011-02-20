@@ -24,8 +24,9 @@
 
 #include "PTNetworkListItemInterfacePage.hpp"
 #include "TransportNetwork.h"
-#include "StaticFunctionRequest.h"
-#include "WebPageDisplayFunction.h"
+#include "Request.h"
+#include "Function.h"
+#include "Webpage.h"
 
 using namespace std;
 using namespace boost;
@@ -33,7 +34,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace util;
-	using namespace pt;
 	using namespace cms;
 	using namespace server;
 
@@ -51,18 +51,13 @@ namespace synthese
 			const pt::TransportNetwork& object,
 			std::size_t rank
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 		
 			pm.insert(Request::PARAMETER_OBJECT_ID, object.getKey());
 			pm.insert(DATA_NAME, object.getName()); //1
 			pm.insert(DATA_RANK, rank);
 			pm.insert(DATA_RANK_IS_ODD, rank % 2); //3
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
-	}
-}
+}	}

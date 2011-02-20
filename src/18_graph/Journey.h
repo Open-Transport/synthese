@@ -71,6 +71,14 @@ namespace synthese
 
 
 			//////////////////////////////////////////////////////////////////////////
+			/// Journey constructor from a service pointer.
+			Journey(
+				const ServicePointer& servicePointer
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
 			/// Builds a journey by adding a service use to an existing journey.
 			/// @param journey the journey to fill
 			/// @param serviceUse the leg to add to the journey

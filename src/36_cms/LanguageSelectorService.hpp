@@ -1,9 +1,9 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
-/// WebPageDisplayFunction class header.
-///	@file WebPageDisplayFunction.h
-///	@author Hugues
-///	@date 2010
+/// LanguageSelectorService class header.
+///	@file LanguageSelectorService.hpp
+///	@author RCSobility
+///	@date 2011
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
 ///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -22,110 +22,84 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_WebPageDisplayFunction_H__
-#define SYNTHESE_WebPageDisplayFunction_H__
+#ifndef SYNTHESE_LanguageSelectorService_H__
+#define SYNTHESE_LanguageSelectorService_H__
 
 #include "FactorableTemplate.h"
-#include "FunctionWithSite.h"
+#include "Function.h"
 
 namespace synthese
 {
+	class Language;
+
 	namespace cms
 	{
-		class Webpage;
-
 		//////////////////////////////////////////////////////////////////////////
-		/// 36.15 Function : display of a web page.
-		///	@author Hugues Romain
-		///	@date 2010
-		///	@ingroup m56Functions refFunctions
+		///	36.15 Function : LanguageSelectorService.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/Language_selector
 		//////////////////////////////////////////////////////////////////////////
-		///
-		/// <h3>Access by page id</h3>
-		///
-		/// Parameters :
-		///	<ul>
-		///		<li><b>fonction=page</b></li>
-		///		<li><b>p</b> : id of the page to display</li>
-		///		<li><b>use_template<b> : <u>1</u>|0 : 1=use the template to display the page, 0=display only the page content</li>
-		///		<li>all other parameters are available in the page (accessed by
-		///			the @ function (GetValueFunction)). </li>
-		///	</ul>
-		///
-		/// Other parameters can be added by using the aditionnalParameters attribute too.
-		///
-		/// <h3>Access by smart URL</h3>
-		/// Parameters :
-		///	<ul>
-		///		<li><b>fonction=page</b></li>
-		///		<li><b>si</b> : site id</i>
-		///		<li><b>smart_url</b> : smart URL of the page to display</i>
-		///		<li><b>use_template<b> : <u>1</u>|0 : 1=use the template to display the page, 0=display only the page content</li>
-		///		<li>all other parameters are available in the page (accessed by
-		///			the @ function (GetValueFunction)). </li>
-		///	</ul>
-		class WebPageDisplayFunction:
-			public util::FactorableTemplate<FunctionWithSite<false>, WebPageDisplayFunction>
+		///	@ingroup m36Functions refFunctions
+		///	@author RCSobility
+		///	@date 2011
+		/// @since 3.2.1
+		class LanguageSelectorService:
+			public util::FactorableTemplate<server::Function,LanguageSelectorService>
 		{
 		public:
-			static const std::string PARAMETER_PAGE_ID;	
-			static const std::string PARAMETER_USE_TEMPLATE;
-			static const std::string PARAMETER_SMART_URL;
-			
+			static const std::string PARAMETER_LANGUAGE;
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_VALUE;
+
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const Webpage>	_page;
-				bool					_useTemplate;
-				std::string _smartURL;
+				const Language* _language;
+				const Language* _value;
+				std::string _name;
 			//@}
 			
 			
-		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/Language_selector#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
-			/// @author Hugues
-			/// @date 2010
+			/// @author RCSobility
+			/// @date 2011
+			/// @since 3.2.1
 			server::ParametersMap _getParametersMap() const;
 			
 			
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/Language_selector#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
-			/// @author Hugues
-			/// @date 2010
+			/// @author RCSobility
+			/// @date 2011
+			/// @since 3.2.1
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
 			
 			
-			WebPageDisplayFunction();
+		public:
+			LanguageSelectorService();
 
 			//! @name Setters
 			//@{
-				void setPage(boost::shared_ptr<const Webpage> value) { _page = value; }
-				void setUseTemplate(bool value){ _useTemplate = value; }
+			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
 			//@}
 
-			//! @name Getters
-			//@{
-				boost::shared_ptr<const Webpage> getPage() const { return _page; }
-				bool getUseTemplate() const { return _useTemplate; }
-				const std::string& getSmartURL() const { return _smartURL; }
-			//@}
-
-
-			void addParameters(const server::ParametersMap& value);
 
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of the content generated by the function.
 			/// @param stream Stream to display the content on.
 			/// @param request the current request
-			/// @author Hugues
-			/// @date 2010
+			/// @author RCSobility
+			/// @date 2011
 			virtual void run(std::ostream& stream, const server::Request& request) const;
 			
 			
@@ -134,8 +108,8 @@ namespace synthese
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session
 			/// @return true if the function can be run
-			/// @author Hugues
-			/// @date 2010
+			/// @author RCSobility
+			/// @date 2011
 			virtual bool isAuthorized(const server::Session* session) const;
 
 
@@ -143,11 +117,11 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets the Mime type of the content generated by the function.
 			/// @return the Mime type of the content generated by the function
-			/// @author Hugues
-			/// @date 2010
+			/// @author RCSobility
+			/// @date 2011
 			virtual std::string getOutputMimeType() const;
 		};
 	}
 }
 
-#endif // SYNTHESE_WebPageDisplayFunction_H__
+#endif // SYNTHESE_LanguageSelectorService_H__

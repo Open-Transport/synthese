@@ -92,6 +92,19 @@ namespace synthese
 
 
 			//////////////////////////////////////////////////////////////////////////
+			/// Constructor.
+			ServicePointer(
+				bool RTData,
+				std::size_t userClassRank,
+				const Service& service,
+				const boost::gregorian::date& date,
+				const Edge& departureEdge,
+				const Edge& arrivalEdge
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
 			/// @pre partially filled pointer must not be completed.
 			ServicePointer(
 				const ServicePointer& partiallyFilledPointer,

@@ -102,8 +102,6 @@ namespace synthese
 				string functionParameters;
 				if (_function_parameters.get())
 					functionParameters = _function_parameters->getValue(parameters, variables, object, request);
-				if (functionParameters.empty() && functionKey == request->getFunction()->getFactoryKey())
-					functionParameters = request->getFunction()->getFixedParametersMap().getURI();
 				
 				stringstream s;
 				s	<<

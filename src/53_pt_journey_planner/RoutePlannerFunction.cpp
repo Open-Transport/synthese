@@ -61,7 +61,6 @@
 #include "StopArea.hpp"
 #include "StaticFunctionRequest.h"
 #include "PTObjectsCMSExporters.hpp"
-#include "WebPageDisplayFunction.h"
 #include "RoutePlannerFunction.h"
 #include "ReservationRuleInterfacePage.h"
 #include "LineMarkerInterfacePage.h"
@@ -1621,10 +1620,7 @@ namespace synthese
 			const pt_website::HourPeriod* period,
 			const graph::AccessParameters& accessParameters
 		) const	{
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			const City* originCity(dynamic_cast<const City*>(originPlace));
 			string originPlaceName;
@@ -2031,8 +2027,7 @@ namespace synthese
 				pm.insert(DATA_MAPS, maps.str());
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_page->display(stream, request, pm);
 		}
 
 
@@ -2046,10 +2041,7 @@ namespace synthese
 			bool isOrigin,
 			bool isDestination
 		) const	{
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_schedulesRowPage);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(Request::PARAMETER_OBJECT_ID, place.getKey());
 			pm.insert(DATA_CELLS, cells);
@@ -2058,8 +2050,7 @@ namespace synthese
 			pm.insert(DATA_IS_ORIGIN_ROW, isOrigin);
 			pm.insert(DATA_PLACE_NAME, place.getFullName());
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_schedulesRowPage->display(stream, request, pm);
 		}
 
 
@@ -2078,10 +2069,7 @@ namespace synthese
 			bool isLastWriting,
 			bool isFirstFoot
 		) const {
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_schedulesCellPage);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_IS_FIRST_ROW, isItFirstRow);
 			pm.insert(DATA_IS_LAST_ROW, isItLastRow);
@@ -2107,8 +2095,7 @@ namespace synthese
 			pm.insert(DATA_IS_LAST_WRITING, isLastWriting);
 			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_schedulesCellPage->display(stream ,request, pm);
 		}
 
 
@@ -2119,10 +2106,7 @@ namespace synthese
 			std::size_t columnNumber,
 			const graph::Journey& journey
 		) const	{
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_linesRowPage);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_COLUMN_NUMBER, columnNumber);
 
@@ -2151,8 +2135,7 @@ namespace synthese
 				pm.insert(DATA_CONTENT, content.str());
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_linesRowPage->display(stream ,request, pm);
 		}
 
 
@@ -2172,10 +2155,7 @@ namespace synthese
 			boost::logic::tribool bikeFilter,
 			bool isTheLast
 		) const	{
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// Rank
 			pm.insert(DATA_RANK, n);
@@ -2454,18 +2434,14 @@ namespace synthese
 				pm.insert(DATA_CONTENT, content.str());
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
 
 		void RoutePlannerFunction::DisplayStopCell( std::ostream& stream, boost::shared_ptr<const cms::Webpage> page, const server::Request& request, bool isItArrival, const messages::SentAlarm* alarm, bool isItTerminus, const pt::StopPoint& physicalStop, bool color, const boost::posix_time::ptime& time, boost::posix_time::time_duration continuousServiceRange, bool isLastLeg )
 		{
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			ptime endRangeTime(time);
 			if (continuousServiceRange.total_seconds() > 0)
@@ -2514,18 +2490,14 @@ namespace synthese
 			
 			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
 
 		void RoutePlannerFunction::DisplayJunctionCell( std::ostream& stream, boost::shared_ptr<const cms::Webpage> page, const server::Request& request, const graph::Vertex& vertex, const messages::SentAlarm* alarm, bool color, const road::Road* road, double distance )
 		{
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// Point
 			if(	vertex.getGeometry().get() &&
@@ -2546,18 +2518,14 @@ namespace synthese
 			}
 			pm.insert(DATA_LENGTH, distance);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
 
 		void RoutePlannerFunction::DisplayServiceCell( std::ostream& stream, boost::shared_ptr<const cms::Webpage> page, const server::Request& request, const graph::ServicePointer& serviceUse, boost::posix_time::time_duration continuousServiceRange, boost::logic::tribool handicappedFilterStatus, boost::logic::tribool bikeFilterStatus, const messages::SentAlarm* alarm, bool color )
 		{
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// Continuous service
 			ptime lastDepartureDateTime(serviceUse.getDepartureDateTime());
@@ -2633,7 +2601,6 @@ namespace synthese
 			}
 			pm.insert(DATA_ODD_ROW, color); // 21
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 }	}

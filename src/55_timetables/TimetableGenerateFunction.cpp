@@ -42,8 +42,6 @@
 #include "StopAreaTableSync.hpp"
 #include "Webpage.h"
 #include "TimetableWarning.h"
-#include "WebPageDisplayFunction.h"
-#include "StaticFunctionRequest.h"
 #include "CalendarDateInterfacePage.hpp"
 #include "TimetableServiceColInterfacePage.hpp"
 #include "TimetableServiceRowInterfacePage.h"
@@ -185,7 +183,7 @@ namespace synthese
 			{
 				shared_ptr<Timetable> timetable(new Timetable);
 
-				if(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_ID))
+				if(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_ID, 0))
 				{
 					try
 					{
@@ -439,15 +437,7 @@ namespace synthese
 			const timetables::TimetableResult& result,
 			size_t rank
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
-
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// Common parameters
 			pm.insert(DATA_GENERATOR_TYPE, GetTimetableTypeCode(object.getContentType()));
@@ -713,8 +703,7 @@ namespace synthese
 				break;
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -744,15 +733,7 @@ namespace synthese
 			const server::Request& request,
 			const TimetableWarning& object
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
-
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 		
 			pm.insert(DATA_NUMBER, object.getNumber());
 			pm.insert(DATA_TEXT, object.getText());
@@ -776,8 +757,6 @@ namespace synthese
 				pm.insert(DATA_LAST_YEAR, lastDate.year());
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
-
 }	}

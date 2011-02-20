@@ -33,10 +33,9 @@
 #include "AdminParametersException.h"
 #include "LoginAdmin.hpp"
 #include "Webpage.h"
-#include "WebPageDisplayFunction.h"
-#include "StaticActionFunctionRequest.h"
 #include "LogoutAction.h"
 #include "ServerModule.h"
+#include "StaticActionFunctionRequest.h"
 
 using namespace std;
 using namespace boost;
@@ -291,14 +290,7 @@ namespace synthese
 		) const {
 			AdminRequest adminRequest(request, true);
 
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_mainTemplate);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// error_message
 			if(errorMessage)
@@ -370,8 +362,7 @@ namespace synthese
 			// version
 			pm.insert(DATA_VERSION, ServerModule::VERSION);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_mainTemplate->display(stream, request, pm);
 		}
 
 
@@ -384,14 +375,7 @@ namespace synthese
 			bool isLast
 		) const {
 
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_positionElementTemplate);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// title, icon, url
 			ExportAdminCompound(pm, request, link);
@@ -402,8 +386,7 @@ namespace synthese
 			// is_last
 			pm.insert(DATA_IS_LAST, isLast);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_positionElementTemplate->display(stream, request, pm);
 		}
 
 
@@ -417,14 +400,7 @@ namespace synthese
 			bool isLast
 		) const {
 
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_treeNodeTemplate);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// icon, title, url
 			ExportAdminCompound(pm, request, tree.page);
@@ -458,8 +434,7 @@ namespace synthese
 			// is_current
 			pm.insert(DATA_IS_CURRENT, *tree.page == *currentCompound);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_treeNodeTemplate->display(stream, request, pm);
 		}
 
 

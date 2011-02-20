@@ -31,7 +31,6 @@
 #include "CommercialLine.h"
 #include "StaticFunctionRequest.h"
 #include "Webpage.h"
-#include "WebPageDisplayFunction.h"
 #include "RollingStock.h"
 #include "JourneyPattern.hpp"
 #include "PTObjectsCMSExporters.hpp"
@@ -93,14 +92,7 @@ namespace synthese
 			const server::Request& request,
 			const TimetableResult::RowLinesVector& lines
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TYPE, TYPE_LINE); //0
 		
@@ -122,8 +114,7 @@ namespace synthese
 				pm.insert(DATA_CELLS_CONTENT, content.str()); //1
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -135,14 +126,7 @@ namespace synthese
 			const pt::CommercialLine& object,
 			std::size_t colRank
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TYPE, TYPE_LINE); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
@@ -150,8 +134,7 @@ namespace synthese
 			pm.insert(Request::PARAMETER_OBJECT_ID, object.getKey()); //3
 			PTObjectsCMSExporters::ExportLine(pm, object);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -162,21 +145,13 @@ namespace synthese
 			const server::Request& request,
 			std::size_t colRank
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TYPE, TYPE_LINE); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
 			pm.insert(DATA_ROW_RANK, 0); //2
 			
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -193,15 +168,7 @@ namespace synthese
 			bool isBeforeTransfer,
 			std::size_t depth
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
-
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TYPE, TYPE_TIME); //0
 			pm.insert(DATA_GLOBAL_RANK, globalRank);
@@ -243,8 +210,7 @@ namespace synthese
 				pm.insert(DATA_STOP_NAME_26, static_cast<const StopArea*>(place.getPlace())->getTimetableName());
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -258,14 +224,7 @@ namespace synthese
 			std::size_t colRank,
 			const pt::SchedulesBasedService* service
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TYPE, TYPE_TIME); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
@@ -281,8 +240,7 @@ namespace synthese
 				pm.insert(DATA_SERVICE_ID, service->getKey());
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -295,14 +253,7 @@ namespace synthese
 			const TimetableResult::RowNotesVector& notes,
 			const TimetableResult::Columns& columns
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TYPE, TYPE_NOTE); //0
 		
@@ -317,8 +268,7 @@ namespace synthese
 				pm.insert(DATA_CELLS_CONTENT, content.str()); //1
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -330,14 +280,7 @@ namespace synthese
 			std::size_t colRank,
 			const TimetableColumn& column
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TYPE, TYPE_NOTE); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
@@ -351,8 +294,7 @@ namespace synthese
 				pm.insert(DATA_TRANSPORT_MODE_ID, column.getLine()->getRollingStock()->getKey());
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -364,14 +306,7 @@ namespace synthese
 			const server::Request& request,
 			const TimetableResult::RowRollingStockVector& rollingStock
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TYPE, TYPE_ROLLING_STOCK); //0
 
@@ -386,9 +321,9 @@ namespace synthese
 				pm.insert(DATA_CELLS_CONTENT, content.str()); //1
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
+
 
 
 		void TimetableServiceColInterfacePage::DisplayRollingStockCell(
@@ -398,14 +333,7 @@ namespace synthese
 			const pt::RollingStock* object,
 			std::size_t colRank
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TYPE, TYPE_ROLLING_STOCK); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
@@ -416,7 +344,6 @@ namespace synthese
 				pm.insert(DATA_ROLLING_STOCK_NAME, object->getName()); //5
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 }	}

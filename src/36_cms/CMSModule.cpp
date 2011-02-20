@@ -100,14 +100,14 @@ namespace synthese
 			const server::Request& request
 		){
 			shared_ptr<const WebPageDisplayFunction> function(
-					dynamic_pointer_cast<const WebPageDisplayFunction>(
+				dynamic_pointer_cast<const WebPageDisplayFunction>(
 					request.getFunction()
 			)	);
 			if(function.get())
 			{
-				if(function->getAditionnalParametersMap().getDefault<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID, 0))
+				if(function->getSavedParameters().getDefault<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID, 0))
 				{
-					return Env::GetOfficialEnv().get<Webpage>(function->getAditionnalParametersMap().get<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID));
+					return Env::GetOfficialEnv().get<Webpage>(function->getSavedParameters().get<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID));
 				}
 				else
 				{

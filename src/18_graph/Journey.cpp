@@ -103,6 +103,17 @@ namespace synthese
 
 
 
+		Journey::Journey(
+			const ServicePointer& servicePointer
+		):	_effectiveDuration(servicePointer.getDuration()),
+			_transportConnectionCount(1),
+			_distance(servicePointer.getDistance())
+		{
+			append(servicePointer);
+		}
+
+
+
 		Journey::~Journey ()
 		{
 		}

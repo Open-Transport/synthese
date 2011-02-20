@@ -58,7 +58,6 @@
 #include "AdminInterfaceElement.h"
 #include "UserTableSync.h"
 #include "Webpage.h"
-#include "WebPageDisplayFunction.h"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -307,7 +306,7 @@ namespace synthese
 			std::size_t rank
 		) const {
 
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_NAME, reservation.getTransaction()->getCustomerName());
 			pm.insert(DATA_DEPARTURE_PLACE_NAME, reservation.getDeparturePlaceName());
@@ -321,11 +320,7 @@ namespace synthese
 			pm.insert(DATA_LANGUAGE, user->getLanguage());
 
 			// Launch of the display
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_reservationPage);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_reservationPage->display(stream, request, pm);
 		}
 	}
 }

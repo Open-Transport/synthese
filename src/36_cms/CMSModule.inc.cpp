@@ -11,6 +11,8 @@
 #include "WebPageMoveAction.hpp"
 
 #include "BitAndFunction.hpp"
+#include "DateService.hpp"
+#include "LanguageSelectorService.hpp"
 #include "WebPageDisplayFunction.h"
 #include "WebPageLastNewsFunction.hpp"
 #include "IfFunction.hpp"

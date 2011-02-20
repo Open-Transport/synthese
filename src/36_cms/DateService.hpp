@@ -1,9 +1,9 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
-/// PTRouteDetailFunction class header.
-///	@file PTRouteDetailFunction.hpp
-///	@author Hugues Romain
-///	@date 2010
+/// DateService class header.
+///	@file DateService.hpp
+///	@author RCSobility
+///	@date 2011
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
 ///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -22,8 +22,8 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_PTRouteDetailFunction_H__
-#define SYNTHESE_PTRouteDetailFunction_H__
+#ifndef SYNTHESE_DateService_H__
+#define SYNTHESE_DateService_H__
 
 #include "FactorableTemplate.h"
 #include "Function.h"
@@ -32,105 +32,56 @@ namespace synthese
 {
 	namespace cms
 	{
-		class Webpage;
-	}
-
-	namespace graph
-	{
-		class Edge;
-	}
-
-	namespace pt
-	{
-		class JourneyPattern;
-		class SchedulesBasedService;
-
 		//////////////////////////////////////////////////////////////////////////
-		///	35.15 Function : PTRouteDetailFunction.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Route_detail
+		///	36.15 Function : DateService.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/Date
 		//////////////////////////////////////////////////////////////////////////
-		///	@ingroup m35Functions refFunctions
-		///	@author Hugues Romain
-		///	@date 2010
-		/// @since 3.1.18
-		class PTRouteDetailFunction:
-			public util::FactorableTemplate<server::Function,PTRouteDetailFunction>
+		///	@ingroup m36Functions refFunctions
+		///	@author RCSobility
+		///	@date 2011
+		/// @since 3.2.1
+		class DateService:
+			public util::FactorableTemplate<server::Function,DateService>
 		{
 		public:
-			static const std::string PARAMETER_MAIN_PAGE_ID;
-			static const std::string PARAMETER_STOP_PAGE_ID;
-			static const std::string PARAMETER_DISPLAY_DEPARTURE_STOPS;
-			static const std::string PARAMETER_DISPLAY_ARRIVAL_STOPS;
-
-		private:
-			static const std::string TAG_ROUTE;
-			static const std::string TAG_STOP;
-			static const std::string DATA_ID;
-			static const std::string DATA_NAME;
-			static const std::string DATA_LINE_ID;
-			static const std::string DATA_LINE_NAME;
-			static const std::string DATA_LINE_SHORT_NAME;
-			static const std::string DATA_LINE_LONG_NAME;
-			static const std::string DATA_LINE_IMAGE;
-			static const std::string DATA_LINE_COLOR;
-			static const std::string DATA_LINE_STYLE;
-			static const std::string DATA_DIRECTION;
-			static const std::string DATA_STOPS;
-			static const std::string DATA_OPERATOR_CODE;
-			static const std::string DATA_RANK;
-			static const std::string DATA_DEPARTURE_IS_ALLOWED;
-			static const std::string DATA_ARRIVAL_IS_ALLOWED;
-			static const std::string DATA_STOP_AREA_ID;
-			static const std::string DATA_STOP_AREA_NAME;
-			static const std::string DATA_CITY_ID;
-			static const std::string DATA_CITY_NAME;
-			static const std::string DATA_DIRECTION_ALIAS;
-			static const std::string DATA_DEPARTURE_TIME;
-			static const std::string DATA_ARRIVAL_TIME;
-
+			static const std::string PARAMETER_DAY;
+			static const std::string PARAMETER_WITH_TIME;
+			
+		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const JourneyPattern> _journeyPattern;
-				boost::shared_ptr<const SchedulesBasedService> _service;
-				bool _displayDepartureStops;
-				bool _displayArrivalStops;
-				boost::shared_ptr<const cms::Webpage> _mainPage;
-				boost::shared_ptr<const cms::Webpage> _stopPage;
+				boost::posix_time::ptime _time;
+				bool _withTime;
 			//@}
 			
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Route_detail
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/Date#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
-			/// @author Hugues Romain
-			/// @date 2010
+			/// @author RCSobility
+			/// @date 2011
+			/// @since 3.2.1
 			server::ParametersMap _getParametersMap() const;
 			
 			
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Route_detail
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/Date#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
-			/// @author Hugues Romain
-			/// @date 2010
+			/// @author RCSobility
+			/// @date 2011
+			/// @since 3.2.1
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-
-
-
-			void _displayStop(
-				std::ostream& stream,
-				const graph::Edge& edge
-			) const;
 			
 			
 		public:
-			PTRouteDetailFunction();
+			DateService();
 
 			//! @name Setters
 			//@{
@@ -141,12 +92,10 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of the content generated by the function.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Route_detail
-			//////////////////////////////////////////////////////////////////////////
 			/// @param stream Stream to display the content on.
 			/// @param request the current request
-			/// @author Hugues Romain
-			/// @date 2010
+			/// @author RCSobility
+			/// @date 2011
 			virtual void run(std::ostream& stream, const server::Request& request) const;
 			
 			
@@ -155,8 +104,8 @@ namespace synthese
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session
 			/// @return true if the function can be run
-			/// @author Hugues Romain
-			/// @date 2010
+			/// @author RCSobility
+			/// @date 2011
 			virtual bool isAuthorized(const server::Session* session) const;
 
 
@@ -164,10 +113,11 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets the Mime type of the content generated by the function.
 			/// @return the Mime type of the content generated by the function
-			/// @author Hugues Romain
-			/// @date 2010
+			/// @author RCSobility
+			/// @date 2011
 			virtual std::string getOutputMimeType() const;
 		};
-}	}
+	}
+}
 
-#endif // SYNTHESE_PTRouteDetailFunction_H__
+#endif // SYNTHESE_DateService_H__

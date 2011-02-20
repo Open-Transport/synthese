@@ -223,7 +223,7 @@ namespace synthese
 			bool _hasForum;
 			bool _ignoreWhiteChars;
 			bool _rawEditor; //!< if false the editor is WYSIWYG editor
-
+			boost::mutex _mutex;
 
 
 			//////////////////////////////////////////////////////////////////////////

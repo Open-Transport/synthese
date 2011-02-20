@@ -33,6 +33,7 @@
 #include "Log.h"
 #include "Factory.h"
 #include "ModuleClass.h"
+#include "Language.hpp"
 #include "DBModule.h"
 
 #include <csignal>
@@ -291,6 +292,7 @@ int main( int argc, char **argv )
 			const boost::filesystem::path& workingDir = boost::filesystem::current_path();
 			Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
 
+			synthese::Language::Populate();
 			ModuleClass::SetDefaultParameters (defaultParams);
 			DBModule::SetDatabasePath (dbpath);
 

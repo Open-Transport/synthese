@@ -29,7 +29,6 @@
 #include "Webpage.h"
 #include "PTOperationModule.hpp"
 #include "Composition.hpp"
-#include "WebPageDisplayFunction.h"
 #include "Vehicle.hpp"
 #include "StopPoint.hpp"
 
@@ -199,7 +198,7 @@ namespace synthese
 			size_t rank
 		) const {
 
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// Rank
 			pm.insert(DATA_RANK, rank);
@@ -248,11 +247,7 @@ namespace synthese
 
 
 			// Launch of the display
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_compositionPage);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_compositionPage->display(stream, request, pm);
 		}
 
 
@@ -265,7 +260,7 @@ namespace synthese
 			size_t rank
 		) const {
 
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// Rank
 			pm.insert(DATA_RANK, rank);
@@ -283,11 +278,7 @@ namespace synthese
 			pm.insert(Request::PARAMETER_OBJECT_ID, vehicle.getKey());
 
 			// Launch of the display
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_compositionPage);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_compositionPage->display(stream, request, pm);
 		}
 
 
@@ -299,7 +290,7 @@ namespace synthese
 			size_t rank
 		) const {
 
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// Rank
 			pm.insert(DATA_RANK, rank);
@@ -311,10 +302,6 @@ namespace synthese
 			pm.insert(Request::PARAMETER_OBJECT_ID, quay.getKey());
 
 			// Launch of the display
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_compositionPage);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_compositionPage->display(stream, request, pm);
 		}
 }	}

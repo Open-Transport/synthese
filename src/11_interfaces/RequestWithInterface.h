@@ -55,8 +55,6 @@ namespace synthese
 
 			virtual void _copy(const Function& function);
 
-			virtual server::ParametersMap getFixedParametersMap() const;
-
 			/** Interface getter.
 				@return Requested interface (can be NULL)
 				@author Hugues Romain

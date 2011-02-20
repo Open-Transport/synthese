@@ -105,7 +105,7 @@ namespace synthese
 			{	// Classic URL
 				StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
 				openRequest.getFunction()->setPage(_target);
-				openRequest.getFunction()->setAditionnalParametersMap(_otherParameters);
+				openRequest.getFunction()->addParameters(_otherParameters);
 				if(!_target->getRoot()->getClientURL().empty())
 				{
 					openRequest.setClientURL(_target->getRoot()->getClientURL());

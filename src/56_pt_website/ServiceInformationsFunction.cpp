@@ -31,7 +31,6 @@
 #include "StopPoint.hpp"
 #include "Webpage.h"
 #include "AccessParameters.h"
-#include "WebPageDisplayFunction.h"
 
 using namespace std;
 using namespace boost;
@@ -176,11 +175,7 @@ namespace synthese
 			const graph::ServicePointer& ptr,
 			const Request& request
 		) const	{
-	
-			WebPageDisplayFunction displayRequest;
-			displayRequest.setPage(_stopPage);
-			displayRequest.setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			const Edge& edge(departureTime ? *ptr.getDepartureEdge() : *ptr.getArrivalEdge());
 			const ptime& time(departureTime ? ptr.getDepartureDateTime() : ptr.getArrivalDateTime());
@@ -195,9 +190,7 @@ namespace synthese
 
 			pm.insert(PAGE_PARAMETER_TIME, time);
 
-
-			displayRequest.setAditionnalParametersMap(pm);
-			displayRequest.run(stream, request);
+			_stopPage->display(stream, request, pm);
 		}
 
 
@@ -206,5 +199,4 @@ namespace synthese
 		{
 			/// @todo to be implemented
 		}
-	}
-}
+}	}

@@ -90,11 +90,6 @@ namespace synthese
 			return _interface;
 		}
 
-		synthese::server::ParametersMap RequestWithInterface::getFixedParametersMap() const
-		{
-			return _getParametersMap();
-		}
-
 
 
 		void RequestWithInterface::setInterface( boost::shared_ptr<const Interface> value )

@@ -157,6 +157,13 @@ namespace synthese
 
 
 
+		boost::posix_time::time_duration SchedulesBasedService::getArrivalSchedule( bool RTData, std::size_t rank ) const
+		{
+			return getArrivalSchedules(RTData).at(rank);
+		}
+
+
+
 		const boost::posix_time::time_duration& SchedulesBasedService::getLastArrivalSchedule( bool RTData ) const
 		{
 			Schedules::const_iterator it(getArrivalSchedules(RTData).end() - 1);
@@ -374,5 +381,4 @@ namespace synthese
 			_arrivalSchedules = arrivalSchedules;
 			clearRTData();
 		}
-	}
-}
+}	}

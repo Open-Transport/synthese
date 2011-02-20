@@ -27,9 +27,7 @@
 #include "MessagesRight.h"
 #include "ScenariosListFunction.hpp"
 #include "ScenarioFolderTableSync.h"
-#include "StaticFunctionRequest.h"
 #include "Webpage.h"
-#include "WebPageDisplayFunction.h"
 #include "ScenarioFolder.h"
 #include "SentScenarioInheritedTableSync.h"
 #include "ScenarioTemplateInheritedTableSync.h"
@@ -183,14 +181,7 @@ namespace synthese
 			const SentScenario& scenario
 		) const	{
 
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_cmsTemplate);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// roid
 			pm.insert(Request::PARAMETER_OBJECT_ID, scenario.getKey());
@@ -210,8 +201,7 @@ namespace synthese
 				pm.insert(DATA_END_DATE, scenario.getPeriodEnd());
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_cmsTemplate->display(stream, request, pm);
 		}
 
 
@@ -222,14 +212,7 @@ namespace synthese
 			const ScenarioTemplate& scenario
 		) const	{
 
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_cmsTemplate);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// roid
 			pm.insert(Request::PARAMETER_OBJECT_ID, scenario.getKey());
@@ -243,7 +226,6 @@ namespace synthese
 				pm.insert(DATA_FOLDER_ID, scenario.getFolder()->getKey());
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_cmsTemplate->display(stream, request, pm);
 		}
 }	}

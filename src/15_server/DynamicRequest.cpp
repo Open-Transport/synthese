@@ -70,6 +70,9 @@ namespace synthese
 			// Function parameters
 			if(_function.get())
 			{
+				_function->setSavedParameters(_parametersMap);
+				_function->removeSavedParameter(Request::PARAMETER_SERVICE);
+				_function->removeSavedParameter(Request::PARAMETER_FUNCTION);
 				_function->_setFromParametersMap(_parametersMap);
 			}
 		}
