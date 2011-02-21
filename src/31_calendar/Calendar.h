@@ -29,6 +29,7 @@
 #include <bitset>
 #include <map>
 #include <vector>
+#include <boost/optional/optional.hpp>
 
 namespace synthese
 {
