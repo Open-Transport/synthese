@@ -39,6 +39,7 @@
 #include "LineStopTableSync.h"
 #include "JourneyPatternTableSync.hpp"
 
+#include "PTQualityControlAdmin.hpp"
 #include "TransportNetworkAdmin.h"
 #include "CommercialLineAdmin.h"
 #include "JourneyPatternAdmin.hpp"
