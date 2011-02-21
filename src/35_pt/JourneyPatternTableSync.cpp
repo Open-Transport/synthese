@@ -257,21 +257,16 @@ namespace synthese
 		JourneyPatternTableSync::SearchResult JourneyPatternTableSync::Search(
 			Env& env,
 			boost::optional<util::RegistryKeyType> commercialLineId,
-			boost::optional<util::RegistryKeyType> dataSourceId
-			, int first /*= 0*/
-			, boost::optional<std::size_t> number
-			, bool orderByName
-			, bool raisingOrder,
+			int first, /*= 0*/
+			boost::optional<std::size_t> number,
+			bool orderByName,
+			bool raisingOrder,
 			LinkLevel linkLevel
 		){
 			SelectQuery<JourneyPatternTableSync> query;
 			if (commercialLineId)
 			{
 				query.addWhereField(COL_COMMERCIAL_LINE_ID, *commercialLineId);
-			}
-			if (dataSourceId)
-			{
-				query.addWhereField(COL_DATASOURCE_ID, *dataSourceId);
 			}
 			if (orderByName)
 			{

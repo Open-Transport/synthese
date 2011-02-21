@@ -125,7 +125,7 @@ namespace synthese
 				}
 				if(_displayPage.get())
 				{
-					WebPageInterfacePage::Display(stream, *_displayPage, request, *curPage, false);
+					WebPageInterfacePage::Display(stream, *_displayPage, request, *curPage, false, false);
 				}
 				else
 				{

@@ -103,6 +103,7 @@ namespace synthese
 				{
 					throw RequestException("Smart URL and site, or page ID must be specified");
 				}
+				_savedParameters.remove(PARAMETER_SMART_URL);
 
 				_page = Env::GetOfficialEnv().getSPtr(getSite()->getPageBySmartURL(_smartURL));
 				if(!_page.get())

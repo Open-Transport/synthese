@@ -226,7 +226,6 @@ namespace synthese
 			JourneyPatternTableSync::Search(
 				_env,
 				_line->getKey(),
-				optional<RegistryKeyType>(),
 				0,
 				optional<size_t>(),
 				true, true, UP_LINKS_LOAD_LEVEL
@@ -1406,7 +1405,7 @@ namespace synthese
 
 			// Load of existing routes
 			JourneyPatternTableSync::SearchResult sroutes(
-				JourneyPatternTableSync::Search(_env, cline->getKey(), _dataSource.getKey())
+				JourneyPatternTableSync::Search(_env, cline->getKey())
 			);
 			BOOST_FOREACH(shared_ptr<JourneyPattern> line, sroutes)
 			{

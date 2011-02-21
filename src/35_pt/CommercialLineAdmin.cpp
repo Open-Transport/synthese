@@ -177,7 +177,6 @@ namespace synthese
 					JourneyPatternTableSync::Search(
 						Env::GetOfficialEnv(),
 						_cline->getKey(),
-						optional<RegistryKeyType>(),
 						_requestParameters.first,
 						_requestParameters.maxSize,
 						_requestParameters.orderField == PARAMETER_SEARCH_NAME,

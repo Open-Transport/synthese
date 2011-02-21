@@ -348,7 +348,7 @@ namespace synthese
 
 							// Load of existing routes
 							JourneyPatternTableSync::SearchResult sroutes(
-								JourneyPatternTableSync::Search(_env, cline->getKey(), _dataSource.getKey())
+								JourneyPatternTableSync::Search(_env, cline->getKey())
 							);
 							BOOST_FOREACH(shared_ptr<JourneyPattern> sroute, sroutes)
 							{
