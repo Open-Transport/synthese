@@ -89,7 +89,7 @@ namespace synthese
 			optional<int> depth = map.getOptional<int>(PARAMETER_MAX_DEPTH);
 			if(depth)
 			{
-				if(depth > 0)
+				if(*depth > 0)
 				{
 					_maxDepth = depth;
 				}
