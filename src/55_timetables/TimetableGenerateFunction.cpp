@@ -201,7 +201,7 @@ namespace synthese
 					date curDate(day_clock::local_day());
 					if(map.getOptional<string>(PARAMETER_DAY))
 					{
-						curDate = from_simple_string(map.get<string>(PARAMETER_DAY));
+						curDate = from_string(map.get<string>(PARAMETER_DAY));
 					}
 
 					CalendarTemplate* calendarTemplate(new CalendarTemplate);

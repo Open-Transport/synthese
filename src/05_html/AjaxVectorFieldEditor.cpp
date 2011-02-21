@@ -198,7 +198,12 @@ namespace synthese
 
 		void AjaxVectorFieldEditor::SelectField::outputValue( std::ostream& stream, const std::string& value ) const
 		{
-			stream << "\"" << lexical_cast<RegistryKeyType>(value) << "\"";
+			stream << "\"";
+			if(!value.empty())
+			{
+				stream << lexical_cast<RegistryKeyType>(value);
+			}
+			stream << "\"";
 		}
 
 

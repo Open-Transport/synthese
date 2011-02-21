@@ -56,6 +56,7 @@
 #include "City.h"
 #include "LineStopUpdateAction.hpp"
 #include "ServiceRemoveAction.h"
+#include "ImportableAdmin.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -74,7 +75,7 @@ namespace synthese
 	using namespace html;
 	using namespace security;
 	using namespace graph;
-	using namespace pt;
+	using namespace impex;
 	
 
 	namespace util
@@ -511,6 +512,10 @@ namespace synthese
 				stream << p.close();
 
 				PTRuleUserAdmin<JourneyPattern,JourneyPatternAdmin>::Display(stream, _line, _request);
+
+				StaticActionRequest<JourneyPatternUpdateAction> updateOnlyRequest(_request);
+				updateOnlyRequest.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
+				ImportableAdmin::DisplayDataSourcesTab(stream, *_line, updateOnlyRequest);
 			}
 
 			////////////////////////////////////////////////////////////////////
