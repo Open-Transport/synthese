@@ -59,6 +59,9 @@ namespace synthese
 			
 			_BitSets _markedDates;
 
+			mutable boost::optional<boost::gregorian::date> _firstActiveDate;
+			mutable boost::optional<boost::gregorian::date> _lastActiveDate;
+
 			static size_t _BitPos(const boost::gregorian::date& d);
 
 		public:
@@ -88,8 +91,8 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				boost::gregorian::date getFirstActiveDate () const;
-				boost::gregorian::date getLastActiveDate () const;
+				boost::gregorian::date getFirstActiveDate() const;
+				boost::gregorian::date getLastActiveDate() const;
 			
 				/** Tests if a date is active according to the calendar.
 				 * This method can be overloaded by subclasses to do additional controls.

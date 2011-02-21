@@ -214,7 +214,7 @@ namespace synthese
 					element.setRank(0);
 					calendarTemplate->addElement(element);
 					calendarTemplate->setText(
-						lexical_cast<string>(curDate.day()) + "/" + lexical_cast<string>(lexical_cast<int>(curDate.month())) + "/" + lexical_cast<string>(curDate.year())
+						lexical_cast<string>(curDate.day()) + "/" + lexical_cast<string>(static_cast<int>(curDate.month())) + "/" + lexical_cast<string>(curDate.year())
 					);
 					timetable->setBaseCalendar(calendarTemplate);
 					_calendarTemplate.reset(calendarTemplate);
