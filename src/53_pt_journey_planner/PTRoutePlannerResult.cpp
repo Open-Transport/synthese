@@ -475,7 +475,7 @@ namespace synthese
 			}
 			PlacesList::iterator nextMaxPos(maxPos);
 			++nextMaxPos;
-			if(maxPos != target && nextMaxPos != _orderedPlaces.end() && nextMaxPos != target)
+			if(maxPos != source && nextMaxPos != _orderedPlaces.end() && nextMaxPos != target)
 			{
 				return _canBeSwapped(maxPos, target);
 			}
