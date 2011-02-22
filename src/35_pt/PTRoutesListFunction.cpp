@@ -141,20 +141,19 @@ namespace synthese
 			// Selection of routes by same comparison
 			BOOST_FOREACH(const Path* path, _line->getPaths())
 			{
-				bool toInsert(true);
-
 				if(_date)
 				{
 					const JourneyPattern* thisRoute = dynamic_cast<const JourneyPattern*>(path);
 
-					if(thisRoute->isActive(_date->date()))
+					if(!thisRoute->isActive(_date->date()))
 					{
-						toInsert = false;
+						continue;
 					}
 				}
 
 				if(_mergeSameRoutes)
 				{
+					bool toInsert(true);
 					BOOST_FOREACH(const JourneyPattern* existingRoute, routes)
 					{
 						if(existingRoute->sameContent(*path, false, false))
@@ -163,12 +162,13 @@ namespace synthese
 							break;
 						}
 					}
+					if(!toInsert)
+					{
+						continue;
+					}
 				}
 
-				if(toInsert)
-				{
-					routes.insert(dynamic_cast<const JourneyPattern*>(path));
-				}
+				routes.insert(dynamic_cast<const JourneyPattern*>(path));
 			}
 
 			// Selection of routes by inclusion
