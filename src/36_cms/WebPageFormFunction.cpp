@@ -70,9 +70,7 @@ namespace synthese
 			BOOST_FOREACH(const ParametersMap::Map::value_type& it, map.getMap())
 			{
 				if(	it.first != Request::PARAMETER_FUNCTION &&
-					it.first != Request::PARAMETER_SERVICE &&
-					it.first != Request::PARAMETER_ACTION &&
-					(it.first.size() < Action_PARAMETER_PREFIX.size() || it.first.substr(0, Action_PARAMETER_PREFIX.size()) != Action_PARAMETER_PREFIX)
+					it.first != Request::PARAMETER_SERVICE
 				){
 					_aditionnalParameters.insert(it.first, it.second);
 				}
@@ -118,6 +116,7 @@ namespace synthese
 				try
 				{
 					StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
+					openRequest.getFunction()->setSavedParameters(_aditionnalParameters);
 					openRequest.getFunction()->setPage(_page);
 					if(!_page->getRoot()->getClientURL().empty())
 					{

@@ -204,74 +204,83 @@ namespace synthese
 
 			if(!_customer.get())
 			{
-				_createCustomer = map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false);
-			}
-
-			if (_createCustomer)
-			{
-				_customer.reset(new User);
-				_customer->setName(map.get<string>(PARAMETER_CUSTOMER_NAME));
-				if (_customer->getName().empty())
-					throw ActionException("Le nom du client doit être rempli");
-
-				_customer->setSurname(map.get<string>(PARAMETER_CUSTOMER_SURNAME));
-				if (_customer->getSurname().empty())
-					throw ActionException("Le prénom du client doit être rempli");
-
-				_customer->setPhone(map.get<string>(PARAMETER_CUSTOMER_PHONE));
-				if (_customer->getPhone().empty())
-					throw ActionException("Le numéro de téléphone doit être rempli");
-
-				// Integrity test : the key is name + surname + phone
-				Env env;
-				UserTableSync::Search(
-					env,
-					optional<string>(),
-					_customer->getName(),
-					_customer->getSurname(),
-					_customer->getPhone(),
-					optional<RegistryKeyType>(),
-					logic::indeterminate,
-					logic::indeterminate,
-					optional<RegistryKeyType>(),
-					0, 1
-				);
-				if (!env.getRegistry<User>().empty())
-					throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
-				
-				_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
-				_customer->setProfile(ResaModule::GetBasicResaCustomerProfile().get());
-
-				if(map.getOptional<string>(PARAMETER_CUSTOMER_LANGUAGE))
+				if (map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false))
 				{
-					try
+					_customer.reset(new User);
+					_customer->setName(map.get<string>(PARAMETER_CUSTOMER_NAME));
+					if (_customer->getName().empty())
 					{
-						_customer->setLanguage(&Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_CUSTOMER_LANGUAGE)));
+						throw ActionException("Le nom du client doit être rempli");
 					}
-					catch(Language::LanguageNotFoundException& e)
+
+					_customer->setSurname(map.get<string>(PARAMETER_CUSTOMER_SURNAME));
+					if (_customer->getSurname().empty())
 					{
-						throw ActionException("Langue incorrecte");
+						throw ActionException("Le prénom du client doit être rempli");
+					}
+
+					_customer->setPhone(map.get<string>(PARAMETER_CUSTOMER_PHONE));
+					if (_customer->getPhone().empty())
+					{
+						throw ActionException("Le numéro de téléphone doit être rempli");
+					}
+
+					// Integrity test : the key is name + surname + phone
+					Env env;
+					UserTableSync::Search(
+						env,
+						optional<string>(),
+						_customer->getName(),
+						_customer->getSurname(),
+						_customer->getPhone(),
+						optional<RegistryKeyType>(),
+						logic::indeterminate,
+						logic::indeterminate,
+						optional<RegistryKeyType>(),
+						0, 1
+					);
+					if (!env.getRegistry<User>().empty())
+					{
+						throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
+					}
+					
+					_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
+					_customer->setProfile(ResaModule::GetBasicResaCustomerProfile().get());
+
+					if(map.getOptional<string>(PARAMETER_CUSTOMER_LANGUAGE))
+					{
+						try
+						{
+							_customer->setLanguage(&Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_CUSTOMER_LANGUAGE)));
+						}
+						catch(Language::LanguageNotFoundException& e)
+						{
+							throw ActionException("Langue incorrecte");
+						}
 					}
 				}
-			}
-			else
-			{
-				// Customer ID
-				optional<RegistryKeyType> id(map.get<RegistryKeyType>(PARAMETER_CUSTOMER_ID));
-				if (id)
-					_customer = UserTableSync::GetEditable(*id, *_env);
-			}
-			if(!_customer.get())
-			{
+				else
+				{
+					// Customer ID
+					optional<RegistryKeyType> id(map.get<RegistryKeyType>(PARAMETER_CUSTOMER_ID));
+					if (id)
+					{
+						_customer = UserTableSync::GetEditable(*id, *_env);
+					}
+				}
 				throw ActionException("Undefined customer.");
 			}
 
 			// Deduce naming fields from the customer if already recognized
 			if (_customer->getName().empty())
+			{
 				throw ActionException("Client sans nom. Réservation impossible");
+			}
 
 			if (_customer->getPhone().empty())
+			{
 				throw ActionException("Client sans numéro de téléphone. Veuillez renseigner ce champ dans la fiche client et recommencer la réservation.");
+			}
 
 			// Seats number
 			_seatsNumber = map.getDefault<size_t>(PARAMETER_SEATS_NUMBER, 1);
@@ -292,10 +301,10 @@ namespace synthese
 					throw RequestException("No such service");
 				}
 
-				gregorian::date date(gregorian::date_from_iso_string(map.get<string>(PARAMETER_DATE_TIME)));
+				gregorian::date date(gregorian::from_string(map.get<string>(PARAMETER_DATE_TIME)));
 
 				size_t departureRank(map.get<size_t>(PARAMETER_DEPARTURE_RANK));
-				size_t arrivalRank(map.get<size_t>(PARAMETER_DEPARTURE_RANK));
+				size_t arrivalRank(map.get<size_t>(PARAMETER_ARRIVAL_RANK));
 				if(departureRank >= _service->getPath()->getEdges().size())
 				{
 					throw RequestException("Invalid departure rank");
@@ -542,8 +551,7 @@ namespace synthese
 
 		bool BookReservationAction::isAuthorized(const Session* session
 		) const {
-			return true; // Temporary
-/*			if( !session || !session->hasProfile())
+			if( !session || !session->hasProfile())
 			{
 				return false;
 			}
@@ -553,7 +561,7 @@ namespace synthese
 				_customer->getKey() == session->getUser()->getKey() &&
 				session->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, WRITE)
 			;
-*/		}
+		}
 
 
 

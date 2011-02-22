@@ -245,6 +245,7 @@ namespace synthese
 					bool		_importJunctions;
 					boost::posix_time::time_duration	_defaultTransferDuration;
 					boost::gregorian::date	_startDate;
+					bool		_treatAllStopAreaAsQuay;
 				//@}
 
 				static std::string GetCoordinate(const double value);
@@ -256,6 +257,7 @@ namespace synthese
 				static const std::string PARAMETER_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_WITH_OLD_DATES;
 				static const std::string PARAMETER_AUTOGENERATE_STOP_AREAS;
+				static const std::string PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY;
 
 				Importer_(
 					util::Env& env,

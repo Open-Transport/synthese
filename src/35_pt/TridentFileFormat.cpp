@@ -111,6 +111,7 @@ namespace synthese
 		const string TridentFileFormat::Importer_::PARAMETER_WITH_OLD_DATES("wod");
 		const string TridentFileFormat::Importer_::PARAMETER_DEFAULT_TRANSFER_DURATION("dtd");
 		const string TridentFileFormat::Importer_::PARAMETER_AUTOGENERATE_STOP_AREAS("asa");
+		const string TridentFileFormat::Importer_::PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY("sasp");
 		const string TridentFileFormat::Exporter_::PARAMETER_LINE_ID("li");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_TISSEO_EXTENSION("wt");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_OLD_DATES("wod");
@@ -153,6 +154,7 @@ namespace synthese
 				date_duration du(day_clock::local_day() - _startDate);
 				result.insert(PARAMETER_WITH_OLD_DATES, static_cast<int>(du.days()));
 			}
+			result.insert(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, _treatAllStopAreaAsQuay);
 			return result;
 		}
 
@@ -184,6 +186,7 @@ namespace synthese
 			}
 			_startDate = day_clock::local_day();
 			_startDate -= days(map.getDefault<int>(PARAMETER_WITH_OLD_DATES, 0));
+			_treatAllStopAreaAsQuay = map.getDefault<bool>(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, false);
 		}
 
 
@@ -1017,6 +1020,41 @@ namespace synthese
 		) const {
 			bool failure(false);
 
+			string encoding(_dataSource.getCharset());
+			if(encoding.empty())
+			{
+				ifstream inFile;
+				inFile.open(filePath.file_string().c_str());
+				if(!inFile)
+				{
+					throw Exception("Could no open the file " + filePath.file_string());
+				}
+				string line;
+				if(!getline(inFile, line))
+				{
+					return false;
+				}
+				string pattern("encoding=");
+				string::const_iterator it(search(line.begin(), line.end(), pattern.begin(), pattern.end()));
+				if(it != line.end())
+				{
+					for(it += pattern.size(); it != line.end() && *it != '\'' && *it != '"'; ++it) ;
+					if( it != line.end())
+					{
+						string::const_iterator it2(it+1);
+						for(; it2 != line.end() && *it2 != '\'' && *it2 != '"'; ++it2);
+						if(it2 != line.end())
+						{
+							encoding = line.substr(it-line.begin()+1, it2-it-1);
+						}
+					}
+				}
+			}
+			if(encoding.empty())
+			{
+				encoding = "UTF-8";
+			}
+
 			XMLResults pResults;
 			XMLNode allNode = XMLNode::parseFile(filePath.file_string().c_str(), "ChouettePTNetwork", &pResults);
 			if (pResults.error != eXMLErrorNone)
@@ -1046,7 +1084,7 @@ namespace synthese
 				PTFileFormat::CreateOrUpdateNetwork(
 					networks,
 					networkIdNode.getText(),
-					ImpExModule::ConvertChar(networkNameNode.getText(), _dataSource.getCharset(), "UTF-8"),
+					ImpExModule::ConvertChar(networkNameNode.getText(), encoding, "UTF-8"),
 					_dataSource,
 					_env,
 					os
@@ -1058,8 +1096,8 @@ namespace synthese
 				PTFileFormat::CreateOrUpdateLine(
 					lines,
 					lineKeyNode.getText(),
-					ImpExModule::ConvertChar(clineNameNode.getText(), _dataSource.getCharset(), "UTF-8"),
-					ImpExModule::ConvertChar(clineShortNameNode.getText(), _dataSource.getCharset(), "UTF-8"),
+					ImpExModule::ConvertChar(clineNameNode.getText(), encoding, "UTF-8"),
+					ImpExModule::ConvertChar(clineShortNameNode.getText(), encoding, "UTF-8"),
 					optional<RGBColor>(),
 					*network,
 					_dataSource,
@@ -1101,7 +1139,7 @@ namespace synthese
 
 			// Commercial stops
 			map<string, StopArea*> commercialStopsByPhysicalStop;
-			if(_importStops)
+			if(_importStops && !_treatAllStopAreaAsQuay)
 			{
 				XMLNode chouetteAreaNode(allNode.getChildNode("ChouetteArea"));
 				int stopsNumber(chouetteAreaNode.nChildNode("StopArea"));
@@ -1110,51 +1148,30 @@ namespace synthese
 					XMLNode stopAreaNode(chouetteAreaNode.getChildNode("StopArea", stopRank));
 					XMLNode extensionNode(stopAreaNode.getChildNode("StopAreaExtension", 0));
 					XMLNode areaTypeNode(extensionNode.getChildNode("areaType",0));
-					if(string(areaTypeNode.getText()) != string("CommercialStopPoint")) continue;
+					if(to_lower_copy(string(areaTypeNode.getText())) != string("commercialstoppoint")) continue;
 
 					XMLNode keyNode(stopAreaNode.getChildNode("objectId", 0));
 					XMLNode nameNode(stopAreaNode.getChildNode("name", 0));
 					string stopKey(keyNode.getText());
+
 					XMLNode areaNode(stopAreaNode.getChildNode("centroidOfArea", 0));
-					
-					// Place
-					map<string,XMLNode>::iterator itPlace(areaCentroids.find(areaNode.getText()));
-					if(itPlace == areaCentroids.end())
+					string cityCode;
+					if(!areaNode.isEmpty())
 					{
-						os << "ERR  : area centroid " << areaNode.getText() << " not found in CommercialStopPoint " << stopKey << " (" << nameNode.getText() << ")<br />";
-						failure = true;
-						continue;
-					}
-					XMLNode& areaCentroid(itPlace->second);
-					XMLNode addressNode(areaCentroid.getChildNode("address", 0));
-					string cityCode(
-						addressNode.getChildNode("countryCode", 0).getText()
-					);
-
-					// Search of the city
-					shared_ptr<const City> city;
-					CityTableSync::SearchResult cityResult(
-						CityTableSync::Search(_env, optional<string>(), optional<string>(), cityCode)
-					);
-					if(!cityResult.empty())
-					{
-						city = cityResult.front();
-					}
-					else
-					{
-						// If no city was found, attempting to find an alias with the right code
-						CityAliasTableSync::SearchResult cityAliasResult(
-							CityAliasTableSync::Search(_env, optional<RegistryKeyType>(), cityCode)
-						);
-
-						if(cityAliasResult.empty())
+						// Place
+						map<string,XMLNode>::iterator itPlace(areaCentroids.find(areaNode.getText()));
+						if(itPlace == areaCentroids.end())
 						{
-							os << "ERR  : commercial stop point " << stopKey << " with area centroid " << areaNode.getText() << " does not link to a valid city (" << addressNode.getChildNode("countryCode", 0).getText() << ")<br />";
+							os << "ERR  : area centroid " << areaNode.getText() << " not found in CommercialStopPoint " << stopKey << " (" << nameNode.getText() << ")<br />";
 							failure = true;
 							continue;
 						}
-
-						city = _env.getSPtr(cityAliasResult.front()->getCity());
+						XMLNode& areaCentroid(itPlace->second);
+						XMLNode addressNode(areaCentroid.getChildNode("address", 0));
+						if(!addressNode.isEmpty() && addressNode.getChildNode("countryCode", 0).getText())
+						{
+							cityCode = addressNode.getChildNode("countryCode", 0).getText();
+						}
 					}
 
 					// Search of an existing connection place with the same code
@@ -1180,8 +1197,34 @@ namespace synthese
 						os << "LOAD : link between stops by code " << stopKey << " (" << nameNode.getText() << ") and "
 							<< curStop->getKey() << " (" << curStop->getFullName() << ")<br />";
 					}
-					else
+					else if(!cityCode.empty())
 					{
+						// Search of the city
+						shared_ptr<const City> city;
+						CityTableSync::SearchResult cityResult(
+							CityTableSync::Search(_env, optional<string>(), optional<string>(), cityCode)
+						);
+						if(!cityResult.empty())
+						{
+							city = cityResult.front();
+						}
+						else
+						{
+							// If no city was found, attempting to find an alias with the right code
+							CityAliasTableSync::SearchResult cityAliasResult(
+								CityAliasTableSync::Search(_env, optional<RegistryKeyType>(), cityCode)
+								);
+
+							if(cityAliasResult.empty())
+							{
+								os << "ERR  : commercial stop point " << stopKey << " does not link to a valid city (" << cityCode << ")<br />";
+								failure = true;
+								continue;
+							}
+
+							city = _env.getSPtr(cityAliasResult.front()->getCity());
+						}
+
 						StopAreaTableSync::SearchResult cstops(
 							StopAreaTableSync::Search(
 								_env,
@@ -1208,16 +1251,30 @@ namespace synthese
 							curStop->setAllowedConnection(true);
 							curStop->setDefaultTransferDelay(_defaultTransferDuration);
 							curStop->setKey(StopAreaTableSync::getId());
+							curStop->setCity(city.get());
 							_env.getEditableRegistry<StopArea>().add(curStop);
 
 							os << "CREA : Creation of the commercial stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
 						}
 					}
+					else
+					{
+						if(_autoGenerateStopAreas)
+						{
+							os << "WARN";
+						}
+						else
+						{
+							failure = true;
+							os << "ERR ";
+						}
+						os << " : commercial stop point " << stopKey << " cannot be created due to undefined city<br />";
+						continue;
+					}
 
 					curStop->setName(
-						ImpExModule::ConvertChar(nameNode.getText(), _dataSource.getCharset(), "UTF-8")
+						ImpExModule::ConvertChar(nameNode.getText(), encoding, "UTF-8")
 					);
-					curStop->setCity(city.get());
 
 					// Link from physical stops
 					int pstopsNumber(stopAreaNode.nChildNode("contains"));
@@ -1237,8 +1294,9 @@ namespace synthese
 				XMLNode stopAreaNode(chouetteAreaNode.getChildNode("StopArea", stopRank));
 				XMLNode extensionNode(stopAreaNode.getChildNode("StopAreaExtension", 0));
 				XMLNode areaTypeNode(extensionNode.getChildNode("areaType",0));
-				if(	string(areaTypeNode.getText()) != string("BoardingPosition") &&
-					string(areaTypeNode.getText()) != string("Quay") 
+				if(	!_treatAllStopAreaAsQuay &&
+					to_lower_copy(string(areaTypeNode.getText())) != "boardingposition" &&
+					to_lower_copy(string(areaTypeNode.getText())) != "quay" 
 				){
 					continue;
 				}
@@ -1260,69 +1318,80 @@ namespace synthese
 					// Geometry
 					shared_ptr<StopPoint::Geometry> geometry;
 					shared_ptr<const City> city;
-					map<string, XMLNode>::iterator itPlace(areaCentroids.find(areaCentroidNode.getText()));
-					if(itPlace == areaCentroids.end())
+					if(areaCentroidNode.isEmpty())
 					{
-						os << "WARN : Physical stop with key " << stopKey << " links to a not found area centroid " << areaCentroidNode.getText() << " (" << name <<  ")<br />";
+						os << "WARN : Physical stop " << stopKey << " does not have any area centroid (" << name <<  ")<br />";
 					}
 					else
+
 					{
-						XMLNode& areaCentroid(itPlace->second);
-						XMLNode longitudeNode(areaCentroid.getChildNode("longitude", 0));
-						XMLNode latitudeNode(areaCentroid.getChildNode("latitude", 0));
-						if(!longitudeNode.isEmpty() && !latitudeNode.isEmpty())
+
+						map<string, XMLNode>::iterator itPlace(areaCentroids.find(areaCentroidNode.getText()));
+						if(itPlace == areaCentroids.end())
 						{
-							geometry = CoordinatesSystem::GetCoordinatesSystem(
-								_getSRIDFromTrident(areaCentroid.getChildNode("longLatType", 0).getText())
-							).createPoint(
-								lexical_cast<double>(longitudeNode.getText()),
-								lexical_cast<double>(latitudeNode.getText())
-							);
+							os << "WARN : Physical stop with key " << stopKey << " links to a not found area centroid " << areaCentroidNode.getText() << " (" << name <<  ")<br />";
 						}
 						else
 						{
-							XMLNode projectedPointNode(areaCentroid.getChildNode("projectedPoint", 0));
-							if(!projectedPointNode.isEmpty())
+							XMLNode& areaCentroid(itPlace->second);
+							XMLNode longitudeNode(areaCentroid.getChildNode("longitude", 0));
+							XMLNode latitudeNode(areaCentroid.getChildNode("latitude", 0));
+							if(!longitudeNode.isEmpty() && !latitudeNode.isEmpty())
 							{
 								geometry = CoordinatesSystem::GetCoordinatesSystem(
-									_getSRIDFromTrident(projectedPointNode.getChildNode("projectionType", 0).getText())
-								).createPoint(
-									lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
-									lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
-								);
-							}
-						}
-
-						XMLNode addressNode(areaCentroid.getChildNode("address", 0));
-						string cityCode(
-							addressNode.isEmpty() ? string() : addressNode.getChildNode("countryCode", 0).getText()
-						);
-
-						// Search of the city
-						if(!cityCode.empty())
-						{
-							CityTableSync::SearchResult cityResult(
-								CityTableSync::Search(_env, optional<string>(), optional<string>(), cityCode)
-								);
-							if(!cityResult.empty())
-							{
-								city = cityResult.front();
+									_getSRIDFromTrident(areaCentroid.getChildNode("longLatType", 0).getText())
+									).createPoint(
+									lexical_cast<double>(longitudeNode.getText()),
+									lexical_cast<double>(latitudeNode.getText())
+									);
 							}
 							else
 							{
-								// If no city was found, attempting to find an alias with the right code
-								CityAliasTableSync::SearchResult cityAliasResult(
-									CityAliasTableSync::Search(_env, optional<RegistryKeyType>(), cityCode)
-									);
-
-								if(cityAliasResult.empty())
+								XMLNode projectedPointNode(areaCentroid.getChildNode("projectedPoint", 0));
+								if(!projectedPointNode.isEmpty())
 								{
-									os << "ERR  : stop point " << stopKey << " with area centroid " << areaCentroid.getText() << " does not link to a valid city (" << addressNode.getChildNode("countryCode", 0).getText() << ")<br />";
-									failure = true;
-									continue;
+									geometry = CoordinatesSystem::GetCoordinatesSystem(
+										_getSRIDFromTrident(projectedPointNode.getChildNode("projectionType", 0).getText())
+										).createPoint(
+										lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
+										lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
+										);
 								}
+							}
 
-								city = _env.getSPtr(cityAliasResult.front()->getCity());
+							XMLNode addressNode(areaCentroid.getChildNode("address", 0));
+							string cityCode(
+								(addressNode.isEmpty() || !addressNode.getChildNode("countryCode", 0).getText()) ?
+								string() :
+							addressNode.getChildNode("countryCode", 0).getText()
+								);
+
+							// Search of the city
+							if(!cityCode.empty())
+							{
+								CityTableSync::SearchResult cityResult(
+									CityTableSync::Search(_env, optional<string>(), optional<string>(), cityCode)
+									);
+								if(!cityResult.empty())
+								{
+									city = cityResult.front();
+								}
+								else
+								{
+									// If no city was found, attempting to find an alias with the right code
+									CityAliasTableSync::SearchResult cityAliasResult(
+										CityAliasTableSync::Search(_env, optional<RegistryKeyType>(), cityCode)
+										);
+
+									if(cityAliasResult.empty())
+									{
+										os << "ERR  : stop point " << stopKey << " with area centroid " << areaCentroid.getText() << " does not link to a valid city (" << addressNode.getChildNode("countryCode", 0).getText() << ")<br />";
+										failure = true;
+										continue;
+									}
+
+									city = _env.getSPtr(cityAliasResult.front()->getCity());
+								}
 							}
 						}
 					}
@@ -1334,28 +1403,26 @@ namespace synthese
 					{
 						curStop = itcstop->second;
 					}
-					else
-					{
-						if(!_autoGenerateStopAreas || !city.get())
-						{
-							os << "ERR  : stop " << stopKey << " not found in any commercial stop (" << name << ")<br />";
-							failure = true;
-							continue;
-						}
-					}
 				
-					PTFileFormat::CreateOrUpdateStopPoints(
-						stops,
-						stopKey,
-						name,
-						curStop,
-						geometry.get(),
-						_autoGenerateStopAreas ? city.get() : NULL,
-						_defaultTransferDuration,
-						_dataSource,
-						_env,
-						os
-					);
+					set<StopPoint*> stops(
+						PTFileFormat::CreateOrUpdateStopPoints(
+							stops,
+							stopKey,
+							name,
+							curStop,
+							geometry.get(),
+							_autoGenerateStopAreas ? city.get() : NULL,
+							_defaultTransferDuration,
+							_dataSource,
+							_env,
+							os
+					)	);
+					if(stops.empty())
+					{
+						os << "ERR  : stop " << stopKey << " not found and cannot be created in any commercial stop (" << name << ")<br />";
+						failure = true;
+						continue;
+					}
 				}
 				else
 				{
@@ -1376,7 +1443,7 @@ namespace synthese
 			if(failure)
 			{
 				os << "<b>FAILURE : At least a stop is missing : load interrupted</b><br />";
-				throw Exception("At least a stop is missing : load interrupted");
+				return !failure;
 			}
 
 			// JourneyPattern stops
@@ -1400,7 +1467,7 @@ namespace synthese
 			if(failure)
 			{
 				os << "<b>FAILURE : At least a stop point is missing : load interrupted</b><br />";
-				throw Exception("At least a stop point is missing");
+				return !failure;
 			}
 
 			// Load of existing routes
@@ -1905,6 +1972,7 @@ namespace synthese
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
 			stream << t.cell("Import arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOPS, _importStops));
 			stream << t.cell("Autogénérer arrêts commerciaux", t.getForm().getOuiNonRadioInput(PARAMETER_AUTOGENERATE_STOP_AREAS, _autoGenerateStopAreas));
+			stream << t.cell("Traiter tous les StopArea en tant qu'arrêts physiques", t.getForm().getOuiNonRadioInput(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, _treatAllStopAreaAsQuay));
 			stream << t.cell("Import transferts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_JUNCTIONS, _importJunctions));
 			stream << t.cell("Importer dates passées (nombre de jours)", t.getForm().getTextInput(PARAMETER_WITH_OLD_DATES, "0"));
 			stream << t.cell("Temps de correspondance par défaut (minutes)", t.getForm().getTextInput(PARAMETER_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_defaultTransferDuration.total_seconds() / 60)));
