@@ -70,9 +70,18 @@ namespace synthese
 			// Function parameters
 			if(_function.get())
 			{
-				_function->setSavedParameters(_parametersMap);
-				_function->removeSavedParameter(Request::PARAMETER_SERVICE);
-				_function->removeSavedParameter(Request::PARAMETER_FUNCTION);
+				ParametersMap savedParametersMap;
+				BOOST_FOREACH(const ParametersMap::Map::value_type& it, _parametersMap.getMap())
+				{
+					if(	it.first != Request::PARAMETER_FUNCTION &&
+						it.first != Request::PARAMETER_SERVICE &&
+						it.first != Request::PARAMETER_ACTION &&
+						(it.first.size() < Action_PARAMETER_PREFIX.size() || it.first.substr(0, Action_PARAMETER_PREFIX.size()) != Action_PARAMETER_PREFIX)
+					){
+						savedParametersMap.insert(it.first, it.second);
+					}
+				}
+				_function->setSavedParameters(savedParametersMap);
 				_function->_setFromParametersMap(_parametersMap);
 			}
 		}

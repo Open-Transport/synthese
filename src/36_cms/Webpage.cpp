@@ -440,7 +440,7 @@ namespace synthese
 		) const	{
 
 			// Parameters
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 			BOOST_FOREACH(const Parameters::value_type& param, parameters)
 			{
 				stringstream s;
@@ -450,24 +450,12 @@ namespace synthese
 				}
 				pm.insert(param.first, s.str());
 			}
-//			pm.merge(aditionalParametersMap);
 
 			// Function
 			shared_ptr<Function> function(functionCreator->create());
-			ParametersMap requestParametersMap(
-				dynamic_cast<const DynamicRequest*>(&request) ?
-				dynamic_cast<const DynamicRequest&>(request).getParametersMap() :
-				ParametersMap()
-			);
-			requestParametersMap.remove(Request::PARAMETER_FUNCTION);
-			requestParametersMap.remove(Request::PARAMETER_SERVICE);
-			pm.merge(requestParametersMap);
-			if(CMSModule::GetSite(request).get())
-			{
-				pm.insert(FunctionWithSiteBase::PARAMETER_SITE, CMSModule::GetSite(request)->getKey());
-			}
 			try
 			{
+				function->setSavedParameters(pm);
 				function->_setFromParametersMap(pm);
 				if (function->isAuthorized(request.getSession()))
 				{

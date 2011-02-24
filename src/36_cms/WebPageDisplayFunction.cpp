@@ -70,17 +70,6 @@ namespace synthese
 		{
 			_FunctionWithSite::_setFromParametersMap(map);
 
-			BOOST_FOREACH(const ParametersMap::Map::value_type& it, map.getMap())
-			{
-				if(	it.first != Request::PARAMETER_FUNCTION &&
-					it.first != Request::PARAMETER_SERVICE &&
-					it.first != Request::PARAMETER_ACTION &&
-					(it.first.size() < Action_PARAMETER_PREFIX.size() || it.first.substr(0, Action_PARAMETER_PREFIX.size()) != Action_PARAMETER_PREFIX)
-				){
-					_savedParameters.insert(it.first, it.second);
-				}
-			}
-
 			if(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID))
 			{
 				try
@@ -144,9 +133,8 @@ namespace synthese
 					stringstream url;
 					url << "http://" << request.getHostName() << _page->getSmartURLPath();
 
-					ParametersMap pm(request.getFunction()->getSavedParameters());
+					ParametersMap pm(_savedParameters);
 					pm.remove(PARAMETER_PAGE_ID);
-					pm.remove(PARAMETER_SMART_URL);
 					pm.remove(FunctionWithSiteBase::PARAMETER_SITE);
 					string parameters(pm.getURI());
 					if(!parameters.empty())

@@ -212,7 +212,7 @@ namespace synthese
 			{
 				if(_page.get())
 				{
-					ParametersMap pm(request.getFunction()->getSavedParameters());
+					ParametersMap pm(_savedParameters);
 
 					pm.insert(Request::PARAMETER_OBJECT_ID, route->getKey()); //0
 					pm.insert(DATA_NAME, route->getName()); //1

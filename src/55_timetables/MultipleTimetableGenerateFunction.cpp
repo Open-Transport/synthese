@@ -195,26 +195,16 @@ namespace synthese
 				}
 
 				stringstream content;
-				auto_ptr<TimetableGenerator> generator(tt.first->getGenerator(Env::GetOfficialEnv()));
-				if(tt.second.get())
-				{
-					generator->setBaseCalendar(tt.second->getResult(generator->getBaseCalendar()));
-				}
-				TimetableResult result(generator->build(true, warnings));
-				TimetableGenerateFunction::Display(
-					content,
-					_pageForSubTimetable,
-					shared_ptr<const Webpage>(),
-					shared_ptr<const Webpage>(),
-					shared_ptr<const Webpage>(),
-					_rowPage,
-					_cellPage,
-					request,
-					*tt.first,
-					*generator,
-					result,
-					timetableRank
-				);
+				TimetableGenerateFunction function;
+				function.setSavedParameters(_savedParameters);
+				function.setTimetable(tt.first);
+				function.setCalendarTemplate(tt.second);
+				function.setTimetableRank(timetableRank);
+				function.setPage(_pageForSubTimetable);
+				function.setRowPage(_rowPage);
+				function.setCellPage(_cellPage);
+				function.setWarnings(warnings);
+				function.run(content, request);
 				pm.insert(DATA_CONTENT + lexical_cast<string>(timetableRank), content.str());
 				timetableRank++;
 			}
@@ -223,12 +213,14 @@ namespace synthese
 			if(_notePage.get())
 			{
 				stringstream notes;
+				TimetableGenerateFunction function;
+				function.setSavedParameters(_savedParameters);
+				function.setNotePage(_notePage);
+				function.setNoteCalendarPage(_noteCalendarPage);
 				BOOST_FOREACH(const TimetableResult::Warnings::value_type& warning, *warnings)
 				{
-					TimetableGenerateFunction::DisplayNote(
+					function._displayNote(
 						notes,
-						_notePage,
-						_noteCalendarPage,
 						request,
 						*warning.second
 					);
