@@ -1404,7 +1404,7 @@ namespace synthese
 						curStop = itcstop->second;
 					}
 				
-					set<StopPoint*> stops(
+					set<StopPoint*> stopPoints(
 						PTFileFormat::CreateOrUpdateStopPoints(
 							stops,
 							stopKey,
@@ -1417,7 +1417,7 @@ namespace synthese
 							_env,
 							os
 					)	);
-					if(stops.empty())
+					if(stopPoints.empty())
 					{
 						os << "ERR  : stop " << stopKey << " not found and cannot be created in any commercial stop (" << name << ")<br />";
 						failure = true;
