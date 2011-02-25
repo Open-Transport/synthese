@@ -1505,14 +1505,23 @@ namespace synthese
 			{
 				XMLNode routeNode(chouetteLineDescriptionNode.getChildNode("ChouetteRoute",crouteRank));
 				XMLNode crouteKeyNode(routeNode.getChildNode("objectId"));
-				XMLNode extNode(routeNode.getChildNode("RouteExtension"));
-				XMLNode waybackNode(extNode.getChildNode("wayBack"));
 				XMLNode nameNode(routeNode.getChildNode("name"));
 				routeNames[crouteKeyNode.getText()] = ImpExModule::ConvertChar(nameNode.getText(), _dataSource.getCharset(), "UTF-8");
-				routeWaybacks[crouteKeyNode.getText()] = (
-					waybackNode.getText() == string("R") ||
-					waybackNode.getText() == string("1")
-				);
+
+				bool wayBack(false);
+				XMLNode extNode(routeNode.getChildNode("RouteExtension"));
+				if(!extNode.isEmpty())
+				{
+					XMLNode waybackNode(extNode.getChildNode("wayBack"));
+					if(!waybackNode.isEmpty() && waybackNode.getText())
+					{
+						wayBack = (
+							waybackNode.getText() == string("R") ||
+							waybackNode.getText() == string("1")
+						);
+					}
+				}
+				routeWaybacks[crouteKeyNode.getText()] = wayBack;
 			}
 			
 			

@@ -33,7 +33,7 @@ namespace synthese
 	Language::LanguagesMap Language::_iso639_1LanguagesMap;
 	Language::LanguagesMap Language::_iso639_2LanguagesMap;
 
-	const std::string& Language::getName( const Language& nameLanguage )
+	const std::string& Language::getName( const Language& nameLanguage ) const
 	{
 		NamesMap::const_iterator it(_names.find(&nameLanguage));
 		if(it == _names.end())
@@ -48,7 +48,7 @@ namespace synthese
 
 
 
-	const std::string& Language::getName()
+	const std::string& Language::getName() const
 	{
 		return getName(*this);
 	}

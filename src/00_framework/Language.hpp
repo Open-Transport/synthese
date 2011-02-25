@@ -87,8 +87,8 @@ namespace synthese
 
 		//! @name Services
 		//@{
-			const std::string& getName(const Language& nameLanguage);
-			const std::string& getName();
+			const std::string& getName(const Language& nameLanguage) const;
+			const std::string& getName() const;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// @throws Language::LanguageNotFoundException

@@ -159,6 +159,11 @@ namespace synthese
 			const Request& request
 		) const {
 
+			if(!_compositionPage.get())
+			{
+				return;
+			}
+
 			size_t rank(0);
 			BOOST_FOREACH(const PTOperationModule::ServiceCompositions::mapped_type::value_type& composition, PTOperationModule::GetCompositions(*_service))
 			{
@@ -198,7 +203,7 @@ namespace synthese
 			size_t rank
 		) const {
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(_savedParameters);
 
 			// Rank
 			pm.insert(DATA_RANK, rank);
@@ -260,7 +265,7 @@ namespace synthese
 			size_t rank
 		) const {
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(_savedParameters);
 
 			// Rank
 			pm.insert(DATA_RANK, rank);
@@ -278,7 +283,7 @@ namespace synthese
 			pm.insert(Request::PARAMETER_OBJECT_ID, vehicle.getKey());
 
 			// Launch of the display
-			_compositionPage->display(stream, request, pm);
+			_vehiclePage->display(stream, request, pm);
 		}
 
 
@@ -290,7 +295,7 @@ namespace synthese
 			size_t rank
 		) const {
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(_savedParameters);
 
 			// Rank
 			pm.insert(DATA_RANK, rank);
@@ -302,6 +307,6 @@ namespace synthese
 			pm.insert(Request::PARAMETER_OBJECT_ID, quay.getKey());
 
 			// Launch of the display
-			_compositionPage->display(stream, request, pm);
+			_quayPage->display(stream, request, pm);
 		}
 }	}

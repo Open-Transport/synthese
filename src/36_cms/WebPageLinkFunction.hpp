@@ -37,28 +37,12 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : WebPageLinkFunction.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Links
+		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m56Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.1.16
-		//////////////////////////////////////////////////////////////////////////
-		/// Key : link
-		///
-		/// Parameters :
-		///	<ul>
-		///		<li>target : id of a page</li>
-		///		<li>text : If empty, use the target page name</li>
-		///		<li>use_smart_url (optional) : 1|0 link to the smart URL instead of the classic URL if available (default=1)</li>
-		///		<li>(other parameters) : other parameters are transmitted into the link without any transformation</li>
-		///	</ul>
-		///
-		/// Examples :
-		///	<ul>
-		///		<li>target=123 : <pre><a href="fonction=page&p=123">Name of the 123 page</a></pre></li>
-		///		<li>target=123&roid=12 : <pre><a href="fonction=page&p=123&roid=12">Name of the 123 page</a></pre></li>
-		///		<li>target=123&text=toto : <pre><a href="fonction=page&p=123">toto</a></pre></li>
-		///		<li>target=123&text=toto&roid=12 : <pre><a href="fonction=page&p=123&roid=12">toto</a></pre></li>
-		///	</ul>
 		class WebPageLinkFunction:
 			public util::FactorableTemplate<server::Function,WebPageLinkFunction>
 		{
@@ -66,6 +50,7 @@ namespace synthese
 			static const std::string PARAMETER_TARGET;
 			static const std::string PARAMETER_TEXT;
 			static const std::string PARAMETER_USE_SMART_URL;
+			static const std::string PARAMETER_CONFIRM;
 			
 		protected:
 			//! \name Page parameters
@@ -74,6 +59,7 @@ namespace synthese
 				std::string _text;
 				server::ParametersMap _otherParameters;
 				bool _useSmartURL;
+				std::string _confirm;
 			//@}
 			
 			

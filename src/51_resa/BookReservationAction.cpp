@@ -268,6 +268,10 @@ namespace synthese
 						_customer = UserTableSync::GetEditable(*id, *_env);
 					}
 				}
+			}
+
+			if(!_customer.get())
+			{
 				throw ActionException("Undefined customer.");
 			}
 

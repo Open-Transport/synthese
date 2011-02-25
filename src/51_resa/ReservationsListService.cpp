@@ -58,6 +58,7 @@
 #include "AdminInterfaceElement.h"
 #include "UserTableSync.h"
 #include "Webpage.h"
+#include "Language.hpp"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -86,6 +87,8 @@ namespace synthese
 		const string ReservationsListService::PARAMETER_DATE("da");
 		const string ReservationsListService::PARAMETER_SERVICE_NUMBER("sn");
 		const string ReservationsListService::PARAMETER_RESERVATION_PAGE_ID("rp");
+		const string ReservationsListService::PARAMETER_SERVICE_ID("se");
+		const string ReservationsListService::PARAMETER_LANGUAGE("la");
 
 		const string ReservationsListService::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
 		const string ReservationsListService::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
@@ -93,28 +96,42 @@ namespace synthese
 		const string ReservationsListService::DATA_NAME("name");
 		const string ReservationsListService::DATA_RANK("rank");
 		const string ReservationsListService::DATA_TRANSACTION_ID("transaction_id");
+		const string ReservationsListService::DATA_SEATS_NUMBER("seats_number");
 
 		ParametersMap ReservationsListService::_getParametersMap() const
 		{
 			ParametersMap map;
 
-			// Line
-			if(_line.get())
+			if(_service.get())
 			{
-				map.insert(PARAMETER_LINE_ID, _line->getKey());
+				map.insert(PARAMETER_SERVICE_ID, _service->getKey());
+			}
+			else
+			{
+				// Line
+				if(_line.get())
+				{
+					map.insert(PARAMETER_LINE_ID, _line->getKey());
+				}
+				map.insert(PARAMETER_SERVICE_NUMBER, _serviceNumber);
 			}
 
 			map.insert(PARAMETER_DATE, to_iso_extended_string(_date));
-
-			map.insert(PARAMETER_SERVICE_NUMBER, _serviceNumber);
 
 			if(_reservationPage.get())
 			{
 				map.insert(PARAMETER_RESERVATION_PAGE_ID, _reservationPage->getKey());
 			}
 
+			if(_language)
+			{
+				map.insert(PARAMETER_LANGUAGE, _language->getIso639_2Code());
+			}
+
 			return map;
 		}
+
+
 
 		void ReservationsListService::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -139,15 +156,34 @@ namespace synthese
 				throw RequestException("Bad value for date");
 			}
 
-			// Line
-			RegistryKeyType id(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
-			try
+			if(map.isDefined(PARAMETER_SERVICE_ID))
 			{
-				_line = CommercialLineTableSync::Get(id, *_env);
+				// Service
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_SERVICE_ID));
+				try
+				{
+					_service = ScheduledServiceTableSync::Get(id, *_env);
+					_line = _env->getSPtr(static_cast<const CommercialLine*>(_service->getPath()->getPathGroup()));
+					_serviceNumber = _service->getServiceNumber();
+				}
+				catch (ObjectNotFoundException<ScheduledServiceTableSync>&)
+				{
+					throw RequestException("Bad value for service ID");
+				}
 			}
-			catch (...)
+			else
 			{
-				throw RequestException("Bad value for line ID");
+				// Line
+				RegistryKeyType id(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+				try
+				{
+					_line = CommercialLineTableSync::Get(id, *_env);
+				}
+				catch (ObjectNotFoundException<CommercialLine>&)
+				{
+					throw RequestException("Bad value for line ID");
+				}
+				_serviceNumber = map.get<string>(PARAMETER_SERVICE_NUMBER);
 			}
 
 			// Routes reading
@@ -167,8 +203,6 @@ namespace synthese
 				);
 			}
 
-			_serviceNumber = map.get<string>(PARAMETER_SERVICE_NUMBER);
-
 			// Reservation display page
 			try
 			{
@@ -181,6 +215,11 @@ namespace synthese
 			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such reservation page");
+			}
+
+			if(map.isDefined(PARAMETER_LANGUAGE))
+			{
+				_language = Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_LANGUAGE));
 			}
 		}
 
@@ -212,7 +251,7 @@ namespace synthese
 					_line->getKey(),
 					_date,
 					_serviceNumber,
-					true,
+					false,
 					logic::tribool(false)
 			)	);
 
@@ -228,7 +267,7 @@ namespace synthese
 						_line->getKey(),
 						optional<RegistryKeyType>(),
 						_serviceNumber,
-						true,
+						false,
 						0,
 						optional<size_t>(),
 						true, true, UP_LINKS_LOAD_LEVEL
@@ -269,15 +308,18 @@ namespace synthese
 				string plural((serviceSeatsNumber > 1) ? "s" : "");
 				seatsNumber += serviceSeatsNumber;
 
-				size_t rank(0);
-				BOOST_FOREACH(shared_ptr<const Reservation> reservation, serviceReservations)
+				if(_reservationPage.get())
 				{
-					_displayReservation(
-						stream,
-						request,
-						*reservation,
-						rank++
-					);
+					size_t rank(0);
+					BOOST_FOREACH(shared_ptr<const Reservation> reservation, serviceReservations)
+					{
+						_displayReservation(
+							stream,
+							request,
+							*reservation,
+							rank++
+							);
+					}
 				}
 			} // End services loop
 		}
@@ -314,10 +356,15 @@ namespace synthese
 			pm.insert(DATA_RANK, rank);
 			pm.insert(Request::PARAMETER_OBJECT_ID, reservation.getKey());
 			pm.insert(DATA_TRANSACTION_ID, reservation.getTransaction()->getKey());
+			pm.insert(DATA_SEATS_NUMBER, reservation.getTransaction()->getSeats());
 			
 			// Language
 			shared_ptr<const User> user(UserTableSync::Get(reservation.getTransaction()->getCustomerUserId(), *_env));
-			pm.insert(DATA_LANGUAGE, user->getLanguage());
+
+			if(_language && user->getLanguage())
+			{
+				pm.insert(DATA_LANGUAGE, user->getLanguage()->getName(*_language));
+			}
 
 			// Launch of the display
 			_reservationPage->display(stream, request, pm);
