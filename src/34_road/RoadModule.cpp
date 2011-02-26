@@ -38,6 +38,8 @@ namespace synthese
 	using namespace road;
 	using namespace server;
 	using namespace geography;
+	using namespace lexical_matcher;
+	
 
 
 	namespace graph
@@ -124,8 +126,6 @@ namespace synthese
 			const std::string& placeName,
 			std::size_t resultsNumber
 		){
-			ExtendedFetchPlacesResult result;
-
 			if (cityName.empty())
 			{
 				throw UndeterminedPlaceException(cityName, placeName, UndeterminedPlaceException::EMPTY_CITY);
@@ -139,15 +139,41 @@ namespace synthese
 				throw UndeterminedPlaceException(cityName, placeName, UndeterminedPlaceException::NO_RESULT_FROM_CITY_SEARCH);
 			}
 
+			GeographyModule::CitiesMatcher::MatchResult::value_type city(cities.front());
+			return ExtendedFetchPlaces(city, placeName, resultsNumber);
+		}
+
+
+
+		RoadModule::ExtendedFetchPlacesResult RoadModule::ExtendedFetchPlaces(
+			boost::shared_ptr<geography::City> city,
+			const std::string& placeName,
+			std::size_t resultsNumber
+		){
+			GeographyModule::CitiesMatcher::MatchResult::value_type cityResult;
+			cityResult.key = FrenchSentence(city->getName()+" "+ city->getCode());
+			cityResult.score.levenshtein = 0;
+			cityResult.score.phoneticScore = 1;
+			cityResult.value = city;
+			return ExtendedFetchPlaces(cityResult, placeName, resultsNumber);
+		}
+
+
+		RoadModule::ExtendedFetchPlacesResult RoadModule::ExtendedFetchPlaces(
+			const GeographyModule::CitiesMatcher::MatchResult::value_type& cityResult,
+			const std::string& placeName,
+			std::size_t resultsNumber
+		){
+			ExtendedFetchPlacesResult result;
+
 			if(placeName.empty())
 			{	// Default place of the city
 				ExtendedFetchPlaceResult defaultPlaceResult;
-				defaultPlaceResult.cityResult = cities.front();
+				defaultPlaceResult.cityResult = cityResult;
 				defaultPlaceResult.placeResult.key = defaultPlaceResult.cityResult.key;
 				defaultPlaceResult.placeResult.score = defaultPlaceResult.cityResult.score;
 				defaultPlaceResult.placeResult.value = defaultPlaceResult.cityResult.value;
 				assert(defaultPlaceResult.placeResult.value != NULL);
-
 				result.push_back(defaultPlaceResult);
 
 				return result;
@@ -165,7 +191,7 @@ namespace synthese
 					string roadName(placeName.substr(words[0].size() + 1));
 
 					City::PlacesMatcher::MatchResult places(
-						cities.front().value->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(roadName, resultsNumber)
+						cityResult.value->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(roadName, resultsNumber)
 					);
 
 					BOOST_FOREACH(const City::PlacesMatcher::MatchResult::value_type& place, places)
@@ -177,7 +203,7 @@ namespace synthese
 						shared_ptr<House> house(roadPlace.getHouse(number));
 
 						ExtendedFetchPlaceResult placeResult;
-						placeResult.cityResult = cities.front();
+						placeResult.cityResult = cityResult;
 						placeResult.placeResult.key = place.key;
 						placeResult.placeResult.score = place.score;
 						placeResult.placeResult.value = house.get() ? house : place.value;
@@ -195,12 +221,12 @@ namespace synthese
 
 			// Text points to a stop or a street
 			City::PlacesMatcher::MatchResult places(
-				cities.front().value->getAllPlacesMatcher().bestMatches(placeName, resultsNumber)
+				cityResult.value->getAllPlacesMatcher().bestMatches(placeName, resultsNumber)
 			);
 			BOOST_FOREACH(const City::PlacesMatcher::MatchResult::value_type& place, places)
 			{
 				ExtendedFetchPlaceResult placeResult;
-				placeResult.cityResult = cities.front();
+				placeResult.cityResult = cityResult;
 				placeResult.placeResult.key = place.key;
 				placeResult.placeResult.score = place.score;
 				placeResult.placeResult.value = place.value;
@@ -211,7 +237,7 @@ namespace synthese
 			return result;
 		}
 
-		
+
 
 		RoadModule::UndeterminedPlaceException::UndeterminedPlaceException(
 			const std::string& cityName,

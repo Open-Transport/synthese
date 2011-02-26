@@ -153,6 +153,22 @@ namespace synthese
 
 
 
+			static ExtendedFetchPlacesResult ExtendedFetchPlaces(
+				boost::shared_ptr<geography::City> city,
+				const std::string& placeName,
+				std::size_t resultsNumber
+			);
+
+
+
+			static ExtendedFetchPlacesResult ExtendedFetchPlaces(
+				const geography::GeographyModule::CitiesMatcher::MatchResult::value_type& cityResult,
+				const std::string& placeName,
+				std::size_t resultsNumber
+			);
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// @param citiesMatcher lexical matcher to find city
 			/// @param cityName name of the city to find
