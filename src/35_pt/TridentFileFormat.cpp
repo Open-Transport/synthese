@@ -1506,7 +1506,10 @@ namespace synthese
 				XMLNode routeNode(chouetteLineDescriptionNode.getChildNode("ChouetteRoute",crouteRank));
 				XMLNode crouteKeyNode(routeNode.getChildNode("objectId"));
 				XMLNode nameNode(routeNode.getChildNode("name"));
-				routeNames[crouteKeyNode.getText()] = ImpExModule::ConvertChar(nameNode.getText(), _dataSource.getCharset(), "UTF-8");
+				routeNames[crouteKeyNode.getText()] =
+					(!nameNode.isEmpty() && nameNode.getText()) ?
+					ImpExModule::ConvertChar(nameNode.getText(), _dataSource.getCharset(), "UTF-8") :
+					string();
 
 				bool wayBack(false);
 				XMLNode extNode(routeNode.getChildNode("RouteExtension"));
