@@ -441,6 +441,7 @@ namespace synthese
 
 			// Parameters
 			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap callParametersMap;
 			BOOST_FOREACH(const Parameters::value_type& param, parameters)
 			{
 				stringstream s;
@@ -449,6 +450,7 @@ namespace synthese
 					node->display(s, request, aditionalParametersMap);
 				}
 				pm.insert(param.first, s.str());
+				callParametersMap.insert(param.first, s.str());
 			}
 
 			// Function
@@ -456,7 +458,7 @@ namespace synthese
 			try
 			{
 				function->setSavedParameters(pm);
-				function->_setFromParametersMap(pm);
+				function->_setFromParametersMap(callParametersMap);
 				if (function->isAuthorized(request.getSession()))
 				{
 					function->run(stream, request);
