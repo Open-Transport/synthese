@@ -52,7 +52,7 @@ namespace synthese
 
 		ParametersMap WebPageFormFunction::_getParametersMap() const
 		{
-			ParametersMap map(_aditionnalParameters);
+			ParametersMap map;
 			map.insert(PARAMETER_NAME, _name);
 			map.insert(PARAMETER_SCRIPT, _script);
 			if(_page.get())
@@ -67,15 +67,6 @@ namespace synthese
 
 		void WebPageFormFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			BOOST_FOREACH(const ParametersMap::Map::value_type& it, map.getMap())
-			{
-				if(	it.first != Request::PARAMETER_FUNCTION &&
-					it.first != Request::PARAMETER_SERVICE
-				){
-					_aditionnalParameters.insert(it.first, it.second);
-				}
-			}
-
 			_name = map.get<string>(PARAMETER_NAME);
 			_script = map.getDefault<string>(PARAMETER_SCRIPT);
 			_idem = map.getDefault<bool>(PARAMETER_IDEM, false);
@@ -120,7 +111,7 @@ namespace synthese
 				try
 				{
 					StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
-					openRequest.getFunction()->setSavedParameters(_aditionnalParameters);
+					openRequest.getFunction()->setSavedParameters(_savedParameters);
 					openRequest.getFunction()->setPage(_page);
 					if(!_page->getRoot()->getClientURL().empty())
 					{

@@ -57,7 +57,6 @@ namespace synthese
 			//@{
 				boost::shared_ptr<const Webpage> _target;
 				std::string _text;
-				server::ParametersMap _otherParameters;
 				bool _useSmartURL;
 				std::string _confirm;
 			//@}
