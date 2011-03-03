@@ -107,7 +107,7 @@ namespace synthese
 
 			shared_ptr<const TransportWebsite> site(
 				dynamic_pointer_cast<const TransportWebsite, const Website>(
-					CMSModule::GetSite(request)
+					CMSModule::GetSite(request, _savedParameters)
 			)	);
 			if(!site.get())
 			{

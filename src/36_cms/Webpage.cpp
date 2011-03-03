@@ -516,9 +516,10 @@ namespace synthese
 			}
 			else if(name == "site")
 			{
-				if(CMSModule::GetSite(request))
+				boost::shared_ptr<const Website> site(CMSModule::GetSite(request, aditionalParametersMap));
+				if(site.get())
 				{
-					stream << CMSModule::GetSite(request)->getKey();
+					stream << site->getKey();
 				}
 			}
 			else
