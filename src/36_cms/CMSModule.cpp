@@ -67,8 +67,15 @@ namespace synthese
 
 
 		boost::shared_ptr<const Website> CMSModule::GetSite(
-			const server::Request& request
+			const server::Request& request,
+			const ParametersMap& pm
 		){
+			RegistryKeyType id(pm.getDefault<RegistryKeyType>(FunctionWithSiteBase::PARAMETER_SITE, 0));
+			if(id)
+			{
+				return Fetcher<Website>::Fetch(id, Env::GetOfficialEnv());
+			}
+
 			{
 				shared_ptr<const WebPageDisplayFunction> function(
 					dynamic_pointer_cast<const WebPageDisplayFunction>(
