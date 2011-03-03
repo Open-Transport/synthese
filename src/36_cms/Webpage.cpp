@@ -558,7 +558,7 @@ namespace synthese
 			}
 			pm.merge(aditionalParametersMap);
 
-			Webpage* page(CMSModule::GetSite(request)->getPageBySmartURL(pageName));
+			Webpage* page(CMSModule::GetSite(request, aditionalParametersMap)->getPageBySmartURL(pageName));
 			if(page)
 			{
 				page->display(stream, request, pm);
