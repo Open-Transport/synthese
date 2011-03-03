@@ -63,6 +63,7 @@ namespace synthese
 		const string GetCompositionsService::DATA_NUMBER("number");
 		const string GetCompositionsService::DATA_NAME("name");
 		const string GetCompositionsService::DATA_PICTURE("picture");
+		const string GetCompositionsService::DATA_SEATS("seats");
 
 		ParametersMap GetCompositionsService::_getParametersMap() const
 		{
@@ -272,6 +273,8 @@ namespace synthese
 
 			// Picture
 			pm.insert(DATA_PICTURE, vehicle.getPicture());
+
+			pm.insert(DATA_SEATS, vehicle.getSeats().size());
 
 			// Name
 			pm.insert(DATA_NAME, vehicle.getName());
