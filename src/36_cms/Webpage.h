@@ -114,6 +114,8 @@ namespace synthese
 			class Node
 			{
 			public:
+				static const std::string PARAMETER_TRANSMIT_PARAMETERS;
+
 				virtual void display(
 					std::ostream& stream,
 					const server::Request& request,

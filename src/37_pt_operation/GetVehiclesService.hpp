@@ -63,6 +63,7 @@ namespace synthese
 			static const std::string DATA_NAME;
 			static const std::string DATA_NUMBER;
 			static const std::string DATA_RANK;
+			static const std::string DATA_SEATS;
 			
 		protected:
 			//! \name Page parameters

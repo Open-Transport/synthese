@@ -43,6 +43,8 @@ namespace synthese
 
 	namespace cms
 	{
+		const string Webpage::Node::PARAMETER_TRANSMIT_PARAMETERS("tp");
+
 		Webpage::Webpage( util::RegistryKeyType id  ):
 			Registrable(id),
 			_startDate(posix_time::not_a_date_time),
@@ -451,6 +453,10 @@ namespace synthese
 				}
 				pm.insert(param.first, s.str());
 				callParametersMap.insert(param.first, s.str());
+			}
+			if(callParametersMap.isDefined(PARAMETER_TRANSMIT_PARAMETERS))
+			{
+				callParametersMap.merge(pm);
 			}
 
 			// Function

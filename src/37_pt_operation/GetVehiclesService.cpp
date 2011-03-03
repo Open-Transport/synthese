@@ -50,6 +50,7 @@ namespace synthese
 		const string GetVehiclesService::DATA_NUMBER("number");
 		const string GetVehiclesService::DATA_PICTURE("picture");
 		const string GetVehiclesService::DATA_RANK("rank");
+		const string GetVehiclesService::DATA_SEATS("seats");
 
 
 		ParametersMap GetVehiclesService::_getParametersMap() const
@@ -117,12 +118,15 @@ namespace synthese
 					}
 				}
 
-				_displayVehicle(
-					stream,
-					request,
-					*vehicle.second,
-					rank++
-				);
+				if(_vehiclePage.get())
+				{
+					_displayVehicle(
+						stream,
+						request,
+						*vehicle.second,
+						rank++
+					);
+				}
 			}
 		}
 		
@@ -155,6 +159,7 @@ namespace synthese
 			pm.insert(DATA_NAME, vehicle.getName());
 			pm.insert(DATA_NUMBER, vehicle.getNumber());
 			pm.insert(DATA_PICTURE, vehicle.getPicture());
+			pm.insert(DATA_SEATS, vehicle.getSeats().size());
 			pm.insert(DATA_RANK, rank);
 			pm.insert(Request::PARAMETER_OBJECT_ID, vehicle.getKey());
 

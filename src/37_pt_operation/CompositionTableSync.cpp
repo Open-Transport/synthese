@@ -127,22 +127,25 @@ namespace synthese
 				vector<string> vehicleLinksTexts;
 				Composition::VehicleLinks vehicleLinks;
 				string text(rows->getText(CompositionTableSync::COL_VEHICLES));
-				split(vehicleLinksTexts, text, is_any_of(","));
-				BOOST_FOREACH(const string& vehicleLink, vehicleLinksTexts)
+				if(!text.empty())
 				{
-					vector<string> values;
-					split(values, vehicleLink, is_any_of("|"));
+					split(vehicleLinksTexts, text, is_any_of(","));
+					BOOST_FOREACH(const string& vehicleLink, vehicleLinksTexts)
+					{
+						vector<string> values;
+						split(values, vehicleLink, is_any_of("|"));
 
-					Composition::VehicleLinks::value_type value;
-					try
-					{
-						value.vehicle = VehicleTableSync::GetEditable(lexical_cast<RegistryKeyType>(values[0]), env, linkLevel).get();
-						value.number = values[1];
-						vehicleLinks.push_back(value);
-					}
-					catch(ObjectNotFoundException<Vehicle>& e)
-					{
-						Log::GetInstance().warn("No such vehicle "+ values[0] +" in Composition "+ lexical_cast<string>(object->getKey()));
+						Composition::VehicleLinks::value_type value;
+						try
+						{
+							value.vehicle = VehicleTableSync::GetEditable(lexical_cast<RegistryKeyType>(values[0]), env, linkLevel).get();
+							value.number = values[1];
+							vehicleLinks.push_back(value);
+						}
+						catch(ObjectNotFoundException<Vehicle>& e)
+						{
+							Log::GetInstance().warn("No such vehicle "+ values[0] +" in Composition "+ lexical_cast<string>(object->getKey()));
+						}
 					}
 				}
 				object->setVehicles(vehicleLinks);
@@ -160,12 +163,15 @@ namespace synthese
 				{
 					vector<string> verticesString;
 					string text(rows->getText(CompositionTableSync::COL_SERVED_VERTICES));
-					split(verticesString, text, is_any_of(","));
-					BOOST_FOREACH(const string& vertexString, verticesString)
+					if(!text.empty())
 					{
-						vertices.push_back(
-							StopPointTableSync::GetEditable(lexical_cast<RegistryKeyType>(vertexString), env, linkLevel).get()
-						);
+						split(verticesString, text, is_any_of(","));
+						BOOST_FOREACH(const string& vertexString, verticesString)
+						{
+							vertices.push_back(
+								StopPointTableSync::GetEditable(lexical_cast<RegistryKeyType>(vertexString), env, linkLevel).get()
+							);
+						}
 					}
 				}
 				object->setServedVertices(vertices);
