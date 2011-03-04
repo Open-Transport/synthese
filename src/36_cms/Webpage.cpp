@@ -463,7 +463,7 @@ namespace synthese
 			shared_ptr<Function> function(functionCreator->create());
 			try
 			{
-				function->setSavedParameters(pm);
+				function->setSavedParameters(callParametersMap);
 				function->_setFromParametersMap(callParametersMap);
 				if (function->isAuthorized(request.getSession()))
 				{
