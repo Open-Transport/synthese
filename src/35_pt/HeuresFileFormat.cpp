@@ -40,6 +40,20 @@
 #include "DataSourceAdmin.h"
 #include "ImportableTableSync.hpp"
 #include "PTFileFormat.hpp"
+#include "PropertiesHTMLTable.h"
+#include "DataSourceAdmin.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
+#include "StopPointTableSync.hpp"
+#include "PTPlaceAdmin.h"
+#include "StopArea.hpp"
+#include "DataSource.h"
+#include "ImpExModule.h"
+#include "Importer.hpp"
+#include "AdminActionFunctionRequest.hpp"
+#include "HTMLModule.h"
+#include "HTMLForm.h"
+#include "DBModule.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -52,8 +66,6 @@ using namespace boost::filesystem;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
 using namespace boost::algorithm;
-
-
 
 namespace synthese
 {
@@ -68,8 +80,6 @@ namespace synthese
 	using namespace calendar;
 	using namespace server;
 	using namespace html;
-	
-	
 
 	namespace util
 	{
@@ -78,16 +88,20 @@ namespace synthese
 
 	namespace pt
 	{
-		const std::string HeuresFileFormat::Importer_::FILE_ITINERAI("1itinerai"); 
-		const std::string HeuresFileFormat::Importer_::FILE_TRONCONS("2troncons");
-		const std::string HeuresFileFormat::Importer_::FILE_SERVICES("3services");
-		const std::string HeuresFileFormat::Importer_::PARAMETER_END_DATE("ed"); 
-		const std::string HeuresFileFormat::Importer_::PARAMETER_START_DATE("sd");
+		const std::string HeuresFileFormat::Importer_::FILE_POINTSARRETS("pointsarrets"); 
+		const std::string HeuresFileFormat::Importer_::FILE_ITINERAI("itinerai"); 
+		const std::string HeuresFileFormat::Importer_::FILE_TRONCONS("troncons");
+		const std::string HeuresFileFormat::Importer_::FILE_SERVICES("services");
+
+		const std::string HeuresFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops"); 
+		const std::string HeuresFileFormat::Importer_::PARAMETER_END_DATE("end_date"); 
+		const std::string HeuresFileFormat::Importer_::PARAMETER_START_DATE("start_date");
 	}
 
 	namespace impex
 	{
 		template<> const MultipleFileTypesImporter<HeuresFileFormat>::Files MultipleFileTypesImporter<HeuresFileFormat>::FILES(
+			HeuresFileFormat::Importer_::FILE_POINTSARRETS.c_str(),
 			HeuresFileFormat::Importer_::FILE_ITINERAI.c_str(),
 			HeuresFileFormat::Importer_::FILE_TRONCONS.c_str(),
 			HeuresFileFormat::Importer_::FILE_SERVICES.c_str(),
@@ -104,11 +118,13 @@ namespace synthese
 			if(it == _pathsMap.end() || it->second.empty()) return false;
 			it = _pathsMap.find(FILE_SERVICES);
 			if(it == _pathsMap.end() || it->second.empty()) return false;
+			it = _pathsMap.find(FILE_POINTSARRETS);
+			if(it == _pathsMap.end() || it->second.empty()) return false;
 			return true;
 		}
 
-		
-		
+
+
 		SQLiteTransaction HeuresFileFormat::Importer_::_save() const
 		{
 			SQLiteTransaction transaction;
@@ -138,9 +154,9 @@ namespace synthese
 
 		bool HeuresFileFormat::Importer_::_parse(
 			const path& filePath,
-			std::ostream& os,
+			std::ostream& stream,
 			const std::string& key,
-			boost::optional<const admin::AdminRequest&> adminRequest
+			boost::optional<const admin::AdminRequest&> request
 		) const {
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
@@ -150,8 +166,64 @@ namespace synthese
 			}
 
 
-			// 1 : Routes
-			if(key == FILE_ITINERAI)
+			if(key == FILE_POINTSARRETS)
+			{
+				string line;
+
+				PTFileFormat::ImportableStopPoints linkedStopPoints;
+				PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
+				ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(_dataSource, _env);
+
+				while(getline(inFile, line))
+				{
+					if(!_dataSource.getCharset().empty())
+					{
+						line = ImpExModule::ConvertChar(line, _dataSource.getCharset(), "UTF-8");
+					}
+
+					string id(boost::algorithm::trim_copy(line.substr(0, 4)));
+					string name(boost::algorithm::trim_copy(line.substr(5, 50)));
+
+					PTFileFormat::ImportableStopPoint isp;
+					isp.operatorCode = id;
+					isp.name = name;
+					isp.linkedStopPoints = stopPoints.get(id);
+
+					if(isp.linkedStopPoints.empty())
+					{
+						nonLinkedStopPoints.push_back(isp);
+					}
+					else if(_displayLinkedStops)
+					{
+						linkedStopPoints.push_back(isp);
+					}
+				}
+				inFile.close();
+
+				PTFileFormat::DisplayStopPointImportScreen(
+					nonLinkedStopPoints,
+					*request,
+					_env,
+					_dataSource,
+					stream
+				);
+				if(_displayLinkedStops)
+				{
+					PTFileFormat::DisplayStopPointImportScreen(
+						linkedStopPoints,
+						*request,
+						_env,
+						_dataSource,
+						stream
+					);
+				}
+
+				if(!nonLinkedStopPoints.empty())
+				{
+					return false;
+				}
+			}
+			if(key == FILE_ITINERAI) // 1 : Routes
 			{
 				// Load of the stops
 				ImportableTableSync::ObjectBySource<StopPointTableSync> stops(_dataSource, _env);
@@ -179,16 +251,16 @@ namespace synthese
 					int commercialLineNumber(lexical_cast<int>(trim_copy(line.substr(0, 4))));
 					if(!lines.contains(lexical_cast<string>(commercialLineNumber)))
 					{
-						os << "WARN : commercial line with key " << commercialLineNumber << "not found<br />";
+						stream << "WARN : commercial line with key " << commercialLineNumber << "not found<br />";
 						continue;
 					}
 					if(lines.get(lexical_cast<string>(commercialLineNumber)).size() > 1)
 					{
-						os << "WARN : more than one commercial line with key " << commercialLineNumber << "<br />";
+						stream << "WARN : more than one commercial line with key " << commercialLineNumber << "<br />";
 					}
 					cline = *lines.get(lexical_cast<string>(commercialLineNumber)).begin();
 
-					os << "LOAD : use of existing commercial line" << cline->getKey() << " (" << cline->getName() << ")<br />";
+					stream << "LOAD : use of existing commercial line" << cline->getKey() << " (" << cline->getName() << ")<br />";
 
 					// Load of existing routes
 					JourneyPatternTableSync::SearchResult sroutes(
@@ -225,7 +297,7 @@ namespace synthese
 					{
 						if(line.length() < i+10)
 						{
-							os << "WARN : inconsistent line size " << line << "<br />";
+							stream << "WARN : inconsistent line size " << line << "<br />";
 							ignoreRoute = true;
 							break;
 						}
@@ -245,7 +317,7 @@ namespace synthese
 
 						if(!stops.contains(stopNumber))
 						{
-							os << "WARN : stop " << stopNumber << " not found<br />";
+							stream << "WARN : stop " << stopNumber << " not found<br />";
 							ignoreRoute = true;
 						}
 
@@ -279,7 +351,7 @@ namespace synthese
 							servedStops,
 							_dataSource,
 							_env,
-							os
+							stream
 					)	);
 
 					_routes.insert(
@@ -309,7 +381,7 @@ namespace synthese
 						RoutesMap::iterator it(_routes.find(make_pair(lineNumber, routeNumber)));
 						if(it == _routes.end())
 						{
-							os << "WARN : route not found in service file " << lineNumber << "/" << routeNumber << "<br />";
+							stream << "WARN : route not found in service file " << lineNumber << "/" << routeNumber << "<br />";
 							for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 							continue;
 						}
@@ -321,7 +393,7 @@ namespace synthese
 						{
 							if(itS->first.first != route)
 							{
-								os << "WARN : inconsistent route in service file " << serviceNumber << "/" << lineNumber << "/" << routeNumber << "<br />";
+								stream << "WARN : inconsistent route in service file " << serviceNumber << "/" << lineNumber << "/" << routeNumber << "<br />";
 								for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 								continue;
 							}
@@ -385,7 +457,7 @@ namespace synthese
 							it.first.second,
 							_dataSource,
 							_env,
-							os
+							stream
 					)	);
 
 					_services.insert(
@@ -429,7 +501,7 @@ namespace synthese
 						)	);
 						if(itS == _services.end())
 						{
-							os << "WARN : inconsistent service number " << line << "<br />";
+							stream << "WARN : inconsistent service number " << line << "<br />";
 							continue;
 						}
 
@@ -455,14 +527,36 @@ namespace synthese
 			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
 			PropertiesHTMLTable t(importRequest.getHTMLForm());
 			stream << t.open();
-			stream << t.title("Propriétés");
+			stream << t.title("Mode");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.cell("Date début", t.getForm().getCalendarInput(PARAMETER_START_DATE, _startDate));
-			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _endDate));
 			stream << t.title("Données");
-			stream << t.cell("Itinerai", t.getForm().getTextInput(_getFileParameterName(FILE_ITINERAI), _pathsMap[FILE_ITINERAI].file_string()));
+			stream << t.cell("Arrêts", t.getForm().getTextInput(_getFileParameterName(FILE_POINTSARRETS), _pathsMap[FILE_POINTSARRETS].file_string()));
+			stream << t.cell("Itineraires", t.getForm().getTextInput(_getFileParameterName(FILE_ITINERAI), _pathsMap[FILE_ITINERAI].file_string()));
 			stream << t.cell("Troncons", t.getForm().getTextInput(_getFileParameterName(FILE_TRONCONS), _pathsMap[FILE_TRONCONS].file_string()));
 			stream << t.cell("Services", t.getForm().getTextInput(_getFileParameterName(FILE_SERVICES), _pathsMap[FILE_SERVICES].file_string()));
+			stream << t.title("Paramètres");
+			stream << t.cell("Affichage arrêts liés", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
+			stream << t.cell("Date début", t.getForm().getCalendarInput(PARAMETER_START_DATE, _startDate));
+			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _endDate));
 			stream << t.close();
+		}
+
+
+		server::ParametersMap HeuresFileFormat::Importer_::_getParametersMap() const
+		{
+			ParametersMap map;
+			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
+			map.insert(PARAMETER_START_DATE, _startDate);
+			map.insert(PARAMETER_END_DATE, _endDate);
+			return map;
+		}
+
+
+
+		void HeuresFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
+		{
+			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
+			_startDate = from_string(map.get<string>(PARAMETER_START_DATE));
+			_endDate = from_string(map.get<string>(PARAMETER_END_DATE));
 		}
 }	}

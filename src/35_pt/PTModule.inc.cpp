@@ -21,7 +21,6 @@
 #include "PladisStopsFileFormat.hpp"
 #include "HeuresStopsFileFormat.hpp"
 #include "HeuresFileFormat.hpp"
-#include "GTFSStopsFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
 
 #include "PTUseRuleTableSync.h"

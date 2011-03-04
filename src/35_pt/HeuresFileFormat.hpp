@@ -74,17 +74,20 @@ namespace synthese
 			{
 
 			public:
+				static const std::string FILE_POINTSARRETS;
 				static const std::string FILE_ITINERAI;
 				static const std::string FILE_TRONCONS;
 				static const std::string FILE_SERVICES;
 
 				static const std::string PARAMETER_START_DATE;
 				static const std::string PARAMETER_END_DATE;
+				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
 
 			private:
 				
 				boost::gregorian::date _startDate;
 				boost::gregorian::date _endDate;
+				bool _displayLinkedStops;
 				
 				typedef std::map<std::pair<int, std::string>, pt::JourneyPattern*> RoutesMap;
 				mutable RoutesMap _routes;
@@ -124,6 +127,26 @@ namespace synthese
 				) const;
 
 				virtual db::SQLiteTransaction _save() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from attributes to generic parameter maps.
+				/// @return Generated parameters map
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.2.1
+				virtual server::ParametersMap _getParametersMap() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from generic parameters map to attributes.
+				/// @param map Parameters map to interpret
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.2.1
+				virtual void _setFromParametersMap(const server::ParametersMap& map);
 			};
 
 			typedef impex::NoExportPolicy<HeuresFileFormat> Exporter_;

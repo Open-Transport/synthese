@@ -76,10 +76,9 @@ namespace synthese
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByDepartureTime = true,
 				bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_ContinuousServiceTableSync_H__

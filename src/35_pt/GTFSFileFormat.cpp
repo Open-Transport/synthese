@@ -31,6 +31,30 @@
 #include "PropertiesHTMLTable.h"
 #include "DataSourceAdmin.h"
 #include "AdminFunctionRequest.hpp"
+#include "PropertiesHTMLTable.h"
+#include "DataSourceAdmin.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminActionFunctionRequest.hpp"
+#include "StopAreaTableSync.hpp"
+#include "StopPointTableSync.hpp"
+#include "PTPlaceAdmin.h"
+#include "StopPointAdmin.hpp"
+#include "StopAreaAddAction.h"
+#include "StopArea.hpp"
+#include "DataSource.h"
+#include "ImpExModule.h"
+#include "Importer.hpp"
+#include "StopPointMoveAction.hpp"
+#include "AdminActionFunctionRequest.hpp"
+#include "HTMLModule.h"
+#include "HTMLForm.h"
+#include "DBModule.h"
+#include "GTFSFileFormat.hpp"
+#include "City.h"
+#include "PTFileFormat.hpp"
+#include "CityTableSync.h"
+#include "Junction.hpp"
+#include "JunctionTableSync.hpp"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
@@ -52,8 +76,8 @@ namespace synthese
 	using namespace graph;
 	using namespace html;
 	using namespace admin;
-	
-	
+	using namespace server;
+	using namespace geography;
 	
 	namespace util
 	{
@@ -62,6 +86,8 @@ namespace synthese
 	
 	namespace pt
 	{
+		const std::string GTFSFileFormat::Importer_::FILE_STOPS("stops");
+		const std::string GTFSFileFormat::Importer_::FILE_TRANSFERS("transfers");
 		const std::string GTFSFileFormat::Importer_::FILE_AGENCY("agency");
 		const std::string GTFSFileFormat::Importer_::FILE_ROUTES("routes");
 		const std::string GTFSFileFormat::Importer_::FILE_CALENDAR("calendar");
@@ -73,11 +99,18 @@ namespace synthese
 		const std::string GTFSFileFormat::Importer_::FILE_SHAPES("shapes");
 		const std::string GTFSFileFormat::Importer_::FILE_FREQUENCIES("frequencies");
 		const std::string GTFSFileFormat::Importer_::SEP(",");
+
+		const std::string GTFSFileFormat::Importer_::PARAMETER_IMPORT_STOP_AREA("isa");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
+		const std::string GTFSFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
 	}
 
 	namespace impex
 	{
 		template<> const MultipleFileTypesImporter<GTFSFileFormat>::Files MultipleFileTypesImporter<GTFSFileFormat>::FILES(
+			GTFSFileFormat::Importer_::FILE_STOPS.c_str(),
+			GTFSFileFormat::Importer_::FILE_TRANSFERS.c_str(),
 			GTFSFileFormat::Importer_::FILE_AGENCY.c_str(),
 			GTFSFileFormat::Importer_::FILE_ROUTES.c_str(),
 			GTFSFileFormat::Importer_::FILE_CALENDAR.c_str(),
@@ -98,6 +131,8 @@ namespace synthese
 		{
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_AGENCY));
 			if(it == _pathsMap.end() || it->second.empty()) return false;
+			it = _pathsMap.find(FILE_STOPS);
+			if(it == _pathsMap.end() || it->second.empty()) return false;
 			it = _pathsMap.find(FILE_ROUTES);
 			if(it == _pathsMap.end() || it->second.empty()) return false;
 			it = _pathsMap.find(FILE_TRIPS);
@@ -115,6 +150,9 @@ namespace synthese
 			util::Env& env,
 			const impex::DataSource& dataSource
 		):	MultipleFileTypesImporter<GTFSFileFormat>(env, dataSource),
+			_importStopArea(false),
+			_interactive(false),
+			_displayLinkedStops(false),
 			_networks(_dataSource, _env),
 			_stopPoints(_dataSource, _env),
 			_lines(_dataSource, _env)
@@ -124,9 +162,9 @@ namespace synthese
 
 		bool GTFSFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
-			std::ostream& os,
+			std::ostream& stream,
 			const std::string& key,
-			boost::optional<const admin::AdminRequest&> adminRequest
+			boost::optional<const admin::AdminRequest&> request
 		) const {
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
@@ -142,7 +180,197 @@ namespace synthese
 			_loadFieldsMap(line);
 
 			// 1 : Routes
-			if(key == FILE_AGENCY)
+			// Stops
+			if(key == FILE_STOPS)
+			{
+				ImportableTableSync::ObjectBySource<StopAreaTableSync> stopAreas(_dataSource, _env);
+
+				// 2.1 : stop areas
+				if(_importStopArea)
+				{
+					PTFileFormat::ImportableStopAreas linkedStopAreas;
+					PTFileFormat::ImportableStopAreas nonLinkedStopAreas;
+
+					// Loop
+					while(getline(inFile, line))
+					{
+						_loadLine(line);
+						if(_getValue("location_type") != "1")
+						{
+							continue;
+						}
+
+						string id(_getValue("stop_id"));
+						string name(_getValue("stop_name"));
+
+						if(request)
+						{
+							PTFileFormat::ImportableStopArea isa;
+							isa.operatorCode = id;
+							isa.name = name;
+							isa.linkedStopAreas = stopAreas.get(id);
+
+							if(isa.linkedStopAreas.empty())
+							{
+								nonLinkedStopAreas.push_back(isa);
+							}
+							else if(_displayLinkedStops)
+							{
+								linkedStopAreas.push_back(isa);
+							}
+						}
+						else
+						{
+							PTFileFormat::CreateOrUpdateStopAreas(
+								stopAreas,
+								id,
+								name,
+								*_defaultCity,
+								_stopAreaDefaultTransferDuration,
+								_dataSource,
+								_env,
+								stream
+							);
+						}
+					}
+
+					if(request)
+					{
+						PTFileFormat::DisplayStopAreaImportScreen(
+							nonLinkedStopAreas,
+							*request,
+							true,
+							false,
+							_defaultCity,
+							_env,
+							_dataSource,
+							stream
+						);
+						if(_displayLinkedStops)
+						{
+							PTFileFormat::DisplayStopAreaImportScreen(
+								linkedStopAreas,
+								*request,
+								true,
+								false,
+								_defaultCity,
+								_env,
+								_dataSource,
+								stream
+								);
+						}
+					}
+				}
+
+				// 2.2 : stops
+				PTFileFormat::ImportableStopPoints linkedStopPoints;
+				PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
+
+				// Loop
+				inFile.clear();
+				inFile.seekg(0, ios::beg);
+				getline(inFile, line);
+				while(getline(inFile, line))
+				{
+					_loadLine(line);
+					if(_getValue("location_type") != "0")
+					{
+						continue;
+					}
+
+					string id(_getValue("stop_id"));
+					string name(_getValue("stop_name"));
+
+					// Stop area
+					string stopAreaId(_getValue("parent_station"));
+					const StopArea* stopArea(NULL);
+					if(stopAreas.contains(stopAreaId))
+					{
+						stopArea = *stopAreas.get(stopAreaId).begin();
+					}
+					else if(_stopPoints.contains(id))
+					{
+						stopArea = (*_stopPoints.get(id).begin())->getConnectionPlace();
+					}
+					else
+					{
+						stream << "WARN : inconsistent stop area id "<< stopAreaId <<" in the stop point "<< id <<"<br />";
+						continue;
+					}
+
+					// Point
+					shared_ptr<geos::geom::Point> point(
+						CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
+							lexical_cast<double>(_getValue("stop_lon")),
+							lexical_cast<double>(_getValue("stop_lat"))
+					)	);
+					if(point->isEmpty())
+					{
+						point.reset();
+					}
+
+					if(request)
+					{
+						PTFileFormat::ImportableStopPoint isp;
+						isp.operatorCode = id;
+						isp.name = name;
+						isp.linkedStopPoints = _stopPoints.get(id);
+						isp.stopArea = stopArea;
+						isp.coords = point;
+
+						if(isp.linkedStopPoints.empty())
+						{
+							nonLinkedStopPoints.push_back(isp);
+						}
+						else if(_displayLinkedStops)
+						{
+							linkedStopPoints.push_back(isp);
+						}
+					}
+					else
+					{
+						// Creation or update
+						PTFileFormat::CreateOrUpdateStopPoints(
+							_stopPoints,
+							id,
+							name,
+							stopArea,
+							point.get(),
+							NULL,
+							optional<time_duration>(),
+							_dataSource,
+							_env,
+							stream
+						);
+					}
+				}
+
+				if(request)
+				{
+					PTFileFormat::DisplayStopPointImportScreen(
+						nonLinkedStopPoints,
+						*request,
+						_env,
+						_dataSource,
+						stream
+					);
+					if(_displayLinkedStops)
+					{
+						PTFileFormat::DisplayStopPointImportScreen(
+							linkedStopPoints,
+							*request,
+							_env,
+							_dataSource,
+							stream
+						);
+					}
+				}
+			}
+			else if(key == FILE_TRANSFERS)
+			{
+				//TODO
+			}
+			else if(key == FILE_AGENCY)
 			{
 				while(getline(inFile, line))
 				{
@@ -154,7 +382,7 @@ namespace synthese
 						_getValue("agency_name"),
 						_dataSource,
 						_env,
-						os
+						stream
 					);
 				}
 			}
@@ -179,7 +407,7 @@ namespace synthese
 					}
 					else
 					{
-						os << "WARN : inconsistent network id "<< networkId <<" in the line "<< id <<"<br />";
+						stream << "WARN : inconsistent network id "<< networkId <<" in the line "<< id <<"<br />";
 						continue;
 					}
 
@@ -192,7 +420,7 @@ namespace synthese
 						*network,
 						_dataSource,
 						_env,
-						os
+						stream
 					);
 				}
 			}
@@ -281,7 +509,7 @@ namespace synthese
 					string lineCode(_getValue("route_id"));
 					if(!_lines.contains(lineCode))
 					{
-						os << "WARN : inconsistent line id "<< lineCode <<" in the trip "<< id <<"<br />";
+						stream << "WARN : inconsistent line id "<< lineCode <<" in the trip "<< id <<"<br />";
 						continue;
 					}
 					trip.line = *_lines.get(lineCode).begin();
@@ -291,7 +519,7 @@ namespace synthese
 					Calendars::const_iterator it(_calendars.find(calendarCode));
 					if(it == _calendars.end())
 					{
-						os << "WARN : inconsistent service id "<< calendarCode <<" in the trip "<< id <<"<br />";
+						stream << "WARN : inconsistent service id "<< calendarCode <<" in the trip "<< id <<"<br />";
 						continue;
 					}
 					trip.calendar = it->second;
@@ -321,7 +549,7 @@ namespace synthese
 						TripsMap::const_iterator it(_trips.find(tripCode));
 						if(it == _trips.end())
 						{
-							os << "WARN : inconsistent trip id "<< tripCode <<" in the trip stops file<br />";
+							stream << "WARN : inconsistent trip id "<< tripCode <<" in the trip stops file<br />";
 							continue;
 						}
 						Trip trip(it->second);
@@ -350,7 +578,7 @@ namespace synthese
 								stops,
 								_dataSource,
 								_env,
-								os
+								stream
 						)	);
 
 						// Service
@@ -373,7 +601,7 @@ namespace synthese
 								tripCode,
 								_dataSource,
 								_env,
-								os
+								stream
 						)	);
 						*service |= trip.calendar;
 						
@@ -383,17 +611,26 @@ namespace synthese
 					TripDetail tripDetail;
 					tripDetail.offsetFromLast = lexical_cast<Edge::MetricOffset>(_getValue("shape_dist_traveled"));
 					tripDetail.arrivalTime = duration_from_string(_getValue("arrival_time"));
+					if(tripDetail.arrivalTime.seconds())
+					{
+						tripDetail.arrivalTime += seconds(60 - tripDetail.arrivalTime.seconds());
+					}
 					tripDetail.departureTime = duration_from_string(_getValue("departure_time"));
+					if(tripDetail.departureTime.seconds())
+					{
+						tripDetail.departureTime -= seconds(tripDetail.departureTime.seconds());
+					}
 
 					string stopCode(_getValue("stop_id"));
 					if(!_stopPoints.contains(stopCode))
 					{
-						os << "WARN : inconsistent stop id "<< stopCode <<" in the trip "<< tripCode <<"<br />";
+						stream << "WARN : inconsistent stop id "<< stopCode <<" in the trip "<< tripCode <<"<br />";
 						continue;
 					}
 					tripDetail.stop = _stopPoints.get(stopCode);
 					
 					tripDetailVector.push_back(tripDetail);
+					lastTripCode = tripCode;
 				}
 			}
 			else if(key == FILE_FARE_ATTRIBUTES)
@@ -426,9 +663,11 @@ namespace synthese
 			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
 			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
 			stream << t.open();
-			stream << t.title("Propriétés");
+			stream << t.title("Mode");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
 			stream << t.title("Fichiers");
+			stream << t.cell("Fichier stops", t.getForm().getTextInput(_getFileParameterName(FILE_STOPS), _pathsMap[FILE_STOPS].file_string()));
+			stream << t.cell("Fichier transfers (optionnel)", t.getForm().getTextInput(_getFileParameterName(FILE_TRANSFERS), _pathsMap[FILE_TRANSFERS].file_string()));
 			stream << t.cell("Fichier réseaux", t.getForm().getTextInput(_getFileParameterName(FILE_AGENCY), _pathsMap[FILE_AGENCY].file_string()));
 			stream << t.cell("Fichier routes", t.getForm().getTextInput(_getFileParameterName(FILE_ROUTES), _pathsMap[FILE_ROUTES].file_string()));
 			stream << t.cell("Fichier calendriers", t.getForm().getTextInput(_getFileParameterName(FILE_CALENDAR), _pathsMap[FILE_CALENDAR].file_string()));
@@ -439,6 +678,11 @@ namespace synthese
 			stream << t.cell("Fichier règles tarification", t.getForm().getTextInput(_getFileParameterName(FILE_FARE_RULES), _pathsMap[FILE_FARE_RULES].file_string()));
 			stream << t.cell("Fichier géométries", t.getForm().getTextInput(_getFileParameterName(FILE_SHAPES), _pathsMap[FILE_SHAPES].file_string()));
 			stream << t.cell("Fichier services continus", t.getForm().getTextInput(_getFileParameterName(FILE_FREQUENCIES), _pathsMap[FILE_FREQUENCIES].file_string()));
+			stream << t.title("Paramètres");
+			stream << t.cell("Affichage arrêts liés", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
+			stream << t.cell("Import zones d'arrêt", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOP_AREA, _importStopArea));
+			stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
+			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
 			stream << t.close();
 		}
 
@@ -449,6 +693,21 @@ namespace synthese
 			SQLiteTransaction transaction;
 
 			// Saving of each created or altered objects
+			if(_importStopArea)
+			{
+				BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
+				{
+					StopAreaTableSync::Save(cstop.second.get(), transaction);
+				}
+			}
+			BOOST_FOREACH(Registry<StopPoint>::value_type stop, _env.getRegistry<StopPoint>())
+			{
+				StopPointTableSync::Save(stop.second.get(), transaction);
+			}
+			BOOST_FOREACH(const Registry<Junction>::value_type& junction, _env.getRegistry<Junction>())
+			{
+				JunctionTableSync::Save(junction.second.get(), transaction);
+			}
 			BOOST_FOREACH(Registry<TransportNetwork>::value_type network, _env.getRegistry<TransportNetwork>())
 			{
 				TransportNetworkTableSync::Save(network.second.get(), transaction);
@@ -501,5 +760,37 @@ namespace synthese
 			_line.clear();
 			string utfLine(ImpExModule::ConvertChar(line, _dataSource.getCharset(), "UTF-8"));
 			split(_line, utfLine, is_any_of(SEP));
+		}
+
+
+
+		server::ParametersMap GTFSFileFormat::Importer_::_getParametersMap() const
+		{
+			ParametersMap map;
+			map.insert(PARAMETER_IMPORT_STOP_AREA, _importStopArea);
+			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
+			if(_defaultCity.get())
+			{
+				map.insert(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity->getKey());
+			}
+			if(!_stopAreaDefaultTransferDuration.is_not_a_date_time())
+			{
+				map.insert(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, _stopAreaDefaultTransferDuration.total_seconds() / 60);
+			}
+			return map;
+		}
+
+
+
+		void GTFSFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
+		{
+			_importStopArea = map.getDefault<bool>(PARAMETER_IMPORT_STOP_AREA, false);
+			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
+			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
+
+			if(map.getDefault<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY, 0))
+			{
+				_defaultCity = CityTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY), _env);
+			}
 		}
 }	}

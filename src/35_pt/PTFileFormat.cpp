@@ -31,6 +31,8 @@
 #include "TransportNetworkTableSync.h"
 #include "StopPointTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
+#include "ContinuousServiceTableSync.h"
+#include "LineStopTableSync.h"
 #include "PTPlaceAdmin.h"
 #include "StopAreaAddAction.h"
 #include "AdminActionFunctionRequest.hpp"
@@ -356,6 +358,14 @@ namespace synthese
 				}
 				line = *loadedLines.begin();
 
+				JourneyPatternTableSync::Search(env, line->getKey());
+				ScheduledServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
+				ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
+				BOOST_FOREACH(const Path* route, line->getPaths())
+				{
+					LineStopTableSync::Search(env, route->getKey());
+				}
+
 				logStream << "LOAD : use of existing commercial line" << line->getKey() << " (" << line->getName() << ")<br />";
 			}
 			else
@@ -421,6 +431,7 @@ namespace synthese
 					JourneyPatternTableSync::getId()
 				);
 				result->setCommercialLine(&line);
+				line.addPath(result);
 				Importable::DataSourceLinks links;
 				if(id)
 				{

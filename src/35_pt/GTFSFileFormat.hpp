@@ -72,6 +72,8 @@ namespace synthese
 				public impex::MultipleFileTypesImporter<GTFSFileFormat>
 			{
 			public:
+				static const std::string FILE_STOPS;
+				static const std::string FILE_TRANSFERS;
 				static const std::string FILE_AGENCY;
 				static const std::string FILE_ROUTES;
 				static const std::string FILE_CALENDAR;
@@ -85,9 +87,19 @@ namespace synthese
 
 				static const std::string PARAMETER_START_DATE;
 				static const std::string PARAMETER_END_DATE;
+				static const std::string PARAMETER_IMPORT_STOP_AREA;
+				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
+				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
+				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
 
 			private:
 				static const std::string SEP;
+
+				bool _importStopArea;
+				bool _interactive;
+				bool _displayLinkedStops;
+				boost::shared_ptr<const geography::City> _defaultCity;
+				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 
 				typedef std::map<std::string, std::size_t> FieldsMap;
 				mutable FieldsMap _fieldsMap;
@@ -159,6 +171,28 @@ namespace synthese
 					std::ostream& os,
 					const admin::AdminRequest& request
 				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from attributes to generic parameter maps.
+				/// @return Generated parameters map
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.2.1
+				virtual server::ParametersMap _getParametersMap() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from generic parameters map to attributes.
+				/// @param map Parameters map to interpret
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.2.1
+				virtual void _setFromParametersMap(const server::ParametersMap& map);
+
+
 
 				virtual db::SQLiteTransaction _save() const;
 			};
