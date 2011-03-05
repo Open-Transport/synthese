@@ -263,16 +263,22 @@ namespace synthese
 						continue;
 					}
 
+					// Route number
+					string routeNumber(trim_copy(line.substr(7,2)));
+					int technicalLineNumber(lexical_cast<int>(trim_copy(line.substr(4, 3))));
+
 					// Route type
 					int routeType(lexical_cast<int>(line.substr(9,1)));
 					if(routeType != 0 && routeType != 1)
 					{
+						_technicalRoutes.insert(
+							make_pair(technicalLineNumber, routeNumber)
+						);
 						continue;
 					}
-					
+
 					// Commercial line number
 					int commercialLineNumber(lexical_cast<int>(trim_copy(line.substr(0, 4))));
-					int technicalLineNumber(lexical_cast<int>(trim_copy(line.substr(4, 3))));
 
 					cline = PTFileFormat::CreateOrUpdateLine(
 						lines,
@@ -333,9 +339,6 @@ namespace synthese
 						continue;
 					}
 
-					// Route number
-					string routeNumber(trim_copy(line.substr(7,2)));
-					
 					// Route identification
 					JourneyPattern* route(
 						PTFileFormat::CreateOrUpdateRoute(
@@ -386,7 +389,10 @@ namespace synthese
 						RoutesMap::iterator it(_routes.find(make_pair(lineNumber, routeNumber)));
 						if(it == _routes.end())
 						{
-							stream << "WARN : route not found in service file " << lineNumber << "/" << routeNumber << "<br />";
+							if(_technicalRoutes.find(make_pair(lineNumber, routeNumber)) == _technicalRoutes.end())
+							{
+								stream << "WARN : route not found in service file " << lineNumber << "/" << routeNumber << "<br />";
+							}
 							for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 							continue;
 						}
