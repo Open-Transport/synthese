@@ -54,6 +54,8 @@
 #include "HTMLModule.h"
 #include "HTMLForm.h"
 #include "DBModule.h"
+#include "TransportNetworkTableSync.h"
+#include "RollingStockTableSync.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -96,6 +98,7 @@ namespace synthese
 		const std::string HeuresFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops"); 
 		const std::string HeuresFileFormat::Importer_::PARAMETER_END_DATE("end_date"); 
 		const std::string HeuresFileFormat::Importer_::PARAMETER_START_DATE("start_date");
+		const std::string HeuresFileFormat::Importer_::PARAMETER_NETWORK_ID("network_id");
 	}
 
 	namespace impex
@@ -128,9 +131,13 @@ namespace synthese
 		SQLiteTransaction HeuresFileFormat::Importer_::_save() const
 		{
 			SQLiteTransaction transaction;
-			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env.getRegistry<JourneyPattern>())
+			BOOST_FOREACH(Registry<CommercialLine>::value_type line, _env.getRegistry<CommercialLine>())
 			{
-				JourneyPatternTableSync::Save(line.second.get(), transaction);
+				CommercialLineTableSync::Save(line.second.get(), transaction);
+			}
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type route, _env.getRegistry<JourneyPattern>())
+			{
+				JourneyPatternTableSync::Save(route.second.get(), transaction);
 			}
 			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getRegistry<LineStop>())
 			{
@@ -220,11 +227,27 @@ namespace synthese
 
 				if(!nonLinkedStopPoints.empty())
 				{
+					stream << "ERR  : At least a stop could not be linked.<br/>";
 					return false;
 				}
 			}
 			if(key == FILE_ITINERAI) // 1 : Routes
 			{
+				if(!_network.get())
+				{
+					stream << "ERR  : The transport network was not specified.<br/>";
+					return false;
+				}
+
+				// Bus
+				RollingStockTableSync::SearchResult rollingstock(RollingStockTableSync::Search(_env, string("Bus")));
+				if(rollingstock.empty())
+				{
+					stream << "ERR  : The bus transport mode is not registered in the table 49.<br />";
+					return false;
+				}
+				RollingStock* bus(rollingstock.front().get());
+
 				// Load of the stops
 				ImportableTableSync::ObjectBySource<StopPointTableSync> stops(_dataSource, _env);
 				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
@@ -241,59 +264,33 @@ namespace synthese
 					}
 
 					// Route type
-					int routeType(lexical_cast<int>(line.substr(7,1)));
-					if(routeType != 0 || routeType != 1)
+					int routeType(lexical_cast<int>(line.substr(9,1)));
+					if(routeType != 0 && routeType != 1)
 					{
 						continue;
 					}
 					
 					// Commercial line number
 					int commercialLineNumber(lexical_cast<int>(trim_copy(line.substr(0, 4))));
-					if(!lines.contains(lexical_cast<string>(commercialLineNumber)))
-					{
-						stream << "WARN : commercial line with key " << commercialLineNumber << "not found<br />";
-						continue;
-					}
-					if(lines.get(lexical_cast<string>(commercialLineNumber)).size() > 1)
-					{
-						stream << "WARN : more than one commercial line with key " << commercialLineNumber << "<br />";
-					}
-					cline = *lines.get(lexical_cast<string>(commercialLineNumber)).begin();
+					int technicalLineNumber(lexical_cast<int>(trim_copy(line.substr(4, 3))));
 
-					stream << "LOAD : use of existing commercial line" << cline->getKey() << " (" << cline->getName() << ")<br />";
-
-					// Load of existing routes
-					JourneyPatternTableSync::SearchResult sroutes(
-						JourneyPatternTableSync::Search(_env, cline->getKey())
+					cline = PTFileFormat::CreateOrUpdateLine(
+						lines,
+						lexical_cast<string>(commercialLineNumber),
+						string(),
+						lexical_cast<string>(commercialLineNumber),
+						optional<RGBColor>(),
+						*_network,
+						_dataSource,
+						_env,
+						stream
 					);
-					BOOST_FOREACH(shared_ptr<JourneyPattern> sroute, sroutes)
-					{
-						LineStopTableSync::Search(
-							_env,
-							sroute->getKey(),
-							optional<RegistryKeyType>(),
-							0,
-							optional<size_t>(),
-							true, true,
-							UP_LINKS_LOAD_LEVEL
-						);
-						ScheduledServiceTableSync::Search(
-							_env,
-							sroute->getKey(),
-							optional<RegistryKeyType>(),
-							optional<RegistryKeyType>(),
-							optional<string>(),
-							false,
-							0, optional<size_t>(), true, true,
-							UP_LINKS_LOAD_LEVEL
-						);
-					}
-				
+
 					// Stops
 					JourneyPattern::StopsWithDepartureArrivalAuthorization servedStops;
 					Edge::MetricOffset distance(0);
 					bool ignoreRoute(false);
-					for(size_t i(11); i<line.size(); i += 10)
+					for(size_t i(10); i<line.size(); i += 10)
 					{
 						if(line.length() < i+10)
 						{
@@ -337,7 +334,7 @@ namespace synthese
 					}
 
 					// Route number
-					string routeNumber(trim_copy(line.substr(6,2)));
+					string routeNumber(trim_copy(line.substr(7,2)));
 					
 					// Route identification
 					JourneyPattern* route(
@@ -347,7 +344,7 @@ namespace synthese
 							optional<const string&>(),
 							optional<const string&>(),
 							true,
-							Env::GetOfficialEnv().getEditable<RollingStock>(13792273858822585).get(),
+							bus,
 							servedStops,
 							_dataSource,
 							_env,
@@ -356,7 +353,7 @@ namespace synthese
 
 					_routes.insert(
 						make_pair(
-							make_pair(commercialLineNumber, routeNumber),
+							make_pair(technicalLineNumber, routeNumber),
 							route
 					)	);
 				}
@@ -366,18 +363,26 @@ namespace synthese
 				string line;
 				typedef map<
 					pair<JourneyPattern*, string>, // string is service number
-					pair<ScheduledService::Schedules, ScheduledService::Schedules> // departure / arrival schedules
+					pair<
+						pair<ScheduledService::Schedules, ScheduledService::Schedules>, // departure / arrival schedules
+						vector<pair<int, int> > // technical line, elementary service number
+					>
 				> SchedulesMap;
 				SchedulesMap services;
-				vector<shared_ptr<ScheduledService> > createdServices;
-
+				
 				// Reading of the file
 				while(getline(inFile, line))
 				{
+					int lineNumber(lexical_cast<int>(trim_copy(line.substr(0,3))));
+					pair<int, int> lineKey(
+						make_pair(
+							lineNumber,
+							lexical_cast<int>(trim_copy(line.substr(3,3)))
+					)	);
+					
 					for(size_t i(29); i<line.size(); ++i)
 					{
 						string routeNumber(trim_copy(line.substr(i,2)));
-						int lineNumber(lexical_cast<int>(trim_copy(line.substr(i+2,4))));
 						RoutesMap::iterator it(_routes.find(make_pair(lineNumber, routeNumber)));
 						if(it == _routes.end())
 						{
@@ -408,10 +413,13 @@ namespace synthese
 							size_t schedulesNumber(route->getScheduledStopsNumber());
 							for(size_t s(0); s<schedulesNumber; ++s)
 							{
-								itS->second.first.push_back(time_duration(not_a_date_time));
-								itS->second.second.push_back(time_duration(not_a_date_time));
+								itS->second.first.first.push_back(time_duration(not_a_date_time));
+								itS->second.first.second.push_back(time_duration(not_a_date_time));
 							}
 						}
+
+						// Register the line key
+						itS->second.second.push_back(lineKey);
 
 						// Read the available schedules
 						size_t rank(0);
@@ -422,7 +430,7 @@ namespace synthese
 
 							if(departureSchedule != "9999")
 							{
-								itS->second.first[rank] = time_duration(
+								itS->second.first.first[rank] = time_duration(
 									lexical_cast<int>(departureSchedule.substr(0,2)), 
 									lexical_cast<int>(departureSchedule.substr(2,2)),
 									0
@@ -430,7 +438,7 @@ namespace synthese
 							}
 							if(arrivalSchedule != "9999")
 							{
-								itS->second.second[rank] = time_duration(
+								itS->second.first.second[rank] = time_duration(
 									lexical_cast<int>(arrivalSchedule.substr(0,2)),
 									lexical_cast<int>(arrivalSchedule.substr(2,2)),
 									0
@@ -442,41 +450,38 @@ namespace synthese
 				// Storage as ScheduledService
 				BOOST_FOREACH(const SchedulesMap::value_type& it, services)
 				{
-					typedef map<
-						pair<JourneyPattern*, string>, // string is service number
-						pair<ScheduledService::Schedules, ScheduledService::Schedules> // departure / arrival schedules
-					> SchedulesMap;
-
 					JourneyPattern* route(it.first.first);
 
 					ScheduledService* service(
 						PTFileFormat::CreateOrUpdateService(
 							*route,
-							it.second.first,
-							it.second.second,
+							it.second.first.first,
+							it.second.first.second,
 							it.first.second,
 							_dataSource,
 							_env,
 							stream
 					)	);
 
-					_services.insert(
-						make_pair(
-							make_pair(
-								lexical_cast<int>(route->getCodeBySource(_dataSource)),
-								service->getServiceNumber()
-							),
-							service
-					)	);
+					BOOST_FOREACH(const SchedulesMap::mapped_type::second_type::value_type& itKey, it.second.second)
+					{
+						_services[itKey].push_back(service);
+					}
 				}
 			} // 3 : Services
 			else if (key == FILE_SERVICES)
 			{
+				if(_startDate.is_not_a_date() || _endDate.is_not_a_date())
+				{
+					stream << "ERR  : Start date or end date not defined<br />";
+					return false;
+				}
+
 				string line;
 				while(getline(inFile, line))
 				{
 					// Read of calendar
-					vector<bool> days;
+					vector<bool> days(7, false);
 					for(size_t i(0); i<7; ++i)
 					{
 						days[i] = (line[i==0 ? 12 : i+5] == '1');
@@ -494,20 +499,21 @@ namespace synthese
 					for(size_t i(13); i<line.size(); i+=29)
 					{
 						int lineNumber(lexical_cast<int>(trim_copy(line.substr(i,3))));
-						string serviceNumber(trim_copy(line.substr(i+3,3)));
+						int serviceNumber(lexical_cast<int>(trim_copy(line.substr(i+3,3))));
 
 						ServicesMap::iterator itS(_services.find(
-							make_pair(lineNumber, serviceNumber)
+								make_pair(lineNumber, serviceNumber)
 						)	);
 						if(itS == _services.end())
 						{
-							stream << "WARN : inconsistent service number " << line << "<br />";
+							stream << "WARN : inconsistent service number " << lineNumber << "/" << serviceNumber << " in " << line << "<br />";
 							continue;
 						}
 
-						ScheduledService* service(itS->second);
-
-						service->copyDates(cal);
+						BOOST_FOREACH(ScheduledService* service, itS->second)
+						{
+							*service |= cal;
+						}
 					}
 				}
 			}
@@ -529,15 +535,16 @@ namespace synthese
 			stream << t.open();
 			stream << t.title("Mode");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.title("Données");
-			stream << t.cell("Arrêts", t.getForm().getTextInput(_getFileParameterName(FILE_POINTSARRETS), _pathsMap[FILE_POINTSARRETS].file_string()));
+			stream << t.title("DonnÃ©es");
+			stream << t.cell("ArrÃªts", t.getForm().getTextInput(_getFileParameterName(FILE_POINTSARRETS), _pathsMap[FILE_POINTSARRETS].file_string()));
 			stream << t.cell("Itineraires", t.getForm().getTextInput(_getFileParameterName(FILE_ITINERAI), _pathsMap[FILE_ITINERAI].file_string()));
 			stream << t.cell("Troncons", t.getForm().getTextInput(_getFileParameterName(FILE_TRONCONS), _pathsMap[FILE_TRONCONS].file_string()));
 			stream << t.cell("Services", t.getForm().getTextInput(_getFileParameterName(FILE_SERVICES), _pathsMap[FILE_SERVICES].file_string()));
-			stream << t.title("Paramètres");
-			stream << t.cell("Affichage arrêts liés", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
-			stream << t.cell("Date début", t.getForm().getCalendarInput(PARAMETER_START_DATE, _startDate));
+			stream << t.title("ParamÃ¨tres");
+			stream << t.cell("Affichage arrÃªts liÃ©s", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
+			stream << t.cell("Date dÃ©but", t.getForm().getCalendarInput(PARAMETER_START_DATE, _startDate));
 			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _endDate));
+			stream << t.cell("RÃ©seau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 			stream << t.close();
 		}
 
@@ -546,8 +553,18 @@ namespace synthese
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
-			map.insert(PARAMETER_START_DATE, _startDate);
-			map.insert(PARAMETER_END_DATE, _endDate);
+			if(!_startDate.is_not_a_date())
+			{
+				map.insert(PARAMETER_START_DATE, _startDate);
+			}
+			if(!_startDate.is_not_a_date())
+			{
+				map.insert(PARAMETER_END_DATE, _endDate);
+			}
+			if(_network.get())
+			{
+				map.insert(PARAMETER_NETWORK_ID, _network->getKey());
+			}
 			return map;
 		}
 
@@ -556,7 +573,17 @@ namespace synthese
 		void HeuresFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
 		{
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
-			_startDate = from_string(map.get<string>(PARAMETER_START_DATE));
-			_endDate = from_string(map.get<string>(PARAMETER_END_DATE));
+			if(!map.getDefault<string>(PARAMETER_START_DATE).empty())
+			{
+				_startDate = from_string(map.get<string>(PARAMETER_START_DATE));
+			}
+			if(!map.getDefault<string>(PARAMETER_END_DATE).empty())
+			{
+				_endDate = from_string(map.get<string>(PARAMETER_END_DATE));
+			}
+			if(map.getOptional<RegistryKeyType>(PARAMETER_NETWORK_ID))
+			{
+				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
+			}
 		}
 }	}

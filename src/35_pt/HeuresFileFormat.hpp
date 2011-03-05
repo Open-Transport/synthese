@@ -51,6 +51,7 @@ namespace synthese
 		class JourneyPattern;
 		class CommercialLine;
 		class ScheduledService;
+		class TransportNetwork;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Heures file format.
@@ -82,17 +83,21 @@ namespace synthese
 				static const std::string PARAMETER_START_DATE;
 				static const std::string PARAMETER_END_DATE;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
+				static const std::string PARAMETER_NETWORK_ID;
 
 			private:
 				
 				boost::gregorian::date _startDate;
 				boost::gregorian::date _endDate;
 				bool _displayLinkedStops;
+				boost::shared_ptr<const TransportNetwork> _network;
 				
 				typedef std::map<std::pair<int, std::string>, pt::JourneyPattern*> RoutesMap;
 				mutable RoutesMap _routes;
+				typedef std::set<std::pair<int, std::string> > IgnoredRoutes;
+				mutable IgnoredRoutes _technicalRoutes;
 
-				typedef std::map<std::pair<int, std::string>, ScheduledService*> ServicesMap;
+				typedef std::map<std::pair<int, int>, std::vector<ScheduledService*> > ServicesMap;
 				mutable ServicesMap _services;
 
 			protected:

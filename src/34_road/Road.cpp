@@ -52,7 +52,9 @@ namespace synthese
 			_type (type)
 		{
 			// Creation of the permanent service
-			addService(new PermanentService(id, this), false);
+			PermanentService* service(new PermanentService(id, this));
+			addService(service, false);
+			service->setPath(this);
 		}
 
 

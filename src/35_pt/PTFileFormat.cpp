@@ -358,12 +358,15 @@ namespace synthese
 				}
 				line = *loadedLines.begin();
 
-				JourneyPatternTableSync::Search(env, line->getKey());
-				ScheduledServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
-				ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
-				BOOST_FOREACH(const Path* route, line->getPaths())
+				if(line->getPaths().empty())
 				{
-					LineStopTableSync::Search(env, route->getKey());
+					JourneyPatternTableSync::Search(env, line->getKey());
+					ScheduledServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
+					ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
+					BOOST_FOREACH(const Path* route, line->getPaths())
+					{
+						LineStopTableSync::Search(env, route->getKey());
+					}
 				}
 
 				logStream << "LOAD : use of existing commercial line" << line->getKey() << " (" << line->getName() << ")<br />";
@@ -382,8 +385,14 @@ namespace synthese
 				lines.add(*line);
 			}
 
-			line->setName(name);
-			line->setShortName(shortName);
+			if(!name.empty())
+			{
+				line->setName(name);
+			}
+			if(!shortName.empty())
+			{
+				line->setShortName(shortName);
+			}
 
 			return line;
 		}
@@ -509,8 +518,7 @@ namespace synthese
 				if(!curService) continue;
 
 				if(	curService->getServiceNumber() == number &&
-					curService->getDepartureSchedules(false) == departureSchedules &&
-					curService->getArrivalSchedules(false) == arrivalSchedules
+					curService->comparePlannedSchedules(departureSchedules, arrivalSchedules)
 				){
 					result = curService;
 					break;
@@ -527,6 +535,7 @@ namespace synthese
 				);
 				result->setSchedules(departureSchedules, arrivalSchedules);
 				result->setPathId(route.getKey());
+				result->setPath(&route);
 				route.addService(result, false);
 				env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(result));
 				

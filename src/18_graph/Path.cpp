@@ -101,7 +101,6 @@ namespace synthese
 				);
 			}
 			markScheduleIndexesUpdateNeeded ();
-			service->setPath(this);
 		}
 
 

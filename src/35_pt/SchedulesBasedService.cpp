@@ -132,8 +132,7 @@ namespace synthese
 				}
 			}
 
-			_RTDepartureSchedules = departureSchedules;
-			_RTArrivalSchedules = arrivalSchedules;
+			clearRTData();
 			_computeNextRTUpdate();
 		}
 
@@ -289,15 +288,15 @@ namespace synthese
 			const std::string value,
 			boost::posix_time::time_duration shiftArrivals
 		){
-		    typedef tokenizer<char_separator<char> > tokenizer;
+			typedef tokenizer<char_separator<char> > tokenizer;
 
-		    // Parse all schedules arrival#departure,arrival#departure...
-		    tokenizer schedulesTokens (value, char_separator<char>(","));
-		    
-		    Schedules departureSchedules;
-		    Schedules arrivalSchedules;
-		    
-		    for(tokenizer::iterator schedulesIter = schedulesTokens.begin();
+			// Parse all schedules arrival#departure,arrival#departure...
+			tokenizer schedulesTokens (value, char_separator<char>(","));
+		
+			Schedules departureSchedules;
+			Schedules arrivalSchedules;
+		
+			for(tokenizer::iterator schedulesIter = schedulesTokens.begin();
 				schedulesIter != schedulesTokens.end ();
 				++schedulesIter
 			){
@@ -327,7 +326,7 @@ namespace synthese
 				
 				departureSchedules.push_back (departureSchedule);
 				arrivalSchedules.push_back (arrivalSchedule);
-		    }
+			}
 
 			if(	departureSchedules.size () <= 0 ||
 				arrivalSchedules.size () <= 0 ||
@@ -336,8 +335,10 @@ namespace synthese
 				throw BadSchedulesException();
 			}
 
-			_departureSchedules = departureSchedules;
-			_arrivalSchedules = arrivalSchedules;
+			setSchedules(
+				departureSchedules,
+				arrivalSchedules
+			);
 		}
 
 
@@ -356,9 +357,10 @@ namespace synthese
 				departureSchedules.push_back(i+1 == other._departureSchedules.size() ? minutes(0) : (other._departureSchedules[i].is_not_a_date_time() ? not_a_date_time : (other._departureSchedules[i] + shift)));
 				arrivalSchedules.push_back(i==0 ? minutes(0) : (other._arrivalSchedules[i].is_not_a_date_time() ? not_a_date_time : (other._arrivalSchedules[i] + shift)));
 			}
-			_departureSchedules = departureSchedules;
-			_arrivalSchedules = arrivalSchedules;
-			clearRTData();
+			setSchedules(
+				departureSchedules,
+				arrivalSchedules
+			);
 		}
 
 
@@ -377,8 +379,35 @@ namespace synthese
 				firstSchedule += minutes(1);
 			}
 
-			_departureSchedules = departureSchedules;
-			_arrivalSchedules = arrivalSchedules;
-			clearRTData();
+			setSchedules(
+				departureSchedules,
+				arrivalSchedules
+			);
+		}
+
+
+
+		bool SchedulesBasedService::comparePlannedSchedules( const Schedules& departure, const Schedules& arrival ) const
+		{
+			size_t i(0);
+			Schedules::const_iterator itd(departure.begin());
+			Schedules::const_iterator ita(arrival.begin());
+			BOOST_FOREACH(const Edge* edge, _path->getEdges())
+			{
+				if(!static_cast<const LineStop*>(edge)->getScheduleInput())
+				{
+					++i;
+					continue;
+				}
+				if(	_departureSchedules[i] != *itd ||
+					_arrivalSchedules[i] != *ita
+				){
+					return false;
+				}
+				++i;
+				++itd;
+				++ita;
+			}
+			return true;
 		}
 }	}

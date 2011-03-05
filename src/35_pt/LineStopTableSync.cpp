@@ -79,6 +79,7 @@ namespace synthese
 			SQLiteTableSync::Field(LineStopTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
 			SQLiteTableSync::Field(LineStopTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
 			SQLiteTableSync::Field(LineStopTableSync::COL_METRICOFFSET, SQL_DOUBLE),
+			SQLiteTableSync::Field(LineStopTableSync::COL_SCHEDULEINPUT, SQL_BOOLEAN),
 			SQLiteTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
 			SQLiteTableSync::Field()
 		};
@@ -106,7 +107,7 @@ namespace synthese
 			bool isArrival (rows->getBool (LineStopTableSync::COL_ISARRIVAL));
 			double metricOffset (rows->getDouble (LineStopTableSync::COL_METRICOFFSET));
 			
-		    // Geometry
+			// Geometry
 			string viaPointsStr(rows->getText(TABLE_COL_GEOMETRY));
 			if(viaPointsStr.empty())
 			{
@@ -126,8 +127,14 @@ namespace synthese
 			ls->setLine(NULL);
 			ls->setPhysicalStop(NULL);
 			
-			if (rows->getColumnIndex (LineStopTableSync::COL_SCHEDULEINPUT) != UNKNOWN_VALUE)
+			if (rows->getColumnIndex(LineStopTableSync::COL_SCHEDULEINPUT) != UNKNOWN_VALUE)
+			{
 				ls->setScheduleInput(rows->getBool(LineStopTableSync::COL_SCHEDULEINPUT));
+			}
+			else
+			{
+				ls->setScheduleInput(true);
+			}
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -216,6 +223,7 @@ namespace synthese
 			query.addField(object->isDepartureAllowed());
 			query.addField(object->isArrivalAllowed());
 			query.addField(object->getMetricOffset());
+			query.addField(object->getScheduleInput());
 			query.addField(static_pointer_cast<Geometry,LineString>(object->getGeometry()));
 			query.execute(transaction);
 		}
@@ -290,5 +298,4 @@ namespace synthese
 
 			transaction.run();
 		}
-	}
-}
+}	}

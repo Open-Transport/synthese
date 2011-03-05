@@ -19,7 +19,6 @@
 #include "TridentFileFormat.h"
 #include "CarPostalFileFormat.hpp"
 #include "PladisStopsFileFormat.hpp"
-#include "HeuresStopsFileFormat.hpp"
 #include "HeuresFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
 

@@ -1,5 +1,4 @@
 
-
 /** JourneyPatternCopy class implementation.
 	@file JourneyPatternCopy.cpp
 
@@ -26,6 +25,7 @@
 #include "Edge.h"
 #include "LineStop.h"
 #include "PathGroup.h"
+#include "Service.h"
 
 using namespace std;
 
@@ -81,6 +81,7 @@ namespace synthese
 				return false;
 
 			Path::addService(service, false);
+			service->setPath(this);
 			
 			return true;
 		}

@@ -124,6 +124,8 @@ namespace synthese
 
 				void setSchedulesFromOther(const SchedulesBasedService& other, boost::posix_time::time_duration shift);
 				void generateIncrementalSchedules(boost::posix_time::time_duration firstSchedule);
+
+				bool comparePlannedSchedules(const Schedules& departure, const Schedules& arrival) const;
 			//@}
 
 

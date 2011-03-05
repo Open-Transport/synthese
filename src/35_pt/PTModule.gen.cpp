@@ -30,7 +30,6 @@ synthese::pt::PTModule::integrate();
 synthese::pt::TridentFileFormat::integrate ();
 synthese::pt::CarPostalFileFormat::integrate();
 synthese::pt::PladisStopsFileFormat::integrate();
-synthese::pt::HeuresStopsFileFormat::integrate();
 synthese::pt::HeuresFileFormat::integrate();
 synthese::pt::GTFSFileFormat::integrate();
 

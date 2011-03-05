@@ -105,6 +105,7 @@ namespace synthese
 				duration
 			)	);
 			addService(service, false);
+			service->setPath(this);
 
 
 			// Generation of back

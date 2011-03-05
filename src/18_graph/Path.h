@@ -271,7 +271,7 @@ namespace synthese
 					
 					@todo Update dates of the path
 				*/
-				virtual void addService (Service* service, bool ensureLineTheory);
+				virtual void addService(Service* service, bool ensureLineTheory);
 
 
 
