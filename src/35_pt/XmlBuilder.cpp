@@ -28,6 +28,7 @@
 #include "StopArea.hpp"
 #include "Conversion.h"
 #include "XmlToolkit.h"
+#include "DesignatedLinePhysicalStop.hpp"
 
 using namespace synthese::util::XmlToolkit;
 using namespace boost;
@@ -140,7 +141,7 @@ namespace synthese
 
 
 
-		shared_ptr<LineStop> 
+		shared_ptr<DesignatedLinePhysicalStop> 
 		XmlBuilder::CreateLineStop (XMLNode& node, 
 						Registry<JourneyPattern>& lines,
 						const Registry<StopPoint>& physicalStops)
@@ -158,8 +159,8 @@ namespace synthese
 		   
 			shared_ptr<JourneyPattern> line = lines.getEditable (lineId);
 
-			shared_ptr<LineStop> lineStop (
-			new LineStop (
+			shared_ptr<DesignatedLinePhysicalStop> lineStop (
+			new DesignatedLinePhysicalStop(
 				id,
 				line.get(), 
 				rankInPath, 

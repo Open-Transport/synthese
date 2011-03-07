@@ -141,6 +141,53 @@ namespace synthese
 
 
 
+			static boost::shared_ptr<typename ObjectClass::Registry::ObjectsClass> LoadFromRow(
+				const SQLiteResultSPtr& rows,
+				util::Env& env,
+				util::LinkLevel linkLevel
+			){
+				typename ObjectClass::Registry& registry(env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>());
+				util::RegistryKeyType key(rows->getKey());
+				try
+				{
+					if(registry.contains(key))
+					{
+						return registry.getEditable(key);
+					}
+					else
+					{
+						boost::shared_ptr<ObjectClass> object(new ObjectClass(key));
+						registry.add(
+							boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
+						);
+						Load(object.get(), rows, env, linkLevel);
+						return boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass,ObjectClass>(object);
+				}	}
+				catch(std::exception& e)
+				{
+					if(registry.contains(key))
+					{
+						registry.remove(key);
+					}
+					util::Log::GetInstance().warn("Skipped object in results load.", e);
+					return boost::shared_ptr<typename ObjectClass::Registry::ObjectsClass>();
+				}
+			}
+
+
+
+			virtual boost::shared_ptr<typename ParentTableSyncClass::ObjectType> _loadFromRow(
+				const SQLiteResultSPtr& rows,
+				util::Env& env,
+				util::LinkLevel linkLevel
+			) const {
+				return boost::static_pointer_cast<typename ParentTableSyncClass::ObjectType, typename ObjectClass::Registry::ObjectsClass>(
+					LoadFromRow(rows, env, linkLevel)
+				);
+			}
+
+
+
 			/** Load objects into an environment, from a SQL query.
 				@param query SQL query
 				@param env Environment to populate
@@ -153,36 +200,20 @@ namespace synthese
 				util::LinkLevel linkLevel
 			){
 				SearchResult r;
-				typename ObjectClass::Registry& registry(env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>());
 				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query);
 				while (rows->next ())
 				{
-					util::RegistryKeyType key(rows->getKey());
-					try
+					boost::shared_ptr<typename ObjectClass::Registry::ObjectsClass> o(
+						LoadFromRow(
+							rows,
+							env,
+							linkLevel
+					)	);
+					if(o.get())
 					{
-						if(registry.contains(key))
-						{
-							r.push_back(registry.getEditable(key));
-						}
-						else
-						{
-							boost::shared_ptr<ObjectClass> object(new ObjectClass(key));
-							registry.add(
-								boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
-							);
-							Load(object.get(), rows, env, linkLevel);
-							r.push_back(
-								boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass,ObjectClass>(object)
-							);
-					}	}
-					catch(std::exception& e)
-					{
-						if(registry.contains(key))
-						{
-							registry.remove(key);
-						}
-						util::Log::GetInstance().warn("Skipped object in results load of " + query, e);
-				}	}
+						r.push_back(o);
+					}
+				}
 				return r;
 			}
 

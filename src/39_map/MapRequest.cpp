@@ -216,7 +216,7 @@ namespace synthese
 			for (int i=0; i<nbLineStops; ++i) 
 			{
 				XMLNode lineStopNode = GetChildNode (lineStopsNode, "lineStop", i);
-				_temporaryEnvironment.getEditableRegistry<LineStop>().add (synthese::pt::XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.getEditableRegistry<JourneyPattern>(), _temporaryEnvironment.getEditableRegistry<StopPoint>()));
+				_temporaryEnvironment.getEditableRegistry<DesignatedLinePhysicalStop>().add (synthese::pt::XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.getEditableRegistry<JourneyPattern>(), _temporaryEnvironment.getEditableRegistry<StopPoint>()));
 			}
 		}
 

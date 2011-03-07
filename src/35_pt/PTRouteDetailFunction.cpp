@@ -202,7 +202,7 @@ namespace synthese
 				if(_stopPage.get())
 				{
 					stringstream s;
-					BOOST_FOREACH(const Edge* edge,_journeyPattern->getEdges())
+					BOOST_FOREACH(const Edge* edge, _journeyPattern->getAllEdges())
 					{
 						if(	(!edge->isDepartureAllowed() || !_displayDepartureStops) &&
 							(!edge->isArrivalAllowed() || !_displayArrivalStops)
@@ -265,7 +265,7 @@ namespace synthese
 					"\">";
 			}
 
-			BOOST_FOREACH(const Edge* edge,_journeyPattern->getEdges())
+			BOOST_FOREACH(const Edge* edge, _journeyPattern->getAllEdges())
 			{
 				const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
 

@@ -88,7 +88,7 @@ namespace synthese
 			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
 			{
 				const LineStop& lineStop(static_cast<const LineStop&>(**itEdge));
-				if(lineStop.getScheduleInput())
+				if(	lineStop.getScheduleInput())
 				{
 					// Interpolation of preceding schedules
 					if(atLeastOneUnscheduledEdge)

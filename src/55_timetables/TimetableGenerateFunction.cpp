@@ -34,7 +34,7 @@
 #include "JourneyPattern.hpp"
 #include "CalendarTemplate.h"
 #include "Calendar.h"
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
 #include "StopAreaTableSync.hpp"
@@ -278,10 +278,16 @@ namespace synthese
 					size_t rank(0);
 					BOOST_FOREACH(const Edge* edge, _line->getEdges())
 					{
+						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(edge));
+						if(!lineStop) // This is an area stop
+						{
+							continue;
+						}
+
 						TimetableRow row;
 						row.setIsArrival(edge->isArrival());
 						row.setIsDeparture(edge->isDeparture());
-						row.setPlace(static_cast<const LineStop*>(edge)->getPhysicalStop()->getConnectionPlace());
+						row.setPlace(lineStop->getPhysicalStop()->getConnectionPlace());
 						row.setRank(rank++);
 						timetable->addRow(row);
 					}

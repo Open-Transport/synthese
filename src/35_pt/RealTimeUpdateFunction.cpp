@@ -27,7 +27,7 @@
 #include "TransportNetworkRight.h"
 #include "RealTimeUpdateFunction.h"
 #include "StopArea.hpp"
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "ScheduledService.h"
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "Interface.h"
@@ -198,7 +198,10 @@ namespace synthese
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// Current location
-			PTObjectsCMSExporters::ExportStopArea(pm, *lineStop.getPhysicalStop()->getConnectionPlace(), DATA_LOCATION_);
+			if(dynamic_cast<const LinePhysicalStop*>(&lineStop))
+			{
+				PTObjectsCMSExporters::ExportStopArea(pm, *dynamic_cast<const LinePhysicalStop&>(lineStop).getPhysicalStop()->getConnectionPlace(), DATA_LOCATION_);
+			}
 
 			// Destination
 			PTObjectsCMSExporters::ExportStopArea(pm, *lineStop.getLine()->getDestination()->getConnectionPlace(), DATA_DESTINATION_);

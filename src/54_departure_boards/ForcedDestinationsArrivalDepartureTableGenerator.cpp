@@ -22,7 +22,7 @@
 
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "JourneyPattern.hpp"
 #include "ForcedDestinationsArrivalDepartureTableGenerator.h"
 #include "StandardArrivalDepartureTableGenerator.h"
@@ -77,13 +77,13 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 				{
-					const LineStop* ls = static_cast<const LineStop*>(edge.second);
+					const LinePhysicalStop& ls = static_cast<const LinePhysicalStop&>(*edge.second);
 
 					if (!_allowedLineStop(ls))
 						continue;
 
 					const StopArea* place(
-						ls->getLine()->getDestination()->getConnectionPlace()
+						ls.getLine()->getDestination()->getConnectionPlace()
 					);
 					_forcedDestinations.insert(make_pair(place->getKey(), place));
 				}
@@ -107,10 +107,10 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 				{
-					const LineStop* ls = static_cast<const LineStop*>(edge.second);
+					const LinePhysicalStop& ls = static_cast<const LinePhysicalStop&>(*edge.second);
 
 					// Selection of the line
-					if (!_allowedLineStop(ls) || !ls->getFollowingArrivalForFineSteppingOnly())
+					if (!_allowedLineStop(ls) || !ls.getFollowingArrivalForFineSteppingOnly())
 						continue;
 
 					// Max time for forced destination
@@ -123,7 +123,7 @@ namespace synthese
 					while(true)
 					{
 						// Next service
-						serviceInstance = ls->getNextService(
+						serviceInstance = ls.getNextService(
 							USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
 							minTimeForForcedDestination,
 							maxTimeForForcedDestination,
@@ -147,11 +147,11 @@ namespace synthese
 //					bool insertionIsDone = false;
 
 					// Exploration of the line
-					for(const LineStop* curGLA(
-							static_cast<const LineStop*>(ls->getFollowingArrivalForFineSteppingOnly())
+					for(const LinePhysicalStop* curGLA(
+							static_cast<const LinePhysicalStop*>(ls.getFollowingArrivalForFineSteppingOnly())
 						);
 						curGLA != NULL;
-						curGLA = static_cast<const LineStop*>(curGLA->getFollowingArrivalForFineSteppingOnly())
+						curGLA = static_cast<const LinePhysicalStop*>(curGLA->getFollowingArrivalForFineSteppingOnly())
 					){
 						const StopArea* connectionPlace(
 							curGLA->getPhysicalStop()->getConnectionPlace()
@@ -218,18 +218,13 @@ namespace synthese
 				}
 			}
 
-
 			if (_result.size() > _maxSize)
 			{
-			    ArrivalDepartureList::iterator itr = _result.begin ();
-			    std::advance(itr, _maxSize);
-			    _result.erase (itr, _result.end ());
+				ArrivalDepartureList::iterator itr = _result.begin ();
+				std::advance(itr, _maxSize);
+				_result.erase (itr, _result.end ());
 			}
 
-
 			return _result;
-
 		}
-
-	}
-}
+}	}

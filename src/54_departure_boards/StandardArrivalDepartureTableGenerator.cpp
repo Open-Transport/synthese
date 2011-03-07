@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "StandardArrivalDepartureTableGenerator.h"
@@ -69,9 +69,9 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 				{
-					const LineStop* ls = static_cast<const LineStop*>(edge.second);
+					const LinePhysicalStop& ls = static_cast<const LinePhysicalStop&>(*edge.second);
 
-					if (!_allowedLineStop(ls) || !ls->getFollowingArrivalForFineSteppingOnly())
+					if (!_allowedLineStop(ls) || !ls.getFollowingArrivalForFineSteppingOnly())
 						continue;
 
 					// Loop on services
@@ -81,14 +81,14 @@ namespace synthese
 					while(true)
 					{
 						ServicePointer servicePointer(
-							ls->getNextService(
+							ls.getNextService(
 								USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
 								departureDateTime
 								, _endDateTime
 								, false
 								, index
 						)	);
-						if (!servicePointer.getService())
+						if(	!servicePointer.getService())
 							break;
 						++*index;
 						departureDateTime = servicePointer.getDepartureDateTime();
@@ -97,7 +97,7 @@ namespace synthese
 						_insert(servicePointer);
 						++insertedServices;
 						if(insertedServices >= _maxSize) break;
-					}		
+					}
 				}
 			}
 			return _result;

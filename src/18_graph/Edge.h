@@ -120,10 +120,12 @@ namespace synthese
 
 			std::size_t _rankInPath;		//!< Rank in path.
 
+			Edge* _previous;
 			Edge* _previousConnectionDeparture;			//!< Previous connection departure edge along path.
 			Edge* _previousDepartureForFineSteppingOnly;	//!< Previous departure edge with or without connection
 			Edge* _followingConnectionArrival;			//!< Next connection arrival edge along path.
 			Edge* _followingArrivalForFineSteppingOnly;	//!< Next arrival edge with or without connection
+			Edge* _next;
 
 			mutable DepartureServiceIndices _departureIndex;	//!< First service index by departure hour of day
 			mutable ArrivalServiceIndices _arrivalIndex;		//!< First service index by arrival hour of day
@@ -159,10 +161,12 @@ namespace synthese
 			//@{
 				void setRankInPath(std::size_t value) { _rankInPath = value; }
 				void setParentPath(Path* path) { _parentPath = path; }
+				void setPrevious(Edge* value){ _previous = value; }
 				void setPreviousConnectionDeparture(Edge* previousConnectionDeparture) { _previousConnectionDeparture = previousConnectionDeparture; }
 				void setPreviousDepartureForFineSteppingOnly (Edge* previousDeparture) { _previousDepartureForFineSteppingOnly = previousDeparture; }
 				void setFollowingConnectionArrival(Edge* followingConnectionArrival) {_followingConnectionArrival = followingConnectionArrival; }
 				void setFollowingArrivalForFineSteppingOnly(Edge* followingArrival) { _followingArrivalForFineSteppingOnly = followingArrival; }
+				void setNext(Edge* value){ _next = value; }
 				void setMetricOffset (MetricOffset metricOffset) { _metricOffset = metricOffset; }
 				void setFromVertex(Vertex* value) { _fromVertex = value; }
 			//@}
@@ -180,11 +184,13 @@ namespace synthese
 				*/
 				MetricOffset getMetricOffset () const { return _metricOffset; }
 
+				Edge* getPrevious() const { return _previous; }
 				Edge* getPreviousConnectionDeparture () const { return _previousConnectionDeparture; }
 				Edge* getPreviousDepartureForFineSteppingOnly () const { return _previousDepartureForFineSteppingOnly; }
 				Edge* getFollowingConnectionArrival () const { return _followingConnectionArrival; }
 				Edge* getFollowingArrivalForFineSteppingOnly () const { return _followingArrivalForFineSteppingOnly; }
-			    
+				Edge* getNext() const { return _next; }
+
 				const DepartureServiceIndices& getDepartureIndices() const { return _departureIndex; }
 				const ArrivalServiceIndices& getArrivalIndices() const { return _arrivalIndex; }
 
@@ -196,6 +202,14 @@ namespace synthese
 			//@{
 				virtual bool isDepartureAllowed() const = 0;
 				virtual bool isArrivalAllowed() const = 0;
+
+				typedef std::vector<graph::Edge*> SubEdges;
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Virtual method to get sub-edges to link instead of the edge registered
+				/// in the path (useful for area type vertices).
+				/// Default implementation return the object alone.
+				virtual SubEdges getSubEdges() const;
 				
 				bool isConnectingEdge() const;
 
@@ -242,19 +256,11 @@ namespace synthese
 				/// @since 3.2.0
 				/// @date 2010
 				MetricOffset getEndMetricOffset() const;
-				
 
 
-				//////////////////////////////////////////////////////////////////////////
-				/// Gets the next edge in the path.
-				/// @return the next edge in the path, null if the current edge is the last one.
-				/// @author Hugues Romain
-				/// @date 2010
-				/// @since 3.2.0
-				Edge* getNextEdge() const;
 
 //				int getBestRunTime (const Edge& other ) const;
-			    
+
 				/** Checks consistency of input schedules.
 				@param edgeWithPreviousSchedule Previous edge with schedule
 				@return true if no problem detected, false otherwise

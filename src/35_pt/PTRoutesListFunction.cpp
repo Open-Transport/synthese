@@ -32,7 +32,7 @@
 #include "StopPoint.hpp"
 #include "City.h"
 #include "StopArea.hpp"
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -219,15 +219,21 @@ namespace synthese
 					pm.insert(DATA_LENGTH, route->getLastEdge() ? route->getLastEdge()->getMetricOffset() : double(0)); //2
 					pm.insert(DATA_STOPS_NUMBER, route->getEdges().size()); //3
 					pm.insert(DATA_DIRECTION, route->getDirection()); //4
-					if(dynamic_cast<const LineStop*>(route->getEdge(0)))
 					{
-						pm.insert(DATA_ORIGIN_CITY_NAME, static_cast<const LineStop*>(route->getEdge(0))->getPhysicalStop()->getConnectionPlace()->getCity()->getName()); //5
-						pm.insert(DATA_ORIGIN_STOP_NAME, static_cast<const LineStop*>(route->getEdge(0))->getPhysicalStop()->getConnectionPlace()->getName()); //6
+						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(*route->getAllEdges().begin()));
+						if(lineStop)
+						{
+							pm.insert(DATA_ORIGIN_CITY_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName()); //5
+							pm.insert(DATA_ORIGIN_STOP_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getName()); //6
+						}
 					}
-					if(dynamic_cast<const LineStop*>(route->getLastEdge()))
 					{
-						pm.insert(DATA_DESTINATION_CITY_NAME, static_cast<const LineStop*>(route->getLastEdge())->getPhysicalStop()->getConnectionPlace()->getCity()->getName());
-						pm.insert(DATA_DESTINATION_STOP_NAME, static_cast<const LineStop*>(route->getLastEdge())->getPhysicalStop()->getConnectionPlace()->getName());
+						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(*route->getAllEdges().rbegin()));
+						if(lineStop)
+						{
+							pm.insert(DATA_DESTINATION_CITY_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName());
+							pm.insert(DATA_DESTINATION_STOP_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getName());
+						}
 					}
 					pm.insert(DATA_RANK, rank);
 					pm.insert(DATA_RANK_IS_ODD, rank % 2);
@@ -237,7 +243,7 @@ namespace synthese
 				else // XML
 				{
 					//Ignore auto-generated routes
-					if(route->getKey()==0)
+					if(route->getKey()==0 || route->getEdges().empty())
 						continue;
 
 					stream << "<direction id=\""<< route->getKey() <<

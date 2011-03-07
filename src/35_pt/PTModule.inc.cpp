@@ -35,7 +35,10 @@
 #include "StopAreaTableSync.hpp"
 #include "FareTableSync.h"
 #include "LineStopTableSync.h"
+#include "LineAreaInheritedTableSync.hpp"
+#include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
 #include "JourneyPatternTableSync.hpp"
+#include "DRTAreaTableSync.hpp"
 
 #include "PTQualityControlAdmin.hpp"
 #include "TransportNetworkAdmin.h"
@@ -51,6 +54,8 @@
 #include "PTUseRulesAdmin.h"
 #include "PTUseRuleAdmin.h"
 #include "StopPointAdmin.hpp"
+#include "DRTAreaAdmin.hpp"
+#include "DRTAreasAdmin.hpp"
 
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "LineMarkerInterfacePage.h"
@@ -85,6 +90,8 @@
 #include "JourneyPatternRemoveAction.hpp"
 #include "ProjectAllStopPointsAction.hpp"
 #include "StopAreaTransferAddAction.h"
+#include "DRTAreaUpdateAction.hpp"
+#include "DRTAreaRemoveAction.hpp"
 
 #include "TransportNetworkRight.h"
 
@@ -93,7 +100,8 @@
 // Registries
 
 #include "JourneyPattern.hpp"
-#include "LineStop.h"
+#include "LineArea.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "StopArea.hpp"
 #include "ReservationContact.h"
 #include "CommercialLine.h"
@@ -106,4 +114,4 @@
 #include "ScheduledService.h"
 #include "ContinuousService.h"
 #include "NonConcurrencyRule.h"
-
+#include "DRTArea.hpp"

@@ -21,7 +21,7 @@
 */
 
 #include "PTFileFormat.hpp"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
@@ -77,17 +77,19 @@ namespace synthese
 			size_t rank(0);
 			BOOST_FOREACH(const JourneyPattern::StopsWithDepartureArrivalAuthorization::value_type& stop, stops)
 			{
-				shared_ptr<LineStop> ls(new LineStop);
-				ls->setLine(route.get());
-				ls->setPhysicalStop(*stop._stop.begin());
-				ls->setRankInPath(rank);
-				ls->setIsArrival(rank > 0 && stop._arrival);
-				ls->setIsDeparture(rank+1 < stops.size() && stop._departure);
-				ls->setMetricOffset(stop._metricOffset ? *stop._metricOffset : 0);
-				ls->setKey(LineStopTableSync::getId());
-				ls->setScheduleInput(stop._withTimes);
+				shared_ptr<DesignatedLinePhysicalStop> ls(
+					new DesignatedLinePhysicalStop(
+						LineStopTableSync::getId(),
+						route.get(),
+						rank,
+						rank+1 < stops.size() && stop._departure,
+						rank > 0 && stop._arrival,
+						stop._metricOffset ? *stop._metricOffset : 0,
+						*stop._stop.begin(),
+						stop._withTimes
+				)	);
 				route->addEdge(*ls);
-				env.getEditableRegistry<LineStop>().add(ls);
+				env.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
 
 				++rank;
 			}
@@ -461,17 +463,19 @@ namespace synthese
 				size_t rank(0);
 				BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization stop, servedStops)
 				{
-					shared_ptr<LineStop> ls(new LineStop);
-					ls->setLine(result);
-					ls->setPhysicalStop(*stop._stop.begin());
-					ls->setRankInPath(rank);
-					ls->setIsArrival(rank > 0 && stop._arrival);
-					ls->setIsDeparture(rank+1 < servedStops.size() && stop._departure);
-					ls->setMetricOffset(0);
-					ls->setScheduleInput(stop._withTimes);
-					ls->setKey(LineStopTableSync::getId());
+					shared_ptr<DesignatedLinePhysicalStop> ls(
+						new DesignatedLinePhysicalStop(
+							LineStopTableSync::getId(),
+							result,
+							rank,
+							rank+1 < servedStops.size() && stop._departure,
+							rank > 0 && stop._arrival,
+							0,
+							*stop._stop.begin(),
+							stop._withTimes
+					)	);
 					result->addEdge(*ls);
-					env.getEditableRegistry<LineStop>().add(ls);
+					env.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
 					++rank;
 				}
 			}

@@ -57,10 +57,12 @@ namespace synthese
 			_parentPath (parentPath),
 			_metricOffset(metricOffset),
 			_rankInPath (rankInPath),
+			_previous(NULL),
 			_previousConnectionDeparture(NULL),
 			_previousDepartureForFineSteppingOnly(NULL),
 			_followingConnectionArrival(NULL),
 			_followingArrivalForFineSteppingOnly(NULL),
+			_next(NULL),
 			_departureIndex(INDICES_NUMBER),
 			_arrivalIndex(INDICES_NUMBER),
 			_serviceIndexUpdateNeeded (true)
@@ -366,7 +368,7 @@ namespace synthese
 		}
 
 
-		
+
 		void Edge::markServiceIndexUpdateNeeded(
 			bool RTDataOnly
 		) const {
@@ -375,26 +377,27 @@ namespace synthese
 				_serviceIndexUpdateNeeded = true;
 			}
 			_RTserviceIndexUpdateNeeded = true;
-	    }
+		}
 
 
 
-	    Edge::DepartureServiceIndex::Value Edge::getDepartureFromIndex(
+		Edge::DepartureServiceIndex::Value Edge::getDepartureFromIndex(
 			bool RTData,
 			size_t hour
 		) const {
 			if (_getServiceIndexUpdateNeeded(RTData)) _updateServiceIndex(RTData);
 			return  _departureIndex[hour].get(RTData);
-	    }
+		}
 
 
-	    Edge::ArrivalServiceIndex::Value Edge::getArrivalFromIndex(
+
+		Edge::ArrivalServiceIndex::Value Edge::getArrivalFromIndex(
 			bool RTData,
 			size_t hour
 		) const {
 			if (_getServiceIndexUpdateNeeded(RTData)) _updateServiceIndex(RTData);
 			return _arrivalIndex[hour].get(RTData);
-	    }
+		}
 
 
 
@@ -445,19 +448,16 @@ namespace synthese
 
 		Edge::MetricOffset Edge::getEndMetricOffset() const
 		{
-			Edge* nextEdge(getNextEdge());
+			Edge* nextEdge(getNext());
 			return nextEdge ? nextEdge->getMetricOffset() : getMetricOffset();
 		}
 
 
 
-		Edge* Edge::getNextEdge() const
+		Edge::SubEdges Edge::getSubEdges() const
 		{
-			if(	!_parentPath ||
-				_parentPath->getLastEdge() == this
-			){
-				return NULL;
-			}
-			return const_cast<Edge*>(_parentPath->getEdge(_rankInPath + 1));
+			SubEdges result;
+			result.push_back(const_cast<Edge*>(this));
+			return result;
 		}
 }	}

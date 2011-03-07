@@ -49,7 +49,8 @@
 #include "CommercialLineUpdateAction.h"
 #include "PropertiesHTMLTable.h"
 #include "ReservationContact.h"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "LineArea.hpp"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "PTRuleUserAdmin.hpp"
@@ -61,6 +62,7 @@
 #include "TridentFileFormat.h"
 #include "ExportFunction.hpp"
 #include "ImportableAdmin.hpp"
+#include "DRTArea.hpp"
 
 using namespace std;
 using namespace boost;
@@ -225,10 +227,45 @@ namespace synthese
 					}
 					else
 					{
-						stream << t.col();
-						stream << line->getLineStop(0)->getPhysicalStop()->getConnectionPlace()->getFullName();
-						stream << t.col();
-						stream << line->getLineStop(line->getEdges().size()-1)->getPhysicalStop()->getConnectionPlace()->getFullName();
+						{
+							stream << t.col();
+							const DesignatedLinePhysicalStop* lineStop(
+								dynamic_cast<const DesignatedLinePhysicalStop*>(
+									line->getLineStop(0)
+							)	);
+							if(lineStop)
+							{
+								stream << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+							}
+							const LineArea* lineArea(
+								dynamic_cast<const LineArea*>(
+									line->getLineStop(0)
+							)	);
+							if(lineArea)
+							{
+								stream << lineArea->getArea()->getName();
+							}
+						}
+
+						{
+							stream << t.col();
+							const DesignatedLinePhysicalStop* lineStop(
+								dynamic_cast<const DesignatedLinePhysicalStop*>(
+									line->getLineStop(line->getEdges().size()-1)
+							)	);
+							if(lineStop)
+							{
+								stream << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+							}
+							const LineArea* lineArea(
+								dynamic_cast<const LineArea*>(
+									line->getLineStop(line->getEdges().size()-1)
+							)	);
+							if(lineArea)
+							{
+								stream << lineArea->getArea()->getName();
+							}
+						}
 						stream << t.col();
 						stream << line->getEdges().size();
 						stream << t.col();

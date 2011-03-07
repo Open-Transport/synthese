@@ -55,6 +55,7 @@
 #include "CityTableSync.h"
 #include "Junction.hpp"
 #include "JunctionTableSync.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
@@ -720,7 +721,7 @@ namespace synthese
 			{
 				JourneyPatternTableSync::Save(line.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getRegistry<LineStop>())
+			BOOST_FOREACH(Registry<DesignatedLinePhysicalStop>::value_type lineStop, _env.getRegistry<DesignatedLinePhysicalStop>())
 			{
 				LineStopTableSync::Save(lineStop.second.get(), transaction);
 			}

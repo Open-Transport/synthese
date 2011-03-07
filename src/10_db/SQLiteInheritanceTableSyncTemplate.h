@@ -47,6 +47,7 @@ namespace synthese
 		public:
 			typedef T		ObjectType;
 			typedef K		FactoryClass;
+			typedef std::vector<boost::shared_ptr<T> > SearchResult;
 
 
 		protected:
@@ -121,7 +122,17 @@ namespace synthese
 						assert(false);
 						return boost::shared_ptr<T>();
 				}
-			//@}
+
+				virtual boost::shared_ptr<T> _loadFromRow(
+					const SQLiteResultSPtr& rows,
+					util::Env& env,
+					util::LinkLevel linkLevel
+				) const {
+					assert(false);
+					return boost::shared_ptr<T>();
+				}
+
+				//@}
 
 		public:
 			virtual bool getRegisterInSubClassMap() const
@@ -242,6 +253,39 @@ namespace synthese
 					return tablesync->_get(key, env, linkLevel, autoCreate);
 			}
 
+
+			////////////////////////////////////////////////////////////////////
+			/// Load objects into an environment, from a SQL query, and return 
+			/// the list of loaded objects.
+			///	@param query SQL query
+			///	@param env Environment to write
+			///	@param linkLevel Link level
+			/// @return search result (ordered vector of pointer to objects)
+			///	@throws Exception if the load failed
+			////////////////////////////////////////////////////////////////////
+			static SearchResult LoadFromQuery(
+				const std::string& query,
+				util::Env& env,
+				util::LinkLevel linkLevel
+			){
+				SearchResult result;
+				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query, true);
+				while (rows->next ())
+				{
+					boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(rows)));
+					boost::shared_ptr<typename ObjectType> o(
+						tablesync->_loadFromRow(
+							rows,
+							env,
+							linkLevel
+					)	);
+					if(o.get())
+					{
+						result.push_back(o);
+					}
+				}
+				return result;
+			}
 		};
 	}
 }

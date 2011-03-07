@@ -85,7 +85,7 @@ namespace synthese
 			assert(edge);
 			assert(edge->getParentPath());
 
-			_arrivalEdges.insert(make_pair(edge->getParentPath(), edge));    
+			_arrivalEdges.insert(make_pair(edge->getParentPath(), edge));
 		}
 
 

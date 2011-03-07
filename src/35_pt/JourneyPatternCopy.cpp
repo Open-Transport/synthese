@@ -21,13 +21,15 @@
 */
 
 #include "JourneyPatternCopy.hpp"
-#include "Conversion.h"
-#include "Edge.h"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "LineArea.hpp"
 #include "PathGroup.h"
 #include "Service.h"
 
+#include <boost/lexical_cast.hpp>
+
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -48,7 +50,7 @@ namespace synthese
 			// Copy of the properties
 			setCommercialLine(const_cast<CommercialLine*>(line->getCommercialLine()));
 			setRollingStock(line->getRollingStock());
-			setName(line->getName() + " (subline " + Conversion::ToString(rank) + ")");
+			setName(line->getName() + " (subline " + lexical_cast<string>(rank) + ")");
 			setTimetableName(line->getTimetableName());
 			setDirection(line->getDirection());
 			setWalkingLine(line->getWalkingLine());
@@ -60,16 +62,38 @@ namespace synthese
 			const Path::Edges edges(line->getEdges());
 			for (Path::Edges::const_iterator it(edges.begin()); it != edges.end(); ++it)
 			{
-				Edge* newEdge(new LineStop(
-						0
-						, this
-						, (*it)->getRankInPath()
-						, (*it)->isDeparture()
-						, (*it)->isArrival()
-						, (*it)->getMetricOffset()
-						, const_cast<StopPoint*>(static_cast<const LineStop*>(*it)->getPhysicalStop())
-				)	);
-				addEdge(*newEdge);
+				if(dynamic_cast<const DesignatedLinePhysicalStop*>(*it))
+				{
+					const DesignatedLinePhysicalStop& lineStop(static_cast<const DesignatedLinePhysicalStop&>(**it));
+					Edge* newEdge(
+						new DesignatedLinePhysicalStop(
+							0,
+							this,
+							lineStop.getRankInPath(),
+							lineStop.isDeparture(),
+							lineStop.isArrival(),
+							lineStop.getMetricOffset(),
+							lineStop.getPhysicalStop(),
+							lineStop.getScheduleInput()
+					)	);
+					addEdge(*newEdge);
+				}
+				if(dynamic_cast<const LineArea*>(*it))
+				{
+					const LineArea& lineStop(static_cast<const LineArea&>(**it));
+					Edge* newEdge(
+						new LineArea(
+							0,
+							this,
+							lineStop.getRankInPath(),
+							lineStop.isDeparture(),
+							lineStop.isArrival(),
+							lineStop.getMetricOffset(),
+							lineStop.getArea(),
+							lineStop.getInternalService()
+					)	);
+					addEdge(*newEdge);
+				}
 			}
 
 			_pathGroup->addPath(this);

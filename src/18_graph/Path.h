@@ -75,8 +75,8 @@ namespace synthese
 
 			@ingroup m18
 		*/
-		class Path
-		:	public RuleUser,
+		class Path:
+			public RuleUser,
 			public virtual util::Registrable
 		{
 		public:
@@ -222,10 +222,34 @@ namespace synthese
 				/// @date 2010
 				/// @since 3.2.0
 				Edge* getEdgeAtOffset(double offset) const;
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Returns all edges including sub edges.
+				//////////////////////////////////////////////////////////////////////////
+				/// @author Hugues Romain
+				/// @since 3.2.1
+				/// @date 2011
+				Edges getAllEdges() const;
 			//@}
 			
 			//! @name Modifiers.
 			//@{
+			protected:
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Builds the links between a new edge and the existing edges of the path.
+				//////////////////////////////////////////////////////////////////////////
+				/// @param previousEdge previous edge before the new one, NULL if the new edge is inserted at first
+				/// @param nextEdge next edge after the new one, NULL if the new edge is inserted at the end
+				/// @param edge the new edge
+				void _linkEdge(
+					Edge* previousEdge,
+					Edge* nextEdge,
+					Edge& edge
+				);
+
+			public:
 				//////////////////////////////////////////////////////////////////////////
 				/// Inserts an edge in the path.
 				///	@param edge The edge to add

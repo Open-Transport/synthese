@@ -56,6 +56,7 @@
 #include "DBModule.h"
 #include "TransportNetworkTableSync.h"
 #include "RollingStockTableSync.h"
+#include "DesignatedLinePhysicalStop.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -139,7 +140,7 @@ namespace synthese
 			{
 				JourneyPatternTableSync::Save(route.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getRegistry<LineStop>())
+			BOOST_FOREACH(Registry<DesignatedLinePhysicalStop>::value_type lineStop, _env.getRegistry<DesignatedLinePhysicalStop>())
 			{
 				LineStopTableSync::Save(lineStop.second.get(), transaction);
 			}

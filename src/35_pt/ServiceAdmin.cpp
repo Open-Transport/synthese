@@ -33,7 +33,7 @@
 #include "ContinuousService.h"
 #include "ResultHTMLTable.h"
 #include "JourneyPattern.hpp"
-#include "LineStop.h"
+#include "LineArea.hpp"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "HTMLForm.h"
@@ -54,6 +54,9 @@
 #include "ServiceApplyCalendarAction.h"
 #include "CalendarTemplateTableSync.h"
 #include "ServiceDateChangeAction.h"
+#include "DRTAreaAdmin.hpp"
+#include "DRTArea.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
 
 using namespace std;
 using namespace boost;
@@ -87,6 +90,7 @@ namespace synthese
 		const string ServiceAdmin::TAB_CALENDAR("ca");
 		const string ServiceAdmin::TAB_PROPERTIES("pr");
 		const string ServiceAdmin::TAB_SCHEDULES("sc");
+		const string ServiceAdmin::TAB_REAL_TIME("rt");
 
 
 		ServiceAdmin::ServiceAdmin()
@@ -154,29 +158,8 @@ namespace synthese
 			// TAB SCHEDULES
 			if (openTabContent(stream, TAB_SCHEDULES))
 			{
-				AdminActionFunctionRequest<ScheduleRealTimeUpdateAction, ServiceAdmin> scheduleUpdateRequest(request);
-				if(_scheduledService.get())
-				{
-					scheduleUpdateRequest.getPage()->setService(_scheduledService);
-				}
-				else
-				{
-					scheduleUpdateRequest.getPage()->setService(_continuousService);
-				}
-				scheduleUpdateRequest.getAction()->setService(_scheduledService);
-
-				AdminActionFunctionRequest<ServiceVertexRealTimeUpdateAction, ServiceAdmin> vertexUpdateRequest(request);
-				if(_scheduledService.get())
-				{
-					vertexUpdateRequest.getPage()->setService(_scheduledService);
-				}
-				else
-				{
-					vertexUpdateRequest.getPage()->setService(_continuousService);
-				}
-				vertexUpdateRequest.getAction()->setService(_scheduledService);
-
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
+				AdminFunctionRequest<DRTAreaAdmin> openAreaRequest(request);
 
 				AdminActionFunctionRequest<ServiceTimetableUpdateAction,ServiceAdmin> timetableUpdateRequest(request);
 				timetableUpdateRequest.getAction()->setService(const_pointer_cast<SchedulesBasedService>(_service));
@@ -187,11 +170,7 @@ namespace synthese
 				vs.push_back("Arrêt");
 				vs.push_back("Quai");
 				vs.push_back("Arrivée");
-				vs.push_back("Arrivée");
 				vs.push_back("Départ");
-				vs.push_back("Départ");
-				vs.push_back("Retard");
-				vs.push_back("Changement de quai");
 				
 				HTMLTable ts(vs, ResultHTMLTable::CSS_CLASS);
 
@@ -200,20 +179,48 @@ namespace synthese
 				const Path* line(_service->getPath());
 				BOOST_FOREACH(const Path::Edges::value_type& edge, line->getEdges())
 				{
-					const LineStop& lineStop(dynamic_cast<const LineStop&>(*edge));
+					const LineStop& lineStop(static_cast<const LineStop&>(*edge));
+					if(!lineStop.getScheduleInput())
+					{
+						continue;
+					}
+
+					const DesignatedLinePhysicalStop* linePhysicalStop(dynamic_cast<const DesignatedLinePhysicalStop*>(edge));
+					const LineArea* lineArea(dynamic_cast<const LineArea*>(edge));
+
 					timetableUpdateRequest.getAction()->setRank(lineStop.getRankInPath());
 
-					openPlaceRequest.getPage()->setConnectionPlace(
-						Env::GetOfficialEnv().getSPtr(lineStop.getPhysicalStop()->getConnectionPlace())
-					);
-					
 					stream << ts.row();
-					stream << ts.col() << 
-						HTMLModule::getHTMLLink(
-							openPlaceRequest.getURL(),
-							lineStop.getPhysicalStop()->getConnectionPlace()->getFullName()
+
+					// Place / area
+					if(linePhysicalStop)
+					{
+						stream << ts.col();
+						openPlaceRequest.getPage()->setConnectionPlace(
+							Env::GetOfficialEnv().getSPtr(linePhysicalStop->getPhysicalStop()->getConnectionPlace())
 						);
-					stream << ts.col() << lineStop.getPhysicalStop()->getName();
+						stream <<
+							HTMLModule::getHTMLLink(
+								openPlaceRequest.getURL(),
+								linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getFullName()
+							);
+						stream << ts.col();
+						stream << linePhysicalStop->getPhysicalStop()->getName();
+					}
+					if(lineArea)
+					{
+						stream << ts.col(2);
+						openAreaRequest.getPage()->setArea(
+							Env::GetOfficialEnv().getSPtr(lineArea->getArea())
+						);
+						stream <<
+							HTMLModule::getHTMLLink(
+								openAreaRequest.getURL(),
+								lineArea->getArea()->getName()
+							);
+					}
+					
+					// Arrival time
 					stream << ts.col();
 					if(lineStop.isArrival())
 					{
@@ -241,12 +248,8 @@ namespace synthese
 						stream << suForm.getSubmitButton("Shift");
 						stream << suForm.close();
 					}
-					stream << ts.col();
-					if(lineStop.isArrival() && !(_service->getArrivalBeginScheduleToIndex(true, lineStop.getRankInPath()) == _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath())))
-					{
-						time_duration delta(_service->getArrivalBeginScheduleToIndex(true, lineStop.getRankInPath()) - _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath()));
-						stream << (delta.total_seconds() > 0 ? "+" : string()) << delta << " min";
-					}
+
+					// Departure time
 					stream << ts.col();
 					if(lineStop.isDeparture())
 					{
@@ -274,6 +277,135 @@ namespace synthese
 						stream << suForm.getSubmitButton("Shift");
 						stream << suForm.close();
 					}
+				}
+
+				stream << ts.close();
+
+				if(_continuousService.get())
+				{
+					stream << "<h1>Service continu</h1>";
+
+					AdminActionFunctionRequest<ContinuousServiceUpdateAction,ServiceAdmin> updateRequest(request);
+					updateRequest.getAction()->setService(const_pointer_cast<ContinuousService>(_continuousService));
+					
+					PropertiesHTMLTable t(updateRequest.getHTMLForm());
+					stream << t.open();
+					stream << t.cell("Attente maximale (minutes)", t.getForm().getTextInput(ContinuousServiceUpdateAction::PARAMETER_WAITING_DURATION, lexical_cast<string>(_continuousService->getMaxWaitingTime().total_seconds() / 60)));
+					stream << t.cell("Fin de période", t.getForm().getTextInput(ContinuousServiceUpdateAction::PARAMETER_END_TIME, lexical_cast<string>(_continuousService->getDepartureEndScheduleToIndex(false, 0))));
+					stream << t.close();
+				}
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB REAL TIME
+			if (openTabContent(stream, TAB_REAL_TIME))
+			{
+				AdminActionFunctionRequest<ScheduleRealTimeUpdateAction, ServiceAdmin> scheduleUpdateRequest(request);
+				if(_scheduledService.get())
+				{
+					scheduleUpdateRequest.getPage()->setService(_scheduledService);
+				}
+				else
+				{
+					scheduleUpdateRequest.getPage()->setService(_continuousService);
+				}
+				scheduleUpdateRequest.getAction()->setService(_scheduledService);
+
+				AdminActionFunctionRequest<ServiceVertexRealTimeUpdateAction, ServiceAdmin> vertexUpdateRequest(request);
+				if(_scheduledService.get())
+				{
+					vertexUpdateRequest.getPage()->setService(_scheduledService);
+				}
+				else
+				{
+					vertexUpdateRequest.getPage()->setService(_continuousService);
+				}
+				vertexUpdateRequest.getAction()->setService(_scheduledService);
+
+				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
+				AdminFunctionRequest<DRTAreaAdmin> openAreaRequest(request);
+
+				stream << "<h1>Horaires</h1>";
+				
+				HTMLTable::ColsVector vs;
+				vs.push_back("Arrêt");
+				vs.push_back("Quai");
+				vs.push_back("Arrivée");
+				vs.push_back("Arrivée");
+				vs.push_back("Départ");
+				vs.push_back("Départ");
+				vs.push_back("Retard");
+				vs.push_back("Changement de quai");
+				
+				HTMLTable ts(vs, ResultHTMLTable::CSS_CLASS);
+
+				stream << ts.open();
+
+				const Path* line(_service->getPath());
+				BOOST_FOREACH(const Path::Edges::value_type& edge, line->getEdges())
+				{
+					const LineStop& lineStop(dynamic_cast<const LineStop&>(*edge));
+
+					const DesignatedLinePhysicalStop* linePhysicalStop(dynamic_cast<const DesignatedLinePhysicalStop*>(edge));
+					const LineArea* lineArea(dynamic_cast<const LineArea*>(edge));
+
+					stream << ts.row();
+
+					// Place / area
+					if(linePhysicalStop)
+					{
+						stream << ts.col();
+						openPlaceRequest.getPage()->setConnectionPlace(
+							Env::GetOfficialEnv().getSPtr(linePhysicalStop->getPhysicalStop()->getConnectionPlace())
+						);
+						stream <<
+							HTMLModule::getHTMLLink(
+								openPlaceRequest.getURL(),
+								linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getFullName()
+							);
+						stream << ts.col();
+						stream << linePhysicalStop->getPhysicalStop()->getName();
+					}
+					if(lineArea)
+					{
+						stream << ts.col(2);
+						openAreaRequest.getPage()->setArea(
+								Env::GetOfficialEnv().getSPtr(lineArea->getArea())
+							);
+						stream <<
+							HTMLModule::getHTMLLink(
+								openAreaRequest.getURL(),
+								lineArea->getArea()->getName()
+							);
+					}
+
+					// Arrival time
+					stream << ts.col();
+					if(lineStop.isArrival())
+					{
+						stream << to_simple_string(
+							_service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath())
+						);
+					}
+
+					// Arrival real time
+					stream << ts.col();
+					if(lineStop.isArrival() && !(_service->getArrivalBeginScheduleToIndex(true, lineStop.getRankInPath()) == _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath())))
+					{
+						time_duration delta(_service->getArrivalBeginScheduleToIndex(true, lineStop.getRankInPath()) - _service->getArrivalBeginScheduleToIndex(false, lineStop.getRankInPath()));
+						stream << (delta.total_seconds() > 0 ? "+" : string()) << delta << " min";
+					}
+
+					// Departure time
+					stream << ts.col();
+					if(lineStop.isDeparture())
+					{
+						stream << to_simple_string(
+							_service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath())
+						);
+					}
+
+					// Departure real time
 					stream << ts.col();
 					if(lineStop.isDeparture() && !(_service->getDepartureBeginScheduleToIndex(true, lineStop.getRankInPath()) == _service->getDepartureBeginScheduleToIndex(false, lineStop.getRankInPath())))
 					{
@@ -292,35 +424,24 @@ namespace synthese
 					stream << f.close();
 
 					stream << ts.col();
-					HTMLForm f2(vertexUpdateRequest.getHTMLForm("quay"+lexical_cast<string>(lineStop.getRankInPath())));
-					stream << f2.open();
-					stream << "Quai : " << f.getSelectInput(
-						ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID,
-						lineStop.getPhysicalStop()->getConnectionPlace()->getPhysicalStopLabels(),
-						optional<RegistryKeyType>(_service->getRealTimeVertex(lineStop.getRankInPath())->getKey())
-					);
-					stream << f.getSubmitButton("OK");
-					stream << f2.close();
+					if(linePhysicalStop)
+					{
+						HTMLForm f2(vertexUpdateRequest.getHTMLForm("quay"+lexical_cast<string>(lineStop.getRankInPath())));
+						stream << f2.open();
+						stream << "Quai : " << f.getSelectInput(
+							ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID,
+							linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStopLabels(),
+							optional<RegistryKeyType>(_service->getRealTimeVertex(lineStop.getRankInPath())->getKey())
+						);
+						stream << f.getSubmitButton("OK");
+						stream << f2.close();
+					}
 				}
 
 				stream << ts.close();
 
 				stream << "<h1>Informations temps réel</h1>";
 				stream << "<p>Information temps réel valables jusqu'à : " << posix_time::to_simple_string(_service->getNextRTUpdate()) << "</p>";
-
-				if(_continuousService.get())
-				{
-					stream << "<h1>Service continu</h1>";
-
-					AdminActionFunctionRequest<ContinuousServiceUpdateAction,ServiceAdmin> updateRequest(request);
-					updateRequest.getAction()->setService(const_pointer_cast<ContinuousService>(_continuousService));
-					
-					PropertiesHTMLTable t(updateRequest.getHTMLForm());
-					stream << t.open();
-					stream << t.cell("Attente maximale (minutes)", t.getForm().getTextInput(ContinuousServiceUpdateAction::PARAMETER_WAITING_DURATION, lexical_cast<string>(_continuousService->getMaxWaitingTime().total_seconds() / 60)));
-					stream << t.cell("Fin de période", t.getForm().getTextInput(ContinuousServiceUpdateAction::PARAMETER_END_TIME, lexical_cast<string>(_continuousService->getDepartureEndScheduleToIndex(false, 0))));
-					stream << t.close();
-				}
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -401,6 +522,8 @@ namespace synthese
 			_tabs.clear();
 
 			_tabs.push_back(Tab("Horaires", TAB_SCHEDULES, true, "time.png"));
+
+			_tabs.push_back(Tab("Temps réel", TAB_REAL_TIME, true, "time.png"));
 
 			_tabs.push_back(Tab("Calendrier", TAB_CALENDAR, true, "calendar.png"));
 

@@ -29,6 +29,7 @@
 #include "Request.h"
 #include "LineStopTableSync.h"
 #include "StopPointTableSync.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
 
 using namespace std;
 
@@ -107,9 +108,9 @@ namespace synthese
 			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			if(_physicalStop.get())
+			if(_physicalStop.get() && dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get()))
 			{
-				_lineStop->setPhysicalStop(_physicalStop.get());
+				dynamic_cast<DesignatedLinePhysicalStop&>(*_lineStop).setPhysicalStop(*_physicalStop);
 			}
 			if(_allowedArrival)
 			{

@@ -37,7 +37,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "JourneyPattern.hpp"
 #include "JourneyPatternTableSync.hpp"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
 #include "TransportNetwork.h"
 #include "TransportNetworkTableSync.h"
@@ -65,6 +65,7 @@
 #include "DataSourceAdmin.h"
 #include "PTFileFormat.hpp"
 #include "ImpExModule.h"
+#include "DesignatedLinePhysicalStop.hpp"
 
 #include <algorithm>
 #include <iomanip>
@@ -600,9 +601,9 @@ namespace synthese
 			}
 		
 			// --------------------------------------------------- StopPoint
-			BOOST_FOREACH(Registry<LineStop>::value_type itls, _env.getRegistry<LineStop>())
+			BOOST_FOREACH(Registry<DesignatedLinePhysicalStop>::value_type itls, _env.getRegistry<DesignatedLinePhysicalStop>())
 			{
-				const LineStop* ls(itls.second.get());
+				const DesignatedLinePhysicalStop* ls(itls.second.get());
 				const StopPoint* ps = static_cast<const StopPoint*>(ls->getFromVertex());
 
 				shared_ptr<Point> wgs84ps;
@@ -692,7 +693,11 @@ namespace synthese
 				for (vector<Edge*>::const_iterator itedge = edges.begin ();
 					 itedge != edges.end (); ++itedge)
 				{
-					const LineStop* lineStop = dynamic_cast<const LineStop*> (*itedge);
+					const DesignatedLinePhysicalStop* lineStop = dynamic_cast<const DesignatedLinePhysicalStop*> (*itedge);
+					if(!lineStop)
+					{
+						continue;
+					}
 					os << "<stopPointList>" << TridentId (peerid, "StopPoint", *lineStop) << "</stopPointList>" << "\n";
 				}
 
@@ -1806,7 +1811,7 @@ namespace synthese
 			{
 				JourneyPatternTableSync::Save(line.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getRegistry<LineStop>())
+			BOOST_FOREACH(Registry<DesignatedLinePhysicalStop>::value_type lineStop, _env.getRegistry<DesignatedLinePhysicalStop>())
 			{
 				LineStopTableSync::Save(lineStop.second.get(), transaction);
 			}

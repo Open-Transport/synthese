@@ -26,6 +26,8 @@
 #include "JourneyPatternCopy.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "StopPointTableSync.hpp"
+#include "LineAreaInheritedTableSync.hpp"
+#include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
 
 #include <sstream>
 
@@ -53,13 +55,14 @@ namespace synthese
 
 	namespace pt
 	{
-		const std::string LineStopTableSync::COL_PHYSICALSTOPID ("physical_stop_id");
-		const std::string LineStopTableSync::COL_LINEID ("line_id");
-		const std::string LineStopTableSync::COL_RANKINPATH ("rank_in_path");
-		const std::string LineStopTableSync::COL_ISDEPARTURE ("is_departure");
-		const std::string LineStopTableSync::COL_ISARRIVAL ("is_arrival");
-		const std::string LineStopTableSync::COL_METRICOFFSET ("metric_offset");
-		const std::string LineStopTableSync::COL_SCHEDULEINPUT ("schedule_input");
+		const std::string LineStopTableSync::COL_PHYSICALSTOPID("physical_stop_id");
+		const std::string LineStopTableSync::COL_LINEID("line_id");
+		const std::string LineStopTableSync::COL_RANKINPATH("rank_in_path");
+		const std::string LineStopTableSync::COL_ISDEPARTURE("is_departure");
+		const std::string LineStopTableSync::COL_ISARRIVAL("is_arrival");
+		const std::string LineStopTableSync::COL_METRICOFFSET("metric_offset");
+		const std::string LineStopTableSync::COL_SCHEDULEINPUT("schedule_input");
+		const std::string LineStopTableSync::COL_INTERNAL_SERVICE("internal_service");
 	}
 
 	namespace db
@@ -80,9 +83,12 @@ namespace synthese
 			SQLiteTableSync::Field(LineStopTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
 			SQLiteTableSync::Field(LineStopTableSync::COL_METRICOFFSET, SQL_DOUBLE),
 			SQLiteTableSync::Field(LineStopTableSync::COL_SCHEDULEINPUT, SQL_BOOLEAN),
+			SQLiteTableSync::Field(LineStopTableSync::COL_INTERNAL_SERVICE, SQL_BOOLEAN),
 			SQLiteTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
 			SQLiteTableSync::Field()
 		};
+
+
 
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<LineStopTableSync>::_INDEXES[]=
 		{
@@ -95,10 +101,35 @@ namespace synthese
 			SQLiteTableSync::Index()
 		};
 
-		
-		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Load(
+
+
+		template<>
+		string SQLiteInheritanceTableSyncTemplate<LineStopTableSync,LineStop>::_GetSubClassKey(const SQLiteResultSPtr& row)
+		{
+			return
+				(decodeTableId(row->getLongLong(LineStopTableSync::COL_PHYSICALSTOPID)) == StopPointTableSync::TABLE.ID) ?
+				DesignatedLinePhysicalStopInheritedTableSync::FACTORY_KEY :
+				LineAreaInheritedTableSync::FACTORY_KEY
+			;
+		}
+
+
+
+		template<>
+		string SQLiteInheritanceTableSyncTemplate<LineStopTableSync,LineStop>::_GetSubClassKey(const LineStop* obj)
+		{
+			return
+				(dynamic_cast<const DesignatedLinePhysicalStop*>(obj) != NULL) ?
+				DesignatedLinePhysicalStopInheritedTableSync::FACTORY_KEY :
+				LineAreaInheritedTableSync::FACTORY_KEY
+			;
+		}
+
+
+
+		template<> void SQLiteInheritanceTableSyncTemplate<LineStopTableSync,LineStop>::_CommonLoad(
 			LineStop* ls,
-			const db::SQLiteResultSPtr& rows,
+			const SQLiteResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -125,107 +156,14 @@ namespace synthese
 			ls->setIsDeparture(isDeparture);
 			ls->setRankInPath(rankInPath);
 			ls->setLine(NULL);
-			ls->setPhysicalStop(NULL);
 			
-			if (rows->getColumnIndex(LineStopTableSync::COL_SCHEDULEINPUT) != UNKNOWN_VALUE)
-			{
-				ls->setScheduleInput(rows->getBool(LineStopTableSync::COL_SCHEDULEINPUT));
-			}
-			else
-			{
-				ls->setScheduleInput(true);
-			}
-
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				util::RegistryKeyType fromPhysicalStopId (
-					rows->getLongLong (LineStopTableSync::COL_PHYSICALSTOPID));
-
+				// Line
 				util::RegistryKeyType lineId (rows->getLongLong (LineStopTableSync::COL_LINEID));
 				JourneyPattern* line(JourneyPatternTableSync::GetEditable (lineId, env, linkLevel).get());
-
 				ls->setLine(line);
-				ls->setPhysicalStop(StopPointTableSync::GetEditable(fromPhysicalStopId, env, linkLevel).get());
-				
-				line->addEdge(*ls);
-
-				// Sublines update
-				BOOST_FOREACH(JourneyPatternCopy* copy, line->getSubLines())
-				{
-					Edge* newEdge(new LineStop(
-							0,
-							copy,
-							ls->getRankInPath(),
-							ls->isDeparture(),
-							ls->isArrival(),
-							ls->getMetricOffset(),
-							const_cast<StopPoint*>(ls->getPhysicalStop())
-					)	);
-					copy->addEdge(*newEdge);
-				}
 			}
-		}
-
-
-
-		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Unlink(
-			LineStop* obj
-		){
-			StopPoint* stop(obj->getPhysicalStop());
-
-			// Collecting all line stops to unlink including journey pattern copies
-			typedef vector<pair<JourneyPattern*, LineStop*> > ToClean;
-			ToClean toClean;
-			toClean.push_back(make_pair(obj->getLine(), obj));
-			BOOST_FOREACH(JourneyPatternCopy* copy, obj->getLine()->getSubLines())
-			{
-				toClean.push_back(make_pair(
-						copy,
-						const_cast<LineStop*>(static_cast<const LineStop*>(copy->getEdge(obj->getRankInPath())))
-				)	);
-			}
-
-			BOOST_FOREACH(const ToClean::value_type& it, toClean)
-			{
-				// Removing edge from journey pattern
-				it.first->removeEdge(*it.second);
-
-				// Removing edge from stop point
-				if(it.second->getIsArrival())
-				{
-					stop->removeArrivalEdge(it.second);
-				}
-				if(it.second->getIsDeparture())
-				{
-					stop->removeDepartureEdge(it.second);
-				}
-
-				if(it.second != obj)
-				{
-					delete it.second;
-				}
-			}
-		}
-
-
-
-		template<> void SQLiteDirectTableSyncTemplate<LineStopTableSync,LineStop>::Save(
-			LineStop* object,
-			optional<SQLiteTransaction&> transaction
-		){
-			if(!object->getPhysicalStop()) throw Exception("Linestop save error. Missing physical stop");
-			if(!object->getLine()) throw Exception("Linestop Save error. Missing line");
-
-			ReplaceQuery<LineStopTableSync> query(*object);
-			query.addField(object->getPhysicalStop()->getKey());
-			query.addField(object->getLine()->getKey());
-			query.addField(object->getRankInPath());
-			query.addField(object->isDepartureAllowed());
-			query.addField(object->isArrivalAllowed());
-			query.addField(object->getMetricOffset());
-			query.addField(object->getScheduleInput());
-			query.addField(static_pointer_cast<Geometry,LineString>(object->getGeometry()));
-			query.execute(transaction);
 		}
 	}
 
@@ -235,7 +173,7 @@ namespace synthese
 			Env& env,
 			optional<RegistryKeyType> lineId,
 			optional<RegistryKeyType> physicalStopId
-			, int first /*= 0*/
+			, int first
 			, boost::optional<std::size_t> number
 			, bool orderByRank
 			, bool raisingOrder,
@@ -263,7 +201,7 @@ namespace synthese
 				query.setFirst(first);
 			}
 
-			return LoadFromQuery(query, env, linkLevel);
+			return LoadFromQuery(query.toString(), env, linkLevel);
 		}
 
 

@@ -36,6 +36,7 @@ namespace synthese
 	{
 		class JourneyPattern;
 		class StopPoint;
+		class LinePhysicalStop;
 	}
 
 	namespace departure_boards
@@ -84,7 +85,7 @@ namespace synthese
 			/** Autorisation d'afficher une ligne sur le tableau de départs.
 				@param linestop linestop to test
 			*/
-				bool _allowedLineStop(const pt::LineStop*) const;
+				bool _allowedLineStop(const pt::LinePhysicalStop& linestop) const;
 			
 			/** Insertion.
 				@return iterator on the element.
