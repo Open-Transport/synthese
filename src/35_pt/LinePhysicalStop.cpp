@@ -44,7 +44,12 @@ namespace synthese
 			StopPoint* stop
 		):	Registrable(id),
 			LineStop(id, line, rankInPath, isDeparture, isArrival, metricOffset, stop)
-		{}
+		{
+			if(stop)
+			{
+				setPhysicalStop(*stop);
+			}
+		}
 
 
 

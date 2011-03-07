@@ -522,6 +522,8 @@ namespace synthese
 						if (it == _edges.begin()) break;
 					}
 				}
+
+				edge.getPrevious()->setNext(edge.getNext());
 			}
 		
 			// Previous departure
@@ -546,6 +548,8 @@ namespace synthese
 						(*it)->setPreviousConnectionDeparture(previousConnectingDeparture);
 					}
 				}
+
+				edge.getNext()->setPrevious(edge.getPrevious());
 			}
 
 			// Insertion of the new edges
