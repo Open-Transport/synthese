@@ -273,7 +273,7 @@ namespace synthese
 				while (rows->next ())
 				{
 					boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(rows)));
-					boost::shared_ptr<typename ObjectType> o(
+					boost::shared_ptr<ObjectType> o(
 						tablesync->_loadFromRow(
 							rows,
 							env,
