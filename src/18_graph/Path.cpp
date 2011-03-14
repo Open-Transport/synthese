@@ -287,16 +287,24 @@ namespace synthese
 			}
 
 			// Builds the links between edges
-			Edge* previousEdge(
-				insertionPosition != _edges.begin() ?
-				*(*(insertionPosition - 1))->getSubEdges().rbegin() :
-				NULL
-			);
-			Edge* nextEdge(
-				insertionPosition != _edges.end() ?
-				*(*insertionPosition)->getSubEdges().begin() :
-				NULL
-			);
+			Edge* previousEdge(NULL);
+			if(insertionPosition != _edges.begin())
+			{
+				Edge::SubEdges subEdges(
+					insertionPosition != _edges.end() ?
+					(*(insertionPosition - 1))->getSubEdges() :
+					(*_edges.rbegin())->getSubEdges()
+				);
+				previousEdge = *subEdges.rbegin();
+			}
+			Edge* nextEdge(NULL);
+			if(insertionPosition != _edges.end())
+			{
+				Edge::SubEdges subEdges(
+					(*insertionPosition)->getSubEdges()
+				);
+				nextEdge = *subEdges.begin();
+			}
 			BOOST_FOREACH(Edge* subEdge, edge.getSubEdges())
 			{
 				_linkEdge(previousEdge, nextEdge, *subEdge);

@@ -28,6 +28,7 @@
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "StopAreaTableSync.hpp"
+#include "StopPointTableSync.hpp"
 
 #include <boost/algorithm/string/split.hpp>
 
@@ -178,9 +179,11 @@ namespace synthese
 				{
 					try
 					{
+						RegistryKeyType placeId(lexical_cast<RegistryKeyType>(stop));
 						result.insert(
-							StopAreaTableSync::GetEditable(lexical_cast<RegistryKeyType>(stop), env).get()
+							StopAreaTableSync::GetEditable(placeId, env).get()
 						);
+						StopPointTableSync::Search(env, placeId);
 					}
 					catch(ObjectNotFoundException<StopArea>&)
 					{
