@@ -296,13 +296,27 @@ namespace synthese
 					{
 						stream << t.col();
 
+						stream << HTMLModule::getHTMLImage(DRTAreaAdmin::ICON, "Zone TAD");
+
 						stream << HTMLModule::getHTMLLink(
 							openDRTAreaRequest.getURL(),
 							lineArea->getArea()->getName()
 						);
 
 						stream << t.col(2);
-						stream << "Desserte interne : OUI NON";
+						stream << "Desserte interne : ";
+						AdminActionFunctionRequest<LineStopUpdateAction,JourneyPatternAdmin> internalUpdateRequest(_request);
+						internalUpdateRequest.getAction()->setLineStop(const_pointer_cast<LineStop>(lineStop));
+						if(lineArea->getInternalService())
+						{
+							internalUpdateRequest.getAction()->setAllowedInternal(false);
+							stream << "[OUI] " << HTMLModule::getHTMLLink(internalUpdateRequest.getURL(), "NON");
+						}
+						else
+						{
+							internalUpdateRequest.getAction()->setAllowedInternal(true);
+							stream << HTMLModule::getHTMLLink(internalUpdateRequest.getURL(), "OUI") << " [NON]";
+						}
 					}
 
 
@@ -346,15 +360,17 @@ namespace synthese
 				if(sservices.empty() && cservices.empty())
 				{
 					stream << t.row();
-					stream << t.col() << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(_line->getEdges().size()), optional<size_t>());
-					stream << t.col() << _line->getEdges().size();
+					stream << t.col(1,string(),false,string(),2) << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(_line->getEdges().size()), optional<size_t>());
+					stream << t.col(1,string(),false,string(),2) << _line->getEdges().size();
 					stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_CITY_NAME, string(), "(localité)");
 					stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_STOP_NAME, string(), "(arrêt)");
-					stream << t.col();
-					stream << t.col();
-					stream << t.col();
-					stream << t.col();
-					stream << t.col() << f.getSubmitButton("Ajouter");
+					stream << t.col(1,string(),false,string(),2);
+					stream << t.col(1,string(),false,string(),2);
+					stream << t.col(1,string(),false,string(),2);
+					stream << t.col(1,string(),false,string(),2);
+					stream << t.col(1,string(),false,string(),2) << f.getSubmitButton("Ajouter");
+					stream << t.row();
+					stream << t.col(2) << "ou zone TAD n°" << f.getTextInput(LineStopAddAction::PARAMETER_AREA, string());
 				}
 
 				stream << t.close();

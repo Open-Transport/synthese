@@ -122,6 +122,7 @@ namespace synthese
 			HTMLForm f(addRequest.getHTMLForm("add"));
 
 			HTMLTable::ColsVector c;
+			c.push_back("ID");
 			c.push_back("Nom");
 			c.push_back("Action");
 			c.push_back("Action");
@@ -135,6 +136,9 @@ namespace synthese
 				stream << t.row();
 
 				stream << t.col();
+				stream << it.second->getKey();
+
+				stream << t.col();
 				stream << it.second->getName();
 
 				stream << t.col();
@@ -143,10 +147,11 @@ namespace synthese
 
 				stream << t.col();
 				deleteRequest.getAction()->setArea(it.second);
-				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la zone ?", "delete.png");
+				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer la zone ?", "delete.png");
 			}
 
 			stream << t.row();
+			stream << t.col();
 			stream << t.col();
 			stream << f.getTextInput(DRTAreaUpdateAction::PARAMETER_NAME, string(), "(nom)");
 			stream << t.col(2);

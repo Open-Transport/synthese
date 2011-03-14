@@ -112,27 +112,28 @@ namespace synthese
 		) const	{
 
 			{
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 
 				AdminActionFunctionRequest<DRTAreaUpdateAction, DRTAreaAdmin> updateRequest(request);
 				updateRequest.getAction()->setArea(const_pointer_cast<DRTArea>(_area));
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
 				stream << t.open();
+				stream << t.cell("ID", lexical_cast<string>(_area->getKey()));
 				stream << t.cell("Nom", t.getForm().GetTextInput(DRTAreaUpdateAction::PARAMETER_NAME, _area->getName()));
 				stream << t.close();
 			}
 
 			{
-				stream << "<h1>Arrêts</h1>";
+				stream << "<h1>ArrÃªts</h1>";
 
-				AdminActionFunctionRequest<DRTAreaUpdateAction, DRTAreaAdmin> updateRequest(request);
+				StaticActionRequest<DRTAreaUpdateAction> updateRequest(request);
 				updateRequest.getAction()->setArea(const_pointer_cast<DRTArea>(_area));
 
 				AjaxVectorFieldEditor::Fields fields;
 
 				// Stop field
-				fields.push_back(shared_ptr<AjaxVectorFieldEditor::Field>(new AjaxVectorFieldEditor::TextInputField("Arrêt")));
+				fields.push_back(shared_ptr<AjaxVectorFieldEditor::Field>(new AjaxVectorFieldEditor::TextInputField("ArrÃªt")));
 
 				// Creation of the editor
 				AjaxVectorFieldEditor editor(

@@ -498,7 +498,7 @@ namespace synthese
 				stream << t.title("Apparence");
 				stream << t.cell("Image", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_IMAGE, _cline->getImage()));
 				stream << t.cell("Style CSS", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_STYLE, _cline->getStyle()));
-				stream << t.cell("Couleur", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_COLOR, _cline->getColor() ? _cline->getColor()->toString() : string()));
+				stream << t.cell("Couleur : format (r,g,b)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_COLOR, _cline->getColor() ? _cline->getColor()->toString() : string()));
 				stream << t.title("Réservation");
 				stream << t.cell("Centre de contact", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_RESERVATION_CONTACT_ID, _cline->getReservationContact() ? lexical_cast<string>(_cline->getReservationContact()->getKey()) : string()));
 				stream << t.close();

@@ -170,19 +170,22 @@ namespace synthese
 		DRTArea::Stops DRTAreaTableSync::UnserializeStops( const std::string& value, util::Env& env )
 		{
 			DRTArea::Stops result;
-			vector<string> stops;
-			split(stops, value, is_any_of(","));
-			BOOST_FOREACH(const string& stop, stops)
+			if(!value.empty())
 			{
-				try
+				vector<string> stops;
+				split(stops, value, is_any_of(","));
+				BOOST_FOREACH(const string& stop, stops)
 				{
-					result.insert(
-						StopAreaTableSync::GetEditable(lexical_cast<RegistryKeyType>(stop), env).get()
-					);
-				}
-				catch(ObjectNotFoundException<StopArea>&)
-				{
+					try
+					{
+						result.insert(
+							StopAreaTableSync::GetEditable(lexical_cast<RegistryKeyType>(stop), env).get()
+						);
+					}
+					catch(ObjectNotFoundException<StopArea>&)
+					{
 
+					}
 				}
 			}
 			return result;

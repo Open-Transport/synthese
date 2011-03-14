@@ -75,16 +75,24 @@ namespace synthese
 
 
 
-		bool Edge::isArrival () const
+		bool Edge::isArrival() const
 		{
-			return _previousDepartureForFineSteppingOnly && isArrivalAllowed();
+			Edge::SubEdges edges(getSubEdges());
+			return
+				!edges.empty() &&
+				(*edges.begin())->_previousDepartureForFineSteppingOnly &&
+				isArrivalAllowed();
 		}
 
 
 
-		bool Edge::isDeparture () const
+		bool Edge::isDeparture() const
 		{
-			return _followingArrivalForFineSteppingOnly && isDepartureAllowed();
+			Edge::SubEdges edges(getSubEdges());
+			return
+				!edges.empty() &&
+				(*edges.rbegin())->_followingArrivalForFineSteppingOnly &&
+				isDepartureAllowed();
 		}
 
 

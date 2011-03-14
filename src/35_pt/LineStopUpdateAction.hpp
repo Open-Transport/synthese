@@ -59,12 +59,14 @@ namespace synthese
 			static const std::string PARAMETER_PHYSICAL_STOP_ID;
 			static const std::string PARAMETER_ALLOWED_DEPARTURE;
 			static const std::string PARAMETER_ALLOWED_ARRIVAL;
+			static const std::string PARAMETER_ALLOWED_INTERNAL;
 
 		private:
 			boost::shared_ptr<LineStop> _lineStop;
 			boost::shared_ptr<StopPoint> _physicalStop;
 			boost::optional<bool> _allowedDeparture;
 			boost::optional<bool> _allowedArrival;
+			boost::optional<bool> _allowedInternal;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -101,6 +103,7 @@ namespace synthese
 				void setLineStop(boost::shared_ptr<LineStop> value) { _lineStop = value; }
 				void setAllowedDeparture(boost::optional<bool>(value)){ _allowedDeparture = value; }
 				void setAllowedArrival(boost::optional<bool>(value)){ _allowedArrival = value; }
+				void setAllowedInternal(boost::optional<bool>(value)){ _allowedInternal = value; }
 				void setPhysicalStop(boost::shared_ptr<StopPoint> value){ _physicalStop = value; }
 			//@}
 		};

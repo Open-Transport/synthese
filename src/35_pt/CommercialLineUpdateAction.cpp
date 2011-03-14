@@ -181,7 +181,7 @@ namespace synthese
 			// Reservation contact
 			if(map.isDefined(PARAMETER_RESERVATION_CONTACT_ID))
 			{
-				RegistryKeyType rid(map.get<RegistryKeyType>(PARAMETER_RESERVATION_CONTACT_ID));
+				RegistryKeyType rid(map.getDefault<RegistryKeyType>(PARAMETER_RESERVATION_CONTACT_ID, 0));
 				if(rid > 0)
 				{
 					try
@@ -192,6 +192,10 @@ namespace synthese
 					{
 						throw ActionException("No such reservation contact");
 					}
+				}
+				else
+				{
+					_reservationContact = shared_ptr<const ReservationContact>();
 				}
 			}
 		}

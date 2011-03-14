@@ -65,7 +65,7 @@ namespace synthese
 				obj->getLine()->addEdge(*obj);
 			}
 
-			if (rows->getColumnIndex(LineStopTableSync::COL_SCHEDULEINPUT) != UNKNOWN_VALUE)
+			if(!rows->getText(LineStopTableSync::COL_SCHEDULEINPUT).empty())
 			{
 				obj->setScheduleInput(rows->getBool(LineStopTableSync::COL_SCHEDULEINPUT));
 			}

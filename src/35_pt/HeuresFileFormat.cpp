@@ -190,6 +190,11 @@ namespace synthese
 					}
 
 					string id(boost::algorithm::trim_copy(line.substr(0, 4)));
+					if(lexical_cast<int>(id) > 9000)
+					{
+						continue;
+					}
+
 					string name(boost::algorithm::trim_copy(line.substr(5, 50)));
 
 					PTFileFormat::ImportableStopPoint isp;
