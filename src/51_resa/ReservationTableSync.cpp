@@ -73,6 +73,8 @@ namespace synthese
 		const string ReservationTableSync::COL_RESERVATION_DEAD_LINE("reservation_dead_line");
 		const string ReservationTableSync::COL_VEHICLE_ID("vehicle_id");
 		const string ReservationTableSync::COL_SEAT_NUMBER("seat_number");
+		const string ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_DEPARTURE("vehicle_position_id_at_departure");
+		const string ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_ARRIVAL("vehicle_position_id_at_arrival");
 	}
 
 	namespace db

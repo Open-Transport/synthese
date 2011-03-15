@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "VehiclePosition.h"
+#include "VehiclePosition.hpp"
 
 namespace synthese
 {
@@ -36,6 +36,10 @@ namespace synthese
 	{
 		VehiclePosition::VehiclePosition(
 			RegistryKeyType id
-		):	Registrable(id)
+		):	Registrable(id),
+			_vehicle(NULL),
+			_stopPoint(NULL),
+			_service(NULL)
+		{}
 	}
 }

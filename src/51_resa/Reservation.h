@@ -36,6 +36,7 @@ namespace synthese
 	namespace pt_operation
 	{
 		class Vehicle;
+		class VehiclePosition;
 	}
 
 	namespace resa
@@ -82,6 +83,8 @@ namespace synthese
 				boost::posix_time::ptime		_reservationDeadLine;
 				const pt_operation::Vehicle*	_vehicle;
 				std::string						_seatNumber;
+				const pt_operation::VehiclePosition*	_vehiclePositionAtDeparture;
+				const pt_operation::VehiclePosition*	_vehiclePositionAtArrival;
 			//@}
 
 		public:
@@ -104,6 +107,8 @@ namespace synthese
 				void setSeatNumber			(const std::string& value){ _seatNumber = value; }
 				void setOriginDateTime		(const boost::posix_time::ptime& time){ _originDateTime = time; }
 				void setReservationDeadLine	(const boost::posix_time::ptime& time){ _reservationDeadLine = time; }
+				void setVehiclePositionAtDeparture	(const pt_operation::VehiclePosition* value){ _vehiclePositionAtDeparture = value; }
+				void setVehiclePositionAtArrival	(const pt_operation::VehiclePosition* value){ _vehiclePositionAtArrival = value; }
 
 
 				/** Transaction setter.
@@ -135,6 +140,8 @@ namespace synthese
 				const boost::posix_time::ptime&	getReservationDeadLine()	const { return _reservationDeadLine; }
 				const pt_operation::Vehicle*	getVehicle()				const { return _vehicle; }
 				const std::string&				getSeatNumber()				const { return _seatNumber; }
+				const pt_operation::VehiclePosition*	getVehiclePositionAtDeparture()	const { return _vehiclePositionAtDeparture; }
+				const pt_operation::VehiclePosition*	getVehiclePositionAtArrival()	const { return _vehiclePositionAtArrival; }
 			//@}
 
 

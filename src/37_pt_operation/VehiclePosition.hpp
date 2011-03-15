@@ -26,6 +26,9 @@
 #include "Registrable.h"
 #include "Registry.h"
 
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/optional.hpp>
+
 namespace geos
 {
 	namespace geom
@@ -62,15 +65,16 @@ namespace synthese
 				DEAD_RUN_DEPOT,
 				DEAD_RUN_TRANSFER,
 				SERVICE,
-				COMMERCIAL
+				COMMERCIAL,
+				NOT_IN_SERVICE
 			} Status;
 
 		private:
+			Status _status;
 			Vehicle* _vehicle;
 			boost::shared_ptr<geos::geom::Point> _point;
 			boost::posix_time::ptime _time;
 			Meters _meterOffset;
-			bool _zero;
 			pt::StopPoint* _stopPoint;
 			std::string _comment;
 			pt::ScheduledService* _service;
@@ -81,6 +85,26 @@ namespace synthese
 			VehiclePosition(
 				util::RegistryKeyType id = 0
 			);
+
+			void setStatus(Status value){ _status = value; }
+			void setVehicle(Vehicle* value){ _vehicle = value; }
+			void setPoint(boost::shared_ptr<geos::geom::Point> value){ _point = value; }
+			void setTime(const boost::posix_time::ptime& value){ _time = value; }
+			void setMeterOffset(const Meters& value){ _meterOffset = value; }
+			void setStopPoint(pt::StopPoint* value){ _stopPoint = value; }
+			void setComment(const std::string& value){ _comment = value; }
+			void setService(pt::ScheduledService* value){ _service = value; }
+			void setRankInPath(boost::optional<std::size_t> value){ _rankInPath = value; }
+			void setPassangers(boost::optional<std::size_t> value){ _passengers = value; }
+
+			const Status& getStatus() const { return _status; }
+			Vehicle* getVehicle() const { return _vehicle; }
+			boost::shared_ptr<geos::geom::Point> getPoint() const { return _point; }
+			pt::StopPoint* getStopPoint() const { return _stopPoint; }
+			const std::string& getComment() const { return _comment; }
+			pt::ScheduledService* getService() const { return _service; }
+			boost::optional<std::size_t> getRankInPath() const { return _rankInPath; }
+			boost::optional<std::size_t> getPassengers() const { return _passengers; }
 		};
 }	}
 
