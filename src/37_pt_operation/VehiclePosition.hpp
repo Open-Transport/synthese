@@ -78,11 +78,10 @@ namespace synthese
 			boost::optional<std::size_t> _passengers;
 
 		public:
-			VehiclePosition();
-
-
+			VehiclePosition(
+				util::RegistryKeyType id = 0
+			);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_pt_operation_VehiclePosition_hpp__
