@@ -302,9 +302,9 @@ namespace synthese
 					JourneyPattern::StopsWithDepartureArrivalAuthorization servedStops;
 					Edge::MetricOffset distance(0);
 					bool ignoreRoute(false);
-					for(size_t i(10); i<line.size(); i += 10)
+					for(size_t i(10); i+1<line.size(); i += 10)
 					{
-						if(line.length() < i+10)
+						if(line.size() < i+9)
 						{
 							stream << "WARN : inconsistent line size " << line << "<br />";
 							ignoreRoute = true;
@@ -389,7 +389,7 @@ namespace synthese
 							lexical_cast<int>(trim_copy(line.substr(3,3)))
 					)	);
 					
-					for(size_t i(29); i<line.size(); ++i)
+					for(size_t i(29); i+1<line.size(); ++i)
 					{
 						string routeNumber(trim_copy(line.substr(i,2)));
 						RoutesMap::iterator it(_routes.find(make_pair(lineNumber, routeNumber)));
@@ -508,7 +508,7 @@ namespace synthese
 					}
 					
 					// Services list
-					for(size_t i(13); i<line.size(); i+=29)
+					for(size_t i(13); i+6<line.size(); i+=29)
 					{
 						int lineNumber(lexical_cast<int>(trim_copy(line.substr(i,3))));
 						int serviceNumber(lexical_cast<int>(trim_copy(line.substr(i+3,3))));
