@@ -51,6 +51,7 @@
 #include "AdminParametersException.h"
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"
+#include "DRTArea.hpp"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -452,9 +453,17 @@ namespace synthese
 						}
 					}
 
-					stream << t.col(6, string(), true) << "Service " << service->getServiceNumber() << " - départ de " <<
-						dynamic_cast<const NamedPlace*>(static_cast<const JourneyPattern*>(service->getPath())->getEdge(0)->getHub())->getFullName() <<
-						" à " << Service::GetTimeOfDay(service->getDepartureSchedule(false, 0));
+					stream << t.col(6, string(), true) << "Service " << service->getServiceNumber() << " - départ de ";
+					const Edge* edge(service->getPath()->getEdge(0));
+					if(dynamic_cast<const NamedPlace*>(edge->getHub()))
+					{
+						stream << dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName();
+					}
+					else if(dynamic_cast<const DRTArea*>(edge->getFromVertex()))
+					{
+						stream << static_cast<const DRTArea*>(edge->getFromVertex())->getName();
+					}
+					stream << " à " << Service::GetTimeOfDay(service->getDepartureSchedule(false, 0));
 					if (serviceSeatsNumber > 0)
 						stream << " - " << serviceSeatsNumber << " place" << plural << " réservée" << plural;
 

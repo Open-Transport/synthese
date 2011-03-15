@@ -19,4 +19,5 @@ synthese::pt_operation::VehiclesAdmin::integrate();
 
 synthese::util::Env::Integrate<synthese::pt_operation::Composition>();
 synthese::util::Env::Integrate<synthese::pt_operation::Vehicle>();
+synthese::util::Env::Integrate<synthese::pt_operation::VehiclePosition>();
 

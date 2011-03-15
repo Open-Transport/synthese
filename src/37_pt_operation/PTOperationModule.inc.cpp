@@ -19,3 +19,4 @@
 
 #include "Composition.hpp"
 #include "Vehicle.hpp"
+#include "VehiclePosition.hpp"

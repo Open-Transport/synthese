@@ -265,6 +265,12 @@ namespace synthese
 			// Empty path : just put the edge in the vector
 			if (_edges.empty())
 			{
+				Edge* previousEdge(NULL);
+				BOOST_FOREACH(Edge* subEdge, edge.getSubEdges())
+				{
+					_linkEdge(previousEdge, NULL, *subEdge);
+					previousEdge = subEdge;
+				}
 				_edges.push_back(&edge);
 				return;
 			}

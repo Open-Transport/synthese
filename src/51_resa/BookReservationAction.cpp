@@ -131,6 +131,7 @@ namespace synthese
 		ParametersMap BookReservationAction::getParametersMap() const
 		{
 			ParametersMap map;
+			map.insert(PARAMETER_CREATE_CUSTOMER, _createCustomer);
 			if(_service.get() && _journey.size() == 1)
 			{
 				map.insert(PARAMETER_SERVICE_ID, _service->getKey());
@@ -193,6 +194,8 @@ namespace synthese
 
 		void BookReservationAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			_createCustomer = map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false);
+
 			if(map.getDefault<bool>(PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME, false))
 			{
 				UserTableSync::SearchResult customers(UserTableSync::Search(*_env, optional<string>(), map.get<string>(PARAMETER_CUSTOMER_NAME)));
@@ -204,7 +207,7 @@ namespace synthese
 
 			if(!_customer.get())
 			{
-				if (map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false))
+				if (_createCustomer)
 				{
 					_customer.reset(new User);
 					_customer->setName(map.get<string>(PARAMETER_CUSTOMER_NAME));

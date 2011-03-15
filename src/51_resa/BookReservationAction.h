@@ -160,6 +160,7 @@ namespace synthese
 			
 			void setJourney(const graph::Journey& value){ _journey = value; }
 			void setAccessParameters(const graph::AccessParameters& value){ _accessParameters = value; }
+			void setCreateCustomer(bool value){ _createCustomer = value; }
 
 			virtual bool isAuthorized(const server::Session* session) const;
 
