@@ -213,8 +213,19 @@ boost::posix_time::ptime {
 
 ; Posix time_duration
 boost::posix_time::time_duration {
-  preview  (#if ($e.is_special()) (#("special")) #else (#("time_duration (expand to view)")))
-  children (#if ($e.is_special()) (#("special")) #else ([_print_time_duration(*&($e)),s]))
+	preview(
+		#if($e.is_special())
+		(#("special"))
+		#else(
+			#(
+				$e.ticks_.value_/3600000000,
+				"h",
+				(($e.ticks_.value_/1000000)%3600)/60,
+				"'",
+				(($e.ticks.value_/1000000)%3600)%60
+			)
+		)
+	)
 }
 
 ;
@@ -316,7 +327,47 @@ boost::optional<*>|boost::optional_detail::optional_base<*> {
 
 
 ;-------------------------------------------------------------
-; SYNTHESE DateTime
+; SYNTHESE StopArea
+;
+synthese::pt::StopArea {
+  preview
+  (
+    #(
+       (*$e._city)._name,
+       " ",
+       $e._name
+    )
+  )
+}
+
+;-------------------------------------------------------------
+; SYNTHESE StopPoint
+;
+synthese::pt::StopPoint {
+  preview
+  (
+    #(
+       (*(synthese::pt::StopArea*)($e._hub)),
+       $e._name
+    )
+  )
+}
+
+;-------------------------------------------------------------
+; SYNTHESE LineStop
+;
+synthese::pt::LineStop {
+  preview
+  (
+    #(
+       (*(synthese::pt::StopPoint*)($e._fromVertex)),
+       (*(synthese::pt::JourneyPattern*)($e._parentPath))
+    )
+  )
+}
+
+;-------------------------------------------------------------
+; SYNTHESE ServiceUse
 ;
 synthese::graph::ServiceUse {
   children
@@ -334,30 +385,6 @@ synthese::graph::ServiceUse {
          departureEdge:$e._edge,
          arrivalTime:$e._secondActualDateTime,
          arrivalEdge:$e._secondEdge
-      )
-    )
-  )
-}
-
-; SYNTHESE DateTime END
-;-----------------------------------------------------------
-
-
-
-;-------------------------------------------------------------
-; SYNTHESE DateTime
-;
-synthese::time::DateTime {
-  preview
-  (
-    #if($e._date._year==-1)
-    (
-      "?"
-    )
-    #else
-    (
-      #(
-	$e._date._year, "-", $e._date._month , "-", $e._date._day, " ", $e._hour._hours, "-", $e._hour._minutes, "-", $e._hour._seconds
       )
     )
   )
