@@ -102,7 +102,7 @@ namespace synthese
 		void SQLiteInheritedTableSyncTemplate<LineStopTableSync,LineAreaInheritedTableSync,LineArea>::Unlink(
 			LineArea* obj
 		){
-
+	
 		}
 
 

@@ -99,6 +99,8 @@ namespace synthese
 
 			const Status& getStatus() const { return _status; }
 			Vehicle* getVehicle() const { return _vehicle; }
+			const boost::posix_time::ptime& getTime() const { return _time; }
+			const Meters& getMeterOffset() const { return _meterOffset; }
 			boost::shared_ptr<geos::geom::Point> getPoint() const { return _point; }
 			pt::StopPoint* getStopPoint() const { return _stopPoint; }
 			const std::string& getComment() const { return _comment; }

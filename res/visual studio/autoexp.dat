@@ -222,7 +222,7 @@ boost::posix_time::time_duration {
 				"h",
 				(($e.ticks_.value_/1000000)%3600)/60,
 				"'",
-				(($e.ticks.value_/1000000)%3600)%60
+				(($e.ticks_.value_/1000000)%3600)%60
 			)
 		)
 	)

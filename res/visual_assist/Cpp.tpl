@@ -1577,7 +1577,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds links to the pages of the current class to put directly under
 			/// a module admin page in the pages tree.
-			///	@param moduleKey Key of the module
+			///	@param module The module
 			///	@param currentPage Currently displayed page
 			/// @param request Current request
 			///	@return PageLinks each page to put under the module page in the page
@@ -1586,7 +1586,7 @@ namespace synthese
 			/// @todo A DEFAULT IMPLEMENTATION RETURNS NOTHING.
 			///       REMOVE THIS METHOD OVERLOAD IF IT IS NOT NECESSARY.
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
-				const std::string& moduleKey,
+				const server::ModuleClass& module,
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
@@ -1650,7 +1650,7 @@ a:Admin Page Implementation::
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "$FILE_BASE$.h"
+#include "$FILE_BASE$.hpp"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
 #include "$ModuleClass$.h"
@@ -1726,7 +1726,7 @@ namespace synthese
 
 		void $FILE_BASE$::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const admin::AdminRequest& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -1744,19 +1744,19 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks $FILE_BASE$::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const admin::AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == $ModuleClass$::FACTORY_KEY &&
-				_request.getUser() &&
-				_request.getUser()->getProfile() &&
-				isAuthorized(*_request.getUser())
+			if(	dynamic_cast<const $ModuleClass$*>(&module) &&
+				request.getUser() &&
+				request.getUser()->getProfile() &&
+				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			
 			return links;
@@ -1766,7 +1766,7 @@ namespace synthese
 		
 		AdminInterfaceElement::PageLinks $FILE_BASE$::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const admin::AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
@@ -1778,7 +1778,7 @@ namespace synthese
 			// if(ua)
 			// {
 			//	shared_ptr<$FILE_BASE$> p(getNewOtherPage<$FILE_BASE$>());
-			//	AddToLinks(links, p);
+			//	links.push_back(p);
 			// }
 			
 			return links;
@@ -1806,7 +1806,7 @@ namespace synthese
 		) const	{
 			_tabs.clear();
 
-			// _tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, profile.isAuthorized<$RightClass$>(WRITE, UNKNOWN_RIGHT_LEVEL)));
+			// _tabs.push_back(Tab("Propriï¿½tï¿½s", TAB_PROPERTIES, profile.isAuthorized<$RightClass$>(WRITE, UNKNOWN_RIGHT_LEVEL)));
 
 			_tabBuilded = true;
 		}
@@ -2274,117 +2274,189 @@ namespace synthese
 
 a:Inherited Table Sync Header::
 
-/** $FILE_BASE$ class header.
-	@file $FILE_BASE$.$FILE_EXT$
+//////////////////////////////////////////////////////////////////////////
+///	$FILE_BASE$ class header.
+///	@file $FILE_BASE$.$FILE_EXT$
+///	@author %USERNAME%
+///	@date $YEAR$
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software
+///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+#ifndef SYNTHESE_$Namespace$_$FILE_BASE$_$FILE_EXT$__
+#define SYNTHESE_$Namespace$_$FILE_BASE$_$FILE_EXT$__
 
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
+#include "SQLiteInherited$NoSync_or_Registry$TableSyncTemplate.h"
 
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#ifndef SYNTHESE_$Module$_$FILE_BASE$_$FILE_EXT$__
-#define SYNTHESE_$Module$_$FILE_BASE$_$FILE_EXT$__
-
-#include "02_db/SQLiteInheritedTableSyncTemplate.h"
-
-#include "$Parent_table_sync$.h"
+#include "$Parent_Table_Sync$.hpp"
 #include "$Class$.h"
 
 namespace synthese
 {
-	namespace $Module$
+	namespace $Namespace$
 	{
-		/** $FILE_BASE$ class.
-			@ingroup m$Module_number$ILS refILS
-		*/
-		class $FILE_BASE$
-			: public db::SQLiteInheritedTableSyncTemplate<$Parent_table_sync$, $FILE_BASE$, $Class$>
+		//////////////////////////////////////////////////////////////////////////
+		///	$FILE_BASE$ class.
+		//////////////////////////////////////////////////////////////////////////
+		///	@ingroup m$Module$ILS refILS
+		///	@author %USERNAME%
+		/// @since $Version$
+		/// @date $YEAR$
+		class $FILE_BASE$:
+			public db::SQLiteInherited$NoSync_or_Registry$TableSyncTemplate<
+				$Parent_Table_Sync$,
+				$FILE_BASE$,
+				$Class$
+			>
 		{
 		public:
-			/** Constructor.
-			*/
-			$FILE_BASE$();
+			//////////////////////////////////////////////////////////////////////////
+			/// Search of $Class$ objects.
+			/// @param env Environment to populate when loading objects
+			/// @param first first element to return
+			/// @param number maximal number of elements to return
+			/// @param orderById order the returned elements by their id
+			/// @param raisingOrder order ascendantly or not
+			/// @param linkLevel automatic load of objects linked by foreign key
+			///	@author %USERNAME%
+			/// @since $Version$
+			/// @date $YEAR$
+			static SearchResult Search(
+				util::Env& env,
+				std::size_t first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				bool orderById = false,
+				bool raisingOrder = false,
+				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+			);
 		};
-	}
-}
+}	}
 
-#endif // SYNTHESE_$Module$_$FILE_BASE$_$FILE_EXT$__
+#endif // SYNTHESE_$Namespace$_$FILE_BASE$_$FILE_EXT$__
 
 
 a:Inherited Table Sync Implementation::
 
-/** $FILE_BASE$ class implementation.
-	@file $FILE_BASE$.$FILE_EXT$
+//////////////////////////////////////////////////////////////////////////
+///	$FILE_BASE$ class implementation.
+///	@file $FILE_BASE$.$FILE_EXT$
+///	@author %USERNAME%
+///	@date $YEAR$
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized software)
+///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software
+///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include "$FILE_BASE$.h"
+#include "$FILE_BASE$.hpp"
+#include "ReplaceQuery.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace db;
-	using namespace $Module$;
+	using namespace $Namespace$;
+	using namespace util;
 
 	template<>
-	const string util::FactorableTemplate<$Parent_table_sync$, $FILE_BASE$>::FACTORY_KEY("$FILE_BASE$");
+	const string util::FactorableTemplate<$Parent_Table_Sync$,$FILE_BASE$>::FACTORY_KEY("$FILE_BASE$");
 
 	namespace db
 	{
-
 		template<>
-		void SQLiteInheritedTableSyncTemplate<$Parent_table_sync$,$FILE_BASE$,$Class$>::_Link($Class$* obj, const SQLiteResultSPtr& rows, GetSource temporary)
-		{
-			/// @todo Implement Link
+		void SQLiteInheritedTableSyncTemplate<$Parent_Table_Sync$,$FILE_BASE$,$Class$>::Load(
+			$Class$* obj,
+			const SQLiteResultSPtr& rows,
+			Env& env,
+			LinkLevel linkLevel
+		){
+			_CommonLoad(obj, rows, env, linkLevel);
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+			}
 		}
 
+
+
 		template<>
-		void SQLiteInheritedTableSyncTemplate<$Parent_table_sync$,$FILE_BASE$,$Class$>::_Unlink($Class$* obj)
-		{
-			/// @todo Implement Unlink
+		void SQLiteInheritedTableSyncTemplate<$Parent_Table_Sync$,$FILE_BASE$,$Class$>::Unlink(
+			$Class$* obj
+		){
+		}
+
+
+
+		template<>
+		void SQLiteInheritedTableSyncTemplate<$Parent_Table_Sync$,$FILE_BASE$,$Class$>::Save(
+			$Class$* obj,
+			optional<SQLiteTransaction&> transaction
+		){
+			// The query
+			ReplaceQuery<$Parent_Table_Sync$> query(*obj);
+			// query.addField(object->getName());
+			query.execute(transaction);
 		}
 	}
 
-	namespace $Module$
+	namespace $Namespace$
 	{
+		$FILE_BASE$::SearchResult $FILE_BASE$::Search(
+			Env& env,
+			size_t first,
+			boost::optional<std::size_t> number,
+			bool orderById,
+			bool raisingOrder,
+			LinkLevel linkLevel
+		){
+			SelectQuery<$Parent_Table_Sync$> query;
+			
+			// Ordering
+			if(orderById)
+			{
+				query.addOrderField(TABLE_COL_ID, raisingOrder);
+			}
+			if (number)
+			{
+				query.setNumber(*number + 1);
+				if (first > 0)
+				{
+					query.setFirst(first);
+				}
+			}
 
-		$FILE_BASE$::$FILE_BASE$()
-			: SQLiteInheritedNoSyncTableSyncTemplate<$Parent_table_sync$, $FILE_BASE$, $Class$>()
-		{
-
+			return LoadFromQuery(query, env, linkLevel);
 		}
-	}
-}
+}	}
+
+
 a:Function Header::
 
 //////////////////////////////////////////////////////////////////////////////////////////
