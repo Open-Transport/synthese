@@ -117,7 +117,9 @@ namespace synthese
 				bvrmd,
 				destinationVam,
 				direction == DEPARTURE_TO_ARRIVAL ? getLowestDepartureTime() : getHighestArrivalTime(),
-				direction == DEPARTURE_TO_ARRIVAL ? getHighestDepartureTime() : getLowestArrivalTime(),
+				direction == DEPARTURE_TO_ARRIVAL ?
+					getLowestDepartureTime() + (getHighestArrivalTime() - getHighestDepartureTime()) :
+					getHighestArrivalTime() - (getLowestArrivalTime() - getLowestDepartureTime()),
 				highestArrivalTime,
 				false,
 				false,
