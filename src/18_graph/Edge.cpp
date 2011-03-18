@@ -65,7 +65,8 @@ namespace synthese
 			_next(NULL),
 			_departureIndex(INDICES_NUMBER),
 			_arrivalIndex(INDICES_NUMBER),
-			_serviceIndexUpdateNeeded (true)
+			_serviceIndexUpdateNeeded (true),
+			_RTserviceIndexUpdateNeeded(true)
 		{}
 
 
