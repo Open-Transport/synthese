@@ -58,6 +58,7 @@
 #include "User.h"
 #include "UserTableSync.h"
 
+#include <geos/geom/Point.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
@@ -342,15 +343,39 @@ namespace synthese
 
 			if(!_confirmedTransaction.get())
 			{
-				ptime endDate(_dateTime);
+				ptime maxDepartureTime(_dateTime);
 				if(_planningOrder == DEPARTURE_FIRST)
 				{
-					endDate += days(1);
+					maxDepartureTime += days(1);
 				}
 				else
 				{
-					endDate -= days(1);
+					maxDepartureTime -= days(1);
 				}
+				ptime maxArrivalTime(maxDepartureTime);
+				if(_planningOrder == DEPARTURE_FIRST)
+				{
+					maxArrivalTime += days(1);
+					if(	startPlace->getPoint().get() &&
+						!startPlace->getPoint()->isEmpty() &&
+						endPlace->getPoint().get() &&
+						!endPlace->getPoint()->isEmpty()
+					){
+							maxArrivalTime += minutes(2 * static_cast<int>(startPlace->getPoint()->distance(endPlace->getPoint().get()) / 1000));
+					}
+				}
+				else
+				{
+					maxArrivalTime -= days(1);
+					if(	startPlace->getPoint().get() &&
+						!startPlace->getPoint()->isEmpty() &&
+						endPlace->getPoint().get() &&
+						!endPlace->getPoint()->isEmpty()
+					){
+						maxArrivalTime -= minutes(2 * static_cast<int>(startPlace->getPoint()->distance(endPlace->getPoint().get()) / 1000));
+					}
+				}
+
 
 				// Route planning
 				AccessParameters ap(
@@ -374,10 +399,10 @@ namespace synthese
 				PTTimeSlotRoutePlanner r(
 					startPlace.get(),
 					endPlace.get(),
-					_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
-					_planningOrder == DEPARTURE_FIRST ? endDate : _dateTime,
-					_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
-					_planningOrder == DEPARTURE_FIRST ? endDate : _dateTime,
+					_planningOrder == DEPARTURE_FIRST ? _dateTime : maxArrivalTime,
+					_planningOrder == DEPARTURE_FIRST ? maxDepartureTime : _dateTime,
+					_planningOrder == DEPARTURE_FIRST ? _dateTime : maxDepartureTime,
+					_planningOrder == DEPARTURE_FIRST ? maxArrivalTime : _dateTime,
 					5,
 					ap,
 					_planningOrder
