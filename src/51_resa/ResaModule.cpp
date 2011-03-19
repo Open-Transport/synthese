@@ -48,6 +48,8 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "OnlineReservationRule.h"
 #include "OnlineReservationRuleTableSync.h"
+#include "TransportWebsite.h"
+#include "TransportWebsiteTableSync.h"
 
 #include <boost/foreach.hpp>
 
@@ -64,6 +66,7 @@ namespace synthese
 	using namespace dblog;
 	using namespace util;
 	using namespace resa;
+	using namespace pt_website;
 
 	template<> const std::string util::FactorableTemplate<ModuleClass,ResaModule>::FACTORY_KEY("51_resa");
 
@@ -73,6 +76,7 @@ namespace synthese
 		const string ResaModule::_AUTORESA_PROFILE_NAME("Autoresa Resa Customer");	// Never change this or the database will be corrupted
 		const string ResaModule::_ADMIN_PROFILE_NAME("Resa admin user");	// Never change this or the database will be corrupted
 		const string ResaModule::_RESERVATION_CONTACT_PARAMETER("reservation_contact");
+		const string ResaModule::_JOURNEY_PLANNER_WEBSITE("resa_journey_planner_website");
 
 		const std::string ResaModule::DATA_SWITCH_CALL_URL("switch_call_url");
 		const std::string ResaModule::DATA_CURRENT_CALL_ID("current_call_id");
@@ -84,17 +88,23 @@ namespace synthese
 		shared_ptr<Profile> ResaModule::_adminProfile;
 		recursive_mutex ResaModule::_sessionsCallIdsMutex;
 		shared_ptr<OnlineReservationRule> ResaModule::_reservationContact;
+		shared_ptr<TransportWebsite> ResaModule::_journeyPlannerWebsite;
 	}
 
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<ResaModule>::NAME("TAD Réservation");
 		
+
+
 		template<> void ModuleClassTemplate<ResaModule>::PreInit()
 		{
 			RegisterParameter(ResaModule::_RESERVATION_CONTACT_PARAMETER, "0", &ResaModule::ParameterCallback);
+			RegisterParameter(ResaModule::_JOURNEY_PLANNER_WEBSITE, "0", &ResaModule::ParameterCallback);
 		}
 		
+
+
 		template<> void ModuleClassTemplate<ResaModule>::Init()
 		{
 			
@@ -141,6 +151,8 @@ namespace synthese
 			}
 		}
 		
+
+
 		template<> void ModuleClassTemplate<ResaModule>::End()
 		{
 		}
@@ -184,6 +196,8 @@ namespace synthese
 			stream << "</ul>";
 		}
 
+
+
 		void ResaModule::CallOpen( const server::Session* session )
 		{
 			recursive_mutex::scoped_lock lock(_sessionsCallIdsMutex);
@@ -194,6 +208,8 @@ namespace synthese
 
 			_sessionsCallIds[session] = entryId;
 		}
+
+
 
 		void ResaModule::CallClose( const server::Session* session )
 		{
@@ -207,6 +223,8 @@ namespace synthese
 				_sessionsCallIds.erase(it);
 			}
 		}
+
+
 
 		RegistryKeyType ResaModule::GetCurrentCallId( const server::Session* session )
 		{
@@ -282,7 +300,24 @@ namespace synthese
 
 				if(id > 0)
 				{
-					ResaModule::_reservationContact = OnlineReservationRuleTableSync::GetEditable(id, Env::GetOfficialEnv());				
+					_reservationContact = OnlineReservationRuleTableSync::GetEditable(id, Env::GetOfficialEnv());
+				}
+				else
+				{
+					_reservationContact.reset();
+				}
+			}
+			else if(name == _JOURNEY_PLANNER_WEBSITE)
+			{
+				RegistryKeyType id(lexical_cast<RegistryKeyType>(value));
+
+				if(id > 0)
+				{
+					_journeyPlannerWebsite = TransportWebsiteTableSync::GetEditable(id, Env::GetOfficialEnv());
+				}
+				else
+				{
+					_journeyPlannerWebsite.reset();
 				}
 			}
 		}
@@ -309,7 +344,7 @@ namespace synthese
 
 					AdminActionFunctionRequest<CallBeginAction,ReservationRoutePlannerAdmin> callRequest(
 						request
-						);
+					);
 					map.insert(DATA_SWITCH_CALL_URL, callRequest.getURL());
 				}
 				else
@@ -318,12 +353,12 @@ namespace synthese
 
 					AdminActionFunctionRequest<CallEndAction,ResaEditLogEntryAdmin> callRequest(
 						request
-						);
+					);
 					callRequest.getPage()->setEntry(
 						DBLogEntryTableSync::Get(
-						callId,
-						*request.getFunction()->getEnv()
-						)	);
+							callId,
+							*request.getFunction()->getEnv()
+					)	);
 					map.insert(DATA_SWITCH_CALL_URL, callRequest.getURL());
 
 					Env env;
@@ -331,5 +366,12 @@ namespace synthese
 					map.insert(DATA_CURRENT_CALL_TIMESTAMP, to_iso_string(entry->getDate()));
 				}
 			}
+		}
+
+
+
+		pt_website::TransportWebsite* ResaModule::GetJourneyPlannerWebsite()
+		{
+			return _journeyPlannerWebsite.get();
 		}
 }	}

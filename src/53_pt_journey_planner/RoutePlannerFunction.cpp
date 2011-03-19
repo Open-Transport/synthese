@@ -99,6 +99,7 @@ namespace synthese
 	{
 		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER("msn");
 		const string RoutePlannerFunction::PARAMETER_MAX_DEPTH("md");
+		const string RoutePlannerFunction::PARAMETER_APPROACH_SPEED("apsp");
 		const string RoutePlannerFunction::PARAMETER_DAY("dy");
 		const string RoutePlannerFunction::PARAMETER_PERIOD_ID("pi");
 		const string RoutePlannerFunction::PARAMETER_ACCESSIBILITY("ac");
@@ -414,6 +415,10 @@ namespace synthese
 			if(map.getOptional<size_t>(PARAMETER_MAX_DEPTH))
 			{
 				_accessParameters.setMaxtransportConnectionsCount(map.getOptional<size_t>(PARAMETER_MAX_DEPTH));
+			}
+			if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
+			{
+				_accessParameters.setApproachSpeed(*(map.getOptional<double>(PARAMETER_APPROACH_SPEED)));
 			}
 
 			if(	!_departure_place.placeResult.value || !_arrival_place.placeResult.value
@@ -883,7 +888,7 @@ namespace synthese
 								PTRoutePlannerResult::GetNamedPlaceFromLegs(
 									itl == jl.begin() ? NULL : &(*(itl - 1)),
 									&curET,
-									dynamic_cast<const NamedPlace*>(_departure_place.placeResult.value.get())
+									PTRoutePlannerResult::getNamedPlace(_departure_place.placeResult.value.get())
 							)	);
 
 							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
@@ -926,7 +931,7 @@ namespace synthese
 								PTRoutePlannerResult::GetNamedPlaceFromLegs(
 									&curET,
 									itl == jl.end()-1 ? NULL : &(*(itl+1)),
-									dynamic_cast<const NamedPlace*>(_arrival_place.placeResult.value.get())
+									PTRoutePlannerResult::getNamedPlace(_arrival_place.placeResult.value.get())
 							)	);
 							
 							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )

@@ -216,7 +216,6 @@ namespace synthese
 				boost::optional<boost::shared_ptr<const geography::NamedPlace> > getPlace() const { return _place; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif

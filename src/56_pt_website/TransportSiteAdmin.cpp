@@ -61,6 +61,7 @@
 #include "RoadJourneyPlanner.h"
 #include "RoadModule.h"
 
+#include <geos/geom/Point.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/foreach.hpp>
 
@@ -404,26 +405,55 @@ namespace synthese
 				if (_log)
 					stream << "<h1>Trace</h1>";
 
-				ptime endDate(_dateTime);
-				endDate += days(1);
-
+				algorithm::PlanningOrder _planningOrder(DEPARTURE_FIRST);
 				// Route planning
 				RoadModule::ExtendedFetchPlaceResult startPlace(RoadModule::ExtendedFetchPlace(_site->getCitiesMatcher(), _startCity, _startPlace));
 				RoadModule::ExtendedFetchPlaceResult endPlace(RoadModule::ExtendedFetchPlace(_site->getCitiesMatcher(), _endCity, _endPlace));
 
-				stream << "<h1>Résultats</h1>";
+				ptime maxDepartureTime(_dateTime);
+				if(_planningOrder == DEPARTURE_FIRST)
+				{
+					maxDepartureTime += days(1);
+				}
+				else
+				{
+					maxDepartureTime -= days(1);
+				}
+				ptime maxArrivalTime(maxDepartureTime);
+				if(_planningOrder == DEPARTURE_FIRST)
+				{
+					maxArrivalTime += days(1);
+					if(	startPlace.placeResult.value->getPoint().get() &&
+						!startPlace.placeResult.value->getPoint()->isEmpty() &&
+						endPlace.placeResult.value->getPoint().get() &&
+						!endPlace.placeResult.value->getPoint()->isEmpty()
+					){
+						maxArrivalTime += minutes(2 * static_cast<int>(startPlace.placeResult.value->getPoint()->distance(endPlace.placeResult.value->getPoint().get()) / 1000));
+					}
+				}
+				else
+				{
+					maxArrivalTime -= days(1);
+					if(	startPlace.placeResult.value->getPoint().get() &&
+						!startPlace.placeResult.value->getPoint()->isEmpty() &&
+						endPlace.placeResult.value->getPoint().get() &&
+						!endPlace.placeResult.value->getPoint()->isEmpty()
+					){
+						maxArrivalTime -= minutes(2 * static_cast<int>(startPlace.placeResult.value->getPoint()->distance(endPlace.placeResult.value->getPoint().get()) / 1000));
+					}
+				}
 
-				algorithm::PlanningOrder _planningOrder(DEPARTURE_FIRST);
+				stream << "<h1>Résultats</h1>";
 
 				if(_pt_journey_planning)
 				{
 					PTTimeSlotRoutePlanner r(
 						startPlace.placeResult.value.get(),
 						endPlace.placeResult.value.get(),
-						_dateTime,
-						endDate,
-						_dateTime,
-						endDate,
+						_planningOrder == DEPARTURE_FIRST ? _dateTime : maxArrivalTime,
+						_planningOrder == DEPARTURE_FIRST ? maxDepartureTime : _dateTime,
+						_planningOrder == DEPARTURE_FIRST ? _dateTime : maxDepartureTime,
+						_planningOrder == DEPARTURE_FIRST ? maxArrivalTime : _dateTime,
 						_resultsNumber,
 						_site->getAccessParameters(_accessibility, _rollingStockFilter ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()),
 						_planningOrder,
@@ -444,10 +474,10 @@ namespace synthese
 					RoadJourneyPlanner r(
 						startPlace.placeResult.value.get(),
 						endPlace.placeResult.value.get(),
-						_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
-						_planningOrder == DEPARTURE_FIRST ? endDate : _dateTime,
-						_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
-						_planningOrder == DEPARTURE_FIRST ? endDate : _dateTime,
+						_planningOrder == DEPARTURE_FIRST ? _dateTime : maxArrivalTime,
+						_planningOrder == DEPARTURE_FIRST ? maxDepartureTime : _dateTime,
+						_planningOrder == DEPARTURE_FIRST ? _dateTime : maxDepartureTime,
+						_planningOrder == DEPARTURE_FIRST ? maxArrivalTime : _dateTime,
 						1,
 						ap,
 						_planningOrder

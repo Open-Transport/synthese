@@ -1,5 +1,10 @@
 Import ('s3env')
 
+s3env = s3env.Clone ()
+# For compiling Boost random_device.cpp, this define has to be set.
+# To be removed once migrated to Boost 1.45.
+s3env.Append ( CPPDEFINES = ['BOOST_RANDOM_DECL='] )
+
 CppSynthese3LibProject(
 	s3env, 's3-server', s3env['S3VERSION'], 
 	source_files = s3env.Glob ('*.cpp'),

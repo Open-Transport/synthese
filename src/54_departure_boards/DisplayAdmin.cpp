@@ -1263,5 +1263,4 @@ namespace synthese
 
 			return links;
 		}
-	}
-}
+}	}

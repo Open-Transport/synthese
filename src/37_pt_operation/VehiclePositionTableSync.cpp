@@ -52,7 +52,7 @@ namespace synthese
 		const std::string VehiclePositionTableSync::COL_COMMENT;
 		const std::string VehiclePositionTableSync::COL_SERVICE_ID;
 		const std::string VehiclePositionTableSync::COL_RANK_IN_PATH;
-		const std::string VehiclePositionTableSync::COL_RANK_PASSENGERS;
+		const std::string VehiclePositionTableSync::COL_PASSENGERS;
 		const std::string VehiclePositionTableSync::COL_GEOMETRY;
 	}
 	
@@ -75,9 +75,8 @@ namespace synthese
 			SQLiteTableSync::Field(VehiclePositionTableSync::COL_COMMENT, SQL_TEXT),
 			SQLiteTableSync::Field(VehiclePositionTableSync::COL_SERVICE_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(VehiclePositionTableSync::COL_RANK_IN_PATH, SQL_INTEGER),
-			static const std::string COL_RANK_IN_PATH;
-			static const std::string COL_RANK_PASSENGERS;
-			static const std::string COL_GEOMETRY;
+			SQLiteTableSync::Field(VehiclePositionTableSync::COL_PASSENGERS, SQL_INTEGER),
+			SQLiteTableSync::Field(VehiclePositionTableSync::COL_GEOMETRY, SQL_GEOM_POINT),
 			SQLiteTableSync::Field()
 		};
 

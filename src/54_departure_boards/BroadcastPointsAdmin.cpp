@@ -260,41 +260,47 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+		
 			const DisplaySearchAdmin* sa(
 				dynamic_cast<const DisplaySearchAdmin*>(&currentPage)
 			);
 			
-			vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(
-				searchConnectionPlacesWithBroadcastPoints(
-					Env::GetOfficialEnv(),
-					request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>(),
-					request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ
-					, READ
-					, string()
-					, string()
-					, AT_LEAST_ONE_BROADCASTPOINT
-			)	);
+			if(	sa ||
+				dynamic_cast<const DisplayScreenCPUAdmin*>(&currentPage) ||
+				dynamic_cast<const BroadcastPointsAdmin*>(&currentPage) ||
+				dynamic_cast<const DisplayAdmin*>(&currentPage)
+			){
+				vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchResult(
+					searchConnectionPlacesWithBroadcastPoints(
+						_getEnv(),
+						request.getUser()->getProfile()->getRightsForModuleClass<ArrivalDepartureTableRight>(),
+						request.getUser()->getProfile()->getGlobalPublicRight<ArrivalDepartureTableRight>() >= READ,
+						READ,
+						string(),
+						string(),
+						AT_LEAST_ONE_BROADCASTPOINT
+				)	);
 
-			bool currentToAdd(sa && sa->getPlace() && sa->getPlace()->get());
-			BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> result, searchResult)
-			{
-				shared_ptr<DisplaySearchAdmin> p(
-					getNewPage<DisplaySearchAdmin>()
-				);
-				p->setPlace(result->place->getKey());
-				links.push_back(p);
-				if(*p == currentPage) currentToAdd = false;
-			}
-			
-			if(currentToAdd)
-			{
-				shared_ptr<DisplaySearchAdmin> p(
-					getNewPage<DisplaySearchAdmin>()
-				);
-				p->setPlace((*sa->getPlace())->getKey());
-				links.push_back(p);
-			}
+				bool currentToAdd(sa && sa->getPlace() && sa->getPlace()->get());
+				BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> result, searchResult)
+				{
+					shared_ptr<DisplaySearchAdmin> p(
+						getNewPage<DisplaySearchAdmin>()
+					);
+					p->setPlace(result->place->getKey());
+					links.push_back(p);
+					if(*p == currentPage) currentToAdd = false;
+				}
+				
+				if(currentToAdd)
+				{
+					shared_ptr<DisplaySearchAdmin> p(
+						getNewPage<DisplaySearchAdmin>()
+					);
+					p->setPlace((*sa->getPlace())->getKey());
+					links.push_back(p);
+			}	}
+
 			return links;
 		}
 		

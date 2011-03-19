@@ -222,7 +222,7 @@ namespace synthese
 					
 					// Arrival time
 					stream << ts.col();
-					if(lineStop.isArrival())
+					if(lineStop.isArrivalAllowed())
 					{
 						timetableUpdateRequest.getAction()->setUpdateArrival(true);
 						HTMLForm tuForm(timetableUpdateRequest.getHTMLForm());
@@ -251,7 +251,7 @@ namespace synthese
 
 					// Departure time
 					stream << ts.col();
-					if(lineStop.isDeparture())
+					if(lineStop.isDepartureAllowed())
 					{
 						timetableUpdateRequest.getAction()->setUpdateArrival(false);
 						HTMLForm tuForm(timetableUpdateRequest.getHTMLForm());

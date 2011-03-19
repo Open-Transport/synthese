@@ -52,7 +52,7 @@ namespace synthese
 				static const std::string COL_COMMENT;
 				static const std::string COL_SERVICE_ID;
 				static const std::string COL_RANK_IN_PATH;
-				static const std::string COL_RANK_PASSENGERS;
+				static const std::string COL_PASSENGERS;
 				static const std::string COL_GEOMETRY;
 			//@}
 			

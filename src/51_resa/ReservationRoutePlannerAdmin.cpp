@@ -42,7 +42,7 @@
 #include "RoadModule.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "PTRoutePlannerResult.h"
-
+#include "TransportWebsite.h"
 #include "SearchFormHTMLTable.h"
 #include "PTConstants.h"
 #include "Journey.h"
@@ -58,6 +58,7 @@
 #include "User.h"
 #include "UserTableSync.h"
 
+#include <geos/geom/Point.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
@@ -105,6 +106,8 @@ namespace synthese
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_CUSTOMER_ID("cu");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_SEATS_NUMBER("sn");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_PLANNING_ORDER("po");
+		const std::string ReservationRoutePlannerAdmin::PARAMETER_APPROACH_SPEED("apsp");
+		const std::string ReservationRoutePlannerAdmin::PARAMETER_ENABLED_PEDESTRIAN("epe");
 
 
 
@@ -114,8 +117,12 @@ namespace synthese
 			_withoutTransfer(false),
 			_dateTime(second_clock::local_time()),
 			_seatsNumber(1),
-			_planningOrder(DEPARTURE_FIRST)
-		{ }
+			_planningOrder(DEPARTURE_FIRST),
+			_enabledPedestrian(true),
+			_approachSpeed(0.833)//0.833 = 3km/h, 1.111 = 4km/h
+		{
+			_effectiveApproachSpeed = _approachSpeed;
+		}
 		
 
 
@@ -138,6 +145,20 @@ namespace synthese
 			}
 			_disabledPassenger = map.getDefault<bool>(PARAMETER_DISABLED_PASSENGER, false);
 			_withoutTransfer = map.getDefault<bool>(PARAMETER_WITHOUT_TRANSFER, false);
+			_enabledPedestrian = map.getDefault<bool>(PARAMETER_ENABLED_PEDESTRIAN, true);
+
+			if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
+			{
+				_approachSpeed = map.get<double>(PARAMETER_APPROACH_SPEED);
+			}
+			if(_enabledPedestrian)
+			{
+				_effectiveApproachSpeed = _approachSpeed;
+			}
+			else //If pedestrian disabled, then set pedestrian speed to 0 to avoid using roads
+			{
+				_effectiveApproachSpeed = 0;
+			}
 
 			if(map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
 			{
@@ -156,7 +177,7 @@ namespace synthese
 					throw AdminParametersException("Reservation load error");
 				}
 			}
-			
+
 			if(map.getOptional<RegistryKeyType>(PARAMETER_CUSTOMER_ID))
 			{
 				try
@@ -188,6 +209,7 @@ namespace synthese
 			m.insert(PARAMETER_WITHOUT_TRANSFER, _withoutTransfer);
 			m.insert(PARAMETER_SEATS_NUMBER, _seatsNumber);
 			m.insert(PARAMETER_PLANNING_ORDER, static_cast<int>(_planningOrder));
+			m.insert(PARAMETER_APPROACH_SPEED, _approachSpeed);
 			if(_customer.get())
 			{
 				m.insert(PARAMETER_CUSTOMER_ID, _customer->getKey());
@@ -221,6 +243,10 @@ namespace synthese
 				_request
 			);
 			resaRequest.setActionWillCreateObject();
+			if(ResaModule::GetJourneyPlannerWebsite())
+			{
+				resaRequest.getAction()->setSite(Env::GetOfficialEnv().getSPtr(ResaModule::GetJourneyPlannerWebsite()));
+			}
 
 			StaticFunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request, true);
 			customerSearchRequest.getFunction()->setNumber(20);
@@ -243,8 +269,16 @@ namespace synthese
 
 			if (!_startCity.empty() && !_endCity.empty())
 			{
-				startPlace = RoadModule::FetchPlace(_startCity, _startPlace);
-				endPlace = RoadModule::FetchPlace(_endCity, _endPlace);
+				if(ResaModule::GetJourneyPlannerWebsite())
+				{
+					startPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(_startCity, _startPlace);
+					endPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(_endCity, _endPlace);
+				}
+				else
+				{
+					startPlace = RoadModule::FetchPlace(_startCity, _startPlace);
+					endPlace = RoadModule::FetchPlace(_endCity, _endPlace);
+				}
 			}
 
 			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request);
@@ -290,6 +324,7 @@ namespace synthese
 			)	);
 			stream << st.cell("PMR", st.getForm().getOuiNonRadioInput(PARAMETER_DISABLED_PASSENGER, _disabledPassenger));
 			stream << st.cell("Sans correspondance", st.getForm().getOuiNonRadioInput(PARAMETER_WITHOUT_TRANSFER, _withoutTransfer));
+			stream << st.cell("Avec trajet piéton", st.getForm().getOuiNonRadioInput(PARAMETER_ENABLED_PEDESTRIAN, _enabledPedestrian));
 			stream << st.close();
 			stream << st.getForm().setFocus(PARAMETER_START_CITY);
 
@@ -308,20 +343,55 @@ namespace synthese
 
 			if(!_confirmedTransaction.get())
 			{
-				ptime endDate(_dateTime);
+				ptime maxDepartureTime(_dateTime);
 				if(_planningOrder == DEPARTURE_FIRST)
 				{
-					endDate += days(1);
+					maxDepartureTime += days(1);
 				}
 				else
 				{
-					endDate -= days(1);
+					maxDepartureTime -= days(1);
 				}
+				ptime maxArrivalTime(maxDepartureTime);
+				if(_planningOrder == DEPARTURE_FIRST)
+				{
+					maxArrivalTime += days(1);
+					if(	startPlace->getPoint().get() &&
+						!startPlace->getPoint()->isEmpty() &&
+						endPlace->getPoint().get() &&
+						!endPlace->getPoint()->isEmpty()
+					){
+							maxArrivalTime += minutes(2 * static_cast<int>(startPlace->getPoint()->distance(endPlace->getPoint().get()) / 1000));
+					}
+				}
+				else
+				{
+					maxArrivalTime -= days(1);
+					if(	startPlace->getPoint().get() &&
+						!startPlace->getPoint()->isEmpty() &&
+						endPlace->getPoint().get() &&
+						!endPlace->getPoint()->isEmpty()
+					){
+						maxArrivalTime -= minutes(2 * static_cast<int>(startPlace->getPoint()->distance(endPlace->getPoint().get()) / 1000));
+					}
+				}
+
 
 				// Route planning
 				AccessParameters ap(
 					_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
-					false, false, 1000, posix_time::minutes(23), 1.111,
+					false, false, 1000, posix_time::minutes(23), 1.111)
+				;
+				if(ResaModule::GetJourneyPlannerWebsite())
+				{
+					ap = ResaModule::GetJourneyPlannerWebsite()->getAccessParameters(
+						_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
+						AccessParameters::AllowedPathClasses()
+					);
+				}
+				ap.setApproachSpeed(_effectiveApproachSpeed);
+
+				ap.setMaxtransportConnectionsCount(
 					_withoutTransfer ? 1 : optional<size_t>()
 				);
 				resaRequest.getAction()->setAccessParameters(ap);
@@ -329,10 +399,10 @@ namespace synthese
 				PTTimeSlotRoutePlanner r(
 					startPlace.get(),
 					endPlace.get(),
-					_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
-					_planningOrder == DEPARTURE_FIRST ? endDate : _dateTime,
-					_planningOrder == DEPARTURE_FIRST ? _dateTime : endDate,
-					_planningOrder == DEPARTURE_FIRST ? endDate : _dateTime,
+					_planningOrder == DEPARTURE_FIRST ? _dateTime : maxArrivalTime,
+					_planningOrder == DEPARTURE_FIRST ? maxDepartureTime : _dateTime,
+					_planningOrder == DEPARTURE_FIRST ? _dateTime : maxDepartureTime,
+					_planningOrder == DEPARTURE_FIRST ? maxArrivalTime : _dateTime,
 					5,
 					ap,
 					_planningOrder
@@ -398,6 +468,11 @@ namespace synthese
 				{
 					withReservation = true;
 					resaRequest.getAction()->setJourney(*it);
+					resaRequest.getAction()->setOriginDestinationPlace(
+							_startCity,
+							_startPlace,
+							_endCity,
+							_endPlace);
 					break;
 				}
 			}
@@ -415,7 +490,9 @@ namespace synthese
 			stream << "<h1>Réservation</h1>";
 
 			if (!withReservation)
+			{
 				stream << "<p>Aucune solution proposée n'est ouverte à la réservation.</p>";
+			}
 			else
 			{
 				stream << rf.setFocus(BookReservationAction::PARAMETER_DATE_TIME, 0);

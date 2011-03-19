@@ -192,6 +192,34 @@ namespace synthese
 
 
 
+		void BookReservationAction::setOriginDestinationPlace(
+			string origcity,
+			string origplace,
+			string destcity,
+			string destplace
+		){
+			if(ResaModule::GetJourneyPlannerWebsite())
+			{
+				_originPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(origcity,origplace);
+				_destinationPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(destcity,destplace);
+			}
+			else
+			{
+				_originPlace = RoadModule::FetchPlace(
+					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+					origcity,
+					origplace
+					);
+				_destinationPlace = RoadModule::FetchPlace(
+					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+					destcity,
+					destplace
+					);
+			}
+		}
+
+
+
 		void BookReservationAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_createCustomer = map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false);
@@ -343,25 +371,21 @@ namespace synthese
 				}
 
 				// Journey
-				_originPlace = RoadModule::FetchPlace(
-					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
+				setOriginDestinationPlace(
 					map.get<string>(PARAMETER_ORIGIN_CITY),
-					map.get<string>(PARAMETER_ORIGIN_PLACE)
+					map.get<string>(PARAMETER_ORIGIN_PLACE),
+					map.get<string>(PARAMETER_DESTINATION_CITY),
+					map.get<string>(PARAMETER_DESTINATION_PLACE)
 				);
+				if(!_destinationPlace.get())
+				{
+					throw ActionException("Invalid destination place");
+				}
 				if(!_originPlace.get())
 				{
 					throw ActionException("Invalid origin place");
 				}
 
-				_destinationPlace = RoadModule::FetchPlace(
-					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
-					map.get<string>(PARAMETER_DESTINATION_CITY),
-					map.get<string>(PARAMETER_DESTINATION_PLACE)
-					);
-				if(!_destinationPlace.get())
-				{
-					throw ActionException("Invalid destination place");
-				}
 
 				// Departure date time
 				ptime departureDateTime(time_from_string(map.get<string>(PARAMETER_DATE_TIME)));

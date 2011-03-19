@@ -35,6 +35,11 @@
 
 namespace synthese
 {
+	namespace pt_website
+	{
+		class TransportWebsite;
+	}
+
 	namespace pt
 	{
 		class ReservationContact;
@@ -159,6 +164,7 @@ namespace synthese
 			static const std::string _AUTORESA_PROFILE_NAME;
 			static const std::string _ADMIN_PROFILE_NAME;
 			static const std::string _RESERVATION_CONTACT_PARAMETER;
+			static const std::string _JOURNEY_PLANNER_WEBSITE;
 
 			static const std::string DATA_SWITCH_CALL_URL;
 			static const std::string DATA_CURRENT_CALL_ID;
@@ -168,6 +174,7 @@ namespace synthese
 			static boost::shared_ptr<security::Profile>	_autoresaProfile;
 			static boost::shared_ptr<security::Profile>	_adminProfile;
 			static boost::shared_ptr<OnlineReservationRule> _reservationContact;
+			static boost::shared_ptr<pt_website::TransportWebsite> _journeyPlannerWebsite;
 
 		public:
 			static boost::shared_ptr<security::Profile> GetBasicResaCustomerProfile();
@@ -193,6 +200,7 @@ namespace synthese
 			static std::string GetStatusText(ReservationStatus status);
 
 			static OnlineReservationRule* GetReservationContact();
+			static pt_website::TransportWebsite* GetJourneyPlannerWebsite();
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Adds parameters to send to the display template for admin pages.
