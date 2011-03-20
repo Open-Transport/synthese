@@ -37,14 +37,14 @@ namespace synthese
 		{
 		public:
 			FakeHub() {}
-			synthese::geometry::Point2D p;
+			boost::shared_ptr<geos::geom::Point> p;
 
 			virtual boost::posix_time::time_duration getMinTransferDelay() const { return boost::posix_time::minutes(0); }
-			virtual void getVertexAccessMap(VertexAccessMap& result,const AccessDirection& accessDirection,	GraphIdType whatToSearch,const Vertex& vertex	) const {}
+			virtual void getVertexAccessMap(VertexAccessMap& result, GraphIdType whatToSearch,const Vertex& vertex, bool vertexIsOrigin ) const {}
 			virtual bool isConnectionAllowed(const Vertex& origin, const Vertex& destination) const { return true; }
 			virtual boost::posix_time::time_duration getTransferDelay(	const Vertex& origin,const Vertex& destination	) const { return boost::posix_time::minutes(0); }
 			virtual HubScore getScore() const { return 0; }
-			virtual const synthese::geometry::Point2D& getPoint() const { return p; }
+			virtual boost::shared_ptr<geos::geom::Point> getPoint() const { return p; }
 			virtual bool containsAnyVertex(GraphIdType graphType) const { return true; }
 		};
 
@@ -52,7 +52,7 @@ namespace synthese
 			public Vertex
 		{
 		public:
-			FakeVertex(Hub* hub): Vertex(hub), synthese::util::Registrable(0) {}
+			FakeVertex(Hub* hub): Vertex(hub, boost::shared_ptr<geos::geom::Point>()), synthese::util::Registrable(0) {}
 			virtual GraphIdType getGraphType() const { return 0; }
 		};
 
@@ -87,7 +87,8 @@ namespace synthese
 			virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(bool RTData,std::size_t rankInPath) const {return boost::posix_time::minutes(0);}
 			virtual boost::posix_time::time_duration getArrivalBeginScheduleToIndex(bool RTData,std::size_t rankInPath) const {return boost::posix_time::minutes(0);}
 			virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(bool RTData,std::size_t rankInPath) const {return boost::posix_time::minutes(0);}
-			virtual ServicePointer getFromPresenceTime(bool RTData,AccessDirection method,std::size_t userClassRank,const Edge* edge, const boost::posix_time::ptime& presenceDateTime, bool controlIfTheServiceIsReachable, bool inverted) const {return ServicePointer();}
+			virtual ServicePointer getFromPresenceTime(bool RTData,bool getDeparture,std::size_t userClassRank,const Edge& edge, const boost::posix_time::ptime& presenceDateTime, bool controlIfTheServiceIsReachable, bool inverted) const {return ServicePointer();}
+			virtual void completeServicePointer(synthese::graph::ServicePointer &,const synthese::graph::Edge &,const synthese::graph::AccessParameters &) const {}
 			virtual boost::posix_time::ptime getLeaveTime(const ServicePointer& servicePointer, const Edge* edge) const { return boost::posix_time::not_a_date_time; }
 			virtual boost::posix_time::time_duration getDepartureSchedule(bool RTData,size_t rank) const {return boost::posix_time::minutes(0); }
 		};
