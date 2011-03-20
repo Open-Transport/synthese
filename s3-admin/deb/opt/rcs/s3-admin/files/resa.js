@@ -9,7 +9,7 @@ function programCustomerUpdate(formName, newCustomerFieldName, divId, fieldName,
 
 function customerUpdate(formName,newCustomerFieldName,divId,fieldName, url)
 {
-    if (window.XMLHttpRequest)                 //  Objet de la fenêtre courant
+    if (window.XMLHttpRequest)                 //  Objet de la fenÃªtre courant
     { 
         xhr = new XMLHttpRequest();     //  Firefox, Safari, ...
     } 
@@ -44,7 +44,7 @@ function customerUpdate(formName,newCustomerFieldName,divId,fieldName, url)
 					;
 				var n = document.forms[formName][fieldName].options.length;
 				document.getElementById(divId).innerHTML 
-					+= " (" + n +" client"+ (n>1?"s":"") +" trouvé"+ (n>1?"s":"") +")";
+					+= " (" + n +" client"+ (n>1?"s":"") +" trouvÃ©"+ (n>1?"s":"") +")";
 				
 				for (i = 0; i < radios.length; ++i)
                 {
