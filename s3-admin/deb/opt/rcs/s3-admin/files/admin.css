@@ -105,9 +105,9 @@ table {margin-bottom:1.5em;border-collapse:collapse;}
 .alarmwillbedisplayed { background-color:#0080FF;} 
 .alarmdisplayedwithenddate { background-color:#00FF80;} 
 
-input[type=submit], a.linkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#333333; background-color:#c0d077; border:solid #949948 1px; padding:2px; cursor:pointer;} 
-a.activatedlinkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#ffffff; background-color:#c0d077; border:solid #949948 1px; padding:2px; cursor:pointer;} 
-a.clickedlinkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#333333; background-color:#c0d077; border:solid #949948 1px; padding:0.15em; cursor:pointer; } 
+input[type=submit], a.linkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#333333; background-color:#c0d077; border:solid #949948 1px; padding:2px; cursor:pointer; display:inline-block; margin:0; } 
+a.activatedlinkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#ffffff; background-color:#c0d077; border:solid #949948 1px; padding:2px; cursor:pointer; display:inline-block; margin:0;} 
+a.clickedlinkbutton { white-space:nowrap; text-decoration:none; font-family:helvetica; font-size:0.85em; color:#333333; background-color:#c0d077; border:solid #949948 1px; padding:0.15em; cursor:pointer; display:inline-block; margin:0.05em; } 
 a.linkbutton img, a.activatedlinkbutton img, a.clickedlinkbutton img { border:none; vertical-align:bottom; cursor:pointer; } 
 
 input[type=submit]:hover { color:#ffffff; cursor:pointer;} 
@@ -120,6 +120,7 @@ table.searchform td.submitcell { text-align:right; cursor:pointer; }
 
 
 .adminresults img { border:none; vertical-align:middle; } 
+table.adminresults th, table.propertysheet th, table.adminresults tfoot td, table.propertysheet tfoot td { background-color:#999999; color:#ffffff; border:solid #dcdddd 1px; }
 table.adminresults th, table.propertysheet th { background-color:#999999; vertical-align:middle; padding:0.2em 1em; color:#ffffff; border:solid #dcdddd 1px; }
 table.adminresults a { color:#333333; text-decoration:none; }
 table.adminresults a:hover { color:#ffffff; }  
@@ -163,7 +164,11 @@ li.log { background-image:url(book_open.png); }
 #admin_tabs .active_tab { background-color:#999999; color:white; }
 #admin_tabs .active_tab:hover { cursor:default; }
 
+.up_down_button { width:16px; display:inline-block;}
+
 span.line { padding: 0 5px 0 5px; font-weight:bold; margin: 0 1px 0 1px; }
+
+.waiting textarea, .waiting input { opacity:0.3;  filter : alpha(opacity=30); }
 
 @media print
 {

@@ -134,7 +134,7 @@ namespace synthese
 			{
 				page->setEnv(_env);
 				PageLinks l(
-					page->getSubPagesOfModule(_moduleClass->getFactoryKey(), currentPage, request)
+					page->getSubPagesOfModule(*_moduleClass, currentPage, request)
 				);
 				BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> link, l)
 				{

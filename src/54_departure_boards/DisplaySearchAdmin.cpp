@@ -555,24 +555,25 @@ namespace synthese
 		}
 
 		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
 			// General search page
-			if (moduleKey == DeparturesTableModule::FACTORY_KEY && request.getUser() &&
+			if(	dynamic_cast<const DeparturesTableModule*>(&module) &&
+				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser()))
 			{
 				// General search
-				shared_ptr<DisplaySearchAdmin> p1(getNewOtherPage<DisplaySearchAdmin>());
+				shared_ptr<DisplaySearchAdmin> p1(getNewPage<DisplaySearchAdmin>());
 				p1->_place = optional<shared_ptr<const StopArea> >();
 				links.push_back(p1);
 			
 				// Stock
-				shared_ptr<DisplaySearchAdmin> p2(getNewOtherPage<DisplaySearchAdmin>());
+				shared_ptr<DisplaySearchAdmin> p2(getNewPage<DisplaySearchAdmin>());
 				p2->_place = shared_ptr<const StopArea>();
 				links.push_back(p2);
 			}
@@ -606,7 +607,7 @@ namespace synthese
 				)	);
 				BOOST_FOREACH(shared_ptr<DisplayScreenCPU> cpu, cpus)
 				{
-					shared_ptr<DisplayScreenCPUAdmin> p(getNewOtherPage<DisplayScreenCPUAdmin>());
+					shared_ptr<DisplayScreenCPUAdmin> p(getNewPage<DisplayScreenCPUAdmin>());
 					p->setCPU(cpu);
 					links.push_back(p);
 				}
@@ -626,7 +627,7 @@ namespace synthese
 					){
 						continue;
 					}
-					shared_ptr<DisplayAdmin> p(getNewOtherPage<DisplayAdmin>());
+					shared_ptr<DisplayAdmin> p(getNewPage<DisplayAdmin>());
 					p->setScreen(screen);
 					links.push_back(p);
 				}

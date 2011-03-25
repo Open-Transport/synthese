@@ -32,6 +32,11 @@
 #include "AdminFunctionRequest.hpp"
 #include "DataSourceAdmin.h"
 #include "HTMLModule.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "DataSourceUpdateAction.hpp"
+#include "DataSourceRemoveAction.hpp"
+#include "HTMLForm.h"
+#include "ImpExModule.h"
 
 #include <boost/foreach.hpp>
 
@@ -106,9 +111,17 @@ namespace synthese
 			const AdminRequest& request
 		) const	{
 
+			stream << "<h1>Sources de données</h1>";
+
 			AdminFunctionRequest<DataSourcesAdmin> searchRequest(request);
 
 			AdminFunctionRequest<DataSourceAdmin> openRequest(request);
+
+			AdminActionFunctionRequest<DataSourceUpdateAction, DataSourceAdmin> addRequest(request);
+			addRequest.setActionWillCreateObject();
+			addRequest.setActionFailedPage<DataSourcesAdmin>();
+
+			AdminActionFunctionRequest<DataSourceRemoveAction, DataSourcesAdmin> removeRequest(request);
 
 			DataSourceTableSync::SearchResult dataSources(
 				DataSourceTableSync::Search(
@@ -121,11 +134,15 @@ namespace synthese
 					_requestParameters.raisingOrder
 			)	);
 
+			HTMLForm f(addRequest.getHTMLForm("add"));
+			stream << f.open();
+
 			ResultHTMLTable::HeaderVector c;
 			c.push_back(make_pair(string(), "ID"));
 			c.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			c.push_back(make_pair(string(), "Format"));
-			c.push_back(make_pair(string(), "Action"));
+			c.push_back(make_pair(string(), "Actions"));
+			c.push_back(make_pair(string(), "Actions"));
 			ResultHTMLTable t(c, searchRequest.getHTMLForm(), _requestParameters, dataSources);
 
 			stream << t.open();
@@ -133,34 +150,41 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<DataSource> dataSource, dataSources)
 			{
 				openRequest.getPage()->setDataSource(const_pointer_cast<const DataSource>(dataSource));
+				removeRequest.getAction()->setDataSource(const_pointer_cast<const DataSource>(dataSource));
 
 				stream << t.row();
 				stream << t.col() << dataSource->getKey();
 				stream << t.col() << dataSource->getName();
 				stream << t.col() << dataSource->getFormat();
 				stream << t.col() << HTMLModule::getLinkButton(openRequest.getHTMLForm().getURL(), "Ouvrir", string(), "database_edit.png");
+				stream << t.col() << HTMLModule::getLinkButton(removeRequest.getHTMLForm().getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la source de données "+ dataSource->getName() +" ?", "database_delete.png");
 			}
 
+			stream << t.row();
+			stream << t.col() << "Création :";
+			stream << t.col() << f.getTextInput(DataSourceUpdateAction::PARAMETER_NAME, string(), "(nom)");
+			stream << t.col() << f.getSelectInput(DataSourceUpdateAction::PARAMETER_FORMAT, ImpExModule::GetFileFormatsList(), optional<string>());
+			stream << t.col(2) << f.getSubmitButton("Ajouter");
 			stream << t.close();
-		
+			stream << f.close();
 		}
 
 
 
 		AdminInterfaceElement::PageLinks DataSourcesAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == ImpExModule::FACTORY_KEY &&
+			if(	dynamic_cast<const ImpExModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			
 			return links;
@@ -180,7 +204,7 @@ namespace synthese
 			);
 			BOOST_FOREACH(shared_ptr<DataSource> dataSource, dataSources)
 			{
-				shared_ptr<DataSourceAdmin> p(getNewOtherPage<DataSourceAdmin>());
+				shared_ptr<DataSourceAdmin> p(getNewPage<DataSourceAdmin>());
 				p->setDataSource(dataSource);
 				links.push_back(p);
 			}

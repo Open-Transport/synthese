@@ -64,7 +64,7 @@ namespace synthese
 		{
 			try
 			{
-				_lineStop = Env::GetOfficialEnv().get<LineStop>(map.get<RegistryKeyType>(PARAMETER_LINESTOP_ID));
+				_lineStop = LineStopTableSync::Get(map.get<RegistryKeyType>(PARAMETER_LINESTOP_ID), *_env);
 			}
 			catch(ObjectNotFoundException<LineStop>&)
 			{

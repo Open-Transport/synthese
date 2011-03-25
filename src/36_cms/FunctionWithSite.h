@@ -75,13 +75,7 @@ namespace synthese
 					}
 				}
 			}
-
-			
-		public:
-
-			virtual server::ParametersMap getFixedParametersMap() const { return _getParametersMap(); }
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_FunctionWithSite_H__

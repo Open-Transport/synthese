@@ -24,8 +24,6 @@
 
 #include "WebPageInterfacePage.h"
 #include "Webpage.h"
-#include "StaticFunctionRequest.h"
-#include "WebPageDisplayFunction.h"
 #include "CMSModule.hpp"
 
 #include <sstream>
@@ -60,13 +58,7 @@ namespace synthese
 			bool edit,
 			bool displayContent
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(Env::GetOfficialEnv().getSPtr(&templatePage));
-			ParametersMap pm(
-				dynamic_pointer_cast<const WebPageDisplayFunction>(request.getFunction()) ?
-				dynamic_pointer_cast<const WebPageDisplayFunction>(request.getFunction())->getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TITLE, page.getName());
 			
@@ -90,9 +82,6 @@ namespace synthese
 
 			pm.insert(DATA_DEPTH, page.getDepth());
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.run(stream);
+			templatePage.display(stream, request, pm);
 		}
-	}
-}
+}	}

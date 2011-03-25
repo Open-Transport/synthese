@@ -25,10 +25,12 @@
 
 #include "ImpExModule.h"
 #include "Exception.h"
+#include "FileFormat.h"
 
 #include <iconv.h>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -93,6 +95,20 @@ namespace synthese
 			delete utf8buf;
 			iconv_close (cvt);
 			return result;
+		}
+
+
+
+		ImpExModule::FileFormatsList ImpExModule::GetFileFormatsList()
+		{
+			Factory<FileFormat>::Keys keys(Factory<FileFormat>::GetKeys());
+			FileFormatsList vec;
+			vec.push_back(make_pair(optional<string>(), "(saisie manuelle)"));
+			BOOST_FOREACH(const Factory<FileFormat>::Keys::value_type& key, keys)
+			{
+				vec.push_back(make_pair(optional<string>(key), key));
+			}
+			return vec;
 		}
 	}
 }

@@ -29,6 +29,7 @@
 #include "DataSourceTableSync.h"
 #include "SelectQuery.hpp"
 #include "ReplaceQuery.h"
+#include "ImportableTableSync.hpp"
 
 #include <sstream>
 #include <geos/geom/Point.h>
@@ -55,7 +56,6 @@ namespace synthese
 	{
 		const std::string CrossingTableSync::COL_CODE_BY_SOURCE ("code_by_source");
 		const std::string CrossingTableSync::COL_SOURCE_ID ("source_id");
-		const std::string CrossingTableSync::COL_GEOMETRY("geometry");
 	}
 
 	namespace db
@@ -69,7 +69,7 @@ namespace synthese
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
 			SQLiteTableSync::Field(CrossingTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
 			SQLiteTableSync::Field(CrossingTableSync::COL_SOURCE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(CrossingTableSync::COL_GEOMETRY, SQL_GEOM_POINT),
+			SQLiteTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			SQLiteTableSync::Field()
 		};
 
@@ -88,7 +88,7 @@ namespace synthese
 			// Geometry
 			shared_ptr<Point> point(
 				static_pointer_cast<Point, Geometry>(
-					rows->getGeometryFromWKT(CrossingTableSync::COL_GEOMETRY)
+					rows->getGeometryFromWKT(TABLE_COL_GEOMETRY)
 			)	);
 			if(point.get())
 			{
@@ -96,26 +96,11 @@ namespace synthese
 			}
 
 			// Code by source
-			object->setCodeBySource(rows->getText(CrossingTableSync::COL_CODE_BY_SOURCE));
-		
-			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
-			{
-				// Columns reading
-				RegistryKeyType sourceId = rows->getLongLong(CrossingTableSync::COL_SOURCE_ID);
-
-				// Links from the object
-				try
-				{
-					if(sourceId > 0)
-					{
-						object->setDataSource(DataSourceTableSync::Get(sourceId, env, linkLevel).get());
-					}
-				}
-				catch (ObjectNotFoundException<DataSource>& e)
-				{
-					throw LinkException<DataSourceTableSync>(rows, CrossingTableSync::COL_SOURCE_ID, e);
-				}
-			}
+			object->setDataSourceLinks(
+				ImportableTableSync::GetDataSourceLinksFromSerializedString(
+					rows->getText(CrossingTableSync::COL_CODE_BY_SOURCE),
+					env
+			)	);
 		}
 
 
@@ -132,8 +117,8 @@ namespace synthese
 			optional<SQLiteTransaction&> transaction
 		){
 			ReplaceQuery<CrossingTableSync> query(*object);
-			query.addField(object->getCodeBySource());
-			query.addField(object->getDataSource() ? lexical_cast<string>(object->getDataSource()->getKey()) : 0);
+			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addFieldNull();
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
 			query.execute(transaction);
 		}

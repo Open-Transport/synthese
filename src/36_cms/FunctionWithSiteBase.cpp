@@ -45,10 +45,12 @@ namespace synthese
 
 
 
-		void FunctionWithSiteBase::_copy( boost::shared_ptr<const Function> function )
+		void FunctionWithSiteBase::_copy(const Function& function )
 		{
-			Function::_copy(function);
-			_site = boost::static_pointer_cast<const FunctionWithSiteBase, const Function>(function)->_site;
+			const FunctionWithSiteBase* fws(dynamic_cast<const FunctionWithSiteBase*>(&function));
+			if(fws)
+			{
+				_site = fws->_site;
+			}
 		}
-	}
-}
+}	}

@@ -53,6 +53,7 @@ namespace synthese
 
 		const string Request::PARAMETER_STARTER("?");
 		const string Request::PARAMETER_FUNCTION("fonction");
+		const string Request::PARAMETER_SERVICE("SERVICE");
 		const string Request::PARAMETER_SESSION("sid");
 		const string Request::PARAMETER_OBJECT_ID("roid");
 		const string Request::PARAMETER_ACTION("a");
@@ -78,7 +79,7 @@ namespace synthese
 			// Function
 			if (_function.get())
 			{
-				result.insert(Request::PARAMETER_FUNCTION, _function->getFactoryKey());
+				result.insert(Request::PARAMETER_SERVICE, _function->getFactoryKey());
 				ParametersMap::Map functionMap(_function->_getParametersMap().getMap());
 				for (ParametersMap::Map::const_iterator it = functionMap.begin(); it != functionMap.end(); ++it)
 					result.insert(it->first, it->second);
@@ -281,6 +282,22 @@ namespace synthese
 		void Request::setSession( Session* session )
 		{
 			_session = session;
+		}
+
+
+
+		html::AjaxForm Request::getAjaxForm( const std::string& name ) const
+		{
+			html::AjaxForm form(name, _clientURL);
+			ParametersMap map(_getParametersMap());
+			map.insert(PARAMETER_NO_REDIRECT_AFTER_ACTION, true);
+			map.remove(PARAMETER_FUNCTION);
+			map.remove(PARAMETER_SERVICE);
+			BOOST_FOREACH(const ParametersMap::Map::value_type& it, map.getMap())
+			{
+				form.addHiddenField(it.first, it.second);
+			}
+			return form;
 		}
 	}
 }

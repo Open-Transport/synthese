@@ -422,6 +422,9 @@ namespace synthese
 			case ResaDBLog::RESERVATION_ENTRY:
 				return "resa_compulsory.png";
 
+			case ResaDBLog::RESERVATION_UPDATE:
+				return "resa_compulsory.png";
+
 			case ResaDBLog::CANCELLATION_ENTRY:
 				return ResaModule::GetStatusIcon(CANCELLED);
 
@@ -493,6 +496,9 @@ namespace synthese
 
 			case ResaDBLog::RESERVATION_ENTRY:
 				return "Réservation";
+
+			case ResaDBLog::RESERVATION_UPDATE:
+				return "Mise à jour de réservation";
 
 			case ResaDBLog::CANCELLATION_ENTRY:
 				return "Annulation de réservation";
@@ -646,6 +652,24 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), subject.getKey(), callId);
 
 			UpdateCallEntryCustomer(callId, subject.getKey());
+		}
+
+
+
+		void ResaDBLog::AddReservationUpdateEntry(
+			const server::Session& session,
+			const Reservation& reservation,
+			const std::string& detail
+		){
+			RegistryKeyType callId(ResaModule::GetCurrentCallId(&session));
+
+			DBLog::ColumnsVector content;
+			content.push_back(lexical_cast<string>(RESERVATION_UPDATE));
+			content.push_back(string());
+			content.push_back(detail);
+			content.push_back(lexical_cast<string>(reservation.getTransaction()->getKey()));
+
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, session.getUser().get(), reservation.getKey(), callId);
 		}
 	}
 }

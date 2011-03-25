@@ -107,7 +107,7 @@ namespace synthese
 
 				stream <<
 					ps.getKey() << ";" <<
-					ps.getCodeBySource() << ";" <<
+					ps.getCodeBySources() << ";" <<
 					ps.getGeometry()->getX() << ";" <<
 					ps.getGeometry()->getY() << ";" <<
 					"\"" << ps.getConnectionPlace()->getCity()->getName() << "\";" <<

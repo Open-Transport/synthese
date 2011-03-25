@@ -49,7 +49,8 @@
 #include "CommercialLineUpdateAction.h"
 #include "PropertiesHTMLTable.h"
 #include "ReservationContact.h"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "LineArea.hpp"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "PTRuleUserAdmin.hpp"
@@ -60,6 +61,8 @@
 #include "JourneyPatternRemoveAction.hpp"
 #include "TridentFileFormat.h"
 #include "ExportFunction.hpp"
+#include "ImportableAdmin.hpp"
+#include "DRTArea.hpp"
 
 using namespace std;
 using namespace boost;
@@ -77,8 +80,6 @@ namespace synthese
 	using namespace calendar;
 	using namespace impex;
 	
-	
-
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, CommercialLineAdmin>::FACTORY_KEY("CommercialLineAdmin");
@@ -101,6 +102,13 @@ namespace synthese
 		const string CommercialLineAdmin::PARAMETER_DATES_START("ds");
 		const string CommercialLineAdmin::PARAMETER_DATES_END("de");
 		const string CommercialLineAdmin::PARAMETER_CALENDAR_CONTROL("cc");
+
+
+
+		CommercialLineAdmin::CommercialLineAdmin(
+		):	_controlCalendar(false)
+		{}
+
 
 		
 		void CommercialLineAdmin::setFromParametersMap(
@@ -171,7 +179,6 @@ namespace synthese
 					JourneyPatternTableSync::Search(
 						Env::GetOfficialEnv(),
 						_cline->getKey(),
-						optional<RegistryKeyType>(),
 						_requestParameters.first,
 						_requestParameters.maxSize,
 						_requestParameters.orderField == PARAMETER_SEARCH_NAME,
@@ -179,7 +186,7 @@ namespace synthese
 				)	);
 				
 				AdminActionFunctionRequest<JourneyPatternAddAction,JourneyPatternAdmin> creationRequest(_request);
-				creationRequest.getFunction()->setActionFailedPage(getNewPage());
+				creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
 				creationRequest.setActionWillCreateObject();
 				creationRequest.getAction()->setCommercialLine(const_pointer_cast<CommercialLine>(_cline));
 
@@ -220,10 +227,45 @@ namespace synthese
 					}
 					else
 					{
-						stream << t.col();
-						stream << line->getLineStop(0)->getPhysicalStop()->getConnectionPlace()->getFullName();
-						stream << t.col();
-						stream << line->getLineStop(line->getEdges().size()-1)->getPhysicalStop()->getConnectionPlace()->getFullName();
+						{
+							stream << t.col();
+							const DesignatedLinePhysicalStop* lineStop(
+								dynamic_cast<const DesignatedLinePhysicalStop*>(
+									line->getLineStop(0)
+							)	);
+							if(lineStop)
+							{
+								stream << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+							}
+							const LineArea* lineArea(
+								dynamic_cast<const LineArea*>(
+									line->getLineStop(0)
+							)	);
+							if(lineArea)
+							{
+								stream << lineArea->getArea()->getName();
+							}
+						}
+
+						{
+							stream << t.col();
+							const DesignatedLinePhysicalStop* lineStop(
+								dynamic_cast<const DesignatedLinePhysicalStop*>(
+									line->getLineStop(line->getEdges().size()-1)
+							)	);
+							if(lineStop)
+							{
+								stream << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+							}
+							const LineArea* lineArea(
+								dynamic_cast<const LineArea*>(
+									line->getLineStop(line->getEdges().size()-1)
+							)	);
+							if(lineArea)
+							{
+								stream << lineArea->getArea()->getName();
+							}
+						}
 						stream << t.col();
 						stream << line->getEdges().size();
 						stream << t.col();
@@ -234,16 +276,27 @@ namespace synthese
 					stream << line->getServices().size();
 
 					stream << t.col();
-					if(line->getDataSource())
+					BOOST_FOREACH(const Importable::DataSourceLinks::value_type& it, line->getDataSourceLinks())
 					{
+						if(!it.first)
+						{ // Unknown data source
+							continue;
+						}
+
+						string name(it.first->getName());
+						if(!it.second.empty())
+						{
+							name += " (code "+ it.second +")";
+						}
+
 						stream <<
 							HTMLModule::getHTMLImage(
-								line->getDataSource()->getIcon().empty() ?
+								it.first->getIcon().empty() ?
 								"note.png" :
-								line->getDataSource()->getIcon(),
-								line->getDataSource()->getName()
+								it.first->getIcon(),
+								name
 							);
-						if(!line->getDataSource()->getFormat().empty())
+						if(!it.first->getFormat().empty())
 						{
 							stream << HTMLModule::getHTMLImage(DataSourceAdmin::ICON, "Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire");
 						}
@@ -438,7 +491,6 @@ namespace synthese
 				stream << t.open();
 				stream << t.title("Réseau");
 				stream << t.cell("Réseau", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NETWORK_ID, _cline->getNetwork() ? lexical_cast<string>(_cline->getNetwork()->getKey()) : string()));
-				stream << t.cell("ID vu par le réseau", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_CREATOR_ID, _cline->getCreatorId()));
 				stream << t.title("Nom");
 				stream << t.cell("Nom (menu)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NAME, _cline->getName()));
 				stream << t.cell("Nom long (feuille de route)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_LONG_NAME, _cline->getLongName()));
@@ -446,10 +498,15 @@ namespace synthese
 				stream << t.title("Apparence");
 				stream << t.cell("Image", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_IMAGE, _cline->getImage()));
 				stream << t.cell("Style CSS", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_STYLE, _cline->getStyle()));
-				stream << t.cell("Couleur", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_COLOR, _cline->getColor() ? _cline->getColor()->toString() : string()));
+				stream << t.cell("Couleur : format (r,g,b)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_COLOR, _cline->getColor() ? _cline->getColor()->toString() : string()));
 				stream << t.title("Réservation");
 				stream << t.cell("Centre de contact", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_RESERVATION_CONTACT_ID, _cline->getReservationContact() ? lexical_cast<string>(_cline->getReservationContact()->getKey()) : string()));
 				stream << t.close();
+
+				StaticActionRequest<CommercialLineUpdateAction> updateOnlyRequest(_request);
+				updateOnlyRequest.getAction()->setLine(const_pointer_cast<CommercialLine>(_cline));
+
+				ImportableAdmin::DisplayDataSourcesTab(stream, *_cline, updateOnlyRequest);
 
 				PTRuleUserAdmin<CommercialLine,CommercialLineAdmin>::Display(stream, _cline, _request);
 			}
@@ -506,7 +563,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 				{
 					shared_ptr<JourneyPatternAdmin> p(
-						getNewOtherPage<JourneyPatternAdmin>()
+						getNewPage<JourneyPatternAdmin>()
 					);
 					p->setLine(line);
 					links.push_back(p);
@@ -543,12 +600,11 @@ namespace synthese
 			PageLinks links;
 
 			shared_ptr<TransportNetworkAdmin> p(
-				getNewOtherPage<TransportNetworkAdmin>()
+				getNewPage<TransportNetworkAdmin>()
 			);
 			p->setNetwork(Env::GetOfficialEnv().getSPtr(_cline->getNetwork()));
 
 			links.push_back(p);
 			return links;
 		}
-	}
-}
+}	}

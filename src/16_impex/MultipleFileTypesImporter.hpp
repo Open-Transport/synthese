@@ -90,8 +90,10 @@ namespace synthese
 
 			static const Files FILES;
 
-			MultipleFileTypesImporter(const DataSource& dataSource):
-				Importer(dataSource)
+			MultipleFileTypesImporter(
+				util::Env& env,
+				const DataSource& dataSource
+			):	Importer(env, dataSource)
 			{}
 
 			virtual bool _parse(
@@ -105,7 +107,7 @@ namespace synthese
 
 			virtual void _setFromParametersMap(const server::ParametersMap& map) {}
 
-			virtual server::ParametersMap _getFromParametersMap() const { return server::ParametersMap(); }
+			virtual server::ParametersMap _getParametersMap() const { return server::ParametersMap(); }
 
 			void setFromParametersMap(
 				const server::ParametersMap& map,
@@ -130,7 +132,7 @@ namespace synthese
 
 			server::ParametersMap getParametersMap() const
 			{
-				server::ParametersMap result(_getFromParametersMap());
+				server::ParametersMap result(_getParametersMap());
 				BOOST_FOREACH(const FilePathsMap::value_type& it, _pathsMap)
 				{
 					result.insert(_getFileParameterName(it.first), it.second.file_string());

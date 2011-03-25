@@ -28,14 +28,17 @@ namespace synthese
 {
 	namespace html
 	{
+		const string PropertiesHTMLTable::CSS_CLASS("propertysheet");
 
 
-		PropertiesHTMLTable::PropertiesHTMLTable(const HTMLForm form)
-			: HTMLTable(2, "propertysheet")
-			, _form(form)
-		{
 
-		}
+		PropertiesHTMLTable::PropertiesHTMLTable(
+			const HTMLForm form
+		):	HTMLTable(2, CSS_CLASS),
+			_form(form)
+		{}
+
+
 
 		std::string PropertiesHTMLTable::open()
 		{
@@ -45,6 +48,8 @@ namespace synthese
 				<< "<col class=\"property\" /><col class=\"value\" />";
 			return s.str();
 		}
+
+
 
 		std::string PropertiesHTMLTable::close()
 		{
@@ -58,10 +63,14 @@ namespace synthese
 			return s.str();
 		}
 
+
+
 		HTMLForm& PropertiesHTMLTable::getForm()
 		{
 			return _form;
 		}
+
+
 
 		std::string PropertiesHTMLTable::cell( const std::string& label, const std::string& content)
 		{
@@ -72,6 +81,8 @@ namespace synthese
 			return s.str();
 		}
 
+
+
 		std::string PropertiesHTMLTable::title( const std::string& title )
 		{
 			stringstream s;
@@ -79,5 +90,4 @@ namespace synthese
 			s	<< col(2, string(), true) << title;
 			return s.str();
 		}
-	}
-}
+}	}

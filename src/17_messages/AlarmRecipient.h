@@ -26,7 +26,7 @@
 #include <ostream>
 
 #include "FactoryBase.h"
-#include "12_security/Types.h"
+#include "SecurityTypes.hpp"
 #include "MessagesTypes.h"
 #include "StaticActionRequest.h"
 

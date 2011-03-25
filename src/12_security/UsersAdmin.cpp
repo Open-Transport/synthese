@@ -237,19 +237,19 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks UsersAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == SecurityModule::FACTORY_KEY &&
+			if(	dynamic_cast<const SecurityModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}
@@ -268,7 +268,7 @@ namespace synthese
 			
 			if(ua)
 			{
-				shared_ptr<UserAdmin> p(getNewOtherPage<UserAdmin>());
+				shared_ptr<UserAdmin> p(getNewPage<UserAdmin>());
 				p->setUserC(ua->getUser());
 				links.push_back(p);
 			}

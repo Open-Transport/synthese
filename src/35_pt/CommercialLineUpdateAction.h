@@ -28,6 +28,7 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include "RGBColor.h"
+#include "Importable.h"
 
 namespace synthese
 {
@@ -59,7 +60,7 @@ namespace synthese
 		///		<li>actionParamim : image url (for the cartouche)</li>
 		///		<li>actionParamni : network id</li>
 		///		<li>actionParamri : reservation contact id</li>
-		///		<li>actionParamci : creator id</li>
+		///		<li>actionParamdsl : data source links</li>
 		///	</ul>
 		class CommercialLineUpdateAction:
 			public util::FactorableTemplate<server::Action, CommercialLineUpdateAction>
@@ -74,19 +75,18 @@ namespace synthese
 			static const std::string PARAMETER_IMAGE;
 			static const std::string PARAMETER_NETWORK_ID;
 			static const std::string PARAMETER_RESERVATION_CONTACT_ID;
-			static const std::string PARAMETER_CREATOR_ID;
-
+		
 		private:
 			boost::shared_ptr<pt::CommercialLine> _line;
-			std::string			_name;		//!< Name (code)
-			std::string			_shortName;	//!< Name (cartouche)
-			std::string			_longName;	//!< Name for schedule card
-			boost::optional<util::RGBColor>		_color;		//!< JourneyPattern color
-			std::string			_style;		//!< CSS style (cartouche)
-			std::string			_image;		//!< Display image (cartouche)
-			boost::shared_ptr<const TransportNetwork>	_network;	//!< Network
-			boost::shared_ptr<const pt::ReservationContact>	_reservationContact;	//!< Reservation contact
-			std::string _creatorId;
+			boost::optional<std::string>	_name;		//!< Name (code)
+			boost::optional<std::string>	_shortName;	//!< Name (cartouche)
+			boost::optional<std::string>	_longName;	//!< Name for schedule card
+			boost::optional<boost::optional<util::RGBColor> >		_color;		//!< JourneyPattern color
+			boost::optional<std::string>			_style;		//!< CSS style (cartouche)
+			boost::optional<std::string>			_image;		//!< Display image (cartouche)
+			boost::optional<boost::shared_ptr<const TransportNetwork> >	_network;	//!< Network
+			boost::optional<boost::shared_ptr<const pt::ReservationContact> >	_reservationContact;	//!< Reservation contact
+			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

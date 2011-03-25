@@ -114,10 +114,8 @@ namespace synthese
 				void setActionFailedPage(boost::shared_ptr<AdminInterfaceElement> aie){ _actionFailedPage = aie; }
 	
 				template<class T>
-				void setActionFailedPage() { _actionFailedPage = _page->getNewOtherPage<T>(); }
+				void setActionFailedPage();
 			//@}
-
-			virtual void _copy(boost::shared_ptr<const Function> function);
 
 			virtual std::string getOutputMimeType() const;
 
@@ -235,6 +233,21 @@ namespace synthese
 				bool isLast
 			) const;
 		};
-	}
-}
+
+
+		template<class T>
+		void AdminFunction::setActionFailedPage()
+		{
+			T* tpage(dynamic_cast<T*>(_page.get()));
+			if(tpage)
+			{
+				_actionFailedPage = tpage->getNewCopiedPage();
+			}
+			else
+			{
+				_actionFailedPage = _page->getNewPage<T>();
+			}
+		}
+}	}
+
 #endif // SYNTHESE_AdminRequest_H__

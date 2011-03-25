@@ -27,6 +27,7 @@
 #define SYNTHESE_HTMLModule_H__
 
 #include <string>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -85,6 +86,8 @@ input[type=submit]:hover {background-color:#0080E0;}
 				bool useOnclick = false
 			);
 
+
+
 			/** Simple HTML link generator.
 				@param url URL to link
 				@param content Content of the link
@@ -92,9 +95,29 @@ input[type=submit]:hover {background-color:#0080E0;}
 				@author Hugues Romain
 				@date 2007				
 			*/
-			static std::string getHTMLLink(const std::string& url, const std::string& content);
+			static std::string getHTMLLink(
+				const std::string& url,
+				const std::string& content,
+				std::string confirm = std::string(),
+				bool useOnclick = false,
+				std::string title = std::string(),
+				std::string cssClass = std::string(),
+				std::string htmlComplement = std::string()
+			);
 
-			static std::string getHTMLImage(const std::string& url, const std::string& alt);
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Image object generator (img tag).
+			/// @param url URL of the image (src parameter)
+			/// @param alt Alternate text (alt parameter)
+			/// @param title Title (title parameter). If undefined, same value as alt parameter
+			/// @author Hugues Romain
+			static std::string getHTMLImage(
+				const std::string& url,
+				const std::string& alt,
+				boost::optional<const std::string&> title = boost::optional<const std::string&>()
+			);
 
 			static std::string GetHTMLJavascriptOpen(std::string url=std::string());
 

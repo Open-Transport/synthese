@@ -66,7 +66,7 @@ namespace synthese
 		{}
 
 
-	    
+
 		bool ScheduledService::isContinuous () const
 		{
 			return false;

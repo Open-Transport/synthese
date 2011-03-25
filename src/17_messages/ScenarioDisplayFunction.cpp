@@ -26,7 +26,6 @@
 #include "Request.h"
 #include "ScenarioDisplayFunction.hpp"
 #include "Webpage.h"
-#include "WebPageDisplayFunction.h"
 #include "ScenarioTemplate.h"
 #include "SentScenario.h"
 #include "AlarmTemplate.h"
@@ -36,7 +35,6 @@
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "ScenarioTableSync.h"
-#include "StaticFunctionRequest.h"
 
 using namespace std;
 using namespace boost;
@@ -121,6 +119,7 @@ namespace synthese
 			{
 				throw RequestException("No such main CMS template : "+ e.getMessage());
 			}
+			_savedParameters.remove(PARAMETER_MAIN_TEMPLATE);
 
 			try
 			{
@@ -134,6 +133,7 @@ namespace synthese
 			{
 				throw RequestException("No such message CMS template : "+ e.getMessage());
 			}
+			_savedParameters.remove(PARAMETER_MESSAGE_TEMPLATE);
 
 			try
 			{
@@ -147,6 +147,7 @@ namespace synthese
 			{
 				throw RequestException("No such variable CMS template : "+ e.getMessage());
 			}
+			_savedParameters.remove(PARAMETER_VARIABLE_TEMPLATE);
 		}
 
 
@@ -158,14 +159,7 @@ namespace synthese
 
 			bool isTemplate(dynamic_cast<const ScenarioTemplate*>(_scenario.get()));
 
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_mainTemplate);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// roid
 			pm.insert(Request::PARAMETER_OBJECT_ID, _scenario->getKey());
@@ -273,8 +267,7 @@ namespace synthese
 				pm.insert(DATA_ACTIVE, scenario.getIsEnabled());
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_mainTemplate->display(stream, request, pm);
 		}
 		
 		
@@ -306,14 +299,7 @@ namespace synthese
 				return;
 			}
 
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_variableTemplate);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// code
 			pm.insert(DATA_CODE, variable.code);
@@ -327,7 +313,6 @@ namespace synthese
 			// value
 			pm.insert(DATA_VALUE, value);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_variableTemplate->display(stream, request, pm);
 		}
 }	}

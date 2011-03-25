@@ -162,7 +162,7 @@ namespace synthese
 
 				AdminActionFunctionRequest<CityAddAction,PTPlacesAdmin> creationRequest(request);
 				creationRequest.setActionWillCreateObject();
-				creationRequest.getFunction()->setActionFailedPage(getNewPage());
+				creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
 
 				PropertiesHTMLTable tc(creationRequest.getHTMLForm());
 				stream << tc.open();
@@ -179,19 +179,19 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks PTCitiesAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == PTModule::FACTORY_KEY &&
+			if(	dynamic_cast<const PTModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			
 			return links;

@@ -78,8 +78,9 @@ namespace synthese
 		public:
 
 		protected:
+			server::ParametersMap _savedParameters;
 			boost::shared_ptr<util::Env>	_env;
-
+			
 			//////////////////////////////////////////////////////////////////////////
 			///	Constructor.
 			//////////////////////////////////////////////////////////////////////////
@@ -91,15 +92,20 @@ namespace synthese
 			}
 
 		public:
-			/** Conversion from fixed attributes to generic parameter map.
-				@return synthese::server::ParametersMap The generated parameters map
-				@author Hugues Romain
-				@date 2007
-				
-				The fixed attributes are those which concern the session and other "always the same" information, like interface number, etc.
-				The variables attributes are the business parameters of the function.
-			*/
-			virtual ParametersMap getFixedParametersMap() const { return ParametersMap(); }
+			//! @name Getters
+			//@{
+				boost::shared_ptr<util::Env> getEnv() const { return _env; }
+				const server::ParametersMap& getSavedParameters() const { return _savedParameters; }
+			//@}
+
+			//! @name Setters
+			//@{
+				void setEnv(boost::shared_ptr<util::Env> value){ _env = value; }
+				void setSavedParameters(const ParametersMap& value){ _savedParameters = value; }
+				void removeSavedParameter(const std::string& key){ _savedParameters.remove(key); }
+			//@}
+
+
 
 			/** Conversion from attributes to generic parameter maps.
 				@return The generated parameters map
@@ -120,8 +126,6 @@ namespace synthese
 			///    empty = display directly the result in the browser
 			virtual std::string getFileName() const { return std::string(); }
 
-			boost::shared_ptr<util::Env> getEnv() const { return _env; }
-			void setEnv(boost::shared_ptr<util::Env> value) { _env = value; }
 
 
 			/** Copy of the function parameters.
@@ -129,7 +133,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2007				
 			*/
-			virtual void _copy(boost::shared_ptr<const Function> function) { _setFromParametersMap(function->_getParametersMap()); }
+			virtual void _copy(const Function& function) {}
 
 
 			/** Conversion from generic parameters map to attributes.
@@ -170,7 +174,6 @@ namespace synthese
 				const Request& request
 			) const = 0;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_Function_h__

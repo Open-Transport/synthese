@@ -30,8 +30,6 @@
 #include "TimetableTableSync.h"
 #include "Timetable.h"
 #include "TimetableGenerateFunction.h"
-#include "WebPageDisplayFunction.h"
-#include "StaticFunctionRequest.h"
 
 using namespace std;
 using namespace boost;
@@ -184,14 +182,7 @@ namespace synthese
 			const Request& request
 		) const {
 			
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			shared_ptr<TimetableResult::Warnings> warnings(new TimetableResult::Warnings);
 			size_t timetableRank(0);
@@ -204,26 +195,16 @@ namespace synthese
 				}
 
 				stringstream content;
-				auto_ptr<TimetableGenerator> generator(tt.first->getGenerator(Env::GetOfficialEnv()));
-				if(tt.second.get())
-				{
-					generator->setBaseCalendar(tt.second->getResult(generator->getBaseCalendar()));
-				}
-				TimetableResult result(generator->build(true, warnings));
-				TimetableGenerateFunction::Display(
-					content,
-					_pageForSubTimetable,
-					shared_ptr<const Webpage>(),
-					shared_ptr<const Webpage>(),
-					shared_ptr<const Webpage>(),
-					_rowPage,
-					_cellPage,
-					request,
-					*tt.first,
-					*generator,
-					result,
-					timetableRank
-				);
+				TimetableGenerateFunction function;
+				function.setSavedParameters(_savedParameters);
+				function.setTimetable(tt.first);
+				function.setCalendarTemplate(tt.second);
+				function.setTimetableRank(timetableRank);
+				function.setPage(_pageForSubTimetable);
+				function.setRowPage(_rowPage);
+				function.setCellPage(_cellPage);
+				function.setWarnings(warnings);
+				function.run(content, request);
 				pm.insert(DATA_CONTENT + lexical_cast<string>(timetableRank), content.str());
 				timetableRank++;
 			}
@@ -232,12 +213,14 @@ namespace synthese
 			if(_notePage.get())
 			{
 				stringstream notes;
+				TimetableGenerateFunction function;
+				function.setSavedParameters(_savedParameters);
+				function.setNotePage(_notePage);
+				function.setNoteCalendarPage(_noteCalendarPage);
 				BOOST_FOREACH(const TimetableResult::Warnings::value_type& warning, *warnings)
 				{
-					TimetableGenerateFunction::DisplayNote(
+					function._displayNote(
 						notes,
-						_notePage,
-						_noteCalendarPage,
 						request,
 						*warning.second
 					);
@@ -245,8 +228,7 @@ namespace synthese
 				pm.insert(TimetableGenerateFunction::DATA_NOTES, notes.str()); //2
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_page->display(stream, request, pm);
 		}
 		
 		

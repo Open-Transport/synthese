@@ -33,11 +33,19 @@
 #include "StopPointUpdateAction.hpp"
 #include "StopArea.hpp"
 #include "PTPlaceAdmin.h"
+#include "ImportableAdmin.hpp"
+#include "HTMLMap.hpp"
+#include "CommercialLine.h"
+#include "StopPointMoveAction.hpp"
+#include "LineStop.h"
+#include "JourneyPattern.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include <geos/geom/Point.h>
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -47,6 +55,10 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace pt;
+	using namespace impex;
+	using namespace geography;
+	using namespace graph;
+	
 
 	namespace util
 	{
@@ -62,7 +74,6 @@ namespace synthese
 	namespace pt
 	{
 		const string StopPointAdmin::TAB_LINKS("li");
-		const string StopPointAdmin::TAB_OPERATOR_CODES("oc");
 		const string StopPointAdmin::TAB_PROPERTIES("pr");
 
 
@@ -117,6 +128,60 @@ namespace synthese
 			// PROPERTIES TAB
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
+				stream << "<h1>Carte</h1>";
+
+				shared_ptr<Point> mapCenter(_stop->getConnectionPlace()->getPoint());
+				if(!mapCenter.get() || mapCenter->isEmpty()) // If the place does not contain any point, it has no coordinate : search the last created place with coordinates
+				{
+					const Registry<StopArea>& registry(Env::GetOfficialEnv().getRegistry<StopArea>());
+					BOOST_REVERSE_FOREACH(Registry<StopArea>::value_type stopArea, registry)
+					{
+						if(stopArea.second->getPoint() && !stopArea.second->getPoint()->isEmpty())
+						{
+							mapCenter = stopArea.second->getPoint();
+							break;
+						}
+					}
+				}
+				if(!mapCenter.get() || mapCenter->isEmpty())
+				{
+					mapCenter = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(0,0);
+				}
+				HTMLMap map(*mapCenter, 18, true, true);
+
+				StaticActionRequest<StopPointMoveAction> moveAction(request);
+				moveAction.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
+
+				if(_stop->getGeometry().get())
+				{
+					stringstream popupcontent;
+					set<const CommercialLine*> lines;
+					BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stop->getDepartureEdges())
+					{
+						lines.insert(
+							static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
+						);
+					}
+					BOOST_FOREACH(const CommercialLine* line, lines)
+					{
+						popupcontent <<
+							"<span class=\"line " << line->getStyle() << "\">" <<
+							line->getShortName() <<
+							"</span>"
+							;
+					}
+					map.addPoint(HTMLMap::MapPoint(*_stop->getGeometry(), "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), _stop->getName() + "<br />" + popupcontent.str()));
+				}
+
+				map.draw(stream);
+
+				if(!_stop->getGeometry().get())
+				{
+					stream << map.getAddPointLink(moveAction.getURL(), "Placer l'arrêt");
+				}
+
+				stream << "<h1>Propriétés</h1>";
+
 				AdminActionFunctionRequest<StopPointUpdateAction, StopPointAdmin> updateRequest(request);
 				updateRequest.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
 				
@@ -146,15 +211,17 @@ namespace synthese
 						StopPointUpdateAction::PARAMETER_Y,
 						_stop->getGeometry().get() ? lexical_cast<string>(_stop->getGeometry()->getY()) : string()
 				)	);
-				stream << t.cell("Code opérateur", t.getForm().getTextInput(StopPointUpdateAction::PARAMETER_OPERATOR_CODE, _stop->getCodeBySource()));
 				stream << t.close();
 			}
 
 
 			////////////////////////////////////////////////////////////////////
 			// OPERATOR CODES TAB
-			if (openTabContent(stream, TAB_OPERATOR_CODES))
+			if (openTabContent(stream, ImportableAdmin::TAB_DATA_SOURCES))
 			{
+				StaticActionRequest<StopPointUpdateAction> updateOnlyRequest(request);
+				updateOnlyRequest.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
+				ImportableAdmin::DisplayDataSourcesTab(stream, *_stop, updateOnlyRequest);
 			}
 		
 			////////////////////////////////////////////////////////////////////
@@ -190,6 +257,7 @@ namespace synthese
 			_tabs.clear();
 
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, profile.isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
+			_tabs.push_back(Tab("Sources de données", ImportableAdmin::TAB_DATA_SOURCES, profile.isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
 
 			_tabBuilded = true;
 		}
@@ -200,12 +268,12 @@ namespace synthese
 		{
 			PageLinks links;
 
-			shared_ptr<PTPlaceAdmin> p(getNewOtherPage<PTPlaceAdmin>(false));
+			shared_ptr<PTPlaceAdmin> p(getNewPage<PTPlaceAdmin>());
 			p->setConnectionPlace(Env::GetOfficialEnv().getSPtr(
 					_stop->getConnectionPlace()
 			)	);
 			links = p->_getCurrentTreeBranch();
-			links.push_back(getNewPage());
+			links.push_back(getNewCopiedPage());
 
 			return links;
 

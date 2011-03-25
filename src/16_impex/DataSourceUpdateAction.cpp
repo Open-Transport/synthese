@@ -61,10 +61,22 @@ namespace synthese
 			{
 				map.insert(PARAMETER_DATA_SOURCE, _dataSource->getKey());
 			}
-			map.insert(PARAMETER_FORMAT, _format);
-			map.insert(PARAMETER_ICON, _icon);
-			map.insert(PARAMETER_NAME, _name);
-			map.insert(PARAMETER_CHARSET, _charset);
+			if(_format)
+			{
+				map.insert(PARAMETER_FORMAT, *_format);
+			}
+			if(_icon)
+			{
+				map.insert(PARAMETER_ICON, *_icon);
+			}
+			if(_name)
+			{
+				map.insert(PARAMETER_NAME, *_name);
+			}
+			if(_charset)
+			{
+				map.insert(PARAMETER_CHARSET, *_charset);
+			}
 			return map;
 		}
 		
@@ -72,7 +84,7 @@ namespace synthese
 		
 		void DataSourceUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
+			if(map.isDefined(PARAMETER_DATA_SOURCE)) try
 			{
 				_dataSource = DataSourceTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_DATA_SOURCE), *_env);
 			}
@@ -80,22 +92,39 @@ namespace synthese
 			{
 				throw ActionException("No such data source");
 			}
-
-			_name = map.get<string>(PARAMETER_NAME);
-			if(_name.empty())
+			else
 			{
-				throw ActionException("The name must be non empty");
+				_dataSource.reset(new DataSource);
 			}
 
-			_format = map.getDefault<string>(PARAMETER_FORMAT);
-			if(	!_format.empty() &&
-				!Factory<FileFormat>::contains(_format)
-			){
-				throw ActionException("The format must be manual typing or must correspond to an available file format");
+			if(map.isDefined(PARAMETER_NAME))
+			{
+				_name = map.get<string>(PARAMETER_NAME);
+				if(_name->empty())
+				{
+					throw ActionException("The name must be non empty");
+				}
 			}
 
-			_icon = map.getDefault<string>(PARAMETER_ICON);
-			_charset = map.getDefault<string>(PARAMETER_CHARSET);
+			if(map.isDefined(PARAMETER_FORMAT))
+			{
+				_format = map.getDefault<string>(PARAMETER_FORMAT);
+				if(	!_format->empty() &&
+					!Factory<FileFormat>::contains(*_format)
+				){
+					throw ActionException("The format must be manual typing or must correspond to an available file format");
+				}
+			}
+
+			if(map.isDefined(PARAMETER_ICON))
+			{
+				_icon = map.getDefault<string>(PARAMETER_ICON);
+			}
+
+			if(map.isDefined(PARAMETER_CHARSET))
+			{
+				_charset = map.getDefault<string>(PARAMETER_CHARSET);
+			}
 		}
 		
 		
@@ -106,12 +135,29 @@ namespace synthese
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			_dataSource->setName(_name);
-			_dataSource->setFormat(_format);
-			_dataSource->setIcon(_icon);
-			_dataSource->setCharset(_charset);
+			if(_name)
+			{
+				_dataSource->setName(*_name);
+			}
+			if(_format)
+			{
+				_dataSource->setFormat(*_format);
+			}
+			if(_icon)
+			{
+				_dataSource->setIcon(*_icon);
+			}
+			if(_charset)
+			{
+				_dataSource->setCharset(*_charset);
+			}
 
 			DataSourceTableSync::Save(_dataSource.get());
+
+			if(request.getActionWillCreateObject())
+			{
+				request.setActionCreatedId(_dataSource->getKey());
+			}
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}

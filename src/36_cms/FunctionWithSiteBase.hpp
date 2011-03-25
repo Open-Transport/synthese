@@ -60,7 +60,7 @@ namespace synthese
 			/// Public function with site copy.
 			/// @param function function to copy
 			/// @author Hugues Romain
-			virtual void _copy(boost::shared_ptr<const server::Function> function);
+			virtual void _copy(const server::Function& function);
 
 		public:
 			//! @name Getters

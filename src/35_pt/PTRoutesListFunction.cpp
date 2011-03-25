@@ -28,17 +28,18 @@
 #include "CommercialLine.h"
 #include "JourneyPattern.hpp"
 #include "Env.h"
-#include "PTRoutesListItemInterfacePage.hpp"
 #include "Webpage.h"
 #include "StopPoint.hpp"
 #include "City.h"
 #include "StopArea.hpp"
+#include "LinePhysicalStop.hpp"
 
 #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -58,6 +59,19 @@ namespace synthese
 		const string PTRoutesListFunction::PARAMETER_MERGE_SAME_ROUTES("msr");
 		const string PTRoutesListFunction::PARAMETER_DATE("date");
 		
+		const std::string PTRoutesListFunction::DATA_NAME("name");
+		const std::string PTRoutesListFunction::DATA_LENGTH("length");
+		const std::string PTRoutesListFunction::DATA_STOPS_NUMBER("stops_number");
+		const std::string PTRoutesListFunction::DATA_DIRECTION("direction");
+		const std::string PTRoutesListFunction::DATA_ORIGIN_CITY_NAME("origin_city_name");
+		const std::string PTRoutesListFunction::DATA_ORIGIN_STOP_NAME("origin_stop_name");
+		const std::string PTRoutesListFunction::DATA_DESTINATION_CITY_NAME("destination_city_name");
+		const std::string PTRoutesListFunction::DATA_DESTINATION_STOP_NAME("destination_stop_name");
+		const std::string PTRoutesListFunction::DATA_RANK("rank");
+		const std::string PTRoutesListFunction::DATA_RANK_IS_ODD("rank_is_odd");
+
+
+
 		ParametersMap PTRoutesListFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -74,6 +88,8 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void PTRoutesListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
@@ -86,6 +102,7 @@ namespace synthese
 				throw RequestException("No such page");
 			}
 			_mergeIncludingRoutes = map.getDefault<bool>(PARAMETER_MERGE_INCLUDING_ROUTES, false);
+
 			_mergeSameRoutes = map.getDefault<bool>(PARAMETER_MERGE_SAME_ROUTES, false);
 
 			try
@@ -97,11 +114,23 @@ namespace synthese
 				throw RequestException("No such line");
 			}
 
-			if(!map.getDefault<string>(PARAMETER_DATE).empty())
+			string dateStr(map.getDefault<string>(PARAMETER_DATE));
+			if(!dateStr.empty())
 			{
-				_date = time_from_string(map.get<string>(PARAMETER_DATE));
+				if(dateStr.size() == 10)
+				{
+					_date = ptime(
+						from_string(dateStr)
+					);
+				}
+				else
+				{
+					_date = time_from_string(dateStr);
+				}
 			}
 		}
+
+
 
 		void PTRoutesListFunction::run(
 			std::ostream& stream,
@@ -112,20 +141,19 @@ namespace synthese
 			// Selection of routes by same comparison
 			BOOST_FOREACH(const Path* path, _line->getPaths())
 			{
-				bool toInsert(true);
-
 				if(_date)
 				{
 					const JourneyPattern* thisRoute = dynamic_cast<const JourneyPattern*>(path);
 
-					if(thisRoute->isActive(_date->date()))
+					if(!thisRoute->isActive(_date->date()))
 					{
-						toInsert = false;
+						continue;
 					}
 				}
 
 				if(_mergeSameRoutes)
 				{
+					bool toInsert(true);
 					BOOST_FOREACH(const JourneyPattern* existingRoute, routes)
 					{
 						if(existingRoute->sameContent(*path, false, false))
@@ -134,12 +162,13 @@ namespace synthese
 							break;
 						}
 					}
+					if(!toInsert)
+					{
+						continue;
+					}
 				}
 
-				if(toInsert)
-				{
-					routes.insert(dynamic_cast<const JourneyPattern*>(path));
-				}
+				routes.insert(dynamic_cast<const JourneyPattern*>(path));
 			}
 
 			// Selection of routes by inclusion
@@ -183,18 +212,38 @@ namespace synthese
 			{
 				if(_page.get())
 				{
-					PTRoutesListItemInterfacePage::Display(
-						stream,
-						_page,
-						request,
-						*route,
-						rank++
-					);
+					ParametersMap pm(_savedParameters);
+
+					pm.insert(Request::PARAMETER_OBJECT_ID, route->getKey()); //0
+					pm.insert(DATA_NAME, route->getName()); //1
+					pm.insert(DATA_LENGTH, route->getLastEdge() ? route->getLastEdge()->getMetricOffset() : double(0)); //2
+					pm.insert(DATA_STOPS_NUMBER, route->getEdges().size()); //3
+					pm.insert(DATA_DIRECTION, route->getDirection()); //4
+					{
+						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(*route->getAllEdges().begin()));
+						if(lineStop)
+						{
+							pm.insert(DATA_ORIGIN_CITY_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName()); //5
+							pm.insert(DATA_ORIGIN_STOP_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getName()); //6
+						}
+					}
+					{
+						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(*route->getAllEdges().rbegin()));
+						if(lineStop)
+						{
+							pm.insert(DATA_DESTINATION_CITY_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName());
+							pm.insert(DATA_DESTINATION_STOP_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getName());
+						}
+					}
+					pm.insert(DATA_RANK, rank);
+					pm.insert(DATA_RANK_IS_ODD, rank % 2);
+
+					_page->display(stream, request, pm);
 				}
 				else // XML
 				{
 					//Ignore auto-generated routes
-					if(route->getKey()==0)
+					if(route->getKey()==0 || route->getEdges().empty())
 						continue;
 
 					stream << "<direction id=\""<< route->getKey() <<

@@ -25,9 +25,9 @@
 
 #include "CommercialLine.h"
 #include "LineMarkerInterfacePage.h"
-#include "StaticFunctionRequest.h"
-#include "WebPageDisplayFunction.h"
 #include "TransportNetwork.h"
+#include "Request.h"
+#include "Webpage.h"
 
 using namespace std;
 using namespace boost;
@@ -38,6 +38,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace server;
 	using namespace cms;
+	using namespace server;
 	
 
 	template<> const string util::FactorableTemplate<InterfacePage,pt::LineMarkerInterfacePage>::FACTORY_KEY("line_marker");
@@ -81,9 +82,7 @@ namespace synthese
 
 		LineMarkerInterfacePage::LineMarkerInterfacePage(
 		):	Registrable(0)
-		{
-
-		}
+		{}
 
 
 
@@ -94,10 +93,7 @@ namespace synthese
 			const pt::CommercialLine& commercialLine,
 			optional<size_t> rank
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_STYLE_NAME, commercialLine.getStyle());
 			pm.insert(DATA_IMAGE_URL, commercialLine.getImage());
@@ -119,8 +115,6 @@ namespace synthese
 				pm.insert(DATA_RANK_IS_ODD, *rank % 2);
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
-	}
-}
+}	}

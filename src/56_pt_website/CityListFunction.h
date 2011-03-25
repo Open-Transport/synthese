@@ -25,6 +25,7 @@
 
 #include "FunctionWithSite.h"
 #include "FactorableTemplate.h"
+#include "TransportWebsiteTypes.hpp"
 
 #include <string>
 
@@ -44,80 +45,63 @@ namespace synthese
 	{
 		class PlacesListInterfacePage;
 
-		/** City list query public function.
-			@ingroup m56Functions refFunctions
-
-			<h3>Request</h3>
-
-			<pre>
-			fonction=lc
-			si=<id website> : site id
-			t=<texte saisi> : texte entré par l’utilisateur
-			n=<nombre resultats> : nombre de résultats devant être fournis par le serveur
-			p=<id> : id of page to use to display the list by PlacesListInterfacePage
-			ip=<id> : id of page to use to display each item of the list
-			</pre>
-
-			<h3>Réponse</h3>
-
-			La réponse propose, dans l’ordre décroissant de pertinence, les n lieux de la commune, dont le nom
-			est le plus proche possible du texte entré.
-
-			Si p est spécifié, la réponse est définie par la page PlacesListInterfacePage désignée.
-			Si p n'est pas spécifié, la réponse respecte le schéma XML suivant :
-			
-			@image html options.png
-			
-			Les objets suivants sont définis :
-			<ul>
-			<li>options : balise racine</li>
-			<li>option : définit un élément retourné</li>
-			<li>score : taux de correspondance entre le texte proposé et le texte entré, entre 0
-			(limite basse théorique) et 1 (texte identique).</li>
-			<li>Type : type d’objet retourné, porte systématiquement la valeur <i>city</i>, choix parmi les valeurs suivantes (ne peut être que
-			city dans le cas d’une recherche de commune) :
-			<ul>
-			<li>city : commune</li>
-			<li>stop : arrêt du réseau de transport</li>
-			<li>publicPlace : lieu public</li>
-			<li>street : rue entière (tous points de la rue considérés équivalents)</li>
-			<li>address : adresse sur une rue (point précis sur la rue)</li>
-			</ul></ul>
-
-			<h3>Attachments</h3>
-
-			<ul>
-			<li><a href="include/56_transport_website/places_list.xsd">Response XSD schema</a></li>
-			<li><a href="include/56_transport_website/places_listSample.xml">Example of XML response</a></li>
-			</ul>
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// City list query public function.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list
+		//////////////////////////////////////////////////////////////////////////
+		///	@ingroup m56Functions refFunctions
+		/// @author Hugues Romain
 		class CityListFunction:
 			public util::FactorableTemplate<cms::FunctionWithSite<true>, CityListFunction>
 		{
 		public:
 			static const std::string PARAMETER_INPUT;
 			static const std::string PARAMETER_NUMBER;
-			static const std::string PARAMETER_IS_FOR_ORIGIN;
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_ITEM_PAGE;
+			static const std::string PARAMETER_AT_LEAST_A_STOP;
+
+			static const std::string DATA_RESULTS_SIZE;
+			static const std::string DATA_CONTENT;
+
+			static const std::string DATA_NAME;
+			static const std::string DATA_RANK;
 
 		private:
 			std::string _input;
-			int _n;
-			bool _isForOrigin;
+			boost::optional<std::size_t> _n;
+			bool _atLeastAStop;
 			boost::shared_ptr<const cms::Webpage>	_page;
 			boost::shared_ptr<const cms::Webpage>	_itemPage;
 
 		protected:
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list#Request
+			//////////////////////////////////////////////////////////////////////////
 			server::ParametersMap _getParametersMap() const;
+
+
+
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list#Request
+			//////////////////////////////////////////////////////////////////////////
 			void _setFromParametersMap(const server::ParametersMap& map);
 
+
+
+			void _displayItems(
+				std::ostream& stream,
+				const PlacesList& items,
+				const server::Request& request
+			) const;
+
 		public:
+			CityListFunction(): _atLeastAStop(false) {}
+
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list#Response
+			//////////////////////////////////////////////////////////////////////////
 			void run(std::ostream& stream, const server::Request& request) const;
 
-			void setTextInput(const std::string& text);
-			void setNumber(int number);
-			void setIsForOrigin(bool isForOrigin);
+			void setTextInput(const std::string& text){ _input = text; }
+			void setNumber(boost::optional<std::size_t> number){ _n = number; }
 
 			virtual bool isAuthorized(const server::Session* session) const;
 

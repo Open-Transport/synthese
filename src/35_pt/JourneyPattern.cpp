@@ -24,7 +24,8 @@
 #include "Registry.h"
 #include "RollingStock.h"
 #include "Service.h"
-#include "LineStop.h"
+#include "LineArea.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "StopPoint.hpp"
 #include "CommercialLine.h"
 #include "JourneyPatternCopy.hpp"
@@ -187,7 +188,7 @@ namespace synthese
 		{
 			if (getEdges().empty())
 				return NULL;
-		    return static_cast<const StopPoint*>((getEdges().at (0))->getFromVertex());
+			return static_cast<const StopPoint*>((*getAllEdges().begin())->getFromVertex());
 		}
 
 
@@ -195,8 +196,7 @@ namespace synthese
 		{
 			if (getEdges().empty())
 				return NULL;
-			Edge* edge = getLastEdge();
-			return static_cast<const StopPoint*>(edge->getFromVertex());
+			return static_cast<const StopPoint*>((*getAllEdges().rbegin())->getFromVertex());
 		}
 
 
@@ -298,8 +298,9 @@ namespace synthese
 
 
 
-		bool JourneyPattern::operator==( const StopsWithDepartureArrivalAuthorization& stops ) const
-		{
+		bool JourneyPattern::operator==(
+			const StopsWithDepartureArrivalAuthorization& stops
+		) const	{
 			if(getEdges().size() != stops.size())
 			{
 				return false;
@@ -309,9 +310,9 @@ namespace synthese
 			BOOST_FOREACH(const Edge* edge, getEdges())
 			{
 				const StopsWithDepartureArrivalAuthorization::value_type& stop(stops[rank]);
-				if( stop.stop.find(static_cast<StopPoint*>(edge->getFromVertex())) == stop.stop.end() ||
-					edge->isDeparture() != stop.departure ||
-					edge->isArrival() != stop.arrival
+				if( stop._stop.find(static_cast<StopPoint*>(edge->getFromVertex())) == stop._stop.end() ||
+					(rank > 0 && rank+1 < stops.size() && (edge->isDeparture() != stop._departure || edge->isArrival() != stop._arrival)) ||
+					(dynamic_cast<const DesignatedLinePhysicalStop*>(edge) && stop._withTimes != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput())
 				){
 					return false;
 				}
@@ -333,5 +334,33 @@ namespace synthese
 		{
 			return Calendar::isActive(date);
 		}
-	}
-}
+
+
+
+		std::size_t JourneyPattern::getScheduledStopsNumber() const
+		{
+			size_t result(0);
+			BOOST_FOREACH(const Edge* edge, _edges)
+			{
+				if(	static_cast<const LineStop&>(*edge).getScheduleInput()
+				){
+					++result;
+				}
+			}
+			return result;
+		}
+
+
+		JourneyPattern::StopWithDepartureArrivalAuthorization::StopWithDepartureArrivalAuthorization(
+			const std::set<StopPoint*>& stop,
+			boost::optional<Edge::MetricOffset> metricOffset /*= boost::optional<MetricOffset>()*/,
+			bool departure /*= true*/,
+			bool arrival /*= true */,
+			bool withTimes
+		):	_stop(stop),
+			_metricOffset(metricOffset),
+			_departure(departure),
+			_arrival(arrival),
+			_withTimes(withTimes)
+		{}
+}	}

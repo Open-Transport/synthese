@@ -36,24 +36,10 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 36.15 Action : Web page properties update.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Item_update
+		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m56Actions refActions
 		/// @author Hugues Romain
-		//////////////////////////////////////////////////////////////////////////
-		/// Key : WebPageUpdateAction
-		///
-		/// Parameters :
-		/// <ul>
-		///		<li>wp : web page to update</li>
-		///		<li>ui : value of parent page id</li>
-		///		<li>te : value of template id</li>
-		///		<li>sd : value of publication start date</li>
-		///		<li>ed : value of publication end date</li>
-		///		<li>mt : value of mime type</li>
-		///		<li>du : value of do not use template</li>
-		///		<li>fo : value of has forum</li>
-		///		<li>sp : value of smart URL path</li>
-		///		<li>sn : value of smart URL default parameter name</li>
-		/// </ul>
 		class WebPageUpdateAction:
 			public util::FactorableTemplate<server::Action, WebPageUpdateAction>
 		{
@@ -68,22 +54,40 @@ namespace synthese
 			static const std::string PARAMETER_HAS_FORUM;
 			static const std::string PARAMETER_SMART_URL_PATH;
 			static const std::string PARAMETER_SMART_URL_DEFAULT_PARAMETER_NAME;
+			static const std::string PARAMETER_CONTENT1;
+			static const std::string PARAMETER_ABSTRACT;
+			static const std::string PARAMETER_IMAGE;
+			static const std::string PARAMETER_TITLE;
+			static const std::string PARAMETER_IGNORE_WHITE_CHARS;
+			static const std::string PARAMETER_DECODE_XML_ENTITIES_IN_CONTENT;
+			static const std::string PARAMETER_RAW_EDITOR;			
 
 		private:
 			boost::shared_ptr<Webpage> _page;
-			boost::shared_ptr<Webpage> _up;
-			boost::shared_ptr<Webpage> _template;
-			boost::posix_time::ptime _startDate;
-			boost::posix_time::ptime _endDate;
-			std::string _mimeType;
-			bool _doNotUseTemplate;
-			bool _hasForum;
-			std::string _smartURLPath;
-			std::string _smartURLDefaultParameterName;
+
+			boost::optional<std::string> _content1;
+			boost::optional<std::string> _abstract;
+			boost::optional<std::string> _image;
+			boost::optional<std::string> _title;
+			boost::optional<bool> _ignoreWhiteChars;
+			boost::optional<boost::shared_ptr<Webpage> > _up;
+			boost::optional<boost::shared_ptr<Webpage> > _template;
+			boost::optional<boost::posix_time::ptime> _startDate;
+			boost::optional<boost::posix_time::ptime> _endDate;
+			boost::optional<std::string> _mimeType;
+			boost::optional<bool> _doNotUseTemplate;
+			boost::optional<bool> _hasForum;
+			boost::optional<std::string> _smartURLPath;
+			boost::optional<bool> _rawEditor;
+			boost::optional<std::string> _smartURLDefaultParameterName;
+
+			bool _decodeXMLEntitiesInContent;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a generic parameters map from the action parameters.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Item_update#Request
+			//////////////////////////////////////////////////////////////////////////
 			/// @return The generated parameters map
 			server::ParametersMap getParametersMap() const;
 
@@ -91,6 +95,8 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads the parameters of the action on a generic parameters map.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Item_update#Request
+			//////////////////////////////////////////////////////////////////////////
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const server::ParametersMap& map);
@@ -114,8 +120,9 @@ namespace synthese
 
 
 			void setWebPage(boost::shared_ptr<Webpage> value);
+			void setdecodeXMLEntitiesInContent(bool value){ _decodeXMLEntitiesInContent = value; }
+			void setRawEditor(bool value){ _rawEditor = value; }
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_WebPageUpdateAction_H__

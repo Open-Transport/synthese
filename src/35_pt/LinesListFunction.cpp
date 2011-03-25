@@ -33,6 +33,8 @@
 #include "Path.h"
 #include "JourneyPattern.hpp"
 #include "TransportNetworkTableSync.h"
+#include "ImportableTableSync.hpp"
+
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
@@ -47,6 +49,7 @@ namespace synthese
 	using namespace security;
 	using namespace cms;
 	using namespace graph;
+	using namespace impex;
 	
 	template<> const string util::FactorableTemplate<server::Function,pt::LinesListFunction>::FACTORY_KEY(
 		"LinesListFunction2"
@@ -227,7 +230,7 @@ namespace synthese
 				else if(_outputFormat =="xml")
 				{
 					stream <<"<line id=\""<< line->getKey() <<
-						"\" creatorId=\"" << line->getCreatorId() <<
+						"\" creatorId=\"" << (line->getDataSourceLinks().size() == 1 ? lexical_cast<string>(line->getDataSourceLinks().begin()->second) : ImportableTableSync::SerializeDataSourceLinks(line->getDataSourceLinks())) <<
 						"\" name=\""      << line->getName() <<
 						"\" shortName=\"" << line->getShortName() <<
 						"\" longName=\""  << line->getLongName() <<

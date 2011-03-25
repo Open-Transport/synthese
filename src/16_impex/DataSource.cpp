@@ -50,10 +50,11 @@ namespace synthese
 
 
 
-		boost::shared_ptr<Importer> DataSource::getImporter() const
-		{
+		boost::shared_ptr<Importer> DataSource::getImporter(
+			util::Env& env
+		) const {
 			shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(_format));
-			return fileFormat->getImporter(*this);
+			return fileFormat->getImporter(env, *this);
 		}
 
 

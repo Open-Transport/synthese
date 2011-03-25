@@ -77,6 +77,20 @@ namespace synthese
 			: _useEnvironment(true)
 		{}
 
+
+
+		MapRequest::MapRequest(
+			const MapRequest& value
+		):	util::FactorableTemplate<server::Function, MapRequest>(value),
+			_output(value._output),
+			_query(value._query),
+			_data(value._data),
+			_useEnvironment(value._useEnvironment),
+			_temporaryEnvironment(value._temporaryEnvironment)
+		{}
+
+
+
 		ParametersMap MapRequest::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -144,12 +158,6 @@ namespace synthese
 
 
 
-		MapRequest::~MapRequest()
-		{
-		}
-
-
-
 		void MapRequest::setData( const std::string& value )
 		{
 			_data = value;
@@ -208,7 +216,7 @@ namespace synthese
 			for (int i=0; i<nbLineStops; ++i) 
 			{
 				XMLNode lineStopNode = GetChildNode (lineStopsNode, "lineStop", i);
-				_temporaryEnvironment.getEditableRegistry<LineStop>().add (synthese::pt::XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.getEditableRegistry<JourneyPattern>(), _temporaryEnvironment.getEditableRegistry<StopPoint>()));
+				_temporaryEnvironment.getEditableRegistry<DesignatedLinePhysicalStop>().add (synthese::pt::XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.getEditableRegistry<JourneyPattern>(), _temporaryEnvironment.getEditableRegistry<StopPoint>()));
 			}
 		}
 

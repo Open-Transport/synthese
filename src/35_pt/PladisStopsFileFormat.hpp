@@ -23,7 +23,6 @@
 #define SYNTHESE_PladisStopsFileFormat_H__
 
 #include "FileFormatTemplate.h"
-#include "Calendar.h"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
 
@@ -116,8 +115,10 @@ namespace synthese
 				) const;
 
 			public:
-				Importer_(const impex::DataSource& dataSource):
-					impex::MultipleFileTypesImporter<PladisStopsFileFormat>(dataSource)
+				Importer_(
+					util::Env& env,
+					const impex::DataSource& dataSource
+				):	impex::MultipleFileTypesImporter<PladisStopsFileFormat>(env, dataSource)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////

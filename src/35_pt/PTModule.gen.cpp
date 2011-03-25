@@ -24,13 +24,19 @@ synthese::pt::JourneyPatternTableSync::integrate();
 synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::StopAreaTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::pt::StopAreaTableSync>::integrate();
 synthese::pt::LineStopTableSync::integrate();
+synthese::pt::LineAreaInheritedTableSync::integrate();
+synthese::pt::DesignatedLinePhysicalStopInheritedTableSync::integrate();
+synthese::pt::DRTAreaTableSync::integrate();
 
 synthese::pt::PTModule::integrate();
 
 synthese::pt::TridentFileFormat::integrate ();
 synthese::pt::CarPostalFileFormat::integrate();
 synthese::pt::PladisStopsFileFormat::integrate();
+synthese::pt::HeuresFileFormat::integrate();
+synthese::pt::GTFSFileFormat::integrate();
 
+synthese::pt::PTQualityControlAdmin::integrate();
 synthese::pt::ServiceAdmin::integrate();
 synthese::pt::TransportNetworkAdmin::integrate();
 synthese::pt::CommercialLineAdmin::integrate();
@@ -44,6 +50,8 @@ synthese::pt::PTPlaceAdmin::integrate();
 synthese::pt::PTUseRuleAdmin::integrate();
 synthese::pt::PTUseRulesAdmin::integrate();
 synthese::pt::StopPointAdmin::integrate();
+synthese::pt::DRTAreaAdmin::integrate();
+synthese::pt::DRTAreasAdmin::integrate();
 
 synthese::pt::RealTimeUpdateFunction::integrate();
 synthese::pt::PhysicalStopsCSVExportFunction::integrate();
@@ -59,25 +67,26 @@ synthese::pt::PTObjectInformationFunction::integrate();
 synthese::pt::LineMarkerInterfacePage::integrate();
 synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
 
-synthese::pt::NonConcurrencyRuleAddAction::integrate();
-synthese::pt::NonConcurrencyRuleRemoveAction::integrate();
-synthese::pt::ScheduleRealTimeUpdateAction::integrate();
-synthese::pt::ServiceVertexRealTimeUpdateAction::integrate();
-synthese::pt::TransportNetworkAddAction::integrate();
 synthese::pt::CommercialLineAddAction::integrate();
-synthese::pt::JourneyPatternAddAction::integrate();
-synthese::pt::ServiceAddAction::integrate();
-synthese::pt::StopAreaUpdateAction::integrate();
 synthese::pt::CommercialLineCalendarTemplateUpdateAction::integrate();
 synthese::pt::CommercialLineUpdateAction::integrate();
 synthese::pt::ContinuousServiceUpdateAction::integrate();
-synthese::pt::StopAreaNameUpdateAction::integrate();
+synthese::pt::DRTAreaRemoveAction::integrate();
+synthese::pt::DRTAreaUpdateAction::integrate();
+synthese::pt::JourneyPatternAddAction::integrate();
+synthese::pt::NonConcurrencyRuleAddAction::integrate();
+synthese::pt::NonConcurrencyRuleRemoveAction::integrate();
 synthese::pt::PTUseRuleAddAction::integrate();
 synthese::pt::PTUseRuleUpdateAction::integrate();
+synthese::pt::ScheduleRealTimeUpdateAction::integrate();
+synthese::pt::ServiceAddAction::integrate();
+synthese::pt::ServiceApplyCalendarAction::integrate();
 synthese::pt::ServiceTimetableUpdateAction::integrate();
 synthese::pt::ServiceUpdateAction::integrate();
+synthese::pt::ServiceVertexRealTimeUpdateAction::integrate();
+synthese::pt::StopAreaUpdateAction::integrate();
+synthese::pt::TransportNetworkUpdateAction::integrate();
 synthese::pt::JourneyPatternUpdateAction::integrate();
-synthese::pt::ServiceApplyCalendarAction::integrate();
 synthese::pt::LineStopAddAction::integrate();
 synthese::pt::LineStopRemoveAction::integrate();
 synthese::pt::ServiceDateChangeAction::integrate();
@@ -95,10 +104,12 @@ synthese::pt::TransportNetworkRight::integrate();
 
 synthese::pt::StopArea::integrate();
 
+synthese::pt::StopPointWFSType::integrate();
 
 // Registries
 synthese::util::Env::Integrate<synthese::pt::JourneyPattern>();
-synthese::util::Env::Integrate<synthese::pt::LineStop>();
+synthese::util::Env::Integrate<synthese::pt::LineArea>();
+synthese::util::Env::Integrate<synthese::pt::DesignatedLinePhysicalStop>();
 synthese::util::Env::Integrate<synthese::pt::StopArea>();
 synthese::util::Env::Integrate<synthese::pt::CommercialLine>();
 synthese::util::Env::Integrate<synthese::pt::StopPoint>();
@@ -111,4 +122,5 @@ synthese::util::Env::Integrate<synthese::pt::RollingStock>();
 synthese::util::Env::Integrate<synthese::pt::Fare>();
 synthese::util::Env::Integrate<synthese::pt::NonConcurrencyRule>();
 synthese::util::Env::Integrate<synthese::pt::ReservationContact>();
+synthese::util::Env::Integrate<synthese::pt::DRTArea>();
 

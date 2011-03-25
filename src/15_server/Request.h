@@ -28,10 +28,10 @@
 #include "Session.h"
 #include "User.h"
 #include "Profile.h"
-#include "12_security/Types.h"
-#include "12_security/Constants.h"
+#include "SecurityTypes.hpp"
+#include "SecurityConstants.hpp"
 #include "ParametersMap.h"
-#include "HTMLForm.h"
+#include "AjaxForm.hpp"
 
 namespace synthese
 {
@@ -148,6 +148,7 @@ namespace synthese
 
 			static const std::string PARAMETER_STARTER;
 			static const std::string PARAMETER_FUNCTION;
+			static const std::string PARAMETER_SERVICE;
 			static const std::string PARAMETER_SESSION;
 			static const std::string PARAMETER_OBJECT_ID;
 			static const std::string PARAMETER_ACTION;
@@ -266,6 +267,8 @@ namespace synthese
 					@date 2007					
 				*/
 				html::HTMLForm getHTMLForm(std::string name=std::string()) const;
+
+				html::AjaxForm getAjaxForm(const std::string& name) const;
 
 				/** Query string getter for building links.
 					@return The query string corresponding to the request.

@@ -27,20 +27,19 @@
 #include "TransportNetworkRight.h"
 #include "RealTimeUpdateFunction.h"
 #include "StopArea.hpp"
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "ScheduledService.h"
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "Interface.h"
 #include "JourneyPattern.hpp"
 #include "Webpage.h"
-#include "WebPageDisplayFunction.h"
-#include "StaticFunctionRequest.h"
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
 #include "PTObjectsCMSExporters.hpp"
 #include "StopPoint.hpp"
 #include "RollingStock.h"
 #include "StaticActionFunctionRequest.h"
+#include "WebPageDisplayFunction.h"
 
 using namespace std;
 using namespace boost;
@@ -196,17 +195,13 @@ namespace synthese
 			const ScheduledService& service,
 			const LineStop& lineStop
 		) const	{
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_cmsTemplate);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// Current location
-			PTObjectsCMSExporters::ExportStopArea(pm, *lineStop.getPhysicalStop()->getConnectionPlace(), DATA_LOCATION_);
+			if(dynamic_cast<const LinePhysicalStop*>(&lineStop))
+			{
+				PTObjectsCMSExporters::ExportStopArea(pm, *dynamic_cast<const LinePhysicalStop&>(lineStop).getPhysicalStop()->getConnectionPlace(), DATA_LOCATION_);
+			}
 
 			// Destination
 			PTObjectsCMSExporters::ExportStopArea(pm, *lineStop.getLine()->getDestination()->getConnectionPlace(), DATA_DESTINATION_);
@@ -268,7 +263,6 @@ namespace synthese
 				vertexUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID + Request::PARAMETER_ASSIGNMENT
 			);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_cmsTemplate->display(stream, request, pm);
 		}
 }	}

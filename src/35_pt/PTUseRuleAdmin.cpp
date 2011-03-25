@@ -159,7 +159,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks PTUseRuleAdmin::_getCurrentTreeBranch() const
 		{
 			PageLinks links;
-			links.push_back(getNewOtherPage<PTUseRulesAdmin>());
+			links.push_back(getNewPage<PTUseRulesAdmin>());
 			return links;
 		}
 	}

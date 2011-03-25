@@ -159,19 +159,19 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks HikingTrailsAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == HikingModule::FACTORY_KEY &&
+			if(	dynamic_cast<const HikingModule*>(&module) &&
 				_request.getUser() &&
 				_request.getUser()->getProfile() &&
 				isAuthorized(*_request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			
 			return links;
@@ -188,7 +188,7 @@ namespace synthese
 
 			BOOST_FOREACH(Registry<HikingTrail>::value_type it, Env::GetOfficialEnv().getRegistry<HikingTrail>())
 			{
-				shared_ptr<HikingTrailAdmin> p(getNewOtherPage<HikingTrailAdmin>());
+				shared_ptr<HikingTrailAdmin> p(getNewPage<HikingTrailAdmin>());
 				p->setTrail(it.second);
 				links.push_back(p);
 			}

@@ -31,6 +31,7 @@
 #include "GraphTypes.h"
 #include "Calendar.h"
 #include "Named.h"
+#include "Importable.h"
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/optional.hpp>
@@ -59,7 +60,7 @@ namespace synthese
 		/** Commercial line.
 			@ingroup m35
 
-			TRIDENT = JourneyPattern
+			TRIDENT = Line
 
 			A commercial line is a group of @ref JourneyPattern "routes" known as a same offer unit by the customers and by the network organization. It belongs to a @ref TransportNetwork "transport network".
 
@@ -67,7 +68,8 @@ namespace synthese
 		*/
 		class CommercialLine:
 			public graph::PathGroup,
-			public util::Named
+			public util::Named,
+			public impex::Importable
 		{
 		public:
 
@@ -91,8 +93,6 @@ namespace synthese
 			const pt::ReservationContact*	_reservationContact;	//!< Reservation contact
 			PlacesSet	_optionalReservationPlaces;
 			
-			std::string _creatorId;
-
 			NonConcurrencyRules _nonConcurrencyRules;
 			mutable boost::recursive_mutex _nonConcurrencyRulesMutex;
 
@@ -115,7 +115,6 @@ namespace synthese
 				const std::string& getImage () const { return _image; }
 				const boost::optional<util::RGBColor>& getColor () const { return _color; }
 				const pt::ReservationContact* getReservationContact() const { return _reservationContact; }
-				const std::string& getCreatorId() const { return _creatorId; }
 				const PlacesSet& getOptionalReservationPlaces() const { return _optionalReservationPlaces; }
 				const NonConcurrencyRules& getNonConcurrencyRules() const { return _nonConcurrencyRules; }
 				calendar::CalendarTemplate* getCalendarTemplate() const { return _calendarTemplate; }
@@ -131,7 +130,6 @@ namespace synthese
 				void setImage (const std::string& image) { _image = image; }
 				void setColor (const boost::optional<util::RGBColor>& color) { _color = color; }
 				void setReservationContact(const pt::ReservationContact* value) { _reservationContact = value; }
-				void setCreatorId(const std::string& value) { _creatorId = value; }
 				void setCalendarTemplate(calendar::CalendarTemplate* value) { _calendarTemplate = value;}
 				void setNonConcurrencyRules(const NonConcurrencyRules& value) { _nonConcurrencyRules = value; }
 				void setOpionalReservationPlaces(const PlacesSet& value) { _optionalReservationPlaces = value; }

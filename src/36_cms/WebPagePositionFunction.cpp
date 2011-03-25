@@ -89,7 +89,7 @@ namespace synthese
 			optional<int> depth = map.getOptional<int>(PARAMETER_MAX_DEPTH);
 			if(depth)
 			{
-				if(depth > 0)
+				if(*depth > 0)
 				{
 					_maxDepth = depth;
 				}
@@ -125,7 +125,7 @@ namespace synthese
 				}
 				if(_displayPage.get())
 				{
-					WebPageInterfacePage::Display(stream, *_displayPage, request, *curPage, false);
+					WebPageInterfacePage::Display(stream, *_displayPage, request, *curPage, false, false);
 				}
 				else
 				{

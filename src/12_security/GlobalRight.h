@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_GLOBAL_RIGHT_H
 #define SYNTHESE_GLOBAL_RIGHT_H
 
-#include "12_security/RightTemplate.h"
+#include "RightTemplate.h"
 
 namespace synthese
 {

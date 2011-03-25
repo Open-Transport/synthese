@@ -21,12 +21,11 @@
 */
 
 #include "MessagesObjectsCMSExporters.hpp"
-#include "WebPageDisplayFunction.h"
 #include "Alarm.h"
 #include "Webpage.h"
-#include "StaticFunctionRequest.h"
 #include "ParametersMap.h"
 #include "Scenario.h"
+#include "Request.h"
 
 using namespace std;
 
@@ -56,14 +55,7 @@ namespace synthese
 			{
 				return;
 			}
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(Request::PARAMETER_OBJECT_ID, message.getKey());
 			pm.insert(DATA_TITLE, message.getShortMessage());
@@ -72,7 +64,6 @@ namespace synthese
 			pm.insert(DATA_SCENARIO_ID, message.getScenario()->getKey());
 			pm.insert(DATA_SCENARIO_NAME, message.getScenario()->getName());
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 }	}

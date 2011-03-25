@@ -31,8 +31,11 @@
 #include "TransportNetworkTableSync.h"
 #include "ReservationContactTableSync.h"
 #include "CommercialLineTableSync.h"
+#include "ImportableTableSync.hpp"
+#include "ImportableAdmin.hpp"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -40,6 +43,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace pt;
+	using namespace impex;
 	
 	namespace util
 	{
@@ -57,8 +61,7 @@ namespace synthese
 		const string CommercialLineUpdateAction::PARAMETER_IMAGE = Action_PARAMETER_PREFIX + "im";
 		const string CommercialLineUpdateAction::PARAMETER_NETWORK_ID = Action_PARAMETER_PREFIX + "ni";
 		const string CommercialLineUpdateAction::PARAMETER_RESERVATION_CONTACT_ID = Action_PARAMETER_PREFIX + "ri";
-		const string CommercialLineUpdateAction::PARAMETER_CREATOR_ID = Action_PARAMETER_PREFIX + "ci";
-
+		
 		
 		
 		ParametersMap CommercialLineUpdateAction::getParametersMap() const
@@ -67,19 +70,42 @@ namespace synthese
 			if(_line.get())
 			{
 				map.insert(PARAMETER_LINE_ID, _line->getKey());
-				map.insert(PARAMETER_COLOR, _color ? _color->toString() : string());
-				map.insert(PARAMETER_CREATOR_ID, _creatorId);
-				map.insert(PARAMETER_IMAGE, _image);
-				map.insert(PARAMETER_LONG_NAME, _longName);
-				if(_network.get())
-				{
-					map.insert(PARAMETER_NETWORK_ID, _network->getKey());
-				}
-				if(_reservationContact.get())
-				{
-					map.insert(PARAMETER_RESERVATION_CONTACT_ID, _reservationContact->getKey());
-				}
-				map.insert(PARAMETER_STYLE, _style);
+			}
+			if(_color)
+			{
+				map.insert(PARAMETER_COLOR, *_color ? (*_color)->toString() : string());
+			}
+			if(_dataSourceLinks)
+			{
+				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
+			}
+			if(_image)
+			{
+				map.insert(PARAMETER_IMAGE, *_image);
+			}
+			if(_longName)
+			{
+				map.insert(PARAMETER_LONG_NAME, *_longName);
+			}
+			if(_name)
+			{
+				map.insert(PARAMETER_NAME, *_name);
+			}
+			if(_shortName)
+			{
+				map.insert(PARAMETER_SHORT_NAME, *_shortName);
+			}
+			if(_network)
+			{
+				map.insert(PARAMETER_NETWORK_ID, _network->get() ? (*_network)->getKey() : 0);
+			}
+			if(_reservationContact)
+			{
+				map.insert(PARAMETER_RESERVATION_CONTACT_ID, _reservationContact.get() ? (*_reservationContact)->getKey() : 0);
+			}
+			if(_style)
+			{
+				map.insert(PARAMETER_STYLE, *_style);
 			}
 			return map;
 		}
@@ -99,7 +125,7 @@ namespace synthese
 			}
 
 			// Network
-			try
+			if(map.isDefined(PARAMETER_NETWORK_ID))	try
 			{
 				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), *_env);
 			}
@@ -109,37 +135,67 @@ namespace synthese
 			}
 
 			// Color
-			string color(map.getDefault<string>(PARAMETER_COLOR));
-			if(!color.empty())
+			if(map.isDefined(PARAMETER_COLOR))
 			{
-				_color = RGBColor(color);
+				string color(map.getDefault<string>(PARAMETER_COLOR));
+				_color = color.empty() ? optional<RGBColor>() : RGBColor(color);
 			}
 
 			// Creator ID
-			_creatorId = map.getDefault<string>(PARAMETER_CREATOR_ID);
+			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
+			{
+				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(
+					map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS),
+					*_env
+				);
+			}
 
 			// Image
-			_image = map.getDefault<string>(PARAMETER_IMAGE);
+			if(map.isDefined(PARAMETER_IMAGE))
+			{
+				_image = map.get<string>(PARAMETER_IMAGE);
+			}
 
 			// Name
-			_longName = map.getDefault<string>(PARAMETER_LONG_NAME);
-			_shortName = map.getDefault<string>(PARAMETER_SHORT_NAME);
-			_name = map.getDefault<string>(PARAMETER_NAME);
+			if(map.isDefined(PARAMETER_LONG_NAME))
+			{
+				_longName = map.get<string>(PARAMETER_LONG_NAME);
+			}
+
+			if(map.isDefined(PARAMETER_SHORT_NAME))
+			{
+				_shortName = map.get<string>(PARAMETER_SHORT_NAME);
+			}
+
+			if(map.isDefined(PARAMETER_NAME))
+			{
+				_name = map.get<string>(PARAMETER_NAME);
+			}
 
 			// Style
-			_style = map.getDefault<string>(PARAMETER_STYLE);
+			if(map.isDefined(PARAMETER_STYLE))
+			{
+				_style = map.get<string>(PARAMETER_STYLE);
+			}
 
 			// Reservation contact
-			RegistryKeyType rid(map.getDefault<RegistryKeyType>(PARAMETER_RESERVATION_CONTACT_ID, 0));
-			if(rid > 0)
+			if(map.isDefined(PARAMETER_RESERVATION_CONTACT_ID))
 			{
-				try
+				RegistryKeyType rid(map.getDefault<RegistryKeyType>(PARAMETER_RESERVATION_CONTACT_ID, 0));
+				if(rid > 0)
 				{
-					_reservationContact = ReservationContactTableSync::Get(rid, *_env);
+					try
+					{
+						_reservationContact = ReservationContactTableSync::Get(rid, *_env);
+					}
+					catch (ObjectNotFoundException<ReservationContact>&)
+					{
+						throw ActionException("No such reservation contact");
+					}
 				}
-				catch (ObjectNotFoundException<ReservationContact>&)
+				else
 				{
-					throw ActionException("No such reservation contact");
+					_reservationContact = shared_ptr<const ReservationContact>();
 				}
 			}
 		}
@@ -151,16 +207,43 @@ namespace synthese
 		){
 			//stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			
-			_line->setColor(_color);
-			_line->setCreatorId(_creatorId);
-			_line->setImage(_image);
-			_line->setLongName(_longName);
-			_line->setName(_name);
-			_line->setNetwork(_network.get());
-			_line->setReservationContact(_reservationContact.get());
-			_line->setShortName(_shortName);
-			_line->setStyle(_style);
+
+			if(_color)
+			{
+				_line->setColor(*_color);
+			}
+			if(_dataSourceLinks)
+			{
+				_line->setDataSourceLinks(*_dataSourceLinks);
+			}
+			if(_image)
+			{
+				_line->setImage(*_image);
+			}
+			if(_longName)
+			{
+				_line->setLongName(*_longName);
+			}
+			if(_name)
+			{
+				_line->setName(*_name);
+			}
+			if(_network)
+			{
+				_line->setNetwork(_network->get());
+			}
+			if(_reservationContact)
+			{
+				_line->setReservationContact(_reservationContact->get());
+			}
+			if(_shortName)
+			{
+				_line->setShortName(*_shortName);
+			}
+			if(_style)
+			{
+				_line->setStyle(*_style);
+			}
 			
 			CommercialLineTableSync::Save(_line.get());
 			

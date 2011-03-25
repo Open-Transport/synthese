@@ -131,7 +131,7 @@ namespace synthese
 				while (rows->next ())
 				{
 					shared_ptr<ConnectionPlaceWithBroadcastPoint> object(new ConnectionPlaceWithBroadcastPoint);
-					object->broadCastPointsNumber = rows->getInt ("bc");
+					object->broadCastPointsNumber = rows->getInt("bc");
 					object->cpuNumber = rows->getInt("cc");
 					if(env.getRegistry<StopArea>().contains(rows->getKey()))
 					{

@@ -115,7 +115,10 @@ namespace synthese
 			///		<li>A subclass from FunctionWithSiteBase (the site is read in the base class)</li>
 			///		<li>WebPageDisplayFunction (the site is read from the displayed page)</li>
 			///	</ul>
-			static boost::shared_ptr<const Website> GetSite(const server::Request& request);
+			static boost::shared_ptr<const Website> GetSite(
+				const server::Request& request,
+				const server::ParametersMap& pm
+			);
 
 
 

@@ -241,9 +241,11 @@ namespace synthese
 				//! @name Import parameters
 				//@{
 					bool		_importStops;
+					bool		_autoGenerateStopAreas;
 					bool		_importJunctions;
 					boost::posix_time::time_duration	_defaultTransferDuration;
 					boost::gregorian::date	_startDate;
+					bool		_treatAllStopAreaAsQuay;
 				//@}
 
 				static std::string GetCoordinate(const double value);
@@ -254,8 +256,13 @@ namespace synthese
 				static const std::string PARAMETER_IMPORT_JUNCTIONS;
 				static const std::string PARAMETER_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_WITH_OLD_DATES;
+				static const std::string PARAMETER_AUTOGENERATE_STOP_AREAS;
+				static const std::string PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY;
 
-				Importer_(const impex::DataSource& dataSource);
+				Importer_(
+					util::Env& env,
+					const impex::DataSource& dataSource
+				);
 			
 
 				//! @name Setters

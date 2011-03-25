@@ -47,8 +47,27 @@ namespace synthese
 			
 			virtual std::string getIcon() const { return ICON; }
 			virtual std::string getTitle() const { return DEFAULT_TITLE; }
+
+			boost::shared_ptr<T> getNewCopiedPage() const;
+
+			virtual boost::shared_ptr<AdminInterfaceElement> getNewBaseCopiedPage() const;
 		};
-	}
-}
+
+
+
+		template<class T>
+		boost::shared_ptr<AdminInterfaceElement> synthese::admin::AdminInterfaceElementTemplate<T>::getNewBaseCopiedPage() const
+		{
+			return boost::static_pointer_cast<AdminInterfaceElement, T>(getNewCopiedPage());
+		}
+
+
+
+		template<class T>
+		boost::shared_ptr<T> AdminInterfaceElementTemplate<T>::getNewCopiedPage() const
+		{
+			return boost::shared_ptr<T>(new T(dynamic_cast<const T&>(*this)));
+		}
+}	}
 
 #endif // SYNTHESE_admin_AdminInterfaceElementTemplate_h__

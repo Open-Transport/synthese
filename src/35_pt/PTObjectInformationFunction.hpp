@@ -36,50 +36,16 @@ namespace synthese
 		class CommercialLine;
 		class JourneyPattern;
 		class StopArea;
+		class ScheduledService;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	35.15 Function : PTObjectInformationFunction.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/PT_Object_information
+		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m35Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.1.16
-		//////////////////////////////////////////////////////////////////////////
-		/// Key : PTObjectInformationFunction
-		///
-		/// Parameters :
-		///	<ul>
-		///		<li>roid : id of the object to extract the infromations from.
-		///		The object can be a service, a route, a line, a network.</li>
-		///		<li>info : code of the information to extract (see above)</li>
-		///	</ul>
-		///
-		/// Information codes :
-		///	<ul>
-		///		<li>if the object is a network</li>
-		///		<ul>
-		///			<li>name : name of the network</li>
-		///		</ul>
-		///		<li>if the object is a line</li>
-		///		<ul>
-		///			<li>short_name : short name of the line</li>
-		///			<li>name : name of the line</li>
-		///			<li>network_id : id of the network</li>
-		///			<li>style : style of the line</li>
-		///			<li>image : image of the line</li>
-		///		</ul>
-		///		<li>if the object is a route</li>
-		///		<ul>
-		///			<li>line_id : id of the line</li>
-		///			<li>origin_city_name : name of the city of the origin stop</li>
-		///			<li>origin_stop_name : name of the origin stop</li>
-		///			<li>destination_city_name : name of the city of the destination stop</li>
-		///			<li>destination_stop_name : name of the destination stop</li>
-		///		</ul>
-		///		<li>if the object is a commercial stop</li>
-		///		<ul>
-		///			<li>city_name : name of the city of the stop</li>
-		///			<li>name : name of the stop</li>
-		///		</ul>
 		class PTObjectInformationFunction:
 			public util::FactorableTemplate<server::Function,PTObjectInformationFunction>
 		{
@@ -94,11 +60,14 @@ namespace synthese
 				boost::shared_ptr<const CommercialLine> _line;
 				boost::shared_ptr<const JourneyPattern> _route;
 				boost::shared_ptr<const StopArea> _stop;
+				boost::shared_ptr<const ScheduledService> _service;
 			//@}
 			
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
+				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/PT_Object_information#Request
+				//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
 			/// @date 2010
@@ -108,6 +77,8 @@ namespace synthese
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/PT_Object_information#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain
 			/// @date 2010

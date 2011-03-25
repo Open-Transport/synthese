@@ -48,7 +48,7 @@
 #include "PlaceAliasTableSync.h"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
-#include "12_security/Constants.h"
+#include "SecurityConstants.hpp"
 #include "Right.h"
 #include "PTUseRuleTableSync.h"
 #include "RollingStockTableSync.h"
@@ -143,17 +143,13 @@ namespace synthese
 	{
 		void PTModule::RTDataCleaner()
 		{
-			Registry<ScheduledService>& registry(
-				Env::GetOfficialEnv().getEditableRegistry<ScheduledService>()
-			);
-
 			while(true)
 			{
 				ServerModule::SetCurrentThreadRunningAction();
 
 				posix_time::ptime now(posix_time::second_clock::local_time());
 
-				BOOST_FOREACH(Registry<ScheduledService>::value_type& service, registry)
+				BOOST_FOREACH(Registry<ScheduledService>::value_type& service, Env::GetOfficialEnv().getEditableRegistry<ScheduledService>())
 				{
 					if(now > service.second->getNextRTUpdate())
 					{
@@ -291,5 +287,4 @@ namespace synthese
 			return result;
 		}
 
-	}
-}
+}	}

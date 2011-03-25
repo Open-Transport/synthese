@@ -28,7 +28,6 @@
 #include "WebPageTableSync.h"
 #include "PropertiesHTMLTable.h"
 #include "WebPageUpdateAction.h"
-#include "WebPageContentUpdateAction.hpp"
 #include "WebPageDisplayFunction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "Interface.h"
@@ -41,6 +40,11 @@
 #include "WebPageLinkRemoveAction.hpp"
 #include "WebPageMoveAction.hpp"
 #include "AdminFunctionRequest.hpp"
+#include "TinyMCE.hpp"
+#include "StaticActionRequest.h"
+#include "AjaxForm.hpp"
+
+#include <boost/algorithm/string/find.hpp>
 
 using namespace std;
 using namespace boost;
@@ -68,6 +72,7 @@ namespace synthese
 	namespace cms
 	{
 		const string WebPageAdmin::TAB_CONTENT("co");
+		const string WebPageAdmin::TAB_PROPERTIES("pr");
 		const string WebPageAdmin::TAB_TREE("tr");
 		const string WebPageAdmin::TAB_LINKS("li");
 
@@ -124,32 +129,94 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 
+			StaticFunctionRequest<WebPageDisplayFunction> viewRequest(request, false);
+			if(	!_page->getRoot()->getClientURL().empty()
+			){
+				viewRequest.setClientURL(_page->getRoot()->getClientURL());
+			}
+			viewRequest.getFunction()->setPage(_page);
+
 			////////////////////////////////////////////////////////////////////
 			// TAB CONTENT
 			if (openTabContent(stream, TAB_CONTENT))
 			{
-				stream << "<h1>Visualisation</h1>";
+				bool canBeWYSIWYG(
+					!boost::algorithm::find_first(_page->getContent(), "<?") &&
+					!boost::algorithm::find_first(_page->getContent(), "<#") &&
+					!boost::algorithm::find_first(_page->getContent(), "<@") &&
+					!boost::algorithm::find_first(_page->getContent(), "<%")
+				);
 
-				StaticFunctionRequest<WebPageDisplayFunction> viewRequest(request, false);
-				if(	!_page->getRoot()->getClientURL().empty()
-				){
-					viewRequest.setClientURL(_page->getRoot()->getClientURL());
-				}
-				viewRequest.getFunction()->setPage(_page);
+				stream << "<h1>Visualisation</h1>";
 				stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "page_go.png") << "</p>";
+
 
 				stream << "<h1>Contenu</h1>";
 
+				stream << "<p>";
+
+				if(canBeWYSIWYG)
 				{
-					AdminActionFunctionRequest<WebPageContentUpdateAction, WebPageAdmin> contentUpdateRequest(request);
+					AdminActionFunctionRequest<WebPageUpdateAction,WebPageAdmin> rawEditorUpdateRequest(request);
+					rawEditorUpdateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
+					rawEditorUpdateRequest.getAction()->setRawEditor(!_page->getRawEditor());
+					stream <<
+						HTMLModule::getLinkButton(
+							rawEditorUpdateRequest.getHTMLForm().getURL(),
+							"Passer à l'éditeur "+ string(_page->getRawEditor() ? "WYSIWYG" : "technique")
+						);
+				}
+				else
+				{
+					stream << "L'éditeur technique est obligatoire à cause de la présence de balise d'appel aux services SYNTHESE dans le contenu de la page.";
+				}
+				stream << "</p>";
+
+				StaticActionRequest<WebPageUpdateAction> contentUpdateRequest(request);
+				contentUpdateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
+
+				TinyMCE tinyMCE;
+				tinyMCE.setAjaxSaveURL(contentUpdateRequest.getURL());
+				stream << tinyMCE.open();
+
+				if(canBeWYSIWYG && !_page->getRawEditor())
+				{
+					stream << TinyMCE::GetFakeFormWithInput(WebPageUpdateAction::PARAMETER_CONTENT1, _page->getContent());
+				}
+				else
+				{
+					AjaxForm f(contentUpdateRequest.getAjaxForm("update_content"));
+					stream << f.open();
+					stream << f.getTextAreaInput(WebPageUpdateAction::PARAMETER_CONTENT1, _page->getContent(), 20, 80, false);
+					stream << f.getSubmitButton("Sauvegarder");
+					stream << f.close();
+				}
+
+				stream << "<h1>Résumé</h1>";
+				stream << TinyMCE::GetFakeFormWithInput(WebPageUpdateAction::PARAMETER_ABSTRACT, _page->getAbstract());
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// TAB PROPERTIES
+			if (openTabContent(stream, TAB_PROPERTIES))
+			{
+				stream << "<h1>Visualisation</h1>";
+				stream << "<p>" << HTMLModule::getLinkButton(viewRequest.getURL(), "Voir", string(), "page_go.png") << "</p>";
+
+				stream << "<h1>Propriétés</h1>";
+
+				{
+					AdminActionFunctionRequest<WebPageUpdateAction, WebPageAdmin> contentUpdateRequest(request);
 					contentUpdateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
 					PropertiesHTMLTable t(contentUpdateRequest.getHTMLForm());
 					stream << t.open();
-					stream << t.cell("Titre", t.getForm().getTextInput(WebPageContentUpdateAction::PARAMETER_TITLE, _page->getName()));
-					stream << t.cell("Contenu", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_CONTENT1, _page->getContent(), 15, 60));
-					stream << t.cell("Résumé", t.getForm().getTextAreaInput(WebPageContentUpdateAction::PARAMETER_ABSTRACT, _page->getAbstract(), 5, 60));
-					stream << t.cell("Image", t.getForm().getTextInput(WebPageContentUpdateAction::PARAMETER_IMAGE, _page->getImage()));
-					stream << t.cell("Ignorer caractères invisibles", t.getForm().getOuiNonRadioInput(WebPageContentUpdateAction::PARAMETER_IGNORE_WHITE_CHARS, _page->getIgnoreWhiteChars()));
+					stream << t.cell("Titre", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TITLE, _page->getName()));
+					stream << t.cell("Image", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_IMAGE, _page->getImage()));
+					stream << t.cell("Modèle (défaut : modèle du site)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TEMPLATE_ID, _page->_getTemplate() ? lexical_cast<string>(_page->_getTemplate()->getKey()) : "0"));
+					stream << t.cell("Ne pas utiliser le modèle", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE, _page->getDoNotUseTemplate()));
+					stream << t.cell("Inclure forum", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_HAS_FORUM, _page->getHasForum()));
+					stream << t.cell("Ignorer caractères invisibles", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_IGNORE_WHITE_CHARS, _page->getIgnoreWhiteChars()));
+					stream << t.cell("Type MIME (défaut : text/html)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->_getMimeType()));
 					stream << t.close();
 				}
 			}
@@ -158,18 +225,13 @@ namespace synthese
 			// TAB TREE
 			if (openTabContent(stream, TAB_TREE))
 			{
-				stream << "<h1>Propriétés</h1>";
-
+				stream << "<h1>Paramètres de publication</h1>";
 				{
 					AdminActionFunctionRequest<WebPageUpdateAction, WebPageAdmin> updateRequest(request);
 					updateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
 					PropertiesHTMLTable t(updateRequest.getHTMLForm());
 					stream << t.open();
 					stream << t.cell("ID", lexical_cast<string>(_page->getKey()));
-					stream << t.cell("Modèle (défaut : modèle du site)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TEMPLATE_ID, _page->_getTemplate() ? lexical_cast<string>(_page->_getTemplate()->getKey()) : "0"));
-					stream << t.cell("Ne pas utiliser le modèle", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE, _page->getDoNotUseTemplate()));
-					stream << t.cell("Inclure forum", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_HAS_FORUM, _page->getHasForum()));
-					stream << t.cell("Type MIME (défaut : text/html)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->_getMimeType()));
 					stream << t.cell("Début publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_START_DATE, _page->getStartDate()));
 					stream << t.cell("Fin publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_END_DATE, _page->getEndDate()));
 					stream << t.cell(
@@ -272,7 +334,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<Webpage> page, pages)
 			{
 				shared_ptr<WebPageAdmin> p(
-					getNewOtherPage<WebPageAdmin>(false)
+					getNewPage<WebPageAdmin>()
 				);
 				p->setPage(const_pointer_cast<const Webpage>(page));
 				links.push_back(p);
@@ -288,7 +350,7 @@ namespace synthese
 			if(_page->getParent())
 			{
 				shared_ptr<WebPageAdmin> p(
-					getNewOtherPage<WebPageAdmin>()
+					getNewPage<WebPageAdmin>()
 				);
 				p->setPage(Env::GetOfficialEnv().getSPtr(_page->getParent()));
 				PageLinks links(p->getCurrentTreeBranch());
@@ -298,7 +360,7 @@ namespace synthese
 			else
 			{
 				shared_ptr<WebsiteAdmin> p(
-					getNewOtherPage<WebsiteAdmin>()
+					getNewPage<WebsiteAdmin>()
 				);
 				p->setSite(Env::GetOfficialEnv().getSPtr(_page->getRoot()));
 				PageLinks links(p->getCurrentTreeBranch());
@@ -314,6 +376,7 @@ namespace synthese
 			_tabs.clear();
 
 			_tabs.push_back(Tab("Contenu", TAB_CONTENT, true));
+			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
 			_tabs.push_back(Tab("Arborescence", TAB_TREE, true));
 			_tabs.push_back(Tab("Liens", TAB_LINKS, true));
 
