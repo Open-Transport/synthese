@@ -47,6 +47,7 @@ namespace synthese
 			/// @name Parameter identifiers
 			//@{
 				static const std::string TAB_SCHEDULES;
+				static const std::string TAB_REAL_TIME;
 				static const std::string TAB_PROPERTIES;
 				static const std::string TAB_CALENDAR;
 			//@}

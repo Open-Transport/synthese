@@ -151,14 +151,14 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks InterfaceAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const server::ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == InterfaceModule::FACTORY_KEY &&
+			if (dynamic_cast<const InterfaceModule*>(&module) &&
 				_request.getUser() &&
 				_request.getUser()->getProfile() &&
 				isAuthorized(*_request.getUser())
@@ -167,7 +167,7 @@ namespace synthese
 				InterfaceTableSync::SearchResult interfaces(InterfaceTableSync::Search(Env::GetOfficialEnv()));
 				BOOST_FOREACH(shared_ptr<Interface> interf, interfaces)
 				{
-					shared_ptr<InterfaceAdmin> p(getNewOtherPage<InterfaceAdmin>(false));
+					shared_ptr<InterfaceAdmin> p(getNewPage<InterfaceAdmin>());
 					p->_interface = const_pointer_cast<const Interface>(interf);
 					links.push_back(p);
 				}
@@ -188,7 +188,7 @@ namespace synthese
 			InterfacePageTableSync::SearchResult pages(InterfacePageTableSync::Search(Env::GetOfficialEnv(), _interface->getKey()));
 			BOOST_FOREACH(shared_ptr<InterfacePage> page, pages)
 			{
-				shared_ptr<InterfacePageAdmin> p(getNewOtherPage<InterfacePageAdmin>());
+				shared_ptr<InterfacePageAdmin> p(getNewPage<InterfacePageAdmin>());
 				p->setPage(const_pointer_cast<const InterfacePage>(page));
 				links.push_back(p);
 			}

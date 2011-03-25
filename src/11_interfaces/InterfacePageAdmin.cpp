@@ -115,7 +115,7 @@ namespace synthese
 
 			PropertiesHTMLTable p(updateRequest.getHTMLForm());
 			stream << p.open();
-			stream << p.cell("Code source", p.getForm().getTextAreaInput(InterfacePageUpdateAction::PARAMETER_SOURCE, _page->getSource(), 50, 100));
+			stream << p.cell("Code source", p.getForm().getTextAreaInput(InterfacePageUpdateAction::PARAMETER_SOURCE, _page->getSource(), 50, 100, false));
 			stream << p.close();
 
 		}

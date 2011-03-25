@@ -339,7 +339,7 @@ namespace synthese
 						t.getForm().getTextAreaInput(
 							UpdateDisplayMaintenanceAction::PARAMETER_MESSAGE,
 							_displayScreen->getMaintenanceMessage(),
-							3, 60
+							3, 60, false
 					)	)
 				;
 				stream << t.close();
@@ -617,7 +617,7 @@ namespace synthese
 							){
 								stream << t.row();
 								stream << t.col() << it.second->getName();
-								stream << t.col() << it.second->getCodeBySource();
+								stream << t.col() << it.second->getCodeBySources();
 								
 								// Lines column
 								stream << t.col();
@@ -1254,7 +1254,7 @@ namespace synthese
 				BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, _displayScreen->getChildren())
 				{
 					shared_ptr<DisplayAdmin> p(
-						getNewOtherPage<DisplayAdmin>(false)
+						getNewPage<DisplayAdmin>()
 					);
 					p->setScreen(Env::GetOfficialEnv().getSPtr(it.second));
 					links.push_back(p);

@@ -239,16 +239,17 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if (moduleKey == DeparturesTableModule::FACTORY_KEY && request.getUser() &&
+			if(	dynamic_cast<const DeparturesTableModule*>(&module) &&
+				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser()))
 			{
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}
@@ -284,22 +285,22 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> result, searchResult)
 				{
 					shared_ptr<DisplaySearchAdmin> p(
-						getNewOtherPage<DisplaySearchAdmin>()
+						getNewPage<DisplaySearchAdmin>()
 					);
 					p->setPlace(result->place->getKey());
 					links.push_back(p);
 					if(*p == currentPage) currentToAdd = false;
 				}
-
+				
 				if(currentToAdd)
 				{
 					shared_ptr<DisplaySearchAdmin> p(
-						getNewOtherPage<DisplaySearchAdmin>()
+						getNewPage<DisplaySearchAdmin>()
 					);
 					p->setPlace((*sa->getPlace())->getKey());
 					links.push_back(p);
-				}
-			}
+			}	}
+
 			return links;
 		}
 		

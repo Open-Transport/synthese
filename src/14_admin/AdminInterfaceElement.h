@@ -42,6 +42,7 @@ namespace synthese
 	namespace server
 	{
 		class ParametersMap;
+		class ModuleClass;
 	}
 
 	namespace admin
@@ -481,33 +482,12 @@ namespace synthese
 
 
 				virtual PageLinks getSubPagesOfModule(
-					const std::string& moduleKey,
+					const server::ModuleClass& module,
 					const AdminInterfaceElement& currentPage,
 					const AdminRequest& _request
 				) const;
 
 
-				boost::shared_ptr<AdminInterfaceElement> getNewPage() const;
-
-
-				template<class T>
-				boost::shared_ptr<T> getNewOtherPage(
-					boost::logic::tribool copyParameters = boost::logic::indeterminate
-				) const {
-					boost::shared_ptr<T> p(new T);
-					p->setEnv(_env);
-					if(	copyParameters == true ||
-						boost::logic::indeterminate(copyParameters) &&
-						this->getFactoryKey() == T::FACTORY_KEY
-					){
-						p->setActiveTab(getCurrentTab());
-						p->setFromParametersMap(
-							getParametersMap()
-						);
-					}
-					return p;
-				}
-				
 
 				/** Gets the opening position of the node in the tree view.
 					@return bool true = the page is visible, all the superior nodes are open, false = the page must not be visible, and will be hidden if no one another page of the same level must be visible.
@@ -518,10 +498,24 @@ namespace synthese
 					const AdminInterfaceElement& currentPage,
 					const AdminRequest& _request
 				) const;
+
+				template<class N>
+				boost::shared_ptr<N> getNewPage() const;
+
+				virtual boost::shared_ptr<AdminInterfaceElement> getNewBaseCopiedPage() const = 0;
 			//@}
 		};
-	}
-}
+
+
+
+		template<class N>
+		boost::shared_ptr<N> AdminInterfaceElement::getNewPage() const
+		{
+			boost::shared_ptr<N> p(new N);
+			p->setEnv(_env);
+			return p;
+		}
+}	}
 
 #endif
 

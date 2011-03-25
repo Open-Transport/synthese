@@ -29,7 +29,7 @@
 #include "FactoryBase.h"
 #include "DBLogEntry.h"
 #include "Registry.h"
-#include "12_security/Types.h"
+#include "SecurityTypes.hpp"
 
 #include <boost/optional.hpp>
 

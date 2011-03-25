@@ -25,7 +25,7 @@
 #include "Conversion.h"
 
 #include "SecurityModule.h"
-#include "12_security/Constants.h"
+#include "SecurityConstants.hpp"
 #include "Profile.h"
 
 #include <boost/foreach.hpp>

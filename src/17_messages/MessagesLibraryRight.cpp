@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "12_security/Constants.h"
+#include "SecurityConstants.hpp"
 
 #include "17_messages/MessagesLibraryRight.h"
 

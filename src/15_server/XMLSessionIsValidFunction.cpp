@@ -27,20 +27,28 @@
 #include "RequestException.h"
 #include "XMLSessionIsValidFunction.h"
 #include "SessionException.h"
+#include "Webpage.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace server;
 	using namespace security;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,XMLSessionIsValidFunction>::FACTORY_KEY("XMLSessionIsValidFunction");
 	
 	namespace server
 	{
 		const string XMLSessionIsValidFunction::PARAMETER_SESSION_ID_TO_CONTROL("si");
+		const string XMLSessionIsValidFunction::PARAMETER_CMS_TEMPLATE_ID("ti");
+
+		const string XMLSessionIsValidFunction::TAG_VALID_SESSION("validSession");
+		const string XMLSessionIsValidFunction::ATTR_ID("id");
+		const string XMLSessionIsValidFunction::ATTR_VALID("valid");
 		
 		ParametersMap XMLSessionIsValidFunction::_getParametersMap() const
 		{
@@ -49,38 +57,61 @@ namespace synthese
 			{
 				map.insert(PARAMETER_SESSION_ID_TO_CONTROL, _sessionIdToControl);
 			}
+			if(_cmsTemplate.get())
+			{
+				map.insert(PARAMETER_CMS_TEMPLATE_ID, _cmsTemplate->getKey());
+			}
 			return map;
 		}
 
 		void XMLSessionIsValidFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Session number
 			_sessionIdToControl = map.get<string>(PARAMETER_SESSION_ID_TO_CONTROL);
+
+			// CMS template
+			optional<RegistryKeyType> tid(map.getOptional<RegistryKeyType>(PARAMETER_CMS_TEMPLATE_ID));
+			if(tid) try
+			{
+				_cmsTemplate = Env::GetOfficialEnv().get<Webpage>(*tid);
+			}
+			catch (ObjectNotFoundException<Webpage>&)
+			{
+				throw RequestException("No such main page");
+			}
+			_savedParameters.remove(PARAMETER_CMS_TEMPLATE_ID);
 		}
 
 		void XMLSessionIsValidFunction::run( std::ostream& stream, const Request& request ) const
 		{
+			// Service
 			ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(_sessionIdToControl);
-			stream <<
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-				"<validSession xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/xml_session_is_valid_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" <<
-				" id=\"" << _sessionIdToControl << "\" valid=\"";
-			if(sit != ServerModule::getSessions().end())
+			bool value (sit != ServerModule::getSessions().end());
+			if(value) try
 			{
-				try
-				{
-					sit->second->controlAndRefresh(request.getIP());
-					stream << "true";
-				}
-				catch(SessionException)
-				{
-					stream << "false";
-				}
+				sit->second->controlAndRefresh(request.getIP());
 			}
-			else
+			catch(SessionException)
 			{
-				stream << "false";
+				value = false;
 			}
-			stream << "\" />";
+
+			// CMS response
+			if(_cmsTemplate.get())
+			{
+				ParametersMap pm;
+				pm.insert(ATTR_ID, _sessionIdToControl);
+				pm.insert(ATTR_VALID, value);
+				_cmsTemplate->display(stream, request, pm);
+			}
+			else // XML response
+			{
+				stream <<
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
+					"<" << TAG_VALID_SESSION << " xsi:noNamespaceSchemaLocation=\"https://extranet-rcsmobility.com/projects/synthese/repository/raw/src/15_server/xml_session_is_valid_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" <<
+					" " << ATTR_ID << "=\"" << _sessionIdToControl << "\" " << ATTR_VALID << "=\"" << (value ? "true" : "false") << "\" />"
+				;
+			}
 		}
 		
 		
@@ -94,7 +125,6 @@ namespace synthese
 
 		std::string XMLSessionIsValidFunction::getOutputMimeType() const
 		{
-			return "text/xml";
+			return _cmsTemplate.get() ? _cmsTemplate->getMimeType() : "text/xml";
 		}
-	}
-}
+}	}

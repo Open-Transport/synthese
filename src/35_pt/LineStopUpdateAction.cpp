@@ -29,6 +29,8 @@
 #include "Request.h"
 #include "LineStopTableSync.h"
 #include "StopPointTableSync.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "LineArea.hpp"
 
 using namespace std;
 
@@ -49,7 +51,7 @@ namespace synthese
 		const string LineStopUpdateAction::PARAMETER_PHYSICAL_STOP_ID = Action_PARAMETER_PREFIX + "ps";
 		const string LineStopUpdateAction::PARAMETER_ALLOWED_DEPARTURE = Action_PARAMETER_PREFIX + "ad";
 		const string LineStopUpdateAction::PARAMETER_ALLOWED_ARRIVAL = Action_PARAMETER_PREFIX + "aa";
-		
+		const string LineStopUpdateAction::PARAMETER_ALLOWED_INTERNAL = Action_PARAMETER_PREFIX + "ai";
 		
 		
 		ParametersMap LineStopUpdateAction::getParametersMap() const
@@ -71,6 +73,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_ALLOWED_ARRIVAL, *_allowedArrival);
 			}
+			if(_allowedInternal)
+			{
+				map.insert(PARAMETER_ALLOWED_INTERNAL, *_allowedInternal);
+			}
 			return map;
 		}
 		
@@ -88,6 +94,7 @@ namespace synthese
 				}
 				_allowedArrival = map.getOptional<bool>(PARAMETER_ALLOWED_ARRIVAL);
 				_allowedDeparture = map.getOptional<bool>(PARAMETER_ALLOWED_DEPARTURE);
+				_allowedInternal = map.getOptional<bool>(PARAMETER_ALLOWED_INTERNAL);
 			}
 			catch(ObjectNotFoundException<LineStop>&)
 			{
@@ -107,9 +114,13 @@ namespace synthese
 			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			if(_physicalStop.get())
+			if(_physicalStop.get() && dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get()))
 			{
-				_lineStop->setPhysicalStop(_physicalStop.get());
+				dynamic_cast<DesignatedLinePhysicalStop&>(*_lineStop).setPhysicalStop(*_physicalStop);
+			}
+			if(_allowedInternal && dynamic_cast<LineArea*>(_lineStop.get()))
+			{
+				dynamic_cast<LineArea&>(*_lineStop).setInternalService(*_allowedInternal);
 			}
 			if(_allowedArrival)
 			{

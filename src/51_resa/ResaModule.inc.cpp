@@ -16,11 +16,13 @@
 #include "ResaLogEntryUpdateAction.h"
 #include "ReservationUserUpdateAction.h"
 #include "SendPasswordAction.h"
+#include "ReservationUpdateAction.hpp"
 
 #include "XMLReservationFunction.h"
 #include "ResaCustomerHtmlOptionListFunction.h"
 #include "ReservationEditFunction.h"
 #include "CSVResaStatisticsFunction.h"
+#include "ReservationsListService.hpp"
 
 #include "ReservationItemInterfacePage.h"
 #include "ReservationConfirmationEMailInterfacePage.h"

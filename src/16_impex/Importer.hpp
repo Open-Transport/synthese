@@ -43,12 +43,15 @@ namespace synthese
 		class Importer
 		{
 		public:
-			Importer(const DataSource& dataSource):
+			Importer(
+				util::Env& env,
+				const DataSource& dataSource
+			):	_env(env),
 				_dataSource(dataSource)
 			{}
 			
 		protected:
-			mutable util::Env						_env;
+			mutable util::Env&						_env;
 			const DataSource&						_dataSource;
 
 			virtual db::SQLiteTransaction _save() const = 0;

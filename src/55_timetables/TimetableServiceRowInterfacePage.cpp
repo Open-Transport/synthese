@@ -33,7 +33,6 @@
 #include "StopArea.hpp"
 #include "StaticFunctionRequest.h"
 #include "Webpage.h"
-#include "WebPageDisplayFunction.h"
 #include "City.h"
 
 #include <sstream>
@@ -92,14 +91,7 @@ namespace synthese
 			size_t rank,
 			std::size_t followingServicesWithSameHour
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 		
 			pm.insert(DATA_DEPARTURE_HOUR, Service::GetTimeOfDay(object.getContent().begin()->second).hours()); //0
 			pm.insert(DATA_DEPARTURE_MINUTES, Service::GetTimeOfDay(object.getContent().begin()->second).minutes()); //1
@@ -155,8 +147,7 @@ namespace synthese
 			pm.insert(DATA_LINE_ID, object.getLine()->getCommercialLine()->getKey()); //18
 			pm.insert(DATA_ROUTE_ID, object.getLine()->getKey()); //19
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -169,15 +160,7 @@ namespace synthese
 			const pt::RollingStock* rollingStock,
 			std::size_t rank
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
-
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			if(object.first)
 			{
@@ -193,8 +176,6 @@ namespace synthese
 				pm.insert(DATA_ROLLING_STOCK_ID, rollingStock->getKey()); //6
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
-	}
-}
+}	}

@@ -61,8 +61,9 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			next_day,
 			PTModule::GRAPH_ID,
-			PTModule::GRAPH_ID
-			);
+			PTModule::GRAPH_ID,
+			100
+		);
 
 		Journey j(r.run());
 
@@ -85,8 +86,9 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			next_day,
 			PTModule::GRAPH_ID,
-			PTModule::GRAPH_ID
-			);
+			PTModule::GRAPH_ID,
+			100
+		);
 
 		Journey j(r.run());
 
@@ -125,7 +127,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			next_day,
 			PTModule::GRAPH_ID,
-			PTModule::GRAPH_ID
+			PTModule::GRAPH_ID,
+			100
 		);
 
 		Journey j(r.run());
@@ -158,7 +161,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			next_day,
 			PTModule::GRAPH_ID,
-			PTModule::GRAPH_ID
+			PTModule::GRAPH_ID,
+			100
 		);
 
 		Journey j(r.run());
@@ -199,7 +203,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			next_day,
 			PTModule::GRAPH_ID,
-			PTModule::GRAPH_ID
+			PTModule::GRAPH_ID,
+			100
 		);
 
 		Journey j(r.run());
@@ -254,7 +259,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			boost::optional<std::size_t>(),
 			a,
 			DEPARTURE_FIRST
-			);
+		);
 		PTRoutePlannerResult result(r.run());
 
 		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 5);
@@ -272,7 +277,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			boost::optional<std::size_t>(),
 			a,
 			DEPARTURE_FIRST
-			);
+		);
 		PTRoutePlannerResult result(r.run());
 
 		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 3);

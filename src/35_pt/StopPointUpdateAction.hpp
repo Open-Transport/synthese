@@ -27,6 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "Importable.h"
 
 namespace geos
 {
@@ -75,9 +76,9 @@ namespace synthese
 		private:
 			boost::shared_ptr<StopPoint> _stop;
 			boost::shared_ptr<geos::geom::Point> _point;
-			std::string _operatorCode;
-			std::string _name;
-			boost::shared_ptr<const StopArea> _stopArea;
+			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
+			boost::optional<std::string> _name;
+			boost::optional<boost::shared_ptr<const StopArea> > _stopArea;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

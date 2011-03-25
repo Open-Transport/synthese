@@ -49,14 +49,18 @@ namespace synthese
 
 	namespace security
 	{
-		User::User(util::RegistryKeyType id)
-			: Registrable(id)
-			, _cityId(0)
-			, _isConnectionAllowed(true)
-			, _birthDate(not_a_date_time),
-			_profile(NULL)
+		User::User(
+			util::RegistryKeyType id
+		):	Registrable(id),
+			_cityId(0),
+			_isConnectionAllowed(true),
+			_birthDate(not_a_date_time),
+			_profile(NULL),
+			_language(NULL)
 		{
 		}
+
+
 
 		void User::setProfile(const Profile* profile )
 		{

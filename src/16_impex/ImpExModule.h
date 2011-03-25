@@ -90,6 +90,9 @@ namespace synthese
 				const std::string& from,
 				const std::string& to
 			);
+
+			typedef std::vector<std::pair<boost::optional<std::string>, std::string> > FileFormatsList;
+			static FileFormatsList GetFileFormatsList();
 		};
 	}
 	/** @} */

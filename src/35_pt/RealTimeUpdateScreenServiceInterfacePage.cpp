@@ -24,7 +24,7 @@
 
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "ScheduledService.h"
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "JourneyPattern.hpp"
@@ -74,7 +74,10 @@ namespace synthese
 		) const	{
 			ParametersVector pv;
 
-			pv.push_back(lineStop.getPhysicalStop()->getConnectionPlace()->getFullName()); //0
+			if(dynamic_cast<const LinePhysicalStop*>(&lineStop))
+			{
+				pv.push_back(dynamic_cast<const LinePhysicalStop&>(lineStop).getPhysicalStop()->getConnectionPlace()->getFullName()); //0
+			}
 			
 			pv.push_back(lineStop.getLine()->getCommercialLine()->getStyle()); //1
 			pv.push_back(lineStop.getLine()->getCommercialLine()->getShortName()); //2

@@ -24,7 +24,7 @@
 #define SYNTHESE_LineStopTableSync_H__
 
 #include "LineStop.h"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "SQLiteInheritanceTableSyncTemplate.h"
 
 namespace synthese
 {
@@ -51,7 +51,7 @@ namespace synthese
 		///		by coma.</li>
 		///	</ul>
 		class LineStopTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<LineStopTableSync,LineStop>
+			public db::SQLiteInheritanceTableSyncTemplate<LineStopTableSync,LineStop>
 		{
 		public:
 			static const std::string COL_PHYSICALSTOPID;
@@ -61,7 +61,7 @@ namespace synthese
 			static const std::string COL_ISARRIVAL;
 			static const std::string COL_METRICOFFSET;
 			static const std::string COL_SCHEDULEINPUT;
-			static const std::string COL_GEOMETRY;
+			static const std::string COL_INTERNAL_SERVICE;
 
 			/** LineStop search.
 				(other search parameters)

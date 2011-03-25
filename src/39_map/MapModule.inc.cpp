@@ -1,13 +1,13 @@
 
-#include "39_map/MapModule.h"
+#include "MapModule.h"
 
-#include "39_map/MapRequest.h"
+#include "MapRequest.h"
 
-#include "39_map/HtmlMapRenderer.h"
-#include "39_map/JpegRenderer.h"
-#include "39_map/MapInfoRenderer.h"
-#include "39_map/PostscriptRenderer.h"
+#include "HtmlMapRenderer.h"
+#include "JpegRenderer.h"
+#include "MapInfoRenderer.h"
+#include "PostscriptRenderer.h"
 
-#include "39_map/TestMapAdmin.h"
+#include "TestMapAdmin.h"
 
-
+#include "WFSService.hpp"

@@ -31,6 +31,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class Env;
+	}
+
 	namespace impex
 	{
 		class Importer;
@@ -95,7 +100,7 @@ namespace synthese
 
 			//! @name Queries
 			//@{
-				boost::shared_ptr<Importer> getImporter() const;
+				boost::shared_ptr<Importer> getImporter(util::Env& env) const;
 				bool canImport() const;
 			//@}
 		

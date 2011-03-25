@@ -646,18 +646,18 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks TimetableAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const admin::AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
-			if(	moduleKey == TimetableModule::FACTORY_KEY &&
+			if(	dynamic_cast<const TimetableModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}
@@ -670,12 +670,12 @@ namespace synthese
 
 			// Subpages
 			TimetableTableSync::SearchResult timetables(
-				TimetableTableSync::Search(*_env, _timetable.get() ? _timetable->getKey() : 0)
+				TimetableTableSync::Search(Env::GetOfficialEnv(), _timetable.get() ? _timetable->getKey() : 0)
 			);
 			BOOST_FOREACH(shared_ptr<Timetable> tt, timetables)
 			{
 				shared_ptr<TimetableAdmin> page(
-					getNewOtherPage<TimetableAdmin>()
+					getNewPage<TimetableAdmin>()
 				);
 				page->setTimetable(tt);
 				links.push_back(page);

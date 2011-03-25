@@ -96,10 +96,51 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-		    string serviceNumber (rows->getText(ScheduledServiceTableSync::COL_SERVICENUMBER));
+			// Service number
+			string serviceNumber (rows->getText(ScheduledServiceTableSync::COL_SERVICENUMBER));
+			ss->setServiceNumber(serviceNumber);
 
+			// Team
+			ss->setTeam(rows->getText(ScheduledServiceTableSync::COL_TEAM));
+
+			// Path
 			util::RegistryKeyType pathId(rows->getLongLong(ScheduledServiceTableSync::COL_PATHID));
+			ss->setPathId(pathId);
+			Path* path(NULL);
 
+			// Use rules
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				// Path
+				path = JourneyPatternTableSync::GetEditable(pathId, env, linkLevel).get();
+				ss->setPath(path);
+				if(path->getEdges().empty())
+				{
+					LineStopTableSync::Search(env, pathId);
+				}
+				
+				// Use rules
+				util::RegistryKeyType bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
+				if(bikeComplianceId > 0)
+				{
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get();
+				}
+				util::RegistryKeyType handicappedComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
+				if(handicappedComplianceId > 0)
+				{
+					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
+				}
+				util::RegistryKeyType pedestrianComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
+				if(pedestrianComplianceId > 0)
+				{
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get();
+				}
+				ss->setRules(rules);
+			}
+
+			// Schedules
 			try
 			{
 				ss->decodeSchedules(
@@ -110,55 +151,24 @@ namespace synthese
 			{
 				throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size");
 			}
+			if(	path &&
+				path->getEdges().size() != ss->getArrivalSchedules(false).size()
+			){
+				throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");
+			}
 
-		    ss->setServiceNumber(serviceNumber);
-			ss->setTeam(rows->getText(ScheduledServiceTableSync::COL_TEAM));
-			ss->setPathId(pathId);
-			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+			// Calendar dates
+			ss->setFromSerializedString(rows->getText(ScheduledServiceTableSync::COL_DATES));
 
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			// Registration in path
+			if(path)
 			{
-				Path* path = JourneyPatternTableSync::GetEditable(pathId, env, linkLevel).get();
-				if(path->getEdges().empty())
-				{
-					LineStopTableSync::Search(env, pathId);
-				}
-				
-				if(	path->getEdges ().size () != ss->getArrivalSchedules(false).size ()
-				){
-					throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");
-				}
-
-				util::RegistryKeyType bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
-
-				util::RegistryKeyType handicappedComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID));
-
-				util::RegistryKeyType pedestrianComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID));
-
-
-				if(bikeComplianceId > 0)
-				{
-					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get();
-				}
-				if(handicappedComplianceId > 0)
-				{
-					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
-				}
-				if(pedestrianComplianceId > 0)
-				{
-					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get();
-				}
-				ss->setRules(rules);
-
 				path->addService(
 					ss,
 					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
 				);
+				ss->updatePathCalendar();
 			}
-
-			// After path linking to update path calendar
-			ss->setFromSerializedString(rows->getText(ScheduledServiceTableSync::COL_DATES));
-			ss->updatePathCalendar();
 		}
 
 

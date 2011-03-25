@@ -36,7 +36,7 @@
 #include "TransportNetworkTableSync.h"
 #include "HTMLModule.h"
 #include "SearchFormHTMLTable.h"
-#include "TransportNetworkAddAction.h"
+#include "TransportNetworkUpdateAction.hpp"
 #include "ActionResultHTMLTable.h"
 
 using namespace std;
@@ -131,7 +131,7 @@ namespace synthese
 					_requestParameters.raisingOrder
 			)	);
 
-			AdminActionFunctionRequest<TransportNetworkAddAction,TransportNetworkAdmin> newRequest(request);
+			AdminActionFunctionRequest<TransportNetworkUpdateAction,TransportNetworkAdmin> newRequest(request);
 			newRequest.getFunction()->setActionFailedPage<PTNetworksAdmin>();
 			newRequest.setActionWillCreateObject();
 
@@ -153,7 +153,7 @@ namespace synthese
 			}
 			stream << t.row();
 			stream << t.col();
-			stream << t.getActionForm().getTextInput(TransportNetworkAddAction::PARAMETER_NAME, string());
+			stream << t.getActionForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_NAME, string());
 			stream << t.col();
 			stream << t.getActionForm().getSubmitButton("Créer");
 			stream << t.close();
@@ -162,18 +162,19 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks PTNetworksAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == PTModule::FACTORY_KEY && request.getUser() &&
+			if(	dynamic_cast<const PTModule*>(&module) &&
+				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser()))
 			{
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			
 			return links;
@@ -193,7 +194,7 @@ namespace synthese
 			BOOST_FOREACH(const TransportNetworkTableSync::SearchResult::value_type& network, networks)
 			{
 				shared_ptr<TransportNetworkAdmin> link(
-					getNewOtherPage<TransportNetworkAdmin>(false)
+					getNewPage<TransportNetworkAdmin>()
 				);
 				link->setNetwork(const_pointer_cast<const TransportNetwork>(network));
 				links.push_back(link);

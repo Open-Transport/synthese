@@ -26,8 +26,6 @@
 #include "Request.h"
 #include "HikingTrailSearchFunction.h"
 #include "HikingTrailTableSync.h"
-#include "StaticFunctionRequest.h"
-#include "WebPageDisplayFunction.h"
 #include "ParametersMap.h"
 #include "Webpage.h"
 
@@ -80,15 +78,11 @@ namespace synthese
 			
 			HikingTrailTableSync::SearchResult trails(HikingTrailTableSync::Search(Env::GetOfficialEnv(), _searchName));
 
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_itemDisplayPage);
-
 			BOOST_FOREACH(HikingTrailTableSync::SearchResult::value_type& trail, trails)
 			{
-				ParametersMap pm;
+				ParametersMap pm(request.getFunction()->getSavedParameters());
 				pm.insert(Request::PARAMETER_OBJECT_ID, trail->getKey());
-				displayRequest.getFunction()->setAditionnalParametersMap(pm);
-				displayRequest.run(stream);
+				_itemDisplayPage->display(stream, request, pm);
 			}
 		}
 		
@@ -106,5 +100,4 @@ namespace synthese
 		{
 			return _itemDisplayPage.get() ? _itemDisplayPage->getMimeType() : "text/xml";
 		}
-	}
-}
+}	}

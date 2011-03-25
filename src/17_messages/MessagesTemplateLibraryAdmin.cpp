@@ -202,8 +202,8 @@ namespace synthese
 					t.getForm().setUpdateRight(updateRight);
 					stream << t.open();
 					stream << t.cell("Nom", t.getForm().getTextInput(UpdateTextTemplateAction::PARAMETER_NAME, tt->getName()));
-					stream << t.cell("Texte court", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_SHORT_MESSAGE, tt->getShortMessage(), 2, 60));
-					stream << t.cell("Texte long", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE, tt->getLongMessage(), 6, 60));
+					stream << t.cell("Texte court", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_SHORT_MESSAGE, tt->getShortMessage(), 2, 60, false));
+					stream << t.cell("Texte long", t.getForm().getTextAreaInput(UpdateTextTemplateAction::PARAMETER_LONG_MESSAGE, tt->getLongMessage(), 6, 60, false));
 					stream << t.close();
 				}
 			}
@@ -215,8 +215,8 @@ namespace synthese
 				PropertiesHTMLTable ta(addRequest.getHTMLForm("add"));
 				stream << ta.open();
 				stream << ta.cell("Nom", ta.getForm().getTextInput(TextTemplateAddAction::PARAMETER_NAME, string()));
-				stream << ta.cell("Texte court", ta.getForm().getTextAreaInput(TextTemplateAddAction::PARAMETER_SHORT_MESSAGE, string(), 2, 60));
-				stream << ta.cell("Texte long", ta.getForm().getTextAreaInput(TextTemplateAddAction::PARAMETER_LONG_MESSAGE, string(), 6, 60));
+				stream << ta.cell("Texte court", ta.getForm().getTextAreaInput(TextTemplateAddAction::PARAMETER_SHORT_MESSAGE, string(), 2, 60, false));
+				stream << ta.cell("Texte long", ta.getForm().getTextAreaInput(TextTemplateAddAction::PARAMETER_LONG_MESSAGE, string(), 6, 60, false));
 				stream << ta.close();
 			}
 		}
@@ -232,18 +232,18 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == MessagesModule::FACTORY_KEY &&
+			if(	dynamic_cast<const MessagesModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewOtherPage<MessagesTemplateLibraryAdmin>());
+				links.push_back(getNewPage<MessagesTemplateLibraryAdmin>());
 			}
 			return links;
 		}

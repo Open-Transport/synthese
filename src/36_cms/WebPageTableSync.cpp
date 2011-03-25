@@ -62,6 +62,7 @@ namespace synthese
 		const string WebPageTableSync::COL_SMART_URL_PATH("smart_url_path");
 		const string WebPageTableSync::COL_SMART_URL_DEFAULT_PARAMETER_NAME("smart_url_default_parameter_name");
 		const string WebPageTableSync::COL_IGNORE_WHITE_CHARS("ignore_white_chars");
+		const string WebPageTableSync::COL_RAW_EDITOR("raw_editor");
 	}
 
 	namespace db
@@ -89,6 +90,7 @@ namespace synthese
 			SQLiteTableSync::Field(WebPageTableSync::COL_SMART_URL_PATH, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_SMART_URL_DEFAULT_PARAMETER_NAME, SQL_TEXT),
 			SQLiteTableSync::Field(WebPageTableSync::COL_IGNORE_WHITE_CHARS, SQL_BOOLEAN),
+			SQLiteTableSync::Field(WebPageTableSync::COL_RAW_EDITOR, SQL_BOOLEAN),
 			SQLiteTableSync::Field()
 		};
 
@@ -119,6 +121,7 @@ namespace synthese
 			webpage->setSmartURLPath(rows->getText(WebPageTableSync::COL_SMART_URL_PATH));
 			webpage->setSmartURLDefaultParameterName(rows->getText(WebPageTableSync::COL_SMART_URL_DEFAULT_PARAMETER_NAME));
 			webpage->setIgnoreWhiteChars(rows->getBool(WebPageTableSync::COL_IGNORE_WHITE_CHARS));
+			webpage->setRawEditor(rows->getBool(WebPageTableSync::COL_RAW_EDITOR));
 
 			if(!rows->getText(WebPageTableSync::COL_START_TIME).empty())
 			{
@@ -244,6 +247,7 @@ namespace synthese
 			query.addField(webPage->getSmartURLPath());
 			query.addField(webPage->getSmartURLDefaultParameterName());
 			query.addField(webPage->getIgnoreWhiteChars());
+			query.addField(webPage->getRawEditor());
 			query.execute(transaction);
 		}
 	}

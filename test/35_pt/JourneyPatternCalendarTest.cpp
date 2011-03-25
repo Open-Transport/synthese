@@ -21,7 +21,7 @@
 */
 
 #include "JourneyPattern.hpp"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "ScheduledService.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
@@ -44,8 +44,8 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		JourneyPattern jp;
 		StopArea sa(0, true);
 		StopPoint sp(0, "sp", &sa);
-		LineStop ls1(0, &jp, 0, true, false,0,&sp);
-		LineStop ls2(0, &jp, 1, false, true,0,&sp);
+		DesignatedLinePhysicalStop ls1(0, &jp, 0, true, false,0,&sp);
+		DesignatedLinePhysicalStop ls2(0, &jp, 1, false, true,0,&sp);
 		jp.addEdge(ls1);
 		jp.addEdge(ls2);
 
@@ -53,8 +53,7 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(8, 0, 0));
 		schedules.push_back(time_duration(9, 0, 0));
-		s.setDepartureSchedules(schedules);
-		s.setArrivalSchedules(schedules);
+		s.setSchedules(schedules, schedules);
 
 		date d(day_clock::local_day());
 		s.setActive(d);
@@ -74,8 +73,8 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		JourneyPattern jp;
 		StopArea sa(0, true);
 		StopPoint sp(0, "sp", &sa);
-		LineStop ls1(0, &jp, 0, true, false,0,&sp);
-		LineStop ls2(0, &jp, 1, false, true,0,&sp);
+		DesignatedLinePhysicalStop ls1(0, &jp, 0, true, false,0,&sp);
+		DesignatedLinePhysicalStop ls2(0, &jp, 1, false, true,0,&sp);
 		jp.addEdge(ls1);
 		jp.addEdge(ls2);
 
@@ -83,8 +82,7 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(8, 0, 0));
 		schedules.push_back(time_duration(25, 0, 0));
-		s.setDepartureSchedules(schedules);
-		s.setArrivalSchedules(schedules);
+		s.setSchedules(schedules, schedules);
 
 		date d(day_clock::local_day());
 		s.setActive(d);
@@ -106,8 +104,8 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		JourneyPattern jp;
 		StopArea sa(0, true);
 		StopPoint sp(0, "sp", &sa);
-		LineStop ls1(0, &jp, 0, true, false,0,&sp);
-		LineStop ls2(0, &jp, 1, false, true,0,&sp);
+		DesignatedLinePhysicalStop ls1(0, &jp, 0, true, false,0,&sp);
+		DesignatedLinePhysicalStop ls2(0, &jp, 1, false, true,0,&sp);
 		jp.addEdge(ls1);
 		jp.addEdge(ls2);
 
@@ -115,8 +113,7 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(26, 0, 0));
 		schedules.push_back(time_duration(32, 0, 0));
-		s.setDepartureSchedules(schedules);
-		s.setArrivalSchedules(schedules);
+		s.setSchedules(schedules, schedules);
 
 		date d(day_clock::local_day());
 		s.setActive(d);
@@ -138,8 +135,8 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		JourneyPattern jp;
 		StopArea sa(0, true);
 		StopPoint sp(0, "sp", &sa);
-		LineStop ls1(0, &jp, 0, true, false,0,&sp);
-		LineStop ls2(0, &jp, 1, false, true,0,&sp);
+		DesignatedLinePhysicalStop ls1(0, &jp, 0, true, false,0,&sp);
+		DesignatedLinePhysicalStop ls2(0, &jp, 1, false, true,0,&sp);
 		jp.addEdge(ls1);
 		jp.addEdge(ls2);
 
@@ -147,8 +144,7 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 		SchedulesBasedService::Schedules schedules;
 		schedules.push_back(time_duration(26, 0, 0));
 		schedules.push_back(time_duration(49, 0, 0));
-		s.setDepartureSchedules(schedules);
-		s.setArrivalSchedules(schedules);
+		s.setSchedules(schedules, schedules);
 
 		date d(day_clock::local_day());
 		s.setActive(d);

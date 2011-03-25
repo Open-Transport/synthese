@@ -25,7 +25,7 @@
 
 
 #include "GraphModuleTemplate.h"
-#include "12_security/Types.h"
+#include "SecurityTypes.hpp"
 #include "Registry.h"
 
 #include <vector>
@@ -71,6 +71,9 @@ namespace synthese
 			@ingroup m35
 
 			@defgroup m35File 35.16 File formats
+			@ingroup m35
+
+			@defgroup m35WFS 35.39 WFS types
 			@ingroup m35
 
 			@defgroup m35 35 Transport

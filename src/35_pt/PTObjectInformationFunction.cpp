@@ -33,6 +33,7 @@
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "JourneyPattern.hpp"
+#include "ScheduledServiceTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -72,9 +73,13 @@ namespace synthese
 			{
 				_route = Env::GetOfficialEnv().get<JourneyPattern>(id);
 			}
-			else if(StopAreaTableSync::TABLE.ID)
+			else if(tableId == StopAreaTableSync::TABLE.ID)
 			{
 				_stop = Env::GetOfficialEnv().get<StopArea>(id);
+			}
+			else if(tableId == ScheduledServiceTableSync::TABLE.ID)
+			{
+				_service = Env::GetOfficialEnv().get<ScheduledService>(id);
 			}
 
 			_info = map.get<string>(PARAMETER_INFO);
@@ -148,6 +153,17 @@ namespace synthese
 				else if(_info == "name")
 				{
 					stream << _stop->getName();
+				}
+			}
+			else if(_service.get())
+			{
+				if(_info == "line_id")
+				{
+					stream << _service->getPath()->getPathGroup()->getKey();
+				}
+				else if(_info == "route_id")
+				{
+					stream << _service->getPath()->getKey();
 				}
 			}
 		}

@@ -29,6 +29,7 @@
 #include "LinkException.h"
 #include "CityTableSync.h"
 #include "CrossingTableSync.hpp"
+#include "ImportableTableSync.hpp"
 
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/Point.h>
@@ -44,6 +45,7 @@ namespace synthese
 	using namespace pt;
 	using namespace geography;
 	using namespace road;
+	using namespace impex;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,StopPointTableSync>::FACTORY_KEY("35.55.01 Physical stops");
 	template<> const string FactorableTemplate<Fetcher<graph::Vertex>, StopPointTableSync>::FACTORY_KEY("12");
@@ -57,7 +59,6 @@ namespace synthese
 		const string StopPointTableSync::COL_OPERATOR_CODE("operator_code");
 		const string StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID("projected_road_chunk_id");
 		const string StopPointTableSync::COL_PROJECTED_METRIC_OFFSET("projected_metric_offset");
-		const string StopPointTableSync::COL_GEOMETRY("geometry");
 	}
 
     namespace db
@@ -76,7 +77,7 @@ namespace synthese
 			SQLiteTableSync::Field(StopPointTableSync::COL_OPERATOR_CODE, SQL_TEXT),
 			SQLiteTableSync::Field(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, SQL_INTEGER),
 			SQLiteTableSync::Field(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, SQL_DOUBLE),
-			SQLiteTableSync::Field(StopPointTableSync::COL_GEOMETRY, SQL_GEOM_POINT),
+			SQLiteTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			SQLiteTableSync::Field()
 		};
 
@@ -99,11 +100,11 @@ namespace synthese
 
 			// Position : Lon/lat prior to x/y
 			object->resetGeometry();
-			if(!rows->getText(StopPointTableSync::COL_GEOMETRY).empty())
+			if(!rows->getText(TABLE_COL_GEOMETRY).empty())
 			{
 				shared_ptr<Point> point(
 					static_pointer_cast<Point, Geometry>(
-						rows->getGeometryFromWKT(StopPointTableSync::COL_GEOMETRY)
+						rows->getGeometryFromWKT(TABLE_COL_GEOMETRY)
 				)	);
 				if(point.get())
 				{
@@ -119,7 +120,12 @@ namespace synthese
 				)	);
 			}
 
-			object->setCodeBySource(rows->getText ( StopPointTableSync::COL_OPERATOR_CODE));
+			object->setDataSourceLinks(
+				ImportableTableSync::GetDataSourceLinksFromSerializedString(
+					rows->getText(StopPointTableSync::COL_OPERATOR_CODE),
+					env
+			)	);
+
 			object->setHub(NULL);
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
@@ -199,7 +205,9 @@ namespace synthese
 				query.addFieldNull();
 				query.addFieldNull();
 			}
-			query.addField(object->getCodeBySource());
+			query.addField(
+				ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks())
+			);
 			if(object->getProjectedPoint().getRoadChunk())
 			{
 				query.addField(object->getProjectedPoint().getRoadChunk()->getKey());

@@ -103,7 +103,8 @@ namespace synthese
 
 					EdgeProjector<MainRoadChunk>::From paths(
 						RoadChunkTableSync::SearchByMaxDistance(
-							*stopPoint->getGeometry(), _maxDistance
+							*stopPoint->getGeometry(), _maxDistance,
+							Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL
 					)	);
 
 					if(!paths.empty())

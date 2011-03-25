@@ -1,14 +1,35 @@
+/** RGBColor class implementation.
+	@file RGBColor.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
 #include "RGBColor.h"
 
-#include "01_util/Conversion.h"
-
 #include <boost/tokenizer.hpp>
+#include <boost/lexical_cast.hpp>
 
 #include <iostream>
 #include <sstream>
 #include <iomanip>
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -30,9 +51,9 @@ namespace synthese
 				std::string gs = *(tok_iter); ++tok_iter;
 				std::string bs = *(tok_iter);
 		
-				r = Conversion::ToInt (rs) / 255.0;
-				g = Conversion::ToInt (gs) / 255.0;
-				b = Conversion::ToInt (bs) / 255.0;
+				r = lexical_cast<int>(rs) / 255.0;
+				g = lexical_cast<int>(gs) / 255.0;
+				b = lexical_cast<int>(bs) / 255.0;
 		
 			} else if (colorName == "blue") {
 			r = 0; g = 0; b = 255;
@@ -76,6 +97,27 @@ namespace synthese
 			s << hex << r << g << b;
 			return s.str();			
 		}
+
+
+
+		RGBColor RGBColor::FromXMLColor( const std::string& value )
+		{
+			vector<int> values;
+			for(size_t p(1); p<value.size() && p<6; ++p)
+			{
+				string number("0x"+ value.substr(p,2));
+				istringstream str(number);
+				int v;
+				str >> hex >> v;
+				values.push_back(v);
+			}
+			if(values.size() != 3)
+			{
+				throw synthese::Exception("Bad XML value for color");
+			}
+			return RGBColor(values[0], values[1], values[2]);
+		}
+
 
 
 		RGBColor::Exception::Exception()

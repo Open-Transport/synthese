@@ -130,8 +130,8 @@ namespace synthese
 			stream << "<h1>Données XML à tester</h1>";
 			stream << st.open();
 			stream << st.cell("Tracer environnement partagé", st.getForm().getOuiNonRadioInput(PARAMETER_USE_ENVIRONMENT, _useEnvironment));
-			stream << st.cell("Données temporaires (XML)", st.getForm().getTextAreaInput(PARAMETER_DATA_XML, _dataXml, 5, 50));
-			stream << st.cell("Requète (XML)", st.getForm().getTextAreaInput(PARAMETER_QUERY_XML, _queryXml, 5, 50));
+			stream << st.cell("Données temporaires (XML)", st.getForm().getTextAreaInput(PARAMETER_DATA_XML, _dataXml, 5, 50, false));
+			stream << st.cell("Requète (XML)", st.getForm().getTextAreaInput(PARAMETER_QUERY_XML, _queryXml, 5, 50, false));
 			stream << st.close();
 
 			// Display
@@ -156,16 +156,17 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(moduleKey == MapModule::FACTORY_KEY && request.getUser() &&
+			if(	dynamic_cast<const MapModule*>(&module) &&
+				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser()))
 			{
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}

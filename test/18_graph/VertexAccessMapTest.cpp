@@ -23,12 +23,11 @@
 #include "VertexAccessMap.h"
 #include "FakeGraphImplementation.hpp"
 #include "Journey.h"
-#include "ServiceUse.h"
+#include "ServicePointer.h"
 
 #include <boost/test/auto_unit_test.hpp>
 
 using namespace synthese::graph;
-using namespace synthese::geometry;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace boost;
@@ -78,6 +77,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 
 		FakePath L;
 		FakeService S;
+		S.setPath(&L);
 		FakeHub h1;
 
 		FakeVertex v1(&h1);
@@ -95,13 +95,12 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		FakeEdge e3;
 		e3.setFromVertex(&v3);
 		e3.setParentPath(&L);
-		ServicePointer sp3_0(false, DEPARTURE_TO_ARRIVAL, 0, &e1);
-		sp3_0.setService(&S);
 		ptime d3_0s(date(2000,1,1), minutes(0));
-		sp3_0.setActualTime(d3_0s);
 		ptime d3_0e(date(2000,1,1), minutes(5));
-		ServiceUse s3_0(sp3_0,&e3,d3_0e);
-		j3 = Journey(j3, s3_0);
+		ServicePointer sp3_0(false, 0, S, d3_0s);
+		sp3_0.setDepartureInformations(e1, d3_0s, d3_0s, *e1.getFromVertex());
+		sp3_0.setArrivalInformations(e3, d3_0e, d3_0e, *e3.getFromVertex());
+		j3 = Journey(j3, sp3_0);
 
 		// The first map contains a point of the second one, reached in 5 minutes
 		map1.insert(&v3, VertexAccess(boost::posix_time::minutes(5), 1000, j3));
@@ -110,8 +109,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		BOOST_CHECK(map2.intersercts(map1));
 		Journey jt(map1.getBestIntersection(map2));
 		BOOST_REQUIRE(!jt.empty());
-		BOOST_CHECK_EQUAL(jt.getMethod(), DEPARTURE_TO_ARRIVAL);
-		ServiceUse su(*jt.getServiceUses().begin());
+		ServicePointer su(*jt.getServiceUses().begin());
 		BOOST_CHECK_EQUAL(su.getDepartureEdge(), &e1);
 		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getDepartureDateTime()), boost::posix_time::to_simple_string(d3_0s));
 		BOOST_CHECK_EQUAL(su.getArrivalEdge(), &e3);
@@ -124,6 +122,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 
 		FakePath L;
 		FakeService S;
+		S.setPath(&L);
 		FakeHub h1;
 
 		FakeVertex v1(&h1);
@@ -141,13 +140,12 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		FakeEdge e3;
 		e3.setFromVertex(&v3);
 		e3.setParentPath(&L);
-		ServicePointer sp3_0(false, ARRIVAL_TO_DEPARTURE, 0, &e2);
-		sp3_0.setService(&S);
-		ptime d3_0e(date(2000,1,1), minutes(5));
-		sp3_0.setActualTime(d3_0e);
 		ptime d3_0s(date(2000,1,1), minutes(0));
-		ServiceUse s3_0(sp3_0,&e3,d3_0s);
-		j3 = Journey(j3, s3_0);
+		ptime d3_0e(date(2000,1,1), minutes(5));
+		ServicePointer sp3_0(false, 0, S, d3_0s);
+		sp3_0.setArrivalInformations(e2, d3_0e, d3_0e, *e2.getFromVertex());
+		sp3_0.setDepartureInformations(e3, d3_0s, d3_0s, *e3.getFromVertex());
+		j3 = Journey(j3, sp3_0);
 
 		// The second map contains a point of the first one, reached in 5 minutes
 		map2.insert(&v3, VertexAccess(boost::posix_time::minutes(5), 1000, j3));
@@ -156,8 +154,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		BOOST_CHECK(map2.intersercts(map1));
 		Journey jt(map1.getBestIntersection(map2));
 		BOOST_REQUIRE(!jt.empty());
-		ServiceUse su(*jt.getServiceUses().begin());
-		BOOST_CHECK_EQUAL(jt.getMethod(), ARRIVAL_TO_DEPARTURE);
+		ServicePointer su(*jt.getServiceUses().begin());
 		BOOST_CHECK_EQUAL(su.getDepartureEdge(), &e3);
 		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getDepartureDateTime()), boost::posix_time::to_simple_string(d3_0s));
 		BOOST_CHECK_EQUAL(su.getArrivalEdge(), &e2);
@@ -170,6 +167,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 
 		FakePath L;
 		FakeService S;
+		S.setPath(&L);
 		FakeHub h1;
 
 		FakeVertex v1(&h1);
@@ -190,25 +188,23 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		e3.setParentPath(&L);
 
 		Journey j3_1;
-		ServicePointer sp3_1(false, DEPARTURE_TO_ARRIVAL, 0, &e1);
-		sp3_1.setService(&S);
 		ptime d3_1s(date(2000,1,1), minutes(0));
-		sp3_1.setActualTime(d3_1s);
 		ptime d3_1e(date(2000,1,1), minutes(5));
-		ServiceUse s3_1(sp3_1,&e3,d3_1e);
-		j3_1 = Journey(j3_1, s3_1);
+		ServicePointer sp3_1(false, 0, S, d3_1s);
+		sp3_1.setDepartureInformations(e1, d3_1s, d3_1s, *e1.getFromVertex());
+		sp3_1.setArrivalInformations(e3, d3_1e, d3_1e, *e3.getFromVertex());
+		j3_1 = Journey(j3_1, sp3_1);
 
 		// The second map contains a point of the first one, reached in 5 minutes
 		map1.insert(&v3, VertexAccess(boost::posix_time::minutes(5), 1000, j3_1));
 
 		Journey j3_2;
-		ServicePointer sp3_2(false, ARRIVAL_TO_DEPARTURE, 0, &e2);
-		sp3_2.setService(&S);
-		ptime d3_2e(date(2000,1,1), minutes(5));
-		sp3_2.setActualTime(d3_2e);
 		ptime d3_2s(date(2000,1,1), minutes(0));
-		ServiceUse s3_2(sp3_2,&e3,d3_2s);
-		j3_2 = Journey(j3_2, s3_2);
+		ptime d3_2e(date(2000,1,1), minutes(5));
+		ServicePointer sp3_2(false, 0, S, d3_2s);
+		sp3_2.setArrivalInformations(e2, d3_2e, d3_2e, *e2.getFromVertex());
+		sp3_2.setDepartureInformations(e3, d3_2s, d3_2s, *e3.getFromVertex());
+		j3_2 = Journey(j3_2, sp3_2);
 
 		// The second map contains a point of the first one, reached in 5 minutes
 		map2.insert(&v3, VertexAccess(boost::posix_time::minutes(5), 1000, j3_2));
@@ -219,16 +215,15 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		BOOST_CHECK(map2.intersercts(map1));
 		Journey jt(map1.getBestIntersection(map2));
 		BOOST_REQUIRE(!jt.empty());
-		BOOST_CHECK_EQUAL(jt.getMethod(), DEPARTURE_TO_ARRIVAL);
 
-		ServiceUse su(*jt.getServiceUses().begin());
+		ServicePointer su(*jt.getServiceUses().begin());
 		BOOST_CHECK_EQUAL(su.getDepartureEdge(), &e1);
 		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getDepartureDateTime()), boost::posix_time::to_simple_string(d3_1s));
 		BOOST_CHECK_EQUAL(su.getArrivalEdge(), &e3);
 		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su.getArrivalDateTime()), boost::posix_time::to_simple_string(d3_1e));
 
 		BOOST_REQUIRE(jt.getServiceUses().begin() + 1 != jt.getServiceUses().end());
-		ServiceUse su2(*(jt.getServiceUses().begin() + 1));
+		ServicePointer su2(*(jt.getServiceUses().begin() + 1));
 		BOOST_CHECK_EQUAL(su2.getDepartureEdge(), &e3);
 		BOOST_CHECK_EQUAL(boost::posix_time::to_simple_string(su2.getDepartureDateTime()), boost::posix_time::to_simple_string(d3_2s - shifting_delay));
 		BOOST_CHECK_EQUAL(su2.getArrivalEdge(), &e2);

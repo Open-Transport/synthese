@@ -34,6 +34,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class Env;
+	}
+
 	namespace db
 	{
 		class SQLiteTransaction;
@@ -70,6 +75,7 @@ namespace synthese
 			virtual bool canExport() const = 0;
 
 			virtual boost::shared_ptr<Importer> getImporter(
+				util::Env& env,
 				const DataSource& dataSource
 			) const = 0;
 			

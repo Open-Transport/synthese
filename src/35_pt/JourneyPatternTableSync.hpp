@@ -76,11 +76,10 @@ namespace synthese
 			static SearchResult Search(
 				util::Env& env,
 				boost::optional<util::RegistryKeyType> commercialLineId = boost::optional<util::RegistryKeyType>(),
-				boost::optional<util::RegistryKeyType> dataSourceId = boost::optional<util::RegistryKeyType>()
-				, int first = 0
-				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
-				, bool orderByName = true
-				, bool raisingOrder = true,
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				bool orderByName = true,
+				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};

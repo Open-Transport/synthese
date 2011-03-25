@@ -140,7 +140,7 @@ namespace synthese
 
 			DisplayTypeTableSync::SearchResult types(
 				DisplayTypeTableSync::Search(
-					_getEnv(),
+					Env::GetOfficialEnv(),
 					_searchName ? optional<string>("%"+ *_searchName +"%") : _searchName,
 					_searchInterfaceId,
 					_requestParameters.first,
@@ -263,17 +263,18 @@ namespace synthese
 		
 		
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if (moduleKey == DeparturesTableModule::FACTORY_KEY && request.getUser() &&
+			if(	dynamic_cast<const DeparturesTableModule*>(&module) &&
+				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser()))
 			{
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}
@@ -296,7 +297,7 @@ namespace synthese
 		
 			DisplayTypeTableSync::SearchResult types(
 				DisplayTypeTableSync::Search(
-					*_env,
+					Env::GetOfficialEnv(),
 					optional<string>(),
 					optional<RegistryKeyType>(),
 					0,
@@ -310,7 +311,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 			BOOST_FOREACH(shared_ptr<DisplayType> displayType, types)
 			{
-				shared_ptr<DisplayTypeAdmin> p(getNewOtherPage<DisplayTypeAdmin>());
+				shared_ptr<DisplayTypeAdmin> p(getNewPage<DisplayTypeAdmin>());
 				p->setType(displayType);
 				links.push_back(p);
 			}

@@ -70,7 +70,8 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 			next_day,
 			false,
 			false,
-			boost::optional<boost::posix_time::time_duration>()
+			boost::optional<boost::posix_time::time_duration>(),
+			100
 		);
 
 		i.integralSearch(
@@ -107,7 +108,8 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 			next_day,
 			false,
 			false,
-			boost::optional<boost::posix_time::time_duration>()
+			boost::optional<boost::posix_time::time_duration>(),
+			100
 		);
 
 		i.integralSearch(

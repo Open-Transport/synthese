@@ -37,7 +37,7 @@
 #include "StopArea.hpp"
 #include "ServicePointer.h"
 #include "JourneyPattern.hpp"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "City.h"
 #include "CommercialLine.h"
 #include "AlarmTestOnDisplayScreenFunction.h"
@@ -131,9 +131,9 @@ namespace synthese
 				JourneyPattern line;
 				line.setCommercialLine(&cline);
 				PermanentService s(0, &line, minutes(5));
-				LineStop lineStop;
+				DesignatedLinePhysicalStop lineStop;
 				lineStop.setLine(&line);
-				lineStop.setPhysicalStop(&ps);
+				lineStop.setPhysicalStop(ps);
 				ptime d(second_clock::local_time());
 
 				for (int i(0); i<_type->getRowNumber(); ++i)

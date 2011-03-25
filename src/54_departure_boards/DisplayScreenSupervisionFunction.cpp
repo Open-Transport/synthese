@@ -30,8 +30,7 @@
 #include "DisplayMonitoringStatus.h"
 #include "DisplayMonitoringStatusTableSync.h"
 #include "Interface.h"
-#include "StaticFunctionRequest.h"
-#include "WebPageDisplayFunction.h"
+#include "Webpage.h"
 
 #include <assert.h>
 #include <sstream>
@@ -171,18 +170,10 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			const std::string& textToParse
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TEXT, textToParse);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 }	}

@@ -112,13 +112,12 @@ namespace synthese
 			) const;
 			
 			/** Gets sub page of the designed parent page, which are from the current class.
-				@param factoryKey Key of the parent class
 				@return PageLinks A link to the page if the parent is Users
 				@author Hugues Romain
 				@date 2008
 			*/
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
-				const std::string& moduleKey,
+				const server::ModuleClass& module,
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;

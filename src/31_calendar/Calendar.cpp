@@ -33,11 +33,10 @@ using namespace boost::gregorian;
 
 namespace synthese
 {
-    namespace calendar
-    {
+	namespace calendar
+	{
 		Calendar::Calendar()
-		{
-		}
+		{}
 
 
 
@@ -72,38 +71,54 @@ namespace synthese
 
 		date Calendar::getFirstActiveDate(
 		) const {
-			if(_markedDates.empty())
-				return gregorian::date();
-
-			_BitSets::const_iterator it(_markedDates.begin());
-
-			for(size_t p(0); p != 366; ++p)
+			if(!_firstActiveDate)
 			{
-				if(it->second.test(p))
+				if(_markedDates.empty())
 				{
-					return date(it->first, Jan, 1) + days(p);
+					_firstActiveDate = gregorian::date();
+				}
+				else
+				{
+					_BitSets::const_iterator it(_markedDates.begin());
+
+					for(size_t p(0); p != 366; ++p)
+					{
+						if(it->second.test(p))
+						{
+							_firstActiveDate = date(it->first, Jan, 1) + days(p);
+							break;
+						}
+					}
 				}
 			}
-			return gregorian::date();
+			return *_firstActiveDate;
 		}
 
 
 
 		date Calendar::getLastActiveDate(
 		) const {
-			if(_markedDates.empty())
-				return gregorian::date();
-
-			_BitSets::const_reverse_iterator it(_markedDates.rbegin());
-
-			for(size_t p(366); p != 0; --p)
+			if(!_lastActiveDate)
 			{
-				if(it->second.test(p-1))
+				if(_markedDates.empty())
 				{
-					return date(it->first, Jan, 1) + days(p-1);
+					_lastActiveDate = gregorian::date();
+				}
+				else
+				{
+					_BitSets::const_reverse_iterator it(_markedDates.rbegin());
+
+					for(size_t p(366); p != 0; --p)
+					{
+						if(it->second.test(p-1))
+						{
+							_lastActiveDate = date(it->first, Jan, 1) + days(p-1);
+							break;
+						}
+					}
 				}
 			}
-			return gregorian::date();
+			return *_lastActiveDate;
 		}
 
 
@@ -149,6 +164,9 @@ namespace synthese
 			}
 
 			it->second.set(_BitPos(d));
+
+			_firstActiveDate.reset();
+			_lastActiveDate.reset();
 		}
 		
 		
@@ -156,6 +174,8 @@ namespace synthese
 		void Calendar::clear()
 		{
 			_markedDates.clear();
+			_firstActiveDate.reset();
+			_lastActiveDate.reset();
 		}
 		
 		
@@ -172,6 +192,9 @@ namespace synthese
 
 			if(!it->second.any())
 				_markedDates.erase(it);
+
+			_firstActiveDate.reset();
+			_lastActiveDate.reset();
 		}
 	
 	
@@ -179,6 +202,8 @@ namespace synthese
 		Calendar& Calendar::operator&= (const Calendar& op)
 		{
 			*this = *this & op;
+			_firstActiveDate.reset();
+			_lastActiveDate.reset();
 			return *this;
 		}
 	
@@ -188,6 +213,8 @@ namespace synthese
 			const Calendar& op
 		){
 			*this = *this | op;
+			_firstActiveDate.reset();
+			_lastActiveDate.reset();
 			return *this;
 		}
 	
@@ -286,6 +313,8 @@ namespace synthese
 					}
 				}
 			}
+			_firstActiveDate.reset();
+			_lastActiveDate.reset();
 		}
 
 
@@ -331,6 +360,8 @@ namespace synthese
 		void Calendar::copyDates( const Calendar& op )
 		{
 			_markedDates = op._markedDates;
+			_firstActiveDate = op._firstActiveDate;
+			_lastActiveDate = op._lastActiveDate;
 		}
 
 
@@ -362,6 +393,8 @@ namespace synthese
 						bits
 				)	);
 			}
+			_firstActiveDate.reset();
+			_lastActiveDate.reset();
 		}
 
 
@@ -372,6 +405,8 @@ namespace synthese
 			{
 				yearDates.second <<= i;
 			}
+			_firstActiveDate.reset();
+			_lastActiveDate.reset();
 			return *this;
 		}
 
@@ -381,6 +416,8 @@ namespace synthese
 		{
 			Calendar obj(*this);
 			obj <<= i;
+			_firstActiveDate.reset();
+			_lastActiveDate.reset();
 			return obj;
 		}
 
@@ -390,5 +427,4 @@ namespace synthese
 		{
 			return (*this & other) == other;
 		}
-	}
-}
+}	}

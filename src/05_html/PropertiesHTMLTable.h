@@ -41,6 +41,8 @@ namespace synthese
 			HTMLForm	_form;
 
 		public:
+			static const std::string CSS_CLASS;
+
 			PropertiesHTMLTable(HTMLForm form);
 
 			std::string open();

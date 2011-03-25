@@ -21,13 +21,8 @@
 */
 
 #include "LineStop.h"
-#include "Registry.h"
-
 #include "JourneyPattern.hpp"
-#include "Service.h"
-#include "ContinuousService.h"
-#include "StopPoint.hpp"
-#include "StopArea.hpp"
+#include "Vertex.h"
 
 using namespace std;
 
@@ -37,11 +32,6 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 
-	namespace util
-	{
-		template<> const string Registry<pt::LineStop>::KEY("LineStop");
-	}
-
 	namespace pt
 	{
 		LineStop::LineStop(
@@ -49,18 +39,14 @@ namespace synthese
 			JourneyPattern* line,
 			size_t rankInPath,
 			bool isDeparture,
-			bool isArrival,		
+			bool isArrival,
 			double metricOffset,
-			StopPoint* physicalStop
+			Vertex* vertex
 		):	Registrable(id),
 			_isDeparture(isDeparture),
 			_isArrival(isArrival),
-			Edge(line, rankInPath, physicalStop, metricOffset),
-			_scheduleInput(true)
-		{
-			if (physicalStop)
-				setPhysicalStop(physicalStop);
-		}
+			Edge(line, rankInPath, vertex, metricOffset)
+		{}
 
 
 
@@ -92,7 +78,6 @@ namespace synthese
 			}
 
 			return true;
-		    
 		}
 
 
@@ -102,31 +87,12 @@ namespace synthese
 			return static_cast<JourneyPattern*>(getParentPath());
 		}
 
-		StopPoint* LineStop::getPhysicalStop() const
-		{
-			return static_cast<StopPoint*>(getFromVertex());
-		}
 
 		void LineStop::setLine(JourneyPattern* line )
 		{
 			setParentPath(static_cast<Path*>(line));
 		}
 
-		void LineStop::setPhysicalStop(StopPoint* stop )
-		{
-			// Saving of the attribute
-			setFromVertex(static_cast<Vertex*>(stop));
-
-			// Links from stop to the linestop
-			if(stop)
-			{
-				if(getIsArrival())
-					stop->addArrivalEdge((Edge*) this);
-				if(getIsDeparture())
-					stop->addDepartureEdge((Edge*) this);
-			}
-		}
-		
 		
 		
 		bool LineStop::isDepartureAllowed() const

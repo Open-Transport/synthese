@@ -101,7 +101,7 @@ namespace synthese
 			const Request& request
 		) const {
 
-			shared_ptr<const Website> site(CMSModule::GetSite(request));
+			shared_ptr<const Website> site(CMSModule::GetSite(request, _savedParameters));
 			shared_ptr<const Webpage> curPage(CMSModule::GetWebPage(request));
 
 			WebPageTableSync::SearchResult pages(

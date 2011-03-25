@@ -34,6 +34,7 @@
 #include "ImpExModule.h"
 #include "Importer.hpp"
 #include "StopPointMoveAction.hpp"
+#include "StopPointAddAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "HTMLModule.h"
 #include "HTMLForm.h"
@@ -238,12 +239,13 @@ namespace synthese
 							stream << fixed << bahnhof.second.coords->getY();
 
 							stream << t.col();
-							AdminActionFunctionRequest<StopAreaAddAction, DataSourceAdmin> addRequest(*request);
-							addRequest.getAction()->setCreateCityIfNecessary(true);
-							addRequest.getAction()->setCreatePhysicalStop(true);
+							AdminActionFunctionRequest<StopPointAddAction, DataSourceAdmin> addRequest(*request);
 							addRequest.getAction()->setName(bahnhof.second.name);
 							addRequest.getAction()->setCityName(bahnhof.second.cityName);
-							addRequest.getAction()->setOperatorCode(bahnhof.first);
+							addRequest.getAction()->setCreateCityIfNecessary(true);
+							Importable::DataSourceLinks links;
+							links.insert(make_pair(&_dataSource, bahnhof.first));
+							addRequest.getAction()->setDataSourceLinks(links);
 							addRequest.getAction()->setPoint(DBModule::GetStorageCoordinatesSystem().convertPoint(*bahnhof.second.coords));
 							stream << HTMLModule::getLinkButton(addRequest.getURL(), "Ajouter");
 						}

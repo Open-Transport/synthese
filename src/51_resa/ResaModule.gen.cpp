@@ -10,11 +10,13 @@ synthese::resa::CallEndAction::integrate();
 synthese::resa::ResaLogEntryUpdateAction::integrate();
 synthese::resa::ReservationUserUpdateAction::integrate();
 synthese::resa::SendPasswordAction::integrate();
+synthese::resa::ReservationUpdateAction::integrate();
 
 synthese::resa::XMLReservationFunction::integrate();
 synthese::resa::ResaCustomerHtmlOptionListFunction::integrate();
 synthese::resa::ReservationEditFunction::integrate();
 synthese::resa::CSVResaStatisticsFunction::integrate();
+synthese::resa::ReservationsListService::integrate();
 
 synthese::resa::ReservationItemInterfacePage::integrate();
 synthese::resa::ReservationConfirmationEMailInterfacePage::integrate();

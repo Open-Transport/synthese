@@ -27,6 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "Importable.h"
 
 namespace synthese
 {
@@ -37,21 +38,12 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : Route properties update.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_pattern_update
+		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m35Actions refActions
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.1.16
-		//////////////////////////////////////////////////////////////////////////
-		/// Key : JourneyPatternUpdateAction
-		///
-		/// Parameters :
-		///	<ul>
-		///		<li>actionParamid : id of the object to update</li>
-		///		<li>actionParamtm : id of the transport mode</li>
-		///		<li>actionParamna : name</li>
-		///		<li>actionParamdi : direction to display instead of last stop name</li>
-		///		<li>actionParamwb : 1 if the route can be considered as "return route" of the line</li>
-		///	</ul>
 		class JourneyPatternUpdateAction:
 			public util::FactorableTemplate<server::Action, JourneyPatternUpdateAction>
 		{
@@ -61,17 +53,22 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_DIRECTION;
 			static const std::string PARAMETER_WAYBACK;
+			static const std::string PARAMETER_DATASOURCE_LINKS;
 
 		private:
 			boost::shared_ptr<JourneyPattern> _route;
-			boost::shared_ptr<RollingStock> _transportMode;
-			std::string _name;
-			std::string _direction;
-			bool _wayback;
+			
+			boost::optional<boost::shared_ptr<RollingStock> > _transportMode;
+			boost::optional<std::string> _name;
+			boost::optional<std::string> _direction;
+			boost::optional<bool> _wayback;
+			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a generic parameters map from the action parameters.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_pattern_update
+			//////////////////////////////////////////////////////////////////////////
 			/// @return The generated parameters map
 			server::ParametersMap getParametersMap() const;
 
@@ -79,6 +76,8 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads the parameters of the action on a generic parameters map.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_pattern_update
+			//////////////////////////////////////////////////////////////////////////
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const server::ParametersMap& map);
@@ -86,6 +85,8 @@ namespace synthese
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_pattern_update
+			//////////////////////////////////////////////////////////////////////////
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
 			

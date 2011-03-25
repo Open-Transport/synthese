@@ -45,16 +45,12 @@ namespace synthese
 			TRIDENT = PtLink
 			@ingroup m35
 		*/
-		class LineStop
-		:	public graph::Edge
+		class LineStop:
+			public graph::Edge
 		{
 		public:
 
-			/// Chosen registry class.
-			typedef util::Registry<LineStop>	Registry;
-
 		private:
-			bool	_scheduleInput;
 			bool	_isDeparture;		//!< The departure from the vertex is allowed
 			bool	_isArrival;			//!< The arrival at the vertex is allowed
 
@@ -68,7 +64,7 @@ namespace synthese
 				bool isDeparture = true,
 				bool isArrival = true,
 				double metricOffset = 0,
-				pt::StopPoint* physicalStop = NULL
+				graph::Vertex* vertex = NULL
 			);
 			
 			~LineStop();
@@ -76,14 +72,12 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				bool getScheduleInput()	const { return _scheduleInput; }
 				bool getIsDeparture()	const { return _isDeparture; }
 				bool getIsArrival()		const { return _isArrival; }
 			//@}
 				
 			//!	@name Setters
 			//@{
-				void				setScheduleInput(bool value) { _scheduleInput = value; }
 				void				setIsDeparture(bool value) { _isDeparture = value; }
 				void				setIsArrival(bool value) { _isArrival = value; }
 			//@}
@@ -101,7 +95,7 @@ namespace synthese
 				virtual bool isDepartureAllowed() const;
 				virtual bool isArrivalAllowed() const;
 
-				StopPoint*	getPhysicalStop()	const;
+				virtual bool getScheduleInput() const = 0;
 
 				JourneyPattern*				getLine()			const;
 			//@}
@@ -109,19 +103,9 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
-				//////////////////////////////////////////////////////////////////////////
- 				/// Physical stop modifier.
-				///	@param stop the physical stop supporting the linestop
-				///	The physical stop setter builds the links from the physical stop to the linestop.
-				///	Use this method instead of setFromVertex.
-				///
-				///	@warning the isArrival and the isDeparture attributes must be up to date to avoid false links in the physical stop.
-				void setPhysicalStop(StopPoint* stop);
-
 				void setLine(JourneyPattern* line);
-		    //@}
+			//@}
 		};
-	}
-}
+}	}
 
 #endif

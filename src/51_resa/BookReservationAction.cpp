@@ -21,7 +21,7 @@
 */
 
 #include "BookReservationAction.h"
-
+#include "Language.hpp"
 #include "TransportWebsite.h"
 #include "StopArea.hpp"
 #include "RoutePlannerFunction.h"
@@ -41,8 +41,7 @@
 #include "Place.h"
 #include "City.h"
 #include "Journey.h"
-#include "Service.h"
-#include "Edge.h"
+#include "LineStop.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "Road.h"
@@ -55,6 +54,7 @@
 #include "GeographyModule.h"
 #include "OnlineReservationRule.h"
 #include "Env.h"
+#include "ScheduledService.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -97,35 +97,50 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_ORIGIN_PLACE = Action_PARAMETER_PREFIX + "dpt";
 		const string BookReservationAction::PARAMETER_DESTINATION_CITY = Action_PARAMETER_PREFIX + "act";
 		const string BookReservationAction::PARAMETER_DESTINATION_PLACE = Action_PARAMETER_PREFIX + "apt";
-        const string BookReservationAction::PARAMETER_DATE_TIME = Action_PARAMETER_PREFIX + "da";
+		const string BookReservationAction::PARAMETER_DATE_TIME = Action_PARAMETER_PREFIX + "da";
 
 
 		const string BookReservationAction::PARAMETER_CREATE_CUSTOMER = Action_PARAMETER_PREFIX + "cc";
 		const string BookReservationAction::PARAMETER_CUSTOMER_ID = Action_PARAMETER_PREFIX + "cuid";
+		const string BookReservationAction::PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME(Action_PARAMETER_PREFIX + "csn");
 		const string BookReservationAction::PARAMETER_CUSTOMER_NAME = Action_PARAMETER_PREFIX + "cuna";
 		const string BookReservationAction::PARAMETER_CUSTOMER_SURNAME = Action_PARAMETER_PREFIX + "cs";
 		const string BookReservationAction::PARAMETER_CUSTOMER_PHONE = Action_PARAMETER_PREFIX + "cuph";
 		const string BookReservationAction::PARAMETER_CUSTOMER_EMAIL = Action_PARAMETER_PREFIX + "cupe";
+		const string BookReservationAction::PARAMETER_CUSTOMER_LANGUAGE(Action_PARAMETER_PREFIX + "cl");
 
 		const string BookReservationAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "pass";
 
 		const string BookReservationAction::PARAMETER_SEATS_NUMBER = Action_PARAMETER_PREFIX + "senu";
 
+		const string BookReservationAction::PARAMETER_SERVICE_ID(Action_PARAMETER_PREFIX + "se");
+		const string BookReservationAction::PARAMETER_DEPARTURE_RANK(Action_PARAMETER_PREFIX + "dr");
+		const string BookReservationAction::PARAMETER_ARRIVAL_RANK(Action_PARAMETER_PREFIX + "ar");
 
-		BookReservationAction::BookReservationAction():
-			util::FactorableTemplate<server::Action, BookReservationAction>(),
+
+
+		BookReservationAction::BookReservationAction(
+		):	util::FactorableTemplate<server::Action, BookReservationAction>(),
 			_createCustomer(false),
 			_seatsNumber(1)
-		{
+		{}
 
-		}
 
 
 
 		ParametersMap BookReservationAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if (!_journey.empty())
+			map.insert(PARAMETER_CREATE_CUSTOMER, _createCustomer);
+			if(_service.get() && _journey.size() == 1)
+			{
+				map.insert(PARAMETER_SERVICE_ID, _service->getKey());
+				const ServicePointer& su(*_journey.getServiceUses().begin());
+				map.insert(PARAMETER_DEPARTURE_RANK, su.getDepartureEdge()->getRankInPath());
+				map.insert(PARAMETER_ARRIVAL_RANK, su.getArrivalEdge()->getRankInPath());
+				map.insert(PARAMETER_DATE_TIME, su.getOriginDateTime().date());
+			}
+			else if (!_journey.empty())
 			{
 				if (_journey.getOrigin())
 				{
@@ -166,18 +181,23 @@ namespace synthese
 						map.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, static_cast<int>(_rollingStockFilter->getRank()));
 					}
 				}
-				map.insert(PARAMETER_ACCESS_PARAMETERS, _accessParameters.serialize());
+				else
+				{
+					map.insert(PARAMETER_ACCESS_PARAMETERS, _accessParameters.serialize());
+				}
 			}
+			map.insert(PARAMETER_SEATS_NUMBER, _seatsNumber);
 			return map;
 		}
 
-	    void BookReservationAction::setOriginDestinationPlace(
-	    		string origcity,
-	    		string origplace,
-	    		string destcity,
-	    		string destplace
-	    	)
-	    {
+
+
+		void BookReservationAction::setOriginDestinationPlace(
+			string origcity,
+			string origplace,
+			string destcity,
+			string destplace
+		){
 			if(ResaModule::GetJourneyPlannerWebsite())
 			{
 				_originPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(origcity,origplace);
@@ -187,65 +207,100 @@ namespace synthese
 			{
 				_originPlace = RoadModule::FetchPlace(
 					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
-						origcity,
-						origplace
-				);
+					origcity,
+					origplace
+					);
 				_destinationPlace = RoadModule::FetchPlace(
 					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
-						destcity,
-						destplace
-				);
+					destcity,
+					destplace
+					);
 			}
-	    }
+		}
+
+
 
 		void BookReservationAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_createCustomer = map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false);
 
-			if (_createCustomer)
+			if(map.getDefault<bool>(PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME, false))
 			{
-				_customer.reset(new User);
-				_customer->setName(map.get<string>(PARAMETER_CUSTOMER_NAME));
-				if (_customer->getName().empty())
-					throw ActionException("Le nom du client doit être rempli");
-
-				_customer->setSurname(map.get<string>(PARAMETER_CUSTOMER_SURNAME));
-				if (_customer->getSurname().empty())
-					throw ActionException("Le prénom du client doit être rempli");
-
-				_customer->setPhone(map.get<string>(PARAMETER_CUSTOMER_PHONE));
-				if (_customer->getPhone().empty())
-					throw ActionException("Le numéro de téléphone doit être rempli");
-
-				// Integrity test : the key is name + surname + phone
-				Env env;
-				UserTableSync::Search(
-					env,
-					optional<string>(),
-					_customer->getName(),
-					_customer->getSurname(),
-					_customer->getPhone(),
-					optional<RegistryKeyType>(),
-					logic::indeterminate,
-					logic::indeterminate,
-					optional<RegistryKeyType>(),
-					0, 1
-				);
-				if (!env.getRegistry<User>().empty())
+				UserTableSync::SearchResult customers(UserTableSync::Search(*_env, optional<string>(), map.get<string>(PARAMETER_CUSTOMER_NAME)));
+				if(!customers.empty())
 				{
-					throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
+					_customer = *customers.begin();
 				}
-				
-				_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
-				_customer->setProfile(ResaModule::GetBasicResaCustomerProfile().get());
 			}
-			else
+
+			if(!_customer.get())
 			{
-				// Customer ID
-				optional<RegistryKeyType> id(map.get<RegistryKeyType>(PARAMETER_CUSTOMER_ID));
-				if (id)
-					_customer = UserTableSync::GetEditable(*id, *_env);
+				if (_createCustomer)
+				{
+					_customer.reset(new User);
+					_customer->setName(map.get<string>(PARAMETER_CUSTOMER_NAME));
+					if (_customer->getName().empty())
+					{
+						throw ActionException("Le nom du client doit être rempli");
+					}
+
+					_customer->setSurname(map.get<string>(PARAMETER_CUSTOMER_SURNAME));
+					if (_customer->getSurname().empty())
+					{
+						throw ActionException("Le prénom du client doit être rempli");
+					}
+
+					_customer->setPhone(map.get<string>(PARAMETER_CUSTOMER_PHONE));
+					if (_customer->getPhone().empty())
+					{
+						throw ActionException("Le numéro de téléphone doit être rempli");
+					}
+
+					// Integrity test : the key is name + surname + phone
+					Env env;
+					UserTableSync::Search(
+						env,
+						optional<string>(),
+						_customer->getName(),
+						_customer->getSurname(),
+						_customer->getPhone(),
+						optional<RegistryKeyType>(),
+						logic::indeterminate,
+						logic::indeterminate,
+						optional<RegistryKeyType>(),
+						0, 1
+					);
+					if (!env.getRegistry<User>().empty())
+					{
+						throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
+					}
+					
+					_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
+					_customer->setProfile(ResaModule::GetBasicResaCustomerProfile().get());
+
+					if(map.getOptional<string>(PARAMETER_CUSTOMER_LANGUAGE))
+					{
+						try
+						{
+							_customer->setLanguage(&Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_CUSTOMER_LANGUAGE)));
+						}
+						catch(Language::LanguageNotFoundException& e)
+						{
+							throw ActionException("Langue incorrecte");
+						}
+					}
+				}
+				else
+				{
+					// Customer ID
+					optional<RegistryKeyType> id(map.get<RegistryKeyType>(PARAMETER_CUSTOMER_ID));
+					if (id)
+					{
+						_customer = UserTableSync::GetEditable(*id, *_env);
+					}
+				}
 			}
+
 			if(!_customer.get())
 			{
 				throw ActionException("Undefined customer.");
@@ -253,111 +308,150 @@ namespace synthese
 
 			// Deduce naming fields from the customer if already recognized
 			if (_customer->getName().empty())
+			{
 				throw ActionException("Client sans nom. Réservation impossible");
+			}
 
 			if (_customer->getPhone().empty())
-				throw ActionException("Client sans numéro de téléphone. Veuillez renseigner ce champ dans la fiche client et recommencer la réservation.");
-
-			// Website
-			RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_SITE, 0));
-			if (id > 0 && Env::GetOfficialEnv().getRegistry<TransportWebsite>().contains(id))
 			{
-				_site = Env::GetOfficialEnv().getRegistry<TransportWebsite>().get(id);
+				throw ActionException("Client sans numéro de téléphone. Veuillez renseigner ce champ dans la fiche client et recommencer la réservation.");
 			}
 
 			// Seats number
-			_seatsNumber = map.get<int>(PARAMETER_SEATS_NUMBER);
+			_seatsNumber = map.getDefault<size_t>(PARAMETER_SEATS_NUMBER, 1);
 			if (_seatsNumber < 1 || _seatsNumber > 99)
+			{
 				throw ActionException("Invalid seats number");
-
-			// Journey
-			setOriginDestinationPlace(
-				map.get<string>(PARAMETER_ORIGIN_CITY),
-				map.get<string>(PARAMETER_ORIGIN_PLACE),
-				map.get<string>(PARAMETER_DESTINATION_CITY),
-				map.get<string>(PARAMETER_DESTINATION_PLACE)
-			);
-			if(!_destinationPlace.get())
-			{
-				throw ActionException("Invalid destination place");
-			}
-			if(!_originPlace.get())
-			{
-				throw ActionException("Invalid origin place");
 			}
 
-			
-			// Departure date time
-			ptime departureDateTime(time_from_string(map.get<string>(PARAMETER_DATE_TIME)));
-			ptime arrivalDateTime(departureDateTime);
-			arrivalDateTime += days(1);
-			if(	_originPlace->getPoint().get() &&
-				!_originPlace->getPoint()->isEmpty() &&
-				_destinationPlace->getPoint().get() &&
-				!_destinationPlace->getPoint()->isEmpty()
-			){
-				arrivalDateTime += minutes(2 * static_cast<int>(_originPlace->getPoint()->distance(_destinationPlace->getPoint().get()) / 1000));
-			}
-
-			// Accessibility
-			if(_site.get())
+			// Reservation on a service
+			if(map.getOptional<RegistryKeyType>(PARAMETER_SERVICE_ID))
 			{
 				try
 				{
-					// Rolling stock filter
-					if(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID))
-					{
-						_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
-					}
+					_service = Env::GetOfficialEnv().get<ScheduledService>(map.get<RegistryKeyType>(PARAMETER_SERVICE_ID));
 				}
-				catch(ObjectNotFoundException<RollingStockFilter>& e)
+				catch(ObjectNotFoundException<ScheduledService>&)
 				{
+					throw RequestException("No such service");
 				}
 
-				if(_rollingStockFilter.get() && _rollingStockFilter->getSite() != _site.get())
+				gregorian::date date(gregorian::from_string(map.get<string>(PARAMETER_DATE_TIME)));
+
+				size_t departureRank(map.get<size_t>(PARAMETER_DEPARTURE_RANK));
+				size_t arrivalRank(map.get<size_t>(PARAMETER_ARRIVAL_RANK));
+				if(departureRank >= _service->getPath()->getEdges().size())
 				{
-					throw ActionException("Bad rolling stock filter");
+					throw RequestException("Invalid departure rank");
+				}
+				if(	arrivalRank >= _service->getPath()->getEdges().size() ||
+					arrivalRank <= departureRank
+				){
+					throw RequestException("Invalid arrival rank");
 				}
 
-				_accessParameters = _site->getAccessParameters(
-					map.getDefault<UserClassCode>(PARAMETER_USER_CLASS_ID, USER_PEDESTRIAN),
-					_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
+				ServicePointer sp(
+					false,
+					map.getDefault<UserClassCode>(PARAMETER_USER_CLASS_ID, USER_PEDESTRIAN) - USER_CLASS_CODE_OFFSET,
+					*_service,
+					date,
+					*_service->getPath()->getEdge(departureRank),
+					*_service->getPath()->getEdge(arrivalRank)
 				);
 
-				if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
-				{
-					AccessParameters accessParameters;
-					accessParameters = map.get<string>(PARAMETER_ACCESS_PARAMETERS);
-					_accessParameters.setMaxtransportConnectionsCount(accessParameters.getMaxtransportConnectionsCount());
-					_accessParameters.setApproachSpeed(accessParameters.getApproachSpeed());
-				}
+				_journey = Journey(sp);
 			}
-			else if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
+			else
 			{
-				_accessParameters = map.get<string>(PARAMETER_ACCESS_PARAMETERS);
+				// Website
+				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_SITE, 0));
+				if (id > 0 && Env::GetOfficialEnv().getRegistry<TransportWebsite>().contains(id))
+				{
+					_site = Env::GetOfficialEnv().getRegistry<TransportWebsite>().get(id);
+				}
+
+				// Journey
+				setOriginDestinationPlace(
+					map.get<string>(PARAMETER_ORIGIN_CITY),
+					map.get<string>(PARAMETER_ORIGIN_PLACE),
+					map.get<string>(PARAMETER_DESTINATION_CITY),
+					map.get<string>(PARAMETER_DESTINATION_PLACE)
+				);
+				if(!_destinationPlace.get())
+				{
+					throw ActionException("Invalid destination place");
+				}
+				if(!_originPlace.get())
+				{
+					throw ActionException("Invalid origin place");
+				}
+
+
+				// Departure date time
+				ptime departureDateTime(time_from_string(map.get<string>(PARAMETER_DATE_TIME)));
+				ptime arrivalDateTime(departureDateTime);
+				arrivalDateTime += days(1);
+				if(	_originPlace->getPoint().get() &&
+					!_originPlace->getPoint()->isEmpty() &&
+					_destinationPlace->getPoint().get() &&
+					!_destinationPlace->getPoint()->isEmpty()
+				){
+					arrivalDateTime += minutes(2 * static_cast<int>(_originPlace->getPoint()->distance(_destinationPlace->getPoint().get()) / 1000));
+				}
+
+				// Accessibility
+				if(_site.get())
+				{
+					try
+					{
+						// Rolling stock filter
+						if(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID))
+						{
+							_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
+						}
+					}
+					catch(ObjectNotFoundException<RollingStockFilter>& e)
+					{
+					}
+
+					if(_rollingStockFilter.get() && _rollingStockFilter->getSite() != _site.get())
+					{
+						throw ActionException("Bad rolling stock filter");
+					}
+
+					_accessParameters = _site->getAccessParameters(
+						map.getDefault<UserClassCode>(PARAMETER_USER_CLASS_ID, USER_PEDESTRIAN),
+						_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
+					);
+				}
+				else if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
+				{
+					_accessParameters = map.get<string>(PARAMETER_ACCESS_PARAMETERS);
+				}
+
+				PTTimeSlotRoutePlanner rp(
+					_originPlace.get(),
+					_destinationPlace.get(),
+					departureDateTime,
+					departureDateTime,
+					arrivalDateTime,
+					arrivalDateTime,
+					1,
+					_accessParameters,
+					DEPARTURE_FIRST
+					);
+				PTRoutePlannerResult jr(rp.run());
+
+				if (jr.getJourneys().empty())
+				{
+					throw ActionException("The route planning does not find a journey to book");
+				}
+
+				_journey = jr.getJourneys().front();
 			}
-
-			PTTimeSlotRoutePlanner rp(
-				_originPlace.get(),
-				_destinationPlace.get(),
-				departureDateTime,
-				departureDateTime,
-				arrivalDateTime,
-				arrivalDateTime,
-				1,
-				_accessParameters,
-				DEPARTURE_FIRST
-			);
-
-
-			PTRoutePlannerResult jr(rp.run());
-
-			if (jr.getJourneys().empty())
-				throw ActionException("The route planning does not find a journey to book");
-
-			_journey = jr.getJourneys().front();
-
 		}
+
+
 
 		void BookReservationAction::run(Request& request)
 		{
@@ -462,6 +556,7 @@ namespace synthese
 				}
 				r->setServiceId(su.getService()->getKey());
 				r->setServiceCode(lexical_cast<string>(su.getService()->getServiceNumber()));
+				
 				ReservationTableSync::Save(r.get());
 			}
 
@@ -476,9 +571,11 @@ namespace synthese
 				ResaDBLog::AddEMailEntry(*request.getSession(), *_customer, "Récapitulatif de réservation");
  			}
  
-
 			// Redirect
-			request.setActionCreatedId(rt.getKey());
+			if(request.getActionWillCreateObject())
+			{
+				request.setActionCreatedId(rt.getKey());
+			}
 		}
 
 
@@ -530,5 +627,4 @@ namespace synthese
 			}
 			return NULL;
 		}
-	}
-}
+}	}

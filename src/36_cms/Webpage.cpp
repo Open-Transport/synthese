@@ -43,6 +43,8 @@ namespace synthese
 
 	namespace cms
 	{
+		const string Webpage::Node::PARAMETER_TRANSMIT_PARAMETERS("tp");
+
 		Webpage::Webpage( util::RegistryKeyType id  ):
 			Registrable(id),
 			_startDate(posix_time::not_a_date_time),
@@ -50,7 +52,8 @@ namespace synthese
 			_template(NULL),
 			_doNotUseTemplate(false),
 			_hasForum(false),
-			_ignoreWhiteChars(false)
+			_ignoreWhiteChars(false),
+			_rawEditor(false)
 		{
 		}
 
@@ -439,7 +442,8 @@ namespace synthese
 		) const	{
 
 			// Parameters
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap callParametersMap;
 			BOOST_FOREACH(const Parameters::value_type& param, parameters)
 			{
 				stringstream s;
@@ -448,25 +452,19 @@ namespace synthese
 					node->display(s, request, aditionalParametersMap);
 				}
 				pm.insert(param.first, s.str());
+				callParametersMap.insert(param.first, s.str());
 			}
-//			pm.merge(aditionalParametersMap);
+			if(callParametersMap.isDefined(PARAMETER_TRANSMIT_PARAMETERS))
+			{
+				callParametersMap.merge(pm);
+			}
 
 			// Function
 			shared_ptr<Function> function(functionCreator->create());
-			ParametersMap requestParametersMap(
-				dynamic_cast<const DynamicRequest*>(&request) ?
-				dynamic_cast<const DynamicRequest&>(request).getParametersMap() :
-				ParametersMap()
-			);
-			requestParametersMap.remove(Request::PARAMETER_FUNCTION);
-			pm.merge(requestParametersMap);
-			if(CMSModule::GetSite(request).get())
-			{
-				pm.insert(FunctionWithSiteBase::PARAMETER_SITE, CMSModule::GetSite(request)->getKey());
-			}
 			try
 			{
-				function->_setFromParametersMap(pm);
+				function->setSavedParameters(callParametersMap);
+				function->_setFromParametersMap(callParametersMap);
 				if (function->isAuthorized(request.getSession()))
 				{
 					function->run(stream, request);
@@ -518,9 +516,10 @@ namespace synthese
 			}
 			else if(name == "site")
 			{
-				if(CMSModule::GetSite(request))
+				boost::shared_ptr<const Website> site(CMSModule::GetSite(request, aditionalParametersMap));
+				if(site.get())
 				{
-					stream << CMSModule::GetSite(request)->getKey();
+					stream << site->getKey();
 				}
 			}
 			else
@@ -559,7 +558,7 @@ namespace synthese
 			}
 			pm.merge(aditionalParametersMap);
 
-			Webpage* page(CMSModule::GetSite(request)->getPageBySmartURL(pageName));
+			Webpage* page(CMSModule::GetSite(request, aditionalParametersMap)->getPageBySmartURL(pageName));
 			if(page)
 			{
 				page->display(stream, request, pm);

@@ -171,18 +171,18 @@ namespace synthese
 		}
 		
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == CalendarModule::FACTORY_KEY &&
+			if(	dynamic_cast<const CalendarModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}
@@ -199,7 +199,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, calendars)
 			{
 				shared_ptr<CalendarTemplateAdmin> p(
-					getNewOtherPage<CalendarTemplateAdmin>()
+					getNewPage<CalendarTemplateAdmin>()
 				);
 				p->setCalendar(ct);
 				links.push_back(p);

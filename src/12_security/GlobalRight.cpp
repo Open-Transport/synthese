@@ -21,7 +21,7 @@
 */
 
 #include "GlobalRight.h"
-#include "12_security/Constants.h"
+#include "SecurityConstants.hpp"
 
 using namespace std;
 

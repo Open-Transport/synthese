@@ -34,7 +34,6 @@ namespace synthese
 {
 	namespace html
 	{
-
 		std::string HTMLModule::getLinkButton(
 			const std::string& url,
 			const std::string& caption,
@@ -42,12 +41,32 @@ namespace synthese
 			const string icon,
 			bool useOnclick
 		){
+			return getHTMLLink(
+				url,
+				(icon.empty() ? string() : getHTMLImage(icon, caption)) + "&nbsp;" + caption,
+				confirm,
+				useOnclick,
+				string(),
+				"linkbutton",
+				"onmouseover=\"this.className='activatedlinkbutton';\" onmouseout=\"this.className='linkbutton';\" onmousedown=\"this.className='clickedlinkbutton';\" onmouseup=\"this.className='activatedlinkbutton';\" "
+			);
+		}
+
+
+
+		std::string HTMLModule::getHTMLLink(
+			const string& url,
+			const std::string& content,
+			std::string confirm,
+			bool useOnclick,
+			std::string title,
+			std::string cssClass,
+			std::string htmlComplement
+		){
 			stringstream s;
-			s	<< "<a class=\"linkbutton\" "
-				<< "onmouseover=\"this.className='activatedlinkbutton';\" "
-				<< "onmouseout=\"this.className='linkbutton';\" "
-				<< "onmousedown=\"this.className='clickedlinkbutton';\" "
-				<< "onmouseup=\"this.className='activatedlinkbutton';\" ";
+			s	<< "<a ";
+
+			// Confirmation
 			if (confirm.empty())
 			{
 				if (useOnclick)
@@ -56,7 +75,7 @@ namespace synthese
 				}
 				else
 				{
-					s << "href=\"" << url << "\"";
+					s << "href=\"" << url << "\" ";
 				}
 			}
 			else
@@ -74,29 +93,61 @@ namespace synthese
 				{
 					s << "window.location='" << url << "';";
 				}
-				s << "return false;\"";
+				s << "return false;\" ";
 			}
-			s	<< ">";
-			if (!icon.empty())
-				s << getHTMLImage(icon, caption) << "&nbsp;";
-			s << caption << "</a>";
+
+			// CSS class
+			if(!cssClass.empty())
+			{
+				s << "class=\"" << cssClass << "\" ";
+			}
+
+			// TItle
+			if(!title.empty())
+			{
+				s << "title=\"" << title << "\" ";
+			}
+
+			// HTML complement
+			if(!htmlComplement.empty())
+			{
+				s << htmlComplement << " ";
+			}
+
+			// Content
+			s	<< ">" << content << "</a>";
+
 			return s.str();
 		}
 
-		std::string HTMLModule::getHTMLLink(const string& url, const std::string& content )
-		{
-			std::stringstream str;
-			str << "<a href=\"" << url << "\">"
-				<< content << "</a>";
-			return str.str();
-		}
 
-		std::string HTMLModule::getHTMLImage( const std::string& url, const std::string& title )
-		{
+
+		std::string HTMLModule::getHTMLImage(
+			const std::string& url,
+			const std::string& alt,
+			optional<const string&> title
+		){
 			stringstream s;
-			s << "<img src=\"" << url << "\" alt=\"" << title << "\" title=\"" << title << "\" />";
+			s << "<img src=\"" << url << "\" alt=\"" << alt << "\" ";
+			if(title)
+			{
+				if(!title->empty())
+				{
+					s << "title=\"" << *title << "\" ";
+				}
+			}
+			else
+			{
+				if(!alt.empty())
+				{
+					s << "title=\"" << alt << "\" ";
+				}
+			}
+			s << "/>";
 			return s.str();
 		}
+
+
 
 		std::string HTMLModule::GetHTMLJavascriptOpen( std::string url/*=std::string()*/ )
 		{
@@ -168,5 +219,4 @@ namespace synthese
 			}
 			return s.str();
 		}
-	}
-}
+}	}

@@ -28,16 +28,19 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include <boost/date_time/time_duration.hpp>
+#include "Importable.h"
 
 namespace synthese
 {
-	namespace pt
+	namespace geography
 	{
-		class StopArea;
+		class City;
 	}
 
 	namespace pt
 	{
+		class StopArea;
+	
 		//////////////////////////////////////////////////////////////////////////
 		/// Updates stop area transfer attributes.
 		/// @ingroup m35Actions refActions
@@ -52,6 +55,12 @@ namespace synthese
 		///		<li>actionParamid (compulsory) : the id of the stop area to update</li>
 		///		<li>actionParamac (compulsory) : sets if connection is allowed in the stop area</li>
 		///		<li>actionParamdt (compulsory) : sets the default transfer duration</li>
+		///		<li>actionParamna : name</li>
+		///		<li>actionParamsn : name for display on 13 characters wide screens</li>
+		///		<li>actionParamln : name for display on 26 characters wide screens</li>
+		///		<li>actionParamtn : timetable name</li>
+		///		<li>actionParamci : city id</li>
+		///		<li>actionParamma : wether the stop is selected as default in the city when no stop is specified</li>
 		///	</ul>
 		class StopAreaUpdateAction:
 			public util::FactorableTemplate<server::Action, StopAreaUpdateAction>
@@ -60,11 +69,24 @@ namespace synthese
 			static const std::string PARAMETER_PLACE_ID;
 			static const std::string PARAMETER_ALLOWED_CONNECTIONS;
 			static const std::string PARAMETER_DEFAULT_TRANSFER_DURATION;
+			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_TIMETABLE_NAME;
+			static const std::string PARAMETER_SHORT_NAME;
+			static const std::string PARAMETER_LONG_NAME;
+			static const std::string PARAMETER_CITY_ID;
+			static const std::string PARAMETER_IS_MAIN;
 
 		private:
 			boost::shared_ptr<pt::StopArea> _place;
-			bool _allowedConnections;
-			boost::posix_time::time_duration _defaultTransferDuration;
+			boost::optional<bool> _allowedConnections;
+			boost::optional<boost::posix_time::time_duration> _defaultTransferDuration;
+			boost::optional<std::string> _name;
+			boost::optional<std::string> _shortName;
+			boost::optional<std::string> _longName;
+			boost::shared_ptr<geography::City> _city;
+			boost::optional<bool> _isMain;
+			boost::optional<std::string> _timetableName;
+			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

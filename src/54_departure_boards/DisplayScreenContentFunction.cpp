@@ -41,8 +41,6 @@
 #include "CommercialLine.h"
 #include "City.h"
 #include "Alarm.h"
-#include "StaticFunctionRequest.h"
-#include "WebPageDisplayFunction.h"
 #include "Webpage.h"
 #include "PTObjectsCMSExporters.hpp"
 
@@ -221,7 +219,7 @@ namespace synthese
 							const ArrivalDepartureTableGenerator::PhysicalStops& stops(place->getPhysicalStops());
 							BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, stops)
 							{
-								if(it.second->getCodeBySource() == oc)
+								if(it.second->getCodeBySources() == oc)
 									screen->addPhysicalStop(it.second);
 							}
 						}
@@ -260,7 +258,7 @@ namespace synthese
 							typedef const pair<const RegistryKeyType, shared_ptr<StopPoint> > myType;
 							BOOST_FOREACH(myType&  myStop,Env::GetOfficialEnv().getRegistry<StopPoint>())
 							{
-								if(myStop.second->getCodeBySource() == oc)
+								if(myStop.second->getCodeBySources() == oc)
 								{
 									screen->addPhysicalStop(myStop.second.get());
 									break;
@@ -332,7 +330,7 @@ namespace synthese
 			RollingStock * rs = journeyPattern->getRollingStock();
 
 			stream << "<stop id=\"" << stop->getKey() <<
-				"\" operatorCode=\""<< stop->getCodeBySource() <<
+				"\" operatorCode=\""<< stop->getCodeBySources() <<
 				"\" name=\""        << stop->getName() <<
 				"\" />";
 
@@ -344,7 +342,12 @@ namespace synthese
 			const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
 
 			stream <<"<line id=\""<< commercialLine->getKey() <<
-				"\" creatorId=\"" << commercialLine->getCreatorId() <<
+				"\" creatorId=\"";
+			if(!commercialLine->getDataSourceLinks().empty())
+			{
+				stream << commercialLine->getDataSourceLinks().begin()->second;
+			}
+			stream <<
 				"\" name=\""      << commercialLine->getName() <<
 				"\" shortName=\"" << commercialLine->getShortName() <<
 				"\" longName=\""  << commercialLine->getLongName() <<
@@ -599,7 +602,7 @@ namespace synthese
 			const ArrivalDepartureListWithAlarm& rows,
 			const DisplayScreen& screen
 		){
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 			pm.insert(Request::PARAMETER_OBJECT_ID, screen.getKey());
 			pm.insert(DATA_MAC, screen.getMacAddress());
 			pm.insert(DATA_DATE, to_iso_extended_string(date.date()) + " " + to_simple_string(date.time_of_day()));
@@ -706,11 +709,7 @@ namespace synthese
 			}
 
 			// Launch of the display
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -726,8 +725,7 @@ namespace synthese
 			const ArrivalDepartureRow& row,
 			const DisplayScreen& screen
 		){
-
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 			pm.insert(Request::PARAMETER_OBJECT_ID, screen.getKey());
 			pm.insert(DATA_ROW_RANK, rowRank);
 			pm.insert(DATA_PAGE_NUMBER, pageNumber);
@@ -879,11 +877,7 @@ namespace synthese
 			}
 
 			// Launch of the display
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -908,7 +902,7 @@ namespace synthese
 					(rank ? object.getArrivalEdge() : object.getDepartureEdge())->getHub()
 			)	);
 
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 			PTObjectsCMSExporters::ExportStopArea(pm, *place);
 			pm.insert(DATA_IS_SAME_CITY, lastDisplayedStopWasInTheSameCity);
 			pm.insert(DATA_TIME, to_iso_extended_string((rank ? object.getArrivalDateTime() : object.getDepartureDateTime()).date()) +" "+ to_simple_string((rank ? object.getArrivalDateTime() : object.getDepartureDateTime()).time_of_day()));
@@ -957,11 +951,7 @@ namespace synthese
 			}
 
 			// Launch of the display
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -974,7 +964,7 @@ namespace synthese
 			std::size_t localTransferRank,
 			const DisplayScreen& screen
 		){
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(object.getService()->getPath()));
 			const StopArea* place(dynamic_cast<const StopArea*>(object.getArrivalEdge()->getFromVertex()->getHub()));
@@ -1021,11 +1011,7 @@ namespace synthese
 			}
 
 			// Launch of the display
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -1047,7 +1033,7 @@ namespace synthese
 			const RoutePlanningListWithAlarm& rows,
 			const DisplayScreen::ChildrenType& subscreens
 		){
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 			pm.insert(DATA_TITLE, title);
 			pm.insert(DATA_WIRING_CODE, wiringCode);
 			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, displayServiceNumber);
@@ -1125,11 +1111,7 @@ namespace synthese
 			}
 
 			// Launch of the display
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -1149,7 +1131,7 @@ namespace synthese
 			const DisplayScreen::ChildrenType& subscreens
 		){
 
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_ROW_RANK, rowId);
 			pm.insert(DATA_WITH_TRANSFER, withTransfer);
@@ -1257,11 +1239,7 @@ namespace synthese
 			}
 
 			// Launch of the display
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -1272,14 +1250,10 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			const pt::StopArea& place
 		){
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 			PTObjectsCMSExporters::ExportStopArea(pm, place);
 
 			// Launch of the display
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 }	}

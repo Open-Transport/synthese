@@ -22,12 +22,13 @@
 
 #include "SchedulesBasedService.h"
 #include "Path.h"
-#include "Edge.h"
+#include "LineStop.h"
 
 #include <sstream>
 #include <iomanip>
 #include <boost/tokenizer.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -50,7 +51,6 @@ namespace synthese
 
 
 
-
 		void SchedulesBasedService::_computeNextRTUpdate()
 		{
 			if(!_arrivalSchedules.empty())
@@ -70,18 +70,69 @@ namespace synthese
 
 
 
-		void SchedulesBasedService::setDepartureSchedules( const Schedules& schedules )
-		{
-			_departureSchedules = schedules;
-			_RTDepartureSchedules = schedules;
-		}
+		void SchedulesBasedService::setSchedules(
+			const Schedules& departureSchedules,
+			const Schedules& arrivalSchedules
+		){
+			if(!_path)
+			{
+				throw BadSchedulesException();
+			}
 
+			_departureSchedules.clear();
+			_arrivalSchedules.clear();
+			Schedules::const_iterator itDeparture(departureSchedules.begin());
+			Schedules::const_iterator itArrival(arrivalSchedules.begin());
+			Path::Edges::const_iterator lastScheduledEdge(_path->getEdges().end());
+			bool atLeastOneUnscheduledEdge(false);
+			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
+			{
+				const LineStop& lineStop(static_cast<const LineStop&>(**itEdge));
+				if(	lineStop.getScheduleInput())
+				{
+					// Interpolation of preceding schedules
+					if(atLeastOneUnscheduledEdge)
+					{
+						Edge::MetricOffset totalDistance(lineStop.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
+						time_duration originDepartureSchedule(*_departureSchedules.rbegin());
+						time_duration totalTime(*itArrival - originDepartureSchedule);
+						for(Path::Edges::const_iterator it(lastScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
+						{
+							Edge::MetricOffset distance((*it)->getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
 
+							time_duration departureSchedule(originDepartureSchedule);
+							time_duration arrivalSchedule(originDepartureSchedule);
+							departureSchedule += minutes(
+								floor( (totalTime.total_seconds() / 60) * (distance / totalDistance))
+							);
+							arrivalSchedule += minutes(
+								ceil( (totalTime.total_seconds() / 60) * (distance / totalDistance))
+							);
 
-		void SchedulesBasedService::setArrivalSchedules( const Schedules& schedules )
-		{
-			_arrivalSchedules = schedules;
-			_RTArrivalSchedules = schedules;
+							_departureSchedules.push_back(departureSchedule);
+							_arrivalSchedules.push_back(arrivalSchedule);
+						}
+					}
+
+					// Store the schedules
+					_departureSchedules.push_back(*itDeparture);
+					_arrivalSchedules.push_back(*itArrival);
+
+					// Store the last scheduled edge
+					lastScheduledEdge = itEdge;
+					atLeastOneUnscheduledEdge = false;
+
+					// Increment iterators
+					++itDeparture;
+					++itArrival;
+				}
+				else
+				{
+					atLeastOneUnscheduledEdge = true;
+				}
+			}
+
+			clearRTData();
 			_computeNextRTUpdate();
 		}
 
@@ -101,6 +152,13 @@ namespace synthese
 					return getDepartureSchedules(RTData).at((*it)->getRankInPath());
 			assert(false);
 			return getDepartureSchedules(RTData).at(0);
+		}
+
+
+
+		boost::posix_time::time_duration SchedulesBasedService::getArrivalSchedule( bool RTData, std::size_t rank ) const
+		{
+			return getArrivalSchedules(RTData).at(rank);
 		}
 
 
@@ -206,13 +264,20 @@ namespace synthese
 			boost::posix_time::time_duration shiftArrivals
 		) const {
 			stringstream str;
-			for(size_t i(0); i<_departureSchedules.size(); ++i)
+			size_t i(0);
+			BOOST_FOREACH(const Edge* edge, _path->getEdges())
 			{
+				if(!static_cast<const LineStop*>(edge)->getScheduleInput())
+				{
+					++i;
+					continue;
+				}
 				if(i)
 				{
 					str << ",";
 				}
 				str << EncodeSchedule(_arrivalSchedules[i] + shiftArrivals) << "#" << EncodeSchedule(_departureSchedules[i]);
+				++i;
 			}
 			return str.str();
 		}
@@ -223,15 +288,15 @@ namespace synthese
 			const std::string value,
 			boost::posix_time::time_duration shiftArrivals
 		){
-		    typedef tokenizer<char_separator<char> > tokenizer;
+			typedef tokenizer<char_separator<char> > tokenizer;
 
-		    // Parse all schedules arrival#departure,arrival#departure...
-		    tokenizer schedulesTokens (value, char_separator<char>(","));
-		    
-		    Schedules departureSchedules;
-		    Schedules arrivalSchedules;
-		    
-		    for(tokenizer::iterator schedulesIter = schedulesTokens.begin();
+			// Parse all schedules arrival#departure,arrival#departure...
+			tokenizer schedulesTokens (value, char_separator<char>(","));
+		
+			Schedules departureSchedules;
+			Schedules arrivalSchedules;
+		
+			for(tokenizer::iterator schedulesIter = schedulesTokens.begin();
 				schedulesIter != schedulesTokens.end ();
 				++schedulesIter
 			){
@@ -261,7 +326,7 @@ namespace synthese
 				
 				departureSchedules.push_back (departureSchedule);
 				arrivalSchedules.push_back (arrivalSchedule);
-		    }
+			}
 
 			if(	departureSchedules.size () <= 0 ||
 				arrivalSchedules.size () <= 0 ||
@@ -270,8 +335,10 @@ namespace synthese
 				throw BadSchedulesException();
 			}
 
-			_departureSchedules = departureSchedules;
-			_arrivalSchedules = arrivalSchedules;
+			setSchedules(
+				departureSchedules,
+				arrivalSchedules
+			);
 		}
 
 
@@ -290,9 +357,10 @@ namespace synthese
 				departureSchedules.push_back(i+1 == other._departureSchedules.size() ? minutes(0) : (other._departureSchedules[i].is_not_a_date_time() ? not_a_date_time : (other._departureSchedules[i] + shift)));
 				arrivalSchedules.push_back(i==0 ? minutes(0) : (other._arrivalSchedules[i].is_not_a_date_time() ? not_a_date_time : (other._arrivalSchedules[i] + shift)));
 			}
-			_departureSchedules = departureSchedules;
-			_arrivalSchedules = arrivalSchedules;
-			clearRTData();
+			setSchedules(
+				departureSchedules,
+				arrivalSchedules
+			);
 		}
 
 
@@ -311,9 +379,35 @@ namespace synthese
 				firstSchedule += minutes(1);
 			}
 
-			_departureSchedules = departureSchedules;
-			_arrivalSchedules = arrivalSchedules;
-			clearRTData();
+			setSchedules(
+				departureSchedules,
+				arrivalSchedules
+			);
 		}
-	}
-}
+
+
+
+		bool SchedulesBasedService::comparePlannedSchedules( const Schedules& departure, const Schedules& arrival ) const
+		{
+			size_t i(0);
+			Schedules::const_iterator itd(departure.begin());
+			Schedules::const_iterator ita(arrival.begin());
+			BOOST_FOREACH(const Edge* edge, _path->getEdges())
+			{
+				if(!static_cast<const LineStop*>(edge)->getScheduleInput())
+				{
+					++i;
+					continue;
+				}
+				if(	_departureSchedules[i] != *itd ||
+					_arrivalSchedules[i] != *ita
+				){
+					return false;
+				}
+				++i;
+				++itd;
+				++ita;
+			}
+			return true;
+		}
+}	}
