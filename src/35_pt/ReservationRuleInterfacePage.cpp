@@ -24,8 +24,7 @@
 #include "Journey.h"
 #include "DateTimeInterfacePage.h"
 #include "Webpage.h"
-#include "StaticFunctionRequest.h"
-#include "WebPageDisplayFunction.h"
+#include "Request.h"
 
 #include <sstream>
 
@@ -55,11 +54,7 @@ namespace synthese
 			const Request& request,
 			const Journey& journey
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
-
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			ptime now(second_clock::local_time());
 			ptime deadLine(journey.getReservationDeadLine());
@@ -88,8 +83,6 @@ namespace synthese
 				}
 			}
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
-	}
-}
+}	}

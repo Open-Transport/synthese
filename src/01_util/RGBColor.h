@@ -71,6 +71,8 @@ namespace synthese
 				@date 2009		
 			*/
 			std::string toXMLColor() const;
+
+			static RGBColor FromXMLColor(const std::string& value);
 		};
 	}
 }

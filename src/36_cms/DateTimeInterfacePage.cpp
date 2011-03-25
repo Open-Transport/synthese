@@ -21,8 +21,8 @@
 */
 
 #include "DateTimeInterfacePage.h"
-#include "StaticFunctionRequest.h"
-#include "WebPageDisplayFunction.h"
+#include "Webpage.h"
+#include "Request.h"
 
 using namespace std;
 using namespace boost;
@@ -49,10 +49,7 @@ namespace synthese
 			const server::Request& request,
 			const boost::posix_time::ptime& dateTime
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_YEAR, dateTime.date().year());
 			pm.insert(DATA_MONTH, dateTime.date().month());
@@ -61,8 +58,7 @@ namespace synthese
 			pm.insert(DATA_MINUTES, dateTime.time_of_day().minutes());
 			pm.insert(DATA_DAY_OF_WEEK, dateTime.date().day_of_week());
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -73,18 +69,14 @@ namespace synthese
 			const server::Request& request,
 			const boost::gregorian::date& date
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_YEAR, date.year());
 			pm.insert(DATA_MONTH, date.month());
 			pm.insert(DATA_DAY, date.day());
 			pm.insert(DATA_DAY_OF_WEEK, date.day_of_week());
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page->display(stream, request, pm);
 		}
 
 
@@ -95,18 +87,12 @@ namespace synthese
 			const server::Request& request,
 			const boost::posix_time::time_duration& duration
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(page);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_HOURS, duration.hours());
 			pm.insert(DATA_MINUTES, duration.minutes());
 			pm.insert(DATA_TOTAL_MINUTES, duration.total_seconds() / 60);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
-
+			page->display(stream, request, pm);
 		}
-	}
-}
+}	}

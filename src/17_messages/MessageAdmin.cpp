@@ -147,7 +147,7 @@ namespace synthese
 						optional<AlarmLevel>(_alarm->getLevel())
 				)	);
 				stream << tu.cell("Titre", tu.getForm().getTextInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage()));
-				stream << tu.cell("Contenu", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 6, 60));
+				stream << tu.cell("Contenu", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 6, 60, false));
 				stream << tu.close();
 			}
 

@@ -226,7 +226,9 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007
 				*/
-				std::string open(const std::string htmlComplement = std::string());
+				virtual std::string open(
+					std::string htmlComplement = std::string()
+				) const;
 
 
 
@@ -236,7 +238,7 @@ namespace synthese
 					@date 2007
 					
 				*/
-				std::string close();
+				virtual std::string close();
 
 
 
@@ -498,12 +500,29 @@ namespace synthese
 					@param value default text present in the text area at the page load
 					@param rows number of rows to be displayed (vertical size)
 					@param cols number of columns to be displayed (horizontal size)
+					@param tinyMCE activation or not of TinyMCE on this input field
 					@return std::string the HTML generated code
 					@author Hugues Romain
 					@date 2008-2010
 					@pre the value must not be already encoded with HTML entities
 				*/
-				std::string getTextAreaInput(const std::string& name, const std::string& value, int rows, int cols);
+				std::string getTextAreaInput(
+					const std::string& name,
+					const std::string& value,
+					std::size_t rows,
+					std::size_t cols,
+					bool tinyMCE
+				);
+
+
+				static std::string GetTextAreaInput(
+					const std::string& name,
+					const std::string& value,
+					std::size_t rows,
+					std::size_t cols,
+					bool tinyMCE,
+					std::string id = std::string()
+				);
 
 
 
@@ -513,7 +532,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008					
 				*/
-				std::string getSubmitButton(const std::string& caption);
+				virtual std::string getSubmitButton(const std::string& caption);
 
 
 
@@ -525,7 +544,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008				
 				*/
-				std::string getImageSubmitButton(const std::string& imageURL, const std::string& alt, std::string name="im");
+				virtual std::string getImageSubmitButton(const std::string& imageURL, const std::string& alt, std::string name="im");
 
 
 

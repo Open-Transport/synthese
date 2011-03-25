@@ -43,6 +43,7 @@ namespace synthese
 				Request()
 			{
 				_action = boost::shared_ptr<Action>(new ActionT);
+				_redirectAfterAction = false;
 			}
 
 			explicit StaticActionRequest(const Request& request):
@@ -62,6 +63,8 @@ namespace synthese
 				{
 					throw Exception("The source request does not allow copy");
 				}
+
+				_redirectAfterAction = false;
 			}
 
 

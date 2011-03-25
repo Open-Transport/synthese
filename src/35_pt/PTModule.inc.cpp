@@ -19,6 +19,8 @@
 #include "TridentFileFormat.h"
 #include "CarPostalFileFormat.hpp"
 #include "PladisStopsFileFormat.hpp"
+#include "HeuresFileFormat.hpp"
+#include "GTFSFileFormat.hpp"
 
 #include "PTUseRuleTableSync.h"
 #include "ContinuousServiceTableSync.h"
@@ -33,8 +35,12 @@
 #include "StopAreaTableSync.hpp"
 #include "FareTableSync.h"
 #include "LineStopTableSync.h"
+#include "LineAreaInheritedTableSync.hpp"
+#include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
 #include "JourneyPatternTableSync.hpp"
+#include "DRTAreaTableSync.hpp"
 
+#include "PTQualityControlAdmin.hpp"
 #include "TransportNetworkAdmin.h"
 #include "CommercialLineAdmin.h"
 #include "JourneyPatternAdmin.hpp"
@@ -48,6 +54,8 @@
 #include "PTUseRulesAdmin.h"
 #include "PTUseRuleAdmin.h"
 #include "StopPointAdmin.hpp"
+#include "DRTAreaAdmin.hpp"
+#include "DRTAreasAdmin.hpp"
 
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "LineMarkerInterfacePage.h"
@@ -62,9 +70,8 @@
 #include "ServiceAddAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
 #include "StopAreaUpdateAction.h"
-#include "TransportNetworkAddAction.h"
+#include "TransportNetworkUpdateAction.hpp"
 #include "ContinuousServiceUpdateAction.h"
-#include "StopAreaNameUpdateAction.hpp"
 #include "PTUseRuleAddAction.hpp"
 #include "PTUseRuleUpdateAction.hpp"
 #include "ServiceTimetableUpdateAction.h"
@@ -83,15 +90,18 @@
 #include "JourneyPatternRemoveAction.hpp"
 #include "ProjectAllStopPointsAction.hpp"
 #include "StopAreaTransferAddAction.h"
+#include "DRTAreaUpdateAction.hpp"
+#include "DRTAreaRemoveAction.hpp"
 
 #include "TransportNetworkRight.h"
 
-
+#include "StopPointWFSType.hpp"
 
 // Registries
 
 #include "JourneyPattern.hpp"
-#include "LineStop.h"
+#include "LineArea.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "StopArea.hpp"
 #include "ReservationContact.h"
 #include "CommercialLine.h"
@@ -104,4 +114,4 @@
 #include "ScheduledService.h"
 #include "ContinuousService.h"
 #include "NonConcurrencyRule.h"
-
+#include "DRTArea.hpp"

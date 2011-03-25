@@ -73,21 +73,16 @@ namespace synthese
 			//! @name Setters
 			//@{
 				
-				/** Departure schedules update.
+				/** Schedules update.
 					Updates both theoretical and real time data.
-					@param schedules Departure schedules of the service
+					@param departureSchedules Departure schedules of the service
+					@param arrivalSchedules Arrival schedules of the service
 					@author Hugues Romain
 				*/
-				void	setDepartureSchedules(const Schedules& schedules);
-
-
-
-				/** Arrival schedules update.
-					Updates both theoretical and real time data.
-					@param schedules Arrival schedules of the service
-					@author Hugues Romain
-				*/
-				void	setArrivalSchedules(const Schedules& schedules);
+				void setSchedules(
+					const Schedules& departureSchedules,
+					const Schedules& arrivalSchedules
+				);
 			//@}
 
 
@@ -99,6 +94,8 @@ namespace synthese
 				virtual boost::posix_time::time_duration getDepartureSchedule (bool RTData, std::size_t rank) const;
 
 				const boost::posix_time::time_duration& getLastDepartureSchedule(bool RTData) const;
+
+				virtual boost::posix_time::time_duration getArrivalSchedule (bool RTData, std::size_t rank) const;
 
 				virtual const boost::posix_time::time_duration& getLastArrivalSchedule(bool RTData) const;
 
@@ -127,6 +124,8 @@ namespace synthese
 
 				void setSchedulesFromOther(const SchedulesBasedService& other, boost::posix_time::time_duration shift);
 				void generateIncrementalSchedules(boost::posix_time::time_duration firstSchedule);
+
+				bool comparePlannedSchedules(const Schedules& departure, const Schedules& arrival) const;
 			//@}
 
 
@@ -138,6 +137,7 @@ namespace synthese
 				
 				//////////////////////////////////////////////////////////////////////////
 				/// Encode schedules into a string.
+				/// Schedules at non scheduled stops are ignored.
 				/// @param shiftArrivals duration to add to the arrival times before encoding (default 0)
 				/// @author Hugues Romain
 				std::string encodeSchedules(
@@ -148,6 +148,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Reads schedules from encoded strings.
+				/// Schedules at non scheduled stops are ignored.
 				/// @param value encoded strings
 				/// @param shiftArrivals duration to add to the arrival times (default 0)
 				/// @author Hugues Romain

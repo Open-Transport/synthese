@@ -135,17 +135,17 @@ namespace synthese
 		}
 		
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(	moduleKey == ResaModule::FACTORY_KEY &&
+			if(	dynamic_cast<const ResaModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}
@@ -158,7 +158,7 @@ namespace synthese
 
 			CommercialLineTableSync::SearchResult lines(
 				CommercialLineTableSync::Search(
-					*_env,
+					Env::GetOfficialEnv(),
 					request.getUser()->getProfile()->getRightsForModuleClass<ResaRight>(),
 					request.getUser()->getProfile()->getGlobalPublicRight<ResaRight>() >= READ
 					, READ
@@ -169,7 +169,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 			{
 				shared_ptr<BookableCommercialLineAdmin> p(
-					getNewOtherPage<BookableCommercialLineAdmin>()
+					getNewPage<BookableCommercialLineAdmin>()
 				);
 				p->setCommercialLine(line);
 				links.push_back(p);

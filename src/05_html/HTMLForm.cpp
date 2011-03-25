@@ -24,6 +24,7 @@
 #include <map>
 
 #include "HTMLForm.h"
+#include "TinyMCE.hpp"
 
 using namespace std;
 using namespace boost;
@@ -37,8 +38,9 @@ namespace synthese
 	namespace html
 	{
 
-		std::string HTMLForm::open(const std::string htmlComplement)
-		{
+		std::string HTMLForm::open(
+			std::string htmlComplement
+		) const {
 			if (!_updateRight)
 				return string();
 
@@ -157,6 +159,8 @@ namespace synthese
 			return s.str();
 		}
 
+
+
 		std::string HTMLForm::getSubmitButton( const std::string& caption )
 		{
 			if (!_updateRight)
@@ -170,6 +174,8 @@ namespace synthese
 			return s.str();
 		}
 
+
+
 		std::string HTMLForm::setFocus(const std::string& fieldName ) const
 		{
 			if (!_updateRight)
@@ -182,6 +188,8 @@ namespace synthese
 			return s.str();
 		}
 
+		
+		
 		std::string HTMLForm::setFocus( const std::string& fieldName, int fieldRank ) const
 		{
 			if (!_updateRight)
@@ -194,24 +202,56 @@ namespace synthese
 			return s.str();
 		}
 
-		std::string HTMLForm::getTextAreaInput( const std::string& name, const std::string& value, int rows, int cols )
-		{
+		
+		
+		std::string HTMLForm::getTextAreaInput(
+			const std::string& name,
+			const std::string& value,
+			size_t rows,
+			size_t cols,
+			bool tinyMCE
+		){
 			if (!_updateRight)
 			{
 				return HTMLModule::HTMLEncode(value);
 			}
 
 			removeHiddenFieldIfExists(name, value);
+
+			return GetTextAreaInput(name, value, rows, cols, tinyMCE, _getFieldId(name));
+		}
+
+
+
+		std::string HTMLForm::GetTextAreaInput(
+			const std::string& name,
+			const std::string& value,
+			std::size_t rows,
+			std::size_t cols,
+			bool tinyMCE,
+			string id
+		){
 			stringstream s;
 			s	<< "<textarea "
 				<< "name=\"" << name << "\" "
 				<< "rows=\"" << rows << "\" "
-				<< "cols=\"" << cols << "\" "
-				<< "id=\"" << _getFieldId(name) << "\" "
-				<< ">" 
-				<< HTMLModule::HTMLEncode(value) << "</textarea>";
+				<< "cols=\"" << cols << "\" ";
+			if(!id.empty())
+			{
+				s << "id=\"" << id << "\" ";
+			}
+			if(tinyMCE)
+			{
+				s << "class=\"" << TinyMCE::MCE_EDITOR_ACTIVATION_CLASS << "\" ";
+			}
+			s <<
+				">" <<
+				HTMLModule::HTMLEncode(value) << "</textarea>"
+			;
 			return s.str();
 		}
+
+
 
 		std::string HTMLForm::getOuiNonRadioInput( const std::string& name, bool value )
 		{
@@ -567,5 +607,4 @@ namespace synthese
 		{
 			return _updateRight;
 		}
-	}
-}
+}	}

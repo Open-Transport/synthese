@@ -27,8 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-
-#include <geos/geom/Point.h>
+#include "Importable.h"
 
 namespace synthese
 {
@@ -45,21 +44,6 @@ namespace synthese
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.1.18
-		//////////////////////////////////////////////////////////////////////////
-		/// Key : StopAreaAddAction
-		///
-		/// Parameters :
-		///	<ul>
-		///		<li>actionParamci : city id (optional)</li>
-		///		<li>actionParamcn : city name (used if the city id is not defined)</li>
-		///		<li>actionParamcc : create city if the name does not correspond exactly</li>
-		///		<li>actionParamsn : stop name</li>
-		///		<li>actionParamcp : creation of a physical stop</li>
-		///		<li>actionParamsc : operator code of the physical stop to create (if creation activated)</li>
-		///		<li>actionParamxx : x coordinates of the physical stop to create (lambert II étendu projection)</li>
-		///		<li>actionParamyy : y coordinates of the physical stop to create (lambert II étendu projection)</li>
-		///		<li>actionParamyy : y coordinates of the physical stop to create (lambert II étendu projection)</li>
-		///	</ul>
 		class StopAreaAddAction:
 			public util::FactorableTemplate<server::Action, StopAreaAddAction>
 		{
@@ -68,23 +52,20 @@ namespace synthese
 			static const std::string PARAMETER_CITY_NAME;
 			static const std::string PARAMETER_CREATE_CITY_IF_NECESSARY;
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_CREATE_PHYSICAL_STOP;
-			static const std::string PARAMETER_PHYSICAL_STOP_OPERATOR_CODE;
-			static const std::string PARAMETER_PHYSICAL_STOP_X;
-			static const std::string PARAMETER_PHYSICAL_STOP_Y;
+			static const std::string PARAMETER_DATA_SOURCE_LINKS;
 
 		private:
 			boost::shared_ptr<geography::City> _city;
 			std::string _cityName;
 			bool _createCityIfNecessary;
 			std::string _name;
-			bool _createPhysicalStop;
-			std::string _physicalStopOperatorCode;
-			boost::shared_ptr<geos::geom::Point> _point;
+			impex::Importable::DataSourceLinks _dataSourceLinks;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a generic parameters map from the action parameters.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_area_creation
+			//////////////////////////////////////////////////////////////////////////
 			/// @return The generated parameters map
 			server::ParametersMap getParametersMap() const;
 
@@ -92,14 +73,15 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads the parameters of the action on a generic parameters map.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_area_creation
+			//////////////////////////////////////////////////////////////////////////
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
 			StopAreaAddAction():
-				_createCityIfNecessary(false),
-				_createPhysicalStop(false)
+				_createCityIfNecessary(false)
 			{}
 
 
@@ -122,11 +104,9 @@ namespace synthese
 			//@{
 				void setCity(boost::shared_ptr<geography::City> value){ _city = value; }
 				void setCreateCityIfNecessary(bool value) { _createCityIfNecessary = value; }
-				void setCreatePhysicalStop(bool value) { _createPhysicalStop = value; }
-				void setPoint(boost::shared_ptr<geos::geom::Point> value) { _point = value; }
 				void setCityName(const std::string& value) { _cityName = value; }
 				void setName(const std::string& value) { _name = value; }
-				void setOperatorCode(const std::string& value) { _physicalStopOperatorCode = value; }
+				void setDataSourceLinks(const impex::Importable::DataSourceLinks value){ _dataSourceLinks = value; }
 			//@}
 		};
 	}

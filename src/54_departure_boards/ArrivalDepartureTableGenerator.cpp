@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
 #include "JourneyPattern.hpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
@@ -69,13 +69,13 @@ namespace synthese
 				- Si tableau des origines seulement, ligne originaire de l'arrêt affiché sur le tableau courant
 				- L'arrêt d'arrivée suivant ou la destination doivent être différent de l'arrêt courant (?? -> removed currently)
 		*/
-		bool ArrivalDepartureTableGenerator::_allowedLineStop(const LineStop* linestop) const
+		bool ArrivalDepartureTableGenerator::_allowedLineStop(const LinePhysicalStop& linestop) const
 		{
 			/** - If a forbidden place is served, the the line is not allowed */
 			if (!_forbiddenPlaces.empty())
-				for(const LineStop* curLinestop(linestop);
+				for(const LinePhysicalStop* curLinestop(&linestop);
 					curLinestop != NULL;
-					curLinestop = static_cast<const LineStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly())
+					curLinestop = static_cast<const LinePhysicalStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly())
 				){
 					if(	_forbiddenPlaces.find(curLinestop->getPhysicalStop()->getConnectionPlace()->getKey()) !=
 						_forbiddenPlaces.end()
@@ -84,11 +84,11 @@ namespace synthese
 					}
 				}
 
-			return 	linestop->getLine()->getUseInDepartureBoards()
-				&&	_lineFilter.find(linestop->getLine()->getKey()) == _lineFilter.end()
-				&&	((_endFilter == WITH_PASSING) || (linestop->getPreviousDepartureForFineSteppingOnly() == NULL))
-				//&&	(((linestop->getFollowingArrival() != NULL) && (linestop->getFollowingArrival()->getConnectionPlace() != _place))
-				//	|| ( linestop->getLine()->getDestination()->getConnectionPlace() != _place))
+			return 	linestop.getLine()->getUseInDepartureBoards()
+				&&	_lineFilter.find(linestop.getLine()->getKey()) == _lineFilter.end()
+				&&	((_endFilter == WITH_PASSING) || (linestop.getPreviousDepartureForFineSteppingOnly() == NULL))
+				//&&	(((linestop.getFollowingArrival() != NULL) && (linestop.getFollowingArrival()->getConnectionPlace() != _place))
+				//	|| ( linestop.getLine()->getDestination()->getConnectionPlace() != _place))
 			;
 		}
 
@@ -106,8 +106,8 @@ namespace synthese
 				)->getDestination()->getConnectionPlace()
 			);
 
-			const LineStop* curLinestop(static_cast<const LineStop*>(servicePointer.getDepartureEdge()));
-			const LineStop* lastLineStop(NULL);
+			const LinePhysicalStop* curLinestop(static_cast<const LinePhysicalStop*>(servicePointer.getDepartureEdge()));
+			const LinePhysicalStop* lastLineStop(NULL);
 			const StopArea* place(curLinestop->getPhysicalStop()->getConnectionPlace());
 
 			// Adding of the beginning place
@@ -115,9 +115,9 @@ namespace synthese
 			encounteredPlaces.insert(place);
 			AccessParameters ap;
 
-			for(curLinestop = static_cast<const LineStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly());
+			for(curLinestop = static_cast<const LinePhysicalStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly());
 				curLinestop != NULL;
-				curLinestop = static_cast<const LineStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly())
+				curLinestop = static_cast<const LinePhysicalStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly())
 			){
 				if(!servicePointer.getService()->nonConcurrencyRuleOK(
 						servicePointer.getOriginDateTime().date(),
@@ -174,5 +174,4 @@ namespace synthese
 				serviceUse
 			)	);
 		}
-	}
-}
+}	}

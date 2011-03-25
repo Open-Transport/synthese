@@ -336,7 +336,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks CalendarTemplateAdmin::_getCurrentTreeBranch() const
 		{
 			shared_ptr<CalendarTemplatesAdmin> p(
-				getNewOtherPage<CalendarTemplatesAdmin>()
+				getNewPage<CalendarTemplatesAdmin>()
 			);
 
 			PageLinks links(p->_getCurrentTreeBranch());

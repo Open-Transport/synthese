@@ -41,6 +41,7 @@
 #include "GraphConstants.h"
 #include "ReplaceQuery.h"
 #include "LoadException.h"
+#include "LineStopTableSync.h"
 
 #include <set>
 #include <boost/algorithm/string.hpp>
@@ -108,11 +109,62 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-		    string serviceNumber (rows->getText(ContinuousServiceTableSync::COL_SERVICENUMBER));
-		    boost::posix_time::time_duration range (minutes(rows->getInt (ContinuousServiceTableSync::COL_RANGE)));
-		    boost::posix_time::time_duration maxWaitingTime (minutes(rows->getInt (ContinuousServiceTableSync::COL_MAXWAITINGTIME)));
-			util::RegistryKeyType pathId(rows->getLongLong(ContinuousServiceTableSync::COL_PATHID));
+			// Service number
+			string serviceNumber (rows->getText(ContinuousServiceTableSync::COL_SERVICENUMBER));
+			cs->setServiceNumber(serviceNumber);
 
+			// Range
+			boost::posix_time::time_duration range (minutes(rows->getInt (ContinuousServiceTableSync::COL_RANGE)));
+			cs->setRange(range);
+
+			// Max waiting time
+			boost::posix_time::time_duration maxWaitingTime (minutes(rows->getInt (ContinuousServiceTableSync::COL_MAXWAITINGTIME)));
+			cs->setMaxWaitingTime(maxWaitingTime);
+
+			// Path
+			util::RegistryKeyType pathId(rows->getLongLong(ContinuousServiceTableSync::COL_PATHID));
+			cs->setPathId(pathId);
+			Path* path(NULL);
+
+			// Use rules
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				// Path
+				path = JourneyPatternTableSync::GetEditable(pathId, env, linkLevel).get();
+				cs->setPath(path);
+				if(path->getEdges().empty())
+				{
+					LineStopTableSync::Search(env, pathId);
+				}
+
+				// Use rules
+				util::RegistryKeyType bikeComplianceId(
+					rows->getLongLong (ContinuousServiceTableSync::COL_BIKE_USE_RULE)
+				);
+				if(bikeComplianceId > 0)
+				{
+					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get();
+				}
+				util::RegistryKeyType handicappedComplianceId(
+					rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE)
+				);
+				if(handicappedComplianceId > 0)
+				{
+					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
+				}
+				util::RegistryKeyType pedestrianComplianceId(
+					rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE)
+				);
+				if(pedestrianComplianceId > 0)
+				{
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get();
+				}
+			}
+			cs->setRules(rules);
+
+			// Schedules
 			try
 			{
 				cs->decodeSchedules(
@@ -124,49 +176,21 @@ namespace synthese
 			{
 				throw LoadException<ContinuousServiceTableSync>(rows, ContinuousServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size");
 			}
-
-			cs->setServiceNumber(serviceNumber);
-			cs->setRange(range);
-			cs->setMaxWaitingTime(maxWaitingTime);
-			cs->setPathId(pathId);
-			RuleUser::Rules rules(RuleUser::GetEmptyRules());
-
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				Path* path(JourneyPatternTableSync::GetEditable(pathId, env, linkLevel).get());
-				assert (path);
-	//			assert (path->getEdges ().size () == arrivalSchedules.size ());
-
-				util::RegistryKeyType bikeComplianceId(
-					rows->getLongLong (ContinuousServiceTableSync::COL_BIKE_USE_RULE)
-				);
-				util::RegistryKeyType handicappedComplianceId(
-					rows->getLongLong (ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE)
-				);
-				util::RegistryKeyType pedestrianComplianceId(
-					rows->getLongLong (ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE)
-				);
-
-				if(bikeComplianceId > 0)
-				{
-					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get();
-				}
-				if(handicappedComplianceId > 0)
-				{
-					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
-				}
-				if(pedestrianComplianceId > 0)
-				{
-					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get();
-				}
-
-				path->addService (cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+			if(	cs->getPath() &&
+				cs->getPath()->getEdges().size() != cs->getArrivalSchedules(false).size()
+			){
+				throw LoadException<ContinuousServiceTableSync>(rows, ContinuousServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");
 			}
-			cs->setRules(rules);
 
-			// After path linking to update path calendar
+			// Calendar
 			cs->setFromSerializedString(rows->getText(ContinuousServiceTableSync::COL_DATES));
-			cs->updatePathCalendar();
+
+			// Registration in path
+			if(path)
+			{
+				path->addService (cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+				cs->updatePathCalendar();
+			}
 		}
 
 		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Unlink(

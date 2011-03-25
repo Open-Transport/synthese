@@ -58,7 +58,7 @@ namespace synthese
 
 		ParametersMap WebPageDisplayFunction::_getParametersMap() const
 		{
-			ParametersMap map(_aditionnalParameters);
+			ParametersMap map(_savedParameters);
 			if(_page.get())
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
@@ -69,16 +69,6 @@ namespace synthese
 		void WebPageDisplayFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_FunctionWithSite::_setFromParametersMap(map);
-
-			BOOST_FOREACH(const ParametersMap::Map::value_type& it, map.getMap())
-			{
-				if(	it.first != Request::PARAMETER_FUNCTION &&
-					it.first != Request::PARAMETER_ACTION &&
-					(it.first.size() < Action_PARAMETER_PREFIX.size() || it.first.substr(0, Action_PARAMETER_PREFIX.size()) != Action_PARAMETER_PREFIX)
-				){
-					_aditionnalParameters.insert(it.first, it.second);
-				}
-			}
 
 			if(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID))
 			{
@@ -102,6 +92,7 @@ namespace synthese
 				{
 					throw RequestException("Smart URL and site, or page ID must be specified");
 				}
+				_savedParameters.remove(PARAMETER_SMART_URL);
 
 				_page = Env::GetOfficialEnv().getSPtr(getSite()->getPageBySmartURL(_smartURL));
 				if(!_page.get())
@@ -120,9 +111,9 @@ namespace synthese
 						throw Request::NotFoundException();
 					}
 
-					_aditionnalParameters.insert(_page->getSmartURLDefaultParameterName(), paths[1]);
+					_savedParameters.insert(_page->getSmartURLDefaultParameterName(), paths[1]);
 				}
-				_aditionnalParameters.insert(PARAMETER_PAGE_ID, _page->getKey());
+				_savedParameters.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
 
 			_useTemplate = map.getDefault<bool>(PARAMETER_USE_TEMPLATE, true);
@@ -142,9 +133,8 @@ namespace synthese
 					stringstream url;
 					url << "http://" << request.getHostName() << _page->getSmartURLPath();
 
-					ParametersMap pm(_aditionnalParameters);
+					ParametersMap pm(_savedParameters);
 					pm.remove(PARAMETER_PAGE_ID);
-					pm.remove(PARAMETER_SMART_URL);
 					pm.remove(FunctionWithSiteBase::PARAMETER_SITE);
 					string parameters(pm.getURI());
 					if(!parameters.empty())
@@ -167,7 +157,7 @@ namespace synthese
 				}
 				else
 				{
-					_page->display(stream, request, _aditionnalParameters);
+					_page->display(stream, request, request.getFunction()->getSavedParameters());
 				}
 			}
 		}
@@ -205,5 +195,14 @@ namespace synthese
 		{
 
 		}
-	}
-}
+
+
+
+		void WebPageDisplayFunction::addParameters( const server::ParametersMap& value )
+		{
+			BOOST_FOREACH(const ParametersMap::Map::value_type& param, value.getMap())
+			{
+				_savedParameters.insert(param.first, param.second);
+			}
+		}
+}	}

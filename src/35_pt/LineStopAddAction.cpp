@@ -36,6 +36,10 @@
 #include "CityTableSync.h"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "LineArea.hpp"
+#include "DRTArea.hpp"
+#include "DRTAreaTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -59,9 +63,10 @@ namespace synthese
 		const string LineStopAddAction::PARAMETER_RANK = Action_PARAMETER_PREFIX + "rk";
 		const string LineStopAddAction::PARAMETER_ROUTE_ID = Action_PARAMETER_PREFIX + "id";
 		const string LineStopAddAction::PARAMETER_METRIC_OFFSET = Action_PARAMETER_PREFIX + "mo";
+		const string LineStopAddAction::PARAMETER_AREA = Action_PARAMETER_PREFIX + "ar";
 
-		
-		
+
+
 		ParametersMap LineStopAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -69,6 +74,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_CITY_NAME, _stop->getConnectionPlace()->getCity()->getName());
 				map.insert(PARAMETER_STOP_NAME, _stop->getConnectionPlace()->getName());
+			}
+			if(_area.get())
+			{
+				map.insert(PARAMETER_AREA, _area->getKey());
 			}
 			if(_route.get())
 			{
@@ -92,29 +101,48 @@ namespace synthese
 				throw ActionException("No such line");
 			}
 
-			GeographyModule::CityList cities(GeographyModule::GuessCity(map.get<string>(PARAMETER_CITY_NAME), 1));
-			if(cities.empty())
-			{
-				throw ActionException("City not found");
-			}
-			shared_ptr<City> city(CityTableSync::GetEditable(cities.front()->getKey(), *_env));
+			if(	map.getOptional<string>(PARAMETER_CITY_NAME) &&
+				map.getOptional<string>(PARAMETER_STOP_NAME)
+			){
+				GeographyModule::CityList cities(GeographyModule::GuessCity(map.get<string>(PARAMETER_CITY_NAME), 1));
+				if(cities.empty())
+				{
+					throw ActionException("City not found");
+				}
+				shared_ptr<City> city(CityTableSync::GetEditable(cities.front()->getKey(), *_env));
 
-			const string place(map.get<string>(PARAMETER_STOP_NAME));
-			vector<shared_ptr<StopArea> > stops(
-				cities.front()->search<StopArea>(place, 1)
-			);
-			if(stops.empty())
-			{
-				throw ActionException("Place not found");
-			}
-			shared_ptr<StopArea> stop(StopAreaTableSync::GetEditable(stops.front()->getKey(), *_env));
-			StopPointTableSync::Search(*_env, stop->getKey());
+				const string place(map.get<string>(PARAMETER_STOP_NAME));
+				vector<shared_ptr<StopArea> > stops(
+					cities.front()->search<StopArea>(place, 1)
+				);
+				if(stops.empty())
+				{
+					throw ActionException("Place not found");
+				}
+				shared_ptr<StopArea> stop(StopAreaTableSync::GetEditable(stops.front()->getKey(), *_env));
+				StopPointTableSync::Search(*_env, stop->getKey());
 
-			if(stop->getPhysicalStops().empty())
-			{
-				throw ActionException("Commercial stop without physical stop");
+				if(stop->getPhysicalStops().empty())
+				{
+					throw ActionException("Commercial stop without physical stop");
+				}
+				_stop = const_pointer_cast<StopPoint>(_env->getSPtr(stop->getPhysicalStops().begin()->second));
 			}
-			_stop = const_pointer_cast<StopPoint>(_env->getSPtr(stop->getPhysicalStops().begin()->second));
+			else if(map.getOptional<RegistryKeyType>(PARAMETER_AREA))
+			{
+				try
+				{
+					_area = DRTAreaTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_AREA), *_env);
+				}
+				catch(ObjectNotFoundException<DRTArea>&)
+				{
+					throw ActionException("No such area");
+				}
+			}
+			else
+			{
+				throw ActionException("The place must be specified");
+			}
 
 			_rank = map.getOptional<size_t>(PARAMETER_RANK) ?
 				map.get<size_t>(PARAMETER_RANK) : _route->getEdges().size();
@@ -137,13 +165,34 @@ namespace synthese
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			//_object->setAttribute(_value);
 			
-			LineStop lineStop;
-			lineStop.setFromVertex(_stop.get());
-			lineStop.setLine(_route.get());
-			lineStop.setRankInPath(_rank);
-			lineStop.setMetricOffset(_metricOffset);
-
-			LineStopTableSync::InsertStop(lineStop);
+			if(_stop.get())
+			{
+				DesignatedLinePhysicalStop lineStop(
+					0,
+					_route.get(),
+					_rank,
+					true,
+					true,
+					_metricOffset,
+					_stop.get(),
+					true
+				);
+				LineStopTableSync::InsertStop(lineStop);
+			}
+			if(_area.get())
+			{
+				LineArea lineStop(
+					0,
+					_route.get(),
+					_rank,
+					true,
+					true,
+					_metricOffset,
+					_area.get(),
+					true
+				);
+				LineStopTableSync::InsertStop(lineStop);
+			}
 
 			//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}

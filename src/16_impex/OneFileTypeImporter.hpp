@@ -24,6 +24,7 @@
 #define SYNTHESE_impex_OneFileTypeImporter_hpp__
 
 #include "Importer.hpp"
+#include <boost/algorithm/string/split.hpp>
 
 namespace synthese
 {
@@ -56,8 +57,10 @@ namespace synthese
 			virtual server::ParametersMap _getParametersMap() const { return server::ParametersMap(); }
 
 		public:
-			OneFileTypeImporter(const DataSource& dataSource):
-				Importer(dataSource)
+			OneFileTypeImporter(
+				util::Env& env,
+				const DataSource& dataSource
+			):	Importer(env, dataSource)
 			{}
 			
 
@@ -65,14 +68,16 @@ namespace synthese
 				const server::ParametersMap& map,
 				bool doImport
 			){
-				boost::tokenizer<boost::char_separator<char> > pathsTokens(
-					map.get<std::string>(PARAMETER_PATH),
-					boost::char_separator<char>(",")
-				);
-				BOOST_FOREACH(const std::string& token, pathsTokens)
+				if(map.getOptional<std::string>(PARAMETER_PATH))
 				{
-					if(token.empty()) continue;
-					_pathsSet.insert(token);
+					std::vector<std::string> pathsVector;
+					std::string path(map.get<std::string>(PARAMETER_PATH));
+					boost::algorithm::split(pathsVector, path, boost::is_any_of(","));
+					BOOST_FOREACH(const std::string& token, pathsVector)
+					{
+						if(token.empty()) continue;
+						_pathsSet.insert(token);
+					}
 				}
 				_setFromParametersMap(map);
 			}

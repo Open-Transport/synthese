@@ -232,16 +232,17 @@ namespace synthese
 		}
 		
 		AdminInterfaceElement::PageLinks RoadJourneyPlannerAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			if(moduleKey == RoadJourneyPlannerModule::FACTORY_KEY && request.getUser() &&
+			if(	dynamic_cast<const RoadJourneyPlannerModule*>(&module) &&
+				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser()))
 			{
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}

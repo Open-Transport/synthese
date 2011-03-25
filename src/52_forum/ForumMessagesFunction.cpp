@@ -90,6 +90,7 @@ namespace synthese
 				{
 					throw RequestException("No such display template");
 				}
+				_savedParameters.remove(PARAMETER_DISPLAY_TEMPLATE);
 			}{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_DATE_DISPLAY_TEMPLATE));
 				if(id) try
@@ -100,6 +101,7 @@ namespace synthese
 				{
 					throw RequestException("No such date display template");
 				}
+				_savedParameters.remove(PARAMETER_DATE_DISPLAY_TEMPLATE);
 			}
 		}
 

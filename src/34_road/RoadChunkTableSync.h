@@ -81,7 +81,6 @@ namespace synthese
 			*/
 			static const std::string COL_CROSSING_ID;
 			static const std::string COL_RANKINPATH;
-			static const std::string COL_GEOMETRY;
 			static const std::string COL_ROADID ;  // NU
 			static const std::string COL_METRICOFFSET;  // U ??
 			static const std::string COL_LEFT_START_HOUSE_NUMBER;
@@ -108,27 +107,7 @@ namespace synthese
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Search of road chunks by maximal distance from a point.
-			/// @param point point from where calculate the distance
-			/// @param distanceLimit maximal distance
-			/// @param linkLevel level of link
-			///	@return Found road chunks objects
-			///	@author Hugues Romain
-			///	@date 2010
-			/// @since 3.2.0
-			//////////////////////////////////////////////////////////////////////////
-			/// The official environment is used.
-			static RoadChunkTableSync::SearchResult SearchByMaxDistance(
-				const geos::geom::Point& point,
-				double distanceLimit,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
-			);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_RoadChunkTableSync_H__

@@ -275,18 +275,18 @@ namespace synthese
 		}
 
 		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPagesOfModule(
-			const std::string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == MessagesModule::FACTORY_KEY &&
+			if(	dynamic_cast<const MessagesModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}
@@ -306,7 +306,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, folders)
 			{
 				shared_ptr<MessagesLibraryAdmin> p(
-					getNewOtherPage<MessagesLibraryAdmin>()
+					getNewPage<MessagesLibraryAdmin>()
 				);
 				p->setFolder(cfolder);
 				links.push_back(p);
@@ -321,7 +321,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, scenarios)
 			{
 				shared_ptr<MessagesScenarioAdmin> p(
-					getNewOtherPage<MessagesScenarioAdmin>()
+					getNewPage<MessagesScenarioAdmin>()
 				);
 				p->setScenario(tpl);
 				links.push_back(p);

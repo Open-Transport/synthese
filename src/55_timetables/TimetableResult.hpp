@@ -35,11 +35,8 @@ namespace synthese
 	namespace pt
 	{
 		class CommercialLine;
-	}
-
-	namespace pt
-	{
 		class RollingStock;
+		class SchedulesBasedService;
 	}
 
 	namespace timetables
@@ -58,6 +55,7 @@ namespace synthese
 			typedef std::vector<TimetableColumn>			Columns;
 			typedef std::map<std::size_t, boost::shared_ptr<TimetableWarning> >		Warnings;
 			typedef std::vector<pt::CommercialLine*> RowLinesVector;
+			typedef std::vector<const pt::SchedulesBasedService*> RowServicesVector;
 			typedef std::vector<boost::shared_ptr<TimetableWarning> > RowNotesVector;
 			typedef std::vector<const pt::RollingStock*> RowRollingStockVector;
 			typedef std::vector<boost::posix_time::time_duration> RowTimesVector;
@@ -91,6 +89,7 @@ namespace synthese
 			//@{
 				RowTimesVector			getRowSchedules(std::size_t rank)	const;
 				RowLinesVector			getRowLines()								const;
+				RowServicesVector		getRowServices()							const;
 				RowNotesVector			getRowNotes()								const;
 				RowRollingStockVector	getRowRollingStock()						const;
 				RowTypeODVector			getOriginTypes()							const;

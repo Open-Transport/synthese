@@ -29,6 +29,7 @@
 #include "Request.h"
 #include "JourneyPatternTableSync.hpp"
 #include "RollingStockTableSync.h"
+#include "ImportableTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -38,7 +39,8 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+	using namespace impex;
+		
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::JourneyPatternUpdateAction>::FACTORY_KEY("JourneyPatternUpdateAction");
@@ -51,7 +53,8 @@ namespace synthese
 		const string JourneyPatternUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string JourneyPatternUpdateAction::PARAMETER_DIRECTION = Action_PARAMETER_PREFIX + "di";
 		const string JourneyPatternUpdateAction::PARAMETER_WAYBACK = Action_PARAMETER_PREFIX + "wb";
-		
+		const string JourneyPatternUpdateAction::PARAMETER_DATASOURCE_LINKS = Action_PARAMETER_PREFIX + "sl";
+
 		
 		
 		ParametersMap JourneyPatternUpdateAction::getParametersMap() const
@@ -60,10 +63,26 @@ namespace synthese
 			if(_route.get())
 			{
 				map.insert(PARAMETER_ROUTE_ID, _route->getKey());
-				map.insert(PARAMETER_NAME, _name);
-				map.insert(PARAMETER_DIRECTION, _direction);
-				map.insert(PARAMETER_WAYBACK, _wayback);
-				map.insert(PARAMETER_TRANSPORT_MODE_ID, _transportMode.get() ? _transportMode->getKey() : RegistryKeyType(0));
+			}
+			if(_name)
+			{
+				map.insert(PARAMETER_NAME, *_name);
+			}
+			if(_direction)
+			{
+				map.insert(PARAMETER_DIRECTION, *_direction);
+			}
+			if(_wayback)
+			{
+				map.insert(PARAMETER_WAYBACK, *_wayback);
+			}
+			if(_transportMode)
+			{
+				map.insert(PARAMETER_TRANSPORT_MODE_ID, _transportMode->get() ? (*_transportMode)->getKey() : RegistryKeyType(0));
+			}
+			if(_dataSourceLinks)
+			{
+				map.insert(PARAMETER_DATASOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
 			}
 			return map;
 		}
@@ -80,18 +99,40 @@ namespace synthese
 			{
 				throw ActionException("No such route");
 			}
-			_direction = map.get<string>(PARAMETER_DIRECTION);
-			_name = map.get<string>(PARAMETER_NAME);
-			_wayback = map.get<bool>(PARAMETER_WAYBACK);
 
-			optional<RegistryKeyType> rid(map.getOptional<RegistryKeyType>(PARAMETER_TRANSPORT_MODE_ID));
-			if(rid && *rid > 0)	try
+			if(map.isDefined(PARAMETER_DIRECTION))
 			{
-				_transportMode = RollingStockTableSync::GetEditable(*rid, *_env);
+				_direction = map.get<string>(PARAMETER_DIRECTION);
 			}
-			catch(ObjectNotFoundException<RollingStock>&)
+			if(map.isDefined(PARAMETER_NAME))
 			{
-				throw ActionException("No such transport mode");
+				_name = map.get<string>(PARAMETER_NAME);
+			}
+			if(map.isDefined(PARAMETER_WAYBACK))
+			{
+				_wayback = map.get<bool>(PARAMETER_WAYBACK);
+			}
+
+			if(map.isDefined(PARAMETER_TRANSPORT_MODE_ID))
+			{
+				RegistryKeyType rid(map.getDefault<RegistryKeyType>(PARAMETER_TRANSPORT_MODE_ID, 0));
+				if(rid > 0)	try
+				{
+					_transportMode	= RollingStockTableSync::GetEditable(rid, *_env);
+				}
+				catch(ObjectNotFoundException<RollingStock>&)
+				{
+					throw ActionException("No such transport mode");
+				}
+				else
+				{
+					_transportMode = shared_ptr<RollingStock>();
+				}
+			}
+
+			if(map.isDefined(PARAMETER_DATASOURCE_LINKS))
+			{
+				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(PARAMETER_DATASOURCE_LINKS), *_env);
 			}
 		}
 		
@@ -103,10 +144,26 @@ namespace synthese
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			
-			_route->setName(_name);
-			_route->setRollingStock(_transportMode.get());
-			_route->setDirection(_direction);
-			_route->setWayBack(_wayback);
+			if(_name)
+			{
+				_route->setName(*_name);
+			}
+			if(_transportMode)
+			{
+				_route->setRollingStock(_transportMode->get());
+			}
+			if(_direction)
+			{
+				_route->setDirection(*_direction);
+			}
+			if(_wayback)
+			{
+				_route->setWayBack(*_wayback);
+			}
+			if(_dataSourceLinks)
+			{
+				_route->setDataSourceLinks(*_dataSourceLinks);
+			}
 			
 			JourneyPatternTableSync::Save(_route.get());
 

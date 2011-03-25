@@ -47,7 +47,6 @@ namespace synthese
 			/// @name Parameter identifiers
 			//@{
 				static const std::string TAB_PROPERTIES;
-				static const std::string TAB_OPERATOR_CODES;
 				static const std::string TAB_LINKS;
 			//@}
 

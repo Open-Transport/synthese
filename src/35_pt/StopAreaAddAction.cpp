@@ -28,10 +28,11 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "StopAreaTableSync.hpp"
-#include "StopPointTableSync.hpp"
 #include "SQLiteTransaction.h"
 #include "CityTableSync.h"
 #include "CoordinatesSystem.hpp"
+#include "DataSourceTableSync.h"
+#include "ImportableTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -45,6 +46,7 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace geography;
+	using namespace impex;
 	
 	namespace util
 	{
@@ -57,10 +59,7 @@ namespace synthese
 		const string StopAreaAddAction::PARAMETER_CITY_ID = Action_PARAMETER_PREFIX + "ci";
 		const string StopAreaAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "sn";
 		const string StopAreaAddAction::PARAMETER_CREATE_CITY_IF_NECESSARY = Action_PARAMETER_PREFIX + "cc";
-		const string StopAreaAddAction::PARAMETER_PHYSICAL_STOP_OPERATOR_CODE = Action_PARAMETER_PREFIX + "sc";
-		const string StopAreaAddAction::PARAMETER_CREATE_PHYSICAL_STOP = Action_PARAMETER_PREFIX + "cp";
-		const string StopAreaAddAction::PARAMETER_PHYSICAL_STOP_X = Action_PARAMETER_PREFIX + "xx";
-		const string StopAreaAddAction::PARAMETER_PHYSICAL_STOP_Y = Action_PARAMETER_PREFIX + "yy";
+		const string StopAreaAddAction::PARAMETER_DATA_SOURCE_LINKS(Action_PARAMETER_PREFIX + "sl");
 		
 		
 		
@@ -76,14 +75,11 @@ namespace synthese
 				map.insert(PARAMETER_CITY_NAME, _cityName);
 			}
 			map.insert(PARAMETER_NAME, _name);
-			map.insert(PARAMETER_CREATE_PHYSICAL_STOP, _createPhysicalStop);
 			map.insert(PARAMETER_CREATE_CITY_IF_NECESSARY, _createCityIfNecessary);
-			map.insert(PARAMETER_PHYSICAL_STOP_OPERATOR_CODE, _physicalStopOperatorCode);
-			if(_point.get() && !_point->isEmpty())
-			{
-				map.insert(PARAMETER_PHYSICAL_STOP_X, _point->getX());
-				map.insert(PARAMETER_PHYSICAL_STOP_Y, _point->getY());
-			}
+			map.insert(
+				PARAMETER_DATA_SOURCE_LINKS,
+				ImportableTableSync::SerializeDataSourceLinks(_dataSourceLinks)
+			);
 			return map;
 		}
 		
@@ -111,17 +107,11 @@ namespace synthese
 			}
 
 			_name = map.get<string>(PARAMETER_NAME);
-			_physicalStopOperatorCode = map.getDefault<string>(PARAMETER_PHYSICAL_STOP_OPERATOR_CODE);
-			_createPhysicalStop = map.getDefault<bool>(PARAMETER_CREATE_PHYSICAL_STOP, false);
-			optional<double> x(map.getOptional<double>(PARAMETER_PHYSICAL_STOP_X));
-			optional<double> y(map.getOptional<double>(PARAMETER_PHYSICAL_STOP_Y));
-			if(x && y)
-			{
-				_point = 
-					CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-						*DBModule::GetStorageCoordinatesSystem().createPoint(*x, *y)
-					);
-			}
+
+			_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(
+				map.getDefault<string>(PARAMETER_DATA_SOURCE_LINKS),
+				*_env
+			);
 		}
 		
 		
@@ -139,25 +129,14 @@ namespace synthese
 			{
 				_city.reset(new City);
 				_city->setName(_cityName);
-				_city->setKey(CityTableSync::getId());
 				CityTableSync::Save(_city.get(), transaction);
 			}
 			stopArea.setCity(_city.get());
-			stopArea.setKey(StopAreaTableSync::getId());
 			stopArea.setDefaultTransferDelay(minutes(2));
-
 			stopArea.setName(_name);
+			stopArea.setDataSourceLinks(_dataSourceLinks);
 			StopAreaTableSync::Save(&stopArea, transaction);
 
-			if(_createPhysicalStop || _point.get() && !_point->isEmpty() && _point->getX() && _point->getY())
-			{
-				StopPoint stop;
-				stop.setName(_name);
-				stop.setHub(&stopArea);
-				stop.setCodeBySource(_physicalStopOperatorCode);
-				stop.setGeometry(_point);
-				StopPointTableSync::Save(&stop, transaction);
-			}
 			transaction.run();
 
 //			::AddCreationEntry(object, request.getUser().get());

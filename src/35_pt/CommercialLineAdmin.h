@@ -76,6 +76,7 @@ namespace synthese
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
 
 		public:
+			CommercialLineAdmin();
 		
 			virtual PageLinks _getCurrentTreeBranch() const;
 

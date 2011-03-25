@@ -24,6 +24,7 @@
 #include "Service.h"
 #include "UseRule.h"
 #include "Edge.h"
+#include "AccessParameters.h"
 
 using namespace boost;
 using namespace boost::posix_time;
@@ -47,6 +48,30 @@ namespace synthese
 			_userClassRank(userClassRank),
 			_originDateTime(originDateTime)
 		{}
+
+
+
+		ServicePointer::ServicePointer(
+			bool RTData,
+			size_t userClassRank,
+			const Service& service,
+			const gregorian::date& date,
+			const Edge& departureEdge,
+			const Edge& arrivalEdge
+		):	_RTData(RTData),
+			_service(&service),
+			_range(posix_time::seconds(0)),
+			_departureEdge(NULL),
+			_realTimeDepartureVertex(NULL),
+			_arrivalEdge(NULL),
+			_realTimeArrivalVertex(NULL),
+			_userClassRank(userClassRank),
+			_originDateTime(ptime(date, service.getDepartureSchedule(RTData, 0)))
+		{
+			AccessParameters ap(userClassRank+ USER_CLASS_CODE_OFFSET);
+			_service->completeServicePointer(*this, arrivalEdge, ap);
+			_service->completeServicePointer(*this, departureEdge, ap);
+		}
 
 
 

@@ -374,18 +374,18 @@ namespace synthese
 		}
 
 		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPagesOfModule(
-			const string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == MessagesModule::FACTORY_KEY &&
+			if(	dynamic_cast<const MessagesModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}
@@ -419,7 +419,7 @@ namespace synthese
 				dynamic_cast<const SentAlarm*>(ma->getAlarm().get())
 			){
 				shared_ptr<MessagesScenarioAdmin> p(
-					getNewOtherPage<MessagesScenarioAdmin>()
+					getNewPage<MessagesScenarioAdmin>()
 				);
 				p->setScenario(
 					SentScenarioInheritedTableSync::GetEditable(

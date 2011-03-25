@@ -30,7 +30,8 @@
 #include "HTMLModule.h"
 #include "StopPoint.hpp"
 #include "JourneyPattern.hpp"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "LineArea.hpp"
 #include "LineStopTableSync.h"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
@@ -56,6 +57,9 @@
 #include "City.h"
 #include "LineStopUpdateAction.hpp"
 #include "ServiceRemoveAction.h"
+#include "ImportableAdmin.hpp"
+#include "DRTAreaAdmin.hpp"
+#include "DRTArea.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -74,7 +78,7 @@ namespace synthese
 	using namespace html;
 	using namespace security;
 	using namespace graph;
-	using namespace pt;
+	using namespace impex;
 	
 
 	namespace util
@@ -168,21 +172,11 @@ namespace synthese
 			{
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(_request);
 				AdminFunctionRequest<PTPlacesAdmin> openCityRequest(_request);
+				AdminFunctionRequest<DRTAreaAdmin> openDRTAreaRequest(_request);
 				
 				// Reservation
 // 				bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
-				LineStopTableSync::SearchResult lineStops(
-					LineStopTableSync::Search(
-						Env::GetOfficialEnv(),
-						_line->getKey(),
-						optional<RegistryKeyType>(),
-						0,
-						optional<size_t>(),
-						true,
-						true,
-						UP_LINKS_LOAD_LEVEL
-				)	);
-
+				
 				AdminActionFunctionRequest<LineStopRemoveAction,JourneyPatternAdmin> lineStopRemoveAction(_request);
 				
 				AdminActionFunctionRequest<LineStopAddAction,JourneyPatternAdmin> lineStopAddAction(_request);
@@ -211,61 +205,118 @@ namespace synthese
 				}
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<LineStop> lineStop, lineStops)
+				BOOST_FOREACH(const Edge* edge, _line->getEdges())
 				{
-					lineStopRemoveAction.getAction()->setLineStop(const_pointer_cast<const LineStop>(lineStop));
-					lineStopUpdateAction.getAction()->setLineStop(lineStop);
+					shared_ptr<const DesignatedLinePhysicalStop> linePhysicalStop(
+						dynamic_cast<const DesignatedLinePhysicalStop*>(edge) ?
+						Env::GetOfficialEnv().getSPtr(static_cast<const DesignatedLinePhysicalStop*>(edge)) :
+						shared_ptr<const DesignatedLinePhysicalStop>()
+					);
+					shared_ptr<const LineArea> lineArea(
+						dynamic_cast<const LineArea*>(edge) ?
+						Env::GetOfficialEnv().getSPtr(static_cast<const LineArea*>(edge)) :
+						shared_ptr<const LineArea>()
+					);
+					shared_ptr<const LineStop> lineStop(
+						linePhysicalStop.get() ?
+						static_pointer_cast<const LineStop, const LinePhysicalStop>(linePhysicalStop) :
+						static_pointer_cast<const LineStop, const LineArea>(lineArea)
+					);
+						
+					lineStopRemoveAction.getAction()->setLineStop(lineStop);
+					lineStopUpdateAction.getAction()->setLineStop(const_pointer_cast<LineStop>(lineStop));
 
-					openPlaceRequest.getPage()->setConnectionPlace(
-						Env::GetOfficialEnv().getSPtr(lineStop->getPhysicalStop()->getConnectionPlace())
-					);
-					openCityRequest.getPage()->setCity(
-						Env::GetOfficialEnv().getSPtr(lineStop->getPhysicalStop()->getConnectionPlace()->getCity())
-					);
+					if(linePhysicalStop.get())
+					{
+						openPlaceRequest.getPage()->setConnectionPlace(
+							Env::GetOfficialEnv().getSPtr(linePhysicalStop->getPhysicalStop()->getConnectionPlace())
+						);
+						openCityRequest.getPage()->setCity(
+							Env::GetOfficialEnv().getSPtr(linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getCity())
+						);
+					}
+
+					if(lineArea.get())
+					{
+						openDRTAreaRequest.getPage()->setArea(
+							Env::GetOfficialEnv().getSPtr(lineArea->getArea())
+						);
+					}
+
 					stream << t.row();
 					stream << t.col() << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(lineStop->getRankInPath()), optional<size_t>());
 					stream << t.col() << lineStop->getRankInPath();
 
-					stream << t.col() << HTMLModule::getHTMLLink(
-						openCityRequest.getURL(),
-						lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName()
-					);
+					if(linePhysicalStop.get())
+					{
+						stream << t.col() << HTMLModule::getHTMLLink(
+							openCityRequest.getURL(),
+							linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName()
+						);
 
-					stream << t.col() << HTMLModule::getHTMLLink(
-						openPlaceRequest.getURL(),
-						lineStop->getPhysicalStop()->getConnectionPlace()->getName()
-					);
+						stream << t.col() << HTMLModule::getHTMLLink(
+							openPlaceRequest.getURL(),
+							linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getName()
+						);
 
-					// Physical stop
-					stream << t.col();
-/*					HTMLForm f2(lineStopUpdateAction.getHTMLForm("quay"+lexical_cast<string>(lineStop->getRankInPath())));
-					stream << f2.open();
-					stream << f2.getSelectInput(
+						// Physical stop
+						stream << t.col();
+						/*					HTMLForm f2(lineStopUpdateAction.getHTMLForm("quay"+lexical_cast<string>(lineStop->getRankInPath())));
+						stream << f2.open();
+						stream << f2.getSelectInput(
 						LineStopUpdateAction::PARAMETER_PHYSICAL_STOP_ID,
 						lineStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStopLabels(),
 						optional<RegistryKeyType>(lineStop->getPhysicalStop()->getKey())
-					);
-					stream << f2.getSubmitButton("OK");
-					stream << f2.close();
-*/
-					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& ps, lineStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStops())
-					{
-						if(ps.second == lineStop->getPhysicalStop())
-						{
-							stream << "[";
-						}
-						lineStopUpdateAction.getAction()->setPhysicalStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<StopPoint*>(ps.second)));
-						stream << HTMLModule::getHTMLLink(
-							lineStopUpdateAction.getHTMLForm().getURL(),
-							ps.second->getName().empty() ? lexical_cast<string>(ps.second->getKey()) : ps.second->getName()
 						);
-						lineStopUpdateAction.getAction()->setPhysicalStop(shared_ptr<StopPoint>());
-
-						if(ps.second == lineStop->getPhysicalStop())
+						stream << f2.getSubmitButton("OK");
+						stream << f2.close();
+						*/
+						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& ps, linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStops())
 						{
-							stream << "]";
+							if(ps.second == linePhysicalStop->getPhysicalStop())
+							{
+								stream << "[";
+							}
+							lineStopUpdateAction.getAction()->setPhysicalStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<StopPoint*>(ps.second)));
+							stream << HTMLModule::getHTMLLink(
+								lineStopUpdateAction.getHTMLForm().getURL(),
+								ps.second->getName().empty() ? lexical_cast<string>(ps.second->getKey()) : ps.second->getName()
+							);
+							lineStopUpdateAction.getAction()->setPhysicalStop(shared_ptr<StopPoint>());
+
+							if(ps.second == linePhysicalStop->getPhysicalStop())
+							{
+								stream << "]";
+							}
+							stream << " ";
 						}
-						stream << " ";
+					}
+
+					if(lineArea.get())
+					{
+						stream << t.col();
+
+						stream << HTMLModule::getHTMLImage(DRTAreaAdmin::ICON, "Zone TAD");
+
+						stream << HTMLModule::getHTMLLink(
+							openDRTAreaRequest.getURL(),
+							lineArea->getArea()->getName()
+						);
+
+						stream << t.col(2);
+						stream << "Desserte interne : ";
+						AdminActionFunctionRequest<LineStopUpdateAction,JourneyPatternAdmin> internalUpdateRequest(_request);
+						internalUpdateRequest.getAction()->setLineStop(const_pointer_cast<LineStop>(lineStop));
+						if(lineArea->getInternalService())
+						{
+							internalUpdateRequest.getAction()->setAllowedInternal(false);
+							stream << "[OUI] " << HTMLModule::getHTMLLink(internalUpdateRequest.getURL(), "NON");
+						}
+						else
+						{
+							internalUpdateRequest.getAction()->setAllowedInternal(true);
+							stream << HTMLModule::getHTMLLink(internalUpdateRequest.getURL(), "OUI") << " [NON]";
+						}
 					}
 
 
@@ -275,7 +326,7 @@ namespace synthese
 						t.col() <<
 						HTMLModule::getHTMLLink(
 							lineStopUpdateAction.getHTMLForm().getURL(),
-							(lineStop->isArrival() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"))
+							(lineStop->isArrivalAllowed() ? HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") : HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible"))
 						);
 					lineStopUpdateAction.getAction()->setAllowedArrival(optional<bool>());
 
@@ -285,11 +336,22 @@ namespace synthese
 						t.col() <<
 						HTMLModule::getHTMLLink(
 							lineStopUpdateAction.getHTMLForm().getURL(),
-							(lineStop->isDeparture() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"))
+							(lineStop->isDepartureAllowed() ? HTMLModule::getHTMLImage("bullet_green.png", "Départ possible") : HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible"))
 						);
 					lineStopUpdateAction.getAction()->setAllowedDeparture(optional<bool>());
 
-					stream << t.col() << (lineStop->getScheduleInput() ? HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") : HTMLModule::getHTMLImage("tree_vert.png", "Houraire non fourni à cet arrêt"));
+					// Scheduled stop
+					stream << t.col();
+					if(	lineArea.get() ||
+						linePhysicalStop.get() && linePhysicalStop->getScheduleInput()
+					){
+						stream << HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt");
+					}
+					else
+					{
+						stream << HTMLModule::getHTMLImage("ftv2vertline.png", "Houraire non fourni à cet arrêt");
+					}
+
 // 					if (reservation)
 // 						stream << t.col() << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire au départ de cet arrêt");
 					stream << t.col() << HTMLModule::getLinkButton(lineStopRemoveAction.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
@@ -298,15 +360,17 @@ namespace synthese
 				if(sservices.empty() && cservices.empty())
 				{
 					stream << t.row();
-					stream << t.col() << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(_line->getEdges().size()), optional<size_t>());
-					stream << t.col() << _line->getEdges().size();
+					stream << t.col(1,string(),false,string(),2) << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(_line->getEdges().size()), optional<size_t>());
+					stream << t.col(1,string(),false,string(),2) << _line->getEdges().size();
 					stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_CITY_NAME, string(), "(localité)");
 					stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_STOP_NAME, string(), "(arrêt)");
-					stream << t.col();
-					stream << t.col();
-					stream << t.col();
-					stream << t.col();
-					stream << t.col() << f.getSubmitButton("Ajouter");
+					stream << t.col(1,string(),false,string(),2);
+					stream << t.col(1,string(),false,string(),2);
+					stream << t.col(1,string(),false,string(),2);
+					stream << t.col(1,string(),false,string(),2);
+					stream << t.col(1,string(),false,string(),2) << f.getSubmitButton("Ajouter");
+					stream << t.row();
+					stream << t.col(2) << "ou zone TAD n°" << f.getTextInput(LineStopAddAction::PARAMETER_AREA, string());
 				}
 
 				stream << t.close();
@@ -511,6 +575,10 @@ namespace synthese
 				stream << p.close();
 
 				PTRuleUserAdmin<JourneyPattern,JourneyPatternAdmin>::Display(stream, _line, _request);
+
+				StaticActionRequest<JourneyPatternUpdateAction> updateOnlyRequest(_request);
+				updateOnlyRequest.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
+				ImportableAdmin::DisplayDataSourcesTab(stream, *_line, updateOnlyRequest);
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -531,13 +599,23 @@ namespace synthese
 				BOOST_FOREACH(const Path::Edges::value_type& edge, _line->getEdges())
 				{
 					const LineStop& lineStop(dynamic_cast<const LineStop&>(*edge));
+					const DesignatedLinePhysicalStop* linePhysicalStop(dynamic_cast<const DesignatedLinePhysicalStop*>(edge));
+					const LineArea* lineArea(dynamic_cast<const LineArea*>(edge));
 					lineStop.getDepartureFromIndex(false,0);
 					lineStop.getDepartureFromIndex(true,0);
 
 					if(lineStop.isArrival())
 					{
 						stream << t.row();
-						stream << t.col(1, string(), true) << lineStop.getPhysicalStop()->getConnectionPlace()->getFullName();
+						stream << t.col(1, string(), true);
+						if(linePhysicalStop)
+						{
+							stream << linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+						}
+						if(lineArea)
+						{
+							stream << lineArea->getArea()->getName();
+						}
 						stream << t.col(1, string(), true) << "A";
 
 						BOOST_FOREACH(const Edge::ArrivalServiceIndices::value_type& index, lineStop.getArrivalIndices())
@@ -560,7 +638,15 @@ namespace synthese
 					if(lineStop.isDeparture())
 					{
 						stream << t.row();
-						stream << t.col(1, string(), true) << lineStop.getPhysicalStop()->getConnectionPlace()->getFullName();
+						stream << t.col(1, string(), true);
+						if(linePhysicalStop)
+						{
+							stream << linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+						}
+						if(lineArea)
+						{
+							stream << lineArea->getArea()->getName();
+						}
 						stream << t.col(1, string(), true) << "D";
 
 						BOOST_FOREACH(const Edge::DepartureServiceIndices::value_type& index, lineStop.getDepartureIndices())
@@ -660,7 +746,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<const ScheduledService> service, services)
 				{
 					shared_ptr<ServiceAdmin> p(
-						getNewOtherPage<ServiceAdmin>()
+						getNewPage<ServiceAdmin>()
 					);
 					p->setService(service);
 					links.push_back(p);
@@ -671,7 +757,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<const ContinuousService> service, cservices)
 				{
 					shared_ptr<ServiceAdmin> p(
-						getNewOtherPage<ServiceAdmin>()
+						getNewPage<ServiceAdmin>()
 					);
 					p->setService(service);
 					links.push_back(p);
@@ -686,7 +772,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks JourneyPatternAdmin::_getCurrentTreeBranch() const
 		{
 			shared_ptr<CommercialLineAdmin> p(
-				getNewOtherPage<CommercialLineAdmin>()
+				getNewPage<CommercialLineAdmin>()
 			);
 			p->setCommercialLine(Env::GetOfficialEnv().getSPtr(_line->getCommercialLine()));
 

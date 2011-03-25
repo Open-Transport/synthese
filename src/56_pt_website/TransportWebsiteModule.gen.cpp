@@ -10,15 +10,10 @@ synthese::pt_website::UserFavoriteJourneyTableSync::integrate();
 
 synthese::pt_website::TransportWebsiteModule::integrate();
 
-synthese::pt_website::PlacesListRequestFunction::integrate();
-synthese::pt_website::UserFavoriteListInterfaceElement::integrate();
-
-synthese::pt_website::UserFavoriteInterfacePage::integrate();
-
-synthese::pt_website::CityListRequestFunction::integrate();
 synthese::pt_website::CityListFunction::integrate();
 synthese::pt_website::PlacesListFunction::integrate();
 synthese::pt_website::ServiceInformationsFunction::integrate();
+synthese::pt_website::UserBookmarksService::integrate();
 
 synthese::pt_website::SiteUpdateAction::integrate();
 synthese::pt_website::AddUserFavoriteJourneyAction::integrate();

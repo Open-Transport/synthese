@@ -80,8 +80,8 @@ namespace synthese
 			RegistryKeyType dataSourceId(map.get<RegistryKeyType>(PARAMETER_DATA_SOURCE));
 			try
 			{
-				shared_ptr<const DataSource> dataSource(Env::GetOfficialEnv().get<DataSource>(dataSourceId));
-				_importer = dataSource->getImporter();
+				shared_ptr<const DataSource> dataSource(DataSourceTableSync::Get(dataSourceId, *_env));
+				_importer = dataSource->getImporter(*_env);
 				_importer->setFromParametersMap(map, true);
 				
 				stringstream output;

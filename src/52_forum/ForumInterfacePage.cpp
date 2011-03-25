@@ -22,8 +22,6 @@
 
 #include "ForumInterfacePage.hpp"
 #include "DateTimeInterfacePage.h"
-#include "WebPageDisplayFunction.h"
-#include "StaticFunctionRequest.h"
 #include "ForumMessageTableSync.hpp"
 #include "ForumTopicTableSync.hpp"
 #include "Webpage.h"
@@ -67,15 +65,7 @@ namespace synthese
 			const ForumTopic& topic,
 			std::size_t rank
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(Env::GetOfficialEnv().getSPtr(&page));
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
-
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 			
 			Env env;
 			ForumMessageTableSync::SearchResult messages(
@@ -139,8 +129,7 @@ namespace synthese
 			pm.insert(DATA_RANK, rank);
 			pm.insert(DATA_RANK_IS_ODD, rank % 2);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page.display(stream, request, pm);
 		}
 
 
@@ -153,14 +142,7 @@ namespace synthese
 			const ForumMessage& message,
 			std::size_t rank
 		){
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(Env::GetOfficialEnv().getSPtr(&page));
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(Request::PARAMETER_OBJECT_ID, message.getKey());
 			if(message.getTopic())
@@ -198,8 +180,7 @@ namespace synthese
 			pm.insert(DATA_RANK, rank);
 			pm.insert(DATA_RANK_IS_ODD, rank % 1);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			page.display(stream, request, pm);
 		}
 	}
 }

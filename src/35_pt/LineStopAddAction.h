@@ -34,6 +34,7 @@ namespace synthese
 	{
 		class JourneyPattern;
 		class StopPoint;
+		class DRTArea;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : Adds a stop into a route.
@@ -72,10 +73,12 @@ namespace synthese
 			static const std::string PARAMETER_CITY_NAME;
 			static const std::string PARAMETER_STOP_NAME;
 			static const std::string PARAMETER_METRIC_OFFSET;
+			static const std::string PARAMETER_AREA;
 
 		private:
 			boost::shared_ptr<JourneyPattern> _route;
 			boost::shared_ptr<StopPoint> _stop;
+			boost::shared_ptr<DRTArea> _area;
 			std::size_t _rank;
 			double _metricOffset;
 

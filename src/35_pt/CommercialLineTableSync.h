@@ -35,7 +35,7 @@
 #include "SQLiteRegistryTableSyncTemplate.h"
 
 // Security
-#include "12_security/Types.h"
+#include "SecurityTypes.hpp"
 
 #include <boost/optional.hpp>
 

@@ -152,7 +152,7 @@ namespace synthese
 			){
 				BOOST_FOREACH(Path* road, _roadPlace->getPaths())
 				{
-					shared_ptr<PTRoadAdmin> p(getNewOtherPage<PTRoadAdmin>());
+					shared_ptr<PTRoadAdmin> p(getNewPage<PTRoadAdmin>());
 					p->setRoad(Env::GetOfficialEnv().getSPtr(static_cast<Road*>(road)));
 					links.push_back(p);
 				}
@@ -173,11 +173,11 @@ namespace synthese
 		{
 			PageLinks links;
 
-			links.push_back(getNewOtherPage<PTCitiesAdmin>());
-			shared_ptr<PTPlacesAdmin> p(getNewOtherPage<PTPlacesAdmin>());
+			links.push_back(getNewPage<PTCitiesAdmin>());
+			shared_ptr<PTPlacesAdmin> p(getNewPage<PTPlacesAdmin>());
 			p->setCity(Env::GetOfficialEnv().getSPtr(_roadPlace->getCity()));
 			links.push_back(p);
-			links.push_back(getNewPage());
+			links.push_back(getNewCopiedPage());
 
 			return links;
 		}

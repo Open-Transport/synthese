@@ -193,18 +193,18 @@ namespace synthese
 
 
 		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPagesOfModule(
-			const string& moduleKey,
+			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			
-			if(	moduleKey == ResaModule::FACTORY_KEY &&
+			if(	dynamic_cast<const ResaModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser())
 			){
-				links.push_back(getNewPage());
+				links.push_back(getNewCopiedPage());
 			}
 			return links;
 		}
@@ -223,7 +223,7 @@ namespace synthese
 			if(ra)
 			{
 				shared_ptr<ResaCustomerAdmin> p(
-					getNewOtherPage<ResaCustomerAdmin>()
+					getNewPage<ResaCustomerAdmin>()
 				);
 				p->setUser(ra->getUser());
 				

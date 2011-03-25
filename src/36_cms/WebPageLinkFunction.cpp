@@ -47,16 +47,18 @@ namespace synthese
 		const string WebPageLinkFunction::PARAMETER_TARGET("target");
 		const string WebPageLinkFunction::PARAMETER_TEXT("text");
 		const string WebPageLinkFunction::PARAMETER_USE_SMART_URL("use_smart_url");
+		const string WebPageLinkFunction::PARAMETER_CONFIRM("confirm");
 		
 		ParametersMap WebPageLinkFunction::_getParametersMap() const
 		{
-			ParametersMap map(_otherParameters);
+			ParametersMap map;
 			if(_target.get())
 			{
 				map.insert(PARAMETER_TARGET, _target->getKey());
 			}
 			map.insert(PARAMETER_TEXT, _text);
 			map.insert(PARAMETER_USE_SMART_URL, _useSmartURL);
+			map.insert(PARAMETER_CONFIRM, _confirm);
 			return map;
 		}
 
@@ -74,11 +76,13 @@ namespace synthese
 			}
 			optional<string> ot(map.getOptional<string>(PARAMETER_TEXT));
 			_text = ot ? *ot : _target->getName();
-			_otherParameters = map;
-			_otherParameters.remove(PARAMETER_TARGET);
-			_otherParameters.remove(PARAMETER_TEXT);
-			_otherParameters.remove(Request::PARAMETER_FUNCTION);
+			_savedParameters.remove(PARAMETER_TARGET);
+			_savedParameters.remove(PARAMETER_TEXT);
+			_savedParameters.remove(PARAMETER_CONFIRM);
+			_savedParameters.remove(PARAMETER_USE_SMART_URL);
 			_useSmartURL = map.getDefault<bool>(PARAMETER_USE_SMART_URL, true);
+
+			_confirm = map.getDefault<string>(PARAMETER_CONFIRM);
 		}
 
 
@@ -104,14 +108,14 @@ namespace synthese
 			{	// Classic URL
 				StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
 				openRequest.getFunction()->setPage(_target);
-				openRequest.getFunction()->setAditionnalParametersMap(_otherParameters);
+				openRequest.getFunction()->addParameters(_savedParameters);
 				if(!_target->getRoot()->getClientURL().empty())
 				{
 					openRequest.setClientURL(_target->getRoot()->getClientURL());
 				}
 				url = openRequest.getURL();
 			}
-			stream << HTMLModule::getHTMLLink(url, _text);
+			stream << HTMLModule::getHTMLLink(url, _text, _confirm);
 		}
 		
 		
@@ -136,5 +140,4 @@ namespace synthese
 		{
 
 		}
-	}
-}
+}	}

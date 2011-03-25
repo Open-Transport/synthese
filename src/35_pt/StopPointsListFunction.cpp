@@ -34,6 +34,7 @@
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "City.h"
+#include "Webpage.h"
 
 #include <sstream>
 
@@ -47,6 +48,7 @@ namespace synthese
 	using namespace graph;
 	using namespace server;
 	using namespace security;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,pt::StopPointsListFunction>::FACTORY_KEY("StopPointsListFunction");
 	
@@ -54,11 +56,19 @@ namespace synthese
 	{
 		const string StopPointsListFunction::PARAMETER_LINE_ID = "lineid";
 		const string StopPointsListFunction::PARAMETER_DATE = "date";
+		const string StopPointsListFunction::PARAMETER_PAGE_ID = "page_id";
+
+		const string StopPointsListFunction::DATA_NAME("name");
+		const string StopPointsListFunction::DATA_STOPAREA_NAME("stopAreaName");
 
 		ParametersMap StopPointsListFunction::_getParametersMap() const
 		{
 			ParametersMap map;
 			if(_date && _date->is_not_a_date_time()) map.insert(PARAMETER_DATE, *_date);
+			if(_page.get())
+			{
+				map.insert(PARAMETER_PAGE_ID, _page->getKey());
+			}
 			return map;
 		}
 
@@ -82,6 +92,15 @@ namespace synthese
 				}
 			}
 
+			if(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID)) try
+			{
+				_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
+			}
+			catch (ObjectNotFoundException<Webpage>&)
+			{
+				throw RequestException("No such page");
+			}
+			
 		}
 
 		void StopPointsListFunction::run(
@@ -99,24 +118,27 @@ namespace synthese
 			endDateTime = date - date.time_of_day() + hours(27);
 
 			// XML header
-			if(_commercialLineID)//destination of this line will be displayed
+			if(!_page.get())
 			{
-				stream <<
-					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-					"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
-					"\" stopAreaName=\"" << _stopArea->getName() <<
-					"\" lineName=\""     << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getName() <<
-					"\" lineShortName=\""<< Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getShortName() <<
-					"\" lineStyle=\""    << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getStyle() <<
-					"\">";
-			}
-			else
-			{
-				stream <<
-					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-					"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
-					"\" stopAreaName=\"" << _stopArea->getName() <<
-					"\">";
+				if(_commercialLineID)//destination of this line will be displayed
+				{
+					stream <<
+						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
+						"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
+						"\" " << DATA_STOPAREA_NAME << "=\"" << _stopArea->getName() <<
+						"\" lineName=\""     << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getName() <<
+						"\" lineShortName=\""<< Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getShortName() <<
+						"\" lineStyle=\""    << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getStyle() <<
+						"\">";
+				}
+				else
+				{
+					stream <<
+						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
+						"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
+						"\" " << DATA_STOPAREA_NAME << "=\"" << _stopArea->getName() <<
+						"\">";
+				}
 			}
 
 			const StopArea::PhysicalStops& stops(_stopArea->getPhysicalStops());
@@ -167,25 +189,39 @@ namespace synthese
 					if(stopAreaMap.empty())
 						continue;
 
-					stream << "<physicalStop id=\"" << it.second->getKey() <<
-						"\" operatorCode=\""    << it.second->getCodeBySource() <<
-						"\">";
-
-					BOOST_FOREACH(const stopAreaMapType::value_type& destination, stopAreaMap)
+					if(_page.get())
 					{
-						stream << "<destination id=\"" << destination.second->getKey() <<
-							"\" name=\""    << destination.second->getName() <<
-							"\" cityName=\""<< destination.second->getCity()->getName() <<
-							"\" />";
+						_display(stream, request, *it.second);
 					}
+					else
+					{
+						stream << "<physicalStop id=\"" << it.second->getKey() <<
+							"\" operatorCode=\""    << it.second->getCodeBySources() <<
+							"\">";
 
-					stream << "</physicalStop>";
+						BOOST_FOREACH(const stopAreaMapType::value_type& destination, stopAreaMap)
+						{
+							stream << "<destination id=\"" << destination.second->getKey() <<
+								"\" name=\""    << destination.second->getName() <<
+								"\" cityName=\""<< destination.second->getCity()->getName() <<
+								"\" />";
+						}
+
+						stream << "</physicalStop>";
+					}
 				}
 				else//all physical stop will be displayed, without lines destination information
 				{
-					stream << "<physicalStop id=\"" << it.second->getKey() <<
-						"\" operatorCode=\""    << it.second->getCodeBySource() <<
-						"\" />";
+					if(_page.get())
+					{
+						_display(stream, request, *it.second);
+					}
+					else
+					{
+						stream << "<physicalStop id=\"" << it.second->getKey() <<
+							"\" operatorCode=\""    << it.second->getCodeBySources() <<
+							"\" />";
+					}
 				}
 			}
 
@@ -205,7 +241,21 @@ namespace synthese
 
 		std::string StopPointsListFunction::getOutputMimeType() const
 		{
-			return "text/xml";
+			return _page.get() ? _page->getMimeType() : "text/xml";
+		}
+
+
+
+		void StopPointsListFunction::_display(
+			std::ostream& stream,
+			const server::Request& request,
+			const StopPoint& stop
+		) const {
+			ParametersMap pm;
+			pm.insert(Request::PARAMETER_OBJECT_ID, stop.getKey());
+			pm.insert(DATA_NAME, stop.getName());
+			pm.insert(DATA_STOPAREA_NAME, stop.getConnectionPlace()->getFullName());
+			_page->display(stream, request, pm);
 		}
 	}
 }

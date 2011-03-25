@@ -39,6 +39,9 @@
 #include "SearchFormHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "CommercialLineAddAction.h"
+#include "ImportableAdmin.hpp"
+#include "TransportNetworkUpdateAction.hpp"
+#include "PropertiesHTMLTable.h"
 
 #include <boost/foreach.hpp>
 
@@ -53,7 +56,7 @@ namespace synthese
 	using namespace pt;
 	using namespace security;
 	using namespace html;
-	using namespace pt;
+	using namespace impex;
 
 	namespace util
 	{
@@ -81,7 +84,7 @@ namespace synthese
 			{
 				_network = TransportNetworkTableSync::Get(
 					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					_getEnv(),
+					Env::GetOfficialEnv(),
 					UP_LINKS_LOAD_LEVEL
 				);
 			}
@@ -126,7 +129,7 @@ namespace synthese
 			
 			CommercialLineTableSync::SearchResult lines(
 				CommercialLineTableSync::Search(
-					_getEnv(),
+					Env::GetOfficialEnv(),
 					_network->getKey()
 					, string("%"+_searchName+"%"),
 					optional<string>(),
@@ -158,7 +161,7 @@ namespace synthese
 			}
 
 			AdminActionFunctionRequest<CommercialLineAddAction,CommercialLineAdmin> creationRequest(_request);
-			creationRequest.getFunction()->setActionFailedPage(getNewPage());
+			creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
 			creationRequest.setActionWillCreateObject();
 			creationRequest.getAction()->setNetwork(_network);
 
@@ -166,6 +169,20 @@ namespace synthese
 			stream << t.col(2) << "Création de ligne";
 			stream << t.col() << HTMLModule::getLinkButton(creationRequest.getURL(), "Créer");
 			stream << t.close();
+
+			// Properties
+			stream << "<h1>Propriétés</h1>";
+			AdminActionFunctionRequest<TransportNetworkUpdateAction,TransportNetworkAdmin> updateRequest(_request);
+			updateRequest.getAction()->setNetwork(const_pointer_cast<TransportNetwork>(_network));
+			PropertiesHTMLTable p(updateRequest.getHTMLForm("update"));
+			stream << p.open();
+			stream << p.cell("Nom", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_NAME, _network->getName()));
+			stream << p.close();
+
+			// Source id
+			StaticActionRequest<TransportNetworkUpdateAction> updateOnlyRequest(_request);
+			updateOnlyRequest.getAction()->setNetwork(const_pointer_cast<TransportNetwork>(_network));
+			ImportableAdmin::DisplayDataSourcesTab(stream, *_network, updateOnlyRequest);
 		}
 
 		bool TransportNetworkAdmin::isAuthorized(
@@ -193,7 +210,7 @@ namespace synthese
 			){
 				CommercialLineTableSync::SearchResult lines(
 					CommercialLineTableSync::Search(
-						*_env,
+						Env::GetOfficialEnv(),
 						_network->getKey(),
 						optional<string>(),
 						optional<string>(),
@@ -205,7 +222,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 				{
 					shared_ptr<CommercialLineAdmin> p(
-						getNewOtherPage<CommercialLineAdmin>()
+						getNewPage<CommercialLineAdmin>()
 					);
 					p->setCommercialLine(line);
 					links.push_back(p);

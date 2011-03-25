@@ -28,7 +28,7 @@
 #include "City.h"
 #include "CommercialLine.h"
 #include "JourneyPattern.hpp"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "Registry.h"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
@@ -128,7 +128,7 @@ class XmlBuilder
 	 static boost::shared_ptr<JourneyPattern> CreateLine (XMLNode& node, 
 		 const util::Registry<CommercialLine>& commercialLines);
 
-	 static boost::shared_ptr<LineStop> CreateLineStop (XMLNode& node, 
+	 static boost::shared_ptr<DesignatedLinePhysicalStop> CreateLineStop (XMLNode& node, 
 		 util::Registry<JourneyPattern>& lines,
 		 const util::Registry<pt::StopPoint>& physicalStops);
 

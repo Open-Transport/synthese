@@ -26,7 +26,7 @@
 #include "SQLiteResult.h"
 #include "SQLite.h"
 #include "SQLiteException.h"
-
+#include "Language.hpp"
 #include "Profile.h"
 #include "UserTableSync.h"
 #include "ProfileTableSync.h"
@@ -64,6 +64,7 @@ namespace synthese
 		const string UserTableSync::TABLE_COL_PHONE = "phone";
 		const string UserTableSync::COL_LOGIN_AUTHORIZED = "auth";
 		const string UserTableSync::COL_BIRTH_DATE = "birth_date";
+		const string UserTableSync::COL_LANGUAGE = "language";
 	}
 
 	namespace db
@@ -89,6 +90,7 @@ namespace synthese
 			SQLiteTableSync::Field(UserTableSync::TABLE_COL_PHONE, SQL_TEXT),
 			SQLiteTableSync::Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_INTEGER),
 			SQLiteTableSync::Field(UserTableSync::COL_BIRTH_DATE, SQL_TIMESTAMP),
+			SQLiteTableSync::Field(UserTableSync::COL_LANGUAGE, SQL_TEXT),
 			SQLiteTableSync::Field()
 		};
 
@@ -119,6 +121,17 @@ namespace synthese
 			user->setPhone(rows->getText ( UserTableSync::TABLE_COL_PHONE));
 			user->setConnectionAllowed(rows->getBool ( UserTableSync::COL_LOGIN_AUTHORIZED));
 			user->setBirthDate(rows->getDate(UserTableSync::COL_BIRTH_DATE));
+
+			// Language
+			string langStr(rows->getText(UserTableSync::COL_LANGUAGE));
+			if(!langStr.empty()) try
+			{
+				user->setLanguage(&Language::GetLanguageFromIso639_2Code(langStr));
+			}
+			catch(Language::LanguageNotFoundException& e)
+			{
+				Log::GetInstance().warn("Language error in user "+ lexical_cast<string>(user->getKey()), e);
+			}
 	
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -135,6 +148,7 @@ namespace synthese
 			User* obj
 		){
 			obj->setProfile(NULL);
+			obj->setLanguage(NULL);
 		}
 
 
@@ -148,7 +162,7 @@ namespace synthese
 			query.addField(user->getSurname());
 			query.addField(user->getLogin());
 			query.addField(user->getPassword());
-			query.addField(user->getProfile()->getKey());
+			query.addField(user->getProfile() ? user->getProfile()->getKey() : RegistryKeyType(0));
 			query.addField(user->getAddress());
 			query.addField(user->getPostCode());
 			query.addField(user->getCityText());
@@ -158,9 +172,11 @@ namespace synthese
 			query.addField(user->getPhone());
 			query.addField(user->getConnectionAllowed());
 			query.addField(user->getBirthDate());
+			query.addField(user->getLanguage() ? user->getLanguage()->getIso639_2Code() : string());
 			query.execute(transaction);
 		}
 	}
+
 	namespace security
 	{
 		shared_ptr<User> UserTableSync::getUserFromLogin(const string& login )

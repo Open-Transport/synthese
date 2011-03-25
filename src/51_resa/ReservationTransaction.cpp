@@ -190,6 +190,13 @@ namespace synthese
 
 		void ReservationTransaction::addReservation(Reservation* resa )
 		{
+			BOOST_FOREACH(const Reservations::value_type& existingReservation, _reservations)
+			{
+				if(existingReservation == resa)
+				{
+					return;
+				}
+			}
 			_reservations.push_back(resa);
 		}
 	}

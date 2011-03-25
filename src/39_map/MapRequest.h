@@ -40,15 +40,16 @@ namespace synthese
 {
 	namespace map
 	{
-	    class Map;
+		class Map;
 
-	    /** MapRequest class.
+		/** MapRequest class.
 			@ingroup m59Functions refFunctions
-	    */
-		class MapRequest : public util::FactorableTemplate<server::Function, MapRequest>
-	    {
+		*/
+		class MapRequest:
+			public util::FactorableTemplate<server::Function, MapRequest>
+		{
 		
-	    private:
+		private:
 			//! @name Query
 			//@{
 				std::string _output;
@@ -67,7 +68,7 @@ namespace synthese
 				std::auto_ptr<Map> _map;
 			//@}
 
-		    
+
 			/** Conversion from attributes to generic parameter maps.
 			 */
 			server::ParametersMap _getParametersMap() const;
@@ -76,15 +77,15 @@ namespace synthese
 			 */
 			void _setFromParametersMap(const server::ParametersMap& map);
 
-	    public:
+		public:
 			
 			static const std::string OUTPUT_PARAMETER;
 			static const std::string DATA_PARAMETER;
 			static const std::string MAP_PARAMETER;
-				static const std::string PARAMETER_USE_ENVIRONMENT;
+			static const std::string PARAMETER_USE_ENVIRONMENT;
 
 			MapRequest();
-			~MapRequest();
+			MapRequest(const MapRequest& value);
 			
 			//! @name Setters
 			//@{
@@ -117,7 +118,7 @@ namespace synthese
 			virtual bool isAuthorized(const server::Session* session) const;
 
 			virtual std::string getOutputMimeType() const;
-	    };
-	}
-}
+		};
+}	}
+
 #endif // SYNTHESE_MapRequest_H__

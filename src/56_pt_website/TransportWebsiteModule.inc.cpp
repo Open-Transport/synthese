@@ -7,15 +7,10 @@
 
 #include "TransportWebsiteModule.h"
 
-#include "UserFavoriteListInterfaceElement.h"
-
-#include "PlacesListRequestFunction.hpp"
 #include "CityListFunction.h"
-#include "CityListRequestFunction.hpp"
 #include "PlacesListFunction.h"
 #include "ServiceInformationsFunction.hpp"
-
-#include "UserFavoriteInterfacePage.h"
+#include "UserBookmarksService.hpp"
 
 #include "TransportWebsiteTableSync.h"
 #include "ObjectSiteLinkTableSync.h"

@@ -22,12 +22,11 @@
 
 #include "CityListFunction.h"
 #include "Webpage.h"
-#include "PlacesListInterfacePage.h"
 #include "Types.h"
 #include "TransportWebsite.h"
 #include "RequestException.h"
 #include "City.h"
-#include "Interface.h"
+#include "StopArea.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -43,6 +42,7 @@ namespace synthese
 	using namespace lexical_matcher;
 	using namespace pt_website;
 	using namespace cms;
+	using namespace pt;
 
 	template<> const string util::FactorableTemplate<CityListFunction::_FunctionWithSite,CityListFunction>::FACTORY_KEY("lc");
 	
@@ -50,56 +50,23 @@ namespace synthese
 	{
 		const string CityListFunction::PARAMETER_INPUT("t");
 		const string CityListFunction::PARAMETER_NUMBER("n");
-		const string CityListFunction::PARAMETER_IS_FOR_ORIGIN("o");
-		const string CityListFunction::PARAMETER_PAGE("p");
-		const string CityListFunction::PARAMETER_ITEM_PAGE("ip");
-		
-		void CityListFunction::run( std::ostream& stream, const Request& request ) const
-		{
-			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
-			if(!site) throw RequestException("Incorrect site");
-			
-			GeographyModule::CitiesMatcher::MatchResult matches(
-				site->getCitiesMatcher().bestMatches(_input, _n)
-			);
+		const string CityListFunction::PARAMETER_PAGE("page_id");
+		const string CityListFunction::PARAMETER_ITEM_PAGE("item_page_id");
+		const string CityListFunction::PARAMETER_AT_LEAST_A_STOP("at_least_a_stop");
 
-			if(_page.get())
-			{
-				PlacesList placesList;
-				BOOST_FOREACH(LexicalMatcher<shared_ptr<City> >::MatchHit it, matches)
-				{
-					placesList.push_back(make_pair(it.value->getKey(), it.key.getSource()));
-				}
+		const std::string CityListFunction::DATA_RESULTS_SIZE("size");
+		const std::string CityListFunction::DATA_CONTENT("content");
 
-				PlacesListInterfacePage::DisplayCitiesList(
-					stream,
-					_page,
-					_itemPage,
-					request,
-					placesList,
-					_isForOrigin
-				);
-			}
-			else
-			{
-				stream <<
-					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-					"<options xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-				;
-				BOOST_FOREACH(LexicalMatcher<shared_ptr<City> >::MatchHit it, matches)
-				{
-					stream << "<option type=\"city\" score=\"" << it.score.phoneticScore << "\">" << it.key.getSource() << "</option>";
-				}
-				stream << "</options>";
-			}
-		}
+		const string CityListFunction::DATA_NAME("name");
+		const string CityListFunction::DATA_RANK("rank");
+
+
 
 		ParametersMap CityListFunction::_getParametersMap() const
 		{
 			ParametersMap pm(FunctionWithSiteBase::_getParametersMap());
 			pm.insert(PARAMETER_INPUT, _input);
 			pm.insert(PARAMETER_NUMBER, _n);
-			pm.insert(PARAMETER_IS_FOR_ORIGIN, _isForOrigin);
 			if(_page.get())
 			{
 				pm.insert(PARAMETER_PAGE, _page->getKey());
@@ -108,8 +75,11 @@ namespace synthese
 			{
 				pm.insert(PARAMETER_ITEM_PAGE, _itemPage->getKey());
 			}
+			pm.insert(PARAMETER_AT_LEAST_A_STOP, _atLeastAStop);
 			return pm;
 		}
+
+
 
 		void CityListFunction::_setFromParametersMap( const server::ParametersMap& map )
 		{
@@ -123,27 +93,97 @@ namespace synthese
 			{
 				_itemPage = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_ITEM_PAGE));
 			}
-			_input = map.get<string>(PARAMETER_INPUT);
-			_isForOrigin = map.getDefault<bool>(PARAMETER_IS_FOR_ORIGIN, false);
+			_input = map.getDefault<string>(PARAMETER_INPUT);
+			_atLeastAStop = map.getDefault<bool>(PARAMETER_AT_LEAST_A_STOP, false);
 		
-			_n = map.get<size_t>(PARAMETER_NUMBER);
-			if (_n < 0)
-				throw RequestException("Bad value for number");
+			_n = map.getOptional<size_t>(PARAMETER_NUMBER);
+			if (!_input.empty() && !_n)
+			{
+				throw RequestException("Number of result must be limited");
+			}
 		}
 
-		void CityListFunction::setTextInput( const std::string& text )
-		{
-			_input = text;
-		}
 
-		void CityListFunction::setNumber( int number )
-		{
-			_n = number;
-		}
 
-		void CityListFunction::setIsForOrigin( bool isForOrigin )
-		{
-			_isForOrigin = isForOrigin;
+		void CityListFunction::run(
+			std::ostream& stream,
+			const Request& request
+		) const {
+			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
+			if(!site) throw RequestException("Incorrect site");
+			
+			PlacesList placesList;
+
+			if(!_input.empty())
+			{
+				GeographyModule::CitiesMatcher::MatchResult matches(
+					site->getCitiesMatcher().bestMatches(_input, *_n)
+				);
+				BOOST_FOREACH(LexicalMatcher<shared_ptr<City> >::MatchHit it, matches)
+				{
+					if(_atLeastAStop && it.value->getLexicalMatcher(StopArea::FACTORY_KEY).size() == 0)
+					{
+						continue;
+					}
+					placesList.push_back(make_pair(it.value->getKey(), it.value->getName()));
+				}
+
+				if(!_page.get())
+				{
+					stream <<
+						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
+						"<options xsi:noNamespaceSchemaLocation=\"https://extranet-rcsmobility.com/projects/synthese/repository/raw/doc/include/56_transport_website/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+						;
+					BOOST_FOREACH(LexicalMatcher<shared_ptr<City> >::MatchHit it, matches)
+					{
+						if(_atLeastAStop && it.value->getLexicalMatcher(StopArea::FACTORY_KEY).size() == 0)
+						{
+							continue;
+						}
+						stream << "<option type=\"city\" score=\"" << it.score.phoneticScore << "\">" << it.key.getSource() << "</option>";
+					}
+					stream << "</options>";
+				}
+			}
+			else
+			{
+				size_t c(0);
+				BOOST_FOREACH(const LexicalMatcher<shared_ptr<City> >::Map::value_type& it, site->getCitiesMatcher().entries())
+				{
+					if(_atLeastAStop && it.second->getLexicalMatcher(StopArea::FACTORY_KEY).size() == 0)
+					{
+						continue;
+					}
+					placesList.push_back(make_pair(it.second->getKey(), it.second->getName()));
+					if(_n && c >= *_n)
+					{
+						break;
+					}
+					++c;
+				}
+			}
+
+			if(_page.get())
+			{
+				ParametersMap pm(_savedParameters);
+
+				// Size
+				pm.insert(DATA_RESULTS_SIZE, placesList.size());
+
+				// Content
+				if(_itemPage.get())
+				{
+					stringstream content;
+					_displayItems(content, placesList, request);
+					pm.insert(DATA_CONTENT, content.str());
+				}
+
+				_page->display(stream, request, pm);
+			}
+			else if(_itemPage.get())
+			{
+				_displayItems(stream, placesList, request);
+			}
 		}
 
 
@@ -153,9 +193,40 @@ namespace synthese
 			return true;
 		}
 
+
+
 		std::string CityListFunction::getOutputMimeType() const
 		{
-			return _page.get() ? _page->getMimeType() : "text/xml";
+			if(_page.get())
+			{
+				return _page->getMimeType();
+			}
+			if(_itemPage.get())
+			{
+				return _itemPage->getMimeType();
+			}
+			return "text/xml";
 		}
-	}
-}
+
+
+
+		void CityListFunction::_displayItems(
+			ostream& stream,
+			const PlacesList& items,
+			const Request& request
+		) const	{
+			size_t i(0);
+			BOOST_FOREACH(const PlacesList::value_type& it, items)
+			{
+				ParametersMap pmi(_savedParameters);
+
+				pmi.insert(DATA_RANK, i);
+				pmi.insert(DATA_NAME, it.second);
+				pmi.insert(Request::PARAMETER_OBJECT_ID, it.first);
+
+				_itemPage->display(stream, request, pmi);
+
+				++i;
+			}
+		}
+}	}

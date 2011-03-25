@@ -23,6 +23,8 @@
 #include "TimetableResult.hpp"
 #include "JourneyPattern.hpp"
 
+#include <boost/foreach.hpp>
+
 using namespace boost;
 
 namespace synthese
@@ -162,4 +164,16 @@ namespace synthese
 			boost::shared_ptr<Warnings> warnings
 		):	_warnings(warnings.get() ? warnings : shared_ptr<Warnings>(new Warnings))
 		{}
+
+
+
+		TimetableResult::RowServicesVector TimetableResult::getRowServices() const
+		{
+			RowServicesVector result;
+			BOOST_FOREACH(const Columns::value_type& col, _columns)
+			{
+				result.push_back(col.getService());
+			}
+			return result;
+		}
 }	}

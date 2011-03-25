@@ -52,7 +52,7 @@ namespace synthese
 
 		ParametersMap WebPageFormFunction::_getParametersMap() const
 		{
-			ParametersMap map(_aditionnalParameters);
+			ParametersMap map;
 			map.insert(PARAMETER_NAME, _name);
 			map.insert(PARAMETER_SCRIPT, _script);
 			if(_page.get())
@@ -67,16 +67,6 @@ namespace synthese
 
 		void WebPageFormFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			BOOST_FOREACH(const ParametersMap::Map::value_type& it, map.getMap())
-			{
-				if(	it.first != Request::PARAMETER_FUNCTION &&
-					it.first != Request::PARAMETER_ACTION &&
-					(it.first.size() < Action_PARAMETER_PREFIX.size() || it.first.substr(0, Action_PARAMETER_PREFIX.size()) != Action_PARAMETER_PREFIX)
-				){
-					_aditionnalParameters.insert(it.first, it.second);
-				}
-			}
-
 			_name = map.get<string>(PARAMETER_NAME);
 			_script = map.getDefault<string>(PARAMETER_SCRIPT);
 			_idem = map.getDefault<bool>(PARAMETER_IDEM, false);
@@ -91,6 +81,10 @@ namespace synthese
 					throw RequestException("No such page");
 				}
 			}
+			_savedParameters.remove(PARAMETER_PAGE_ID);
+			_savedParameters.remove(PARAMETER_NAME);
+			_savedParameters.remove(PARAMETER_SCRIPT);
+			_savedParameters.remove(PARAMETER_IDEM);
 		}
 
 
@@ -117,6 +111,7 @@ namespace synthese
 				try
 				{
 					StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
+					openRequest.getFunction()->setSavedParameters(_savedParameters);
 					openRequest.getFunction()->setPage(_page);
 					if(!_page->getRoot()->getClientURL().empty())
 					{

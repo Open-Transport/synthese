@@ -33,6 +33,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "FileFormat.h"
 #include "Importer.hpp"
+#include "DataSourceTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -80,7 +81,7 @@ namespace synthese
 		){
 			try
 			{
-				_dataSource = Env::GetOfficialEnv().get<DataSource>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+				_dataSource = DataSourceTableSync::Get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID), *_env);
 			}
 			catch (ObjectNotFoundException<DataSource>&)
 			{
@@ -90,7 +91,7 @@ namespace synthese
 			if(Factory<FileFormat>::contains(_dataSource->getFormat()))
 			{
 				_doImport = map.getDefault<bool>(PARAMETER_DO_IMPORT, false);
-				_importer = _dataSource->getImporter();
+				_importer = _dataSource->getImporter(*_env);
 				_importer->setFromParametersMap(map, _doImport);
 			}
 		}
@@ -134,15 +135,7 @@ namespace synthese
 				stream << t.open();
 				stream << t.cell("ID", lexical_cast<string>(_dataSource->getKey()));
 				stream << t.cell("Nom", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_NAME, _dataSource->getName()));
-
-				Factory<FileFormat>::Keys keys(Factory<FileFormat>::GetKeys());
-				vector<pair<optional<string>, string> > vec;
-				vec.push_back(make_pair(optional<string>(), "(saisie manuelle)"));
-				BOOST_FOREACH(const Factory<FileFormat>::Keys::value_type& key, keys)
-				{
-					vec.push_back(make_pair(optional<string>(key), key));
-				}
-				stream << t.cell("Format", t.getForm().getSelectInput(DataSourceUpdateAction::PARAMETER_FORMAT, vec, optional<string>(_dataSource->getFormat())));
+				stream << t.cell("Format", t.getForm().getSelectInput(DataSourceUpdateAction::PARAMETER_FORMAT, ImpExModule::GetFileFormatsList(), optional<string>(_dataSource->getFormat())));
 				stream << t.cell("Icone", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_ICON, _dataSource->getIcon()) + " " + HTMLModule::getHTMLImage(_dataSource->getIcon().empty() ? "note.png" : _dataSource->getIcon(), _dataSource->getFormat()));
 				stream << t.cell("Jeu de caractères (défaut = auto-détection)", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_CHARSET, _dataSource->getCharset()));
 				stream << t.close();

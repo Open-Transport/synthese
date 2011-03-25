@@ -27,6 +27,7 @@
 #include "LinkException.h"
 #include "CityTableSync.h"
 #include "SelectQuery.hpp"
+#include "ImportableTableSync.hpp"
 
 #include <boost/tokenizer.hpp>
 #include <assert.h>
@@ -41,6 +42,7 @@ namespace synthese
 	using namespace util;
 	using namespace geography;
 	using namespace road;
+	using namespace impex;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,pt::StopAreaTableSync>::FACTORY_KEY("35.40.01 Connection places");
 	template<> const string FactorableTemplate<Fetcher<NamedPlace>, StopAreaTableSync>::FACTORY_KEY("7");
@@ -104,8 +106,7 @@ namespace synthese
 			bool connectionType(rows->getBool(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE));
 			posix_time::time_duration defaultTransferDelay(posix_time::minutes(rows->getInt (StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY)));
 			string transferDelaysStr (rows->getText (StopAreaTableSync::TABLE_COL_TRANSFERDELAYS));
-			string codeBySource(rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE));
-
+			
 			// Update of the object
 			cp->setName (name);
 			if (!name13.empty())
@@ -118,7 +119,12 @@ namespace synthese
 			
 			cp->clearTransferDelays ();    
 			cp->setDefaultTransferDelay (defaultTransferDelay);
-			cp->setCodeBySource(codeBySource);
+
+			cp->setDataSourceLinks(
+				ImportableTableSync::GetDataSourceLinksFromSerializedString(
+					rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE),
+					env
+			)	);
 
 			typedef tokenizer<char_separator<char> > tokenizer;
 			char_separator<char> sep1 (",");
@@ -209,7 +215,7 @@ namespace synthese
 			query.addField(delays.str());
 			query.addField(object->getName13());
 			query.addField(object->getName26());
-			query.addField(object->getCodeBySource());
+			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
 			query.addField(object->getTimetableName());
 			query.execute(transaction);
 		}

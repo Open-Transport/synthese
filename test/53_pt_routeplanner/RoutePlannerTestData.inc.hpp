@@ -33,18 +33,20 @@
 #include "ReservationContact.h"
 #include "JourneyPattern.hpp"
 #include "RollingStock.h"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "ScheduledService.h"
 #include "ContinuousService.h"
 #include "RoadPlace.h"
-#include "Road.h"
-#include "RoadChunk.h"
 #include "DataSource.h"
 #include "Env.h"
 #include "ResaModule.h"
 #include "RuleUser.h"
 #include "NonConcurrencyRule.h"
 #include "GeographyModule.h"
+#include "CoordinatesSystem.hpp"
+#include "MainRoadChunk.hpp"
+#include "MainRoadPart.hpp"
+#include "DBModule.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>

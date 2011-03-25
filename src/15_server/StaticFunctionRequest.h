@@ -50,16 +50,26 @@ namespace synthese
 				bool copyFunction
 			):	Request(request)
 			{
-				if(!request.getFunction().get())
+				const Function* f(request.getFunction().get());
+				if(!f)
 				{
 					throw synthese::Exception("The source request does not allow copy");
 				}
-				_function = boost::shared_ptr<Function>(new FunctionT);
-				if (FunctionT::FACTORY_KEY == request.getFunction()->getFactoryKey() && copyFunction)
+
+				const FunctionT* tf(dynamic_cast<const FunctionT*>(f));
+				if(tf && copyFunction)
 				{
-					_function->_copy(request.getFunction());
+					_function.reset(new FunctionT(*tf));
 				}
-				_function->setEnv(request.getFunction()->getEnv());
+				else
+				{
+					_function.reset(new FunctionT);
+					_function->setEnv(f->getEnv());
+					if(copyFunction)
+					{
+						_function->_copy(*f);
+					}
+				}
 			}
 
 

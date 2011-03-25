@@ -75,6 +75,7 @@ namespace synthese
 			calendar::Calendar				_calendar;
 			boost::shared_ptr<TimetableWarning>			_warning;
 			const pt::JourneyPattern*				_line;
+			const pt::SchedulesBasedService*		_service;
 			tTypeOD							_originType;
 			tTypeOD							_destinationType;
 
@@ -112,10 +113,11 @@ namespace synthese
 			//@{
 				const calendar::Calendar&				getCalendar()			const { return _calendar; }
 				const Content&							getContent()			const { return _content; }
-				const pt::JourneyPattern*						getLine()				const { return _line; }
+				const pt::JourneyPattern*				getLine()				const { return _line; }
+				const pt::SchedulesBasedService*		getService()			const { return _service; }
 				tTypeOD									getOriginType()			const { return _originType; }
 				tTypeOD									getDestinationType()	const { return _destinationType; }
-				boost::shared_ptr<TimetableWarning>					getWarning()			const { return _warning; }
+				boost::shared_ptr<TimetableWarning>		getWarning()			const { return _warning; }
 			//@}
 		};
 	}

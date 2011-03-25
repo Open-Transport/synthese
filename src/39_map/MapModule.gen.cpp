@@ -9,3 +9,5 @@ synthese::map::PostscriptRenderer::integrate();
 synthese::map::MapRequest::integrate();
 
 synthese::map::TestMapAdmin::integrate();
+
+synthese::map::WFSService::integrate();

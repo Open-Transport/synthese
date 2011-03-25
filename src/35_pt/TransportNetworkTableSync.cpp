@@ -23,6 +23,7 @@
 #include "TransportNetworkTableSync.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "ImportableTableSync.hpp"
 
 #include <boost/logic/tribool.hpp>
 #include <assert.h>
@@ -36,6 +37,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace pt;
+	using namespace impex;
 
 	template<> const string util::FactorableTemplate<SQLiteTableSync,TransportNetworkTableSync>::FACTORY_KEY(
 		"35.20.02 Network transport"
@@ -53,6 +55,8 @@ namespace synthese
 			"t022_transport_networks"
 		);
 
+
+
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<TransportNetworkTableSync>::_FIELDS[]=
 		{
 			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
@@ -61,12 +65,16 @@ namespace synthese
 			SQLiteTableSync::Field()
 		};
 
+
+
 		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TransportNetworkTableSync>::_INDEXES[]=
 		{
 			SQLiteTableSync::Index(TransportNetworkTableSync::COL_CREATOR_ID.c_str(), ""),
 			SQLiteTableSync::Index(TransportNetworkTableSync::COL_NAME.c_str(), ""),
 			SQLiteTableSync::Index()
 		};
+
+
 
 		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Load(
 			TransportNetwork* object,
@@ -78,8 +86,10 @@ namespace synthese
 			std::string creatorId(rows->getText (TransportNetworkTableSync::COL_CREATOR_ID));
 
 			object->setName(name);
-			object->setCreatorId(creatorId);
+			object->setDataSourceLinks(ImportableTableSync::GetDataSourceLinksFromSerializedString(creatorId, env));
 		}
+
+
 
 		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Save(
 			TransportNetwork* object,
@@ -87,7 +97,7 @@ namespace synthese
 		){
 			ReplaceQuery<TransportNetworkTableSync> query(*object);
 			query.addField(object->getName());
-			query.addField(object->getCreatorId());
+			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 
@@ -101,7 +111,7 @@ namespace synthese
 
 	namespace pt
 	{
-	    TransportNetworkTableSync::SearchResult TransportNetworkTableSync::Search(
+		TransportNetworkTableSync::SearchResult TransportNetworkTableSync::Search(
 			Env& env,
 			string name,
 			string creatorId,
@@ -112,7 +122,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			SelectQuery<TransportNetworkTableSync> query;
-			if (!name.empty())
+			if(!name.empty())
 			{
 				query.addWhereField(COL_NAME, name, ComposedExpression::OP_LIKE);
 			}
@@ -120,19 +130,18 @@ namespace synthese
 			{
 				query.addWhereField(COL_CREATOR_ID, creatorId, ComposedExpression::OP_LIKE);
 			}
-			if (orderByName)
+			if(orderByName)
 			{
 				query.addOrderField(COL_NAME, raisingOrder);
 			}
-			if (number)
+			if(number)
 			{
 				query.setNumber(*number + 1);
 			}
-			if (first > 0)
+			if(first > 0)
 			{
 				query.setFirst(first);
 			}
 			return LoadFromQuery(query, env, linkLevel);
 		}
-	}
-}
+}	}

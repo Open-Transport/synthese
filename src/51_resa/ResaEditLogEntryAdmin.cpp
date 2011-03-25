@@ -213,7 +213,7 @@ namespace synthese
 					addChoices,
 					optional<ResaDBLog::_EntryType>(ResaDBLog::CALL_ENTRY)
 			)	);
-			stream << t.cell("Texte", t.getForm().getTextAreaInput(ResaLogEntryUpdateAction::PARAMETER_TEXT, string(), 4, 50));
+			stream << t.cell("Texte", t.getForm().getTextAreaInput(ResaLogEntryUpdateAction::PARAMETER_TEXT, string(), 4, 50, false));
 			stream << t.getForm().setFocus(ResaLogEntryUpdateAction::PARAMETER_TYPE);
 			stream << t.close();
 

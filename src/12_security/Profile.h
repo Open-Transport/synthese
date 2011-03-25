@@ -31,8 +31,8 @@
 #include "Registrable.h"
 #include "Registry.h"
 
-#include "12_security/Constants.h"
-#include "12_security/Types.h"
+#include "SecurityConstants.hpp"
+#include "SecurityTypes.hpp"
 #include "GlobalRight.h"
 
 namespace synthese

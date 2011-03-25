@@ -23,13 +23,13 @@
 #include "PTRoutePlannerResult.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
-#include "LineStop.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "Journey.h"
 #include "JourneyPattern.hpp"
 #include "PermanentService.h"
 #include "JourneyPattern.hpp"
-#include "Road.h"
-#include "RoadChunk.h"
+#include "MainRoadPart.hpp"
+#include "MainRoadChunk.hpp"
 #include "Crossing.h"
 #include "Address.h"
 #include "GeographyModule.h"
@@ -58,55 +58,43 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 	CA.setName("A");
 	StopPoint PA;
 	PA.setHub(&CA);
-	LineStop A;
-	A.setLine(&L);
-	A.setPhysicalStop(&PA);
-	A.setRankInPath(0);
-
+	DesignatedLinePhysicalStop A(0, &L, 0);
+	A.setPhysicalStop(PA);
+	
 	StopArea CB;
 	CB.setName("B");
 	StopPoint PB;
 	PB.setHub(&CB);
-	LineStop B;
-	B.setLine(&L);
-	B.setPhysicalStop(&PB);
-	B.setRankInPath(1);
+	DesignatedLinePhysicalStop B(0, &L, 1);
+	B.setPhysicalStop(PB);
 
 	StopArea CC;
 	CC.setName("C");
 	StopPoint PC;
 	PC.setHub(&CC);
-	LineStop C;
-	C.setLine(&L);
-	C.setPhysicalStop(&PC);
-	C.setRankInPath(2);
-
+	DesignatedLinePhysicalStop C(0, &L, 2);
+	C.setPhysicalStop(PC);
+	
 	StopArea CD;
 	CD.setName("D");
 	StopPoint PD;
 	PD.setHub(&CD);
-	LineStop D;
-	D.setLine(&L);
-	D.setPhysicalStop(&PD);
-	D.setRankInPath(3);
+	DesignatedLinePhysicalStop D(0, &L, 3);
+	D.setPhysicalStop(PD);
 
 	StopArea CE;
 	CE.setName("E");
 	StopPoint PE;
 	PE.setHub(&CE);
-	LineStop E;
-	E.setLine(&L);
-	E.setPhysicalStop(&PE);
-	E.setRankInPath(4);
+	DesignatedLinePhysicalStop E(0, &L, 4);
+	E.setPhysicalStop(PE);
 
 	StopArea CF;
 	CF.setName("F");
 	StopPoint PF;
 	PF.setHub(&CF);
-	LineStop F;
-	F.setLine(&L);
-	F.setPhysicalStop(&PF);
-	F.setRankInPath(5);
+	DesignatedLinePhysicalStop F(0, &L, 5);
+	F.setPhysicalStop(PF);
 
 	Journey j0;
 	ServicePointer sp0_0(false, USER_PEDESTRIAN, S, now);
@@ -373,97 +361,78 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	CA.setName("A");
 	StopPoint PA;
 	PA.setHub(&CA);
-	LineStop A;
+	DesignatedLinePhysicalStop A;
 	A.setLine(&L);
-	A.setPhysicalStop(&PA);
+	A.setPhysicalStop(PA);
 	A.setRankInPath(0);
 
 	StopArea CB;
 	CB.setName("B");
 	StopPoint PB;
 	PB.setHub(&CB);
-	LineStop B;
+	DesignatedLinePhysicalStop B;
 	B.setLine(&L);
-	B.setPhysicalStop(&PB);
+	B.setPhysicalStop(PB);
 	B.setRankInPath(1);
 
 	StopArea CC;
 	CC.setName("C");
 	StopPoint PC;
 	PC.setHub(&CC);
-	LineStop C;
+	DesignatedLinePhysicalStop C;
 	C.setLine(&L);
-	C.setPhysicalStop(&PC);
+	C.setPhysicalStop(PC);
 	C.setRankInPath(2);
 
 	StopArea CD;
 	CD.setName("D");
 	StopPoint PD;
 	PD.setHub(&CD);
-	LineStop D;
+	DesignatedLinePhysicalStop D;
 	D.setLine(&L);
-	D.setPhysicalStop(&PD);
+	D.setPhysicalStop(PD);
 	D.setRankInPath(3);
 
 	StopArea CE;
 	CE.setName("E");
 	StopPoint PE;
 	PE.setHub(&CE);
-	LineStop E;
+	DesignatedLinePhysicalStop E;
 	E.setLine(&L);
-	E.setPhysicalStop(&PE);
+	E.setPhysicalStop(PE);
 	E.setRankInPath(4);
 
 	StopArea CF;
 	CF.setName("F");
 	StopPoint PF;
 	PF.setHub(&CF);
-	LineStop F;
+	DesignatedLinePhysicalStop F;
 	F.setLine(&L);
-	F.setPhysicalStop(&PF);
+	F.setPhysicalStop(PF);
 	F.setRankInPath(5);
 
-	Road R;
+	MainRoadPart R;
 	PermanentService Sr(0, &R, boost::posix_time::minutes(5));
 
 	Crossing Cr0;
-	Address A0;
-	A0.setHub(&Cr0);
-	
 	Crossing Cr1;
-	Address A1;
-	A1.setHub(&Cr1);
-	
 	Crossing Cr2;
-	Address A2;
-	A2.setHub(&Cr2);
-
-	RoadChunk Ch0;
-	Ch0.setRoad(&R);
-	Ch0.setFromAddress(&A0);
-	Ch0.setRankInPath(0);
-
-	RoadChunk Ch1;
-	Ch1.setRoad(&R);
-	Ch1.setFromAddress(&A1);
-	Ch1.setRankInPath(1);
-
-	RoadChunk Ch2;
-	Ch2.setRoad(&R);
-	Ch2.setFromAddress(&A2);
-	Ch2.setRankInPath(2);
+	
+	MainRoadChunk Ch0(0, &Cr0, 0, &R);
+	MainRoadChunk Ch1(0, &Cr1, 1, &R);
+	MainRoadChunk Ch2(0, &Cr2, 2, &R);
 
 	Journey j0;
 	ServicePointer s0_0(false, USER_PEDESTRIAN, Sr, now);
 	s0_0.setDepartureInformations(A, now, now, PA);
-	s0_0.setArrivalInformations(Ch0, now, now, A0);
+	s0_0.setArrivalInformations(Ch0, now, now, Cr0);
 	j0 = Journey(j0, s0_0);
 	ServicePointer s0_1(false, USER_PEDESTRIAN, Sr, now);
-	s0_1.setDepartureInformations(Ch0, now, now, A0);
-	s0_1.setArrivalInformations(Ch1, now, now, A1);
+	s0_1.setDepartureInformations(Ch0, now, now, Cr0);
+	s0_1.setArrivalInformations(Ch1, now, now, Cr1);
 	j0 = Journey(j0, s0_1);
 	ServicePointer s0_2(false, USER_PEDESTRIAN, Sr, now);
-	s0_2.setDepartureInformations(Ch1, now, now, A1);
+	s0_2.setDepartureInformations(Ch1, now, now, Cr1);
 	s0_2.setArrivalInformations(C, now, now, PC);
 	j0 = Journey(j0, s0_2);
 	ServicePointer s0_3(false, USER_PEDESTRIAN, Sr, now);
@@ -503,10 +472,10 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	j1 = Journey(j1, s1_0);
 	ServicePointer s1_1(false, USER_PEDESTRIAN, Sr, now);
 	s1_1.setDepartureInformations(E, now, now, PE);
-	s1_1.setArrivalInformations(Ch2, now, now, A2);
+	s1_1.setArrivalInformations(Ch2, now, now, Cr2);
 	j1 = Journey(j1, s1_1);
 	ServicePointer s1_2(false, USER_PEDESTRIAN, Sr, now);
-	s1_2.setDepartureInformations(Ch2, now, now, A2);
+	s1_2.setDepartureInformations(Ch2, now, now, Cr2);
 	s1_2.setArrivalInformations(B, now, now, PB);
 	j1 = Journey(j1, s1_2);
 
@@ -541,7 +510,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 
 	Journey j2;
 	ServicePointer s2_0(false, USER_PEDESTRIAN, Sr, now);
-	s2_0.setDepartureInformations(Ch0, now, now, A0);
+	s2_0.setDepartureInformations(Ch0, now, now, Cr0);
 	s2_0.setArrivalInformations(D, now, now, PD);
 	j2 = Journey(j2, s2_0);
 	ServicePointer s2_1(false, USER_PEDESTRIAN, S, now);
@@ -590,7 +559,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	j3 = Journey(j3, s3_0);
 	ServicePointer s3_1(false, USER_PEDESTRIAN, Sr, now);
 	s3_1.setDepartureInformations(F, now, now, PF);
-	s3_1.setArrivalInformations(Ch2, now, now, A2);
+	s3_1.setArrivalInformations(Ch2, now, now, Cr2);
 	j3 = Journey(j3, s3_1);
 
 	j.push_back(j3);
@@ -634,12 +603,12 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 
 	Journey j4;
 	ServicePointer s4_0(false, USER_PEDESTRIAN, Sr, now);
-	s4_0.setDepartureInformations(Ch0, now, now, A0);
+	s4_0.setDepartureInformations(Ch0, now, now, Cr0);
 	s4_0.setArrivalInformations(F, now, now, PF);
 	j4 = Journey(j4, s4_0);
 	ServicePointer s4_1(false, USER_PEDESTRIAN, Sr, now);
 	s4_1.setDepartureInformations(F, now, now, PF);
-	s4_1.setArrivalInformations(Ch2, now, now, A2);
+	s4_1.setArrivalInformations(Ch2, now, now, Cr2);
 	j4 = Journey(j4, s4_1);
 
 	j.push_back(j4);
@@ -683,8 +652,8 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 
 	Journey j5;
 	ServicePointer s5_0(false, USER_PEDESTRIAN, Sr, now);
-	s5_0.setDepartureInformations(Ch0, now, now, A0);
-	s5_0.setArrivalInformations(Ch1, now, now, A1);
+	s5_0.setDepartureInformations(Ch0, now, now, Cr0);
+	s5_0.setArrivalInformations(Ch1, now, now, Cr1);
 	j5 = Journey(j5, s5_0);
 
 	j.push_back(j5);
@@ -738,54 +707,54 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 	CA.setName("A");
 	StopPoint PA;
 	PA.setHub(&CA);
-	LineStop A;
+	DesignatedLinePhysicalStop A;
 	A.setLine(&L);
-	A.setPhysicalStop(&PA);
+	A.setPhysicalStop(PA);
 	A.setRankInPath(0);
 
 	StopArea CB;
 	CB.setName("B");
 	StopPoint PB;
 	PB.setHub(&CB);
-	LineStop B;
+	DesignatedLinePhysicalStop B;
 	B.setLine(&L);
-	B.setPhysicalStop(&PB);
+	B.setPhysicalStop(PB);
 	B.setRankInPath(1);
 
 	StopArea CC;
 	CC.setName("C");
 	StopPoint PC;
 	PC.setHub(&CC);
-	LineStop C;
+	DesignatedLinePhysicalStop C;
 	C.setLine(&L);
-	C.setPhysicalStop(&PC);
+	C.setPhysicalStop(PC);
 	C.setRankInPath(2);
 
 	StopArea CD;
 	CD.setName("D");
 	StopPoint PD;
 	PD.setHub(&CD);
-	LineStop D;
+	DesignatedLinePhysicalStop D;
 	D.setLine(&L);
-	D.setPhysicalStop(&PD);
+	D.setPhysicalStop(PD);
 	D.setRankInPath(3);
 
 	StopArea CE;
 	CE.setName("E");
 	StopPoint PE;
 	PE.setHub(&CE);
-	LineStop E;
+	DesignatedLinePhysicalStop E;
 	E.setLine(&L);
-	E.setPhysicalStop(&PE);
+	E.setPhysicalStop(PE);
 	E.setRankInPath(4);
 
 	StopArea CF;
 	CF.setName("F");
 	StopPoint PF;
 	PF.setHub(&CF);
-	LineStop F;
+	DesignatedLinePhysicalStop F;
 	F.setLine(&L);
-	F.setPhysicalStop(&PF);
+	F.setPhysicalStop(PF);
 	F.setRankInPath(5);
 
 	{

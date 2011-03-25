@@ -31,6 +31,8 @@
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "SQLiteTransaction.h"
+#include "LineArea.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
 
 #include <geos/geom/LineString.h>
 
@@ -150,46 +152,100 @@ namespace synthese
 					const double maxMetricOffset(_template->getLastEdge()->getMetricOffset());
 					for(Path::Edges::const_reverse_iterator it(_template->getEdges().rbegin()); it != _template->getEdges().rend(); ++it)
 					{
-						const LineStop& other(static_cast<const LineStop&>(**it));
-						LineStop ls;
-						ls.setLine(&object);
-						ls.setIsArrival(other.getIsDeparture());
-						ls.setIsDeparture(other.getIsArrival());
-						ls.setPhysicalStop(other.getPhysicalStop());
-						ls.setScheduleInput(other.getScheduleInput());
-						ls.setMetricOffset(maxMetricOffset - other.getMetricOffset());
-						ls.setRankInPath(rank++);
-						if(other.getGeometry().get())
+						if(dynamic_cast<const DesignatedLinePhysicalStop*>(*it))
 						{
-							ls.setGeometry(
-								shared_ptr<LineString>(
-									dynamic_cast<LineString*>(other.getGeometry()->reverse())
-							)	);
+							const DesignatedLinePhysicalStop& other(static_cast<const DesignatedLinePhysicalStop&>(**it));
+							DesignatedLinePhysicalStop ls(
+								0,
+								&object,
+								rank++,
+								other.getIsDeparture(),
+								other.getIsArrival(),
+								maxMetricOffset - other.getMetricOffset(),
+								other.getPhysicalStop(),
+								other.getScheduleInput()
+							);
+							if(other.getGeometry().get())
+							{
+								ls.setGeometry(
+									shared_ptr<LineString>(
+										dynamic_cast<LineString*>(other.getGeometry()->reverse())
+								)	);
+							}
+							LineStopTableSync::Save(&ls, transaction);
 						}
-						LineStopTableSync::Save(&ls, transaction);
+						if(dynamic_cast<const LineArea*>(*it))
+						{
+							const LineArea& other(static_cast<const LineArea&>(**it));
+							LineArea ls(
+								0,
+								&object,
+								rank++,
+								other.getIsDeparture(),
+								other.getIsArrival(),
+								maxMetricOffset - other.getMetricOffset(),
+								other.getArea(),
+								other.getInternalService()
+							);
+							if(other.getGeometry().get())
+							{
+								ls.setGeometry(
+									shared_ptr<LineString>(
+										dynamic_cast<LineString*>(other.getGeometry()->reverse())
+								)	);
+							}
+							LineStopTableSync::Save(&ls, transaction);
+						}
 					}
 				}
 				else
 				{
 					for(Path::Edges::const_iterator it(_template->getEdges().begin()); it != _template->getEdges().end(); ++it)
 					{
-						const LineStop& other(static_cast<const LineStop&>(**it));
-						LineStop ls;
-						ls.setLine(&object);
-						ls.setIsArrival(other.getIsArrival());
-						ls.setIsDeparture(other.getIsDeparture());
-						ls.setPhysicalStop(other.getPhysicalStop());
-						ls.setScheduleInput(other.getScheduleInput());
-						ls.setRankInPath(other.getRankInPath());
-						ls.setMetricOffset(other.getMetricOffset());
-						if(other.getGeometry().get())
+						if(dynamic_cast<const DesignatedLinePhysicalStop*>(*it))
 						{
-							ls.setGeometry(
-								shared_ptr<LineString>(
-									dynamic_cast<LineString*>(other.getGeometry()->clone())
-							)	);
+							const DesignatedLinePhysicalStop& other(static_cast<const DesignatedLinePhysicalStop&>(**it));
+							DesignatedLinePhysicalStop ls(
+								0,
+								&object,
+								other.getRankInPath(),
+								other.getIsDeparture(),
+								other.getIsArrival(),
+								other.getMetricOffset(),
+								other.getPhysicalStop(),
+								other.getScheduleInput()
+							);
+							if(other.getGeometry().get())
+							{
+								ls.setGeometry(
+									shared_ptr<LineString>(
+										dynamic_cast<LineString*>(other.getGeometry()->clone())
+								)	);
+							}
+							LineStopTableSync::Save(&ls, transaction);
 						}
-						LineStopTableSync::Save(&ls, transaction);
+						if(dynamic_cast<const LineArea*>(*it))
+						{
+							const LineArea& other(static_cast<const LineArea&>(**it));
+							LineArea ls(
+								0,
+								&object,
+								other.getRankInPath(),
+								other.getIsDeparture(),
+								other.getIsArrival(),
+								other.getMetricOffset(),
+								other.getArea(),
+								other.getInternalService()
+							);
+							if(other.getGeometry().get())
+							{
+								ls.setGeometry(
+									shared_ptr<LineString>(
+										dynamic_cast<LineString*>(other.getGeometry()->clone())
+								)	);
+							}
+							LineStopTableSync::Save(&ls, transaction);
+						}
 					}
 				}
 			}
@@ -214,5 +270,4 @@ namespace synthese
 		{
 			_commercialLine = value;
 		}
-	}
-}
+}	}

@@ -38,6 +38,8 @@
 #include "AdminFunctionRequest.hpp"
 #include "PropertiesHTMLTable.h"
 #include "DataSourceAdmin.h"
+#include "PTFileFormat.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -110,7 +112,7 @@ namespace synthese
 			{
 				JourneyPatternTableSync::Save(line.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<LineStop>::value_type lineStop, _env.getRegistry<LineStop>())
+			BOOST_FOREACH(Registry<DesignatedLinePhysicalStop>::value_type lineStop, _env.getRegistry<DesignatedLinePhysicalStop>())
 			{
 				LineStopTableSync::Save(lineStop.second.get(), transaction);
 			}
@@ -284,23 +286,29 @@ namespace synthese
 						{
 							string departureTime(line.substr(34,4));
 							string arrivalTime(line.substr(29,4));
+							bool isDeparture(departureTime != "9999" && departureTime != "    ");
+							bool isArrival(arrivalTime != "9999" && departureTime != "    ");
 
-							JourneyPattern::StopWithDepartureArrivalAuthorization stop;
+							JourneyPattern::StopWithDepartureArrivalAuthorization::StopsSet stop;
 							BOOST_FOREACH(const StopPointTableSync::SearchResult::value_type& itstop, searchStop)
 							{
-								stop.stop.insert(itstop.get());
+								stop.insert(itstop.get());
 							}
-							stop.departure = (departureTime != "9999" && departureTime != "    ");
-							stop.arrival = (arrivalTime != "9999" && arrivalTime != "    ");
-							stops.push_back(stop);
+							stops.push_back(
+								JourneyPattern::StopWithDepartureArrivalAuthorization(
+									stop,
+									optional<Edge::MetricOffset>(),
+									isDeparture,
+									isArrival
+							)	);
 							
 							arrivals.push_back(
-								stop.arrival ?
+								isArrival ?
 								hours(lexical_cast<int>(line.substr(29,2))) + minutes(lexical_cast<int>(line.substr(31,2))) :
 								minutes(0)
 							);
 							departures.push_back(
-								stop.departure ?
+								isDeparture ?
 								hours(lexical_cast<int>(line.substr(34,2))) + minutes(lexical_cast<int>(line.substr(36,2))) :
 								minutes(0)
 							);
@@ -341,7 +349,7 @@ namespace synthese
 
 							// Load of existing routes
 							JourneyPatternTableSync::SearchResult sroutes(
-								JourneyPatternTableSync::Search(_env, cline->getKey(), _dataSource.getKey())
+								JourneyPatternTableSync::Search(_env, cline->getKey())
 							);
 							BOOST_FOREACH(shared_ptr<JourneyPattern> sroute, sroutes)
 							{
@@ -383,29 +391,13 @@ namespace synthese
 						if(!route.get())
 						{
 							os << "CREA : Creation of route for " << cline->getName() << "<br />";
-							route.reset(new JourneyPattern);
-							route->setCommercialLine(cline.get());
-							route->setDataSource(&_dataSource);
-							route->setKey(JourneyPatternTableSync::getId());
-							_env.getEditableRegistry<JourneyPattern>().add(route);
-							cline->addPath(route.get());
-							
-							size_t rank(0);
-							BOOST_FOREACH(const JourneyPattern::StopsWithDepartureArrivalAuthorization::value_type& stop, stops)
-							{
-								shared_ptr<LineStop> ls(new LineStop);
-								ls->setLine(route.get());
-								ls->setPhysicalStop(*stop.stop.begin());
-								ls->setRankInPath(rank);
-								ls->setIsArrival(rank > 0 && stop.arrival);
-								ls->setIsDeparture(rank+1 < stops.size() && stop.departure);
-								ls->setMetricOffset(0);
-								ls->setKey(LineStopTableSync::getId());
-								route->addEdge(*ls);
-								_env.getEditableRegistry<LineStop>().add(ls);
-
-								++rank;
-							}
+							route = PTFileFormat::CreateJourneyPattern(
+								stops,
+								*cline,
+								_dataSource,
+								_env,
+								os
+							);
 						}
 						else
 						{
@@ -413,45 +405,21 @@ namespace synthese
 						}
 						route->setRollingStock(Env::GetOfficialEnv().getEditable<RollingStock>(13792273858822585).get());
 
-						// Services
-						// Creation of the service
-						shared_ptr<ScheduledService> service(new ScheduledService);
-						service->setPath(route.get());
-						service->setPathId(route->getKey());
-						service->setServiceNumber(serviceNumber);
-						service->setDepartureSchedules(departures);
-						service->setArrivalSchedules(arrivals);
-
-						// Search for a corresponding service
-						ScheduledService* existingService(NULL);
-						BOOST_FOREACH(Service* tservice, route->getServices())
-						{
-							ScheduledService* curService(dynamic_cast<ScheduledService*>(tservice));
-
-							if(!curService) continue;
-
-							if (*curService == *service)
-							{
-								os << "LOAD : Use of service " << curService->getKey() << " for " << serviceNumber << " (" << departures[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
-								existingService = curService;
-								break;
-							}
-						}
-
-						// If not found creation
-						if(!existingService)
-						{
-							service->setKey(ScheduledServiceTableSync::getId());
-							route->addService(service.get(), false);
-							_env.getEditableRegistry<ScheduledService>().add(service);
-							existingService = service.get();
-							
-							os << "CREA : Creation of service " << service->getServiceNumber() << " for " << serviceNumber << " (" << departures[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
-						}
+						// Service
+						ScheduledService* service(
+							PTFileFormat::CreateOrUpdateService(
+								*route,
+								departures,
+								arrivals,
+								serviceNumber,
+								_dataSource,
+								_env,
+								os
+						)	);
 
 						// Calendar
-						existingService->subDates(mask);
-						*existingService |= _calendarMap[calendarNumber];
+						service->subDates(mask);
+						*service |= _calendarMap[calendarNumber];
 					}
 				}
 			}

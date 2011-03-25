@@ -1,6 +1,6 @@
 
-/** AdminRequest class implementation.
-	@file AdminRequest.cpp
+/** AdminFunction class implementation.
+	@file AdminFunction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -33,10 +33,9 @@
 #include "AdminParametersException.h"
 #include "LoginAdmin.hpp"
 #include "Webpage.h"
-#include "WebPageDisplayFunction.h"
-#include "StaticActionFunctionRequest.h"
 #include "LogoutAction.h"
 #include "ServerModule.h"
+#include "StaticActionFunctionRequest.h"
 
 using namespace std;
 using namespace boost;
@@ -86,7 +85,14 @@ namespace synthese
 			if (_page.get())
 			{
 				result.insert(PARAMETER_PAGE, _page->getFactoryKey());
-				result.insert(PARAMETER_TAB, _page->getActiveTab());
+				if(_page->getCurrentTab().empty())
+				{
+					result.insert(PARAMETER_TAB, _page->getActiveTab());
+				}
+				else
+				{
+					result.insert(PARAMETER_TAB, _page->getCurrentTab());
+				}
 				const map<string,string> adminMap(_page->getParametersMap().getMap());
 				for (map<string,string>::const_iterator it(adminMap.begin()); it != adminMap.end(); ++it)
 				{
@@ -276,17 +282,6 @@ namespace synthese
 
 
 
-		void AdminFunction::_copy( boost::shared_ptr<const Function> function )
-		{
-			const AdminFunction& adminFunction(static_cast<const AdminFunction&>(*function));
-			_page = adminFunction._page;
-			_mainTemplate = adminFunction._mainTemplate;
-			_positionElementTemplate = adminFunction._positionElementTemplate;
-			_treeNodeTemplate = adminFunction._treeNodeTemplate;
-		}
-
-
-
 		void AdminFunction::_display(
 			std::ostream& stream,
 			const server::Request& request,
@@ -295,14 +290,7 @@ namespace synthese
 		) const {
 			AdminRequest adminRequest(request, true);
 
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_mainTemplate);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// error_message
 			if(errorMessage)
@@ -374,8 +362,7 @@ namespace synthese
 			// version
 			pm.insert(DATA_VERSION, ServerModule::VERSION);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_mainTemplate->display(stream, request, pm);
 		}
 
 
@@ -388,14 +375,7 @@ namespace synthese
 			bool isLast
 		) const {
 
-			StaticFunctionRequest<WebPageDisplayFunction> displayRequest(request, false);
-			displayRequest.getFunction()->setPage(_positionElementTemplate);
-			displayRequest.getFunction()->setUseTemplate(false);
-			ParametersMap pm(
-				dynamic_cast<const WebPageDisplayFunction*>(request.getFunction().get()) ?
-				dynamic_cast<const WebPageDisplayFunction&>(*request.getFunction()).getAditionnalParametersMap() :
-				ParametersMap()
-			);
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// title, icon, url
 			ExportAdminCompound(pm, request, link);
@@ -406,8 +386,7 @@ namespace synthese
 			// is_last
 			pm.insert(DATA_IS_LAST, isLast);
 
-			displayRequest.getFunction()->setAditionnalParametersMap(pm);
-			displayRequest.run(stream);
+			_positionElementTemplate->display(stream, request, pm);
 		}
 
 
@@ -421,82 +400,7 @@ namespace synthese
 			bool isLast
 		) const {
 
-			// subtree
-			stringstream subtreeStream;
-			for(vector<AdminInterfaceElement::PageLinksTree>::const_iterator it(tree.subPages.begin());
-				it != tree.subPages.end();
-				++it
-			){
-				_displayAdminTreeNode(
-					subtreeStream,
-					request,
-					*it,
-					currentCompound,
-					depth+1,
-					it+1==tree.subPages.end()
-				);
-			}
-			string subtree(subtreeStream.str());
-
-		
-			stream << "<div class=\"";
-			if(isLast)
-			{
-				stream << "lastblock";
-			}
-			else
-			{
-				stream << "notlastblock";
-			}
-			stream << "\"><div class=\"tree_icon";
-			if(depth > 0)
-			{
-				stream << "s";
-			}
-			stream << "\">";
-			if(depth > 0)
-			{
-				if(!subtree.empty())
-				{
-					stream << "<img class=\"node\" src=\"";
-					if(tree.isNodeOpened)
-					{
-						stream << "ftv2mlastnode";
-					}
-					else
-					{
-						stream << "ftv2plastnode";
-					}
-					stream << ".png\" />";
-				}
-				else
-				{
-					stream << "<img src=\"ftv2lastnode.png\" />";
-				}
-			}
-			stream << "<img src=\"" << tree.page->getIcon() << "\" class=\"icon\" /></div>"
-				<< " <div class=\"text level" << depth << "\">";
-			bool isCurrent(*tree.page == *currentCompound);
-			if(!isCurrent)
-			{
-				AdminRequest r(request, true);
-				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(tree.page));
-				stream << "<a href=\"" << r.getURL() << "\">";
-			}
-			stream << tree.page->getTitle();
-			if(!isCurrent)
-			{
-				stream << "</a>";
-			}
-			stream << "</div>"
-				<< " <div ";
-			if(!tree.isNodeOpened)
-			{
-				stream << "style=\"display:none\" ";
-			}
-			stream << "class=\"subtree subtree" << depth << "\">" << subtree << "</div></div>";
-
-/*			ParametersMap pm;
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// icon, title, url
 			ExportAdminCompound(pm, request, tree.page);
@@ -531,7 +435,7 @@ namespace synthese
 			pm.insert(DATA_IS_CURRENT, *tree.page == *currentCompound);
 
 			_treeNodeTemplate->display(stream, request, pm);
-*/		}
+		}
 
 
 
