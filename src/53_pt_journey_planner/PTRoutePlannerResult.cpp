@@ -218,12 +218,12 @@ namespace synthese
 
 						// Place
 						stream << t.col();
-						const NamedPlace* namedPlace(
-							GetNamedPlaceFromLegs(&(*its), &(*(its+1)), NULL)
-						);
-						if(namedPlace)
+						if(dynamic_cast<const StopArea*>(its->getArrivalEdge()->getHub()))
 						{
-							stream << namedPlace->getFullName();
+							stream <<
+								static_cast<const StopArea*>(
+									its->getArrivalEdge()->getHub()
+								)->getFullName();
 						}
 
 						// Next service use
