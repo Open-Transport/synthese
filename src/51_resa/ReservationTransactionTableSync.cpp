@@ -31,7 +31,6 @@
 
 #include "DBModule.h"
 #include "SQLiteResult.h"
-#include "SQLite.h"
 #include "SQLiteException.h"
 
 #include <boost/foreach.hpp>

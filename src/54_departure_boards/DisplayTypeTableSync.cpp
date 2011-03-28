@@ -25,7 +25,6 @@
 #include "DisplayTypeTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
-#include "SQLite.h"
 #include "SQLiteException.h"
 #include "InterfaceTableSync.h"
 #include "Conversion.h"

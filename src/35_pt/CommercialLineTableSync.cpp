@@ -38,7 +38,6 @@
 #include "AllowedUseRule.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
-#include "SQLite.h"
 #include "SQLiteException.h"
 #include "CalendarTemplateTableSync.h"
 #include "ReplaceQuery.h"

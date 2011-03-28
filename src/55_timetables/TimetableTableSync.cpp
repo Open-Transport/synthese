@@ -31,7 +31,6 @@
 #include "CalendarTemplate.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
-#include "SQLite.h"
 #include "SQLiteException.h"
 #include "Interface.h"
 #include "CommercialLine.h"

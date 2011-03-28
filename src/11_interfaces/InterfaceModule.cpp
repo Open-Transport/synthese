@@ -26,7 +26,6 @@
 
 #include "threads/Thread.h"
 
-#include "SQLite.h"
 #include "SQLiteSync.h"
 
 #include "InterfaceTableSync.h"

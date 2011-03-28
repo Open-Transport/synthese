@@ -60,6 +60,7 @@ namespace synthese
 		const string TransportWebsiteTableSync::COL_USE_DATES_RANGE("use_dates_range");
 		const string TransportWebsiteTableSync::COL_PERIODS("periods");
 		const string TransportWebsiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS("display_road_approach_detail");
+		// TODO: rename to client_url once complex schema updates are in place (issue #9453).
 		const string TransportWebsiteTableSync::COL_CLIENT_URL("cient_url");
 		const string TransportWebsiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID("default_page_template_id");
 	}

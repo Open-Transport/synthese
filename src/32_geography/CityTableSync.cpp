@@ -22,8 +22,6 @@
 
 #include "CityTableSync.h"
 #include "Conversion.h"
-#include "SQLiteResult.h"
-#include "SQLite.h"
 #include "GeographyModule.h"
 #include "ReplaceQuery.h"
 

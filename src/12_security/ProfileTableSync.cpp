@@ -25,7 +25,6 @@
 
 #include "DBModule.h"
 #include "SQLiteResult.h"
-#include "SQLite.h"
 #include "SQLiteException.h"
 #include "ReplaceQuery.h"
 #include "01_util/Log.h"

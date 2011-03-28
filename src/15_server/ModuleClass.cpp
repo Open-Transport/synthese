@@ -111,6 +111,8 @@ namespace synthese
 		){
 			assert(HasParameter(name));
 			_Callbacks.erase(name);
+			_Parameters.erase(name);
+			_DefaultParameters.erase(name);
 		}
 
 

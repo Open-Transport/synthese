@@ -27,9 +27,9 @@
 #include "RuleUserUpdateAction.hpp"
 #include "Request.h"
 #include "DBModule.h"
-#include "SQLite.h"
 #include "SQLiteException.h"
 #include "SQLiteTableSync.h"
+#include "UpdateQuery.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -101,24 +101,12 @@ namespace synthese
 		void RuleUserUpdateAction::run(
 			Request& request
 		){
-			stringstream query;
-			query << "UPDATE " << _tableSync->getFormat().NAME << " SET ";
-			bool first(true);
+			UpdateQuery query(_tableSync->getFormat().NAME, _id);
 			BOOST_FOREACH(const Values::value_type& element, _values)
 			{
-				if(!first)
-				{
-					query << ",";
-				}
-				query << element.first << "=" << element.second;
-				first = false;
+				query.addUpdateField(element.first, element.second);
 			}
-			query << " WHERE " << TABLE_COL_ID << "=" << _id;
-
-			DBModule::GetSQLite()->execUpdate(query.str());
-
-			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
-
+			query.execute(boost::optional<SQLiteTransaction&>());
 		}
 		
 		

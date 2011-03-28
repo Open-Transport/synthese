@@ -29,6 +29,9 @@
 #include "FactorableTemplate.h"
 #include "RuleUser.h"
 
+// YYY
+#define SQLiteTableSync DBTableSync
+
 namespace synthese
 {
 	namespace db

@@ -22,7 +22,6 @@
 
 
 #include "DbModuleConfigTableSync.h"
-#include "SQLite.h"
 
 #include "ModuleClass.h"
 
@@ -46,12 +45,12 @@ namespace synthese
 	namespace db
 	{
 	    template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DbModuleConfigTableSync>::TABLE(
-			"t999_config", false, true, TRIGGERS_ENABLED_CLAUSE, false
+			"t999_config", false, false
 			);
 
 		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DbModuleConfigTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(DbModuleConfigTableSync::COL_PARAMNAME, SQL_TEXT),
+			SQLiteTableSync::Field(DbModuleConfigTableSync::COL_PARAMNAME, SQL_TEXT_FIXED),
 			SQLiteTableSync::Field(DbModuleConfigTableSync::COL_PARAMVALUE, SQL_TIMESTAMP),
 			SQLiteTableSync::Field()
 		};
@@ -89,12 +88,14 @@ namespace synthese
 
 
 		void 
-		DbModuleConfigTableSync::rowsRemoved (SQLite* sqlite, 
-							SQLiteSync* sync,
-							const SQLiteResultSPtr& rows)
-		{
-
+		DbModuleConfigTableSync::rowsRemoved(
+			SQLite* sqlite,
+			SQLiteSync* sync,
+			const RowIdList& rowIds
+		){
 		}
+
+
 
 		const std::string& DbModuleConfigTableSync::getTableName() const
 		{
