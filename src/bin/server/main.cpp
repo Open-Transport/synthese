@@ -189,6 +189,12 @@ int main( int argc, char **argv )
 	std::signal(SIGPIPE, sig_PIPE_handler);
 #endif
 
+#ifdef WIN32
+	// Useful for attaching debugger at startup.
+	if (::getenv("SYNTHESE_PAUSE"))
+		::system("pause");
+#endif
+
     try 
     {
 		{
