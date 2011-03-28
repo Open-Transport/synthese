@@ -42,7 +42,7 @@ namespace util
 
     // Moreover, this way, it is feasible to share the same ThreadExec between different
     // Thread objects. Of course, using proper thread-local variables and mutexes in ThreadExec 
-    // derived classes is left to user responsability.
+    // derived classes is left to user responsibility.
 
 }
 
