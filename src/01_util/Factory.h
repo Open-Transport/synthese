@@ -116,20 +116,37 @@ namespace synthese
 
 			////////////////////////////////////////////////////////////////////
 			/// Subclass automatic registration.
-			///	@return the key if ok, empty string if the subclass is already registered
+			///	@throw FactoryException if a factory class is already integrated with the same key
+			// TODO: rename to Register for consistency?
 			template <class T>
 			static void Integrate(
 				const std::string& key
 			){
-				Log::GetInstance ().debug ("Registering compound... " + key);
+				Log::GetInstance().debug("Registering compound... " + key);
 
-				// If the key is already used then return false (it would be better to use exceptions)
 				if(_registeredCreator.find(key) != _registeredCreator.end())
-					throw FactoryException<RootObject>("Attempted to integrate a class twice : "+ key);
+					throw FactoryException<RootObject>("Attempted to integrate a factory class twice : " + key);
 
 				// Saving of the auto generated builder
 				boost::shared_ptr<CreatorInterface> creator(new Creator<T>);
 				_registeredCreator.insert(make_pair(key, creator));
+			}
+
+
+
+			////////////////////////////////////////////////////////////////////
+			/// Subclass automatic unregistration.
+			///	@throw FactoryException if no factory class is already integrated with the given key
+			template <class T>
+			static void Unregister(
+				const std::string& key
+			){
+				Log::GetInstance().debug("Unregistering compound... " + key);
+
+				if(_registeredCreator.find(key) == _registeredCreator.end())
+					throw FactoryException<RootObject>("Attempted to unregister a factory class not registered : " + key);
+
+				_registeredCreator.erase(key);
 			}
 
 
