@@ -72,8 +72,8 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_PORT ("port");
 		const string ServerModule::MODULE_PARAM_NB_THREADS ("nb_threads");
 		const string ServerModule::MODULE_PARAM_LOG_LEVEL ("log_level");
-		const string ServerModule::MODULE_PARAM_SMTP_PORT ("smtp_port");
 		const string ServerModule::MODULE_PARAM_SMTP_SERVER ("smtp_server");
+		const string ServerModule::MODULE_PARAM_SMTP_PORT ("smtp_port");
 		const string ServerModule::MODULE_PARAM_SESSION_MAX_DURATION("session_max_duration");
 
 		const std::string ServerModule::VERSION("3.2.1");
@@ -88,7 +88,7 @@ namespace synthese
 			RegisterParameter(ServerModule::MODULE_PARAM_LOG_LEVEL, "1", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_SERVER, "smtp", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT, "mail", &ServerModule::ParameterCallback);
-			RegisterParameter(ServerModule::MODULE_PARAM_LOG_LEVEL, "30", &ServerModule::ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_SESSION_MAX_DURATION, "30", &ServerModule::ParameterCallback);
 		}
 
 
@@ -145,7 +145,7 @@ namespace synthese
 			UnregisterParameter(ServerModule::MODULE_PARAM_LOG_LEVEL);
 			UnregisterParameter(ServerModule::MODULE_PARAM_SMTP_SERVER);
 			UnregisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT);
-			UnregisterParameter(ServerModule::MODULE_PARAM_LOG_LEVEL);
+			UnregisterParameter(ServerModule::MODULE_PARAM_SESSION_MAX_DURATION);
 
 			ServerModule::_io_service.stop();
 		}
