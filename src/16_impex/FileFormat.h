@@ -39,13 +39,6 @@ namespace synthese
 		class Env;
 	}
 
-	namespace db
-	{
-		// YYY
-		//class DBTransaction;
-		//typedef DBTransaction DBTransaction;
-	}
-
 	namespace impex
 	{
 		class DataSource;

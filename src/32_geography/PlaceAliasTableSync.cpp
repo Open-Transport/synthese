@@ -29,6 +29,7 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "ReplaceQuery.h"
 
 #include "Conversion.h"
 
@@ -124,17 +125,13 @@ namespace synthese
 			PlaceAlias* object,
 			optional<DBTransaction&> transaction
 		){
-			DB* db = DBModule::GetDB();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());	/// @todo Use grid ID
-               
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				/// @todo fill other fields separated by ,
-				<< ")";
-			db->execUpdate(query.str(), transaction);
+			ReplaceQuery<PlaceAliasTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getAliasedPlace() ? object->getAliasedPlace()->getKey() : RegistryKeyType(0));
+			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
+			// TODO: how to retrieve the isCityMainConnection value?
+			query.addField(false);
+			query.execute(transaction);
 		}
 
 	}

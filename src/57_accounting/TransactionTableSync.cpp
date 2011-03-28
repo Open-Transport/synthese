@@ -86,6 +86,7 @@ namespace synthese
 		{
 		    try
 		    {
+				// TODO: use ReplaceQuery instead of building the SQL.				
 				DB* db = DBModule::GetDB();
 				stringstream query;
 				if (t->getKey() <= 0)
@@ -129,8 +130,8 @@ namespace synthese
 			addTableColumn(TABLE_COL_ID, "SQL_INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "SQL_TEXT", true);
 			addTableColumn(TABLE_COL_DOCUMENT_ID, "SQL_INTEGER", true);
-			addTableColumn(TABLE_COL_START_DATE_TIME, "SQL_TIMESTAMP", true);
-			addTableColumn(TABLE_COL_END_DATE_TIME, "SQL_TIMESTAMP", true);
+			addTableColumn(TABLE_COL_START_DATE_TIME, "SQL_DATETIME", true);
+			addTableColumn(TABLE_COL_END_DATE_TIME, "SQL_DATETIME", true);
 			addTableColumn(TABLE_COL_LEFT_USER_ID, "SQL_INTEGER", true);
 			addTableColumn(TABLE_COL_PLACE_ID, "SQL_INTEGER", true);
 			addTableColumn(TABLE_COL_COMMENT, "SQL_TEXT", true);

@@ -74,7 +74,7 @@ namespace synthese
 			DBTableSync::Field(ForumMessageTableSync::COL_USER_EMAIL, SQL_TEXT),
 			DBTableSync::Field(ForumMessageTableSync::COL_USER_NAME, SQL_TEXT),
 			DBTableSync::Field(ForumMessageTableSync::COL_USER_ID, SQL_INTEGER),
-			DBTableSync::Field(ForumMessageTableSync::COL_DATE, SQL_TIMESTAMP),
+			DBTableSync::Field(ForumMessageTableSync::COL_DATE, SQL_DATETIME),
 			DBTableSync::Field(ForumMessageTableSync::COL_PUBLISHED, SQL_BOOLEAN),
 			DBTableSync::Field(ForumMessageTableSync::COL_IP, SQL_TEXT),
 			DBTableSync::Field()
@@ -139,7 +139,7 @@ namespace synthese
 				}
 			}
 
-			object->setDate(rows->getTimestamp(ForumMessageTableSync::COL_DATE));
+			object->setDate(rows->getDateTime(ForumMessageTableSync::COL_DATE));
 			object->setPublished(rows->getBool(ForumMessageTableSync::COL_PUBLISHED));
 			object->setIP(rows->getText(ForumMessageTableSync::COL_IP));
 		}

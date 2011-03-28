@@ -51,7 +51,7 @@ namespace synthese
 		template<> const DBTableSync::Field DBTableSyncTemplate<DbModuleConfigTableSync>::_FIELDS[]=
 		{
 			DBTableSync::Field(DbModuleConfigTableSync::COL_PARAMNAME, SQL_TEXT_FIXED),
-			DBTableSync::Field(DbModuleConfigTableSync::COL_PARAMVALUE, SQL_TIMESTAMP),
+			DBTableSync::Field(DbModuleConfigTableSync::COL_PARAMVALUE, SQL_DATETIME),
 			DBTableSync::Field()
 		};
 		
@@ -64,9 +64,9 @@ namespace synthese
 	namespace server
 	{
 		void 
-		DbModuleConfigTableSync::rowsAdded (DB* db, 
-						    SQLiteSync* sync,
-						    const DBResultSPtr& rows
+		DbModuleConfigTableSync::rowsAdded(
+			DB* db, 
+			const DBResultSPtr& rows
 		){
 			while (rows->next ())
 			{
@@ -79,10 +79,9 @@ namespace synthese
 
 		void DbModuleConfigTableSync::rowsUpdated(
 			DB* db, 
-			SQLiteSync* sync,
 			const DBResultSPtr& rows
 		){
-		    rowsAdded (db, sync, rows);
+		    rowsAdded (db, rows);
 		}
 
 
@@ -90,7 +89,6 @@ namespace synthese
 		void 
 		DbModuleConfigTableSync::rowsRemoved(
 			DB* db,
-			SQLiteSync* sync,
 			const RowIdList& rowIds
 		){
 		}

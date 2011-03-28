@@ -88,7 +88,7 @@ namespace synthese
 			DBTableSync::Field(UserTableSync::TABLE_COL_EMAIL, SQL_TEXT),
 			DBTableSync::Field(UserTableSync::TABLE_COL_PHONE, SQL_TEXT),
 			DBTableSync::Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_INTEGER),
-			DBTableSync::Field(UserTableSync::COL_BIRTH_DATE, SQL_TIMESTAMP),
+			DBTableSync::Field(UserTableSync::COL_BIRTH_DATE, SQL_DATETIME),
 			DBTableSync::Field(UserTableSync::COL_LANGUAGE, SQL_TEXT),
 			DBTableSync::Field()
 		};

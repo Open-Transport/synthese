@@ -26,6 +26,7 @@ REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
 <head>
+<meta charset="utf-8">
 <title><@title@> - SYNTHESE3 Admin</title>
 <link rel="icon" type="image/png" href="<@icon@>" />
 <style type="text/css">@import url(colors.css); @import url(admin.css); @import url(calendar-win2k-1.css);</style>

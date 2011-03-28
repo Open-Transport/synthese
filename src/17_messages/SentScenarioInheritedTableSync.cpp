@@ -30,6 +30,7 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "SentAlarm.h"
 #include "ReplaceQuery.h"
+#include "UpdateQuery.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -142,16 +143,19 @@ namespace synthese
 			query.execute(transaction);
 
 			// Alarms query
-			stringstream alarmquery;
-			alarmquery
-				<< "UPDATE "
-				<< AlarmTableSync::TABLE.NAME
-				<< " SET "
-				<< AlarmTableSync::COL_PERIODSTART << "='" << to_iso_extended_string(obj->getPeriodStart().date()) << " " << to_simple_string(obj->getPeriodStart().time_of_day()) << "'"
-				<< "," << AlarmTableSync::COL_PERIODEND << "='" << to_iso_extended_string(obj->getPeriodEnd().date()) << " " << to_simple_string(obj->getPeriodEnd().time_of_day()) << "'"
-				<< " WHERE " 
-				<< AlarmTableSync::COL_SCENARIO_ID << "=" << obj->getKey();
-			DBModule::GetDB()->execUpdate(alarmquery.str(), transaction);
+			UpdateQuery<AlarmTableSync> alarmsQuery;
+			alarmsQuery.addUpdateField(
+				AlarmTableSync::COL_PERIODSTART,
+				to_iso_extended_string(obj->getPeriodStart().date()) + " " +
+				to_simple_string(obj->getPeriodStart().time_of_day())
+			);
+			alarmsQuery.addUpdateField(
+				AlarmTableSync::COL_PERIODEND,
+				to_iso_extended_string(obj->getPeriodEnd().date()) + " " +
+				to_simple_string(obj->getPeriodEnd().time_of_day())
+			);
+			alarmsQuery.addWhereField(AlarmTableSync::COL_SCENARIO_ID, obj->getKey());
+			alarmsQuery.execute(transaction);
 		}
 	}
 

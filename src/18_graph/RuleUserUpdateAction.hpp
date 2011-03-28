@@ -29,9 +29,6 @@
 #include "FactorableTemplate.h"
 #include "RuleUser.h"
 
-// YYY
-#define DBTableSync DBTableSync
-
 namespace synthese
 {
 	namespace db
