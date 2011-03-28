@@ -2,10 +2,15 @@
 ## This is the SConstruct file for RCS forge build system.
 ## @author Marc Jambert
 ## @author Hugues Romain
+## @author Sylvain Pasche
 
-import os, filecmp, tempfile
-import os, fnmatch
-import time, datetime
+import datetime
+import glob
+import filecmp
+import fnmatch
+import os
+import tempfile
+import time
 
 
 EnsureSConsVersion(1, 0)
@@ -25,7 +30,10 @@ vars.AddVariables(
     BoolVariable('_DEB_BUILD_DEPS', 'Build deb dependencies files if needed', False),
     EnumVariable('_DEB_TARGET_DIST', 'Targeted debian distribution', 'unstable', allowed_values = ('unstable', 'testing', 'stable')),
     EnumVariable('_DEB_DPUT_HOST', 'Upload automatically generated deb package to proper repository', 'rcs-local', allowed_values = ('','rcs-local', 'rcs-official')),
-    BoolVariable('_USE_BUILD_RPATH', 'Use build/_CPPMODE/repo/lib for runtime search path (posix only)', False))
+    BoolVariable('_USE_BUILD_RPATH', 'Use build/_CPPMODE/repo/lib for runtime search path (posix only)', False),
+    BoolVariable('_WITH_MYSQL', 'Build with MySQL backend support', False),
+    PathVariable('_MYSQL_ROOT', 'Path to the MySQL server directory', None),
+    )
 
 vars.Add ('_LOCAL_EROS_SHAPE_DROP_DIR', 'Local eros shape drop dir to use', '/srv/pub/tmp/shape/')
 vars.Add('_REFERENCE_ENTERPRISE_HOST', 'Host where enterprise reference mysql db is stored', 'localhost')
@@ -90,6 +98,33 @@ env['_DEB_BIN_INSTALL_DIR'] = '/opt/rcs/bin/'
 env['_DEB_ETC_INSTALL_DIR'] = '/etc/opt/rcs/'
 env['_DEB_VAR_INSTALL_DIR'] = '/srv/data/'
 env['_DEB_DOC_INSTALL_DIR'] = '/srv/doc/'
+
+
+# MySQL build variables.
+if env['_WITH_MYSQL']:
+    env.Append ( CPPDEFINES = ['WITH_MYSQL=1'] )
+
+    if env['_PLATFORM'] == 'win32':
+        mysql_root = env.get('_MYSQL_ROOT')
+        if not mysql_root:
+            root_glob = os.path.join(env.SrcDir(''), os.pardir, 'mysql-*-win32')
+            try:
+                mysql_root = sorted(glob.glob(root_glob))[0]
+            except IndexError:
+                pass
+
+        if not mysql_root or not os.path.isdir(mysql_root):
+            raise Exception('Can\'t find MySQL root directory (tried %s)' % mysql_root)
+
+        env['_MYSQL_INCLUDE_DIR'] = os.path.join(mysql_root, 'include')
+        env['_MYSQL_LIBRARIES'] = os.path.join(mysql_root, 'lib', 'mysqlclient.lib')
+    else:
+        mysql_root = env.get('_MYSQL_ROOT', '/usr')
+        env['_MYSQL_INCLUDE_DIR'] = os.path.join(mysql_root, 'include', 'mysql')
+        # TODO: update library path if it's not in a location search by default.
+
+        env['_MYSQL_LIBRARIES'] = 'mysqlclient_r'
+
 
 #os.environ['COMSPEC'] = 'c:\windows\system32\cmd.exe'
 #os.environ['TEMP'] = 'c:\temp'
