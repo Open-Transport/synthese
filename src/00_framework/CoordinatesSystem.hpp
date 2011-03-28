@@ -182,6 +182,16 @@ namespace synthese
 			);
 
 
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Remove all the coordinates systems registered through AddCoordinatesSystem.
+			/// @author Sylvain Pasche
+			/// @date 2011
+			/// @since 3.3.0
+			static void ClearCoordinatesSystems();
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// @throws NotFoundException if the system was not found
 			static const CoordinatesSystem& GetCoordinatesSystem(SRID srid);
