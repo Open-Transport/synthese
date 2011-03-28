@@ -83,6 +83,8 @@ namespace synthese
 		geos::geom::GeometryFactory _geometryFactory;
 		bool _degrees;
 
+		CoordinatesSystem(const CoordinatesSystem&);
+		void operator=(const CoordinatesSystem&);
 
 	public:
 
@@ -92,7 +94,7 @@ namespace synthese
 			const std::string& projSequence
 		);
 
-		CoordinatesSystem() {}
+		~CoordinatesSystem();
 
 		//! @name Getters
 		//@{
@@ -151,7 +153,7 @@ namespace synthese
 			static const std::string _INSTANCE_COORDINATES_SYSTEM;
 			static const CoordinatesSystem* _instanceCoordinatesSystem;
 
-			typedef std::map<SRID, CoordinatesSystem> CoordinatesSystemsMap;
+			typedef std::map<SRID, boost::shared_ptr<CoordinatesSystem> > CoordinatesSystemsMap;
 
 			////////////////////////////////////////////////////////////////////
 			/// All coordinates systems.
