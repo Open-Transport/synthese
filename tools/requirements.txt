@@ -1,0 +1,7 @@
+argparse
+mechanize
+# Fails when installed from pip on Windows. It is only installed on Linux.
+#MySQL-python
+Paste
+static
+unittest2
