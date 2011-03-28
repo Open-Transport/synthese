@@ -27,7 +27,7 @@
 #include "NamedPlace.h"
 #include "CoordinatesSystem.hpp"
 #include "DBModule.h"
-#include "SQLiteResult.h"
+#include "DBResult.hpp"
 
 #include <sstream>
 #include <boost/iostreams/filtering_stream.hpp>

@@ -31,18 +31,18 @@
 
 #include "DataSource.h"
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
 	namespace impex
 	{
-		/** DataSource SQLite table synchronizer.
+		/** DataSource table synchronizer.
 			Automatic sychrnozation : none
 			@ingroup m16LS refLS
 		*/
 		class DataSourceTableSync
-		:	public db::SQLiteRegistryTableSyncTemplate<DataSourceTableSync,DataSource>
+		:	public db::DBRegistryTableSyncTemplate<DataSourceTableSync,DataSource>
 		{
 		 public:
 			 static const std::string COL_NAME;

@@ -26,7 +26,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -34,7 +34,7 @@ namespace synthese
 	{
 		class Profile;
 
-		/** Profile SQLite table synchronizer.
+		/** Profile table synchronizer.
 
 			The storage of rights is :
 				- rights separated by |
@@ -44,7 +44,7 @@ namespace synthese
 			@ingroup m12LS refLS
 		*/
 		class ProfileTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<ProfileTableSync,Profile>
+			public db::DBRegistryTableSyncTemplate<ProfileTableSync,Profile>
 		{
 
 		public:

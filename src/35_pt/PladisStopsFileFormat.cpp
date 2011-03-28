@@ -408,8 +408,8 @@ namespace synthese
 
 
 
-		db::SQLiteTransaction PladisStopsFileFormat::Importer_::_save() const
+		db::DBTransaction PladisStopsFileFormat::Importer_::_save() const
 		{
-			return SQLiteTransaction();
+			return DBTransaction();
 		}
 }	}

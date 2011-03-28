@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -42,7 +42,7 @@ namespace synthese
 		/// @since 3.1.15
 		//////////////////////////////////////////////////////////////////////////
 		class WebPageTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<WebPageTableSync,Webpage>
+			public db::DBRegistryTableSyncTemplate<WebPageTableSync,Webpage>
 		{
 		public:
 			static const std::string COL_TITLE;

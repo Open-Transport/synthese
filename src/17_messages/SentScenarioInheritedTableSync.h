@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteInheritedRegistryTableSync.h"
+#include "DBInheritedRegistryTableSync.hpp"
 #include "ScenarioTableSync.h"
 #include "SentScenario.h"
 
@@ -42,7 +42,7 @@ namespace synthese
 			@ingroup m17LS refLS
 		*/
 		class SentScenarioInheritedTableSync
-			: public db::SQLiteInheritedRegistryTableSync<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>
+			: public db::DBInheritedRegistryTableSync<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>
 		{
 		public:
 			typedef enum

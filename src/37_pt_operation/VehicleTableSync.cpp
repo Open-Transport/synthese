@@ -49,7 +49,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,VehicleTableSync>::FACTORY_KEY("37.01 Vehicles");
+		template<> const string FactorableTemplate<DBTableSync,VehicleTableSync>::FACTORY_KEY("37.01 Vehicles");
 	}
 
 	namespace pt_operation
@@ -63,38 +63,38 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<VehicleTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<VehicleTableSync>::TABLE(
 			"t069_vehicles"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<VehicleTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<VehicleTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(VehicleTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(VehicleTableSync::COL_NUMBER, SQL_TEXT),
-			SQLiteTableSync::Field(VehicleTableSync::COL_ALLOWED_LINES, SQL_TEXT),
-			SQLiteTableSync::Field(VehicleTableSync::COL_SEATS, SQL_TEXT),
-			SQLiteTableSync::Field(VehicleTableSync::COL_PICTURE, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(VehicleTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(VehicleTableSync::COL_NUMBER, SQL_TEXT),
+			DBTableSync::Field(VehicleTableSync::COL_ALLOWED_LINES, SQL_TEXT),
+			DBTableSync::Field(VehicleTableSync::COL_SEATS, SQL_TEXT),
+			DBTableSync::Field(VehicleTableSync::COL_PICTURE, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<VehicleTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<VehicleTableSync>::_INDEXES[]=
 		{
-			// SQLiteTableSync::Index(
+			// DBTableSync::Index(
 			//	VehicleTableSync::COL_NAME.c_str(),
 			// ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<VehicleTableSync,Vehicle>::Load(
+		template<> void DBDirectTableSyncTemplate<VehicleTableSync,Vehicle>::Load(
 			Vehicle* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -114,9 +114,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<VehicleTableSync,Vehicle>::Save(
+		template<> void DBDirectTableSyncTemplate<VehicleTableSync,Vehicle>::Save(
 			Vehicle* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<VehicleTableSync> query(*object);
 			query.addField(object->getName());
@@ -129,7 +129,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<VehicleTableSync,Vehicle>::Unlink(
+		template<> void DBDirectTableSyncTemplate<VehicleTableSync,Vehicle>::Unlink(
 			Vehicle* obj
 		){
 			PTOperationModule::UnregisterVehicle(*obj);

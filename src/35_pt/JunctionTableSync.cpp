@@ -27,8 +27,8 @@
 #include "JunctionTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "DataSourceTableSync.h"
 #include "StopPointTableSync.hpp"
 
@@ -45,7 +45,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,JunctionTableSync>::FACTORY_KEY("35.60 Junctions");
+		template<> const string FactorableTemplate<DBTableSync,JunctionTableSync>::FACTORY_KEY("35.60 Junctions");
 	}
 
 	namespace pt
@@ -59,43 +59,43 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<JunctionTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<JunctionTableSync>::TABLE(
 			"t066_junctions"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<JunctionTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<JunctionTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(JunctionTableSync::COL_START_PHYSICAL_STOP_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(JunctionTableSync::COL_END_PHYSICAL_STOP_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(JunctionTableSync::COL_LENGTH, SQL_INTEGER),
-			SQLiteTableSync::Field(JunctionTableSync::COL_DURATION, SQL_INTEGER),
-			SQLiteTableSync::Field(JunctionTableSync::COL_BIDIRECTIONAL, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(JunctionTableSync::COL_START_PHYSICAL_STOP_ID, SQL_INTEGER),
+			DBTableSync::Field(JunctionTableSync::COL_END_PHYSICAL_STOP_ID, SQL_INTEGER),
+			DBTableSync::Field(JunctionTableSync::COL_LENGTH, SQL_INTEGER),
+			DBTableSync::Field(JunctionTableSync::COL_DURATION, SQL_INTEGER),
+			DBTableSync::Field(JunctionTableSync::COL_BIDIRECTIONAL, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<JunctionTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<JunctionTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				JunctionTableSync::COL_START_PHYSICAL_STOP_ID.c_str(),
 				JunctionTableSync::COL_END_PHYSICAL_STOP_ID.c_str(),
 			""),
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				JunctionTableSync::COL_END_PHYSICAL_STOP_ID.c_str(),
 				JunctionTableSync::COL_START_PHYSICAL_STOP_ID.c_str(),
 			""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<JunctionTableSync,Junction>::Load(
+		template<> void DBDirectTableSyncTemplate<JunctionTableSync,Junction>::Load(
 			Junction* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -129,9 +129,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<JunctionTableSync,Junction>::Save(
+		template<> void DBDirectTableSyncTemplate<JunctionTableSync,Junction>::Save(
 			Junction* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<JunctionTableSync> query(*object);
 			query.addField(object->isValid() ? object->getStart()->getKey() : RegistryKeyType(0));
@@ -144,7 +144,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<JunctionTableSync,Junction>::Unlink(
+		template<> void DBDirectTableSyncTemplate<JunctionTableSync,Junction>::Unlink(
 			Junction* obj
 		){
 		}

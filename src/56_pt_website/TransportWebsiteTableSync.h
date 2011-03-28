@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_SiteTableSync_H__
 #define SYNTHESE_SiteTableSync_H__
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 #include "TransportWebsite.h"
 #include "FetcherTemplate.h"
 
@@ -41,7 +41,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t025_sites
 		class TransportWebsiteTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>,
+			public db::DBRegistryTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>,
 			public db::FetcherTemplate<cms::Website, TransportWebsiteTableSync>
 		{
 		public:

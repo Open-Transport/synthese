@@ -28,13 +28,13 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
 	namespace geography
 	{
-		/** City SQLite table synchronizer.
+		/** City table synchronizer.
 			@ingroup m32LS refLS
 
 			- on insert : insert entry in associator
@@ -42,7 +42,7 @@ namespace synthese
 			- on delete : X
 		*/
 		class CityTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<CityTableSync,City>
+			public db::DBRegistryTableSyncTemplate<CityTableSync,City>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;

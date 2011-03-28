@@ -30,8 +30,8 @@
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "SelectQuery.hpp"
 #include "ReplaceQuery.h"
 
@@ -47,7 +47,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,CalendarTemplateElementTableSync>::FACTORY_KEY("55.11 Calendar Template Elements");
+		template<> const string FactorableTemplate<DBTableSync,CalendarTemplateElementTableSync>::FACTORY_KEY("55.11 Calendar Template Elements");
 	}
 	
 	namespace calendar
@@ -63,39 +63,39 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CalendarTemplateElementTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<CalendarTemplateElementTableSync>::TABLE(
 			"t055_calendar_template_elements"
 		);
 		
 		
 		
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CalendarTemplateElementTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<CalendarTemplateElementTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_CALENDAR_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_RANK, SQL_INTEGER),
-			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_MIN_DATE, SQL_DATE),
-			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_MAX_DATE, SQL_DATE),
-			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_INTERVAL, SQL_INTEGER),
-			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_POSITIVE, SQL_INTEGER),
-			SQLiteTableSync::Field(CalendarTemplateElementTableSync::COL_INCLUDE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(CalendarTemplateElementTableSync::COL_CALENDAR_ID, SQL_INTEGER),
+			DBTableSync::Field(CalendarTemplateElementTableSync::COL_RANK, SQL_INTEGER),
+			DBTableSync::Field(CalendarTemplateElementTableSync::COL_MIN_DATE, SQL_DATE),
+			DBTableSync::Field(CalendarTemplateElementTableSync::COL_MAX_DATE, SQL_DATE),
+			DBTableSync::Field(CalendarTemplateElementTableSync::COL_INTERVAL, SQL_INTEGER),
+			DBTableSync::Field(CalendarTemplateElementTableSync::COL_POSITIVE, SQL_INTEGER),
+			DBTableSync::Field(CalendarTemplateElementTableSync::COL_INCLUDE_ID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CalendarTemplateElementTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<CalendarTemplateElementTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(CalendarTemplateElementTableSync::COL_CALENDAR_ID.c_str(), ""),
-			SQLiteTableSync::Index(CalendarTemplateElementTableSync::COL_INCLUDE_ID.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(CalendarTemplateElementTableSync::COL_CALENDAR_ID.c_str(), ""),
+			DBTableSync::Index(CalendarTemplateElementTableSync::COL_INCLUDE_ID.c_str(), ""),
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Load(
+		template<> void DBDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Load(
 			CalendarTemplateElement* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -154,9 +154,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Save(
+		template<> void DBDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Save(
 			CalendarTemplateElement* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<CalendarTemplateElementTableSync> query(*object);
 			query.addField(object->getCalendar() ? object->getCalendar()->getKey() : RegistryKeyType(0));
@@ -171,7 +171,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Unlink(
+		template<> void DBDirectTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>::Unlink(
 			CalendarTemplateElement* obj
 		){
 			if(obj->getCalendar())
@@ -219,7 +219,7 @@ namespace synthese
 
 		void CalendarTemplateElementTableSync::Shift( RegistryKeyType calendarId , int rank , int delta )
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 
 			stringstream query;
 
@@ -231,14 +231,14 @@ namespace synthese
 				<< " AND " << COL_RANK << ">=" << rank
 				;
 
-			sqlite->execUpdate(query.str());
+			db->execUpdate(query.str());
 		}
 
 
 
 		int CalendarTemplateElementTableSync::GetMaxRank( RegistryKeyType calendarId )
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 
 			stringstream query;
 
@@ -251,14 +251,14 @@ namespace synthese
 
 			try
 			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				DBResultSPtr rows = db->execQuery(query.str());
 				while (rows->next ())
 				{
 					return rows->getText("mr").empty() ? UNKNOWN_VALUE : rows->getInt("mr");
 				}
 				return UNKNOWN_VALUE;
 			}
-			catch(SQLiteException& e)
+			catch(DBException& e)
 			{
 				throw Exception(e.getMessage());
 			}
@@ -268,7 +268,7 @@ namespace synthese
 
 		void CalendarTemplateElementTableSync::Clean( util::RegistryKeyType calendarId )
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 
 			stringstream query;
 
@@ -278,7 +278,7 @@ namespace synthese
 				<< " WHERE " << COL_CALENDAR_ID << "=" << calendarId
 			;
 
-			sqlite->execUpdate(query.str());
+			db->execUpdate(query.str());
 		}
 	}
 }

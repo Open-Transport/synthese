@@ -33,7 +33,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 
-#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "DBNoSyncTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -50,7 +50,7 @@ namespace synthese
 			@ingroup m31LS refLS
 		*/
 		class ReservationTransactionTableSync:
-			public db::SQLiteNoSyncTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>
+			public db::DBNoSyncTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>
 		{
 		public:
 			static const std::string COL_LAST_RESERVATION_ID;

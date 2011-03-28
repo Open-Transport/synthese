@@ -43,7 +43,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,ForumMessageTableSync>::FACTORY_KEY("52.20 Messages");
+		template<> const string FactorableTemplate<DBTableSync,ForumMessageTableSync>::FACTORY_KEY("52.20 Messages");
 	}
 
 	namespace forum
@@ -60,46 +60,46 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ForumMessageTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<ForumMessageTableSync>::TABLE(
 			"t068_forum_messages"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ForumMessageTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<ForumMessageTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(ForumMessageTableSync::COL_TOPIC_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(ForumMessageTableSync::COL_CONTENT, SQL_TEXT),
-			SQLiteTableSync::Field(ForumMessageTableSync::COL_USER_EMAIL, SQL_TEXT),
-			SQLiteTableSync::Field(ForumMessageTableSync::COL_USER_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(ForumMessageTableSync::COL_USER_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(ForumMessageTableSync::COL_DATE, SQL_TIMESTAMP),
-			SQLiteTableSync::Field(ForumMessageTableSync::COL_PUBLISHED, SQL_BOOLEAN),
-			SQLiteTableSync::Field(ForumMessageTableSync::COL_IP, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(ForumMessageTableSync::COL_TOPIC_ID, SQL_INTEGER),
+			DBTableSync::Field(ForumMessageTableSync::COL_CONTENT, SQL_TEXT),
+			DBTableSync::Field(ForumMessageTableSync::COL_USER_EMAIL, SQL_TEXT),
+			DBTableSync::Field(ForumMessageTableSync::COL_USER_NAME, SQL_TEXT),
+			DBTableSync::Field(ForumMessageTableSync::COL_USER_ID, SQL_INTEGER),
+			DBTableSync::Field(ForumMessageTableSync::COL_DATE, SQL_TIMESTAMP),
+			DBTableSync::Field(ForumMessageTableSync::COL_PUBLISHED, SQL_BOOLEAN),
+			DBTableSync::Field(ForumMessageTableSync::COL_IP, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ForumMessageTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<ForumMessageTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				ForumMessageTableSync::COL_TOPIC_ID.c_str(),
 				ForumMessageTableSync::COL_DATE.c_str(),
 			""),
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				ForumMessageTableSync::COL_USER_ID.c_str(),
 				ForumMessageTableSync::COL_DATE.c_str(),
 			""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ForumMessageTableSync,ForumMessage>::Load(
+		template<> void DBDirectTableSyncTemplate<ForumMessageTableSync,ForumMessage>::Load(
 			ForumMessage* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -146,9 +146,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ForumMessageTableSync,ForumMessage>::Save(
+		template<> void DBDirectTableSyncTemplate<ForumMessageTableSync,ForumMessage>::Save(
 			ForumMessage* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<ForumMessageTableSync> query(*object);
 			query.addField(object->getTopic() ? object->getTopic()->getKey() : RegistryKeyType(0));
@@ -164,7 +164,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ForumMessageTableSync,ForumMessage>::Unlink(
+		template<> void DBDirectTableSyncTemplate<ForumMessageTableSync,ForumMessage>::Unlink(
 			ForumMessage* obj
 		){
 		}

@@ -27,8 +27,8 @@
 #include "CityTableSync.h"
 #include "Fetcher.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 
 #include "Conversion.h"
 
@@ -43,7 +43,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync, PlaceAliasTableSync>::FACTORY_KEY("14.10.01 Places Alias");
+		template<> const string FactorableTemplate<DBTableSync, PlaceAliasTableSync>::FACTORY_KEY("14.10.01 Places Alias");
 	}
 	
 	namespace geography
@@ -56,30 +56,30 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<PlaceAliasTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<PlaceAliasTableSync>::TABLE(
 			"t011_place_aliases"
 			);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<PlaceAliasTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<PlaceAliasTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(PlaceAliasTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(PlaceAliasTableSync::COL_ALIASEDPLACEID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(PlaceAliasTableSync::COL_CITYID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(PlaceAliasTableSync::COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(PlaceAliasTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(PlaceAliasTableSync::COL_ALIASEDPLACEID, SQL_INTEGER),
+			DBTableSync::Field(PlaceAliasTableSync::COL_CITYID, SQL_INTEGER),
+			DBTableSync::Field(PlaceAliasTableSync::COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
+			DBTableSync::Field()
 		};
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<PlaceAliasTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<PlaceAliasTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Load(
+		template<> void DBDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Load(
 			PlaceAlias* obj,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -109,7 +109,7 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Unlink(
+		template<> void DBDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Unlink(
 			PlaceAlias* obj
 		){
 			City* city(const_cast<City*>(obj->getCity()));
@@ -120,11 +120,11 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Save(
+		template<> void DBDirectTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>::Save(
 			PlaceAlias* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());	/// @todo Use grid ID
@@ -134,7 +134,7 @@ namespace synthese
 				<< Conversion::ToString(object->getKey())
 				/// @todo fill other fields separated by ,
 				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			db->execUpdate(query.str(), transaction);
 		}
 
 	}
@@ -142,7 +142,7 @@ namespace synthese
 	namespace geography
 	{
 		PlaceAliasTableSync::PlaceAliasTableSync()
-			: SQLiteRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>()
+			: DBRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>()
 		{
 		}
 
@@ -161,7 +161,7 @@ namespace synthese
 				<< " WHERE 1 ";
 			/// @todo Fill Where criteria
 			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToDBString(name, false) << "%'";
 				;
 			//if (orderByName)
 			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");

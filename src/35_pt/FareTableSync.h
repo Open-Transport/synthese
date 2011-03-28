@@ -29,7 +29,7 @@
 #include <iostream>
 
 #include "Fare.h"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -43,7 +43,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Synchronization : permanent.
 		class FareTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<FareTableSync,Fare>
+			public db::DBRegistryTableSyncTemplate<FareTableSync,Fare>
 		{
 		public:
 			static const std::string COL_NAME;

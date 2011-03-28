@@ -27,7 +27,7 @@
 #define SYNTHESE_DisplayScreenTableSync_H__
 
 #include "DisplayScreen.h"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 #include "SecurityTypes.hpp"
 
 #include <boost/optional.hpp>
@@ -45,7 +45,7 @@ namespace synthese
 			@ingroup m54LS refLS
 		*/
 		class DisplayScreenTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>
+			public db::DBRegistryTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>
 		{
 		public:
 			//! \name Columns

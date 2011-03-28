@@ -39,7 +39,7 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,PTUseRuleTableSync>::FACTORY_KEY("35.10.06 Public transportation use rules");
+	template<> const string util::FactorableTemplate<DBTableSync,PTUseRuleTableSync>::FACTORY_KEY("35.10.06 Public transportation use rules");
 
 	namespace pt
 	{
@@ -56,33 +56,33 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<PTUseRuleTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<PTUseRuleTableSync>::TABLE(
 			"t061_pt_use_rules"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<PTUseRuleTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<PTUseRuleTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(PTUseRuleTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(PTUseRuleTableSync::COL_CAPACITY, SQL_TEXT),
-			SQLiteTableSync::Field(PTUseRuleTableSync::COL_RESERVATION_TYPE, SQL_INTEGER),
-			SQLiteTableSync::Field(PTUseRuleTableSync::COL_ORIGINISREFERENCE, SQL_BOOLEAN),
-			SQLiteTableSync::Field(PTUseRuleTableSync::COL_MINDELAYMINUTES, SQL_INTEGER),
-			SQLiteTableSync::Field(PTUseRuleTableSync::COL_MINDELAYDAYS, SQL_INTEGER),
-			SQLiteTableSync::Field(PTUseRuleTableSync::COL_MAXDELAYDAYS, SQL_INTEGER),
-			SQLiteTableSync::Field(PTUseRuleTableSync::COL_HOURDEADLINE, SQL_TIME),
-			SQLiteTableSync::Field(PTUseRuleTableSync::COL_DEFAULT_FARE, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(PTUseRuleTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(PTUseRuleTableSync::COL_CAPACITY, SQL_TEXT),
+			DBTableSync::Field(PTUseRuleTableSync::COL_RESERVATION_TYPE, SQL_INTEGER),
+			DBTableSync::Field(PTUseRuleTableSync::COL_ORIGINISREFERENCE, SQL_BOOLEAN),
+			DBTableSync::Field(PTUseRuleTableSync::COL_MINDELAYMINUTES, SQL_INTEGER),
+			DBTableSync::Field(PTUseRuleTableSync::COL_MINDELAYDAYS, SQL_INTEGER),
+			DBTableSync::Field(PTUseRuleTableSync::COL_MAXDELAYDAYS, SQL_INTEGER),
+			DBTableSync::Field(PTUseRuleTableSync::COL_HOURDEADLINE, SQL_TIME),
+			DBTableSync::Field(PTUseRuleTableSync::COL_DEFAULT_FARE, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<PTUseRuleTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<PTUseRuleTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Load(
+		template<> void DBDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Load(
 			PTUseRule* rr,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -123,9 +123,9 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Save(
+		template<> void DBDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Save(
 			PTUseRule* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<PTUseRuleTableSync> query(*object);
 			query.addField(object->getName());
@@ -142,7 +142,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Unlink(
+		template<> void DBDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Unlink(
 			PTUseRule* obj
 		){
 

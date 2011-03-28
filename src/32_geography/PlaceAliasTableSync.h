@@ -25,7 +25,7 @@
 
 #include "PlaceAlias.h"
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 #include <vector>
 #include <string>
@@ -39,7 +39,7 @@ namespace synthese
 			@ingroup m32LS refLS
 		*/
 		class PlaceAliasTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>
+			public db::DBRegistryTableSyncTemplate<PlaceAliasTableSync,PlaceAlias>
 		{
 		public:
 			static const std::string COL_NAME;

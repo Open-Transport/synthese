@@ -23,8 +23,8 @@
 
 #include "ReplaceQuery.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "Language.hpp"
 #include "Profile.h"
 #include "UserTableSync.h"
@@ -44,7 +44,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,UserTableSync>::FACTORY_KEY("12.02 User");
+		template<> const string FactorableTemplate<DBTableSync,UserTableSync>::FACTORY_KEY("12.02 User");
 	}
 
 	namespace security
@@ -68,42 +68,42 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<UserTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<UserTableSync>::TABLE(
 			"t026_users", true
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<UserTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<UserTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(UserTableSync::TABLE_COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(UserTableSync::TABLE_COL_SURNAME, SQL_TEXT),
-			SQLiteTableSync::Field(UserTableSync::TABLE_COL_LOGIN, SQL_TEXT),
-			SQLiteTableSync::Field(UserTableSync::TABLE_COL_PASSWORD, SQL_TEXT),
-			SQLiteTableSync::Field(UserTableSync::TABLE_COL_PROFILE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(UserTableSync::TABLE_COL_ADDRESS, SQL_TEXT),
-			SQLiteTableSync::Field(UserTableSync::TABLE_COL_POST_CODE, SQL_TEXT),
-			SQLiteTableSync::Field(UserTableSync::TABLE_COL_CITY_TEXT, SQL_TEXT),
-			SQLiteTableSync::Field(UserTableSync::TABLE_COL_CITY_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(UserTableSync::TABLE_COL_COUNTRY, SQL_TEXT),
-			SQLiteTableSync::Field(UserTableSync::TABLE_COL_EMAIL, SQL_TEXT),
-			SQLiteTableSync::Field(UserTableSync::TABLE_COL_PHONE, SQL_TEXT),
-			SQLiteTableSync::Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_INTEGER),
-			SQLiteTableSync::Field(UserTableSync::COL_BIRTH_DATE, SQL_TIMESTAMP),
-			SQLiteTableSync::Field(UserTableSync::COL_LANGUAGE, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(UserTableSync::TABLE_COL_NAME, SQL_TEXT),
+			DBTableSync::Field(UserTableSync::TABLE_COL_SURNAME, SQL_TEXT),
+			DBTableSync::Field(UserTableSync::TABLE_COL_LOGIN, SQL_TEXT),
+			DBTableSync::Field(UserTableSync::TABLE_COL_PASSWORD, SQL_TEXT),
+			DBTableSync::Field(UserTableSync::TABLE_COL_PROFILE_ID, SQL_INTEGER),
+			DBTableSync::Field(UserTableSync::TABLE_COL_ADDRESS, SQL_TEXT),
+			DBTableSync::Field(UserTableSync::TABLE_COL_POST_CODE, SQL_TEXT),
+			DBTableSync::Field(UserTableSync::TABLE_COL_CITY_TEXT, SQL_TEXT),
+			DBTableSync::Field(UserTableSync::TABLE_COL_CITY_ID, SQL_INTEGER),
+			DBTableSync::Field(UserTableSync::TABLE_COL_COUNTRY, SQL_TEXT),
+			DBTableSync::Field(UserTableSync::TABLE_COL_EMAIL, SQL_TEXT),
+			DBTableSync::Field(UserTableSync::TABLE_COL_PHONE, SQL_TEXT),
+			DBTableSync::Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_INTEGER),
+			DBTableSync::Field(UserTableSync::COL_BIRTH_DATE, SQL_TIMESTAMP),
+			DBTableSync::Field(UserTableSync::COL_LANGUAGE, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<UserTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<UserTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(UserTableSync::TABLE_COL_NAME.c_str(), ""),
-			SQLiteTableSync::Index(UserTableSync::TABLE_COL_LOGIN.c_str(), ""),
-			SQLiteTableSync::Index(UserTableSync::TABLE_COL_PROFILE_ID.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(UserTableSync::TABLE_COL_NAME.c_str(), ""),
+			DBTableSync::Index(UserTableSync::TABLE_COL_LOGIN.c_str(), ""),
+			DBTableSync::Index(UserTableSync::TABLE_COL_PROFILE_ID.c_str(), ""),
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Load(
+		template<> void DBDirectTableSyncTemplate<UserTableSync,User>::Load(
 			User* user,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -143,7 +143,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Unlink(
+		template<> void DBDirectTableSyncTemplate<UserTableSync,User>::Unlink(
 			User* obj
 		){
 			obj->setProfile(NULL);
@@ -152,9 +152,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<UserTableSync,User>::Save(
+		template<> void DBDirectTableSyncTemplate<UserTableSync,User>::Save(
 			User* user,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<UserTableSync> query(*user);
 			query.addField(user->getName());
@@ -181,15 +181,15 @@ namespace synthese
 		shared_ptr<User> UserTableSync::getUserFromLogin(const string& login )
 		{
 			Env& env(Env::GetOfficialEnv());
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			query
 				<< "SELECT *"
 				<< " FROM " << TABLE.NAME
-				<< " WHERE " << TABLE_COL_LOGIN << "=" << Conversion::ToSQLiteString(login);
+				<< " WHERE " << TABLE_COL_LOGIN << "=" << Conversion::ToDBString(login);
 			try
 			{
-				db::SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				db::DBResultSPtr rows = db->execQuery(query.str());
 				if (rows->next () == false)
 					throw Exception("User "+ login + " not found in database.");
 
@@ -197,7 +197,7 @@ namespace synthese
 				Load(user.get(), rows, env, UP_LINKS_LOAD_LEVEL);
 				return user;
 			}
-			catch (SQLiteException e)
+			catch (DBException e)
 			{
 				throw Exception(e.getMessage());
 			}
@@ -232,13 +232,13 @@ namespace synthese
 				query << " INNER JOIN " << ProfileTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=t." << TABLE_COL_PROFILE_ID;
 			query << " WHERE 1 "; 
 			if(login)
-				query << " AND t." << TABLE_COL_LOGIN << " LIKE " << Conversion::ToSQLiteString(*login);
+				query << " AND t." << TABLE_COL_LOGIN << " LIKE " << Conversion::ToDBString(*login);
 			if(name)
-				query << " AND t." << TABLE_COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
+				query << " AND t." << TABLE_COL_NAME << " LIKE " << Conversion::ToDBString(*name);
 			if(surname)
-				query << " AND t." << TABLE_COL_SURNAME << " LIKE " << Conversion::ToSQLiteString(*surname);
+				query << " AND t." << TABLE_COL_SURNAME << " LIKE " << Conversion::ToDBString(*surname);
 			if(phone)
-				query << " AND t." << TABLE_COL_PHONE << " LIKE " << Conversion::ToSQLiteString(*phone);
+				query << " AND t." << TABLE_COL_PHONE << " LIKE " << Conversion::ToDBString(*phone);
 			if(profileId)
 				query << " AND " << TABLE_COL_PROFILE_ID << "=" << *profileId;
 			if (!indeterminate(emptyLogin))
@@ -274,18 +274,18 @@ namespace synthese
 		{
 			try
 			{
-				SQLite* sqlite = DBModule::GetSQLite();
+				DB* db = DBModule::GetDB();
 				stringstream query;
 				query
 					<< "SELECT " << TABLE_COL_ID
 					<< " FROM " << TABLE.NAME
-					<< " WHERE " << TABLE_COL_LOGIN << "=" << Conversion::ToSQLiteString(login)
+					<< " WHERE " << TABLE_COL_LOGIN << "=" << Conversion::ToDBString(login)
 					<< " LIMIT 1 ";
 				
-				db::SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				db::DBResultSPtr rows = db->execQuery(query.str());
 				return (rows->next () != false);
 			}
-			catch (SQLiteException e)
+			catch (DBException e)
 			{
 				throw Exception(e.getMessage());
 			}

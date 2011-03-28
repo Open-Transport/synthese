@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_messages_AlarmTemplateInheritedTableSync_h__
 #define SYNTHESE_messages_AlarmTemplateInheritedTableSync_h__
 
-#include "SQLiteInheritedNoSyncTableSyncTemplate.h"
+#include "DBInheritedNoSyncTableSyncTemplate.hpp"
 
 #include "AlarmTableSync.h"
 #include "AlarmTemplate.h"
@@ -36,7 +36,7 @@ namespace synthese
 			@ingroup m17ILS refILS
 		*/
 		class AlarmTemplateInheritedTableSync
-		:	public db::SQLiteInheritedNoSyncTableSyncTemplate<
+		:	public db::DBInheritedNoSyncTableSyncTemplate<
 				AlarmTableSync, AlarmTemplateInheritedTableSync, AlarmTemplate
 			>
 		{

@@ -30,7 +30,7 @@
 
 #include "DisplayType.h"
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -43,7 +43,7 @@ namespace synthese
 		///	@ingroup m54LS refLS
 		/// @author Hugues Romain
 		class DisplayTypeTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<DisplayTypeTableSync,DisplayType>
+			public db::DBRegistryTableSyncTemplate<DisplayTypeTableSync,DisplayType>
 		{
 		public:
 			static const std::string COL_NAME;

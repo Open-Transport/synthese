@@ -47,7 +47,7 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,ScheduledServiceTableSync>::FACTORY_KEY("35.60.03 Scheduled services");
+	template<> const string util::FactorableTemplate<DBTableSync,ScheduledServiceTableSync>::FACTORY_KEY("35.60.03 Scheduled services");
 	template<> const string FactorableTemplate<Fetcher<SchedulesBasedService>, ScheduledServiceTableSync>::FACTORY_KEY("16");
 	template<> const string FactorableTemplate<Fetcher<Service>, ScheduledServiceTableSync>::FACTORY_KEY("16");
 
@@ -66,33 +66,33 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ScheduledServiceTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<ScheduledServiceTableSync>::TABLE(
 			"t016_scheduled_services"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ScheduledServiceTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<ScheduledServiceTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
-			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_SCHEDULES, SQL_TEXT),
-			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_PATHID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_TEAM, SQL_TEXT),
-			SQLiteTableSync::Field(ScheduledServiceTableSync::COL_DATES, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(ScheduledServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
+			DBTableSync::Field(ScheduledServiceTableSync::COL_SCHEDULES, SQL_TEXT),
+			DBTableSync::Field(ScheduledServiceTableSync::COL_PATHID, SQL_INTEGER),
+			DBTableSync::Field(ScheduledServiceTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
+			DBTableSync::Field(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
+			DBTableSync::Field(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+			DBTableSync::Field(ScheduledServiceTableSync::COL_TEAM, SQL_TEXT),
+			DBTableSync::Field(ScheduledServiceTableSync::COL_DATES, SQL_TEXT),
+			DBTableSync::Field()
 		};
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ScheduledServiceTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<ScheduledServiceTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(ScheduledServiceTableSync::COL_PATHID.c_str(), ScheduledServiceTableSync::COL_SCHEDULES.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(ScheduledServiceTableSync::COL_PATHID.c_str(), ScheduledServiceTableSync::COL_SCHEDULES.c_str(), ""),
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Load(
+		template<> void DBDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Load(
 			ScheduledService* ss,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -173,7 +173,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Unlink(
+		template<> void DBDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Unlink(
 			ScheduledService* ss
 		){
 			ss->getPath()->removeService(ss);
@@ -181,9 +181,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Save(
+		template<> void DBDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Save(
 			ScheduledService* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			// Dates preparation
 			stringstream datesStr;

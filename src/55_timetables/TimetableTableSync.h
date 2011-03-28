@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "DBNoSyncTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -41,7 +41,7 @@ namespace synthese
 		/** Timetable table synchronizer.
 			@ingroup m55LS refLS
 		*/
-		class TimetableTableSync : public db::SQLiteNoSyncTableSyncTemplate<TimetableTableSync,Timetable>
+		class TimetableTableSync : public db::DBNoSyncTableSyncTemplate<TimetableTableSync,Timetable>
 		{
 		public:
 			static const std::string COL_BOOK_ID;

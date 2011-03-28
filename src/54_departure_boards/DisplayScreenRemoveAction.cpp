@@ -28,7 +28,7 @@
 #include "Request.h"
 #include "ParametersMap.h"
 #include "Right.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "AlarmObjectLinkTableSync.h"
 
 using namespace std;
@@ -81,7 +81,7 @@ namespace synthese
 			Request& request
 		) throw(ActionException) {
 
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 			AlarmObjectLinkTableSync::RemoveByTarget(_displayScreen->getKey(), transaction);
 			DisplayScreenTableSync::Remove(_displayScreen->getKey(), transaction);
 			transaction.run();

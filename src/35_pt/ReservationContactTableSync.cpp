@@ -26,8 +26,8 @@
 
 #include "ReservationContactTableSync.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "ReplaceQuery.h"
 
 using namespace std;
@@ -39,7 +39,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,ReservationContactTableSync>::FACTORY_KEY("35.10.06 Reservation contacts");
+	template<> const string util::FactorableTemplate<DBTableSync,ReservationContactTableSync>::FACTORY_KEY("35.10.06 Reservation contacts");
 
 	namespace pt
 	{
@@ -51,29 +51,29 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ReservationContactTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<ReservationContactTableSync>::TABLE(
 			"t021_reservation_contacts"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ReservationContactTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<ReservationContactTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(ReservationContactTableSync::COL_PHONEEXCHANGENUMBER, SQL_TEXT),
-			SQLiteTableSync::Field(ReservationContactTableSync::COL_PHONEEXCHANGEOPENINGHOURS, SQL_TEXT),
-			SQLiteTableSync::Field(ReservationContactTableSync::COL_DESCRIPTION, SQL_TEXT),
-			SQLiteTableSync::Field(ReservationContactTableSync::COL_WEBSITEURL, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(ReservationContactTableSync::COL_PHONEEXCHANGENUMBER, SQL_TEXT),
+			DBTableSync::Field(ReservationContactTableSync::COL_PHONEEXCHANGEOPENINGHOURS, SQL_TEXT),
+			DBTableSync::Field(ReservationContactTableSync::COL_DESCRIPTION, SQL_TEXT),
+			DBTableSync::Field(ReservationContactTableSync::COL_WEBSITEURL, SQL_TEXT),
+			DBTableSync::Field()
 		};
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ReservationContactTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<ReservationContactTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationContactTableSync,ReservationContact>::Load(
+		template<> void DBDirectTableSyncTemplate<ReservationContactTableSync,ReservationContact>::Load(
 			ReservationContact* rr,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -96,9 +96,9 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationContactTableSync,ReservationContact>::Save(
+		template<> void DBDirectTableSyncTemplate<ReservationContactTableSync,ReservationContact>::Save(
 			ReservationContact* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<ReservationContactTableSync> query(*object);
 			query.addField(object->getPhoneExchangeNumber());
@@ -110,7 +110,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationContactTableSync,ReservationContact>::Unlink(
+		template<> void DBDirectTableSyncTemplate<ReservationContactTableSync,ReservationContact>::Unlink(
 			ReservationContact* obj
 		){
 
@@ -121,7 +121,7 @@ namespace synthese
 	namespace pt
 	{
 		ReservationContactTableSync::ReservationContactTableSync()
-			: SQLiteRegistryTableSyncTemplate<ReservationContactTableSync,ReservationContact>()
+			: DBRegistryTableSyncTemplate<ReservationContactTableSync,ReservationContact>()
 		{
 		}
 
@@ -139,7 +139,7 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 " 
 				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
+				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(name, false) << "%'"
 				;
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);

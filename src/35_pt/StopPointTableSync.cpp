@@ -47,7 +47,7 @@ namespace synthese
 	using namespace road;
 	using namespace impex;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,StopPointTableSync>::FACTORY_KEY("35.55.01 Physical stops");
+	template<> const string util::FactorableTemplate<DBTableSync,StopPointTableSync>::FACTORY_KEY("35.55.01 Physical stops");
 	template<> const string FactorableTemplate<Fetcher<graph::Vertex>, StopPointTableSync>::FACTORY_KEY("12");
 
 	namespace pt
@@ -63,36 +63,36 @@ namespace synthese
 
     namespace db
     {
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<StopPointTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<StopPointTableSync>::TABLE(
 			"t012_physical_stops"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<StopPointTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<StopPointTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(StopPointTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(StopPointTableSync::COL_PLACEID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(StopPointTableSync::COL_X, SQL_DOUBLE),
-			SQLiteTableSync::Field(StopPointTableSync::COL_Y, SQL_DOUBLE),
-			SQLiteTableSync::Field(StopPointTableSync::COL_OPERATOR_CODE, SQL_TEXT),
-			SQLiteTableSync::Field(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, SQL_DOUBLE),
-			SQLiteTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(StopPointTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(StopPointTableSync::COL_PLACEID, SQL_INTEGER),
+			DBTableSync::Field(StopPointTableSync::COL_X, SQL_DOUBLE),
+			DBTableSync::Field(StopPointTableSync::COL_Y, SQL_DOUBLE),
+			DBTableSync::Field(StopPointTableSync::COL_OPERATOR_CODE, SQL_TEXT),
+			DBTableSync::Field(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, SQL_INTEGER),
+			DBTableSync::Field(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, SQL_DOUBLE),
+			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<StopPointTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<StopPointTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(StopPointTableSync::COL_PLACEID.c_str(), ""),
-			SQLiteTableSync::Index(StopPointTableSync::COL_OPERATOR_CODE.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(StopPointTableSync::COL_PLACEID.c_str(), ""),
+			DBTableSync::Index(StopPointTableSync::COL_OPERATOR_CODE.c_str(), ""),
+			DBTableSync::Index()
 		};
 
 
 		/** Does not update the place */
-		template<> void SQLiteDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Load(
+		template<> void DBDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Load(
 			StopPoint* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -172,7 +172,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Unlink(
+		template<> void DBDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Unlink(
 			StopPoint* obj
 		){
 			StopArea* place = const_cast<StopArea*>(obj->getConnectionPlace());
@@ -188,9 +188,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Save(
+		template<> void DBDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Save(
 			StopPoint* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<StopPointTableSync> query(*object);
 			query.addField(object->getName());

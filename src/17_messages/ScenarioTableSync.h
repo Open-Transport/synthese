@@ -30,7 +30,7 @@
 #include "AlarmTemplate.h"
 #include "SentAlarm.h"
 
-#include "SQLiteInheritanceTableSyncTemplate.h"
+#include "DBInheritanceTableSyncTemplate.hpp"
 
 #include <vector>
 #include <string>
@@ -57,7 +57,7 @@ namespace synthese
 		/// The format of the variables column is :
 		///		- for sent scenarios : <variable>|<value>, ...
 		/// 
-		class ScenarioTableSync : public db::SQLiteInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>
+		class ScenarioTableSync : public db::DBInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>
 		{
 		public:
 			static const std::string COL_IS_TEMPLATE;

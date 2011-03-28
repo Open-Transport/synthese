@@ -62,7 +62,7 @@ namespace synthese
 				<< "p." << StopPointTableSync::COL_PLACEID << "=" << placeId
 				<< " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=" << lineId
 				<< " LIMIT 1";
-			SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str()));
+			DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
 			return rows->next();
 		}
 
@@ -79,7 +79,7 @@ namespace synthese
 				<< "p." << StopPointTableSync::COL_PLACEID << "=" << placeId
 				<< " AND c." << CommercialLineTableSync::COL_NETWORK_ID << "=" << networkId
 				<< " LIMIT 1";
-			SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str()));
+			DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
 			return rows->next();
 		}
 
@@ -94,7 +94,7 @@ namespace synthese
 				<< LineStopTableSync::COL_LINEID << "=" << line
 				<< " AND " << LineStopTableSync::COL_ISDEPARTURE << "=1"
 				<< " LIMIT 1";
-			SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str()));
+			DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
 			if (!rows->next())
 				throw Exception("The line does not exists or does not contains any line stop");
 			return rows->getInt(LineStopTableSync::COL_RANKINPATH);

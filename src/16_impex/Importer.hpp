@@ -25,7 +25,7 @@
 
 #include "Env.h"
 #include "ParametersMap.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "AdminInterfaceElement.h"
 
 #include <ostream>
@@ -54,7 +54,7 @@ namespace synthese
 			mutable util::Env&						_env;
 			const DataSource&						_dataSource;
 
-			virtual db::SQLiteTransaction _save() const = 0;
+			virtual db::DBTransaction _save() const = 0;
 
 		public:
 			//! @name Getters
@@ -93,9 +93,9 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Interface for the save method.
 			/// @return transaction to run
-			db::SQLiteTransaction save() const
+			db::DBTransaction save() const
 			{
-				db::SQLiteTransaction result(_save());
+				db::DBTransaction result(_save());
 				_env.clear();
 				return result;
 			}

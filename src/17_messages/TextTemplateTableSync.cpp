@@ -25,8 +25,8 @@
 #include "Conversion.h"
 
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
@@ -44,7 +44,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,TextTemplateTableSync>::FACTORY_KEY("17.10.10 Text templates");
+		template<> const string FactorableTemplate<DBTableSync,TextTemplateTableSync>::FACTORY_KEY("17.10.10 Text templates");
 	}
 
 	namespace messages
@@ -58,30 +58,30 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TextTemplateTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<TextTemplateTableSync>::TABLE(
 			"t038_text_templates"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<TextTemplateTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<TextTemplateTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(TextTemplateTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(TextTemplateTableSync::COL_SHORT_TEXT, SQL_TEXT),
-			SQLiteTableSync::Field(TextTemplateTableSync::COL_LONG_TEXT, SQL_TEXT),
-			SQLiteTableSync::Field(TextTemplateTableSync::COL_IS_FOLDER, SQL_INTEGER),
-			SQLiteTableSync::Field(TextTemplateTableSync::COL_PARENT_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(TextTemplateTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(TextTemplateTableSync::COL_SHORT_TEXT, SQL_TEXT),
+			DBTableSync::Field(TextTemplateTableSync::COL_LONG_TEXT, SQL_TEXT),
+			DBTableSync::Field(TextTemplateTableSync::COL_IS_FOLDER, SQL_INTEGER),
+			DBTableSync::Field(TextTemplateTableSync::COL_PARENT_ID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TextTemplateTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<TextTemplateTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(TextTemplateTableSync::COL_PARENT_ID.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(TextTemplateTableSync::COL_PARENT_ID.c_str(), ""),
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Load(
+		template<> void DBDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Load(
 			TextTemplate* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -92,14 +92,14 @@ namespace synthese
 			object->setParentId(rows->getLongLong(TextTemplateTableSync::COL_PARENT_ID));
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Unlink(
+		template<> void DBDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Unlink(
 			TextTemplate* obj
 		){
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Save(
+		template<> void DBDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Save(
 			TextTemplate* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<TextTemplateTableSync> query(*object);
 			query.addField(object->getName());
@@ -140,7 +140,7 @@ namespace synthese
 			if (parentId)
 				query << " AND " << COL_PARENT_ID << "=" << *parentId;
 			if (!name.empty())
-				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
+				query << " AND " << COL_NAME << "=" << Conversion::ToDBString(name);
 			if (templateToBeDifferentWith)
 				query << " AND " << TABLE_COL_ID << "!=" << templateToBeDifferentWith->getKey();
 			

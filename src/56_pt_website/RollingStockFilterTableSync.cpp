@@ -31,8 +31,8 @@
 #include "TransportWebsite.h"
 #include "TransportWebsiteTableSync.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -50,7 +50,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,RollingStockFilterTableSync>::FACTORY_KEY("36.5 Rolling Stock Filter");
+		template<> const string FactorableTemplate<DBTableSync,RollingStockFilterTableSync>::FACTORY_KEY("36.5 Rolling Stock Filter");
 	}
 
 
@@ -66,31 +66,31 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RollingStockFilterTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<RollingStockFilterTableSync>::TABLE(
 			"t062_rolling_stock_filters"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<RollingStockFilterTableSync>::_FIELDS[] =
+		template<> const DBTableSync::Field DBTableSyncTemplate<RollingStockFilterTableSync>::_FIELDS[] =
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(RollingStockFilterTableSync::COL_SITE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(RollingStockFilterTableSync::COL_RANK, SQL_INTEGER),
-			SQLiteTableSync::Field(RollingStockFilterTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(RollingStockFilterTableSync::COL_AUTHORIZED_ONLY, SQL_INTEGER),
-			SQLiteTableSync::Field(RollingStockFilterTableSync::COL_ROLLING_STOCK_IDS, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(RollingStockFilterTableSync::COL_SITE_ID, SQL_INTEGER),
+			DBTableSync::Field(RollingStockFilterTableSync::COL_RANK, SQL_INTEGER),
+			DBTableSync::Field(RollingStockFilterTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(RollingStockFilterTableSync::COL_AUTHORIZED_ONLY, SQL_INTEGER),
+			DBTableSync::Field(RollingStockFilterTableSync::COL_ROLLING_STOCK_IDS, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<RollingStockFilterTableSync>::_INDEXES[] =
+		template<> const DBTableSync::Index DBTableSyncTemplate<RollingStockFilterTableSync>::_INDEXES[] =
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>::Load(
+		template<> void DBDirectTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>::Load(
 			RollingStockFilter* object
-			, const db::SQLiteResultSPtr& rows
+			, const db::DBResultSPtr& rows
 			, util::Env& environment, util::LinkLevel linkLevel /* = util::UP_LINKS_LOAD_LEVEL */ 
 		){
 			// Columns reading
@@ -151,9 +151,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>::Save(
+		template<> void DBDirectTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>::Save(
 			RollingStockFilter* object
-			, boost::optional<SQLiteTransaction&> transaction /* = boost::optional<SQLiteTransaction&> */
+			, boost::optional<DBTransaction&> transaction /* = boost::optional<DBTransaction&> */
 		){
 			stringstream query;
 			if (object->getKey() <= 0)
@@ -164,7 +164,7 @@ namespace synthese
 				object->getKey() << "," <<
 				(object->getSite() ? object->getSite()->getKey() : RegistryKeyType(0)) << "," <<
 				object->getRank() << "," <<
-				Conversion::ToSQLiteString(object->getName()) << "," <<
+				Conversion::ToDBString(object->getName()) << "," <<
 				object->getAuthorizedOnly() << "," <<
 				"\"";
 			 bool first(true);
@@ -177,12 +177,12 @@ namespace synthese
 			query << "\"" <<
 			")";
 			
-			 DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+			 DBModule::GetDB()->execUpdate(query.str(), transaction);
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>::Unlink(
+		template<> void DBDirectTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>::Unlink(
 			RollingStockFilter* obj
 		){
 			if(obj->getSite())
@@ -209,7 +209,7 @@ namespace synthese
 				<< " WHERE 1 ";
 			/// @todo Fill Where criteria
 			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'";
+			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToDBString(name, false) << "%'";
 				;
 			//if (orderByName)
 			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");

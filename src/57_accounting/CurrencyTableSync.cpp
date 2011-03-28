@@ -25,8 +25,8 @@
 #include "Conversion.h"
 
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 
 #include "AccountingModule.h"
 #include "Currency.h"
@@ -43,45 +43,45 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<SQLiteTableSync,CurrencyTableSync>::FACTORY_KEY("57.00 Currency");
+		template<> const std::string FactorableTemplate<DBTableSync,CurrencyTableSync>::FACTORY_KEY("57.00 Currency");
 	}
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CurrencyTableSync>::TABLE.NAME = "t029_currencies";
-		template<> const int SQLiteTableSyncTemplate<CurrencyTableSync>::TABLE.ID = 29;
-		template<> const bool SQLiteTableSyncTemplate<CurrencyTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const DBTableSync::Format DBTableSyncTemplate<CurrencyTableSync>::TABLE.NAME = "t029_currencies";
+		template<> const int DBTableSyncTemplate<CurrencyTableSync>::TABLE.ID = 29;
+		template<> const bool DBTableSyncTemplate<CurrencyTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<CurrencyTableSync,Currency>::load(Currency* currency, const db::SQLiteResultSPtr& rows )
+		template<> void DBDirectTableSyncTemplate<CurrencyTableSync,Currency>::load(Currency* currency, const db::DBResultSPtr& rows )
 		{
 			currency->setKey(rows->getLongLong (TABLE_COL_ID));
 			currency->setName(rows->getText ( CurrencyTableSync::TABLE_COL_NAME));
 			currency->setSymbol(rows->getText ( CurrencyTableSync::TABLE_COL_SYMBOL));
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<CurrencyTableSync,Currency>::_link(Currency* currency, const db::SQLiteResultSPtr& rows, GetSource temporary )
+		template<> void DBDirectTableSyncTemplate<CurrencyTableSync,Currency>::_link(Currency* currency, const db::DBResultSPtr& rows, GetSource temporary )
 		{
 
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<CurrencyTableSync,Currency>::_unlink(Currency* currency)
+		template<> void DBDirectTableSyncTemplate<CurrencyTableSync,Currency>::_unlink(Currency* currency)
 		{
 
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<CurrencyTableSync,Currency>::Save(Currency* currency)
+		template<> void DBDirectTableSyncTemplate<CurrencyTableSync,Currency>::Save(Currency* currency)
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			if (currency->getKey() <= 0)
 				currency->setKey(getId());
             query
 				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(currency->getKey())
-				<< "," << Conversion::ToSQLiteString(currency->getName())
-				<< "," << Conversion::ToSQLiteString(currency->getSymbol())
+				<< "," << Conversion::ToDBString(currency->getName())
+				<< "," << Conversion::ToDBString(currency->getSymbol())
 				<< ")";
-			sqlite->execUpdate(query.str());
+			db->execUpdate(query.str());
 		}
 
 	}
@@ -93,7 +93,7 @@ namespace synthese
 
 
 		CurrencyTableSync::CurrencyTableSync()
-			: SQLiteRegistryTableSyncTemplate<CurrencyTableSync,Currency>()
+			: DBRegistryTableSyncTemplate<CurrencyTableSync,Currency>()
 		{
 			addTableColumn(TABLE_COL_ID, "SQL_INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "SQL_TEXT", true);
@@ -104,13 +104,13 @@ namespace synthese
 
 		std::vector<shared_ptr<Currency> > CurrencyTableSync::search(const std::string& name, const std::string& symbol , int first /*= 0*/, int number /*= 0*/ )
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
-				<< " WHERE " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
-				<< " AND " << TABLE_COL_SYMBOL << " LIKE '%" << Conversion::ToSQLiteString(symbol, false) << "%'";
+				<< " WHERE " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(name, false) << "%'"
+				<< " AND " << TABLE_COL_SYMBOL << " LIKE '%" << Conversion::ToDBString(symbol, false) << "%'";
 			if (number > 0)
 				query << " LIMIT " << Conversion::ToString(number + 1);
 			if (first > 0)
@@ -118,7 +118,7 @@ namespace synthese
 
 			try
 			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				DBResultSPtr rows = db->execQuery(query.str());
 				vector<shared_ptr<Currency> > currencies;
 				while (rows->next ())
 				{
@@ -128,7 +128,7 @@ namespace synthese
 				}
 				return currencies;
 			}
-			catch(SQLiteException& e)
+			catch(DBException& e)
 			{
 				throw Exception(e.getMessage());
 			}

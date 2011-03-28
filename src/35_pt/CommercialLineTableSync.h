@@ -32,7 +32,7 @@
 #include <iostream>
 
 // Db
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 // Security
 #include "SecurityTypes.hpp"
@@ -47,7 +47,7 @@ namespace synthese
 			@ingroup m35LS refLS
 		*/
 		class CommercialLineTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<CommercialLineTableSync,CommercialLine>
+			public db::DBRegistryTableSyncTemplate<CommercialLineTableSync,CommercialLine>
 		{
 		public:
 			static const std::string COL_NETWORK_ID;

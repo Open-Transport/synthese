@@ -185,7 +185,7 @@ namespace synthese
 		void StopPointAddAction::run(
 			Request& request
 		){
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 
 			// Place creation
 			if(!_place.get())

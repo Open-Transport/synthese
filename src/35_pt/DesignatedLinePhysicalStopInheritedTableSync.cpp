@@ -46,9 +46,9 @@ namespace synthese
 	namespace db
 	{
 		template<>
-		void SQLiteInheritedTableSyncTemplate<LineStopTableSync,DesignatedLinePhysicalStopInheritedTableSync,DesignatedLinePhysicalStop>::Load(
+		void DBInheritedTableSyncTemplate<LineStopTableSync,DesignatedLinePhysicalStopInheritedTableSync,DesignatedLinePhysicalStop>::Load(
 			DesignatedLinePhysicalStop* obj,
-			const SQLiteResultSPtr& rows,
+			const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -97,7 +97,7 @@ namespace synthese
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<LineStopTableSync,DesignatedLinePhysicalStopInheritedTableSync,DesignatedLinePhysicalStop>::Unlink(
+		void DBInheritedTableSyncTemplate<LineStopTableSync,DesignatedLinePhysicalStopInheritedTableSync,DesignatedLinePhysicalStop>::Unlink(
 			DesignatedLinePhysicalStop* obj
 		){
 			obj->clearPhysicalStop();
@@ -106,9 +106,9 @@ namespace synthese
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<LineStopTableSync,DesignatedLinePhysicalStopInheritedTableSync,DesignatedLinePhysicalStop>::Save(
+		void DBInheritedTableSyncTemplate<LineStopTableSync,DesignatedLinePhysicalStopInheritedTableSync,DesignatedLinePhysicalStop>::Save(
 			DesignatedLinePhysicalStop* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			if(!object->getPhysicalStop()) throw Exception("Linestop save error. Missing physical stop");
 			if(!object->getLine()) throw Exception("Linestop Save error. Missing line");

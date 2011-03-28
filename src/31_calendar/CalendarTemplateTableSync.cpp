@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,CalendarTemplateTableSync>::FACTORY_KEY("55.10 Calendar templates");
+		template<> const string FactorableTemplate<DBTableSync,CalendarTemplateTableSync>::FACTORY_KEY("55.10 Calendar templates");
 	}
 	
 	namespace calendar
@@ -50,29 +50,29 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CalendarTemplateTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<CalendarTemplateTableSync>::TABLE(
 			"t054_calendar_templates"
 		);
 		
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CalendarTemplateTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<CalendarTemplateTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(CalendarTemplateTableSync::COL_TEXT, SQL_TEXT),
-			SQLiteTableSync::Field(CalendarTemplateTableSync::COL_CATEGORY, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(CalendarTemplateTableSync::COL_TEXT, SQL_TEXT),
+			DBTableSync::Field(CalendarTemplateTableSync::COL_CATEGORY, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CalendarTemplateTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<CalendarTemplateTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::Load(
+		template<> void DBDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::Load(
 			CalendarTemplate* object
-			, const db::SQLiteResultSPtr& rows,
+			, const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -103,9 +103,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::Save(
+		template<> void DBDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::Save(
 			CalendarTemplate* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<CalendarTemplateTableSync> query(*object);
 			query.addField(object->getText());
@@ -115,7 +115,7 @@ namespace synthese
 
 
 		
-		template<> void SQLiteDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::Unlink(
+		template<> void DBDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::Unlink(
 			CalendarTemplate* obj
 		){
 		}

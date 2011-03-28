@@ -45,7 +45,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,TransportWebsiteTableSync>::FACTORY_KEY("56.01 TransportWebsite");
+		template<> const string FactorableTemplate<DBTableSync,TransportWebsiteTableSync>::FACTORY_KEY("56.01 TransportWebsite");
 		template<> const string FactorableTemplate<Fetcher<Website>, TransportWebsiteTableSync>::FACTORY_KEY("25");
 	}
 
@@ -67,36 +67,36 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TransportWebsiteTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<TransportWebsiteTableSync>::TABLE(
 			"t025_sites"
 		);
 		
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<TransportWebsiteTableSync>::_FIELDS[] =
+		template<> const DBTableSync::Field DBTableSyncTemplate<TransportWebsiteTableSync>::_FIELDS[] =
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(TransportWebsiteTableSync::TABLE_COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(TransportWebsiteTableSync::TABLE_COL_START_DATE, SQL_DATE),
-			SQLiteTableSync::Field(TransportWebsiteTableSync::TABLE_COL_END_DATE, SQL_DATE),
-			SQLiteTableSync::Field(TransportWebsiteTableSync::TABLE_COL_ONLINE_BOOKING, SQL_INTEGER),
-			SQLiteTableSync::Field(TransportWebsiteTableSync::TABLE_COL_USE_OLD_DATA, SQL_INTEGER),
-			SQLiteTableSync::Field(TransportWebsiteTableSync::COL_MAX_CONNECTIONS, SQL_INTEGER),
-			SQLiteTableSync::Field(TransportWebsiteTableSync::COL_USE_DATES_RANGE, SQL_INTEGER),
-			SQLiteTableSync::Field(TransportWebsiteTableSync::COL_PERIODS, SQL_TEXT),
-			SQLiteTableSync::Field(TransportWebsiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS, SQL_INTEGER),
-			SQLiteTableSync::Field(TransportWebsiteTableSync::COL_CLIENT_URL, SQL_TEXT),
-			SQLiteTableSync::Field(TransportWebsiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(TransportWebsiteTableSync::TABLE_COL_NAME, SQL_TEXT),
+			DBTableSync::Field(TransportWebsiteTableSync::TABLE_COL_START_DATE, SQL_DATE),
+			DBTableSync::Field(TransportWebsiteTableSync::TABLE_COL_END_DATE, SQL_DATE),
+			DBTableSync::Field(TransportWebsiteTableSync::TABLE_COL_ONLINE_BOOKING, SQL_INTEGER),
+			DBTableSync::Field(TransportWebsiteTableSync::TABLE_COL_USE_OLD_DATA, SQL_INTEGER),
+			DBTableSync::Field(TransportWebsiteTableSync::COL_MAX_CONNECTIONS, SQL_INTEGER),
+			DBTableSync::Field(TransportWebsiteTableSync::COL_USE_DATES_RANGE, SQL_INTEGER),
+			DBTableSync::Field(TransportWebsiteTableSync::COL_PERIODS, SQL_TEXT),
+			DBTableSync::Field(TransportWebsiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS, SQL_INTEGER),
+			DBTableSync::Field(TransportWebsiteTableSync::COL_CLIENT_URL, SQL_TEXT),
+			DBTableSync::Field(TransportWebsiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TransportWebsiteTableSync>::_INDEXES[] =
+		template<> const DBTableSync::Index DBTableSyncTemplate<TransportWebsiteTableSync>::_INDEXES[] =
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Load(
+		template<> void DBDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Load(
 			TransportWebsite* site,
-			const SQLiteResultSPtr& rows,
+			const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -160,16 +160,16 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Unlink(
+		template<> void DBDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Unlink(
 			TransportWebsite* obj
 		){
 			CMSModule::RemoveSite(obj->getClientURL());
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Save(
+		template<> void DBDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Save(
 			TransportWebsite* site,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			// Preparation
 			stringstream periodstr;

@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 #include "NonConcurrencyRule.h"
 
 namespace synthese
@@ -40,7 +40,7 @@ namespace synthese
 		/** NonConcurrencyRule table synchronizer.
 			@ingroup m35LS refLS
 		*/
-		class NonConcurrencyRuleTableSync : public db::SQLiteRegistryTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>
+		class NonConcurrencyRuleTableSync : public db::DBRegistryTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>
 		{
 		public:
 			static const std::string COL_PRIORITY_LINE_ID;

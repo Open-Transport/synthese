@@ -53,9 +53,9 @@ namespace synthese
 	{
 		
 		template<>
-		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>::Load(
+		void DBInheritedTableSyncTemplate<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>::Load(
 			SentScenario* obj,
-			const SQLiteResultSPtr& rows,
+			const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -101,16 +101,16 @@ namespace synthese
 		}
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>::Unlink(
+		void DBInheritedTableSyncTemplate<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>::Unlink(
 			SentScenario* obj
 		){
 
 		}
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>::Save(
+		void DBInheritedTableSyncTemplate<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>::Save(
 			SentScenario* obj,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			// Preparation
 			stringstream vars;
@@ -151,7 +151,7 @@ namespace synthese
 				<< "," << AlarmTableSync::COL_PERIODEND << "='" << to_iso_extended_string(obj->getPeriodEnd().date()) << " " << to_simple_string(obj->getPeriodEnd().time_of_day()) << "'"
 				<< " WHERE " 
 				<< AlarmTableSync::COL_SCENARIO_ID << "=" << obj->getKey();
-			DBModule::GetSQLite()->execUpdate(alarmquery.str(), transaction);
+			DBModule::GetDB()->execUpdate(alarmquery.str(), transaction);
 		}
 	}
 
@@ -183,7 +183,7 @@ namespace synthese
 
 			if (name)
 			{
-				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
+				query << " AND " << COL_NAME << " LIKE " << Conversion::ToDBString(*name);
 			}
 
 			if(status && date)

@@ -45,7 +45,7 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,JourneyPatternTableSync>::FACTORY_KEY(
+	template<> const string util::FactorableTemplate<DBTableSync,JourneyPatternTableSync>::FACTORY_KEY(
 		"35.30.01 Journey patterns"
 	);
 
@@ -69,40 +69,40 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<JourneyPatternTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<JourneyPatternTableSync>::TABLE(
 			"t009_lines"
 		);
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<JourneyPatternTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<JourneyPatternTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_TIMETABLENAME, SQL_TEXT),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_DIRECTION, SQL_TEXT),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_ISWALKINGLINE, SQL_BOOLEAN),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_USEINDEPARTUREBOARDS, SQL_BOOLEAN),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_USEINTIMETABLES, SQL_BOOLEAN),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_USEINROUTEPLANNING, SQL_BOOLEAN),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_ROLLINGSTOCKID, SQL_INTEGER),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_WAYBACK, SQL_INTEGER),
-			SQLiteTableSync::Field(JourneyPatternTableSync::COL_DATASOURCE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
+			DBTableSync::Field(JourneyPatternTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(JourneyPatternTableSync::COL_TIMETABLENAME, SQL_TEXT),
+			DBTableSync::Field(JourneyPatternTableSync::COL_DIRECTION, SQL_TEXT),
+			DBTableSync::Field(JourneyPatternTableSync::COL_ISWALKINGLINE, SQL_BOOLEAN),
+			DBTableSync::Field(JourneyPatternTableSync::COL_USEINDEPARTUREBOARDS, SQL_BOOLEAN),
+			DBTableSync::Field(JourneyPatternTableSync::COL_USEINTIMETABLES, SQL_BOOLEAN),
+			DBTableSync::Field(JourneyPatternTableSync::COL_USEINROUTEPLANNING, SQL_BOOLEAN),
+			DBTableSync::Field(JourneyPatternTableSync::COL_ROLLINGSTOCKID, SQL_INTEGER),
+			DBTableSync::Field(JourneyPatternTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
+			DBTableSync::Field(JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
+			DBTableSync::Field(JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+			DBTableSync::Field(JourneyPatternTableSync::COL_WAYBACK, SQL_INTEGER),
+			DBTableSync::Field(JourneyPatternTableSync::COL_DATASOURCE_ID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<JourneyPatternTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<JourneyPatternTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID.c_str(), ""),
-			SQLiteTableSync::Index(JourneyPatternTableSync::COL_DATASOURCE_ID.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID.c_str(), ""),
+			DBTableSync::Index(JourneyPatternTableSync::COL_DATASOURCE_ID.c_str(), ""),
+			DBTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Load(
+		template<> void DBDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Load(
 			JourneyPattern* line,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -206,9 +206,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Save(
+		template<> void DBDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Save(
 			JourneyPattern* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			if(!object->getCommercialLine()) throw Exception("JourneyPattern save error. Missing commercial line");
 			ReplaceQuery<JourneyPatternTableSync> query(*object);
@@ -243,7 +243,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Unlink(JourneyPattern* obj)
+		template<> void DBDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Unlink(JourneyPattern* obj)
 		{
 			if(obj->getCommercialLine())
 			{

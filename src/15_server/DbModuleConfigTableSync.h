@@ -32,8 +32,8 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteTableSyncTemplate.h"
-#include "SQLiteResult.h"
+#include "DBTableSyncTemplate.hpp"
+#include "DBResult.hpp"
 #include "FactorableTemplate.h"
 
 namespace synthese
@@ -48,11 +48,11 @@ namespace synthese
 	
 	namespace server
 	{
-		/** DbModuleConfig SQLite table synchronizer.
+		/** DbModuleConfig table synchronizer.
 			@ingroup m15LS refLS
 		*/
 		class DbModuleConfigTableSync:
-			public db::SQLiteTableSyncTemplate<DbModuleConfigTableSync>
+			public db::DBTableSyncTemplate<DbModuleConfigTableSync>
 		{
 		 public:
 
@@ -63,19 +63,19 @@ namespace synthese
 
 			 virtual const std::string& getTableName() const;
 			void rowsAdded(
-				db::SQLite* sqlite,
+				db::DB* db,
 				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows
+				const db::DBResultSPtr& rows
 			);
 
 			void rowsUpdated(
-				db::SQLite* sqlite,
+				db::DB* db,
 				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows
+				const db::DBResultSPtr& rows
 			);
 
 			void rowsRemoved(
-				db::SQLite* sqlite,
+				db::DB* db,
 				db::SQLiteSync* sync,
 				const db::RowIdList& rowIds
 			);

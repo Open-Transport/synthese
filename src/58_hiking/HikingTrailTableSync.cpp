@@ -42,7 +42,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,HikingTrailTableSync>::FACTORY_KEY("58 Hiking trails");
+		template<> const string FactorableTemplate<DBTableSync,HikingTrailTableSync>::FACTORY_KEY("58 Hiking trails");
 	}
 
 	namespace hiking
@@ -57,39 +57,39 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<HikingTrailTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<HikingTrailTableSync>::TABLE(
 			"t064_hiking_trails"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<HikingTrailTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<HikingTrailTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(HikingTrailTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(HikingTrailTableSync::COL_DURATION, SQL_TEXT),
-			SQLiteTableSync::Field(HikingTrailTableSync::COL_MAP, SQL_TEXT),
-			SQLiteTableSync::Field(HikingTrailTableSync::COL_PROFILE, SQL_TEXT),
-			SQLiteTableSync::Field(HikingTrailTableSync::COL_URL, SQL_TEXT),
-			SQLiteTableSync::Field(HikingTrailTableSync::COL_STOPS, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(HikingTrailTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(HikingTrailTableSync::COL_DURATION, SQL_TEXT),
+			DBTableSync::Field(HikingTrailTableSync::COL_MAP, SQL_TEXT),
+			DBTableSync::Field(HikingTrailTableSync::COL_PROFILE, SQL_TEXT),
+			DBTableSync::Field(HikingTrailTableSync::COL_URL, SQL_TEXT),
+			DBTableSync::Field(HikingTrailTableSync::COL_STOPS, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<HikingTrailTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<HikingTrailTableSync>::_INDEXES[]=
 		{
-			// SQLiteTableSync::Index(
+			// DBTableSync::Index(
 			//	HikingTrailTableSync::COL_NAME.c_str(),
 			// ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<HikingTrailTableSync,HikingTrail>::Load(
+		template<> void DBDirectTableSyncTemplate<HikingTrailTableSync,HikingTrail>::Load(
 			HikingTrail* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -126,9 +126,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<HikingTrailTableSync,HikingTrail>::Save(
+		template<> void DBDirectTableSyncTemplate<HikingTrailTableSync,HikingTrail>::Save(
 			HikingTrail* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			stringstream stops;
 			{
@@ -153,7 +153,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<HikingTrailTableSync,HikingTrail>::Unlink(
+		template<> void DBDirectTableSyncTemplate<HikingTrailTableSync,HikingTrail>::Unlink(
 			HikingTrail* obj
 		){
 		}

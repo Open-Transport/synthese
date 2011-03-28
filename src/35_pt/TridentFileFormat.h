@@ -312,7 +312,7 @@ namespace synthese
 					boost::optional<const admin::AdminRequest&> adminRequest
 				) const;
 
-				virtual db::SQLiteTransaction _save() const;
+				virtual db::DBTransaction _save() const;
 
 
 

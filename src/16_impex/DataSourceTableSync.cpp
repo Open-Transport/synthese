@@ -38,7 +38,7 @@ namespace synthese
 	using namespace util;
 	using namespace impex;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,DataSourceTableSync>::FACTORY_KEY(
+	template<> const string util::FactorableTemplate<DBTableSync,DataSourceTableSync>::FACTORY_KEY(
 		"16.01 DataSource"
 	);
 
@@ -52,28 +52,28 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DataSourceTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<DataSourceTableSync>::TABLE(
 			"t059_data_sources"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DataSourceTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<DataSourceTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(DataSourceTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(DataSourceTableSync::COL_FORMAT, SQL_TEXT),
-			SQLiteTableSync::Field(DataSourceTableSync::COL_ICON, SQL_TEXT),
-			SQLiteTableSync::Field(DataSourceTableSync::COL_CHARSET, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(DataSourceTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(DataSourceTableSync::COL_FORMAT, SQL_TEXT),
+			DBTableSync::Field(DataSourceTableSync::COL_ICON, SQL_TEXT),
+			DBTableSync::Field(DataSourceTableSync::COL_CHARSET, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<DataSourceTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<DataSourceTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Load(
+		template<> void DBDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Load(
 			DataSource* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -86,9 +86,9 @@ namespace synthese
 			object->setCharset(rows->getText(DataSourceTableSync::COL_CHARSET));
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Save(
+		template<> void DBDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Save(
 			DataSource* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<DataSourceTableSync> query(*object);
 			query.addField(object->getName());
@@ -98,7 +98,7 @@ namespace synthese
 			query.execute(transaction);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Unlink(
+		template<> void DBDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Unlink(
 			DataSource* object
 		){
 		}
@@ -107,7 +107,7 @@ namespace synthese
 	namespace impex
 	{
 		DataSourceTableSync::DataSourceTableSync ()
-		:	SQLiteRegistryTableSyncTemplate<DataSourceTableSync,DataSource>()
+		:	DBRegistryTableSyncTemplate<DataSourceTableSync,DataSource>()
 		{
 		}
 

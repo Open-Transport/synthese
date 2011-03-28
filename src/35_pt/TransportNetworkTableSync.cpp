@@ -39,7 +39,7 @@ namespace synthese
 	using namespace pt;
 	using namespace impex;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,TransportNetworkTableSync>::FACTORY_KEY(
+	template<> const string util::FactorableTemplate<DBTableSync,TransportNetworkTableSync>::FACTORY_KEY(
 		"35.20.02 Network transport"
 	);
 
@@ -51,34 +51,34 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TransportNetworkTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<TransportNetworkTableSync>::TABLE(
 			"t022_transport_networks"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<TransportNetworkTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<TransportNetworkTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(TransportNetworkTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(TransportNetworkTableSync::COL_CREATOR_ID, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(TransportNetworkTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(TransportNetworkTableSync::COL_CREATOR_ID, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TransportNetworkTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<TransportNetworkTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(TransportNetworkTableSync::COL_CREATOR_ID.c_str(), ""),
-			SQLiteTableSync::Index(TransportNetworkTableSync::COL_NAME.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(TransportNetworkTableSync::COL_CREATOR_ID.c_str(), ""),
+			DBTableSync::Index(TransportNetworkTableSync::COL_NAME.c_str(), ""),
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Load(
+		template<> void DBDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Load(
 			TransportNetwork* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -91,9 +91,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Save(
+		template<> void DBDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Save(
 			TransportNetwork* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<TransportNetworkTableSync> query(*object);
 			query.addField(object->getName());
@@ -103,7 +103,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Unlink(
+		template<> void DBDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Unlink(
 			TransportNetwork* object
 		){
 		}

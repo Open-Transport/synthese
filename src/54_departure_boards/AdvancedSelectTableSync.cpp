@@ -88,9 +88,9 @@ namespace synthese
 			if (lineId)
 				query << " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=" << *lineId;
 			if (!cityName.empty())
-				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(cityName, false) << "%'";
+				query << " AND c." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(cityName, false) << "%'";
 			if (!placeName.empty())
-				query << " AND p." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(placeName, false) << "%'";
+				query << " AND p." << CityTableSync::TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(placeName, false) << "%'";
 			if (bpPresence != WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
 			{
 				query << " AND bc+cc ";
@@ -125,7 +125,7 @@ namespace synthese
 
 			try
 			{
-				SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(query.str());
+				DBResultSPtr rows = DBModule::GetDB()->execQuery(query.str());
 				vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > objects;
 				while (rows->next ())
 				{
@@ -148,7 +148,7 @@ namespace synthese
 				}
 				return objects;
 			}
-			catch(SQLiteException& e)
+			catch(DBException& e)
 			{
 				throw Exception(e.getMessage());
 			}
@@ -178,8 +178,8 @@ namespace synthese
 
 			try
 			{
-				SQLite* sqlite = DBModule::GetSQLite();
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				DB* db = DBModule::GetDB();
+				DBResultSPtr rows = db->execQuery(query.str());
 				vector<shared_ptr<const CommercialLine> > objects;
 				while (rows->next ())
 				{
@@ -190,7 +190,7 @@ namespace synthese
 				}
 				return objects;
 			}
-			catch(SQLiteException& e)
+			catch(DBException& e)
 			{
 				throw Exception(e.getMessage());
 			}

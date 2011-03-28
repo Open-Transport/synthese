@@ -27,7 +27,7 @@
 #include "SelectQuery.hpp"
 #include "StopAreaTableSync.hpp"
 #include "DBModule.h"
-#include "SQLiteResult.h"
+#include "DBResult.hpp"
 
 using namespace std;
 using namespace boost;
@@ -41,7 +41,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,TimetableRowTableSync>::FACTORY_KEY("55.02 Timetable rows");
+		template<> const string FactorableTemplate<DBTableSync,TimetableRowTableSync>::FACTORY_KEY("55.02 Timetable rows");
 	}
 	
 	namespace timetables
@@ -56,37 +56,37 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TimetableRowTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<TimetableRowTableSync>::TABLE(
 			"t053_timetable_rows"
 		);
 		
 		
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<TimetableRowTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<TimetableRowTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(TimetableRowTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableRowTableSync::COL_RANK, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableRowTableSync::COL_PLACE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableRowTableSync::COL_IS_DEPARTURE, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableRowTableSync::COL_IS_ARRIVAL, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableRowTableSync::COL_IS_COMPULSORY, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(TimetableRowTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
+			DBTableSync::Field(TimetableRowTableSync::COL_RANK, SQL_INTEGER),
+			DBTableSync::Field(TimetableRowTableSync::COL_PLACE_ID, SQL_INTEGER),
+			DBTableSync::Field(TimetableRowTableSync::COL_IS_DEPARTURE, SQL_INTEGER),
+			DBTableSync::Field(TimetableRowTableSync::COL_IS_ARRIVAL, SQL_INTEGER),
+			DBTableSync::Field(TimetableRowTableSync::COL_IS_COMPULSORY, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TimetableRowTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<TimetableRowTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				TimetableRowTableSync::COL_TIMETABLE_ID.c_str()
 				, TimetableRowTableSync::COL_RANK.c_str()
 			, ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Load(
+		template<> void DBDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Load(
 			TimetableRow* object
-			, const db::SQLiteResultSPtr& rows,
+			, const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -117,9 +117,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Save(
+		template<> void DBDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Save(
 			TimetableRow* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<TimetableRowTableSync> query(*object);
 			query.addField(object->getTimetableId());
@@ -133,7 +133,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Unlink(
+		template<> void DBDirectTableSyncTemplate<TimetableRowTableSync,TimetableRow>::Unlink(
 			TimetableRow* obj
 		){
 		}
@@ -180,7 +180,7 @@ namespace synthese
 
 		void TimetableRowTableSync::Shift( util::RegistryKeyType timetableId , int rank , int delta )
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 
 			stringstream query;
 
@@ -192,7 +192,7 @@ namespace synthese
 				<< " AND " << COL_RANK << ">=" << rank
 				;
 
-			sqlite->execUpdate(query.str());
+			db->execUpdate(query.str());
 	
 		}
 
@@ -200,7 +200,7 @@ namespace synthese
 
 		int TimetableRowTableSync::GetMaxRank( util::RegistryKeyType timetableId )
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 
 			stringstream query;
 
@@ -213,14 +213,14 @@ namespace synthese
 
 			try
 			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				DBResultSPtr rows = db->execQuery(query.str());
 				while (rows->next ())
 				{
 					return rows->getText("mr").empty() ? UNKNOWN_VALUE : rows->getInt("mr");
 				}
 				return UNKNOWN_VALUE;
 			}
-			catch(SQLiteException& e)
+			catch(DBException& e)
 			{
 				throw Exception(e.getMessage());
 			}

@@ -29,7 +29,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 #include "FetcherTemplate.h"
 
 #include <boost/optional.hpp>
@@ -43,7 +43,7 @@ namespace synthese
 		///	@ingroup m35LS refLS
 		///
 		class ContinuousServiceTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>,
+			public db::DBRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>,
 			public db::FetcherTemplate<SchedulesBasedService, ContinuousServiceTableSync>,
 			public db::FetcherTemplate<graph::Service, ContinuousServiceTableSync>
 		{

@@ -53,7 +53,7 @@
 #include "CoordinatesSystem.hpp"
 #include "Conversion.h"
 #include "XmlToolkit.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "CityAliasTableSync.hpp"
 #include "JunctionTableSync.hpp"
 #include "RollingStockTableSync.h"
@@ -1782,9 +1782,9 @@ namespace synthese
 		
 
 
-		SQLiteTransaction TridentFileFormat::Importer_::_save() const
+		DBTransaction TridentFileFormat::Importer_::_save() const
 		{
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 
 			// Saving of each created or altered objects
 			if(_importStops)

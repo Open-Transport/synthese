@@ -32,7 +32,7 @@ namespace synthese
 	using namespace db;
 	using namespace server;
 	
-	template<> const string util::FactorableTemplate<SQLiteTableSync,DbModuleConfigTableSync>::FACTORY_KEY(
+	template<> const string util::FactorableTemplate<DBTableSync,DbModuleConfigTableSync>::FACTORY_KEY(
 		"999 db config"
 	);
 
@@ -44,29 +44,29 @@ namespace synthese
 
 	namespace db
 	{
-	    template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DbModuleConfigTableSync>::TABLE(
+	    template<> const DBTableSync::Format DBTableSyncTemplate<DbModuleConfigTableSync>::TABLE(
 			"t999_config", false, false
 			);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DbModuleConfigTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<DbModuleConfigTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(DbModuleConfigTableSync::COL_PARAMNAME, SQL_TEXT_FIXED),
-			SQLiteTableSync::Field(DbModuleConfigTableSync::COL_PARAMVALUE, SQL_TIMESTAMP),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(DbModuleConfigTableSync::COL_PARAMNAME, SQL_TEXT_FIXED),
+			DBTableSync::Field(DbModuleConfigTableSync::COL_PARAMVALUE, SQL_TIMESTAMP),
+			DBTableSync::Field()
 		};
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<DbModuleConfigTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<DbModuleConfigTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 	}
 
 	namespace server
 	{
 		void 
-		DbModuleConfigTableSync::rowsAdded (SQLite* sqlite, 
+		DbModuleConfigTableSync::rowsAdded (DB* db, 
 						    SQLiteSync* sync,
-						    const SQLiteResultSPtr& rows
+						    const DBResultSPtr& rows
 		){
 			while (rows->next ())
 			{
@@ -78,18 +78,18 @@ namespace synthese
 
 
 		void DbModuleConfigTableSync::rowsUpdated(
-			SQLite* sqlite, 
+			DB* db, 
 			SQLiteSync* sync,
-			const SQLiteResultSPtr& rows
+			const DBResultSPtr& rows
 		){
-		    rowsAdded (sqlite, sync, rows);
+		    rowsAdded (db, sync, rows);
 		}
 
 
 
 		void 
 		DbModuleConfigTableSync::rowsRemoved(
-			SQLite* sqlite,
+			DB* db,
 			SQLiteSync* sync,
 			const RowIdList& rowIds
 		){

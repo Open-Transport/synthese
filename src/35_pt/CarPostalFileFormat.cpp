@@ -28,7 +28,7 @@
 #include "StopAreaTableSync.hpp"
 #include "City.h"
 #include "CityTableSync.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "CommercialLineTableSync.h"
@@ -105,9 +105,9 @@ namespace synthese
 
 		
 		
-		SQLiteTransaction CarPostalFileFormat::Importer_::_save() const
+		DBTransaction CarPostalFileFormat::Importer_::_save() const
 		{
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env.getRegistry<JourneyPattern>())
 			{
 				JourneyPatternTableSync::Save(line.second.get(), transaction);

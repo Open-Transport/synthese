@@ -31,7 +31,7 @@
 #include "EdgeProjector.hpp"
 #include "RoadPlace.h"
 #include "LexicalMatcher.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "StopArea.hpp"
 #include "Road.h"
 #include "RoadChunkTableSync.h"
@@ -81,7 +81,7 @@ namespace synthese
 		void ProjectAllStopPointsAction::run(
 			Request& request
 		){
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 
 			vector<shared_ptr<StopPoint> > stopPoints(
 				StopPointTableSync::Search(

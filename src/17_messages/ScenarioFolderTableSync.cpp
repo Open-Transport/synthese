@@ -28,8 +28,8 @@
 #include "ScenarioFolder.h"
 
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 
 #include "Conversion.h"
 
@@ -44,7 +44,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,ScenarioFolderTableSync>::FACTORY_KEY("17 ScenarioFolder");
+		template<> const string FactorableTemplate<DBTableSync,ScenarioFolderTableSync>::FACTORY_KEY("17 ScenarioFolder");
 	}
 
 	namespace messages
@@ -55,29 +55,29 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ScenarioFolderTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<ScenarioFolderTableSync>::TABLE(
 			"t051_scenario_folder"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ScenarioFolderTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<ScenarioFolderTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(ScenarioFolderTableSync::COL_NAME, SQL_INTEGER),
-			SQLiteTableSync::Field(ScenarioFolderTableSync::COL_PARENT_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(ScenarioFolderTableSync::COL_NAME, SQL_INTEGER),
+			DBTableSync::Field(ScenarioFolderTableSync::COL_PARENT_ID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ScenarioFolderTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<ScenarioFolderTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(ScenarioFolderTableSync::COL_PARENT_ID.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(ScenarioFolderTableSync::COL_PARENT_ID.c_str(), ""),
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Load(
+		template<> void DBDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Load(
 			ScenarioFolder* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -102,11 +102,11 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Save(
+		template<> void DBDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Save(
 			ScenarioFolder* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());
@@ -114,15 +114,15 @@ namespace synthese
 			 query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToSQLiteString(object->getName())
+				<< "," << Conversion::ToDBString(object->getName())
 				<< "," << (object->getParent() ? Conversion::ToString(object->getParent()->getKey()) : "0")
 				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			db->execUpdate(query.str(), transaction);
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Unlink(
+		template<> void DBDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Unlink(
 			ScenarioFolder* obj
 		){
 		}
@@ -152,7 +152,7 @@ namespace synthese
 			}
 			if(name)
 			{
-				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
+				query << " AND " << COL_NAME << " LIKE " << Conversion::ToDBString(*name);
 			}
 			query << " ORDER BY " << COL_NAME << " ASC";
 			if (number)

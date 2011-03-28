@@ -43,9 +43,9 @@ namespace synthese
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,SentAlarm>::Load(
+		void DBInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,SentAlarm>::Load(
 			SentAlarm* obj,
-			const SQLiteResultSPtr& rows, 
+			const DBResultSPtr& rows, 
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -76,7 +76,7 @@ namespace synthese
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<
+		void DBInheritedTableSyncTemplate<
 			AlarmTableSync,ScenarioSentAlarmInheritedTableSync, SentAlarm
 		>::Unlink(
 			SentAlarm* obj
@@ -86,11 +86,11 @@ namespace synthese
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<
+		void DBInheritedTableSyncTemplate<
 			AlarmTableSync,ScenarioSentAlarmInheritedTableSync, SentAlarm
 		>::Save(
 			SentAlarm* obj,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			if (obj->getKey() == 0)
 				obj->setKey(getId());
@@ -101,14 +101,14 @@ namespace synthese
 				<< ",0"
 				<< ",0"
 				<< "," << Conversion::ToString(static_cast<int>(obj->getLevel()))
-				<< "," << Conversion::ToSQLiteString(obj->getShortMessage())
-				<< "," << Conversion::ToSQLiteString(obj->getLongMessage())
+				<< "," << Conversion::ToDBString(obj->getShortMessage())
+				<< "," << Conversion::ToDBString(obj->getLongMessage())
 				<< ",NULL"
 				<< ",NULL" 
 				<< "," << (obj->getScenario() ? Conversion::ToString(obj->getScenario()->getKey()) : "0")
 				<< "," << (obj->getTemplate() ? Conversion::ToString(obj->getTemplate()->getKey()) : "0")
 				<< ")";
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+			DBModule::GetDB()->execUpdate(query.str(), transaction);
 		}
 	}
 
@@ -146,7 +146,7 @@ namespace synthese
 void SingleSentAlarmInheritedTableSync::Search( util::Env& env, ptime startDate , ptime endDate , AlarmConflict conflict , AlarmLevel level , int first, int number, bool orderByDate, bool orderByLevel,
 bool orderByStatus, bool orderByConflict, bool raisingOrder, util::LinkLevel linkLevel )
 {
-	SQLite* sqlite = DBModule::GetSQLite();
+	DB* db = DBModule::GetDB();
 	stringstream query;
 	query
 		<< " SELECT "
@@ -184,7 +184,7 @@ bool orderByStatus, bool orderByConflict, bool raisingOrder, util::LinkLevel lin
 	try
 	{
 		Registry<SentAlarm>& registry(env.getEditableRegistry<SentAlarm>());
-		SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+		DBResultSPtr rows = db->execQuery(query.str());
 		while (rows->next ())
 		{
 			shared_ptr<SingleSentAlarm> object(new SingleSentAlarm);
@@ -221,7 +221,7 @@ bool orderByStatus, bool orderByConflict, bool raisingOrder, util::LinkLevel lin
 			registry.add(static_pointer_cast<SentAlarm,SingleSentAlarm>(object));
 		}
 	}
-	catch(SQLiteException& e)
+	catch(DBException& e)
 	{
 		throw Exception(e.getMessage());
 	}

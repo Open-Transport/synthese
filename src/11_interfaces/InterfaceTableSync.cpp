@@ -22,7 +22,7 @@
 
 #include "Conversion.h"
 
-#include "SQLiteResult.h"
+#include "DBResult.hpp"
 #include "ReplaceQuery.h"
 #include "InterfaceTableSync.h"
 #include "InterfacePageTableSync.h"
@@ -40,7 +40,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<SQLiteTableSync,InterfaceTableSync>::FACTORY_KEY("16.01 Interfaces");
+		template<> const std::string FactorableTemplate<DBTableSync,InterfaceTableSync>::FACTORY_KEY("16.01 Interfaces");
 	}
 
 	namespace interfaces
@@ -52,27 +52,27 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<InterfaceTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<InterfaceTableSync>::TABLE(
 			"t024_interfaces"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<InterfaceTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<InterfaceTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE, SQL_TEXT),
-			SQLiteTableSync::Field(InterfaceTableSync::TABLE_COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(InterfaceTableSync::COL_DEFAULT_CLIENT_URL, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE, SQL_TEXT),
+			DBTableSync::Field(InterfaceTableSync::TABLE_COL_NAME, SQL_TEXT),
+			DBTableSync::Field(InterfaceTableSync::COL_DEFAULT_CLIENT_URL, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<InterfaceTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<InterfaceTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Load(
+		template<> void DBDirectTableSyncTemplate<InterfaceTableSync,Interface>::Load(
 			Interface* interf,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -83,15 +83,15 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Unlink(
+		template<> void DBDirectTableSyncTemplate<InterfaceTableSync,Interface>::Unlink(
 			Interface* interf
 		){
 
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<InterfaceTableSync,Interface>::Save(
+		template<> void DBDirectTableSyncTemplate<InterfaceTableSync,Interface>::Save(
 			Interface* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<InterfaceTableSync> query(*object);
 			query.addField(object->getNoSessionDefaultPageCode());
@@ -120,7 +120,7 @@ namespace synthese
 			if (interfacePageKey)
 				query << " AND EXISTS(SELECT * FROM " << InterfacePageTableSync::TABLE.NAME << " p"
 					<< " WHERE p." << InterfacePageTableSync::TABLE_COL_INTERFACE << "=" << TABLE.NAME << "." << TABLE_COL_ID
-					<< " AND p." << InterfacePageTableSync::TABLE_COL_CLASS << "=" << Conversion::ToSQLiteString(*interfacePageKey)
+					<< " AND p." << InterfacePageTableSync::TABLE_COL_CLASS << "=" << Conversion::ToDBString(*interfacePageKey)
 					<< ")";
 			if(orderByName)
 				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");

@@ -25,8 +25,8 @@
 #include "ReservationContactTableSync.h"
 #include "InterfaceTableSync.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "ReplaceQuery.h"
 
 #include <sstream>
@@ -45,7 +45,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,OnlineReservationRuleTableSync>::FACTORY_KEY(
+		template<> const string FactorableTemplate<DBTableSync,OnlineReservationRuleTableSync>::FACTORY_KEY(
 			"31.5 Online Reservation Rule Table Sync"
 		);
 	}
@@ -69,38 +69,38 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<OnlineReservationRuleTableSync>::TABLE(
 				"t047_online_reservation_rules"
 				);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<OnlineReservationRuleTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_EMAIL, SQL_TEXT),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_COPY_EMAIL, SQL_TEXT),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_SURNAME, SQL_INTEGER),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_ADDRESS, SQL_INTEGER),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_PHONE, SQL_INTEGER),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_EMAIL, SQL_INTEGER),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_CUSTOMER_NUMBER, SQL_INTEGER),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_MAX_SEATS, SQL_INTEGER),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_THRESHOLDS, SQL_INTEGER),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_SENDER_EMAIL, SQL_TEXT),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_SENDER_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_EMAIL, SQL_TEXT),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_COPY_EMAIL, SQL_TEXT),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_SURNAME, SQL_INTEGER),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_ADDRESS, SQL_INTEGER),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_PHONE, SQL_INTEGER),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_EMAIL, SQL_INTEGER),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_CUSTOMER_NUMBER, SQL_INTEGER),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_MAX_SEATS, SQL_INTEGER),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_THRESHOLDS, SQL_INTEGER),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_SENDER_EMAIL, SQL_TEXT),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_SENDER_NAME, SQL_TEXT),
+			DBTableSync::Field(OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<OnlineReservationRuleTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<OnlineReservationRuleTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(OnlineReservationRuleTableSync::COL_RESERVATION_CONTACT_ID.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(OnlineReservationRuleTableSync::COL_RESERVATION_CONTACT_ID.c_str(), ""),
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Load(
+		template<> void DBDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Load(
 			OnlineReservationRule* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -151,15 +151,15 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Unlink(
+		template<> void DBDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Unlink(
 			OnlineReservationRule* object
 		){
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Save(
+		template<> void DBDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Save(
 			OnlineReservationRule* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<OnlineReservationRuleTableSync> query(*object);
 			query.addField(object->getReservationContact() ? object->getReservationContact()->getKey() : RegistryKeyType(0));
@@ -194,7 +194,7 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 				/// @todo Fill Where criteria
-				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
+				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(name, false) << "%'"
 				;
 			if (number > 0)
 				query << " LIMIT " << (number + 1);

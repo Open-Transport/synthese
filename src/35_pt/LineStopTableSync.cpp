@@ -33,7 +33,7 @@
 
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 
 #include <geos/geom/LineString.h>
 #include <boost/foreach.hpp>
@@ -51,7 +51,7 @@ namespace synthese
 	using namespace geography;
 	using namespace graph;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,LineStopTableSync>::FACTORY_KEY("35.57.01 JourneyPattern stops");
+	template<> const string util::FactorableTemplate<DBTableSync,LineStopTableSync>::FACTORY_KEY("35.57.01 JourneyPattern stops");
 
 	namespace pt
 	{
@@ -67,44 +67,44 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<LineStopTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<LineStopTableSync>::TABLE(
 			"t010_line_stops"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<LineStopTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<LineStopTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(LineStopTableSync::COL_PHYSICALSTOPID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(LineStopTableSync::COL_LINEID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(LineStopTableSync::COL_RANKINPATH, SQL_INTEGER),
-			SQLiteTableSync::Field(LineStopTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
-			SQLiteTableSync::Field(LineStopTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
-			SQLiteTableSync::Field(LineStopTableSync::COL_METRICOFFSET, SQL_DOUBLE),
-			SQLiteTableSync::Field(LineStopTableSync::COL_SCHEDULEINPUT, SQL_BOOLEAN),
-			SQLiteTableSync::Field(LineStopTableSync::COL_INTERNAL_SERVICE, SQL_BOOLEAN),
-			SQLiteTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(LineStopTableSync::COL_PHYSICALSTOPID, SQL_INTEGER),
+			DBTableSync::Field(LineStopTableSync::COL_LINEID, SQL_INTEGER),
+			DBTableSync::Field(LineStopTableSync::COL_RANKINPATH, SQL_INTEGER),
+			DBTableSync::Field(LineStopTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
+			DBTableSync::Field(LineStopTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
+			DBTableSync::Field(LineStopTableSync::COL_METRICOFFSET, SQL_DOUBLE),
+			DBTableSync::Field(LineStopTableSync::COL_SCHEDULEINPUT, SQL_BOOLEAN),
+			DBTableSync::Field(LineStopTableSync::COL_INTERNAL_SERVICE, SQL_BOOLEAN),
+			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<LineStopTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<LineStopTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				LineStopTableSync::COL_LINEID.c_str(),
 				LineStopTableSync::COL_RANKINPATH.c_str(),
 				""
 			),
-			SQLiteTableSync::Index(LineStopTableSync::COL_PHYSICALSTOPID.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(LineStopTableSync::COL_PHYSICALSTOPID.c_str(), ""),
+			DBTableSync::Index()
 		};
 
 
 
 		template<>
-		string SQLiteInheritanceTableSyncTemplate<LineStopTableSync,LineStop>::_GetSubClassKey(const SQLiteResultSPtr& row)
+		string DBInheritanceTableSyncTemplate<LineStopTableSync,LineStop>::_GetSubClassKey(const DBResultSPtr& row)
 		{
 			return
 				(decodeTableId(row->getLongLong(LineStopTableSync::COL_PHYSICALSTOPID)) == StopPointTableSync::TABLE.ID) ?
@@ -116,7 +116,7 @@ namespace synthese
 
 
 		template<>
-		string SQLiteInheritanceTableSyncTemplate<LineStopTableSync,LineStop>::_GetSubClassKey(const LineStop* obj)
+		string DBInheritanceTableSyncTemplate<LineStopTableSync,LineStop>::_GetSubClassKey(const LineStop* obj)
 		{
 			return
 				(dynamic_cast<const DesignatedLinePhysicalStop*>(obj) != NULL) ?
@@ -127,9 +127,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteInheritanceTableSyncTemplate<LineStopTableSync,LineStop>::_CommonLoad(
+		template<> void DBInheritanceTableSyncTemplate<LineStopTableSync,LineStop>::_CommonLoad(
 			LineStop* ls,
-			const SQLiteResultSPtr& rows,
+			const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -213,7 +213,7 @@ namespace synthese
 			query << "UPDATE " << TABLE.NAME << " SET " << COL_RANKINPATH << "=" << COL_RANKINPATH << "+1 WHERE " <<
 				COL_LINEID << "=" << lineStop.getLine()->getKey() << " AND " << COL_RANKINPATH << ">=" << lineStop.getRankInPath();
 
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 			transaction.add(query.str());
 
 			Save(&lineStop, transaction);
@@ -225,7 +225,7 @@ namespace synthese
 
 		void LineStopTableSync::RemoveStop(const LineStop& lineStop )
 		{
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 
 			Remove(lineStop.getKey(), transaction);
 

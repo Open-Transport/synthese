@@ -45,7 +45,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync, RoadChunkTableSync>::FACTORY_KEY("34.30.01 Road chunks");
+		template<> const string FactorableTemplate<DBTableSync, RoadChunkTableSync>::FACTORY_KEY("34.30.01 Road chunks");
 	}
 
 	namespace road
@@ -64,40 +64,40 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RoadChunkTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<RoadChunkTableSync>::TABLE(
 			"t014_road_chunks"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<RoadChunkTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<RoadChunkTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_CROSSING_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_RANKINPATH, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_ROADID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_METRICOFFSET, SQL_DOUBLE, false),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_LEFT_START_HOUSE_NUMBER, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_LEFT_END_HOUSE_NUMBER, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_RIGHT_START_HOUSE_NUMBER, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_RIGHT_END_HOUSE_NUMBER, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_LEFT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadChunkTableSync::COL_RIGHT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
-			SQLiteTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(RoadChunkTableSync::COL_CROSSING_ID, SQL_INTEGER),
+			DBTableSync::Field(RoadChunkTableSync::COL_RANKINPATH, SQL_INTEGER),
+			DBTableSync::Field(RoadChunkTableSync::COL_ROADID, SQL_INTEGER),
+			DBTableSync::Field(RoadChunkTableSync::COL_METRICOFFSET, SQL_DOUBLE),
+			DBTableSync::Field(RoadChunkTableSync::COL_LEFT_START_HOUSE_NUMBER, SQL_INTEGER),
+			DBTableSync::Field(RoadChunkTableSync::COL_LEFT_END_HOUSE_NUMBER, SQL_INTEGER),
+			DBTableSync::Field(RoadChunkTableSync::COL_RIGHT_START_HOUSE_NUMBER, SQL_INTEGER),
+			DBTableSync::Field(RoadChunkTableSync::COL_RIGHT_END_HOUSE_NUMBER, SQL_INTEGER),
+			DBTableSync::Field(RoadChunkTableSync::COL_LEFT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
+			DBTableSync::Field(RoadChunkTableSync::COL_RIGHT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
+			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<RoadChunkTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<RoadChunkTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				RoadChunkTableSync::COL_ROADID.c_str(),
 				RoadChunkTableSync::COL_RANKINPATH.c_str(),
 				""
 			),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>::Load(
+		template<> void DBDirectTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>::Load(
 			MainRoadChunk* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -182,16 +182,16 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>::Unlink(
+		template<> void DBDirectTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>::Unlink(
 			MainRoadChunk* obj
 		){
 		}
 
 
 	    
-	    template<> void SQLiteDirectTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>::Save(
+	    template<> void DBDirectTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>::Save(
 			MainRoadChunk* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<RoadChunkTableSync> query(*object);
 			query.addField(object->getFromCrossing() ? object->getFromCrossing()->getKey() : RegistryKeyType(0));
