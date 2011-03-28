@@ -26,8 +26,6 @@
 
 #include "threads/Thread.h"
 
-#include "DBSync.hpp"
-
 #include "InterfaceTableSync.h"
 #include "Interface.h"
 #include "InterfacePageTableSync.h"

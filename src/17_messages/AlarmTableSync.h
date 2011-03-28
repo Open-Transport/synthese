@@ -44,7 +44,6 @@ namespace synthese
 
 		/** Alarm table synchronizer.
 			@ingroup m17LS refLS
-			@warning (for the future db node synchronizer) The alarm table sync insertion hook must always be run after the one for the scenario
 
 			Only the sent alarms are loaded in ram.
 
@@ -67,10 +66,8 @@ namespace synthese
 			static const std::string COL_ENABLED;
 			static const std::string COL_TEMPLATE_ID;
 			
-			AlarmTableSync ();
-			~AlarmTableSync ();
-
-		public:
+			AlarmTableSync();
+			~AlarmTableSync();
 		};
 	}
 }

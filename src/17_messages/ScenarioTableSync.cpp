@@ -71,8 +71,8 @@ namespace synthese
 			DBTableSync::Field(ScenarioTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
 			DBTableSync::Field(ScenarioTableSync::COL_ENABLED, SQL_INTEGER),
 			DBTableSync::Field(ScenarioTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(ScenarioTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
-			DBTableSync::Field(ScenarioTableSync::COL_PERIODEND, SQL_TIMESTAMP),
+			DBTableSync::Field(ScenarioTableSync::COL_PERIODSTART, SQL_DATETIME),
+			DBTableSync::Field(ScenarioTableSync::COL_PERIODEND, SQL_DATETIME),
 			DBTableSync::Field(ScenarioTableSync::COL_FOLDER_ID, SQL_INTEGER),
 			DBTableSync::Field(ScenarioTableSync::COL_VARIABLES, SQL_TEXT),
 			DBTableSync::Field(ScenarioTableSync::COL_TEMPLATE, SQL_INTEGER),
@@ -126,6 +126,10 @@ namespace synthese
 	{
 		ScenarioTableSync::ScenarioTableSync()
 			: DBInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>()
+		{
+		}
+
+		ScenarioTableSync::~ScenarioTableSync ()
 		{
 		}
 	}

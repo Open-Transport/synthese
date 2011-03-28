@@ -35,6 +35,7 @@
 #include "Interface.h"
 #include "CommercialLine.h"
 #include "StopPoint.hpp"
+#include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
 
 #include "01_util/Conversion.h"
@@ -85,7 +86,7 @@ namespace synthese
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
 			DBTableSync::Field(TimetableTableSync::COL_BOOK_ID, SQL_INTEGER),
 			DBTableSync::Field(TimetableTableSync::COL_RANK, SQL_INTEGER),
-			DBTableSync::Field(TimetableTableSync::COL_TITLE, SQL_INTEGER),
+			DBTableSync::Field(TimetableTableSync::COL_TITLE, SQL_TEXT),
 			DBTableSync::Field(TimetableTableSync::COL_CALENDAR_ID, SQL_INTEGER),
 			DBTableSync::Field(TimetableTableSync::COL_FORMAT, SQL_INTEGER),
 			DBTableSync::Field(TimetableTableSync::COL_AUTHORIZED_LINES, SQL_TEXT),
@@ -324,19 +325,9 @@ namespace synthese
 
 		void TimetableTableSync::Shift( util::RegistryKeyType bookId , int rank , int delta )
 		{
-			DB* db = DBModule::GetDB();
-
-			stringstream query;
-
-			// Content
-			query
-				<< "UPDATE " << TABLE.NAME
-				<< " SET " << COL_RANK << "=" << COL_RANK << ((delta > 0) ? "+" : "") << delta
-				<< " WHERE " << COL_BOOK_ID << "=" << bookId
-				<< " AND " << COL_RANK << ">=" << rank
-				;
-
-			db->execUpdate(query.str());
+			RankUpdateQuery<TimetableTableSync> query(COL_RANK, delta, rank);
+			query.addWhereField(COL_BOOK_ID, bookId);
+			query.execute();
 		}
 
 

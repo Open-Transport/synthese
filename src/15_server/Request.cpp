@@ -160,7 +160,8 @@ namespace synthese
 				}
 				catch(ActionException& e)
 				{
-					_actionErrorMessage = "Action error : "+ e.getMessage();
+					_actionErrorMessage = "Action error : " + e.getMessage();
+					Log::GetInstance().debug("Action error : " + e.getMessage());
 				}
 			}
 

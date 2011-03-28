@@ -55,7 +55,7 @@ namespace synthese
 			Plusieurs entrées sont consignées dans la base de données sous formes d'entrées de journal. 
 			Le journal lui-même est le composant d'administration dédié à leur consultation.
 
-			Le stockage des entrées de journal s'effectue dans la base de données SQLite.
+			Le stockage des entrées de journal s'effectue dans la base de données.
 
 			Les éléments de journal contiennent les données suivantes :
 				- date de l'événement

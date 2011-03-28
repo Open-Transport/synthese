@@ -81,8 +81,8 @@ namespace synthese
 			DBTableSync::Field(AlarmTableSync::COL_LEVEL, SQL_INTEGER),
 			DBTableSync::Field(AlarmTableSync::COL_SHORT_MESSAGE, SQL_TEXT),
 			DBTableSync::Field(AlarmTableSync::COL_LONG_MESSAGE, SQL_TEXT),
-			DBTableSync::Field(AlarmTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
-			DBTableSync::Field(AlarmTableSync::COL_PERIODEND, SQL_TIMESTAMP),
+			DBTableSync::Field(AlarmTableSync::COL_PERIODSTART, SQL_DATETIME),
+			DBTableSync::Field(AlarmTableSync::COL_PERIODEND, SQL_DATETIME),
 			DBTableSync::Field(AlarmTableSync::COL_SCENARIO_ID, SQL_INTEGER),
 			DBTableSync::Field(AlarmTableSync::COL_TEMPLATE_ID, SQL_INTEGER),
 			DBTableSync::Field()
@@ -129,7 +129,7 @@ namespace synthese
 	namespace messages
 	{
 		AlarmTableSync::AlarmTableSync ()
-		: DBInheritanceTableSyncTemplate<AlarmTableSync,Alarm>()
+			: DBInheritanceTableSyncTemplate<AlarmTableSync,Alarm>()
 		{
 		}
 

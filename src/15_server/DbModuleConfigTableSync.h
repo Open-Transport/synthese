@@ -40,10 +40,7 @@ namespace synthese
 {
 	namespace db
 	{
-		// YYY
-		//class SQLite;
 		class DB;
-		typedef DB SQLite;
 	}
 	
 	namespace server
@@ -64,19 +61,16 @@ namespace synthese
 			 virtual const std::string& getTableName() const;
 			void rowsAdded(
 				db::DB* db,
-				db::SQLiteSync* sync,
 				const db::DBResultSPtr& rows
 			);
 
 			void rowsUpdated(
 				db::DB* db,
-				db::SQLiteSync* sync,
 				const db::DBResultSPtr& rows
 			);
 
 			void rowsRemoved(
 				db::DB* db,
-				db::SQLiteSync* sync,
 				const db::RowIdList& rowIds
 			);
 		};
