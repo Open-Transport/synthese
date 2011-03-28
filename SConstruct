@@ -37,15 +37,16 @@ opts.Add('S3VERSION','Version of the project')
 opts.Add('CC', 'C compiler to use.')
 opts.Add('CXX', 'C++ compiler to use.')
 
-
 # note : specifying doxygen as a tool will call generate on doxygen.py toolpath
-env = Environment(ENV = os.environ, options=opts, tools= ['default', 'merge', 'bjam', 
-                                                          'doxygen', 'untar', 'unzip', 
-                                                          'test', 'makedef', 'msvsproject', 
+# TODO: add option for selecting between x86 and x86_64?
+env = Environment(ENV = os.environ, options=opts, tools= ['default', 'merge', 'bjam',
+                                                          'doxygen', 'untar', 'unzip',
+                                                          'test', 'makedef', 'msvsproject',
                                                           'msvssolution', 'msvsphpproject', 'deb',
                                                           'mysqldump', 'enterprises3', 'enterprises2',
                                                           'forge_html_doc', 'trident'
-                                                          ])
+                                                          ], TARGET_ARCH='x86',
+                                                          MSVC_VERSION='9.0')
 env.Decider('MD5-timestamp')
 Help(opts.GenerateHelpText(env))
 
@@ -77,7 +78,7 @@ if env['_PLATFORM'] == 'posix':
    #env['_REFERENCE_ENTERPRISE_LASTUPDATE'] = os.popen(reqcmd).readline ()[:-1].replace('-','').replace(':','').replace(' ','.')
    #print '** enterprise db last modified on ' + env['_REFERENCE_ENTERPRISE_LASTUPDATE'] + ' **'
    #if os.path.exists (env['_LOCAL_EROS_SHAPE_DROP_DIR']):
-   #   env['_REFERENCE_EROSSHAPE_LASTUPDATE'] = time.strftime ('%Y%m%d.%H%M%S', time.localtime(os.path.getmtime(env['_LOCAL_EROS_SHAPE_DROP_DIR']))) 
+   #   env['_REFERENCE_EROSSHAPE_LASTUPDATE'] = time.strftime ('%Y%m%d.%H%M%S', time.localtime(os.path.getmtime(env['_LOCAL_EROS_SHAPE_DROP_DIR'])))
    #   print '** eros drop dir last modified on ' + env['_REFERENCE_HASTUSZIP_LASTUPDATE'] + ' **'
    #else:
    #   print '** no eros shape dir found; some data package might not be built' + ' **'
@@ -119,14 +120,14 @@ if (env['_PLATFORM'] == 'posix') or (env['_PLATFORM'] == 'darwin'):
    env.Append ( CPPDEFINES = ['UNIX'] )
    if (env.IsCppModeDebug ()):
       env.Append ( CPPDEFINES = ['DEBUG'] )
-   else:  
+   else:
       env.Append ( CPPDEFINES = ['NDEBUG'] )
 
 elif (env['_PLATFORM']=='win32'):
    env.Append ( CPPDEFINES = ['_MBCS', '_USE_MATH_DEFINES', '__WIN32__', 'WIN32', 'NOMINMAX'] )
    if (env.IsCppModeDebug ()):
       env.Append ( CPPDEFINES = ['DEBUG', '_DEBUG'] )
-   else:  
+   else:
       env.Append ( CPPDEFINES = ['NDEBUG'] )
 
 
@@ -134,12 +135,12 @@ elif (env['_PLATFORM']=='win32'):
 # Default cpp compilation options
 if (env['_PLATFORM'] == 'posix'):
    if (env.IsCppModeDebug ()):
-      env.Append ( CCFLAGS = ['-ggdb', '-Wall', '-Wextra', '-pedantic', '-Wno-long-long',  '-Wno-parentheses', '-Wno-unused-parameter'] ) # '-Werror=return-type', 
+      env.Append ( CCFLAGS = ['-ggdb', '-Wall', '-Wextra', '-pedantic', '-Wno-long-long',  '-Wno-parentheses', '-Wno-unused-parameter'] ) # '-Werror=return-type',
    else:
       env.Append ( CCFLAGS = ['-O3'] )
    if env.IsCppModeProfile ():
       env.Append ( CCFLAGS = ['-pg'] )
-            
+
 elif (env['_PLATFORM'] == 'darwin'):
    if (env.IsCppModeDebug ()):
       env.Append ( CCFLAGS = ['-ggdb', '-fno-inline'] )
@@ -149,22 +150,30 @@ elif (env['_PLATFORM'] == 'darwin'):
 elif (env['_PLATFORM']=='win32'):
    env.Append ( CCFLAGS = ['/bigobj', '/EHsc', '/GR', '/GS', '/W3', '/nologo', '/c'] )
    env.Append ( CCFLAGS = ['/wd4005', '/wd4996', '/wd4290', '/wd4503'])
-   
+
    if (env.IsCppModeDebug ()):
       #env.Append ( CCFLAGS = ['/Od', '/MTd', '/Gm', '/RTC1', '/ZI', '/showIncludes'] )
       env.Append ( CCFLAGS = ['/Od', '/MTd', '/Gm', '/RTC1', '/ZI'] )
       env.AddIncludeDir('#3rd/msvs/vld/include')
-   else:  
+   else:
       env.Append ( CCFLAGS = ['/Ox', '/FD', '/MT', '/Zi'] )
 
 
 
 # Default link flags
 if (env['_PLATFORM']=='win32'):
-   env.Append ( LINKFLAGS = ['/NOLOGO', '/MACHINE:X86', '/OPT:NOREF', '/INCREMENTAL:NO', '/FIXED:NO'] )
+   env.Append ( LINKFLAGS = ['/NOLOGO', '/MACHINE:X86', '/OPT:NOREF', '/INCREMENTAL:NO', '/FIXED:NO',
+                             '/NODEFAULTLIB:libc.lib', '/NODEFAULTLIB:libcd.lib',
+                             '/NODEFAULTLIB:msvcrt.lib', '/NODEFAULTLIB:msvcrtd.lib',
+                             '/NODEFAULTLIB:msvcprt.lib', '/NODEFAULTLIB:msvcprtd.lib'
+                             ] )
+
    if (env.IsCppModeDebug ()):
-	      env.Append ( LINKFLAGS = ['/Profile', '/DEBUG'] )
-      
+      env.Append ( LINKFLAGS = ['/NODEFAULTLIB:libcmt.lib'] )
+      env.Append ( LINKFLAGS = ['/Profile', '/DEBUG'] )
+   else:
+      env.Append ( LINKFLAGS = ['/NODEFAULTLIB:libcmtd.lib'] )
+
 if env['_PLATFORM'] == 'posix':
    if env.IsCppModeProfile ():
       env.Append ( LINKFLAGS = ['-pg'] )
@@ -172,20 +181,20 @@ if env['_PLATFORM'] == 'posix':
 if (env['_PLATFORM']=='posix'):
    env.Append ( LIBS = ['dl'] )
 if (env['_PLATFORM']=='win32'):
-   env.Append ( LIBS = ['advapi32.lib'] )  
+   env.Append ( LIBS = ['advapi32.lib'] )
 
 
 # multithreading config
 if (env['_PLATFORM'] == 'posix'):
    env.Append (CCFLAGS= '-pthread' )
-   env.Append (LIBS= ['pthread'] ) 
+   env.Append (LIBS= ['pthread'] )
 
 if (env['_PLATFORM'] == 'darwin'):
    env.Append (CCFLAGS= '-pthread' )
-   env.Append (LIBS= ['pthread'] ) 
+   env.Append (LIBS= ['pthread'] )
 
 elif (env['_PLATFORM'] == 'win32'):
-   env.Append ( LIBS = ['ws2_32.lib'] )  
+   env.Append ( LIBS = ['ws2_32.lib'] )
 
 
 if env['_PLATFORM'] != 'win32':
@@ -224,7 +233,7 @@ for subdir in subdirs:
 # print "Reading all dependencies"
 #for project in env.GetRootEnv()['_PROJECTS'].values():
 #	project.append_dependencies()
-    
+
 #env.ProcessDependenciesOrder ()
 
 ## @todo Include the dot file generation in the doc target
