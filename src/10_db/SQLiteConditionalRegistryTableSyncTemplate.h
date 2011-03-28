@@ -52,7 +52,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Static method to be implemented by template instantiation
 			/// determinating if a row corresponds to an object that must be
-			/// loaded into phyisical memory or not.
+			/// loaded into physical memory or not.
 			/// @param row row to read
 			/// @result true if the object mest be loaded into the physical memory
 			static bool IsLoaded(

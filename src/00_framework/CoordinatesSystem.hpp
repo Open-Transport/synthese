@@ -137,7 +137,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds a CoordinateFilter which converts coordinate from a spatial
-			///	reference system to an other one.
+			///	reference system to another one.
 			/// @param sourceSRID SRID of the object to convert
 			/// @return a CoordinateFilter which converts from the source to the current system
 			/// @author Hugues Romain
