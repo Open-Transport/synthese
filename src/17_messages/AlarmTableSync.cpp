@@ -36,7 +36,6 @@
 #include "Conversion.h"
 
 #include "SQLiteResult.h"
-#include "SQLite.h"
 
 using namespace std;
 using namespace boost;

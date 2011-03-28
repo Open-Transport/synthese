@@ -21,7 +21,6 @@
 */
 
 #include "DataSource.h"
-#include "SQLite.h"
 #include "DBModule.h"
 #include "TridentFileFormat.h"
 #include "GraphConstants.h"

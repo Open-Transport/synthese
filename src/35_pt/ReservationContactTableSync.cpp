@@ -27,7 +27,6 @@
 #include "ReservationContactTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
-#include "SQLite.h"
 #include "SQLiteException.h"
 #include "ReplaceQuery.h"
 

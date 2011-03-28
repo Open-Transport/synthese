@@ -29,7 +29,6 @@
 #include "ReplaceQuery.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
-#include "SQLite.h"
 #include "SQLiteException.h"
 
 using namespace std;

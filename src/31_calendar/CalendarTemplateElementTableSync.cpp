@@ -31,7 +31,6 @@
 #include "CalendarTemplateTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
-#include "SQLite.h"
 #include "SQLiteException.h"
 #include "SelectQuery.hpp"
 #include "ReplaceQuery.h"

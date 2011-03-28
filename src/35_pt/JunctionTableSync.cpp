@@ -28,7 +28,6 @@
 #include "ReplaceQuery.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
-#include "SQLite.h"
 #include "SQLiteException.h"
 #include "DataSourceTableSync.h"
 #include "StopPointTableSync.hpp"

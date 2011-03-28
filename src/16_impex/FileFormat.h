@@ -41,7 +41,9 @@ namespace synthese
 
 	namespace db
 	{
-		class SQLiteTransaction;
+		// YYY
+		//class DBTransaction;
+		//typedef DBTransaction SQLiteTransaction;
 	}
 
 	namespace impex

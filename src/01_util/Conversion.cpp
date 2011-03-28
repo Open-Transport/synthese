@@ -179,7 +179,9 @@ namespace synthese
 			return (t == true) ? "1" : "0";
 		}
 
-		std::string Conversion::ToSQLiteString( const std::string& s, bool withApostrophes)
+
+
+		std::string Conversion::ToDBString( const std::string& s, bool withApostrophes)
 		{
 			std::string result;
 			if (withApostrophes)
@@ -196,7 +198,11 @@ namespace synthese
 				result.push_back('\'');
 			return result;
 		}
-
+		// YYY compat, to be removed
+		std::string Conversion::ToSQLiteString( const std::string& s, bool withApostrophes)
+		{
+			return Conversion::ToDBString(s, withApostrophes);
+		}
 
 
 
