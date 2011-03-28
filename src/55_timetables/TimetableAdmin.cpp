@@ -278,11 +278,15 @@ namespace synthese
 
 						stream <<
 							t3.col() <<
+							// TODO: There is no TimetableRemoveAction yet. Uncomment and add the action below once this is done.
+							"";
+							/*
 							HTMLModule::getLinkButton(
 								string(),
 								"Supprimer",
 								"Etes-vous sûr de vouloir supprimer la fiche horaire "+ tt->getTitle() +" ?", "table_delete.png"
 							);
+							*/
 					}
 					stream << t3.row(lexical_cast<string>(++lastRank));
 					vector<pair<optional<bool>, string> > booknotbook;

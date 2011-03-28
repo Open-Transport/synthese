@@ -33,6 +33,7 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "ReplaceQuery.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -155,29 +156,23 @@ namespace synthese
 			RollingStockFilter* object
 			, boost::optional<DBTransaction&> transaction /* = boost::optional<DBTransaction&> */
 		){
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			 query <<
-				" REPLACE INTO " << TABLE.NAME << " VALUES(" <<
-				object->getKey() << "," <<
-				(object->getSite() ? object->getSite()->getKey() : RegistryKeyType(0)) << "," <<
-				object->getRank() << "," <<
-				Conversion::ToDBString(object->getName()) << "," <<
-				object->getAuthorizedOnly() << "," <<
-				"\"";
-			 bool first(true);
-			 BOOST_FOREACH(const RollingStock* item, object->getList())
-			 {
-				 if(!first) query << ",";
-				 query << item->getKey();
-				 first = false;
-			 }
-			query << "\"" <<
-			")";
-			
-			 DBModule::GetDB()->execUpdate(query.str(), transaction);
+			ReplaceQuery<RollingStockFilterTableSync> query(*object);
+			query.addField(object->getSite() ? object->getSite()->getKey() : RegistryKeyType(0));
+			query.addField(object->getRank());
+			query.addField(object->getName());
+			query.addField(object->getAuthorizedOnly());
+
+			bool first(true);
+			stringstream rollingStocks;
+			BOOST_FOREACH(const RollingStock* item, object->getList())
+			{
+				if(!first) rollingStocks << ",";
+				rollingStocks << item->getKey();
+				first = false;
+			}
+			query.addField(rollingStocks.str());
+
+			query.execute(transaction);
 		}
 
 

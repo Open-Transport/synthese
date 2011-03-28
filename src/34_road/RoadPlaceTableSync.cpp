@@ -30,6 +30,7 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "ReplaceQuery.h"
 #include "Conversion.h"
 
 using namespace std;
@@ -105,18 +106,10 @@ namespace synthese
 			RoadPlace* object,
 			optional<DBTransaction&> transaction
 		){
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES(" <<
-				object->getKey() << "," <<
-				Conversion::ToDBString(object->getName())	<< "," <<
-				(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0)) <<
-			")";
-			
-			DBModule::GetDB()->execUpdate(query.str(), transaction);
+			ReplaceQuery<RoadPlaceTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
+			query.execute(transaction);
 		}
 
 

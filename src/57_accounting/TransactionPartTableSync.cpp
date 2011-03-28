@@ -92,6 +92,7 @@ namespace synthese
 		{
 			try
 			{
+				// TODO: use ReplaceQuery instead of building the SQL.
 				DB* db = DBModule::GetDB();
 				if (!tp->getKey())
 					tp->setKey(getId());

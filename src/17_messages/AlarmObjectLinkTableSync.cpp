@@ -31,6 +31,7 @@
 #include "LinkException.h"
 #include "MessagesModule.h"
 #include "DeleteQuery.hpp"
+#include "ReplaceQuery.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -146,18 +147,11 @@ namespace synthese
 			AlarmObjectLink* object,
 			optional<DBTransaction&> transaction
 		){
-			DB* db = DBModule::GetDB();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-            query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToDBString(object->getRecipientKey())
-				<< "," << Conversion::ToString(object->getObjectId())
-				<< "," << (object->getAlarm() ? object->getAlarm()->getKey() : RegistryKeyType(0))
-				<< ")";
-			db->execUpdate(query.str());
+			ReplaceQuery<AlarmObjectLinkTableSync> query(*object);
+			query.addField(object->getRecipientKey());
+			query.addField(object->getObjectId());
+			query.addField(object->getAlarm() ? object->getAlarm()->getKey() : RegistryKeyType(0));
+			query.execute(transaction);
 		}
 
 		template<> bool DBConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::IsLoaded( const DBResultSPtr& row )
@@ -180,17 +174,10 @@ namespace synthese
 			RegistryKeyType alarmId,
 			optional<RegistryKeyType> objectId
 		){
-			stringstream query;
-			query
-				<< "DELETE FROM " << TABLE.NAME
-				<< " WHERE " 
-				<< COL_ALARM_ID << "=" << Conversion::ToString(alarmId);
-			if (objectId)
-			{
-				query << " AND " << COL_OBJECT_ID << "=" << *objectId;
-			}
-
-			DBModule::GetDB()->execUpdate(query.str());
+			DeleteQuery<AlarmObjectLinkTableSync> query;
+			query.addWhereField(COL_ALARM_ID, alarmId);
+			query.addWhereField(COL_OBJECT_ID, *objectId);
+			query.execute();
 		}
 
 		

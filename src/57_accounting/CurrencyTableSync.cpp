@@ -71,6 +71,7 @@ namespace synthese
 
 		template<> void DBDirectTableSyncTemplate<CurrencyTableSync,Currency>::Save(Currency* currency)
 		{
+			// TODO: use ReplaceQuery instead of building the SQL.
 			DB* db = DBModule::GetDB();
 			stringstream query;
 			if (currency->getKey() <= 0)

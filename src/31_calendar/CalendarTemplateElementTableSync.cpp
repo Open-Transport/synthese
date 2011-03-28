@@ -32,7 +32,10 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "DeleteQuery.hpp"
 #include "SelectQuery.hpp"
+#include "UpdateQuery.hpp"
+#include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
 
 using namespace std;
@@ -219,19 +222,9 @@ namespace synthese
 
 		void CalendarTemplateElementTableSync::Shift( RegistryKeyType calendarId , int rank , int delta )
 		{
-			DB* db = DBModule::GetDB();
-
-			stringstream query;
-
-			// Content
-			query
-				<< "UPDATE " << TABLE.NAME
-				<< " SET " << COL_RANK << "=" << COL_RANK << ((delta > 0) ? "+" : "") << delta
-				<< " WHERE " << COL_CALENDAR_ID << "=" << calendarId
-				<< " AND " << COL_RANK << ">=" << rank
-				;
-
-			db->execUpdate(query.str());
+			RankUpdateQuery<CalendarTemplateElementTableSync> query(COL_RANK, delta, rank);
+			query.addWhereField(COL_CALENDAR_ID, calendarId);
+			query.execute();
 		}
 
 
@@ -268,17 +261,9 @@ namespace synthese
 
 		void CalendarTemplateElementTableSync::Clean( util::RegistryKeyType calendarId )
 		{
-			DB* db = DBModule::GetDB();
-
-			stringstream query;
-
-			// Content
-			query
-				<< "DELETE FROM " << TABLE.NAME
-				<< " WHERE " << COL_CALENDAR_ID << "=" << calendarId
-			;
-
-			db->execUpdate(query.str());
+			DeleteQuery<CalendarTemplateElementTableSync> query;
+			query.addWhereField(COL_CALENDAR_ID, calendarId);
+			query.execute();
 		}
 	}
 }

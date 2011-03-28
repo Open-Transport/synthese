@@ -70,6 +70,7 @@ namespace synthese
 			static const std::string COL_TEMPLATE;
 
 			ScenarioTableSync();
+			~ScenarioTableSync();
 		};
 	}
 }

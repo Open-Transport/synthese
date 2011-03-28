@@ -21,6 +21,7 @@
 */
 
 #include "AlarmTemplateInheritedTableSync.h"
+#include "ReplaceQuery.h"
 #include "ScenarioTemplateInheritedTableSync.h"
 #include <sstream>
 
@@ -69,26 +70,20 @@ namespace synthese
 
 		template<>
 		void DBInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Save(
-			AlarmTemplate* obj,
+			AlarmTemplate* object,
 			optional<DBTransaction&> transaction
 		){
-			stringstream query;
-			if (obj->getKey() == 0)
-				obj->setKey(getId());
-			query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(obj->getKey())
-				<< ",1"
-				<< ",0"
-				<< "," << Conversion::ToString((int) obj->getLevel())
-				<< "," << Conversion::ToDBString(obj->getShortMessage())
-				<< "," << Conversion::ToDBString(obj->getLongMessage())
-				<< ",''"
-				<< ",''"
-				<< "," << (obj->getScenario() ? Conversion::ToString(obj->getScenario()->getKey()) : "")
-				<< ",0"
-				<< ")";
-			DBModule::GetDB()->execUpdate(query.str(), transaction);
+			ReplaceQuery<AlarmTableSync> query(*object);
+			query.addField(1);
+			query.addField(0);
+			query.addField(object->getLevel());
+			query.addField(object->getShortMessage());
+			query.addField(object->getLongMessage());
+			query.addFieldNull();
+			query.addFieldNull();
+			query.addField(object->getScenario() ? object->getScenario()->getKey() : RegistryKeyType(0));
+			query.addField(0);
+			query.execute(transaction);
 		}
 	}
 

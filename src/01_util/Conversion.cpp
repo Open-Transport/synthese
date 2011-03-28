@@ -198,11 +198,6 @@ namespace synthese
 				result.push_back('\'');
 			return result;
 		}
-		// YYY compat, to be removed
-		std::string Conversion::ToDBString( const std::string& s, bool withApostrophes)
-		{
-			return Conversion::ToDBString(s, withApostrophes);
-		}
 
 
 

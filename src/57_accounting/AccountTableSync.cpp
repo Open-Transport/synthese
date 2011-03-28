@@ -103,6 +103,7 @@ namespace synthese
 			Account* account,
 			optional<DBTransaction&> transaction
 		){
+			// TODO: use ReplaceQuery instead of building the SQL.
 			DB* db = DBModule::GetDB();
 			stringstream query;
 			if (account->getKey() <= 0)

@@ -31,6 +31,7 @@
 
 #include <sstream>
 
+#include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "DBTransaction.hpp"
@@ -209,12 +210,11 @@ namespace synthese
 		void LineStopTableSync::InsertStop(
 			LineStop& lineStop
 		){
-			stringstream query;
-			query << "UPDATE " << TABLE.NAME << " SET " << COL_RANKINPATH << "=" << COL_RANKINPATH << "+1 WHERE " <<
-				COL_LINEID << "=" << lineStop.getLine()->getKey() << " AND " << COL_RANKINPATH << ">=" << lineStop.getRankInPath();
-
 			DBTransaction transaction;
-			transaction.add(query.str());
+
+			RankUpdateQuery<LineStopTableSync> query(COL_RANKINPATH, 1, lineStop.getRankInPath());
+			query.addWhereField(COL_LINEID, lineStop.getLine()->getKey());
+			query.execute(transaction);
 
 			Save(&lineStop, transaction);
 
@@ -229,10 +229,9 @@ namespace synthese
 
 			Remove(lineStop.getKey(), transaction);
 
-			stringstream query;
-			query << "UPDATE " << TABLE.NAME << " SET " << COL_RANKINPATH << "=" << COL_RANKINPATH << "-1 WHERE " <<
-				COL_LINEID << "=" << lineStop.getLine()->getKey() << " AND " << COL_RANKINPATH << ">" << lineStop.getRankInPath();
-			transaction.add(query.str());
+			RankUpdateQuery<LineStopTableSync> query(COL_RANKINPATH, -1, lineStop.getRankInPath(), false);
+			query.addWhereField(COL_LINEID, lineStop.getLine()->getKey());
+			query.execute(transaction);
 
 			transaction.run();
 		}

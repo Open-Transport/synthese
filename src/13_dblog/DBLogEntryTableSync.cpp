@@ -65,7 +65,7 @@ namespace synthese
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
 			DBTableSync::Field(DBLogEntryTableSync::COL_LOG_KEY, SQL_TEXT),
-			DBTableSync::Field(DBLogEntryTableSync::COL_DATE, SQL_TIMESTAMP),
+			DBTableSync::Field(DBLogEntryTableSync::COL_DATE, SQL_DATETIME),
 			DBTableSync::Field(DBLogEntryTableSync::COL_USER_ID, SQL_INTEGER),
 			DBTableSync::Field(DBLogEntryTableSync::COL_LEVEL, SQL_INTEGER),
 			DBTableSync::Field(DBLogEntryTableSync::COL_CONTENT, SQL_TEXT),

@@ -28,6 +28,7 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "ReplaceQuery.h"
 #include "Conversion.h"
 #include "StopArea.hpp"
 #include "Fetcher.h"
@@ -121,22 +122,14 @@ namespace synthese
 			DisplayScreenCPU* object,
 			optional<DBTransaction&> transaction
 		){
-			DB* db = DBModule::GetDB();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-               
-			query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< object->getKey() << ","
-				<< Conversion::ToDBString(object->getName()) << ","
-				<< ((object->getPlace() != NULL) ? object->getPlace()->getKey() : 0) << ","
-				<< Conversion::ToDBString(object->getMacAddress()) << ","
-				<< object->getMonitoringDelay().minutes() << ","
-				<< object->getIsOnline() << ","
-				<< Conversion::ToDBString(object->getMaintenanceMessage())
-				<< ")";
-			db->execUpdate(query.str(), transaction);
+			ReplaceQuery<DisplayScreenCPUTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getPlace() ? object->getPlace()->getKey() : RegistryKeyType(0));
+			query.addField(object->getMacAddress());
+			query.addField(object->getMonitoringDelay().minutes());
+			query.addField(object->getIsOnline());
+			query.addField(object->getMaintenanceMessage());
+			query.execute(transaction);
 		}
 
 

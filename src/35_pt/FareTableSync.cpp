@@ -27,6 +27,7 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "ReplaceQuery.h"
 #include "FareTableSync.h"
 
 #include <boost/foreach.hpp>
@@ -81,17 +82,10 @@ namespace synthese
 			Fare* object,
 			optional<DBTransaction&> transaction
 		){
-			DB* db = DBModule::GetDB();
-			stringstream query;
-			if (object->getKey() > 0)
-				object->setKey(getId());
-            query
-				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< object->getKey() << "," <<
-				Conversion::ToDBString(object->getName()) << "," <<
-				static_cast<int>(object->getType()) <<
-			")";
-			db->execUpdate(query.str(), transaction);
+			ReplaceQuery<FareTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getType());
+			query.execute(transaction);
 		}
 
 

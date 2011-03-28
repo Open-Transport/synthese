@@ -49,7 +49,7 @@ namespace synthese
 			static const std::string COL_MIME_TYPE;
 			static const std::string TABLE_COL_CONTENT;
 
-			/** Interface page SQLite table constructor.
+			/** Interface page table sync constructor.
 			*/
 			InterfacePageTableSync();
 

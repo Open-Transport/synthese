@@ -83,7 +83,7 @@ namespace synthese
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
 			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_SCREEN_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_TIME, SQL_TIMESTAMP),
+			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_TIME, SQL_DATETIME),
 			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_GENERAL_STATUS, SQL_INTEGER),
 			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_MEMORY_STATUS, SQL_INTEGER),
 			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_CLOCK_STATUS, SQL_INTEGER),
@@ -116,7 +116,7 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			object->setTime(rows->getTimestamp(DisplayMonitoringStatusTableSync::COL_TIME));
+			object->setTime(rows->getDateTime(DisplayMonitoringStatusTableSync::COL_TIME));
 			object->setGeneralStatus(static_cast<DisplayMonitoringStatus::Status>(rows->getInt(DisplayMonitoringStatusTableSync::COL_GENERAL_STATUS)));
 			object->setMemoryStatus(static_cast<DisplayMonitoringStatus::Status>(rows->getInt(DisplayMonitoringStatusTableSync::COL_MEMORY_STATUS)));
 			object->setClockStatus(static_cast<DisplayMonitoringStatus::Status>(rows->getInt(DisplayMonitoringStatusTableSync::COL_CLOCK_STATUS)));

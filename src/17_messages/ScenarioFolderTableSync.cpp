@@ -30,6 +30,7 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "ReplaceQuery.h"
 
 #include "Conversion.h"
 
@@ -62,7 +63,7 @@ namespace synthese
 		template<> const DBTableSync::Field DBTableSyncTemplate<ScenarioFolderTableSync>::_FIELDS[]=
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(ScenarioFolderTableSync::COL_NAME, SQL_INTEGER),
+			DBTableSync::Field(ScenarioFolderTableSync::COL_NAME, SQL_TEXT),
 			DBTableSync::Field(ScenarioFolderTableSync::COL_PARENT_ID, SQL_INTEGER),
 			DBTableSync::Field()
 		};
@@ -106,18 +107,10 @@ namespace synthese
 			ScenarioFolder* object,
 			optional<DBTransaction&> transaction
 		){
-			DB* db = DBModule::GetDB();
-			stringstream query;
-			if (object->getKey() <= 0)
-				object->setKey(getId());
-			 
-			 query
-				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
-				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToDBString(object->getName())
-				<< "," << (object->getParent() ? Conversion::ToString(object->getParent()->getKey()) : "0")
-				<< ")";
-			db->execUpdate(query.str(), transaction);
+			ReplaceQuery<ScenarioFolderTableSync> query(*object);
+			query.addField(object->getName());
+			query.addField(object->getParent() ? object->getParent()->getKey() : RegistryKeyType(0));
+			query.execute(transaction);
 		}
 
 

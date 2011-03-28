@@ -21,6 +21,7 @@
 */
 
 #include "WebPageTableSync.h"
+#include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
 #include "DBResult.hpp"
 #include "Fetcher.h"
@@ -341,16 +342,10 @@ namespace synthese
 			std::size_t rank,
 			bool add
 		){
-			stringstream query;
-			query <<
-				"UPDATE " << TABLE.NAME <<
-				" SET " << COL_RANK << "=" << COL_RANK << (add ? "+" : "-") << "1" <<
-				" WHERE " <<
-					COL_SITE_ID << "=" << siteId << " AND " <<
-					COL_UP_ID << "=" << parentId << " AND " <<
-					COL_RANK << ">=" << rank
-			;
-			DBModule::GetDB()->execUpdate(query.str());
+			RankUpdateQuery<WebPageTableSync> query(COL_RANK, add ? 1 : -1, rank);
+			query.addWhereField(COL_SITE_ID, siteId);
+			query.addWhereField(COL_UP_ID, parentId);
+			query.execute();
 		}
 
 

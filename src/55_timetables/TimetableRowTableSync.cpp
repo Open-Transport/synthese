@@ -23,6 +23,7 @@
 */
 
 #include "TimetableRowTableSync.h"
+#include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "StopAreaTableSync.hpp"
@@ -180,20 +181,9 @@ namespace synthese
 
 		void TimetableRowTableSync::Shift( util::RegistryKeyType timetableId , int rank , int delta )
 		{
-			DB* db = DBModule::GetDB();
-
-			stringstream query;
-
-			// Content
-			query
-				<< "UPDATE " << TABLE.NAME
-				<< " SET " << COL_RANK << "=" << COL_RANK << ((delta > 0) ? "+" : "") << delta
-				<< " WHERE " << COL_TIMETABLE_ID << "=" << timetableId
-				<< " AND " << COL_RANK << ">=" << rank
-				;
-
-			db->execUpdate(query.str());
-	
+			RankUpdateQuery<TimetableRowTableSync> query(COL_RANK, delta, rank);
+			query.addWhereField(COL_TIMETABLE_ID, timetableId);
+			query.execute();
 		}
 
 

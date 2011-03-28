@@ -101,7 +101,8 @@ namespace synthese
 		void RuleUserUpdateAction::run(
 			Request& request
 		){
-			UpdateQuery query(_tableSync->getFormat().NAME, _id);
+			DynamicUpdateQuery query(_tableSync->getFormat().NAME);
+			query.addWhereField(TABLE_COL_ID, _id);
 			BOOST_FOREACH(const Values::value_type& element, _values)
 			{
 				query.addUpdateField(element.first, element.second);
