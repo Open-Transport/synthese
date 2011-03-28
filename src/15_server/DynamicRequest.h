@@ -69,7 +69,7 @@ namespace synthese
 				const std::string& errorMessage,
 				boost::optional<util::RegistryKeyType> actionCreatedId
 			);
-			
+
 
 /*
 			template<class FunctionT>

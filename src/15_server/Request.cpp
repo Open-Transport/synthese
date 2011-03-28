@@ -64,6 +64,20 @@ namespace synthese
 
 
 
+		const Request::CookiesMap& Request::getCookiesMap() const
+		{
+			return _cookiesMap;
+		}
+
+
+
+		void Request::setCookie(string name, string value, int maxAge)
+		{
+			_cookiesMap[name] = make_pair<string, int>(value, maxAge);
+		}
+
+
+
 		void Request::deleteSession()
 		{
 			delete _session;
@@ -93,12 +107,6 @@ namespace synthese
 				for (ParametersMap::Map::const_iterator it = actionMap.begin(); it != actionMap.end(); ++it)
 					result.insert(it->first, it->second);
 				result.insert(Request::PARAMETER_ACTION_WILL_CREATE_OBJECT, _actionWillCreateObject);
-			}
-
-			// Session
-			if(_session)
-			{
-				result.insert(Request::PARAMETER_SESSION, _session->getKey());
 			}
 
 			// Object ID
@@ -171,7 +179,7 @@ namespace synthese
 				if (_action.get() && _redirectAfterAction)
 				{
 					_deleteAction();
-					throw RedirectException(getURL(), false);
+					throw RedirectException(getURL(), false, getCookiesMap());
 				}
 
 				if (!_function->isAuthorized(_session))
