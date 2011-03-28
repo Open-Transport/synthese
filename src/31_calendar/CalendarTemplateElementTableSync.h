@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -47,7 +47,7 @@ namespace synthese
 		/// Object : CalendarTemplateElement
 		/// See also : CalendarTemplateTableSync
 		class CalendarTemplateElementTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>
+			public db::DBRegistryTableSyncTemplate<CalendarTemplateElementTableSync,CalendarTemplateElement>
 		{
 		public:
 			static const std::string COL_CALENDAR_ID;

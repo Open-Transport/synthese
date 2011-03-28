@@ -37,8 +37,8 @@
 #include "GraphConstants.h"
 #include "AllowedUseRule.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "CalendarTemplateTableSync.h"
 #include "ReplaceQuery.h"
 #include "ImportableTableSync.hpp"
@@ -74,7 +74,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,CommercialLineTableSync>::FACTORY_KEY("35.25.01 Commercial lines");
+		template<> const string FactorableTemplate<DBTableSync,CommercialLineTableSync>::FACTORY_KEY("35.25.01 Commercial lines");
 	}
 	namespace pt
 	{
@@ -96,43 +96,43 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CommercialLineTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<CommercialLineTableSync>::TABLE(
 			"t042_commercial_lines"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CommercialLineTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<CommercialLineTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_NETWORK_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_SHORT_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_LONG_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_COLOR, SQL_TEXT),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_STYLE, SQL_TEXT),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_IMAGE, SQL_TEXT),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, SQL_TEXT),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_CREATOR_ID, SQL_TEXT),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(CommercialLineTableSync::COL_NETWORK_ID, SQL_INTEGER),
+			DBTableSync::Field(CommercialLineTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(CommercialLineTableSync::COL_SHORT_NAME, SQL_TEXT),
+			DBTableSync::Field(CommercialLineTableSync::COL_LONG_NAME, SQL_TEXT),
+			DBTableSync::Field(CommercialLineTableSync::COL_COLOR, SQL_TEXT),
+			DBTableSync::Field(CommercialLineTableSync::COL_STYLE, SQL_TEXT),
+			DBTableSync::Field(CommercialLineTableSync::COL_IMAGE, SQL_TEXT),
+			DBTableSync::Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, SQL_TEXT),
+			DBTableSync::Field(CommercialLineTableSync::COL_CREATOR_ID, SQL_TEXT),
+			DBTableSync::Field(CommercialLineTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
+			DBTableSync::Field(CommercialLineTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
+			DBTableSync::Field(CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
+			DBTableSync::Field(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
+			DBTableSync::Field(CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CommercialLineTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<CommercialLineTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				CommercialLineTableSync::COL_NETWORK_ID.c_str(),
 				CommercialLineTableSync::COL_CREATOR_ID.c_str(),
 				""
 			),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Load(
+		template<> void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Load(
 			CommercialLine* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -267,7 +267,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Unlink(
+		template<> void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Unlink(
 			CommercialLine* obj
 		){
 
@@ -275,9 +275,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Save(
+		template<> void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Save(
 			CommercialLine* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			// Preparation of places with optional reservation
 			stringstream optionalReservationPlaces;
@@ -356,14 +356,14 @@ namespace synthese
 				if (creatorId->empty())
 					query << " AND (l." << COL_CREATOR_ID << " IS NULL OR l." << COL_CREATOR_ID << "='')";
 				else
-					query << " AND l." << COL_CREATOR_ID << " LIKE " << Conversion::ToSQLiteString(*creatorId);
+					query << " AND l." << COL_CREATOR_ID << " LIKE " << Conversion::ToDBString(*creatorId);
 			}
 			if(name && *name != "%%" && *name != "%")
 			{
 				if (name->empty())
 					query << " AND (l." << COL_NAME << " IS NULL OR l." << COL_NAME << "='')";
 				else
-					query << " AND l." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
+					query << " AND l." << COL_NAME << " LIKE " << Conversion::ToDBString(*name);
 			}
 			if (networkId)
 				query << " AND l." << COL_NETWORK_ID << "=" << *networkId;

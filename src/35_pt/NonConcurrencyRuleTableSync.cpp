@@ -30,8 +30,8 @@
 #include "CommercialLine.h"
 #include "TransportNetworkTableSync.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "LinkException.h"
 #include "ReplaceQuery.h"
 
@@ -48,7 +48,7 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,NonConcurrencyRuleTableSync>::FACTORY_KEY("35.25.02 Non concurrency rules");
+		template<> const string FactorableTemplate<DBTableSync,NonConcurrencyRuleTableSync>::FACTORY_KEY("35.25.02 Non concurrency rules");
 	}
 	
 	namespace pt
@@ -60,28 +60,28 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<NonConcurrencyRuleTableSync>::TABLE(
 			"t056_non_concurrency_rules"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<NonConcurrencyRuleTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(NonConcurrencyRuleTableSync::COL_DELAY, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID, SQL_INTEGER),
+			DBTableSync::Field(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID, SQL_INTEGER),
+			DBTableSync::Field(NonConcurrencyRuleTableSync::COL_DELAY, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<NonConcurrencyRuleTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<NonConcurrencyRuleTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Load(
+		template<> void DBDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Load(
 			NonConcurrencyRule* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -123,9 +123,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Save(
+		template<> void DBDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Save(
 			NonConcurrencyRule* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<NonConcurrencyRuleTableSync> query(*object);
 			query.addField(object->getPriorityLine()->getKey());
@@ -136,7 +136,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Unlink(
+		template<> void DBDirectTableSyncTemplate<NonConcurrencyRuleTableSync,NonConcurrencyRule>::Unlink(
 			NonConcurrencyRule* obj
 		){
 			if(obj->getHiddenLine()) obj->getHiddenLine()->removeConcurrencyRule(obj);

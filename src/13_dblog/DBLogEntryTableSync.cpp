@@ -41,7 +41,7 @@ namespace synthese
 	using namespace dblog;
 	using namespace security;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,DBLogEntryTableSync>::FACTORY_KEY("13.01 DB Log entries");
+	template<> const string util::FactorableTemplate<DBTableSync,DBLogEntryTableSync>::FACTORY_KEY("13.01 DB Log entries");
 
 	namespace dblog
 	{
@@ -57,49 +57,49 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DBLogEntryTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<DBLogEntryTableSync>::TABLE(
 			"t045_log_entries", true
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DBLogEntryTableSync>::_FIELDS[] =
+		template<> const DBTableSync::Field DBTableSyncTemplate<DBLogEntryTableSync>::_FIELDS[] =
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(DBLogEntryTableSync::COL_LOG_KEY, SQL_TEXT),
-			SQLiteTableSync::Field(DBLogEntryTableSync::COL_DATE, SQL_TIMESTAMP),
-			SQLiteTableSync::Field(DBLogEntryTableSync::COL_USER_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DBLogEntryTableSync::COL_LEVEL, SQL_INTEGER),
-			SQLiteTableSync::Field(DBLogEntryTableSync::COL_CONTENT, SQL_TEXT),
-			SQLiteTableSync::Field(DBLogEntryTableSync::COL_OBJECT_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DBLogEntryTableSync::COL_OBJECT2_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(DBLogEntryTableSync::COL_LOG_KEY, SQL_TEXT),
+			DBTableSync::Field(DBLogEntryTableSync::COL_DATE, SQL_TIMESTAMP),
+			DBTableSync::Field(DBLogEntryTableSync::COL_USER_ID, SQL_INTEGER),
+			DBTableSync::Field(DBLogEntryTableSync::COL_LEVEL, SQL_INTEGER),
+			DBTableSync::Field(DBLogEntryTableSync::COL_CONTENT, SQL_TEXT),
+			DBTableSync::Field(DBLogEntryTableSync::COL_OBJECT_ID, SQL_INTEGER),
+			DBTableSync::Field(DBLogEntryTableSync::COL_OBJECT2_ID, SQL_INTEGER),
+			DBTableSync::Field()
 
 		};
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<DBLogEntryTableSync>::_INDEXES[] = 
+		template<> const DBTableSync::Index DBTableSyncTemplate<DBLogEntryTableSync>::_INDEXES[] = 
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				DBLogEntryTableSync::COL_LOG_KEY.c_str(),
 				DBLogEntryTableSync::COL_OBJECT_ID.c_str(),
 				DBLogEntryTableSync::COL_DATE.c_str(),
 				""
 			),
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				DBLogEntryTableSync::COL_LOG_KEY.c_str(),
 				DBLogEntryTableSync::COL_OBJECT2_ID.c_str(),
 				DBLogEntryTableSync::COL_DATE.c_str(),
 				""
 			),
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				DBLogEntryTableSync::COL_LOG_KEY.c_str(),
 				DBLogEntryTableSync::COL_DATE.c_str(),
 				""
 			),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Load(
+		template<> void DBDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Load(
 			DBLogEntry* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -123,14 +123,14 @@ namespace synthese
 			object->setUserId(rows->getLongLong ( DBLogEntryTableSync::COL_USER_ID));
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::Unlink(
+		template<> void DBDirectTableSyncTemplate<DBLogEntryTableSync, DBLogEntry>::Unlink(
 			DBLogEntry* obj
 		){
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Save(
+		template<> void DBDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Save(
 			DBLogEntry* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			// Preparation
 			stringstream content;

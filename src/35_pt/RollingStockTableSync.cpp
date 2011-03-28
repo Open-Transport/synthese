@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,RollingStockTableSync>::FACTORY_KEY("35.10.07 Rolling Stock");
+		template<> const string FactorableTemplate<DBTableSync,RollingStockTableSync>::FACTORY_KEY("35.10.07 Rolling Stock");
 	}
 
 	namespace pt
@@ -53,31 +53,31 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RollingStockTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<RollingStockTableSync>::TABLE(
 			"t049_rolling_stock"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<RollingStockTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<RollingStockTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(RollingStockTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(RollingStockTableSync::COL_ARTICLE, SQL_TEXT),
-			SQLiteTableSync::Field(RollingStockTableSync::COL_INDICATOR, SQL_TEXT),
-			SQLiteTableSync::Field(RollingStockTableSync::COL_TRIDENT, SQL_TEXT),
-			SQLiteTableSync::Field(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(RollingStockTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(RollingStockTableSync::COL_ARTICLE, SQL_TEXT),
+			DBTableSync::Field(RollingStockTableSync::COL_INDICATOR, SQL_TEXT),
+			DBTableSync::Field(RollingStockTableSync::COL_TRIDENT, SQL_TEXT),
+			DBTableSync::Field(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<RollingStockTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<RollingStockTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(RollingStockTableSync::COL_TRIDENT.c_str(), RollingStockTableSync::COL_IS_TRIDENT_REFERENCE.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(RollingStockTableSync::COL_TRIDENT.c_str(), RollingStockTableSync::COL_IS_TRIDENT_REFERENCE.c_str(), ""),
+			DBTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Load(
+		template<> void DBDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Load(
 			RollingStock* object
-			, const db::SQLiteResultSPtr& rows
+			, const db::DBResultSPtr& rows
 			, Env& env,
 			LinkLevel linkLevel
 		){
@@ -91,9 +91,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Save(
+		template<> void DBDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Save(
 			RollingStock* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<RollingStockTableSync> query(*object);
 			query.addField(object->getName());
@@ -106,7 +106,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Unlink(
+		template<> void DBDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Unlink(
 			RollingStock* obj
 		){
 		}
@@ -117,7 +117,7 @@ namespace synthese
 	namespace pt
 	{
 		RollingStockTableSync::RollingStockTableSync()
-			: SQLiteRegistryTableSyncTemplate<RollingStockTableSync,RollingStock>()
+			: DBRegistryTableSyncTemplate<RollingStockTableSync,RollingStock>()
 		{
 		}
 

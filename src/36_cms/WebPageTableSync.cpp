@@ -22,7 +22,7 @@
 
 #include "WebPageTableSync.h"
 #include "ReplaceQuery.h"
-#include "SQLiteResult.h"
+#include "DBResult.hpp"
 #include "Fetcher.h"
 #include "Website.hpp"
 #include "SelectQuery.hpp"
@@ -41,7 +41,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,WebPageTableSync>::FACTORY_KEY("36.10 Web pages");
+		template<> const string FactorableTemplate<DBTableSync,WebPageTableSync>::FACTORY_KEY("36.10 Web pages");
 	}
 
 	namespace cms
@@ -67,44 +67,44 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<WebPageTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<WebPageTableSync>::TABLE(
 			"t063_web_pages"
 		);
 		
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<WebPageTableSync>::_FIELDS[] =
+		template<> const DBTableSync::Field DBTableSyncTemplate<WebPageTableSync>::_FIELDS[] =
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(WebPageTableSync::COL_SITE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(WebPageTableSync::COL_UP_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(WebPageTableSync::COL_RANK, SQL_INTEGER),
-			SQLiteTableSync::Field(WebPageTableSync::COL_TITLE, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_CONTENT1, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_START_TIME, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_END_TIME, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_MIME_TYPE, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_ABSTRACT, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_IMAGE, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_LINKS, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_DO_NOT_USE_TEMPLATE, SQL_BOOLEAN),
-			SQLiteTableSync::Field(WebPageTableSync::COL_HAS_FORUM, SQL_BOOLEAN),
-			SQLiteTableSync::Field(WebPageTableSync::COL_SMART_URL_PATH, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_SMART_URL_DEFAULT_PARAMETER_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(WebPageTableSync::COL_IGNORE_WHITE_CHARS, SQL_BOOLEAN),
-			SQLiteTableSync::Field(WebPageTableSync::COL_RAW_EDITOR, SQL_BOOLEAN),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(WebPageTableSync::COL_SITE_ID, SQL_INTEGER),
+			DBTableSync::Field(WebPageTableSync::COL_UP_ID, SQL_INTEGER),
+			DBTableSync::Field(WebPageTableSync::COL_RANK, SQL_INTEGER),
+			DBTableSync::Field(WebPageTableSync::COL_TITLE, SQL_TEXT),
+			DBTableSync::Field(WebPageTableSync::COL_CONTENT1, SQL_TEXT),
+			DBTableSync::Field(WebPageTableSync::COL_START_TIME, SQL_TEXT),
+			DBTableSync::Field(WebPageTableSync::COL_END_TIME, SQL_TEXT),
+			DBTableSync::Field(WebPageTableSync::COL_MIME_TYPE, SQL_TEXT),
+			DBTableSync::Field(WebPageTableSync::COL_ABSTRACT, SQL_TEXT),
+			DBTableSync::Field(WebPageTableSync::COL_IMAGE, SQL_TEXT),
+			DBTableSync::Field(WebPageTableSync::COL_LINKS, SQL_TEXT),
+			DBTableSync::Field(WebPageTableSync::COL_DO_NOT_USE_TEMPLATE, SQL_BOOLEAN),
+			DBTableSync::Field(WebPageTableSync::COL_HAS_FORUM, SQL_BOOLEAN),
+			DBTableSync::Field(WebPageTableSync::COL_SMART_URL_PATH, SQL_TEXT),
+			DBTableSync::Field(WebPageTableSync::COL_SMART_URL_DEFAULT_PARAMETER_NAME, SQL_TEXT),
+			DBTableSync::Field(WebPageTableSync::COL_IGNORE_WHITE_CHARS, SQL_BOOLEAN),
+			DBTableSync::Field(WebPageTableSync::COL_RAW_EDITOR, SQL_BOOLEAN),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<WebPageTableSync>::_INDEXES[] =
+		template<> const DBTableSync::Index DBTableSyncTemplate<WebPageTableSync>::_INDEXES[] =
 		{
-			SQLiteTableSync::Index(WebPageTableSync::COL_SITE_ID.c_str(), ""),
-			SQLiteTableSync::Index(WebPageTableSync::COL_UP_ID.c_str(), WebPageTableSync::COL_RANK.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(WebPageTableSync::COL_SITE_ID.c_str(), ""),
+			DBTableSync::Index(WebPageTableSync::COL_UP_ID.c_str(), WebPageTableSync::COL_RANK.c_str(), ""),
+			DBTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,Webpage>::Load(
+		template<> void DBDirectTableSyncTemplate<WebPageTableSync,Webpage>::Load(
 			Webpage* webpage,
-			const SQLiteResultSPtr& rows,
+			const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -198,7 +198,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,Webpage>::Unlink(
+		template<> void DBDirectTableSyncTemplate<WebPageTableSync,Webpage>::Unlink(
 			Webpage* obj
 		){
 			if(obj->getRoot())
@@ -209,9 +209,9 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<WebPageTableSync,Webpage>::Save(
+		template<> void DBDirectTableSyncTemplate<WebPageTableSync,Webpage>::Save(
 			Webpage* webPage,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			// Links preparation
 			stringstream linksStream;
@@ -350,7 +350,7 @@ namespace synthese
 					COL_UP_ID << "=" << parentId << " AND " <<
 					COL_RANK << ">=" << rank
 			;
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetDB()->execUpdate(query.str());
 		}
 
 
@@ -359,7 +359,7 @@ namespace synthese
 		{
 			SelectQuery<WebPageTableSync> query;
 			Env env;
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 			query.addWhereField(COL_LINKS, "%"+ lexical_cast<string>(destination.getKey()) +"%", ComposedExpression::OP_LIKE);
 			SearchResult pages(LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
 			BOOST_FOREACH(shared_ptr<Webpage> page, pages)

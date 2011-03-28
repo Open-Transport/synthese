@@ -30,7 +30,7 @@
 #include "Log.h"
 #include "Factory.h"
 #include "DBConstants.h"
-#include "SQLiteResult.h"
+#include "DBResult.hpp"
 #include "InterfacePageException.h"
 #include "ReplaceQuery.h"
 
@@ -45,7 +45,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,InterfacePageTableSync>::FACTORY_KEY("16.02 Interface Pages");
+		template<> const string FactorableTemplate<DBTableSync,InterfacePageTableSync>::FACTORY_KEY("16.02 Interface Pages");
 	}
 
 	namespace interfaces
@@ -60,32 +60,32 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<InterfacePageTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<InterfacePageTableSync>::TABLE(
 			"t023_interface_pages"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<InterfacePageTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<InterfacePageTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_INTERFACE, SQL_INTEGER, false),
-			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_CLASS, SQL_TEXT, false),
-			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_PAGE, SQL_TEXT, false),
-			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED, SQL_INTEGER),
-			SQLiteTableSync::Field(InterfacePageTableSync::COL_MIME_TYPE, SQL_TEXT),
-			SQLiteTableSync::Field(InterfacePageTableSync::TABLE_COL_CONTENT, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(InterfacePageTableSync::TABLE_COL_INTERFACE, SQL_INTEGER),
+			DBTableSync::Field(InterfacePageTableSync::TABLE_COL_CLASS, SQL_TEXT),
+			DBTableSync::Field(InterfacePageTableSync::TABLE_COL_PAGE, SQL_TEXT),
+			DBTableSync::Field(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED, SQL_INTEGER),
+			DBTableSync::Field(InterfacePageTableSync::COL_MIME_TYPE, SQL_TEXT),
+			DBTableSync::Field(InterfacePageTableSync::TABLE_COL_CONTENT, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<InterfacePageTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<InterfacePageTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::Load(
+		template<> void DBDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::Load(
 			InterfacePage* page,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -117,9 +117,9 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::Save(
+		template<> void DBDirectTableSyncTemplate<InterfacePageTableSync,InterfacePage>::Save(
 			InterfacePage* page,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<InterfacePageTableSync> query(*page);
 			query.addField(page->getInterface() ? page->getInterface()->getKey() : RegistryKeyType(0));
@@ -132,7 +132,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<InterfacePageTableSync, InterfacePage>::Unlink(
+		template<> void DBDirectTableSyncTemplate<InterfacePageTableSync, InterfacePage>::Unlink(
 			InterfacePage* obj
 		){
 			if (obj->getInterface() != NULL)
@@ -153,14 +153,14 @@ namespace synthese
 	namespace interfaces
 	{
 		InterfacePageTableSync::InterfacePageTableSync()
-			: SQLiteRegistryTableSyncTemplate<InterfacePageTableSync,InterfacePage> ()
+			: DBRegistryTableSyncTemplate<InterfacePageTableSync,InterfacePage> ()
 		{
 		}
 
 
 
 		boost::shared_ptr<InterfacePage> InterfacePageTableSync::GetNewObject(
-			const SQLiteResultSPtr& row
+			const DBResultSPtr& row
 		){
 			shared_ptr<InterfacePage> page(Factory<InterfacePage>::create(row->getText(InterfacePageTableSync::TABLE_COL_CLASS)));
 			page->setKey(row->getKey());

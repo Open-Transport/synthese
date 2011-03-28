@@ -26,7 +26,7 @@
 #define SYNTHESE_ForumMessageTableSync_hpp__
 
 #include "ForumMessage.hpp"
-#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "DBNoSyncTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -39,7 +39,7 @@ namespace synthese
 		///	@date 2010
 		/// @since 3.1.18
 		class ForumMessageTableSync:
-			public db::SQLiteNoSyncTableSyncTemplate<ForumMessageTableSync,ForumMessage>
+			public db::DBNoSyncTableSyncTemplate<ForumMessageTableSync,ForumMessage>
 		{
 		public:
 			//! @name Field names

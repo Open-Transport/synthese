@@ -27,7 +27,7 @@
 #include "WebPageMoveAction.hpp"
 #include "Request.h"
 #include "WebPageTableSync.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -106,7 +106,7 @@ namespace synthese
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			SQLiteTransaction t;
+			DBTransaction t;
 
 			_page->setRank(_up ? _page->getRank() - 1 : _page->getRank() + 1);
 			WebPageTableSync::Save(_page.get(), t);

@@ -32,7 +32,7 @@
 #include <iostream>
 
 // Db
-#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "DBNoSyncTableSyncTemplate.hpp"
 
 // Boost
 #include <boost/shared_ptr.hpp>
@@ -51,7 +51,7 @@ namespace synthese
 		///	@ingroup m54LS refLS
 		////////////////////////////////////////////////////////////////////////
 		class DisplayMonitoringStatusTableSync
-		: public db::SQLiteNoSyncTableSyncTemplate<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>
+		: public db::DBNoSyncTableSyncTemplate<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>
 		{
 		public:
 			static const std::string COL_SCREEN_ID;

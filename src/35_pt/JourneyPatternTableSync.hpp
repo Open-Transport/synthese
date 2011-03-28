@@ -30,7 +30,7 @@
 
 #include "JourneyPattern.hpp"
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -46,7 +46,7 @@ namespace synthese
 			- on update : 
 			- on delete : X
 		*/
-		class JourneyPatternTableSync : public db::SQLiteRegistryTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>
+		class JourneyPatternTableSync : public db::DBRegistryTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>
 		{
 		public:
 			static const std::string COL_COMMERCIAL_LINE_ID;

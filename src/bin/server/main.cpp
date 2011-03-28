@@ -208,7 +208,7 @@ int main( int argc, char **argv )
 			po::options_description desc("Allowed options");
 			desc.add_options()
 				("help", "produce this help message")
-				("dbconn", po::value<std::string>(&dbConnString)->default_value(std::string ("sqlite://path=config.db3")),
+				("dbconn", po::value<std::string>(&dbConnString)->default_value(std::string ("db://path=config.db3")),
 				 "Database connection string, using format <backend>://<backend_specific_parameters> "
 				 "(see backend documentation for the meaning of backend specific parameters).")
 #ifndef WIN32

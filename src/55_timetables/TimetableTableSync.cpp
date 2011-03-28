@@ -30,8 +30,8 @@
 #include "TimetableRowTableSync.h"
 #include "CalendarTemplate.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "Interface.h"
 #include "CommercialLine.h"
 #include "StopPoint.hpp"
@@ -54,7 +54,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,TimetableTableSync>::FACTORY_KEY("55.01 Timetables");
+		template<> const string FactorableTemplate<DBTableSync,TimetableTableSync>::FACTORY_KEY("55.01 Timetables");
 	}
 	
 	
@@ -73,44 +73,44 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TimetableTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<TimetableTableSync>::TABLE(
 			"t052_timetables"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<TimetableTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<TimetableTableSync>::_FIELDS[]=
 		{
 
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(TimetableTableSync::COL_BOOK_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableTableSync::COL_RANK, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableTableSync::COL_TITLE, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableTableSync::COL_CALENDAR_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableTableSync::COL_FORMAT, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableTableSync::COL_AUTHORIZED_LINES, SQL_TEXT),
-			SQLiteTableSync::Field(TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS, SQL_TEXT),
-			SQLiteTableSync::Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE, SQL_INTEGER),
-			SQLiteTableSync::Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(TimetableTableSync::COL_BOOK_ID, SQL_INTEGER),
+			DBTableSync::Field(TimetableTableSync::COL_RANK, SQL_INTEGER),
+			DBTableSync::Field(TimetableTableSync::COL_TITLE, SQL_INTEGER),
+			DBTableSync::Field(TimetableTableSync::COL_CALENDAR_ID, SQL_INTEGER),
+			DBTableSync::Field(TimetableTableSync::COL_FORMAT, SQL_INTEGER),
+			DBTableSync::Field(TimetableTableSync::COL_AUTHORIZED_LINES, SQL_TEXT),
+			DBTableSync::Field(TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS, SQL_TEXT),
+			DBTableSync::Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE, SQL_INTEGER),
+			DBTableSync::Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
 		
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TimetableTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<TimetableTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				TimetableTableSync::COL_BOOK_ID.c_str(),
 				TimetableTableSync::COL_RANK.c_str(),
 				""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TimetableTableSync,Timetable>::Load(
+		template<> void DBDirectTableSyncTemplate<TimetableTableSync,Timetable>::Load(
 			Timetable* object
-			, const db::SQLiteResultSPtr& rows,
+			, const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -221,9 +221,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TimetableTableSync,Timetable>::Save(
+		template<> void DBDirectTableSyncTemplate<TimetableTableSync,Timetable>::Save(
 			Timetable* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			// Preparation
 			stringstream authorizedLines;
@@ -263,7 +263,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TimetableTableSync,Timetable>::Unlink(
+		template<> void DBDirectTableSyncTemplate<TimetableTableSync,Timetable>::Unlink(
 			Timetable* obj
 		){
 		}
@@ -274,7 +274,7 @@ namespace synthese
 	namespace timetables
 	{
 		TimetableTableSync::TimetableTableSync()
-			: SQLiteNoSyncTableSyncTemplate<TimetableTableSync, Timetable>()
+			: DBNoSyncTableSyncTemplate<TimetableTableSync, Timetable>()
 		{
 		}
 
@@ -324,7 +324,7 @@ namespace synthese
 
 		void TimetableTableSync::Shift( util::RegistryKeyType bookId , int rank , int delta )
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 
 			stringstream query;
 
@@ -336,14 +336,14 @@ namespace synthese
 				<< " AND " << COL_RANK << ">=" << rank
 				;
 
-			sqlite->execUpdate(query.str());
+			db->execUpdate(query.str());
 		}
 
 
 
 		int TimetableTableSync::GetMaxRank( util::RegistryKeyType bookId )
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 
 			stringstream query;
 
@@ -356,14 +356,14 @@ namespace synthese
 
 			try
 			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				DBResultSPtr rows = db->execQuery(query.str());
 				while (rows->next ())
 				{
 					return rows->getInt("mr");
 				}
 				return UNKNOWN_VALUE;
 			}
-			catch(SQLiteException& e)
+			catch(DBException& e)
 			{
 				throw Exception(e.getMessage());
 			}

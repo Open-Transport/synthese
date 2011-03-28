@@ -26,7 +26,7 @@
 #define SYNTHESE_HikingTrailTableSync_h__
 
 #include "HikingTrail.h"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -36,7 +36,7 @@ namespace synthese
 		///	HikingTrail table synchronizer.
 		///	@ingroup m58LS refLS
 		class HikingTrailTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<HikingTrailTableSync,HikingTrail>
+			public db::DBRegistryTableSyncTemplate<HikingTrailTableSync,HikingTrail>
 		{
 		public:
 			//! @name Field names

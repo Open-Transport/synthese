@@ -41,7 +41,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,ObjectSiteLinkTableSync>::FACTORY_KEY("56.11 Object Website Links");
+		template<> const string FactorableTemplate<DBTableSync,ObjectSiteLinkTableSync>::FACTORY_KEY("56.11 Object Website Links");
 	}
 
 	namespace pt_website
@@ -52,33 +52,33 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<ObjectSiteLinkTableSync>::TABLE(
 			"t001_object_site_links"
 		);
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<ObjectSiteLinkTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(ObjectSiteLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(ObjectSiteLinkTableSync::COL_SITE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(ObjectSiteLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
+			DBTableSync::Field(ObjectSiteLinkTableSync::COL_SITE_ID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ObjectSiteLinkTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<ObjectSiteLinkTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(ObjectSiteLinkTableSync::COL_SITE_ID.c_str(), ""),
-			SQLiteTableSync::Index(ObjectSiteLinkTableSync::COL_OBJECT_ID.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(ObjectSiteLinkTableSync::COL_SITE_ID.c_str(), ""),
+			DBTableSync::Index(ObjectSiteLinkTableSync::COL_OBJECT_ID.c_str(), ""),
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Load(
+		template<> void DBDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Load(
 			ObjectSiteLink* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -105,9 +105,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Save(
+		template<> void DBDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Save(
 			ObjectSiteLink* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<ObjectSiteLinkTableSync> query(*object);
 			query.addField(object->getObjectId());
@@ -117,7 +117,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Unlink(
+		template<> void DBDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Unlink(
 			ObjectSiteLink* obj
 		){
 		}

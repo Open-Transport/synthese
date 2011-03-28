@@ -38,7 +38,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,CityTableSync>::FACTORY_KEY("14.00.01 Cities");
+		template<> const string FactorableTemplate<DBTableSync,CityTableSync>::FACTORY_KEY("14.00.01 Cities");
 	}
 
 	namespace geography
@@ -49,29 +49,29 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CityTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<CityTableSync>::TABLE(
 			"t006_cities"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CityTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<CityTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(CityTableSync::TABLE_COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(CityTableSync::TABLE_COL_CODE, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(CityTableSync::TABLE_COL_NAME, SQL_TEXT),
+			DBTableSync::Field(CityTableSync::TABLE_COL_CODE, SQL_TEXT),
+			DBTableSync::Field()
 
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CityTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<CityTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(CityTableSync::TABLE_COL_NAME.c_str(), ""),
-			SQLiteTableSync::Index(CityTableSync::TABLE_COL_CODE.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(CityTableSync::TABLE_COL_NAME.c_str(), ""),
+			DBTableSync::Index(CityTableSync::TABLE_COL_CODE.c_str(), ""),
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Load(
+		template<> void DBDirectTableSyncTemplate<CityTableSync,City>::Load(
 			City* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -85,14 +85,14 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Unlink(City* obj)
+		template<> void DBDirectTableSyncTemplate<CityTableSync,City>::Unlink(City* obj)
 		{
 			GeographyModule::RemoveFromCitiesMatchers(Env::GetOfficialEnv().getEditableSPtr(obj));
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<CityTableSync,City>::Save(
+		template<> void DBDirectTableSyncTemplate<CityTableSync,City>::Save(
 			City* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<CityTableSync> query(*object);
 			query.addField(object->getName());
@@ -120,11 +120,11 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (exactName)
-				query << " AND " << TABLE_COL_NAME << "=" << Conversion::ToSQLiteString(*exactName);
+				query << " AND " << TABLE_COL_NAME << "=" << Conversion::ToDBString(*exactName);
 			if (likeName)
-				query << " AND " << TABLE_COL_NAME << " LIKE " << Conversion::ToSQLiteString(*exactName);
+				query << " AND " << TABLE_COL_NAME << " LIKE " << Conversion::ToDBString(*exactName);
 			if (code)
-				query << " AND " << TABLE_COL_CODE << "=" << Conversion::ToSQLiteString(*code);
+				query << " AND " << TABLE_COL_CODE << "=" << Conversion::ToDBString(*code);
 			if (orderByName)
 				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)

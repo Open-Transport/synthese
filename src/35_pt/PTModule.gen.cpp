@@ -6,13 +6,13 @@
 synthese::pt::TransportNetworkTableSync::integrate();
 
 synthese::pt::PTUseRuleTableSync::integrate();
-synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::StopPointTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::StopPointTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex>, synthese::pt::StopPointTableSync>::integrate();
 synthese::pt::JunctionTableSync::integrate();
-synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::ContinuousServiceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::ContinuousServiceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::SchedulesBasedService>, synthese::pt::ContinuousServiceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Service>, synthese::pt::ContinuousServiceTableSync>::integrate();
-synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::ScheduledServiceTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::ScheduledServiceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::SchedulesBasedService>, synthese::pt::ScheduledServiceTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Service>, synthese::pt::ScheduledServiceTableSync>::integrate();
 synthese::pt::FareTableSync::integrate();
@@ -21,7 +21,7 @@ synthese::pt::NonConcurrencyRuleTableSync::integrate();
 synthese::pt::ReservationContactTableSync::integrate();
 synthese::pt::CommercialLineTableSync::integrate();
 synthese::pt::JourneyPatternTableSync::integrate();
-synthese::util::FactorableTemplate<synthese::db::SQLiteTableSync,synthese::pt::StopAreaTableSync>::integrate();
+synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::StopAreaTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::pt::StopAreaTableSync>::integrate();
 synthese::pt::LineStopTableSync::integrate();
 synthese::pt::LineAreaInheritedTableSync::integrate();

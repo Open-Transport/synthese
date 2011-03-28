@@ -43,7 +43,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,DRTAreaTableSync>::FACTORY_KEY("35.40.05 DRT Areas");
+		template<> const string FactorableTemplate<DBTableSync,DRTAreaTableSync>::FACTORY_KEY("35.40.05 DRT Areas");
 	}
 
 	namespace pt
@@ -54,32 +54,32 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DRTAreaTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<DRTAreaTableSync>::TABLE(
 			"t071_drt_areas"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DRTAreaTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<DRTAreaTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(DRTAreaTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(DRTAreaTableSync::COL_STOPS, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(DRTAreaTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(DRTAreaTableSync::COL_STOPS, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<DRTAreaTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<DRTAreaTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<DRTAreaTableSync,DRTArea>::Load(
+		template<> void DBDirectTableSyncTemplate<DRTAreaTableSync,DRTArea>::Load(
 			DRTArea* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -93,9 +93,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<DRTAreaTableSync,DRTArea>::Save(
+		template<> void DBDirectTableSyncTemplate<DRTAreaTableSync,DRTArea>::Save(
 			DRTArea* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<DRTAreaTableSync> query(*object);
 			query.addField(object->getName());
@@ -105,7 +105,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<DRTAreaTableSync,DRTArea>::Unlink(
+		template<> void DBDirectTableSyncTemplate<DRTAreaTableSync,DRTArea>::Unlink(
 			DRTArea* obj
 		){
 		}

@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "DBNoSyncTableSyncTemplate.hpp"
 #include "TextTemplate.h"
 
 namespace synthese
@@ -39,7 +39,7 @@ namespace synthese
 			@ingroup m17LS refLS
 		*/
 		class TextTemplateTableSync:
-			public db::SQLiteNoSyncTableSyncTemplate<TextTemplateTableSync,TextTemplate>
+			public db::DBNoSyncTableSyncTemplate<TextTemplateTableSync,TextTemplate>
 		{
 		public:
 			static const std::string COL_NAME;

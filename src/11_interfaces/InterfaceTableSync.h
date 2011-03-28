@@ -27,7 +27,7 @@
 
 #include <string>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 #include <boost/optional.hpp>
 
@@ -35,10 +35,10 @@ namespace synthese
 {
 	namespace interfaces
 	{
-		/** InterfaceTableSync SQLite table synchronizer.
+		/** InterfaceTableSync table synchronizer.
 			@ingroup m11LS refLS
 		*/
-		class InterfaceTableSync : public db::SQLiteRegistryTableSyncTemplate<InterfaceTableSync,Interface>
+		class InterfaceTableSync : public db::DBRegistryTableSyncTemplate<InterfaceTableSync,Interface>
 		{
 		public:
 			static const std::string TABLE_COL_NO_SESSION_DEFAULT_PAGE;

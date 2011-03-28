@@ -199,7 +199,7 @@ namespace synthese
 			return result;
 		}
 		// YYY compat, to be removed
-		std::string Conversion::ToSQLiteString( const std::string& s, bool withApostrophes)
+		std::string Conversion::ToDBString( const std::string& s, bool withApostrophes)
 		{
 			return Conversion::ToDBString(s, withApostrophes);
 		}

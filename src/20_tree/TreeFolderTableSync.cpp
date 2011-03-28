@@ -28,8 +28,8 @@
 #include "TreeFolderRoot.hpp"
 #include "ReplaceQuery.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 
 using namespace std;
 using namespace boost;
@@ -42,7 +42,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,TreeFolderTableSync>::FACTORY_KEY("20 Tree folders");
+		template<> const string FactorableTemplate<DBTableSync,TreeFolderTableSync>::FACTORY_KEY("20 Tree folders");
 	}
 
 	namespace tree
@@ -53,33 +53,33 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TreeFolderTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<TreeFolderTableSync>::TABLE(
 			"t051_scenario_folder"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<TreeFolderTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<TreeFolderTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(TreeFolderTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(TreeFolderTableSync::COL_PARENT_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(TreeFolderTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(TreeFolderTableSync::COL_PARENT_ID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<TreeFolderTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<TreeFolderTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				TreeFolderTableSync::COL_PARENT_ID.c_str(),
 				TreeFolderTableSync::COL_NAME.c_str(),
 			""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Load(
+		template<> void DBDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Load(
 			TreeFolderRoot* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -104,9 +104,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Save(
+		template<> void DBDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Save(
 			TreeFolderRoot* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<TreeFolderTableSync> query(*object);
 			query.addField(object->getName());
@@ -116,7 +116,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Unlink(
+		template<> void DBDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Unlink(
 			TreeFolderRoot* obj
 		){			
 		}
@@ -146,7 +146,7 @@ namespace synthese
 			}
 			if(name)
 			{
-				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
+				query << " AND " << COL_NAME << " LIKE " << Conversion::ToDBString(*name);
 			}
 			query << " ORDER BY " << COL_NAME << " ASC";
 			if (number)

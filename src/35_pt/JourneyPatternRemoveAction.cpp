@@ -83,7 +83,7 @@ namespace synthese
 			Request& request
 		){
 			// Services deletion
-			SQLiteTransaction serviceTransaction;
+			DBTransaction serviceTransaction;
 			BOOST_FOREACH(Service* service, _journeyPattern->getServices())
 			{
 				Fetcher<Service>::FetchRemove(*service, serviceTransaction);
@@ -91,7 +91,7 @@ namespace synthese
 			serviceTransaction.run();
 
 			// LineStops deletion
-			SQLiteTransaction lineStopsTransaction;
+			DBTransaction lineStopsTransaction;
 			BOOST_FOREACH(Edge* edge, _journeyPattern->getEdges())
 			{
 				LineStopTableSync::Remove(edge->getKey(), lineStopsTransaction);

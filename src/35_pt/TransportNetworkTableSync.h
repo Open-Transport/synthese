@@ -28,7 +28,7 @@
 
 #include "TransportNetwork.h"
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -41,7 +41,7 @@ namespace synthese
 		/// @date 2006
 		//////////////////////////////////////////////////////////////////////////
 		class TransportNetworkTableSync
-		:	public db::SQLiteRegistryTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>
+		:	public db::DBRegistryTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>
 		{
 		 public:
 			 static const std::string COL_NAME;

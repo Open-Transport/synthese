@@ -38,15 +38,15 @@ string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 	/* Cache Management Mecanism
 	// struct in DB t800_cache_system
 	// words : string (key) , fileName : string , filePath : string , creatDateTime : date , lastAcessDateTime : date , category : number (p.ex: 0 music, 1 file etc)
-	SQLite* sqlite = DBModule::GetSQLite();
+	DB* db = DBModule::GetDB();
 	stringstream query;
 	query
 		<< "SELECT *"
 		<< " FROM " << " t800_cache_system "
-		<< " WHERE " << TABLE_COL_LOGIN << "=" << Conversion::ToSQLiteString(login);
+		<< " WHERE " << TABLE_COL_LOGIN << "=" << Conversion::ToDBString(login);
 	try
 	{
-		db::SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+		db::DBResultSPtr rows = db->execQuery(query.str());
 		if (rows->next () == false)
 			throw UserTableSyncException("User "+ login + " not found in database.");
 
@@ -55,7 +55,7 @@ string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 		link(user.get(), rows, GET_AUTO);
 		return user;
 	}
-	catch (SQLiteException e)
+	catch (DBException e)
 	{
 		throw UserTableSyncException(e.getMessage());
 	}

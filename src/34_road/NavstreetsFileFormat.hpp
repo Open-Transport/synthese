@@ -249,7 +249,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @since 3.2.0
 				/// @date 2010
-				virtual db::SQLiteTransaction _save() const;
+				virtual db::DBTransaction _save() const;
 			};
 
 			typedef impex::NoExportPolicy<NavstreetsFileFormat> Exporter_;

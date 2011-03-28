@@ -26,7 +26,7 @@
 #define SYNTHESE_CityAliasTableSync_hpp__
 
 #include "CityAlias.hpp"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -39,7 +39,7 @@ namespace synthese
 		///	@date 2010
 		/// @since 3.1.16
 		class CityAliasTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<CityAliasTableSync,CityAlias>
+			public db::DBRegistryTableSyncTemplate<CityAliasTableSync,CityAlias>
 		{
 		public:
 			//! @name Field names

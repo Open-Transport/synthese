@@ -49,7 +49,7 @@ namespace synthese
 
 			virtual server::ParametersMap getParametersMap() const { return server::ParametersMap(); }
 
-			virtual db::SQLiteTransaction save() const { return db::SQLiteTransaction(); }
+			virtual db::DBTransaction save() const { return db::DBTransaction(); }
 		};
 
 		template<class FF>

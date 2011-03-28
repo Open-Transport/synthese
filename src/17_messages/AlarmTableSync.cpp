@@ -35,7 +35,7 @@
 
 #include "Conversion.h"
 
-#include "SQLiteResult.h"
+#include "DBResult.hpp"
 
 using namespace std;
 using namespace boost;
@@ -48,7 +48,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,AlarmTableSync>::FACTORY_KEY("17.10.01 Alarms");
+		template<> const string FactorableTemplate<DBTableSync,AlarmTableSync>::FACTORY_KEY("17.10.01 Alarms");
 	}
 
 	namespace messages
@@ -69,33 +69,33 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<AlarmTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<AlarmTableSync>::TABLE(
 			"t003_alarms"
 			);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<AlarmTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<AlarmTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(AlarmTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
-			SQLiteTableSync::Field(AlarmTableSync::COL_ENABLED, SQL_INTEGER),
-			SQLiteTableSync::Field(AlarmTableSync::COL_LEVEL, SQL_INTEGER),
-			SQLiteTableSync::Field(AlarmTableSync::COL_SHORT_MESSAGE, SQL_TEXT),
-			SQLiteTableSync::Field(AlarmTableSync::COL_LONG_MESSAGE, SQL_TEXT),
-			SQLiteTableSync::Field(AlarmTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
-			SQLiteTableSync::Field(AlarmTableSync::COL_PERIODEND, SQL_TIMESTAMP),
-			SQLiteTableSync::Field(AlarmTableSync::COL_SCENARIO_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(AlarmTableSync::COL_TEMPLATE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(AlarmTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
+			DBTableSync::Field(AlarmTableSync::COL_ENABLED, SQL_INTEGER),
+			DBTableSync::Field(AlarmTableSync::COL_LEVEL, SQL_INTEGER),
+			DBTableSync::Field(AlarmTableSync::COL_SHORT_MESSAGE, SQL_TEXT),
+			DBTableSync::Field(AlarmTableSync::COL_LONG_MESSAGE, SQL_TEXT),
+			DBTableSync::Field(AlarmTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
+			DBTableSync::Field(AlarmTableSync::COL_PERIODEND, SQL_TIMESTAMP),
+			DBTableSync::Field(AlarmTableSync::COL_SCENARIO_ID, SQL_INTEGER),
+			DBTableSync::Field(AlarmTableSync::COL_TEMPLATE_ID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<AlarmTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<AlarmTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(AlarmTableSync::COL_SCENARIO_ID.c_str(),	AlarmTableSync::COL_PERIODSTART.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(AlarmTableSync::COL_SCENARIO_ID.c_str(),	AlarmTableSync::COL_PERIODSTART.c_str(), ""),
+			DBTableSync::Index()
 		};
 	    
 		template<>
-		string SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_GetSubClassKey(const SQLiteResultSPtr& row)
+		string DBInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_GetSubClassKey(const DBResultSPtr& row)
 		{
 			return row->getBool(AlarmTableSync::COL_IS_TEMPLATE)
 				? AlarmTemplateInheritedTableSync::FACTORY_KEY
@@ -105,7 +105,7 @@ namespace synthese
 
 
 		template<>
-		string SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_GetSubClassKey(const Alarm* obj)
+		string DBInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_GetSubClassKey(const Alarm* obj)
 		{
 			return	(dynamic_cast<const SentAlarm*>(obj) != NULL)
 				?	ScenarioSentAlarmInheritedTableSync::FACTORY_KEY
@@ -113,9 +113,9 @@ namespace synthese
 			;
 		}
 
-		template<> void SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_CommonLoad(
+		template<> void DBInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_CommonLoad(
 			Alarm* alarm
-			, const SQLiteResultSPtr& rows,
+			, const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -129,7 +129,7 @@ namespace synthese
 	namespace messages
 	{
 		AlarmTableSync::AlarmTableSync ()
-		: SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>()
+		: DBInheritanceTableSyncTemplate<AlarmTableSync,Alarm>()
 		{
 		}
 

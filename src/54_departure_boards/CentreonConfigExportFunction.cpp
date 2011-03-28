@@ -189,8 +189,8 @@ namespace synthese
 					stream <<
 						"INSERT INTO contactgroup(cg_id,cg_name,cg_alias,cg_comment,cg_activate) VALUES(" <<
 							decodeObjectId(profile->getKey()) << "," <<
-							Conversion::ToSQLiteString(_ConvertToNagiosName(profile->getName())) << "," <<
-							Conversion::ToSQLiteString(_ConvertToNagiosName(profile->getName())) << "," <<
+							Conversion::ToDBString(_ConvertToNagiosName(profile->getName())) << "," <<
+							Conversion::ToDBString(_ConvertToNagiosName(profile->getName())) << "," <<
 							GENERATED_BY_SYNTHESE << "," <<
 							"'1'"
 						");" << endl <<
@@ -227,11 +227,11 @@ namespace synthese
 							"contact_type_msg,contact_activate,contact_auth_type" <<
 						") VALUES (" <<
 							decodeObjectId(user->getKey()) << ",1,1," << 
-							Conversion::ToSQLiteString(_ConvertToNagiosName(user->getFullName())) << "," <<
-							Conversion::ToSQLiteString(user->getLogin()) << "," << 
-							Conversion::ToSQLiteString(md5.getHashFromString(user->getPassword())) << "," <<
+							Conversion::ToDBString(_ConvertToNagiosName(user->getFullName())) << "," <<
+							Conversion::ToDBString(user->getLogin()) << "," << 
+							Conversion::ToDBString(md5.getHashFromString(user->getPassword())) << "," <<
 							"'fr_FR','n','n'," <<
-							Conversion::ToSQLiteString(user->getEMail()) << "," << GENERATED_BY_SYNTHESE << ",'1','0'," << 
+							Conversion::ToDBString(user->getEMail()) << "," << GENERATED_BY_SYNTHESE << ",'1','0'," << 
 							"'txt','1','local'" <<
 						");" << endl
 					;
@@ -273,8 +273,8 @@ namespace synthese
 					stream <<
 						"INSERT INTO hostgroup(hg_id,hg_name,hg_alias,hg_comment,hg_activate) VALUES(" <<
 							decodeObjectId(type->getKey()) << "," <<
-							Conversion::ToSQLiteString(hostgroup) << "," <<
-							Conversion::ToSQLiteString(hostgroup) << "," <<
+							Conversion::ToDBString(hostgroup) << "," <<
+							Conversion::ToDBString(hostgroup) << "," <<
 							GENERATED_BY_SYNTHESE << "," <<
 							"'1'" <<
 						");" << endl <<
@@ -335,8 +335,8 @@ namespace synthese
 							decodeObjectId(screen->getKey()) << ",(SELECT command_id FROM command WHERE command_name='check_centreon_dummy')," <<
 							"'!0!N/A'," <<
 							"1,1," <<
-							Conversion::ToSQLiteString(host) << "," << 
-							Conversion::ToSQLiteString(host) << "," <<
+							Conversion::ToDBString(host) << "," << 
+							Conversion::ToDBString(host) << "," <<
 							screen->getKey() << ",1000," <<
 							"'1','2'," <<
 							"'2','2'," <<
@@ -387,7 +387,7 @@ namespace synthese
 						SYNTHESE_SERVER_ID << ",(SELECT command_id FROM command WHERE command_name='check_host_alive')," <<
 						"1,1," <<
 						SYNTHESE_SERVER_NAME << "," << SYNTHESE_SERVER_NAME << "," <<
-						Conversion::ToSQLiteString(request.getHostName()) << ",1000," <<
+						Conversion::ToDBString(request.getHostName()) << ",1000," <<
 						"'1','2'," <<
 						"'2','2'," <<
 						"'2','2'," <<

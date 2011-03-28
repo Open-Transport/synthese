@@ -26,7 +26,7 @@
 #define SYNTHESE_DRTAreaTableSync_hpp__
 
 #include "DRTArea.hpp"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -39,7 +39,7 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.2.1
 		class DRTAreaTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<DRTAreaTableSync,DRTArea>
+			public db::DBRegistryTableSyncTemplate<DRTAreaTableSync,DRTArea>
 		{
 		public:
 			//! @name Field names

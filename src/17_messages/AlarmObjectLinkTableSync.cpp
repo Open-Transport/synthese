@@ -45,7 +45,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,AlarmObjectLinkTableSync>::FACTORY_KEY("99.00.01 Alarm links");
+		template<> const string FactorableTemplate<DBTableSync,AlarmObjectLinkTableSync>::FACTORY_KEY("99.00.01 Alarm links");
 	}
 
 	namespace messages
@@ -57,29 +57,29 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<AlarmObjectLinkTableSync>::TABLE(
 			"t040_alarm_object_links"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<AlarmObjectLinkTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY, SQL_TEXT),
-			SQLiteTableSync::Field(AlarmObjectLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(AlarmObjectLinkTableSync::COL_ALARM_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY, SQL_TEXT),
+			DBTableSync::Field(AlarmObjectLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
+			DBTableSync::Field(AlarmObjectLinkTableSync::COL_ALARM_ID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<AlarmObjectLinkTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<AlarmObjectLinkTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(AlarmObjectLinkTableSync::COL_OBJECT_ID.c_str(),	AlarmObjectLinkTableSync::COL_ALARM_ID.c_str(), ""),
-			SQLiteTableSync::Index(AlarmObjectLinkTableSync::COL_ALARM_ID.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(AlarmObjectLinkTableSync::COL_OBJECT_ID.c_str(),	AlarmObjectLinkTableSync::COL_ALARM_ID.c_str(), ""),
+			DBTableSync::Index(AlarmObjectLinkTableSync::COL_ALARM_ID.c_str(), ""),
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Load(
+		template<> void DBDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Load(
 			AlarmObjectLink* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -123,7 +123,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Unlink(
+		template<> void DBDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Unlink(
 			AlarmObjectLink* object
 		){
 			if(dynamic_cast<SentAlarm*>(object->getAlarm()))
@@ -142,25 +142,25 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Save(
+		template<> void DBDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Save(
 			AlarmObjectLink* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());
             query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(object->getKey())
-				<< "," << Conversion::ToSQLiteString(object->getRecipientKey())
+				<< "," << Conversion::ToDBString(object->getRecipientKey())
 				<< "," << Conversion::ToString(object->getObjectId())
 				<< "," << (object->getAlarm() ? object->getAlarm()->getKey() : RegistryKeyType(0))
 				<< ")";
-			sqlite->execUpdate(query.str());
+			db->execUpdate(query.str());
 		}
 
-		template<> bool SQLiteConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::IsLoaded( const SQLiteResultSPtr& row )
+		template<> bool DBConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::IsLoaded( const DBResultSPtr& row )
 		{
 			shared_ptr<Alarm> alarm(AlarmTableSync::GetEditable(
 				row->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID),
@@ -190,7 +190,7 @@ namespace synthese
 				query << " AND " << COL_OBJECT_ID << "=" << *objectId;
 			}
 
-			DBModule::GetSQLite()->execUpdate(query.str());
+			DBModule::GetDB()->execUpdate(query.str());
 		}
 
 		
@@ -238,7 +238,7 @@ namespace synthese
 
 		void AlarmObjectLinkTableSync::RemoveByTarget(
 			util::RegistryKeyType objectId,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			DeleteQuery<AlarmObjectLinkTableSync> query;
 			query.addWhereField(COL_OBJECT_ID, objectId);

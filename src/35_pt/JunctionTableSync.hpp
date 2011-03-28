@@ -26,7 +26,7 @@
 #define SYNTHESE_JunctionTableSync_hpp__
 
 #include "Junction.hpp"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -38,7 +38,7 @@ namespace synthese
 		///	@author Hugues Romain
 		///	@date 2010
 		class JunctionTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<JunctionTableSync,Junction>
+			public db::DBRegistryTableSyncTemplate<JunctionTableSync,Junction>
 		{
 		public:
 			//! @name Field names

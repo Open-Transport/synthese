@@ -27,19 +27,19 @@
 #include <boost/shared_ptr.hpp>
 
 #include "User.h"
-#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "DBNoSyncTableSyncTemplate.hpp"
 
 namespace synthese
 {
 	namespace security
 	{
-		/** User SQLite table synchronizer.
+		/** User table synchronizer.
 			@ingroup m12LS refLS
 			@todo Update the opened session on user update
 		*/
 
 		class UserTableSync:
-			public db::SQLiteNoSyncTableSyncTemplate<UserTableSync,User>
+			public db::DBNoSyncTableSyncTemplate<UserTableSync,User>
 		{
 		public:
 			static const std::string TABLE_COL_LOGIN;

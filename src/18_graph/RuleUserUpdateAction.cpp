@@ -27,8 +27,8 @@
 #include "RuleUserUpdateAction.hpp"
 #include "Request.h"
 #include "DBModule.h"
-#include "SQLiteException.h"
-#include "SQLiteTableSync.h"
+#include "DBException.hpp"
+#include "DBTableSync.hpp"
 #include "UpdateQuery.hpp"
 
 #include <boost/foreach.hpp>
@@ -84,7 +84,7 @@ namespace synthese
 			{
 				_tableSync = DBModule::GetTableSync(decodeTableId(_id));
 			}
-			catch(SQLiteException)
+			catch(DBException)
 			{
 				throw ActionException("Invalid id, the table does not exist");
 			}
@@ -106,7 +106,7 @@ namespace synthese
 			{
 				query.addUpdateField(element.first, element.second);
 			}
-			query.execute(boost::optional<SQLiteTransaction&>());
+			query.execute(boost::optional<DBTransaction&>());
 		}
 		
 		

@@ -28,7 +28,7 @@
 
 #include <boost/optional.hpp>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 #include "CalendarTemplate.h"
 
 namespace synthese
@@ -43,7 +43,7 @@ namespace synthese
 		/// Table name : t054_calendar_templates
 		/// Corresponding class : CalendarTemplate
 		class CalendarTemplateTableSync
-		:	public db::SQLiteRegistryTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>
+		:	public db::DBRegistryTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>
 		{
 		public:
 			static const std::string COL_TEXT;

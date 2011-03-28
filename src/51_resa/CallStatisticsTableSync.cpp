@@ -62,7 +62,7 @@ namespace synthese
 				" CAST(" << DBLogEntryTableSync::COL_CONTENT << " AS INTEGER)" <<
 				" ORDER BY CAST(" << DBLogEntryTableSync::COL_CONTENT << " AS INTEGER)"
 			;
-			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(s.str());
+			DBResultSPtr rows = DBModule::GetDB()->execQuery(s.str());
 			while (rows->next ())
 			{
 				if(!lastStep || *lastStep != static_cast<ResaDBLog::_EntryType>(rows->getInt("type")))

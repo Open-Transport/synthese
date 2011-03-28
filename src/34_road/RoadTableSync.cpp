@@ -27,8 +27,8 @@
 #include "CityTableSync.h"
 #include "RoadChunkTableSync.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "ReplaceQuery.h"
 
 using namespace std;
@@ -42,7 +42,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync, RoadTableSync>::FACTORY_KEY(
+		template<> const string FactorableTemplate<DBTableSync, RoadTableSync>::FACTORY_KEY(
 			"34.10.01 Roads"
 		);
 	}
@@ -58,35 +58,35 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RoadTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<RoadTableSync>::TABLE(
 			"t015_roads"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<RoadTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<RoadTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(RoadTableSync::COL_ROADTYPE, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			SQLiteTableSync::Field(RoadTableSync::COL_ROAD_PLACE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(RoadTableSync::COL_ROADTYPE, SQL_INTEGER),
+			DBTableSync::Field(RoadTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
+			DBTableSync::Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
+			DBTableSync::Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+			DBTableSync::Field(RoadTableSync::COL_ROAD_PLACE_ID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<RoadTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<RoadTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,MainRoadPart>::Load(
+		template<> void DBDirectTableSyncTemplate<RoadTableSync,MainRoadPart>::Load(
 			MainRoadPart* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -110,16 +110,16 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,MainRoadPart>::Unlink(
+		template<> void DBDirectTableSyncTemplate<RoadTableSync,MainRoadPart>::Unlink(
 			MainRoadPart* obj
 		){
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadTableSync,MainRoadPart>::Save(
+		template<> void DBDirectTableSyncTemplate<RoadTableSync,MainRoadPart>::Save(
 			MainRoadPart* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<RoadTableSync> query(*object);
 			query.addField(static_cast<int>(object->getType()));

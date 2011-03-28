@@ -26,8 +26,8 @@
 #include "Conversion.h"
 
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 
 #include "AccountingModule.h"
 #include "Transaction.h"
@@ -47,16 +47,16 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,TransactionTableSync>::FACTORY_KEY("57.20 Transaction");
+		template<> const string FactorableTemplate<DBTableSync,TransactionTableSync>::FACTORY_KEY("57.20 Transaction");
 	}
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TransactionTableSync>::TABLE.NAME = "t031_transactions";
-		template<> const int SQLiteTableSyncTemplate<TransactionTableSync>::TABLE.ID = 31;
-		template<> const bool SQLiteTableSyncTemplate<TransactionTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const DBTableSync::Format DBTableSyncTemplate<TransactionTableSync>::TABLE.NAME = "t031_transactions";
+		template<> const int DBTableSyncTemplate<TransactionTableSync>::TABLE.ID = 31;
+		template<> const bool DBTableSyncTemplate<TransactionTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<TransactionTableSync,Transaction>::load(Transaction* t, const db::SQLiteResultSPtr& rows )
+		template<> void DBDirectTableSyncTemplate<TransactionTableSync,Transaction>::load(Transaction* t, const db::DBResultSPtr& rows )
 		{
 		    t->setKey(rows->getLongLong (TABLE_COL_ID));
 		    t->setComment(rows->getText ( TransactionTableSync::TABLE_COL_COMMENT));
@@ -70,40 +70,40 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransactionTableSync,Transaction>::_link(Transaction* t, const db::SQLiteResultSPtr& rows, GetSource temporary )
+		template<> void DBDirectTableSyncTemplate<TransactionTableSync,Transaction>::_link(Transaction* t, const db::DBResultSPtr& rows, GetSource temporary )
 		{
 
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransactionTableSync,Transaction>::_unlink(Transaction* t)
+		template<> void DBDirectTableSyncTemplate<TransactionTableSync,Transaction>::_unlink(Transaction* t)
 		{
 
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransactionTableSync,Transaction>::Save(Transaction* t)
+		template<> void DBDirectTableSyncTemplate<TransactionTableSync,Transaction>::Save(Transaction* t)
 		{
 		    try
 		    {
-				SQLite* sqlite = DBModule::GetSQLite();
+				DB* db = DBModule::GetDB();
 				stringstream query;
 				if (t->getKey() <= 0)
 					t->setKey(getId());
 				query
 					<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 					<< Conversion::ToString(t->getKey())
-					<< "," << Conversion::ToSQLiteString(t->getName())
+					<< "," << Conversion::ToDBString(t->getName())
 					<< "," << Conversion::ToString(t->getDocumentId())
 					<< "," << t->getStartDateTime().toSQLString()
 					<< "," << t->getEndDateTime().toSQLString()
 					<< "," << Conversion::ToString(t->getLeftUserId())
 					<< "," << Conversion::ToString(t->getPlaceId())
-					<< "," << Conversion::ToSQLiteString(t->getComment())
+					<< "," << Conversion::ToDBString(t->getComment())
 					<< ")";
-				sqlite->execUpdate(query.str());
+				db->execUpdate(query.str());
 		    }
-		    catch (SQLiteException& e)
+		    catch (DBException& e)
 		    {
 			
 		    }
@@ -124,7 +124,7 @@ namespace synthese
 		const std::string TransactionTableSync::TABLE_COL_COMMENT = "comment";
 
 		TransactionTableSync::TransactionTableSync()
-			: SQLiteNoSyncTableSyncTemplate<TransactionTableSync,Transaction>()
+			: DBNoSyncTableSyncTemplate<TransactionTableSync,Transaction>()
 		{
 			addTableColumn(TABLE_COL_ID, "SQL_INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "SQL_TEXT", true);

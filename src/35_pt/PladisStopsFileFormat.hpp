@@ -132,7 +132,7 @@ namespace synthese
 					const admin::AdminRequest& request
 				) const;
 
-				virtual db::SQLiteTransaction _save() const;
+				virtual db::DBTransaction _save() const;
 			};
 
 			typedef impex::NoExportPolicy<PladisStopsFileFormat> Exporter_;

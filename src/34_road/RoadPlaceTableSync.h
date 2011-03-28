@@ -31,7 +31,7 @@
 
 #include "RoadPlace.h"
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 #include <boost/optional.hpp>
 
@@ -39,11 +39,11 @@ namespace synthese
 {
 	namespace road
 	{
-		/** RoadPlace SQLite table synchronizer.
+		/** RoadPlace table synchronizer.
 			@ingroup m34LS refLS
 		*/
 		class RoadPlaceTableSync
-		:	public db::SQLiteRegistryTableSyncTemplate<RoadPlaceTableSync,RoadPlace>
+		:	public db::DBRegistryTableSyncTemplate<RoadPlaceTableSync,RoadPlace>
 		{
 		 public:
 			static const std::string COL_NAME;

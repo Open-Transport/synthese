@@ -26,7 +26,7 @@
 #ifndef SYNTHESE_DisplayScreenCPUTableSync_H__
 #define SYNTHESE_DisplayScreenCPUTableSync_H__
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 #include <vector>
 #include <string>
@@ -45,7 +45,7 @@ namespace synthese
 		///	@ingroup m54LS refLS
 		////////////////////////////////////////////////////////////////////////
 		class DisplayScreenCPUTableSync
-		: public db::SQLiteRegistryTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>
+		: public db::DBRegistryTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>
 		{
 		public:
 			static const std::string COL_NAME;

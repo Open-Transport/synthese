@@ -47,9 +47,9 @@ namespace synthese
 	namespace db
 	{
 		template<>
-		void SQLiteInheritedTableSyncTemplate<LineStopTableSync,LineAreaInheritedTableSync,LineArea>::Load(
+		void DBInheritedTableSyncTemplate<LineStopTableSync,LineAreaInheritedTableSync,LineArea>::Load(
 			LineArea* obj,
-			const SQLiteResultSPtr& rows,
+			const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -99,7 +99,7 @@ namespace synthese
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<LineStopTableSync,LineAreaInheritedTableSync,LineArea>::Unlink(
+		void DBInheritedTableSyncTemplate<LineStopTableSync,LineAreaInheritedTableSync,LineArea>::Unlink(
 			LineArea* obj
 		){
 	
@@ -108,9 +108,9 @@ namespace synthese
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<LineStopTableSync,LineAreaInheritedTableSync,LineArea>::Save(
+		void DBInheritedTableSyncTemplate<LineStopTableSync,LineAreaInheritedTableSync,LineArea>::Save(
 			LineArea* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			// The query
 			if(!object->getArea()) throw Exception("LineArea save error. Missing physical stop");

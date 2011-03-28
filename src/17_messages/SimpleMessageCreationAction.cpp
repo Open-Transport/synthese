@@ -29,7 +29,7 @@
 #include "Request.h"
 #include "MessagesLog.h"
 #include "AlarmObjectLinkTableSync.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "SentScenario.h"
 #include "ScenarioTableSync.h"
 #include "SentAlarm.h"
@@ -90,7 +90,7 @@ namespace synthese
 		void SimpleMessageCreationAction::run(
 			Request& request
 		){
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 			ptime time(second_clock::local_time());
 
 			SentScenario scenario;

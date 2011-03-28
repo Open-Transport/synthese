@@ -25,8 +25,8 @@
 #include "Conversion.h"
 
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 
 #include "Account.h"
 #include "AccountTableSync.h"
@@ -44,16 +44,16 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,AccountTableSync>::FACTORY_KEY("57.10 Account");
+		template<> const string FactorableTemplate<DBTableSync,AccountTableSync>::FACTORY_KEY("57.10 Account");
 	}
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<AccountTableSync>::TABLE.NAME = "t028_account";
-		template<> const int SQLiteTableSyncTemplate<AccountTableSync>::TABLE.ID = 28;
-		template<> const bool SQLiteTableSyncTemplate<AccountTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const DBTableSync::Format DBTableSyncTemplate<AccountTableSync>::TABLE.NAME = "t028_account";
+		template<> const int DBTableSyncTemplate<AccountTableSync>::TABLE.ID = 28;
+		template<> const bool DBTableSyncTemplate<AccountTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::load(Account* account, const db::SQLiteResultSPtr& rows )
+		template<> void DBDirectTableSyncTemplate<AccountTableSync,Account>::load(Account* account, const db::DBResultSPtr& rows )
 		{
 		    account->setKey(rows->getLongLong (TABLE_COL_ID));
 		
@@ -71,7 +71,7 @@ namespace synthese
 			account->setUnitPrice(rows->getDouble(AccountTableSync::COL_UNIT_PRICE));
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::_link(Account* account, const db::SQLiteResultSPtr& rows, GetSource temporary)
+		template<> void DBDirectTableSyncTemplate<AccountTableSync,Account>::_link(Account* account, const db::DBResultSPtr& rows, GetSource temporary)
 		{
 			try
 			{
@@ -93,37 +93,37 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::_unlink(Account* account)
+		template<> void DBDirectTableSyncTemplate<AccountTableSync,Account>::_unlink(Account* account)
 		{
 			account->setLeftCurrency(NULL);
 			account->setRightCurrency(NULL);
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<AccountTableSync,Account>::Save(
+		template<> void DBDirectTableSyncTemplate<AccountTableSync,Account>::Save(
 			Account* account,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			if (account->getKey() <= 0)
 				account->setKey(getId());
 			query
 				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< Conversion::ToString(account->getKey())
-				<< "," << Conversion::ToSQLiteString(account->getName())
+				<< "," << Conversion::ToDBString(account->getName())
 				<< "," << Conversion::ToString(account->getLeftUserId())
-				<< "," << Conversion::ToSQLiteString(account->getLeftNumber())
-				<< "," << Conversion::ToSQLiteString(account->getLeftClassNumber())
+				<< "," << Conversion::ToDBString(account->getLeftNumber())
+				<< "," << Conversion::ToDBString(account->getLeftClassNumber())
 				<< "," << Conversion::ToString(account->getLeftCurrency()->getKey())
 				<< "," << Conversion::ToString(account->getRightUserId())
-				<< "," << Conversion::ToSQLiteString(account->getRightNumber())
-				<< "," << Conversion::ToSQLiteString(account->getRightClassNumber())
+				<< "," << Conversion::ToDBString(account->getRightNumber())
+				<< "," << Conversion::ToDBString(account->getRightClassNumber())
 				<< "," << Conversion::ToString(account->getRightCurrency()->getKey())
 				<< "," << Conversion::ToString(account->getLocked())
 				<< "," << Conversion::ToString(account->getStockAccountId())
 				<< "," << Conversion::ToString(account->getUnitPrice())
 				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			db->execUpdate(query.str(), transaction);
 		}
 	}
 
@@ -145,7 +145,7 @@ namespace synthese
 
 
 		AccountTableSync::AccountTableSync()
-			: SQLiteNoSyncTableSyncTemplate<AccountTableSync,Account>()
+			: DBNoSyncTableSyncTemplate<AccountTableSync,Account>()
 		{
 			addTableColumn(TABLE_COL_ID, "SQL_INTEGER", false);
 			addTableColumn(TABLE_COL_NAME, "SQL_TEXT", true);
@@ -174,16 +174,16 @@ namespace synthese
 			, int first /*= 0*/
 			, int number /*= 0*/
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE " << TABLE_COL_RIGHT_USER_ID << "=" << Conversion::ToString(rightUserId)
-				<< " AND " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToSQLiteString(name, false) << "%'"
+				<< " AND " << TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(name, false) << "%'"
 				<< " AND (" << TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(leftUserId) << " OR " << TABLE_COL_LEFT_USER_ID << "=0 OR " << TABLE_COL_LEFT_USER_ID << "=\"\")"
-				<< " AND " << TABLE_COL_LEFT_CLASS_NUMBER << " LIKE '" << Conversion::ToSQLiteString(leftClassNumber, false) << "'"
-				<< " AND " << TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE '" << Conversion::ToSQLiteString(rightClassNumber, false) << "'"
+				<< " AND " << TABLE_COL_LEFT_CLASS_NUMBER << " LIKE '" << Conversion::ToDBString(leftClassNumber, false) << "'"
+				<< " AND " << TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE '" << Conversion::ToDBString(rightClassNumber, false) << "'"
 			;
 			if (orderByName)
 				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
@@ -194,7 +194,7 @@ namespace synthese
 
 			try
 			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				DBResultSPtr rows = db->execQuery(query.str());
 				vector<shared_ptr<Account> > accounts;
 				while (rows->next ())
 				{
@@ -204,7 +204,7 @@ namespace synthese
 				}
 				return accounts;
 			}
-			catch(SQLiteException& e)
+			catch(DBException& e)
 			{
 				throw Exception(e.getMessage());
 			}
@@ -212,7 +212,7 @@ namespace synthese
 
 		std::string AccountTableSync::GetNextCode( std::string basisCode )
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			query
 				<< " SELECT MAX(" << TABLE_COL_RIGHT_CLASS_NUMBER << ") AS nu"
@@ -220,7 +220,7 @@ namespace synthese
 				<< " WHERE " << TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE '" << basisCode << "%'";
 			try
 			{
-				SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+				DBResultSPtr rows = db->execQuery(query.str());
 				int nextCode(1);
 				if (rows->next() && !rows->getText("nu").empty())
 				{
@@ -230,7 +230,7 @@ namespace synthese
 				}
 				return basisCode + Conversion::ToFixedSizeString(nextCode, 5);
 			}
-			catch(SQLiteException& e)
+			catch(DBException& e)
 			{
 				throw Exception(e.getMessage());
 			}

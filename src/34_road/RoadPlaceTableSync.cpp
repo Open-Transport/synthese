@@ -28,8 +28,8 @@
 #include "RoadPlace.h"
 #include "CityTableSync.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "Conversion.h"
 
 using namespace std;
@@ -45,7 +45,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,RoadPlaceTableSync>::FACTORY_KEY("34.01 RoadPlace");
+		template<> const string FactorableTemplate<DBTableSync,RoadPlaceTableSync>::FACTORY_KEY("34.01 RoadPlace");
 	}
 
 	namespace road
@@ -57,30 +57,30 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<RoadPlaceTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<RoadPlaceTableSync>::TABLE(
 			"t060_road_places"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<RoadPlaceTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<RoadPlaceTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(RoadPlaceTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(RoadPlaceTableSync::COL_CITYID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(RoadPlaceTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(RoadPlaceTableSync::COL_CITYID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<RoadPlaceTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<RoadPlaceTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				RoadPlaceTableSync::COL_CITYID.c_str()
 				, ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadPlaceTableSync,RoadPlace>::Load(
+		template<> void DBDirectTableSyncTemplate<RoadPlaceTableSync,RoadPlace>::Load(
 			RoadPlace* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -101,9 +101,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadPlaceTableSync,RoadPlace>::Save(
+		template<> void DBDirectTableSyncTemplate<RoadPlaceTableSync,RoadPlace>::Save(
 			RoadPlace* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			stringstream query;
 			if (object->getKey() <= 0)
@@ -112,16 +112,16 @@ namespace synthese
 			 query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES(" <<
 				object->getKey() << "," <<
-				Conversion::ToSQLiteString(object->getName())	<< "," <<
+				Conversion::ToDBString(object->getName())	<< "," <<
 				(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0)) <<
 			")";
 			
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+			DBModule::GetDB()->execUpdate(query.str(), transaction);
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<RoadPlaceTableSync,RoadPlace>::Unlink(
+		template<> void DBDirectTableSyncTemplate<RoadPlaceTableSync,RoadPlace>::Unlink(
 			RoadPlace* obj
 		){
 			City* city = const_cast<City*>(obj->getCity ());
@@ -154,9 +154,9 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (exactName)
-			 	query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(*exactName);
+			 	query << " AND " << COL_NAME << "=" << Conversion::ToDBString(*exactName);
 			if (likeName)
-				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*likeName);
+				query << " AND " << COL_NAME << " LIKE " << Conversion::ToDBString(*likeName);
 			if (cityId)
 				query << " AND " << COL_CITYID << "=" <<*cityId;
 			if (orderByName)

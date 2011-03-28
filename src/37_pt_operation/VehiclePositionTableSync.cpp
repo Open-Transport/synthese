@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,VehiclePositionTableSync>::FACTORY_KEY("37.20 Vehicle positions");
+		template<> const string FactorableTemplate<DBTableSync,VehiclePositionTableSync>::FACTORY_KEY("37.20 Vehicle positions");
 	}
 
 	namespace pt_operation
@@ -58,43 +58,43 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<VehiclePositionTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<VehiclePositionTableSync>::TABLE(
 			"t072_vehicle_positions"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<VehiclePositionTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<VehiclePositionTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(VehiclePositionTableSync::COL_STATUS, SQL_INTEGER),
-			SQLiteTableSync::Field(VehiclePositionTableSync::COL_VEHICLE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(VehiclePositionTableSync::COL_TIME, SQL_TEXT),
-			SQLiteTableSync::Field(VehiclePositionTableSync::COL_METER_OFFSET, SQL_DOUBLE),
-			SQLiteTableSync::Field(VehiclePositionTableSync::COL_STOP_POINT_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(VehiclePositionTableSync::COL_COMMENT, SQL_TEXT),
-			SQLiteTableSync::Field(VehiclePositionTableSync::COL_SERVICE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(VehiclePositionTableSync::COL_RANK_IN_PATH, SQL_INTEGER),
-			SQLiteTableSync::Field(VehiclePositionTableSync::COL_PASSENGERS, SQL_INTEGER),
-			SQLiteTableSync::Field(VehiclePositionTableSync::COL_GEOMETRY, SQL_GEOM_POINT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(VehiclePositionTableSync::COL_STATUS, SQL_INTEGER),
+			DBTableSync::Field(VehiclePositionTableSync::COL_VEHICLE_ID, SQL_INTEGER),
+			DBTableSync::Field(VehiclePositionTableSync::COL_TIME, SQL_TEXT),
+			DBTableSync::Field(VehiclePositionTableSync::COL_METER_OFFSET, SQL_DOUBLE),
+			DBTableSync::Field(VehiclePositionTableSync::COL_STOP_POINT_ID, SQL_INTEGER),
+			DBTableSync::Field(VehiclePositionTableSync::COL_COMMENT, SQL_TEXT),
+			DBTableSync::Field(VehiclePositionTableSync::COL_SERVICE_ID, SQL_INTEGER),
+			DBTableSync::Field(VehiclePositionTableSync::COL_RANK_IN_PATH, SQL_INTEGER),
+			DBTableSync::Field(VehiclePositionTableSync::COL_PASSENGERS, SQL_INTEGER),
+			DBTableSync::Field(VehiclePositionTableSync::COL_GEOMETRY, SQL_GEOM_POINT),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<VehiclePositionTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<VehiclePositionTableSync>::_INDEXES[]=
 		{
-			// SQLiteTableSync::Index(
+			// DBTableSync::Index(
 			//	VehiclePositionTableSync::COL_NAME.c_str(),
 			// ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<VehiclePositionTableSync,VehiclePosition>::Load(
+		template<> void DBDirectTableSyncTemplate<VehiclePositionTableSync,VehiclePosition>::Load(
 			VehiclePosition* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -119,9 +119,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<VehiclePositionTableSync,VehiclePosition>::Save(
+		template<> void DBDirectTableSyncTemplate<VehiclePositionTableSync,VehiclePosition>::Save(
 			VehiclePosition* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<VehiclePositionTableSync> query(*object);
 			// query.addField(object->getName());
@@ -131,7 +131,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<VehiclePositionTableSync,VehiclePosition>::Unlink(
+		template<> void DBDirectTableSyncTemplate<VehiclePositionTableSync,VehiclePosition>::Unlink(
 			VehiclePosition* obj
 		){
 		}

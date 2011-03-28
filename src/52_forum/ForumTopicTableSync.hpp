@@ -26,7 +26,7 @@
 #define SYNTHESE_ForumTopicTableSync_hpp__
 
 #include "ForumTopic.hpp"
-#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "DBNoSyncTableSyncTemplate.hpp"
 
 #include <boost/logic/tribool.hpp>
 #include <boost/optional/optional.hpp>
@@ -42,7 +42,7 @@ namespace synthese
 		///	@date 2010
 		/// @since 3.1.18
 		class ForumTopicTableSync:
-			public db::SQLiteNoSyncTableSyncTemplate<ForumTopicTableSync,ForumTopic>
+			public db::DBNoSyncTableSyncTemplate<ForumTopicTableSync,ForumTopic>
 		{
 		public:
 			//! @name Field names

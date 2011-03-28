@@ -29,7 +29,7 @@
 #include <iostream>
 
 #include "MainRoadPart.hpp"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -48,7 +48,7 @@ namespace synthese
 		///		- right_side : (1|0) : true = the main Road object is on right side,
 		///			false = the main Road object is on left side
 		class RoadTableSync
-		:	public db::SQLiteRegistryTableSyncTemplate<RoadTableSync, MainRoadPart>
+		:	public db::DBRegistryTableSyncTemplate<RoadTableSync, MainRoadPart>
 		{
 		public:
 			

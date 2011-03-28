@@ -28,7 +28,7 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "StopAreaTableSync.hpp"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "CityTableSync.h"
 #include "CoordinatesSystem.hpp"
 #include "DataSourceTableSync.h"
@@ -120,7 +120,7 @@ namespace synthese
 			Request& request
 		){
 
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 
 			StopArea stopArea;
 			stopArea.setAllowedConnection(true);

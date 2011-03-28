@@ -70,7 +70,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync, DisplayScreenTableSync>::FACTORY_KEY("54.50 Display Screens");
+		template<> const string FactorableTemplate<DBTableSync, DisplayScreenTableSync>::FACTORY_KEY("54.50 Display Screens");
 	}
 
 	namespace departure_boards
@@ -112,59 +112,59 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DisplayScreenTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<DisplayScreenTableSync>::TABLE(
 			"t041_display_screens"
 		);
 		
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DisplayScreenTableSync>::_FIELDS[] =
+		template<> const DBTableSync::Field DBTableSyncTemplate<DisplayScreenTableSync>::_FIELDS[] =
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_PLACE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_TYPE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_WIRING_CODE, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_TITLE, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_BLINKING_DELAY, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_DISPLAY_TEAM, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_DIRECTION, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_ORIGINS_ONLY, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAX_DELAY, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_CLEARING_DELAY, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_FIRST_ROW, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_GENERATION_METHOD, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_DISPLAY_CLOCK, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_COM_PORT, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_CPU_HOST_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_MAC_ADDRESS, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER, SQL_BOOLEAN),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_UP_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenTableSync::COL_SUB_SCREEN_TYPE, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_PLACE_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenTableSync::COL_TYPE_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_WIRING_CODE, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_TITLE, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenTableSync::COL_BLINKING_DELAY, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_DISPLAY_TEAM, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenTableSync::COL_DIRECTION, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_ORIGINS_ONLY, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenTableSync::COL_MAX_DELAY, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_CLEARING_DELAY, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_FIRST_ROW, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_GENERATION_METHOD, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenTableSync::COL_DISPLAY_CLOCK, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_COM_PORT, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_CPU_HOST_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_MAC_ADDRESS, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER, SQL_BOOLEAN),
+			DBTableSync::Field(DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenTableSync::COL_UP_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_SUB_SCREEN_TYPE, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<DisplayScreenTableSync>::_INDEXES[] =
+		template<> const DBTableSync::Index DBTableSyncTemplate<DisplayScreenTableSync>::_INDEXES[] =
 		{
-			SQLiteTableSync::Index(DisplayScreenTableSync::COL_PLACE_ID.c_str(), ""),
-			SQLiteTableSync::Index(DisplayScreenTableSync::COL_MAC_ADDRESS.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(DisplayScreenTableSync::COL_PLACE_ID.c_str(), ""),
+			DBTableSync::Index(DisplayScreenTableSync::COL_MAC_ADDRESS.c_str(), ""),
+			DBTableSync::Index()
 		};
 					
-		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Load(
+		template<> void DBDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Load(
 			DisplayScreen* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -348,7 +348,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Unlink(
+		template<> void DBDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Unlink(
 			DisplayScreen* object
 		){
 			if(object->getRoot<DisplayScreenCPU>() && !object->getParent())
@@ -360,9 +360,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Save(
+		template<> void DBDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Save(
 			DisplayScreen* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			// Physical stops
 			stringstream psstream;
@@ -710,7 +710,7 @@ namespace synthese
 			{
 				query.setNumber(*limit);
 			}
-			SQLiteResultSPtr rows = query.execute();
+			DBResultSPtr rows = query.execute();
 			vector<shared_ptr<SentAlarm> > result;
 			while(rows->next())
 			{
@@ -745,7 +745,7 @@ namespace synthese
 				<< " AND ('%'|| p2." << StopPointTableSync::COL_PLACEID << " ||'%') LIKE d." << COL_FORBIDDEN_ARRIVAL_PLACES_IDS
 				<< ")"
 				<< " LIMIT 1";
-			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(q.str());
+			DBResultSPtr rows = DBModule::GetDB()->execQuery(q.str());
 			return rows->next();
 		}
 
@@ -771,7 +771,7 @@ namespace synthese
 			{
 				q << " LIMIT " << *number;
 			}
-			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(q.str());
+			DBResultSPtr rows = DBModule::GetDB()->execQuery(q.str());
 			vector<shared_ptr<SentAlarm> > result;
 			while(rows->next())
 			{
@@ -790,7 +790,7 @@ namespace synthese
 			SelectQuery<DisplayScreenTableSync> query;
 			query.addWhereField(COL_MAC_ADDRESS, macAddress);
 			query.setNumber(1);
-			SQLiteResultSPtr rows = query.execute();
+			DBResultSPtr rows = query.execute();
 			if(rows->next ())
 			{
 				util::Registry<DisplayScreen>& registry(env.getEditableRegistry<DisplayScreen>());
