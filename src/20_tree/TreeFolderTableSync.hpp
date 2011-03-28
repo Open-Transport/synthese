@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "DBNoSyncTableSyncTemplate.hpp"
 #include "TreeFolderRoot.hpp"
 
 namespace synthese
@@ -41,7 +41,7 @@ namespace synthese
 			@ingroup m20LS refLS
 		*/
 		class TreeFolderTableSync:
-			public db::SQLiteNoSyncTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>
+			public db::DBNoSyncTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>
 		{
 		public:
 			static const std::string COL_PARENT_ID;
@@ -63,7 +63,7 @@ namespace synthese
 */				boost::shared_ptr<typename ObjectType_::TreeFolderType> object;
 /*				try
 				{
-					db::SQLiteResultSPtr rows(db::SQLiteTableSyncTemplate<TreeFolderTableSync>::_GetRow(id));
+					db::DBResultSPtr rows(db::DBTableSyncTemplate<TreeFolderTableSync>::_GetRow(id));
 					object.reset(new typename ObjectType_::TreeFolderType(rows->getKey()));
 					Load(object.get(), rows, env, linkLevel);
 				}

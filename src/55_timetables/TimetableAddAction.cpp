@@ -25,7 +25,7 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "Request.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "TimetableAddAction.h"
 #include "TimetableRight.h"
 #include "TimetableRow.h"
@@ -139,7 +139,7 @@ namespace synthese
 		
 		void TimetableAddAction::run(Request& request)
 		{
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 
 			// timetable creation
 			Timetable t;

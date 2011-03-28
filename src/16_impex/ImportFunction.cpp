@@ -25,7 +25,7 @@
 #include "DataSource.h"
 #include "DataSourceTableSync.h"
 #include "FileFormat.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "ImportFunction.h"
 
 #include <boost/tokenizer.hpp>

@@ -24,7 +24,7 @@
 #define SYNTHESE_DBLogEntryTableSync_H__
 
 #include "DBLogEntry.h"
-#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "DBNoSyncTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -39,7 +39,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t045_log_entries
 		class DBLogEntryTableSync:
-			public db::SQLiteNoSyncTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>
+			public db::DBNoSyncTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>
 		{
 		public:
 			static const std::string CONTENT_SEPARATOR;

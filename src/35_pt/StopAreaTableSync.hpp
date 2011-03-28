@@ -25,7 +25,7 @@
 
 #include "StopArea.hpp"
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 #include "FetcherTemplate.h"
 
 #include <string>
@@ -35,7 +35,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		/** ConnectionPlace SQLite table synchronizer.
+		/** ConnectionPlace table synchronizer.
 			@ingroup m35LS refLS
 
 			Connection places table :
@@ -44,7 +44,7 @@ namespace synthese
 				- on delete : X
 		*/
 		class StopAreaTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<StopAreaTableSync,StopArea>,
+			public db::DBRegistryTableSyncTemplate<StopAreaTableSync,StopArea>,
 			public db::FetcherTemplate<geography::NamedPlace, StopAreaTableSync>
 		{
 		public:

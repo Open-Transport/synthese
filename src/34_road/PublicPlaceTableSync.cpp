@@ -41,7 +41,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync, PublicPlaceTableSync>::FACTORY_KEY("34.40.03 Public places");
+		template<> const string FactorableTemplate<DBTableSync, PublicPlaceTableSync>::FACTORY_KEY("34.40.03 Public places");
 		template<> const string FactorableTemplate<Fetcher<NamedPlace>, PublicPlaceTableSync>::FACTORY_KEY("13");
 	}
 
@@ -53,26 +53,26 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<PublicPlaceTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<PublicPlaceTableSync>::TABLE(
 			"t013_public_places"
 			);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<PublicPlaceTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<PublicPlaceTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(PublicPlaceTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(PublicPlaceTableSync::COL_CITYID, SQL_INTEGER, false),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(PublicPlaceTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(PublicPlaceTableSync::COL_CITYID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<PublicPlaceTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<PublicPlaceTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Load(
+		template<> void DBDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Load(
 			PublicPlace* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -88,7 +88,7 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Unlink(
+		template<> void DBDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Unlink(
 			PublicPlace* obj
 		){
 			City* city(const_cast<City*>(obj->getCity()));
@@ -100,9 +100,9 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Save(
+		template<> void DBDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Save(
 			PublicPlace* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<PublicPlaceTableSync> query(*object);
 			query.addField(object->getName());

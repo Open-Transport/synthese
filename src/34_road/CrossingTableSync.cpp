@@ -48,7 +48,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync, CrossingTableSync>::FACTORY_KEY("34.20.01 Crossings");
+		template<> const string FactorableTemplate<DBTableSync, CrossingTableSync>::FACTORY_KEY("34.20.01 Crossings");
 		template<> const string FactorableTemplate<Fetcher<Vertex>, CrossingTableSync>::FACTORY_KEY("43");
 	}
 
@@ -60,27 +60,27 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CrossingTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<CrossingTableSync>::TABLE(
 			"t043_crossings"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CrossingTableSync>::_FIELDS[] =
+		template<> const DBTableSync::Field DBTableSyncTemplate<CrossingTableSync>::_FIELDS[] =
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(CrossingTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
-			SQLiteTableSync::Field(CrossingTableSync::COL_SOURCE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(CrossingTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
+			DBTableSync::Field(CrossingTableSync::COL_SOURCE_ID, SQL_INTEGER),
+			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CrossingTableSync>::_INDEXES[] =
+		template<> const DBTableSync::Index DBTableSyncTemplate<CrossingTableSync>::_INDEXES[] =
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync, Crossing>::Load(
+		template<> void DBDirectTableSyncTemplate<CrossingTableSync, Crossing>::Load(
 			Crossing* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -105,16 +105,16 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync, Crossing>::Unlink(
+		template<> void DBDirectTableSyncTemplate<CrossingTableSync, Crossing>::Unlink(
 			Crossing* obj
 		){
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CrossingTableSync, Crossing>::Save(
+		template<> void DBDirectTableSyncTemplate<CrossingTableSync, Crossing>::Save(
 			Crossing* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<CrossingTableSync> query(*object);
 			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
@@ -127,7 +127,7 @@ namespace synthese
 	namespace road
 	{
 		CrossingTableSync::CrossingTableSync()
-			: SQLiteRegistryTableSyncTemplate<CrossingTableSync, Crossing>()
+			: DBRegistryTableSyncTemplate<CrossingTableSync, Crossing>()
 		{
 		}
 

@@ -24,8 +24,8 @@
 
 #include "DisplayTypeTableSync.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "InterfaceTableSync.h"
 #include "Conversion.h"
 #include "ReplaceQuery.h"
@@ -47,7 +47,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,DisplayTypeTableSync>::FACTORY_KEY("54.00 Display Types");
+		template<> const string FactorableTemplate<DBTableSync,DisplayTypeTableSync>::FACTORY_KEY("54.00 Display Types");
 	}
 
 	namespace departure_boards
@@ -68,36 +68,36 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DisplayTypeTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<DisplayTypeTableSync>::TABLE(
 			"t036_display_types"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DisplayTypeTableSync>::_FIELDS[] =
+		template<> const DBTableSync::Field DBTableSyncTemplate<DisplayTypeTableSync>::_FIELDS[] =
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(DisplayTypeTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayTypeTableSync::COL_ROWS_NUMBER, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayTypeTableSync::COL_MAX_STOPS_NUMBER, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_MAIN_PAGE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_ROW_PAGE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayTypeTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayTypeTableSync::COL_ROWS_NUMBER, SQL_INTEGER),
+			DBTableSync::Field(DisplayTypeTableSync::COL_MAX_STOPS_NUMBER, SQL_INTEGER),
+			DBTableSync::Field(DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS, SQL_INTEGER),
+			DBTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_MAIN_PAGE_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_ROW_PAGE_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<DisplayTypeTableSync>::_INDEXES[] =
+		template<> const DBTableSync::Index DBTableSyncTemplate<DisplayTypeTableSync>::_INDEXES[] =
 		{
-			SQLiteTableSyncTemplate::Index()
+			DBTableSyncTemplate::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Load(
+		template<> void DBDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Load(
 			DisplayType* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -222,16 +222,16 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Unlink(
+		template<> void DBDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Unlink(
 			DisplayType* obj
 		){
 		}
 
     
 
-		template<> void SQLiteDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Save(
+		template<> void DBDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Save(
 			DisplayType* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<DisplayTypeTableSync> query(*object);
 			query.addField(object->getName());
@@ -280,7 +280,7 @@ namespace synthese
 			query << " WHERE 1";
 			if (likeName)
 			{
-				query << " AND t." << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*likeName);
+				query << " AND t." << COL_NAME << " LIKE " << Conversion::ToDBString(*likeName);
 			}
 			if(interfaceId)
 			{

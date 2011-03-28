@@ -26,7 +26,7 @@
 #define SYNTHESE_CompositionTableSync_hpp__
 
 #include "Composition.hpp"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -39,7 +39,7 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.2.1
 		class CompositionTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<CompositionTableSync,Composition>
+			public db::DBRegistryTableSyncTemplate<CompositionTableSync,Composition>
 		{
 		public:
 			//! @name Field names

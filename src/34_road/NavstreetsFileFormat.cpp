@@ -29,7 +29,7 @@
 #include "DataSource.h"
 #include "Crossing.h"
 #include "CoordinatesSystem.hpp"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "VirtualShapeVirtualTable.hpp"
 #include "AdminFunctionRequest.hpp"
 #include "DataSourceAdmin.h"
@@ -143,7 +143,7 @@ namespace synthese
 				{	// 1.1 Departements
 					stringstream query;
 					query << "SELECT * FROM " << table.getName() << " WHERE " << NavstreetsFileFormat::_FIELD_ADMIN_LVL << "=3";
-					SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
+					DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str(), true));
 					while(rows->next())
 					{
 						string item(rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3));
@@ -160,7 +160,7 @@ namespace synthese
 				{	// 1.2 Cities
 					stringstream query;
 					query << "SELECT * FROM " << table.getName() << " WHERE " << NavstreetsFileFormat::_FIELD_ADMIN_LVL << "=4";
-					SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
+					DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str(), true));
 					while(rows->next())
 					{
 						stringstream code;
@@ -194,7 +194,7 @@ namespace synthese
 					// 1.3 Settlements
 					stringstream query;
 					query << "SELECT * FROM " << table.getName() << " WHERE " << NavstreetsFileFormat::_FIELD_ADMIN_LVL << "=5";
-					SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
+					DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str(), true));
 					while(rows->next())
 					{
 						CityCodes::const_iterator it(cityCodes.find(
@@ -230,7 +230,7 @@ namespace synthese
 
 				stringstream query;
 				query << "SELECT *, AsText(" << NavstreetsFileFormat::_FIELD_GEOMETRY << ") AS " << NavstreetsFileFormat::_FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
-				SQLiteResultSPtr rows(DBModule::GetSQLite()->execQuery(query.str(), true));
+				DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str(), true));
 				while(rows->next())
 				{
 					// Fields to test if the record can be imported
@@ -512,9 +512,9 @@ namespace synthese
 
 
 
-		SQLiteTransaction NavstreetsFileFormat::Importer_::_save() const
+		DBTransaction NavstreetsFileFormat::Importer_::_save() const
 		{
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 			BOOST_FOREACH(Registry<Crossing>::value_type crossing, _env.getEditableRegistry<Crossing>())
 			{
 				CrossingTableSync::Save(crossing.second.get(), transaction);

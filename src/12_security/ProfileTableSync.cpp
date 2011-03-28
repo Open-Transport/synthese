@@ -24,8 +24,8 @@
 #include "Profile.h"
 
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "ReplaceQuery.h"
 #include "01_util/Log.h"
 #include "Factory.h"
@@ -46,7 +46,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,ProfileTableSync>::FACTORY_KEY("12.01 Profile");
+		template<> const string FactorableTemplate<DBTableSync,ProfileTableSync>::FACTORY_KEY("12.01 Profile");
 	}
 
 	namespace security
@@ -61,27 +61,27 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ProfileTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<ProfileTableSync>::TABLE(
 				"t027_profiles"
 				);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ProfileTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<ProfileTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(ProfileTableSync::TABLE_COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(ProfileTableSync::TABLE_COL_PARENT_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(ProfileTableSync::TABLE_COL_RIGHTS_STRING, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(ProfileTableSync::TABLE_COL_NAME, SQL_TEXT),
+			DBTableSync::Field(ProfileTableSync::TABLE_COL_PARENT_ID, SQL_INTEGER),
+			DBTableSync::Field(ProfileTableSync::TABLE_COL_RIGHTS_STRING, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ProfileTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<ProfileTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::Load(
+		template<> void DBDirectTableSyncTemplate<ProfileTableSync,Profile>::Load(
 			Profile* profile,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -107,9 +107,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::Save(
+		template<> void DBDirectTableSyncTemplate<ProfileTableSync,Profile>::Save(
 			Profile* profile,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<ProfileTableSync> query(*profile);
 			query.addField(profile->getName());
@@ -119,7 +119,7 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ProfileTableSync,Profile>::Unlink(Profile* profile)
+		template<> void DBDirectTableSyncTemplate<ProfileTableSync,Profile>::Unlink(Profile* profile)
 		{
 			profile->setParent(NULL);
 		}
@@ -143,9 +143,9 @@ namespace synthese
 				<< " FROM " << TABLE.NAME					
 				<< " WHERE 1 ";
 			if (!name.empty())
-				query << " AND " << TABLE_COL_NAME << " LIKE " << Conversion::ToSQLiteString(name);
+				query << " AND " << TABLE_COL_NAME << " LIKE " << Conversion::ToDBString(name);
 			if (!right.empty())
-				query << " AND " << TABLE_COL_RIGHTS_STRING << " LIKE " << Conversion::ToSQLiteString(right);
+				query << " AND " << TABLE_COL_RIGHTS_STRING << " LIKE " << Conversion::ToDBString(right);
 			if (orderByName)
 				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number)

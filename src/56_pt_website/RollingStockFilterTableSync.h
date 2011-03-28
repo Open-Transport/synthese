@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -42,7 +42,7 @@ namespace synthese
 			@ingroup m56LS refLS
 		*/
 		class RollingStockFilterTableSync :
-			public db::SQLiteRegistryTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>
+			public db::DBRegistryTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>
 		{
 		public:
 			static const std::string COL_SITE_ID;

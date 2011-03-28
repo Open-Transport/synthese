@@ -28,7 +28,7 @@
 #include "ForumTopicTableSync.hpp"
 #include "ForumMessageTableSync.hpp"
 #include "Request.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 
 using namespace std;
 
@@ -120,7 +120,7 @@ namespace synthese
 			message.setUserEMail(_userEMail);
 			message.setUserName(_userName);
 
-			SQLiteTransaction t;
+			DBTransaction t;
 			ForumTopicTableSync::Save(&topic, t);
 			ForumMessageTableSync::Save(&message, t);
 			t.run();

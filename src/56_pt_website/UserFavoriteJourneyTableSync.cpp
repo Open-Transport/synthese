@@ -41,7 +41,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,UserFavoriteJourneyTableSync>::FACTORY_KEY("53.1 User favorite journey");
+		template<> const string FactorableTemplate<DBTableSync,UserFavoriteJourneyTableSync>::FACTORY_KEY("53.1 User favorite journey");
 	}
 
 	namespace pt_website
@@ -56,32 +56,32 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<UserFavoriteJourneyTableSync>::TABLE(
 				"t048_user_favorite_journey"
 				);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<UserFavoriteJourneyTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_USER_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_RANK, SQL_INTEGER),
-			SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_USER_ID, SQL_INTEGER),
+			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_RANK, SQL_INTEGER),
+			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME, SQL_TEXT),
+			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME, SQL_TEXT),
+			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME, SQL_TEXT),
+			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME, SQL_TEXT),
+			DBTableSync::Field()
 		};
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<UserFavoriteJourneyTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<UserFavoriteJourneyTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Load(
+		template<> void DBDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Load(
 			UserFavoriteJourney* object
-			, const db::SQLiteResultSPtr& rows,
+			, const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -101,9 +101,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Save(
+		template<> void DBDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Save(
 			UserFavoriteJourney* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<UserFavoriteJourneyTableSync> query(*object);
 			query.addField(object->getUser() ? object->getUser()->getKey() : RegistryKeyType(0));
@@ -129,7 +129,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Unlink(
+		template<> void DBDirectTableSyncTemplate<UserFavoriteJourneyTableSync,UserFavoriteJourney>::Unlink(
 			UserFavoriteJourney* object
 		){
 			object->setUser(NULL);

@@ -28,7 +28,7 @@
 #include "StopAreaTableSync.hpp"
 #include "City.h"
 #include "CityTableSync.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "CommercialLineTableSync.h"
@@ -129,9 +129,9 @@ namespace synthese
 
 
 
-		SQLiteTransaction HeuresFileFormat::Importer_::_save() const
+		DBTransaction HeuresFileFormat::Importer_::_save() const
 		{
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 			BOOST_FOREACH(Registry<CommercialLine>::value_type line, _env.getRegistry<CommercialLine>())
 			{
 				CommercialLineTableSync::Save(line.second.get(), transaction);

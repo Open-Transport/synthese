@@ -25,8 +25,8 @@
 #include "Conversion.h"
 
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "FareTableSync.h"
 
 #include <boost/foreach.hpp>
@@ -40,7 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync, FareTableSync>::FACTORY_KEY("35.10.02 Fares");
+	template<> const string util::FactorableTemplate<DBTableSync, FareTableSync>::FACTORY_KEY("35.10.02 Fares");
 
 	namespace pt
 	{
@@ -50,26 +50,26 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<FareTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<FareTableSync>::TABLE(
 			"t008_fares"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<FareTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<FareTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(FareTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(FareTableSync::COL_FARETYPE, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(FareTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(FareTableSync::COL_FARETYPE, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<FareTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<FareTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::Load(
+		template<> void DBDirectTableSyncTemplate<FareTableSync,Fare>::Load(
 			Fare* fare,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel		
 		){
@@ -77,25 +77,25 @@ namespace synthese
 			fare->setType (static_cast<Fare::FareType>(rows->getInt (FareTableSync::COL_FARETYPE)));
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::Save(
+		template<> void DBDirectTableSyncTemplate<FareTableSync,Fare>::Save(
 			Fare* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			if (object->getKey() > 0)
 				object->setKey(getId());
             query
 				<< "REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< object->getKey() << "," <<
-				Conversion::ToSQLiteString(object->getName()) << "," <<
+				Conversion::ToDBString(object->getName()) << "," <<
 				static_cast<int>(object->getType()) <<
 			")";
-			sqlite->execUpdate(query.str(), transaction);
+			db->execUpdate(query.str(), transaction);
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<FareTableSync,Fare>::Unlink(Fare* obj)
+		template<> void DBDirectTableSyncTemplate<FareTableSync,Fare>::Unlink(Fare* obj)
 		{
 
 		}
@@ -120,7 +120,7 @@ namespace synthese
 				<< " WHERE 1 ";
 			if(name)
 			{
-				query << " AND " << COL_NAME << " LIKE " << Conversion::ToSQLiteString(*name);
+				query << " AND " << COL_NAME << " LIKE " << Conversion::ToDBString(*name);
 			}
 			if(orderByName)
 			{

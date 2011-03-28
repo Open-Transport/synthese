@@ -90,7 +90,7 @@ namespace synthese
 			}
 
 
-			SQLiteResultSPtr rows = DBModule::GetSQLite()->execQuery(s.str());
+			DBResultSPtr rows = DBModule::GetDB()->execQuery(s.str());
 			while (rows->next ())
 			{
 				const string row(hasRowStep ? rows->getText("row") : "row");

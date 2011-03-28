@@ -27,7 +27,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 #include "PTUseRule.h"
 
 namespace synthese
@@ -38,7 +38,7 @@ namespace synthese
 			@ingroup m35LS refLS
 		*/
 		class PTUseRuleTableSync
-		:	public db::SQLiteRegistryTableSyncTemplate<PTUseRuleTableSync,PTUseRule>
+		:	public db::DBRegistryTableSyncTemplate<PTUseRuleTableSync,PTUseRule>
 		{
 		public:
 			static const std::string COL_NAME;

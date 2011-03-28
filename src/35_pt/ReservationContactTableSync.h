@@ -31,7 +31,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "ReservationContact.h"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -41,7 +41,7 @@ namespace synthese
 			@ingroup m35LS refLS
 		*/
 		class ReservationContactTableSync
-		:	public db::SQLiteRegistryTableSyncTemplate<ReservationContactTableSync,ReservationContact>
+		:	public db::DBRegistryTableSyncTemplate<ReservationContactTableSync,ReservationContact>
 		{
 		public:
 			static const std::string COL_PHONEEXCHANGENUMBER;

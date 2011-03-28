@@ -26,8 +26,8 @@
 #include "Conversion.h"
 
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 
 #include "User.h"
 
@@ -52,16 +52,16 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const std::string FactorableTemplate<SQLiteTableSync,TransactionPartTableSync>::FACTORY_KEY("57.30 Transaction Part");
+		template<> const std::string FactorableTemplate<DBTableSync,TransactionPartTableSync>::FACTORY_KEY("57.30 Transaction Part");
 	}
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<TransactionPartTableSync>::TABLE.NAME = "t030_transaction_parts";
-		template<> const int SQLiteTableSyncTemplate<TransactionPartTableSync>::TABLE.ID = 30;
-		template<> const bool SQLiteTableSyncTemplate<TransactionPartTableSync>::HAS_AUTO_INCREMENT = true;
+		template<> const DBTableSync::Format DBTableSyncTemplate<TransactionPartTableSync>::TABLE.NAME = "t030_transaction_parts";
+		template<> const int DBTableSyncTemplate<TransactionPartTableSync>::TABLE.ID = 30;
+		template<> const bool DBTableSyncTemplate<TransactionPartTableSync>::HAS_AUTO_INCREMENT = true;
 
-		template<> void SQLiteDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::load(TransactionPart* tp, const db::SQLiteResultSPtr& rows )
+		template<> void DBDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::load(TransactionPart* tp, const db::DBResultSPtr& rows )
 		{
 			tp->setKey (rows->getLongLong (TABLE_COL_ID));
 			tp->setTransactionId(rows->getLongLong ( TransactionPartTableSync::TABLE_COL_TRANSACTION_ID));
@@ -75,24 +75,24 @@ namespace synthese
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::_link(TransactionPart* tp, const db::SQLiteResultSPtr& rows, GetSource temporary )
+		template<> void DBDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::_link(TransactionPart* tp, const db::DBResultSPtr& rows, GetSource temporary )
 		{
 
 		}
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::_unlink(TransactionPart* tp)
+		template<> void DBDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::_unlink(TransactionPart* tp)
 		{
 
 		}
 
 
-		template<> void SQLiteDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::Save(TransactionPart* tp)
+		template<> void DBDirectTableSyncTemplate<TransactionPartTableSync,TransactionPart>::Save(TransactionPart* tp)
 		{
 			try
 			{
-				SQLite* sqlite = DBModule::GetSQLite();
+				DB* db = DBModule::GetDB();
 				if (!tp->getKey())
 					tp->setKey(getId());
 				stringstream query;
@@ -103,13 +103,13 @@ namespace synthese
 					<< "," << Conversion::ToString(tp->getRightCurrencyAmount())
 					<< "," << Conversion::ToString(tp->getAccountId())
 					<< "," << Conversion::ToString(tp->getRateId())
-					<< "," << Conversion::ToSQLiteString(tp->getTradedObjectId())
-					<< "," << Conversion::ToSQLiteString(tp->getComment())
+					<< "," << Conversion::ToDBString(tp->getTradedObjectId())
+					<< "," << Conversion::ToDBString(tp->getComment())
 					<< "," << Conversion::ToString(tp->getStockId())
 					<< ')';
-				sqlite->execUpdate(query.str());
+				db->execUpdate(query.str());
 			}
-			catch (SQLiteException& e)
+			catch (DBException& e)
 			{
 
 			}
@@ -130,7 +130,7 @@ namespace synthese
 		const string TransactionPartTableSync::COL_STOCK_ID("stock_id");
 
 		TransactionPartTableSync::TransactionPartTableSync()
-			: SQLiteNoSyncTableSyncTemplate<TransactionPartTableSync,TransactionPart>()
+			: DBNoSyncTableSyncTemplate<TransactionPartTableSync,TransactionPart>()
 		{
 			// Columns
 			addTableColumn(TABLE_COL_ID, "SQL_INTEGER", false);
@@ -156,7 +156,7 @@ namespace synthese
 				shared_ptr<const Transaction> transaction, shared_ptr<const Account> account
 				, int first, int number)
 		{
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			query
 				<< " SELECT * "
@@ -167,7 +167,7 @@ namespace synthese
 				query << " AND p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey());
 			query << " LIMIT " << number << " OFFSET " << first;
 			
-			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+			DBResultSPtr rows = db->execQuery(query.str());
 			vector<shared_ptr<TransactionPart> > tps;
 			while (rows->next ())
 			{
@@ -190,7 +190,7 @@ namespace synthese
 			, int first
 			, int number
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			query
 				<< " SELECT * "
@@ -198,7 +198,7 @@ namespace synthese
 				<< " INNER JOIN " << TransactionTableSync::TABLE.NAME << " AS t ON t." << TABLE_COL_ID << "=p." << TABLE_COL_TRANSACTION_ID
 				<< " INNER JOIN " << AccountTableSync::TABLE.NAME << " AS a ON a." << TABLE_COL_ID << "=p." << TABLE_COL_ACCOUNT_ID
 				<< " WHERE "
-				<< " a." << AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE " << Conversion::ToSQLiteString(accountCode)
+				<< " a." << AccountTableSync::TABLE_COL_RIGHT_CLASS_NUMBER << " LIKE " << Conversion::ToDBString(accountCode)
 			;
 			if (rightUserId != UNKNOWN_VALUE)
 				query << " AND a." << AccountTableSync::TABLE_COL_RIGHT_USER_ID << "=" << rightUserId;
@@ -210,7 +210,7 @@ namespace synthese
 				query << " ORDER BY t." << TransactionTableSync::TABLE_COL_START_DATE_TIME << (raisingOrder ? " ASC" : " DESC");
 			query << " LIMIT " << number << " OFFSET " << first;
 
-			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+			DBResultSPtr rows = db->execQuery(query.str());
 			vector<shared_ptr<TransactionPart> > tps;
 			while (rows->next ())
 			{
@@ -227,7 +227,7 @@ namespace synthese
 			, shared_ptr<const User> user
 			, bool order, int first /*= 0*/, int number /*= 0*/
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			query
 				<< " SELECT * "
@@ -242,7 +242,7 @@ namespace synthese
 				query << " DESC ";
 			query << " LIMIT " << number << " OFFSET " << first;
 			
-			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+			DBResultSPtr rows = db->execQuery(query.str());
 			vector<shared_ptr<TransactionPart> > tps;
 			while (rows->next ())
 			{
@@ -257,7 +257,7 @@ namespace synthese
 		map<int, int> TransactionPartTableSync::count(
 			shared_ptr<const Account> account, Date startDate, Date endDate, int first, int number
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			query
 				<< " SELECT strftime('%H', t.start_date_time) AS hours,"
@@ -272,7 +272,7 @@ namespace synthese
 				<< " LIMIT " << number << " OFFSET " << first
 			;
 			
-			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+			DBResultSPtr rows = db->execQuery(query.str());
 			map<int, int> mapii;
 			while (rows->next ())
 			{
@@ -285,7 +285,7 @@ namespace synthese
 			boost::shared_ptr<const Account> account
 			, boost::shared_ptr<const security::User> user
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			query
 				<< " SELECT sum(p." << TABLE_COL_LEFT_CURRENCY_AMOUNT << ") AS sum"
@@ -296,7 +296,7 @@ namespace synthese
 				<< " AND t." << TransactionTableSync::TABLE_COL_LEFT_USER_ID << "=" << Conversion::ToString(user.get() ? user->getKey() : 0)
 				;
 
-			SQLiteResultSPtr rows = sqlite->execQuery(query.str());
+			DBResultSPtr rows = db->execQuery(query.str());
 			return rows->next () ? rows->getDouble("sum") : 0;
 		}
 	}

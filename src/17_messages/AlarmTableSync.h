@@ -22,7 +22,7 @@
 #ifndef SYNTHESE_ENVLSSQL_ALARMTABLESYNC_H
 #define SYNTHESE_ENVLSSQL_ALARMTABLESYNC_H
 
-#include "SQLiteInheritanceTableSyncTemplate.h"
+#include "DBInheritanceTableSyncTemplate.hpp"
 
 #include "Alarm.h"
 #include "MessagesTypes.h"
@@ -42,15 +42,15 @@ namespace synthese
 		class Scenario;
 
 
-		/** Alarm SQLite table synchronizer.
+		/** Alarm table synchronizer.
 			@ingroup m17LS refLS
-			@warning (for the future sqlite node synchronizer) The alarm table sync insertion hook must always be run after the one for the scenario
+			@warning (for the future db node synchronizer) The alarm table sync insertion hook must always be run after the one for the scenario
 
 			Only the sent alarms are loaded in ram.
 
 			@note As Alarm is an abstract class, do not use the get static method. Use getAlarm instead.
 		*/
-		class AlarmTableSync : public db::SQLiteInheritanceTableSyncTemplate<AlarmTableSync,Alarm>
+		class AlarmTableSync : public db::DBInheritanceTableSyncTemplate<AlarmTableSync,Alarm>
 		{
 		protected:
 			static const std::string _COL_CONFLICT_LEVEL;

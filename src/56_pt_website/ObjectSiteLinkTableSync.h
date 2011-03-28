@@ -26,7 +26,7 @@
 #define SYNTHESE_ObjectSiteLinkTableSync_H__
 
 #include "ObjectSiteLink.h"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -40,7 +40,7 @@ namespace synthese
 		/// Table name : t001_object_site_links
 		/// Corresponding class : ObjectSiteLink
 		class ObjectSiteLinkTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>
+			public db::DBRegistryTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>
 		{
 		public:
 			static const std::string COL_OBJECT_ID;

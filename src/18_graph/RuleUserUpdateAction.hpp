@@ -30,13 +30,13 @@
 #include "RuleUser.h"
 
 // YYY
-#define SQLiteTableSync DBTableSync
+#define DBTableSync DBTableSync
 
 namespace synthese
 {
 	namespace db
 	{
-		class SQLiteTableSync;
+		class DBTableSync;
 	}
 
 	namespace graph
@@ -68,7 +68,7 @@ namespace synthese
 			typedef std::map<std::string, util::RegistryKeyType> Values;
 
 		private:
-			boost::shared_ptr<db::SQLiteTableSync> _tableSync;
+			boost::shared_ptr<db::DBTableSync> _tableSync;
 			util::RegistryKeyType _id;
 			Values _values;
 

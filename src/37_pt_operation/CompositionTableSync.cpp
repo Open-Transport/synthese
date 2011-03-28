@@ -53,7 +53,7 @@ namespace synthese
 		
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,CompositionTableSync>::FACTORY_KEY("37.11 Compositions");
+		template<> const string FactorableTemplate<DBTableSync,CompositionTableSync>::FACTORY_KEY("37.11 Compositions");
 	}
 
 	namespace pt_operation
@@ -66,38 +66,38 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CompositionTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<CompositionTableSync>::TABLE(
 			"t070_compositions"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CompositionTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<CompositionTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(CompositionTableSync::COL_SERVICE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(CompositionTableSync::COL_VEHICLES, SQL_TEXT),
-			SQLiteTableSync::Field(CompositionTableSync::COL_DATES, SQL_TEXT),
-			SQLiteTableSync::Field(CompositionTableSync::COL_SERVED_VERTICES, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(CompositionTableSync::COL_SERVICE_ID, SQL_INTEGER),
+			DBTableSync::Field(CompositionTableSync::COL_VEHICLES, SQL_TEXT),
+			DBTableSync::Field(CompositionTableSync::COL_DATES, SQL_TEXT),
+			DBTableSync::Field(CompositionTableSync::COL_SERVED_VERTICES, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CompositionTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<CompositionTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				CompositionTableSync::COL_SERVICE_ID.c_str(),
 				""
 			),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CompositionTableSync,Composition>::Load(
+		template<> void DBDirectTableSyncTemplate<CompositionTableSync,Composition>::Load(
 			Composition* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -180,9 +180,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CompositionTableSync,Composition>::Save(
+		template<> void DBDirectTableSyncTemplate<CompositionTableSync,Composition>::Save(
 			Composition* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			// Vehicles
 			stringstream vehiclesString;
@@ -231,7 +231,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CompositionTableSync,Composition>::Unlink(
+		template<> void DBDirectTableSyncTemplate<CompositionTableSync,Composition>::Unlink(
 			Composition* obj
 		){
 			PTOperationModule::UnregisterComposition(*obj);

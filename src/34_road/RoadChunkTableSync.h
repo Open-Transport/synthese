@@ -25,7 +25,7 @@
 
 #include "MainRoadChunk.hpp"
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 #include <vector>
 #include <string>
@@ -71,7 +71,7 @@ namespace synthese
 		///		<dt>road_id</dt><dd>id of the @ref road::RoadTableSync "road" which the chunk belongs to</dd>
 		///	</dl>
 		class RoadChunkTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>
+			public db::DBRegistryTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>
 		{
 		public:
 			/** Road chunks table :

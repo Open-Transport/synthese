@@ -29,7 +29,7 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -37,11 +37,11 @@ namespace synthese
 	{
 		class Currency;
 
-		/** Currency SQLite table synchronizer.
+		/** Currency table synchronizer.
 			@ingroup m37LS refLS
 		*/
 
-		class CurrencyTableSync : public db::SQLiteRegistryTableSyncTemplate<CurrencyTableSync,Currency>
+		class CurrencyTableSync : public db::DBRegistryTableSyncTemplate<CurrencyTableSync,Currency>
 		{
 		public:
 			static const std::string TABLE_COL_NAME;
@@ -51,7 +51,7 @@ namespace synthese
 
 
 			/** Currency search.
-				@param sqlite SQLite thread
+				@param db SQLite thread
 				@param first First user to answer
 				@param number Number of users to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@return vector<Currency*> Founded currencies.

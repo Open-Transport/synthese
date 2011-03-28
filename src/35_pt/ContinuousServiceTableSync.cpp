@@ -33,8 +33,8 @@
 #include <boost/tokenizer.hpp>
 
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"
 #include "GraphConstants.h"
@@ -58,7 +58,7 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,ContinuousServiceTableSync>::FACTORY_KEY("35.60.02 Continuous services");
+	template<> const string util::FactorableTemplate<DBTableSync,ContinuousServiceTableSync>::FACTORY_KEY("35.60.02 Continuous services");
 	template<> const string FactorableTemplate<Fetcher<SchedulesBasedService>, ContinuousServiceTableSync>::FACTORY_KEY("17");
 	template<> const string FactorableTemplate<Fetcher<Service>, ContinuousServiceTableSync>::FACTORY_KEY("17");
 
@@ -77,34 +77,34 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ContinuousServiceTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<ContinuousServiceTableSync>::TABLE(
 			"t017_continuous_services"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ContinuousServiceTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<ContinuousServiceTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
-			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_SCHEDULES, SQL_TEXT),
-			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_PATHID, SQL_INTEGER),
-			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_RANGE, SQL_INTEGER),
-			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_MAXWAITINGTIME, SQL_INTEGER),
-			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
-			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
-			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
-			SQLiteTableSync::Field(ContinuousServiceTableSync::COL_DATES, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(ContinuousServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
+			DBTableSync::Field(ContinuousServiceTableSync::COL_SCHEDULES, SQL_TEXT),
+			DBTableSync::Field(ContinuousServiceTableSync::COL_PATHID, SQL_INTEGER),
+			DBTableSync::Field(ContinuousServiceTableSync::COL_RANGE, SQL_INTEGER),
+			DBTableSync::Field(ContinuousServiceTableSync::COL_MAXWAITINGTIME, SQL_INTEGER),
+			DBTableSync::Field(ContinuousServiceTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
+			DBTableSync::Field(ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
+			DBTableSync::Field(ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
+			DBTableSync::Field(ContinuousServiceTableSync::COL_DATES, SQL_TEXT),
+			DBTableSync::Field()
 		};
 		
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ContinuousServiceTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<ContinuousServiceTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(ContinuousServiceTableSync::COL_PATHID.c_str(), ContinuousServiceTableSync::COL_SCHEDULES.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(ContinuousServiceTableSync::COL_PATHID.c_str(), ContinuousServiceTableSync::COL_SCHEDULES.c_str(), ""),
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Load(
+		template<> void DBDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Load(
 			ContinuousService* cs,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -192,7 +192,7 @@ namespace synthese
 			}
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Unlink(
+		template<> void DBDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Unlink(
 			ContinuousService* obj
 		){
 			obj->getPath()->removeService(obj);
@@ -200,9 +200,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Save(
+		template<> void DBDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Save(
 			ContinuousService* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			// Dates preparation
 			stringstream datesStr;

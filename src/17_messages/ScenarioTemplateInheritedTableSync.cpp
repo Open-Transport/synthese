@@ -50,11 +50,11 @@ namespace synthese
 	{
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<
+		void DBInheritedTableSyncTemplate<
 			ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate
 		>::Load(
 			ScenarioTemplate* obj, 
-			const SQLiteResultSPtr& rows,
+			const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -73,18 +73,18 @@ namespace synthese
 		}
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Unlink(ScenarioTemplate* obj)
+		void DBInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Unlink(ScenarioTemplate* obj)
 		{
 
 		}
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Save(
+		void DBInheritedTableSyncTemplate<ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate>::Save(
 			ScenarioTemplate* obj,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 
 			if (obj->getKey() == 0)
@@ -95,14 +95,14 @@ namespace synthese
 				<< Conversion::ToString(obj->getKey())
 				<< ",1"
 				<< ",0" 
-				<< "," << Conversion::ToSQLiteString(obj->getName())
+				<< "," << Conversion::ToDBString(obj->getName())
 				<< ",NULL"
 				<< ",NULL"
 				<< "," << (obj->getFolder() ? Conversion::ToString(obj->getFolder()->getKey()) : "0")
 				<< ",''"
 				<< ",0"
 				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			db->execUpdate(query.str(), transaction);
 		}
 	}
 
@@ -133,7 +133,7 @@ namespace synthese
 				query << ")";
 			}
 			if (!name.empty())
-				query << " AND " << COL_NAME << "=" << Conversion::ToSQLiteString(name);
+				query << " AND " << COL_NAME << "=" << Conversion::ToDBString(name);
 			if (scenarioToBeDifferentWith)
 				query << " AND " << TABLE_COL_ID << "!=" << scenarioToBeDifferentWith->getKey();
 			if (orderByName)

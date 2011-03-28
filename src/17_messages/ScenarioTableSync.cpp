@@ -28,8 +28,8 @@
 #include "AlarmTableSync.h"
 #include "Conversion.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 
 #include <sstream>
 
@@ -44,7 +44,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,ScenarioTableSync>::FACTORY_KEY("17.00.01 Alarm scenarii");
+		template<> const string FactorableTemplate<DBTableSync,ScenarioTableSync>::FACTORY_KEY("17.00.01 Alarm scenarii");
 	}
 
 	namespace messages
@@ -61,37 +61,37 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ScenarioTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<ScenarioTableSync>::TABLE(
 			"t039_scenarios"
 			);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ScenarioTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<ScenarioTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(ScenarioTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
-			SQLiteTableSync::Field(ScenarioTableSync::COL_ENABLED, SQL_INTEGER),
-			SQLiteTableSync::Field(ScenarioTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(ScenarioTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
-			SQLiteTableSync::Field(ScenarioTableSync::COL_PERIODEND, SQL_TIMESTAMP),
-			SQLiteTableSync::Field(ScenarioTableSync::COL_FOLDER_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(ScenarioTableSync::COL_VARIABLES, SQL_TEXT),
-			SQLiteTableSync::Field(ScenarioTableSync::COL_TEMPLATE, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(ScenarioTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
+			DBTableSync::Field(ScenarioTableSync::COL_ENABLED, SQL_INTEGER),
+			DBTableSync::Field(ScenarioTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(ScenarioTableSync::COL_PERIODSTART, SQL_TIMESTAMP),
+			DBTableSync::Field(ScenarioTableSync::COL_PERIODEND, SQL_TIMESTAMP),
+			DBTableSync::Field(ScenarioTableSync::COL_FOLDER_ID, SQL_INTEGER),
+			DBTableSync::Field(ScenarioTableSync::COL_VARIABLES, SQL_TEXT),
+			DBTableSync::Field(ScenarioTableSync::COL_TEMPLATE, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ScenarioTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<ScenarioTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				ScenarioTableSync::COL_IS_TEMPLATE.c_str(),
 				ScenarioTableSync::COL_PERIODSTART.c_str(),
 			""),
-			SQLiteTableSync::Index(ScenarioTableSync::COL_FOLDER_ID.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(ScenarioTableSync::COL_FOLDER_ID.c_str(), ""),
+			DBTableSync::Index()
 		};
 
 
 		template<>
-		string SQLiteInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>::_GetSubClassKey(const SQLiteResultSPtr& row)
+		string DBInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>::_GetSubClassKey(const DBResultSPtr& row)
 		{
 			return row->getBool(ScenarioTableSync::COL_IS_TEMPLATE)
 				? ScenarioTemplateInheritedTableSync::FACTORY_KEY
@@ -102,7 +102,7 @@ namespace synthese
 
 
 		template<>
-		string SQLiteInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>::_GetSubClassKey(const Scenario* obj)
+		string DBInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>::_GetSubClassKey(const Scenario* obj)
 		{
 			return (dynamic_cast<const SentScenario*>(obj) != NULL)
 				?	SentScenarioInheritedTableSync::FACTORY_KEY
@@ -112,9 +112,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>::_CommonLoad(
+		template<> void DBInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>::_CommonLoad(
 			Scenario* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -125,7 +125,7 @@ namespace synthese
 	namespace messages
 	{
 		ScenarioTableSync::ScenarioTableSync()
-			: SQLiteInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>()
+			: DBInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>()
 		{
 		}
 	}

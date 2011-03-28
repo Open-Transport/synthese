@@ -33,7 +33,7 @@
 #include "Registrable.h"
 
 #include "DBModule.h"
-#include "SQLiteConditionalRegistryTableSyncTemplate.h"
+#include "DBConditionalRegistryTableSyncTemplate.hpp"
 
 #include "AlarmObjectLink.h"
 #include "MessagesModule.h"
@@ -57,7 +57,7 @@ namespace synthese
 			 - removes the link between the alarm and the object if the alarm is a SentAlarm object (no exception is thrown if it does not exists)
 		*/
 		class AlarmObjectLinkTableSync
-		:	public db::SQLiteConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>
+		:	public db::DBConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>
 		{
 		public:
 			static const std::string COL_RECIPIENT_KEY;
@@ -122,7 +122,7 @@ namespace synthese
 			/// @since 3.2.0
 			static void RemoveByTarget(
 				util::RegistryKeyType objectId,
-				boost::optional<db::SQLiteTransaction&> transaction = boost::optional<db::SQLiteTransaction&>()
+				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
 			);
 
 
@@ -148,20 +148,20 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " WHERE " 
 					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarmId)
-					<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToSQLiteString(recipientKey);
+					<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToDBString(recipientKey);
 			if (number)
 			    query << " LIMIT " << (*number + 1);
 			if (first > 0)
 			    query << " OFFSET " << first;
 
-			db::SQLiteResultSPtr rows = db::DBModule::GetSQLite()->execQuery(query.str());
+			db::DBResultSPtr rows = db::DBModule::GetDB()->execQuery(query.str());
 			std::vector< boost::shared_ptr<T> > objects;
 			while (rows->next ())
 			{
 				try
 				{
 					objects.push_back(
-						db::SQLiteDirectTableSyncTemplate<K,T>::GetEditable(
+						db::DBDirectTableSyncTemplate<K,T>::GetEditable(
 						rows->getLongLong (COL_OBJECT_ID),
 						env,
 						linkLevel

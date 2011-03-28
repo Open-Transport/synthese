@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_pt_LineAreaInheritedTableSync_hpp__
 #define SYNTHESE_pt_LineAreaInheritedTableSync_hpp__
 
-#include "SQLiteInheritedRegistryTableSync.h"
+#include "DBInheritedRegistryTableSync.hpp"
 
 #include "LineStopTableSync.h"
 #include "LineArea.hpp"
@@ -42,7 +42,7 @@ namespace synthese
 		/// @since 3.2.1
 		/// @date 2011
 		class LineAreaInheritedTableSync:
-			public db::SQLiteInheritedRegistryTableSync<
+			public db::DBInheritedRegistryTableSync<
 				LineStopTableSync,
 				LineAreaInheritedTableSync,
 				LineArea

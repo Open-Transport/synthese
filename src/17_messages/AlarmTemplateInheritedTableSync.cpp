@@ -40,9 +40,9 @@ namespace synthese
 	{
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Load(
+		void DBInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Load(
 			AlarmTemplate* obj,
-			const SQLiteResultSPtr& rows,
+			const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -59,7 +59,7 @@ namespace synthese
 		}
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Unlink(
+		void DBInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Unlink(
 			AlarmTemplate* obj
 		){
 			obj->setScenario(NULL);
@@ -68,9 +68,9 @@ namespace synthese
 
 
 		template<>
-		void SQLiteInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Save(
+		void DBInheritedTableSyncTemplate<AlarmTableSync,AlarmTemplateInheritedTableSync,AlarmTemplate>::Save(
 			AlarmTemplate* obj,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			stringstream query;
 			if (obj->getKey() == 0)
@@ -81,14 +81,14 @@ namespace synthese
 				<< ",1"
 				<< ",0"
 				<< "," << Conversion::ToString((int) obj->getLevel())
-				<< "," << Conversion::ToSQLiteString(obj->getShortMessage())
-				<< "," << Conversion::ToSQLiteString(obj->getLongMessage())
+				<< "," << Conversion::ToDBString(obj->getShortMessage())
+				<< "," << Conversion::ToDBString(obj->getLongMessage())
 				<< ",''"
 				<< ",''"
 				<< "," << (obj->getScenario() ? Conversion::ToString(obj->getScenario()->getKey()) : "")
 				<< ",0"
 				<< ")";
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+			DBModule::GetDB()->execUpdate(query.str(), transaction);
 		}
 	}
 

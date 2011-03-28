@@ -689,9 +689,9 @@ namespace synthese
 
 
 
-		db::SQLiteTransaction GTFSFileFormat::Importer_::_save() const
+		db::DBTransaction GTFSFileFormat::Importer_::_save() const
 		{
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 
 			// Saving of each created or altered objects
 			if(_importStopArea)

@@ -44,7 +44,7 @@ namespace synthese
 	using namespace road;
 	using namespace impex;
 
-	template<> const string util::FactorableTemplate<SQLiteTableSync,pt::StopAreaTableSync>::FACTORY_KEY("35.40.01 Connection places");
+	template<> const string util::FactorableTemplate<DBTableSync,pt::StopAreaTableSync>::FACTORY_KEY("35.40.01 Connection places");
 	template<> const string FactorableTemplate<Fetcher<NamedPlace>, StopAreaTableSync>::FACTORY_KEY("7");
 
 	namespace pt
@@ -65,37 +65,37 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<StopAreaTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<StopAreaTableSync>::TABLE(
 			"t007_connection_places"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<StopAreaTableSync>::_FIELDS[] =
+		template<> const DBTableSync::Field DBTableSyncTemplate<StopAreaTableSync>::_FIELDS[] =
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(StopAreaTableSync::TABLE_COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(StopAreaTableSync::TABLE_COL_CITYID, SQL_INTEGER),
-			SQLiteTableSync::Field(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE, SQL_INTEGER),
-			SQLiteTableSync::Field(StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
-			SQLiteTableSync::Field(StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY, SQL_INTEGER),
-			SQLiteTableSync::Field(StopAreaTableSync::TABLE_COL_TRANSFERDELAYS, SQL_TEXT),
-			SQLiteTableSync::Field(StopAreaTableSync::COL_NAME13, SQL_TEXT),
-			SQLiteTableSync::Field(StopAreaTableSync::COL_NAME26, SQL_TEXT),
-			SQLiteTableSync::Field(StopAreaTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
-			SQLiteTableSync::Field(StopAreaTableSync::COL_TIMETABLE_NAME, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(StopAreaTableSync::TABLE_COL_NAME, SQL_TEXT),
+			DBTableSync::Field(StopAreaTableSync::TABLE_COL_CITYID, SQL_INTEGER),
+			DBTableSync::Field(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE, SQL_INTEGER),
+			DBTableSync::Field(StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
+			DBTableSync::Field(StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY, SQL_INTEGER),
+			DBTableSync::Field(StopAreaTableSync::TABLE_COL_TRANSFERDELAYS, SQL_TEXT),
+			DBTableSync::Field(StopAreaTableSync::COL_NAME13, SQL_TEXT),
+			DBTableSync::Field(StopAreaTableSync::COL_NAME26, SQL_TEXT),
+			DBTableSync::Field(StopAreaTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
+			DBTableSync::Field(StopAreaTableSync::COL_TIMETABLE_NAME, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<StopAreaTableSync>::_INDEXES[] =
+		template<> const DBTableSync::Index DBTableSyncTemplate<StopAreaTableSync>::_INDEXES[] =
 		{
-			SQLiteTableSync::Index(StopAreaTableSync::TABLE_COL_CITYID.c_str(), StopAreaTableSync::TABLE_COL_NAME.c_str(), ""),
-			SQLiteTableSync::Index(StopAreaTableSync::COL_CODE_BY_SOURCE.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(StopAreaTableSync::TABLE_COL_CITYID.c_str(), StopAreaTableSync::TABLE_COL_NAME.c_str(), ""),
+			DBTableSync::Index(StopAreaTableSync::COL_CODE_BY_SOURCE.c_str(), ""),
+			DBTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Load(
+		template<> void DBDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Load(
 			StopArea* cp,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -183,9 +183,9 @@ namespace synthese
 
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Save(
+		template<> void DBDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Save(
 			StopArea* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			// Transfer delay matrix
 			stringstream delays;
@@ -221,7 +221,7 @@ namespace synthese
 		}
 
 		
-		template<> void SQLiteDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Unlink(
+		template<> void DBDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Unlink(
 			StopArea* cp
 		){
 			City* city(const_cast<City*>(cp->getCity()));

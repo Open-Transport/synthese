@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 #include "FetcherTemplate.h"
 
 namespace synthese
@@ -36,7 +36,7 @@ namespace synthese
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// StopPoint SQLite table synchronizer.
+		/// StopPoint table synchronizer.
 		///	@ingroup m35LS refLS
 		/// @author Marc Jambert, Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
@@ -62,7 +62,7 @@ namespace synthese
 		///	<dt>projected_metric_offset</dt><dd>metric offset of the projected point on the road chunk</dd>
 		///	</dl>
 		class StopPointTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<StopPointTableSync,StopPoint>,
+			public db::DBRegistryTableSyncTemplate<StopPointTableSync,StopPoint>,
 			public db::FetcherTemplate<graph::Vertex, StopPointTableSync>
 		{
 		public:

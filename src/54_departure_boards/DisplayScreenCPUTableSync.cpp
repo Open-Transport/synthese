@@ -26,8 +26,8 @@
 #include "DisplayScreenCPUTableSync.h"
 #include "DisplayScreenCPU.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "Conversion.h"
 #include "StopArea.hpp"
 #include "Fetcher.h"
@@ -48,7 +48,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,DisplayScreenCPUTableSync>::FACTORY_KEY("54.49 Display screen CPU");
+		template<> const string FactorableTemplate<DBTableSync,DisplayScreenCPUTableSync>::FACTORY_KEY("54.49 Display screen CPU");
 	}
 
 	namespace departure_boards
@@ -63,33 +63,33 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<DisplayScreenCPUTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<DisplayScreenCPUTableSync>::TABLE(
 			"t058_display_screen_cpu"
 		);
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<DisplayScreenCPUTableSync>::_FIELDS[] =
+		template<> const DBTableSync::Field DBTableSyncTemplate<DisplayScreenCPUTableSync>::_FIELDS[] =
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_PLACE_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_MAC_ADDRESS, SQL_TEXT),
-			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_MONITORING_DELAY, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_IS_ONLINE, SQL_INTEGER),
-			SQLiteTableSync::Field(DisplayScreenCPUTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenCPUTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenCPUTableSync::COL_PLACE_ID, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenCPUTableSync::COL_MAC_ADDRESS, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenCPUTableSync::COL_MONITORING_DELAY, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenCPUTableSync::COL_IS_ONLINE, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenCPUTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
+			DBTableSync::Field()
 		};
 		
-		template<>  const SQLiteTableSync::Index SQLiteTableSyncTemplate<DisplayScreenCPUTableSync>::_INDEXES[] =
+		template<>  const DBTableSync::Index DBTableSyncTemplate<DisplayScreenCPUTableSync>::_INDEXES[] =
 		{
-			SQLiteTableSync::Index(DisplayScreenCPUTableSync::COL_PLACE_ID.c_str(), ""),
-			SQLiteTableSync::Index(DisplayScreenCPUTableSync::COL_MAC_ADDRESS.c_str(), ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index(DisplayScreenCPUTableSync::COL_PLACE_ID.c_str(), ""),
+			DBTableSync::Index(DisplayScreenCPUTableSync::COL_MAC_ADDRESS.c_str(), ""),
+			DBTableSync::Index()
 		};
 
 
-		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>::Load(
+		template<> void DBDirectTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>::Load(
 			DisplayScreenCPU* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -117,11 +117,11 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>::Save(
+		template<> void DBDirectTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>::Save(
 			DisplayScreenCPU* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
-			SQLite* sqlite = DBModule::GetSQLite();
+			DB* db = DBModule::GetDB();
 			stringstream query;
 			if (object->getKey() <= 0)
 				object->setKey(getId());
@@ -129,19 +129,19 @@ namespace synthese
 			query
 				<< " REPLACE INTO " << TABLE.NAME << " VALUES("
 				<< object->getKey() << ","
-				<< Conversion::ToSQLiteString(object->getName()) << ","
+				<< Conversion::ToDBString(object->getName()) << ","
 				<< ((object->getPlace() != NULL) ? object->getPlace()->getKey() : 0) << ","
-				<< Conversion::ToSQLiteString(object->getMacAddress()) << ","
+				<< Conversion::ToDBString(object->getMacAddress()) << ","
 				<< object->getMonitoringDelay().minutes() << ","
 				<< object->getIsOnline() << ","
-				<< Conversion::ToSQLiteString(object->getMaintenanceMessage())
+				<< Conversion::ToDBString(object->getMaintenanceMessage())
 				<< ")";
-			sqlite->execUpdate(query.str(), transaction);
+			db->execUpdate(query.str(), transaction);
 		}
 
 
 		
-		template<> void SQLiteDirectTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>::Unlink(
+		template<> void DBDirectTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>::Unlink(
 			DisplayScreenCPU* object
 		){
 			object->setPlace(NULL);
@@ -173,7 +173,7 @@ namespace synthese
 			}
 			if(macAddress)
 			{
-				query << " AND " << COL_MAC_ADDRESS << "=" << Conversion::ToSQLiteString(*macAddress);
+				query << " AND " << COL_MAC_ADDRESS << "=" << Conversion::ToDBString(*macAddress);
 			}
 			if (orderByName)
 			{

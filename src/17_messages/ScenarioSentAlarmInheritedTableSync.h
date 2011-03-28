@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_messages_ScenarioSentAlarmInheritedTableSync_h__
 #define SYNTHESE_messages_ScenarioSentAlarmInheritedTableSync_h__
 
-#include "SQLiteInheritedRegistryTableSync.h"
+#include "DBInheritedRegistryTableSync.hpp"
 
 #include "AlarmTableSync.h"
 #include "SentAlarm.h"
@@ -36,7 +36,7 @@ namespace synthese
 			@ingroup m17ILS refILS
 		*/
 		class ScenarioSentAlarmInheritedTableSync
-		:	public db::SQLiteInheritedRegistryTableSync<
+		:	public db::DBInheritedRegistryTableSync<
 				AlarmTableSync, ScenarioSentAlarmInheritedTableSync, SentAlarm
 			>
 		{

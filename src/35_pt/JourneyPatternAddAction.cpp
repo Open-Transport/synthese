@@ -30,7 +30,7 @@
 #include "CommercialLineTableSync.h"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "LineArea.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 
@@ -118,7 +118,7 @@ namespace synthese
 		void JourneyPatternAddAction::run(
 			Request& request
 		){
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 			JourneyPattern object;
 
 			if(_template.get())

@@ -31,7 +31,7 @@
 #include <iostream>
 
 #include "RollingStock.h"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 #include <boost/optional.hpp>
 
@@ -46,7 +46,7 @@ namespace synthese
 		/// @date 2007
 		//////////////////////////////////////////////////////////////////////////
 		/// See : RollingStock
-		class RollingStockTableSync : public db::SQLiteRegistryTableSyncTemplate<RollingStockTableSync,RollingStock>
+		class RollingStockTableSync : public db::DBRegistryTableSyncTemplate<RollingStockTableSync,RollingStock>
 		{
 		public:
 			static const std::string COL_NAME;

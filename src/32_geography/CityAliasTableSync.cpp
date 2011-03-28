@@ -27,8 +27,8 @@
 #include "CityAliasTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 #include "CityTableSync.h"
 
 using namespace std;
@@ -42,7 +42,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,CityAliasTableSync>::FACTORY_KEY("32.40 City aliases");
+		template<> const string FactorableTemplate<DBTableSync,CityAliasTableSync>::FACTORY_KEY("32.40 City aliases");
 	}
 
 	namespace geography
@@ -55,41 +55,41 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<CityAliasTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<CityAliasTableSync>::TABLE(
 			"t065_city_aliases"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<CityAliasTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<CityAliasTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(CityAliasTableSync::COL_ALIASED_CITY_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(CityAliasTableSync::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(CityAliasTableSync::COL_CODE, SQL_TEXT),
-			SQLiteTableSync::Field(CityAliasTableSync::COL_VISIBLE, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(CityAliasTableSync::COL_ALIASED_CITY_ID, SQL_INTEGER),
+			DBTableSync::Field(CityAliasTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(CityAliasTableSync::COL_CODE, SQL_TEXT),
+			DBTableSync::Field(CityAliasTableSync::COL_VISIBLE, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<CityAliasTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<CityAliasTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				CityAliasTableSync::COL_CODE.c_str(),
 			""),
-			SQLiteTableSync::Index(
+			DBTableSync::Index(
 				CityAliasTableSync::COL_ALIASED_CITY_ID.c_str(),
 				CityAliasTableSync::COL_NAME.c_str(),
 			""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CityAliasTableSync,CityAlias>::Load(
+		template<> void DBDirectTableSyncTemplate<CityAliasTableSync,CityAlias>::Load(
 			CityAlias* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -116,9 +116,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CityAliasTableSync,CityAlias>::Save(
+		template<> void DBDirectTableSyncTemplate<CityAliasTableSync,CityAlias>::Save(
 			CityAlias* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<CityAliasTableSync> query(*object);
 			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
@@ -130,7 +130,7 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<CityAliasTableSync,CityAlias>::Unlink(
+		template<> void DBDirectTableSyncTemplate<CityAliasTableSync,CityAlias>::Unlink(
 			CityAlias* obj
 		){
 		}

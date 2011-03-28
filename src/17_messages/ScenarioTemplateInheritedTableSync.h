@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_messages_ScenarioTemplateInheritedTableSync_h__
 #define SYNTHESE_messages_ScenarioTemplateInheritedTableSync_h__
 
-#include "SQLiteInheritedNoSyncTableSyncTemplate.h"
+#include "DBInheritedNoSyncTableSyncTemplate.hpp"
 #include "ScenarioTableSync.h"
 #include "ScenarioTemplate.h"
 
@@ -35,7 +35,7 @@ namespace synthese
 			@ingroup m17
 		*/
 		class ScenarioTemplateInheritedTableSync
-		:	public db::SQLiteInheritedNoSyncTableSyncTemplate<
+		:	public db::DBInheritedNoSyncTableSyncTemplate<
 				ScenarioTableSync, ScenarioTemplateInheritedTableSync, ScenarioTemplate
 			>
 		{

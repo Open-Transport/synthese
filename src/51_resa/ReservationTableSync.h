@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "DBNoSyncTableSyncTemplate.hpp"
 #include "Reservation.h"
 
 namespace synthese
@@ -41,7 +41,7 @@ namespace synthese
 			@warning The load method does not update the transaction attribute. To do it, load the transaction first and load each reservation which belongs to it.
 		*/
 		class ReservationTableSync:
-			public db::SQLiteNoSyncTableSyncTemplate<ReservationTableSync,Reservation>
+			public db::DBNoSyncTableSyncTemplate<ReservationTableSync,Reservation>
 		{
 		public:
 			static const std::string COL_TRANSACTION_ID;

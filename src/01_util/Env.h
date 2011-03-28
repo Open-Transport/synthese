@@ -250,7 +250,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Official environment static getter.
 			/// @return Pointer to the main environment containing the physical memory loaded
-			/// of each table that use this feature (see SQLiteDirectTableSyncTemplate).
+			/// of each table that use this feature (see DBDirectTableSyncTemplate).
 			//////////////////////////////////////////////////////////////////////////
 			static Env& GetOfficialEnv() { return *_officialRegistries; }
 
@@ -258,7 +258,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Official environment static getter.
 			/// @return Pointer to the main environment containing the physical memory loaded
-			/// of each table that use this feature (see SQLiteDirectTableSyncTemplate).
+			/// of each table that use this feature (see DBDirectTableSyncTemplate).
 			//////////////////////////////////////////////////////////////////////////
 			static boost::shared_ptr<Env> GetOfficialEnvSPtr() { return _officialRegistries; }
 

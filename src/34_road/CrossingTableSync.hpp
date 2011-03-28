@@ -30,7 +30,7 @@
 
 #include "Crossing.h"
 #include "FetcherTemplate.h"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -60,7 +60,7 @@ namespace synthese
 			</dl>
 		*/
 		class CrossingTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<CrossingTableSync, Crossing>,
+			public db::DBRegistryTableSyncTemplate<CrossingTableSync, Crossing>,
 			public db::FetcherTemplate<graph::Vertex, CrossingTableSync>
 		{
 		public:

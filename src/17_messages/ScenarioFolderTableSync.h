@@ -31,7 +31,7 @@
 #include <iostream>
 #include <boost/optional.hpp>
 
-#include "SQLiteNoSyncTableSyncTemplate.h"
+#include "DBNoSyncTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -43,7 +43,7 @@ namespace synthese
 			@ingroup m17LS refLS
 		*/
 		class ScenarioFolderTableSync:
-			public db::SQLiteNoSyncTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>
+			public db::DBNoSyncTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>
 		{
 		public:
 			static const std::string COL_NAME;

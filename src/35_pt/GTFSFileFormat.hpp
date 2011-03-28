@@ -194,7 +194,7 @@ namespace synthese
 
 
 
-				virtual db::SQLiteTransaction _save() const;
+				virtual db::DBTransaction _save() const;
 			};
 
 			typedef impex::NoExportPolicy<GTFSFileFormat> Exporter_;

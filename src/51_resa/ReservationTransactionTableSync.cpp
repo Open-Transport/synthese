@@ -30,8 +30,8 @@
 #include "Service.h"
 
 #include "DBModule.h"
-#include "SQLiteResult.h"
-#include "SQLiteException.h"
+#include "DBResult.hpp"
+#include "DBException.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -48,7 +48,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync, ReservationTransactionTableSync>::FACTORY_KEY("31.2 Reservation Transaction Table Sync");
+		template<> const string FactorableTemplate<DBTableSync, ReservationTransactionTableSync>::FACTORY_KEY("31.2 Reservation Transaction Table Sync");
 	}
 
 	namespace resa
@@ -67,33 +67,33 @@ namespace synthese
 
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<ReservationTransactionTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<ReservationTransactionTableSync>::TABLE(
 			"t046_reservation_transactions", true
 		);
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<ReservationTransactionTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<ReservationTransactionTableSync>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_LAST_RESERVATION_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_SEATS, SQL_INTEGER),
-			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_BOOKING_TIME, SQL_TIMESTAMP),
-			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CANCELLATION_TIME, SQL_TIMESTAMP),
-			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_NAME, SQL_TEXT),
-			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_PHONE, SQL_TEXT),
-			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL, SQL_TEXT),
-			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_BOOKING_USER_ID, SQL_INTEGER),
-			SQLiteTableSync::Field(ReservationTransactionTableSync::COL_CANCEL_USER_ID, SQL_INTEGER),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(ReservationTransactionTableSync::COL_LAST_RESERVATION_ID, SQL_INTEGER),
+			DBTableSync::Field(ReservationTransactionTableSync::COL_SEATS, SQL_INTEGER),
+			DBTableSync::Field(ReservationTransactionTableSync::COL_BOOKING_TIME, SQL_TIMESTAMP),
+			DBTableSync::Field(ReservationTransactionTableSync::COL_CANCELLATION_TIME, SQL_TIMESTAMP),
+			DBTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_ID, SQL_INTEGER),
+			DBTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_NAME, SQL_TEXT),
+			DBTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_PHONE, SQL_TEXT),
+			DBTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL, SQL_TEXT),
+			DBTableSync::Field(ReservationTransactionTableSync::COL_BOOKING_USER_ID, SQL_INTEGER),
+			DBTableSync::Field(ReservationTransactionTableSync::COL_CANCEL_USER_ID, SQL_INTEGER),
+			DBTableSync::Field()
 		};
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<ReservationTransactionTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<ReservationTransactionTableSync>::_INDEXES[]=
 		{
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Load(
+		template<> void DBDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Load(
 			ReservationTransaction* object
-			, const db::SQLiteResultSPtr& rows,
+			, const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -109,9 +109,9 @@ namespace synthese
 			object->setCustomerEMail(rows->getText(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL));
 		}
 
-		template<> void SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Save(
+		template<> void DBDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Save(
 			ReservationTransaction* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<ReservationTransactionTableSync> query(*object);
 			query.addField(object->getLastReservation());
@@ -127,7 +127,7 @@ namespace synthese
 			query.execute(transaction);
 		}
 
-		template<> void  SQLiteDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Unlink(
+		template<> void  DBDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Unlink(
 			ReservationTransaction* obj
 		){
 

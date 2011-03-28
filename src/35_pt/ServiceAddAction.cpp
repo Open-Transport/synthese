@@ -34,7 +34,7 @@
 #include "JourneyPattern.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "Fetcher.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -180,7 +180,7 @@ namespace synthese
 				}
 			}
 
-			SQLiteTransaction transaction;
+			DBTransaction transaction;
 
 			if(_isContinuous)
 			{

@@ -26,7 +26,7 @@
 #define SYNTHESE_VehicleTableSync_hpp__
 
 #include "Vehicle.hpp"
-#include "SQLiteRegistryTableSyncTemplate.h"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -39,7 +39,7 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.2.1
 		class VehicleTableSync:
-			public db::SQLiteRegistryTableSyncTemplate<VehicleTableSync,Vehicle>
+			public db::DBRegistryTableSyncTemplate<VehicleTableSync,Vehicle>
 		{
 		public:
 			//! @name Field names
