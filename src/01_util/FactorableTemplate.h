@@ -49,15 +49,26 @@ namespace synthese
 
 			virtual F* clone() const;
 
+			// TODO: rename to register for consistency?
 			static void integrate ();
+
+			static void unregister();
 		};
 
 
 
 		template<class F, class C>
-		void synthese::util::FactorableTemplate<F, C>::integrate ()
+		void synthese::util::FactorableTemplate<F, C>::integrate()
 		{
 			synthese::util::Factory<typename F::FactoryClass>::template Integrate<C>(
+				FactorableTemplate<F,C>::FACTORY_KEY
+			);
+		}
+
+		template<class F, class C>
+		void synthese::util::FactorableTemplate<F, C>::unregister()
+		{
+			synthese::util::Factory<typename F::FactoryClass>::template Unregister<C>(
 				FactorableTemplate<F,C>::FACTORY_KEY
 			);
 		}
