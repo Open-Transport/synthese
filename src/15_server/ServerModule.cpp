@@ -133,7 +133,7 @@ namespace synthese
 	
 			Log::GetInstance().info(
 				"HTTP Server is now listening on port " + GetParameter(ServerModule::MODULE_PARAM_PORT) +
-				" by at least "+ GetParameter(ServerModule::MODULE_PARAM_NB_THREADS) + " threads ..."
+				" with at least "+ GetParameter(ServerModule::MODULE_PARAM_NB_THREADS) + " threads ..."
 			);
 		}
 
