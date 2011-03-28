@@ -24,7 +24,7 @@
 #define SYNTHESE_DBEmptyResultException_H__
 
 #include "ObjectNotFoundException.h"
-#include "SQLiteTableSyncTemplate.h"
+#include "DBTableSyncTemplate.hpp"
 
 #include <string>
 

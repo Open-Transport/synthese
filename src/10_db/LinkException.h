@@ -45,7 +45,7 @@ namespace synthese
 		{
 		public:
 			LinkException(
-				const db::SQLiteResultSPtr& row,
+				const db::DBResultSPtr& row,
 				const std::string& field,
 				const Exception& e
 			):	Exception(

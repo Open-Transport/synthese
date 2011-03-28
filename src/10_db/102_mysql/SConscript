@@ -1,0 +1,14 @@
+Import ('s3env')
+
+if s3env['_WITH_MYSQL']:
+
+    CppSynthese3LibProject(
+        s3env, 's3-db-mysql', s3env['S3VERSION'], 
+        source_files = s3env.Glob ('*.cpp'),
+        include_dir = s3env['_MYSQL_INCLUDE_DIR'],
+        dependencies = [
+            's3-db.cpplib',
+        ]
+    )
+
+    s3env.Append(LIBS = [s3env['_MYSQL_LIBRARIES']])

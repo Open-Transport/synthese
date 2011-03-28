@@ -41,7 +41,7 @@ namespace synthese
 		{
 		public:
 			LoadException(
-				const db::SQLiteResultSPtr& row,
+				const db::DBResultSPtr& row,
 				const std::string& field,
 				const std::string& text
 			):	Exception(

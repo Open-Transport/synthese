@@ -25,15 +25,17 @@
 #ifndef SYNTHESE_DBModule_H__
 #define SYNTHESE_DBModule_H__
 
-#include <boost/filesystem/path.hpp>
-
+#include "DB.hpp"
 #include "ModuleClassTemplate.hpp"
 #include "DBConstants.h"
 #include "DBTypes.h"
 #include "Registry.h"
 
 #include <map>
+#include <boost/filesystem/path.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/shared_ptr.hpp>
+
 
 namespace synthese
 {
@@ -42,21 +44,17 @@ namespace synthese
 	/** @defgroup m10Exceptions 10 Exceptions
 		@ingroup m10
 	
-		@defgroup m10 10 SQLite database access
+		@defgroup m10 10 database access
 		@ingroup m1
 
 	@{
 	*/
 
-	/** 10 SQLite database access module namespace.
+	/** 10 database access module namespace.
 	*/
 	namespace db
 	{
-	    class SQLite;
-	    class SQLiteHandle;
-		class SQLiteTableSync;
-
-//		static const std::string TRIGGERS_ENABLED_CLAUSE;
+		class DBTableSync;
 
 		//////////////////////////////////////////////////////////////
 		/// Database handling module class.
@@ -65,27 +63,33 @@ namespace synthese
 			public server::ModuleClassTemplate<DBModule>
 		{
 			friend class server::ModuleClassTemplate<DBModule>;
+			// For accessing ModuleClass::RegisterParameter.
+			friend class DB;
+
 			
 		public:
-			typedef std::map<util::RegistryKeyType, std::string>	SubClassMap;
-			typedef std::map<std::string, boost::shared_ptr<SQLiteTableSync> > TablesByNameMap;
-			typedef std::map<int, boost::shared_ptr<SQLiteTableSync> > TablesByIdMap;
+			typedef std::map<util::RegistryKeyType, std::string> SubClassMap;
+			typedef std::map<std::string, boost::shared_ptr<DBTableSync> > TablesByNameMap;
+			typedef std::map<int, boost::shared_ptr<DBTableSync> > TablesByIdMap;
 
 
 		private:
-		    static SQLiteHandle*	_sqlite;
+			static boost::shared_ptr<DB::ConnectionInfo> _ConnectionInfo;
+			static boost::shared_ptr<DB> _Db;
 			static SubClassMap		_subClassMap;
 			static TablesByNameMap	_tableSyncMap;
 			static TablesByIdMap	_idTableSyncMap;
-		    static boost::filesystem::path _DatabasePath;
 			static const CoordinatesSystem* _storageCoordinatesSystem;
 
+
 		public:
+			DBModule() { };
+			
+			virtual ~DBModule() { };
 
-		    static const boost::filesystem::path& GetDatabasePath ();
-		    static void SetDatabasePath (const boost::filesystem::path& databasePath);
+			static void SetConnectionString(const std::string& connectionString);
 
-		    static SQLite* GetSQLite ();
+			static DB* GetDB();
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets the table sync by table name.
@@ -94,8 +98,8 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.1.16
-			/// @throws SQLiteException if the table was not found
-			static boost::shared_ptr<SQLiteTableSync> GetTableSync(const std::string& tableName);
+			/// @throws DBException if the table was not found
+			static boost::shared_ptr<DBTableSync> GetTableSync(const std::string& tableName);
 			
 
 
@@ -106,8 +110,8 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.1.16
-			/// @throws SQLiteException if the table was not found
-			static boost::shared_ptr<SQLiteTableSync> GetTableSync(int tableId);
+			/// @throws DBException if the table was not found
+			static boost::shared_ptr<DBTableSync> GetTableSync(int tableId);
 
 			//////////////////////////////////////////////////////////////////////////
 			/// @since 3.2.0
@@ -123,6 +127,7 @@ namespace synthese
 
 			static const CoordinatesSystem& GetStorageCoordinatesSystem() { return *_storageCoordinatesSystem; }
 			static void SetStorageCoordinatesSystem(const CoordinatesSystem& value) { _storageCoordinatesSystem = &value; }
+			static void ClearStorageCoordinatesSystem() { _storageCoordinatesSystem = 0; }
 		};
 	}
 
