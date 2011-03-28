@@ -140,6 +140,13 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<ServerModule>::End()
 		{
+			UnregisterParameter(ServerModule::MODULE_PARAM_PORT);
+			UnregisterParameter(ServerModule::MODULE_PARAM_NB_THREADS);
+			UnregisterParameter(ServerModule::MODULE_PARAM_LOG_LEVEL);
+			UnregisterParameter(ServerModule::MODULE_PARAM_SMTP_SERVER);
+			UnregisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT);
+			UnregisterParameter(ServerModule::MODULE_PARAM_LOG_LEVEL);
+
 			ServerModule::_io_service.stop();
 		}
 		

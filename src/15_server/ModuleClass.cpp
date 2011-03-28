@@ -65,7 +65,6 @@ namespace synthese
 
 
 
-
 	    void ModuleClass::SetParameter(
 			const std::string& name,
 			const std::string& value,
@@ -87,8 +86,6 @@ namespace synthese
 
 
 
-
-	
 	    void ModuleClass::RegisterParameter(
 	    	const std::string& name,
 			const std::string& defaultValue,
@@ -106,6 +103,15 @@ namespace synthese
 				SetParameter (name, defv);
 			}
 	    }
+
+
+
+		void ModuleClass::UnregisterParameter(
+			const std::string& name
+		){
+			assert(HasParameter(name));
+			_Callbacks.erase(name);
+		}
 
 
 
