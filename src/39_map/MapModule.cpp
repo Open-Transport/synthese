@@ -79,6 +79,9 @@ namespace synthese
 		
 		template<> void ModuleClassTemplate<MapModule>::End()
 		{
+			UnregisterParameter(MapModule::PARAM_HTTP_TEMP_DIR);
+			UnregisterParameter(MapModule::PARAM_HTTP_TEMP_URL);
+			UnregisterParameter(MapModule::PARAM_BACKGROUNDS_DIR);
 		}
 	}
 
