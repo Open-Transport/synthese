@@ -8,38 +8,39 @@ import os, fnmatch
 import time, datetime
 
 
-EnsureSConsVersion(0,97)
+EnsureSConsVersion(1, 0)
 
-opts = Options('config.py')
 
-opts.AddOptions(
-   EnumOption ('_CPPMODE', 'C/C++ compilation mode', 'release', allowed_values = ('debug', 'release', 'profile')),
+vars = Variables('config.py')
+
+vars.AddVariables(
+   EnumVariable('_CPPMODE', 'C/C++ compilation mode', 'release', allowed_values = ('debug', 'release', 'profile')),
    )
 
 env = Environment()
 env.Replace ( _PLATFORM = str (Platform()))
 
 #if env['_PLATFORM'] == 'posix':
-opts.AddOptions(
-   	BoolOption ('_DEB_BUILD_DEPS', 'Build deb dependencies files if needed', False),
-   	EnumOption ('_DEB_TARGET_DIST', 'Targeted debian distribution', 'unstable', allowed_values = ('unstable', 'testing', 'stable')),
-   	EnumOption ('_DEB_DPUT_HOST', 'Upload automatically generated deb package to proper repository', 'rcs-local', allowed_values = ('','rcs-local', 'rcs-official')),
-   	BoolOption ('_USE_BUILD_RPATH', 'Use build/_CPPMODE/repo/lib for runtime search path (posix only)', False))
+vars.AddVariables(
+    BoolVariable('_DEB_BUILD_DEPS', 'Build deb dependencies files if needed', False),
+    EnumVariable('_DEB_TARGET_DIST', 'Targeted debian distribution', 'unstable', allowed_values = ('unstable', 'testing', 'stable')),
+    EnumVariable('_DEB_DPUT_HOST', 'Upload automatically generated deb package to proper repository', 'rcs-local', allowed_values = ('','rcs-local', 'rcs-official')),
+    BoolVariable('_USE_BUILD_RPATH', 'Use build/_CPPMODE/repo/lib for runtime search path (posix only)', False))
 
-opts.Add ('_LOCAL_EROS_SHAPE_DROP_DIR', 'Local eros shape drop dir to use', '/srv/pub/tmp/shape/')
-opts.Add('_REFERENCE_ENTERPRISE_HOST', 'Host where enterprise reference mysql db is stored', 'localhost')
-opts.Add('_REFERENCE_ENTERPRISE_USER', 'User name to log onto enterprise reference mysql db')
-opts.Add('_REFERENCE_ENTERPRISE_PASSWORD', 'Password to log onto enterprise reference mysql db')
-opts.Add('_BUILD_ROOT','Build root')
-opts.Add('S3VERSION','Version of the project')
+vars.Add ('_LOCAL_EROS_SHAPE_DROP_DIR', 'Local eros shape drop dir to use', '/srv/pub/tmp/shape/')
+vars.Add('_REFERENCE_ENTERPRISE_HOST', 'Host where enterprise reference mysql db is stored', 'localhost')
+vars.Add('_REFERENCE_ENTERPRISE_USER', 'User name to log onto enterprise reference mysql db')
+vars.Add('_REFERENCE_ENTERPRISE_PASSWORD', 'Password to log onto enterprise reference mysql db')
+vars.Add('_BUILD_ROOT','Build root')
+vars.Add('S3VERSION','Version of the project')
 
 
-opts.Add('CC', 'C compiler to use.')
-opts.Add('CXX', 'C++ compiler to use.')
+vars.Add('CC', 'C compiler to use.')
+vars.Add('CXX', 'C++ compiler to use.')
 
 # note : specifying doxygen as a tool will call generate on doxygen.py toolpath
 # TODO: add option for selecting between x86 and x86_64?
-env = Environment(ENV = os.environ, options=opts, tools= ['default', 'merge', 'bjam',
+env = Environment(ENV = os.environ, variables=vars, tools= ['default', 'merge', 'bjam',
                                                           'doxygen', 'untar', 'unzip',
                                                           'test', 'makedef', 'msvsproject',
                                                           'msvssolution', 'msvsphpproject', 'deb',
@@ -48,7 +49,7 @@ env = Environment(ENV = os.environ, options=opts, tools= ['default', 'merge', 'b
                                                           ], TARGET_ARCH='x86',
                                                           MSVC_VERSION='9.0')
 env.Decider('MD5-timestamp')
-Help(opts.GenerateHelpText(env))
+Help(vars.GenerateHelpText(env))
 
 
 env.Replace ( _PLATFORM = str (Platform()))
