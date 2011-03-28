@@ -80,14 +80,14 @@ namespace synthese
 		{
 			throw CoordinatesSystemNotFoundException(srid);
 		}
-		return it->second;
+		return *(it->second);
 	}
 
 
 
 	void CoordinatesSystem::AddCoordinatesSystem( SRID srid, const std::string& name, const std::string& projSequence )
 	{
-		_coordinates_systems[srid] = CoordinatesSystem(srid,name, projSequence);
+		_coordinates_systems.insert(make_pair(srid, new CoordinatesSystem(srid, name, projSequence)));
 	}
 
 
@@ -119,6 +119,11 @@ namespace synthese
 		_degrees(contains(projSequence,"+proj=longlat"))
 	{}
 
+
+
+	CoordinatesSystem::~CoordinatesSystem() {
+		pj_free(_projObject);
+	}
 
 
 
