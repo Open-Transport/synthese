@@ -217,6 +217,10 @@ namespace synthese
 			///		<li>http://www.rfc-editor.org/rfc/rfc1738.txt</li>
 			///	</ul>
 			static std::string URLEncode(const std::string& value);
+
+		private:
+			/// Sets headers in the given HTTPReply from the cookies stored in cookiesMap.
+			static void _SetCookieHeaders(HTTPReply& httpReply, const Request::CookiesMap& cookiesMap);
 		};
 	}
 	/** @} */

@@ -30,6 +30,8 @@
 #include "Function.h"
 #include "SessionException.h"
 
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -132,6 +134,26 @@ namespace synthese
 			{
 				ParametersMap getMap(uri.substr(separator+1));
 				_parametersMap.merge(getMap);
+			}
+
+			// Cookies
+			it = httpRequest.headers.find("Cookie");
+			if(it != httpRequest.headers.end())
+			{
+				vector<string> cookies;
+				boost::algorithm::split(cookies, it->second, is_any_of(";"));
+				BOOST_FOREACH(const string& cookie, cookies)
+				{
+					vector<string> nameValue;
+					string trimmedCookie(cookie);
+					boost::trim(trimmedCookie);
+					boost::algorithm::split(nameValue, trimmedCookie, is_any_of("="));
+
+					if (nameValue.size() != 2)
+						continue;
+					// TODO: proper unescaping of cookie values
+					_parametersMap.insert(nameValue[0], nameValue[1]);
+				}
 			}
 
 			// Action will create object
