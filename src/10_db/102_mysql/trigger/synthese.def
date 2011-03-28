@@ -1,0 +1,5 @@
+LIBRARY		synthese
+VERSION		1.0
+EXPORTS
+  notify_synthese_http_init
+  notify_synthese_http

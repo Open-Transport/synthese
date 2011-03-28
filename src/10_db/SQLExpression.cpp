@@ -138,36 +138,43 @@ namespace synthese
 
 
 
-		boost::shared_ptr<SQLExpression> ValueExpression<std::string>::Get( const std::string& value )
+		boost::shared_ptr<SQLExpression> ValueExpression<std::string>::Get(const std::string& value)
 		{
 			return boost::shared_ptr<SQLExpression>(
 				static_cast<SQLExpression*>(new ValueExpression<std::string>(value))
-				);
+			);
 		}
 
 
-		boost::shared_ptr<SQLExpression> ValueExpression<boost::posix_time::ptime>::Get( const boost::posix_time::ptime& value )
+		boost::shared_ptr<SQLExpression> ValueExpression<boost::posix_time::ptime>::Get(const boost::posix_time::ptime& value)
 		{
 			return boost::shared_ptr<SQLExpression>(
 				static_cast<SQLExpression*>(new ValueExpression<boost::posix_time::ptime>(value))
-				);
+			);
 		}
 
 
-		boost::shared_ptr<SQLExpression> ValueExpression<boost::gregorian::date>::Get( const boost::gregorian::date& value )
+		boost::shared_ptr<SQLExpression> ValueExpression<boost::gregorian::date>::Get(const boost::gregorian::date& value)
 		{
 			return boost::shared_ptr<SQLExpression>(
 				static_cast<SQLExpression*>(new ValueExpression<boost::gregorian::date>(value))
-				);
+			);
 		}
 
 
-		boost::shared_ptr<SQLExpression> ValueExpression<boost::logic::tribool>::Get( const boost::logic::tribool& value )
+		boost::shared_ptr<SQLExpression> ValueExpression<boost::logic::tribool>::Get(const boost::logic::tribool& value)
 		{
 			return boost::shared_ptr<SQLExpression>(
 				static_cast<SQLExpression*>(new ValueExpression<boost::logic::tribool>(value))
-				);
+			);
 		}
 
+
+		boost::shared_ptr<SQLExpression> ValueExpression<RawSQL>::Get(const RawSQL& value)
+		{
+			return boost::shared_ptr<SQLExpression>(
+				static_cast<SQLExpression*>(new ValueExpression<RawSQL>(value))
+			);
+		}
 	}
 }

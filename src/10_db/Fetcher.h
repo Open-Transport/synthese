@@ -26,7 +26,7 @@
 #include "Factory.h"
 #include "UtilTypes.h"
 #include "DBTypes.h"
-#include "SQLiteTransaction.h"
+#include "DBTransaction.hpp"
 #include "Env.h"
 
 #include <boost/lexical_cast.hpp>
@@ -65,12 +65,12 @@ namespace synthese
 
 			virtual void _save(
 				BaseClass& object,
-				boost::optional<SQLiteTransaction&> transaction
+				boost::optional<DBTransaction&> transaction
 			) const = 0;
 
 			virtual void _remove(
 				const BaseClass& object,
-				boost::optional<SQLiteTransaction&> transaction
+				boost::optional<DBTransaction&> transaction
 			) const = 0;
 
 		public:
@@ -100,7 +100,7 @@ namespace synthese
 
 			static void FetchSave(
 				BaseClass& object,
-				boost::optional<SQLiteTransaction&> transaction = boost::optional<SQLiteTransaction&>()
+				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()
 			){
 				std::string ts(boost::lexical_cast<std::string>(util::decodeTableId(object.getKey())));
 				std::auto_ptr<Fetcher<BaseClass> > pf(util::Factory<Fetcher<BaseClass> >::create(ts));
@@ -111,7 +111,7 @@ namespace synthese
 
 			static void FetchRemove(
 				const BaseClass& object,
-				boost::optional<SQLiteTransaction&> transaction = boost::optional<SQLiteTransaction&>()
+				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()
 			){
 				std::string ts(boost::lexical_cast<std::string>(util::decodeTableId(object.getKey())));
 				std::auto_ptr<Fetcher<BaseClass> > pf(util::Factory<Fetcher<BaseClass> >::create(ts));

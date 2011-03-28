@@ -22,8 +22,8 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef SYNTHESE_db_Constants_h__
-#define SYNTHESE_db_Constants_h__
+#ifndef SYNTHESE_db_DBConstants_h__
+#define SYNTHESE_db_DBConstants_h__
 
 #include <string>
 
@@ -42,15 +42,9 @@ namespace synthese
 		static const std::string CONFIG_TABLE_NAME ("t999_config");
 		static const std::string CONFIG_TABLE_COL_PARAMNAME ("param_name");
 		static const std::string CONFIG_TABLE_COL_PARAMVALUE ("param_value");
-		static const std::string CONFIG_TABLE_COL_PARAMVALUE_TRIGGERSENABLED ("triggers_enabled");
-
-		static const std::string TRIGGERS_ENABLED_CLAUSE (
-			"(SELECT " + CONFIG_TABLE_COL_PARAMVALUE
-			+ " FROM " + CONFIG_TABLE_NAME + " WHERE " + CONFIG_TABLE_COL_PARAMNAME
-			+ "='" + CONFIG_TABLE_COL_PARAMVALUE_TRIGGERSENABLED + "')");
 
 		/** @} */
 	}
 }
 
-#endif // SYNTHESE_db_Constants_h__
+#endif // SYNTHESE_db_DBConstants_h__
