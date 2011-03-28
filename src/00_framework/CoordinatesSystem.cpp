@@ -92,6 +92,13 @@ namespace synthese
 
 
 
+	void CoordinatesSystem::ClearCoordinatesSystems()
+	{
+		_coordinates_systems.clear();
+	};
+
+
+
 	void CoordinatesSystem::SetDefaultCoordinatesSystems( SRID instanceSRID )
 	{
 		_instanceCoordinatesSystem = &GetCoordinatesSystem(instanceSRID);
