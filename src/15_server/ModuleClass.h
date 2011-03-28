@@ -78,10 +78,13 @@ namespace synthese
 		
 		protected:
 		
-		    static void RegisterParameter(
-		    	const std::string& name,
+			static void RegisterParameter(
+				const std::string& name,
 				const std::string& defaultValue,
 				PtrCallback cb
+			);
+			static void UnregisterParameter(
+				const std::string& name
 			);
 
 		

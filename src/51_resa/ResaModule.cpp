@@ -155,6 +155,8 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<ResaModule>::End()
 		{
+			UnregisterParameter(ResaModule::_RESERVATION_CONTACT_PARAMETER);
+			UnregisterParameter(ResaModule::_JOURNEY_PLANNER_WEBSITE);
 		}
 	}
 
