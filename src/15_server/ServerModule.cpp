@@ -220,11 +220,14 @@ namespace synthese
 				{
 					rep.headers.insert(make_pair("Content-Disposition", "attachement; filename="+ request.getFunction()->getFileName()));
 				}
+
+				_SetCookieHeaders(rep, request.getCookiesMap());
 			}
 			catch(Request::RedirectException& e)
 			{
 				rep = HTTPReply::stock_reply(e.getPermanently() ? HTTPReply::moved_permanently : HTTPReply::moved_temporarily);
 				rep.headers.insert(make_pair("Location", e.getLocation()));
+				_SetCookieHeaders(rep, e.getCookiesMap());
 			}
 			catch(Request::ForbiddenRequestException& e)
 			{
@@ -576,6 +579,23 @@ namespace synthese
 		const char* ServerModule::ThreadInfo::Exception::what() const throw()
 		{
 			return "Current thread is unregistered. Cannot retrieve thread info.";
+		}
+
+
+
+		void ServerModule::_SetCookieHeaders(HTTPReply& httpReply, const Request::CookiesMap& cookiesMap)
+		{
+			BOOST_FOREACH(const Request::CookiesMap::value_type &cookie, cookiesMap)
+			{
+				// TODO: proper escaping of cookie values
+				httpReply.headers.insert(
+					make_pair(
+						"Set-Cookie",
+						cookie.first + "=" + cookie.second.first +
+						"; Max-Age=" + lexical_cast<string>(cookie.second.second) + ";"
+					)
+				);
+			}
 		}
 	}
 }

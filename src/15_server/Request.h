@@ -102,6 +102,8 @@ namespace synthese
 		class Request
 		{
 		public:
+			typedef std::map<std::string, std::pair<std::string, int> > CookiesMap;
+
 			/** Exception asking the server to redirect.
 				@ingroup m15
 			*/
@@ -110,13 +112,25 @@ namespace synthese
 			{
 				const std::string _location;
 				const bool _permanently;
+				CookiesMap _cookiesMap;
 
 			public:
 				//////////////////////////////////////////////////////////////////////////
 				/// Constructor.
 				/// @param location location where the request must be redirected
 				/// @param permanently true=301 redirection, else 302
-				RedirectException(const std::string& location, bool permanently): _location(location), _permanently(permanently) {}
+				/// @param cookiesMap map of cookies to send
+				RedirectException(
+					const std::string& location,
+					bool permanently,
+					const boost::optional<const CookiesMap&> cookiesMap = boost::optional<const CookiesMap&>()
+				): 
+					_location(location),
+					_permanently(permanently)
+				{
+					if (cookiesMap)
+						_cookiesMap = *cookiesMap;
+				}
 
 				virtual ~RedirectException() throw() {}
 
@@ -124,6 +138,7 @@ namespace synthese
 				//@{
 					const std::string& getLocation() { return _location; }
 					bool getPermanently() const { return _permanently; }
+					const CookiesMap& getCookiesMap() const { return _cookiesMap; }
 				//@}
 			};
 
@@ -169,6 +184,9 @@ namespace synthese
 			bool									_redirectAfterAction;
 			std::string								_actionErrorMessage;
 
+		private:
+			CookiesMap _cookiesMap;
+
 		public:
 			Request();
 			explicit Request(
@@ -200,7 +218,7 @@ namespace synthese
 				boost::shared_ptr<const Action> getAction() const { return boost::const_pointer_cast<const Action>(_action); }
 				boost::shared_ptr<Function> getFunction() { return _function; }
 				boost::shared_ptr<const Function> getFunction() const { return boost::const_pointer_cast<const Function>(_function); }
-
+				const CookiesMap& getCookiesMap() const;
 			//@}
 
 			//! \name Setters
@@ -216,6 +234,7 @@ namespace synthese
 					@date 2007
 				*/
 				void setClientURL(const std::string& url) { _clientURL = url; }
+				void setCookie(std::string name, std::string value, int maxAge);
 			//@}
 
 			//! \name Modifiers
@@ -293,7 +312,6 @@ namespace synthese
 			}
 			return _session->getUser()->getProfile()->isAuthorized<R>(publicr, privater, parameter);
 		}
-
 	}
 }
 #endif // SYNTHESE_Request_H__
