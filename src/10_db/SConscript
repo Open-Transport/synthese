@@ -1,14 +1,21 @@
 Import ('s3env')
 
+dependencies = [
+	's3-server.cpplib',
+	's3-util-threads.cpplib',
+	's3-util.cpplib',
+	'spatialite.cpplib',
+	's3-framework.cpplib',
+	's3-db-sqlite.cpplib',
+]
+
+if s3env['_WITH_MYSQL']:
+	dependencies.append('s3-db-mysql.cpplib')
+
 CppSynthese3LibProject(
 	s3env, 's3-db', s3env['S3VERSION'], 
     source_files = s3env.Glob ('*.cpp'),
-    dependencies = [
-		's3-server.cpplib',
-    	's3-util-threads.cpplib',
-    	's3-util.cpplib',
-    	'spatialite.cpplib',
-    	's3-framework.cpplib'
-    ]
+    dependencies = dependencies,
 )
 
+s3env.SubBuild ()

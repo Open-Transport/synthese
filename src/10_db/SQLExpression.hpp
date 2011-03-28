@@ -116,6 +116,14 @@ namespace synthese
 			static boost::shared_ptr<SQLExpression> Get(boost::shared_ptr<SQLExpression> expr1, std::string op, boost::shared_ptr<SQLExpression> expr2);
 		};
 
+		class RawSQL
+		{
+			const std::string _sql;
+		public:
+			RawSQL(const std::string& sql) : _sql(sql) {}
+			const std::string& getSQL() const { return _sql; }
+		};
+
 		template<class T>
 		class ValueExpression:
 			public SQLExpression
@@ -328,6 +336,20 @@ namespace synthese
 			}
 		};
 
+
+
+		template<>
+		class ValueExpression<RawSQL>:
+			public SQLExpression
+		{
+			std::string _value;
+		public:
+			ValueExpression(const RawSQL& value) {
+				_value = value.getSQL();
+			}
+			virtual std::string toString() const { return _value; }
+			static boost::shared_ptr<SQLExpression> Get(const RawSQL& value);
+		};
 
 
 

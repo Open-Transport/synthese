@@ -23,10 +23,10 @@
 #ifndef SYNTHESE_db_SelectQuery_hpp__
 #define SYNTHESE_db_SelectQuery_hpp__
 
-#include "SQLiteResult.h"
+#include "DBResult.hpp"
 #include "DBModule.h"
 #include "SQLExpression.hpp"
-#include "SQLite.h"
+#include "DB.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -119,7 +119,7 @@ namespace synthese
 			//! @name Services
 			//@{
 				std::string toString() const;
-				SQLiteResultSPtr execute(bool cache = false) const;
+				DBResultSPtr execute() const;
 			//@}
 		};
 
@@ -400,9 +400,9 @@ namespace synthese
 
 
 		template<class Table>
-		SQLiteResultSPtr synthese::db::SelectQuery<Table>::execute( bool cache) const
+		DBResultSPtr synthese::db::SelectQuery<Table>::execute() const
 		{
-			return DBModule::GetSQLite()->execQuery(toString(), !cache);
+			return DBModule::GetDB()->execQuery(toString());
 		}
 
 	}

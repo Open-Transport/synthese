@@ -24,7 +24,7 @@
 #define SYNTHESE_db_ReplaceQuery_h__
 
 #include "DBModule.h"
-#include "SQLite.h"
+#include "DB.hpp"
 #include "SQLExpression.hpp"
 
 #include <vector>
@@ -47,6 +47,7 @@ namespace synthese
 
 			Fields _fields;
 			util::RegistryKeyType _id;
+			bool _objectAdded;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -57,12 +58,13 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// If the id of the object is not defined, then the object is updated by
 			/// applying auto increment on it.
-			ReplaceQuery(
-				typename TableSync::ObjectType& object
-			){
+			ReplaceQuery(typename TableSync::ObjectType& object) :
+				_objectAdded(false)
+			{
 				if(object.getKey() == 0)
 				{
 					object.setKey(TableSync::getId());
+					_objectAdded = true;
 				}
 				_id = object.getKey();
 			}
@@ -98,7 +100,7 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			void execute(
-				boost::optional<SQLiteTransaction&> transaction
+				boost::optional<DBTransaction&> transaction
 			) const;
 		};
 
@@ -125,18 +127,32 @@ namespace synthese
 
 
 		template<class TableSync>
-		void ReplaceQuery<TableSync>::execute( boost::optional<SQLiteTransaction&> transaction ) const
+		void ReplaceQuery<TableSync>::execute(boost::optional<DBTransaction&> transaction) const
 		{
 			std::stringstream query;
 			query
-				<< " REPLACE INTO " << TableSync::TABLE.NAME << " VALUES("
+				<< "REPLACE INTO " << TableSync::TABLE.NAME << " VALUES("
 				<< _id;
 			BOOST_FOREACH(const Fields::value_type& field, _fields)
 			{
 				query << std::fixed << "," << field->toString();
 			}
 			query << ");";
-			DBModule::GetSQLite()->execUpdate(query.str(), transaction);
+			DB* db = DBModule::GetDB();
+			db->execUpdate(query.str(), transaction);
+
+			db->addDBModifEvent(
+				DB::DBModifEvent(
+					TableSync::TABLE.NAME,
+					_objectAdded ? DB::MODIF_INSERT : DB::MODIF_UPDATE,
+					_id
+				),
+				transaction
+			);
+
+#ifdef DO_VERIFY_TRIGGER_EVENTS
+			db->checkModificationEvents();
+#endif
 		}
 
 

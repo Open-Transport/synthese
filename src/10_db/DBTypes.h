@@ -28,17 +28,21 @@ namespace synthese
 	namespace db
 	{
 		////////////////////////////////////////////////////////////////////
-		/// SQLite data types (see http://www.sqlite.org/datatype3.html and http://www.gaia-gis.it/spatialite/spatialite-sql-2.3.1.html#p16)
+		/// Database column types.
 		typedef enum
 		{
 			SQL_INTEGER,
 			SQL_DOUBLE,
 			SQL_TEXT,
-			SQL_REAL,
+			// Text with a fixed length. It has to be used instead of SQL_TEXT on the first column.
+			// That's because MySQL creates a primary key on the first column, and needs a fixed
+			// length if the type is text.
+			// TODO: remove this workaround once we use VARCHAR with a fixed length on MySQL.
+			SQL_TEXT_FIXED,
 			SQL_BOOLEAN,
-			SQL_TIME,
+			SQL_DATETIME,
 			SQL_DATE,
-			SQL_TIMESTAMP,
+			SQL_TIME,
 			SQL_GEOM_POINT,
 			SQL_GEOM_LINESTRING,
 			SQL_GEOM_POLYGON,

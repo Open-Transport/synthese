@@ -22,7 +22,7 @@
 
 #include "SQLiteVirtualTable.hpp"
 #include "DBModule.h"
-#include "SQLite.h"
+#include "DB.hpp"
 
 #include <sstream>
 
@@ -42,7 +42,7 @@ namespace synthese
 				"DROP TABLE IF EXISTS " << _name << ";" <<
 				"CREATE VIRTUAL TABLE " << _name << " USING " << using_param << ";"
 			;
-			DBModule::GetSQLite()->execUpdate(s.str());
+			DBModule::GetDB()->execUpdate(s.str());
 		}
 
 
@@ -51,7 +51,7 @@ namespace synthese
 		{
 			stringstream s;
 			s << "DROP TABLE " << _name << ";";
-			DBModule::GetSQLite()->execUpdate(s.str());
+			DBModule::GetDB()->execUpdate(s.str());
 		}
 	}
 }

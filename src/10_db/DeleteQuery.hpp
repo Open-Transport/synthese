@@ -24,14 +24,17 @@
 #define SYNTHESE_db_DeleteQuery_hpp__
 
 #include "SQLExpression.hpp"
-#include "SQLiteTransaction.h"
-#include "SQLite.h"
+#include "DBTransaction.hpp"
+#include "DB.hpp"
 #include "DBModule.h"
 
 #include <vector>
 #include <utility>
 #include <boost/shared_ptr.hpp>
 #include <boost/optional.hpp>
+
+using std::string;
+using std::vector;
 
 namespace synthese
 {
@@ -70,9 +73,12 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				std::string toString() const;
-				void execute(boost::optional<SQLiteTransaction&> transaction = boost::optional<SQLiteTransaction&>()) const;
+				void execute(boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()) const;
 			//@}
+
+		private:
+			std::string _fromWhereQueryPart() const;
+
 		};
 
 
@@ -99,10 +105,9 @@ namespace synthese
 
 
 		template<class Table>
-		std::string DeleteQuery<Table>::toString() const
+		std::string DeleteQuery<Table>::_fromWhereQueryPart() const
 		{
 			std::stringstream s;
-			s << "DELETE";
 
 			// Tables
 			s << " FROM " << Table::TABLE.NAME;
@@ -145,15 +150,47 @@ namespace synthese
 				s << " LIMIT " << _number;
 			}
 
+			s << ";";
 			return s.str();
 		}
 
 
 
 		template<class Table>
-		void DeleteQuery<Table>::execute(boost::optional<SQLiteTransaction&> transaction) const
+		void DeleteQuery<Table>::execute(boost::optional<DBTransaction&> transaction) const
 		{
-			return DBModule::GetSQLite()->execUpdate(toString(), transaction);
+			// TODO: this should run inside of a transaction, an id could appear or disappear between the SELECT and the DELETE.
+
+			DB* db = DBModule::GetDB();
+
+			string selectQuery("SELECT " + TABLE_COL_ID + " " + _fromWhereQueryPart());
+			DBResultSPtr rows = db->execQuery(selectQuery);
+
+			// TODO: call rowRemoved directly from this loop once checkModificationEvents() infrastructure is removed.
+			vector<util::RegistryKeyType> removedIds;
+			while (rows->next())
+			{
+				removedIds.push_back(rows->getLongLong(TABLE_COL_ID));
+			}
+
+			string deleteQuery("DELETE " + _fromWhereQueryPart());
+			db->execUpdate(deleteQuery, transaction);
+
+			BOOST_FOREACH(util::RegistryKeyType removedId, removedIds)
+			{
+				db->addDBModifEvent(
+					DB::DBModifEvent(
+						Table::TABLE.NAME,
+						DB::MODIF_DELETE,
+						removedId
+					),
+					transaction
+				);
+			}
+
+#ifdef DO_VERIFY_TRIGGER_EVENTS
+			db->checkModificationEvents();
+#endif
 		}
 	}
 }
