@@ -14,8 +14,21 @@
 #include <string>
 #include <map>
 
+#include <boost/algorithm/string/predicate.hpp>
+#include <boost/function.hpp>
+
 namespace synthese
 {
+	namespace
+	{
+		bool str_iless(std::string const & a, std::string const & b)
+		{
+			return boost::algorithm::lexicographical_compare(a, b, boost::is_iless());
+		}
+	}
+
+
+
 	namespace server
 	{
 		/// addtogroup m15
@@ -24,7 +37,11 @@ namespace synthese
 		/// A request received from a client.
 		struct HTTPRequest
 		{
-			typedef std::map<std::string, std::string> Headers;
+			/// Case insensitive map for storing the headers to match the HTTP spec.
+			typedef std::map<
+				std::string,
+				std::string,
+				boost::function<bool(std::string const &, std::string const &)> > Headers;
 			typedef Headers::value_type Header;
 
 			std::string method;
@@ -34,6 +51,10 @@ namespace synthese
 			int http_version_minor;
 			Headers headers;
 			std::string postData;
+
+			HTTPRequest() : headers(&str_iless)
+			{
+			}
 		};
 
 		/// @}
