@@ -186,8 +186,8 @@ namespace synthese
 				result.push_back('\'');
 			for (size_t i=0; i<s.size(); ++i)
 			{
-				// Escape several characters
-				if (s.at(i) == '\'' || s.at(i) == '\'')
+				// Escape single quotes
+				if (s.at(i) == '\'')
 					result.push_back('\'');
 				
 				result.push_back(s.at(i));
