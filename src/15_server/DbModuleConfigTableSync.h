@@ -40,7 +40,10 @@ namespace synthese
 {
 	namespace db
 	{
-		class SQLite;
+		// YYY
+		//class SQLite;
+		class DB;
+		typedef DB SQLite;
 	}
 	
 	namespace server
@@ -74,7 +77,7 @@ namespace synthese
 			void rowsRemoved(
 				db::SQLite* sqlite,
 				db::SQLiteSync* sync,
-				const db::SQLiteResultSPtr& rows
+				const db::RowIdList& rowIds
 			);
 		};
 	}

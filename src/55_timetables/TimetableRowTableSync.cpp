@@ -27,7 +27,6 @@
 #include "SelectQuery.hpp"
 #include "StopAreaTableSync.hpp"
 #include "DBModule.h"
-#include "SQLite.h"
 #include "SQLiteResult.h"
 
 using namespace std;

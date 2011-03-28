@@ -32,7 +32,6 @@
 #include "TransportWebsiteTableSync.h"
 #include "DBModule.h"
 #include "SQLiteResult.h"
-#include "SQLite.h"
 #include "SQLiteException.h"
 
 #include <boost/lexical_cast.hpp>

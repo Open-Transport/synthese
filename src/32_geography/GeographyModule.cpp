@@ -28,7 +28,6 @@
 #include "CoordinatesSystem.hpp"
 #include "DBModule.h"
 #include "SQLiteResult.h"
-#include "SQLite.h"
 
 #include <sstream>
 #include <boost/iostreams/filtering_stream.hpp>

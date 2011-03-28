@@ -21,7 +21,6 @@
 */
 
 #include "DBModule.h"
-#include "SQLite.h"
 #include "StopAreaTableSync.hpp"
 #include "CityTableSync.h"
 #include "StopPointTableSync.hpp"

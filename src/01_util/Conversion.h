@@ -111,6 +111,8 @@ namespace synthese
 					- escape some characters
 					- add apostrophes at the beginning and at the end of the string
 			*/
+			static std::string ToDBString (const std::string& s, bool withApostrophes=true);
+			// YYY compat, to be removed
 			static std::string ToSQLiteString (const std::string& s, bool withApostrophes=true);
 
 			static std::string ToFixedSizeString(int number, int size);

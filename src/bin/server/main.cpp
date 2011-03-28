@@ -198,7 +198,7 @@ int main( int argc, char **argv )
     try 
     {
 		{
-			std::string db;
+			std::string dbConnString;
 			std::string pidf;
 			std::string logf;
 			std::vector<std::string> params;
@@ -208,7 +208,9 @@ int main( int argc, char **argv )
 			po::options_description desc("Allowed options");
 			desc.add_options()
 				("help", "produce this help message")
-				("db", po::value<std::string>(&db)->default_value (std::string ("config.db3")), "SQLite database file")
+				("dbconn", po::value<std::string>(&dbConnString)->default_value(std::string ("sqlite://path=config.db3")),
+				 "Database connection string, using format <backend>://<backend_specific_parameters> "
+				 "(see backend documentation for the meaning of backend specific parameters).")
 #ifndef WIN32
 				("daemon", "Run server in daemon mode")
 #endif        
@@ -261,10 +263,8 @@ int main( int argc, char **argv )
 			}
 #endif        
 
-			boost::filesystem::path dbpath (createCompletePath (db));
 			boost::filesystem::path logFile (createCompletePath (logf));
 
-			ensureWritablePath (dbpath, false);
 			std::ostream* logStream = &std::cout;
 			if (logf != "-")
 			{
@@ -300,7 +300,7 @@ int main( int argc, char **argv )
 
 			synthese::Language::Populate();
 			ModuleClass::SetDefaultParameters (defaultParams);
-			DBModule::SetDatabasePath (dbpath);
+			DBModule::SetConnectionString(dbConnString);
 
 			// Initialize modules
 			//		if (Factory<ModuleClass>::size() == 0)
