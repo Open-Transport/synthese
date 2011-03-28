@@ -117,18 +117,35 @@ namespace synthese
 			/// Subclass automatic registration.
 			///	@throw EnvException if a registry class is already integrated with the same key
 			//////////////////////////////////////////////////////////////////////////
+			// TODO: rename to Register for consistency?
 			template <class R>
 			static void Integrate()
 			{
-				Log::GetInstance ().debug ("Registering registry... " + Registry<R>::KEY);
+				Log::GetInstance().debug("Registering registry... " + Registry<R>::KEY);
 
-				// If the key is already used then throw exception
 				if(_registryCreators.find(Registry<R>::KEY) != _registryCreators.end())
-					throw util::EnvException(Registry<R>::KEY);
+					throw util::EnvException("Attempted to integrate a registry class twice " + Registry<R>::KEY);
 
 				// Saving of the auto generated builder
 				boost::shared_ptr<RegistryCreatorInterface> creator(new RegistryCreator<R>);
 				_registryCreators.insert(make_pair(Registry<R>::KEY, creator));
+			}
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Subclass automatic registration.
+			///	@throw EnvException if no registry class is already integrated with the given key
+			//////////////////////////////////////////////////////////////////////////
+			template <class R>
+			static void Unregister()
+			{
+				Log::GetInstance().debug("Unregistering registry... " + Registry<R>::KEY);
+
+				if(_registryCreators.find(Registry<R>::KEY) == _registryCreators.end())
+					throw util::EnvException("Attempted to unregister a registry class not registered " + Registry<R>::KEY);
+
+				_registryCreators.erase(Registry<R>::KEY);
 			}
 
 
