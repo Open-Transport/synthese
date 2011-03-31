@@ -39,21 +39,36 @@ class WSGIProxy(object):
         if env.static_dir:
             self.other_static_app = static.Cling(env.static_dir)
 
+    def _redirect(self, environ, start_response, url):
+        if not url.startswith('http://'):
+            url = 'http://' + environ['HTTP_HOST'] + url
+        start_response('302 Found', [
+            ('Location', url),
+            ('Content-type', 'text/plain')])
+        return '302 Found'
+
     def __call__(self, environ, start_response):
         path_info = environ['PATH_INFO']
         is_admin = path_info.startswith(self.ADMIN_PREFIXES)
+
+        if path_info == '/':
+            return self._redirect(
+                environ,
+                start_response,
+                self.ADMIN_PREFIXES[0] +
+                self.SYNTHESE_SUFFIXES[0].replace('/', '') +
+                self.DEFAULT_ADMIN_QUERYSTRING
+            )
 
         if path_info.endswith(self.SYNTHESE_SUFFIXES):
             if (is_admin and
                 environ['REQUEST_METHOD'] == 'GET' and
                 not environ['QUERY_STRING']):
-                new_location = ('http://' + environ['HTTP_HOST'] +
-                    path_info +
-                    self.DEFAULT_ADMIN_QUERYSTRING)
-                start_response('302 Found', [
-                    ('Location', new_location),
-                    ('Content-type', 'text/plain')])
-                return '302 Found'
+                return self._redirect(
+                    environ,
+                    start_response,
+                    path_info + self.DEFAULT_ADMIN_QUERYSTRING
+                )
 
             # Force utf-8 content type
             def start_response_wrapper(status, headers):
