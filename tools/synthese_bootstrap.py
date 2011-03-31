@@ -26,9 +26,10 @@ class BootstrapEnv(object):
         env_classes = [SconsEnv, CMakeEnv, InstalledEnv]
 
         bootstrap_script = os.environ.get('SYNTHESE_BOOTSTRAP_SCRIPT', __file__)
+        bootstrap_script = os.path.abspath(bootstrap_script)
 
         env_path = None
-        
+
         for env_class in env_classes:
             env_path = env_class.get_env_path_from_bootstrap_script(bootstrap_script)
             if env_path:
