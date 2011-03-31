@@ -1,0 +1,77 @@
+
+set(security_SRCS
+AddProfileAction.cpp
+AddProfileAction.h
+AddRightAction.cpp
+AddRightAction.h
+AddUserAction.cpp
+AddUserAction.h
+DefaultRight.h
+DeleteProfileAction.cpp
+DeleteProfileAction.h
+DeleteRightAction.cpp
+DeleteRightAction.h
+DelUserAction.cpp
+DelUserAction.h
+GlobalRight.cpp
+GlobalRight.h
+Profile.cpp
+Profile.h
+ProfileAdmin.cpp
+ProfileAdmin.h
+ProfilesAdmin.cpp
+ProfilesAdmin.h
+ProfileTableSync.cpp
+ProfileTableSync.h
+Right.cpp
+Right.h
+RightTemplate.h
+SecurityConstants.hpp
+SecurityLog.cpp
+SecurityLog.h
+SecurityModule.cpp
+SecurityModule.h
+SecurityRight.cpp
+SecurityRight.h
+SecurityTypes.hpp
+UpdateProfileAction.cpp
+UpdateProfileAction.h
+UpdateRightAction.cpp
+UpdateRightAction.h
+User.cpp
+User.h
+UserAdmin.cpp
+UserAdmin.h
+UserException.cpp
+UserException.h
+UserIdInterfaceElement.cpp
+UserIdInterfaceElement.h
+UserNameInterfaceElement.cpp
+UserNameInterfaceElement.h
+UserPasswordUpdateAction.cpp
+UserPasswordUpdateAction.h
+UserPhoneInterfaceElement.cpp
+UserPhoneInterfaceElement.h
+UserPrefPanel.h
+UserPrefPanelTemplate.h
+UsersAdmin.cpp
+UsersAdmin.h
+UserTableSync.cpp
+UserTableSync.h
+UserUpdateAction.cpp
+UserUpdateAction.h
+)
+
+add_library(12_security ${security_SRCS})
+
+target_link_libraries(12_security
+  # Forward dependencies:
+  #15_server
+  #14_admin
+  13_dblog
+  11_interfaces
+  10_db
+  05_html
+)
+
+install(TARGETS 12_security DESTINATION lib)
