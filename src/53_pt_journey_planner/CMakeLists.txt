@@ -1,0 +1,17 @@
+
+set(pt_journey_planner_SRCS
+PTRoutePlannerInputFunction.cpp
+PTRoutePlannerInputFunction.hpp
+PTRoutePlannerModule.cpp
+PTRoutePlannerModule.h
+PTRoutePlannerResult.cpp
+PTRoutePlannerResult.h
+PTTimeSlotRoutePlanner.cpp
+PTTimeSlotRoutePlanner.h
+RoutePlannerFunction.cpp
+RoutePlannerFunction.h
+)
+
+add_library(53_pt_journey_planner ${pt_journey_planner_SRCS})
+
+install(TARGETS 53_pt_journey_planner DESTINATION lib)
