@@ -1,7 +1,0 @@
-Import ('s3env')
-
-CppTestProject(
-	s3env, 's3-db-test', s3env['S3VERSION'],
-	source_files = s3env.Glob ('*Test.cpp'),
-	dependencies = ['s3-db.cpplib']
-)
