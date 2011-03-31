@@ -1,0 +1,37 @@
+
+set(hiking_SRCS
+HikingModule.cpp
+HikingModule.h
+HikingRight.cpp
+HikingRight.h
+HikingTrail.cpp
+HikingTrail.h
+HikingTrailAddAction.cpp
+HikingTrailAddAction.h
+HikingTrailAdmin.cpp
+HikingTrailAdmin.h
+HikingTrailDisplayFunction.cpp
+HikingTrailDisplayFunction.h
+HikingTrailMultipleRoutePlannerFunction.cpp
+HikingTrailMultipleRoutePlannerFunction.hpp
+HikingTrailRemoveAction.cpp
+HikingTrailRemoveAction.h
+HikingTrailsAdmin.cpp
+HikingTrailsAdmin.h
+HikingTrailSearchFormInterfaceElement.cpp
+HikingTrailSearchFormInterfaceElement.h
+HikingTrailSearchFunction.cpp
+HikingTrailSearchFunction.h
+HikingTrailStopAddAction.cpp
+HikingTrailStopAddAction.hpp
+HikingTrailStopRemoveAction.cpp
+HikingTrailStopRemoveAction.hpp
+HikingTrailTableSync.cpp
+HikingTrailTableSync.h
+HikingTrailUpdateAction.cpp
+HikingTrailUpdateAction.h
+)
+
+add_library(58_hiking ${hiking_SRCS})
+
+install(TARGETS 58_hiking DESTINATION lib)

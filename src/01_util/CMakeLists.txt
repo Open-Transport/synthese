@@ -1,0 +1,65 @@
+
+set(util_SRCS
+AlphanumericFilter.h
+ConcurrentQueue.hpp
+ConstantReturner.h
+Conversion.cpp
+Conversion.h
+EMail.cpp
+EMail.h
+Env.cpp
+Env.h
+EnvException.cpp
+EnvException.h
+FactorableTemplate.h
+Factory.h
+FactoryBase.h
+FactoryException.h
+Log.cpp
+Log.h
+LowerCaseFilter.h
+MacAddressGetter.cpp
+MacAddressGetter.h
+MD5.cpp
+MD5.h
+MD5Wrapper.cpp
+MD5Wrapper.h
+Named.h
+ObjectNotFoundException.h
+ObjectNotFoundInRegistryException.h
+PlainCharFilter.h
+Registrable.cpp
+Registrable.h
+Registry.h
+RegistryBase.cpp
+RegistryBase.h
+RegistryException.h
+RegistryKeyException.h
+RGBColor.cpp
+RGBColor.h
+SqlFilter.h
+T9Filter.h
+UniqueStringsSet.cpp
+UniqueStringsSet.h
+UtilConstants.h
+UtilTypes.cpp
+UtilTypes.h
+XmlException.cpp
+XmlException.h
+XmlParser.cpp
+XmlParser.h
+XmlToolkit.cpp
+XmlToolkit.h
+concurrent/SynchronizedQueue.h
+)
+
+add_library(01_util ${util_SRCS})
+
+target_link_libraries(01_util 00_framework)
+target_link_libraries(01_util 01_util_iostreams)
+target_link_libraries(01_util 01_util_threads)
+
+add_subdirectory(iostreams)
+add_subdirectory(threads)
+
+install(TARGETS 01_util DESTINATION lib)
