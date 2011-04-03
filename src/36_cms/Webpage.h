@@ -119,7 +119,8 @@ namespace synthese
 				virtual void display(
 					std::ostream& stream,
 					const server::Request& request,
-					const server::ParametersMap& aditionalParametersMap
+					const server::ParametersMap& aditionalParametersMap,
+					const Webpage& page
 				) const = 0;
 			};
 
@@ -133,7 +134,8 @@ namespace synthese
 				virtual void display(
 					std::ostream& stream,
 					const server::Request& request,
-					const server::ParametersMap& aditionalParametersMap
+					const server::ParametersMap& aditionalParametersMap,
+					const Webpage& page
 				) const;
 			};
 
@@ -147,7 +149,8 @@ namespace synthese
 				virtual void display(
 					std::ostream& stream,
 					const server::Request& request,
-					const server::ParametersMap& aditionalParametersMap
+					const server::ParametersMap& aditionalParametersMap,
+					const Webpage& page
 				) const;
 			};
 
@@ -159,7 +162,8 @@ namespace synthese
 				virtual void display(
 					std::ostream& stream,
 					const server::Request& request,
-					const server::ParametersMap& aditionalParametersMap
+					const server::ParametersMap& aditionalParametersMap,
+					const Webpage& page
 				) const;
 			};
 
@@ -171,7 +175,8 @@ namespace synthese
 				virtual void display(
 					std::ostream& stream,
 					const server::Request& request,
-					const server::ParametersMap& aditionalParametersMap
+					const server::ParametersMap& aditionalParametersMap,
+					const Webpage& page
 				) const;
 			};
 
@@ -183,7 +188,8 @@ namespace synthese
 				virtual void display(
 					std::ostream& stream,
 					const server::Request& request,
-					const server::ParametersMap& aditionalParametersMap
+					const server::ParametersMap& aditionalParametersMap,
+					const Webpage& page
 				) const;
 			};
 
@@ -197,7 +203,8 @@ namespace synthese
 				virtual void display(
 					std::ostream& stream,
 					const server::Request& request,
-					const server::ParametersMap& aditionalParametersMap
+					const server::ParametersMap& aditionalParametersMap,
+					const Webpage& page
 				) const;
 			};
 
