@@ -119,6 +119,7 @@ namespace synthese
 			MessagesModule::MessagesByRecipientId::mapped_type messages(MessagesModule::GetMessages(_recipientId));
 		
 			size_t number(0);
+			optional<AlarmLevel> bestPriority;
 			if(_priorityOrder)
 			{
 				BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
@@ -131,10 +132,11 @@ namespace synthese
 					{
 						break;
 					}
-					if( _bestPriorityOnly && it->getLevel() != (*messages.begin())->getLevel())
+					if( _bestPriorityOnly && bestPriority && it->getLevel() != *bestPriority)
 					{
 						break;
 					}
+					bestPriority = it->getLevel();
 					if(_cmsTemplate.get())
 					{
 						MessagesObjectsCMSExporters::DisplayMessage(stream, request, _cmsTemplate, *it);
@@ -148,6 +150,14 @@ namespace synthese
 			}
 			else
 			{
+				BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
+				{
+					if(!it->getScenario()->isApplicable(_date))
+					{
+						bestPriority = it->getLevel();
+						break;
+					}
+				}
 				BOOST_REVERSE_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
 				{
 					if(!it->getScenario()->isApplicable(_date))
@@ -158,7 +168,7 @@ namespace synthese
 					{
 						break;
 					}
-					if( _bestPriorityOnly && it->getLevel() != (*messages.begin())->getLevel())
+					if( _bestPriorityOnly && it->getLevel() != *bestPriority)
 					{
 						continue;
 					}
