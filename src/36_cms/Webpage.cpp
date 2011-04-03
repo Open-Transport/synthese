@@ -317,7 +317,7 @@ namespace synthese
 					stringstream label;
 					BOOST_FOREACH(boost::shared_ptr<Node> node, static_cast<GotoNode*>(itNode->get())->direction)
 					{
-						node->display(label, request, aditionalParametersMap);
+						node->display(label, request, aditionalParametersMap, *this);
 					}
 					if(!label.str().empty())
 					{
@@ -345,7 +345,7 @@ namespace synthese
 				}
 				else
 				{
-					(*itNode)->display(stream, request, aditionalParametersMap);
+					(*itNode)->display(stream, request, aditionalParametersMap,*this);
 				}
 				++itNode;
 			}
@@ -438,7 +438,8 @@ namespace synthese
 		void Webpage::FunctionNode::display(
 			std::ostream& stream,
 			const server::Request& request,
-			const server::ParametersMap& aditionalParametersMap
+			const server::ParametersMap& aditionalParametersMap,
+			const Webpage& page
 		) const	{
 
 			// Parameters
@@ -449,7 +450,7 @@ namespace synthese
 				stringstream s;
 				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
 				{
-					node->display(s, request, aditionalParametersMap);
+					node->display(s, request, aditionalParametersMap, page);
 				}
 				pm.insert(param.first, s.str());
 				callParametersMap.insert(param.first, s.str());
@@ -486,16 +487,22 @@ namespace synthese
 
 
 
-		void Webpage::LabelNode::display( std::ostream& stream, const server::Request& request, const server::ParametersMap& aditionalParametersMap ) const
-		{
-
+		void Webpage::LabelNode::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const server::ParametersMap& aditionalParametersMap,
+			const Webpage& page
+		) const {
 		}
 
 
 
-		void Webpage::GotoNode::display( std::ostream& stream, const server::Request& request, const server::ParametersMap& aditionalParametersMap ) const
-		{
-
+		void Webpage::GotoNode::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const server::ParametersMap& aditionalParametersMap,
+			const Webpage& page
+		) const {
 		}
 
 
@@ -503,7 +510,8 @@ namespace synthese
 		void Webpage::ValueNode::display(
 			std::ostream& stream,
 			const server::Request& request,
-			const server::ParametersMap& aditionalParametersMap
+			const server::ParametersMap& aditionalParametersMap,
+			const Webpage& page
 		) const	{
 
 			if(name == "client_url")
@@ -516,7 +524,7 @@ namespace synthese
 			}
 			else if(name == "site")
 			{
-				boost::shared_ptr<const Website> site(CMSModule::GetSite(request, aditionalParametersMap));
+				boost::shared_ptr<const Website> site(page.getRoot());
 				if(site.get())
 				{
 					stream << site->getKey();
@@ -542,7 +550,8 @@ namespace synthese
 		void Webpage::IncludeNode::display(
 			std::ostream& stream,
 			const server::Request& request,
-			const server::ParametersMap& aditionalParametersMap
+			const server::ParametersMap& aditionalParametersMap,
+			const Webpage& page
 		) const	{
 
 			// Parameters
@@ -552,24 +561,28 @@ namespace synthese
 				stringstream s;
 				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
 				{
-					node->display(s, request, aditionalParametersMap);
+					node->display(s, request, aditionalParametersMap, page);
 				}
 				pm.insert(param.first, s.str());
 			}
 			pm.merge(aditionalParametersMap);
 
-			Webpage* page(CMSModule::GetSite(request, aditionalParametersMap)->getPageBySmartURL(pageName));
-			if(page)
+			Webpage* includedPage(page.getRoot()->getPageBySmartURL(pageName));
+			if(includedPage)
 			{
-				page->display(stream, request, pm);
+				includedPage->display(stream, request, pm);
 			}
 
 		}
 
 
 
-		void Webpage::TextNode::display( std::ostream& stream, const server::Request& request, const server::ParametersMap& aditionalParametersMap ) const
-		{
+		void Webpage::TextNode::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const server::ParametersMap& aditionalParametersMap,
+			const Webpage& page
+		) const {
 			stream << text;
 		}
 }	}
