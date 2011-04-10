@@ -38,7 +38,7 @@
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
 #include "UpdateTextTemplateAction.h"
-#include "DeleteTextTemplateAction.h"
+#include "RemoveObjectAction.hpp"
 #include "TextTemplateAddAction.h"
 #include "MessagesLibraryRight.h"
 #include "MessagesModule.h"
@@ -57,7 +57,8 @@ namespace synthese
 	using namespace messages;
 	using namespace html;
 	using namespace security;
-
+	using namespace db;
+	
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, MessagesTemplateLibraryAdmin>::FACTORY_KEY("1MessagesTemplateLibraryAdmin");
@@ -119,7 +120,7 @@ namespace synthese
 			// Requests
 			AdminActionFunctionRequest<UpdateTextTemplateAction,MessagesTemplateLibraryAdmin> updateRequest(_request);
 			
-			AdminActionFunctionRequest<DeleteTextTemplateAction,MessagesTemplateLibraryAdmin> deleteRequest(_request);
+			AdminActionFunctionRequest<RemoveObjectAction,MessagesTemplateLibraryAdmin> deleteRequest(_request);
 			
 			AdminActionFunctionRequest<TextTemplateAddAction,MessagesTemplateLibraryAdmin> addRequest(_request);
 			addRequest.getAction()->setParentId(_folder.get() ? _folder->getKey() : RegistryKeyType(0));
@@ -189,7 +190,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<TextTemplate> tt, templates)
 				{
 					// Variables
-					deleteRequest.getAction()->setTemplate(tt);
+					deleteRequest.getAction()->setObjectId(tt->getKey());
 					updateRequest.getAction()->setTemplate(tt);
 
 					// Display
@@ -198,7 +199,7 @@ namespace synthese
 						stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le modèle "+ tt->getName()+" ?", "page_delete.png") << " ";
 					stream << tt->getName() << "</h2>";
 
-					PropertiesHTMLTable t(updateRequest.getHTMLForm("up"+Conversion::ToString(tt->getKey())));
+					PropertiesHTMLTable t(updateRequest.getHTMLForm("up"+ lexical_cast<string>(tt->getKey())));
 					t.getForm().setUpdateRight(updateRight);
 					stream << t.open();
 					stream << t.cell("Nom", t.getForm().getTextInput(UpdateTextTemplateAction::PARAMETER_NAME, tt->getName()));

@@ -51,7 +51,7 @@
 #include "DisplayScreenRemoveDisplayedPlaceAction.h"
 #include "DisplayScreenRemoveForbiddenPlaceAction.h"
 #include "DisplaySearchAdmin.h"
-#include "DisplayScreenRemoveAction.h"
+#include "RemoveObjectAction.hpp"
 #include "DisplayScreenContentFunction.h"
 #include "ArrivalDepartureTableRight.h"
 #include "UpdateDisplayMaintenanceAction.h"
@@ -186,8 +186,8 @@ namespace synthese
 				updateDisplayRequest.getAction()->setScreenId(_displayScreen->getKey());
 
 				// Delete the screen request
-				AdminActionFunctionRequest<DisplayScreenRemoveAction, DisplaySearchAdmin> deleteRequest(_request);
-				deleteRequest.getAction()->setDisplayScreen(_displayScreen);
+				AdminActionFunctionRequest<RemoveObjectAction, DisplaySearchAdmin> deleteRequest(_request);
+				deleteRequest.getAction()->setObjectId(_displayScreen->getKey());
 
 				stream << "<h1>Propriétés</h1>";
 
@@ -766,7 +766,7 @@ namespace synthese
 				createDisplayRequest.setActionWillCreateObject();
 				createDisplayRequest.getAction()->setUp(_displayScreen);
 
-				AdminActionFunctionRequest<DisplayScreenRemoveAction,DisplayAdmin> removeDisplayRequest(
+				AdminActionFunctionRequest<RemoveObjectAction,DisplayAdmin> removeDisplayRequest(
 					_request
 				);
 
@@ -784,7 +784,7 @@ namespace synthese
 				{
 					const DisplayScreen& screen(*it.second);
 					displayRequest.getPage()->setScreen(Env::GetOfficialEnv().getSPtr(&screen));
-					removeDisplayRequest.getAction()->setDisplayScreen(Env::GetOfficialEnv().getSPtr(&screen));
+					removeDisplayRequest.getAction()->setObjectId(screen.getKey());
 
 					stream << td.row();
 					stream << td.col() << HTMLModule::getHTMLLink(displayRequest.getHTMLForm().getURL(), screen.getName());

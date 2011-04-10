@@ -14,7 +14,6 @@ synthese::impex::DataSourcesAdmin::integrate();
 synthese::impex::DataSourceAdmin::integrate();
 
 synthese::impex::DataSourceUpdateAction::integrate();
-synthese::impex::DataSourceRemoveAction::integrate();
 
 // Registries
 

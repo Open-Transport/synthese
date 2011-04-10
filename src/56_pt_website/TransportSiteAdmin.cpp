@@ -47,7 +47,6 @@
 #include "WebPageAdmin.h"
 #include "ActionResultHTMLTable.h"
 #include "WebPageAddAction.h"
-#include "WebPageRemoveAction.h"
 #include "AdminFunctionRequest.hpp"
 #include "WebPageDisplayFunction.h"
 #include "City.h"
@@ -57,9 +56,9 @@
 #include "ObjectSiteLinkTableSync.h"
 #include "WebPageMoveAction.hpp"
 #include "SiteCityAddAction.hpp"
-#include "SiteObjectLinkRemoveAction.hpp"
 #include "RoadJourneyPlanner.h"
 #include "RoadModule.h"
+#include "RemoveObjectAction.hpp"
 
 #include <geos/geom/Point.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -88,7 +87,7 @@ namespace synthese
 	using namespace road;
 	using namespace cms;
 	using namespace road_journey_planner;
-		
+	using namespace db;
 
 	namespace util
 	{
@@ -303,7 +302,7 @@ namespace synthese
 				AdminActionFunctionRequest<SiteCityAddAction,TransportSiteAdmin> cityAddRequest(_request);
 				cityAddRequest.getAction()->setSite(_site);
 
-				AdminActionFunctionRequest<SiteObjectLinkRemoveAction,TransportSiteAdmin> cityRemoveRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction,TransportSiteAdmin> cityRemoveRequest(_request);
 
 				HTMLForm f(cityAddRequest.getHTMLForm("add_city"));
 				HTMLTable::ColsVector v;
@@ -314,7 +313,7 @@ namespace synthese
 				stream << f.open() << t.open();
 				BOOST_FOREACH(shared_ptr<ObjectSiteLink> link, cities)
 				{
-					cityRemoveRequest.getAction()->setLink(const_pointer_cast<ObjectSiteLink>(link));
+					cityRemoveRequest.getAction()->setObjectId(link->getKey());
 
 					stream << t.row();
 					if(Env::GetOfficialEnv().getRegistry<City>().contains(link->getObjectId()))
@@ -348,7 +347,7 @@ namespace synthese
 				AdminActionFunctionRequest<WebPageAddAction, TransportSiteAdmin> addRequest(_request);
 				addRequest.getAction()->setSite(const_pointer_cast<TransportWebsite>(_site));
 
-				AdminActionFunctionRequest<WebPageRemoveAction, TransportSiteAdmin> deleteRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction, TransportSiteAdmin> deleteRequest(_request);
 
 				AdminActionFunctionRequest<WebPageMoveAction, TransportSiteAdmin> moveRequest(_request);
 

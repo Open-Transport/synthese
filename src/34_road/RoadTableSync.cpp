@@ -1,4 +1,3 @@
-
 /** RoadTableSync class implementation.
 	@file RoadTableSync.cpp
 
@@ -128,6 +127,41 @@ namespace synthese
 			query.addField(0);
 			query.addField(object->getRoadPlace() ? object->getRoadPlace()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<RoadTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO Control user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<RoadTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<RoadTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<RoadTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 

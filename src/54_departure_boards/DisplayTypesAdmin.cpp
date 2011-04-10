@@ -31,7 +31,7 @@
 #include "CreateDisplayTypeAction.h"
 #include "UpdateDisplayTypeAction.h"
 #include "DisplayTypeTableSync.h"
-#include "DisplayTypeRemoveAction.h"
+#include "RemoveObjectAction.hpp"
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayTypeAdmin.h"
 #include "AdminFunctionRequest.hpp"
@@ -57,6 +57,7 @@ namespace synthese
 	using namespace html;
 	using namespace departure_boards;
 	using namespace security;
+	using namespace db;
 
 	namespace util
 	{
@@ -115,7 +116,7 @@ namespace synthese
 			createRequest.setActionWillCreateObject();
 			createRequest.getFunction()->setActionFailedPage<DisplayTypesAdmin>();
 			
-			AdminActionFunctionRequest<DisplayTypeRemoveAction,DisplayTypesAdmin> deleteRequest(
+			AdminActionFunctionRequest<RemoveObjectAction,DisplayTypesAdmin> deleteRequest(
 				_request
 			);
 
@@ -175,7 +176,7 @@ namespace synthese
 			stream << t.open();
 			BOOST_FOREACH(shared_ptr<DisplayType> dt, types)
 			{
-				deleteRequest.getAction()->setType(dt);
+				deleteRequest.getAction()->setObjectId(dt->getKey());
 				openRequest.getPage()->setType(dt);
 
 				stream << t.row();

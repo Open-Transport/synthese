@@ -1588,7 +1588,14 @@ namespace synthese
 				string serviceNumber(numberNode.isEmpty() ? string() : ImpExModule::ConvertChar(numberNode.getText(), _dataSource.getCharset(), "UTF-8"));
 				
 				// Creation of the service
-				JourneyPattern* line(routes[jpKeyNode.getText()]);
+
+				map<string,JourneyPattern*>::const_iterator itLine(routes.find(jpKeyNode.getText()));
+				if(itLine == routes.end())
+				{
+					os << "WARN : Service " << serviceNumber << " / " << keyNode.getText() << " ignored because journey pattern " << jpKeyNode.getText() << " was not found.<br />";
+					continue;
+				}
+				JourneyPattern* line(itLine->second);
 				size_t stopsNumber(serviceNode.nChildNode("VehicleJourneyAtStop"));
 				if(stopsNumber != line->getEdges().size())
 				{

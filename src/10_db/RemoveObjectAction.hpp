@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// VehicleRemoveAction class header.
-///	@file VehicleRemoveAction.hpp
+/// RemoveObjectAction class header.
+///	@file RemoveObjectAction.hpp
 ///	@author RCSobility
 ///	@date 2011
 ///
@@ -22,39 +22,41 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_VehicleRemoveAction_H__
-#define SYNTHESE_VehicleRemoveAction_H__
+#ifndef SYNTHESE_RemoveObjectAction_H__
+#define SYNTHESE_RemoveObjectAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
 
 namespace synthese
 {
-	namespace pt_operation
+	namespace db
 	{
-		class Vehicle;
+		class DBTableSync;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 37.15 Action : VehicleRemoveAction.
-		/// @ingroup m37Actions refActions
+		/// 10.15 Action : RemoveObjectAction.
+		/// @ingroup m10Actions refActions
 		///	@author RCSobility
 		///	@date 2011
-		/// @since 3.2.1
+		/// @since 3.3.0
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : VehicleRemoveAction
+		/// Key : RemoveObjectAction
 		///
 		/// Parameters :
 		///	<dl>
 		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
 		///	</dl>
-		class VehicleRemoveAction:
-			public util::FactorableTemplate<server::Action, VehicleRemoveAction>
+		class RemoveObjectAction:
+			public util::FactorableTemplate<server::Action, RemoveObjectAction>
 		{
 		public:
-			static const std::string PARAMETER_VEHICLE_ID;
+			static const std::string PARAMETER_OBJECT_ID;
 
 		private:
-			boost::shared_ptr<const Vehicle> _vehicle;
+			util::RegistryKeyType _objectId;
+			boost::shared_ptr<DBTableSync> _tableSync;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -88,10 +90,10 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setVehicle(boost::shared_ptr<const Vehicle> value) { _vehicle = value; }
+				void setObjectId(util::RegistryKeyType value);
 			//@}
 		};
 	}
 }
 
-#endif // SYNTHESE_VehicleRemoveAction_H__
+#endif // SYNTHESE_RemoveObjectAction_H__

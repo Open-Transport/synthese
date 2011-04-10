@@ -135,6 +135,41 @@ namespace synthese
 			PTOperationModule::UnregisterVehicle(*obj);
 			obj->setAllowedLines(Vehicle::AllowedLines());
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<VehicleTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO Check tue user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<VehicleTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<VehicleTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<VehicleTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 	
 	

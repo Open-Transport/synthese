@@ -105,8 +105,13 @@ namespace synthese
 				@date 2008
 			*/
 			static void	AddDeleteEntry(
-				const SentAlarm* alarm
-				, const security::User* user
+				const SentAlarm* alarm,
+				const security::User* user
+			);
+
+			static void	AddDeleteEntry(
+				const SentScenario& scenario,
+				const security::User& user
 			);
 
 

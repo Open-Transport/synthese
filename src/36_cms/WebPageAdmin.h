@@ -38,9 +38,13 @@ namespace synthese
 		class HTMLForm;
 	}
 
+	namespace db
+	{
+		class RemoveObjectAction;
+	}
+
 	namespace cms
 	{
-		class WebPageRemoveAction;
 		class WebPageAddAction;
 		class WebPageMoveAction;
 		class Webpage;
@@ -76,7 +80,7 @@ namespace synthese
 			static void _displaySubPages(
 				std::ostream& stream,
 				const WebPageTableSync::SearchResult& pages,
-				server::StaticActionRequest<WebPageRemoveAction>& deleteRequest,
+				server::StaticActionRequest<db::RemoveObjectAction>& deleteRequest,
 				server::StaticActionRequest<WebPageMoveAction>& moveRequest,
 				const admin::AdminRequest& request,
 				html::HTMLTable& t,
@@ -215,7 +219,7 @@ namespace synthese
 				std::ostream& stream,
 				util::RegistryKeyType parentId,
 				server::StaticActionRequest<WebPageAddAction>& createRequest,
-				server::StaticActionRequest<WebPageRemoveAction>& deleteRequest,
+				server::StaticActionRequest<db::RemoveObjectAction>& deleteRequest,
 				server::StaticActionRequest<WebPageMoveAction>& moveRequest,
 				const admin::AdminRequest& request
 			);

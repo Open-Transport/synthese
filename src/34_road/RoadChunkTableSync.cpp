@@ -188,8 +188,8 @@ namespace synthese
 		}
 
 
-	    
-	    template<> void DBDirectTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>::Save(
+
+		template<> void DBDirectTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>::Save(
 			MainRoadChunk* object,
 			optional<DBTransaction&> transaction
 		){
@@ -206,7 +206,42 @@ namespace synthese
 			query.addField(static_cast<int>(object->getRightHouseNumberBounds() ? object->getRightHouseNumberingPolicy() : MainRoadChunk::ALL));
 			query.addField(static_pointer_cast<Geometry,LineString>(object->getGeometry()));
 			query.execute(transaction);
-	    }
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<RoadChunkTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO Control user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<RoadChunkTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<RoadChunkTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<RoadChunkTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 
 

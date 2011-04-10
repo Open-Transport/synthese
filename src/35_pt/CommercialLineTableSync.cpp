@@ -42,6 +42,7 @@
 #include "CalendarTemplateTableSync.h"
 #include "ReplaceQuery.h"
 #include "ImportableTableSync.hpp"
+#include "TransportNetworkRight.h"
 
 // Util
 #include "Conversion.h"
@@ -66,7 +67,6 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace security;
-	using namespace pt;
 	using namespace geography;
 	using namespace graph;
 	using namespace calendar;
@@ -136,9 +136,9 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-		    object->setName(rows->getText ( CommercialLineTableSync::COL_NAME));
-		    object->setShortName(rows->getText ( CommercialLineTableSync::COL_SHORT_NAME));
-		    object->setLongName(rows->getText ( CommercialLineTableSync::COL_LONG_NAME));
+			object->setName(rows->getText ( CommercialLineTableSync::COL_NAME));
+			object->setShortName(rows->getText ( CommercialLineTableSync::COL_SHORT_NAME));
+			object->setLongName(rows->getText ( CommercialLineTableSync::COL_LONG_NAME));
 			
 			// Color
 			string color(rows->getText(CommercialLineTableSync::COL_COLOR));
@@ -154,7 +154,7 @@ namespace synthese
 				}
 			}
 			object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
-		    object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
+			object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
 
 			object->setDataSourceLinks(
 				ImportableTableSync::GetDataSourceLinksFromSerializedString(
@@ -328,6 +328,46 @@ namespace synthese
 				object->getCalendarTemplate() ? object->getCalendarTemplate()->getKey() : RegistryKeyType(0)
 			);
 			query.execute(transaction);
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<CommercialLineTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CommercialLineTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			Env env;
+			JourneyPatternTableSync::SearchResult routes(JourneyPatternTableSync::Search(env, id));
+			BOOST_FOREACH(const JourneyPatternTableSync::SearchResult::value_type& route, routes)
+			{
+				JourneyPatternTableSync::Remove(NULL, id, transaction, false);
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CommercialLineTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<CommercialLineTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO log line removal
 		}
 	}
 

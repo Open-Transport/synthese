@@ -122,6 +122,41 @@ namespace synthese
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
 			query.execute(transaction);
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<CrossingTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO Control user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CrossingTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CrossingTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<CrossingTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 
 	namespace road

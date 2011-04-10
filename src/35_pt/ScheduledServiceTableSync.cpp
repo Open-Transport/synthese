@@ -31,6 +31,7 @@
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "LineStopTableSync.h"
+#include "TransportNetworkRight.h"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 
@@ -45,7 +46,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace graph;
-	using namespace pt;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<DBTableSync,ScheduledServiceTableSync>::FACTORY_KEY("35.60.03 Scheduled services");
 	template<> const string FactorableTemplate<Fetcher<SchedulesBasedService>, ScheduledServiceTableSync>::FACTORY_KEY("16");
@@ -211,6 +212,40 @@ namespace synthese
 			query.addField(object->getTeam());
 			query.addField(datesStr.str());
 			query.execute(transaction);
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<ScheduledServiceTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ScheduledServiceTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ScheduledServiceTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<ScheduledServiceTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 
 	}

@@ -33,7 +33,6 @@
 #include "ScenarioTableSync.h"
 #include "AlarmTableSync.h"
 #include "ScenarioSaveAction.h"
-#include "DeleteAlarmAction.h"
 #include "NewMessageAction.h"
 #include "MessagesLibraryAdmin.h"
 #include "MessagesModule.h"
@@ -51,6 +50,7 @@
 #include "MessagesLibraryLog.h"
 #include "ScenarioFolder.h"
 #include "Profile.h"
+#include "RemoveObjectAction.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -64,7 +64,9 @@ namespace synthese
 	using namespace util;
 	using namespace html;
 	using namespace messages;
-	using namespace security;	
+	using namespace security;
+	using namespace db;
+	
 
 	namespace util
 	{
@@ -189,7 +191,7 @@ namespace synthese
 			// TAB MESSAGES
 			if (openTabContent(stream, TAB_MESSAGES))
 			{
-				AdminActionFunctionRequest<DeleteAlarmAction,MessagesScenarioAdmin> deleteRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction,MessagesScenarioAdmin> deleteRequest(_request);
 
 				AdminActionFunctionRequest<NewMessageAction,MessageAdmin> addRequest(_request);
 				addRequest.setActionWillCreateObject();
@@ -239,7 +241,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<Alarm> alarm, v)
 				{
 					messRequest.getPage()->setMessage(alarm);
-					deleteRequest.getAction()->setAlarmId(alarm->getKey());
+					deleteRequest.getAction()->setObjectId(alarm->getKey());
 
 					stream << t.row(Conversion::ToString(alarm->getKey()));
 					stream << t.col() << alarm->getShortMessage();
@@ -307,11 +309,12 @@ namespace synthese
 			return user.getProfile()->isAuthorized<MessagesLibraryRight>(READ);
 		}
 
+
+
 		MessagesScenarioAdmin::MessagesScenarioAdmin(
 		):	AdminInterfaceElementTemplate<MessagesScenarioAdmin>(),
 			_generalLogView("g")
 		{
-
 		}
 
 
@@ -400,7 +403,7 @@ namespace synthese
 		bool MessagesScenarioAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			const MessagesScenarioAdmin& mother(static_cast<const MessagesScenarioAdmin&>(other));
-			return _scenario && mother._scenario && _scenario->getKey() == mother._scenario->getKey();
+			return _scenario.get() && mother._scenario.get() && _scenario->getKey() == mother._scenario->getKey();
 		}
 	}
 }

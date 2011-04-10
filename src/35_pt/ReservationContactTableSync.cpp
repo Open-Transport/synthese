@@ -29,6 +29,7 @@
 #include "DBResult.hpp"
 #include "DBException.hpp"
 #include "ReplaceQuery.h"
+#include "TransportNetworkRight.h"
 
 using namespace std;
 using namespace boost;
@@ -38,6 +39,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace pt;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<DBTableSync,ReservationContactTableSync>::FACTORY_KEY("35.10.06 Reservation contacts");
 
@@ -77,22 +79,26 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-		    string phoneExchangeNumber (
-			rows->getText (ReservationContactTableSync::COL_PHONEEXCHANGENUMBER));
+			string phoneExchangeNumber (
+				rows->getText (ReservationContactTableSync::COL_PHONEEXCHANGENUMBER)
+			);
 
-		    string phoneExchangeOpeningHours (
-			rows->getText (ReservationContactTableSync::COL_PHONEEXCHANGEOPENINGHOURS));
+			string phoneExchangeOpeningHours (
+				rows->getText (ReservationContactTableSync::COL_PHONEEXCHANGEOPENINGHOURS)
+			);
 
-		    string description (
-			rows->getText (ReservationContactTableSync::COL_DESCRIPTION));
+			string description (
+				rows->getText (ReservationContactTableSync::COL_DESCRIPTION)
+			);
 
-		    string webSiteUrl (
-			rows->getText (ReservationContactTableSync::COL_WEBSITEURL));
+			string webSiteUrl (
+				rows->getText (ReservationContactTableSync::COL_WEBSITEURL)
+			);
 
-		    rr->setPhoneExchangeNumber (phoneExchangeNumber);
-		    rr->setPhoneExchangeOpeningHours (phoneExchangeOpeningHours);
-		    rr->setDescription (description);
-		    rr->setWebSiteUrl (webSiteUrl);
+			rr->setPhoneExchangeNumber (phoneExchangeNumber);
+			rr->setPhoneExchangeOpeningHours (phoneExchangeOpeningHours);
+			rr->setDescription (description);
+			rr->setWebSiteUrl (webSiteUrl);
 		}
 
 
@@ -113,9 +119,41 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<ReservationContactTableSync,ReservationContact>::Unlink(
 			ReservationContact* obj
 		){
-
 		}
 
+
+
+		template<> bool DBTableSyncTemplate<ReservationContactTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ReservationContactTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ReservationContactTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<ReservationContactTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 
 	namespace pt

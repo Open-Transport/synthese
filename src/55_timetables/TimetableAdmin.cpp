@@ -42,7 +42,6 @@
 #include "TimetableRowTableSync.h"
 #include "TimetableUpdateAction.h"
 #include "TimetableRowAddAction.h"
-#include "TimetableRowDeleteAction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
 #include "ModuleAdmin.h"
@@ -57,6 +56,7 @@
 #include "StopPointTableSync.hpp"
 #include "TimetableResult.hpp"
 #include "TimetableTransferUpdateAction.hpp"
+#include "RemoveObjectAction.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -152,6 +152,10 @@ namespace synthese
 				PropertiesHTMLTable pt(updateRequest.getHTMLForm("update"));
 				stream << pt.open();
 				stream << pt.cell(
+					"ID",
+					lexical_cast<string>(_timetable->getKey())
+				);
+				stream << pt.cell(
 					"Conteneur",
 					pt.getForm().getSelectInput(
 						TimetableUpdateAction::PARAMETER_CONTAINER_ID,
@@ -210,6 +214,8 @@ namespace synthese
 					AdminActionFunctionRequest<TimetableAddAction,TimetableAdmin> copyTimetableRequest(_request);
 					copyTimetableRequest.setActionWillCreateObject();
 
+					AdminActionFunctionRequest<RemoveObjectAction,TimetableAdmin> removeRequest(_request);
+
 					ActionResultHTMLTable::HeaderVector h3;
 					h3.push_back(make_pair(PARAMETER_RANK, "Rang"));
 					h3.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_up.png", "^")));
@@ -238,6 +244,7 @@ namespace synthese
 					{
 						editTimetableRequest.getPage()->setTimetable(tt);
 						copyTimetableRequest.getAction()->setTemplate(const_pointer_cast<const Timetable>(tt));
+						removeRequest.getAction()->setObjectId(tt->getKey());
 
 						lastRank = tt->getRank();
 
@@ -278,15 +285,11 @@ namespace synthese
 
 						stream <<
 							t3.col() <<
-							// TODO: There is no TimetableRemoveAction yet. Uncomment and add the action below once this is done.
-							"";
-							/*
 							HTMLModule::getLinkButton(
-								string(),
+								removeRequest.getURL(),
 								"Supprimer",
 								"Etes-vous sûr de vouloir supprimer la fiche horaire "+ tt->getTitle() +" ?", "table_delete.png"
 							);
-							*/
 					}
 					stream << t3.row(lexical_cast<string>(++lastRank));
 					vector<pair<optional<bool>, string> > booknotbook;
@@ -316,7 +319,7 @@ namespace synthese
 					AdminActionFunctionRequest<TimetableRowAddAction,TimetableAdmin> addRowRequest(_request);
 					addRowRequest.getAction()->setTimetable(_timetable);
 
-					AdminActionFunctionRequest<TimetableRowDeleteAction,TimetableAdmin> deleteRowRequest(_request);
+					AdminActionFunctionRequest<RemoveObjectAction,TimetableAdmin> deleteRowRequest(_request);
 
 					AdminFunctionRequest<TimetableAdmin> searchRequest(_request);
 
@@ -382,7 +385,7 @@ namespace synthese
 					BOOST_FOREACH(shared_ptr<TimetableRow> row, rows)
 					{
 						lastRank = row->getRank();
-						deleteRowRequest.getAction()->setElement(const_pointer_cast<const TimetableRow>(row));
+						deleteRowRequest.getAction()->setObjectId(row->getKey());
 
 						const StopArea& place(*Env::GetOfficialEnv().get<StopArea>(row->getPlace()->getKey()));
 						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& stop, place.getPhysicalStops())

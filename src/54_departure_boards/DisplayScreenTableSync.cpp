@@ -45,6 +45,9 @@
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
 #include "ScenarioTableSync.h"
+#include "ArrivalDepartureTableLog.h"
+#include "ArrivalDepartureTableRight.h"
+#include "AlarmObjectLinkTableSync.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -488,34 +491,89 @@ namespace synthese
 			query.addField(object->getParent() ? object->getParent()->getKey() : RegistryKeyType(0));
 			query.addField(static_cast<int>(object->getSubScreenType()));
 			query.execute(transaction);
-	}	}
+		}
+
+
+
+
+		template<> bool DBTableSyncTemplate<DisplayScreenTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			try
+			{
+				Env env;
+				shared_ptr<const DisplayScreen> screen(DisplayScreenTableSync::Get(object_id, env));
+				if (screen->getLocation() != NULL)
+				{
+					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(screen->getLocation()->getKey()));
+				}
+				else
+				{
+					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				}
+			}
+			catch(ObjectNotFoundException<DisplayScreen>&)
+			{
+				return false;
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DisplayScreenTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			AlarmObjectLinkTableSync::RemoveByTarget(id, transaction);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DisplayScreenTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<DisplayScreenTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			Env env;
+			shared_ptr<const DisplayScreen> screen(DisplayScreenTableSync::Get(id, env));
+			ArrivalDepartureTableLog::addRemoveEntry(screen.get(), session->getUser().get());
+		}
+	}
 
 	namespace departure_boards
 	{
-	    DisplayScreenTableSync::SearchResult DisplayScreenTableSync::Search(
+		DisplayScreenTableSync::SearchResult DisplayScreenTableSync::Search(
 			Env& env,
-			optional<const security::RightsOfSameClassMap&> rights 
-			, bool totalControl 
-			, RightLevel neededLevel,
+			optional<const security::RightsOfSameClassMap&> rights,
+			bool totalControl,
+			RightLevel neededLevel,
 			optional<RegistryKeyType> duid,
 			optional<RegistryKeyType> localizationid,
 			optional<RegistryKeyType> lineid,
 			optional<RegistryKeyType> typeuid,
-			string cityName
-			, string stopName
-			, string name,
+			string cityName,
+			string stopName,
+			string name,
 			optional<int> state,
 			optional<int> message,
 			size_t first /*= 0*/,
-			boost::optional<std::size_t> number
-			, bool orderByUid /*= false*/
-			, bool orderByCity /*= true*/
-			, bool orderByStopName /*= false*/
-			, bool orderByName /*= false*/
-			, bool orderByType /*= false*/
-			, bool orderByStatus
-			, bool orderByMessage
-			, bool raisingOrder,
+			boost::optional<std::size_t> number,
+			bool orderByUid, /*= false*/
+			bool orderByCity, /*= true*/
+			bool orderByStopName, /*= false*/
+			bool orderByName, /*= false*/
+			bool orderByType, /*= false*/
+			bool orderByStatus,
+			bool orderByMessage,
+			bool raisingOrder,
 			LinkLevel linkLevel
 		){
 			SelectQuery<DisplayScreenTableSync> query;

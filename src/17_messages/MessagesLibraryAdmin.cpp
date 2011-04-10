@@ -29,7 +29,6 @@
 #include "ScenarioTableSync.h"
 #include "MessagesLibraryAdmin.h"
 #include "MessagesScenarioAdmin.h"
-#include "DeleteScenarioAction.h"
 #include "AddScenarioAction.h"
 #include "MessagesAdmin.h"
 #include "MessagesLibraryRight.h"
@@ -37,10 +36,9 @@
 #include "ScenarioFolderAdd.h"
 #include "ScenarioFolderTableSync.h"
 #include "ScenarioFolder.h"
-#include "ScenarioFolderRemoveAction.h"
 #include "ScenarioFolderUpdateAction.h"
 #include "ScenarioTemplateInheritedTableSync.h"
-
+#include "RemoveObjectAction.hpp"
 #include "StaticActionFunctionRequest.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
@@ -62,6 +60,7 @@ namespace synthese
 	using namespace html;
 	using namespace messages;
 	using namespace security;
+	using namespace db;
 
 	namespace util
 	{
@@ -127,8 +126,8 @@ namespace synthese
 				if(	_getEnv().getRegistry<ScenarioTemplate>().empty() &&
 					_getEnv().getRegistry<ScenarioFolder>().empty()
 				){
-					AdminActionFunctionRequest<ScenarioFolderRemoveAction,MessagesLibraryAdmin> removeFolderRequest(_request);
-					removeFolderRequest.getAction()->setFolder(_folder);
+					AdminActionFunctionRequest<RemoveObjectAction,MessagesLibraryAdmin> removeFolderRequest(_request);
+					removeFolderRequest.getAction()->setObjectId(_folder->getKey());
 					removeFolderRequest.getPage()->setFolder(
 						_folder->getParent() ?
 						ScenarioFolderTableSync::Get(
@@ -173,7 +172,7 @@ namespace synthese
 
 			AdminFunctionRequest<MessagesScenarioAdmin> updateScenarioRequest(_request);
 			
-			AdminActionFunctionRequest<DeleteScenarioAction,MessagesLibraryAdmin> deleteScenarioRequest(_request);
+			AdminActionFunctionRequest<RemoveObjectAction, MessagesLibraryAdmin> deleteScenarioRequest(_request);
 			
 			AdminActionFunctionRequest<AddScenarioAction,MessagesScenarioAdmin> addScenarioRequest(_request);
 			addScenarioRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
@@ -210,7 +209,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, scenarios)
 			{
 				updateScenarioRequest.getPage()->setScenario(scenario);
-				deleteScenarioRequest.getAction()->setScenario(scenario);
+				deleteScenarioRequest.getAction()->setObjectId(scenario->getKey());
 				stream << t3.row(Conversion::ToString(scenario->getKey()));
 				stream << t3.col() << scenario->getName();
 				stream << t3.col() << HTMLModule::getLinkButton(updateScenarioRequest.getURL(), "Ouvrir", string(), "cog_edit.png");
@@ -251,7 +250,13 @@ namespace synthese
 				if(folder == _folder) continue;
 
 				goFolderRequest.getPage()->setFolder(folder);
+				deleteScenarioRequest.getAction()->setObjectId(folder->getKey());
 				stream << l.element("folder");
+				if(deleteScenarioRequest.getAction()->isAuthorized(_request.getSession()))
+				{
+					stream <<
+						HTMLModule::getHTMLLink(deleteScenarioRequest.getURL(), HTMLModule::getHTMLImage("remove.png", "Supprimer"), "Etes-vous sûr de vouloir supprimer le répertoire ?");
+				}
 				stream << HTMLModule::getHTMLLink(goFolderRequest.getURL(), folder->getName());
 			}
 			
@@ -291,8 +296,8 @@ namespace synthese
 			return links;
 		}
 
-		
-		
+
+
 		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
@@ -364,5 +369,14 @@ namespace synthese
 		{
 			_folder = folder;
 		}
-	}
-}
+
+
+
+		bool MessagesLibraryAdmin::_hasSameContent( const AdminInterfaceElement& other ) const
+		{
+			const MessagesLibraryAdmin& mother(static_cast<const MessagesLibraryAdmin&>(other));
+			return
+				!_folder.get() && !mother._folder.get() ||
+				_folder.get() && mother._folder.get() && mother._folder->getKey() == _folder->getKey();
+		}
+}	}

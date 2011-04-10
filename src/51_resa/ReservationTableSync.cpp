@@ -191,6 +191,38 @@ namespace synthese
 			query.execute(transaction);
 		}
 
+
+
+		template<> bool DBTableSyncTemplate<ReservationTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return false;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ReservationTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ReservationTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<ReservationTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+		}
 	}
 
 	namespace resa

@@ -75,9 +75,10 @@ namespace synthese
 
 
 			static void Shift(
-				util::RegistryKeyType timetableId
-				, int rank
-				, int delta
+				util::RegistryKeyType timetableId,
+				int rank,
+				int delta,
+				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
 			);
 
 			static int GetMaxRank(util::RegistryKeyType timetableId);

@@ -30,6 +30,9 @@
 #include "Conversion.h"
 #include "ReplaceQuery.h"
 #include "WebPageTableSync.h"
+#include "DisplayScreenTableSync.h"
+#include "ArrivalDepartureTableRight.h"
+#include "ArrivalDepartureTableLog.h"
 
 #include <sstream>
 
@@ -44,6 +47,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace cms;
+	using namespace security;
 
 	namespace util
 	{
@@ -227,7 +231,7 @@ namespace synthese
 		){
 		}
 
-    
+
 
 		template<> void DBDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Save(
 			DisplayType* object,
@@ -249,6 +253,65 @@ namespace synthese
 			query.execute(transaction);
 		}
 
+
+
+
+		template<> bool DBTableSyncTemplate<DisplayTypeTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			Env env;
+			DisplayScreenTableSync::Search(
+				env,
+				RightsOfSameClassMap(),
+				true,
+				UNKNOWN_RIGHT_LEVEL,
+				optional<RegistryKeyType>(),
+				optional<RegistryKeyType>(),
+				optional<RegistryKeyType>(),
+				object_id,
+				std::string(),
+				std::string(),
+				std::string(),
+				optional<int>(),
+				optional<int>(),
+				0,
+				1
+			);
+			if (!env.getRegistry<DisplayScreen>().empty())
+			{
+				return false;
+			}
+
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DisplayTypeTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DisplayTypeTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<DisplayTypeTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			Env env;
+			shared_ptr<const DisplayType> typ(DisplayTypeTableSync::Get(id, env));
+			ArrivalDepartureTableLog::addDeleteTypeEntry(typ.get(), session->getUser().get());
+		}
 	}
 
 	namespace departure_boards

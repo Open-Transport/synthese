@@ -25,6 +25,9 @@
 #include "SelectQuery.hpp"
 #include "WebPageTableSync.h"
 #include "CMSModule.hpp"
+#include "ObjectSiteLinkTableSync.h"
+#include "RollingStockFilterTableSync.h"
+#include "TransportWebsiteRight.h"
 
 #include <sstream>
 #include <boost/tokenizer.hpp>
@@ -42,6 +45,7 @@ namespace synthese
 	using namespace db;
 	using namespace pt_website;
 	using namespace cms;
+	using namespace security;
 
 	namespace util
 	{
@@ -197,6 +201,51 @@ namespace synthese
 			query.addField(site->getClientURL());
 			query.addField(site->getDefaultTemplate() ? site->getDefaultTemplate()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<TransportWebsiteTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TransportWebsiteTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			Env env;
+			ObjectSiteLinkTableSync::SearchResult links(ObjectSiteLinkTableSync::Search(env, id));
+			BOOST_FOREACH(const ObjectSiteLinkTableSync::SearchResult::value_type& link, links)
+			{
+				ObjectSiteLinkTableSync::Remove(NULL, link->getKey(), transaction, false);
+			}
+			RollingStockFilterTableSync::SearchResult filters(RollingStockFilterTableSync::Search(env, id));
+			BOOST_FOREACH(const RollingStockFilterTableSync::SearchResult::value_type& filter, filters)
+			{
+				RollingStockFilterTableSync::Remove(NULL, filter->getKey(), transaction, false);
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TransportWebsiteTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<TransportWebsiteTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO log the removal
 		}
 	}
 

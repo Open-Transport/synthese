@@ -28,14 +28,13 @@
 #include "StopPointTableSync.hpp"
 #include "LineAreaInheritedTableSync.hpp"
 #include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
-
-#include <sstream>
-
+#include "TransportNetworkRight.h"
 #include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "DBTransaction.hpp"
 
+#include <sstream>
 #include <geos/geom/LineString.h>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -51,6 +50,7 @@ namespace synthese
 	using namespace pt;
 	using namespace geography;
 	using namespace graph;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<DBTableSync,LineStopTableSync>::FACTORY_KEY("35.57.01 JourneyPattern stops");
 
@@ -166,6 +166,46 @@ namespace synthese
 				ls->setLine(line);
 			}
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<LineStopTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<LineStopTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<LineStopTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			Env env;
+			shared_ptr<const LineStop> lineStop(LineStopTableSync::Get(id, env));
+
+			RankUpdateQuery<LineStopTableSync> query(LineStopTableSync::COL_RANKINPATH, -1, lineStop->getRankInPath(), false);
+			query.addWhereField(LineStopTableSync::COL_LINEID, lineStop->getLine()->getKey());
+			query.execute(transaction);
+		}
+
+
+
+		void DBTableSyncTemplate<LineStopTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 
 	namespace pt
@@ -217,21 +257,6 @@ namespace synthese
 			query.execute(transaction);
 
 			Save(&lineStop, transaction);
-
-			transaction.run();
-		}
-
-
-
-		void LineStopTableSync::RemoveStop(const LineStop& lineStop )
-		{
-			DBTransaction transaction;
-
-			Remove(lineStop.getKey(), transaction);
-
-			RankUpdateQuery<LineStopTableSync> query(COL_RANKINPATH, -1, lineStop.getRankInPath(), false);
-			query.addWhereField(COL_LINEID, lineStop.getLine()->getKey());
-			query.execute(transaction);
 
 			transaction.run();
 		}

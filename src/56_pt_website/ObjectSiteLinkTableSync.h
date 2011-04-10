@@ -63,19 +63,7 @@ namespace synthese
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
-
-			/** Remove a link between a site and an object specified by their id.
-				@param siteId ID of the site
-				@param objectId ID of the object. undefined = Removes all links of the alarm
-				@author Hugues Romain
-				@date 2007				
-			*/
-//			static void Remove(
-//				util::RegistryKeyType siteId,
-//				boost::optional<util::RegistryKeyType> objectId = boost::optional<util::RegistryKeyType>()
-//			);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_ObjectSiteLinkTableSync_H__

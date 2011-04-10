@@ -120,7 +120,7 @@ namespace synthese
 			{
 				if(service.second->empty())
 				{
-					ScheduledServiceTableSync::Remove(service.second->getKey(), transaction);
+					ScheduledServiceTableSync::RemoveRow(service.second->getKey(), transaction);
 				}
 				else
 				{

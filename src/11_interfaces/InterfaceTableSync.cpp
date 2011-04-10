@@ -99,6 +99,39 @@ namespace synthese
 			query.addField(object->getDefaultClientURL());
 			query.execute(transaction);
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<InterfaceTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<InterfaceTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<InterfaceTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<InterfaceTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+		}
 	}
 
 	namespace interfaces

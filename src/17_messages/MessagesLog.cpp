@@ -175,5 +175,16 @@ namespace synthese
 			content.push_back(text.str());
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, alarm->getScenario()->getKey());
 		}
-	}
-}
+
+
+
+		void MessagesLog::AddDeleteEntry( const SentScenario& scenario, const security::User& user )
+		{
+			DBLog::ColumnsVector content;
+			content.push_back(lexical_cast<string>(scenario.getKey()));
+			stringstream text;
+			text << "Suppression du scénario " << scenario.getName();
+			content.push_back(text.str());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, scenario.getKey());
+		}
+}	}

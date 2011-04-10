@@ -32,7 +32,7 @@
 #include "ResultHTMLTable.h"
 #include "AdminFunctionRequest.hpp"
 #include "HTMLModule.h"
-#include "DRTAreaRemoveAction.hpp"
+#include "RemoveObjectAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "DRTAreaUpdateAction.hpp"
 
@@ -47,6 +47,7 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace html;
+	using namespace db;
 
 	namespace util
 	{
@@ -113,7 +114,7 @@ namespace synthese
 
 			AdminFunctionRequest<DRTAreaAdmin> openRequest(request);
 
-			AdminActionFunctionRequest<DRTAreaRemoveAction, DRTAreasAdmin> deleteRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, DRTAreasAdmin> deleteRequest(request);
 
 			AdminActionFunctionRequest<DRTAreaUpdateAction, DRTAreaAdmin> addRequest(request);
 			addRequest.setActionWillCreateObject();
@@ -136,7 +137,7 @@ namespace synthese
 				stream << t.row();
 
 				stream << t.col();
-				stream << it.second->getKey();
+				stream << it.first;
 
 				stream << t.col();
 				stream << it.second->getName();
@@ -146,7 +147,7 @@ namespace synthese
 				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), DRTAreaAdmin::ICON);
 
 				stream << t.col();
-				deleteRequest.getAction()->setArea(it.second);
+				deleteRequest.getAction()->setObjectId(it.first);
 				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la zone ?", "delete.png");
 			}
 

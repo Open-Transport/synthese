@@ -35,7 +35,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "VehicleUpdateAction.hpp"
 #include "VehicleTableSync.hpp"
-#include "VehicleRemoveAction.hpp"
+#include "RemoveObjectAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -48,6 +48,8 @@ namespace synthese
 	using namespace security;
 	using namespace pt_operation;
 	using namespace html;
+	using namespace db;
+	
 
 	namespace util
 	{
@@ -113,7 +115,7 @@ namespace synthese
 			createRequest.setActionFailedPage<VehiclesAdmin>();
 			createRequest.setActionWillCreateObject();
 
-			AdminActionFunctionRequest<VehicleRemoveAction, VehiclesAdmin> removeRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, VehiclesAdmin> removeRequest(request);
 
 			// Search
 			VehicleTableSync::SearchResult vehicles(
@@ -153,7 +155,7 @@ namespace synthese
 				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), VehicleAdmin::ICON);
 				
 				stream << t.col();
-				removeRequest.getAction()->setVehicle(const_pointer_cast<const Vehicle>(vehicle));
+				removeRequest.getAction()->setObjectId(vehicle->getKey());
 				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le véhicule "+ vehicle->getName() + " ?");
 			}
 

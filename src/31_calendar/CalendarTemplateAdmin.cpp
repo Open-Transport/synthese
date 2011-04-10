@@ -33,7 +33,7 @@
 #include "CalendarTemplate.h"
 #include "CalendarTemplateElement.h"
 #include "CalendarTemplateElementAddAction.h"
-#include "CalendarTemplateElementRemoveAction.h"
+#include "RemoveObjectAction.hpp"
 #include "CalendarTemplatePropertiesUpdateAction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
@@ -45,7 +45,6 @@
 #include "CalendarTemplateElementTableSync.h"
 #include "CalendarTemplateTableSync.h"
 #include "CalendarTemplateCleanAction.hpp"
-#include "CalendarTemplateRemoveAction.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -63,6 +62,7 @@ namespace synthese
 	using namespace calendar;
 	using namespace html;
 	using namespace security;
+	using namespace db;
 
 	namespace util
 	{
@@ -156,10 +156,10 @@ namespace synthese
 				AdminActionFunctionRequest<CalendarTemplateCleanAction,CalendarTemplateAdmin> cleanRequest(_request);
 				cleanRequest.getAction()->setCalendar(_calendar);
 
-				AdminActionFunctionRequest<CalendarTemplateRemoveAction,CalendarTemplatesAdmin> removeCalendar(_request);
-				removeCalendar.getAction()->setCalendarTemplate(_calendar);
+				AdminActionFunctionRequest<RemoveObjectAction,CalendarTemplatesAdmin> removeCalendar(_request);
+				removeCalendar.getAction()->setObjectId(_calendar->getKey());
 
-				AdminActionFunctionRequest<CalendarTemplateElementRemoveAction,CalendarTemplateAdmin> delRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction,CalendarTemplateAdmin> delRequest(_request);
 
 				AdminFunctionRequest<CalendarTemplateAdmin> searchRequest(_request);
 
@@ -209,7 +209,7 @@ namespace synthese
 				size_t nextRank(0);
 				BOOST_FOREACH(shared_ptr<CalendarTemplateElement> ct, elements)
 				{
-					delRequest.getAction()->setElement(ct);
+					delRequest.getAction()->setObjectId(ct->getKey());
 					nextRank = ct->getRank() + 1;
 				
 					stream << t.row(lexical_cast<string>(ct->getRank()));

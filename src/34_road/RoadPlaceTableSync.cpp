@@ -124,6 +124,41 @@ namespace synthese
 				obj->setCity(NULL);
 			}
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<RoadPlaceTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO Control user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<RoadPlaceTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<RoadPlaceTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<RoadPlaceTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 	
 	

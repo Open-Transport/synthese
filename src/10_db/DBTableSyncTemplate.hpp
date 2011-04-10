@@ -129,6 +129,26 @@ namespace synthese
 				DB* db
 			);
 
+			static bool CanDelete(
+				const server::Session* session,
+				util::RegistryKeyType object_id
+			);
+
+			static void BeforeDelete(
+				util::RegistryKeyType id,
+				DBTransaction&
+			);
+
+			static void AfterDelete(
+				util::RegistryKeyType id,
+				DBTransaction& transaction
+			);
+
+			static void LogRemoval(
+				const server::Session* session,
+				util::RegistryKeyType id
+			);
+
 			////////////////////////////////////////////////////////////////////
 			/// Gets a result row in the database.
 			/// @param key key of the row to get (corresponds to the id field)
@@ -238,6 +258,21 @@ namespace synthese
 				virtual void firstSync(DB* db) const { _FirstSync(db); }
 				virtual void updateSchema(DB* db) const { _UpdateSchema(db); }
 				virtual const DBTableSync::Format& getFormat() const { return K::TABLE; }
+
+				virtual bool canDelete(
+					const server::Session* session,
+					util::RegistryKeyType object_id
+				) const {
+					return K::CanDelete(session, object_id);
+				}
+
+				virtual void deleteRecord(
+					const server::Session* session,
+					util::RegistryKeyType id,
+					DBTransaction& transaction
+				) const {
+					DBTableSyncTemplate<K>::Remove(session, id, transaction);
+				}
 			//@}
 
 
@@ -304,6 +339,23 @@ namespace synthese
 
 
 			static void Remove(
+				const server::Session* session,
+				util::RegistryKeyType id,
+				DBTransaction& transaction,
+				bool log = true
+			){
+				if(log)
+				{
+					DBTableSyncTemplate<K>::LogRemoval(session, id);
+				}
+				DBTableSyncTemplate<K>::BeforeDelete(id, transaction);
+				DBTableSyncTemplate<K>::RemoveRow(id, transaction);
+				DBTableSyncTemplate<K>::AfterDelete(id, transaction);
+			}
+
+
+
+			static void RemoveRow(
 				util::RegistryKeyType key,
 				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()
 			){

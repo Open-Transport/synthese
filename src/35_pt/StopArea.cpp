@@ -379,5 +379,17 @@ namespace synthese
 			_isoBarycentre.reset();
 			_physicalStops.erase(physicalStop.getKey());
 		}
-	}
-}
+
+
+
+		void StopArea::removeTransferDelay( TransferDelaysMap::key_type::first_type departure, TransferDelaysMap::key_type::second_type arrival )
+		{
+			TransferDelaysMap::iterator it(
+				_transferDelays.find(std::make_pair (departure, arrival))
+			);
+			if(it != _transferDelays.end())
+			{
+				_transferDelays.erase(it);
+			}
+		}
+}	}

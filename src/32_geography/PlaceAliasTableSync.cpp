@@ -134,6 +134,39 @@ namespace synthese
 			query.execute(transaction);
 		}
 
+
+
+		template<> bool DBTableSyncTemplate<PlaceAliasTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO Check user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<PlaceAliasTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<PlaceAliasTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<PlaceAliasTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+		}
 	}
 
 	namespace geography

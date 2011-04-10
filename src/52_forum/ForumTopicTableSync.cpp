@@ -161,6 +161,42 @@ namespace synthese
 			ForumTopic* obj
 		){
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<ForumTopicTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO test if the user has sufficient right level
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ForumTopicTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			//TODO delete all messages of the topic
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ForumTopicTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<ForumTopicTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 	
 	

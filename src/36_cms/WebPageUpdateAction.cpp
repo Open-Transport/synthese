@@ -27,6 +27,7 @@
 #include "WebPageUpdateAction.h"
 #include "Request.h"
 #include "WebPageTableSync.h"
+#include "DBTransaction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -37,7 +38,8 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+	using namespace db;
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, cms::WebPageUpdateAction>::FACTORY_KEY("WebPageUpdateAction");
@@ -263,6 +265,8 @@ namespace synthese
 		void WebPageUpdateAction::run(
 			Request& request
 		){
+			DBTransaction transaction;
+
 			stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			
@@ -274,7 +278,8 @@ namespace synthese
 					_page->getRoot()->getKey(),
 					_page->getParent() ? _page->getParent()->getKey() : RegistryKeyType(0),
 					_page->getRank(),
-					false
+					false,
+					transaction
 				);
 
 				// Giving the highest rank into the new branch
@@ -357,7 +362,8 @@ namespace synthese
 				_page->setRawEditor(*_rawEditor);
 			}
 
-			WebPageTableSync::Save(_page.get());
+			WebPageTableSync::Save(_page.get(), transaction);
+			transaction.run();
 
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}

@@ -148,6 +148,39 @@ namespace synthese
 				obj->setInterface(NULL);
 			}
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<InterfacePageTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<InterfacePageTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<InterfacePageTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<InterfacePageTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+		}
 	}
 
 	namespace interfaces

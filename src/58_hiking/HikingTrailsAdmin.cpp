@@ -33,8 +33,8 @@
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "HikingTrailAddAction.h"
-#include "HikingTrailRemoveAction.h"
 #include "HikingTrailAdmin.h"
+#include "RemoveObjectAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -47,6 +47,7 @@ namespace synthese
 	using namespace security;
 	using namespace hiking;
 	using namespace html;
+	using namespace db;
 
 	namespace util
 	{
@@ -123,7 +124,7 @@ namespace synthese
 
 			AdminFunctionRequest<HikingTrailAdmin> openRequest(_request);
 
-			AdminActionFunctionRequest<HikingTrailRemoveAction,HikingTrailsAdmin> removeRequest(_request);
+			AdminActionFunctionRequest<RemoveObjectAction,HikingTrailsAdmin> removeRequest(_request);
 
 			AdminActionFunctionRequest<HikingTrailAddAction,HikingTrailAdmin> addRequest(_request);
 			addRequest.setActionWillCreateObject();
@@ -140,7 +141,7 @@ namespace synthese
 			BOOST_FOREACH(HikingTrailTableSync::SearchResult::value_type trail, trails)
 			{
 				openRequest.getPage()->setTrail(trail);
-				removeRequest.getAction()->setTrail(trail);
+				removeRequest.getAction()->setObjectId(trail->getKey());
 				stream << t.row();
 				stream << t.col() << trail->getName();
 				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), HikingTrailAdmin::ICON);

@@ -32,6 +32,9 @@
 #include "Conversion.h"
 #include "StopArea.hpp"
 #include "Fetcher.h"
+#include "ArrivalDepartureTableRight.h"
+#include "DisplayScreenTableSync.h"
+#include "ArrivalDepartureTableLog.h"
 
 #include <sstream>
 
@@ -46,6 +49,7 @@ namespace synthese
 	using namespace departure_boards;
 	using namespace pt;
 	using namespace geography;
+	using namespace security;
 
 	namespace util
 	{
@@ -138,6 +142,71 @@ namespace synthese
 			DisplayScreenCPU* object
 		){
 			object->setPlace(NULL);
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<DisplayScreenCPUTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			try
+			{
+				Env env;
+				shared_ptr<const DisplayScreenCPU> cpu(DisplayScreenCPUTableSync::Get(object_id, env));
+				if (cpu->getPlace())
+				{
+					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(cpu->getPlace()->getKey()));
+				}
+				else
+				{
+					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				}
+			}
+			catch (ObjectNotFoundException<DisplayScreenCPU>&)
+			{
+				return false;
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DisplayScreenCPUTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			try
+			{
+				Env env;
+				DisplayScreenTableSync::SearchResult screens(DisplayScreenTableSync::SearchFromCPU(env, id));
+				BOOST_FOREACH(const DisplayScreenTableSync::SearchResult::value_type& screen, screens)
+				{
+					DisplayScreenTableSync::Remove(NULL, screen->getKey(), transaction, false);
+				}
+			}
+			catch (ObjectNotFoundException<DisplayScreenCPU>&)
+			{
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DisplayScreenCPUTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<DisplayScreenCPUTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			// Log
+			Env env;
+			shared_ptr<const DisplayScreenCPU> cpu(DisplayScreenCPUTableSync::Get(id, env));
+			ArrivalDepartureTableLog::addRemoveEntry(*cpu, *session->getUser());
 		}
 	}
 	

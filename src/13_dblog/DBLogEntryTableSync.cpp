@@ -23,7 +23,8 @@
 #include "DeleteQuery.hpp"
 #include "SelectQuery.hpp"
 #include "ReplaceQuery.h"
-
+#include "DBLog.h"
+#include "DBLogRight.h"
 #include "UserTableSync.h"
 #include "DBLogEntryTableSync.h"
 
@@ -154,6 +155,57 @@ namespace synthese
 			query.execute(transaction);
 		}
 
+		template<> bool DBTableSyncTemplate<DBLogEntryTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			Env env;
+			boost::shared_ptr<DBLog> dbLog;
+			try
+			{
+				shared_ptr<const DBLogEntry> entry(DBLogEntryTableSync::Get(object_id, env));
+				dbLog.reset(Factory<DBLog>::create(entry->getLogKey()));
+			}
+			catch(ObjectNotFoundException<DBLogEntry>&)
+			{
+				return false;
+			}
+			catch(FactoryException<DBLog>&)
+			{
+				return false;
+			}
+
+			return 
+				session &&
+				session->hasProfile() &&
+				session->getUser()->getProfile()->isAuthorized<DBLogRight>(DELETE_RIGHT) &&
+				dbLog->isAuthorized(*session->getUser()->getProfile(), DELETE_RIGHT)
+			;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DBLogEntryTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DBLogEntryTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<DBLogEntryTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+		}
 	}
 
 	namespace dblog

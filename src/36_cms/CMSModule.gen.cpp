@@ -8,6 +8,7 @@ synthese::cms::CMSModule::integrate();
 
 synthese::cms::BitAndFunction::integrate();
 synthese::cms::DateService::integrate();
+synthese::cms::EvalService::integrate();
 synthese::cms::LanguageSelectorService::integrate();
 synthese::cms::WebPageDisplayFunction::integrate();
 synthese::cms::WebPageLastNewsFunction::integrate();
@@ -29,7 +30,6 @@ synthese::cms::ChrFunction::integrate();
 
 synthese::cms::WebPageAddAction::integrate();
 synthese::cms::WebPageUpdateAction::integrate();
-synthese::cms::WebPageRemoveAction::integrate();
 synthese::cms::WebPageLinkAddAction::integrate();
 synthese::cms::WebPageLinkRemoveAction::integrate();
 synthese::cms::WebPageMoveAction::integrate();

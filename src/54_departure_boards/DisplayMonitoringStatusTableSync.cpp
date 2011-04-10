@@ -197,6 +197,41 @@ namespace synthese
 			DisplayMonitoringStatus* obj
 		){
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<DisplayMonitoringStatusTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO test if the user has sufficient right level
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DisplayMonitoringStatusTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DisplayMonitoringStatusTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<DisplayMonitoringStatusTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 	
 	

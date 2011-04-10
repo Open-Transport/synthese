@@ -27,7 +27,8 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
-
+#include "MessagesLibraryLog.h"
+#include "MessagesLibraryRight.h"
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
 
@@ -41,6 +42,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace messages;
+	using namespace security;
 
 	namespace util
 	{
@@ -110,7 +112,44 @@ namespace synthese
 			query.execute(transaction);
 		}
 
+
+
+		template<> bool DBTableSyncTemplate<TextTemplateTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TextTemplateTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TextTemplateTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<TextTemplateTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			Env env;
+			shared_ptr<const TextTemplate> text(TextTemplateTableSync::Get(id, env));
+			MessagesLibraryLog::AddTemplateDeleteEntry(*text, session->getUser().get());
+		}
 	}
+
+
 
 	namespace messages
 	{

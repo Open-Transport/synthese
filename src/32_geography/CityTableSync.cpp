@@ -90,6 +90,8 @@ namespace synthese
 			GeographyModule::RemoveFromCitiesMatchers(Env::GetOfficialEnv().getEditableSPtr(obj));
 		}
 
+
+
 		template<> void DBDirectTableSyncTemplate<CityTableSync,City>::Save(
 			City* object,
 			optional<DBTransaction&> transaction
@@ -98,6 +100,41 @@ namespace synthese
 			query.addField(object->getName());
 			query.addField(object->getCode());
 			query.execute(transaction);
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<CityTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO check user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CityTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CityTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<CityTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 

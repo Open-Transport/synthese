@@ -34,7 +34,7 @@
 #include "HTMLModule.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "DataSourceUpdateAction.hpp"
-#include "DataSourceRemoveAction.hpp"
+#include "RemoveObjectAction.hpp"
 #include "HTMLForm.h"
 #include "ImpExModule.h"
 
@@ -52,7 +52,8 @@ namespace synthese
 	using namespace impex;
 	using namespace security;
 	using namespace html;
-
+	using namespace db;
+	
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, DataSourcesAdmin>::FACTORY_KEY("DataSourcesAdmin");
@@ -121,7 +122,7 @@ namespace synthese
 			addRequest.setActionWillCreateObject();
 			addRequest.setActionFailedPage<DataSourcesAdmin>();
 
-			AdminActionFunctionRequest<DataSourceRemoveAction, DataSourcesAdmin> removeRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, DataSourcesAdmin> removeRequest(request);
 
 			DataSourceTableSync::SearchResult dataSources(
 				DataSourceTableSync::Search(
@@ -150,7 +151,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<DataSource> dataSource, dataSources)
 			{
 				openRequest.getPage()->setDataSource(const_pointer_cast<const DataSource>(dataSource));
-				removeRequest.getAction()->setDataSource(const_pointer_cast<const DataSource>(dataSource));
+				removeRequest.getAction()->setObjectId(dataSource->getKey());
 
 				stream << t.row();
 				stream << t.col() << dataSource->getKey();

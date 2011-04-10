@@ -52,11 +52,10 @@
 #include "PropertiesHTMLTable.h"
 #include "RollingStockTableSync.h"
 #include "LineStopAddAction.h"
-#include "LineStopRemoveAction.h"
 #include "PTPlacesAdmin.h"
 #include "City.h"
 #include "LineStopUpdateAction.hpp"
-#include "ServiceRemoveAction.h"
+#include "RemoveObjectAction.hpp"
 #include "ImportableAdmin.hpp"
 #include "DRTAreaAdmin.hpp"
 #include "DRTArea.hpp"
@@ -79,7 +78,7 @@ namespace synthese
 	using namespace security;
 	using namespace graph;
 	using namespace impex;
-	
+	using namespace db;
 
 	namespace util
 	{
@@ -177,7 +176,7 @@ namespace synthese
 				// Reservation
 // 				bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
 				
-				AdminActionFunctionRequest<LineStopRemoveAction,JourneyPatternAdmin> lineStopRemoveAction(_request);
+				AdminActionFunctionRequest<RemoveObjectAction,JourneyPatternAdmin> lineStopRemoveAction(_request);
 				
 				AdminActionFunctionRequest<LineStopAddAction,JourneyPatternAdmin> lineStopAddAction(_request);
 				lineStopAddAction.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
@@ -223,7 +222,7 @@ namespace synthese
 						static_pointer_cast<const LineStop, const LineArea>(lineArea)
 					);
 						
-					lineStopRemoveAction.getAction()->setLineStop(lineStop);
+					lineStopRemoveAction.getAction()->setObjectId(lineStop->getKey());
 					lineStopUpdateAction.getAction()->setLineStop(const_pointer_cast<LineStop>(lineStop));
 
 					if(linePhysicalStop.get())
@@ -393,7 +392,7 @@ namespace synthese
 				newRequest.getAction()->setLine(const_pointer_cast<JourneyPattern>(_line));
 				newRequest.getAction()->setIsContinuous(false);
 
-				AdminActionFunctionRequest<ServiceRemoveAction, JourneyPatternAdmin> removeRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction, JourneyPatternAdmin> removeRequest(_request);
 
 				ActionResultHTMLTable::HeaderVector vs;
 				vs.push_back(make_pair(string(), "Num"));
@@ -414,9 +413,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<ScheduledService> service, sservices)
 				{
 					serviceRequest.getPage()->setService(service);
-					removeRequest.getAction()->setService(
-						const_pointer_cast<const Service>(static_pointer_cast<Service, ScheduledService>(service))
-					);
+					removeRequest.getAction()->setObjectId(service->getKey());
 
 					string number("S"+ lexical_cast<string>(i++));
 					services[service.get()] = number;
@@ -468,7 +465,7 @@ namespace synthese
 
 				AdminFunctionRequest<ServiceAdmin> serviceRequest(_request);
 
-				AdminActionFunctionRequest<ServiceRemoveAction, JourneyPatternAdmin> removeRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction, JourneyPatternAdmin> removeRequest(_request);
 
 				ActionResultHTMLTable::HeaderVector vc;
 				vc.push_back(make_pair(string(), "Num"));
@@ -491,9 +488,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<ContinuousService> service, cservices)
 				{
 					serviceRequest.getPage()->setService(service);
-					removeRequest.getAction()->setService(
-						const_pointer_cast<const Service>(static_pointer_cast<Service, ContinuousService>(service))
-					);
+					removeRequest.getAction()->setObjectId(service->getKey());
 
 					string number("C"+ lexical_cast<string>(i++));
 					services[service.get()] = number;
