@@ -305,8 +305,8 @@ namespace synthese
 			_NonConcurrencyCache::const_iterator it(
 				_nonConcurrencyCache.find(
 					_NonConcurrencyCache::key_type(
-						departureEdge.getRankInPath(),
-						arrivalEdge.getRankInPath(),
+						&departureEdge,
+						&arrivalEdge,
 						userClass,
 						date
 			)	)	);
@@ -380,13 +380,13 @@ namespace synthese
 								{
 									_nonConcurrencyCache.insert(
 										make_pair(
-										_NonConcurrencyCache::key_type(
-										departureEdge.getRankInPath(),
-										arrivalEdge.getRankInPath(),
-										userClass,
-										date
-										), false
-										)	);
+											_NonConcurrencyCache::key_type(
+												&departureEdge,
+												&arrivalEdge,
+												userClass,
+												date
+											), false
+									)	);
 									return false;
 								}
 							}
@@ -398,8 +398,8 @@ namespace synthese
 			_nonConcurrencyCache.insert(
 				make_pair(
 					_NonConcurrencyCache::key_type(
-						departureEdge.getRankInPath(),
-						arrivalEdge.getRankInPath(),
+						&departureEdge,
+						&arrivalEdge,
 						userClass,
 						date
 					), true

@@ -65,8 +65,8 @@ namespace synthese
 		private:
 			typedef std::map<
 				boost::tuples::tuple<
-					std::size_t,
-					std::size_t,
+					const graph::Edge*,
+					const graph::Edge*,
 					std::size_t,
 					boost::gregorian::date
 				>, bool
@@ -88,7 +88,6 @@ namespace synthese
 
 			~ScheduledService ();
 
-		    
 			//! @name Getters
 			//@{
 				virtual std::string getTeam() const;
