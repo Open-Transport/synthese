@@ -33,8 +33,8 @@
 #include "DataSource.h"
 #include "ImpExModule.h"
 #include "Importer.hpp"
-#include "StopPointMoveAction.hpp"
 #include "StopPointAddAction.hpp"
+#include "StopPointUpdateAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "HTMLModule.h"
 #include "HTMLForm.h"
@@ -365,7 +365,7 @@ namespace synthese
 							stream << t.col();
 							if(distance != 0)
 							{
-								AdminActionFunctionRequest<StopPointMoveAction, DataSourceAdmin> moveRequest(*request);
+								AdminActionFunctionRequest<StopPointUpdateAction, DataSourceAdmin> moveRequest(*request);
 								moveRequest.getAction()->setStop(bahnhof.second.stop);
 								moveRequest.getAction()->setPoint(DBModule::GetStorageCoordinatesSystem().convertPoint(*bahnhof.second.coords));
 								stream << HTMLModule::getLinkButton(moveRequest.getHTMLForm().getURL(), "Mettre à jour coordonnées");

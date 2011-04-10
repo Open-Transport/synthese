@@ -37,18 +37,25 @@ namespace synthese
 
 	namespace geography
 	{
+		const std::string HTMLMap::PARAMETER_ACTION_WKT("actionParamwkt");
+
 		HTMLMap::HTMLMap(
 			const Point& center,
 			int zoom,
 			bool editable,
 			bool addable,
+			bool highlight,
 			const std::string id /*= "map" */
 		):	_center(static_cast<Point*>(center.clone())),
 			_zoom(zoom),
 			_editable(editable),
+			_highlight(highlight),
 			_id(id)
 		{
-			_controls.push_back(Control(Control::HIGHLIGHT, "highlight", true));
+			if(highlight)
+			{
+				_controls.push_back(Control(Control::HIGHLIGHT, "highlight", true));
+			}
 			if(editable)
 			{
 				_controls.push_back(Control(Control::DRAG, "modify", true));
@@ -81,34 +88,113 @@ namespace synthese
 					"map.addLayers([mapnik, vectorLayer]);"
 			;
 
-			BOOST_FOREACH(const Points::value_type& point, _points)
+			if(!_lineStrings.empty())
 			{
-				shared_ptr<Point> wgs84Point(
-					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-						*point.point
-				)	);
-				stream <<
-					"vectorLayer.addFeatures(" <<
-						"new OpenLayers.Feature.Vector(" <<
-							"new OpenLayers.Geometry.Point(" << fixed << wgs84Point->getX() << "," << fixed << wgs84Point->getY() << ").transform(" <<
+				bool first(true);
+				stream << "vectorLayer.addFeatures(Array(";
+				BOOST_FOREACH(const LineStrings::value_type& lineString, _lineStrings)
+				{
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						stream << ",";
+					}
+					stream << "new OpenLayers.Feature.Vector(new OpenLayers.Geometry.LineString(Array(";
+					for(size_t i=0; i<lineString.lineString->getNumPoints(); ++i)
+					{
+						shared_ptr<Point> wgs84Point(
+							CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+								*lineString.lineString->getPointN(i)
+						)	);
+
+						if(i>0)
+						{
+							stream << ",";
+						}
+						stream <<
+							"new OpenLayers.Geometry.Point(" <<
+								fixed << wgs84Point->getX() << "," << fixed << wgs84Point->getY() <<
+							").transform(" <<
 								"new OpenLayers.Projection(\"EPSG:4326\")," << // transform from WGS 1984
 								"new OpenLayers.Projection(\"EPSG:900913\")" << // to Spherical Mercator Projection
-							"),{ graphic:\"" << HTMLModule::EscapeDoubleQuotes(point.icon) << "\"," <<
+							")"
+						;
+					}
+					stream <<
+						")),{" <<
+							"'editionStrokeColor':'#000080'," <<
+							"'waitingStrokeColor':'#00ffff'," <<
+							"'strokeColor':'#ff0000'," <<
+							"'requestURL':\"" << HTMLModule::EscapeDoubleQuotes(lineString.updateRequest) << "\"" <<
+						"},{" <<
+							"'strokeWidth': 5," <<
+							"'strokeColor': '#ff0000'" <<
+						"}" <<
+					")";
+				}
+				stream << "));";
+			}
+
+			if(!_points.empty())
+			{
+				bool first(true);
+				stream << "vectorLayer.addFeatures(Array(";
+				BOOST_FOREACH(const Points::value_type& point, _points)
+				{
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						stream << ",";
+					}
+					shared_ptr<Point> wgs84Point(
+						CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+							*point.point
+					)	);
+					stream <<
+						"new OpenLayers.Feature.Vector(" <<
+							"new OpenLayers.Geometry.Point(" << fixed << wgs84Point->getX() << "," << fixed << wgs84Point->getY() <<
+							").transform(" <<
+								"new OpenLayers.Projection(\"EPSG:4326\")," << // transform from WGS 1984
+								"new OpenLayers.Projection(\"EPSG:900913\")" << // to Spherical Mercator Projection
+							"),{graphic:\"" << HTMLModule::EscapeDoubleQuotes(point.icon) << "\"," <<
 								"waitingGraphic:\"" << HTMLModule::EscapeDoubleQuotes(point.waitingIcon) << "\"," <<
 								"editionGraphic:\"" << HTMLModule::EscapeDoubleQuotes(point.editionIcon) << "\"," <<
-								"requestURL:\"" << HTMLModule::EscapeDoubleQuotes(point.updateRequest) << "\"," <<
-								"htmlPopup:\"" << HTMLModule::EscapeDoubleQuotes(point.htmlPopup) << "\"" <<
-							"},{ externalGraphic:\"" << HTMLModule::EscapeDoubleQuotes(point.icon) << "\"," <<
-								"graphicHeight: 25," <<
-								"graphicWidth: 21" <<
+								"requestURL:\"" << HTMLModule::EscapeDoubleQuotes(point.updateRequest) << "\",";
+					if(_highlight)
+					{
+						stream <<
+								"htmlPopup:\"" << HTMLModule::EscapeDoubleQuotes(point.htmlPopup) << "\"";
+					}
+					stream <<
+							"},{externalGraphic:\"" << HTMLModule::EscapeDoubleQuotes(point.icon) << "\"," <<
+							"graphicWidth:" << point.width << "," <<
+							"graphicHeight:" << point.height;
+					if(!_highlight)
+					{
+						stream << ",label:\"" << HTMLModule::EscapeDoubleQuotes(point.htmlPopup) << "\"" <<
+								",fontSize: '10px'" <<
+								",fontWeight: 'bold'" <<
+								",labelAlign: 'lt'" <<
+								",labelXOffset: '5'" <<
+								",labelYOffset: '-5'";
+					}
+					stream <<
 							"}" <<
-					")	);"
-				;
+						")"
+					;
+				}
+				stream << "));";
 			}
 
 			if(!_controls.empty())
 			{
-				stream << "controls = {";
+				stream << "var controls = {";
 				bool first(true);
 				BOOST_FOREACH(const Control& control, _controls)
 				{
@@ -140,21 +226,28 @@ namespace synthese
 				stream <<
 					"vectorLayer.events.on({" <<
 						"'beforefeaturemodified': function(evt) {" <<
-							"evt.feature.style.externalGraphic = evt.feature.data.editionGraphic;" <<
+							"if(controls['highlight']) controls['highlight'].deactivate();" <<
+							"if(evt.feature.data.editionGraphic) evt.feature.style.externalGraphic = evt.feature.data.editionGraphic;" <<
+							"if(evt.feature.data.editionStrokeColor) evt.feature.style.strokeColor = evt.feature.data.editionStrokeColor;" <<
 							"vectorLayer.redraw();" <<
 						"}," <<
 						"'afterfeaturemodified': function(evt) {" <<
-							"evt.feature.style.externalGraphic = evt.feature.data.waitingGraphic;" <<
+							"if(controls['highlight']) controls['highlight'].activate();" <<
+							"if(evt.feature.data.waitingGraphic) evt.feature.style.externalGraphic = evt.feature.data.waitingGraphic;\n" <<
+							"if(evt.feature.data.waitingStrokeColor) evt.feature.style.strokeColor = evt.feature.data.waitingStrokeColor;" <<
 							"vectorLayer.redraw();" <<
-							"var newpoint = evt.feature.geometry.clone();" <<
-							"newpoint.transform(" <<
+							"var feat = evt.feature.clone();" <<
+							"feat.geometry.transform(" <<
 								"new OpenLayers.Projection(\"EPSG:900913\")," << // to Spherical Mercator Projection
 								"new OpenLayers.Projection(\"EPSG:4326\")" << // transform from WGS 1984
 							");" <<
-							"new OpenLayers.Ajax.Request(evt.feature.data.requestURL + '&actionParamlon='+ newpoint.x +'&actionParamlat=' + newpoint.y," <<
-							"{   method: 'get'," <<
+							"var writer = new OpenLayers.Format.WKT();" <<
+							"var wkt = writer.write(feat);" <<
+							"new OpenLayers.Ajax.Request(evt.feature.data.requestURL + '&" << PARAMETER_ACTION_WKT << "='+ wkt," <<
+							"{	method: 'get'," <<
 								"onComplete: function(transport) {" <<
-									"evt.feature.style.externalGraphic = evt.feature.data.graphic;" <<
+									"if(evt.feature.data.graphic) evt.feature.style.externalGraphic = evt.feature.data.graphic;" <<
+									"if(evt.feature.data.strokeColor) evt.feature.style.strokeColor = evt.feature.data.strokeColor;" <<
 									"vectorLayer.redraw();" <<
 								"}" <<
 							"});" <<
@@ -224,7 +317,7 @@ namespace synthese
 			}
 			else if(_controlType == Control::DRAG)
 			{
-				stream << "ModifyFeature(" << layerName << ", { mode: OpenLayers.Control.ModifyFeature.DRAG })";
+				stream << "ModifyFeature(" << layerName << ", { mode: OpenLayers.Control.ModifyFeature.RESHAPE })";
 			}
 			else if(_controlType == Control::HIGHLIGHT)
 			{

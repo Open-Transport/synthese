@@ -31,14 +31,25 @@
 #include "StopPointTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineArea.hpp"
+#include "DBModule.h"
+#include "HTMLMap.hpp"
+
+#include <geos/geom/LineString.h>
+#include <geos/io/WKTReader.h>
+#include <geos/io/WKTWriter.h>
 
 using namespace std;
+using namespace boost;
+using namespace geos::geom;
+using namespace geos::io;
 
 namespace synthese
 {
 	using namespace server;
 	using namespace security;
 	using namespace util;
+	using namespace db;
+	using namespace geography;
 	
 	namespace util
 	{
@@ -77,6 +88,11 @@ namespace synthese
 			{
 				map.insert(PARAMETER_ALLOWED_INTERNAL, *_allowedInternal);
 			}
+			if(_geometry)
+			{
+				WKTWriter writer;
+				map.insert(HTMLMap::PARAMETER_ACTION_WKT, _geometry->get() ? writer.write(static_cast<const Geometry*>(_geometry->get())) : string());
+			}
 			return map;
 		}
 		
@@ -87,14 +103,37 @@ namespace synthese
 			try
 			{
 				_lineStop = LineStopTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_LINE_STOP_ID), *_env);
-				RegistryKeyType psid(map.getDefault<RegistryKeyType>(PARAMETER_PHYSICAL_STOP_ID, 0));
-				if(psid)
+
+				if(map.isDefined(PARAMETER_PHYSICAL_STOP_ID))
 				{
-					_physicalStop = StopPointTableSync::GetEditable(psid, *_env);
+					RegistryKeyType psid(map.get<RegistryKeyType>(PARAMETER_PHYSICAL_STOP_ID));
+					if(psid)
+					{
+						_physicalStop = StopPointTableSync::GetEditable(psid, *_env);
+					}
 				}
-				_allowedArrival = map.getOptional<bool>(PARAMETER_ALLOWED_ARRIVAL);
-				_allowedDeparture = map.getOptional<bool>(PARAMETER_ALLOWED_DEPARTURE);
-				_allowedInternal = map.getOptional<bool>(PARAMETER_ALLOWED_INTERNAL);
+
+				if(map.isDefined(PARAMETER_ALLOWED_ARRIVAL))
+				{
+					_allowedArrival = map.get<bool>(PARAMETER_ALLOWED_ARRIVAL);
+				}
+				if(map.isDefined(PARAMETER_ALLOWED_DEPARTURE))
+				{
+					_allowedDeparture = map.get<bool>(PARAMETER_ALLOWED_DEPARTURE);
+				}
+				if(map.isDefined(PARAMETER_ALLOWED_INTERNAL))
+				{
+					_allowedInternal = map.get<bool>(PARAMETER_ALLOWED_INTERNAL);
+				}
+
+				if(map.isDefined(HTMLMap::PARAMETER_ACTION_WKT))
+				{
+					WKTReader reader(&DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
+					_geometry = shared_ptr<LineString>(
+						static_cast<LineString*>(
+							reader.read(map.get<string>(HTMLMap::PARAMETER_ACTION_WKT))
+					)	);
+				}
 			}
 			catch(ObjectNotFoundException<LineStop>&)
 			{
@@ -129,6 +168,10 @@ namespace synthese
 			if(_allowedDeparture)
 			{
 				_lineStop->setIsDeparture(*_allowedDeparture);
+			}
+			if(_geometry)
+			{
+				_lineStop->setGeometry(*_geometry);
 			}
 
 			LineStopTableSync::Save(_lineStop.get());
