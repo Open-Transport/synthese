@@ -102,6 +102,41 @@ namespace synthese
 			DataSource* object
 		){
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<DataSourceTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO test if the user has sufficient right level
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DataSourceTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DataSourceTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<DataSourceTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 
 	namespace impex
@@ -112,7 +147,7 @@ namespace synthese
 		}
 
 
-	    
+
 		DataSourceTableSync::SearchResult DataSourceTableSync::Search(
 			Env& env,
 			string name,

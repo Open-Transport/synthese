@@ -28,6 +28,8 @@
 #include "CityTableSync.h"
 #include "SelectQuery.hpp"
 #include "ImportableTableSync.hpp"
+#include "StopPointTableSync.hpp"
+#include "TransportNetworkRight.h"
 
 #include <boost/tokenizer.hpp>
 #include <assert.h>
@@ -43,6 +45,7 @@ namespace synthese
 	using namespace geography;
 	using namespace road;
 	using namespace impex;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<DBTableSync,pt::StopAreaTableSync>::FACTORY_KEY("35.40.01 Connection places");
 	template<> const string FactorableTemplate<Fetcher<NamedPlace>, StopAreaTableSync>::FACTORY_KEY("7");
@@ -231,6 +234,46 @@ namespace synthese
 //				city->removePlaceFromMatcher<StopArea>(cp);
 				city->removeIncludedPlace(cp);
 			}
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<StopAreaTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<StopAreaTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			Env env;
+			StopPointTableSync::SearchResult stops(StopPointTableSync::Search(env, id));
+			BOOST_FOREACH(const StopPointTableSync::SearchResult::value_type& stop, stops)
+			{
+				StopPointTableSync::Remove(NULL, stop->getKey(), transaction, false);
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<StopAreaTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<StopAreaTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 

@@ -1,23 +1,22 @@
-
 /** StopPointTableSync class implementation.
-    @file StopPointTableSync.cpp
+	@file StopPointTableSync.cpp
 
-    This file belongs to the SYNTHESE project (public transportation specialized software)
-    Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
 
-    This program is free software; you can redistribute it and/or
-    modify it under the terms of the GNU General Public License
-    as published by the Free Software Foundation; either version 2
-    of the License, or (at your option) any later version.
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include "StopPointTableSync.hpp"
@@ -30,6 +29,7 @@
 #include "CityTableSync.h"
 #include "CrossingTableSync.hpp"
 #include "ImportableTableSync.hpp"
+#include "TransportNetworkRight.h"
 
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/Point.h>
@@ -40,12 +40,13 @@ using namespace geos::geom;
 
 namespace synthese
 {
-    using namespace db;
-    using namespace util;
+	using namespace db;
+	using namespace util;
 	using namespace pt;
 	using namespace geography;
 	using namespace road;
 	using namespace impex;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<DBTableSync,StopPointTableSync>::FACTORY_KEY("35.55.01 Physical stops");
 	template<> const string FactorableTemplate<Fetcher<graph::Vertex>, StopPointTableSync>::FACTORY_KEY("12");
@@ -61,8 +62,8 @@ namespace synthese
 		const string StopPointTableSync::COL_PROJECTED_METRIC_OFFSET("projected_metric_offset");
 	}
 
-    namespace db
-    {
+	namespace db
+	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<StopPointTableSync>::TABLE(
 			"t012_physical_stops"
 		);
@@ -229,10 +230,44 @@ namespace synthese
 
 			query.execute(transaction);
 		}
-    }
 
-    namespace pt
-    {
+
+
+		template<> bool DBTableSyncTemplate<StopPointTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<StopPointTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<StopPointTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<StopPointTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
+	}
+
+	namespace pt
+	{
 		StopPointTableSync::SearchResult StopPointTableSync::Search(
 			Env& env, 
 			optional<RegistryKeyType> placeId,

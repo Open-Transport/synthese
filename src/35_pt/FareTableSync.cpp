@@ -29,6 +29,7 @@
 #include "DBException.hpp"
 #include "ReplaceQuery.h"
 #include "FareTableSync.h"
+#include "TransportNetworkRight.h"
 
 #include <boost/foreach.hpp>
 
@@ -40,6 +41,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace pt;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<DBTableSync, FareTableSync>::FACTORY_KEY("35.10.02 Fares");
 
@@ -91,9 +93,41 @@ namespace synthese
 
 		template<> void DBDirectTableSyncTemplate<FareTableSync,Fare>::Unlink(Fare* obj)
 		{
-
 		}
 
+
+
+		template<> bool DBTableSyncTemplate<FareTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<FareTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<FareTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<FareTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 
 	namespace pt

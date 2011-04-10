@@ -239,6 +239,41 @@ namespace synthese
 			obj->setVehicles(Composition::VehicleLinks());
 			obj->setServedVertices(Service::ServedVertices());
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<CompositionTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO Check the user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CompositionTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CompositionTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<CompositionTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 	
 	

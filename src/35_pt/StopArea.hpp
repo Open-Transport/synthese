@@ -232,6 +232,11 @@ namespace synthese
 
 				void clearTransferDelays ();
 
+				void removeTransferDelay(
+					TransferDelaysMap::key_type::first_type departure,
+					TransferDelaysMap::key_type::second_type arrival
+				);
+
 				void removePhysicalStop(const pt::StopPoint& physicalStop);
 			//@}
 

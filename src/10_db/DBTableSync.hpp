@@ -36,6 +36,11 @@
 
 namespace synthese
 {
+	namespace server
+	{
+		class Session;
+	}
+
 	namespace db
 	{
 		typedef std::vector<util::RegistryKeyType> RowIdList;
@@ -43,6 +48,7 @@ namespace synthese
 		class DBException;
 		class DBResult;
 		class DB;
+		class DBTransaction;
 
 		/// @defgroup refLS Table synchronizers.
 		///	@ingroup ref
@@ -248,6 +254,34 @@ namespace synthese
 				///	@author Hugues Romain
 				///	@date 2008
 				virtual void updateSchema(DB* db) const = 0;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if specified object can be deleted from the table, according to
+				/// the current user rights if a session is opened.
+				/// @param session currently opened session
+				/// @param object_id id of the object to remove
+				/// @param recursively test for a recursive deletion
+				/// @author Hugues Romain
+				/// @since 2011
+				/// @version 3.3.0
+				virtual bool canDelete(
+					const server::Session* session,
+					util::RegistryKeyType object_id
+				) const = 0;
+
+
+
+				////////////////////////////////////////////////////////////////////
+				/// Utility method to delete a record specified by its id.
+				/// @param id id of the record to delete
+				/// @param recursively delete the records of the tables that point to the deleted record.
+				virtual void deleteRecord(
+					const server::Session* session,
+					util::RegistryKeyType id,
+					DBTransaction& transaction
+				) const = 0;
 			//@}
 
 			
@@ -273,7 +307,6 @@ namespace synthese
 				util::RegistryKeyType id
 			) const = 0;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_db_DBTableSync_hpp__

@@ -35,7 +35,7 @@
 #include "ResultHTMLTable.h"
 #include "HTMLModule.h"
 #include "WebPageAddAction.h"
-#include "WebPageRemoveAction.h"
+#include "RemoveObjectAction.hpp"
 #include "WebPageLinkAddAction.hpp"
 #include "WebPageLinkRemoveAction.hpp"
 #include "WebPageMoveAction.hpp"
@@ -57,6 +57,7 @@ namespace synthese
 	using namespace security;
 	using namespace cms;
 	using namespace html;
+	using namespace db;
 
 	namespace util
 	{
@@ -251,7 +252,7 @@ namespace synthese
 					AdminActionFunctionRequest<WebPageAddAction, WebPageAdmin> addRequest(request);
 					addRequest.getAction()->setParent(const_pointer_cast<Webpage>(_page));
 
-					AdminActionFunctionRequest<WebPageRemoveAction, WebPageAdmin> deleteRequest(request);
+					AdminActionFunctionRequest<RemoveObjectAction, WebPageAdmin> deleteRequest(request);
 
 					AdminActionFunctionRequest<WebPageMoveAction, WebPageAdmin> moveRequest(request);
 
@@ -387,7 +388,7 @@ namespace synthese
 		void WebPageAdmin::_displaySubPages(
 			std::ostream& stream,
 			const WebPageTableSync::SearchResult& pages,
-			StaticActionRequest<WebPageRemoveAction>& deleteRequest,
+			StaticActionRequest<RemoveObjectAction>& deleteRequest,
 			StaticActionRequest<WebPageMoveAction>& moveRequest,
 			const admin::AdminRequest& request,
 			HTMLTable& t,
@@ -410,7 +411,7 @@ namespace synthese
 				){
 					viewRequest.setClientURL(page->getRoot()->getClientURL());
 				}
-				deleteRequest.getAction()->setPage(page);
+				deleteRequest.getAction()->setObjectId(page->getKey());
 
 				stream << t.row();
 				stream << t.col();
@@ -469,7 +470,7 @@ namespace synthese
 			std::ostream& stream,
 			RegistryKeyType parentId,
 			server::StaticActionRequest<WebPageAddAction>& createRequest,
-			server::StaticActionRequest<WebPageRemoveAction>& deleteRequest,
+			server::StaticActionRequest<RemoveObjectAction>& deleteRequest,
 			server::StaticActionRequest<WebPageMoveAction>& moveRequest,
 			const admin::AdminRequest& request
 		){

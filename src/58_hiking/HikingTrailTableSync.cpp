@@ -29,6 +29,7 @@
 #include "SelectQuery.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopArea.hpp"
+#include "HikingRight.h"
 
 using namespace std;
 using namespace boost;
@@ -39,6 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace hiking;
 	using namespace pt;
+	using namespace security;
 
 	namespace util
 	{
@@ -155,6 +157,39 @@ namespace synthese
 
 		template<> void DBDirectTableSyncTemplate<HikingTrailTableSync,HikingTrail>::Unlink(
 			HikingTrail* obj
+		){
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<HikingTrailTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<HikingRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<HikingTrailTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<HikingTrailTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<HikingTrailTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
 		){
 		}
 	}

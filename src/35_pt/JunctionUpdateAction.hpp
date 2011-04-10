@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// DRTAreaRemoveAction class header.
-///	@file DRTAreaRemoveAction.hpp
+/// JunctionUpdateAction class header.
+///	@file JunctionUpdateAction.hpp
 ///	@author RCSobility
 ///	@date 2011
 ///
@@ -22,43 +22,52 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_DRTAreaRemoveAction_H__
-#define SYNTHESE_DRTAreaRemoveAction_H__
+#ifndef SYNTHESE_JunctionUpdateAction_H__
+#define SYNTHESE_JunctionUpdateAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+
+#include <boost/optional.hpp>
 
 namespace synthese
 {
 	namespace pt
 	{
-		class DRTArea;
+		class StopPoint;
+		class Junction;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 35.15 Action : DRTAreaRemoveAction.
+		/// 35.15 Action : JunctionUpdateAction.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Junction_update
+		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m35Actions refActions
 		///	@author RCSobility
 		///	@date 2011
-		/// @since 3.2.1
-		//////////////////////////////////////////////////////////////////////////
-		/// Key : DRTAreaRemoveAction
-		///
-		/// Parameters :
-		///	<dl>
-		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
-		///	</dl>
-		class DRTAreaRemoveAction:
-			public util::FactorableTemplate<server::Action, DRTAreaRemoveAction>
+		/// @since 3.3.0
+		class JunctionUpdateAction:
+			public util::FactorableTemplate<server::Action, JunctionUpdateAction>
 		{
 		public:
-			static const std::string PARAMETER_AREA;
+			static const std::string PARAMETER_JUNCTION_ID;
+			static const std::string PARAMETER_FROM_ID;
+			static const std::string PARAMETER_TO_ID;
+			static const std::string PARAMETER_LENGTH;
+			static const std::string PARAMETER_TIME;
+			static const std::string PARAMETER_BIDIRECTIONAL;
 
 		private:
-			boost::shared_ptr<const DRTArea> _area;
+			boost::shared_ptr<Junction> _junction;
+			boost::optional<bool> _bidirectional;
+			boost::optional<boost::shared_ptr<StopPoint> > _from;
+			boost::optional<boost::shared_ptr<StopPoint> > _to;
+			boost::optional<double> _length;
+			boost::optional<boost::posix_time::time_duration> _duration;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a generic parameters map from the action parameters.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Junction_update#Request
 			/// @return The generated parameters map
 			server::ParametersMap getParametersMap() const;
 
@@ -66,6 +75,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads the parameters of the action on a generic parameters map.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Junction_update#Request
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const server::ParametersMap& map);
@@ -88,10 +98,10 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setArea(boost::shared_ptr<const DRTArea> value) { _area = value; }
+				void setJunction(boost::shared_ptr<Junction> value) { _junction = value; }
 			//@}
 		};
 	}
 }
 
-#endif // SYNTHESE_DRTAreaRemoveAction_H__
+#endif // SYNTHESE_JunctionUpdateAction_H__

@@ -27,11 +27,7 @@
 #include "JourneyPattern.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "PTModule.h"
-
-#include <sstream>
-
-#include <boost/tokenizer.hpp>
-
+#include "TransportNetworkRight.h"
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
@@ -43,6 +39,8 @@
 #include "LineStopTableSync.h"
 
 #include <set>
+#include <sstream>
+#include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 
 
@@ -56,7 +54,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace graph;
-	using namespace pt;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<DBTableSync,ContinuousServiceTableSync>::FACTORY_KEY("35.60.02 Continuous services");
 	template<> const string FactorableTemplate<Fetcher<SchedulesBasedService>, ContinuousServiceTableSync>::FACTORY_KEY("17");
@@ -235,6 +233,39 @@ namespace synthese
 			query.execute(transaction);
 		}
 
+
+
+		template<> bool DBTableSyncTemplate<ContinuousServiceTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ContinuousServiceTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ContinuousServiceTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<ContinuousServiceTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 
 	namespace pt

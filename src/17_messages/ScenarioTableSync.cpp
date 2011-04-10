@@ -30,6 +30,13 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "AlarmTableSync.h"
+#include "MessagesLibraryRight.h"
+#include "MessagesRight.h"
+#include "MessagesLibraryLog.h"
+#include "MessagesLog.h"
+#include "AlarmTemplateInheritedTableSync.h"
+#include "ScenarioSentAlarmInheritedTableSync.h"
 
 #include <sstream>
 
@@ -41,6 +48,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace messages;
+	using namespace security;
 
 	namespace util
 	{
@@ -63,7 +71,7 @@ namespace synthese
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<ScenarioTableSync>::TABLE(
 			"t039_scenarios"
-			);
+		);
 
 		template<> const DBTableSync::Field DBTableSyncTemplate<ScenarioTableSync>::_FIELDS[]=
 		{
@@ -96,7 +104,7 @@ namespace synthese
 			return row->getBool(ScenarioTableSync::COL_IS_TEMPLATE)
 				? ScenarioTemplateInheritedTableSync::FACTORY_KEY
 				: SentScenarioInheritedTableSync::FACTORY_KEY
-				;
+			;
 		}
 
 
@@ -107,7 +115,7 @@ namespace synthese
 			return (dynamic_cast<const SentScenario*>(obj) != NULL)
 				?	SentScenarioInheritedTableSync::FACTORY_KEY
 				:	ScenarioTemplateInheritedTableSync::FACTORY_KEY
-				;
+			;
 		}
 
 
@@ -119,6 +127,80 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			object->setName(rows->getText ( ScenarioTableSync::COL_NAME));
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<ScenarioTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			Env env;
+			shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(object_id, env));
+			if(dynamic_cast<const ScenarioTemplate*>(scenario.get()))
+			{
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
+			}
+			else
+			{
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(DELETE_RIGHT);
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ScenarioTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			Env env;
+			shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env));
+			if(dynamic_cast<const ScenarioTemplate*>(scenario.get()))
+			{
+				AlarmTemplateInheritedTableSync::SearchResult alarms(
+					AlarmTemplateInheritedTableSync::Search(env, id)
+				);
+				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, alarms)
+				{
+					AlarmTableSync::Remove(NULL, alarm->getKey(), transaction, false);
+				}
+			}
+			else
+			{
+				ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
+					ScenarioSentAlarmInheritedTableSync::Search(env, id)
+				);
+				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
+				{
+					AlarmTableSync::Remove(NULL, alarm->getKey(), transaction, false);
+				}
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ScenarioTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<ScenarioTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			Env env;
+			shared_ptr<const Scenario> scenario(ScenarioTableSync::Get(id, env));
+			if(dynamic_cast<const ScenarioTemplate*>(scenario.get()))
+			{
+				MessagesLibraryLog::addDeleteEntry(dynamic_cast<const ScenarioTemplate*>(scenario.get()), session->getUser().get());
+			}
+			else
+			{
+				MessagesLog::AddDeleteEntry(*dynamic_cast<const SentScenario*>(scenario.get()), *session->getUser());
+			}
 		}
 	}
 

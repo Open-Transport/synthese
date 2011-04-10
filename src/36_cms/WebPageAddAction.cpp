@@ -161,6 +161,8 @@ namespace synthese
 		void WebPageAddAction::run(
 			Request& request
 		){
+			DBTransaction transaction;
+
 			Webpage object;
 			object.setName(_title);
 			object.setRoot(_site.get());
@@ -182,10 +184,11 @@ namespace synthese
 				_site->getKey(),
 				object.getParent() ? object.getParent()->getKey() : 0,
 				_rank,
-				true
+				true,
+				transaction
 			);
 
-			WebPageTableSync::Save(&object);
+			WebPageTableSync::Save(&object, transaction);
 
 //			::AddCreationEntry(object, request.getUser().get());
 		}

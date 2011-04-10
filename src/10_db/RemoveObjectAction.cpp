@@ -1,9 +1,9 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// LineStopRemoveAction class implementation.
-/// @file LineStopRemoveAction.cpp
-/// @author Hugues Romain
-/// @date 2010
+/// RemoveObjectAction class implementation.
+/// @file RemoveObjectAction.cpp
+/// @author RCSobility
+/// @date 2011
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
 ///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -24,12 +24,13 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "LineStopRemoveAction.h"
-#include "TransportNetworkRight.h"
+#include "RemoveObjectAction.hpp"
 #include "Request.h"
-#include "LineStopTableSync.h"
+#include "DBTransaction.hpp"
+#include "DBModule.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -39,55 +40,52 @@ namespace synthese
 	
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, pt::LineStopRemoveAction>::FACTORY_KEY("LineStopRemoveAction");
+		template<> const string FactorableTemplate<Action, db::RemoveObjectAction>::FACTORY_KEY("RemoveObjectAction");
 	}
 
-	namespace pt
+	namespace db
 	{
-		const string LineStopRemoveAction::PARAMETER_LINESTOP_ID = Action_PARAMETER_PREFIX + "id";
+		const string RemoveObjectAction::PARAMETER_OBJECT_ID = Action_PARAMETER_PREFIX + "oi";
 		
 		
 		
-		ParametersMap LineStopRemoveAction::getParametersMap() const
+		ParametersMap RemoveObjectAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if(_lineStop.get())
-			{
-				map.insert(PARAMETER_LINESTOP_ID, _lineStop->getKey());
-			}
+			map.insert(PARAMETER_OBJECT_ID, _objectId);
 			return map;
 		}
 		
 		
 		
-		void LineStopRemoveAction::_setFromParametersMap(const ParametersMap& map)
+		void RemoveObjectAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				_lineStop = LineStopTableSync::Get(map.get<RegistryKeyType>(PARAMETER_LINESTOP_ID), *_env);
-			}
-			catch(ObjectNotFoundException<LineStop>&)
-			{
-				throw ActionException("No such line stop");
-			}
+			setObjectId(map.get<RegistryKeyType>(PARAMETER_OBJECT_ID));
 		}
 		
 		
 		
-		void LineStopRemoveAction::run(
+		void RemoveObjectAction::run(
 			Request& request
 		){
-			LineStopTableSync::RemoveStop(*_lineStop);
-
-//			::AddDeleteEntry(*_object, request.getUser().get());
+			DBTransaction transaction;
+			_tableSync->deleteRecord(request.getSession(), _objectId, transaction);
+			transaction.run();
 		}
 		
 		
 		
-		bool LineStopRemoveAction::isAuthorized(
+		bool RemoveObjectAction::isAuthorized(
 			const Session* session
 		) const {
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
+			return _tableSync->canDelete(session, _objectId);
 		}
-	}
-}
+
+
+
+		void RemoveObjectAction::setObjectId( util::RegistryKeyType value )
+		{
+			_objectId = value;
+			_tableSync = shared_ptr<DBTableSync>(DBModule::GetTableSync(decodeTableId(_objectId)));
+		}
+}	}

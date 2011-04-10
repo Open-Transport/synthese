@@ -31,6 +31,7 @@
 #include "DBException.hpp"
 #include "DataSourceTableSync.h"
 #include "StopPointTableSync.hpp"
+#include "TransportNetworkRight.h"
 
 using namespace std;
 using namespace boost;
@@ -42,6 +43,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace impex;
+	using namespace security;
 
 	namespace util
 	{
@@ -147,6 +149,40 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<JunctionTableSync,Junction>::Unlink(
 			Junction* obj
 		){
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<JunctionTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<JunctionTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<JunctionTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<JunctionTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 	

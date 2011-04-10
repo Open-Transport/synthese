@@ -13,7 +13,6 @@
 #include "DataSourceAdmin.h"
 
 #include "DataSourceUpdateAction.hpp"
-#include "DataSourceRemoveAction.hpp"
 
 // Registries
 

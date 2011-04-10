@@ -37,7 +37,6 @@
 #include "AdminInterfaceElement.h"
 #include "AdminFunctionRequest.hpp"
 #include "NonConcurrencyRuleAddAction.h"
-#include "NonConcurrencyRuleRemoveAction.h"
 #include "AdminParametersException.h"
 #include "SearchFormHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
@@ -58,7 +57,7 @@
 #include "AdminModule.h"
 #include "DataSource.h"
 #include "DataSourceAdmin.h"
-#include "JourneyPatternRemoveAction.hpp"
+#include "RemoveObjectAction.hpp"
 #include "TridentFileFormat.h"
 #include "ExportFunction.hpp"
 #include "ImportableAdmin.hpp"
@@ -76,7 +75,7 @@ namespace synthese
 	using namespace pt;
 	using namespace security;
 	using namespace html;
-	using namespace pt;
+	using namespace db;
 	using namespace calendar;
 	using namespace impex;
 	
@@ -161,7 +160,7 @@ namespace synthese
 				// Requests
 				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request);
 
-				AdminActionFunctionRequest<JourneyPatternRemoveAction, CommercialLineAdmin> removeRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(_request);
 				
 				// Search form
 				stream << "<h1>Recherche</h1>";
@@ -215,7 +214,7 @@ namespace synthese
  				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 				{
 					lineOpenRequest.getPage()->setLine(line);
-					removeRequest.getAction()->setJourneyPattern(const_pointer_cast<const JourneyPattern>(line));
+					removeRequest.getAction()->setObjectId(line->getKey());
 
 					stream << t.row(lexical_cast<string>(line->getKey()));
 					stream << t.col();
@@ -415,7 +414,8 @@ namespace synthese
 			{
 				AdminActionFunctionRequest<NonConcurrencyRuleAddAction,CommercialLineAdmin> addRequest(_request);
 				addRequest.getAction()->setHiddenLine(_cline);
-				AdminActionFunctionRequest<NonConcurrencyRuleRemoveAction, CommercialLineAdmin> removeRequest(_request);
+
+				AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(_request);
 				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request);
 
 				stream << "<h1>Lignes prioritaires</h1>";
@@ -439,7 +439,7 @@ namespace synthese
 
 				BOOST_FOREACH(shared_ptr<NonConcurrencyRule> rule, rules)
 				{
-					removeRequest.getAction()->setRule(const_pointer_cast<const NonConcurrencyRule>(rule));
+					removeRequest.getAction()->setObjectId(rule->getKey());
 
 					stream << t.row();
 					stream << t.col() << rule->getPriorityLine()->getNetwork()->getName();

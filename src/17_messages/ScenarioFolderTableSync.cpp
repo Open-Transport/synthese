@@ -31,6 +31,8 @@
 #include "DBResult.hpp"
 #include "DBException.hpp"
 #include "ReplaceQuery.h"
+#include "ScenarioTemplateInheritedTableSync.h"
+#include "MessagesLibraryRight.h"
 
 #include "Conversion.h"
 
@@ -42,6 +44,8 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace messages;
+	using namespace security;
+	
 
 	namespace util
 	{
@@ -118,6 +122,54 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<ScenarioFolderTableSync,ScenarioFolder>::Unlink(
 			ScenarioFolder* obj
 		){
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<ScenarioFolderTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			Env env;
+			ScenarioTemplateInheritedTableSync::Search(
+				env, 
+				object_id,
+				string(),
+				NULL,
+				0,
+				1
+			);
+			if (!env.getRegistry<ScenarioTemplate>().empty())
+			{
+				return false;
+			}
+
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ScenarioFolderTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ScenarioFolderTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<ScenarioFolderTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 	

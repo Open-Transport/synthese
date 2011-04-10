@@ -1,5 +1,3 @@
-
-
 /** PublicPlaceTableSync class implementation.
 	@file PublicPlaceTableSync.cpp
 
@@ -108,6 +106,41 @@ namespace synthese
 			query.addField(object->getName());
 			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<PublicPlaceTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO Control user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<PublicPlaceTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<PublicPlaceTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<PublicPlaceTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 

@@ -143,7 +143,7 @@ namespace synthese
 						webpage->setRoot(Fetcher<Website>::FetchEditable(id, env, linkLevel).get());
 						webpage->getRoot()->addPage(*webpage);
 					}
-					catch(ObjectNotFoundException<Website>& e)
+					catch(ObjectNotFoundException<Website>&)
 					{
 						Log::GetInstance().warn(
 							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : website " +
@@ -159,7 +159,7 @@ namespace synthese
 					{
 						Webpage::SetParent(*webpage, WebPageTableSync::GetEditable(up_id, env, linkLevel).get());
 					}
-					catch(ObjectNotFoundException<Webpage>& e)
+					catch(ObjectNotFoundException<Webpage>&)
 					{
 						Log::GetInstance().warn(
 							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : up web page " +
@@ -251,6 +251,67 @@ namespace synthese
 			query.addField(webPage->getRawEditor());
 			query.execute(transaction);
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<WebPageTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO Control user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<WebPageTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			SelectQuery<WebPageTableSync> query;
+			Env env;
+			query.addWhereField(WebPageTableSync::COL_LINKS, "%"+ lexical_cast<string>(id) +"%", ComposedExpression::OP_LIKE);
+			WebPageTableSync::SearchResult pages(WebPageTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
+			BOOST_FOREACH(shared_ptr<Webpage> page, pages)
+			{
+				Webpage::Links newLinks;
+				BOOST_FOREACH(Webpage* linkedPage, page->getLinks())
+				{
+					if(linkedPage->getKey() != id)
+					{
+						newLinks.push_back(linkedPage);
+					}
+				}
+				page->setLinks(newLinks);
+				WebPageTableSync::Save(page.get(), transaction);
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<WebPageTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			Env env;
+			shared_ptr<const Webpage> page(WebPageTableSync::Get(id, env));
+			WebPageTableSync::ShiftRank(
+				page->getRoot()->getKey(),
+				page->getParent() ? page->getParent()->getKey() : RegistryKeyType(0),
+				page->getRank(),
+				false,
+				transaction
+			);
+		}
+
+
+
+		void DBTableSyncTemplate<WebPageTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 
 	namespace cms
@@ -340,37 +401,12 @@ namespace synthese
 			RegistryKeyType siteId,
 			util::RegistryKeyType parentId,
 			std::size_t rank,
-			bool add
+			bool add,
+			db::DBTransaction& transaction
 		){
 			RankUpdateQuery<WebPageTableSync> query(COL_RANK, add ? 1 : -1, rank);
 			query.addWhereField(COL_SITE_ID, siteId);
 			query.addWhereField(COL_UP_ID, parentId);
-			query.execute();
+			query.execute(transaction);
 		}
-
-
-
-		void WebPageTableSync::RemoveLinks( const Webpage& destination )
-		{
-			SelectQuery<WebPageTableSync> query;
-			Env env;
-			DBTransaction transaction;
-			query.addWhereField(COL_LINKS, "%"+ lexical_cast<string>(destination.getKey()) +"%", ComposedExpression::OP_LIKE);
-			SearchResult pages(LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
-			BOOST_FOREACH(shared_ptr<Webpage> page, pages)
-			{
-				Webpage::Links newLinks;
-				BOOST_FOREACH(Webpage* linkedPage, page->getLinks())
-				{
-					if(linkedPage->getKey() != destination.getKey())
-					{
-						newLinks.push_back(linkedPage);
-					}
-				}
-				page->setLinks(newLinks);
-				Save(page.get(), transaction);
-			}
-			transaction.run();
-		}
-	}
-}
+}	}

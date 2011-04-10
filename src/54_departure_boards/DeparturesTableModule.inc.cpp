@@ -43,8 +43,6 @@
 #include "UpdateDisplayTypeAction.h"
 #include "UpdateDisplayScreenAction.h"
 #include "CreateDisplayScreenAction.h"
-#include "DisplayTypeRemoveAction.h"
-#include "DisplayScreenRemoveAction.h"
 #include "DisplayScreenAppearanceUpdateAction.h"
 #include "AddPreselectionPlaceToDisplayScreenAction.h"
 #include "UpdateDisplayPreselectionParametersAction.h"

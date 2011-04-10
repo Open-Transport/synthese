@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// DataSourceRemoveAction class header.
-///	@file DataSourceRemoveAction.hpp
+/// StopAreaTransferRemoveAction class header.
+///	@file StopAreaTransferRemoveAction.h
 ///	@author RCSobility
 ///	@date 2011
 ///
@@ -22,39 +22,42 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_DataSourceRemoveAction_H__
-#define SYNTHESE_DataSourceRemoveAction_H__
+#ifndef SYNTHESE_StopAreaTransferRemoveAction_H__
+#define SYNTHESE_StopAreaTransferRemoveAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
 
 namespace synthese
 {
-	namespace impex
+	namespace pt
 	{
-		class DataSource;
+		class StopPoint;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 16.15 Action : DataSourceRemoveAction.
-		/// @ingroup m16Actions refActions
-		///	@author RCSobility
+		/// 35.15 Action : StopAreaTransferRemoveAction.
+		/// @ingroup m35Actions refActions
+		///	@author Hugues Romain
 		///	@date 2011
-		/// @since 3.2.1
+		/// @since 3.3.0
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : DataSourceRemoveAction
+		/// Key : StopAreaTransferRemoveAction
 		///
 		/// Parameters :
 		///	<dl>
-		///	<dt>actionParamds</dt><dd>id of the data source to remove</dd>
+		///		<li>actionParamfi : id of the starting stop point</li>
+		///		<li>actionParamti : id of the ending stop point</li>
 		///	</dl>
-		class DataSourceRemoveAction:
-			public util::FactorableTemplate<server::Action, DataSourceRemoveAction>
+		class StopAreaTransferRemoveAction:
+			public util::FactorableTemplate<server::Action, StopAreaTransferRemoveAction>
 		{
 		public:
-			static const std::string PARAMETER_DATASOURCE_ID;
+			static const std::string PARAMETER_FROM_ID;
+			static const std::string PARAMETER_TO_ID;
 
 		private:
-			boost::shared_ptr<const DataSource> _dataSource;
+			boost::shared_ptr<const StopPoint> _from;
+			boost::shared_ptr<const StopPoint> _to;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -88,9 +91,11 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setDataSource(boost::shared_ptr<const DataSource> value) { _dataSource = value; }
+				void setFrom(boost::shared_ptr<StopPoint> value) { _from = value; }
+				void setTo(boost::shared_ptr<StopPoint> value) { _to = value; }
 			//@}
 		};
-}	}
+	}
+}
 
-#endif // SYNTHESE_DataSourceRemoveAction_H__
+#endif // SYNTHESE_StopAreaTransferRemoveAction_H__

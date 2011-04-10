@@ -45,8 +45,6 @@ synthese::departure_boards::DisplayScreenRemovePhysicalStopAction::integrate();
 synthese::departure_boards::DisplayScreenRemoveDisplayedPlaceAction::integrate();
 synthese::departure_boards::DisplayScreenRemoveForbiddenPlaceAction::integrate();
 synthese::departure_boards::UpdateDisplayMaintenanceAction::integrate();
-synthese::departure_boards::DisplayTypeRemoveAction::integrate();
-synthese::departure_boards::DisplayScreenRemoveAction::integrate();
 synthese::departure_boards::DisplayScreenAppearanceUpdateAction::integrate();
 synthese::departure_boards::DisplayScreenCPUCreateAction::integrate();
 synthese::departure_boards::DisplayScreenCPUUpdateAction::integrate();

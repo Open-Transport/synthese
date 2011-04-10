@@ -32,6 +32,11 @@
 #include "MessagesModule.h"
 #include "DeleteQuery.hpp"
 #include "ReplaceQuery.h"
+#include "MessagesLibraryRight.h"
+#include "MessagesRight.h"
+#include "MessagesLibraryLog.h"
+#include "MessagesLog.h"
+#include "AlarmTemplate.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -43,6 +48,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace messages;
+	using namespace security;
 
 	namespace util
 	{
@@ -165,6 +171,73 @@ namespace synthese
 				dynamic_cast<SentAlarm*>(alarm.get()) &&
 				Factory<AlarmRecipient>::contains(row->getText(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY))
 			;
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<AlarmObjectLinkTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			try
+			{
+				Env env;
+				shared_ptr<const AlarmObjectLink> aol(AlarmObjectLinkTableSync::Get(object_id, env));
+				if(dynamic_cast<AlarmTemplate*>(aol->getAlarm()))
+				{
+					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(WRITE);
+				}
+				else
+				{
+					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);
+				}
+			}
+			catch (ObjectNotFoundException<AlarmObjectLink>&)
+			{
+				return false;
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<AlarmObjectLinkTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<AlarmObjectLinkTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<AlarmObjectLinkTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			Env env;
+			shared_ptr<const AlarmObjectLink> aol(AlarmObjectLinkTableSync::Get(id, env));
+			if (dynamic_cast<AlarmTemplate*>(aol->getAlarm()))
+			{
+				MessagesLibraryLog::addUpdateEntry(
+					dynamic_cast<AlarmTemplate*>(aol->getAlarm()),
+					"Suppression de la destination "+ lexical_cast<string>(aol->getObjectId()),
+					session->getUser().get()
+				);
+			}
+			else if(dynamic_cast<SentAlarm*>(aol->getAlarm()))
+			{
+				MessagesLog::addUpdateEntry(
+					dynamic_cast<SentAlarm*>(aol->getAlarm()),
+					"Suppression de la destination "+ lexical_cast<string>(aol->getObjectId()),
+					session->getUser().get()
+				);
+			}
 		}
 	}
 

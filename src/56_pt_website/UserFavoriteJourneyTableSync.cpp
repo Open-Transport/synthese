@@ -28,6 +28,7 @@
 #include "UserFavoriteJourney.h"
 #include "UserTableSync.h"
 #include "ReplaceQuery.h"
+#include "TransportWebsiteRight.h"
 
 using namespace std;
 using namespace boost;
@@ -134,10 +135,44 @@ namespace synthese
 		){
 			object->setUser(NULL);
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<UserFavoriteJourneyTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<UserFavoriteJourneyTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<UserFavoriteJourneyTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<UserFavoriteJourneyTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO log the removal
+		}
 	}
-	
-	
-	
+
+
+
 	namespace pt_website
 	{
 		UserFavoriteJourneyTableSync::SearchResult UserFavoriteJourneyTableSync::Search(

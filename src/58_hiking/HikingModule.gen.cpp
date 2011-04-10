@@ -13,7 +13,6 @@ synthese::hiking::HikingTrailSearchFunction::integrate();
 
 synthese::hiking::HikingTrailAddAction::integrate();
 synthese::hiking::HikingTrailUpdateAction::integrate();
-synthese::hiking::HikingTrailRemoveAction::integrate();
 synthese::hiking::HikingTrailStopAddAction::integrate();
 synthese::hiking::HikingTrailStopRemoveAction::integrate();
 

@@ -14,9 +14,7 @@ synthese::security::ProfilesAdmin::integrate();
 synthese::security::ProfileAdmin::integrate();
 
 synthese::security::AddUserAction::integrate();
-synthese::security::DelUserAction::integrate();
 synthese::security::AddProfileAction::integrate();
-synthese::security::DeleteProfileAction::integrate();
 synthese::security::AddRightAction::integrate();
 synthese::security::DeleteRightAction::integrate();
 synthese::security::UpdateRightAction::integrate();

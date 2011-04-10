@@ -163,8 +163,9 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
+
+			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_MessagesLibraryAdmin_H__

@@ -37,6 +37,7 @@
 #include "UpdateQuery.hpp"
 #include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
+#include "CalendarRight.h"
 
 using namespace std;
 using namespace boost;
@@ -47,6 +48,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace calendar;
+	using namespace security;
 
 	namespace util
 	{
@@ -182,6 +184,53 @@ namespace synthese
 				const_cast<CalendarTemplate*>(obj->getCalendar())->removeElement(*obj);
 			}
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<CalendarTemplateElementTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CalendarRight>(WRITE);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CalendarTemplateElementTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CalendarTemplateElementTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			try
+			{
+				Env env;
+				shared_ptr<const CalendarTemplateElement> element(CalendarTemplateElementTableSync::Get(id,env));
+				if(element->getCalendar())
+				{
+					CalendarTemplateElementTableSync::Shift(element->getCalendar()->getKey(), element->getRank(), -1, transaction);
+				}
+			}
+			catch(ObjectNotFoundException<CalendarTemplateElement>&)
+			{
+				
+			}
+		}
+
+
+
+		void DBTableSyncTemplate<CalendarTemplateElementTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO log calendar template element removal
+		}
 	}
 	
 	
@@ -220,11 +269,15 @@ namespace synthese
 
 
 
-		void CalendarTemplateElementTableSync::Shift( RegistryKeyType calendarId , int rank , int delta )
-		{
+		void CalendarTemplateElementTableSync::Shift(
+			RegistryKeyType calendarId,
+			int rank,
+			int delta,
+			boost::optional<DBTransaction&> transaction
+		){
 			RankUpdateQuery<CalendarTemplateElementTableSync> query(COL_RANK, delta, rank);
 			query.addWhereField(COL_CALENDAR_ID, calendarId);
-			query.execute();
+			query.execute(transaction);
 		}
 
 
@@ -259,11 +312,13 @@ namespace synthese
 
 
 
-		void CalendarTemplateElementTableSync::Clean( util::RegistryKeyType calendarId )
-		{
+		void CalendarTemplateElementTableSync::Clean(
+			RegistryKeyType calendarId,
+			boost::optional<DBTransaction&> transaction
+		){
 			DeleteQuery<CalendarTemplateElementTableSync> query;
 			query.addWhereField(COL_CALENDAR_ID, calendarId);
-			query.execute();
+			query.execute(transaction);
 		}
 	}
 }

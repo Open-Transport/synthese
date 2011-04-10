@@ -30,6 +30,8 @@
 #include "UserTableSync.h"
 #include "ProfileTableSync.h"
 #include "User.h"
+#include "SecurityRight.h"
+#include "SecurityLog.h"
 
 using namespace std;
 using namespace boost;
@@ -173,6 +175,58 @@ namespace synthese
 			query.addField(user->getBirthDate());
 			query.addField(user->getLanguage() ? user->getLanguage()->getIso639_2Code() : string());
 			query.execute(transaction);
+		}
+
+
+		template<> bool DBTableSyncTemplate<UserTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			try
+			{
+				Env env;
+				UserTableSync::Get(
+					object_id,
+					env
+				);
+			}
+			catch (ObjectNotFoundException<User>& e)
+			{
+				return false;
+			}
+
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(DELETE_RIGHT);;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<UserTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<UserTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<UserTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			Env env;
+			shared_ptr<const User> user(UserTableSync::Get(id, env));
+			SecurityLog::addUserAdmin(
+				session->getUser().get(),
+				user.get(),
+				"Suppression de l'utilisateur "+ user->getLogin()
+			);
 		}
 	}
 

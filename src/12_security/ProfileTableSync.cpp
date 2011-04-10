@@ -29,6 +29,9 @@
 #include "ReplaceQuery.h"
 #include "01_util/Log.h"
 #include "Factory.h"
+#include "UserTableSync.h"
+#include "SecurityRight.h"
+#include "SecurityLog.h"
 
 #include <sstream>
 
@@ -123,6 +126,73 @@ namespace synthese
 		{
 			profile->setParent(NULL);
 		}
+
+
+		template<> bool DBTableSyncTemplate<ProfileTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			Env env;
+
+			// Search of child profiles
+			ProfileTableSync::SearchResult profiles(
+				ProfileTableSync::Search(env, object_id, 0, 1, FIELDS_ONLY_LOAD_LEVEL)
+			);
+			if(!profiles.empty())
+			{
+				return false;
+			}
+
+			// Search of users
+			UserTableSync::Search(
+				env,
+				optional<string>(),
+				optional<string>(),
+				optional<string>(),
+				optional<string>(),
+				object_id,
+				boost::logic::indeterminate,
+				boost::logic::indeterminate,
+				optional<RegistryKeyType>(),
+				0, 1,
+				false, false, false, false,
+				FIELDS_ONLY_LOAD_LEVEL
+			);
+			if (!env.getRegistry<User>().empty())
+			{
+				return false;
+			}
+
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ProfileTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ProfileTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<ProfileTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			Env env;
+			shared_ptr<const Profile> profile(ProfileTableSync::Get(id, env));
+			SecurityLog::addProfileAdmin(session->getUser().get(), profile.get(), "Suppression de " + profile->getName());
+		}
+
 	}
 
 	namespace security
