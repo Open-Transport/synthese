@@ -32,6 +32,10 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
+#include "MessagesLibraryLog.h"
+#include "MessagesLibraryRight.h"
+#include "MessagesRight.h"
+#include "MessagesLog.h"
 
 #include "Conversion.h"
 
@@ -45,6 +49,7 @@ namespace synthese
 	using namespace db;
 	using namespace messages;
 	using namespace util;
+	using namespace security;
 
 	namespace util
 	{
@@ -113,6 +118,8 @@ namespace synthese
 			;
 		}
 
+
+
 		template<> void DBInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_CommonLoad(
 			Alarm* alarm
 			, const DBResultSPtr& rows,
@@ -122,6 +129,66 @@ namespace synthese
 			alarm->setLevel (static_cast<AlarmLevel>(rows->getInt ( AlarmTableSync::COL_LEVEL)));
 			alarm->setShortMessage (rows->getText (AlarmTableSync::COL_SHORT_MESSAGE));
 			alarm->setLongMessage (rows->getText (AlarmTableSync::COL_LONG_MESSAGE));
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<AlarmTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			try
+			{
+				Env env;
+				shared_ptr<const Alarm> alarm(AlarmTableSync::Get(object_id, env));
+				if (dynamic_cast<const SentAlarm*>(alarm.get()))
+				{
+					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(DELETE_RIGHT);
+				}
+				else
+				{
+					return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesLibraryRight>(DELETE_RIGHT);
+				}
+			}
+			catch (ObjectNotFoundException<AlarmObjectLink>&)
+			{
+				return false;
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<AlarmTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			AlarmObjectLinkTableSync::Remove(id);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<AlarmTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<AlarmTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			Env env;
+			shared_ptr<const Alarm> alarm(AlarmTableSync::Get(id, env));
+			if (dynamic_cast<const SentAlarm*>(alarm.get()))
+			{
+				MessagesLog::AddDeleteEntry(static_cast<const SentAlarm*>(alarm.get()), session->getUser().get());
+			}
+			else
+			{
+				MessagesLibraryLog::AddDeleteEntry(static_cast<const AlarmTemplate*>(alarm.get()), session->getUser().get());
+			}
 		}
 	}
 

@@ -31,19 +31,15 @@ synthese::messages::ScenarioDisplayFunction::integrate();
 synthese::messages::ScenarioSaveAction::integrate();
 synthese::messages::SimpleMessageCreationAction::integrate();
 synthese::messages::ScenarioStopAction::integrate();
-synthese::messages::DeleteAlarmAction::integrate();
 synthese::messages::UpdateAlarmMessagesFromTemplateAction::integrate();
 synthese::messages::NewMessageAction::integrate();
-synthese::messages::DeleteTextTemplateAction::integrate();
 synthese::messages::UpdateTextTemplateAction::integrate();
 synthese::messages::AddScenarioAction::integrate();
-synthese::messages::DeleteScenarioAction::integrate();
 synthese::messages::TextTemplateAddAction::integrate();
 synthese::messages::UpdateAlarmMessagesAction::integrate();
 synthese::messages::AlarmRemoveLinkAction::integrate();
 synthese::messages::AlarmAddLinkAction::integrate();
 synthese::messages::ScenarioFolderAdd::integrate();
-synthese::messages::ScenarioFolderRemoveAction::integrate();
 synthese::messages::ScenarioFolderUpdateAction::integrate();
 
 // Registries

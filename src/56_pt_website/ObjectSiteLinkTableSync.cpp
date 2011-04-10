@@ -28,6 +28,7 @@
 #include "CityTableSync.h"
 #include "ReplaceQuery.h"
 #include "UtilTypes.h"
+#include "TransportWebsiteRight.h"
 
 using namespace std;
 using namespace boost;
@@ -38,6 +39,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt_website;
 	using namespace geography;
+	using namespace security;
 
 	namespace util
 	{
@@ -120,6 +122,40 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<ObjectSiteLinkTableSync,ObjectSiteLink>::Unlink(
 			ObjectSiteLink* obj
 		){
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<ObjectSiteLinkTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ObjectSiteLinkTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ObjectSiteLinkTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<ObjectSiteLinkTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO log the removal
 		}
 	}
 	

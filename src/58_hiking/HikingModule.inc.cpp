@@ -10,7 +10,6 @@
 
 #include "HikingTrailAddAction.h"
 #include "HikingTrailUpdateAction.h"
-#include "HikingTrailRemoveAction.h"
 #include "HikingTrailStopAddAction.hpp"
 #include "HikingTrailStopRemoveAction.hpp"
 

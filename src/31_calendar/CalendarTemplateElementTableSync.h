@@ -81,15 +81,17 @@ namespace synthese
 
 
 			static void Shift(
-				util::RegistryKeyType calendarId
-				, int rank
-				, int delta
+				util::RegistryKeyType calendarId,
+				int rank,
+				int delta,
+				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
 			);
 
 			static int GetMaxRank(util::RegistryKeyType calendarId);
 
 			static void Clean(
-				util::RegistryKeyType calendarId
+				util::RegistryKeyType calendarId,
+				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
 			);
 		};
 	}

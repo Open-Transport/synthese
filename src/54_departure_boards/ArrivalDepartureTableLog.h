@@ -84,6 +84,12 @@ namespace synthese
 					const DisplayScreen* screen
 					, const security::User* user
 				);
+
+				static void addRemoveEntry(
+					const DisplayScreenCPU& cpu,
+					const security::User& user
+				);
+
 				static void addUpdateTypeEntry(
 					const DisplayType* type
 					, const security::User* user

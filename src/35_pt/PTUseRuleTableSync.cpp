@@ -25,6 +25,7 @@
 #include "FareTableSync.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "TransportNetworkRight.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -38,6 +39,7 @@ namespace synthese
 	using namespace pt;
 	using namespace util;
 	using namespace db;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<DBTableSync,PTUseRuleTableSync>::FACTORY_KEY("35.10.06 Public transportation use rules");
 
@@ -98,11 +100,11 @@ namespace synthese
 			PTUseRule::ReservationRuleType ruleType(static_cast<PTUseRule::ReservationRuleType>(rows->getInt(PTUseRuleTableSync::COL_RESERVATION_TYPE)));
 
 			rr->setReservationType(ruleType);
- 		    rr->setOriginIsReference (originIsReference);
- 		    rr->setMinDelayMinutes (minDelayMinutes);
- 		    rr->setMinDelayDays (minDelayDays);
+			rr->setOriginIsReference (originIsReference);
+			rr->setMinDelayMinutes (minDelayMinutes);
+			rr->setMinDelayDays (minDelayDays);
 			rr->setMaxDelayDays(maxDelayDays.days() > 0 ? maxDelayDays : optional<date_duration>());
- 		    rr->setHourDeadLine (hourDeadline);
+			rr->setHourDeadLine (hourDeadline);
 			rr->setName(rows->getText(PTUseRuleTableSync::COL_NAME));
 			rr->setAccessCapacity(rows->getOptionalUnsignedInt(PTUseRuleTableSync::COL_CAPACITY));
 
@@ -146,6 +148,40 @@ namespace synthese
 			PTUseRule* obj
 		){
 
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<PTUseRuleTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<PTUseRuleTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<PTUseRuleTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<PTUseRuleTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 

@@ -130,7 +130,39 @@ namespace synthese
 		template<> void  DBDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Unlink(
 			ReservationTransaction* obj
 		){
+		}
 
+
+
+		template<> bool DBTableSyncTemplate<ReservationTransactionTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return false;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ReservationTransactionTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<ReservationTransactionTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<ReservationTransactionTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
 		}
 	}
 

@@ -27,6 +27,8 @@
 
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "CalendarRight.h"
+#include "CalendarTemplateElementTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -36,6 +38,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace calendar;
+	using namespace security;
 
 	namespace util
 	{
@@ -118,6 +121,55 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::Unlink(
 			CalendarTemplate* obj
 		){
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<CalendarTemplateTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			Env env;
+			CalendarTemplateElementTableSync::SearchResult result(
+				CalendarTemplateElementTableSync::Search(
+					env,
+					optional<RegistryKeyType>(),
+					object_id,
+					0,
+					1
+			)	);
+			if(!result.empty())
+			{
+				return false;
+			}
+
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CalendarRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CalendarTemplateTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			CalendarTemplateElementTableSync::Clean(id, transaction);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CalendarTemplateTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<CalendarTemplateTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO log calendar template element removal
 		}
 	}
 	

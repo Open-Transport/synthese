@@ -18,7 +18,6 @@ synthese::pt_website::UserBookmarksService::integrate();
 synthese::pt_website::SiteUpdateAction::integrate();
 synthese::pt_website::AddUserFavoriteJourneyAction::integrate();
 synthese::pt_website::SiteCityAddAction::integrate();
-synthese::pt_website::SiteObjectLinkRemoveAction::integrate();
 
 synthese::pt_website::TransportWebsiteRight::integrate();
 

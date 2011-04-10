@@ -34,7 +34,6 @@
 #include "PropertiesHTMLTable.h"
 #include "UpdateDisplayTypeAction.h"
 #include "AdminInterfaceElement.h"
-#include "DisplayTypeRemoveAction.h"
 #include "Interface.h"
 #include "ArrivalDepartureTableRight.h"
 #include "DeparturesTableInterfacePage.h"
@@ -42,6 +41,7 @@
 #include "InterfaceTableSync.h"
 #include "Profile.h"
 #include "Webpage.h"
+#include "RemoveObjectAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -56,7 +56,7 @@ namespace synthese
 	using namespace html;
 	using namespace security;
 	using namespace cms;
-	
+	using namespace db;
 
 	namespace util
 	{
@@ -73,8 +73,10 @@ namespace synthese
 	{
 		DisplayTypeAdmin::DisplayTypeAdmin()
 			: AdminInterfaceElementTemplate<DisplayTypeAdmin>()
-		{ }
-		
+		{}
+
+
+
 		void DisplayTypeAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -91,33 +93,29 @@ namespace synthese
 				throw AdminParametersException("Display type not found by "+ FACTORY_KEY +" : "+ e.getMessage());
 			}
 		}
-		
-		
-		
+
+
+
 		ParametersMap DisplayTypeAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(_type.get()) m.insert(Request::PARAMETER_OBJECT_ID, _type->getKey());
 			return m;
 		}
-		
-		
-		
+
+
+
 		void DisplayTypeAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
 		) const	{
 
 			// Requests
-			AdminActionFunctionRequest<UpdateDisplayTypeAction,DisplayTypeAdmin> updateRequest(
-				_request
-			);
+			AdminActionFunctionRequest<UpdateDisplayTypeAction,DisplayTypeAdmin> updateRequest(_request);
 			updateRequest.getAction()->setTypeId(_type->getKey());
 
-			AdminActionFunctionRequest<DisplayTypeRemoveAction,DisplayTypesAdmin> deleteRequest(
-				_request
-			);
-			deleteRequest.getAction()->setType(_type);
+			AdminActionFunctionRequest<RemoveObjectAction,DisplayTypesAdmin> deleteRequest(_request);
+			deleteRequest.getAction()->setObjectId(_type->getKey());
 
 			// Display
 			PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));

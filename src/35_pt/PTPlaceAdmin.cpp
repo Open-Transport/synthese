@@ -51,6 +51,9 @@
 #include "DBModule.h"
 #include "StopAreaTransferAddAction.h"
 #include "ImportableAdmin.hpp"
+#include "StopAreaTransferRemoveAction.hpp"
+#include "JunctionUpdateAction.hpp"
+#include "RemoveObjectAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -312,6 +315,7 @@ namespace synthese
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_X, string());
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_Y, string());
 				stream << t.col();
+				stream << t.col();
 				stream << t.col() << f.getSubmitButton("Ajouter");
 
 				stream << t.close() << f.close();
@@ -363,6 +367,8 @@ namespace synthese
 				{
 					AdminActionFunctionRequest<StopAreaTransferAddAction,PTPlaceAdmin> addTransferRequest(request);
 
+					AdminActionFunctionRequest<StopAreaTransferRemoveAction,PTPlaceAdmin> removeTransferRequest(request);
+
 					HTMLForm f(addTransferRequest.getHTMLForm("addtransfer"));
 					stream << f.open();
 
@@ -380,16 +386,21 @@ namespace synthese
 
 					BOOST_FOREACH(const StopArea::TransferDelaysMap::value_type& it, _connectionPlace->getTransferDelays())
 					{
+						shared_ptr<StopPoint> startStop(Env::GetOfficialEnv().getEditable<StopPoint>(it.first.first));
+						shared_ptr<StopPoint> endStop(Env::GetOfficialEnv().getEditable<StopPoint>(it.first.second));
+						removeTransferRequest.getAction()->setFrom(startStop);
+						removeTransferRequest.getAction()->setTo(endStop);
+
 						stream << t.row();
-						stream << t.col() << it.first.first;
-						stream << t.col() << it.first.second;
+						stream << t.col() << startStop->getCodeBySources() << " / " << startStop->getName();
+						stream << t.col() << endStop->getCodeBySources() << " / " << endStop->getName();
 						stream << t.col() << (it.second.total_seconds() / 60) << " min";
-						stream << t.col() << "Supprimer";
+						stream << t.col() << HTMLModule::getLinkButton(removeTransferRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le délai de correspondance ?");
 					}
 
 					stream << t.row();
-					stream << t.col() << f.getTextInput(StopAreaTransferAddAction::PARAMETER_FROM_ID,string(),"(id arrêt début)");
-					stream << t.col() << f.getTextInput(StopAreaTransferAddAction::PARAMETER_TO_ID,string(),"(id arrêt fin)");
+					stream << t.col() << f.getSelectInput(StopAreaTransferAddAction::PARAMETER_FROM_ID, _connectionPlace->getPhysicalStopLabels(), optional<RegistryKeyType>());
+					stream << t.col() << f.getSelectInput(StopAreaTransferAddAction::PARAMETER_TO_ID, _connectionPlace->getPhysicalStopLabels(), optional<RegistryKeyType>());
 					stream << t.col() << f.getTextInput(StopAreaTransferAddAction::PARAMETER_DURATION,string(),"(minutes ou F)");
 					stream << t.col() << f.getSubmitButton("Ajouter");
 					
@@ -401,6 +412,10 @@ namespace synthese
 				{
 					AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
 
+					AdminActionFunctionRequest<JunctionUpdateAction,PTPlaceAdmin> addJunctionRequest(request);
+
+					AdminActionFunctionRequest<RemoveObjectAction,PTPlaceAdmin> removeJunctionRequest(request);
+
 					stream << "<h1>Transferts externes (jonctions)</h1>";
 
 					JunctionTableSync::SearchResult startings(
@@ -409,6 +424,9 @@ namespace synthese
 					JunctionTableSync::SearchResult endings(
 						JunctionTableSync::Search(Env::GetOfficialEnv(), optional<RegistryKeyType>(), _connectionPlace->getKey())
 					);
+
+					HTMLForm f(addJunctionRequest.getHTMLForm("addJunction"));
+					stream << f.open();
 
 					HTMLTable::ColsVector c;
 					c.push_back("Quai");
@@ -431,6 +449,7 @@ namespace synthese
 						openPlaceRequest.getPage()->setConnectionPlace(
 							Env::GetOfficialEnv().getSPtr(junction->getEnd()->getConnectionPlace())
 						);
+						removeJunctionRequest.getAction()->setObjectId(junction->getKey());
 
 						stream << t.row();
 						stream << t.col() << junction->getStart()->getName();
@@ -442,7 +461,12 @@ namespace synthese
 						stream << t.col() << junction->getEnd()->getName();
 						stream << t.col() << junction->getLength() << " m";
 						stream << t.col() << (junction->getDuration().total_seconds() / 60) << " min";
-						stream << t.col() << "Fusionner l'arrêt";
+						stream << t.col() << HTMLModule::getLinkButton(
+							removeJunctionRequest.getURL(),
+							"Supprimer",
+							"Etes-vous sûr de vouloir supprimer le transfert ?"
+						);
+
 					}
 
 					stream << t.row();
@@ -456,6 +480,8 @@ namespace synthese
 						openPlaceRequest.getPage()->setConnectionPlace(
 							Env::GetOfficialEnv().getSPtr(junction->getEnd()->getConnectionPlace())
 						);
+						removeJunctionRequest.getAction()->setObjectId(junction->getKey());
+
 						stream << t.row();
 						stream << t.col() << junction->getStart()->getName();
 						stream << t.col() << HTMLModule::getHTMLLink(
@@ -465,7 +491,11 @@ namespace synthese
 						stream << t.col() << junction->getEnd()->getName();
 						stream << t.col() << junction->getLength() << " m";
 						stream << t.col() << (junction->getDuration().total_seconds() / 60) << " min";
-						stream << t.col() << "Fusionner l'arrêt";
+						stream << t.col() << HTMLModule::getLinkButton(
+							removeJunctionRequest.getURL(),
+							"Supprimer",
+							"Etes-vous sûr de vouloir supprimer le transfert ?"
+						);
 					}
 
 					stream << t.row();
@@ -479,6 +509,8 @@ namespace synthese
 						openPlaceRequest.getPage()->setConnectionPlace(
 							Env::GetOfficialEnv().getSPtr(junction->getStart()->getConnectionPlace())
 						);
+						removeJunctionRequest.getAction()->setObjectId(junction->getKey());
+
 						stream << t.row();
 						stream << t.col() << junction->getEnd()->getName();
 						stream << t.col() << 
@@ -489,10 +521,23 @@ namespace synthese
 						stream << t.col() << junction->getStart()->getName();
 						stream << t.col() << junction->getLength() << " m";
 						stream << t.col() << (junction->getDuration().total_seconds() / 60) << " min";
-						stream << t.col() << "Fusionner l'arrêt";
+						stream << t.col() << HTMLModule::getLinkButton(
+							removeJunctionRequest.getURL(),
+							"Supprimer",
+							"Etes-vous sûr de vouloir supprimer le transfert ?"
+						);
 					}
 
+					stream << t.row();
+					stream << t.col() << f.getSelectInput(JunctionUpdateAction::PARAMETER_FROM_ID, _connectionPlace->getPhysicalStopLabels(), optional<RegistryKeyType>());
+					stream << t.col(2) << f.getTextInput(JunctionUpdateAction::PARAMETER_TO_ID, string());
+					stream << t.col() << f.getTextInput(JunctionUpdateAction::PARAMETER_LENGTH, string());
+					stream << t.col() << f.getTextInput(JunctionUpdateAction::PARAMETER_TIME, string());
+					stream << t.col() << f.getOuiNonRadioInput(JunctionUpdateAction::PARAMETER_BIDIRECTIONAL,true);
+					stream << f.getSubmitButton("Ajouter");
+
 					stream << t.close();
+					stream << f.close();
 				}
 			}
 

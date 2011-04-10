@@ -34,6 +34,7 @@
 #include "DBException.hpp"
 #include "LinkException.h"
 #include "ReplaceQuery.h"
+#include "TransportNetworkRight.h"
 
 using namespace std;
 using namespace boost;
@@ -44,7 +45,7 @@ namespace synthese
 	using namespace pt;
 	using namespace db;
 	using namespace util;
-	using namespace pt;
+	using namespace security;
 	
 	namespace util
 	{
@@ -140,6 +141,40 @@ namespace synthese
 			NonConcurrencyRule* obj
 		){
 			if(obj->getHiddenLine()) obj->getHiddenLine()->removeConcurrencyRule(obj);
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<NonConcurrencyRuleTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<NonConcurrencyRuleTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<NonConcurrencyRuleTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<NonConcurrencyRuleTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 	

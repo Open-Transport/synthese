@@ -32,7 +32,7 @@
 #include "CalendarTemplateAdmin.h"
 #include "CalendarTemplateTableSync.h"
 #include "CalendarTemplateAddAction.h"
-#include "CalendarTemplateRemoveAction.hpp"
+#include "RemoveObjectAction.hpp"
 #include "CalendarRight.h"
 #include "CalendarTemplateElementTableSync.h"
 
@@ -58,6 +58,7 @@ namespace synthese
 	using namespace calendar;
 	using namespace html;
 	using namespace security;
+	using namespace db;
 
 	namespace util
 	{
@@ -100,7 +101,7 @@ namespace synthese
 			addCalendar.getFunction()->setActionFailedPage<CalendarTemplatesAdmin>();
 			addCalendar.setActionWillCreateObject();
 			
-			AdminActionFunctionRequest<CalendarTemplateRemoveAction,CalendarTemplatesAdmin> removeCalendar(_request);
+			AdminActionFunctionRequest<RemoveObjectAction,CalendarTemplatesAdmin> removeCalendar(_request);
 			
 			// Display
 			stream << "<h1>Calendriers</h1>";
@@ -123,7 +124,7 @@ namespace synthese
 				calendars
 			){
 				editCalendar.getPage()->setCalendar(ct);
-				removeCalendar.getAction()->setCalendarTemplate(const_pointer_cast<const CalendarTemplate>(ct));
+				removeCalendar.getAction()->setObjectId(ct->getKey());
 
 				stream << t.row();
 				stream << t.col() << ct->getText();

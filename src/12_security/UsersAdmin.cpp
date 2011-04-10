@@ -28,7 +28,7 @@
 #include "SecurityModule.h"
 #include "UserAdmin.h"
 #include "AddUserAction.h"
-#include "DelUserAction.h"
+#include "RemoveObjectAction.hpp"
 #include "ProfileTableSync.h"
 #include "UserTableSync.h"
 #include "UsersAdmin.h"
@@ -54,6 +54,7 @@ namespace synthese
 	using namespace admin;
 	using namespace html;
 	using namespace security;
+	using namespace db;
 
 	namespace util
 	{
@@ -145,7 +146,7 @@ namespace synthese
 			addUserRequest.setActionWillCreateObject();
 
 			// Request for delete action form
-			AdminActionFunctionRequest<DelUserAction, UsersAdmin> deleteUserRequest(_request);
+			AdminActionFunctionRequest<RemoveObjectAction, UsersAdmin> deleteUserRequest(_request);
 			
 			// Request for user link
 			AdminFunctionRequest<UserAdmin> userRequest(_request);
@@ -212,7 +213,8 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<User> user, users)
 			{
 				userRequest.getPage()->setUser(user);
-				deleteUserRequest.getAction()->setUser(user);
+				deleteUserRequest.getAction()->setObjectId(user->getKey());
+
 				stream << t.row();
 				stream << t.col() << HTMLModule::getHTMLLink(userRequest.getURL(), user->getLogin());
 				stream << t.col() << HTMLModule::getHTMLLink(userRequest.getURL(), user->getName());

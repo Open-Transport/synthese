@@ -135,6 +135,41 @@ namespace synthese
 			VehiclePosition* obj
 		){
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<VehiclePositionTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO Check the user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<VehiclePositionTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<VehiclePositionTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<VehiclePositionTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
+		}
 	}
 	
 	

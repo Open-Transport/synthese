@@ -34,6 +34,7 @@
 #include "DBResult.hpp"
 #include "DBException.hpp"
 #include "ReplaceQuery.h"
+#include "TransportWebsiteRight.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -48,6 +49,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt_website;
 	using namespace pt;
+	using namespace security;
 
 	namespace util
 	{
@@ -185,37 +187,66 @@ namespace synthese
 				const_cast<TransportWebsite*>(obj->getSite())->removeRollingStockFilter(*obj);
 			}
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<RollingStockFilterTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<RollingStockFilterTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<RollingStockFilterTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<RollingStockFilterTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO log the removal
+		}
 	}
 	
 	
 	
 	namespace pt_website
 	{
-		vector<shared_ptr<RollingStockFilter> > RollingStockFilterTableSync::Search(
+		RollingStockFilterTableSync::SearchResult RollingStockFilterTableSync::Search(
 			Env& env,
+			boost::optional<util::RegistryKeyType> siteId,
 			int first /*= 0*/,
 			boost::optional<std::size_t> number,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
-			/// @todo Fill Where criteria
-			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToDBString(name, false) << "%'";
-				;
-			//if (orderByName)
-			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
+			SelectQuery<RollingStockFilterTableSync> query;
+			if(siteId)
+			{
+				query.addWhereField(COL_SITE_ID, *siteId);
+			}
 			if (number)
 			{
-				query << " LIMIT " << (*number + 1);
+				query.setNumber(*number + 1);
 				if (first > 0)
-					query << " OFFSET " << first;
+					query.setFirst(first);
 			}
 
-			return LoadFromQuery(query.str(), env, linkLevel);
+			return LoadFromQuery(query, env, linkLevel);
 		}
 	}
 }

@@ -29,6 +29,7 @@
 #include "SelectQuery.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
+#include "TransportNetworkRight.h"
 
 #include <boost/algorithm/string/split.hpp>
 
@@ -40,6 +41,7 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace pt;
+	using namespace security;
 
 	namespace util
 	{
@@ -108,6 +110,40 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<DRTAreaTableSync,DRTArea>::Unlink(
 			DRTArea* obj
 		){
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<DRTAreaTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DRTAreaTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DRTAreaTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<DRTAreaTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 	

@@ -15,7 +15,6 @@
 #include "CompositionVehicleAddAction.hpp"
 #include "CompositionVehicleRemoveAction.hpp"
 #include "VehicleUpdateAction.hpp"
-#include "VehicleRemoveAction.hpp"
 
 #include "Composition.hpp"
 #include "Vehicle.hpp"

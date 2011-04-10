@@ -30,21 +30,17 @@
 
 #include "ScenarioSaveAction.h"
 #include "SimpleMessageCreationAction.hpp"
-#include "DeleteAlarmAction.h"
 #include "UpdateAlarmMessagesFromTemplateAction.h"
 #include "NewMessageAction.h"
-#include "DeleteTextTemplateAction.h"
 #include "UpdateTextTemplateAction.h"
 #include "ScenarioStopAction.h"
 #include "AddScenarioAction.h"
-#include "DeleteScenarioAction.h"
 #include "TextTemplateAddAction.h"
 #include "UpdateAlarmMessagesAction.h"
 #include "AlarmRemoveLinkAction.h"
 #include "AlarmAddLinkAction.h"
 #include "ScenarioStopAction.h"
 #include "ScenarioFolderAdd.h"
-#include "ScenarioFolderRemoveAction.h"
 #include "ScenarioFolderUpdateAction.h"
 
 // Registries

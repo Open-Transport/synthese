@@ -24,6 +24,8 @@
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "ImportableTableSync.hpp"
+#include "TransportNetworkRight.h"
+#include "CommercialLineTableSync.h"
 
 #include <boost/logic/tribool.hpp>
 #include <assert.h>
@@ -38,6 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace impex;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<DBTableSync,TransportNetworkTableSync>::FACTORY_KEY(
 		"35.20.02 Network transport"
@@ -106,6 +109,45 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<TransportNetworkTableSync,TransportNetwork>::Unlink(
 			TransportNetwork* object
 		){
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<TransportNetworkTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TransportNetworkTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			Env env;
+			CommercialLineTableSync::SearchResult lines(CommercialLineTableSync::Search(env, id));
+			BOOST_FOREACH(const CommercialLineTableSync::SearchResult::value_type& line, lines)
+			{
+				CommercialLineTableSync::Remove(NULL, line->getKey(), transaction, false);
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TransportNetworkTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+		void DBTableSyncTemplate<TransportNetworkTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 

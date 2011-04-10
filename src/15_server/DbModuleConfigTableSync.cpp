@@ -22,7 +22,7 @@
 
 
 #include "DbModuleConfigTableSync.h"
-
+#include "ServerAdminRight.h"
 #include "ModuleClass.h"
 
 using namespace std;
@@ -31,6 +31,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace server;
+	using namespace security;
 	
 	template<> const string util::FactorableTemplate<DBTableSync,DbModuleConfigTableSync>::FACTORY_KEY(
 		"999 db config"
@@ -59,6 +60,39 @@ namespace synthese
 		{
 			DBTableSync::Index()
 		};
+
+
+
+		template<> bool DBTableSyncTemplate<DbModuleConfigTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ServerAdminRight>(WRITE);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DbModuleConfigTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<DbModuleConfigTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<DbModuleConfigTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+		}
 	}
 
 	namespace server

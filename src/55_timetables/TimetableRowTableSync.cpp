@@ -29,6 +29,7 @@
 #include "StopAreaTableSync.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
+#include "TimetableRight.h"
 
 using namespace std;
 using namespace boost;
@@ -39,6 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace timetables;
 	using namespace pt;
+	using namespace security;
 
 	namespace util
 	{
@@ -138,6 +140,43 @@ namespace synthese
 			TimetableRow* obj
 		){
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<TimetableRowTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(WRITE);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TimetableRowTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TimetableRowTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			Env env;
+			shared_ptr<const TimetableRow> row(TimetableRowTableSync::Get(id, env));
+			TimetableRowTableSync::Shift(row->getTimetableId(), row->getRank(), -1, transaction);
+		}
+
+
+
+		void DBTableSyncTemplate<TimetableRowTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO log the removal
+		}
 	}
 	
 	
@@ -179,11 +218,15 @@ namespace synthese
 
 
 
-		void TimetableRowTableSync::Shift( util::RegistryKeyType timetableId , int rank , int delta )
-		{
+		void TimetableRowTableSync::Shift(
+			RegistryKeyType timetableId,
+			int rank,
+			int delta,
+			optional<DBTransaction&> transaction
+		){
 			RankUpdateQuery<TimetableRowTableSync> query(COL_RANK, delta, rank);
 			query.addWhereField(COL_TIMETABLE_ID, timetableId);
-			query.execute();
+			query.execute(transaction);
 		}
 
 

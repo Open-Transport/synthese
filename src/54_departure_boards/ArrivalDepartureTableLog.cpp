@@ -145,6 +145,15 @@ namespace synthese
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, screen->getKey());
 		}
 
+		void ArrivalDepartureTableLog::addRemoveEntry(
+			const DisplayScreenCPU& cpu,
+			const security::User& user
+		){
+			DBLogEntry::Content content;
+			content.push_back("Suppression de l'unité centrale " + cpu.getFullName());
+			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, &user, cpu.getKey());
+		}
+
 		void ArrivalDepartureTableLog::addUpdateTypeEntry(const DisplayType* type , const security::User* user , const std::string& text )
 		{
 			DBLogEntry::Content content;

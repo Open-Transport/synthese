@@ -36,6 +36,7 @@
 #include "CommercialLine.h"
 #include "StopPoint.hpp"
 #include "RankUpdateQuery.hpp"
+#include "TimetableRight.h"
 #include "ReplaceQuery.h"
 
 #include "01_util/Conversion.h"
@@ -51,7 +52,7 @@ namespace synthese
 	using namespace calendar;
 	using namespace interfaces;
 	using namespace pt;
-	using namespace pt;
+	using namespace security;
 
 	namespace util
 	{
@@ -267,6 +268,45 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<TimetableTableSync,Timetable>::Unlink(
 			Timetable* obj
 		){
+		}
+
+
+		template<> bool DBTableSyncTemplate<TimetableTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TimetableTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			Env env;
+			TimetableRowTableSync::SearchResult rows(TimetableRowTableSync::Search(env, id));
+			BOOST_FOREACH(const TimetableRowTableSync::SearchResult::value_type& row, rows)
+			{
+				TimetableRowTableSync::Remove(NULL, row->getKey(), transaction, false);
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TimetableTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<TimetableTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO log the removal
 		}
 	}
 	

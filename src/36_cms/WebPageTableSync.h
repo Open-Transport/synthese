@@ -127,16 +127,8 @@ namespace synthese
 				util::RegistryKeyType siteId,
 				util::RegistryKeyType parentId,
 				std::size_t rank,
-				bool add
-			);
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Removes all links to the specified page.
-			/// @param destination the destination of the links to remove
-			static void RemoveLinks(
-				const Webpage& destination
+				bool add,
+				db::DBTransaction& transaction
 			);
 		};
 	}

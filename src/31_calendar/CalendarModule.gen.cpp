@@ -11,9 +11,7 @@ synthese::calendar::CalendarTemplatesAdmin::integrate();
 
 synthese::calendar::CalendarTemplateAddAction::integrate();
 synthese::calendar::CalendarTemplateElementAddAction::integrate();
-synthese::calendar::CalendarTemplateElementRemoveAction::integrate();
 synthese::calendar::CalendarTemplatePropertiesUpdateAction::integrate();
-synthese::calendar::CalendarTemplateRemoveAction::integrate();
 synthese::calendar::CalendarTemplateCleanAction::integrate();
 
 synthese::calendar::CalendarModule::integrate();

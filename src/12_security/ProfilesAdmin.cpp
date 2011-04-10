@@ -28,7 +28,7 @@
 #include "ProfileAdmin.h"
 #include "ProfileTableSync.h"
 #include "AddProfileAction.h"
-#include "DeleteProfileAction.h"
+#include "RemoveObjectAction.hpp"
 #include "Right.h"
 #include "SecurityRight.h"
 #include "SecurityModule.h"
@@ -55,7 +55,8 @@ namespace synthese
 	using namespace util;
 	using namespace html;
 	using namespace security;
-
+	using namespace db;
+	
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, ProfilesAdmin>::FACTORY_KEY("profiles");
@@ -105,7 +106,7 @@ namespace synthese
 
 			AdminFunctionRequest<ProfileAdmin> profileRequest(_request);
 
-			AdminActionFunctionRequest<DeleteProfileAction, ProfilesAdmin> deleteProfileRequest(_request);
+			AdminActionFunctionRequest<RemoveObjectAction, ProfilesAdmin> deleteProfileRequest(_request);
 			
 			AdminActionFunctionRequest<AddProfileAction, ProfileAdmin> addProfileRequest(_request);
 			addProfileRequest.getFunction()->setActionFailedPage<ProfilesAdmin>();
@@ -165,7 +166,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
 			{
 				profileRequest.getPage()->setProfile(profile);
-				deleteProfileRequest.getAction()->setProfile(profile);
+				deleteProfileRequest.getAction()->setObjectId(profile->getKey());
 
 				stream << t.row(lexical_cast<string>(profile->getKey()));
 				stream << t.col() << profile->getName();

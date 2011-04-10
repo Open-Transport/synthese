@@ -7,8 +7,6 @@
 #include "12_security/UsersAdmin.h"
 #include "12_security/UserAdmin.h"
 #include "12_security/AddUserAction.h"
-#include "12_security/DelUserAction.h"
-#include "12_security/DeleteProfileAction.h"
 #include "12_security/AddProfileAction.h"
 #include "12_security/DeleteRightAction.h"
 #include "12_security/AddRightAction.h"

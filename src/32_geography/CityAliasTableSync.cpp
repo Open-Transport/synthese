@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////
 ///	CityAliasTableSync class implementation.
 ///	@file CityAliasTableSync.cpp
-///	@author Hugues
+///	@author Hugues Romain
 ///	@date 2010
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -133,6 +133,41 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<CityAliasTableSync,CityAlias>::Unlink(
 			CityAlias* obj
 		){
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<CityAliasTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO check user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CityAliasTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<CityAliasTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<CityAliasTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 	

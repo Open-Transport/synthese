@@ -33,6 +33,10 @@
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"
 #include "ImportableTableSync.hpp"
+#include "ScheduledServiceTableSync.h"
+#include "ContinuousServiceTableSync.h"
+#include "LineStopTableSync.h"
+#include "TransportNetworkRight.h"
 
 using namespace std;
 using namespace boost;
@@ -44,6 +48,7 @@ namespace synthese
 	using namespace impex;
 	using namespace graph;
 	using namespace pt;
+	using namespace security;
 
 	template<> const string util::FactorableTemplate<DBTableSync,JourneyPatternTableSync>::FACTORY_KEY(
 		"35.30.01 Journey patterns"
@@ -249,6 +254,60 @@ namespace synthese
 			{
 				const_cast<CommercialLine*>(obj->getCommercialLine())->removePath(obj);
 			}
+		}
+
+
+
+		template<> bool DBTableSyncTemplate<JourneyPatternTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+		}
+
+
+
+		template<> void DBTableSyncTemplate<JourneyPatternTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+			// Services deletion
+			Env env;
+			ScheduledServiceTableSync::SearchResult sservices(ScheduledServiceTableSync::Search(env, id));
+			BOOST_FOREACH(const ScheduledServiceTableSync::SearchResult::value_type& sservice, sservices)
+			{
+				ScheduledServiceTableSync::Remove(NULL, sservice->getKey(), transaction, false);
+			}
+
+			ContinuousServiceTableSync::SearchResult cservices(ContinuousServiceTableSync::Search(env, id));
+			BOOST_FOREACH(const ContinuousServiceTableSync::SearchResult::value_type& cservice, cservices)
+			{
+				ContinuousServiceTableSync::Remove(NULL, cservice->getKey(), transaction, false);
+			}
+
+			// LineStops deletion
+			LineStopTableSync::SearchResult edges(LineStopTableSync::Search(env, id));
+			BOOST_FOREACH(const LineStopTableSync::SearchResult::value_type& edge, edges)
+			{
+				LineStopTableSync::RemoveRow(edge->getKey(), transaction);
+			}
+		}
+
+
+
+		template<> void DBTableSyncTemplate<JourneyPatternTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		void DBTableSyncTemplate<JourneyPatternTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 
