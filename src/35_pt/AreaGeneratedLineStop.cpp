@@ -35,7 +35,7 @@ namespace synthese
 			StopPoint* stop /*= NULL*/,
 			LineArea* lineArea
 		):	Registrable(0),
-			LinePhysicalStop(0, line, rankInPath, true, true, metricOffset, stop),
+			LinePhysicalStop(0, line, rankInPath, isDeparture, isArrival, metricOffset, stop),
 			_lineArea(lineArea)
 		{}
 }	}
