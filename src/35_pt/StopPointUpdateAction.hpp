@@ -113,6 +113,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setStop(boost::shared_ptr<StopPoint> value) { _stop = value; }
+				void setPoint(boost::shared_ptr<geos::geom::Point> value);
 			//@}
 		};
 	}

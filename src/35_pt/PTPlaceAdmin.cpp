@@ -46,7 +46,6 @@
 #include "CommercialLine.h"
 #include "StopPointAddAction.hpp"
 #include "HTMLMap.hpp"
-#include "StopPointMoveAction.hpp"
 #include "StaticActionRequest.h"
 #include "DBModule.h"
 #include "StopAreaTransferAddAction.h"
@@ -54,6 +53,7 @@
 #include "StopAreaTransferRemoveAction.hpp"
 #include "JunctionUpdateAction.hpp"
 #include "RemoveObjectAction.hpp"
+#include "StopPointUpdateAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -153,7 +153,7 @@ namespace synthese
 				{
 					stream << "<h1>Carte</h1>";
 
-					StaticActionRequest<StopPointMoveAction> moveAction(request);
+					StaticActionRequest<StopPointUpdateAction> moveAction(request);
 
 					shared_ptr<Point> mapCenter(_connectionPlace->getPoint());
 					if(!mapCenter.get() || mapCenter->isEmpty()) // If the place does not contain any point, it has no coordinate : search the last created place with coordinates
@@ -172,7 +172,7 @@ namespace synthese
 					{
 						mapCenter = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(0,0);
 					}
-					HTMLMap map(*mapCenter, 18, true, true);
+					HTMLMap map(*mapCenter, 18, true, true, true);
 					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 					{
 						if(!it.second->getGeometry().get())
@@ -198,7 +198,7 @@ namespace synthese
 								"</span>"
 							;
 						}
-						map.addPoint(HTMLMap::MapPoint(*it.second->getGeometry(), "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), it.second->getName() + "<br />" + popupcontent.str()));
+						map.addPoint(HTMLMap::MapPoint(*it.second->getGeometry(), "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), it.second->getName() + "<br />" + popupcontent.str(), 21, 25));
 					}
 					/*
 					BOOST_FOREACH(const AddressablePlace::Addresses::value_type& address, _addressablePlace->getAddresses())

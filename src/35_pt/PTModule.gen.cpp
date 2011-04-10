@@ -93,7 +93,6 @@ synthese::pt::StopPointUpdateAction::integrate();
 synthese::pt::StopPointAddAction::integrate();
 synthese::pt::StopAreaAddAction::integrate();
 synthese::pt::LineStopUpdateAction::integrate();
-synthese::pt::StopPointMoveAction::integrate();
 synthese::pt::ProjectAllStopPointsAction::integrate();
 synthese::pt::StopAreaTransferAddAction::integrate();
 

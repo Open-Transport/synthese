@@ -85,7 +85,6 @@
 #include "StopPointAddAction.hpp"
 #include "StopAreaAddAction.h"
 #include "LineStopUpdateAction.hpp"
-#include "StopPointMoveAction.hpp"
 #include "ProjectAllStopPointsAction.hpp"
 #include "StopAreaTransferAddAction.h"
 #include "DRTAreaUpdateAction.hpp"

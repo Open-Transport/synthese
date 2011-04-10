@@ -59,14 +59,17 @@
 #include "ImportableAdmin.hpp"
 #include "DRTAreaAdmin.hpp"
 #include "DRTArea.hpp"
+#include "HTMLMap.hpp"
+#include "StopPointUpdateAction.hpp"
 
+#include <geos/geom/Envelope.h>
 #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
-
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -79,6 +82,7 @@ namespace synthese
 	using namespace graph;
 	using namespace impex;
 	using namespace db;
+	using namespace geography;
 
 	namespace util
 	{
@@ -169,6 +173,8 @@ namespace synthese
 			// TAB STOPS
 			if (openTabContent(stream, TAB_STOPS))
 			{
+				stream << "<h1>Desserte</h1>";
+
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(_request);
 				AdminFunctionRequest<PTPlacesAdmin> openCityRequest(_request);
 				AdminFunctionRequest<DRTAreaAdmin> openDRTAreaRequest(_request);
@@ -190,6 +196,7 @@ namespace synthese
 				v.push_back("Localité");
 				v.push_back("Arrêt");
 				v.push_back("Quai");
+				v.push_back("pm");
 				v.push_back("A");
 				v.push_back("D");
 				v.push_back("Hor");
@@ -291,6 +298,9 @@ namespace synthese
 						}
 					}
 
+					stream << t.col();
+					stream << lineStop->getMetricOffset();
+
 					if(lineArea.get())
 					{
 						stream << t.col();
@@ -377,6 +387,65 @@ namespace synthese
 				{
 					stream << f.close();
 				}
+
+				stream << "<h1>Carte</h1>";
+
+				Envelope e;
+				shared_ptr<geos::geom::Point> center;
+				BOOST_FOREACH(const Path::Edges::value_type& edge, _line->getEdges())
+				{
+					if(edge->getFromVertex()->hasGeometry())
+					{
+						e.expandToInclude(*edge->getFromVertex()->getGeometry()->getCoordinate());
+					}
+				}
+				if(!e.isNull())
+				{
+					Coordinate c;
+					e.centre(c);
+					center.reset(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(c));
+				}
+
+					
+				HTMLMap map(*center, 12, true, false, false);
+				StaticActionRequest<LineStopUpdateAction> lineStopUpdateRequest(_request);
+				StaticActionRequest<StopPointUpdateAction> stopPointUpdateRequest(_request);
+				for(Path::Edges::const_iterator itEdge(_line->getEdges().begin()); itEdge!=_line->getEdges().end(); ++itEdge)
+				{
+					if(dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge))
+					{
+						lineStopUpdateRequest.getAction()->setLineStop(
+							static_pointer_cast<LineStop, DesignatedLinePhysicalStop>(
+								Env::GetOfficialEnv().getEditableSPtr(static_cast<DesignatedLinePhysicalStop*>(*itEdge))
+						)	);
+						stopPointUpdateRequest.getAction()->setStop(
+							Env::GetOfficialEnv().getEditableSPtr(static_cast<StopPoint*>((*itEdge)->getFromVertex()))
+						);
+					}
+					if(itEdge+1 != _line->getEdges().end())
+					{
+						map.addLineString(
+							HTMLMap::MapLineString(
+								*(*itEdge)->getRealGeometry(),
+								dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? lineStopUpdateRequest.getURL() : string()
+						)	);
+					}
+					if((*itEdge)->getFromVertex()->getGeometry().get())
+					{
+						map.addPoint(
+							HTMLMap::MapPoint(
+								*(*itEdge)->getFromVertex()->getGeometry(),
+								"arret-rouge-blanc-8px.png",
+								"arret-rouge-blanc-8px.png",
+								"arret-rouge-blanc-8px.png",
+								dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? stopPointUpdateRequest.getURL() : string(),
+								dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? static_cast<StopPoint*>((*itEdge)->getFromVertex())->getConnectionPlace()->getFullName() : string(),
+								10, 10
+						)	);
+					}
+				}
+
+				map.draw(stream);
 			}
 
 			////////////////////////////////////////////////////////////////////

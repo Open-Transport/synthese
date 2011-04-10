@@ -44,7 +44,6 @@
 #include "DataSource.h"
 #include "ImpExModule.h"
 #include "Importer.hpp"
-#include "StopPointMoveAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "HTMLModule.h"
 #include "HTMLForm.h"
