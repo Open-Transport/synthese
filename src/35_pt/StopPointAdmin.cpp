@@ -36,7 +36,6 @@
 #include "ImportableAdmin.hpp"
 #include "HTMLMap.hpp"
 #include "CommercialLine.h"
-#include "StopPointMoveAction.hpp"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
 
@@ -147,9 +146,9 @@ namespace synthese
 				{
 					mapCenter = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(0,0);
 				}
-				HTMLMap map(*mapCenter, 18, true, true);
+				HTMLMap map(*mapCenter, 18, true, true, false);
 
-				StaticActionRequest<StopPointMoveAction> moveAction(request);
+				StaticActionRequest<StopPointUpdateAction> moveAction(request);
 				moveAction.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
 
 				if(_stop->getGeometry().get())
@@ -170,7 +169,7 @@ namespace synthese
 							"</span>"
 							;
 					}
-					map.addPoint(HTMLMap::MapPoint(*_stop->getGeometry(), "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), _stop->getName() + "<br />" + popupcontent.str()));
+					map.addPoint(HTMLMap::MapPoint(*_stop->getGeometry(), "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), _stop->getName() + "<br />" + popupcontent.str(), 21, 25));
 				}
 
 				map.draw(stream);

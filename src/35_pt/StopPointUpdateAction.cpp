@@ -31,10 +31,14 @@
 #include "StopAreaTableSync.hpp"
 #include "ImportableTableSync.hpp"
 #include "ImportableAdmin.hpp"
+#include "HTMLMap.hpp"
+
+#include <geos/io/WKTReader.h>
 
 using namespace std;
 using namespace boost;
 using namespace geos::geom;
+using namespace geos::io;
 
 namespace synthese
 {
@@ -43,6 +47,7 @@ namespace synthese
 	using namespace util;
 	using namespace geography;
 	using namespace impex;
+	using namespace db;
 	
 	namespace util
 	{
@@ -131,6 +136,12 @@ namespace synthese
 				);
 			}
 
+			if(map.isDefined(HTMLMap::PARAMETER_ACTION_WKT))
+			{
+				WKTReader reader(&DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
+				_point.reset(static_cast<Point*>(reader.read(map.get<string>(HTMLMap::PARAMETER_ACTION_WKT))));
+			}
+
 			if(map.isDefined(PARAMETER_OPERATOR_CODE))
 			{
 				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(
@@ -186,6 +197,13 @@ namespace synthese
 			const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
+		}
+
+
+
+		void StopPointUpdateAction::setPoint( boost::shared_ptr<geos::geom::Point> value )
+		{
+			_point = _point = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*value);
 		}
 	}
 }

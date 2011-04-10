@@ -26,6 +26,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include <geos/geom/Point.h>
+#include <geos/geom/LineString.h>
 
 namespace synthese
 {
@@ -49,6 +50,8 @@ namespace synthese
 		class HTMLMap
 		{
 		public:
+			static const std::string PARAMETER_ACTION_WKT;
+
 			struct MapPoint
 			{
 				boost::shared_ptr<geos::geom::Point> point;
@@ -57,6 +60,8 @@ namespace synthese
 				std::string waitingIcon;
 				std::string updateRequest;
 				std::string htmlPopup;
+				std::size_t width;
+				std::size_t height;
 				
 				MapPoint(
 					const geos::geom::Point& _point,
@@ -64,16 +69,34 @@ namespace synthese
 					const std::string& _editionIcon,
 					const std::string& _waitingIcon,
 					const std::string& _updateRequest,
-					const std::string& _htmlPopup
+					const std::string& _htmlPopup,
+					std::size_t _width,
+					std::size_t _height
 				):	point(static_cast<geos::geom::Point*>(_point.clone())),
 					icon(_icon),
 					editionIcon(_editionIcon),
 					waitingIcon(_waitingIcon),
 					updateRequest(_updateRequest),
-					htmlPopup(_htmlPopup)
+					htmlPopup(_htmlPopup),
+					width(_width),
+					height(_height)
 				{}
 			};
 			typedef std::vector<MapPoint> Points;
+
+			struct MapLineString
+			{
+				boost::shared_ptr<geos::geom::LineString> lineString;
+				std::string updateRequest;
+
+				MapLineString(
+					const geos::geom::LineString& _lineString,
+					const std::string& _updateRequest
+				):	lineString(static_cast<geos::geom::LineString*>(_lineString.clone())),
+					updateRequest(_updateRequest)
+				{}
+			};
+			typedef std::vector<MapLineString> LineStrings;
 
 			class Control
 			{
@@ -113,8 +136,10 @@ namespace synthese
 			const int _zoom;
 			const std::string _id;
 			Points _points;
+			LineStrings _lineStrings;
 			Controls _controls;
 			bool _editable;
+			bool _highlight;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -130,6 +155,7 @@ namespace synthese
 				int zoom,
 				bool editable,
 				bool addable,
+				bool highlight,
 				const std::string id = "map"
 			);
 
@@ -137,6 +163,7 @@ namespace synthese
 			//! @name Update methods
 			//@{
 				void addPoint(MapPoint value){ _points.push_back(value); }
+				void addLineString(MapLineString value){ _lineStrings.push_back(value); }
 			//@}
 
 			//! @name Services

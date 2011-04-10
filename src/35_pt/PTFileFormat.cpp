@@ -43,7 +43,7 @@
 #include "HTMLModule.h"
 #include "HTMLTable.h"
 #include "City.h"
-#include "StopPointMoveAction.hpp"
+#include "StopPointUpdateAction.hpp"
 
 #include <geos/operation/distance/DistanceOp.h>
 
@@ -815,7 +815,7 @@ namespace synthese
 						stream << t.col();
 						if(distance > 0)
 						{
-							AdminActionFunctionRequest<StopPointMoveAction, DataSourceAdmin> moveRequest(request);
+							AdminActionFunctionRequest<StopPointUpdateAction, DataSourceAdmin> moveRequest(request);
 							moveRequest.getAction()->setStop(
 								env.getEditableSPtr(stopPoint)
 							);
