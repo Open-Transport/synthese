@@ -36,8 +36,6 @@ DRTArea.cpp
 DRTArea.hpp
 DRTAreaAdmin.cpp
 DRTAreaAdmin.hpp
-DRTAreaRemoveAction.cpp
-DRTAreaRemoveAction.hpp
 DRTAreasAdmin.cpp
 DRTAreasAdmin.hpp
 DRTAreaTableSync.cpp
@@ -66,8 +64,6 @@ JourneyPatternAdmin.cpp
 JourneyPatternAdmin.hpp
 JourneyPatternCopy.cpp
 JourneyPatternCopy.hpp
-JourneyPatternRemoveAction.cpp
-JourneyPatternRemoveAction.hpp
 JourneyPatternTableSync.cpp
 JourneyPatternTableSync.hpp
 JourneyPatternUpdateAction.cpp
@@ -78,6 +74,8 @@ JunctionStop.cpp
 JunctionStop.hpp
 JunctionTableSync.cpp
 JunctionTableSync.hpp
+JunctionUpdateAction.cpp
+JunctionUpdateAction.hpp
 LineArea.cpp
 LineArea.hpp
 LineAreaInheritedTableSync.cpp
@@ -92,8 +90,6 @@ LineStop.cpp
 LineStop.h
 LineStopAddAction.cpp
 LineStopAddAction.h
-LineStopRemoveAction.cpp
-LineStopRemoveAction.h
 LineStopTableSync.cpp
 LineStopTableSync.h
 LineStopUpdateAction.cpp
@@ -104,8 +100,6 @@ NonConcurrencyRule.cpp
 NonConcurrencyRule.h
 NonConcurrencyRuleAddAction.cpp
 NonConcurrencyRuleAddAction.h
-NonConcurrencyRuleRemoveAction.cpp
-NonConcurrencyRuleRemoveAction.h
 NonConcurrencyRuleTableSync.cpp
 NonConcurrencyRuleTableSync.h
 NonPermanentService.cpp
@@ -194,8 +188,6 @@ ServiceApplyCalendarAction.cpp
 ServiceApplyCalendarAction.h
 ServiceDateChangeAction.cpp
 ServiceDateChangeAction.h
-ServiceRemoveAction.cpp
-ServiceRemoveAction.h
 ServiceTimetableUpdateAction.cpp
 ServiceTimetableUpdateAction.h
 ServiceUpdateAction.cpp
@@ -213,7 +205,7 @@ StopAreaTableSync.hpp
 StopAreaTransferAddAction.cpp
 StopAreaTransferAddAction.h
 StopAreaTransferRemoveAction.cpp
-StopAreaTransferRemoveAction.h
+StopAreaTransferRemoveAction.hpp
 StopAreaUpdateAction.cpp
 StopAreaUpdateAction.h
 StopPoint.cpp
@@ -222,8 +214,6 @@ StopPointAddAction.cpp
 StopPointAddAction.hpp
 StopPointAdmin.cpp
 StopPointAdmin.hpp
-StopPointMoveAction.cpp
-StopPointMoveAction.hpp
 StopPointsListFunction.cpp
 StopPointsListFunction.hpp
 StopPointTableSync.cpp

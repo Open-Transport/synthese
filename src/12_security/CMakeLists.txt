@@ -7,12 +7,8 @@ AddRightAction.h
 AddUserAction.cpp
 AddUserAction.h
 DefaultRight.h
-DeleteProfileAction.cpp
-DeleteProfileAction.h
 DeleteRightAction.cpp
 DeleteRightAction.h
-DelUserAction.cpp
-DelUserAction.h
 GlobalRight.cpp
 GlobalRight.h
 Profile.cpp

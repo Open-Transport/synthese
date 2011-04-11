@@ -31,6 +31,8 @@ FetcherTemplate.h
 LinkException.h
 LoadException.h
 RankUpdateQuery.hpp
+RemoveObjectAction.cpp
+RemoveObjectAction.hpp
 ReplaceQuery.h
 SelectQuery.hpp
 spatial_ref_sys_sql.inc.h

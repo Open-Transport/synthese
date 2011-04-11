@@ -93,8 +93,6 @@ DisplayScreenHasAlarmValueInterfaceElement.cpp
 DisplayScreenHasAlarmValueInterfaceElement.h
 DisplayScreenPhysicalStopFunction.cpp
 DisplayScreenPhysicalStopFunction.h
-DisplayScreenRemoveAction.cpp
-DisplayScreenRemoveAction.h
 DisplayScreenRemoveDisplayedPlaceAction.cpp
 DisplayScreenRemoveDisplayedPlaceAction.h
 DisplayScreenRemoveForbiddenPlaceAction.cpp
@@ -117,8 +115,6 @@ DisplayType.cpp
 DisplayType.h
 DisplayTypeAdmin.cpp
 DisplayTypeAdmin.h
-DisplayTypeRemoveAction.cpp
-DisplayTypeRemoveAction.h
 DisplayTypesAdmin.cpp
 DisplayTypesAdmin.h
 DisplayTypeTableSync.cpp

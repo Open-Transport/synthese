@@ -14,8 +14,6 @@ HikingTrailDisplayFunction.cpp
 HikingTrailDisplayFunction.h
 HikingTrailMultipleRoutePlannerFunction.cpp
 HikingTrailMultipleRoutePlannerFunction.hpp
-HikingTrailRemoveAction.cpp
-HikingTrailRemoveAction.h
 HikingTrailsAdmin.cpp
 HikingTrailsAdmin.h
 HikingTrailSearchFormInterfaceElement.cpp

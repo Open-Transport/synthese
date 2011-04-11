@@ -24,8 +24,6 @@ VehiclePosition.cpp
 VehiclePosition.hpp
 VehiclePositionTableSync.cpp
 VehiclePositionTableSync.hpp
-VehicleRemoveAction.cpp
-VehicleRemoveAction.hpp
 VehiclesAdmin.cpp
 VehiclesAdmin.hpp
 VehicleTableSync.cpp
