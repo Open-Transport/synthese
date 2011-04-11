@@ -241,7 +241,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<ScheduledServiceTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<ScheduledServiceTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

@@ -131,7 +131,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<DataSourceTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<DataSourceTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

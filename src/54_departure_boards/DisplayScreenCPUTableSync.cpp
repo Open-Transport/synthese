@@ -199,7 +199,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<DisplayScreenCPUTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<DisplayScreenCPUTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

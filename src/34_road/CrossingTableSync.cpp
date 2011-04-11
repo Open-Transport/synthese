@@ -151,7 +151,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<CrossingTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<CrossingTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

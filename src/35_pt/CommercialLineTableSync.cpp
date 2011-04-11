@@ -363,7 +363,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<CommercialLineTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<CommercialLineTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

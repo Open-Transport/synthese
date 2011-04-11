@@ -159,7 +159,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<ReservationTransactionTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<ReservationTransactionTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

@@ -153,7 +153,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<RoadPlaceTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<RoadPlaceTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

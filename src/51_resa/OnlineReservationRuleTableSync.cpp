@@ -206,7 +206,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<OnlineReservationRuleTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<OnlineReservationRuleTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

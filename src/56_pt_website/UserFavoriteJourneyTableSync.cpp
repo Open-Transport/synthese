@@ -163,7 +163,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<UserFavoriteJourneyTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<UserFavoriteJourneyTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){
