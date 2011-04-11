@@ -88,7 +88,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<DbModuleConfigTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<DbModuleConfigTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

@@ -215,7 +215,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<RollingStockFilterTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<RollingStockFilterTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

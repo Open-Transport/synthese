@@ -151,7 +151,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<ObjectSiteLinkTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<ObjectSiteLinkTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

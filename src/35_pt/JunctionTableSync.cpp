@@ -178,7 +178,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<JunctionTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<JunctionTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

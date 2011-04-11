@@ -34,9 +34,16 @@
 
 namespace synthese
 {
-	class graph::ServicePointer;
-	class pt::StopPoint;
-	class pt::StopArea;
+	namespace graph
+	{
+		class ServicePointer;
+	}
+
+	namespace pt
+	{
+		class StopPoint;
+		class StopArea;
+	}
 
 	namespace departure_boards
 	{

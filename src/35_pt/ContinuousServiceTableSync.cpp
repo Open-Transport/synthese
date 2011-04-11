@@ -260,7 +260,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<ContinuousServiceTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<ContinuousServiceTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

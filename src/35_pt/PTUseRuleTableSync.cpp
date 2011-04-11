@@ -177,7 +177,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<PTUseRuleTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<PTUseRuleTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

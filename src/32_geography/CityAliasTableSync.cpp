@@ -163,7 +163,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<CityAliasTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<CityAliasTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

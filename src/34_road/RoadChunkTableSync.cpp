@@ -236,7 +236,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<RoadChunkTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<RoadChunkTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){
