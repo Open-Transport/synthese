@@ -24,8 +24,6 @@ TimetableRow.cpp
 TimetableRow.h
 TimetableRowAddAction.cpp
 TimetableRowAddAction.h
-TimetableRowDeleteAction.cpp
-TimetableRowDeleteAction.h
 TimetableRowTableSync.cpp
 TimetableRowTableSync.h
 TimetableServiceRowInterfacePage.cpp

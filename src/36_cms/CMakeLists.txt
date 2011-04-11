@@ -16,6 +16,8 @@ DateTimeInterfacePage.cpp
 DateTimeInterfacePage.h
 EqualFunction.cpp
 EqualFunction.hpp
+EvalService.cpp
+EvalService.hpp
 FunctionWithSite.h
 FunctionWithSiteBase.cpp
 FunctionWithSiteBase.hpp
@@ -63,8 +65,6 @@ WebPagePositionFunction.cpp
 WebPagePositionFunction.hpp
 WebpagePreviousFunction.cpp
 WebpagePreviousFunction.hpp
-WebPageRemoveAction.cpp
-WebPageRemoveAction.h
 WebPageTableSync.cpp
 WebPageTableSync.h
 WebPageUpdateAction.cpp

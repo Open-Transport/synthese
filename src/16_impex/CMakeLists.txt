@@ -4,8 +4,6 @@ DataSource.cpp
 DataSource.h
 DataSourceAdmin.cpp
 DataSourceAdmin.h
-DataSourceRemoveAction.cpp
-DataSourceRemoveAction.hpp
 DataSourcesAdmin.cpp
 DataSourcesAdmin.h
 DataSourceTableSync.cpp

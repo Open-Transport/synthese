@@ -21,14 +21,10 @@ CalendarTemplateElement.cpp
 CalendarTemplateElement.h
 CalendarTemplateElementAddAction.cpp
 CalendarTemplateElementAddAction.h
-CalendarTemplateElementRemoveAction.cpp
-CalendarTemplateElementRemoveAction.h
 CalendarTemplateElementTableSync.cpp
 CalendarTemplateElementTableSync.h
 CalendarTemplatePropertiesUpdateAction.cpp
 CalendarTemplatePropertiesUpdateAction.h
-CalendarTemplateRemoveAction.cpp
-CalendarTemplateRemoveAction.hpp
 CalendarTemplatesAdmin.cpp
 CalendarTemplatesAdmin.h
 CalendarTemplatesListFunction.cpp

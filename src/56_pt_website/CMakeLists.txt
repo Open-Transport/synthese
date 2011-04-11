@@ -22,8 +22,6 @@ SiteCityAddAction.cpp
 SiteCityAddAction.hpp
 SiteCommercialLineLink.cpp
 SiteCommercialLineLink.h
-SiteObjectLinkRemoveAction.cpp
-SiteObjectLinkRemoveAction.hpp
 SiteUpdateAction.cpp
 SiteUpdateAction.h
 TransportSiteAdmin.cpp
