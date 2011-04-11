@@ -23,12 +23,6 @@ AlarmTemplate.cpp
 AlarmTemplate.h
 AlarmTemplateInheritedTableSync.cpp
 AlarmTemplateInheritedTableSync.h
-DeleteAlarmAction.cpp
-DeleteAlarmAction.h
-DeleteScenarioAction.cpp
-DeleteScenarioAction.h
-DeleteTextTemplateAction.cpp
-DeleteTextTemplateAction.h
 GetMessagesFunction.cpp
 GetMessagesFunction.hpp
 MessageAdmin.cpp
@@ -66,8 +60,6 @@ ScenarioFolder.cpp
 ScenarioFolder.h
 ScenarioFolderAdd.cpp
 ScenarioFolderAdd.h
-ScenarioFolderRemoveAction.cpp
-ScenarioFolderRemoveAction.h
 ScenarioFolderTableSync.cpp
 ScenarioFolderTableSync.h
 ScenarioFolderUpdateAction.cpp
