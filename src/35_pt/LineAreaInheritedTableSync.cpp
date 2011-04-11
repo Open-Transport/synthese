@@ -55,6 +55,8 @@ namespace synthese
 		){
 			_CommonLoad(obj, rows, env, linkLevel);
 
+			obj->setInternalService(rows->getBool(LineStopTableSync::COL_INTERNAL_SERVICE));
+
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				RegistryKeyType areaId(rows->getLongLong(LineStopTableSync::COL_PHYSICALSTOPID));
@@ -72,8 +74,6 @@ namespace synthese
 				// Line update
 				obj->getLine()->addEdge(*obj);
 			}
-
-			obj->setInternalService(rows->getBool(LineStopTableSync::COL_INTERNAL_SERVICE));
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
