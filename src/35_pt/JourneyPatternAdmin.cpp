@@ -388,7 +388,6 @@ namespace synthese
 					stream << f.close();
 				}
 
-				stream << "<h1>Carte</h1>";
 
 				Envelope e;
 				shared_ptr<geos::geom::Point> center;
@@ -406,46 +405,50 @@ namespace synthese
 					center.reset(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(c));
 				}
 
-					
-				HTMLMap map(*center, 12, true, false, false);
-				StaticActionRequest<LineStopUpdateAction> lineStopUpdateRequest(_request);
-				StaticActionRequest<StopPointUpdateAction> stopPointUpdateRequest(_request);
-				for(Path::Edges::const_iterator itEdge(_line->getEdges().begin()); itEdge!=_line->getEdges().end(); ++itEdge)
-				{
-					if(dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge))
-					{
-						lineStopUpdateRequest.getAction()->setLineStop(
-							static_pointer_cast<LineStop, DesignatedLinePhysicalStop>(
-								Env::GetOfficialEnv().getEditableSPtr(static_cast<DesignatedLinePhysicalStop*>(*itEdge))
-						)	);
-						stopPointUpdateRequest.getAction()->setStop(
-							Env::GetOfficialEnv().getEditableSPtr(static_cast<StopPoint*>((*itEdge)->getFromVertex()))
-						);
-					}
-					if(itEdge+1 != _line->getEdges().end())
-					{
-						map.addLineString(
-							HTMLMap::MapLineString(
-								*(*itEdge)->getRealGeometry(),
-								dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? lineStopUpdateRequest.getURL() : string()
-						)	);
-					}
-					if((*itEdge)->getFromVertex()->getGeometry().get())
-					{
-						map.addPoint(
-							HTMLMap::MapPoint(
-								*(*itEdge)->getFromVertex()->getGeometry(),
-								"arret-rouge-blanc-8px.png",
-								"arret-rouge-blanc-8px.png",
-								"arret-rouge-blanc-8px.png",
-								dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? stopPointUpdateRequest.getURL() : string(),
-								dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? static_cast<StopPoint*>((*itEdge)->getFromVertex())->getConnectionPlace()->getFullName() : string(),
-								10, 10
-						)	);
-					}
-				}
 
-				map.draw(stream);
+				if(center.get())
+				{
+					stream << "<h1>Carte</h1>";
+					HTMLMap map(*center, 12, true, false, false);
+					StaticActionRequest<LineStopUpdateAction> lineStopUpdateRequest(_request);
+					StaticActionRequest<StopPointUpdateAction> stopPointUpdateRequest(_request);
+					for(Path::Edges::const_iterator itEdge(_line->getEdges().begin()); itEdge!=_line->getEdges().end(); ++itEdge)
+					{
+						if(dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge))
+						{
+							lineStopUpdateRequest.getAction()->setLineStop(
+								static_pointer_cast<LineStop, DesignatedLinePhysicalStop>(
+									Env::GetOfficialEnv().getEditableSPtr(static_cast<DesignatedLinePhysicalStop*>(*itEdge))
+							)	);
+							stopPointUpdateRequest.getAction()->setStop(
+								Env::GetOfficialEnv().getEditableSPtr(static_cast<StopPoint*>((*itEdge)->getFromVertex()))
+							);
+						}
+						if(itEdge+1 != _line->getEdges().end())
+						{
+							map.addLineString(
+								HTMLMap::MapLineString(
+									*(*itEdge)->getRealGeometry(),
+									dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? lineStopUpdateRequest.getURL() : string()
+							)	);
+						}
+						if((*itEdge)->getFromVertex()->getGeometry().get())
+						{
+							map.addPoint(
+								HTMLMap::MapPoint(
+									*(*itEdge)->getFromVertex()->getGeometry(),
+									"arret-rouge-blanc-8px.png",
+									"arret-rouge-blanc-8px.png",
+									"arret-rouge-blanc-8px.png",
+									dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? stopPointUpdateRequest.getURL() : string(),
+									dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? static_cast<StopPoint*>((*itEdge)->getFromVertex())->getConnectionPlace()->getFullName() : string(),
+									10, 10
+							)	);
+						}
+					}
+
+					map.draw(stream);
+				}
 			}
 
 			////////////////////////////////////////////////////////////////////
