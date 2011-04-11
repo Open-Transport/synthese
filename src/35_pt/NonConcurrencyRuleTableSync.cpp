@@ -170,7 +170,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<NonConcurrencyRuleTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<NonConcurrencyRuleTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

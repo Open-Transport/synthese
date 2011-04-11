@@ -191,7 +191,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<ForumTopicTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<ForumTopicTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

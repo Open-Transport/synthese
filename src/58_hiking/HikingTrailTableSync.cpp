@@ -187,7 +187,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<HikingTrailTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<HikingTrailTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

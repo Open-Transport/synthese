@@ -302,7 +302,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<TimetableTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<TimetableTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

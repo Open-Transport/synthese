@@ -122,7 +122,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<FareTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<FareTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

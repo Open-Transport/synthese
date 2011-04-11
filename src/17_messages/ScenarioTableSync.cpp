@@ -187,7 +187,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<ScenarioTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<ScenarioTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

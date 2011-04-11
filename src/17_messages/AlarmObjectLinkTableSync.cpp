@@ -216,7 +216,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<AlarmObjectLinkTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<AlarmObjectLinkTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

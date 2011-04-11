@@ -303,7 +303,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<JourneyPatternTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<JourneyPatternTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

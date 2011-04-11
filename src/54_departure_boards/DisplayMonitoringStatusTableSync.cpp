@@ -226,7 +226,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<DisplayMonitoringStatusTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<DisplayMonitoringStatusTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

@@ -139,7 +139,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<DRTAreaTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<DRTAreaTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

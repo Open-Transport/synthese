@@ -162,7 +162,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<PlaceAliasTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<PlaceAliasTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

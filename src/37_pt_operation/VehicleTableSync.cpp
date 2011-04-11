@@ -164,7 +164,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<VehicleTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<VehicleTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

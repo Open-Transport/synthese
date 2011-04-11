@@ -143,7 +143,7 @@ namespace synthese
 		}
 
 
-		void DBTableSyncTemplate<TransportNetworkTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<TransportNetworkTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

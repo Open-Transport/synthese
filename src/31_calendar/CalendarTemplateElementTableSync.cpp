@@ -225,7 +225,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<CalendarTemplateElementTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<CalendarTemplateElementTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){

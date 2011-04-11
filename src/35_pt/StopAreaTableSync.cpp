@@ -269,7 +269,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<StopAreaTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<StopAreaTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){
