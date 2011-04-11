@@ -524,8 +524,8 @@ namespace synthese
 			}
 			else if(name == "site")
 			{
-				boost::shared_ptr<const Website> site(page.getRoot());
-				if(site.get())
+				const Website* site(page.getRoot());
+				if(site)
 				{
 					stream << site->getKey();
 				}
