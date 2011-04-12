@@ -125,7 +125,7 @@ void testRegistryTableSync(const TestBackend& testBackend)
 	CHECK_COUNTERS(1, 0, 1);
 	BOOST_REQUIRE_EQUAL(registry.size(), 1);
 
-	TestTableSync::Remove(obj2.getKey());
+	TestTableSync::RemoveRow(obj2.getKey());
 
 	CHECK_COUNTERS(0, 1, 0);
 	BOOST_CHECK_EQUAL(registry.size(), 0);
@@ -156,7 +156,7 @@ void testRegistryTableSync(const TestBackend& testBackend)
 		// Object is not yet in the registry
 		BOOST_REQUIRE_EQUAL(registry.size(), 0);
 
-		TestTableSync::Remove(obj2.getKey(), transaction);
+		TestTableSync::RemoveRow(obj2.getKey(), transaction);
 
 		CHECK_COUNTERS(0, 0, 0);
 
