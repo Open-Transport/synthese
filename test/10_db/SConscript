@@ -1,0 +1,7 @@
+Import ('s3env')
+
+senv = s3env.Clone ()
+
+CppTestProject (senv, 's3-db-test', s3env['S3VERSION'], source_files = senv.Glob ('*Test.cpp'),
+ include_dir = senv.SrcDir('#src'),
+                     dependencies = ['s3-framework.cpplib', 's3-util.cpplib', 's3-db-sqlite.cpplib', 's3-db-mysql.cpplib'])
