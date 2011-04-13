@@ -17,4 +17,8 @@ ThreadManager.h
 
 add_library(01_util_threads ${util_threads_SRCS})
 
+target_link_libraries(01_util_threads
+  01_util
+)
+
 install(TARGETS 01_util_threads DESTINATION lib)

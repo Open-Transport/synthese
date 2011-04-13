@@ -21,6 +21,13 @@ include_directories(${EXPAT_INCLUDE_DIRS})
 
 add_library(06_openstreetmap ${openstreetmap_SRCS})
 
-target_link_libraries(06_openstreetmap expat)
+target_link_libraries(06_openstreetmap
+  ${Boost_LIBRARIES}
+  01_util
+  # Forward dependencies:
+  #34_road
+  expat
+  proj
+)
 
 install(TARGETS 06_openstreetmap DESTINATION lib)

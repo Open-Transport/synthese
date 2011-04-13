@@ -81,14 +81,14 @@ add_definitions(-DBOOST_RANDOM_DECL=)
 add_library(15_server ${server_SRCS})
 
 target_link_libraries(15_server
+  01_util
+  05_html
+  10_db
+  11_interfaces
+  12_security
+  13_dblog
   # Forward dependencies:
   #36_cms
-  #14_admin
-  13_dblog
-  12_security
-  11_interfaces
-  10_db
-  05_html
 )
 
 install(TARGETS 15_server DESTINATION lib)

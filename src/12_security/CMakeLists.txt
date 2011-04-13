@@ -61,13 +61,13 @@ UserUpdateAction.h
 add_library(12_security ${security_SRCS})
 
 target_link_libraries(12_security
-  # Forward dependencies:
-  #15_server
-  #14_admin
-  13_dblog
-  11_interfaces
-  10_db
   05_html
+  10_db
+  11_interfaces
+  # Forward dependencies:
+  #13_dblog
+  #14_admin
+  #15_server
 )
 
 install(TARGETS 12_security DESTINATION lib)

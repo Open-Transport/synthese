@@ -56,8 +56,7 @@ concurrent/SynchronizedQueue.h
 add_library(01_util ${util_SRCS})
 
 target_link_libraries(01_util
-  01_util_iostreams
-  01_util_threads
+  ${Boost_LIBRARIES}
   00_framework
 )
 

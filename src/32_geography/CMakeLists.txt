@@ -33,4 +33,11 @@ PlaceAliasTableSync.h
 
 add_library(32_geography ${geography_SRCS})
 
+target_link_libraries(32_geography
+  07_lexical_matcher
+  11_interfaces
+  18_graph
+  proj
+)
+
 install(TARGETS 32_geography DESTINATION lib)

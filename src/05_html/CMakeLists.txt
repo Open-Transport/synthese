@@ -28,4 +28,8 @@ TinyMCE.hpp
 
 add_library(05_html ${html_SRCS})
 
+target_link_libraries(05_html
+  01_util
+)
+
 install(TARGETS 05_html DESTINATION lib)

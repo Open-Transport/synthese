@@ -45,4 +45,11 @@ UserFavoriteJourneyTableSync.h
 
 add_library(56_pt_website ${pt_website_SRCS})
 
+target_link_libraries(56_pt_website
+  36_cms
+  53_pt_journey_planner
+  # Forward dependencies:
+  #59_road_journey_planner
+)
+
 install(TARGETS 56_pt_website DESTINATION lib)

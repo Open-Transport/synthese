@@ -40,4 +40,9 @@ VertexAccessMap.h
 
 add_library(18_graph ${graph_SRCS})
 
+target_link_libraries(18_graph
+  01_util
+  15_server
+)
+
 install(TARGETS 18_graph DESTINATION lib)

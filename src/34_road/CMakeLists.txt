@@ -41,4 +41,11 @@ RoadTableSync.h
 
 add_library(34_road ${road_SRCS})
 
+target_link_libraries(34_road
+  06_openstreetmap
+  16_impex
+  18_graph
+  32_geography
+)
+
 install(TARGETS 34_road DESTINATION lib)

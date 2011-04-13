@@ -97,4 +97,11 @@ XMLReservationFunction.h
 
 add_library(51_resa ${resa_SRCS})
 
+target_link_libraries(51_resa
+  36_cms
+  37_pt_operation
+  # Forward dependencies:
+  #53_pt_journey_planner
+)
+
 install(TARGETS 51_resa DESTINATION lib)

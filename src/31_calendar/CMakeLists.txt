@@ -35,4 +35,13 @@ CalendarTemplateTableSync.h
 
 add_library(31_calendar ${calendar_SRCS})
 
+target_link_libraries(31_calendar
+  01_util
+  10_db
+  14_admin
+  15_server
+  # Forward dependencies:
+  #36_cms
+)
+
 install(TARGETS 31_calendar DESTINATION lib)
