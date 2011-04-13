@@ -22,4 +22,14 @@ DBLogTemplate.h
 
 add_library(13_dblog ${dblog_SRCS})
 
+target_link_libraries(13_dblog
+  05_html
+  10_db
+  11_interfaces
+  12_security
+  # Forward dependencies:
+  #14_admin
+  #15_server
+)
+
 install(TARGETS 13_dblog DESTINATION lib)

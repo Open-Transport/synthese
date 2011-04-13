@@ -44,4 +44,11 @@ TimetableWarning.h
 
 add_library(55_timetables ${timetables_SRCS})
 
+target_link_libraries(55_timetables
+  ${Boost_LIBRARIES}
+  01_util
+  10_db
+  35_pt
+)
+
 install(TARGETS 55_timetables DESTINATION lib)

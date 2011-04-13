@@ -79,4 +79,11 @@ ValueElementList.h
 
 add_library(11_interfaces ${interfaces_SRCS})
 
+target_link_libraries(11_interfaces
+  05_html
+  10_db
+  # Forward dependencies:
+  #15_server
+)
+
 install(TARGETS 11_interfaces DESTINATION lib)

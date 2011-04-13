@@ -75,4 +75,10 @@ Website.hpp
 
 add_library(36_cms ${cms_SRCS})
 
+target_link_libraries(36_cms
+  12_security
+  15_server
+  20_tree
+)
+
 install(TARGETS 36_cms DESTINATION lib)

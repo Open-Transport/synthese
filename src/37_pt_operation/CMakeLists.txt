@@ -34,4 +34,8 @@ VehicleUpdateAction.hpp
 
 add_library(37_pt_operation ${pt_operation_SRCS})
 
+target_link_libraries(37_pt_operation
+  35_pt
+)
+
 install(TARGETS 37_pt_operation DESTINATION lib)

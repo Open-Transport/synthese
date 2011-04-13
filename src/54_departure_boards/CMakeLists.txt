@@ -145,4 +145,14 @@ UpdateDisplayTypeAction.h
 
 add_library(54_departure_boards ${departure_boards_SRCS})
 
+target_link_libraries(54_departure_boards
+  07_lexical_matcher
+  10_db
+  17_messages
+  18_graph
+  32_geography
+  33_algorithm
+  35_pt
+)
+
 install(TARGETS 54_departure_boards DESTINATION lib)
