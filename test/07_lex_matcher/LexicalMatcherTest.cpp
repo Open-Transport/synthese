@@ -1,4 +1,4 @@
-#include "07_lex_matcher/LexicalMatcher.h"
+#include "07_lexical_matcher/LexicalMatcher.h"
 
 #include <iostream>
 

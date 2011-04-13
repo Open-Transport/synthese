@@ -2,5 +2,9 @@ Import ('s3env')
 
 senv = s3env.Clone ()
 
-CppTestProject (senv, 's3-html-test', s3env['S3VERSION'], source_files = senv.Glob ('*Test.cpp'),
-                     dependencies = ['s3-html.cpplib'])
+CppTestProject(
+    senv, 's3-html-test', s3env['S3VERSION'],
+    source_files = senv.Glob ('*Test.cpp'),
+    include_dir = senv.SrcDir('#src'),
+    dependencies = ['s3-html.cpplib']
+)
