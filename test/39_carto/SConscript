@@ -1,0 +1,11 @@
+Import ('s3env')
+
+# TODO: this module should be renamed to 39_map
+
+# FIXME: doesn't compile, missing cppunit includes.
+if False:
+	CppTestProject(
+		s3env, 's3-carto-test', s3env['S3VERSION'],
+		source_files = s3env.Glob('*Test.cpp'),
+		dependencies = ['s3-map.cpplib']
+	)

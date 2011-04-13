@@ -1,5 +1,3 @@
-include_directories("${PROJECT_SOURCE_DIR}/src")
-
 include_directories(${SPATIALITE_INCLUDE_DIRS})
 include_directories(${PROJ_INCLUDE_DIRS})
 include_directories(${GEOS_INCLUDE_DIRS})
