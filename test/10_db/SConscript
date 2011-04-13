@@ -1,7 +1,12 @@
-Import ('s3env')
+Import('s3env')
 
-senv = s3env.Clone ()
+sources = s3env.Glob('*Test.cpp')
+if not s3env['_WITH_MYSQL']:
+    sources.remove('MySQLTriggerTest.cpp')
 
-CppTestProject (senv, 's3-db-test', s3env['S3VERSION'], source_files = senv.Glob ('*Test.cpp'),
- include_dir = senv.SrcDir('#src'),
-                     dependencies = ['s3-framework.cpplib', 's3-util.cpplib', 's3-db-sqlite.cpplib', 's3-db-mysql.cpplib'])
+CppTestProject(
+    s3env, 's3-db-test', s3env['S3VERSION'],
+    source_files = sources,
+    include_dir = s3env.SrcDir('#src'),
+    dependencies = ['s3-db.cpplib']
+)
