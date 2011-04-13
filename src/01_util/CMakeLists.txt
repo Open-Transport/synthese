@@ -55,9 +55,11 @@ concurrent/SynchronizedQueue.h
 
 add_library(01_util ${util_SRCS})
 
-target_link_libraries(01_util 00_framework)
-target_link_libraries(01_util 01_util_iostreams)
-target_link_libraries(01_util 01_util_threads)
+target_link_libraries(01_util
+  01_util_iostreams
+  01_util_threads
+  00_framework
+)
 
 add_subdirectory(iostreams)
 add_subdirectory(threads)
