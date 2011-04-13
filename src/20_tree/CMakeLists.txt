@@ -27,4 +27,9 @@ TreeUniqueRootPolicy.hpp
 
 add_library(20_tree ${tree_SRCS})
 
+target_link_libraries(20_tree
+  10_db
+  14_admin
+)
+
 install(TARGETS 20_tree DESTINATION lib)

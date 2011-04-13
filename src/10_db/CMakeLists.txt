@@ -51,10 +51,13 @@ include_directories(${SPATIALITE_INCLUDE_DIRS})
 add_library(10_db ${db_SRCS})
 
 target_link_libraries(10_db
-  spatialite
+  00_framework
+  01_util
+  01_util_threads
+  10_db_sqlite
   # Forward dependencies:
   #15_server
-  01_util
+  spatialite
 )
 
 if(WITH_MYSQL)

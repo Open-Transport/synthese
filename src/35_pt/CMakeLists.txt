@@ -240,4 +240,22 @@ XmlBuilder.h
 
 add_library(35_pt ${pt_SRCS})
 
+target_link_libraries(35_pt
+  00_framework
+  01_util
+  10_db
+  11_interfaces
+  12_security
+  16_impex
+  17_messages
+  18_graph
+  31_calendar
+  32_geography
+  33_algorithm
+  34_road
+  # Forward dependencies:
+  #36_cms
+  #39_map
+)
+
 install(TARGETS 35_pt DESTINATION lib)

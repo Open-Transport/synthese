@@ -31,4 +31,10 @@ TransactionTableSync.h
 
 add_library(57_accounting ${accounting_SRCS})
 
+target_link_libraries(57_accounting
+  10_db
+  12_security
+  15_server
+)
+
 install(TARGETS 57_accounting DESTINATION lib)

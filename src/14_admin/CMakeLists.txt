@@ -22,12 +22,12 @@ ModuleAdmin.h
 add_library(14_admin ${admin_SRCS})
 
 target_link_libraries(14_admin
-  # Forward dependencies:
-  #36_cms
-  #15_server
-  12_security
-  10_db
   05_html
+  10_db
+  12_security
+  # Forward dependencies:
+  #15_server
+  #36_cms
 )
 
 install(TARGETS 14_admin DESTINATION lib)

@@ -32,4 +32,9 @@ HikingTrailUpdateAction.h
 
 add_library(58_hiking ${hiking_SRCS})
 
+target_link_libraries(58_hiking
+  53_pt_journey_planner
+  56_pt_website
+)
+
 install(TARGETS 58_hiking DESTINATION lib)

@@ -26,4 +26,12 @@ TimeSlotRoutePlanner.h
 
 add_library(33_algorithm ${algorithm_SRCS})
 
+target_link_libraries(33_algorithm
+  17_messages
+  # Forward dependencies:
+  #34_road
+  #35_pt
+  #51_resa
+)
+
 install(TARGETS 33_algorithm DESTINATION lib)

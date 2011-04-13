@@ -54,4 +54,10 @@ XmlBuilder.h
 
 add_library(39_map ${map_SRCS})
 
+target_link_libraries(39_map
+  ${Boost_LIBRARIES}
+  01_util
+  35_pt
+)
+
 install(TARGETS 39_map DESTINATION lib)
