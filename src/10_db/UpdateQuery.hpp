@@ -26,9 +26,6 @@
 #define SYNTHESE_db_UpdateQuery_hpp__
 
 #include "SQLExpression.hpp"
-#include "DBTransaction.hpp"
-#include "DB.hpp"
-#include "DBModule.h"
 
 #include <vector>
 #include <utility>
@@ -42,8 +39,7 @@ namespace synthese
 		/** UpdateQuery class.
 			@ingroup m10
 		*/
-		template<class Table>
-		class UpdateQuery
+		class DynamicUpdateQuery
 		{
 		private:
 			typedef std::pair<std::string, boost::shared_ptr<SQLExpression> > UpdateType;
@@ -55,8 +51,7 @@ namespace synthese
 			WheresType _wheres;
 
 		public:
-			UpdateQuery() : _table(Table::TABLE.NAME) {}
-			UpdateQuery(const std::string table) : _table(table) {}
+			DynamicUpdateQuery(const std::string table) : _table(table) {}
 
 			//! @name Modifiers
 			//@{
@@ -79,9 +74,23 @@ namespace synthese
 
 
 
-		template<class Table> template<class T>
-		void UpdateQuery<Table>::addUpdateField( const std::string field, const T& value)
+		template<class Table>
+		class UpdateQuery:
+			public DynamicUpdateQuery
 		{
+		public:
+			UpdateQuery():
+			DynamicUpdateQuery(Table::TABLE.NAME)
+			{}
+		};
+
+
+
+		template<class T>
+		void DynamicUpdateQuery::addUpdateField(
+			const std::string field,
+			const T& value
+		){
 			_updates.push_back(
 				std::make_pair(
 					field,
@@ -91,113 +100,18 @@ namespace synthese
 
 
 
-		template<class Table> template<class T>
-		void UpdateQuery<Table>::addWhereField( const std::string field, const T& value, std::string op)
-		{
+		template<class T>
+		void DynamicUpdateQuery::addWhereField(
+			const std::string field,
+			const T& value, std::string op
+		){
 			_wheres.push_back(
 				ComposedExpression::Get(
-					FieldExpression::Get(Table::TABLE.NAME, field),
+					FieldExpression::Get(_table, field),
 					op,
 					ValueExpression<T>::Get(value)
 			)	);
 		}
-
-
-
-		template<class Table>
-		std::string UpdateQuery<Table>::_whereQueryPart() const
-		{
-			std::stringstream s;
-
-			// Where
-			if(!_wheres.empty())
-			{
-				s << " WHERE ";
-				bool first(true);
-				BOOST_FOREACH(const WheresType::value_type& where, _wheres)
-				{
-					if(!first)
-					{
-						s << " AND ";
-					}
-					s << where->toString();
-					first = false;
-				}
-			}
-
-			return s.str();
-		}
-
-
-
-		template<class Table>
-		void UpdateQuery<Table>::execute(boost::optional<DBTransaction&> transaction) const
-		{
-			// TODO: this should run inside of a transaction, an id could appear or disappear between the SELECT and the UPDATE.
-
-			DB* db = DBModule::GetDB();
-
-			std::string selectQuery("SELECT " + TABLE_COL_ID + " FROM " + Table::TABLE.NAME + _whereQueryPart());
-			DBResultSPtr rows = db->execQuery(selectQuery);
-
-			// TODO: call rowUpdated directly from this loop once checkModificationEvents() infrastructure is removed.
-			std::vector<util::RegistryKeyType> updatedIds;
-			while (rows->next())
-			{
-				updatedIds.push_back(rows->getLongLong(TABLE_COL_ID));
-			}
-
-			std::stringstream updateQuery;
-			updateQuery << "UPDATE " << Table::TABLE.NAME << " SET ";
-
-			bool first(true);
-			BOOST_FOREACH(const UpdateType& update, _updates)
-			{
-				if(!first)
-				{
-					updateQuery << ",";
-				}
-				updateQuery << update.first << "=" << update.second->toString();
-				first = false;
-			}
-
-			updateQuery << _whereQueryPart();
-
-			db->execUpdate(updateQuery.str(), transaction);
-
-			BOOST_FOREACH(util::RegistryKeyType updatedId, updatedIds)
-			{
-				db->addDBModifEvent(
-					DB::DBModifEvent(
-						Table::TABLE.NAME,
-						DB::MODIF_UPDATE,
-						updatedId
-					),
-					transaction
-				);
-			}
-#ifdef DO_VERIFY_TRIGGER_EVENTS
-			db->checkModificationEvents();
-#endif
-		}
-
-
-
-		struct DummyTableSync
-		{
-			static const DBTableSync::Format TABLE;
-		};
-
-
-
-		// Same as UpdateQuery, but the table name is given to the constructor.
-		// Useful to run an update query without a table sync class.
-		class DynamicUpdateQuery : public UpdateQuery<DummyTableSync>
-		{
-		public:
-			DynamicUpdateQuery(const std::string& table) : UpdateQuery<DummyTableSync>(table) {}
-		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_db_UpdateQuery_hpp__

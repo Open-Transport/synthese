@@ -136,6 +136,10 @@ namespace synthese
 			stream << t.title("Autres propriétés");
 			stream << t.cell("Capacité maximale (vide=illimité)", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_CAPACITY, _rule->getAccessCapacity() ? lexical_cast<string>(*_rule->getAccessCapacity()) : string()));
 			stream << t.cell("Tarification principale", t.getForm().getSelectInput(PTUseRuleUpdateAction::PARAMETER_FARE_ID, FareTableSync::GetList(_getEnv()), optional<RegistryKeyType>(_rule->getDefaultFare() ? _rule->getDefaultFare()->getKey() : 0)));
+			stream << t.title("Autres propriétés");
+			stream << t.cell("Ignorer dans tableaux de départs", t.getForm().getOuiNonRadioInput(PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS, _rule->getForbiddenInDepartureBoards()));
+			stream << t.cell("Ignorer dans fiches horaires", t.getForm().getOuiNonRadioInput(PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_TIMETABLES, _rule->getForbiddenInTimetables()));
+			stream << t.cell("Ignorer dans calcul d'itinéraires", t.getForm().getOuiNonRadioInput(PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_JOURNEY_PLANNER, _rule->getForbiddenInJourneyPlanning()));
 			stream << t.close();
 		}
 

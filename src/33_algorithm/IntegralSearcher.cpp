@@ -40,6 +40,7 @@
 #include "RoadModule.h"
 #include "Service.h"
 #include "Log.h"
+#include "PTUseRule.h"
 
 #include <sstream>
 #include <limits>
@@ -352,6 +353,12 @@ namespace synthese
 						if(	!path.isCompatibleWith(_accessParameters) ||
 							!_accessParameters.isAllowedPathClass(path.getPathClass() ? path.getPathClass()->getIdentifier() : 0)
 						){
+							continue;
+						}
+
+						const UseRule& useRule(path.getUseRule(_accessParameters.getUserClassRank()));
+						if(dynamic_cast<const PTUseRule*>(&useRule) && static_cast<const PTUseRule&>(useRule).getForbiddenInJourneyPlanning())
+						{
 							continue;
 						}
 

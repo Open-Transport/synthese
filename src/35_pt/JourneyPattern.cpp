@@ -50,17 +50,14 @@ namespace synthese
 		JourneyPattern::JourneyPattern(
 			util::RegistryKeyType id,
 			std::string name
-		):	util::Registrable(id)
-			, Path(),
+		):	util::Registrable(id),
+			Path(),
 			Importable(),
 			Named(name),
 			Calendar(),
-			_isWalkingLine (false)
-			, _useInDepartureBoards (true)
-			, _useInTimetables (true)
-			, _useInRoutePlanning (true)
-			, _wayBack(false)
-		{	}
+			_isWalkingLine (false),
+			_wayBack(false)
+		{}
 
 
 
@@ -68,58 +65,6 @@ namespace synthese
 		{
 			for (SubLines::const_iterator it(_subLines.begin()); it != _subLines.end(); ++it)
 				delete *it;
-		}
-
-
-
-
-		bool 
-		JourneyPattern::getUseInDepartureBoards () const
-		{
-			return _useInDepartureBoards;
-		}
-
-
-
-		void 
-		JourneyPattern::setUseInDepartureBoards (bool useInDepartureBoards)
-		{
-			_useInDepartureBoards = useInDepartureBoards;
-		}
-
-
-
-
-		bool 
-		JourneyPattern::getUseInTimetables () const
-		{
-			return _useInTimetables;
-		}
-
-
-
-		void 
-		JourneyPattern::setUseInTimetables (bool useInTimetables)
-		{
-			_useInTimetables = useInTimetables;
-		}
-
-
-
-
-		bool 
-		JourneyPattern::getUseInRoutePlanning () const
-		{
-			return _useInRoutePlanning;
-		}
-
-
-
-
-		void 
-		JourneyPattern::setUseInRoutePlanning (bool useInRoutePlanning)
-		{
-			_useInRoutePlanning = useInRoutePlanning;
 		}
 
 
@@ -206,21 +151,29 @@ namespace synthese
 			_pathGroup = commercialLine;
 		}
 
+
+
 		CommercialLine* JourneyPattern::getCommercialLine() const
 		{
 			return static_cast<CommercialLine*>(_pathGroup);
 		}
+
+
 
 		bool JourneyPattern::isPedestrianMode() const
 		{
 			return getWalkingLine();
 		}
 
+
+
 		int JourneyPattern::addSubLine( JourneyPatternCopy* line )
 		{
 			SubLines::iterator it(_subLines.insert(_subLines.end(), line));
 			return (it - _subLines.begin());
 		}
+
+
 
 		void JourneyPattern::addService(
 			Service* service,

@@ -23,11 +23,87 @@
 */
 
 #include "10_db/UpdateQuery.hpp"
+#include "DBModule.h"
+#include "DBTransaction.hpp"
+#include "DB.hpp"
 
 namespace synthese
 {
 	namespace db
 	{
-		const DBTableSync::Format DummyTableSync::TABLE("t001_dummy");
-	}
-}
+		std::string DynamicUpdateQuery::_whereQueryPart() const
+		{
+			std::stringstream s;
+
+			// Where
+			if(!_wheres.empty())
+			{
+				s << " WHERE ";
+				bool first(true);
+				BOOST_FOREACH(const WheresType::value_type& where, _wheres)
+				{
+					if(!first)
+					{
+						s << " AND ";
+					}
+					s << where->toString();
+					first = false;
+				}
+			}
+
+			return s.str();
+		}
+
+
+
+		void DynamicUpdateQuery::execute(boost::optional<DBTransaction&> transaction) const
+		{
+			// TODO: this should run inside of a transaction, an id could appear or disappear between the SELECT and the UPDATE.
+
+			DB* db = DBModule::GetDB();
+
+			std::string selectQuery("SELECT " + TABLE_COL_ID + " FROM " + _table + _whereQueryPart());
+			DBResultSPtr rows = db->execQuery(selectQuery);
+
+			// TODO: call rowUpdated directly from this loop once checkModificationEvents() infrastructure is removed.
+			std::vector<util::RegistryKeyType> updatedIds;
+			while (rows->next())
+			{
+				updatedIds.push_back(rows->getLongLong(TABLE_COL_ID));
+			}
+
+			std::stringstream updateQuery;
+			updateQuery << "UPDATE " << _table << " SET ";
+
+			bool first(true);
+			BOOST_FOREACH(const UpdateType& update, _updates)
+			{
+				if(!first)
+				{
+					updateQuery << ",";
+				}
+				updateQuery << update.first << "=" << update.second->toString();
+				first = false;
+			}
+
+			updateQuery << _whereQueryPart();
+
+			db->execUpdate(updateQuery.str(), transaction);
+
+			BOOST_FOREACH(util::RegistryKeyType updatedId, updatedIds)
+			{
+				db->addDBModifEvent(
+					DB::DBModifEvent(
+						_table,
+						DB::MODIF_UPDATE,
+						updatedId
+					),
+					transaction
+				);
+			}
+#ifdef DO_VERIFY_TRIGGER_EVENTS
+			db->checkModificationEvents();
+#endif
+		}
+
+}	}

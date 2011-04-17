@@ -61,9 +61,6 @@ namespace synthese
 		const string JourneyPatternTableSync::COL_TIMETABLENAME ("timetable_name");
 		const string JourneyPatternTableSync::COL_DIRECTION ("direction");
 		const string JourneyPatternTableSync::COL_ISWALKINGLINE ("is_walking_line");
-		const string JourneyPatternTableSync::COL_USEINDEPARTUREBOARDS ("use_in_departure_boards");
-		const string JourneyPatternTableSync::COL_USEINTIMETABLES ("use_in_timetables");
-		const string JourneyPatternTableSync::COL_USEINROUTEPLANNING ("use_in_routeplanning");
 		const string JourneyPatternTableSync::COL_ROLLINGSTOCKID ("rolling_stock_id");
 		const string JourneyPatternTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
 		const string JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID ("handicapped_compliance_id");
@@ -85,9 +82,6 @@ namespace synthese
 			DBTableSync::Field(JourneyPatternTableSync::COL_TIMETABLENAME, SQL_TEXT),
 			DBTableSync::Field(JourneyPatternTableSync::COL_DIRECTION, SQL_TEXT),
 			DBTableSync::Field(JourneyPatternTableSync::COL_ISWALKINGLINE, SQL_BOOLEAN),
-			DBTableSync::Field(JourneyPatternTableSync::COL_USEINDEPARTUREBOARDS, SQL_BOOLEAN),
-			DBTableSync::Field(JourneyPatternTableSync::COL_USEINTIMETABLES, SQL_BOOLEAN),
-			DBTableSync::Field(JourneyPatternTableSync::COL_USEINROUTEPLANNING, SQL_BOOLEAN),
 			DBTableSync::Field(JourneyPatternTableSync::COL_ROLLINGSTOCKID, SQL_INTEGER),
 			DBTableSync::Field(JourneyPatternTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
 			DBTableSync::Field(JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
@@ -119,17 +113,11 @@ namespace synthese
 			    rows->getText (JourneyPatternTableSync::COL_DIRECTION));
 
 			bool isWalkingLine (rows->getBool (JourneyPatternTableSync::COL_ISWALKINGLINE));
-			bool useInDepartureBoards (rows->getBool (JourneyPatternTableSync::COL_USEINDEPARTUREBOARDS));
-			bool useInTimetables (rows->getBool (JourneyPatternTableSync::COL_USEINTIMETABLES));
-			bool useInRoutePlanning (rows->getBool (JourneyPatternTableSync::COL_USEINROUTEPLANNING));
 			
 			line->setName(name);
 			line->setTimetableName (timetableName);
 			line->setDirection (direction);
 			line->setWalkingLine (isWalkingLine);
-			line->setUseInDepartureBoards (useInDepartureBoards);
-			line->setUseInTimetables (useInTimetables);
-			line->setUseInRoutePlanning (useInRoutePlanning);
 			line->setWayBack(rows->getBool(JourneyPatternTableSync::COL_WAYBACK));
 			line->setRollingStock(NULL);
 			line->setCommercialLine(NULL);
@@ -222,9 +210,6 @@ namespace synthese
 			query.addField(object->getTimetableName());
 			query.addField(object->getDirection());
 			query.addField(object->getWalkingLine());
-			query.addField(object->getUseInDepartureBoards());
-			query.addField(object->getUseInTimetables());
-			query.addField(object->getUseInRoutePlanning());
 			query.addField(object->getRollingStock() ? object->getRollingStock()->getKey() : RegistryKeyType(0));
 			query.addField(
 				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?

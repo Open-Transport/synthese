@@ -94,10 +94,6 @@ namespace synthese
 			std::string _direction;		//!< Direction (shown on vehicles)
 
 			bool _isWalkingLine;
-		    
-			bool _useInDepartureBoards; 
-			bool _useInTimetables; 
-			bool _useInRoutePlanning;
 
 			SubLines	_subLines;	//!< Copied lines handling services which not serve the line theory
 
@@ -116,9 +112,6 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				bool				getUseInDepartureBoards ()	const;
-				bool				getUseInTimetables ()		const;
-				bool				getUseInRoutePlanning ()	const;
 				const std::string&	getDirection ()				const;
 				const std::string&	getTimetableName ()			const;
 				pt::RollingStock*	getRollingStock()			const;
@@ -131,13 +124,10 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setUseInDepartureBoards (bool useInDepartureBoards);
 				void setWalkingLine (bool isWalkingLine);
 				void setRollingStock(pt::RollingStock*);
 				void setTimetableName (const std::string& timetableName);
 				void setDirection (const std::string& direction);
-				void setUseInRoutePlanning (bool useInRoutePlanning);
-				void setUseInTimetables (bool useInTimetables);
 				void setCommercialLine(CommercialLine* value);
 				void setWayBack(bool value) { _wayBack = value; }
 			//@}

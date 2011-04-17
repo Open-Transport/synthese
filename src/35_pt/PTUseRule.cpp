@@ -57,9 +57,11 @@ namespace synthese
 			_minDelayDays(days(0)),
 			_maxDelayDays(not_a_date_time),
 			_hourDeadLine(not_a_date_time),
-			_defaultFare(NULL)
-		{
-		}
+			_defaultFare(NULL),
+			_forbiddenInDepartureBoards(false),
+			_forbiddenInTimetables(false),
+			_forbiddenInJourneyPlanning(false)
+		{}
 
 
 
