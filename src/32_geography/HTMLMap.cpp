@@ -194,7 +194,7 @@ namespace synthese
 
 			if(!_controls.empty())
 			{
-				stream << "var controls = {";
+				stream << "controls = {";
 				bool first(true);
 				BOOST_FOREACH(const Control& control, _controls)
 				{
