@@ -28,6 +28,7 @@
 #include "ArrivalDepartureTableGenerator.h"
 #include "GraphConstants.h"
 #include "AccessParameters.h"
+#include "PTUseRule.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -84,9 +85,11 @@ namespace synthese
 					}
 				}
 
-			return 	linestop.getLine()->getUseInDepartureBoards()
-				&&	_lineFilter.find(linestop.getLine()->getKey()) == _lineFilter.end()
-				&&	((_endFilter == WITH_PASSING) || (linestop.getPreviousDepartureForFineSteppingOnly() == NULL))
+			const UseRule& useRule(linestop.getLine()->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+			return
+				(!dynamic_cast<const PTUseRule*>(&useRule) || !static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards()) &&
+				_lineFilter.find(linestop.getLine()->getKey()) == _lineFilter.end() &&
+				((_endFilter == WITH_PASSING) || (linestop.getPreviousDepartureForFineSteppingOnly() == NULL))
 				//&&	(((linestop.getFollowingArrival() != NULL) && (linestop.getFollowingArrival()->getConnectionPlace() != _place))
 				//	|| ( linestop.getLine()->getDestination()->getConnectionPlace() != _place))
 			;

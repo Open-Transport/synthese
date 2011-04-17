@@ -35,31 +35,18 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : Transport condition update.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Use_rule_update
+		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m35Actions refActions
 		/// @author Hugues Romain
 		/// @date 2010
 		/// @since 3.1.16
-		//////////////////////////////////////////////////////////////////////////
-		/// Key : PTUseRuleUpdateAction
-		///
-		/// Parameters :
-		///	<ul>
-		///		<li>actionParamid : id of the object to update</li>
-		///		<li>actionParamna : new name</li>
-		///		<li>actionParamca : new capacity</li>
-		///		<li>actionParamor : new value for origin is reference</li>
-		///		<li>actionParamfi : new value for default fare</li>
-		///		<li>actionParamty : new value for type of reservation rule</li>
-		///		<li>actionParammx : new value for max delay days</li>
-		///		<li>actionParammd : new value for min delay days</li>
-		///		<li>actionParammm : new value for min delay minutes</li>
-		///		<li>actionParamdl : new value for hour dead line</li>
-		/// </ul>
 		class PTUseRuleUpdateAction:
 			public util::FactorableTemplate<server::Action, PTUseRuleUpdateAction>
 		{
 		public:
 			static const std::string PARAMETER_RULE_ID;
+			static const std::string PARAMETER_TEMPLATE_ID;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_CAPACITY;
 			static const std::string PARAMETER_ORIGIN_IS_REFERENCE;
@@ -69,19 +56,25 @@ namespace synthese
 			static const std::string PARAMETER_MIN_DELAY_DAYS;
 			static const std::string PARAMETER_MIN_DELAY_MINUTES;
 			static const std::string PARAMETER_HOUR_DEADLINE;
+			static const std::string PARAMETER_FORBIDDEN_IN_TIMETABLES;
+			static const std::string PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS;
+			static const std::string PARAMETER_FORBIDDEN_IN_JOURNEY_PLANNER;
 
 		private:
 			boost::shared_ptr<PTUseRule> _rule;
-			std::string _name;
-			graph::UseRule::AccessCapacity _capacity;
-			bool _originIsReference;
-			boost::shared_ptr<const Fare> _fare;
-			PTUseRule::ReservationRuleType _type;
-			boost::posix_time::time_duration _minDelayMinutes;
-			boost::gregorian::date_duration _minDelayDays; 
-			boost::optional<boost::gregorian::date_duration> _maxDelayDays;
-			boost::posix_time::time_duration _hourDeadLine;
-
+			boost::shared_ptr<const PTUseRule> _template;
+			boost::optional<std::string> _name;
+			boost::optional<graph::UseRule::AccessCapacity> _capacity;
+			boost::optional<bool> _originIsReference;
+			boost::optional<boost::shared_ptr<const Fare> > _fare;
+			boost::optional<PTUseRule::ReservationRuleType> _type;
+			boost::optional<boost::posix_time::time_duration> _minDelayMinutes;
+			boost::optional<boost::gregorian::date_duration> _minDelayDays; 
+			boost::optional<boost::optional<boost::gregorian::date_duration> > _maxDelayDays;
+			boost::optional<boost::posix_time::time_duration> _hourDeadLine;
+			boost::optional<bool> _forbiddenInTimetables;
+			boost::optional<bool> _forbiddenInDepartureBoards;
+			boost::optional<bool> _forbiddenInJourneyPlanner;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -102,7 +95,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -118,7 +111,6 @@ namespace synthese
 				void setRule(boost::shared_ptr<PTUseRule> value) { _rule = value; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_PTUseRuleUpdateAction_H__

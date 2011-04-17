@@ -29,6 +29,7 @@
 #include "Env.h"
 #include "CalendarModule.h"
 #include "JourneyPatternCopy.hpp"
+#include "PTUseRule.h"
 
 #include <boost/foreach.hpp>
 
@@ -42,7 +43,6 @@ namespace synthese
 	using namespace calendar;
 	using namespace util;
 	using namespace graph;
-	using namespace pt;
 
 	namespace timetables
 	{
@@ -334,8 +334,12 @@ namespace synthese
 
 		bool TimetableGenerator::_isLineSelected( const pt::JourneyPattern& line ) const
 		{
-			if (!line.getUseInTimetables())
+			const UseRule& useRule(line.getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+			if(	dynamic_cast<const PTUseRule*>(&useRule) &&
+				static_cast<const PTUseRule&>(useRule).getForbiddenInTimetables()
+			){
 				return false;
+			}
 
 			bool lineIsSelected(false);
 			bool passageOk(false);
