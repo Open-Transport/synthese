@@ -50,6 +50,7 @@ namespace synthese
 	namespace pt
 	{
 		const string PTUseRuleUpdateAction::PARAMETER_RULE_ID = Action_PARAMETER_PREFIX + "id";
+		const string PTUseRuleUpdateAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "ti";
 		const string PTUseRuleUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string PTUseRuleUpdateAction::PARAMETER_CAPACITY = Action_PARAMETER_PREFIX + "ca";
 		const string PTUseRuleUpdateAction::PARAMETER_ORIGIN_IS_REFERENCE = Action_PARAMETER_PREFIX + "or";
@@ -59,8 +60,9 @@ namespace synthese
 		const string PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_DAYS = Action_PARAMETER_PREFIX + "md";
 		const string PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_MINUTES = Action_PARAMETER_PREFIX + "mm";
 		const string PTUseRuleUpdateAction::PARAMETER_HOUR_DEADLINE = Action_PARAMETER_PREFIX + "dl";
-
-		
+		const string PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS(Action_PARAMETER_PREFIX + "fb");
+		const string PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_TIMETABLES(Action_PARAMETER_PREFIX + "ft");
+		const string PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_JOURNEY_PLANNER(Action_PARAMETER_PREFIX + "fj");
 		
 		ParametersMap PTUseRuleUpdateAction::getParametersMap() const
 		{
@@ -68,24 +70,79 @@ namespace synthese
 			if(_rule.get())
 			{
 				map.insert(PARAMETER_RULE_ID, _rule->getKey());
-				map.insert(PARAMETER_NAME, _name);
-				if(_capacity && *_capacity)
+			}
+			if(_template.get())
+			{
+				map.insert(PARAMETER_TEMPLATE_ID, _template->getKey());
+			}
+			if(_name)
+			{
+				map.insert(PARAMETER_NAME, *_name);
+			}
+			if(_capacity)
+			{
+				if(*_capacity)
 				{
-					map.insert(PARAMETER_CAPACITY, static_cast<int>(*_capacity));
+					map.insert(PARAMETER_CAPACITY, static_cast<int>(**_capacity));
 				}
-				map.insert(PARAMETER_ORIGIN_IS_REFERENCE, _originIsReference);
-				map.insert(PARAMETER_FARE_ID, _fare.get() ? _fare->getKey() : RegistryKeyType(0));
-				map.insert(PARAMETER_TYPE, static_cast<int>(_type));
-				if(_maxDelayDays)
+				else
 				{
-					map.insert(PARAMETER_MAX_DELAY_DAYS, static_cast<int>(_maxDelayDays->days()));
+					map.insert(PARAMETER_CAPACITY, string());
 				}
-				map.insert(PARAMETER_MIN_DELAY_DAYS, static_cast<int>(_minDelayDays.days()));
-				map.insert(PARAMETER_MIN_DELAY_MINUTES, _minDelayMinutes.total_seconds() / 60);
-				if(!_hourDeadLine.is_not_a_date_time())
+			}
+			if(_originIsReference)
+			{
+				map.insert(PARAMETER_ORIGIN_IS_REFERENCE, *_originIsReference);
+			}
+			if(_fare)
+			{
+				map.insert(PARAMETER_FARE_ID, _fare->get() ? (*_fare)->getKey() : RegistryKeyType(0));
+			}
+			if(_type)
+			{
+				map.insert(PARAMETER_TYPE, static_cast<int>(*_type));
+			}
+			if(_maxDelayDays)
+			{
+				if(*_maxDelayDays)
 				{
-					map.insert(PARAMETER_HOUR_DEADLINE, to_simple_string(_hourDeadLine));
+					map.insert(PARAMETER_MAX_DELAY_DAYS, static_cast<int>((*_maxDelayDays)->days()));
 				}
+				else
+				{
+					map.insert(PARAMETER_MAX_DELAY_DAYS, string());
+				}
+			}
+			if(_minDelayDays)
+			{
+				map.insert(PARAMETER_MIN_DELAY_DAYS, static_cast<int>(_minDelayDays->days()));
+			}
+			if(_minDelayMinutes)
+			{
+				map.insert(PARAMETER_MIN_DELAY_MINUTES, _minDelayMinutes->total_seconds() / 60);
+			}
+			if(_hourDeadLine)
+			{
+				if(!_hourDeadLine->is_not_a_date_time())
+				{
+					map.insert(PARAMETER_HOUR_DEADLINE, to_simple_string(*_hourDeadLine));
+				}
+				else
+				{
+					map.insert(PARAMETER_HOUR_DEADLINE, string());
+				}
+			}
+			if(_forbiddenInDepartureBoards)
+			{
+				map.insert(PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS, *_forbiddenInDepartureBoards);
+			}
+			if(_forbiddenInTimetables)
+			{
+				map.insert(PARAMETER_FORBIDDEN_IN_TIMETABLES, *_forbiddenInTimetables);
+			}
+			if(_forbiddenInJourneyPlanner)
+			{
+				map.insert(PARAMETER_FORBIDDEN_IN_JOURNEY_PLANNER, *_forbiddenInJourneyPlanner);
 			}
 			return map;
 		}
@@ -94,71 +151,204 @@ namespace synthese
 		
 		void PTUseRuleUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
+			if(map.isDefined(PARAMETER_RULE_ID) && map.get<RegistryKeyType>(PARAMETER_RULE_ID))
 			{
-				_rule = PTUseRuleTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_RULE_ID), *_env);
+				try
+				{
+					_rule = PTUseRuleTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_RULE_ID), *_env);
+				}
+				catch(ObjectNotFoundException<PTUseRule>&)
+				{
+					throw ActionException("No such use rule");
+				}
 			}
-			catch(ObjectNotFoundException<PTUseRule>&)
+			else
 			{
-				throw ActionException("No such use rule");
+				// Template
+				RegistryKeyType tid(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE_ID, 0));
+				if(tid > 0)	try
+				{
+					_template = PTUseRuleTableSync::Get(tid, *_env);
+					_rule.reset(new PTUseRule(*_template));
+					_rule->setKey(0);
+				}
+				catch(ObjectNotFoundException<PTUseRule>&)
+				{
+					throw ActionException("No such template");
+				}
+				else
+				{
+					_rule.reset(new PTUseRule);
+				}
 			}
 
-			_name = map.getDefault<string>(PARAMETER_NAME);
-			_capacity = map.getOptional<size_t>(PARAMETER_NAME);
-			if(_capacity && *_capacity == 0)
+			if(map.isDefined(PARAMETER_NAME))
 			{
-				_capacity = UseRule::AccessCapacity();
+				_name = map.getDefault<string>(PARAMETER_NAME);
 			}
-			_originIsReference = map.getDefault<bool>(PARAMETER_ORIGIN_IS_REFERENCE, false);
 
-			RegistryKeyType fid(map.getDefault<RegistryKeyType>(PARAMETER_FARE_ID, 0));
-			if(fid > 0) try
+			if(map.isDefined(PARAMETER_CAPACITY))
 			{
-				_fare = FareTableSync::Get(fid, *_env);
+				_capacity = map.getOptional<size_t>(PARAMETER_NAME);
+				if(_capacity && *_capacity == 0)
+				{
+					_capacity = UseRule::AccessCapacity();
+				}
 			}
-			catch(ObjectNotFoundException<Fare>&)
+
+			if(map.isDefined(PARAMETER_ORIGIN_IS_REFERENCE))
 			{
-				throw ActionException("No such fare");
+				_originIsReference = map.getDefault<bool>(PARAMETER_ORIGIN_IS_REFERENCE, false);
 			}
-			_type = static_cast<PTUseRule::ReservationRuleType>(map.getDefault<int>(PARAMETER_TYPE, 0));
-			_minDelayMinutes = minutes(map.getDefault<long>(PARAMETER_MIN_DELAY_MINUTES, 0));
-			_minDelayDays = days(map.getDefault<long>(PARAMETER_MIN_DELAY_DAYS, 0));
-			_maxDelayDays = (map.getDefault<long>(PARAMETER_MAX_DELAY_DAYS, 0) > 0 ? days(map.get<long>(PARAMETER_MAX_DELAY_DAYS)) : optional<date_duration>());
-			if(!map.getDefault<string>(PARAMETER_HOUR_DEADLINE).empty())
+
+			if(map.isDefined(PARAMETER_FARE_ID))
 			{
-				_hourDeadLine = duration_from_string(map.get<string>(PARAMETER_HOUR_DEADLINE));
+				RegistryKeyType fid(map.getDefault<RegistryKeyType>(PARAMETER_FARE_ID, 0));
+				if(fid > 0) try
+				{
+					_fare = FareTableSync::Get(fid, *_env);
+				}
+				catch(ObjectNotFoundException<Fare>&)
+				{
+					throw ActionException("No such fare");
+				}
+				else
+				{
+					_fare = shared_ptr<Fare>();
+				}
+			}
+
+			if(map.isDefined(PARAMETER_TYPE))
+			{
+				_type = static_cast<PTUseRule::ReservationRuleType>(map.getDefault<int>(PARAMETER_TYPE, 0));
+			}
+
+			if(map.isDefined(PARAMETER_MIN_DELAY_MINUTES))
+			{
+				_minDelayMinutes = minutes(map.getDefault<long>(PARAMETER_MIN_DELAY_MINUTES, 0));
+			}
+
+			if(map.isDefined(PARAMETER_MIN_DELAY_DAYS))
+			{
+				_minDelayDays = days(map.getDefault<long>(PARAMETER_MIN_DELAY_DAYS, 0));
+			}
+
+			if(map.isDefined(PARAMETER_MAX_DELAY_DAYS))
+			{
+				_maxDelayDays = (map.getDefault<long>(PARAMETER_MAX_DELAY_DAYS, 0) > 0 ? days(map.get<long>(PARAMETER_MAX_DELAY_DAYS)) : optional<date_duration>());
+			}
+
+			if(map.isDefined(PARAMETER_HOUR_DEADLINE))
+			{
+				if(!map.getDefault<string>(PARAMETER_HOUR_DEADLINE).empty())
+				{
+					_hourDeadLine = duration_from_string(map.get<string>(PARAMETER_HOUR_DEADLINE));
+				}
+				else
+				{
+					_hourDeadLine = optional<time_duration>();
+				}
+			}
+
+			if(map.isDefined(PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS))
+			{
+				_forbiddenInDepartureBoards = map.get<bool>(PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS);
+			}
+
+			if(map.isDefined(PARAMETER_FORBIDDEN_IN_TIMETABLES))
+			{
+				_forbiddenInTimetables = map.get<bool>(PARAMETER_FORBIDDEN_IN_TIMETABLES);
+			}
+
+			if(map.isDefined(PARAMETER_FORBIDDEN_IN_JOURNEY_PLANNER))
+			{
+				_forbiddenInJourneyPlanner = map.get<bool>(PARAMETER_FORBIDDEN_IN_TIMETABLES);
 			}
 		}
-		
-		
-		
+
+
+
 		void PTUseRuleUpdateAction::run(
 			Request& request
 		){
 			//stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			_rule->setName(_name);
-			_rule->setAccessCapacity(_capacity);
-			_rule->setOriginIsReference(_originIsReference);
-			_rule->setDefaultFare(_fare.get());
-			_rule->setReservationType(_type);
-			_rule->setHourDeadLine(_hourDeadLine);
-			_rule->setMaxDelayDays(_maxDelayDays);
-			_rule->setMinDelayDays(_minDelayDays);
-			_rule->setMinDelayMinutes(_minDelayMinutes);
+			if(_name)
+			{
+				_rule->setName(*_name);
+			}
+
+			if(_capacity)
+			{
+				_rule->setAccessCapacity(*_capacity);
+			}
+
+			if(_originIsReference)
+			{
+				_rule->setOriginIsReference(*_originIsReference);
+			}
+
+			if(_fare)
+			{
+				_rule->setDefaultFare(_fare->get());
+			}
+
+			if(_type)
+			{
+				_rule->setReservationType(*_type);
+			}
+
+			if(_hourDeadLine)
+			{
+				_rule->setHourDeadLine(*_hourDeadLine);
+			}
+
+			if(_maxDelayDays)
+			{
+				_rule->setMaxDelayDays(*_maxDelayDays);
+			}
+
+			if(_minDelayDays)
+			{
+				_rule->setMinDelayDays(*_minDelayDays);
+			}
+
+			if(_minDelayMinutes)
+			{
+				_rule->setMinDelayMinutes(*_minDelayMinutes);
+			}
 			
+			if(_forbiddenInDepartureBoards)
+			{
+				_rule->setForbiddenInDepartureBoards(*_forbiddenInDepartureBoards);
+			}
+
+			if(_forbiddenInTimetables)
+			{
+				_rule->setForbiddenInTimetables(*_forbiddenInTimetables);
+			}
+
+			if(_forbiddenInJourneyPlanner)
+			{
+				_rule->setForbiddenInJourneyPlanning(*_forbiddenInJourneyPlanner);
+			}
+
 			PTUseRuleTableSync::Save(_rule.get());
 
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
+
+			if(request.getActionWillCreateObject())
+			{
+				request.setActionCreatedId(_rule->getKey());
+			}
 		}
-		
-		
-		
+
+
+
 		bool PTUseRuleUpdateAction::isAuthorized(
 			const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
 		}
-	}
-}
+}	}

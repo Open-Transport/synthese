@@ -29,7 +29,7 @@
 #include "TransportNetworkRight.h"
 #include "PTUseRuleTableSync.h"
 #include "ActionResultHTMLTable.h"
-#include "PTUseRuleAddAction.hpp"
+#include "PTUseRuleUpdateAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
 #include "PTUseRuleAdmin.h"
@@ -110,7 +110,7 @@ namespace synthese
 
 			stream << "<h1>Conditions de transport</h1>";
 
-			AdminActionFunctionRequest<PTUseRuleAddAction, PTUseRuleAdmin> creationRequest(_request);
+			AdminActionFunctionRequest<PTUseRuleUpdateAction, PTUseRuleAdmin> creationRequest(_request);
 			creationRequest.setActionWillCreateObject();
 			creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
 
@@ -139,7 +139,7 @@ namespace synthese
 			h.push_back(make_pair(string(),"Actions"));
 			h.push_back(make_pair(string(),"Actions"));
 
-			ActionResultHTMLTable t(h, st.getForm(), _requestParameters, ptrules, creationRequest.getHTMLForm(), PTUseRuleAddAction::PARAMETER_TEMPLATE_ID);
+			ActionResultHTMLTable t(h, st.getForm(), _requestParameters, ptrules, creationRequest.getHTMLForm(), PTUseRuleUpdateAction::PARAMETER_TEMPLATE_ID);
 			stream << t.open();
 
 			BOOST_FOREACH(shared_ptr<PTUseRule> ptrule, ptrules)
@@ -153,7 +153,7 @@ namespace synthese
 			}
 
 			stream << t.row();
-			stream << t.col(2) << t.getActionForm().getTextInput(PTUseRuleAddAction::PARAMETER_NAME, string());
+			stream << t.col(2) << t.getActionForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_NAME, string());
 			stream << t.col(2) << t.getActionForm().getSubmitButton("Ajouter");
 
 			stream << t.close();

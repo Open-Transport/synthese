@@ -112,6 +112,9 @@ namespace synthese
 
 				boost::posix_time::time_duration _hourDeadLine; //!< Latest reservation hour the last day open for reservation
 
+				bool _forbiddenInDepartureBoards; 
+				bool _forbiddenInTimetables; 
+				bool _forbiddenInJourneyPlanning;
 			//@}
 			
 			
@@ -137,6 +140,9 @@ namespace synthese
 				const boost::optional<boost::gregorian::date_duration>&	getMaxDelayDays()		const { return _maxDelayDays; }
 				ReservationRuleType	getReservationType()			const { return _reservationType; }
 				const Fare*	getDefaultFare()				const { return _defaultFare; }
+				bool getForbiddenInDepartureBoards ()	const { return _forbiddenInDepartureBoards; }
+				bool getForbiddenInTimetables ()		const { return _forbiddenInTimetables; }
+				bool getForbiddenInJourneyPlanning ()	const { return _forbiddenInJourneyPlanning; }
 			//@}
 			
 			//! @name Setters
@@ -154,6 +160,9 @@ namespace synthese
 				void setReservationType(ReservationRuleType value){ _reservationType = value; }
 				void setAccessCapacity(AccessCapacity value){ _accessCapacity = value; }
 				void setDefaultFare(const Fare* value){ _defaultFare = value; }
+				void setForbiddenInDepartureBoards (bool value){ _forbiddenInDepartureBoards = value; }
+				void setForbiddenInJourneyPlanning (bool value){ _forbiddenInJourneyPlanning = value; }
+				void setForbiddenInTimetables (bool value){ _forbiddenInTimetables = value; }
 			//@}
 
 			//! @name Service

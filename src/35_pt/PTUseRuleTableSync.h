@@ -50,6 +50,9 @@ namespace synthese
 			static const std::string COL_MAXDELAYDAYS;
 			static const std::string COL_HOURDEADLINE;
 			static const std::string COL_DEFAULT_FARE;
+			static const std::string COL_FORBIDDEN_IN_DEPARTURE_BOARDS;
+			static const std::string COL_FORBIDDEN_IN_TIMETABLES;
+			static const std::string COL_FORBIDDEN_IN_JOURNEY_PLANNING;
 
 
 			//////////////////////////////////////////////////////////////////////////

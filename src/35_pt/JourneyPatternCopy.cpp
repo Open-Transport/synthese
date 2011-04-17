@@ -54,10 +54,7 @@ namespace synthese
 			setTimetableName(line->getTimetableName());
 			setDirection(line->getDirection());
 			setWalkingLine(line->getWalkingLine());
-			setUseInDepartureBoards(line->getUseInDepartureBoards());
-			setUseInRoutePlanning(line->getUseInRoutePlanning());
-			setUseInTimetables(line->getUseInTimetables());
-
+			
 			// Copy of the line-stops
 			const Path::Edges edges(line->getEdges());
 			for (Path::Edges::const_iterator it(edges.begin()); it != edges.end(); ++it)

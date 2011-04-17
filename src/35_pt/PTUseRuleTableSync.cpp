@@ -54,6 +54,9 @@ namespace synthese
 		const string PTUseRuleTableSync::COL_HOURDEADLINE ("hour_deadline");
 		const string PTUseRuleTableSync::COL_NAME("name");
 		const string PTUseRuleTableSync::COL_DEFAULT_FARE("default_fare_id");
+		const string PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS("forbidden_in_departure_boards");
+		const string PTUseRuleTableSync::COL_FORBIDDEN_IN_TIMETABLES("forbidden_in_timetables");
+		const string PTUseRuleTableSync::COL_FORBIDDEN_IN_JOURNEY_PLANNING("forbidden_in_journey_planning");
 	}
 
 	namespace db
@@ -74,6 +77,9 @@ namespace synthese
 			DBTableSync::Field(PTUseRuleTableSync::COL_MAXDELAYDAYS, SQL_INTEGER),
 			DBTableSync::Field(PTUseRuleTableSync::COL_HOURDEADLINE, SQL_TIME),
 			DBTableSync::Field(PTUseRuleTableSync::COL_DEFAULT_FARE, SQL_INTEGER),
+			DBTableSync::Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS, SQL_BOOLEAN),
+			DBTableSync::Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_TIMETABLES, SQL_BOOLEAN),
+			DBTableSync::Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_JOURNEY_PLANNING, SQL_BOOLEAN),
 			DBTableSync::Field()
 		};
 
@@ -107,6 +113,9 @@ namespace synthese
 			rr->setHourDeadLine (hourDeadline);
 			rr->setName(rows->getText(PTUseRuleTableSync::COL_NAME));
 			rr->setAccessCapacity(rows->getOptionalUnsignedInt(PTUseRuleTableSync::COL_CAPACITY));
+			rr->setForbiddenInDepartureBoards(rows->getBool(PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS));
+			rr->setForbiddenInTimetables(rows->getBool(PTUseRuleTableSync::COL_FORBIDDEN_IN_TIMETABLES));
+			rr->setForbiddenInJourneyPlanning(rows->getBool(PTUseRuleTableSync::COL_FORBIDDEN_IN_JOURNEY_PLANNING));
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -139,6 +148,9 @@ namespace synthese
 			query.addField(object->getMaxDelayDays() ? lexical_cast<string>(object->getMaxDelayDays()->days()) : string());
 			query.addField(object->getHourDeadLine().is_not_a_date_time() ? string() : to_simple_string(object->getHourDeadLine()));
 			query.addField(object->getDefaultFare() ? object->getDefaultFare()->getKey() : RegistryKeyType(0));
+			query.addField(object->getForbiddenInDepartureBoards());
+			query.addField(object->getForbiddenInTimetables());
+			query.addField(object->getForbiddenInJourneyPlanning());
 			query.execute(transaction);
 		}
 
@@ -185,6 +197,8 @@ namespace synthese
 		}
 	}
 
+
+
 	namespace pt
 	{
 		PTUseRuleTableSync::SearchResult PTUseRuleTableSync::Search(
@@ -214,8 +228,5 @@ namespace synthese
 				}
 			}
 			return LoadFromQuery(query, env, linkLevel);
-
 		}
-
-	}
-}
+}	}
