@@ -195,7 +195,7 @@ namespace synthese
 				return false;
 			}
 
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(DELETE_RIGHT);;
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(DELETE_RIGHT);
 		}
 
 
