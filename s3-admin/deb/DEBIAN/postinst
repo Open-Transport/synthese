@@ -1,7 +1,8 @@
 #!/bin/bash
 
+S3_SERVER_DB_FILE=/srv/data/s3-server/config.db3
 
-source /etc/opt/rcs/s3-server.conf
+#source /etc/opt/rcs/s3-server.conf
 
 test ! -x /etc/init.d/s3-server || /etc/init.d/s3-server stop
 
