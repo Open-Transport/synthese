@@ -27,6 +27,8 @@
 
 #include <vector>
 #include <string>
+#include <set>
+#include <utility>
 
 namespace synthese
 {
@@ -42,8 +44,11 @@ namespace synthese
 			typedef std::vector<DB::DBModifEvent> DBModifEvents;
 
 		private:
+			typedef std::set<std::pair<std::string, util::RegistryKeyType> > DeletedRows;
+
 			Queries _queries;
 			DBModifEvents _modifEvents;
+			DeletedRows _deletedRows;
 
 		public:
 			void addQuery(const std::string& query);
