@@ -63,35 +63,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<TestSchemaTableSync>::BeforeDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-		}
-
-
-
-		template<> void DBTableSyncTemplate<TestSchemaTableSync>::AfterDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-		}
-
-
-
-		void DBTableSyncTemplate<TestSchemaTableSync>::LogRemoval(
-			const server::Session* session,
-			util::RegistryKeyType id
-		){
-		}
-
-
-		template<> bool DBTableSyncTemplate<TestSchemaTableSync>::CanDelete(
-			const server::Session* session,
-			util::RegistryKeyType object_id
-		){
-			return true;
-		}
+		DEFINE_EMPTY_TABLESYNC_DELETE_METHODS(TestSchemaTableSync)
 	}
 }
 
@@ -140,35 +112,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<TestSchema2TableSync>::BeforeDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-		}
-
-
-
-		template<> void DBTableSyncTemplate<TestSchema2TableSync>::AfterDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-		}
-
-
-
-		void DBTableSyncTemplate<TestSchema2TableSync>::LogRemoval(
-			const server::Session* session,
-			util::RegistryKeyType id
-		){
-		}
-
-
-		template<> bool DBTableSyncTemplate<TestSchema2TableSync>::CanDelete(
-			const server::Session* session,
-			util::RegistryKeyType object_id
-		){
-			return true;
-		}
+		DEFINE_EMPTY_TABLESYNC_DELETE_METHODS(TestSchema2TableSync)
 	}
 }
 
@@ -218,35 +162,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<TestSchema3TableSync>::BeforeDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-		}
-
-
-
-		template<> void DBTableSyncTemplate<TestSchema3TableSync>::AfterDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-		}
-
-
-
-		void DBTableSyncTemplate<TestSchema3TableSync>::LogRemoval(
-			const server::Session* session,
-			util::RegistryKeyType id
-		){
-		}
-
-
-		template<> bool DBTableSyncTemplate<TestSchema3TableSync>::CanDelete(
-			const server::Session* session,
-			util::RegistryKeyType object_id
-		){
-			return true;
-		}
+		DEFINE_EMPTY_TABLESYNC_DELETE_METHODS(TestSchema3TableSync)
 	}
 }
 
