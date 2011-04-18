@@ -541,7 +541,7 @@ namespace synthese
 			}
 		
 			// Previous departure
-			if(removalPosition != _edges.end() && edge.isDepartureAllowed())
+			if(removalPosition+1 != _edges.end() && edge.isDepartureAllowed())
 			{
 				Edge* previousDeparture(edge.getPreviousDepartureForFineSteppingOnly());
 				Edge* previousConnectingDeparture(edge.getPreviousConnectionDeparture());
