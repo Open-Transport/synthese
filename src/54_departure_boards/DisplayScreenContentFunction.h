@@ -49,119 +49,13 @@ namespace synthese
 	{
 		class DisplayType;
 
-		/** Arrival/departures table generator function.
-			@ingroup m54Functions refFunctions
-			@author Hugues Romain, Xavier Raffin
-			@date 2002
-
-			<h2>Usage</h2>
-			
-			The content can be specified in 3 different ways :
-			
-			<h3>Usage 1 : Loading pre-configured display screen</h3>
-	
-			Remark : this is the only way to configure several parameters like the generation algorithm.
-			
-			The display screen can be specified by two ways :
-
-			<h4>Usage 1.1 by id
-			Parameters :
-			<ul>
-				<li>roid / tb : id of the pre-configured display screen</li>
-				<li>date (optional) : date of search (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
-			</ul>
-
-			<h4>Usage 1.2 by mac address
-			Parameters :
-			<ul>
-				<li>m : MAC address of the display screen</li>
-				<li>date (optional) : date of search (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
-			</ul>
-			
-			<h3>Usage 2 : Generating from a connection place</h3>
-			
-			The connection place can be specified by two ways :
-			
-			<h4>Usage 2.1 by id</h4>
-			
-			Parameters :
-			<ul>
-				<li>roid : id of the connection place</li>
-				<li>i : id of display interface. If not specified, the standard XML output is used</li>
-				<li>rn : table rows number</li>
-				<li>date (optional) : date of search (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
-			</ul>
-			
-			<h4>Usage 2.2 : by name</h4>
-			
-			Parameters :
-			<ul>
-				<li>cn : name of the city</li>
-				<li>sn : name of the stop</li>
-				<li>i : id of display interface. If not specified, the standard XML output is used</li>
-				<li>rn : table rows number</li>
-				<li>date (optional) : date of search (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
-			</ul>
-			
-			<h3>Usage 3 : Generating from a physical stop</h3>
-						
-			The physical stop can be specified by two ways :
-			
-			<h4>Usage 3.1 by id</h4>
-			
-			Parameters :
-			<ul>
-				<li>roid : id of the physical stop</li>
-				<li>i : id of display interface. If not specified, the standard XML output is used</li>
-				<li>rn : table rows number</li>
-			</ul>
-			
-			<h4>Usage 3.2 : by operator code</h4>
-			
-			Parameters :
-			<ul>
-				<li>roid : id of the connection place which belongs the stop</li>
-				<li>oc : operator code of the physical stop</li>
-				<li>i : id of display interface. If not specified, the standard XML output is used</li>
-				<li>rn : table rows number</li>
-			</ul>
-
-
-			<h3>Usage 4 : Standard XML output</h2>
-
-			<h4>Usage 4.1 : by operator code</h4>
-			<ul>
-				<li>oc : operator code of the physical stop</li>
-				<li>rn : table rows number</li>
-				<li>date (optional) : reference date (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
-				<li>way (optional) : "backward" or "forward" Default value : "forward"</li>
-				<li>lineid (optional) : Commercial line ID : if given then results are only for this line</li>
-			</ul>
-			If 'way' is "forward" the answer will be the 'rn' next departures after 'date'.
-			If 'way' is "backward" the answer will be the 'rn' previous departures just before 'date'.
-			<u>WARNING :</u> rn is the number of departures which have different start time.
-			Consequently, if two service starts at the same minutes it will count for 1 start !
-
-			<h4>Usage 4.2 : by physical stop ID</h4>
-			<ul>
-				<li>roid : id of the physical stop</li>
-				<li>rn : table rows number</li>
-				<li>date (optional) : reference date (iso format : YYYY-MM-DD HH:II). Default value : the time of the request</li>
-				<li>way (optional) : "backward" or "forward" Default value : "forward"</li>
-				<li>lineid (optional) : Commercial line ID : if given then results are only for this line</li>
-			</ul>
-			If 'way' is "forward" the answer will be the 'rn' next departures after 'date'.
-			If 'way' is "backward" the answer will be the 'rn' previous departures just before 'date'.
-			<u>WARNING :</u> rn is the number of departures which have different start time.
-			Consequently, if two service starts at the same minutes it will count for 1 start !
-
-			@image html DisplayScreenContentFunction.png
-
-			<h3>Download</h3>
-			<ul>
-				<li><a href="include/54_departures_table/DisplayScreenContentFunction.xsd">XML output schema</a></li>
-			</ul>
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Arrival/departures table generator function.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator
+		//////////////////////////////////////////////////////////////////////////
+		/// @ingroup m54Functions refFunctions
+		///	@author Hugues Romain, Xavier Raffin
+		///	@date 2002
 		class DisplayScreenContentFunction:
 			public util::FactorableTemplate<cms::FunctionWithSite<false>,DisplayScreenContentFunction>
 		{
@@ -187,13 +81,21 @@ namespace synthese
 				bool	_wayIsBackward;
 			//@}
 
-			/** Conversion from attributes to generic parameter maps.
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from attributes to generic parameter maps.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Request
+			//////////////////////////////////////////////////////////////////////////
 			server::ParametersMap _getParametersMap() const;
 
-			/** Conversion from generic parameters map to attributes.
-			*/
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from generic parameters map to attributes.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Request
+			//////////////////////////////////////////////////////////////////////////
 			void _setFromParametersMap(const server::ParametersMap& map);
+
+
 
 			/** Concat an search XML result to stream
 			*/
@@ -206,6 +108,8 @@ namespace synthese
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Launches the display.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response
+			//////////////////////////////////////////////////////////////////////////
 			///	@param stream stream to write the output on
 			///	@param request request which has launched the function
 			/// @pre _screen and _screen->getType() must be not null
@@ -242,24 +146,7 @@ namespace synthese
 		public:
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of a departure board.
-				///	Variables sent to the cms :
-				/// <dl>
-				/// <dt>roid</dt><dd>id of the screen</dd>
-				///	<dt>title</dt><dd>title of the screen</dd>
-				/// <dt>date</dt><dd>date of the display</dd>
-				///	<dt>wiring_code</dt><dd>wiring code of the screen</dd>
-				///	<dt>display_service_number</dt><dd>service number must be displayed (1|0)</dd>
-				///	<dt>display_track_number</dt><dd>track number must be displayed (1|0)</dd>
-				///	<dt>intermediate_stops_number</dt><dd>number of intermediates stops to display</dd>
-				///	<dt>display_team</dt><dd>team identifier must be displayed (1|0)</dd>
-				///	<dt>stop_name</dt><dd>name of the departure stop area</dd>
-				///	<dt>display_clock</dt><dd>clock must be displayed (1|0)</dd>
-				///	<dt>rows</dt><dd>rows of the departure board</dd>
-				///	<dt>message_level</dt><dd>level of the message linked with the screen (undefined if no message)</dd>
-				/// <dt>message_content</dt><dd>content of the message linked with the screen (undefined if no message)</dd>
-				/// <dt>subscreen_x</dt><dd>id of the xth sub screen (x replaced by numeric value 0, 1, 2, ... The cms must lauch itself the display for each subscreen.</dd>
-				/// </dl>
-				///
+				///	https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				/// @param stream stream to write the result on
 				/// @param request request which has called the display
@@ -302,41 +189,7 @@ namespace synthese
 				
 				//////////////////////////////////////////////////////////////////////////
 				/// Displays a row of a departure board.
-				///	Variables sent to the CMS template :
-				/// <dl>
-				///	<dt>row_rank</dt><dd>Rank of the row in the departure table</dd>
-				///	<dt>page_number</dt><dd>Number of the page to display for multiple page protocol (eg Lumiplan)</dd>
-				///	<dt>display_service_number</dt><dd>service number must be displayed (1|0)</dd>
-				///	<dt>display_track_number</dt><dd>track number must be displayed (1|0)</dd>
-				///	<dt>intermediate_stops_number</dt><dd>number of intermediates stops to display</dd>
-				///	<dt>display_team</dt><dd>team identifier must be displayed (1|0)</dd>
-				///	<dt>blinks</dt><dd>Departure blinks ? (1|0)</dd>
-				///	<dt>time</dt><dd>Departure date time</dd>
-				/// <dt>planned_time</dt><dd>Planned departure date time</dd>
-				/// <dt>service_id</dt><dd>ID of the service</dd>
-				///	<dt>service_number</dt><dd>Service number</dd>
-				///	<dt>track</dt><dd>Track name</dd>
-				///	<dt>team</dt><dd>Team number</dd>
-				///	<dt>transport_mode</dt><dd>ID of the transport mode</dd>
-				///	<dt>delay</dt><dd>delay duration</dd>
-				/// <dt>rank_in_path</dt><dd>Rank of the departure stop in the path of the service</dd>
-				/// <dt>destinations</dt><dd>Destinations (content generated by the cms if a destinationPage is defined)</dd>
-				/// <dt>subscreen_x</dt><dd>id of the xth sub screen (x replaced by numeric value 0, 1, 2, ... The cms must lauch itself the display for each subscreen.</dd>
-				/// <dt>direction</dt><dd>Direction shown in front of the vehicle</dd>
-				/// <dt>line_id</dt><dd>line id</dd>
-				///	<dt>line_short_name</dt><dd>line short name (in most of cases the line number)</dd>
-				///	<dt>line_long_name</dt><dd>line long name</dd>
-				///	<dt>line_color</dt><dd>line RGB color</dd>
-				///	<dt>line_style</dt><dd>line CSS class</dd>
-				/// <dt>line_image</dt><dd>line image url</dd>
-				/// <dt>stop_id</dt><dd>departure stop area id</dd>
-				///	<dt>stop_name</dt><dd>departure stop area name in the city</dd>
-				///	<dt>city_id</dt><dd>id of the departure city where the stop area is located</dd>
-				///	<dt>city name</dt><dd>name of the departure city where the stop area is located</dd>
-				///	<dt>stop_name_13</dt><dd>departure stop area short alias (13 characters max) designed for departure boards</dd>
-				///	<dt>stop_name_26</dt><dd>departure stop area middle sized alias (26 characters max) designed for departure boards</dd>
-				///	<dt>stop_name_for_timetables</dt><dd>departure stop area alias designed for timetables</dd>
-				/// </dl>
+				///	https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				/// @param stream stream to write the result on
 				/// @param request request which has called the display
@@ -373,25 +226,7 @@ namespace synthese
 				
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of an intermediate or ending destination of a departure board.
-				///
-				/// Variables sent to the cms :
-				/// <dl>
-				///	<dt>stop_id</dt><dd>stop ID</dd>
-				///	<dt>city_name</dt><dd>stop city name</dd>
-				///	<dt>stop_name</dt><dd>stop name</dd>
-				///	<dt>stop_name_26</dt><dd>stop 26 characters alias</dd>
-				///	<dt>stop_name_13</dt><dd>stop 13 characters alias</dd>
-				///	<dt>is_same_city</dt><dd>last displayed stop was in the same city ? (1|0)</dd>
-				///	<dt>time</dt><dd>arrival date time</dd>
-				///	<dt>is_end_station</dt><dd>is the end station</dd>
-				///	<dt>destination_rank</dt><dd>rank of the destination in the service (not rank in path)</dd>
-				/// <dt>destination_global_rank</dt><dd>rank of the destination in the board (includes continuation transfer reached destinations)</dd>
-				/// <dt>transfers</dt><dd>Transfers (content generated by the cms if a transferPage is defined)</dd>
-				/// <dt>subscreen_x</dt><dd>id of the xth sub screen (x replaced by numeric value 0, 1, 2, ... The cms must lauch itself the display for each subscreen.</dd>
-				/// <dt>direction</dt><dd>Direction shown in front of the vehicle</dd>
-				/// <dt>is_continuation</dt><dd>1|0 : 1 if the destination is reached by a continuation transfer</dd>
-				/// <dt>continuation_starts_at_end</dt><dd>1|0 : 1 if the continuation has started where the main service ends</dd>
-				/// </dl>
+				///	https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				/// @param stream stream to write the result on
 				/// @param request request which has called the display
@@ -431,24 +266,8 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of a transfer destination from an intermediate stop.
-				/// <dl>
-				///	<dt>transport_mode</dt><dd>transport mode ID</dd>
-				///	<dt>line_id</dt><dd>line ID</dd>
-				///	<dt>line_short_name</dt><dd>line number (short name)</dd>
-				///	<dt>line_long_name</dt><dd>line long name</dd>
-				///	<dt>line_style</dt><dd>line CSS class</dd>
-				///	<dt>line_color</dt><dd>line RGB Color</dd>
-				///	<dt>line_image</dt><dd>line img path</dd>
-				///	<dt>stop_id</dt><dd>destination ID</dd>
-				///	<dt>city_name</dt><dd>destination city name</dd>
-				///	<dt>stop_name</dt><dd>destination name</dd>
-				///	<dt>stop_name_26</dt><dd>destination 26 characters alias</dd>
-				///	<dt>stop_name_13</dt><dd>destination 13 characters alias</dd>
-				///	<dt>departure_time</dt><dd>departure time</dd>
-				///	<dt>arrival_time</dt><dd>arrival time</dd>
-				///	<dt>transfer_rank</dt><dd>transfer rank in the transfer place</dd>
-				///	<dt>subscreen_x</dt><dd>id of the xth sub screen (x replaced by numeric value 0, 1, 2, ... The cms must lauch itself the display for each subscreen.</dd>
-				/// </dl>
+				///	https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
+				//////////////////////////////////////////////////////////////////////////
 				static void DisplayDepartureBoardTrandferDestination(
 					std::ostream& stream,
 					const server::Request& request,
@@ -497,6 +316,7 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Displays a row of a route planning board.
 				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Destination-of-journey-planner-based-departure-board
+				//////////////////////////////////////////////////////////////////////////
 				static void DisplayRoutePlanningBoardRow(
 					std::ostream& stream,
 					const server::Request& request,
@@ -515,12 +335,8 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Variables sent to the cms :
-				/// <dl>
-				///	<dt>city_name</dt><dd>City name</dd>
-				///	<dt>stop_name</dt><dd>Place name</dd>
-				///	<dt>stop_name_13</dt><dd>Place name (13 chars)</dd>
-				///	<dt>stop_name_26</dt><dd>Place name (26 chars)</dd>
-				/// </dl>
+				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Destination-of-journey-planner-based-departure-board
+				//////////////////////////////////////////////////////////////////////////
 				static void DisplayRoutePlanningBoardDestination(
 					std::ostream& stream,
 					const server::Request& request,
