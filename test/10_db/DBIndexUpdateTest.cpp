@@ -66,36 +66,7 @@ namespace synthese
 		};
 
 
-
-		template<> void DBTableSyncTemplate<TestIndexTableSync>::BeforeDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-		}
-
-
-
-		template<> void DBTableSyncTemplate<TestIndexTableSync>::AfterDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-		}
-
-
-
-		void DBTableSyncTemplate<TestIndexTableSync>::LogRemoval(
-			const server::Session* session,
-			util::RegistryKeyType id
-		){
-		}
-
-
-		template<> bool DBTableSyncTemplate<TestIndexTableSync>::CanDelete(
-			const server::Session* session,
-			util::RegistryKeyType object_id
-		){
-			return true;
-		}
+		DEFINE_EMPTY_TABLESYNC_DELETE_METHODS(TestIndexTableSync)
 	}
 }
 
@@ -146,35 +117,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<TestIndex2TableSync>::BeforeDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-		}
-
-
-
-		template<> void DBTableSyncTemplate<TestIndex2TableSync>::AfterDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-		}
-
-
-
-		void DBTableSyncTemplate<TestIndex2TableSync>::LogRemoval(
-			const server::Session* session,
-			util::RegistryKeyType id
-		){
-		}
-
-
-		template<> bool DBTableSyncTemplate<TestIndex2TableSync>::CanDelete(
-			const server::Session* session,
-			util::RegistryKeyType object_id
-		){
-			return true;
-		}
+		DEFINE_EMPTY_TABLESYNC_DELETE_METHODS(TestIndex2TableSync)
 	}
 }
 

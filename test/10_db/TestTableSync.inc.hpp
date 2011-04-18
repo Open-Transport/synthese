@@ -181,38 +181,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<TestTableSync>::BeforeDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-		}
-
-
-
-		template<> void DBTableSyncTemplate<TestTableSync>::AfterDelete(
-			util::RegistryKeyType id,
-			db::DBTransaction& transaction
-		){
-		}
-
-
-
-		void DBTableSyncTemplate<TestTableSync>::LogRemoval(
-			const server::Session* session,
-			util::RegistryKeyType id
-		){
-		}
-
-
-
-
-		template<> bool DBTableSyncTemplate<TestTableSync>::CanDelete(
-			const server::Session* session,
-			util::RegistryKeyType object_id
-		){
-			return true;
-		}
-
+		DEFINE_EMPTY_TABLESYNC_DELETE_METHODS(TestTableSync)
 	}
 }
 

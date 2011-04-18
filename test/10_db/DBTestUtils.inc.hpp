@@ -297,4 +297,27 @@ public:
 	) {};
 };
 
+#define DEFINE_EMPTY_TABLESYNC_DELETE_METHODS(TABLE) \
+template<> void DBTableSyncTemplate<TABLE>::BeforeDelete( \
+	util::RegistryKeyType id, \
+	db::DBTransaction& transaction \
+){ \
+} \
+template<> void DBTableSyncTemplate<TABLE>::AfterDelete( \
+	util::RegistryKeyType id, \
+	db::DBTransaction& transaction \
+){ \
+} \
+template<> void DBTableSyncTemplate<TABLE>::LogRemoval( \
+	const server::Session* session, \
+	util::RegistryKeyType id \
+){ \
+} \
+template<> bool DBTableSyncTemplate<TABLE>::CanDelete( \
+	const server::Session* session, \
+	util::RegistryKeyType object_id \
+){ \
+	return true; \
+}
+
 #endif // SYNTHESE_db_DbTestUtils_inc_hpp__
