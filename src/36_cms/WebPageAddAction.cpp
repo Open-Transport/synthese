@@ -190,6 +190,8 @@ namespace synthese
 
 			WebPageTableSync::Save(&object, transaction);
 
+			transaction.run();
+
 //			::AddCreationEntry(object, request.getUser().get());
 		}
 		
