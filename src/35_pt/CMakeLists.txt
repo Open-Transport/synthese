@@ -144,8 +144,6 @@ PTRoutesListFunction.hpp
 PTRuleUserAdmin.hpp
 PTUseRule.cpp
 PTUseRule.h
-PTUseRuleAddAction.cpp
-PTUseRuleAddAction.hpp
 PTUseRuleAdmin.cpp
 PTUseRuleAdmin.h
 PTUseRulesAdmin.cpp
