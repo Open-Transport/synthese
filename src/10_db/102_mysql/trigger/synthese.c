@@ -87,6 +87,105 @@ static size_t dummy_writefunction(void* ptr, size_t size, size_t nmemb, void* st
 	return nmemb * size;
 }
 
+
+longlong notify_synthese_http_realtime_update(
+	UDF_INIT *initid __attribute__((unused)),
+	UDF_ARGS *args,
+	char *is_null __attribute__((unused)),
+	char *error __attribute__((unused))
+) {
+	CURL *curl;
+	CURLcode res;
+	char url[512];
+	char postfields[512];
+	char *end = postfields;
+	char idBuf[50];
+	int len;
+
+	if (!args->args[0] || !args->args[1] || !args->args[2] || !args->args[3])
+	{
+		LOG1("error one parameter is NULL or empty\n");
+		*error = 1;
+		return 0;
+	}
+
+	curl = curl_easy_init();
+	if (!curl)
+	{
+		LOG1("error initializing curl\n");
+		*error = 1;
+		return 0;
+	}
+
+	if (args->lengths[0] >= sizeof(url))
+	{
+		goto buffer_too_small;
+	}
+	memcpy(url, args->args[0], args->lengths[0]);
+	url[args->lengths[0]] = 0;
+
+	DBG2("posting to url %s\n", url);
+	curl_easy_setopt(curl, CURLOPT_URL, url);
+
+#define APPEND_BUF(ptr, length) \
+	if (end - postfields + length >= sizeof(postfields)) \
+		goto buffer_too_small; \
+	memcpy(end, ptr, length); \
+	end += length;
+
+#define APPEND_STR(str) APPEND_BUF(str, strlen(str))
+
+	APPEND_STR("a=ScheduleRealTimeUpdateAction&nr=1&actionParamst=");
+	APPEND_BUF(args->args[1], args->lengths[1]);
+
+	APPEND_STR("&actionParamtb=");
+	APPEND_BUF(args->args[2], args->lengths[2]);
+
+	APPEND_STR("&actionParamty=");
+	APPEND_BUF(args->args[3], args->lengths[3]);
+
+	APPEND_STR("&actionParamid=");
+
+	len = snprintf(idBuf, sizeof(idBuf), "%lld", *((longlong*) args->args[4]));
+	APPEND_BUF(idBuf, len);
+
+#undef APPEND_BUF
+#undef APPEND_STR
+
+	*end = 0;
+
+	DBG2("postfields: %s\n", postfields);
+
+	curl_easy_setopt(curl, CURLOPT_POSTFIELDS, postfields);
+
+#ifndef SHOW_HTTP_OUTPUT
+	// dummy write function to prevent output from being written to standard output.
+	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, dummy_writefunction);
+#endif
+
+	res = curl_easy_perform(curl);
+	DBG2("curl return code: %i\n", res);
+
+	if (res)
+	{
+		*error = 1;
+		LOG2("curl returned an error while performing the request, code=%i\n", res
+		);
+	}
+
+	curl_easy_cleanup(curl);
+	return 0;
+
+buffer_too_small:
+
+	*error = 1;
+	curl_easy_cleanup(curl);
+	LOG1("error, buffer is too small\n");
+	return 0;
+}
+
+
+
 longlong notify_synthese_http(
 	UDF_INIT *initid __attribute__((unused)),
 	UDF_ARGS *args,
