@@ -41,7 +41,21 @@ namespace synthese
 
 		void DBTransaction::addDBModifEvent(const DB::DBModifEvent& modifEvent)
 		{
+			// Controls if the row was already updated by older queries in the transaction
+			DeletedRows::value_type key(make_pair(modifEvent.table, modifEvent.id));
+			if(_deletedRows.find(key) != _deletedRows.end())
+			{
+				return;
+			}
+
+			// Adds the event in the list
 			_modifEvents.push_back(modifEvent);
+
+			// Remains the deletion for further controls
+			if(modifEvent.type == DB::MODIF_DELETE)
+			{
+				_deletedRows.insert(key);
+			}
 		}
 
 
@@ -50,6 +64,7 @@ namespace synthese
 		){
 			DBModule::GetDB()->execTransaction(*this);
 			_queries.clear();
+			_deletedRows.clear();
 		}
 
 
