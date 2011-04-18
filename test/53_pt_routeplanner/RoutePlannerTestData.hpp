@@ -480,9 +480,6 @@ cl92.setStyle("vertfonce");
 
 JourneyPattern li92(2533274790397692, "92");
 li92.setTimetableName("92.1");
-li92.setUseInDepartureBoards(true);
-li92.setUseInTimetables(true);
-li92.setUseInRoutePlanning(true);
 li92.setRollingStock(&rs57);
 li92.setCommercialLine(&cl92);
 
@@ -591,9 +588,6 @@ cl93.setStyle("bleuclair");
 
 JourneyPattern li93(2533274790397693, "93-2");
 li93.setTimetableName("93.2");
-li93.setUseInDepartureBoards(true);
-li93.setUseInTimetables(true);
-li93.setUseInRoutePlanning(true);
 li93.setRollingStock(&rs57);
 li93.setCommercialLine(&cl93);
 
@@ -683,9 +677,6 @@ cl94.setStyle("orange");
 
 JourneyPattern li94(2533274790397694, "94-3");
 li94.setTimetableName("94.3");
-li94.setUseInDepartureBoards(true);
-li94.setUseInTimetables(true);
-li94.setUseInRoutePlanning(true);
 li94.setRollingStock(&rs57);
 li94.setCommercialLine(&cl94);
 
@@ -777,9 +768,6 @@ cl95.setStyle("rouge");
 
 JourneyPattern li95(2533274790397695, "95-1");
 li95.setTimetableName("95.1");
-li95.setUseInDepartureBoards(true);
-li95.setUseInTimetables(true);
-li95.setUseInRoutePlanning(true);
 li95.setRollingStock(&rs57);
 li95.setCommercialLine(&cl95);
 
@@ -835,9 +823,6 @@ cl96.setStyle("jaune");
 
 JourneyPattern li96(2533274790397696, "96-1");
 li96.setTimetableName("96.1");
-li96.setUseInDepartureBoards(true);
-li96.setUseInTimetables(true);
-li96.setUseInRoutePlanning(true);
 li96.setRollingStock(&rs57);
 li96.setCommercialLine(&cl96);
 
@@ -893,9 +878,6 @@ cl97.setStyle("rose");
 
 JourneyPattern li97(2533274790397697, "97");
 li97.setTimetableName("97");
-li97.setUseInDepartureBoards(true);
-li97.setUseInTimetables(true);
-li97.setUseInRoutePlanning(true);
 li97.setRollingStock(&rs57);
 li97.setCommercialLine(&cl97);
 
@@ -938,9 +920,6 @@ cl98.setStyle("vertclair");
 
 JourneyPattern li98(2533274790397698, "98");
 li98.setTimetableName("98");
-li98.setUseInDepartureBoards(true);
-li98.setUseInTimetables(true);
-li98.setUseInRoutePlanning(true);
 li98.setRollingStock(&rs57);
 li98.setCommercialLine(&cl98);
 
