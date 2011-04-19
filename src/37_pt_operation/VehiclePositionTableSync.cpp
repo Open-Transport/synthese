@@ -51,15 +51,15 @@ namespace synthese
 
 	namespace pt_operation
 	{
-		const std::string VehiclePositionTableSync::COL_STATUS;
-		const std::string VehiclePositionTableSync::COL_VEHICLE_ID;
-		const std::string VehiclePositionTableSync::COL_TIME;
-		const std::string VehiclePositionTableSync::COL_METER_OFFSET;
-		const std::string VehiclePositionTableSync::COL_STOP_POINT_ID;
-		const std::string VehiclePositionTableSync::COL_COMMENT;
-		const std::string VehiclePositionTableSync::COL_SERVICE_ID;
-		const std::string VehiclePositionTableSync::COL_RANK_IN_PATH;
-		const std::string VehiclePositionTableSync::COL_PASSENGERS;
+		const std::string VehiclePositionTableSync::COL_STATUS("status");
+		const std::string VehiclePositionTableSync::COL_VEHICLE_ID("vehicle_id");
+		const std::string VehiclePositionTableSync::COL_TIME("time");
+		const std::string VehiclePositionTableSync::COL_METER_OFFSET("meter_offset");
+		const std::string VehiclePositionTableSync::COL_STOP_POINT_ID("stop_point_id");
+		const std::string VehiclePositionTableSync::COL_COMMENT("comment");
+		const std::string VehiclePositionTableSync::COL_SERVICE_ID("service_id");
+		const std::string VehiclePositionTableSync::COL_RANK_IN_PATH("rank_in_path");
+		const std::string VehiclePositionTableSync::COL_PASSENGERS("passengers");
 	}
 	
 	namespace db
