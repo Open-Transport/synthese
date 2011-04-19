@@ -35,7 +35,7 @@ namespace synthese
 	namespace pt_operation
 	{
 		Vehicle::Vehicle(RegistryKeyType id):
-			Registrable(id)
+			Registrable(id),
+			_available(true)
 		{}
-	}
-}
+}	}

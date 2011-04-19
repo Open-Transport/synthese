@@ -31,10 +31,17 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "VehicleUpdateAction.hpp"
 #include "VehicleTableSync.hpp"
+#include "SearchFormHTMLTable.h"
+#include "AdminFunctionRequest.hpp"
+#include "VehiclePositionTableSync.hpp"
+#include "ActionResultHTMLTable.h"
+#include "VehiclePositionUpdateAction.hpp"
+#include "StopPoint.hpp"
+#include "StopArea.hpp"
 
 using namespace std;
 using namespace boost;
-
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -44,7 +51,6 @@ namespace synthese
 	using namespace security;
 	using namespace pt_operation;
 	using namespace html;
-	
 
 	namespace util
 	{
@@ -59,6 +65,12 @@ namespace synthese
 
 	namespace pt_operation
 	{
+		const string VehicleAdmin::TAB_LOG("lg");
+		const string VehicleAdmin::TAB_PROPERTIES("pr");
+
+		const string VehicleAdmin::PARAMETER_SEARCH_START_DATE("sd");
+		const string VehicleAdmin::PARAMETER_SEARCH_END_DATE("ed");
+
 		VehicleAdmin::VehicleAdmin()
 			: AdminInterfaceElementTemplate<VehicleAdmin>()
 		{ }
@@ -76,13 +88,30 @@ namespace synthese
 			{
 				throw AdminParametersException("No such vehicle");
 			}
+
+			// Start date
+			string searchStartDateStr(map.getDefault<string>(PARAMETER_SEARCH_START_DATE));
+			if(!searchStartDateStr.empty())
+			{
+				_searchStartDate = time_from_string(searchStartDateStr);
+			}
+
+			// End date
+			string searchEndDateStr(map.getDefault<string>(PARAMETER_SEARCH_END_DATE));
+			if(!searchEndDateStr.empty())
+			{
+				_searchEndDate = time_from_string(searchEndDateStr);
+			}
+
+			// Parameters
+			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_START_DATE, 100, false);
 		}
 
 
 
 		ParametersMap VehicleAdmin::getParametersMap() const
 		{
-			ParametersMap m;
+			ParametersMap m(_requestParameters.getParametersMap());
 
 			if(_vehicle.get())
 			{
@@ -107,19 +136,105 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 
-			stream << "<h1>Propriétés</h1>";
+			////////////////////////////////////////////////////////////////////
+			// PROPERTIES TAB
+			if (openTabContent(stream, TAB_PROPERTIES))
+			{
+				stream << "<h1>Propriétés</h1>";
 
-			AdminActionFunctionRequest<VehicleUpdateAction, VehicleAdmin> updateRequest(request);
-			updateRequest.getAction()->setVehicle(const_pointer_cast<Vehicle>(_vehicle));
+				AdminActionFunctionRequest<VehicleUpdateAction, VehicleAdmin> updateRequest(request);
+				updateRequest.getAction()->setVehicle(const_pointer_cast<Vehicle>(_vehicle));
 
-			PropertiesHTMLTable t(updateRequest.getHTMLForm("update_form"));
-			stream << t.open();
-			stream << t.cell("Nom", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_NAME, _vehicle->getName()));
-			stream << t.cell("Numéro", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_NUMBER, _vehicle->getNumber()));
-			stream << t.cell("Image", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_PICTURE, _vehicle->getPicture()));
-			stream << t.cell("Places", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_SEATS, VehicleTableSync::SerializeSeats(_vehicle->getSeats())));
-			stream << t.cell("Lignes autorisées", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_ALLOWED_LINES, VehicleTableSync::SerializeAllowedLines(_vehicle->getAllowedLines())));
-			stream << t.close();
+				PropertiesHTMLTable t(updateRequest.getHTMLForm("update_form"));
+				stream << t.open();
+				stream << t.cell("Nom", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_NAME, _vehicle->getName()));
+				stream << t.cell("Numéro", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_NUMBER, _vehicle->getNumber()));
+				stream << t.cell("Image", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_PICTURE, _vehicle->getPicture()));
+				stream << t.cell("Places", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_SEATS, VehicleTableSync::SerializeSeats(_vehicle->getSeats())));
+				stream << t.cell("Lignes autorisées", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_ALLOWED_LINES, VehicleTableSync::SerializeAllowedLines(_vehicle->getAllowedLines())));
+				stream << t.cell("En service", t.getForm().getOuiNonRadioInput(VehicleUpdateAction::PARAMETER_AVAILABLE, _vehicle->getAvailable()));
+				stream << t.cell("URL", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_URL, _vehicle->getURL()));
+				stream << t.cell("Immatriculation", t.getForm().getTextInput(VehicleUpdateAction::PARAMETER_REGISTRATION_NUMBERS, _vehicle->getRegistrationNumbers()));
+				if(!_vehicle->getURL().empty())
+				{
+					stream << t.cell("Lien", HTMLModule::getHTMLLink(_vehicle->getURL(), _vehicle->getURL(), string(), false, string(), string(), "target=\"_new\""));
+				}
+				stream << t.close();
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// LOG TAB
+			if (openTabContent(stream, TAB_LOG))
+			{
+				stream << "<h1>Recherche</h1>";
+
+				ptime now(second_clock::local_time());
+				AdminFunctionRequest<VehicleAdmin> searchRequest(request);
+				SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
+				stream << s.open();
+				stream << s.cell("Date début", s.getForm().getCalendarInput(PARAMETER_SEARCH_START_DATE, _searchStartDate ? *_searchStartDate : now));
+				stream << s.cell("Date fin", s.getForm().getCalendarInput(PARAMETER_SEARCH_END_DATE, _searchEndDate ? *_searchEndDate : now));
+				stream << s.close();
+				
+				stream << "<h1>Résultats</h1>";
+
+				AdminActionFunctionRequest<VehiclePositionUpdateAction,VehicleAdmin> addRequest(request);
+				addRequest.getAction()->setVehicle(const_pointer_cast<Vehicle>(_vehicle));
+
+				// Search
+				VehiclePositionTableSync::SearchResult positions(
+					VehiclePositionTableSync::Search(
+					_getEnv(),
+					_searchStartDate,
+					_searchEndDate,
+					_requestParameters.first,
+					_requestParameters.maxSize,
+					_requestParameters.orderField == PARAMETER_SEARCH_START_DATE,
+					_requestParameters.raisingOrder
+				)	);
+
+				ActionResultHTMLTable::HeaderVector v;
+				v.push_back(make_pair(string(), string("#")));
+				v.push_back(make_pair(PARAMETER_SEARCH_START_DATE, string("Heure")));
+				v.push_back(make_pair(string(), string("Statut")));
+				v.push_back(make_pair(string(), string("Lieu")));
+				v.push_back(make_pair(string(), string("Actions")));
+				ActionResultHTMLTable t(
+					v,
+					searchRequest.getHTMLForm(),
+					_requestParameters,
+					positions,
+					addRequest.getHTMLForm("add"),
+					VehiclePositionUpdateAction::PARAMETER_BEFORE_ID
+				);
+
+				stream << t.open();
+				size_t rank(0);
+				BOOST_FOREACH(shared_ptr<VehiclePosition> position, positions)
+				{
+					stream << t.row(lexical_cast<string>(position->getKey()));
+					stream << t.col() << rank++;
+					stream << t.col() << position->getTime();
+					stream << t.col();
+					if(position->getStopPoint() && position->getStopPoint()->getConnectionPlace())
+					{
+						stream << position->getStopPoint()->getConnectionPlace()->getFullName();
+					}
+				}
+
+				stream << t.row(string());
+				stream << t.col() << rank;
+				stream << t.col() << t.getActionForm().getCalendarInput(VehiclePositionUpdateAction::PARAMETER_TIME, now);
+				stream << t.col();
+				stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
+				stream << t.close();
+
+
+			}
+
+			////////////////////////////////////////////////////////////////////
+			/// END TABS
+			closeTabContent(stream);
 		}
 
 
@@ -134,6 +249,19 @@ namespace synthese
 		bool VehicleAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _vehicle->getKey()  == static_cast<const VehicleAdmin&>(other)._vehicle->getKey();
+		}
+
+
+
+		void VehicleAdmin::_buildTabs( const security::Profile& profile ) const
+		{
+			_tabs.clear();
+//			bool writeRight(profile.isAuthorized<ResaRight>(WRITE, UNKNOWN_RIGHT_LEVEL));
+
+			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true, "car.png"));
+			_tabs.push_back(Tab("Journal", TAB_LOG, true, "book.png"));
+
+			_tabBuilded = true;
 		}
 	}
 }

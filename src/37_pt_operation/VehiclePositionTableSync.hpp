@@ -53,7 +53,6 @@ namespace synthese
 				static const std::string COL_SERVICE_ID;
 				static const std::string COL_RANK_IN_PATH;
 				static const std::string COL_PASSENGERS;
-				static const std::string COL_GEOMETRY;
 			//@}
 			
 
@@ -74,10 +73,11 @@ namespace synthese
 				/// @since 3.2.1
 				static SearchResult Search(
 					util::Env& env,
-					// boost::optional<util::RegistryKeyType> parameterId = boost::optional<util::RegistryKeyType>(),
+					boost::optional<boost::posix_time::ptime> startDate = boost::optional<boost::posix_time::ptime>(),
+					boost::optional<boost::posix_time::ptime> endDate = boost::optional<boost::posix_time::ptime>(),
 					std::size_t first = 0,
 					boost::optional<std::size_t> number = boost::optional<std::size_t>(),
-					bool orderByName = true,
+					bool orderByDate = true,
 					bool raisingOrder = true,
 					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 				);

@@ -74,6 +74,8 @@ namespace synthese
 			static const std::string DATA_RANK;
 			static const std::string DATA_TRANSACTION_ID;
 			static const std::string DATA_SEATS_NUMBER;
+			static const std::string DATA_VEHICLE_ID;
+			static const std::string DATA_SEAT;
 			
 		protected:
 			//! \name Page parameters

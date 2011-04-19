@@ -1,8 +1,8 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// VehicleUpdateAction class header.
-///	@file VehicleUpdateAction.hpp
-///	@author RCSobility
+/// VehiclePositionUpdateAction class header.
+///	@file VehiclePositionUpdateAction.hpp
+///	@author Hugues Romain
 ///	@date 2011
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -22,54 +22,63 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_VehicleUpdateAction_H__
-#define SYNTHESE_VehicleUpdateAction_H__
+#ifndef SYNTHESE_VehiclePositionUpdateAction_H__
+#define SYNTHESE_VehiclePositionUpdateAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "Vehicle.hpp"
+#include "VehiclePosition.hpp"
 
 namespace synthese
 {
+	namespace pt
+	{
+		class StopPoint;
+		class ScheduledService;
+	}
+
 	namespace pt_operation
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 37.15 Action : VehicleUpdateAction.
+		/// 37.15 Action : VehiclePositionUpdateAction.
 		/// @ingroup m37Actions refActions
 		///	@author RCSobility
 		///	@date 2011
-		/// @since 3.2.1
+		/// @since 3.3.0
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : VehicleUpdateAction
+		/// Key : VehiclePositionUpdateAction
 		///
 		/// Parameters :
 		///	<dl>
 		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
 		///	</dl>
-		class VehicleUpdateAction:
-			public util::FactorableTemplate<server::Action, VehicleUpdateAction>
+		class VehiclePositionUpdateAction:
+			public util::FactorableTemplate<server::Action, VehiclePositionUpdateAction>
 		{
 		public:
 			static const std::string PARAMETER_VEHICLE_ID;
-			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_ALLOWED_LINES;
-			static const std::string PARAMETER_NUMBER;
-			static const std::string PARAMETER_SEATS;
-			static const std::string PARAMETER_PICTURE;
-			static const std::string PARAMETER_AVAILABLE;
-			static const std::string PARAMETER_URL;
-			static const std::string PARAMETER_REGISTRATION_NUMBERS;
+			static const std::string PARAMETER_BEFORE_ID;
+			static const std::string PARAMETER_VEHICLE_POSITION_ID;
+			static const std::string PARAMETER_STATUS;
+			static const std::string PARAMETER_TIME;
+			static const std::string PARAMETER_METER_OFFSET;
+			static const std::string PARAMETER_STOP_POINT_ID;
+			static const std::string PARAMETER_COMMENT;
+			static const std::string PARAMETER_SERVICE_ID;
+			static const std::string PARAMETER_RANK_IN_PATH;
+			static const std::string PARAMETER_PASSENGERS;
 
 		private:
-			boost::shared_ptr<Vehicle> _vehicle;
-			boost::optional<std::string> _name;
-			boost::optional<Vehicle::AllowedLines> _allowedLines;
-			boost::optional<std::string> _number;
-			boost::optional<Vehicle::Seats> _seats;
-			boost::optional<std::string> _picture;
-			boost::optional<bool> _available;
-			boost::optional<std::string> _url;
-			boost::optional<std::string> _registrationNumbers;
+			boost::shared_ptr<VehiclePosition> _vehiclePosition;
+			boost::optional<boost::shared_ptr<Vehicle> > _vehicle;
+			boost::optional<VehiclePosition::Status> _status;
+			boost::optional<boost::posix_time::ptime> _time;
+			boost::optional<VehiclePosition::Meters> _meterOffset;
+			boost::optional<boost::shared_ptr<pt::StopPoint> > _stopPoint;
+			boost::optional<std::string> _comment;
+			boost::optional<boost::shared_ptr<pt::ScheduledService> > _service;
+			boost::optional<boost::optional<std::size_t> > _rankInPath;
+			boost::optional<boost::optional<std::size_t> > _passengers;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -103,10 +112,11 @@ namespace synthese
 
 			//! @name Setters
 			//@{
+				void setVehiclePosition(boost::shared_ptr<VehiclePosition> value) { _vehiclePosition = value; }
 				void setVehicle(boost::shared_ptr<Vehicle> value) { _vehicle = value; }
 			//@}
 		};
 	}
 }
 
-#endif // SYNTHESE_VehicleUpdateAction_H__
+#endif // SYNTHESE_VehiclePositionUpdateAction_H__

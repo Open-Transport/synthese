@@ -56,6 +56,9 @@ namespace synthese
 			std::string _number;
 			Seats _seats;
 			std::string _picture;
+			bool _available;
+			std::string _url;
+			std::string _registrationNumbers;
 
 		public:
 			Vehicle(util::RegistryKeyType id=0);
@@ -66,6 +69,9 @@ namespace synthese
 				void setNumber(const std::string& value){ _number = value; }
 				void setSeats(const Seats& value){ _seats = value; }
 				void setPicture(const std::string& value){ _picture = value; }
+				void setAvailable(bool value){ _available = value; }
+				void setURL(const std::string& value){ _url = value; }
+				void setRegistrationNumbers(const std::string& value){ _registrationNumbers = value; }
 			//@}
 
 			//! @name Getters
@@ -74,6 +80,9 @@ namespace synthese
 				const std::string& getNumber() const { return _number; }
 				const Seats& getSeats() const { return _seats; }
 				const std::string& getPicture() const { return _picture; }
+				bool getAvailable() const { return _available; }
+				const std::string& getURL() const { return _url; }
+				const std::string& getRegistrationNumbers() const { return _registrationNumbers; }
 			//@}
 
 			//! @name Updaters
@@ -83,9 +92,7 @@ namespace synthese
 			//! @name Services
 			//@{
 			//@}
-
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_pt_operations_Vehicle_hpp__
