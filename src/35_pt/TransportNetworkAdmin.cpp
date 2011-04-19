@@ -176,6 +176,7 @@ namespace synthese
 			updateRequest.getAction()->setNetwork(const_pointer_cast<TransportNetwork>(_network));
 			PropertiesHTMLTable p(updateRequest.getHTMLForm("update"));
 			stream << p.open();
+			stream << p.cell("ID", lexical_cast<string>(_network->getKey()));
 			stream << p.cell("Nom", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_NAME, _network->getName()));
 			stream << p.close();
 
