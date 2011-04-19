@@ -36,17 +36,11 @@ namespace synthese
 	{
 		class ScheduledService;
 
-		/** Action class : real time update of service schedules.
-			@ingroup m35Actions refActions
-
-			Parameters :
-				- se : service ID
-				- ls : line stop ID
-				- la : late duration (minutes)
-				- aa : the late concerns the arrival time at the edge (default=true)
-				- ad : the late concerns the departure time from the edge (default=true)
-				- pc : the late must be propagated into the following edges with the same value (default=true)
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		///	Action class : real time update of service schedules.
+		///	See https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_scheduled_service
+		//////////////////////////////////////////////////////////////////////////
+		///	@ingroup m35Actions refActions
 		class ScheduleRealTimeUpdateAction:
 			public util::FactorableTemplate<server::Action, ScheduleRealTimeUpdateAction>
 		{
@@ -67,16 +61,21 @@ namespace synthese
 			bool _propagateConstantly;
 
 		protected:
-			/** Conversion from attributes to generic parameter maps.
-				@return Generated parameters map
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from attributes to generic parameter maps.
+			///	See https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_scheduled_service#Request
+			//////////////////////////////////////////////////////////////////////////
+			/// @return Generated parameters map
 			server::ParametersMap getParametersMap() const;
 
-			/** Conversion from generic parameters map to attributes.
-				Removes the used parameters from the map.
-				@param map Parameters map to interpret
-				@exception ActionException Occurs when some parameters are missing or incorrect.
-			*/
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from generic parameters map to attributes.
+			///	See https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_scheduled_service#Request
+			//////////////////////////////////////////////////////////////////////////
+			/// @param map Parameters map to interpret
+			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
