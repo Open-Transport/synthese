@@ -24,6 +24,7 @@
 
 #include "102_mysql/MySQLDBModifiedAction.hpp"
 #include "102_mysql/MySQLDB.hpp"
+#include "102_mysql/MySQLException.hpp"
 #include "DBModule.h"
 #include "ActionException.h"
 #include "ParametersMap.h"
@@ -80,7 +81,14 @@ namespace synthese
 				throw ActionException("No MySQL database loaded");
 			}
 
-			db->addDBModifEvent(_table, _type, _id);
+			try
+			{
+				db->addDBModifEvent(_table, _type, _id);
+			}
+			catch(MySQLException& e)
+			{
+				throw ActionException(e.getMessage());
+			}
 		}
 
 
