@@ -25,6 +25,7 @@
 
 #include "Registrable.h"
 #include "Registry.h"
+#include "WithGeometry.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/optional.hpp>
@@ -53,7 +54,8 @@ namespace synthese
 			@ingroup m37
 		*/
 		class VehiclePosition:
-			public util::Registrable
+			public util::Registrable,
+			public WithGeometry<geos::geom::Point>
 		{
 		public:
 			typedef util::Registry<Vehicle> Registry;
@@ -61,18 +63,17 @@ namespace synthese
 
 			typedef enum
 			{
-				TRAINING,
-				DEAD_RUN_DEPOT,
-				DEAD_RUN_TRANSFER,
-				SERVICE,
-				COMMERCIAL,
-				NOT_IN_SERVICE
+				TRAINING = 0,
+				DEAD_RUN_DEPOT = 1,
+				DEAD_RUN_TRANSFER = 2,
+				SERVICE = 3,
+				COMMERCIAL = 4,
+				NOT_IN_SERVICE = 5
 			} Status;
 
 		private:
 			Status _status;
 			Vehicle* _vehicle;
-			boost::shared_ptr<geos::geom::Point> _point;
 			boost::posix_time::ptime _time;
 			Meters _meterOffset;
 			pt::StopPoint* _stopPoint;
@@ -88,7 +89,6 @@ namespace synthese
 
 			void setStatus(Status value){ _status = value; }
 			void setVehicle(Vehicle* value){ _vehicle = value; }
-			void setPoint(boost::shared_ptr<geos::geom::Point> value){ _point = value; }
 			void setTime(const boost::posix_time::ptime& value){ _time = value; }
 			void setMeterOffset(const Meters& value){ _meterOffset = value; }
 			void setStopPoint(pt::StopPoint* value){ _stopPoint = value; }
@@ -101,7 +101,6 @@ namespace synthese
 			Vehicle* getVehicle() const { return _vehicle; }
 			const boost::posix_time::ptime& getTime() const { return _time; }
 			const Meters& getMeterOffset() const { return _meterOffset; }
-			boost::shared_ptr<geos::geom::Point> getPoint() const { return _point; }
 			pt::StopPoint* getStopPoint() const { return _stopPoint; }
 			const std::string& getComment() const { return _comment; }
 			pt::ScheduledService* getService() const { return _service; }

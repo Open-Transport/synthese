@@ -59,6 +59,9 @@ namespace synthese
 		const string VehicleTableSync::COL_ALLOWED_LINES("allowed_lines");
 		const string VehicleTableSync::COL_SEATS("seats");
 		const string VehicleTableSync::COL_PICTURE("picture");
+		const string VehicleTableSync::COL_AVAILABLE("available");
+		const string VehicleTableSync::COL_URL("url");
+		const string VehicleTableSync::COL_REGISTRATION_NUMBERS("registration_numbers");
 	}
 	
 	namespace db
@@ -77,6 +80,9 @@ namespace synthese
 			DBTableSync::Field(VehicleTableSync::COL_ALLOWED_LINES, SQL_TEXT),
 			DBTableSync::Field(VehicleTableSync::COL_SEATS, SQL_TEXT),
 			DBTableSync::Field(VehicleTableSync::COL_PICTURE, SQL_TEXT),
+			DBTableSync::Field(VehicleTableSync::COL_AVAILABLE, SQL_BOOLEAN),
+			DBTableSync::Field(VehicleTableSync::COL_URL, SQL_TEXT),
+			DBTableSync::Field(VehicleTableSync::COL_REGISTRATION_NUMBERS, SQL_TEXT),
 			DBTableSync::Field()
 		};
 
@@ -101,6 +107,9 @@ namespace synthese
 			object->setName(rows->getText(VehicleTableSync::COL_NAME));
 			object->setNumber(rows->getText(VehicleTableSync::COL_NUMBER));
 			object->setPicture(rows->getText(VehicleTableSync::COL_PICTURE));
+			object->setAvailable(rows->getBool(VehicleTableSync::COL_AVAILABLE));
+			object->setURL(rows->getText(VehicleTableSync::COL_URL));
+			object->setRegistrationNumbers(rows->getText(VehicleTableSync::COL_REGISTRATION_NUMBERS));
 			
 			// Seats
 			object->setSeats(VehicleTableSync::UnserializeSeats(rows->getText(VehicleTableSync::COL_SEATS)));
@@ -124,6 +133,9 @@ namespace synthese
 			query.addField(VehicleTableSync::SerializeAllowedLines(object->getAllowedLines()));
 			query.addField(VehicleTableSync::SerializeSeats(object->getSeats()));
 			query.addField(object->getPicture());
+			query.addField(object->getAvailable());
+			query.addField(object->getURL());
+			query.addField(object->getRegistrationNumbers());
 			query.execute(transaction);
 		}
 

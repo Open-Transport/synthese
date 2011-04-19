@@ -49,6 +49,9 @@ namespace synthese
 				static const std::string COL_ALLOWED_LINES;
 				static const std::string COL_SEATS;
 				static const std::string COL_PICTURE;
+				static const std::string COL_AVAILABLE;
+				static const std::string COL_URL;
+				static const std::string COL_REGISTRATION_NUMBERS;
 			//@}
 			
 
