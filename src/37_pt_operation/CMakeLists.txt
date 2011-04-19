@@ -22,6 +22,8 @@ VehicleAdmin.cpp
 VehicleAdmin.hpp
 VehiclePosition.cpp
 VehiclePosition.hpp
+VehiclePositionUpdateAction.cpp
+VehiclePositionUpdateAction.hpp
 VehiclePositionTableSync.cpp
 VehiclePositionTableSync.hpp
 VehiclesAdmin.cpp

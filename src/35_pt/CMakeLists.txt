@@ -56,6 +56,8 @@ GTFSFileFormat.cpp
 GTFSFileFormat.hpp
 HeuresFileFormat.cpp
 HeuresFileFormat.hpp
+IneoFileFormat.cpp
+IneoFileFormat.hpp
 JourneyPattern.cpp
 JourneyPattern.hpp
 JourneyPatternAddAction.cpp
