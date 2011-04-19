@@ -49,9 +49,12 @@ namespace synthese
 		const string VehicleUpdateAction::PARAMETER_NUMBER = Action_PARAMETER_PREFIX + "nu";
 		const string VehicleUpdateAction::PARAMETER_PICTURE = Action_PARAMETER_PREFIX + "pi";
 		const string VehicleUpdateAction::PARAMETER_SEATS = Action_PARAMETER_PREFIX + "se";
+		const string VehicleUpdateAction::PARAMETER_AVAILABLE = Action_PARAMETER_PREFIX + "av";
+		const string VehicleUpdateAction::PARAMETER_URL = Action_PARAMETER_PREFIX + "ur";
+		const string VehicleUpdateAction::PARAMETER_REGISTRATION_NUMBERS = Action_PARAMETER_PREFIX + "rn";
 
-		
-		
+
+
 		ParametersMap VehicleUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -78,6 +81,18 @@ namespace synthese
 			if(_picture)
 			{
 				map.insert(PARAMETER_PICTURE, *_picture);
+			}
+			if(_available)
+			{
+				map.insert(PARAMETER_AVAILABLE, *_available);
+			}
+			if(_url)
+			{
+				map.insert(PARAMETER_URL, *_url);
+			}
+			if(_registrationNumbers)
+			{
+				map.insert(PARAMETER_REGISTRATION_NUMBERS, *_registrationNumbers);
 			}
 			return map;
 		}
@@ -123,6 +138,20 @@ namespace synthese
 			{
 				_seats = VehicleTableSync::UnserializeSeats(map.get<string>(PARAMETER_SEATS));
 			}
+
+			if(map.isDefined(PARAMETER_AVAILABLE))
+			{
+				_available = map.get<bool>(PARAMETER_AVAILABLE);
+			}
+
+			if(map.isDefined(PARAMETER_URL))
+			{
+				_url = map.get<string>(PARAMETER_URL);
+			}
+			if(map.isDefined(PARAMETER_REGISTRATION_NUMBERS))
+			{
+				_registrationNumbers = map.get<string>(PARAMETER_REGISTRATION_NUMBERS);
+			}
 		}
 		
 		
@@ -156,6 +185,20 @@ namespace synthese
 			if(_allowedLines)
 			{
 				_vehicle->setAllowedLines(*_allowedLines);
+			}
+
+			if(_available)
+			{
+				_vehicle->setAvailable(*_available);
+			}
+
+			if(_url)
+			{
+				_vehicle->setURL(*_url);
+			}
+			if(_registrationNumbers)
+			{
+				_vehicle->setRegistrationNumbers(*_registrationNumbers);
 			}
 			
 			VehicleTableSync::Save(_vehicle.get());

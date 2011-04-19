@@ -59,6 +59,7 @@
 #include "UserTableSync.h"
 #include "Webpage.h"
 #include "Language.hpp"
+#include "Vehicle.hpp"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -97,6 +98,8 @@ namespace synthese
 		const string ReservationsListService::DATA_RANK("rank");
 		const string ReservationsListService::DATA_TRANSACTION_ID("transaction_id");
 		const string ReservationsListService::DATA_SEATS_NUMBER("seats_number");
+		const string ReservationsListService::DATA_VEHICLE_ID("vehicle_id");
+		const string ReservationsListService::DATA_SEAT("seat");
 
 		ParametersMap ReservationsListService::_getParametersMap() const
 		{
@@ -357,6 +360,13 @@ namespace synthese
 			pm.insert(Request::PARAMETER_OBJECT_ID, reservation.getKey());
 			pm.insert(DATA_TRANSACTION_ID, reservation.getTransaction()->getKey());
 			pm.insert(DATA_SEATS_NUMBER, reservation.getTransaction()->getSeats());
+
+			// Vehicle
+			if(reservation.getVehicle())
+			{
+				pm.insert(DATA_VEHICLE_ID, reservation.getVehicle()->getKey());
+			}
+			pm.insert(DATA_SEAT, reservation.getSeatNumber());
 			
 			// Language
 			shared_ptr<const User> user(UserTableSync::Get(reservation.getTransaction()->getCustomerUserId(), *_env));

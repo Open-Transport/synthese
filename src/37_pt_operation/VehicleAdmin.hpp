@@ -1,5 +1,3 @@
-
-
 //////////////////////////////////////////////////////////////////////////
 /// VehicleAdmin class header.
 ///	@file VehicleAdmin.hpp
@@ -46,12 +44,21 @@ namespace synthese
 		public:
 			/// @name Parameter identifiers
 			//@{
+				static const std::string TAB_PROPERTIES;
+				static const std::string TAB_LOG;
+				
+				static const std::string PARAMETER_SEARCH_START_DATE;
+				static const std::string PARAMETER_SEARCH_END_DATE;
 			//@}
 
 		private:
 			/// @name Search parameters
 			//@{
 				boost::shared_ptr<const Vehicle> _vehicle;
+				boost::optional<boost::posix_time::ptime> _searchStartDate;
+				boost::optional<boost::posix_time::ptime> _searchEndDate;
+
+				html::ResultHTMLTable::RequestParameters	_requestParameters;
 			//@}
 
 		protected:
@@ -124,7 +131,13 @@ namespace synthese
 			) const;
 
 
-			
+
+			virtual void _buildTabs(
+				const security::Profile& profile
+			) const;
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Title getter.
 			///	@return The title of the page

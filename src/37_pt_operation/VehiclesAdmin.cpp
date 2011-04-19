@@ -131,6 +131,7 @@ namespace synthese
 			ActionResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(string(), "Numéro"));
+			h.push_back(make_pair(string(), "Lien"));
 			h.push_back(make_pair(string(), "Actions"));
 			h.push_back(make_pair(string(), "Actions"));
 			
@@ -149,6 +150,14 @@ namespace synthese
 				stream << t.row(lexical_cast<string>(vehicle->getKey()));
 				stream << t.col() << vehicle->getName();
 				stream << t.col() << vehicle->getNumber();
+
+				// Link
+				stream << t.col();
+				if(!vehicle->getURL().empty())
+				{
+					stream << HTMLModule::getLinkButton(vehicle->getURL(), "Lien");
+				}
+
 				stream << t.col();
 
 				openRequest.getPage()->setVehicle(const_pointer_cast<const Vehicle>(vehicle));
@@ -162,7 +171,9 @@ namespace synthese
 			stream << t.row(string());
 			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_NAME, "", "Entrez le nom du véhicule ici");
 			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_NUMBER, "", "Entrez le numéro du véhicule ici");
+			stream << t.col();
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
+			stream << t.col();
 			stream << t.close();
 		}
 
