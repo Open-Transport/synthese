@@ -35,6 +35,7 @@ synthese::pt::CarPostalFileFormat::integrate();
 synthese::pt::PladisStopsFileFormat::integrate();
 synthese::pt::HeuresFileFormat::integrate();
 synthese::pt::GTFSFileFormat::integrate();
+synthese::pt::IneoFileFormat::integrate();
 
 synthese::pt::PTQualityControlAdmin::integrate();
 synthese::pt::ServiceAdmin::integrate();
