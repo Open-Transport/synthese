@@ -145,7 +145,6 @@ namespace synthese
 				std::ostream& os,
 				boost::optional<const admin::AdminRequest&> request
 			) const {
-				bool result(true);
 				BOOST_FOREACH(const std::string& key, FILES.getFiles())
 				{
 					FilePathsMap::const_iterator it(_pathsMap.find(key));
@@ -155,9 +154,12 @@ namespace synthese
 					}
 					const FilePathsMap::mapped_type& path(it->second);
 
-					result &= _parse(path, os, key, request);
+					if(!_parse(path, os, key, request))
+					{
+						return false;
+					}
 				}
-				return result;
+				return true;
 			}
 		};
 
