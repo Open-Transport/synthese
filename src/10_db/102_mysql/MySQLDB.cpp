@@ -279,14 +279,18 @@ namespace synthese
 				"DROP PROCEDURE IF EXISTS notify_synthese;" <<
 
 				"CREATE PROCEDURE notify_synthese(IN tablename VARCHAR(50), IN type VARCHAR(10), IN id BIGINT)" <<
-				"BEGIN" <<
+				"proc: BEGIN" <<
 				"  DECLARE _url, _secret_token VARCHAR(100);" <<
+				"  DECLARE _post_data VARCHAR(512);" <<
 				"  DECLARE _synthese_conn_id, _dummy INTEGER;" <<
 				"  SELECT url, secret_token, synthese_conn_id FROM trigger_metadata INTO " <<
 				"    _url, _secret_token, _synthese_conn_id;" <<
-				"  IF NOT ISNULL(_url) AND CONNECTION_ID() != _synthese_conn_id THEN" <<
-				"    SELECT notify_synthese_http(_url, _secret_token, tablename, type, id) INTO _dummy;" <<
+				"  IF ISNULL(_url) OR CONNECTION_ID() = _synthese_conn_id THEN" <<
+				"    LEAVE proc;" <<
 				"  END IF;" <<
+				"  SELECT CONCAT('nr=1&a=MySQLDBModifiedAction&actionParamst=', _secret_token, '&actionParamtb=', " <<
+				"    tablename, '&actionParamty=', type, '&actionParamid=', id) INTO _post_data;" <<
+				"  SELECT notify_synthese_http(_url, _post_data) INTO _dummy;" <<
 				"END;";
 			execUpdate(sql.str());
 		}
