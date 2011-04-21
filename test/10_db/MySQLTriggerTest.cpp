@@ -123,7 +123,13 @@ BOOST_AUTO_TEST_CASE(MySQLTrigger)
 	BOOST_CHECK_EQUAL(objFromReg->getShortName(), obj.getShortName());
 
 	string sql("UPDATE t020_test SET name='new name' WHERE name='sample name';");
-	BOOST_REQUIRE(!mysql_query(connection, sql.c_str()));
+	
+	int res = mysql_query(connection, sql.c_str());
+	if (res)
+	{
+		cout << "mysql_query error: " << mysql_error(connection) << endl;
+	}
+	BOOST_REQUIRE(!res);
 
 	cout << "Waiting for trigger callback" << endl;
 	util::Thread::Sleep(400);
