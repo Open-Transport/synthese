@@ -27,6 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "VehiclePosition.hpp"
 
 namespace synthese
 {
@@ -59,11 +60,21 @@ namespace synthese
 			static const std::string PARAMETER_RESERVATION_ID;
 			static const std::string PARAMETER_VEHICLE_ID;
 			static const std::string PARAMETER_SEAT_NUMBER;
+			static const std::string PARAMETER_CANCELLED_BY_OPERATOR;
+			static const std::string PARAMETER_REAL_DEPARTURE_TIME;
+			static const std::string PARAMETER_REAL_ARRIVAL_TIME;
+			static const std::string PARAMETER_DEPARTURE_METER_OFFSET;
+			static const std::string PARAMETER_ARRIVAL_METER_OFFSET;
 
 		private:
 			boost::shared_ptr<Reservation> _reservation;
 			boost::optional<boost::shared_ptr<const pt_operation::Vehicle> > _vehicle;
 			boost::optional<std::string> _seatNumber;
+			boost::optional<boost::posix_time::ptime> _realDepartureTime;
+			boost::optional<boost::posix_time::ptime> _realArrivalTime;
+			boost::optional<bool> _cancelledByOperator;
+			boost::optional<pt_operation::VehiclePosition::Meters> _departureMeterOffset;
+			boost::optional<pt_operation::VehiclePosition::Meters> _arrivalMeterOffset;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -97,7 +108,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				// void setObject(boost::shared_ptr<Object> value) { _object = value; }
+				void setReservation(boost::shared_ptr<Reservation> value) { _reservation = value; }
 			//@}
 		};
 	}

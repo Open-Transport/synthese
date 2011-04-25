@@ -49,6 +49,7 @@ namespace synthese
 	namespace pt_operation
 	{
 		class Vehicle;
+		class Depot;
 
 		/** VehiclePosition class.
 			@ingroup m37
@@ -68,8 +69,15 @@ namespace synthese
 				DEAD_RUN_TRANSFER = 2,
 				SERVICE = 3,
 				COMMERCIAL = 4,
-				NOT_IN_SERVICE = 5
+				NOT_IN_SERVICE = 5,
+				OUT_OF_SERVICE = 6,
+				UNKNOWN_STATUS = 7,
+				REFUELING = 8
 			} Status;
+
+			static std::string GetStatusName(Status value);
+			static std::vector<std::pair<boost::optional<Status>, std::string> > GetStatusList();
+
 
 		private:
 			Status _status;
@@ -77,10 +85,11 @@ namespace synthese
 			boost::posix_time::ptime _time;
 			Meters _meterOffset;
 			pt::StopPoint* _stopPoint;
+			Depot* _depot;
 			std::string _comment;
 			pt::ScheduledService* _service;
 			boost::optional<std::size_t> _rankInPath;
-			boost::optional<std::size_t> _passengers;
+			std::size_t _passengers;
 
 		public:
 			VehiclePosition(
@@ -95,7 +104,8 @@ namespace synthese
 			void setComment(const std::string& value){ _comment = value; }
 			void setService(pt::ScheduledService* value){ _service = value; }
 			void setRankInPath(boost::optional<std::size_t> value){ _rankInPath = value; }
-			void setPassangers(boost::optional<std::size_t> value){ _passengers = value; }
+			void setPassangers(std::size_t value){ _passengers = value; }
+			void setDepot(Depot* value){ _depot = value; }
 
 			const Status& getStatus() const { return _status; }
 			Vehicle* getVehicle() const { return _vehicle; }
@@ -105,7 +115,8 @@ namespace synthese
 			const std::string& getComment() const { return _comment; }
 			pt::ScheduledService* getService() const { return _service; }
 			boost::optional<std::size_t> getRankInPath() const { return _rankInPath; }
-			boost::optional<std::size_t> getPassengers() const { return _passengers; }
+			std::size_t getPassengers() const { return _passengers; }
+			Depot* getDepot() const { return _depot; }
 		};
 }	}
 

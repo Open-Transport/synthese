@@ -149,7 +149,7 @@ namespace synthese
 				bool						_allPhysicalStopsDisplayed;
 				ForbiddenPlacesList			_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
 				LineFilter					_forbiddenLines;
-				DeparturesTableDirection	_direction;
+					DeparturesTableDirection	_direction;
 				EndFilter					_originsOnly;
 				int							_maxDelay;			//!< Max time length for the table
 				int							_clearingDelay;

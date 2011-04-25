@@ -1,8 +1,8 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// VehiclePositionUpdateAction class header.
-///	@file VehiclePositionUpdateAction.hpp
-///	@author Hugues Romain
+/// DepotUpdateAction class header.
+///	@file DepotUpdateAction.hpp
+///	@author RCSobility
 ///	@date 2011
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -22,66 +22,41 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_VehiclePositionUpdateAction_H__
-#define SYNTHESE_VehiclePositionUpdateAction_H__
+#ifndef SYNTHESE_DepotUpdateAction_H__
+#define SYNTHESE_DepotUpdateAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "VehiclePosition.hpp"
 
 namespace synthese
 {
-	namespace pt
-	{
-		class StopPoint;
-		class ScheduledService;
-	}
-
 	namespace pt_operation
 	{
 		class Depot;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 37.15 Action : VehiclePositionUpdateAction.
+		/// 37.15 Action : DepotUpdateAction.
 		/// @ingroup m37Actions refActions
 		///	@author RCSobility
 		///	@date 2011
 		/// @since 3.3.0
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : VehiclePositionUpdateAction
+		/// Key : DepotUpdateAction
 		///
 		/// Parameters :
 		///	<dl>
 		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
 		///	</dl>
-		class VehiclePositionUpdateAction:
-			public util::FactorableTemplate<server::Action, VehiclePositionUpdateAction>
+		class DepotUpdateAction:
+			public util::FactorableTemplate<server::Action, DepotUpdateAction>
 		{
 		public:
-			static const std::string PARAMETER_VEHICLE_ID;
-			static const std::string PARAMETER_BEFORE_ID;
-			static const std::string PARAMETER_VEHICLE_POSITION_ID;
-			static const std::string PARAMETER_STATUS;
-			static const std::string PARAMETER_TIME;
-			static const std::string PARAMETER_METER_OFFSET;
-			static const std::string PARAMETER_STOP_POINT_ID;
-			static const std::string PARAMETER_COMMENT;
-			static const std::string PARAMETER_SERVICE_ID;
-			static const std::string PARAMETER_RANK_IN_PATH;
-			static const std::string PARAMETER_PASSENGERS;
+			static const std::string PARAMETER_DEPOT;
+			static const std::string PARAMETER_NAME;
 
 		private:
-			boost::shared_ptr<VehiclePosition> _vehiclePosition;
-			boost::optional<boost::shared_ptr<Vehicle> > _vehicle;
-			boost::optional<VehiclePosition::Status> _status;
-			boost::optional<boost::posix_time::ptime> _time;
-			boost::optional<VehiclePosition::Meters> _meterOffset;
-			boost::optional<boost::shared_ptr<pt::StopPoint> > _stopPoint;
-			boost::optional<boost::shared_ptr<pt_operation::Depot> > _depot;
-			boost::optional<std::string> _comment;
-			boost::optional<boost::shared_ptr<pt::ScheduledService> > _service;
-			boost::optional<boost::optional<std::size_t> > _rankInPath;
-			boost::optional<std::size_t> _passengers;
+			boost::shared_ptr<Depot> _depot;
+			boost::optional<std::string> _name;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -115,11 +90,10 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setVehiclePosition(boost::shared_ptr<VehiclePosition> value) { _vehiclePosition = value; }
-				void setVehicle(boost::shared_ptr<Vehicle> value) { _vehicle = value; }
+				void setDepot(boost::shared_ptr<Depot> value) { _depot = value; }
 			//@}
 		};
 	}
 }
 
-#endif // SYNTHESE_VehiclePositionUpdateAction_H__
+#endif // SYNTHESE_DepotUpdateAction_H__

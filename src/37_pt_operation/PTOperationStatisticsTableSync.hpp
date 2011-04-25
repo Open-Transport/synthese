@@ -1,6 +1,6 @@
 
-/** Resa StatisticsTableSync class header.
-	@file ResaStatisticsTableSync.h
+/** PTOperationStatisticsTableSync class header.
+	@file PTOperationStatisticsTableSync.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -20,34 +20,30 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_resa_ResaStatisticsTableSync_h__
-#define SYNTHESE_resa_ResaStatisticsTableSync_h__
+#ifndef SYNTHESE_pt_operation_PTOperationStatisticsTableSync_hpp__
+#define SYNTHESE_pt_operation_PTOperationStatisticsTableSync_hpp__
 
-#include "Registry.h"
+#include <boost/date_time/gregorian/gregorian_types.hpp>
 
 #include <map>
 #include <string>
 
-#include <boost/date_time/gregorian/gregorian_types.hpp>
-#include <boost/logic/tribool.hpp>
-#include <boost/optional.hpp>
-
 namespace synthese
 {
-	namespace resa
+	namespace pt_operation
 	{
-		/** Reservation StatisticsTableSync class.
-			@ingroup m31
+		/** PTOperationStatisticsTableSync class.
+			@ingroup m37
 		*/
-		class ResaStatisticsTableSync
+		class PTOperationStatisticsTableSync
 		{
 		public:
 			typedef std::map<
 				std::string,
 				std::map<
 					std::string,
-					std::size_t
-			>	> ResaCountSearchResult;
+					int
+			>	> CountSearchResult;
 
 			enum Step
 			{
@@ -59,27 +55,26 @@ namespace synthese
 				WEEK_STEP,
 				MONTH_STEP,
 				YEAR_STEP,
-				DEPARTURE_STOP_STEP,
-				DEPARTURE_CITY_STEP,
-				ARRIVAL_STOP_STEP,
-				ARRIVAL_CITY_STEP,
-				RESERVATION_DELAY_10_MIN_STEP,
-				RESERVATION_DELAY_30_MIN_STEP,
-				RESERVATION_DELAY_60_MIN_STEP
+				LINE_STEP
 			};
 
-			static ResaCountSearchResult CountCalls(
+			enum What
+			{
+				KM
+			};
+
+			static CountSearchResult Count(
 				boost::gregorian::date_period period,
 				Step rowStep,
 				Step colStep,
-				boost::optional<util::RegistryKeyType> lineFilter,
-				boost::logic::tribool cancelledFilter = false
+				What what
 			);
 
 			static std::string GetSQLColumn(Step step);
 			static std::string GetSQLGroupBy(Step step);
+			static std::string GetSQLWhat(What what);
 		};
 	}
 }
 
-#endif // SYNTHESE_resa_CallStatisticsTableSync_h__
+#endif // SYNTHESE_pt_operation_PTOperationStatisticsTableSync_hpp__
