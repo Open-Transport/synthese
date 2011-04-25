@@ -54,6 +54,7 @@ namespace synthese
 				static const std::string COL_REGISTRATION_NUMBERS;
 			//@}
 			
+				typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > VehiclesList;
 
 			//! @name Services
 			//@{		
@@ -73,9 +74,13 @@ namespace synthese
 				static SearchResult Search(
 					util::Env& env,
 					boost::optional<std::string> name = boost::optional<std::string>(),
+					boost::optional<std::string> vehicleNumber = boost::optional<std::string>(),
+					boost::optional<std::string> registration = boost::optional<std::string>(),
 					std::size_t first = 0,
 					boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 					bool orderByName = true,
+					bool orderByNumber = true,
+					bool orderByRegistration = true,
 					bool raisingOrder = true,
 					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 				);
@@ -103,6 +108,12 @@ namespace synthese
 
 				static Vehicle::Seats UnserializeSeats(
 					const std::string& value
+				);
+
+
+				static VehiclesList GetVehiclesList(
+					util::Env& env,
+					boost::optional<std::string> noVehicleLabel
 				);
 			//@}
 		};

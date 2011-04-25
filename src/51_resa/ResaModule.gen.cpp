@@ -42,6 +42,7 @@ synthese::resa::ResaEditLogEntryAdmin::integrate();
 synthese::resa::CallStatisticsAdmin::integrate();
 synthese::resa::ResaStatisticsAdmin::integrate();
 synthese::resa::ResaStatisticsMenuAdmin::integrate();
+synthese::resa::ReservationAdmin::integrate();
 
 
 synthese::resa::ResaDBLog::integrate();

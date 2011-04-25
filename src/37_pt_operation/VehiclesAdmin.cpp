@@ -65,6 +65,8 @@ namespace synthese
 	namespace pt_operation
 	{
 		const string VehiclesAdmin::PARAMETER_SEARCH_NAME("sn");
+		const string VehiclesAdmin::PARAMETER_SEARCH_NUMBER("su");
+		const string VehiclesAdmin::PARAMETER_SEARCH_REGISTRATION("sr");
 
 
 
@@ -78,6 +80,10 @@ namespace synthese
 			const ParametersMap& map
 		){
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
+			if(!map.getDefault<string>(PARAMETER_SEARCH_NAME).empty())
+			{
+				_searchName = map.get<string>(PARAMETER_SEARCH_NAME);
+			}
 		}
 
 
@@ -87,7 +93,9 @@ namespace synthese
 			ParametersMap m(_requestParameters.getParametersMap());
 
 			if(_searchName)
+			{
 				m.insert(PARAMETER_SEARCH_NAME, *_searchName);
+			}
 
 			return m;
 		}
@@ -121,16 +129,21 @@ namespace synthese
 			VehicleTableSync::SearchResult vehicles(
 				VehicleTableSync::Search(
 					_getEnv(),
-					_searchName
-					, _requestParameters.first
-					, _requestParameters.maxSize
-					, _requestParameters.orderField == PARAMETER_SEARCH_NAME
-					, _requestParameters.raisingOrder
+					_searchName,
+					_searchNumber,
+					_searchRegistration,
+					_requestParameters.first,
+					_requestParameters.maxSize,
+					_requestParameters.orderField == PARAMETER_SEARCH_NAME,
+					_requestParameters.orderField == PARAMETER_SEARCH_NUMBER,
+					_requestParameters.orderField == PARAMETER_SEARCH_REGISTRATION,
+					_requestParameters.raisingOrder
 			)	);
 
 			ActionResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
-			h.push_back(make_pair(string(), "Numéro"));
+			h.push_back(make_pair(PARAMETER_SEARCH_NUMBER, "Numéro"));
+			h.push_back(make_pair(PARAMETER_SEARCH_REGISTRATION, "Immatriculation"));
 			h.push_back(make_pair(string(), "Lien"));
 			h.push_back(make_pair(string(), "Actions"));
 			h.push_back(make_pair(string(), "Actions"));
@@ -150,6 +163,7 @@ namespace synthese
 				stream << t.row(lexical_cast<string>(vehicle->getKey()));
 				stream << t.col() << vehicle->getName();
 				stream << t.col() << vehicle->getNumber();
+				stream << t.col() << vehicle->getRegistrationNumbers();
 
 				// Link
 				stream << t.col();
@@ -171,6 +185,7 @@ namespace synthese
 			stream << t.row(string());
 			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_NAME, "", "Entrez le nom du véhicule ici");
 			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_NUMBER, "", "Entrez le numéro du véhicule ici");
+			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_REGISTRATION_NUMBERS, "", "Entrez l'immatriculation ici");
 			stream << t.col();
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 			stream << t.col();

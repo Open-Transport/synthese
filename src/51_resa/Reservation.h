@@ -85,6 +85,7 @@ namespace synthese
 				std::string						_seatNumber;
 				const pt_operation::VehiclePosition*	_vehiclePositionAtDeparture;
 				const pt_operation::VehiclePosition*	_vehiclePositionAtArrival;
+				bool							_cancelledByOperator;
 			//@}
 
 		public:
@@ -109,7 +110,7 @@ namespace synthese
 				void setReservationDeadLine	(const boost::posix_time::ptime& time){ _reservationDeadLine = time; }
 				void setVehiclePositionAtDeparture	(const pt_operation::VehiclePosition* value){ _vehiclePositionAtDeparture = value; }
 				void setVehiclePositionAtArrival	(const pt_operation::VehiclePosition* value){ _vehiclePositionAtArrival = value; }
-
+				void setCancelledByOperator(bool value){ _cancelledByOperator = value; }
 
 				/** Transaction setter.
 					@param transaction the transaction which the reservation belongs
@@ -142,6 +143,7 @@ namespace synthese
 				const std::string&				getSeatNumber()				const { return _seatNumber; }
 				const pt_operation::VehiclePosition*	getVehiclePositionAtDeparture()	const { return _vehiclePositionAtDeparture; }
 				const pt_operation::VehiclePosition*	getVehiclePositionAtArrival()	const { return _vehiclePositionAtArrival; }
+				bool							getCancelledByOperator()	const { return _cancelledByOperator; }
 			//@}
 
 

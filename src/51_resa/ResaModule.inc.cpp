@@ -44,6 +44,7 @@
 #include "CallStatisticsAdmin.h"
 #include "ResaStatisticsAdmin.h"
 #include "ResaStatisticsMenuAdmin.h"
+#include "ReservationAdmin.hpp"
 
 // Registries
 #include "Reservation.h"

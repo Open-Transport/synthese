@@ -99,6 +99,12 @@ namespace synthese
 
 				virtual const boost::posix_time::time_duration& getLastArrivalSchedule(bool RTData) const;
 
+				graph::Edge* getEdgeFromStopAndTime(
+					const graph::Vertex& vertex,
+					const boost::posix_time::time_duration& schedule,
+					bool departure
+				) const;
+
 			//! @name Update methods
 			//@{
 				//////////////////////////////////////////////////////////////////////////

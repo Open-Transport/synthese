@@ -62,6 +62,7 @@ namespace synthese
 			static const std::string COL_SEAT_NUMBER;
 			static const std::string COL_VEHICLE_POSITION_ID_AT_DEPARTURE;
 			static const std::string COL_VEHICLE_POSITION_ID_AT_ARRIVAL;
+			static const std::string COL_CANCELLED_BY_OPERATOR;
 
 
 

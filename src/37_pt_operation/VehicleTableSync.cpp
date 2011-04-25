@@ -191,9 +191,13 @@ namespace synthese
 		VehicleTableSync::SearchResult VehicleTableSync::Search(
 			util::Env& env,
 			boost::optional<std::string> name,
+			boost::optional<std::string> vehicleNumber,
+			boost::optional<std::string> registration,
 			size_t first /*= 0*/,
 			optional<size_t> number /*= boost::optional<std::size_t>()*/,
 			bool orderByName,
+			bool orderByNumber,
+			bool orderByRegistration,
 			bool raisingOrder,
 			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
 		){
@@ -202,9 +206,25 @@ namespace synthese
 			{
 				query.addWhereField(COL_NAME, "%"+ *name +"%", ComposedExpression::OP_LIKE);
 			}
+			if(vehicleNumber)
+			{
+				query.addWhereField(COL_NUMBER, "%"+ *vehicleNumber +"%", ComposedExpression::OP_LIKE);
+			}
+			if(registration)
+			{
+				query.addWhereField(COL_REGISTRATION_NUMBERS, "%"+ *registration +"%", ComposedExpression::OP_LIKE);
+			}
 			if(orderByName)
 			{
 				query.addOrderField(COL_NAME, raisingOrder);
+			}
+			else if(orderByNumber)
+			{
+				query.addOrderField(COL_NUMBER, raisingOrder);
+			}
+			else if(orderByRegistration)
+			{
+				query.addOrderField(COL_REGISTRATION_NUMBERS, raisingOrder);
 			}
 			if (number)
 			{
@@ -302,5 +322,24 @@ namespace synthese
 				split(seatsValue, value, is_any_of(","));
 			}
 			return seatsValue;
+		}
+
+
+
+		VehicleTableSync::VehiclesList VehicleTableSync::GetVehiclesList(
+			util::Env& env,
+			optional<string> noVehicleLabel
+		){
+			VehiclesList result;
+			if(noVehicleLabel)
+			{
+				result.push_back(make_pair(optional<RegistryKeyType>(0), *noVehicleLabel));
+			}
+			SearchResult vehicles(Search(env));
+			BOOST_FOREACH(shared_ptr<Vehicle> vehicle, vehicles)
+			{
+				result.push_back(make_pair(optional<RegistryKeyType>(vehicle->getKey()), vehicle->getName()));
+			}
+			return result;
 		}
 }	}

@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-///	VehiclePositionTableSync class header.
-///	@file VehiclePositionTableSync.hpp
+///	DepotTableSync class header.
+///	@file DepotTableSync.hpp
 ///	@author RCSobility
 ///	@date 2011
 ///
@@ -22,44 +22,37 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_VehiclePositionTableSync_hpp__
-#define SYNTHESE_VehiclePositionTableSync_hpp__
+#ifndef SYNTHESE_DepotTableSync_hpp__
+#define SYNTHESE_DepotTableSync_hpp__
 
-#include "VehiclePosition.hpp"
-#include "DBNoSyncTableSyncTemplate.hpp"
+#include "Depot.hpp"
+#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
 	namespace pt_operation
 	{
 		//////////////////////////////////////////////////////////////////////////
-		///	VehiclePosition table synchronizer.
+		///	Depot table synchronizer.
 		///	@ingroup m37LS refLS
 		///	@author RCSobility
 		///	@date 2011
-		/// @since 3.2.1
-		class VehiclePositionTableSync:
-			public db::DBNoSyncTableSyncTemplate<VehiclePositionTableSync,VehiclePosition>
+		/// @since 3.3.0
+		class DepotTableSync:
+			public db::DBRegistryTableSyncTemplate<DepotTableSync,Depot>
 		{
 		public:
 			//! @name Field names
 			//@{
-				static const std::string COL_STATUS;
-				static const std::string COL_VEHICLE_ID;
-				static const std::string COL_TIME;
-				static const std::string COL_METER_OFFSET;
-				static const std::string COL_STOP_POINT_ID;
-				static const std::string COL_COMMENT;
-				static const std::string COL_SERVICE_ID;
-				static const std::string COL_RANK_IN_PATH;
-				static const std::string COL_PASSENGERS;
+				static const std::string COL_NAME;
 			//@}
 			
+				typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > DepotsList;
 
 			//! @name Services
 			//@{		
 				//////////////////////////////////////////////////////////////////////////
-				///	VehiclePosition search.
+				///	Depot search.
 				///	@param env Environment to populate
 				///	@param parameterId optional ID of a foreign key to filter on (deactivated if undefined)
 				///	@param first First  object to answer
@@ -70,30 +63,24 @@ namespace synthese
 				///	@return Found objects.
 				///	@author RCSobility
 				///	@date 2011
-				/// @since 3.2.1
+				/// @since 3.3.0
 				static SearchResult Search(
 					util::Env& env,
-					boost::optional<util::RegistryKeyType> vehicleId = boost::optional<util::RegistryKeyType>(),
-					boost::optional<boost::posix_time::ptime> startDate = boost::optional<boost::posix_time::ptime>(),
-					boost::optional<boost::posix_time::ptime> endDate = boost::optional<boost::posix_time::ptime>(),
+					boost::optional<std::string> name = boost::optional<std::string>(),
 					std::size_t first = 0,
 					boost::optional<std::size_t> number = boost::optional<std::size_t>(),
-					bool orderByDate = true,
+					bool orderByName = true,
 					bool raisingOrder = true,
-					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 				);
 
-
-				static void ChangePassengers(
-					const VehiclePosition& startPosition,
-					const VehiclePosition& endPosition,
-					std::size_t passengersToAdd,
-					std::size_t passengersToRemove,
-					boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
+				static DepotsList GetDepotsList(
+					util::Env& env,
+					boost::optional<std::string> noDepotLabel
 				);
 			//@}
 		};
 	}
 }
 
-#endif // SYNTHESE_VehiclePositionTableSync_hpp__
+#endif // SYNTHESE_DepotTableSync_hpp__

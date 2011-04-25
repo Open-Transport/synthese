@@ -1,8 +1,8 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-/// VehiclesAdmin class header.
-///	@file VehiclesAdmin.hpp
+/// DepotsAdmin class header.
+///	@file DepotsAdmin.hpp
 ///	@author RCSobility
 ///	@date 2011
 ///
@@ -23,8 +23,8 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_VehiclesAdmin_H__
-#define SYNTHESE_VehiclesAdmin_H__
+#ifndef SYNTHESE_DepotsAdmin_H__
+#define SYNTHESE_DepotsAdmin_H__
 
 #include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
@@ -34,27 +34,23 @@ namespace synthese
 	namespace pt_operation
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// VehiclesAdmin Admin compound class.
+		/// DepotsAdmin Admin compound class.
 		///	@ingroup m37Admin refAdmin
 		///	@author RCSobility
 		///	@date 2011
-		class VehiclesAdmin:
-			public admin::AdminInterfaceElementTemplate<VehiclesAdmin>
+		class DepotsAdmin:
+			public admin::AdminInterfaceElementTemplate<DepotsAdmin>
 		{
 		public:
 			/// @name Parameter identifiers
 			//@{
 				static const std::string PARAMETER_SEARCH_NAME;
-				static const std::string PARAMETER_SEARCH_NUMBER;
-				static const std::string PARAMETER_SEARCH_REGISTRATION;
 			//@}
 
 		private:
 			/// @name Search parameters
 			//@{
 				boost::optional<std::string>				_searchName;
-				boost::optional<std::string>				_searchNumber;
-				boost::optional<std::string>				_searchRegistration;
 				html::ResultHTMLTable::RequestParameters	_requestParameters;
 			//@}
 
@@ -63,7 +59,7 @@ namespace synthese
 			/// Constructor.
 			///	@author RCSobility
 			///	@date 2011
-			VehiclesAdmin();
+			DepotsAdmin();
 			
 			
 			
@@ -117,7 +113,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds links to the pages of the current class to put directly under
 			/// a module admin page in the pages tree.
-			///	@param module the module
+			///	@param module The module
 			///	@param currentPage Currently displayed page
 			/// @param request Current request
 			///	@return PageLinks each page to put under the module page in the page
@@ -147,4 +143,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_VehiclesAdmin_H__
+#endif // SYNTHESE_DepotsAdmin_H__
