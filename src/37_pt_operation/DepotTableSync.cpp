@@ -150,7 +150,7 @@ namespace synthese
 
 
 
-		void DBTableSyncTemplate<DepotTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<DepotTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){
