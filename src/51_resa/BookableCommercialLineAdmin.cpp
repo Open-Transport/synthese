@@ -52,6 +52,9 @@
 #include "ModuleAdmin.h"
 #include "AdminInterfaceElement.h"
 #include "DRTArea.hpp"
+#include "ReservationAdmin.hpp"
+#include "ReservationUpdateAction.hpp"
+#include "VehicleTableSync.hpp"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -74,6 +77,7 @@ namespace synthese
 	using namespace graph;
 	using namespace geography;
 	using namespace pt;
+	using namespace pt_operation;
 
 	namespace util
 	{
@@ -196,7 +200,9 @@ namespace synthese
 
 			AdminFunctionRequest<BookableCommercialLineAdmin> printRequest(_request);
 			
-			
+			AdminFunctionRequest<ReservationAdmin> openReservationRequest(_request);
+
+			AdminActionFunctionRequest<ReservationUpdateAction, BookableCommercialLineAdmin> vehicleUpdateRquest(_request);
 
 			// Local variables
 			ptime now(second_clock::local_time());
@@ -482,6 +488,8 @@ namespace synthese
 					BOOST_FOREACH(shared_ptr<const Reservation> reservation, serviceReservations)
 					{
 						ReservationStatus status(reservation->getStatus());
+						openReservationRequest.getPage()->setReservation(reservation);
+						vehicleUpdateRquest.getAction()->setReservation(const_pointer_cast<Reservation>(reservation));
 
 						customerRequest.getPage()->setUser(
 							UserTableSync::Get(
@@ -550,6 +558,18 @@ namespace synthese
 									break;
 								}
 							}
+
+							stream << " " << HTMLModule::getLinkButton(openReservationRequest.getURL(), "Ouvrir");
+
+							HTMLForm uv(vehicleUpdateRquest.getHTMLForm("uv"+ lexical_cast<string>(reservation->getKey())));
+							stream << uv.open();
+							stream << uv.getSelectInput(
+								ReservationUpdateAction::PARAMETER_VEHICLE_ID,
+								VehicleTableSync::GetVehiclesList(*_env, string("(non affecté)")),
+								optional<RegistryKeyType>(reservation->getVehicle() ? reservation->getVehicle()->getKey() : RegistryKeyType(0))
+							);
+							stream << uv.getSubmitButton("Enregistrer");
+							stream << uv.close();
 						}
 					}
 				}

@@ -32,8 +32,16 @@
 #include "VehicleTableSync.hpp"
 #include "ResaDBLog.h"
 #include "DBLogModule.h"
+#include "StopAreaTableSync.hpp"
+#include "StopPointTableSync.hpp"
+#include "ScheduledServiceTableSync.h"
+#include "VehiclePosition.hpp"
+#include "VehiclePositionTableSync.hpp"
+#include "ReservationTransaction.h"
 
 using namespace std;
+using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -42,6 +50,9 @@ namespace synthese
 	using namespace util;
 	using namespace pt_operation;
 	using namespace dblog;
+	using namespace pt;
+	using namespace graph;
+	using namespace db;
 	
 	
 	namespace util
@@ -54,6 +65,11 @@ namespace synthese
 		const string ReservationUpdateAction::PARAMETER_RESERVATION_ID = Action_PARAMETER_PREFIX + "ri";
 		const string ReservationUpdateAction::PARAMETER_VEHICLE_ID = Action_PARAMETER_PREFIX + "vi";
 		const string ReservationUpdateAction::PARAMETER_SEAT_NUMBER = Action_PARAMETER_PREFIX + "sn";
+		const string ReservationUpdateAction::PARAMETER_REAL_DEPARTURE_TIME(Action_PARAMETER_PREFIX + "rd");
+		const string ReservationUpdateAction::PARAMETER_REAL_ARRIVAL_TIME(Action_PARAMETER_PREFIX + "ra");
+		const string ReservationUpdateAction::PARAMETER_CANCELLED_BY_OPERATOR(Action_PARAMETER_PREFIX + "co");
+		const string ReservationUpdateAction::PARAMETER_DEPARTURE_METER_OFFSET(Action_PARAMETER_PREFIX + "dm");
+		const string ReservationUpdateAction::PARAMETER_ARRIVAL_METER_OFFSET(Action_PARAMETER_PREFIX + "am");
 
 		
 		
@@ -72,6 +88,26 @@ namespace synthese
 			{
 				map.insert(PARAMETER_SEAT_NUMBER, *_seatNumber);
 			}
+			if(_realDepartureTime)
+			{
+				map.insert(PARAMETER_REAL_DEPARTURE_TIME, *_realDepartureTime);
+			}
+			if(_realArrivalTime)
+			{
+				map.insert(PARAMETER_REAL_ARRIVAL_TIME, *_realArrivalTime);
+			}
+			if(_cancelledByOperator)
+			{
+				map.insert(PARAMETER_CANCELLED_BY_OPERATOR, *_cancelledByOperator);
+			}
+			if(_departureMeterOffset)
+			{
+				map.insert(PARAMETER_DEPARTURE_METER_OFFSET, *_departureMeterOffset);
+			}
+			if(_arrivalMeterOffset)
+			{
+				map.insert(PARAMETER_ARRIVAL_METER_OFFSET, *_arrivalMeterOffset);
+			}
 			return map;
 		}
 		
@@ -83,7 +119,7 @@ namespace synthese
 			{
 				_reservation = ReservationTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_RESERVATION_ID), *_env);
 			}
-			catch(ObjectNotFoundException<Reservation>& e)
+			catch(ObjectNotFoundException<Reservation>&)
 			{
 				throw ActionException("No such reservation");
 			}
@@ -95,8 +131,12 @@ namespace synthese
 				{
 					_vehicle = VehicleTableSync::Get(id, *_env);
 				}
+				else
+				{
+					_vehicle = shared_ptr<Vehicle>();
+				}
 			}
-			catch(ObjectNotFoundException<Vehicle>& e)
+			catch(ObjectNotFoundException<Vehicle>&)
 			{
 				throw ActionException("No such vehicle");
 			}
@@ -105,34 +145,288 @@ namespace synthese
 			{
 				_seatNumber = map.get<string>(PARAMETER_SEAT_NUMBER);
 			}
+
+			if(map.isDefined(PARAMETER_REAL_DEPARTURE_TIME))
+			{
+				_realDepartureTime = time_from_string(map.get<string>(PARAMETER_REAL_DEPARTURE_TIME));
+			}
+
+			if(map.isDefined(PARAMETER_REAL_ARRIVAL_TIME))
+			{
+				_realArrivalTime = time_from_string(map.get<string>(PARAMETER_REAL_ARRIVAL_TIME));
+				if(_realDepartureTime && *_realDepartureTime > *_realArrivalTime)
+				{
+					throw ActionException("Arrival time must be after than departure time");
+				}
+			}
+
+			if(map.isDefined(PARAMETER_CANCELLED_BY_OPERATOR))
+			{
+				_cancelledByOperator = map.get<bool>(PARAMETER_CANCELLED_BY_OPERATOR);
+			}
+
+			if(map.isDefined(PARAMETER_DEPARTURE_METER_OFFSET) && !map.get<string>(PARAMETER_DEPARTURE_METER_OFFSET).empty())
+			{
+				_departureMeterOffset = map.get<VehiclePosition::Meters>(PARAMETER_DEPARTURE_METER_OFFSET);
+			}
+
+			if(map.isDefined(PARAMETER_ARRIVAL_METER_OFFSET) && !map.get<string>(PARAMETER_ARRIVAL_METER_OFFSET).empty())
+			{
+				_arrivalMeterOffset = map.get<VehiclePosition::Meters>(PARAMETER_ARRIVAL_METER_OFFSET);
+				if(!_departureMeterOffset)
+				{
+					throw ActionException("Departure meter offset must be defined too");
+				}
+				if(*_departureMeterOffset > *_arrivalMeterOffset)
+				{
+					throw ActionException("Arrival meter offset must be greater than departure meter offset");
+				}
+			}
+			else if(_departureMeterOffset)
+			{
+				throw ActionException("Arrival meter offset must be defined too");
+			}
+
+			if(	_realDepartureTime || _realArrivalTime || _departureMeterOffset || _arrivalMeterOffset)
+			{
+				if(!_reservation->getVehicle() && (!_vehicle || !_vehicle->get()))
+				{
+					throw ActionException("A vehicle must be associated to the reservation");
+				}
+
+				if(!_realDepartureTime || _realDepartureTime->is_not_a_date_time())
+				{
+					_realDepartureTime = _reservation->getDepartureTime();
+				}
+
+				if(!_realArrivalTime || _realArrivalTime->is_not_a_date_time())
+				{
+					_realArrivalTime = _reservation->getArrivalTime();
+				}
+
+				if(_cancelledByOperator && *_cancelledByOperator)
+				{
+					throw ActionException("The reservation was cancelled by the operator");
+				}
+			}
 		}
-		
 		
 		
 		void ReservationUpdateAction::run(
 			Request& request
 		){
 			stringstream text;
-			if(_vehicle)
+			if(_vehicle && _reservation->getVehicle() != _vehicle->get())
 			{
 				DBLogModule::appendToLogIfChange(
 					text,
-					"Vehicle",
+					"Affectation véhicule",
 					_reservation->getVehicle() ? _reservation->getVehicle()->getName() : "(undefined)",
 					_vehicle->get() ? (*_vehicle)->getName() : "(undefined)"
 				);
 				_reservation->setVehicle(_vehicle->get());
 			}
 
-			if(_seatNumber)
+			if(_seatNumber && _reservation->getSeatNumber() != *_seatNumber)
 			{
 				DBLogModule::appendToLogIfChange(
 					text,
-					"Seat number",
+					"Numéro de siège",
 					_reservation->getSeatNumber(),
 					*_seatNumber
 				);
 				_reservation->setSeatNumber(*_seatNumber);
+			}
+
+			if(_cancelledByOperator && _reservation->getCancelledByOperator() != *_cancelledByOperator)
+			{
+				DBLogModule::appendToLogIfChange(
+					text,
+					"Annulation par le transporteur",
+					_reservation->getCancelledByOperator(),
+					*_cancelledByOperator
+				);
+				_reservation->setCancelledByOperator(*_cancelledByOperator);
+			}
+
+			if(_realDepartureTime)
+			{
+				// Removes passengers from existing positions
+				if(_reservation->getVehiclePositionAtDeparture() && _reservation->getVehiclePositionAtArrival())
+				{
+					VehiclePositionTableSync::ChangePassengers(
+						*_reservation->getVehiclePositionAtDeparture(),
+						*_reservation->getVehiclePositionAtArrival(),
+						0,
+						_reservation->getTransaction()->getSeats()
+					);
+				}
+
+				{
+					shared_ptr<VehiclePosition> position;
+					if(_reservation->getVehiclePositionAtDeparture())
+					{
+						position = _env->getEditableSPtr(const_cast<VehiclePosition*>(_reservation->getVehiclePositionAtDeparture()));
+					}
+					else
+					{
+						VehiclePositionTableSync::SearchResult existingPositions(
+							VehiclePositionTableSync::Search(
+								*_env,
+								_reservation->getVehicle()->getKey(),
+								_realDepartureTime,
+								_realDepartureTime
+						)	);
+						if(existingPositions.empty())
+						{
+							position.reset(new VehiclePosition);
+							position->setKey(VehiclePositionTableSync::getId());
+							position->setTime(*_realDepartureTime);
+							position->setVehicle(const_cast<Vehicle*>(_reservation->getVehicle()));
+							_env->getEditableRegistry<VehiclePosition>().add(position);
+						}
+						else
+						{
+							position = *existingPositions.begin();
+						}
+					}
+
+					shared_ptr<const StopArea> stopArea(StopAreaTableSync::Get(_reservation->getDeparturePlaceId(), *_env));
+					StopPointTableSync::Search(*_env, stopArea->getKey());
+					const StopPoint* stopPoint(stopArea->getPhysicalStops().begin()->second);
+					shared_ptr<ScheduledService> service(ScheduledServiceTableSync::GetEditable(_reservation->getServiceId(), *_env));
+					Edge* edge(
+						service->getEdgeFromStopAndTime(
+							*stopPoint,
+							_reservation->getDepartureTime() - _reservation->getOriginDateTime(),
+							true
+					)	);
+
+					ptime beforeDepartureTime(*_realDepartureTime);
+					beforeDepartureTime -= seconds(30);
+					VehiclePositionTableSync::SearchResult oldPositions(
+						VehiclePositionTableSync::Search(
+							*_env,
+							_reservation->getVehicle()->getKey(),
+							beforeDepartureTime,
+							_realDepartureTime
+					)	);
+					bool geomToWrite(true);
+					BOOST_FOREACH(shared_ptr<VehiclePosition> oldPosition, oldPositions)
+					{
+						if(oldPosition->getGeometry())
+						{
+							geomToWrite = false;
+							break;
+						}
+					}
+					if(geomToWrite)
+					{
+						position->setGeometry(stopPoint->getGeometry());
+					}
+					position->setStatus(VehiclePosition::COMMERCIAL);
+					position->setStopPoint(const_cast<StopPoint*>(stopPoint));
+					position->setService(service.get());
+					if(edge)
+					{
+						position->setRankInPath(edge->getRankInPath());
+					}
+					_reservation->setVehiclePositionAtDeparture(position.get());
+
+					if(_departureMeterOffset)
+					{
+						position->setMeterOffset(*_departureMeterOffset);
+					}
+					VehiclePositionTableSync::Save(position.get());
+				}
+
+				{
+					shared_ptr<VehiclePosition> position;
+					if(_reservation->getVehiclePositionAtArrival())
+					{
+						position = _env->getEditableSPtr(const_cast<VehiclePosition*>(_reservation->getVehiclePositionAtArrival()));
+					}
+					else
+					{
+						VehiclePositionTableSync::SearchResult existingPositions(
+							VehiclePositionTableSync::Search(
+								*_env,
+								_reservation->getVehicle()->getKey(),
+								_realArrivalTime,
+								_realArrivalTime
+						)	);
+						if(existingPositions.empty())
+						{
+							position.reset(new VehiclePosition);
+							position->setKey(VehiclePositionTableSync::getId());
+							position->setTime(*_realArrivalTime);
+							position->setVehicle(const_cast<Vehicle*>(_reservation->getVehicle()));
+							_env->getEditableRegistry<VehiclePosition>().add(position);
+						}
+						else
+						{
+							position = *existingPositions.begin();
+						}
+					}
+
+					shared_ptr<const StopArea> stopArea(StopAreaTableSync::Get(_reservation->getArrivalPlaceId(), *_env));
+					StopPointTableSync::Search(*_env, stopArea->getKey());
+					const StopPoint* stopPoint(stopArea->getPhysicalStops().begin()->second);
+					shared_ptr<ScheduledService> service(ScheduledServiceTableSync::GetEditable(_reservation->getServiceId(), *_env));
+					Edge* edge(
+						service->getEdgeFromStopAndTime(
+							*stopPoint,
+							_reservation->getArrivalTime() - _reservation->getOriginDateTime(),
+							false
+					)	);
+
+					ptime beforeArrivalTime(*_realArrivalTime);
+					beforeArrivalTime -= seconds(30);
+					VehiclePositionTableSync::SearchResult oldPositions(
+						VehiclePositionTableSync::Search(
+							*_env,
+							_reservation->getVehicle()->getKey(),
+							beforeArrivalTime,
+							_realArrivalTime
+					)	);
+					bool geomToWrite(true);
+					BOOST_FOREACH(shared_ptr<VehiclePosition> oldPosition, oldPositions)
+					{
+						if(oldPosition->getGeometry())
+						{
+							geomToWrite = false;
+							break;
+						}
+					}
+					if(geomToWrite)
+					{
+						position->setGeometry(stopPoint->getGeometry());
+					}
+					position->setStatus(VehiclePosition::COMMERCIAL);
+					position->setStopPoint(const_cast<StopPoint*>(stopPoint));
+					position->setService(service.get());
+					if(edge)
+					{
+						position->setRankInPath(edge->getRankInPath());
+					}
+					_reservation->setVehiclePositionAtArrival(position.get());
+
+					if(_arrivalMeterOffset)
+					{
+						position->setMeterOffset(*_arrivalMeterOffset);
+					}
+					VehiclePositionTableSync::Save(position.get());
+				}
+
+				if(_reservation->getVehiclePositionAtDeparture() && _reservation->getVehiclePositionAtArrival())
+				{
+					VehiclePositionTableSync::ChangePassengers(
+						*_reservation->getVehiclePositionAtDeparture(),
+						*_reservation->getVehiclePositionAtArrival(),
+						_reservation->getTransaction()->getSeats(),
+						0
+					);
+				}
 			}
 
 			ReservationTableSync::Save(_reservation.get());
@@ -151,5 +445,4 @@ namespace synthese
 		) const {
 			return true;
 		}
-	}
-}
+}	}

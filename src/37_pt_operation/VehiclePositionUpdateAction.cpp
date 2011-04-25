@@ -31,6 +31,7 @@
 #include "StopPointTableSync.hpp"
 //#include "PTOperationRight.h"
 #include "Request.h"
+#include "DepotTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -119,7 +120,7 @@ namespace synthese
 
 			if(map.isDefined(PARAMETER_PASSENGERS))
 			{
-				_passengers = map.getOptional<size_t>(PARAMETER_PASSENGERS);
+				_passengers = map.get<size_t>(PARAMETER_PASSENGERS);
 			}
 
 			if(map.isDefined(PARAMETER_RANK_IN_PATH))
@@ -149,15 +150,34 @@ namespace synthese
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_STOP_POINT_ID));
 				if(id > 0) try
 				{
-					_stopPoint = StopPointTableSync::GetEditable(id, *_env);
+					if(decodeTableId(id) == StopPointTableSync::TABLE.ID)
+					{
+						_stopPoint = StopPointTableSync::GetEditable(id, *_env);
+						_depot = shared_ptr<Depot>();
+					}
+					else if(decodeTableId(id) == DepotTableSync::TABLE.ID)
+					{
+						_depot = DepotTableSync::GetEditable(id, *_env);
+						_stopPoint = shared_ptr<StopPoint>();
+					}
+					else
+					{
+						_stopPoint = shared_ptr<StopPoint>();
+						_depot = shared_ptr<Depot>();
+					}
 				}
 				catch(ObjectNotFoundException<StopPoint>&)
 				{
-					throw ActionException("No such stopPoint");
+					throw ActionException("No such stop");
+				}
+				catch(ObjectNotFoundException<Depot>&)
+				{
+					throw ActionException("No such depot");
 				}
 				else
 				{
 					_stopPoint = shared_ptr<StopPoint>();
+					_depot = shared_ptr<Depot>();
 				}
 			}
 
@@ -173,7 +193,7 @@ namespace synthese
 
 			if(map.isDefined(PARAMETER_METER_OFFSET))
 			{
-				_passengers = map.get<VehiclePosition::Meters>(PARAMETER_METER_OFFSET);
+				_meterOffset = map.get<VehiclePosition::Meters>(PARAMETER_METER_OFFSET);
 			}
 
 			if(map.isDefined(PARAMETER_TIME))
@@ -222,6 +242,10 @@ namespace synthese
 			if(_stopPoint)
 			{
 				_vehiclePosition->setStopPoint(_stopPoint->get());
+			}
+			if(_depot)
+			{
+				_vehiclePosition->setDepot(_depot->get());
 			}
 			
 			VehiclePositionTableSync::Save(_vehiclePosition.get());

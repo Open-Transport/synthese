@@ -23,6 +23,7 @@
 #include "SchedulesBasedService.h"
 #include "Path.h"
 #include "LineStop.h"
+#include "Vertex.h"
 
 #include <sstream>
 #include <iomanip>
@@ -409,5 +410,27 @@ namespace synthese
 				++ita;
 			}
 			return true;
+		}
+
+
+
+		graph::Edge* SchedulesBasedService::getEdgeFromStopAndTime(
+			const Vertex& stopPoint,
+			const boost::posix_time::time_duration& schedule,
+			bool departure
+		) const {
+			
+			Path::Edges edges(_path->getAllEdges());
+
+			BOOST_FOREACH(Edge* edge, edges)
+			{
+				if(	edge->getFromVertex()->getHub() == stopPoint.getHub() &&
+					(	(departure && edge->isDepartureAllowed() && schedule == _departureSchedules[edge->getRankInPath()] - _departureSchedules[0]) ||
+						(!departure && edge->isArrivalAllowed() && schedule == _arrivalSchedules[edge->getRankInPath()] - _departureSchedules[0])
+				)	){
+					return edge;
+				}
+			}
+			return NULL;
 		}
 }	}

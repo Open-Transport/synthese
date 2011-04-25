@@ -44,13 +44,16 @@ namespace synthese
 		Reservation::Reservation(
 			RegistryKeyType key
 		):	Registrable(key),
-			_transaction(NULL)
-			, _departureTime(not_a_date_time)
-			, _arrivalTime(not_a_date_time)
-			, _originDateTime(not_a_date_time)
-			, _reservationDeadLine(not_a_date_time)
-			, _reservationRuleId(0),
-			_vehicle(NULL)
+			_transaction(NULL),
+			_departureTime(not_a_date_time),
+			_arrivalTime(not_a_date_time),
+			_originDateTime(not_a_date_time),
+			_reservationDeadLine(not_a_date_time),
+			_reservationRuleId(0),
+			_vehicle(NULL),
+			_vehiclePositionAtDeparture(NULL),
+			_vehiclePositionAtArrival(NULL),
+			_cancelledByOperator(false)
 		{}
 
 

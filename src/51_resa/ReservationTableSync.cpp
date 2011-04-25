@@ -32,6 +32,7 @@
 #include "ScheduledServiceTableSync.h"
 #include "JourneyPatternTableSync.hpp"
 #include "VehicleTableSync.hpp"
+#include "VehiclePositionTableSync.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -74,6 +75,7 @@ namespace synthese
 		const string ReservationTableSync::COL_SEAT_NUMBER("seat_number");
 		const string ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_DEPARTURE("vehicle_position_id_at_departure");
 		const string ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_ARRIVAL("vehicle_position_id_at_arrival");
+		const string ReservationTableSync::COL_CANCELLED_BY_OPERATOR("cancelled_by_operator");
 	}
 
 	namespace db
@@ -101,6 +103,9 @@ namespace synthese
 			DBTableSync::Field(ReservationTableSync::COL_RESERVATION_DEAD_LINE, SQL_DATETIME),
 			DBTableSync::Field(ReservationTableSync::COL_VEHICLE_ID, SQL_INTEGER),
 			DBTableSync::Field(ReservationTableSync::COL_SEAT_NUMBER, SQL_TEXT),
+			DBTableSync::Field(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_DEPARTURE, SQL_INTEGER),
+			DBTableSync::Field(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_ARRIVAL, SQL_INTEGER),
+			DBTableSync::Field(ReservationTableSync::COL_CANCELLED_BY_OPERATOR, SQL_BOOLEAN),
 			DBTableSync::Field()
 		};
 
@@ -137,6 +142,7 @@ namespace synthese
 			object->setOriginDateTime(rows->getDateTime( ReservationTableSync::COL_ORIGIN_DATE_TIME));
 			object->setReservationDeadLine(rows->getDateTime( ReservationTableSync::COL_RESERVATION_DEAD_LINE));
 			object->setSeatNumber(rows->getText(ReservationTableSync::COL_SEAT_NUMBER));
+			object->setCancelledByOperator(rows->getBool(ReservationTableSync::COL_CANCELLED_BY_OPERATOR));
 
 			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
 			{
@@ -154,6 +160,22 @@ namespace synthese
 						VehicleTableSync::Get(vehicleId, env, linkLevel).get()
 					);
 				}
+
+				RegistryKeyType vpd(rows->getLongLong(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_DEPARTURE));
+				if(vpd > 0)
+				{
+					object->setVehiclePositionAtDeparture(
+						VehiclePositionTableSync::GetEditable(vpd, env, linkLevel).get()
+					);
+				}
+
+				RegistryKeyType vpa(rows->getLongLong(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_ARRIVAL));
+				if(vpa > 0)
+				{
+					object->setVehiclePositionAtArrival(
+						VehiclePositionTableSync::GetEditable(vpa, env, linkLevel).get()
+					);
+				}
 			}
 		}
 
@@ -163,6 +185,8 @@ namespace synthese
 		{
 			object->setTransaction(NULL);
 			object->setVehicle(NULL);
+			object->setVehiclePositionAtDeparture(NULL);
+			object->setVehiclePositionAtArrival(NULL);
 		}
 
 
@@ -188,6 +212,9 @@ namespace synthese
 			query.addField(object->getReservationDeadLine());
 			query.addField(object->getVehicle() ? object->getVehicle()->getKey() : RegistryKeyType(0));
 			query.addField(object->getSeatNumber());
+			query.addField(object->getVehiclePositionAtDeparture() ? object->getVehiclePositionAtDeparture()->getKey() : RegistryKeyType(0));
+			query.addField(object->getVehiclePositionAtArrival() ? object->getVehiclePositionAtArrival()->getKey() : RegistryKeyType(0));
+			query.addField(object->getCancelledByOperator());
 			query.execute(transaction);
 		}
 
@@ -325,5 +352,4 @@ namespace synthese
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
-	}
-}
+}	}

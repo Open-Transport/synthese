@@ -38,6 +38,8 @@
 #include "VehiclePositionUpdateAction.hpp"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
+#include "RemoveObjectAction.hpp"
+#include "DepotTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -51,6 +53,8 @@ namespace synthese
 	using namespace security;
 	using namespace pt_operation;
 	using namespace html;
+	using namespace db;
+	using namespace pt;
 
 	namespace util
 	{
@@ -104,7 +108,7 @@ namespace synthese
 			}
 
 			// Parameters
-			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_START_DATE, 100, false);
+			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_START_DATE, 500, false);
 		}
 
 
@@ -181,10 +185,13 @@ namespace synthese
 				AdminActionFunctionRequest<VehiclePositionUpdateAction,VehicleAdmin> addRequest(request);
 				addRequest.getAction()->setVehicle(const_pointer_cast<Vehicle>(_vehicle));
 
+				AdminActionFunctionRequest<RemoveObjectAction, VehicleAdmin> removeRequest(request);
+
 				// Search
 				VehiclePositionTableSync::SearchResult positions(
 					VehiclePositionTableSync::Search(
 					_getEnv(),
+					_vehicle->getKey(),
 					_searchStartDate,
 					_searchEndDate,
 					_requestParameters.first,
@@ -196,8 +203,11 @@ namespace synthese
 				ActionResultHTMLTable::HeaderVector v;
 				v.push_back(make_pair(string(), string("#")));
 				v.push_back(make_pair(PARAMETER_SEARCH_START_DATE, string("Heure")));
+				v.push_back(make_pair(string(), string("Dst")));
 				v.push_back(make_pair(string(), string("Statut")));
 				v.push_back(make_pair(string(), string("Lieu")));
+				v.push_back(make_pair(string(), string("Passagers")));
+				v.push_back(make_pair(string(), string("Commentaire")));
 				v.push_back(make_pair(string(), string("Actions")));
 				ActionResultHTMLTable t(
 					v,
@@ -210,22 +220,78 @@ namespace synthese
 
 				stream << t.open();
 				size_t rank(0);
+				VehiclePosition::Meters meters(0);
+				VehiclePosition::Meters lastMeters(0);
+				Depot* lastDepot(NULL);
+				StopPoint* lastStopPoint(NULL);
 				BOOST_FOREACH(shared_ptr<VehiclePosition> position, positions)
 				{
+					removeRequest.getAction()->setObjectId(position->getKey());
+
 					stream << t.row(lexical_cast<string>(position->getKey()));
 					stream << t.col() << rank++;
 					stream << t.col() << position->getTime();
+					
+					// Meters
+					stream << t.col() << position->getMeterOffset();
+					if(lastMeters > 0)
+					{
+						if(	position->getMeterOffset() < lastMeters && _requestParameters.raisingOrder ||
+							position->getMeterOffset() > lastMeters && !_requestParameters.raisingOrder
+						){
+							stream << HTMLModule::getHTMLImage("exclamation.png", "!", string("Inversion d'ordre des mètres"));
+						}
+						if(	position->getMeterOffset() != lastMeters &&
+							(	position->getDepot() && position->getDepot() == lastDepot ||
+								position->getStopPoint() && position->getStopPoint() == lastStopPoint
+						)	){
+							stream << HTMLModule::getHTMLImage("error.png", "!", string("Mouvement probablement manquant"));
+						}
+					}
+
+					lastMeters = position->getMeterOffset();
+
+					// Status
+					stream << t.col() << VehiclePosition::GetStatusName(position->getStatus());
+
+					// Place
 					stream << t.col();
 					if(position->getStopPoint() && position->getStopPoint()->getConnectionPlace())
 					{
 						stream << position->getStopPoint()->getConnectionPlace()->getFullName();
+						lastStopPoint = position->getStopPoint();
+						lastDepot = NULL;
+					}
+					else if(position->getDepot())
+					{
+						stream << "Dépôt " << position->getDepot()->getName();
+						lastDepot = position->getDepot();
+						lastStopPoint = NULL;
+					}
+					else
+					{
+						lastStopPoint = NULL;
+						lastDepot = NULL;
+					}
+
+					stream << t.col() << position->getPassengers();
+					stream << t.col() << position->getComment();
+					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer cette entrée du journal ?");
+
+					if(position->getMeterOffset() > meters)
+					{
+						meters = position->getMeterOffset();
 					}
 				}
 
 				stream << t.row(string());
 				stream << t.col() << rank;
 				stream << t.col() << t.getActionForm().getCalendarInput(VehiclePositionUpdateAction::PARAMETER_TIME, now);
-				stream << t.col();
+				stream << t.col() << t.getActionForm().getTextInput(VehiclePositionUpdateAction::PARAMETER_METER_OFFSET, lexical_cast<string>(meters));
+				stream << t.col() << t.getActionForm().getSelectInput(VehiclePositionUpdateAction::PARAMETER_STATUS, VehiclePosition::GetStatusList(), optional<VehiclePosition::Status>());
+				stream << t.col() << t.getActionForm().getSelectInput(VehiclePositionUpdateAction::PARAMETER_STOP_POINT_ID, DepotTableSync::GetDepotsList(*_env, optional<string>("(pas de lieu)")), optional<RegistryKeyType>(0));
+				stream << t.col() << t.getActionForm().getSelectNumberInput(VehiclePositionUpdateAction::PARAMETER_PASSENGERS, 0, 99, 0);
+				stream << t.col() << t.getActionForm().getTextInput(VehiclePositionUpdateAction::PARAMETER_COMMENT, string());
 				stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 				stream << t.close();
 

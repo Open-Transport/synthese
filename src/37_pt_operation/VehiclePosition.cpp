@@ -22,6 +22,10 @@
 
 #include "VehiclePosition.hpp"
 
+using namespace std;
+using namespace boost;
+using namespace boost::posix_time;
+
 namespace synthese
 {
 	using namespace util;
@@ -37,9 +41,45 @@ namespace synthese
 		VehiclePosition::VehiclePosition(
 			RegistryKeyType id
 		):	Registrable(id),
+			_status(UNKNOWN_STATUS),
 			_vehicle(NULL),
+			_time(not_a_date_time),
+			_meterOffset(0),
 			_stopPoint(NULL),
-			_service(NULL)
+			_service(NULL),
+			_passengers(0),
+			_depot(NULL)
 		{}
+
+
+
+		std::string VehiclePosition::GetStatusName( Status value )
+		{
+			switch(value)
+			{
+			case TRAINING: return "Formation";
+			case DEAD_RUN_DEPOT: return "Transfert dépôt";
+			case DEAD_RUN_TRANSFER: return "Transfert inter-ligne";
+			case SERVICE: return "Trajet de service";
+			case COMMERCIAL: return "Service commercial";
+			case NOT_IN_SERVICE: return "Arrêt";
+			case OUT_OF_SERVICE: return "Hors service";
+			case UNKNOWN_STATUS: return "Inconnu";
+			case REFUELING: return "Carburant";
+			}
+			return string();
+		}
+
+
+
+		vector<pair<optional<VehiclePosition::Status>, string> > VehiclePosition::GetStatusList()
+		{
+			vector<pair<optional<Status>,string> > result;
+			for(int i(0); i<9; ++i)
+			{
+				result.push_back(make_pair(optional<Status>(static_cast<Status>(i)), GetStatusName(static_cast<Status>(i))));
+			}
+			return result;
+		}
 	}
 }

@@ -26,7 +26,6 @@
 #include "StopAreaTableSync.hpp"
 #include "CityTableSync.h"
 
-#include <boost/optional.hpp>
 #include <sstream>
 
 using namespace std;
@@ -35,7 +34,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace db;
-	using namespace dblog;
 	using namespace pt;
 	using namespace geography;
 

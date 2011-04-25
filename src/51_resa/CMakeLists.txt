@@ -53,6 +53,8 @@ ResaStatisticsTableSync.h
 ResaTypes.h
 Reservation.cpp
 Reservation.h
+ReservationAdmin.cpp
+ReservationAdmin.hpp
 ReservationCancellationEMailContentInterfacePage.cpp
 ReservationCancellationEMailContentInterfacePage.h
 ReservationCancellationEMailSubjectInterfacePage.cpp
