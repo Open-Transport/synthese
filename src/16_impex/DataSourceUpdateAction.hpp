@@ -30,6 +30,8 @@
 
 namespace synthese
 {
+	class CoordinatesSystem;
+
 	namespace impex
 	{
 		class DataSource;
@@ -60,6 +62,7 @@ namespace synthese
 			static const std::string PARAMETER_FORMAT;
 			static const std::string PARAMETER_ICON;
 			static const std::string PARAMETER_CHARSET;
+			static const std::string PARAMETER_SRID;
 
 		private:
 			boost::shared_ptr<DataSource> _dataSource;
@@ -67,6 +70,7 @@ namespace synthese
 			boost::optional<std::string> _format;
 			boost::optional<std::string> _icon;
 			boost::optional<std::string> _charset;
+			boost::optional<const CoordinatesSystem&> _coordinatesSystem;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

@@ -51,6 +51,7 @@ namespace synthese
 		const string DataSourceUpdateAction::PARAMETER_FORMAT = Action_PARAMETER_PREFIX + "fo";
 		const string DataSourceUpdateAction::PARAMETER_ICON = Action_PARAMETER_PREFIX + "ic";
 		const string DataSourceUpdateAction::PARAMETER_CHARSET = Action_PARAMETER_PREFIX + "cs";
+		const string DataSourceUpdateAction::PARAMETER_SRID = Action_PARAMETER_PREFIX + "sr";
 		
 		
 		
@@ -76,6 +77,10 @@ namespace synthese
 			if(_charset)
 			{
 				map.insert(PARAMETER_CHARSET, *_charset);
+			}
+			if(_coordinatesSystem)
+			{
+				map.insert(PARAMETER_SRID, _coordinatesSystem->getSRID());
 			}
 			return map;
 		}
@@ -125,6 +130,18 @@ namespace synthese
 			{
 				_charset = map.getDefault<string>(PARAMETER_CHARSET);
 			}
+
+			if(map.isDefined(PARAMETER_SRID))
+			{
+				try
+				{
+					_coordinatesSystem = CoordinatesSystem::GetCoordinatesSystem(map.get<CoordinatesSystem::SRID>(PARAMETER_SRID));
+				}
+				catch(CoordinatesSystem::CoordinatesSystemNotFoundException&)
+				{
+					throw ActionException("No such coordinate system");
+				}
+			}
 		}
 		
 		
@@ -150,6 +167,10 @@ namespace synthese
 			if(_charset)
 			{
 				_dataSource->setCharset(*_charset);
+			}
+			if(_coordinatesSystem)
+			{
+				_dataSource->setCoordinatesSystem(&*_coordinatesSystem);
 			}
 
 			DataSourceTableSync::Save(_dataSource.get());

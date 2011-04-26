@@ -45,7 +45,8 @@ namespace synthese
 	{
 		DataSource::DataSource(
 			RegistryKeyType id
-		):	Registrable(id)
+		):	Registrable(id),
+			_coordinatesSystem(NULL)
 		{}
 
 

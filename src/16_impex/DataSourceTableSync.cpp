@@ -26,6 +26,7 @@
 #include "DataSourceTableSync.h"
 #include "SelectQuery.hpp"
 #include "ReplaceQuery.h"
+#include "CoordinatesSystem.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -48,6 +49,7 @@ namespace synthese
 		const string DataSourceTableSync::COL_FORMAT("format");
 		const string DataSourceTableSync::COL_ICON("icon");
 		const string DataSourceTableSync::COL_CHARSET("charset");
+		const string DataSourceTableSync::COL_SRID("srid");
 	}
 
 	namespace db
@@ -63,6 +65,7 @@ namespace synthese
 			DBTableSync::Field(DataSourceTableSync::COL_FORMAT, SQL_TEXT),
 			DBTableSync::Field(DataSourceTableSync::COL_ICON, SQL_TEXT),
 			DBTableSync::Field(DataSourceTableSync::COL_CHARSET, SQL_TEXT),
+			DBTableSync::Field(DataSourceTableSync::COL_SRID, SQL_INTEGER),
 			DBTableSync::Field()
 		};
 
@@ -84,6 +87,17 @@ namespace synthese
 			object->setFormat(format);
 			object->setIcon(rows->getText(DataSourceTableSync::COL_ICON));
 			object->setCharset(rows->getText(DataSourceTableSync::COL_CHARSET));
+
+			// CoordinatesSystem
+			CoordinatesSystem::SRID srid(rows->getInt(DataSourceTableSync::COL_SRID));
+			try
+			{
+				object->setCoordinatesSystem(&CoordinatesSystem::GetCoordinatesSystem(srid));
+			}
+			catch(CoordinatesSystem::CoordinatesSystemNotFoundException& e)
+			{
+				Log::GetInstance().error("Bad SRID in record"+ lexical_cast<string>(object->getKey()), e);
+			}
 		}
 
 		template<> void DBDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Save(
@@ -95,6 +109,7 @@ namespace synthese
 			query.addField(object->getFormat());
 			query.addField(object->getIcon());
 			query.addField(object->getCharset());
+			query.addField(object->getCoordinatesSystem() ? object->getCoordinatesSystem()->getSRID() : CoordinatesSystem::SRID(0));
 			query.execute(transaction);
 		}
 
