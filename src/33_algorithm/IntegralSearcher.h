@@ -85,6 +85,7 @@ namespace synthese
 				std::ostream* const							_logStream;
 				boost::optional<boost::posix_time::time_duration>	_maxDuration;
 				const double								_vmax;
+				bool										_ignoreReservation;
 			//@}
 
 			//! @name Route planning data
@@ -165,6 +166,7 @@ namespace synthese
 				bool												optim,
 				boost::optional<boost::posix_time::time_duration>	maxDuration,
 				double												vmax,
+				bool												ignoreReservation,
 				std::ostream* const									logStream = NULL,
 				int													totalDistance = 0,
 				boost::optional<const JourneyTemplates&>			journeyTemplates = boost::optional<const JourneyTemplates&>()

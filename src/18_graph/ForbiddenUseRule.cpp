@@ -40,7 +40,8 @@ namespace synthese
 
 
 		UseRule::RunPossibilityType ForbiddenUseRule::isRunPossible(
-			const ServicePointer& servicePointer
+			const ServicePointer& servicePointer,
+			bool ignoreReservation
 		) const	{
 			return RUN_NOT_POSSIBLE;
 		}
@@ -48,7 +49,8 @@ namespace synthese
 
 
 		UseRule::ReservationAvailabilityType ForbiddenUseRule::getReservationAvailability(
-			const ServicePointer& servicePointer
+			const ServicePointer& servicePointer,
+			bool ignoreReservationDeadline
 		) const	{
 			return RESERVATION_FORBIDDEN;
 		}

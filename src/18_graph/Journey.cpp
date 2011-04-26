@@ -270,13 +270,13 @@ namespace synthese
 
 
 
-		boost::logic::tribool Journey::getReservationCompliance() const
+		boost::logic::tribool Journey::getReservationCompliance(bool ignoreReservationDeadline) const
 		{
 			boost::logic::tribool result(false);
 			BOOST_FOREACH(const ServicePointer& su, _journeyLegs)
 			{
 				const UseRule::ReservationAvailabilityType& resa(
-					su.getUseRule().getReservationAvailability(su)
+					su.getUseRule().getReservationAvailability(su, ignoreReservationDeadline)
 				);
 				if(resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE)
 					return true;
@@ -291,11 +291,11 @@ namespace synthese
 		ptime Journey::getReservationDeadLine() const
 		{
 			ptime result(not_a_date_time);
-			boost::logic::tribool compliance(getReservationCompliance());
+			boost::logic::tribool compliance(getReservationCompliance(true));
 			BOOST_FOREACH(const ServicePointer& su, _journeyLegs)
 			{
 				const UseRule::ReservationAvailabilityType& resa(
-					su.getUseRule().getReservationAvailability(su)
+					su.getUseRule().getReservationAvailability(su, true)
 				);
 				if(	(	boost::logic::indeterminate(compliance) &&
 						resa == UseRule::RESERVATION_OPTIONAL_POSSIBLE

@@ -456,11 +456,12 @@ namespace synthese
 						_resultsNumber,
 						_site->getAccessParameters(_accessibility, _rollingStockFilter ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()),
 						_planningOrder,
+						false,
 						_log ? &stream : NULL
 						);
 					const PTRoutePlannerResult jv(r.run());
 
-					jv.displayHTMLTable(stream, optional<HTMLForm&>(), string());
+					jv.displayHTMLTable(stream, optional<HTMLForm&>(), string(), false);
 				}
 				else
 				{

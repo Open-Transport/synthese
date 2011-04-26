@@ -444,7 +444,8 @@ namespace synthese
 			void displayHTMLTable(
 				std::ostream& stream,
 				boost::optional<html::HTMLForm&> resaForm,
-				const std::string& resaRadioFieldName
+				const std::string& resaRadioFieldName,
+				bool ignoreReservationDeadline
 			) const;
 
 			//////////////////////////////////////////////////////////////////////////

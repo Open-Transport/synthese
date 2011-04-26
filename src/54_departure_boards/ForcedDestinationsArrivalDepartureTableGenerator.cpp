@@ -128,7 +128,9 @@ namespace synthese
 							minTimeForForcedDestination,
 							maxTimeForForcedDestination,
 							false,
-							minIndex
+							minIndex,
+							false,
+							false
 						);
 
 						if(	serviceInstance.getService() == NULL ||

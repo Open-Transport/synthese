@@ -291,9 +291,9 @@ namespace synthese
 
 
 				/** <li>A journey without compulsor reservation is best</li> */
-				if (getReservationCompliance() == true && other.getReservationCompliance() != true)
+				if (getReservationCompliance(false) == true && other.getReservationCompliance(false) != true)
 					return false;
-				if (other.getReservationCompliance() == true && getReservationCompliance() != true)
+				if (other.getReservationCompliance(false) == true && getReservationCompliance(false) != true)
 					return true;
 
 				/** <li>A shorter journey is best</li> */

@@ -108,7 +108,8 @@ namespace synthese
 			const Edge& edge,
 			const ptime& presenceDateTime,
 			bool controlIfTheServiceIsReachable,
-			bool inverted
+			bool inverted,
+			bool ignoreReservation
 		) const	{
 
 			time_duration schedule;
@@ -203,7 +204,7 @@ namespace synthese
 			// Reservation control
 			if (controlIfTheServiceIsReachable)
 			{
-				if (ptr.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
+				if (ptr.isUseRuleCompliant(ignoreReservation) == UseRule::RUN_NOT_POSSIBLE)
 					return ServicePointer();
 			}
 

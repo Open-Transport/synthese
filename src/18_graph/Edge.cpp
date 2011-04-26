@@ -153,7 +153,8 @@ namespace synthese
 			const ptime& maxDepartureMoment,
 			bool controlIfTheServiceIsReachable,
 			optional<DepartureServiceIndex::Value>& minNextServiceIndex,
-			bool inverted
+			bool inverted,
+			bool ignoreReservation
 		) const	{
 
 			const ServiceSet& services(getParentPath()->getServices());
@@ -186,11 +187,12 @@ namespace synthese
 							(*next)->getFromPresenceTime(
 								RTData,
 								true,
-								userClassRank
-								, *this
-								, departureMoment
-								, controlIfTheServiceIsReachable
-								, inverted
+								userClassRank,
+								*this,
+								departureMoment,
+								controlIfTheServiceIsReachable,
+								inverted,
+								ignoreReservation
 							)
 						);
 
@@ -224,7 +226,8 @@ namespace synthese
 			const ptime& minArrivalMoment,
 			bool controlIfTheServiceIsReachable,
 			optional<ArrivalServiceIndex::Value>& maxPreviousServiceIndex,
-			bool inverted
+			bool inverted,
+			bool ignoreReservation
 		) const	{
 
 			const ServiceSet& services(getParentPath()->getServices());
@@ -256,10 +259,11 @@ namespace synthese
 								RTData,
 								false,
 								userClassRank,
-								*this
-								, arrivalMoment
-								, controlIfTheServiceIsReachable
-								, inverted
+								*this,
+								arrivalMoment,
+								controlIfTheServiceIsReachable,
+								inverted,
+								ignoreReservation
 							)
 						);
 

@@ -216,7 +216,8 @@ namespace synthese
 					dead line and be after reservation opening time.
 				*/
 				virtual RunPossibilityType isRunPossible (
-					const graph::ServicePointer& servicePointer
+					const graph::ServicePointer& servicePointer,
+					bool ignoreReservation
 				) const;
 
 
@@ -239,7 +240,8 @@ namespace synthese
 				/// one for any departure time, that is necessarily earlier. So the
 				/// result of this method MUST be confirmed by a call on a full service pointer.
 				virtual ReservationAvailabilityType getReservationAvailability(
-					const graph::ServicePointer& servicePointer
+					const graph::ServicePointer& servicePointer,
+					bool ignoreReservationDeadline
 				) const;
 
 

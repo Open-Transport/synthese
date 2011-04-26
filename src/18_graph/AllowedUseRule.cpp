@@ -52,13 +52,15 @@ namespace synthese
 		}
 
 		UseRule::RunPossibilityType AllowedUseRule::isRunPossible(
-			const ServicePointer& servicePointer
+			const ServicePointer& servicePointer,
+			bool ignoreReservation
 		) const	{
 			return RUN_POSSIBLE;
 		}
 
 		UseRule::ReservationAvailabilityType AllowedUseRule::getReservationAvailability(
-			const ServicePointer& serviceUse
+			const ServicePointer& serviceUse,
+			bool ignoreReservationDeadline
 		) const	{
 			return RESERVATION_FORBIDDEN;
 		}

@@ -66,6 +66,7 @@ namespace synthese
 				const graph::GraphIdType			_graphToUse;
 				const graph::Journey				_parentContinuousService;
 				double								_vmax;
+				bool								_ignoreReservation;
 			//@}
 
 			//! @name Logging
@@ -99,6 +100,7 @@ namespace synthese
 				graph::AccessParameters		accessParameters,
 				PlanningOrder					planningOrder,
 				double							vmax,
+				bool							ignoreReservation,
 				std::ostream* logStream = NULL
 			);
 
@@ -125,6 +127,7 @@ namespace synthese
 				graph::AccessParameters		accessParameters,
 				PlanningOrder					planningOrder,
 				double						vmax,
+				bool							ignoreReservation,
 				std::ostream* logStream = NULL
 			);
 

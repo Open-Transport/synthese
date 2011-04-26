@@ -177,6 +177,7 @@ namespace synthese
 					@date 2007
 				*/
 				UseRule::RunPossibilityType isUseRuleCompliant(
+					bool ignoreReservation
 				) const;
 
 
