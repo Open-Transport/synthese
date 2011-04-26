@@ -49,6 +49,7 @@ namespace synthese
 			 static const std::string COL_FORMAT;
 			 static const std::string COL_ICON;
 			 static const std::string COL_CHARSET;
+			 static const std::string COL_SRID;
 
 			DataSourceTableSync ();
 

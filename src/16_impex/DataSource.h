@@ -31,6 +31,8 @@
 
 namespace synthese
 {
+	class CoordinatesSystem;
+
 	namespace util
 	{
 		class Env;
@@ -70,6 +72,7 @@ namespace synthese
 			std::string _format;
 			std::string _icon;
 			std::string	_charset;
+			const CoordinatesSystem* _coordinatesSystem;
 			
 		public:
 			/////////////////////////////////////////////////////////////////////
@@ -84,6 +87,7 @@ namespace synthese
 				const std::string& getFormat() const { return _format; }
 				const std::string& getIcon() const { return _icon; }
 				const std::string& getCharset() const { return _charset; }
+				const CoordinatesSystem* getCoordinatesSystem() const { return _coordinatesSystem; }
 			//@}
 		
 			//! @name Setters
@@ -92,6 +96,7 @@ namespace synthese
 				void setFormat(const std::string& value) { _format = value; }
 				void setIcon(const std::string& value) { _icon = value; }
 				void setCharset(const std::string& value) { _charset = value; }
+				void setCoordinatesSystem(const CoordinatesSystem* value){ _coordinatesSystem = value; }
 			//@}
 
 			//! @name Modifiers
