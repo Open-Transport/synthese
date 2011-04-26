@@ -554,10 +554,11 @@ namespace synthese
 					{
 						r->setReservationRuleId(static_cast<const PTUseRule&>(su.getUseRule()).getKey());
 					}
-					r->setReservationDeadLine(su.getUseRule().getReservationDeadLine(
-						su.getOriginDateTime()
-						, su.getDepartureDateTime()
-					));
+					r->setReservationDeadLine(
+						su.getUseRule().getReservationDeadLine(
+							su.getOriginDateTime(),
+							su.getDepartureDateTime()
+					)	);
 				}
 				r->setServiceId(su.getService()->getKey());
 				r->setServiceCode(lexical_cast<string>(su.getService()->getServiceNumber()));
@@ -569,7 +570,7 @@ namespace synthese
 			ResaDBLog::AddBookReservationEntry(request.getSession(), rt);
 
 			// Mail
-			if(!_customer->getEMail().empty() && reservationContact)
+			if(!_ignoreReservation && !_customer->getEMail().empty() && reservationContact)
  			{
 				reservationContact->sendCustomerEMail(rt);
 

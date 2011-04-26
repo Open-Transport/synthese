@@ -55,7 +55,8 @@ namespace synthese
 				WEEK_STEP,
 				MONTH_STEP,
 				YEAR_STEP,
-				LINE_STEP
+				LINE_STEP,
+				VEHICLE_STEP
 			};
 
 			enum What
