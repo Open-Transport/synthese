@@ -31,6 +31,7 @@
 #include "FileFormat.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -80,7 +81,7 @@ namespace synthese
 			}
 			if(_coordinatesSystem)
 			{
-				map.insert(PARAMETER_SRID, _coordinatesSystem->getSRID());
+				map.insert(PARAMETER_SRID, lexical_cast<int>(_coordinatesSystem->getSRID()));
 			}
 			return map;
 		}
