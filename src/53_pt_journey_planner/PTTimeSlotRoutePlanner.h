@@ -109,6 +109,7 @@ namespace synthese
 				const boost::optional<std::size_t>	maxSolutionsNumber,
 				const graph::AccessParameters		accessParameters,
 				const algorithm::PlanningOrder		planningOrder,
+				bool								ignoreReservation,
 				std::ostream* logStream = NULL
 			);
 

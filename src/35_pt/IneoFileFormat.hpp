@@ -84,7 +84,7 @@ namespace synthese
 
 				static const std::string PARAMETER_START_DATE;
 				static const std::string PARAMETER_END_DATE;
-				static const std::string PARAMETER_IMPORT_STOP_AREA;
+				static const std::string PARAMETER_AUTO_IMPORT_STOPS;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
@@ -97,7 +97,7 @@ namespace synthese
 
 				boost::shared_ptr<TransportNetwork> _network;
 
-				bool _importStopArea;
+				bool _autoImportStops;
 				bool _interactive;
 				bool _displayLinkedStops;
 				boost::shared_ptr<const geography::City> _defaultCity;

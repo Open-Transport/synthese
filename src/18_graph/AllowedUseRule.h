@@ -61,12 +61,14 @@ namespace synthese
 
 
 			virtual RunPossibilityType isRunPossible (
-				const ServicePointer& servicePointer
+				const ServicePointer& servicePointer,
+				bool ignoreReservation
 			) const;
 
 
 			virtual ReservationAvailabilityType getReservationAvailability(
-				const ServicePointer& servicePointer
+				const ServicePointer& servicePointer,
+				bool ignoreReservationDeadline
 			) const;
 
 			virtual bool isCompatibleWith(

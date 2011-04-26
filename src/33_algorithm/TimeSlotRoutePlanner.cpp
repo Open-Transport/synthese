@@ -53,6 +53,7 @@ namespace synthese
 			AccessParameters accessParameters,
 			PlanningOrder planningOrder,
 			double vmax,
+			bool ignoreReservation,
 			std::ostream* logStream
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
@@ -68,7 +69,8 @@ namespace synthese
 			_planningOrder(planningOrder),
 			_journeyTemplates(graphToUse),
 			_vmax(vmax),
-			_logStream(logStream)
+			_logStream(logStream),
+			_ignoreReservation(ignoreReservation)
 		{
 		}
 
@@ -85,6 +87,7 @@ namespace synthese
 			AccessParameters accessParameters,
 			const PlanningOrder planningOrder,
 			double vmax,
+			bool ignoreReservation,
 			std::ostream* logStream
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
@@ -105,7 +108,8 @@ namespace synthese
 			_parentContinuousService(continuousService),
 			_journeyTemplates(graphToUse),
 			_vmax(vmax),
-			_logStream(logStream)
+			_logStream(logStream),
+			_ignoreReservation(ignoreReservation)
 		{
 		}
 
@@ -163,6 +167,7 @@ namespace synthese
 					_whatToSearch,
 					_graphToUse,
 					_vmax,
+					_ignoreReservation,
 					_logStream,
 					_journeyTemplates
 				);
@@ -184,6 +189,7 @@ namespace synthese
 						_accessParameters,
 						_planningOrder,
 						_vmax,
+						_ignoreReservation,
 						_logStream
 					);
 					Result subResult(_MergeSubResultAndParentContinuousService(journey, tsr.run()));

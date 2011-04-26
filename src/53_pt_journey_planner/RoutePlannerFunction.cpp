@@ -703,7 +703,8 @@ namespace synthese
 				_endArrivalDate,
 				_planningOrder == DEPARTURE_FIRST ? _maxSolutionsNumber : optional<size_t>(),
 				_accessParameters,
-				DEPARTURE_FIRST
+				DEPARTURE_FIRST,
+				false
 			);
 
 			// Computing
@@ -826,7 +827,7 @@ namespace synthese
 					}
 					stream << ">";
 
-					if(journey.getReservationCompliance() != false)
+					if(journey.getReservationCompliance(false) != false)
 					{
 						set<const ReservationContact*> resaRules;
 						BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
@@ -835,7 +836,7 @@ namespace synthese
 							if(line == NULL) continue;
 
 							if(	line->getCommercialLine()->getReservationContact() &&
-								UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su))
+								UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, false))
 							){
 								resaRules.insert(line->getCommercialLine()->getReservationContact());
 							}
@@ -855,7 +856,7 @@ namespace synthese
 
 						stream << "<reservation" <<
 							" online=\"" << (onlineBooking ? "true" : "false") << "\"" <<
-							" type=\"" << (journey.getReservationCompliance() == true ? "compulsory" : "optional") << "\""
+							" type=\"" << (journey.getReservationCompliance(false) == true ? "compulsory" : "optional") << "\""
 						;
 						if(!sOpeningHours.str().empty())
 						{
@@ -2252,7 +2253,7 @@ namespace synthese
 			// Reservation
 			ptime now(second_clock::local_time());
 			ptime resaDeadLine(journey.getReservationDeadLine());
-			logic::tribool resaCompliance(journey.getReservationCompliance());
+			logic::tribool resaCompliance(journey.getReservationCompliance(false));
 			pm.insert(DATA_RESERVATION_AVAILABLE, resaCompliance && resaDeadLine > now);
 			pm.insert(DATA_RESERVATION_COMPULSORY, resaCompliance == true);
 			pm.insert(DATA_RESERVATION_DELAY, resaDeadLine.is_not_a_date_time() ? 0 : (resaDeadLine - now).total_seconds() / 60);
@@ -2279,9 +2280,9 @@ namespace synthese
 				if(line == NULL) continue;
 
 				if(	line->getCommercialLine()->getReservationContact() &&
-					UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su))
-					){
-						resaRules.insert(line->getCommercialLine()->getReservationContact());
+					UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, false))
+				){
+					resaRules.insert(line->getCommercialLine()->getReservationContact());
 				}
 			}
 			stringstream sPhones;
@@ -2291,7 +2292,7 @@ namespace synthese
 				sPhones <<
 					rc->getPhoneExchangeNumber() <<
 					" (" << rc->getPhoneExchangeOpeningHours() << ") "
-					;
+				;
 				if (!OnlineReservationRule::GetOnlineReservationRule(rc))
 				{
 					onlineBooking = false;

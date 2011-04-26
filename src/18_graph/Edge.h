@@ -285,17 +285,18 @@ namespace synthese
 					@retval departureMoment Accurate departure moment. Meaningless if -1 returned.
 					@retval minNextServiceIndex Index corresponding to the returned service
 				*/
-				ServicePointer getNextService (
+				ServicePointer getNextService(
 					std::size_t userClassRank,
 					boost::posix_time::ptime departureMoment,
 					const boost::posix_time::ptime& maxDepartureMoment,
 					bool controlIfTheServiceIsReachable,
 					boost::optional<DepartureServiceIndex::Value>& minNextServiceIndex,
-					bool inverted = false
+					bool inverted = false,
+					bool ignoreReservation = false
 				) const;
 
-			    
-			 
+
+
 				/** Provides previous arrival service number
 					@param arrivalMoment Presence hour at arrival place
 					@param minArrivalMoment Minimum arrival hour
@@ -314,9 +315,9 @@ namespace synthese
 					const boost::posix_time::ptime& minArrivalMoment,
 					bool controlIfTheServiceIsReachable,
 					boost::optional<ArrivalServiceIndex::Value>& maxPreviousServiceIndex,
-					bool inverted = false
+					bool inverted = false,
+					bool ignoreReservation = false
 				) const;
-			    
 			//@}
 
 			//! @name Update methods

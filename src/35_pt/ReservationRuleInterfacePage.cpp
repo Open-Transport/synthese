@@ -58,7 +58,7 @@ namespace synthese
 
 			ptime now(second_clock::local_time());
 			ptime deadLine(journey.getReservationDeadLine());
-			logic::tribool compliance(journey.getReservationCompliance());
+			logic::tribool compliance(journey.getReservationCompliance(false));
 
 			pm.insert(DATA_IS_OPTIONAL, logic::indeterminate(compliance) && (deadLine.is_not_a_date_time() || deadLine > now));
 			pm.insert(DATA_IS_COMPULSORY, compliance == true);

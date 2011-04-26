@@ -78,7 +78,8 @@ namespace synthese
 		void PTRoutePlannerResult::displayHTMLTable(
 			ostream& stream,
 			optional<HTMLForm&> resaForm,
-			const string& resaRadioFieldName
+			const string& resaRadioFieldName,
+			bool ignoreReservationDeadline
 		) const {
 
 			if(_journeys.empty())
@@ -123,8 +124,8 @@ namespace synthese
 				stream << t.row();
 				stream << t.col(7, string(), true);
 				if(	resaForm &&
-					it->getReservationCompliance() &&
-					it->getReservationDeadLine() > now
+					it->getReservationCompliance(ignoreReservationDeadline) &&
+					(ignoreReservationDeadline || it->getReservationDeadLine() > now)
 				){
 					string resaTime(
 						to_simple_string(it->getFirstDepartureTime().date()) +" "+to_simple_string(it->getFirstDepartureTime().time_of_day())
@@ -151,11 +152,11 @@ namespace synthese
 					endRange += it->getContinuousServiceRange();
 					stream << " - Service continu jusqu'à " << endRange;
 				}
-				if (it->getReservationCompliance() != false)
+				if (it->getReservationCompliance(ignoreReservationDeadline) != false)
 				{
 					stream << " - ";
 					
-					if(it->getReservationCompliance() == true)
+					if(it->getReservationCompliance(ignoreReservationDeadline) == true)
 					{
 						stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire") << " Réservation obligatoire";
 					}

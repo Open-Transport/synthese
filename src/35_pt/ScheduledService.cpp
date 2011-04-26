@@ -93,7 +93,8 @@ namespace synthese
 			const Edge& edge,
 			const ptime& presenceDateTime,
 			bool controlIfTheServiceIsReachable,
-			bool inverted
+			bool inverted,
+			bool ignoreReservation
 		) const {
 
 			// Initializations
@@ -151,7 +152,7 @@ namespace synthese
 
 			// Reservation control
 			if(	controlIfTheServiceIsReachable &&
-				ptr.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE
+				ptr.isUseRuleCompliant(ignoreReservation) == UseRule::RUN_NOT_POSSIBLE
 			){
 				return ServicePointer();
 			}		
@@ -249,10 +250,11 @@ namespace synthese
 						**it,
 						ptime(date, GetTimeOfDay(getDepartureSchedule(false, (*it)->getRankInPath()))),
 						false,
+						false,
 						false
 					)	);
 					if(!p.getService()) return UseRule::RESERVATION_FORBIDDEN;
-					return getUseRule(userClassRank).getReservationAvailability(p);
+					return getUseRule(userClassRank).getReservationAvailability(p, false);
 				}
 			}
 			assert(false);
@@ -276,6 +278,7 @@ namespace synthese
 						USER_PEDESTRIAN,
 						**it,
 						ptime(date, getDepartureSchedule(false, (*it)->getRankInPath())),
+						false,
 						false,
 						false
 					)	);
@@ -366,7 +369,9 @@ namespace synthese
 									minStartTime,
 									maxStartTime,
 									true,
-									minServiceIndex
+									minServiceIndex,
+									false,
+									true
 							)	);
 							// If no service, advance to the next path
 							if (!serviceInstance.getService()) continue;
@@ -440,6 +445,7 @@ namespace synthese
 					userClass,
 					*edge,
 					originTime,
+					false,
 					false,
 					false
 			)	);

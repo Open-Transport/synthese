@@ -359,7 +359,8 @@ namespace synthese
 							67,
 							approachJourney.size()+1
 						),
-						DEPARTURE_FIRST
+						DEPARTURE_FIRST,
+						false
 					);
 					
 					const PTRoutePlannerResult solution(rp.run());

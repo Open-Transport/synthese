@@ -186,7 +186,8 @@ namespace synthese
 					const Edge& edge,
 					const boost::posix_time::ptime& presenceDateTime,
 					bool controlIfTheServiceIsReachable,
-					bool inverted
+					bool inverted,
+					bool ignoreReservation
 				) const = 0;
 
 

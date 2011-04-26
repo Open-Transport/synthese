@@ -117,12 +117,14 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_DEPARTURE_RANK(Action_PARAMETER_PREFIX + "dr");
 		const string BookReservationAction::PARAMETER_ARRIVAL_RANK(Action_PARAMETER_PREFIX + "ar");
 
+		const string BookReservationAction::PARAMETER_IGNORE_RESERVATION_RULES(Action_PARAMETER_PREFIX + "irr");
 
 
 		BookReservationAction::BookReservationAction(
 		):	util::FactorableTemplate<server::Action, BookReservationAction>(),
 			_createCustomer(false),
-			_seatsNumber(1)
+			_seatsNumber(1),
+			_ignoreReservation(false)
 		{}
 
 
@@ -132,6 +134,7 @@ namespace synthese
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_CREATE_CUSTOMER, _createCustomer);
+			map.insert(PARAMETER_IGNORE_RESERVATION_RULES, _ignoreReservation);
 			if(_service.get() && _journey.size() == 1)
 			{
 				map.insert(PARAMETER_SERVICE_ID, _service->getKey());
@@ -223,6 +226,7 @@ namespace synthese
 		void BookReservationAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_createCustomer = map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false);
+			_ignoreReservation = map.getDefault<bool>(PARAMETER_IGNORE_RESERVATION_RULES, false);
 
 			if(map.getDefault<bool>(PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME, false))
 			{
@@ -438,8 +442,9 @@ namespace synthese
 					arrivalDateTime,
 					1,
 					_accessParameters,
-					DEPARTURE_FIRST
-					);
+					DEPARTURE_FIRST,
+					_ignoreReservation
+				);
 				PTRoutePlannerResult jr(rp.run());
 
 				if (jr.getJourneys().empty())
@@ -532,7 +537,7 @@ namespace synthese
 				}
 
 
-				if(	UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su))
+				if(	UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, _ignoreReservation))
 				){
 					if(	dynamic_cast<const JourneyPattern*>(su.getService()->getPath()) &&
 						static_cast<const JourneyPattern*>(su.getService()->getPath())->getCommercialLine()

@@ -96,10 +96,11 @@ namespace synthese
 					bool RTData,
 					bool getDeparture,
 					std::size_t userClassRank,
-					const graph::Edge& edge
-					, const boost::posix_time::ptime& presenceDateTime
-					, bool controlIfTheServiceIsReachable
-					, bool inverted
+					const graph::Edge& edge,
+					const boost::posix_time::ptime& presenceDateTime,
+					bool controlIfTheServiceIsReachable,
+					bool inverted,
+					bool ignoreReservation
 				) const;
 
 				virtual void completeServicePointer(

@@ -64,7 +64,8 @@ namespace synthese
 						67,
 						_withTransfer ? 2 : 1
 					),
-					DEPARTURE_FIRST
+					DEPARTURE_FIRST,
+					false
 				);
 				
 				PTRoutePlannerResult solution(rp.run());

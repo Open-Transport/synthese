@@ -132,8 +132,9 @@ namespace synthese
 		
 
 		UseRule::RunPossibilityType ServicePointer::isUseRuleCompliant(
+			bool ignoreReservation
 		) const	{
-			if(getUseRule().isRunPossible(*this) != UseRule::RUN_POSSIBLE)
+			if(getUseRule().isRunPossible(*this, ignoreReservation) != UseRule::RUN_POSSIBLE)
 			{
 				return UseRule::RUN_NOT_POSSIBLE;
 			}
@@ -219,7 +220,7 @@ namespace synthese
 		{
 			assert(_departureEdge);
 
-			UseRule::ReservationAvailabilityType resa(getUseRule().getReservationAvailability(*this));
+			UseRule::ReservationAvailabilityType resa(getUseRule().getReservationAvailability(*this, true));
 			if(	resa == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
 				resa == UseRule::RESERVATION_OPTIONAL_POSSIBLE
 			){

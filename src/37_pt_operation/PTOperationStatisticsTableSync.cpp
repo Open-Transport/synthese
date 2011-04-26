@@ -22,6 +22,9 @@
 
 #include "PTOperationStatisticsTableSync.hpp"
 #include "VehiclePositionTableSync.hpp"
+#include "ScheduledServiceTableSync.h"
+#include "JourneyPatternTableSync.hpp"
+#include "CommercialLineTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -29,6 +32,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace db;
+	using namespace pt;
 	
 	namespace pt_operation
 	{
@@ -88,7 +92,7 @@ namespace synthese
 		std::string PTOperationStatisticsTableSync::GetSQLColumn( Step step )
 		{
 			//TODO take into account of DBMS (this runs only with SQLite)
-			//if(step == LINE_STEP) return ReservationTableSync::COL_SERVICE_CODE;
+			if(step == LINE_STEP) return "(SELECT c."+ CommercialLineTableSync::COL_SHORT_NAME +" FROM "+ CommercialLineTableSync::TABLE.NAME +" AS c INNER JOIN "+ JourneyPatternTableSync::TABLE.NAME +" AS jp ON jp."+ JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID +"=c."+ TABLE_COL_ID +" INNER JOIN "+ ScheduledServiceTableSync::TABLE.NAME +" AS s ON s."+ ScheduledServiceTableSync::COL_PATHID +"=jp."+ TABLE_COL_ID +" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_SERVICE_ID +")";
 			if(step == SERVICE_STEP) return VehiclePositionTableSync::COL_SERVICE_ID;
 			if(step == DATE_STEP) return "strftime('%Y-%m-%d'," + VehiclePositionTableSync::COL_TIME +")";
 			if(step == HOUR_STEP) return "strftime('%H'," + VehiclePositionTableSync::COL_TIME +")";
@@ -104,7 +108,7 @@ namespace synthese
 		std::string PTOperationStatisticsTableSync::GetSQLGroupBy( Step step )
 		{
 			if(step == SERVICE_STEP) return VehiclePositionTableSync::COL_SERVICE_ID;
-			//if(step == LINE_STEP) return ReservationTableSync::COL_SERVICE_CODE;
+			if(step == LINE_STEP) return "(SELECT jp."+ JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID +" FROM "+ JourneyPatternTableSync::TABLE.NAME +" AS jp INNER JOIN "+ ScheduledServiceTableSync::TABLE.NAME +" AS s ON s."+ ScheduledServiceTableSync::COL_PATHID +"=jp."+ TABLE_COL_ID +" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_SERVICE_ID +")";
 			if(step == DATE_STEP) return "strftime('%Y-%m-%d'," + VehiclePositionTableSync::COL_TIME +")";
 			if(step == HOUR_STEP) return "strftime('%H'," + VehiclePositionTableSync::COL_TIME +")";
 			if(step == WEEK_DAY_STEP) return "strftime('%w'," + VehiclePositionTableSync::COL_TIME +")";
@@ -119,7 +123,7 @@ namespace synthese
 		{
 			stringstream s;
 			s << "(SELECT p2." << VehiclePositionTableSync::COL_METER_OFFSET << " FROM " << VehiclePositionTableSync::TABLE.NAME << " AS p2 WHERE p2." <<
-				VehiclePositionTableSync::COL_TIME << ">" << VehiclePositionTableSync::TABLE.NAME << "." << VehiclePositionTableSync::COL_TIME <<
+				VehiclePositionTableSync::COL_TIME << ">r." << VehiclePositionTableSync::COL_TIME <<
 				" AND p2." << VehiclePositionTableSync::COL_METER_OFFSET << ">0" <<
 				" ORDER BY p2." << VehiclePositionTableSync::COL_TIME << " LIMIT 1) - " << VehiclePositionTableSync::COL_METER_OFFSET;
 			return s.str();

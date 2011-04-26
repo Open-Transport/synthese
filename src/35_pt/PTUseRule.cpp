@@ -110,12 +110,18 @@ namespace synthese
 
 
 		UseRule::RunPossibilityType PTUseRule::isRunPossible(
-			const graph::ServicePointer& servicePointer
+			const graph::ServicePointer& servicePointer,
+			bool ignoreReservation
 		) const {
 
 			if(_accessCapacity && *_accessCapacity == 0)
 			{
 				return RUN_NOT_POSSIBLE;
+			}
+
+			if(ignoreReservation)
+			{
+				return RUN_POSSIBLE;
 			}
 
 			switch(_reservationType)
@@ -140,7 +146,7 @@ namespace synthese
 					else
 					{
 						return
-							IsReservationPossible(getReservationAvailability(servicePointer)) ?
+							IsReservationPossible(getReservationAvailability(servicePointer, ignoreReservation)) ?
 							RUN_POSSIBLE :
 							RUN_NOT_POSSIBLE
 						;
@@ -149,7 +155,7 @@ namespace synthese
 
 			case RESERVATION_RULE_COMPULSORY:
 				return
-					IsReservationPossible(getReservationAvailability(servicePointer)) ?
+					IsReservationPossible(getReservationAvailability(servicePointer, ignoreReservation)) ?
 					RUN_POSSIBLE :
 					RUN_NOT_POSSIBLE
 				;
@@ -161,7 +167,8 @@ namespace synthese
 
 
 		UseRule::ReservationAvailabilityType PTUseRule::getReservationAvailability(
-			const ServicePointer& servicePointer
+			const ServicePointer& servicePointer,
+			bool ignoreReservationDeadline
 		) const	{
 			if(!servicePointer.getDepartureEdge() && !servicePointer.getArrivalEdge())
 			{
@@ -175,6 +182,10 @@ namespace synthese
 
 			case RESERVATION_RULE_OPTIONAL:
 				{
+					if(ignoreReservationDeadline)
+					{
+						return RESERVATION_OPTIONAL_POSSIBLE;
+					}
 					ptime reservationTime(second_clock::local_time());
 					if(	reservationTime < getReservationOpeningTime(servicePointer)
 					){
@@ -203,6 +214,10 @@ namespace synthese
 				}
 
 			case RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE:
+				if(ignoreReservationDeadline)
+				{
+					return RESERVATION_OPTIONAL_POSSIBLE;
+				}
 				if(servicePointer.getDepartureEdge())
 				{
 					const Edge* departureEdge(servicePointer.getDepartureEdge());
@@ -235,6 +250,10 @@ namespace synthese
 
 			case RESERVATION_RULE_COMPULSORY:
 				{
+					if(ignoreReservationDeadline)
+					{
+						return RESERVATION_COMPULSORY_POSSIBLE;
+					}
 					ptime reservationTime(second_clock::local_time());
 					if(	reservationTime < getReservationOpeningTime(servicePointer)
 					){
