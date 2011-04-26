@@ -113,7 +113,7 @@ namespace synthese
 			if(step == HOUR_STEP) return "strftime('%H'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
 			if(step == WEEK_DAY_STEP) return "strftime('%w'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
 			if(step == WEEK_STEP) return "strftime('%W'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == MONTH_STEP) return "strftime('%W'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
+			if(step == MONTH_STEP) return "strftime('%Y-%m'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
 			if(step == YEAR_STEP) return "strftime('%Y'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
 			if(step == DEPARTURE_STOP_STEP) return ReservationTableSync::COL_DEPARTURE_PLACE_NAME;
 			if(step == DEPARTURE_CITY_STEP) return "cd." + CityTableSync::TABLE_COL_NAME;
@@ -134,7 +134,7 @@ namespace synthese
 			if(step == HOUR_STEP) return "strftime('%H'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
 			if(step == WEEK_DAY_STEP) return "strftime('%w'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
 			if(step == WEEK_STEP) return "strftime('%W'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == MONTH_STEP) return "strftime('%W'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
+			if(step == MONTH_STEP) return "strftime('%Y-%m'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
 			if(step == YEAR_STEP) return "strftime('%Y'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
 			if(step == DEPARTURE_STOP_STEP) return ReservationTableSync::COL_DEPARTURE_PLACE_ID;
 			if(step == DEPARTURE_CITY_STEP) return "sd." + StopAreaTableSync::TABLE_COL_CITYID;

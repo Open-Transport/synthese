@@ -25,6 +25,7 @@
 #include "ScheduledServiceTableSync.h"
 #include "JourneyPatternTableSync.hpp"
 #include "CommercialLineTableSync.h"
+#include "VehicleTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -98,8 +99,9 @@ namespace synthese
 			if(step == HOUR_STEP) return "strftime('%H'," + VehiclePositionTableSync::COL_TIME +")";
 			if(step == WEEK_DAY_STEP) return "strftime('%w'," + VehiclePositionTableSync::COL_TIME +")";
 			if(step == WEEK_STEP) return "strftime('%W'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == MONTH_STEP) return "strftime('%W'," + VehiclePositionTableSync::COL_TIME +")";
+			if(step == MONTH_STEP) return "strftime('%Y-%m'," + VehiclePositionTableSync::COL_TIME +")";
 			if(step == YEAR_STEP) return "strftime('%Y'," + VehiclePositionTableSync::COL_TIME +")";
+			if(step == VEHICLE_STEP) return "(SELECT v."+ VehicleTableSync::COL_NAME +" FROM "+ VehicleTableSync::TABLE.NAME +" AS v WHERE v."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_VEHICLE_ID +")";
 			return string();
 		}
 
@@ -113,8 +115,9 @@ namespace synthese
 			if(step == HOUR_STEP) return "strftime('%H'," + VehiclePositionTableSync::COL_TIME +")";
 			if(step == WEEK_DAY_STEP) return "strftime('%w'," + VehiclePositionTableSync::COL_TIME +")";
 			if(step == WEEK_STEP) return "strftime('%W'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == MONTH_STEP) return "strftime('%W'," + VehiclePositionTableSync::COL_TIME +")";
+			if(step == MONTH_STEP) return "strftime('%Y-%m'," + VehiclePositionTableSync::COL_TIME +")";
 			if(step == YEAR_STEP) return "strftime('%Y'," + VehiclePositionTableSync::COL_TIME +")";
+			if(step == VEHICLE_STEP) return "r."+ VehiclePositionTableSync::COL_VEHICLE_ID;
 		}
 
 
@@ -125,6 +128,7 @@ namespace synthese
 			s << "(SELECT p2." << VehiclePositionTableSync::COL_METER_OFFSET << " FROM " << VehiclePositionTableSync::TABLE.NAME << " AS p2 WHERE p2." <<
 				VehiclePositionTableSync::COL_TIME << ">r." << VehiclePositionTableSync::COL_TIME <<
 				" AND p2." << VehiclePositionTableSync::COL_METER_OFFSET << ">0" <<
+				" AND p2." << VehiclePositionTableSync::COL_VEHICLE_ID << "=r." << VehiclePositionTableSync::COL_VEHICLE_ID <<
 				" ORDER BY p2." << VehiclePositionTableSync::COL_TIME << " LIMIT 1) - " << VehiclePositionTableSync::COL_METER_OFFSET;
 			return s.str();
 		}
