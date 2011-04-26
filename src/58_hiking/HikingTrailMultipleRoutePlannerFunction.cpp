@@ -436,7 +436,8 @@ namespace synthese
 					endDate,
 					optional<size_t>(),
 					accessParameters,
-					DEPARTURE_FIRST
+					DEPARTURE_FIRST,
+					false
 				);
 
 				// Computing
@@ -497,7 +498,8 @@ namespace synthese
 					endDate,
 					optional<size_t>(),
 					accessParameters,
-					DEPARTURE_FIRST
+					DEPARTURE_FIRST,
+					false
 				);
 
 				// Computing

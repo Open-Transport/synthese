@@ -106,6 +106,7 @@ namespace synthese
 				const graph::GraphIdType			_graphToUse;
 				boost::optional<const JourneyTemplates&> _journeyTemplates;
 				const double						_vmax;
+				bool								_ignoreReservation;
 			//@}
 
 			//! @name Logging
@@ -166,6 +167,7 @@ namespace synthese
 				graph::GraphIdType			whatToSearch,
 				graph::GraphIdType			graphToUse,
 				double						vmax,
+				bool						ignoreReservation,
 				std::ostream* logStream = NULL,
 				boost::optional<const JourneyTemplates&> journeyTemplates = boost::optional<const JourneyTemplates&>()
 			);

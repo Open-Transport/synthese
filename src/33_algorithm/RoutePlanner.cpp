@@ -66,6 +66,7 @@ namespace synthese
 			graph::GraphIdType whatToSearch,
 			graph::GraphIdType graphToUse,
 			double vmax,
+			bool ignoreReservation,
 			std::ostream* logStream /*= NULL*/,
 			boost::optional<const JourneyTemplates&> journeyTemplates
 		):	_originVam(originVam),
@@ -85,7 +86,8 @@ namespace synthese
 				numeric_limits<int>::max()
 			),
 			_journeyTemplates(journeyTemplates),
-			_vmax(vmax)
+			_vmax(vmax),
+			_ignoreReservation(ignoreReservation)
 		{
 		}
 
@@ -248,6 +250,7 @@ namespace synthese
 				secondTime,
 				_maxDuration,
 				_vmax,
+				_ignoreReservation,
 				NULL,
 				_totalDistance,
 				_journeyTemplates

@@ -43,10 +43,11 @@ namespace synthese
 			bool RTData,
 			bool getDeparture,
 			size_t userClass,
-			const Edge& edge
-			, const ptime& presenceDateTime
-			, bool controlIfTheServiceIsReachable
-			, bool inverted
+			const Edge& edge,
+			const ptime& presenceDateTime,
+			bool controlIfTheServiceIsReachable,
+			bool inverted,
+			bool ignoreReservation
 		) const	{
 			ServicePointer sp(RTData, userClass, *this, presenceDateTime);
 			if(getDeparture)

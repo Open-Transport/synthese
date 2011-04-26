@@ -307,6 +307,7 @@ namespace synthese
 			v.push_back(make_pair(PTOperationStatisticsTableSync::MONTH_STEP, GetColumnName(PTOperationStatisticsTableSync::MONTH_STEP)));
 			v.push_back(make_pair(PTOperationStatisticsTableSync::YEAR_STEP, GetColumnName(PTOperationStatisticsTableSync::YEAR_STEP)));
 			v.push_back(make_pair(PTOperationStatisticsTableSync::LINE_STEP, GetColumnName(PTOperationStatisticsTableSync::LINE_STEP)));
+			v.push_back(make_pair(PTOperationStatisticsTableSync::SERVICE_STEP, GetColumnName(PTOperationStatisticsTableSync::SERVICE_STEP)));
 			return v;
 		}
 
@@ -320,6 +321,7 @@ namespace synthese
 			if(step == PTOperationStatisticsTableSync::MONTH_STEP) return "Mois";
 			if(step == PTOperationStatisticsTableSync::YEAR_STEP) return "Année";
 			if(step == PTOperationStatisticsTableSync::LINE_STEP) return "Ligne";
+			if(step == PTOperationStatisticsTableSync::SERVICE_STEP) return "Service";
 			return string();
 		}
 

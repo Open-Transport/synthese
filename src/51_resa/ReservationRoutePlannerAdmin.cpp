@@ -108,6 +108,7 @@ namespace synthese
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_PLANNING_ORDER("po");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_APPROACH_SPEED("apsp");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_ENABLED_PEDESTRIAN("epe");
+		const std::string ReservationRoutePlannerAdmin::PARAMETER_IGNORE_RESERVATION("ir");
 
 
 
@@ -119,7 +120,8 @@ namespace synthese
 			_seatsNumber(1),
 			_planningOrder(DEPARTURE_FIRST),
 			_enabledPedestrian(true),
-			_approachSpeed(0.833)//0.833 = 3km/h, 1.111 = 4km/h
+			_approachSpeed(0.833),//0.833 = 3km/h, 1.111 = 4km/h
+			_ignoreReservation(false)
 		{
 			_effectiveApproachSpeed = _approachSpeed;
 		}
@@ -146,6 +148,7 @@ namespace synthese
 			_disabledPassenger = map.getDefault<bool>(PARAMETER_DISABLED_PASSENGER, false);
 			_withoutTransfer = map.getDefault<bool>(PARAMETER_WITHOUT_TRANSFER, false);
 			_enabledPedestrian = map.getDefault<bool>(PARAMETER_ENABLED_PEDESTRIAN, true);
+			_ignoreReservation = map.getDefault<bool>(PARAMETER_IGNORE_RESERVATION, false);
 
 			if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
 			{
@@ -210,6 +213,7 @@ namespace synthese
 			m.insert(PARAMETER_SEATS_NUMBER, _seatsNumber);
 			m.insert(PARAMETER_PLANNING_ORDER, static_cast<int>(_planningOrder));
 			m.insert(PARAMETER_APPROACH_SPEED, _approachSpeed);
+			m.insert(PARAMETER_IGNORE_RESERVATION, _ignoreReservation);
 			if(_customer.get())
 			{
 				m.insert(PARAMETER_CUSTOMER_ID, _customer->getKey());
@@ -247,6 +251,7 @@ namespace synthese
 			{
 				resaRequest.getAction()->setSite(Env::GetOfficialEnv().getSPtr(ResaModule::GetJourneyPlannerWebsite()));
 			}
+			resaRequest.getAction()->setIgnoreReservationRules(_ignoreReservation);
 
 			StaticFunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request, true);
 			customerSearchRequest.getFunction()->setNumber(20);
@@ -325,6 +330,7 @@ namespace synthese
 			stream << st.cell("PMR", st.getForm().getOuiNonRadioInput(PARAMETER_DISABLED_PASSENGER, _disabledPassenger));
 			stream << st.cell("Sans correspondance", st.getForm().getOuiNonRadioInput(PARAMETER_WITHOUT_TRANSFER, _withoutTransfer));
 			stream << st.cell("Avec trajet piéton", st.getForm().getOuiNonRadioInput(PARAMETER_ENABLED_PEDESTRIAN, _enabledPedestrian));
+			stream << st.cell("Ignorer délai résa", st.getForm().getOuiNonRadioInput(PARAMETER_IGNORE_RESERVATION, _ignoreReservation));
 			stream << st.close();
 			stream << st.getForm().setFocus(PARAMETER_START_CITY);
 
@@ -405,7 +411,8 @@ namespace synthese
 					_planningOrder == DEPARTURE_FIRST ? maxArrivalTime : _dateTime,
 					5,
 					ap,
-					_planningOrder
+					_planningOrder,
+					_ignoreReservation
 				);
 				jv = r.run();
 			}
@@ -464,8 +471,9 @@ namespace synthese
 			bool withReservation(false);
 			for (PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().begin()); it != jv.getJourneys().end(); ++it)
 			{
-				if (it->getReservationCompliance() && it->getReservationDeadLine() > now)
-				{
+				if(	it->getReservationCompliance(_ignoreReservation) &&
+					(_ignoreReservation || it->getReservationDeadLine() > now)
+				){
 					withReservation = true;
 					resaRequest.getAction()->setJourney(*it);
 					resaRequest.getAction()->setOriginDestinationPlace(
@@ -478,9 +486,11 @@ namespace synthese
 			}
 			HTMLForm rf(resaRequest.getHTMLForm("resa"));
 			if (withReservation)
+			{
 				stream << rf.open();
+			}
 
-			jv.displayHTMLTable(stream, rf, BookReservationAction::PARAMETER_DATE_TIME);
+			jv.displayHTMLTable(stream, rf, BookReservationAction::PARAMETER_DATE_TIME, _ignoreReservation);
 
 			if(jv.getJourneys().empty())
 			{

@@ -81,6 +81,7 @@ namespace synthese
 			bool optim,
 			optional<posix_time::time_duration> maxDuration,
 			double vmax,
+			bool ignoreReservation,
 			ostream* const logStream,
 			int totalDistance,
 			boost::optional<const JourneyTemplates&> journeyTemplates
@@ -101,7 +102,8 @@ namespace synthese
 			_vmax(vmax),
 			_logStream(logStream),
 			_totalDistance(totalDistance),
-			_journeyTemplates(journeyTemplates)
+			_journeyTemplates(journeyTemplates),
+			_ignoreReservation(ignoreReservation)
 		{}
 
 
@@ -379,18 +381,20 @@ namespace synthese
 								?	edge.getNextService(
 										_accessParameters.getUserClassRank(),
 										departureMoment,
-										correctedMinMaxDateTimeAtOrigin
-										, true
-										, departureServiceNumber
-										, _inverted
+										correctedMinMaxDateTimeAtOrigin,
+										true,
+										departureServiceNumber,
+										_inverted,
+										_ignoreReservation
 									)
 								:	edge.getPreviousService(
 										_accessParameters.getUserClassRank(),
 										departureMoment,
-										correctedMinMaxDateTimeAtOrigin
-										, true
-										, arrivalServiceNumber
-										, _inverted
+										correctedMinMaxDateTimeAtOrigin,
+										true,
+										arrivalServiceNumber,
+										_inverted,
+										_ignoreReservation
 									)
 							);
 
@@ -473,7 +477,7 @@ namespace synthese
 
 								// Storage of the useful solution
 								ServicePointer serviceUse(serviceInstance, *curEdge, _accessParameters);
-								if (serviceUse.isUseRuleCompliant() == UseRule::RUN_NOT_POSSIBLE)
+								if (serviceUse.isUseRuleCompliant(_ignoreReservation) == UseRule::RUN_NOT_POSSIBLE)
 								{
 									nonServedEdges.insert(curEdge);
 									continue;

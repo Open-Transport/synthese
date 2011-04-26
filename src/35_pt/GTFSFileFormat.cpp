@@ -300,7 +300,7 @@ namespace synthese
 
 					// Point
 					shared_ptr<geos::geom::Point> point(
-						CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
+						_dataSource.getCoordinatesSystem()->createPoint(
 							lexical_cast<double>(_getValue("stop_lon")),
 							lexical_cast<double>(_getValue("stop_lat"))
 					)	);

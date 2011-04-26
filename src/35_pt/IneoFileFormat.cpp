@@ -96,7 +96,7 @@ namespace synthese
 		const std::string IneoFileFormat::Importer_::SEP(";");
 
 		const std::string IneoFileFormat::Importer_::PARAMETER_NETWORK_ID("net");
-		const std::string IneoFileFormat::Importer_::PARAMETER_IMPORT_STOP_AREA("isa");
+		const std::string IneoFileFormat::Importer_::PARAMETER_AUTO_IMPORT_STOPS("isa");
 		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string IneoFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
@@ -143,7 +143,7 @@ namespace synthese
 			util::Env& env,
 			const impex::DataSource& dataSource
 		):	MultipleFileTypesImporter<IneoFileFormat>(env, dataSource),
-			_importStopArea(false),
+			_autoImportStops(false),
 			_interactive(false),
 			_displayLinkedStops(false),
 			_stopPoints(_dataSource, _env),
@@ -190,7 +190,7 @@ namespace synthese
 
 					// Point
 					shared_ptr<geos::geom::Point> point(
-						CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
+						_dataSource.getCoordinatesSystem()->createPoint(
 							lexical_cast<double>(_getValue("X")),
 							lexical_cast<double>(_getValue("Y"))
 					)	);
@@ -230,10 +230,53 @@ namespace synthese
 								const_cast<StopArea*>(stopPoint->getConnectionPlace())->setName(name);
 							}
 						}
+						else
+						{
+							if(_autoImportStops)
+							{
+								StopArea* stopArea(NULL);
+								StopAreaTableSync::SearchResult stopAreas(StopAreaTableSync::Search(
+										_env,
+										_defaultCity->getKey(),
+										logic::indeterminate,
+										optional<string>(),
+										name
+								)	);
+								if(!stopAreas.empty())
+								{
+									stopArea = stopAreas.begin()->get();
+								}
+								else
+								{
+									stopArea = new StopArea;
+									StopArea* stopArea(
+										new StopArea(
+											StopAreaTableSync::getId(),
+											true,
+											_stopAreaDefaultTransferDuration
+									)	);
+									stopArea->setCity(_defaultCity.get());
+									stopArea->setName(name);
+									_env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
+								}
+								PTFileFormat::CreateOrUpdateStopPoints(
+									_stopPoints,
+									id,
+									name,
+									stopArea,
+									point.get(),
+									_defaultCity.get(),
+									_stopAreaDefaultTransferDuration,
+									_dataSource,
+									_env,
+									stream
+								);
+							}
+						}
 					}
 				}
 
-				if(!nonLinkedStopPoints.empty())
+				if(!nonLinkedStopPoints.empty() && !_autoImportStops)
 				{
 					if(request)
 					{
@@ -252,7 +295,7 @@ namespace synthese
 								_env,
 								_dataSource,
 								stream
-								);
+							);
 						}
 					}
 					return false;
@@ -408,7 +451,7 @@ namespace synthese
 			stream << t.title("Paramètres");
 			stream << t.cell("Réseau (ID)", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 			stream << t.cell("Affichage arrêts liés", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
-			stream << t.cell("Import zones d'arrêt", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOP_AREA, _importStopArea));
+			stream << t.cell("Import automatique arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_AUTO_IMPORT_STOPS, _autoImportStops));
 			stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
 			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
 			stream << t.close();
@@ -421,16 +464,16 @@ namespace synthese
 			DBTransaction transaction;
 
 			// Saving of each created or altered objects
-			if(_importStopArea)
+			if(_autoImportStops)
 			{
 				BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
 				{
 					StopAreaTableSync::Save(cstop.second.get(), transaction);
 				}
-			}
-			BOOST_FOREACH(Registry<StopPoint>::value_type stop, _env.getRegistry<StopPoint>())
-			{
-				StopPointTableSync::Save(stop.second.get(), transaction);
+				BOOST_FOREACH(Registry<StopPoint>::value_type stop, _env.getRegistry<StopPoint>())
+				{
+					StopPointTableSync::Save(stop.second.get(), transaction);
+				}
 			}
 			BOOST_FOREACH(const Registry<Junction>::value_type& junction, _env.getRegistry<Junction>())
 			{
@@ -543,7 +586,7 @@ namespace synthese
 		server::ParametersMap IneoFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap map;
-			map.insert(PARAMETER_IMPORT_STOP_AREA, _importStopArea);
+			map.insert(PARAMETER_AUTO_IMPORT_STOPS, _autoImportStops);
 			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
 			if(_defaultCity.get())
 			{
@@ -568,7 +611,7 @@ namespace synthese
 			{
 			}
 			
-			_importStopArea = map.getDefault<bool>(PARAMETER_IMPORT_STOP_AREA, false);
+			_autoImportStops = map.getDefault<bool>(PARAMETER_AUTO_IMPORT_STOPS, false);
 			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
 

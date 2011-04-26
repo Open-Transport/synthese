@@ -443,13 +443,15 @@ namespace synthese
 						while(true)
 						{
 							ServicePointer servicePointer(
-									ls->getNextService(
-											USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
-											departureDateTime
-											, endDateTime
-											, false
-											, index
-									)	);
+								ls->getNextService(
+									USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
+									departureDateTime,
+									endDateTime,
+									false,
+									index,
+									false,
+									false
+							)	);
 							if (!servicePointer.getService())
 								break;
 							++*index;

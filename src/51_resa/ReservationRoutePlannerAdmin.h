@@ -66,6 +66,7 @@ namespace synthese
 			double										_approachSpeed;
 			double										_effectiveApproachSpeed;
 			bool										_enabledPedestrian;
+			bool										_ignoreReservation;
 
 		public:
 			static const std::string PARAMETER_START_CITY;
@@ -81,6 +82,7 @@ namespace synthese
 			static const std::string PARAMETER_PLANNING_ORDER;
 			static const std::string PARAMETER_APPROACH_SPEED;
 			static const std::string PARAMETER_ENABLED_PEDESTRIAN;
+			static const std::string PARAMETER_IGNORE_RESERVATION;
 
 			ReservationRoutePlannerAdmin();
 			

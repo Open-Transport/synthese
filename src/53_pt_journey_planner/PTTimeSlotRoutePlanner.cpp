@@ -59,6 +59,7 @@ namespace synthese
 			const boost::optional<std::size_t> maxSolutionsNumber,
 			const graph::AccessParameters accessParameters,
 			const PlanningOrder planningOrder,
+			bool ignoreReservation,
 			std::ostream* logStream
 		):	TimeSlotRoutePlanner(
 				origin->getVertexAccessMap(
@@ -76,6 +77,7 @@ namespace synthese
 				accessParameters,
 				planningOrder,
 				100,
+				ignoreReservation,
 				logStream
 			),
 			_departurePlace(origin),
@@ -327,6 +329,7 @@ namespace synthese
 					_accessParameters,
 					_planningOrder,
 					100,
+					_ignoreReservation,
 					_logStream
 				);
 				return PTRoutePlannerResult(
@@ -349,6 +352,7 @@ namespace synthese
 					_accessParameters,
 					_planningOrder,
 					100,
+					_ignoreReservation,
 					_logStream
 				);
 				return PTRoutePlannerResult(

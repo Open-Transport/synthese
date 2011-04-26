@@ -166,7 +166,7 @@ namespace synthese
 				*/
 				int getMaxAlarmLevel () const;
 
-				boost::logic::tribool	getReservationCompliance() const;
+				boost::logic::tribool	getReservationCompliance(bool ignoreReservationDeadline) const;
 				boost::posix_time::ptime			getReservationDeadLine() const;
 			//@}
 

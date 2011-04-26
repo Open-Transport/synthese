@@ -147,9 +147,6 @@ namespace synthese
 				
 				/** Indicates whether or not a path can be taken at a given date, 
 					taking into account reservation delay rules.
-					@param originTime Time of start of the corresponding service
-					@param reservationTime Time of booking, if required.
-					@param departureTime Desired departure time.
 					@return true if the line run can be taken, false otherwise.
 
 					This methods checks the following conditions :
@@ -158,7 +155,8 @@ namespace synthese
 					dead line and be after reservation opening time.
 				*/
 				virtual RunPossibilityType isRunPossible (
-					const ServicePointer& servicePointer
+					const ServicePointer& servicePointer,
+					bool ignoreReservation
 				) const = 0;
 
 
@@ -174,7 +172,8 @@ namespace synthese
 						- reservation time must be later than reservation start time.
 				*/
 				virtual ReservationAvailabilityType getReservationAvailability(
-					const ServicePointer& servicePointer
+					const ServicePointer& servicePointer,
+					bool ignoreReservationDeadline
 				) const = 0;
 
 
