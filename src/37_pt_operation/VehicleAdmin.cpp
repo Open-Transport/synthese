@@ -224,6 +224,10 @@ namespace synthese
 				VehiclePosition::Meters lastMeters(0);
 				Depot* lastDepot(NULL);
 				StopPoint* lastStopPoint(NULL);
+				DepotTableSync::DepotsList placesList(
+					DepotTableSync::GetDepotsList(*_env, optional<string>("(pas de lieu)"))
+				);
+				set<StopPoint*> knownPlaces;
 				BOOST_FOREACH(shared_ptr<VehiclePosition> position, positions)
 				{
 					removeRequest.getAction()->setObjectId(position->getKey());
@@ -261,6 +265,11 @@ namespace synthese
 						stream << position->getStopPoint()->getConnectionPlace()->getFullName();
 						lastStopPoint = position->getStopPoint();
 						lastDepot = NULL;
+						if(knownPlaces.find(lastStopPoint) == knownPlaces.end())
+						{
+							knownPlaces.insert(lastStopPoint);
+							placesList.push_back(make_pair(lastStopPoint->getKey(), lastStopPoint->getConnectionPlace()->getFullName()));
+						}
 					}
 					else if(position->getDepot())
 					{
@@ -289,7 +298,7 @@ namespace synthese
 				stream << t.col() << t.getActionForm().getCalendarInput(VehiclePositionUpdateAction::PARAMETER_TIME, now);
 				stream << t.col() << t.getActionForm().getTextInput(VehiclePositionUpdateAction::PARAMETER_METER_OFFSET, lexical_cast<string>(meters));
 				stream << t.col() << t.getActionForm().getSelectInput(VehiclePositionUpdateAction::PARAMETER_STATUS, VehiclePosition::GetStatusList(), optional<VehiclePosition::Status>());
-				stream << t.col() << t.getActionForm().getSelectInput(VehiclePositionUpdateAction::PARAMETER_STOP_POINT_ID, DepotTableSync::GetDepotsList(*_env, optional<string>("(pas de lieu)")), optional<RegistryKeyType>(0));
+				stream << t.col() << t.getActionForm().getSelectInput(VehiclePositionUpdateAction::PARAMETER_STOP_POINT_ID, placesList, optional<RegistryKeyType>(0));
 				stream << t.col() << t.getActionForm().getSelectNumberInput(VehiclePositionUpdateAction::PARAMETER_PASSENGERS, 0, 99, 0);
 				stream << t.col() << t.getActionForm().getTextInput(VehiclePositionUpdateAction::PARAMETER_COMMENT, string());
 				stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
