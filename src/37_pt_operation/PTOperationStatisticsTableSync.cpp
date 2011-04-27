@@ -49,7 +49,7 @@ namespace synthese
 			bool hasColStep(colStep != NO_STEP);
 
 			s << "SELECT " <<
-				GetSQLWhat(what) << " AS result";
+				"SUM(" << GetSQLWhat(what) << ") AS result";
 				if(hasRowStep) s << "," << GetSQLColumn(rowStep) << " AS row";
 				if(hasColStep) s << "," << GetSQLColumn(colStep) << " AS col";
 			s << " FROM " << VehiclePositionTableSync::TABLE.NAME << " AS r " <<
