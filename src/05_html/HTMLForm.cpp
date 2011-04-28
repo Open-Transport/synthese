@@ -335,23 +335,11 @@ namespace synthese
 
 			stringstream s;
 			s	<< "<input "
-				<< "type=\"hidden\" "
-				<< "readonly=\"1\" "
+				<< "type=\"text\" "
 				<< "name=\"" << name << "\" "
 				<< "id=\"" << fieldId << "\" "
 				<< "value=\"" << (value.is_not_a_date_time() ? string() : to_iso_extended_string(value.date()) +" "+ to_simple_string(value.time_of_day())) << "\" "
-				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">";
-			if(value.is_not_a_date_time())
-			{
-				s << "(indéfini)";
-			}
-			else
-			{
-				s <<
-					value.date().day() << "/" << static_cast<int>(value.date().month()) << "/" << value.date().year() <<
-					" " << to_simple_string(value.time_of_day());
-			}
-			s	<< "</span>"
+				<< "/>"
 				<< "<img "
 				<< "src=\"calendar_edit.png\" "
 				<< "style=\"cursor:pointer\" "
@@ -363,7 +351,6 @@ namespace synthese
 				<< HTMLModule::GetHTMLJavascriptOpen()
 				<< "Calendar.setup({"
 				<< "inputField:\"" << fieldId << "\","
-				<< "displayArea:\"" << spanId << "\","
 				<< "button:\"" << triggerId << "\","
 				<< "showsTime : true,"
 				<< "ifFormat :\"%Y-%m-%d %H:%M\","
@@ -414,21 +401,11 @@ namespace synthese
 
 			stringstream s;
 			s	<< "<input "
-				<< "type=\"hidden\" "
-				<< "readonly=\"1\" "
+				<< "type=\"text\" "
 				<< "name=\"" << name << "\" "
 				<< "id=\"" << fieldId << "\" "
 				<< "value=\"" << (value.is_not_a_date() ? string() : to_iso_extended_string(value)) << "\" "
-				<< "/><span class=\"calendar_display\" id=\"" << spanId << "\">";
-			if(value.is_not_a_date())
-			{
-				s << "(indéfini)";
-			}
-			else
-			{
-				s << value.day() << "/" << static_cast<int>(value.month()) << "/" << value.year();
-			}
-			s	<< "</span>"
+				<< "/>"
 				<< "<img "
 				<< "src=\"calendar_edit.png\" "
 				<< "style=\"cursor:pointer\" "
@@ -440,7 +417,6 @@ namespace synthese
 				<< HTMLModule::GetHTMLJavascriptOpen()
 				<< "Calendar.setup({"
 				<< "inputField:\"" << fieldId << "\","
-				<< "displayArea:\"" << spanId << "\","
 				<< "button:\"" << triggerId << "\","
 				<< "showsTime : false,"
 				<< "ifFormat :\"%Y-%m-%d\","
