@@ -2483,7 +2483,7 @@ namespace synthese
 			}
 
 			pm.insert(DATA_IS_TERMINUS, isItTerminus);
-			pm.insert(DATA_STOP_AREA_NAME, dynamic_cast<const NamedPlace&>(*departurePhysicalStop->getHub()).getFullName());
+			pm.insert(DATA_STOP_AREA_NAME, dynamic_cast<const NamedPlace&>(*(departurePhysicalStop ? departurePhysicalStop : arrivalPhysicalStop)->getHub()).getFullName());
 
 			if(arrivalPhysicalStop)
 			{
