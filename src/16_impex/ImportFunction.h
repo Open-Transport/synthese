@@ -35,16 +35,16 @@ namespace synthese
 	{
 		class DataSource;
 		class FileFormat;
-		
+
 		/** Import Function class.
-			
+
 			Usage :
 			@code
 data_source=<id>
 path=file1,file2,file3,file4...
 do_import=0|1
 			@endcode
-			
+
 				data_source : id of the data source referring to the ImportDataSource table
 				path [compulsory] : each file to import (one per line) separated by comas
 				do_import :
@@ -54,8 +54,8 @@ do_import=0|1
 						- if a stop is missing in a line, all the routes of the line are ignored (even those which not use
 							acttually the missing stops). This ignored routes are displayed in the output
 						- the commercial lines are automatically created
-						
-				
+
+
 			@author Hugues Romain
 			@date 2009
 			@ingroup m16Functions refFunctions
@@ -79,9 +79,9 @@ do_import=0|1
 				bool							_doImport;
 				boost::shared_ptr<Importer>		_importer;
 			//@}
-			
+
 			std::string							_output;
-			
+
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map
 			*/
@@ -96,7 +96,7 @@ do_import=0|1
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain
 			void _setFromParametersMap(const server::ParametersMap& map);
-			
+
 		public:
 			/** Action to run, defined by each subclass.
 			*/

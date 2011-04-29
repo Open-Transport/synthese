@@ -7,7 +7,7 @@
 using namespace synthese::lexmatcher;
 
 
-std::vector<std::string> 
+std::vector<std::string>
 getTestBase1 ()
 {
     std::vector<std::string> testBase;
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE (testBasicMatches)
     BOOST_CHECK_EQUAL (std::string ("Peupliers, allée des"), matcher.bestMatch ("peupier").key);
     BOOST_CHECK_EQUAL (std::string ("Peupliers, allée des"), matcher.bestMatch ("peupier allée").key);
     BOOST_CHECK_EQUAL (std::string ("Peupliers, allée des"), matcher.bestMatch ("PeuPlieER").key);
-	
+
     BOOST_CHECK_EQUAL (std::string ("Division Leclerc, rue de la"), matcher.bestMatch ("rue div leclerc").key);
     BOOST_CHECK_EQUAL (std::string ("Division Leclerc, rue de la"), matcher.bestMatch ("ruedivleclerc").key);
     BOOST_CHECK_EQUAL (std::string ("Division Leclerc, rue de la"), matcher.bestMatch ("lecler").key);
@@ -96,11 +96,11 @@ BOOST_AUTO_TEST_CASE (testWholeWordMatchingCriterium)
 	testBase.push_back ("ANPE trucmuche");
 	testBase.push_back ("ANPE bidule");
 	testBase.push_back ("Anges");
-	    
-	    
+
+
 	LexicalMatcher<int> matcher;
 	for (size_t i=0; i<testBase.size (); ++i) matcher.add (testBase[i], 0);
-	    
+
 	BOOST_CHECK_EQUAL (std::string ("ANPE bidule"), matcher.bestMatch ("ANPE").key);
     }
     {
@@ -108,11 +108,11 @@ BOOST_AUTO_TEST_CASE (testWholeWordMatchingCriterium)
 	testBase.push_back ("Rue Sainte-Marie");
 	testBase.push_back ("Rue de Saint-Cyprien");
 	testBase.push_back ("Rue Saint-Cyr");
-	    
-	    
+
+
 	LexicalMatcher<int> matcher;
 	for (size_t i=0; i<testBase.size (); ++i) matcher.add (testBase[i], 0);
-	    
+
 	BOOST_CHECK_EQUAL (std::string ("Rue de Saint-Cyprien"), matcher.bestMatch ("rue saint-siprien").key);
     }
 }

@@ -62,7 +62,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			/** Authorization control.
 				@param request The current request
 				@return bool True if the displayed page can be displayed
@@ -72,7 +72,7 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& profile
 			) const;
-			
+
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param factoryKey Key of the parent class
 				@return PageLinks A link to the page if the parent is Home

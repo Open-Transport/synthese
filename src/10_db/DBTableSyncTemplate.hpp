@@ -60,7 +60,7 @@ namespace synthese
 		public:
 			////////////////////////////////////////////////////////////////////
 			/// Format of the table
-			/// The access to TABLE is public to allow the use of it in SQL 
+			/// The access to TABLE is public to allow the use of it in SQL
 			/// queries everywhere
 			static const DBTableSync::Format TABLE;
 
@@ -240,7 +240,7 @@ namespace synthese
 					@return DBResultSPtr The found result row
 					@throw DBEmptyResultException if the key was not found in the table
 					@author Hugues Romain
-					@date 2007				
+					@date 2007
 				*/
 				static DBResultSPtr _GetRow(util::RegistryKeyType key)
 				{
@@ -311,7 +311,7 @@ namespace synthese
 			*/
 			// TODO: rename to GetId() because it's static.
 			static util::RegistryKeyType getId()
-			{			
+			{
 				boost::mutex::scoped_lock mutex(*_idMutex);
 
 				util::RegistryObjectType retval = _autoIncrementValue++;
@@ -507,10 +507,10 @@ namespace synthese
 
 
 		template <class K>
-		boost::shared_ptr<boost::mutex> DBTableSyncTemplate<K>::_idMutex(new boost::mutex); 
+		boost::shared_ptr<boost::mutex> DBTableSyncTemplate<K>::_idMutex(new boost::mutex);
 
 		template <class K>
-		util::RegistryObjectType DBTableSyncTemplate<K>::_autoIncrementValue(1); 
+		util::RegistryObjectType DBTableSyncTemplate<K>::_autoIncrementValue(1);
 	}
 }
 

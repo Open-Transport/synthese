@@ -43,11 +43,11 @@ namespace synthese
 	using namespace interfaces;
 
 	template<> const string util::FactorableTemplate<RequestWithInterface,resa::ReservationEditFunction>::FACTORY_KEY("ReservationEditFunction");
-	
+
 	namespace resa
 	{
 		const string ReservationEditFunction::PARAMETER_RESERVATION_ID("ri");
-		
+
 		ParametersMap ReservationEditFunction::_getParametersMap() const
 		{
 			ParametersMap map(RequestWithInterface::_getParametersMap());
@@ -82,9 +82,9 @@ namespace synthese
 			VariablesMap v;
 			page->display(stream, *_resa, v, &request);
 		}
-		
-		
-		
+
+
+
 		bool ReservationEditFunction::isAuthorized(const server::Session* session) const
 		{
 			return true;

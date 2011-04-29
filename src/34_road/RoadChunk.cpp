@@ -59,8 +59,8 @@ namespace synthese
 			}
 		}
 
-		
-		
+
+
 		RoadChunk::~RoadChunk ()
 		{
 		}
@@ -71,21 +71,21 @@ namespace synthese
 		{
 			_parentPath = static_cast<Path*>(road);
 		}
-		
-		
+
+
 
 		bool RoadChunk::isDepartureAllowed() const
 		{
 			return true;
 		}
-		
-		
-		
+
+
+
 		bool RoadChunk::isArrivalAllowed() const
 		{
 			return true;
 		}
-		
+
 
 
 		Crossing* RoadChunk::getFromCrossing() const

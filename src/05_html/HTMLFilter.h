@@ -35,7 +35,7 @@ namespace synthese
 {
 	namespace html
 	{
-		/** Filters any stressed or special alphabetical character, which are replaced 
+		/** Filters any stressed or special alphabetical character, which are replaced
 			by the equivalent HTML entity.
 			@ingroup m05
 		*/
@@ -44,12 +44,12 @@ namespace synthese
 
 
 		public:
-		    
+
 			HTMLFilter () {}
 
 			/** @todo Complete filtering implementation for other special characters
 			 */
-			template<typename Sink> 
+			template<typename Sink>
 			std::streamsize write(Sink& dest, const char* s, std::streamsize n);
 
 		};
@@ -58,11 +58,11 @@ namespace synthese
 
 
 		template<typename Sink>
-		std::streamsize 
+		std::streamsize
 		HTMLFilter::write(Sink& dest, const char* s, std::streamsize n)
 		{
 			int i = 0;
-			    
+
 			while (i != n) {
 			const std::string* ref = 0;
 
@@ -71,7 +71,7 @@ namespace synthese
 				char c = s[i];
 
 				// Test ASCII characters
-				// if (c == 'X') ref = &XXXX_HTML_ENTITY; // 
+				// if (c == 'X') ref = &XXXX_HTML_ENTITY; //
 
 				// to be completed...
 
@@ -81,7 +81,7 @@ namespace synthese
 				boost::iostreams::put(dest, c);
 				}
 				i++;
-			} 
+			}
 			else if ( n-i >= 2 )
 			{
 				// Test some special characters encoded on 2 bytes (UTF-8)
@@ -100,7 +100,7 @@ namespace synthese
 				else if (c == 0xC382) ref = &UPCASE_ACIRC_HTML_ENTITY; // Â
 				else if (c == 0xC384) ref = &UPCASE_AUML_HTML_ENTITY; // Ä
 
-				else if (c == 0xC3A9) ref = &EACUTE_HTML_ENTITY; // é 
+				else if (c == 0xC3A9) ref = &EACUTE_HTML_ENTITY; // é
 				else if (c == 0xC3A8) ref = &EGRAVE_HTML_ENTITY; // è
 				else if (c == 0xC3AA) ref = &ECIRC_HTML_ENTITY; // ê
 				else if (c == 0xC3AB) ref = &EUML_HTML_ENTITY; // ë
@@ -110,7 +110,7 @@ namespace synthese
 				else if (c == 0xC38A) ref = &UPCASE_ECIRC_HTML_ENTITY; // Ê
 				else if (c == 0xC38B) ref = &UPCASE_EUML_HTML_ENTITY; // Ë
 
-				else if (c == 0xC3AD) ref = &IACUTE_HTML_ENTITY; // í 
+				else if (c == 0xC3AD) ref = &IACUTE_HTML_ENTITY; // í
 				else if (c == 0xC3AC) ref = &IGRAVE_HTML_ENTITY; // ì
 				else if (c == 0xC3AF) ref = &IUML_HTML_ENTITY; // ï
 				else if (c == 0xC3AE) ref = &ICIRC_HTML_ENTITY; // î
@@ -143,14 +143,14 @@ namespace synthese
 				else if (c == 0xC3A7) ref = &CCEDIL_HTML_ENTITY; // ç
 				else if (c == 0xC387) ref = &UPCASE_CCEDIL_HTML_ENTITY; // ç
 
-			    
+
 				if (ref != 0) {
 				boost::iostreams::write(dest, ref->c_str (), ref->size ());
 				} else {
 				boost::iostreams::put(dest, s[i]);
 				boost::iostreams::put(dest, s[i+1]);
 				}
-				
+
 
 				i++;
 				i++;
@@ -160,12 +160,12 @@ namespace synthese
 				i++;
 			}
 
-			
+
 			}
 			return i;
 		}
 
-		
+
 	}
 }
 

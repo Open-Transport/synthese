@@ -40,7 +40,7 @@ namespace synthese
 			RegistryKeyType id
 		):	Registrable(id)
 		{
-	
+
 		}
 	}
 }

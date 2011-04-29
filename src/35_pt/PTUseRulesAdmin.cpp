@@ -69,7 +69,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void PTUseRulesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -94,7 +94,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool PTUseRulesAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -166,9 +166,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const PTModule*>(&module) &&
 				_request.getUser() &&
 				_request.getUser()->getProfile() &&
@@ -176,17 +176,17 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks PTUseRulesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
 
 			PTUseRuleTableSync::SearchResult ptrules(PTUseRuleTableSync::Search(Env::GetOfficialEnv()));
@@ -196,7 +196,7 @@ namespace synthese
 				const PTUseRulesAdmin* ua(
 					dynamic_cast<const PTUseRulesAdmin*>(&currentPage)
 				);
-			
+
 				if(ua)
 				{
 					shared_ptr<PTUseRuleAdmin> p(getNewPage<PTUseRuleAdmin>());
@@ -204,7 +204,7 @@ namespace synthese
 					links.push_back(p);
 				}
 			}
-			
+
 			return links;
 		}
 	}

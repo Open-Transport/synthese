@@ -33,48 +33,48 @@ namespace map
 
 
 
-	
+
     /** Calculates the oriented angle formed by vectors -ba> and -bc>.
      * @return The angle in radians on [-PI..PI] domain.
      */
-    double calculateAngle (const geos::geom::Coordinate& a, 
-			   const geos::geom::Coordinate& b, 
+    double calculateAngle (const geos::geom::Coordinate& a,
+			   const geos::geom::Coordinate& b,
 			   const geos::geom::Coordinate& c);
 
 
     /** Calculates the euclidian distance between points a and b.
      * @return The calculated distance.
      */
-    double calculateDistance (const geos::geom::Coordinate& a, 
+    double calculateDistance (const geos::geom::Coordinate& a,
 			      const geos::geom::Coordinate& b);
-	
+
 
     /** Returns symetric of a regarding b
      */
-    geos::geom::Coordinate calculateSymetric (const geos::geom::Coordinate& a, 
+    geos::geom::Coordinate calculateSymetric (const geos::geom::Coordinate& a,
 					    const geos::geom::Coordinate& b);
-    
-	
+
+
     std::pair<double, double>
-	calculateAffineEquation (const geos::geom::Coordinate& p0, 
+	calculateAffineEquation (const geos::geom::Coordinate& p0,
 				 const geos::geom::Coordinate& p1);
-	
 
-	
 
-    /** Calculates the intersection between two affines defined by 
+
+
+    /** Calculates the intersection between two affines defined by
      * y = a1.x + b1
      * y = a2.x + b2
      *
-     * @param a1 
-     * @param b1 
-     * @param a2 
-     * @param b2 
+     * @param a1
+     * @param b1
+     * @param a2
+     * @param b2
      * @return The intersection point.
      */
-    geos::geom::Coordinate calculateIntersection (double a1, 
-						double b1, 
-						double a2, 
+    geos::geom::Coordinate calculateIntersection (double a1,
+						double b1,
+						double a2,
 						double b2);
 
 
@@ -82,18 +82,18 @@ namespace map
      * The first affine is defined by two points  : p0 and p1.
      * The second affine is defined by two points : p2 and p3.
      *
-     @param p0 
-     @param p1 
-     @param p2 
-     @param p3 
+     @param p0
+     @param p1
+     @param p2
+     @param p3
      @return The intersection point.
     */
     geos::geom::Coordinate calculateIntersection (
-	const geos::geom::Coordinate& p0, 
-	const geos::geom::Coordinate& p1, 
-	const geos::geom::Coordinate& p2, 
+	const geos::geom::Coordinate& p0,
+	const geos::geom::Coordinate& p1,
+	const geos::geom::Coordinate& p2,
 	const geos::geom::Coordinate& p3);
-    
+
 
 
 }

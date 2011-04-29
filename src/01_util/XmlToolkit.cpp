@@ -16,7 +16,7 @@ namespace util
 {
 
 
-int 
+int
 XmlToolkit::GetChildNodeCount (XMLNode& node,
 			       const std::string& nodeName)
 {
@@ -25,9 +25,9 @@ XmlToolkit::GetChildNodeCount (XMLNode& node,
 
 
 
-    
-XMLNode 
-XmlToolkit::GetChildNode (XMLNode& node, 
+
+XMLNode
+XmlToolkit::GetChildNode (XMLNode& node,
 			  const std::string& nodeName,
 			  int index)
 {
@@ -36,7 +36,7 @@ XmlToolkit::GetChildNode (XMLNode& node,
 
 
 
-XMLNode 
+XMLNode
 XmlToolkit::ParseString (const std::string& xmlString, const std::string& rootNodeTag)
 {
     return XMLNode::parseString (xmlString.c_str (), rootNodeTag.c_str ());
@@ -46,8 +46,8 @@ XmlToolkit::ParseString (const std::string& xmlString, const std::string& rootNo
 
 
 
-XMLNode 
-XmlToolkit::ParseFile (const boost::filesystem::path& file, 
+XMLNode
+XmlToolkit::ParseFile (const boost::filesystem::path& file,
 		       const std::string& rootNodeTag)
 {
     return XMLNode::openFileHelper (file.string ().c_str (), rootNodeTag.c_str ());
@@ -55,13 +55,13 @@ XmlToolkit::ParseFile (const boost::filesystem::path& file,
 
 
 
-    
-const char* 
-XmlToolkit::CheckForRequiredAttr (XMLNode& node, 
+
+const char*
+XmlToolkit::CheckForRequiredAttr (XMLNode& node,
 				  const std::string& attrName)
 {
     const char* attrValue = node.getAttribute (attrName.c_str ());
-    if (attrValue == 0) 
+    if (attrValue == 0)
     {
 		std::stringstream msg;
 		msg << "No such attribute '" << attrName << "' on element <" <<
@@ -73,8 +73,8 @@ XmlToolkit::CheckForRequiredAttr (XMLNode& node,
 
 
 
-bool 
-XmlToolkit::HasAttr (XMLNode& node, 
+bool
+XmlToolkit::HasAttr (XMLNode& node,
 		     const std::string& attrName)
 {
     return node.getAttribute (attrName.c_str ()) != 0;
@@ -82,7 +82,7 @@ XmlToolkit::HasAttr (XMLNode& node,
 
 
 
-std::string 
+std::string
 XmlToolkit::GetStringAttr (XMLNode& node,
 			   const std::string& attrName)
 {
@@ -92,20 +92,20 @@ XmlToolkit::GetStringAttr (XMLNode& node,
 
 
 
-std::string 
-XmlToolkit::GetStringAttr (XMLNode& node, 
+std::string
+XmlToolkit::GetStringAttr (XMLNode& node,
 			   const std::string& attrName,
 			   const std::string& defaultValue)
 {
     const char* attrValue = node.getAttribute (attrName.c_str ());
-    return (attrValue == 0) 
+    return (attrValue == 0)
 	? defaultValue : std::string (attrValue);
 
 }
 
 
-    
-bool 
+
+bool
 XmlToolkit::GetBoolAttr (XMLNode& node,
 			 const std::string& attrName)
 {
@@ -114,45 +114,45 @@ XmlToolkit::GetBoolAttr (XMLNode& node,
 }
 
 
-bool 
-XmlToolkit::GetBoolAttr (XMLNode& node, 
+bool
+XmlToolkit::GetBoolAttr (XMLNode& node,
 			 const std::string& attrName,
 			 bool defaultValue)
 {
     const char* attrValue = node.getAttribute (attrName.c_str ());
-    return (attrValue == 0) 
+    return (attrValue == 0)
 	? defaultValue : Conversion::ToBool (attrValue);
 }
 
 
 
 
-boost::logic::tribool 
-XmlToolkit::GetTriboolAttr (XMLNode& node, 
+boost::logic::tribool
+XmlToolkit::GetTriboolAttr (XMLNode& node,
 			    const std::string& attrName)
 {
     const char* attrValue = CheckForRequiredAttr (node, attrName);
     return Conversion::ToTribool (attrValue);
 }
-    
 
 
 
-boost::logic::tribool 
-XmlToolkit::GetTriboolAttr (XMLNode& node, 
+
+boost::logic::tribool
+XmlToolkit::GetTriboolAttr (XMLNode& node,
 			    const std::string& attrName,
 			    boost::logic::tribool defaultValue)
 {
     const char* attrValue = node.getAttribute (attrName.c_str ());
-    return (attrValue == 0) 
+    return (attrValue == 0)
 	? defaultValue : Conversion::ToTribool (attrValue);
 }
- 
 
-   
 
-    
-int 
+
+
+
+int
 XmlToolkit::GetIntAttr (XMLNode& node,
 			const std::string& attrName)
 {
@@ -161,19 +161,19 @@ XmlToolkit::GetIntAttr (XMLNode& node,
 }
 
 
-int 
-XmlToolkit::GetIntAttr (XMLNode& node, 
+int
+XmlToolkit::GetIntAttr (XMLNode& node,
 			const std::string& attrName,
 			int defaultValue)
 {
     const char* attrValue = node.getAttribute (attrName.c_str ());
-    return (attrValue == 0) 
+    return (attrValue == 0)
 	? defaultValue : Conversion::ToInt (attrValue);
 }
 
 
-    
-long 
+
+long
 XmlToolkit::GetLongAttr (XMLNode& node,
 			 const std::string& attrName)
 {
@@ -182,19 +182,19 @@ XmlToolkit::GetLongAttr (XMLNode& node,
 }
 
 
-long 
-XmlToolkit::GetLongAttr (XMLNode& node, 
+long
+XmlToolkit::GetLongAttr (XMLNode& node,
 			 const std::string& attrName,
 			 long defaultValue)
 {
     const char* attrValue = node.getAttribute (attrName.c_str ());
-    return (attrValue == 0) 
+    return (attrValue == 0)
 	? defaultValue : Conversion::ToLong (attrValue);
 }
 
 
 
-long long 
+long long
 XmlToolkit::GetLongLongAttr (XMLNode& node,
 			     const std::string& attrName)
 {
@@ -203,19 +203,19 @@ XmlToolkit::GetLongLongAttr (XMLNode& node,
 }
 
 
-long long 
-XmlToolkit::GetLongLongAttr (XMLNode& node, 
+long long
+XmlToolkit::GetLongLongAttr (XMLNode& node,
 			     const std::string& attrName,
 			     long long defaultValue)
 {
     const char* attrValue = node.getAttribute (attrName.c_str ());
-    return (attrValue == 0) 
+    return (attrValue == 0)
 	? defaultValue : Conversion::ToLongLong (attrValue);
 }
 
 
 
-double 
+double
 XmlToolkit::GetDoubleAttr (XMLNode& node,
 			   const std::string& attrName)
 {
@@ -224,13 +224,13 @@ XmlToolkit::GetDoubleAttr (XMLNode& node,
 }
 
 
-double 
-XmlToolkit::GetDoubleAttr (XMLNode& node, 
+double
+XmlToolkit::GetDoubleAttr (XMLNode& node,
 			   const std::string& attrName,
 			   double defaultValue)
 {
     const char* attrValue = node.getAttribute (attrName.c_str ());
-    return (attrValue == 0) 
+    return (attrValue == 0)
 	? defaultValue : Conversion::ToDouble (attrValue);
 
 }

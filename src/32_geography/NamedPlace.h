@@ -97,7 +97,7 @@ namespace synthese
 						- the name13 record if defined
 						- the 13 first characters of the name else
 					@author Hugues Romain
-					@date 2007				
+					@date 2007
 				*/
 				std::string getName13OrName() const;
 
@@ -106,7 +106,7 @@ namespace synthese
 						- the name26 record if defined
 						- the 26 first characters of the name else
 					@author Hugues Romain
-					@date 2007				
+					@date 2007
 				*/
 				std::string getName26OrName() const;
 

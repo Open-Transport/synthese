@@ -43,7 +43,7 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<Action, security::AddRightAction>::FACTORY_KEY("ara");
 	}
-	
+
 	namespace security
 	{
 		const string AddRightAction::PARAMETER_PROFILE_ID(Action_PARAMETER_PREFIX + "p");
@@ -72,7 +72,7 @@ namespace synthese
 				_rightName = map.get<string>(PARAMETER_RIGHT);
 				if (!Factory<Right>::contains(_rightName))
 					throw ActionException("Specified right class not found");
-				
+
 				_parameter = map.get<string>(PARAMETER_PARAMETER);
 				_publicLevel = static_cast<RightLevel>(
 					map.get<int>(PARAMETER_PUBLIC_LEVEL)
@@ -109,14 +109,14 @@ namespace synthese
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
 			/// @todo Add a control on the profile on the user who creates the new profile
 		}
-		
+
 		void AddRightAction::setProfile(boost::shared_ptr<Profile> value)
 		{
 			_profile = value;
 		}
-	
-	
-	
+
+
+
 		void AddRightAction::setProfile(boost::shared_ptr<const Profile> value)
 		{
 			_profile = const_pointer_cast<Profile>(value);

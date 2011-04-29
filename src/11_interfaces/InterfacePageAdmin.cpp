@@ -67,7 +67,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void InterfacePageAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -96,7 +96,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool InterfacePageAdmin::isAuthorized(
 			const security::User& user
 		) const	{

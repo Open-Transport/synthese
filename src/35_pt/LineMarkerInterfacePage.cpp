@@ -39,7 +39,7 @@ namespace synthese
 	using namespace server;
 	using namespace cms;
 	using namespace server;
-	
+
 
 	template<> const string util::FactorableTemplate<InterfacePage,pt::LineMarkerInterfacePage>::FACTORY_KEY("line_marker");
 

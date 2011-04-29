@@ -39,8 +39,8 @@ namespace synthese
 			@ingroup m35LS refLS
 
 			Connection places table :
-				- on insert : 
-				- on update : 
+				- on insert :
+				- on update :
 				- on delete : X
 		*/
 		class StopAreaTableSync:

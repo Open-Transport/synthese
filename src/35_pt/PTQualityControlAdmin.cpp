@@ -74,7 +74,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void PTQualityControlAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -91,7 +91,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool PTQualityControlAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -147,7 +147,7 @@ namespace synthese
 					;
 				}
 			}
-			
+
 			if (openTabContent(stream, TAB_CITIES_WITHOUT_MAIN_STOP))
 			{
 				if(_runControl && getCurrentTab() == getActiveTab())
@@ -197,9 +197,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const PTModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -207,7 +207,7 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 

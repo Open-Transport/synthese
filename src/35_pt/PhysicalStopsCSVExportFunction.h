@@ -45,23 +45,23 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_BBOX;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::optional<geos::geom::Envelope> _bbox;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
 			/// @author Hugues
 			/// @date 2010
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
@@ -70,8 +70,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 
 			//////////////////////////////////////////////////////////////////////////
@@ -90,9 +90,9 @@ namespace synthese
 				std::ostream& stream,
 				const server::Request& request
 			) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @return true if the function can be run

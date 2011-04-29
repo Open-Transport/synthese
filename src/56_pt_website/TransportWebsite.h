@@ -43,7 +43,7 @@ namespace synthese
 	{
 		class Place;
 	}
-	
+
 	namespace graph
 	{
 		class AccessParameters;
@@ -87,9 +87,9 @@ namespace synthese
 			typedef util::Registry<TransportWebsite>	Registry;
 
 			typedef std::vector<HourPeriod> Periods;
-			
+
 			typedef std::map<std::size_t,RollingStockFilter*> RollingStockFilters;
-			
+
 		private:
 			//! \name Environment
 			//@{
@@ -173,12 +173,12 @@ namespace synthese
 					graph::UserClassCode parameter,
 					const graph::AccessParameters::AllowedPathClasses& allowedPathClasses
 				) const;
-	
+
 				const geography::GeographyModule::CitiesMatcher&			getCitiesMatcher() const;
 
 				const boost::gregorian::date				getMinUseDate() const;
 				const boost::gregorian::date				getMaxUseDate() const;
-				
+
 
 				/** Interprets date from text and environment data.
 					@param text Text to interpret
@@ -198,13 +198,13 @@ namespace synthese
 				*/
 				boost::gregorian::date interpretDate( const std::string& text ) const;
 
-					
+
 				/** Apply this period to given dates.
 					@param startTime The start time object to update.
 					@param endTime The end time object to update.
 					@param calculationTime Time of calculation.
 					@param pastSolutions Past solutions filter (true = past solutions kept)
-					@return true if the applied period of time is valid (ie if the required period is not anterior 
+					@return true if the applied period of time is valid (ie if the required period is not anterior
 						to current time or if the pastSolutions filter is active).
 
 					This method does the following :
@@ -219,7 +219,7 @@ namespace synthese
 					const HourPeriod& period
 					, boost::posix_time::ptime& startTime
 					, boost::posix_time::ptime& endTime
-				) const;				
+				) const;
 
 				/** Find the best place corresponding to a city name and a place name.
 					@param cityName City name

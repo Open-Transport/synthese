@@ -122,7 +122,7 @@ namespace synthese
 			return time_duration(23,59,59);
 		}
 
-	
+
 
 		bool PermanentService::isContinuous() const
 		{

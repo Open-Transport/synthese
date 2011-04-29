@@ -40,7 +40,7 @@ namespace synthese
 	{
 		class DisplayType;
 		class DisplayScreenCPU;
-		
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Display screen technical properties update.
 		///	@ingroup m54Actions refActions
@@ -76,7 +76,7 @@ namespace synthese
 			std::string									_macAddress;
 			DisplayScreen::SubScreenType				_subScreenType;
 
-			
+
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 				@warning Not yet implemented;

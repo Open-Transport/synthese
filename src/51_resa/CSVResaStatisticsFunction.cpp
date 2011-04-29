@@ -42,7 +42,7 @@ namespace synthese
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<Function,resa::CSVResaStatisticsFunction>::FACTORY_KEY("CSVResaStatisticsFunction");
-	
+
 	namespace resa
 	{
 		const std::string CSVResaStatisticsFunction::PARAM_LINE_ID("li");
@@ -50,7 +50,7 @@ namespace synthese
 		const std::string CSVResaStatisticsFunction::PARAM_SEARCH_END_DATE("ed");
 		const std::string CSVResaStatisticsFunction::PARAM_ROW_STEP("rs");
 		const std::string CSVResaStatisticsFunction::PARAM_COL_STEP("cs");
-		
+
 		ParametersMap CSVResaStatisticsFunction::_getParametersMap() const
 		{
 			ParametersMap m;
@@ -185,9 +185,9 @@ namespace synthese
 				stream << totalSum << "\r\n";
 			}
 		}
-		
-		
-		
+
+
+
 		bool CSVResaStatisticsFunction::isAuthorized(const server::Session* session) const
 		{
 			if (!_line.get())

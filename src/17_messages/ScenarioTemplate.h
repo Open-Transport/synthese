@@ -43,7 +43,7 @@ namespace synthese
 		/// Scenario template class.
 		///	@ingroup m17
 		///
-		/// Variables handling : scan all the contained messages to find all 
+		/// Variables handling : scan all the contained messages to find all
 		/// variables declarations and fill in the _variables attribute
 		class ScenarioTemplate
 		:	public Scenario
@@ -72,9 +72,9 @@ namespace synthese
 		public:
 			/// @name constructors and destructor
 			//@{
-			
+
 				/** Basic constructor.
-				 * 
+				 *
 				 * @param name Name of the scenario template
 				 * @param folderId ID of the folder of the scenario
 				 */
@@ -82,18 +82,18 @@ namespace synthese
 					const std::string name = std::string(),
 					ScenarioFolder* folder = NULL
 				);
-				
-				
+
+
 				/** Copy constructor.
-				 * 
-				 * @param source 
-				 * @param name 
+				 *
+				 * @param source
+				 * @param name
 				 */
 				ScenarioTemplate(
 					const ScenarioTemplate& source,
 					const std::string& name
 				);
-				
+
 				ScenarioTemplate(util::RegistryKeyType key);
 				~ScenarioTemplate();
 			//@}
@@ -114,8 +114,8 @@ namespace synthese
 			//@{
 			//@}
 
-			
-			
+
+
 			/** Parses a string to find variables informations and stores it into a variables list.
 				@param text text to parse
 				@param result variables list to populate
@@ -134,22 +134,22 @@ namespace synthese
 				ScenarioTemplate::VariablesMap& result
 			);
 
-		
-			
+
+
 			/** Creates a string from the template text and the variables content.
 				@param text text to parse
 				@param values variables values
 				@return std::string generated text
 				@author Hugues Romain
 				@date 2009
-				
+
 				The following replacements are done by the method:
 				 - $xxx$ => value of the xxx variable (nothing if undefined)
 				 - $$xxx$ => value of the xxx variable (nothing if undefined)
 				 - $$$ => $
 				 - $xxx|yyy$ => value of the xxx variable (nothing if undefined)
 				 - $$xxx|yyy$ => value of the xxx variable (nothing if undefined)
-				
+
 				@warning the presence of compulsory variables is not controlled by this method. Use ControlCompulsoryVariables to do it.
 			*/
 			static std::string WriteTextFromVariables(
@@ -158,8 +158,8 @@ namespace synthese
 			);
 
 
-			
-			
+
+
 			/** Controls that all compulsory variables are valued.
 				@param variables variables informations
 				@param values values of the variables

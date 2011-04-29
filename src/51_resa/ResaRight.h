@@ -41,13 +41,13 @@ namespace synthese
 				- READ : The user read the list of his own reservations
 				- WRITE : The user can do a reservation for himself
 				- DELETE : The user can cancel a reservation created by himself
-				
+
 			Public rights :
 				- USE : Nothing
 				- READ : The user can read the list of all the reservations
 				- WRITE : The user can do a reservation for anyone
 				- DELETE : The user can cancel any reservation
-				
+
 			Perimeter definition :
 				- CommercialLine object : the rules apply only on reservation for the specified line
 				- TransportNetwork : the rules apply only on reservations for lines of the specified network

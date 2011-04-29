@@ -28,7 +28,7 @@
 #include <string>
 #include <iostream>
 
-/// @defgroup refExceptions Exceptions 
+/// @defgroup refExceptions Exceptions
 ///	@ingroup ref
 
 namespace synthese
@@ -51,13 +51,13 @@ namespace synthese
 		Exception(const synthese::Exception& ref );
 
 		virtual ~Exception () throw ();
-	    
+
 
 		//! @name Getters/Setters
 		//@{
 		const std::string& getMessage () const;
 		//@}
-	    
+
 		//! @name Query methods
 		//@{
 		const char* what () const throw ();

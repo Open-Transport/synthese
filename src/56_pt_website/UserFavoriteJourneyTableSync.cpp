@@ -72,7 +72,7 @@ namespace synthese
 			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME, SQL_TEXT),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<UserFavoriteJourneyTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index()
@@ -112,7 +112,7 @@ namespace synthese
 			{
 				query.addFieldExpression(
 					SubQueryExpression::Get(
-						"SELECT MAX(" + UserFavoriteJourneyTableSync::COL_RANK + string(") +1 FROM ") + 
+						"SELECT MAX(" + UserFavoriteJourneyTableSync::COL_RANK + string(") +1 FROM ") +
 						UserFavoriteJourneyTableSync::TABLE.NAME + " WHERE " +
 						UserFavoriteJourneyTableSync::COL_USER_ID + "=" + lexical_cast<string>(object->getUser()->getKey())
 				)	);
@@ -196,7 +196,7 @@ namespace synthese
 				if (first > 0)
 					query << " OFFSET " << Conversion::ToString(first);
 			}
-			
+
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}

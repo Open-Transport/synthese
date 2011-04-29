@@ -27,7 +27,7 @@ namespace synthese
 		{}
 
 
-	    
+
 		void BasicClient::request(
 			std::ostream& out,
 			const std::string& url

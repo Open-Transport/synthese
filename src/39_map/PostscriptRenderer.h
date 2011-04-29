@@ -58,13 +58,13 @@ namespace map
     PostscriptRenderer ();
     virtual ~PostscriptRenderer ();
 
-	std::string render(const boost::filesystem::path& tempDir, 
+	std::string render(const boost::filesystem::path& tempDir,
 		const std::string& filenamePrefix,
 		const util::Registry<pt::JourneyPattern>& lines,
 		synthese::map::Map& map,
 		const synthese::map::RenderingConfig& config);
 
-    
+
  private:
 
     void renderBackground (PostscriptCanvas& _canvas, Map& map);
@@ -73,13 +73,13 @@ namespace map
 
     void doDrawCurvedLine (PostscriptCanvas& _canvas,const DrawableLine* dbl);
 
-	void doDrawTriangleArrow (PostscriptCanvas& _canvas,const geos::geom::Coordinate& point, 
+	void doDrawTriangleArrow (PostscriptCanvas& _canvas,const geos::geom::Coordinate& point,
                               double angle);
-    
-	void doDrawSquareStop (PostscriptCanvas& _canvas,const geos::geom::Coordinate& point, 
+
+	void doDrawSquareStop (PostscriptCanvas& _canvas,const geos::geom::Coordinate& point,
                            double angle);
-    
-	void doDrawSquareTerminus (PostscriptCanvas& _canvas,const geos::geom::Coordinate& point, 
+
+	void doDrawSquareTerminus (PostscriptCanvas& _canvas,const geos::geom::Coordinate& point,
 			       double angle);
 
 };

@@ -34,7 +34,7 @@ namespace synthese
 
 		/** Ecran de recherche et liste d'utilisateurs.
 			@ingroup m12Admin refAdmin
-		
+
 			@image html cap_admin_users.png
 			@image latex cap_admin_users.png "Maquette de l'écran de recherche d'utilisateur" width=14cm
 
@@ -69,7 +69,7 @@ namespace synthese
 				-# Un <b>Bouton de suppression</b> permet de supprimer les utilisateurs sélectionnés grâce aux cases à cocher. Après confirmation par une boite de dialogue, la suppression est effectuée pour chaque utilisateur :
 					- l'utilisateur est réellement supprimé si il n'est à l'origine d'aucune entrée de journal
 					- l'utilisateur est désactivé si il est à l'origine d'au moins une entrée de journal, afin de permettre d'accéder à ses informations dans le cadre de la consultation ultérieure du journal. En ce cas, son login est tout de même remis à disposition.
-			
+
 			<i>Sécurité</i>
 				- Une habilitation publique SecurityRight de niveau READ est nécessaire pour accéder à la page en consultation. NB : Les résultats de la recherche d'utilisateur <b>ne dépendent pas</b> du périmètre de l'habilitation de l'utilisateur courant (la page accédée en lecture seule est considérée comme un annuaire)
 				- Une habilitation publique SecurityRight de niveau WRITE est nécessaire pour disposer du bouton de création d'utilisateur. La liste des profils pouvant être utilisés est la liste des profils inférieurs ou égaux à celui de l'habilitation.
@@ -104,23 +104,23 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
-			
-			
-			
+
+
+
 			void display(
 				std::ostream& stream,
 				const admin::AdminRequest& _request
 			) const;
-			
+
 			bool isAuthorized(
 				const security::User& user
 			) const;
@@ -136,8 +136,8 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
-			
-			
+
+
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request

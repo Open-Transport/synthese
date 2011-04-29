@@ -52,7 +52,7 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const	{
 			ParametersVector pv;
-			
+
 			pv.push_back(functionIfSucceed->getFactoryKey());
 			pv.push_back(functionIfSucceed->_getParametersMap().getURI());
 			pv.push_back(title);

@@ -63,7 +63,7 @@ namespace synthese
 				int				_transportConnectionCount;
 				double			_distance;
 			//@}
-			
+
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Empty journey constructor.
@@ -110,7 +110,7 @@ namespace synthese
 				/** Journey legs getter.
 					@return const JourneyLegs& The journey legs
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 				const ServiceUses& getServiceUses() const { return _journeyLegs; }
 				ServiceUses& getServiceUses() { return _journeyLegs; }
@@ -120,7 +120,7 @@ namespace synthese
 					travelling, excluding tranfer delays.
 				*/
 				boost::posix_time::time_duration getEffectiveDuration () const;
-	
+
 				/** Continuous service range of this journey.
 					@return Range duration in minutes, or 0 if unique service.
 				*/
@@ -136,11 +136,11 @@ namespace synthese
 			//@{
 				bool empty()	const;
 				std::size_t size() const;
-				
+
 				const ServicePointer& getJourneyLeg (std::size_t index) const;
 				const ServicePointer& getFirstJourneyLeg () const;
 				const ServicePointer& getLastJourneyLeg () const;
-				
+
 				const boost::posix_time::ptime& getFirstDepartureTime () const;
 				boost::posix_time::ptime getLastDepartureTime () const;
 				const boost::posix_time::ptime& getFirstArrivalTime () const;
@@ -152,16 +152,16 @@ namespace synthese
 				const Edge* getDestination() const;
 
 				double getDistance () const;
-		
-		
+
+
 				/** Detects max alarm level in journey.
-			      
+
 					For each journey leg, 4 cases are possible :
 				- Alert on origin
 				- Service with reservation rule
 				- Service alert
 				- Alert on destination
-			      
+
 				@return Maximum journey alert level.
 				*/
 				int getMaxAlarmLevel () const;

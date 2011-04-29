@@ -72,7 +72,7 @@ namespace synthese
 				<< "content += elems[i].name +'='+ encodeURIComponent(elems[i].value);"
 				<< "}"
 				<< "if(window.XMLHttpRequest) xajax = new XMLHttpRequest();"
-				<< "else if(window.ActiveXObject) xajax = new ActiveXObject('Microsoft.XMLHTTP');" 
+				<< "else if(window.ActiveXObject) xajax = new ActiveXObject('Microsoft.XMLHTTP');"
 				<< "else return false;"
 				<< "xajax.open('POST','" << _action << "');"
 				<< "xajax.setRequestHeader('Content-Type','application/x-www-form-urlencoded');"
@@ -80,14 +80,14 @@ namespace synthese
 				<< "xajax.onreadystatechange = function(){"
 				<< "if(xajax.readyState == 4) {"
 				<< "document.forms['" << _name << "'].className='';"
-				<< "if(xajax.responseText) alert(xajax.responseText);" 
-				<< "}};}" 
+				<< "if(xajax.responseText) alert(xajax.responseText);"
+				<< "}};}"
 			;
 			if(closeJSTag)
 			{
 				s << HTMLModule::GetHTMLJavascriptClose();
 			}
-			
+
 			return s.str();
 		}
 

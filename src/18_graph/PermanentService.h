@@ -48,7 +48,7 @@ namespace synthese
 				graph::Path* path = NULL,
 				boost::optional<boost::posix_time::time_duration> duration = boost::optional<boost::posix_time::time_duration>()
 			);
-			
+
 			//! @name Getters
 			//@{
 				boost::optional<boost::posix_time::time_duration> getDuration() const;
@@ -80,7 +80,7 @@ namespace synthese
 				@return A full ServicePointer to the service. If the service cannot be used at the specified date/time, then the ServicePointer points to a NULL service.
 				@author Hugues Romain
 				@date 2007
-				@warning The service index is unknown in the generated ServicePointer.					
+				@warning The service index is unknown in the generated ServicePointer.
 			*/
 			virtual graph::ServicePointer getFromPresenceTime(
 				bool RTData,

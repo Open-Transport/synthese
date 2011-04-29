@@ -92,7 +92,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void ResaStatisticsAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -138,7 +138,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool ResaStatisticsAdmin::isAuthorized(
 			const security::User& user
 		) const	{

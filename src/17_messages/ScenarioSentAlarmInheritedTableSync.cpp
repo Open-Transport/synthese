@@ -46,7 +46,7 @@ namespace synthese
 		template<>
 		void DBInheritedTableSyncTemplate<AlarmTableSync,ScenarioSentAlarmInheritedTableSync,SentAlarm>::Load(
 			SentAlarm* obj,
-			const DBResultSPtr& rows, 
+			const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){

@@ -39,7 +39,7 @@ namespace synthese
 		public:
 			static const bool EXPORTABLE;
 
-			virtual void build(std::ostream&) const {} 
+			virtual void build(std::ostream&) const {}
 
 			virtual std::string getOutputMimeType() const { return "text/plain"; }
 

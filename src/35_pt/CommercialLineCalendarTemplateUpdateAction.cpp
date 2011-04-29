@@ -40,7 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace calendar;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::CommercialLineCalendarTemplateUpdateAction>::FACTORY_KEY("CommercialLineCalendarTemplateUpdateAction");
@@ -50,9 +50,9 @@ namespace synthese
 	{
 		const string CommercialLineCalendarTemplateUpdateAction::PARAMETER_LINE_ID = Action_PARAMETER_PREFIX + "id";
 		const string CommercialLineCalendarTemplateUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID = Action_PARAMETER_PREFIX + "ci";
-		
-		
-		
+
+
+
 		ParametersMap CommercialLineCalendarTemplateUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -66,9 +66,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CommercialLineCalendarTemplateUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -89,24 +89,24 @@ namespace synthese
 				throw ActionException("No such calendar template");
 			}
 		}
-		
-		
-		
+
+
+
 		void CommercialLineCalendarTemplateUpdateAction::run(
 			Request& request
 		){
 			//stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			
+
 			_line->setCalendarTemplate(_calendarTemplate.get());
 
 			CommercialLineTableSync::Save(_line.get());
 
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool CommercialLineCalendarTemplateUpdateAction::isAuthorized(
 			const Session* session
 		) const {

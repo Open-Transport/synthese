@@ -127,7 +127,7 @@ namespace synthese
 			virtual bool isAuthorized(const server::Session* session) const;
 
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			///	Scenario setter.
 			///	@param id id of scenario

@@ -170,7 +170,7 @@ namespace synthese
 			*/
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<TestTypesTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index()
@@ -253,7 +253,7 @@ void testTypes(const TestBackend& testBackend)
 			BOOST_CHECK_EQUAL(false, TestTypesTableSync::AddedRows->getBool("boolean"));
 			// Note: the only way to check for an indeterminate value is to use the indeterminate function.
 			BOOST_CHECK(boost::logic::indeterminate(TestTypesTableSync::AddedRows->getTribool("triboolean")));
-		
+
 			BOOST_CHECK_EQUAL(time_duration(not_a_date_time), TestTypesTableSync::AddedRows->getHour("time"));
 			BOOST_CHECK_EQUAL(date(not_a_date_time), TestTypesTableSync::AddedRows->getDate("date"));
 			BOOST_CHECK_EQUAL(ptime(not_a_date_time), TestTypesTableSync::AddedRows->getDateTime("timestamp"));
@@ -342,7 +342,7 @@ void testTypes(const TestBackend& testBackend)
 
 			BOOST_CHECK_EQUAL(true, TestTypesTableSync::AddedRows->getBool("boolean"));
 			BOOST_CHECK_EQUAL(boost::tribool::false_value, TestTypesTableSync::AddedRows->getTribool("triboolean"));
-		
+
 			BOOST_CHECK_EQUAL(time_duration(22, 0, 0), TestTypesTableSync::AddedRows->getHour("time"));
 			BOOST_CHECK_EQUAL(date(2011, 03, 30), TestTypesTableSync::AddedRows->getDate("date"));
 			BOOST_CHECK_EQUAL(ptime(date(1995, 12, 07), time_duration(13, 25, 10)), TestTypesTableSync::AddedRows->getDateTime("timestamp"));

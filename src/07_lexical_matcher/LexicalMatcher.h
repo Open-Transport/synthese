@@ -24,7 +24,7 @@ namespace synthese
 	namespace lexical_matcher
 	{
 
-		/** 
+		/**
 		*/
 		template<class T>
 		class LexicalMatcher
@@ -39,7 +39,7 @@ namespace synthese
 				FrenchSentence key;
 				T value;
 			};
-			
+
 			typedef typename std::vector<MatchHit> MatchResult;
 
 			struct MatchHitSort
@@ -53,7 +53,7 @@ namespace synthese
 						op1.score.phoneticScore == op2.score.phoneticScore && op1.score.levenshtein < op2.score.levenshtein;
 				}
 			};
-			
+
 			Map _map;
 
 		 public:
@@ -70,36 +70,36 @@ namespace synthese
 			//! @name Query methods
 			//@{
 				size_t size () const;
-	
+
 				MatchHit bestMatch(
 					const std::string& fuzzyKey
 				) const;
-				
+
 				MatchResult	bestMatches(
 					const std::string& fuzzyKey,
 					size_t nbMatches
 				) const;
-				
+
 				MatchResult	match(
 					const std::string& fuzzyKey,
 					double minScore,
 					size_t maxNbValues
 				) const;
 
-			
+
 			//! @name Update methods
 			//@{
 				/** Removes and destroy all the values in map.
 				*/
 				void clear ();
-	
+
 				void add (const std::string& key, T value);
 				void remove (const std::string& key);
 			//@}
 		};
-		 
-		 
-	/** @} */		 
+
+
+	/** @} */
 
 
 		template<class T>
@@ -128,9 +128,9 @@ namespace synthese
 			{
 				return typename LexicalMatcher<T>::MatchResult();
 			}
-			
+
 			MatchResult result = match(fuzzyKey, 0.0, 0);
-			
+
 			if (result.size () > nbMatches)
 			{
 				// Truncate the result
@@ -151,7 +151,7 @@ namespace synthese
 		) const {
 			MatchResult result;
 			FrenchSentence ppkey(fuzzyKey);
-			
+
 			// Iterate over all candidates
 			BOOST_FOREACH(const typename Map::value_type& value, _map)
 			{
@@ -175,7 +175,7 @@ namespace synthese
 					hit.value = value.second;
 					result.push_back(hit);
 				}
-	
+
 				if (maxNbValues > 0 && result.size() == maxNbValues) break;
 			}
 

@@ -61,7 +61,7 @@ namespace synthese
 		{}
 
 
-		    
+
 		boost::posix_time::time_duration
 		ContinuousService::getMaxWaitingTime () const
 		{
@@ -70,7 +70,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		ContinuousService::setMaxWaitingTime (boost::posix_time::time_duration maxWaitingTime)
 		{
 			_maxWaitingTime = maxWaitingTime;
@@ -85,7 +85,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		ContinuousService::setRange (boost::posix_time::time_duration range)
 		{
 			_range = range;
@@ -93,7 +93,7 @@ namespace synthese
 
 
 
-		bool 
+		bool
 		ContinuousService::isContinuous () const
 		{
 			return true;
@@ -116,7 +116,7 @@ namespace synthese
 			ptime actualDateTime(presenceDateTime);
 			posix_time::time_duration range;
 			size_t edgeIndex(edge.getRankInPath());
-			
+
 			if (getDeparture)
 			{
 				schedule = (RTData ? _RTDepartureSchedules : _departureSchedules).at(edgeIndex);
@@ -200,7 +200,7 @@ namespace synthese
 			{
 				ptr.setArrivalInformations(edge, actualDateTime, actualDateTime, *edge.getFromVertex());
 			}
-			
+
 			// Reservation control
 			if (controlIfTheServiceIsReachable)
 			{

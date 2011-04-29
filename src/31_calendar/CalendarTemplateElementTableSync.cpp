@@ -54,7 +54,7 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<DBTableSync,CalendarTemplateElementTableSync>::FACTORY_KEY("55.11 Calendar Template Elements");
 	}
-	
+
 	namespace calendar
 	{
 		const std::string CalendarTemplateElementTableSync::COL_CALENDAR_ID("calendar_id");
@@ -65,15 +65,15 @@ namespace synthese
 		const std::string CalendarTemplateElementTableSync::COL_POSITIVE("positive");
 		const std::string CalendarTemplateElementTableSync::COL_INCLUDE_ID("include_id");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<CalendarTemplateElementTableSync>::TABLE(
 			"t055_calendar_template_elements"
 		);
-		
-		
-		
+
+
+
 		template<> const DBTableSync::Field DBTableSyncTemplate<CalendarTemplateElementTableSync>::_FIELDS[]=
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
@@ -219,7 +219,7 @@ namespace synthese
 			}
 			catch(ObjectNotFoundException<CalendarTemplateElement>&)
 			{
-				
+
 			}
 		}
 
@@ -232,9 +232,9 @@ namespace synthese
 			//TODO log calendar template element removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace calendar
 	{
 		CalendarTemplateElementTableSync::SearchResult CalendarTemplateElementTableSync::Search(

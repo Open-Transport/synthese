@@ -36,9 +36,9 @@ namespace synthese
 	using namespace server;
 	using namespace db;
 	using namespace util;
-	
+
 	template<> const string util::FactorableTemplate<Action, security::UserPasswordUpdateAction>::FACTORY_KEY("upua");
-	
+
 	namespace security
 	{
 		const string UserPasswordUpdateAction::PARAMETER_USER_ID(Action_PARAMETER_PREFIX + "u");
@@ -80,9 +80,9 @@ namespace synthese
 		void UserPasswordUpdateAction::run(Request& request)
 		{
 			_user->setPassword(_password);
-			
+
 			UserTableSync::Save(_user.get());
-			
+
 			SecurityLog::addUserAdmin(
 				request.getUser().get(),
 				_user.get(),
@@ -102,13 +102,13 @@ namespace synthese
 				)
 			;
 		}
-		
-		
+
+
 		void UserPasswordUpdateAction::setUser(boost::shared_ptr<User> value)
 		{
 			_user = value;
 		}
-	
+
 		void UserPasswordUpdateAction::setUserC(boost::shared_ptr<const User> value)
 		{
 			_user = const_pointer_cast<User>(value);

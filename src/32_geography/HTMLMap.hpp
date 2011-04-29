@@ -62,7 +62,7 @@ namespace synthese
 				std::string htmlPopup;
 				std::size_t width;
 				std::size_t height;
-				
+
 				MapPoint(
 					const geos::geom::Point& _point,
 					const std::string& _icon,

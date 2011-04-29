@@ -78,7 +78,7 @@ namespace synthese
 				s << " colspan=\"" << colspan << "\"";
 			}
 			s << ">" << lastHeader << "</th>";
-			_headers = s.str();			
+			_headers = s.str();
 		}
 
 

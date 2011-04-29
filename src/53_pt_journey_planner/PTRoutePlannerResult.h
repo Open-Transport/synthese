@@ -91,7 +91,7 @@ namespace synthese
 			typedef algorithm::TimeSlotRoutePlanner::Result Journeys;
 
 			typedef std::map<Journeys::const_iterator, std::vector<PlacesList::iterator> > JourneysPlacePositions;
-			
+
 
 		private:
 			//! @name Informations about the computing process
@@ -145,10 +145,10 @@ namespace synthese
 				PlacesList::iterator source,
 				PlacesList::iterator target
 			);
-		
+
 		public:
 			void operator=(const PTRoutePlannerResult& other);
-		
+
 			/** Build of the places list of a future schedule sheet corresponding to a journey vector.
 				@author Hugues Romain
 				@date 2001-2006
@@ -429,7 +429,7 @@ namespace synthese
 				const geography::Place* getDeparturePlace() const { return _departurePlace; }
 				const geography::Place* getArrivalPlace() const { return _arrivalPlace; }
 			//@}
-			
+
 			void removeFirstJourneys(size_t value);
 
 
@@ -449,7 +449,7 @@ namespace synthese
 			) const;
 
 			//////////////////////////////////////////////////////////////////////////
-			/// Reads the named place from one of the 
+			/// Reads the named place from one of the
 			static const geography::NamedPlace* GetNamedPlaceFromLegs(
 				const graph::ServicePointer* arrivalLeg,
 				const graph::ServicePointer* departureLeg,

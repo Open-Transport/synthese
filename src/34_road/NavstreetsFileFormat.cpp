@@ -139,7 +139,7 @@ namespace synthese
 				map<string, string> departementCodes;
 				typedef map<pair<string, string>, City*> CityCodes;
 				CityCodes cityCodes;
-			
+
 				{	// 1.1 Departements
 					stringstream query;
 					query << "SELECT * FROM " << table.getName() << " WHERE " << NavstreetsFileFormat::_FIELD_ADMIN_LVL << "=3";
@@ -218,9 +218,9 @@ namespace synthese
 			{
 				// Loading the file into SQLite as virtual table
 				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), 27572);
-				
+
 				typedef map<string, shared_ptr<Crossing> > _CrossingsMap;
-				_CrossingsMap _navteqCrossings;	
+				_CrossingsMap _navteqCrossings;
 
 				const GeometryFactory& geometryFactory(CoordinatesSystem::GetCoordinatesSystem(27572).getGeometryFactory());
 
@@ -319,7 +319,7 @@ namespace synthese
 									rightId,
 									&_dataSource
 							)	);
-							
+
 							_navteqCrossings.insert(make_pair(rightId, rightNode));
 							_env.getEditableRegistry<Crossing>().add(rightNode);
 						}

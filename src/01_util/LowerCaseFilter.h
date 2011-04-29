@@ -18,16 +18,16 @@ namespace util
 
 /** Converts any upper case letter going through this filter to lower case.
 Any numerical character is preserved. All other characters are converted to space.
- *  
+ *
 @ingroup m01
 */
 class LowerCaseFilter : public boost::iostreams::output_filter {
 private:
 public:
-    
+
     LowerCaseFilter () {}
 
-    template<typename Sink> 
+    template<typename Sink>
 	bool put(Sink& dest, int c);
 
 
@@ -37,7 +37,7 @@ public:
 
 
 template<typename Sink>
-bool 
+bool
 LowerCaseFilter::put(Sink& dest, int c)
 {
     if(
@@ -60,8 +60,8 @@ LowerCaseFilter::put(Sink& dest, int c)
 		return boost::iostreams::put(dest, c);
     }
 }
- 
- 
+
+
 
 
 

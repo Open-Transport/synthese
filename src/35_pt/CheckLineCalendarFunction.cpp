@@ -43,11 +43,11 @@ namespace synthese
 	using namespace calendar;
 
 	template<> const string util::FactorableTemplate<Function,pt::CheckLineCalendarFunction>::FACTORY_KEY("CheckLineCalendar");
-	
+
 	namespace pt
 	{
 		const string CheckLineCalendarFunction::PARAMETER_DURATION("du");
-		
+
 		ParametersMap CheckLineCalendarFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -79,13 +79,13 @@ namespace synthese
 			){
 				stream << "3\nNo such line.|days=-1\n";
 			} else {
-				
+
 				date now(day_clock::local_day());
 				date endDate(now + _duration);
 				Calendar period(now, endDate);
 
 				Calendar runDays(_line->getRunDays(period));
-				
+
 				if(	!_line->getCalendarTemplate()
 				){
 					stream << "3\nLine "+ _line->getShortName() +" is unmonitored.|days="+ lexical_cast<string>(runDays.size()) + "\n";
@@ -103,9 +103,9 @@ namespace synthese
 			}
 
 		}
-		
-		
-		
+
+
+
 		bool CheckLineCalendarFunction::isAuthorized(
 			const Session* session
 		) const {

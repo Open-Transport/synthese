@@ -71,7 +71,7 @@ namespace synthese
 		template<> const DBTableSync::Format DBTableSyncTemplate<WebPageTableSync>::TABLE(
 			"t063_web_pages"
 		);
-		
+
 		template<> const DBTableSync::Field DBTableSyncTemplate<WebPageTableSync>::_FIELDS[] =
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
@@ -318,7 +318,7 @@ namespace synthese
 	{
 		WebPageTableSync::SearchResult WebPageTableSync::Search(
 			util::Env& env,
-			boost::optional<util::RegistryKeyType> siteId /*= boost::optional<util::RegistryKeyType>()*/, 
+			boost::optional<util::RegistryKeyType> siteId /*= boost::optional<util::RegistryKeyType>()*/,
 			optional<RegistryKeyType> parentId,
 			boost::optional<std::size_t> rank,
 			int first /*= 0 */,

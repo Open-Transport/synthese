@@ -72,7 +72,7 @@ namespace synthese
 		const string ResaCustomersAdmin::PARAM_SEARCH_NAME("sn");
 		const string ResaCustomersAdmin::PARAM_SEARCH_SURNAME("ss");
 
-		
+
 		void ResaCustomersAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -88,12 +88,12 @@ namespace synthese
 			{
 				_searchLogin = map.getOptional<string>(PARAM_SEARCH_LOGIN);
 			}
-			
+
 			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 30);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap ResaCustomersAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
@@ -106,7 +106,7 @@ namespace synthese
 			return m;
 		}
 
-		
+
 		void ResaCustomersAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -116,7 +116,7 @@ namespace synthese
 			AdminFunctionRequest<ResaCustomersAdmin> searchRequest(_request);
 
 			AdminFunctionRequest<ResaCustomerAdmin> openRequest(_request);
-			
+
 			// Form
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << "<h1>Recherche</h1>";
@@ -160,7 +160,7 @@ namespace synthese
 				h.push_back(make_pair(string(), "Téléphone"));
 				h.push_back(make_pair(PARAM_SEARCH_LOGIN, "Login"));
 				h.push_back(make_pair(string(), "Action"));
-				
+
 				ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, users);
 
 				stream << t.open();
@@ -198,7 +198,7 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const ResaModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -208,28 +208,28 @@ namespace synthese
 			}
 			return links;
 		}
-	
-	
+
+
 		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			const ResaCustomerAdmin* ra(
 				dynamic_cast<const ResaCustomerAdmin*>(&currentPage)
 			);
-			
+
 			if(ra)
 			{
 				shared_ptr<ResaCustomerAdmin> p(
 					getNewPage<ResaCustomerAdmin>()
 				);
 				p->setUser(ra->getUser());
-				
+
 				links.push_back(p);
 			}
-			
+
 			return links;
 		}
 }	}

@@ -34,7 +34,7 @@ namespace synthese
 	{
 		template<> const string Registry<pt::Fare>::KEY("Fare");
 	}
-	
+
 	namespace pt
 	{
 		Fare::Fare(RegistryKeyType key)

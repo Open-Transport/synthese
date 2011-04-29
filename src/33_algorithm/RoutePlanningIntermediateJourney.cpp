@@ -262,11 +262,11 @@ namespace synthese
 			if (getEndEdge().getFromVertex() == other.getEndEdge().getFromVertex() ||
 				_endReached
 			){
-				//! <li>An empty journey cannot be superior to another</li> 
+				//! <li>An empty journey cannot be superior to another</li>
 				if (empty())
 					return false;
 
-				//! <li>A populated journey is superior to an empty journey</li> 
+				//! <li>A populated journey is superior to an empty journey</li>
 				if (other.empty())
 					return true;
 
@@ -300,7 +300,7 @@ namespace synthese
 				if (getDuration () != other.getDuration ())
 					return getDuration() < other.getDuration();
 
-				//! <li>Less transport connection count is best</li> 
+				//! <li>Less transport connection count is best</li>
 				if (_transportConnectionCount != other._transportConnectionCount)
 					return _transportConnectionCount < other._transportConnectionCount;
 

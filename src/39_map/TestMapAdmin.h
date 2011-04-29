@@ -41,14 +41,14 @@ namespace synthese
 			std::string	_dataXml;
 			std::string	_queryXml;
 			bool		_useEnvironment;
-			
+
 		public:
 			static const std::string PARAMETER_DATA_XML;
 			static const std::string PARAMETER_QUERY_XML;
 			static const std::string PARAMETER_USE_ENVIRONMENT;
 
 			TestMapAdmin();
-			
+
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -64,12 +64,12 @@ namespace synthese
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
-	
-	
-	
+
+
+
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 				@author Hugues Romain
@@ -90,7 +90,7 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& user
 			) const;
-			
+
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param parentLink Link to the parent page
 				@param currentPage Currently displayed page

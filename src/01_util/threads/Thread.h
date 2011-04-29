@@ -55,14 +55,14 @@ namespace util
 class Thread
 {
  public:
-    
+
 
     typedef enum { NOT_STARTED = 0, INIT, READY, PAUSED, STOPPED } ThreadState;
 
- 
+
     static const std::string DEFAULT_NAME_PREFIX;
     static int _NbThreads;
-    
+
 
  protected:
 
@@ -72,14 +72,14 @@ class Thread
     int _loopDelay;  //!< Loop delay in nanoseconds
 
 
-    
+
  private:
-    
+
     boost::shared_ptr<ThreadState> _state;
-    boost::shared_ptr<unsigned long> _nbLoops; //!< Number of loops executed by this thread 
-    boost::shared_ptr<boost::mutex> _stateMutex; 
-    boost::shared_ptr<boost::mutex> _nbLoopsMutex; 
-    boost::shared_ptr<boost::mutex> _execMutex; 
+    boost::shared_ptr<unsigned long> _nbLoops; //!< Number of loops executed by this thread
+    boost::shared_ptr<boost::mutex> _stateMutex;
+    boost::shared_ptr<boost::mutex> _nbLoopsMutex;
+    boost::shared_ptr<boost::mutex> _execMutex;
 
 
  protected:
@@ -115,7 +115,7 @@ class Thread
     static void RunOnce (ThreadExec* exec);
 
  protected:
-    
+
     void setState (ThreadState state);
 
     unsigned long getNbLoops () const;

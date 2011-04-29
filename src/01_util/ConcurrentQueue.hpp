@@ -61,7 +61,7 @@ public:
 		{
 			return false;
 		}
-		
+
 		popped_value=the_queue.front();
 		the_queue.pop();
 		return true;
@@ -74,7 +74,7 @@ public:
 		{
 			the_condition_variable.wait(lock);
 		}
-		
+
 		popped_value=the_queue.front();
 		the_queue.pop();
 	}

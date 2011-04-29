@@ -38,11 +38,11 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::WebpageNextFunction>::FACTORY_KEY("next");
-	
+
 	namespace cms
 	{
 		const string WebpageNextFunction::PARAMETER_PAGE_ID("page_id");
-		
+
 		ParametersMap WebpageNextFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -77,9 +77,9 @@ namespace synthese
 				stream << next->getKey();
 			}
 		}
-		
-		
-		
+
+
+
 		bool WebpageNextFunction::isAuthorized(
 			const Session* session
 		) const {

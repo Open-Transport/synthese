@@ -15,7 +15,7 @@ namespace synthese
 namespace map
 {
 
-    
+
 class MapBackground;
 
 
@@ -31,23 +31,23 @@ private:
 
 
     MapBackgroundManager(const boost::filesystem::path& backgroundDir);
-    
-public:
-    
-    ~MapBackgroundManager();
-    
-    
 
-    const MapBackground* getBestScalingBackground (double mapScaleX, 
+public:
+
+    ~MapBackgroundManager();
+
+
+
+    const MapBackground* getBestScalingBackground (double mapScaleX,
                                                    double mapScaleY) const;
-    
+
     static const MapBackgroundManager* GetMapBackgroundManager (const std::string& id);
-    
+
     static void Initialize (const boost::filesystem::path& backgroundsDir);
 
 
 private:
-    
+
     void clearBackgrounds ();
 };
 

@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE (testFiltering)
       std::stringstream sout;
 
       PlainCharFilter filter;
-      
+
       io::filtering_ostream out;
       out.push (filter);
       out.push (sout);

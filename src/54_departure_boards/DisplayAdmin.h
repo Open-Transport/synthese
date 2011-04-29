@@ -97,7 +97,7 @@ namespace synthese
 					-# <tt>Arrêts de desserte intermédiaire supplémentaires</tt> : Liste présentant l'ensemble des arrêt logiques faisant l'objet d'une présélection qui s'ajoutent aux terminus des différents parcours types des lignes affichées. Il est inutile d'ajouter ici un terminus de ligne : il fait obligatoirement partie de la présélection.
 						- Un bouton <tt>Supprimer</tt> est présent au niveau de chaque arrêt logique permettant de supprimer un arrêt à présélectionner
 						- Une liste déroulante munie d'un bouton <tt>Ajouter</tt> permet d'ajouter un arrêt logique à présélectionner. Le contenu de la liste déroulante est l'ensemble des arrêts logiques desservis par les lignes partant de l'emplacement de l'afficheur.
-						
+
 			<i>Sécurité</i> :
 				- Une habilitation publique ArrivalDepartureTableRight de niveau READ est nécessaire pour afficher la page en mode consultation. L'emplacement de l'afficheur doit entrer dans le périmètre de l'habilitation.
 				- Une habilitation publique ArrivalDepartureTableRight de niveau WRITE est nécessaire pour afficher la page en mode modification. L'emplacement de l'afficheur doit entrer dans le périmètre de l'habilitation. Le contenu des diverses listes déroulantes est impacté par le périmètre de l'habilitation.
@@ -120,7 +120,7 @@ namespace synthese
 				- Complément de précision sur l'emplacement de l'afficheur (non affiché si le complément est vide)
 				- Texte <tt>Maintenance</tt>
 
-			<i>Zone de contenus</i> : 
+			<i>Zone de contenus</i> :
 				-# <b>Formulaire de paramétrage</b> :
 					-# <tt>Nombre de contrôles matériels par jour</tt> : Liste déroulante définissant le nombre de contrôles matériels devant être faits chaque jour (valeurs possibles 1 à 48), afin de déclencher une alerte en cas d'absence de contrôle au delà d'une certaine durée
 					-# <tt>Afficheur déclaré en service</tt> : Choix OUI/NON permettant de déclarer l'afficheur en service ou non :
@@ -142,17 +142,17 @@ namespace synthese
 						- <tt>Error</tt> (rouge) si le terminal est déclaré hors service au niveau du présent écran.
 					-# <tt>Date du dernier contrôle positif</tt> : Indique la dernière date connue de contrôle matériel positif
 					-# <tt>Motif de l'alerte</tt> : Texte explicatif sur l'erreur relevée
-					
+
 			<i>Sécurité</i> :
 				- Une habilitation publique DisplayMaintenanceRight de niveau READ est nécessire pour afficher la page en mode consultation. L'emplacement de l'afficheur doit entrer dans le périmètre de l'habilitation.
-				- Une habilitation publique DisplayMaintenanceRight de niveau WRITE est nécessire pour afficher la page en mode modification. L'emplacement de l'afficheur doit entrer dans le périmètre de l'habilitation. 
+				- Une habilitation publique DisplayMaintenanceRight de niveau WRITE est nécessire pour afficher la page en mode modification. L'emplacement de l'afficheur doit entrer dans le périmètre de l'habilitation.
 
 			<i>Journal</i> : Les actions suivantes génèrent une entrée dans le journal de maintenance des afficheurs DisplayMaintenanceLog :
 				- INFO : Modification de paramètre
 				- WARNING : Détection d'une erreur de cohérence de données lors de l'affichage de la page
 				- ERROR : Passage en hors service
-				- WARNING : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai compris entre 150% et 500% de la durée présupposée entre deux contrôles. 
-				- ERROR : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai supérieur à 500% de la durée présupposée entre deux contrôles. 
+				- WARNING : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai compris entre 150% et 500% de la durée présupposée entre deux contrôles.
+				- ERROR : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai supérieur à 500% de la durée présupposée entre deux contrôles.
 				- NB : Ces deux entrées apparaissent à la première visualisation d'un problème de ce type dans une console d'administration, afin de suppléer à l'absence de démon de surveillance. Un passage en contrôle continu avec alerte pourrait être implémenté.
 				- NB : Des entrées INFO/WARNING/ERROR sont entrées dans le journal de maintenance directement par les clients de supervision via une requête SendLogEntry.
 		*/
@@ -175,7 +175,7 @@ namespace synthese
 
 		public:
 			DisplayAdmin();
-			
+
 			void setScreen(boost::shared_ptr<const DisplayScreen> value);
 			boost::shared_ptr<const DisplayScreen> getScreen() const;
 
@@ -185,21 +185,21 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 				@return server::ParametersMap The generated parameters map
 				@author Hugues Romain
-				@date 2007					
+				@date 2007
 			*/
 			virtual server::ParametersMap getParametersMap() const;
-			
+
 			void display(
 				std::ostream& stream,
 				const admin::AdminRequest& _request
 			) const;
-			
+
 			bool isAuthorized(
 				const security::User& user
 			) const;

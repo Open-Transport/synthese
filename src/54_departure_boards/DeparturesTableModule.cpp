@@ -46,19 +46,19 @@ namespace synthese
 	{
 		template<> const std::string util::FactorableTemplate<ModuleClass, departure_boards::DeparturesTableModule>::FACTORY_KEY("54_departures_table");
 	}
-	
+
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<DeparturesTableModule>::NAME("SAI Tableaux de départs");
-		
+
 		template<> void ModuleClassTemplate<DeparturesTableModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<DeparturesTableModule>::Init()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<DeparturesTableModule>::End()
 		{
 		}
@@ -90,8 +90,8 @@ namespace synthese
 		}
 
 		DeparturesTableModule::Labels DeparturesTableModule::getPlacesWithBroadcastPointsLabels(
-			const security::RightsOfSameClassMap& rights 
-			, bool totalControl 
+			const security::RightsOfSameClassMap& rights
+			, bool totalControl
 			, RightLevel neededLevel
 			, bool withAll /*= false*/
 		){

@@ -47,10 +47,10 @@ namespace synthese
 
 		////////////////////////////////////////////////////////////////////////
 		///	Display screen CPU class.
-		///	
+		///
 		///	Represents a CPU which can connect some display screens by serial
 		///	port.
-		///	
+		///
 		///	@ingroup m54
 		////////////////////////////////////////////////////////////////////////
 		class DisplayScreenCPU:
@@ -60,7 +60,7 @@ namespace synthese
 		public:
 			typedef util::Registry<DisplayScreenCPU> Registry;
 			typedef std::set<const DisplayScreen*> WiredScreens;
-			
+
 		protected:
 			// Attributes
 			const geography::NamedPlace*	_place;
@@ -71,7 +71,7 @@ namespace synthese
 
 			// Linked objects
 			WiredScreens										_wiredScreens;
-			
+
 		public:
 			////////////////////////////////////////////////////////////////////
 			///	DisplayScreenCPU Constructor.
@@ -80,13 +80,13 @@ namespace synthese
 			explicit DisplayScreenCPU(
 				util::RegistryKeyType id = 0
 			);
-			
+
 			////////////////////////////////////////////////////////////////////
 			///	DisplayScreenCPU Destructor.
 			///	@date 2008
 			////////////////////////////////////////////////////////////////////
 			~DisplayScreenCPU();
-			
+
 			//! @name Getters
 			//@{
 				const geography::NamedPlace*	getPlace()				const { return _place; }
@@ -96,7 +96,7 @@ namespace synthese
 				const std::string&									getMaintenanceMessage()	const;
 				const WiredScreens&									getWiredScreens()		const;
 			//@}
-			
+
 			//! @name Setters
 			//@{
 				void setPlace(const geography::NamedPlace* value){ _place = value; }
@@ -107,7 +107,7 @@ namespace synthese
 				void addWiredScreen(const DisplayScreen* value);
 				void removeWiredScreen(const DisplayScreen* value);
 			//@}
-			
+
 			//! @name Queries
 			//@{
 				std::string getFullName() const;
@@ -122,7 +122,7 @@ namespace synthese
 				bool isDown(const boost::posix_time::ptime& status) const;
 
 			//@}
-			
+
 			//! @name Others
 			//@{
 				void copy(const DisplayScreenCPU& e);

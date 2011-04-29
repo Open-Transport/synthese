@@ -30,7 +30,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace interfaces;
-	
+
 	namespace util
 	{
 		template<> const std::string FactorableTemplate<LibraryInterfaceElement, PrintInterfaceElement>::FACTORY_KEY = "print";

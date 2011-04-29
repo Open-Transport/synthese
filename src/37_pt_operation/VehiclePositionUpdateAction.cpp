@@ -43,8 +43,8 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace pt;
-	
-	
+
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt_operation::VehiclePositionUpdateAction>::FACTORY_KEY("VehiclePositionUpdateAction");
@@ -80,9 +80,9 @@ namespace synthese
 			// Warning : Export other parameters if setters are implemented
 			return map;
 		}
-		
-		
-		
+
+
+
 		void VehiclePositionUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.isDefined(PARAMETER_VEHICLE_POSITION_ID))
@@ -201,9 +201,9 @@ namespace synthese
 				_time = time_from_string(map.get<string>(PARAMETER_TIME));
 			}
 		}
-		
-		
-		
+
+
+
 		void VehiclePositionUpdateAction::run(
 			Request& request
 		){
@@ -247,7 +247,7 @@ namespace synthese
 			{
 				_vehiclePosition->setDepot(_depot->get());
 			}
-			
+
 			VehiclePositionTableSync::Save(_vehiclePosition.get());
 
 			if(request.getActionWillCreateObject())
@@ -255,9 +255,9 @@ namespace synthese
 				request.setActionCreatedId(_vehiclePosition->getKey());
 			}
 		}
-		
-		
-		
+
+
+
 		bool VehiclePositionUpdateAction::isAuthorized(
 			const Session* session
 		) const {

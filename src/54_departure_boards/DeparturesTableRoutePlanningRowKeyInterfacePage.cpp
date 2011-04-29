@@ -50,8 +50,8 @@ namespace synthese
 			Registrable(0)
 		{
 		}
-		
-		
+
+
 
 		void DeparturesTableRoutePlanningRowKeyInterfacePage::display(
 			std::ostream& stream,

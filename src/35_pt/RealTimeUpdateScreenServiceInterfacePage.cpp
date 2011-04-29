@@ -62,8 +62,8 @@ namespace synthese
 			FactorableTemplate<interfaces::InterfacePage, RealTimeUpdateScreenServiceInterfacePage>()
 		{
 		}
-		
-		
+
+
 
 		void RealTimeUpdateScreenServiceInterfacePage::display(
 			std::ostream& stream,
@@ -78,7 +78,7 @@ namespace synthese
 			{
 				pv.push_back(dynamic_cast<const LinePhysicalStop&>(lineStop).getPhysicalStop()->getConnectionPlace()->getFullName()); //0
 			}
-			
+
 			pv.push_back(lineStop.getLine()->getCommercialLine()->getStyle()); //1
 			pv.push_back(lineStop.getLine()->getCommercialLine()->getShortName()); //2
 			pv.push_back(lineStop.getLine()->getCommercialLine()->getImage()); //3

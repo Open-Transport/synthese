@@ -37,7 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, forum::ForumMessagePostAction>::FACTORY_KEY("ForumMessagePostAction");
@@ -49,9 +49,9 @@ namespace synthese
 		const string ForumMessagePostAction::PARAMETER_USER_NAME = Action_PARAMETER_PREFIX + "un";
 		const string ForumMessagePostAction::PARAMETER_USER_EMAIL = Action_PARAMETER_PREFIX + "um";
 		const string ForumMessagePostAction::PARAMETER_TOPIC_ID = Action_PARAMETER_PREFIX + "ti";
-		
-		
-		
+
+
+
 		ParametersMap ForumMessagePostAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -64,9 +64,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ForumMessagePostAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -99,9 +99,9 @@ namespace synthese
 			}
 
 		}
-		
-		
-		
+
+
+
 		void ForumMessagePostAction::run(
 			Request& request
 		){
@@ -113,13 +113,13 @@ namespace synthese
 			message.setUserName(_userName);
 
 			ForumMessageTableSync::Save(&message);
-			
+
 //			::AddCreationEntry(object, request.getUser().get());
 			request.setActionCreatedId(message.getKey());
 		}
-		
-		
-		
+
+
+
 		bool ForumMessagePostAction::isAuthorized(
 			const Session* session
 		) const {

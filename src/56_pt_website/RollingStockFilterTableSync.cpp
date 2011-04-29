@@ -94,7 +94,7 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<RollingStockFilterTableSync,RollingStockFilter>::Load(
 			RollingStockFilter* object
 			, const db::DBResultSPtr& rows
-			, util::Env& environment, util::LinkLevel linkLevel /* = util::UP_LINKS_LOAD_LEVEL */ 
+			, util::Env& environment, util::LinkLevel linkLevel /* = util::UP_LINKS_LOAD_LEVEL */
 		){
 			// Columns reading
 			RegistryKeyType id(rows->getLongLong(TABLE_COL_ID));
@@ -222,9 +222,9 @@ namespace synthese
 			//TODO log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace pt_website
 	{
 		RollingStockFilterTableSync::SearchResult RollingStockFilterTableSync::Search(

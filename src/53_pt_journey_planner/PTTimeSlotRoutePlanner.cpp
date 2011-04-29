@@ -154,7 +154,7 @@ namespace synthese
 					result.insert(
 						it.first,
 						VertexAccess(
-							itps.second.approachTime + 
+							itps.second.approachTime +
 							(	direction == DEPARTURE_TO_ARRIVAL ?
 								vertex->getHub()->getTransferDelay(*vertex, *it.first) :
 								vertex->getHub()->getTransferDelay(*it.first, *vertex)
@@ -200,7 +200,7 @@ namespace synthese
 					*(	direction == DEPARTURE_TO_ARRIVAL ?
 						oj->getDestination() :
 						oj->getOrigin()
-					)->getFromVertex() 
+					)->getFromVertex()
 				);
 				cp->getVertexAccessMap(
 					vam2,

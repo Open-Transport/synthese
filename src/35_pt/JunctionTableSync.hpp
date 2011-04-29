@@ -49,10 +49,10 @@ namespace synthese
 				static const std::string COL_DURATION;
 				static const std::string COL_BIDIRECTIONAL;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	Junction search.
 				///	@param env Environment to populate

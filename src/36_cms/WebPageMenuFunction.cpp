@@ -45,7 +45,7 @@ namespace synthese
 	using namespace html;
 
 	template<> const string util::FactorableTemplate<Function,cms::WebPageMenuFunction>::FACTORY_KEY("menu");
-	
+
 	namespace cms
 	{
 		const std::string WebPageMenuFunction::PARAMETER_ROOT_ID("root");
@@ -57,7 +57,7 @@ namespace synthese
 		const std::string WebPageMenuFunction::PARAMETER_ENDING_SELECTED("ending_selected_");
 		const std::string WebPageMenuFunction::PARAMETER_BEGINNING_BEFORE_SUBMENU("beginning_before_submenu_");
 		const std::string WebPageMenuFunction::PARAMETER_ENDING_AFTER_SUBMENU("ending_after_submenu_");
-		
+
 		ParametersMap WebPageMenuFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -134,9 +134,9 @@ namespace synthese
 				currentPage
 			);
 		}
-		
-		
-		
+
+
+
 		bool WebPageMenuFunction::isAuthorized(
 			const Session* session
 		) const {

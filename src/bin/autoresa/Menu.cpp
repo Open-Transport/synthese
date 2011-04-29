@@ -4,13 +4,13 @@
 	@parameters:
 		int: language choiced
 			1, french
-			
+
 		int: category,
 			1, login
-			
-			
+
+
 		int: step number
-		
+
 	@return:
 		string: menu text
 */
@@ -20,7 +20,7 @@ string Functions::getMenu(int _category, int _step)
 	switch(Functions::getLanguage())
 	{
 		case 1:	// french
-		
+
 			switch(_category)
 			{
 				case 0:	// main menu
@@ -57,7 +57,7 @@ string Functions::getMenu(int _category, int _step)
 							return NULL;
 					}
 					break;
-					
+
 				case 2:	// search
 					switch(_step)
 					{
@@ -82,7 +82,7 @@ string Functions::getMenu(int _category, int _step)
 							return "vous n'avez pas le droit d'effacement";
 						case 6: // resa deleted
 							return "reservation est effacee";
-			
+
 					}
 					break;
 				case 4:	// confirmation
@@ -93,7 +93,7 @@ string Functions::getMenu(int _category, int _step)
 						case 2:	// add after 1
 							return " reservation enregistrï¿½e";
 					}
-			
+
 			}
 			break;
 	}

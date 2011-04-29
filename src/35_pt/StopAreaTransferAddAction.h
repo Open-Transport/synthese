@@ -64,7 +64,7 @@ namespace synthese
 			boost::shared_ptr<const StopPoint> _from;
 			boost::shared_ptr<const StopPoint> _to;
 			boost::optional<boost::posix_time::time_duration> _duration;
-			
+
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a generic parameters map from the action parameters.
@@ -84,7 +84,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -97,7 +97,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				
+
 			//@}
 		};
 	}

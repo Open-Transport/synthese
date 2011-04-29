@@ -85,7 +85,7 @@ namespace synthese
 		}
 
 
-		
+
 		void CallStatisticsAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -97,7 +97,7 @@ namespace synthese
 					gregorian::from_string(map.get<string>(PARAM_SEARCH_END_DATE)) + gregorian::days(1)
 				);
 			}
-				
+
 			if(_searchPeriod.is_null())
 				throw RequestException("Dates invalides");
 
@@ -117,7 +117,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool CallStatisticsAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -130,7 +130,7 @@ namespace synthese
 			ostream& stream,
 			const AdminRequest& request
 		) const	{
-		
+
 			AdminFunctionRequest<CallStatisticsAdmin> searchRequest(request);
 
 			{

@@ -43,7 +43,7 @@ namespace synthese
 
 	/** @defgroup m10Exceptions 10 Exceptions
 		@ingroup m10
-	
+
 		@defgroup m10 10 database access
 		@ingroup m1
 
@@ -66,7 +66,7 @@ namespace synthese
 			// For accessing ModuleClass::RegisterParameter.
 			friend class DB;
 
-			
+
 		public:
 			typedef std::map<util::RegistryKeyType, std::string> SubClassMap;
 			typedef std::map<std::string, boost::shared_ptr<DBTableSync> > TablesByNameMap;
@@ -84,7 +84,7 @@ namespace synthese
 
 		public:
 			DBModule() { };
-			
+
 			virtual ~DBModule() { };
 
 			static void SetConnectionString(const std::string& connectionString);
@@ -100,7 +100,7 @@ namespace synthese
 			/// @since 3.1.16
 			/// @throws DBException if the table was not found
 			static boost::shared_ptr<DBTableSync> GetTableSync(const std::string& tableName);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ namespace synthese
 
 		    /** Called whenever a parameter registered by this module is changed
 		     */
-		    static void ParameterCallback (const std::string& name, 
+		    static void ParameterCallback (const std::string& name,
 						   const std::string& value);
 
 			static void AddSubClass(util::RegistryKeyType, const std::string&);

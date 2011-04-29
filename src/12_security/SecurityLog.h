@@ -46,7 +46,7 @@ namespace synthese
 
 			Les colonnes additionnelles du journal de sécurité sont :
 				- Action : décrit l'action effectuée (ex : création de profil)
-				- UID objet concerné : 
+				- UID objet concerné :
 					- lien vers l'utilisateur traité pour les actions d'administration sur les utilisateurs (différent de l'utilisateur connecté)
 					- lien vers le profil traité pour les actions d'administration sur les profils
 					- rien pour les entrées concernant les connexions d'utilisateurs

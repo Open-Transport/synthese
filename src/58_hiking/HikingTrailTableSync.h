@@ -48,10 +48,10 @@ namespace synthese
 				static const std::string COL_STOPS;
 				static const std::string COL_URL;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	HikingTrail search.
 				///	@param env Environment to populate

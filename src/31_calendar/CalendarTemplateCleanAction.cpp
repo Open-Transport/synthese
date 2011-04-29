@@ -37,7 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, calendar::CalendarTemplateCleanAction>::FACTORY_KEY("CalendarTemplateCleanAction");
@@ -46,9 +46,9 @@ namespace synthese
 	namespace calendar
 	{
 		const string CalendarTemplateCleanAction::PARAMETER_CALENDAR_ID = Action_PARAMETER_PREFIX + "id";
-		
-		
-		
+
+
+
 		ParametersMap CalendarTemplateCleanAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -58,9 +58,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CalendarTemplateCleanAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -72,18 +72,18 @@ namespace synthese
 				throw ActionException("No such calendar");
 			}
 		}
-		
-		
-		
+
+
+
 		void CalendarTemplateCleanAction::run(
 			Request& request
 		){
 			CalendarTemplateElementTableSync::Clean(_calendar->getKey());
 //			::AddDeleteEntry(*_object, request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool CalendarTemplateCleanAction::isAuthorized(
 			const Session* session
 		) const {

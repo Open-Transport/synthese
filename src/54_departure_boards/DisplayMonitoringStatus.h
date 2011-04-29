@@ -42,8 +42,8 @@ namespace synthese
 
 		////////////////////////////////////////////////////////////////////////
 		///	Display monitoring status class.
-		///	
-		///	
+		///
+		///
 		///
 		///	@ingroup m54
 		////////////////////////////////////////////////////////////////////////
@@ -61,7 +61,7 @@ namespace synthese
 			} Status;
 
 			typedef util::Registry<DisplayMonitoringStatus> Registry;
-			
+
 		protected:
 			// Attributes
 			const DisplayScreen*		_displayScreen;
@@ -82,8 +82,8 @@ namespace synthese
 			boost::optional<double>	_temperatureValue;
 			Status					_communicationStatus;
 			Status					_localizationStatus;
-			
-		public:	
+
+		public:
 			////////////////////////////////////////////////////////////////////
 			///	DisplayMonitoringStatus Constructor.
 			///	@param id id of the object
@@ -94,7 +94,7 @@ namespace synthese
 			);
 
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			///	Constructor which parses the return of monitoring input
 			///	interface page.
@@ -108,7 +108,7 @@ namespace synthese
 			///	The time of the monitoring status is initialized at the current
 			/// time at the object construction.
 			///
-			/// This method offers backward compatibility : it breaks at the 
+			/// This method offers backward compatibility : it breaks at the
 			/// last token even if all known fields are not fulfilled.
 			/// Then old interfaces can be handled even if new fields have been
 			/// added meanwhile.
@@ -140,13 +140,13 @@ namespace synthese
 			);
 
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			///	DisplayMonitoringStatus Destructor.
 			///	@date 2008
 			////////////////////////////////////////////////////////////////////
 			~DisplayMonitoringStatus();
-			
+
 			//! @name Getters
 			//@{
 				Status				getGeneralStatus()			const;
@@ -168,7 +168,7 @@ namespace synthese
 				const DisplayScreen*	getScreen()				const;
 				const DisplayScreenCPU*	getCPU()				const;
 			//@}
-			
+
 			//! @name Setters
 			//@{
 				void	setGeneralStatus(Status value);
@@ -190,7 +190,7 @@ namespace synthese
 				void	setScreen(const DisplayScreen* value);
 				void	setCPU(const DisplayScreenCPU* value);
 			//@}
-			
+
 			//! @name Queries
 			//@{
 				////////////////////////////////////////////////////////////////////
@@ -232,7 +232,7 @@ namespace synthese
 				Status getGlobalStatus()	const;
 
 
-				
+
 				////////////////////////////////////////////////////////////////////
 				///	Descriptive detail generator.
 				///	@return std::string the summary of the status
@@ -247,7 +247,7 @@ namespace synthese
 				////////////////////////////////////////////////////////////////////
 				std::string getDetail()	const;
 			//@}
-			
+
 			//! @name Others
 			//@{
 				////////////////////////////////////////////////////////////////////
@@ -260,7 +260,7 @@ namespace synthese
 				static std::string GetStatusString(Status value);
 
 
-				
+
 				////////////////////////////////////////////////////////////////////
 				///	Translates a status code into a standardized icon.
 				///	@param value status code

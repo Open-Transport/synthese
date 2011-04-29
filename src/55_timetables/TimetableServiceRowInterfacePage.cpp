@@ -92,7 +92,7 @@ namespace synthese
 			std::size_t followingServicesWithSameHour
 		){
 			ParametersMap pm(request.getFunction()->getSavedParameters());
-		
+
 			pm.insert(DATA_DEPARTURE_HOUR, Service::GetTimeOfDay(object.getContent().begin()->second).hours()); //0
 			pm.insert(DATA_DEPARTURE_MINUTES, Service::GetTimeOfDay(object.getContent().begin()->second).minutes()); //1
 			pm.insert(DATA_LAST_DEPARTURE_HOUR, Service::GetTimeOfDay(lastSchedule).hours()); //2

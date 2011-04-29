@@ -80,7 +80,7 @@ namespace synthese
 			{
 			case ALL: return true;
 			case ODD: return houseNumber % 2;
-			case EVEN: return !(houseNumber % 2); 
+			case EVEN: return !(houseNumber % 2);
 			}
 
 			// Never execute

@@ -38,16 +38,16 @@ int main( int argc, char **argv )
   runner.addTest( CPPUNIT_NS::TestFactoryRegistry::getRegistry().makeTest() );
 
   runner.run( controller );
-      
+
   std::cerr << std::endl;
-      
+
   // Print test in a compiler compatible format.
   CppUnit::CompilerOutputter outputter( &result, std::cerr );
-  outputter.write();                      
+  outputter.write();
 
-  
+
   // runner.run( controller );
-  
+
   return result.wasSuccessful() ? 0 : 1;
 }
 

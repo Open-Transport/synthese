@@ -98,7 +98,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void ServiceAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -140,7 +140,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool ServiceAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -153,7 +153,7 @@ namespace synthese
 			ostream& stream,
 			const AdminRequest& request
 		) const	{
-		
+
 			////////////////////////////////////////////////////////////////////
 			// TAB SCHEDULES
 			if (openTabContent(stream, TAB_SCHEDULES))
@@ -163,15 +163,15 @@ namespace synthese
 
 				AdminActionFunctionRequest<ServiceTimetableUpdateAction,ServiceAdmin> timetableUpdateRequest(request);
 				timetableUpdateRequest.getAction()->setService(const_pointer_cast<SchedulesBasedService>(_service));
-				
+
 				stream << "<h1>Horaires</h1>";
-				
+
 				HTMLTable::ColsVector vs;
 				vs.push_back("Arrêt");
 				vs.push_back("Quai");
 				vs.push_back("Arrivée");
 				vs.push_back("Départ");
-				
+
 				HTMLTable ts(vs, ResultHTMLTable::CSS_CLASS);
 
 				stream << ts.open();
@@ -219,7 +219,7 @@ namespace synthese
 								lineArea->getArea()->getName()
 							);
 					}
-					
+
 					// Arrival time
 					stream << ts.col();
 					if(lineStop.isArrivalAllowed())
@@ -236,7 +236,7 @@ namespace synthese
 						);
 						stream << tuForm.getSubmitButton("Change");
 						stream << tuForm.close();
-						
+
 						HTMLForm suForm(timetableUpdateRequest.getHTMLForm());
 						stream << suForm.open();
 						stream << suForm.getTextInput(
@@ -287,7 +287,7 @@ namespace synthese
 
 					AdminActionFunctionRequest<ContinuousServiceUpdateAction,ServiceAdmin> updateRequest(request);
 					updateRequest.getAction()->setService(const_pointer_cast<ContinuousService>(_continuousService));
-					
+
 					PropertiesHTMLTable t(updateRequest.getHTMLForm());
 					stream << t.open();
 					stream << t.cell("Attente maximale (minutes)", t.getForm().getTextInput(ContinuousServiceUpdateAction::PARAMETER_WAITING_DURATION, lexical_cast<string>(_continuousService->getMaxWaitingTime().total_seconds() / 60)));
@@ -326,7 +326,7 @@ namespace synthese
 				AdminFunctionRequest<DRTAreaAdmin> openAreaRequest(request);
 
 				stream << "<h1>Horaires</h1>";
-				
+
 				HTMLTable::ColsVector vs;
 				vs.push_back("Arrêt");
 				vs.push_back("Quai");
@@ -336,7 +336,7 @@ namespace synthese
 				vs.push_back("Départ");
 				vs.push_back("Retard");
 				vs.push_back("Changement de quai");
-				
+
 				HTMLTable ts(vs, ResultHTMLTable::CSS_CLASS);
 
 				stream << ts.open();
@@ -474,7 +474,7 @@ namespace synthese
 
 				// ServiceDateChangeAction
 			}
-		
+
 			////////////////////////////////////////////////////////////////////
 			// TAB PROPERTIES
 			if (openTabContent(stream, TAB_PROPERTIES))
@@ -528,7 +528,7 @@ namespace synthese
 			_tabs.push_back(Tab("Calendrier", TAB_CALENDAR, true, "calendar.png"));
 
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true, "application_form.png"));
-			
+
 			_tabBuilded = true;
 		}
 

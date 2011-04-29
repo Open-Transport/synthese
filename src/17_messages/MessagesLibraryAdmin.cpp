@@ -77,7 +77,7 @@ namespace synthese
 	{
 		const std::string MessagesLibraryAdmin::PARAMETER_NAME = "nam";
 
-		
+
 		void MessagesLibraryAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -86,7 +86,7 @@ namespace synthese
 				PARAMETER_NAME,
 				optional<size_t>()
 			);
-			
+
 			optional<RegistryKeyType> id(
 				map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
 			);
@@ -136,7 +136,7 @@ namespace synthese
 						):
 						shared_ptr<const ScenarioFolder>()
 					);
-					
+
 					stream <<
 						"<p>" <<
 						HTMLModule::getLinkButton(
@@ -150,7 +150,7 @@ namespace synthese
 
 				AdminActionFunctionRequest<ScenarioFolderUpdateAction,MessagesLibraryAdmin> updateFolderRequest(_request);
 				updateFolderRequest.getAction()->setFolder(_folder);
-				
+
 				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
 				stream << t.open();
 				stream << t.cell("Nom", t.getForm().getTextInput(ScenarioFolderUpdateAction::PARAMETER_NAME, _folder->getName()));
@@ -171,14 +171,14 @@ namespace synthese
 			searchRequest.getPage()->setFolder(_folder);
 
 			AdminFunctionRequest<MessagesScenarioAdmin> updateScenarioRequest(_request);
-			
+
 			AdminActionFunctionRequest<RemoveObjectAction, MessagesLibraryAdmin> deleteScenarioRequest(_request);
-			
+
 			AdminActionFunctionRequest<AddScenarioAction,MessagesScenarioAdmin> addScenarioRequest(_request);
 			addScenarioRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
 			addScenarioRequest.getAction()->setFolder(_folder);
 			addScenarioRequest.setActionWillCreateObject();
-			
+
 			// Search
 			ScenarioTemplateInheritedTableSync::SearchResult scenarios(
 				ScenarioTemplateInheritedTableSync::Search(
@@ -190,12 +190,12 @@ namespace synthese
 					, _requestParameters.orderField == PARAMETER_NAME
 					, _requestParameters.raisingOrder
 			)	);
-			
+
 			ActionResultHTMLTable::HeaderVector h3;
 			h3.push_back(make_pair(PARAMETER_NAME, "Nom"));
 			h3.push_back(make_pair(string(), "Actions"));
 			h3.push_back(make_pair(string(), "Actions"));
-			
+
 			ActionResultHTMLTable t3(
 				h3,
 				searchRequest.getHTMLForm(),
@@ -205,7 +205,7 @@ namespace synthese
 				AddScenarioAction::PARAMETER_TEMPLATE_ID
 			);
 			stream << t3.open();
-			
+
 			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, scenarios)
 			{
 				updateScenarioRequest.getPage()->setScenario(scenario);
@@ -233,9 +233,9 @@ namespace synthese
 			{
 				stream << "<p>Aucun sous-répertoire.</p>";
 			}
-			
+
 			AdminFunctionRequest<MessagesLibraryAdmin> goFolderRequest(_request);
-			
+
 			AdminActionFunctionRequest<ScenarioFolderAdd,MessagesLibraryAdmin> addFolderRequest(_request);
 			addFolderRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
 			addFolderRequest.getAction()->setParent(_folder);
@@ -259,7 +259,7 @@ namespace synthese
 				}
 				stream << HTMLModule::getHTMLLink(goFolderRequest.getURL(), folder->getName());
 			}
-			
+
 			stream << l.element("folder");
 			stream << f.getImageSubmitButton("add.png", "Ajouter");
 			stream << f.getTextInput(ScenarioFolderAdd::PARAMETER_NAME,"","(Entrez le nom du répertoire ici)");
@@ -276,7 +276,7 @@ namespace synthese
 		MessagesLibraryAdmin::MessagesLibraryAdmin()
 			: AdminInterfaceElementTemplate<MessagesLibraryAdmin>()
 		{
-			
+
 		}
 
 		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPagesOfModule(
@@ -285,7 +285,7 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const MessagesModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -316,7 +316,7 @@ namespace synthese
 				p->setFolder(cfolder);
 				links.push_back(p);
 			}
-			
+
 			// Scenarios
 			ScenarioTemplateInheritedTableSync::SearchResult scenarios(
 				ScenarioTemplateInheritedTableSync::Search(
@@ -331,7 +331,7 @@ namespace synthese
 				p->setScenario(tpl);
 				links.push_back(p);
 			}
-			
+
 			return links;
 		}
 
@@ -354,17 +354,17 @@ namespace synthese
 		) const	{
 			return !_folder.get();
 		}
-		
+
 		boost::shared_ptr<const ScenarioFolder> MessagesLibraryAdmin::getFolder() const
 		{
 			return _folder;
 		}
-		
+
 		void MessagesLibraryAdmin::setFolder(boost::shared_ptr<ScenarioFolder> folder)
 		{
 			_folder = const_pointer_cast<const ScenarioFolder>(folder);
 		}
-	
+
 		void MessagesLibraryAdmin::setFolder(boost::shared_ptr<const ScenarioFolder> folder)
 		{
 			_folder = folder;

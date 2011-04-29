@@ -67,7 +67,7 @@ namespace synthese
 					DEPARTURE_FIRST,
 					false
 				);
-				
+
 				PTRoutePlannerResult solution(rp.run());
 				result.insert(
 					make_pair(

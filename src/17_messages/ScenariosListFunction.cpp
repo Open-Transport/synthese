@@ -45,7 +45,7 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,messages::ScenariosListFunction>::FACTORY_KEY("scenarii");
-	
+
 	namespace messages
 	{
 		const string ScenariosListFunction::PARAMETER_CMS_TEMPLATE_ID("p");
@@ -57,7 +57,7 @@ namespace synthese
 		const string ScenariosListFunction::DATA_END_DATE("end_date");
 		const string ScenariosListFunction::DATA_FOLDER_ID("folder_id");
 
-		
+
 		ParametersMap ScenariosListFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -147,9 +147,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		bool ScenariosListFunction::isAuthorized(
 			const Session* session
 		) const {

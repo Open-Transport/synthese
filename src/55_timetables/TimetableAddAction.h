@@ -90,9 +90,9 @@ namespace synthese
 				void setTemplate(boost::shared_ptr<const Timetable> value){ _template = value; }
 				void setReverse(bool value){ _reverse = value; }
 			//@}
-			
+
 			TimetableAddAction();
-			
+
 			virtual bool isAuthorized(const server::Session* session) const;
 		};
 	}

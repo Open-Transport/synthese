@@ -113,7 +113,7 @@ namespace synthese
 			    rows->getText (JourneyPatternTableSync::COL_DIRECTION));
 
 			bool isWalkingLine (rows->getBool (JourneyPatternTableSync::COL_ISWALKINGLINE));
-			
+
 			line->setName(name);
 			line->setTimetableName (timetableName);
 			line->setDirection (direction);
@@ -181,7 +181,7 @@ namespace synthese
 					{
 						Log::GetInstance().warn("Bad value " + lexical_cast<string>(handicappedComplianceId) + " for handicapped compliance in line " + lexical_cast<string>(line->getKey()));
 				}	}
-				
+
 				RegistryKeyType pedestrianComplianceId(rows->getLongLong (JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID));
 				if(pedestrianComplianceId > 0)
 				{
@@ -216,11 +216,11 @@ namespace synthese
 				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() : RegistryKeyType(0)
 			);
 			query.addField(
-				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
+				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() : RegistryKeyType(0)
 			);
 			query.addField(
-				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
+				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() : RegistryKeyType(0)
 			);
 			query.addField(object->getWayBack());

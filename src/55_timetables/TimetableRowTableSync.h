@@ -50,8 +50,8 @@ namespace synthese
 			static const std::string COL_IS_DEPARTURE;
 			static const std::string COL_IS_ARRIVAL;
 			static const std::string COL_IS_COMPULSORY;
-			
-			
+
+
 
 			/** TimetablesRow search.
 				@param env Environment to populate

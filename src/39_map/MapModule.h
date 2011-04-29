@@ -50,12 +50,12 @@ namespace synthese
 
 		@defgroup m59Logs 59 DB Logs
 		@ingroup m59
-		
+
 		@defgroup m59 59 Map drawing
 		@ingroup m5
-		
+
 		(Module documentation)
-		
+
 		Le tracé de carte se fait à partir de quatre catégories d'éléments d'entrée  :
 			- données géographiques du serveur (chargées à l'initialisation) : voir @ref uc10 "liste des données"
 			- données géographiques propres à la carte, fournies avec la demande de carte, permettant de tracer sur la carte des éléments supplémentaires provenant par exemple de l'application cliente. Les données pouvant être transmises à la volée sont les mêmes que les @ref uc10 "données du serveur" à l'exception des fonds de carte bitmap
@@ -75,9 +75,9 @@ namespace synthese
 
 		<table class="tableau">
 		<tr><th>Format</th><th>Table de liens</th><th>Carte</th><th>Utilisation de Ghostscript</th></tr>
-		<tr><th>PS</th><td>NON</td><td>OUI</td><td>NON</td></tr>	
-		<tr><th>PDF</th><td>OUI</td><td>OUI</td><td>OUI</td></tr>	
-		<tr><th>JPEG</th><td>NON</td><td>OUI</td><td>OUI</td></tr>	
+		<tr><th>PS</th><td>NON</td><td>OUI</td><td>NON</td></tr>
+		<tr><th>PDF</th><td>OUI</td><td>OUI</td><td>OUI</td></tr>
+		<tr><th>JPEG</th><td>NON</td><td>OUI</td><td>OUI</td></tr>
 		<tr><th>HTML</th><td>OUI</td><td>NON</td><td>NON</td></tr>
 		<tr><th>Mapinfo</th><td>OUI</td><td>NON</td><td>NON</td></tr>
 		</table>
@@ -98,11 +98,11 @@ namespace synthese
 		    static const std::string PARAM_HTTP_TEMP_DIR;
 		    static const std::string PARAM_HTTP_TEMP_URL;
 		    static const std::string PARAM_BACKGROUNDS_DIR;
-			
+
 		    /** Called whenever a parameter registered by this module is changed
 		     */
-		    static void ParameterCallback (const std::string& name, 
-						   const std::string& value);		
+		    static void ParameterCallback (const std::string& name,
+						   const std::string& value);
 		};
 	}
 	/** @} */

@@ -45,15 +45,15 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<ModuleClass,SecurityModule>::FACTORY_KEY("12_security");
-	
+
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<SecurityModule>::NAME("Sécurité");
-		
+
 		template<> void ModuleClassTemplate<SecurityModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<SecurityModule>::Init()
 		{
 			Env env;
@@ -64,7 +64,7 @@ namespace synthese
 				SecurityModule::_rootProfile.reset(new Profile);
 			else
 				SecurityModule::_rootProfile = rootProfiles.front();
-	
+
 			SecurityModule::_rootProfile->setName(SecurityModule::ROOT_PROFILE);
 			shared_ptr<Right> r(new GlobalRight);
 			r->setPublicLevel(DELETE_RIGHT);
@@ -95,7 +95,7 @@ namespace synthese
 			SecurityModule::_rootUser->setConnectionAllowed(true);
 			UserTableSync::Save(SecurityModule::_rootUser.get());
 		}
-		
+
 		template<> void ModuleClassTemplate<SecurityModule>::End()
 		{
 		}
@@ -134,7 +134,7 @@ namespace synthese
 			{
 				m.push_back(make_pair(optional<RegistryKeyType>(), "(tous)"));
 			}
-			
+
 			Env env;
 			ProfileTableSync::SearchResult profiles(
 				ProfileTableSync::Search(env)

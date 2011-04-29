@@ -123,7 +123,7 @@ namespace synthese
 			_address = address;
 		}
 
-		
+
 		void User::setPostCode( const std::string& code )
 		{
 			_postCode = code;
@@ -230,7 +230,7 @@ namespace synthese
 			rng.seed(getKey() * posix_time::microsec_clock::local_time().time_of_day().total_microseconds());
 			uniform_int<> six(0,61);      // distribution that maps to 1..6
 			variate_generator<mt19937&, uniform_int<> >	die(rng, six); // glues randomness with mapping
-			
+
 			string password;
 
 			for(int i=0; i<8; ++i)

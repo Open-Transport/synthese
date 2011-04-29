@@ -62,7 +62,7 @@ namespace synthese
 			void run(server::Request& request);
 
 			virtual bool isAuthorized(const server::Session* session) const;
-			
+
 			void setProfile(boost::shared_ptr<const Profile> value);
 		};
 	}

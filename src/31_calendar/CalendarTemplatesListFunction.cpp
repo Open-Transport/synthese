@@ -38,13 +38,13 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,calendar::CalendarTemplatesListFunction>::FACTORY_KEY("CalendarTemplatesListFunction");
-	
+
 	namespace calendar
 	{
 		const string CalendarTemplatesListFunction::PARAMETER_ROOT_CALENDAR("root_calendar");
 		const string CalendarTemplatesListFunction::PARAMETER_DEFAULT_VALUE("default_value");
 		const string CalendarTemplatesListFunction::PARAMETER_FIELD_NAME("field_name");
-		
+
 		ParametersMap CalendarTemplatesListFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -63,7 +63,7 @@ namespace synthese
 		void CalendarTemplatesListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_fieldName = map.getDefault<string>(PARAMETER_FIELD_NAME, "calendar_template");
-			
+
 			// Root calendar
 			RegistryKeyType rid(map.getDefault<RegistryKeyType>(PARAMETER_ROOT_CALENDAR, 0));
 			if(rid)
@@ -104,9 +104,9 @@ namespace synthese
 			}
 			stream << "</select>";
 		}
-		
-		
-		
+
+
+
 		bool CalendarTemplatesListFunction::isAuthorized(
 			const Session* session
 		) const {

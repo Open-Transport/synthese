@@ -160,11 +160,11 @@ namespace synthese
 			AdminActionFunctionRequest<ScenarioSaveAction,MessagesScenarioAdmin> newScenarioRequest(_request);
 			newScenarioRequest.getFunction()->setActionFailedPage<MessagesAdmin>();
 			newScenarioRequest.setActionWillCreateObject();
-			
+
 			AdminFunctionRequest<MessagesScenarioAdmin> scenarioRequest(_request);
 
 			AdminActionFunctionRequest<ScenarioStopAction,MessagesAdmin> scenarioStopRequest(_request);
-			
+
 			vector<pair<optional<SentScenarioInheritedTableSync::StatusSearch>, string> > statusMap;
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING, "En diffusion / prévu"));
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING_WITH_END, "&nbsp;&gt;&nbsp;En cours avec date de fin"));
@@ -172,7 +172,7 @@ namespace synthese
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::FUTURE_BROADCAST, "&nbsp;&gt;&nbsp;Diffusion ultérieure"));
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_OVER, "Archivés"));
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_DRAFT, "Brouillons"));
-			
+
 			ptime now(second_clock::local_time());
 
 			stream << "<h1>Recherche</h1>";
@@ -229,7 +229,7 @@ namespace synthese
 					, _requestParameters.orderField == PARAMETER_SEARCH_STATUS
 					, _requestParameters.raisingOrder
 			)	);
-			
+
 			ActionResultHTMLTable::HeaderVector v1;
 			v1.push_back(make_pair(string(), string("Statut")));
 			v1.push_back(make_pair(PARAMETER_SEARCH_DATE, string("Dates")));
@@ -245,7 +245,7 @@ namespace synthese
 				newScenarioRequest.getHTMLForm("newscen"),
 				ScenarioSaveAction::PARAMETER_MESSAGE_TO_COPY
 			);
-			
+
 			stream << t1.open();
 
 			BOOST_FOREACH(shared_ptr<SentScenario> message, scenarios)
@@ -313,8 +313,8 @@ namespace synthese
 						stream << "Prévu";
 					}
 				}
-				
-				
+
+
 				stream << t1.col();
 				if (message->getPeriodStart().is_not_a_date_time() && message->getPeriodEnd().is_not_a_date_time())
 				{
@@ -335,7 +335,7 @@ namespace synthese
 
 				// Type
 //				stream << t1.col() << MessagesModule::getLevelLabel(message.level);
-				
+
 				stream << t1.col() << message->getName();
 				//stream << t1.col(); // Bullet
 //				stream << t1.col() << MessagesModule::getConflictLabel(message.conflict); /// @todo put a graphic bullet
@@ -379,7 +379,7 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const MessagesModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -403,16 +403,16 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-		
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			const MessagesScenarioAdmin* sa(
 				dynamic_cast<const MessagesScenarioAdmin*>(&currentPage)
 			);
 			const MessageAdmin* ma(
 				dynamic_cast<const MessageAdmin*>(&currentPage)
 			);
-			
+
 			if(	sa &&
 				dynamic_cast<const SentScenario*>(sa->getScenario().get()) ||
 				ma &&

@@ -57,7 +57,7 @@ namespace synthese
 			const Path::Edges& edges(service.getPath()->getEdges());
 			Path::Edges::const_iterator itEdge(edges.begin());
 			bool first(true);
-			
+
 			for(TimetableGenerator::Rows::const_iterator itRow(rows.begin()); itRow != rows.end(); ++itRow)
 			{
 				Path::Edges::const_iterator itEdge2;
@@ -163,7 +163,7 @@ namespace synthese
 						){
 							return false;
 						}
-						
+
 						if (i != 0)
 						{
 							for(size_t k = i-1; k>0; --k)
@@ -202,7 +202,7 @@ namespace synthese
 						_destinationType = Indetermine;
 				}
 			}
-			
+
 			_service = NULL;
 			_calendar |= col._calendar;
 		}
@@ -213,7 +213,7 @@ namespace synthese
 		{
 			assert(op._content.size() == _content.size());
 
-			return 
+			return
 				(_line == NULL && op._line == NULL) ||
 				(_line != NULL && op._line != NULL && _line->getCommercialLine() == op._line->getCommercialLine() && _content == op._content)
 			;

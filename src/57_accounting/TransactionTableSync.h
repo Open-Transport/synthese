@@ -3,7 +3,7 @@
 	@file TransactionTableSync.h
 
 	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
-	Copyright (C) 2006 Vinci Park 
+	Copyright (C) 2006 Vinci Park
 	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
 
 	This program is free software; you can redistribute it and/or
@@ -58,9 +58,9 @@ namespace synthese
 			/** TransactionPart search.
 			@param first First user to answer
 			@param number Number of users to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-			@return vector<Account*> Founded accounts. 
+			@return vector<Account*> Founded accounts.
 			@author Hugues Romain
-			@date 2006				
+			@date 2006
 			*/
 			static std::vector<boost::shared_ptr<Transaction> > searchTransactions(db::DB* db
 

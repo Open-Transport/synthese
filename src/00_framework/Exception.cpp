@@ -44,14 +44,14 @@ namespace synthese
 
 
 
-	const std::string& 
+	const std::string&
 	Exception::getMessage () const
 	{
 		return _message;
 	}
 
 
-	const char* 
+	const char*
 	Exception::what () const throw ()
 	{
 		return _message.c_str ();

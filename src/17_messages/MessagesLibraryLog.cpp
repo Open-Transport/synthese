@@ -104,7 +104,7 @@ namespace synthese
 			DBLogEntry::Content content;
 			content.push_back(string());
 			content.push_back(text);
-			
+
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, 0);
 		}
 
@@ -166,8 +166,8 @@ namespace synthese
 
 			_addEntry(FACTORY_KEY, DBLogEntry::DB_LOG_INFO, content, user, scenario.getKey());
 		}
-		
-		
+
+
 		void MessagesLibraryLog::AddTemplateInstanciationEntry(
 			const SentScenario& scenario
 			, const security::User* user

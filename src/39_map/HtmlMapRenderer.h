@@ -53,7 +53,7 @@ namespace synthese
 		private:
 			std::string _urlPattern; //!< URL pattern ($id is replaced by the proper object id)
 			std::string _mapImgFilename; //!< Filename of the img used in generated HTML map
-			
+
 		public:
 
 
@@ -68,23 +68,23 @@ namespace synthese
 
 			virtual ~HtmlMapRenderer ();
 
-			std::string render (const boost::filesystem::path& tempDir, 
+			std::string render (const boost::filesystem::path& tempDir,
 					    const std::string& filenamePrefix,
 						const util::Registry<pt::JourneyPattern>& lines,
 						synthese::map::Map& map,
 					    const synthese::map::RenderingConfig& config);
-			
+
 		private:
 
 			void renderLines(
-				std::ostream& output, 
-				const util::Registry<pt::JourneyPattern>& lines, 
+				std::ostream& output,
+				const util::Registry<pt::JourneyPattern>& lines,
 				Map& map
 			);
 
 			void renderPhysicalStops (std::ostream& output, Map& map);
 
-			
+
 		};
 	}
 }

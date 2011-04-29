@@ -84,7 +84,7 @@ namespace synthese
 			, const server::Request* request /*= NULL*/ ) const
 		{
 			const RoutePlanningList& ptds(static_cast<const RoutePlanningListWithAlarm*>(object)->map);
-			
+
 			int departuresToHide(_departuresToHide ? Conversion::ToInt(_departuresToHide->getValue(parameters, variables, object, request)) : 0);
 			bool displayServiceNumber(_displayServiceNumber ? Conversion::ToBool(_displayServiceNumber->getValue(parameters, variables, object, request)) : false);
 			bool displayQuai(_displayQuai ? Conversion::ToBool(_displayQuai->getValue(parameters, variables, object, request)) : false);

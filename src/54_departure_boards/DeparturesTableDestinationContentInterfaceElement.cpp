@@ -89,7 +89,7 @@ namespace synthese
 	//		string displayCity(_displayCityVIE->getValue(parameters, variables, object, request));
 			string __AvantCommune = _beforeCityVIE->getValue(parameters, variables, object, request);
 			string __ApresCommune = _afterCityVIE->getValue(parameters, variables, object, request);
-			
+
 			const City* __DerniereCommune = dynamic_cast<const NamedPlace*>(__DP->second.at(0).place)->getCity();
 			size_t totalTransferRank(0);
 
@@ -159,7 +159,7 @@ namespace synthese
 
 					out << place->getCity () ->getName() << flush;
 					string cityName (ss.str ());
-					
+
 					if(
 						!cityName.empty()
 						&& cityName[0] >= 'a'
@@ -182,7 +182,7 @@ namespace synthese
 
 				// Affichage de la destination 26 caracteres dans les cas ou necessaire
 				if( __TypeAffichage == TYPE_CHAR_26
-				||	__TypeAffichage == TYPE_CHAR_26_OR_STATION_CITY_IF_NEW					
+				||	__TypeAffichage == TYPE_CHAR_26_OR_STATION_CITY_IF_NEW
 				)	stream << place->getName26OrName();
 			}
 			return string();

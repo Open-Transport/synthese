@@ -55,7 +55,7 @@ namespace synthese
 			static const std::string PARAM_SEARCH_END_DATE;
 			static const std::string PARAM_ROW_STEP;
 			static const std::string PARAM_COL_STEP;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
@@ -64,7 +64,7 @@ namespace synthese
 				ResaStatisticsTableSync::Step _searchRowStep;
 				ResaStatisticsTableSync::Step _searchColStep;
 			//@}
-			
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
@@ -72,9 +72,9 @@ namespace synthese
 			/// @author Hugues
 			/// @date 2009
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
@@ -83,8 +83,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 			void setLine(boost::shared_ptr<const pt::CommercialLine> value);
 			void setPeriod(boost::gregorian::date_period value);
@@ -101,12 +101,12 @@ namespace synthese
 			/// @author Hugues
 			/// @date 2009
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
+
 
 
 			virtual std::string getFileName() const;
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @return true if the function can be run

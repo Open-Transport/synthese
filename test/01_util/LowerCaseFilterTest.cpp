@@ -27,7 +27,7 @@ BOOST_AUTO_TEST_CASE (testEncodingDecoding)
       }
       sout.str ("");
       {
-	  
+
 	  out << "ABCDEFGHIJKLMNOPQRSTUVWXYZ" << std::flush ;;
 	  std::string expected ("abcdefghijklmnopqrstuvwxyz");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());

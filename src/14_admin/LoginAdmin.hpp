@@ -77,8 +77,8 @@ namespace synthese
 				const server::ParametersMap& map
 			);
 
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Creation of the parameters map from the object attributes.
 			///	@author Hugues Romain
@@ -99,7 +99,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Authorization control.
 			/// Returns if the page can be displayed. In most cases, the needed right

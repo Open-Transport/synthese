@@ -38,20 +38,20 @@ namespace synthese
 	namespace util
 	{
 
-		/** 
+		/**
 		    @ingroup m01
 		*/
 		class Archive
 		{
 		private:
-		    
-		    static const char LINK_INDICATOR_NORMAL_FILE;      
+
+		    static const char LINK_INDICATOR_NORMAL_FILE;
 		    static const char LINK_INDICATOR_NORMALOLD_FILE;    // Unhandled
 		    static const char LINK_INDICATOR_HARDLINK_FILE;     // Unhandled
 		    static const char LINK_INDICATOR_SYMBOLIC_FILE;     // Unhandled
 		    static const char LINK_INDICATOR_CHARSPECIAL_FILE;  // Unhandled
 		    static const char LINK_INDICATOR_BLOCKSPECIAL_FILE; // Unhandled
-		    static const char LINK_INDICATOR_DIRECTORY_FILE; 
+		    static const char LINK_INDICATOR_DIRECTORY_FILE;
 		    static const char LINK_INDICATOR_FIFO_FILE;         // Unhandled
 		    static const char LINK_INDICATOR_CONTIGUOUS_FILE;   // Unhandled
 
@@ -64,14 +64,14 @@ namespace synthese
 			    This method can be called any number of times to add more entries
 			    to the tarball.
 			*/
-			static void Tar (const boost::filesystem::path& baseDir, 
-					 const boost::filesystem::path& relativePath, 
+			static void Tar (const boost::filesystem::path& baseDir,
+					 const boost::filesystem::path& relativePath,
 					 std::ostream& os, bool recursive);
 
 		public:
 
-			static void Tar (const boost::filesystem::path& baseDir, 
-					 const boost::filesystem::path& relativePath, 
+			static void Tar (const boost::filesystem::path& baseDir,
+					 const boost::filesystem::path& relativePath,
 					 std::ostream& os);
 
 		};

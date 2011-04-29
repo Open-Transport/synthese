@@ -38,7 +38,7 @@ namespace synthese
 		class DisplayScreen;
 
 		/** Action class : Adds a stop to the selection of a departures table.
-			
+
 			@ingroup m54Actions refActions
 		*/
 		class AddDepartureStopToDisplayScreenAction
@@ -69,7 +69,7 @@ namespace synthese
 			void run(server::Request& request);
 
 			virtual bool isAuthorized(const server::Session* session) const;
-			
+
 			void setStopId(
 				util::RegistryKeyType id
 			);

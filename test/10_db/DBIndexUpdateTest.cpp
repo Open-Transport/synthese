@@ -55,7 +55,7 @@ namespace synthese
 			DBTableSync::Field(TestIndexTableSync::COL_COLUMN1, SQL_INTEGER),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<TestIndexTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index(
@@ -100,7 +100,7 @@ namespace synthese
 			DBTableSync::Field(TestIndex2TableSync::COL_COLUMN1, SQL_INTEGER),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<TestIndex2TableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index(

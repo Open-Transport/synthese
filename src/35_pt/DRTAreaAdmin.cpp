@@ -47,7 +47,7 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace html;
-	
+
 
 	namespace util
 	{
@@ -67,7 +67,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void DRTAreaAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -79,7 +79,7 @@ namespace synthese
 			{
 				throw AdminParametersException("No such area");
 			}
-			
+
 		}
 
 
@@ -87,7 +87,7 @@ namespace synthese
 		ParametersMap DRTAreaAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			
+
 			if(_area.get())
 			{
 				m.insert(Request::PARAMETER_OBJECT_ID, _area->getKey());
@@ -97,7 +97,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DRTAreaAdmin::isAuthorized(
 			const security::User& user
 		) const	{

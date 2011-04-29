@@ -109,7 +109,7 @@ namespace synthese
 				query << " LIMIT " << (*number + 1);
 			if (first > 0)
 				query << " OFFSET " << first;
-			
+
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 	}

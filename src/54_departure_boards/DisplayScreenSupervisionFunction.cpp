@@ -52,9 +52,9 @@ namespace synthese
 	{
 		const std::string DisplayScreenSupervisionFunction::PARAMETER_DISPLAY_SCREEN_ID = "tb";
 		const std::string DisplayScreenSupervisionFunction::PARAMETER_STATUS = "status";
-		
+
 		const std::string DisplayScreenSupervisionFunction::DATA_TEXT = "text";
-		
+
 
 
 		DisplayScreenSupervisionFunction::DisplayScreenSupervisionFunction()
@@ -106,8 +106,8 @@ namespace synthese
 			assert(_displayScreen->getType() != NULL);
 			assert(_displayScreen->getType()->getMonitoringInterface() != NULL);
 			assert(_displayScreen->getType()->getMonitoringInterface()->getPage<ParseDisplayReturnInterfacePage>() != NULL);
-			
-			
+
+
 			// Last monitoring status
 			DisplayMonitoringStatusTableSync::SearchResult entries(
 				DisplayMonitoringStatusTableSync::Search(*_env, _displayScreen->getKey(), 0, 1, true, false)

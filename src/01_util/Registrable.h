@@ -61,9 +61,9 @@ namespace synthese
 			///	@date 2008
 			////////////////////////////////////////////////////////////////////
 			explicit Registrable(RegistryKeyType key);
-						
-			
-			
+
+
+
 			////////////////////////////////////////////////////////////////////
 			///	Registrable default constructor for building purpose only.
 			///	@throws RegistryException<void> always (should not be used)
@@ -88,7 +88,7 @@ namespace synthese
 			//@{
 				////////////////////////////////////////////////////////////////////
 				/// ID of the object setter.
-				///	@param key the ID of the object to set 
+				///	@param key the ID of the object to set
 				////////////////////////////////////////////////////////////////////
 				void setKey(RegistryKeyType key);
 			//@}

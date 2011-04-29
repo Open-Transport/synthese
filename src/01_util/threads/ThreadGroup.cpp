@@ -9,20 +9,20 @@ namespace util
 
 
 
-ThreadGroup::ThreadGroup () 
+ThreadGroup::ThreadGroup ()
 {
-    
+
 }
-    
 
 
-ThreadGroup::~ThreadGroup () 
+
+ThreadGroup::~ThreadGroup ()
 {
 }
-    
 
 
-void 
+
+void
 ThreadGroup::addThread (const ThreadSPtr& thread)
 {
     _threads.push_back (thread);
@@ -32,7 +32,7 @@ ThreadGroup::addThread (const ThreadSPtr& thread)
 
 
 
-void 
+void
 ThreadGroup::waitForAllReady () const
 {
     waitAllInState (Thread::READY);
@@ -40,7 +40,7 @@ ThreadGroup::waitForAllReady () const
 
 
 
-void 
+void
 ThreadGroup::waitForAllStopped () const
 {
     waitAllInState (Thread::STOPPED);
@@ -48,7 +48,7 @@ ThreadGroup::waitForAllStopped () const
 
 
 
-void 
+void
 ThreadGroup::waitAllInState (const Thread::ThreadState& state) const
 {
     while (1)

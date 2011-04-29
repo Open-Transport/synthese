@@ -48,7 +48,7 @@ namespace synthese
 		public:
 			static const std::string COL_TEXT;
 			static const std::string COL_CATEGORY;
-			
+
 
 			/** CalendarTemplate search.
 				@param env Environment to populate
@@ -71,7 +71,7 @@ namespace synthese
 
 
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > CalendarTemplatesList;
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a list of the calendar templates.
 			/// @param zeroName if non empty, a zero choice is added at the top of the list, named by the parameter value

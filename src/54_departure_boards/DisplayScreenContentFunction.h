@@ -186,7 +186,7 @@ namespace synthese
 				static const std::string DATA_RANK_IN_PATH;
 				static const std::string DATA_DESTINATIONS;
 				static const std::string DATA_DIRECTION;
-				
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Displays a row of a departure board.
 				///	https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
@@ -223,7 +223,7 @@ namespace synthese
 				static const std::string DATA_TRANSFERS;
 				static const std::string DATA_IS_CONTINUATION;
 				static const std::string DATA_CONTINUATION_STARTS_AT_END;
-				
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of an intermediate or ending destination of a departure board.
 				///	https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
@@ -312,7 +312,7 @@ namespace synthese
 				static const std::string DATA_SECOND_TIME;
 				static const std::string DATA_SECOND_TRANSPORT_MODE;
 				static const std::string DATA_TRANSFER_STOP_NAME;
-				
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Displays a row of a route planning board.
 				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Destination-of-journey-planner-based-departure-board

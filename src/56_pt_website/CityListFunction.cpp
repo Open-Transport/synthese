@@ -45,7 +45,7 @@ namespace synthese
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<CityListFunction::_FunctionWithSite,CityListFunction>::FACTORY_KEY("lc");
-	
+
 	namespace pt_website
 	{
 		const string CityListFunction::PARAMETER_INPUT("t");
@@ -95,7 +95,7 @@ namespace synthese
 			}
 			_input = map.getDefault<string>(PARAMETER_INPUT);
 			_atLeastAStop = map.getDefault<bool>(PARAMETER_AT_LEAST_A_STOP, false);
-		
+
 			_n = map.getOptional<size_t>(PARAMETER_NUMBER);
 			if (!_input.empty() && !_n)
 			{
@@ -111,7 +111,7 @@ namespace synthese
 		) const {
 			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
 			if(!site) throw RequestException("Incorrect site");
-			
+
 			PlacesList placesList;
 
 			if(!_input.empty())

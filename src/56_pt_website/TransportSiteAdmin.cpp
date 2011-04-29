@@ -119,7 +119,7 @@ namespace synthese
 		const string TransportSiteAdmin::TAB_PERIMETER("pe");
 		const string TransportSiteAdmin::TAB_ROUTE_PLANNING("rp");
 		const string TransportSiteAdmin::TAB_WEB_PAGES("wp");
-		
+
 		TransportSiteAdmin::TransportSiteAdmin()
 			: AdminInterfaceElementTemplate<TransportSiteAdmin>(),
 			_dateTime(not_a_date_time),
@@ -128,7 +128,7 @@ namespace synthese
 			_rollingStockFilter(NULL),
 			_pt_journey_planning(true)
 		{ }
-		
+
 		void TransportSiteAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -168,7 +168,7 @@ namespace synthese
 			_accessibility = static_cast<UserClassCode>(
 				map.getDefault<int>(PARAMETER_ACCESSIBILITY, UNKNOWN_VALUE)
 			);
-		
+
 			if(!_site->getRollingStockFilters().empty())
 			{
 				if(map.getOptional<size_t>(PARAMETER_ROLLING_STOCK_FILTER))
@@ -186,9 +186,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap TransportSiteAdmin::getParametersMap() const
 		{
 			ParametersMap m(_pageSearchParameter.getParametersMap());
@@ -217,7 +217,7 @@ namespace synthese
 		}
 
 
-		
+
 		void TransportSiteAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -512,7 +512,7 @@ namespace synthese
 		) const	{
 			return user.getProfile()->isAuthorized<TransportWebsiteRight>(READ);
 		}
-		
+
 
 
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfModule(
@@ -521,7 +521,7 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const TransportWebsiteModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -541,7 +541,7 @@ namespace synthese
 			}
 			return links;
 		}
-		
+
 
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
@@ -561,7 +561,7 @@ namespace synthese
 					p->setPage(const_pointer_cast<const Webpage>(page));
 					links.push_back(p);
 				}	}
-			
+
 			return links;
 		}
 
@@ -571,10 +571,10 @@ namespace synthese
 		{
 			return _site.get() ? _site->getName() : DEFAULT_TITLE;
 		}
-		
 
 
-		
+
+
 		bool TransportSiteAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _site->getKey() == static_cast<const TransportSiteAdmin&>(other)._site->getKey();

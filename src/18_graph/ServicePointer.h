@@ -68,7 +68,7 @@ namespace synthese
 				const Vertex*		_realTimeArrivalVertex;
 				boost::posix_time::ptime		_theoreticalArrivalTime;
 			//@}
-			
+
 			//! @name General information
 			//@{
 				std::size_t		_userClassRank;
@@ -77,7 +77,7 @@ namespace synthese
 				boost::posix_time::ptime		_originDateTime;
 				boost::posix_time::time_duration	_range;
 			//@}
-			
+
 		public:
 
 			//////////////////////////////////////////////////////////////////////////

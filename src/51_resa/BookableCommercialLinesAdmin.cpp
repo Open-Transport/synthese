@@ -68,14 +68,14 @@ namespace synthese
 		BookableCommercialLinesAdmin::BookableCommercialLinesAdmin()
 			: AdminInterfaceElementTemplate<BookableCommercialLinesAdmin>()
 		{ }
-		
+
 		void BookableCommercialLinesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
 			_requestParameters.setFromParametersMap(map.getMap());
 		}
-		
-		
+
+
 		server::ParametersMap BookableCommercialLinesAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
@@ -83,7 +83,7 @@ namespace synthese
 		}
 
 
-		
+
 		void BookableCommercialLinesAdmin::display(
 			ostream& stream,
 			const AdminRequest& _request
@@ -133,7 +133,7 @@ namespace synthese
 		) const	{
 			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
-		
+
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
@@ -149,7 +149,7 @@ namespace synthese
 			}
 			return links;
 		}
-		
+
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request

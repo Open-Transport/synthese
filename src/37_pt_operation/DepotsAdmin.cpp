@@ -46,7 +46,7 @@ namespace synthese
 	using namespace pt_operation;
 	using namespace db;
 	using namespace html;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, DepotsAdmin>::FACTORY_KEY("DepotsAdmin");
@@ -69,7 +69,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void DepotsAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -95,7 +95,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DepotsAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -134,7 +134,7 @@ namespace synthese
 			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(string(), "Actions"));
 			h.push_back(make_pair(string(), "Actions"));
-			
+
 			ActionResultHTMLTable t(
 				h,
 				searchRequest.getHTMLForm(),
@@ -153,7 +153,7 @@ namespace synthese
 				stream << t.col();
 //				openRequest.getPage()->setVehicle(const_pointer_cast<const Vehicle>(vehicle));
 //				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), VehicleAdmin::ICON);
-				
+
 				stream << t.col();
 				removeRequest.getAction()->setObjectId(depot->getKey());
 				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le dépôt "+ depot->getName() + " ?");
@@ -175,9 +175,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const PTOperationModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -185,29 +185,29 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks DepotsAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			// const DepotsAdmin* ua(
 			//	dynamic_cast<const DepotsAdmin*>(&currentPage)
 			// );
-			
+
 			// if(ua)
 			// {
 			//	shared_ptr<DepotsAdmin> p(getNewOtherPage<DepotsAdmin>());
 			//	links.push_back(p);
 			// }
-			
+
 			return links;
 		}
 	}

@@ -48,7 +48,7 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 	using namespace pt;
-	
+
 
 	namespace util
 	{

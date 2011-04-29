@@ -36,7 +36,7 @@ namespace synthese
 		/** Journal relatif à la gestion des paramètres du téléaffichage.
 
 			Colonnes :
-				- Action effectuée				
+				- Action effectuée
 
 			@ingroup m54Log refLog
 		*/

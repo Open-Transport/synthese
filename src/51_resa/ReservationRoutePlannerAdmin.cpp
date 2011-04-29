@@ -76,7 +76,7 @@ namespace synthese
 	using namespace pt;
 	using namespace html;
 	using namespace pt_journey_planner;
-	using namespace algorithm;	
+	using namespace algorithm;
 	using namespace security;
 	using namespace graph;
 	using namespace road;
@@ -125,7 +125,7 @@ namespace synthese
 		{
 			_effectiveApproachSpeed = _approachSpeed;
 		}
-		
+
 
 
 		void ReservationRoutePlannerAdmin::setFromParametersMap(
@@ -196,9 +196,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		ParametersMap ReservationRoutePlannerAdmin::getParametersMap() const
 		{
 			ParametersMap m;
@@ -221,8 +221,8 @@ namespace synthese
 			return m;
 		}
 
-		
-		
+
+
 		void ReservationRoutePlannerAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -290,26 +290,26 @@ namespace synthese
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
 			stream << st.cell("Commune départ", st.getForm().getTextInput(
-						PARAMETER_START_CITY, 
-						startPlace ? 
+						PARAMETER_START_CITY,
+						startPlace ?
 						(dynamic_cast<City*>(startPlace.get()) ? dynamic_cast<City*>(startPlace.get())->getName() : dynamic_cast<NamedPlace*>(startPlace.get())->getCity()->getName()) :
 						_startCity
 				)	);
 			stream << st.cell("Arrêt départ", st.getForm().getTextInput(
 						PARAMETER_START_PLACE,
-						startPlace ? 
+						startPlace ?
 						(dynamic_cast<City*>(startPlace.get()) ? string() : dynamic_cast<NamedPlace*>(startPlace.get())->getName()) :
 						_startPlace
 				)	);
 			stream << st.cell("Commune arrivée", st.getForm().getTextInput(
 						PARAMETER_END_CITY,
-						endPlace ? 
+						endPlace ?
 						(dynamic_cast<const City*>(endPlace.get()) ? dynamic_cast<City*>(endPlace.get())->getName() : dynamic_cast<NamedPlace*>(endPlace.get())->getCity()->getName()) :
 						_endCity
-				)	);	
+				)	);
 			stream << st.cell("Arrêt arrivée", st.getForm().getTextInput(
 						PARAMETER_END_PLACE,
-						endPlace ? 
+						endPlace ?
 						(dynamic_cast<const City*>(endPlace.get()) ? string() : dynamic_cast<NamedPlace*>(endPlace.get())->getName()) :
 						_endPlace
 				)	);
@@ -422,7 +422,7 @@ namespace synthese
 			date -= days(1);
 			searchRequest.getPage()->_dateTime = date;
 			stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Jour précédent", string(), "rewind_blue.png") << " ";
-			
+
 			if(!jv.getJourneys().empty())
 			{
 				PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().begin());
@@ -532,17 +532,17 @@ namespace synthese
 						<< ",'" << BookReservationAction::PARAMETER_CREATE_CUSTOMER << "'"
 						<< ",'ie_bug_curstomer_div'"
 						<< ",'" << BookReservationAction::PARAMETER_CUSTOMER_ID << "'"
-						<< ",'" << customerSearchRequest.getURL() 
+						<< ",'" << customerSearchRequest.getURL()
 						<< "&" << ResaCustomerHtmlOptionListFunction::PARAMETER_NAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_NAME) << "').value"
 						<< "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_SURNAME) << "').value"
 						<< "); };";
 					stream << "document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_SURNAME) << "').onkeyup = "
-						<< "function(){ programCustomerUpdate(" 
+						<< "function(){ programCustomerUpdate("
 						<< "'" << rf.getName() << "'"
 						<< ",'" << BookReservationAction::PARAMETER_CREATE_CUSTOMER << "'"
 						<< ",'ie_bug_curstomer_div'"
 						<< ",'" << BookReservationAction::PARAMETER_CUSTOMER_ID << "'"
-						<< ",'" << customerSearchRequest.getURL() 
+						<< ",'" << customerSearchRequest.getURL()
 						<< "&" << ResaCustomerHtmlOptionListFunction::PARAMETER_NAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_NAME) << "').value"
 						<< "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_SURNAME) << "').value"
 						<< "); };";
@@ -561,7 +561,7 @@ namespace synthese
 					stream << rt.row();
 					stream << rt.col() << "Client";
 					stream << rt.col() << rf.getRadioInput(
-						BookReservationAction::PARAMETER_CREATE_CUSTOMER, 
+						BookReservationAction::PARAMETER_CREATE_CUSTOMER,
 						optional<bool>(true),
 						optional<bool>(true),
 						"Nouveau client"
@@ -577,8 +577,8 @@ namespace synthese
 					);
 					stream << "<span id=\"ie_bug_curstomer_div\"></span>";
 				}
-				
-				
+
+
 				stream << rt.row();
 				stream << rt.col() << "Nombre de places";
 				stream << rt.col() << rf.getTextInput(BookReservationAction::PARAMETER_SEATS_NUMBER, lexical_cast<string>(_seatsNumber));
@@ -595,7 +595,7 @@ namespace synthese
 		) const	{
 			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
-		
+
 		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
@@ -611,16 +611,16 @@ namespace synthese
 			}
 			return links;
 		}
-		
-		
-		
+
+
+
 		bool ReservationRoutePlannerAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			return true;
 		}
-		
+
 		void ReservationRoutePlannerAdmin::setCustomer(boost::shared_ptr<const User> value)
 		{
 			_customer = value;

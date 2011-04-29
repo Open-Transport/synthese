@@ -50,7 +50,7 @@ namespace synthese
 	using namespace geography;
 	using namespace db;
 	using namespace impex;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::StopPointAddAction>::FACTORY_KEY("StopPointAddAction");
@@ -69,8 +69,8 @@ namespace synthese
 		const string StopPointAddAction::PARAMETER_CITY_ID = Action_PARAMETER_PREFIX + "ci";
 		const string StopPointAddAction::PARAMETER_CREATE_CITY_IF_NECESSARY = Action_PARAMETER_PREFIX + "cc";
 
-		
-		
+
+
 		ParametersMap StopPointAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -100,9 +100,9 @@ namespace synthese
 
 			return map;
 		}
-		
-		
-		
+
+
+
 		void StopPointAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_name = map.getDefault<string>(PARAMETER_NAME);
@@ -133,7 +133,7 @@ namespace synthese
 					{
 						throw ActionException("Empty city name");
 					}
-					
+
 
 					GeographyModule::CitiesMatcher::MatchResult cities(
 						GeographyModule::GetCitiesMatcher().bestMatches(*_cityName,1)
@@ -179,9 +179,9 @@ namespace synthese
 				)	);
 			}
 		}
-		
-		
-		
+
+
+
 		void StopPointAddAction::run(
 			Request& request
 		){
@@ -232,9 +232,9 @@ namespace synthese
 				request.setActionCreatedId(object.getKey());
 			}
 		}
-		
-		
-		
+
+
+
 		bool StopPointAddAction::isAuthorized(
 			const Session* session
 		) const {

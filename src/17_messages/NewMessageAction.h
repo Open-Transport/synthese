@@ -35,7 +35,7 @@ namespace synthese
 	{
 		class SentScenario;
 		class ScenarioTemplate;
-		
+
 		/** Action class : Creation of a new message, part of a scenario.
 			@ingroup m17Actions refActions
 		*/
@@ -48,7 +48,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<const SentScenario>		_sentScenario;
 			boost::shared_ptr<const ScenarioTemplate>	_scenarioTemplate;
-		
+
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/

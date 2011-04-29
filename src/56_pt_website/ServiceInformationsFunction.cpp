@@ -46,7 +46,7 @@ namespace synthese
 	using namespace graph;
 
 	template<> const string util::FactorableTemplate<Function,pt_website::ServiceInformationsFunction>::FACTORY_KEY("ServiceInformationsFunction");
-	
+
 	namespace pt_website
 	{
 		const string ServiceInformationsFunction::PARAMETER_STOP_PAGE_ID("stop_page_id");
@@ -114,10 +114,10 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			
+
 			ServicePointer ptr(_service->getDeparturePosition(true, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,_date));
 			AccessParameters ap;
-			
+
 			if(_stopPage.get())
 			{
 				_displayStop(stream, true, ptr, request);
@@ -143,9 +143,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		bool ServiceInformationsFunction::isAuthorized(
 			const Session* session
 		) const {
@@ -181,7 +181,7 @@ namespace synthese
 			const ptime& time(departureTime ? ptr.getDepartureDateTime() : ptr.getArrivalDateTime());
 
 			pm.insert(PAGE_PARAMETER_RANK, edge.getRankInPath());
-			
+
 			pm.insert(PAGE_PARAMETER_DURATION, departureTime ? 0 : ((time - _date).total_seconds() / 60));
 
 			pm.insert(PAGE_PARAMETER_STOP_AREA_ID, static_cast<StopPoint*>(edge.getFromVertex())->getConnectionPlace()->getKey());
@@ -194,7 +194,7 @@ namespace synthese
 		}
 
 
- 
+
 		void ServiceInformationsFunction::_displaySIRI( std::ostream& stream ) const
 		{
 			/// @todo to be implemented

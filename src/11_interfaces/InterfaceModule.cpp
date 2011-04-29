@@ -49,15 +49,15 @@ namespace synthese
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<InterfaceModule>::NAME("Moteur d'interfaces");
-		
+
 		template<> void ModuleClassTemplate<InterfaceModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<InterfaceModule>::Init()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<InterfaceModule>::End()
 		{
 		}

@@ -104,7 +104,7 @@ namespace synthese
 		    // Rank in road
 		    int rankInRoad (rows->getInt (RoadChunkTableSync::COL_RANKINPATH));
 		    object->setRankInPath(rankInRoad);
-			
+
 			// Metric offset
 			object->setMetricOffset(rows->getDouble (RoadChunkTableSync::COL_METRICOFFSET));
 

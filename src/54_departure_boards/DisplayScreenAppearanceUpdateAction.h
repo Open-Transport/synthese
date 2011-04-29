@@ -73,7 +73,7 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			///	Authorization test.
 			///	@return bool true if the user can use the action.
@@ -86,7 +86,7 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run(server::Request& request);
-			
+
 			DisplayScreenAppearanceUpdateAction();
 
 			void setScreenId(util::RegistryKeyType id);

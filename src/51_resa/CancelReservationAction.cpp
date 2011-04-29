@@ -53,8 +53,8 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace pt;
-	
-	
+
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, resa::CancelReservationAction>::FACTORY_KEY("cancelreservation");
@@ -64,17 +64,17 @@ namespace synthese
 	{
 		const string CancelReservationAction::PARAMETER_RESERVATION_TRANSACTION_ID = Action_PARAMETER_PREFIX + "rt";
 
-		
-		
+
+
 		ParametersMap CancelReservationAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if (_transaction->getKey()) map.insert(PARAMETER_RESERVATION_TRANSACTION_ID, _transaction->getKey());
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CancelReservationAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Load of the transaction
@@ -108,9 +108,9 @@ namespace synthese
 				throw ActionException("Cette réservation est déjà annulée.");
 			}
 		}
-		
-		
-		
+
+
+
 		void CancelReservationAction::run(Request& request)
 		{
 			// Store old parameters
@@ -166,7 +166,7 @@ namespace synthese
 
 		bool CancelReservationAction::isAuthorized(const Session* session
 		) const {
-			
+
 			if(!session || !session->hasProfile())
 			{
 				return false;

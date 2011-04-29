@@ -27,7 +27,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const std::string Registry<timetables::TimetableRow>::KEY("TimetableRow");

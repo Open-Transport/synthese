@@ -50,7 +50,7 @@ namespace synthese
 	{
 		class City;
 	}
-	
+
 	namespace pt
 	{
 		class TransportNetwork;
@@ -108,7 +108,7 @@ namespace synthese
 				mutable bool _alreadyRead;
 				typedef std::map<std::size_t, std::map<std::size_t, calendar::Calendar> > Calendars;
 
-				
+
 				void _loadFieldsMap(std::ifstream& file) const;
 				std::string _getValue(const std::string& field) const;
 				bool _readLine(std::ifstream& file) const;
@@ -149,15 +149,15 @@ namespace synthese
 			protected:
 
 				virtual bool _controlPathsMap() const;
-				
+
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
 					std::ostream& os,
 					const std::string& key,
 					boost::optional<const admin::AdminRequest&> adminRequest
 				) const;
-		
-			
+
+
 			public:
 				Importer_(
 					util::Env& env,

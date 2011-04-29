@@ -108,7 +108,7 @@ namespace synthese
 			return DBLog::getObjectName(id, searchRequest);
 		}
 
-		
+
 
 		void ArrivalDepartureTableLog::addUpdateEntry(
 			const DisplayScreen& screen,

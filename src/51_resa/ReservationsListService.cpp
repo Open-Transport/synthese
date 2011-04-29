@@ -78,10 +78,10 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace cms;
-	
+
 
 	template<> const string util::FactorableTemplate<Function, resa::ReservationsListService>::FACTORY_KEY("ReservationsListService");
-	
+
 	namespace resa
 	{
 		const string ReservationsListService::PARAMETER_LINE_ID("li");
@@ -262,7 +262,7 @@ namespace synthese
 			vector<shared_ptr<ScheduledService> > sortedServices;
 			{
 				map<string, shared_ptr<ScheduledService> > servicesByNumber;
-				
+
 				ScheduledServiceTableSync::SearchResult services(
 					ScheduledServiceTableSync::Search(
 						*_env,
@@ -294,7 +294,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<const Reservation> resa, sqlreservations)
 			{
 				if(!_env->getRegistry<ScheduledService>().contains(resa->getServiceId())) continue;
-				
+
 				const ScheduledService* service(_env->getRegistry<ScheduledService>().get(resa->getServiceId()).get());
 				if(reservations.find(service->getServiceNumber()) == reservations.end())
 				{
@@ -326,9 +326,9 @@ namespace synthese
 				}
 			} // End services loop
 		}
-		
-		
-		
+
+
+
 		bool ReservationsListService::isAuthorized(
 			const Session* session
 		) const {
@@ -367,7 +367,7 @@ namespace synthese
 				pm.insert(DATA_VEHICLE_ID, reservation.getVehicle()->getKey());
 			}
 			pm.insert(DATA_SEAT, reservation.getSeatNumber());
-			
+
 			// Language
 			shared_ptr<const User> user(UserTableSync::Get(reservation.getTransaction()->getCustomerUserId(), *_env));
 

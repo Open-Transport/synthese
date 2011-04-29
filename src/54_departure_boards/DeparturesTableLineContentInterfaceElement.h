@@ -35,7 +35,7 @@ namespace synthese
 	{
 		class ValueInterfaceElement;
 	}
-	
+
 	namespace departure_boards
 	{
 

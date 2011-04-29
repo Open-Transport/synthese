@@ -40,16 +40,16 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	
+
 	template<> const string util::FactorableTemplate<Function,cms::WebPagePositionFunction>::FACTORY_KEY("position");
-	
+
 	namespace cms
 	{
 		const string WebPagePositionFunction::PARAMETER_PAGE_ID("page_id");
 		const string WebPagePositionFunction::PARAMETER_DISPLAY_PAGE_ID("display_page_id");
 		const string WebPagePositionFunction::PARAMETER_MIN_DEPTH("min_depth");
 		const string WebPagePositionFunction::PARAMETER_MAX_DEPTH("max_depth");
-		
+
 		ParametersMap WebPagePositionFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -138,9 +138,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		bool WebPagePositionFunction::isAuthorized(
 			const Session* session
 		) const {

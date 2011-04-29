@@ -35,7 +35,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string Registry<impex::DataSource>::KEY("DataSource");

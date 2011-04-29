@@ -42,7 +42,7 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace algorithm;
-		
+
 
 	namespace departure_boards
 	{
@@ -131,7 +131,7 @@ namespace synthese
 
 				place = curLinestop->getPhysicalStop()->getConnectionPlace();
 				lastLineStop = curLinestop;
-				
+
 				// If the place must be displayed according to the display rules (only once per place)
 				if(	_displayedPlaces.find(place->getKey()) != _displayedPlaces.end() &&
 					encounteredPlaces.find(place) == encounteredPlaces.end() &&
@@ -162,7 +162,7 @@ namespace synthese
 			{
 				_result.erase(--_result.end());
 			}
-			
+
 			return insertResult.first;
 		}
 

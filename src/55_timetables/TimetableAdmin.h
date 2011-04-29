@@ -64,11 +64,11 @@ namespace synthese
 
 		public:
 			TimetableAdmin();
-			
+
 			void setTimetable(boost::shared_ptr<Timetable> timetable);
-			
+
 			boost::shared_ptr<const Timetable> getTimetable() const;
-			
+
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -78,13 +78,13 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 				@return server::ParametersMap The generated parameters map
 				@author Hugues Romain
-				@date 2007					
+				@date 2007
 			*/
 			virtual server::ParametersMap getParametersMap() const;
 
@@ -112,14 +112,14 @@ namespace synthese
 			virtual bool isAuthorized(
 				const security::User& user
 			) const;
-			
+
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
-			
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 
 

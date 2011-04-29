@@ -80,24 +80,24 @@ namespace synthese
 				DISPLAY_MONITORING_UP = 40,
 				DISPLAY_MONITORING_DOWN = 45
 			} EntryType;
-			
+
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
-			
-			
+
+
 
 			DBLog::ColumnsVector parse(
 				const dblog::DBLogEntry& entry,
 				const server::Request& searchRequest
 			) const;
-			
+
 			std::string getObjectName(
 				util::RegistryKeyType id,
 				const server::Request& searchRequest
 			) const;
-			
-			
-			
+
+
+
 			////////////////////////////////////////////////////////////////////
 			///	Entry creator for administration console uses logging.
 			///	@param screen The edited screen
@@ -147,7 +147,7 @@ namespace synthese
 			);
 
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			///	Entry creator for status change.
 			///	@param screen The monitored screen
@@ -155,7 +155,7 @@ namespace synthese
 			///	@param newValue new status value
 			///	@author Hugues Romain
 			///	@date 2008
-			/// Level : generated from the new global status (see 
+			/// Level : generated from the new global status (see
 			///	DisplayMonitoringStatus::getGlobalStatus() :
 			///		- to OK status : Info
 			///		- to WARNING or UNKNOWN status : Warning
@@ -170,7 +170,7 @@ namespace synthese
 			);
 
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			///	Entry creator for monitoring contact up.
 			///	@param screen The monitored screen
@@ -187,7 +187,7 @@ namespace synthese
 			);
 
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			///	Entry creator for monitoring contact up.
 			///	@param cpu The monitored cpu
@@ -204,7 +204,7 @@ namespace synthese
 			);
 
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			///	Entry creator for the first monitoring check.
 			///	@param screen The monitored screen
@@ -218,7 +218,7 @@ namespace synthese
 			);
 
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			///	Entry creator for the first monitoring check.
 			///	@param cpu The monitored cpu

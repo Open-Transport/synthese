@@ -42,7 +42,7 @@ namespace synthese
 	{
 		class DB;
 	}
-	
+
 	namespace server
 	{
 		/** DbModuleConfig table synchronizer.

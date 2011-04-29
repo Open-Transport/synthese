@@ -88,9 +88,9 @@ namespace synthese
 				map.get<string>(PARAMETER_LOG_KEY)
 			);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap DBLogAdmin::getParametersMap() const
 		{
 			ParametersMap m(_viewer.getParametersMap());
@@ -146,7 +146,7 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const DBLogModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile()
@@ -192,8 +192,8 @@ namespace synthese
 				throw AdminParametersException("Invalid log key : " + key);
 			}
 		}
-		
-		
+
+
 		bool DBLogAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _viewer.getLogKey() == static_cast<const DBLogAdmin&>(other)._viewer.getLogKey();

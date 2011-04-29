@@ -43,15 +43,15 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,timetables::MultipleTimetableGenerateFunction>::FACTORY_KEY("MultipleTimetableGenerateFunction");
-	
+
 	namespace timetables
 	{
 		const string MultipleTimetableGenerateFunction::PARAMETER_OBJECT_ID("roid_");
 		const string MultipleTimetableGenerateFunction::PARAMETER_CALENDAR_ID("cid_");
 
 		const string MultipleTimetableGenerateFunction::DATA_CONTENT("content_");
-		
-		
+
+
 		ParametersMap MultipleTimetableGenerateFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -117,7 +117,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(TimetableGenerateFunction::PARAMETER_NOTE_PAGE_ID));
-				if(id) 
+				if(id)
 				{
 					_notePage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -153,7 +153,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(TimetableGenerateFunction::PARAMETER_CELL_PAGE_ID));
-				if(id) 
+				if(id)
 				{
 					_cellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -165,7 +165,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(TimetableGenerateFunction::PARAMETER_PAGE_FOR_SUB_TIMETABLE_ID));
-				if(id) 
+				if(id)
 				{
 					_pageForSubTimetable = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -181,7 +181,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			
+
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			shared_ptr<TimetableResult::Warnings> warnings(new TimetableResult::Warnings);
@@ -230,9 +230,9 @@ namespace synthese
 
 			_page->display(stream, request, pm);
 		}
-		
-		
-		
+
+
+
 		bool MultipleTimetableGenerateFunction::isAuthorized(
 			const Session* session
 		) const {

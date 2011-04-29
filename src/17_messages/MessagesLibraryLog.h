@@ -49,7 +49,7 @@ namespace synthese
 		public:
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
-			
+
 
 
 			static void	addUpdateEntry(
@@ -66,7 +66,7 @@ namespace synthese
 				const ScenarioTemplate* scenario
 				, const security::User* user
 			);
-			
+
 			static void AddTemplateDeleteEntry(
 				const TextTemplate& text
 				, const security::User* user
@@ -108,7 +108,7 @@ namespace synthese
 				, const ScenarioTemplate& scenarioTemplate
 				, const security::User* user
 			);
-			
+
 			static void addCreateEntry(
 				const ScenarioTemplate& scenario
 				, const security::User* user

@@ -53,8 +53,8 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace db;
-	
-	
+
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, resa::ReservationUpdateAction>::FACTORY_KEY("ReservationUpdateAction");
@@ -71,8 +71,8 @@ namespace synthese
 		const string ReservationUpdateAction::PARAMETER_DEPARTURE_METER_OFFSET(Action_PARAMETER_PREFIX + "dm");
 		const string ReservationUpdateAction::PARAMETER_ARRIVAL_METER_OFFSET(Action_PARAMETER_PREFIX + "am");
 
-		
-		
+
+
 		ParametersMap ReservationUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -110,9 +110,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ReservationUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -210,8 +210,8 @@ namespace synthese
 				}
 			}
 		}
-		
-		
+
+
 		void ReservationUpdateAction::run(
 			Request& request
 		){
@@ -437,9 +437,9 @@ namespace synthese
 //				text.str()
 //			);
 		}
-		
-		
-		
+
+
+
 		bool ReservationUpdateAction::isAuthorized(
 			const Session* session
 		) const {

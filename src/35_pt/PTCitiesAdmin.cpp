@@ -74,7 +74,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void PTCitiesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -96,7 +96,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool PTCitiesAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -109,11 +109,11 @@ namespace synthese
 			ostream& stream,
 			const AdminRequest& request
 		) const	{
-		
+
 			////////////////////////////////////////////////////////////////////
 			// TAB LIST
 //			if (openTabContent(stream, TAB_PHONETIC))
-			{				
+			{
 				AdminFunctionRequest<PTCitiesAdmin> searchRequest(request);
 
 				stream << "<h1>Recherche</h1>";
@@ -142,7 +142,7 @@ namespace synthese
 
 					const GeographyModule::CitiesMatcher& matcher(GeographyModule::GetCitiesMatcher());
 					GeographyModule::CitiesMatcher::MatchResult result(matcher.bestMatches(_searchName, 20));
-										
+
 					BOOST_FOREACH(const GeographyModule::CitiesMatcher::MatchHit& it, result)
 					{
 						openCityRequest.getPage()->setCity(it.value);
@@ -183,9 +183,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const PTModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -193,24 +193,24 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks PTCitiesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
 
 			if(	currentPage.getCurrentTreeBranch().find(*this))
 			{
 				links.push_back(currentPage.getCurrentTreeBranch().getNextSubPage(*this));
 			}
-			
+
 			return links;
 		}
 

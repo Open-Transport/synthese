@@ -45,9 +45,9 @@ namespace synthese
 			public FunctionWithSiteBase
 		{
 		public:
-		
+
 			typedef FunctionWithSite<compulsory> _FunctionWithSite;
-			
+
 		protected:
 			/** Conversion from generic parameters map to attributes.
 				@param map Parameters map to interpret

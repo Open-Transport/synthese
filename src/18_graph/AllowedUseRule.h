@@ -55,7 +55,7 @@ namespace synthese
 			) const;
 
 
-			virtual boost::posix_time::ptime getReservationOpeningTime ( 
+			virtual boost::posix_time::ptime getReservationOpeningTime (
 				const ServicePointer& servicePointer
 			) const;
 

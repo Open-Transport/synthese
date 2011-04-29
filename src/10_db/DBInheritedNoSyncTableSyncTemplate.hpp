@@ -50,21 +50,21 @@ namespace synthese
 			}
 
 			void rowsAdded (
-				DB* db, 
+				DB* db,
 				const DBResultSPtr& rows
 			){
 
 			}
 
 			void rowsUpdated (
-				DB* db, 
+				DB* db,
 				const DBResultSPtr& rows
 			){
 
 			}
 
 			void rowsRemoved (
-				DB* db, 
+				DB* db,
 				const RowIdList& rowIds
 			){
 

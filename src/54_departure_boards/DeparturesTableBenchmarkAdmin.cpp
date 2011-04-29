@@ -86,9 +86,9 @@ namespace synthese
 			m.insert(PARAMETER_DOIT, _doIt);
 			return m;
 		}
-		
-			
-			
+
+
+
 		void DeparturesTableBenchmarkAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -97,14 +97,14 @@ namespace synthese
 			if(_doIt)
 			{
 				TestCases	_testCases;
-				
+
 				DisplayScreenTableSync::SearchResult screens(
 					DisplayScreenTableSync::Search(Env::GetOfficialEnv())
 				);
 				DisplayScreenCPUTableSync::SearchResult cpus(
 					DisplayScreenCPUTableSync::Search(Env::GetOfficialEnv())
 				);
-				
+
 				StaticFunctionRequest<DisplayScreenContentFunction> r(_request, true);
 				StaticFunctionRequest<CPUGetWiredScreensFunction> r2(_request, true);
 				ptime t0(microsec_clock::local_time());
@@ -123,7 +123,7 @@ namespace synthese
 					_testCases.push_back(t);
 					duration = t2 - t0;
 				}
-	
+
 				BOOST_FOREACH(shared_ptr<const DisplayScreenCPU> cpu, cpus)
 				{
 					stringstream s;
@@ -145,7 +145,7 @@ namespace synthese
 					_testCases.push_back(t);
 					duration = t2 - t0;
 				}
-				
+
 				AdminFunctionRequest<DeparturesTableBenchmarkAdmin> reloadRequest(_request);
 				reloadRequest.getPage()->_doIt = true;
 
@@ -158,7 +158,7 @@ namespace synthese
 				h.push_back("Temps calcul");
 				h.push_back("Taille générée");
 				HTMLTable t(h, ResultHTMLTable::CSS_CLASS);
-				
+
 				int rank(1);
 				time_duration total_duration;
 				size_t total_size(0);
@@ -200,7 +200,7 @@ namespace synthese
 					stream << t.col(3) << "MOYENNE PAR EQUIPEMENT";
 					stream << t.col() << total_duration.total_milliseconds() / (rank - 1) << " ms";
 					stream << t.col() << setprecision(2) << fixed << (static_cast<float>(total_size) / (1024 * (rank - 1))) << " ko";;
-				
+
 					stream << t.row();
 					stream << t.col(3) << "Taux d'utilisation du serveur si une requête par minute";
 					stream << t.col(2) << setprecision(2) << fixed << (static_cast<float>(total_duration.total_milliseconds()) / 600) << " %";
@@ -232,7 +232,7 @@ namespace synthese
 				stream << f.getSubmitButton("Lancer le benchmark");
 				stream << f.close();
 			}
-			
+
 		}
 
 		bool DeparturesTableBenchmarkAdmin::isAuthorized(

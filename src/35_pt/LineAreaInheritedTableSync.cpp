@@ -102,7 +102,7 @@ namespace synthese
 		void DBInheritedTableSyncTemplate<LineStopTableSync,LineAreaInheritedTableSync,LineArea>::Unlink(
 			LineArea* obj
 		){
-	
+
 		}
 
 
@@ -141,7 +141,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			SelectQuery<LineStopTableSync> query;
-			
+
 			// Ordering
 			if(orderById)
 			{

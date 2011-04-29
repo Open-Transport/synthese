@@ -57,7 +57,7 @@ namespace synthese
 	using namespace impex;
 	using namespace geography;
 	using namespace graph;
-	
+
 
 	namespace util
 	{
@@ -82,7 +82,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void StopPointAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -109,7 +109,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool StopPointAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -183,7 +183,7 @@ namespace synthese
 
 				AdminActionFunctionRequest<StopPointUpdateAction, StopPointAdmin> updateRequest(request);
 				updateRequest.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
-				
+
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
 				if(_stop->getConnectionPlace())
@@ -222,7 +222,7 @@ namespace synthese
 				updateOnlyRequest.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
 				ImportableAdmin::DisplayDataSourcesTab(stream, *_stop, updateOnlyRequest);
 			}
-		
+
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
 			closeTabContent(stream);

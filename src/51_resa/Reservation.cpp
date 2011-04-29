@@ -67,7 +67,7 @@ namespace synthese
 			}
 		}
 
-		
+
 
 		ReservationStatus Reservation::getStatus() const
 		{
@@ -103,7 +103,7 @@ namespace synthese
 		{
 			ReservationStatus status(getStatus());
 			string statusText(ResaModule::GetStatusText(status));
-			
+
 			switch(status)
 			{
 			case OPTION: return statusText + " pouvant être annulée avant le " + to_simple_string(_reservationDeadLine);

@@ -51,7 +51,7 @@ namespace synthese
 	{
 		class City;
 	}
-	
+
 	namespace pt
 	{
 		class StopPoint;
@@ -73,7 +73,7 @@ namespace synthese
 		///	can read such BAHNHOF.DAT and KOORD.DAT and show differences with SYNTHESE.</li>
 		///
 		/// The physical stops must be linked with the items of BAHNHOF.DAT.
-		/// More than one physical stop can be linked with the same CarPostal stop. In this case, 
+		/// More than one physical stop can be linked with the same CarPostal stop. In this case,
 		/// the import will select automatically the actual stop regarding the whole itinerary.
 		class PladisStopsFileFormat:
 			public impex::FileFormatTemplate<PladisStopsFileFormat>
@@ -88,7 +88,7 @@ namespace synthese
 				static const std::string FILE_KOORDS;
 
 			private:
-				struct Bahnhof 
+				struct Bahnhof
 				{
 					std::string operatorCode;
 					std::string cityName;
@@ -106,7 +106,7 @@ namespace synthese
 			protected:
 
 				virtual bool _controlPathsMap() const;
-				
+
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
 					std::ostream& os,

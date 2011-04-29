@@ -58,7 +58,7 @@ namespace synthese
 		const std::string JunctionTableSync::COL_DURATION("duration");
 		const std::string JunctionTableSync::COL_BIDIRECTIONAL("bidirectional");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<JunctionTableSync>::TABLE(
@@ -185,9 +185,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace pt
 	{
 		JunctionTableSync::SearchResult JunctionTableSync::Search(

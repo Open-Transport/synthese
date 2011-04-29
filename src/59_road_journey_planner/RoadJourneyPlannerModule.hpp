@@ -40,42 +40,42 @@ namespace synthese
 	{
 		/**	@defgroup m59Exceptions 59.01 Exceptions
 			@ingroup m59
-	
+
 			@defgroup m59LS 59.10 Table synchronizers
 			@ingroup m59
-	
+
 			@defgroup m59Pages 59.11 Interface Pages
 			@ingroup m59
-	
+
 			@defgroup m59Library 59.11 Interface Library
 			@ingroup m59
-	
+
 			@defgroup m59Rights 59.12 Rights
 			@ingroup m59
-	
+
 			@defgroup m59Logs 59.13 DB Logs
 			@ingroup m59
-	
+
 			@defgroup m59Admin 59.14 Administration pages
 			@ingroup m59
-	
+
 			@defgroup m59Actions 59.15 Actions
 			@ingroup m59
-	
+
 			@defgroup m59Functions 59.15 Functions
 			@ingroup m59
-	
+
 			@defgroup m59File 59.16 File formats
 			@ingroup m59
-	
+
 			@defgroup m59Alarm 59.17 Messages recipient
 			@ingroup m59
-			
+
 			@defgroup m59 59 road_journey_planner
 			@ingroup m5
-			
+
 			@todo Write Module documentation
-			
+
 			@{
 		*/
 
@@ -89,7 +89,7 @@ namespace synthese
 			public server::ModuleClassTemplate<RoadJourneyPlannerModule>
 		{
 		private:
-			
+
 		public:
 
 		};

@@ -70,8 +70,8 @@ namespace synthese
 				boost::optional<util::RegistryKeyType>		_commercialLineID;
 				boost::shared_ptr<const cms::Webpage>				_page;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stops_list#Request
@@ -80,9 +80,9 @@ namespace synthese
 			/// @author Xavier Raffin
 			/// @date 2010
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stops_list#Request
@@ -103,8 +103,8 @@ namespace synthese
 				const server::Request& request,
 				const StopPoint& stop
 			) const;
-			
-			
+
+
 		public:
 			//! @name Setters
 			//@{
@@ -122,9 +122,9 @@ namespace synthese
 			/// @author Xavier Raffin
 			/// @date 2010
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

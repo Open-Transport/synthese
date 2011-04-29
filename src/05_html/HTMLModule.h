@@ -66,7 +66,7 @@ namespace synthese
 				Example of css :
 				@code
 a.linkbutton { display:inline-block; padding:2px 4px 2px 4px; text-decoration:none; color:black; background-color:#C0C0C0; border-style:solid; border-width:1px 2px 2px 1px; border-color:#000060; cursor:auto; }
-a.activatedlinkbutton { display:inline-block; padding:2px 4px 2px 4px; border-style:solid; text-decoration:none; color:black; background-color:#0080E0; border-width:1px 2px 2px 1px; cursor:hand; } 
+a.activatedlinkbutton { display:inline-block; padding:2px 4px 2px 4px; border-style:solid; text-decoration:none; color:black; background-color:#0080E0; border-width:1px 2px 2px 1px; cursor:hand; }
 a.clickedlinkbutton { display:inline-block; padding:2px 4px 2px 4px; border-style:solid; color:black; text-decoration:none; background-color:#0080E0; border-width:2px 1px 1px 2px; cursor:hand; }
 				@endcode
 
@@ -93,7 +93,7 @@ input[type=submit]:hover {background-color:#0080E0;}
 				@param content Content of the link
 				@return std::string The generated HTML code
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 			*/
 			static std::string getHTMLLink(
 				const std::string& url,

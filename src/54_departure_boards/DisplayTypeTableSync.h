@@ -69,10 +69,10 @@ namespace synthese
 			///		(default = deactivate the filter)
 			/// @param first First user to answer
 			///	@param number Number of users to answer (default = all)
-			///		The size of the result registry is less or equal to number, then all 
-			///		users were returned despite of the number limit. If the size 
-			///		is greater than number (actually equal to number + 1) then 
-			///		there is others accounts to show. Test it to know if the 
+			///		The size of the result registry is less or equal to number, then all
+			///		users were returned despite of the number limit. If the size
+			///		is greater than number (actually equal to number + 1) then
+			///		there is others accounts to show. Test it to know if the
 			///		situation needs a "click for more" button.
 			/// @param orderByName Order the results alphabetically by the name
 			/// @param orderByInterfaceName Order the results alphabetically by

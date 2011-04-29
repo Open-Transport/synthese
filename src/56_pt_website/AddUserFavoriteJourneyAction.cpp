@@ -41,7 +41,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt_website::AddUserFavoriteJourneyAction>::FACTORY_KEY("add_favorite_journey");
@@ -54,24 +54,24 @@ namespace synthese
 		const string AddUserFavoriteJourneyAction::PARAMETER_ORIGIN_PLACE_NAME = Action_PARAMETER_PREFIX + "opn";
 		const string AddUserFavoriteJourneyAction::PARAMETER_DESTINATION_CITY_NAME = Action_PARAMETER_PREFIX + "dcn";
 		const string AddUserFavoriteJourneyAction::PARAMETER_DESTINATION_PLACE_NAME = Action_PARAMETER_PREFIX + "dpn";
-		
-		
+
+
 		AddUserFavoriteJourneyAction::AddUserFavoriteJourneyAction()
 			: util::FactorableTemplate<Action, AddUserFavoriteJourneyAction>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap AddUserFavoriteJourneyAction::getParametersMap() const
 		{
 			ParametersMap map;
 			//map.insert(make_pair(PARAMETER_xxx, _xxx));
 			return map;
 		}
-		
-		
-		
+
+
+
 		void AddUserFavoriteJourneyAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -94,9 +94,9 @@ namespace synthese
 				throw ActionException(e, *this);
 			}
 		}
-		
-		
-		
+
+
+
 		void AddUserFavoriteJourneyAction::run(Request& request)
 		{
 			UserFavoriteJourney f;
@@ -112,7 +112,7 @@ namespace synthese
 
 		bool AddUserFavoriteJourneyAction::isAuthorized(const Session* session
 		) const {
-			return 
+			return
 				session &&
 				(	session->hasProfile() && session->getUser()->getProfile()->isAuthorized<GlobalRight>(WRITE) ||
 					session->getUser() != NULL && session->getUser()->getKey() == _user->getKey()

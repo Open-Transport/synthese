@@ -215,7 +215,7 @@ namespace synthese
 						1, 120,
 						_type->getTimeBetweenChecks().total_seconds() / 60,
 						1
-					)+ " minutes"	
+					)+ " minutes"
 				);
 			stream << t.close();
 		}
@@ -226,7 +226,7 @@ namespace synthese
 			if (_type.get() == NULL) return false;
 			return user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ);
 		}
-		
+
 
 
 		std::string DisplayTypeAdmin::getTitle() const
@@ -242,13 +242,13 @@ namespace synthese
 			_type = value;
 		}
 
-		
+
 		boost::shared_ptr<const DisplayType> DisplayTypeAdmin::getType() const
 		{
 			return _type;
 		}
-		
-		
+
+
 		bool DisplayTypeAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _type == static_cast<const DisplayTypeAdmin&>(other)._type;

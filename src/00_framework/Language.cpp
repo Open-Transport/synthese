@@ -95,7 +95,7 @@ namespace synthese
 
 		english->addName(*french, "anglais");
 		english->addName(*german, "englisch");
-		
+
 		french->addName(*english, "french");
 		french->addName(*german, "französisch");
 

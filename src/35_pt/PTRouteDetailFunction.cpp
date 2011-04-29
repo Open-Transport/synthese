@@ -181,7 +181,7 @@ namespace synthese
 		void PTRouteDetailFunction::run(ostream& stream, const Request& request) const
 		{
 			const CommercialLine * commercialLine(_journeyPattern->getCommercialLine());
-			
+
 			if(_mainPage.get())
 			{
 				ParametersMap m(request.getFunction()->getSavedParameters());

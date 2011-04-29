@@ -35,7 +35,7 @@ namespace synthese
 	using namespace html;
 	using namespace graph;
 	using namespace geography;
-	
+
 
 
 	namespace algorithm
@@ -94,7 +94,7 @@ namespace synthese
 							{
 							stream << " - Réservation facultative avant le " << journey->getReservationDeadLine();
 							}
-							
+
 							stream << "<tr>";
 							stream << "<td>" << its->getDepartureDateTime() << "</td>";
 
@@ -158,8 +158,8 @@ namespace synthese
 							// Final arrival
 							stream << "<td>" << its->getArrivalDateTime() << "</td>";
 */
-							
-					
+
+
 			_stream << _t.row();
 			_stream << _t.col(1, string(), true);
 			_stream << _t.col(1, string(), true) << "rk";
@@ -172,7 +172,7 @@ namespace synthese
 			_stream << _t.col(1, string(), true) << "plscore";
 //			_stream << _t.col(1, string(), true) << "minsp";
 //			_stream << _t.col(1, string(), true) << "journey";
-			
+
 			size_t r(1);
 			BOOST_FOREACH(shared_ptr<RoutePlanningIntermediateJourney> journey, _todoBeforeClean)
 			{

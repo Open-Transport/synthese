@@ -80,7 +80,7 @@ void sig_INT_handler(int sig)
 
 void sig_PIPE_handler(int sig)
 {
-    // Catch SIGPIPE and ignore it. We do not want the program to 
+    // Catch SIGPIPE and ignore it. We do not want the program to
     // die on a broken pipe error, which is well detected at socket level.
     Log::GetInstance ().info ("Ignoring broken pipe.");
 }
@@ -97,7 +97,7 @@ pid_t daemonize ()
 		Log::GetInstance ().fatal ("fork() failed !");
 		exit (1);
     }
-    if (pid > 0) 
+    if (pid > 0)
     {
 		// Wait for PID file to exist
 		while ((pidFile == 0) || boost::filesystem::exists (*pidFile) == false)
@@ -106,7 +106,7 @@ pid_t daemonize ()
 		}
 		exit(0);
 	}
-    
+
     umask(022);
     if (setsid () < 0)
     {
@@ -152,7 +152,7 @@ void quit(bool doExit)
 {
 	// End all threads
 	ServerModule::KillAllHTTPThreads(false);
-	
+
 	// Terminate all modules
 	vector<shared_ptr<ModuleClass> > modules(Factory<ModuleClass>::GetNewCollection());
 	BOOST_FOREACH(const shared_ptr<ModuleClass> module, modules)
@@ -195,7 +195,7 @@ int main( int argc, char **argv )
 		::system("pause");
 #endif
 
-    try 
+    try
     {
 		{
 			std::string dbConnString;
@@ -213,7 +213,7 @@ int main( int argc, char **argv )
 				 "(see backend documentation for the meaning of backend specific parameters).")
 #ifndef WIN32
 				("daemon", "Run server in daemon mode")
-#endif        
+#endif
 				("logfile", po::value<std::string>(&logf)->default_value (std::string ("-")), "Log file path or - for standard output)")
 #ifndef WIN32
 				("pidfile", po::value<std::string>(&pidf)->default_value (std::string ("s3_server.pid")), "PID file ( - = no pid file )")
@@ -222,7 +222,7 @@ int main( int argc, char **argv )
 
 			po::variables_map vm;
 			po::store(po::parse_command_line(argc, argv, desc), vm);
-			po::notify(vm);    
+			po::notify(vm);
 
 			if (vm.count("help"))
 			{
@@ -234,7 +234,7 @@ int main( int argc, char **argv )
 #endif
 
 			ModuleClass::Parameters defaultParams;
-			for (std::vector<std::string>::const_iterator it = params.begin (); 
+			for (std::vector<std::string>::const_iterator it = params.begin ();
 				it != params.end (); ++it)
 			{
 				int index = it->find ("=");
@@ -261,7 +261,7 @@ int main( int argc, char **argv )
 				}
 				ensureWritablePath (*pidFile, true);
 			}
-#endif        
+#endif
 
 			boost::filesystem::path logFile (createCompletePath (logf));
 
@@ -290,7 +290,7 @@ int main( int argc, char **argv )
 				pid = daemonize ();
 			}
 			Log::GetInstance ().info ("Process PID = " + lexical_cast<string>(pid) + (daemonMode ? " (daemon mode)" : ""));
-#endif        
+#endif
 
 			// included auto generated code
 #include "generated.cpp.inc"
@@ -337,7 +337,7 @@ int main( int argc, char **argv )
 				freopen ("/dev/null", "w", stdout);
 				freopen ("/dev/null", "w", stderr);
 			}
-#endif    
+#endif
 
 #ifdef VLD
 			VLDEnable();
@@ -348,7 +348,7 @@ int main( int argc, char **argv )
 
 			quit(false);
 		}
-		
+
 		exit(0);
     }
     catch (std::exception& e)

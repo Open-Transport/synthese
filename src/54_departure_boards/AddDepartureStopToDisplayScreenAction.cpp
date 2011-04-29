@@ -47,7 +47,7 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<Action, departure_boards::AddDepartureStopToDisplayScreenAction>::FACTORY_KEY("adstdsa");
 	}
-	
+
 	namespace departure_boards
 	{
 		const string AddDepartureStopToDisplayScreenAction::PARAMETER_SCREEN_ID = Action_PARAMETER_PREFIX + "sc";
@@ -87,14 +87,14 @@ namespace synthese
 		{
 			// Preparation
 			_screen->addPhysicalStop(_stop.get());
-			
+
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
 				"Ajout de l'arrêt de départ "+ _stop->getCodeBySources() +"/"+ _stop->getName(),
 				*request.getUser()
 			);
-			
+
 			// Action
 			DisplayScreenTableSync::Save(_screen.get());
 		}
@@ -113,7 +113,7 @@ namespace synthese
 				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
-		
+
 		void AddDepartureStopToDisplayScreenAction::setStopId(
 			RegistryKeyType id
 		){
@@ -126,13 +126,13 @@ namespace synthese
 				throw ActionException("Departure physical stop", e, *this);
 			}
 		}
-		
+
 		void AddDepartureStopToDisplayScreenAction::setScreen(
 			boost::shared_ptr<DisplayScreen> screen
 		){
 			_screen = screen;
 		}
-	
+
 		void AddDepartureStopToDisplayScreenAction::setScreen(
 			boost::shared_ptr<const DisplayScreen> screen
 		){

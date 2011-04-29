@@ -39,7 +39,7 @@ namespace synthese
 	{
 		class Road;
 		class House;
-		
+
 		////////////////////////////////////////////////////////////////////////
 		/// Road place class.
 		/// @ingroup m34
@@ -51,13 +51,13 @@ namespace synthese
 			public geography::NamedPlaceTemplate<RoadPlace>
 		{
 		public:
-	
+
 			/// Chosen registry class.
 			typedef util::Registry<RoadPlace> Registry;
 
-		
+
 		private:
-			
+
 		public:
 			/////////////////////////////////////////////////////////////////////
 			/// RoadModule Constructor.
@@ -73,7 +73,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 			//@}
-		
+
 			//! @name Setters
 			//@{
 			//@}
@@ -89,7 +89,7 @@ namespace synthese
 				virtual std::string getRuleUserName() const;
 
 				virtual void getVertexAccessMap(
-					graph::VertexAccessMap& result, 
+					graph::VertexAccessMap& result,
 					const graph::AccessParameters& accessParameters,
 					const GraphTypes& whatToSearch
 				) const;
@@ -116,7 +116,7 @@ namespace synthese
 					MainRoadChunk::HouseNumber houseNumber
 				) const;
 			//@}
-		
+
 			//! @name Static algorithms
 			//@{
 			//@}
@@ -125,4 +125,4 @@ namespace synthese
 }
 
 #endif // SYNTHESE_RoadPlace_h__
- 
+

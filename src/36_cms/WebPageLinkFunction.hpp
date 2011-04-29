@@ -51,7 +51,7 @@ namespace synthese
 			static const std::string PARAMETER_TEXT;
 			static const std::string PARAMETER_USE_SMART_URL;
 			static const std::string PARAMETER_CONFIRM;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
@@ -60,17 +60,17 @@ namespace synthese
 				bool _useSmartURL;
 				std::string _confirm;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
 			/// @author Hugues Romain
 			/// @date 2010
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
@@ -79,8 +79,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 			WebPageLinkFunction();
 
@@ -93,9 +93,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

@@ -60,12 +60,12 @@ namespace synthese
 			void storeParameters (ValueElementList& vel);
 			std::string display(
 				std::ostream&
-				, const ParametersVector&, 
-				interfaces::VariablesMap& variables, 
+				, const ParametersVector&,
+				interfaces::VariablesMap& variables,
 				const void* object = NULL,
 				const server::Request* request = NULL
 				) const;
-                
+
 		};
 	}
 }

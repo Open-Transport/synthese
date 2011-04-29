@@ -43,11 +43,11 @@ namespace synthese
 		class Request;
 		class ParametersMap;
 	}
-	
+
 	namespace dblog
 	{
 		class DBLog;
-		
+
 		////////////////////////////////////////////////////////////////////////
 		/// DBLogHTMLView class.
 		/// @ingroup m13
@@ -55,7 +55,7 @@ namespace synthese
 		{
 		public:
 			// Typedefs
-			
+
 			static const std::string PARAMETER_PREFIX;
 			static const std::string PARAMETER_SEARCH_USER;
 			static const std::string PARAMETER_SEARCH_TYPE;
@@ -65,7 +65,7 @@ namespace synthese
 			static const std::string PARAMETER_OBJECT_ID;
 			static const std::string PARAMETER_OBJECT_ID2;
 
-			
+
 		private:
 			// Attributes
 			const std::string				_code;
@@ -86,7 +86,7 @@ namespace synthese
 			bool							_fixedObjectId;
 			bool							_fixedObjectId2;
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
-			
+
 			std::string _getParameterName(const std::string& parameter) const;
 		public:
 			/////////////////////////////////////////////////////////////////////
@@ -96,11 +96,11 @@ namespace synthese
 			);
 
 
-			
+
 			//! @name Getters
 			//@{
 			//@}
-		
+
 			//! @name Setters
 			//@{
 			//@}
@@ -108,18 +108,18 @@ namespace synthese
 			//! @name Modifiers
 			//@{
 				void setLogKey(const std::string& value);
-				
+
 				/** Global Modifier.
-				* 
+				*
 				* @param map Map containing the parameters described by the user query
 				* @param code Code of the DBLog viewer (useless if only one viewer in a page)
 				* @param logKey log key to override the map
-				* @param searchStartDate 
-				* @param searchEndDate 
-				* @param searchLevel 
-				* @param searchUserId 
-				* @param searchText 
-				* @param searchObjectId 
+				* @param searchStartDate
+				* @param searchEndDate
+				* @param searchLevel
+				* @param searchUserId
+				* @param searchText
+				* @param searchObjectId
 				*/
 				void set(
 					const server::ParametersMap& map,
@@ -145,15 +145,15 @@ namespace synthese
 					bool withForm = true,
 					bool withLinkToAdminPage = false
 				) const;
-				
+
 				bool isAuthorized(
 					const security::Profile& profile
 				) const;
-				
+
 				server::ParametersMap getParametersMap(
 				) const;
 			//@}
-		
+
 			//! @name Static algorithms
 			//@{
 			//@}

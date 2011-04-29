@@ -56,8 +56,8 @@ namespace synthese
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Login#Request
 			server::ParametersMap getParametersMap() const;
 
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Login#Request

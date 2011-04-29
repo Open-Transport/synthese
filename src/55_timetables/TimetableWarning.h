@@ -55,7 +55,7 @@ namespace synthese
 				@param calendar
 				@param number
 				@author Hugues Romain
-				@date 2008				
+				@date 2008
 			*/
 			TimetableWarning(
 				const calendar::Calendar& calendar,
@@ -63,7 +63,7 @@ namespace synthese
 				const std::string& text
 			);
 
-		
+
 
 			//! @name Getters
 			//@{

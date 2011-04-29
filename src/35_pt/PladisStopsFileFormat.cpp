@@ -68,7 +68,7 @@ namespace synthese
 
 	namespace pt
 	{
-		const std::string PladisStopsFileFormat::Importer_::FILE_BAHNHOFS("bahnhofs"); 
+		const std::string PladisStopsFileFormat::Importer_::FILE_BAHNHOFS("bahnhofs");
 		const std::string PladisStopsFileFormat::Importer_::FILE_KOORDS("koords");
 	}
 
@@ -234,7 +234,7 @@ namespace synthese
 						{
 							stream << t.col();
 							stream << fixed << bahnhof.second.coords->getX();
-					
+
 							stream << t.col();
 							stream << fixed << bahnhof.second.coords->getY();
 
@@ -255,7 +255,7 @@ namespace synthese
 							stream << t.col();
 							stream << t.col();
 						}
-						
+
 					}
 					stream << t.close();
 				}
@@ -342,7 +342,7 @@ namespace synthese
 							{
 								stream << t.col();
 								stream << fixed << bahnhof.second.coords->getX();
-						
+
 								stream << t.col();
 								stream << fixed << bahnhof.second.coords->getY();
 							}

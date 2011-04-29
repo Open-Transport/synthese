@@ -46,7 +46,7 @@ namespace synthese
 			static const std::string COL_PRIORITY_LINE_ID;
 			static const std::string COL_HIDDEN_LINE_ID;
 			static const std::string COL_DELAY;
-			
+
 
 
 			/** NonConcurrencyRule search.

@@ -46,7 +46,7 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,resa::XMLReservationFunction>::FACTORY_KEY("XMLReservationFunction");
-	
+
 	namespace resa
 	{
 		ParametersMap XMLReservationFunction::_getParametersMap() const
@@ -130,9 +130,9 @@ namespace synthese
 			}
 			stream << "</reservation>";
 		}
-		
-		
-		
+
+
+
 		bool XMLReservationFunction::isAuthorized(const server::Session* session) const
 		{
 			return

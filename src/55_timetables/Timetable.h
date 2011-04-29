@@ -46,7 +46,7 @@ namespace synthese
 	namespace timetables
 	{
 		class TimetableRow;
-		
+
 		/** Timetable class.
 			Tableau d'indicateur papier, caractérisée par:
 				- des gares (cGareIndicateurs)
@@ -62,7 +62,7 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<TimetableRow>	Rows;
-						
+
 			/// Chosen registry class.
 			typedef util::Registry<Timetable>	Registry;
 

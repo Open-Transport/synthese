@@ -40,7 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace pt;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::ScheduleRealTimeUpdateAction>::FACTORY_KEY("ScheduleRealTimeUpdateAction");
@@ -56,7 +56,7 @@ namespace synthese
 		const string ScheduleRealTimeUpdateAction::PARAMETER_PROPAGATE_CONSTANTLY = Action_PARAMETER_PREFIX + "pc";
 
 
-	
+
 		ParametersMap ScheduleRealTimeUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -74,9 +74,9 @@ namespace synthese
 			map.insert(PARAMETER_PROPAGATE_CONSTANTLY, _propagateConstantly);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ScheduleRealTimeUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_lateDuration = posix_time::minutes(map.get<int>(PARAMETER_LATE_DURATION_MINUTES));
@@ -103,9 +103,9 @@ namespace synthese
 			_atDeparture = map.getDefault<bool>(PARAMETER_AT_DEPARTURE, true);
 			_propagateConstantly = map.getDefault<bool>(PARAMETER_PROPAGATE_CONSTANTLY, true);
 		}
-		
-		
-		
+
+
+
 		void ScheduleRealTimeUpdateAction::run(Request& request)
 		{
 			_service->applyRealTimeLateDuration(
@@ -116,9 +116,9 @@ namespace synthese
 				_propagateConstantly
 			);
 		}
-		
-		
-		
+
+
+
 		bool ScheduleRealTimeUpdateAction::isAuthorized(const Session* session
 		) const {
 			return true;

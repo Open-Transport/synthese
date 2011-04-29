@@ -47,8 +47,8 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace security;
-	
-	
+
+
 	template<> const string util::FactorableTemplate<Action, messages::AddScenarioAction>::FACTORY_KEY("masca");
 
 	namespace messages
@@ -96,7 +96,7 @@ namespace synthese
 					throw ActionException("Bad folder ID");
 				}
 			}
-			
+
 			// Name
 			_name = map.get<string>(PARAMETER_NAME);
 			if(_name.empty())
@@ -114,9 +114,9 @@ namespace synthese
 			if (_template.get())
 			{
 				ScenarioTemplate scenario(*_template, _name);
-				
+
 				ScenarioTableSync::Save(&scenario);
-				
+
 				ScenarioTemplateInheritedTableSync::CopyMessagesFromOther(
 					_template->getKey(), scenario
 				);
@@ -134,7 +134,7 @@ namespace synthese
 					_name,
 					_folder.get()
 				);
-				
+
 				ScenarioTableSync::Save(&scenario);
 
 				// Remember of the id of created object to view it after the action

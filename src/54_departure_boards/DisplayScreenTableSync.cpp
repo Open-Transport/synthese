@@ -69,7 +69,7 @@ namespace synthese
 	using namespace messages;
 	using namespace geography;
 	using namespace pt;
-		
+
 
 	namespace util
 	{
@@ -118,7 +118,7 @@ namespace synthese
 		template<> const DBTableSync::Format DBTableSyncTemplate<DisplayScreenTableSync>::TABLE(
 			"t041_display_screens"
 		);
-		
+
 		template<> const DBTableSync::Field DBTableSyncTemplate<DisplayScreenTableSync>::_FIELDS[] =
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
@@ -157,14 +157,14 @@ namespace synthese
 			DBTableSync::Field(DisplayScreenTableSync::COL_SUB_SCREEN_TYPE, SQL_INTEGER),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<DisplayScreenTableSync>::_INDEXES[] =
 		{
 			DBTableSync::Index(DisplayScreenTableSync::COL_PLACE_ID.c_str(), ""),
 			DBTableSync::Index(DisplayScreenTableSync::COL_MAC_ADDRESS.c_str(), ""),
 			DBTableSync::Index()
 		};
-					
+
 		template<> void DBDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Load(
 			DisplayScreen* object,
 			const db::DBResultSPtr& rows,
@@ -346,7 +346,7 @@ namespace synthese
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, e);
 					}
 				}
-			
+
 		}	}
 
 
@@ -584,7 +584,7 @@ namespace synthese
 				query.addTableAndEqualJoin<StopAreaTableSync>(TABLE_COL_ID, COL_PLACE_ID);
 				query.addTableAndEqualOtherJoin<CityTableSync,StopAreaTableSync>(TABLE_COL_ID, StopAreaTableSync::TABLE_COL_CITYID);
 				query.addTableAndEqualOtherJoin<StopPointTableSync,StopAreaTableSync>(StopPointTableSync::COL_PLACEID, TABLE_COL_ID);
-			
+
 				if (lineid || neededLevel > FORBIDDEN)
 				{
 					query.addTableAndEqualOtherJoin<LineStopTableSync,StopPointTableSync>(LineStopTableSync::COL_PHYSICALSTOPID, TABLE_COL_ID);
@@ -596,7 +596,7 @@ namespace synthese
 					query.addTableAndEqualJoin<DisplayTypeTableSync>(TABLE_COL_ID, COL_TYPE_ID);
 				}
 			}
-			
+
 			// Filtering
 			if(!localizationid || *localizationid != 0)
 			{
@@ -649,10 +649,10 @@ namespace synthese
 			{
 				query.addWhereField(COL_TYPE_ID, *typeuid);
 			}
-			
+
 			// Grouping
 			query.addGroupByField();
-			
+
 			// Ordering
 			if (orderByUid)
 			{

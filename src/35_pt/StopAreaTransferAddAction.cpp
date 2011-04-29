@@ -38,7 +38,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::StopAreaTransferAddAction>::FACTORY_KEY("StopAreaTransferAddAction");
@@ -49,9 +49,9 @@ namespace synthese
 		const string StopAreaTransferAddAction::PARAMETER_FROM_ID = Action_PARAMETER_PREFIX + "fi";
 		const string StopAreaTransferAddAction::PARAMETER_TO_ID = Action_PARAMETER_PREFIX + "ti";
 		const string StopAreaTransferAddAction::PARAMETER_DURATION = Action_PARAMETER_PREFIX + "du";
-		
-		
-		
+
+
+
 		ParametersMap StopAreaTransferAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -73,9 +73,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void StopAreaTransferAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -106,9 +106,9 @@ namespace synthese
 				_duration = minutes(map.get<long>(PARAMETER_DURATION));
 			}
 		}
-		
-		
-		
+
+
+
 		void StopAreaTransferAddAction::run(
 			Request& request
 		){
@@ -135,9 +135,9 @@ namespace synthese
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool StopAreaTransferAddAction::isAuthorized(
 			const Session* session
 		) const {

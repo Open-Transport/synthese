@@ -90,27 +90,27 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
-			
-			
-			
+
+
+
 			void display(
 				std::ostream& stream,
 				const admin::AdminRequest& _request
 			) const;
-			
+
 			bool isAuthorized(
 				const security::User& user
 			) const;
-			
+
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@return PageLinks A link to the page if the parent is Users
 				@author Hugues Romain
@@ -121,7 +121,7 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
-			
+
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request

@@ -275,7 +275,7 @@ namespace synthese
 				"  secret_token varchar(100) DEFAULT NULL," <<
 				"  synthese_conn_id INT DEFAULT NULL" <<
 				");" <<
-				
+
 				"DROP PROCEDURE IF EXISTS notify_synthese;" <<
 
 				"CREATE PROCEDURE notify_synthese(IN tablename VARCHAR(50), IN type VARCHAR(10), IN id BIGINT)" <<
@@ -502,7 +502,7 @@ namespace synthese
 		bool MySQLDB::doesIndexExist(const std::string& tableName, const DBTableSync::Index& index)
 		{
 			std::stringstream sql;
-			sql << 
+			sql <<
 				"SELECT COUNT(INDEX_NAME) " <<
 				"FROM INFORMATION_SCHEMA.STATISTICS " <<
 				"WHERE TABLE_SCHEMA='" << _connInfo->db << "' AND " <<
@@ -511,7 +511,7 @@ namespace synthese
 			DBResultSPtr res = execQuery(sql.str());
 			res->next();
 			int columnCount = res->getInt(0);
-			
+
 			if (columnCount == 0)
 				return false;
 
@@ -566,7 +566,7 @@ namespace synthese
 		}
 
 
-		
+
 		const std::string& MySQLDB::getSecretToken()
 		{
 			return _secretToken;
@@ -585,7 +585,7 @@ namespace synthese
 			recursive_mutex::scoped_lock lock(_tableSynchronizersMutex);
 
 			DBModifType modifType;
-			if (type == "insert") { modifType = MODIF_INSERT; } 
+			if (type == "insert") { modifType = MODIF_INSERT; }
 			else if (type == "update") { modifType = MODIF_UPDATE; }
 			else if (type == "delete") { modifType = MODIF_DELETE; }
 			else { throw MySQLException("Unknown database modification type " + type); }

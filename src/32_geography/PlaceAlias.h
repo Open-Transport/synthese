@@ -50,7 +50,7 @@ namespace synthese
 
 
 		private:
-		        
+
 
 		public:
 
@@ -65,7 +65,7 @@ namespace synthese
 			//@{
 
 			/** Gets official name of this place.
-		     
+
 				@return aliased place official name.
 			 */
 			const std::string& getOfficialName () const;
@@ -90,4 +90,4 @@ namespace synthese
 	}
 }
 
-#endif 	    
+#endif

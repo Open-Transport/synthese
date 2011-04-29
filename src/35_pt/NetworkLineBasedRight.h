@@ -73,7 +73,7 @@ namespace synthese
 			std::string	displayParameter(
 				util::Env& env = util::Env::GetOfficialEnv()
 			) const;
-			
+
 
 			/** Test of inclusion of an other perimeter by the current one.
 				@param perimeter to compare with
@@ -96,7 +96,7 @@ namespace synthese
 			try
 			{
 				util::RegistryObjectType tableId(util::decodeTableId(id));
-				
+
 				if (tableId == pt::TransportNetworkTableSync::TABLE.ID)
 				{
 					boost::shared_ptr<const pt::TransportNetwork> network(

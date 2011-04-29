@@ -46,7 +46,7 @@ namespace synthese
 		public:
 			static const std::string COL_PARENT_ID;
 			static const std::string COL_NAME;
-			
+
 			TreeFolderTableSync();
 
 			template<class ObjectType_>
@@ -59,7 +59,7 @@ namespace synthese
 				{
 					return env.getEditable<TreeFolderRoot>(id);
 				}
-				
+
 */				boost::shared_ptr<typename ObjectType_::TreeFolderType> object;
 /*				try
 				{

@@ -66,7 +66,7 @@ namespace synthese
 			DBTableSync::Field(ReservationContactTableSync::COL_WEBSITEURL, SQL_TEXT),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<ReservationContactTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index()
@@ -175,7 +175,7 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 " 
+				<< " WHERE 1 "
 				/// @todo Fill Where criteria
 				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(name, false) << "%'"
 				;

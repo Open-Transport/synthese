@@ -96,8 +96,8 @@ namespace synthese
 
 			virtual bool isAuthorized(const server::Session* session) const;
 
-			
-			
+
+
 			////////////////////////////////////////////////////////////////////
 			///	Screen loader.
 			///	@param id ID of the screen

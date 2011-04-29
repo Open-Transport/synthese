@@ -47,13 +47,13 @@ namespace synthese
 				static const std::string COL_NAME;
 				static const std::string COL_STOPS;
 			//@}
-			
+
 
 			static std::string SerializeStops(const DRTArea::Stops& value);
 			static DRTArea::Stops UnserializeStops(const std::string& value, util::Env& env);
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	DRTArea search.
 				///	@param env Environment to populate

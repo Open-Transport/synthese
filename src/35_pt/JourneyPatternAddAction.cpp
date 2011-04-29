@@ -48,7 +48,7 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::JourneyPatternAddAction>::FACTORY_KEY("JourneyPatternAddAction");
@@ -60,9 +60,9 @@ namespace synthese
 		const string JourneyPatternAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string JourneyPatternAddAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "te";
 		const string JourneyPatternAddAction::PARAMETER_REVERSE_COPY = Action_PARAMETER_PREFIX + "re";
-		
-		
-		
+
+
+
 		ParametersMap JourneyPatternAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -78,9 +78,9 @@ namespace synthese
 			map.insert(PARAMETER_NAME, _name);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void JourneyPatternAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			RegistryKeyType tid(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE_ID));
@@ -112,9 +112,9 @@ namespace synthese
 			}
 			_name = map.getDefault<string>(PARAMETER_NAME);
 		}
-		
-		
-		
+
+
+
 		void JourneyPatternAddAction::run(
 			Request& request
 		){
@@ -255,9 +255,9 @@ namespace synthese
 			//::AddCreationEntry(object, request.getUser().get());
 			request.setActionCreatedId(object.getKey());
 		}
-		
-		
-		
+
+
+
 		bool JourneyPatternAddAction::isAuthorized(
 			const Session* session
 		) const {

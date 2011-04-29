@@ -19,23 +19,23 @@ namespace carto
 
 
 
-  void 
-  DrawableLineComparatorTest::setUp () 
+  void
+  DrawableLineComparatorTest::setUp ()
   {
 
   }
 
 
-  void 
-  DrawableLineComparatorTest::tearDown() 
+  void
+  DrawableLineComparatorTest::tearDown()
   {
 
-  } 
+  }
 
 
 
-  void 
-  DrawableLineComparatorTest::testSameLines () 
+  void
+  DrawableLineComparatorTest::testSameLines ()
   {
 /* PROBLEM the comparator use fuzzyfied points but the test does not run fuzzyfication
    the comparator should just use points
@@ -49,14 +49,14 @@ namespace carto
       const Point C2 (6.0, 6.0);
 
       std::vector<const Point*> points1;
-      points1.push_back (&A1); 
-      points1.push_back (&B1); 
-      points1.push_back (&C1); 
+      points1.push_back (&A1);
+      points1.push_back (&B1);
+      points1.push_back (&C1);
 
       std::vector<const Point*> points2;
-      points2.push_back (&A2); 
-      points2.push_back (&B2); 
-      points2.push_back (&C2); 
+      points2.push_back (&A2);
+      points2.push_back (&B2);
+      points2.push_back (&C2);
 
       DrawableLine line1 ("1", points1, "L1", RGBColor ("blue"));
       DrawableLine line2 ("2", points2, "L2", RGBColor ("red"));
@@ -76,19 +76,19 @@ namespace carto
 	  CPPUNIT_ASSERT_EQUAL (1, cmp (&line2, &line1)); // Following 1, 2 is on the right of 1
 	  CPPUNIT_ASSERT_EQUAL (0, cmp (&line1, &line2)); // Following 1, 1 is on the left of 2
       }
-*/      
+*/
 
   }
 
 
 
-  void 
-  DrawableLineComparatorTest::testTiniestLines0 () 
+  void
+  DrawableLineComparatorTest::testTiniestLines0 ()
   {
       /*
        *       D x
        *         |
-       *       C x   
+       *       C x
        *        /|
        *       / |
        *    A x  x B
@@ -104,20 +104,20 @@ namespace carto
       const Point B (3.1, 0.1);
       const Point C (3.1, 3.1);
       const Point D (3.1, 6.1);
-      
+
       std::vector<const Point*> points;
-      points.push_back (&A); 
-      points.push_back (&C); 
-      points.push_back (&D); 
-      
+      points.push_back (&A);
+      points.push_back (&C);
+      points.push_back (&D);
+
       DrawableLine line1 ("1", points, "L1", RGBColor ("red"));
-	  
+
       points.clear ();
-      
-      points.push_back (&B); 
-      points.push_back (&C); 
-      points.push_back (&D); 
-      
+
+      points.push_back (&B);
+      points.push_back (&C);
+      points.push_back (&D);
+
       DrawableLine line2 ("2", points, "L2", RGBColor ("black"));
 
       {
@@ -135,11 +135,11 @@ namespace carto
 
 
 
-  void 
-  DrawableLineComparatorTest::testTiniestLines1 () 
+  void
+  DrawableLineComparatorTest::testTiniestLines1 ()
   {
       /*
-       *       C x   
+       *       C x
        *        /|
        *       / |
        *    A x  x B
@@ -154,18 +154,18 @@ namespace carto
       const Point A (0.1, 0.1);
       const Point B (3.1, 0.1);
       const Point C (3.1, 3.1);
-      
+
       std::vector<const Point*> points;
-      points.push_back (&A); 
-      points.push_back (&C); 
-      
+      points.push_back (&A);
+      points.push_back (&C);
+
       DrawableLine line1 ("1", points, "L1", RGBColor ("red"));
-	  
+
       points.clear ();
-      
-      points.push_back (&B); 
-      points.push_back (&C); 
-      
+
+      points.push_back (&B);
+      points.push_back (&C);
+
       DrawableLine line2 ("2", points, "L2", RGBColor ("black"));
 
       {
@@ -181,8 +181,8 @@ namespace carto
 
 
 
-  void 
-  DrawableLineComparatorTest::testVariousComparisons () 
+  void
+  DrawableLineComparatorTest::testVariousComparisons ()
   {
 /* PROBLEM the comparator use fuzzyfied points but the test does not run fuzzyfication
    the comparator should just use points
@@ -208,56 +208,56 @@ namespace carto
       const Point S (20.0, 10.0);
 
       std::vector<const Point*> points;
-      points.push_back (&A); 
-      points.push_back (&B); 
-      points.push_back (&C); 
-      points.push_back (&D); 
-      points.push_back (&E); 
-      points.push_back (&F); 
-      points.push_back (&G); 
-      points.push_back (&H); 
-      points.push_back (&I); 
-      
+      points.push_back (&A);
+      points.push_back (&B);
+      points.push_back (&C);
+      points.push_back (&D);
+      points.push_back (&E);
+      points.push_back (&F);
+      points.push_back (&G);
+      points.push_back (&H);
+      points.push_back (&I);
+
       DrawableLine line1 ("1", points, "L1", RGBColor ("red"));
 
       points.clear ();
-      points.push_back (&J); 
-      points.push_back (&E); 
-      points.push_back (&F); 
-      points.push_back (&G); 
-      points.push_back (&K); 
+      points.push_back (&J);
+      points.push_back (&E);
+      points.push_back (&F);
+      points.push_back (&G);
+      points.push_back (&K);
 
       DrawableLine line2 ("2", points, "L2", RGBColor ("blue"));
 
       points.clear ();
-      points.push_back (&M); 
-      points.push_back (&H); 
-      points.push_back (&G); 
-      points.push_back (&F); 
-      points.push_back (&L); 
+      points.push_back (&M);
+      points.push_back (&H);
+      points.push_back (&G);
+      points.push_back (&F);
+      points.push_back (&L);
 
       DrawableLine line3 ("3", points, "L3", RGBColor ("cyan"));
       points.clear ();
-      points.push_back (&H); 
-      points.push_back (&G); 
-      points.push_back (&F); 
-      points.push_back (&N); 
+      points.push_back (&H);
+      points.push_back (&G);
+      points.push_back (&F);
+      points.push_back (&N);
 
       DrawableLine line4 ("4", points, "L4", RGBColor ("yellow"));
-	
+
       points.clear ();
-      points.push_back (&F); 
-      points.push_back (&G); 
-      points.push_back (&H); 
+      points.push_back (&F);
+      points.push_back (&G);
+      points.push_back (&H);
 
       DrawableLine line5 ("5", points, "L5", RGBColor ("green"));
-	
+
       points.clear ();
-      points.push_back (&K); 
-      points.push_back (&G); 
-      points.push_back (&F); 
-      points.push_back (&E); 
-      points.push_back (&J); 
+      points.push_back (&K);
+      points.push_back (&G);
+      points.push_back (&F);
+      points.push_back (&E);
+      points.push_back (&J);
 
       DrawableLine line6 ("6", points, "L6", RGBColor ("magenta"));
       {
@@ -316,7 +316,7 @@ namespace carto
 
 
 
-  void 
+  void
   DrawableLineComparatorTest::testLinesWithSharedBeginEnd ()
   {
 /* PROBLEM the comparator use fuzzyfied points but the test does not run fuzzyfication
@@ -330,20 +330,20 @@ namespace carto
       const Point F (50.0, 40.0);
 
       std::vector<const Point*> points;
-      points.push_back (&A); 
-      points.push_back (&B); 
-      points.push_back (&F); 
+      points.push_back (&A);
+      points.push_back (&B);
+      points.push_back (&F);
 
       DrawableLine line1 ("1", points, "L1", RGBColor ("cyan"));
       DrawableLine line2 ("2", points, "L2", RGBColor ("yellow"));
 
       points.clear ();
-      points.push_back (&A); 
-      points.push_back (&B); 
-      points.push_back (&C); 
-      points.push_back (&D); 
-      points.push_back (&E); 
-      points.push_back (&F); 
+      points.push_back (&A);
+      points.push_back (&B);
+      points.push_back (&C);
+      points.push_back (&D);
+      points.push_back (&E);
+      points.push_back (&F);
 
       DrawableLine line3 ("3", points, "L3", RGBColor ("green"));
 

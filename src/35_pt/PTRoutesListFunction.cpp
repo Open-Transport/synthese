@@ -51,14 +51,14 @@ namespace synthese
 	using namespace graph;
 
 	template<> const string FactorableTemplate<Function, PTRoutesListFunction>::FACTORY_KEY("PTRoutesListFunction");
-	
+
 	namespace pt
 	{
 		const string PTRoutesListFunction::PARAMETER_PAGE_ID("p");
 		const string PTRoutesListFunction::PARAMETER_MERGE_INCLUDING_ROUTES("mir");
 		const string PTRoutesListFunction::PARAMETER_MERGE_SAME_ROUTES("msr");
 		const string PTRoutesListFunction::PARAMETER_DATE("date");
-		
+
 		const std::string PTRoutesListFunction::DATA_NAME("name");
 		const std::string PTRoutesListFunction::DATA_LENGTH("length");
 		const std::string PTRoutesListFunction::DATA_STOPS_NUMBER("stops_number");
@@ -136,7 +136,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			
+
 			set<const JourneyPattern*> routes;
 			// Selection of routes by same comparison
 			BOOST_FOREACH(const Path* path, _line->getPaths())
@@ -281,9 +281,9 @@ namespace synthese
 				stream << "</directions>";
 			}
 		}
-		
-		
-		
+
+
+
 		bool PTRoutesListFunction::isAuthorized(
 			const Session* session
 		) const {

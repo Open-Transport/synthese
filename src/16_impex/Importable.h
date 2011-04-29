@@ -71,7 +71,7 @@ namespace synthese
 					const Importable& object
 				);
 			};
-			
+
 		private:
 			// Attributes
 			DataSourceLinks _dataSourceLinks;
@@ -80,12 +80,12 @@ namespace synthese
 			/////////////////////////////////////////////////////////////////////
 			/// DataSource Constructor.
 			Importable();
-			
+
 			//! @name Getters
 			//@{
 				const DataSourceLinks& getDataSourceLinks() const { return _dataSourceLinks; }
 			//@}
-		
+
 			//! @name Setters
 			//@{
 				void setDataSourceLinks(const DataSourceLinks& value){ _dataSourceLinks = value; }
@@ -114,7 +114,7 @@ namespace synthese
 
 				std::string getCodeBySources() const;
 			//@}
-		
+
 			//! @name Static algorithms
 			//@{
 			//@}

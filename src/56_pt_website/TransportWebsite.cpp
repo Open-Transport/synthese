@@ -69,7 +69,7 @@ namespace synthese
 			RegistryKeyType id
 		):	Registrable(id),
 			_displayRoadApproachDetail(true)
-		{		
+		{
 		}
 
 
@@ -103,7 +103,7 @@ namespace synthese
 
 			if (text.size() == 1)
 				return day_clock::local_day();
-			
+
 			return date(from_string(text));
 		}
 
@@ -140,7 +140,7 @@ namespace synthese
 			, ptime& startTime
 			, ptime& endTime
 		) const {
-			
+
 			// Updates
 			if (period.getEndHour() <= period.getBeginHour())
 			{
@@ -158,8 +158,8 @@ namespace synthese
 				{
 					throw ForbiddenDateException();
 				}
-					
-				if(startTime < now) 
+
+				if(startTime < now)
 				{
 					startTime = now;
 				}
@@ -172,18 +172,18 @@ namespace synthese
 		}
 
 
-		
+
 		const GeographyModule::CitiesMatcher& TransportWebsite::getCitiesMatcher () const
 		{
 			return _citiesMatcher.size() ? _citiesMatcher : GeographyModule::GetCitiesMatcher();
 		}
-		
-		
-		
+
+
+
 		void TransportWebsite::addCity(shared_ptr<City> city)
 		{
 			if(!city) return;
-			
+
 			// Conflict control
 			string name(city->getName());
 			GeographyModule::CitiesMatcher::Map::const_iterator it(_citiesMatcher.entries().find(name));
@@ -195,19 +195,19 @@ namespace synthese
 				_citiesMatcher.add(oldName + " (" + oldCity->getCode().substr(0,2) + ")", oldCity);
 				name += " (" + city->getCode().substr(0,2) + ")";
 			}
-			
+
 			// Already resolved conflict control
 			//TODO Implement it
-			
+
 			_citiesMatcher.add(name, city);
-			
-						
+
+
 /*			stringstream ss;
 			boost::iostreams::filtering_ostream out;
 			out.push (T9Filter());
 			out.push (ss);
 			out << city->getName() << flush;
-			
+
 			_citiesT9Matcher.add(ss.str(), city->getKey());
 */
 		}

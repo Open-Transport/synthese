@@ -67,7 +67,7 @@ namespace synthese
 			void run(server::Request& request);
 
 			virtual bool isAuthorized(const server::Session* session) const;
-			
+
 			void setScreen(boost::shared_ptr<DisplayScreen> value);
 			void setScreen(boost::shared_ptr<const DisplayScreen> value);
 		};

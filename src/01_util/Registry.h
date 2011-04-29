@@ -51,7 +51,7 @@ namespace synthese
 			This class should not be used directly : use instead the "template" typedef in the classes derived from Registrable.
 
 			A registry stores a collection of objects making an environment.
-							
+
 			It is possible to erase a single element in the ordered way of use : the pop_back method removes
 			the least element of the vector and the corresponding record in the map.
 
@@ -95,20 +95,20 @@ namespace synthese
 			typedef typename Map::value_type value_type;
 			typedef typename Map::reverse_iterator reverse_iterator;
 			typedef typename Map::const_reverse_iterator const_reverse_iterator;
-			
+
 		private:
-			
+
 			 Map	_registry;
 
 		 public:
-	
+
 			Registry(): RegistryBase() {}
 
 			/** Static registry key.
 				Used by Env class to select the whole registry from a string designing the class.
 			*/
 			static const std::string KEY;
-		
+
 			//! @name Query methods
 			//@{
 				bool contains (const RegistryKeyType& key) const
@@ -125,7 +125,7 @@ namespace synthese
 				boost::shared_ptr<const T> get(
 					const RegistryKeyType key
 				) const;
-				
+
 
 
 				/** Gets a shared pointer to a registered object with write permission.
@@ -139,7 +139,7 @@ namespace synthese
 				);
 
 
-				
+
 				size_t size () const { return _registry.size(); }
 				bool empty() const { return _registry.empty(); }
 				iterator begin() { return _registry.begin(); }
@@ -152,7 +152,7 @@ namespace synthese
 				const_reverse_iterator rend() const { return _registry.rend(); }
 			//@}
 
-		    
+
 			//! @name Update methods
 			//@{
 				/** Removes and destroy all the registered objects.
@@ -164,7 +164,7 @@ namespace synthese
 					@throws RegistryKeyException if the key of the object is 0 or if the keys is already used in the registry
 				*/
 				void add (boost::shared_ptr<T> ptr);
-				
+
 				/** Replaces an object in the registry.
 					@param ptr Shared pointer to the new object to add instead of the old one
 					@throws RegistryKeyException if the key of the object is 0 (0 is reserved for a const neutral element)
@@ -172,7 +172,7 @@ namespace synthese
 					This method cleans the ordered vector.
 				*/
 				void replace (boost::shared_ptr<T> ptr);
-				
+
 				/** Removes an object from the registry.
 					@param key key of the object to remove
 					@throws RegistryKeyException if the key of the object is 0 (0 is reserved for a const neutral element)
@@ -182,7 +182,7 @@ namespace synthese
 				void remove (const RegistryKeyType& key);
 
 			//@}
-			
+
 
 		 private:
 
@@ -213,10 +213,10 @@ namespace synthese
 			const RegistryKeyType key
 		) const	{
 			typename Map::const_iterator it(_registry.find(key));
-			
+
 			if(it == _registry.end())
 				throw util::ObjectNotFoundInRegistryException<T>(key);
-				
+
 			return boost::const_pointer_cast<const T, T>(it->second);
 		}
 
@@ -230,11 +230,11 @@ namespace synthese
 				throw RegistryKeyException<T>("Object with unknown key cannot be registered.", 0);
 			}
 
-			if (contains (ptr->getKey ())) 
+			if (contains (ptr->getKey ()))
 			{
 				throw RegistryKeyException<T>("Duplicate key in registry", ptr->getKey ());
 			}
-			
+
 			_registry.insert (std::make_pair (ptr->getKey (), ptr));
 		}
 
@@ -254,7 +254,7 @@ namespace synthese
 			if (key == 0)
 				throw typename util::RegistryKeyException<T>("Neutral object cannot be removed at execution time", 0);
 
-			if (contains (key) == false) 
+			if (contains (key) == false)
 				throw typename util::ObjectNotFoundInRegistryException<T>(key);
 
 			_registry.erase (key);

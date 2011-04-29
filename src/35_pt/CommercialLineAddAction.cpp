@@ -39,7 +39,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace pt;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::CommercialLineAddAction>::FACTORY_KEY("CommercialLineAddAction");
@@ -48,9 +48,9 @@ namespace synthese
 	namespace pt
 	{
 		const string CommercialLineAddAction::PARAMETER_NETWORK_ID = Action_PARAMETER_PREFIX + "ni";
-		
-		
-		
+
+
+
 		ParametersMap CommercialLineAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -60,9 +60,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CommercialLineAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -75,9 +75,9 @@ namespace synthese
 			}
 
 		}
-		
-		
-		
+
+
+
 		void CommercialLineAddAction::run(
 			Request& request
 		){
@@ -88,9 +88,9 @@ namespace synthese
 
 			request.setActionCreatedId(line.getKey());
 		}
-		
-		
-		
+
+
+
 		bool CommercialLineAddAction::isAuthorized(
 			const Session* session
 		) const {

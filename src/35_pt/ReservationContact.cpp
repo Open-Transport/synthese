@@ -49,7 +49,7 @@ namespace synthese
 
 
 
-		const std::string& 
+		const std::string&
 		ReservationContact::getPhoneExchangeOpeningHours () const
 		{
 			return _phoneExchangeOpeningHours;
@@ -66,7 +66,7 @@ namespace synthese
 
 
 
-		const std::string& 
+		const std::string&
 		ReservationContact::getWebSiteUrl () const
 		{
 			return _webSiteUrl;
@@ -91,7 +91,7 @@ namespace synthese
 
 
 
-		const std::string& 
+		const std::string&
 		ReservationContact::getPhoneExchangeNumber () const
 		{
 			return _phoneExchangeNumber;
@@ -107,7 +107,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		ReservationContact::setDescription (const std::string& description)
 		{
 			_description = description;

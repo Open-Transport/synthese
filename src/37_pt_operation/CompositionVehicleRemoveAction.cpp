@@ -39,7 +39,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt_operation::CompositionVehicleRemoveAction>::FACTORY_KEY("CompositionVehicleRemoveAction");
@@ -49,9 +49,9 @@ namespace synthese
 	{
 		const string CompositionVehicleRemoveAction::PARAMETER_COMPOSITION_ID = Action_PARAMETER_PREFIX + "ci";
 		const string CompositionVehicleRemoveAction::PARAMETER_VEHICLE_ID = Action_PARAMETER_PREFIX + "vi";
-		
-		
-		
+
+
+
 		ParametersMap CompositionVehicleRemoveAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -65,9 +65,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CompositionVehicleRemoveAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -88,15 +88,15 @@ namespace synthese
 				throw ActionException("No such vehicle");
 			}
 		}
-		
-		
-		
+
+
+
 		void CompositionVehicleRemoveAction::run(
 			Request& request
 		){
 			//stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			
+
 			Composition::VehicleLinks links(_composition->getVehicles());
 			for(Composition::VehicleLinks::iterator it(links.begin()); it != links.end(); ++it)
 			{
@@ -107,14 +107,14 @@ namespace synthese
 				}
 			}
 			_composition->setVehicles(links);
-			
+
 			CompositionTableSync::Save(_composition.get());
-			
+
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool CompositionVehicleRemoveAction::isAuthorized(
 			const Session* session
 		) const {

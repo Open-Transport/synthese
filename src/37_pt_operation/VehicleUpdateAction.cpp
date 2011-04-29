@@ -35,7 +35,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt_operation::VehicleUpdateAction>::FACTORY_KEY("VehicleUpdateAction");
@@ -96,9 +96,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void VehicleUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.isDefined(PARAMETER_VEHICLE_ID)) try
@@ -153,9 +153,9 @@ namespace synthese
 				_registrationNumbers = map.get<string>(PARAMETER_REGISTRATION_NUMBERS);
 			}
 		}
-		
-		
-		
+
+
+
 		void VehicleUpdateAction::run(
 			Request& request
 		){
@@ -200,7 +200,7 @@ namespace synthese
 			{
 				_vehicle->setRegistrationNumbers(*_registrationNumbers);
 			}
-			
+
 			VehicleTableSync::Save(_vehicle.get());
 
 			// ::AddUpdateEntry(*_object, text.str(), request.getUser().get());
@@ -210,9 +210,9 @@ namespace synthese
 				request.setActionCreatedId(_vehicle->getKey());
 			}
 		}
-		
-		
-		
+
+
+
 		bool VehicleUpdateAction::isAuthorized(
 			const Session* session
 		) const {

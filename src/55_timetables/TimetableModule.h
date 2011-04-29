@@ -58,12 +58,12 @@ namespace synthese
 
 		@defgroup m55Alarm 55.17 Messages recipient
 		@ingroup m55
-		
+
 		@defgroup m55 55 Timetables generator
 		@ingroup m5
-		
-		
-		
+
+
+
 		@{
 	*/
 

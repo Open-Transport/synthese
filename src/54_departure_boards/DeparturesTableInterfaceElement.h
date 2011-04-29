@@ -32,7 +32,7 @@ namespace synthese
     namespace interfaces
     {
 	class ValueInterfaceElement;
-	
+
     }
 
 

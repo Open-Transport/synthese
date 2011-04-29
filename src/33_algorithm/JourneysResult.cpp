@@ -110,12 +110,12 @@ namespace synthese
 				)	);
 			}
 
-		
-			
+
+
 			/** Adds an empty journey for a specified vertex.
 				@param method Access direction of the journey to create
 				@author Hugues Romain
-				@date 2008					
+				@date 2008
 			*/
 			void JourneysResult::addEmptyJourney()
 			{
@@ -147,8 +147,8 @@ namespace synthese
 				return ptr;
 			}
 
-			
-			
+
+
 			/** Removes useless result journeys according to the current best reaches.
 				@param updateMinSpeed
 				@param newMaxTime
@@ -190,7 +190,7 @@ namespace synthese
 						journey->setScore(
 							is._getScore(
 								newTotalDuration,
-								*journey->getDistanceToEnd(), 
+								*journey->getDistanceToEnd(),
 								_accessDirection == DEPARTURE_TO_ARRIVAL ?
 									journey->getFirstArrivalTime() - is.getOriginDateTime() :
 									is.getOriginDateTime() - journey->getLastDepartureTime(),
@@ -235,8 +235,8 @@ namespace synthese
 					return boost::shared_ptr<RoutePlanningIntermediateJourney>();
 			}
 
-			
-			
+
+
 			/** Is the result empty ?.
 				@return bool true if the result is empty
 				@author Hugues Romain

@@ -51,10 +51,10 @@ namespace synthese
 
 		public:
 			ResaEditLogEntryAdmin();
-			
+
 			void setEntry(boost::shared_ptr<const dblog::DBLogEntry> value);
 			boost::shared_ptr<const dblog::DBLogEntry> getEntry() const;
-			
+
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -70,11 +70,11 @@ namespace synthese
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
-			
-			
+
+
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
@@ -96,18 +96,18 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& profile
 			) const;
-			
-			
+
+
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
-			
-			
+
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
-			
+
 		};
 	}
 }

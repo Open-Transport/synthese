@@ -43,42 +43,42 @@ namespace synthese
 	{
 		/**	@defgroup m36Exceptions 36.01 Exceptions
 			@ingroup m36
-	
+
 			@defgroup m36LS 36.10 Table synchronizers
 			@ingroup m36
-	
+
 			@defgroup m36Pages 36.11 Interface Pages
 			@ingroup m36
-	
+
 			@defgroup m36Library 36.11 Interface Library
 			@ingroup m36
-	
+
 			@defgroup m36Rights 36.12 Rights
 			@ingroup m36
-	
+
 			@defgroup m36Logs 36.13 DB Logs
 			@ingroup m36
-	
+
 			@defgroup m36Admin 36.14 Administration pages
 			@ingroup m36
-	
+
 			@defgroup m36Actions 36.15 Actions
 			@ingroup m36
-	
+
 			@defgroup m36Functions 36.15 Functions
 			@ingroup m36
-	
+
 			@defgroup m36File 36.16 File formats
 			@ingroup m36
-	
+
 			@defgroup m36Alarm 36.17 Messages recipient
 			@ingroup m36
-			
+
 			@defgroup m36 36 CMS
 			@ingroup m3
-			
+
 			@todo Write Module documentation
-			
+
 			@{
 		*/
 
@@ -131,7 +131,7 @@ namespace synthese
 			/// The current function must be WebPageDisplayFunction
 			static boost::shared_ptr<const Webpage> GetWebPage(const server::Request& request);
 
-		
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Removes a site from the map of sites indexed by client URL.
@@ -141,8 +141,8 @@ namespace synthese
 			/// @since 3.2.0
 			static void RemoveSite(const std::string& key);
 
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Adds a site on the map of sites indexed by client URL.
 			/// @param value the site to add

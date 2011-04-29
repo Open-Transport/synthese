@@ -54,7 +54,7 @@ namespace synthese
 		const std::string DisplayScreenCPUMaintenanceUpdateAction::PARAMETER_IS_ONLINE = Action_PARAMETER_PREFIX + "io";
 		const std::string DisplayScreenCPUMaintenanceUpdateAction::PARAMETER_MAINTENANCE_MESSAGE = Action_PARAMETER_PREFIX + "mm";
 		const std::string DisplayScreenCPUMaintenanceUpdateAction::PARAMETER_MONITORING_DELAY = Action_PARAMETER_PREFIX + "md";
-		
+
 		ParametersMap DisplayScreenCPUMaintenanceUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;

@@ -44,14 +44,14 @@ namespace synthese
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _right;
 
 		public:
-		
+
 			std::string display(
 				std::ostream&
 				, const interfaces::ParametersVector& parameters
 				, interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL) const;
-			
+
 			void storeParameters(interfaces::ValueElementList& vel);
 		};
 	}

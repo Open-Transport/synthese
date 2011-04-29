@@ -34,7 +34,7 @@ namespace synthese
 
 			@image html cap_admin_home.png
 			@image latex cap_admin_home.png "Accueil de la console d'administration" width=14cm
-			
+
 			La console d'administration est divisée en 4 parties :
 				- la <i>zone utilisateur</i> située en haut à gauche indique :
 					- le nom de l'utilisateur connecté
@@ -58,13 +58,13 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
 

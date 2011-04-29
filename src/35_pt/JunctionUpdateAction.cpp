@@ -41,7 +41,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::JunctionUpdateAction>::FACTORY_KEY("JunctionUpdateAction");
@@ -56,8 +56,8 @@ namespace synthese
 		const string JunctionUpdateAction::PARAMETER_LENGTH = Action_PARAMETER_PREFIX + "le";
 		const string JunctionUpdateAction::PARAMETER_TIME = Action_PARAMETER_PREFIX + "du";
 
-		
-		
+
+
 		ParametersMap JunctionUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -87,9 +87,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void JunctionUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.isDefined(PARAMETER_JUNCTION_ID))
@@ -147,9 +147,9 @@ namespace synthese
 				_bidirectional = map.getDefault<bool>(PARAMETER_BIDIRECTIONAL);
 			}
 		}
-		
-		
-		
+
+
+
 		void JunctionUpdateAction::run(
 			Request& request
 		){
@@ -168,9 +168,9 @@ namespace synthese
 				request.setActionCreatedId(_junction->getKey());
 			}
 		}
-		
-		
-		
+
+
+
 		bool JunctionUpdateAction::isAuthorized(
 			const Session* session
 		) const {

@@ -137,7 +137,7 @@ namespace synthese
 				///  - 100 : maximum value for a score
 				virtual graph::HubScore getScore(
 				) const;
-				
+
 
 
 				//////////////////////////////////////////////////////////////////////////

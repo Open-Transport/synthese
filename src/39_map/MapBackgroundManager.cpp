@@ -61,28 +61,28 @@ MapBackgroundManager::~MapBackgroundManager()
 
 
 
-void 
+void
 MapBackgroundManager::clearBackgrounds ()
 {
-    for (std::vector<const MapBackground*>::const_iterator iter = _backgrounds.begin (); 
-         iter < _backgrounds.end (); 
+    for (std::vector<const MapBackground*>::const_iterator iter = _backgrounds.begin ();
+         iter < _backgrounds.end ();
          ++iter)
     {
-        delete *iter;   
+        delete *iter;
     }
     _backgrounds.clear ();
 }
 
 
 
-const MapBackground* 
-MapBackgroundManager::getBestScalingBackground (double mapScaleX, 
+const MapBackground*
+MapBackgroundManager::getBestScalingBackground (double mapScaleX,
                                                 double mapScaleY) const
 {
     double currentDiff = std::numeric_limits<double>::max ();
     const MapBackground* currentBackground = 0;
-    for (std::vector<const MapBackground*>::const_iterator iter = _backgrounds.begin (); 
-         iter < _backgrounds.end (); 
+    for (std::vector<const MapBackground*>::const_iterator iter = _backgrounds.begin ();
+         iter < _backgrounds.end ();
          ++iter)
     {
         const MapBackground* mbg = *iter;
@@ -94,11 +94,11 @@ MapBackgroundManager::getBestScalingBackground (double mapScaleX,
             currentBackground = mbg;
         }
     }
-	if (currentBackground != 0) 
+	if (currentBackground != 0)
 	{
-		Log::GetInstance ().info ("Best scale for " + 
-			Conversion::ToString (mapScaleX) + ", " + 
-			Conversion::ToString (mapScaleY) + " : " 
+		Log::GetInstance ().info ("Best scale for " +
+			Conversion::ToString (mapScaleX) + ", " +
+			Conversion::ToString (mapScaleY) + " : "
 			+ Conversion::ToString (currentBackground->getScaleX ()) + ", "
 			+ Conversion::ToString (currentBackground->getScaleY ()));
 	}
@@ -109,14 +109,14 @@ MapBackgroundManager::getBestScalingBackground (double mapScaleX,
 
 
 
-void 
+void
 MapBackgroundManager::Initialize (const boost::filesystem::path& backgroundsDir)
 {
-    for (std::map<std::string, MapBackgroundManager*>::const_iterator iter = _managers.begin (); 
-         iter != _managers.end (); 
+    for (std::map<std::string, MapBackgroundManager*>::const_iterator iter = _managers.begin ();
+         iter != _managers.end ();
          ++iter)
     {
-        delete iter->second;   
+        delete iter->second;
     }
     _managers.clear ();
 
@@ -125,7 +125,7 @@ MapBackgroundManager::Initialize (const boost::filesystem::path& backgroundsDir)
 	Log::GetInstance ().warn ("Map backgrounds dir does not exist : " + backgroundsDir.string ());
 	return;
     }
-    
+
     // Create all managers
     fs::directory_iterator end_iter;
     for ( fs::directory_iterator dir_itr( backgroundsDir );
@@ -133,13 +133,13 @@ MapBackgroundManager::Initialize (const boost::filesystem::path& backgroundsDir)
 	  ++dir_itr )
     {
 	std::string dirpath = dir_itr->leaf();
-	
+
 	MapBackgroundManager* manager = new MapBackgroundManager (backgroundsDir / dirpath);
 	_managers.insert (std::make_pair (dirpath, manager));
     }
-    
+
 }
-    
+
 
 
 

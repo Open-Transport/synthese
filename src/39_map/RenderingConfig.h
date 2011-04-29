@@ -13,7 +13,7 @@ namespace map
 class RenderingConfig
 {
 private:
-    
+
     bool _enableCurves;
     double _radius;
     double _radiusDelta;
@@ -26,7 +26,7 @@ public:
 
     RenderingConfig ();
     ~RenderingConfig ();
-	
+
     bool getEnableCurves () const;
     void setEnableCurves (bool enableCurves);
 
@@ -48,7 +48,7 @@ public:
     int getBorderWidth () const;
     void setBorderWidth (int borderWidth);
 
-	
+
 };
 
 }

@@ -43,7 +43,7 @@ namespace synthese
 
 		/** Profil utilisateur.
 			@ingroup m12
-		
+
 			Un profil utilisateur est un "modèle" de droits utilisateurs consistant en une liste d'@ref synthese::security::Right "habilitations" prédéfinies.
 
 			Un profil utilisateur peut hériter d'un autre : l'ensemble des habilitations définies par le profil parent est inclus, à l'exception de celles qui sont redéfinies. Un profil peut ne pas avoir de parent.
@@ -79,7 +79,7 @@ namespace synthese
 			int operator<=(const Profile& profile) const;
 
 			Profile(util::RegistryKeyType id = 0);
-			
+
 			//!	\name Getters
 			//@{
 				const std::string&	getName()	const;
@@ -136,7 +136,7 @@ namespace synthese
 					@param parameter Perimeter string to search (default : global perimeter)
 					@return Right* The specified right if exists, NULL else
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 				boost::shared_ptr<Right> getRight(const std::string key = GLOBAL_PERIMETER, const std::string parameter = GLOBAL_PERIMETER);
 
@@ -145,7 +145,7 @@ namespace synthese
 					@param parameter Perimeter string to search (default : global perimeter)
 					@return Right* The specified right if exists, NULL else
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 				boost::shared_ptr<const Right> getRight(const std::string key = GLOBAL_PERIMETER, const std::string parameter = GLOBAL_PERIMETER) const;
 
@@ -153,7 +153,7 @@ namespace synthese
 					@param key The class key to search
 					@return RightsOfSameClassMap Rights of the specified class
 					@author Hugues Romain
-					@date 2007				
+					@date 2007
 				*/
 				RightsOfSameClassMap	getRights(const std::string& key) const;
 

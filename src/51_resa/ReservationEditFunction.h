@@ -44,23 +44,23 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_RESERVATION_ID;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const ReservationTransaction>	_resa;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
 			/// @author Hugues
 			/// @date 2009
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
@@ -69,10 +69,10 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 		public:
-			ReservationEditFunction();	
+			ReservationEditFunction();
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -81,9 +81,9 @@ namespace synthese
 			/// @author Hugues
 			/// @date 2009
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @return true if the function can be run

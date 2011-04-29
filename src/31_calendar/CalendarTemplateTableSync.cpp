@@ -44,19 +44,19 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<DBTableSync,CalendarTemplateTableSync>::FACTORY_KEY("55.10 Calendar templates");
 	}
-	
+
 	namespace calendar
 	{
 		const std::string CalendarTemplateTableSync::COL_TEXT("name");
 		const std::string CalendarTemplateTableSync::COL_CATEGORY("category");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<CalendarTemplateTableSync>::TABLE(
 			"t054_calendar_templates"
 		);
-		
+
 
 		template<> const DBTableSync::Field DBTableSyncTemplate<CalendarTemplateTableSync>::_FIELDS[]=
 		{
@@ -86,7 +86,7 @@ namespace synthese
 			object->setKey(id);
 			object->setText(rows->getText(CalendarTemplateTableSync::COL_TEXT));
 			object->setCategory(static_cast<CalendarTemplate::Category>(rows->getInt(CalendarTemplateTableSync::COL_CATEGORY)));
-			
+
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
  				CalendarTemplateElementTableSync::SearchResult elements(
@@ -117,7 +117,7 @@ namespace synthese
 		}
 
 
-		
+
 		template<> void DBDirectTableSyncTemplate<CalendarTemplateTableSync,CalendarTemplate>::Unlink(
 			CalendarTemplate* obj
 		){
@@ -172,9 +172,9 @@ namespace synthese
 			//TODO log calendar template element removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace calendar
 	{
 		CalendarTemplateTableSync::SearchResult CalendarTemplateTableSync::Search(

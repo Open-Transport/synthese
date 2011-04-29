@@ -96,7 +96,7 @@ std::string SendToDisplay(const std::string& comPort, const std::string& text)
 			NULL  // hTemplate must be NULL for comm devices
 	)	);
 
-	if (hCom == INVALID_HANDLE_VALUE) 
+	if (hCom == INVALID_HANDLE_VALUE)
 	{
 		Log::GetInstance ().fatal ("Error while creating comm file " + lexical_cast<string>(GetLastError()));
 		return string();
@@ -108,7 +108,7 @@ std::string SendToDisplay(const std::string& comPort, const std::string& text)
 	BOOL fSuccess(
 		GetCommState(hCom, &dcb)
 	);
-	if (!fSuccess) 
+	if (!fSuccess)
 	{
 		// Handle the error.
 		Log::GetInstance ().fatal ("Error while getting comm state " + lexical_cast<string>(GetLastError()));
@@ -131,7 +131,7 @@ std::string SendToDisplay(const std::string& comPort, const std::string& text)
 	dcb.Parity = NOPARITY;      // parity bit
 	dcb.StopBits = ONESTOPBIT;    // one stop bit
 	fSuccess = SetCommState(hCom, &dcb);
-	if (!fSuccess) 
+	if (!fSuccess)
 	{
 		// Handle the error.
 		Log::GetInstance ().fatal ("SetCommState failed with error " + lexical_cast<string>(GetLastError()));
@@ -150,14 +150,14 @@ std::string SendToDisplay(const std::string& comPort, const std::string& text)
 	// Read is updated with the number of bytes read
 	char buf[MAX_QUERY_SIZE];
 	DWORD readComm = 0;
-	fSuccess = ReadFile (hCom, buf, STATUS_MESSAGE_SIZE, &readComm, NULL); 
+	fSuccess = ReadFile (hCom, buf, STATUS_MESSAGE_SIZE, &readComm, NULL);
 	if (!fSuccess)
 	{
-		Log::GetInstance ().error ("Error while reading status ! Returned status message will be empty or incomplete."); 
+		Log::GetInstance ().error ("Error while reading status ! Returned status message will be empty or incomplete.");
 	}
-	Log::GetInstance ().info(lexical_cast<string>(readComm) + " bytes read :"); 
+	Log::GetInstance ().info(lexical_cast<string>(readComm) + " bytes read :");
 
-	// Create status message to be sent back to server. 
+	// Create status message to be sent back to server.
 	// It will be sent the next time that the client will ask for update.
 	std::stringstream status;
 	for (DWORD i=0; i<readComm; ++i)
@@ -297,7 +297,7 @@ void exec_thread(
 			if (received.empty ())
 			{
 				Log::GetInstance ().warn ("Received empty displays list ! Maybe a server crash ?");
-			} 
+			}
 			else
 			{
 				Log::GetInstance ().info ("Received displays list : " + received);
@@ -332,7 +332,7 @@ void exec_thread(
 			{
 				Log::GetInstance ().warn ("Received empty command ! Maybe a server crash ?");
 				continue;
-			} 
+			}
 
 			Log::GetInstance ().info ("Received command : " + command);
 
@@ -363,10 +363,10 @@ void exec_thread(
 	@param argc Number of execution parameters
 	@param argv Execution parameters array
 	@ingroup m92
-*/ 
+*/
 int main(int argc, char* argv[])
 {
-	if(argc < 2) 
+	if(argc < 2)
 	{
 		Log::GetInstance ().fatal ("Invalid number of arguments");
 		exit(-1);

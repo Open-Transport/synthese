@@ -64,13 +64,13 @@ namespace synthese
 
 			StopPoint(
 				util::RegistryKeyType id = 0,
-				std::string name = std::string(), 
+				std::string name = std::string(),
 				const pt::StopArea* place = NULL,
 				boost::shared_ptr<geos::geom::Point> geometry = boost::shared_ptr<geos::geom::Point>()
 			);
 
 			~StopPoint();
-		    
+
 
 			//! @name Getters
 			//@{
@@ -81,7 +81,7 @@ namespace synthese
 			//@{
 				void setProjectedPoint(const road::Address& value){ _projectedPoint = value; }
 			//@}
-		
+
 			//! @name Query methods
 			//@{
 				const pt::StopArea* getConnectionPlace() const;

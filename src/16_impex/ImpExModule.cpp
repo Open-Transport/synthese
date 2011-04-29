@@ -37,24 +37,24 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace impex;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<ModuleClass,ImpExModule>::FACTORY_KEY("16_impex");
 	}
-	
+
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<ImpExModule>::NAME("Import Export");
-		
+
 		template<> void ModuleClassTemplate<ImpExModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<ImpExModule>::Init()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<ImpExModule>::End()
 		{
 		}

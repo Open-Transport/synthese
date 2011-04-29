@@ -51,7 +51,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_ALARM_ID;
 			static const std::string PARAMETER_OBJECT_ID;
-			
+
 		private:
 			boost::shared_ptr<const Alarm>	_alarm;
 			util::RegistryKeyType		_objectId;
@@ -70,8 +70,8 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map) throw(server::ActionException);
 
 		public:
-			
-			
+
+
 			////////////////////////////////////////////////////////////////////
 			///	Message setter.
 			///	@param id ID of the message to edit
@@ -82,7 +82,7 @@ namespace synthese
 
 			void setObjectId(util::RegistryKeyType id);
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			/// Action to run, defined by each subclass.
 			void run(

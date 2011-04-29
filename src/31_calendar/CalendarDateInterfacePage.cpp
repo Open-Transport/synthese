@@ -39,12 +39,12 @@ namespace synthese
 
 	namespace calendar
 	{
-		const string CalendarDateInterfacePage::DATA_DAY("day");	
+		const string CalendarDateInterfacePage::DATA_DAY("day");
 		const string CalendarDateInterfacePage::DATA_WEEK_DAY("week_day");
 		const string CalendarDateInterfacePage::DATA_MONTH("month");
 		const string CalendarDateInterfacePage::DATA_YEAR("year");
 		const string CalendarDateInterfacePage::DATA_IS_ACTIVE("is_active");
-		
+
 
 		void CalendarDateInterfacePage::Display(
 			std::ostream& stream,

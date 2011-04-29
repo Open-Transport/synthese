@@ -55,7 +55,7 @@ namespace synthese
 				@return Generated parameters map
 			*/
 			server::ParametersMap _getParametersMap() const;
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Public function with site copy.
 			/// @param function function to copy

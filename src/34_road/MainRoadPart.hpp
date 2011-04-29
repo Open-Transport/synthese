@@ -60,10 +60,10 @@ namespace synthese
 			//! @name Update methods.
 			//@{
 				//////////////////////////////////////////////////////////////////////////
-				/// Inserts a road chunk at the beginning of the road 
+				/// Inserts a road chunk at the beginning of the road
 				/// @param chunk the chunk to add
 				/// @param length length of the chunk
-				/// @param rankShift 
+				/// @param rankShift
 				/// @author Hugues Romain
 				/// @date 2010
 				/// @since 3.1.18
@@ -77,8 +77,8 @@ namespace synthese
 					std::size_t rankShift
 				);
 
-			  
-			  
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Adds a road chunk in the road at the space specified by the rank in path attribute.
 				/// @param chunk the chunk to add
@@ -104,7 +104,7 @@ namespace synthese
 					MainRoadPart& other
 				);
 
-				
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Links the road to a road place.
 				/// @param value the road place to link to the current road

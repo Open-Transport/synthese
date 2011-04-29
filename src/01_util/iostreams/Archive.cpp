@@ -35,8 +35,8 @@ namespace util
 
 
 
-    void Archive::Tar (const boost::filesystem::path& baseDir, 
-		       const boost::filesystem::path& relativePath, 
+    void Archive::Tar (const boost::filesystem::path& baseDir,
+		       const boost::filesystem::path& relativePath,
 		       std::ostream& os)
     {
 		Archive::Tar (baseDir, relativePath, os, true);
@@ -44,8 +44,8 @@ namespace util
 
 
 
-    void Archive::Tar (const boost::filesystem::path& baseDir, 
-		       const boost::filesystem::path& relativePath, 
+    void Archive::Tar (const boost::filesystem::path& baseDir,
+		       const boost::filesystem::path& relativePath,
 		       std::ostream& os, bool recursive)
     {
 		// The ostream MUST have been opened with std::ios_base::binary
@@ -56,17 +56,17 @@ namespace util
 	bool isDir (boost::filesystem::is_directory (entry));
 	char linkIndicator = LINK_INDICATOR_NORMAL_FILE;
 	std::string filename (relativePath.string ());
-	
+
 	if (isDir)
 	{
 	    linkIndicator = LINK_INDICATOR_DIRECTORY_FILE;
 	    filename.append ("/");
 	}
-	else 
+	else
 	{
 	    // assert (is_regular (entry));
 	}
-	
+
 	// First write header
         // 	  100 	name 	name of file
         // 	    8 	mode 	file mode
@@ -80,9 +80,9 @@ namespace util
 
 	long size = isDir ? 0 : file_size (entry);
 	std::time_t lastModificationTime = last_write_time (entry);
-	
+
 	std::stringstream ss;
-	
+
 	ss << Conversion::ToPostpaddedString (filename, '\0', 100);
 	ss << (isDir ? "0000755" : "0000644") << '\0';  // posix permissions are lost; could do better.
 	ss << "0000000" << '\0';
@@ -104,7 +104,7 @@ namespace util
 	for (int i=0; i<512; ++i) checksum += ((int) header[i]);
 
 	std::string checksumstr (Conversion::ToPrepaddedString (Conversion::ToOctalString (checksum), '0', 6));
-	for (int i=0; i<6; ++i) header[148+i] = checksumstr[i]; 
+	for (int i=0; i<6; ++i) header[148+i] = checksumstr[i];
 	header[148+6] = '\0';
 
 	os << header << std::flush;
@@ -125,7 +125,7 @@ namespace util
 	{
 	    char buffer[512];
 		std::ifstream ifs (entry.string ().c_str (), std::ifstream::binary);
-	    while (!ifs.eof ()) 
+	    while (!ifs.eof ())
 	    {
 			memset (buffer, '\0', 512);
 			ifs.read (buffer, 512);
@@ -140,9 +140,9 @@ namespace util
 	    ifs.close ();
 
 	}
-	
+
     }
-    
+
 
 /* sample code
     {

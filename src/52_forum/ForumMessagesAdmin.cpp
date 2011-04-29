@@ -64,7 +64,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void ForumMessagesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -86,7 +86,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool ForumMessagesAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -118,7 +118,7 @@ namespace synthese
 			h.push_back(make_pair("Sujet", string()));
 			h.push_back(make_pair("Message", string()));
 			h.push_back(make_pair("Actions", string()));
-			
+
 
 		}
 
@@ -129,9 +129,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const ForumModule*>(&module) &&
 				_request.getUser() &&
 				_request.getUser()->getProfile() &&
@@ -139,12 +139,12 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		std::string ForumMessagesAdmin::getTitle() const
 		{
 			return _topic.get() ? _topic->getName() : DEFAULT_TITLE;

@@ -53,10 +53,10 @@ namespace synthese
 				static const std::string COL_PUBLISHED;
 				static const std::string COL_IP;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	ForumMessage search.
 				///	@param env Environment to populate

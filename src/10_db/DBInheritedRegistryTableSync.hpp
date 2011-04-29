@@ -1,4 +1,4 @@
-	
+
 /** DBInheritedRegistryTableSync class header.
 	@file DBInheritedRegistryTableSync.hpp
 
@@ -95,7 +95,7 @@ namespace synthese
 
 
 			void rowsUpdated(
-				DB* db, 
+				DB* db,
 				const DBResultSPtr& rows
 			){
 				util::Env& env(util::Env::GetOfficialEnv());
@@ -121,7 +121,7 @@ namespace synthese
 
 
 			void rowsRemoved(
-				DB* db, 
+				DB* db,
 				const RowIdList& rowIds
 			){
 				util::Env& env(util::Env::GetOfficialEnv());

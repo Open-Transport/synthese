@@ -35,7 +35,7 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,server::XMLSessionFunction>::FACTORY_KEY("XMLSessionFunction");
-	
+
 	namespace server
 	{
 		ParametersMap XMLSessionFunction::_getParametersMap() const
@@ -72,9 +72,9 @@ namespace synthese
 
 			stream << "</login>";
 		}
-		
-		
-		
+
+
+
 		bool XMLSessionFunction::isAuthorized(const Session*) const
 		{
 			return true;

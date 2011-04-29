@@ -182,7 +182,7 @@ namespace synthese
 				query << " AND " << COL_NAME << "=" << Conversion::ToDBString(name);
 			if (templateToBeDifferentWith)
 				query << " AND " << TABLE_COL_ID << "!=" << templateToBeDifferentWith->getKey();
-			
+
 			// Ordering
 			if (orderByName)
 				query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
@@ -190,7 +190,7 @@ namespace synthese
 				query << " ORDER BY " << COL_SHORT_TEXT << (raisingOrder ? " ASC" : " DESC");
 			if (orderByLongText)
 				query << " ORDER BY " << COL_LONG_TEXT << (raisingOrder ? " ASC" : " DESC");
-			
+
 			// Size
 			if (number)
 			{

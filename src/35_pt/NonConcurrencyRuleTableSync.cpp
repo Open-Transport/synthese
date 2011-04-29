@@ -46,12 +46,12 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace security;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<DBTableSync,NonConcurrencyRuleTableSync>::FACTORY_KEY("35.25.02 Non concurrency rules");
 	}
-	
+
 	namespace pt
 	{
 		const std::string NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID("priority_line_id");
@@ -73,7 +73,7 @@ namespace synthese
 			DBTableSync::Field(NonConcurrencyRuleTableSync::COL_DELAY, SQL_INTEGER),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<NonConcurrencyRuleTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index()
@@ -177,9 +177,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace pt
 	{
 		NonConcurrencyRuleTableSync::SearchResult NonConcurrencyRuleTableSync::Search(
@@ -188,7 +188,7 @@ namespace synthese
 			optional<RegistryKeyType> priorityLineId
 			, bool hiddenAndPriority
 			, int first /*= 0*/
-			, boost::optional<std::size_t> number  /*= 0*/ 
+			, boost::optional<std::size_t> number  /*= 0*/
 			, bool orderByPriorityLine //= true
 			, bool orderByHiddenLine //= false
 			, bool orderByDelay //= false
@@ -230,7 +230,7 @@ namespace synthese
 			{
 				query <<
 					" ORDER BY n." << TransportNetworkTableSync::COL_NAME << (raisingOrder ? " ASC" : " DESC") << "," <<
-					" c." << CommercialLineTableSync::COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC")				
+					" c." << CommercialLineTableSync::COL_SHORT_NAME << (raisingOrder ? " ASC" : " DESC")
 				;
 			}
 			else if(orderByDelay)

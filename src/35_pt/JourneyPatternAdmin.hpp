@@ -69,15 +69,15 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
-			
+
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
@@ -88,7 +88,7 @@ namespace synthese
 				std::ostream& stream,
 				const admin::AdminRequest& _request
 			) const;
-			
+
 
 
 			/** Authorization control.
@@ -99,12 +99,12 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& user
 			) const;
-			
+
 			/** Sub pages getter.
 				@return PageLinks Ordered vector of sub pages links
 				@author Hugues Romain
 				@date 2008
-				
+
 				The default implementation handles the auto registration of administrative components by getSuperiorVirtual() method.
 				This method can be overloaded to create customized sub tree.
 			*/
@@ -123,9 +123,9 @@ namespace synthese
 			virtual void _buildTabs(
 				const security::Profile& profile
 			) const;
-			
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
-			
+
 		};
 	}
 }

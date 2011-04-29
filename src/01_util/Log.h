@@ -54,12 +54,12 @@ namespace synthese
 		 public:
 
 			typedef enum
-			{	
+			{
 				LEVEL_TRACE = -1
- 				, LEVEL_DEBUG = 0, 
-				   LEVEL_INFO, 
-				   LEVEL_WARN, 
-				   LEVEL_ERROR, 
+ 				, LEVEL_DEBUG = 0,
+				   LEVEL_INFO,
+				   LEVEL_WARN,
+				   LEVEL_ERROR,
 				   LEVEL_FATAL,
 				   LEVEL_NONE
 			} Level;
@@ -79,7 +79,7 @@ namespace synthese
 			struct tm* _logTimeInfo;
 
 
-			Log ( std::ostream* outputStream = &std::cout, 
+			Log ( std::ostream* outputStream = &std::cout,
 			  Log::Level level = Log::LEVEL_DEBUG );
 
 		 public:
@@ -117,7 +117,7 @@ namespace synthese
 				void fatal (const std::string& message, const std::exception& exception);
 
 			//@}
-		    
+
 
 		 private:
 
@@ -128,8 +128,8 @@ namespace synthese
 			static const std::string LOG_PREFIX_ERROR;
 			static const std::string LOG_PREFIX_FATAL;
 
-			void append (Log::Level level, 
-				 const std::string& message, 
+			void append (Log::Level level,
+				 const std::string& message,
 				 const std::exception* exception = 0);
 
 		};

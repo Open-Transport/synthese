@@ -58,7 +58,7 @@ namespace synthese
 			, const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
 		{
 			string text = _text->getValue(parameters, variables, object, request);
-			
+
 			std::stringstream sout;
 
 			PlainCharFilter filter;

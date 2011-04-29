@@ -47,7 +47,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::ServiceAddAction>::FACTORY_KEY("ServiceAddAction");
@@ -73,8 +73,8 @@ namespace synthese
 
 		}
 
-		
-		
+
+
 		ParametersMap ServiceAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -87,9 +87,9 @@ namespace synthese
 			map.insert(PARAMETER_PERIOD, _period.total_seconds() / 60);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ServiceAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_isContinuous = map.get<bool>(PARAMETER_IS_CONTINUOUS);
@@ -156,9 +156,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		void ServiceAddAction::run(
 			Request& request
 		){
@@ -203,9 +203,9 @@ namespace synthese
 				{
 					object.generateIncrementalSchedules(_startDepartureTime);
 				}
-				
+
 				ContinuousServiceTableSync::Save(&object, transaction);
-				
+
 				//::AddCreationEntry(object, request.getUser().get());
 
 				request.setActionCreatedId(object.getKey());
@@ -231,7 +231,7 @@ namespace synthese
 				}
 
 				ScheduledServiceTableSync::Save(&object, transaction);
-				
+
 				request.setActionCreatedId(object.getKey());
 
 				if(_period.total_seconds() > 0 && !_endDepartureTime.is_not_a_date_time())
@@ -242,7 +242,7 @@ namespace synthese
 						number = lexical_cast<int>(_number);
 					}
 					catch (bad_lexical_cast)
-					{						
+					{
 					}
 
 					for(time_duration departureTime(_startDepartureTime + _period); departureTime <= _endDepartureTime; departureTime += _period)
@@ -261,9 +261,9 @@ namespace synthese
 
 			transaction.run();
 		}
-		
-		
-		
+
+
+
 		bool ServiceAddAction::isAuthorized(
 			const Session* session
 		) const {

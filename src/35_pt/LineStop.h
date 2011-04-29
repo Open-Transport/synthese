@@ -66,7 +66,7 @@ namespace synthese
 				double metricOffset = 0,
 				graph::Vertex* vertex = NULL
 			);
-			
+
 			~LineStop();
 
 
@@ -75,7 +75,7 @@ namespace synthese
 				bool getIsDeparture()	const { return _isDeparture; }
 				bool getIsArrival()		const { return _isArrival; }
 			//@}
-				
+
 			//!	@name Setters
 			//@{
 				void				setIsDeparture(bool value) { _isDeparture = value; }
@@ -85,7 +85,7 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				/*! Estimates consistency of line stops sequence according to 
+				/*! Estimates consistency of line stops sequence according to
 					metric offsets and physical stops coordinates.
 					@param other Other line stop to compare.
 					@return true if data seems consistent, false otherwise.

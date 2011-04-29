@@ -57,7 +57,7 @@ namespace synthese
 			static const std::string COL_INTERVAL;
 			static const std::string COL_POSITIVE;
 			static const std::string COL_INCLUDE_ID;
-			
+
 			/** CalendarTemplateElement search.
 				@param env Environment to populate
 				@param calendarId ID of the calendar which the searched elements must belong

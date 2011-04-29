@@ -44,7 +44,7 @@ namespace synthese
 				- 0 :
 				- 1 :
 
-			Object : 
+			Object :
 
 		*/
 		class LogicalAndInterfaceElement
@@ -58,7 +58,7 @@ namespace synthese
 				@param vel Parameters list to read
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
-			
+
 			/* Displays the object.
 				@param stream Stream to write on
 				@param parameters Runtime parameters used in the internal parameters reading
@@ -73,7 +73,7 @@ namespace synthese
 				, const void* object = NULL
 				, const server::Request* request = NULL
 				) const;
-				
+
 			~LogicalAndInterfaceElement();
 		};
 	}

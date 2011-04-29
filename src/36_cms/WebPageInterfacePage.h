@@ -58,7 +58,7 @@ namespace synthese
 			static const std::string DATA_FORUM;
 			static const std::string DATA_IS_CURRENT;
 			static const std::string DATA_DEPTH;
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of a web page content by a template.
 			///	@param stream Stream to write on

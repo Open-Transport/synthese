@@ -84,7 +84,7 @@ namespace synthese
 		void UpdateDisplayPreselectionParametersAction::run(Request& request)
 		{
 			stringstream t;
-			
+
 			// Function
 			DBLogModule::appendToLogIfChange(t, "Fonction", GetFunctionList()[GetFunction(*_screen)], GetFunctionList()[_function]);
 			switch (_function)
@@ -146,23 +146,23 @@ namespace synthese
 				);
 				_screen->setDestinationForceDelay(*_preselectionDelay);
 			}
-			
+
 			// Terminus
 			DBLogModule::appendToLogIfChange(
 				t, "Affichage des terminus seulement", _screen->getEndFilter(), _endFilter
 			);
 			_screen->setOriginsOnly(_endFilter);
-			
+
 			// Cleaning delay
 			DBLogModule::appendToLogIfChange(
 				t, "Délai d'effacement", _screen->getClearingDelay(), _cleaningDelay
 			);
 			_screen->setClearingDelay(_cleaningDelay);
-			
+
 			// Max delay
 			DBLogModule::appendToLogIfChange(t, "Délai d'apparition", _screen->getMaxDelay(), _maxDelay);
 			_screen->setMaxDelay(_maxDelay);
-			
+
 			// Saving
 			DisplayScreenTableSync::Save(_screen.get());
 			ArrivalDepartureTableLog::addUpdateEntry(*_screen, t.str(), *request.getUser());

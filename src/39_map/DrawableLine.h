@@ -54,7 +54,7 @@ namespace synthese
 		class DrawableLineIndex;
 
 		/** @ingroup m59 */
-		class DrawableLine 
+		class DrawableLine
 		{
 		private:
 
@@ -68,17 +68,17 @@ namespace synthese
 
 			std::vector<int> _shifts;
 			std::vector<bool> _shifted;
-			
+
 			std::vector<geos::geom::Coordinate> _fuzzyfiedPoints;
 			mutable std::vector<geos::geom::Coordinate> _shiftedPoints;
 
-			
+
 
 
 		public:
 
 			typedef enum { NONE, SINGLE, SQL_DOUBLE } PointShiftingMode;
-		    
+
 			DrawableLine (const synthese::pt::JourneyPattern* line,
 				  int fromLineStopIndex,
 				  int toLineStopIndex,
@@ -103,7 +103,7 @@ namespace synthese
 
 			boost::shared_ptr<geos::geom::LineString> getPoints() const { return _geometry; }
 
-			const std::vector<geos::geom::Coordinate>& 
+			const std::vector<geos::geom::Coordinate>&
 			getFuzzyfiedPoints () const;
 
 
@@ -128,40 +128,40 @@ namespace synthese
 			std::size_t numberOfCommonPointsWith (const DrawableLine* dbl) const;
 
 			virtual void prepare (Map& map, double spacing, PointShiftingMode shiftMode = SQL_DOUBLE) const;
-		    
+
 			/** Find first point in this line points
 			which is equal (by value) to a given point.
 			*/
 			int firstIndexOf (const geos::geom::Coordinate& p) const;
 
-			const std::vector<geos::geom::Coordinate> 
-				calculateShiftedPoints (const std::vector<geos::geom::Coordinate>& points, 
-						double spacing, 
+			const std::vector<geos::geom::Coordinate>
+				calculateShiftedPoints (const std::vector<geos::geom::Coordinate>& points,
+						double spacing,
 						PointShiftingMode shiftMode) const;
 
 			const std::vector<geos::geom::Coordinate>
-			calculateAbsoluteShiftedPoints (const std::vector<geos::geom::Coordinate>& points, 
+			calculateAbsoluteShiftedPoints (const std::vector<geos::geom::Coordinate>& points,
 												 double spacing) const;
 
 		private:
 
 
-			geos::geom::Coordinate  
-			calculateSingleShiftedPoint (geos::geom::Coordinate a, 
-							 geos::geom::Coordinate b, 
+			geos::geom::Coordinate
+			calculateSingleShiftedPoint (geos::geom::Coordinate a,
+							 geos::geom::Coordinate b,
 							 double distance) const;
 
 			geos::geom::Coordinate
-			calculateSingleShiftedPoint (geos::geom::Coordinate a, 
-							 geos::geom::Coordinate b, 
-							 geos::geom::Coordinate c, 
+			calculateSingleShiftedPoint (geos::geom::Coordinate a,
+							 geos::geom::Coordinate b,
+							 geos::geom::Coordinate c,
 							 double distance) const;
-			
+
 			geos::geom::Coordinate calculateDoubleShiftedPoint(
-				geos::geom::Coordinate a, 
-				geos::geom::Coordinate b, 
-				geos::geom::Coordinate c, 
-				double incomingDistance, 
+				geos::geom::Coordinate a,
+				geos::geom::Coordinate b,
+				geos::geom::Coordinate c,
+				double incomingDistance,
 				double outgoingDistance
 			) const;
 		};

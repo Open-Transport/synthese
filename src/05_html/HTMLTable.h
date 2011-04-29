@@ -66,17 +66,17 @@ namespace synthese
 			const std::string	_className;
 			bool				_lastColWasH;
 			bool				_rowOpen;
-			
+
 			void _closeRow(std::ostream& stream);
 			void _closeSection(std::ostream& stream);
 
 		public:
-			
+
 			/** Constructor with columns number.
 				@param cols Number of columns (default = unknown = 0)
 				@param className Name of css class (default = undefined)
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 			*/
 			HTMLTable(
 				int cols=0,
@@ -89,7 +89,7 @@ namespace synthese
 				@param header Header vector. Each element of the vector represents an header.
 				@author Hugues Romain
 				@date 2007
-				
+
 				A colspan header is available : put the same column name twice (or more) in two following cells.
 			*/
 			HTMLTable(
@@ -97,18 +97,18 @@ namespace synthese
 				std::string className = "",
 				std::string id = std::string()
 			);
-			
+
 			virtual ~HTMLTable();
 
 			/** Opens the table.
 				If defined, the headers are outputed.
 			*/
 			virtual std::string open();
-			
+
 			/** Closes the table.
 			*/
 			virtual std::string close();
-			
+
 			/** Adds a cell to the table.
 				@param colSpan Number of columns the cell will use
 				@param className CSS class name

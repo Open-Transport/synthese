@@ -193,7 +193,7 @@ namespace synthese
 						_logStream
 					);
 					Result subResult(_MergeSubResultAndParentContinuousService(journey, tsr.run()));
-			
+
 					if(_planningOrder == DEPARTURE_FIRST)
 					{
 						BOOST_FOREACH(const Result::value_type& sj, subResult)

@@ -44,7 +44,7 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,messages::GetMessagesFunction>::FACTORY_KEY("messages");
-	
+
 	namespace messages
 	{
 		const string GetMessagesFunction::PARAMETER_RECIPIENT_ID("r");
@@ -53,7 +53,7 @@ namespace synthese
 		const string GetMessagesFunction::PARAMETER_PRIORITY_ORDER("o");
 		const string GetMessagesFunction::PARAMETER_DATE("d");
 		const string GetMessagesFunction::PARAMETER_CMS_TEMPLATE_ID("t");
-		
+
 
 
 		ParametersMap GetMessagesFunction::_getParametersMap() const
@@ -115,9 +115,9 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			
+
 			MessagesModule::MessagesByRecipientId::mapped_type messages(MessagesModule::GetMessages(_recipientId));
-		
+
 			size_t number(0);
 			optional<AlarmLevel> bestPriority;
 			if(_priorityOrder)
@@ -184,9 +184,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		bool GetMessagesFunction::isAuthorized(
 			const Session* session
 		) const {

@@ -48,8 +48,8 @@ namespace synthese
 			Registrable(0)
 		{
 		}
-		
-		
+
+
 
 		void CustomerPasswordEMailContentInterfacePage::display(
 			std::ostream& stream,

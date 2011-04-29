@@ -66,7 +66,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void ResaStatisticsMenuAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -83,7 +83,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool ResaStatisticsMenuAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -144,7 +144,7 @@ namespace synthese
 			}
 			stream << t.close();
 
-		
+
 		}
 
 
@@ -154,9 +154,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const ResaModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -164,12 +164,12 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks ResaStatisticsMenuAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request

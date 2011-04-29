@@ -78,13 +78,13 @@ namespace synthese
 	using namespace geography;
 	using namespace pt;
 	using namespace algorithm;
-	
+
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, resa::BookReservationAction>::FACTORY_KEY("bra");
 	}
-	
+
 	namespace resa
 	{
 		const string BookReservationAction::PARAMETER_SITE = Action_PARAMETER_PREFIX + "sit";
@@ -278,7 +278,7 @@ namespace synthese
 					{
 						throw ActionException("Un utilisateur avec les mêmes nom, prénom, téléphone existe déjà.");
 					}
-					
+
 					_customer->setEMail(map.getDefault<string>(PARAMETER_CUSTOMER_EMAIL));
 					_customer->setProfile(ResaModule::GetBasicResaCustomerProfile().get());
 
@@ -520,7 +520,7 @@ namespace synthese
 					);
 				}
 				r->setArrivalTime(su.getArrivalDateTime());
-				
+
 				const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
 				if (line)
 				{
@@ -562,7 +562,7 @@ namespace synthese
 				}
 				r->setServiceId(su.getService()->getKey());
 				r->setServiceCode(lexical_cast<string>(su.getService()->getServiceNumber()));
-				
+
 				ReservationTableSync::Save(r.get());
 			}
 
@@ -576,7 +576,7 @@ namespace synthese
 
 				ResaDBLog::AddEMailEntry(*request.getSession(), *_customer, "Récapitulatif de réservation");
  			}
- 
+
 			// Redirect
 			if(request.getActionWillCreateObject())
 			{
@@ -592,7 +592,7 @@ namespace synthese
 			{
 				return false;
 			}
-			return 
+			return
 				session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE) ||
 				!_createCustomer &&
 				_customer->getKey() == session->getUser()->getKey() &&

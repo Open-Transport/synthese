@@ -80,7 +80,7 @@ namespace synthese
 		{
 		public:
 			typedef RoutePlanningIntermediateJourney Result;
-			
+
 			/** Exception to throw when the route planning has no sense because of the presence of a common vertex in
 				both the the departure and the arrival vertex access maps.
 			*/
@@ -113,7 +113,7 @@ namespace synthese
 			//@{
 				std::ostream* const					_logStream;
 			//@}
-				
+
 
 			//! @name Intermediate values
 			//@{
@@ -123,10 +123,10 @@ namespace synthese
 			/** Best journey finder.
 				@param accessDirection Type of computing : search of better arrival or of a better departure
 				@param currentJourney Journey conducting to the departure vam
-				@param sctrictTime Filter : 
+				@param sctrictTime Filter :
 					- true : solutions starting at the vam time are only selected
 					- false : all solutions are selected
-				@param optim Filter : 
+				@param optim Filter :
 					- true : solutions allowing a comfort raising and a time saving are selected
 					- false :solutions allowing a time saving are only selected
 			*/
@@ -172,15 +172,15 @@ namespace synthese
 				boost::optional<const JourneyTemplates&> journeyTemplates = boost::optional<const JourneyTemplates&>()
 			);
 
-			
-			
+
+
 			/** Launches the computing ans return the result.
 				@return The result (Journey object)
 					- non empty if the graph allows to reach the destination from the origin according to the access parameters
 					- empty if no solution has been found
 				@throws SamePlacesException if the departure and the arrival places intersects.
 				@author Hugues
-				@date 2009				
+				@date 2009
 			*/
 			graph::Journey run();
 		};

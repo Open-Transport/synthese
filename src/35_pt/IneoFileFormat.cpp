@@ -78,12 +78,12 @@ namespace synthese
 	using namespace admin;
 	using namespace server;
 	using namespace geography;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<FileFormat,IneoFileFormat>::FACTORY_KEY("Ineo");
 	}
-	
+
 	namespace pt
 	{
 		const std::string IneoFileFormat::Importer_::FILE_PNT("pnt");
@@ -610,7 +610,7 @@ namespace synthese
 			catch (ObjectNotFoundException<TransportNetwork>&)
 			{
 			}
-			
+
 			_autoImportStops = map.getDefault<bool>(PARAMETER_AUTO_IMPORT_STOPS, false);
 			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);

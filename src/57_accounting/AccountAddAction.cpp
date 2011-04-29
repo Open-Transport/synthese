@@ -41,7 +41,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace security;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, accounts::AccountAddAction>::FACTORY_KEY("addaccount");
@@ -54,14 +54,14 @@ namespace synthese
 		const string AccountAddAction::PARAMETER_CLASS = Action_PARAMETER_PREFIX + "cl";
 		const string AccountAddAction::PARAMETER_AUTO_INCREMENT_CLASS = Action_PARAMETER_PREFIX + "ai";
 		const string AccountAddAction::PARAMETER_RIGHT_USER_ID = Action_PARAMETER_PREFIX + "ru";
-		
+
 		AccountAddAction::AccountAddAction()
 		: util::FactorableTemplate<Action, AccountAddAction>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap AccountAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -73,9 +73,9 @@ namespace synthese
 			map.insert(PARAMETER_AUTO_INCREMENT_CLASS, _autoIncrementClass);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void AccountAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_name = map.getDefault<string>(PARAMETER_NAME);
@@ -86,7 +86,7 @@ namespace synthese
 			_class = map.getDefault<string>(PARAMETER_CLASS);
 			if (_class.empty())
 				throw ActionException("Class must be non empty");
-			
+
 			_autoIncrementClass = map.getDefautl<bool>(PARAMETER_AUTO_INCREMENT_CLASS, false);
 
 			try
@@ -111,9 +111,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		void AccountAddAction::run(Request& request)
 		{
 			Account a;
@@ -122,7 +122,7 @@ namespace synthese
 			a.setRightCurrency(_currency.get());
 			a.setLeftCurrency(_currency.get());
 			a.setRightUserId(_rightUser->getKey());
-			
+
 			AccountTableSync::Save(&a);
 		}
 

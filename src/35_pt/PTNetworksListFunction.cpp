@@ -44,11 +44,11 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,pt::PTNetworksListFunction>::FACTORY_KEY("PTNetworksListFunction");
-	
+
 	namespace pt
 	{
 		const string PTNetworksListFunction::PARAMETER_PAGE_ID("p");
-		
+
 		ParametersMap PTNetworksListFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -108,9 +108,9 @@ namespace synthese
 				/// @todo generate XML footer
 			}
 		}
-		
-		
-		
+
+
+
 		bool PTNetworksListFunction::isAuthorized(
 			const Session* session
 		) const {

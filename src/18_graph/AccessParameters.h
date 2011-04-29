@@ -159,7 +159,7 @@ namespace synthese
 					@param duration duration of the approach
 					@return bool true if the approach is compatible with the current rules
 					@author Hugues Romain
-					@date 2008				
+					@date 2008
 				*/
 				bool isCompatibleWithApproach(
 					double distance,
@@ -220,7 +220,7 @@ namespace synthese
 				bool getWithoutDRT()	const { return _withoutDrt;	}
 				boost::posix_time::time_duration getMaxApproachTime() const {	return _maxApproachTime; }
 				double getMaxApproachDistance() const { return _maxApproachDistance; }
-				const AllowedPathClasses& getAllowedPathClasses() const { return _allowedPathClasses; } 
+				const AllowedPathClasses& getAllowedPathClasses() const { return _allowedPathClasses; }
 			//@}
 
 			//! @name Setters

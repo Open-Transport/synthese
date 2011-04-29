@@ -51,7 +51,7 @@ namespace synthese
 		 public:
 
 			~SQLiteResult ();
-		    
+
 			//! @name Query methods.
 			//@{
 				virtual void reset() const;

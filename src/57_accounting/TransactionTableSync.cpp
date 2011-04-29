@@ -3,7 +3,7 @@
 	@file TransactionTableSync.cpp
 
 	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
-	Copyright (C) 2006 Vinci Park 
+	Copyright (C) 2006 Vinci Park
 	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
 
 	This program is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ namespace synthese
 	using namespace accounts;
 	using namespace accounts;
 	using namespace util;
-	
+
 
 	namespace util
 	{
@@ -86,7 +86,7 @@ namespace synthese
 		{
 		    try
 		    {
-				// TODO: use ReplaceQuery instead of building the SQL.				
+				// TODO: use ReplaceQuery instead of building the SQL.
 				DB* db = DBModule::GetDB();
 				stringstream query;
 				if (t->getKey() <= 0)
@@ -106,12 +106,12 @@ namespace synthese
 		    }
 		    catch (DBException& e)
 		    {
-			
+
 		    }
 		}
-	    
+
 	}
-    
+
 
 
 	namespace accounts

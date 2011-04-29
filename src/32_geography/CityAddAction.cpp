@@ -35,7 +35,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, geography::CityAddAction>::FACTORY_KEY("CityAddAction");
@@ -45,9 +45,9 @@ namespace synthese
 	{
 		const string CityAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string CityAddAction::PARAMETER_CODE = Action_PARAMETER_PREFIX + "co";
-		
-		
-		
+
+
+
 		ParametersMap CityAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -55,17 +55,17 @@ namespace synthese
 			map.insert(PARAMETER_CODE, _code);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CityAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_name = map.getDefault<string>(PARAMETER_NAME);
 			_code = map.getDefault<string>(PARAMETER_CODE);
 		}
-		
-		
-		
+
+
+
 		void CityAddAction::run(
 			Request& request
 		){
@@ -76,12 +76,12 @@ namespace synthese
 			CityTableSync::Save(&city);
 
 			//::AddCreationEntry(object, request.getUser().get());
-			
+
 			request.setActionCreatedId(city.getKey());
 		}
-		
-		
-		
+
+
+
 		bool CityAddAction::isAuthorized(
 			const Session* session
 		) const {

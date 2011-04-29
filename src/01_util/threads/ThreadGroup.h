@@ -71,7 +71,7 @@ class ThreadGroup
  private:
 
     void waitAllInState (const Thread::ThreadState& state) const;
-    
+
 };
 
 

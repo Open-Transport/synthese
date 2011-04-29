@@ -33,7 +33,7 @@ namespace synthese
 	namespace messages
 	{
 		/** Scenario Folder class.
-			
+
 			@ingroup m17
 		*/
 		class ScenarioFolder
@@ -70,7 +70,7 @@ namespace synthese
 				/** Full path getter.
 					@return std::string The name of the folder and its parent separated by /
 					@author Hugues Romain
-					@date 2009					
+					@date 2009
 				*/
 				std::string getFullName() const;
 			//@}

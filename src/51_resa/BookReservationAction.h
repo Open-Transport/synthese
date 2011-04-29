@@ -68,7 +68,7 @@ namespace synthese
 			: public util::FactorableTemplate<server::Action, BookReservationAction>
 		{
 		public:
-		
+
 			// Accessibility
 			static const std::string PARAMETER_ACCESS_PARAMETERS;
 
@@ -115,7 +115,7 @@ namespace synthese
 			graph::AccessParameters				_accessParameters;
 			std::size_t							_seatsNumber;
 			bool								_ignoreReservation;
-			
+
 			//! @name Reservation on a service
 			//@{
 				boost::shared_ptr<const pt::ScheduledService>	_service;
@@ -169,7 +169,7 @@ namespace synthese
 					std::string destplace
 				);
 			//@}
-			
+
 			//! @name Setters
 			//@{
 				void setJourney(const graph::Journey& journey){ _journey = journey;	}

@@ -37,7 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, db::RemoveObjectAction>::FACTORY_KEY("RemoveObjectAction");
@@ -46,25 +46,25 @@ namespace synthese
 	namespace db
 	{
 		const string RemoveObjectAction::PARAMETER_OBJECT_ID = Action_PARAMETER_PREFIX + "oi";
-		
-		
-		
+
+
+
 		ParametersMap RemoveObjectAction::getParametersMap() const
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_OBJECT_ID, _objectId);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void RemoveObjectAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			setObjectId(map.get<RegistryKeyType>(PARAMETER_OBJECT_ID));
 		}
-		
-		
-		
+
+
+
 		void RemoveObjectAction::run(
 			Request& request
 		){
@@ -72,9 +72,9 @@ namespace synthese
 			_tableSync->deleteRecord(request.getSession(), _objectId, transaction);
 			transaction.run();
 		}
-		
-		
-		
+
+
+
 		bool RemoveObjectAction::isAuthorized(
 			const Session* session
 		) const {

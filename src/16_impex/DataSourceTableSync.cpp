@@ -194,7 +194,7 @@ namespace synthese
 			{
 				query.setFirst(first);
 			}
-			
+
 			return LoadFromQuery(query, env, linkLevel);
 		}
 	}

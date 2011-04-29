@@ -47,7 +47,7 @@ namespace synthese
 	using namespace db;
 	using namespace geography;
 	using namespace impex;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::StopAreaAddAction>::FACTORY_KEY("StopAreaAddAction");
@@ -60,9 +60,9 @@ namespace synthese
 		const string StopAreaAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "sn";
 		const string StopAreaAddAction::PARAMETER_CREATE_CITY_IF_NECESSARY = Action_PARAMETER_PREFIX + "cc";
 		const string StopAreaAddAction::PARAMETER_DATA_SOURCE_LINKS(Action_PARAMETER_PREFIX + "sl");
-		
-		
-		
+
+
+
 		ParametersMap StopAreaAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -82,9 +82,9 @@ namespace synthese
 			);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void StopAreaAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.getDefault<RegistryKeyType>(PARAMETER_CITY_ID, 0))
@@ -113,9 +113,9 @@ namespace synthese
 				*_env
 			);
 		}
-		
-		
-		
+
+
+
 		void StopAreaAddAction::run(
 			Request& request
 		){
@@ -124,7 +124,7 @@ namespace synthese
 
 			StopArea stopArea;
 			stopArea.setAllowedConnection(true);
-			
+
 			if(!_city.get())
 			{
 				_city.reset(new City);
@@ -142,9 +142,9 @@ namespace synthese
 //			::AddCreationEntry(object, request.getUser().get());
 			request.setActionCreatedId(stopArea.getKey());
 		}
-		
-		
-		
+
+
+
 		bool StopAreaAddAction::isAuthorized(
 			const Session* session
 		) const {

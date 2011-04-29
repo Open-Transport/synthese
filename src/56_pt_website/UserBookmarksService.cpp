@@ -41,12 +41,12 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function, pt_website::UserBookmarksService>::FACTORY_KEY("UserBookmarksService");
-	
+
 	namespace pt_website
 	{
 		const string UserBookmarksService::PARAMETER_USER_ID("user_id");
 		const string UserBookmarksService::PARAMETER_ITEM_DISPLAY_TEMPLATE_ID("item_display_template_id");
-		
+
 		const string UserBookmarksService::DATA_RANK("rank");
 		const string UserBookmarksService::DATA_ORIGIN_CITY_NAME("origin_city_name");
 		const string UserBookmarksService::DATA_ORIGIN_PLACE_NAME("origin_place_name");
@@ -102,7 +102,7 @@ namespace synthese
 
 			UserFavoriteJourneyTableSync::SearchResult favorites(
 				UserFavoriteJourneyTableSync::Search(*_env, _user.get())
-			);	
+			);
 			BOOST_FOREACH(shared_ptr<UserFavoriteJourney> fav, favorites)
 			{
 				ParametersMap pm(_savedParameters);
@@ -117,9 +117,9 @@ namespace synthese
 				_itemDisplayTemplate->display(stream, request, pm);
 			}
 		}
-		
-		
-		
+
+
+
 		bool UserBookmarksService::isAuthorized(
 			const Session* session
 		) const {

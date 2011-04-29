@@ -44,7 +44,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace impex;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::CommercialLineUpdateAction>::FACTORY_KEY("CommercialLineUpdateAction");
@@ -61,9 +61,9 @@ namespace synthese
 		const string CommercialLineUpdateAction::PARAMETER_IMAGE = Action_PARAMETER_PREFIX + "im";
 		const string CommercialLineUpdateAction::PARAMETER_NETWORK_ID = Action_PARAMETER_PREFIX + "ni";
 		const string CommercialLineUpdateAction::PARAMETER_RESERVATION_CONTACT_ID = Action_PARAMETER_PREFIX + "ri";
-		
-		
-		
+
+
+
 		ParametersMap CommercialLineUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -109,9 +109,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CommercialLineUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// JourneyPattern
@@ -199,9 +199,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		void CommercialLineUpdateAction::run(
 			Request& request
 		){
@@ -244,14 +244,14 @@ namespace synthese
 			{
 				_line->setStyle(*_style);
 			}
-			
+
 			CommercialLineTableSync::Save(_line.get());
-			
+
 			// ::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool CommercialLineUpdateAction::isAuthorized(
 			const Session* session
 		) const {

@@ -37,25 +37,25 @@ class DrawableLine;
 
 class DrawableLineComparator
 {
-private:	
+private:
 
     const DrawableLine* _reference;
     const geos::geom::Coordinate _referencePoint;
-    
+
     geos::geom::Coordinate _point;
-    
-    
-    int firstIndexOf (const geos::geom::Coordinate& point, 
+
+
+    int firstIndexOf (const geos::geom::Coordinate& point,
       const std::vector<geos::geom::Coordinate>& points) const;
-	
+
 public:
 
-    DrawableLineComparator(const DrawableLine* reference, 
-			   const geos::geom::Coordinate& referencePoint, 
+    DrawableLineComparator(const DrawableLine* reference,
+			   const geos::geom::Coordinate& referencePoint,
 			   const geos::geom::Coordinate& point);
-    
+
     ~DrawableLineComparator();
-	
+
     void setPoint (const geos::geom::Coordinate& point);
 
 
@@ -68,17 +68,17 @@ public:
 			    const std::vector<geos::geom::Coordinate>& points2, int index2) const;
 
 
-	
+
     double calculateStartAngleAtIndex (
-	const std::vector<geos::geom::Coordinate>& points, 
+	const std::vector<geos::geom::Coordinate>& points,
 	int index) const;
-    
+
     double calculateEndAngleAtIndex (
-	const std::vector<geos::geom::Coordinate>& points, 
+	const std::vector<geos::geom::Coordinate>& points,
 	int index) const;
-	
+
     int operator() (const DrawableLine* bl1, const DrawableLine* bl2) const;
-	
+
 };
 
 }

@@ -37,7 +37,7 @@ namespace synthese
 		{
 		public:
 			static const std::string CSS_AUTO_ORDER;
-	
+
 		public:
 			class Field
 			{
@@ -74,7 +74,7 @@ namespace synthese
 			private:
 				bool _unique;
 				const Choices& _choices;
-			
+
 			public:
 				SelectField(
 					const std::string& title,
@@ -83,7 +83,7 @@ namespace synthese
 				);
 
 				virtual void getField(std::ostream& stream) const;
-				
+
 				virtual void getInit(
 					std::ostream& stream,
 					const std::string& formName,
@@ -98,14 +98,14 @@ namespace synthese
 				public Field
 			{
 			private:
-			
+
 			public:
 				TextInputField(
 					const std::string& title
 				);
 
 				virtual void getField(std::ostream& stream) const;
-				
+
 				virtual void getInit(
 					std::ostream& stream,
 					const std::string& formName,

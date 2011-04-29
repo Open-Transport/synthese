@@ -33,7 +33,7 @@ namespace synthese
 	namespace hiking
 	{
 		class HikingTrail;
-		
+
 		//////////////////////////////////////////////////////////////////////////
 		/// 58.15 Function : hiking trail value display.
 		///	@author Hugues Romain
@@ -58,24 +58,24 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_KEY;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const HikingTrail> _hikingTrail;
 				std::string _key;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
 			/// @author Hugues
 			/// @date 2010
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
@@ -84,8 +84,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 
 
@@ -96,9 +96,9 @@ namespace synthese
 			/// @author Hugues
 			/// @date 2010
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

@@ -40,7 +40,7 @@ namespace synthese
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<Function,pt_operation::GetVehiclesService>::FACTORY_KEY("GetVehiclesService");
-	
+
 	namespace pt_operation
 	{
 		const string GetVehiclesService::PARAMETER_VEHICLE_PAGE_ID("vp");
@@ -129,9 +129,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		bool GetVehiclesService::isAuthorized(
 			const Session* session
 		) const {

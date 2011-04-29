@@ -39,7 +39,7 @@ namespace synthese
 				- dummy
 				- dummy 1
 				- dummy 2
-			
+
 			If a "dummy 2" string is added, then a second number is added :
 				- dummy 2 1
 		*/

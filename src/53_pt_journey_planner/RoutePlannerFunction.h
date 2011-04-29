@@ -144,7 +144,7 @@ namespace synthese
 			static const std::string PARAMETER_MAP_JUNCTION_PAGE;
 			static const std::string PARAMETER_SHOW_RESULT_TABLE;
 			static const std::string PARAMETER_SHOW_COORDINATES;
-			
+
 		private:
 			static const std::string DATA_LINES;
 			static const std::string DATA_SCHEDULES;
@@ -443,7 +443,7 @@ namespace synthese
 				, bool isItContinuousService
 				, bool isFirstWriting
 				, bool isLastWriting
-				, bool isFirstFoot				
+				, bool isFirstFoot
 			) const;
 
 

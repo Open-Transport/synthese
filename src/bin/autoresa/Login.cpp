@@ -29,11 +29,11 @@ Login::~Login()
 int Login::start()
 {
 	int temp=0;
-	
+
 	if(Functions::getFatalError().empty())
 	{
 		int tryTime=0;
-		session->callerId=Functions::getCallerId(agi,res);		
+		session->callerId=Functions::getCallerId(agi,res);
 		try
 		{
 			while((!identifyUser())&&(tryTime<2))
@@ -45,8 +45,8 @@ int Login::start()
 			if(tryTime>2)
 			{
 				Functions::setFatalError("usr login failed");
-				
-				
+
+
 			}
 		}
 		catch(int e)
@@ -58,8 +58,8 @@ int Login::start()
 		{
 			cerr<<"unknown Exception catched "<<e<<endl;
 			return 0;
-		}		
-		
+		}
+
 		if((!session->sessionId.empty())&&(Functions::getFatalError().empty()))
 		{
 			if(!session->message.empty()) Functions::playbackText(agi,res,session->message);
@@ -96,7 +96,7 @@ int Login::start()
 		cerr<<"fatal error found in Login"<<endl;
 		return 0;
 	}
-	
+
 }
 
 
@@ -111,13 +111,13 @@ this function is to identify the user name and passwor near the Synthese
 **/
 bool Login::identifyUser() throw (int)
 {
-	
+
 	int usr,psw;
 
 	usr=Functions::readKey(agi,res,menuKey,0,4,"Veuillez entrer le numero d\'utilisateur.");
 
 	psw=Functions::readKey(agi,res,menuKey,0,4,"Veuillez entrer votre mots de passe.");
-	
+
 	session->psw=synthese::util::Conversion::ToString(usr);
 	session->psw=synthese::util::Conversion::ToString(psw);
 
@@ -130,47 +130,47 @@ bool Login::identifyUser() throw (int)
 
 		// interface 4
 		req<<"ipaddr=0.0.0.0&a=login&fonction=page&page=login_response&i=4&actionParamlogin="<<usr<<"&actionParampwd="<<psw<<"&nr=1";
-		
-		
+
+
 		// valeur de retour Ã  reflechir
 		string xml=Functions::makeRequest(req.str());
-		//cerr<<"xml return"<<xml<<endl; 
+		//cerr<<"xml return"<<xml<<endl;
 
 		// do xml parser
 		session->sessionId=Functions::smartXmlParser(xml,"session");
 		cerr<<"sessionId: "<<session->sessionId<<endl;
-		
+
 		if(!session->sessionId.empty())
 		{
-		
+
 			session->name=Functions::smartXmlParser(xml,"name");
 			cerr<<"name: "<<session->name<<endl;
-			
+
 			session->userId=Functions::smartXmlParser(xml,"user_id");
 			cerr<<"userId: "<<session->userId<<endl;
 			//session->registredPhone=Functions::smartXmlParser(xml,"phone");
 			//cerr<<"registred Phone: "<<session->registredPhone<<endl;
 			session->favorisSentence=Functions::smartXmlParser(xml,"sentence");
 			cerr<<"sentence: "<<session->favorisSentence<<endl;
-			
+
 			session->favoris.clear();
 			/*
 			<favorite rank="1" origin_city="TOULOUSE" origin_place="Capitole" destination_city="FLOURENS" destination_place="Mairie" />
 			<favorite rank="2" origin_city="QUINT-FONSEGRIVES" origin_place="Mairie" destination_city="PIN-BALMA" destination_place="Pastoureau" />
 			*/
-			
+
 			XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, "login");
 			XMLNode xmlNodeChild;
-			
+
 			bool stillValue=true;
 			SessionReturnType::FavorisVectorStruct favorisSt;
 			string place;
-			
+
 			cerr<<xmlNode.nChildNode("favorite")<<" favoris finded"<<endl;
-			
+
 			for(int i=0;i<xmlNode.nChildNode("favorite");i++)
 			{
-				
+
 				xmlNodeChild=synthese::util::XmlToolkit::GetChildNode(xmlNode,"favorite",i);
 				place="rank";
 				favorisSt.rank=synthese::util::XmlToolkit::GetIntAttr(xmlNodeChild,place);;
@@ -182,17 +182,17 @@ bool Login::identifyUser() throw (int)
 				favorisSt.destination_city=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
 				place="destination_place";
 				favorisSt.destination_place=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
-				
+
 				cerr<<endl;
 				cerr<<"favoris rank: "<<favorisSt.rank<<endl;
 				cerr<<"origin_city: "<<favorisSt.origin_city<<endl;
 				cerr<<"origin_place: "<<favorisSt.origin_place<<endl;
 				cerr<<"destination_city: "<<favorisSt.destination_city<<endl;
 				cerr<<"destination_place: "<<favorisSt.destination_place<<endl<<endl;
-					
+
 				session->favoris.push_back(favorisSt);
 			}
-			
+
 			return true;
 		}
 		else
@@ -200,7 +200,7 @@ bool Login::identifyUser() throw (int)
 				cerr<<"session id null"<<endl;
 				return false;
 		}
-		
+
 	}
 	catch (int e)
 	{

@@ -57,11 +57,11 @@ namespace synthese
 
 		@defgroup m56Logs 56 DB Logs
 		@ingroup m56
-		
+
 		@defgroup m56 56 Transport website
 		@ingroup m5
-		
-		
+
+
 		@{
 	*/
 

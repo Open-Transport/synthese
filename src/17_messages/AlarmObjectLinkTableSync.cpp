@@ -253,8 +253,8 @@ namespace synthese
 			query.execute();
 		}
 
-		
-		
+
+
 		void AlarmObjectLinkTableSync::CopyRecipients(
 			const Alarm& sourceAlarm,
 			Alarm& destAlarm
@@ -284,7 +284,7 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
-				<< " WHERE " 
+				<< " WHERE "
 				<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarmId);
 			if (number)
 				query << " LIMIT " << (*number + 1);

@@ -75,7 +75,7 @@ namespace synthese
 				@param caption text displayed on the button
 				@return std::string the HTML generated code
 				@author Hugues Romain
-				@date 2008					
+				@date 2008
 			*/
 			virtual std::string getSubmitButton(
 				const std::string& caption,

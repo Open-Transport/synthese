@@ -69,7 +69,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void InterfaceAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -97,7 +97,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool InterfaceAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -155,9 +155,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if (dynamic_cast<const InterfaceModule*>(&module) &&
 				_request.getUser() &&
 				_request.getUser()->getProfile() &&
@@ -172,19 +172,19 @@ namespace synthese
 					links.push_back(p);
 				}
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks InterfaceAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			InterfacePageTableSync::SearchResult pages(InterfacePageTableSync::Search(Env::GetOfficialEnv(), _interface->getKey()));
 			BOOST_FOREACH(shared_ptr<InterfacePage> page, pages)
 			{
@@ -192,7 +192,7 @@ namespace synthese
 				p->setPage(const_pointer_cast<const InterfacePage>(page));
 				links.push_back(p);
 			}
-			
+
 			return links;
 		}
 

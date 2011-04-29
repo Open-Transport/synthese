@@ -155,7 +155,7 @@ namespace synthese
 				if (it->getReservationCompliance(ignoreReservationDeadline) != false)
 				{
 					stream << " - ";
-					
+
 					if(it->getReservationCompliance(ignoreReservationDeadline) == true)
 					{
 						stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Réservation obligatoire") << " Réservation obligatoire";
@@ -166,7 +166,7 @@ namespace synthese
 					}
 
 					const ptime deadline(it->getReservationDeadLine());
-					stream << " avant le " << 
+					stream << " avant le " <<
 						deadline.date().day() << "/" << deadline.date().month() << "/" << deadline.date().year() << " à " <<
 						deadline.time_of_day().hours() << ":" << deadline.time_of_day().minutes()
 					;
@@ -176,7 +176,7 @@ namespace synthese
 					stream << " (";
 					if(dynamic_cast<const City*>(_departurePlace) && dynamic_cast<const StopArea*>(its->getDepartureEdge()->getHub()))
 					{
-						stream << "départ de " << 
+						stream << "départ de " <<
 							static_cast<const StopArea*>(
 								its->getDepartureEdge()->getHub()
 							)->getFullName()
@@ -186,7 +186,7 @@ namespace synthese
 					{
 						if(dynamic_cast<const City*>(_departurePlace)) stream << " - ";
 						Journey::ServiceUses::const_iterator ite(it->getServiceUses().end() - 1);
-						stream << "arrivée à " << 
+						stream << "arrivée à " <<
 							static_cast<const StopArea*>(
 								ite->getArrivalEdge()->getHub()
 							)->getFullName()
@@ -447,7 +447,7 @@ namespace synthese
 						break;
 					}
 				}
-				
+
 				// If next element of the journey was found, it is the new brake
 				if(itNewPos == *(curPos + 1))
 				{

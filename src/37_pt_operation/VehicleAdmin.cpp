@@ -80,7 +80,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void VehicleAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -126,7 +126,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool VehicleAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -179,7 +179,7 @@ namespace synthese
 				stream << s.cell("Date début", s.getForm().getCalendarInput(PARAMETER_SEARCH_START_DATE, _searchStartDate ? *_searchStartDate : now));
 				stream << s.cell("Date fin", s.getForm().getCalendarInput(PARAMETER_SEARCH_END_DATE, _searchEndDate ? *_searchEndDate : now));
 				stream << s.close();
-				
+
 				stream << "<h1>Résultats</h1>";
 
 				AdminActionFunctionRequest<VehiclePositionUpdateAction,VehicleAdmin> addRequest(request);
@@ -235,7 +235,7 @@ namespace synthese
 					stream << t.row(lexical_cast<string>(position->getKey()));
 					stream << t.col() << rank++;
 					stream << t.col() << position->getTime();
-					
+
 					// Meters
 					stream << t.col() << position->getMeterOffset();
 					if(lastMeters > 0)

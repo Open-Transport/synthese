@@ -59,7 +59,7 @@ namespace synthese
 		///	<ul>
 		///		<li>by adding the distance between points by direct line to the metric offset
 		///		of the previous stop, if the coordinates are known and if there is a previous stop</li>
-		///		<li>by dividing by 2 the distance between the next and the previous stop if there is 
+		///		<li>by dividing by 2 the distance between the next and the previous stop if there is
 		///		a next and a previous stop</li>
 		///		<li>by adding 500 meters to the preceding stop if there is a previous stop</li>
 		///		<li>0 else</li>
@@ -103,7 +103,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////

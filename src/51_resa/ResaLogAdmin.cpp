@@ -68,7 +68,7 @@ namespace synthese
 			: AdminInterfaceElementTemplate<ResaLogAdmin>(),
 			_log("log")
 		{ }
-		
+
 		void ResaLogAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -77,16 +77,16 @@ namespace synthese
 				ResaDBLog::FACTORY_KEY
 			);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap ResaLogAdmin::getParametersMap() const
 		{
 			ParametersMap m(_log.getParametersMap());
 			return m;
 		}
 
-		
+
 		void ResaLogAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -111,7 +111,7 @@ namespace synthese
 				ResaDBLog::IsAuthorized(*user.getProfile(), READ)
 			;
 		}
-		
+
 		AdminInterfaceElement::PageLinks ResaLogAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
@@ -127,26 +127,26 @@ namespace synthese
 			}
 			return links;
 		}
-	
-	
-	
+
+
+
 		AdminInterfaceElement::PageLinks ResaLogAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			const ResaEditLogEntryAdmin* rp(
 				dynamic_cast<const ResaEditLogEntryAdmin*>(&currentPage)
 			);
-			
+
 			if(rp)
 			{
 				shared_ptr<ResaEditLogEntryAdmin> p(getNewPage<ResaEditLogEntryAdmin>());
 				p->setEntry(rp->getEntry());
 				links.push_back(p);
 			}
-			
+
 			return links;
 		}
 	}

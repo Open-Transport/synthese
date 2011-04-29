@@ -64,7 +64,7 @@ namespace synthese
 	using namespace security;
 	using namespace html;
 	using namespace util;
-	
+
 
 	namespace util
 	{
@@ -89,9 +89,9 @@ namespace synthese
 			_generalLogView(TAB_LOG),
 			_maintenanceLogView(TAB_MAINTENANCE)
 		{ }
-		
-		
-		
+
+
+
 		void DisplayScreenCPUAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -110,23 +110,23 @@ namespace synthese
 			_generalLogView.set(map, ArrivalDepartureTableLog::FACTORY_KEY, _cpu->getKey());
 			_maintenanceLogView.set(map, DisplayMaintenanceLog::FACTORY_KEY, _cpu->getKey());
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap DisplayScreenCPUAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(_cpu.get()) m.insert(Request::PARAMETER_OBJECT_ID, _cpu->getKey());
 			return m;
 		}
-		
-		
-		
+
+
+
 		void DisplayScreenCPUAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
 		) const	{
-			
+
 			////////////////////////////////////////////////////////////////////
 			// TECHNICAL TAB
 			if (openTabContent(stream, TAB_TECHNICAL))
@@ -209,7 +209,7 @@ namespace synthese
 						" Cette unité centrale n'est pas supervisée."
 						;
 				} else {
-					
+
 					boost::posix_time::ptime _lastContact(
 						DisplayMonitoringStatusTableSync::GetLastContact(*_cpu)
 					);
@@ -243,7 +243,7 @@ namespace synthese
 					if(!_lastContact.is_not_a_date_time())
 					{
 						stream << l.element() << "Dernier contact le " << to_simple_string(_lastContact);
-						
+
 					}
 				}
 
@@ -269,7 +269,7 @@ namespace synthese
 				);
 				createDisplayRequest.setActionWillCreateObject();
 				createDisplayRequest.getAction()->setCPU(_cpu);
-				
+
 				DisplayScreenTableSync::SearchResult screens(
 					DisplayScreenTableSync::SearchFromCPU(_getEnv(), _cpu->getKey())
 				);
@@ -321,7 +321,7 @@ namespace synthese
 				lexical_cast<string>(_cpu->getPlace()->getKey())
 			);
 		}
-		
+
 
 
 		std::string DisplayScreenCPUAdmin::getTitle() const
@@ -348,10 +348,10 @@ namespace synthese
 				_tabs.push_back(Tab("Afficheurs", TAB_DISPLAYS, writePermission, "monitor.png"));
 			}
 			_tabs.push_back(Tab("Journal", TAB_LOG, writePermission, "book.png"));
-			
+
 			_tabBuilded = true;
 		}
-		
+
 		void DisplayScreenCPUAdmin::setCPU(boost::shared_ptr<const DisplayScreenCPU> value)
 		{
 			_cpu = value;
@@ -361,7 +361,7 @@ namespace synthese
 		{
 			return _cpu;
 		}
-		
+
 		bool DisplayScreenCPUAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _cpu == static_cast<const DisplayScreenCPUAdmin&>(other)._cpu;

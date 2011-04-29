@@ -65,7 +65,7 @@ namespace synthese
 				,interfaces::VariablesMap& variables
 				, const void* object = NULL
 				, const server::Request* request = NULL) const;
-			
+
 		};
 	}
 }

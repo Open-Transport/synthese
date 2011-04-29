@@ -98,7 +98,7 @@ namespace synthese
 
 
 
-/*		int 
+/*		int
 		Edge::getBestRunTime (const Edge& other ) const
 		{
 			int curT;
@@ -120,7 +120,7 @@ namespace synthese
 
 
 
-/*		bool 
+/*		bool
 		Edge::checkSchedule (const Edge* edgeWithPreviousSchedule ) const
 		{
 			// Vertical chronology check
@@ -209,7 +209,7 @@ namespace synthese
 						// The service is now returned
 						return servicePointer;
 				}	}
-				
+
 				departureMoment = ptime(departureMoment.date(), hours(24));
 
 				next = _departureIndex[0].get(RTData);

@@ -65,8 +65,8 @@ namespace synthese
 			static const std::string PARAMETER_PLANNING_ORDER;
 
 			RoadJourneyPlannerAdmin();
-			
-			
+
+
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -87,8 +87,8 @@ namespace synthese
 				@since 3.2.0
 			*/
 			virtual server::ParametersMap getParametersMap() const;
-			
-			
+
+
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
@@ -102,7 +102,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			/** Authorization control.
 				@return bool True if the displayed page can be displayed
 				@author Thomas Bonfort
@@ -112,7 +112,7 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& user
 			) const;
-			
+
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param parentLink Link to the parent page
 				@param currentPage Currently displayed page

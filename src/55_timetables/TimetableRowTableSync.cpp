@@ -46,7 +46,7 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<DBTableSync,TimetableRowTableSync>::FACTORY_KEY("55.02 Timetable rows");
 	}
-	
+
 	namespace timetables
 	{
 		const string TimetableRowTableSync::COL_TIMETABLE_ID("timetable_id");
@@ -56,14 +56,14 @@ namespace synthese
 		const string TimetableRowTableSync::COL_IS_ARRIVAL("is_arrival");
 		const string TimetableRowTableSync::COL_IS_COMPULSORY("is_compulsory");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<TimetableRowTableSync>::TABLE(
 			"t053_timetable_rows"
 		);
-		
-		
+
+
 		template<> const DBTableSync::Field DBTableSyncTemplate<TimetableRowTableSync>::_FIELDS[]=
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
@@ -98,7 +98,7 @@ namespace synthese
 			object->setCompulsory(static_cast<TimetableRow::tTypeGareIndicateur>(rows->getInt(TimetableRowTableSync::COL_IS_COMPULSORY)));
 			object->setIsArrival(rows->getBool(TimetableRowTableSync::COL_IS_ARRIVAL));
 			object->setIsDeparture(rows->getBool(TimetableRowTableSync::COL_IS_DEPARTURE));
-			
+
 			try
 			{
 				object->setPlace(
@@ -178,9 +178,9 @@ namespace synthese
 			//TODO log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace timetables
 	{
 		TimetableRowTableSync::SearchResult TimetableRowTableSync::Search(
@@ -199,7 +199,7 @@ namespace synthese
 			{
 				query.addWhereField(COL_TIMETABLE_ID, *timetableId);
 			}
-			
+
 			// Ordering
 			if (orderByTimetable)
 			{

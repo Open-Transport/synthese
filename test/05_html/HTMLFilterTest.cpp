@@ -16,11 +16,11 @@ namespace io = boost::iostreams;
 
 BOOST_AUTO_TEST_CASE (testFiltering)
 {
-    
+
       std::stringstream sout;
 
       HTMLFilter filter;
-      
+
       io::filtering_ostream out;
       out.push (filter);
       out.push (sout);
@@ -102,6 +102,6 @@ BOOST_AUTO_TEST_CASE (testFiltering)
 	  std::string expected ("Salut tout le monde");
 	  BOOST_REQUIRE_EQUAL (expected, sout.str ());
       }
-	  
+
 }
 

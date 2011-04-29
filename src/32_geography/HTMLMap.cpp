@@ -73,7 +73,7 @@ namespace synthese
 			stream << "<div id=\"" << _id << "\"></div>";
 			stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openlayers.org/api/OpenLayers.js");
 			stream << HTMLModule::GetHTMLJavascriptOpen();
-			
+
 			stream << "var map, vectors, controls;";
 			//support functions
 			stream <<

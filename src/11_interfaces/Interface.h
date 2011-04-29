@@ -38,18 +38,18 @@ namespace synthese
 	namespace interfaces
 	{
 		class InterfacePage;
-		
+
 		/** Interface.
 			@author Hugues Romain
 			@date 2001-2006
 			@ingroup m11
-		 
+
 			Cette classe définit les différentes interfaces pour l'affichage de résultats issus de calculs SYNTHESE. Une interface est constituée de modèles d'affichage, permettant la définition du graphisme en sortie, fournis à SYNTHESE en tant que données. Des modèles de fichiers de sortie doivent être fournis au chargement d'après un format de codage défini pour l'occasion.</p>
-		 
+
 			La liste des \ref InterfaceObjetsStandard définit les objets qui peuvent être décrits par un modèle. La fourniture d'un modèle pour chacun de ces objets est facultative. En cas de demande d'affichage d'un objet pour lequel aucun modèle n'a été fourni, une page vide sera retournée.
-			 
+
 			Les modèles sont définis par la classe cElementInterface et ses dérivés, et sont indéxés dans le tableau de pointeurs vElement, selon une indexation par numéro d'objet standard, selon la nomenclature des \ref InterfaceObjetsStandard .
-			 
+
 		*/
 		class Interface
 		:	public virtual util::Registrable
@@ -61,7 +61,7 @@ namespace synthese
 
 		private:
 			typedef std::map<std::string, std::map<std::string, InterfacePage*> >	PagesMap;
-			
+
 			std::string	_name;
 			PagesMap	_pages;
 			std::string	_noSessionDefaultPageCode;

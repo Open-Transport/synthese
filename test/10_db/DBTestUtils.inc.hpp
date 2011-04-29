@@ -189,7 +189,7 @@ public:
 		std::string params = "host=localhost,user=synthese,passwd=synthese";
 		if (getenv("SYNTHESE_MYSQL_PARAMS"))
 			params = getenv("SYNTHESE_MYSQL_PARAMS");
-		
+
 		if (getenv("SYNTHESE_MYSQL_DB"))
 			_dbName = getenv("SYNTHESE_MYSQL_DB");
 		else

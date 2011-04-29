@@ -56,7 +56,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<UserAdmin>::ICON("user.png");
 		template<> const string AdminInterfaceElementTemplate<UserAdmin>::DEFAULT_TITLE("Utilisateur inconnu");
 	}
-	
+
 	namespace security
 	{
 		UserAdmin::UserAdmin()
@@ -66,7 +66,7 @@ namespace synthese
 		}
 
 
-		
+
 		void UserAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -102,7 +102,7 @@ namespace synthese
 
 			AdminActionFunctionRequest<UserUpdateAction, UserAdmin> updateRequest(_request);
 			updateRequest.getAction()->setUser(_user);
-			
+
 			AdminActionFunctionRequest<UserPasswordUpdateAction, UserAdmin> userPasswordUpdateRequest(_request);
 			userPasswordUpdateRequest.getAction()->setUserC(_user);
 
@@ -127,7 +127,7 @@ namespace synthese
 				stream << t.open();
 				stream << t.title("Connexion");
 				stream << t.cell("Login", t.getForm().getTextInput(UserUpdateAction::PARAMETER_LOGIN, _user->getLogin()));
-				
+
 				stream << t.title("Coordonnées");
 				stream << t.cell("Prénom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_SURNAME, _user->getSurname()));
 				stream << t.cell("Nom", t.getForm().getTextInput(UserUpdateAction::PARAMETER_NAME, _user->getName()));
@@ -136,7 +136,7 @@ namespace synthese
 				stream << t.cell("Ville", t.getForm().getTextInput(UserUpdateAction::PARAMETER_CITY, _user->getCityText()));
 				stream << t.cell("Téléphone",t.getForm().getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
 				stream << t.cell("E-mail",t.getForm().getTextInput(UserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
-				
+
 				if(	_request.isAuthorized<SecurityRight>(
 						WRITE,
 						UNKNOWN_RIGHT_LEVEL,
@@ -158,7 +158,7 @@ namespace synthese
 			if(writeRights)
 			{
 				stream << "<h1>Changement de mot de passe</h1>";
-	
+
 				PropertiesHTMLTable t(userPasswordUpdateRequest.getHTMLForm("pass"));
 				stream << t.open();
 				stream << t.cell("Mot de passe", t.getForm().getPasswordInput(UserPasswordUpdateAction::PARAMETER_PASS1, ""));
@@ -193,8 +193,8 @@ namespace synthese
 		{
 			return _user.get() ? _user->getSurname() + " " + _user->getName() : DEFAULT_TITLE;
 		}
-		
-		
+
+
 		void UserAdmin::setUser(shared_ptr<User> value)
 		{
 			_user = value;
@@ -210,8 +210,8 @@ namespace synthese
 		{
 			return _user;
 		}
-		
-		
+
+
 		bool UserAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _user == static_cast<const UserAdmin&>(other)._user;

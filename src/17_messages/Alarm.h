@@ -57,7 +57,7 @@ namespace synthese
 			std::string			_shortMessage;  //!< Alarm message
 			std::string			_longMessage;  //!< Alarm message
 			const Scenario* 	_scenario;
-		    
+
 			Alarm(
 				util::RegistryKeyType key,
 				const Scenario* scenario
@@ -67,7 +67,7 @@ namespace synthese
 				const Alarm& source,
 				const Scenario* scenario
 			);
-			
+
 		public:
 			virtual ~Alarm();
 

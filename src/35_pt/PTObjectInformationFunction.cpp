@@ -45,11 +45,11 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,pt::PTObjectInformationFunction>::FACTORY_KEY("PTObjectInformationFunction");
-	
+
 	namespace pt
 	{
 		const string PTObjectInformationFunction::PARAMETER_INFO("info");
-		
+
 		ParametersMap PTObjectInformationFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -167,9 +167,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		bool PTObjectInformationFunction::isAuthorized(
 			const Session* session
 		) const {

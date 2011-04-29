@@ -155,7 +155,7 @@ namespace synthese
 				ptr.isUseRuleCompliant(ignoreReservation) == UseRule::RUN_NOT_POSSIBLE
 			){
 				return ServicePointer();
-			}		
+			}
 
 			return ptr;
 		}
@@ -167,7 +167,7 @@ namespace synthese
 			const Edge& edge,
 			const AccessParameters&
 		) const	{
-			
+
 			size_t edgeIndex(edge.getRankInPath());
 			if(servicePointer.getArrivalEdge() == NULL)
 			{
@@ -230,7 +230,7 @@ namespace synthese
 		{
 			return _team;
 		}
-		
+
 
 
 		graph::UseRule::ReservationAvailabilityType ScheduledService::getReservationAbility(
@@ -260,8 +260,8 @@ namespace synthese
 			assert(false);
 			return UseRule::RESERVATION_FORBIDDEN;
 		}
-		
-		
+
+
 		ptime ScheduledService::getReservationDeadLine(
 			const date& date,
 			std::size_t userClassRank
@@ -454,13 +454,13 @@ namespace synthese
 			{
 				return originPtr;
 			}
-			
+
 			for(edge = edge->getFollowingArrivalForFineSteppingOnly(); edge; edge = edge->getFollowingArrivalForFineSteppingOnly())
 			{
 				ptime arrivalTime(
 					originPtr.getOriginDateTime() + (getArrivalSchedules(false)[edge->getRankInPath()] - _departureSchedules[0])
 				);
-				
+
 				if(arrivalTime > date)
 				{
 					edge = edge->getPreviousDepartureForFineSteppingOnly();

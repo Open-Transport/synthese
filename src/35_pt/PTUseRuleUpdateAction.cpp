@@ -41,7 +41,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace graph;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::PTUseRuleUpdateAction>::FACTORY_KEY("PTUseRuleUpdateAction");
@@ -63,7 +63,7 @@ namespace synthese
 		const string PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS(Action_PARAMETER_PREFIX + "fb");
 		const string PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_TIMETABLES(Action_PARAMETER_PREFIX + "ft");
 		const string PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_JOURNEY_PLANNER(Action_PARAMETER_PREFIX + "fj");
-		
+
 		ParametersMap PTUseRuleUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -146,9 +146,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void PTUseRuleUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.isDefined(PARAMETER_RULE_ID) && map.get<RegistryKeyType>(PARAMETER_RULE_ID))
@@ -318,7 +318,7 @@ namespace synthese
 			{
 				_rule->setMinDelayMinutes(*_minDelayMinutes);
 			}
-			
+
 			if(_forbiddenInDepartureBoards)
 			{
 				_rule->setForbiddenInDepartureBoards(*_forbiddenInDepartureBoards);

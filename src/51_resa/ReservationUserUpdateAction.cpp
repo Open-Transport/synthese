@@ -65,18 +65,18 @@ namespace synthese
 		const string ReservationUserUpdateAction::PARAMETER_EMAIL = Action_PARAMETER_PREFIX + "email";
 		const string ReservationUserUpdateAction::PARAMETER_AUTHORIZED_LOGIN(Action_PARAMETER_PREFIX + "al");
 		const string ReservationUserUpdateAction::PARAMETER_AUTORESA_ACTIVATED = Action_PARAMETER_PREFIX + "aa";
-		
-		
-		
+
+
+
 		ParametersMap ReservationUserUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if(_user.get()) map.insert(PARAMETER_USER_ID, _user->getKey());
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ReservationUserUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -142,9 +142,9 @@ namespace synthese
 				throw ActionException("Utilisateur introuvable");
 			}
 		}
-		
-		
-		
+
+
+
 		void ReservationUserUpdateAction::run(Request& request)
 		{
 			stringstream s;
@@ -253,9 +253,9 @@ namespace synthese
 
 			UserTableSync::Save(_user.get());
 		}
-		
-		
-		
+
+
+
 		bool ReservationUserUpdateAction::isAuthorized(const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE);

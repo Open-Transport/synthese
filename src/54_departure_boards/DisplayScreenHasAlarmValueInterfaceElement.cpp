@@ -53,7 +53,7 @@ namespace synthese
 			, const void* object, const server::Request* request) const
 		{
 			const Alarm* alarm(static_cast<const ArrivalDepartureListWithAlarm*>(object)->alarm);
-			
+
 			stream << static_cast<int>(alarm ? alarm->getLevel() : ALARM_LEVEL_NO_ALARM);
 
 			return string();

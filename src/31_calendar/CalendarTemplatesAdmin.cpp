@@ -76,21 +76,21 @@ namespace synthese
 		CalendarTemplatesAdmin::CalendarTemplatesAdmin()
 			: AdminInterfaceElementTemplate<CalendarTemplatesAdmin>()
 		{ }
-		
+
 		void CalendarTemplatesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
 		}
-		
-		
-		
+
+
+
 		ParametersMap CalendarTemplatesAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			return m;
-		}		
-		
-		
+		}
+
+
 		void CalendarTemplatesAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -100,9 +100,9 @@ namespace synthese
 			AdminActionFunctionRequest<CalendarTemplateAddAction,CalendarTemplateAdmin> addCalendar(_request);
 			addCalendar.getFunction()->setActionFailedPage<CalendarTemplatesAdmin>();
 			addCalendar.setActionWillCreateObject();
-			
+
 			AdminActionFunctionRequest<RemoveObjectAction,CalendarTemplatesAdmin> removeCalendar(_request);
-			
+
 			// Display
 			stream << "<h1>Calendriers</h1>";
 
@@ -170,14 +170,14 @@ namespace synthese
 		) const	{
 			return user.getProfile()->isAuthorized<CalendarRight>(READ);
 		}
-		
+
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const CalendarModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -187,7 +187,7 @@ namespace synthese
 			}
 			return links;
 		}
-		
+
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request

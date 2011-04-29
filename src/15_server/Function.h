@@ -80,7 +80,7 @@ namespace synthese
 		protected:
 			server::ParametersMap _savedParameters;
 			boost::shared_ptr<util::Env>	_env;
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			///	Constructor.
 			//////////////////////////////////////////////////////////////////////////
@@ -131,7 +131,7 @@ namespace synthese
 			/** Copy of the function parameters.
 				@param function
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 			*/
 			virtual void _copy(const Function& function) {}
 

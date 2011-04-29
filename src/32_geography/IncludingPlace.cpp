@@ -39,7 +39,7 @@ namespace synthese
 	namespace geography
 	{
 		IncludingPlace::IncludingPlace(
-		):	Place()			
+		):	Place()
 		{
 		}
 
@@ -51,15 +51,15 @@ namespace synthese
 
 
 
-		const IncludingPlace::IncludedPlaces& 
+		const IncludingPlace::IncludedPlaces&
 		IncludingPlace::getIncludedPlaces () const
 		{
 			return _includedPlaces;
 		}
-		    
 
 
-		void 
+
+		void
 		IncludingPlace::addIncludedPlace (const Place* place)
 		{
 			_isoBarycentre.reset();

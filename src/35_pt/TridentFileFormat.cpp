@@ -98,7 +98,7 @@ namespace synthese
 	using namespace server;
 	using namespace admin;
 	using namespace html;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<FileFormat,pt::TridentFileFormat>::FACTORY_KEY("Trident");
@@ -115,7 +115,7 @@ namespace synthese
 		const string TridentFileFormat::Exporter_::PARAMETER_LINE_ID("li");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_TISSEO_EXTENSION("wt");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_OLD_DATES("wod");
-		
+
 		TridentFileFormat::SRIDConversionMap TridentFileFormat::_SRIDConversionMap;
 
 		string ToXsdDaysDuration (date_duration daysDelay);
@@ -220,7 +220,7 @@ namespace synthese
 			ostream& os
 		) const {
 			static const string peerid ("SYNTHESE");
-			
+
 			//os.imbue (locale("POSIX"));
 			// os.imbue (locale("en_US.UTF-8"));
 			//cerr << "locale = " << os.getloc ().name () << "\n";
@@ -287,7 +287,7 @@ namespace synthese
 			else
 				os << "<ChouettePTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident  http://www.rcsmobility.com/synthese/include/35_pt/chouette/Chouette.xsd'>" << "\n";
 
-			// --------------------------------------------------- PTNetwork 
+			// --------------------------------------------------- PTNetwork
 			const TransportNetwork* tn(_line->getNetwork());
 			os << "<PTNetwork>" << "\n";
 			os << "<objectId>" << TridentId (peerid, "PTNetwork", *tn) << "</objectId>" << "\n";
@@ -360,9 +360,9 @@ namespace synthese
 				os << "<registration><registrationNumber>" << rn << "</registrationNumber></registration>" << "\n";
 				os << "</StopAreaExtension>" << "\n";
 				os << "</StopArea>" << "\n";
-			    
+
 			}
-		    
+
 			// --------------------------------------------------- StopArea (type = CommercialStopPoint)
 			BOOST_FOREACH(
 				Registry<StopArea>::value_type itcp,
@@ -381,20 +381,20 @@ namespace synthese
 				}
 
 				// Decide what to take for centroidOfArea of a connectionPlace. Only regarding physical stops coordinates
-				// or also regarding addresses coordinates, or fixed manually ? 
+				// or also regarding addresses coordinates, or fixed manually ?
 				// os << "<centroidOfArea>" << TridentId (peerid, "AreaCentroid", cp->getKey ()) << "</centroidOfArea>" << "\n";
-			    
+
 				os << "<StopAreaExtension>" << "\n";
 				os << "<areaType>" << "CommercialStopPoint" << "</areaType>" << "\n";
 				os << "</StopAreaExtension>" << "\n";
 				os << "</StopArea>" << "\n";
 			}
 
-		    
+
 			// --------------------------------------------------- StopArea (type = ITL)
-			// "Interdiction de traffic local" 
+			// "Interdiction de traffic local"
 			// Not mapped right now.
-		    
+
 
 
 			// --------------------------------------------------- AreaCentroid
@@ -410,7 +410,7 @@ namespace synthese
 				os << fixed;
 				os << "<AreaCentroid>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "AreaCentroid", ps) << "</objectId>" << "\n";
-			    
+
 				os << "<longitude>" << (ps.hasGeometry() ? 0 : wgs84ps->getX()) << "</longitude>" << "\n";
 				os << "<latitude>" << (ps.hasGeometry() ? 0 : wgs84ps->getY()) << "</latitude>" << "\n";
 				os << "<longLatType>" << _getTridentFromSRID(wgs84ps->getSRID()) << "</longLatType>" << "\n";
@@ -432,7 +432,7 @@ namespace synthese
 
 				os << "</AreaCentroid>" << "\n";
 			}
-		
+
 			os << "</ChouetteArea>" << "\n";
 
 			// --------------------------------------------------- ConnectionLink
@@ -442,7 +442,7 @@ namespace synthese
 			){
 				const StopArea& cp(*itcp.second);
 				if(!cp.isConnectionPossible()) continue;
-				
+
 				// Contained physical stops
 				const StopArea::PhysicalStops& stops(cp.getPhysicalStops());
 				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it1, stops)
@@ -463,13 +463,13 @@ namespace synthese
 					}
 				}
 			}
-			
+
 			// --------------------------------------------------- Timetable
 			// One timetable per service
 			BOOST_FOREACH(Registry<ScheduledService>::value_type itsrv, _env.getRegistry<ScheduledService>())
 			{
 				const ScheduledService* srv(itsrv.second.get());
-				
+
 				os << "<Timetable>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "Timetable", *srv) << "</objectId>" << "\n";
 
@@ -525,7 +525,7 @@ namespace synthese
 			// --------------------------------------------------- ChouetteLineDescription
 			{
 			os << "<ChouetteLineDescription>" << "\n";
-			
+
 			// --------------------------------------------------- Line
 			{
 				os << "<Line>" << "\n";
@@ -533,13 +533,13 @@ namespace synthese
 				os << "<name>" << _line->getName () << "</name>" << "\n";
 				os << "<number>" << _line->getShortName () << "</number>" << "\n";
 				os << "<publishedName>" << _line->getLongName () << "</publishedName>" << "\n";
-				
+
 				os <<
 					"<transportModeName>" <<
 					((rollingStock == NULL || rollingStock->getTridentKey().empty()) ? "Other" : rollingStock->getTridentKey()) <<
 					"</transportModeName>" <<
 				"\n";
-			    
+
 				BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env.getRegistry<JourneyPattern>())
 				{
 					os << "<routeId>" << TridentId (peerid, "ChouetteRoute", *line.second) << "</routeId>" << "\n";
@@ -555,11 +555,11 @@ namespace synthese
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type itline, _env.getRegistry<JourneyPattern>())
 			{
 				const JourneyPattern* line(itline.second.get());
-				
+
 				os << "<ChouetteRoute>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "ChouetteRoute", line->getKey ()) << "</objectId>" << "\n";
 				os << "<name>" << line->getName () << "</name>" << "\n";
-				
+
 				os << "<publishedName>";
 				{
 					const StopPoint* ps(line->getOrigin());
@@ -573,7 +573,7 @@ namespace synthese
 						os << ps->getConnectionPlace ()->getCity ()->getName () << " " << ps->getConnectionPlace ()->getName ();
 				}
 				os << "</publishedName>" << "\n";
-				
+
 				const Edge* from(NULL);
 				BOOST_FOREACH(const Edge* to, line->getEdges())
 				{
@@ -586,7 +586,7 @@ namespace synthese
 
 
 				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", *line) << "</journeyPatternId>" << "\n";
-				
+
 				// Wayback
 				int wayback(line->getWayBack() ? 1 : 0);
 				if (_withTisseoExtension)
@@ -598,7 +598,7 @@ namespace synthese
 				os << "</wayBack></RouteExtension>" << "\n";
 				os << "</ChouetteRoute>" << "\n";
 			}
-		
+
 			// --------------------------------------------------- StopPoint
 			BOOST_FOREACH(Registry<DesignatedLinePhysicalStop>::value_type itls, _env.getRegistry<DesignatedLinePhysicalStop>())
 			{
@@ -618,7 +618,7 @@ namespace synthese
 				os << "<longitude>" << (ps->hasGeometry() ? 0 : wgs84ps->getX()) << "</longitude>" << "\n";
 				os << "<latitude>" << (ps->hasGeometry() ? 0 : wgs84ps->getY()) << "</latitude>" << "\n";
 				os << "<longLatType>" << _getTridentFromSRID(wgs84ps->getSRID()) << "</longLatType>" << "\n";
-				
+
 				os << "<address><countryCode>" << ps->getConnectionPlace()->getCity()->getCode() << "</countryCode></address>";
 
 				if(ps->hasGeometry())
@@ -632,11 +632,11 @@ namespace synthese
 
 
 				os << "<containedIn>" << TridentId (peerid, "StopArea", *ps) << "</containedIn>" << "\n";
-				os << "<name>" << ps->getConnectionPlace ()->getCity ()->getName () << " " << 
+				os << "<name>" << ps->getConnectionPlace ()->getCity ()->getName () << " " <<
 					ps->getConnectionPlace ()->getName ();
 				if (ps->getName ().empty () == false) os << " (" + ps->getName () + ")";
 				os << "</name>" << "\n";
-				
+
 				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_line) << "</lineIdShortcut>" << "\n";
 				os << "<ptNetworkIdShortcut>" << TridentId (peerid, "PTNetwork", *tn) << "</ptNetworkIdShortcut>" << "\n";
 
@@ -646,7 +646,7 @@ namespace synthese
 				}
 				os << "</StopPoint>" << "\n";
 			}
-			
+
 			// --------------------------------------------------- ITL
 			// Not implemented
 			{
@@ -671,10 +671,10 @@ namespace synthese
 					}
 					from = to;
 				}
-			}		
+			}
 
 			// --------------------------------------------------- JourneyPattern
-			// One per route 
+			// One per route
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type itline, _env.getRegistry<JourneyPattern>())
 			{
 				const JourneyPattern* line(itline.second.get());
@@ -703,7 +703,7 @@ namespace synthese
 				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_line) << "</lineIdShortcut>" << "\n";
 				os << "</JourneyPattern>" << "\n";
 			}
-		
+
 			// --------------------------------------------------- VehicleJourney
 			BOOST_FOREACH(Registry<ScheduledService>::value_type itsrv, _env.getRegistry<ScheduledService>())
 			{
@@ -731,7 +731,7 @@ namespace synthese
 				}
 
 				// --------------------------------------------------- VehicleJourneyAtStop
-				
+
 				LineStopTableSync::SearchResult linestops(
 					LineStopTableSync::Search(_env, srv->getPathId())
 				);
@@ -742,7 +742,7 @@ namespace synthese
 					os << "<vehicleJourneyId>" << TridentId (peerid, "VehicleJourney", *srv) << "</vehicleJourneyId>" << "\n";
 
 					if (ls->getRankInPath() > 0 && ls->isArrival())
-						os << "<arrivalTime>" << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()))) 
+						os << "<arrivalTime>" << ToXsdTime (Service::GetTimeOfDay(srv->getArrivalBeginScheduleToIndex(false, ls->getRankInPath())))
 						<< "</arrivalTime>" << "\n";
 
 					os	<< "<departureTime>";
@@ -922,9 +922,9 @@ namespace synthese
  				BOOST_FOREACH(Registry<PTUseRule>::value_type r, _env.getRegistry<PTUseRule>())
  				{
  					const PTUseRule& rule(*r.second);
- 
+
 					if (rule.getReservationType() == PTUseRule::RESERVATION_RULE_FORBIDDEN || (rule.getMinDelayDays().days() == 0 && rule.getMinDelayMinutes().total_seconds() == 0))	continue;
- 
+
  					os << "<ReservationRule>" << "\n";
  					os << "<objectId>" << TridentId (peerid, "ReservationRule", rule.getKey ()) << "</objectId>" << "\n";
 					os << "<ReservationCompulsory>" << ((rule.getReservationType() == PTUseRule::RESERVATION_RULE_COMPULSORY) ? "compulsory" : "optional") << "</ReservationCompulsory>" << "\n";
@@ -970,7 +970,7 @@ namespace synthese
 				}
 
 
-				// CityMainStops --------------------------------------------------- 
+				// CityMainStops ---------------------------------------------------
 				BOOST_FOREACH(Registry<City>::value_type itcity, _env.getRegistry<City>())
 				{
 					const City* city(itcity.second.get());
@@ -1069,7 +1069,7 @@ namespace synthese
 					" at line " << pResults.nLine << ", column " << pResults.nColumn;
 				throw Exception("XML Parsing error");
 			}
-			
+
 			// Title
 			XMLNode chouetteLineDescriptionNode(allNode.getChildNode("ChouetteLineDescription"));
 			XMLNode lineNode(chouetteLineDescriptionNode.getChildNode("Line"));
@@ -1077,12 +1077,12 @@ namespace synthese
 			XMLNode clineShortNameNode = lineNode.getChildNode("number", 0);
 			XMLNode clineNameNode = lineNode.getChildNode("name");
 			os << "<h2>Trident import of " << clineNameNode.getText() << "</h2>";
-			
+
 			// Network
 			XMLNode networkNode =  allNode.getChildNode("PTNetwork", 0);
 			XMLNode networkIdNode = networkNode.getChildNode("objectId", 0);
 			XMLNode networkNameNode = networkNode.getChildNode("name", 0);
-			
+
 			ImportableTableSync::ObjectBySource<TransportNetworkTableSync> networks(_dataSource, _env);
 			TransportNetwork* network(
 				PTFileFormat::CreateOrUpdateNetwork(
@@ -1108,7 +1108,7 @@ namespace synthese
 					_env,
 					os
 			)	);
-			
+
 			// Transport mode
 			shared_ptr<RollingStock> rollingStock;
 			RollingStockTableSync::SearchResult rollingStocks(
@@ -1300,7 +1300,7 @@ namespace synthese
 				XMLNode areaTypeNode(extensionNode.getChildNode("areaType",0));
 				if(	!_treatAllStopAreaAsQuay &&
 					to_lower_copy(string(areaTypeNode.getText())) != "boardingposition" &&
-					to_lower_copy(string(areaTypeNode.getText())) != "quay" 
+					to_lower_copy(string(areaTypeNode.getText())) != "quay"
 				){
 					continue;
 				}
@@ -1407,7 +1407,7 @@ namespace synthese
 					{
 						curStop = itcstop->second;
 					}
-				
+
 					set<StopPoint*> stopPoints(
 						PTFileFormat::CreateOrUpdateStopPoints(
 							stops,
@@ -1442,8 +1442,8 @@ namespace synthese
 					}
 				}
 			}
-			
-		
+
+
 			if(failure)
 			{
 				os << "<b>FAILURE : At least a stop is missing : load interrupted</b><br />";
@@ -1500,7 +1500,7 @@ namespace synthese
 					UP_LINKS_LOAD_LEVEL
 				);
 			}
-			
+
 			// Chouette routes
 			map<string,string> routeNames;
 			map<string,bool> routeWaybacks;
@@ -1530,8 +1530,8 @@ namespace synthese
 				}
 				routeWaybacks[crouteKeyNode.getText()] = wayBack;
 			}
-			
-			
+
+
 			// Routes
 			map<string,JourneyPattern*> routes;
 			int routesNumber(chouetteLineDescriptionNode.nChildNode("JourneyPattern"));
@@ -1540,7 +1540,7 @@ namespace synthese
 				XMLNode routeNode(chouetteLineDescriptionNode.getChildNode("JourneyPattern",routeRank));
 				string objectId(routeNode.getChildNode("objectId").getText());
 				string routeId(routeNode.getChildNode("routeId").getText());
-				
+
 				// Reading stops list
 				JourneyPattern::StopsWithDepartureArrivalAuthorization routeStops;
 				int lineStopsNumber(routeNode.nChildNode("stopPointList"));
@@ -1575,7 +1575,7 @@ namespace synthese
 					os
 				);
 			}
-			
+
 			// Services
 			map<string, ScheduledService*> services;
 			int servicesNumber(chouetteLineDescriptionNode.nChildNode("VehicleJourney"));
@@ -1586,7 +1586,7 @@ namespace synthese
 				XMLNode jpKeyNode(serviceNode.getChildNode("journeyPatternId"));
 				XMLNode numberNode(serviceNode.getChildNode("publishedJourneyName"));
 				string serviceNumber(numberNode.isEmpty() ? string() : ImpExModule::ConvertChar(numberNode.getText(), _dataSource.getCharset(), "UTF-8"));
-				
+
 				// Creation of the service
 
 				map<string,JourneyPattern*>::const_iterator itLine(routes.find(jpKeyNode.getText()));
@@ -1632,13 +1632,13 @@ namespace synthese
 					os
 				);
 			}
-			
+
 			// Calendars
 			int calendarNumber(allNode.nChildNode("Timetable"));
 			for(int calendarRank(0); calendarRank < calendarNumber; ++calendarRank)
 			{
 				XMLNode calendarNode(allNode.getChildNode("Timetable", calendarRank));
-				
+
 				int daysNumber(calendarNode.nChildNode("calendarDay"));
 				int servicesNumber(calendarNode.nChildNode("vehicleJourneyId"));
 
@@ -1710,7 +1710,7 @@ namespace synthese
 				{
 					// Connection node
 					XMLNode connectionNode(allNode.getChildNode("ConnectionLink", connectionRank));
-					
+
 					// Connection properties
 					XMLNode key(connectionNode.getChildNode("objectId", 0));
 					XMLNode startNode(connectionNode.getChildNode("startOfLink", 0));
@@ -1770,7 +1770,7 @@ namespace synthese
 							junction->setKey(JunctionTableSync::getId());
 							os << "CREA : Creation of junction " << key.getText() << "<br />";
 						}
-						
+
 
 						junction->setStops(
 							startStop.get(),
@@ -1786,7 +1786,7 @@ namespace synthese
 			os << "<b>SUCCESS : Data loaded</b><br />";
 			return !failure;
 		}
-		
+
 
 
 		DBTransaction TridentFileFormat::Importer_::_save() const

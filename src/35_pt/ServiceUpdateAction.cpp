@@ -40,7 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace graph;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::ServiceUpdateAction>::FACTORY_KEY("ServiceUpdateAction");
@@ -51,9 +51,9 @@ namespace synthese
 		const string ServiceUpdateAction::PARAMETER_OBJECT_ID = Action_PARAMETER_PREFIX + "id";
 		const string ServiceUpdateAction::PARAMETER_SERVICE_NUMBER = Action_PARAMETER_PREFIX + "sn";
 		const string ServiceUpdateAction::PARAMETER_TEAM_NUMBER = Action_PARAMETER_PREFIX + "te";
-		
-		
-		
+
+
+
 		ParametersMap ServiceUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -65,9 +65,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ServiceUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -86,9 +86,9 @@ namespace synthese
 				_teamNumber = map.get<string>(PARAMETER_TEAM_NUMBER);
 			}
 		}
-		
-		
-		
+
+
+
 		void ServiceUpdateAction::run(
 			Request& request
 		){
@@ -100,14 +100,14 @@ namespace synthese
 			{
 				static_cast<ScheduledService*>(_service.get())->setTeam(_teamNumber);
 			}
-			
+
 			Fetcher<Service>::FetchSave(*_service);
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool ServiceUpdateAction::isAuthorized(
 			const Session* session
 		) const {

@@ -40,7 +40,7 @@ namespace synthese
 		{
 		public:
 			CalendarTemplatesAdmin();
-			
+
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -50,13 +50,13 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
 
@@ -69,9 +69,9 @@ namespace synthese
 				std::ostream& stream,
 				const admin::AdminRequest& _request
 			) const;
-			
-			
-			
+
+
+
 			/** Authorization control.
 				@return bool True if the displayed page can be displayed
 				@author Hugues Romain
@@ -80,9 +80,9 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& profile
 			) const;
-			
-			
-			
+
+
+
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param parentLink Link to the parent page
 				@param currentPage Currently displayed page
@@ -95,9 +95,9 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
-			
-			
-			
+
+
+
 			/** Sub pages getter.
 				@param currentPage Currently displayed page
 				@return PageLinks each subpage of the current page

@@ -34,7 +34,7 @@ namespace synthese
 	namespace security
 	{
 		class Profile;
-		
+
 		/** AddRightAction action class.
 			@ingroup m12Actions refActions
 		*/
@@ -75,7 +75,7 @@ namespace synthese
 			virtual bool isAuthorized(
 				const server::Session* session
 			) const;
-			
+
 			void setProfile(boost::shared_ptr<Profile> value);
 			void setProfile(boost::shared_ptr<const Profile> value);
 		};

@@ -109,7 +109,7 @@ namespace synthese
 			const boost::optional<date>& endDate
 		){
 			RunHours result;
-			
+
 			ScheduledServiceTableSync::SearchResult services(
 				ScheduledServiceTableSync::Search(
 					env,
@@ -172,7 +172,7 @@ namespace synthese
 					}
 				}
 			}
-			
+
 			ContinuousServiceTableSync::SearchResult cservices(
 				ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), id)
 			);

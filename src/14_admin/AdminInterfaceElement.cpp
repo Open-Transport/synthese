@@ -42,7 +42,7 @@ namespace synthese
 	using namespace html;
 	using namespace util;
 	using namespace security;
-	
+
 
 	namespace admin
 	{
@@ -51,9 +51,9 @@ namespace synthese
 			_currentTab(NULL)
 		{
 		}
-		
-		
-		
+
+
+
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
@@ -77,12 +77,12 @@ namespace synthese
 		) const {
 			// Cleaning
 			_tree.subPages.clear();
-			
+
 			// Initialisation
 			shared_ptr<HomeAdmin> homeAdmin(
 				getNewPage<HomeAdmin>()
 			);
-			
+
 			PageLinks position;
 			position.push_back(homeAdmin);
 			_tree = _buildTreeRecursion(homeAdmin, position, request);
@@ -98,8 +98,8 @@ namespace synthese
 		{
 			return getFactoryKey() == other.getFactoryKey() && _hasSameContent(other);
 		}
-		
-		
+
+
 		bool AdminInterfaceElement::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return true;
@@ -114,7 +114,7 @@ namespace synthese
 
 			// Local variables
 			AdminInterfaceElement::PageLinksTree tree(adminPage);
-			
+
 			// Recursion
 			PageLinks pages(adminPage->getSubPages(*this, request));
 			BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> link, pages)
@@ -125,7 +125,7 @@ namespace synthese
 					_treePosition = position;
 					tree.isNodeOpened = true;
 				}
-				
+
 				try
 				{
 					AdminInterfaceElement::PageLinksTree subTree(

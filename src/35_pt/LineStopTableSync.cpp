@@ -138,7 +138,7 @@ namespace synthese
 			bool isDeparture (rows->getBool (LineStopTableSync::COL_ISDEPARTURE));
 			bool isArrival (rows->getBool (LineStopTableSync::COL_ISARRIVAL));
 			double metricOffset (rows->getDouble (LineStopTableSync::COL_METRICOFFSET));
-			
+
 			// Geometry
 			string viaPointsStr(rows->getText(TABLE_COL_GEOMETRY));
 			if(viaPointsStr.empty())
@@ -157,7 +157,7 @@ namespace synthese
 			ls->setIsDeparture(isDeparture);
 			ls->setRankInPath(rankInPath);
 			ls->setLine(NULL);
-			
+
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				// Line

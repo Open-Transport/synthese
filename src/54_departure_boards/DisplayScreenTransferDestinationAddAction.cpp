@@ -44,7 +44,7 @@ namespace synthese
 	using namespace pt;
 	using namespace util;
 	using namespace geography;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, departure_boards::DisplayScreenTransferDestinationAddAction>::FACTORY_KEY("DisplayScreenTransferDestinationAddAction");
@@ -56,9 +56,9 @@ namespace synthese
 		const string DisplayScreenTransferDestinationAddAction::PARAMETER_TRANSFER_PLACE_ID = Action_PARAMETER_PREFIX + "tp";
 		const string DisplayScreenTransferDestinationAddAction::PARAMETER_DESTINATION_PLACE_CITY_NAME = Action_PARAMETER_PREFIX + "dc";
 		const string DisplayScreenTransferDestinationAddAction::PARAMETER_DESTINATION_PLACE_NAME = Action_PARAMETER_PREFIX + "dp";
-		
-		
-		
+
+
+
 		ParametersMap DisplayScreenTransferDestinationAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -73,9 +73,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void DisplayScreenTransferDestinationAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -110,9 +110,9 @@ namespace synthese
 			}
 			_destinationPlace = stops.front().get();
 		}
-		
-		
-		
+
+
+
 		void DisplayScreenTransferDestinationAddAction::run(Request& request)
 		{
 			// Action
@@ -131,9 +131,9 @@ namespace synthese
 				*request.getUser()
 			);
 		}
-		
-		
-		
+
+
+
 		bool DisplayScreenTransferDestinationAddAction::isAuthorized(const Session* session
 		) const {
 			assert(_screen.get() != NULL);

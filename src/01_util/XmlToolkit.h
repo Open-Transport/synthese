@@ -45,16 +45,16 @@ namespace util
 namespace XmlToolkit
 {
 
-    const char* CheckForRequiredAttr (XMLNode& node, 
+    const char* CheckForRequiredAttr (XMLNode& node,
 					     const std::string& attrName);
 
-    bool HasAttr (XMLNode& node, 
+    bool HasAttr (XMLNode& node,
 		  const std::string& attrName);
 
-    int GetChildNodeCount (XMLNode& node, 
+    int GetChildNodeCount (XMLNode& node,
 			   const std::string& nodeName);
 
-    XMLNode GetChildNode (XMLNode& node, 
+    XMLNode GetChildNode (XMLNode& node,
 			  const std::string& nodeName,
 			  int index);
 
@@ -64,51 +64,51 @@ namespace XmlToolkit
     XMLNode ParseFile (const boost::filesystem::path& file, const std::string& rootNodeTag);
 
 
-    std::string GetStringAttr (XMLNode& node, 
+    std::string GetStringAttr (XMLNode& node,
 			       const std::string& attrName);
 
-    std::string GetStringAttr (XMLNode& node, 
-			       const std::string& attrName, 
+    std::string GetStringAttr (XMLNode& node,
+			       const std::string& attrName,
 			       const std::string& defaultValue);
-    
-    bool GetBoolAttr (XMLNode& node, 
+
+    bool GetBoolAttr (XMLNode& node,
 		      const std::string& attrName);
 
-    bool GetBoolAttr (XMLNode& node, 
+    bool GetBoolAttr (XMLNode& node,
 		      const std::string& attrName,
 		      bool defaultValue);
 
-    boost::logic::tribool GetTriboolAttr (XMLNode& node, 
+    boost::logic::tribool GetTriboolAttr (XMLNode& node,
 					  const std::string& attrName);
-    
-    boost::logic::tribool GetTriboolAttr (XMLNode& node, 
+
+    boost::logic::tribool GetTriboolAttr (XMLNode& node,
 					  const std::string& attrName,
 					  boost::logic::tribool defaultValue);
-    
-    int GetIntAttr (XMLNode& node, 
+
+    int GetIntAttr (XMLNode& node,
 			   const std::string& attrName);
 
-    int GetIntAttr (XMLNode& node, 
+    int GetIntAttr (XMLNode& node,
 			   const std::string& attrName,
 			   int defaultValue);
-    
+
     long GetLongAttr (XMLNode& node, const std::string& attrName);
 
-    long GetLongAttr (XMLNode& node, 
+    long GetLongAttr (XMLNode& node,
 			     const std::string& attrName,
 			     long defaultValue);
 
     long long GetLongLongAttr (XMLNode& node,
 				      const std::string& attrName);
 
-    long long GetLongLongAttr (XMLNode& node, 
+    long long GetLongLongAttr (XMLNode& node,
 				      const std::string& attrName,
 				      long long defaultValue);
 
     double GetDoubleAttr (XMLNode& node,
 				 const std::string& attrName);
 
-    double GetDoubleAttr (XMLNode& node, 
+    double GetDoubleAttr (XMLNode& node,
 				 const std::string& attrName,
 				 double defaultValue);
 

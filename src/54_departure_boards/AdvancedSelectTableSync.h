@@ -62,7 +62,7 @@ namespace synthese
 			int broadCastPointsNumber;
 			int cpuNumber;
 		};
-		
+
 		typedef enum {
 			AT_LEAST_ONE_BROADCASTPOINT,
 			NO_BROADCASTPOINT,
@@ -71,11 +71,11 @@ namespace synthese
 
 		/** Connection place searcher.
 			@param broadCastPointsNumber Filter on broadcast points number : 0 = no broadcast points, 1 = at least one broadcast point
-			@result vector of the founded searched connection places from the live data objects (do not delete the objects after use). 
+			@result vector of the founded searched connection places from the live data objects (do not delete the objects after use).
 		*/
 		std::vector<boost::shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints(
 			util::Env& env,
-			const security::RightsOfSameClassMap& rights 
+			const security::RightsOfSameClassMap& rights
 			, bool totalControl = true
 			, security::RightLevel neededLevel = security::FORBIDDEN
 			, std::string cityName = std::string()
@@ -94,7 +94,7 @@ namespace synthese
 
 
 		/** JourneyPattern searcher.
-			@result found physical stops from the live data objects with the corresponding broadcast point if exists (NULL else) The broadcast points are temporary object and must be deleted after use. 
+			@result found physical stops from the live data objects with the corresponding broadcast point if exists (NULL else) The broadcast points are temporary object and must be deleted after use.
 		*/
 		std::vector<boost::shared_ptr<const pt::CommercialLine> > getCommercialLineWithBroadcastPoints(
 			util::Env& env,

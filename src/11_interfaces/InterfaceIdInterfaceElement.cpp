@@ -32,7 +32,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace interfaces;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<LibraryInterfaceElement, interfaces::InterfaceIdInterfaceElement>::FACTORY_KEY("interface_id");

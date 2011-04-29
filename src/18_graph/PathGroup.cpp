@@ -28,7 +28,7 @@
 namespace synthese
 {
 	using namespace util;
-	
+
 	namespace graph
 	{
 		PathGroup::PathGroup(
@@ -36,8 +36,8 @@ namespace synthese
 		):	Registrable(id)
 		{
 		}
-		
-		
+
+
 		const RuleUser* PathGroup::_getParentRuleUser() const
 		{
 			return NULL;

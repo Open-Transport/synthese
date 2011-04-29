@@ -47,13 +47,13 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,messages::ScenarioDisplayFunction>::FACTORY_KEY("scenario");
-	
+
 	namespace messages
 	{
 		const string ScenarioDisplayFunction::PARAMETER_MAIN_TEMPLATE("t");
 		const string ScenarioDisplayFunction::PARAMETER_MESSAGE_TEMPLATE("m");
 		const string ScenarioDisplayFunction::PARAMETER_VARIABLE_TEMPLATE("v");
-		
+
 		const std::string ScenarioDisplayFunction::DATA_NAME("name");
 		const std::string ScenarioDisplayFunction::DATA_FOLDER_ID("folder_id");
 		const std::string ScenarioDisplayFunction::DATA_FOLDER_NAME("folder_name");
@@ -269,9 +269,9 @@ namespace synthese
 
 			_mainTemplate->display(stream, request, pm);
 		}
-		
-		
-		
+
+
+
 		bool ScenarioDisplayFunction::isAuthorized(
 			const Session* session
 		) const {

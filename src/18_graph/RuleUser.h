@@ -36,7 +36,7 @@ namespace synthese
 	{
 		class UseRule;
 		class AccessParameters;
-		
+
 		/////////////////////////////////////////////////////////////////////////
 		/// Interface for user of rules defined by UseRules class.
 		/// @ingroup m18
@@ -48,15 +48,15 @@ namespace synthese
 
 		private:
 			Rules _rules;
-		
+
 		protected:
-			
+
 			/////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			RuleUser() :
 			_rules(USER_CLASSES_VECTOR_SIZE, NULL)
 			{}
-			
+
 		public:
 			//! @name Getters
 			//@{
@@ -67,7 +67,7 @@ namespace synthese
 				/// use getActualRules() instead.
 				const Rules& getRules() const { return _rules; }
 			//@}
-			
+
 			//! @name Setters
 			//@{
 				//////////////////////////////////////////////////////////////////////////

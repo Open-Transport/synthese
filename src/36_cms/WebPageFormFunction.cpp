@@ -42,7 +42,7 @@ namespace synthese
 	using namespace html;
 
 	template<> const string util::FactorableTemplate<Function,cms::WebPageFormFunction>::FACTORY_KEY("form");
-	
+
 	namespace cms
 	{
 		const string WebPageFormFunction::PARAMETER_NAME("name");
@@ -127,9 +127,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		bool WebPageFormFunction::isAuthorized(
 			const Session* session
 		) const {

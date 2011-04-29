@@ -41,7 +41,7 @@ namespace util
     // (which is the one likeky to be asked for its state).
 
     // Moreover, this way, it is feasible to share the same ThreadExec between different
-    // Thread objects. Of course, using proper thread-local variables and mutexes in ThreadExec 
+    // Thread objects. Of course, using proper thread-local variables and mutexes in ThreadExec
     // derived classes is left to user responsibility.
 
 }
@@ -54,7 +54,7 @@ Thread::~Thread ()
 
 
 
-const std::string& 
+const std::string&
 Thread::getName () const
 {
     return _name;
@@ -65,7 +65,7 @@ Thread::getName () const
 
 
 
-void 
+void
 Thread::start ()
 {
     if (getState () != NOT_STARTED) throw ThreadException ("Thread was already started.");
@@ -78,7 +78,7 @@ Thread::start ()
 
 
 
-void 
+void
 Thread::stop ()
 {
     if (getState () == STOPPED) return;
@@ -87,7 +87,7 @@ Thread::stop ()
 
 
 
-void 
+void
 Thread::pause ()
 {
     if (getState () == STOPPED) throw ThreadException ("Thread was stopped.");
@@ -95,7 +95,7 @@ Thread::pause ()
 }
 
 
-void 
+void
 Thread::resume ()
 {
     if (getState () != PAUSED) throw ThreadException ("Thread is not paused.");
@@ -106,7 +106,7 @@ Thread::resume ()
 
 
 
-void 
+void
 Thread::operator()()
 {
     try
@@ -114,8 +114,8 @@ Thread::operator()()
 	execInitialize ();
 
 	ThreadState state = getState ();
-	
-	while (state != STOPPED) 
+
+	while (state != STOPPED)
 	{
 	    execLoop ();
 	    Sleep (_loopDelay);
@@ -126,13 +126,13 @@ Thread::operator()()
     catch (std::exception& ex)
     {
 	Log::GetInstance ().error ("Thread " + _name +  " has crashed.", ex);
-    } 
+    }
 
     // Finalization is done in ANY case even after a crash
     Log::GetInstance ().info ("Finalizing thread " + _name + "...");
-    
+
     _exec->finalize ();
-    
+
     Log::GetInstance ().info ("Finalization done. " + _name + " is dead.");
 
 }
@@ -142,7 +142,7 @@ Thread::operator()()
 
 
 /*
-void 
+void
 Thread::Yield ()
 {
     boost::thread::yield ();
@@ -150,15 +150,15 @@ Thread::Yield ()
 */
 
 
-void 
+void
 Thread::Sleep (long ms)
 {
     boost::xtime xt;
     boost::xtime_get(&xt, boost::TIME_UTC);
 
-    xt.sec += ms / 1000; 
+    xt.sec += ms / 1000;
     unsigned long ns = ((long) xt.nsec) + (ms % 1000000L) * 1000000L;
-    
+
     if (ns >= 1000000000)
     {
 	xt.sec += 1;
@@ -166,14 +166,14 @@ Thread::Sleep (long ms)
     }
     xt.nsec = ns;
     boost::thread::sleep(xt);
-} 
+}
 
 
 
 
 
 
-Thread::ThreadState 
+Thread::ThreadState
 Thread::getState () const
 {
     boost::mutex::scoped_lock lock (*_stateMutex);
@@ -182,7 +182,7 @@ Thread::getState () const
 
 
 
-void 
+void
 Thread::setState (ThreadState state)
 {
     boost::mutex::scoped_lock lock (*_stateMutex);
@@ -192,7 +192,7 @@ Thread::setState (ThreadState state)
 
 
 unsigned long
-Thread::getNbLoops () const 
+Thread::getNbLoops () const
 {
     boost::mutex::scoped_lock lock (*_nbLoopsMutex);
     return *_nbLoops;
@@ -201,34 +201,34 @@ Thread::getNbLoops () const
 
 
 
-void 
+void
 Thread::execInitialize ()
 {
     setState (INIT);
     Log::GetInstance ().info ("Initializing thread " + _name +  "...");
-    
+
     _exec->initialize ();
     setState (READY);
-    
+
     Log::GetInstance ().info ("Thread " + _name +  " is ready.");
 }
 
 
 
 
-void 
+void
 Thread::execLoop ()
 {
     boost::mutex::scoped_lock lock (*_nbLoopsMutex);
     if (getState () != PAUSED) _exec->loop ();
-    *_nbLoops = *_nbLoops + 1;    
+    *_nbLoops = *_nbLoops + 1;
 }
 
 
 
 
 
-void 
+void
 Thread::waitForReadyState () const
 {
     waitForState (Thread::READY);
@@ -236,7 +236,7 @@ Thread::waitForReadyState () const
 
 
 
-void 
+void
 Thread::waitForState (const Thread::ThreadState& state) const
 {
     while (1)
@@ -254,9 +254,9 @@ Thread::waitForState (const Thread::ThreadState& state) const
 typedef struct runOnce
 {
     boost::shared_ptr<ThreadExec> _exec;
-    
+
     runOnce (ThreadExec* exec) : _exec (exec) {}
-	
+
 	void operator()()
 	{
 	    try
@@ -268,14 +268,14 @@ typedef struct runOnce
 	    catch (std::exception& ex)
 	    {
 		Log::GetInstance ().error ("Thread has crashed.", ex);
-	    } 
+	    }
 	}
 } RunOnceStruct ;
 
 
 
 
-void 
+void
 Thread::RunOnce (ThreadExec* exec)
 {
     RunOnceStruct runOnce (exec);

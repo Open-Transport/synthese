@@ -50,7 +50,7 @@ namespace synthese
 	using namespace geography;
 	using namespace util;
 	using namespace graph;
-	
+
 
 	namespace algorithm
 	{
@@ -121,7 +121,7 @@ namespace synthese
 			if(	_maxDuration &&
 				result2.getDuration() > _maxDuration
 			){
-				endBound = 
+				endBound =
 					_planningOrder == DEPARTURE_FIRST ?
 					result2.getFirstArrivalTime() - *_maxDuration :
 					result2.getFirstDepartureTime() + *_maxDuration
@@ -216,10 +216,10 @@ namespace synthese
 			ptime __minMaxDateTimeAtDestination(minMaxDateTimeAtDestination);
 
 			JourneysResult todo(originDateTime, accessDirection);
-			
+
 			ptime bestEndTime(minMaxDateTimeAtDestination);
 			ptime lastBestEndTime(minMaxDateTimeAtDestination);
-			
+
 			// Initialization of the best vertex reaches map
 			BestVertexReachesMap bestVertexReachesMap(accessDirection, startVam, endVam);
 
@@ -285,14 +285,14 @@ namespace synthese
 					JourneysResult::ResultSet::const_iterator next(it);
 					++next;
 					const RoutePlanningIntermediateJourney& journey(*it->first);
-					
+
 					if (!journey.getEndReached())
 						break;
-					
+
 					// A destination without any approach time stops the recursion
 					const Vertex* reachedVertex(journey.getEndEdge().getFromVertex());
 					const VertexAccess& va = endVam.getVertexAccess(reachedVertex);
-					
+
 					// Attempt to elect the solution as the result
 					if (journey > result)
 					{
@@ -310,7 +310,7 @@ namespace synthese
 					{
 						todo.remove(it->first);
 					}
-										
+
 					it = next;
 				}
 
