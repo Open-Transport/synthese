@@ -1,7 +1,7 @@
 Import ('s3env')
 
 CppSynthese3LibProject(
-	s3env, 's3-security', s3env['S3VERSION'], 
+	s3env, 's3-security', s3env['S3VERSION'],
 	source_files = s3env.Glob ('*.cpp'),
 	dependencies = ['s3-admin.cpplib', 's3-interfaces.cpplib', 's3-server.cpplib', 's3-dblog.cpplib', 's3-db.cpplib', 's3-html.cpplib']
 )
