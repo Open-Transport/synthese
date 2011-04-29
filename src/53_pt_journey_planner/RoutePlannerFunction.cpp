@@ -2483,18 +2483,18 @@ namespace synthese
 			}
 
 			pm.insert(DATA_IS_TERMINUS, isItTerminus);
-			pm.insert(DATA_STOP_AREA_NAME, dynamic_cast<const NamedPlace&>(*physicalStop.getHub()).getFullName());
+			pm.insert(DATA_STOP_AREA_NAME, dynamic_cast<const NamedPlace&>(*departurePhysicalStop->getHub()).getFullName());
 
 			if(arrivalPhysicalStop)
 			{
 				pm.insert(DATA_ARRIVAL_STOP_NAME, arrivalPhysicalStop->getName());
 				// Point
-				if(	arrivalPhysicalStop.getGeometry().get() &&
-					!arrivalPhysicalStop.getGeometry()->isEmpty()
+				if(	arrivalPhysicalStop->getGeometry().get() &&
+					!arrivalPhysicalStop->getGeometry()->isEmpty()
 				){
 					shared_ptr<Point> point(
 						CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-							*arrivalPhysicalStop.getGeometry()
+							*arrivalPhysicalStop->getGeometry()
 					)	);
 					pm.insert(DATA_LONGITUDE, point->getX());
 					pm.insert(DATA_LATITUDE, point->getY());
@@ -2505,12 +2505,12 @@ namespace synthese
 			{
 				pm.insert(DATA_DEPARTURE_STOP_NAME, departurePhysicalStop->getName());
 				// Point
-				if(	departurePhysicalStop.getGeometry().get() &&
-					!departurePhysicalStop.getGeometry()->isEmpty()
+				if(	departurePhysicalStop->getGeometry().get() &&
+					!departurePhysicalStop->getGeometry()->isEmpty()
 				){
 					shared_ptr<Point> point(
 						CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-							*departurePhysicalStop.getGeometry()
+							*departurePhysicalStop->getGeometry()
 					)	);
 					pm.insert(DATA_DEPARTURE_LONGITUDE, point->getX());
 					pm.insert(DATA_DEPARTURE_LATITUDE, point->getY());
