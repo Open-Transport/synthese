@@ -45,7 +45,7 @@ namespace synthese
 			@image latex cap_admin_displays.png "Maquette de l'écran de gestion des afficheurs" width=14cm
 
 			<i>Titre de la fenêtre</i> : SYNTHESE Admin - Afficheurs
-				
+
 			<i>Barre de navigation</i> :
 				- Lien vers l'accueil de la console d'administration
 
@@ -106,8 +106,8 @@ namespace synthese
 				- INFO : suppression d'un afficheur
 
 			<i>Journal</i> : Les actions suivants entraînent une écriture dans le journal de maintenance des afficheurs DisplayMaintenanceLog :
-				- WARNING : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai compris entre 150% et 500% de la durée présupposée entre deux contrôles. 
-				- ERROR : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai supérieur à 500% de la durée présupposée entre deux contrôles. 
+				- WARNING : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai compris entre 150% et 500% de la durée présupposée entre deux contrôles.
+				- ERROR : première constatation d'une absence d'entrée de type contrôle sur un afficheur dans un délai supérieur à 500% de la durée présupposée entre deux contrôles.
 				- NB : Ces deux entrées apparaissent à la première visualisation d'un problème de ce type dans une console d'administration, afin de suppléer à l'absence de démon de surveillance. Un passage en contrôle continu avec alerte pourrait être implémenté.
 		*/
 		class DisplaySearchAdmin :
@@ -123,7 +123,7 @@ namespace synthese
 			boost::optional<int>							_searchState;
 			boost::optional<int>							_searchMessage;
 			html::ResultHTMLTable::RequestParameters		_requestParameters;
-			
+
 		public:
 			static const std::string PARAMETER_SEARCH_CITY;
 			static const std::string PARAMETER_SEARCH_STOP;
@@ -138,25 +138,25 @@ namespace synthese
 			static const std::string TAB_CPU;
 
 			DisplaySearchAdmin();
-			
+
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
-			
-			
-			
+
+
+
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 			*/
@@ -193,8 +193,8 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
-			
-			
+
+
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
@@ -208,7 +208,7 @@ namespace synthese
 			) const;
 
 			void setPlace(boost::optional<util::RegistryKeyType> id);
-			
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 
 			//! @name Getters

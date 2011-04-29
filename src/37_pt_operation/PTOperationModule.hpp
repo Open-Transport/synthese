@@ -49,42 +49,42 @@ namespace synthese
 
 		/**	@defgroup m37Exceptions 37.01 Exceptions
 			@ingroup m37
-	
+
 			@defgroup m37LS 37.10 Table synchronizers
 			@ingroup m37
-	
+
 			@defgroup m37Pages 37.11 Interface Pages
 			@ingroup m37
-	
+
 			@defgroup m37Library 37.11 Interface Library
 			@ingroup m37
-	
+
 			@defgroup m37Rights 37.12 Rights
 			@ingroup m37
-	
+
 			@defgroup m37Logs 37.13 DB Logs
 			@ingroup m37
-	
+
 			@defgroup m37Admin 37.14 Administration pages
 			@ingroup m37
-	
+
 			@defgroup m37Actions 37.15 Actions
 			@ingroup m37
-	
+
 			@defgroup m37Functions 37.15 Functions
 			@ingroup m37
-	
+
 			@defgroup m37File 37.16 File formats
 			@ingroup m37
-	
+
 			@defgroup m37Alarm 37.17 Messages recipient
 			@ingroup m37
-			
+
 			@defgroup m37 37 pt_operation
 			@ingroup m3
-			
+
 			@todo Write Module documentation
-			
+
 			@{
 		*/
 
@@ -100,11 +100,11 @@ namespace synthese
 		public:
 			typedef std::map<const pt::CommercialLine*, std::set<const Vehicle*> > LinesAllowedVehicles;
 			typedef std::map<const pt::ScheduledService*, std::set<const Composition*> > ServiceCompositions;
-			
+
 		private:
 			static LinesAllowedVehicles _linesAllowedVehicles;
 			static ServiceCompositions _serviceCompositions;
-			
+
 		public:
 			static void RegisterVehicle(const Vehicle& vehicle);
 			static void UnregisterVehicle(const Vehicle& vehicle);

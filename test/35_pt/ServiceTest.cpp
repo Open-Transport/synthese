@@ -84,22 +84,22 @@ BOOST_AUTO_TEST_CASE (testStopsWithoutSchedules)
 	BOOST_CHECK_EQUAL(s.getKey(), 1234);
 	BOOST_CHECK_EQUAL(s.getServiceNumber(), "1234AB");
 	BOOST_CHECK_EQUAL(s.getPath(), &l);
-	
+
 	SchedulesBasedService::Schedules d;
 	SchedulesBasedService::Schedules a;
 
 	a.push_back(time_duration(2, 0, 0));
 	d.push_back(time_duration(2, 0, 0));
-	
+
 	a.push_back(time_duration(2, 24, 0));
 	d.push_back(time_duration(2, 30, 0));
-	
+
 	a.push_back(time_duration(2, 31, 0));
 	d.push_back(time_duration(2, 31, 0));
-	
+
 	a.push_back(time_duration(3, 10, 0));
 	d.push_back(time_duration(3, 10, 0));
-	
+
 	s.setSchedules(d, a);
 
 	SchedulesBasedService::Schedules id(s.getDepartureSchedules(false));

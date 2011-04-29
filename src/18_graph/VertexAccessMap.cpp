@@ -54,7 +54,7 @@ namespace synthese
 
 
 
-		const VertexAccess& 
+		const VertexAccess&
 		VertexAccessMap::getVertexAccess (const Vertex* vertex) const
 		{
 			assert (contains (vertex));
@@ -63,7 +63,7 @@ namespace synthese
 
 
 
-		bool 
+		bool
 		VertexAccessMap::needFineSteppingForDeparture (const Path* path) const
 		{
 			return _pathOnWhichFineSteppingForDeparture.find(path) != _pathOnWhichFineSteppingForDeparture.end();
@@ -71,7 +71,7 @@ namespace synthese
 
 
 
-		bool 
+		bool
 		VertexAccessMap::needFineSteppingForArrival (const Path* path) const
 		{
 			return _pathOnWhichFineSteppingForArrival.find(path) != _pathOnWhichFineSteppingForArrival.end();
@@ -79,7 +79,7 @@ namespace synthese
 
 
 
-		bool 
+		bool
 		VertexAccessMap::contains (const Vertex* vertex) const
 		{
 			return (_map.find (vertex) != _map.end ());
@@ -98,7 +98,7 @@ namespace synthese
 				// Insertion of a new vertex
 				_map.insert (std::make_pair (vertex, vertexAccess));
 				_isobarycentre.reset();
-				
+
 				// Updating the paths which needs fine stepping set
 				if (!vertex->getHub()->isConnectionPossible())
 				{

@@ -73,7 +73,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void PTNetworksAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -93,7 +93,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool PTNetworksAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -139,7 +139,7 @@ namespace synthese
 			h.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(string(), "Actions"));
 			ActionResultHTMLTable t(h,sortedForm,_requestParameters, networks, newRequest.getHTMLForm());
-		
+
 			stream << t.open();
 			AdminFunctionRequest<TransportNetworkAdmin> openRequest(request);
 			BOOST_FOREACH(shared_ptr<TransportNetwork> network, networks)
@@ -166,9 +166,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const PTModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -176,17 +176,17 @@ namespace synthese
 			{
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks PTNetworksAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
 			TransportNetworkTableSync::SearchResult networks(
 				TransportNetworkTableSync::Search(Env::GetOfficialEnv())
@@ -199,7 +199,7 @@ namespace synthese
 				link->setNetwork(const_pointer_cast<const TransportNetwork>(network));
 				links.push_back(link);
 			}
-			
+
 			return links;
 		}
 	}

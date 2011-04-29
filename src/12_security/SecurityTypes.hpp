@@ -45,7 +45,7 @@ namespace synthese
 
 		/** Vector of rights defining an habilitation.
 			This typedef is a map :
-				- key : a pair : 
+				- key : a pair :
 					- left : Factory key of the Right subclass
 					- right : parameter value (see each Right subclass for the possible values of the parameter)
 				- value : a constant shared pointer to a Right object

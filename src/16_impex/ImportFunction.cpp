@@ -41,10 +41,10 @@ namespace synthese
 	using namespace security;
 	using namespace db;
 	using namespace admin;
-	
+
 
 	template<> const string util::FactorableTemplate<Function,impex::ImportFunction>::FACTORY_KEY("ImportFunction");
-	
+
 	namespace impex
 	{
 		/// Parameter names declarations
@@ -83,7 +83,7 @@ namespace synthese
 				shared_ptr<const DataSource> dataSource(DataSourceTableSync::Get(dataSourceId, *_env));
 				_importer = dataSource->getImporter(*_env);
 				_importer->setFromParametersMap(map, true);
-				
+
 				stringstream output;
 				_doImport = _importer->parseFiles(output, optional<const AdminRequest&>()) && map.getDefault<bool>(PARAMETER_DO_IMPORT, false);
 				_output = output.str();
@@ -97,7 +97,7 @@ namespace synthese
 				throw RequestException("Load failed : " + e.getMessage());
 			}
 		}
-		
+
 
 
 		void ImportFunction::run( std::ostream& stream, const Request& request ) const
@@ -109,9 +109,9 @@ namespace synthese
 
 			stream << _output;
 		}
-		
-		
-		
+
+
+
 		bool ImportFunction::isAuthorized(const Session* session
 		) const {
 			return true;

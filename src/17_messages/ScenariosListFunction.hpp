@@ -57,7 +57,7 @@ namespace synthese
 			static const std::string PARAMETER_FOLDER_ID;
 			static const std::string PARAMETER_CMS_TEMPLATE_ID;
 			static const std::string PARAMETER_CURRENTLY_DISPLAYED;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
@@ -66,8 +66,8 @@ namespace synthese
 				boost::shared_ptr<const ScenarioFolder> _parentFolder;
 				boost::shared_ptr<const cms::Webpage> _cmsTemplate;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenarii_list#Request
@@ -76,9 +76,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenarii_list#Request
@@ -89,7 +89,7 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
+
 		private:
 
 			static const std::string DATA_NAME;
@@ -116,7 +116,7 @@ namespace synthese
 				const server::Request& request,
 				const ScenarioTemplate& scenario
 			) const;
-			
+
 		public:
 			ScenariosListFunction();
 
@@ -129,9 +129,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

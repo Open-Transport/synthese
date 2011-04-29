@@ -35,12 +35,12 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::AndFunction>::FACTORY_KEY("and");
-	
+
 	namespace cms
 	{
 		const string AndFunction::PARAMETER_LEFT("l");
 		const string AndFunction::PARAMETER_RIGHT("r");
-		
+
 		ParametersMap AndFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -61,9 +61,9 @@ namespace synthese
 		) const {
 			stream << (!_left.empty() && _left != "0" && !_right.empty() && _right != "0");
 		}
-		
-		
-		
+
+
+
 		bool AndFunction::isAuthorized(
 			const Session* session
 		) const {

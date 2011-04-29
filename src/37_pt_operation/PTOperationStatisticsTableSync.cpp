@@ -34,7 +34,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace pt;
-	
+
 	namespace pt_operation
 	{
 		PTOperationStatisticsTableSync::CountSearchResult PTOperationStatisticsTableSync::Count(

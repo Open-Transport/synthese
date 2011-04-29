@@ -46,9 +46,9 @@ namespace synthese
 	using namespace pt;
 	using namespace calendar;
 	using namespace graph;
-	
-	
-	
+
+
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt_operation::CompositionUpdateAction>::FACTORY_KEY("CompositionUpdateAction");
@@ -60,9 +60,9 @@ namespace synthese
 		const string CompositionUpdateAction::PARAMETER_DATE = Action_PARAMETER_PREFIX + "da";
 		const string CompositionUpdateAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "si";
 		const string CompositionUpdateAction::PARAMETER_FIRST_QUAY = Action_PARAMETER_PREFIX + "fq";
-		
-		
-		
+
+
+
 		ParametersMap CompositionUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -84,9 +84,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CompositionUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.getOptional<RegistryKeyType>(PARAMETER_COMPOSITION_ID))
@@ -137,15 +137,15 @@ namespace synthese
 				throw RequestException("No such service");
 			}
 		}
-		
-		
-		
+
+
+
 		void CompositionUpdateAction::run(
 			Request& request
 		){
 			//stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			
+
 			Calendar calendar;
 			if(_date)
 			{
@@ -157,7 +157,7 @@ namespace synthese
 			{
 				_composition->setService(_service.get());
 			}
-			
+
 			if(_firstQuay.get())
 			{
 				Service::ServedVertices vertices;
@@ -175,9 +175,9 @@ namespace synthese
 				}
 				_composition->setServedVertices(vertices);
 			}
-			
+
 			CompositionTableSync::Save(_composition.get());
-			
+
 			if(request.getActionWillCreateObject())
 			{
 				request.setActionCreatedId(_composition->getKey());
@@ -185,9 +185,9 @@ namespace synthese
 
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool CompositionUpdateAction::isAuthorized(
 			const Session* session
 		) const {

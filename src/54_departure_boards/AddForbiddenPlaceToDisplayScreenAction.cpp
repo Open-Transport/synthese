@@ -45,7 +45,7 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<Action, departure_boards::AddForbiddenPlaceToDisplayScreenAction>::FACTORY_KEY("afptdsa");
 	}
-	
+
 	namespace departure_boards
 	{
 		const string AddForbiddenPlaceToDisplayScreenAction::PARAMETER_SCREEN_ID(
@@ -84,7 +84,7 @@ namespace synthese
 		{
 			_screen->addForbiddenPlace(_place.get());
 			DisplayScreenTableSync::Save(_screen.get());
-			
+
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
@@ -107,14 +107,14 @@ namespace synthese
 				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
-		
-		
+
+
 		void AddForbiddenPlaceToDisplayScreenAction::setScreen(boost::shared_ptr<DisplayScreen> value)
 		{
 			_screen = value;
 		}
-	
-	
+
+
 		void AddForbiddenPlaceToDisplayScreenAction::setScreen(
 			boost::shared_ptr<const DisplayScreen> value)
 		{

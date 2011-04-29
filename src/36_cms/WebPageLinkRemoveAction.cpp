@@ -37,7 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, cms::WebPageLinkRemoveAction>::FACTORY_KEY("WebPageLinkRemoveAction");
@@ -47,9 +47,9 @@ namespace synthese
 	{
 		const string WebPageLinkRemoveAction::PARAMETER_PAGE_ID = Action_PARAMETER_PREFIX + "id";
 		const string WebPageLinkRemoveAction::PARAMETER_DESTINATION_ID = Action_PARAMETER_PREFIX + "to";
-		
-		
-		
+
+
+
 		ParametersMap WebPageLinkRemoveAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -63,9 +63,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void WebPageLinkRemoveAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -85,9 +85,9 @@ namespace synthese
 				throw ActionException("No such destination web page");
 			}
 		}
-		
-		
-		
+
+
+
 		void WebPageLinkRemoveAction::run(
 			Request& request
 		){
@@ -109,9 +109,9 @@ namespace synthese
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool WebPageLinkRemoveAction::isAuthorized(
 			const Session* session
 		) const {

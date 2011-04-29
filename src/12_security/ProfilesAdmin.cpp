@@ -56,7 +56,7 @@ namespace synthese
 	using namespace html;
 	using namespace security;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, ProfilesAdmin>::FACTORY_KEY("profiles");
@@ -72,7 +72,7 @@ namespace synthese
 	{
 		const std::string ProfilesAdmin::PARAMETER_SEARCH_NAME = "pasn";
 		const std::string ProfilesAdmin::PARAMETER_SEARCH_RIGHT = "pasr";
-		
+
 		void ProfilesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -85,8 +85,8 @@ namespace synthese
 			// Parameters
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 30);
 		}
-		
-		
+
+
 		server::ParametersMap ProfilesAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
@@ -107,12 +107,12 @@ namespace synthese
 			AdminFunctionRequest<ProfileAdmin> profileRequest(_request);
 
 			AdminActionFunctionRequest<RemoveObjectAction, ProfilesAdmin> deleteProfileRequest(_request);
-			
+
 			AdminActionFunctionRequest<AddProfileAction, ProfileAdmin> addProfileRequest(_request);
 			addProfileRequest.getFunction()->setActionFailedPage<ProfilesAdmin>();
 			addProfileRequest.setActionWillCreateObject();
 
-			
+
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 			stream << s.open();
 			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, _searchName));
@@ -121,7 +121,7 @@ namespace synthese
 				s.getForm().getSelectInput(PARAMETER_SEARCH_RIGHT, SecurityModule::getRightLabels(true), optional<string>(_searchRightName)));
 			stream << s.close();
 			stream << s.getForm().setFocus(PARAMETER_SEARCH_NAME);
-				
+
 			stream << "<h1>Résultats de la recherche</h1>";
 
 			// Search
@@ -161,7 +161,7 @@ namespace synthese
 			);
 
 			stream << t.open();
-			
+
 			// Profiles loop
 			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
 			{
@@ -211,15 +211,15 @@ namespace synthese
 			return user.getProfile()->isAuthorized<SecurityRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
-		
-		
+
+
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const SecurityModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -229,14 +229,14 @@ namespace synthese
 			}
 			return links;
 		}
-	
-	
+
+
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			ProfileTableSync::SearchResult profiles(
 				ProfileTableSync::Search(
 					_getEnv(),
@@ -248,7 +248,7 @@ namespace synthese
 				p->setProfile(profile);
 				links.push_back(p);
 			}
-			
+
 			return links;
 		}
 	}

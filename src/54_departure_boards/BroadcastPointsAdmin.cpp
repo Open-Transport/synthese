@@ -76,7 +76,7 @@ namespace synthese
 		const string BroadcastPointsAdmin::PARAMETER_CITY_NAME = "city";
 		const string BroadcastPointsAdmin::PARAMETER_PLACE_NAME = "place";
 		const string BroadcastPointsAdmin::PARAMETER_LINE_ID = "line";
-		
+
 		BroadcastPointsAdmin::BroadcastPointsAdmin():
 			AdminInterfaceElementTemplate<BroadcastPointsAdmin>(),
 			_searchDevicesNumber(WITH_OR_WITHOUT_ANY_BROADCASTPOINT)
@@ -87,7 +87,7 @@ namespace synthese
 		){
 			_cityName = map.getDefault<string>(PARAMETER_CITY_NAME);
 			_placeName = map.getDefault<string>(PARAMETER_PLACE_NAME);
-			
+
 			optional<int> i(map.getOptional<int>(PARAMETER_DEVICES_NUMBER));
 			if (i)	_searchDevicesNumber = static_cast<BroadcastPointsPresence>(*i);
 
@@ -95,9 +95,9 @@ namespace synthese
 
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_CITY_NAME, 30);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap BroadcastPointsAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
@@ -167,14 +167,14 @@ namespace synthese
 					, _requestParameters.orderField == PARAMETER_DEVICES_NUMBER
 					, _requestParameters.raisingOrder
 			)	);
-			
+
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(PARAMETER_CITY_NAME, "Commune"));
 			h.push_back(make_pair(PARAMETER_PLACE_NAME, "Nom zone d'arrêt"));
 			h.push_back(make_pair(PARAMETER_DEVICES_NUMBER, "Equipements"));
 			h.push_back(make_pair(PARAMETER_DEVICES_NUMBER, "Equipements"));
 			h.push_back(make_pair(string(), "Actions"));
-			
+
 			ResultHTMLTable t(
 				h,
 				searchRequest.getHTMLForm(),
@@ -191,7 +191,7 @@ namespace synthese
 				{
 					stream << t.col() << pl->cityName;
 					stream << t.col() << pl->place->getName();
-					
+
 					if(pl->cpuNumber == 0 && pl->broadCastPointsNumber == 0)
 					{
 						stream << t.col(2) << "aucun";
@@ -215,7 +215,7 @@ namespace synthese
 							;
 						}
 					}
-					
+
 					HTMLForm gf(goRequest.getHTMLForm());
 					gf.addHiddenField(DisplaySearchAdmin::PARAMETER_SEARCH_LOCALIZATION_ID, Conversion::ToString(pl->place->getKey()));
 					stream << t.col() << gf.getLinkButton("Ouvrir", string(), "building_edit.png");
@@ -260,11 +260,11 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-		
+
 			const DisplaySearchAdmin* sa(
 				dynamic_cast<const DisplaySearchAdmin*>(&currentPage)
 			);
-			
+
 			if(	sa ||
 				dynamic_cast<const DisplayScreenCPUAdmin*>(&currentPage) ||
 				dynamic_cast<const BroadcastPointsAdmin*>(&currentPage) ||
@@ -291,7 +291,7 @@ namespace synthese
 					links.push_back(p);
 					if(*p == currentPage) currentToAdd = false;
 				}
-				
+
 				if(currentToAdd)
 				{
 					shared_ptr<DisplaySearchAdmin> p(
@@ -303,8 +303,8 @@ namespace synthese
 
 			return links;
 		}
-		
-		
+
+
 
 		bool BroadcastPointsAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,

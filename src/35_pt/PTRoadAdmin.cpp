@@ -80,7 +80,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void PTRoadAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -111,7 +111,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool PTRoadAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -124,7 +124,7 @@ namespace synthese
 			ostream& stream,
 			const AdminRequest& request
 		) const	{
-		
+
 			////////////////////////////////////////////////////////////////////
 			// TAB MAP
 			if (openTabContent(stream, TAB_MAP))

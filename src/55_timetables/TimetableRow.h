@@ -52,7 +52,7 @@ namespace synthese
 		public:
 			/// Chosen registry class.
 			typedef util::Registry<TimetableRow>	Registry;
-		
+
 			enum tTypeGareIndicateur
 			{
 				PassageFacultatif = -1

@@ -36,7 +36,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, hiking::HikingTrailAddAction>::FACTORY_KEY("HikingTrailAddAction");
@@ -45,25 +45,25 @@ namespace synthese
 	namespace hiking
 	{
 		const string HikingTrailAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-		
-		
-		
+
+
+
 		ParametersMap HikingTrailAddAction::getParametersMap() const
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_NAME, _name);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void HikingTrailAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_name = map.getDefault<string>(PARAMETER_NAME);
 		}
-		
-		
-		
+
+
+
 		void HikingTrailAddAction::run(
 			Request& request
 		){
@@ -73,9 +73,9 @@ namespace synthese
 			//::AddCreationEntry(object, request.getUser().get());
 			request.setActionCreatedId(object.getKey());
 		}
-		
-		
-		
+
+
+
 		bool HikingTrailAddAction::isAuthorized(
 			const Session* session
 		) const {

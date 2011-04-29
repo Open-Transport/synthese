@@ -34,7 +34,7 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace html;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<LibraryInterfaceElement, server::HtmlFormFieldInterfaceElement>::FACTORY_KEY("htmlinput");

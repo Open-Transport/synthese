@@ -18,7 +18,7 @@ using namespace synthese::util;
 	    : RegistrableTemplate<int,RegistrableForTest> (key)
 	    {
 	    }
-	    
+
     };
 
 
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE (testRegistryOperations)
       BOOST_REQUIRE_EQUAL ((size_t)1, reg.size ());
       BOOST_REQUIRE (reg.contains (1));
       BOOST_REQUIRE_EQUAL (reg1, reg.get (1).get ());
-      
+
       RegistrableForTest* reg2 = new RegistrableForTest (2);
       reg.add (SPtr (reg2));
 
@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE (testRegistryOperations)
       try
       {
 	  reg.get (3);
-      } 
+      }
       catch (RegistrableForTest::RegistryKeyException& rke)
       {
 	  exceptionThrown = true;
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE (testRegistryOperations)
       try
       {
 	  reg.add (SPtr (reg3));
-      } 
+      }
       catch (RegistrableForTest::RegistryKeyException& rke)
       {
 	  exceptionThrown = true;
@@ -86,18 +86,18 @@ BOOST_AUTO_TEST_CASE (testRegistryOperations)
       try
       {
 	  reg.remove (3);
-      } 
+      }
       catch (RegistrableForTest::RegistryKeyException& rke)
       {
 	  exceptionThrown = true;
       }
       BOOST_REQUIRE (exceptionThrown);
-      
+
       reg.remove (1);
       BOOST_REQUIRE_EQUAL ((size_t) 1, reg.size ());
       BOOST_REQUIRE (reg.contains (2));
       BOOST_REQUIRE_EQUAL (reg2, reg.get (2).get ());
-      
+
       reg.clear ();
       BOOST_REQUIRE_EQUAL ((size_t) 0, reg.size ());
 }

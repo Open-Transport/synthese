@@ -40,11 +40,11 @@ namespace synthese
 	{
 		class Webpage;
 	}
-	
+
 	namespace pt
 	{
 		class TransportNetwork;
-	
+
 		/** PTNetworkListItemInterfacePage Interface Page Class.
 			@ingroup m35Pages refPages
 			@author Hugues Romain

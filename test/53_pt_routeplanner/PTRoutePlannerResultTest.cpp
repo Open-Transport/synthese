@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 	PA.setHub(&CA);
 	DesignatedLinePhysicalStop A(0, &L, 0);
 	A.setPhysicalStop(PA);
-	
+
 	StopArea CB;
 	CB.setName("B");
 	StopPoint PB;
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_OrderingTests)
 	PC.setHub(&CC);
 	DesignatedLinePhysicalStop C(0, &L, 2);
 	C.setPhysicalStop(PC);
-	
+
 	StopArea CD;
 	CD.setName("D");
 	StopPoint PD;
@@ -417,7 +417,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_RoadChunks)
 	Crossing Cr0;
 	Crossing Cr1;
 	Crossing Cr2;
-	
+
 	MainRoadChunk Ch0(0, &Cr0, 0, &R);
 	MainRoadChunk Ch1(0, &Cr1, 1, &R);
 	MainRoadChunk Ch2(0, &Cr2, 2, &R);

@@ -83,13 +83,13 @@ namespace synthese
 			///	@author Hugues
 			///	@date 2009
 			ResaStatisticsAdmin();
-			
-			
+
+
 			void setCommercialLine(boost::shared_ptr<pt::CommercialLine> value);
 			void setCommercialLineC(boost::shared_ptr<const pt::CommercialLine> value);
 			boost::shared_ptr<const pt::CommercialLine> getCommercialLine() const;
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.
 			///	@param map The parameters map to use for the initialization.
@@ -122,7 +122,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Authorization control.
 			/// Returns if the page can be displayed. In most cases, the needed right

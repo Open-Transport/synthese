@@ -40,7 +40,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::ServiceTimetableUpdateAction>::FACTORY_KEY("ServiceTimetableUpdateAction");
@@ -53,9 +53,9 @@ namespace synthese
 		const string ServiceTimetableUpdateAction::PARAMETER_RANK = Action_PARAMETER_PREFIX + "rk";
 		const string ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY = Action_PARAMETER_PREFIX + "sd";
 		const string ServiceTimetableUpdateAction::PARAMETER_TIME = Action_PARAMETER_PREFIX + "ti";
-		
-		
-		
+
+
+
 		ParametersMap ServiceTimetableUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -75,9 +75,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ServiceTimetableUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -110,9 +110,9 @@ namespace synthese
 				_time = duration_from_string(map.get<string>(PARAMETER_TIME));
 			}
 		}
-		
-		
-		
+
+
+
 		void ServiceTimetableUpdateAction::run(
 			Request& request
 		){
@@ -148,9 +148,9 @@ namespace synthese
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool ServiceTimetableUpdateAction::isAuthorized(
 			const Session* session
 		) const {

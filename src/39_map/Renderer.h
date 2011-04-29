@@ -61,12 +61,12 @@ namespace synthese
 
 			virtual ~Renderer ();
 
-			virtual std::string render (const boost::filesystem::path& tempDir, 
+			virtual std::string render (const boost::filesystem::path& tempDir,
 						    const std::string& filenamePrefix,
 							const util::Registry<pt::JourneyPattern>& lines,
 						    synthese::map::Map& map,
 						    const synthese::map::RenderingConfig& config) = 0;
-		    
+
 		};
 
 	}

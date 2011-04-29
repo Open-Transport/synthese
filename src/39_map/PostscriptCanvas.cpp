@@ -94,7 +94,7 @@ namespace map
 } def";
 */
 
-	
+
     const std::string PostscriptCanvas::PATHTEXT_DEF = "\
 /pathtextdict 26 dict def\n\
 /pathtext\n\
@@ -206,13 +206,13 @@ const std::string PostscriptCanvas::FRAMETEXT_DEF = "\
 
 
 
-                              
-                                         
-                                         
-                                         
-	
-	
-	
+
+
+
+
+
+
+
 
 PostscriptCanvas::PostscriptCanvas(std::ostream& output)
 : _output (output)
@@ -224,7 +224,7 @@ PostscriptCanvas::~PostscriptCanvas()
 }
 
 
-void 
+void
 PostscriptCanvas::startPage (double x, double y, double width, double height)
 {
     _output << "%!PS-Adobe-3.0" << std::endl;
@@ -236,72 +236,72 @@ PostscriptCanvas::startPage (double x, double y, double width, double height)
     _output << "%%LanguageLevel: 3" << std::endl;
     _output << "%%Orientation: Portrait" << std::endl;
     _output << "%%EndComments" << std::endl;
-    
+
     _output << PATHTEXT_DEF << std::endl;
     _output << TRIANGLE_DEF << std::endl;
     _output << SQUARE_DEF << std::endl;
     _output << STICKER_DEF << std::endl;
-	
+
 }
 
-void 
-PostscriptCanvas::moveto (double x, double y) 
+void
+PostscriptCanvas::moveto (double x, double y)
 {
     _output << x << " " << y << " moveto" << std::endl;
 }
 
-void 
-PostscriptCanvas::rmoveto (double x, double y) 
+void
+PostscriptCanvas::rmoveto (double x, double y)
 {
     _output << x << " " << y << " rmoveto" << std::endl;
 }
 
 
 
-void 
-PostscriptCanvas::arct (double x1, double y1, double x2, double y2, double r) 
+void
+PostscriptCanvas::arct (double x1, double y1, double x2, double y2, double r)
 {
     _output << x1 << " " << y1 << " " << x2 << " " << y2 << " "  << r << " arct" << std::endl;
 }
 
 
-void 
+void
 PostscriptCanvas::setfont (const std::string& fontName, int fontSize) {
     _output << "/" << fontName << " findfont" << std::endl;
     _output << fontSize << " scalefont" << std::endl;
     _output << "setfont" << std::endl;
-	
+
 }
 
 
 
-void 
+void
 PostscriptCanvas::setlinecap (int lineCap) {
     // 0 = butt; 1 = round; 2 = projecting
     _output << lineCap << " setlinecap" << std::endl;
 }
 
-void 
+void
 PostscriptCanvas::setlinejoin (int lineJoin) {
     _output << lineJoin << " setlinejoin" << std::endl;
 }
 
 
 
-void 
+void
 PostscriptCanvas:: setlinewidth (int lineWidth) {
     _output << lineWidth << " setlinewidth" << std::endl;
 }
 
 
-void 
+void
 PostscriptCanvas:: setrgbcolor (double red, double green, double blue) {
     _output << red << " " << green << " " << blue << " setrgbcolor" << std::endl;
 }
 
 
 
-void 
+void
 PostscriptCanvas::setrgbcolor (const synthese::util::RGBColor& color)
 {
     setrgbcolor (color.r, color.g, color.b);
@@ -309,13 +309,13 @@ PostscriptCanvas::setrgbcolor (const synthese::util::RGBColor& color)
 
 
 
-void 
+void
 PostscriptCanvas::text (const std::string& text) {
     _output << "(" << text << ") show" << std::endl;
 }
 
 
-void 
+void
 PostscriptCanvas::pathtext (double offset, const std::string& text) {
     _output << "(" << text << ") " << (int) offset << " pathtext" << std::endl;
 }
@@ -324,90 +324,90 @@ PostscriptCanvas::pathtext (double offset, const std::string& text) {
 
 
 
-void 
+void
 PostscriptCanvas:: newpath () {
     _output << "newpath" << std::endl;
 }
 
-void 
+void
 PostscriptCanvas:: closepath () {
     _output << "closepath" << std::endl;
 }
 
 
-void 
+void
 PostscriptCanvas:: lineto (double x, double y) {
     _output << x << " " << y << " lineto" << std::endl;
 }
 
 
-void 
+void
 PostscriptCanvas:: curveto (double cp1x, double cp1y, double cp2x, double cp2y, double x, double y) {
     _output << cp1x << " " << cp1y << " " << cp2x
 	    << " " << cp2y << " " << x << " " << y << " curveto" << std::endl;
 }
 
 
-void 
+void
 PostscriptCanvas:: square (double width)
 {
     _output << width << " square" << std::endl;
 }
 
 
-void 
+void
 PostscriptCanvas::stroke () {
     _output << "stroke" << std::endl;
 }
 
 
-void 
+void
 PostscriptCanvas::fill () {
     _output << "fill" << std::endl;
 }
 
-void 
+void
 PostscriptCanvas::triangle (double width) {
     _output << width << " triangle" << std::endl;
 }
 
 
 
-void 
+void
 PostscriptCanvas::showPage () {
     _output << "showpage" << std::endl;
 }
 
-void 
+void
 PostscriptCanvas::gsave () {
     _output << "gsave" << std::endl;
 }
 
-void 
+void
 PostscriptCanvas::grestore () {
     _output << "grestore" << std::endl;
 }
 
 
 
-void 
+void
 PostscriptCanvas::scale (double xscale, double yscale) {
     _output << xscale << " " << yscale << " scale" << std::endl;
-}	
+}
 
-void 
+void
 PostscriptCanvas::translate (double xtranslate, double ytranslate) {
     _output << xtranslate << " " << ytranslate << " translate" << std::endl;
-}	
+}
 
-void 
+void
 PostscriptCanvas::rotate (double rotate) {
     _output << rotate << " " << " rotate" << std::endl;
-}	
+}
 
 
-void 
-PostscriptCanvas::sticker (const std::string& label, 
+void
+PostscriptCanvas::sticker (const std::string& label,
                            const synthese::util::RGBColor& bgColor,
                            double xMargin, double yMargin)
 {

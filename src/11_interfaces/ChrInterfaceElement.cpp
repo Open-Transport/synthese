@@ -42,22 +42,22 @@ namespace synthese
 	{
 		string ChrInterfaceElement::display(
 			ostream& stream
-			, const ParametersVector& parameters, 
-              interfaces::VariablesMap& vars, 
-              const void* rootObject, 
+			, const ParametersVector& parameters,
+              interfaces::VariablesMap& vars,
+              const void* rootObject,
 			const server::Request* request
 		) const	{
 			stream << static_cast<char>(atoi (_asciiCode->getValue (parameters, vars, rootObject, request).c_str ()));
             return string();
 		}
 
-              
-              
+
+
 		void ChrInterfaceElement::storeParameters(ValueElementList& vel )
 		{
 			if (vel.size() != 1)
 				throw InterfacePageException("Malformed chr command");
-                        
+
 			_asciiCode = vel.front();
 		}
 	}

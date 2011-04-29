@@ -67,7 +67,7 @@ namespace synthese
 						@code {text to save} @endcode
 					-# recursive call of a value element to parse : The recursive call is surrounded with double braces. The first word is the ValueInterfaceElement to call when the display will be done, and the following ones are its parameters elements which are ValueInterfaceElement too. They are separated by spaces.
 						@code {{valuetype param1 param2 {long text param 3} param4}} @endcode
-						In this case, each parameter is reevaluated by a new recursion of this parse function. 
+						In this case, each parameter is reevaluated by a new recursion of this parse function.
 						The value elements can be cascaded with double braces notation :
 						@code {{valuetype param1 {valuetype2 param2.1 {{param 2.2}} param2.3} param3}} @endcode
 						For calling a value interface element without parameter, surround it with double braces without having to put the : character
@@ -93,7 +93,7 @@ namespace synthese
 			*/
 			ValueElementList();
 
-		
+
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> front();
 			bool isEmpty() const;
 			size_t size() const;

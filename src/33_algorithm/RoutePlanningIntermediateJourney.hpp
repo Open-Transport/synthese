@@ -180,7 +180,7 @@ namespace synthese
 			///		<li>If the two journeys start and end at the same place or call
 			///		both the origin and destination vams, then the best journey is chosen
 			///		according to the comfort criteria</li>
-			///		<li>Else, the choice corresponds to the best bet to reach the 
+			///		<li>Else, the choice corresponds to the best bet to reach the
 			///		destination quickly</li>
 			///	</ul>
 			bool operator>(const RoutePlanningIntermediateJourney& other) const;

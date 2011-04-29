@@ -71,7 +71,7 @@ namespace synthese
 			static const std::string COL_TEMPERATURE_VALUE;
 			static const std::string COL_COMMUNICATION_STATUS;
 			static const std::string COL_LOCALIZATION_STATUS;
-			
+
 
 
 			/** DisplayMonitoringStatus search.
@@ -94,7 +94,7 @@ namespace synthese
 			);
 
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			///	Gets the monitoring status of a screen.
 			///	@param screen the screen to describe

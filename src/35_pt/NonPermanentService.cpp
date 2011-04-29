@@ -62,19 +62,19 @@ namespace synthese
 		){
 			// Mark the date in service calendar
 			Calendar::setInactive(d);
-		
-		    /// @todo Implement it : 
+
+		    /// @todo Implement it :
 			// see in each date if there is at least an other service which runs.
 			// If not unmark the date and see the following one.
 		}
-		
-		
+
+
 		void NonPermanentService::setActive(
 			const date& d
 		){
 			// Mark the date in service calendar
 			Calendar::setActive(d);
-			
+
 			if(dynamic_cast<JourneyPattern*>(getPath()))
 			{
 				date newDate(d);

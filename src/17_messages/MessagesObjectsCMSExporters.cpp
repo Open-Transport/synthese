@@ -50,7 +50,7 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			const Alarm& message
 		){
-			
+
 			if(!page.get())
 			{
 				return;

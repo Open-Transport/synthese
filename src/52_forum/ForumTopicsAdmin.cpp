@@ -63,7 +63,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void ForumTopicsAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -90,7 +90,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool ForumTopicsAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -117,9 +117,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const ForumModule*>(&module) &&
 				_request.getUser() &&
 				_request.getUser()->getProfile() &&
@@ -127,7 +127,7 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 	}

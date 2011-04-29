@@ -154,8 +154,8 @@ namespace synthese
 		string ParametersMap::getURI() const
 		{
 			stringstream ss;
-			for (Map::const_iterator iter = _map.begin(); 
-				iter != _map.end(); 
+			for (Map::const_iterator iter = _map.begin();
+				iter != _map.end();
 				++iter
 			){
 					if (iter != _map.begin ())
@@ -165,9 +165,9 @@ namespace synthese
 
 			return ss.str();
 		}
-		
-		
-		
+
+
+
 		void ParametersMap::merge(const ParametersMap& other)
 		{
 			BOOST_FOREACH(ParametersMap::Map::value_type it, other._map)
@@ -208,7 +208,7 @@ namespace synthese
 		}
 
 
-		
+
 		ParametersMap::MissingParameterException::MissingParameterException( const std::string& field ):
 			_field(field),
 			_message("Missing parameter in request parsing : " + _field)

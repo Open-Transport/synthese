@@ -67,7 +67,7 @@ namespace synthese
 			: AdminInterfaceElementTemplate<TestMapAdmin>(),
 			_useEnvironment(true)
 		{ }
-		
+
 		void TestMapAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -75,9 +75,9 @@ namespace synthese
 			_queryXml = map.getDefault<string>(PARAMETER_QUERY_XML);
 			_useEnvironment = map.getDefault<bool>(PARAMETER_USE_ENVIRONMENT, true);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap TestMapAdmin::getParametersMap() const
 		{
 			ParametersMap m;
@@ -88,15 +88,15 @@ namespace synthese
 		}
 
 
-		
+
 		void TestMapAdmin::display(
 			ostream& stream,
 			const AdminRequest& _request
 		) const	{
 			// Requests
 			AdminFunctionRequest<TestMapAdmin> testMapRequest(_request);
-			
-			
+
+
 			std::string _tempFileUrl;
 			std::string	_postScript;
 			bool		_error(false);
@@ -124,7 +124,7 @@ namespace synthese
 				}
 			}
 
-			
+
 			// Form
 			PropertiesHTMLTable  st(testMapRequest.getHTMLForm("test"));
 			stream << "<h1>Données XML à tester</h1>";
@@ -152,7 +152,7 @@ namespace synthese
 		) const {
 			return user.getProfile()->isAuthorized<GlobalRight>(READ);;
 		}
-		
+
 
 
 		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPagesOfModule(

@@ -40,7 +40,7 @@ namespace synthese
 
 			Usage :
 			@code {{substr <param> <param>}} @endcode
-			
+
 			The parameters of the elements are :
 				-# The string to read
 				-# The position of the first character to return
@@ -74,7 +74,7 @@ namespace synthese
 			std::string display(
 				std::ostream&
 				, const interfaces::ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object = NULL, const server::Request* request = NULL) const;
-			
+
 			/** Parameters storage and quantity verification.
 				@param vel Value Elements List : the parameters
 				@throw InterfacePageException if the parameters number is incorrect

@@ -42,26 +42,26 @@ DrawableLineIndex::DrawableLineIndex()
 {
 
 }
- 
+
 
 
 DrawableLineIndex::~DrawableLineIndex()
 {
-	
-    for (Index2D::iterator it2 = _index.begin (); 
-	 it2 != _index.end (); ++it2) 
+
+    for (Index2D::iterator it2 = _index.begin ();
+	 it2 != _index.end (); ++it2)
     {
-	Index1D* index1 = it2->second;		
-	for (Index1D::iterator it1 = index1->begin (); 
+	Index1D* index1 = it2->second;
+	for (Index1D::iterator it1 = index1->begin ();
 	     it1 != index1->end (); ++it1) {
-	    delete it1->second; 
+	    delete it1->second;
 	}
 	delete index1;
     }
 }
 
 
-void 
+void
 DrawableLineIndex::setScaleX (double scaleX)
 {
 	_scaleX = scaleX;
@@ -69,7 +69,7 @@ DrawableLineIndex::setScaleX (double scaleX)
 
 
 
-void 
+void
 DrawableLineIndex::setScaleY (double scaleY)
 {
 	_scaleY = scaleY;
@@ -83,7 +83,7 @@ DrawableLineIndex::find (const Coordinate& point) const
 {
     return doFind (point);
 }
-	
+
 
 std::set<DrawableLine*>&
 DrawableLineIndex::doFind (const Coordinate& point) const
@@ -92,21 +92,21 @@ DrawableLineIndex::doFind (const Coordinate& point) const
     if (xmap == 0) {
 	xmap = new Index1D ();
 	_index[point.x] = xmap;
-    } 
-	
+    }
+
     std::set<DrawableLine*>* dlset = (*xmap)[point.y];
     if (dlset == 0) {
 	dlset = new std::set<DrawableLine*> ();
 	(*xmap)[point.y] = dlset;
     }
-	
-    return *dlset; 	
+
+    return *dlset;
 }
 
 
 
-void 
-DrawableLineIndex::add (const Coordinate& point, 
+void
+DrawableLineIndex::add (const Coordinate& point,
 			DrawableLine* line) const
 {
     doFind (point).insert (line);
@@ -114,17 +114,17 @@ DrawableLineIndex::add (const Coordinate& point,
 
 
 
-Coordinate 
+Coordinate
 DrawableLineIndex::getFuzzyPoint (const Coordinate& point) const
 {
-	// Iterate on all stored points looking for one which is 
-	// distant to point of less than a minimum distance on the 
+	// Iterate on all stored points looking for one which is
+	// distant to point of less than a minimum distance on the
 	// final rendered map.
 	for (std::vector<Coordinate>::iterator it = _fuzzyPoints.begin ();
 		it != _fuzzyPoints.end (); ++it) {
-		Coordinate fuzzyOutputPoint (it->x * _scaleX, 
+		Coordinate fuzzyOutputPoint (it->x * _scaleX,
 								it->y * _scaleY);
-		Coordinate outputPoint (point.x * _scaleX, 
+		Coordinate outputPoint (point.x * _scaleX,
 						   point.y * _scaleY);
 	    double d = calculateDistance (outputPoint, fuzzyOutputPoint);
 		if (d <= 20) return (*it); // 5 pixels

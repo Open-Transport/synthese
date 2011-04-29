@@ -48,7 +48,7 @@ namespace synthese
 	using namespace geography;
 	using namespace impex;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::StopPointUpdateAction>::FACTORY_KEY("StopPointUpdateAction");
@@ -62,9 +62,9 @@ namespace synthese
 		const string StopPointUpdateAction::PARAMETER_OPERATOR_CODE = Action_PARAMETER_PREFIX + "oc";
 		const string StopPointUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string StopPointUpdateAction::PARAMETER_STOP_AREA = Action_PARAMETER_PREFIX + "sa";
-		
 
-		
+
+
 		ParametersMap StopPointUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -97,9 +97,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void StopPointUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -160,9 +160,9 @@ namespace synthese
 				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
 			}
 		}
-		
-		
-		
+
+
+
 		void StopPointUpdateAction::run(
 			Request& request
 		){
@@ -190,9 +190,9 @@ namespace synthese
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool StopPointUpdateAction::isAuthorized(
 			const Session* session
 		) const {

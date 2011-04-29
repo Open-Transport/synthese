@@ -98,7 +98,7 @@ namespace synthese
 
 			NonConcurrencyRules::iterator it(_nonConcurrencyRules.find(rule));
 			if(it == _nonConcurrencyRules.end()) return;
-			
+
 			_nonConcurrencyRules.erase(it);
 
 			BOOST_FOREACH(const Path* path, _paths)

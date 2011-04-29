@@ -56,7 +56,7 @@ namespace synthese
 
 
 
-		const NamedPlace* 
+		const NamedPlace*
 		PlaceAlias::getAliasedPlace () const
 		{
 			assert(!_includedPlaces.empty());
@@ -65,7 +65,7 @@ namespace synthese
 		}
 
 
-		const std::string& 
+		const std::string&
 		PlaceAlias::getOfficialName () const
 		{
 			return getAliasedPlace()->getOfficialName ();

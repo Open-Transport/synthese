@@ -36,7 +36,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace server;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, accounts::AccountLockAction>::FACTORY_KEY("lock_account");
@@ -44,23 +44,23 @@ namespace synthese
 
 	namespace accounts
 	{
-		
+
 		AccountLockAction::AccountLockAction()
 			: util::FactorableTemplate<Action, AccountLockAction>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap AccountLockAction::getParametersMap() const
 		{
 			ParametersMap map;
 			//map.insert(PARAMETER_xxx, _xxx);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void AccountLockAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			uid id(request.getObjectId());
@@ -73,9 +73,9 @@ namespace synthese
 				throw ActionException("Account not found");
 			}
 		}
-		
-		
-		
+
+
+
 		void AccountLockAction::run(Request& request)
 		{
 			_account->setLocked(true);

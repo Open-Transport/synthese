@@ -143,7 +143,7 @@ namespace synthese
 
 		bool Junction::isValid() const
 		{
-			return _edges.size() == 2 && _services.size() == 1 && static_cast<PermanentService*>(*_services.begin())->getDuration(); 
+			return _edges.size() == 2 && _services.size() == 1 && static_cast<PermanentService*>(*_services.begin())->getDuration();
 		}
 
 

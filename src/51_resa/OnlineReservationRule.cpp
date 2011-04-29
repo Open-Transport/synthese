@@ -66,7 +66,7 @@ namespace synthese
 			_maxSeats(UNKNOWN_VALUE),
 			_reservationRule(NULL),
 			_eMailInterface(NULL)
-		{		
+		{
 		}
 
 		const std::string& OnlineReservationRule::getEMail() const
@@ -218,7 +218,7 @@ namespace synthese
 				);
 				email.setSubject(subject.str());
 				email.addRecipient(resa.getCustomerEMail(), resa.getCustomerName());
-				
+
 				stringstream content;
 				_eMailInterface->getPage<ReservationConfirmationEMailInterfacePage>()->display(
 					content,

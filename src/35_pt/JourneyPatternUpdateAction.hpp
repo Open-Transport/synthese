@@ -57,7 +57,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<JourneyPattern> _route;
-			
+
 			boost::optional<boost::shared_ptr<RollingStock> > _transportMode;
 			boost::optional<std::string> _name;
 			boost::optional<std::string> _direction;
@@ -89,7 +89,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////

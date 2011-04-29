@@ -42,7 +42,7 @@ namespace synthese
 			typedef std::set<const Place*> IncludedPlaces;
 
 		protected:
-			IncludedPlaces _includedPlaces; 
+			IncludedPlaces _includedPlaces;
 
 			IncludingPlace(
 			);
@@ -58,7 +58,7 @@ namespace synthese
 				/** Gets included places.
 				 */
 				const IncludedPlaces& getIncludedPlaces () const;
-			    
+
 			//@}
 
 
@@ -103,4 +103,4 @@ namespace synthese
 	}
 }
 
-#endif 	    
+#endif

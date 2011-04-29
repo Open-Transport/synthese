@@ -36,10 +36,10 @@ namespace synthese
 
 		/** Alarm level.
 
-		- INFO : the solution is available, but some information is 
+		- INFO : the solution is available, but some information is
 		provided for better comfort
 
-		- WARNING : the solution could not be available, or requires action 
+		- WARNING : the solution could not be available, or requires action
 		from the passenger (reservation...)
 		*/
 		typedef enum

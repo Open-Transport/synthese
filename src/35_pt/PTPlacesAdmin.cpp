@@ -90,7 +90,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void PTPlacesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -128,7 +128,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool PTPlacesAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -249,7 +249,7 @@ namespace synthese
 				if(_city.get())
 				{
 					stream << "<h1>Lieux principaux</h1>";
-				
+
 					HTMLTable::ColsVector c;
 					c.push_back("Type");
 					c.push_back("Type");
@@ -440,9 +440,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const PTModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -450,24 +450,24 @@ namespace synthese
 			{
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks PTPlacesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	currentPage.getCurrentTreeBranch().find(*this))
 			{
 				links.push_back(currentPage.getCurrentTreeBranch().getNextSubPage(*this));
 			}
-			
+
 			return links;
 		}
 

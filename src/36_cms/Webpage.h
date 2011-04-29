@@ -56,9 +56,9 @@ namespace synthese
 			@code <?fonction=...&param=...?> @endcode
 
 			The query string can contain spaces and other special characters according to the function loader.
-			
+
 			In order to get the code cleaner, it is possible to insert carriage return inside a query string : all of then will be ignored, as defined in the HTML specifications. To generate a carriage return, insert \n in the content.
-			
+
 			The query string can include recursive calls to other query strings : a parameter of a function can be the result of an other function, without depth limit.
 
 			The carriage return, the \ character, and the <? and ?> sequence are reserved words. It is possible to display it by using special commands :
@@ -77,7 +77,7 @@ namespace synthese
 			The full smart URL for displaying a page follows this pattern :
 			<pre>http://<host><page smart path>[/<main parameter value>][&<other parameters>]</pre>
 
-			To transfert the smart URL into a real one, a Apache Rewrite Rule is necessary. After the rule, the 
+			To transfert the smart URL into a real one, a Apache Rewrite Rule is necessary. After the rule, the
 			URL is transformed into :
 			<pre>http://<host>/<site client url>?fonction=page&smart_url=<page smart path>[/<main parameter value>][&<other parameters>]</pre>
 

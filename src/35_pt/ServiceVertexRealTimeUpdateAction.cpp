@@ -41,7 +41,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace pt;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::ServiceVertexRealTimeUpdateAction>::FACTORY_KEY("ServiceVertexRealTimeUpdateAction");
@@ -53,8 +53,8 @@ namespace synthese
 		const string ServiceVertexRealTimeUpdateAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "se";
 		const string ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID = Action_PARAMETER_PREFIX + "st";
 
-		
-		
+
+
 		ParametersMap ServiceVertexRealTimeUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -69,9 +69,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ServiceVertexRealTimeUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -104,16 +104,16 @@ namespace synthese
 				throw ActionException("Inconsistent physical stop");
 			}
 		}
-		
-		
-		
+
+
+
 		void ServiceVertexRealTimeUpdateAction::run(Request& request)
 		{
 			_service->setRealTimeVertex(_lineStopRank, _physicalStop.get());
 		}
-		
-		
-		
+
+
+
 		bool ServiceVertexRealTimeUpdateAction::isAuthorized(const Session* session
 		) const {
 			return true;

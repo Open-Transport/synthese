@@ -36,7 +36,7 @@ class CleanerThreadExec : public synthese::util::ThreadExec
 
     //! @name Update methods
     //@{
-    void addTempDirectory (const boost::filesystem::path& path, 
+    void addTempDirectory (const boost::filesystem::path& path,
 			   boost::posix_time::time_duration checkPeriod);
 
     void removeTempDirectory (const boost::filesystem::path& path);

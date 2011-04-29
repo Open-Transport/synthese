@@ -80,8 +80,8 @@ namespace synthese
 
 			}
 
-			
-			
+
+
 			////////////////////////////////////////////////////////////////////
 			///	Simple action related exception constructor.
 			///	@param message Exception message
@@ -90,8 +90,8 @@ namespace synthese
 				const std::string& message
 			) throw();
 
-			
-			
+
+
 			////////////////////////////////////////////////////////////////////
 			///	Action related exception destructor.
 			///	@author Hugues Romain

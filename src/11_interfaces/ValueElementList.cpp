@@ -156,7 +156,7 @@ namespace synthese
 				else if (str.at(0) != '{' && str.at(0) != '[')
 				{
 					vie.reset(new StaticValueInterfaceElement(str));
-				} 
+				}
 
 				// Case 3 : multiple word
 				else if(str.size() > 1 && (str.at(0) == '{' && str.at(1) != '{' || str.at(0) == '['))

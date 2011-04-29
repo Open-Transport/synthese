@@ -35,7 +35,7 @@ namespace synthese
 	namespace pt
 	{
 		class CommercialLine;
-	
+
 		////////////////////////////////////////////////////////////////////
 		/// 35.15 Function : Stop Area list public Function class.
 		/// @author Xavier Raffin
@@ -53,7 +53,7 @@ namespace synthese
 		///
 		/// <h2>Standard XML output</h2>
 		///	<h3>Description</h3>
-		/// 
+		///
 		///	@image html StopAreasListFunction.png
 		///
 		///	<h3>Download</h3>

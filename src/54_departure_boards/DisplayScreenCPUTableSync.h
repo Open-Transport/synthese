@@ -55,8 +55,8 @@ namespace synthese
 			static const std::string COL_IS_ONLINE;
 			static const std::string COL_MAINTENANCE_MESSAGE;
 
-			
-			
+
+
 			////////////////////////////////////////////////////////////////////
 			/// DisplayScreenCPU search.
 			///	@param env Environment to populate

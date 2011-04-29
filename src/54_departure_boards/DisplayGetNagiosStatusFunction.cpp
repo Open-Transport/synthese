@@ -43,12 +43,12 @@ namespace synthese
 	using namespace server;
 
 	template<> const string util::FactorableTemplate<Function,departure_boards::DisplayGetNagiosStatusFunction>::FACTORY_KEY("DisplayGetNagiosStatusFunction");
-	
+
 	namespace departure_boards
 	{
 		const string DisplayGetNagiosStatusFunction::PARAMETER_DISPLAY_SCREEN_ID("id");
 
-		
+
 		ParametersMap DisplayGetNagiosStatusFunction::_getParametersMap() const
 		{
 			ParametersMap map;

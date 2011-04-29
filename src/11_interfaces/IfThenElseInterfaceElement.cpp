@@ -54,7 +54,7 @@ namespace synthese
 				? _to_return_if_false->display(stream, parameters, variables, object, request)
 				: _to_return_if_true->display(stream, parameters, variables, object, request);
 		}
-		
+
 		void IfThenElseInterfaceElement::storeParameters(ValueElementList& vel )
 		{
 			if (vel.size() < 2)

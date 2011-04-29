@@ -40,7 +40,7 @@ namespace synthese
 	namespace pt
 	{
 		class TransportNetwork;
-	
+
 		////////////////////////////////////////////////////////////////////
 		/// 35.15 Function : Lines list public Function class.
 		/// @author Hugues Romain
@@ -65,7 +65,7 @@ namespace synthese
 		///
 		/// <h2>Standard XML output</h2>
 		///	<h3>Description</h3>
-		/// 
+		///
 		///	@image html LinesListFunction.png
 		///
 		///	<h3>Download</h3>

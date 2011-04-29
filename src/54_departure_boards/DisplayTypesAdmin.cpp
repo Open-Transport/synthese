@@ -97,9 +97,9 @@ namespace synthese
 			if(_searchInterfaceId) m.insert(PARAMETER_INTERFACE_ID, *_searchInterfaceId);
 			return m;
 		}
-		
-			
-			
+
+
+
 		void DisplayTypesAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -107,7 +107,7 @@ namespace synthese
 
 			// Right
 			bool writeRight(_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
-			
+
 			AdminFunctionRequest<DisplayTypesAdmin> searchRequest(_request);
 
 			AdminActionFunctionRequest<CreateDisplayTypeAction,DisplayTypeAdmin> createRequest(
@@ -115,13 +115,13 @@ namespace synthese
 			);
 			createRequest.setActionWillCreateObject();
 			createRequest.getFunction()->setActionFailedPage<DisplayTypesAdmin>();
-			
+
 			AdminActionFunctionRequest<RemoveObjectAction,DisplayTypesAdmin> deleteRequest(
 				_request
 			);
 
 			AdminFunctionRequest<DisplayTypeAdmin> openRequest(_request);
-			
+
 			stream << "<h1>Recherche</h1>";
 
 			SearchFormHTMLTable f(searchRequest.getHTMLForm());
@@ -152,7 +152,7 @@ namespace synthese
 					_requestParameters.raisingOrder,
 					UP_LINKS_LOAD_LEVEL
 			)	);
-			
+
 			ResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(DisplayTypeTableSync::COL_NAME, "Nom"));
 			v.push_back(make_pair(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, "Interface d'affichage"));
@@ -163,7 +163,7 @@ namespace synthese
 			{
 				v.push_back(make_pair(string(), "Actions"));
 			}
-			
+
 			ActionResultHTMLTable t(
 				v,
 				searchRequest.getHTMLForm(),
@@ -183,7 +183,7 @@ namespace synthese
 				stream << t.col() << dt->getName();
 				stream << t.col() << ((dt->getDisplayInterface() == NULL) ? "(aucune)" : dt->getDisplayInterface()->getName());
 				stream << t.col() << dt->getRowNumber();
-				
+
 				stream << t.col();
 				if(	dt->getMonitoringInterface() != NULL &&
 					dt->getTimeBetweenChecks().minutes() > 0
@@ -192,7 +192,7 @@ namespace synthese
 				} else {
 					stream << "(non supervisé)";
 				}
-				
+
 				stream <<
 					t.col() <<
 					openRequest.getHTMLForm().getLinkButton("Ouvrir", string(), "monitor_edit.png")
@@ -215,7 +215,7 @@ namespace synthese
 			if (writeRight)
 			{
 				stream << t.row();
-				
+
 				stream <<
 					t.col() <<
 					t.getActionForm().getTextInput(
@@ -261,15 +261,15 @@ namespace synthese
 			);
 		}
 
-		
-		
+
+
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const DeparturesTableModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -295,7 +295,7 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const {
-		
+
 			DisplayTypeTableSync::SearchResult types(
 				DisplayTypeTableSync::Search(
 					Env::GetOfficialEnv(),

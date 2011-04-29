@@ -38,7 +38,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, interfaces::InterfacePageAddAction>::FACTORY_KEY("InterfacePageAddAction");
@@ -49,9 +49,9 @@ namespace synthese
 		const string InterfacePageAddAction::PARAMETER_CLASS = Action_PARAMETER_PREFIX + "cl";
 		const string InterfacePageAddAction::PARAMETER_INTERFACE_ID = Action_PARAMETER_PREFIX + "ii";
 		const string InterfacePageAddAction::PARAMETER_VARIANT = Action_PARAMETER_PREFIX + "va";
-		
-		
-		
+
+
+
 		ParametersMap InterfacePageAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -63,9 +63,9 @@ namespace synthese
 			map.insert(PARAMETER_VARIANT, _variant);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void InterfacePageAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Interface id
@@ -88,9 +88,9 @@ namespace synthese
 			// Variant
 			_variant = map.get<string>(PARAMETER_VARIANT);
 		}
-		
-		
-		
+
+
+
 		void InterfacePageAddAction::run(
 			Request& request
 		){
@@ -100,9 +100,9 @@ namespace synthese
 			InterfacePageTableSync::Save(object.get());
 			request.setActionCreatedId(object->getKey());
 		}
-		
-		
-		
+
+
+
 		bool InterfacePageAddAction::isAuthorized(
 			const Session* session
 		) const {

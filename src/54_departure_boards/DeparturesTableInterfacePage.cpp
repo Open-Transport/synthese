@@ -96,7 +96,7 @@ namespace synthese
 			bool displayClock,
 			const pt::StopArea* place ,
 			const RoutePlanningListWithAlarm& rows ,
-			const server::Request* request /*= NULL */ 
+			const server::Request* request /*= NULL */
 		) const	{
 			ParametersVector pv;
 			pv.push_back(title);
@@ -126,4 +126,4 @@ namespace synthese
 		}
 	}
 }
- 
+

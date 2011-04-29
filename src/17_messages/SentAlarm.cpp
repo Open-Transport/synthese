@@ -72,7 +72,7 @@ namespace synthese
 			const SentAlarm& source
 		):	Alarm(source, &scenario),
 			Registrable(0),
-			_template(source._template)			
+			_template(source._template)
 		{
 		}
 
@@ -101,7 +101,7 @@ namespace synthese
 			// Common period : different level gives priority to an alarm
 			if (other.getLevel() != getLevel())
 				return ALARM_WARNING_ON_INFO;
-*/			
+*/
 //			return ALARM_CONFLICT;
 			return ALARM_NO_CONFLICT;
 		}

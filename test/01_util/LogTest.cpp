@@ -25,7 +25,7 @@ BOOST_AUTO_TEST_CASE (testBasicLogging)
       log.warn ("message 3");
       log.error ("message 4");
       log.fatal ("message 5");
-      
+
       // Default log level is INFO
       char lineBuffer[256];
 
@@ -92,13 +92,13 @@ struct LogThread
 {
     Log& _log;
     const std::string _testMessage;
-    
-    LogThread (Log& log, const std::string& testMessage) 
+
+    LogThread (Log& log, const std::string& testMessage)
 	: _log (log)
-	, _testMessage (testMessage) 
+	, _testMessage (testMessage)
 	{
 	}
-    
+
     void operator()()
 	{
 	    // Print 1000 times the test message.
@@ -109,12 +109,12 @@ struct LogThread
 	    }
 	}
 };
-    
 
 
 
 
-  
+
+
 
 BOOST_AUTO_TEST_CASE (testConcurrentLogging)
 {
@@ -133,7 +133,7 @@ BOOST_AUTO_TEST_CASE (testConcurrentLogging)
       for (int i=0; i<10; ++i) {
 	  threads.create_thread(testLog);
       }
-      
+
       threads.join_all();
 
       // If the class is thread safe nothing is mixed in the
@@ -146,12 +146,12 @@ BOOST_AUTO_TEST_CASE (testConcurrentLogging)
       {
 	  buffer.getline (lineBuffer, 256);
 	  std::string line (lineBuffer);
-	  
+
 	  if (line.size () == 0) break;
 	  if (expectedLineSize == -1) expectedLineSize = line.size ();
 
 	  BOOST_REQUIRE_EQUAL (expectedLineSize, (int) line.size ());
-      } 
+      }
 
 }
 

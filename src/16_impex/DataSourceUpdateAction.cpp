@@ -39,7 +39,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace impex;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, impex::DataSourceUpdateAction>::FACTORY_KEY("DataSourceUpdateAction");
@@ -53,9 +53,9 @@ namespace synthese
 		const string DataSourceUpdateAction::PARAMETER_ICON = Action_PARAMETER_PREFIX + "ic";
 		const string DataSourceUpdateAction::PARAMETER_CHARSET = Action_PARAMETER_PREFIX + "cs";
 		const string DataSourceUpdateAction::PARAMETER_SRID = Action_PARAMETER_PREFIX + "sr";
-		
-		
-		
+
+
+
 		ParametersMap DataSourceUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -85,9 +85,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void DataSourceUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.isDefined(PARAMETER_DATA_SOURCE)) try
@@ -144,9 +144,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		void DataSourceUpdateAction::run(
 			Request& request
 		){
@@ -183,9 +183,9 @@ namespace synthese
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool DataSourceUpdateAction::isAuthorized(
 			const Session* session
 		) const {

@@ -9,34 +9,34 @@ namespace util
 
 
 
-ThreadExec::ThreadExec () 
+ThreadExec::ThreadExec ()
 {
-    
+
 }
-    
 
 
-ThreadExec::~ThreadExec () 
+
+ThreadExec::~ThreadExec ()
 {
 }
-    
 
 
 
-void 
+
+void
 ThreadExec::initialize ()
 {
 }
 
 
-void 
+void
 ThreadExec::finalize ()
 {
 }
 
 
- 
-void 
+
+void
 ThreadExec::loops (int nbLoops)
 {
     for (int i=0; i<nbLoops; ++i)

@@ -49,7 +49,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_SESSION_ID_TO_CONTROL;
 			static const std::string PARAMETER_CMS_TEMPLATE_ID;
-			
+
 		private:
 			static const std::string TAG_VALID_SESSION;
 			static const std::string ATTR_ID;
@@ -60,8 +60,8 @@ namespace synthese
 				std::string _sessionIdToControl;
 				boost::shared_ptr<const cms::Webpage> _cmsTemplate;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Session_test#Request
@@ -70,9 +70,9 @@ namespace synthese
 			/// @author Hugues Romain (RCSmobility)
 			/// @date 2009-2011
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Session_test#Request
@@ -83,8 +83,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 
 
@@ -97,9 +97,9 @@ namespace synthese
 			/// @author Hugues Romain (RCSmobility)
 			/// @date 2009-2011
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @return true if the function can be run

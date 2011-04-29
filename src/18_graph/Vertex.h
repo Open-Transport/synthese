@@ -77,7 +77,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const Hub*		getHub()				const;  
+				const Hub*		getHub()				const;
 				const Edges&	getDepartureEdges ()	const;
 				const Edges&	getArrivalEdges ()		const;
 			//@}

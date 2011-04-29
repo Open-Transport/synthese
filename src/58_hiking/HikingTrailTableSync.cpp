@@ -56,7 +56,7 @@ namespace synthese
 		const string HikingTrailTableSync::COL_URL ("url");
 		const string HikingTrailTableSync::COL_STOPS ("stops");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<HikingTrailTableSync>::TABLE(
@@ -193,9 +193,9 @@ namespace synthese
 		){
 		}
 	}
-	
-	
-	
+
+
+
 	namespace hiking
 	{
 		HikingTrailTableSync::SearchResult HikingTrailTableSync::Search(

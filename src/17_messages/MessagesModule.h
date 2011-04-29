@@ -36,7 +36,7 @@ namespace synthese
 {
 	/** @defgroup m17Exceptions 17.01 Exceptions
 		@ingroup m17
-		
+
 		@defgroup m17LS 17.10 Table synchronizers
 		@ingroup m17
 
@@ -57,7 +57,7 @@ namespace synthese
 
 		@defgroup m17Actions 17.15 Actions
 		@ingroup m17
-		
+
 		@defgroup m17 17 Messages
 		@ingroup m1
 	@{	*/
@@ -90,9 +90,9 @@ namespace synthese
 		public:
 
 			static MessagesByRecipientId::mapped_type GetMessages(util::RegistryKeyType recipientId);
-			
+
 			static void AddMessage(util::RegistryKeyType recipientId, SentAlarm* value);
-			
+
 			static void RemoveMessage(util::RegistryKeyType recipientId, SentAlarm* value);
 
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
@@ -133,7 +133,7 @@ namespace synthese
 			typedef std::vector<std::pair<boost::optional<AlarmLevel>, std::string> > LevelLabels;
 
 			static LevelLabels getLevelLabels(bool withAll = false);
-			
+
 			static Labels GetLevelLabelsWithScenarios(
 				bool withAll
 			);

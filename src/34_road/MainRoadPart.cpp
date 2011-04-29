@@ -128,12 +128,12 @@ namespace synthese
 							-chunk.getMetricOffset()
 					)	);
 					_reverseRoad->addEdge(
-						*reverseChunk							
+						*reverseChunk
 					);
 					chunk.setReverseRoadChunk(reverseChunk);
 				}
 			}
-		
+
 			addEdge(static_cast<Edge&>(chunk));
 		}
 

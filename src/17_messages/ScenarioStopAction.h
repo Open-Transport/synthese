@@ -40,7 +40,7 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_SCENARIO_ID;
-			
+
 		private:
 			boost::shared_ptr<SentScenario>	_scenario;
 			const boost::posix_time::ptime	_stopDateTime;
@@ -64,7 +64,7 @@ namespace synthese
 			void run(server::Request& request);
 
 			virtual bool isAuthorized(const server::Session* session) const;
-			
+
 			void setScenario(boost::shared_ptr<SentScenario> value);
 		};
 	}

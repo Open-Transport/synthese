@@ -70,12 +70,12 @@ namespace synthese
 			{
 				return boost::static_pointer_cast<P, AdminInterfaceElement>(
 					this->getFunction()->getPage()
-				); 
+				);
 			}
 
 			boost::shared_ptr<AdminInterfaceElement> getActionFailedPage() const
 			{
-				return this->getFunction()->getActionFailedPage(); 
+				return this->getFunction()->getActionFailedPage();
 			}
 
 
@@ -85,7 +85,7 @@ namespace synthese
 				this->getFunction()->setActionFailedPage(aie);
 			}
 
-			
+
 
 			template<class T>
 			void setActionFailedPage()

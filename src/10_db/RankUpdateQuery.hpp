@@ -108,7 +108,7 @@ namespace synthese
 		template<class Table>
 		void RankUpdateQuery<Table>::execute(boost::optional<DBTransaction&> transaction) const
 		{
-			
+
 			_updateQuery->execute(transaction);
 		}
 	}

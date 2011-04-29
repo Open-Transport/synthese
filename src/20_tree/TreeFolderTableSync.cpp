@@ -50,7 +50,7 @@ namespace synthese
 		const string TreeFolderTableSync::COL_PARENT_ID ("parent_id");
 		const string TreeFolderTableSync::COL_NAME ("name");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<TreeFolderTableSync>::TABLE(
@@ -118,12 +118,12 @@ namespace synthese
 
 		template<> void DBDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Unlink(
 			TreeFolderRoot* obj
-		){			
+		){
 		}
 	}
-	
-	
-	
+
+
+
 	namespace tree
 	{
 		TreeFolderTableSync::SearchResult TreeFolderTableSync::Search(

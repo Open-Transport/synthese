@@ -8,14 +8,14 @@ Search::Search(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res)
 
 Search::~Search()
 {
-	
+
 
 }
 /*
 	this function is the principal to begin the procedure of the initinairy search
 	@parameter:
 		string: fatalError
-	@return:	
+	@return:
 		int:  to signe the next step,
 			1: Reservation
 			-1: if fatalError raised
@@ -27,7 +27,7 @@ int Search::start(SessionReturnType *_session)
 {
 	session=_session;
 	if(_session->sessionId.empty()) Functions::setFatalError("without session id in Search processus");
-	
+
 	if(Functions::getFatalError().empty())
 	{
 		try
@@ -42,7 +42,7 @@ int Search::start(SessionReturnType *_session)
 			Functions::translateExpt(e);
 			return -1;
 		}
-		
+
 		if(session->favoris.size()!=0)	// with favoris
 		{
 
@@ -74,19 +74,19 @@ int Search::start(SessionReturnType *_session)
 				}
 				while(!session->solutionVector.at(choicedFavorisTrajet-1).reservation);
 			}
-			
-			
+
+
 			return 1;		// Ok
 
 		}
 		// without favoris, ask origne & dest first
 		// T9 input, will be realized after Nov.
-		else  
+		else
 		{
 			// do nothing before Nov.
 			return 0;
 		}
-	
+
 	}
 	else
 	{
@@ -128,7 +128,7 @@ string Search::readDateTime(int prefix)
 		dtmfInput=Functions::readKey(agi,res,menuKey,3,1,"veuillez entrer, 1, pour une recherche en temps actuel. presser 2 pour modifier l\'heure du trajet cherché. presser 3 pour modifier la date et l\'heure du trajet cherché.");
 	}
 	else dtmfInput=prefix;
-	
+
 	if(dtmfInput==1) return "A";
 	if(dtmfInput==2)
 	{
@@ -138,7 +138,7 @@ string Search::readDateTime(int prefix)
 		else
 		{
 			string dt=synthese::util::Conversion::ToString(dtmfInput);
-			
+
 			if(dt.size()<2)
 			{
 				string zeros;
@@ -146,14 +146,14 @@ string Search::readDateTime(int prefix)
 				cerr<<"no enough number detected, "<<zeros<<" will be added"<<endl;
 				dt.insert(0,zeros);
 			}
-			
+
 			// dt format orignal: 08350310 , il faut 03-10 08:35
 			string hour=dt.substr(0,2); cerr<<"hour input: "<<hour<<", ";
 			//string min=dt.substr(2,2); cerr<<"min input: "<<min<<", ";
 			string min="01"; cerr<<"min input:"<<min<<", ";
 			string date=synthese::util::Conversion::ToString(dateTime->getDay()); cerr<<"date input: "<<date<<", ";
 			string month=synthese::util::Conversion::ToString(dateTime->getMonth()); cerr<<"month input: "<<month<<", "; cerr<<endl;
-			
+
 			string year=synthese::util::Conversion::ToString(dateTime->getYear());
 			dt=year+"-"+month+"-"+date+" "+hour+":"+min;
 			cerr<<"time organised: "<<dt<<endl;
@@ -168,7 +168,7 @@ string Search::readDateTime(int prefix)
 		else
 		{
 			string dt=synthese::util::Conversion::ToString(dtmfInput);
-			
+
 			if(dt.size()<4)
 			{
 				string zeros;
@@ -178,14 +178,14 @@ string Search::readDateTime(int prefix)
 			}
 			string date=dt.substr(0,2); cerr<<"date input: "<<date<<", ";
 			string month=dt.substr(2,2); cerr<<"month input: "<<month<<", "; cerr<<endl;
-			
+
 			dt=readDateTime(2);
-			
+
 			// dt format orignal: 08350310 , il faut 03-10 08:35
 			string hour=dt.substr(10,2); cerr<<"hour input: "<<hour<<", ";
 			string min=dt.substr(13,2); cerr<<"min input: "<<min<<", ";
-			
-			
+
+
 			string year=synthese::util::Conversion::ToString(dateTime->getYear());
 			dt=year+"-"+month+"-"+date+" "+hour+":"+min;
 			cerr<<"time organised: "<<dt<<endl;
@@ -216,17 +216,17 @@ string Search::readDateTime(int prefix)
 string Search::searchFromSynthese(int _favoris) throw (int)
 {
 		_favoris--;
-		
+
 		string dt=readDateTime();
 		string req="fonction=rp&si=3&da="+dt+"&msn=3&dct="+session->favoris.at(_favoris).origin_city+"&dpt="+session->favoris.at(_favoris).origin_place+"&act="+session->favoris.at(_favoris).destination_city+"&apt="+session->favoris.at(_favoris).destination_place+"&ac=0";
-				
+
 		// valeur de retour à reflechir
 		string xml=Functions::makeRequest(req);
-		
+
 		/*
 		<solution
 			rank="1"
-			date="2007-11-03 19:38:00" 
+			date="2007-11-03 19:38:00"
 			reservation="1"
 			sentence="D?tail de votre trajet : Vous partez de City68 93.A 19:38, prenez la ligne 92 ? destination de City12 99.Descendez ? l\'arr?tCity12 97.A 20:11, prenez la ligne 94 ? destination de City68 93.Descendez ? l\'arr?tCity6 95.Vous arrivez ? City6 95 ? 20:15.Attention ! La r?servation est obligatoire pour pouvoir emprunter cette relation.Taper 1 pour r?server votre place." />
 		*/
@@ -235,14 +235,14 @@ string Search::searchFromSynthese(int _favoris) throw (int)
 		int n=0;
 		XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, "solutions");
 		XMLNode xmlNodeChild=synthese::util::XmlToolkit::GetChildNode(xmlNode,"solution",0);
-		
+
 		bool stillValue=true;
 		SessionReturnType::SolutionSt solutionSt;
 		string place;
-		
+
 		while(!xmlNodeChild.isEmpty())
 		{
-			
+
 			place="rank";
 			solutionSt.rank=synthese::util::XmlToolkit::GetIntAttr(xmlNodeChild,place);;
 			place="date";
@@ -251,19 +251,19 @@ string Search::searchFromSynthese(int _favoris) throw (int)
 			solutionSt.reservation=synthese::util::XmlToolkit::GetIntAttr(xmlNodeChild,place);
 			place="sentence";
 			solutionSt.sentence=synthese::util::XmlToolkit::GetStringAttr(xmlNodeChild,place);
-			
+
 			cerr<<endl;
 			cerr<<"solution rank: "<<solutionSt.rank<<endl;
 			cerr<<"date: "<<solutionSt.date<<endl;
 			cerr<<"reservation: "<<solutionSt.reservation<<endl;
 			cerr<<"sentence: "<<solutionSt.sentence<<endl;
-				
+
 			session->solutionVector.push_back(solutionSt);
 			xmlNodeChild=synthese::util::XmlToolkit::GetChildNode(xmlNode,"solution",++n);
 		}
-		
+
 		return Functions::smartXmlParser(xml,"sentence");
-	
-	
+
+
 }
 

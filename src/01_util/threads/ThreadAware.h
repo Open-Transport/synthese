@@ -49,7 +49,7 @@ private:
     const boost::thread _ownerThread;
 
  protected:
-    
+
     ThreadAware ();
     virtual ~ThreadAware ();
 

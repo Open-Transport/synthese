@@ -60,7 +60,7 @@ namespace synthese
 		class PTFileFormat
 		{
 		public:
-			/// The created object is owned by the environment (it is not required to 
+			/// The created object is owned by the environment (it is not required to
 			/// maintain the returned shared pointer)
 			static boost::shared_ptr<JourneyPattern> CreateJourneyPattern(
 				const JourneyPattern::StopsWithDepartureArrivalAuthorization& stops,
@@ -73,7 +73,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// @return the created network object.
-			/// The created object is owned by the environment (it is not required to 
+			/// The created object is owned by the environment (it is not required to
 			/// maintain the returned shared pointer)
 			static TransportNetwork* CreateOrUpdateNetwork(
 				impex::ImportableTableSync::ObjectBySource<TransportNetworkTableSync>& networks,
@@ -88,7 +88,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// @return the created network object.
-			/// The created object is owned by the environment (it is not required to 
+			/// The created object is owned by the environment (it is not required to
 			/// maintain the returned shared pointer)
 			static CommercialLine* CreateOrUpdateLine(
 				impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>& lines,

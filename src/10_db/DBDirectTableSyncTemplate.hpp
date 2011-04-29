@@ -60,13 +60,13 @@ namespace synthese
 		////////////////////////////////////////////////////////////////////////
 		///	Table synchronizer template (abstract class) for standard SYNTHESE
 		///	tables.
-		///	
+		///
 		/// A standard SYNTHESE table has the following properties :
 		///		- Removal allowed
 		///		- Autoincrement activated
 		///		- an internal class corresponds to the records of the table
 		///		- a Load and a Save function convert records into class object
-		///			and vice versa 
+		///			and vice versa
 		///	@ingroup m10
 		////////////////////////////////////////////////////////////////////////
 		template <class K, class T>
@@ -120,7 +120,7 @@ namespace synthese
 					}
 					object.reset(new T(key));
 				}
-				
+
 				return object;
 			}
 
@@ -135,7 +135,7 @@ namespace synthese
 				@param linkLevel Level of load recursion (see each TableSync to know precisely the signification of each level for each class)
 				@return shared pointer Pointer to an object corresponding to the fetched record.
 				@throw DBEmptyResultException if the object was not found
-				
+
 				Note : in case of writing in the environment, the object present in the environment will have read/write permissions.
 			*/
 			static boost::shared_ptr<const T> Get(
@@ -208,9 +208,9 @@ namespace synthese
 				return LoadFromQuery(query.toString(), env, linkLevel);
 			}
 
-			
+
 			////////////////////////////////////////////////////////////////////
-			/// Load objects into an environment, from a SQL query, and return 
+			/// Load objects into an environment, from a SQL query, and return
 			/// the list of loaded objects.
 			///	@param query SQL query
 			///	@param env Environment to write
@@ -324,7 +324,7 @@ namespace synthese
 				)	)	);
 
 				geos::geom::Envelope envelope(*minPoint->getCoordinate(), *maxPoint->getCoordinate());
-				
+
 				return SearchByEnvelope(envelope, env, linkLevel);
 			}
 		};

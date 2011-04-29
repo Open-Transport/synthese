@@ -48,7 +48,7 @@ namespace synthese
 			//! @name Field names
 			//@{
 				static const std::string COL_NAME;
-				static const std::string COL_NODE_ID;	
+				static const std::string COL_NODE_ID;
 				static const std::string COL_NODE_EXTENSION;
 				static const std::string COL_USER_EMAIL;
 				static const std::string COL_USER_NAME;
@@ -58,10 +58,10 @@ namespace synthese
 				static const std::string COL_CLOSED;
 				static const std::string COL_IP;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	ForumTopic search.
 				///	@param env Environment to populate

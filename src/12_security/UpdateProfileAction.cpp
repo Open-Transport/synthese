@@ -38,7 +38,7 @@ namespace synthese
 	using namespace server;
 	using namespace db;
 	using namespace dblog;
-	using namespace util;	
+	using namespace util;
 
 	namespace util
 	{
@@ -103,8 +103,8 @@ namespace synthese
 			/// @todo add a control on the users profile
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
 		}
-		
-		
+
+
 		void UpdateProfileAction::setProfile(boost::shared_ptr<const Profile> value)
 		{
 			_profile = const_pointer_cast<Profile>(value);

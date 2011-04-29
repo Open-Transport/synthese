@@ -46,7 +46,7 @@ namespace synthese
 			};
 
 			typedef std::set<boost::shared_ptr<const Reservation>, ReservationsLess> ReservationsList;
-			
+
 
 		private:
 			ReservationsList	_reservations;

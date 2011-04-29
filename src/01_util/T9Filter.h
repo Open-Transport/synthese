@@ -34,7 +34,7 @@ namespace synthese
 	namespace util
 	{
 
-		/** Converts any letter into T9 replacement digit. 
+		/** Converts any letter into T9 replacement digit.
 			The digits are unchanged.
 			All other characters are converted to 0.
 			@ingroup m01
@@ -46,7 +46,7 @@ namespace synthese
 
 			T9Filter () {}
 
-			template<typename Sink> 
+			template<typename Sink>
 			bool put(Sink& dest, int c);
 
 
@@ -56,7 +56,7 @@ namespace synthese
 
 
 		template<typename Sink>
-		bool 
+		bool
 			T9Filter::put(Sink& dest, int c)
 		{
 			if (c >= 'A' && c <= 'C' || c >= 'a' && c <= 'c' || c == 'à' || c == 'Â' || c == 'Ä' || c == 'ç' || c == 'À')

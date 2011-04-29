@@ -63,11 +63,11 @@ namespace synthese
 
 
 		AlarmObjectLink::AlarmObjectLink(
-			RegistryKeyType key 
+			RegistryKeyType key
 		):	Registrable(key),
 			_alarm(NULL)
 		{
-		
+
 		}
 
 

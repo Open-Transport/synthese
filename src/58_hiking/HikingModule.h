@@ -55,12 +55,12 @@ namespace synthese
 
 		@defgroup m58Logs 58 DB Logs
 		@ingroup m58
-		
+
 		@defgroup m58 58 Hiking
 		@ingroup m5
-		
+
 		(Module documentation)
-		
+
 		@{
 	*/
 
@@ -79,12 +79,12 @@ namespace synthese
 			public server::ModuleClassTemplate<HikingModule>
 		{
 		private:
-			
+
 		public:
 			/** Initialization of the 58 Hiking module after the automatic database loads.
 				@author Hugues
 				@date 2010
-			*/			
+			*/
 			void initialize();
 		};
 	}

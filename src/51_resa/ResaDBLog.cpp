@@ -254,11 +254,11 @@ namespace synthese
 			shared_ptr<ReservationTransaction> tr;
 			ReservationStatus status(NO_RESERVATION);
 			Env env;
-			
+
 			if (Conversion::ToLongLong(content[ResaDBLog::COL_RESA]) > 0)
 			{
 				tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]), env);
-				
+
 				ReservationTableSync::SearchResult reservations(
 					ReservationTableSync::Search(env, tr->getKey())
 				);
@@ -385,7 +385,7 @@ namespace synthese
 				{
 
 				}
-			
+
 				result.push_back(stream.str());
 			}
 
@@ -430,10 +430,10 @@ namespace synthese
 
 			case ResaDBLog::DELAYED_CANCELLATION_ENTRY:
 				return ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY);
-				
+
 			case ResaDBLog::NO_SHOW_ENTRY:
 				return ResaModule::GetStatusIcon(NO_SHOW);
-				
+
 			case ResaDBLog::CUSTOMER_COMMENT_ENTRY:
 				return "user_comment.png";
 

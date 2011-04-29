@@ -3,7 +3,7 @@
 	@file TransactionPartTableSync.cpp
 
 	This file belongs to the VINCI BIKE RENTAL SYNTHESE module
-	Copyright (C) 2006 Vinci Park 
+	Copyright (C) 2006 Vinci Park
 	Contact : Raphaël Murat - Vinci Park <rmurat@vincipark.com>
 
 	This program is free software; you can redistribute it and/or
@@ -54,7 +54,7 @@ namespace synthese
 	{
 		template<> const std::string FactorableTemplate<DBTableSync,TransactionPartTableSync>::FACTORY_KEY("57.30 Transaction Part");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<TransactionPartTableSync>::TABLE.NAME = "t030_transaction_parts";
@@ -167,7 +167,7 @@ namespace synthese
 			if (account != NULL)
 				query << " AND p." << TABLE_COL_ACCOUNT_ID << "=" << Conversion::ToString(account->getKey());
 			query << " LIMIT " << number << " OFFSET " << first;
-			
+
 			DBResultSPtr rows = db->execQuery(query.str());
 			vector<shared_ptr<TransactionPart> > tps;
 			while (rows->next ())
@@ -242,7 +242,7 @@ namespace synthese
 			if (!order)
 				query << " DESC ";
 			query << " LIMIT " << number << " OFFSET " << first;
-			
+
 			DBResultSPtr rows = db->execQuery(query.str());
 			vector<shared_ptr<TransactionPart> > tps;
 			while (rows->next ())
@@ -253,8 +253,8 @@ namespace synthese
 			}
 			return tps;
 		}
-	    
-	    
+
+
 		map<int, int> TransactionPartTableSync::count(
 			shared_ptr<const Account> account, Date startDate, Date endDate, int first, int number
 		){
@@ -272,7 +272,7 @@ namespace synthese
 				<< " GROUP BY strftime('%H', t.start_date_time) "
 				<< " LIMIT " << number << " OFFSET " << first
 			;
-			
+
 			DBResultSPtr rows = db->execQuery(query.str());
 			map<int, int> mapii;
 			while (rows->next ())

@@ -65,7 +65,7 @@ namespace synthese
 			The way to determinate if a journey is useful is :
 				- if the vertex record is empty, insert the journey and accept it
 				- if the vertex is not empty, loop on the ascending transfer number. For each one :
-					- if the recorded transfers number is less than the transfer number of the journey 
+					- if the recorded transfers number is less than the transfer number of the journey
 						- if the recorded duration is smaller or equal to the duration of the journey, return not to keep the journey
 						- if the recorded duration is longer than the duration of the journey, do nothing and continue the loop
 					- if the recorded transfers number is equal to the transfers number of the journey :
@@ -106,7 +106,7 @@ namespace synthese
 						boost::posix_time::time_duration,
 						boost::shared_ptr<RoutePlanningIntermediateJourney>
 			>	>	> TimeMap;
-		    
+
 			TimeMap _bestTimeMap;
 			const PlanningPhase _accessDirection;
 

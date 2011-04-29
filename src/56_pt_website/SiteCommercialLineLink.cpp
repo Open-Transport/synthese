@@ -35,7 +35,7 @@ namespace synthese
 	namespace pt_website
 	{
 		SiteCommercialLineLink::SiteCommercialLineLink(
-			util::RegistryKeyType id 
+			util::RegistryKeyType id
 		):	Registrable(id)
 		{
 

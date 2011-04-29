@@ -46,7 +46,7 @@ namespace synthese
 			@ingroup m53
 		*/
 		class JourneysResult
-		{			
+		{
 		public:
 			typedef std::map<
 				boost::shared_ptr<RoutePlanningIntermediateJourney>,
@@ -56,7 +56,7 @@ namespace synthese
 
 		private:
 			typedef std::map<const graph::Vertex*, ResultSet::iterator> IndexMap;
-			
+
 			boost::posix_time::ptime _originDateTime;
 			const PlanningPhase _accessDirection;
 			ResultSet	_result;
@@ -105,12 +105,12 @@ namespace synthese
 					@author Hugues Romain
 				*/
 				void add(boost::shared_ptr<RoutePlanningIntermediateJourney> journey);
-			
-				
+
+
 				/** Adds an empty journey for a specified vertex.
 					@param method Access direction of the journey to create
 					@author Hugues Romain
-					@date 2008					
+					@date 2008
 				*/
 				void addEmptyJourney();
 
@@ -122,8 +122,8 @@ namespace synthese
 				*/
 				boost::shared_ptr<RoutePlanningIntermediateJourney> front();
 
-				
-				
+
+
 				/** Removes useless result journeys according to the current best reaches.
 					@param updateMinSpeed
 					@param newMaxTime
@@ -150,9 +150,9 @@ namespace synthese
 					@author Hugues Romain
 				*/
 				boost::shared_ptr<RoutePlanningIntermediateJourney> get(const graph::Vertex* vertex) const;
-				
-				
-				
+
+
+
 				/** Is the result empty ?.
 					@return bool true if the result is empty
 					@author Hugues Romain

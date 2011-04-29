@@ -56,7 +56,7 @@ namespace synthese
 
 		private:
 			ParametersMap _parametersMap;
-			
+
 		public:
 			DynamicRequest(
 				const HTTPRequest& httpRequest
@@ -82,7 +82,7 @@ namespace synthese
 				return boost::static_pointer_cast<FunctionT, Function>(_function);
 			}
 
-		
+
 			template<class FunctionT>
 			boost::shared_ptr<const FunctionT> getFunction() const
 			{
@@ -93,9 +93,9 @@ namespace synthese
 				return boost::static_pointer_cast<const FunctionT, Function>(_function);
 			}
 */
-		
-		
-		
+
+
+
 			virtual void _loadAction();
 
 

@@ -49,8 +49,8 @@ namespace synthese
 	using namespace calendar;
 	using namespace graph;
 	using namespace pt;
-	
-		
+
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<DBTableSync,CompositionTableSync>::FACTORY_KEY("37.11 Compositions");
@@ -63,7 +63,7 @@ namespace synthese
 		const string CompositionTableSync::COL_DATES("dates");
 		const string CompositionTableSync::COL_SERVED_VERTICES("served_vertices");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<CompositionTableSync>::TABLE(
@@ -275,9 +275,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace pt_operation
 	{
 		CompositionTableSync::SearchResult CompositionTableSync::Search(

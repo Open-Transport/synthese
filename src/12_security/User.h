@@ -39,8 +39,8 @@ namespace synthese
 
 		/** Utilisateur.
 			@ingroup m12
-		
-			Un utilisateur correspond à un identifiant de connexion rattaché à une personne. 
+
+			Un utilisateur correspond à un identifiant de connexion rattaché à une personne.
 			Les données suivantes lui sont reliées :
 				- un nom d'utilisateur
 				- un mot de passe
@@ -73,7 +73,7 @@ namespace synthese
 			bool			_isConnectionAllowed;
 			boost::gregorian::date	_birthDate;
 			const Language*	_language;
-			
+
 		public:
 			User(util::RegistryKeyType id = 0);
 
@@ -81,7 +81,7 @@ namespace synthese
 			//@{
 				void setProfile(const Profile* profile);
 				void setLogin(const std::string& login);
-				
+
 				/** Password setter.
 					@todo handle encryption
 				*/

@@ -94,7 +94,7 @@ namespace synthese
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<ResaModule>::NAME("TAD Réservation");
-		
+
 
 
 		template<> void ModuleClassTemplate<ResaModule>::PreInit()
@@ -102,12 +102,12 @@ namespace synthese
 			RegisterParameter(ResaModule::_RESERVATION_CONTACT_PARAMETER, "0", &ResaModule::ParameterCallback);
 			RegisterParameter(ResaModule::_JOURNEY_PLANNER_WEBSITE, "0", &ResaModule::ParameterCallback);
 		}
-		
+
 
 
 		template<> void ModuleClassTemplate<ResaModule>::Init()
 		{
-			
+
 			// Basic resa profile
 			{
 				Env env;
@@ -150,7 +150,7 @@ namespace synthese
 				ProfileTableSync::Save(ResaModule::_autoresaProfile.get());
 			}
 		}
-		
+
 
 
 		template<> void ModuleClassTemplate<ResaModule>::End()
@@ -205,7 +205,7 @@ namespace synthese
 			recursive_mutex::scoped_lock lock(_sessionsCallIdsMutex);
 
 			CallClose(session);
-				
+
 			RegistryKeyType entryId(ResaDBLog::AddCallEntry(session->getUser().get()));
 
 			_sessionsCallIds[session] = entryId;

@@ -50,13 +50,13 @@ namespace synthese
 		///	@note As Scenario is an abstract class, do not use the get static
 		/// method. Use getAlarm instead.
 		///
-		/// Only sent scenarios store its variables into the table. The 
-		/// scenario template contains all definitions within the text of 
+		/// Only sent scenarios store its variables into the table. The
+		/// scenario template contains all definitions within the text of
 		/// its alarms.
 		///
 		/// The format of the variables column is :
 		///		- for sent scenarios : <variable>|<value>, ...
-		/// 
+		///
 		class ScenarioTableSync : public db::DBInheritanceTableSyncTemplate<ScenarioTableSync,Scenario>
 		{
 		public:

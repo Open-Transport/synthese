@@ -100,7 +100,7 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run(server::Request& request);
-			
+
 			CalendarTemplateElementAddAction();
 
 			//! @name Setters

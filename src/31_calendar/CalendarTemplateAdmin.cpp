@@ -87,7 +87,7 @@ namespace synthese
 			_resultStartDate(day_clock::local_day().year(), 1, 1),
 			_resultEndDate(day_clock::local_day().year() + 1, 12, 31)
 		{ }
-		
+
 		void CalendarTemplateAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -109,9 +109,9 @@ namespace synthese
 				_resultEndDate = from_string(map.get<string>(PARAMETER_RESULT_END));
 			}
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap CalendarTemplateAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
@@ -119,8 +119,8 @@ namespace synthese
 			return m;
 		}
 
-		
-		
+
+
 		void CalendarTemplateAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -164,7 +164,7 @@ namespace synthese
 				AdminFunctionRequest<CalendarTemplateAdmin> searchRequest(_request);
 
 				AdminFunctionRequest<CalendarTemplateAdmin> goRequest(_request);
-				
+
 				stream <<
 					"<p>" <<
 					HTMLModule::getLinkButton(cleanRequest.getURL(), "Vider le calendrier", "Etes-vous sûr de vouloir vider le calendrier "+ _calendar->getText() +" ?")
@@ -185,7 +185,7 @@ namespace synthese
 				CalendarTemplateElementTableSync::SearchResult elements(
 					CalendarTemplateElementTableSync::Search(Env::GetOfficialEnv(), _calendar->getKey())
 				);
-				
+
 				HTMLForm f(addRequest.getHTMLForm("add"));
 				ActionResultHTMLTable::HeaderVector c;
 				c.push_back(make_pair(CalendarTemplateElementTableSync::COL_RANK, "Rang"));
@@ -211,16 +211,16 @@ namespace synthese
 				{
 					delRequest.getAction()->setObjectId(ct->getKey());
 					nextRank = ct->getRank() + 1;
-				
+
 					stream << t.row(lexical_cast<string>(ct->getRank()));
 
 					stream << t.col() << ct->getRank();
 					stream << t.col() << static_cast<char>(ct->getOperation());
-					
+
 					stream << t.col() << (ct->getMinDate().is_special() ? "-&infin;" : to_simple_string(ct->getMinDate()));
 					stream << t.col() << (ct->getMaxDate().is_special() ? "+&infin;" : to_simple_string(ct->getMaxDate()));
 					stream << t.col() << ct->getInterval().days();
-					
+
 					stream << t.col();
 					if (ct->getInclude())
 					{
@@ -274,7 +274,7 @@ namespace synthese
 				stream << f.close();
 
 				stream << "<h1>Résultat</h1>";
-				
+
 				Calendar mask(_resultStartDate, _resultEndDate);
 				Calendar result(_calendar->getResult(mask));
 
@@ -295,24 +295,24 @@ namespace synthese
 		) const {
 			return user.getProfile()->isAuthorized<CalendarRight>(READ);
 		}
-		
+
 
 
 		std::string CalendarTemplateAdmin::getTitle() const
 		{
 			return _calendar.get() ? _calendar->getText() : DEFAULT_TITLE;
 		}
-		
+
 		void CalendarTemplateAdmin::setCalendar(shared_ptr<CalendarTemplate> value)
 		{
 			_calendar = const_pointer_cast<const CalendarTemplate>(value);
 		}
-		
+
 		boost::shared_ptr<const CalendarTemplate> CalendarTemplateAdmin::getCalendar() const
 		{
 			return _calendar;
 		}
-		
+
 		bool CalendarTemplateAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _calendar == static_cast<const CalendarTemplateAdmin&>(other)._calendar;

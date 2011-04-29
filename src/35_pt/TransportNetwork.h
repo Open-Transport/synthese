@@ -59,7 +59,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 			//@}
-				
+
 			//! @name Setters
 			//@{
 			//@}

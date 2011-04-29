@@ -43,13 +43,13 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,forum::ForumMessagesFunction>::FACTORY_KEY("forum_messages");
-	
+
 	namespace forum
 	{
 		const string ForumMessagesFunction::PARAMETER_TOPIC_ID("topic_id");
 		const string ForumMessagesFunction::PARAMETER_DISPLAY_TEMPLATE("page");
 		const string ForumMessagesFunction::PARAMETER_DATE_DISPLAY_TEMPLATE("date_page");
-		
+
 
 
 		ParametersMap ForumMessagesFunction::_getParametersMap() const
@@ -133,9 +133,9 @@ namespace synthese
 			}
 
 		}
-		
-		
-		
+
+
+
 		bool ForumMessagesFunction::isAuthorized(
 			const Session* session
 		) const {

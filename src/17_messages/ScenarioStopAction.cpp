@@ -43,13 +43,13 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, messages::ScenarioStopAction>::FACTORY_KEY("scenariostop");
-	
+
 	namespace messages
 	{
 		const string ScenarioStopAction::PARAMETER_SCENARIO_ID(
 			Action_PARAMETER_PREFIX + "s"
 		);
-		
+
 		ParametersMap ScenarioStopAction::getParametersMap() const
 		{
 			ParametersMap m;
@@ -76,7 +76,7 @@ namespace synthese
 			// Action
 			_scenario->setPeriodEnd(_stopDateTime);
 			_scenario->setIsEnabled(false);
-			
+
 			ScenarioTableSync::Save(_scenario.get());
 
 			// Log
@@ -86,7 +86,7 @@ namespace synthese
 		ScenarioStopAction::ScenarioStopAction()
 			: FactorableTemplate<Action, ScenarioStopAction>(), _stopDateTime(second_clock::local_time())
 		{
-	
+
 		}
 
 
@@ -95,7 +95,7 @@ namespace synthese
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);
 		}
-		
+
 		void ScenarioStopAction::setScenario(boost::shared_ptr<SentScenario> value){
 			_scenario = value;
 		}

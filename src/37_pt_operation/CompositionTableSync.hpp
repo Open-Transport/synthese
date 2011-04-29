@@ -49,10 +49,10 @@ namespace synthese
 				static const std::string COL_DATES;
 				static const std::string COL_SERVED_VERTICES;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	Composition search.
 				///	@param env Environment to populate

@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		VertexAccessMap dvam(static_cast<Place&>(place99).getVertexAccessMap(a, PTModule::GRAPH_ID, 0));
 
 		ptime departure(tomorrow.date(), time_duration(7,6,0));
-		
+
 		RoutePlanner r(
 			ovam,
 			dvam,
@@ -150,7 +150,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		VertexAccessMap dvam(static_cast<Place&>(place07).getVertexAccessMap(a, PTModule::GRAPH_ID, 0));
 
 		ptime departure(tomorrow.date(), time_duration(21,0,0));
-		
+
 		RoutePlanner r(
 			ovam,
 			dvam,
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		VertexAccessMap dvam(static_cast<Place&>(place07).getVertexAccessMap(a, PTModule::GRAPH_ID, 0));
 
 		ptime departure(tomorrow.date(), time_duration(22,0,0));
-		
+
 		RoutePlanner r(
 			ovam,
 			dvam,
@@ -230,7 +230,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 	}
 
 	{ // 47th street -> 99
-		
+
 		PTTimeSlotRoutePlanner r(
 			&rp47,
 			&place99,
@@ -243,7 +243,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			DEPARTURE_FIRST
 		);
 		PTRoutePlannerResult result(r.run());
-		
+
 		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 5);
 	}
 

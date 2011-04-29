@@ -35,12 +35,12 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::SuperiorFunction>::FACTORY_KEY(">");
-	
+
 	namespace cms
 	{
 		const string SuperiorFunction::PARAMETER_L("l");
 		const string SuperiorFunction::PARAMETER_R("r");
-		
+
 		ParametersMap SuperiorFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -61,9 +61,9 @@ namespace synthese
 		) const {
 			stream << (_left > _right);
 		}
-		
-		
-		
+
+
+
 		bool SuperiorFunction::isAuthorized(
 			const Session* session
 		) const {

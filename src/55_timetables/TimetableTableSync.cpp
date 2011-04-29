@@ -58,8 +58,8 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<DBTableSync,TimetableTableSync>::FACTORY_KEY("55.01 Timetables");
 	}
-	
-	
+
+
 	namespace timetables
 	{
 		const std::string TimetableTableSync::COL_BOOK_ID("book_id");
@@ -72,7 +72,7 @@ namespace synthese
 		const std::string TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE("transfer_timetable_before");
 		const std::string TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER("transfer_timetable_after");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<TimetableTableSync>::TABLE(
@@ -97,8 +97,8 @@ namespace synthese
 			DBTableSync::Field()
 		};
 
-		
-		
+
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<TimetableTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index(
@@ -122,7 +122,7 @@ namespace synthese
 			object->setRank(rows->getInt(TimetableTableSync::COL_RANK));
 			object->setTitle(rows->getText(TimetableTableSync::COL_TITLE));
 			object->setContentType(static_cast<Timetable::ContentType>(rows->getInt(TimetableTableSync::COL_FORMAT)));
-			
+
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				vector<string> lines = Conversion::ToStringVector(rows->getText (TimetableTableSync::COL_AUTHORIZED_LINES));
@@ -309,9 +309,9 @@ namespace synthese
 			//TODO log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace timetables
 	{
 		TimetableTableSync::TimetableTableSync()
@@ -338,7 +338,7 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
-			
+
 			// Selection
 			if (bookId)
 			{

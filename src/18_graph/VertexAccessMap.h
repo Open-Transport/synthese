@@ -49,7 +49,7 @@ namespace synthese
 			boost::posix_time::time_duration approachTime;
 			double approachDistance;
 			Journey approachJourney;
-			
+
 			VertexAccess(
 				boost::posix_time::time_duration __approachTime,
 				double __approachDistance,
@@ -72,7 +72,7 @@ namespace synthese
 
 
 
-		/** 
+		/**
 TRIDENT : VertexAccess => AccesPoint
 		@ingroup m35
 		*/
@@ -80,21 +80,21 @@ TRIDENT : VertexAccess => AccesPoint
 		{
 		public:
 			typedef std::map<const Vertex*, VertexAccess> VamMap;
-	    
+
 		private:
 
 			VamMap _map;
 			std::set<const Path*> _pathOnWhichFineSteppingForDeparture;
 			std::set<const Path*> _pathOnWhichFineSteppingForArrival;
-		    
+
 			mutable boost::shared_ptr<geos::geom::Point> _isobarycentre;   //!< Isobarycenter of all points contained in this map.
-		
+
 			boost::posix_time::time_duration _minApproachTime;
 
 
 		// une fonction qui verifie pour une ligne donnée si elle passe par l'un des vertex
 		// de la vam qui n'est pas de correspondance transport.
-		// VertexAccessMap vam, 
+		// VertexAccessMap vam,
 
 		public:
 
@@ -111,11 +111,11 @@ TRIDENT : VertexAccess => AccesPoint
 
 			bool needFineSteppingForDeparture (const Path* path) const;
 			bool needFineSteppingForArrival (const Path* path) const;
-		    
+
 			bool contains (const Vertex* vertex) const;
-			
-			
-			
+
+
+
 			/** Tests if the object and the tested one have at least one common vertex.
 				@param other the other object
 				@return bool true if the objects have at least one common vertex.
@@ -142,14 +142,14 @@ TRIDENT : VertexAccess => AccesPoint
 				@param vertexAccess access conditions to the vertex
 				@author Hugues Romain
 				@date 2008
-				
+
 				If the vertex already belongs to the object, then only the access conditions are updated, only if they are more efficient.
 			*/
 			void insert (const Vertex* vertex, const VertexAccess& vertexAccess);
-		    
+
 
 			boost::shared_ptr<geos::geom::Point> getCentroid() const;
-		    
+
 			boost::posix_time::time_duration getMinApproachTime () const;
 
 		private:
@@ -161,4 +161,4 @@ TRIDENT : VertexAccess => AccesPoint
 	}
 }
 
-#endif 	    
+#endif

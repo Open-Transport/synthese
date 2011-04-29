@@ -129,7 +129,7 @@ namespace synthese
 			return _service->getUseRule(_userClassRank);
 		}
 
-		
+
 
 		UseRule::RunPossibilityType ServicePointer::isUseRuleCompliant(
 			bool ignoreReservation

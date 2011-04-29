@@ -48,7 +48,7 @@ namespace synthese
 	{
 		const string DepotTableSync::COL_NAME ("name");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<DepotTableSync>::TABLE(
@@ -157,9 +157,9 @@ namespace synthese
 		}
 
 	}
-	
-	
-	
+
+
+
 	namespace pt_operation
 	{
 		DepotTableSync::SearchResult DepotTableSync::Search(

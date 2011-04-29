@@ -97,8 +97,8 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _mainPage;
 				boost::shared_ptr<const cms::Webpage> _stopPage;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Route_detail
@@ -107,9 +107,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Route_detail
@@ -127,8 +127,8 @@ namespace synthese
 				std::ostream& stream,
 				const graph::Edge& edge
 			) const;
-			
-			
+
+
 		public:
 			PTRouteDetailFunction();
 
@@ -148,9 +148,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

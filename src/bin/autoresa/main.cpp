@@ -18,17 +18,17 @@ int main(int argc, char *argv[])
 	int state=0;
 	int stateRs=0;
 
-	
+
 	AGITool_answer(&agi, &res);
 	cerr<<"main AutoResa"<<endl;
-	
+
 	//int menuKey[]={1,2,3,4,5};
 	//Functions::setLanguage(Functions::readKey(&agi,&res,menuKey,5,1,Functions::getMenu(0,0)));
 	Functions::setLanguage(1);
-	
+
 	// menu bienvenu, time to creat the objects
 	Functions::playbackText(&agi,&res,"Bienvenu au système de reservation.");
-	
+
 	// prepare objects during the language
 	Login *login=new Login(&agi,&res);
 	Search *search=new Search(&agi,&res);
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 			state=confirmation->start(login->getSession());
 			cerr<<"state of confirmation: "<<state<<endl;
 			break;
-			
+
 		case 8: cerr<<"jump to FeedbackDrv"<<endl;
 			state=confirmation->start(login->getSession());
 			break;
@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
 			}
 			while(stateRs==3);
 			break;
-			
+
 		case -1:
 			Functions::playbackText(&agi,&res,"Identification échuée. Veuillez renouveler votre appel.");
 			cerr<<"interuption, system stopped"<<endl;
@@ -96,18 +96,18 @@ int main(int argc, char *argv[])
 
 
 	//Functions::playbackText(&agi,&res,Functions::getMenu(0,1));
-	
+
 	sleep(2);
 	AGITool_Destroy(&agi);
 	logout->start(Functions::getFatalError(),login->getSession());
-	
-	
+
+
 	delete login;
 	delete search;
 	delete reservation;
 	delete confirmation;
 	delete logout;
-	
+
 	return 0;
 }
 

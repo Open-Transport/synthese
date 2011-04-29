@@ -35,7 +35,7 @@ namespace synthese
 	namespace pt
 	{
 		class SchedulesBasedService;
-		
+
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : ServiceDateChangeAction.
 		/// @ingroup m35Actions refActions
@@ -80,7 +80,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////

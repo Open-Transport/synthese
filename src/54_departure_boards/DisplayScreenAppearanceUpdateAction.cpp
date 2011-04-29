@@ -43,7 +43,7 @@ namespace synthese
 	using namespace security;
 	using namespace dblog;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, departure_boards::DisplayScreenAppearanceUpdateAction>::FACTORY_KEY("DisplayScreenAppearanceUpdateAction");
@@ -59,23 +59,23 @@ namespace synthese
 		const string DisplayScreenAppearanceUpdateAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "tt";
 		const string DisplayScreenAppearanceUpdateAction::PARAMETER_DISPLAY_TEAM(Action_PARAMETER_PREFIX + "dt");
 
-		
+
 		DisplayScreenAppearanceUpdateAction::DisplayScreenAppearanceUpdateAction()
 			: util::FactorableTemplate<Action, DisplayScreenAppearanceUpdateAction>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap DisplayScreenAppearanceUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if (_screen.get() != NULL) map.insert(PARAMETER_DISPLAY_SCREEN, _screen->getKey());
 			return map;
 		}
-		
-		
-		
+
+
+
 		void DisplayScreenAppearanceUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -93,9 +93,9 @@ namespace synthese
 				throw ActionException(e, *this);
 			}
 		}
-		
-		
-		
+
+
+
 		void DisplayScreenAppearanceUpdateAction::run(Request& request)
 		{
 			// Log

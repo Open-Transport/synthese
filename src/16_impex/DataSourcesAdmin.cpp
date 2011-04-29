@@ -53,7 +53,7 @@ namespace synthese
 	using namespace security;
 	using namespace html;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, DataSourcesAdmin>::FACTORY_KEY("DataSourcesAdmin");
@@ -76,7 +76,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void DataSourcesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -98,7 +98,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DataSourcesAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -177,9 +177,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const ImpExModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -187,17 +187,17 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks DataSourcesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
 
 			DataSourceTableSync::SearchResult dataSources(

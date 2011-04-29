@@ -40,7 +40,7 @@ namespace synthese
 
 
 
-		const std::string& 
+		const std::string&
 			NamedPlace::getOfficialName () const
 		{
 			return getName ();
@@ -53,8 +53,8 @@ namespace synthese
 			return ((_city != NULL) ? (_city->getName() + " ") : "") + getName();
 		}
 
-		
-		
+
+
 		string NamedPlace::getName13OrName() const
 		{
 			return _name13.empty() ? _name.substr(0, 13) : _name13;

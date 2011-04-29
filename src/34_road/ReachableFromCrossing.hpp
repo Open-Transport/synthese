@@ -40,7 +40,7 @@ namespace synthese
 		class ReachableFromCrossing
 		{
 		public:
-			
+
 			virtual graph::VertexAccess getVertexAccess(const Crossing& crossing) const = 0;
 			virtual graph::GraphIdType getGraphType() const = 0;
 

@@ -84,7 +84,7 @@ namespace synthese
 				static const std::string COL_UP_ID;
 				static const std::string COL_SUB_SCREEN_TYPE;
 			//@}
-			
+
 
 
 			/** DisplayScreen search.
@@ -193,7 +193,7 @@ namespace synthese
 			);
 
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			///	Tests if at least a line is displayed on the screen.
 			///	@param screenId id of the screen

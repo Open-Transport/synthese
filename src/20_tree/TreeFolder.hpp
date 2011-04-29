@@ -37,7 +37,7 @@ namespace synthese
 		template<
 			class ObjectType_,
 			class RootPolicy_
-		>	
+		>
 		class TreeFolder:
 			public TreeFolderRoot,
 			public RootPolicy_

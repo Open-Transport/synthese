@@ -42,7 +42,7 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace calendar;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::ServiceApplyCalendarAction>::FACTORY_KEY("ServiceApplyCalendarAction");
@@ -57,8 +57,8 @@ namespace synthese
 		const string ServiceApplyCalendarAction::PARAMETER_PERIOD = Action_PARAMETER_PREFIX + "pe";
 		const string ServiceApplyCalendarAction::PARAMETER_ADD = Action_PARAMETER_PREFIX + "ad";
 
-				
-		
+
+
 		ParametersMap ServiceApplyCalendarAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -85,9 +85,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ServiceApplyCalendarAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -125,9 +125,9 @@ namespace synthese
 
 			_add = map.getDefault<bool>(PARAMETER_ADD, true);
 		}
-		
-		
-		
+
+
+
 		void ServiceApplyCalendarAction::run(
 			Request& request
 		){
@@ -157,9 +157,9 @@ namespace synthese
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool ServiceApplyCalendarAction::isAuthorized(
 			const Session* session
 		) const {

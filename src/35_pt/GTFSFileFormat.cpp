@@ -78,12 +78,12 @@ namespace synthese
 	using namespace admin;
 	using namespace server;
 	using namespace geography;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<FileFormat,GTFSFileFormat>::FACTORY_KEY("GTFS");
 	}
-	
+
 	namespace pt
 	{
 		const std::string GTFSFileFormat::Importer_::FILE_STOPS("stops");
@@ -454,7 +454,7 @@ namespace synthese
 						lexical_cast<int>(endDateStr.substr(4,2)),
 						lexical_cast<int>(endDateStr.substr(6,2))
 					);
-					
+
 					for(date curDate(startDate); curDate<=endDate; curDate += days(1))
 					{
 						if(_getValue(week_days[curDate.day_of_week()]) == "1")
@@ -503,7 +503,7 @@ namespace synthese
 					_loadLine(line);
 
 					Trip trip;
-					
+
 					// Line
 					string id(_getValue("trip_id"));
 					string lineCode(_getValue("route_id"));
@@ -566,7 +566,7 @@ namespace synthese
 							);
 							stops.push_back(stop);
 						}
-						
+
 						JourneyPattern* route(
 							PTFileFormat::CreateOrUpdateRoute(
 								*trip.line,
@@ -604,7 +604,7 @@ namespace synthese
 								stream
 						)	);
 						*service |= trip.calendar;
-						
+
 						tripDetailVector.clear();
 					}
 
@@ -628,7 +628,7 @@ namespace synthese
 						continue;
 					}
 					tripDetail.stop = _stopPoints.get(stopCode);
-					
+
 					tripDetailVector.push_back(tripDetail);
 					lastTripCode = tripCode;
 				}

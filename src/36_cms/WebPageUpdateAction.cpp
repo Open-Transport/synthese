@@ -65,8 +65,8 @@ namespace synthese
 		const string WebPageUpdateAction::PARAMETER_DECODE_XML_ENTITIES_IN_CONTENT(Action_PARAMETER_PREFIX + "dx");
 		const string WebPageUpdateAction::PARAMETER_RAW_EDITOR(Action_PARAMETER_PREFIX + "re");
 
-		
-		
+
+
 		ParametersMap WebPageUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -129,9 +129,9 @@ namespace synthese
 			map.insert(PARAMETER_DECODE_XML_ENTITIES_IN_CONTENT, _decodeXMLEntitiesInContent);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void WebPageUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -259,9 +259,9 @@ namespace synthese
 			}
 			_decodeXMLEntitiesInContent = map.getDefault<bool>(PARAMETER_DECODE_XML_ENTITIES_IN_CONTENT, false);
 		}
-		
-		
-		
+
+
+
 		void WebPageUpdateAction::run(
 			Request& request
 		){
@@ -269,7 +269,7 @@ namespace synthese
 
 			stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			
+
 			// Moving the page into an other node of the tree
 			if(_up && _up->get() != _page->getParent())
 			{
@@ -367,9 +367,9 @@ namespace synthese
 
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool WebPageUpdateAction::isAuthorized(
 			const Session* session
 		) const {

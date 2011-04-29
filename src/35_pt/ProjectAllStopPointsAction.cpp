@@ -51,7 +51,7 @@ namespace synthese
 	using namespace road;
 	using namespace db;
 	using namespace graph;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::ProjectAllStopPointsAction>::FACTORY_KEY("ProjectAllStopPointsAction");
@@ -60,24 +60,24 @@ namespace synthese
 	namespace pt
 	{
 		const string ProjectAllStopPointsAction::PARAMETER_MAX_DISTANCE("md");
-		
-		
+
+
 		ParametersMap ProjectAllStopPointsAction::getParametersMap() const
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_MAX_DISTANCE, _maxDistance);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ProjectAllStopPointsAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_maxDistance = map.getDefault<double>(PARAMETER_MAX_DISTANCE, 100);
 		}
-		
-		
-		
+
+
+
 		void ProjectAllStopPointsAction::run(
 			Request& request
 		){
@@ -132,9 +132,9 @@ namespace synthese
 
 			transaction.run();
 		}
-		
-		
-		
+
+
+
 		bool ProjectAllStopPointsAction::isAuthorized(
 			const Session* session
 		) const {

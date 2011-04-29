@@ -43,7 +43,7 @@ namespace synthese
 			const std::string& logKey
 			, DBLogEntry::Level level
 			, const DBLogEntry::Content& content
-			, const security::User* user /*= NULL*/ 
+			, const security::User* user /*= NULL*/
 			, util::RegistryKeyType objectId,
 			util::RegistryKeyType objectId2
 		){

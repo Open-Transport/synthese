@@ -78,7 +78,7 @@ namespace synthese
 			/// @param stream Stream to write the result on
 			/// @param vars Interface variables
 			/// @param rowId Rank of the row in the departure table
-			/// @param pageNumber Rank of the page if the display type is based on 
+			/// @param pageNumber Rank of the page if the display type is based on
 			///		memory pages
 			/// @param displayQuaiNumber true if the number of the quay must be
 			///		displayed

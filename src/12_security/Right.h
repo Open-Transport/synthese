@@ -49,7 +49,7 @@ namespace synthese
 		///	opération(s) sur un périmètre donné.
 		///
 		///	Une habilitation est définie par :
-		///		-# un périmètre d'application dont l'usage est précisé par les sous classes. 
+		///		-# un périmètre d'application dont l'usage est précisé par les sous classes.
 		///			Exemple d'utilisations possibles :
 		///			- Masque de code SYNTHESE d'objet (MP/TLS/*, MP/TLS/14/*...)
 		///			- Liste d'objet(s) (MP/TLS/14;MP/TLS/41)
@@ -66,8 +66,8 @@ namespace synthese
 		///		- DELETE : accès en écriture, effacement permis
 		///		- NB : Chaque niveau de droit inclut les niveaux précédents.
 		///
-		///	Chaque module contient des définitions d'habilitations (sous-classes enregistrées 
-		///	dans Factory<Right>) 
+		///	Chaque module contient des définitions d'habilitations (sous-classes enregistrées
+		///	dans Factory<Right>)
 		/// qui implémentent le contrôe des droits et la génération d'une liste de paramètres possibles.
 		class Right
 		:	public util::FactoryBase<Right>
@@ -98,14 +98,14 @@ namespace synthese
 					util::Env& env = util::Env::GetOfficialEnv()
 				) const = 0;
 				virtual ParameterLabelsVector	getParametersLabels()	const = 0;
-				
-				
+
+
 				/** Perimeter inclusion test.
 					@param env Environment to read
 					@param perimeter Perimeter to test
 					@return bool True if the current perimeter includes the compared one
 					@author Hugues Romain
-					@date 2007				
+					@date 2007
 				*/
 				virtual bool perimeterIncludes(
 					const std::string& perimeter,

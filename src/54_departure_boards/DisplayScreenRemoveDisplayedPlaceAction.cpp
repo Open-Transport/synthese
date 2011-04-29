@@ -42,7 +42,7 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, departure_boards::DisplayScreenRemoveDisplayedPlaceAction>::FACTORY_KEY("dsrdp");
-	
+
 	namespace departure_boards
 	{
 		const string DisplayScreenRemoveDisplayedPlaceAction::PARAMETER_PLACE(Action_PARAMETER_PREFIX + "pl");

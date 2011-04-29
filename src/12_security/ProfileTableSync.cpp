@@ -202,7 +202,7 @@ namespace synthese
 			string name
 			, string right
 			, int first /*= 0*/
-			, boost::optional<std::size_t> number  /*= -1*/ 
+			, boost::optional<std::size_t> number  /*= -1*/
 			, bool orderByName
 			, bool raisingOrder,
 			LinkLevel linkLevel
@@ -210,7 +210,7 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE.NAME					
+				<< " FROM " << TABLE.NAME
 				<< " WHERE 1 ";
 			if (!name.empty())
 				query << " AND " << TABLE_COL_NAME << " LIKE " << Conversion::ToDBString(name);
@@ -238,8 +238,8 @@ namespace synthese
 			stringstream query;
 			query
 				<< " SELECT *"
-				<< " FROM " << TABLE.NAME					
-				<< " WHERE " 
+				<< " FROM " << TABLE.NAME
+				<< " WHERE "
 				<< TABLE_COL_PARENT_ID << "=" << parentId;
 			if (number)
 				query << " LIMIT " << (*number + 1);
@@ -254,13 +254,13 @@ namespace synthese
 		string ProfileTableSync::getRightsString(const Profile* p)
 		{
 			stringstream s;
-			
+
 			for (RightsVector::const_iterator it = p->getRights().begin(); it != p->getRights().end(); ++it)
 			{
 				shared_ptr<const Right> right = it->second;
 				if (it != p->getRights().begin())
 					s	<< RIGHT_SEPARATOR;
-				s	<< right->getFactoryKey() 
+				s	<< right->getFactoryKey()
 					<< RIGHT_VALUE_SEPARATOR << right->getParameter()
 					<< RIGHT_VALUE_SEPARATOR << (static_cast<int>(right->getPrivateRightLevel()))
 					<< RIGHT_VALUE_SEPARATOR << (static_cast<int>(right->getPublicRightLevel()))

@@ -60,8 +60,8 @@ namespace synthese
 			Registrable(0)
 		{
 		}
-		
-		
+
+
 
 		void DeparturesTableTransferDestinationInterfacePage::display(
 			std::ostream& stream,
@@ -75,7 +75,7 @@ namespace synthese
 
 			const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(object.getService()->getPath()));
 			const StopArea* place(dynamic_cast<const StopArea*>(object.getArrivalEdge()->getFromVertex()->getHub()));
-		
+
 			pv.push_back(line->getRollingStock() ? lexical_cast<string>(line->getRollingStock()->getKey()) : string()); //0
 			pv.push_back(lexical_cast<string>(line->getCommercialLine()->getKey())); //1
 			pv.push_back(line->getCommercialLine()->getShortName()); //2

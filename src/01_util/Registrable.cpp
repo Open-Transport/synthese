@@ -37,7 +37,7 @@ namespace synthese
 		Registrable::Registrable( RegistryKeyType key )
 		:	_key(key)
 		{
-			
+
 		}
 
 

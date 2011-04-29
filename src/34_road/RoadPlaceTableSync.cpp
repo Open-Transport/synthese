@@ -42,7 +42,7 @@ namespace synthese
 	using namespace util;
 	using namespace road;
 	using namespace geography;
-	
+
 
 	namespace util
 	{
@@ -55,7 +55,7 @@ namespace synthese
 		const string RoadPlaceTableSync::COL_CITYID("city_id");
 	}
 
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<RoadPlaceTableSync>::TABLE(
@@ -92,7 +92,7 @@ namespace synthese
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				RegistryKeyType cityId(rows->getLongLong(RoadPlaceTableSync::COL_CITYID));
-				
+
 				// City
 				object->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
 				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
@@ -160,9 +160,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace road
 	{
 		RoadPlaceTableSync::SearchResult RoadPlaceTableSync::Search(
@@ -214,4 +214,4 @@ namespace synthese
 	}
 }
 
- 
+

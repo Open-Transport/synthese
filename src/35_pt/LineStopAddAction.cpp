@@ -50,7 +50,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace geography;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::LineStopAddAction>::FACTORY_KEY("LineStopAddAction");
@@ -86,9 +86,9 @@ namespace synthese
 			map.insert(PARAMETER_RANK, _rank);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void LineStopAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -146,7 +146,7 @@ namespace synthese
 
 			_rank = map.getOptional<size_t>(PARAMETER_RANK) ?
 				map.get<size_t>(PARAMETER_RANK) : _route->getEdges().size();
-			
+
 			if(map.getOptional<double>(PARAMETER_METRIC_OFFSET))
 			{
 				_metricOffset = map.get<double>(PARAMETER_METRIC_OFFSET);
@@ -155,16 +155,16 @@ namespace synthese
 			{
 			}
 		}
-		
-		
-		
+
+
+
 		void LineStopAddAction::run(
 			Request& request
 		){
 			//stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			//_object->setAttribute(_value);
-			
+
 			if(_stop.get())
 			{
 				DesignatedLinePhysicalStop lineStop(
@@ -196,9 +196,9 @@ namespace synthese
 
 			//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool LineStopAddAction::isAuthorized(
 			const Session* session
 		) const {

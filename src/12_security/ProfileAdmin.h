@@ -33,7 +33,7 @@ namespace synthese
 
 		/** Ecran d'édition de profil.
 			@ingroup m12Admin refAdmin
-		
+
 			@image html cap_admin_profile.png
 			@image latex cap_admin_profile.png "Maquette d'écran d'édition de profil" width=14cm
 
@@ -64,10 +64,10 @@ namespace synthese
 						- Ecriture
 						- Suppression
 					-# <tt>Ajouter</tt> : bouton d'ajout d'habilitation. L'ajout se fait directement sans confirmation.
-			
+
 			<i>Sécurité</i>
 				- Une habilitation SecurityRights de niveau public WRITE est nécessaire pour accéder à la page, pour laquelle le profil demandé est inférieur ou égal.
-				
+
 			<i>Journaux</i> : Les opérations suivantes sont consignées dans le journal de sécurité SecurityLog :
 				- INFO : Modification du nom du profil
 				- INFO : Ajout d'habilitation au profil
@@ -82,7 +82,7 @@ namespace synthese
 
 		public:
 			ProfileAdmin();
-			
+
 			void setProfile(boost::shared_ptr<Profile> value);
 			boost::shared_ptr<const Profile> getProfile() const;
 
@@ -92,13 +92,13 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
 
@@ -108,7 +108,7 @@ namespace synthese
 				std::ostream& stream,
 				const admin::AdminRequest& _request
 			) const;
-			
+
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
@@ -120,10 +120,10 @@ namespace synthese
 			) const;
 
 			virtual std::string getTitle() const;
-			
-			
+
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
-			
+
 		};
 	}
 }

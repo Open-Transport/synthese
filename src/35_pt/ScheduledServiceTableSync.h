@@ -57,8 +57,8 @@ namespace synthese
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
 			static const std::string COL_TEAM;
 			static const std::string COL_DATES;
-			
-			
+
+
 
 			/** ScheduledService search.
 				@param line JourneyPattern which the service must belong to

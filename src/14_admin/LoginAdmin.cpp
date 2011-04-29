@@ -59,7 +59,7 @@ namespace synthese
 		const string LoginAdmin::PARAM_URL_TO_LAUNCH("ul");
 
 
-		
+
 		void LoginAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -76,7 +76,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool LoginAdmin::isAuthorized(
 			const security::User& user
 		) const	{

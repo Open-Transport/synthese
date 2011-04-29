@@ -51,7 +51,7 @@ namespace synthese
 	{
 		class TransportWebsite;
 		class RollingStockFilter;
-		
+
 
 		/** Transport web site administration page class.
 			@ingroup m56Admin refAdmin
@@ -110,17 +110,17 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
-			
-			
+
+
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
@@ -131,7 +131,7 @@ namespace synthese
 				std::ostream& stream,
 				const admin::AdminRequest& _request
 			) const;
-			
+
 
 
 			/** Authorization control.
@@ -142,7 +142,7 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& user
 			) const;
-			
+
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param parentLink Link to the parent page
 				@param currentPage Currently displayed page
@@ -155,23 +155,23 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
-			
-			
-			
+
+
+
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
 
-			
+
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
-			
-			
+
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds the tabs of the page.
@@ -185,7 +185,7 @@ namespace synthese
 
 
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
-			
+
 		};
 	}
 }

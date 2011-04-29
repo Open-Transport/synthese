@@ -42,7 +42,7 @@ namespace synthese
 	using namespace db;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, calendar::CalendarTemplateElementAddAction>::FACTORY_KEY("CalendarTemplateElementAddAction");
@@ -58,16 +58,16 @@ namespace synthese
 		const string CalendarTemplateElementAddAction::PARAMETER_POSITIVE= Action_PARAMETER_PREFIX + "po";
 		const string CalendarTemplateElementAddAction::PARAMETER_RANK= Action_PARAMETER_PREFIX + "rk";
 
-		
-		
+
+
 		CalendarTemplateElementAddAction::CalendarTemplateElementAddAction()
 		:	util::FactorableTemplate<Action, CalendarTemplateElementAddAction>(),
 			_interval(days(1))
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap CalendarTemplateElementAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -75,9 +75,9 @@ namespace synthese
 				map.insert(PARAMETER_CALENDAR_ID, _calendar->getKey());
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CalendarTemplateElementAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -97,7 +97,7 @@ namespace synthese
 				date(neg_infin) :
 				from_string(map.get<string>(PARAMETER_MIN_DATE))
 			;
-			_maxDate = 
+			_maxDate =
 				map.getDefault<string>(PARAMETER_MAX_DATE).empty() ?
 				date(pos_infin) :
 				from_string(map.get<string>(PARAMETER_MAX_DATE))
@@ -118,9 +118,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		void CalendarTemplateElementAddAction::run(Request& request)
 		{
 			CalendarTemplateElement e;

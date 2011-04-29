@@ -37,20 +37,20 @@ namespace synthese
 	{
 		template<> const std::string util::FactorableTemplate<ModuleClass, dblog::DBLogModule>::FACTORY_KEY("13_dblog");
 	}
-	
-	
+
+
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<DBLogModule>::NAME("Journaux");
-		
+
 		template<> void ModuleClassTemplate<DBLogModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<DBLogModule>::Init()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<DBLogModule>::End()
 		{
 		}

@@ -66,7 +66,7 @@ namespace synthese
 		public:
 			static const std::string COL_CODE_BY_SOURCE;
 			static const std::string COL_SOURCE_ID;
-			
+
 			CrossingTableSync();
 			~CrossingTableSync();
 

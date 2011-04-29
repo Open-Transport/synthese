@@ -44,7 +44,7 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_SURNAME;
 			static const std::string PARAMETER_NUMBER;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
@@ -52,20 +52,20 @@ namespace synthese
 				boost::optional<std::string> _surname;
 				size_t						_number;
 			//@}
-			
-			
+
+
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map
 			*/
 			server::ParametersMap _getParametersMap() const;
-			
+
 			/** Conversion from generic parameters map to attributes.
 				@param map Parameters map to interpret
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
-			
-			
-			
+
+
+
 		public:
 			ResaCustomerHtmlOptionListFunction();
 

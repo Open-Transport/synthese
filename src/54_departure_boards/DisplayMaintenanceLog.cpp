@@ -52,7 +52,7 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<DBLog, DisplayMaintenanceLog>::FACTORY_KEY("displaymaintenance");
 	}
-    
+
 	namespace departure_boards
 	{
 		const int DisplayMaintenanceLog::_COL_TYPE(0);
@@ -71,7 +71,7 @@ namespace synthese
 		}
 
 
-	
+
 		void DisplayMaintenanceLog::AddAdminEntry(
 			const DisplayScreen& screen
 			, const security::User& user

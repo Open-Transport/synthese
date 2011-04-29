@@ -32,29 +32,29 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace admin;
-	
+
 	namespace util
 	{
 		template<> const string	FactorableTemplate<ModuleClass,AdminModule>::FACTORY_KEY("14_admin");
 	}
-	
+
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<AdminModule>::NAME("Console d'administration");
-		
+
 		template<> void ModuleClassTemplate<AdminModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<AdminModule>::Init()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<AdminModule>::End()
 		{
 		}
 	}
-	
+
 	namespace admin
 	{
 		const std::string AdminModule::TABLE_COL_ID = "id";

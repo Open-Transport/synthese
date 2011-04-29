@@ -40,7 +40,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace geography;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt_website::SiteCityAddAction>::FACTORY_KEY("SiteCityAddAction");
@@ -50,9 +50,9 @@ namespace synthese
 	{
 		const string SiteCityAddAction::PARAMETER_SITE_ID = Action_PARAMETER_PREFIX + "id";
 		const string SiteCityAddAction::PARAMETER_CITY_NAME = Action_PARAMETER_PREFIX + "cn";
-		
-		
-		
+
+
+
 		ParametersMap SiteCityAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -62,13 +62,13 @@ namespace synthese
 			}
 			if(_city)
 			{
-				
+
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void SiteCityAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -93,9 +93,9 @@ namespace synthese
 			}
 			_city = list.front().get();
 		}
-		
-		
-		
+
+
+
 		void SiteCityAddAction::run(
 			Request& request
 		){
@@ -107,9 +107,9 @@ namespace synthese
 //			::AddCreationEntry(object, request.getUser().get());
 			request.setActionCreatedId(link.getKey());
 		}
-		
-		
-		
+
+
+
 		bool SiteCityAddAction::isAuthorized(
 			const Session* session
 		) const {

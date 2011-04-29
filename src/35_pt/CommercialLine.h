@@ -44,7 +44,7 @@ namespace synthese
 		class NonConcurrencyRule;
 		class ReservationContact;
 	}
-	
+
 	namespace pt
 	{
 		class StopArea;
@@ -92,7 +92,7 @@ namespace synthese
 
 			const pt::ReservationContact*	_reservationContact;	//!< Reservation contact
 			PlacesSet	_optionalReservationPlaces;
-			
+
 			NonConcurrencyRules _nonConcurrencyRules;
 			mutable boost::recursive_mutex _nonConcurrencyRulesMutex;
 
@@ -120,7 +120,7 @@ namespace synthese
 				calendar::CalendarTemplate* getCalendarTemplate() const { return _calendarTemplate; }
 				boost::recursive_mutex& getNonConcurrencyRulesMutex() const { return _nonConcurrencyRulesMutex; }
 			//@}
-			
+
 			//! @name Setters
 			//@{
 				void setStyle (const std::string& value) { _style = value; }

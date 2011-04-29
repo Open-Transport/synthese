@@ -254,7 +254,7 @@ namespace synthese
 
 			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
 			if(!site) throw RequestException("Incorrect site");
-			
+
 			_outputRoadApproachDetail = site->getDisplayRoadApproachDetail();
 
 
@@ -446,7 +446,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE));
-				if(id) 
+				if(id)
 				{
 					_page = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -458,7 +458,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SCHEDULES_ROW_PAGE));
-				if(id) 
+				if(id)
 				{
 					_schedulesRowPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -470,7 +470,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SCHEDULES_CELL_PAGE));
-				if(id) 
+				if(id)
 				{
 					_schedulesCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -482,7 +482,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_LINES_ROW_PAGE));
-				if(id) 
+				if(id)
 				{
 					_linesRowPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -494,7 +494,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_LINE_MARKER_PAGE));
-				if(id) 
+				if(id)
 				{
 					_lineMarkerPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -506,7 +506,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_BOARD_PAGE));
-				if(id) 
+				if(id)
 				{
 					_boardPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -530,7 +530,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_RESERVATION_PAGE));
-				if(id) 
+				if(id)
 				{
 					_reservationPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -542,7 +542,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_DURATION_PAGE));
-				if(id) 
+				if(id)
 				{
 					_durationPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -554,7 +554,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_TEXT_DURATION_PAGE));
-				if(id) 
+				if(id)
 				{
 					_textDurationPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -566,7 +566,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_PAGE));
-				if(id) 
+				if(id)
 				{
 					_mapPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -578,7 +578,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_LINE_PAGE));
-				if(id) 
+				if(id)
 				{
 					_mapLinePage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -590,7 +590,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_DATE_TIME_PAGE));
-				if(id) 
+				if(id)
 				{
 					_dateTimePage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -602,7 +602,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_STOP_CELL_PAGE));
-				if(id) 
+				if(id)
 				{
 					_stopCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -614,7 +614,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SERVICE_CELL_PAGE));
-				if(id) 
+				if(id)
 				{
 					_serviceCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -638,7 +638,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_STOP_PAGE));
-				if(id) 
+				if(id)
 				{
 					_mapStopCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -650,7 +650,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_SERVICE_PAGE));
-				if(id) 
+				if(id)
 				{
 					_mapServiceCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -898,7 +898,7 @@ namespace synthese
 							}
 
 							pedestrianMode = curET.getService()->getPath()->isPedestrianMode();
-							
+
 							// Saving of the columns on each lines
 							if(itl == jl.begin())
 							{
@@ -911,7 +911,7 @@ namespace synthese
 							{
 								posix_time::ptime edTime(curET.getDepartureDateTime());
 								edTime += journey.getContinuousServiceRange();
-								**itSheetRow << " endDepartureDateTime=\"" << 
+								**itSheetRow << " endDepartureDateTime=\"" <<
 									posix_time::to_iso_extended_string(edTime) << "\"";
 							}
 							if(pedestrianMode)
@@ -923,7 +923,7 @@ namespace synthese
 							++itPlaces; ++itSheetRow;
 							lastPedestrianMode = pedestrianMode;
 						}
-						
+
 						if(	itl == jl.end()-1
 						||	!(itl+1)->getService()->getPath()->isPedestrianMode()
 						||	!curET.getService()->getPath()->isPedestrianMode()
@@ -934,7 +934,7 @@ namespace synthese
 									itl == jl.end()-1 ? NULL : &(*(itl+1)),
 									PTRoutePlannerResult::getNamedPlace(_arrival_place.placeResult.value.get())
 							)	);
-							
+
 							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
 							{
 								**itSheetRow << "<cell";
@@ -1137,7 +1137,7 @@ namespace synthese
 						{
 							if(_outputRoadApproachDetail)
 							{
-								stream << 
+								stream <<
 									"<street" <<
 									" length=\"" << ceil(curET.getDistance()) << "\"" <<
 									" city=\"" << road->getRoadPlace()->getCity()->getName() << "\"" <<
@@ -1357,7 +1357,7 @@ namespace synthese
 			, _home(false),
 			_startArrivalDate(not_a_date_time),
 			_endArrivalDate(not_a_date_time)
-		{			
+		{
 		}
 
 
@@ -1497,7 +1497,7 @@ namespace synthese
 					bool showCoords
 		){
 			shared_ptr<Point> gp;
-			
+
 			if(	np.getPoint().get() &&
 				!np.getPoint()->isEmpty()
 			){
@@ -1539,7 +1539,7 @@ namespace synthese
 			bool showCoords
 		){
 			shared_ptr<Point> gp;
-			
+
 			if(	address.getGeometry().get() &&
 				!address.getGeometry()->isEmpty()
 			){
@@ -1580,7 +1580,7 @@ namespace synthese
 			bool showCoords
 		){
 			shared_ptr<Point> gp;
-			
+
 			if(	roadPlace.getPoint().get() &&
 				!roadPlace.getPoint()->isEmpty()
 			){
@@ -1642,7 +1642,7 @@ namespace synthese
 				destinationCity = dynamic_cast<const NamedPlace*>(destinationPlace)->getCity();
 				destinationPlaceName = dynamic_cast<const NamedPlace*>(destinationPlace)->getName();
 			}
-			
+
 			pm.insert(DATA_INTERNAL_DATE, to_iso_extended_string(date));
 			pm.insert(DATA_ORIGIN_CITY_TEXT, originCity->getName());
 			pm.insert(DATA_HANDICAPPED_FILTER, accessParameters.getUserClass() == USER_HANDICAPPED);
@@ -2202,14 +2202,14 @@ namespace synthese
 				).getFullName()
 			);
 			pm.insert(DATA_DEPARTURE_PLACE_NAME, displayedDeparturePlace);
-			
+
 			shared_ptr<Point> departurePoint(
 				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 					*departurePlace.getPoint()
 			)	);
 			pm.insert(DATA_DEPARTURE_PLACE_LONGITUDE, departurePoint->getX());
 			pm.insert(DATA_DEPARTURE_PLACE_LATITUDE, departurePoint->getY());
-			
+
 			// Arrival time
 			{
 				stringstream s;
@@ -2230,7 +2230,7 @@ namespace synthese
 				).getFullName()
 			);
 			pm.insert(DATA_ARRIVAL_PLACE_NAME, displayedArrivalPlace);
-			
+
 			shared_ptr<Point> arrivalPoint(
 				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 					*arrivalPlace.getPoint()
@@ -2433,7 +2433,7 @@ namespace synthese
 							, distance
 						);
 
-						distance = 0;				
+						distance = 0;
 						__Couleur = !__Couleur;
 					}
 				}
@@ -2454,7 +2454,7 @@ namespace synthese
 				endRangeTime += continuousServiceRange;
 
 			pm.insert(DATA_IS_ARRIVAL, isItArrival);
-			
+
 			// Alarm
 			if(alarm)
 			{
@@ -2493,7 +2493,7 @@ namespace synthese
 				pm.insert(DATA_LONGITUDE, point->getX());
 				pm.insert(DATA_LATITUDE, point->getY());
 			}
-			
+
 			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
 
 			page->display(stream, request, pm);

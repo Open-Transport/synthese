@@ -63,7 +63,7 @@ namespace synthese
 		const std::string VehiclePositionTableSync::COL_RANK_IN_PATH("rank_in_path");
 		const std::string VehiclePositionTableSync::COL_PASSENGERS("passengers");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<VehiclePositionTableSync>::TABLE(
@@ -113,8 +113,8 @@ namespace synthese
 			object->setComment(rows->getText(VehiclePositionTableSync::COL_COMMENT));
 			object->setRankInPath(rows->getOptionalUnsignedInt(VehiclePositionTableSync::COL_RANK_IN_PATH));
 			object->setPassangers(rows->getInt(VehiclePositionTableSync::COL_PASSENGERS));
-			
-			
+
+
 			string pointsStr(rows->getText(TABLE_COL_GEOMETRY));
 			if(pointsStr.empty())
 			{
@@ -126,7 +126,7 @@ namespace synthese
 					dynamic_pointer_cast<Point,Geometry>(rows->getGeometryFromWKT(TABLE_COL_GEOMETRY))
 				);
 			}
-			
+
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
 				RegistryKeyType pid(rows->getLongLong(VehiclePositionTableSync::COL_VEHICLE_ID));
@@ -266,9 +266,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace pt_operation
 	{
 		VehiclePositionTableSync::SearchResult VehiclePositionTableSync::Search(

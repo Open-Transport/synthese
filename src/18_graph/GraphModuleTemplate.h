@@ -28,7 +28,7 @@
 
 namespace synthese
 {
-	/** 
+	/**
 	*/
 	namespace graph
 	{

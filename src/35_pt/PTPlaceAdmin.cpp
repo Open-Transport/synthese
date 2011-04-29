@@ -98,21 +98,21 @@ namespace synthese
 		{ }
 
 
-		
+
 		void PTPlaceAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
 			try
 			{
 				RegistryTableType tableId(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
-				
+
 				setConnectionPlace(Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)));
 			}
 			catch(ObjectNotFoundException<StopArea> e)
 			{
 				throw AdminParametersException("No such connection place");
 			}
-			
+
 			// Search table initialization
 			// _requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_XXX, 30);
 		}
@@ -131,7 +131,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool PTPlaceAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -144,7 +144,7 @@ namespace synthese
 			ostream& stream,
 			const AdminRequest& request
 		) const	{
-		
+
 			////////////////////////////////////////////////////////////////////
 			// TAB PROPERTIES
 			if (openTabContent(stream, TAB_GENERAL))
@@ -403,7 +403,7 @@ namespace synthese
 					stream << t.col() << f.getSelectInput(StopAreaTransferAddAction::PARAMETER_TO_ID, _connectionPlace->getPhysicalStopLabels(), optional<RegistryKeyType>());
 					stream << t.col() << f.getTextInput(StopAreaTransferAddAction::PARAMETER_DURATION,string(),"(minutes ou F)");
 					stream << t.col() << f.getSubmitButton("Ajouter");
-					
+
 					stream << t.close();
 					stream << f.close();
 				}
@@ -453,7 +453,7 @@ namespace synthese
 
 						stream << t.row();
 						stream << t.col() << junction->getStart()->getName();
-						stream << t.col() << 
+						stream << t.col() <<
 							HTMLModule::getHTMLLink(
 								openPlaceRequest.getURL(),
 								junction->getEnd()->getConnectionPlace()->getFullName()
@@ -513,7 +513,7 @@ namespace synthese
 
 						stream << t.row();
 						stream << t.col() << junction->getEnd()->getName();
-						stream << t.col() << 
+						stream << t.col() <<
 							HTMLModule::getHTMLLink(
 								openPlaceRequest.getURL(),
 								junction->getStart()->getConnectionPlace()->getFullName()
@@ -547,12 +547,12 @@ namespace synthese
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks PTPlaceAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
 
 
@@ -562,7 +562,7 @@ namespace synthese
 				p->setStop(Env::GetOfficialEnv().getSPtr(it.second));
 				links.push_back(p);
 			}
-			
+
 			return links;
 		}
 
@@ -595,7 +595,7 @@ namespace synthese
 		{
 			if(_connectionPlace.get() && static_cast<const PTPlaceAdmin&>(other)._connectionPlace.get())
 			{
-				return 
+				return
 					_connectionPlace->getKey() == static_cast<const PTPlaceAdmin&>(other)._connectionPlace->getKey();
 			}
 			return false;

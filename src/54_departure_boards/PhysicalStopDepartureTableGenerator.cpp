@@ -39,7 +39,7 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace pt;
-	
+
 
 	namespace departure_boards
 	{
@@ -74,7 +74,7 @@ namespace synthese
 		{
 			typedef map<const StopArea*, ArrivalDepartureList::iterator> ReachedDestinationMap;
 			ReachedDestinationMap reachedDestination;
-			
+
 			BOOST_FOREACH(const PhysicalStops::value_type& it, _physicalStops)
 			{
 				PhysicalStops fakeList;

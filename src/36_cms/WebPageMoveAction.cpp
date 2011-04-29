@@ -38,7 +38,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, cms::WebPageMoveAction>::FACTORY_KEY("WebPageMoveAction");
@@ -48,9 +48,9 @@ namespace synthese
 	{
 		const string WebPageMoveAction::PARAMETER_PAGE_ID = Action_PARAMETER_PREFIX + "id";
 		const string WebPageMoveAction::PARAMETER_DIRECTION = Action_PARAMETER_PREFIX + "di";
-		
-		
-		
+
+
+
 		ParametersMap WebPageMoveAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -61,9 +61,9 @@ namespace synthese
 			map.insert(PARAMETER_DIRECTION, _up);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void WebPageMoveAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -86,7 +86,7 @@ namespace synthese
 					0,
 					1
 			)	);
-			
+
 			if(pages.empty())
 			{
 				throw ActionException(
@@ -97,9 +97,9 @@ namespace synthese
 			}
 			_switchedPage = pages.front();
 		}
-		
-		
-		
+
+
+
 		void WebPageMoveAction::run(
 			Request& request
 		){
@@ -118,9 +118,9 @@ namespace synthese
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool WebPageMoveAction::isAuthorized(
 			const Session* session
 		) const {

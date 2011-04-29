@@ -50,11 +50,11 @@ namespace synthese
 	using namespace cms;
 	using namespace graph;
 	using namespace impex;
-	
+
 	template<> const string util::FactorableTemplate<server::Function,pt::LinesListFunction>::FACTORY_KEY(
 		"LinesListFunction2"
 	);
-	
+
 	namespace pt
 	{
 		const string LinesListFunction::PARAMETER_OUTPUT_FORMAT("of");
@@ -74,7 +74,7 @@ namespace synthese
 		void LinesListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			setNetworkId(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID));
-			
+
 			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
 			if(id)
 			try

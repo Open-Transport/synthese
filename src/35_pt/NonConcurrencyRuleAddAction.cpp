@@ -41,7 +41,7 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::NonConcurrencyRuleAddAction>::FACTORY_KEY("NonConcurrencyRuleAddAction");
@@ -53,8 +53,8 @@ namespace synthese
 		const string NonConcurrencyRuleAddAction::PARAMETER_HIDDEN_LINE_ID = Action_PARAMETER_PREFIX + "hl";
 		const string NonConcurrencyRuleAddAction::PARAMETER_DURATION = Action_PARAMETER_PREFIX + "de";
 
-		
-		
+
+
 		ParametersMap NonConcurrencyRuleAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -63,9 +63,9 @@ namespace synthese
 			map.insert(PARAMETER_DURATION, _duration.minutes());
 			return map;
 		}
-		
-		
-		
+
+
+
 		void NonConcurrencyRuleAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -86,9 +86,9 @@ namespace synthese
 			}
 			_duration = posix_time::minutes(map.get<int>(PARAMETER_DURATION));
 		}
-		
-		
-		
+
+
+
 		void NonConcurrencyRuleAddAction::run(Request& request)
 		{
 			NonConcurrencyRule r;
@@ -98,9 +98,9 @@ namespace synthese
 
 			NonConcurrencyRuleTableSync::Save(&r);
 		}
-		
-		
-		
+
+
+
 		bool NonConcurrencyRuleAddAction::isAuthorized(
 			const Session* session
 		) const {

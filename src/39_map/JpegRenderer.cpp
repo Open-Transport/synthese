@@ -37,7 +37,7 @@ namespace synthese
 	using namespace util;
 	using namespace map;
 	using namespace pt;
-	
+
 
 	namespace util
 	{
@@ -49,10 +49,10 @@ namespace synthese
 	{
 
 
-	    std::string JpegRenderer::render(const boost::filesystem::path& tempDir,  
-					     const std::string& filenamePrefix, 
+	    std::string JpegRenderer::render(const boost::filesystem::path& tempDir,
+					     const std::string& filenamePrefix,
 					     const Registry<JourneyPattern>& lines,
-					     synthese::map::Map& map, 
+					     synthese::map::Map& map,
 					     const synthese::map::RenderingConfig& config )
 		{
 			PostscriptRenderer psRenderer;
@@ -66,8 +66,8 @@ namespace synthese
 
 			// Convert the ps file to jpeg with ghostscript
 			std::stringstream gscmd;
-			gscmd << GHOSTSCRIPT_BIN << " -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=jpeg -dJPEGQ=50 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -g" 
-				<< map.getWidth () << "x" << map.getHeight () 
+			gscmd << GHOSTSCRIPT_BIN << " -q -dSAFER -dBATCH -dNOPAUSE -sDEVICE=jpeg -dJPEGQ=50 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -g"
+				<< map.getWidth () << "x" << map.getHeight ()
 				<< " -sOutputFile=" << jpegFile.string () << " " << psFile.string ();
 
 			Log::GetInstance ().debug (gscmd.str ());

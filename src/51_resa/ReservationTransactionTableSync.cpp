@@ -183,7 +183,7 @@ namespace synthese
 				<< " FROM " << TABLE.NAME
 				<< " INNER JOIN " << ReservationTableSync::TABLE.NAME << " AS r ON "
 				<< " r." << ReservationTableSync::COL_TRANSACTION_ID << "=" << TABLE.NAME << "." << TABLE_COL_ID
-				<< " WHERE " 
+				<< " WHERE "
 				<< " r." << ReservationTableSync::COL_SERVICE_ID << "=" << serviceId
 				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << ">='" << to_iso_extended_string(originDate) << " 00:00'"
 				<< " AND r." << ReservationTableSync::COL_ORIGIN_DATE_TIME << "<='" << to_iso_extended_string(originDate) << " 23:59'";

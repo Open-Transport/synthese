@@ -95,8 +95,8 @@ namespace synthese
 
 			_parameters = map;
 		}
-		
-		
+
+
 
 
 		server::ParametersMap MessageAdmin::getParametersMap() const
@@ -170,7 +170,7 @@ namespace synthese
 					recipient->displayBroadcastListEditor(stream, _alarm.get(), _parameters, searchRequest, addRequest, removeRequest);
 				}
 			}
-			
+
 
 			////////////////////////////////////////////////////////////////////
 			// END TABS
@@ -210,7 +210,7 @@ namespace synthese
 		MessageAdmin::MessageAdmin()
 			: AdminInterfaceElementTemplate<MessageAdmin>()
 		{
-		
+
 		}
 
 
@@ -232,7 +232,7 @@ namespace synthese
 			const MessagesScenarioAdmin* ma(
 				dynamic_cast<const MessagesScenarioAdmin*>(&currentPage)
 			);
-			
+
 			if(	!ma) return false;
 
 			if(!_alarm->getScenario())
@@ -240,13 +240,13 @@ namespace synthese
 
 			return _alarm->getScenario()->getKey() == ma->getScenario()->getKey();
 		}
-		
+
 		void MessageAdmin::setMessage(boost::shared_ptr<const Alarm> value)
 		{
 			_alarm = value;
 		}
-		
-		
+
+
 		bool MessageAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			const MessageAdmin& mother(static_cast<const MessageAdmin&>(other));

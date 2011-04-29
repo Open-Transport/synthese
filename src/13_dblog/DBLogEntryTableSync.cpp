@@ -75,8 +75,8 @@ namespace synthese
 			DBTableSync::Field()
 
 		};
-		
-		template<> const DBTableSync::Index DBTableSyncTemplate<DBLogEntryTableSync>::_INDEXES[] = 
+
+		template<> const DBTableSync::Index DBTableSyncTemplate<DBLogEntryTableSync>::_INDEXES[] =
 		{
 			DBTableSync::Index(
 				DBLogEntryTableSync::COL_LOG_KEY.c_str(),
@@ -110,12 +110,12 @@ namespace synthese
 			object->setObjectId(rows->getLongLong(DBLogEntryTableSync::COL_OBJECT_ID));
 			object->setObjectId2(rows->getLongLong(DBLogEntryTableSync::COL_OBJECT2_ID));
 
-			// Content column : parse all contents separated by | 
+			// Content column : parse all contents separated by |
 			DBLogEntry::Content v;
 			typedef tokenizer<char_separator<char> > tokenizer;
 			string content = rows->getText ( DBLogEntryTableSync::COL_CONTENT);
 			char_separator<char> sep (DBLogEntryTableSync::CONTENT_SEPARATOR.c_str(), "", keep_empty_tokens);
-			
+
 			tokenizer columns (content, sep);
 			for (tokenizer::iterator it = columns.begin(); it != columns.end (); ++it)
 				v.push_back(*it);
@@ -175,7 +175,7 @@ namespace synthese
 				return false;
 			}
 
-			return 
+			return
 				session &&
 				session->hasProfile() &&
 				session->getUser()->getProfile()->isAuthorized<DBLogRight>(DELETE_RIGHT) &&

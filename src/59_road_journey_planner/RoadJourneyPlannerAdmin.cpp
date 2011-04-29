@@ -61,13 +61,13 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace html;
-	using namespace algorithm;	
+	using namespace algorithm;
 	using namespace security;
 	using namespace graph;
 	using namespace road;
 	using namespace geography;
 	using namespace road_journey_planner;
-	
+
 
 	namespace util
 	{
@@ -94,7 +94,7 @@ namespace synthese
 		):	AdminInterfaceElementTemplate<RoadJourneyPlannerAdmin>(),
 			_planningOrder(DEPARTURE_FIRST)
 		{ }
-		
+
 
 
 		void RoadJourneyPlannerAdmin::setFromParametersMap(
@@ -107,9 +107,9 @@ namespace synthese
 			_endPlace = map.getDefault<string>(PARAMETER_END_PLACE);
 
 		}
-		
-		
-		
+
+
+
 		ParametersMap RoadJourneyPlannerAdmin::getParametersMap() const
 		{
 			ParametersMap m;
@@ -121,8 +121,8 @@ namespace synthese
 			return m;
 		}
 
-		
-		
+
+
 		void RoadJourneyPlannerAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -144,27 +144,27 @@ namespace synthese
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
 			stream << st.cell("Commune d&eacute;part", st.getForm().getTextInput(
-						PARAMETER_START_CITY, 
-						startPlace.get() ? 
+						PARAMETER_START_CITY,
+						startPlace.get() ?
 						(dynamic_cast<const City*>(startPlace.get()) ? dynamic_cast<const City*>(startPlace.get())->getName() : dynamic_cast<const NamedPlace*>(startPlace.get())->getCity()->getName()) :
 						_startCity
 				)	);
 			stream << st.cell("Lieu d&eacute;part", st.getForm().getTextInput(
 						PARAMETER_START_PLACE,
-						startPlace.get() ? 
+						startPlace.get() ?
 						(dynamic_cast<const City*>(startPlace.get()) ? string() : dynamic_cast<const NamedPlace*>(startPlace.get())->getName()) :
 						_startPlace
 				)	);
 			stream << st.row();
 			stream << st.cell("Commune arriv&eacute;e", st.getForm().getTextInput(
 						PARAMETER_END_CITY,
-						endPlace.get() ? 
+						endPlace.get() ?
 						(dynamic_cast<const City*>(endPlace.get()) ? dynamic_cast<const City*>(endPlace.get())->getName() : dynamic_cast<const NamedPlace*>(endPlace.get())->getCity()->getName()) :
 						_endCity
-				)	);	
+				)	);
 			stream << st.cell("Lieu arriv&eacute;e", st.getForm().getTextInput(
 						PARAMETER_END_PLACE,
-						endPlace.get() ? 
+						endPlace.get() ?
 						(dynamic_cast<const City*>(endPlace.get()) ? string() : dynamic_cast<const NamedPlace*>(endPlace.get())->getName()) :
 						_endPlace
 				)	);
@@ -230,7 +230,7 @@ namespace synthese
 		) const	{
 			return true;
 		}
-		
+
 		AdminInterfaceElement::PageLinks RoadJourneyPlannerAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
@@ -246,9 +246,9 @@ namespace synthese
 			}
 			return links;
 		}
-		
-		
-		
+
+
+
 		bool RoadJourneyPlannerAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request

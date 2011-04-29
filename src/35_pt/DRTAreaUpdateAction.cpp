@@ -1,4 +1,4 @@
-		
+
 //////////////////////////////////////////////////////////////////////////
 /// DRTAreaUpdateAction class implementation.
 /// @file DRTAreaUpdateAction.cpp
@@ -36,7 +36,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::DRTAreaUpdateAction>::FACTORY_KEY("DRTAreaUpdateAction");
@@ -47,7 +47,7 @@ namespace synthese
 		const string DRTAreaUpdateAction::PARAMETER_AREA_ID = Action_PARAMETER_PREFIX + "id";
 		const string DRTAreaUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string DRTAreaUpdateAction::PARAMETER_STOPS = Action_PARAMETER_PREFIX + "st";
-		
+
 		ParametersMap DRTAreaUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -65,9 +65,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void DRTAreaUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.getOptional<RegistryKeyType>(PARAMETER_AREA_ID)) try
@@ -82,7 +82,7 @@ namespace synthese
 			{
 				_area.reset(new DRTArea);
 			}
-			
+
 			if(map.isDefined(PARAMETER_NAME))
 			{
 				_name = map.get<string>(PARAMETER_NAME);
@@ -93,9 +93,9 @@ namespace synthese
 				_stops = DRTAreaTableSync::UnserializeStops(map.get<string>(PARAMETER_STOPS), *_env);
 			}
 		}
-		
-		
-		
+
+
+
 		void DRTAreaUpdateAction::run(
 			Request& request
 		){
@@ -119,9 +119,9 @@ namespace synthese
 				request.setActionCreatedId(_area->getKey());
 			}
 		}
-		
-		
-		
+
+
+
 		bool DRTAreaUpdateAction::isAuthorized(
 			const Session* session
 		) const {

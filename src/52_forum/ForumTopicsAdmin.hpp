@@ -62,9 +62,9 @@ namespace synthese
 			///	@author Hugues Romain
 			///	@date 2010
 			ForumTopicsAdmin();
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.
 			///	@param map The parameters map to use for the initialization.
@@ -75,8 +75,8 @@ namespace synthese
 				const server::ParametersMap& map
 			);
 
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Creation of the parameters map from the object attributes.
 			///	@author Hugues Romain
@@ -97,7 +97,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Authorization control.
 			/// Returns if the page can be displayed. In most cases, the needed right
@@ -111,7 +111,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds links to the pages of the current class to put directly under
 			/// a module admin page in the pages tree.

@@ -30,7 +30,7 @@ using boost::shared_ptr;
 namespace synthese
 {
 	using namespace util;
-	
+
 	namespace accounts
 	{
 		Transaction::Transaction( uid id /*= 0*/ )

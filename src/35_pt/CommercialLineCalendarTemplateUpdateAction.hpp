@@ -45,7 +45,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// Update of the calendar template of a commercial line.
 		/// @ingroup m35Actions refActions
-		/// 
+		///
 		/// Parameters :
 		///	<ul>
 		///		<li>actionParamid : id of the line to update</li>
@@ -81,7 +81,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////

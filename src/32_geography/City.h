@@ -61,10 +61,10 @@ namespace synthese
 
 		private:
 			typedef std::map<std::string, PlacesMatcher> PlacesMatchers;
-			
+
 			PlacesMatcher	_allPlacesMatcher;
 			PlacesMatchers _lexicalMatchers;
-			
+
 			std::string _name;
 			std::string _code; //!< Unique code identifier for city within its country (france => INSEE code)
 
@@ -75,7 +75,7 @@ namespace synthese
 				std::string name = std::string(),
 				std::string code = std::string()
 			);
-		    
+
 			~City ();
 
 
@@ -108,11 +108,11 @@ namespace synthese
 			//! @name Query methods
 			//@{
 				void getVertexAccessMap(
-					graph::VertexAccessMap& result, 
+					graph::VertexAccessMap& result,
 					const graph::AccessParameters& accessParameters,
 					const GraphTypes& whatToSearch
 				) const;
-				
+
 
 
 				template<class T>

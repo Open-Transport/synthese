@@ -72,4 +72,4 @@ namespace synthese
 	}
 }
 
-#endif 	    
+#endif

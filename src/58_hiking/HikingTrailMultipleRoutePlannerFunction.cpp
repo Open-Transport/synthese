@@ -51,7 +51,7 @@ namespace synthese
 	using namespace pt_website;
 
 	template<> const string util::FactorableTemplate<Function,hiking::HikingTrailMultipleRoutePlannerFunction>::FACTORY_KEY("HikingTrailMultipleRoutePlannerFunction");
-	
+
 	namespace hiking
 	{
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_CITY("ci");
@@ -63,7 +63,7 @@ namespace synthese
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_BEGINNING_PERIOD("bp");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_ENDING_DAY("ed");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_ENDING_PERIOD("ep");
-		
+
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_PAGE("page");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_SCHEDULES_ROW_PAGE("schedules_row_page");
 		const string HikingTrailMultipleRoutePlannerFunction::PARAMETER_SCHEDULES_CELL_PAGE("schedule_cell_page");
@@ -174,7 +174,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE));
-				if(id) 
+				if(id)
 				{
 					_page = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -186,7 +186,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SCHEDULES_ROW_PAGE));
-				if(id) 
+				if(id)
 				{
 					_schedulesRowPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -198,7 +198,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SCHEDULES_CELL_PAGE));
-				if(id) 
+				if(id)
 				{
 					_schedulesCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -210,7 +210,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_LINES_ROW_PAGE));
-				if(id) 
+				if(id)
 				{
 					_linesRowPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -234,7 +234,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_BOARD_PAGE));
-				if(id) 
+				if(id)
 				{
 					_boardPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -258,7 +258,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_RESERVATION_PAGE));
-				if(id) 
+				if(id)
 				{
 					_reservationPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -270,7 +270,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_DURATION_PAGE));
-				if(id) 
+				if(id)
 				{
 					_durationPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -282,7 +282,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_TEXT_DURATION_PAGE));
-				if(id) 
+				if(id)
 				{
 					_textDurationPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -294,7 +294,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_PAGE));
-				if(id) 
+				if(id)
 				{
 					_mapPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -306,7 +306,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_LINE_PAGE));
-				if(id) 
+				if(id)
 				{
 					_mapLinePage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -318,7 +318,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_DATE_TIME_PAGE));
-				if(id) 
+				if(id)
 				{
 					_dateTimePage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -330,7 +330,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_STOP_CELL_PAGE));
-				if(id) 
+				if(id)
 				{
 					_stopCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -342,7 +342,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SERVICE_CELL_PAGE));
-				if(id) 
+				if(id)
 				{
 					_serviceCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -366,7 +366,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_STOP_PAGE));
-				if(id) 
+				if(id)
 				{
 					_mapStopCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -378,7 +378,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_SERVICE_PAGE));
-				if(id) 
+				if(id)
 				{
 					_mapServiceCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -538,9 +538,9 @@ namespace synthese
 				);
 */			}
 		}
-		
-		
-		
+
+
+
 		bool HikingTrailMultipleRoutePlannerFunction::isAuthorized(
 			const Session* session
 		) const {

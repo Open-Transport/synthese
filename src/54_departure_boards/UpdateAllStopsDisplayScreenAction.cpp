@@ -83,10 +83,10 @@ namespace synthese
 				_screen->getAllPhysicalStopsDisplayed() ? "OUI" : "NON",
 				_value ? "OUI" : "NON"
 			);
-			
+
 			_screen->setAllPhysicalStopsDisplayed(_value);
 			DisplayScreenTableSync::Save(_screen.get());
-			
+
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
 				log.str(),
@@ -108,8 +108,8 @@ namespace synthese
 				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
-		
-		
+
+
 		void UpdateAllStopsDisplayScreenAction::setScreen(
 			boost::shared_ptr<const DisplayScreen> value
 		){

@@ -64,7 +64,7 @@ namespace synthese
 
 		static LanguagesMap _iso639_1LanguagesMap;
 		static LanguagesMap _iso639_2LanguagesMap;
-		
+
 		static boost::shared_ptr<Language> AddLanguage(
 			const boost::optional<std::string>& iso639_1Code,
 			const std::string& iso639_2Code,

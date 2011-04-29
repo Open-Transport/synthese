@@ -69,7 +69,7 @@ namespace synthese
 			DBTableSync::Field(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE, SQL_INTEGER),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<RollingStockTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index(RollingStockTableSync::COL_TRIDENT.c_str(), RollingStockTableSync::COL_IS_TRIDENT_REFERENCE.c_str(), ""),
@@ -147,9 +147,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace pt
 	{
 		RollingStockTableSync::RollingStockTableSync()
@@ -184,7 +184,7 @@ namespace synthese
 			}
 			query.setNumber(number);
 			query.setFirst(first);
-		
+
 			return LoadFromQuery(query, env, linkLevel);
 		}
 

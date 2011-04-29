@@ -18,22 +18,22 @@ class TestExec : public ThreadExec
 {
 private:
     int _calls;
-    mutable boost::mutex* _callsMutex; 
-    
+    mutable boost::mutex* _callsMutex;
+
 public:
-    
-    TestExec () 
+
+    TestExec ()
 	: _calls (-1)
 	, _callsMutex (new boost::mutex ())
 	{
 	}
-    
-    ~TestExec () 
+
+    ~TestExec ()
 	{
 	    delete _callsMutex;
 	}
-    
-    
+
+
     int getCalls ()
 	{
 	    boost::mutex::scoped_lock lock (*_callsMutex);
@@ -49,8 +49,8 @@ public:
 	    }
 	    Thread::Sleep (200);
 	}
-    
-	
+
+
     void loop ()
 	{
 	    boost::mutex::scoped_lock lock (*_callsMutex);
@@ -63,7 +63,7 @@ public:
 	    boost::mutex::scoped_lock lock (*_callsMutex);
 	    _calls = -1;
 	}
-    
+
 
 };
 
@@ -74,14 +74,14 @@ public:
 
 BOOST_AUTO_TEST_CASE (testStartPauseResumeStop)
 {
-    
+
       TestExec* exec = new TestExec ();
 
       Thread thread (exec);
-      
+
       BOOST_REQUIRE_EQUAL (Thread::NOT_STARTED, thread.getState ());
       BOOST_REQUIRE_EQUAL (-1, exec->getCalls ());
-      
+
       thread.start ();
 
       while (thread.getState () != Thread::INIT) Thread::Sleep (5);
@@ -111,5 +111,5 @@ BOOST_AUTO_TEST_CASE (testStartPauseResumeStop)
 
       Thread::Sleep (1000);
       BOOST_REQUIRE_EQUAL (Thread::STOPPED, thread.getState ());
-	  
+
 }

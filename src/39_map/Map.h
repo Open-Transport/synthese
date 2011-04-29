@@ -61,8 +61,8 @@ public:
 private:
 
     Rectangle _realFrame;
-    double _width;	
-    double _height;	
+    double _width;
+    double _height;
     double _neighborhood;
 
 	bool _preserveRatio;
@@ -71,65 +71,65 @@ private:
     double _mapScaleY;
 
 	bool _lineGrouping;
-    
+
     const MapBackgroundManager* _backgroundManager;
     const std::string _urlPattern;
-    
+
     std::set<DrawableLine*> _selectedLines;
     std::set<DrawablePhysicalStop*> _selectedPhysicalStops;
 
     DrawableLineIndex _indexedLines;  //!< Drawable lines indexed by point.
-    
+
     std::vector<DrawableLine*>
 	findLinesSharingPoint (const std::set<DrawableLine*>& drawableLines,
 			       const geos::geom::Coordinate& point) const;
-    
+
     std::pair<geos::geom::Coordinate, int>
-	findMostSharedPoint (const DrawableLine* drawableLine, 
-			     const std::set<DrawableLine*>& exclusionList = 
+	findMostSharedPoint (const DrawableLine* drawableLine,
+			     const std::set<DrawableLine*>& exclusionList =
 			     std::set<DrawableLine*> ()) const;
-    
-    DrawableLine* findMostSharedLine (const std::set<DrawableLine*>& drawableLines, 
+
+    DrawableLine* findMostSharedLine (const std::set<DrawableLine*>& drawableLines,
 				      const std::set<DrawableLine*>& exclusionList) const;
-    
-    
-    std::pair<const DrawableLine*, int>
-	findLeftMostLine (const geos::geom::Coordinate& vertex, 
-			  const DrawableLine* reference, 
-			  const std::set<DrawableLine*>& lines) const;
-    
+
 
     std::pair<const DrawableLine*, int>
-	findRightMostLine (const geos::geom::Coordinate& vertex, 
-			   const DrawableLine* reference, 
+	findLeftMostLine (const geos::geom::Coordinate& vertex,
+			  const DrawableLine* reference,
+			  const std::set<DrawableLine*>& lines) const;
+
+
+    std::pair<const DrawableLine*, int>
+	findRightMostLine (const geos::geom::Coordinate& vertex,
+			   const DrawableLine* reference,
 			   const std::set<DrawableLine*>& lines) const;
-    
-    
-    void 
-	assignShiftFactors (const DrawableLine* reference, 
-			    const geos::geom::Coordinate& referencePoint, 
-			    DrawableLine* drawableLine, 
+
+
+    void
+	assignShiftFactors (const DrawableLine* reference,
+			    const geos::geom::Coordinate& referencePoint,
+			    DrawableLine* drawableLine,
 			    const std::set<DrawableLine*>& exclusionList);
-    
+
     const DrawableLine*
-	findBestAvailableReference (const DrawableLine* drawableLine, 
+	findBestAvailableReference (const DrawableLine* drawableLine,
 				    const std::vector<DrawableLine*>& lines) const;
-    
-    
-    
+
+
+
     static void populateLineIndex (const DrawableLineIndex& lineIndex, const std::set<DrawableLine*>& selectedLines);
     void prepareLines ();
     void preparePhysicalStops ();
     void dumpBackground (PostscriptCanvas& canvas);
     void dumpLines (PostscriptCanvas& canvas);
     void dumpPhysicalStops (PostscriptCanvas& canvas);
-    
+
 public:
 
 
     Map(const std::set<DrawableLine*>& selectedLines,
-	const Rectangle& realFrame, 
-	double width, 
+	const Rectangle& realFrame,
+	double width,
 	double height,
 	bool preserveRatio,
         const MapBackgroundManager* backgroundManager = 0,
@@ -137,19 +137,19 @@ public:
 
 
     Map(const std::set<DrawableLine*>& selectedLines,
-	double width, 
+	double width,
 	double height,
 	double neighborhood,
 	bool preserveRatio,
     const MapBackgroundManager* backgroundManager = 0,
 	const std::string& urlPattern = "");
 
-    
+
     virtual ~Map();
-    
+
     geos::geom::Coordinate toRealFrame (const geos::geom::Coordinate& p);
     geos::geom::Coordinate toOutputFrame (const geos::geom::Coordinate& p);
-	
+
     //! @name Getters/Setters
     //@{
 
@@ -169,7 +169,7 @@ public:
 
     const std::set<DrawableLine*>& getSelectedLines () const;
     const std::set<DrawablePhysicalStop*>& getSelectedPhysicalStops () const;
-    
+
 	bool getLineGrouping () const;
 	void setLineGrouping (bool lineGrouping);
 
@@ -187,5 +187,5 @@ public:
 }
 }
 
-#endif 
+#endif
 

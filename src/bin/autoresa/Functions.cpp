@@ -66,13 +66,13 @@ string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 	string fileName=synthese::util::Conversion::ToString(RSHash(_text));
 	//string fileTemp=spath+"temp/"+fileName;
 	fileName=spath+fileName;
-	
+
 	//cerr<<" FileName: "<<fileName<<" and FileTemp: "<<fileTemp<<endl;
-	cerr<<" FileName: "<<fileName<<endl;	
-	
+	cerr<<" FileName: "<<fileName<<endl;
+
 	//string gsmFileName=fileName+".gsm";
 	//cerr<<"gsmFileName: "<<gsmFileName<<endl;
-	
+
 	// search if file exist
 	FILE * pFile;
 	//pFile = fopen (gsmFileName.c_str(),"r");
@@ -91,7 +91,7 @@ string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 		cerr<<"do voice file, bcz not exist: "<<fileName+".au"<<endl<<endl;
 		//PlaybackAcapela::mainFunc(_text,fileTemp+".raw",ipAcapela,voiceChoiced);
 		PlaybackAcapela::mainFunc(_text,fileName+".au",ipAcapela,voiceChoiced);
-		
+
 		/*
 		string cmdSox="sox -r 22060 -s -w  "+fileTemp+".raw "+fileTemp+".wav";
 		cerr<<"command: "<<cmdSox.c_str()<<" , return: ";
@@ -109,12 +109,12 @@ string Functions::text2Voice(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,string _text)
 			cerr<<"system error, voice file is not created: "<<returnVal<<endl;
 		}
 		*/
-		
+
 		return fileName+".au";
 	}
-		
-	
-	
+
+
+
 
 }
 
@@ -143,10 +143,10 @@ this function is to play a background message, to read the keyboard dtmf input a
 @parameters:
 	AGI_TOOLS*: agi handle
 	AGI_CMD_RESULT*: agi result handle
-	
+
 	int*: defined autorised menu key
 	int: how many menu key
-	
+
 	int: each key size, normally is 1 as 1 touche
 	string: menu text
 @return:
@@ -166,11 +166,11 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 	{
 		playbackText(_agi,_res,"l\'entrée invalide, veuillez reessayer.");
 	}
-	
+
 	cerr<<"MenuKey autorised: ";
 	for(int i=0;i<_nMenuKey;i++) cerr<<_menuKey[i]<<" ";
 	cerr<<endl;
-	
+
 	int inputKey=0;
 	// to play background message
 	string fileName=text2Voice(_agi,_res,_menu);
@@ -179,7 +179,7 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 	int timeout=0;
 	if(_nMenuKey==1) timeout=8000;
 	else timeout=(int)(ceil(_nKey*1.5))*1000+_menu.size()*1000;
-	
+
 	if(_nKey==1)	// if one input, call stream_file function to diff 0 and *,#
 	{
 		char allkey[]={'0','1','2','3','4','5','6','7','8','9'};
@@ -197,20 +197,20 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 			cerr<<"dtmf channel failed, system halt"<<endl;
 			exit(-1);
 		}
-		
+
 	}
 	else	// if many input, call get_data, diff is no more important
 	{
 		inputKey=AGITool_get_data(_agi,_res,fileName.c_str(),timeout, _nKey);
 		cerr<<"get_data called for mtl. dtmf: "<<inputKey<<endl;
 	}
-	
+
 	if((_nKey==1)&&(inputKey==0))
 		Functions::passToManuel(_agi,_res,getCallerId(_agi,_res));
 		//return readKey(_agi,_res,_menuKey,_nMenuKey,_nKey,_menu,++tryTime);
-	
+
 	cerr<<"inputKey: "<<inputKey<<endl;
-	
+
 	if(_nMenuKey==0)
 		return inputKey;
 	else if(validateInput(_menuKey,_nMenuKey,inputKey)) return inputKey;
@@ -218,7 +218,7 @@ int Functions::readKey(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res,int* _menuKey, int 
 			return readKey(_agi,_res,_menuKey,_nMenuKey,_nKey,_menu,++tryTime);
 
 }
-	
+
 
 /*
 	the function is to play the forground text message vocal
@@ -238,7 +238,7 @@ int Functions::playbackText(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res, string _msg)
 /*
 	the function is called when the dtmf error producted
 	@parameters: void
-	@return: void	
+	@return: void
 **/
 void Functions::exptMsgDtmf()
 {
@@ -268,7 +268,7 @@ void Functions::exptMsgRmtFailed()
 {
 	cerr<<"remote server failed";
 	// voice warning, set fatalerror to cut system
-	// write to log later with callerid 
+	// write to log later with callerid
 }
 
 
@@ -311,26 +311,26 @@ void Functions::translateExpt(int _n)
 				cerr<<fatalError<<endl;
 				exptMsgRmtFailed();
 				break;
-				
+
 		case 6: // dtmf malformed
 				setFatalError("error: dtmf malformed");
 				cerr<<fatalError<<endl;
 				exptMsgDtmf();
 				break;
-				
+
 		case 8: // absolut timeout error
 				setFatalError("error: absolut timeout exceeded");
 				cerr<<fatalError<<endl;
 				exptMsgTimeout();
-		
+
 				break;
-				
+
 		default: // unknown error
 				cerr<<"unknown error raised as Nr. "<<_n<<endl;
 				//exit(-1);
 				break;
 	}
-	
+
 }
 
 /*
@@ -361,16 +361,16 @@ string Functions::makeRequest(string _request) throw (int)
 	cerr<<"REQUEST: "<<_request<<endl;
 	synthese::server::BasicClient *basicClient=new synthese::server::BasicClient(ipSynthese3,portSynthese3);
 	//synthese::server::BasicClient *basicClient=new synthese::server::BasicClient("81.63.140.157",3593);
-	
+
 	std::stringstream out;
 	basicClient->request(out,_request);
-	
+
 	delete basicClient;
-	
+
 	cerr<<"RETURN: "<<out.str() <<endl;
-	
+
 	return out.str();
-	
+
 }
 
 string Functions::getCallerId(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res)
@@ -391,10 +391,10 @@ static string Functions::smartXmlParser(string xml, string nodeName)
 	XMLNode xmlNode=synthese::util::XmlToolkit::ParseString(xml, nodeName);
 	cerr<<"xml Node: "<<xmlNode.getName()<<endl;
 	xmlNode=synthese::util::XmlToolkit::ParseString(xml, xmlNode.getName());
-		
+
 	string msg;
 	int i=0;
-	
+
 	try
 	{
 		xmlNode=xmlNode.getChildNode(nodeName.c_str());
@@ -407,7 +407,7 @@ static string Functions::smartXmlParser(string xml, string nodeName)
 	{
 		//cerr<<e;
 	}
-	
+
 	return msg;
 }
 

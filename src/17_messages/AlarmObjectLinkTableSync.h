@@ -44,7 +44,7 @@ namespace synthese
 	{
 		/** Alarm object links table synchronizer.
 			@ingroup m17LS refLS
-			
+
 			Only the links concerning the sent alarms are loaded in ram.
 
 			Load method behavior per load level :
@@ -104,7 +104,7 @@ namespace synthese
 				@param alarmId ID of the alarm
 				@param objectId ID of the object. UNKNOWN_VALUE = Removes all links of the alarm
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 			*/
 			static void Remove(
 				util::RegistryKeyType alarmId,
@@ -146,7 +146,7 @@ namespace synthese
 				<< " SELECT "
 					<< AlarmObjectLinkTableSync::COL_OBJECT_ID
 				<< " FROM " << TABLE.NAME
-				<< " WHERE " 
+				<< " WHERE "
 					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarmId)
 					<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToDBString(recipientKey);
 			if (number)

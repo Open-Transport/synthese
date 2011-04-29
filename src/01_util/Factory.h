@@ -63,7 +63,7 @@ namespace synthese
 			{
 			public:
 				virtual RootObject* create() const = 0;
-				
+
 				virtual ~CreatorInterface() {}
 			};
 
@@ -212,7 +212,7 @@ namespace synthese
 			}
 
 
-			
+
 			static void Destroy()
 			{
 				BOOST_FOREACH(const typename Map::value_type& it, _registeredCreator)
@@ -222,8 +222,8 @@ namespace synthese
 				_registeredCreator.clear();
 			}
 
-			
-			
+
+
 			////////////////////////////////////////////////////////////////////
 			///	Builds a collection of new elements of each factorable subclass.
 			///	@return a collection of new elements of each factorable subclass.

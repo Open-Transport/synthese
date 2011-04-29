@@ -40,7 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace interfaces;
 	using namespace security;
-	
+
 
 	namespace util
 	{
@@ -55,7 +55,7 @@ namespace synthese
 		const string CreateDisplayTypeAction::PARAMETER_MONITORING_INTERFACE_ID(
 			Action_PARAMETER_PREFIX + "mi"
 		);
-		
+
 
 
 		ParametersMap CreateDisplayTypeAction::getParametersMap() const
@@ -99,7 +99,7 @@ namespace synthese
 			{
 				throw ActionException("Interface d'affichage", e, *this);
 			}
-		
+
 			// Monitoring Interface
 			id = map.getOptional<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID);
 			if(id && *id > 0)

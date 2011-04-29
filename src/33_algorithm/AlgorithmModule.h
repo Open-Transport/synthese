@@ -52,10 +52,10 @@ namespace synthese
 
 			@defgroup m33Logs 33 DB Logs
 			@ingroup m33
-			
+
 			@defgroup m33 33 Algorithm
 			@ingroup m3
-			
+
 			@{
 		*/
 
@@ -67,8 +67,8 @@ namespace synthese
 			public server::ModuleClassTemplate<AlgorithmModule>
 		{
 		private:
-			
-			
+
+
 		public:
 		};
 	}

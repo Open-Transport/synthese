@@ -59,7 +59,7 @@ namespace synthese
 		{
 			if (_parameter == GLOBAL_PERIMETER)
 				return "all";
-			
+
 			return _parameter;
 		}
 

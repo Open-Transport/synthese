@@ -52,9 +52,9 @@ namespace synthese
 
 		@defgroup m16 16 Import export framework
 		@ingroup m1
-		
+
 		Management of data sources and standardized import / export interface.
-		
+
 		@{
 	*/
 
@@ -73,8 +73,8 @@ namespace synthese
 			public server::ModuleClassTemplate<ImpExModule>
 		{
 		private:
-			
-			
+
+
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Character set conversion.

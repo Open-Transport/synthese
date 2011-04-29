@@ -34,7 +34,7 @@ namespace synthese
 
 		/** Route planning departure table based on a display screen definition.
 			@ingroup m54Library refLibrary
-			
+
 			Displays : The defined departure table.
 			Parameters :
 				- 0 : Origin id
@@ -43,7 +43,7 @@ namespace synthese
 				- 3 : Display track number
 				- 4 : With transfer
 				- 5 : Blinking delay
-				- 6 : 
+				- 6 :
 		*/
 		class DeparturesTableRoutePlanningInterfaceElement:
 			public util::FactorableTemplate<interfaces::LibraryInterfaceElement, DeparturesTableRoutePlanningInterfaceElement>

@@ -85,9 +85,9 @@ namespace synthese
 			, const server::Request* request /*= NULL*/ ) const
 		{
 			const ArrivalDepartureList& ptds(static_cast<const ArrivalDepartureListWithAlarm*>(object)->map);
-			
+
 			int __MultiplicateurRangee(_multiplicateurRangeeVIE->isFalse(parameters, variables, object, request)
-				? 1 
+				? 1
 				: Conversion::ToInt(_multiplicateurRangeeVIE->getValue(parameters, variables, object, request))
 			);
 			int __Pages = Conversion::ToInt(_pagesVIE->getValue(parameters, variables, object, request));

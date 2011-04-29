@@ -29,7 +29,7 @@ namespace synthese
 {
 	/// @addtogroup m01
 	//@{
-	
+
 	static const int UNKNOWN_VALUE = -1;
 
 	//@}

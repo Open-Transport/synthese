@@ -38,7 +38,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, cms::WebPageLinkAddAction>::FACTORY_KEY("WebPageLinkAddAction");
@@ -48,9 +48,9 @@ namespace synthese
 	{
 		const string WebPageLinkAddAction::PARAMETER_PAGE_ID = Action_PARAMETER_PREFIX + "id";
 		const string WebPageLinkAddAction::PARAMETER_DESTINATION_ID = Action_PARAMETER_PREFIX + "to";
-		
-		
-		
+
+
+
 		ParametersMap WebPageLinkAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -64,9 +64,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void WebPageLinkAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -86,9 +86,9 @@ namespace synthese
 				throw ActionException("No such destination web page");
 			}
 		}
-		
-		
-		
+
+
+
 		void WebPageLinkAddAction::run(
 			Request& request
 		){
@@ -110,9 +110,9 @@ namespace synthese
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool WebPageLinkAddAction::isAuthorized(
 			const Session* session
 		) const {

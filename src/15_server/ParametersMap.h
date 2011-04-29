@@ -134,7 +134,7 @@ namespace synthese
 				/// Builds a query string from a parameters map.
 				///	@return the generated query string
 				///	@author Hugues Romain
-				///	@date 2007					
+				///	@date 2007
 				std::string getURI() const;
 
 
@@ -176,7 +176,7 @@ namespace synthese
 				/// @param parameterName key of the parameter to get
 				/// @return the parameter value converted into the C type
 				/// @author Hugues Romain
-				/// @throws MissingParameterException if the parameter does not exist or 
+				/// @throws MissingParameterException if the parameter does not exist or
 				/// cannot be converted into the type specified by the template parameter C.
 				template<class C>
 				C get(
@@ -214,7 +214,7 @@ namespace synthese
 				/// @author Hugues Romain
 				//////////////////////////////////////////////////////////////////////////
 				/// If the parameter does not exist, is empty, or cannot be converted into
-				/// the type specified by the template parameter C, then a the object 
+				/// the type specified by the template parameter C, then a the object
 				/// constructed by default constructor returned.
 				template<class C>
 				C getDefault(
@@ -234,7 +234,7 @@ namespace synthese
 				void insert(const std::string& parameterName, const boost::gregorian::date& value);
 				void insert(const std::string& parameterName, const boost::posix_time::time_duration& value);
 
-	
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Merges this map with an other, with priority to the current one.
 				/// @param other map to read an integrate into the current one

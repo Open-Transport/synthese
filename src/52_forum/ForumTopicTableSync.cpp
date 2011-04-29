@@ -48,7 +48,7 @@ namespace synthese
 	namespace forum
 	{
 		const string ForumTopicTableSync::COL_NAME("name");
-		const string ForumTopicTableSync::COL_NODE_ID("node_id");	
+		const string ForumTopicTableSync::COL_NODE_ID("node_id");
 		const string ForumTopicTableSync::COL_NODE_EXTENSION("node_extension");
 		const string ForumTopicTableSync::COL_USER_EMAIL("user_email");
 		const string ForumTopicTableSync::COL_USER_NAME("user_name");
@@ -58,7 +58,7 @@ namespace synthese
 		const string ForumTopicTableSync::COL_CLOSED("closed");
 		const string ForumTopicTableSync::COL_IP("ip");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<ForumTopicTableSync>::TABLE(
@@ -198,9 +198,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace forum
 	{
 		ForumTopicTableSync::SearchResult ForumTopicTableSync::Search(

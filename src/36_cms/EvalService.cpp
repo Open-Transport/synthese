@@ -37,11 +37,11 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::EvalService>::FACTORY_KEY("EvalService");
-	
+
 	namespace cms
 	{
 		const string EvalService::PARAMETER_TEXT("t");
-		
+
 		ParametersMap EvalService::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -66,9 +66,9 @@ namespace synthese
 			p.display(stream, request, _savedParameters);
 
 		}
-		
-		
-		
+
+
+
 		bool EvalService::isAuthorized(
 			const Session* session
 		) const {

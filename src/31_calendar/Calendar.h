@@ -38,7 +38,7 @@ namespace synthese
 		/** Calendar described by an array of booleans (one per day).
 			@ingroup m19
 
-			The Calendar class implements the service calendar, holding a 
+			The Calendar class implements the service calendar, holding a
 			bitset representing year days. Each year day can be activated or not.
 
 			The active dates of the calendar are marked as activated bits on a bitset per year.
@@ -46,7 +46,7 @@ namespace synthese
 			In a year bitset, a date is represented by the bit at the rank corresponding to its day number in the year.
 			Example : 2008-02-03 => bit 34 of the 2008 bitset.
 		*/
-		class Calendar 
+		class Calendar
 		{
 		public:
 			typedef std::vector<boost::gregorian::date> DatesVector;
@@ -57,7 +57,7 @@ namespace synthese
 				boost::gregorian::greg_year,
 				std::bitset<366>
 			> _BitSets;
-			
+
 			_BitSets _markedDates;
 
 			mutable boost::optional<boost::gregorian::date> _firstActiveDate;
@@ -73,7 +73,7 @@ namespace synthese
 					const boost::gregorian::date& firstDate,
 					const boost::gregorian::date& lastDate
 				);
-				Calendar( 
+				Calendar(
 					const Calendar& other
 				);
 
@@ -83,7 +83,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @date 2010
 				/// @since 3.1.16
-				/// 
+				///
 				/// The serialized string comes from Calendar::serialize.
 				Calendar(
 					const std::string& serialized
@@ -94,7 +94,7 @@ namespace synthese
 			//@{
 				boost::gregorian::date getFirstActiveDate() const;
 				boost::gregorian::date getLastActiveDate() const;
-			
+
 				/** Tests if a date is active according to the calendar.
 				 * This method can be overloaded by subclasses to do additional controls.
 				 * @param date date to test
@@ -103,11 +103,11 @@ namespace synthese
 				virtual bool isActive(
 					const boost::gregorian::date& date
 				) const;
-				
-				
-				
+
+
+
 				/** Gets all the active dates of the calendar.
-				 * 
+				 *
 				 * @return vector containing the active dates of the calendar
 				 */
 				DatesVector getActiveDates () const;
@@ -116,7 +116,7 @@ namespace synthese
 					@param op calendar to compare with
 					@return bool true if at least one date is marked in the two calendars
 					@author Hugues Romain
-					@date 2008				
+					@date 2008
 				*/
 				bool hasAtLeastOneCommonDateWith(const Calendar& op) const;
 
@@ -181,7 +181,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @date 2010
 				/// @since 3.1.16
-				/// 
+				///
 				/// The serialized string comes from Calendar::serialize.
 				void setFromSerializedString(const std::string& value);
 			//@}

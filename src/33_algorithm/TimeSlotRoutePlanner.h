@@ -104,7 +104,7 @@ namespace synthese
 				std::ostream* logStream = NULL
 			);
 
-			
+
 			/** Constructor for attempting to optimize a continuous service slot.
 				@param originVam
 				@param destinationVam
@@ -112,9 +112,9 @@ namespace synthese
 				@param maxSolutionsNumber
 				@param accessParameters
 				@param planningOrder
-				@return 
+				@return
 				@author Hugues Romain
-				@date 2009				
+				@date 2009
 			*/
 			TimeSlotRoutePlanner(
 				const graph::VertexAccessMap& originVam,

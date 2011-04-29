@@ -77,7 +77,7 @@ namespace synthese
 			/** Remove all the links to the object present in the environment.
 				@param obj Pointer to the object to unlink
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 
 				This method must be implemented by each template instantiation
 			*/
@@ -272,7 +272,7 @@ namespace synthese
 				Load(static_cast<ObjectClass*>(obj), rows, env, linkLevel);
 			}
 
-			
+
 			virtual void _save(
 				typename ParentTableSyncClass::ObjectType* obj,
 				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()

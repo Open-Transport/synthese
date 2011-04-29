@@ -47,8 +47,8 @@ namespace synthese
 			Registrable(0)
 		{
 		}
-		
-		
+
+
 
 		void ReservationConfirmationEMailItemInterfacePage::display(
 			std::ostream& stream,
@@ -57,7 +57,7 @@ namespace synthese
 			const server::Request* request /*= NULL*/
 		) const	{
 			ParametersVector pv;
-		
+
 			pv.push_back(to_simple_string(resa.getDepartureTime().time_of_day()));
 			pv.push_back(resa.getDeparturePlaceName());
 			pv.push_back(to_simple_string(resa.getArrivalTime().time_of_day()));

@@ -204,7 +204,7 @@ namespace synthese
 					- first : utility to store the journey as result or a future result part.
 					- second : utility to continue to traverse the rest of the path
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 			*/
 			_JourneyUsefulness evaluateJourney(
 				boost::shared_ptr<RoutePlanningIntermediateJourney> journey

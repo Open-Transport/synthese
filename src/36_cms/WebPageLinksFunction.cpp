@@ -42,12 +42,12 @@ namespace synthese
 	using namespace admin;
 
 	template<> const string util::FactorableTemplate<Function,cms::WebPageLinksFunction>::FACTORY_KEY("links");
-	
+
 	namespace cms
 	{
 		const string WebPageLinksFunction::PARAMETER_PAGE_ID("page_id");
 		const string WebPageLinksFunction::PARAMETER_DISPLAY_TEMPLATE_ID("display_page_id");
-		
+
 		ParametersMap WebPageLinksFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -86,7 +86,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			
+
 			size_t number(0);
 			BOOST_FOREACH(const Webpage::Links::value_type& link, _page->getLinks())
 			{
@@ -107,9 +107,9 @@ namespace synthese
 				stream << number;
 			}
 		}
-		
-		
-		
+
+
+
 		bool WebPageLinksFunction::isAuthorized(
 			const Session* session
 		) const {

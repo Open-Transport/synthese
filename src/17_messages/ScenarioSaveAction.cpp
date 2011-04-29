@@ -58,7 +58,7 @@ namespace synthese
 	using namespace dblog;
 
 	template<> const string util::FactorableTemplate<Action,messages::ScenarioSaveAction>::FACTORY_KEY("scenario_save");
-		
+
 	namespace messages
 	{
 		const string ScenarioSaveAction::PARAMETER_CREATE_TEMPLATE(Action_PARAMETER_PREFIX + "t");
@@ -88,7 +88,7 @@ namespace synthese
 			{
 				// Update
 				if(map.isDefined(PARAMETER_SCENARIO_ID))
-				{					
+				{
 					setScenarioId(map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID));
 				}
 				else
@@ -244,7 +244,7 @@ namespace synthese
 						}
 					}
 				}
-				
+
 				// Sent scenario only
 				if(_sscenario.get())
 				{

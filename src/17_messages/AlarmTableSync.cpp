@@ -64,11 +64,11 @@ namespace synthese
 		const string AlarmTableSync::COL_IS_TEMPLATE = "is_template";
 		const string AlarmTableSync::COL_ENABLED = "is_enabled";
 		const string AlarmTableSync::COL_LEVEL = "level";
-		const string AlarmTableSync::COL_SHORT_MESSAGE = "short_message"; 
+		const string AlarmTableSync::COL_SHORT_MESSAGE = "short_message";
 		const string AlarmTableSync::COL_LONG_MESSAGE = "long_message";
 		const string AlarmTableSync::COL_PERIODSTART = "period_start";
-		const string AlarmTableSync::COL_PERIODEND = "period_end"; 
-		const string AlarmTableSync::COL_SCENARIO_ID = "scenario_id"; 
+		const string AlarmTableSync::COL_PERIODEND = "period_end";
+		const string AlarmTableSync::COL_SCENARIO_ID = "scenario_id";
 		const string AlarmTableSync::COL_TEMPLATE_ID("template_id");
 	}
 
@@ -98,7 +98,7 @@ namespace synthese
 			DBTableSync::Index(AlarmTableSync::COL_SCENARIO_ID.c_str(),	AlarmTableSync::COL_PERIODSTART.c_str(), ""),
 			DBTableSync::Index()
 		};
-	    
+
 		template<>
 		string DBInheritanceTableSyncTemplate<AlarmTableSync,Alarm>::_GetSubClassKey(const DBResultSPtr& row)
 		{

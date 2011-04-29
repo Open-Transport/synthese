@@ -39,7 +39,7 @@ namespace synthese
 	namespace admin
 	{
 		class AdminInterfaceElement;
-		
+
 		//////////////////////////////////////////////////////////////////////////
 		/// 14.15 Function : display of administration console.
 		/// Key : admin
@@ -69,7 +69,7 @@ namespace synthese
 			static const std::string PARAMETER_MAIN_CMS_TEMPLATE;
 			static const std::string PARAMETER_POSITION_ELEMENT_CMS_TEMPLATE;
 			static const std::string PARAMETER_TREE_ELEMENT_CMS_TEMPLATE;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
@@ -101,18 +101,18 @@ namespace synthese
 			virtual bool isAuthorized(const server::Session* session) const;
 
 		public:
-		
+
 			//! @name Getters
 			//@{
 				boost::shared_ptr<AdminInterfaceElement> getPage() const { return _page; }
 				boost::shared_ptr<AdminInterfaceElement> getActionFailedPage() const { return _actionFailedPage; }
 			//@}
-			
+
 			//! @name Setters
 			//@{
 				void setPage(boost::shared_ptr<AdminInterfaceElement> aie){ _page = aie; }
 				void setActionFailedPage(boost::shared_ptr<AdminInterfaceElement> aie){ _actionFailedPage = aie; }
-	
+
 				template<class T>
 				void setActionFailedPage();
 			//@}

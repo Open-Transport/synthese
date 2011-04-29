@@ -32,7 +32,7 @@ namespace synthese
 	namespace interfaces
 	{
 		/** Execution parameter reading Value Interface Element class.
-			
+
 			Usage :
 			@code {{param <rank>}} @endcode
 
@@ -52,7 +52,7 @@ namespace synthese
 				, const void* object = NULL
 				, const server::Request* request = NULL
 				) const;
-			
+
 			void storeParameters(ValueElementList& vel);
 
 			ParameterValueInterfaceElement();

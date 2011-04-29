@@ -57,7 +57,7 @@ namespace synthese
 		    static std::map<std::string, PtrCallback> _Callbacks;
 		    static Parameters _DefaultParameters;
 		    static Parameters _Parameters;
-		
+
 
 		public:
 			static void SetDefaultParameters(
@@ -75,9 +75,9 @@ namespace synthese
 				const std::string& value,
 				bool runCallback = true
 			);
-		
+
 		protected:
-		
+
 			static void RegisterParameter(
 				const std::string& name,
 				const std::string& defaultValue,
@@ -87,7 +87,7 @@ namespace synthese
 				const std::string& name
 			);
 
-		
+
 		public:
 			virtual void preInit() const = 0;
 			virtual void init() const = 0;

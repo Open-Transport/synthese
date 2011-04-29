@@ -68,7 +68,7 @@ namespace synthese
 			static const std::string PARAMETER_ALLOWED_DEPARTURE;
 			static const std::string PARAMETER_ALLOWED_ARRIVAL;
 			static const std::string PARAMETER_ALLOWED_INTERNAL;
-			
+
 		private:
 			boost::shared_ptr<LineStop> _lineStop;
 			boost::shared_ptr<StopPoint> _physicalStop;
@@ -96,7 +96,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////

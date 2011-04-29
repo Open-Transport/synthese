@@ -66,10 +66,10 @@ namespace synthese
 
 		@defgroup m32Alarm 32.17 Messages recipient
 		@ingroup m32
-		
+
 		@defgroup m32 32 Geography
 		@ingroup m3
-		
+
 		The geography module contains the objects related to the locations on earth.
 
 		@image html uml_generic_place.png

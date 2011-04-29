@@ -64,7 +64,7 @@ namespace synthese
 
 			this->backend.assign(it, it + pos);
 			it += pos + 3;
-			
+
 			if (!util::Factory<DB>::contains(this->backend))
 			{
 				throw InvalidConnectionStringException("No factory for backend: " + this->backend);
@@ -104,9 +104,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-			
+
+
+
 		DB::DBModifEvent::DBModifEvent(std::string _table, DBModifType _type, util::RegistryKeyType _id) :
 			table(_table), type(_type), id(_id)
 		{ }
@@ -217,7 +217,7 @@ namespace synthese
 			BOOST_FOREACH(const shared_ptr<DBTableSync> tableSync, tableSyncs)
 			{
 				Log::GetInstance().info("Updating schema for table " + tableSync->getFactoryKey() + "...");
-			    try 
+			    try
 			    {
 					tableSync->updateSchema(this);
 			    }
@@ -236,18 +236,18 @@ namespace synthese
 			{
 				tableSync->initAutoIncrement();
 			}
-			
+
 			// Call the first sync step on all synchronizers.
 			BOOST_FOREACH(const shared_ptr<DBTableSync> tableSync, tableSyncs)
 			{
 			    Log::GetInstance().info("Loading table " + tableSync->getFactoryKey() +"...");
-			    try 
+			    try
 			    {
 					tableSync->firstSync(this);
 			    }
 			    catch (std::exception& e)
 			    {
-					Log::GetInstance().error("Unattended error during first sync of " + tableSync->getFactoryKey() + 
+					Log::GetInstance().error("Unattended error during first sync of " + tableSync->getFactoryKey() +
 							  ". In-memory data might be inconsistent.", e);
 					if (_connInfo->debug)
 						throw;
@@ -399,15 +399,15 @@ namespace synthese
 			}
 			DBTableSync* tableSync = it->second.get();
 
-			if (modifEvent.type == MODIF_INSERT) 
+			if (modifEvent.type == MODIF_INSERT)
 			{
 				tableSync->rowsAdded(this, tableSync->getRow(modifEvent.id));
 			}
-			else if (modifEvent.type == MODIF_UPDATE) 
+			else if (modifEvent.type == MODIF_UPDATE)
 			{
 				tableSync->rowsUpdated(this, tableSync->getRow(modifEvent.id));
 			}
-			else if (modifEvent.type == MODIF_DELETE) 
+			else if (modifEvent.type == MODIF_DELETE)
 			{
 				RowIdList rowIds;
 				rowIds.push_back(modifEvent.id);

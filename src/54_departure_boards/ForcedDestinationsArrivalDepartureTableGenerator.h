@@ -37,7 +37,7 @@ namespace synthese
 	namespace departure_boards
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// Departure table generator : chronological order with priority to 
+		/// Departure table generator : chronological order with priority to
 		///	display at least one departure per available destination.
 		/// @ingroup m54
 		/// @author Hugues Romain

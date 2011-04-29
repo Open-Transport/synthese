@@ -107,7 +107,7 @@ namespace synthese
 	using namespace messages;
 	using namespace graph;
 	using namespace pt;
-	
+
 
 	namespace util
 	{
@@ -139,7 +139,7 @@ namespace synthese
 				_displayScreen = Env::GetOfficialEnv().get<DisplayScreen>(
 					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
 				);
-				
+
 				_status = DisplayMonitoringStatusTableSync::GetStatus(
 					_displayScreen->getKey()
 				);
@@ -155,9 +155,9 @@ namespace synthese
 				throw AdminParametersException("Place not found");
 			}
 		}
-		
-		
-		
+
+
+
 		ParametersMap DisplayAdmin::getParametersMap() const
 		{
 			ParametersMap m(_maintenanceLogView.getParametersMap());
@@ -232,9 +232,9 @@ namespace synthese
 					)	)
 				;
 				stream << t.cell("Adresse MAC", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_MAC_ADDRESS, _displayScreen->getMacAddress()));
-				
+
 				stream << t.title("Connexion");
-				
+
 				if (_displayScreen->getLocation() != NULL && _displayScreen->getParent() == NULL)
 				{
 					// CPU search
@@ -243,7 +243,7 @@ namespace synthese
 							Env::GetOfficialEnv(),
 							_displayScreen->getLocation()->getKey()
 					)	);
-					
+
 					if(!cpus.empty())
 					{
 						AdminFunctionRequest<DisplayScreenCPUAdmin> goCPURequest(_request);
@@ -253,7 +253,7 @@ namespace synthese
 								Env::GetOfficialEnv().getSPtr(_displayScreen->getRoot<DisplayScreenCPU>())
 							);
 						}
-						
+
 						stream << t.cell(
 							"Unité centrale",
 							t.getForm().getSelectInput(
@@ -309,13 +309,13 @@ namespace synthese
 				// Update action
 				AdminActionFunctionRequest<UpdateDisplayMaintenanceAction,DisplayAdmin> updateRequest(_request);
 				updateRequest.getAction()->setScreenId(_displayScreen->getKey());
-				
+
 				// View the display type
 				AdminFunctionRequest<DisplayTypeAdmin> displayTypeRequest(_request);
 				displayTypeRequest.getPage()->setType(
 					Env::GetOfficialEnv().getSPtr(_displayScreen->getType())
 				);
-				
+
 				// Log search
 				AdminFunctionRequest<DisplayAdmin> searchRequest(_request);
 
@@ -347,7 +347,7 @@ namespace synthese
 				stream << "<h1>Informations de supervision</h1>";
 
 				bool monitored(_displayScreen->isMonitored());
-				
+
 				HTMLList l;
 				stream << l.open();
 
@@ -372,7 +372,7 @@ namespace synthese
 				}
 
 
-				
+
 				if(!monitored)
 				{
 					stream <<
@@ -541,7 +541,7 @@ namespace synthese
 					stream << t.close();
 				}
 
-				
+
 
 				if(_displayScreen->getGenerationMethod() == DisplayScreen::ROUTE_PLANNING)
 				{
@@ -618,7 +618,7 @@ namespace synthese
 								stream << t.row();
 								stream << t.col() << it.second->getName();
 								stream << t.col() << it.second->getCodeBySources();
-								
+
 								// Lines column
 								stream << t.col();
 								set<const CommercialLine*> lines;
@@ -636,9 +636,9 @@ namespace synthese
 										"</span>"
 									;
 								}
-								
+
 								// Activated column
-								stream << t.col();							
+								stream << t.col();
 								if(	_displayScreen->getPhysicalStops().find(it.first) ==
 									_displayScreen->getPhysicalStops().end()
 								){
@@ -789,7 +789,7 @@ namespace synthese
 					stream << td.row();
 					stream << td.col() << HTMLModule::getHTMLLink(displayRequest.getHTMLForm().getURL(), screen.getName());
 					stream << td.col() << DisplayScreen::GetSubScreenTypeLabel(screen.getSubScreenType());
-					
+
 					// Displayed place
 					stream << td.col();
 					if(screen.getDisplayedPlace())
@@ -901,7 +901,7 @@ namespace synthese
 						_displayScreen->getSortedAvaliableDestinationsLabels(_displayScreen->getDisplayedPlaces()),
 						optional<RegistryKeyType>(0)
 					);
-						
+
 					stream << t.col() << f.getSubmitButton("Ajouter");
 
 					stream << t.close() << f.close();
@@ -1099,8 +1099,8 @@ namespace synthese
 				stream << viewForm.close();
 				stream << "</p>";
 			}
-			
-			
+
+
 			////////////////////////////////////////////////////////////////////
 			// LOG TAB
 			if (openTabContent(stream, TAB_LOG))
@@ -1223,7 +1223,7 @@ namespace synthese
 
 			_tabBuilded = true;
 		}
-		
+
 		bool DisplayAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _displayScreen == static_cast<const DisplayAdmin&>(other)._displayScreen;
@@ -1233,7 +1233,7 @@ namespace synthese
 		{
 			_displayScreen = value;
 		}
-		
+
 		boost::shared_ptr<const DisplayScreen> DisplayAdmin::getScreen() const
 		{
 			return _displayScreen;

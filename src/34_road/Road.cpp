@@ -47,7 +47,7 @@ namespace synthese
 	{
 		Road::Road (
 			RegistryKeyType id,
-			RoadType type			
+			RoadType type
 		):	Registrable(id),
 			_type (type)
 		{
@@ -67,8 +67,8 @@ namespace synthese
 			}
 		}
 
-		
-		
+
+
 		void Road::setType(
 			const RoadType& type
 		){
@@ -81,8 +81,8 @@ namespace synthese
 		{
 			return true;
 		}
-		
-		
+
+
 
 		RoadPlace* Road::getRoadPlace(
 		) const {

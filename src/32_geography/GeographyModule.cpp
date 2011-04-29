@@ -54,15 +54,15 @@ namespace synthese
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<GeographyModule>::NAME("Géographie");
-	
+
 		template<> void ModuleClassTemplate<GeographyModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<GeographyModule>::Init()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<GeographyModule>::End()
 		{
 		}
@@ -71,7 +71,7 @@ namespace synthese
 
 	namespace geography
 	{
-		GeographyModule::CitiesMatcher GeographyModule::_citiesMatcher; 
+		GeographyModule::CitiesMatcher GeographyModule::_citiesMatcher;
 		GeographyModule::CitiesMatcher GeographyModule::_citiesT9Matcher;
 
 

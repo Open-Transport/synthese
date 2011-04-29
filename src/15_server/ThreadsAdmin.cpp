@@ -63,7 +63,7 @@ namespace synthese
 		void ThreadsAdmin::setFromParametersMap(const ParametersMap& map)
 		{
 		}
-		
+
 		void ThreadsAdmin::display(
 			ostream& stream,
 			const AdminRequest& request

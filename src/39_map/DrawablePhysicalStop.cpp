@@ -34,7 +34,7 @@ using namespace geos::geom;
 namespace synthese
 {
 	using namespace pt;
-	
+
 	namespace map
 	{
 		DrawablePhysicalStop::DrawablePhysicalStop(
@@ -44,37 +44,37 @@ namespace synthese
 			, _point (*physicalStop->getGeometry()->getCoordinate())
 		{
 		}
-		
-		
+
+
 		DrawablePhysicalStop::~DrawablePhysicalStop ()
 		{
 		}
-		
-		
-		
-		int 
+
+
+
+		int
 		DrawablePhysicalStop::getPhysicalStopId () const
 		{
 			return _physicalStopId;
 		}
-		
-		
-		const std::string& 
+
+
+		const std::string&
 		DrawablePhysicalStop::getName () const
 		{
 			return _name;
 		}
-		
-		
-		const Coordinate& 
+
+
+		const Coordinate&
 		DrawablePhysicalStop::getPoint () const
 		{
 			return _point;
 		}
-		
-		
-		
-		void 
+
+
+
+		void
 		DrawablePhysicalStop::prepare (Map& map)
 		{
 			_point = map.toOutputFrame (_point);

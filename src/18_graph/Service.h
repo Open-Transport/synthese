@@ -1,20 +1,20 @@
 
 /** service class header.
     @file service.h
- 
+
     This file belongs to the SYNTHESE project (public transportation specialized software)
     Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
- 
+
     This program is free software; you can redistribute it and/or
     modify it under the terms of the GNU General Public License
     as published by the Free Software Foundation; either version 2
     of the License, or (at your option) any later version.
- 
+
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
- 
+
     You should have received a copy of the GNU General Public License
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -41,19 +41,19 @@ namespace synthese
 		class AccessParameters;
 
 		/** Service abstract base class.
-			
+
 			A service represents the ability to follow a path
 			at certain days and hours.
 
 			The days when the service is provided are stored in a Calendar object.
-			Even if a Service intrinsically corresponds to a sequence of 
+			Even if a Service intrinsically corresponds to a sequence of
 			(arrival schedule - departure schedule) couples, these schedules are not
-			stored in Service objects but per Edge (JourneyPattern/Road). However, this is how 
+			stored in Service objects but per Edge (JourneyPattern/Road). However, this is how
 			Service objects are persisted.
 
-			It is completely independent from the "vehicle" : this ability 
-			can be provided by an external entity (bus, train...), 
-			but also self-provided by the traveller himself 
+			It is completely independent from the "vehicle" : this ability
+			can be provided by an external entity (bus, train...),
+			but also self-provided by the traveller himself
 			(walking, cycling...).
 
 			@warning Each constructor of Service implementations must run clearRTData().
@@ -63,7 +63,7 @@ namespace synthese
 		*/
 		class Service
 		:	public RuleUser,
-			public virtual util::Registrable		
+			public virtual util::Registrable
 		{
 		public:
 			typedef std::vector<const Vertex*> ServedVertices;
@@ -126,12 +126,12 @@ namespace synthese
 					bool RTData,
 					std::size_t rankInPath
 				) const = 0;
-				
+
 				virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(
 					bool RTData,
 					std::size_t rankInPath
 				) const = 0;
-				
+
 				virtual boost::posix_time::time_duration getArrivalBeginScheduleToIndex(
 					bool RTData,
 					std::size_t rankInPath
@@ -148,7 +148,7 @@ namespace synthese
 					const graph::Edge& arrivalEdge,
 					std::size_t userClassRank
 				) const;
-				
+
 				virtual void clearNonConcurrencyCache() const;
 
 
@@ -177,7 +177,7 @@ namespace synthese
 					@return A full ServicePointer to the service. If the service cannot be used at the specified date/time, then the ServicePointer points to a NULL service.
 					@author Hugues Romain
 					@date 2007
-					@warning The service index is unknown in the generated ServicePointer.					
+					@warning The service index is unknown in the generated ServicePointer.
 				*/
 				virtual ServicePointer getFromPresenceTime(
 					bool RTData,
@@ -235,7 +235,7 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Update a served edge at real time.
 				/// @param rank Rank of the edge to update
-				/// @param value Served edge 
+				/// @param value Served edge
 				void setRealTimeVertex(
 					std::size_t rank,
 					const graph::Vertex* value

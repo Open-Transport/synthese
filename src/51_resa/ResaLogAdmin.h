@@ -43,7 +43,7 @@ namespace synthese
 
 		public:
 			ResaLogAdmin();
-			
+
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -59,10 +59,10 @@ namespace synthese
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
-			
+
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
@@ -75,7 +75,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			/** Authorization control.
 				@return bool True if the displayed page can be displayed
 				@author Hugues Romain
@@ -84,7 +84,7 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& profile
 			) const;
-			
+
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param parentLink Link to the parent page
 				@param currentPage Currently displayed page
@@ -97,8 +97,8 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
-		
-		
+
+
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request

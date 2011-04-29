@@ -50,7 +50,7 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace geography;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::LineStopUpdateAction>::FACTORY_KEY("LineStopUpdateAction");
@@ -63,8 +63,8 @@ namespace synthese
 		const string LineStopUpdateAction::PARAMETER_ALLOWED_DEPARTURE = Action_PARAMETER_PREFIX + "ad";
 		const string LineStopUpdateAction::PARAMETER_ALLOWED_ARRIVAL = Action_PARAMETER_PREFIX + "aa";
 		const string LineStopUpdateAction::PARAMETER_ALLOWED_INTERNAL = Action_PARAMETER_PREFIX + "ai";
-		
-		
+
+
 		ParametersMap LineStopUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -95,9 +95,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void LineStopUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -144,9 +144,9 @@ namespace synthese
 				throw ActionException("No such physical stop");
 			}
 		}
-		
-		
-		
+
+
+
 		void LineStopUpdateAction::run(
 			Request& request
 		){
@@ -178,9 +178,9 @@ namespace synthese
 
 			//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool LineStopUpdateAction::isAuthorized(
 			const Session* session
 		) const {

@@ -47,7 +47,7 @@ namespace synthese
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<Action, departure_boards::DisplayScreenRemovePhysicalStopAction>::FACTORY_KEY("dsrps");
-	
+
 	namespace departure_boards
 	{
 		const string DisplayScreenRemovePhysicalStopAction::PARAMETER_SCREEN_ID(
@@ -90,7 +90,7 @@ namespace synthese
 		{
 			// Preparation
 			_screen->removePhysicalStop(_stop.get());
-			
+
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
@@ -115,9 +115,9 @@ namespace synthese
 				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
-		
-		
-		
+
+
+
 		void DisplayScreenRemovePhysicalStopAction::setStopId(
 			RegistryKeyType id
 		){
@@ -130,8 +130,8 @@ namespace synthese
 				throw ActionException("Departure physical stop", e, *this);
 			}
 		}
-		
-		
+
+
 		void DisplayScreenRemovePhysicalStopAction::setScreen(
 			boost::shared_ptr<const DisplayScreen> value
 		){

@@ -62,36 +62,36 @@ namespace synthese
 				V,
 				Z
 			};
-			
+
 			typedef std::vector<Phoneme> PhoneticString;
 			typedef size_t LevenshteinDistance;
-			
+
 		private:
 			std::string	_source;
 			PhoneticString _phonetic;
-			
+
 			static bool _IsLast(const std::string& source, size_t pos, size_t len=1);
 			static bool _IsFollowedBy(const std::string& source, size_t pos, const std::string& text);
 			static bool _IsPrecededBy(const std::string& source, size_t pos, const std::string& text);
-		
+
 		public:
 			FrenchPhoneticString();
 			FrenchPhoneticString(const std::string& source);
-			
+
 			void setSource(const std::string& source);
 			const std::string& getSource() const;
 			const PhoneticString& getPhonetic() const;
 			std::string getPhoneticString() const;
-			
+
 			LevenshteinDistance levenshtein(const FrenchPhoneticString& s) const;
-			
+
 			template<class T>
 			static LevenshteinDistance Levenshtein(const T& s1, const T& s2)
 			{
 				if (s2.size () > 256 || s1.size() > 256) return std::numeric_limits<LevenshteinDistance>::max ();
 
 				// Levenshtein Word Distance matrix.
-				// Note that the dims are bounded to 256. It means that it is 
+				// Note that the dims are bounded to 256. It means that it is
 				// forbidden to compare words larger than 256 characters each!
 				LevenshteinDistance matrix[256][256];
 
@@ -105,10 +105,10 @@ namespace synthese
 				for(LevenshteinDistance i = 0; i <= n; matrix[i][0] = i++) ;
 				for(LevenshteinDistance j = 1; j <= m; matrix[0][j] = j++) ;
 
-				for (LevenshteinDistance i = 1; i <= n; i++ ) 
+				for (LevenshteinDistance i = 1; i <= n; i++ )
 				{
 					char sc = s2[i-1];
-					for (LevenshteinDistance j = 1; j <= m;j++) 
+					for (LevenshteinDistance j = 1; j <= m;j++)
 					{
 						LevenshteinDistance v = matrix[i-1][j-1];
 						if ( s1[j-1] !=  sc ) v++;

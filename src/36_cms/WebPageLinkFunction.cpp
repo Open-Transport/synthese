@@ -41,14 +41,14 @@ namespace synthese
 	using namespace html;
 
 	template<> const string util::FactorableTemplate<Function,cms::WebPageLinkFunction>::FACTORY_KEY("link");
-	
+
 	namespace cms
 	{
 		const string WebPageLinkFunction::PARAMETER_TARGET("target");
 		const string WebPageLinkFunction::PARAMETER_TEXT("text");
 		const string WebPageLinkFunction::PARAMETER_USE_SMART_URL("use_smart_url");
 		const string WebPageLinkFunction::PARAMETER_CONFIRM("confirm");
-		
+
 		ParametersMap WebPageLinkFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -117,9 +117,9 @@ namespace synthese
 			}
 			stream << HTMLModule::getHTMLLink(url, _text, _confirm);
 		}
-		
-		
-		
+
+
+
 		bool WebPageLinkFunction::isAuthorized(
 			const Session* session
 		) const {

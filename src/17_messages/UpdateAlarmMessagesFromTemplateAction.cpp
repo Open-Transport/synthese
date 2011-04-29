@@ -46,10 +46,10 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace security;
-	
+
 
 	template<> const string util::FactorableTemplate<Action, messages::UpdateAlarmMessagesFromTemplateAction>::FACTORY_KEY("uaft");
-	
+
 	namespace messages
 	{
 		const string UpdateAlarmMessagesFromTemplateAction::PARAMETER_ALARM_ID(Action_PARAMETER_PREFIX + "ai");
@@ -84,10 +84,10 @@ namespace synthese
 		void UpdateAlarmMessagesFromTemplateAction::run(
 			Request& request
 		) throw(ActionException) {
-			
+
 			_message->setShortMessage(_template->getShortMessage());
 			_message->setLongMessage(_template->getLongMessage());
-			
+
 			AlarmTableSync::Save(_message.get());
 		}
 
@@ -104,7 +104,7 @@ namespace synthese
 			catch (ObjectNotFoundException<Alarm>& e)
 			{
 				throw ActionException("edited message", e, *this);
-			}			
+			}
 		}
 
 

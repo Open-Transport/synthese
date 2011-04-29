@@ -55,7 +55,7 @@ namespace synthese
 			//@{
 				static std::string	_GetSubClassKey(const DBResultSPtr& row);
 				static std::string	_GetSubClassKey(const T* obj);
-			
+
 				/** Fields load operations common to all subclasses.
 					@param obj Pointer to the object to load from the database
 					@param rows Row to read
@@ -156,7 +156,7 @@ namespace synthese
 			}
 
 			virtual void rowsUpdated (
-				DB* db, 
+				DB* db,
 				const DBResultSPtr& rows
 			){
 				while (rows->next ())
@@ -254,7 +254,7 @@ namespace synthese
 
 
 			////////////////////////////////////////////////////////////////////
-			/// Load objects into an environment, from a SQL query, and return 
+			/// Load objects into an environment, from a SQL query, and return
 			/// the list of loaded objects.
 			///	@param query SQL query
 			///	@param env Environment to write

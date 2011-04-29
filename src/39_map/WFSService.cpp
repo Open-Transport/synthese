@@ -47,12 +47,12 @@ namespace synthese
 	using namespace db;
 
 	template<> const string util::FactorableTemplate<Function,map::WFSService>::FACTORY_KEY("WFS");
-	
+
 	namespace map
 	{
 		const string WFSService::PARAMETER_VERSION("VERSION");
 		const string WFSService::VALUE_VERSION_1_1_0("1.1.0");
-		
+
 		const string WFSService::PARAMETER_REQUEST("REQUEST");
 		const string WFSService::VALUE_REQUEST_GetCapabilities("GetCapabilities");
 		const string WFSService::VALUE_REQUEST_DescribeFeatureType("DescribeFeatureType");
@@ -88,7 +88,7 @@ namespace synthese
 			map.insert(PARAMETER_REQUEST, _request);
 			map.insert(PARAMETER_OUTPUTFORMAT, _outputFormat);
 			map.insert(PARAMETER_RESULTTYPE, _outputResults ? VALUE_RESULTTYPE_RESULTS : VALUE_RESULTTYPE_HITS);
-			
+
 			// SRS name
 			if(_srs)
 			{
@@ -316,7 +316,7 @@ namespace synthese
 						"xmlns=\"http://www.w3.org/2001/XMLSchema\" " <<
 						"xmlns:gml=\"http://www.opengis.net/gml\" " <<
 						"elementFormDefault=\"qualified\" " <<
-						"attributeFormDefault=\"unqualified\" " << 
+						"attributeFormDefault=\"unqualified\" " <<
 					">" <<
 					"<import namespace=\"http://www.opengis.net/gml\" schemaLocation=\"../gml/3.1.1/base/gml.xsd\" />"
 				;
@@ -472,9 +472,9 @@ namespace synthese
 				"</wfs:WFS_Capabilites>";
 			}
 		}
-		
-		
-		
+
+
+
 		bool WFSService::isAuthorized(
 			const Session* session
 		) const {

@@ -40,7 +40,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace impex;
-		
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::JourneyPatternUpdateAction>::FACTORY_KEY("JourneyPatternUpdateAction");
@@ -55,8 +55,8 @@ namespace synthese
 		const string JourneyPatternUpdateAction::PARAMETER_WAYBACK = Action_PARAMETER_PREFIX + "wb";
 		const string JourneyPatternUpdateAction::PARAMETER_DATASOURCE_LINKS = Action_PARAMETER_PREFIX + "sl";
 
-		
-		
+
+
 		ParametersMap JourneyPatternUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -86,9 +86,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void JourneyPatternUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -135,15 +135,15 @@ namespace synthese
 				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(PARAMETER_DATASOURCE_LINKS), *_env);
 			}
 		}
-		
-		
-		
+
+
+
 		void JourneyPatternUpdateAction::run(
 			Request& request
 		){
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			
+
 			if(_name)
 			{
 				_route->setName(*_name);
@@ -164,14 +164,14 @@ namespace synthese
 			{
 				_route->setDataSourceLinks(*_dataSourceLinks);
 			}
-			
+
 			JourneyPatternTableSync::Save(_route.get());
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool JourneyPatternUpdateAction::isAuthorized(
 			const Session* session
 		) const {

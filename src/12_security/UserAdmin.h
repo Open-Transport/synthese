@@ -33,7 +33,7 @@ namespace synthese
 
 		/** Ecran d'édition d'utilisateur.
 			@ingroup m12Admin refAdmin
-		
+
 			@image html cap_admin_user.png
 			@image latex cap_admin_user.png "Maquette de l'écran d'édition d'utilisateur" width=14cm
 
@@ -67,7 +67,7 @@ namespace synthese
 				-# <b>Droits</b> : cette section n'est disponible que pour les utilisateurs disposant d'une habilitation sur le module sécurité en entier.
 					-# <tt>Connexion autorisée</tt> : Champ OUI/NON. Si le choix est sur NON, l'utilisateur est temporairement désactivé. Cela permet à l'administrateur de suspendre un droit d'accès sans toutefois supprimer l'utilisateur.
 					-# <tt>Profil</tt> : Liste de choix permettant de sélectionner le profil d'habilitations de l'utilisateur.
-								
+
 			<i>Sécurité</i>
 				- Une habilitation privée SecurityRight de niveau READ est nécessaire pour accéder à la page en consultation sur l'utilisateur courant. Dans ce cas la partie "droits" n'est pas affichée.
 				- Une habilitation privée SecurityRight de niveau WRITE est nécessaire pour accéder à la page en modification sur l'utilisateur courant. Dans ce cas la partie "droits" n'est pas affichée.
@@ -86,7 +86,7 @@ namespace synthese
 
 		public:
 			UserAdmin();
-			
+
 			void setUser(boost::shared_ptr<User> value);
 			void setUserC(boost::shared_ptr<const User> value);
 			boost::shared_ptr<const User> getUser() const;
@@ -97,29 +97,29 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
-			
-			
+
+
 
 			void display(
 				std::ostream& stream,
 				const admin::AdminRequest& _request
 			) const;
-			
+
 			bool isAuthorized(
 				const security::User& user
 			) const;
 
 			virtual std::string getTitle() const;
-			
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 
 		};

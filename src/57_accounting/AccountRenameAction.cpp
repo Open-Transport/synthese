@@ -36,7 +36,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace server;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, accounts::AccountRenameAction>::FACTORY_KEY("account_rename");
@@ -45,25 +45,25 @@ namespace synthese
 	namespace accounts
 	{
 		const string AccountRenameAction::PARAMETER_VALUE = Action_PARAMETER_PREFIX + "va";
-		
-		
-		
+
+
+
 		AccountRenameAction::AccountRenameAction()
 			: util::FactorableTemplate<Action, AccountRenameAction>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap AccountRenameAction::getParametersMap() const
 		{
 			ParametersMap map;
 			//map.insert(PARAMETER_xxx, _xxx);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void AccountRenameAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_value = map.get<string>(PARAMETER_VALUE);
@@ -78,9 +78,9 @@ namespace synthese
 				throw ActionException("Account not found");
 			}
 		}
-		
-		
-		
+
+
+
 		void AccountRenameAction::run(Request& request)
 		{
 			_account->setName(_value);

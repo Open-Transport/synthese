@@ -42,7 +42,7 @@ namespace synthese
 	using namespace db;
 	using namespace messages;
 	using namespace util;
-	
+
 
 	template<>
 	const string util::FactorableTemplate<ScenarioTableSync, ScenarioTemplateInheritedTableSync>::FACTORY_KEY("ScenarioTemplateInheritedTableSync");
@@ -54,7 +54,7 @@ namespace synthese
 		void DBInheritedTableSyncTemplate<
 			ScenarioTableSync,ScenarioTemplateInheritedTableSync,ScenarioTemplate
 		>::Load(
-			ScenarioTemplate* obj, 
+			ScenarioTemplate* obj,
 			const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
@@ -115,7 +115,7 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
-				<< " WHERE " 
+				<< " WHERE "
 				<< COL_IS_TEMPLATE << "=1";
 			if(folderId)
 			{
@@ -134,12 +134,12 @@ namespace synthese
 				query << " LIMIT " << (*number + 1);
 			if (first > 0)
 				query << " OFFSET " << first;
-			
+
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
-		
-		
-		
+
+
+
 		ScenarioTemplate::VariablesMap ScenarioTemplateInheritedTableSync::GetVariables(
 			util::RegistryKeyType scenarioId
 		){
@@ -155,9 +155,9 @@ namespace synthese
 			}
 			return result;
 		}
-	
-	
-	
+
+
+
 		void ScenarioTemplateInheritedTableSync::CopyMessagesFromOther(
 			util::RegistryKeyType sourceId,
 			const ScenarioTemplate& dest

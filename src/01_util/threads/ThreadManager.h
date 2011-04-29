@@ -63,7 +63,7 @@ class ThreadManager
 
     std::vector<std::string> _names;  //!< Thread names ordered by registration.
     std::map<std::string, ManagedThreadEntry> _threads;  //!< Managed threads.
-    
+
 
     ThreadManager (bool monothreadEmulation = true);
 
@@ -89,7 +89,7 @@ class ThreadManager
 
     friend class ManagedThread;
 
-    
+
 };
 
 

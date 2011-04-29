@@ -36,7 +36,7 @@ namespace synthese
 
 		Usage :
 			@code {{$ <param1> <param2> ... <paramn>}} @endcode
-			
+
 			The output is the concatenation of each param.
 			@warning no space will be inserted between the parameters.
 

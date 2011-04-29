@@ -102,14 +102,14 @@ namespace synthese
 				string functionParameters;
 				if (_function_parameters.get())
 					functionParameters = _function_parameters->getValue(parameters, variables, object, request);
-				
+
 				stringstream s;
 				s	<<
 					request->getClientURL() << Request::PARAMETER_STARTER <<
 					Request::PARAMETER_SERVICE << Request::PARAMETER_ASSIGNMENT << functionKey
 					<< Request::PARAMETER_SEPARATOR << RequestWithInterface::PARAMETER_INTERFACE << Request::PARAMETER_ASSIGNMENT << _page->getInterface()->getKey()
 					;
-					
+
 
 				if (!functionParameters.empty())
 					s << Request::PARAMETER_SEPARATOR << functionParameters;
@@ -127,10 +127,10 @@ namespace synthese
 				q.ipaddr = request->getIP();
 				DynamicRequest r(q);
 				r.setClientURL(request->getClientURL());
-				
-				
+
+
 				HTMLForm f(r.getHTMLForm(_name->getValue(parameters, variables, object, request)));
-				
+
 				for (vector<shared_ptr<LibraryInterfaceElement> >::const_iterator it = _fieldsToAvoid.begin(); it != _fieldsToAvoid.end(); ++it)
 				{
 					string fieldName((*it)->getValue(parameters, variables, object, request));
@@ -139,7 +139,7 @@ namespace synthese
 				}
 				stream << f.open();
 				stream << f.getHiddenFields();
-				
+
 				return string();
 			}
 			catch(FactoryException<Request> e)

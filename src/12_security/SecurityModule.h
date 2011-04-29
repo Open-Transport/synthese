@@ -75,7 +75,7 @@ namespace synthese
 			public server::ModuleClassTemplate<SecurityModule>
 		{
 			friend class server::ModuleClassTemplate<SecurityModule>;
-			
+
 		public:
 			static const std::string ROOT_PROFILE;
 			static const std::string ROOT_RIGHTS;
@@ -97,7 +97,7 @@ namespace synthese
 			/** List of the sub profiles of the current one.
 					@return std::vector<Profile*> List of the sub profiles of the current one.
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 			*/
 			static std::vector<boost::shared_ptr<Profile> > getSubProfiles(boost::shared_ptr<const Profile> profile);
 		};

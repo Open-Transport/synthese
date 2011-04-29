@@ -52,7 +52,7 @@ namespace synthese
 		const string CityAliasTableSync::COL_CODE ("code");
 		const string CityAliasTableSync::COL_VISIBLE ("visible");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<CityAliasTableSync>::TABLE(
@@ -170,9 +170,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace geography
 	{
 		CityAliasTableSync::SearchResult CityAliasTableSync::Search(

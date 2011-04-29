@@ -60,7 +60,7 @@ namespace synthese
 			static const std::string PARAMETER_TITLE;
 			static const std::string PARAMETER_IGNORE_WHITE_CHARS;
 			static const std::string PARAMETER_DECODE_XML_ENTITIES_IN_CONTENT;
-			static const std::string PARAMETER_RAW_EDITOR;			
+			static const std::string PARAMETER_RAW_EDITOR;
 
 		private:
 			boost::shared_ptr<Webpage> _page;
@@ -108,7 +108,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////

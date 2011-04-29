@@ -61,7 +61,7 @@ namespace synthese
 		:	Registrable(key),
 			_parent(NULL)
 		{
-	
+
 		}
 
 

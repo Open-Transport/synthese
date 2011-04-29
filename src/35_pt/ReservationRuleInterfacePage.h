@@ -35,7 +35,7 @@ namespace synthese
 	{
 		class Request;
 	}
-	
+
 	namespace graph
 	{
 		class Journey;

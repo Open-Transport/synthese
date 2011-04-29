@@ -35,7 +35,7 @@ namespace synthese
 			Les niveaux de droit public utilisés sont les suivants :
 				- WRITE : Permet de créer, modifier des modèles de messages et des scénarios de diffusion
 				- DELETE : Permet de supprimer des modèles de messages et des scénarios de diffusion
-			
+
 			Aucun niveau de droit privé n'est utilisé pour cette habilitation.
 
 			Cette habilitation ne peut être paramétrée

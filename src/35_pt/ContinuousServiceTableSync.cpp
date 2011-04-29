@@ -93,7 +93,7 @@ namespace synthese
 			DBTableSync::Field(ContinuousServiceTableSync::COL_DATES, SQL_TEXT),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<ContinuousServiceTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index(ContinuousServiceTableSync::COL_PATHID.c_str(), ContinuousServiceTableSync::COL_SCHEDULES.c_str(), ""),
@@ -213,17 +213,17 @@ namespace synthese
 			query.addField(object->getRange().total_seconds() / 60);
 			query.addField(object->getMaxWaitingTime().total_seconds() / 60);
 			query.addField(
-				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
+				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :
 				RegistryKeyType(0)
 			);
 			query.addField(
-				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
+				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() :
 				RegistryKeyType(0)
 			);
 			query.addField(
-				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
+				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() :
 				RegistryKeyType(0)
 			);

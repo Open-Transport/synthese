@@ -84,7 +84,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void WebPageAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -115,7 +115,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool WebPageAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -398,7 +398,7 @@ namespace synthese
 
 			AdminFunctionRequest<WebPageAdmin> openRequest(request);
 			StaticFunctionRequest<WebPageDisplayFunction> viewRequest(request, false);
-			
+
 			for(WebPageTableSync::SearchResult::const_iterator it(pages.begin()); it != pages.end(); ++it)
 			{
 				shared_ptr<Webpage> page(*it);

@@ -28,25 +28,25 @@ namespace synthese
 {
 	using namespace server;
 	using namespace algorithm;
-	
+
 	namespace util
 	{
 		template<>
 		const string FactorableTemplate<ModuleClass,AlgorithmModule>::FACTORY_KEY("33_algorithm");
 	}
-	
+
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<AlgorithmModule>::NAME("Algorithmes");
-		
+
 		template<> void ModuleClassTemplate<AlgorithmModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<AlgorithmModule>::Init()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<AlgorithmModule>::End()
 		{
 		}

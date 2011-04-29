@@ -40,12 +40,12 @@ namespace synthese
 		/// @author Hugues Romain
 		/// @date 2008
 		/// @ingroup m54Functions refFunctions
-		/// 
+		///
 		/// This function displays monitoring informations about a specified
 		/// display screen, according to the SYNTHESE nagios plugin format :
 		///		- at the first line : the returning code of the nagios plugin :
 		///		- from the second line : the nagios plugin standard output
-		///			according to the Nagios norm (see 
+		///			according to the Nagios norm (see
 		///			http://nagios.sourceforge.net/docs/3_0/pluginapi.html)
 		///
 		/// The Nagios output plug-in return code can be :
@@ -73,29 +73,29 @@ namespace synthese
 			//@{
 				boost::shared_ptr<const DisplayScreen>	_screen;
 			//@}
-			
-			
+
+
 			////////////////////////////////////////////////////////////////////
 			///	Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
 			void _setFromParametersMap(const server::ParametersMap& map);
-			
-			
+
+
 		public:
 			////////////////////////////////////////////////////////////////////
 			/// Action to run, defined by each subclass.
 			///	@param stream Stream to write the output on
 			void run(std::ostream& stream, const server::Request& request) const;
 
-			
-			
+
+
 			////////////////////////////////////////////////////////////////////
 			///	Defines the security policy of the action.
 			///	@author Hugues Romain

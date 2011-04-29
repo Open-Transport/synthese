@@ -40,7 +40,7 @@ namespace synthese
 	{
 		JunctionStop::JunctionStop(
 			Junction* parentPath /*= NULL*/,
-			StopPoint* fromVertex /*= NULL*/			
+			StopPoint* fromVertex /*= NULL*/
 		):	Edge(parentPath, 0, static_cast<StopPoint*>(fromVertex), 0),
 			Registrable(0)
 		{

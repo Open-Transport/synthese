@@ -40,7 +40,7 @@ namespace synthese
 	{
 		class Road;
 		class Crossing;
-	
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Association class between road and crossings.
 		///	@ingroup m35
@@ -87,7 +87,7 @@ namespace synthese
 				void setRoad(Road* road);
 			//@}
 
-			
+
 
 			//! @name Query methods.
 			//@{
@@ -109,4 +109,4 @@ namespace synthese
 		};
 }	}
 
-#endif 
+#endif

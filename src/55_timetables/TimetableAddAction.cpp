@@ -43,7 +43,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, timetables::TimetableAddAction>::FACTORY_KEY("TimetableAddAction");
@@ -57,17 +57,17 @@ namespace synthese
 		const string TimetableAddAction::PARAMETER_IS_BOOK = Action_PARAMETER_PREFIX + "ib";
 		const string TimetableAddAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "te";
 		const string TimetableAddAction::PARAMETER_REVERSE = Action_PARAMETER_PREFIX + "re";
-		
-		
+
+
 		TimetableAddAction::TimetableAddAction():
 			util::FactorableTemplate<Action, TimetableAddAction>(),
 			_isBook(false),
 			_reverse(false)
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap TimetableAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -85,9 +85,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void TimetableAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.getOptional<RegistryKeyType>(PARAMETER_TEMPLATE_ID))
@@ -134,9 +134,9 @@ namespace synthese
 				_isBook = map.get<bool>(PARAMETER_IS_BOOK);
 			}
 		}
-		
-		
-		
+
+
+
 		void TimetableAddAction::run(Request& request)
 		{
 			DBTransaction transaction;
@@ -207,8 +207,8 @@ namespace synthese
 
 			_book = book;
 		}
-		
-		
+
+
 		bool TimetableAddAction::isAuthorized(const server::Session* session) const
 		{
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(WRITE);

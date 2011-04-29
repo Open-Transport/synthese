@@ -66,7 +66,7 @@ namespace synthese
 
 
 			/** Action to do on DisplayType deletion.
-			This method deletes the corresponding object in ram and runs 
+			This method deletes the corresponding object in ram and runs
 			all necessary cleaning actions.
 			*/
 			void rowsRemoved(

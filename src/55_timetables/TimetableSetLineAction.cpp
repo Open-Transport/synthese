@@ -40,7 +40,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace pt;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, timetables::TimetableSetLineAction>::FACTORY_KEY("TimetableSetLineAction");
@@ -50,9 +50,9 @@ namespace synthese
 	{
 		const string TimetableSetLineAction::PARAMETER_TIMETABLE_ID = Action_PARAMETER_PREFIX + "ti";
 		const string TimetableSetLineAction::PARAMETER_LINE_ID = Action_PARAMETER_PREFIX + "li";
-		
-		
-		
+
+
+
 		ParametersMap TimetableSetLineAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -60,9 +60,9 @@ namespace synthese
 			if(_line.get()) map.insert(PARAMETER_LINE_ID, _line->getKey());
 			return map;
 		}
-		
-		
-		
+
+
+
 		void TimetableSetLineAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -83,9 +83,9 @@ namespace synthese
 				throw ActionException("No such line", e, *this);
 			}
 		}
-		
-		
-		
+
+
+
 		void TimetableSetLineAction::run(Request& request)
 		{
 			if(_timetable->getAuthorizedLines().find(_line.get()) == _timetable->getAuthorizedLines().end())
@@ -98,9 +98,9 @@ namespace synthese
 			}
 			TimetableTableSync::Save(_timetable.get());
 		}
-		
-		
-		
+
+
+
 		bool TimetableSetLineAction::isAuthorized(const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(WRITE);

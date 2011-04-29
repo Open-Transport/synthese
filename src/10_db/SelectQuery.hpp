@@ -54,7 +54,7 @@ namespace synthese
 			typedef std::vector<boost::shared_ptr<SQLExpression> > WheresType;
 			typedef std::vector<std::pair<boost::shared_ptr<SQLExpression>, bool> > OrdersType;
 			typedef std::vector<boost::shared_ptr<SQLExpression> > GroupsType;
-		
+
 			FieldsType _fields;
 			TablesType _tables;
 			WheresType _wheres;
@@ -75,7 +75,7 @@ namespace synthese
 			//! @name Modifiers
 			//@{
 				void addTableField(const std::string& field, std::string alias = std::string());
-				
+
 				template<class T>
 				void addValueField(const T& value, std::string alias = std::string());
 
@@ -109,7 +109,7 @@ namespace synthese
 				void addWhere(boost::shared_ptr<SQLExpression> expression) { _wheres.push_back(expression); }
 
 				void addGroupByField(const std::string field = TABLE_COL_ID);
-			
+
 				template<class Table1>
 				void addGroupByFieldOther(const std::string field = TABLE_COL_ID);
 

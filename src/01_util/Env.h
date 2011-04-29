@@ -155,7 +155,7 @@ namespace synthese
 			/// The template parameter class must be a subclass of Registrable and must
 			///	have been integrated at the launch of the program (run Integrate method
 			/// in *.gen.cpp files)
-			///	@throw EnvException if no registry corresponds to the template parameter 
+			///	@throw EnvException if no registry corresponds to the template parameter
 			///	class.
 			//////////////////////////////////////////////////////////////////////////
 			template<class R>
@@ -171,7 +171,7 @@ namespace synthese
 			/// The template parameter class must be a subclass of Registrable and must
 			///	have been integrated at the launch of the program (run Integrate method
 			/// in *.gen.cpp files)
-			///	@throw EnvException if no registry corresponds to the template parameter 
+			///	@throw EnvException if no registry corresponds to the template parameter
 			///	class.
 			//////////////////////////////////////////////////////////////////////////
 			template<class R>
@@ -194,9 +194,9 @@ namespace synthese
 				it = _map.find(Registry<R>::KEY);
 				return * boost::static_pointer_cast<Registry<R>, RegistryBase>(it->second);
 			}
-			
-			
-			
+
+
+
 			template<class R>
 			boost::shared_ptr<const R> get(
 				util::RegistryKeyType id

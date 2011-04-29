@@ -37,7 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, server::QuitAction>::FACTORY_KEY("QuitAction");
@@ -50,24 +50,24 @@ namespace synthese
 			ParametersMap map;
 			return map;
 		}
-		
-		
-		
+
+
+
 		void QuitAction::_setFromParametersMap(const ParametersMap& map)
 		{
 		}
-		
-		
-		
+
+
+
 		void QuitAction::run(
 			Request& request
 		){
 			ServerModule::KillAllThreads();
 			SecurityLog::AddQuitEntry(*request.getUser());
 		}
-		
-		
-		
+
+
+
 		bool QuitAction::isAuthorized(
 			const Session* session
 		) const {

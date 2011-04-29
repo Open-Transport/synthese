@@ -44,7 +44,7 @@ namespace synthese
 	typedef db::DB::ConnectionInfo ConnectionInfo;
 
 	template<> const string util::FactorableTemplate<ModuleClass,DBModule>::FACTORY_KEY("10_db");
-	
+
 	namespace db
 	{
 		DBModule::TablesByNameMap	DBModule::_tableSyncMap;
@@ -60,9 +60,9 @@ namespace synthese
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<DBModule>::NAME("Base de données");
-		
-		
-		
+
+
+
 		template<> void ModuleClassTemplate<DBModule>::PreInit()
 		{
 			if (!DBModule::_ConnectionInfo)
@@ -89,16 +89,16 @@ namespace synthese
 				DBModule::_idTableSyncMap[sync->getFormat().ID] = sync;
 			}
 	    }
-	
-	
-	
+
+
+
 		template<> void ModuleClassTemplate<DBModule>::End()
 		{
 			DBModule::_ConnectionInfo.reset();
 			DBModule::_Db.reset();
 		}
 	}
-	
+
 	namespace db
 	{
 		void DBModule::SetConnectionString(const std::string& connectionString)

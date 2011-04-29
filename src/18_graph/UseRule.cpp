@@ -1,7 +1,7 @@
 //
 // C++ Implementation: UseRule
 //
-// Description: 
+// Description:
 //
 //
 // Author: Hugues Romain (RCS) <hugues.romain@reseaux-conseil.com>, (C) 2009
@@ -23,13 +23,13 @@ namespace synthese
 		UseRule::UseRule(
 		){
 		}
-		
-		
-		
+
+
+
 		UseRule::~UseRule()
 		{
 		}
-		
+
 
 
 		bool UseRule::IsReservationPossible( const UseRule::ReservationAvailabilityType& value )

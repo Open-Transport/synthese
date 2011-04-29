@@ -53,7 +53,7 @@ namespace synthese
 		///	Parameters
 		///	<ul>
 		///		<li>actionParamid : id of the object to update</li>
-		///		<li>actionParamvaxx : value for xx field (if 0, undefined)</li> 
+		///		<li>actionParamvaxx : value for xx field (if 0, undefined)</li>
 		///</ul>
 		class RuleUserUpdateAction:
 			public util::FactorableTemplate<server::Action, RuleUserUpdateAction>
@@ -89,7 +89,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////

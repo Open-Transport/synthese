@@ -71,7 +71,7 @@ namespace synthese
 			}
 			lie->_page = page;
 			lie->parse((text.size() > word_end_pos + 1)
-				? text.substr(word_end_pos + 1, text.size() - word_end_pos - 1) 
+				? text.substr(word_end_pos + 1, text.size() - word_end_pos - 1)
 				: "");
 
 			return lie;

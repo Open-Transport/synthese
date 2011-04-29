@@ -57,7 +57,7 @@ namespace synthese
 			static const std::string COL_HANDICAPPED_USE_RULE;
 			static const std::string COL_BIKE_USE_RULE;
 			static const std::string COL_DATES;
-			
+
 
 
 			/** ContinuousService search.

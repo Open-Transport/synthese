@@ -80,8 +80,8 @@ namespace synthese
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
 
-			
-			
+
+
 			/** Makes a name compatible with Nagios.
 				@param text name to convert
 				@return converted name

@@ -62,7 +62,7 @@ namespace synthese
 		const string StopAreaTableSync::COL_NAME26("long_display_name");
 		const string StopAreaTableSync::COL_CODE_BY_SOURCE("code_by_source");
 		const string StopAreaTableSync::COL_TIMETABLE_NAME("timetable_name");
-		
+
 		const string StopAreaTableSync::FORBIDDEN_DELAY_SYMBOL("F");
 	}
 
@@ -109,7 +109,7 @@ namespace synthese
 			bool connectionType(rows->getBool(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE));
 			posix_time::time_duration defaultTransferDelay(posix_time::minutes(rows->getInt (StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY)));
 			string transferDelaysStr (rows->getText (StopAreaTableSync::TABLE_COL_TRANSFERDELAYS));
-			
+
 			// Update of the object
 			cp->setName (name);
 			if (!name13.empty())
@@ -119,8 +119,8 @@ namespace synthese
 			cp->setTimetableName(rows->getText(StopAreaTableSync::COL_TIMETABLE_NAME));
 
 			cp->setAllowedConnection(connectionType);
-			
-			cp->clearTransferDelays ();    
+
+			cp->clearTransferDelays ();
 			cp->setDefaultTransferDelay (defaultTransferDelay);
 
 			cp->setDataSourceLinks(
@@ -223,7 +223,7 @@ namespace synthese
 			query.execute(transaction);
 		}
 
-		
+
 		template<> void DBDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Unlink(
 			StopArea* cp
 		){

@@ -63,7 +63,7 @@ namespace synthese
 		const string VehicleTableSync::COL_URL("url");
 		const string VehicleTableSync::COL_REGISTRATION_NUMBERS("registration_numbers");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<VehicleTableSync>::TABLE(
@@ -110,7 +110,7 @@ namespace synthese
 			object->setAvailable(rows->getBool(VehicleTableSync::COL_AVAILABLE));
 			object->setURL(rows->getText(VehicleTableSync::COL_URL));
 			object->setRegistrationNumbers(rows->getText(VehicleTableSync::COL_REGISTRATION_NUMBERS));
-			
+
 			// Seats
 			object->setSeats(VehicleTableSync::UnserializeSeats(rows->getText(VehicleTableSync::COL_SEATS)));
 
@@ -183,9 +183,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace pt_operation
 	{
 		VehicleTableSync::SearchResult VehicleTableSync::Search(

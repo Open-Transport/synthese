@@ -68,7 +68,7 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,timetables::TimetableGenerateFunction>::FACTORY_KEY("TimetableGenerateFunction");
-	
+
 	namespace timetables
 	{
 		const string TimetableGenerateFunction::PARAMETER_CALENDAR_ID("cid");
@@ -259,7 +259,7 @@ namespace synthese
 					timetable->setBaseCalendar(calendarTemplate);
 					_calendarTemplate.reset(calendarTemplate);
 				}
-				
+
 
 				// Way 2 : line time table
 				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == JourneyPatternTableSync::TABLE.ID)
@@ -274,7 +274,7 @@ namespace synthese
 					}
 					timetable->addAuthorizedLine(_line->getCommercialLine());
 					timetable->setContentType(Timetable::TABLE_SERVICES_IN_COLS);
-					
+
 					size_t rank(0);
 					BOOST_FOREACH(const Edge* edge, _line->getEdges())
 					{
@@ -357,7 +357,7 @@ namespace synthese
 
 				_timetable = const_pointer_cast<const Timetable>(timetable);
 			}
-			
+
 			// Display templates
 
 			try
@@ -375,7 +375,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_NOTE_PAGE_ID));
-				if(id) 
+				if(id)
 				{
 					_notePage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -411,7 +411,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_CELL_PAGE_ID));
-				if(id) 
+				if(id)
 				{
 					_cellPage = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -423,7 +423,7 @@ namespace synthese
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_FOR_SUB_TIMETABLE_ID));
-				if(id) 
+				if(id)
 				{
 					_pageForSubTimetable = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
@@ -450,9 +450,9 @@ namespace synthese
 				_timetableRank
 			);
 		}
-		
-		
-		
+
+
+
 		bool TimetableGenerateFunction::isAuthorized(const server::Session* session) const
 		{
 			return true;
@@ -551,7 +551,7 @@ namespace synthese
 
 				}
 				break;
-				
+
 			case Timetable::TABLE_SERVICES_IN_COLS:
 				if(	_rowPage.get()
 				){
@@ -628,7 +628,7 @@ namespace synthese
 					}
 
 					pm.insert(DATA_SERVICES_IN_COLS_SCHEDULES_ROWS, timesContent.str()); //5
-					
+
 					// 6 : Rolling stock rows
 					stringstream rollingStockContent;
 					_displayRollingStockRow(
@@ -678,7 +678,7 @@ namespace synthese
 						const TimetableResult::Columns::value_type& column(*it);
 
 						followingWithSameHour = 1;
-						for(TimetableResult::Columns::const_iterator it2(it+1); 
+						for(TimetableResult::Columns::const_iterator it2(it+1);
 							it2 != result.getColumns().end() && Service::GetTimeOfDay(it2->getContent().begin()->second).hours() == Service::GetTimeOfDay(it->getContent().begin()->second).hours();
 							++it2
 						){
@@ -753,7 +753,7 @@ namespace synthese
 			const TimetableWarning& object
 		) const {
 			ParametersMap pm(_savedParameters);
-		
+
 			pm.insert(DATA_NUMBER, object.getNumber());
 			pm.insert(DATA_TEXT, object.getText());
 
@@ -788,7 +788,7 @@ namespace synthese
 			ParametersMap pm(_savedParameters);
 
 			pm.insert(DATA_TYPE, TYPE_LINE);
-		
+
 			if(_cellPage.get())
 			{
 				stringstream content;
@@ -841,7 +841,7 @@ namespace synthese
 			pm.insert(DATA_TYPE, TYPE_LINE); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
 			pm.insert(DATA_ROW_RANK, 0); //2
-			
+
 			_cellPage->display(stream, request, pm);
 		}
 
@@ -863,7 +863,7 @@ namespace synthese
 			pm.insert(DATA_GLOBAL_RANK, globalRank);
 			pm.insert(DATA_IS_BEFORE_TRANSFER, isBeforeTransfer);
 			pm.insert(DATA_TRANSFER_DEPTH, depth);
-		
+
 			if(_cellPage.get())
 			{
 				stringstream content;
@@ -941,7 +941,7 @@ namespace synthese
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TYPE, TYPE_NOTE);
-		
+
 			if(_cellPage.get())
 			{
 				stringstream content;

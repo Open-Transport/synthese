@@ -40,7 +40,7 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::DateService>::FACTORY_KEY("date");
-	
+
 	namespace cms
 	{
 		const string DateService::PARAMETER_DAY("d");
@@ -85,9 +85,9 @@ namespace synthese
 				stream << " " << to_simple_string(_time.time_of_day());
 			}
 		}
-		
-		
-		
+
+
+
 		bool DateService::isAuthorized(
 			const Session* session
 		) const {

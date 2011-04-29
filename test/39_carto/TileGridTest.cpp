@@ -20,27 +20,27 @@ namespace carto
 
 
 
-  void 
-  TileGridTest::setUp () 
+  void
+  TileGridTest::setUp ()
   {
 
   }
 
 
-  void 
-  TileGridTest::tearDown() 
+  void
+  TileGridTest::tearDown()
   {
 
-  } 
+  }
 
 
-  void 
+  void
   TileGridTest::testPointMarking ()
   {
       TileGrid grid (10.0, 10.0, 1.0, 1.0);
       grid.markTilesForPoint (Point (1.5, 0.5));
       grid.markTilesForPoint (Point (3.5, 3.5));
-	  
+
       CPPUNIT_ASSERT (grid.isMarked (1, 0) == true);
       CPPUNIT_ASSERT (grid.isMarked (0, 0) == false);
       CPPUNIT_ASSERT (grid.isMarked (0, 1) == false);
@@ -57,19 +57,19 @@ namespace carto
       CPPUNIT_ASSERT (grid.isMarked (3, 2) == false);
       CPPUNIT_ASSERT (grid.isMarked (3, 4) == false);
   }
-      
 
 
 
 
 
 
-  void 
+
+  void
   TileGridTest::testLineMarking ()
   {
       TileGrid grid (10.0, 10.0, 1.0, 1.0);
       grid.markTilesForLine (Point (1.5, 0.5), Point (3.5, 3.5));
-	  
+
       CPPUNIT_ASSERT (grid.isMarked (1, 0) == true);
       CPPUNIT_ASSERT (grid.isMarked (1, 1) == true);
       CPPUNIT_ASSERT (grid.isMarked (2, 1) == true);

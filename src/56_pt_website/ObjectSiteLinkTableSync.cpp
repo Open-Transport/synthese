@@ -93,7 +93,7 @@ namespace synthese
 			catch(Exception e)
 			{
 			}
-			
+
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				if(decodeTableId(object->getObjectId()) == CityTableSync::TABLE.ID)
@@ -158,9 +158,9 @@ namespace synthese
 			//TODO log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace pt_website
 	{
 		ObjectSiteLinkTableSync::SearchResult ObjectSiteLinkTableSync::Search(

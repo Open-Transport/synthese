@@ -35,11 +35,11 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::StrLenFunction>::FACTORY_KEY("strlen");
-	
+
 	namespace cms
 	{
 		const string StrLenFunction::PARAMETER_TEXT("t");
-		
+
 		ParametersMap StrLenFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -58,9 +58,9 @@ namespace synthese
 		) const {
 			stream << _text.size();
 		}
-		
-		
-		
+
+
+
 		bool StrLenFunction::isAuthorized(
 			const Session* session
 		) const {

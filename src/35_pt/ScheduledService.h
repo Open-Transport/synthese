@@ -58,7 +58,7 @@ namespace synthese
 		:	public SchedulesBasedService
 		{
 		public:
-			
+
 			/// Chosen registry class.
 			typedef util::Registry<ScheduledService>	Registry;
 
@@ -136,7 +136,7 @@ namespace synthese
 					@return A full ServicePointer to the service. If the service cannot be used at the specified date/time, then the ServicePointer points to a NULL service.
 					@author Hugues Romain
 					@date 2007
-					@warning The service index is unknown in the generated ServicePointer.					
+					@warning The service index is unknown in the generated ServicePointer.
 				*/
 				virtual graph::ServicePointer getFromPresenceTime(
 					bool RTData,
@@ -148,14 +148,14 @@ namespace synthese
 					bool inverted,
 					bool ignoreReservation
 				) const;
-				
+
 				virtual void completeServicePointer(
 					graph::ServicePointer& servicePointer,
 					const graph::Edge& edge,
 					const graph::AccessParameters& accessParameters
 				) const;
 
-				
+
 
 				virtual boost::posix_time::time_duration getDepartureBeginScheduleToIndex(bool RTData, std::size_t rankInPath) const;
 				virtual boost::posix_time::time_duration getDepartureEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
@@ -170,7 +170,7 @@ namespace synthese
 			//@}
 
 		};
-	
+
 		bool operator==(const ScheduledService& first, const ScheduledService& second);
 	}
 }

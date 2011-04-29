@@ -153,7 +153,7 @@ namespace synthese
 					const ReservationTransaction& resa
 				) const;
 
-				
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Sends e-mail to the customer containing his password.
 				/// @param customer Reservation transaction

@@ -40,7 +40,7 @@ namespace synthese
 	using namespace security;
 	using namespace impex;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::TransportNetworkUpdateAction>::FACTORY_KEY("network_update");
@@ -50,9 +50,9 @@ namespace synthese
 	{
 		const string TransportNetworkUpdateAction::PARAMETER_NETWORK_ID = Action_PARAMETER_PREFIX + "ni";
 		const string TransportNetworkUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-		
-		
-		
+
+
+
 		ParametersMap TransportNetworkUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -70,9 +70,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void TransportNetworkUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.getOptional<RegistryKeyType>(PARAMETER_NETWORK_ID)) try
@@ -93,9 +93,9 @@ namespace synthese
 				_name = map.get<string>(PARAMETER_NAME);
 				if (_name->empty())
 				{
-					throw ActionException("Le nom du réseau ne peut pas être vide.");	
+					throw ActionException("Le nom du réseau ne peut pas être vide.");
 				}
-				
+
 				TransportNetworkTableSync::SearchResult networks(
 					TransportNetworkTableSync::Search(*_env, *_name, string(), 0, 1)
 				);
@@ -110,9 +110,9 @@ namespace synthese
 				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
 			}
 		}
-		
-		
-		
+
+
+
 		void TransportNetworkUpdateAction::run(
 			Request& request
 		){
@@ -133,9 +133,9 @@ namespace synthese
 				request.setActionCreatedId(_network->getKey());
 			}
 		}
-		
-		
-		
+
+
+
 		bool TransportNetworkUpdateAction::isAuthorized(
 			const Session* session
 		) const {

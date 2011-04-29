@@ -43,7 +43,7 @@ namespace synthese
 	using namespace calendar;
 	using namespace util;
 	using namespace interfaces;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, timetables::TimetableUpdateAction>::FACTORY_KEY("TimetableUpdateAction");
@@ -56,16 +56,16 @@ namespace synthese
 		const string TimetableUpdateAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "tt";
 		const string TimetableUpdateAction::PARAMETER_FORMAT = Action_PARAMETER_PREFIX + "fo";
 		const string TimetableUpdateAction::PARAMETER_CONTAINER_ID = Action_PARAMETER_PREFIX + "co";
-		
-		
-		
+
+
+
 		TimetableUpdateAction::TimetableUpdateAction()
 			: util::FactorableTemplate<Action, TimetableUpdateAction>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap TimetableUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -75,9 +75,9 @@ namespace synthese
 			map.insert(PARAMETER_TITLE, _title);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void TimetableUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -120,9 +120,9 @@ namespace synthese
 			_title = map.get<string>(PARAMETER_TITLE);
 			_format = static_cast<Timetable::ContentType>(map.get<int>(PARAMETER_FORMAT));
 		}
-		
-		
-		
+
+
+
 		void TimetableUpdateAction::run(Request& request)
 		{
 			_timetable->setBaseCalendar(_calendarTemplate.get());
@@ -132,8 +132,8 @@ namespace synthese
 
 			TimetableTableSync::Save(_timetable.get());
 		}
-		
-		
+
+
 		bool TimetableUpdateAction::isAuthorized(const server::Session* session) const
 		{
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(WRITE);

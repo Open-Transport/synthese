@@ -51,7 +51,7 @@ namespace synthese
 		private:
 			static const std::string DATA_TEXT;
 
-			
+
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const DisplayScreen>	_displayScreen;
@@ -74,7 +74,7 @@ namespace synthese
 			///	<dl>
 			///	<dt>text</dt><dd>text to parse</dd>
 			/// </dl>
-			///	
+			///
 			///	The CMS page is supposed to return a standardized string composed
 			/// by fields separated by |.
 			///
@@ -114,7 +114,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> page,
 				const std::string& textToParse
 			);
-			
+
 		public:
 			DisplayScreenSupervisionFunction();
 

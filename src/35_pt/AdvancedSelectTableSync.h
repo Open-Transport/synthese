@@ -37,7 +37,7 @@ namespace synthese
 	{
 		class Env;
 	}
-	
+
 	namespace pt
 	{
 		typedef std::map<std::pair<boost::gregorian::date, int>, int> RunHours;
@@ -51,7 +51,7 @@ namespace synthese
 
 		bool isPlaceServedByCommercialLine(util::RegistryKeyType JourneyPattern, util::RegistryKeyType place);
 		bool isPlaceServedByNetwork(util::RegistryKeyType networkId, util::RegistryKeyType place);
-		
+
 		/** Reads in database the rank of the last departure stop of a route.
 			@param line The ID of the route
 			@return int the rank of the last departure line-stop

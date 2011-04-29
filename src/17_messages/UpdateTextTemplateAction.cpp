@@ -47,7 +47,7 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, messages::UpdateTextTemplateAction>::FACTORY_KEY("utta");
-	
+
 	namespace messages
 	{
 		const string UpdateTextTemplateAction::PARAMETER_TEXT_ID = Action_PARAMETER_PREFIX + "tid";
@@ -71,7 +71,7 @@ namespace synthese
 			{
 				// Text ID
 				_text = TextTemplateTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_TEXT_ID), *_env);
-		
+
 				//id = map.get<RegistryKeyType>(PARAMETER_FOLDER_ID);
 				//_folder = TextTemplateTableSync::Get(id, *_env);
 
@@ -87,7 +87,7 @@ namespace synthese
 
 				// Short message
 				_shortMessage = map.get<string>(PARAMETER_SHORT_MESSAGE);
-				
+
 				// Long message
 				_longMessage = map.get<string>(PARAMETER_LONG_MESSAGE);
 			}

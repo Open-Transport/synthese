@@ -38,40 +38,40 @@ namespace synthese
 	{
 		/**	@defgroup m53Exceptions 53.01 Exceptions
 			@ingroup m53
-	
+
 			@defgroup m53LS 53.10 Table synchronizers
 			@ingroup m53
-	
+
 			@defgroup m53Pages 53.11 Interface Pages
 			@ingroup m53
-	
+
 			@defgroup m53Library 53.11 Interface Library
 			@ingroup m53
-	
+
 			@defgroup m53Rights 53.12 Rights
 			@ingroup m53
-	
+
 			@defgroup m53Logs 53.13 DB Logs
 			@ingroup m53
-	
+
 			@defgroup m53Admin 53.14 Administration pages
 			@ingroup m53
-	
+
 			@defgroup m53Actions 53.15 Actions
 			@ingroup m53
-	
+
 			@defgroup m53Functions 53.15 Functions
 			@ingroup m53
-	
+
 			@defgroup m53File 53.16 File formats
 			@ingroup m53
-	
+
 			@defgroup m53Alarm 53.17 Messages recipient
 			@ingroup m53
-			
+
 			@defgroup m53 53 Public transport journey planner module namespace.
 			@ingroup m5
-			
+
 			<h3>Road exploration : Transport public stops approach</h3>
 
 			Cette fonctionnalité consiste en la détermination de l'ensemble des points d'arrêt accessibles en un temps maximal fixé avec le descriptif du trajet d'approche à effectuer à pied, à partir des éléments suivants :
@@ -89,7 +89,7 @@ namespace synthese
 
 			- Etape 2 : Calcul d'approche vers des communes proches (module @ref m40), et extraction de « Tous lieux » des communes s'ils existent :
 			<center><table class="Tableau"><tr><th>Communes</th><th>Point d'arrêt</th><th>Durée</th></tr>
-			<tr><td>A</td><td>PA 4</td><td>7</td></tr>	
+			<tr><td>A</td><td>PA 4</td><td>7</td></tr>
 			<tr><td>B</td><td>PA 5</td><td>5</td></tr>
 			</table></center>
 
@@ -126,10 +126,10 @@ namespace synthese
 
 			<h3>Monopoint Approach Exploration + Route Planning</h3>
 
-			Reference classes : 
+			Reference classes :
 			- ApproachExplorerAndRoutePlanner
 
-			
+
 			@{
 		*/
 
@@ -142,15 +142,15 @@ namespace synthese
 			public server::ModuleClassTemplate<PTRoutePlannerModule>
 		{
 		private:
-			
-			
+
+
 		public:
 			/** Initialization of the 53 pt_routeplanner module after the automatic database loads.
 				@author Hugues Romain
 				@date 2010
-			*/			
+			*/
 			//void initialize();
-			
+
 		};
 	}
 	/** @} */

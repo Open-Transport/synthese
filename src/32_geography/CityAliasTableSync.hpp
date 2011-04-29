@@ -49,10 +49,10 @@ namespace synthese
 				static const std::string COL_ALIASED_CITY_ID;
 				static const std::string COL_VISIBLE;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	City Alias search.
 				///	@param env Environment to populate

@@ -39,13 +39,13 @@ struct XMLNode;
 
 namespace synthese
 {
-	
+
 
 
 
 namespace pt
 {
-   
+
 
 /** Environment XML loading/saving service class.
 
@@ -68,7 +68,7 @@ Sample XML format :
  </connectionPlaces>
 
  <physicalStops>
-   <physicalStop id="1" name="Metro gare SNCF" 
+   <physicalStop id="1" name="Metro gare SNCF"
                  connectionPlaceId="1" rankInConnectionPlace="1"
 	         x="1334.5" y="123.2"/>
    <!-- ... -->
@@ -118,24 +118,24 @@ class XmlBuilder
 
 	 static boost::shared_ptr<geography::City> CreateCity (XMLNode& node);
 
-    
+
 	 static boost::shared_ptr<StopArea> CreateConnectionPlace(
-		 XMLNode& node, 
+		 XMLNode& node,
 		 const util::Registry<geography::City>& cities);
 
 	 static boost::shared_ptr<CommercialLine> CreateCommercialLine (XMLNode& node);
 
-	 static boost::shared_ptr<JourneyPattern> CreateLine (XMLNode& node, 
+	 static boost::shared_ptr<JourneyPattern> CreateLine (XMLNode& node,
 		 const util::Registry<CommercialLine>& commercialLines);
 
-	 static boost::shared_ptr<DesignatedLinePhysicalStop> CreateLineStop (XMLNode& node, 
+	 static boost::shared_ptr<DesignatedLinePhysicalStop> CreateLineStop (XMLNode& node,
 		 util::Registry<JourneyPattern>& lines,
 		 const util::Registry<pt::StopPoint>& physicalStops);
 
-	 static boost::shared_ptr<pt::StopPoint> CreatePhysicalStop (XMLNode& node, 
+	 static boost::shared_ptr<pt::StopPoint> CreatePhysicalStop (XMLNode& node,
 		 const util::Registry<StopArea>& connectionPlaces
 	);
-    
+
 	 static geos::geom::Coordinate CreatePoint (XMLNode& node);
 
 

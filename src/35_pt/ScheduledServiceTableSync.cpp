@@ -84,7 +84,7 @@ namespace synthese
 			DBTableSync::Field(ScheduledServiceTableSync::COL_DATES, SQL_TEXT),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<ScheduledServiceTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index(ScheduledServiceTableSync::COL_PATHID.c_str(), ScheduledServiceTableSync::COL_SCHEDULES.c_str(), ""),
@@ -121,7 +121,7 @@ namespace synthese
 				{
 					LineStopTableSync::Search(env, pathId);
 				}
-				
+
 				// Use rules
 				util::RegistryKeyType bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
 				if(bikeComplianceId > 0)
@@ -195,17 +195,17 @@ namespace synthese
 			query.addField(object->encodeSchedules());
 			query.addField(object->getPathId());
 			query.addField(
-				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
+				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :
 				RegistryKeyType(0)
 			);
 			query.addField(
-				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
+				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() :
 				RegistryKeyType(0)
 			);
 			query.addField(
-				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
+				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() :
 				RegistryKeyType(0)
 			);
@@ -295,7 +295,7 @@ namespace synthese
 				{
 					snow += hours(24);
 				}
-				query.addWhereField(ScheduledServiceTableSync::COL_SCHEDULES,"00:00:00#"+ SchedulesBasedService::EncodeSchedule(snow), ComposedExpression::OP_SUPEQ); 
+				query.addWhereField(ScheduledServiceTableSync::COL_SCHEDULES,"00:00:00#"+ SchedulesBasedService::EncodeSchedule(snow), ComposedExpression::OP_SUPEQ);
 			}
 			if (orderByOriginTime)
 			{

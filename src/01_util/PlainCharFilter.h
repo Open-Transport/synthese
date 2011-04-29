@@ -46,10 +46,10 @@ namespace synthese
 		public boost::iostreams::multichar_output_filter
 		{
 		public:
-		    
+
 			PlainCharFilter() {}
 
-			template<typename Sink> 
+			template<typename Sink>
 			std::streamsize write(Sink& dest, const char* s, std::streamsize n);
 		};
 
@@ -63,7 +63,7 @@ namespace synthese
 			while (i != n)
 			{
 				char c = s[i];
-					
+
 				if (c == 0xFFFFFFc3 )
 				{
 					i++;
@@ -155,10 +155,10 @@ namespace synthese
 				{
 					boost::iostreams::put(dest, c) ;
 				}
-				
+
 				++i;
 			}
-		    
+
 			return i;
 		}
 	}

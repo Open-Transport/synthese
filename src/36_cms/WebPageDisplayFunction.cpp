@@ -49,7 +49,7 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<FunctionWithSite<false>,WebPageDisplayFunction>::FACTORY_KEY("page");
-	
+
 	namespace cms
 	{
 		const string WebPageDisplayFunction::PARAMETER_PAGE_ID("p");
@@ -141,7 +141,7 @@ namespace synthese
 					{
 						url << Request::PARAMETER_STARTER << parameters;
 					}
-					
+
 					throw Request::RedirectException(url.str(), true);
 				}
 
@@ -161,9 +161,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		bool WebPageDisplayFunction::isAuthorized(
 			const Session* session
 		) const {

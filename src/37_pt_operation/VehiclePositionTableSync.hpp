@@ -54,10 +54,10 @@ namespace synthese
 				static const std::string COL_RANK_IN_PATH;
 				static const std::string COL_PASSENGERS;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	VehiclePosition search.
 				///	@param env Environment to populate

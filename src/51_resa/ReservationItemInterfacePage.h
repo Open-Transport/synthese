@@ -55,7 +55,7 @@ namespace synthese
 				- 4 : Seats
 				- 5 : URL to reservation cancellation (empty = non cancellable)
 				- 6 : Status canceled (1 = not canceled, 0 = canceled)
-				
+
 			Object : ReservationTransaction
 		*/
 		class ReservationItemInterfacePage
@@ -83,7 +83,7 @@ namespace synthese
 				, interfaces::VariablesMap& variables
 				, const server::Request* request = NULL
 			) const;
-			
+
 			ReservationItemInterfacePage();
 		};
 	}

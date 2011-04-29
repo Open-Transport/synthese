@@ -40,12 +40,12 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,hiking::HikingTrailSearchFunction>::FACTORY_KEY("HikingTrailSearchFunction");
-	
+
 	namespace hiking
 	{
 		const string HikingTrailSearchFunction::PARAMETER_SEARCH_NAME("sn");
 		const string HikingTrailSearchFunction::PARAMETER_ITEM_DISPLAY_PAGE_ID("pi");
-		
+
 		ParametersMap HikingTrailSearchFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -75,7 +75,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			
+
 			HikingTrailTableSync::SearchResult trails(HikingTrailTableSync::Search(Env::GetOfficialEnv(), _searchName));
 
 			BOOST_FOREACH(HikingTrailTableSync::SearchResult::value_type& trail, trails)
@@ -85,9 +85,9 @@ namespace synthese
 				_itemDisplayPage->display(stream, request, pm);
 			}
 		}
-		
-		
-		
+
+
+
 		bool HikingTrailSearchFunction::isAuthorized(
 			const Session* session
 		) const {

@@ -47,8 +47,8 @@ namespace synthese
 			Registrable(0)
 		{
 		}
-		
-		
+
+
 
 		void ReservationConfirmationEMailSubjectInterfacePage::display(
 			std::ostream& stream,

@@ -146,7 +146,7 @@ namespace synthese
 			if(stopAreas.contains(id))
 			{
 				set<StopArea*> loadedStopAreas(stopAreas.get(id));
-				
+
 				logStream
 					<< "LOAD : link between stop areas " << id;
 				if(name)
@@ -542,7 +542,7 @@ namespace synthese
 				result->setPath(&route);
 				route.addService(result, false);
 				env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(result));
-				
+
 				logStream << "CREA : Creation of service " << result->getServiceNumber() << " for " << number << " (" << departureSchedules[0] << ") on route " << route.getKey() << " (" << route.getName() << ")<br />";
 			}
 			else
@@ -572,7 +572,7 @@ namespace synthese
 			// Variables
 			bool linked(!objects.begin()->linkedStopAreas.empty());
 			AdminFunctionRequest<PTPlaceAdmin> openRequest(request);
-			
+
 			// Title
 			stream << "<h1>Zones d'arrêt ";
 			if(!linked)
@@ -676,7 +676,7 @@ namespace synthese
 			bool linked(!objects.begin()->linkedStopPoints.empty());
 			AdminFunctionRequest<PTPlaceAdmin> openRequest(request);
 			AdminFunctionRequest<StopPointAdmin> openStopPointRequest(request);
-			
+
 			// Title
 			stream << "<h1>Arrêts ";
 			if(!linked)
@@ -785,7 +785,7 @@ namespace synthese
 						{
 							stream << std::fixed << stopPoint->getGeometry()->getX();
 						}
-						
+
 						stream << t.col();
 						if(stopPoint->getGeometry().get())
 						{
@@ -795,7 +795,7 @@ namespace synthese
 						{
 							stream << "(non localisé)";
 						}
-				
+
 						double distance(-1);
 						if (stopPoint->getGeometry().get() && object.coords.get())
 						{

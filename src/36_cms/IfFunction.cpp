@@ -35,13 +35,13 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::IfFunction>::FACTORY_KEY("if");
-	
+
 	namespace cms
 	{
 		const string IfFunction::PARAMETER_CONDITION("cond");
 		const string IfFunction::PARAMETER_THEN("then");
 		const string IfFunction::PARAMETER_ELSE("else");
-		
+
 		ParametersMap IfFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -71,9 +71,9 @@ namespace synthese
 				stream << _then;
 			}
 		}
-		
-		
-		
+
+
+
 		bool IfFunction::isAuthorized(
 			const Session* session
 		) const {

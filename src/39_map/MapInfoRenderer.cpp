@@ -49,14 +49,14 @@ namespace synthese
 	using namespace util;
 	using namespace map;
 	using namespace pt;
-	
+
 
 	namespace util
 	{
 		template<>
 		const string FactorableTemplate<Renderer,MapInfoRenderer>::FACTORY_KEY("mapinfo");
 	}
-	
+
 
 namespace map
 {
@@ -73,8 +73,8 @@ MapInfoRenderer::~MapInfoRenderer()
 
 
 
-std::string 
-MapInfoRenderer::render(const boost::filesystem::path& tempDir, 
+std::string
+MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 			const std::string& filenamePrefix,
 			const Registry<JourneyPattern>& lines,
 			synthese::map::Map& map,
@@ -87,11 +87,11 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 
 
 
-    std::string mifFilename (boost::replace_last_copy (_zipOutput.string (), 
+    std::string mifFilename (boost::replace_last_copy (_zipOutput.string (),
 						  ".zip", ".mif"));
-    std::string midFilename (boost::replace_last_copy (_zipOutput.string (), 
+    std::string midFilename (boost::replace_last_copy (_zipOutput.string (),
 						  ".zip", ".mid"));
-			     
+
     const boost::filesystem::path mifFile (mifFilename, boost::filesystem::native);
     const boost::filesystem::path midFile (midFilename, boost::filesystem::native);
 
@@ -103,19 +103,19 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
     mifof << "Delimiter \",\"" << std::endl;
     mifof << "Index 52" << std::endl;
     mifof << "CoordSys Earth Projection 3, 1002, \"m\", 0, 46.8, 45.898918964419, 47.696014502038, 600000, 2200000 Bounds (-113967455.417, -106367759.649) (115167455.417, 122767151.185)" << std::endl; // this should never change...
-    mifof << "Columns 1" << std::endl; 
+    mifof << "Columns 1" << std::endl;
     mifof << "  Libelle Char(200)" << std::endl;
-    mifof << "Data" << std::endl << std::endl; 
+    mifof << "Data" << std::endl << std::endl;
 
     const std::set<DrawableLine*>& selectedLines = map.getSelectedLines ();
     for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
-         it != selectedLines.end () ; ++it) 
+         it != selectedLines.end () ; ++it)
     {
 	const DrawableLine* dbl = *it;
 	shared_ptr<LineString> points = dbl->getPoints ();
 
 
-	
+
 	int firstStopIndex = -1;
 	// find first stop index
 	for (int i=0; i<points->getCoordinatesRO()->getSize();++i)
@@ -128,7 +128,7 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 
 	if (firstStopIndex == -1) continue;
 
-	
+
 	while (true)
 	{
 
@@ -143,28 +143,28 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 		secondStopIndex = i;
 		break;
 	    }
-	    
+
 	    if (secondStopIndex == -1) break;
-	    
+
 	    mifof << "Pline " << (secondStopIndex - firstStopIndex + 1) << std::endl;
-	    
+
 	    // Dump points between first stop index and second point index
 	    for (int i=firstStopIndex; i<=secondStopIndex; ++i)
 	    {
 		mifof << points->getCoordinateN(i).x << " " << points->getCoordinateN(i).y << std::endl;
 	    }
-	    mifof << "    Pen (" 
+	    mifof << "    Pen ("
 		  << 3 << "," // pen width
 		  << 2 << "," // pen pattern
-		  << (((int) (dbl->getColor ().r * 65536) + 
-		       ((int) dbl->getColor ().g * 256) + 
+		  << (((int) (dbl->getColor ().r * 65536) +
+		       ((int) dbl->getColor ().g * 256) +
 		       (int) dbl->getColor ().b)) // pen color
 		  << ")" << std::endl;
 
 //	    midof << ((const StopPoint*) points[firstStopIndex])->getName ()
 //		  << " > " << ((const StopPoint*) points[secondStopIndex])->getName ()
 //		  << std::endl;
-	    
+
 	    firstStopIndex = secondStopIndex;
 	}
     }
@@ -175,18 +175,18 @@ MapInfoRenderer::render(const boost::filesystem::path& tempDir,
 
     // Once everything generated, create the zip file
     std::stringstream zipcmd;
-    zipcmd << ZIP_BIN << " " << _zipOutput.string () << " " 
+    zipcmd << ZIP_BIN << " " << _zipOutput.string () << " "
 	   << mifFile.string () << " " << midFile.string ();
-    
+
     Log::GetInstance ().debug (zipcmd.str ());
-    
+
 	int ret = ::system (zipcmd.str ().c_str ());
-    
+
     if (ret != 0)
     {
 	throw synthese::Exception ("Error executing Zip (zip executable in path ?)");
     }
-    
+
 
     return resultFilename;
 }
@@ -202,19 +202,19 @@ MapInfoRenderer::MapInfoRenderer()
 
 /*
 
-void 
+void
 MapInfoRenderer::renderLines (Map& map)
 {
     const std::set<DrawableLine*>& selectedLines = map.getSelectedLines ();
-    
+
     for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
          it != selectedLines.end () ; ++it) {
 		const DrawableLine* dbl = *it;
 		dbl->prepare (map, _config.getSpacing ());
-    }    
-    
+    }
+
     for (std::set<DrawableLine*>::const_iterator it = selectedLines.begin ();
-         it != selectedLines.end () ; ++it) 
+         it != selectedLines.end () ; ++it)
 	{
 		const DrawableLine* dbl = *it;
 		const std::vector<Coordinate>& shiftedPoints = dbl->getShiftedPoints ();
@@ -222,7 +222,7 @@ MapInfoRenderer::renderLines (Map& map)
 		// Shift them again on right and left of half-width to get the enveloppe.
 		const std::vector<synthese::pt::Coordinate> points1 =
 		  dbl->calculateAbsoluteShiftedPoints (shiftedPoints, (_config.getBorderWidth () / 2));
-		
+
 		std::string href (_urlPattern);
 		boost::replace_all (href, "$id", dbl->getLineId ());
 
@@ -232,7 +232,7 @@ MapInfoRenderer::renderLines (Map& map)
 			_output << (int) points1[i].x << "," << (int) (map.getHeight () - points1[i].y) << ",";
 		}
 
-		std::vector<synthese::pt::Coordinate> points2 = 
+		std::vector<synthese::pt::Coordinate> points2 =
 			dbl->calculateAbsoluteShiftedPoints (shiftedPoints, - (_config.getBorderWidth () / 2));
 
 		std::reverse (points2.begin (), points2.end ());
@@ -244,7 +244,7 @@ MapInfoRenderer::renderLines (Map& map)
 		}
 		_output << "'/>" << std::endl;
 
-    }    
+    }
 
 
 
@@ -254,14 +254,14 @@ MapInfoRenderer::renderLines (Map& map)
 
 
 
-void 
+void
 MapInfoRenderer::renderPhysicalStops (Map& map)
 {
-    const std::set<DrawablePhysicalStop*>& selectedPhysicalStops = 
+    const std::set<DrawablePhysicalStop*>& selectedPhysicalStops =
 	map.getSelectedPhysicalStops ();
 
     for (std::set<DrawablePhysicalStop*>::const_iterator it = selectedPhysicalStops.begin ();
-         it != selectedPhysicalStops.end () ; ++it) 
+         it != selectedPhysicalStops.end () ; ++it)
     {
 	const DrawablePhysicalStop* dps = *it;
 
@@ -269,8 +269,8 @@ MapInfoRenderer::renderPhysicalStops (Map& map)
 	boost::replace_all (href, "$id", Conversion::ToString (dps->getPhysicalStopId ()));
 
 	_output << "<area href='" << href << "' shape='circle' coords='";
-	_output << dps->getPoint ().x  << "," 
-		<< (int) (map.getHeight () - dps->getPoint ().y) << "," 
+	_output << dps->getPoint ().x  << ","
+		<< (int) (map.getHeight () - dps->getPoint ().y) << ","
 		<< _config.getLineWidth () << "'/>" << std::endl;
     }
 }

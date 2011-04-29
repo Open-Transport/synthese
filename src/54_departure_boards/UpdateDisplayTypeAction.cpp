@@ -52,7 +52,7 @@ namespace synthese
 	using namespace dblog;
 	using namespace security;
 	using namespace cms;
-		
+
 
 	namespace util
 	{
@@ -307,7 +307,7 @@ namespace synthese
 			{
 				// Display type
 				_dt = DisplayTypeTableSync::GetEditable(id, *_env, UP_LINKS_LOAD_LEVEL);
-			}			
+			}
 			catch (ObjectNotFoundException<DisplayType>& e)
 			{
 				throw ActionException("Display Type not found / "+ e.getMessage());

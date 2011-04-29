@@ -59,7 +59,7 @@ namespace synthese
 				",setup : function(ed) {" <<
 					//This event (onBeforeSetContent)gets executed when the setContent method is called
 					//gets executed when the setContent method is called but before the contents gets
-					//serialized and placed in the editor.         
+					//serialized and placed in the editor.
 					"ed.onBeforeSetContent.add(function(ed, o) {" <<
 						//replace all instances of <? and ?> with HTML entities
 						"o.content = o.content.replace(/<\\?/gi, \"&lt;?\");" <<
@@ -91,7 +91,7 @@ namespace synthese
 			{
 				s << ",save";
 			}
-			
+
 			s <<
 				",style,layer,table,advhr,advimage,advlink,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template\"" <<
 				",theme_advanced_buttons1 : \"";
@@ -129,7 +129,7 @@ namespace synthese
 					s << ",insertimage";
 				}
 			}
-			
+
 			s << "\"" <<
 				",theme_advanced_toolbar_location : \"top\"" <<
 				",theme_advanced_toolbar_align : \"left\"" <<
@@ -170,7 +170,7 @@ namespace synthese
 							"}" <<
 						"}; " <<
 
-						"xhr.open('GET', \"" << _ajaxSaveURL << "&\" + ed.getElement().name +\"=\"+ ed.getContent(),  true);" << 
+						"xhr.open('GET', \"" << _ajaxSaveURL << "&\" + ed.getElement().name +\"=\"+ ed.getContent(),  true);" <<
 						"xhr.send(null);" <<
 					"}"
 				;

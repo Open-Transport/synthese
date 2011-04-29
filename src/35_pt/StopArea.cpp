@@ -130,7 +130,7 @@ namespace synthese
 							}
 						}
 					}
-	
+
 					BOOST_FOREACH(ScoresMap::value_type itc, scores)
 					{
 						if (itc.second <= 10)
@@ -164,7 +164,7 @@ namespace synthese
 			const Vertex& origin,
 			bool vertexIsOrigin
 		) const {
-		    
+
 			if (whatToSearch != PTModule::GRAPH_ID) return;
 
 			if(vertexIsOrigin)
@@ -173,7 +173,7 @@ namespace synthese
 					const PhysicalStops::value_type& it,
 					_physicalStops
 				){
-					
+
 					if(!isConnectionAllowed(origin, *it.second)) continue;
 
 					result.insert(
@@ -195,7 +195,7 @@ namespace synthese
 					);
 				}
 			}
-		} 
+		}
 
 
 
@@ -226,7 +226,7 @@ namespace synthese
 					)	);
 				}
 			}
-		    
+
 			if (whatToSearch.find(PTModule::GRAPH_ID) == whatToSearch.end()) return;
 
 			BOOST_FOREACH(

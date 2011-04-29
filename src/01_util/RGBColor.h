@@ -49,26 +49,26 @@ namespace synthese
 			double r;
 			double g;
 			double b;
-			
-			RGBColor (double red, double green, double blue) 
+
+			RGBColor (double red, double green, double blue)
 				: r (red), g (green), b (blue) {}
-			
-			RGBColor (int red, int green, int blue) 
+
+			RGBColor (int red, int green, int blue)
 				: r (red/255.0), g (green/255.0), b (blue/255.0) {}
 
 			RGBColor (const std::string& colorName);
-			
+
 
 			bool operator == (const synthese::util::RGBColor& op2 ) const;
 
 			std::string toString() const;
 
-			
-			
+
+
 			/** Outputs the color in XML format (#RRGGBB).
 				@return std::string the color in XML Format (#RRGGBB)
 				@author Hugues Romain
-				@date 2009		
+				@date 2009
 			*/
 			std::string toXMLColor() const;
 

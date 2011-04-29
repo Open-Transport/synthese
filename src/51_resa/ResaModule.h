@@ -105,7 +105,7 @@ namespace synthese
 		The features of the reservation module are :
 			- BoolingScreenFunction : booking screen, available directly in a route planner journey roadmap
 			- BoolingConfirmationFunction : booking confirmation
-			
+
 		A logged standard user uses the administration panel to access to the following features :
 			- edit personal informations (in security module)
 			- edit favorites journeys (in pt_journey_planner module)
@@ -123,7 +123,7 @@ namespace synthese
 				- display the reservation list of the line
 					- ServiceReservationsRoadMapFunction : display the detailed reservation list of a service / course (pop up : not in the admin panel, optimized for printing)
 			- display an integrated route planner (pt_journey_planner module)
-			
+
 			Move the following features in a call center module :
 			- display the call center planning
 			- display the calls list
@@ -154,7 +154,7 @@ namespace synthese
 			public server::ModuleClassTemplate<ResaModule>
 		{
 			friend class server::ModuleClassTemplate<ResaModule>;
-			
+
 		private:
 			typedef std::map<const server::Session*, util::RegistryKeyType> _SessionsCallIdMap;
 			static _SessionsCallIdMap _sessionsCallIds;

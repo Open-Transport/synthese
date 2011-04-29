@@ -46,11 +46,11 @@ namespace synthese
 			<i>Barre de navigation</i> :
 
 			<i>Zone de contenus</i> :
-						
+
 			<i>Sécurité</i> :
 				- Une habilitation publique ArrivalDepartureTableRight de niveau DELETE sur le périmètre "tout" est nécessaire pour accéder à la page.
-				
-			<i>Journal</i> : 
+
+			<i>Journal</i> :
 		*/
 		class DeparturesTableBenchmarkAdmin :
 			public admin::AdminInterfaceElementTemplate<DeparturesTableBenchmarkAdmin>
@@ -64,14 +64,14 @@ namespace synthese
 				size_t size;
 			};
 			typedef std::vector<TestCase> TestCases;
-		
+
 			bool		_doIt;
-			
+
 		public:
 			static const std::string PARAMETER_DOIT;
-			
+
 			DeparturesTableBenchmarkAdmin();
-			
+
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
@@ -82,10 +82,10 @@ namespace synthese
 			/** Parameters map generator, used when building an url to the admin page.
 				@return server::ParametersMap The generated parameters map
 				@author Hugues Romain
-				@date 2007					
+				@date 2007
 			*/
 			virtual server::ParametersMap getParametersMap() const;
-			
+
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
@@ -117,7 +117,7 @@ namespace synthese
 			/** Gets the opening position of the node in the tree view.
 				@return Always visible
 				@author Hugues Romain
-				@date 2008					
+				@date 2008
 			*/
 			virtual bool isPageVisibleInTree(
 				const AdminInterfaceElement& currentPage,

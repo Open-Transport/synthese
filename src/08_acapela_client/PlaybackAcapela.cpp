@@ -52,7 +52,7 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
     int						idtabFindVoice = 0;
 
     int nbvoice;
-    
+
 	// voice file type AU head
     static const unsigned char auHead[24] =
 	{
@@ -101,8 +101,8 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
         //cout<<"ERROR: not enough memory"<<endl;
         return -1;
     }
-  
-  
+
+
     // search voice
     if ((Result = nscFindFirstVoice(hSrv,NULL,0,0,0,&FindVoice,&hVoice)) == NSC_OK)
     {
@@ -118,18 +118,18 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
         return -1;
     }
     nscCloseFindVoice(hVoice);
-	
+
     nbvoice = idtabFindVoice;
     idtabFindVoice = 0;
-  
-    while (nbvoice > 0) 
+
+    while (nbvoice > 0)
     {
 		//cerr<<ptabFindVoice[idtabFindVoice].cVoiceName<<endl;
 		idtabFindVoice++;
 		nbvoice--;
     }
 
-  
+
     /* Init channel  */
 
     if ((Result = nscInitChannel(hSrv,_voice.c_str(),0,0,hDispatch,&ChId)) == NSC_OK)
@@ -141,7 +141,7 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
         //cout<<"ERROR: nscInitChannel return "<<Result<<endl;
         return -1;
     }
-	
+
     /* Lock channel */
     if( (Result = nscLockChannel(hSrv,ChId,hDispatch,&hTTS)) == NSC_OK)
     {
@@ -161,15 +161,15 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
 	{
 		cerr<<"change of voice speed error: "<<Result<<endl;
 	}
-	
-	
+
+
     /* AddText channel */
      ////cout<<"textVoiceAck: "<<_text<<endl;
      ////cout<<"voiceFileNameAck: "<<_fileName<<endl;
-  
+
     int IdText = 1;
     ////cout<<"Text %i adding...   "<<IdText<<endl;
-    
+
     if ((Result = nscAddText(hTTS,_text.c_str(),(void *)IdText)) == NSC_OK)
     {
         ////cout<<"Text added: "<<_text<<endl;
@@ -193,12 +193,12 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
     {
 	    // fput head inside
             //fwrite (auHead[i] ,sizeof(auHead[i]),sizeof(auHead),f);
-            
+
         for(int i=0;i<24;i++)
         {
             fputc(auHead[i],f);
         }
-    
+
         ExecData.pAppInstanceData=(void *)f;
 
         if((Result = nscExecChannel(hTTS,&ExecData)) == NSC_OK)
@@ -228,7 +228,7 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
         //cout<<"ERROR: nscUnlockChannel return  "<<Result<<endl;
         return -1;
     }
-	
+
     /* Close channel */
 
     if( (Result = nscCloseChannel(hSrv,ChId))==NSC_OK)
@@ -240,8 +240,8 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
         //cout<<"ERROR: nscCloseChannel return "<<endl;
         return -1;
     }
-			
-	
+
+
     /* DeleteDispatcher */
 
     if ((Result = nscDeleteDispatcher(hDispatch)) == NSC_OK)
@@ -265,6 +265,6 @@ int PlaybackAcapela::mainFunc(string _text, string _fileName, string _ipServer, 
         //cout<<"ERROR: nscReleaseServerContext return "<<Result<<endl;
         return -1;
     }
-  
+
     return 0;
 }

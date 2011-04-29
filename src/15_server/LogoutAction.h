@@ -49,7 +49,7 @@ namespace synthese
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Logout#Request
 			void _setFromParametersMap(const server::ParametersMap& map);
-		
+
 		public:
 
 			/** Action to run, defined by each subclass.

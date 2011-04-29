@@ -81,12 +81,12 @@ namespace synthese
 				ArrivalDepartureList _result; //!< The result
 			//@}
 
-			
+
 			/** Autorisation d'afficher une ligne sur le tableau de départs.
 				@param linestop linestop to test
 			*/
 				bool _allowedLineStop(const pt::LinePhysicalStop& linestop) const;
-			
+
 			/** Insertion.
 				@return iterator on the element.
 			*/
@@ -111,7 +111,7 @@ namespace synthese
 			);
 
 		public:
-			
+
 			virtual const ArrivalDepartureList& generate() = 0;
 			virtual ~ArrivalDepartureTableGenerator() {}
 

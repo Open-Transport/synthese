@@ -66,7 +66,7 @@ namespace synthese
 	using namespace messages;
 	using namespace security;
 	using namespace db;
-	
+
 
 	namespace util
 	{
@@ -101,7 +101,7 @@ namespace synthese
 			{
 				throw AdminParametersException("Specified scenario not found");
 			}
-			
+
 			if(dynamic_cast<const SentScenario*>(_scenario.get()))
 			{
 				_generalLogView.set(map, MessagesLog::FACTORY_KEY, _scenario->getKey());
@@ -200,7 +200,7 @@ namespace synthese
 				stream << "<h1>Messages</h1>";
 
 				vector<shared_ptr<Alarm> > v;
-				
+
 				if (_sentScenario.get())
 				{
 					ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
@@ -288,7 +288,7 @@ namespace synthese
 					stream << t.close();
 				}
 			}
-			
+
 			////////////////////////////////////////////////////////////////////
 			// TAB LOG
 			if (openTabContent(stream, TAB_LOG))
@@ -324,7 +324,7 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if (dynamic_cast<const SentScenario*>(_scenario.get()))
 			{
 				ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
@@ -378,7 +378,7 @@ namespace synthese
 
 			_tabs.push_back(Tab("Paramètres", TAB_PARAMETERS, true, "table.png"));
 			_tabs.push_back(Tab("Messages", TAB_MESSAGES, true, "note.png"));
-			
+
 			if(dynamic_cast<const ScenarioTemplate*>(_scenario.get()))
 			{
 				_tabs.push_back(Tab("Variables", TAB_VARIABLES, true));
@@ -394,12 +394,12 @@ namespace synthese
 		{
 			return _scenario;
 		}
-		
+
 		void MessagesScenarioAdmin::setScenario(boost::shared_ptr<Scenario> value)
 		{
 			_scenario = const_pointer_cast<const Scenario>(value);
 		}
-	
+
 		bool MessagesScenarioAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			const MessagesScenarioAdmin& mother(static_cast<const MessagesScenarioAdmin&>(other));

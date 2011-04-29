@@ -43,13 +43,13 @@ namespace synthese
 	using namespace graph;
 	using namespace road;
 	using namespace pt;
-		
+
 
 	namespace algorithm
 	{
 
 
-// 
+//
 // 		bool BestVertexReachesMap::mustBeCleared(
 // 			const Journey& testJourney,
 // 			const time::ptime& ptime,
@@ -61,7 +61,7 @@ namespace synthese
 // 			if (itc != _bestTimeMap.end ())
 // 				return (ptime.*_cleanUpUselessComparison)(itc->second);
 // 			return false;
-// 
+//
 // 		}
 
 
@@ -165,7 +165,7 @@ namespace synthese
 		){
 			TimeMap::iterator itc = _bestTimeMap.find (vertex);
 
-			if (itc == _bestTimeMap.end ()) 
+			if (itc == _bestTimeMap.end ())
 			{
 				itc = _bestTimeMap.insert(make_pair(vertex, TimeMap::mapped_type())).first;
 			}
@@ -190,7 +190,7 @@ namespace synthese
 			boost::shared_ptr<RoutePlanningIntermediateJourney> journey
 		){
 			_insert(vertex, transfers, duration, journey);
-			
+
 			if(!vertex->getHub()->isConnectionPossible()) return;
 
 			const Hub* p(vertex->getHub());

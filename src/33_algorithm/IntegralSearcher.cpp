@@ -196,7 +196,7 @@ namespace synthese
 						<< "<th colspan=\"7\">Journey</th>"
 						<< "</tr>"
 						;
-					
+
 					// Departure time
 					Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
 
@@ -417,7 +417,7 @@ namespace synthese
 							if (!serviceInstance.getService()->isCompatibleWith(_accessParameters))
 								continue;
 
-							PtrEdgeStep step(	
+							PtrEdgeStep step(
 								(_accessDirection == DEPARTURE_TO_ARRIVAL)
 								?(	!_searchOnlyNodes || _destinationVam.needFineSteppingForArrival (edge.getParentPath())
 									? (&Edge::getFollowingArrivalForFineSteppingOnly)
@@ -450,8 +450,8 @@ namespace synthese
 
 								// The reached vertex is analyzed only in 3 cases :
 								//  - if the vertex belongs to the goal
-								//  - if the type of the vertex corresponds to the searched one (if 
-								//		the _searchOnlyNodes parameter is activated, the vertex must 
+								//  - if the type of the vertex corresponds to the searched one (if
+								//		the _searchOnlyNodes parameter is activated, the vertex must
 								//		also belong to a connection place)
 								//  - if the vertex belongs to a connection place
 								bool isGoalReached(
@@ -651,9 +651,9 @@ namespace synthese
 				)
 			)	return _JourneyUsefulness(false, false);
 
-			/** - If the reached vertex does not belong to the goal, comparison with the known best time at the goal, to determinate 
+			/** - If the reached vertex does not belong to the goal, comparison with the known best time at the goal, to determinate
 				if there is any chance to reach the goal more efficiently by using this path
-				The time used for comparison corresponds to the minimal time to reach the goal from the vertex, constituted of : 
+				The time used for comparison corresponds to the minimal time to reach the goal from the vertex, constituted of :
 					-# the known time to reach the current vertex
 					-# the minimal time to do a transfer in the connecting place
 					-# the minimal travel time from the connecting place and the goal according to the current vmax

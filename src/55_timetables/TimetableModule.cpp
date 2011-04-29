@@ -33,24 +33,24 @@ namespace synthese
 	using namespace timetables;
 	using namespace server;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<ModuleClass,TimetableModule>::FACTORY_KEY("55_timetables");
 	}
-	
+
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<TimetableModule>::NAME("Fiches horaires");
-		
+
 		template<> void ModuleClassTemplate<TimetableModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<TimetableModule>::Init()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<TimetableModule>::End()
 		{
 		}

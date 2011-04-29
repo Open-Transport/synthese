@@ -40,8 +40,8 @@ namespace synthese
 	using namespace admin;
 	using namespace util;
 	using namespace security;
-	using namespace html;	
-	
+	using namespace html;
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, HomeAdmin>::FACTORY_KEY = "home";
@@ -68,7 +68,7 @@ namespace synthese
 			{
 				AdminRequest r(request, true);
 				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(link));
-				
+
 				stream << "<li>" << HTMLModule::getHTMLLink(r.getURL(), link->getTitle()) << "</li>";
 			}
 
@@ -81,9 +81,9 @@ namespace synthese
 			const ParametersMap& map
 		){
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap HomeAdmin::getParametersMap() const
 		{
 			ParametersMap m;
@@ -111,7 +111,7 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
-			
+
 			vector<shared_ptr<ModuleClass> > modules(
 				Factory<ModuleClass>::GetNewCollection()
 			);
@@ -135,7 +135,7 @@ namespace synthese
 				userPage->setUserC(request.getUser());
 				links.push_back(userPage);
 			}
-			
+
 			return links;
 		}
 }	}

@@ -35,8 +35,8 @@ namespace synthese
 {
 	using namespace graph;
 	using namespace util;
-	
-	
+
+
 	namespace util
 	{
 		template<> const string Registry<pt::LineArea>::KEY("LineArea");

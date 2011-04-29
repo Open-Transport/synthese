@@ -50,7 +50,7 @@ namespace synthese
 			typedef util::Registry<ReservationTransaction>	Registry;
 
 			typedef std::vector<Reservation*> Reservations;
-			
+
 		private:
 
 			//!	\name Caractéristiques de la réservation
@@ -112,7 +112,7 @@ namespace synthese
 			/** Creation of a child reservation.
 				@return boost::shared_ptr<Reservation> The created reservation
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 			*/
 			Reservation* newReservation();
 
@@ -120,12 +120,12 @@ namespace synthese
 			void addReservation(Reservation* resa);
 
 			//! @name Queries
-			//@{				
+			//@{
 				/** Reservation transaction status computing.
 					@return ReservationStatus the status of the reservation transaction
 					@author Hugues Romain
 					@date 2008
-					
+
 					The reservation status of a reservation transaction is :
 						- NO_SHOW if at least one reservation is at NO_SHOW status
 						- else the minimum of the status of each reservation
@@ -134,13 +134,13 @@ namespace synthese
 
 				std::string	getFullStatusText()	const;
 
-				
-				
+
+
 				/** Dead line of the reservation transaction.
 					@return the deadline
 					@author Hugues Romain
 					@date 2008
-					
+
 					The dead line of the reservation transaction is the time when the cancellation is not allowed anymore.
 					This is the first reservation dead line in chronological order.
 				*/

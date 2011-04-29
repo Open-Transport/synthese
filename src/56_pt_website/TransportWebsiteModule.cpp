@@ -36,22 +36,22 @@ namespace synthese
 	using namespace graph;
 	using namespace server;
 	using namespace pt_website;
-	
+
 	template<> const std::string util::FactorableTemplate<ModuleClass,TransportWebsiteModule>::FACTORY_KEY("36_places_list");
-	
+
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<TransportWebsiteModule>::NAME("Site web transport public");
-		
+
 		template<> void ModuleClassTemplate<TransportWebsiteModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<TransportWebsiteModule>::Init()
 		{
-			
+
 		}
-		
+
 		template<> void ModuleClassTemplate<TransportWebsiteModule>::End()
 		{
 		}

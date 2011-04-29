@@ -43,7 +43,7 @@ namespace synthese
 	{
 		/** Visualisation de journal d'événements.
 			@ingroup m13Admin refAdmin
-		
+
 			@image html cap_admin_logviewer.png
 			@image latex cap_admin_logviewer.png "Maquette de l'écran de visualisation de journal" width=14cm
 
@@ -56,7 +56,7 @@ namespace synthese
 				-# <b>Formulaire de recherche</b> :
 					-# <tt>Date début</tt> : champ texte qui permet de filtrer les entrées postérieures à la date saisie. Si aucune date valide n'est entrée, alors le filtre est désactivé.
 					-# <tt>Date fin</tt> : champ texte qui permet de filtrer les entrées antérieures à la date saisie. Si aucune date valide n'est entrée, alors le filtre est désactivé.
-					-# <tt>Utilisateur</tt> : liste de choix contenant l'ensemble des utilisateurs ayant généré au moins une entrée sur le journal affiché. 
+					-# <tt>Utilisateur</tt> : liste de choix contenant l'ensemble des utilisateurs ayant généré au moins une entrée sur le journal affiché.
 						- si un utilisateur est sélectionné, alors seules les entrées générées par l'utilisateurs sélectionné sont affichées
 						- si aucun utilisateur n'est sélectionné, alors le filtre est désactivé.
 					-# <tt>Type</tt> : liste de choix permettant de filtrer sur le type d'entrée :
@@ -95,22 +95,22 @@ namespace synthese
 
 		public:
 			static const std::string PARAMETER_LOG_KEY;
-			
+
 			DBLogAdmin();
-			
+
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
 
@@ -126,7 +126,7 @@ namespace synthese
 
 			/** Authorization test.
 			 * @todo Add a right control by log file
-			 * @return 
+			 * @return
 			 */
 			bool isAuthorized(
 				const security::User& user
@@ -146,15 +146,15 @@ namespace synthese
 
 
 			virtual std::string getTitle() const;
-			
+
 			/** Key log setter.
 				@param key Key of the log to display
 				@throw AdminParametersException if the log does not exist
 				@author Hugues Romain
-				@date 2008				
+				@date 2008
 			*/
 			void setLogKey(const std::string& key);
-			
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 		};
 	}

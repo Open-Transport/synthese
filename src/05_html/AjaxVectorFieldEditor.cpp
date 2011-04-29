@@ -32,7 +32,7 @@ using namespace boost::algorithm;
 namespace synthese
 {
 	using namespace util;
-	
+
 	namespace html
 	{
 		const string AjaxVectorFieldEditor::CSS_AUTO_ORDER("autoorder");

@@ -99,7 +99,7 @@ namespace synthese
 
 		protected:
 			typedef std::map<std::string, int> IDCounterMap;
-			
+
 			const std::string	_name;				//!< Name of the form, must be unique within the page
 			const std::string	_action;			//!< Action to be launched at the form submit
 			IDCounterMap		_idCounter;			//!< ID map used to generate unique ID of the fields
@@ -115,7 +115,7 @@ namespace synthese
 				@return std::string The generated unique ID
 				@author Hugues Romain
 				@date 2007
-				
+
 				The generated id is the concatenation of :
 					- the form name,
 					- the field name,
@@ -126,7 +126,7 @@ namespace synthese
 			std::string _getFieldId(const std::string& name, bool increment=true);
 
 
-			
+
 		public:
 			////////////////////////////////////////////////////////////////////
 			/// HTML Form constructor.
@@ -143,13 +143,13 @@ namespace synthese
 				/** Gets the name of the form.
 					@return const std::string& the name of the form
 					@author Hugues Romain
-					@date 2008					
+					@date 2008
 				*/
 				const std::string& getName() const;
 
 
-				
-				
+
+
 				/** Gets the update right status.
 					@return bool the update right status
 					@author Hugues Romain
@@ -165,7 +165,7 @@ namespace synthese
 				/** Update right setter.
 					@param value true if a real form must be generated, false if only the value must be generated as simple text
 					@author Hugues Romain
-					@date 2007				
+					@date 2007
 				*/
 				void setUpdateRight(bool value);
 			//@}
@@ -173,7 +173,7 @@ namespace synthese
 
 
 			//! @name Utilities
-			//@{			
+			//@{
 				/** Gets the unique id of a form field within the HTML page.
 					@param name Name of the field
 					@return std::string The unique id of the field
@@ -190,7 +190,7 @@ namespace synthese
 					@param value Value of the field
 					@author Hugues Romain
 					@date 2007
-					
+
 					The corresponding code is generated at the form closing (see getHiddenFields method).
 					If the field already exists, its value is replaced by the last one.
 				*/
@@ -212,7 +212,7 @@ namespace synthese
 					@param overridingFields Fields value to output instead of the registered ones.
 					@return std::string The URL launching the form (GET action)
 					@author Hugues Romain
-					@date 2007				
+					@date 2007
 				*/
 				std::string getURL(HiddenFieldsMap overridingFields = HiddenFieldsMap(), bool withInitialValues=true) const;
 			//@}
@@ -236,7 +236,7 @@ namespace synthese
 					@return std::string The HTML generated code.
 					@author Hugues Romain
 					@date 2007
-					
+
 				*/
 				virtual std::string close();
 
@@ -247,7 +247,7 @@ namespace synthese
 					@return std::string The generated HTML code
 					@author Hugues Romain
 					@date 2007
-					
+
 				*/
 				std::string setFocus(const std::string& fieldName) const;
 
@@ -262,8 +262,8 @@ namespace synthese
 				*/
 				std::string setFocus(const std::string& fieldName, int fieldRank) const;
 
-				
-				
+
+
 				/** Gets all hidden fields to write on the page.
 					@return std::string the generated HTML code
 					@author Hugues Romain
@@ -285,15 +285,15 @@ namespace synthese
 				*/
 				std::string getLinkButton(const std::string& caption, const std::string confirm="", const std::string icon="") const;
 
-				
-				
+
+
 				/** Generates of link that submits the form content to a pop-up by POST method.
 					@param content text of the link
 					@param width width of the pop-pup
 					@param height height of the pop-up
 					@return std::string The generated HTML code
 					@author Hugues Romain
-					@date 2008					
+					@date 2008
 				*/
 				std::string getSubmitOnPopupLink(const std::string& content, int width, int height);
 			//@}
@@ -338,8 +338,8 @@ namespace synthese
 					boost::optional<K> value
 				);
 
-				
-				
+
+
 				////////////////////////////////////////////////////////////////////
 				///	Builds select input from a registry.
 				///	@param name Name of the field
@@ -360,8 +360,8 @@ namespace synthese
 					const std::string zeroLabel = std::string(),
 					const std::string unknownLabel = std::string()
 				);
-				
-				
+
+
 				/** Radio input element generator (input type=radio).
 					@param name name of the whole field (the same in each element)
 					@param valueIfSelected value of the field element to transmit if it is checked
@@ -370,7 +370,7 @@ namespace synthese
 					@param disabled disabled status of the element (default : enabled)
 					@return std::string the HTML generated code
 					@author Hugues Romain
-					@date 2008					
+					@date 2008
 				*/
 				template<class K>
 				std::string getRadioInput(
@@ -381,8 +381,8 @@ namespace synthese
 					bool disabled = false
 				);
 
-				
-				
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Radio input collection generated upon a vector of values (input type=radio).
 				///	@param name name of the field
@@ -391,7 +391,7 @@ namespace synthese
 				/// @param withBR adds a BR tag after each label
 				///	@return std::string the HTML generated code
 				///	@author Hugues Romain
-				///	@date 2008					
+				///	@date 2008
 				template<class K>
 				std::string getRadioInputCollection(
 					const std::string& name,
@@ -445,7 +445,7 @@ namespace synthese
 					@param value default value present in the field at the page load
 					@return std::string the generated HTML code
 					@author Hugues Romain
-					@date 2008					
+					@date 2008
 				*/
 				std::string getPasswordInput(const std::string& name, const std::string& value);
 
@@ -530,7 +530,7 @@ namespace synthese
 					@param caption text displayed on the button
 					@return std::string the HTML generated code
 					@author Hugues Romain
-					@date 2008					
+					@date 2008
 				*/
 				virtual std::string getSubmitButton(const std::string& caption);
 
@@ -542,7 +542,7 @@ namespace synthese
 					@param name Name of the input (optional)
 					@return std::string HTML input button
 					@author Hugues Romain
-					@date 2008				
+					@date 2008
 				*/
 				virtual std::string getImageSubmitButton(const std::string& imageURL, const std::string& alt, std::string name="im");
 
@@ -554,12 +554,12 @@ namespace synthese
 					@param checked indicates if the field must be checked at the page load
 					@return std::string the HTML generated code
 					@author Hugues Romain
-					@date 2008					
+					@date 2008
 				*/
 				std::string getCheckBox(const std::string& name, const std::string& value, bool checked);
 
-				
-				
+
+
 				/** Options list containing numbers.
 					@param name Name of the field
 					@param mini Minimal number of the suite
@@ -571,7 +571,7 @@ namespace synthese
 						- if non empty : UNKNOWN_VALUE choice, designed by the provided text in the list
 					@return std::string Select HTML Tag containing all options elements as defined above
 					@author Hugues Romain
-					@date 2008				
+					@date 2008
 				*/
 				std::string getSelectNumberInput(
 					const std::string& name

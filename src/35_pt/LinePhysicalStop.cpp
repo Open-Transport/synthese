@@ -31,7 +31,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
-	
+
 	namespace pt
 	{
 		LinePhysicalStop::LinePhysicalStop(

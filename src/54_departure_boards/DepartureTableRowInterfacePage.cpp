@@ -137,14 +137,14 @@ namespace synthese
 					realTimeRequest.getFunction()->setInterface(Env::GetOfficialEnv().getRegistry<Interface>().get(getInterface()->getKey()));
 					realTimeRequest.getFunction()->setService(Env::GetOfficialEnv().getRegistry<ScheduledService>().get(ptd.first.getService()->getKey()));
 					realTimeRequest.getFunction()->setLineStopRank(ptd.first.getDepartureEdge()->getRankInPath());
-					parameters.push_back(realTimeRequest.getURL());				
+					parameters.push_back(realTimeRequest.getURL());
 				}
 				else
 				{
 					parameters.push_back(string());
 				} //14
 			}
-			
+
 			InterfacePage::_display(
 				stream,
 				parameters,

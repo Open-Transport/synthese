@@ -36,7 +36,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt_operation::DepotUpdateAction>::FACTORY_KEY("DepotUpdateAction");
@@ -46,8 +46,8 @@ namespace synthese
 	{
 		const string DepotUpdateAction::PARAMETER_DEPOT = Action_PARAMETER_PREFIX + "dp";
 		const string DepotUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-		
-		
+
+
 		ParametersMap DepotUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -61,9 +61,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void DepotUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.isDefined(PARAMETER_DEPOT))
@@ -87,9 +87,9 @@ namespace synthese
 				_name = map.get<string>(PARAMETER_NAME);
 			}
 		}
-		
-		
-		
+
+
+
 		void DepotUpdateAction::run(
 			Request& request
 		){
@@ -110,9 +110,9 @@ namespace synthese
 				request.setActionCreatedId(_depot->getKey());
 			}
 		}
-		
-		
-		
+
+
+
 		bool DepotUpdateAction::isAuthorized(
 			const Session* session
 		) const {

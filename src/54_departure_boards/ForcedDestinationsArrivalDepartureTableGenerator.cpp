@@ -41,7 +41,7 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace pt;
-	
+
 
 	namespace departure_boards
 	{
@@ -102,7 +102,7 @@ namespace synthese
 			ReachedDestinationMap reachedDestination;
 
 			const StopArea::PhysicalStops& physicalStops(_physicalStops.begin()->second->getConnectionPlace()->getPhysicalStops());
-			
+
 			BOOST_FOREACH(const PhysicalStops::value_type& it, physicalStops)
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())

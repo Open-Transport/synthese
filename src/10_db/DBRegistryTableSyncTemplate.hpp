@@ -127,7 +127,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Synchronization on row deletion.
-			/// This method deletes the corresponding object in ram and runs 
+			/// This method deletes the corresponding object in ram and runs
 			/// all necessary cleaning actions.
 			void rowsRemoved(
 				DB* db,

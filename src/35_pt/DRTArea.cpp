@@ -27,7 +27,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace graph;
-	
+
 	namespace util
 	{
 		template<> const std::string Registry<pt::DRTArea>::KEY("DRTArea");

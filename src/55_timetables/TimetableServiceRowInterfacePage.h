@@ -46,7 +46,7 @@ namespace synthese
 	{
 		class RollingStock;
 	}
-	
+
 	namespace timetables
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -148,7 +148,7 @@ namespace synthese
 			/// @param rollingStock the rolling stock of the row
 			/// @param rank cell rank
 			//////////////////////////////////////////////////////////////////////////
-			/// If the stop corresponding to the cell is served by the service 
+			/// If the stop corresponding to the cell is served by the service
 			/// corresponding to the row, the following parameters are sent to the page :
 			///	<ul>
 			///		<li>hour : Hour of the stop</li>

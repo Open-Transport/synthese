@@ -40,8 +40,8 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace security;
-	
-	
+
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, messages::ScenarioFolderUpdateAction>::FACTORY_KEY("ScenarioFolderUpdateAction");
@@ -51,25 +51,25 @@ namespace synthese
 	{
 		const string ScenarioFolderUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string ScenarioFolderUpdateAction::PARAMETER_PARENT_FOLDER_ID = Action_PARAMETER_PREFIX + "fi";
-		
-		
-		
+
+
+
 		ScenarioFolderUpdateAction::ScenarioFolderUpdateAction()
 			: util::FactorableTemplate<Action, ScenarioFolderUpdateAction>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap ScenarioFolderUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
 			map.insert(Request::PARAMETER_OBJECT_ID, _folder.get() ? _folder->getKey() : 0);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ScenarioFolderUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			RegistryKeyType id(
@@ -115,9 +115,9 @@ namespace synthese
 					throw ActionException("Ce nom est déjà utilisé dans le répertoire courant.");
 			}
 		}
-		
-		
-		
+
+
+
 		void ScenarioFolderUpdateAction::run(Request& request)
 		{
 			_folder->setName(_name);

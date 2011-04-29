@@ -18,23 +18,23 @@ namespace synthese
 {
 	namespace server
 	{
-		
+
 		HTTPConnection::HTTPConnection(
 			boost::asio::io_service& io_service
 		):	strand_(io_service),
 			socket_(io_service)
 		{
 		}
-		
-		
-		
+
+
+
 		boost::asio::ip::tcp::socket& HTTPConnection::socket()
 		{
 			return socket_;
 		}
-		
-		
-		
+
+
+
 		void HTTPConnection::start()
 		{
 			socket_.async_read_some(boost::asio::buffer(buffer_),
@@ -43,9 +43,9 @@ namespace synthese
 					boost::asio::placeholders::error,
 					boost::asio::placeholders::bytes_transferred)));
 		}
-		
-		
-		
+
+
+
 		void HTTPConnection::handle_read(
 			const boost::system::error_code& e,
 			std::size_t bytes_transferred
@@ -55,7 +55,7 @@ namespace synthese
 				boost::tribool result;
 				boost::tie(result, boost::tuples::ignore) = request_parser_.parse(
 					request_, buffer_.data(), buffer_.data() + bytes_transferred);
-			
+
 				if (result)
 				{
 					request_.ipaddr = socket_.remote_endpoint().address().to_string();
@@ -82,15 +82,15 @@ namespace synthese
 							boost::asio::placeholders::bytes_transferred)));
 				}
 			}
-			
+
 			// If an error occurs then no new asynchronous operations are started. This
 			// means that all shared_ptr references to the connection object will
 			// disappear and the object will be destroyed automatically after this
 			// handler returns. The connection class's destructor closes the socket.
 		}
-		
-		
-		
+
+
+
 		void HTTPConnection::handle_write(const boost::system::error_code& e)
 		{
 			if (!e)
@@ -99,12 +99,12 @@ namespace synthese
 				boost::system::error_code ignored_ec;
 				socket_.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ignored_ec);
 			}
-			
+
 			// No new asynchronous operations are started. This means that all shared_ptr
 			// references to the connection object will disappear and the object will be
 			// destroyed automatically after this handler returns. The connection class's
 			// destructor closes the socket.
 		}
-		
+
 	} // namespace server3
 } // namespace http

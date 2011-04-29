@@ -37,13 +37,13 @@ namespace synthese
 
 		/** Element of calendar template class.
 			@ingroup m19
-			
+
 			An element of a calendar describes a range of dates by several ways :
 				- single date d : minDate=d, maxDate=d
 				- date range from s to e : minDate=s, maxDate=e, interval=1
 				- day of a week from s to e : minDate=s, maxDate=e, interval=7
 				- the maxDate can be unknown date (unlimited range)
-			
+
 		*/
 		class CalendarTemplateElement
 		:	public virtual util::Registrable
@@ -58,7 +58,7 @@ namespace synthese
 				SUB = '-',
 				AND = '*'
 			};
-			
+
 		private:
 			//! @name Key
 			//@{

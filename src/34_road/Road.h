@@ -34,7 +34,7 @@ namespace synthese
 		class RoadPlace;
 		class RoadChunk;
 		class Address;
-		
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Contiguous part of a named road.
 		/// Road class.
@@ -61,9 +61,9 @@ namespace synthese
 			public graph::Path
 		{
 		public:
-			
-		  typedef enum { 
-			ROAD_TYPE_UNKNOWN, 
+
+		  typedef enum {
+			ROAD_TYPE_UNKNOWN,
 			ROAD_TYPE_MOTORWAY, /* autoroute */
 			ROAD_TYPE_MEDIANSTRIPPEDROAD,  /* route a chaussees separees (terre plein) */
 			ROAD_TYPE_PRINCIPLEAXIS, /* axe principal (au sens rue) */
@@ -108,7 +108,7 @@ namespace synthese
 		//@{
 			void setType (const RoadType& type);
 		//@}
-		
+
 		//! @name Services
 		//@{
 			RoadPlace* getRoadPlace() const;

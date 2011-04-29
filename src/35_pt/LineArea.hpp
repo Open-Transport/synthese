@@ -52,7 +52,7 @@ namespace synthese
 			void _addAllStops(
 				bool isForArrival
 			);
-			
+
 		public:
 			Edge::SubEdges getSubEdges() const;
 

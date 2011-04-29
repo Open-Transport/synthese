@@ -44,7 +44,7 @@ namespace synthese
 
 			@image html cap_admin_places.png
 			@image latex cap_admin_places.png "Maquette de l'écran de recherche de lieux" width=14cm
-			
+
 			<i>Titre de la fenêtre</i> :
 				- SYNTHESE Admin - Emplacements
 
@@ -64,7 +64,7 @@ namespace synthese
 					-# <tt>Nom</tt> : Nom de l'emplacement
 					-# Bouton <tt>Editer</tt> : Conduit vers la page synthese::interfaces::PlaceAdmin sur l'emplacement sélectionné
 				-# Un maximum de 50 emplacements est affiché à l'écran. En cas de dépassement de ce nombre d'après les critères de recherche, un lien <tt>Emplacements suivants</tt> apparait et permet de visualiser les entrées suivantes. A partir de la seconde page, un lien <tt>Emplacements précédents</tt> apparait également.
-			
+
 			<i>Sécurité</i>
 				- Une habilitation publique PlacesRight de niveau READ est nécessaire pour accéder à la page et pour utiliser toutes les fonctionnalités.
 				- Le résultat des recherches dépend du périmètre des habilitations de niveau READ et supérieur
@@ -89,20 +89,20 @@ namespace synthese
 			static const std::string PARAMETER_DEVICES_NUMBER;
 
 			BroadcastPointsAdmin();
-			
+
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
 
@@ -149,7 +149,7 @@ namespace synthese
 			/** Gets the opening position of the node in the tree view.
 				@return Always visible
 				@author Hugues Romain
-				@date 2008					
+				@date 2008
 			*/
 			virtual bool isPageVisibleInTree(
 				const AdminInterfaceElement& currentPage,

@@ -34,7 +34,7 @@ namespace synthese
 
 		/** NonPermanentService class.
 			@ingroup m35
-			
+
 			Use isActive to determinate if this service is provided a given day.
 			The date parameter corresponds to the departure date of the service from its origin
 			(warning: do not test the customer departure date which can be one or more days later;
@@ -64,13 +64,13 @@ namespace synthese
 
 			/** Marks a date on the calendar of the service.
 			 * Updates the calendar of the path too.
-			 * @param date the date to mark 
+			 * @param date the date to mark
 			 */
 			virtual void setActive(const boost::gregorian::date& d);
-			
+
 			/** Unmarks a date on the calendar of the service.
 			 * Updates the calendar of the path too.
-			 * @param date the date to unmark 
+			 * @param date the date to unmark
 			 */
 			virtual void setInactive(const boost::gregorian::date& d);
 

@@ -41,13 +41,13 @@ namespace synthese
 			Les entrées du journal de messages sont :
 				- envois de messages
 				- envois selon scénarios de diffusion
-				
+
 			Les colonnes additionnelles du journal de sécurité sont :
 				- Action : décrit l'action effectuée (ex : création de profil)
-				- UID objet concerné : 
+				- UID objet concerné :
 					- lien vers le message si envoi de message unique
 					- lien vers le scénario si envoi selon un scénario de diffusion
-			
+
 			@ingroup m17Logs refLogs
 		*/
 		class MessagesLog:
@@ -56,7 +56,7 @@ namespace synthese
 		public:
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
-			
+
 
 
 			static void AddNewScenarioMessageEntry(
@@ -95,7 +95,7 @@ namespace synthese
 				, const std::string& text
 				, const security::User* user
 				);
-			
+
 
 
 			/** Adds an Alarm deletion entry.

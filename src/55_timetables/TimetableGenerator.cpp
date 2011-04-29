@@ -74,7 +74,7 @@ namespace synthese
 					{
 						continue;
 					}
-					
+
 					// A0: JourneyPattern selection upon calendar
 					if (_baseCalendar.hasAtLeastOneCommonDateWith(line))
 					{
@@ -312,7 +312,7 @@ namespace synthese
 						break;
 					}
 				}
-				
+
 				if (!warn.get())
 				{
 					warn = result.getWarnings().insert(
@@ -325,7 +325,7 @@ namespace synthese
 					)	)	)	).first->second;
 					++nextNumber;
 				}
-				
+
 				itCol->setWarning(warn);
 			}
 		}
@@ -365,7 +365,7 @@ namespace synthese
 						dynamic_cast<const StopArea*>((*itEdge)->getHub())->getKey() == itRow->getPlace()->getKey() &&
 						(	_authorizedPhysicalStops.empty() ||
 							_authorizedPhysicalStops.find(dynamic_cast<const StopPoint*>((*itEdge)->getFromVertex())) != _authorizedPhysicalStops.end()
-						)	
+						)
 					){
 						lineIsSelected = true;
 						if (itRow->getIsArrival() || itRow->getCompulsory() == TimetableRow::PassageSuffisant)

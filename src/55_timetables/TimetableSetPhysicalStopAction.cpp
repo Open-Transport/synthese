@@ -43,7 +43,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace pt;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, timetables::TimetableSetPhysicalStopAction>::FACTORY_KEY("TimetableSetPhysicalStopAction");
@@ -53,9 +53,9 @@ namespace synthese
 	{
 		const string TimetableSetPhysicalStopAction::PARAMETER_PHYSICAL_STOP_ID = Action_PARAMETER_PREFIX + "pi";
 		const string TimetableSetPhysicalStopAction::PARAMETER_TIMETABLE_ID = Action_PARAMETER_PREFIX + "ti";
-		
-		
-		
+
+
+
 		ParametersMap TimetableSetPhysicalStopAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -69,9 +69,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void TimetableSetPhysicalStopAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -92,9 +92,9 @@ namespace synthese
 				throw ActionException("No such physical stop", e, *this);
 			}
 		}
-		
-		
-		
+
+
+
 		void TimetableSetPhysicalStopAction::run(
 			Request& request
 		){
@@ -108,9 +108,9 @@ namespace synthese
 			}
 			TimetableTableSync::Save(_timetable.get());
 		}
-		
-		
-		
+
+
+
 		bool TimetableSetPhysicalStopAction::isAuthorized(
 			const Session* session
 		) const {

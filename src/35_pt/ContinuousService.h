@@ -49,7 +49,7 @@ namespace synthese
 
 			boost::posix_time::time_duration			_range;				//!< Continuous service range (minutes).
 			boost::posix_time::time_duration			_maxWaitingTime;	//!< Max waiting waiting time before next service.
-			
+
 
 		public:
 
@@ -63,7 +63,7 @@ namespace synthese
 
 			~ContinuousService ();
 
-		    
+
 			//! @name Getters
 			//@{
 				boost::posix_time::time_duration getMaxWaitingTime () const;
@@ -90,7 +90,7 @@ namespace synthese
 					@return A full ServicePointer to the service. If the service cannot be used at the specified date/time, then the ServicePointer points to a NULL service.
 					@author Hugues Romain
 					@date 2007-2010
-					@warning The service index is unknown in the generated ServicePointer.					
+					@warning The service index is unknown in the generated ServicePointer.
 				*/
 				virtual graph::ServicePointer getFromPresenceTime(
 					bool RTData,

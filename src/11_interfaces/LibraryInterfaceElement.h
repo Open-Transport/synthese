@@ -65,7 +65,7 @@ namespace synthese
 			void setPage(const InterfacePage* page);
 
 			virtual std::string getLabel() const { return std::string(); }
-			
+
 			void parse( const std::string& text );
 
 			/** Library page element creation.
@@ -93,7 +93,7 @@ namespace synthese
 					- it can write outputs on the stream : parameter stream
 					- it can write (and read) local variables : parameter variables
 					- it can return a label to go after the display
-				
+
 				@param stream Stream to write the output on
 				@param parameters Execution parameters
 				@param variables Execution variables

@@ -48,7 +48,7 @@ namespace synthese
 		class MapRequest:
 			public util::FactorableTemplate<server::Function, MapRequest>
 		{
-		
+
 		private:
 			//! @name Query
 			//@{
@@ -72,13 +72,13 @@ namespace synthese
 			/** Conversion from attributes to generic parameter maps.
 			 */
 			server::ParametersMap _getParametersMap() const;
-			
+
 			/** Conversion from generic parameters map to attributes.
 			 */
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			
+
 			static const std::string OUTPUT_PARAMETER;
 			static const std::string DATA_PARAMETER;
 			static const std::string MAP_PARAMETER;
@@ -86,11 +86,11 @@ namespace synthese
 
 			MapRequest();
 			MapRequest(const MapRequest& value);
-			
+
 			//! @name Setters
 			//@{
-				
-				
+
+
 				/** Sets and parse the data to be used for drawing the map.
 					The call of this setter is useless if _useEnvironment is set to true / default.
 					@param value the data provided in XML format
@@ -98,19 +98,19 @@ namespace synthese
 					@date 2008
 				*/
 				void setData(const std::string& value);
-				
-				
+
+
 				/** Sets and parse the map XML query.
 					@warning the setUseEnvironment and/or the setData method must be launched before setQuery.
 					@param value the XML Query
 					@author Hugues Romain
-					@date 2008			
+					@date 2008
 				*/
 				void setQuery(const std::string& value);
 				void setOutput(const std::string& value);
 				void setUseEnvironment(bool value);
 			//@}
-		
+
 			/** Action to run, defined by each subclass.
 			 */
 			void run(std::ostream& stream, const server::Request& request) const;

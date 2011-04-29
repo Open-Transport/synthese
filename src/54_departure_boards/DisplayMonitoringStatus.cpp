@@ -559,13 +559,13 @@ namespace synthese
 			{
 			case DISPLAY_MONITORING_OK:
 				return "OK";
-			
+
 			case DISPLAY_MONITORING_ERROR:
 				return "Error";
-			
+
 			case DISPLAY_MONITORING_UNKNOWN:
 				return "Unknown";
-			
+
 			case DISPLAY_MONITORING_WARNING:
 				return "Warning";
 			}

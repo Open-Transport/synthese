@@ -67,7 +67,7 @@ namespace synthese
 			std::string open() const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// @param name name of the field
 			/// @param value value of the field

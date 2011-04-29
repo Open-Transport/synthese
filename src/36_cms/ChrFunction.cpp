@@ -35,11 +35,11 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::ChrFunction>::FACTORY_KEY("char");
-	
+
 	namespace cms
 	{
 		const string ChrFunction::PARAMETER_CODE("code");
-		
+
 		ParametersMap ChrFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -58,9 +58,9 @@ namespace synthese
 		) const {
 			stream << atoi(_code.c_str());
 		}
-		
-		
-		
+
+
+
 		bool ChrFunction::isAuthorized(
 			const Session* session
 		) const {

@@ -47,7 +47,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<Profile>	_profile;
 			boost::shared_ptr<const Right>	_right;
-			
+
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
@@ -64,7 +64,7 @@ namespace synthese
 			void run(server::Request& request);
 
 			virtual bool isAuthorized(const server::Session* session) const;
-			
+
 			void setProfile(boost::shared_ptr<const Profile> value);
 		};
 	}

@@ -24,7 +24,7 @@
 #include <string>
 
 
-#if defined(UNIX) 
+#if defined(UNIX)
   #include <unistd.h>
 #endif
 
@@ -85,8 +85,8 @@ int main( int argc, char **argv )
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
-    po::notify(vm);    
-    
+    po::notify(vm);
+
     if (vm.count("help")) {
 	std::cout << desc << std::endl;
 	return 1;
@@ -98,18 +98,18 @@ int main( int argc, char **argv )
 
     char buf[1024*64];
 
-    
+
 
     // No timeout !
     int timeout = 0;
     TcpClientSocket clientSock (host, port, timeout);
-		
+
     while (clientSock.isConnected () == false)
     {
 	clientSock.tryToConnect ();
 	Thread::Sleep (500);
     }
-    
+
     // The client is connected.
 
     // Create commodity stream:
@@ -123,11 +123,11 @@ int main( int argc, char **argv )
 
     // R = Replication
     // L = Local node only
-    cliSocketStream << (withoutReplication ? 'L' : 'R');  
+    cliSocketStream << (withoutReplication ? 'L' : 'R');
 
     message << buf;
 
-    if (isInteractive) 
+    if (isInteractive)
 	std::cout << message.str () << std::endl;
 
     try
@@ -140,29 +140,29 @@ int main( int argc, char **argv )
 
 	    std::stringstream reply;
 	    Compression::ZlibDecompress (cliSocketStream, reply);
-	    
+
 	    // Keeps first two characters as error code.
 	    std::string errorCode;
 	    errorCode += ((char) reply.get ());
 	    errorCode += ((char) reply.get ());
-		    
+
 	    if (errorCode == "00")
 	    {
 		// Everything went fine. Do not dump the answer in non-interactive mode
 	    }
-	    else 
+	    else
 	    {
 		boost::iostreams::copy (reply, std::cerr);
 		std::cerr << std::endl;
 	    }
-	    
+
 	}
-	else 
+	else
 	{
 	    std::stringstream input;
 	    char c;
 	    std::cout << "? ";
-	    
+
 	    int nbStatements;
 	    bool processIt (false);
 	    while (!std::cin.eof ())
@@ -175,35 +175,35 @@ int main( int argc, char **argv )
 
 		    std::stringstream reply;
 		    Compression::ZlibDecompress (cliSocketStream, reply);
-		    
+
 		    // Keeps first two characters as error code.
 		    std::string errorCode;
 		    errorCode += ((char) reply.get ());
 		    errorCode += ((char) reply.get ());
-		    
+
 		    if (errorCode == "00")
 		    {
 			// Everything went fine. Dump the answer
 			boost::iostreams::copy (reply, std::cout);
 			std::cout << std::endl;
 		    }
-		    else 
+		    else
 		    {
 			// Error!
 			boost::iostreams::copy (reply, std::cerr);
 			std::cerr << std::endl;
 		    }
 		    ++nbStatements;
-		    
+
 		    // Clear temporary stringstream
 		    input.str ("");
 		    std::cout << "? ";
 		}
 	    }
-	    
+
 	}
-    } 
-	
+    }
+
     catch (synthese::Exception& ex)
     {
 	Log::GetInstance ().fatal ("Exit!", ex);
@@ -211,7 +211,7 @@ int main( int argc, char **argv )
 
     cliSocketStream.close ();
 
-    
+
 }
 
 

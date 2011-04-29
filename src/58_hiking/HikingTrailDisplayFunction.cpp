@@ -38,11 +38,11 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<hiking::HikingTrailDisplayFunction::_FunctionWithSite,hiking::HikingTrailDisplayFunction>::FACTORY_KEY("HikingTrailDisplayFunction");
-	
+
 	namespace hiking
 	{
 		const string HikingTrailDisplayFunction::PARAMETER_KEY("key");
-		
+
 		ParametersMap HikingTrailDisplayFunction::_getParametersMap() const
 		{
 			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
@@ -93,9 +93,9 @@ namespace synthese
 				stream << _hikingTrail->getURL();
 			}
 		}
-		
-		
-		
+
+
+
 		bool HikingTrailDisplayFunction::isAuthorized(
 			const Session* session
 		) const {

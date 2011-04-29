@@ -48,7 +48,7 @@ namespace synthese
 	using namespace security;
 	using namespace server;
 	using namespace html;
-	
+
 	namespace dblog
 	{
 		const string DBLogHTMLView::PARAMETER_PREFIX = "dblhv";
@@ -88,7 +88,7 @@ namespace synthese
 			std::string searchText
 		){
 			const string FACTORY_KEY("LogViewer");
-			
+
 			// Log key
 			setLogKey(logKey);
 
@@ -133,7 +133,7 @@ namespace synthese
 				_fixedLevel = false;
 			}
 			_searchLevel = searchLevel;
-			
+
 			// Text
 			if(searchText.empty())
 			{
@@ -173,16 +173,16 @@ namespace synthese
 				PARAMETER_PREFIX  + _code
 			);
 		}
-		
-		
-		
+
+
+
 		std::string DBLogHTMLView::_getParameterName(
 			const std::string& parameter
 		) const {
 			return PARAMETER_PREFIX + _code + parameter;
 		}
-		
-		
+
+
 		void DBLogHTMLView::display(
 			std::ostream& stream,
 			const Request& searchRequest,
@@ -248,7 +248,7 @@ namespace synthese
 				}
 				stream << st.close();
 			}
-			
+
 			ResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(_getParameterName(PARAMETER_SEARCH_TYPE), "Type"));
 			v.push_back(make_pair(_getParameterName(PARAMETER_START_DATE), "Date"));
@@ -356,11 +356,11 @@ namespace synthese
 					stream << t.col() << col;
 				}
 			}
-			
+
 			stream << t.close();
 
 		}
-		
+
 		string DBLogHTMLView::getLogKey() const
 		{
 			return
@@ -368,9 +368,9 @@ namespace synthese
 				_dbLog->getFactoryKey() :
 				string();
 		}
-		
-		
-		
+
+
+
 		string DBLogHTMLView::getLogName() const
 		{
 			return
@@ -378,9 +378,9 @@ namespace synthese
 				_dbLog->getName() :
 				string();
 		}
-		
-		
-		
+
+
+
 		void DBLogHTMLView::setLogKey(const string& value)
 		{
 			if (!Factory<DBLog>::contains(value))
@@ -390,17 +390,17 @@ namespace synthese
 			}
 			_dbLog.reset(Factory<DBLog>::create(value));
 		}
-		
-		
-		
+
+
+
 		bool DBLogHTMLView::isAuthorized(
 			const security::Profile& profile
 		) const {
 			return _dbLog.get() && _dbLog->isAuthorized(profile, READ);
 		}
-		
-		
-		
+
+
+
 		ParametersMap DBLogHTMLView::getParametersMap(
 		) const {
 			ParametersMap m(_requestParameters.getParametersMap());

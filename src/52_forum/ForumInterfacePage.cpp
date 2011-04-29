@@ -66,7 +66,7 @@ namespace synthese
 			std::size_t rank
 		){
 			ParametersMap pm(request.getFunction()->getSavedParameters());
-			
+
 			Env env;
 			ForumMessageTableSync::SearchResult messages(
 				ForumMessageTableSync::Search(

@@ -32,7 +32,7 @@ namespace synthese
 	using namespace db;
 	using namespace server;
 	using namespace security;
-	
+
 	template<> const string util::FactorableTemplate<DBTableSync,DbModuleConfigTableSync>::FACTORY_KEY(
 		"999 db config"
 	);
@@ -55,7 +55,7 @@ namespace synthese
 			DBTableSync::Field(DbModuleConfigTableSync::COL_PARAMVALUE, SQL_DATETIME),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<DbModuleConfigTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index()
@@ -97,14 +97,14 @@ namespace synthese
 
 	namespace server
 	{
-		void 
+		void
 		DbModuleConfigTableSync::rowsAdded(
-			DB* db, 
+			DB* db,
 			const DBResultSPtr& rows
 		){
 			while (rows->next ())
 			{
-				ModuleClass::SetParameter (rows->getText (COL_PARAMNAME), 
+				ModuleClass::SetParameter (rows->getText (COL_PARAMNAME),
 						     rows->getText (COL_PARAMVALUE));
 			}
 		}
@@ -112,7 +112,7 @@ namespace synthese
 
 
 		void DbModuleConfigTableSync::rowsUpdated(
-			DB* db, 
+			DB* db,
 			const DBResultSPtr& rows
 		){
 		    rowsAdded (db, rows);
@@ -120,7 +120,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		DbModuleConfigTableSync::rowsRemoved(
 			DB* db,
 			const RowIdList& rowIds

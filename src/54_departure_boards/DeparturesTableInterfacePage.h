@@ -39,9 +39,9 @@ namespace synthese
 	namespace departure_boards
 	{
 		/** Departures table.
-			
+
 			@code departure_boards P1 P2 P3 @endcode
-			
+
 			Available data :
 				- 0 : Title of the screen
 				- 1 : Wiring code
@@ -52,7 +52,7 @@ namespace synthese
 				- 6 : text : name of the stop
 				- 7 : blinking_delay : blinking delay
 				- 8 : 1|0 : Clock display
-				
+
 			Object :
 				- result of table generation
 

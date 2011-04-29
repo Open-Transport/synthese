@@ -65,13 +65,13 @@ namespace synthese
 	typedef std::map<boost::optional<util::RegistryKeyType>,const pt::StopArea*> ForbiddenPlacesList;
 	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;
 	typedef enum { ENDS_ONLY = 1, WITH_PASSING = 0 } EndFilter;
-	
+
 	struct DeparturesTableElementLess : public std::binary_function<graph::ServicePointer, graph::ServicePointer, bool>
 	{
 		bool operator()(const graph::ServicePointer& _Left, const graph::ServicePointer& _Right) const
 		{
 			return (_Left.getDepartureDateTime() < _Right.getDepartureDateTime()
-				|| _Left.getDepartureDateTime() == _Right.getDepartureDateTime() 
+				|| _Left.getDepartureDateTime() == _Right.getDepartureDateTime()
 				&& _Left.getDepartureEdge() < _Right.getDepartureEdge()
 				);
 		}
@@ -111,13 +111,13 @@ namespace synthese
 		IntermediateStop(const pt::StopArea* _place, const graph::ServicePointer& _serviceUse) : place(_place), serviceUse(_serviceUse) {}
 	};
 
-	
+
 	typedef std::map<
 		graph::ServicePointer,
 		ActualDisplayedArrivalsList,
 		DeparturesTableElementLess
 	> ArrivalDepartureList;
-	
+
 	typedef ArrivalDepartureList::value_type ArrivalDepartureRow;
 
 	struct ArrivalDepartureListWithAlarm

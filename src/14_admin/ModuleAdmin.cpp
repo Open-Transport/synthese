@@ -60,7 +60,7 @@ namespace synthese
 		ModuleAdmin::ModuleAdmin()
 			: AdminInterfaceElementTemplate<ModuleAdmin>()
 		{ }
-		
+
 		void ModuleAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -75,18 +75,18 @@ namespace synthese
 				throw AdminParametersException("Invalid Module Key");
 			}
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap ModuleAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(_moduleClass.get()) m.insert(PARAMETER_MODULE, _moduleClass->getFactoryKey());
 			return m;
 		}
-		
-		
-		
+
+
+
 		void ModuleAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -101,7 +101,7 @@ namespace synthese
 			stream << "<h1>Pages d'administration</h1>";
 
 			stream << "Les liens suivants donnent accès aux pages d'administration du module " << _moduleClass->getName() << ".</p>";
-			
+
 			stream << "<ul>";
 
 			AdminRequest r(_request, true);
@@ -121,12 +121,12 @@ namespace synthese
 		) const	{
 			return true;
 		}
-		
+
 		AdminInterfaceElement::PageLinks ModuleAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
 
 			Factory<AdminInterfaceElement>::ObjectsCollection pages(Factory<AdminInterfaceElement>::GetNewCollection());
@@ -155,18 +155,18 @@ namespace synthese
 		) const	{
 			return true;
 		}
-		
+
 		boost::shared_ptr<const server::ModuleClass> ModuleAdmin::getModuleClass() const
 		{
 			return _moduleClass;
 		}
-		
+
 		void ModuleAdmin::setModuleClass(boost::shared_ptr<const server::ModuleClass> value)
 		{
 			_moduleClass = value;
 		}
-		
-		
+
+
 		bool ModuleAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _moduleClass->getFactoryKey() == static_cast<const ModuleAdmin&>(other)._moduleClass->getFactoryKey();

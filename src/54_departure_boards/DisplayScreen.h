@@ -84,7 +84,7 @@ namespace synthese
 						- Tableau d'arrivée chronologique
 						- Tableau d'arrivée à provenance privilégiée
 				- Format de sortie (défini par l'interface utilisée)
-				- Paramétrage du contenu généré par la fonction : 
+				- Paramétrage du contenu généré par la fonction :
 						- Titre
 						- Nombre de départs ou d'arrivées
 						- Filtre de terminus (sert à n'afficher que les lignes ayant pour origine le lieu affiché)
@@ -162,7 +162,7 @@ namespace synthese
 				GenerationMethod			_generationMethod;
 				DisplayedPlacesList			_forcedDestinations;	//!< Destinations to display absolutely
 				int							_destinationForceDelay;	//!< Durée pendant laquelle une destination est forcée
-			
+
 			//@}
 
 			//! \name Maintenance
@@ -235,7 +235,7 @@ namespace synthese
 				void	setTitle(const std::string&);
 				void	setTrackNumberDisplay(bool value);
 				void	setType(const DisplayType*);
-				void	setWiringCode(int);				
+				void	setWiringCode(int);
 				void	setDisplayTeam(bool value);
 				void	setDisplayClock(bool value);
 				void	setComPort(int value);
@@ -259,11 +259,11 @@ namespace synthese
 				void	removeForbiddenPlace(const pt::StopArea*);
 				void	removeForcedDestination(const pt::StopArea*);
 				void	removePhysicalStop(const pt::StopPoint*);
-				
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Adds a destination by transfer to display if necessary.
 				/// @param transferPlace place to the transfer must be
-				/// @param destinationPlace destination place 
+				/// @param destinationPlace destination place
 				void addTransferDestination(
 					TransferDestinationsList::key_type transferPlace,
 					TransferDestinationsList::mapped_type::value_type destinationPlace
@@ -272,7 +272,7 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Remove a destination by transfer to display if necessary.
 				/// @param transferPlace place to the transfer must be
-				/// @param destinationPlace destination place 
+				/// @param destinationPlace destination place
 				void removeTransferDestination(
 					TransferDestinationsList::key_type transferPlace,
 					TransferDestinationsList::mapped_type::value_type destinationPlace

@@ -43,24 +43,24 @@ namespace synthese
 				size_t levenshtein;
 				double phoneticScore;
 			};
-			
+
 		private:
 			typedef std::vector<FrenchPhoneticString> _Words;
 			std::string		_source;
 			_Words			_words;
-			
+
 			static std::string	_ConvertAlias(const std::string& source);
-			
-			
+
+
 		public:
 			FrenchSentence();
 			FrenchSentence(const std::string& source);
-			
+
 			const std::string& getSource() const;
 			std::string getPhoneticString() const;
-			
+
 			ComparisonScore compare(const FrenchSentence& s) const;
-			
+
 			bool operator<(const FrenchSentence& s) const;
 			bool operator==(const FrenchSentence& s) const;
 

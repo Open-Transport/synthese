@@ -46,11 +46,11 @@ namespace synthese
 	using namespace pt;
 
 	template<> const string util::FactorableTemplate<Function,pt::PhysicalStopsCSVExportFunction>::FACTORY_KEY("PhysicalStopsCSVExportFunction");
-	
+
 	namespace pt
 	{
 		const string PhysicalStopsCSVExportFunction::PARAMETER_BBOX("bbox");
-		
+
 		ParametersMap PhysicalStopsCSVExportFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -71,7 +71,7 @@ namespace synthese
 			{
 				vector< string > parsed_bbox;
 				split(parsed_bbox, bbox, is_any_of(",; ") );
-				
+
 				if(parsed_bbox.size() != 4)
 				{
 					throw RequestException("Malformed bbox.");
@@ -90,7 +90,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const	{
-			
+
 			stream << fixed;
 			BOOST_FOREACH(Registry<StopPoint>::value_type itps, Env::GetOfficialEnv().getRegistry<StopPoint>())
 			{
@@ -118,9 +118,9 @@ namespace synthese
 				;
 			}
 		}
-		
-		
-		
+
+
+
 		bool PhysicalStopsCSVExportFunction::isAuthorized(const Session* session) const
 		{
 			return true;

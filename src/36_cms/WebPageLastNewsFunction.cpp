@@ -46,13 +46,13 @@ namespace synthese
 	using namespace html;
 
 	template<> const string util::FactorableTemplate<Function,cms::WebPageLastNewsFunction>::FACTORY_KEY("last_news");
-	
+
 	namespace cms
 	{
 		const string WebPageLastNewsFunction::PARAMETER_ROOT_ID("root");
 		const string WebPageLastNewsFunction::PARAMETER_DISPLAY_PAGE_ID("display_page");
 		const string WebPageLastNewsFunction::PARAMETER_MAX_NUMBER("number");
-		
+
 		ParametersMap WebPageLastNewsFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -187,9 +187,9 @@ namespace synthese
 				stream << "</channel></rss>";
 			}
 		}
-		
-		
-		
+
+
+
 		bool WebPageLastNewsFunction::isAuthorized(
 			const Session* session
 		) const {

@@ -50,7 +50,7 @@ namespace synthese
 		private:
 			typedef std::vector<boost::shared_ptr<SQLExpression> > WheresType;
 			typedef std::vector<std::pair<boost::shared_ptr<SQLExpression>, bool> > OrdersType;
-			
+
 			WheresType _wheres;
 			OrdersType _orders;
 			std::size_t _number;

@@ -76,7 +76,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_CITY_NAME("cn");
 		const string DisplayScreenContentFunction::PARAMETER_STOP_NAME("sn");
 		const string DisplayScreenContentFunction::PARAMETER_LINE_ID("lineid");
-		
+
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_TEAM("display_team");
@@ -106,7 +106,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_RANK_IN_PATH("rank_in_path");
 		const string DisplayScreenContentFunction::DATA_DESTINATIONS("destinations");
 		const string DisplayScreenContentFunction::DATA_DIRECTION("direction");
-		
+
 		const string DisplayScreenContentFunction::DATA_IS_SAME_CITY("is_same_city");
 		const string DisplayScreenContentFunction::DATA_IS_END_STATION("is_end_station");
 		const string DisplayScreenContentFunction::DATA_DESTINATION_RANK("destination_rank");
@@ -149,15 +149,15 @@ namespace synthese
 				{
 					id = map.getDefault<RegistryKeyType>(PARAMETER_TB, 0);
 				}
-				
+
 				// Way 1 : pre-configured display screen
-				
+
 				// 1.1 by id
 				if (decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
 				{
 					_screen = DisplayScreenTableSync::Get(id, *_env);
 				}
-				
+
 				// 1.2 by mac address
 				else if(!map.getDefault<string>(PARAMETER_MAC_ADDRESS).empty())
 				{
@@ -285,7 +285,7 @@ namespace synthese
 					}
 					_screen.reset(screen);
 				}
-				
+
 				// Date
 				if(!map.getDefault<string>(PARAMETER_DATE).empty() && map.getDefault<string>(PARAMETER_DATE) != "A")
 				{
@@ -752,7 +752,7 @@ namespace synthese
 				// Time
 				pm.insert(DATA_TIME, to_iso_extended_string(row.first.getDepartureDateTime().date()) + " " + to_simple_string(row.first.getDepartureDateTime().time_of_day()));
 				pm.insert(DATA_PLANNED_TIME, to_iso_extended_string(row.first.getTheoreticalDepartureDateTime().date()) + " " + to_simple_string(row.first.getTheoreticalDepartureDateTime().time_of_day()));
-			
+
 				// Delay
 				pm.insert(
 					DATA_DELAY,
@@ -796,7 +796,7 @@ namespace synthese
 					for(size_t rank(1); rank < row.second.size(); ++rank)
 					{
 						const IntermediateStop& stop(row.second.at(rank));
-						
+
 						DisplayDepartureBoardDestination(
 							destinationsStream,
 							request,
@@ -979,7 +979,7 @@ namespace synthese
 
 			PTObjectsCMSExporters::ExportLine(pm, *line->getCommercialLine());
 			PTObjectsCMSExporters::ExportStopArea(pm, *place);
-			
+
 			{ // Departure time
 				stringstream s;
 				s <<
@@ -1049,7 +1049,7 @@ namespace synthese
 			{
 				stringstream rowsStream;
 				const RoutePlanningList& ptds(rows.map);
-				
+
 				// Sort of the rows
 				typedef map<string,RoutePlanningList::const_iterator> SortedRows;
 				SortedRows sortedRows;
@@ -1139,7 +1139,7 @@ namespace synthese
 			pm.insert(DATA_WITH_TRANSFER, withTransfer);
 			pm.insert(DATA_DISPLAY_TRACK_NUMBER, displayQuaiNumber);
 			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, displayServiceNumber);
-			
+
 			{ // Destination
 				stringstream str;
 				if(destinationPage.get())

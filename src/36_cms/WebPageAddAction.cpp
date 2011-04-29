@@ -41,7 +41,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, cms::WebPageAddAction>::FACTORY_KEY("WebPageAddAction");
@@ -53,9 +53,9 @@ namespace synthese
 		const string WebPageAddAction::PARAMETER_SITE_ID = Action_PARAMETER_PREFIX + "si";
 		const string WebPageAddAction::PARAMETER_TEMPLATE_ID = Action_PARAMETER_PREFIX + "te";
 		const string WebPageAddAction::PARAMETER_PARENT_ID = Action_PARAMETER_PREFIX + "pi";
-		
-		
-		
+
+
+
 		ParametersMap WebPageAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -74,9 +74,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void WebPageAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_title = map.getDefault<string>(PARAMETER_TITLE);
@@ -155,9 +155,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		void WebPageAddAction::run(
 			Request& request
 		){
@@ -194,9 +194,9 @@ namespace synthese
 
 //			::AddCreationEntry(object, request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool WebPageAddAction::isAuthorized(
 			const Session* session
 		) const {
