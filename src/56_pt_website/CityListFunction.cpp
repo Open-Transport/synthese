@@ -140,7 +140,7 @@ namespace synthese
 						{
 							continue;
 						}
-						stream << "<option type=\"city\" score=\"" << it.score.phoneticScore << "\">" << it.key.getSource() << "</option>";
+						stream << "<option type=\"city\" score=\"" << it.score.phoneticScore << "\">" << it.value->getName() << "</option>";
 					}
 					stream << "</options>";
 				}
