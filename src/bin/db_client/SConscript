@@ -1,7 +1,7 @@
 Import ('s3env')
 
 CppBinProject(
-	s3env, 's3-db-client', s3env['S3VERSION'], 
+	s3env, 's3-db-client', s3env['S3VERSION'],
 	source_files = s3env.Glob ('main.cpp'),
 	dependencies = ['s3-db.cpplib', 's3-util-iostreams.cpplib', 'boost.cppinc', 'boost-program-options.cpplib'],
 )
