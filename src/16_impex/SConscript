@@ -7,7 +7,7 @@ if s3env.GetPlatform () == 'win32':
 CppSynthese3LibProject(
 	s3env,
 	's3-impex',
-	s3env['S3VERSION'], 
+	s3env['S3VERSION'],
 	source_files = s3env.Glob ('*.cpp'),
 	dependencies = deps,
 )
