@@ -216,9 +216,15 @@ namespace synthese
 		// Stop cells
 		const string RoutePlannerFunction::DATA_IS_ARRIVAL("is_arrival");
 		const string RoutePlannerFunction::DATA_IS_TERMINUS("is_terminus");
-		const string RoutePlannerFunction::DATA_STOP_NAME("stop_name");
+		const string RoutePlannerFunction::DATA_STOP_AREA_NAME("stop_name");
 		const string RoutePlannerFunction::DATA_LONGITUDE("longitude");
 		const string RoutePlannerFunction::DATA_LATITUDE("latitude");
+		const string RoutePlannerFunction::DATA_DEPARTURE_STOP_NAME("departure_stop_name");
+		const string RoutePlannerFunction::DATA_DEPARTURE_LONGITUDE("departure_longitude");
+		const string RoutePlannerFunction::DATA_DEPARTURE_LATITUDE("departure_latitude");
+		const string RoutePlannerFunction::DATA_ARRIVAL_STOP_NAME("arrival_stop_name");
+		const string RoutePlannerFunction::DATA_ARRIVAL_LONGITUDE("arrival_longitude");
+		const string RoutePlannerFunction::DATA_ARRIVAL_LATITUDE("arrival_latitude");
 		const string RoutePlannerFunction::DATA_IS_LAST_LEG("is_last_leg");
 
 		// Junction cells
@@ -2335,13 +2341,14 @@ namespace synthese
 								content,
 								stopCellPage,
 								request,
-								false
-								, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
-								, false
-								, *static_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex())
-								, __Couleur
-								, leg.getDepartureDateTime()
-								, journey.getContinuousServiceRange(),
+								false,
+								NULL, // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
+								false,
+								NULL,
+								static_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()),
+								__Couleur,
+								leg.getDepartureDateTime(),
+								journey.getContinuousServiceRange(),
 								false
 							);
 
@@ -2387,13 +2394,14 @@ namespace synthese
 							content,
 							stopCellPage,
 							request,
-							true
-							, NULL // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
-							, leg.getArrivalEdge()->getHub() == leg.getService()->getPath()->getEdges().back()->getHub()
-							, *static_cast<const StopPoint*>(leg.getArrivalEdge()->getFromVertex())
-							, __Couleur
-							, leg.getArrivalDateTime()
-							, journey.getContinuousServiceRange(),
+							true,
+							NULL, // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
+							leg.getArrivalEdge()->getHub() == leg.getService()->getPath()->getEdges().back()->getHub(),
+							static_cast<const StopPoint*>(leg.getArrivalEdge()->getFromVertex()),
+							it+1 != services.end() ? static_cast<const StopPoint*>((it+1)->getDepartureEdge()->getFromVertex()) : NULL,
+							__Couleur,
+							leg.getArrivalDateTime(),
+							journey.getContinuousServiceRange(),
 							it+1 == services.end()
 						);
 
@@ -2445,8 +2453,20 @@ namespace synthese
 
 
 
-		void RoutePlannerFunction::DisplayStopCell( std::ostream& stream, boost::shared_ptr<const cms::Webpage> page, const server::Request& request, bool isItArrival, const messages::SentAlarm* alarm, bool isItTerminus, const pt::StopPoint& physicalStop, bool color, const boost::posix_time::ptime& time, boost::posix_time::time_duration continuousServiceRange, bool isLastLeg )
-		{
+		void RoutePlannerFunction::DisplayStopCell(
+			std::ostream& stream,
+			boost::shared_ptr<const cms::Webpage> page,
+			const server::Request& request,
+			bool isItArrival,
+			const messages::SentAlarm* alarm,
+			bool isItTerminus,
+			const pt::StopPoint* arrivalPhysicalStop,
+			const pt::StopPoint* departurePhysicalStop,
+			bool color,
+			const boost::posix_time::ptime& time,
+			boost::posix_time::time_duration continuousServiceRange,
+			bool isLastLeg
+		){
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			ptime endRangeTime(time);
@@ -2463,7 +2483,40 @@ namespace synthese
 			}
 
 			pm.insert(DATA_IS_TERMINUS, isItTerminus);
-			pm.insert(DATA_STOP_NAME, dynamic_cast<const NamedPlace&>(*physicalStop.getHub()).getFullName());
+			pm.insert(DATA_STOP_AREA_NAME, dynamic_cast<const NamedPlace&>(*physicalStop.getHub()).getFullName());
+
+			if(arrivalPhysicalStop)
+			{
+				pm.insert(DATA_ARRIVAL_STOP_NAME, arrivalPhysicalStop->getName());
+				// Point
+				if(	arrivalPhysicalStop.getGeometry().get() &&
+					!arrivalPhysicalStop.getGeometry()->isEmpty()
+				){
+					shared_ptr<Point> point(
+						CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+							*arrivalPhysicalStop.getGeometry()
+					)	);
+					pm.insert(DATA_LONGITUDE, point->getX());
+					pm.insert(DATA_LATITUDE, point->getY());
+				}
+			}
+
+			if(departurePhysicalStop)
+			{
+				pm.insert(DATA_DEPARTURE_STOP_NAME, departurePhysicalStop->getName());
+				// Point
+				if(	departurePhysicalStop.getGeometry().get() &&
+					!departurePhysicalStop.getGeometry()->isEmpty()
+				){
+					shared_ptr<Point> point(
+						CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+							*departurePhysicalStop.getGeometry()
+					)	);
+					pm.insert(DATA_DEPARTURE_LONGITUDE, point->getX());
+					pm.insert(DATA_DEPARTURE_LATITUDE, point->getY());
+				}
+			}
+
 			pm.insert(DATA_ODD_ROW, color);
 			{
 				stringstream s;
@@ -2480,18 +2533,6 @@ namespace synthese
 					s << setw(2) << setfill('0') << endRangeTime.time_of_day().hours() << ":" << setw(2) << setfill('0') << endRangeTime.time_of_day().minutes();
 				}
 				pm.insert(DATA_LAST_TIME, s.str()); // 7
-			}
-
-			// Point
-			if(	physicalStop.getGeometry().get() &&
-				!physicalStop.getGeometry()->isEmpty()
-			){
-				shared_ptr<Point> point(
-					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-						*physicalStop.getGeometry()
-				)	);
-				pm.insert(DATA_LONGITUDE, point->getX());
-				pm.insert(DATA_LATITUDE, point->getY());
 			}
 
 			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
